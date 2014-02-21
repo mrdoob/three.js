@@ -11,13 +11,29 @@ Sidebar.Location = function ( editor ) {
     var veglist = new UI.FancySelect().setId( 'veglist' ).onChange( function () {
         var input = document.createElement( 'input' );
         input.type = 'file';
+        
         input.addEventListener( 'change', function ( event ) {
-            console.log( input.files[0] );
-            editor.loader.loadFile( input.files[ 0 ] );
+            //console.log( input.files[0] );
+            //editor.loader.loadFile( input.files[ 0 ] );
         } );
+        
         //signals.vegChanged.dispatch( veglist.getValue() );
+        
         var vegAddButton = new UI.Button( 'Add' ).onClick( function() {
-            input.click();
+            //input.click();
+
+            var callback = function( geometry, materials ) {
+
+                var default_mat = new THREE.MeshBasicMaterial( { color: 0xdddddd } );        
+                var vegmesh = new THREE.Mesh( geometry, default_mat );
+                vegmesh.name = veglist.options[veglist.getValue()].innerHTML + " 1";
+                editor.addObject( vegmesh );
+               
+            }
+    
+            var mloader = new THREE.ColladaLoader();
+            mloader.load("media/river_birch.DAE", callback); // FIXME
+
         } );
         veginfoPanel.clear();
         veginfoPanel.add( new UI.Text( veglist.options[veglist.getValue()].innerHTML ) );

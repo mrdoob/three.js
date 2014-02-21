@@ -24,6 +24,7 @@ function createTreeAtPos( x, y, z ) {
     
     var	mloader = new THREE.JSONLoader();
     mloader.load("../../streetview-studio/models/tree.js", callback); // FIXME
+    
 }
 
 function createGround() {
