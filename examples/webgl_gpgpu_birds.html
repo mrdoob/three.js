@@ -392,15 +392,24 @@
 			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
 			THREE.BirdGeometry = function () {
 
+				var triangles = BIRDS * 3;
+				var points = triangles * 3;
+
 				THREE.BufferGeometry.call( this );
-				// THREE.Geometry2.call( this, BIRDS * 3 );
+				// THREE.Geometry2.call( this, points );
 
-				var triangles = 3 * BIRDS;
+				var vertices = new Float32Array( points * 3 );
+				var birdColors = new Float32Array( points * 3 );
+				var references = new Float32Array( points * 2 );
+				var birdVertex = new Float32Array( points );
 
-				// this.addAttribute( 'index', Uint16Array, triangles * 3, 1 );
-				var vertices = this.addAttribute( 'position', Float32Array, triangles * 3, 3 ).array;
-				// this.addAttribute( 'normal', Float32Array, triangles * 3, 3 );
-				// this.addAttribute( 'color', Float32Array, triangles * 3, 3 );
+				this.addAttribute( 'position', vertices, 3 );
+				this.addAttribute( 'birdColor', birdColors, 3 );
+				this.addAttribute( 'reference', references, 2 );
+				this.addAttribute( 'birdVertex', birdVertex, 1 );
+
+				// this.addAttribute( 'normal', new Float32Array( points * 3 ), 3 );
+
 
 				var v = 0;
 
@@ -437,11 +446,6 @@
 
 				}
 
-				var birdColors = this.addAttribute( 'birdColor', Float32Array, triangles * 3, 3 ).array;
-				var references = this.addAttribute( 'reference', Float32Array, triangles * 3, 2 ).array;
-				var birdVertex = this.addAttribute( 'birdVertex', Float32Array, triangles * 3, 1 ).array;
-				// Uint16Array
-
 				for( var v = 0; v < triangles * 3; v++ ) {
 
 					var i = ~~(v / 3);
@@ -466,9 +470,6 @@
 
 				this.applyMatrix( new THREE.Matrix4().makeScale( 0.2, 0.2, 0.2 ) );
 
-				// this.computeCentroids();
-				// this.computeFaceNormals();
-				// this.computeVertexNormals();
 
 			}
 
