@@ -21,6 +21,8 @@
 				top: 0px; width: 100%;
 				padding: 5px;
 				z-index: 100;
+				color: #ddd;
+				text-shadow: 0 0 1px rgba(0,0,0,1);
 			}
 
 			a {
@@ -82,7 +84,7 @@
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - cameras - logarithmic depth buffer<br/>
-			Zoom through scene with objects ranging in size from 1µm to 120,000 light years using the mousewheel<br/>
+			Zoom through scene with objects ranging in size from 1µm to 100,000,000 light years using the mousewheel<br/>
 			Linear z-buffer handles close-up objects well, but fails spectacularly at distant objects<br/>
 			Logarithmic handles all but the smallest objects with ease
 		</div>
@@ -174,9 +176,8 @@
 					color: 0xffffff,
 					specular: 0xffaa00,
 					shininess: 50,
-					metal: true,
 					shading: THREE.SmoothShading,
-					emissive: 0x333333
+					emissive: 0x000000
 				};
 
 				var geomtransform = new THREE.Matrix4();
@@ -205,9 +206,20 @@
 					}
 					materialargs.color = THREE.ColorKeywords[ colorkeys[ i + coloroffset ] ];
 
-					var mesh = new THREE.Mesh( labelgeo, new THREE.MeshPhongMaterial( materialargs ) );
+					var material = new THREE.MeshPhongMaterial( materialargs );
+					var textmesh = new THREE.Mesh( labelgeo, material );
+					textmesh.scale.set(scale, scale, scale);
+					textmesh.position.z = -labeldata[i].size * scale;
+					textmesh.position.y = labeldata[i].size / 4 * scale;
+					var dotmesh = new THREE.Mesh(new THREE.SphereGeometry(labeldata[i].size * scale / 2, 24, 12), material);
+					dotmesh.position.y = -labeldata[i].size / 4 * scale;
+
+					var merged = new THREE.Geometry();
+					THREE.GeometryUtils.merge(merged, textmesh);
+					THREE.GeometryUtils.merge(merged, dotmesh);
+
+					var mesh = new THREE.Mesh(merged, material);
 					mesh.position.z = -labeldata[i].size * 1 * scale;
-					mesh.scale.set(scale, scale, scale);
 
 					scene.add(mesh);
 				}
