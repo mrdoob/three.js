@@ -314,44 +314,6 @@ THREE.GeometryUtils = {
 
 		return offset;
 
-	},
-
-	triangulateQuads: function ( geometry ) {
-
-		var i, il, j, jl;
-
-		var faces = [];
-		var faceVertexUvs = [];
-
-		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
-
-			faceVertexUvs[ i ] = [];
-
-		}
-
-		for ( i = 0, il = geometry.faces.length; i < il; i ++ ) {
-
-			var face = geometry.faces[ i ];
-
-			faces.push( face );
-
-			for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-				faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
-
-			}
-
-		}
-
-		geometry.faces = faces;
-		geometry.faceVertexUvs = faceVertexUvs;
-
-		geometry.computeCentroids();
-		geometry.computeFaceNormals();
-		geometry.computeVertexNormals();
-
-		if ( geometry.hasTangents ) geometry.computeTangents();
-
 	}
 
 };
