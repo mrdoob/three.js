@@ -171,6 +171,13 @@ input.Number {
 		font-size: 12px;
 	}
 
+	#sidebar #veglist {
+		width: 100%;
+		height: 140px;
+		color: #868686;
+		font-size: 12px;
+	}
+
 	#sidebar .Panel.Material canvas {
 
 		border: solid 1px #5A5A5A;

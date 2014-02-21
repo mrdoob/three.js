@@ -144,6 +144,13 @@ input.Number {
 		font-size: 12px;
 	}
 
+	#sidebar #veglist {
+		width: 100%;
+		height: 140px;
+		color: #444;
+		font-size: 12px;
+	}
+
 #toolbar {
 	position: absolute;
 	left: 0px;
