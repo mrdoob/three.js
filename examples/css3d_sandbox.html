@@ -57,6 +57,7 @@
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

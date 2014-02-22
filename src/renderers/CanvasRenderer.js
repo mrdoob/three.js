@@ -74,6 +74,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_pointLights = new THREE.Color(),
 
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
+	_centroid = new THREE.Vector3(),
 	_normal = new THREE.Vector3(),
 	_normalViewMatrix = new THREE.Matrix3();
 
@@ -641,7 +642,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_color.copy( _ambientLight );
 
-			calculateLight( element.centroidModel, element.normalModel, _color );
+			_centroid.copy( v1.positionWorld ).add( v2.positionWorld ).add( v3.positionWorld ).divideScalar( 3 );
+
+			calculateLight( _centroid, element.normalModel, _color );
 
 			_color.multiply( _diffuseColor ).add( _emissiveColor );
 

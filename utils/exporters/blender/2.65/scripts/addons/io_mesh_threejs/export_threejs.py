@@ -1479,10 +1479,6 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
             if not mesh:
                 raise Exception("Error, could not get mesh data from object [%s]" % object.name)
 
-            # preserve original name
-
-            mesh.name = object.name
-
             if export_single_model:
 
                 if flipyz:

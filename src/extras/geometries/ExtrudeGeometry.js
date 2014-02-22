@@ -39,7 +39,6 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	this.addShapeList( shapes, options );
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	// can't really use automatic vertex normals
@@ -347,7 +346,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
+
 			v( vert.x, vert.y,  - z );
 
 		}
@@ -362,7 +361,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			for ( i = 0, il = ahole.length; i < il; i++ ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
-				//vert = scalePt( ahole[ i ], holesCentroids[ h ], bs, true );
 
 				v( vert.x, vert.y,  -z );
 

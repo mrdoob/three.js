@@ -51,7 +51,7 @@ THREE.Loader.prototype = {
 
 		} else {
 
-			message += ( progress.loaded / 1000 ).toFixed(2) + " KB";
+			message += ( progress.loaded / 1024 ).toFixed(2) + " KB";
 
 		}
 
