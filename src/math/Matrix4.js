@@ -427,7 +427,14 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiplyVector3Array: function() {
+	multiplyVector3Array: function ( a ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		return this.applyToVector3Array( a );
+
+	},
+
+	applyToVector3Array: function() {
 
 		var v1 = new THREE.Vector3();
 
@@ -439,7 +446,7 @@ THREE.Matrix4.prototype = {
 				v1.y = a[ i + 1 ];
 				v1.z = a[ i + 2 ];
 
-				v1.applyProjection( this );
+				v1.applyMatrix4( this );
 
 				a[ i ]     = v1.x;
 				a[ i + 1 ] = v1.y;
