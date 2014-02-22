@@ -8482,8 +8482,6 @@ THREE.Projector = function () {
 
 						_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-						_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
-
 						faceVertexNormals = face.vertexNormals;
 
 						for ( var n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
@@ -8858,8 +8856,6 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
-	this.centroid = new THREE.Vector3();
-
 };
 
 THREE.Face3.prototype = {
@@ -8872,7 +8868,6 @@ THREE.Face3.prototype = {
 
 		face.normal.copy( this.normal );
 		face.color.copy( this.color );
-		face.centroid.copy( this.centroid );
 
 		face.materialIndex = this.materialIndex;
 
@@ -9772,8 +9767,6 @@ THREE.Geometry.prototype = {
 
 			}
 
-			face.centroid.applyMatrix4( matrix );
-
 		}
 
 		if ( this.boundingBox instanceof THREE.Box3 ) {
@@ -9785,24 +9778,6 @@ THREE.Geometry.prototype = {
 		if ( this.boundingSphere instanceof THREE.Sphere ) {
 
 			this.computeBoundingSphere();
-
-		}
-
-	},
-
-	computeCentroids: function () {
-
-		var f, fl, face;
-
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-			face = this.faces[ f ];
-			face.centroid.set( 0, 0, 0 );
-
-			face.centroid.add( this.vertices[ face.a ] );
-			face.centroid.add( this.vertices[ face.b ] );
-			face.centroid.add( this.vertices[ face.c ] );
-			face.centroid.divideScalar( 3 );
 
 		}
 
@@ -11594,7 +11569,6 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 	parseSkin();
 	parseMorphing( scale );
 
-	geometry.computeCentroids();
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
 
@@ -16164,6 +16138,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_pointLights = new THREE.Color(),
 
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
+	_centroid = new THREE.Vector3(),
 	_normal = new THREE.Vector3(),
 	_normalViewMatrix = new THREE.Matrix3();
 
@@ -16731,7 +16706,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_color.copy( _ambientLight );
 
-			calculateLight( element.centroidModel, element.normalModel, _color );
+			_centroid.copy( v1.positionWorld ).add( v2.positionWorld ).add( v3.positionWorld ).divideScalar( 3 );
+
+			calculateLight( _centroid, element.normalModel, _color );
 
 			_color.multiply( _diffuseColor ).add( _emissiveColor );
 
@@ -26841,8 +26818,6 @@ THREE.RenderableFace = function () {
 	this.v2 = new THREE.RenderableVertex();
 	this.v3 = new THREE.RenderableVertex();
 
-	this.centroidModel = new THREE.Vector3();
-
 	this.normalModel = new THREE.Vector3();
 
 	this.vertexNormalsModel = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
@@ -26997,14 +26972,6 @@ THREE.GeometryUtils = {
 			}
 
 			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
-
-			faceCopy.centroid.copy( face.centroid );
-
-			if ( matrix ) {
-
-				faceCopy.centroid.applyMatrix4( matrix );
-
-			}
 
 			faces1.push( faceCopy );
 
@@ -27223,44 +27190,6 @@ THREE.GeometryUtils = {
 		geometry.computeBoundingBox();
 
 		return offset;
-
-	},
-
-	triangulateQuads: function ( geometry ) {
-
-		var i, il, j, jl;
-
-		var faces = [];
-		var faceVertexUvs = [];
-
-		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
-
-			faceVertexUvs[ i ] = [];
-
-		}
-
-		for ( i = 0, il = geometry.faces.length; i < il; i ++ ) {
-
-			var face = geometry.faces[ i ];
-
-			faces.push( face );
-
-			for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-				faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
-
-			}
-
-		}
-
-		geometry.faces = faces;
-		geometry.faceVertexUvs = faceVertexUvs;
-
-		geometry.computeCentroids();
-		geometry.computeFaceNormals();
-		geometry.computeVertexNormals();
-
-		if ( geometry.hasTangents ) geometry.computeTangents();
 
 	}
 
@@ -28900,7 +28829,7 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 
 
-// Returns min and max coordinates, as well as centroid
+// Returns min and max coordinates
 
 THREE.CurvePath.prototype.getBoundingBox = function () {
 
@@ -28944,8 +28873,7 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 		minX: minX,
 		minY: minY,
 		maxX: maxX,
-		maxY: maxY,
-		centroid: sum.divideScalar( il )
+		maxY: maxY
 
 	};
 
@@ -32131,7 +32059,6 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 	}
 
-	this.computeCentroids();
 	this.mergeVertices();
 
 };
@@ -32184,7 +32111,6 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
@@ -32350,7 +32276,6 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 }
@@ -32398,7 +32323,6 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	this.addShapeList( shapes, options );
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	// can't really use automatic vertex normals
@@ -32706,7 +32630,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
+
 			v( vert.x, vert.y,  - z );
 
 		}
@@ -32721,7 +32645,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			for ( i = 0, il = ahole.length; i < il; i++ ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
-				//vert = scalePt( ahole[ i ], holesCentroids[ h ], bs, true );
 
 				v( vert.x, vert.y,  -z );
 
@@ -33092,7 +33015,6 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	this.addShapeList( shapes, options );
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 };
@@ -33292,7 +33214,6 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 	}
 
 	this.mergeVertices();
-	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
@@ -33375,8 +33296,6 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	}
 
-	this.computeCentroids();
-
 };
 
 THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
@@ -33445,7 +33364,6 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 		}
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
@@ -33547,7 +33465,6 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
@@ -33682,7 +33599,6 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 };
@@ -33770,7 +33686,6 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 		}
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
@@ -33914,7 +33829,6 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 		}
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
@@ -34091,6 +34005,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	var midpoints = [], p = this.vertices;
 
 	var f = [];
+
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 		var v1 = p[ faces[ i ][ 0 ] ];
@@ -34100,6 +34015,8 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		f[ i ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
 
 	}
+
+	var centroid = new THREE.Vector3();
 
 	for ( var i = 0, l = f.length; i < l; i ++ ) {
 
@@ -34145,8 +34062,6 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	this.mergeVertices();
 
-	this.computeCentroids();
-
 	this.computeFaceNormals();
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
@@ -34175,10 +34090,11 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	function make( v1, v2, v3 ) {
 
 		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-		face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
 		that.faces.push( face );
 
-		var azi = azimuth( face.centroid );
+		centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
+
+		var azi = azimuth( centroid );
 
 		that.faceVertexUvs[ 0 ].push( [
 			correctUV( v1.uv, v1, azi ),
@@ -34191,7 +34107,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	// Analytically subdivide a face to the required detail level.
 
-	function subdivide(face, detail ) {
+	function subdivide( face, detail ) {
 
 		var cols = Math.pow(2, detail);
 		var cells = Math.pow(4, detail);
@@ -34431,7 +34347,6 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	// var diff = this.mergeVertices();
 	// console.log('removed ', diff, ' vertices by merging');
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
@@ -35066,8 +34981,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-		geometry.vertices.push( new THREE.Vector3() );
-		geometry.vertices.push( new THREE.Vector3() );
+		geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
 
 	}
 
@@ -35083,43 +34997,42 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 THREE.FaceNormalsHelper.prototype = Object.create( THREE.Line.prototype );
 
-THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
+THREE.FaceNormalsHelper.prototype.update = function () {
 
-	var v1 = new THREE.Vector3();
+	var vertices = this.geometry.vertices;
 
-	return function ( object ) {
+	var object = this.object;
+	var objectVertices = object.geometry.vertices;
+	var objectFaces = object.geometry.faces;
+	var objectWorldMatrix = object.matrixWorld;
 
-		this.object.updateMatrixWorld( true );
+	object.updateMatrixWorld( true );
 
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+	this.normalMatrix.getNormalMatrix( objectWorldMatrix );
 
-		var vertices = this.geometry.vertices;
+	for ( var i = 0, i2 = 0, l = objectFaces.length; i < l; i ++, i2 += 2 ) {
 
-		var faces = this.object.geometry.faces;
+		var face = objectFaces[ i ];
 
-		var worldMatrix = this.object.matrixWorld;
+		vertices[ i2 ].copy( objectVertices[ face.a ] )
+			.add( objectVertices[ face.b ] )
+			.add( objectVertices[ face.c ] )
+			.divideScalar( 3 )
+			.applyMatrix4( objectWorldMatrix );
 
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-			var face = faces[ i ];
-
-			v1.copy( face.normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size );
-
-			var idx = 2 * i;
-
-			vertices[ idx ].copy( face.centroid ).applyMatrix4( worldMatrix );
-
-			vertices[ idx + 1 ].addVectors( vertices[ idx ], v1 );
-
-		}
-
-		this.geometry.verticesNeedUpdate = true;
-
-		return this;
+		vertices[ i2 + 1 ].copy( face.normal )
+			.applyMatrix3( this.normalMatrix )
+			.normalize()
+			.multiplyScalar( this.size )
+			.add( vertices[ i2 ] );
 
 	}
 
-}());
+	this.geometry.verticesNeedUpdate = true;
+
+	return this;
+
+};
 
 
 /**
