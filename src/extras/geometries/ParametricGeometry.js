@@ -68,7 +68,6 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	// var diff = this.mergeVertices();
 	// console.log('removed ', diff, ' vertices by merging');
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 

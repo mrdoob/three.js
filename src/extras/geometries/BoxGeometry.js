@@ -112,7 +112,6 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 	}
 
-	this.computeCentroids();
 	this.mergeVertices();
 
 };

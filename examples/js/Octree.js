@@ -686,6 +686,8 @@
 		},
 		
 		getFace3BoundingRadius: function ( object, face ) {
+
+			if ( face.centroid === undefined ) face.centroid = new THREE.Vector3();
 			
 			var geometry = object.geometry || object,
 				vertices = geometry.vertices,

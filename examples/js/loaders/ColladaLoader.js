@@ -2616,7 +2616,6 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		this.geometry3js.computeCentroids();
 		this.geometry3js.computeFaceNormals();
 
 		if ( this.geometry3js.calcNormals ) {

@@ -64,7 +64,6 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 };

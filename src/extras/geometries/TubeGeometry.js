@@ -119,7 +119,6 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 		}
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 

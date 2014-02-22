@@ -88,14 +88,6 @@ THREE.GeometryUtils = {
 
 			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
 
-			faceCopy.centroid.copy( face.centroid );
-
-			if ( matrix ) {
-
-				faceCopy.centroid.applyMatrix4( matrix );
-
-			}
-
 			faces1.push( faceCopy );
 
 		}

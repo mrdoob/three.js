@@ -22,6 +22,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	var midpoints = [], p = this.vertices;
 
 	var f = [];
+
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 		var v1 = p[ faces[ i ][ 0 ] ];
@@ -31,6 +32,8 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		f[ i ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
 
 	}
+
+	var centroid = new THREE.Vector3();
 
 	for ( var i = 0, l = f.length; i < l; i ++ ) {
 
@@ -76,8 +79,6 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	this.mergeVertices();
 
-	this.computeCentroids();
-
 	this.computeFaceNormals();
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
@@ -106,10 +107,11 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	function make( v1, v2, v3 ) {
 
 		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-		face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
 		that.faces.push( face );
 
-		var azi = azimuth( face.centroid );
+		centroid.copy( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
+
+		var azi = azimuth( centroid );
 
 		that.faceVertexUvs[ 0 ].push( [
 			correctUV( v1.uv, v1, azi ),
@@ -122,7 +124,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	// Analytically subdivide a face to the required detail level.
 
-	function subdivide(face, detail ) {
+	function subdivide( face, detail ) {
 
 		var cols = Math.pow(2, detail);
 		var cells = Math.pow(4, detail);

@@ -149,7 +149,6 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 }

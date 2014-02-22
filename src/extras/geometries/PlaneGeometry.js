@@ -73,8 +73,6 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	}
 
-	this.computeCentroids();
-
 };
 
 THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
