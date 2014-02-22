@@ -288,16 +288,12 @@
 			uniform sampler2D texturePosition;
 			uniform sampler2D textureVelocity;
 
-			varying vec3 vNormal;
-			varying vec2 vUv;
 			varying vec4 vColor;
 			varying float z;
 
 			uniform float time;
 
 			void main() {
-
-				vNormal = normal;
 
 				vec4 tmpPos = texture2D( texturePosition, reference );
 				vec3 pos = tmpPos.xyz;
@@ -351,8 +347,6 @@
 		<!-- bird geometry shader -->
 		<script type="x-shader/x-fragment" id="birdFS">
 
-			varying vec3 vNormal;
-			varying vec2 vUv;
 			varying vec4 vColor;
 			varying float z;
 
@@ -362,15 +356,6 @@
 				// Fake colors for now
 				float z2 = 0.2 + ( 1000. - z ) / 1000. * vColor.x;
 				gl_FragColor = vec4( z2, z2, z2, 1. );
-
-				// vec3 light = vec3( 0.0, 1.0, 1.0 );
-				// light = normalize( light );
-				// float dProd = dot( vNormal, light ) ; //* 0.5 + 0.5;
-				// vec4 tcolor = vColor;
-				// vec4 gray = vec4( vec3( tcolor.r * 0.3 + tcolor.g * 0.59 + tcolor.b * 0.11 ), 1.0 );
-
-				// gl_FragColor =  gray * dProd;
-				// gl_FragColor =  vec4( dProd  * tcolor );
 
 			}
 
