@@ -280,7 +280,7 @@
 		this.setActivePlane = function ( axis, eye ) {
 
 			var tempMatrix = new THREE.Matrix4();
-			eye.applyProjection( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
+			eye.applyMatrix4( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
 
 			if ( axis == "X" ) {
 				this.activePlane = this.planes[ "XY" ];
@@ -408,7 +408,7 @@
 			tempQuaternion.setFromEuler( worldRotation );
 
 			tempMatrix.makeRotationFromQuaternion( tempQuaternion ).getInverse( tempMatrix );
-			eye.applyProjection( tempMatrix );
+			eye.applyMatrix4( tempMatrix );
 
 			this.traverse(function(child) {
 
@@ -496,7 +496,7 @@
 		this.setActivePlane = function ( axis, eye ) {
 
 			var tempMatrix = new THREE.Matrix4();
-			eye.applyProjection( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
+			eye.applyMatrix4( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
 
 			if ( axis == "X" ) {
 				this.activePlane = this.planes[ "XY" ];
