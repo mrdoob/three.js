@@ -38,6 +38,25 @@ THREE.ObjectLoader.prototype = {
 		var materials = this.parseMaterials( json.materials );
 		var object = this.parseObject( json.object, geometries, materials );
 
+		if(object instanceof THREE.Scene){
+
+			// Find lights with targets that have recorded the UUID of their target.
+			// Link those lights with their targets
+
+			object.traverse(function(childObject){
+
+				if(childObject.targetUuid){
+
+					// object is the scene, and childObject is a light with a target
+
+					childObject.target = object.getObjectByUuid(childObject.targetUuid,true);
+				
+				}
+
+			});
+
+		}
+
 		return object;
 
 	},
@@ -254,6 +273,12 @@ THREE.ObjectLoader.prototype = {
 
 					object = new THREE.DirectionalLight( data.color, data.intensity );
 
+					if( data.targetUuid){
+
+						object.targetUuid = data.targetUuid;
+
+					}
+
 					break;
 
 				case 'PointLight':
@@ -265,6 +290,12 @@ THREE.ObjectLoader.prototype = {
 				case 'SpotLight':
 
 					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
+
+					if( data.targetUuid){
+
+						object.targetUuid = data.targetUuid;
+
+					}
 
 					break;
 

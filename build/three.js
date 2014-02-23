@@ -7857,6 +7857,36 @@ THREE.Object3D.prototype = {
 		return undefined;
 
 	},
+	
+	getObjectByUuid: function ( uuid, recursive ) {
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			var child = this.children[ i ];
+
+			if ( child.uuid === uuid ) {
+
+				return child;
+
+			}
+
+			if ( recursive === true ) {
+
+				child = child.getObjectByUuid( uuid, recursive );
+
+				if ( child !== undefined ) {
+
+					return child;
+
+				}
+
+			}
+
+		}
+
+		return undefined;
+
+	},
 
 	getObjectByName: function ( name, recursive ) {
 
@@ -12286,6 +12316,25 @@ THREE.ObjectLoader.prototype = {
 		var materials = this.parseMaterials( json.materials );
 		var object = this.parseObject( json.object, geometries, materials );
 
+		if(object instanceof THREE.Scene){
+
+			// Find lights with targets that have recorded the UUID of their target.
+			// Link those lights with their targets
+
+			object.traverse(function(childObject){
+
+				if(childObject.targetUuid){
+
+					// object is the scene, and childObject is a light with a target
+
+					childObject.target = object.getObjectByUuid(childObject.targetUuid,true);
+				
+				}
+
+			});
+
+		}
+
 		return object;
 
 	},
@@ -12502,6 +12551,12 @@ THREE.ObjectLoader.prototype = {
 
 					object = new THREE.DirectionalLight( data.color, data.intensity );
 
+					if( data.targetUuid){
+
+						object.targetUuid = data.targetUuid;
+
+					}
+
 					break;
 
 				case 'PointLight':
@@ -12513,6 +12568,12 @@ THREE.ObjectLoader.prototype = {
 				case 'SpotLight':
 
 					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
+
+					if( data.targetUuid){
+
+						object.targetUuid = data.targetUuid;
+
+					}
 
 					break;
 
@@ -15925,11 +15986,23 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 		}
 
-		if ( object.target && object.target.parent === undefined ) {
 
-			this.add( object.target );
+		if ( object.target && object.target.parent === undefined) {
 
+			if(!object.targetUuid){
+
+				// Add a new target to the scene for this light
+
+				this.add( object.target );
+				object.targetuuid = object.target.uuid;
+
+			}
+
+			// If the light has a targetUuid, then it is likely being loaded from JSON and already had a target.
+			// its target will be loaded later, after which we can link this light to its target.
+			
 		}
+		
 
 	} else if ( !( object instanceof THREE.Camera || object instanceof THREE.Bone ) ) {
 

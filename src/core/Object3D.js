@@ -412,6 +412,36 @@ THREE.Object3D.prototype = {
 		return undefined;
 
 	},
+	
+	getObjectByUuid: function ( uuid, recursive ) {
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			var child = this.children[ i ];
+
+			if ( child.uuid === uuid ) {
+
+				return child;
+
+			}
+
+			if ( recursive === true ) {
+
+				child = child.getObjectByUuid( uuid, recursive );
+
+				if ( child !== undefined ) {
+
+					return child;
+
+				}
+
+			}
+
+		}
+
+		return undefined;
+
+	},
 
 	getObjectByName: function ( name, recursive ) {
 
