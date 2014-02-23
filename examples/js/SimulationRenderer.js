@@ -10,7 +10,7 @@
  *
  */
 
-function SimulatorRenderer(WIDTH, renderer) {
+function SimulationRenderer(WIDTH, renderer) {
 
 	WIDTH = WIDTH || 4;
 	var camera = new THREE.Camera();
