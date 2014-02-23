@@ -73,6 +73,38 @@ THREE.DirectionalLight.prototype.clone = function () {
 	light.castShadow = this.castShadow;
 	light.onlyShadow = this.onlyShadow;
 
+	//
+
+	light.shadowCameraNear = this.shadowCameraNear;
+	light.shadowCameraFar = this.shadowCameraFar;
+
+	light.shadowCameraLeft = this.shadowCameraLeft;
+	light.shadowCameraRight = this.shadowCameraRight;
+	light.shadowCameraTop = this.shadowCameraTop;
+	light.shadowCameraBottom = this.shadowCameraBottom;
+
+	light.shadowCameraVisible = this.shadowCameraVisible;
+
+	light.shadowBias = this.shadowBias;
+	light.shadowDarkness = this.shadowDarkness;
+
+	light.shadowMapWidth = this.shadowMapWidth;
+	light.shadowMapHeight = this.shadowMapHeight;
+
+	//
+
+	light.shadowCascade = this.shadowCascade;
+
+	light.shadowCascadeOffset.copy( this.shadowCascadeOffset );
+	light.shadowCascadeCount = this.shadowCascadeCount;
+
+	light.shadowCascadeBias = this.shadowCascadeBias.slice( 0 );
+	light.shadowCascadeWidth = this.shadowCascadeWidth.slice( 0 );
+	light.shadowCascadeHeight = this.shadowCascadeHeight.slice( 0 );
+
+	light.shadowCascadeNearZ = this.shadowCascadeNearZ.slice( 0 );
+	light.shadowCascadeFarZ  = this.shadowCascadeFarZ.slice( 0 );
+
 	return light;
 
 };
