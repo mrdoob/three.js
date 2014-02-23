@@ -2453,7 +2453,7 @@ def save(operator, context, filepath = "",
                 # otherwise can share geometry
 
                 #else:
-                name = object.name
+                name = object.data.name
 
                 if name not in geo_set:
 
@@ -2479,7 +2479,7 @@ def save(operator, context, filepath = "",
                                                         option_animation_skeletal,
                                                         option_frame_step)
 
-                        embeds[object.data.name] = model_string
+                        embeds[name] = model_string
 
                     else:
 
