@@ -41,6 +41,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var raycaster = new THREE.Raycaster( origin, direction );
 	var raycasterLight = new THREE.Raycaster();
 
+	var perspective;
 	var cameraNormalMatrix = new THREE.Matrix3();
 
 	var objects;
@@ -95,7 +96,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			for ( var x = 0; x < blockSize; x ++, index += 4 ) {
 
-				direction.set( x + blockX - canvasWidthHalf, - ( y + blockY - canvasHeightHalf ), - 1000 );
+				direction.set( x + blockX - canvasWidthHalf, - ( y + blockY - canvasHeightHalf ), - perspective );
 				direction.applyMatrix3( cameraNormalMatrix ).normalize();
 
 				var intersections = raycaster.intersectObjects( objects, true );
@@ -191,6 +192,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		cameraNormalMatrix.getNormalMatrix( camera.matrixWorld );
 		origin.copy( camera.position );
+
+		perspective = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * canvasHeight;
 
 		objects = scene.children;
 
