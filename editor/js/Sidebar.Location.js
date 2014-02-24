@@ -23,10 +23,13 @@ Sidebar.Location = function ( editor ) {
                 tree.position.set(50,-100,250);
                 tree.castShadow = true;
                 tree.receiveShadow = true;
+                tree.material = new THREE.MeshBasicMaterial( {
+                    map: THREE.ImageUtils.loadTexture( "media/river_birch.png" ),
+                    transparent: true
+                } );
 
-
-                editor.addObject(tree);// obj3d.scene );
-                editor.select(tree);// obj3d.scene );
+                editor.addObject(tree);
+                editor.select(tree);
             }
     
             var mloader = new THREE.ColladaLoader();
