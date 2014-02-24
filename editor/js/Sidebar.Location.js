@@ -1,3 +1,7 @@
+/**
+ * @author Clinton Freeman <freeman@cs.unc.edu>
+ */
+
 Sidebar.Location = function ( editor ) {
 
 	var signals = editor.signals;
@@ -9,36 +13,34 @@ Sidebar.Location = function ( editor ) {
 
     var veginfoPanel = new UI.Panel();
     var veglist = new UI.FancySelect().setId( 'veglist' ).onChange( function () {
-        var input = document.createElement( 'input' );
-        input.type = 'file';
-        
-        input.addEventListener( 'change', function ( event ) {
-            //console.log( input.files[0] );
-            //editor.loader.loadFile( input.files[ 0 ] );
-        } );
-        
-        //signals.vegChanged.dispatch( veglist.getValue() );
-        
+
         var vegAddButton = new UI.Button( 'Add' ).onClick( function() {
-            //input.click();
 
-            var callback = function( geometry, materials ) {
+            var callback = function( obj3d ) {
 
-                var default_mat = new THREE.MeshBasicMaterial( { color: 0xdddddd } );        
-                var vegmesh = new THREE.Mesh( geometry, default_mat );
-                vegmesh.name = veglist.options[veglist.getValue()].innerHTML + " 1";
-                editor.addObject( vegmesh );
-               
+                var tree = obj3d.scene.children[0];
+                tree.name = "tree";
+                tree.position.set(50,-100,250);
+                tree.castShadow = true;
+                tree.receiveShadow = true;
+
+
+                editor.addObject(tree);// obj3d.scene );
+                editor.select(tree);// obj3d.scene );
             }
     
             var mloader = new THREE.ColladaLoader();
             mloader.load("media/river_birch.DAE", callback); // FIXME
 
+            createTreeAtPos(80,-100,250);
+
         } );
+
         veginfoPanel.clear();
         veginfoPanel.add( new UI.Text( veglist.options[veglist.getValue()].innerHTML ) );
         veginfoPanel.add( new UI.Break() );
         veginfoPanel.add( vegAddButton );
+
     } );
 
 	var goButton = new UI.Button( 'Go' ).onClick( function() {
@@ -58,14 +60,6 @@ Sidebar.Location = function ( editor ) {
                 	dataType: 'json',
                 	success: function( data ) {
                     	console.log( 'success' );
-                    	//$("output").append(JSON.stringify(data));
-                    	//console.log(data.addition);
-                        /*
-                        data.forEach( function( tree ) {
-                            container.add( new UI.Text( tree ) );
-                            container.add( new UI.Break() );
-                        } );
-                        */
                         veglist.setOptions( data );
                 	},
                 	error: function( jqXHR, textStatus, errorThrown ) {
@@ -74,13 +68,8 @@ Sidebar.Location = function ( editor ) {
                 	}
 	            } );
 
-                //map.setCenter(results[0].geometry.location);
-                //showMessage( 'Address found.' );
-                //addMarker( results[0].geometry.location ); // move to position (thanks @jocabola!)
             } else {
-            	console.log("failure!");
-                //showError("Geocode was not successful for the following reason: " + status);
-                //showProgress( false );
+            	console.log( "Geocoding error. Status: " + status );
             }
         } );
 	} );

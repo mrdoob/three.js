@@ -2,10 +2,12 @@
  * @author Steven Love <slove13@cs.unc.edu>
  */
 
+
 function createTreeAtPos( x, y, z ) {
 
     var callback = function( geometry, materials ) {
 
+        
         var default_mat = new THREE.MeshLambertMaterial( { color: 0x223311 } );        
         var tree = new THREE.Mesh( geometry, default_mat );
         var scale = 64;
@@ -39,12 +41,14 @@ function createGround() {
     );
     ground.overdraw = true;
     ground.receiveShadow = true;
-    ground.position.set( 0, 2, 0 );
+    ground.position.set( 0, -100, 0 );
     ground.name = "ground";
     editor.addObject(ground);
     //ground.translateY(50);
 
 }     
+
+
 
 /** 
  * notes on problems with spotlight in the editor: 
@@ -152,13 +156,6 @@ function loadPanorama() {
     loader.setZoom( 3 );
 
     loader.load( getLatLng() );
-
-}
-
-function deletePanorama() {
-
-    editor.selectById(69)
-    removeObject(mesh);
 
 }
 

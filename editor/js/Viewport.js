@@ -472,6 +472,7 @@ var Viewport = function ( editor ) {
 
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
+	renderer.shadowMapEnabled = true;
 	container.dom.appendChild( renderer.domElement );
 
 	animate();
