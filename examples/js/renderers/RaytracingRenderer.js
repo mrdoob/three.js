@@ -18,8 +18,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var clearColor = new THREE.Color( 0x000000 );
 
-	var blockX = 0;
-	var blockY = 0;
+	var blockX, blockY;
 	var blockSize = 64;
 
 	var canvasBlock = document.createElement( 'canvas' );
@@ -33,15 +32,16 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var imagedata = contextBlock.getImageData( 0, 0, blockSize, blockSize );
 	var data = imagedata.data;
 
-	var viewMatrix = new THREE.Matrix4();
-	var viewProjectionMatrix = new THREE.Matrix4();
+	var color = new THREE.Color();
 
 	var origin = new THREE.Vector3();
 	var direction = new THREE.Vector3();
 
 	var raycaster = new THREE.Raycaster( origin, direction );
+	var raycasterLight = new THREE.Raycaster();
 
 	var objects;
+	var lights = [];
 
 	this.domElement = canvas;
 
@@ -99,19 +99,39 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					var intersection = intersections[ 0 ];
 
+					var point = intersection.point;
 					var object = intersection.object;
 					var material = object.material;
-					var face = intersection.face;
-
-					var color;
 
 					if ( material.vertexColors === THREE.NoColors ) {
 
-						color = material.color;
+						color.copy( material.color );
 
 					} else if ( material.vertexColors === THREE.FaceColors ) {
 
-						color = face.color;
+						color.copy( intersection.face.color );
+
+					}
+
+					if ( lights.length > 0 ) {
+
+						raycasterLight.ray.origin.copy( point );
+
+						for ( var i = 0, l = lights.length; i < l; i ++ ) {
+
+							var light = lights[ i ];
+
+							raycasterLight.ray.direction.copy( light.position ).sub( point ).normalize();
+
+							var intersections = raycasterLight.intersectObjects( objects, true );
+
+							if ( intersections.length > 0 ) {
+
+								color.multiplyScalar( 0.25 );
+
+							}
+
+						}
 
 					}
 
@@ -150,9 +170,26 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		if ( this.autoClear === true ) this.clear();
 
+		blockX = 0;
+		blockY = 0;
+
 		origin.copy( camera.position );
 
 		objects = scene.children;
+
+		// collect lights
+
+		lights.length = 0;
+
+		scene.traverse( function ( object ) {
+
+			if ( object instanceof THREE.Light ) {
+
+				lights.push( object );
+
+			}
+
+		} )
 
 		renderBlock();
 
