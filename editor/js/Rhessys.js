@@ -90,7 +90,9 @@ function loadPanorama() {
 
     var mesh = new THREE.Mesh(
         new THREE.SphereGeometry( 500, 60, 40 ), 
-        new THREE.MeshBasicMaterial( ) 
+        new THREE.MeshBasicMaterial( { 
+            map: THREE.ImageUtils.loadTexture( './../../streetview-studio/search.png' ) // FIXME
+        } ) 
     );
     var loader = new GSVPANO.PanoLoader();
 
@@ -98,8 +100,7 @@ function loadPanorama() {
     //mesh.position.set( 0, editor.config.getKey( "floorh" ), 0 );
     mesh.position.set( 0, 0, 0 );
     mesh.name = "panorama";
-    editor.sceneBackground.add( mesh );
-    //editor.addObject( mesh );
+    editor.addObject( mesh );
     //editor.select( mesh );
 
     function getLatLng() {
