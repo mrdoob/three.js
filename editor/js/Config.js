@@ -7,7 +7,7 @@ var Config = function () {
 		camera: {
 			//position: [ 500, 250, 500 ],
 			position: [ 0, 0, 0 ],
-			target: [ 0, 0, -1 ] 
+			target: [ 0, 0, 1 ] 
 		}
 	};
 

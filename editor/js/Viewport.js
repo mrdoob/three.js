@@ -15,6 +15,7 @@ var Viewport = function ( editor ) {
 	container.add( info );
 
 	var scene = editor.scene;
+	var sceneBackground = editor.sceneBackground;
 	var sceneHelpers = editor.sceneHelpers;
 
 	var objects = [];
@@ -26,7 +27,7 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
+	var camera = new THREE.PerspectiveCamera( 70, 1, 1, 5000 );
 	camera.position.fromArray( editor.config.getKey( 'camera' ).position );
 	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
 
@@ -253,7 +254,6 @@ var Viewport = function ( editor ) {
 		}
 
 		saveTimeout = setTimeout( function () {
-
 			editor.config.setKey( 'camera', {
 				position: camera.position.toArray(),
 				target: controls.center.toArray()
@@ -577,6 +577,8 @@ var Viewport = function ( editor ) {
 		scene.updateMatrixWorld();
 
 		renderer.clear();
+		renderer.render( sceneBackground, camera );
+		renderer.clear( false, true, false );
 		renderer.render( scene, camera );
 		renderer.render( sceneHelpers, camera );
 

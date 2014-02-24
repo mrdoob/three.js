@@ -102,7 +102,8 @@ function loadPanorama() {
     //mesh.position.set( 0, editor.config.getKey( "floorh" ), 0 );
     mesh.position.set( 0, 0, 0 );
     mesh.name = "panorama";
-    editor.addObject( mesh );
+    editor.sceneBackground.add( mesh );
+    //editor.addObject( mesh );
     //editor.select( mesh );
 
     function getLatLng() {
@@ -123,6 +124,7 @@ function loadPanorama() {
         var pos = locations[ Math.floor( Math.random() * locations.length ) ];
         var myLatLng = new google.maps.LatLng( pos.lat, pos.lng );
         return myLatLng;
+
     }
 
     loader.onProgress = function( p ) {

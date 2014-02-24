@@ -54,6 +54,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.pan = function ( distance ) {
 
+		/*
 		normalMatrix.getNormalMatrix( object.matrix );
 
 		distance.applyMatrix3( normalMatrix );
@@ -61,6 +62,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		object.position.add( distance );
 		center.add( distance );
+		*/
+		console.log("pan!");
 
 		scope.dispatchEvent( changeEvent );
 
@@ -68,12 +71,21 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.zoom = function ( distance ) {
 
+		/*
 		normalMatrix.getNormalMatrix( object.matrix );
 
 		distance.applyMatrix3( normalMatrix );
 		distance.multiplyScalar( vector.copy( center ).sub( object.position ).length() * 0.001 );
 
 		object.position.add( distance );
+		*/
+		console.log("zoom!");
+		console.log(object.fov);
+
+		object.fov += distance;
+  		object.fov = Math.min(Math.max(object.fov, 10), 170);
+
+		object.updateProjectionMatrix();
 
 		scope.dispatchEvent( changeEvent );
 
@@ -149,13 +161,16 @@ THREE.EditorControls = function ( object, domElement ) {
 		var movementX = pointer.x - pointerOld.x;
 		var movementY = pointer.y - pointerOld.y;
 
+		console.log( state );
+
 		if ( state === STATE.ROTATE ) {
 
-			scope.rotate( new THREE.Vector3( - movementX * 0.005, - movementY * 0.005, 0 ) );
+			scope.rotate( new THREE.Vector3( movementX * 0.001, movementY * 0.001, 0 ) );
 
 		} else if ( state === STATE.ZOOM ) {
 
-			scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
+			//scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
+			scope.zoom( movementY );
 
 		} else if ( state === STATE.PAN ) {
 
@@ -194,7 +209,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
-		scope.zoom( new THREE.Vector3( 0, 0, delta ) );
+		//scope.zoom( new THREE.Vector3( 0, 0, delta ) );
+		scope.zoom( delta / 64.0 );
 
 	}
 
