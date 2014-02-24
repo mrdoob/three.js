@@ -187,6 +187,15 @@ THREE.ObjectExporter.prototype = {
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
 			if ( object.visible !== true ) data.visible = object.visible;
+			/*console.log('');
+			console.log(object.name + " properties:");
+
+			for ( property in object ){
+				if(!(object[property] instanceof Function)){
+					data[property] = object[property];
+					console.log("\t"+property);
+				}
+			}*/
 
 			if ( object instanceof THREE.Scene ) {
 
@@ -220,6 +229,7 @@ THREE.ObjectExporter.prototype = {
 				data.type = 'DirectionalLight';
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
+				data.targetUuid = object.target.uuid;
 
 			} else if ( object instanceof THREE.PointLight ) {
 
@@ -236,6 +246,7 @@ THREE.ObjectExporter.prototype = {
 				data.distance = object.distance;
 				data.angle = object.angle;
 				data.exponent = object.exponent;
+				data.targetUuid = object.target.uuid;
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
