@@ -34,16 +34,16 @@ var Toolbar = function ( editor ) {
 
 	var grid = new UI.Number( 25 ).onChange( update );
 	grid.dom.style.width = '42px';
-	buttons.add( new UI.Text( 'Grid: ' ) );
-	buttons.add( grid );
+	//buttons.add( new UI.Text( 'Grid: ' ) );
+	//buttons.add( grid );
 
 	var snap = new UI.Checkbox( false ).onChange( update );
-	buttons.add( snap );
-	buttons.add( new UI.Text( 'snap' ) );
+	//buttons.add( snap );
+	//buttons.add( new UI.Text( 'snap' ) );
 
 	var local = new UI.Checkbox( false ).onChange( update );
-	buttons.add( local );
-	buttons.add( new UI.Text( 'local' ) );
+	//buttons.add( local );
+	//buttons.add( new UI.Text( 'local' ) );
 
 	function update() {
 

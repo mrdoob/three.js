@@ -48,7 +48,7 @@ Sidebar.Scene = function ( editor ) {
 	fogTypeRow.add( new UI.Text( 'Fog' ).setWidth( '90px' ) );
 	fogTypeRow.add( fogType );
 
-	container.add( fogTypeRow );
+	//container.add( fogTypeRow );
 
 	// fog color
 
@@ -65,7 +65,7 @@ Sidebar.Scene = function ( editor ) {
 	fogColorRow.add( new UI.Text( 'Fog color' ).setWidth( '90px' ) );
 	fogColorRow.add( fogColor );
 
-	container.add( fogColorRow );
+	//container.add( fogColorRow );
 
 	// fog near
 
@@ -77,7 +77,7 @@ Sidebar.Scene = function ( editor ) {
 	fogNearRow.add( new UI.Text( 'Fog near' ).setWidth( '90px' ) );
 	fogNearRow.add( fogNear );
 
-	container.add( fogNearRow );
+	//container.add( fogNearRow );
 
 	var fogFarRow = new UI.Panel();
 	fogFarRow.setDisplay( 'none' );
@@ -89,7 +89,7 @@ Sidebar.Scene = function ( editor ) {
 	fogFarRow.add( new UI.Text( 'Fog far' ).setWidth( '90px' ) );
 	fogFarRow.add( fogFar );
 
-	container.add( fogFarRow );
+	//container.add( fogFarRow );
 
 	// fog density
 
@@ -101,7 +101,7 @@ Sidebar.Scene = function ( editor ) {
 	fogDensityRow.add( new UI.Text( 'Fog density' ).setWidth( '90px' ) );
 	fogDensityRow.add( fogDensity );
 
-	container.add( fogDensityRow );
+	//container.add( fogDensityRow );
 
 	//
 
@@ -188,7 +188,7 @@ Sidebar.Scene = function ( editor ) {
 
 		}
 
-		refreshFogUI();
+		//refreshFogUI();
 
 	} );
 
