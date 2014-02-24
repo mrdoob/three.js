@@ -273,8 +273,14 @@ Editor.prototype = {
 
 		if(this.unselectable( object ) ){
 
+			//Don't allow selection of these things
+			/*
 			this.deselect();
 			return;
+			*/
+
+
+			//Still allow selecting so that I can mess with them.
 
 		}
 

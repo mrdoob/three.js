@@ -36,7 +36,7 @@ function createGround() {
         new THREE.MeshLambertMaterial( {
             emissive: 'white', 
             transparent: true, 
-            opacity: 0
+            opacity: 0.5
         } )
     );
     ground.overdraw = true;
@@ -68,7 +68,7 @@ function createLightAtPos( x, y, z ) {
 
     // some problem with directional light creating empty objects visible in 
     // the editor list of objects...
-    var dlight = new THREE.SpotLight( 0xffffff );
+    var dlight = new THREE.DirectionalLight( 0xffffff );
     dlight.position.set( x, y, z );        
     
     
@@ -77,13 +77,34 @@ function createLightAtPos( x, y, z ) {
     //dlight.shadowCameraVisible = true;
     
     dlight.target.name = "lightTarget";
-    dlight.target.position.set( x, y-10, z );
+    dlight.target.position.set( 50,-100,200 );
 
     dlight.name = "light";
     dlight.intensity = 7;
     editor.addObject(dlight);
 
     //editor.addObject(dlight.target);
+}
+
+function loadTreeAtPos(x,y,z){
+    
+     var callback = function( obj3d ) {
+
+                console.log(obj3d);
+
+                var tree = obj3d.scene.children[0];
+                //tree.name = "tree";
+                tree.position.set(50,-100,250);
+                tree.castShadow = true;
+                tree.receiveShadow = true;
+
+
+                editor.addObject(tree);// obj3d.scene );
+                editor.select(tree);// obj3d.scene );
+            }
+    
+            var mloader = new THREE.ColladaLoader();
+            mloader.load("media/river_birch.DAE", callback); // FIXME
 }
 
 function loadPanorama() {

@@ -230,6 +230,7 @@ THREE.ObjectExporter.prototype = {
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
 				data.targetUuid = object.target.uuid;
+				data.castShadow = object.castShadow;
 
 			} else if ( object instanceof THREE.PointLight ) {
 
@@ -247,6 +248,7 @@ THREE.ObjectExporter.prototype = {
 				data.angle = object.angle;
 				data.exponent = object.exponent;
 				data.targetUuid = object.target.uuid;
+				data.castShadow = object.castShadow;
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
@@ -259,6 +261,8 @@ THREE.ObjectExporter.prototype = {
 				data.type = 'Mesh';
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
+				data.receiveShadow = object.receiveShadow;
+				data.castShadow = object.castShadow;
 
 			} else if ( object instanceof THREE.Sprite ) {
 

@@ -95,9 +95,6 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.rotate = function ( delta ) {
 
-
-		//vector.copy( object.target );
-		//vector.copy( object.position ).sub( center );
 		vector.copy(target);
 
 		var theta = Math.atan2( vector.x, vector.z );
@@ -118,6 +115,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		//object.position.copy( center ).add( vector );
 		target = vector;
+
 		object.lookAt( target );
 
 		scope.dispatchEvent( changeEvent );

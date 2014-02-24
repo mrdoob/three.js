@@ -118,7 +118,7 @@ Sidebar.Scene = function ( editor ) {
 
 	// events
 
-	//Hide Objects for a simpler view for Rhessys
+	//Hide Objects for a simpler view for RHESSys
 	function displayObject(obj){
 		if(editor.getObjectType(obj)!= "Mesh")return false;
 		
@@ -148,13 +148,18 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 				var objectType = editor.getObjectType( object );
+
 				if(!displayObject(object)){
-					continue;
+					//don't display them at all
+					//continue;
+
+					//"Advanced view": display them with extra padding, so we can distinguish them
+					var invis_pad = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 				}
 
 
 
-				var option = pad + '<span class="type ' + objectType + '"></span> ' + object.name;
+				var option = invis_pad + pad + '<span class="type ' + objectType + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
@@ -171,7 +176,7 @@ Sidebar.Scene = function ( editor ) {
 
 				options[ object.id ] = option;
 
-				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' ); //this is the subsequent spacing that children of other objects get
+				addObjects( object.children, invis_pad + pad + '&nbsp;&nbsp;&nbsp;' ); //this is the subsequent spacing that children of other objects get
 
 			}
 
