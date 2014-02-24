@@ -39,7 +39,7 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 				// Add a new target to the scene for this light
 
 				this.add( object.target );
-				object.targetuuid = object.target.uuid;
+				object.targetUuid = object.target.uuid;
 
 			}
 
