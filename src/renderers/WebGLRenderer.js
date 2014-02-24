@@ -3180,7 +3180,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function painterSortStable ( a, b ) {
 
-		if ( a.z !== b.z ) {
+		if ( a.materialId !== b.materialId ) {
+
+			return b.materialId - a.materialId;
+
+		} else if ( a.z !== b.z ) {
 
 			return b.z - a.z;
 
@@ -3269,6 +3273,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object = webglObject.object;
 
 			webglObject.id = i;
+			webglObject.materialId = object.material.id;
 			webglObject.render = false;
 
 			if ( object.visible ) {
@@ -3811,6 +3816,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				id: null,
 				buffer: buffer,
 				object: object,
+				materialId: null,
 				opaque: null,
 				transparent: null,
 				z: 0
