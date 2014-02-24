@@ -20257,9 +20257,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_buffers = {},
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
-	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
-	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+	_depth = parameters.depth !== undefined ? parameters.depth : true,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
+	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
@@ -23255,12 +23256,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function disableAttributes() {
 
-		for ( var attribute in _enabledAttributes ) {
+		for ( var i = 0, l = _enabledAttributes.length; i < l; i ++ ) {
 
-			if ( _enabledAttributes[ attribute ] === 1 ) {
+			if ( _enabledAttributes[ i ] === 1 ) {
 
-				_gl.disableVertexAttribArray( attribute );
-				_enabledAttributes[ attribute ] = 0;
+				_gl.disableVertexAttribArray( i );
+				_enabledAttributes[ i ] = 0;
 
 			}
 
@@ -23417,7 +23418,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function painterSortStable ( a, b ) {
 
-		if ( a.z !== b.z ) {
+		if ( a.materialId !== b.materialId ) {
+
+			return b.materialId - a.materialId;
+
+		} else if ( a.z !== b.z ) {
 
 			return b.z - a.z;
 
@@ -23506,6 +23511,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object = webglObject.object;
 
 			webglObject.id = i;
+			webglObject.materialId = object.material.id;
 			webglObject.render = false;
 
 			if ( object.visible ) {
@@ -24048,6 +24054,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				id: null,
 				buffer: buffer,
 				object: object,
+				materialId: null,
 				opaque: null,
 				transparent: null,
 				z: 0
@@ -26644,9 +26651,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var attributes = {
 				alpha: _alpha,
-				premultipliedAlpha: _premultipliedAlpha,
-				antialias: _antialias,
+				depth: _depth,
 				stencil: _stencil,
+				antialias: _antialias,
+				premultipliedAlpha: _premultipliedAlpha,
 				preserveDrawingBuffer: _preserveDrawingBuffer
 			};
 
