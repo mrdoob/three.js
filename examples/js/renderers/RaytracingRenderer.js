@@ -41,8 +41,12 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var raycaster = new THREE.Raycaster( origin, direction );
 	var raycasterLight = new THREE.Raycaster();
 
+	var cameraNormalMatrix = new THREE.Matrix3();
+
 	var objects;
 	var lights = [];
+
+	var animationFrameId = null;
 
 	this.domElement = canvas;
 
@@ -91,8 +95,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			for ( var x = 0; x < blockSize; x ++, index += 4 ) {
 
-				direction.set( x + blockX - canvasWidthHalf, y + blockY - canvasHeightHalf, - 500 );
-				direction.normalize();
+				direction.set( x + blockX - canvasWidthHalf, - ( y + blockY - canvasHeightHalf ), - 1000 );
+				direction.applyMatrix3( cameraNormalMatrix ).normalize();
 
 				var intersections = raycaster.intersectObjects( objects, true );
 
@@ -115,7 +119,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					}
 
-					if ( material instanceof THREE.MeshLambertMaterial ) {
+					if ( material instanceof THREE.MeshLambertMaterial ||
+						 material instanceof THREE.MeshPhongMaterial ) {
 
 						lightColor.set( 0, 0, 0 );
 
@@ -131,7 +136,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 							if ( intersections.length === 0 ) {
 
-								var dot = 1.0 - Math.max( face.normal.dot( raycasterLight.ray.direction ), 0 );
+								var dot = Math.max( face.normal.dot( raycasterLight.ray.direction ), 0 );
 								var intensity = dot * light.intensity;
 
 								lightColor.r += light.color.r * intensity;
@@ -171,7 +176,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		context.fillRect( blockX, blockY, blockSize, blockSize );
 
-		requestAnimationFrame( renderBlock );
+		animationFrameId = requestAnimationFrame( renderBlock );
 
 	};
 
@@ -179,9 +184,12 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		if ( this.autoClear === true ) this.clear();
 
+		cancelAnimationFrame( animationFrameId );
+
 		blockX = 0;
 		blockY = 0;
 
+		cameraNormalMatrix.getNormalMatrix( camera.matrixWorld );
 		origin.copy( camera.position );
 
 		objects = scene.children;
