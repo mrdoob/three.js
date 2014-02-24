@@ -55,7 +55,7 @@
 
 				}
 
-				torus = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, vertexColors: THREE.FaceColors } ) );
+				torus = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
 				scene.add( torus );
 
 				// Plane
@@ -68,15 +68,15 @@
 
 				}
 
-				cube = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x00ff00, vertexColors: THREE.FaceColors } ) );
+				cube = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } ) );
 				scene.add( cube );
 
-				var light = new THREE.PointLight( 0xffffff );
+				var light = new THREE.PointLight( 0xffffff, 0.5 );
 				light.position.set( 300, 300, 300 );
 				scene.add( light );
 
-				var light = new THREE.PointLight( 0xffffff );
-				light.position.set( - 300, - 300, 300 );
+				var light = new THREE.PointLight( 0x0000ff );
+				light.position.set( - 300, 300, 300 );
 				scene.add( light );
 
 				renderer = new THREE.RaytracingRenderer();

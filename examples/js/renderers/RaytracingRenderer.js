@@ -33,6 +33,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var data = imagedata.data;
 
 	var color = new THREE.Color();
+	var lightColor = new THREE.Color();
 
 	var origin = new THREE.Vector3();
 	var direction = new THREE.Vector3();
@@ -88,7 +89,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		for ( var y = 0; y < blockSize; y ++ ) {
 
-			for ( var x = 0; x < blockSize; x ++ ) {
+			for ( var x = 0; x < blockSize; x ++, index += 4 ) {
 
 				direction.set( x + blockX - canvasWidthHalf, y + blockY - canvasHeightHalf, - 500 );
 				direction.normalize();
@@ -102,6 +103,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 					var point = intersection.point;
 					var object = intersection.object;
 					var material = object.material;
+					var face = intersection.face;
 
 					if ( material.vertexColors === THREE.NoColors ) {
 
@@ -109,11 +111,13 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					} else if ( material.vertexColors === THREE.FaceColors ) {
 
-						color.copy( intersection.face.color );
+						color.copy( face.color );
 
 					}
 
-					if ( lights.length > 0 ) {
+					if ( material instanceof THREE.MeshLambertMaterial ) {
+
+						lightColor.set( 0, 0, 0 );
 
 						raycasterLight.ray.origin.copy( point );
 
@@ -125,13 +129,20 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 							var intersections = raycasterLight.intersectObjects( objects, true );
 
-							if ( intersections.length > 0 ) {
+							if ( intersections.length === 0 ) {
 
-								color.multiplyScalar( 0.25 );
+								var dot = 1.0 - Math.max( face.normal.dot( raycasterLight.ray.direction ), 0 );
+								var intensity = dot * light.intensity;
+
+								lightColor.r += light.color.r * intensity;
+								lightColor.g += light.color.g * intensity;
+								lightColor.b += light.color.b * intensity;
 
 							}
 
 						}
+
+						color.multiply( lightColor );
 
 					}
 
@@ -140,8 +151,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 					data[ index + 2 ] = color.b * 255;
 
 				}
-
-				index += 4;
 
 			}
 
