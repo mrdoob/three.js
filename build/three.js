@@ -7858,6 +7858,36 @@ THREE.Object3D.prototype = {
 
 	},
 
+	getObjectByUuid: function ( uuid, recursive ) {
+ 
+ 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+ 
+ 			var child = this.children[ i ];
+ 
+ 			if ( child.uuid === uuid ) {
+ 
+ 				return child;
+ 
+ 			}
+ 
+ 			if ( recursive === true ) {
+ 
+ 				child = child.getObjectByUuid( uuid, recursive );
+ 
+ 				if ( child !== undefined ) {
+ 
+ 					return child;
+ 
+ 				}
+ 
+ 			}
+ 
+ 		}
+ 
+ 		return undefined;
+ 
+ 	},
+
 	getObjectByName: function ( name, recursive ) {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
@@ -12286,6 +12316,27 @@ THREE.ObjectLoader.prototype = {
 		var materials = this.parseMaterials( json.materials );
 		var object = this.parseObject( json.object, geometries, materials );
 
+		if(object instanceof THREE.Scene){
+
+			// Find lights with targets that have recorded the UUID of their target.
+			// Link those lights with their targets
+
+			object.traverse(function(childObject){
+
+				if(childObject.targetUuid){
+
+					// object is the scene, and childObject is a light with a target
+
+					childObject.target = object.getObjectByUuid(childObject.targetUuid,true);
+					console.log(childObject.name + " has target " + childObject.target.uuid);
+
+				}
+
+			});
+
+		}
+
+
 		return object;
 
 	},
@@ -12502,6 +12553,12 @@ THREE.ObjectLoader.prototype = {
 
 					object = new THREE.DirectionalLight( data.color, data.intensity );
 
+					if( data.targetUuid ){
+
+						object.targetUuid = data.targetUuid;
+
+					}
+
 					break;
 
 				case 'PointLight':
@@ -12514,6 +12571,12 @@ THREE.ObjectLoader.prototype = {
 
 					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
 
+					if( data.targetUuid ){
+
+							object.targetUuid = data.targetUuid;
+
+					}
+					
 					break;
 
 				case 'HemisphereLight':
@@ -15927,7 +15990,12 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 		if ( object.target && object.target.parent === undefined ) {
 
-			this.add( object.target );
+			if(!object.targetUuid){
+
+				this.add( object.target );
+				object.targetUuid = object.target.uuid;
+
+			}
 
 		}
 

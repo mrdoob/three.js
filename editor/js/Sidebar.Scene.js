@@ -118,14 +118,29 @@ Sidebar.Scene = function ( editor ) {
 
 	// events
 
+	//Hide Objects for a simpler view for Rhessys
+	function displayObject(obj){
+		if(editor.getObjectType(obj)!= "Mesh")return false;
+		
+		if(obj.name == "ground") return false;
+		//if(obj  THREE.light) return false;
+		if(obj.name == "panorama") return false;
+		/*
+		if(editor.getObjectType(obj) == "Object3d") return false;
+		*/
+		return true;
+	}
+
+
 	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
 		var sceneType = editor.getObjectType( scene );
 
 		var options = {};
+		//add the scene to the list
 
-		options[ scene.id ] = '<span class="type ' + sceneType + '"></span> ' + scene.name;
+		//options[ scene.id ] = '<span class="type ' + sceneType + '"></span> ' + scene.name;
 
 		( function addObjects( objects, pad ) {
 
@@ -133,6 +148,11 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 				var objectType = editor.getObjectType( object );
+				if(!displayObject(object)){
+					continue;
+				}
+
+
 
 				var option = pad + '<span class="type ' + objectType + '"></span> ' + object.name;
 
@@ -151,11 +171,11 @@ Sidebar.Scene = function ( editor ) {
 
 				options[ object.id ] = option;
 
-				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
+				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' ); //this is the subsequent spacing that children of other objects get
 
 			}
 
-		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
+		} )( scene.children, '' ); //this is the initial spacing that all children of the scene receive
 
 		outliner.setOptions( options );
 

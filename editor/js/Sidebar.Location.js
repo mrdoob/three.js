@@ -32,7 +32,6 @@ Sidebar.Location = function ( editor ) {
             var mloader = new THREE.ColladaLoader();
             mloader.load("media/river_birch.DAE", callback); // FIXME
 
-            createTreeAtPos(80,-100,250);
 
         } );
 
