@@ -2414,6 +2414,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferImmediate = function ( object, program, material ) {
 
+		initAttributes();
+
 		if ( object.hasPositions && ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
 		if ( object.hasNormals && ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
 		if ( object.hasUvs && ! object.__webglUvBuffer ) object.__webglUvBuffer = _gl.createBuffer();
@@ -2423,7 +2425,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.position );
+			enableAttribute( program.attributes.position );
 			_gl.vertexAttribPointer( program.attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -2476,7 +2478,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.normal );
+			enableAttribute( program.attributes.normal );
 			_gl.vertexAttribPointer( program.attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -2485,7 +2487,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUvBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.uv );
+			enableAttribute( program.attributes.uv );
 			_gl.vertexAttribPointer( program.attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -2494,10 +2496,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.color );
+			enableAttribute( program.attributes.color );
 			_gl.vertexAttribPointer( program.attributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
+
+		disableUnusedAttributes();
 
 		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
@@ -3696,14 +3700,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry === undefined ) {
 
-				// TODO: Hacky...
+				// ImmediateRenderObject
 
-				object.__webglActive = true;
-				return;
-
-			}
-
-			if ( geometry.__webglInit === undefined ) {
+			} else if ( geometry.__webglInit === undefined ) {
 
 				geometry.__webglInit = true;
 				geometry.addEventListener( 'dispose', onGeometryDispose );
