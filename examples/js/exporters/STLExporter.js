@@ -41,7 +41,7 @@ THREE.STLExporter.prototype = {
 			mesh = meshes[i];
 			
 			geometry = mesh.geometry;
-			matrix = mesh.matrix;
+			matrix = mesh.matrixWorld;
 			position = mesh.position;
 			
 			for (j = 0; j < geometry.faces.length; j++) {
