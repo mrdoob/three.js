@@ -12028,7 +12028,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	};
 
-	if ( json.materials === undefined ) {
+	if ( json.materials === undefined || json.materials.length === 0 ) {
 
 		return { geometry: geometry };
 
@@ -20373,6 +20373,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentWidth = 0,
 	_currentHeight = 0,
 
+	_newAttributes = new Uint8Array( 16 ),
 	_enabledAttributes = new Uint8Array( 16 ),
 
 	// frustum
@@ -22641,6 +22642,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferImmediate = function ( object, program, material ) {
 
+		initAttributes();
+
 		if ( object.hasPositions && ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
 		if ( object.hasNormals && ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
 		if ( object.hasUvs && ! object.__webglUvBuffer ) object.__webglUvBuffer = _gl.createBuffer();
@@ -22650,7 +22653,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.position );
+			enableAttribute( program.attributes.position );
 			_gl.vertexAttribPointer( program.attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -22703,7 +22706,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.normal );
+			enableAttribute( program.attributes.normal );
 			_gl.vertexAttribPointer( program.attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -22712,7 +22715,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUvBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.uv );
+			enableAttribute( program.attributes.uv );
 			_gl.vertexAttribPointer( program.attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -22721,10 +22724,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.color );
+			enableAttribute( program.attributes.color );
 			_gl.vertexAttribPointer( program.attributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
+
+		disableUnusedAttributes();
 
 		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
@@ -22766,6 +22771,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		disableUnusedAttributes();
 		
 	}
 
@@ -22794,7 +22801,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( updateBuffers ) {
 
-			disableAttributes();
+			initAttributes();
 
 		}
 
@@ -23029,7 +23036,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( updateBuffers ) {
 
-			disableAttributes();
+			initAttributes();
 
 		}
 
@@ -23181,6 +23188,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		disableUnusedAttributes();
+
 		// render mesh
 
 		if ( object instanceof THREE.Mesh ) {
@@ -23233,7 +23242,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function initAttributes() {
+
+		for ( var i = 0, l = _newAttributes.length; i < l; i ++ ) {
+
+			_newAttributes[ i ] = 0;
+
+		}
+
+	}
+
 	function enableAttribute( attribute ) {
+
+		_newAttributes[ attribute ] = 1;
 
 		if ( _enabledAttributes[ attribute ] === 0 ) {
 
@@ -23242,13 +23263,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	function disableAttributes() {
+	function disableUnusedAttributes() {
 
 		for ( var i = 0, l = _enabledAttributes.length; i < l; i ++ ) {
 
-			if ( _enabledAttributes[ i ] === 1 ) {
+			if ( _enabledAttributes[ i ] !== _newAttributes[ i ] ) {
 
 				_gl.disableVertexAttribArray( i );
 				_enabledAttributes[ i ] = 0;
@@ -23257,7 +23278,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	function setupMorphTargets ( material, geometryGroup, object ) {
 
@@ -23907,14 +23928,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry === undefined ) {
 
-				// TODO: Hacky...
+				// ImmediateRenderObject
 
-				object.__webglActive = true;
-				return;
-
-			}
-
-			if ( geometry.__webglInit === undefined ) {
+			} else if ( geometry.__webglInit === undefined ) {
 
 				geometry.__webglInit = true;
 				geometry.addEventListener( 'dispose', onGeometryDispose );
