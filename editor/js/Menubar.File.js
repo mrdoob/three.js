@@ -7,18 +7,14 @@ Menubar.File = function ( editor ) {
 		var object = editor.selected;
 		var exporter = new exporterClass();
 
-		var output;
+		var output = exporter.parse( object.geometry );
 
 		if ( exporter instanceof THREE.BufferGeometryExporter ||
 			 exporter instanceof THREE.Geometry2Exporter ||
 		     exporter instanceof THREE.GeometryExporter ) {
 
-			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
+			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		} else {
-
-			output = exporter.parse( object.geometry );
 
 		}
 
@@ -50,8 +46,14 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new exporterClass();
 
-		var output = JSON.stringify( exporter.parse( editor.scene ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+		var output = exporter.parse( editor.scene );
+
+		if ( exporterClass instanceof THREE.ObjectExporter ) {
+
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		}
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
@@ -151,6 +153,12 @@ Menubar.File = function ( editor ) {
 
 	}
 
+	function onExportSTLOptionClick () {
+
+		exportScene( THREE.STLExporter );
+
+	}
+
 	// create file input element for scene import
 
 	var fileInput = document.createElement( 'input' );
@@ -172,7 +180,8 @@ Menubar.File = function ( editor ) {
 		createOption( 'Export Geometry', onExportGeometryOptionClick ),
 		createOption( 'Export Object', onExportObjectOptionClick ),
 		createOption( 'Export Scene', onExportSceneOptionClick ),
-		createOption( 'Export OBJ', onExportOBJOptionClick )
+		createOption( 'Export OBJ', onExportOBJOptionClick ),
+		createOption( 'Export STL', onExportSTLOptionClick )
 	];
 
 	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );

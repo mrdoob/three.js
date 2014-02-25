@@ -8,6 +8,12 @@ THREE.STLExporter = function () {
 
 THREE.STLExporter.prototype = {
 	constructor: THREE.STLExporter,
+
+	parse : function (scene) {
+
+		return this.exportScene (scene);
+
+	},
 	
 	exportScene : function (scene) {
 		var meshes = [];
