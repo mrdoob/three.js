@@ -5512,39 +5512,39 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#ifdef USE_COLOR",
 
-				"attribute vec3 color;",
+			"	attribute vec3 color;",
 
 			"#endif",
 
 			"#ifdef USE_MORPHTARGETS",
 
-				"attribute vec3 morphTarget0;",
-				"attribute vec3 morphTarget1;",
-				"attribute vec3 morphTarget2;",
-				"attribute vec3 morphTarget3;",
+			"	attribute vec3 morphTarget0;",
+			"	attribute vec3 morphTarget1;",
+			"	attribute vec3 morphTarget2;",
+			"	attribute vec3 morphTarget3;",
 
-				"#ifdef USE_MORPHNORMALS",
+			"	#ifdef USE_MORPHNORMALS",
 
-					"attribute vec3 morphNormal0;",
-					"attribute vec3 morphNormal1;",
-					"attribute vec3 morphNormal2;",
-					"attribute vec3 morphNormal3;",
+			"		attribute vec3 morphNormal0;",
+			"		attribute vec3 morphNormal1;",
+			"		attribute vec3 morphNormal2;",
+			"		attribute vec3 morphNormal3;",
 
-				"#else",
+			"	#else",
 
-					"attribute vec3 morphTarget4;",
-					"attribute vec3 morphTarget5;",
-					"attribute vec3 morphTarget6;",
-					"attribute vec3 morphTarget7;",
+			"		attribute vec3 morphTarget4;",
+			"		attribute vec3 morphTarget5;",
+			"		attribute vec3 morphTarget6;",
+			"		attribute vec3 morphTarget7;",
 
-				"#endif",
+			"	#endif",
 
 			"#endif",
 
 			"#ifdef USE_SKINNING",
 
-				"attribute vec4 skinIndex;",
-				"attribute vec4 skinWeight;",
+			"	attribute vec4 skinIndex;",
+			"	attribute vec4 skinWeight;",
 
 			"#endif",
 
