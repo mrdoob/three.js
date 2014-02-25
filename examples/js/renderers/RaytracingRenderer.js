@@ -65,7 +65,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var renderBlock = ( function () {
 
-		var blockSize = 64;
+		var blockSize = 32;
 
 		var canvasBlock = document.createElement( 'canvas' );
 		canvasBlock.width = blockSize;
