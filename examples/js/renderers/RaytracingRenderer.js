@@ -18,23 +18,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var clearColor = new THREE.Color( 0x000000 );
 
-	var blockX, blockY;
-	var blockSize = 64;
-
-	var canvasBlock = document.createElement( 'canvas' );
-	canvasBlock.width = blockSize;
-	canvasBlock.height = blockSize;
-
-	var contextBlock = canvasBlock.getContext( '2d', {
-		alpha: parameters.alpha === true
-	} );
-
-	var imagedata = contextBlock.getImageData( 0, 0, blockSize, blockSize );
-	var data = imagedata.data;
-
-	var color = new THREE.Color();
-	var lightColor = new THREE.Color();
-
 	var origin = new THREE.Vector3();
 	var direction = new THREE.Vector3();
 
@@ -80,115 +63,134 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	};
 
-	var renderBlock = function () {
+	var renderBlock = ( function () {
 
-		for ( var i = 0, l = data.length; i < l; i += 4 ) {
+		var blockSize = 64;
 
-			data[ i ] = 0;
-			data[ i + 1 ] = 0;
-			data[ i + 2 ] = 0;
+		var canvasBlock = document.createElement( 'canvas' );
+		canvasBlock.width = blockSize;
+		canvasBlock.height = blockSize;
 
-		}
+		var contextBlock = canvasBlock.getContext( '2d', {
+			alpha: parameters.alpha === true
+		} );
 
-		var index = 0;
+		var imagedata = contextBlock.getImageData( 0, 0, blockSize, blockSize );
+		var data = imagedata.data;
 
-		for ( var y = 0; y < blockSize; y ++ ) {
+		var color = new THREE.Color();
+		var lightColor = new THREE.Color();
 
-			for ( var x = 0; x < blockSize; x ++, index += 4 ) {
+		return function ( blockX, blockY ) {
 
-				direction.set( x + blockX - canvasWidthHalf, - ( y + blockY - canvasHeightHalf ), - perspective );
-				direction.applyMatrix3( cameraNormalMatrix ).normalize();
+			var index = 0;
 
-				var intersections = raycaster.intersectObjects( objects, true );
+			for ( var y = 0; y < blockSize; y ++ ) {
 
-				if ( intersections.length > 0 ) {
+				for ( var x = 0; x < blockSize; x ++, index += 4 ) {
 
-					var intersection = intersections[ 0 ];
+					direction.set( x + blockX - canvasWidthHalf, - ( y + blockY - canvasHeightHalf ), - perspective );
+					direction.applyMatrix3( cameraNormalMatrix ).normalize();
 
-					var point = intersection.point;
-					var object = intersection.object;
-					var material = object.material;
-					var face = intersection.face;
+					var intersections = raycaster.intersectObjects( objects, true );
 
-					if ( material.vertexColors === THREE.NoColors ) {
+					if ( intersections.length > 0 ) {
 
-						color.copy( material.color );
+						var intersection = intersections[ 0 ];
 
-					} else if ( material.vertexColors === THREE.FaceColors ) {
+						var point = intersection.point;
+						var object = intersection.object;
+						var material = object.material;
+						var face = intersection.face;
 
-						color.copy( face.color );
+						if ( material.vertexColors === THREE.NoColors ) {
 
-					}
+							color.copy( material.color );
 
-					if ( material instanceof THREE.MeshLambertMaterial ||
-						 material instanceof THREE.MeshPhongMaterial ) {
+						} else if ( material.vertexColors === THREE.FaceColors ) {
 
-						lightColor.set( 0, 0, 0 );
-
-						raycasterLight.ray.origin.copy( point );
-
-						for ( var i = 0, l = lights.length; i < l; i ++ ) {
-
-							var light = lights[ i ];
-
-							raycasterLight.ray.direction.copy( light.position ).sub( point ).normalize();
-
-							var intersections = raycasterLight.intersectObjects( objects, true );
-
-							if ( intersections.length === 0 ) {
-
-								var dot = Math.max( face.normal.dot( raycasterLight.ray.direction ), 0 );
-								var intensity = dot * light.intensity;
-
-								lightColor.r += light.color.r * intensity;
-								lightColor.g += light.color.g * intensity;
-								lightColor.b += light.color.b * intensity;
-
-							}
+							color.copy( face.color );
 
 						}
 
-						color.multiply( lightColor );
+						if ( material instanceof THREE.MeshLambertMaterial ||
+							 material instanceof THREE.MeshPhongMaterial ) {
+
+							lightColor.set( 0, 0, 0 );
+
+							raycasterLight.ray.origin.copy( point );
+
+							for ( var i = 0, l = lights.length; i < l; i ++ ) {
+
+								var light = lights[ i ];
+
+								raycasterLight.ray.direction.copy( light.position ).sub( point ).normalize();
+
+								var intersections = raycasterLight.intersectObjects( objects, true );
+
+								if ( intersections.length === 0 ) {
+
+									var dot = Math.max( face.normal.dot( raycasterLight.ray.direction ), 0 );
+									var intensity = dot * light.intensity;
+
+									lightColor.r += light.color.r * intensity;
+									lightColor.g += light.color.g * intensity;
+									lightColor.b += light.color.b * intensity;
+
+								}
+
+							}
+
+							color.multiply( lightColor );
+
+						}
+
+						data[ index ] = color.r * 255;
+						data[ index + 1 ] = color.g * 255;
+						data[ index + 2 ] = color.b * 255;
+
+					} else {
+
+						data[ index ] = 0;
+						data[ index + 1 ] = 0;
+						data[ index + 2 ] = 0;
 
 					}
-
-					data[ index ] = color.r * 255;
-					data[ index + 1 ] = color.g * 255;
-					data[ index + 2 ] = color.b * 255;
 
 				}
 
 			}
 
-		}
+			context.putImageData( imagedata, blockX, blockY );
 
-		context.putImageData( imagedata, blockX, blockY );
+			blockX += blockSize;
 
-		blockX += blockSize;
+			if ( blockX >= canvasWidth ) {
 
-		if ( blockX >= canvasWidth ) {
+				blockX = 0;
+				blockY += blockSize;
 
-			blockX = 0;
-			blockY += blockSize;
+				if ( blockY >= canvasHeight ) return;
 
-			if ( blockY >= canvasHeight ) return;
+			}
 
-		}
+			context.fillRect( blockX, blockY, blockSize, blockSize );
 
-		context.fillRect( blockX, blockY, blockSize, blockSize );
+			animationFrameId = requestAnimationFrame( function () {
 
-		animationFrameId = requestAnimationFrame( renderBlock );
+				renderBlock( blockX, blockY );
 
-	};
+			} );
+
+		};
+
+	}() );
 
 	this.render = function ( scene, camera ) {
 
 		if ( this.autoClear === true ) this.clear();
 
 		cancelAnimationFrame( animationFrameId );
-
-		blockX = 0;
-		blockY = 0;
 
 		cameraNormalMatrix.getNormalMatrix( camera.matrixWorld );
 		origin.copy( camera.position );
@@ -211,7 +213,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		} )
 
-		renderBlock();
+		renderBlock( 0, 0 );
 
 	}
 
