@@ -522,7 +522,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	};
 
-	if ( json.materials === undefined ) {
+	if ( json.materials === undefined || json.materials.length === 0 ) {
 
 		return { geometry: geometry };
 
