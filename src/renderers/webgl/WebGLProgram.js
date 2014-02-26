@@ -262,6 +262,11 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		// clean up
+
+		_gl.deleteShader( glVertexShader );
+		_gl.deleteShader( glFragmentShader );
+
 		// cache uniform locations
 
 		var identifiers = [
@@ -326,13 +331,8 @@ THREE.WebGLProgram = ( function () {
 		this.code = code;
 		this.usedTimes = 1;
 		this.program = program;
-		this.vertexShader = glVertexShader; // _gl.getShaderSource( glVertexShader );
-		this.fragmentShader = _gl.getShaderSource( glFragmentShader );
-
-		// clean up
-
-		_gl.deleteShader( glVertexShader );
-		_gl.deleteShader( glFragmentShader );
+		this.vertexShader = glVertexShader;
+		this.fragmentShader = glFragmentShader;
 
 		return this;
 
