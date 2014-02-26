@@ -50,35 +50,96 @@
 
 				// materials
 
-				var phongMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x222222, shininess: 150, vertexColors: THREE.NoColors, shading: THREE.SmoothShading } );
+				var phongMaterial = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					specular: 0x222222,
+					shininess: 150,
+					vertexColors: THREE.NoColors,
+					shading: THREE.SmoothShading
+				} );
 
-				var phongMaterialBox = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 100, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
-				var phongMaterialBoxBottom = new THREE.MeshPhongMaterial( { color: 0x666666, specular: 0x111111, shininess: 100, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
-				var phongMaterialBoxLeft = new THREE.MeshPhongMaterial( { color: 0x990000, specular: 0x111111, shininess: 100, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
-				var phongMaterialBoxRight = new THREE.MeshPhongMaterial( { color: 0x0066ff, specular: 0x111111, shininess: 100, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+				var phongMaterialBox = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					specular: 0x111111,
+					shininess: 100,
+					vertexColors: THREE.NoColors,
+					shading: THREE.FlatShading
+				} );
 
-				var mirrorMaterialFlat = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff8888, shininess: 10000, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+				var phongMaterialBoxBottom = new THREE.MeshPhongMaterial( {
+					color: 0x666666,
+					specular: 0x111111,
+					shininess: 100,
+					vertexColors: THREE.NoColors,
+					shading: THREE.FlatShading
+				} );
+
+				var phongMaterialBoxLeft = new THREE.MeshPhongMaterial( {
+					color: 0x990000,
+					specular: 0x111111,
+					shininess: 100,
+					vertexColors: THREE.NoColors,
+					shading: THREE.FlatShading
+				} );
+
+				var phongMaterialBoxRight = new THREE.MeshPhongMaterial( {
+					color: 0x0066ff,
+					specular: 0x111111,
+					shininess: 100,
+					vertexColors: THREE.NoColors,
+					shading: THREE.FlatShading
+				} );
+
+				var mirrorMaterialFlat = new THREE.MeshPhongMaterial( {
+					color: 0x000000,
+					specular: 0xff8888,
+					shininess: 10000,
+					vertexColors: THREE.NoColors,
+					shading: THREE.FlatShading
+				} );
 				mirrorMaterialFlat.mirror = true;
 				mirrorMaterialFlat.reflectivity = 1;
 
-				var mirrorMaterialFlatDark = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xaaaaaa, shininess: 10000, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+				var mirrorMaterialFlatDark = new THREE.MeshPhongMaterial( {
+					color: 0x000000,
+					specular: 0xaaaaaa,
+					shininess: 10000,
+					vertexColors: THREE.NoColors,
+					shading: THREE.FlatShading
+				} );
 				mirrorMaterialFlatDark.mirror = true;
 				mirrorMaterialFlatDark.reflectivity = 1;
 
-				var mirrorMaterialSmooth = new THREE.MeshPhongMaterial( { color: 0xffaa00, specular: 0x222222, shininess: 10000, vertexColors: THREE.NoColors, shading: THREE.SmoothShading } );
+				var mirrorMaterialSmooth = new THREE.MeshPhongMaterial( {
+					color: 0xffaa00,
+					specular: 0x222222,
+					shininess: 10000,
+					vertexColors: THREE.NoColors,
+					shading: THREE.SmoothShading
+				} );
 				mirrorMaterialSmooth.mirror = true;
 				mirrorMaterialSmooth.reflectivity = 0.3;
 
-				var glassMaterialFlat = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x00ff00, shininess: 10000, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+				var glassMaterialFlat = new THREE.MeshPhongMaterial( {
+					color: 0x000000,
+					specular: 0x00ff00,
+					shininess: 10000,
+					vertexColors: THREE.NoColors,
+					shading: THREE.FlatShading
+				} );
 				glassMaterialFlat.glass = true;
 				glassMaterialFlat.reflectivity = 0.5;
 
-				var glassMaterialSmooth = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffaa55, shininess: 10000, vertexColors: THREE.NoColors, shading: THREE.SmoothShading } );
+				var glassMaterialSmooth = new THREE.MeshPhongMaterial( {
+					color: 0x000000,
+					specular: 0xffaa55,
+					shininess: 10000,
+					vertexColors: THREE.NoColors,
+					shading: THREE.SmoothShading
+				} );
 				glassMaterialSmooth.glass = true;
 				glassMaterialSmooth.reflectivity = 0.25;
 				glassMaterialSmooth.refractionRatio = 0.6;
-
-				var debugMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
 				// geometries
 
@@ -176,11 +237,6 @@
 				light.position.set( 0, 0, 300 );
 				light.physicalAttenuation = true;
 				scene.add( light );
-
-				//
-
-				//var mesh = new THREE.Mesh( new THREE.BoxGeometry( 5, 5, 5 ), debugMaterial );
-				//light.add( mesh );
 
 				//
 
