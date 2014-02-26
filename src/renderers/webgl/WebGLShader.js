@@ -16,32 +16,12 @@ THREE.WebGLShader = ( function () {
 
 	return function ( gl, type, string ) {
 
-		var shader; 
-
-		if ( type === 'vertex' ) {
-
-			shader = gl.createShader( gl.VERTEX_SHADER );
-
-		} else if ( type === 'fragment' ) {
-
-			shader = gl.createShader( gl.FRAGMENT_SHADER );
-
-		} else {
-
-			console.error( 'THREE.WebGLShader:', 'Unrecognised shader type', type );
-			return null;
-
-		}
+		var shader = gl.createShader( type ); 
 
 		gl.shaderSource( shader, string );
 		gl.compileShader( shader );
 
-		/*
-		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
-
-
-		}
-		*/
+		// if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {}
 
 		if ( gl.getShaderInfoLog( shader ) !== '' ) {
 

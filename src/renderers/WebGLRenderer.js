@@ -5600,8 +5600,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		].join( '\n' );
 
-		var glVertexShader = new THREE.WebGLShader( _gl, 'vertex', prefix_vertex + vertexShader );
-		var glFragmentShader = new THREE.WebGLShader( _gl, 'fragment', prefix_fragment + fragmentShader );
+		var glVertexShader = new THREE.WebGLShader( _gl, _gl.VERTEX_SHADER, prefix_vertex + vertexShader );
+		var glFragmentShader = new THREE.WebGLShader( _gl, _gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
 
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
