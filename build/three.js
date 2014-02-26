@@ -8909,15 +8909,8 @@ THREE.BufferGeometry = function () {
 
 	this.name = '';
 
-	// attributes
-
 	this.attributes = {};
-
-	// offsets for chunks when using indexed elements
-
 	this.offsets = [];
-
-	// boundings
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -8957,6 +8950,18 @@ THREE.BufferGeometry.prototype = {
 	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
+
+	},
+
+	addDrawCall: function ( start, count, indexOffset ) {
+
+		this.offsets.push( {
+
+			start: start,
+			count: count,
+			index: indexOffset !== undefined ? indexOffset : 0
+
+		} );
 
 	},
 
