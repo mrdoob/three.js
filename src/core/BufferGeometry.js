@@ -59,7 +59,7 @@ THREE.BufferGeometry.prototype = {
 
 			start: start,
 			count: count,
-			index: indexOffset || 0
+			index: indexOffset !== undefined ? indexOffset : 0
 
 		} );
 
