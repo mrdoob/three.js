@@ -25831,10 +25831,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform vec3 cameraPosition;",
 			""
 
-		].join("\n");
+		].join( '\n' );
 
-		var glVertexShader = getShader( "vertex", prefix_vertex + vertexShader );
-		var glFragmentShader = getShader( "fragment", prefix_fragment + fragmentShader );
+		var glVertexShader = new THREE.WebGLShader( _gl, 'vertex', prefix_vertex + vertexShader );
+		var glFragmentShader = new THREE.WebGLShader( _gl, 'fragment', prefix_fragment + fragmentShader );
 
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
@@ -25976,51 +25976,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function addLineNumbers ( string ) {
 
-		var chunks = string.split( "\n" );
-
-		for ( var i = 0, il = chunks.length; i < il; i ++ ) {
-
-			// Chrome reports shader errors on lines
-			// starting counting from 1
-
-			chunks[ i ] = ( i + 1 ) + ": " + chunks[ i ];
-
-		}
-
-		return chunks.join( "\n" );
-
-	};
-
-	function getShader ( type, string ) {
-
-		var shader;
-
-		if ( type === "fragment" ) {
-
-			shader = _gl.createShader( _gl.FRAGMENT_SHADER );
-
-		} else if ( type === "vertex" ) {
-
-			shader = _gl.createShader( _gl.VERTEX_SHADER );
-
-		}
-
-		_gl.shaderSource( shader, string );
-		_gl.compileShader( shader );
-
-		if ( !_gl.getShaderParameter( shader, _gl.COMPILE_STATUS ) ) {
-
-			console.error( _gl.getShaderInfoLog( shader ) );
-			console.error( addLineNumbers( string ) );
-			return null;
-
-		}
-
-		return shader;
-
-	};
 
 	// Textures
 
@@ -26866,6 +26822,63 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 
 THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
 
+THREE.WebGLShader = ( function () {
+
+	var addLineNumbers = function ( string ) {
+
+		var lines = string.split( '\n' );
+
+		for ( var i = 0; i < lines.length; i ++ ) {
+
+			lines[ i ] = ( i + 1 ) + ': ' + lines[ i ];
+
+		}
+
+		return lines.join( '\n' );
+
+	};
+
+	return function ( gl, type, string ) {
+
+		var shader; 
+
+		if ( type === 'vertex' ) {
+
+			shader = gl.createShader( gl.VERTEX_SHADER );
+
+		} else if ( type === 'fragment' ) {
+
+			shader = gl.createShader( gl.FRAGMENT_SHADER );
+
+		} else {
+
+			console.error( 'THREE.WebGLShader:', 'Unrecognised shader type', type );
+			return null;
+
+		}
+
+		gl.shaderSource( shader, string );
+		gl.compileShader( shader );
+
+		/*
+		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
+
+
+		}
+		*/
+
+		if ( gl.getShaderInfoLog( shader ) !== '' ) {
+
+			console.error( 'THREE.WebGLShader:', 'gl.getShaderInfoLog()', gl.getShaderInfoLog( shader ) );
+			console.error( addLineNumbers( string ) );
+
+		}
+
+		return shader;
+
+	};
+
+} )();
 /**
  * @author mrdoob / http://mrdoob.com/
  */
