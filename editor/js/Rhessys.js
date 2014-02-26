@@ -2,53 +2,24 @@
  * @author Steven Love <slove13@cs.unc.edu>
  */
 
-
-function createTreeAtPos( x, y, z ) {
-
-    var callback = function( geometry, materials ) {
-
-        
-        var default_mat = new THREE.MeshLambertMaterial( { color: 0x223311 } );        
-        var tree = new THREE.Mesh( geometry, default_mat );
-        var scale = 64;
-        tree.castShadow = true;
-        tree.receiveShadow = true;
-        tree.position.set( x, y, z );
-        tree.scale.set( scale, scale, scale );
-                 
-        // obj3d.castShadow = true;
-        // obj3d.receiveShadow = true;
-        // obj3d.name = "ModelContainer"
-        tree.name = "TreeModel";
-        editor.addObject( tree );
-               
-    }
-    
-    var	mloader = new THREE.JSONLoader();
-    mloader.load("../../streetview-studio/models/tree.js", callback); // FIXME
-    
-}
-
 function createGround() {
 
     var ground = new THREE.Mesh(
-        new THREE.CubeGeometry( 1024, 1, 1024 ), 
+        new THREE.PlaneGeometry( 2048, 2048 ),
         new THREE.MeshLambertMaterial( {
             emissive: 'white', 
             transparent: true, 
-            opacity: 0.5
+            opacity: 0.0
         } )
     );
-    ground.overdraw = true;
+    //ground.overdraw = true;
     ground.receiveShadow = true;
-    ground.position.set( 0, -100, 0 );
-    ground.name = "ground";
-    editor.addObject(ground);
-    //ground.translateY(50);
+    ground.rotation.set( 1.5 * Math.PI, 0, 0 );
+    ground.position.set( 0, -64, 0 );
+    ground.name = 'ground';
+    editor.addObject( ground );
 
 }     
-
-
 
 /** 
  * notes on problems with spotlight in the editor: 
@@ -71,78 +42,111 @@ function createLightAtPos( x, y, z ) {
     var dlight = new THREE.DirectionalLight( 0xffffff );
     dlight.position.set( x, y, z );        
     
-    
     dlight.castShadow = true;
     dlight.shadowDarkness = 0.5;
+    dlight.shadowMapWidth = 2048;
+    dlight.shadowMapHeight = 2048;
+
+    var d = 512;
+
+    dlight.shadowCameraLeft = -d;
+    dlight.shadowCameraRight = d;
+    dlight.shadowCameraTop = d;
+    dlight.shadowCameraBottom = -d;
+
+    dlight.shadowCameraFar = 1000;
     //dlight.shadowCameraVisible = true;
     
     dlight.target.name = "lightTarget";
-    dlight.target.position.set( 50,-100,200 );
+    dlight.target.position.set( 0, 0, 0 );
 
     dlight.name = "light";
-    dlight.intensity = 7;
-    editor.addObject(dlight);
+    dlight.intensity = 1;
+    editor.addObject( dlight );
 
-    //editor.addObject(dlight.target);
+    dlight = new THREE.DirectionalLight( 0xc4df9b, 0.25 );
+    dlight.position.set( 0, -32, 0 );
+
+    editor.addObject( dlight );
+
+    editor.addObject( new THREE.AmbientLight( 0x222222 ) );
+
 }
 
-function loadTreeAtPos(x,y,z){
+function loadTreeAtPos( x, y, z ) {
     
-     var callback = function( obj3d ) {
+    var callback = function( obj3d ) {
 
-                console.log(obj3d);
+        console.log( obj3d );
 
-                var tree = obj3d.scene.children[0];
-                //tree.name = "tree";
-                tree.position.set(50,-100,250);
-                tree.castShadow = true;
-                tree.receiveShadow = true;
+        var treeTexture = THREE.ImageUtils.loadTexture( 'media/river_birch.png' );
 
+        var uniforms = { texture:  { type: "t", value: treeTexture } };
+        
+        var fragmentShader = '' +
+            'uniform sampler2D texture;' +
+            'varying vec2 vUV;' +
+            'vec4 pack_depth( const in float depth ) {' +
+                'const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );' +
+                'const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );' +
+                'vec4 res = fract( depth * bit_shift );' +
+                'res -= res.xxyz * bit_mask;' +
+                'return res;' +
+            '}' +
+            'void main() {' +
+                'vec4 pixel = texture2D( texture, vUV );' +
+                'if ( pixel.a < 0.5 ) discard;' +
+                'gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );' +
+            '}';
 
-                editor.addObject(tree);// obj3d.scene );
-                editor.select(tree);// obj3d.scene );
-            }
+        var vertexShader = '' +
+            'varying vec2 vUV;' +
+            'void main() {' +
+                'vUV = 0.75 * uv;' +
+                'vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );' +
+                'gl_Position = projectionMatrix * mvPosition;' +
+            '}';
+
+        var tree = obj3d.scene.children[0];
+        //tree.name = "tree";
+        tree.position.set( x, y, z );
+        tree.scale.set( 1.5, 1.5, 1.5 );
+        tree.castShadow = true;
+        tree.receiveShadow = true;
+        tree.material = new THREE.MeshLambertMaterial( {
+            map: treeTexture,
+            transparent: true,
+            side: THREE.DoubleSide
+        } );
+        tree.customDepthMaterial = new THREE.ShaderMaterial( { 
+            uniforms: uniforms, 
+            vertexShader: vertexShader, 
+            fragmentShader: fragmentShader 
+        } );
+
+        editor.addObject( tree );
+        editor.select( tree );
+
+    }
     
-            var mloader = new THREE.ColladaLoader();
-            mloader.load("media/river_birch.DAE", callback); // FIXME
+    var mloader = new THREE.ColladaLoader();
+    mloader.load( 'media/river_birch.DAE', callback ); // FIXME
 }
 
 function loadPanorama() {
 
     var mesh = new THREE.Mesh(
-        new THREE.SphereGeometry( 500, 60, 40 ), 
-        new THREE.MeshBasicMaterial( { 
-            map: THREE.ImageUtils.loadTexture( './../../streetview-studio/search.png' ) // FIXME
-        } ) 
+        new THREE.SphereGeometry( 512, 32, 32 ), 
+        new THREE.MeshBasicMaterial( {
+            map: new THREE.Texture()
+        } )
     );
     var loader = new GSVPANO.PanoLoader();
 
     // create the spherical background mesh before we attach the panorama to it 
-    //mesh.position.set( 0, editor.config.getKey( "floorh" ), 0 );
     mesh.position.set( 0, 0, 0 );
     mesh.name = "panorama";
-    editor.addObject( mesh );
-    //editor.select( mesh );
-
-    function getLatLng() {
-        //choose one of these locations
-        var locations = [
-            { lat: 39.29533, lng: -76.74360 }
-            // { lat: 51.50700703827454, lng: -0.12791916931155356 },
-            // { lat: 32.6144404, lng: -108.9852017 },
-            // { lat: 39.36382677360614, lng: 8.431220278759724 },
-            // { lat: 59.30571937680209, lng: 4.879402148657164 },
-            // { lat: 28.240385123352873, lng: -16.629988706884774 },
-            // { lat: 50.09072314148827, lng: 14.393133454556278 },
-            // { lat: 41.413416092316275, lng: 2.1531126527786455 },
-            // { lat: 35.69143938066447, lng: 139.695139627539 },
-            // { lat: 35.67120372775569, lng: 139.77167914398797 },
-            // { lat: 54.552083679428065, lng: -3.297380963134742 }
-        ];
-        var pos = locations[ Math.floor( Math.random() * locations.length ) ];
-        var myLatLng = new google.maps.LatLng( pos.lat, pos.lng );
-        return myLatLng;
-    }
+    editor.sceneBackground.add( mesh );
 
     loader.onProgress = function( p ) {
         //setProgress( p );
@@ -159,13 +163,11 @@ function loadPanorama() {
             
     loader.onPanoramaLoad = function() {
     
-        console.log( "onPanoramaLoad" );
+        console.log( 'onPanoramaLoad' );
         //activeLocation = this.location;
         mesh.material.map = new THREE.Texture( this.canvas ); 
         mesh.material.side = THREE.DoubleSide;
         mesh.material.map.needsUpdate = true;
-        //showMessage( 'Panorama tiles loaded.<br/>The images are ' + this.copyright );
-        //showProgress( false );
         onWindowResize();
 
     };
@@ -173,8 +175,7 @@ function loadPanorama() {
     // 1 is very fuzzy, 2 is fuzzy, 3 is the highest resolution available.  
     // 4 errors occur, possibly because 4 panels don't have resolution 3 available
     loader.setZoom( 3 );
-
-    loader.load( getLatLng() );
+    loader.load( new google.maps.LatLng( 39.29533, -76.74360 ) );
 
 }
 
@@ -209,3 +210,31 @@ function raiseThings( amt ) {
     } );
 
 }
+
+/*
+function createTreeAtPos( x, y, z ) {
+
+    var callback = function( geometry, materials ) {
+
+        
+        var default_mat = new THREE.MeshLambertMaterial( { color: 0x223311 } );        
+        var tree = new THREE.Mesh( geometry, default_mat );
+        var scale = 64;
+        tree.castShadow = true;
+        tree.receiveShadow = true;
+        tree.position.set( x, y, z );
+        tree.scale.set( scale, scale, scale );
+                 
+        // obj3d.castShadow = true;
+        // obj3d.receiveShadow = true;
+        // obj3d.name = "ModelContainer"
+        tree.name = "TreeModel";
+        editor.addObject( tree );
+               
+    }
+    
+    var mloader = new THREE.JSONLoader();
+    mloader.load("../../streetview-studio/models/tree.js", callback); // FIXME
+    
+}
+*/

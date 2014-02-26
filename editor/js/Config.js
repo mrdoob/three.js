@@ -5,9 +5,8 @@ var Config = function () {
 	var storage = {
 		theme: 'css/light.css',
 		camera: {
-			//position: [ 500, 250, 500 ],
 			position: [ 0, 0, 0 ],
-			target: [ 50, 0, 200 ] 
+			target: [ 0, 0, 1 ] 
 		}
 	};
 

@@ -4,6 +4,30 @@ var Toolbar = function ( editor ) {
 
 	var container = new UI.Panel();
 
+	var location = new UI.Panel().setId( 'location' ).setClass( 'locdiv' );
+	var locationInput = new UI.Input().setWidth( '248px' ).setColor( '#444' );
+	var autocomplete = new google.maps.places.Autocomplete( locationInput.dom );
+	var goButton = new UI.Button( 'Go' ).onClick( function() {
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode( { 'address': locationInput.getValue() }, function( results, status ) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var coords = {
+            		lat: results[0].geometry.location.lat(),
+            		lng: results[0].geometry.location.lng()
+            	};
+
+            	editor.setLocation( coords );
+
+            } else {
+            	console.log( "Geocoding error. Status: " + status );
+            }
+        } );
+	} );
+
+	location.add( locationInput );
+	location.add( goButton );
+	container.add( location );
+
 	var buttons = new UI.Panel();
 	container.add( buttons );
 
@@ -44,6 +68,29 @@ var Toolbar = function ( editor ) {
 	var local = new UI.Checkbox( false ).onChange( update );
 	//buttons.add( local );
 	//buttons.add( new UI.Text( 'local' ) );
+
+
+	container.init = function( addr ) {
+		locationInput.setValue( addr );
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode( { 'address': locationInput.getValue() }, function( results, status ) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                var coords = {
+            		lat: results[0].geometry.location.lat(),
+            		lng: results[0].geometry.location.lng()
+            	};
+
+            	// hack for demo...
+            	coords.lat = 39.29533;
+            	coords.lng = -76.74360;
+
+            	editor.setLocation( coords );
+
+            } else {
+            	console.log( "Geocoding error. Status: " + status );
+            }
+        } );
+	}
 
 	function update() {
 

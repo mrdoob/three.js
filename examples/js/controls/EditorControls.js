@@ -18,6 +18,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var scope = this;
 	var vector = new THREE.Vector3();
+	var theta = 0.0;
+	var phi = Math.PI/2;
 
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
@@ -27,7 +29,7 @@ THREE.EditorControls = function ( object, domElement ) {
 	var pointer = new THREE.Vector2();
 	var pointerOld = new THREE.Vector2();
 
-	var target = new THREE.Vector3(50,0,200);
+	var target = new THREE.Vector3( 0, 0, 0);
 
 	// events
 
@@ -65,7 +67,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		object.position.add( distance );
 		center.add( distance );
 		*/
-		console.log("pan!");
+		//console.log("pan!");
 
 		scope.dispatchEvent( changeEvent );
 
@@ -81,8 +83,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		object.position.add( distance );
 		*/
-		console.log("zoom!");
-		console.log(object.fov);
+		//console.log("zoom!");
+		//console.log(object.fov);
 
 		object.fov += distance;
   		object.fov = Math.min(Math.max(object.fov, 10), 170);
@@ -95,10 +97,10 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.rotate = function ( delta ) {
 
-		vector.copy(target);
+		//vector.copy(target);
 
-		var theta = Math.atan2( vector.x, vector.z );
-		var phi = Math.atan2( Math.sqrt( vector.x * vector.x + vector.z * vector.z ), vector.y );
+		//var theta = Math.atan2( vector.x, vector.z );
+		//var phi = Math.atan2( Math.sqrt( vector.x * vector.x + vector.z * vector.z ), vector.y );
 
 		theta += delta.x;
 		phi -= delta.y;
@@ -107,16 +109,13 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
 
-		var radius = vector.length();
+		var radius = 1.0;
+		var look = new THREE.Vector3();
+		look.x = radius * Math.sin( phi ) * Math.sin( theta );
+		look.y = radius * Math.cos( phi );
+		look.z = radius * Math.sin( phi ) * Math.cos( theta );
 
-		vector.x = radius * Math.sin( phi ) * Math.sin( theta );
-		vector.y = radius * Math.cos( phi );
-		vector.z = radius * Math.sin( phi ) * Math.cos( theta );
-
-		//object.position.copy( center ).add( vector );
-		target = vector;
-
-		object.lookAt( target );
+		object.lookAt( look );
 
 		scope.dispatchEvent( changeEvent );
 
@@ -164,7 +163,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		var movementX = pointer.x - pointerOld.x;
 		var movementY = pointer.y - pointerOld.y;
 
-		console.log( state );
+		//console.log( state );
 
 		if ( state === STATE.ROTATE ) {
 

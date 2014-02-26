@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - cloth simulation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				text-align: center;
+				padding: 10px;
+				z-index: 10;
+				width: 100%;
+				position: absolute;
+			}
+
+			a {
+				text-decoration: underline;
+				cursor: pointer;
+			}
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">Simple Cloth Simulation<br/>
+			Verlet integration with Constrains relaxation<br/>
+			Toggle: <a onclick="rotate = !rotate;">Camera</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="../examples/js/Detector.js"></script>
+		<script src="../examples/js/libs/stats.min.js"></script>
+
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+
+		<script type="x-shader/x-fragment" id="fragmentShaderDepth">
+
+			uniform sampler2D texture;
+			varying vec2 vUV;
+
+			vec4 pack_depth( const in float depth ) {
+
+				const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
+				const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
+				vec4 res = fract( depth * bit_shift );
+				res -= res.xxyz * bit_mask;
+				return res;
+
+			}
+
+			void main() {
+
+				vec4 pixel = texture2D( texture, vUV );
+
+				if ( pixel.a < 0.5 ) discard;
+
+				gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );
+
+			}
+		</script>
+
+		<script type="x-shader/x-vertex" id="vertexShaderDepth">
+
+			varying vec2 vUV;
+
+			void main() {
+
+				vUV = 0.75 * uv;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var camera, scene, renderer;
+
+			var rotate = true;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// scene
+
+				scene = new THREE.Scene();
+
+				scene.fog = new THREE.Fog( 0xcce0ff, 500, 10000 );
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.y = 50;
+				camera.position.z = 1500;
+				scene.add( camera );
+
+				// lights
+
+				var light, materials;
+
+				scene.add( new THREE.AmbientLight( 0x333333 ) );
+
+				light = new THREE.DirectionalLight( 0xdfebff, 1 );
+				light.position.set( 50, 200, 100 );
+				light.position.multiplyScalar( 1.3 );
+
+				light.castShadow = true;
+				//light.shadowCameraVisible = true;
+
+				light.shadowMapWidth = 2048;
+				light.shadowMapHeight = 2048;
+
+				var d = 300;
+
+				light.shadowCameraLeft = -d;
+				light.shadowCameraRight = d;
+				light.shadowCameraTop = d;
+				light.shadowCameraBottom = -d;
+
+				light.shadowCameraFar = 1000;
+				light.shadowDarkness = 0.5;
+
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0x3dff0c, 0.35 );
+				light.position.set( 0, -1, 0 );
+
+				scene.add( light );
+
+				var callback = function( obj3d ) {
+
+			        console.log( obj3d );
+
+			        var treeTexture = THREE.ImageUtils.loadTexture( 'media/river_birch.png' );
+
+			        var uni = { texture:  { type: "t", value: treeTexture } };
+			        
+			        var fShader = '' +
+			            'uniform sampler2D texture;' +
+			            'varying vec2 vUV;' +
+			            'vec4 pack_depth( const in float depth ) {' +
+			                'const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );' +
+			                'const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );' +
+			                'vec4 res = fract( depth * bit_shift );' +
+			                'res -= res.xxyz * bit_mask;' +
+			                'return res;' +
+			            '}' +
+			            'void main() {' +
+			                'vec4 pixel = texture2D( texture, vUV );' +
+			                'if ( pixel.a < 0.5 ) discard;' +
+			                'gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );' +
+			            '}';
+
+			        var vShader = '' +
+			            'varying vec2 vUV;' +
+			            'void main() {' +
+			                'vUV = 0.75 * uv;' +
+			                'vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );' +
+			                'gl_Position = projectionMatrix * mvPosition;' +
+			            '}';
+
+			        var tree = obj3d.scene.children[0];
+			        //tree.name = "tree";
+			        tree.position.set( 0, -250, 0 );
+			        tree.scale.set( 4, 4, 4 );
+			        tree.castShadow = true;
+			        tree.receiveShadow = true;
+			        tree.material = new THREE.MeshLambertMaterial( {
+			            map: treeTexture,
+			            transparent: true,
+			            side: THREE.DoubleSide
+			        } );
+			        tree.customDepthMaterial = new THREE.ShaderMaterial( { 
+			            uniforms: uni, 
+			            vertexShader: vShader, 
+			            fragmentShader: fShader 
+			        } );
+
+			        //editor.addObject( tree );
+			        //editor.select( tree );
+			        scene.add( tree );
+			    }
+			    
+			    var mloader = new THREE.ColladaLoader();
+			    mloader.load( 'media/river_birch.DAE', callback ); // FIXME
+
+				// ground
+
+				var initColor = new THREE.Color( 0x497f13 );
+				var initTexture = THREE.ImageUtils.generateDataTexture( 1, 1, initColor );
+
+				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: initTexture } );
+
+				var groundTexture = THREE.ImageUtils.loadTexture( "../examples/textures/terrain/grasslight-big.jpg", undefined, function() { groundMaterial.map = groundTexture } );
+				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+				groundTexture.repeat.set( 25, 25 );
+				groundTexture.anisotropy = 16;
+
+				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000 ), groundMaterial );
+				mesh.position.y = -250;
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( scene.fog.color );
+
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				renderer.shadowMapEnabled = true;
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var time = Date.now();
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = Date.now() * 0.0002;
+
+				if ( rotate ) {
+
+					camera.position.x = Math.cos( timer ) * 1500;
+					camera.position.z = Math.sin( timer ) * 1500;
+
+				}
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

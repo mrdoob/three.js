@@ -119,15 +119,26 @@ Sidebar.Scene = function ( editor ) {
 	// events
 
 	//Hide Objects for a simpler view for RHESSys
-	function displayObject(obj){
-		if(editor.getObjectType(obj)!= "Mesh")return false;
+	function displayObject( obj ) {
+
+		if ( editor.getObjectType(obj) != "Mesh" ) {
+			return false;	
+		} 
 		
-		if(obj.name == "ground") return false;
+		if ( obj.name == "ground" ) {
+			return false;	
+		} 
+		
 		//if(obj  THREE.light) return false;
-		if(obj.name == "panorama") return false;
+		
+		if ( obj.name == "panorama" ) {
+			return false;	
+		} 
+		
 		/*
 		if(editor.getObjectType(obj) == "Object3d") return false;
 		*/
+		
 		return true;
 	}
 
@@ -149,15 +160,13 @@ Sidebar.Scene = function ( editor ) {
 				var object = objects[ i ];
 				var objectType = editor.getObjectType( object );
 
-				if(!displayObject(object)){
+				if ( !displayObject( object ) ) {
 					//don't display them at all
-					//continue;
+					continue;
 
 					//"Advanced view": display them with extra padding, so we can distinguish them
 					var invis_pad = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 				}
-
-
 
 				var option = invis_pad + pad + '<span class="type ' + objectType + '"></span> ' + object.name;
 

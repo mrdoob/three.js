@@ -60,7 +60,7 @@
 		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Sidebar.js"></script>
-		<script src="js/Sidebar.Location.js"></script>
+		<script src="js/Sidebar.Vegetation.js"></script>
 		<script src="js/Sidebar.Add.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
 		<script src="js/Sidebar.Object3D.js"></script>
@@ -103,6 +103,8 @@
 
 			//
 
+			toolbar.init( '1306 Black Friars Road, Woodlawn, Maryland' );
+
 			editor.setTheme( editor.config.getKey( 'theme' ) );
 
 			editor.storage.init( function () {
@@ -114,21 +116,13 @@
 						var loader = new THREE.ObjectLoader();
 						var scene = loader.parse( state );
 
-						var pano = scene.getObjectByName( "panorama", false );
-						scene.remove( pano );
-
-						loadPanorama();
-
 						editor.setScene( scene );
 
 					} else {
 
-						//setFloorHeight( 100 );
-						//viewport.camera.lookAt(0,10,200);
-						createLightAtPos( 0, 10, 200 );
-						loadTreeAtPos( 50, -100, 200 );
+						createLightAtPos( -256, 512, -128 );
+						//loadTreeAtPos( 128, -64, 256 );
 						createGround();
-						loadPanorama();
 
 					}
 

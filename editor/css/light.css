@@ -58,16 +58,17 @@ input.Number {
 
 #viewport {
 	position: absolute;
-	top: 32px;
+	top: 66px;
 	left: 0px;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0px;
 }
 
 #menubar {
 	position: absolute;
 	width: 100%;
 	height: 32px;
+	border-bottom: 1px solid #ccc;
 	background: #eee;
 	padding: 0px;
 	margin: 0px;
@@ -87,6 +88,7 @@ input.Number {
 			display: none;
 			padding: 5px 0px;
 			background: #eee;
+			border: 1px solid #ccc;
 			width: 140px;
 		}
 
@@ -107,14 +109,14 @@ input.Number {
 
 				#menubar .menu .options .option:hover {
 					color: #fff;
-					background-color: #08f;
+					background-color: #39b54a;
 				}
 
 
 #sidebar {
 	position: absolute;
 	right: 0px;
-	top: 32px;
+	top: 66px;
 	bottom: 0px;
 	width: 300px;
 	background: #eee;
@@ -146,20 +148,30 @@ input.Number {
 
 	#sidebar #veglist {
 		width: 100%;
-		height: 140px;
+		height: 384px;
 		color: #444;
 		font-size: 12px;
 	}
 
 #toolbar {
 	position: absolute;
+	width: 100%;
+	/*
 	left: 0px;
 	right: 300px;
 	bottom: 0px;
+	*/
+	top: 33px;
 	height: 32px;
+	border-bottom: 1px solid #ccc;
+	border-left: 2px dotted #aaa;
 	background: #eee;
 	color: #333;
 }
+
+	#location .Panel {
+		padding: 0 !important;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;
@@ -170,4 +182,27 @@ input.Number {
 		margin-right: 6px;
 	}
 
+	#location {
+		float: right;
+		width: 296px;	
+		line-height: 30px;
+	}
 
+	.locdiv {
+		padding: 0;
+	}
+
+
+.pac-item-query .pac-matched {
+	position: relative;
+	top: -2px;
+}
+
+.pac-matched {
+	position: relative;
+	top: -1px;
+}
+
+.pac-icon {
+	background-image: url(http://maps.gstatic.com/mapfiles/api-3/images/autocomplete-icons.png);
+}
