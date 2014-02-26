@@ -17,7 +17,7 @@ function createGround() {
     ground.rotation.set( 1.5 * Math.PI, 0, 0 );
     ground.position.set( 0, -64, 0 );
     ground.name = 'ground';
-    editor.addObject( ground );
+    editor.addObject( ground ); 
 
 }     
 
@@ -77,12 +77,12 @@ function loadTreeAtPos( x, y, z ) {
     
     var callback = function( obj3d ) {
 
-        console.log( obj3d );
-
-        var treeTexture = THREE.ImageUtils.loadTexture( 'media/river_birch.png' );
-
+        var treeTexture = THREE.ImageUtils.loadTexture( 'media/garden.png' );
+        treeTexture.anisotropy = editor.config.getKey( 'maxAnisotropy' );
+        //treeTexture.minFilter = THREE.NearestMipMapLinearFilter;
+        treeTexture.minFilter = treeTexture.magFilter = THREE.LinearFilter;
         var uniforms = { texture:  { type: "t", value: treeTexture } };
-        
+
         var fragmentShader = '' +
             'uniform sampler2D texture;' +
             'varying vec2 vUV;' +
@@ -109,20 +109,22 @@ function loadTreeAtPos( x, y, z ) {
 
         var tree = obj3d.scene.children[0];
         //tree.name = "tree";
-        tree.position.set( x, y, z );
+        tree.position.set( 128, -64, 256 );
         tree.scale.set( 1.5, 1.5, 1.5 );
         tree.castShadow = true;
         tree.receiveShadow = true;
         tree.material = new THREE.MeshLambertMaterial( {
             map: treeTexture,
-            transparent: true,
-            side: THREE.DoubleSide
+            transparent: true
+            //side: THREE.DoubleSide
         } );
+        /*
         tree.customDepthMaterial = new THREE.ShaderMaterial( { 
             uniforms: uniforms, 
             vertexShader: vertexShader, 
             fragmentShader: fragmentShader 
         } );
+*/
 
         editor.addObject( tree );
         editor.select( tree );
@@ -130,7 +132,7 @@ function loadTreeAtPos( x, y, z ) {
     }
     
     var mloader = new THREE.ColladaLoader();
-    mloader.load( 'media/river_birch.DAE', callback ); // FIXME
+    mloader.load( 'media/garden.DAE', callback ); // FIXME
 }
 
 function loadPanorama() {

@@ -233,6 +233,8 @@ var Viewport = function ( editor ) {
 		renderer.shadowMapEnabled = true;
 		renderer.sortObjects = true;
 
+		editor.config.setKey( 'maxAnisotropy', renderer.getMaxAnisotropy() );
+
 		container.dom.appendChild( renderer.domElement );
 
 		render();

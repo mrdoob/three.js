@@ -153,6 +153,13 @@ input.Number {
 		font-size: 12px;
 	}
 
+	#sidebar #gndlist {
+		width: 100%;
+		height: 384px;
+		color: #444;
+		font-size: 12px;	
+	}
+
 #toolbar {
 	position: absolute;
 	width: 100%;
