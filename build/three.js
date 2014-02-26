@@ -25833,8 +25833,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		].join( '\n' );
 
-		var glVertexShader = new THREE.WebGLShader( _gl, 'vertex', prefix_vertex + vertexShader );
-		var glFragmentShader = new THREE.WebGLShader( _gl, 'fragment', prefix_fragment + fragmentShader );
+		var glVertexShader = new THREE.WebGLShader( _gl, _gl.VERTEX_SHADER, prefix_vertex + vertexShader );
+		var glFragmentShader = new THREE.WebGLShader( _gl, _gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
 
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
@@ -26840,32 +26840,12 @@ THREE.WebGLShader = ( function () {
 
 	return function ( gl, type, string ) {
 
-		var shader; 
-
-		if ( type === 'vertex' ) {
-
-			shader = gl.createShader( gl.VERTEX_SHADER );
-
-		} else if ( type === 'fragment' ) {
-
-			shader = gl.createShader( gl.FRAGMENT_SHADER );
-
-		} else {
-
-			console.error( 'THREE.WebGLShader:', 'Unrecognised shader type', type );
-			return null;
-
-		}
+		var shader = gl.createShader( type ); 
 
 		gl.shaderSource( shader, string );
 		gl.compileShader( shader );
 
-		/*
-		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
-
-
-		}
-		*/
+		// if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {}
 
 		if ( gl.getShaderInfoLog( shader ) !== '' ) {
 
