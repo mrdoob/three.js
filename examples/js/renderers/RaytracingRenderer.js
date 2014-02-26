@@ -29,10 +29,12 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var raycasterLight = new THREE.Raycaster();
 
 	var perspective;
+	var modelViewMatrix = new THREE.Matrix4();
 	var cameraNormalMatrix = new THREE.Matrix3();
 
 	var objects;
 	var lights = [];
+	var cache = {};
 
 	var animationFrameId = null;
 
@@ -137,7 +139,9 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			//
 
-			localPoint.copy( point ).applyMatrix4( object._inverseMatrix );
+			var _object = cache[ object.id ];
+
+			localPoint.copy( point ).applyMatrix4( _object.inverseMatrix );
 			eyeVector.subVectors( raycaster.ray.origin, point ).normalize();
 
 			// resolve pixel diffuse color
@@ -211,13 +215,13 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					// point lit
 
-					if ( ! normalComputed ) {
+					if ( normalComputed === false ) {
 
 						// the same normal can be reused for all lights
 						// (should be possible to cache even more)
 
 						computePixelNormal( normalVector, localPoint, material.shading, face, vertices );
-						normalVector.applyMatrix3( object._normalMatrix ).normalize();
+						normalVector.applyMatrix3( _object.normalMatrix ).normalize();
 
 						normalComputed = true;
 
@@ -227,7 +231,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					var attenuation = 1.0;
 
-					if ( light.physicalAttenuation ) {
+					if ( light.physicalAttenuation === true ) {
 
 						attenuation = lightVector.length();
 						attenuation = 1.0 / ( attenuation * attenuation );
@@ -505,17 +509,21 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			}
 
-			if ( object._modelViewMatrix === undefined ) {
+			if ( cache[ object.id ] === undefined ) {
 
-				object._modelViewMatrix = new THREE.Matrix4();
-				object._normalMatrix = new THREE.Matrix3();
-				object._inverseMatrix = new THREE.Matrix4();
+				cache[ object.id ] = {
+					normalMatrix: new THREE.Matrix3(),
+					inverseMatrix: new THREE.Matrix4()
+				};
 
 			}
 
-			object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
-			object._inverseMatrix.getInverse( object.matrixWorld );
+			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld )
+
+			var _object = cache[ object.id ];
+
+			_object.normalMatrix.getNormalMatrix( modelViewMatrix );
+			_object.inverseMatrix.getInverse( object.matrixWorld );
 
 		} );
 
