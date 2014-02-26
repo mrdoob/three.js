@@ -293,7 +293,7 @@ THREE.WebGLProgram = ( function () {
 
 		// cache attributes locations
 
-		var identifiers = [
+		identifiers = [
 
 			"position", "normal", "uv", "uv2", "tangent", "color",
 			"skinIndex", "skinWeight", "lineDistance"
