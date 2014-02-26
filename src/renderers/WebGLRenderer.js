@@ -5631,10 +5631,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		program.vertexShader = _gl.getShaderSource( glVertexShader );
+		program.fragmentShader = _gl.getShaderSource( glFragmentShader );
+
 		// clean up
 
-		_gl.deleteShader( glFragmentShader );
 		_gl.deleteShader( glVertexShader );
+		_gl.deleteShader( glFragmentShader );
 
 		// console.log( prefix_fragment + fragmentShader );
 		// console.log( prefix_vertex + vertexShader );
