@@ -62,6 +62,14 @@ THREE.WebGLProgram = ( function () {
 		var defines = material.defines;
 		var index0AttributeName = material.index0AttributeName;
 
+		if ( index0AttributeName === undefined && parameters.morphTargets === true ) {
+
+			// programs with morphTargets displace position out of attribute 0
+
+			index0AttributeName = 'position';
+
+		}
+
 		var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
 
 		if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
@@ -237,10 +245,11 @@ THREE.WebGLProgram = ( function () {
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
 
-		// Force a particular attribute to index 0.
-		// because potentially expensive emulation is done by browser if attribute 0 is disabled.
-		// And, color, for example is often automatically bound to index 0 so disabling it
 		if ( index0AttributeName !== undefined ) {
+
+			// Force a particular attribute to index 0.
+			// because potentially expensive emulation is done by browser if attribute 0 is disabled.
+			// And, color, for example is often automatically bound to index 0 so disabling it
 
 			_gl.bindAttribLocation( program, 0, index0AttributeName );
 

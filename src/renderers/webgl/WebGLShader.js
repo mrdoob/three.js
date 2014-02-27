@@ -21,7 +21,11 @@ THREE.WebGLShader = ( function () {
 		gl.shaderSource( shader, string );
 		gl.compileShader( shader );
 
-		// if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {}
+		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
+
+			console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
+
+		}
 
 		if ( gl.getShaderInfoLog( shader ) !== '' ) {
 
