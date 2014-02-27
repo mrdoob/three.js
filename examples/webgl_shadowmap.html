@@ -49,11 +49,10 @@
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
-			var MARGIN = 100;
 			var HUD_MARGIN = 0.05;
 
 			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
 			var camera, controls, scene, renderer;
@@ -134,8 +133,6 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-				renderer.domElement.style.top = MARGIN + 'px';
 				container.appendChild( renderer.domElement );
 
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -164,7 +161,7 @@
 			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+				SCREEN_HEIGHT = window.innerHeight;
 
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
