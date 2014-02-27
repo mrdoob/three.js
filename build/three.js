@@ -14832,9 +14832,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 		"uv2" : [ 0, 0 ]
 	};
 
-	// By default, bind position to attribute index 0. In WebGL, attribute 0
-	// should always be used to avoid potentially expensive emulation.
-	this.index0AttributeName = "position";
+	this.index0AttributeName = undefined;
 
 	this.setValues( parameters );
 
@@ -26559,6 +26557,14 @@ THREE.WebGLProgram = ( function () {
 		var defines = material.defines;
 		var index0AttributeName = material.index0AttributeName;
 
+		if ( index0AttributeName === undefined && parameters.morphTargets === true ) {
+
+			// programs with morphTargets displace position out of attribute 0
+
+			index0AttributeName = 'position';
+
+		}
+
 		var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
 
 		if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
@@ -26734,10 +26740,11 @@ THREE.WebGLProgram = ( function () {
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
 
-		// Force a particular attribute to index 0.
-		// because potentially expensive emulation is done by browser if attribute 0 is disabled.
-		// And, color, for example is often automatically bound to index 0 so disabling it
 		if ( index0AttributeName !== undefined ) {
+
+			// Force a particular attribute to index 0.
+			// because potentially expensive emulation is done by browser if attribute 0 is disabled.
+			// And, color, for example is often automatically bound to index 0 so disabling it
 
 			_gl.bindAttribLocation( program, 0, index0AttributeName );
 
@@ -26859,7 +26866,11 @@ THREE.WebGLShader = ( function () {
 		gl.shaderSource( shader, string );
 		gl.compileShader( shader );
 
-		// if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {}
+		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
+
+			console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
+
+		}
 
 		if ( gl.getShaderInfoLog( shader ) !== '' ) {
 
