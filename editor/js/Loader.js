@@ -39,7 +39,7 @@ var Loader = function ( editor ) {
 					stream.offset = 0;
 
 					var loader = new THREE.CTMLoader();
-					loader.createModelBuffers( new CTM.File( stream ), function( geometry ) {
+					loader.createModel( new CTM.File( stream ), function( geometry ) {
 
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
