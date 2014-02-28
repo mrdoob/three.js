@@ -403,17 +403,19 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	scope.options = [];
 
-	for ( var key in options ) {
+	for ( var i = 0; i < options.length; i ++ ) {
 
-		var option = document.createElement('div');
-		option.className = 'option';
-		option.innerHTML = options[ key ];
-		option.value = key;
-		scope.dom.appendChild( option );
+		var option = options[ i ];
 
-		scope.options.push( option );
+		var div = document.createElement( 'div' );
+		div.className = 'option';
+		div.innerHTML = option.html;
+		div.value = option.value;
+		scope.dom.appendChild( div );
 
-		option.addEventListener( 'click', function ( event ) {
+		scope.options.push( div );
+
+		div.addEventListener( 'click', function ( event ) {
 
 			scope.setValue( this.value );
 			scope.dom.dispatchEvent( changeEvent );
@@ -433,8 +435,6 @@ UI.FancySelect.prototype.getValue = function () {
 };
 
 UI.FancySelect.prototype.setValue = function ( value ) {
-
-	if ( typeof value === 'number' ) value = value.toString();
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
