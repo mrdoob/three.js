@@ -8377,7 +8377,7 @@ THREE.Projector = function () {
 
 					} else {
 
-						for ( var i = 0, l = attributes.position.count / 3; i < l; i += 3 ) {
+						for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
 
 							renderList.pushTriangle( i, i + 1, i + 2 );
 
@@ -8910,7 +8910,8 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 
 	this.attributes = {};
-	this.offsets = [];
+	this.drawcalls = [];
+	this.offsets = this.drawcalls; // backwards compatibility
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -8921,13 +8922,12 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, array, itemSize, count ) {
+	addAttribute: function ( name, array, itemSize ) {
 
 		this.attributes[ name ] = {
 
 			array: array,
-			itemSize: itemSize,
-			count: count !== undefined ? count : array.length
+			itemSize: itemSize
 
 		};
 
@@ -8941,7 +8941,7 @@ THREE.BufferGeometry.prototype = {
 
 	addDrawCall: function ( start, count, indexOffset ) {
 
-		this.offsets.push( {
+		this.drawcalls.push( {
 
 			start: start,
 			count: count,
@@ -22879,11 +22879,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
 
-				_gl.drawArrays( _gl.TRIANGLES, 0, position.count / 3 );
+				_gl.drawArrays( _gl.TRIANGLES, 0, position.array.length / 3 );
 
 				_this.info.render.calls ++;
-				_this.info.render.vertices += position.count / 3;
-				_this.info.render.faces += position.count / 9;
+				_this.info.render.vertices += position.array.length / 3;
+				_this.info.render.faces += position.array.length / 9;
 
 			}
 
@@ -22901,10 +22901,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// render particles
 
-			_gl.drawArrays( _gl.POINTS, 0, position.count / 3 );
+			_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
 
 			_this.info.render.calls ++;
-			_this.info.render.points += position.count / 3;
+			_this.info.render.points += position.array.length / 3;
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -22990,10 +22990,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var position = geometryAttributes[ "position" ];
 
-				_gl.drawArrays( primitives, 0, position.count / 3 );
+				_gl.drawArrays( primitives, 0, position.array.length / 3 );
 
 				_this.info.render.calls ++;
-				_this.info.render.points += position.count / 3;
+				_this.info.render.points += position.array.length / 3;
 
 			}
 
