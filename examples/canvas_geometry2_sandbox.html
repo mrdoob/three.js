@@ -44,67 +44,10 @@
 
 				scene = new THREE.Scene();
 
-				// Plane
-
-				console.time( 'PlaneGeometry' );
-
-				var geometry = new THREE.PlaneGeometry( 200, 200, 10, 10 );
-
-				console.timeEnd( 'PlaneGeometry' );
-
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-
-				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-
-				plane = new THREE.Mesh( geometry, material );
-				plane.position.x = - 200;
-				scene.add( plane );
-
-				// Cube
-
-				console.time( 'BoxGeometry' );
-
-				var geometry = new THREE.BoxGeometry( 200, 200, 200, 10, 10, 10 );
-
-				console.timeEnd( 'BoxGeometry' );
-
-				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
-
-				cube = new THREE.Mesh( geometry, material );
-				cube.position.y = 150;
-				plane.add( cube );
-
 				//
 
-				// Plane
-
-				console.time( 'PlaneGeometry2' );
-
-				var geometry = new THREE.PlaneGeometry2( 200, 200, 10, 10 );
-
-				console.timeEnd( 'PlaneGeometry2' );
-
-				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-
-				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-
-				plane = new THREE.Mesh( geometry, material );
-				plane.position.x = 200;
-				scene.add( plane );
-
-				// Cube
-
-				console.time( 'BoxGeometry2' );
-
-				var geometry = new THREE.BoxGeometry2( 200, 200, 200, 10, 10, 10 );
-
-				console.timeEnd( 'BoxGeometry2' );
-
-				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
-
-				cube = new THREE.Mesh( geometry, material );
-				cube.position.y = 150;
-				plane.add( cube );
+				addGeometries( 'PlaneGeometry', 'BoxGeometry', - 200 );
+				addGeometries( 'PlaneGeometry2', 'BoxGeometry2', 200 );
 
 				//
 
@@ -122,6 +65,50 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				setInterval( function () {
+
+					console.log( '---' );
+
+					createGeometry( 'PlaneGeometry' );
+					createGeometry( 'PlaneGeometry2' );
+
+				}, 1000 );
+
+			}
+
+			function createGeometry( primitive ) {
+
+				console.time( primitive );
+
+				new THREE[ primitive ]( 200, 200, 60, 60 );
+
+				console.timeEnd( primitive );
+
+			}
+
+			function addGeometries( PlaneGeometry, BoxGeometry, x ) {
+
+				// Plane
+
+				var geometry = new THREE[ PlaneGeometry ]( 200, 200, 10, 10 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+
+				plane = new THREE.Mesh( geometry, material );
+				plane.position.x = x;
+				scene.add( plane );
+
+				// Cube
+
+				var geometry = new THREE[ BoxGeometry ]( 200, 200, 200, 10, 10, 10 );
+
+				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
+
+				cube = new THREE.Mesh( geometry, material );
+				cube.position.y = 150;
+				plane.add( cube );
 
 			}
 
