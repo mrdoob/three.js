@@ -108,7 +108,7 @@ THREE.GeometryUtils = {
 			
 			if ( uv === undefined ) {
 				
-				break;
+				continue;
 				
 			}
 
