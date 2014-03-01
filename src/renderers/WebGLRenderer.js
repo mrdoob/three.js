@@ -2662,11 +2662,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
 
-				_gl.drawArrays( _gl.TRIANGLES, 0, position.array.length / 3 );
+				_gl.drawArrays( _gl.TRIANGLES, 0, position.count / 3 );
 
 				_this.info.render.calls ++;
-				_this.info.render.vertices += position.array.length / 3;
-				_this.info.render.faces += position.array.length / 3 / 3;
+				_this.info.render.vertices += position.count / 3;
+				_this.info.render.faces += position.count / 9;
 
 			}
 
@@ -2684,10 +2684,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// render particles
 
-			_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
+			_gl.drawArrays( _gl.POINTS, 0, position.count / 3 );
 
 			_this.info.render.calls ++;
-			_this.info.render.points += position.array.length / 3;
+			_this.info.render.points += position.count / 3;
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -2773,10 +2773,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var position = geometryAttributes[ "position" ];
 
-				_gl.drawArrays( primitives, 0, position.array.length / 3 );
+				_gl.drawArrays( primitives, 0, position.count / 3 );
 
 				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length;
+				_this.info.render.points += position.count / 3;
 
 			}
 

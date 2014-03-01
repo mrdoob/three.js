@@ -21,29 +21,15 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, array, itemSize ) {
+	addAttribute: function ( name, array, itemSize, count ) {
 
-		if ( arguments.length === 4 ) {
+		this.attributes[ name ] = {
 
-			console.warn( 'DEPRECATED: BufferGeometry.addAttribute() now accepts only 3 arguments ( name, array, itemSize )' );
+			array: array,
+			itemSize: itemSize,
+			count: count !== undefined ? count : array.length
 
-			this.attributes[ arguments[ 0 ] ] = {
-
-				array: new arguments[ 1 ]( arguments[ 2 ] * arguments[ 3 ] ),
-				itemSize: arguments[ 3 ]
-
-			};
-
-		} else {
-
-			this.attributes[ name ] = {
-
-				array: array,
-				itemSize: itemSize
-
-			};
-
-		}
+		};
 
 	},
 
