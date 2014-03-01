@@ -315,7 +315,6 @@ THREE.OBJLoader.prototype = {
 
 			var geometry = children[ i ].geometry;
 
-			geometry.computeCentroids();
 			geometry.computeFaceNormals();
 			geometry.computeBoundingSphere();
 

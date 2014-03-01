@@ -158,7 +158,6 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 
-		geometry.computeCentroids();
 		//geometry.computeFaceNormals();
 		//geometry.computeVertexNormals();
 		//geometry.computeTangents();

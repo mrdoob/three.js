@@ -19,8 +19,6 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
-	this.centroid = new THREE.Vector3();
-
 };
 
 THREE.Face3.prototype = {
@@ -33,7 +31,6 @@ THREE.Face3.prototype = {
 
 		face.normal.copy( this.normal );
 		face.color.copy( this.color );
-		face.centroid.copy( this.centroid );
 
 		face.materialIndex = this.materialIndex;
 

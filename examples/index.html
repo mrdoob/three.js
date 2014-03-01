@@ -74,7 +74,7 @@
 
 			#button {
 				position: fixed;
-				top: 20px;
+				bottom: 20px;
 				right: 20px;
 				padding: 8px;
 				color: #fff;
@@ -275,6 +275,7 @@
 			],
 			"misc": [
 				"misc_animation_keys",
+				"misc_controls_deviceorientation",
 				"misc_controls_fly",
 				"misc_controls_oculusrift",
 				"misc_controls_orbit",
@@ -327,6 +328,9 @@
 				"canvas_performance",
 				"canvas_sandbox"
 			],
+			"raytracing": [
+				"raytracing_sandbox"
+			],
 			"software": [
 				"software_sandbox"
 			]
@@ -342,13 +346,13 @@
 
 		var button = document.createElement( 'div' );
 		button.id = 'button';
-		button.textContent = 'View source';
+		button.textContent = '#';
 		button.addEventListener( 'click', function ( event ) {
 
 			var array = location.href.split( '/' );
 			array.pop();
 
-			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
+			window.open( array.join( '/' ) + '/' + selected + '.html' );
 
 		}, false );
 		button.style.display = 'none';

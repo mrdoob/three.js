@@ -1479,10 +1479,6 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
             if not mesh:
                 raise Exception("Error, could not get mesh data from object [%s]" % object.name)
 
-            # preserve original name
-
-            mesh.name = object.name
-
             if export_single_model:
 
                 if flipyz:
@@ -2457,7 +2453,7 @@ def save(operator, context, filepath = "",
                 # otherwise can share geometry
 
                 #else:
-                name = object.name
+                name = object.data.name
 
                 if name not in geo_set:
 
@@ -2483,7 +2479,7 @@ def save(operator, context, filepath = "",
                                                         option_animation_skeletal,
                                                         option_frame_step)
 
-                        embeds[object.data.name] = model_string
+                        embeds[name] = model_string
 
                     else:
 

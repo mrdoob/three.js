@@ -208,7 +208,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 		init_quads_flat( start_quad_flat );
 		init_quads_smooth( start_quad_smooth );
 
-		this.computeCentroids();
 		this.computeFaceNormals();
 
 		function handlePadding( n ) {

@@ -9,15 +9,8 @@ THREE.BufferGeometry = function () {
 
 	this.name = '';
 
-	// attributes
-
 	this.attributes = {};
-
-	// offsets for chunks when using indexed elements
-
 	this.offsets = [];
-
-	// boundings
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -28,29 +21,15 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, array, itemSize ) {
+	addAttribute: function ( name, array, itemSize, count ) {
 
-		if ( arguments.length === 4 ) {
+		this.attributes[ name ] = {
 
-			console.warn( 'DEPRECATED: BufferGeometry.addAttribute() now accepts only 3 arguments ( name, array, itemSize )' );
+			array: array,
+			itemSize: itemSize,
+			count: count !== undefined ? count : array.length
 
-			this.attributes[ arguments[ 0 ] ] = {
-
-				array: new arguments[ 1 ]( arguments[ 2 ] * arguments[ 3 ] ),
-				itemSize: arguments[ 3 ]
-
-			};
-
-		} else {
-
-			this.attributes[ name ] = {
-
-				array: array,
-				itemSize: itemSize
-
-			};
-
-		}
+		};
 
 	},
 
@@ -60,13 +39,25 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	addDrawCall: function ( start, count, indexOffset ) {
+
+		this.offsets.push( {
+
+			start: start,
+			count: count,
+			index: indexOffset !== undefined ? indexOffset : 0
+
+		} );
+
+	},
+
 	applyMatrix: function ( matrix ) {
 
 		var position = this.attributes.position;
 
 		if ( position !== undefined ) {
 
-			matrix.multiplyVector3Array( position.array );
+			matrix.applyToVector3Array( position.array );
 			position.needsUpdate = true;
 
 		}
@@ -77,7 +68,7 @@ THREE.BufferGeometry.prototype = {
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.multiplyVector3Array( normal.array );
+			normalMatrix.applyToVector3Array( normal.array );
 			normal.needsUpdate = true;
 
 		}

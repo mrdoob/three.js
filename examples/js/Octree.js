@@ -624,12 +624,6 @@
 			this.face3 = true;
 			this.utilVec31FaceBounds = new THREE.Vector3();
 			
-		} else if ( part instanceof THREE.Face4 ) {
-			
-			this.face4 = true;
-			this.faces = part;
-			this.utilVec31FaceBounds = new THREE.Vector3();
-			
 		} else if ( part instanceof THREE.Vector3 ) {
 			
 			this.vertices = part;
@@ -658,11 +652,6 @@
 			if ( this.face3 ) {
 				
 				this.radius = this.getFace3BoundingRadius( this.object, this.faces );
-				this.position.copy( this.faces.centroid ).applyMatrix4( this.object.matrixWorld );
-				
-			} else if ( this.face4 ) {
-				
-				this.radius = this.getFace4BoundingRadius( this.object, this.faces );
 				this.position.copy( this.faces.centroid ).applyMatrix4( this.object.matrixWorld );
 				
 			} else if ( this.vertices ) {
@@ -697,6 +686,8 @@
 		},
 		
 		getFace3BoundingRadius: function ( object, face ) {
+
+			if ( face.centroid === undefined ) face.centroid = new THREE.Vector3();
 			
 			var geometry = object.geometry || object,
 				vertices = geometry.vertices,
@@ -707,22 +698,6 @@
 				
 			centroid.addVectors( va, vb ).add( vc ).divideScalar( 3 );
 			radius = Math.max( centroidToVert.subVectors( centroid, va ).length(), centroidToVert.subVectors( centroid, vb ).length(), centroidToVert.subVectors( centroid, vc ).length() );
-			
-			return radius;
-			
-		},
-		
-		getFace4BoundingRadius: function ( object, face ) {
-			
-			var geometry = object.geometry || object,
-				vertices = geometry.vertices,
-				centroid = face.centroid,
-				va = vertices[ face.a ], vb = vertices[ face.b ], vc = vertices[ face.c ], vd = vertices[ face.d ],
-				centroidToVert = this.utilVec31FaceBounds,
-				radius;
-				
-			centroid.addVectors( va, vb ).add( vc ).add( vd ).divideScalar( 4 );
-			radius = Math.max( centroidToVert.subVectors( centroid, va ).length(), centroidToVert.subVectors( centroid, vb ).length(), centroidToVert.subVectors( centroid, vc ).length(), centroidToVert.subVectors( centroid, vd ).length() );
 			
 			return radius;
 			
