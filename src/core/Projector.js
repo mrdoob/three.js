@@ -367,7 +367,7 @@ THREE.Projector = function () {
 
 					} else {
 
-						for ( var i = 0, l = attributes.position.count / 3; i < l; i += 3 ) {
+						for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
 
 							renderList.pushTriangle( i, i + 1, i + 2 );
 
