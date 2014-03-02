@@ -144,11 +144,15 @@ THREE.Projector = function () {
 		var normals = [];
 
 		var object = null;
+		var material = null;
+
 		var normalMatrix = new THREE.Matrix3();
 
 		var setObject = function ( value ) {
 
 			object = value;
+			material = object.material;
+
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 
 			normals.length = 0;
@@ -191,14 +195,19 @@ THREE.Projector = function () {
 
 		};
 
+		var checkVerticesVisibility = function ( v1, v2, v3 ) {
+
+			return v1.visible === true && v2.visible === true && v3.visible === true;
+
+		};
+
 		var checkTriangleVisibility = function ( v1, v2, v3 ) {
 
 			_points3[ 0 ] = v1.positionScreen;
 			_points3[ 1 ] = v2.positionScreen;
 			_points3[ 2 ] = v3.positionScreen;
 
-			if ( v1.visible === true || v2.visible === true || v3.visible === true ||
-				_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
+			if ( _clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
 
 				return ( ( v3.positionScreen.x - v1.positionScreen.x ) *
 					    ( v2.positionScreen.y - v1.positionScreen.y ) -
@@ -235,7 +244,9 @@ THREE.Projector = function () {
 			var v2 = _vertexPool[ b ];
 			var v3 = _vertexPool[ c ];
 
-			if ( checkTriangleVisibility( v1, v2, v3 ) === true ) {
+			if ( checkVerticesVisibility( v1, v2, v3 ) === false ) return;
+
+			if ( material.side === THREE.DoubleSide || checkTriangleVisibility( v1, v2, v3 ) === true ) {
 
 				_face = getNextFaceInPool();
 
@@ -268,6 +279,7 @@ THREE.Projector = function () {
 		return {
 			setObject: setObject,
 			projectVertex: projectVertex,
+			checkVerticesVisibility: checkVerticesVisibility,
 			checkTriangleVisibility: checkTriangleVisibility,
 			pushVertex: pushVertex,
 			pushNormal: pushNormal,
@@ -328,11 +340,15 @@ THREE.Projector = function () {
 
 					}
 
-					var normals = attributes.normal.array;
+					if ( attributes.normal !== undefined ) {
 
-					for ( var i = 0, l = normals.length; i < l; i += 3 ) {
+						var normals = attributes.normal.array;
 
-						renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+						for ( var i = 0, l = normals.length; i < l; i += 3 ) {
+
+							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+
+						}
 
 					}
 
@@ -454,10 +470,14 @@ THREE.Projector = function () {
 
 						}
 
+						if ( renderList.checkVerticesVisibility( v1, v2, v3 ) === false ) continue;
+
 						var visible = renderList.checkTriangleVisibility( v1, v2, v3 );
 
-						if ( ( visible === false && side === THREE.FrontSide ) ||
-							 ( visible === true && side === THREE.BackSide ) ) continue;
+						if ( side !== THREE.DoubleSide ) {
+							if ( side === THREE.FrontSide && visible === false ) continue;
+							if ( side === THREE.BackSide && visible === true ) continue;
+						}
 
 						_face = getNextFaceInPool();
 
