@@ -19,6 +19,7 @@
 
 		<script src="../src/extras/geometries/BoxGeometry2.js"></script>
 		<script src="../src/extras/geometries/PlaneGeometry2.js"></script>
+		<script src="../src/extras/geometries/PlaneGeometry2b.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -46,8 +47,9 @@
 
 				//
 
-				addGeometries( 'PlaneGeometry', 'BoxGeometry', - 200 );
-				addGeometries( 'PlaneGeometry2', 'BoxGeometry2', 200 );
+				addGeometries( 'PlaneGeometry', 'BoxGeometry', - 300 );
+				addGeometries( 'PlaneGeometry2', 'BoxGeometry2', 0 );
+				addGeometries( 'PlaneGeometry2b', 'BoxGeometry2', 300 );
 
 				//
 
@@ -72,6 +74,7 @@
 
 					createGeometry( 'PlaneGeometry' );
 					createGeometry( 'PlaneGeometry2' );
+					createGeometry( 'PlaneGeometry2b' );
 
 				}, 1000 );
 

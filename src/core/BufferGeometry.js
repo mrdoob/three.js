@@ -22,14 +22,9 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, array, itemSize ) {
+	addAttribute: function ( name, attribute ) {
 
-		this.attributes[ name ] = {
-
-			array: array,
-			itemSize: itemSize
-
-		};
+		this.attributes[ name ] = attribute;
 
 	},
 
