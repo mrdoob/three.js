@@ -8908,6 +8908,12 @@ THREE.BufferAttribute.prototype = {
 
 	constructor: THREE.BufferAttribute,
 
+	get length () {
+
+		return this.array.length;
+
+	},
+
 	set: function ( value ) {
 
 		this.array.set( value );
