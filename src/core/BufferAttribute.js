@@ -55,6 +55,17 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 
+	},
+
+	setXYZW: function ( index, x, y, z, w ) {
+
+		index *= this.itemSize;
+
+		this.array[ index     ] = x;
+		this.array[ index + 1 ] = y;
+		this.array[ index + 2 ] = z;
+		this.array[ index + 3 ] = w;
+
 	}
 
 };
