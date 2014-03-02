@@ -200,7 +200,7 @@ THREE.WebGLProgram = ( function () {
 
 			].join( '\n' );
 
-			var prefix_fragment = [
+			prefix_fragment = [
 
 				"precision " + parameters.precision + " float;",
 				"precision " + parameters.precision + " int;",

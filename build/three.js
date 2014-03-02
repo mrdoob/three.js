@@ -8955,6 +8955,17 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 
+	},
+
+	setXYZW: function ( index, x, y, z, w ) {
+
+		index *= this.itemSize;
+
+		this.array[ index     ] = x;
+		this.array[ index + 1 ] = y;
+		this.array[ index + 2 ] = z;
+		this.array[ index + 3 ] = w;
+
 	}
 
 };
@@ -14948,7 +14959,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
 	this.defaultAttributeValues = {
-		"color" : [ 1, 1, 1],
+		"color" : [ 1, 1, 1 ],
 		"uv" : [ 0, 0 ],
 		"uv2" : [ 0, 0 ]
 	};
@@ -14990,6 +15001,28 @@ THREE.ShaderMaterial.prototype.clone = function () {
 
 	material.morphTargets = this.morphTargets;
 	material.morphNormals = this.morphNormals;
+
+	return material;
+
+};
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.RawShaderMaterial = function ( parameters ) {
+
+	THREE.ShaderMaterial.call( this, parameters );
+
+};
+
+THREE.RawShaderMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
+
+THREE.RawShaderMaterial.prototype.clone = function () {
+
+	var material = new THREE.RawShaderMaterial();
+
+	THREE.ShaderMaterial.prototype.clone.call( this, material );
 
 	return material;
 
@@ -26711,152 +26744,163 @@ THREE.WebGLProgram = ( function () {
 
 		var program = _gl.createProgram();
 
-		var prefix_vertex = [
+		var prefix_vertex, prefix_fragment;
 
-			"precision " + parameters.precision + " float;",
-			"precision " + parameters.precision + " int;",
+		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			customDefines,
+			prefix_vertex = '';
+			prefix_fragment = '';
 
-			parameters.supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
+		} else {
 
-			_this.gammaInput ? "#define GAMMA_INPUT" : "",
-			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+			prefix_vertex = [
 
-			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
-			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
-			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
-			"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
+				"precision " + parameters.precision + " float;",
+				"precision " + parameters.precision + " int;",
 
-			"#define MAX_SHADOWS " + parameters.maxShadows,
+				customDefines,
 
-			"#define MAX_BONES " + parameters.maxBones,
+				parameters.supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
-			parameters.map ? "#define USE_MAP" : "",
-			parameters.envMap ? "#define USE_ENVMAP" : "",
-			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
-			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
-			parameters.normalMap ? "#define USE_NORMALMAP" : "",
-			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
-			parameters.vertexColors ? "#define USE_COLOR" : "",
+				_this.gammaInput ? "#define GAMMA_INPUT" : "",
+				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
 
-			parameters.skinning ? "#define USE_SKINNING" : "",
-			parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
+				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
+				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+				"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
+				"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
 
-			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
-			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
-			parameters.wrapAround ? "#define WRAP_AROUND" : "",
-			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-			parameters.flipSided ? "#define FLIP_SIDED" : "",
+				"#define MAX_SHADOWS " + parameters.maxShadows,
 
-			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
-			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
-			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
+				"#define MAX_BONES " + parameters.maxBones,
 
-			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
+				parameters.map ? "#define USE_MAP" : "",
+				parameters.envMap ? "#define USE_ENVMAP" : "",
+				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+				parameters.normalMap ? "#define USE_NORMALMAP" : "",
+				parameters.specularMap ? "#define USE_SPECULARMAP" : "",
+				parameters.vertexColors ? "#define USE_COLOR" : "",
 
-			"uniform mat4 modelMatrix;",
-			"uniform mat4 modelViewMatrix;",
-			"uniform mat4 projectionMatrix;",
-			"uniform mat4 viewMatrix;",
-			"uniform mat3 normalMatrix;",
-			"uniform vec3 cameraPosition;",
+				parameters.skinning ? "#define USE_SKINNING" : "",
+				parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
 
-			"attribute vec3 position;",
-			"attribute vec3 normal;",
-			"attribute vec2 uv;",
-			"attribute vec2 uv2;",
+				parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
+				parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
+				parameters.wrapAround ? "#define WRAP_AROUND" : "",
+				parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
+				parameters.flipSided ? "#define FLIP_SIDED" : "",
 
-			"#ifdef USE_COLOR",
+				parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
+				parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
+				parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+				parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
-			"	attribute vec3 color;",
+				parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
-			"#endif",
+				"uniform mat4 modelMatrix;",
+				"uniform mat4 modelViewMatrix;",
+				"uniform mat4 projectionMatrix;",
+				"uniform mat4 viewMatrix;",
+				"uniform mat3 normalMatrix;",
+				"uniform vec3 cameraPosition;",
 
-			"#ifdef USE_MORPHTARGETS",
+				"attribute vec3 position;",
+				"attribute vec3 normal;",
+				"attribute vec2 uv;",
+				"attribute vec2 uv2;",
 
-			"	attribute vec3 morphTarget0;",
-			"	attribute vec3 morphTarget1;",
-			"	attribute vec3 morphTarget2;",
-			"	attribute vec3 morphTarget3;",
+				"#ifdef USE_COLOR",
 
-			"	#ifdef USE_MORPHNORMALS",
+				"	attribute vec3 color;",
 
-			"		attribute vec3 morphNormal0;",
-			"		attribute vec3 morphNormal1;",
-			"		attribute vec3 morphNormal2;",
-			"		attribute vec3 morphNormal3;",
+				"#endif",
 
-			"	#else",
+				"#ifdef USE_MORPHTARGETS",
 
-			"		attribute vec3 morphTarget4;",
-			"		attribute vec3 morphTarget5;",
-			"		attribute vec3 morphTarget6;",
-			"		attribute vec3 morphTarget7;",
+				"	attribute vec3 morphTarget0;",
+				"	attribute vec3 morphTarget1;",
+				"	attribute vec3 morphTarget2;",
+				"	attribute vec3 morphTarget3;",
 
-			"	#endif",
+				"	#ifdef USE_MORPHNORMALS",
 
-			"#endif",
+				"		attribute vec3 morphNormal0;",
+				"		attribute vec3 morphNormal1;",
+				"		attribute vec3 morphNormal2;",
+				"		attribute vec3 morphNormal3;",
 
-			"#ifdef USE_SKINNING",
+				"	#else",
 
-			"	attribute vec4 skinIndex;",
-			"	attribute vec4 skinWeight;",
+				"		attribute vec3 morphTarget4;",
+				"		attribute vec3 morphTarget5;",
+				"		attribute vec3 morphTarget6;",
+				"		attribute vec3 morphTarget7;",
 
-			"#endif",
+				"	#endif",
 
-			""
+				"#endif",
 
-		].join( '\n' );
+				"#ifdef USE_SKINNING",
 
-		var prefix_fragment = [
+				"	attribute vec4 skinIndex;",
+				"	attribute vec4 skinWeight;",
 
-			"precision " + parameters.precision + " float;",
-			"precision " + parameters.precision + " int;",
+				"#endif",
 
-			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
+				""
 
-			customDefines,
+			].join( '\n' );
 
-			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
-			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
-			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
-			"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
+			prefix_fragment = [
 
-			"#define MAX_SHADOWS " + parameters.maxShadows,
+				"precision " + parameters.precision + " float;",
+				"precision " + parameters.precision + " int;",
 
-			parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
+				( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
-			_this.gammaInput ? "#define GAMMA_INPUT" : "",
-			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+				customDefines,
 
-			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
-			( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
+				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
+				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+				"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
+				"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
 
-			parameters.map ? "#define USE_MAP" : "",
-			parameters.envMap ? "#define USE_ENVMAP" : "",
-			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
-			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
-			parameters.normalMap ? "#define USE_NORMALMAP" : "",
-			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
-			parameters.vertexColors ? "#define USE_COLOR" : "",
+				"#define MAX_SHADOWS " + parameters.maxShadows,
 
-			parameters.metal ? "#define METAL" : "",
-			parameters.wrapAround ? "#define WRAP_AROUND" : "",
-			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-			parameters.flipSided ? "#define FLIP_SIDED" : "",
+				parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
 
-			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
-			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
-			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
+				_this.gammaInput ? "#define GAMMA_INPUT" : "",
+				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
 
-			"uniform mat4 viewMatrix;",
-			"uniform vec3 cameraPosition;",
-			""
+				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
+				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
 
-		].join( '\n' );
+				parameters.map ? "#define USE_MAP" : "",
+				parameters.envMap ? "#define USE_ENVMAP" : "",
+				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+				parameters.normalMap ? "#define USE_NORMALMAP" : "",
+				parameters.specularMap ? "#define USE_SPECULARMAP" : "",
+				parameters.vertexColors ? "#define USE_COLOR" : "",
+
+				parameters.metal ? "#define METAL" : "",
+				parameters.wrapAround ? "#define WRAP_AROUND" : "",
+				parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
+				parameters.flipSided ? "#define FLIP_SIDED" : "",
+
+				parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
+				parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
+				parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+				parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
+
+				"uniform mat4 viewMatrix;",
+				"uniform vec3 cameraPosition;",
+				""
+
+			].join( '\n' );
+
+		}
 
 		var glVertexShader = new THREE.WebGLShader( _gl, _gl.VERTEX_SHADER, prefix_vertex + vertexShader );
 		var glFragmentShader = new THREE.WebGLShader( _gl, _gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
