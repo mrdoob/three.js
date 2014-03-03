@@ -383,15 +383,15 @@
 				THREE.BufferGeometry.call( this );
 				// THREE.Geometry2.call( this, points );
 
-				var vertices = new Float32Array( points * 3 );
-				var birdColors = new Float32Array( points * 3 );
-				var references = new Float32Array( points * 2 );
-				var birdVertex = new Float32Array( points );
+				var vertices = new THREE.Float32Attribute( points, 3 );
+				var birdColors = new THREE.Float32Attribute( points, 3 );
+				var references = new THREE.Float32Attribute( points, 2 );
+				var birdVertex = new THREE.Float32Attribute( points, 1 );
 
-				this.addAttribute( 'position', vertices, 3 );
-				this.addAttribute( 'birdColor', birdColors, 3 );
-				this.addAttribute( 'reference', references, 2 );
-				this.addAttribute( 'birdVertex', birdVertex, 1 );
+				this.addAttribute( 'position', vertices );
+				this.addAttribute( 'birdColor', birdColors );
+				this.addAttribute( 'reference', references );
+				this.addAttribute( 'birdVertex', birdVertex );
 
 				// this.addAttribute( 'normal', new Float32Array( points * 3 ), 3 );
 
@@ -400,7 +400,7 @@
 
 				function verts_push() {
 					for (var i=0; i < arguments.length; i++) {
-						vertices[v++] = arguments[i];
+						vertices.array[v++] = arguments[i];
 					}
 				}
 
@@ -442,14 +442,14 @@
 						~~(v / 9) / BIRDS * 0x666666
 					);
 
-					birdColors[ v * 3 + 0 ] = c.r;
-					birdColors[ v * 3 + 1 ] = c.g;
-					birdColors[ v * 3 + 2 ] = c.b;
+					birdColors.array[ v * 3 + 0 ] = c.r;
+					birdColors.array[ v * 3 + 1 ] = c.g;
+					birdColors.array[ v * 3 + 2 ] = c.b;
 
-					references[ v * 2     ] = x;
-					references[ v * 2 + 1 ] = y;
+					references.array[ v * 2     ] = x;
+					references.array[ v * 2 + 1 ] = y;
 
-					birdVertex[ v         ] = v % 9;
+					birdVertex.array[ v         ] = v % 9;
 
 				}
 
