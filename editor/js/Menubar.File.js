@@ -48,7 +48,7 @@ Menubar.File = function ( editor ) {
 
 		var output = exporter.parse( editor.scene );
 
-		if ( exporterClass instanceof THREE.ObjectExporter ) {
+		if ( exporter instanceof THREE.ObjectExporter ) {
 
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
