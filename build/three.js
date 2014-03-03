@@ -9098,6 +9098,16 @@ THREE.BufferGeometry.prototype = {
 
 	addAttribute: function ( name, attribute ) {
 
+		if ( attribute instanceof THREE.BufferAttribute === false ) {
+
+			console.warn( 'DEPRECATED: BufferGeometry\'s addAttribute() now expects ( name, attribute ).' );
+
+			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+
+			return;
+
+		}
+
 		this.attributes[ name ] = attribute;
 
 	},
