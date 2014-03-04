@@ -700,7 +700,7 @@ THREE.ShaderChunk = {
 
 	lights_phong_pars_vertex: [
 
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
 
 		"	varying vec3 vWorldPosition;",
 
@@ -711,7 +711,7 @@ THREE.ShaderChunk = {
 
 	lights_phong_vertex: [
 
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
 
 		"	vWorldPosition = worldPosition.xyz;",
 
@@ -759,7 +759,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
 
 		"	varying vec3 vWorldPosition;",
 
