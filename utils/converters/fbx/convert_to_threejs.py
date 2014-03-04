@@ -7,6 +7,7 @@ import operator
 import re
 import json
 import types
+import shutil
 
 # #####################################################
 # Globals
@@ -20,6 +21,8 @@ option_default_light = False
 option_pretty_print = False
 
 converter = None
+inputFolder = ""
+outputFolder = ""
 
 # #####################################################
 # Pretty Printing Hacks
@@ -504,8 +507,11 @@ def generate_texture_object(texture):
 
     if type(texture) is FbxFileTexture:
         url = texture.GetFileName()
+            
     else:
         url = getTextureName( texture )
+        
+    url = replace_inFolder2OutFolder( url )
 
     output = {
 
@@ -517,8 +523,32 @@ def generate_texture_object(texture):
       'anisotropy': True
 
     }
-
+    
     return output
+
+# #####################################################
+# Replace Texture input path to output
+# #####################################################
+def replace_inFolder2OutFolder(url):
+    folderIndex =  url.find(inputFolder)
+        
+    if  folderIndex != -1:
+        url = url[ len(inputFolder): ]
+        url = outputFolder + url
+            
+    return url
+
+# #####################################################
+# Replace Texture output path to input
+# #####################################################
+def replace_OutFolder2inFolder(url):
+    folderIndex =  url.find(outputFolder)
+        
+    if  folderIndex != -1:
+        url = url[ len(outputFolder): ]
+        url = inputFolder + url
+            
+    return url
 
 # #####################################################
 # Find Scene Textures
@@ -903,7 +933,8 @@ def extract_fbx_vertex_uvs(mesh):
                         index = mesh_uvs.GetIndexArray().GetAt(control_point_index)
                         poly_uvs.append(index)
                 elif mesh_uvs.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
-                    uv_texture_index = mesh.GetTextureUVIndex(p, v)
+                   # uv_texture_index = mesh.GetTextureUVIndex(p, v) # comment for fix COLLADA uv bug
+                    uv_texture_index = mesh_uvs.GetIndexArray().GetAt(vertexId)
                     if mesh_uvs.GetReferenceMode() == FbxLayerElement.eDirect or \
                        mesh_uvs.GetReferenceMode() == FbxLayerElement.eIndexToDirect:
                         poly_uvs.append(uv_texture_index)
@@ -1982,6 +2013,13 @@ def read_file(filepath):
     f.close()
     return content
 
+def copy_textures(textures):
+    for key in textures:
+        url = textures[key]['url']
+        
+        src = replace_OutFolder2inFolder(url)
+        shutil.copyfile(src, url)
+
 def findFilesWithExt(directory, ext, include_path = True):
     ext = ext.lower()
     found = []
@@ -2057,9 +2095,23 @@ if __name__ == "__main__":
             print("\nForcing geometry to triangles")
             triangulate_scene(scene)
             
+        # According to asset's coordinate to convert scene 
+        upVector = scene.GetGlobalSettings().GetAxisSystem().GetUpVector();
+        
         axis_system = FbxAxisSystem.MayaYUp
+        if upVector[0] == 3:
+            axis_system = FbxAxisSystem.MayaZUp
+        
         axis_system.ConvertScene(scene)
+        
+        inputFolder = args[0].replace( "\\", "/" );
+        index = args[0].rfind( "/" );
+        inputFolder = inputFolder[:index+1]
 
+        outputFolder = args[1].replace( "\\", "/" );
+        index = args[1].rfind( "/" );
+        outputFolder = outputFolder[:index+1]
+         
         if option_geometry:
             output_content = extract_geometry(scene, os.path.basename(args[0]))
         else:
@@ -2074,6 +2126,7 @@ if __name__ == "__main__":
 
         output_path = os.path.join(os.getcwd(), args[1])
         write_file(output_path, output_string)
+        copy_textures( output_content['textures'] )       
 
         print("\nExported Three.js file to:\n%s\n" % output_path)
 
