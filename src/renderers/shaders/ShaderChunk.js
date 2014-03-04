@@ -1300,6 +1300,8 @@ THREE.ShaderChunk = {
 
 		"	mat4 skinMatrix = skinWeight.x * boneMatX;",
 		"	skinMatrix 	+= skinWeight.y * boneMatY;",
+		"	skinMatrix 	+= skinWeight.z * boneMatZ;",
+		"	skinMatrix 	+= skinWeight.w * boneMatW;",
 
 		"	#ifdef USE_MORPHNORMALS",
 
