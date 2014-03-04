@@ -180,8 +180,9 @@ THREE.Quaternion.prototype = {
 
 	setFromAxisAngle: function ( axis, angle ) {
 
-		// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
-		// axis have to be normalized
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
+
+		// assumes axis is normalized
 
 		var halfAngle = angle / 2, s = Math.sin( halfAngle );
 
@@ -254,6 +255,30 @@ THREE.Quaternion.prototype = {
 		return this;
 
 	},
+
+	setFromUnitVectors: function () {
+
+		// http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+
+		// assumes direction vectors vFrom and vTo are normalized
+
+		var v1;
+
+		return function( vFrom, vTo ) {
+
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
+
+			v1.crossVectors( vFrom, vTo );
+
+			this.set( v1.x, v1.y, v1.z, vFrom.dot( vTo ) + 1 ).normalize();
+
+			this._updateEuler();
+
+			return this;
+
+		}
+
+	}(),
 
 	inverse: function () {
 
