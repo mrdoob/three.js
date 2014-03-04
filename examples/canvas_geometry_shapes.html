@@ -286,9 +286,9 @@
 
 				//
 
-				renderer = new THREE.CanvasRenderer( { antialias: true } );
+				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				renderer.sortElements = false;
 				container.appendChild( renderer.domElement );
 

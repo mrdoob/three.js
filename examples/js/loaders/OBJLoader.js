@@ -101,7 +101,7 @@ THREE.OBJLoader.prototype = {
 		}
 		
 		function add_uvs( a, b, c ) {
-      
+	  
 			geometry.faceVertexUvs[ 0 ].push( [
 				uvs[ parseUVIndex( a ) ].clone(),
 				uvs[ parseUVIndex( b ) ].clone(),

@@ -4,78 +4,15 @@
 
 THREE.Geometry2 = function ( size ) {
 
-	this.id = THREE.GeometryIdCount ++;
-	this.uuid = THREE.Math.generateUUID();
+	THREE.BufferGeometry.call( this );
 
-	this.name = '';
-
-	this.vertices = size !== undefined ? new Float32Array( size * 3 ) : [];
-	this.normals = size !== undefined ? new Float32Array( size * 3 ) : [];
-	this.uvs = size !== undefined ? new Float32Array( size * 2 ) : [];
+	this.vertices = this.addAttribute( 'position', Float32Array, size, 3 ).array;
+	this.normals = this.addAttribute( 'normal', Float32Array, size, 3 ).array;
+	this.uvs = this.addAttribute( 'uv', Float32Array, size, 2 ).array;
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
 };
 
-THREE.Geometry2.prototype = {
-
-	constructor: THREE.Geometry2,
-
-	applyMatrix: function ( matrix ) {
-
-		matrix.multiplyVector3Array( this.vertices );
-
-	},
-
-	computeBoundingSphere: function () {
-
-		var box = new THREE.Box3();
-		var vector = new THREE.Vector3();
-
-		return function () {
-
-			if ( this.boundingSphere === null ) {
-
-				this.boundingSphere = new THREE.Sphere();
-
-			}
-
-			box.makeEmpty();
-
-			var vertices = this.vertices;
-			var center = this.boundingSphere.center;
-
-			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
-
-				vector.set( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
-				box.addPoint( vector );
-
-			}
-
-			box.center( center );
-
-			var maxRadiusSq = 0;
-
-			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
-
-				vector.set( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
-
-			}
-
-			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-		}
-
-	}(),
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
-	}
-
-};
-
-THREE.EventDispatcher.prototype.apply( THREE.Geometry2.prototype );
+THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );

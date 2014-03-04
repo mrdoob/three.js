@@ -33,13 +33,13 @@ var Loader = function ( editor ) {
 				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
-					var contents = event.target.result;
+					var data = new Uint8Array( event.target.result );
 
-					var stream = new CTM.Stream( contents );
+					var stream = new CTM.Stream( data );
 					stream.offset = 0;
 
 					var loader = new THREE.CTMLoader();
-					loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
+					loader.createModelBuffers( new CTM.File( stream ), function( geometry ) {
 
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
@@ -55,7 +55,7 @@ var Loader = function ( editor ) {
 					} );
 
 				}, false );
-				reader.readAsBinaryString( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 

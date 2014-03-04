@@ -165,6 +165,11 @@ Sidebar.Geometry = function ( editor ) {
 			geometryVertices.setValue( geometry.vertices.length );
 			geometryFaces.setValue( geometry.faces.length );
 
+		} else if ( geometry instanceof THREE.Geometry2 ) {
+
+			geometryVertices.setValue( geometry.vertices.length / 3 );
+			geometryFaces.setValue( geometry.vertices.length / 9 );
+
 		} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 			geometryVertices.setValue( geometry.attributes.position.array.length / 3 );
@@ -175,10 +180,9 @@ Sidebar.Geometry = function ( editor ) {
 
 			} else {
 
-				geometryFaces.setValue( geometry.attributes.position.array.length / 3 / 3 );
+				geometryFaces.setValue( geometry.attributes.position.array.length / 9 );
 
 			}
-
 
 		}
 

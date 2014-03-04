@@ -23,7 +23,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_canvasWidthHalf = Math.floor( _canvasWidth / 2 ),
 	_canvasHeightHalf = Math.floor( _canvasHeight / 2 ),
 	
-	_context = _canvas.getContext( '2d' ),
+	_context = _canvas.getContext( '2d', {
+		alpha: parameters.alpha === true
+	} ),
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0,
@@ -317,7 +319,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableFace3 ) {
+			} else if ( element instanceof THREE.RenderableFace ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
@@ -459,13 +461,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
 		_elemBox.max.set( v1.x + dist, v1.y + dist );
-
-		if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-			_elemBox.makeEmpty();
-			return;
-
-		}
 
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility

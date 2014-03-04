@@ -35,7 +35,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 		scene = new THREE.Scene();
 
-		geometry = new THREE.CubeGeometry( 200, 200, 200 );
+		geometry = new THREE.BoxGeometry( 200, 200, 200 );
 		material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
 		mesh = new THREE.Mesh( geometry, material );
@@ -62,7 +62,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 </script>
 ```
-If everything went well you should see [this](http://jsfiddle.net/HptjJ/).
+If everything went well you should see [this](http://jsfiddle.net/Gy4w7/).
 
 ### Change log ###
 
