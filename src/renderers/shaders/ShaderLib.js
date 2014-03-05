@@ -1085,6 +1085,8 @@ THREE.ShaderLib = {
 
 			"				vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
 			"				skinned 	  += boneMatY * skinVertex * skinWeight.y;",
+			"				skinned 	  += boneMatZ * skinVertex * skinWeight.z;",
+			"				skinned 	  += boneMatW * skinVertex * skinWeight.w;",
 
 			"				displacedPosition  = skinned.xyz;",
 
