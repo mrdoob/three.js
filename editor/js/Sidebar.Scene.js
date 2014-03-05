@@ -120,7 +120,7 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
-		var scene = editor.scene;
+		var scene = editor.getScene();
 		var sceneType = editor.getObjectType( scene );
 
 		var options = [];
@@ -159,9 +159,9 @@ Sidebar.Scene = function ( editor ) {
 
 		outliner.setOptions( options );
 
-		if ( editor.selected !== null ) {
-
-			outliner.setValue( editor.selected.id );
+		if ( editor.getSelectedObject() !== undefined ) {
+			console.log('selected object', typeof editor.getSelectedObject());
+			outliner.setValue( editor.getSelectedObject().id );
 
 		}
 

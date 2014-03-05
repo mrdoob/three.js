@@ -14,15 +14,15 @@ var Viewport = function ( editor ) {
 	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
 	container.add( info );
 
-	var scene = editor.scene;
-	var sceneHelpers = editor.sceneHelpers;
+	var scene        = editor.getScene();
+	var helpersScene = editor.getHelpersScene();
 
 	var objects = [];
 
 	// helpers
 
 	var grid = new THREE.GridHelper( 500, 25 );
-	sceneHelpers.add( grid );
+	helpersScene.add( grid );
 
 	//
 
@@ -36,10 +36,12 @@ var Viewport = function ( editor ) {
 	selectionBox.material.depthTest = false;
 	selectionBox.material.transparent = true;
 	selectionBox.visible = false;
-	sceneHelpers.add( selectionBox );
+	helpersScene.add( selectionBox );
 
 	var transformControls = new THREE.TransformControls( camera, container.dom );
+
 	transformControls.addEventListener( 'change', function () {
+		var selectedObject = editor.getSelectedObject();
 
 		controls.enabled = true;
 
@@ -49,14 +51,14 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( editor.selected !== null ) {
+		if ( selectedObject !== null ) {
 
-			signals.objectChanged.dispatch( editor.selected );
+			signals.objectChanged.dispatch( selectedObject );
 
 		}
 
 	} );
-	sceneHelpers.add( transformControls );
+	helpersScene.add( transformControls );
 
 	// fog
 
@@ -153,11 +155,12 @@ var Viewport = function ( editor ) {
 
 	var onDoubleClick = function ( event ) {
 
-		var intersects = getIntersects( event, objects );
+		var intersects     = getIntersects( event, objects ),
+			selectedObject = editor.getSelectedObject();
 
-		if ( intersects.length > 0 && intersects[ 0 ].object === editor.selected ) {
+		if ( intersects.length > 0 && intersects[ 0 ].object === selectedObject ) {
 
-			controls.focus( editor.selected );
+			controls.focus( selectedObject );
 
 		}
 
@@ -237,8 +240,8 @@ var Viewport = function ( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
-		scene        = editor.scene;
-		sceneHelpers = editor.sceneHelpers;
+		scene        = editor.getScene();
+		helpersScene = editor.getHelpersScene();
 
 		render();
 		updateInfo();
@@ -312,10 +315,11 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.objectChanged.add( function ( object ) {
+		var helpers = editor.getHelpers();
 
 		transformControls.update();
 
-		if ( object !== camera ) {
+		if ( object !== undefined && object !== camera ) {
 
 			if ( object.geometry !== undefined ) {
 
@@ -323,9 +327,9 @@ var Viewport = function ( editor ) {
 
 			}
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			if ( helpers !== undefined ) {
 
-				editor.helpers[ object.id ].update();
+				helpers[ object.id ].update();
 
 			}
 
@@ -531,7 +535,7 @@ var Viewport = function ( editor ) {
 
 	function updateMaterials() {
 
-		editor.scene.traverse( function ( node ) {
+		editor.getScene().traverse( function ( node ) {
 
 			if ( node.material ) {
 
@@ -575,8 +579,9 @@ var Viewport = function ( editor ) {
 
 	function render() {
 
-		sceneHelpers.updateMatrixWorld();
-		scene.updateMatrixWorld();
+		// if(scene !== undefined) {
+			helpersScene.updateMatrixWorld();
+			scene.updateMatrixWorld();
 
 		renderer.clear();
 		renderer.render( scene, camera );

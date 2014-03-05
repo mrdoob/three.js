@@ -281,7 +281,7 @@ Sidebar.Object3D = function ( editor ) {
 
 				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
-					editor.parent( object, editor.scene.getObjectById( newParentId, true ) );
+					editor.parent( object, editor.getScene().getObjectById( newParentId, true ) );
 
 				}
 
@@ -374,7 +374,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	function updateRows() {
 
-		var object = editor.selected;
+		var object = editor.getSelectedObject();
 
 		var properties = {
 			'parent': objectParentRow,
@@ -426,7 +426,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
-		var scene = editor.scene;
+		var scene = editor.getScene();
 
 		var options = {};
 
@@ -462,7 +462,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		container.setDisplay( 'none' );
 
-		var object = editor.selected;
+		var object = editor.getSelectedObject();
 
 		if ( object !== null ) {
 

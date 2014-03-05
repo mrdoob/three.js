@@ -1,14 +1,16 @@
 Editor.ChangeHistory = function(editor) {
     this.editor              = editor;
+    this.baseModel           = editor.data;
 
-    this.baseScene           = undefined;
+    this.baseScene           = editor.getScene();
+    this.baseHelperScene     = editor.getHelpersScene();
     this.transactions        = [];
     this.transactionsPointer = this.transactions.length - 1;
 
     this.loader   = new THREE.ObjectLoader();
     this.exporter = new THREE.ObjectExporter();
 
-    this.setBaseScene(editor.scene);
+    this.setBaseScene(editor.getScene());
 }
 
 Editor.ChangeHistory.prototype = {
@@ -35,6 +37,18 @@ Editor.ChangeHistory.prototype = {
 
     },
 
+    setBaseHelperScene: function(scene) {
+
+        this.baseHelperScene = this.cloneScene(scene);
+        
+    },
+
+    getBaseHelperScene: function(model) {
+
+        return this.baseHelperScene;
+
+    },
+
     addAndApplyChange: function(transaction) {
 
         // this creates an alternative future
@@ -54,11 +68,13 @@ Editor.ChangeHistory.prototype = {
     },
 
     applyChanges: function() {
-        var clonedScene = this.cloneScene(this.getBaseScene()),
-            pointer     = this.transactionsPointer;
+        var clonedScene       = this.cloneScene(this.getBaseScene()),
+            clonedHelperScene = this.cloneScene(this.getBaseHelperScene()),
+            pointer           = this.transactionsPointer;
 
         // set scene for applying transactions
         this.editor.setScene(clonedScene, true);
+        this.editor.setHelpersScene(clonedHelperScene, true);
 
         this.transactions.forEach(function(transaction, idx) {
             if(idx <= pointer) {
@@ -68,6 +84,7 @@ Editor.ChangeHistory.prototype = {
 
         // set secene with change signal dispatching
         this.editor.setScene(clonedScene);
+        this.editor.setHelpersScene(clonedHelperScene);
     },
 
     undo: function () {
