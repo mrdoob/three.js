@@ -139,6 +139,7 @@ var list = {
 		"Extras": [
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
+			[ "ImageRegistry", "api/extras/ImageRegistry" ],
 			[ "ImageUtils", "api/extras/ImageUtils" ],
 			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
