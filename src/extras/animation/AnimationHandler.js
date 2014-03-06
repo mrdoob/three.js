@@ -52,6 +52,17 @@ THREE.AnimationHandler = (function() {
 		initData( data );
 
 	};
+	
+	//--- remove ---
+
+	that.remove = function( name ) {
+
+		if ( library[ name ] === undefined )
+			console.log( "THREE.AnimationHandler.add: Warning! " + name + " doesn't exists in library. Doing nothing." );
+			
+		library[ name ] = undefined;
+
+	};
 
 
 	//--- get ---
