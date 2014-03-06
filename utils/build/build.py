@@ -79,7 +79,7 @@ def main(argv=None):
 		# header
 
 		with open(output,'r') as f: text = f.read()
-		with open(output,'w') as f: f.write('// three.js - http://github.com/mrdoob/three.js\n// Released under the MIT license.\n// https://github.com/mrdoob/three.js/blob/master/LICENSE' + text + sourcemapping)
+		with open(output,'w') as f: f.write('// three.js - http://github.com/mrdoob/three.js\n// Released under the MIT license.\n// https://github.com/mrdoob/three.js/blob/master/LICENSE\n' + text + sourcemapping)
 
 	os.close(fd)
 	os.remove(path)
