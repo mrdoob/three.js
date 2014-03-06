@@ -11,6 +11,7 @@ THREE.Loader = function ( showStatus ) {
 	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
 
+	this.imageRegistry = THREE.DefaultImageRegistry;
 };
 
 THREE.Loader.prototype = {
@@ -73,11 +74,13 @@ THREE.Loader.prototype = {
 
 	initMaterials: function ( materials, texturePath ) {
 
+		this.imageRegistry.texturePath = texturePath
+
 		var array = [];
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
+			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ] );
 
 		}
 
@@ -99,7 +102,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	createMaterial: function ( m, texturePath ) {
+	createMaterial: function ( m ) {
 
 		var _this = this;
 
@@ -151,7 +154,7 @@ THREE.Loader.prototype = {
 
 			var isCompressed = /\.dds$/i.test( sourceFile );
 
-			var fullPath = texturePath + sourceFile;
+			var fullPath = this.imageRegistry.get(sourceFile)
 
 			if ( isCompressed ) {
 
@@ -334,31 +337,31 @@ THREE.Loader.prototype = {
 
 		// textures
 
-		if ( m.mapDiffuse && texturePath ) {
+		if ( m.mapDiffuse && this.imageRegistry ) {
 
 			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 
 		}
 
-		if ( m.mapLight && texturePath ) {
+		if ( m.mapLight && this.imageRegistry ) {
 
 			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
 
 		}
 
-		if ( m.mapBump && texturePath ) {
+		if ( m.mapBump && this.imageRegistry ) {
 
 			create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
 
 		}
 
-		if ( m.mapNormal && texturePath ) {
+		if ( m.mapNormal && this.imageRegistry ) {
 
 			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 
 		}
 
-		if ( m.mapSpecular && texturePath ) {
+		if ( m.mapSpecular && this.imageRegistry ) {
 
 			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
 

@@ -2,9 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+THREE.ImageLoader = function ( manager, registry ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.registry = ( registry !== undefined ) ? registry : THREE.DefaultImageRegistry;
 
 };
 
@@ -50,7 +51,7 @@ THREE.ImageLoader.prototype = {
 
 		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
-		image.src = url;
+		image.src = this.registry.get( url );
 
 		scope.manager.itemStart( url );
 

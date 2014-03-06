@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A helper class to allow textures referenced in model files to be loaded from a different URL.</div>
+		
+
+		<h2>Properties</h2>
+
+
+
+		<h3>.[page:string texturePath]</h3>
+		<div>
+		The path that will be prepended to file names.
+		</div> 
+
+		<h3>.[page:function defaultGetter]</h3>
+		<div>
+		The function that will be called when no registry entry is present for a file. The default behavior is to prepend the texturePath.
+		</div> 
+
+		<h2>Methods</h2>
+
+
+
+		<h3>.get([page:string sourceFile]) [page:string]</h3>
+		<div>
+		sourceFile -- The file name to fetch from the registry.
+		</div>
+		<div>
+		Will return the entry for the given source file if one is present, or call the default getter.
+		</div>
+
+		<h3>.put([page:string sourceFile], [page:function getter]) [page:string]</h3>
+		<div>
+		sourceFile -- The file name to enter into the registry. <br />
+		getter -- The function to call when this file is requested.
+		</div>
+		<div>
+		Will register the given getter function to be called when the same sourceFile is passed to get. If the given getter is a string, that string will be passed to the default getter, allowing simple aliasing of file names.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
