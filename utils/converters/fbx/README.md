@@ -31,6 +31,7 @@ Options:
 * Some camera properties are not converted correctly
 * Some light properties are not converted correctly
 * Some material properties are not converted correctly
+* Textures must be put in asset's folder, and use relative path in the material
 
 ## Dependencies
 

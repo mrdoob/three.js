@@ -507,7 +507,6 @@ def generate_texture_object(texture):
 
     if type(texture) is FbxFileTexture:
         url = texture.GetFileName()
-            
     else:
         url = getTextureName( texture )
         
@@ -533,7 +532,7 @@ def replace_inFolder2OutFolder(url):
     folderIndex =  url.find(inputFolder)
         
     if  folderIndex != -1:
-        url = url[ len(inputFolder): ]
+        url = url[ folderIndex+len(inputFolder): ]
         url = outputFolder + url
             
     return url
@@ -545,7 +544,7 @@ def replace_OutFolder2inFolder(url):
     folderIndex =  url.find(outputFolder)
         
     if  folderIndex != -1:
-        url = url[ len(outputFolder): ]
+        url = url[ folderIndex+len(outputFolder): ]
         url = inputFolder + url
             
     return url
@@ -933,8 +932,8 @@ def extract_fbx_vertex_uvs(mesh):
                         index = mesh_uvs.GetIndexArray().GetAt(control_point_index)
                         poly_uvs.append(index)
                 elif mesh_uvs.GetMappingMode() == FbxLayerElement.eByPolygonVertex:
-                   # uv_texture_index = mesh.GetTextureUVIndex(p, v) # comment for fix COLLADA uv bug
                     uv_texture_index = mesh_uvs.GetIndexArray().GetAt(vertexId)
+                    
                     if mesh_uvs.GetReferenceMode() == FbxLayerElement.eDirect or \
                        mesh_uvs.GetReferenceMode() == FbxLayerElement.eIndexToDirect:
                         poly_uvs.append(uv_texture_index)
@@ -2003,6 +2002,12 @@ def extract_geometry(scene, filename):
 # File Helpers
 # #####################################################
 def write_file(filepath, content):
+    index = filepath.rfind('/')
+    dir = filepath[0:index]
+    
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    
     out = open(filepath, "w")
     out.write(content.encode('utf8', 'replace'))
     out.close()
@@ -2014,11 +2019,28 @@ def read_file(filepath):
     return content
 
 def copy_textures(textures):
+    texture_dict = {}
+    
     for key in textures:
-        url = textures[key]['url']
-        
+        url = textures[key]['url']        
         src = replace_OutFolder2inFolder(url)
-        shutil.copyfile(src, url)
+        
+        if url in texture_dict:  # texture has been copied
+            continue
+        
+        if not os.path.exists(src):
+            print("copy_texture error: we can't find this texture at " + src)
+            continue
+        
+        try:
+            index = url.rfind('/')
+            folder = url[0:index]            
+            if len(folder) and not os.path.exists(folder):
+                os.makedirs(folder)                
+            shutil.copyfile(src, url)
+            texture_dict[url] = True
+        except IOError as e:
+            print "I/O error({0}): {1} {2}".format(e.errno, e.strerror, src)
 
 def findFilesWithExt(directory, ext, include_path = True):
     ext = ext.lower()
@@ -2106,11 +2128,11 @@ if __name__ == "__main__":
         
         inputFolder = args[0].replace( "\\", "/" );
         index = args[0].rfind( "/" );
-        inputFolder = inputFolder[:index+1]
+        inputFolder = inputFolder[:index]
 
         outputFolder = args[1].replace( "\\", "/" );
         index = args[1].rfind( "/" );
-        outputFolder = outputFolder[:index+1]
+        outputFolder = outputFolder[:index]
          
         if option_geometry:
             output_content = extract_geometry(scene, os.path.basename(args[0]))
