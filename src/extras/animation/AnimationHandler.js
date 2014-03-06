@@ -75,7 +75,6 @@ THREE.AnimationHandler = ( function () {
 
 			} else {
 
-				console.log( "THREE.AnimationHandler.get: Couldn't find animation " + name );
 				return null;
 
 			}
