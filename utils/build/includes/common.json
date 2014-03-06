@@ -41,6 +41,7 @@
 	"src/lights/HemisphereLight.js",
 	"src/lights/PointLight.js",
 	"src/lights/SpotLight.js",
+	"src/loaders/Cache.js",
 	"src/loaders/Loader.js",
 	"src/loaders/XHRLoader.js",
 	"src/loaders/ImageLoader.js",
