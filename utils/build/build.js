@@ -68,7 +68,7 @@ function main() {
 
 		var result = uglify.minify( sources, { outSourceMap: sourcemap } );
 		
-		fs.writeFileSync( output, 'three.js - http://github.com/mrdoob/three.js\n// Released under the MIT license.\n// https://github.com/mrdoob/three.js/blob/master/LICENSE\n' + result.code + sourcemapping, 'utf8' );
+		fs.writeFileSync( output, 'three.js / threejs.org/license\n' + result.code + sourcemapping, 'utf8' );
 
 		if ( args.sourcemaps ) {
 
