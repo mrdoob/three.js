@@ -8,7 +8,9 @@
 
   var littleEndian = true;
 
-  THREE.AWDLoader = function ( showStatus ) {
+  THREE.AWDLoader = AWDLoader;
+
+  function AWDLoader( showStatus ) {
 
     THREE.Loader.call( this, showStatus );
 
