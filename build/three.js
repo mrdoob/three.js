@@ -11133,6 +11133,43 @@ THREE.SpotLight.prototype.clone = function () {
 };
 
 /**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Cache = {
+
+	files: {},
+
+	add: function ( key, file ) {
+
+		// console.log( 'THREE.Cache', 'Adding key:', key );
+
+		this.files[ key ] = file;
+
+	},
+
+	get: function ( key ) {
+
+		// console.log( 'THREE.Cache', 'Checking key:', key );
+
+		return this.files[ key ];
+
+	},
+
+	remove: function ( key ) {
+
+		delete this.files[ key ];
+
+	},
+
+	clear: function () {
+
+		this.files = {}
+
+	}
+
+};
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -11237,47 +11274,10 @@ THREE.Loader.prototype = {
 
 		var _this = this;
 
-		function is_pow2( n ) {
-
-			var l = Math.log( n ) / Math.LN2;
-			return Math.floor( l ) == l;
-
-		}
-
 		function nearest_pow2( n ) {
 
 			var l = Math.log( n ) / Math.LN2;
 			return Math.pow( 2, Math.round(  l ) );
-
-		}
-
-		function load_image( where, url ) {
-
-			var image = new Image();
-
-			image.onload = function () {
-
-				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
-
-					var width = nearest_pow2( this.width );
-					var height = nearest_pow2( this.height );
-
-					where.image.width = width;
-					where.image.height = height;
-					where.image.getContext( '2d' ).drawImage( this, 0, 0, width, height );
-
-				} else {
-
-					where.image = this;
-
-				}
-
-				where.needsUpdate = true;
-
-			};
-
-			if ( _this.crossOrigin !== undefined ) image.crossOrigin = _this.crossOrigin;
-			image.src = url;
 
 		}
 
@@ -11338,7 +11338,31 @@ THREE.Loader.prototype = {
 
 			if ( ! isCompressed ) {
 
-				load_image( where[ name ], fullPath );
+				var texture = where[ name ];
+
+				var loader = new THREE.ImageLoader();
+				loader.crossOrigin = _this.crossOrigin;
+				loader.load( fullPath, function ( image ) {
+
+					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
+						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
+
+						var width = nearest_pow2( image.width );
+						var height = nearest_pow2( image.height );
+
+						texture.image.width = width;
+						texture.image.height = height;
+						texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
+
+					} else {
+
+						texture.image = image;
+
+					}
+
+					texture.needsUpdate = true;
+
+				} );
 
 			}
 
@@ -11595,12 +11619,23 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var cached = THREE.Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			onLoad( cached );
+			return;
+
+		}
+
 		var scope = this;
 		var request = new XMLHttpRequest();
 
 		if ( onLoad !== undefined ) {
 
 			request.addEventListener( 'load', function ( event ) {
+
+				THREE.Cache.add( url, event.target.responseText );
 
 				onLoad( event.target.responseText );
 				scope.manager.itemEnd( url );
@@ -11662,6 +11697,15 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var cached = THREE.Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			onLoad( cached );
+			return;
+
+		}
+
 		var scope = this;
 		var image = document.createElement( 'img' );
 
@@ -11669,8 +11713,10 @@ THREE.ImageLoader.prototype = {
 
 			image.addEventListener( 'load', function ( event ) {
 
-				scope.manager.itemEnd( url );
+				THREE.Cache.add( url, this );
+
 				onLoad( this );
+				scope.manager.itemEnd( url );
 
 			}, false );
 
