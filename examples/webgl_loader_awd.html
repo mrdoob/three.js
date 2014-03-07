@@ -56,7 +56,7 @@
 			loader.load( './models/awd/simple/simple.awd', function ( _trunk ) {
 
 				trunk = _trunk;
-			
+
 				init();
 				render();
 
@@ -64,13 +64,14 @@
 
 
 			function createMaterial( name ){
-				console.log( name );
-				var mat = new THREE.MeshPhongMaterial({
-					color: 0xaaaaaa,
-					shininess: 20
-					
-				});
-				return mat;
+				// console.log( name );
+				// var mat = new THREE.MeshPhongMaterial({
+				// 	color: 0xaaaaaa,
+				// 	shininess: 20
+
+				// });
+				// return mat;
+				return null;
 			}
 
 
@@ -86,7 +87,7 @@
 
 				scene = new THREE.Scene();
 
-			
+
 				// Add the AWD SCENE
 
 				scene.add( trunk );
@@ -97,9 +98,7 @@
 				scene.add( new THREE.AmbientLight( 0x606060 ) );
 
 				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.set( .2, -1, .2 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 

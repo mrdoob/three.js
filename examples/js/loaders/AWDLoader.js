@@ -1,5 +1,5 @@
 /**
- * User: plepers
+ * Author: Pierre Lepers
  * Date: 09/12/2013 17:21
  */
 
@@ -35,7 +35,7 @@ THREE.AWDLoader = (function (){
       BOOL       = 21,
       COLOR      = 22,
       BADDR      = 23,
-      
+
       INT8    = 1,
       INT16   = 2,
       INT32   = 3,
@@ -47,6 +47,34 @@ THREE.AWDLoader = (function (){
 
 
   var littleEndian = true;
+
+  // ResourcesLoader
+  // =============
+  // handle loading for external resources
+  function ResourcesLoader( awdUrl ){
+
+    this._baseDir = awdUrl.substr( 0, awdUrl.lastIndexOf( '/' )+1 );
+
+    this._loadingManager = new THREE.LoadingManager();
+
+  }
+
+  ResourcesLoader.prototype = {
+
+    loadTexture : function( path ){
+      var tex = new THREE.Texture();
+
+      var loader = new THREE.ImageLoader( this._loadingManager );
+
+      loader.load( this._baseDir+path, function( image ) {
+        tex.image = image;
+        tex.needsUpdate = true;
+      });
+
+      return tex;
+
+    }
+  }
 
 
 
@@ -64,6 +92,9 @@ THREE.AWDLoader = (function (){
     this.trunk = new THREE.Object3D();
 
     this.materialFactory = undefined;
+
+    this._resourceLoader = null;
+    this._url = null;
 
     this._data;
     this._ptr = 0;
@@ -92,6 +123,7 @@ THREE.AWDLoader = (function (){
   AWDLoader.prototype.load = function ( url, callback ) {
 
     var that = this;
+    this._url = url;
     var xhr = new XMLHttpRequest();
     xhr.open( "GET", url, true );
     xhr.responseType = 'arraybuffer';
@@ -124,7 +156,7 @@ THREE.AWDLoader = (function (){
 
     this._ptr = 0;
     this._data = new DataView( data );
-    
+
     this._parseHeader( );
 
     if( this._compression != 0  ) {
@@ -228,10 +260,10 @@ THREE.AWDLoader = (function (){
 
     this._streaming = (flags & 0x1) == 0x1;
 
-    if ((version[0] == 2) && (version[1] == 1)) {
-      this._accuracyMatrix =  (flags & 0x2) == 0x2;
-      this._accuracyGeo =     (flags & 0x4) == 0x4;
-      this._accuracyProps =   (flags & 0x8) == 0x8;
+    if ((version[0] === 2) && (version[1] === 1)) {
+      this._accuracyMatrix =  (flags & 0x2) === 0x2;
+      this._accuracyGeo =     (flags & 0x4) === 0x4;
+      this._accuracyProps =   (flags & 0x8) === 0x8;
     }
 
     this._geoNrType     = this._accuracyGeo     ? FLOAT64 : FLOAT32;
@@ -260,9 +292,9 @@ THREE.AWDLoader = (function (){
     parent.add(ctr);
 
     this.parseProperties({
-      1:this._matrixNrType, 
-      2:this._matrixNrType, 
-      3:this._matrixNrType, 
+      1:this._matrixNrType,
+      2:this._matrixNrType,
+      3:this._matrixNrType,
       4:UINT8
     });
 
@@ -315,7 +347,7 @@ THREE.AWDLoader = (function (){
         meshes.push( sm );
         mesh.add( sm );
       }
-    } 
+    }
     else {
       mesh = new THREE.Mesh( geometries[0] );
       meshes.push( mesh );
@@ -362,12 +394,12 @@ THREE.AWDLoader = (function (){
 
     // Read material numerical properties
     // (1=color, 2=bitmap url, 11=alpha_blending, 12=alpha_threshold, 13=repeat)
-    props = this.parseProperties({ 
-      1:  AWD_FIELD_INT32, 
+    props = this.parseProperties({
+      1:  AWD_FIELD_INT32,
       2:  AWD_FIELD_BADDR,
-      11: AWD_FIELD_BOOL, 
-      12: AWD_FIELD_FLOAT32, 
-      13: AWD_FIELD_BOOL 
+      11: AWD_FIELD_BOOL,
+      12: AWD_FIELD_FLOAT32,
+      13: AWD_FIELD_BOOL
     });
 
     methods_parsed = 0;
@@ -385,14 +417,14 @@ THREE.AWDLoader = (function (){
       if( mat ) return mat;
     }
 
-    if (type == 1) { // Color material
-      mat = new THREE.MeshBasicMaterial();
-      mat.color = new THREE.Color( props.get(1, 0xcccccc) );
+    mat = new THREE.MeshPhongMaterial();
+
+    if (type === 1) { // Color material
+      mat.color.setHex( props.get(1, 0xcccccc) );
     }
-    else if (type == 2) { // Bitmap material
-
-      mat = new THREE.MeshBasicMaterial();
-
+    else if (type === 2) { // Bitmap material
+      var tex_addr = props.get(2, 0);
+      mat.map = this.getBlock( tex_addr );
     }
 
     mat.extra = attributes;
@@ -406,7 +438,6 @@ THREE.AWDLoader = (function (){
 
 
 
-    //Block ID = 82
   AWDLoader.prototype.parseTexture = function( len ) {
 
 
@@ -414,12 +445,14 @@ THREE.AWDLoader = (function (){
         type = this.readU8(),
         asset,
         data_len;
-    
+
     // External
-    if (type == 0) {
+    if (type === 0) {
       data_len = this.readU32();
       var url = this.readUTFBytes(data_len);
       console.log( url );
+
+      asset = this.loadTexture( url );
     } else {
       // embed texture not supported
     }
@@ -430,7 +463,13 @@ THREE.AWDLoader = (function (){
     return asset;
   }
 
+  AWDLoader.prototype.loadTexture = function( url ) {
 
+    if( null === this._resourceLoader )
+      this._resourceLoader = new ResourcesLoader( this._url );
+
+    return this._resourceLoader.loadTexture( url );
+  }
 
   // broken : skeleton pose format is different than threejs one
   AWDLoader.prototype.parseSkeleton = function(len) // Array<Bone>
@@ -651,11 +690,11 @@ THREE.AWDLoader = (function (){
         skinW, skinI,
         geometries = [];
 
-  
+
 
 
     props = this.parseProperties({
-      1: this._geoNrType, 
+      1: this._geoNrType,
       2: this._geoNrType
     });
 
@@ -744,14 +783,14 @@ THREE.AWDLoader = (function (){
 
           geom.addAttribute( 'uv', attrib );
           idx = 0;
-          
+
           while (this._ptr < str_end) {
             buffer[idx]   = this.readF32();
             buffer[idx+1] = 1.0-this.readF32();
             idx+=2;
           }
         }
-        
+
         // NORMALS
         else if (str_type === 4) {
 
