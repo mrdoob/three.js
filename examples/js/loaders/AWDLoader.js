@@ -3,12 +3,59 @@
  * Date: 09/12/2013 17:21
  */
 
-(function (){
+THREE.AWDLoader = (function (){
+
+
+
+  var UNCOMPRESSED = 0,
+      DEFLATE = 1,
+      LZMA = 2,
+
+      AWD_FIELD_INT8 = 1,
+      AWD_FIELD_INT16 = 2,
+      AWD_FIELD_INT32 = 3,
+      AWD_FIELD_UINT8 = 4,
+      AWD_FIELD_UINT16 = 5,
+      AWD_FIELD_UINT32 = 6,
+      AWD_FIELD_FLOAT32 = 7,
+      AWD_FIELD_FLOAT64 = 8,
+      AWD_FIELD_BOOL = 21,
+      AWD_FIELD_COLOR = 22,
+      AWD_FIELD_BADDR = 23,
+      AWD_FIELD_STRING = 31,
+      AWD_FIELD_BYTEARRAY = 32,
+      AWD_FIELD_VECTOR2x1 = 41,
+      AWD_FIELD_VECTOR3x1 = 42,
+      AWD_FIELD_VECTOR4x1 = 43,
+      AWD_FIELD_MTX3x2 = 44,
+      AWD_FIELD_MTX3x3 = 45,
+      AWD_FIELD_MTX4x3 = 46,
+      AWD_FIELD_MTX4x4 = 47,
+
+      BOOL       = 21,
+      COLOR      = 22,
+      BADDR      = 23,
+      
+      INT8    = 1,
+      INT16   = 2,
+      INT32   = 3,
+      UINT8   = 4,
+      UINT16  = 5,
+      UINT32  = 6,
+      FLOAT32 = 7,
+      FLOAT64 = 8;
 
 
   var littleEndian = true;
 
-  THREE.AWDLoader = AWDLoader;
+
+
+  function Block(){
+    this.id = 0;
+    this.data = null;
+  }
+
+
 
   function AWDLoader( showStatus ) {
 
@@ -26,15 +73,13 @@
     this._optimized_for_accuracy = false;
     this._compression = 0;
     this._bodylen = 0xFFFFFFFF;
-    this._cur_block_id = 0x00000000;
 
-    this._blocks = new Array();//AWDBlock
-    this._blocks[0] = new AWDBlock();
-    this._blocks[0].data = null;
 
-    this._accuracyMatrix = false;
-    this._accuracyGeo = false;
-    this._accuracyProps = false;
+    this._blocks = [ new Block() ];
+
+    this._accuracyMatrix  = false;
+    this._accuracyGeo     = false;
+    this._accuracyProps   = false;
 
 
   };
@@ -56,9 +101,7 @@
       if ( xhr.readyState == 4 ) {
 
         if ( xhr.status == 200 || xhr.status == 0 ) {
-          var parseTime = Date.now();
           that.parse( xhr.response );
-          parseTime = Date.now() - parseTime;
           callback( that.trunk );
 
         } else {
@@ -77,14 +120,15 @@
 
   AWDLoader.prototype.parse = function ( data ) {
 
-    this._data = new DataView( data );
     var blen = data.byteLength;
-    this._ptr = 0;
 
+    this._ptr = 0;
+    this._data = new DataView( data );
+    
     this._parseHeader( );
 
     if( this._compression != 0  ) {
-      console.error( 'compressed AWD nor supported' );
+      console.error( 'compressed AWD not supported' );
     }
 
     if (!this._streaming && this._bodylen != data.byteLength - this._ptr ) {
@@ -95,23 +139,20 @@
       this.parseNextBlock();
     }
 
-    this.logHeadInfos();
   }
 
 
 
   AWDLoader.prototype.parseNextBlock = function ( ) {
 
-    var assetData;
-    var ns, type, len;
-    this._cur_block_id = this.readU32();
+    var assetData,
+        ns, type, len, block,
+        blockId = this.readU32(),
+        ns      = this.readU8(),
+        type    = this.readU8(),
+        flags   = this.readU8(),
+        len     = this.readU32();
 
-    ns = this.readU8();
-    type = this.readU8();
-    flags = this.readU8();
-    len = this.readU32();
-
-    var posExpected = this._ptr + len;
 
     switch (type) {
       case 1:
@@ -160,140 +201,113 @@
         break;
     }
 
-    // log( "AWDloader.js in block parsed - ptr : " , this._ptr, "expected " , posExpected);
-
 
     // Store block reference for later use
-    this._blocks[this._cur_block_id] = new AWDBlock();
-    this._blocks[this._cur_block_id].data = assetData;
-    this._blocks[this._cur_block_id].id = this._cur_block_id;
-
-  }
-
-  AWDLoader.prototype.logHeadInfos = function ( data ) {
-
-    console.log('HEADER:');
-    console.log('version:', this._major+"."+this._minor);
-    console.log('streaming?', this._streaming);
-    console.log('accurate?', this._optimized_for_accuracy);
-    console.log('compression:', this._compression);
-    console.log('bodylen:', this._bodylen);
+    this._blocks[blockId] = block = new Block();
+    block.data = assetData;
+    block.id = blockId;
 
   }
 
 
   AWDLoader.prototype._parseHeader = function () {
 
+    var version = this._version,
+        awdmagic = 		
+            ( this.readU8()<<16)
+        | 	( this.readU8()<<8 )
+        | 	  this.readU8();
 
-    var awdmagic = 		(this._data.getUint8( this._ptr++ )<<16)
-        | 	(this._data.getUint8( this._ptr++, littleEndian )<<8 )
-        | 	this._data.getUint8( this._ptr++, littleEndian );
+    if( awdmagic != 4282180 )
+      throw new Error( "AWDLoader - bad magic" );
 
-    if( awdmagic != 4282180 ) // utf "AWD"
-      console.error( "AWDLoader bad magic" );
-
-    this._version[0] = this.readU8();
-    this._version[1] = this.readU8();
+    version[0] = this.readU8();
+    version[1] = this.readU8();
 
     var flags = this.readU16();
 
     this._streaming 				= (flags & 0x1) == 0x1;
 
-    if ((this._version[0] == 2) && (this._version[1] == 1)) {
+    if ((version[0] == 2) && (version[1] == 1)) {
       this._accuracyMatrix =  (flags & 0x2) == 0x2;
       this._accuracyGeo =     (flags & 0x4) == 0x4;
       this._accuracyProps =   (flags & 0x8) == 0x8;
     }
 
-    this._geoNrType = FLOAT32;
-    if (this._accuracyGeo)
-      this._geoNrType = FLOAT64;
+    this._geoNrType     = this._accuracyGeo     ? FLOAT64 : FLOAT32;
+    this._matrixNrType  = this._accuracyMatrix  ? FLOAT64 : FLOAT32;
+    this._propsNrType   = this._accuracyProps   ? FLOAT64 : FLOAT32;
 
-    this._matrixNrType = FLOAT32;
-    if (this._accuracyMatrix)
-      this._matrixNrType = FLOAT64;
-
-    this._propsNrType = FLOAT32;
-    if (this._accuracyProps)
-      this._propsNrType = FLOAT64;
-
-    this._optimized_for_accuracy 	= (flags & 0x2) == 0x2;
+    this._optimized_for_accuracy 	= (flags & 0x2) === 0x2;
 
     this._compression = this.readU8();
     this._bodylen = this.readU32();
 
-    // log("Import AWDFile of version = " + this._version[0] + " - " + this._version[1]);
-    // log("Global Settings = Compression = " + this._compression + " | Streaming = " + this._streaming + " | Matrix-Precision = " + this._accuracyMatrix + " | Geometry-Precision = " + this._accuracyGeo + " | Properties-Precision = " + this._accuracyProps);
 
   }
 
 
   AWDLoader.prototype.parseContainer = function ( len ) {
-    var name;
-    var par_id;
-    var mtx;
-    var ctr;
-    var parent;
+    var parent,
+        ctr     = new THREE.Object3D(),
+        par_id  = this.readU32(),
+        mtx     = this.parseMatrix4();
 
-    ctr = new THREE.Object3D();
-
-    par_id = this.readU32();
-    mtx = this.parseMatrix4();
     ctr.name = this.readUTF();
-
-    //log( "AWDLoader parseContainer ", ctr.name );
-
     ctr.applyMatrix( mtx );
 
     parent = this._blocks[par_id].data || this.trunk;
-    //log( "			p", parent.name );
     parent.add(ctr);
 
-    this.parseProperties({1:this._matrixNrType, 2:this._matrixNrType, 3:this._matrixNrType, 4:UINT8});
-    ctr.extra = this.parseUserAttributes();
+    this.parseProperties({
+      1:this._matrixNrType, 
+      2:this._matrixNrType, 
+      3:this._matrixNrType, 
+      4:UINT8
+    });
 
-    //finalizeAsset(ctr, name);
+    ctr.extra = this.parseUserAttributes();
 
     return ctr;
   }
 
+
+
   AWDLoader.prototype.parseMeshInstance = function ( len ) {
-    var name;
-    var mesh, geometries;
-    var par_id, data_id;
-    var mtx;
-    var materials;
-    var num_materials;
-    var materials_parsed;
-    var parent;
-    var i;
+    var name,
+        mesh, geometries, meshLen, meshes,
+        par_id, data_id,
+        mtx,
+        materials, mat, mat_id,
+        num_materials,
+        materials_parsed,
+        parent,
+        i;
 
-    par_id = this.readU32();
-    mtx = this.parseMatrix4();
-    name = this.readUTF();
+    par_id        = this.readU32();
+    mtx           = this.parseMatrix4();
+    name          = this.readUTF();
+    data_id       = this.readU32();
+    num_materials = this.readU16();
 
-    debug("awd mesh : "+name);
-
-    data_id = this.readU32();
-    geometries = this._blocks[data_id].data;
+    geometries = this.getBlock( data_id );
 
     materials = [];
-    num_materials = this.readU16();
     materials_parsed = 0;
-    while (materials_parsed < num_materials) {
-      var mat_id;
-      var mat;
+
+    for ( i = 0; i < num_materials; i++) {
       mat_id = this.readU32();
-
-      mat = this._blocks[mat_id].data;
-      materials.push(mat);
-
-      materials_parsed++;
+      mat = this.getBlock( mat_id );
+      materials.push( mat );
     }
 
-    //log( "AWDLoader parseMeshInstance ", name );
-    var meshLen = geometries.length
-    var meshes = [];
+
+
+    meshLen = geometries.length
+    meshes = [];
+
+    // TODO : BufferGeometry don't support "geometryGroups" for now.
+    // so we create sub meshes for each groups
     if( meshLen  > 1 ) {
       mesh = new THREE.Object3D()
       for ( i = 0; i < meshLen; i++) {
@@ -301,66 +315,66 @@
         meshes.push( sm );
         mesh.add( sm );
       }
-    } else {
+    } 
+    else {
       mesh = new THREE.Mesh( geometries[0] );
       meshes.push( mesh );
     }
+
     mesh.applyMatrix( mtx );
     mesh.name = name;
 
-    // Add to parent if one exists
-    parent = this._blocks[par_id].data || this.trunk;
-    parent.add(mesh);
 
-    log(materials);
-    // TODO check sub geom lenght?
+    parent = this.getBlock( par_id ) || this.trunk;
+    parent.add( mesh );
+
+
     var matLen = materials.length;
     var maxLen = Math.max( meshLen, matLen);
     for( i = 0; i< maxLen; i++ )
-      meshes[i%meshLen].material = new THREE.MeshBasicMaterial({
-        side: THREE.DoubleSide,
-        color: 0x808080
-      });//materials[i‰matLen];
+      meshes[ i%meshLen ].material = materials[ i % matLen ];
 
 
     // Ignore for now
-    this.parseProperties(null);
+    this.parseProperties( null );
     mesh.extra = this.parseUserAttributes();
-
-    //finalizeAsset(mesh, name);
 
     return mesh;
   }
 
 
-  AWDLoader.prototype.parseMaterial = function ( len ) {
-    var name;
-    var type;
-    var props;
-    var mat;
-    var attributes;
-    var finalize;
-    var num_methods;
-    var methods_parsed;
 
-    name = this.readUTF();
-    type = this.readU8();
+  AWDLoader.prototype.parseMaterial = function ( len ) {
+    var name,
+        type,
+        props,
+        mat,
+        attributes,
+        finalize,
+        num_methods,
+        methods_parsed;
+
+    name        = this.readUTF();
+    type        = this.readU8();
     num_methods = this.readU8();
 
     //log( "AWDLoader parseMaterial ",name )
 
     // Read material numerical properties
     // (1=color, 2=bitmap url, 11=alpha_blending, 12=alpha_threshold, 13=repeat)
-    props = this.parseProperties({ 1:AWD_FIELD_INT32, 2:AWD_FIELD_BADDR,
-      11:AWD_FIELD_BOOL, 12:AWD_FIELD_FLOAT32, 13:AWD_FIELD_BOOL });
+    props = this.parseProperties({ 
+      1:  AWD_FIELD_INT32, 
+      2:  AWD_FIELD_BADDR,
+      11: AWD_FIELD_BOOL, 
+      12: AWD_FIELD_FLOAT32, 
+      13: AWD_FIELD_BOOL 
+    });
 
     methods_parsed = 0;
 
-    while (methods_parsed < num_methods) {
-      var method_type;
-
-      method_type = this.readU16();
-      this.parseProperties(null);
+    while( methods_parsed < num_methods ) {
+      var method_type = this.readU16();
+      this.parseProperties( null );
       this.parseUserAttributes();
     }
 
@@ -385,38 +399,22 @@
     mat.alphaThreshold = props.get(12, 0.0);
     mat.repeat = props.get(13, false);
 
-    // if (finalize) {
-    // 	finalizeAsset(mat, name);
-    // }
 
     return mat;
   }
 
+  // broken : skeleton pose format is different than threejs one
   AWDLoader.prototype.parseSkeleton = function(len) // Array<Bone>
   {
-    var name;
-    var num_joints;
-    var joints_parsed;
-    var skeleton;
+    var name          = this.readUTF(),
+        num_joints    = this.readU16(),
+        skeleton      = [],
+        joints_parsed = 0;
 
-    name = this.readUTF();
-    num_joints = this.readU16();
-    skeleton = []
-
-    // Discard properties for now
-    this.parseProperties(null);
-
-    joints_parsed = 0;
-
-    // debug( 'parse Skeleton '+num_joints+ ' joints');
+    this.parseProperties( null );
 
     while (joints_parsed < num_joints) {
-      // TODO: not used
-      //        var parent_id : uint;
-      // TODO: not used
-      //var joint_name : String;
-      var joint;// : SkeletonJoint;
-      var ibp;// : Matrix3D;
+      var joint, ibp;
 
       // Ignore joint id
       this.readU16();
@@ -442,6 +440,8 @@
 
     return skeleton;
   }
+
+
 
   AWDLoader.prototype.parseSkeletonPose = function(blockID)
   {
@@ -526,14 +526,13 @@
 
   AWDLoader.prototype.parseVertexAnimationSet = function(len)
   {
-    var poseBlockAdress; //:int
-    var name = this.readUTF();
-    var num_frames = this.readU16();
-    var props = this.parseProperties({1:UINT16});
-    var frames_parsed = 0;
-    var skeletonFrames = []; //:Vector.<SkeletonClipNode> = new Vector.<SkeletonClipNode>;
-    //var vertexFrames = [];//:Vector.<VertexClipNode> = new Vector.<VertexClipNode>;
-    // debug ( 'parseVertexAnimationSet num_frames: '+num_frames)
+    var poseBlockAdress,
+        name           = this.readUTF(),
+        num_frames     = this.readU16(),
+        props          = this.parseProperties({1:UINT16}),
+        frames_parsed  = 0,
+        skeletonFrames = [];
+
     while (frames_parsed < num_frames) {
       poseBlockAdress = this.readU32();
       skeletonFrames.push(this._blocks[poseBlockAdress].data);
@@ -614,40 +613,32 @@
 
   AWDLoader.prototype.parseMeshData = function ( len ) {
 
-    var name;
-    var geom;
-    var num_subs;
-    var subs_parsed;
-    var props;
+    var name      = this.readUTF(),
+        num_subs  = this.readU16(),
+        geom,
+        subs_parsed = 0,
+        props,
+        buffer,
+        skinW, skinI,
+        geometries = [];
 
-    var tmparray;
-    var skinW, skinI;
+  
 
-    // Read name and sub count
-    name = this.readUTF();
-    num_subs = this.readU16();
 
-    //log( "AWDloader.js parseMeshData geom name ["+name+"]", num_subs );
+    props = this.parseProperties({
+      1: this._geoNrType, 
+      2: this._geoNrType
+    });
 
-    // Read optional properties
-    props = this.parseProperties({1:this._geoNrType, 2:this._geoNrType});
-
-    // TODO
-    // var geoScaleU:Number = props.get(1, 1);
-    // var geoScaleV:Number = props.get(2, 1);
-
-    var geometries = []
 
 
     // Loop through sub meshes
-    subs_parsed = 0;
-
     while (subs_parsed < num_subs) {
 
-      var sm_len, sm_end;
+      var sm_len, sm_end, attrib;
 
       geom = new THREE.BufferGeometry();
-      geom.name = name
+      geom.name = name;
       geometries.push( geom );
 
 
@@ -662,39 +653,41 @@
       while ( this._ptr < sm_end ) {
 
 
-        var idx = 0;
+        var idx = 0,
+            str_type  = this.readU8(),
+            str_ftype = this.readU8(),
+            str_len   = this.readU32(),
+            str_end   = str_len + this._ptr;
 
-        var str_type, str_ftype, str_len, str_end;
 
-        str_type = this.readU8();
-        str_ftype = this.readU8();
-        str_len = this.readU32();
-        str_end = str_len + this._ptr;
 
-        // TODO ! native typedarray copy (endianness????)
-        // debug( "geom stream type : "+ str_type);
+
 
         // VERTICES
         // ------------------
-        if (str_type == 1) {
+        if ( str_type === 1 ) {
 
-          geom.addAttribute( 'position', Float32Array, str_len/12, 3 );
-          tmparray = geom.attributes.position.array;
-          idx = 0
+          attrib = new THREE.Float32Attribute( str_len/12, 3 );
+          buffer = attrib.array;
+
+          geom.addAttribute( 'position', attrib );
+          idx = 0;
+
           while (this._ptr < str_end) {
-            tmparray[idx]   = -this.readF32();
-            tmparray[idx+1] = this.readF32();
-            tmparray[idx+2] = this.readF32();
+            buffer[idx]   = -this.readF32();
+            buffer[idx+1] = this.readF32();
+            buffer[idx+2] = this.readF32();
             idx+=3;
           }
         }
 
 
-        // INDICES / FACES
+        // INDICES
         // -----------------
-        else if (str_type == 2) {
-          // todo ??? item size 1 ?
-          geom.addAttribute( 'index', Uint16Array, str_len/2, 1 );
+        else if (str_type === 2) {
+
+          attrib = new THREE.Uint16Attribute( str_len/2, 1 );
+          geom.addAttribute( 'index', attrib );
 
           geom.offsets.push({
             start: 0,
@@ -702,72 +695,70 @@
             count: str_len/2
           });
 
-          tmparray = geom.attributes.index.array
-          idx = 0
+          buffer = attrib.array;
+          idx = 0;
 
           while (this._ptr < str_end) {
-            tmparray[idx+1]   = this.readU16();
-            tmparray[idx]     = this.readU16();
-            tmparray[idx+2]   = this.readU16();
+            buffer[idx+1]   = this.readU16();
+            buffer[idx]     = this.readU16();
+            buffer[idx+2]   = this.readU16();
             idx+=3;
           }
         }
-        // UVS / TEX COORDS
-        else if (str_type == 3) {
-          geom.addAttribute( 'uv', Float32Array, str_len/8, 2 );
-          tmparray = geom.attributes.uv.array
-          idx = 0
+
+        // UVS
+        // -------------------
+        else if (str_type === 3) {
+
+          attrib = new THREE.Float32Attribute( str_len/8, 2 );
+          buffer = attrib.array;
+
+          geom.addAttribute( 'uv', attrib );
+          idx = 0;
+          
           while (this._ptr < str_end) {
-            tmparray[idx]   = this.readF32();
-            tmparray[idx+1] = 1.0-this.readF32();
+            buffer[idx]   = this.readF32();
+            buffer[idx+1] = 1.0-this.readF32();
             idx+=2;
           }
         }
         
         // NORMALS
-        else if (str_type == 4) {
+        else if (str_type === 4) {
 
-          geom.addAttribute( 'normal', Float32Array, str_len/12, 3 );
-          tmparray = geom.attributes.normal.array
+          attrib = new THREE.Float32Attribute( str_len/12, 3 );
+          geom.addAttribute( 'normal', attrib );
+          buffer = attrib.array
           idx = 0
 
           while (this._ptr < str_end) {
-            tmparray[idx]   = -this.readF32();
-            tmparray[idx+1] = this.readF32();
-            tmparray[idx+2] = this.readF32();
+            buffer[idx]   = -this.readF32();
+            buffer[idx+1] = this.readF32();
+            buffer[idx+2] = this.readF32();
             idx+=3;
           }
 
         }
 
-        else if (str_type == 6) {
-          skinI = new Float32Array( str_len>>1 );
-          log("parse skin indices");
-//          geom.addAttribute( 'skinIndex', Float32Array, str_len/4, 4 );
-//          tmparray = geom.attributes.skinIndex.array
-          idx = 0
+        // else if (str_type == 6) {
+        //   skinI = new Float32Array( str_len>>1 );
+        //   idx = 0
 
-          while (this._ptr < str_end) {
-            skinI[idx]   = this.readU16();
-            idx++;
-          }
+        //   while (this._ptr < str_end) {
+        //     skinI[idx]   = this.readU16();
+        //     idx++;
+        //   }
 
-        }
-        else if (str_type == 7) {
-          skinW = new Float32Array( str_len>>2 );
+        // }
+        // else if (str_type == 7) {
+        //   skinW = new Float32Array( str_len>>2 );
+        //   idx = 0;
 
-//          geom.addAttribute( 'skinWeight', Float32Array, str_len/8, 4 );
-//          tmparray = geom.attributes.skinWeight.array
-          log("parse skin weights");
-//          console.log( tmparray.length );
-          idx = 0;
-
-          while (this._ptr < str_end) {
-            skinW[idx]   = this.readF32();
-            idx++;
-
-          }
-        }
+        //   while (this._ptr < str_end) {
+        //     skinW[idx]   = this.readF32();
+        //     idx++;
+        //   }
+        // }
         else {
           this._ptr = str_end;
         }
@@ -775,48 +766,6 @@
 
 
       }
-
-      if( skinI !== undefined ){
-
-        tmparray = geom.attributes.position.array;
-        var nverts = tmparray.length/3;
-        var jointsPerVertex = skinW.length / nverts;
-        // debug('jointsPerVertex '+jointsPerVertex );
-
-        // if( jointsPerVertex !== 4 )
-        //   console.error( "jointsPerVertex must be 4", jointsPerVertex );
-
-
-        geom.addAttribute( 'skinIndex', Float32Array, nverts, 4 );
-        tmparray = geom.attributes.skinIndex.array
-        tmparray.set( skinI );
-
-        geom.addAttribute( 'skinWeight', Float32Array, nverts, 4 );
-        tmparray = geom.attributes.skinWeight.array
-        tmparray.set( skinW );
-
-//        idx = 0;
-//        while(idx< skinW.length ) {
-//
-//          var ccc = 0;
-//          for( var i = 0; i< jointsPerVertex; i++) {
-//            if( skinW[idx+i]> 0.001 ) ccc++
-//          }
-//
-//          if( ccc > 2 ) {
-//
-//            console.log('more than 2 '+ccc );
-//            for( var i = 0; i< jointsPerVertex; i++) {
-//              console.log( skinW[idx+i] );
-//            }
-//          }
-//          idx += jointsPerVertex;
-//        }
-
-      }
-
-
-
 
       this.parseUserAttributes();
 
@@ -837,39 +786,40 @@
 
   AWDLoader.prototype.parseMeshPoseAnimation = function(len, poseOnly)
   {
-    var num_frames = 1;
-    var num_submeshes;
-    var frames_parsed;
-    var subMeshParsed;
-    var frame_dur;
-    var x;
-    var y;
-    var z;
-    var str_len;
-    var str_end;
-    var geometry; //:Geometry
-    var subGeom; //:CompactSubGeometry
-    var idx = 0;
-    var clip = {};//:VertexClipNode = new VertexClipNode();
+    var num_frames = 1,
+        num_submeshes,
+        frames_parsed,
+        subMeshParsed,
+        frame_dur,
+        x, y, z,
 
-    var indices; //:Vector.<uint>;
-    var verts; //:Vector.<Number>;
-    var num_Streams; //:int = 0;
-    var streamsParsed; //:int = 0;
-    var streamtypes = []; //:Vector.<int> = new Vector.<int>;
+        str_len,
+        str_end,
+        geom,
+        subGeom,
+        idx = 0,
+        clip = {},
+        indices,
+        verts,
+        num_Streams,
+        streamsParsed,
+        streamtypes = [],
 
-    var props;//:AWDProperties;
-    var thisGeo; //:Geometry;
-    var name = this.readUTF();
-    var geoAdress = this.readU32();
+        props,
+        thisGeo,
+        name = this.readUTF(),
+        geoAdress = this.readU32();
 
-    var mesh = this._blocks[geoAdress].data;
+
+    var mesh = this.getBlock( geoAdress );
+
     if (mesh == null) {
       console.log( "parseMeshPoseAnimation target mesh not found at:", geoAdress );
       return;
     }
-    var geom = mesh.geometry
-    geom.morphTargets = []
+
+    geom = mesh.geometry;
+    geom.morphTargets = [];
 
     if (!poseOnly)
       num_frames = this.readU16();
@@ -909,21 +859,20 @@
           if (streamtypes[streamsParsed] == 1) {
 
             //geom.addAttribute( 'morphTarget'+frames_parsed, Float32Array, str_len/12, 3 );
-            tmparray = new Float32Array(str_len/4);
+            var buffer = new Float32Array(str_len/4);
             geom.morphTargets.push( {
-              array : tmparray
+              array : buffer
             });
 
-            //tmparray = geom.attributes['morphTarget'+frames_parsed].array
+            //buffer = geom.attributes['morphTarget'+frames_parsed].array
             idx = 0;
 
-            while ( this._ptr < str_end) {
-              tmparray[idx]     = this.readF32();
-              tmparray[idx+1]   = this.readF32();
-              tmparray[idx+2]   = this.readF32();
-              idx+=3;
+            while ( this._ptr < str_end ) {
+              buffer[idx]     = this.readF32();
+              buffer[idx+1]   = this.readF32();
+              buffer[idx+2]   = this.readF32();
+              idx += 3;
             }
-
 
 
             subMeshParsed++;
@@ -947,6 +896,11 @@
 
 
 
+
+
+  AWDLoader.prototype.getBlock = function ( id ) {
+    return this._blocks[id].data;
+  },
 
 
   AWDLoader.prototype.parseMatrix4 = function ( ) {
@@ -1092,10 +1046,10 @@
 
 
   AWDLoader.prototype.readU8 = function () {
-    return this._data.getUint8( this._ptr++, littleEndian );
+    return this._data.getUint8( this._ptr++ );
   }
   AWDLoader.prototype.readI8 = function () {
-    return this._data.getInt8( this._ptr++, littleEndian );
+    return this._data.getInt8( this._ptr++ );
   }
 
   AWDLoader.prototype.readU16 = function () {
@@ -1162,61 +1116,9 @@
   };
 
 
-  UNCOMPRESSED = 0;
-  DEFLATE = 1;
-  LZMA = 2;
 
 
 
-  AWD_FIELD_INT8 = 1;
-  AWD_FIELD_INT16 = 2;
-  AWD_FIELD_INT32 = 3;
-  AWD_FIELD_UINT8 = 4;
-  AWD_FIELD_UINT16 = 5;
-  AWD_FIELD_UINT32 = 6;
-  AWD_FIELD_FLOAT32 = 7;
-  AWD_FIELD_FLOAT64 = 8;
-
-  AWD_FIELD_BOOL = 21;
-  AWD_FIELD_COLOR = 22;
-  AWD_FIELD_BADDR = 23;
-
-  AWD_FIELD_STRING = 31;
-  AWD_FIELD_BYTEARRAY = 32;
-
-  AWD_FIELD_VECTOR2x1 = 41;
-  AWD_FIELD_VECTOR3x1 = 42;
-  AWD_FIELD_VECTOR4x1 = 43;
-  AWD_FIELD_MTX3x2 = 44;
-  AWD_FIELD_MTX3x3 = 45;
-  AWD_FIELD_MTX4x3 = 46;
-  AWD_FIELD_MTX4x4 = 47;
-
-
-
-
-  BOOL       = 21;
-  COLOR      = 22;
-  BADDR      = 23;
-
-
-  INT8    = 1;
-  INT16   = 2;
-  INT32   = 3;
-  UINT8   = 4;
-  UINT16  = 5;
-  UINT32  = 6;
-  FLOAT32 = 7;
-  FLOAT64 = 8;
-
-
-  AWDBlock = function()
-  {
-    var id;
-    var data;
-  }
-
-  AWDBlock.prototype.constructor = AWDBlock;
 
 
   AWDProperties = function(){}
