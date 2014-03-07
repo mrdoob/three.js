@@ -7,30 +7,30 @@ THREE.AWDLoader = (function (){
 
 
 
-  var UNCOMPRESSED = 0,
-      DEFLATE = 1,
-      LZMA = 2,
+  var UNCOMPRESSED  = 0,
+      DEFLATE       = 1,
+      LZMA          = 2,
 
-      AWD_FIELD_INT8 = 1,
-      AWD_FIELD_INT16 = 2,
-      AWD_FIELD_INT32 = 3,
-      AWD_FIELD_UINT8 = 4,
-      AWD_FIELD_UINT16 = 5,
-      AWD_FIELD_UINT32 = 6,
-      AWD_FIELD_FLOAT32 = 7,
-      AWD_FIELD_FLOAT64 = 8,
-      AWD_FIELD_BOOL = 21,
-      AWD_FIELD_COLOR = 22,
-      AWD_FIELD_BADDR = 23,
-      AWD_FIELD_STRING = 31,
+      AWD_FIELD_INT8      = 1,
+      AWD_FIELD_INT16     = 2,
+      AWD_FIELD_INT32     = 3,
+      AWD_FIELD_UINT8     = 4,
+      AWD_FIELD_UINT16    = 5,
+      AWD_FIELD_UINT32    = 6,
+      AWD_FIELD_FLOAT32   = 7,
+      AWD_FIELD_FLOAT64   = 8,
+      AWD_FIELD_BOOL      = 21,
+      AWD_FIELD_COLOR     = 22,
+      AWD_FIELD_BADDR     = 23,
+      AWD_FIELD_STRING    = 31,
       AWD_FIELD_BYTEARRAY = 32,
       AWD_FIELD_VECTOR2x1 = 41,
       AWD_FIELD_VECTOR3x1 = 42,
       AWD_FIELD_VECTOR4x1 = 43,
-      AWD_FIELD_MTX3x2 = 44,
-      AWD_FIELD_MTX3x3 = 45,
-      AWD_FIELD_MTX4x3 = 46,
-      AWD_FIELD_MTX4x4 = 47,
+      AWD_FIELD_MTX3x2    = 44,
+      AWD_FIELD_MTX3x3    = 45,
+      AWD_FIELD_MTX4x3    = 46,
+      AWD_FIELD_MTX4x4    = 47,
 
       BOOL       = 21,
       COLOR      = 22,
@@ -167,12 +167,12 @@ THREE.AWDLoader = (function (){
       case 81:
         assetData = this.parseMaterial(len);
         break;
-      // case 82:
-      // 	assetData = parseTexture(len);
-      // 	break;
+      case 82:
+        assetData = this.parseTexture(len);
+        break;
       case 101:
-      	assetData = this.parseSkeleton(len);
-      	break;
+        assetData = this.parseSkeleton(len);
+        break;
 
 //      case 111:
 //        assetData = this.parseMeshPoseAnimation(len, true);
@@ -213,10 +213,10 @@ THREE.AWDLoader = (function (){
   AWDLoader.prototype._parseHeader = function () {
 
     var version = this._version,
-        awdmagic = 		
+        awdmagic =
             ( this.readU8()<<16)
-        | 	( this.readU8()<<8 )
-        | 	  this.readU8();
+        |   ( this.readU8()<<8 )
+        |     this.readU8();
 
     if( awdmagic != 4282180 )
       throw new Error( "AWDLoader - bad magic" );
@@ -226,7 +226,7 @@ THREE.AWDLoader = (function (){
 
     var flags = this.readU16();
 
-    this._streaming 				= (flags & 0x1) == 0x1;
+    this._streaming = (flags & 0x1) == 0x1;
 
     if ((version[0] == 2) && (version[1] == 1)) {
       this._accuracyMatrix =  (flags & 0x2) == 0x2;
@@ -402,6 +402,35 @@ THREE.AWDLoader = (function (){
 
     return mat;
   }
+
+
+
+
+    //Block ID = 82
+  AWDLoader.prototype.parseTexture = function( len ) {
+
+
+    var name = this.readUTF(),
+        type = this.readU8(),
+        asset,
+        data_len;
+    
+    // External
+    if (type == 0) {
+      data_len = this.readU32();
+      var url = this.readUTFBytes(data_len);
+      console.log( url );
+    } else {
+      // embed texture not supported
+    }
+    // Ignore for now
+    this.parseProperties( null );
+
+    this.parseUserAttributes();
+    return asset;
+  }
+
+
 
   // broken : skeleton pose format is different than threejs one
   AWDLoader.prototype.parseSkeleton = function(len) // Array<Bone>
@@ -1091,13 +1120,24 @@ THREE.AWDLoader = (function (){
    * @return {string} 16-bit Unicode string.
    */
   AWDLoader.prototype.readUTF = function () {
-    var end = this.readU16();
+    var len = this.readU16();
+
+    return this.readUTFBytes( len );
+  };
+
+  /**
+   * Converts a UTF-8 byte array to JavaScript's 16-bit Unicode.
+   * @param {Array.<number>} bytes UTF-8 byte array.
+   * @return {string} 16-bit Unicode string.
+   */
+  AWDLoader.prototype.readUTFBytes = function ( len ) {
+
 
     // TODO(user): Use native implementations if/when available
 
     var out = [], c = 0;
 
-    while ( out.length < end ) {
+    while ( out.length < len ) {
       var c1 = this._data.getUint8( this._ptr++, littleEndian );
       if (c1 < 128) {
         out[c++] = String.fromCharCode(c1);
@@ -1114,6 +1154,8 @@ THREE.AWDLoader = (function (){
     }
     return out.join('');
   };
+
+
 
 
 
