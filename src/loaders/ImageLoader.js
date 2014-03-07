@@ -14,6 +14,15 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var cached = THREE.Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			onLoad( cached );
+			return;
+
+		}
+
 		var scope = this;
 		var image = document.createElement( 'img' );
 
@@ -21,8 +30,10 @@ THREE.ImageLoader.prototype = {
 
 			image.addEventListener( 'load', function ( event ) {
 
-				scope.manager.itemEnd( url );
+				THREE.Cache.add( url, this );
+
 				onLoad( this );
+				scope.manager.itemEnd( url );
 
 			}, false );
 

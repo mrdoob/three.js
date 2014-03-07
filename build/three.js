@@ -1224,11 +1224,29 @@ THREE.Vector2.prototype = {
 		return this;
 
 	},
+	
+	multiply: function ( v ) {
+
+		this.x *= v.x;
+		this.y *= v.y;
+
+		return this;
+
+	},
 
 	multiplyScalar: function ( s ) {
 
 		this.x *= s;
 		this.y *= s;
+
+		return this;
+
+	},
+
+	divide: function ( v ) {
+
+		this.x /= v.x;
+		this.y /= v.y;
 
 		return this;
 
@@ -11115,6 +11133,43 @@ THREE.SpotLight.prototype.clone = function () {
 };
 
 /**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Cache = {
+
+	files: {},
+
+	add: function ( key, file ) {
+
+		// console.log( 'THREE.Cache', 'Adding key:', key );
+
+		this.files[ key ] = file;
+
+	},
+
+	get: function ( key ) {
+
+		// console.log( 'THREE.Cache', 'Checking key:', key );
+
+		return this.files[ key ];
+
+	},
+
+	remove: function ( key ) {
+
+		delete this.files[ key ];
+
+	},
+
+	clear: function () {
+
+		this.files = {}
+
+	}
+
+};
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -11193,7 +11248,7 @@ THREE.Loader.prototype = {
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
+			array[ i ] = this.createMaterial( materials[ i ], texturePath );
 
 		}
 
@@ -11219,47 +11274,10 @@ THREE.Loader.prototype = {
 
 		var _this = this;
 
-		function is_pow2( n ) {
-
-			var l = Math.log( n ) / Math.LN2;
-			return Math.floor( l ) == l;
-
-		}
-
 		function nearest_pow2( n ) {
 
 			var l = Math.log( n ) / Math.LN2;
 			return Math.pow( 2, Math.round(  l ) );
-
-		}
-
-		function load_image( where, url ) {
-
-			var image = new Image();
-
-			image.onload = function () {
-
-				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
-
-					var width = nearest_pow2( this.width );
-					var height = nearest_pow2( this.height );
-
-					where.image.width = width;
-					where.image.height = height;
-					where.image.getContext( '2d' ).drawImage( this, 0, 0, width, height );
-
-				} else {
-
-					where.image = this;
-
-				}
-
-				where.needsUpdate = true;
-
-			};
-
-			if ( _this.crossOrigin !== undefined ) image.crossOrigin = _this.crossOrigin;
-			image.src = url;
 
 		}
 
@@ -11320,7 +11338,31 @@ THREE.Loader.prototype = {
 
 			if ( ! isCompressed ) {
 
-				load_image( where[ name ], fullPath );
+				var texture = where[ name ];
+
+				var loader = new THREE.ImageLoader();
+				loader.crossOrigin = _this.crossOrigin;
+				loader.load( fullPath, function ( image ) {
+
+					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
+						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
+
+						var width = nearest_pow2( image.width );
+						var height = nearest_pow2( image.height );
+
+						texture.image.width = width;
+						texture.image.height = height;
+						texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
+
+					} else {
+
+						texture.image = image;
+
+					}
+
+					texture.needsUpdate = true;
+
+				} );
 
 			}
 
@@ -11577,12 +11619,23 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var cached = THREE.Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			onLoad( cached );
+			return;
+
+		}
+
 		var scope = this;
 		var request = new XMLHttpRequest();
 
 		if ( onLoad !== undefined ) {
 
 			request.addEventListener( 'load', function ( event ) {
+
+				THREE.Cache.add( url, event.target.responseText );
 
 				onLoad( event.target.responseText );
 				scope.manager.itemEnd( url );
@@ -11644,6 +11697,15 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var cached = THREE.Cache.get( url );
+
+		if ( cached !== undefined ) {
+
+			onLoad( cached );
+			return;
+
+		}
+
 		var scope = this;
 		var image = document.createElement( 'img' );
 
@@ -11651,8 +11713,10 @@ THREE.ImageLoader.prototype = {
 
 			image.addEventListener( 'load', function ( event ) {
 
-				scope.manager.itemEnd( url );
+				THREE.Cache.add( url, this );
+
 				onLoad( this );
+				scope.manager.itemEnd( url );
 
 			}, false );
 
@@ -31033,61 +31097,70 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.AnimationHandler = (function() {
+THREE.AnimationHandler = ( function () {
 
 	var playing = [];
 	var library = {};
 	var that    = {};
 
+	that.update = function ( deltaTimeMS ) {
 
-	//--- update ---
+		for ( var i = 0; i < playing.length; i ++ ) {
 
-	that.update = function( deltaTimeMS ) {
-
-		for( var i = 0; i < playing.length; i ++ )
 			playing[ i ].update( deltaTimeMS );
 
+		}
+
 	};
 
+	that.addToUpdate = function ( animation ) {
 
-	//--- add ---
+		if ( playing.indexOf( animation ) === -1 ) {
 
-	that.addToUpdate = function( animation ) {
-
-		if ( playing.indexOf( animation ) === -1 )
 			playing.push( animation );
 
+		}
+
 	};
 
-
-	//--- remove ---
-
-	that.removeFromUpdate = function( animation ) {
+	that.removeFromUpdate = function ( animation ) {
 
 		var index = playing.indexOf( animation );
 
-		if( index !== -1 )
+		if ( index !== -1 ) {
+
 			playing.splice( index, 1 );
+
+		}
 
 	};
 
+	that.add = function ( data ) {
 
-	//--- add ---
+		if ( library[ data.name ] !== undefined ) {
 
-	that.add = function( data ) {
-
-		if ( library[ data.name ] !== undefined )
 			console.log( "THREE.AnimationHandler.add: Warning! " + data.name + " already exists in library. Overwriting." );
+
+		}
 
 		library[ data.name ] = data;
 		initData( data );
 
 	};
 
+	that.remove = function ( name ) {
 
-	//--- get ---
+		if ( library[ name ] === undefined ) {
 
-	that.get = function( name ) {
+			console.log( "THREE.AnimationHandler.add: Warning! " + name + " doesn't exists in library. Doing nothing." );
+
+		}
+			
+		library[ name ] = undefined;
+
+	};
+
+	that.get = function ( name ) {
 
 		if ( typeof name === "string" ) {
 
@@ -31097,7 +31170,6 @@ THREE.AnimationHandler = (function() {
 
 			} else {
 
-				console.log( "THREE.AnimationHandler.get: Couldn't find animation " + name );
 				return null;
 
 			}
@@ -31110,9 +31182,7 @@ THREE.AnimationHandler = (function() {
 
 	};
 
-	//--- parse ---
-
-	that.parse = function( root ) {
+	that.parse = function ( root ) {
 
 		// setup hierarchy
 
@@ -31120,7 +31190,7 @@ THREE.AnimationHandler = (function() {
 
 		if ( root instanceof THREE.SkinnedMesh ) {
 
-			for( var b = 0; b < root.bones.length; b++ ) {
+			for ( var b = 0; b < root.bones.length; b++ ) {
 
 				hierarchy.push( root.bones[ b ] );
 
@@ -31136,52 +31206,50 @@ THREE.AnimationHandler = (function() {
 
 	};
 
-	var parseRecurseHierarchy = function( root, hierarchy ) {
+	var parseRecurseHierarchy = function ( root, hierarchy ) {
 
 		hierarchy.push( root );
 
-		for( var c = 0; c < root.children.length; c++ )
+		for ( var c = 0; c < root.children.length; c++ )
 			parseRecurseHierarchy( root.children[ c ], hierarchy );
 
 	}
 
+	var initData = function ( data ) {
 
-	//--- init data ---
-
-	var initData = function( data ) {
-
-		if( data.initialized === true )
+		if ( data.initialized === true )
 			return;
 
 
 		// loop through all keys
 
-		for( var h = 0; h < data.hierarchy.length; h ++ ) {
+		for ( var h = 0; h < data.hierarchy.length; h ++ ) {
 
-			for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+			for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 				// remove minus times
 
-				if( data.hierarchy[ h ].keys[ k ].time < 0 )
-					data.hierarchy[ h ].keys[ k ].time = 0;
+				if ( data.hierarchy[ h ].keys[ k ].time < 0 ) {
 
+					 data.hierarchy[ h ].keys[ k ].time = 0;
+
+				}
 
 				// create quaternions
 
-				if( data.hierarchy[ h ].keys[ k ].rot !== undefined &&
-				 !( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
+				if ( data.hierarchy[ h ].keys[ k ].rot !== undefined &&
+				  !( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
 
 					var quat = data.hierarchy[ h ].keys[ k ].rot;
-					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion( quat[0], quat[1], quat[2], quat[3] );
+					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion().fromArray( quat );
 
 				}
 
 			}
 
-
 			// prepare morph target keys
 
-			if( data.hierarchy[ h ].keys.length && data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
+			if ( data.hierarchy[ h ].keys.length && data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
 
 				// get all used
 
@@ -31259,8 +31327,6 @@ THREE.AnimationHandler = (function() {
 
 		}
 
-		// done
-
 		data.initialized = true;
 
 	};
@@ -31274,7 +31340,7 @@ THREE.AnimationHandler = (function() {
 
 	return that;
 
-}());
+}() );
 
 /**
  * @author mikael emtinger / http://gomo.se/
