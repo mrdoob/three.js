@@ -11131,9 +11131,15 @@ THREE.SpotLight.prototype.clone = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Cache = {
+THREE.Cache = function () {
 
-	files: {},
+	this.files = {};
+
+};
+
+THREE.Cache.prototype = {
+
+	constructor: THREE.Cache,
 
 	add: function ( key, file ) {
 
@@ -11172,6 +11178,8 @@ THREE.Loader = function ( showStatus ) {
 
 	this.showStatus = showStatus;
 	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
+
+	this.imageLoader = new THREE.ImageLoader();
 
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function () {};
@@ -11267,7 +11275,7 @@ THREE.Loader.prototype = {
 
 	createMaterial: function ( m, texturePath ) {
 
-		var _this = this;
+		var scope = this;
 
 		function nearest_pow2( n ) {
 
@@ -11335,9 +11343,8 @@ THREE.Loader.prototype = {
 
 				var texture = where[ name ];
 
-				var loader = new THREE.ImageLoader();
-				loader.crossOrigin = _this.crossOrigin;
-				loader.load( fullPath, function ( image ) {
+				scope.imageLoader.crossOrigin = scope.crossOrigin;
+				scope.imageLoader.load( fullPath, function ( image ) {
 
 					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
 						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
@@ -11604,6 +11611,7 @@ THREE.Loader.prototype = {
 
 THREE.XHRLoader = function ( manager ) {
 
+	this.cache = new THREE.Cache();
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -11614,7 +11622,9 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var cached = THREE.Cache.get( url );
+		var scope = this;
+
+		var cached = scope.cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -11623,14 +11633,13 @@ THREE.XHRLoader.prototype = {
 
 		}
 
-		var scope = this;
 		var request = new XMLHttpRequest();
 
 		if ( onLoad !== undefined ) {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				THREE.Cache.add( url, event.target.responseText );
+				scope.cache.add( url, event.target.responseText );
 
 				onLoad( event.target.responseText );
 				scope.manager.itemEnd( url );
@@ -11682,6 +11691,7 @@ THREE.XHRLoader.prototype = {
 
 THREE.ImageLoader = function ( manager ) {
 
+	this.cache = new THREE.Cache();
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -11692,7 +11702,9 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var cached = THREE.Cache.get( url );
+		var scope = this;
+
+		var cached = scope.cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -11701,14 +11713,13 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		var scope = this;
 		var image = document.createElement( 'img' );
 
 		if ( onLoad !== undefined ) {
 
 			image.addEventListener( 'load', function ( event ) {
 
-				THREE.Cache.add( url, this );
+				scope.cache.add( url, this );
 
 				onLoad( this );
 				scope.manager.itemEnd( url );
