@@ -4,6 +4,7 @@
 
 THREE.ImageLoader = function ( manager ) {
 
+	this.cache = new THREE.Cache();
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -14,7 +15,9 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var cached = THREE.Cache.get( url );
+		var scope = this;
+
+		var cached = scope.cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -23,14 +26,13 @@ THREE.ImageLoader.prototype = {
 
 		}
 
-		var scope = this;
 		var image = document.createElement( 'img' );
 
 		if ( onLoad !== undefined ) {
 
 			image.addEventListener( 'load', function ( event ) {
 
-				THREE.Cache.add( url, this );
+				scope.cache.add( url, this );
 
 				onLoad( this );
 				scope.manager.itemEnd( url );

@@ -7,6 +7,8 @@ THREE.Loader = function ( showStatus ) {
 	this.showStatus = showStatus;
 	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
+	this.imageLoader = new THREE.ImageLoader();
+
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
@@ -101,7 +103,7 @@ THREE.Loader.prototype = {
 
 	createMaterial: function ( m, texturePath ) {
 
-		var _this = this;
+		var scope = this;
 
 		function nearest_pow2( n ) {
 
@@ -169,9 +171,8 @@ THREE.Loader.prototype = {
 
 				var texture = where[ name ];
 
-				var loader = new THREE.ImageLoader();
-				loader.crossOrigin = _this.crossOrigin;
-				loader.load( fullPath, function ( image ) {
+				scope.imageLoader.crossOrigin = scope.crossOrigin;
+				scope.imageLoader.load( fullPath, function ( image ) {
 
 					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
 						 THREE.Math.isPowerOfTwo( image.height ) === false ) {

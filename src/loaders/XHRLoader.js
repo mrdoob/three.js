@@ -4,6 +4,7 @@
 
 THREE.XHRLoader = function ( manager ) {
 
+	this.cache = new THREE.Cache();
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -14,7 +15,9 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var cached = THREE.Cache.get( url );
+		var scope = this;
+
+		var cached = scope.cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -23,14 +26,13 @@ THREE.XHRLoader.prototype = {
 
 		}
 
-		var scope = this;
 		var request = new XMLHttpRequest();
 
 		if ( onLoad !== undefined ) {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				THREE.Cache.add( url, event.target.responseText );
+				scope.cache.add( url, event.target.responseText );
 
 				onLoad( event.target.responseText );
 				scope.manager.itemEnd( url );

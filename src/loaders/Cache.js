@@ -2,9 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Cache = {
+THREE.Cache = function () {
 
-	files: {},
+	this.files = {};
+
+};
+
+THREE.Cache.prototype = {
+
+	constructor: THREE.Cache,
 
 	add: function ( key, file ) {
 
