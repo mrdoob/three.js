@@ -28,8 +28,6 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 
 	var offset = 0;
 
-	var normal = new THREE.Vector3( 0, 0, 1 );
-
 	for ( var iy = 0; iy < gridY; iy ++ ) {
 
 		var y1 = iy * segmentHeight - heightHalf;
