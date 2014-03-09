@@ -27,7 +27,6 @@ var list = {
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
-			[ "Geometry2", "api/core/Geometry2" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Projector", "api/core/Projector" ],
 			[ "Raycaster", "api/core/Raycaster" ],
@@ -46,7 +45,6 @@ var list = {
 
 		"Loaders": [
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
-			[ "Geometry2Loader", "api/loaders/Geometry2Loader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
@@ -184,7 +182,6 @@ var list = {
 
 		"Extras / Geometries": [
 			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
-			[ "BoxGeometry2", "api/extras/geometries/BoxGeometry2" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
@@ -194,7 +191,6 @@ var list = {
 			[ "OctahedronGeometry", "api/extras/geometries/OctahedronGeometry" ],
 			[ "ParametricGeometry", "api/extras/geometries/ParametricGeometry" ],
 			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
-			[ "PlaneGeometry2", "api/extras/geometries/PlaneGeometry2" ],
 			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
 			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
 			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],

@@ -21,6 +21,11 @@
 		<script src="../src/extras/geometries/PlaneGeometry2.js"></script>
 		<script src="../src/extras/geometries/PlaneGeometry2b.js"></script>
 
+		<script src="../src/core/Geometry3.js"></script>
+		<script src="../src/extras/geometries/PlaneGeometry3.js"></script>
+
+		<script src="../src/extras/geometries/PlaneGeometryB.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -45,15 +50,20 @@
 
 				scene = new THREE.Scene();
 
-				//
-
-				addGeometries( 'PlaneGeometry', 'BoxGeometry', - 300 );
-				addGeometries( 'PlaneGeometry2', 'BoxGeometry2', 0 );
-				addGeometries( 'PlaneGeometry2b', 'BoxGeometry2', 300 );
+				var light = new THREE.PointLight( 0xffffff );
+				light.position.set( 0, 200, - 50 );
+				scene.add( light );
 
 				//
 
-				renderer = new THREE.CanvasRenderer();
+				addGeometries( 'PlaneGeometry', 'BoxGeometry', 0 );
+				// addGeometries( 'PlaneGeometry2', 'BoxGeometry2', 0 );
+				// addGeometries( 'PlaneGeometry3', 'BoxGeometry2', 0 );
+				// addGeometries( 'PlaneGeometryB', 'BoxGeometry2', 0 );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -75,8 +85,9 @@
 					createGeometry( 'PlaneGeometry' );
 					createGeometry( 'PlaneGeometry2' );
 					createGeometry( 'PlaneGeometry2b' );
+					createGeometry( 'PlaneGeometryB' );
 
-				}, 1000 );
+				}, 2000 );
 
 			}
 
@@ -94,15 +105,19 @@
 
 				// Plane
 
-				var geometry = new THREE[ PlaneGeometry ]( 200, 200, 10, 10 );
+				console.time( PlaneGeometry );
+				var geometry = new THREE[ PlaneGeometry ]( 200, 200, 100, 100 );
+				console.timeEnd( PlaneGeometry );
+
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff /*, wireframe: true*/ } );
 
 				plane = new THREE.Mesh( geometry, material );
 				plane.position.x = x;
 				scene.add( plane );
 
+				/*
 				// Cube
 
 				var geometry = new THREE[ BoxGeometry ]( 200, 200, 200, 10, 10, 10 );
@@ -112,6 +127,7 @@
 				cube = new THREE.Mesh( geometry, material );
 				cube.position.y = 150;
 				plane.add( cube );
+				*/
 
 			}
 
