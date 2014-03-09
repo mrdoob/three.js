@@ -68,6 +68,8 @@ THREE.BinaryLoader.prototype.loadAjaxJSON = function ( context, url, callback, t
 
 THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binaryPath, texturePath, callbackProgress ) {
 
+	var scope = this;
+
 	var xhr = new XMLHttpRequest(),
 		url = binaryPath + json.buffers;
 
@@ -96,7 +98,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 		}
 
-		THREE.BinaryLoader.prototype.createBinModel( buffer, callback, texturePath, json.materials );
+		scope.createBinModel( buffer, callback, texturePath, json.materials );
 
 	}, false );
 
