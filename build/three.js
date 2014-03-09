@@ -17545,13 +17545,18 @@ THREE.ShaderChunk = {
 
 		"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
+				// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
+				// "Transforming Normal Vectors with the Inverse Transformation"
+
+		"		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );",
+
 		"		if ( useRefract ) {",
 
-		"			reflectVec = refract( cameraToVertex, normal, refractionRatio );",
+		"			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );",
 
 		"		} else { ",
 
-		"			reflectVec = reflect( cameraToVertex, normal );",
+		"			reflectVec = reflect( cameraToVertex, worldNormal );",
 
 		"		}",
 
@@ -32372,26 +32377,31 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 	THREE.Geometry.call( this );
 
-	var scope = this;
-
-	this.width = width;
-	this.height = height;
-	this.depth = depth;
+	this.parameters = {
+		width: width,
+		height: height,
+		depth: depth,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments,
+		depthSegments: depthSegments
+	};
 
 	this.widthSegments = widthSegments || 1;
 	this.heightSegments = heightSegments || 1;
 	this.depthSegments = depthSegments || 1;
 
-	var width_half = this.width / 2;
-	var height_half = this.height / 2;
-	var depth_half = this.depth / 2;
+	var scope = this;
 
-	buildPlane( 'z', 'y', - 1, - 1, this.depth, this.height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, this.depth, this.height, - width_half, 1 ); // nx
-	buildPlane( 'x', 'z',   1,   1, this.width, this.depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, this.width, this.depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, this.width, this.height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, this.width, this.height, - depth_half, 5 ); // nz
+	var width_half = width / 2;
+	var height_half = height / 2;
+	var depth_half = depth / 2;
+
+	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
+	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
+	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
+	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
+	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
+	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
 
@@ -32491,11 +32501,18 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	THREE.Geometry.call( this );
 
-	this.radius = radius = radius || 50;
-	this.segments = segments = segments !== undefined ? Math.max( 3, segments ) : 8;
+	this.parameters = {
+		radius: radius,
+		segments: segments,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
 
-	this.thetaStart = thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	this.thetaLength = thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+	radius = radius || 50;
+	segments = segments !== undefined ? Math.max( 3, segments ) : 8;
+
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
 	var i, uvs = [],
 	center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
@@ -32520,11 +32537,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	for ( i = 1; i <= segments; i ++ ) {
 
-		var v1 = i;
-		var v2 = i + 1 ;
-		var v3 = 0;
-
-		this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
+		this.faces.push( new THREE.Face3( i, i + 1, 0, [ n.clone(), n.clone(), n.clone() ] ) );
 		this.faceVertexUvs[ 0 ].push( [ uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ] );
 
 	}
@@ -32551,14 +32564,23 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	THREE.Geometry.call( this );
 
-	this.radiusTop = radiusTop = radiusTop !== undefined ? radiusTop : 20;
-	this.radiusBottom = radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-	this.height = height = height !== undefined ? height : 100;
+	this.parameters = {
+		radiusTop: radiusTop,
+		radiusBottom: radiusBottom,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		openEnded: openEnded
+	};
 
-	this.radialSegments = radialSegments = radialSegments || 8;
-	this.heightSegments = heightSegments = heightSegments || 1;
+	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	height = height !== undefined ? height : 100;
 
-	this.openEnded = openEnded = openEnded !== undefined ? openEnded : false;
+	radialSegments = radialSegments || 8;
+	heightSegments = heightSegments || 1;
+
+	openEnded = openEnded !== undefined ? openEnded : false;
 
 	var heightHalf = height / 2;
 
@@ -33648,33 +33670,35 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	THREE.Geometry.call( this );
 
-	this.width = width;
-	this.height = height;
-
-	this.widthSegments = widthSegments || 1;
-	this.heightSegments = heightSegments || 1;
+	this.parameters = {
+		width: width,
+		height: height,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments
+	};
 
 	var ix, iz;
 	var width_half = width / 2;
 	var height_half = height / 2;
 
-	var gridX = this.widthSegments;
-	var gridZ = this.heightSegments;
+	var gridX = widthSegments || 1;
+	var gridZ = heightSegments || 1;
 
 	var gridX1 = gridX + 1;
 	var gridZ1 = gridZ + 1;
 
-	var segment_width = this.width / gridX;
-	var segment_height = this.height / gridZ;
+	var segment_width = width / gridX;
+	var segment_height = height / gridZ;
 
 	var normal = new THREE.Vector3( 0, 0, 1 );
 
 	for ( iz = 0; iz < gridZ1; iz ++ ) {
 
+		var y = iz * segment_height - height_half;
+
 		for ( ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
-			var y = iz * segment_height - height_half;
 
 			this.vertices.push( new THREE.Vector3( x, - y, 0 ) );
 
@@ -33798,16 +33822,26 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 	THREE.Geometry.call( this );
 
-	this.radius = radius = radius || 50;
+	this.parameters = {
+		radius: radius,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments,
+		phiStart: phiStart,
+		phiLength: phiLength,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength 
+	};
 
-	this.widthSegments = widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-	this.heightSegments = heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
+	radius = radius || 50;
 
-	this.phiStart = phiStart = phiStart !== undefined ? phiStart : 0;
-	this.phiLength = phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
+	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
 
-	this.thetaStart = thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	this.thetaLength = thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+	phiStart = phiStart !== undefined ? phiStart : 0;
+	phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
 	var x, y, vertices = [], uvs = [];
 
@@ -33838,9 +33872,9 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 	}
 
-	for ( y = 0; y < this.heightSegments; y ++ ) {
+	for ( y = 0; y < heightSegments; y ++ ) {
 
-		for ( x = 0; x < this.widthSegments; x ++ ) {
+		for ( x = 0; x < widthSegments; x ++ ) {
 
 			var v1 = vertices[ y ][ x + 1 ];
 			var v2 = vertices[ y ][ x ];
@@ -33857,13 +33891,13 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 			var uv3 = uvs[ y + 1 ][ x ].clone();
 			var uv4 = uvs[ y + 1 ][ x + 1 ].clone();
 
-			if ( Math.abs( this.vertices[ v1 ].y ) === this.radius ) {
+			if ( Math.abs( this.vertices[ v1 ].y ) === radius ) {
 
 				uv1.x = ( uv1.x + uv2.x ) / 2;
 				this.faces.push( new THREE.Face3( v1, v3, v4, [ n1, n3, n4 ] ) );
 				this.faceVertexUvs[ 0 ].push( [ uv1, uv3, uv4 ] );
 
-			} else if ( Math.abs( this.vertices[ v3 ].y ) === this.radius ) {
+			} else if ( Math.abs( this.vertices[ v3 ].y ) === radius ) {
 
 				uv3.x = ( uv3.x + uv4.x ) / 2;
 				this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
@@ -33961,49 +33995,54 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 	THREE.Geometry.call( this );
 
-	var scope = this;
+	this.parameters = {
+		radius: radius,
+		tube: tube,
+		radialSegments: radialSegments,
+		tubularSegments: tubularSegments,
+		arc: arc
+	};
 
-	this.radius = radius || 100;
-	this.tube = tube || 40;
-	this.radialSegments = radialSegments || 8;
-	this.tubularSegments = tubularSegments || 6;
-	this.arc = arc || Math.PI * 2;
+	radius = radius || 100;
+	tube = tube || 40;
+	radialSegments = radialSegments || 8;
+	tubularSegments = tubularSegments || 6;
+	arc = arc || Math.PI * 2;
 
 	var center = new THREE.Vector3(), uvs = [], normals = [];
 
-	for ( var j = 0; j <= this.radialSegments; j ++ ) {
+	for ( var j = 0; j <= radialSegments; j ++ ) {
 
-		for ( var i = 0; i <= this.tubularSegments; i ++ ) {
+		for ( var i = 0; i <= tubularSegments; i ++ ) {
 
-			var u = i / this.tubularSegments * this.arc;
-			var v = j / this.radialSegments * Math.PI * 2;
+			var u = i / tubularSegments * arc;
+			var v = j / radialSegments * Math.PI * 2;
 
-			center.x = this.radius * Math.cos( u );
-			center.y = this.radius * Math.sin( u );
+			center.x = radius * Math.cos( u );
+			center.y = radius * Math.sin( u );
 
 			var vertex = new THREE.Vector3();
-			vertex.x = ( this.radius + this.tube * Math.cos( v ) ) * Math.cos( u );
-			vertex.y = ( this.radius + this.tube * Math.cos( v ) ) * Math.sin( u );
-			vertex.z = this.tube * Math.sin( v );
+			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
+			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
+			vertex.z = tube * Math.sin( v );
 
 			this.vertices.push( vertex );
 
-			uvs.push( new THREE.Vector2( i / this.tubularSegments, j / this.radialSegments ) );
+			uvs.push( new THREE.Vector2( i / tubularSegments, j / radialSegments ) );
 			normals.push( vertex.clone().sub( center ).normalize() );
 
 		}
 
 	}
 
+	for ( var j = 1; j <= radialSegments; j ++ ) {
 
-	for ( var j = 1; j <= this.radialSegments; j ++ ) {
+		for ( var i = 1; i <= tubularSegments; i ++ ) {
 
-		for ( var i = 1; i <= this.tubularSegments; i ++ ) {
-
-			var a = ( this.tubularSegments + 1 ) * j + i - 1;
-			var b = ( this.tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( this.tubularSegments + 1 ) * ( j - 1 ) + i;
-			var d = ( this.tubularSegments + 1 ) * j + i;
+			var a = ( tubularSegments + 1 ) * j + i - 1;
+			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+			var d = ( tubularSegments + 1 ) * j + i;
 
 			var face = new THREE.Face3( a, b, d, [ normals[ a ].clone(), normals[ b ].clone(), normals[ d ].clone() ] );
 			this.faces.push( face );
@@ -34032,27 +34071,35 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 	THREE.Geometry.call( this );
 
-	var scope = this;
+	this.parameters = {
+		radius: radius,
+		tube: tube,
+		radialSegments: radialSegments,
+		tubularSegments: tubularSegments,
+		p: p,
+		q: q,
+		heightScale: heightScale
+	};
 
-	this.radius = radius || 100;
-	this.tube = tube || 40;
-	this.radialSegments = radialSegments || 64;
-	this.tubularSegments = tubularSegments || 8;
-	this.p = p || 2;
-	this.q = q || 3;
-	this.heightScale = heightScale || 1;
-	this.grid = new Array( this.radialSegments );
-
+	radius = radius || 100;
+	tube = tube || 40;
+	radialSegments = radialSegments || 64;
+	tubularSegments = tubularSegments || 8;
+	p = p || 2;
+	q = q || 3;
+	heightScale = heightScale || 1;
+	
+	var grid = new Array( radialSegments );
 	var tang = new THREE.Vector3();
 	var n = new THREE.Vector3();
 	var bitan = new THREE.Vector3();
 
-	for ( var i = 0; i < this.radialSegments; ++ i ) {
+	for ( var i = 0; i < radialSegments; ++ i ) {
 
-		this.grid[ i ] = new Array( this.tubularSegments );
-		var u = i / this.radialSegments * 2 * this.p * Math.PI;
-		var p1 = getPos( u, this.q, this.p, this.radius, this.heightScale );
-		var p2 = getPos( u + 0.01, this.q, this.p, this.radius, this.heightScale );
+		grid[ i ] = new Array( tubularSegments );
+		var u = i / radialSegments * 2 * p * Math.PI;
+		var p1 = getPos( u, q, p, radius, heightScale );
+		var p2 = getPos( u + 0.01, q, p, radius, heightScale );
 		tang.subVectors( p2, p1 );
 		n.addVectors( p2, p1 );
 
@@ -34061,39 +34108,39 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 		bitan.normalize();
 		n.normalize();
 
-		for ( var j = 0; j < this.tubularSegments; ++ j ) {
+		for ( var j = 0; j < tubularSegments; ++ j ) {
 
-			var v = j / this.tubularSegments * 2 * Math.PI;
-			var cx = - this.tube * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-			var cy = this.tube * Math.sin( v );
+			var v = j / tubularSegments * 2 * Math.PI;
+			var cx = - tube * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+			var cy = tube * Math.sin( v );
 
 			var pos = new THREE.Vector3();
 			pos.x = p1.x + cx * n.x + cy * bitan.x;
 			pos.y = p1.y + cx * n.y + cy * bitan.y;
 			pos.z = p1.z + cx * n.z + cy * bitan.z;
 
-			this.grid[ i ][ j ] = scope.vertices.push( pos ) - 1;
+			grid[ i ][ j ] = this.vertices.push( pos ) - 1;
 
 		}
 
 	}
 
-	for ( var i = 0; i < this.radialSegments; ++ i ) {
+	for ( var i = 0; i < radialSegments; ++ i ) {
 
-		for ( var j = 0; j < this.tubularSegments; ++ j ) {
+		for ( var j = 0; j < tubularSegments; ++ j ) {
 
-			var ip = ( i + 1 ) % this.radialSegments;
-			var jp = ( j + 1 ) % this.tubularSegments;
+			var ip = ( i + 1 ) % radialSegments;
+			var jp = ( j + 1 ) % tubularSegments;
 
-			var a = this.grid[ i ][ j ];
-			var b = this.grid[ ip ][ j ];
-			var c = this.grid[ ip ][ jp ];
-			var d = this.grid[ i ][ jp ];
+			var a = grid[ i ][ j ];
+			var b = grid[ ip ][ j ];
+			var c = grid[ ip ][ jp ];
+			var d = grid[ i ][ jp ];
 
-			var uva = new THREE.Vector2( i / this.radialSegments, j / this.tubularSegments );
-			var uvb = new THREE.Vector2( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
-			var uvc = new THREE.Vector2( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
-			var uvd = new THREE.Vector2( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uva = new THREE.Vector2( i / radialSegments, j / tubularSegments );
+			var uvb = new THREE.Vector2( ( i + 1 ) / radialSegments, j / tubularSegments );
+			var uvc = new THREE.Vector2( ( i + 1 ) / radialSegments, ( j + 1 ) / tubularSegments );
+			var uvd = new THREE.Vector2( i / radialSegments, ( j + 1 ) / tubularSegments );
 
 			this.faces.push( new THREE.Face3( a, b, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
@@ -34139,17 +34186,24 @@ THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) {
+THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed ) {
 
 	THREE.Geometry.call( this );
 
-	this.path = path;
-	this.segments = segments || 64;
-	this.radius = radius || 1;
-	this.radialSegments = radialSegments || 8;
-	this.closed = closed || false;
+	this.parameters = {
+		path: path,
+		segments: segments,
+		radius: radius,
+		radialSegments: radialSegments,
+		closed: closed
+	};
 
-	this.grid = [];
+	segments = segments || 64;
+	radius = radius || 1;
+	radialSegments = radialSegments || 8;
+	closed = closed || false;
+
+	var grid = [];
 
 	var scope = this,
 
@@ -34157,7 +34211,7 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 		normal,
 		binormal,
 
-		numpoints = this.segments + 1,
+		numpoints = segments + 1,
 
 		x, y, z,
 		tx, ty, tz,
@@ -34170,7 +34224,7 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 		a, b, c, d,
 		uva, uvb, uvc, uvd;
 
-	var frames = new THREE.TubeGeometry.FrenetFrames( this.path, this.segments, this.closed ),
+	var frames = new THREE.TubeGeometry.FrenetFrames( path, segments, closed ),
 		tangents = frames.tangents,
 		normals = frames.normals,
 		binormals = frames.binormals;
@@ -34186,12 +34240,11 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 
 	}
 
-
 	// consruct the grid
 
 	for ( i = 0; i < numpoints; i++ ) {
 
-		this.grid[ i ] = [];
+		grid[ i ] = [];
 
 		u = i / ( numpoints - 1 );
 
@@ -34201,19 +34254,19 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 		normal = normals[ i ];
 		binormal = binormals[ i ];
 
-		for ( j = 0; j < this.radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j++ ) {
 
-			v = j / this.radialSegments * 2 * Math.PI;
+			v = j / radialSegments * 2 * Math.PI;
 
-			cx = -this.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-			cy = this.radius * Math.sin( v );
+			cx = -radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+			cy = radius * Math.sin( v );
 
 			pos2.copy( pos );
 			pos2.x += cx * normal.x + cy * binormal.x;
 			pos2.y += cx * normal.y + cy * binormal.y;
 			pos2.z += cx * normal.z + cy * binormal.z;
 
-			this.grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
+			grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
 
 		}
 	}
@@ -34221,22 +34274,22 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 
 	// construct the mesh
 
-	for ( i = 0; i < this.segments; i++ ) {
+	for ( i = 0; i < segments; i++ ) {
 
-		for ( j = 0; j < this.radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j++ ) {
 
-			ip = ( this.closed ) ? (i + 1) % this.segments : i + 1;
-			jp = (j + 1) % this.radialSegments;
+			ip = ( closed ) ? (i + 1) % segments : i + 1;
+			jp = (j + 1) % radialSegments;
 
-			a = this.grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
-			b = this.grid[ ip ][ j ];
-			c = this.grid[ ip ][ jp ];
-			d = this.grid[ i ][ jp ];
+			a = grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
+			b = grid[ ip ][ j ];
+			c = grid[ ip ][ jp ];
+			d = grid[ i ][ jp ];
 
-			uva = new THREE.Vector2( i / this.segments, j / this.radialSegments );
-			uvb = new THREE.Vector2( ( i + 1 ) / this.segments, j / this.radialSegments );
-			uvc = new THREE.Vector2( ( i + 1 ) / this.segments, ( j + 1 ) / this.radialSegments );
-			uvd = new THREE.Vector2( i / this.segments, ( j + 1 ) / this.radialSegments );
+			uva = new THREE.Vector2( i / segments, j / radialSegments );
+			uvb = new THREE.Vector2( ( i + 1 ) / segments, j / radialSegments );
+			uvc = new THREE.Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
+			uvd = new THREE.Vector2( i / segments, ( j + 1 ) / radialSegments );
 
 			this.faces.push( new THREE.Face3( a, b, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
@@ -34256,7 +34309,7 @@ THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
-THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
+THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	var	tangent = new THREE.Vector3(),
 		normal = new THREE.Vector3(),
@@ -34632,8 +34685,10 @@ THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.IcosahedronGeometry = function ( radius, detail ) {
 
-	this.radius = radius;
-	this.detail = detail;
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
 
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
@@ -34661,6 +34716,11 @@ THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
  */
 
 THREE.OctahedronGeometry = function ( radius, detail ) {
+
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
 
 	var vertices = [
 		[ 1, 0, 0 ], [ -1, 0, 0 ], [ 0, 1, 0 ], [ 0, -1, 0 ], [ 0, 0, 1 ], [ 0, 0, -1 ]
