@@ -17,6 +17,8 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/wip/PlaneGeometryB.js"></script>
+
 		<script src="js/wip/Geometry2.js"></script>
 		<script src="js/wip/BoxGeometry2.js"></script>
 		<script src="js/wip/PlaneGeometry2.js"></script>
@@ -25,7 +27,11 @@
 		<script src="js/wip/Geometry3.js"></script>
 		<script src="js/wip/PlaneGeometry3.js"></script>
 
-		<script src="js/wip/PlaneGeometryB.js"></script>
+		<script src="js/wip/Geometry5.js"></script>
+		<script src="js/wip/PlaneGeometry5.js"></script>
+
+		<script src="js/wip/IndexedGeometry5.js"></script>
+		<script src="js/wip/IndexedPlaneGeometry5.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -57,10 +63,11 @@
 
 				//
 
-				addGeometries( 'PlaneGeometryB', 'BoxGeometry', 0 );
+				// addGeometries( 'PlaneGeometry', 'BoxGeometry', 0 );
+				// addGeometries( 'IndexedPlaneGeometry5', 'BoxGeometry', 0 );
 				// addGeometries( 'PlaneGeometry2', 'BoxGeometry2', 0 );
 				// addGeometries( 'PlaneGeometry3', 'BoxGeometry2', 0 );
-				// addGeometries( 'PlaneGeometryB', 'BoxGeometry2', 0 );
+				addGeometries( 'PlaneGeometryB', 'BoxGeometry2', 0 );
 
 				//
 
@@ -79,6 +86,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				/*
 				setInterval( function () {
 
 					console.log( '---' );
@@ -86,9 +94,11 @@
 					createGeometry( 'PlaneGeometry' );
 					createGeometry( 'PlaneGeometry2' );
 					createGeometry( 'PlaneGeometry2b' );
+					createGeometry( 'PlaneGeometry5' );
 					createGeometry( 'PlaneGeometryB' );
 
 				}, 2000 );
+*/
 
 			}
 
@@ -107,12 +117,12 @@
 				// Plane
 
 				console.time( PlaneGeometry );
-				var geometry = new THREE[ PlaneGeometry ]( 200, 200, 100, 100 );
+				var geometry = new THREE[ PlaneGeometry ]( 200, 200, 200, 200 );
 				console.timeEnd( PlaneGeometry );
 
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff /*, wireframe: true*/ } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xff0000/*, wireframe: true*/ } );
 
 				plane = new THREE.Mesh( geometry, material );
 				plane.position.x = x;
