@@ -36,8 +36,6 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/wip/Geometry5b.js"></script>
-
 		<script src="js/ImprovedNoise.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -76,8 +74,6 @@
 
 				var plane = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
 				plane.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-
-				plane = new THREE.Geometry5b( plane );
 
 				for ( var i = 0, l = plane.vertices.length; i < l; i ++ ) {
 
