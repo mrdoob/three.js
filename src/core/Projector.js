@@ -303,7 +303,7 @@ THREE.Projector = function () {
 
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
-		var object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
+		var object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs,
 		isFaceMaterial, objectMaterials;
 
 		_faceCount = 0;
@@ -537,13 +537,13 @@ THREE.Projector = function () {
 
 						_face.vertexNormalsLength = faceVertexNormals.length;
 
-						uvs = faceVertexUvs[ f ];
+						var vertexUvs = faceVertexUvs[ f ];
 
-						if ( uvs !== undefined ) {
+						if ( vertexUvs !== undefined ) {
 
-							for ( var u = 0, ul = uvs.length; u < ul; u ++ ) {
+							for ( var u = 0; u < 3; u ++ ) {
 
-								_face.uvs[ u ].copy( uvs[ u ] );
+								_face.uvs[ u ].copy( vertexUvs[ u ] );
 
 							}
 
