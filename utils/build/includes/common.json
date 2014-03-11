@@ -32,6 +32,7 @@
 	"src/core/BufferAttribute.js",
 	"src/core/BufferGeometry.js",
 	"src/core/Geometry.js",
+	"src/core/Geometry2.js",
 	"src/cameras/Camera.js",
 	"src/cameras/OrthographicCamera.js",
 	"src/cameras/PerspectiveCamera.js",
