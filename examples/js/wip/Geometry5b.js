@@ -16,7 +16,7 @@ THREE.Geometry5b = function ( bufferGeometry ) {
 	this.normals = [];
 	this.uvs = [];
 
-	for ( var i = 0; i < verticesBuffer.length; i ++ ) {
+	for ( var i = 0, l = verticesBuffer.length / 3; i < l; i ++ ) {
 
 		this.vertices.push( new THREE.TypedVector3( verticesBuffer, i * 3 ) );
 		this.normals.push( new THREE.TypedVector3( normalsBuffer, i * 3 ) );
