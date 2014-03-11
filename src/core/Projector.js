@@ -142,6 +142,7 @@ THREE.Projector = function () {
 	var RenderList = function () {
 
 		var normals = [];
+		var uvs = [];
 
 		var object = null;
 		var material = null;
@@ -156,6 +157,7 @@ THREE.Projector = function () {
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 
 			normals.length = 0;
+			uvs.length = 0;
 
 		};
 
@@ -192,6 +194,12 @@ THREE.Projector = function () {
 		var pushNormal = function ( x, y, z ) {
 
 			normals.push( x, y, z );
+
+		};
+
+		var pushUv = function ( x, y ) {
+
+			uvs.push( x, y );
 
 		};
 
@@ -257,8 +265,13 @@ THREE.Projector = function () {
 					var offset = arguments[ i ] * 3;
 					var normal = _face.vertexNormalsModel[ i ];
 
-					normal.set( normals[ offset + 0 ], normals[ offset + 1 ], normals[ offset + 2 ] );
+					normal.set( normals[ offset ], normals[ offset + 1 ], normals[ offset + 2 ] );
 					normal.applyMatrix3( normalMatrix ).normalize();
+
+					var offset2 = arguments[ i ] * 2;
+
+					var uv = _face.uvs[ i ];
+					uv.set( uvs[ offset2 ], uvs[ offset2 + 1 ] );
 
 				}
 
@@ -279,6 +292,7 @@ THREE.Projector = function () {
 			checkBackfaceCulling: checkBackfaceCulling,
 			pushVertex: pushVertex,
 			pushNormal: pushNormal,
+			pushUv: pushUv,
 			pushLine: pushLine,
 			pushTriangle: pushTriangle
 		}
@@ -348,6 +362,18 @@ THREE.Projector = function () {
 
 					}
 
+					if ( attributes.uv !== undefined ) {
+
+						var uvs = attributes.uv.array;
+
+						for ( var i = 0, l = uvs.length; i < l; i += 2 ) {
+
+							renderList.pushUv( uvs[ i ], uvs[ i + 1 ] );
+
+						}
+
+					}
+
 					if ( attributes.index !== undefined ) {
 
 						var indices = attributes.index.array;
@@ -391,7 +417,7 @@ THREE.Projector = function () {
 
 					vertices = geometry.vertices;
 					faces = geometry.faces;
-					faceVertexUvs = geometry.faceVertexUvs;
+					faceVertexUvs = geometry.faceVertexUvs[ 0 ];
 
 					_normalMatrix.getNormalMatrix( _modelMatrix );
 
@@ -511,15 +537,13 @@ THREE.Projector = function () {
 
 						_face.vertexNormalsLength = faceVertexNormals.length;
 
-						for ( var c = 0, cl = Math.min( faceVertexUvs.length, 3 ); c < cl; c ++ ) {
+						uvs = faceVertexUvs[ f ];
 
-							uvs = faceVertexUvs[ c ][ f ];
-
-							if ( uvs === undefined ) continue;
+						if ( uvs !== undefined ) {
 
 							for ( var u = 0, ul = uvs.length; u < ul; u ++ ) {
 
-								_face.uvs[ c ][ u ] = uvs[ u ];
+								_face.uvs[ u ].copy( uvs[ u ] );
 
 							}
 
