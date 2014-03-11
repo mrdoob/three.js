@@ -14,7 +14,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 	this.deviceOrientation = {};
 	this.screenOrientation = 0;
 
-	this._rotationVector = new THREE.Vector4();
+	this._rotationVector = new THREE.Vector3();
 	this._rotationMatrix = new THREE.Matrix4();
 
 	this.onDeviceOrientationChangeEvent = function( rawEvtData ) {
