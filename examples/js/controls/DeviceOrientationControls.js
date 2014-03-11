@@ -111,10 +111,10 @@ THREE.DeviceOrientationControls = function ( object ) {
 				//
 				// 180 degrees counter-clockwise screen transformation matrix:
 				//
-				//   / -1  0  0  0  \
-				//   |  0 -1  0  0  |
-				//   |  0  0  1  0  |
-				//   \  0  0  0  1  /
+				//      / -1  0  0  0  \
+				//      |  0 -1  0  0  |
+				//      |  0  0  1  0  |
+				//      \  0  0  0  1  /
 				//
 				// (see: http://bit.ly/1dIrx0I)
 				//
@@ -190,7 +190,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 		this.setRotationMatrixFromRotationVector( this._rotationVector );
 
-		this.remapRotationMatrixByScreenOrientation( this.screenOrientation, this._rotationMatrix);
+		this.remapRotationMatrixByScreenOrientation( this.screenOrientation, this._rotationMatrix );
 
 		this.object.quaternion.setFromRotationMatrix( this._rotationMatrix );
 
