@@ -9985,9 +9985,9 @@ THREE.BufferGeometryManipulator = function ( bufferGeometry ) {
 	this.uvs = [];
 
 	var attributes = bufferGeometry.attributes;
-	var length = attributes.position.array.length;
+	var length = attributes.position.array.length / 3;
 
-	for ( var i = 0, l = length / 3; i < l; i ++ ) {
+	for ( var i = 0; i < length; i ++ ) {
 
 		this.vertices.push( new THREE.TypedVector3( attributes.position.array, i * 3 ) );
 		this.normals.push( new THREE.TypedVector3( attributes.normal.array, i * 3 ) );
@@ -15533,11 +15533,11 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 };
 
-THREE.Mesh.prototype.clone = function ( object ) {
+THREE.Mesh.prototype.clone = function ( object, recursive ) {
 
 	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+	THREE.Object3D.prototype.clone.call( this, object, recursive );
 
 	return object;
 
@@ -15573,7 +15573,7 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 
 	if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
-		if( parentSkinMatrix ) {
+		if ( parentSkinMatrix ) {
 
 			this.skinMatrix.multiplyMatrices( parentSkinMatrix, this.matrix );
 
@@ -15590,9 +15590,7 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 
 	// update children
 
-	var child, i, l = this.children.length;
-
-	for ( i = 0; i < l; i ++ ) {
+	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 		this.children[ i ].update( this.skinMatrix, forceUpdate );
 
@@ -32507,6 +32505,7 @@ THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 /**
  * @author hughes
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
@@ -32528,12 +32527,10 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	//
 
-	var length = segments + 2;
-
 	var indices = new Uint16Array( ( segments + 1 ) * 3 );
-	var vertices = new Float32Array( length * 3 );
-	var normals = new Float32Array( length * 3 );
-	var uvs = new Float32Array( length * 2 );
+	var vertices = new Float32Array( ( segments + 2 ) * 3 );
+	var normals = new Float32Array( ( segments + 2 ) * 3 );
+	var uvs = new Float32Array( ( segments + 2 ) * 2 );
 
 	normals[ 2 ] = 1;
 
