@@ -45,7 +45,7 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 
 	// update children
 
-	var child, i, l = this.children.length;
+	var i, l = this.children.length;
 
 	for ( i = 0; i < l; i ++ ) {
 
