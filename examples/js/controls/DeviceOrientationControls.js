@@ -15,8 +15,8 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	var degtorad = Math.PI / 180;
 
-	var _objectRotationMatrix = new THREE.Matrix4();
-	var _tmpRotationMatrix    = new THREE.Matrix4();
+	var objectRotationMatrix = new THREE.Matrix4();
+	var tmpRotationMatrix    = new THREE.Matrix4();
 
 	this.onDeviceOrientationChangeEvent = function( rawEvtData ) {
 		this.deviceOrientation = rawEvtData;
@@ -56,18 +56,18 @@ THREE.DeviceOrientationControls = function ( object ) {
 		var m32 = sX;
 		var m33 = cX * cY;
 
-		_objectRotationMatrix.set(
+		objectRotationMatrix.set(
 			m11,    m12,    m13,    0,
 			m21,    m22,    m23,    0,
 			m31,    m32,    m33,    0,
 			0,      0,      0,      1
 		);
 
-		return _objectRotationMatrix;
+		return objectRotationMatrix;
 	};
 
 	this.remapObjectRotationMatrixFromScreenOrientation = function() {
-                _tmpRotationMatrix.copy( _objectRotationMatrix );
+                tmpRotationMatrix.copy( objectRotationMatrix );
 
 		switch( this.screenOrientation ) {
 			case 90:
@@ -83,17 +83,17 @@ THREE.DeviceOrientationControls = function ( object ) {
 				// (see: http://bit.ly/1itCOq2)
 				//
 
-				_objectRotationMatrix.elements[0]  = - _tmpRotationMatrix.elements[4];
-				_objectRotationMatrix.elements[4]  =   _tmpRotationMatrix.elements[0];
-				_objectRotationMatrix.elements[8]  =   _tmpRotationMatrix.elements[8];
+				objectRotationMatrix.elements[0]  = - tmpRotationMatrix.elements[4];
+				objectRotationMatrix.elements[4]  =   tmpRotationMatrix.elements[0];
+				objectRotationMatrix.elements[8]  =   tmpRotationMatrix.elements[8];
 
-				_objectRotationMatrix.elements[1]  = - _tmpRotationMatrix.elements[5];
-				_objectRotationMatrix.elements[5]  =   _tmpRotationMatrix.elements[1];
-				_objectRotationMatrix.elements[9]  =   _tmpRotationMatrix.elements[9];
+				objectRotationMatrix.elements[1]  = - tmpRotationMatrix.elements[5];
+				objectRotationMatrix.elements[5]  =   tmpRotationMatrix.elements[1];
+				objectRotationMatrix.elements[9]  =   tmpRotationMatrix.elements[9];
 
-				_objectRotationMatrix.elements[2]  = - _tmpRotationMatrix.elements[6];
-				_objectRotationMatrix.elements[6]  =   _tmpRotationMatrix.elements[2];
-				_objectRotationMatrix.elements[10] =   _tmpRotationMatrix.elements[10];
+				objectRotationMatrix.elements[2]  = - tmpRotationMatrix.elements[6];
+				objectRotationMatrix.elements[6]  =   tmpRotationMatrix.elements[2];
+				objectRotationMatrix.elements[10] =   tmpRotationMatrix.elements[10];
 
 				break;
 			case 180:
@@ -109,17 +109,17 @@ THREE.DeviceOrientationControls = function ( object ) {
 				// (see: http://bit.ly/1dIrx0I)
 				//
 
-				_objectRotationMatrix.elements[0]  = - _tmpRotationMatrix.elements[0];
-				_objectRotationMatrix.elements[4]  = - _tmpRotationMatrix.elements[4];
-				_objectRotationMatrix.elements[8]  =   _tmpRotationMatrix.elements[8];
+				objectRotationMatrix.elements[0]  = - tmpRotationMatrix.elements[0];
+				objectRotationMatrix.elements[4]  = - tmpRotationMatrix.elements[4];
+				objectRotationMatrix.elements[8]  =   tmpRotationMatrix.elements[8];
 
-				_objectRotationMatrix.elements[1]  = - _tmpRotationMatrix.elements[1];
-				_objectRotationMatrix.elements[5]  = - _tmpRotationMatrix.elements[5];
-				_objectRotationMatrix.elements[9]  =   _tmpRotationMatrix.elements[9];
+				objectRotationMatrix.elements[1]  = - tmpRotationMatrix.elements[1];
+				objectRotationMatrix.elements[5]  = - tmpRotationMatrix.elements[5];
+				objectRotationMatrix.elements[9]  =   tmpRotationMatrix.elements[9];
 
-				_objectRotationMatrix.elements[2]  = - _tmpRotationMatrix.elements[2];
-				_objectRotationMatrix.elements[6]  = - _tmpRotationMatrix.elements[6];
-				_objectRotationMatrix.elements[10] =   _tmpRotationMatrix.elements[10];
+				objectRotationMatrix.elements[2]  = - tmpRotationMatrix.elements[2];
+				objectRotationMatrix.elements[6]  = - tmpRotationMatrix.elements[6];
+				objectRotationMatrix.elements[10] =   tmpRotationMatrix.elements[10];
 
 				break;
 			case 270:
@@ -135,17 +135,17 @@ THREE.DeviceOrientationControls = function ( object ) {
 				// (see: http://bit.ly/1h73sQ0)
 				//
 
-				_objectRotationMatrix.elements[0]  =   _tmpRotationMatrix.elements[4];
-				_objectRotationMatrix.elements[4]  = - _tmpRotationMatrix.elements[0];
-				_objectRotationMatrix.elements[8]  =   _tmpRotationMatrix.elements[8];
+				objectRotationMatrix.elements[0]  =   tmpRotationMatrix.elements[4];
+				objectRotationMatrix.elements[4]  = - tmpRotationMatrix.elements[0];
+				objectRotationMatrix.elements[8]  =   tmpRotationMatrix.elements[8];
 
-				_objectRotationMatrix.elements[1]  =   _tmpRotationMatrix.elements[5];
-				_objectRotationMatrix.elements[5]  = - _tmpRotationMatrix.elements[1];
-				_objectRotationMatrix.elements[9]  =   _tmpRotationMatrix.elements[9];
+				objectRotationMatrix.elements[1]  =   tmpRotationMatrix.elements[5];
+				objectRotationMatrix.elements[5]  = - tmpRotationMatrix.elements[1];
+				objectRotationMatrix.elements[9]  =   tmpRotationMatrix.elements[9];
 
-				_objectRotationMatrix.elements[2]  =   _tmpRotationMatrix.elements[6];
-				_objectRotationMatrix.elements[6]  = - _tmpRotationMatrix.elements[2];
-				_objectRotationMatrix.elements[10] =   _tmpRotationMatrix.elements[10];
+				objectRotationMatrix.elements[2]  =   tmpRotationMatrix.elements[6];
+				objectRotationMatrix.elements[6]  = - tmpRotationMatrix.elements[2];
+				objectRotationMatrix.elements[10] =   tmpRotationMatrix.elements[10];
 
 				break;
 			default:
@@ -162,7 +162,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 				break;
 		}
 
-		return _objectRotationMatrix;
+		return objectRotationMatrix;
 	};
 
 	this.update = function( delta ) {
@@ -174,7 +174,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 		this.remapObjectRotationMatrixFromScreenOrientation();
 
-		this.object.quaternion.setFromRotationMatrix( _objectRotationMatrix );
+		this.object.quaternion.setFromRotationMatrix( objectRotationMatrix );
 	};
 
 	function bind( scope, fn ) {
