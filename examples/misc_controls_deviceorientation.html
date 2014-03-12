@@ -29,12 +29,12 @@
 	</head>
 	<body>
 
+		<div id="container"></div>
+
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - equirectangular panorama demo with DeviceOrientation controls.
 			photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Jón Ragnarsson</a>.
 		</div>
-
-		<div id="container"></div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/controls/DeviceOrientationControls.js"></script>
@@ -44,62 +44,61 @@
 				  "use strict"
 
 				  var hasWebGL = (function() {
-					    try {
-						      var canvas = document.createElement( 'canvas' );
-						      return !! window.WebGLRenderingContext && ( canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' ) );
-					    } catch( e ) {
-						      return false;
-					    }
+						try {
+							  var canvas = document.createElement( 'canvas' );
+							  return !! window.WebGLRenderingContext && ( canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' ) );
+						} catch( e ) {
+							  return false;
+						}
 				  })();
 
 				  window.addEventListener('load', function() {
 
-					    var container, camera, scene, renderer, controls, geometry, mesh;
+						var container, camera, scene, renderer, controls, geometry, mesh;
 
-					    var animate = function(){
-						        controls.update();
-						        renderer.render(scene, camera);
+						var animate = function(){
+								controls.update();
+								renderer.render(scene, camera);
 
-						        window.requestAnimationFrame(animate);
-					    };
+								window.requestAnimationFrame(animate);
+						};
 
-					    container = document.getElementById( 'container' );
+						container = document.getElementById( 'container' );
 
-					    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+						camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
 
-					    controls = new THREE.DeviceOrientationControls( camera );
+						controls = new THREE.DeviceOrientationControls( camera );
 
-					    scene = new THREE.Scene();
+						scene = new THREE.Scene();
 
-					    var geometry = new THREE.SphereGeometry( 500, 60, 40 );
-					    geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
+						var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+						geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
-					    var material = new THREE.MeshBasicMaterial( {
-						        map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
-					    } );
+						var material = new THREE.MeshBasicMaterial( {
+								map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
+						} );
 
-					    var mesh = new THREE.Mesh( geometry, material );
-					    mesh.rotation.x = 90 * ( Math.PI / 180 );
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.rotation.x = 90 * ( Math.PI / 180 );
+						scene.add(mesh);
 
-					    scene.add(mesh);
+						renderer = hasWebGL ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
+						renderer.setSize(window.innerWidth, window.innerHeight);
+						renderer.domElement.style.position = 'absolute';
+						renderer.domElement.style.top = 0;
+						container.appendChild(renderer.domElement);
 
-					    renderer = hasWebGL ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
-					    renderer.setSize(window.innerWidth, window.innerHeight);
-					    renderer.domElement.style.position = 'absolute';
-					    renderer.domElement.style.top = 0;
-					    container.appendChild(renderer.domElement);
+						var resizeWindow = function() {
+								camera.aspect = window.innerWidth / window.innerHeight;
+								camera.updateProjectionMatrix();
+								renderer.setSize( window.innerWidth, window.innerHeight );
+						};
 
-					    var resizeWindow = function() {
-						        camera.aspect = window.innerWidth / window.innerHeight;
-						        camera.updateProjectionMatrix();
-						        renderer.setSize( window.innerWidth, window.innerHeight );
-					    };
+						window.addEventListener('resize', resizeWindow, false);
 
-					    window.addEventListener('resize', resizeWindow, false);
+						controls.connect();
 
-					    controls.connect();
-
-					    animate();
+						animate();
 
 				  }, false);
 
