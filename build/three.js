@@ -33684,7 +33684,7 @@ THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -33771,17 +33771,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 };
 
-THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
-
-	return new THREE.Geometry2( new THREE.PlaneBufferGeometry( width, height, widthSegments, heightSegments ) );
-
-};
+THREE.PlaneGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
 /**
  * @author Kaleb Murphy
