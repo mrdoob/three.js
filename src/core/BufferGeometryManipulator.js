@@ -9,9 +9,9 @@ THREE.BufferGeometryManipulator = function ( bufferGeometry ) {
 	this.uvs = [];
 
 	var attributes = bufferGeometry.attributes;
-	var length = attributes.position.array.length;
+	var length = attributes.position.array.length / 3;
 
-	for ( var i = 0, l = length / 3; i < l; i ++ ) {
+	for ( var i = 0; i < length; i ++ ) {
 
 		this.vertices.push( new THREE.TypedVector3( attributes.position.array, i * 3 ) );
 		this.normals.push( new THREE.TypedVector3( attributes.normal.array, i * 3 ) );
