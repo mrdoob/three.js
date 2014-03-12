@@ -52,11 +52,11 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 };
 
-THREE.Mesh.prototype.clone = function ( object ) {
+THREE.Mesh.prototype.clone = function ( object, recursive ) {
 
 	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+	THREE.Object3D.prototype.clone.call( this, object, recursive );
 
 	return object;
 
