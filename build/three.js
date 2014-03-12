@@ -34503,7 +34503,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
+THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	THREE.Geometry.call( this );
 
@@ -34512,31 +34512,31 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	var that = this;
 
-	for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+	for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
 
-		prepare( new THREE.Vector3( vertices[ i ][ 0 ], vertices[ i ][ 1 ], vertices[ i ][ 2 ] ) );
+		prepare( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
 
 	}
 
 	var midpoints = [], p = this.vertices;
 
-	var f = [];
+	var faces = [];
 
-	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+	for ( var i = 0, j = 0, l = indices.length; i < l; i += 3, j ++ ) {
 
-		var v1 = p[ faces[ i ][ 0 ] ];
-		var v2 = p[ faces[ i ][ 1 ] ];
-		var v3 = p[ faces[ i ][ 2 ] ];
+		var v1 = p[ indices[ i     ] ];
+		var v2 = p[ indices[ i + 1 ] ];
+		var v3 = p[ indices[ i + 2 ] ];
 
-		f[ i ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+		faces[ j ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
 
 	}
 
 	var centroid = new THREE.Vector3();
 
-	for ( var i = 0, l = f.length; i < l; i ++ ) {
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-		subdivide(f[ i ], detail);
+		subdivide( faces[ i ], detail );
 
 	}
 
@@ -34738,19 +34738,19 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
 	var vertices = [
-		[ -1,  t,  0 ], [  1, t, 0 ], [ -1, -t,  0 ], [  1, -t,  0 ],
-		[  0, -1,  t ], [  0, 1, t ], [  0, -1, -t ], [  0,  1, -t ],
-		[  t,  0, -1 ], [  t, 0, 1 ], [ -t,  0, -1 ], [ -t,  0,  1 ]
+		-1,  t,  0,    1,  t,  0,   -1, -t,  0,    1, -t,  0,
+		 0, -1,  t,    0,  1,  t,    0, -1, -t,    0,  1, -t,
+		 t,  0, -1,    t,  0,  1,   -t,  0, -1,   -t,  0,  1
 	];
 
-	var faces = [
-		[ 0, 11,  5 ], [ 0,  5,  1 ], [  0,  1,  7 ], [  0,  7, 10 ], [  0, 10, 11 ],
-		[ 1,  5,  9 ], [ 5, 11,  4 ], [ 11, 10,  2 ], [ 10,  7,  6 ], [  7,  1,  8 ],
-		[ 3,  9,  4 ], [ 3,  4,  2 ], [  3,  2,  6 ], [  3,  6,  8 ], [  3,  8,  9 ],
-		[ 4,  9,  5 ], [ 2,  4, 11 ], [  6,  2, 10 ], [  8,  6,  7 ], [  9,  8,  1 ]
+	var indices = [
+		 0, 11,  5,    0,  5,  1,    0,  1,  7,    0,  7, 10,    0, 10, 11,
+		 1,  5,  9,    5, 11,  4,   11, 10,  2,   10,  7,  6,    7,  1,  8,
+		 3,  9,  4,    3,  4,  2,    3,  2,  6,    3,  6,  8,    3,  8,  9,
+		 4,  9,  5,    2,  4, 11,    6,  2, 10,    8,  6,  7,    9,  8,  1
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, faces, radius, detail );
+	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
 };
 
@@ -34768,14 +34768,14 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 	};
 
 	var vertices = [
-		[ 1, 0, 0 ], [ -1, 0, 0 ], [ 0, 1, 0 ], [ 0, -1, 0 ], [ 0, 0, 1 ], [ 0, 0, -1 ]
+		1, 0, 0,   -1, 0, 0,    0, 1, 0,    0,-1, 0,    0, 0, 1,    0, 0,-1
 	];
 
-	var faces = [
-		[ 0, 2, 4 ], [ 0, 4, 3 ], [ 0, 3, 5 ], [ 0, 5, 2 ], [ 1, 2, 5 ], [ 1, 5, 3 ], [ 1, 3, 4 ], [ 1, 4, 2 ]
+	var indices = [
+		0, 2, 4,    0, 4, 3,    0, 3, 5,    0, 5, 2,    1, 2, 5,    1, 5, 3,    1, 3, 4,    1, 4, 2
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, faces, radius, detail );
+	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 };
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
@@ -34787,14 +34787,14 @@ THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TetrahedronGeometry = function ( radius, detail ) {
 
 	var vertices = [
-		[ 1,  1,  1 ], [ -1, -1, 1 ], [ -1, 1, -1 ], [ 1, -1, -1 ]
+		 1,  1,  1,   -1, -1,  1,   -1,  1, -1,    1, -1, -1
 	];
 
-	var faces = [
-		[ 2, 1, 0 ], [ 0, 3, 2 ], [ 1, 3, 0 ], [ 2, 3, 1 ]
+	var indices = [
+		 2,  1,  0,    0,  3,  2,    1,  3,  0,    2,  3,  1
 	];
 
-	THREE.PolyhedronGeometry.call( this, vertices, faces, radius, detail );
+	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
 };
 
