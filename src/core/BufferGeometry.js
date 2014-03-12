@@ -198,6 +198,12 @@ THREE.BufferGeometry.prototype = {
 
 	}(),
 
+	computeFaceNormals: function () {
+
+		// backwards compatibility
+
+	},
+
 	computeVertexNormals: function () {
 
 		if ( this.attributes[ "position" ] ) {
