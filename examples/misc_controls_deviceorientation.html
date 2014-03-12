@@ -79,7 +79,7 @@
 					    } );
 
 					    var mesh = new THREE.Mesh( geometry, material );
-					    mesh.rotation.x = 90;
+					    mesh.rotation.x = 90 * ( Math.PI / 180 );
 
 					    scene.add(mesh);
 
