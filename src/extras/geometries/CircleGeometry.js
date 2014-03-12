@@ -1,5 +1,6 @@
 /**
  * @author hughes
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
@@ -21,12 +22,10 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	//
 
-	var length = segments + 2;
-
 	var indices = new Uint16Array( ( segments + 1 ) * 3 );
-	var vertices = new Float32Array( length * 3 );
-	var normals = new Float32Array( length * 3 );
-	var uvs = new Float32Array( length * 2 );
+	var vertices = new Float32Array( ( segments + 2 ) * 3 );
+	var normals = new Float32Array( ( segments + 2 ) * 3 );
+	var uvs = new Float32Array( ( segments + 2 ) * 2 );
 
 	normals[ 2 ] = 1;
 
