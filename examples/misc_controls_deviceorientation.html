@@ -57,10 +57,10 @@
 					    var container, camera, scene, renderer, controls, geometry, mesh;
 
 					    var animate = function(){
-							controls.update();
+						        controls.update();
 						        renderer.render(scene, camera);
 
-							window.requestAnimationFrame(animate);
+						        window.requestAnimationFrame(animate);
 					    };
 
 					    container = document.getElementById( 'container' );
@@ -95,21 +95,7 @@
 						        renderer.setSize( window.innerWidth, window.innerHeight );
 					    };
 
-					    var setScreenOrientation = function() {
-						        window.setTimeout(function() {
-						          renderer.domElement.style['MozTransform'] =
-						            renderer.domElement.style['MsTransform'] =
-						              renderer.domElement.style['WebkitTransform'] =
-						                renderer.domElement.style['OTransform'] =
-						                  renderer.domElement.style['Transform'] =
-						                    "rotate(" + ( -window.orientation || 0 ) + "deg)";
-						        }, 200);
-					    };
-
 					    window.addEventListener('resize', resizeWindow, false);
-					    window.addEventListener('orientationchange', setScreenOrientation, false);
-
-					    setScreenOrientation();
 
 					    controls.connect();
 

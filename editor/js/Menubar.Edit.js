@@ -29,8 +29,9 @@ Menubar.Edit = function ( editor ) {
 
 	function onDeleteOptionClick () {
 
+		var parent = editor.selected.parent;
 		editor.removeObject( editor.selected );
-		editor.deselect();
+		editor.select( parent );
 
 	}
 

@@ -1,15 +1,27 @@
 # Three.js Maya Export
 
-Exports Maya models to Three.js' ASCII JSON format.  Currently supports exporting the following:
+Exports Maya models to Three.js' JSON format.  Currently supports exporting the following:
 
 - Vertices
 - Faces
 - Normals
 - UV sets
-- Material indices
-- Vertex colors
+- Shaders/Materials
+- Per-Face material indices
+- Diffuse Maps
+- Specular Maps
+- Bump/Normal Maps
+- Bones
+- Skins (configurable influences per vertex)
+- Skeletal animation
+- Morph Target/Vertex Cache animation
+- Multiple Characters per scene
 
 ## Installation
+
+Install [pymel](http://download.autodesk.com/global/docs/maya2014/en_us/PyMel/install.html).
+Though the docs are way out of date, the process described still works as of
+2014.
 
 Copy the scripts and plug-ins folders to the appropriate maya folder, where `maya-version` is your current version of Maya (eg. 2013-x64).
 

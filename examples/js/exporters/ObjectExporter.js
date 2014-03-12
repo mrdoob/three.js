@@ -24,7 +24,6 @@ THREE.ObjectExporter.prototype = {
 
 		var geometries = {};
 		var geometryExporter = new THREE.GeometryExporter();
-		var geometry2Exporter = new THREE.Geometry2Exporter();
 		var bufferGeometryExporter = new THREE.BufferGeometryExporter();
 
 		var parseGeometry = function ( geometry ) {
@@ -43,88 +42,66 @@ THREE.ObjectExporter.prototype = {
 
 				if ( geometry.name !== "" ) data.name = geometry.name;
 
+				var handleParameters = function ( parameters ) {
+
+					for ( var i = 0; i < parameters.length; i ++ ) {
+
+						var parameter = parameters[ i ];
+
+						if ( geometry.parameters[ parameter ] !== undefined ) {
+
+							data[ parameter ] = geometry.parameters[ parameter ];
+
+						}
+
+					}
+
+				};
+
 				if ( geometry instanceof THREE.PlaneGeometry ) {
 
 					data.type = 'PlaneGeometry';
-					data.width = geometry.width;
-					data.height = geometry.height;
-					data.widthSegments = geometry.widthSegments;
-					data.heightSegments = geometry.heightSegments;
+					handleParameters( [ 'width', 'height', 'widthSegments', 'heightSegments' ] );
 
 				} else if ( geometry instanceof THREE.BoxGeometry ) {
 
 					data.type = 'BoxGeometry';
-					data.width = geometry.width;
-					data.height = geometry.height;
-					data.depth = geometry.depth;
-					data.widthSegments = geometry.widthSegments;
-					data.heightSegments = geometry.heightSegments;
-					data.depthSegments = geometry.depthSegments;
+					handleParameters( [ 'width', 'height', 'depth', 'widthSegments', 'heightSegments', 'depthSegments' ] );
 
 				} else if ( geometry instanceof THREE.CircleGeometry ) {
 
 					data.type = 'CircleGeometry';
-					data.radius = geometry.radius;
-					data.segments = geometry.segments;
+					handleParameters( [ 'radius', 'segments' ] );
 
 				} else if ( geometry instanceof THREE.CylinderGeometry ) {
 
 					data.type = 'CylinderGeometry';
-					data.radiusTop = geometry.radiusTop;
-					data.radiusBottom = geometry.radiusBottom;
-					data.height = geometry.height;
-					data.radialSegments = geometry.radialSegments;
-					data.heightSegments = geometry.heightSegments;
-					data.openEnded = geometry.openEnded;
+					handleParameters( [ 'radiusTop', 'radiusBottom', 'height', 'radialSegments', 'heightSegments', 'openEnded' ] );
 
 				} else if ( geometry instanceof THREE.SphereGeometry ) {
 
 					data.type = 'SphereGeometry';
-					data.radius = geometry.radius;
-					data.widthSegments = geometry.widthSegments;
-					data.heightSegments = geometry.heightSegments;
-					data.phiStart = geometry.phiStart;
-					data.phiLength = geometry.phiLength;
-					data.thetaStart = geometry.thetaStart;
-					data.thetaLength = geometry.thetaLength;
+					handleParameters( [ 'radius', 'widthSegments', 'heightSegments', 'phiStart', 'phiLength', 'thetaStart', 'thetaLength' ] );
 
 				} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
 
 					data.type = 'IcosahedronGeometry';
-					data.radius = geometry.radius;
-					data.detail = geometry.detail;
+					handleParameters( [ 'radius', 'detail' ] );
 
 				} else if ( geometry instanceof THREE.TorusGeometry ) {
 
 					data.type = 'TorusGeometry';
-					data.radius = geometry.radius;
-					data.tube = geometry.tube;
-					data.radialSegments = geometry.radialSegments;
-					data.tubularSegments = geometry.tubularSegments;
-					data.arc = geometry.arc;
+					handleParameters( [ 'radius', 'tube', 'radialSegments', 'tubularSegments', 'arc' ] );
 
 				} else if ( geometry instanceof THREE.TorusKnotGeometry ) {
 
 					data.type = 'TorusKnotGeometry';
-					data.radius = geometry.radius;
-					data.tube = geometry.tube;
-					data.radialSegments = geometry.radialSegments;
-					data.tubularSegments = geometry.tubularSegments;
-					data.p = geometry.p;
-					data.q = geometry.q;
-					data.heightScale = geometry.heightScale;
+					handleParameters( [ 'radius', 'tube', 'radialSegments', 'tubularSegments', 'p', 'q', 'heightScale' ] );
 
 				} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 					data.type = 'BufferGeometry';
 					data.data = bufferGeometryExporter.parse( geometry );
-
-					delete data.data.metadata;
-
-				} else if ( geometry instanceof THREE.Geometry2 ) {
-
-					data.type = 'Geometry2';
-					data.data = geometry2Exporter.parse( geometry );
 
 					delete data.data.metadata;
 

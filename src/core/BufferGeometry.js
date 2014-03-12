@@ -9,15 +9,9 @@ THREE.BufferGeometry = function () {
 
 	this.name = '';
 
-	// attributes
-
 	this.attributes = {};
-
-	// offsets for chunks when using indexed elements
-
-	this.offsets = [];
-
-	// boundings
+	this.drawcalls = [];
+	this.offsets = this.drawcalls; // backwards compatibility
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -28,35 +22,37 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, array, itemSize ) {
+	addAttribute: function ( name, attribute ) {
 
-		if ( arguments.length === 4 ) {
+		if ( attribute instanceof THREE.BufferAttribute === false ) {
 
-			console.warn( 'DEPRECATED: BufferGeometry.addAttribute() now accepts only 3 arguments ( name, array, itemSize )' );
+			console.warn( 'DEPRECATED: BufferGeometry\'s addAttribute() now expects ( name, attribute ).' );
 
-			this.attributes[ arguments[ 0 ] ] = {
+			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
 
-				array: new arguments[ 1 ]( arguments[ 2 ] * arguments[ 3 ] ),
-				itemSize: arguments[ 3 ]
-
-			};
-
-		} else {
-
-			this.attributes[ name ] = {
-
-				array: array,
-				itemSize: itemSize
-
-			};
+			return;
 
 		}
+
+		this.attributes[ name ] = attribute;
 
 	},
 
 	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
+
+	},
+
+	addDrawCall: function ( start, count, indexOffset ) {
+
+		this.drawcalls.push( {
+
+			start: start,
+			count: count,
+			index: indexOffset !== undefined ? indexOffset : 0
+
+		} );
 
 	},
 
@@ -201,6 +197,12 @@ THREE.BufferGeometry.prototype = {
 		}
 
 	}(),
+
+	computeFaceNormals: function () {
+
+		// backwards compatibility
+
+	},
 
 	computeVertexNormals: function () {
 

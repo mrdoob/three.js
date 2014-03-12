@@ -97,6 +97,12 @@ THREE.GeometryUtils = {
 		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
 
 			var uv = uvs2[ i ], uvCopy = [];
+			
+			if ( uv === undefined ) {
+				
+				continue;
+				
+			}
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 

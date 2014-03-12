@@ -175,7 +175,7 @@ function SimulationRenderer(WIDTH, renderer) {
 
 		var a = new Float32Array( PARTICLES * 4 );
 
-		for ( var k = 0; k < PARTICLES; k += 4 ) {
+		for ( var k = 0, kl = a.length; k < kl; k += 4 ) {
 
 			var x = Math.random() * BOUNDS - BOUNDS_HALF;
 			var y = Math.random() * BOUNDS - BOUNDS_HALF;
@@ -202,7 +202,7 @@ function SimulationRenderer(WIDTH, renderer) {
 
 		var a = new Float32Array( PARTICLES * 3 );
 
-		for ( var k = 0; k < PARTICLES; k += 3 ) {
+		for ( var k = 0, kl = a.length; k < kl; k += 3 ) {
 
 			var x = Math.random() - 0.5;
 			var y = Math.random() - 0.5;

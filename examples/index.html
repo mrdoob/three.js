@@ -74,7 +74,7 @@
 
 			#button {
 				position: fixed;
-				top: 20px;
+				bottom: 20px;
 				right: 20px;
 				padding: 8px;
 				color: #fff;
@@ -103,13 +103,13 @@
 		var files = {
 			"webgl": [
 				"webgl_animation_cloth",
-				"webgl_animation_skinning",
 				"webgl_animation_skinning_morph",
 				"webgl_buffergeometry",
 				"webgl_buffergeometry_custom_attributes_particles",
 				"webgl_buffergeometry_lines",
 				"webgl_buffergeometry_lines_indexed",
 				"webgl_buffergeometry_particles",
+				"webgl_buffergeometry_rawshader",
 				"webgl_buffergeometry_uint",
 				"webgl_camera",
 				"webgl_custom_attributes",
@@ -275,6 +275,7 @@
 			],
 			"misc": [
 				"misc_animation_keys",
+				"misc_controls_deviceorientation",
 				"misc_controls_fly",
 				"misc_controls_oculusrift",
 				"misc_controls_orbit",
@@ -303,7 +304,6 @@
 				"canvas_geometry_shapes",
 				"canvas_geometry_terrain",
 				"canvas_geometry_text",
-				"canvas_geometry2_sandbox",
 				"canvas_interactive_cubes",
 				"canvas_interactive_cubes_tween",
 				"canvas_interactive_lines",
@@ -327,6 +327,9 @@
 				"canvas_performance",
 				"canvas_sandbox"
 			],
+			"raytracing": [
+				"raytracing_sandbox"
+			],
 			"software": [
 				"software_sandbox"
 			]
@@ -342,13 +345,13 @@
 
 		var button = document.createElement( 'div' );
 		button.id = 'button';
-		button.textContent = 'View source';
+		button.textContent = '#';
 		button.addEventListener( 'click', function ( event ) {
 
 			var array = location.href.split( '/' );
 			array.pop();
 
-			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
+			window.open( array.join( '/' ) + '/' + selected + '.html' );
 
 		}, false );
 		button.style.display = 'none';

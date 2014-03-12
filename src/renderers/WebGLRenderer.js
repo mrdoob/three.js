@@ -106,7 +106,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _this = this,
 
 	_programs = [],
-	_programs_counter = 0,
 
 	// internal state cache
 
@@ -145,6 +144,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentWidth = 0,
 	_currentHeight = 0,
 
+	_newAttributes = new Uint8Array( 16 ),
 	_enabledAttributes = new Uint8Array( 16 ),
 
 	// frustum
@@ -2413,6 +2413,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferImmediate = function ( object, program, material ) {
 
+		initAttributes();
+
 		if ( object.hasPositions && ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
 		if ( object.hasNormals && ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
 		if ( object.hasUvs && ! object.__webglUvBuffer ) object.__webglUvBuffer = _gl.createBuffer();
@@ -2422,7 +2424,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.position );
+			enableAttribute( program.attributes.position );
 			_gl.vertexAttribPointer( program.attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -2475,7 +2477,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.normal );
+			enableAttribute( program.attributes.normal );
 			_gl.vertexAttribPointer( program.attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -2484,7 +2486,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUvBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.uv );
+			enableAttribute( program.attributes.uv );
 			_gl.vertexAttribPointer( program.attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
 		}
@@ -2493,10 +2495,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
-			_gl.enableVertexAttribArray( program.attributes.color );
+			enableAttribute( program.attributes.color );
 			_gl.vertexAttribPointer( program.attributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
+
+		disableUnusedAttributes();
 
 		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
@@ -2538,6 +2542,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		disableUnusedAttributes();
 		
 	}
 
@@ -2566,7 +2572,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( updateBuffers ) {
 
-			disableAttributes();
+			initAttributes();
 
 		}
 
@@ -2660,7 +2666,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_this.info.render.calls ++;
 				_this.info.render.vertices += position.array.length / 3;
-				_this.info.render.faces += position.array.length / 3 / 3;
+				_this.info.render.faces += position.array.length / 9;
 
 			}
 
@@ -2685,7 +2691,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			var mode = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
 			setLineWidth( material.linewidth );
 
@@ -2767,10 +2773,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var position = geometryAttributes[ "position" ];
 
-				_gl.drawArrays( primitives, 0, position.array.length / 3 );
+				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
 				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length;
+				_this.info.render.points += position.array.length / 3;
 
 			}
 
@@ -2801,7 +2807,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( updateBuffers ) {
 
-			disableAttributes();
+			initAttributes();
 
 		}
 
@@ -2953,6 +2959,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		disableUnusedAttributes();
+
 		// render mesh
 
 		if ( object instanceof THREE.Mesh ) {
@@ -2984,11 +2992,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			var mode = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
 			setLineWidth( material.linewidth );
 
-			_gl.drawArrays( primitives, 0, geometryGroup.__webglLineCount );
+			_gl.drawArrays( mode, 0, geometryGroup.__webglLineCount );
 
 			_this.info.render.calls ++;
 
@@ -3005,7 +3013,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function initAttributes() {
+
+		for ( var i = 0, l = _newAttributes.length; i < l; i ++ ) {
+
+			_newAttributes[ i ] = 0;
+
+		}
+
+	}
+
 	function enableAttribute( attribute ) {
+
+		_newAttributes[ attribute ] = 1;
 
 		if ( _enabledAttributes[ attribute ] === 0 ) {
 
@@ -3014,13 +3034,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	function disableAttributes() {
+	function disableUnusedAttributes() {
 
 		for ( var i = 0, l = _enabledAttributes.length; i < l; i ++ ) {
 
-			if ( _enabledAttributes[ i ] === 1 ) {
+			if ( _enabledAttributes[ i ] !== _newAttributes[ i ] ) {
 
 				_gl.disableVertexAttribArray( i );
 				_enabledAttributes[ i ] = 0;
@@ -3029,7 +3049,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	function setupMorphTargets ( material, geometryGroup, object ) {
 
@@ -3679,14 +3699,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry === undefined ) {
 
-				// TODO: Hacky...
+				// ImmediateRenderObject
 
-				object.__webglActive = true;
-				return;
-
-			}
-
-			if ( geometry.__webglInit === undefined ) {
+			} else if ( geometry.__webglInit === undefined ) {
 
 				geometry.__webglInit = true;
 				geometry.addEventListener( 'dispose', onGeometryDispose );
@@ -4068,6 +4083,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		parameters = {
 
+			precision: _precision,
+			supportsVertexTextures: _supportsVertexTextures,
+
 			map: !!material.map,
 			envMap: !!material.envMap,
 			lightMap: !!material.lightMap,
@@ -4111,7 +4129,66 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		};
 
-		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters, material.index0AttributeName );
+		// Generate code
+
+		var chunks = [];
+
+		if ( shaderID ) {
+
+			chunks.push( shaderID );
+
+		} else {
+
+			chunks.push( material.fragmentShader );
+			chunks.push( material.vertexShader );
+
+		}
+
+		for ( var d in material.defines ) {
+
+			chunks.push( d );
+			chunks.push( material.defines[ d ] );
+
+		}
+
+		for ( var p in parameters ) {
+
+			chunks.push( p );
+			chunks.push( parameters[ p ] );
+
+		}
+
+		var code = chunks.join();
+
+		var program;
+
+		// Check if code has been already compiled
+
+		for ( var p = 0, pl = _programs.length; p < pl; p ++ ) {
+
+			var programInfo = _programs[ p ];
+
+			if ( programInfo.code === code ) {
+
+				program = programInfo;
+				program.usedTimes ++;
+
+				break;
+
+			}
+
+		}
+
+		if ( program === undefined ) {
+
+			program = new THREE.WebGLProgram( this, code, material, parameters );
+			_programs.push( program );
+
+			_this.info.memory.programs = _programs.length;
+
+		}
+
+		material.program = program;
 
 		var attributes = material.program.attributes;
 
@@ -4202,10 +4279,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			p_uniforms = program.uniforms,
 			m_uniforms = material.uniforms;
 
-		if ( program !== _currentProgram ) {
+		if ( program.id !== _currentProgram ) {
 
-			_gl.useProgram( program );
-			_currentProgram = program;
+			_gl.useProgram( program.program );
+			_currentProgram = program.id;
 
 			refreshMaterial = true;
 
@@ -5338,435 +5415,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_oldBlendDst = null;
 
 		}
-
-	};
-
-	// Defines
-
-	function generateDefines ( defines ) {
-
-		var value, chunk, chunks = [];
-
-		for ( var d in defines ) {
-
-			value = defines[ d ];
-			if ( value === false ) continue;
-
-			chunk = "#define " + d + " " + value;
-			chunks.push( chunk );
-
-		}
-
-		return chunks.join( "\n" );
-
-	};
-
-	// Shaders
-
-	function buildProgram( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters, index0AttributeName ) {
-
-		var p, pl, d, program, code;
-		var chunks = [];
-
-		// Generate code
-
-		if ( shaderID ) {
-
-			chunks.push( shaderID );
-
-		} else {
-
-			chunks.push( fragmentShader );
-			chunks.push( vertexShader );
-
-		}
-
-		for ( d in defines ) {
-
-			chunks.push( d );
-			chunks.push( defines[ d ] );
-
-		}
-
-		for ( p in parameters ) {
-
-			chunks.push( p );
-			chunks.push( parameters[ p ] );
-
-		}
-
-		code = chunks.join();
-
-		// Check if code has been already compiled
-
-		for ( p = 0, pl = _programs.length; p < pl; p ++ ) {
-
-			var programInfo = _programs[ p ];
-
-			if ( programInfo.code === code ) {
-
-				// console.log( "Code already compiled." /*: \n\n" + code*/ );
-
-				programInfo.usedTimes ++;
-
-				return programInfo.program;
-
-			}
-
-		}
-
-		var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
-
-		if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
-
-			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF";
-
-		} else if ( parameters.shadowMapType === THREE.PCFSoftShadowMap ) {
-
-			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
-
-		}
-
-		// console.log( "building new program " );
-
-		//
-
-		var customDefines = generateDefines( defines );
-
-		//
-
-		program = _gl.createProgram();
-
-		var prefix_vertex = [
-
-			"precision " + _precision + " float;",
-			"precision " + _precision + " int;",
-
-			customDefines,
-
-			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
-
-			_this.gammaInput ? "#define GAMMA_INPUT" : "",
-			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-
-			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
-			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
-			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
-			"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
-
-			"#define MAX_SHADOWS " + parameters.maxShadows,
-
-			"#define MAX_BONES " + parameters.maxBones,
-
-			parameters.map ? "#define USE_MAP" : "",
-			parameters.envMap ? "#define USE_ENVMAP" : "",
-			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
-			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
-			parameters.normalMap ? "#define USE_NORMALMAP" : "",
-			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
-			parameters.vertexColors ? "#define USE_COLOR" : "",
-
-			parameters.skinning ? "#define USE_SKINNING" : "",
-			parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
-
-			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
-			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
-			parameters.wrapAround ? "#define WRAP_AROUND" : "",
-			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-			parameters.flipSided ? "#define FLIP_SIDED" : "",
-
-			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
-			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
-			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
-
-			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
-
-			"uniform mat4 modelMatrix;",
-			"uniform mat4 modelViewMatrix;",
-			"uniform mat4 projectionMatrix;",
-			"uniform mat4 viewMatrix;",
-			"uniform mat3 normalMatrix;",
-			"uniform vec3 cameraPosition;",
-
-			"attribute vec3 position;",
-			"attribute vec3 normal;",
-			"attribute vec2 uv;",
-			"attribute vec2 uv2;",
-
-			"#ifdef USE_COLOR",
-
-				"attribute vec3 color;",
-
-			"#endif",
-
-			"#ifdef USE_MORPHTARGETS",
-
-				"attribute vec3 morphTarget0;",
-				"attribute vec3 morphTarget1;",
-				"attribute vec3 morphTarget2;",
-				"attribute vec3 morphTarget3;",
-
-				"#ifdef USE_MORPHNORMALS",
-
-					"attribute vec3 morphNormal0;",
-					"attribute vec3 morphNormal1;",
-					"attribute vec3 morphNormal2;",
-					"attribute vec3 morphNormal3;",
-
-				"#else",
-
-					"attribute vec3 morphTarget4;",
-					"attribute vec3 morphTarget5;",
-					"attribute vec3 morphTarget6;",
-					"attribute vec3 morphTarget7;",
-
-				"#endif",
-
-			"#endif",
-
-			"#ifdef USE_SKINNING",
-
-				"attribute vec4 skinIndex;",
-				"attribute vec4 skinWeight;",
-
-			"#endif",
-
-			""
-
-		].join("\n");
-
-		var prefix_fragment = [
-
-			"precision " + _precision + " float;",
-			"precision " + _precision + " int;",
-
-			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
-
-			customDefines,
-
-			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
-			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
-			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
-			"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
-
-			"#define MAX_SHADOWS " + parameters.maxShadows,
-
-			parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
-
-			_this.gammaInput ? "#define GAMMA_INPUT" : "",
-			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-
-			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
-			( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
-
-			parameters.map ? "#define USE_MAP" : "",
-			parameters.envMap ? "#define USE_ENVMAP" : "",
-			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
-			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
-			parameters.normalMap ? "#define USE_NORMALMAP" : "",
-			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
-			parameters.vertexColors ? "#define USE_COLOR" : "",
-
-			parameters.metal ? "#define METAL" : "",
-			parameters.wrapAround ? "#define WRAP_AROUND" : "",
-			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-			parameters.flipSided ? "#define FLIP_SIDED" : "",
-
-			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
-			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
-			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
-
-			"uniform mat4 viewMatrix;",
-			"uniform vec3 cameraPosition;",
-			""
-
-		].join("\n");
-
-		var glVertexShader = getShader( "vertex", prefix_vertex + vertexShader );
-		var glFragmentShader = getShader( "fragment", prefix_fragment + fragmentShader );
-
-		_gl.attachShader( program, glVertexShader );
-		_gl.attachShader( program, glFragmentShader );
-
-		// Force a particular attribute to index 0.
-		// because potentially expensive emulation is done by browser if attribute 0 is disabled.
-		// And, color, for example is often automatically bound to index 0 so disabling it
-		if ( index0AttributeName !== undefined ) {
-
-			_gl.bindAttribLocation( program, 0, index0AttributeName );
-
-		}
-
-		_gl.linkProgram( program );
-
-		if ( _gl.getProgramParameter( program, _gl.LINK_STATUS ) === false ) {
-
-			console.error( 'Could not initialise shader' );
-			console.error( 'gl.VALIDATE_STATUS', _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) );
-			console.error( 'gl.getError()', _gl.getError() );
-
-		}
-
-		if ( _gl.getProgramInfoLog( program ) !== '' ) {
-
-			console.error( 'gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
-
-		}
-
-		// clean up
-
-		_gl.deleteShader( glFragmentShader );
-		_gl.deleteShader( glVertexShader );
-
-		// console.log( prefix_fragment + fragmentShader );
-		// console.log( prefix_vertex + vertexShader );
-
-		program.uniforms = {};
-		program.attributes = {};
-
-		var identifiers, u, a, i;
-
-		// cache uniform locations
-
-		identifiers = [
-
-			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'modelMatrix', 'cameraPosition',
-			'morphTargetInfluences'
-
-		];
-
-		if ( parameters.useVertexTexture ) {
-
-			identifiers.push( 'boneTexture' );
-			identifiers.push( 'boneTextureWidth' );
-			identifiers.push( 'boneTextureHeight' );
-
-		} else {
-
-			identifiers.push( 'boneGlobalMatrices' );
-
-		}
-
-		for ( u in uniforms ) {
-
-			identifiers.push( u );
-
-		}
-
-		cacheUniformLocations( program, identifiers );
-
-		// cache attributes locations
-
-		identifiers = [
-
-			"position", "normal", "uv", "uv2", "tangent", "color",
-			"skinIndex", "skinWeight", "lineDistance"
-
-		];
-
-		for ( i = 0; i < parameters.maxMorphTargets; i ++ ) {
-
-			identifiers.push( "morphTarget" + i );
-
-		}
-
-		for ( i = 0; i < parameters.maxMorphNormals; i ++ ) {
-
-			identifiers.push( "morphNormal" + i );
-
-		}
-
-		for ( a in attributes ) {
-
-			identifiers.push( a );
-
-		}
-
-		cacheAttributeLocations( program, identifiers );
-
-		program.id = _programs_counter ++;
-
-		_programs.push( { program: program, code: code, usedTimes: 1 } );
-
-		_this.info.memory.programs = _programs.length;
-
-		return program;
-
-	};
-
-	// Shader parameters cache
-
-	function cacheUniformLocations ( program, identifiers ) {
-
-		var i, l, id;
-
-		for( i = 0, l = identifiers.length; i < l; i ++ ) {
-
-			id = identifiers[ i ];
-			program.uniforms[ id ] = _gl.getUniformLocation( program, id );
-
-		}
-
-	};
-
-	function cacheAttributeLocations ( program, identifiers ) {
-
-		var i, l, id;
-
-		for( i = 0, l = identifiers.length; i < l; i ++ ) {
-
-			id = identifiers[ i ];
-			program.attributes[ id ] = _gl.getAttribLocation( program, id );
-
-		}
-
-	};
-
-	function addLineNumbers ( string ) {
-
-		var chunks = string.split( "\n" );
-
-		for ( var i = 0, il = chunks.length; i < il; i ++ ) {
-
-			// Chrome reports shader errors on lines
-			// starting counting from 1
-
-			chunks[ i ] = ( i + 1 ) + ": " + chunks[ i ];
-
-		}
-
-		return chunks.join( "\n" );
-
-	};
-
-	function getShader ( type, string ) {
-
-		var shader;
-
-		if ( type === "fragment" ) {
-
-			shader = _gl.createShader( _gl.FRAGMENT_SHADER );
-
-		} else if ( type === "vertex" ) {
-
-			shader = _gl.createShader( _gl.VERTEX_SHADER );
-
-		}
-
-		_gl.shaderSource( shader, string );
-		_gl.compileShader( shader );
-
-		if ( !_gl.getShaderParameter( shader, _gl.COMPILE_STATUS ) ) {
-
-			console.error( _gl.getShaderInfoLog( shader ) );
-			console.error( addLineNumbers( string ) );
-			return null;
-
-		}
-
-		return shader;
 
 	};
 
