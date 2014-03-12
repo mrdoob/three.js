@@ -36,10 +36,6 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	for ( var i = 0; i <= segments; i ++ ) {
 
-		indices[ offset     ] = i + 1;
-		indices[ offset + 1 ] = i + 2;
-		indices[ offset + 2 ] = 0;
-
 		var segment = thetaStart + i / segments * thetaLength;
 
 		var x = radius * Math.cos( segment );
@@ -53,16 +49,12 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 		uvs[ offset2     ] = ( x / radius + 1 ) / 2;
 		uvs[ offset2 + 1 ] = ( y / radius + 1 ) / 2;
 
+		indices[ offset     ] = i + 1;
+		indices[ offset + 1 ] = i + 2;
+		indices[ offset + 2 ] = 0;
+
 		offset += 3;
 		offset2 += 2;
-
-	}
-
-	for ( var i = 1; i <= segments; i ++ ) {
-
-		indices[ offset     ] = i;
-		indices[ offset + 1 ] = i + 1;
-		indices[ offset + 2 ] = 0;
 
 	}
 
