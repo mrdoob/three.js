@@ -146,6 +146,10 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
+				parameters.logarithmicDepthBuffer ? "#define USE_LOGDEPTHBUF" : "",
+				//_this._glExtensionFragDepth ? "#define USE_LOGDEPTHBUF_EXT" : "",
+
+
 				"uniform mat4 modelMatrix;",
 				"uniform mat4 modelViewMatrix;",
 				"uniform mat4 projectionMatrix;",
@@ -242,6 +246,9 @@ THREE.WebGLProgram = ( function () {
 				parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 				parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
+				parameters.logarithmicDepthBuffer ? "#define USE_LOGDEPTHBUF" : "",
+				//_this._glExtensionFragDepth ? "#define USE_LOGDEPTHBUF_EXT" : "",
+
 				"uniform mat4 viewMatrix;",
 				"uniform vec3 cameraPosition;",
 				""
@@ -307,6 +314,13 @@ THREE.WebGLProgram = ( function () {
 			identifiers.push( 'boneGlobalMatrices' );
 
 		}
+
+		if ( parameters.logarithmicDepthBuffer ) {
+
+			identifiers.push('logDepthBufFC');
+
+		}
+
 
 		for ( var u in uniforms ) {
 
