@@ -35,7 +35,15 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_FOG",
 
-		"	float depth = gl_FragCoord.z / gl_FragCoord.w;",
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+
+		"	#else",
+
+		"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+
+		"	#endif",
 
 		"	#ifdef FOG_EXP2",
 
@@ -1656,7 +1664,76 @@ THREE.ShaderChunk = {
 
 		"#endif"
 
-	].join("\n")
+	].join("\n"),
 
+	// LOGARITHMIC DEPTH BUFFER
+	// http://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html
+
+	// WebGL doesn't support gl_FragDepth out of the box, unless the EXT_frag_depth extension is available.  On platforms
+	// without EXT_frag_depth, we have to fall back on linear z-buffer in the fragment shader, which means that some long 
+	// faces close to the camera may have issues.	This can be worked around by tesselating the model more finely when
+	// the camera is near the surface.
+
+	logdepthbuf_pars_vertex: [
+
+		"#ifdef USE_LOGDEPTHBUF",
+
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		varying float vFragDepth;",
+
+		"	#endif",
+
+		"	uniform float logDepthBufFC;",
+
+		"#endif",
+
+	].join('\n'),
+
+	logdepthbuf_vertex: [
+
+		"#ifdef USE_LOGDEPTHBUF",
+
+		"	gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC;",
+
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		vFragDepth = 1.0 + gl_Position.w;",
+
+		"#else",
+
+		"		gl_Position.z = (gl_Position.z - 1.0) * gl_Position.w;",
+
+		"	#endif",
+
+		"#endif"
+
+	].join("\n"),
+
+	logdepthbuf_pars_fragment: [
+
+		"#ifdef USE_LOGDEPTHBUF",
+
+		"	uniform float logDepthBufFC;",
+
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		#extension GL_EXT_frag_depth : enable",
+		"		varying float vFragDepth;",
+
+		"	#endif",
+
+		"#endif"
+
+	].join('\n'),
+
+	logdepthbuf_fragment: [
+		"#if defined(USE_LOGDEPTHBUF) && defined(USE_LOGDEPTHBUF_EXT)",
+
+		"	gl_FragDepthEXT = log2(vFragDepth) * logDepthBufFC * 0.5;",
+
+		"#endif"
+
+	].join("\n")
 
 };

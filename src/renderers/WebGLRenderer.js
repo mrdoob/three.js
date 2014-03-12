@@ -24,6 +24,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+	_logarithmicDepthBuffer = parameters.logarithmicDepthBuffer !== undefined ? parameters.logarithmicDepthBuffer : false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -184,6 +185,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionTextureFilterAnisotropic;
 	var _glExtensionCompressedTextureS3TC;
 	var _glExtensionElementIndexUint;
+	var _glExtensionFragDepth;
 	
 
 	initGL();
@@ -4100,6 +4102,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			fogExp: fog instanceof THREE.FogExp2,
 
 			sizeAttenuation: material.sizeAttenuation,
+			logarithmicDepthBuffer: _logarithmicDepthBuffer,
 
 			skinning: material.skinning,
 			maxBones: maxBones,
@@ -4298,6 +4301,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( refreshMaterial || camera !== _currentCamera ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
+
+			if ( _logarithmicDepthBuffer ) {
+
+				_gl.uniform1f(p_uniforms.logDepthBufFC, 2.0 / (Math.log(camera.far + 1.0) / Math.LN2));
+
+			}
+
 
 			if ( camera !== _currentCamera ) _currentCamera = camera;
 
@@ -6133,6 +6143,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 				};
 
 			}
+		}
+
+		if ( _logarithmicDepthBuffer ) {
+
+			_glExtensionFragDepth = _gl.getExtension( 'EXT_frag_depth' );
+
 		}
 
 	};
