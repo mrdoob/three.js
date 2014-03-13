@@ -20,6 +20,10 @@ THREE.ImageUtils = {
 
 			if ( onLoad ) onLoad( texture );
 
+		}, undefined, function ( event ) {
+
+			if ( onError ) onError( event );
+
 		} );
 
 		texture.image = image;
