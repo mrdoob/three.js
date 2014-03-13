@@ -5,8 +5,6 @@
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
-	THREE.BufferGeometry.call( this );
-
 	this.parameters = {
 		width: width,
 		height: height,
@@ -83,11 +81,8 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	}
 
-	this.attributes[ 'index' ] = { array: indices, itemSize: 1 };
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
 };
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );

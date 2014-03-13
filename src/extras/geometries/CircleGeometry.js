@@ -5,8 +5,6 @@
 
 THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
-	THREE.BufferGeometry.call( this );
-
 	this.parameters = {
 		radius: radius,
 		segments: segments,
@@ -58,13 +56,10 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	}
 
-	this.attributes[ 'index' ] = { array: indices, itemSize: 1 };
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 
-THREE.CircleGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.CircleGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
