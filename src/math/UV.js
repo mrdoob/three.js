@@ -4,7 +4,7 @@
 
 THREE.UV = function ( u, v ) {
 
-	console.warn( 'THREE.UV has been DEPRECATED. Use THREE.Vector2 instead.')
-	return new THREE.Vector2( u, v );
+	//using texel coordinates
+	return new THREE.Vector2( u, 1 - v );
 
 };
