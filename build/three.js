@@ -10669,6 +10669,37 @@ THREE.GeometryIdCount = 0;
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Geometry2 = function ( vertices, normals, uvs ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
+	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
+	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };	
+
+};
+
+THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.IndexedGeometry2 = function ( indices, vertices, normals, uvs ) {
+
+	THREE.BufferGeometry.call( this );
+
+	this.attributes[ 'index' ] = { array: indices, itemSize: 1 };
+	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
+	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
+	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };	
+
+};
+
+THREE.IndexedGeometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+/**
+ * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author WestLangley / http://github.com/WestLangley
 */
@@ -32692,8 +32723,6 @@ THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
-	THREE.BufferGeometry.call( this );
-
 	this.parameters = {
 		radius: radius,
 		segments: segments,
@@ -32745,16 +32774,13 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	}
 
-	this.attributes[ 'index' ] = { array: indices, itemSize: 1 };
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 
-THREE.CircleGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.CircleGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
 // DEPRECATED
 
@@ -33874,8 +33900,6 @@ THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
-	THREE.BufferGeometry.call( this );
-
 	this.parameters = {
 		width: width,
 		height: height,
@@ -33952,14 +33976,11 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	}
 
-	this.attributes[ 'index' ] = { array: indices, itemSize: 1 };
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
 };
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
 /**
  * @author Kaleb Murphy
