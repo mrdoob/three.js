@@ -8,7 +8,7 @@
 		<style>
 			body {
 				font-family: Monospace;
-				background-color: #000;
+				background-color: #222;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -45,6 +45,7 @@
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0x222222 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
