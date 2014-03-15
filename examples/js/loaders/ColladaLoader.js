@@ -1044,7 +1044,12 @@ THREE.ColladaLoader = function () {
 
 				}
 
-				node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
+				// N.B.: TP says this is not a great default behavior. It's a nice
+				// optimization to flatten the hierarchy but this should be done
+				// only if requested by the user via a flag. For now I undid it
+				// and fixed the character animation example that uses it
+				// node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
+				obj.add(mesh);
 
 			}
 
