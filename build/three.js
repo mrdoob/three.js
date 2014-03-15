@@ -2909,16 +2909,16 @@ THREE.Vector4.prototype = {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.TypedVector2 = function ( array, offset ) {
+THREE.ProxyVector2 = function ( array, offset ) {
 
 	this.array = array;
 	this.offset = offset;
 	
 };
 
-THREE.TypedVector2.prototype = Object.create( THREE.Vector2.prototype );
+THREE.ProxyVector2.prototype = Object.create( THREE.Vector2.prototype );
 
-Object.defineProperties( THREE.TypedVector2.prototype, {
+Object.defineProperties( THREE.ProxyVector2.prototype, {
 	'x': {
 		get: function () { return this.array[ this.offset ]; },
 		set: function ( v ) { this.array[ this.offset ] = v; }
@@ -2932,16 +2932,16 @@ Object.defineProperties( THREE.TypedVector2.prototype, {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.TypedVector3 = function ( array, offset ) {
+THREE.ProxyVector3 = function ( array, offset ) {
 	
 	this.array = array;
 	this.offset = offset;
 
 };
 
-THREE.TypedVector3.prototype = Object.create( THREE.Vector3.prototype );
+THREE.ProxyVector3.prototype = Object.create( THREE.Vector3.prototype );
 
-Object.defineProperties( THREE.TypedVector3.prototype, {
+Object.defineProperties( THREE.ProxyVector3.prototype, {
 	'x': {
 		get: function () { return this.array[ this.offset ]; },
 		set: function ( v ) { this.array[ this.offset ] = v; }
@@ -9995,9 +9995,9 @@ THREE.BufferGeometryManipulator = function ( bufferGeometry ) {
 
 	for ( var i = 0; i < length; i ++ ) {
 
-		this.vertices.push( new THREE.TypedVector3( attributes.position.array, i * 3 ) );
-		this.normals.push( new THREE.TypedVector3( attributes.normal.array, i * 3 ) );
-		this.uvs.push( new THREE.TypedVector2( attributes.uv.array, i * 2 ) );
+		this.vertices.push( new THREE.ProxyVector3( attributes.position.array, i * 3 ) );
+		this.normals.push( new THREE.ProxyVector3( attributes.normal.array, i * 3 ) );
+		this.uvs.push( new THREE.ProxyVector2( attributes.uv.array, i * 2 ) );
 
 	}
 
