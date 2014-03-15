@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometryB = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -90,4 +90,4 @@ THREE.PlaneGeometryB = function ( width, height, widthSegments, heightSegments )
 
 };
 
-THREE.PlaneGeometryB.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );

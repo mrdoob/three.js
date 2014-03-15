@@ -13,9 +13,9 @@ THREE.BufferGeometryManipulator = function ( bufferGeometry ) {
 
 	for ( var i = 0; i < length; i ++ ) {
 
-		this.vertices.push( new THREE.TypedVector3( attributes.position.array, i * 3 ) );
-		this.normals.push( new THREE.TypedVector3( attributes.normal.array, i * 3 ) );
-		this.uvs.push( new THREE.TypedVector2( attributes.uv.array, i * 2 ) );
+		this.vertices.push( new THREE.ProxyVector3( attributes.position.array, i * 3 ) );
+		this.normals.push( new THREE.ProxyVector3( attributes.normal.array, i * 3 ) );
+		this.uvs.push( new THREE.ProxyVector2( attributes.uv.array, i * 2 ) );
 
 	}
 

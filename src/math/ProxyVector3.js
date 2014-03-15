@@ -2,16 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.TypedVector3 = function ( array, offset ) {
+THREE.ProxyVector3 = function ( array, offset ) {
 	
 	this.array = array;
 	this.offset = offset;
 
 };
 
-THREE.TypedVector3.prototype = Object.create( THREE.Vector3.prototype );
+THREE.ProxyVector3.prototype = Object.create( THREE.Vector3.prototype );
 
-Object.defineProperties( THREE.TypedVector3.prototype, {
+Object.defineProperties( THREE.ProxyVector3.prototype, {
 	'x': {
 		get: function () { return this.array[ this.offset ]; },
 		set: function ( v ) { this.array[ this.offset ] = v; }
