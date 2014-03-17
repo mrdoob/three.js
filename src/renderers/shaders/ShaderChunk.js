@@ -35,7 +35,15 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_FOG",
 
-		"	float depth = gl_FragCoord.z / gl_FragCoord.w;",
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+
+		"	#else",
+
+		"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+
+		"	#endif",
 
 		"	#ifdef FOG_EXP2",
 
@@ -91,13 +99,18 @@ THREE.ShaderChunk = {
 
 		"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
+				// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
+				// "Transforming Normal Vectors with the Inverse Transformation"
+
+		"		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );",
+
 		"		if ( useRefract ) {",
 
-		"			reflectVec = refract( cameraToVertex, normal, refractionRatio );",
+		"			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );",
 
 		"		} else { ",
 
-		"			reflectVec = reflect( cameraToVertex, normal );",
+		"			reflectVec = reflect( cameraToVertex, worldNormal );",
 
 		"		}",
 
@@ -700,7 +713,7 @@ THREE.ShaderChunk = {
 
 	lights_phong_pars_vertex: [
 
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
 
 		"	varying vec3 vWorldPosition;",
 
@@ -711,7 +724,7 @@ THREE.ShaderChunk = {
 
 	lights_phong_vertex: [
 
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
 
 		"	vWorldPosition = worldPosition.xyz;",
 
@@ -759,7 +772,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
 
 		"	varying vec3 vWorldPosition;",
 
@@ -1300,6 +1313,8 @@ THREE.ShaderChunk = {
 
 		"	mat4 skinMatrix = skinWeight.x * boneMatX;",
 		"	skinMatrix 	+= skinWeight.y * boneMatY;",
+		"	skinMatrix 	+= skinWeight.z * boneMatZ;",
+		"	skinMatrix 	+= skinWeight.w * boneMatW;",
 
 		"	#ifdef USE_MORPHNORMALS",
 
@@ -1649,7 +1664,76 @@ THREE.ShaderChunk = {
 
 		"#endif"
 
-	].join("\n")
+	].join("\n"),
 
+	// LOGARITHMIC DEPTH BUFFER
+	// http://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html
+
+	// WebGL doesn't support gl_FragDepth out of the box, unless the EXT_frag_depth extension is available.  On platforms
+	// without EXT_frag_depth, we have to fall back on linear z-buffer in the fragment shader, which means that some long 
+	// faces close to the camera may have issues.	This can be worked around by tesselating the model more finely when
+	// the camera is near the surface.
+
+	logdepthbuf_pars_vertex: [
+
+		"#ifdef USE_LOGDEPTHBUF",
+
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		varying float vFragDepth;",
+
+		"	#endif",
+
+		"	uniform float logDepthBufFC;",
+
+		"#endif",
+
+	].join('\n'),
+
+	logdepthbuf_vertex: [
+
+		"#ifdef USE_LOGDEPTHBUF",
+
+		"	gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC;",
+
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		vFragDepth = 1.0 + gl_Position.w;",
+
+		"#else",
+
+		"		gl_Position.z = (gl_Position.z - 1.0) * gl_Position.w;",
+
+		"	#endif",
+
+		"#endif"
+
+	].join("\n"),
+
+	logdepthbuf_pars_fragment: [
+
+		"#ifdef USE_LOGDEPTHBUF",
+
+		"	uniform float logDepthBufFC;",
+
+		"	#ifdef USE_LOGDEPTHBUF_EXT",
+
+		"		#extension GL_EXT_frag_depth : enable",
+		"		varying float vFragDepth;",
+
+		"	#endif",
+
+		"#endif"
+
+	].join('\n'),
+
+	logdepthbuf_fragment: [
+		"#if defined(USE_LOGDEPTHBUF) && defined(USE_LOGDEPTHBUF_EXT)",
+
+		"	gl_FragDepthEXT = log2(vFragDepth) * logDepthBufFC * 0.5;",
+
+		"#endif"
+
+	].join("\n")
 
 };

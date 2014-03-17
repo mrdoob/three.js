@@ -313,7 +313,6 @@ Sidebar.Material = function ( editor ) {
 
 		if ( object instanceof THREE.Sprite ) objectHasUvs = true;
 		if ( geometry instanceof THREE.Geometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
-		if ( geometry instanceof THREE.Geometry2 && geometry.uvs.length > 0 ) objectHasUvs = true;
 		if ( geometry instanceof THREE.BufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
 		if ( material ) {

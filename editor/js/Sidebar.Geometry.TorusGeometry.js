@@ -7,7 +7,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 	// radius
 
 	var radiusRow = new UI.Panel();
-	var radius = new UI.Number( geometry.radius ).onChange( update );
+	var radius = new UI.Number( geometry.parameters.radius ).onChange( update );
 
 	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
 	radiusRow.add( radius );
@@ -17,7 +17,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 	// tube
 
 	var tubeRow = new UI.Panel();
-	var tube = new UI.Number( geometry.tube ).onChange( update );
+	var tube = new UI.Number( geometry.parameters.tube ).onChange( update );
 
 	tubeRow.add( new UI.Text( 'Tube' ).setWidth( '90px' ) );
 	tubeRow.add( tube );
@@ -27,7 +27,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 	// radialSegments
 
 	var radialSegmentsRow = new UI.Panel();
-	var radialSegments = new UI.Integer( geometry.radialSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegments = new UI.Integer( geometry.parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -37,7 +37,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 	// tubularSegments
 
 	var tubularSegmentsRow = new UI.Panel();
-	var tubularSegments = new UI.Integer( geometry.tubularSegments ).setRange( 1, Infinity ).onChange( update );
+	var tubularSegments = new UI.Integer( geometry.parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
 	tubularSegmentsRow.add( new UI.Text( 'Tubular segments' ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
@@ -47,7 +47,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 	// arc
 
 	var arcRow = new UI.Panel();
-	var arc = new UI.Number( geometry.arc ).onChange( update );
+	var arc = new UI.Number( geometry.parameters.arc ).onChange( update );
 
 	arcRow.add( new UI.Text( 'Arc' ).setWidth( '90px' ) );
 	arcRow.add( arc );

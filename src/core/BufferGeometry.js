@@ -10,7 +10,8 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 
 	this.attributes = {};
-	this.offsets = [];
+	this.drawcalls = [];
+	this.offsets = this.drawcalls; // backwards compatibility
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -21,15 +22,19 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, array, itemSize, count ) {
+	addAttribute: function ( name, attribute ) {
 
-		this.attributes[ name ] = {
+		if ( attribute instanceof THREE.BufferAttribute === false ) {
 
-			array: array,
-			itemSize: itemSize,
-			count: count !== undefined ? count : array.length
+			console.warn( 'DEPRECATED: BufferGeometry\'s addAttribute() now expects ( name, attribute ).' );
 
-		};
+			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+
+			return;
+
+		}
+
+		this.attributes[ name ] = attribute;
 
 	},
 
@@ -41,7 +46,7 @@ THREE.BufferGeometry.prototype = {
 
 	addDrawCall: function ( start, count, indexOffset ) {
 
-		this.offsets.push( {
+		this.drawcalls.push( {
 
 			start: start,
 			count: count,
@@ -192,6 +197,12 @@ THREE.BufferGeometry.prototype = {
 		}
 
 	}(),
+
+	computeFaceNormals: function () {
+
+		// backwards compatibility
+
+	},
 
 	computeVertexNormals: function () {
 

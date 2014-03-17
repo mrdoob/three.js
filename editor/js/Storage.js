@@ -61,7 +61,7 @@ var Storage = function () {
 			var request = objectStore.put( data, 0 );
 			request.onsuccess = function ( event ) {
 
-				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to IndexedDB in ' + ( performance.now() - start ).toFixed( 2 ) + 'ms.' );
+				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
 
 			};
 

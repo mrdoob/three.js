@@ -316,9 +316,25 @@ var Loader = function ( editor ) {
 			var result = loader.parse( data );
 
 			var geometry = result.geometry;
-			var material = result.materials !== undefined
-						? new THREE.MeshFaceMaterial( result.materials )
-						: new THREE.MeshPhongMaterial();
+			var material;
+
+			if ( result.materials !== undefined ) {
+
+				if ( result.materials.length > 1 ) {
+
+					material = new THREE.MeshFaceMaterial( result.materials );
+
+				} else {
+
+					material = result.materials[ 0 ];
+
+				}
+
+			} else {
+
+				material = new THREE.MeshPhongMaterial();
+
+			}
 
 			geometry.sourceType = "ascii";
 			geometry.sourceFile = file.name;

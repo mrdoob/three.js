@@ -57,7 +57,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 				for ( var i = 0; i < jsonObject.materials.length; i ++ ) {
 
-					materials[ i ] = THREE.Loader.prototype.createMaterial( jsonObject.materials[ i ], basePath );
+					materials[ i ] = scope.createMaterial( jsonObject.materials[ i ], basePath );
 
 				}
 

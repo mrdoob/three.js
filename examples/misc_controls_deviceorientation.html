@@ -43,77 +43,59 @@
 			(function() {
 				  "use strict"
 
-				  var hasWebGL = (function() {
-					    try {
-						      var canvas = document.createElement( 'canvas' );
-						      return !! window.WebGLRenderingContext && ( canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' ) );
-					    } catch( e ) {
-						      return false;
-					    }
-				  })();
-
 				  window.addEventListener('load', function() {
 
-					    var container, camera, scene, renderer, controls, geometry, mesh;
+						var container, camera, scene, renderer, controls, geometry, mesh;
 
-					    var animate = function(){
+						var animate = function(){
+
+							window.requestAnimationFrame( animate );
+
 							controls.update();
-						        renderer.render(scene, camera);
+							renderer.render(scene, camera);
 
-							window.requestAnimationFrame(animate);
-					    };
+						};
 
-					    container = document.getElementById( 'container' );
+						container = document.getElementById( 'container' );
 
-					    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+						camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
 
-					    controls = new THREE.DeviceOrientationControls( camera );
+						controls = new THREE.DeviceOrientationControls( camera );
 
-					    scene = new THREE.Scene();
+						scene = new THREE.Scene();
 
-					    var geometry = new THREE.SphereGeometry( 500, 60, 40 );
-					    geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
+						var geometry = new THREE.SphereGeometry( 500, 16, 8 );
+						geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
-					    var material = new THREE.MeshBasicMaterial( {
-						        map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
-					    } );
+						var material = new THREE.MeshBasicMaterial( {
+								map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
+						} );
 
-					    var mesh = new THREE.Mesh( geometry, material );
-					    mesh.rotation.x = 90;
+						var mesh = new THREE.Mesh( geometry, material );
+						scene.add( mesh );
 
-					    scene.add(mesh);
+						var geometry = new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 );
+						var material = new THREE.MeshBasicMaterial( { color: 0xff00ff, side: THREE.BackSide, wireframe: true } );
+						var mesh = new THREE.Mesh( geometry, material );
+						scene.add( mesh );
 
-					    renderer = hasWebGL ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
-					    renderer.setSize(window.innerWidth, window.innerHeight);
-					    renderer.domElement.style.position = 'absolute';
-					    renderer.domElement.style.top = 0;
-					    container.appendChild(renderer.domElement);
+						renderer = new THREE.WebGLRenderer();
+						renderer.setSize(window.innerWidth, window.innerHeight);
+						renderer.domElement.style.position = 'absolute';
+						renderer.domElement.style.top = 0;
+						container.appendChild(renderer.domElement);
 
-					    var resizeWindow = function() {
-						        camera.aspect = window.innerWidth / window.innerHeight;
-						        camera.updateProjectionMatrix();
-						        renderer.setSize( window.innerWidth, window.innerHeight );
-					    };
+						window.addEventListener('resize', function() {
 
-					    var setScreenOrientation = function() {
-						        window.setTimeout(function() {
-						          renderer.domElement.style['MozTransform'] =
-						            renderer.domElement.style['MsTransform'] =
-						              renderer.domElement.style['WebkitTransform'] =
-						                renderer.domElement.style['OTransform'] =
-						                  renderer.domElement.style['Transform'] =
-						                    "rotate(" + ( -window.orientation || 0 ) + "deg)";
-						        }, 200);
-					    };
+							camera.aspect = window.innerWidth / window.innerHeight;
+							camera.updateProjectionMatrix();
+							renderer.setSize( window.innerWidth, window.innerHeight );
 
-					    window.addEventListener('resize', resizeWindow, false);
-					    window.addEventListener('orientationchange', setScreenOrientation, false);
+						}, false);
 
-					    setScreenOrientation();
+						controls.connect();
 
-					    controls.connect();
-
-					    animate();
+						animate();
 
 				  }, false);
 

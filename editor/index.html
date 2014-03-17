@@ -175,8 +175,9 @@
 						event.preventDefault();
 						break;
 					case 46: // delete
+						var parent = editor.selected.parent;
 						editor.removeObject( editor.selected );
-						editor.deselect();
+						editor.select( parent );
 						break;
 
 				}

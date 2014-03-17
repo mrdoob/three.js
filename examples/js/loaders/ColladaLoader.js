@@ -1,5 +1,6 @@
 /**
  * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
+ * @author Tony Parisi / http://www.tonyparisi.com/ 
  */
 
 THREE.ColladaLoader = function () {
@@ -1043,7 +1044,12 @@ THREE.ColladaLoader = function () {
 
 				}
 
-				node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
+				// N.B.: TP says this is not a great default behavior. It's a nice
+				// optimization to flatten the hierarchy but this should be done
+				// only if requested by the user via a flag. For now I undid it
+				// and fixed the character animation example that uses it
+				// node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
+				obj.add(mesh);
 
 			}
 
@@ -1054,13 +1060,15 @@ THREE.ColladaLoader = function () {
 			var instance_camera = node.cameras[i];
 			var cparams = cameras[instance_camera.url];
 
-			obj = new THREE.PerspectiveCamera(cparams.fov, parseFloat(cparams.aspect_ratio), 
+			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio), 
 					parseFloat(cparams.znear), parseFloat(cparams.zfar));
 
+			obj.add(cam);
 		}
 
 		for ( i = 0; i < node.lights.length; i ++ ) {
 
+			var light = null;
 			var instance_light = node.lights[i];
 			var lparams = lights[instance_light.url];
 
@@ -1076,28 +1084,33 @@ THREE.ColladaLoader = function () {
 
 					case 'directional':
 
-						obj = new THREE.DirectionalLight( color, intensity, distance );
+						light = new THREE.DirectionalLight( color, intensity, distance );
+						light.position.set(0, 0, 1);
 						break;
 
 					case 'point':
 
-						obj = new THREE.PointLight( color, intensity, distance );
+						light = new THREE.PointLight( color, intensity, distance );
 						break;
 
 					case 'spot':
 
-						obj = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						light.position.set(0, 0, 1);
 						break;
 
 					case 'ambient':
 
-						obj = new THREE.AmbientLight( color );
+						light = new THREE.AmbientLight( color );
 						break;
 
 				}
 
 			}
 
+			if (light) {
+				obj.add(light);
+			}
 		}
 
 		obj.name = node.name || node.id || "";

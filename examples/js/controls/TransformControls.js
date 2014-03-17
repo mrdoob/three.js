@@ -151,7 +151,7 @@
 			this.traverse(function ( child ) {
 				if (child instanceof THREE.Mesh) {			
 					var tempGeometry = new THREE.Geometry();
-					THREE.GeometryUtils.merge( tempGeometry, child );
+					// THREE.GeometryUtils.merge( tempGeometry, child );
 					child.geometry = tempGeometry;
 					child.position.set( 0, 0, 0 );
 					child.rotation.set( 0, 0, 0 );
@@ -215,7 +215,7 @@
 		var arrowGeometry = new THREE.Geometry();
 		var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );
 		mesh.position.y = 0.5;
-		THREE.GeometryUtils.merge( arrowGeometry, mesh );
+		// THREE.GeometryUtils.merge( arrowGeometry, mesh );
 		
 		var lineXGeometry = new THREE.Geometry();
 		lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
@@ -449,7 +449,7 @@
 		var arrowGeometry = new THREE.Geometry();
 		var mesh = new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ) );
 		mesh.position.y = 0.5;
-		THREE.GeometryUtils.merge( arrowGeometry, mesh );
+		// THREE.GeometryUtils.merge( arrowGeometry, mesh );
 
 		var lineXGeometry = new THREE.Geometry();
 		lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );

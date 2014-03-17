@@ -15,7 +15,6 @@ Menubar.File = function ( editor ) {
 		var output = exporter.parse( object.geometry );
 
 		if ( exporter instanceof THREE.BufferGeometryExporter ||
-			 exporter instanceof THREE.Geometry2Exporter ||
 		     exporter instanceof THREE.GeometryExporter ) {
 
 			output = JSON.stringify( output, null, '\t' );
@@ -53,7 +52,7 @@ Menubar.File = function ( editor ) {
 
 		var output = exporter.parse( editor.scene );
 
-		if ( exporterClass instanceof THREE.ObjectExporter ) {
+		if ( exporter instanceof THREE.ObjectExporter ) {
 
 			output = JSON.stringify( output, null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
@@ -120,10 +119,6 @@ Menubar.File = function ( editor ) {
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			exportGeometry( THREE.BufferGeometryExporter );
-
-		} else if ( geometry instanceof THREE.Geometry2 ) {
-
-			exportGeometry( THREE.Geometry2Exporter );
 
 		} else if ( geometry instanceof THREE.Geometry ) {
 
