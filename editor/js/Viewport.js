@@ -16,8 +16,7 @@ var Viewport = function ( editor ) {
 
 	var scene        = editor.getScene();
 	var helpersScene = editor.getHelpersScene();
-
-	var objects = [];
+	var objects      = [];
 
 	// helpers
 
@@ -113,6 +112,7 @@ var Viewport = function ( editor ) {
 	};
 
 	var onMouseUp = function ( event ) {
+		var objects = getSceneObjects();
 
 		var rect = container.dom.getBoundingClientRect();
 		x = (event.clientX - rect.left) / rect.width;
@@ -154,8 +154,8 @@ var Viewport = function ( editor ) {
 	};
 
 	var onDoubleClick = function ( event ) {
-
-		var intersects     = getIntersects( event, objects ),
+		var objects        = getSceneObjects(),
+			intersects     = getIntersects( event, objects ),
 			selectedObject = editor.getSelectedObject();
 
 		if ( intersects.length > 0 && intersects[ 0 ].object === selectedObject ) {
@@ -276,22 +276,25 @@ var Viewport = function ( editor ) {
 		selectionBox.visible = false;
 		transformControls.detach();
 
-		if ( object !== null ) {
+		if(object !== null) {
 
-			if ( object.geometry !== undefined &&
-				 object instanceof THREE.Sprite === false ) {
+			if ( object !== null ) {
 
-				selectionBox.update( object );
-				selectionBox.visible = true;
+				if ( object.geometry !== undefined &&
+					 object instanceof THREE.Sprite === false ) {
+
+					selectionBox.update( object );
+					selectionBox.visible = true;
+
+				}
+
+				if ( object instanceof THREE.PerspectiveCamera === false ) {
+
+					transformControls.attach( object );
+
+				}
 
 			}
-
-			if ( object instanceof THREE.PerspectiveCamera === false ) {
-
-				transformControls.attach( object );
-
-			}
-
 		}
 
 		render();
@@ -299,8 +302,8 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.objectAdded.add( function ( object ) {
-
-		var materialsNeedUpdate = false;
+		var objects             = getSceneObjects(),
+			materialsNeedUpdate = false;
 
 		object.traverse( function ( child ) {
 
@@ -323,13 +326,13 @@ var Viewport = function ( editor ) {
 
 			if ( object.geometry !== undefined ) {
 
-				selectionBox.update( object );
+				// selectionBox.update( object );
 
 			}
 
 			if ( helpers !== undefined ) {
 
-				helpers[ object.id ].update();
+				// helpers[ object.id ].update();
 
 			}
 
@@ -342,8 +345,8 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.objectRemoved.add( function ( object ) {
-
-		var materialsNeedUpdate = false;
+		var objects             = getSceneObjects(),
+			materialsNeedUpdate = false;
 
 		object.traverse( function ( child ) {
 
@@ -359,13 +362,13 @@ var Viewport = function ( editor ) {
 
 	signals.helperAdded.add( function ( object ) {
 
-		objects.push( object.getObjectByName( 'picker' ) );
+		// objects.push( object.getObjectByName( 'picker' ) );
 
 	} );
 
 	signals.helperRemoved.add( function ( object ) {
 
-		objects.splice( objects.indexOf( object.getObjectByName( 'picker' ) ), 1 );
+		// objects.splice( objects.indexOf( object.getObjectByName( 'picker' ) ), 1 );
 
 	} );
 
@@ -574,19 +577,24 @@ var Viewport = function ( editor ) {
 
 	function render() {
 
-		// if(scene !== undefined) {
+		if(scene !== undefined) {
 			helpersScene.updateMatrixWorld();
 			scene.updateMatrixWorld();
+		}
 
 		renderer.clear();
 		renderer.render( scene, camera );
 
 		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			renderer.render( sceneHelpers, camera );
+			renderer.render( helpersScene, camera );
 
 		}
 
+	}
+
+	function getSceneObjects() {
+		return scene.children;
 	}
 
 	return container;

@@ -67,6 +67,19 @@ var Editor = function () {
 	// this.helpers = {};
 
 	this.history = new Editor.ChangeHistory(this);
+
+	// this creates the root history transaction.
+	// this update is important when the last 
+	// scene element leaves the scene, in order
+	// to display the scene as 'empty'.
+    var emptySceneTransaction = (function (scope) {
+	    return function emptySceneTransaction() {
+	        scope.signals.sceneGraphChanged.dispatch();
+	        scope.select(null);
+	    };
+	})(this);
+    this.history.addAndApplyChange(emptySceneTransaction);
+
 	window.hist = this.history;
 
 };
@@ -102,6 +115,7 @@ Editor.prototype = {
 		// }
 		
 		this.data.scene = scene;
+		window.sceneGraphChanged = this.signals.sceneGraphChanged;
 
 		if(silent === false) {
 			this.signals.sceneGraphChanged.active = true;
@@ -175,7 +189,7 @@ Editor.prototype = {
 
 		scope.getScene().add( addedObject );
 
-		scope.signals.objectAdded.dispatch( addedObject );
+		// scope.signals.objectAdded.dispatch( addedObject );
 		scope.signals.sceneGraphChanged.dispatch();
 	},
 
