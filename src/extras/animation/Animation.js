@@ -160,7 +160,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 			// START_VEROLD_MOD - keyframes
 			// is there key data?
 
-			if ( !prevKey || !nextKey ) {
+			if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
 
 				continue;
 
