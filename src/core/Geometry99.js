@@ -55,7 +55,38 @@ THREE.Geometry99.prototype.createFaceProxies = function() {
 
 	if ( this.attributes.index ) {
 
-		this.populateProxyFromBuffer(this.faces, "index", THREE.TypedFace3, 3);
+		var indexarray = this.attributes[ 'index' ].array;
+		var size = 3;
+		var attr = this.faces;
+
+		var normalarray = false;
+		if (this.attributes[ 'normal' ]) {
+			normalarray = this.attributes[ 'normal' ].array;
+		}
+
+		for ( var i = 0, l = indexarray.length / size; i < l; i ++ ) {
+
+			var o = i * size;
+
+			// Generate faceVertexNormals
+			var vertexNormals;
+			if (normalarray) {
+
+				vertexNormals = [
+					new THREE.TypedVector3(normalarray, indexarray[o] * 3),
+					new THREE.TypedVector3(normalarray, indexarray[o+1] * 3),
+					new THREE.TypedVector3(normalarray, indexarray[o+2] * 3),
+				]
+
+			}
+
+			// TODO - do BufferGeometries support face normals?
+
+			var face = new THREE.TypedFace3( indexarray, i * size, vertexNormals );
+
+			attr.push(face);
+
+		}
 
 	} else {
 
@@ -117,10 +148,11 @@ THREE.Geometry99.prototype.populateProxyFromBuffer = function(attr, buffername, 
 
 }
 
-THREE.TypedFace3 = function ( array, offset ) {
+THREE.TypedFace3 = function ( array, offset, vertexNormals ) {
 
 	this.array = array;
 	this.offset = offset;
+	this.vertexNormals = vertexNormals;
 
 	//THREE.Face3.call( this, array[offset], array[offset+1], array[offset+2] /*, normal, color, materialIndex */);
 
