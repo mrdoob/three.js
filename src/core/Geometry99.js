@@ -21,12 +21,12 @@ Object.defineProperties(THREE.Geometry99.prototype, {
 		get: function() { return this.createUvProxies() } 
 	},
 	// TODO - fill in additional proxies:
-  // - colors
-  // - morphColors
-  // - morphNormals
-  // - morphTargets
-  // - skinIndex
-  // - skinWeights
+	// - colors
+	// - morphColors
+	// - morphNormals
+	// - morphTargets
+	// - skinIndex
+	// - skinWeights
 });
 
 THREE.Geometry99.prototype.createVertexProxies = function() {
