@@ -34,6 +34,7 @@
 	"src/core/BufferGeometryManipulator.js",
 	"src/core/Geometry.js",
 	"src/core/Geometry2.js",
+	"src/core/Geometry99.js",
 	"src/core/IndexedGeometry2.js",
 	"src/cameras/Camera.js",
 	"src/cameras/OrthographicCamera.js",
