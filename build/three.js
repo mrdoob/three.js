@@ -870,19 +870,41 @@ THREE.Quaternion.prototype = {
 
 	setFromUnitVectors: function () {
 
-		// http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
+		// http://lolengine.net/blog/2014/02/24/quaternion-from-two-vectors-final
 
 		// assumes direction vectors vFrom and vTo are normalized
 
-		var v1;
+		var v1, r;
+
+		var EPS = 0.000001;
 
 		return function( vFrom, vTo ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
-			v1.crossVectors( vFrom, vTo );
+			r = vFrom.dot( vTo ) + 1;
 
-			this.set( v1.x, v1.y, v1.z, vFrom.dot( vTo ) + 1 ).normalize();
+			if ( r < EPS ) {
+
+				r = 0;
+
+				if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
+
+					v1.set( - vFrom.y, vFrom.x, 0 );
+
+				} else {
+
+					v1.set( 0, - vFrom.z, vFrom.y );
+
+				}
+
+			} else {
+
+				v1.crossVectors( vFrom, vTo );
+
+			}
+
+			this.set( v1.x, v1.y, v1.z, r ).normalize();
 
 			this._updateEuler();
 
@@ -2905,56 +2927,6 @@ THREE.Vector4.prototype = {
 
 };
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.ProxyVector2 = function ( array, offset ) {
-
-	this.array = array;
-	this.offset = offset;
-	
-};
-
-THREE.ProxyVector2.prototype = Object.create( THREE.Vector2.prototype );
-
-Object.defineProperties( THREE.ProxyVector2.prototype, {
-	'x': {
-		get: function () { return this.array[ this.offset ]; },
-		set: function ( v ) { this.array[ this.offset ] = v; }
-	},
-	'y': {
-		get: function () { return this.array[ this.offset + 1 ]; },
-		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
-	}
-} );
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.ProxyVector3 = function ( array, offset ) {
-	
-	this.array = array;
-	this.offset = offset;
-
-};
-
-THREE.ProxyVector3.prototype = Object.create( THREE.Vector3.prototype );
-
-Object.defineProperties( THREE.ProxyVector3.prototype, {
-	'x': {
-		get: function () { return this.array[ this.offset ]; },
-		set: function ( v ) { this.array[ this.offset ] = v; }
-	},
-	'y': {
-		get: function () { return this.array[ this.offset + 1 ]; },
-		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
-	},
-	'z': {
-		get: function () { return this.array[ this.offset + 2 ]; },
-		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
-	}
-} );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -10682,6 +10654,168 @@ THREE.Geometry2 = function ( vertices, normals, uvs ) {
 };
 
 THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+
+THREE.Geometry99 = function ( ) {
+
+	THREE.BufferGeometry.call( this );
+
+};
+
+THREE.Geometry99.prototype = Object.create( THREE.BufferGeometry.prototype );
+
+Object.defineProperties( THREE.Geometry99.prototype, {
+
+	vertices: { 
+
+		enumerable: true, 
+		get: function() { return this.createVertexProxies(); } 
+
+	},
+	faces: {
+
+		enumerable: true,  
+		get: function() { return this.createFaceProxies() } 
+
+	},
+	faceVertexUvs: {
+
+		enumerable: true,  
+		get: function() { return this.createUvProxies() } 
+
+	}
+	// TODO - fill in additional proxies:
+	// - colors
+	// - morphColors
+	// - morphNormals
+	// - morphTargets
+	// - skinIndex
+	// - skinWeights
+} );
+
+THREE.Geometry99.prototype.createVertexProxies = function() {
+
+	// Replace the prototype getter with a local array property
+
+	Object.defineProperty( this, "vertices", { value: [] } );
+
+	// If the attribute buffer has already been populated, set up proxy objects
+
+	this.populateProxyFromBuffer( this.vertices, "position", THREE.ProxyVector3, 3 );
+
+	// Return a reference to the newly-created array
+
+	return this.vertices;
+
+};
+
+THREE.Geometry99.prototype.createFaceProxies = function () {
+
+	// Replace the prototype getter with a local array property
+
+	Object.defineProperty( this, "faces", { value: [] } );
+
+	// If the attribute buffer has already been populated, set up proxy objects
+
+	if ( this.attributes.index ) {
+
+		var indexarray = this.attributes[ 'index' ].array;
+		var size = 3;
+		var attr = this.faces;
+
+		var normalarray = false;
+
+		if (this.attributes[ 'normal' ]) {
+
+			normalarray = this.attributes[ 'normal' ].array;
+
+		}
+
+		for ( var i = 0, l = indexarray.length / size; i < l; i ++ ) {
+
+			var o = i * size;
+
+			// Generate faceVertexNormals
+			var vertexNormals;
+			if (normalarray) {
+
+				vertexNormals = [
+					new THREE.ProxyVector3( normalarray, indexarray[ o     ] * 3 ),
+					new THREE.ProxyVector3( normalarray, indexarray[ o + 1 ] * 3 ),
+					new THREE.ProxyVector3( normalarray, indexarray[ o + 2 ] * 3 )
+				]
+
+			}
+
+			// TODO - do BufferGeometries support face normals?
+
+			var face = new THREE.ProxyFace3( indexarray, i * size, vertexNormals );
+
+			attr.push( face );
+
+		}
+
+	} else {
+
+		// TODO - should be able to generate Face data even for non-indexed geometries
+
+	}
+
+	// Return a reference to the newly-created array
+
+	return this.faces;
+
+};
+
+THREE.Geometry99.prototype.createUvProxies = function () {
+
+	// Replace the prototype getter with a local array property
+
+	Object.defineProperty( this, "faceVertexUvs", { value: [[]] } );
+
+	// If the attribute buffer has already been populated, set up proxy objects
+
+	if ( this.attributes.uv ) {
+
+		var faces = this.faces;
+		var uvarray = this.attributes.uv.array;
+
+		for (var i = 0, l = faces.length; i < l; i++) {
+			var f = faces[i];
+
+			this.faceVertexUvs[0][i] = [];
+			this.faceVertexUvs[0][i][0] = new THREE.ProxyVector2(uvarray, f.a * 2);
+			this.faceVertexUvs[0][i][1] = new THREE.ProxyVector2(uvarray, f.b * 2);
+			this.faceVertexUvs[0][i][2] = new THREE.ProxyVector2(uvarray, f.c * 2);
+
+		}
+	
+	}
+
+	// Return a reference to the newly-created array
+
+	return this.faceVertexUvs;
+
+};
+
+THREE.Geometry99.prototype.populateProxyFromBuffer = function ( attr, buffername, proxytype, itemsize, offset, count ) {
+
+	if ( this.attributes[ buffername ] ) {
+
+		var array = this.attributes[ buffername ].array;
+		var size = itemsize || this.attributes[ buffername ].itemSize;
+		var start = offset || 0;
+
+		count = count || ( array.length / size - start );
+
+		for ( var i = start, l = start + count; i < l; i ++ ) {
+
+			attr.push( new proxytype( array, i * size ) );
+
+		}
+
+	}
+
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -10697,7 +10831,91 @@ THREE.IndexedGeometry2 = function ( indices, vertices, normals, uvs ) {
 
 };
 
-THREE.IndexedGeometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.IndexedGeometry2.prototype = Object.create( THREE.Geometry99.prototype );
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.ProxyVector2 = function ( array, offset ) {
+
+	this.array = array;
+	this.offset = offset;
+	
+};
+
+THREE.ProxyVector2.prototype = Object.create( THREE.Vector2.prototype );
+
+Object.defineProperties( THREE.ProxyVector2.prototype, {
+	'x': {
+		get: function () { return this.array[ this.offset ]; },
+		set: function ( v ) { this.array[ this.offset ] = v; }
+	},
+	'y': {
+		get: function () { return this.array[ this.offset + 1 ]; },
+		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
+	}
+} );
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.ProxyVector3 = function ( array, offset ) {
+	
+	this.array = array;
+	this.offset = offset;
+
+};
+
+THREE.ProxyVector3.prototype = Object.create( THREE.Vector3.prototype );
+
+Object.defineProperties( THREE.ProxyVector3.prototype, {
+	'x': {
+		get: function () { return this.array[ this.offset ]; },
+		set: function ( v ) { this.array[ this.offset ] = v; }
+	},
+	'y': {
+		get: function () { return this.array[ this.offset + 1 ]; },
+		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
+	},
+	'z': {
+		get: function () { return this.array[ this.offset + 2 ]; },
+		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
+	}
+} );
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.ProxyFace3 = function ( array, offset, vertexNormals ) {
+
+	this.array = array;
+	this.offset = offset;
+	this.vertexNormals = vertexNormals;
+
+	//THREE.Face3.call( this, array[offset], array[offset+1], array[offset+2] /*, normal, color, materialIndex */);
+
+}
+
+THREE.ProxyFace3.prototype = Object.create( THREE.Face3.prototype );
+
+Object.defineProperties( THREE.ProxyFace3.prototype, {
+	'a': {
+		enumerable: true,  
+		get: function () { return this.array[ this.offset ]; },
+		set: function ( v ) { this.array[ this.offset ] = v; }
+	},
+	'b': {
+		enumerable: true,  
+		get: function () { return this.array[ this.offset + 1 ]; },
+		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
+	},
+	'c': {
+		enumerable: true,  
+		get: function () { return this.array[ this.offset + 2 ]; },
+		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
+	},
+} );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
