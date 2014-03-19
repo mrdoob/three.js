@@ -7,19 +7,26 @@ THREE.Geometry99 = function ( ) {
 
 THREE.Geometry99.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-Object.defineProperties(THREE.Geometry99.prototype, {
+Object.defineProperties( THREE.Geometry99.prototype, {
+
 	vertices: { 
+
 		enumerable: true, 
 		get: function() { return this.createVertexProxies(); } 
+
 	},
 	faces: {
+
 		enumerable: true,  
 		get: function() { return this.createFaceProxies() } 
+
 	},
 	faceVertexUvs: {
+
 		enumerable: true,  
 		get: function() { return this.createUvProxies() } 
-	},
+
+	}
 	// TODO - fill in additional proxies:
 	// - colors
 	// - morphColors
@@ -27,7 +34,7 @@ Object.defineProperties(THREE.Geometry99.prototype, {
 	// - morphTargets
 	// - skinIndex
 	// - skinWeights
-});
+} );
 
 THREE.Geometry99.prototype.createVertexProxies = function() {
 
@@ -37,15 +44,15 @@ THREE.Geometry99.prototype.createVertexProxies = function() {
 
 	// If the attribute buffer has already been populated, set up proxy objects
 
-	this.populateProxyFromBuffer(this.vertices, "position", THREE.TypedVector3, 3);
+	this.populateProxyFromBuffer( this.vertices, "position", THREE.ProxyVector3, 3 );
 
 	// Return a reference to the newly-created array
 
 	return this.vertices;
 
-}
+};
 
-THREE.Geometry99.prototype.createFaceProxies = function() {
+THREE.Geometry99.prototype.createFaceProxies = function () {
 
 	// Replace the prototype getter with a local array property
 
@@ -60,8 +67,11 @@ THREE.Geometry99.prototype.createFaceProxies = function() {
 		var attr = this.faces;
 
 		var normalarray = false;
+
 		if (this.attributes[ 'normal' ]) {
+
 			normalarray = this.attributes[ 'normal' ].array;
+
 		}
 
 		for ( var i = 0, l = indexarray.length / size; i < l; i ++ ) {
@@ -73,18 +83,18 @@ THREE.Geometry99.prototype.createFaceProxies = function() {
 			if (normalarray) {
 
 				vertexNormals = [
-					new THREE.TypedVector3(normalarray, indexarray[o] * 3),
-					new THREE.TypedVector3(normalarray, indexarray[o+1] * 3),
-					new THREE.TypedVector3(normalarray, indexarray[o+2] * 3),
+					new THREE.ProxyVector3( normalarray, indexarray[ o     ] * 3 ),
+					new THREE.ProxyVector3( normalarray, indexarray[ o + 1 ] * 3 ),
+					new THREE.ProxyVector3( normalarray, indexarray[ o + 2 ] * 3 )
 				]
 
 			}
 
 			// TODO - do BufferGeometries support face normals?
 
-			var face = new THREE.TypedFace3( indexarray, i * size, vertexNormals );
+			var face = new THREE.ProxyFace3( indexarray, i * size, vertexNormals );
 
-			attr.push(face);
+			attr.push( face );
 
 		}
 
@@ -98,8 +108,9 @@ THREE.Geometry99.prototype.createFaceProxies = function() {
 
 	return this.faces;
 
-}
-THREE.Geometry99.prototype.createUvProxies = function() {
+};
+
+THREE.Geometry99.prototype.createUvProxies = function () {
 
 	// Replace the prototype getter with a local array property
 
@@ -116,9 +127,9 @@ THREE.Geometry99.prototype.createUvProxies = function() {
 			var f = faces[i];
 
 			this.faceVertexUvs[0][i] = [];
-			this.faceVertexUvs[0][i][0] = new THREE.TypedVector2(uvarray, f.a * 2);
-			this.faceVertexUvs[0][i][1] = new THREE.TypedVector2(uvarray, f.b * 2);
-			this.faceVertexUvs[0][i][2] = new THREE.TypedVector2(uvarray, f.c * 2);
+			this.faceVertexUvs[0][i][0] = new THREE.ProxyVector2(uvarray, f.a * 2);
+			this.faceVertexUvs[0][i][1] = new THREE.ProxyVector2(uvarray, f.b * 2);
+			this.faceVertexUvs[0][i][2] = new THREE.ProxyVector2(uvarray, f.c * 2);
 
 		}
 	
@@ -128,8 +139,9 @@ THREE.Geometry99.prototype.createUvProxies = function() {
 
 	return this.faceVertexUvs;
 
-}
-THREE.Geometry99.prototype.populateProxyFromBuffer = function(attr, buffername, proxytype, itemsize, offset, count) {
+};
+
+THREE.Geometry99.prototype.populateProxyFromBuffer = function ( attr, buffername, proxytype, itemsize, offset, count ) {
 
 	if ( this.attributes[ buffername ] ) {
 
@@ -146,34 +158,4 @@ THREE.Geometry99.prototype.populateProxyFromBuffer = function(attr, buffername, 
 
 	}
 
-}
-
-THREE.TypedFace3 = function ( array, offset, vertexNormals ) {
-
-	this.array = array;
-	this.offset = offset;
-	this.vertexNormals = vertexNormals;
-
-	//THREE.Face3.call( this, array[offset], array[offset+1], array[offset+2] /*, normal, color, materialIndex */);
-
-}
-
-THREE.TypedFace3.prototype = Object.create( THREE.Face3.prototype );
-
-Object.defineProperties( THREE.TypedFace3.prototype, {
-	'a': {
-		enumerable: true,  
-		get: function () { return this.array[ this.offset ]; },
-		set: function ( v ) { this.array[ this.offset ] = v; }
-	},
-	'b': {
-		enumerable: true,  
-		get: function () { return this.array[ this.offset + 1 ]; },
-		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
-	},
-	'c': {
-		enumerable: true,  
-		get: function () { return this.array[ this.offset + 2 ]; },
-		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
-	},
-} );
+};
