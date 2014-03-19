@@ -148,7 +148,8 @@ THREE.Geometry99.prototype.populateProxyFromBuffer = function ( attr, buffername
 		var array = this.attributes[ buffername ].array;
 		var size = itemsize || this.attributes[ buffername ].itemSize;
 		var start = offset || 0;
-		var count = count || (array.length / size - start);
+
+		count = count || ( array.length / size - start );
 
 		for ( var i = start, l = start + count; i < l; i ++ ) {
 
