@@ -18,9 +18,9 @@ THREE.PlaneGeometry6 = function ( width, height, widthSegments, heightSegments )
 
 	for ( var i = 0, l = vertices.length / 3; i < l; i ++ ) {
 
-		this.vertices.push( new THREE.ProxyVector3( vertices, i * 3 ) );
-		this.normals.push( new THREE.ProxyVector3( normals, i * 3 ) );
-		this.uvs.push( new THREE.ProxyVector2( uvs, i * 2 ) );
+		this.vertices.push( new THREE.TypedVector3( vertices, i * 3 ) );
+		this.normals.push( new THREE.TypedVector3( normals, i * 3 ) );
+		this.uvs.push( new THREE.TypedVector2( uvs, i * 2 ) );
 
 	}
 

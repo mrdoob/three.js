@@ -7,18 +7,18 @@ THREE.Geometry99 = function ( ) {
 
 THREE.Geometry99.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-Object.defineProperties(THREE.Geometry99.prototype, {
+Object.defineProperties( THREE.Geometry99.prototype, {
 	vertices: { 
 		enumerable: true, 
-		get: function() { return this.createVertexProxies(); } 
+		get: function () { return this.createVertexProxies(); } 
 	},
 	faces: {
 		enumerable: true,	
-		get: function() { return this.createFaceProxies() } 
+		get: function () { return this.createFaceProxies() } 
 	},
 	faceVertexUvs: {
 		enumerable: true,	
-		get: function() { return this.createUvProxies() } 
+		get: function () { return this.createUvProxies() } 
 	},
 	// TODO - fill in additional proxies:
 	// - morphColors
@@ -30,22 +30,22 @@ Object.defineProperties(THREE.Geometry99.prototype, {
 
 	verticesNeedUpdate: {
 		enumerable: true,	
-		get: function() { return this.attributes[ 'position' ].needsUpdate; } ,
-		set: function(v) { this.attributes[ 'position' ].needsUpdate = v; } 
+		get: function () { return this.attributes[ 'position' ].needsUpdate; } ,
+		set: function ( v ) { this.attributes[ 'position' ].needsUpdate = v; } 
 	},
 	colorsNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'color' ]) return this.attributes[ 'color' ].needsUpdate; } ,
-		set: function(v) { if (this.attributes[ 'color' ]) this.attributes[ 'color' ].needsUpdate = v; } 
+		get: function () { if ( this.attributes[ 'color' ] ) return this.attributes[ 'color' ].needsUpdate; } ,
+		set: function ( v ) { if ( this.attributes[ 'color' ] ) this.attributes[ 'color' ].needsUpdate = v; } 
 	},
 	normalsNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'normal' ]) return this.attributes[ 'normal' ].needsUpdate; } ,
-		set: function(v) { if (this.attributes[ 'normal' ]) this.attributes[ 'normal' ].needsUpdate = v; } 
+		get: function () { if ( this.attributes[ 'normal' ] ) return this.attributes[ 'normal' ].needsUpdate; } ,
+		set: function ( v ) { if ( this.attributes[ 'normal' ] ) this.attributes[ 'normal' ].needsUpdate = v; } 
 	},
 });
 
-THREE.Geometry99.prototype.createVertexProxies = function() {
+THREE.Geometry99.prototype.createVertexProxies = function () {
 
 	// Replace the prototype getter with a local array property
 
@@ -53,7 +53,7 @@ THREE.Geometry99.prototype.createVertexProxies = function() {
 
 	// If the attribute buffer has already been populated, set up proxy objects
 
-	this.populateProxyFromBuffer(this.vertices, "position", THREE.TypedVector3, 3);
+	this.populateProxyFromBuffer( this.vertices, "position", THREE.TypedVector3, 3 );
 
 	// Return a reference to the newly-created array
 
@@ -61,7 +61,7 @@ THREE.Geometry99.prototype.createVertexProxies = function() {
 
 }
 
-THREE.Geometry99.prototype.createFaceProxies = function() {
+THREE.Geometry99.prototype.createFaceProxies = function () {
 
 	// Replace the prototype getter with a local array property
 
@@ -172,7 +172,7 @@ THREE.Geometry99.prototype.createFaceProxies = function() {
 	return this.faces;
 
 }
-THREE.Geometry99.prototype.createUvProxies = function() {
+THREE.Geometry99.prototype.createUvProxies = function () {
 
 	// Replace the prototype getter with a local array property
 
@@ -185,13 +185,14 @@ THREE.Geometry99.prototype.createUvProxies = function() {
 		var faces = this.faces;
 		var uvarray = this.attributes.uv.array;
 
-		for (var i = 0, l = faces.length; i < l; i++) {
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
 			var f = faces[i];
 
-			this.faceVertexUvs[0][i] = [];
-			this.faceVertexUvs[0][i][0] = new THREE.TypedVector2(uvarray, f.a * 2);
-			this.faceVertexUvs[0][i][1] = new THREE.TypedVector2(uvarray, f.b * 2);
-			this.faceVertexUvs[0][i][2] = new THREE.TypedVector2(uvarray, f.c * 2);
+			this.faceVertexUvs[ 0 ][ i ] = [];
+			this.faceVertexUvs[ 0 ][ i ][ 0 ] = new THREE.TypedVector2( uvarray, f.a * 2 );
+			this.faceVertexUvs[ 0 ][ i ][ 1 ] = new THREE.TypedVector2( uvarray, f.b * 2 );
+			this.faceVertexUvs[ 0 ][ i ][ 2 ] = new THREE.TypedVector2( uvarray, f.c * 2 );
 
 		}
 	
@@ -203,14 +204,15 @@ THREE.Geometry99.prototype.createUvProxies = function() {
 
 }
 
-THREE.Geometry99.prototype.populateProxyFromBuffer = function(attr, buffername, proxytype, itemsize, offset, count) {
+THREE.Geometry99.prototype.populateProxyFromBuffer = function ( attr, buffername, proxytype, itemsize, offset, count ) {
 
 	if ( this.attributes[ buffername ] ) {
 
 		var array = this.attributes[ buffername ].array;
 		var size = itemsize || this.attributes[ buffername ].itemSize;
 		var start = offset || 0;
-		var count = count || (array.length / size - start);
+		
+		count = count || ( array.length / size - start );
 
 		for ( var i = start, l = start + count; i < l; i ++ ) {
 
@@ -221,6 +223,57 @@ THREE.Geometry99.prototype.populateProxyFromBuffer = function(attr, buffername, 
 	}
 
 }
+
+// Proxies
+
+THREE.TypedVector2 = function ( array, offset ) {
+
+	this.array = array;
+	this.offset = offset;
+	
+};
+
+THREE.TypedVector2.prototype = Object.create( THREE.Vector2.prototype );
+
+Object.defineProperties( THREE.TypedVector2.prototype, {
+	'x': {
+		get: function () { return this.array[ this.offset ]; },
+		set: function ( v ) { this.array[ this.offset ] = v; }
+	},
+	'y': {
+		get: function () { return this.array[ this.offset + 1 ]; },
+		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
+	}
+} );
+
+//
+
+
+THREE.TypedVector3 = function ( array, offset ) {
+	
+	this.array = array;
+	this.offset = offset;
+
+};
+
+THREE.TypedVector3.prototype = Object.create( THREE.Vector3.prototype );
+
+Object.defineProperties( THREE.TypedVector3.prototype, {
+	'x': {
+		get: function () { return this.array[ this.offset ]; },
+		set: function ( v ) { this.array[ this.offset ] = v; }
+	},
+	'y': {
+		get: function () { return this.array[ this.offset + 1 ]; },
+		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
+	},
+	'z': {
+		get: function () { return this.array[ this.offset + 2 ]; },
+		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
+	}
+} );
+
+//
 
 THREE.TypedFace3 = function ( array, offset, vertexNormals ) {
 
