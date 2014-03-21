@@ -3489,7 +3489,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_this.setMaterialFaces( material );
+				_this.setMaterialFaces( material, object.matrixWorldIsMirrored );
 
 				if ( buffer instanceof THREE.BufferGeometry ) {
 
@@ -3550,7 +3550,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentGeometryGroupHash = -1;
 
-		_this.setMaterialFaces( material );
+		_this.setMaterialFaces( material, object.matrixWorldIsMirrored );
 
 		if ( object.immediateRenderCallback ) {
 
@@ -4127,8 +4127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			alphaTest: material.alphaTest,
 			metal: material.metal,
 			wrapAround: material.wrapAround,
-			doubleSided: material.side === THREE.DoubleSide,
-			flipSided: material.side === THREE.BackSide
+			doubleSided: material.side === THREE.DoubleSide
 
 		};
 
@@ -4351,6 +4350,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
+
+		}
+
+		if ( m_uniforms.flipSided && m_uniforms.flipSided.value !== object.matrixWorldIsMirrored ) {
+
+			_gl.uniform1i( p_uniforms.flipSided, object.matrixWorldIsMirrored );
+			m_uniforms.flipSided.value = object.matrixWorldIsMirrored;
 
 		}
 
@@ -5244,10 +5250,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setMaterialFaces = function ( material ) {
+	this.setMaterialFaces = function ( material, mirrored ) {
 
 		var doubleSided = material.side === THREE.DoubleSide;
-		var flipSided = material.side === THREE.BackSide;
+		var flipSided = material.side === ( mirrored ? THREE.FrontSide : THREE.BackSide );
 
 		if ( _oldDoubleSided !== doubleSided ) {
 

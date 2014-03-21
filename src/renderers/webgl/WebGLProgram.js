@@ -137,7 +137,6 @@ THREE.WebGLProgram = ( function () {
 				parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
 				parameters.wrapAround ? "#define WRAP_AROUND" : "",
 				parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-				parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 				parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 				parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
@@ -239,7 +238,6 @@ THREE.WebGLProgram = ( function () {
 				parameters.metal ? "#define METAL" : "",
 				parameters.wrapAround ? "#define WRAP_AROUND" : "",
 				parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-				parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 				parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 				parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",

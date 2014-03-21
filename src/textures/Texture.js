@@ -38,6 +38,9 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this._needsUpdate = false;
 	this.onUpdate = null;
 
+	this.texcoord = "";
+	this.input_set = 0;
+
 };
 
 THREE.Texture.prototype = {

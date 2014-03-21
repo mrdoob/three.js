@@ -415,6 +415,9 @@ THREE.Projector = function () {
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
+					var frontSide = object.matrixWorldIsMirrored ? THREE.BackSide : THREE.FrontSide;
+					var backSide = object.matrixWorldIsMirrored ? THREE.FrontSide : THREE.BackSide;
+
 					vertices = geometry.vertices;
 					faces = geometry.faces;
 					faceVertexUvs = geometry.faceVertexUvs[ 0 ];
@@ -497,8 +500,8 @@ THREE.Projector = function () {
 						var visible = renderList.checkBackfaceCulling( v1, v2, v3 );
 
 						if ( side !== THREE.DoubleSide ) {
-							if ( side === THREE.FrontSide && visible === false ) continue;
-							if ( side === THREE.BackSide && visible === true ) continue;
+							if ( side === frontSide && visible === false ) continue;
+							if ( side === backSide && visible === true ) continue;
 						}
 
 						_face = getNextFaceInPool();
@@ -510,7 +513,7 @@ THREE.Projector = function () {
 
 						_face.normalModel.copy( face.normal );
 
-						if ( visible === false && ( side === THREE.BackSide || side === THREE.DoubleSide ) ) {
+						if ( visible === false && ( side === backSide || side === THREE.DoubleSide ) ) {
 
 							_face.normalModel.negate();
 
