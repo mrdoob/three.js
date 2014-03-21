@@ -22,7 +22,9 @@ THREE.UniformsLib = {
 		"refractionRatio" : { type: "f", value: 0.98 },
 		"combine" : { type: "i", value: 0 },
 
-		"morphTargetInfluences" : { type: "f", value: 0 }
+		"morphTargetInfluences" : { type: "f", value: 0 },
+
+		"flipSided": { type: "i", value: 0 }
 
 	},
 

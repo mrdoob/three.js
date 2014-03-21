@@ -119,7 +119,7 @@ THREE.DepthPassPlugin = function () {
 
 				objectMaterial = getObjectMaterial( object );
 
-				if ( objectMaterial ) _renderer.setMaterialFaces( object.material );
+				if ( objectMaterial ) _renderer.setMaterialFaces( object.material, object.matrixWorldIsMirrored );
 
 				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
 				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;

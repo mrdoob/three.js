@@ -101,6 +101,12 @@ THREE.Matrix4.prototype = {
 			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
 			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
 
+			if ( this.determinant() < 0 ) {
+
+				scaleX = -scaleX;
+				
+			}
+
 			te[0] = me[0] * scaleX;
 			te[1] = me[1] * scaleX;
 			te[2] = me[2] * scaleX;

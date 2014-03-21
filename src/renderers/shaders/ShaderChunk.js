@@ -1330,6 +1330,12 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	defaultnormal_pars_vertex: [
+
+		"uniform bool flipSided;"
+
+	].join("\n"),
+
 	defaultnormal_vertex: [
 
 		"vec3 objectNormal;",
@@ -1352,11 +1358,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#ifdef FLIP_SIDED",
-
-		"	objectNormal = -objectNormal;",
-
-		"#endif",
+		"if ( flipSided ) objectNormal = -objectNormal;",
 
 		"vec3 transformedNormal = normalMatrix * objectNormal;"
 

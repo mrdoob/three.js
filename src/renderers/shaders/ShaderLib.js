@@ -25,6 +25,13 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
+
+			"#ifdef USE_ENVMAP",
+
+			THREE.ShaderChunk[ "defaultnormal_pars_vertex" ],
+
+			"#endif",
+
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
@@ -129,6 +136,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
@@ -253,6 +261,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
@@ -623,7 +632,9 @@ THREE.ShaderLib = {
 			"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
 			"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
-			"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
+			"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) },
+
+			"flipSided": { type: "i", value: 0 }
 
 			}
 
@@ -702,6 +713,8 @@ THREE.ShaderLib = {
 
 			"#endif",
 
+			"uniform bool flipSided;",
+
 			"varying vec3 vWorldPosition;",
 			"varying vec3 vViewPosition;",
 
@@ -760,11 +773,8 @@ THREE.ShaderLib = {
 			"	mat3 tsb = mat3( normalize( vTangent ), normalize( vBinormal ), normalize( vNormal ) );",
 			"	vec3 finalNormal = tsb * normalTex;",
 
-			"	#ifdef FLIP_SIDED",
-
+			"	if( flipSided )",
 			"		finalNormal = -finalNormal;",
-
-			"	#endif",
 
 			"	vec3 normal = normalize( finalNormal );",
 			"	vec3 viewPosition = normalize( vViewPosition );",
