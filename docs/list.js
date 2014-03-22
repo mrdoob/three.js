@@ -76,7 +76,6 @@ var list = {
 			[ "Box2", "api/math/Box2" ],
 			[ "Box3", "api/math/Box3" ],
 			[ "Color", "api/math/Color" ],
-                        [ "LookupTable", "api/math/Lut" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
 			[ "Line3", "api/math/Line3" ],
@@ -235,7 +234,14 @@ var list = {
 
 		"Extras / Shaders": [
 			[ "ShaderFlares", "api/extras/shaders/ShaderFlares" ]
+		],
+
+		"Examples" : [
+
+			[ "LookupTable", "api/examples/Lut" ]
+
 		]
+
 	}
 
 };
