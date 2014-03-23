@@ -10,10 +10,10 @@
  * @param center     Center of Hilbert curve.
  * @param size       Total width of Hilbert curve.
  * @param iterations Number of subdivisions.
- * @param v1         Corner index -X, -Z.
- * @param v2         Corner index -X, +Z.
- * @param v3         Corner index +X, +Z.
- * @param v4         Corner index +X, -Z.
+ * @param v0         Corner index -X, -Z.
+ * @param v1         Corner index -X, +Z.
+ * @param v2         Corner index +X, +Z.
+ * @param v3         Corner index +X, -Z.
  */
 function hilbert2D (center, size, iterations, v0, v1, v2, v3) {
 	// Default Vars
@@ -28,10 +28,10 @@ function hilbert2D (center, size, iterations, v0, v1, v2, v3) {
 	;
 
 	var vec_s = [
-		new THREE.Vector3(center.x - half, center.y, center.z - half),
-		new THREE.Vector3(center.x - half, center.y, center.z + half),
-		new THREE.Vector3(center.x + half, center.y, center.z + half),
-		new THREE.Vector3(center.x + half, center.y, center.z - half)
+		new THREE.Vector3( center.x - half, center.y, center.z - half ),
+		new THREE.Vector3( center.x - half, center.y, center.z + half ),
+		new THREE.Vector3( center.x + half, center.y, center.z + half ),
+		new THREE.Vector3( center.x + half, center.y, center.z - half )
 	];
 
 	var vec = [
