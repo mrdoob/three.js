@@ -10,10 +10,13 @@
 
 THREE.Geometry = function ( ) {
 
-	//THREE.IndexedGeometry2.call( this );
 	THREE.BufferGeometry.call( this );
 
 	this.addEventListener( 'allocate', this.onGeometryAllocate);
+
+	// TODO - implement as BufferGeometry attributes
+	this.morphTargets = [];
+	this.morphColors = [];
 
 };
 
@@ -37,13 +40,18 @@ Object.defineProperties(THREE.Geometry.prototype, {
 		enumerable: true,	
 		get: function() { return this.createColorProxies() } 
 	},
+	skinIndices: {
+		enumerable: true,	
+		get: function() { return this.createSkinIndexProxies() } 
+	},
+	skinWeights: {
+		enumerable: true,	
+		get: function() { return this.createSkinWeightProxies() } 
+	},
 	// TODO - fill in additional proxies:
 	// - morphColors
 	// - morphNormals
 	// - morphTargets
-	// - skinIndex
-	// - skinWeights
-
 
 	verticesNeedUpdate: {
 		enumerable: true,	
@@ -63,7 +71,6 @@ Object.defineProperties(THREE.Geometry.prototype, {
 });
 
 THREE.Geometry.prototype.createVertexProxies = function(values) {
-
 
 	if (!this.hasOwnProperty('vertices')) {
 
@@ -121,19 +128,23 @@ THREE.Geometry.prototype.createFaceProxies = function(values) {
 			indexarray = false,
 			positionarray = false,
 			normalarray = false,
-			colorarray = false;
+			colorarray = false,
+			tangentarray = false;
 
-	if ( this.attributes.position ) {
-		positionarray = this.attributes[ 'position' ].array;
-	}
-	if ( this.attributes.index ) {
+	if ( this.attributes[ 'index' ] ) {
 		indexarray = this.attributes[ 'index' ].array;
+	}
+	if ( this.attributes[ 'position' ] ) {
+		positionarray = this.attributes[ 'position' ].array;
 	}
 	if (this.attributes[ 'normal' ]) {
 		normalarray = this.attributes[ 'normal' ].array;
 	}
 	if (this.attributes[ 'color' ]) {
 		colorarray = this.attributes[ 'color' ].array;
+	}
+	if (this.attributes[ 'tangent' ]) {
+		tangentarray = this.attributes[ 'tangent' ].array;
 	}
 
 	// TODO - this should be accomplished using "virtual" functions on various classes (IndexedGeometry, SmoothGeometry, etc)
@@ -156,7 +167,7 @@ THREE.Geometry.prototype.createFaceProxies = function(values) {
 			var o = i * 3;
 			var v1 = i, v2 = i+1, v3 = i+2;
 
-			var face = new THREE.Face3( v1, v2, v3 );
+			var face = new THREE.TypedFace3( v1, v2, v3 );
 			faces.push(face);
 
 		}
@@ -189,6 +200,12 @@ THREE.Geometry.prototype.createFaceProxies = function(values) {
 	if (colorarray) {
 
 		this.createFaceVertexColorProxies(values);
+
+	}
+
+	if (tangentarray) {
+
+		this.createFaceVertexTangentProxies(values);
 
 	}
 
@@ -305,6 +322,50 @@ THREE.Geometry.prototype.createFaceVertexColorProxies = function(values) {
 
 }
 
+THREE.Geometry.prototype.createFaceVertexTangentProxies = function(values) {
+
+	if ( this.attributes[ 'tangent' ] && this.attributes[ 'tangent' ].array ) {
+
+		var tangentarray = this.attributes[ 'tangent' ].array;
+
+		for (var i = 0, l = this.faces.length; i < l; i++) {
+
+			var f = this.faces[i];
+
+			f.vertexTangents = [
+				new THREE.TypedVector3(tangentarray, f.a * 3),
+				new THREE.TypedVector3(tangentarray, f.b * 3),
+				new THREE.TypedVector3(tangentarray, f.c * 3),
+			];
+
+		}
+	}
+
+	// If values were passed in, store them in the buffer via the proxy objects
+
+	if (values) {
+
+		for (var i = 0, l = values.length; i < l; i++) {
+
+			var f = this.faces[i],
+			    v = values[i];
+
+			if (v.vertexTangents.length > 0) {
+
+				for (var j = 0, l2 = f.vertexTangents.length; j < l2; j++) {
+
+					f.vertexTangents[j].copy(v.vertexTangents[j]);
+
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
 THREE.Geometry.prototype.createUvProxies = function(values) {
 
 	// Replace the prototype getter with a local array property
@@ -362,6 +423,70 @@ THREE.Geometry.prototype.createUvProxies = function(values) {
 	// Return a reference to the newly-created array
 
 	return this.faceVertexUvs;
+
+}
+
+THREE.Geometry.prototype.createSkinIndexProxies = function(values) {
+
+	// Replace the prototype getter with a local array property
+
+	if (!this.hasOwnProperty('skinIndices')) {
+		Object.defineProperty( this, "skinIndices", { value: [], writable: true } );
+	} else {
+		this.skinIndices = [];
+	}
+
+	// If the attribute buffer has already been populated, set up proxy objects
+
+	this.populateProxyFromBuffer(this.skinIndices, "skinIndex", THREE.TypedVector4, 4);
+
+	// If values were passed in, store them in the buffer via the proxy objects
+
+	if (values) {
+
+		for (var i = 0; i < values.length; i++) {
+
+			this.skinIndices[i].copy(values[i]);
+
+		}
+
+	}
+
+	// Return a reference to the newly-created array
+
+	return this.skinIndices;
+
+}
+
+THREE.Geometry.prototype.createSkinWeightProxies = function(values) {
+
+	// Replace the prototype getter with a local array property
+
+	if (!this.hasOwnProperty('skinWeights')) {
+		Object.defineProperty( this, "skinWeights", { value: [], writable: true } );
+	} else {
+		this.skinWeights = [];
+	}
+
+	// If the attribute buffer has already been populated, set up proxy objects
+
+	this.populateProxyFromBuffer(this.skinWeights, "skinWeight", THREE.TypedVector4, 4);
+
+	// If values were passed in, store them in the buffer via the proxy objects
+
+	if (values) {
+
+		for (var i = 0; i < values.length; i++) {
+
+			this.skinWeights[i].copy(values[i]);
+
+		}
+
+	}
+
+	// Return a reference to the newly-created array
+
+	return this.skinWeights;
 
 }
 
@@ -507,6 +632,9 @@ THREE.Geometry.prototype.mergeVertices = function () {
 
 THREE.Geometry.prototype.onGeometryAllocate = function (ev) {
 
+	// Prevent allocate event listener from firing multiple times
+	this.removeEventListener( 'allocate', this.onGeometryAllocate);
+
 	if (this.hasOwnProperty('vertices')) {
 		var attr = new THREE.Float32Attribute(this.vertices.length, 3);
 		this.addAttribute('position', attr);
@@ -516,156 +644,109 @@ THREE.Geometry.prototype.onGeometryAllocate = function (ev) {
 		var idxattr = new THREE.Uint16Attribute(this.faces.length, 3);
 		this.addAttribute('index', idxattr);
 
-		var hasnormals = (this.hasOwnProperty('normals') || this.faces[0].normal || this.faces[0].vertexNormals.length > 0);
-				hascolors = (this.hasOwnProperty('colors') || this.faces[0].color || this.faces[0].vertexColors.length > 0);
+		if (this.faces.length > 0) {
+			var hasnormals = (this.hasOwnProperty('normals') || this.faces[0].normal || this.faces[0].vertexNormals.length > 0);
+			    hascolors = (this.hasOwnProperty('colors') || this.faces[0].color || this.faces[0].vertexColors.length > 0),
+			    hastangents = (this.faces[0].vertexTangents.length > 0);
 
-		if (hasnormals) {
-			var normalattr = new THREE.Float32Attribute(this.vertices.length, 3);
-			this.addAttribute('normal', normalattr);
-		}
+			if (hasnormals) {
+				var normalattr = new THREE.Float32Attribute(this.vertices.length, 3);
+				this.addAttribute('normal', normalattr);
+			}
 
-		if (hascolors) {
-			var colorattr = new THREE.Float32Attribute(this.faces.length * 3, 3);
-			this.addAttribute('color', colorattr);
+			if (hascolors) {
+				var colorattr = new THREE.Float32Attribute(this.faces.length * 3, 3);
+				this.addAttribute('color', colorattr);
+			}
+
+			if (hastangents) {
+				var tangentattr = new THREE.Float32Attribute(this.faces.length * 3, 3);
+				this.addAttribute('tangent', tangentattr);
+			}
 		}
 
 		this.createFaceProxies(this.faces);
 	}
+
 	if (this.hasOwnProperty('faceVertexUvs')) {
+
 		var uvattr = new THREE.Float32Attribute(this.faces.length * 3, 2);
 		this.addAttribute('uv', uvattr);
 		this.createUvProxies(this.faceVertexUvs[0]);
+
+	}
+
+	if (this.hasOwnProperty('skinIndices')) {
+
+		var skinidxattr = new THREE.Float32Attribute(this.skinIndices.length, 4);
+		this.addAttribute('skinIndex', skinidxattr);
+		this.createSkinIndexProxies(this.skinIndices);
+
+	}
+
+	if (this.hasOwnProperty('skinWeights')) {
+
+		var skinweightattr = new THREE.Float32Attribute(this.skinWeights.length, 4);
+		this.addAttribute('skinWeight', skinweightattr);
+		this.createSkinWeightProxies(this.skinWeights);
+
 	}
 }
 
-/*
+THREE.Geometry.prototype.computeFaceNormals = function() {
+
+	this.dispatchEvent( { type: 'allocate' } );
+
+	return THREE.BufferGeometry.prototype.computeFaceNormals.call(this);
+
+}
+
+THREE.Geometry.prototype.computeVertexNormals = function() {
+
+	this.dispatchEvent( { type: 'allocate' } );
+
+	return THREE.BufferGeometry.prototype.computeVertexNormals.call(this);
+
+}
+
+THREE.Geometry.prototype.computeTangents = function() {
+
+	this.dispatchEvent( { type: 'allocate' } );
+
+	var ret = THREE.BufferGeometry.prototype.computeTangents.call(this);
+
+	// FIXME - this doesn't work yet
+	//this.createFaceVertexTangentProxies();
+
+	return ret;
+
+}
+
 THREE.Geometry.prototype.computeBoundingSphere = function() {
 
-	if ( !this.attributes[ 'position' ] && this.hasOwnProperty('vertices') && this.vertices.length > 0 ) {
+	this.dispatchEvent( { type: 'allocate' } );
 
-		this.onGeometryAllocate();
-
-		THREE.BufferGeometry.prototype.computeBoundingSphere.call(this);
-
-	}
-}
-*/
-
-/* Vector proxy experiments */
-
-THREE.TypedFace3 = function ( array, offset, vertexNormals, vertexColors ) {
-
-	this.array = array;
-	this.offset = offset;
-	this.vertexNormals = vertexNormals || [];
-	this.vertexColors = vertexColors || [];
-
-	//THREE.Face3.call( this, array[offset], array[offset+1], array[offset+2] /*, normal, color, materialIndex */);
+	return THREE.BufferGeometry.prototype.computeBoundingSphere.call(this);
 
 }
 
-THREE.TypedFace3.prototype = Object.create( THREE.Face3.prototype );
+THREE.Geometry.prototype.computeBoundingBox = function () {
 
-Object.defineProperties( THREE.TypedFace3.prototype, {
-	'a': {
-		enumerable: true,	
-		get: function () { return this.array[ this.offset ]; },
-		set: function ( v ) { this.array[ this.offset ] = v; }
-	},
-	'b': {
-		enumerable: true,	
-		get: function () { return this.array[ this.offset + 1 ]; },
-		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
-	},
-	'c': {
-		enumerable: true,	
-		get: function () { return this.array[ this.offset + 2 ]; },
-		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
-	},
-} );
+	this.dispatchEvent( { type: 'allocate' } );
 
-THREE.TypedColor = function ( array, offset ) {
-	this.array = array;
-	this.offset = offset;
+	return THREE.BufferGeometry.prototype.computeBoundingBox.call(this);
+
 }
-THREE.TypedColor.prototype = Object.create( THREE.Color.prototype );
+THREE.Geometry.prototype.clone = function () {
 
-Object.defineProperties( THREE.TypedColor.prototype, {
-	'r': {
-		enumerable: true,	
-		get: function () { return this.array[ this.offset ]; },
-		set: function ( v ) { this.array[ this.offset ] = v; }
-	},
-	'g': {
-		enumerable: true,	
-		get: function () { return this.array[ this.offset + 1 ]; },
-		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
-	},
-	'b': {
-		enumerable: true,	
-		get: function () { return this.array[ this.offset + 2 ]; },
-		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
-	}
-} );
+	var buff = THREE.BufferGeometry.prototype.clone.call(this);
+	var geo = new THREE.Geometry();
+	geo.attributes = buff.attributes;
+	geo.offsets = buff.offsets;
 
-// Allows updating of multiple THREE.Vector3 objects with the same value
-// Used for face.normal -> face.vertexNormal[] compatibility layer for FlatShading
+	return geo;
 
-THREE.MultiVector3 = function(links) {
-	this.links = links;
 }
-THREE.MultiVector3.prototype = Object.create( THREE.Vector3.prototype );
-
-THREE.MultiVector3.prototype.setMulti = function(axis, value) {
-	for (var i = 0, l = this.links.length; i < l; i++) {
-		this.links[i][axis] = value;
-	}
-}
-
-Object.defineProperties( THREE.MultiVector3.prototype, {
-	'x': {
-		get: function () { return this.links[0].x; },
-		set: function ( v ) { this.setMulti('x', v); }
-	},
-	'y': {
-		get: function () { return this.links[0].y; },
-		set: function ( v ) { this.setMulti('y', v); }
-	},
-	'z': {
-		get: function () { return this.links[0].z; },
-		set: function ( v ) { this.setMulti('z', v); }
-	}
-} );
-
-// Allows updating of multiple THREE.Color objects with the same value
-// Used for face.color -> face.vertexColor[] compatibility layer for non-indexed geometry
-
-THREE.MultiColor = function(links) {
-	this.links = links;
-}
-THREE.MultiColor.prototype = Object.create( THREE.Color.prototype );
-
-THREE.MultiColor.prototype.setMulti = function(axis, value) {
-	for (var i = 0, l = this.links.length; i < l; i++) {
-		this.links[i][axis] = value;
-	}
-}
-
-Object.defineProperties( THREE.MultiColor.prototype, {
-	'r': {
-		get: function () { return this.links[0].r; },
-		set: function ( v ) { this.setMulti('r', v); }
-	},
-	'g': {
-		get: function () { return this.links[0].g; },
-		set: function ( v ) { this.setMulti('g', v); }
-	},
-	'b': {
-		get: function () { return this.links[0].b; },
-		set: function ( v ) { this.setMulti('b', v); }
-	}
-} );
-
 
 THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
 
