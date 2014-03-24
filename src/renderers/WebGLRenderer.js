@@ -2493,7 +2493,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					enableAttribute( attributePointer );
 					_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
 
-				} else if ( material.defaultAttributeValues ) {
+				} else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
 
 					if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
 
