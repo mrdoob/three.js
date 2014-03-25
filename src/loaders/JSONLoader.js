@@ -15,8 +15,6 @@ THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
 
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
-	var scope = this;
-
 	// todo: unify load API to for easier SceneLoader use
 
 	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
@@ -26,11 +24,30 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 };
 
+THREE.JSONLoader.prototype.loads = function ( text, callback, texturePath ) {
+
+    var json = JSON.parse( text );
+
+    if ( json.metadata.type === 'scene' ) {
+
+        console.error( 'THREE.JSONLoader: The JSON seems to be a Scene. Use THREE.SceneLoader instead.' );
+        return;
+
+    }
+
+    var result = this.parse( json, texturePath );
+    result.geometry['metadata'] = json.metadata;
+    callback( result.geometry, result.materials );
+
+};
+
 THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, texturePath, callbackProgress ) {
 
 	var xhr = new XMLHttpRequest();
 
 	var length = 0;
+
+	var scope = this;
 
 	xhr.onreadystatechange = function () {
 
@@ -40,17 +57,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 				if ( xhr.responseText ) {
 
-					var json = JSON.parse( xhr.responseText );
-
-					if ( json.metadata.type === 'scene' ) {
-
-						console.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
-						return;
-
-					}
-
-					var result = context.parse( json, texturePath );
-					callback( result.geometry, result.materials );
+					scope.loads( xhr.responseText, callback, texturePath );
 
 				} else {
 
@@ -104,9 +111,8 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
-	var scope = this,
-	geometry = new THREE.Geometry(),
-	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
+	var geometry = new THREE.Geometry(),
+		scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
 	parseModel( scale );
 
