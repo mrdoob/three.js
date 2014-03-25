@@ -632,18 +632,6 @@ THREE.Quaternion.prototype = {
 
 	_x: 0,_y: 0, _z: 0, _w: 0,
 
-	_euler: undefined,
-
-	_updateEuler: function ( callback ) {
-
-		if ( this._euler !== undefined ) {
-
-			this._euler.setFromQuaternion( this, undefined, false );
-
-		}
-
-	},
-
 	get x () {
 
 		return this._x;
@@ -653,7 +641,7 @@ THREE.Quaternion.prototype = {
 	set x ( value ) {
 
 		this._x = value;
-		this._updateEuler();
+		this.onChangeCallback();
 
 	},
 
@@ -666,7 +654,7 @@ THREE.Quaternion.prototype = {
 	set y ( value ) {
 
 		this._y = value;
-		this._updateEuler();
+		this.onChangeCallback();
 
 	},
 
@@ -679,7 +667,7 @@ THREE.Quaternion.prototype = {
 	set z ( value ) {
 
 		this._z = value;
-		this._updateEuler();
+		this.onChangeCallback();
 
 	},
 
@@ -692,7 +680,7 @@ THREE.Quaternion.prototype = {
 	set w ( value ) {
 
 		this._w = value;
-		this._updateEuler();
+		this.onChangeCallback();
 
 	},
 
@@ -703,7 +691,7 @@ THREE.Quaternion.prototype = {
 		this._z = z;
 		this._w = w;
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -716,7 +704,7 @@ THREE.Quaternion.prototype = {
 		this._z = quaternion._z;
 		this._w = quaternion._w;
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -784,7 +772,7 @@ THREE.Quaternion.prototype = {
 
 		}
 
-		if ( update !== false ) this._updateEuler();
+		if ( update !== false ) this.onChangeCallback();
 
 		return this;
 
@@ -803,7 +791,7 @@ THREE.Quaternion.prototype = {
 		this._z = axis.z * s;
 		this._w = Math.cos( halfAngle );
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -862,7 +850,7 @@ THREE.Quaternion.prototype = {
 
 		}
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -906,7 +894,7 @@ THREE.Quaternion.prototype = {
 
 			this.set( v1.x, v1.y, v1.z, r ).normalize();
 
-			this._updateEuler();
+			this.onChangeCallback();
 
 			return this;
 
@@ -928,7 +916,7 @@ THREE.Quaternion.prototype = {
 		this._y *= -1;
 		this._z *= -1;
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -997,7 +985,7 @@ THREE.Quaternion.prototype = {
 		this._z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
 		this._w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -1066,7 +1054,7 @@ THREE.Quaternion.prototype = {
 		this._y = ( y * ratioA + this._y * ratioB );
 		this._z = ( z * ratioA + this._z * ratioB );
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -1085,7 +1073,7 @@ THREE.Quaternion.prototype = {
 		this._z = array[ 2 ];
 		this._w = array[ 3 ];
 
-		this._updateEuler();
+		this.onChangeCallback();
 
 		return this;
 
@@ -1096,6 +1084,16 @@ THREE.Quaternion.prototype = {
 		return [ this._x, this._y, this._z, this._w ];
 
 	},
+
+	onChange: function ( callback ) {
+
+		this.onChangeCallback = callback;
+
+		return this;
+
+	},
+
+	onChangeCallback: function () {},
 
 	clone: function () {
 
@@ -2952,18 +2950,6 @@ THREE.Euler.prototype = {
 
 	_x: 0, _y: 0, _z: 0, _order: THREE.Euler.DefaultOrder,
 
-	_quaternion: undefined,
-
-	_updateQuaternion: function () {
-
-		if ( this._quaternion !== undefined ) {
-
-			this._quaternion.setFromEuler( this, false );
-
-		}
-
-	},
-
 	get x () {
 
 		return this._x;
@@ -2973,7 +2959,7 @@ THREE.Euler.prototype = {
 	set x ( value ) {
 
 		this._x = value;
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 	},
 
@@ -2986,7 +2972,7 @@ THREE.Euler.prototype = {
 	set y ( value ) {
 
 		this._y = value;
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 	},
 
@@ -2999,7 +2985,7 @@ THREE.Euler.prototype = {
 	set z ( value ) {
 
 		this._z = value;
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 	},
 
@@ -3012,7 +2998,7 @@ THREE.Euler.prototype = {
 	set order ( value ) {
 
 		this._order = value;
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 	},
 
@@ -3023,7 +3009,7 @@ THREE.Euler.prototype = {
 		this._z = z;
 		this._order = order || this._order;
 
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 		return this;
 
@@ -3036,7 +3022,7 @@ THREE.Euler.prototype = {
 		this._z = euler._z;
 		this._order = euler._order;
 
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 		return this;
 
@@ -3159,7 +3145,7 @@ THREE.Euler.prototype = {
 
 		this._order = order;
 
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 		return this;
 
@@ -3224,7 +3210,7 @@ THREE.Euler.prototype = {
 
 		this._order = order;
 
-		if ( update !== false ) this._updateQuaternion();
+		if ( update !== false ) this.onChangeCallback();
 
 		return this;
 
@@ -3246,6 +3232,12 @@ THREE.Euler.prototype = {
 
 	}(),
 
+	equals: function ( euler ) {
+
+		return ( euler._x === this._x ) && ( euler._y === this._y ) && ( euler._z === this._z ) && ( euler._order === this._order );
+
+	},
+
 	fromArray: function ( array ) {
 
 		this._x = array[ 0 ];
@@ -3253,7 +3245,7 @@ THREE.Euler.prototype = {
 		this._z = array[ 2 ];
 		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
 
-		this._updateQuaternion();
+		this.onChangeCallback();
 
 		return this;
 
@@ -3265,11 +3257,15 @@ THREE.Euler.prototype = {
 
 	},
 
-	equals: function ( euler ) {
+	onChange: function ( callback ) {
 
-		return ( euler._x === this._x ) && ( euler._y === this._y ) && ( euler._z === this._z ) && ( euler._order === this._order );
+		this.onChangeCallback = callback;
+
+		return this;
 
 	},
+
+	onChangeCallback: function () {},
 
 	clone: function () {
 
@@ -7520,6 +7516,8 @@ THREE.EventDispatcher.prototype = {
 
 THREE.Object3D = function () {
 
+	var scope = this;
+
 	this.id = THREE.Object3DIdCount ++;
 	this.uuid = THREE.Math.generateUUID();
 
@@ -7531,14 +7529,10 @@ THREE.Object3D = function () {
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
-	this._rotation = new THREE.Euler();
-	this._quaternion = new THREE.Quaternion();
+	this.rotation = new THREE.Euler().onChange( function () { scope.quaternion.setFromEuler( scope.rotation, false ); } );
+	this.quaternion = new THREE.Quaternion().onChange( function () { scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
+ } );
 	this.scale = new THREE.Vector3( 1, 1, 1 );
-
-	// keep rotation and quaternion in sync
-
-	this._rotation._quaternion = this.quaternion;
-	this._quaternion._euler = this.rotation;
 
 	this.renderDepth = null;
 
@@ -7565,32 +7559,6 @@ THREE.Object3D = function () {
 THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
-	
-	get rotation () { 
-		return this._rotation; 
-	},
-
-	set rotation ( value ) {
-		
-		this._rotation = value;
-		this._rotation._quaternion = this._quaternion;
-		this._quaternion._euler = this._rotation;
-		this._rotation._updateQuaternion();
-		
-	},
-
-	get quaternion () { 
-		return this._quaternion; 
-	},
-	
-	set quaternion ( value ) {
-		
-		this._quaternion = value;
-		this._quaternion._euler = this._rotation;
-		this._rotation._quaternion = this._quaternion;
-		this._quaternion._updateEuler();
-		
-	},
 
 	get eulerOrder () {
 
@@ -10841,13 +10809,14 @@ THREE.Geometry99.prototype.createUvProxies = function () {
 		var faces = this.faces;
 		var uvarray = this.attributes.uv.array;
 
-		for (var i = 0, l = faces.length; i < l; i++) {
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
 			var f = faces[i];
 
-			this.faceVertexUvs[0][i] = [];
-			this.faceVertexUvs[0][i][0] = new THREE.TypedVector2(uvarray, f.a * 2);
-			this.faceVertexUvs[0][i][1] = new THREE.TypedVector2(uvarray, f.b * 2);
-			this.faceVertexUvs[0][i][2] = new THREE.TypedVector2(uvarray, f.c * 2);
+			this.faceVertexUvs[ 0 ][ i ] = [];
+			this.faceVertexUvs[ 0 ][ i ][ 0 ] = new THREE.TypedVector2( uvarray, f.a * 2 );
+			this.faceVertexUvs[ 0 ][ i ][ 1 ] = new THREE.TypedVector2( uvarray, f.b * 2 );
+			this.faceVertexUvs[ 0 ][ i ][ 2 ] = new THREE.TypedVector2( uvarray, f.c * 2 );
 
 		}
 	
