@@ -280,9 +280,12 @@ THREE.Quaternion.prototype = {
 
 			}
 
-			this.set( v1.x, v1.y, v1.z, r ).normalize();
+			this._x = v1.x;
+			this._y = v1.y;
+			this._z = v1.z;
+			this._w = r;
 
-			this.onChangeCallback();
+			this.normalize();
 
 			return this;
 
@@ -343,6 +346,8 @@ THREE.Quaternion.prototype = {
 			this._w = this._w * l;
 
 		}
+
+		this.onChangeCallback();
 
 		return this;
 
