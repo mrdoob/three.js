@@ -34,6 +34,7 @@ THREE.Object3D = function () {
 
 	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = false;
+	this.matrixWorldIsMirrored = false;
 
 	this.visible = true;
 
@@ -461,6 +462,8 @@ THREE.Object3D.prototype = {
 				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 			}
+
+			this.matrixWorldIsMirrored = this.matrixWorld.determinant() < 0;
 
 			this.matrixWorldNeedsUpdate = false;
 

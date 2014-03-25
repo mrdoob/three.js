@@ -24,6 +24,8 @@ THREE.UniformsLib = {
 
 		"morphTargetInfluences" : { type: "f", value: 0 }
 
+		"flipSided": { type: "i", value: 0 }
+
 	},
 
 	bump: {
