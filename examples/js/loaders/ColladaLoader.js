@@ -3436,17 +3436,17 @@ THREE.ColladaLoader = function () {
 			var transparencyLevel = 0;
 			
 			// Determine transparency level based on opaque mode
-			if(transparentColor.opaque == "RGB_ONE") {
+			if (transparentColor.opaque == "RGB_ONE") {
 				transparencyLevel = (3 - this.transparent.color.r -
 					this.transparent.color.g - 
 					this.transparent.color.b) / 
 					3 * this.transparency;
-			} else if(transparentColor.opaque == "RGB_ZERO") {
+			} else if (transparentColor.opaque == "RGB_ZERO") {
 				transparencyLevel = (this.transparent.color.r +
 					this.transparent.color.g + 
 					this.transparent.color.b) / 
 					3 * this.transparency;
-			} else if(transparentColor.opaque == "A_ONE") {
+			} else if (transparentColor.opaque == "A_ONE") {
 				transparencyLevel = ( 1 - this.transparent.color.a ) * this.transparency;
 			} else { // A_ZERO (default in collada 1.5.0) - http://www.khronos.org/files/collada_1_5_release_notes.pdf (pg 16)
 				transparencyLevel = this.transparent.color.a * this.transparency;
