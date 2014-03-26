@@ -17,27 +17,25 @@ THREE.Object3D = function () {
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
+	this.position = new THREE.Vector3();
+
 	var scope = this;
 
 	Object.defineProperties( this, {
-		position: { 
-			enumerable: true, 
-			value: new THREE.Vector3()
-		},
 		rotation: {
-			enumerable: true,	
+			enumerable: true,
 			value: new THREE.Euler().onChange( function () {
 				scope.quaternion.setFromEuler( scope.rotation, false );
 			} )
 		},
 		quaternion: {
-			enumerable: true,	
+			enumerable: true,
 			value: new THREE.Quaternion().onChange( function () {
 				scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
 			} )
 		},
 		scale: {
-			enumerable: true,	
+			enumerable: true,
 			value: new THREE.Vector3( 1, 1, 1 )
 		}
 	} );
