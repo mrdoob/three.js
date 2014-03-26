@@ -7,8 +7,6 @@
 
 THREE.Object3D = function () {
 
-	var scope = this;
-
 	this.id = THREE.Object3DIdCount ++;
 	this.uuid = THREE.Math.generateUUID();
 
@@ -19,11 +17,30 @@ THREE.Object3D = function () {
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
-	this.position = new THREE.Vector3();
-	this.rotation = new THREE.Euler().onChange( function () { scope.quaternion.setFromEuler( scope.rotation, false ); } );
-	this.quaternion = new THREE.Quaternion().onChange( function () { scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
- } );
-	this.scale = new THREE.Vector3( 1, 1, 1 );
+	var scope = this;
+
+	Object.defineProperties( this, {
+		position: { 
+			enumerable: true, 
+			value: new THREE.Vector3()
+		},
+		rotation: {
+			enumerable: true,	
+			value: new THREE.Euler().onChange( function () {
+				scope.quaternion.setFromEuler( scope.rotation, false );
+			} )
+		},
+		quaternion: {
+			enumerable: true,	
+			value: new THREE.Quaternion().onChange( function () {
+				scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
+			} )
+		},
+		scale: {
+			enumerable: true,	
+			value: new THREE.Vector3( 1, 1, 1 )
+		}
+	} );
 
 	this.renderDepth = null;
 
