@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">	
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>        
-	    <style type="text/css">
-	        html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline}html{line-height:1}ol,ul{list-style:none}table{border-collapse:collapse;border-spacing:0}caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}q,blockquote{quotes:none}q:before,q:after,blockquote:before,blockquote:after{content:"";content:none}a img{border:none}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary{display:block}body{width:100%;height:100%}body #body_container{width:100%;height:100%;background-color:#000000}
-	    </style>        
-    </head>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>        
+		<style type="text/css">
+			html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline}html{line-height:1}ol,ul{list-style:none}table{border-collapse:collapse;border-spacing:0}caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}q,blockquote{quotes:none}q:before,q:after,blockquote:before,blockquote:after{content:"";content:none}a img{border:none}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary{display:block}body{width:100%;height:100%}body #body_container{width:100%;height:100%;background-color:#000000}
+		</style>        
+	</head>
 
 
 	<body>
@@ -23,245 +23,231 @@
 			var lastTime = (new Date()).getTime();
 
 			var WINDOW = {
-			    ms_Width: 0,
-			    ms_Height: 0,
-			    ms_Callbacks: {
-			        70: "WINDOW.ToggleFullScreen()",		// Toggle fullscreen
-			    },
+				ms_Width: 0,
+				ms_Height: 0,
+				ms_Callbacks: {
+					70: "WINDOW.ToggleFullScreen()",		// Toggle fullscreen
+				},
 
-			    Initialize: function () {
-			        this.UpdateSize();
+				Initialize: function () {
+					this.UpdateSize();
 
-			        // Create callbacks from keyboard
-			        document.onkeydown = function (inEvent) { WINDOW.CallAction(inEvent.keyCode); };
-			        window.onresize = function (inEvent) {
-			            WINDOW.UpdateSize();
-			            WINDOW.ResizeCallback(WINDOW.ms_Width, WINDOW.ms_Height);
-			        };
-			    },
-			    UpdateSize: function () {
-			        this.ms_Width = window.outerWidth;
-			        this.ms_Height = window.outerHeight - 4;
-			    },
-			    CallAction: function (inId) {
-			        if (inId in this.ms_Callbacks) {
-			            eval(this.ms_Callbacks[inId]);
-			            return false;
-			        }
-			    },
-			    ToggleFullScreen: function () {
-			        if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
-			            if (document.documentElement.requestFullscreen)
-			                document.documentElement.requestFullscreen();
-			            else if (document.documentElement.mozRequestFullScreen)
-			                document.documentElement.mozRequestFullScreen();
-			            else if (document.documentElement.webkitRequestFullscreen)
-			                document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-			        }
-			        else {
-			            if (document.cancelFullScreen)
-			                document.cancelFullScreen();
-			            else if (document.mozCancelFullScreen)
-			                document.mozCancelFullScreen();
-			            else if (document.webkitCancelFullScreen)
-			                document.webkitCancelFullScreen();
-			        }
-			    },
-			    ResizeCallback: function (inWidth, inHeight) { },
+					// Create callbacks from keyboard
+					document.onkeydown = function (inEvent) { WINDOW.CallAction(inEvent.keyCode); };
+					window.onresize = function (inEvent) {
+						WINDOW.UpdateSize();
+						WINDOW.ResizeCallback(WINDOW.ms_Width, WINDOW.ms_Height);
+					};
+				},
+				UpdateSize: function () {
+					this.ms_Width = window.outerWidth;
+					this.ms_Height = window.outerHeight - 4;
+				},
+				CallAction: function (inId) {
+					if (inId in this.ms_Callbacks) {
+						eval(this.ms_Callbacks[inId]);
+						return false;
+					}
+				},
+				ToggleFullScreen: function () {
+					if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
+						if (document.documentElement.requestFullscreen)
+							document.documentElement.requestFullscreen();
+						else if (document.documentElement.mozRequestFullScreen)
+							document.documentElement.mozRequestFullScreen();
+						else if (document.documentElement.webkitRequestFullscreen)
+							document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+					}
+					else {
+						if (document.cancelFullScreen)
+							document.cancelFullScreen();
+						else if (document.mozCancelFullScreen)
+							document.mozCancelFullScreen();
+						else if (document.webkitCancelFullScreen)
+							document.webkitCancelFullScreen();
+					}
+				},
+				ResizeCallback: function (inWidth, inHeight) { },
 			};
 
 			var lastTime = (new Date()).getTime();
 
 			var DEMO =
 			{
-			    ms_Canvas: null,
-			    ms_Renderer: null,
-			    ms_Camera: null,
-			    ms_Scene: null,
-			    ms_Controls: null,
-			    ms_Ocean: null,
+				ms_Canvas: null,
+				ms_Renderer: null,
+				ms_Camera: null,
+				ms_Scene: null,
+				ms_Controls: null,
+				ms_Ocean: null,
 
-			    Enable: (function () {
-			        try {
-			            var aCanvas = document.createElement('canvas');
-			            return !!window.WebGLRenderingContext && (aCanvas.getContext('webgl') || aCanvas.getContext('experimental-webgl'));
-			        }
-			        catch (e) { return false; }
-			    })(),
+				Initialize: function (inIdCanvas) {
+					this.ms_Canvas = document.getElementById(inIdCanvas);
 
-			    Initialize: function (inIdCanvas) {
-			        this.ms_Canvas = document.getElementById(inIdCanvas);
+					this.ms_Renderer = new THREE.WebGLRenderer();
+					
+					this.ms_Renderer.shadowMapEnabled = true;
+					this.ms_Renderer.context.getExtension('OES_texture_float');
+					this.ms_Renderer.context.getExtension('OES_texture_float_linear');
+					this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
 
-			        // Initialize Renderer, Camera and Scene
-			        this.ms_Renderer =
-			            this.Enable ?
-			                new THREE.WebGLRenderer({ premultipliedAlpha: false, antialias: true })
-			                : new THREE.CanvasRenderer({ premultipliedAlpha: false, antialias: true });
-			        
-			        this.ms_Renderer.shadowMapEnabled = true;
-			        this.ms_Renderer.context.getExtension('OES_texture_float');
-			        this.ms_Renderer.context.getExtension('OES_texture_float_linear');
-			        this.ms_Renderer.autoClear = true;
-			        this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
-			        this.ms_Scene = new THREE.Scene();
+					this.ms_Scene = new THREE.Scene();
 
-			        this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 300000);
-			        this.ms_Camera.position.set(450, 350, 450);
-			        this.ms_Camera.lookAt(new THREE.Vector3(0,0,0));
+					this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 300000);
+					this.ms_Camera.position.set(450, 350, 450);
+					this.ms_Camera.lookAt(new THREE.Vector3(0,0,0));
 
-			        // Initialize Orbit control		
-			        this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
-			        this.ms_Controls.userPan = false;
-			        this.ms_Controls.userPanSpeed = 0.0;
-			        this.ms_Controls.minDistance = 0;
-			        this.ms_Controls.maxDistance = 2000.0;
-			        this.ms_Controls.minPolarAngle = 0;
-			        this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
-			        
-			        this.debugaxis = function (axisLength) {
-			            //Shorten the vertex function
-			            function v(a, b, c) {
-			                return new THREE.Vector3(a, b, c);
-			            }
+					// Initialize Orbit control		
+					this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
+					this.ms_Controls.userPan = false;
+					this.ms_Controls.userPanSpeed = 0.0;
+					this.ms_Controls.minDistance = 0;
+					this.ms_Controls.maxDistance = 2000.0;
+					this.ms_Controls.minPolarAngle = 0;
+					this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
+					
+					this.debugaxis = function (axisLength) {
+						//Shorten the vertex function
+						function v(a, b, c) {
+							return new THREE.Vector3(a, b, c);
+						}
 
-			            //Create axis (point1, point2, colour)
-			            function createAxis(p1, p2, color,scene) {
-			                var line, lineGeometry = new THREE.Geometry(),
-			                lineMat = new THREE.LineBasicMaterial({ color: color, lineWidth: 1 });
-			                lineGeometry.vertices.push(p1, p2);
-			                line = new THREE.Line(lineGeometry, lineMat);
-			                scene.add(line);
-			            }
+						//Create axis (point1, point2, colour)
+						function createAxis(p1, p2, color,scene) {
+							var line, lineGeometry = new THREE.Geometry(),
+							lineMat = new THREE.LineBasicMaterial({ color: color, lineWidth: 1 });
+							lineGeometry.vertices.push(p1, p2);
+							line = new THREE.Line(lineGeometry, lineMat);
+							scene.add(line);
+						}
 
-			            createAxis(v(-axisLength, 0, 0), v(axisLength, 0, 0), 0xFF0000, this.ms_Scene);
-			            createAxis(v(0, -axisLength, 0), v(0, axisLength, 0), 0x00FF00, this.ms_Scene);
-			            createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0xFFFF00, this.ms_Scene);
-			        };
+						createAxis(v(-axisLength, 0, 0), v(axisLength, 0, 0), 0xFF0000, this.ms_Scene);
+						createAxis(v(0, -axisLength, 0), v(0, axisLength, 0), 0x00FF00, this.ms_Scene);
+						createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0xFFFF00, this.ms_Scene);
+					};
 
-			        //To use enter the axis length
-			        this.debugaxis(50);
-			        
-			        var gsize = 512; 
-			        var res = 1024; 
-			        var gres = res / 2;
-			        var origx = -gsize / 2;
-			        var origz = -gsize / 2;
-			        this.ms_Ocean = new THREE.Ocean(this.ms_Renderer, this.ms_Camera, this.ms_Scene,
-			        {
-			            INITIAL_SIZE : 1000.0,
-			            INITIAL_WIND : [10.0, 10.0],
-			            INITIAL_CHOPPINESS : 1.5,
-			            CLEAR_COLOR : [1.0, 1.0, 1.0, 0.0],
-			            GEOMETRY_ORIGIN : [origx, origz],
-			            SUN_DIRECTION : [-1.0, 1.0, 1.0],
-			            OCEAN_COLOR: new THREE.Vector3(0.004, 0.016, 0.047),
-			            SKY_COLOR: new THREE.Vector3(3.2, 9.6, 12.8),
-			            EXPOSURE : 0.35,
-			            GEOMETRY_RESOLUTION: gres,
-			            GEOMETRY_SIZE : gsize,
-			            RESOLUTION : res
-			        });
-			        this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix = { type: "m4", value: this.ms_Camera.projectionMatrix };
-			        this.ms_Ocean.materialOcean.uniforms.u_viewMatrix = { type: "m4", value: this.ms_Camera.matrixWorldInverse };
-			        this.ms_Ocean.materialOcean.uniforms.u_cameraPosition = { type: "v3", value: this.ms_Camera.position };
-			        this.ms_Scene.add(this.ms_Ocean.oceanMesh);
+					//To use enter the axis length
+					this.debugaxis(50);
+					
+					var gsize = 512; 
+					var res = 1024; 
+					var gres = res / 2;
+					var origx = -gsize / 2;
+					var origz = -gsize / 2;
+					this.ms_Ocean = new THREE.Ocean(this.ms_Renderer, this.ms_Camera, this.ms_Scene,
+					{
+						INITIAL_SIZE : 1000.0,
+						INITIAL_WIND : [10.0, 10.0],
+						INITIAL_CHOPPINESS : 1.5,
+						CLEAR_COLOR : [1.0, 1.0, 1.0, 0.0],
+						GEOMETRY_ORIGIN : [origx, origz],
+						SUN_DIRECTION : [-1.0, 1.0, 1.0],
+						OCEAN_COLOR: new THREE.Vector3(0.004, 0.016, 0.047),
+						SKY_COLOR: new THREE.Vector3(3.2, 9.6, 12.8),
+						EXPOSURE : 0.35,
+						GEOMETRY_RESOLUTION: gres,
+						GEOMETRY_SIZE : gsize,
+						RESOLUTION : res
+					});
+					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix = { type: "m4", value: this.ms_Camera.projectionMatrix };
+					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix = { type: "m4", value: this.ms_Camera.matrixWorldInverse };
+					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition = { type: "v3", value: this.ms_Camera.position };
+					this.ms_Scene.add(this.ms_Ocean.oceanMesh);
 
-			        var gui = new dat.GUI();
-			        var c1 = gui.add(this.ms_Ocean, "size",100, 5000);
-			        c1.onChange(function(v) {
-			            this.object.size = v;
-			            this.object.changed = true;
-			        });
-			        var c2 = gui.add(this.ms_Ocean, "choppiness", 0.1, 4);
-			        c2.onChange(function (v) {
-			            this.object.choppiness = v;
-			            this.object.changed = true;
-			        });
-			        var c3 = gui.add(this.ms_Ocean, "windX",-15, 15);
-			        c3.onChange(function (v) {
-			            this.object.windX = v;
-			            this.object.changed = true;
-			        });
-			        var c4 = gui.add(this.ms_Ocean, "windY", -15, 15);
-			        c4.onChange(function (v) {
-			            this.object.windY = v;
-			            this.object.changed = true;
-			        });
-			        var c5 = gui.add(this.ms_Ocean, "sunDirectionX", -1.0, 1.0);
-			        c5.onChange(function (v) {
-			            this.object.sunDirectionX = v;
-			            this.object.changed = true;
-			        });
-			        var c6 = gui.add(this.ms_Ocean, "sunDirectionY", -1.0, 1.0);
-			        c6.onChange(function (v) {
-			            this.object.sunDirectionY = v;
-			            this.object.changed = true;
-			        });
-			        var c7 = gui.add(this.ms_Ocean, "sunDirectionZ", -1.0, 1.0);
-			        c7.onChange(function (v) {
-			            this.object.sunDirectionZ = v;
-			            this.object.changed = true;
-			        });
-			        var c8 = gui.add(this.ms_Ocean, "exposure", 0.0, 0.5);
-			        c8.onChange(function (v) {
-			            this.object.exposure = v;
-			            this.object.changed = true;
-			        });
-			    },
-			    
-			    Display: function () {
-			        this.ms_Renderer.render(this.ms_Scene, this.ms_Camera);
-			    },
+					var gui = new dat.GUI();
+					var c1 = gui.add(this.ms_Ocean, "size",100, 5000);
+					c1.onChange(function(v) {
+						this.object.size = v;
+						this.object.changed = true;
+					});
+					var c2 = gui.add(this.ms_Ocean, "choppiness", 0.1, 4);
+					c2.onChange(function (v) {
+						this.object.choppiness = v;
+						this.object.changed = true;
+					});
+					var c3 = gui.add(this.ms_Ocean, "windX",-15, 15);
+					c3.onChange(function (v) {
+						this.object.windX = v;
+						this.object.changed = true;
+					});
+					var c4 = gui.add(this.ms_Ocean, "windY", -15, 15);
+					c4.onChange(function (v) {
+						this.object.windY = v;
+						this.object.changed = true;
+					});
+					var c5 = gui.add(this.ms_Ocean, "sunDirectionX", -1.0, 1.0);
+					c5.onChange(function (v) {
+						this.object.sunDirectionX = v;
+						this.object.changed = true;
+					});
+					var c6 = gui.add(this.ms_Ocean, "sunDirectionY", -1.0, 1.0);
+					c6.onChange(function (v) {
+						this.object.sunDirectionY = v;
+						this.object.changed = true;
+					});
+					var c7 = gui.add(this.ms_Ocean, "sunDirectionZ", -1.0, 1.0);
+					c7.onChange(function (v) {
+						this.object.sunDirectionZ = v;
+						this.object.changed = true;
+					});
+					var c8 = gui.add(this.ms_Ocean, "exposure", 0.0, 0.5);
+					c8.onChange(function (v) {
+						this.object.exposure = v;
+						this.object.changed = true;
+					});
+				},
+				
+				Display: function () {
+					this.ms_Renderer.render(this.ms_Scene, this.ms_Camera);
+				},
 
-			    Update: function () {
-			        this.ms_Renderer.clear();
-			        var currentTime = new Date().getTime();
-			        this.ms_Ocean.deltaTime = (currentTime - lastTime) / 1000 || 0.0;
-			        lastTime = currentTime;
-			        this.ms_Ocean.render(this.ms_Ocean.deltaTime);
-			        this.ms_Ocean.overrideMaterial = this.ms_Ocean.materialOcean;
-			        if (this.ms_Ocean.changed) {
-			            this.ms_Ocean.materialOcean.uniforms.u_size.value = this.ms_Ocean.size;
-			            this.ms_Ocean.materialOcean.uniforms.u_sunDirection.value = new THREE.Vector3(this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ);
-			            this.ms_Ocean.materialOcean.uniforms.u_exposure.value = this.ms_Ocean.exposure;
-			            this.ms_Ocean.changed = false;
-			        }
-			        this.ms_Ocean.materialOcean.uniforms.u_normalMap.value = this.ms_Ocean.normalMapFramebuffer ;
-			        this.ms_Ocean.materialOcean.uniforms.u_displacementMap.value = this.ms_Ocean.displacementMapFramebuffer ;
-			        this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix.value = this.ms_Camera.projectionMatrix ;
-			        this.ms_Ocean.materialOcean.uniforms.u_viewMatrix.value = this.ms_Camera.matrixWorldInverse ;
-			        this.ms_Ocean.materialOcean.uniforms.u_cameraPosition.value = this.ms_Camera.position;
-			        this.ms_Ocean.materialOcean.depthTest = true;
-			        //this.ms_Scene.__lights[1].position.x = this.ms_Scene.__lights[1].position.x + 0.01;
-			        this.ms_Controls.update();
-			        this.Display();
-			    },
+				Update: function () {
+					this.ms_Renderer.clear();
+					var currentTime = new Date().getTime();
+					this.ms_Ocean.deltaTime = (currentTime - lastTime) / 1000 || 0.0;
+					lastTime = currentTime;
+					this.ms_Ocean.render(this.ms_Ocean.deltaTime);
+					this.ms_Ocean.overrideMaterial = this.ms_Ocean.materialOcean;
+					if (this.ms_Ocean.changed) {
+						this.ms_Ocean.materialOcean.uniforms.u_size.value = this.ms_Ocean.size;
+						this.ms_Ocean.materialOcean.uniforms.u_sunDirection.value = new THREE.Vector3(this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ);
+						this.ms_Ocean.materialOcean.uniforms.u_exposure.value = this.ms_Ocean.exposure;
+						this.ms_Ocean.changed = false;
+					}
+					this.ms_Ocean.materialOcean.uniforms.u_normalMap.value = this.ms_Ocean.normalMapFramebuffer ;
+					this.ms_Ocean.materialOcean.uniforms.u_displacementMap.value = this.ms_Ocean.displacementMapFramebuffer ;
+					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix.value = this.ms_Camera.projectionMatrix ;
+					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix.value = this.ms_Camera.matrixWorldInverse ;
+					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition.value = this.ms_Camera.position;
+					this.ms_Ocean.materialOcean.depthTest = true;
+					//this.ms_Scene.__lights[1].position.x = this.ms_Scene.__lights[1].position.x + 0.01;
+					this.ms_Controls.update();
+					this.Display();
+				},
 
-			    Resize: function (inWidth, inHeight) {
-			        this.ms_Camera.aspect = inWidth / inHeight;
-			        this.ms_Camera.updateProjectionMatrix();
-			        this.ms_Renderer.setSize(inWidth, inHeight);
-			        this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
-			        this.Display();
-			    }
+				Resize: function (inWidth, inHeight) {
+					this.ms_Camera.aspect = inWidth / inHeight;
+					this.ms_Camera.updateProjectionMatrix();
+					this.ms_Renderer.setSize(inWidth, inHeight);
+					this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
+					this.Display();
+				}
 			};
 
 			function MainLoop() {
-			    requestAnimationFrame(MainLoop);
-			    DEMO.Update();
+				requestAnimationFrame(MainLoop);
+				DEMO.Update();
 			};
 
-			$(function () {
+			WINDOW.Initialize();
+			
+			DEMO.Initialize('main_canvas');
 
-			    WINDOW.Initialize();
-			    
-			    DEMO.Initialize('main_canvas');
+			WINDOW.ResizeCallback = function (inWidth, inHeight) { DEMO.Resize(inWidth, inHeight); };
+			DEMO.Resize(WINDOW.ms_Width, WINDOW.ms_Height);
 
-			    WINDOW.ResizeCallback = function (inWidth, inHeight) { DEMO.Resize(inWidth, inHeight); };
-			    DEMO.Resize(WINDOW.ms_Width, WINDOW.ms_Height);
+			MainLoop();
 
-			    MainLoop();
-			});
 		</script>
 	</body>
 </html>
