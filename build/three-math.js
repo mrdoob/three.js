@@ -1160,7 +1160,6 @@ THREE.Vector2.prototype = {
 
 	},
 
-
 	setComponent: function ( index, value ) {
 
 		switch ( index ) {

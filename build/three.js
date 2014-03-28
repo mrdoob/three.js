@@ -1160,7 +1160,6 @@ THREE.Vector2.prototype = {
 
 	},
 
-
 	setComponent: function ( index, value ) {
 
 		switch ( index ) {
@@ -6865,17 +6864,6 @@ THREE.Vertex = function ( v ) {
 };
 
 /**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.UV = function ( u, v ) {
-
-	console.warn( 'THREE.UV has been DEPRECATED. Use THREE.Vector2 instead.')
-	return new THREE.Vector2( u, v );
-
-};
-
-/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -7532,8 +7520,6 @@ THREE.EventDispatcher.prototype = {
 
 THREE.Object3D = function () {
 
-	var scope = this;
-
 	this.id = THREE.Object3DIdCount ++;
 	this.uuid = THREE.Math.generateUUID();
 
@@ -7545,10 +7531,27 @@ THREE.Object3D = function () {
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
-	this.rotation = new THREE.Euler().onChange( function () { scope.quaternion.setFromEuler( scope.rotation, false ); } );
-	this.quaternion = new THREE.Quaternion().onChange( function () { scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
- } );
-	this.scale = new THREE.Vector3( 1, 1, 1 );
+
+	var scope = this;
+
+	Object.defineProperties( this, {
+		rotation: {
+			enumerable: true,
+			value: new THREE.Euler().onChange( function () {
+				scope.quaternion.setFromEuler( scope.rotation, false );
+			} )
+		},
+		quaternion: {
+			enumerable: true,
+			value: new THREE.Quaternion().onChange( function () {
+				scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
+			} )
+		},
+		scale: {
+			enumerable: true,
+			value: new THREE.Vector3( 1, 1, 1 )
+		}
+	} );
 
 	this.renderDepth = null;
 
@@ -17083,7 +17086,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			var material = element.material;
 
-			if ( material === undefined || material.visible === false ) continue;
+			if ( material === undefined || material.opacity === 0 ) continue;
 
 			_elemBox.makeEmpty();
 

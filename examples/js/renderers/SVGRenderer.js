@@ -123,7 +123,7 @@ THREE.SVGRenderer = function () {
 			var element = _elements[ e ];
 			var material = element.material;
 
-			if ( material === undefined || material.visible === false ) continue;
+			if ( material === undefined || material.opacity === 0 ) continue;
 
 			_elemBox.makeEmpty();
 
