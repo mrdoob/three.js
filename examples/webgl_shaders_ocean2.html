@@ -10,12 +10,8 @@
 			}
 		</style>        
 	</head>
-
-
 	<body>
-		<section id="body_container">
-			<div id="main_canvas"></div>
-		</section>		
+
 		<script src="../build/three.min.js"></script>		
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -77,26 +73,25 @@
 
 			var DEMO =
 			{
-				ms_Canvas: null,
 				ms_Renderer: null,
 				ms_Camera: null,
 				ms_Scene: null,
 				ms_Controls: null,
 				ms_Ocean: null,
 
-				Initialize: function (inIdCanvas) {
-					this.ms_Canvas = document.getElementById(inIdCanvas);
+				Initialize: function () {
 
 					this.ms_Renderer = new THREE.WebGLRenderer();
 					this.ms_Renderer.context.getExtension('OES_texture_float');
 					this.ms_Renderer.context.getExtension('OES_texture_float_linear');
-					this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
+
+					document.body.appendChild(this.ms_Renderer.domElement);
 
 					this.ms_Scene = new THREE.Scene();
 
 					this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 300000);
 					this.ms_Camera.position.set(450, 350, 450);
-					this.ms_Camera.lookAt(new THREE.Vector3(0,0,0));
+					this.ms_Camera.lookAt(new THREE.Vector3());
 
 					// Initialize Orbit control		
 					this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
@@ -107,29 +102,6 @@
 					this.ms_Controls.minPolarAngle = 0;
 					this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
 					
-					this.debugaxis = function (axisLength) {
-						//Shorten the vertex function
-						function v(a, b, c) {
-							return new THREE.Vector3(a, b, c);
-						}
-
-						//Create axis (point1, point2, colour)
-						function createAxis(p1, p2, color,scene) {
-							var line, lineGeometry = new THREE.Geometry(),
-							lineMat = new THREE.LineBasicMaterial({ color: color, lineWidth: 1 });
-							lineGeometry.vertices.push(p1, p2);
-							line = new THREE.Line(lineGeometry, lineMat);
-							scene.add(line);
-						}
-
-						createAxis(v(-axisLength, 0, 0), v(axisLength, 0, 0), 0xFF0000, this.ms_Scene);
-						createAxis(v(0, -axisLength, 0), v(0, axisLength, 0), 0x00FF00, this.ms_Scene);
-						createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0xFFFF00, this.ms_Scene);
-					};
-
-					//To use enter the axis length
-					this.debugaxis(50);
-					
 					var gsize = 512; 
 					var res = 1024; 
 					var gres = res / 2;
@@ -137,7 +109,7 @@
 					var origz = -gsize / 2;
 					this.ms_Ocean = new THREE.Ocean(this.ms_Renderer, this.ms_Camera, this.ms_Scene,
 					{
-						INITIAL_SIZE : 1000.0,
+						INITIAL_SIZE : 256.0,
 						INITIAL_WIND : [10.0, 10.0],
 						INITIAL_CHOPPINESS : 1.5,
 						CLEAR_COLOR : [1.0, 1.0, 1.0, 0.0],
@@ -230,24 +202,25 @@
 					this.ms_Camera.aspect = inWidth / inHeight;
 					this.ms_Camera.updateProjectionMatrix();
 					this.ms_Renderer.setSize(inWidth, inHeight);
-					this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
 					this.Display();
 				}
 			};
 
-			function MainLoop() {
-				requestAnimationFrame(MainLoop);
-				DEMO.Update();
-			};
-
 			WINDOW.Initialize();
 			
-			DEMO.Initialize('main_canvas');
+			DEMO.Initialize();
 
 			WINDOW.ResizeCallback = function (inWidth, inHeight) { DEMO.Resize(inWidth, inHeight); };
 			DEMO.Resize(WINDOW.ms_Width, WINDOW.ms_Height);
 
-			MainLoop();
+			var render = function () {
+
+				requestAnimationFrame( render );
+				DEMO.Update();
+
+			};
+
+			render();
 
 		</script>
 	</body>
