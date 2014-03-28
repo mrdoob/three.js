@@ -35,7 +35,6 @@
 	"src/loaders/Loader.js",
 	"src/loaders/ImageLoader.js",
 	"src/loaders/JSONLoader.js",
-	"src/loaders/GeometryLoader.js",
 	"src/loaders/MaterialLoader.js",
 	"src/loaders/SceneLoader.js",
 	"src/loaders/TextureLoader.js",
@@ -59,7 +58,7 @@
 	"src/scenes/Scene.js",
 	"src/renderers/CanvasRenderer.js",
 	"src/renderers/renderables/RenderableVertex.js",
-	"src/renderers/renderables/RenderableFace3.js",
+	"src/renderers/renderables/RenderableFace.js",
 	"src/renderers/renderables/RenderableObject.js",
 	"src/renderers/renderables/RenderableSprite.js",
 	"src/renderers/renderables/RenderableLine.js"

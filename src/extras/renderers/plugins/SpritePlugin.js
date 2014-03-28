@@ -194,8 +194,17 @@ THREE.SpritePlugin = function () {
 
 			}
 
-			_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
-			_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
+			if ( material.map !== null ) {
+
+				_gl.uniform2f( uniforms.uvOffset, material.map.offset.x, material.map.offset.y );
+				_gl.uniform2f( uniforms.uvScale, material.map.repeat.x, material.map.repeat.y );
+
+			} else {
+
+				_gl.uniform2f( uniforms.uvOffset, 0, 0 );
+				_gl.uniform2f( uniforms.uvScale, 1, 1 );
+
+			}
 
 			_gl.uniform1f( uniforms.opacity, material.opacity );
 			_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );

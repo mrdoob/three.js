@@ -175,82 +175,45 @@ Editor.prototype = {
 
 		return function ( object ) {
 
+			var helper;
+
 			if ( object instanceof THREE.Camera ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.CameraHelper( object, 10 );
-				helper.add( picker );
-			
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.CameraHelper( object, 10 );
 
 			} else if ( object instanceof THREE.PointLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.PointLightHelper( object, 10 );
-				helper.add( picker );
-			
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.PointLightHelper( object, 10 );
 
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.DirectionalLightHelper( object, 20 );
-				helper.add( picker );
-
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.DirectionalLightHelper( object, 20 );
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.SpotLightHelper( object, 10 );
-				helper.add( picker );
-
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.SpotLightHelper( object, 10 );
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
+				helper = new THREE.HemisphereLightHelper( object, 10 );
 
-				var helper = new THREE.HemisphereLightHelper( object, 10 );
-				helper.add( picker );
+			} else {
 
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				// no helper for this object type
+				return;
 
 			}
+
+			var picker = new THREE.Mesh( geometry, material );
+			picker.name = 'picker';
+			picker.userData.object = object;
+			picker.visible = false;
+			helper.add( picker );
+
+			this.sceneHelpers.add( helper );
+			this.helpers[ object.id ] = helper;
+
+			this.signals.helperAdded.dispatch( helper );
 
 		};
 
@@ -292,7 +255,17 @@ Editor.prototype = {
 	select: function ( object ) {
 
 		this.selected = object;
-		this.config.setKey( 'selected', object.uuid );
+
+		if ( object !== null ) {
+
+			this.config.setKey( 'selected', object.uuid );
+
+		} else {
+
+			this.config.setKey( 'selected', null );
+
+		}
+
 		this.signals.objectSelected.dispatch( object );
 
 	},
@@ -366,8 +339,8 @@ Editor.prototype = {
 
 		var types = {
 
+			'BoxGeometry': THREE.BoxGeometry,
 			'CircleGeometry': THREE.CircleGeometry,
-			'CubeGeometry': THREE.CubeGeometry,
 			'CylinderGeometry': THREE.CylinderGeometry,
 			'ExtrudeGeometry': THREE.ExtrudeGeometry,
 			'IcosahedronGeometry': THREE.IcosahedronGeometry,

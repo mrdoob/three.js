@@ -50,13 +50,14 @@
 
 				scene = new THREE.Scene();
 
-				geometry = new THREE.CubeGeometry( 200, 200, 200 );
+				geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1 } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

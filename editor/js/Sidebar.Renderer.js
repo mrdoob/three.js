@@ -7,8 +7,9 @@ Sidebar.Renderer = function ( editor ) {
 		'WebGLRenderer': THREE.WebGLRenderer,
 		'WebGLRenderer3': THREE.WebGLRenderer3,
 		'CanvasRenderer': THREE.CanvasRenderer,
+		'SVGRenderer': THREE.SVGRenderer,
 		'SoftwareRenderer': THREE.SoftwareRenderer,
-		'SVGRenderer': THREE.SVGRenderer
+		'RaytracingRenderer': THREE.RaytracingRenderer
 
 	};
 

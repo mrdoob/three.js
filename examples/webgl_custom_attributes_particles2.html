@@ -131,7 +131,7 @@
 
 			vc1 = geometry.vertices.length;
 
-			var geometry2 = new THREE.CubeGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
+			var geometry2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
 
 			THREE.GeometryUtils.merge( geometry, geometry2 );
 
@@ -164,7 +164,7 @@
 
 			scene.add( sphere );
 
-			renderer = new THREE.WebGLRenderer( { alpha: false } );
+			renderer = new THREE.WebGLRenderer();
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );

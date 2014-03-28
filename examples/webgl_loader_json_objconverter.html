@@ -15,16 +15,16 @@
 			}
 			h1 { }
 			a { color:skyblue }
-			canvas { pointer-events:none; z-index:10; }
 
-			#d { text-align:center; margin:1em 0 -9.2em 0; z-index:0; position:relative; display:block }
+			#info { position:absolute; top:0px; width: 100%; text-align:center; }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
 		</style>
 	</head>
 
 	<body>
-		<div id="d">
+		<div id="container"></div>
+		<div id="info">
 			<h1>OBJ to Three.js converter test</h1>
 
 			<span id="rcanvas" class="button inactive">2d canvas renderer</span>
@@ -46,7 +46,7 @@
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
-			var container,stats;
+			var container, stats;
 
 			var camera, scene;
 			var canvasRenderer, webglRenderer;
@@ -75,8 +75,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
@@ -136,7 +135,7 @@
 				var ambient = new THREE.AmbientLight( 0x221100 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd, 1.5 );
 				directionalLight.position.set( 0, -70, 100 ).normalize();
 				scene.add( directionalLight );
 

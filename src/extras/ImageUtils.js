@@ -5,7 +5,7 @@
 
 THREE.ImageUtils = {
 
-	crossOrigin: 'anonymous',
+	crossOrigin: undefined,
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
@@ -19,6 +19,10 @@ THREE.ImageUtils = {
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture );
+
+		}, undefined, function ( event ) {
+
+			if ( onError ) onError( event );
 
 		} );
 

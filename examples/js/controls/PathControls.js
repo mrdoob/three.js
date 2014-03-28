@@ -217,7 +217,10 @@ THREE.PathControls = function ( object, domElement ) {
 
 		THREE.AnimationHandler.add( animationData );
 
-		return new THREE.Animation( parent, name, THREE.AnimationHandler.CATMULLROM_FORWARD, false );
+		var animation = new THREE.Animation( parent, name );
+		animation.interpolationType = THREE.AnimationHandler.CATMULLROM_FORWARD;
+
+		return animation;
 
 	};
 
@@ -285,8 +288,8 @@ THREE.PathControls = function ( object, domElement ) {
 
 			var dummyParentMaterial = new THREE.MeshLambertMaterial( { color: 0x0077ff } ),
 			dummyChildMaterial  = new THREE.MeshLambertMaterial( { color: 0x00ff00 } ),
-			dummyParentGeo = new THREE.CubeGeometry( 10, 10, 20 ),
-			dummyChildGeo  = new THREE.CubeGeometry( 2, 2, 10 );
+			dummyParentGeo = new THREE.BoxGeometry( 10, 10, 20 ),
+			dummyChildGeo  = new THREE.BoxGeometry( 2, 2, 10 );
 
 			this.animationParent = new THREE.Mesh( dummyParentGeo, dummyParentMaterial );
 

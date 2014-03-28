@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - basic</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #f00;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> webgl - animation - basic use
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/Detector.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+        
+		<script>
+			
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			
+			var container, stats;
+			var scene, camera, renderer;
+			var clock = new THREE.Clock();
+			
+			var init = function(){
+				
+				container = document.getElementById( 'container' );
+				
+				camera = new THREE.PerspectiveCamera( 53, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.x = 0;
+				camera.position.y = 0;
+				camera.position.z = 100;
+				camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+				
+				renderer = new THREE.CanvasRenderer( { antialias: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x555555, 1);				
+				container.appendChild( renderer.domElement );	
+				
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+				
+				window.addEventListener( 'resize', onWindowResize, false );
+			};
+			
+			var onWindowResize = function () {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+			
+			var createScene = function(){
+								
+				scene = new THREE.Scene();
+				
+				var axisHelper = new THREE.AxisHelper( 1 );
+				scene.add( axisHelper );				
+				
+				//SphereGeometry
+				var sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+				var sphereMesh = new THREE.Mesh( sphereGeometry, material );
+				
+				//Setup animation
+				sphereMesh.animation = {
+					"name"      : "Action",
+					"fps"       : 25,
+					"length"    : 2.0, 
+					"hierarchy" : [
+						{
+							"parent" : -1, //root
+							"keys"   : [
+								{
+									"time":0,
+									"pos" :[0,0,0],
+									"rot" :[0,0,0],
+									"scl" :[1,1,1]
+								},
+								{
+									"time":1.0,
+									"pos" :[30,0,0]
+								}
+								,
+								{
+									"time":2.0,
+									"pos" :[0,0,0]
+								}
+							]
+						}
+					]
+				};
+				ensureLoop( sphereMesh.animation );
+				THREE.AnimationHandler.add( sphereMesh.animation );
+												
+				var sphereMeshAnimation = new THREE.Animation( sphereMesh, sphereMesh.animation.name )
+				sphereMeshAnimation.play();
+				
+				scene.add( sphereMesh );
+
+			};
+			
+			var ensureLoop = function( animation ) {
+
+				for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
+          
+					var obj = animation.hierarchy[ i ];
+
+					var first = obj.keys[ 0 ];
+					var last = obj.keys[ obj.keys.length - 1 ];
+
+					last.pos = first.pos;
+					last.rot = first.rot;
+					last.scl = first.scl;
+
+				}
+
+			};
+			
+			var animate = function () {
+				requestAnimationFrame( animate );	
+				
+				var delta = clock.getDelta();				
+				THREE.AnimationHandler.update( delta );				
+				
+				render();
+			};
+			
+			var render = function () {
+				renderer.render( scene, camera );
+				stats.update();
+			};
+
+			try {
+				init();
+				createScene();
+				animate();
+			} catch( e ) {
+				var errorReport = "Your program encountered an unrecoverable error. Error was:<br/><br/>";
+				alert( errorReport + e );
+			}
+		
+		</script>
+
+	</body>
+</html>
+

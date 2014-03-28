@@ -120,8 +120,8 @@
 
 				// Add the COLLADA
 
-				model.getChildByName( 'camEye_camera', true ).visible = false;
-				model.getChildByName( 'camTarget_camera', true ).visible = false;
+				model.getObjectByName( 'camEye_camera', true ).visible = false;
+				model.getObjectByName( 'camTarget_camera', true ).visible = false;
 
 				scene.add( model );
 
@@ -194,8 +194,8 @@
 						}
 
 					}
-
-					animation.play( false, 0 );
+					animation.loop = false;
+					animation.play();
 					lastTimestamp = Date.now();
 
 				}

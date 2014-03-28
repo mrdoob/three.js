@@ -9,139 +9,130 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A geometric sphere defined by a center position and radius.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo center], [page:todo radius])</h3>
+		<h3>[name]([page:Vector3 center], [page:Float radius])</h3>
 		<div>
-		center -- todo <br />
-		radius -- todo
+		center -- [page:Vector3] <br />
+		radius -- [page:Float]
 		</div>
-		<div>
-		todo
-		</div>
-
+		
 
 		<h2>Properties</h2>
 
 
-
-		<h3>.[page:number radius]</h3>
-		<div>
-		todo
-		</div> 
-
 		<h3>.[page:Vector3 center]</h3>
-		<div>
-		todo
-		</div> 
-
+		
+		<h3>.[page:Float radius]</h3>
+		
+		
 		<h2>Methods</h2>
 
 
 
-		<h3>.set([page:todo center], [page:todo radius]) [page:todo]</h3>
+		<h3>.set([page:Vector3 center], [page:Float radius]) [page:this:Sphere]</h3>
 		<div>
-		center -- todo <br />
-		radius -- todo
+		center -- [page:Vector3] <br />
+		radius -- [page:Float]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.applyMatrix4([page:todo matrix]) [page:todo]</h3>
-		<div>
-		matrix -- todo
-		</div>
-		<div>
-		todo
+		Sets the center and radius.
 		</div>
 
-		<h3>.clampPoint([page:todo point], [page:todo optionalTarget]) [page:todo]</h3>
+		<h3>.applyMatrix4([page:Matrix4 matrix]) [page:Sphere this]</h3>
 		<div>
-		point -- todo <br />
-		optionalTarget -- todo
+		matrix -- [page:Matrix4]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.translate([page:todo offset]) [page:todo]</h3>
-		<div>
-		offset -- todo
-		</div>
-		<div>
-		todo
+		Transforms this sphere with the provided [page:Matrix4].
 		</div>
 
-		<h3>.clone() [page:todo]</h3>
+		<h3>.clampPoint([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		todo
+		point -- [page:Vector3] The point to clamp <br />
+		optionalTarget -- [page:Vector3] The optional target point to return
+		</div>
+		<div>
+		Clamps a point within the sphere. If the point is is outside the sphere, it will clamp it to the closets point on the edge of the sphere.
 		</div>
 
-		<h3>.equals([page:todo sphere]) [page:todo]</h3>
+		<h3>.translate([page:Vector3 offset]) [page:Sphere this]</h3>
 		<div>
-		sphere -- todo
+		offset -- [page:Vector3]
 		</div>
 		<div>
-		todo
+		Translate the sphere's center by the provided offset vector.
 		</div>
 
-		<h3>.setFromPoints([page:todo points], [page:Vector3 optionalCenter]) [page:todo]</h3>
+		<h3>.clone() [page:Sphere]</h3>
 		<div>
-		points -- list of [page:Vector3 vector] positions.<br />  
-		optionalCenter -- optional position for the sphere's center.<br />
+		Provides a new copy of the sphere.
+		</div>
+
+		<h3>.equals([page:Sphere sphere]) [page:Boolean]</h3>
+		<div>
+		sphere -- [page:Sphere]
+		</div>
+		<div>
+		Checks to see if the two spheres' centers and radii are equal.
+		</div>
+
+		<h3>.setFromPoints([page:Array points], [page:Vector3 optionalCenter]) [page:Sphere this]</h3>
+		<div>
+		points -- [page:Array] of [page:Vector3] positions.<br />  
+		optionalCenter -- Optional [page:Vector3] position for the sphere's center.<br />
 		</div>
 		<div>
 		Computes the minimum bounding sphere for *points*. If *optionalCenter* is given, it is used as the sphere's center. Otherwise, the center of the axis-aligned bounding box encompassing *points* is calculated.
 		</div>
 
-		<h3>.distanceToPoint([page:todo point]) [page:todo]</h3>
+		<h3>.distanceToPoint([page:Vector3 point]) [page:Float]</h3>
 		<div>
-		point -- todo
+		point -- [page:Vector3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.getBoundingBox([page:todo optionalTarget]) [page:todo]</h3>
-		<div>
-		optionalTarget -- todo
-		</div>
-		<div>
-		todo
+		Returns the closest distance from the boundary of the sphere to the point. If the sphere contains the point, the distance will be negative.
 		</div>
 
-		<h3>.containsPoint([page:todo point]) [page:todo]</h3>
+		<h3>.getBoundingBox([page:Box optionalTarget]) [page:Box]</h3>
 		<div>
-		point -- todo
+		optionalTarget -- [page:Box]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.copy([page:todo sphere]) [page:todo]</h3>
-		<div>
-		sphere -- todo
-		</div>
-		<div>
-		todo
+		Returns a bounding box for the sphere, optionally setting a provided box target.
 		</div>
 
-		<h3>.intersectsSphere([page:todo sphere]) [page:todo]</h3>
+		<h3>.containsPoint([page:Vector3 point]) [page:Boolean]</h3>
 		<div>
-		sphere -- todo
+		point -- [page:Vector3]
 		</div>
 		<div>
-		todo
+		Checks to see if the sphere contains the provided point inclusive of the edge of the sphere.
 		</div>
 
-		<h3>.empty() [page:todo]</h3>
+		<h3>.copy([page:Sphere sphere]) [page:Sphere]</h3>
 		<div>
-		todo
+		sphere -- [page:Sphere] to copy
+		</div>
+		<div>
+		Copies the values of the passed sphere to this sphere.
+		</div>
+
+		<h3>.intersectsSphere([page:Sphere sphere]) [page:Boolean]</h3>
+		<div>
+		sphere -- [page:Sphere]
+		</div>
+		<div>
+		Checks to see if two spheres intersect.
+		</div>
+
+		<h3>.empty() [page:Boolean]</h3>
+		<div>
+		Checks to see if the sphere is empty (the radius set to 0).
 		</div>
 
 		<h2>Source</h2>

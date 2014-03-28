@@ -76,8 +76,8 @@
 
 						material = materialC.clone();
 						material.color.setHSL( 0.5 * Math.random(), 0.75, 0.5 );
-						material.uvScale.set( 2, 2 );
-						material.uvOffset.set( -0.5, -0.5 );
+						material.map.offset.set( -0.5, -0.5 );
+						material.map.repeat.set( 2, 2 );
 
 					}
 
@@ -96,7 +96,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
 				

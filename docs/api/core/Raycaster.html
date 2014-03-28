@@ -71,7 +71,10 @@
 		[page:Boolean recursive] — If set, it also checks all descendants. Otherwise it only checks intersecton with the object.
 		</div>
 		<div>
-		checks all intersection between the ray and the object with or without the descendants.
+		checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first.
+        <code>
+            [ { distance, point, face, faceIndex, object }, ... ]
+        </code>
 		</div>
 
 		<h3>.intersectObjects( [page:Array objects], [page:Boolean recursive] )</h3>
@@ -80,7 +83,10 @@
 		[page:Boolean recursive] — If set, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects.
 		</div>
 		<div>
-		checks all intersection between the ray and the objects with or without the descendants.
+		checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first.
+        <code>
+            [ { distance, point, face, faceIndex, object }, ... ]
+        </code>
 		</div>
 
 

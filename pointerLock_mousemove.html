@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>pointerlock mousemove issue in Chrome Beta on Windows</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+
+		<script>
+
+			var container;
+			var testElement;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+				testElement = document.createElement( 'canvas' );
+				testElement.width = window.innerWidth;
+				testElement.height = window.innerHeight;
+
+				container.appendChild( testElement );
+
+				testElement.requestPointerLock = testElement.requestPointerLock || testElement.mozRequestPointerLock || testElement.webkitRequestPointerLock;
+
+        document.pointerLockElement = document.pointerLockElement || document.mozPointerLockElement || document.webkitPointerLockElement;
+        document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock;
+				testElement.addEventListener( 'mousedown', onMouseDown_PointerLock );
+			}
+
+
+			function onMouseDown_PointerLock( event ) {
+			  var that = this;
+			  
+		    testElement.requestPointerLock();
+		    console.log("pointerlock on");
+		    testElement.addEventListener( 'mouseup', function onMouseUp_PointerLock( event ) {
+	        testElement.removeEventListener( 'mouseup', onMouseUp_PointerLock );
+	        console.log("pointerlock off");
+	        document.exitPointerLock();
+		      
+		    } );
+			}
+		
+
+			function onDocumentMouseMove( event ) {
+				console.log(event);
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -630,7 +630,7 @@ CTM.Stream.prototype.readString = function(){
 
   this.offset += len;
 
-  return this.data.subarray(this.offset - len, len);
+  return String.fromCharCode.apply(null,this.data.subarray(this.offset - len, this.offset));
 };
 
 CTM.Stream.prototype.readArrayInt32 = function(array){

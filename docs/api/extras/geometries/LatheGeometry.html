@@ -14,6 +14,20 @@
 		<div class="desc">Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Z axis.</div>
 
 
+		<h2>Example</h2>
+
+		<code>
+		var points = [];
+		for ( var i = 0; i < 10; i ++ ) {
+			points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
+
+		}
+		var geometry = new THREE.LatheGeometry( points );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var lathe = new THREE.Mesh( geometry, material );
+		scene.add( lathe );
+		</code>
+
 		<h2>Constructor</h2>
 
 
@@ -25,7 +39,7 @@
 		phiLength — the radian (0 to 2*PI) range of the lathed section 2*PI is a closed lathe, less than 2PI is a portion. Default is 2*PI
 		</div>
 		<div>
-		todo
+		This creates a LatheGeometry based on the parameters.
 		</div>
 
 

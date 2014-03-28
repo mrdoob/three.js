@@ -48,15 +48,15 @@
 		max -- Lower (x, y, z) boundary of this box.
 		</div>
 		<div>
-		todo
+		Sets the lower and upper (x, y, z) boundaries of this box.
 		</div>
 
 		<h3>.applyMatrix4([page:Matrix4 matrix]) [page:Box3 this]</h3>
 		<div>
-		matrix -- Transform the box with a matrix.
+		matrix -- [page:Matrix4].
 		</div>
 		<div>
-		todo
+		Transform the box with a Matrix4.
 		</div>
 
 		<h3>.expandByPoint([page:Vector3 point]) [page:Box3 this]</h3>
@@ -64,165 +64,168 @@
 		Expands the box outwards by the point. It takes the min and max values of the box.
 		</div>
 
-		<h3>.clampPoint([page:Vector3 point], [page:todo optionalTarget]) [page:todo]</h3>
+		<h3>.clampPoint([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		point -- todo <br />
-		optionalTarget -- todo
+		point -- [page:Vector3] <br />
+		optionalTarget -- [page:Vector3] An optional target point.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.isIntersectionBox([page:todo box]) [page:todo]</h3>
-		<div>
-		box -- todo
-		</div>
-		<div>
-		todo
+		Clamp a point within the min and max boundaries of the box. Returns either a new point or the modified passed target.
 		</div>
 
-		<h3>.setFromPoints([page:todo points]) [page:todo]</h3>
+		<h3>.isIntersectionBox([page:Box3 box]) [page:Boolean]</h3>
 		<div>
-		points -- todo
+		box -- [page:Box3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.size([page:todo optionalTarget]) [page:todo]</h3>
-		<div>
-		optionalTarget -- todo
-		</div>
-		<div>
-		todo
+		Return whether or not the passed box intersects with this Box3.
 		</div>
 
-		<h3>.union([page:todo box]) [page:todo]</h3>
+		<h3>.setFromPoints([page:Array points])</h3>
 		<div>
-		box -- todo
+		points -- [page:Array] of [page:Vector3] points
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.getParameter([page:todo point]) [page:todo]</h3>
-		<div>
-		point -- todo
-		</div>
-		<div>
-		todo
+		Sets this box to the min value and max value of all the points in the array. If the array is empty, then it sets the box as empty.
 		</div>
 
-		<h3>.expandByScalar([page:todo scalar]) [page:todo]</h3>
+		<h3>.size([page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		scalar -- todo
+		optionalTarget -- [page:Vector3] (optional)
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.intersect([page:todo box]) [page:todo]</h3>
-		<div>
-		box -- todo
-		</div>
-		<div>
-		todo
+		Returns either a new Vector3 or the target Vector3 that represents the size of the box from the min point to max point.
 		</div>
 
-		<h3>.containsBox([page:todo box]) [page:todo]</h3>
+		<h3>.union([page:Box3 box]) [page:Box3 this]</h3>
 		<div>
-		box -- todo
+		box -- [page:Box3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.translate([page:todo offset]) [page:todo]</h3>
-		<div>
-		offset -- todo
-		</div>
-		<div>
-		todo
+		Sets the box's min and max boundaries to union of the two boxes.
 		</div>
 
-		<h3>.empty() [page:todo]</h3>
+		<h3>.getParameter([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		todo
+		point -- [page:Vector3]<br/>
+		optionalTarget -- [page:Vector3]
+		</div>
+		<div>
+		Returns a point as a proportion of this box's width, height, and depth. If the point is contained by the box the x, y, and z of the returned vector will be between 0 and 1.
 		</div>
 
-		<h3>.clone() [page:todo]</h3>
+		<h3>.expandByScalar([page:Float scalar]) [page:Box3 this]</h3>
 		<div>
-		todo
+		scalar -- [page:Float] representing the distance to expand
+		</div>
+		<div>
+		Expands or contracts the box by adding the scalar value to the box's min and max vectors.
 		</div>
 
-		<h3>.equals([page:todo box]) [page:todo]</h3>
+		<h3>.intersect([page:Box3 box]) [page:Box3 this]</h3>
 		<div>
-		box -- todo
+		box -- [page:Box3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.expandByVector([page:todo vector]) [page:todo]</h3>
-		<div>
-		vector -- todo
-		</div>
-		<div>
-		todo
+		Returns the intersection of the two boxes, setting the upper bound of this box to the lesser of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes' lower bounds.
+ 
 		</div>
 
-		<h3>.copy([page:todo box]) [page:todo]</h3>
+		<h3>.containsBox([page:Box3 box]) [page:Boolean]</h3>
 		<div>
-		box -- todo
+		box -- [page:Box3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.makeEmpty() [page:todo]</h3>
-		<div>
-		todo
+		Returns true if this box includes the entirety of box. If this and box overlap exactly, this function also returns true.
+ 
 		</div>
 
-		<h3>.center([page:todo optionalTarget]) [page:todo]</h3>
+		<h3>.translate([page:Vector3 offset]) [page:Box3 this]</h3>
 		<div>
-		optionalTarget -- todo
+		offset -- [page:Vector3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.getBoundingSphere([page:todo optionalTarget]) [page:todo]</h3>
-		<div>
-		optionalTarget -- todo
-		</div>
-		<div>
-		todo
+		Translates the box the distance of the offset.
 		</div>
 
-		<h3>.distanceToPoint([page:todo point]) [page:todo]</h3>
+		<h3>.empty() [page:Boolean]</h3>
 		<div>
-		point -- todo
-		</div>
-		<div>
-		todo
+		Checks to see if the box is empty. If the lower and upper bounds of the box are equal, this function still returns false as the box would still contain one point.
 		</div>
 
-		<h3>.containsPoint([page:todo point]) [page:todo]</h3>
+		<h3>.clone() [page:Box3]</h3>
 		<div>
-		point -- todo
-		</div>
-		<div>
-		todo
+		Returns a copy of this box.
 		</div>
 
-		<h3>.setFromCenterAndSize([page:todo center], [page:todo size]) [page:todo]</h3>
+		<h3>.equals([page:Box3 box]) [page:Boolean]</h3>
 		<div>
-		center -- todo <br />
-		size -- todo
+		box -- [page:Box3]
 		</div>
 		<div>
-		todo
+		Returns true if the boes share the same lower and upper bounds. 
+		</div>
+
+		<h3>.expandByVector([page:Vector3 vector]) [page:Box3 this]</h3>
+		<div>
+		vector -- [page:Vector3] representing the amount to expand this box in each dimension.
+		</div>
+		<div>
+		Adds the passed vector to the upper boundary, and subtracts it from the lower boundary.
+		</div>
+
+		<h3>.copy([page:Box3 box]) [page:Box3 this]</h3>
+		<div>
+		box -- [page:Box3] to copy.
+		</div>
+		<div>
+		Copies the values of the passed box to this box.
+		</div>
+
+		<h3>.makeEmpty() [page:Box3 this]</h3>
+		<div>
+		Makes this box empty so that it cannot contain any points.
+		</div>
+
+		<h3>.center([page:Vector3 optionalTarget]) [page:Vector3]</h3>
+		<div>
+		optionalTarget -- [page:Vector3] If specified, the result will be copied here.
+		</div>
+		<div>
+		Returns the center point of this box. 
+		</div>
+
+		<h3>.getBoundingSphere([page:Sphere optionalTarget]) [page:Sphere]</h3>
+		<div>
+		optionalTarget -- [page:Sphere]
+		</div>
+		<div>
+		Returns a bounding sphere.
+		</div>
+
+		<h3>.distanceToPoint([page:Vector3 point]) [page:Float]</h3>
+		<div>
+		point -- [page:Vector3]
+		</div>
+		<div>
+		Returns the distance from any edge of this box to the specified point. If the point lies inside of this box, the distance will be 0.
+		</div>
+
+		<h3>.containsPoint([page:Vector3 point]) [page:Boolean]</h3>
+		<div>
+		point -- [page:Vector3]
+		</div>
+		<div>
+		Returns true if the specified point lies within the boundaries of this box.
+		</div>
+
+		<h3>.setFromCenterAndSize([page:Vector3 center], [page:Vector3 size]) [page:Box3 this]</h3>
+		<div>
+		center -- [page:Vector3] representing the center position.<br />
+		size -- [page:Vector3] representing the dimensions of the box.
+		</div>
+		<div>
+		Sets this box based on a center vector, and width, height, and depth vector.
 		</div>
 
 		<h2>Source</h2>

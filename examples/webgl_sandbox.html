@@ -132,16 +132,12 @@
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
 
-					mesh.matrixAutoUpdate = false;
-					mesh.updateMatrix();
 					scene.add( mesh );
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
-
 				container.appendChild( renderer.domElement );
 
 				if ( statsEnabled ) {

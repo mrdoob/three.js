@@ -33,13 +33,13 @@ var Loader = function ( editor ) {
 				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
 
-					var contents = event.target.result;
+					var data = new Uint8Array( event.target.result );
 
-					var stream = new CTM.Stream( contents );
+					var stream = new CTM.Stream( data );
 					stream.offset = 0;
 
 					var loader = new THREE.CTMLoader();
-					loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
+					loader.createModel( new CTM.File( stream ), function( geometry ) {
 
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
@@ -50,11 +50,12 @@ var Loader = function ( editor ) {
 						mesh.name = filename;
 
 						editor.addObject( mesh );
+						editor.select( mesh );
 
 					} );
 
 				}, false );
-				reader.readAsBinaryString( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
@@ -74,6 +75,7 @@ var Loader = function ( editor ) {
 						collada.scene.name = filename;
 
 						editor.addObject( collada.scene );
+						editor.select( collada.scene );
 
 					} );
 
@@ -150,6 +152,7 @@ var Loader = function ( editor ) {
 					object.name = filename;
 
 					editor.addObject( object );
+					editor.select( object );
 
 				}, false );
 				reader.readAsText( file );
@@ -175,6 +178,7 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -198,6 +202,7 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 
@@ -227,6 +232,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -251,6 +257,7 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -309,9 +316,25 @@ var Loader = function ( editor ) {
 			var result = loader.parse( data );
 
 			var geometry = result.geometry;
-			var material = result.materials !== undefined
-						? new THREE.MeshFaceMaterial( result.materials )
-						: new THREE.MeshPhongMaterial();
+			var material;
+
+			if ( result.materials !== undefined ) {
+
+				if ( result.materials.length > 1 ) {
+
+					material = new THREE.MeshFaceMaterial( result.materials );
+
+				} else {
+
+					material = result.materials[ 0 ];
+
+				}
+
+			} else {
+
+				material = new THREE.MeshPhongMaterial();
+
+			}
 
 			geometry.sourceType = "ascii";
 			geometry.sourceFile = file.name;
@@ -320,6 +343,7 @@ var Loader = function ( editor ) {
 			mesh.name = filename;
 
 			editor.addObject( mesh );
+			editor.select( mesh );
 
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
@@ -333,6 +357,7 @@ var Loader = function ( editor ) {
 			} else {
 
 				editor.addObject( result );
+				editor.select( result );
 
 			}
 

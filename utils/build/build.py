@@ -19,6 +19,7 @@ def main(argv=None):
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--include', action='append', required=True)
 	parser.add_argument('--externs', action='append', default=['externs/common.js'])
+	parser.add_argument('--amd', action='store_true', default=False)
 	parser.add_argument('--minify', action='store_true', default=False)
 	parser.add_argument('--output', default='../../build/three.js')
 	parser.add_argument('--sourcemaps', action='store_true', default=False)
@@ -44,6 +45,9 @@ def main(argv=None):
 	tmp = open(path, 'w')
 	sources = []
 
+	if args.amd:
+		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
+
 	for include in args.include:
 		with open('includes/' + include + '.json','r') as f:
 			files = json.load(f)
@@ -53,6 +57,9 @@ def main(argv=None):
 			with open(filename, 'r') as f:
 				tmp.write(f.read())
 				tmp.write('\n')
+
+	if args.amd:
+		tmp.write('exports.THREE = THREE;\n\n} ) );')
 
 	tmp.close()
 
@@ -72,7 +79,7 @@ def main(argv=None):
 		# header
 
 		with open(output,'r') as f: text = f.read()
-		with open(output,'w') as f: f.write('// three.js - http://github.com/mrdoob/three.js\n' + text + sourcemapping)
+		with open(output,'w') as f: f.write('// three.js / threejs.org/license\n' + text + sourcemapping)
 
 	os.close(fd)
 	os.remove(path)

@@ -7,6 +7,8 @@ THREE.Loader = function ( showStatus ) {
 	this.showStatus = showStatus;
 	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
+	this.imageLoader = new THREE.ImageLoader();
+
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
@@ -17,7 +19,7 @@ THREE.Loader.prototype = {
 
 	constructor: THREE.Loader,
 
-	crossOrigin: 'anonymous',
+	crossOrigin: undefined,
 
 	addStatusElement: function () {
 
@@ -51,7 +53,7 @@ THREE.Loader.prototype = {
 
 		} else {
 
-			message += ( progress.loaded / 1000 ).toFixed(2) + " KB";
+			message += ( progress.loaded / 1024 ).toFixed(2) + " KB";
 
 		}
 
@@ -62,8 +64,12 @@ THREE.Loader.prototype = {
 	extractUrlBase: function ( url ) {
 
 		var parts = url.split( '/' );
+
+		if ( parts.length === 1 ) return './';
+
 		parts.pop();
-		return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+
+		return parts.join( '/' ) + '/';
 
 	},
 
@@ -73,7 +79,7 @@ THREE.Loader.prototype = {
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
+			array[ i ] = this.createMaterial( materials[ i ], texturePath );
 
 		}
 
@@ -97,14 +103,7 @@ THREE.Loader.prototype = {
 
 	createMaterial: function ( m, texturePath ) {
 
-		var _this = this;
-
-		function is_pow2( n ) {
-
-			var l = Math.log( n ) / Math.LN2;
-			return Math.floor( l ) == l;
-
-		}
+		var scope = this;
 
 		function nearest_pow2( n ) {
 
@@ -113,40 +112,11 @@ THREE.Loader.prototype = {
 
 		}
 
-		function load_image( where, url ) {
-
-			var image = new Image();
-
-			image.onload = function () {
-
-				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
-
-					var width = nearest_pow2( this.width );
-					var height = nearest_pow2( this.height );
-
-					where.image.width = width;
-					where.image.height = height;
-					where.image.getContext( '2d' ).drawImage( this, 0, 0, width, height );
-
-				} else {
-
-					where.image = this;
-
-				}
-
-				where.needsUpdate = true;
-
-			};
-
-			image.crossOrigin = _this.crossOrigin;
-			image.src = url;
-
-		}
-
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
 			var isCompressed = /\.dds$/i.test( sourceFile );
-			var fullPath = texturePath + "/" + sourceFile;
+
+			var fullPath = texturePath + sourceFile;
 
 			if ( isCompressed ) {
 
@@ -199,7 +169,30 @@ THREE.Loader.prototype = {
 
 			if ( ! isCompressed ) {
 
-				load_image( where[ name ], fullPath );
+				var texture = where[ name ];
+
+				scope.imageLoader.crossOrigin = scope.crossOrigin;
+				scope.imageLoader.load( fullPath, function ( image ) {
+
+					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
+						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
+
+						var width = nearest_pow2( image.width );
+						var height = nearest_pow2( image.height );
+
+						texture.image.width = width;
+						texture.image.height = height;
+						texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
+
+					} else {
+
+						texture.image = image;
+
+					}
+
+					texture.needsUpdate = true;
+
+				} );
 
 			}
 
@@ -405,15 +398,15 @@ THREE.Loader.prototype = {
 
 			// for the moment don't handle displacement texture
 
-			uniforms[ "uDiffuseColor" ].value.setHex( mpars.color );
-			uniforms[ "uSpecularColor" ].value.setHex( mpars.specular );
-			uniforms[ "uAmbientColor" ].value.setHex( mpars.ambient );
+			uniforms[ "diffuse" ].value.setHex( mpars.color );
+			uniforms[ "specular" ].value.setHex( mpars.specular );
+			uniforms[ "ambient" ].value.setHex( mpars.ambient );
 
-			uniforms[ "uShininess" ].value = mpars.shininess;
+			uniforms[ "shininess" ].value = mpars.shininess;
 
 			if ( mpars.opacity !== undefined ) {
 
-				uniforms[ "uOpacity" ].value = mpars.opacity;
+				uniforms[ "opacity" ].value = mpars.opacity;
 
 			}
 
