@@ -211,51 +211,12 @@
 };
 
 THREE.Ocean.prototype.generateMesh = function () {
-    var geo = new THREE.Geometry();
-    // setup vertices
-    var x, z;
-    var listUV = [];
-    var vU = [], vV = [];
-    for (z = 0; z < this.geometryResolution; z++) {
-        for (x = 0; x < this.geometryResolution; x++) {
-            geo.vertices.push(new THREE.Vector3(
-                (x * this.geometrySize) / (this.geometryResolution - 1) + this.geometryOrigin[0],
-                0.0,
-                (z * this.geometrySize) / (this.geometryResolution - 1) + this.geometryOrigin[1]
-            ));
-            vU.push(x / (this.geometryResolution - 1));
-            vV.push(z / (this.geometryResolution - 1));
-        }
-    }
-    listUV.push(vU);
-    listUV.push(vV);
-    // setup faces (each pass draws a square with 2 triangles)
-    for (z = 0; z < this.geometryResolution - 1; z++) {
-        for (x = 0; x < this.geometryResolution - 1; x++) {
-            var topLeft = z * this.geometryResolution + x,
-                topRight = topLeft + 1,
-                bottomLeft = topLeft + this.geometryResolution,
-                bottomRight = bottomLeft + 1;
-            geo.faces.push(new THREE.Face3(topLeft, bottomLeft, bottomRight));
-            geo.faces.push(new THREE.Face3(bottomRight, topRight, topLeft));
-            geo.faceVertexUvs[0].push(
-                new Array(
-                    new THREE.Vector2(listUV[0][topLeft], listUV[1][topLeft]),
-                    new THREE.Vector2(listUV[0][bottomLeft], listUV[1][bottomLeft]),
-                    new THREE.Vector2(listUV[0][bottomRight], listUV[1][bottomRight])
-                )
-            );
-            geo.faceVertexUvs[0].push(
-                new Array(
-                    new THREE.Vector2(listUV[0][bottomRight], listUV[1][bottomRight]),
-                    new THREE.Vector2(listUV[0][topRight], listUV[1][topRight]),
-                    new THREE.Vector2(listUV[0][topLeft], listUV[1][topLeft])
-                )
-            );
-        }
-    }
 
-    this.oceanMesh = new THREE.Mesh(geo, this.materialOcean);
+    var geometry = new THREE.PlaneGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
+
+    geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+    this.oceanMesh = new THREE.Mesh( geometry, this.materialOcean );
 };
 
 THREE.Ocean.prototype.render = function () {
