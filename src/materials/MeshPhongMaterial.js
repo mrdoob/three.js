@@ -150,3 +150,22 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.MeshPhongMaterial.prototype.serialize = function () {
+
+  var data = THREE.Material.prototype.serialize.call(this);
+	data.type = 'MeshPhongMaterial';
+	data.color = this.color.getHex();
+	data.ambient = this.ambient.getHex();
+	data.emissive = this.emissive.getHex();
+	data.specular = this.specular.getHex();
+	data.shininess = this.shininess;
+	if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
+	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+	if ( this.side !== THREE.FrontSide ) data.side = this.side;
+	data.opacity = this.opacity;
+	data.transparent = this.transparent;
+	data.wireframe = this.wireframe;
+	return data;
+
+};

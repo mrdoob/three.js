@@ -71,3 +71,22 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 };
 
 THREE.CircleGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+
+THREE.CircleGeometry.prototype.serialize = function ( exporters ) {
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+	data.type = 'CircleGeometry';
+	data.radius = this.radius;
+	data.segments = this.segments;
+	
+};
+
+THREE.CircleGeometry.deserialize = function (data, loaders) {
+
+	var geometry = new THREE.CircleGeometry(
+		data.radius,
+		data.segments
+	);
+	return geometry;
+
+};

@@ -74,3 +74,28 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 };
 
 THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
+THREE.TorusGeometry.prototype.serialize = function ( exporters ) {
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+	data.type = 'TorusGeometry';
+	data.radius = this.radius;
+	data.tube = this.tube;
+	data.radialSegments = this.radialSegments;
+	data.tubularSegments = this.tubularSegments;
+	data.arc = this.arc;
+
+};
+
+THREE.TorusGeometry.deserialize = function (data, loaders) {
+
+	var geometry = new THREE.TorusGeometry(
+		data.radius,
+		data.tube,
+		data.radialSegments,
+		data.tubularSegments,
+		data.arc
+	);
+	return geometry;
+
+};

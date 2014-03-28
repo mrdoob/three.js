@@ -662,3 +662,39 @@ THREE.Geometry.prototype = {
 THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
 
 THREE.GeometryIdCount = 0;
+
+THREE.Geometry.prototype.serialize = function ( exporters ) {
+
+	if ( exporters === undefined ) exporters = {};
+
+	if ( exporters.geometryExporter === undefined ) {
+		exporters.geometryExporter = new THREE.GeometryExporter();
+	}
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+
+	data.type = 'Geometry';
+	data.data = exporters.geometryExporter.parse( geometry );
+
+	delete data.data.metadata;
+
+};
+
+THREE.Geometry.serializeCommon = function() {
+	
+	var data = {};
+
+	data.uuid = this.uuid;
+	if ( this.name !== "" ) data.name = this.name;
+
+	return data;
+
+};
+
+
+THREE.Geometry.deserialize = function (data, loaders) {
+
+	var geometry = loaders.geometryLoader.parse( data.data ).geometry;
+	return geometry;
+
+};

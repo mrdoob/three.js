@@ -25,3 +25,24 @@ THREE.PointLight.prototype.clone = function () {
 	return light;
 
 };
+
+THREE.PointLight.prototype.serialize = function( exporters ) {
+
+  var data = THREE.Object3D.prototype.serialize.call( this, exporters )
+  
+  data.type = 'PointLight';
+  data.color = this.color.getHex();
+  data.intensity = this.intensity;
+  data.distance = this.distance;
+
+  return data;
+
+};
+
+THREE.PointLight.deserialize = function( data, geometries, materials ) {
+  
+  var object = new THREE.PointLight( data.color, data.intensity, data.distance );
+  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  return object;
+
+};

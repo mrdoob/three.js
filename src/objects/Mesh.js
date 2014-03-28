@@ -61,3 +61,38 @@ THREE.Mesh.prototype.clone = function ( object, recursive ) {
 	return object;
 
 };
+
+THREE.Mesh.prototype.serialize = function( exporters ) {
+
+	var data = THREE.Object3D.prototype.serialize.call( this, exporters )
+	
+	data.type = 'Mesh';
+	data.geometry = exporters.parseGeometry( this.geometry );
+	data.material = exporters.parseMaterial( this.material );
+
+	return data;
+
+};
+
+THREE.Mesh.deserialize = function( data, geometries, materials ) {
+
+	var geometry = geometries[ data.geometry ];
+	var material = materials[ data.material ];
+
+	if ( geometry === undefined ) {
+
+		console.error( 'THREE.Mesh.deserialize: Undefined geometry ' + data.geometry );
+
+	}
+
+	if ( material === undefined ) {
+
+		console.error( 'THREE.Mesh.deserialize: Undefined material ' + data.material );
+
+	}
+
+	var object = new THREE.Mesh( geometry, material );
+	THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+	return object;
+
+};

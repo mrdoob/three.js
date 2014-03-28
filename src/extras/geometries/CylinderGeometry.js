@@ -163,3 +163,30 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 }
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
+THREE.CylinderGeometry.prototype.serialize = function ( exporters ) {
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+	data.type = 'CylinderGeometry';
+	data.radiusTop = this.radiusTop;
+	data.radiusBottom = this.radiusBottom;
+	data.height = this.height;
+	data.radialSegments = this.radialSegments;
+	data.heightSegments = this.heightSegments;
+	data.openEnded = this.openEnded;
+
+};
+
+THREE.CylinderGeometry.deserialize = function (data, loaders) {
+
+	var geometry = new THREE.CylinderGeometry(
+		data.radiusTop,
+		data.radiusBottom,
+		data.height,
+		data.radialSegments,
+		data.heightSegments,
+		data.openEnded
+	);
+	return geometry;
+
+};

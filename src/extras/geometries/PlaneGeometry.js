@@ -86,3 +86,26 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 };
 
 THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+
+THREE.PlaneGeometry.prototype.serialize = function ( exporters ) {
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+	data.type = 'PlaneGeometry';
+	data.width = this.width;
+	data.height = this.height;
+	data.widthSegments = this.widthSegments;
+	data.heightSegments = this.heightSegments;
+	
+};
+
+THREE.PlaneGeometry.deserialize = function (data, loaders) {
+
+	var geometry = new THREE.PlaneGeometry(
+		data.width,
+		data.height,
+		data.widthSegments,
+		data.heightSegments
+	);
+	return geometry;
+
+};

@@ -128,3 +128,27 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 
 	return camera;
 };
+
+
+THREE.PerspectiveCamera.prototype.serialize = function( exporters ) {
+
+	var data = THREE.Object3D.prototype.serialize.call( this, exporters );
+	
+	data.type = 'PerspectiveCamera';
+	data.fov = this.fov;
+	data.aspect = this.aspect;
+	data.near = this.near;
+	data.far = this.far;
+
+	return data;
+
+};
+
+
+THREE.PerspectiveCamera.deserialize = function( data, geometries, materials ) {
+  
+  var object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  return object;
+
+};

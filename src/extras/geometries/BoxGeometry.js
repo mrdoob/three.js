@@ -122,3 +122,30 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 };
 
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
+THREE.BoxGeometry.prototype.serialize = function ( exporters ) {
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+	data.type = 'BoxGeometry';
+	data.width = this.width;
+	data.height = this.height;
+	data.depth = this.depth;
+	data.widthSegments = this.widthSegments;
+	data.heightSegments = this.heightSegments;
+	data.depthSegments = this.depthSegments;
+	
+};
+
+THREE.BoxGeometry.deserialize = function (data, loaders) {
+
+	var geometry = new THREE.BoxGeometry(
+		data.width,
+		data.height,
+		data.depth,
+		data.widthSegments,
+		data.heightSegments,
+		data.depthSegments
+	);
+	return geometry;
+
+};

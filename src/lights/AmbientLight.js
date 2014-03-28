@@ -19,3 +19,22 @@ THREE.AmbientLight.prototype.clone = function () {
 	return light;
 
 };
+
+THREE.AmbientLight.prototype.serialize = function( exporters ) {
+
+  var data = THREE.Object3D.prototype.serialize.call( this, exporters );
+  
+  data.type = 'AmbientLight';
+  data.color = this.color.getHex();
+
+  return data;
+
+};
+
+THREE.AmbientLight.deserialize = function( data, geometries, materials ) {
+  
+  var object = new THREE.AmbientLight( data.color );
+  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  return object;
+
+};

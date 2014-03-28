@@ -793,3 +793,29 @@ THREE.BufferGeometry.prototype = {
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
+
+THREE.BufferGeometry.prototype.serialize = function ( exporters ) {
+
+	if ( exporters === undefined ) exporters = {};
+
+	if ( exporters.bufferGeometryExporter === undefined ) {
+		exporters.bufferGeometryExporter = new THREE.BufferGeometryExporter();
+	}
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+
+	data.type = 'BufferGeometry';
+	data.data = exporters.bufferGeometryExporter.parse( geometry );
+
+	delete data.data.metadata;
+
+	return data;
+
+};
+
+THREE.BufferGeometry.deserialize = function (data, loaders) {
+
+	var geometry = loaders.bufferGeometryLoader.parse( data.data );
+	return geometry;
+
+};

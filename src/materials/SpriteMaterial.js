@@ -54,3 +54,14 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.SpriteMaterial.prototype.serialize = function () {
+
+  var data = THREE.Material.prototype.serialize.call(this);
+	data.type = 'SpriteMaterial';
+	data.color = this.color.getHex();
+	data.opacity = this.opacity;
+	data.transparent = this.transparent;
+	return data;
+
+};

@@ -27,3 +27,23 @@ THREE.HemisphereLight.prototype.clone = function () {
 	return light;
 
 };
+
+THREE.HemisphereLight.prototype.serialize = function( exporters ) {
+
+  var data = THREE.Object3D.prototype.serialize.call( this, exporters );
+  
+  data.type = 'HemisphereLight';
+  data.color = this.color.getHex();
+  data.groundColor = this.groundColor.getHex();
+
+  return data;
+
+};
+
+THREE.HemisphereLight.deserialize = function( data, geometries, materials ) {
+  
+  var object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
+  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  return object;
+
+};

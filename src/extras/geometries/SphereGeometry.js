@@ -108,3 +108,32 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 };
 
 THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
+THREE.SphereGeometry.prototype.serialize = function ( exporters ) {
+
+	var data = THREE.Geometry.serializeCommon.call( this );
+	data.type = 'SphereGeometry';
+	data.radius = this.radius;
+	data.widthSegments = this.widthSegments;
+	data.heightSegments = this.heightSegments;
+	data.phiStart = this.phiStart;
+	data.phiLength = this.phiLength;
+	data.thetaStart = this.thetaStart;
+	data.thetaLength = this.thetaLength;
+
+};
+
+THREE.SphereGeometry.deserialize = function (data, loaders) {
+
+	var geometry = new THREE.SphereGeometry(
+		data.radius,
+		data.widthSegments,
+		data.heightSegments,
+		data.phiStart,
+		data.phiLength,
+		data.thetaStart,
+		data.thetaLength
+	);
+	return geometry;
+
+};

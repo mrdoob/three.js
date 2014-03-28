@@ -128,3 +128,21 @@ THREE.Scene.prototype.clone = function ( object ) {
 	return object;
 
 };
+
+THREE.Scene.prototype.serialize = function( exporters ) {
+
+	var data = THREE.Object3D.prototype.serialize.call( this, exporters );
+	
+	data.type = 'Scene';
+
+	return data;
+
+};
+
+THREE.Scene.deserialize = function( data, geometries, materials ) {
+  
+  var object = new THREE.Scene();
+  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  return object;
+
+};
