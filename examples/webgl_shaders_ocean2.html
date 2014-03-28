@@ -12,8 +12,7 @@
 	<body>
 		<section id="body_container">
 			<div id="main_canvas"></div>
-		</section>
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		</section>		
 		<script src="../build/three.min.js"></script>		
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -21,38 +20,28 @@
 		<script src="js/Ocean.js"></script>		
 
 		<script>
-			if (!window.requestAnimationFrame) {
-				window.requestAnimationFrame = (function () {
-				    return window.webkitRequestAnimationFrame ||
-					window.mozRequestAnimationFrame || // comment out if FF4 is slow (it caps framerate at ~30fps: https://bugzilla.mozilla.org/show_bug.cgi?id=630127)
-					window.oRequestAnimationFrame ||
-					window.msRequestAnimationFrame ||
-					function ( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-					    window.setTimeout(callback, 1000 / 60);
-					};
-				})();
-			}
-
 			var lastTime = (new Date()).getTime();
 
-			var WINDOW =
-			{
+			var WINDOW = {
 			    ms_Width: 0,
-		    	ms_Height: 0,
-		    	ms_Callbacks: 70: "WINDOW.ToggleFullScreen()",
+			    ms_Height: 0,
+			    ms_Callbacks: {
+			        70: "WINDOW.ToggleFullScreen()",		// Toggle fullscreen
+			    },
+
 			    Initialize: function () {
 			        this.UpdateSize();
 
 			        // Create callbacks from keyboard
-			        $(document).keydown(function (inEvent) { WINDOW.CallAction(inEvent.keyCode); });
-			        $(window).resize(function (inEvent) {
+			        document.onkeydown = function (inEvent) { WINDOW.CallAction(inEvent.keyCode); };
+			        window.onresize = function (inEvent) {
 			            WINDOW.UpdateSize();
 			            WINDOW.ResizeCallback(WINDOW.ms_Width, WINDOW.ms_Height);
-			        });
+			        };
 			    },
 			    UpdateSize: function () {
-			        this.ms_Width = $(window).width();
-			        this.ms_Height = $(window).height() - 4;
+			        this.ms_Width = window.outerWidth;
+			        this.ms_Height = window.outerHeight - 4;
 			    },
 			    CallAction: function (inId) {
 			        if (inId in this.ms_Callbacks) {
@@ -78,7 +67,7 @@
 			                document.webkitCancelFullScreen();
 			        }
 			    },
-			    ResizeCallback: function (inWidth, inHeight) {},
+			    ResizeCallback: function (inWidth, inHeight) { },
 			};
 
 			var lastTime = (new Date()).getTime();
@@ -101,8 +90,7 @@
 			    })(),
 
 			    Initialize: function (inIdCanvas) {
-			        
-			        this.ms_Canvas = $('#' + inIdCanvas);
+			        this.ms_Canvas = document.getElementById(inIdCanvas);
 
 			        // Initialize Renderer, Camera and Scene
 			        this.ms_Renderer =
@@ -114,7 +102,7 @@
 			        this.ms_Renderer.context.getExtension('OES_texture_float');
 			        this.ms_Renderer.context.getExtension('OES_texture_float_linear');
 			        this.ms_Renderer.autoClear = true;
-			        this.ms_Canvas.html(this.ms_Renderer.domElement);
+			        this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
 			        this.ms_Scene = new THREE.Scene();
 
 			        this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 300000);
@@ -253,7 +241,7 @@
 			        this.ms_Camera.aspect = inWidth / inHeight;
 			        this.ms_Camera.updateProjectionMatrix();
 			        this.ms_Renderer.setSize(inWidth, inHeight);
-			        this.ms_Canvas.html(this.ms_Renderer.domElement);
+			        this.ms_Canvas.appendChild(this.ms_Renderer.domElement);
 			        this.Display();
 			    }
 			};
