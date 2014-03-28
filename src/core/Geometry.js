@@ -77,8 +77,6 @@ THREE.Geometry.prototype = {
 
 			}
 
-			face.centroid.applyMatrix4( matrix );
-
 		}
 
 		if ( this.boundingBox instanceof THREE.Box3 ) {
@@ -90,24 +88,6 @@ THREE.Geometry.prototype = {
 		if ( this.boundingSphere instanceof THREE.Sphere ) {
 
 			this.computeBoundingSphere();
-
-		}
-
-	},
-
-	computeCentroids: function () {
-
-		var f, fl, face;
-
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-			face = this.faces[ f ];
-			face.centroid.set( 0, 0, 0 );
-
-			face.centroid.add( this.vertices[ face.a ] );
-			face.centroid.add( this.vertices[ face.b ] );
-			face.centroid.add( this.vertices[ face.c ] );
-			face.centroid.divideScalar( 3 );
 
 		}
 
@@ -570,7 +550,7 @@ THREE.Geometry.prototype = {
 
 		var geometryGroupCounter = 0;
 		
-		return function ( usesFaceMaterial ) {
+		return function ( usesFaceMaterial, maxVerticesInGroup ) {
 
 			var f, fl, face, materialIndex,
 				groupHash, hash_map = {};
@@ -599,7 +579,7 @@ THREE.Geometry.prototype = {
 
 				}
 
-				if ( this.geometryGroups[ groupHash ].vertices + 3 > 65535 ) {
+				if ( this.geometryGroups[ groupHash ].vertices + 3 > maxVerticesInGroup ) {
 
 					hash_map[ materialIndex ].counter += 1;
 					groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;

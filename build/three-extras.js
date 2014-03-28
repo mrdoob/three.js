@@ -5180,58 +5180,77 @@ THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 /**
  * @author hughes
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
-  THREE.Geometry.call( this );
+  this.parameters = {
+    radius: radius,
+    segments: segments,
+    thetaStart: thetaStart,
+    thetaLength: thetaLength
+  };
 
-  this.radius = radius = radius || 50;
-  this.segments = segments = segments !== undefined ? Math.max( 3, segments ) : 8;
+  radius = radius || 50;
+  segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
-  this.thetaStart = thetaStart = thetaStart !== undefined ? thetaStart : 0;
-  this.thetaLength = thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+  thetaStart = thetaStart !== undefined ? thetaStart : 0;
+  thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
-  var i, uvs = [],
-  center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
+  //
 
-  this.vertices.push(center);
-  uvs.push( centerUV );
+  var elements = segments + 2;
 
-  for ( i = 0; i <= segments; i ++ ) {
+  var indices = new Uint16Array( segments * 3 );
+  var vertices = new Float32Array( elements * 3 );
+  var normals = new Float32Array( elements * 3 );
+  var uvs = new Float32Array( elements * 2 );
 
-    var vertex = new THREE.Vector3();
+  // center
+
+  normals[ 2 ] = 1;
+
+  uvs[ 0 ] = 0.5;
+  uvs[ 1 ] = 0.5;
+
+  var offset = 0, offset2 = 2, offset3 = 3;
+
+  for ( var i = 0; i <= segments; i ++ ) {
+
     var segment = thetaStart + i / segments * thetaLength;
 
-    vertex.x = radius * Math.cos( segment );
-    vertex.y = radius * Math.sin( segment );
+    var x = radius * Math.cos( segment );
+    var y = radius * Math.sin( segment );
 
-    this.vertices.push( vertex );
-    uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, ( vertex.y / radius + 1 ) / 2 ) );
+    vertices[ offset3     ] = x;
+    vertices[ offset3 + 1 ] = y;
+
+    normals[ offset3 + 2 ] = 1;
+
+    uvs[ offset2     ] = ( x / radius + 1 ) / 2;
+    uvs[ offset2 + 1 ] = ( y / radius + 1 ) / 2;
+
+    offset2 += 2;
+    offset3 += 3;
+
+    //
+
+    indices[ offset     ] = 0;
+    indices[ offset + 1 ] = i + 1;
+    indices[ offset + 2 ] = i + 2;
+
+    offset  += 3;
 
   }
 
-  var n = new THREE.Vector3( 0, 0, 1 );
-
-  for ( i = 1; i <= segments; i ++ ) {
-
-    var v1 = i;
-    var v2 = i + 1 ;
-    var v3 = 0;
-
-    this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
-    this.faceVertexUvs[ 0 ].push( [ uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ] );
-
-  }
-
-  this.computeCentroids();
-  this.computeFaceNormals();
+  THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
   this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 
-THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.CircleGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
 // DEPRECATED
 
@@ -6351,79 +6370,87 @@ THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
-	THREE.Geometry.call( this );
+	this.parameters = {
+		width: width,
+		height: height,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments
+	};
 
-	this.width = width;
-	this.height = height;
-
-	this.widthSegments = widthSegments || 1;
-	this.heightSegments = heightSegments || 1;
-
-	var ix, iz;
 	var width_half = width / 2;
 	var height_half = height / 2;
 
-	var gridX = this.widthSegments;
-	var gridZ = this.heightSegments;
+	var gridX = widthSegments || 1;
+	var gridY = heightSegments || 1;
 
 	var gridX1 = gridX + 1;
-	var gridZ1 = gridZ + 1;
+	var gridY1 = gridY + 1;
 
-	var segment_width = this.width / gridX;
-	var segment_height = this.height / gridZ;
+	var segment_width = width / gridX;
+	var segment_height = height / gridY;
 
-	var normal = new THREE.Vector3( 0, 0, 1 );
+	var vertices = new Float32Array( gridX1 * gridY1 * 3 );
+	var normals = new Float32Array( gridX1 * gridY1 * 3 );
+	var uvs = new Float32Array( gridX1 * gridY1 * 2 );
 
-	for ( iz = 0; iz < gridZ1; iz ++ ) {
+	var offset = 0;
+	var offset2 = 0;
 
-		for ( ix = 0; ix < gridX1; ix ++ ) {
+	for ( var iy = 0; iy < gridY1; iy ++ ) {
+
+		var y = iy * segment_height - height_half;
+
+		for ( var ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
-			var y = iz * segment_height - height_half;
 
-			this.vertices.push( new THREE.Vector3( x, - y, 0 ) );
+			vertices[ offset     ] = x;
+			vertices[ offset + 1 ] = - y;
 
-		}
+			normals[ offset + 2 ] = 1;
 
-	}
+			uvs[ offset2     ] = ix / gridX;
+			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
 
-	for ( iz = 0; iz < gridZ; iz ++ ) {
-
-		for ( ix = 0; ix < gridX; ix ++ ) {
-
-			var a = ix + gridX1 * iz;
-			var b = ix + gridX1 * ( iz + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
-			var d = ( ix + 1 ) + gridX1 * iz;
-
-			var uva = new THREE.Vector2( ix / gridX, 1 - iz / gridZ );
-			var uvb = new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ );
-			var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ );
-			var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ );
-
-			var face = new THREE.Face3( a, b, d );
-			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-			face = new THREE.Face3( b, c, d );
-			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
+			offset += 3;
+			offset2 += 2;
 
 		}
 
 	}
 
-	this.computeCentroids();
+	offset = 0;
+
+	var indices = new ( vertices.length > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
+
+	for ( var iy = 0; iy < gridY; iy ++ ) {
+
+		for ( var ix = 0; ix < gridX; ix ++ ) {
+
+			var a = ix + gridX1 * iy;
+			var b = ix + gridX1 * ( iy + 1 );
+			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
+			var d = ( ix + 1 ) + gridX1 * iy;
+
+			indices[ offset     ] = a;
+			indices[ offset + 1 ] = b;
+			indices[ offset + 2 ] = d;
+
+			indices[ offset + 3 ] = b;
+			indices[ offset + 4 ] = c;
+			indices[ offset + 5 ] = d;
+
+			offset += 6;
+
+		}
+
+	}
+
+	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
 };
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
 /**
  * @author Kaleb Murphy
