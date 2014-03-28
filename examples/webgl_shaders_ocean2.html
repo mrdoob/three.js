@@ -81,6 +81,8 @@
 			    ResizeCallback: function (inWidth, inHeight) {},
 			};
 
+			var lastTime = (new Date()).getTime();
+
 			var DEMO =
 			{
 			    ms_Canvas: null,
@@ -116,7 +118,7 @@
 			        this.ms_Scene = new THREE.Scene();
 
 			        this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 300000);
-			        this.ms_Camera.position.set(900, 700, 900);
+			        this.ms_Camera.position.set(450, 350, 450);
 			        this.ms_Camera.lookAt(new THREE.Vector3(0,0,0));
 
 			        // Initialize Orbit control		
@@ -149,10 +151,10 @@
 			        };
 
 			        //To use enter the axis length
-			        this.debugaxis(20);
-			        			        
-			        var gsize = 512;
-			        var res = 1024;
+			        this.debugaxis(50);
+			        
+			        var gsize = 512; 
+			        var res = 1024; 
 			        var gres = res / 2;
 			        var origx = -gsize / 2;
 			        var origz = -gsize / 2;
