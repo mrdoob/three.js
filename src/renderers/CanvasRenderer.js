@@ -164,7 +164,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_context.setTransform( width / _canvasWidth, 0, 0, - height / _canvasHeight, x, _canvasHeight - y );
+		var _viewportX = x * this.devicePixelRatio;
+		var _viewportY = y * this.devicePixelRatio;
+
+		var _viewportWidth = width * this.devicePixelRatio;
+		var _viewportHeight = height * this.devicePixelRatio;
+
+		_context.setTransform( _viewportWidth / _canvasWidth, 0, 0, - _viewportHeight / _canvasHeight, _viewportX, _canvasHeight - _viewportY );
 		_context.translate( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
