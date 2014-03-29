@@ -175,7 +175,6 @@
 				},
 
 				Update: function () {
-					this.ms_Renderer.clear();
 					var currentTime = new Date().getTime();
 					this.ms_Ocean.deltaTime = (currentTime - lastTime) / 1000 || 0.0;
 					lastTime = currentTime;
@@ -183,7 +182,7 @@
 					this.ms_Ocean.overrideMaterial = this.ms_Ocean.materialOcean;
 					if (this.ms_Ocean.changed) {
 						this.ms_Ocean.materialOcean.uniforms.u_size.value = this.ms_Ocean.size;
-						this.ms_Ocean.materialOcean.uniforms.u_sunDirection.value = new THREE.Vector3(this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ);
+						this.ms_Ocean.materialOcean.uniforms.u_sunDirection.value.set( this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ );
 						this.ms_Ocean.materialOcean.uniforms.u_exposure.value = this.ms_Ocean.exposure;
 						this.ms_Ocean.changed = false;
 					}

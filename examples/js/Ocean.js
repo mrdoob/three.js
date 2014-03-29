@@ -7,7 +7,7 @@
 	this.oceanCamera = new THREE.OrthographicCamera(); //camera.clone();
 	this.oceanCamera.position.z = 1;
 	this.renderer = renderer;
-	this.renderer.clearColor(new THREE.Color(1.0, 1.0, 1.0, 1.0));
+	this.renderer.clearColor( 0xffffff );
 	
 	this.scene = new THREE.Scene();
 
@@ -128,7 +128,7 @@
 		vertexShader: fullscreeenVertexShader.vertexShader,
 		fragmentShader:initialSpectrumShader.fragmentShader
 	});
-	this.materialInitialSpectrum.uniforms.u_wind = { type: "v2", value: null };
+	this.materialInitialSpectrum.uniforms.u_wind = { type: "v2", value: new THREE.Vector2() };
 	this.materialInitialSpectrum.uniforms.u_resolution = { type: "f", value: this.resolution };
 	this.materialInitialSpectrum.depthTest = false;
 	
@@ -183,7 +183,7 @@
 	this.materialOcean.uniforms.u_normalMap = { type: "t", value: this.normalMapFramebuffer }; 
 	this.materialOcean.uniforms.u_oceanColor = { type: "v3", value: this.oceanColor }; 
 	this.materialOcean.uniforms.u_skyColor = { type: "v3", value: this.skyColor };
-	this.materialOcean.uniforms.u_sunDirection = { type: "v3", value: new THREE.Vector3(this.sunDirectionX,this.sunDirectionY,this.sunDirectionZ )};
+	this.materialOcean.uniforms.u_sunDirection = { type: "v3", value: new THREE.Vector3( this.sunDirectionX, this.sunDirectionY, this.sunDirectionZ ) };
 	this.materialOcean.uniforms.u_exposure = { type: "f", value: this.exposure };
 
 	// Disable blending to prevent default premultiplied alpha values
@@ -195,12 +195,8 @@
 	this.materialNormal.blending = 0;
 	this.materialOcean.blending = 0;
 
-	// Seed the simulation
-	var screenGeo = new THREE.PlaneGeometry(2, 2);
-	screenGeo.buffersNeedUpdate = true;
-
 	// Create the simulation plane
-	this.screenQuad = new THREE.Mesh(screenGeo);
+	this.screenQuad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ) );
 	this.scene.add(this.screenQuad);
 
 	// Initialise spectrum data
@@ -256,7 +252,7 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
 
 THREE.Ocean.prototype.renderInitialSpectrum = function () {
 	this.scene.overrideMaterial = this.materialInitialSpectrum;
-	this.materialInitialSpectrum.uniforms.u_wind.value = new THREE.Vector2(this.windX, this.windY);
+	this.materialInitialSpectrum.uniforms.u_wind.value.set( this.windX, this.windY );
 	this.materialInitialSpectrum.uniforms.u_size.value = this.size;
 	this.renderer.render(this.scene, this.oceanCamera, this.initialSpectrumFramebuffer, true);
 };
