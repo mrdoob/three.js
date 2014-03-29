@@ -10,11 +10,6 @@
 	this.renderer.clearColor( 0xffffff );
 	
 	this.scene = new THREE.Scene();
-
-	// Initialise helper objects
-	this.helpers();
-
-	//this.fullscreenVertexBuffer = this.renderer.context.createBuffer();
 	
 	// Enable necessary extensions
 	this.renderer.context.getExtension('OES_texture_float');
@@ -282,12 +277,12 @@ THREE.Ocean.prototype.renderSpectrum = function () {
 };
 
 THREE.Ocean.prototype.renderSpectrumFFT = function() {
-	//GPU FFT using Stockham formulation
-	var iterations = this.log2(this.resolution);
+	// GPU FFT using Stockham formulation
+	var iterations = Math.log( this.resolution ) / Math.log(2); // log2
 	
 	this.scene.overrideMaterial = this.materialOceanHorizontal;
-	var i;
-	for (i = 0; i < iterations; i++) {
+
+	for (var i = 0; i < iterations; i++) {
 		if (i === 0) {
 			this.materialOceanHorizontal.uniforms.u_input.value = this.spectrumFramebuffer;
 			this.materialOceanHorizontal.uniforms.u_subtransformSize.value = Math.pow(2, (i % (iterations)) + 1);
@@ -305,7 +300,7 @@ THREE.Ocean.prototype.renderSpectrumFFT = function() {
 		}
 	}
 	this.scene.overrideMaterial = this.materialOceanVertical;
-	for (i = iterations; i < iterations*2; i++) {
+	for (var i = iterations; i < iterations*2; i++) {
 		if (i === iterations * 2 - 1) {
 			this.materialOceanVertical.uniforms.u_input.value = (iterations % 2 === 0) ? this.pingTransformFramebuffer : this.pongTransformFramebuffer;
 			this.materialOceanVertical.uniforms.u_subtransformSize.value = Math.pow(2, (i % (iterations)) + 1);
@@ -329,10 +324,4 @@ THREE.Ocean.prototype.renderNormalMap = function () {
 	if (this.changed) this.materialNormal.uniforms.u_size.value = this.size;
 	this.materialNormal.uniforms.u_displacementMap.value = this.displacementMapFramebuffer;
 	this.renderer.render(this.scene, this.oceanCamera, this.normalMapFramebuffer, true);
-};
-
-THREE.Ocean.prototype.helpers = function () {
-	this.log2 = function (number) {
-		return Math.log(number) / Math.log(2);
-	};
 };
