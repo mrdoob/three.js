@@ -491,15 +491,13 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 	function toShapesNoHoles( inSubpaths ) {
 
-		var i, il;
-		var tmpPath, tmpShape;
 		var shapes = [];
 
-		for ( i = 0, il = inSubpaths.length; i < il; i ++ ) {
+		for ( var i = 0, il = inSubpaths.length; i < il; i ++ ) {
 
-			tmpPath = inSubpaths[ i ];
+			var tmpPath = inSubpaths[ i ];
 
-			tmpShape = new THREE.Shape();
+			var tmpShape = new THREE.Shape();
 			tmpShape.actions = tmpPath.actions;
 			tmpShape.curves = tmpPath.curves;
 
@@ -560,7 +558,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 	var subPaths = extractSubpaths( this.actions );
 	if ( subPaths.length == 0 ) return [];
 
-	if ( noHoles )	return	toShapesNoHoles( subPaths );
+	if ( noHoles === true )	return	toShapesNoHoles( subPaths );
 
 
 	var solid, tmpPath, tmpShape, shapes = [];
