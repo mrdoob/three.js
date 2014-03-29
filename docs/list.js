@@ -7,13 +7,13 @@ var list = {
 	},
 
 	"Reference": {
-    "Constants": [
-      [ "CustomBlendingEquation", "api/constants/CustomBlendingEquations"],
-      [ "GLState", "api/constants/GLState"],
-      [ "Materials", "api/constants/Materials"],
-      [ "ShadowingTypes", "api/constants/ShadowingTypes"],
-      [ "Textures", "api/constants/Textures"]
-    ],
+		"Constants": [
+			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations"],
+			[ "GLState", "api/constants/GLState"],
+			[ "Materials", "api/constants/Materials"],
+			[ "ShadowingTypes", "api/constants/ShadowingTypes"],
+			[ "Textures", "api/constants/Textures"]
+		],
 
 		"Cameras": [
 			[ "Camera", "api/cameras/Camera" ],
@@ -22,6 +22,7 @@ var list = {
 		],
 
 		"Core": [
+			[ "BufferAttribute", "api/core/BufferAttribute" ],
 			[ "BufferGeometry", "api/core/BufferGeometry" ],
 			[ "Clock", "api/core/Clock" ],
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
@@ -45,6 +46,7 @@ var list = {
 
 		"Loaders": [
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
+			[ "Cache", "api/loaders/Cache" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
@@ -67,6 +69,7 @@ var list = {
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
 			[ "ParticleSystemMaterial", "api/materials/ParticleSystemMaterial" ],
+			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
 			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ],
 			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
@@ -95,8 +98,8 @@ var list = {
 
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
-			[ "LOD", "api/objects/LOD" ],
 			[ "Line", "api/objects/Line" ],
+			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
 			[ "ParticleSystem", "api/objects/ParticleSystem" ],
@@ -106,9 +109,9 @@ var list = {
 
 		"Renderers": [
 			[ "CanvasRenderer", "api/renderers/CanvasRenderer" ],
+			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ],
 			[ "WebGLRenderTarget", "api/renderers/WebGLRenderTarget" ],
-			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ],
-			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ]
+			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
 		],
 
 		"Renderers / Renderables": [
@@ -124,6 +127,11 @@ var list = {
 			[ "ShaderLib", "api/renderers/shaders/ShaderLib" ],
 			[ "UniformsLib", "api/renderers/shaders/UniformsLib" ],
 			[ "UniformsUtils", "api/renderers/shaders/UniformsUtils" ]
+		],
+
+		"Renderers / WebGL": [
+			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
+			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ]
 		],
 
 		"Scenes": [
@@ -237,7 +245,6 @@ var list = {
 		],
 
 		"Examples" : [
-
 			[ "LookupTable", "api/examples/Lut" ]
 
 		]
