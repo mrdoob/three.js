@@ -407,6 +407,7 @@ THREE.ShaderDeferred = {
 
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+			THREE.ShaderChunk[ "defaultnormal_pars_vertex" ],
 
 			"void main() {",
 
