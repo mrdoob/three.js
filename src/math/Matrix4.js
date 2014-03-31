@@ -542,18 +542,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	flattenToArray: function ( array ) {
-
-		var te = this.elements;
-		array[ 0 ] = te[0]; array[ 1 ] = te[1]; array[ 2 ] = te[2]; array[ 3 ] = te[3];
-		array[ 4 ] = te[4]; array[ 5 ] = te[5]; array[ 6 ] = te[6]; array[ 7 ] = te[7];
-		array[ 8 ] = te[8]; array[ 9 ] = te[9]; array[ 10 ] = te[10]; array[ 11 ] = te[11];
-		array[ 12 ] = te[12]; array[ 13 ] = te[13]; array[ 14 ] = te[14]; array[ 15 ] = te[15];
-
-		return array;
-
-	},
-
 	flattenToArrayOffset: function( array, offset ) {
 
 		var te = this.elements;
