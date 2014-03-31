@@ -187,33 +187,34 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	flattenToArray: function ( flat ) {
+	flattenToArray: function ( array ) {
 
 		var te = this.elements;
-		flat[ 0 ] = te[0]; flat[ 1 ] = te[1]; flat[ 2 ] = te[2];
-		flat[ 3 ] = te[3]; flat[ 4 ] = te[4]; flat[ 5 ] = te[5]; 
-		flat[ 6 ] = te[6]; flat[ 7 ] = te[7]; flat[ 8 ] = te[8];
+		array[ 0 ] = te[0]; array[ 1 ] = te[1]; array[ 2 ] = te[2];
+		array[ 3 ] = te[3]; array[ 4 ] = te[4]; array[ 5 ] = te[5]; 
+		array[ 6 ] = te[6]; array[ 7 ] = te[7]; array[ 8 ] = te[8];
 
-		return flat;
+		return array;
 
 	},
 
-	flattenToArrayOffset: function( flat, offset ) {
+	flattenToArrayOffset: function( array, offset ) {
 
 		var te = this.elements;
-		flat[ offset ] = te[0];
-		flat[ offset + 1 ] = te[1];
-		flat[ offset + 2 ] = te[2];
-		
-		flat[ offset + 3 ] = te[3];
-		flat[ offset + 4 ] = te[4];
-		flat[ offset + 5 ] = te[5];
-		
-		flat[ offset + 6 ] = te[6];
-		flat[ offset + 7 ] = te[7];
-		flat[ offset + 8 ]  = te[8];
 
-		return flat;
+		array[ offset     ] = te[0];
+		array[ offset + 1 ] = te[1];
+		array[ offset + 2 ] = te[2];
+		
+		array[ offset + 3 ] = te[3];
+		array[ offset + 4 ] = te[4];
+		array[ offset + 5 ] = te[5];
+		
+		array[ offset + 6 ] = te[6];
+		array[ offset + 7 ] = te[7];
+		array[ offset + 8 ]  = te[8];
+
+		return array;
 
 	},
 
