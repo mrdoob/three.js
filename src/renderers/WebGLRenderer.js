@@ -5171,6 +5171,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform4fv( location, uniform._array );
 
+			} else if ( type === "m3") { // single THREE.Matrix3
+
+				if ( uniform._array === undefined ) {
+
+					uniform._array = new Float32Array( 9 );
+
+				}
+
+				value.flattenToArray( uniform._array );
+				_gl.uniformMatrix3fv( location, false, uniform._array );
+
+			} else if ( type === "m3v" ) { // array of THREE.Matrix3
+
+				if ( uniform._array === undefined ) {
+
+					uniform._array = new Float32Array( 9 * value.length );
+
+				}
+
+				for ( i = 0, il = value.length; i < il; i ++ ) {
+
+					value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
+
+				}
+
+				_gl.uniformMatrix3fv( location, false, uniform._array );
+
 			} else if ( type === "m4") { // single THREE.Matrix4
 
 				if ( uniform._array === undefined ) {

@@ -78,7 +78,7 @@
 
 				vec3 color = texture2D( texture, uv ).xyz;
 
-				gl_FragColor=vec4(color, 1.0);
+				gl_FragColor = vec4( color, 1.0 );
 
 			}
 
@@ -455,9 +455,7 @@
 
 				this.applyMatrix( new THREE.Matrix4().makeScale( 0.2, 0.2, 0.2 ) );
 
-
 			}
-
 
 			THREE.BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype ); // Geometry2
 
@@ -469,7 +467,6 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 			
-			var HEIGHT = WIDTH;
 			var PARTICLES = WIDTH * WIDTH;
 			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
@@ -489,24 +486,12 @@
 			}
 			document.getElementById('options').innerHTML = options;
 
-			var debug;
-			var data, texture;
-
-			var spline = new THREE.SplineCurve3();
-
-
-			var timer = 0;
-			var paused = false;
-
 			var last = performance.now();
-			var delta, now, t = 0;
-
 
 			var simulator;
 
 			init();
 			animate();
-			onMouseDown();
 
 			function init() {
 
@@ -522,34 +507,11 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( scene.fog.color, 1 );
 				container.appendChild( renderer.domElement );
 
-				renderer.setClearColor( scene.fog.color, 1 );
-				renderer.autoClear = true;
-
-				////////
 				simulator = new SimulationRenderer(WIDTH, renderer);
-
 				simulator.init();
-
-				/////////
-
-
-		
-				plane = new THREE.PlaneGeometry( BOUNDS, BOUNDS, 1, 1 );
-				// new THREE.BoxGeometry( BOUNDS, BOUNDS, BOUNDS),
-
-				cube = new THREE.Mesh(
-					plane,
-					new THREE.MeshBasicMaterial( {color: 0xdddddd, wireframe: true, depthWrite: false} )
-				);
-
-				cube.rotation.x = -Math.PI / 2;
-				cube.position.y = -400;
-				// scene.add(cube);
-
-
-
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -557,8 +519,6 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				// document.addEventListener( 'mousedown', onMouseDown, false );
-				document.addEventListener( 'mouseup', onMouseUp, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
@@ -593,32 +553,16 @@
 				gui.add( effectController, "seperation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
 				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
 				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
-				// gui.add( effectController, "freedom", 0.0, 1.0, 0.025 ).onChange( valuesChanger );
 				gui.close();
 
 				initBirds();
-
-
-				// var ambient = new THREE.AmbientLight( 0x444444 );
-				// scene.add( ambient );
-
-				// light = new THREE.DirectionalLight( 0xffffff );
-				// light.position.set( 1, 1, 1 );
-				// scene.add( light );
-
-
-				// light = new THREE.DirectionalLight( 0xffffff );
-				// light.position.set( -1, -1, -1 );
-				// scene.add( light );
 				
-
-
 			}
 
 
 			function initBirds() {
-				var geometry = new THREE.BirdGeometry( );
 
+				var geometry = new THREE.BirdGeometry();
 
 				// For Vertex Shaders
 				birdAttributes = {
@@ -650,14 +594,10 @@
 
 				});
 
-				// geometry.dynamic = false;
-
 
 				// var 
 				birdMesh = new THREE.Mesh( geometry, shaderMaterial );
 				birdMesh.rotation.y = Math.PI / 2;
-				birdMesh.sortObjects = false;
-
 				birdMesh.matrixAutoUpdate = false;
 				birdMesh.updateMatrix();
 
@@ -722,8 +662,9 @@
 			}
 
 			function render() {
-				now = performance.now()
-				delta = (now - last) / 1000;
+
+				var now = performance.now()
+				var delta = (now - last) / 1000;
 
 				if (delta > 1) delta = 1; // safety cap on large deltas
 				last = now;
@@ -731,24 +672,8 @@
 				birdUniforms.time.value = now;
 				birdUniforms.delta.value = delta;
 
-				// if ( paused ) {
-				// 	camera.position.x += ( mouseX * 2 - camera.position.x ) * 0.05;
-				// 	camera.position.y += ( - mouseY * 2 - camera.position.y ) * 0.05;
-
-				// 	camera.lookAt( scene.position );
-				// 	delta = 0.0001;
-				// }
-
-				if (!paused) {
-					simulator.simulate( delta );
-
-					birdUniforms.texturePosition.value = simulator.currentPosition;
-					birdUniforms.textureVelocity.value = simulator.currentVelocity;
-				}
-
-
+				simulator.simulate( delta );
 				simulator.velocityUniforms.predator.value.set( mouseX / windowHalfX, -mouseY / windowHalfY, 0 );
-
 
 				mouseX = 10000;
 				mouseY = 10000;
@@ -756,17 +681,6 @@
 				renderer.render( scene, camera );
 
 			}
-
-			function onMouseDown() {
-				// simulator.velocityUniforms.testing.value = 0;
-			}
-
-			function onMouseUp() {
-				// simulator.velocityUniforms.testing.value = 1;
-			}
-
-
-
 
 		</script>
 	</body>
