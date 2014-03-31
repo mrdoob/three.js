@@ -78,7 +78,7 @@
 
 				vec3 color = texture2D( texture, uv ).xyz;
 
-				gl_FragColor=vec4(color, 1.0);
+				gl_FragColor = vec4( color, 1.0 );
 
 			}
 
@@ -467,7 +467,6 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 			
-			var HEIGHT = WIDTH;
 			var PARTICLES = WIDTH * WIDTH;
 			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
