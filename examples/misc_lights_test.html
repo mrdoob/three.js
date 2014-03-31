@@ -24,19 +24,8 @@
 	</head>
 
 	<body>
-		<div id="d">
-			<h1>lights test</h1>
-
-			<span id="rcanvas" class="button inactive">2d canvas renderer</span>
-			<span id="rwebgl" class="button">WebGL renderer</span>
-			<br/>
-
-			<p>Best viewed in Chrome or Firefox using WebGL renderer.
-			<p>Canvas renderer is very slow on anything other than Chrome.
-		</div>
 
 		<script src="../build/three.min.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -59,24 +48,14 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var render_canvas = 1, render_gl = 1;
-			var has_gl = 0;
-
 			var lightAdded = false;
 
 			var clock = new THREE.Clock();
-
-			var bcanvas = document.getElementById( 'rcanvas' );
-			var bwebgl = document.getElementById( 'rwebgl' );
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
 			animate();
-
-			//render_canvas = !has_gl;
-			bwebgl.style.display = has_gl ? 'inline' : 'none';
-			bcanvas.className = render_canvas ? 'button' : 'button inactive';
 
 			function init() {
 
@@ -91,7 +70,7 @@
 				// Spheres
 
 				var geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				materialSpheres = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
+				materialSpheres = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
@@ -106,7 +85,7 @@
 
 				// Torus
 
-				materialTorus = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: true } );
+				materialTorus = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
 				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), materialTorus );
 				scene.add( mesh );
 
@@ -128,39 +107,23 @@
 				scene.add( lightMesh );
 
 
-				if ( render_canvas ) {
+				canvasRenderer = new THREE.CanvasRenderer();
+				canvasRenderer.setClearColor( 0xffffff );
+				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( canvasRenderer.domElement );
 
-					canvasRenderer = new THREE.CanvasRenderer();
-					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-					container.appendChild( canvasRenderer.domElement );
+				webglRenderer = new THREE.WebGLRenderer();
+				webglRenderer.setClearColor( 0xffffff );
+				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				webglRenderer.domElement.style.position = "relative";
+				container.appendChild( webglRenderer.domElement );
 
-				}
-
-				if ( render_gl ) {
-
-					try {
-
-						webglRenderer = new THREE.WebGLRenderer( { alpha: true } );
-						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-						webglRenderer.domElement.style.position = "relative";
-						container.appendChild( webglRenderer.domElement );
-
-						has_gl = 1;
-
-					} catch (e) {
-
-					}
-
-				}
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				bcanvas.addEventListener("click", toggleCanvas, false);
-				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				//
 
@@ -176,8 +139,8 @@
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				if ( canvasRenderer ) canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				if ( webglRenderer ) webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
 
@@ -246,38 +209,8 @@
 				lightMesh.position.x = 200 * Math.cos( r );
 				lightMesh.position.z = 200 * Math.sin( r );
 
-				if ( render_canvas ) canvasRenderer.render( scene, camera );
-				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
-
-			}
-
-			function toggleCanvas() {
-
-				render_canvas = !render_canvas;
-				bcanvas.className = render_canvas ? "button" : "button inactive";
-
-				render_gl = !render_canvas;
-				bwebgl.className = render_gl ? "button" : "button inactive";
-
-				if( has_gl )
-					webglRenderer.domElement.style.display = render_gl ? "block" : "none";
-
-				canvasRenderer.domElement.style.display = render_canvas ? "block" : "none";
-
-			}
-
-			function toggleWebGL() {
-
-				render_gl = !render_gl;
-				bwebgl.className = render_gl ? "button" : "button inactive";
-
-				render_canvas = !render_gl;
-				bcanvas.className = render_canvas ? "button" : "button inactive";
-
-				if( has_gl )
-					webglRenderer.domElement.style.display = render_gl ? "block" : "none";
-
-				canvasRenderer.domElement.style.display = render_canvas ? "block" : "none";
+				canvasRenderer.render( scene, camera );
+				webglRenderer.render( scene, camera );
 
 			}
 

@@ -15,16 +15,27 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 	this.matrixAutoUpdate = false;
 
 	size = size || 1;
-	var geometry = new THREE.PlaneGeometry( size, size );
-	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
+
+	var geometry = new THREE.Geometry();
+	geometry.vertices.push(
+		new THREE.Vector3( - size,   size, 0 ),
+		new THREE.Vector3(   size,   size, 0 ),
+		new THREE.Vector3(   size, - size, 0 ),
+		new THREE.Vector3( - size, - size, 0 ),
+		new THREE.Vector3( - size,   size, 0 )
+	);
+
+	var material = new THREE.LineBasicMaterial( { fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.lightPlane = new THREE.Mesh( geometry, material );
+	this.lightPlane = new THREE.Line( geometry, material );
 	this.add( this.lightPlane );
 
 	geometry = new THREE.Geometry();
-	geometry.vertices.push( new THREE.Vector3() );
-	geometry.vertices.push( new THREE.Vector3() );
+	geometry.vertices.push(
+		new THREE.Vector3(),
+		new THREE.Vector3()
+	);
 
 	material = new THREE.LineBasicMaterial( { fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );

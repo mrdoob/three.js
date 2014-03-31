@@ -70,7 +70,14 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	multiplyVector3Array: function() {
+	multiplyVector3Array: function ( a ) {
+
+		console.warn( 'DEPRECATED: Matrix3\'s .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		return this.applyToVector3Array( a );
+
+	},
+
+	applyToVector3Array: function() {
 
 		var v1 = new THREE.Vector3();
 
@@ -82,7 +89,7 @@ THREE.Matrix3.prototype = {
 				v1.y = a[ i + 1 ];
 				v1.z = a[ i + 2 ];
 
-				v1.applyMatrix3(this);
+				v1.applyMatrix3( this );
 
 				a[ i ]     = v1.x;
 				a[ i + 1 ] = v1.y;
@@ -148,7 +155,7 @@ THREE.Matrix3.prototype = {
 
 			if ( throwOnInvertible || false ) {
 
-				throw new Error( msg ); 
+				throw new Error( msg );
 
 			} else {
 
@@ -205,6 +212,26 @@ THREE.Matrix3.prototype = {
 		r[ 8 ] = m[ 8 ];
 
 		return this;
+
+	},
+
+	fromArray: function ( array ) {
+
+		this.elements.set( array );
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		var te = this.elements;
+
+		return [
+			te[ 0 ], te[ 1 ], te[ 2 ],
+			te[ 3 ], te[ 4 ], te[ 5 ],
+			te[ 6 ], te[ 7 ], te[ 8 ]
+		];
 
 	},
 

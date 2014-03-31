@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - controls - deviceorientation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="user-scalable=no, initial-scale=1">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color: #ff8800;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - equirectangular panorama demo with DeviceOrientation controls.
+			photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Jón Ragnarsson</a>.
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/controls/DeviceOrientationControls.js"></script>
+
+		<script>
+			(function() {
+				  "use strict"
+
+				  window.addEventListener('load', function() {
+
+						var container, camera, scene, renderer, controls, geometry, mesh;
+
+						var animate = function(){
+
+							window.requestAnimationFrame( animate );
+
+							controls.update();
+							renderer.render(scene, camera);
+
+						};
+
+						container = document.getElementById( 'container' );
+
+						camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+
+						controls = new THREE.DeviceOrientationControls( camera );
+
+						scene = new THREE.Scene();
+
+						var geometry = new THREE.SphereGeometry( 500, 16, 8 );
+						geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
+
+						var material = new THREE.MeshBasicMaterial( {
+								map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
+						} );
+
+						var mesh = new THREE.Mesh( geometry, material );
+						scene.add( mesh );
+
+						var geometry = new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 );
+						var material = new THREE.MeshBasicMaterial( { color: 0xff00ff, side: THREE.BackSide, wireframe: true } );
+						var mesh = new THREE.Mesh( geometry, material );
+						scene.add( mesh );
+
+						renderer = new THREE.WebGLRenderer();
+						renderer.setSize(window.innerWidth, window.innerHeight);
+						renderer.domElement.style.position = 'absolute';
+						renderer.domElement.style.top = 0;
+						container.appendChild(renderer.domElement);
+
+						window.addEventListener('resize', function() {
+
+							camera.aspect = window.innerWidth / window.innerHeight;
+							camera.updateProjectionMatrix();
+							renderer.setSize( window.innerWidth, window.innerHeight );
+
+						}, false);
+
+						controls.connect();
+
+						animate();
+
+				  }, false);
+
+			})();
+		</script>
+
+	</body>
+</html>

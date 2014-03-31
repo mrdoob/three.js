@@ -9,181 +9,177 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A two dimensional surface that extends infinitely in 3d space.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector3 normal], [page:number constant])</h3>
+		<h3>[name]([page:Vector3 normal], [page:Float constant])</h3>
 		<div>
-		normal -- the normal vector defining the plane <br />
-		constant -- the distance from the origin to the plane along the normal vector
+		normal -- ([Page:Vector3]) normal vector defining the plane pointing towards the origin <br />
+		constant -- ([Page:Float]) the negative distance from the origin to the plane along the normal vector
 		</div>
 
 
 		<h2>Properties</h2>
 
-
-
-		<h3>.[page:number constant]</h3>
-		<div>
-		the distance from the origin to the plane along the normal vector
-		</div> 
-
 		<h3>.[page:Vector3 normal]</h3>
-		<div>
-		the normal vector defining the plane
-		</div> 
 
+		<h3>.[page:Float constant]</h3>
+		
 		<h2>Methods</h2>
 
 
 
-		<h3>.normalize() [page:todo]</h3>
+		<h3>.normalize() [page:Plane this]</h3>
 		<div>
-		todo
+		Normalizes the normal vector, and adjusts the constant value accordingly.
 		</div>
 
-		<h3>.set([page:todo normal], [page:todo constant]) [page:todo]</h3>
+		<h3>.set([page:Vector3 normal], [page:Float constant]) [page:Plane this]</h3>
 		<div>
-		normal -- todo <br />
-		constant -- todo
+		normal -- [Page:Vector3] <br />
+		constant -- [Page:Float]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.copy([page:todo plane]) [page:todo]</h3>
-		<div>
-		plane -- todo
-		</div>
-		<div>
-		todo
+		Sets the plane's values.
 		</div>
 
-		<h3>.applyMatrix4([page:todo matrix], [page:todo optionalNormalMatrix]) [page:todo]</h3>
+		<h3>.copy([page:Plane plane]) [page:Plane this]</h3>
 		<div>
-		matrix -- todo <br />
-		optionalNormalMatrix -- todo
+		plane -- [page:Plane] to copy
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.orthoPoint([page:todo point], [page:todo optionalTarget]) [page:todo]</h3>
-		<div>
-		point -- todo <br />
-		optionalTarget -- todo
-		</div>
-		<div>
-		todo
+		Copies the values of the passed plane to this plane.
 		</div>
 
-		<h3>.isIntersectionLine([page:todo line]) [page:todo]</h3>
+		<h3>.applyMatrix4([page:Matrix4 matrix], [page:Matrix3 optionalNormalMatrix]) [page:Plane this]</h3>
 		<div>
-		line -- todo
+		matrix -- [Page:Matrix4] to apply <br />
+		optionalNormalMatrix -- (optional) pre-computed normal [Page:Matrix3] of the Matrix4 to apply
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.intersectLine([page:todo line], [page:todo optionalTarget]) [page:todo]</h3>
-		<div>
-		line -- todo <br />
-		optionalTarget -- todo
-		</div>
-		<div>
-		todo
+		Apply a Matrix4 to the plane. The second parameter is optional.
+		
+		<code>
+		var optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix ) 
+		</code>
 		</div>
 
-		<h3>.setFromNormalAndCoplanarPoint([page:todo normal], [page:todo point]) [page:todo]</h3>
+		<h3>.orthoPoint([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		normal -- todo <br />
-		point -- todo
+		point -- [page:Vector3] <br />
+		optionalTarget -- [page:Vector3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.clone() [page:todo]</h3>
-		<div>
-		todo
+		Returns a vector in the same direction as the Plane's normal, but the magnitude is passed point's original distance to the plane.
 		</div>
 
-		<h3>.distanceToPoint([page:todo point]) [page:todo]</h3>
+		<h3>.isIntersectionLine([page:Line3 line]) [page:Boolean]</h3>
 		<div>
-		point -- todo
+		line -- [page:Line3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.equals([page:todo plane]) [page:todo]</h3>
-		<div>
-		plane -- todo
-		</div>
-		<div>
-		todo
+		Tests whether a line segment intersects with the plane. (Do not mistake this for a collinear check.)
 		</div>
 
-		<h3>.setComponents([page:todo x], [page:todo y], [page:todo z], [page:todo w]) [page:todo]</h3>
+		<h3>.intersectLine([page:Line3 line], [page:Vector3 optionalTarget]) [page:Vector3] or [page:undefined]</h3>
 		<div>
-		x -- todo <br />
-		y -- todo <br />
-		z -- todo <br />
-		w -- todo
+		line -- [page:Line3] <br />
+		optionalTarget -- [page:Vector3]
 		</div>
 		<div>
-		todo
+		Returns the intersection point of the passed line and the plane. Returns undefined if the line does not intersect. Returns the line's starting point if the line is coplanar with the plane.
 		</div>
 
-		<h3>.distanceToSphere([page:todo sphere]) [page:todo]</h3>
+		<h3>.setFromNormalAndCoplanarPoint([page:Vector3 normal], [page:Vector3 point]) [page:Vector3 this]</h3>
 		<div>
-		sphere -- todo
+		normal -- [page:Vector3] <br />
+		point -- [page:Vector3]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.setFromCoplanarPoints([page:todo a], [page:todo b], [page:todo c]) [page:todo]</h3>
-		<div>
-		a -- todo <br />
-		b -- todo <br />
-		c -- todo
-		</div>
-		<div>
-		todo
+		Sets the plane's values as defined by a normal and arbitrary coplanar point.
 		</div>
 
-		<h3>.projectPoint([page:todo point], [page:todo optionalTarget]) [page:todo]</h3>
+		<h3>.clone() [page:Plane]</h3>
 		<div>
-		point -- todo <br />
-		optionalTarget -- todo
-		</div>
-		<div>
-		todo
+		Returns a new copy of this plane.
 		</div>
 
-		<h3>.negate() [page:todo]</h3>
+		<h3>.distanceToPoint([page:Vector3 point]) [page:Float]</h3>
 		<div>
-		todo
+		point -- [page:Vector3]
+		</div>
+		<div>
+		Returns the smallest distance from the point to the plane.
 		</div>
 
-		<h3>.translate([page:todo offset]) [page:todo]</h3>
+		<h3>.equals([page:Plane plane]) [page:Boolean]</h3>
 		<div>
-		offset -- todo
+		plane -- [page:Planen]
 		</div>
 		<div>
-		todo
+		Checks to see if two planes are equal (their normals and constants match)
 		</div>
 
-		<h3>.coplanarPoint([page:todo optionalTarget]) [page:todo]</h3>
+		<h3>.setComponents([page:Float x], [page:Float y], [page:Float z], [page:Float w]) [page:Plane this]</h3>
 		<div>
-		optionalTarget -- todo
+		x -- [page:Float] x of the normal vector <br />
+		y -- [page:Float] y of the normal vector<br />
+		z -- [page:Float] z of the normal vector<br />
+		w -- [page:Float] distance of the plane from the origin along the normal vector
 		</div>
 		<div>
-		todo
+		Set the individual components that make up the plane.
+		</div>
+
+		<h3>.distanceToSphere([page:Sphere sphere]) [page:Float]</h3>
+		<div>
+		sphere -- [Page:Sphere]
+		</div>
+		<div>
+		Returns the smallest distance from an edge of the sphere to the plane.
+		</div>
+
+		<h3>.setFromCoplanarPoints([page:Vector3 a], [page:Vector3 b], [page:Vector3 c]) [page:Plane this]</h3>
+		<div>
+		a -- [page:Vector3] <br />
+		b -- [page:Vector3] <br />
+		c -- [page:Vector3]
+		</div>
+		<div>
+		Defines the plane based on the 3 provided points. The winding order is counter clockwise, and determines which direction the normal will point.
+		</div>
+
+		<h3>.projectPoint([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
+		<div>
+		point -- [page:Vector3] <br />
+		optionalTarget -- [page:Vector3]
+		</div>
+		<div>
+		Projects a point onto the plane. The projected point is the closest point on the plane to the passed point, so a line drawn from the projected point and the passed point would be orthogonal to the plane.
+		</div>
+
+		<h3>.negate() [page:Plane this]</h3>
+		<div>
+		Negates both the normal vector and constant, effectively mirroring the plane across the origin.
+		</div>
+
+		<h3>.translate([page:Vector3 offset]) [page:Plane this]</h3>
+		<div>
+		offset -- [page:Vector3]
+		</div>
+		<div>
+		Translates the plane the distance defined by the vector. Note that this only affects the constant (distance from origin) and will not affect the normal vector.
+		</div>
+
+		<h3>.coplanarPoint([page:Vector3 optionalTarget]) [page:Vector3]</h3>
+		<div>
+		optionalTarget -- [page:Vector3]
+		</div>
+		<div>
+		Returns a coplanar point. (The projection of the normal vector at the origin onto the plane.)
 		</div>
 
 		<h2>Source</h2>

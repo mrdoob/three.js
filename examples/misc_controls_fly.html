@@ -130,11 +130,11 @@
 				uniforms[ "enableDiffuse" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
 
-				uniforms[ "uDiffuseColor" ].value.setHex( 0xffffff );
-				uniforms[ "uSpecularColor" ].value.setHex( 0x333333 );
-				uniforms[ "uAmbientColor" ].value.setHex( 0x000000 );
+				uniforms[ "diffuse" ].value.setHex( 0xffffff );
+				uniforms[ "specular" ].value.setHex( 0x333333 );
+				uniforms[ "ambient" ].value.setHex( 0x000000 );
 
-				uniforms[ "uShininess" ].value = 15;
+				uniforms[ "shininess" ].value = 15;
 
 				var parameters = {
 
@@ -232,7 +232,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.sortObjects = false;
 

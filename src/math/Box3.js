@@ -235,12 +235,14 @@ THREE.Box3.prototype = {
 
 	},
 
-	getParameter: function ( point ) {
+	getParameter: function ( point, optionalTarget ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		return new THREE.Vector3(
+		var result = optionalTarget || new THREE.Vector3();
+
+		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
 			( point.z - this.min.z ) / ( this.max.z - this.min.z )

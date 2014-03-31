@@ -374,7 +374,7 @@ def rgb2int(rgb):
 # #####################################################
 
 def write_file(fname, content):
-    out = open(fname, "w")
+    out = open(fname, "w", encoding="utf-8")
     out.write(content)
     out.close()
 
@@ -1479,10 +1479,6 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
             if not mesh:
                 raise Exception("Error, could not get mesh data from object [%s]" % object.name)
 
-            # preserve original name
-
-            mesh.name = object.name
-
             if export_single_model:
 
                 if flipyz:
@@ -1965,8 +1961,8 @@ def extract_material_data(m, option_colors):
 
     if textures['bump']:
         material['mapBump'] = textures['bump']['texture'].image.name
-        if textures['normal']['slot'].use_map_normal:
-            material['mapBumpScale'] = textures['normal']['slot'].normal_factor
+        if textures['bump']['slot'].use_map_normal:
+            material['mapBumpScale'] = textures['bump']['slot'].normal_factor
 
     material['shading'] = m.THREE_materialType
     material['blending'] = m.THREE_blendingType
@@ -2161,16 +2157,12 @@ def generate_cameras(data):
         else:
 
             for cameraobj in cams:
-                camera = bpy.data.cameras[cameraobj.name]
+                camera = bpy.data.cameras[cameraobj.data.name]
 
-                # TODO:
-                #   Support more than perspective camera
-                #   Calculate a target/lookat
-                #   Get correct aspect ratio
                 if camera.id_data.type == "PERSP":
 
                     camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
-                    "camera_id" : generate_string(camera.name),
+                    "camera_id" : generate_string(cameraobj.name),
                     "fov"       : (camera.angle / 3.14) * 180.0,
                     "aspect"    : 1.333,
                     "near"      : camera.clip_start,
@@ -2178,7 +2170,21 @@ def generate_cameras(data):
                     "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
                     "target"    : generate_vec3([0, 0, 0])
                     }
+		
+		elif camera.id_data.type == "ORTHO":
 
+                    camera_string = TEMPLATE_CAMERA_ORTHO % {
+                    "camera_id" : generate_string(camera.name),
+                    "left"      : -(camera.angle_x * camera.ortho_scale),
+                    "right"     : (camera.angle_x * camera.ortho_scale),
+                    "top"       : (camera.angle_y * camera.ortho_scale),
+                    "bottom"    : -(camera.angle_y * camera.ortho_scale),
+                    "near"      : camera.clip_start,
+                    "far"       : camera.clip_end,
+                    "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
+                    "target"    : generate_vec3([0, 0, 0])
+                    }
+                    
                 chunks.append(camera_string)
 
     return ",\n\n".join(chunks), len(chunks)
@@ -2483,7 +2489,7 @@ def save(operator, context, filepath = "",
                                                         option_animation_skeletal,
                                                         option_frame_step)
 
-                        embeds[object.data.name] = model_string
+                        embeds[name] = model_string
 
                     else:
 

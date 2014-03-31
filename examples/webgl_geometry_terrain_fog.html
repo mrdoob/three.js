@@ -98,7 +98,7 @@
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xefd1b5 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -131,14 +131,8 @@
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Float32Array( size ),
+				var size = width * height, data = new Uint8Array( size ),
 				perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
-
-				for ( var i = 0; i < size; i ++ ) {
-
-					data[ i ] = 0
-
-				}
 
 				for ( var j = 0; j < 4; j ++ ) {
 
@@ -146,7 +140,6 @@
 
 						var x = i % width, y = ~~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
-
 
 					}
 

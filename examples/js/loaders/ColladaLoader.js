@@ -1,5 +1,6 @@
 /**
  * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
+ * @author Tony Parisi / http://www.tonyparisi.com/ 
  */
 
 THREE.ColladaLoader = function () {
@@ -286,7 +287,7 @@ THREE.ColladaLoader = function () {
 
 	function recurseHierarchy( node ) {
 
-		var n = daeScene.getChildById( node.name, true ),
+		var n = daeScene.getChildById( node.id, true ),
 			newData = null;
 
 		if ( n && n.keys ) {
@@ -1043,7 +1044,12 @@ THREE.ColladaLoader = function () {
 
 				}
 
-				node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
+				// N.B.: TP says this is not a great default behavior. It's a nice
+				// optimization to flatten the hierarchy but this should be done
+				// only if requested by the user via a flag. For now I undid it
+				// and fixed the character animation example that uses it
+				// node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
+				obj.add(mesh);
 
 			}
 
@@ -1054,13 +1060,15 @@ THREE.ColladaLoader = function () {
 			var instance_camera = node.cameras[i];
 			var cparams = cameras[instance_camera.url];
 
-			obj = new THREE.PerspectiveCamera(cparams.fov, parseFloat(cparams.aspect_ratio), 
+			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio), 
 					parseFloat(cparams.znear), parseFloat(cparams.zfar));
 
+			obj.add(cam);
 		}
 
 		for ( i = 0; i < node.lights.length; i ++ ) {
 
+			var light = null;
 			var instance_light = node.lights[i];
 			var lparams = lights[instance_light.url];
 
@@ -1076,31 +1084,38 @@ THREE.ColladaLoader = function () {
 
 					case 'directional':
 
-						obj = new THREE.DirectionalLight( color, intensity, distance );
+						light = new THREE.DirectionalLight( color, intensity, distance );
+						light.position.set(0, 0, 1);
 						break;
 
 					case 'point':
 
-						obj = new THREE.PointLight( color, intensity, distance );
+						light = new THREE.PointLight( color, intensity, distance );
 						break;
 
 					case 'spot':
 
-						obj = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						light.position.set(0, 0, 1);
 						break;
 
 					case 'ambient':
 
-						obj = new THREE.AmbientLight( color );
+						light = new THREE.AmbientLight( color );
 						break;
 
 				}
 
 			}
 
+			if (light) {
+				obj.add(light);
+			}
 		}
 
 		obj.name = node.name || node.id || "";
+		obj.id = node.id || "";
+		obj.layer = node.layer || "";
 		obj.matrix = node.matrix;
 		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 
@@ -2060,6 +2075,7 @@ THREE.ColladaLoader = function () {
 		this.sid = element.getAttribute('sid');
 		this.name = element.getAttribute('name');
 		this.type = element.getAttribute('type');
+		this.layer = element.getAttribute('layer');
 
 		this.type = this.type == 'JOINT' ? this.type : 'NODE';
 
@@ -2614,7 +2630,6 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		this.geometry3js.computeCentroids();
 		this.geometry3js.computeFaceNormals();
 
 		if ( this.geometry3js.calcNormals ) {
@@ -3360,6 +3375,29 @@ THREE.ColladaLoader = function () {
 					this[ child.nodeName ] = ( new ColorOrTexture() ).parse( child );
 					break;
 
+				case 'bump':
+
+					// If 'bumptype' is 'heightfield', create a 'bump' property
+					// Else if 'bumptype' is 'normalmap', create a 'normal' property
+					// (Default to 'bump')
+					var bumpType = child.getAttribute( 'bumptype' );
+					if ( bumpType ) {
+						if ( bumpType.toLowerCase() === "heightfield" ) {
+							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
+						} else if ( bumpType.toLowerCase() === "normalmap" ) {
+							this[ 'normal' ] = ( new ColorOrTexture() ).parse( child );
+						} else {
+							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType + 
+								           ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
+							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
+						}
+					} else {
+						console.warn( "Shader.prototype.parse: Attribute 'bumptype' missing from bump node - defaulting to 'HEIGHTFIELD'" );
+						this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
+					}
+
+					break;
+
 				case 'shininess':
 				case 'reflectivity':
 				case 'index_of_refraction':
@@ -3407,6 +3445,15 @@ THREE.ColladaLoader = function () {
 
 		}
 		
+		var keys = {
+			'diffuse':'map', 
+			'ambient':'lightMap' ,
+			'specular':'specularMap',
+			'emission':'emissionMap',
+			'bump':'bumpMap',
+			'normal':'normalMap'
+			};
+		
 		for ( var prop in this ) {
 
 			switch ( prop ) {
@@ -3415,6 +3462,8 @@ THREE.ColladaLoader = function () {
 				case 'emission':
 				case 'diffuse':
 				case 'specular':
+				case 'bump':
+				case 'normal':
 
 					var cot = this[ prop ];
 
@@ -3439,7 +3488,7 @@ THREE.ColladaLoader = function () {
 									texture.offset.y = cot.texOpts.offsetV;
 									texture.repeat.x = cot.texOpts.repeatU;
 									texture.repeat.y = cot.texOpts.repeatV;
-									props['map'] = texture;
+									props[keys[prop]] = texture;
 
 									// Texture with baked lighting?
 									if (prop === 'emission') props['emissive'] = 0xffffff;
@@ -3783,7 +3832,51 @@ THREE.ColladaLoader = function () {
 
 					this.shader = ( new Shader( child.nodeName, this ) ).parse( child );
 					break;
+				case 'extra':
+					this.parseExtra(child);	
+					break;
+				default:
+					break;
 
+			}
+
+		}
+
+	};
+	
+	Effect.prototype.parseExtra = function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[i];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'technique':
+					this.parseExtraTechnique( child );
+					break;
+				default:
+					break;
+
+			}
+
+		}
+
+	};
+	
+	Effect.prototype.parseExtraTechnique= function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[i];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'bump':
+					this.shader.parse( element );
+					break;
 				default:
 					break;
 
@@ -4164,7 +4257,7 @@ THREE.ColladaLoader = function () {
 	// TODO: Currently only doing linear interpolation. Should support full COLLADA spec.
 	Key.prototype.interpolate = function ( nextKey, time ) {
 
-		for ( var i = 0; i < this.targets.length; ++i ) {
+		for ( var i = 0, l = this.targets.length; i < l; i ++ ) {
 
 			var target = this.targets[ i ],
 				nextTarget = nextKey.getTarget( target.sid ),
@@ -4176,14 +4269,8 @@ THREE.ColladaLoader = function () {
 					nextData = nextTarget.data,
 					prevData = target.data;
 
-				// check scale error
-
-				if ( scale < 0 || scale > 1 ) {
-
-					console.log( "Key.interpolate: Warning! Scale out of bounds:" + scale );
-					scale = scale < 0 ? 0 : 1;
-
-				}
+				if ( scale < 0 ) scale = 0;
+				if ( scale > 1 ) scale = 1;
 
 				if ( prevData.length ) {
 

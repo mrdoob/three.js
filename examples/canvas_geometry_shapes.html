@@ -67,7 +67,7 @@
 					// flat shape
 
 					var geometry = new THREE.ShapeGeometry( shape );
-					var material = new THREE.MeshBasicMaterial( { color: color, overdraw: true } );
+					var material = new THREE.MeshBasicMaterial( { color: color, overdraw: 0.5 } );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( x, y, z );
@@ -286,9 +286,9 @@
 
 				//
 
-				renderer = new THREE.CanvasRenderer( { antialias: true } );
+				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				renderer.sortElements = false;
 				container.appendChild( renderer.domElement );
 

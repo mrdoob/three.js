@@ -480,8 +480,7 @@
 		"ben": {
 			"type": "ctm",
 			"url" : "models/ctm/ben.ctm",
-			"useWorkers" : true,
-			"useBuffers" : true
+			"useWorkers" : true
 		},
 
 		"bunny": {

@@ -39,6 +39,7 @@
 		if ( object instanceof THREE.Sprite ) {
 
 			matrixPosition.setFromMatrixPosition( object.matrixWorld );
+			
 			var distance = raycaster.ray.distanceToPoint( matrixPosition );
 
 			if ( distance > object.scale.x ) {
@@ -100,21 +101,25 @@
 				var material = object.material;
 
 				if ( material === undefined ) return intersects;
-				if ( geometry.dynamic === false ) return intersects;
+
+				var attributes = geometry.attributes;
 
 				var a, b, c;
 				var precision = raycaster.precision;
 
-				if ( geometry.attributes.index !== undefined ) {
+				if ( attributes.index !== undefined ) {
 
+					var indices = attributes.index.array;
+					var positions = attributes.position.array;
 					var offsets = geometry.offsets;
-					var indices = geometry.attributes.index.array;
-					var positions = geometry.attributes.position.array;
-					var offLength = geometry.offsets.length;
 
-					var fl = geometry.attributes.index.array.length / 3;
+					if ( offsets.length === 0 ) {
 
-					for ( var oi = 0; oi < offLength; ++oi ) {
+						offsets = [ { start: 0, count: positions.length, index: 0 } ];
+
+					}
+
+					for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
 
 						var start = offsets[ oi ].start;
 						var count = offsets[ oi ].count;
@@ -165,6 +170,7 @@
 
 								distance: distance,
 								point: intersectionPoint,
+								indices: [a, b, c],
 								face: null,
 								faceIndex: null,
 								object: object
@@ -178,12 +184,9 @@
 				} else {
 
 					var offsets = geometry.offsets;
-					var positions = geometry.attributes.position.array;
-					var offLength = geometry.offsets.length;
+					var positions = attributes.position.array;
 
-					var fl = geometry.attributes.position.array.length;
-
-					for ( var i = 0; i < fl; i += 3 ) {
+					for ( var i = 0, il = attributes.position.array.length; i < il; i += 3 ) {
 
 						a = i;
 						b = i + 1;
@@ -228,6 +231,7 @@
 
 							distance: distance,
 							point: intersectionPoint,
+							indices: [a, b, c],
 							face: null,
 							faceIndex: null,
 							object: object
@@ -259,10 +263,51 @@
 					a = vertices[ face.a ];
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
-					
+
+					if ( material.morphTargets === true ) {
+
+						var morphTargets = geometry.morphTargets;
+						var morphInfluences = object.morphTargetInfluences;
+
+						vA.set( 0, 0, 0 );
+						vB.set( 0, 0, 0 );
+						vC.set( 0, 0, 0 );
+
+						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+							var influence = morphInfluences[ t ];
+
+							if ( influence === 0 ) continue;
+
+							var targets = morphTargets[ t ].vertices;
+
+							vA.x += ( targets[ face.a ].x - a.x ) * influence;
+							vA.y += ( targets[ face.a ].y - a.y ) * influence;
+							vA.z += ( targets[ face.a ].z - a.z ) * influence;
+
+							vB.x += ( targets[ face.b ].x - b.x ) * influence;
+							vB.y += ( targets[ face.b ].y - b.y ) * influence;
+							vB.z += ( targets[ face.b ].z - b.z ) * influence;
+
+							vC.x += ( targets[ face.c ].x - c.x ) * influence;
+							vC.y += ( targets[ face.c ].y - c.y ) * influence;
+							vC.z += ( targets[ face.c ].z - c.z ) * influence;
+
+						}
+
+						vA.add( a );
+						vB.add( b );
+						vC.add( c );
+
+						a = vA;
+						b = vB;
+						c = vC;
+
+					}
+
 					if ( material.side === THREE.BackSide ) {
 							
-						var intersectionPoint = localRay.intersectTriangle( c, b, a, true ); 
+						var intersectionPoint = localRay.intersectTriangle( c, b, a, true );
 
 					} else {
 								

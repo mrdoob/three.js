@@ -1434,7 +1434,6 @@ var Qrcode = function () {
 	f4(20,21,363,362,color2);
 	f4(19,20,362,361,color2);
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	function v( x, y, z ) {

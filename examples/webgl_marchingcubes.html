@@ -157,7 +157,7 @@
 
 			// RENDERER
 
-			renderer = new THREE.WebGLRenderer( { alpha: false } );
+			renderer = new THREE.WebGLRenderer();
 			renderer.setClearColor( 0x050505, 1 );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -171,7 +171,6 @@
 
 			renderer.gammaInput = true;
 			renderer.gammaOutput = true;
-			renderer.physicallyBasedShading = true;
 
 			// CONTROLS
 
@@ -285,7 +284,7 @@
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
 			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
+			var texture = THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 			var materials = {

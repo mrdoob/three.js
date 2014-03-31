@@ -5,8 +5,6 @@
 
 THREE.Math = {
 
-	PI2: Math.PI * 2,
-
 	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
@@ -126,7 +124,7 @@ THREE.Math = {
 
 	sign: function ( x ) {
 
-		return ( x < 0 ) ? -1 : ( ( x > 0 ) ? 1 : 0 );
+		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
 
 	},
 
@@ -152,6 +150,12 @@ THREE.Math = {
 
 		};
 
-	}()
+	}(),
+
+	isPowerOfTwo: function ( value ) {
+
+		return ( value & ( value - 1 ) ) === 0 && value !== 0;
+
+	}
 
 };

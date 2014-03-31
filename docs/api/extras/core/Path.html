@@ -7,6 +7,8 @@
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
 	</head>
 	<body>
+		[page:CurvePath] &rarr;
+
 		<h1>[name]</h1>
 
 		<div class="desc">A 2d path representation, comprising of points, lines, and cubes,  similar to the html5 2d canvas api. It extends CurvePath.</div>
@@ -17,10 +19,10 @@
 
 		<h3>[name]([page:todo points])</h3>
 		<div>
-		points -- todo
+		points -- array of Vector2
 		</div>
 		<div>
-		todo
+		Creates a Path from the points. The first vector defines the offset. After that the lines get defined.
 		</div>
 
 
@@ -29,25 +31,27 @@
 
 		<h3>.[page:array actions]</h3>
 		<div>
-		todo
+		The possible actions that define the path.
 		</div> 
 
 		<h2>Methods</h2>
 
 		<h3>.fromPoints ( vectors ) </h3>
-		<div>todo</div>
+		<div>
+		Adds to the Path from the points. The first vector defines the offset. After that the lines get defined.
+		</div>
 
 		<h3>.moveTo ( x, y ) </h3>
-		<div>todo</div>
+		<div>This moves the offset to x and y</div>
 
 		<h3>.lineTo ( x, y ) </h3>
-		<div>todo</div>
+		<div>This creates a line from the offset to X and Y and updates the offset to X and Y.</div>
 
 		<h3>.quadraticCurveTo ( aCPx, aCPy, aX, aY ) </h3>
-		<div>todo</div>
+		<div>This creates a quadratic curve from the offset to aX and aY with aCPx and aCPy as control point and updates the offset to aX and aY.</div>
 
 		<h3>.bezierCurveTo ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) </h3>
-		<div>todo</div>
+		<div>This creates a bezier curve from the offset to aX and aY with aCP1x, aCP1y and aCP1x, aCP1y  as control points and updates the offset to aX and aY.</div>
 
 		<h3>.splineThru ( pts /*Array of Vector*/ ) </h3>
 		<div>todo</div>

@@ -87,7 +87,6 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 	}
 
 	this.mergeVertices();
-	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 

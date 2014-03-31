@@ -26,7 +26,7 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
+	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
 	camera.position.fromArray( editor.config.getKey( 'camera' ).position );
 	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
 
@@ -43,7 +43,7 @@ var Viewport = function ( editor ) {
 
 		controls.enabled = true;
 
-		if ( transformControls.axis !== undefined ) {
+		if ( transformControls.axis !== null ) {
 
 			controls.enabled = false;
 
@@ -139,7 +139,7 @@ var Viewport = function ( editor ) {
 
 			} else {
 
-				editor.select( camera );
+				editor.select( null );
 
 			}
 
@@ -242,12 +242,24 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	var saveTimeout;
+
 	signals.cameraChanged.add( function () {
 
-		editor.config.setKey( 'camera', {
-			position: camera.position.toArray(),
-			target: controls.center.toArray()
-		} );
+		if ( saveTimeout !== undefined ) {
+
+			clearTimeout( saveTimeout );
+
+		}
+
+		saveTimeout = setTimeout( function () {
+
+			editor.config.setKey( 'camera', {
+				position: camera.position.toArray(),
+				target: controls.center.toArray()
+			} );
+
+		}, 1000 );
 
 		render();
 
@@ -260,7 +272,8 @@ var Viewport = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.geometry !== undefined ) {
+			if ( object.geometry !== undefined &&
+				 object instanceof THREE.Sprite === false ) {
 
 				selectionBox.update( object );
 				selectionBox.visible = true;
@@ -494,7 +507,7 @@ var Viewport = function ( editor ) {
 
 					} else {
 
-						faces += vertices / 3;
+						faces += geometry.attributes.position.array.length / 9;
 
 					}
 
@@ -559,9 +572,12 @@ var Viewport = function ( editor ) {
 
 		renderer.clear();
 		renderer.render( scene, camera );
-		renderer.render( sceneHelpers, camera );
 
-		//console.trace();
+		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+
+			renderer.render( sceneHelpers, camera );
+
+		}
 
 	}
 

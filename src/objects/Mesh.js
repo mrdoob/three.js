@@ -20,7 +20,7 @@ THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
-	if ( this.geometry.morphTargets.length > 0 ) {
+	if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
 
 		this.morphTargetBase = -1;
 		this.morphTargetForcedOrder = [];
@@ -52,11 +52,11 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 };
 
-THREE.Mesh.prototype.clone = function ( object ) {
+THREE.Mesh.prototype.clone = function ( object, recursive ) {
 
 	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+	THREE.Object3D.prototype.clone.call( this, object, recursive );
 
 	return object;
 

@@ -173,18 +173,18 @@
 
 				uniforms[ "uNormalScale" ].value.y = -1;
 
-				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniforms[ "uSpecularColor" ].value.setHex( specular );
-				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+				uniforms[ "diffuse" ].value.setHex( diffuse );
+				uniforms[ "specular" ].value.setHex( specular );
+				uniforms[ "ambient" ].value.setHex( ambient );
 
-				uniforms[ "uShininess" ].value = shininess;
+				uniforms[ "shininess" ].value = shininess;
 
 				uniforms[ "tCube" ].value = reflectionCube;
-				uniforms[ "uReflectivity" ].value = 0.1;
+				uniforms[ "reflectivity" ].value = 0.1;
 
-				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
-				uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
-				uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
+				uniforms[ "diffuse" ].value.convertGammaToLinear();
+				uniforms[ "specular" ].value.convertGammaToLinear();
+				uniforms[ "ambient" ].value.convertGammaToLinear();
 
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
@@ -219,7 +219,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				//
 

@@ -38,8 +38,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="./js/loaders/ColladaLoader.js"></script>
-
+		<script src="js/loaders/ColladaLoader.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -68,7 +67,7 @@
 				light.position.set( 0, -4, -4 ).normalize();
 				scene.add( light );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
@@ -86,20 +85,18 @@
 				
 					scene.add( geometry.scene );
 
-					camera.lookAt(geometry.scene.children[0].children[1].position);
+					// T.P. adapted this to use un-flattened DAE hierarchy; see ColladaLoader.js
+					// for more information
+					var skin = geometry.scene.children[0].children[1].children[0];
+					camera.lookAt(skin.position);
 
-					var skin = geometry.scene.children[0].children[1];
 					
 					if ( skin.geometry.animation ) {
 
 						THREE.AnimationHandler.add( skin.geometry.animation );
 
-						var animation = new THREE.Animation(
-							skin,
-							skin.geometry.animation.name,
-							THREE.AnimationHandler.LINEAR
-						  );
-						 
+						var animation = new THREE.Animation( skin, skin.geometry.animation.name );
+						// animation.loop = false;
 						animation.play();
 						
 					}

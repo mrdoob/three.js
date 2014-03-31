@@ -149,7 +149,7 @@ THREE.SceneLoader.prototype = {
 
 			} else {
 
-				return urlBase + "/" + source_url;
+				return urlBase + source_url;
 
 			}
 
@@ -830,7 +830,7 @@ THREE.SceneLoader.prototype = {
 
 			if ( geoJSON.type === "cube" ) {
 
-				geometry = new THREE.CubeGeometry( geoJSON.width, geoJSON.height, geoJSON.depth, geoJSON.widthSegments, geoJSON.heightSegments, geoJSON.depthSegments );
+				geometry = new THREE.BoxGeometry( geoJSON.width, geoJSON.height, geoJSON.depth, geoJSON.widthSegments, geoJSON.heightSegments, geoJSON.depthSegments );
 				geometry.name = geoID;
 				result.geometries[ geoID ] = geometry;
 
@@ -1127,7 +1127,7 @@ THREE.SceneLoader.prototype = {
 
 					uniforms[ "tCube" ].value = matJSON.parameters.envMap;
 					uniforms[ "enableReflection" ].value = true;
-					uniforms[ "uReflectivity" ].value = matJSON.parameters.reflectivity;
+					uniforms[ "reflectivity" ].value = matJSON.parameters.reflectivity;
 
 				}
 
@@ -1155,15 +1155,15 @@ THREE.SceneLoader.prototype = {
 
 				}
 
-				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniforms[ "uSpecularColor" ].value.setHex( specular );
-				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+				uniforms[ "diffuse" ].value.setHex( diffuse );
+				uniforms[ "specular" ].value.setHex( specular );
+				uniforms[ "ambient" ].value.setHex( ambient );
 
-				uniforms[ "uShininess" ].value = shininess;
+				uniforms[ "shininess" ].value = shininess;
 
 				if ( matJSON.parameters.opacity ) {
 
-					uniforms[ "uOpacity" ].value = matJSON.parameters.opacity;
+					uniforms[ "opacity" ].value = matJSON.parameters.opacity;
 
 				}
 

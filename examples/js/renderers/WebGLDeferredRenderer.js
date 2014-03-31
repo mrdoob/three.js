@@ -22,9 +22,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	if ( this.renderer === undefined ) {
 
-		this.renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
+		this.renderer = new THREE.WebGLRenderer( { antialias: false } );
 		this.renderer.setSize( fullWidth, fullHeight );
-		this.renderer.setClearColorHex( 0x000000, 0 );
+		this.renderer.setClearColor( 0x000000, 0 );
 
 		this.renderer.autoClear = false;
 
@@ -39,6 +39,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	//
 
 	var currentCamera = null;
+	var projectionMatrixInverse = new THREE.Matrix4();
 
 	var positionVS = new THREE.Vector3();
 	var directionVS = new THREE.Vector3();
@@ -932,7 +933,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var uniforms = proxy.material.uniforms;
 
-		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = currentCamera.projectionMatrixInverse;
+		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = projectionMatrixInverse;
 		if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = currentCamera.matrixWorldInverse;
 
 		var originalLight = proxy.userData.originalLight;
@@ -989,7 +990,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		passColor.camera = currentCamera;
 		passNormalDepth.camera = currentCamera;
 		passLightProxy.camera = currentCamera;
-		passLightFullscreen.camera = THREE.EffectComposer.camera;
+		passLightFullscreen.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 
 		passColor.scene = scene;
 		passNormalDepth.scene = scene;
@@ -1055,7 +1056,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		gl.depthFunc( gl.GEQUAL );
 
-		currentCamera.projectionMatrixInverse.getInverse( currentCamera.projectionMatrix );
+		projectionMatrixInverse.getInverse( currentCamera.projectionMatrix );
 
 		for ( var i = 0, il = lightSceneProxy.children.length; i < il; i ++ ) {
 

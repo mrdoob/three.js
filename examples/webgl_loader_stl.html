@@ -156,14 +156,13 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapCullFace = THREE.CullFaceBack;

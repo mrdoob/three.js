@@ -1,38 +1,30 @@
 Menubar.Help = function ( editor ) {
 
-	var container = new UI.Panel();
-	container.setClass( 'menu' );
+	// event handlers
 
-	var title = new UI.Panel();
-	title.setTextContent( 'Help' );
-	title.setMargin( '0px' );
-	title.setPadding( '8px' );
-	container.add( title );
+	function onSourcecodeOptionClick () {
 
-	//
+		window.open( 'https://github.com/mrdoob/three.js/tree/master/editor', '_blank' )
 
-	var options = new UI.Panel();
-	options.setClass( 'options' );
-	container.add( options );
+	}
 
-	// source code
+	function onAboutOptionClick () {
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Source code' );
-	option.onClick( function () { window.open( 'https://github.com/mrdoob/three.js/tree/master/editor', '_blank' ) } );
-	options.add( option );
+		window.open( 'http://threejs.org', '_blank' );
 
-	// about
+	}
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'About' );
-	option.onClick( function () { window.open( 'http://threejs.org', '_blank' ) } );
-	options.add( option );
+	// configure menu contents
 
-	//
+	var createOption = UI.MenubarHelper.createOption;
+	var createDivider = UI.MenubarHelper.createDivider;
 
-	return container;
+	var menuConfig = [
+		createOption( 'Source code', onSourcecodeOptionClick ),
+		createOption( 'About', onAboutOptionClick )
+	];
 
+	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+
+	return UI.MenubarHelper.createMenuContainer( 'Help', optionsPanel );
 }

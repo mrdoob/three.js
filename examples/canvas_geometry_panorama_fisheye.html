@@ -47,6 +47,7 @@
 			target = new THREE.Vector3();
 
 			init();
+			animate();
 
 			function init() {
 
@@ -77,7 +78,7 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 300, 300, 300, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
 				mesh.scale.x = - 1;
 				scene.add( mesh );
 
@@ -117,22 +118,18 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-
 			}
 
 			function loadTexture( path ) {
 
 				var texture = new THREE.Texture( texture_placeholder );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var image = new Image();
 				image.onload = function () {
 
+					texture.image = this;
 					texture.needsUpdate = true;
-					material.map.image = this;
-
-					render();
 
 				};
 				image.src = path;
@@ -157,11 +154,10 @@
 
 			function onDocumentMouseMove( event ) {
 
-				if ( isUserInteracting ) {
+				if ( isUserInteracting === true ) {
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
 					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
-					render();
 
 				}
 			}
@@ -169,7 +165,6 @@
 			function onDocumentMouseUp( event ) {
 
 				isUserInteracting = false;
-				render();
 
 			}
 
@@ -197,10 +192,7 @@
 
 				camera.updateProjectionMatrix();
 
-				render();
-
 			}
-
 
 			function onDocumentTouchStart( event ) {
 
@@ -227,13 +219,24 @@
 					lon = ( onPointerDownPointerX - event.touches[0].pageX ) * 0.1 + onPointerDownLon;
 					lat = ( event.touches[0].pageY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 
-					render();
-
 				}
 
 			}
 
-			function render() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+				update();
+
+			}
+
+			function update() {
+
+				if ( isUserInteracting === false ) {
+
+					lon += 0.1;
+
+				}
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.Math.degToRad( 90 - lat );
@@ -243,9 +246,7 @@
 				target.y = 500 * Math.cos( phi );
 				target.z = 500 * Math.sin( phi ) * Math.sin( theta );
 
-				camera.position.x = - target.x;
-				camera.position.y = - target.y;
-				camera.position.z = - target.z;
+				camera.position.copy( target ).negate();
 				camera.lookAt( target );
 
 				renderer.render( scene, camera );
