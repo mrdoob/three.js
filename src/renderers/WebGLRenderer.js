@@ -3827,7 +3827,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var material = object.material;
 		
 		// START_VEROLD_MOD - materialIndex in offsets
-		var materialIndex, meshMaterial, offset;
+		var materialIndex, offset;
 		// END_VEROLD_MOD - materialIndex in offsets
 
 		if ( material instanceof THREE.MeshFaceMaterial ) {
@@ -3857,11 +3857,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( materialIndex >= 0 ) {
 
-				material = meshMaterial.materials[ materialIndex ];
-
-			} else {
-
-				material = meshMaterial;
+				material = material.materials[ materialIndex ];
 
 			}
 			// END_VEROLD_MOD - materialIndex in offsets
