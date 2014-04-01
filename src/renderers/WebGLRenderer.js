@@ -2691,7 +2691,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object instanceof THREE.Mesh ) {
 
 			var index = geometryAttributes[ "index" ];
-			var index_wireframe = geometryAttributes[ "index_wireframe" ];
+
+			// START_VEROLD_MOD - wireframe
+			var mode = _gl.TRIANGLES;
+
+			if ( material.wireframe && geometryAttributes[ "index_wireframe" ] ) {
+
+				index = geometryAttributes[ "index_wireframe" ];
+				mode = _gl.LINES;
+
+			}
+			// END_VEROLD_MOD - wireframe
 
 			if ( index ) {
 
@@ -2722,7 +2732,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_gl.drawElements( _gl.TRIANGLES, index.array.length, type, 0 );
+					// START_VEROLD_MOD - wireframe
+					_gl.drawElements( mode, index.array.length, type, 0 );
+					// END_VEROLD_MOD - wireframe
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
@@ -2742,6 +2754,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 						var offset = offsets[ offsetIndices[ i ] ];
 						var startIndex = offsets[ i ].index;
 
+						// START_VEROLD_MOD - wireframe
+						if ( material.wireframe ) {
+
+							offset = offset.wireframe;
+
+						}
+						// END_VEROLD_MODE - wireframe
 
 						if ( updateBuffers ) {
 
@@ -2751,12 +2770,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						// render indexed triangles
-						if ( material.wireframe && index_wireframe ) {
-							_gl.drawElements( _gl.LINES, offset.wireframe.count, type, offset.wireframe.start * size );
-						}
-						else {
-							_gl.drawElements( _gl.TRIANGLES, offset.count, type, offset.start * size );
-						}
+						// START_VEROLD_MOD - wireframe
+						_gl.drawElements( mode, offset.count, type, offset.start * size );
+						// END_VEROLD_MOD - wireframe
 
 						_this.info.render.calls ++;
 						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
