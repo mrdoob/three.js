@@ -3648,6 +3648,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					else if (overrideUniforms) {
 						for (var x = 0; x < overrideUniforms.length; x++) {
 							if ( material.uniforms[ overrideUniforms[x].name ] ) {
+								overrideUniforms[x].previousValue = material.uniforms[ overrideUniforms[x].name ].value;
 								material.uniforms[ overrideUniforms[x].name ].value = overrideUniforms[x].value;
 							}
 						}
