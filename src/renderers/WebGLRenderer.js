@@ -3499,21 +3499,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
-		}
-		//START_VEROLD_MOD
-		else if ( scene.enablePicking ) {
-
-			this.setBlending( THREE.NormalBlending );
-			
-			renderObjects( scene.__webglObjects, false, "picking", camera, [], undefined, true );
-			renderObjectsImmediate( scene.__webglObjectsImmediate, "picking", camera, [], undefined, false );	
-		} else if ( scene.enableDepth ) {
-
-			this.setBlending( THREE.NormalBlending );
-			
-			renderObjects( scene.__webglObjects, false, "depth", camera, [], undefined, true );
-			renderObjectsImmediate( scene.__webglObjectsImmediate, "depth", camera, [], undefined, false );
-		//END_VEROLD_MOD
 		} else {
 
 			var material = null;
@@ -3627,15 +3612,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object = webglObject.object;
 				buffer = webglObject.buffer;
 
-				//START_VEROLD_MOD
-				//Variables to store transparency info for material (so that it can be restored
-				//after object transparency has been handled.)
-				var overriden = false;
-				var materialTransparent;
-				var materialDepthWrite;
-				var materialOpacity;
-				//END_VEROLD_MOD
-
 				if ( overrideMaterial ) {
 
 					//START_VEROLD_MOD
@@ -3651,39 +3627,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					material = webglObject[ materialType ];
 
-					//START_VEROLD_MOD
-					//Handle per-object opacity. Save and restore the material's opacity settings after rendering the object.
-					//If this is the opaque pass and we're using object-transparency, skip it.
-					if ( materialType == "opaque" && object.opacity && webglObject.object.opacity < 1.0 ) {
-						continue;
-					}
-					//If this is the transparent pass and we're using object-transparency, override the settings.
-					else if ( materialType == "transparent" && object.opacity && webglObject.object.opacity < 1.0 ) {
-						if (!material) {
-							//This is an object using a normally opaque material that we want to render translucent.
-							material = webglObject[ "opaque" ];
-						}
-						if ( material.uniforms.opacity ) {
-							overriden = true;
-							materialTransparent = material.transparent;
-							materialDepthWrite = material.depthWrite;
-							materialOpacity = material.uniforms.opacity.value;
-
-							material.uniforms.opacity.value = object.opacity;
-							material.transparent = true;
-							material.depthWrite = false;
-						}
-					}
-					//END_VEROLD_MOD
-
 					if ( ! material ) continue;
 					//START_VEROLD_MOD
-					else {
-						if (overrideUniforms) {
-							for (var x = 0; x < overrideUniforms.length; x++) {
-								if ( material.uniforms[ overrideUniforms[x].name ] ) {
-									material.uniforms[ overrideUniforms[x].name ].value = overrideUniforms[x].value;
-								}
+					else if (overrideUniforms) {
+						for (var x = 0; x < overrideUniforms.length; x++) {
+							if ( material.uniforms[ overrideUniforms[x].name ] ) {
+								material.uniforms[ overrideUniforms[x].name ].value = overrideUniforms[x].value;
 							}
 						}
 					}
@@ -3719,14 +3668,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 					}
 				}
-
-				//Restore material transparency after using object transparency
-				if (overriden) {
-					material.uniforms.opacity.value = materialOpacity;
-					material.transparent = materialTransparent;
-					material.depthWrite = materialDepthWrite;
-				}
-				//END_VEROLD_MOD
 
 			}
 
@@ -3807,15 +3748,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			globject.transparent = null;
 
 		}
-		//START_VEROLD_MOD
-		//Set up a special material to use for object picking
-		if ( !globject.picking ) {
-			globject.picking = object.pickingMaterial;
-		}
-		if ( !globject.depth ) {
-			globject.depth = object.customDepthMaterial;
-		}
-		//END_VEROLD_MOD
 	};
 
 	function unrollBufferMaterial ( globject ) {
@@ -3893,15 +3825,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-		//START_VEROLD_MOD
-		//Set up a special material to use for object picking
-		if ( !globject.picking ) {
-			globject.picking = object.pickingMaterial;
-		}
-		if ( !globject.depth ) {
-			globject.depth = object.customDepthMaterial;
-		}
-		//END_VEROLD_MOD
 
 	};
 
