@@ -615,41 +615,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			if ( geometry.geometryGroups !== undefined ) {
-
-				for ( var g in geometry.geometryGroups ) {
-
-					var geometryGroup = geometry.geometryGroups[ g ];
-
-					if ( geometryGroup.numMorphTargets !== undefined ) {
-
-						for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
-
-							_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
-
-						}
-
-					}
-
-					if ( geometryGroup.numMorphNormals !== undefined ) {
-
-						for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
-
-							_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
-
-						}
-
-					}
-
-					deleteBuffers( geometryGroup );
-
-				}
-
-			} else {
-
-				deleteBuffers( geometry );
-
-			}
+			deleteBuffers( geometry );
 
 		}
 
@@ -2527,7 +2493,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					enableAttribute( attributePointer );
 					_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
 
-				} else if ( material.defaultAttributeValues ) {
+				} else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
 
 					if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
 
@@ -3707,45 +3673,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry.__webglInit = true;
 				geometry.addEventListener( 'dispose', onGeometryDispose );
+				geometry.dispatchEvent( { type: 'allocate' } );
 
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					initDirectBuffers( geometry );
-
-				} else if ( object instanceof THREE.Mesh ) {
-
-					material = object.material;
-
-					if ( geometry.geometryGroups === undefined ) {
-
-						geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
-
-					}
-
-					// create separate VBOs per geometry chunk
-
-					for ( g in geometry.geometryGroups ) {
-
-						geometryGroup = geometry.geometryGroups[ g ];
-
-						// initialise VBO on the first access
-
-						if ( ! geometryGroup.__webglVertexBuffer ) {
-
-							createMeshBuffers( geometryGroup );
-							initMeshBuffers( geometryGroup, object );
-
-							geometry.verticesNeedUpdate = true;
-							geometry.morphTargetsNeedUpdate = true;
-							geometry.elementsNeedUpdate = true;
-							geometry.uvsNeedUpdate = true;
-							geometry.normalsNeedUpdate = true;
-							geometry.tangentsNeedUpdate = true;
-							geometry.colorsNeedUpdate = true;
-
-						}
-
-					}
 
 				} else if ( object instanceof THREE.Line ) {
 
@@ -3787,16 +3719,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					addBuffer( scene.__webglObjects, geometry, object );
-
-				} else if ( geometry instanceof THREE.Geometry ) {
-
-					for ( g in geometry.geometryGroups ) {
-
-						geometryGroup = geometry.geometryGroups[ g ];
-
-						addBuffer( scene.__webglObjects, geometryGroup, object );
-
-					}
 
 				}
 
@@ -3865,46 +3787,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			setDirectBuffers( geometry, _gl.DYNAMIC_DRAW );
-
-		} else if ( object instanceof THREE.Mesh ) {
-
-			// check all geometry groups
-
-			for( var i = 0, il = geometry.geometryGroupsList.length; i < il; i ++ ) {
-
-				geometryGroup = geometry.geometryGroupsList[ i ];
-
-				material = getBufferMaterial( object, geometryGroup );
-
-				if ( geometry.buffersNeedUpdate ) {
-
-					initMeshBuffers( geometryGroup, object );
-
-				}
-
-				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-				if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
-					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-					 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate || customAttributesDirty ) {
-
-					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic, material );
-
-				}
-
-			}
-
-			geometry.verticesNeedUpdate = false;
-			geometry.morphTargetsNeedUpdate = false;
-			geometry.elementsNeedUpdate = false;
-			geometry.uvsNeedUpdate = false;
-			geometry.normalsNeedUpdate = false;
-			geometry.colorsNeedUpdate = false;
-			geometry.tangentsNeedUpdate = false;
-
-			geometry.buffersNeedUpdate = false;
-
-			material.attributes && clearCustomAttributes( material );
 
 		} else if ( object instanceof THREE.Line ) {
 
