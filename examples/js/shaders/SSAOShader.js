@@ -206,10 +206,7 @@ THREE.SSAOShader = {
 			"float w = ( 1.0 / width )  / tt + ( noise.x * ( 1.0 - noise.x ) );",
 			"float h = ( 1.0 / height ) / tt + ( noise.y * ( 1.0 - noise.y ) );",
 
-			"float pw;",
-			"float ph;",
-
-			"float ao;",
+			"float ao = 0.0;",
 
 			"float dz = 1.0 / float( samples );",
 			"float z = 1.0 - dz / 2.0;",
@@ -219,8 +216,8 @@ THREE.SSAOShader = {
 
 				"float r = sqrt( 1.0 - z );",
 
-				"pw = cos( l ) * r;",
-				"ph = sin( l ) * r;",
+				"float pw = cos( l ) * r;",
+				"float ph = sin( l ) * r;",
 				"ao += calcAO( depth, pw * w, ph * h );",
 				"z = z - dz;",
 				"l = l + DL;",
