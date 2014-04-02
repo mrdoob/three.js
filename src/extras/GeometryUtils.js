@@ -7,11 +7,22 @@ THREE.GeometryUtils = {
 
 	// Merge two geometries or geometry and geometry from object (using object's transform)
 
-	merge: function ( geometry1, object2 /* mesh | geometry */, materialIndexOffset ) {
+	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
-		console.warn( 'DEPRECATED: GeometryUtils\'s .merge() has been moved to Geometry. Use geometry.merge( geometry2 ) instead.' );
+		console.warn( 'DEPRECATED: GeometryUtils\'s .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
 
-		geometry1.merge( object2, materialIndexOffset );
+		var matrix;
+
+		if ( geometry2 instanceof THREE.Mesh ) {
+
+			geometry2.matrixAutoUpdate && geometry2.updateMatrix();
+
+			matrix = geometry2.matrix;
+			geometry2 = geometry2.geometry;
+
+		}
+
+		geometry1.merge( geometry2, matrix, materialIndexOffset );
 
 	},
 

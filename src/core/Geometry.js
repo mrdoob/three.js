@@ -455,26 +455,21 @@ THREE.Geometry.prototype = {
 
 	},
 
-	merge: function ( object2 /* mesh | geometry */, materialIndexOffset ) {
+	merge: function ( geometry, matrix, materialIndexOffset ) {
 
-		var matrix, normalMatrix,
+		var normalMatrix,
 		vertexOffset = this.vertices.length,
 		uvPosition = this.faceVertexUvs[ 0 ].length,
-		geometry2 = object2 instanceof THREE.Mesh ? object2.geometry : object2,
 		vertices1 = this.vertices,
-		vertices2 = geometry2.vertices,
+		vertices2 = geometry.vertices,
 		faces1 = this.faces,
-		faces2 = geometry2.faces,
+		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
-		uvs2 = geometry2.faceVertexUvs[ 0 ];
+		uvs2 = geometry.faceVertexUvs[ 0 ];
 
 		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
-		if ( object2 instanceof THREE.Mesh ) {
-
-			object2.matrixAutoUpdate && object2.updateMatrix();
-
-			matrix = object2.matrix;
+		if ( matrix !== undefined ) {
 
 			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
@@ -488,7 +483,7 @@ THREE.Geometry.prototype = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) vertexCopy.applyMatrix4( matrix );
+			if ( matrix !== undefined ) vertexCopy.applyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
 
@@ -505,7 +500,7 @@ THREE.Geometry.prototype = {
 			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
 
-			if ( normalMatrix ) {
+			if ( normalMatrix !== undefined ) {
 
 				faceCopy.normal.applyMatrix3( normalMatrix ).normalize();
 
@@ -515,7 +510,7 @@ THREE.Geometry.prototype = {
 
 				normal = faceVertexNormals[ j ].clone();
 
-				if ( normalMatrix ) {
+				if ( normalMatrix !== undefined ) {
 
 					normal.applyMatrix3( normalMatrix ).normalize();
 
