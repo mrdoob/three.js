@@ -31,6 +31,7 @@
 	"src/core/BufferGeometryManipulator.js",
 	"src/core/Geometry2.js",
 	"src/core/IndexedGeometry2.js",
+	"src/core/Geometry.js",
 	"src/core/ProxyGeometry.js",
 	"src/core/proxies/MultiColor.js",
 	"src/core/proxies/MultiVector3.js",
