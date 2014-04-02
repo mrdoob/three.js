@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferGeometryManipulator = function ( bufferGeometry ) {
+THREE.GeometryEditor = function ( bufferGeometry ) {
 
 	this.vertices = [];
 	this.normals = [];

@@ -75,12 +75,12 @@
 				var plane = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
 				plane.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				var manipulator = new THREE.BufferGeometryManipulator( plane );
+				var editor = new THREE.GeometryEditor( plane );
 
-				for ( var i = 0, l = manipulator.vertices.length; i < l; i ++ ) {
+				for ( var i = 0, l = editor.vertices.length; i < l; i ++ ) {
 
 					var x = i % quality, y = Math.floor( i / quality );
-					manipulator.vertices[ i ].y = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
+					editor.vertices[ i ].y = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
 
 				}
 
