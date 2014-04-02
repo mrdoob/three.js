@@ -3,31 +3,30 @@
  * @author jbaicoianu / http://baicoianu.com/
  */
 
-THREE.TypedVector4 = function ( array, offset ) {
-	
+THREE.ProxyColor = function ( array, offset ) {
+
 	this.array = array;
 	this.offset = offset;
 
-};
+}
 
-THREE.TypedVector4.prototype = Object.create( THREE.Vector4.prototype );
+THREE.ProxyColor.prototype = Object.create( THREE.Color.prototype );
 
-Object.defineProperties( THREE.TypedVector4.prototype, {
-	'x': {
+Object.defineProperties( THREE.ProxyColor.prototype, {
+	'r': {
+		enumerable: true,	
 		get: function () { return this.array[ this.offset ]; },
 		set: function ( v ) { this.array[ this.offset ] = v; }
 	},
-	'y': {
+	'g': {
+		enumerable: true,	
 		get: function () { return this.array[ this.offset + 1 ]; },
 		set: function ( v ) { this.array[ this.offset + 1 ] = v; }
 	},
-	'z': {
+	'b': {
+		enumerable: true,	
 		get: function () { return this.array[ this.offset + 2 ]; },
 		set: function ( v ) { this.array[ this.offset + 2 ] = v; }
-	},
-	'w': {
-		get: function () { return this.array[ this.offset + 3 ]; },
-		set: function ( v ) { this.array[ this.offset + 3 ] = v; }
 	}
 } );
 

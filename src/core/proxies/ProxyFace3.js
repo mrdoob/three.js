@@ -2,7 +2,7 @@
  * @author jbaicoianu / http://baicoianu.com/
  */
 
-THREE.TypedFace3 = function ( array, offset, vertexNormals, vertexColors, vertexTangents ) {
+THREE.ProxyFace3 = function ( array, offset, vertexNormals, vertexColors, vertexTangents ) {
 
 	this.array = array;
 	this.offset = offset;
@@ -17,9 +17,9 @@ THREE.TypedFace3 = function ( array, offset, vertexNormals, vertexColors, vertex
 
 }
 
-THREE.TypedFace3.prototype = Object.create( THREE.Face3.prototype );
+THREE.ProxyFace3.prototype = Object.create( THREE.Face3.prototype );
 
-Object.defineProperties( THREE.TypedFace3.prototype, {
+Object.defineProperties( THREE.ProxyFace3.prototype, {
 	'a': {
 		enumerable: true,	
 		get: function () { return this.array[ this.offset ]; },

@@ -8,7 +8,7 @@
  * @author jbaicoianu / http://baicoianu.com
  */
 
-THREE.Geometry = function ( ) {
+THREE.ProxyGeometry = function ( ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -20,9 +20,9 @@ THREE.Geometry = function ( ) {
 
 };
 
-THREE.Geometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.ProxyGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
-Object.defineProperties(THREE.Geometry.prototype, {
+Object.defineProperties(THREE.ProxyGeometry.prototype, {
 	vertices: { 
 		enumerable: true, 
 		configurable: true, 
@@ -70,7 +70,7 @@ Object.defineProperties(THREE.Geometry.prototype, {
 	},
 });
 
-THREE.Geometry.prototype.createVertexProxies = function(values) {
+THREE.ProxyGeometry.prototype.createVertexProxies = function(values) {
 
 	if (!this.hasOwnProperty('vertices')) {
 
@@ -88,7 +88,7 @@ THREE.Geometry.prototype.createVertexProxies = function(values) {
 
 	// If the attribute buffer has already been populated, set up proxy objects
 
-	this.populateProxyFromBuffer(this.vertices, "position", THREE.TypedVector3, 3);
+	this.populateProxyFromBuffer(this.vertices, "position", THREE.ProxyVector3, 3);
 
 	// If values were passed in, store them in the buffer via the proxy objects
 
@@ -107,7 +107,7 @@ THREE.Geometry.prototype.createVertexProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createFaceProxies = function(values) {
+THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 
 	if (!this.hasOwnProperty("faces")) {
 
@@ -155,7 +155,7 @@ THREE.Geometry.prototype.createFaceProxies = function(values) {
 
 			var o = i * 3;
 
-			var face = new THREE.TypedFace3( indexarray, i * 3 );
+			var face = new THREE.ProxyFace3( indexarray, i * 3 );
 			faces.push(face);
 
 		}
@@ -167,7 +167,7 @@ THREE.Geometry.prototype.createFaceProxies = function(values) {
 			var o = i * 3;
 			var v1 = i, v2 = i+1, v3 = i+2;
 
-			var face = new THREE.TypedFace3( v1, v2, v3 );
+			var face = new THREE.ProxyFace3( v1, v2, v3 );
 			faces.push(face);
 
 		}
@@ -215,7 +215,7 @@ THREE.Geometry.prototype.createFaceProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createFaceVertexNormalProxies = function(values) {
+THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 	if ( this.attributes[ 'normal' ] && this.attributes[ 'normal' ].array ) {
 
@@ -226,9 +226,9 @@ THREE.Geometry.prototype.createFaceVertexNormalProxies = function(values) {
 			var f = this.faces[i];
 
 			f.vertexNormals = [
-				new THREE.TypedVector3(normalarray, f.a * 3),
-				new THREE.TypedVector3(normalarray, f.b * 3),
-				new THREE.TypedVector3(normalarray, f.c * 3),
+				new THREE.ProxyVector3(normalarray, f.a * 3),
+				new THREE.ProxyVector3(normalarray, f.b * 3),
+				new THREE.ProxyVector3(normalarray, f.c * 3),
 			];
 			f.normal = new THREE.MultiVector3(f.vertexNormals);
 
@@ -264,7 +264,7 @@ THREE.Geometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createFaceVertexColorProxies = function(values) {
+THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
 	if ( this.attributes[ 'color' ] && this.attributes[ 'color' ].array ) {
 
@@ -275,17 +275,17 @@ THREE.Geometry.prototype.createFaceVertexColorProxies = function(values) {
 
 			if ( this.attributes[ 'index' ] ) {
 				f.vertexColors = [
-						new THREE.TypedColor(colorarray, f.a * 3),
-						new THREE.TypedColor(colorarray, f.b * 3),
-						new THREE.TypedColor(colorarray, f.c * 3),
+						new THREE.ProxyColor(colorarray, f.a * 3),
+						new THREE.ProxyColor(colorarray, f.b * 3),
+						new THREE.ProxyColor(colorarray, f.c * 3),
 					];
 			} else {
 				var o = i * 9;
 
 				f.vertexColors = [
-						new THREE.TypedColor(colorarray, o),
-						new THREE.TypedColor(colorarray, o + 3),
-						new THREE.TypedColor(colorarray, o + 6),
+						new THREE.ProxyColor(colorarray, o),
+						new THREE.ProxyColor(colorarray, o + 3),
+						new THREE.ProxyColor(colorarray, o + 6),
 					];
 			}
 			f.color = new THREE.MultiColor(f.vertexColors);
@@ -322,7 +322,7 @@ THREE.Geometry.prototype.createFaceVertexColorProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createFaceVertexTangentProxies = function(values) {
+THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) {
 
 	if ( this.attributes[ 'tangent' ] && this.attributes[ 'tangent' ].array ) {
 
@@ -333,9 +333,9 @@ THREE.Geometry.prototype.createFaceVertexTangentProxies = function(values) {
 			var f = this.faces[i];
 
 			f.vertexTangents = [
-				new THREE.TypedVector3(tangentarray, f.a * 3),
-				new THREE.TypedVector3(tangentarray, f.b * 3),
-				new THREE.TypedVector3(tangentarray, f.c * 3),
+				new THREE.ProxyVector3(tangentarray, f.a * 3),
+				new THREE.ProxyVector3(tangentarray, f.b * 3),
+				new THREE.ProxyVector3(tangentarray, f.c * 3),
 			];
 
 		}
@@ -366,7 +366,7 @@ THREE.Geometry.prototype.createFaceVertexTangentProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createUvProxies = function(values) {
+THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 
 	// Replace the prototype getter with a local array property
 
@@ -389,14 +389,14 @@ THREE.Geometry.prototype.createUvProxies = function(values) {
 			this.faceVertexUvs[0][i] = [];
 
 			if ( this.attributes[ 'index' ] ) {
-				this.faceVertexUvs[0][i][0] = new THREE.TypedVector2(uvarray, f.a * 2);
-				this.faceVertexUvs[0][i][1] = new THREE.TypedVector2(uvarray, f.b * 2);
-				this.faceVertexUvs[0][i][2] = new THREE.TypedVector2(uvarray, f.c * 2);
+				this.faceVertexUvs[0][i][0] = new THREE.ProxyVector2(uvarray, f.a * 2);
+				this.faceVertexUvs[0][i][1] = new THREE.ProxyVector2(uvarray, f.b * 2);
+				this.faceVertexUvs[0][i][2] = new THREE.ProxyVector2(uvarray, f.c * 2);
 			} else {
 				var o = i * 6;
-				this.faceVertexUvs[0][i][0] = new THREE.TypedVector2(uvarray, o);
-				this.faceVertexUvs[0][i][1] = new THREE.TypedVector2(uvarray, o + 2);
-				this.faceVertexUvs[0][i][2] = new THREE.TypedVector2(uvarray, o + 4);
+				this.faceVertexUvs[0][i][0] = new THREE.ProxyVector2(uvarray, o);
+				this.faceVertexUvs[0][i][1] = new THREE.ProxyVector2(uvarray, o + 2);
+				this.faceVertexUvs[0][i][2] = new THREE.ProxyVector2(uvarray, o + 4);
 			}
 
 		}
@@ -426,7 +426,7 @@ THREE.Geometry.prototype.createUvProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createSkinIndexProxies = function(values) {
+THREE.ProxyGeometry.prototype.createSkinIndexProxies = function(values) {
 
 	// Replace the prototype getter with a local array property
 
@@ -438,7 +438,7 @@ THREE.Geometry.prototype.createSkinIndexProxies = function(values) {
 
 	// If the attribute buffer has already been populated, set up proxy objects
 
-	this.populateProxyFromBuffer(this.skinIndices, "skinIndex", THREE.TypedVector4, 4);
+	this.populateProxyFromBuffer(this.skinIndices, "skinIndex", THREE.ProxyVector4, 4);
 
 	// If values were passed in, store them in the buffer via the proxy objects
 
@@ -458,7 +458,7 @@ THREE.Geometry.prototype.createSkinIndexProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createSkinWeightProxies = function(values) {
+THREE.ProxyGeometry.prototype.createSkinWeightProxies = function(values) {
 
 	// Replace the prototype getter with a local array property
 
@@ -470,7 +470,7 @@ THREE.Geometry.prototype.createSkinWeightProxies = function(values) {
 
 	// If the attribute buffer has already been populated, set up proxy objects
 
-	this.populateProxyFromBuffer(this.skinWeights, "skinWeight", THREE.TypedVector4, 4);
+	this.populateProxyFromBuffer(this.skinWeights, "skinWeight", THREE.ProxyVector4, 4);
 
 	// If values were passed in, store them in the buffer via the proxy objects
 
@@ -490,7 +490,7 @@ THREE.Geometry.prototype.createSkinWeightProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.createColorProxies = function(values) {
+THREE.ProxyGeometry.prototype.createColorProxies = function(values) {
 
 	// Replace the prototype getter with a local array property
 
@@ -502,7 +502,7 @@ THREE.Geometry.prototype.createColorProxies = function(values) {
 
 	// If the attribute buffer has already been populated, set up proxy objects
 
-	this.populateProxyFromBuffer(this.colors, "color", THREE.TypedColor, 3);
+	this.populateProxyFromBuffer(this.colors, "color", THREE.ProxyColor, 3);
 
 	// If values were passed in, store them in the buffer via the proxy objects
 
@@ -522,7 +522,7 @@ THREE.Geometry.prototype.createColorProxies = function(values) {
 
 }
 
-THREE.Geometry.prototype.populateProxyFromBuffer = function(attr, buffername, proxytype, itemsize, offset, count) {
+THREE.ProxyGeometry.prototype.populateProxyFromBuffer = function(attr, buffername, proxytype, itemsize, offset, count) {
 
 	if ( this.attributes[ buffername ] && this.attributes[ buffername ].array ) {
 
@@ -548,7 +548,7 @@ THREE.Geometry.prototype.populateProxyFromBuffer = function(attr, buffername, pr
  * and faces' vertices are updated.
  */
 
-THREE.Geometry.prototype.mergeVertices = function () {
+THREE.ProxyGeometry.prototype.mergeVertices = function () {
 
 	var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
 	var unique = [], changes = [];
@@ -631,7 +631,7 @@ THREE.Geometry.prototype.mergeVertices = function () {
 
 }
 
-THREE.Geometry.prototype.onGeometryAllocate = function (ev) {
+THREE.ProxyGeometry.prototype.onGeometryAllocate = function (ev) {
 
 	// Prevent allocate event listener from firing multiple times
 	this.removeEventListener( 'allocate', this.onGeometryAllocate);
@@ -694,7 +694,7 @@ THREE.Geometry.prototype.onGeometryAllocate = function (ev) {
 	}
 }
 
-THREE.Geometry.prototype.computeFaceNormals = function() {
+THREE.ProxyGeometry.prototype.computeFaceNormals = function() {
 
 	this.dispatchEvent( { type: 'allocate' } );
 
@@ -702,7 +702,7 @@ THREE.Geometry.prototype.computeFaceNormals = function() {
 
 }
 
-THREE.Geometry.prototype.computeVertexNormals = function() {
+THREE.ProxyGeometry.prototype.computeVertexNormals = function() {
 
 	this.dispatchEvent( { type: 'allocate' } );
 
@@ -710,7 +710,7 @@ THREE.Geometry.prototype.computeVertexNormals = function() {
 
 }
 
-THREE.Geometry.prototype.computeTangents = function() {
+THREE.ProxyGeometry.prototype.computeTangents = function() {
 
 	this.dispatchEvent( { type: 'allocate' } );
 
@@ -723,7 +723,7 @@ THREE.Geometry.prototype.computeTangents = function() {
 
 }
 
-THREE.Geometry.prototype.computeBoundingSphere = function() {
+THREE.ProxyGeometry.prototype.computeBoundingSphere = function() {
 
 	this.dispatchEvent( { type: 'allocate' } );
 
@@ -731,17 +731,17 @@ THREE.Geometry.prototype.computeBoundingSphere = function() {
 
 }
 
-THREE.Geometry.prototype.computeBoundingBox = function () {
+THREE.ProxyGeometry.prototype.computeBoundingBox = function () {
 
 	this.dispatchEvent( { type: 'allocate' } );
 
 	return THREE.BufferGeometry.prototype.computeBoundingBox.call(this);
 
 }
-THREE.Geometry.prototype.clone = function () {
+THREE.ProxyGeometry.prototype.clone = function () {
 
 	var buff = THREE.BufferGeometry.prototype.clone.call(this);
-	var geo = new THREE.Geometry();
+	var geo = new THREE.ProxyGeometry();
 	geo.attributes = buff.attributes;
 	geo.offsets = buff.offsets;
 
@@ -749,6 +749,6 @@ THREE.Geometry.prototype.clone = function () {
 
 }
 
-THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
+THREE.EventDispatcher.prototype.apply( THREE.ProxyGeometry.prototype );
 
-THREE.GeometryIdCount = 0;
+THREE.ProxyGeometryIdCount = 0;

@@ -3,16 +3,16 @@
  * @author jbaicoianu / http://baicoianu.com/
  */
 
-THREE.TypedVector2 = function ( array, offset ) {
+THREE.ProxyVector2 = function ( array, offset ) {
 	
 	this.array = array;
 	this.offset = offset;
 
 };
 
-THREE.TypedVector2.prototype = Object.create( THREE.Vector2.prototype );
+THREE.ProxyVector2.prototype = Object.create( THREE.Vector2.prototype );
 
-Object.defineProperties( THREE.TypedVector2.prototype, {
+Object.defineProperties( THREE.ProxyVector2.prototype, {
 	'x': {
 		get: function () { return this.array[ this.offset ]; },
 		set: function ( v ) { this.array[ this.offset ] = v; }
