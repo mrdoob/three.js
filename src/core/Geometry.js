@@ -529,7 +529,8 @@ THREE.Geometry.prototype.populateProxyFromBuffer = function(attr, buffername, pr
 		var array = this.attributes[ buffername ].array;
 		var size = itemsize || this.attributes[ buffername ].itemSize;
 		var start = offset || 0;
-		var count = count || (array.length / size - start);
+		
+		count = count || (array.length / size - start);
 
 		for ( var i = start, l = start + count; i < l; i ++ ) {
 
@@ -646,8 +647,8 @@ THREE.Geometry.prototype.onGeometryAllocate = function (ev) {
 
 		if (this.faces.length > 0) {
 			var hasnormals = (this.hasOwnProperty('normals') || this.faces[0].normal || this.faces[0].vertexNormals.length > 0);
-			    hascolors = (this.hasOwnProperty('colors') || this.faces[0].color || this.faces[0].vertexColors.length > 0),
-			    hastangents = (this.faces[0].vertexTangents.length > 0);
+			var hascolors = (this.hasOwnProperty('colors') || this.faces[0].color || this.faces[0].vertexColors.length > 0);
+			var hastangents = (this.faces[0].vertexTangents.length > 0);
 
 			if (hasnormals) {
 				var normalattr = new THREE.Float32Attribute(this.vertices.length, 3);
