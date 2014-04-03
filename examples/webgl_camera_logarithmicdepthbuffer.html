@@ -207,16 +207,20 @@
 					materialargs.color = THREE.ColorKeywords[ colorkeys[ i + coloroffset ] ];
 
 					var material = new THREE.MeshPhongMaterial( materialargs );
+
 					var textmesh = new THREE.Mesh( labelgeo, material );
 					textmesh.scale.set(scale, scale, scale);
 					textmesh.position.z = -labeldata[i].size * scale;
 					textmesh.position.y = labeldata[i].size / 4 * scale;
+					textmesh.updateMatrix();
+
 					var dotmesh = new THREE.Mesh(new THREE.SphereGeometry(labeldata[i].size * scale / 2, 24, 12), material);
 					dotmesh.position.y = -labeldata[i].size / 4 * scale;
+					dotmesh.updateMatrix();
 
 					var merged = new THREE.Geometry();
-					THREE.GeometryUtils.merge(merged, textmesh);
-					THREE.GeometryUtils.merge(merged, dotmesh);
+					merged.merge( textmesh.geometry, textmesh.matrix );
+					merged.merge( dotmesh.geometry, dotmesh.matrix );
 
 					var mesh = new THREE.Mesh(merged, material);
 					mesh.position.z = -labeldata[i].size * 1 * scale;

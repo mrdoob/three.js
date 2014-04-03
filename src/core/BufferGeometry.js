@@ -255,7 +255,7 @@ THREE.BufferGeometry.prototype = {
 
 				var indices = this.attributes[ "index" ].array;
 
-				var offsets = this.offsets;
+				var offsets = (this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ]);
 
 				for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
 

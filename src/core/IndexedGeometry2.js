@@ -13,4 +13,4 @@ THREE.IndexedGeometry2 = function ( indices, vertices, normals, uvs ) {
 
 };
 
-THREE.IndexedGeometry2.prototype = Object.create( THREE.Geometry99.prototype );
+THREE.IndexedGeometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
