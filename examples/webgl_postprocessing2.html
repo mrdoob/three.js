@@ -6,7 +6,7 @@
 		<style>
 			body {
 				margin: 0px;
-				background-color: #000000;
+				background-color: #ffffff;
 				overflow: hidden;
 			}
 
@@ -30,10 +30,9 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/SSAOShader.js"></script>
 		<script src="js/shaders/DotScreenShader.js"></script>
 		<script src="js/shaders/RGBShiftShader.js"></script>
-		<script src="js/shaders/EdgeShader.js"></script>
-		<script src="js/shaders/EdgeShader2.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -41,11 +40,9 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
 		<div>
+			<label for="ssao">Ambient Occlusion:</label><input id="ssao" checked type="checkbox" onchange="updateOptions()"/><br />
 			<label for="dotScreen">Dot Screen:</label><input id="dotScreen" type="checkbox" onchange="updateOptions()"/><br />
 			<label for="rgbShift">RGB Shift:</label><input id="rgbShift" type="checkbox" onchange="updateOptions()" /><br />
-			<label for="edge">Edge Detection (Frei-Chen Filter):</label><input id="edge" type="checkbox" checked onchange="updateOptions()" /><br />
-			<label for="edge2">Edge Detection (Sobel Filter):</label><input id="edge2" type="checkbox" onchange="updateOptions()" /><br />
-
 		</div>
 
 		<script>
@@ -53,27 +50,24 @@
 			var camera, scene, renderer, composer;
 			var object, light;
 
-			var dotScreenEffect, rgbShiftEffect, edgeEffect, edgeEffect2;
+			var depthPassPlugin, depthTarget;
+			var ssaoEffect, dotScreenEffect, rgbShiftEffect;
 
 			init();
 			animate();
 
 			function updateOptions() {
-				var dotScreen = document.getElementById('dotScreen');
-				var rgbShift = document.getElementById('rgbShift');
-				var edge = document.getElementById('edge');
-				var edge2 = document.getElementById('edge2');
 
-				dotScreenEffect.enabled = dotScreen.checked;
-				rgbShiftEffect.enabled = rgbShift.checked;
-				edgeEffect.enabled = edge.checked;
-				edgeEffect2.enabled = edge2.checked;
+				ssaoEffect.enabled = document.getElementById('ssao').checked;
+				dotScreenEffect.enabled = document.getElementById('dotScreen').checked;
+				rgbShiftEffect.enabled = document.getElementById('rgbShift').checked;
 
 			}
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -83,7 +77,6 @@
 				camera.position.z = 400;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
 
 				object = new THREE.Object3D();
 				scene.add( object );
@@ -92,7 +85,7 @@
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
 
 				for ( var i = 0; i < 100; i ++ ) {
-					material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random(), shading: THREE.FlatShading } );
+					// material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random(), shading: THREE.FlatShading } );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
@@ -103,9 +96,11 @@
 
 				}
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light.position.set( - 1, - 1, - 1 );
+				scene.add( light );
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
@@ -113,6 +108,15 @@
 
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+				depthTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
+
+				ssaoEffect = new THREE.ShaderPass( THREE.SSAOShader );
+				ssaoEffect.uniforms[ 'tDepth' ].value = depthTarget;
+				ssaoEffect.uniforms[ 'size' ].value.set( 0.5 * window.innerWidth, 0.5 * window.innerHeight );
+				ssaoEffect.uniforms[ 'cameraNear' ].value = camera.near;
+				ssaoEffect.uniforms[ 'cameraFar' ].value = camera.far;
+				composer.addPass( ssaoEffect );
 
 				dotScreenEffect = new THREE.ShaderPass( THREE.DotScreenShader );
 				dotScreenEffect.uniforms[ 'scale' ].value = 4;
@@ -122,19 +126,18 @@
 				rgbShiftEffect.uniforms[ 'amount' ].value = 0.0015;
 				composer.addPass( rgbShiftEffect );
 
-				edgeEffect = new THREE.ShaderPass( THREE.EdgeShader );
-				edgeEffect.uniforms[ 'aspect' ].value.x = window.innerWidth;
-				edgeEffect.uniforms[ 'aspect' ].value.y = window.innerHeight;
-				composer.addPass( edgeEffect );
-
-				edgeEffect2 = new THREE.ShaderPass( THREE.EdgeShader2 );
-				edgeEffect2.uniforms[ 'aspect' ].value.x = window.innerWidth;
-				edgeEffect2.uniforms[ 'aspect' ].value.y = window.innerHeight;
-				composer.addPass( edgeEffect2 );
-
 				var effect = new THREE.ShaderPass( THREE.CopyShader);
 				effect.renderToScreen = true;
 				composer.addPass( effect );
+
+				//
+
+				// depth pass
+
+				depthPassPlugin = new THREE.DepthPassPlugin();
+				depthPassPlugin.renderTarget = depthTarget;
+
+				renderer.addPrePlugin( depthPassPlugin );
 
 				//
 
@@ -151,10 +154,12 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				edgeEffect.uniforms[ 'aspect' ].value.x = window.innerWidth;
-				edgeEffect.uniforms[ 'aspect' ].value.y = window.innerHeight;
-				edgeEffect2.uniforms[ 'aspect' ].value.x = window.innerWidth;
-				edgeEffect2.uniforms[ 'aspect' ].value.y = window.innerHeight;
+				depthTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
+
+				depthPassPlugin.renderTarget = depthTarget;
+
+				ssaoEffect.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				ssaoEffect.uniforms[ 'tDepth' ].value = depthTarget;
 
 			}
 
@@ -164,11 +169,29 @@
 
 				var time = Date.now();
 
-				object.rotation.x += 0.005;
-				object.rotation.y += 0.01;
+				object.rotation.x = time * 0.0002;
+				object.rotation.y = time * 0.0001;
+
+				for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+					var child = object.children[ i ];
+					var scale = Math.sin( child.position.x + time * 0.0005 ) * 50 + 50;
+					child.scale.set( scale, scale, scale );
+
+				}
+
+				depthPassPlugin.enabled = true;
+
+				renderer.autoClear = false;
+				renderer.render( scene, camera );
+
+				// renderer.render( scene, camera, depthTarget, true );
+
+				depthPassPlugin.enabled = false;
+
+				//
 
 				composer.render();
-				// renderer.render(scene, camera);
 
 			}
 
