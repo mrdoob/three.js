@@ -2695,7 +2695,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// START_VEROLD_MOD - wireframe
 			var mode = _gl.TRIANGLES;
 
-			if ( material.wireframe && geometryAttributes[ "index_wireframe" ] ) {
+			if ( wireframeBit && geometryAttributes[ "index_wireframe" ] ) {
 
 				index = geometryAttributes[ "index_wireframe" ];
 				mode = _gl.LINES;
@@ -2751,15 +2751,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( var i = 0, il = offsetIndices.length; i < il; i ++ ) {
 
-						var offset = offsets[ offsetIndices[ i ] ];
-						var startIndex = offsets[ i ].index;
-
 						// START_VEROLD_MOD - wireframe
-						if ( material.wireframe ) {
+						var offset = offsets[ offsetIndices[ i ] ];
 
-							offset = offset.wireframe;
+						if ( wireframeBit ) {
+
+							if ( offset.wireframe ) {
+
+								offset = offset.wireframe;
+
+							} else {
+
+								continue;
+
+							}
 
 						}
+
+						var startIndex = offset.index;
 						// END_VEROLD_MODE - wireframe
 
 						if ( updateBuffers ) {
@@ -2782,7 +2791,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			} else {
+			} else if ( !wireframeBit ) {
 
 				// non-indexed triangles
 
