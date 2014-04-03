@@ -2753,6 +2753,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						// START_VEROLD_MOD - wireframe
 						var offset = offsets[ offsetIndices[ i ] ];
+						var startIndex = offset.index;
 
 						if ( wireframeBit ) {
 
@@ -2767,8 +2768,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							}
 
 						}
-
-						var startIndex = offset.index;
 						// END_VEROLD_MODE - wireframe
 
 						if ( updateBuffers ) {
