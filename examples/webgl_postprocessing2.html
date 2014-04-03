@@ -50,6 +50,7 @@
 			var camera, scene, renderer, composer;
 			var object, light;
 
+			var depthScale = 0.5;
 			var depthPassPlugin, depthTarget;
 			var ssaoEffect, dotScreenEffect, rgbShiftEffect;
 
@@ -81,7 +82,7 @@
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
+				var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
 				for ( var i = 0; i < 100; i ++ ) {
 					
@@ -109,11 +110,11 @@
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
-				depthTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
+				depthTarget = new THREE.WebGLRenderTarget( window.innerWidth * depthScale, window.innerHeight * depthScale, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter } );
 
 				ssaoEffect = new THREE.ShaderPass( THREE.SSAOShader );
 				ssaoEffect.uniforms[ 'tDepth' ].value = depthTarget;
-				ssaoEffect.uniforms[ 'size' ].value.set( 0.5 * window.innerWidth, 0.5 * window.innerHeight );
+				ssaoEffect.uniforms[ 'size' ].value.set( window.innerWidth * depthScale, window.innerHeight * depthScale );
 				ssaoEffect.uniforms[ 'cameraNear' ].value = camera.near;
 				ssaoEffect.uniforms[ 'cameraFar' ].value = camera.far;
 				composer.addPass( ssaoEffect );
@@ -154,11 +155,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				depthTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
+				depthTarget = new THREE.WebGLRenderTarget( window.innerWidth * depthScale, window.innerHeight * depthScale, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter } );
 
 				depthPassPlugin.renderTarget = depthTarget;
 
-				ssaoEffect.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				ssaoEffect.uniforms[ 'size' ].value.set( window.innerWidth * depthScale, window.innerHeight * depthScale );
 				ssaoEffect.uniforms[ 'tDepth' ].value = depthTarget;
 
 			}
