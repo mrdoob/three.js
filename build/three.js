@@ -9507,28 +9507,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	normalizeNormals: function () {
-
-		var normals = this.attributes[ "normal" ].array;
-
-		var x, y, z, n;
-
-		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
-
-			x = normals[ i ];
-			y = normals[ i + 1 ];
-			z = normals[ i + 2 ];
-
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-			normals[ i     ] *= n;
-			normals[ i + 1 ] *= n;
-			normals[ i + 2 ] *= n;
-
-		}
-
-	},
-
 	computeTangents: function () {
 
 		// based on http://www.terathon.com/code/tangent.html
@@ -9844,6 +9822,34 @@ THREE.BufferGeometry.prototype = {
 		return offsets;
 	},
 
+	merge: function () {
+
+		console.log( 'BufferGeometry.merge(): TODO' );
+
+	},
+
+	normalizeNormals: function () {
+
+		var normals = this.attributes[ "normal" ].array;
+
+		var x, y, z, n;
+
+		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
+
+			x = normals[ i ];
+			y = normals[ i + 1 ];
+			z = normals[ i + 2 ];
+
+			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+
+			normals[ i     ] *= n;
+			normals[ i + 1 ] *= n;
+			normals[ i + 2 ] *= n;
+
+		}
+
+	},
+
 	/*
 		reoderBuffers:
 		Reorder attributes based on a new indexBuffer and indexMap.
@@ -9971,6 +9977,32 @@ THREE.Geometry2 = function ( vertices, normals, uvs ) {
 };
 
 THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+
+THREE.Geometry2.prototype.merge = function ( geometry, matrix, offset ) {
+
+	if ( offset === undefined ) offset = 0;
+
+	var vertices = this.attributes[ 'position' ].array;
+	var normals = this.attributes[ 'normal' ].array;
+	var uvs = this.attributes[ 'uv' ].array;
+
+	if ( geometry instanceof THREE.Geometry2 ) {
+
+		var vertices2 = geometry.attributes[ 'position' ].array;
+		var normals2 = geometry.attributes[ 'normal' ].array;
+		var uvs2 = geometry.attributes[ 'uv' ].array;
+
+		for ( var i = 0, l = vertices2.length; i < l; i ++ ) {
+
+			vertices[ i + offset ] = vertices2[ i ];
+			normals[ i + offset ] = normals2[ i ];
+			uvs[ i + offset ] = uvs2[ i ];
+
+		}
+
+	}
+
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -24613,7 +24645,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// START_VEROLD_MOD - wireframe
 			var mode = _gl.TRIANGLES;
 
-			if ( material.wireframe && geometryAttributes[ "index_wireframe" ] ) {
+			if ( wireframeBit && geometryAttributes[ "index_wireframe" ] ) {
 
 				index = geometryAttributes[ "index_wireframe" ];
 				mode = _gl.LINES;
@@ -24669,13 +24701,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( var i = 0, il = offsetIndices.length; i < il; i ++ ) {
 
-						var offset = offsets[ offsetIndices[ i ] ];
-						var startIndex = offsets[ i ].index;
-
 						// START_VEROLD_MOD - wireframe
-						if ( material.wireframe ) {
+						var offset = offsets[ offsetIndices[ i ] ];
+						var startIndex = offset.index;
 
-							offset = offset.wireframe;
+						if ( wireframeBit ) {
+
+							if ( offset.wireframe ) {
+
+								offset = offset.wireframe;
+
+							} else {
+
+								continue;
+
+							}
 
 						}
 						// END_VEROLD_MODE - wireframe
@@ -24700,7 +24740,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			} else {
+			} else if ( !wireframeBit ) {
 
 				// non-indexed triangles
 
@@ -25425,10 +25465,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var material = scene.overrideMaterial;
 			//START_VEROLD_MOD - override materials are objects with separate materials defined for different types of objects
-			this.setBlending( material["static"].blending, material["static"].blendEquation, material["static"].blendSrc, material["static"].blendDst );
-			this.setDepthTest( material["static"].depthTest );
-			this.setDepthWrite( material["static"].depthWrite );
-			setPolygonOffset( material["static"].polygonOffset, material["static"].polygonOffsetFactor, material["static"].polygonOffsetUnits );
+			if ( material["static"] ) {
+				this.setBlending( material["static"].blending, material["static"].blendEquation, material["static"].blendSrc, material["static"].blendDst );
+				this.setDepthTest( material["static"].depthTest );
+				this.setDepthWrite( material["static"].depthWrite );
+				setPolygonOffset( material["static"].polygonOffset, material["static"].polygonOffsetFactor, material["static"].polygonOffsetUnits );
+			}
+			else {
+				this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+				this.setDepthTest( material.depthTest );
+				this.setDepthWrite( material.depthWrite );
+				setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+			}
 			//END_VEROLD_MOD
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
@@ -25549,11 +25597,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( overrideMaterial ) {
 
 					//START_VEROLD_MOD
-					if ( object instanceof THREE.SkinnedMesh ) {
-						material = overrideMaterial[ "skinned" ];
+					if ( overrideMaterial[ "static" ] ) {
+						if ( object instanceof THREE.SkinnedMesh ) {
+							material = overrideMaterial[ "skinned" ];
+						}
+						else {
+							material = overrideMaterial[ "static" ];
+						}
 					}
 					else {
-						material = overrideMaterial[ "static" ];
+						material = overrideMaterial;
 					}
 					//END_VEROLD_MOD
 
@@ -35407,87 +35460,77 @@ THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
-	this.parameters = {
-		width: width,
-		height: height,
-		widthSegments: widthSegments,
-		heightSegments: heightSegments
-	};
+	THREE.Geometry.call( this );
 
+	this.width = width;
+	this.height = height;
+
+	this.widthSegments = widthSegments || 1;
+	this.heightSegments = heightSegments || 1;
+
+	var ix, iz;
 	var width_half = width / 2;
 	var height_half = height / 2;
 
-	var gridX = widthSegments || 1;
-	var gridY = heightSegments || 1;
+	var gridX = this.widthSegments;
+	var gridZ = this.heightSegments;
 
 	var gridX1 = gridX + 1;
-	var gridY1 = gridY + 1;
+	var gridZ1 = gridZ + 1;
 
-	var segment_width = width / gridX;
-	var segment_height = height / gridY;
+	var segment_width = this.width / gridX;
+	var segment_height = this.height / gridZ;
 
-	var vertices = new Float32Array( gridX1 * gridY1 * 3 );
-	var normals = new Float32Array( gridX1 * gridY1 * 3 );
-	var uvs = new Float32Array( gridX1 * gridY1 * 2 );
+	var normal = new THREE.Vector3( 0, 0, 1 );
 
-	var offset = 0;
-	var offset2 = 0;
+	for ( iz = 0; iz < gridZ1; iz ++ ) {
 
-	for ( var iy = 0; iy < gridY1; iy ++ ) {
-
-		var y = iy * segment_height - height_half;
-
-		for ( var ix = 0; ix < gridX1; ix ++ ) {
+		for ( ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
+			var y = iz * segment_height - height_half;
 
-			vertices[ offset     ] = x;
-			vertices[ offset + 1 ] = - y;
-
-			normals[ offset + 2 ] = 1;
-
-			uvs[ offset2     ] = ix / gridX;
-			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
-
-			offset += 3;
-			offset2 += 2;
+			this.vertices.push( new THREE.Vector3( x, - y, 0 ) );
 
 		}
 
 	}
 
-	offset = 0;
+	for ( iz = 0; iz < gridZ; iz ++ ) {
 
-	var indices = new ( vertices.length > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
+		for ( ix = 0; ix < gridX; ix ++ ) {
 
-	for ( var iy = 0; iy < gridY; iy ++ ) {
+			var a = ix + gridX1 * iz;
+			var b = ix + gridX1 * ( iz + 1 );
+			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
+			var d = ( ix + 1 ) + gridX1 * iz;
 
-		for ( var ix = 0; ix < gridX; ix ++ ) {
+			var uva = new THREE.Vector2( ix / gridX, 1 - iz / gridZ );
+			var uvb = new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ );
 
-			var a = ix + gridX1 * iy;
-			var b = ix + gridX1 * ( iy + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-			var d = ( ix + 1 ) + gridX1 * iy;
+			var face = new THREE.Face3( a, b, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
-			indices[ offset     ] = a;
-			indices[ offset + 1 ] = b;
-			indices[ offset + 2 ] = d;
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-			indices[ offset + 3 ] = b;
-			indices[ offset + 4 ] = c;
-			indices[ offset + 5 ] = d;
+			face = new THREE.Face3( b, c, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
-			offset += 6;
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 
 	}
-
-	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
 };
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 /**
  * @author Kaleb Murphy

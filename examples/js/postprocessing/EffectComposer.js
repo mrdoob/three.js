@@ -68,10 +68,6 @@ THREE.EffectComposer.prototype = {
 
 			if ( !pass.enabled ) continue;
 
-			//START_VEROLD_MOD - Do any additional work needed for this render
-			if ( pass.preRenderWork ) pass.preRenderWork();
-			//END_VEROLD_MOD
-
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
 			if ( pass.needsSwap ) {
@@ -101,10 +97,6 @@ THREE.EffectComposer.prototype = {
 				maskActive = false;
 
 			}
-
-			//START_VEROLD_MOD - Do any additional work needed for this render
-			if ( pass.postRenderWork ) pass.postRenderWork();
-			//END_VEROLD_MOD - Do any additional work needed for this render
 
 		}
 

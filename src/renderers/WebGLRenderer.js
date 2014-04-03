@@ -3515,10 +3515,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var material = scene.overrideMaterial;
 			//START_VEROLD_MOD - override materials are objects with separate materials defined for different types of objects
-			this.setBlending( material["static"].blending, material["static"].blendEquation, material["static"].blendSrc, material["static"].blendDst );
-			this.setDepthTest( material["static"].depthTest );
-			this.setDepthWrite( material["static"].depthWrite );
-			setPolygonOffset( material["static"].polygonOffset, material["static"].polygonOffsetFactor, material["static"].polygonOffsetUnits );
+			if ( material["static"] ) {
+				this.setBlending( material["static"].blending, material["static"].blendEquation, material["static"].blendSrc, material["static"].blendDst );
+				this.setDepthTest( material["static"].depthTest );
+				this.setDepthWrite( material["static"].depthWrite );
+				setPolygonOffset( material["static"].polygonOffset, material["static"].polygonOffsetFactor, material["static"].polygonOffsetUnits );
+			}
+			else {
+				this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+				this.setDepthTest( material.depthTest );
+				this.setDepthWrite( material.depthWrite );
+				setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+			}
 			//END_VEROLD_MOD
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
@@ -3639,11 +3647,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( overrideMaterial ) {
 
 					//START_VEROLD_MOD
-					if ( object instanceof THREE.SkinnedMesh ) {
-						material = overrideMaterial[ "skinned" ];
+					if ( overrideMaterial[ "static" ] ) {
+						if ( object instanceof THREE.SkinnedMesh ) {
+							material = overrideMaterial[ "skinned" ];
+						}
+						else {
+							material = overrideMaterial[ "static" ];
+						}
 					}
 					else {
-						material = overrideMaterial[ "static" ];
+						material = overrideMaterial;
 					}
 					//END_VEROLD_MOD
 
