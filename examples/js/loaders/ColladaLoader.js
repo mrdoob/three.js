@@ -4718,7 +4718,7 @@ THREE.ColladaLoader = function () {
 
 	function setUpConversion() {
 
-		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
+		if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
 
 			upConversion = null;
 
@@ -4749,7 +4749,7 @@ THREE.ColladaLoader = function () {
 
 	function fixCoords( data, sign ) {
 
-		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
+		if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
 
 			return;
 
@@ -4807,7 +4807,7 @@ THREE.ColladaLoader = function () {
 
 	function getConvertedTranslation( axis, data ) {
 
-		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
+		if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
 
 			return data;
 
