@@ -80,23 +80,26 @@ THREE.Matrix3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( a ) {
+		return function ( array, offset, length ) {
 
-			for ( var i = 0, il = a.length; i < il; i += 3 ) {
+			if ( offset === undefined ) offset = 0;
+			if ( length === undefined ) length = array.length;
 
-				v1.x = a[ i ];
-				v1.y = a[ i + 1 ];
-				v1.z = a[ i + 2 ];
+			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+
+				v1.x = array[ j ];
+				v1.y = array[ j + 1 ];
+				v1.z = array[ j + 2 ];
 
 				v1.applyMatrix3( this );
 
-				a[ i ]     = v1.x;
-				a[ i + 1 ] = v1.y;
-				a[ i + 2 ] = v1.z;
+				array[ j ]     = v1.x;
+				array[ j + 1 ] = v1.y;
+				array[ j + 2 ] = v1.z;
 
 			}
 
-			return a;
+			return array;
 
 		};
 

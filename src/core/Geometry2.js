@@ -2,40 +2,116 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Geometry2 = function ( vertices, normals, uvs ) {
+THREE.Geometry2 = function ( size ) {
 
 	THREE.BufferGeometry.call( this );
 
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };	
+	if ( size !== undefined ) {
+
+		var vertices = new Float32Array( size * 3 * 3 );
+		var normals = new Float32Array( size * 3 * 3 );
+		var uvs = new Float32Array( size * 3 * 2 );
+
+		this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
+		this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
+		this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+
+	}
 
 };
 
 THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-THREE.Geometry2.prototype.merge = function ( geometry, matrix, offset ) {
+THREE.Geometry2.prototype.setArrays = function ( vertices, normals, uvs ) {
 
-	if ( offset === undefined ) offset = 0;
+	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
+	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
+	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
 
-	var vertices = this.attributes[ 'position' ].array;
-	var normals = this.attributes[ 'normal' ].array;
-	var uvs = this.attributes[ 'uv' ].array;
+	return this;
 
-	if ( geometry instanceof THREE.Geometry2 ) {
+};
 
-		var vertices2 = geometry.attributes[ 'position' ].array;
-		var normals2 = geometry.attributes[ 'normal' ].array;
-		var uvs2 = geometry.attributes[ 'uv' ].array;
+THREE.Geometry2.prototype.merge = ( function () {
 
-		for ( var i = 0, l = vertices2.length; i < l; i ++ ) {
+	var offset = 0;
+	var normalMatrix = new THREE.Matrix3();
 
-			vertices[ i + offset ] = vertices2[ i ];
-			normals[ i + offset ] = normals2[ i ];
-			uvs[ i + offset ] = uvs2[ i ];
+	return function ( geometry, matrix, startOffset ) {
+
+		if ( startOffset !== undefined ) offset = startOffset;
+
+		var offset2 = offset * 2;
+		var offset3 = offset * 3;
+
+		var vertices = this.attributes[ 'position' ].array;
+		var normals = this.attributes[ 'normal' ].array;
+		var uvs = this.attributes[ 'uv' ].array;
+
+		if ( geometry instanceof THREE.Geometry2 ) {
+
+			var vertices2 = geometry.attributes[ 'position' ].array;
+			var normals2 = geometry.attributes[ 'normal' ].array;
+			var uvs2 = geometry.attributes[ 'uv' ].array;
+
+			for ( var i = 0, l = vertices2.length; i < l; i += 3 ) {
+
+				vertices[ i + offset3     ] = vertices2[ i     ];
+				vertices[ i + offset3 + 1 ] = vertices2[ i + 1 ];
+				vertices[ i + offset3 + 2 ] = vertices2[ i + 2 ];
+
+				normals[ i + offset3     ] = normals2[ i     ];
+				normals[ i + offset3 + 1 ] = normals2[ i + 1 ];
+				normals[ i + offset3 + 2 ] = normals2[ i + 2 ];
+
+				uvs[ i + offset2     ] = uvs2[ i     ];
+				uvs[ i + offset2 + 1 ] = uvs2[ i + 1 ];
+
+			}
+
+		} else if ( geometry instanceof THREE.IndexedGeometry2 ) {
+
+			var indices2 = geometry.attributes[ 'index' ].array;
+			var vertices2 = geometry.attributes[ 'position' ].array;
+			var normals2 = geometry.attributes[ 'normal' ].array;
+			var uvs2 = geometry.attributes[ 'uv' ].array;
+
+			for ( var i = 0, l = indices2.length; i < l; i ++ ) {
+
+				var index = indices2[ i ];
+
+				var index3 = index * 3;
+				var i3 = i * 3;
+
+				vertices[ i3 + offset3 ] = vertices2[ index3 ];
+				vertices[ i3 + offset3 + 1 ] = vertices2[ index3 + 1 ];
+				vertices[ i3 + offset3 + 2 ] = vertices2[ index3 + 2 ];
+
+				normals[ i3 + offset3 ] = normals2[ index3 ];
+				normals[ i3 + offset3 + 1 ] = normals2[ index3 + 1 ];
+				normals[ i3 + offset3 + 2 ] = normals2[ index3 + 2 ];
+
+				var index2 = index * 2;
+				var i2 = i * 2;
+
+				uvs[ i2 + offset2 ] = uvs2[ index2 ];
+				uvs[ i2 + offset2 + 1 ] = uvs2[ index2 + 1 ];
+
+			}
+
+			if ( matrix !== undefined ) {
+
+				matrix.applyToVector3Array( vertices, offset3, indices2.length * 3 );
+
+				normalMatrix.getNormalMatrix( matrix );
+				normalMatrix.applyToVector3Array( normals, offset3, indices2.length * 3 );
+
+			}
+
+			offset += indices2.length;
 
 		}
 
-	}
+	};
 
-};
+} )();
