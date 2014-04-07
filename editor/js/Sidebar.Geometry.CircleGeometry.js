@@ -17,7 +17,7 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 	// segments
 
 	var segmentsRow = new UI.Panel();
-	var segments = new UI.Integer( geometry.parameters.segments ).onChange( update );
+	var segments = new UI.Integer( geometry.parameters.segments ).setRange( 3, Infinity ).onChange( update );
 
 	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
