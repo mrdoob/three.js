@@ -2170,8 +2170,8 @@ def generate_cameras(data):
                     "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
                     "target"    : generate_vec3([0, 0, 0])
                     }
-		
-		elif camera.id_data.type == "ORTHO":
+
+            elif camera.id_data.type == "ORTHO":
 
                     camera_string = TEMPLATE_CAMERA_ORTHO % {
                     "camera_id" : generate_string(camera.name),
