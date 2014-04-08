@@ -8,13 +8,13 @@ THREE.Geometry2 = function ( size ) {
 
 	if ( size !== undefined ) {
 
-		var vertices = new Float32Array( size * 3 * 3 );
-		var normals = new Float32Array( size * 3 * 3 );
-		var uvs = new Float32Array( size * 3 * 2 );
+		this.vertices = new Float32Array( size * 3 * 3 );
+		this.normals = new Float32Array( size * 3 * 3 );
+		this.uvs = new Float32Array( size * 3 * 2 );
 
-		this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-		this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-		this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+		this.attributes[ 'position' ] = { array: this.vertices, itemSize: 3 };
+		this.attributes[ 'normal' ] = { array: this.normals, itemSize: 3 };
+		this.attributes[ 'uv' ] = { array: this.uvs, itemSize: 2 };
 
 	}
 
@@ -23,6 +23,10 @@ THREE.Geometry2 = function ( size ) {
 THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
 
 THREE.Geometry2.prototype.setArrays = function ( vertices, normals, uvs ) {
+
+	this.vertices = vertices;
+	this.normals = normals;
+	this.uvs = uvs;
 
 	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
 	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
