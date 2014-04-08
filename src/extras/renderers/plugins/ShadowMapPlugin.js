@@ -298,6 +298,8 @@ THREE.ShadowMapPlugin = function () {
 
 					}
 
+					_renderer.setMaterialFaces( objectMaterial );
+
 					if ( buffer instanceof THREE.BufferGeometry ) {
 
 						_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object );
