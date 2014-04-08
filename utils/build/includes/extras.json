@@ -46,6 +46,7 @@
 	"src/extras/geometries/ParametricGeometry.js",
 	"src/extras/helpers/AxisHelper.js",
 	"src/extras/helpers/ArrowHelper.js",
+	"src/extras/helpers/BoneHelper.js",
 	"src/extras/helpers/BoxHelper.js",
 	"src/extras/helpers/BoundingBoxHelper.js",
 	"src/extras/helpers/CameraHelper.js",
