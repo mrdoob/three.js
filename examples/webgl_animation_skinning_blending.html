@@ -25,9 +25,16 @@
   </head>
   <body>
     <div id="container"></div>
+    <div id="info">
+      <a href="http://threejs.org" target="_blank">three.js</a> - Skeletal Animation Blending
+      <br><br> Adjust blend weights to affect the animations that are currently playing.
+      <br> Cross fades (and warping) blend between 2 animations and end with a single animation.
+    </div>
 
     <script src="../build/Three.js"></script>
+
     <script src="js/Detector.js"></script>
+    <script src="js/libs/stats.min.js"></script>
     <script src="js/Controls/OrbitControls.js"></script>
     <script src="js/BlendCharacter.js"></script>
     <script src="js/BlendCharacterGui.js"></script>
@@ -37,12 +44,9 @@
 
       if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-      var container;
+      var container, stats;
 
-      var camera, scene, renderer, controls;
-
-      var light;
-      var blendMesh = null;
+      var blendMesh, camera, scene, renderer, controls;
 
       var clock = new THREE.Clock();
       var gui = null;
@@ -59,18 +63,29 @@
         scene = new THREE.Scene();
         scene.add ( new THREE.AmbientLight( 0xaaaaaa ) );
 
-        light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+        var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
         light.position = new THREE.Vector3( 0, 0, 1000.0 );
         scene.add( light );
 
         renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
         renderer.setClearColor( '#777777', 1 );
         renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.autoClear = false;
+        renderer.autoClear = true;
 
         container.appendChild( renderer.domElement );
 
+        //
+
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        container.appendChild( stats.domElement );
+
+        //
+
         window.addEventListener( 'resize', onWindowResize, false );
+
+        // listen for messages from the gui
         window.addEventListener( 'start-animation', onStartAnimation );
         window.addEventListener( 'stop-animation', onStopAnimation );
         window.addEventListener( 'pause-animation', onPauseAnimation );
@@ -103,7 +118,9 @@
 
         // the blend mesh will combine 1 or more animations
         for ( var i = 0; i < data.anims.length; ++i ) {
+
           blendMesh.play(data.anims[i], data.weights[i]);
+
         }
 
         isFrameStepping = false;
@@ -196,6 +213,7 @@
         controls.update();
 
         // Set default weights
+
         blendMesh.animations[ 'idle' ].weight = 1 / 3;
         blendMesh.animations[ 'walk' ].weight = 1 / 3;
         blendMesh.animations[ 'run' ].weight = 1 / 3;
@@ -209,20 +227,29 @@
 
         requestAnimationFrame( animate, renderer.domElement );
 
+        // step forward in time based on whether we're stepping and scale
+
         var scale = gui.getTimeScale();
         var delta = clock.getDelta();
         var stepSize = (!isFrameStepping) ? delta * scale: timeToStep;
+
+        // modify blend weights
 
         blendMesh.updateWeights( stepSize );
         gui.update();
 
         THREE.AnimationHandler.update( stepSize );
+
+        // update the transform on the bone visualization
+
         blendMesh.updateBoneHelpers();
 
-        timeToStep = 0;
-
-        renderer.clear();
         renderer.render( scene, camera );
+        stats.update();
+
+        // if we are stepping, consume the amount of time set to have been stepped
+
+        timeToStep = 0;
 
       }
 

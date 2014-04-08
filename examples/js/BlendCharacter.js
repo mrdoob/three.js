@@ -2,7 +2,6 @@
  * @author Michael Guerrero / http://realitymeltdown.com
  */
 
-//==============================================================================
 THREE.BlendCharacter = function () {
 
 	var self = this;
@@ -12,33 +11,32 @@ THREE.BlendCharacter = function () {
 	this.weightSchedule = [];
 	this.warpSchedule = [];
 
-	// ---------------------------------------------------------------------------
 	this.load = function(url, loadedCB) {
 
 		var loader = new THREE.JSONLoader();
 		loader.load( url, function( geometry, materials ) {
 
 			var originalMaterial = materials[ 0 ];
-
 			originalMaterial.skinning = true;
-			originalMaterial.transparent = true;
-			originalMaterial.alphaTest = 0.75;
 
 			THREE.SkinnedMesh.call( self, geometry, originalMaterial );
+
+			// Create the animations
 
 			for ( var i = 0; i < geometry.animations.length; ++i ) {
 
 				THREE.AnimationHandler.add( geometry.animations[ i ] );
 
-				// Create the animation object and set a default weight
 				var animName = geometry.animations[ i ].name;
 				self.animations[ animName ] = new THREE.Animation( self, animName );
 
 			}
 
+			// Create the debug visualization
+
 			for ( var i = 0; i < self.skeleton.bones.length; ++i ) {
 
-				var helper = new THREE.BoneAxisHelper( self.skeleton.bones[i], 2, 1 );
+				var helper = new THREE.BoneAxisHelper( self.skeleton.bones[ i ], 2, 1 );
 				helper.update();
 				self.add( helper );
 				self.boneHelpers.push( helper );
@@ -54,24 +52,30 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	// ---------------------------------------------------------------------------
 	this.updateWeights = function( dt ) {
+
 
 		for ( var i = this.weightSchedule.length - 1; i >= 0; --i ) {
 
 			var data = this.weightSchedule[ i ];
 			data.timeElapsed += dt;
 
+			// If the transition is complete, remove it from the schedule
+
 			if ( data.timeElapsed > data.duration ) {
 
 				data.anim.weight = data.endWeight;
 				this.weightSchedule.splice( i, 1 );
+
+				// If we've fade out completely, stop the animation
 
 				if ( data.anim.weight == 0 ) {
 					data.anim.stop( 0 );
 				}
 
 			} else {
+
+				// interpolate the weight for the current time
 
 				data.anim.weight = data.startWeight + (data.endWeight - data.startWeight) * data.timeElapsed / data.duration;
 
@@ -83,8 +87,11 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	// ---------------------------------------------------------------------------
 	this.updateWarps = function( dt ) {
+
+		// Warping modifies the time scale over time to make 2 animations of different
+		// length match. This is useful for smoothing out transitions that get out of
+		// phase such as between a walk and run cycle
 
 		for ( var i = this.warpSchedule.length - 1; i >= 0; --i ) {
 
@@ -112,6 +119,7 @@ THREE.BlendCharacter = function () {
 				var toFromRatio = toLength / fromLength;
 
 				// scale from each time proportionally to the other animation
+
 				data.from.timeScale = ( 1 - alpha ) + fromToRatio * alpha;
 				data.to.timeScale = alpha + toFromRatio * ( 1 - alpha );
 
@@ -124,20 +132,21 @@ THREE.BlendCharacter = function () {
 
 	}
 
-	// ---------------------------------------------------------------------------
 	this.updateBoneHelpers = function() {
 
 		for ( var i = 0; i < this.boneHelpers.length; ++i ) {
+
 			this.boneHelpers[ i ].update();
 		}
+
 	};
 
-	// ---------------------------------------------------------------------------
 	this.play = function(animName, weight) {
+
 		this.animations[ animName ].play( 0, weight );
+
 	};
 
-	// ---------------------------------------------------------------------------
 	this.crossfade = function( fromAnimName, toAnimName, duration ) {
 
 		var fromAnim = this.animations[ fromAnimName ];
@@ -168,7 +177,6 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	// ---------------------------------------------------------------------------
 	this.warp = function( fromAnimName, toAnimName, duration ) {
 
 		var fromAnim = this.animations[ fromAnimName ];
@@ -188,14 +196,12 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	// ---------------------------------------------------------------------------
 	this.applyWeight = function(animName, weight) {
 
 		this.animations[animName].weight = weight;
 
 	};
 
-	// ---------------------------------------------------------------------------
 	this.pauseAll = function() {
 
 		for ( var a in this.animations ) {
@@ -210,7 +216,6 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	// ---------------------------------------------------------------------------
 	this.unPauseAll = function() {
 
 		for ( var a in this.animations ) {
@@ -226,7 +231,6 @@ THREE.BlendCharacter = function () {
 	};
 
 
-	// ---------------------------------------------------------------------------
 	this.stopAll = function() {
 
 		for (a in this.animations) {
@@ -244,7 +248,6 @@ THREE.BlendCharacter = function () {
 
 	}
 
-	// ---------------------------------------------------------------------------
 	this.toggleShowBones = function( shouldShow ) {
 
 		this.visible = !shouldShow;
@@ -263,7 +266,7 @@ THREE.BlendCharacter = function () {
 
 };
 
-//==============================================================================
+
 THREE.BlendCharacter.prototype = Object.create( THREE.SkinnedMesh.prototype );
 
 THREE.BlendCharacter.prototype.getForward = function() {
