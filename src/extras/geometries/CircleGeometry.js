@@ -64,7 +64,9 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	}
 
-	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
+	THREE.IndexedGeometry2.call( this );
+
+	this.setArrays( indices, vertices, normals, uvs );
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 

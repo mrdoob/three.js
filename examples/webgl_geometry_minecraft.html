@@ -107,8 +107,8 @@
 				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
-				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
+				pyGeometry.uvs[ 5 ] = 0.5;
+				pyGeometry.uvs[ 7 ] = 0.5;
 				// pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
 				// pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
 				// pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
