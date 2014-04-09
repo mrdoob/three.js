@@ -36,7 +36,7 @@ THREE.BlendCharacter = function () {
 
 			for ( var i = 0; i < self.skeleton.bones.length; ++i ) {
 
-				var helper = new THREE.BoneAxisHelper( self.skeleton.bones[ i ], 2, 1 );
+				var helper = new THREE.BoneHelper( self.skeleton.bones[ i ], 2, 1 );
 				helper.update();
 				self.add( helper );
 				self.boneHelpers.push( helper );
