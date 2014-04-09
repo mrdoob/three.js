@@ -26,10 +26,12 @@ THREE.BoneHelper = function ( bone, jointBoxSize, scaleRatio ) {
     var lineMaterial = new THREE.LineBasicMaterial();
     var lineGeometry = new THREE.Geometry();
 
+    lineMaterial.vertexColors = true;
+
     lineGeometry.vertices.push( new THREE.Vector3() );
     lineGeometry.vertices.push( new THREE.Vector3() );
-    lineGeometry.colors.push( new THREE.Color( 0, 0, 0) );
-    lineGeometry.colors.push( new THREE.Color( 1, 1, 1) );
+    lineGeometry.colors.push( new THREE.Color( 1, 1, 0 ) );
+    lineGeometry.colors.push( new THREE.Color( 0, 0, 0 ) );
 
     this.line = new THREE.Line( lineGeometry, lineMaterial );
     this.add(this.line);
