@@ -29079,8 +29079,12 @@ THREE.ImageUtils = {
 		var images = [];
 		images.loadCount = 0;
 
+		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
+		
 		var texture = new THREE.Texture();
 		texture.image = images;
+		
 		if ( mapping !== undefined ) texture.mapping = mapping;
 
 		// no flipping needed for cube textures
@@ -29089,10 +29093,7 @@ THREE.ImageUtils = {
 
 		for ( var i = 0, il = array.length; i < il; ++ i ) {
 
-			var cubeImage = new Image();
-			images[ i ] = cubeImage;
-
-			cubeImage.onload = function () {
+			var cubeImage = loader.load( array[i], function () {
 
 				images.loadCount += 1;
 
@@ -29103,15 +29104,11 @@ THREE.ImageUtils = {
 
 				}
 
-			};
-
-			cubeImage.onerror = onError;
-
-			cubeImage.crossOrigin = this.crossOrigin;
-			cubeImage.src = array[ i ];
-
+			} );
+			
+			images[ i ] = cubeImage;
 		}
-
+		
 		return texture;
 
 	},
