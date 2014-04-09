@@ -235,14 +235,10 @@
 
         // modify blend weights
 
-        blendMesh.updateWeights( stepSize );
+        blendMesh.update( stepSize );
         gui.update();
 
         THREE.AnimationHandler.update( stepSize );
-
-        // update the transform on the bone visualization
-
-        blendMesh.updateBoneHelpers();
 
         renderer.render( scene, camera );
         stats.update();

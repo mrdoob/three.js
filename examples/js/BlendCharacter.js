@@ -34,14 +34,8 @@ THREE.BlendCharacter = function () {
 
 			// Create the debug visualization
 
-			for ( var i = 0; i < self.skeleton.bones.length; ++i ) {
-
-				var helper = new THREE.BoneHelper( self.skeleton.bones[ i ], 0.5, 1 );
-				helper.update();
-				self.add( helper );
-				self.boneHelpers.push( helper );
-
-			}
+			self.skeletonHelper = new THREE.SkeletonHelper( self.skeleton, 0.5, 1 );
+			self.add( self.skeletonHelper );
 
 			self.toggleShowBones( false );
 
@@ -52,7 +46,7 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	this.updateWeights = function( dt ) {
+	this.update = function( dt ) {
 
 
 		for ( var i = this.weightSchedule.length - 1; i >= 0; --i ) {
@@ -84,6 +78,7 @@ THREE.BlendCharacter = function () {
 		}
 
 		this.updateWarps( dt );
+		this.skeletonHelper.update();
 
 	};
 
