@@ -37,6 +37,8 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this._needsUpdate = false;
 	this.onUpdate = null;
+	
+	this._subImages = [];
 
 };
 
@@ -88,6 +90,17 @@ THREE.Texture.prototype = {
 
 		return texture;
 
+	},
+	
+	addSubImage: function( offsetX, offsetY, image) {
+		
+		this._subImages.push( {
+			_subOffsetX: offsetX,
+			_subOffsetY: offsetY,
+			image: image
+		} );
+		
+		this.needsUpdate = true;
 	},
 
 	update: function () {

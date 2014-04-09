@@ -5563,7 +5563,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+					if ( texture._subImages.length == 0 ) {
+					
+						_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+					
+					} else {				
+					
+						for ( var i = 0, il = texture._subImages.length; i < il; i ++ ) {
+							_gl.texSubImage2D( _gl.TEXTURE_2D, 0, texture._subImages[ i ]._subOffsetX, texture._subImages[ i ]._subOffsetY, glFormat, glType, texture._subImages[ i ].image );
+							
+						}
+						
+						texture._subImages = [];
+						
+					}
 
 				}
 
