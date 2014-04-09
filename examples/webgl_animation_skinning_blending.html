@@ -243,7 +243,8 @@
         renderer.render( scene, camera );
         stats.update();
 
-        // if we are stepping, consume the amount of time set to have been stepped
+        // if we are stepping, consume time
+        // ( will equal step size next time a single step is desired )
 
         timeToStep = 0;
 
