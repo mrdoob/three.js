@@ -4,14 +4,13 @@
 
 THREE.BlendCharacter = function () {
 
-	var self = this;
-
 	this.animations = {};
-	this.boneHelpers = [];
 	this.weightSchedule = [];
 	this.warpSchedule = [];
 
-	this.load = function(url, loadedCB) {
+	this.load = function( url, onLoad ) {
+
+		var scope = this;
 
 		var loader = new THREE.JSONLoader();
 		loader.load( url, function( geometry, materials ) {
@@ -19,7 +18,7 @@ THREE.BlendCharacter = function () {
 			var originalMaterial = materials[ 0 ];
 			originalMaterial.skinning = true;
 
-			THREE.SkinnedMesh.call( self, geometry, originalMaterial );
+			THREE.SkinnedMesh.call( scope, geometry, originalMaterial );
 
 			// Create the animations
 
@@ -28,26 +27,25 @@ THREE.BlendCharacter = function () {
 				THREE.AnimationHandler.add( geometry.animations[ i ] );
 
 				var animName = geometry.animations[ i ].name;
-				self.animations[ animName ] = new THREE.Animation( self, animName );
+				scope.animations[ animName ] = new THREE.Animation( scope, animName );
 
 			}
 
 			// Create the debug visualization
 
-			self.skeletonHelper = new THREE.SkeletonHelper( self.skeleton, 0.5, 1 );
-			self.add( self.skeletonHelper );
+			scope.skeletonHelper = new THREE.SkeletonHelper( scope.skeleton, 0.5, 1 );
+			scope.add( scope.skeletonHelper );
 
-			self.toggleShowBones( false );
+			scope.toggleShowBones( false );
 
 			// Loading is complete, fire the callback
-			loadedCB && loadedCB();
+			if ( onLoad !== undefined ) onLoad();
 
 		} );
 
 	};
 
 	this.update = function( dt ) {
-
 
 		for ( var i = this.weightSchedule.length - 1; i >= 0; --i ) {
 
@@ -61,10 +59,12 @@ THREE.BlendCharacter = function () {
 				data.anim.weight = data.endWeight;
 				this.weightSchedule.splice( i, 1 );
 
-				// If we've fade out completely, stop the animation
+				// If we've faded out completely, stop the animation
 
 				if ( data.anim.weight == 0 ) {
+
 					data.anim.stop( 0 );
+
 				}
 
 			} else {
@@ -85,7 +85,7 @@ THREE.BlendCharacter = function () {
 	this.updateWarps = function( dt ) {
 
 		// Warping modifies the time scale over time to make 2 animations of different
-		// length match. This is useful for smoothing out transitions that get out of
+		// lengths match. This is useful for smoothing out transitions that get out of
 		// phase such as between a walk and run cycle
 
 		for ( var i = this.warpSchedule.length - 1; i >= 0; --i ) {
@@ -126,15 +126,6 @@ THREE.BlendCharacter = function () {
 		}
 
 	}
-
-	this.updateBoneHelpers = function() {
-
-		for ( var i = 0; i < this.boneHelpers.length; ++i ) {
-
-			this.boneHelpers[ i ].update();
-		}
-
-	};
 
 	this.play = function(animName, weight) {
 
@@ -193,7 +184,7 @@ THREE.BlendCharacter = function () {
 
 	this.applyWeight = function(animName, weight) {
 
-		this.animations[animName].weight = weight;
+		this.animations[ animName ].weight = weight;
 
 	};
 
@@ -228,7 +219,7 @@ THREE.BlendCharacter = function () {
 
 	this.stopAll = function() {
 
-		for (a in this.animations) {
+		for ( a in this.animations ) {
 
 			if ( this.animations[ a ].isPlaying ) {
 				this.animations[ a ].stop(0);
@@ -246,16 +237,7 @@ THREE.BlendCharacter = function () {
 	this.toggleShowBones = function( shouldShow ) {
 
 		this.visible = !shouldShow;
-
-		for ( var i = 0; i < self.boneHelpers.length; ++i ) {
-
-			self.boneHelpers[ i ].traverse( function( obj ) {
-
-				obj.visible = shouldShow;
-
-			} );
-
-		}
+		this.skeletonHelper.setVisible( shouldShow );
 
 	}
 
