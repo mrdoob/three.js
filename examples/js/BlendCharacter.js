@@ -204,17 +204,17 @@ THREE.BlendCharacter = function () {
 
 	this.unPauseAll = function() {
 
-		for ( var a in this.animations ) {
+    for ( var a in this.animations ) {
 
-			if ( this.animations[ a ].isPaused ) {
+      if ( this.animations[ a ].isPlaying && this.animations[ a ].isPaused ) {
 
-				this.animations[ a ].pause();
+        this.animations[ a ].pause();
 
-			}
+      }
 
-		}
+    }
 
-	};
+  };
 
 
 	this.stopAll = function() {
