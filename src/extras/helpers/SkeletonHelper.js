@@ -10,7 +10,8 @@ THREE.SkeletonHelper = function ( skeleton, jointBoxSize, scaleRatio ) {
   this.scaleRatio = ( scaleRatio !== undefined ) ? scaleRatio : 1;
   this.skeleton = skeleton;
 
-  var jointBoxSize = ( jointBoxSize !== undefined ) ? jointBoxSize : 1;
+  if ( jointBoxSize === undefined ) jointBoxSize = 1;
+  
   var boxSize = jointBoxSize * this.scaleRatio;
 
   for ( var i = 0; i < skeleton.bones.length; ++i ) {
