@@ -120,7 +120,8 @@ Editor.prototype = {
     
         	console.log( 'onPanoramaLoad' );
         	//activeLocation = this.location;
-        	editor.panorama.material.map = new THREE.Texture( this.canvas ); 
+        	console.log(this.canvas);
+        	editor.panorama.material.map = new THREE.Texture( this.canvas[0] ); 
         	editor.panorama.material.side = THREE.DoubleSide;
         	editor.panorama.material.map.needsUpdate = true;
         	onWindowResize();
