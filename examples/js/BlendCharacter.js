@@ -36,7 +36,7 @@ THREE.BlendCharacter = function () {
 			scope.skeletonHelper = new THREE.SkeletonHelper( scope.skeleton, 0.5, 1 );
 			scope.add( scope.skeletonHelper );
 
-			scope.toggleShowBones( false );
+			scope.showSkeleton( true );
 
 			// Loading is complete, fire the callback
 			if ( onLoad !== undefined ) onLoad();
@@ -234,10 +234,9 @@ THREE.BlendCharacter = function () {
 
 	}
 
-	this.toggleShowBones = function( shouldShow ) {
+	this.showSkeleton = function( boolean ) {
 
-		this.visible = !shouldShow;
-		this.skeletonHelper.setVisible( shouldShow );
+		this.skeletonHelper.setVisible( boolean );
 
 	}
 
