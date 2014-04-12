@@ -53,6 +53,7 @@
 	"src/objects/Line.js",
 	"src/objects/Mesh.js",
 	"src/objects/Bone.js",
+	"src/objects/Skeleton.js",
 	"src/objects/Sprite.js",
 	"src/scenes/Scene.js",
 	"src/renderers/CanvasRenderer.js",

@@ -82,6 +82,7 @@
 	"src/objects/Line.js",
 	"src/objects/Mesh.js",
 	"src/objects/Bone.js",
+	"src/objects/Skeleton.js",
 	"src/objects/SkinnedMesh.js",
 	"src/objects/MorphAnimMesh.js",
 	"src/objects/LOD.js",
