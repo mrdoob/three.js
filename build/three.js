@@ -37282,7 +37282,7 @@ THREE.SkeletonHelper = function ( skeleton, jointBoxSize, scaleRatio ) {
 
 		var bone = skeleton.bones[ i ];
 		var boxGeometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize );
-		var boxMaterial = new THREE.MeshBasicMaterial();
+		var boxMaterial = new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } );
 
 		bone.helper = {};
 		bone.helper.box = new THREE.Mesh( boxGeometry, boxMaterial );
@@ -37293,10 +37293,8 @@ THREE.SkeletonHelper = function ( skeleton, jointBoxSize, scaleRatio ) {
 
 		if ( bone.parent instanceof THREE.Bone ) {
 
-			var lineMaterial = new THREE.LineBasicMaterial();
+			var lineMaterial = new THREE.LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false } );
 			var lineGeometry = new THREE.Geometry();
-
-			lineMaterial.vertexColors = true;
 
 			lineGeometry.vertices.push( new THREE.Vector3() );
 			lineGeometry.vertices.push( new THREE.Vector3() );
@@ -37304,7 +37302,7 @@ THREE.SkeletonHelper = function ( skeleton, jointBoxSize, scaleRatio ) {
 			lineGeometry.colors.push( new THREE.Color( 0, 0, 0 ) );
 
 			bone.helper.line = new THREE.Line( lineGeometry, lineMaterial );
-			this.add( bone.helper.line);
+			this.add( bone.helper.line );
 
 		}
 
