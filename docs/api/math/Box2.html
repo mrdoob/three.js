@@ -43,7 +43,7 @@
 
 
 
-		<h3>.set([page:Vector2 min], [page:Vector2 max]) [page:todo]</h3>
+		<h3>.set([page:Vector2 min], [page:Vector2 max]) [page:Box2 this]</h3>
 		<div>
 		min -- Lower (x, y) boundary of the box. <br />
 		max -- Upper (x, y) boundary of the box.
@@ -52,7 +52,7 @@
 		Sets the lower and upper (x, y) boundaries of this box.
 		</div>
 
-		<h3>.expandByPoint([page:Vector2 point]) [page:Box2]</h3>
+		<h3>.expandByPoint([page:Vector2 point]) [page:Box2 this]</h3>
 		<div>
 		point -- Point that should be included in the box.
 		</div>
@@ -77,7 +77,7 @@
 		Determines whether or not this box intersects *box*.
 		</div>
 
-		<h3>.setFromPoints([page:Array points]) [page:Box2]</h3>
+		<h3>.setFromPoints([page:Array points]) [page:Box2 this]</h3>
 		<div>
 		points -- Set of points that the resulting box will envelop.
 		</div>
@@ -103,7 +103,7 @@
 		lower bounds.
 		</div>
 
-		<h3>.getParameter([page:Vector2 point]) [page:Vector2]</h3>
+		<h3>.getParameter([page:Vector2 point], [page:Vector2 optionalTarget]) [page:Vector2]</h3>
 		<div>
 		point -- Point to parametrize.
 		</div>
@@ -111,7 +111,7 @@
 		Returns point as a proportion of this box's width and height.
 		</div>
 
-		<h3>.expandByScalar([page:float scalar]) [page:Box2]</h3>
+		<h3>.expandByScalar([page:float scalar]) [page:Box2 this]</h3>
 		<div>
 		scalar -- Distance to expand.
 		</div>
@@ -120,7 +120,7 @@
 		will be contracted.
 		</div>
 
-		<h3>.intersect([page:Box2 box]) [page:Box2]</h3>
+		<h3>.intersect([page:Box2 box]) [page:Box2 this]</h3>
 		<div>
 		box -- Box to intersect with.
 		</div>
@@ -139,7 +139,7 @@
 		this function also returns true. 
 		</div>
 
-		<h3>.translate([page:Vector2 offset]) [page:Box2]</h3>
+		<h3>.translate([page:Vector2 offset]) [page:Box2 this]</h3>
 		<div>
 		offset -- Direction and distance of offset.
 		</div>
@@ -168,7 +168,7 @@
 		Returns true if this box and *box* share the same lower and upper bounds.
 		</div>
 
-		<h3>.expandByVector([page:Vector2 vector]) [page:Box2]</h3>
+		<h3>.expandByVector([page:Vector2 vector]) [page:Box2 this]</h3>
 		<div>
 		vector -- Amount to expand this box in each dimension.
 		</div>
@@ -178,7 +178,7 @@
 		this box will be expanded by the y component of *vector* in both directions.
 		</div>
 
-		<h3>.copy([page:Box2 box]) [page:Box2]</h3>
+		<h3>.copy([page:Box2 box]) [page:Box2 this]</h3>
 		<div>
 		box -- Box to copy.
 		</div>
@@ -186,7 +186,7 @@
 		Copies the values of *box* to this box.
 		</div>
 
-		<h3>.makeEmpty() [page:Box2]</h3>
+		<h3>.makeEmpty() [page:Box2 this]</h3>
 		<div>
 		Makes this box empty.
 		</div>
@@ -210,13 +210,13 @@
 
 		<h3>.containsPoint([page:Vector2 point]) [page:Boolean]</h3>
 		<div>
-		point -- Point to check for inclusion.
+		point -- [page:Vector2] to check for inclusion.
 		</div>
 		<div>
 		Returns true if the specified point lies within the boundaries of this box.
 		</div>
 
-		<h3>.setFromCenterAndSize([page:Vector2 center], [page:Vector2 size]) [page:Box2]</h3>
+		<h3>.setFromCenterAndSize([page:Vector2 center], [page:Vector2 size]) [page:Box2 this]</h3>
 		<div>
 		center -- Desired center position of the box. <br />
 		size -- Desired x and y dimensions of the box. 

@@ -54,6 +54,8 @@ THREE.Box3.prototype = {
 			this.max.z = point.z;
 
 		}
+		
+		return this;
 
 	},
 
