@@ -58,7 +58,7 @@
 			var camera, scene;
 			var renderer;
 
-			var mesh;
+			var mesh, helper;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -153,7 +153,11 @@
 				//
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "models/skinned/knight.js", function ( geometry, materials ) { createScene( geometry, materials, 0, FLOOR, -300, 60 ) } );
+				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
+
+					createScene( geometry, materials, 0, FLOOR, -300, 60 )
+
+				} );
 
 				//
 
@@ -246,6 +250,11 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
+				helper = new THREE.SkeletonHelper( mesh.skeleton );
+				helper.position.copy( mesh.position );
+				helper.scale.copy( mesh.scale );
+				scene.add( helper );
+
 				var animation = new THREE.Animation( mesh, geometry.animation.name );
 				animation.play();
 
@@ -281,6 +290,8 @@
 				// update skinning
 
 				THREE.AnimationHandler.update( delta );
+
+				if ( helper !== undefined ) helper.update();
 
 				// update morphs
 
