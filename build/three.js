@@ -37265,104 +37265,67 @@ THREE.PointLightHelper.prototype.update = function () {
 /**
  * @author Sean Griffin / http://twitter.com/sgrif
  * @author Michael Guerrero / http://realitymeltdown.com
+ * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SkeletonHelper = function ( skeleton, jointBoxSize, scaleRatio ) {
+THREE.SkeletonHelper = function ( skeleton ) {
 
-	THREE.Object3D.call( this );
+	var geometry = new THREE.Geometry();
 
-	this.scaleRatio = ( scaleRatio !== undefined ) ? scaleRatio : 1;
-	this.skeleton = skeleton;
-
-	if ( jointBoxSize === undefined ) jointBoxSize = 1;
-	
-	var boxSize = jointBoxSize * this.scaleRatio;
-
-	for ( var i = 0; i < skeleton.bones.length; ++i ) {
+	for ( var i = 0; i < skeleton.bones.length; i ++ ) {
 
 		var bone = skeleton.bones[ i ];
-		var boxGeometry = new THREE.BoxGeometry( boxSize, boxSize, boxSize );
-		var boxMaterial = new THREE.MeshBasicMaterial( { depthTest: false, depthWrite: false } );
-
-		bone.helper = {};
-		bone.helper.box = new THREE.Mesh( boxGeometry, boxMaterial );
-		bone.helper.axes = new THREE.AxisHelper( jointBoxSize * 3 );
-
-		this.add( bone.helper.box );
-		this.add( bone.helper.axes );
 
 		if ( bone.parent instanceof THREE.Bone ) {
 
-			var lineMaterial = new THREE.LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false } );
-			var lineGeometry = new THREE.Geometry();
-
-			lineGeometry.vertices.push( new THREE.Vector3() );
-			lineGeometry.vertices.push( new THREE.Vector3() );
-			lineGeometry.colors.push( new THREE.Color( 1, 1, 0 ) );
-			lineGeometry.colors.push( new THREE.Color( 0, 0, 0 ) );
-
-			bone.helper.line = new THREE.Line( lineGeometry, lineMaterial );
-			this.add( bone.helper.line );
+			geometry.vertices.push( new THREE.Vector3() );
+			geometry.vertices.push( new THREE.Vector3() );
+			geometry.colors.push( new THREE.Color( 0, 0, 1 ) );
+			geometry.colors.push( new THREE.Color( 0, 1, 0 ) );
 
 		}
 
 	}
 
+	var material = new THREE.LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, transparent: true } );
+
+	THREE.Line.call( this, geometry, material, THREE.LinePieces );
+
+	this.skeleton = skeleton;
+
 	this.update();
+
 };
 
 
-THREE.SkeletonHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.SkeletonHelper.prototype = Object.create( THREE.Line.prototype );
 
 THREE.SkeletonHelper.prototype.update = function () {
 
-	for ( var i = 0; i < this.skeleton.bones.length; ++i ) {
+	var geometry = this.geometry;
+
+	var j = 0;
+
+	for ( var i = 0; i < this.skeleton.bones.length; i ++ ) {
 
 		var bone = this.skeleton.bones[ i ];
 
-		if ( this.visible && bone.parent instanceof THREE.Bone ) {
+		if ( bone.parent instanceof THREE.Bone ) {
 
-			bone.skinMatrix.decompose( bone.helper.box.position, bone.helper.box.quaternion, bone.helper.box.scale );
-			bone.helper.box.position.multiplyScalar( this.scaleRatio );
+			geometry.vertices[ j ].setFromMatrixPosition( bone.skinMatrix );
+			geometry.vertices[ j + 1 ].setFromMatrixPosition( bone.parent.skinMatrix );
 
-			bone.helper.axes.quaternion = bone.helper.box.quaternion;
-			bone.helper.axes.position = bone.helper.box.position;
-			bone.helper.axes.scale = bone.helper.box.scale;
-
-			bone.helper.line.geometry.vertices[0].setFromMatrixPosition( bone.skinMatrix );
-			bone.helper.line.geometry.vertices[0].multiplyScalar( this.scaleRatio );
-
-			bone.helper.line.geometry.vertices[1].setFromMatrixPosition( bone.parent.skinMatrix );
-			bone.helper.line.geometry.vertices[1].multiplyScalar( this.scaleRatio );
-
-			bone.helper.line.geometry.verticesNeedUpdate = true;
+			j += 2;
 
 		}
 
 	}
+
+	geometry.verticesNeedUpdate = true;
+
+	geometry.computeBoundingSphere();
 
 };
-
-THREE.SkeletonHelper.prototype.setVisible = function ( shouldBeVisible ) {
-
-	for ( var i = 0; i < this.skeleton.bones.length; ++i ) {
-
-		var bone = this.skeleton.bones[ i ];
-		if ( bone.helper ) {
-
-			bone.helper.box.visible = shouldBeVisible;
-			bone.helper.axes.visible = shouldBeVisible;
-
-			if ( bone.parent instanceof THREE.Bone ) {
-
-				 bone.helper.line.visible = shouldBeVisible;
-
-			}
-
-		}
-
-	}
-}
 
 /**
  * @author alteredq / http://alteredqualia.com/
