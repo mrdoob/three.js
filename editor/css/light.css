@@ -30,7 +30,7 @@ button {
 
 .CollapsiblePanel .CollapsiblePanelButton {
 	float: left;
-	margin-right: 4px;
+	margin-right: 6px;
 	width: 0px;
 	height: 0px;
 	border: 6px solid transparent;
@@ -38,12 +38,12 @@ button {
 
 .CollapsiblePanel.collapsed .CollapsiblePanelButton {
 	margin-top: 2px;
-	border-left-color: #333;
+	border-left-color: #bbb;
 }
 
 .CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
 	margin-top: 6px;
-	border-top-color: #333;
+	border-top-color: #bbb;
 }
 
 .CollapsiblePanel.collapsed .CollapsibleContent {

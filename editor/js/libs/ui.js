@@ -143,6 +143,7 @@ UI.Panel.prototype.clear = function () {
 UI.CollapsiblePanel = function () {
 
 	UI.Panel.call( this );
+
 	this.dom.className = 'Panel CollapsiblePanel';
 
 	this.button = document.createElement( 'div' );
