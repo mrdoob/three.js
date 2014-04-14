@@ -13,10 +13,10 @@ Sidebar.Renderer = function ( editor ) {
 
 	};
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 
-	container.add( new UI.Text( 'RENDERER' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text( 'RENDERER' ) );
+	container.add( new UI.Break() );
 
 	// class
 
