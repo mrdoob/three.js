@@ -153,6 +153,10 @@ input.Number {
 		margin-bottom: 10px;
 	}
 
+	#sidebar .Panel.collapsed {
+		margin-bottom: 0px;
+	}
+
 	#sidebar > .Panel {
 		color: #888;
 		padding: 10px;
