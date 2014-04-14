@@ -2,10 +2,10 @@ Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 
-	container.add( new UI.Text( 'SCENE' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text( 'SCENE' ) );
+	container.add( new UI.Break() );
 
 	var outliner = new UI.FancySelect().setId( 'outliner' );
 	outliner.onChange( function () {
