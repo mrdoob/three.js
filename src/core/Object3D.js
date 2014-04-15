@@ -546,7 +546,7 @@ THREE.EventDispatcher.prototype.apply( THREE.Object3D.prototype );
 
 THREE.Object3DIdCount = 0;
 
-THREE.Object3D.prototype.serialize = function( exporters ) {
+THREE.Object3D.prototype.toJSON = function( exporters ) {
 
 	var data = {};
 
@@ -565,7 +565,7 @@ THREE.Object3D.prototype.serialize = function( exporters ) {
 
 		for ( var i = 0; i < this.children.length; i ++ ) {
 
-			data.children.push( this.children[ i ].serialize( exporters ) );
+			data.children.push( this.children[ i ].toJSON( exporters ) );
 
 		}
 
@@ -575,15 +575,15 @@ THREE.Object3D.prototype.serialize = function( exporters ) {
 
 };
 
-THREE.Object3D.deserialize = function( data, geometries, materials ) {
+THREE.Object3D.fromJSON = function( data, geometries, materials ) {
 
 	var object = new THREE.Object3D();
-  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
 	return object;
 
 };
 
-THREE.Object3D.deserializeCommon = function( data, geometries, materials ) {
+THREE.Object3D.fromJSONCommon = function( data, geometries, materials ) {
 
 	var parseObject = THREE.ObjectLoader.prototype.parseObject;
 	var matrix = new THREE.Matrix4();

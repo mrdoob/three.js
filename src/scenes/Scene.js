@@ -129,9 +129,9 @@ THREE.Scene.prototype.clone = function ( object ) {
 
 };
 
-THREE.Scene.prototype.serialize = function( exporters ) {
+THREE.Scene.prototype.toJSON = function( exporters ) {
 
-	var data = THREE.Object3D.prototype.serialize.call( this, exporters );
+	var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
 	
 	data.type = 'Scene';
 
@@ -139,10 +139,10 @@ THREE.Scene.prototype.serialize = function( exporters ) {
 
 };
 
-THREE.Scene.deserialize = function( data, geometries, materials ) {
+THREE.Scene.fromJSON = function( data, geometries, materials ) {
   
   var object = new THREE.Scene();
-  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
   return object;
 
 };

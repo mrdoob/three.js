@@ -20,9 +20,9 @@ THREE.AmbientLight.prototype.clone = function () {
 
 };
 
-THREE.AmbientLight.prototype.serialize = function( exporters ) {
+THREE.AmbientLight.prototype.toJSON = function( exporters ) {
 
-  var data = THREE.Object3D.prototype.serialize.call( this, exporters );
+  var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
   
   data.type = 'AmbientLight';
   data.color = this.color.getHex();
@@ -31,10 +31,10 @@ THREE.AmbientLight.prototype.serialize = function( exporters ) {
 
 };
 
-THREE.AmbientLight.deserialize = function( data, geometries, materials ) {
+THREE.AmbientLight.fromJSON = function( data, geometries, materials ) {
   
   var object = new THREE.AmbientLight( data.color );
-  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
   return object;
 
 };

@@ -109,9 +109,9 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-THREE.TorusKnotGeometry.prototype.serialize = function ( exporters ) {
+THREE.TorusKnotGeometry.prototype.toJSON = function ( exporters ) {
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'TorusKnotGeometry';
 	data.radius = this.radius;
 	data.tube = this.tube;
@@ -123,7 +123,7 @@ THREE.TorusKnotGeometry.prototype.serialize = function ( exporters ) {
 
 };
 
-THREE.TorusKnotGeometry.deserialize = function (data, loaders) {
+THREE.TorusKnotGeometry.fromJSON = function (data, loaders) {
 
 	var geometry = new THREE.TorusKnotGeometry(
 		data.radius,

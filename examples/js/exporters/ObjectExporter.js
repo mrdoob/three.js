@@ -39,7 +39,7 @@ THREE.ObjectExporter.prototype = {
 
 			if ( geometries[ geometry.uuid ] === undefined ) {
 
-				var data = geometry.serialize( exporters );
+				var data = geometry.toJSON( exporters );
 
 				geometries[ geometry.uuid ] = data;
 
@@ -65,7 +65,7 @@ THREE.ObjectExporter.prototype = {
 
 			if ( materials[ material.uuid ] === undefined ) {
 
-				var data = material.serialize();
+				var data = material.toJSON();
 
 				materials[ material.uuid ] = data;
 
@@ -82,7 +82,7 @@ THREE.ObjectExporter.prototype = {
 		exporters.parseMaterial = parseMaterial;
 		exporters.parseGeometry = parseGeometry;
 
-		output.object = object.serialize( exporters );
+		output.object = object.toJSON( exporters );
 
 		return output;
 

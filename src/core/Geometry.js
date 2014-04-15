@@ -663,7 +663,7 @@ THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
 
 THREE.GeometryIdCount = 0;
 
-THREE.Geometry.prototype.serialize = function ( exporters ) {
+THREE.Geometry.prototype.toJSON = function ( exporters ) {
 
 	if ( exporters === undefined ) exporters = {};
 
@@ -671,7 +671,7 @@ THREE.Geometry.prototype.serialize = function ( exporters ) {
 		exporters.geometryExporter = new THREE.GeometryExporter();
 	}
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 
 	data.type = 'Geometry';
 	data.data = exporters.geometryExporter.parse( geometry );
@@ -680,7 +680,7 @@ THREE.Geometry.prototype.serialize = function ( exporters ) {
 
 };
 
-THREE.Geometry.serializeCommon = function() {
+THREE.Geometry.toJSONCommon = function() {
 	
 	var data = {};
 
@@ -692,7 +692,7 @@ THREE.Geometry.serializeCommon = function() {
 };
 
 
-THREE.Geometry.deserialize = function (data, loaders) {
+THREE.Geometry.fromJSON = function (data, loaders) {
 
 	var geometry = loaders.geometryLoader.parse( data.data ).geometry;
 	return geometry;

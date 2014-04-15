@@ -132,7 +132,7 @@ THREE.EventDispatcher.prototype.apply( THREE.Material.prototype );
 
 THREE.MaterialIdCount = 0;
 
-THREE.Material.prototype.serialize = function () {
+THREE.Material.prototype.toJSON = function () {
 		
 		var data = {};
 		

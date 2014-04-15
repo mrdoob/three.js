@@ -62,9 +62,9 @@ THREE.Mesh.prototype.clone = function ( object, recursive ) {
 
 };
 
-THREE.Mesh.prototype.serialize = function( exporters ) {
+THREE.Mesh.prototype.toJSON = function( exporters ) {
 
-	var data = THREE.Object3D.prototype.serialize.call( this, exporters )
+	var data = THREE.Object3D.prototype.toJSON.call( this, exporters )
 	
 	data.type = 'Mesh';
 	data.geometry = exporters.parseGeometry( this.geometry );
@@ -74,25 +74,25 @@ THREE.Mesh.prototype.serialize = function( exporters ) {
 
 };
 
-THREE.Mesh.deserialize = function( data, geometries, materials ) {
+THREE.Mesh.fromJSON = function( data, geometries, materials ) {
 
 	var geometry = geometries[ data.geometry ];
 	var material = materials[ data.material ];
 
 	if ( geometry === undefined ) {
 
-		console.error( 'THREE.Mesh.deserialize: Undefined geometry ' + data.geometry );
+		console.error( 'THREE.Mesh.fromJSON: Undefined geometry ' + data.geometry );
 
 	}
 
 	if ( material === undefined ) {
 
-		console.error( 'THREE.Mesh.deserialize: Undefined material ' + data.material );
+		console.error( 'THREE.Mesh.fromJSON: Undefined material ' + data.material );
 
 	}
 
 	var object = new THREE.Mesh( geometry, material );
-	THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
 	return object;
 
 };

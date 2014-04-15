@@ -76,9 +76,9 @@ THREE.SpotLight.prototype.clone = function () {
 
 };
 
-THREE.SpotLight.prototype.serialize = function( exporters ) {
+THREE.SpotLight.prototype.toJSON = function( exporters ) {
 
-  var data = THREE.Object3D.prototype.serialize.call( this, exporters );
+  var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
 	
 	data.type = 'SpotLight';
 	data.color = this.color.getHex();
@@ -91,10 +91,10 @@ THREE.SpotLight.prototype.serialize = function( exporters ) {
 
 };
 
-THREE.SpotLight.deserialize = function( data, geometries, materials ) {
+THREE.SpotLight.fromJSON = function( data, geometries, materials ) {
   
   var object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
-  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
   return object;
 
 };

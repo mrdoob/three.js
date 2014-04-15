@@ -46,9 +46,9 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
-THREE.Sprite.prototype.serialize = function( exporters ) {
+THREE.Sprite.prototype.toJSON = function( exporters ) {
 
-	var data = THREE.Object3D.prototype.serialize.call( this, data, exporters )
+	var data = THREE.Object3D.prototype.toJSON.call( this, data, exporters )
 
 	data.type = 'Sprite';
 	data.material = exporters.parseMaterial( this.material );
@@ -57,18 +57,18 @@ THREE.Sprite.prototype.serialize = function( exporters ) {
 
 };
 
-THREE.Sprite.deserialize = function( data, geometries, materials ) {
+THREE.Sprite.fromJSON = function( data, geometries, materials ) {
 
 	var material = materials[ data.material ];
 
 	if ( material === undefined ) {
 
-		console.error( 'THREE.Sprite.deserialize: Undefined material ' + data.material );
+		console.error( 'THREE.Sprite.fromJSON: Undefined material ' + data.material );
 
 	}
 
 	var object = new THREE.Sprite( material );
-	THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
 	return object;
 
 };

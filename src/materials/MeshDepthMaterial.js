@@ -40,9 +40,9 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshDepthMaterial.prototype.serialize = function () {
+THREE.MeshDepthMaterial.prototype.toJSON = function () {
 
-  var data = THREE.Material.prototype.serialize.call(this);
+  var data = THREE.Material.prototype.toJSON.call(this);
   data.type = 'MeshDepthMaterial';
   if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
   if ( this.side !== THREE.FrontSide ) data.side = this.side;

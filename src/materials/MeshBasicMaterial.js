@@ -107,9 +107,9 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshBasicMaterial.prototype.serialize = function () {
+THREE.MeshBasicMaterial.prototype.toJSON = function () {
 
-	var data = THREE.Material.prototype.serialize.call(this);
+	var data = THREE.Material.prototype.toJSON.call(this);
 	data.type = 'MeshBasicMaterial';
 	data.color = this.color.getHex();
 	if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;

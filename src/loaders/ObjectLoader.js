@@ -61,7 +61,7 @@ THREE.ObjectLoader.prototype = {
 				if (data.type === 'CubeGeometry') data.type = 'BoxGeometry'
 
 				var GeometryClass = THREE[ data.type ];
-				var geometry = GeometryClass.deserialize( data, loaders );
+				var geometry = GeometryClass.fromJSON( data, loaders );
 
 				geometry.uuid = data.uuid;
 
@@ -103,7 +103,7 @@ THREE.ObjectLoader.prototype = {
 	parseObject: function ( data, geometries, materials ) {
 			
 		var ObjectClass = THREE[ data.type ];
-		var object = ObjectClass.deserialize( data, geometries, materials );
+		var object = ObjectClass.fromJSON( data, geometries, materials );
 
 		return object;
 

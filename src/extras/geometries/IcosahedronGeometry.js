@@ -30,16 +30,16 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 
 THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-THREE.IcosahedronGeometry.prototype.serialize = function ( exporters ) {
+THREE.IcosahedronGeometry.prototype.toJSON = function ( exporters ) {
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'IcosahedronGeometry';
 	data.radius = this.radius;
 	data.detail = this.detail;
 
 };
 
-THREE.IcosahedronGeometry.deserialize = function (data, loaders) {
+THREE.IcosahedronGeometry.fromJSON = function (data, loaders) {
 
 	var geometry = new THREE.IcosahedronGeometry(
 		data.radius,

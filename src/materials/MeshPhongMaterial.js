@@ -151,9 +151,9 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshPhongMaterial.prototype.serialize = function () {
+THREE.MeshPhongMaterial.prototype.toJSON = function () {
 
-  var data = THREE.Material.prototype.serialize.call(this);
+  var data = THREE.Material.prototype.toJSON.call(this);
 	data.type = 'MeshPhongMaterial';
 	data.color = this.color.getHex();
 	data.ambient = this.ambient.getHex();

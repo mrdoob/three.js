@@ -123,9 +123,9 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-THREE.BoxGeometry.prototype.serialize = function ( exporters ) {
+THREE.BoxGeometry.prototype.toJSON = function ( exporters ) {
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'BoxGeometry';
 	data.width = this.width;
 	data.height = this.height;
@@ -136,7 +136,7 @@ THREE.BoxGeometry.prototype.serialize = function ( exporters ) {
 	
 };
 
-THREE.BoxGeometry.deserialize = function (data, loaders) {
+THREE.BoxGeometry.fromJSON = function (data, loaders) {
 
 	var geometry = new THREE.BoxGeometry(
 		data.width,

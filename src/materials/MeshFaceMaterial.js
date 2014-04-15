@@ -22,15 +22,15 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshFaceMaterial.prototype.serialize = function () {
+THREE.MeshFaceMaterial.prototype.toJSON = function () {
 
-  var data = THREE.Material.prototype.serialize.call(this);
+  var data = THREE.Material.prototype.toJSON.call(this);
   data.type = 'MeshFaceMaterial';
   data.materials = [];
 
   for ( var i = 0, l = this.materials.length; i < l; i ++ ) {
 
-    data.materials.push( this.materials[ i ].serialize() );
+    data.materials.push( this.materials[ i ].toJSON() );
 
   }
 

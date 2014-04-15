@@ -109,9 +109,9 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-THREE.SphereGeometry.prototype.serialize = function ( exporters ) {
+THREE.SphereGeometry.prototype.toJSON = function ( exporters ) {
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'SphereGeometry';
 	data.radius = this.radius;
 	data.widthSegments = this.widthSegments;
@@ -123,7 +123,7 @@ THREE.SphereGeometry.prototype.serialize = function ( exporters ) {
 
 };
 
-THREE.SphereGeometry.deserialize = function (data, loaders) {
+THREE.SphereGeometry.fromJSON = function (data, loaders) {
 
 	var geometry = new THREE.SphereGeometry(
 		data.radius,

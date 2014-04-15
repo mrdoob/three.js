@@ -123,9 +123,9 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshLambertMaterial.prototype.serialize = function () {
+THREE.MeshLambertMaterial.prototype.toJSON = function () {
 
-  var data = THREE.Material.prototype.serialize.call(this);
+  var data = THREE.Material.prototype.toJSON.call(this);
 	data.type = 'MeshLambertMaterial';
 	data.color = this.color.getHex();
 	data.ambient = this.ambient.getHex();

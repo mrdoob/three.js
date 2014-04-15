@@ -87,9 +87,9 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
-THREE.PlaneGeometry.prototype.serialize = function ( exporters ) {
+THREE.PlaneGeometry.prototype.toJSON = function ( exporters ) {
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'PlaneGeometry';
 	data.width = this.width;
 	data.height = this.height;
@@ -98,7 +98,7 @@ THREE.PlaneGeometry.prototype.serialize = function ( exporters ) {
 	
 };
 
-THREE.PlaneGeometry.deserialize = function (data, loaders) {
+THREE.PlaneGeometry.fromJSON = function (data, loaders) {
 
 	var geometry = new THREE.PlaneGeometry(
 		data.width,

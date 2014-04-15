@@ -72,16 +72,16 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 THREE.CircleGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
-THREE.CircleGeometry.prototype.serialize = function ( exporters ) {
+THREE.CircleGeometry.prototype.toJSON = function ( exporters ) {
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'CircleGeometry';
 	data.radius = this.radius;
 	data.segments = this.segments;
 	
 };
 
-THREE.CircleGeometry.deserialize = function (data, loaders) {
+THREE.CircleGeometry.fromJSON = function (data, loaders) {
 
 	var geometry = new THREE.CircleGeometry(
 		data.radius,

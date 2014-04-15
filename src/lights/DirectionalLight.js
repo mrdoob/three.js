@@ -109,9 +109,9 @@ THREE.DirectionalLight.prototype.clone = function () {
 
 };
 
-THREE.DirectionalLight.prototype.serialize = function( exporters ) {
+THREE.DirectionalLight.prototype.toJSON = function( exporters ) {
 
-  var data = THREE.Object3D.prototype.serialize.call(this, exporters);
+  var data = THREE.Object3D.prototype.toJSON.call(this, exporters);
 	
 	data.type = 'DirectionalLight';
 	data.color = this.color.getHex();
@@ -122,10 +122,10 @@ THREE.DirectionalLight.prototype.serialize = function( exporters ) {
 };
 
 
-THREE.DirectionalLight.deserialize = function( data, geometries, materials ) {
+THREE.DirectionalLight.fromJSON = function( data, geometries, materials ) {
   
   var object = new THREE.DirectionalLight( data.color, data.intensity );
-  THREE.Object3D.deserializeCommon.call( object, data, geometries, materials );
+  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
   return object;
 
 };

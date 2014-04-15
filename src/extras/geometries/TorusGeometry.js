@@ -75,9 +75,9 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-THREE.TorusGeometry.prototype.serialize = function ( exporters ) {
+THREE.TorusGeometry.prototype.toJSON = function ( exporters ) {
 
-	var data = THREE.Geometry.serializeCommon.call( this );
+	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'TorusGeometry';
 	data.radius = this.radius;
 	data.tube = this.tube;
@@ -87,7 +87,7 @@ THREE.TorusGeometry.prototype.serialize = function ( exporters ) {
 
 };
 
-THREE.TorusGeometry.deserialize = function (data, loaders) {
+THREE.TorusGeometry.fromJSON = function (data, loaders) {
 
 	var geometry = new THREE.TorusGeometry(
 		data.radius,
