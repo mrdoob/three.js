@@ -8,7 +8,8 @@ function BlendCharacterGui(animations) {
 
 		gui: null,
 		"Lock Camera": false,
-		"Show Skeleton": true,
+		"Show Model": true,
+		"Show Skeleton": false,
 		"Time Scale": 1.0,
 		"Step Size": 0.016,
 		"Crossfade Time": 3.5,
@@ -19,6 +20,12 @@ function BlendCharacterGui(animations) {
 	};
 
 	var animations = animations;
+
+	this.showModel = function() {
+
+		return controls['Show Model'];
+
+	};
 
 	this.showSkeleton = function() {
 
@@ -49,6 +56,7 @@ function BlendCharacterGui(animations) {
 		var blending = controls.gui.addFolder( 'Blend Tuning' );
 
 		settings.add( controls, "Lock Camera" ).onChange( controls.lockCameraChanged );
+		settings.add( controls, "Show Model" ).onChange( controls.showModelChanged );
 		settings.add( controls, "Show Skeleton" ).onChange( controls.showSkeletonChanged );
 		settings.add( controls, "Time Scale", 0, 1, 0.01 );
 		settings.add( controls, "Step Size", 0.01, 0.1, 0.01 );
@@ -186,6 +194,18 @@ function BlendCharacterGui(animations) {
 		}
 
 		window.dispatchEvent( new CustomEvent( 'toggle-show-skeleton', data ) );
+	}
+
+
+	controls.showModelChanged = function() {
+
+		var data = {
+			detail: {
+				shouldShow: controls['Show Model']
+			}
+		}
+
+		window.dispatchEvent( new CustomEvent( 'toggle-show-model', data ) );
 	}
 
 

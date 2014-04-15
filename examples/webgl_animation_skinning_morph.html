@@ -47,6 +47,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<script src="js/libs/dat.gui.min.js"></script>
+
 		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
@@ -159,6 +161,10 @@
 
 				} );
 
+				// GUI
+
+				initGUI();
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -250,13 +256,28 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				helper = new THREE.SkeletonHelper( mesh.skeleton );
-				helper.position.copy( mesh.position );
-				helper.scale.copy( mesh.scale );
+				helper = new THREE.SkeletonHelper( mesh );
+				helper.material.linewidth = 3;
+				helper.visible = false;
 				scene.add( helper );
 
 				var animation = new THREE.Animation( mesh, geometry.animation.name );
 				animation.play();
+
+			}
+
+			function initGUI() {
+
+				var API = {
+					'show model'    : true,
+					'show skeleton' : false
+				};
+
+				var gui = new dat.GUI();
+
+				gui.add( API, 'show model' ).onChange( function() { mesh.visible = API[ 'show model' ]; } );
+
+				gui.add( API, 'show skeleton' ).onChange( function() { helper.visible = API[ 'show skeleton' ]; } );
 
 			}
 
