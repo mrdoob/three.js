@@ -18,9 +18,9 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
+	this.morphTargets = false;
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
-	this.morphTargets = false; // need to create key in order for setValues() to work
 
 	this.setValues( parameters );
 
