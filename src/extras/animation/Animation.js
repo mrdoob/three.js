@@ -32,10 +32,9 @@ THREE.Animation.prototype.play = function ( startTime, weight ) {
 	this.weight = weight !== undefined ? weight: 1;
 
 	this.isPlaying = true;
-	this.reset();
-	this.update( 0 );
-
 	this.isPaused = false;
+
+	this.reset();
 
 	THREE.AnimationHandler.addToUpdate( this );
 
