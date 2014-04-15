@@ -37268,7 +37268,9 @@ THREE.PointLightHelper.prototype.update = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SkeletonHelper = function ( skeleton ) {
+THREE.SkeletonHelper = function ( object ) {
+
+	var skeleton = object.skeleton;
 
 	var geometry = new THREE.Geometry();
 
@@ -37292,6 +37294,9 @@ THREE.SkeletonHelper = function ( skeleton ) {
 	THREE.Line.call( this, geometry, material, THREE.LinePieces );
 
 	this.skeleton = skeleton;
+
+	this.matrixWorld = object.matrixWorld;
+	this.matrixAutoUpdate = false;
 
 	this.update();
 
