@@ -14,6 +14,7 @@ Sidebar.Renderer = function ( editor ) {
 	};
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( true );
 
 	container.addStatic( new UI.Text( 'RENDERER' ) );
 	container.add( new UI.Break() );
