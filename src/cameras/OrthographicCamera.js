@@ -60,9 +60,9 @@ THREE.OrthographicCamera.prototype.toJSON = function( exporters ) {
 };
 
 THREE.OrthographicCamera.fromJSON = function( data, geometries, materials ) {
-  
-  var object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
-  return object;
+
+	var object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
 
 };

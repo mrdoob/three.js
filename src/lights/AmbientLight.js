@@ -22,19 +22,19 @@ THREE.AmbientLight.prototype.clone = function () {
 
 THREE.AmbientLight.prototype.toJSON = function( exporters ) {
 
-  var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
-  
-  data.type = 'AmbientLight';
-  data.color = this.color.getHex();
+	var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
 
-  return data;
+	data.type = 'AmbientLight';
+	data.color = this.color.getHex();
+
+	return data;
 
 };
 
 THREE.AmbientLight.fromJSON = function( data, geometries, materials ) {
-  
-  var object = new THREE.AmbientLight( data.color );
-  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
-  return object;
+
+	var object = new THREE.AmbientLight( data.color );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
 
 };

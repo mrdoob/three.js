@@ -133,12 +133,12 @@ THREE.EventDispatcher.prototype.apply( THREE.Material.prototype );
 THREE.MaterialIdCount = 0;
 
 THREE.Material.prototype.toJSON = function () {
-		
-		var data = {};
-		
-		data.uuid = material.uuid;
-		if ( material.name !== "" ) data.name = material.name;
 
-		return data;
+	var data = {};
+
+	data.uuid = material.uuid;
+	if ( material.name !== "" ) data.name = material.name;
+
+	return data;
 
 };

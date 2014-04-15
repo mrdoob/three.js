@@ -57,7 +57,7 @@ THREE.SpriteMaterial.prototype.clone = function () {
 
 THREE.SpriteMaterial.prototype.toJSON = function () {
 
-  var data = THREE.Material.prototype.toJSON.call(this);
+	var data = THREE.Material.prototype.toJSON.call(this);
 	data.type = 'SpriteMaterial';
 	data.color = this.color.getHex();
 	data.opacity = this.opacity;

@@ -24,17 +24,17 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
 
 THREE.MeshFaceMaterial.prototype.toJSON = function () {
 
-  var data = THREE.Material.prototype.toJSON.call(this);
-  data.type = 'MeshFaceMaterial';
-  data.materials = [];
+	var data = THREE.Material.prototype.toJSON.call(this);
+	data.type = 'MeshFaceMaterial';
+	data.materials = [];
 
-  for ( var i = 0, l = this.materials.length; i < l; i ++ ) {
+	for ( var i = 0, l = this.materials.length; i < l; i ++ ) {
 
-    data.materials.push( this.materials[ i ].toJSON() );
+		data.materials.push( this.materials[ i ].toJSON() );
 
-  }
+	}
 
-  return data;
+	return data;
 
 };
 

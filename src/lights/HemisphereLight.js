@@ -30,20 +30,20 @@ THREE.HemisphereLight.prototype.clone = function () {
 
 THREE.HemisphereLight.prototype.toJSON = function( exporters ) {
 
-  var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
-  
-  data.type = 'HemisphereLight';
-  data.color = this.color.getHex();
-  data.groundColor = this.groundColor.getHex();
+	var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
 
-  return data;
+	data.type = 'HemisphereLight';
+	data.color = this.color.getHex();
+	data.groundColor = this.groundColor.getHex();
+
+	return data;
 
 };
 
 THREE.HemisphereLight.fromJSON = function( data, geometries, materials ) {
-  
-  var object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
-  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
-  return object;
+
+	var object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
 
 };

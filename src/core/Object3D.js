@@ -578,7 +578,7 @@ THREE.Object3D.prototype.toJSON = function( exporters ) {
 THREE.Object3D.fromJSON = function( data, geometries, materials ) {
 
 	var object = new THREE.Object3D();
-  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
 	return object;
 
 };

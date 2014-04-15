@@ -140,9 +140,9 @@ THREE.Scene.prototype.toJSON = function( exporters ) {
 };
 
 THREE.Scene.fromJSON = function( data, geometries, materials ) {
-  
-  var object = new THREE.Scene();
-  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
-  return object;
+
+	var object = new THREE.Scene();
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
 
 };

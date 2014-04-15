@@ -147,8 +147,8 @@ THREE.PerspectiveCamera.prototype.toJSON = function( exporters ) {
 
 THREE.PerspectiveCamera.fromJSON = function( data, geometries, materials ) {
   
-  var object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-  THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
-  return object;
+	var object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
 
 };
