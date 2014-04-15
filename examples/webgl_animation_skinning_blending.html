@@ -95,6 +95,7 @@
 				window.addEventListener( 'warp', onWarp );
 				window.addEventListener( 'toggle-lock-camera', onLockCameraToggle );
 				window.addEventListener( 'toggle-show-skeleton', onShowSkeleton );
+				window.addEventListener( 'toggle-show-model', onShowModel );
 
 				blendMesh = new THREE.BlendCharacter();
 				blendMesh.load( "models/skinned/marine/marine_anims.js", start );
@@ -194,6 +195,13 @@
 
 				var shouldShow = event.detail.shouldShow;
 				blendMesh.showSkeleton( shouldShow );
+
+			}
+
+			function onShowModel( event ) {
+
+				var shouldShow = event.detail.shouldShow;
+				blendMesh.showModel( shouldShow );
 
 			}
 

@@ -33,10 +33,11 @@ THREE.BlendCharacter = function () {
 
 			// Create the debug visualization
 
-			scope.skeletonHelper = new THREE.SkeletonHelper( scope.skeleton );
+			scope.skeletonHelper = new THREE.SkeletonHelper( scope );
+			scope.skeletonHelper.material.linewidth = 3;
 			scope.add( scope.skeletonHelper );
 
-			scope.showSkeleton( true );
+			scope.showSkeleton( false );
 
 			// Loading is complete, fire the callback
 			if ( onLoad !== undefined ) onLoad();
@@ -237,6 +238,12 @@ THREE.BlendCharacter = function () {
 	this.showSkeleton = function( boolean ) {
 
 		this.skeletonHelper.visible = boolean;
+
+	}
+
+	this.showModel = function( boolean ) {
+
+		this.visible = boolean;
 
 	}
 
