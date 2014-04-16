@@ -53,9 +53,9 @@ THREE.ObjectLoader.prototype = {
 				bufferGeometryLoader: new THREE.BufferGeometryLoader()
 			};
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			Object.keys(json).forEach( function (uuid) {
 
-				var data = json[ i ];
+				var data = json[ uuid ];
 
 				// Backwards compatibility for depricated classes
 				if (data.type === 'CubeGeometry') data.type = 'BoxGeometry'
@@ -69,7 +69,7 @@ THREE.ObjectLoader.prototype = {
 
 				geometries[ data.uuid ] = geometry;
 
-			}
+			})
 
 		}
 
@@ -85,14 +85,14 @@ THREE.ObjectLoader.prototype = {
 
 			var loader = new THREE.MaterialLoader();
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			Object.keys(json).forEach( function (uuid) {
 
-				var data = json[ i ];
+				var data = json[ uuid ];
 				var material = loader.parse( data );
 
 				materials[ data.uuid ] = material;
 
-			}
+			})
 
 		}
 
