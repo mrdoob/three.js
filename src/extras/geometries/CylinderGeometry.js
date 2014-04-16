@@ -175,6 +175,8 @@ THREE.CylinderGeometry.prototype.toJSON = function ( exporters ) {
 	data.heightSegments = this.heightSegments;
 	data.openEnded = this.openEnded;
 
+	return data;
+
 };
 
 THREE.CylinderGeometry.fromJSON = function (data, loaders) {

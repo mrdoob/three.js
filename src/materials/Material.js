@@ -136,8 +136,8 @@ THREE.Material.prototype.toJSON = function () {
 
 	var data = {};
 
-	data.uuid = material.uuid;
-	if ( material.name !== "" ) data.name = material.name;
+	data.uuid = this.uuid;
+	if ( this.name !== "" ) data.name = this.name;
 
 	return data;
 

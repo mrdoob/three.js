@@ -45,7 +45,7 @@ THREE.OrthographicCamera.prototype.clone = function () {
 
 THREE.OrthographicCamera.prototype.toJSON = function( exporters ) {
 
-  var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
+	var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
 	
 	data.type = 'OrthographicCamera';
 	data.left = this.left;

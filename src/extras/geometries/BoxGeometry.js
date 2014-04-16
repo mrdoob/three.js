@@ -133,6 +133,8 @@ THREE.BoxGeometry.prototype.toJSON = function ( exporters ) {
 	data.widthSegments = this.widthSegments;
 	data.heightSegments = this.heightSegments;
 	data.depthSegments = this.depthSegments;
+
+	return data;
 	
 };
 

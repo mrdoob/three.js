@@ -121,6 +121,8 @@ THREE.TorusKnotGeometry.prototype.toJSON = function ( exporters ) {
 	data.q = this.q;
 	data.heightScale = this.heightScale;
 
+	return data;
+
 };
 
 THREE.TorusKnotGeometry.fromJSON = function (data, loaders) {
@@ -134,6 +136,7 @@ THREE.TorusKnotGeometry.fromJSON = function (data, loaders) {
 		data.q,
 		data.heightScale
 	);
+	
 	return geometry;
 
 };

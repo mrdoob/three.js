@@ -121,6 +121,8 @@ THREE.SphereGeometry.prototype.toJSON = function ( exporters ) {
 	data.thetaStart = this.thetaStart;
 	data.thetaLength = this.thetaLength;
 
+	return data;
+
 };
 
 THREE.SphereGeometry.fromJSON = function (data, loaders) {

@@ -674,9 +674,11 @@ THREE.Geometry.prototype.toJSON = function ( exporters ) {
 	var data = THREE.Geometry.toJSONCommon.call( this );
 
 	data.type = 'Geometry';
-	data.data = exporters.geometryExporter.parse( geometry );
+	data.data = exporters.geometryExporter.parse( this );
 
 	delete data.data.metadata;
+
+	return data
 
 };
 

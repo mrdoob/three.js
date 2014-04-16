@@ -85,6 +85,8 @@ THREE.TorusGeometry.prototype.toJSON = function ( exporters ) {
 	data.tubularSegments = this.tubularSegments;
 	data.arc = this.arc;
 
+	return data;
+
 };
 
 THREE.TorusGeometry.fromJSON = function (data, loaders) {

@@ -83,6 +83,8 @@ THREE.ObjectExporter.prototype = {
 		exporters.parseGeometry = parseGeometry;
 
 		output.object = object.toJSON( exporters );
+		output.materials = materials;
+		output.geometries = geometries;
 
 		return output;
 

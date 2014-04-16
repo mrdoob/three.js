@@ -136,6 +136,7 @@ THREE.MeshLambertMaterial.prototype.toJSON = function () {
 	data.opacity = this.opacity;
 	data.transparent = this.transparent;
 	data.wireframe = this.wireframe;
+	
 	return data;
 
 };

@@ -62,6 +62,7 @@ THREE.SpriteMaterial.prototype.toJSON = function () {
 	data.color = this.color.getHex();
 	data.opacity = this.opacity;
 	data.transparent = this.transparent;
+
 	return data;
 
 };

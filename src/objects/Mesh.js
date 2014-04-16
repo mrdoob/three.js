@@ -81,13 +81,13 @@ THREE.Mesh.fromJSON = function( data, geometries, materials ) {
 
 	if ( geometry === undefined ) {
 
-		console.error( 'THREE.Mesh.fromJSON: Undefined geometry ' + data.geometry );
+		throw new Error( 'THREE.Mesh.fromJSON: Undefined geometry ' + data.geometry );
 
 	}
 
 	if ( material === undefined ) {
 
-		console.error( 'THREE.Mesh.fromJSON: Undefined material ' + data.material );
+		throw new Error( 'THREE.Mesh.fromJSON: Undefined material ' + data.material );
 
 	}
 

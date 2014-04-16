@@ -95,7 +95,9 @@ THREE.PlaneGeometry.prototype.toJSON = function ( exporters ) {
 	data.height = this.height;
 	data.widthSegments = this.widthSegments;
 	data.heightSegments = this.heightSegments;
-	
+
+	return data;
+
 };
 
 THREE.PlaneGeometry.fromJSON = function (data, loaders) {

@@ -78,6 +78,8 @@ THREE.CircleGeometry.prototype.toJSON = function ( exporters ) {
 	data.type = 'CircleGeometry';
 	data.radius = this.radius;
 	data.segments = this.segments;
+
+	return data;
 	
 };
 
