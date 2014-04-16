@@ -112,28 +112,4 @@ Editor.ChangeHistory.prototype = {
         return this.transactionsPointer < (this.transactions.length - 1);
 
     },
-
-    addTestCube: function() {
-        var geometry,
-            material,
-            cube;
-
-        // Erzeugt eine Geometry und ein Material.
-        // Das Material soll die Farben der Geometry-Faces wiederspiegeln
-        geometry = new THREE.CubeGeometry(200, 200, 200);
-        material = new THREE.MeshBasicMaterial({ vertexColors: THREE.FaceColors });
-
-        // Verteile zufällige Farben auf den Geometry-Faces.
-        for (var i = 0; i < geometry.faces.length; i++) {
-            geometry.faces[i].color.setHex(Math.random() * 0xffffff);
-        }
-
-        // erzeugt eine konkrete Abbildung in Form
-        // eines Mesh, durch Geometry und Material
-        cube = new THREE.Mesh(geometry, material);
-        cube.position.y =  250;
-        cube.position.x = -550;
-
-        return cube;
-    }
 }
