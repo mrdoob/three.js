@@ -287,7 +287,7 @@ THREE.ColladaLoader = function () {
 
 	function recurseHierarchy( node ) {
 
-		var n = daeScene.getChildById( node.name, true ),
+		var n = daeScene.getChildById( node.id, true ),
 			newData = null;
 
 		if ( n && n.keys ) {
@@ -1114,6 +1114,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		obj.name = node.name || node.id || "";
+		obj.id = node.id || "";
 		obj.layer = node.layer || "";
 		obj.matrix = node.matrix;
 		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
@@ -1342,7 +1343,7 @@ THREE.ColladaLoader = function () {
 					for ( var j = 0, jl = input.length; j < jl; j++ ) {
 
 						var time = input[j],
-							data = sampler.getData( transform.type, j ),
+							data = sampler.getData( transform.type, j, member ),
 							key = findKey( keys, time );
 
 						if ( !key ) {
@@ -3370,9 +3371,31 @@ THREE.ColladaLoader = function () {
 				case 'diffuse':
 				case 'specular':
 				case 'transparent':
-				case 'bump':
 
 					this[ child.nodeName ] = ( new ColorOrTexture() ).parse( child );
+					break;
+
+				case 'bump':
+
+					// If 'bumptype' is 'heightfield', create a 'bump' property
+					// Else if 'bumptype' is 'normalmap', create a 'normal' property
+					// (Default to 'bump')
+					var bumpType = child.getAttribute( 'bumptype' );
+					if ( bumpType ) {
+						if ( bumpType.toLowerCase() === "heightfield" ) {
+							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
+						} else if ( bumpType.toLowerCase() === "normalmap" ) {
+							this[ 'normal' ] = ( new ColorOrTexture() ).parse( child );
+						} else {
+							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType + 
+								           ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
+							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
+						}
+					} else {
+						console.warn( "Shader.prototype.parse: Attribute 'bumptype' missing from bump node - defaulting to 'HEIGHTFIELD'" );
+						this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
+					}
+
 					break;
 
 				case 'shininess':
@@ -3424,10 +3447,11 @@ THREE.ColladaLoader = function () {
 		
 		var keys = {
 			'diffuse':'map', 
-			'ambient':"lightMap" ,
+			'ambient':'lightMap' ,
 			'specular':'specularMap',
 			'emission':'emissionMap',
-			'bump':'normalMap'
+			'bump':'bumpMap',
+			'normal':'normalMap'
 			};
 		
 		for ( var prop in this ) {
@@ -3439,6 +3463,7 @@ THREE.ColladaLoader = function () {
 				case 'diffuse':
 				case 'specular':
 				case 'bump':
+				case 'normal':
 
 					var cot = this[ prop ];
 
@@ -4111,7 +4136,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Sampler.prototype.getData = function ( type, ndx ) {
+	Sampler.prototype.getData = function ( type, ndx, member ) {
 
 		var data;
 
@@ -4157,6 +4182,10 @@ THREE.ColladaLoader = function () {
 
 			data = this.output[ ndx ];
 
+			if ( member && type == 'translate' ) {
+				data = getConvertedTranslation( member, data );
+			}
+			
 		}
 
 		return data;
@@ -4714,7 +4743,7 @@ THREE.ColladaLoader = function () {
 
 	function setUpConversion() {
 
-		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
+		if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
 
 			upConversion = null;
 
@@ -4745,7 +4774,7 @@ THREE.ColladaLoader = function () {
 
 	function fixCoords( data, sign ) {
 
-		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
+		if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
 
 			return;
 
@@ -4799,6 +4828,31 @@ THREE.ColladaLoader = function () {
 
 		}
 
+	};
+
+	function getConvertedTranslation( axis, data ) {
+
+		if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
+
+			return data;
+
+		}
+
+		switch ( axis ) {
+			case 'X':
+				data = upConversion == 'XtoY' ? data * -1 : data;
+				break;
+			case 'Y':
+				data = upConversion == 'YtoZ' || upConversion == 'YtoX' ? data * -1 : data;
+				break;
+			case 'Z':
+				data = upConversion == 'ZtoY' ? data * -1 : data ;
+				break;
+			default:
+				break;
+		}
+
+		return data;
 	};
 
 	function getConvertedVec3( data, offset ) {

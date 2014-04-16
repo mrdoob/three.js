@@ -8,7 +8,6 @@
  *   original technique is made by ArKano22 (http://www.gamedev.net/topic/550699-ssao-no-halo-artifacts/)
  * - modifications
  * - modified to use RGBA packed depth texture (use clear color 1,1,1,1 for depth pass)
- * - made fog more compatible with three.js linear fog
  * - refactoring and optimizations
  */
 
@@ -21,12 +20,9 @@ THREE.SSAOShader = {
 		"size":         { type: "v2", value: new THREE.Vector2( 512, 512 ) },
 		"cameraNear":   { type: "f", value: 1 },
 		"cameraFar":    { type: "f", value: 100 },
-		"fogNear":      { type: "f", value: 5 },
-		"fogFar":       { type: "f", value: 100 },
-		"fogEnabled":   { type: "i", value: 0 },
 		"onlyAO":       { type: "i", value: 0 },
-		"aoClamp":      { type: "f", value: 0.3 },
-		"lumInfluence": { type: "f", value: 0.9 }
+		"aoClamp":      { type: "f", value: 0.5 },
+		"lumInfluence": { type: "f", value: 0.5 }
 
 	},
 
@@ -49,10 +45,6 @@ THREE.SSAOShader = {
 		"uniform float cameraNear;",
 		"uniform float cameraFar;",
 
-		"uniform float fogNear;",
-		"uniform float fogFar;",
-
-		"uniform bool fogEnabled;",  // attenuate AO with linear fog
 		"uniform bool onlyAO;",      // use only ambient occlusion pass?
 
 		"uniform vec2 size;",        // texture width, height
@@ -89,9 +81,6 @@ THREE.SSAOShader = {
 		"const float diffArea = 0.4;",   // self-shadowing reduction
 		"const float gDisplace = 0.4;",  // gauss bell center
 
-		"const vec3 onlyAOColor = vec3( 1.0, 0.7, 0.5 );",
-		// "const vec3 onlyAOColor = vec3( 1.0, 1.0, 1.0 );",
-
 
 		// RGBA depth
 
@@ -126,15 +115,6 @@ THREE.SSAOShader = {
 			"}",
 
 			"return ( noise * 2.0  - 1.0 ) * noiseAmount;",
-
-		"}",
-
-		"float doFog() {",
-
-			"float zdepth = unpackDepth( texture2D( tDepth, vUv ) );",
-			"float depth = -cameraFar * cameraNear / ( zdepth * cameraFarMinusNear - cameraFar );",
-
-			"return smoothstep( fogNear, fogFar, depth );",
 
 		"}",
 
@@ -206,10 +186,7 @@ THREE.SSAOShader = {
 			"float w = ( 1.0 / width )  / tt + ( noise.x * ( 1.0 - noise.x ) );",
 			"float h = ( 1.0 / height ) / tt + ( noise.y * ( 1.0 - noise.y ) );",
 
-			"float pw;",
-			"float ph;",
-
-			"float ao;",
+			"float ao = 0.0;",
 
 			"float dz = 1.0 / float( samples );",
 			"float z = 1.0 - dz / 2.0;",
@@ -219,8 +196,8 @@ THREE.SSAOShader = {
 
 				"float r = sqrt( 1.0 - z );",
 
-				"pw = cos( l ) * r;",
-				"ph = sin( l ) * r;",
+				"float pw = cos( l ) * r;",
+				"float ph = sin( l ) * r;",
 				"ao += calcAO( depth, pw * w, ph * h );",
 				"z = z - dz;",
 				"l = l + DL;",
@@ -229,12 +206,6 @@ THREE.SSAOShader = {
 
 			"ao /= float( samples );",
 			"ao = 1.0 - ao;",
-
-			"if ( fogEnabled ) {",
-
-				"ao = mix( ao, 1.0, doFog() );",
-
-			"}",
 
 			"vec3 color = texture2D( tDiffuse, vUv ).rgb;",
 
@@ -246,7 +217,7 @@ THREE.SSAOShader = {
 
 			"if ( onlyAO ) {",
 
-				"final = onlyAOColor * vec3( mix( vec3( ao ), vec3( 1.0 ), luminance * lumInfluence ) );",  // ambient occlusion only
+				"final = vec3( mix( vec3( ao ), vec3( 1.0 ), luminance * lumInfluence ) );",  // ambient occlusion only
 
 			"}",
 

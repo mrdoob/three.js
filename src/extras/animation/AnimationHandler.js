@@ -60,7 +60,7 @@ THREE.AnimationHandler = ( function () {
 			console.log( "THREE.AnimationHandler.add: Warning! " + name + " doesn't exists in library. Doing nothing." );
 
 		}
-			
+
 		library[ name ] = undefined;
 
 	};
@@ -95,9 +95,9 @@ THREE.AnimationHandler = ( function () {
 
 		if ( root instanceof THREE.SkinnedMesh ) {
 
-			for ( var b = 0; b < root.bones.length; b++ ) {
+			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
 
-				hierarchy.push( root.bones[ b ] );
+				hierarchy.push( root.skeleton.bones[ b ] );
 
 			}
 

@@ -36,6 +36,8 @@
 		<script src="js/wip/PlaneBufferGeometry.js"></script>
 		<script src="js/wip/PlaneGeometry6.js"></script>
 
+		<script src="js/wip/PlaneGeometry99.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -48,6 +50,8 @@
 
 			init();
 			animate();
+
+			var test = new THREE.PlaneGeometry99( 200, 200, 200, 200 );
 
 			function init() {
 
@@ -66,13 +70,14 @@
 
 				//
 
-				addGeometries( 'PlaneGeometry', 'BoxGeometry', 0 );
+				addGeometries( 'PlaneGeometry', 'BoxGeometry', -100 );
 				// addGeometries( 'IndexedPlaneGeometry5', 'BoxGeometry', 0 );
 				// addGeometries( 'PlaneGeometry2', 'BoxGeometry2', 0 );
 				// addGeometries( 'PlaneGeometry3', 'BoxGeometry2', 0 );
-				addGeometries( 'PlaneGeometry5', 'BoxGeometry2', 0 );
+				addGeometries( 'PlaneGeometry5', 'BoxGeometry2', -50 );
 				addGeometries( 'PlaneBufferGeometry', 'BoxGeometry2', 0 );
-				addGeometries( 'PlaneGeometry6', 'BoxGeometry2', 0 );
+				addGeometries( 'PlaneGeometry6', 'BoxGeometry2', 50 );
+				addGeometries( 'PlaneGeometry99', 'BoxGeometry2', 100 );
 
 				//
 
@@ -117,7 +122,7 @@
 
 			}
 
-			function addGeometries( PlaneGeometry, BoxGeometry, x ) {
+			function addGeometries( PlaneGeometry, BoxGeometry, y ) {
 
 				// Plane
 
@@ -130,7 +135,7 @@
 				var material = new THREE.MeshPhongMaterial( { color: 0xff0000/*, wireframe: true*/ } );
 
 				plane = new THREE.Mesh( geometry, material );
-				plane.position.x = x;
+				plane.position.y = y;
 				scene.add( plane );
 
 				/*

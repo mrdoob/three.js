@@ -190,8 +190,8 @@
 					for ( var i = 0; i < geometries.length; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometries[ i ], materials[ i ] );
-						mesh.position = position;
-						mesh.scale = scale;
+						mesh.position.copy( position );
+						mesh.scale.copy( scale );
 						scene.add( mesh );
 
 					}

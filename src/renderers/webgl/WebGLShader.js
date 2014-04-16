@@ -34,6 +34,9 @@ THREE.WebGLShader = ( function () {
 
 		}
 
+		// --enable-privileged-webgl-extension
+		// console.log( type, gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
+
 		return shader;
 
 	};

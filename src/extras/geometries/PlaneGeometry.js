@@ -81,7 +81,10 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	}
 
-	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
+	THREE.IndexedGeometry2.call( this );
+
+	this.setArrays( indices, vertices, normals, uvs );
+	this.computeBoundingSphere();
 
 };
 

@@ -2,12 +2,12 @@ Sidebar.Object3D = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );
-	container.add( objectType );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( objectType );
+	container.add( new UI.Break() );
 
 	// uuid
 

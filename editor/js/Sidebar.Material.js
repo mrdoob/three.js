@@ -20,12 +20,12 @@ Sidebar.Material = function ( editor ) {
 
 	};
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 	container.dom.classList.add( 'Material' );
 
-	container.add( new UI.Text().setValue( 'MATERIAL' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text().setValue( 'MATERIAL' ) );
+	container.add( new UI.Break() );
 
 	// uuid
 

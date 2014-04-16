@@ -2159,10 +2159,6 @@ def generate_cameras(data):
             for cameraobj in cams:
                 camera = bpy.data.cameras[cameraobj.data.name]
 
-                # TODO:
-                #   Support more than perspective camera
-                #   Calculate a target/lookat
-                #   Get correct aspect ratio
                 if camera.id_data.type == "PERSP":
 
                     camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
@@ -2175,6 +2171,20 @@ def generate_cameras(data):
                     "target"    : generate_vec3([0, 0, 0])
                     }
 
+            elif camera.id_data.type == "ORTHO":
+
+                    camera_string = TEMPLATE_CAMERA_ORTHO % {
+                    "camera_id" : generate_string(camera.name),
+                    "left"      : -(camera.angle_x * camera.ortho_scale),
+                    "right"     : (camera.angle_x * camera.ortho_scale),
+                    "top"       : (camera.angle_y * camera.ortho_scale),
+                    "bottom"    : -(camera.angle_y * camera.ortho_scale),
+                    "near"      : camera.clip_start,
+                    "far"       : camera.clip_end,
+                    "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
+                    "target"    : generate_vec3([0, 0, 0])
+                    }
+                    
                 chunks.append(camera_string)
 
     return ",\n\n".join(chunks), len(chunks)
