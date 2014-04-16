@@ -15,7 +15,6 @@
 	"ignore": [
 		"**/.*",
 		"*.md",
-		"bower.json",
 		"docs",
 		"editor",
 		"examples",

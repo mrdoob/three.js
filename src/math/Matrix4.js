@@ -427,27 +427,37 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiplyVector3Array: function() {
+	multiplyVector3Array: function ( a ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		return this.applyToVector3Array( a );
+
+	},
+
+	applyToVector3Array: function() {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( a ) {
+		return function ( array, offset, length ) {
 
-			for ( var i = 0, il = a.length; i < il; i += 3 ) {
+			if ( offset === undefined ) offset = 0;
+			if ( length === undefined ) length = array.length;
 
-				v1.x = a[ i ];
-				v1.y = a[ i + 1 ];
-				v1.z = a[ i + 2 ];
+			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
 
-				v1.applyProjection( this );
+				v1.x = array[ j ];
+				v1.y = array[ j + 1 ];
+				v1.z = array[ j + 2 ];
 
-				a[ i ]     = v1.x;
-				a[ i + 1 ] = v1.y;
-				a[ i + 2 ] = v1.z;
+				v1.applyMatrix4( this );
+
+				array[ j ]     = v1.x;
+				array[ j + 1 ] = v1.y;
+				array[ j + 2 ] = v1.z;
 
 			}
 
-			return a;
+			return array;
 
 		};
 
@@ -535,42 +545,31 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	flattenToArray: function ( flat ) {
+	flattenToArrayOffset: function( array, offset ) {
 
 		var te = this.elements;
-		flat[ 0 ] = te[0]; flat[ 1 ] = te[1]; flat[ 2 ] = te[2]; flat[ 3 ] = te[3];
-		flat[ 4 ] = te[4]; flat[ 5 ] = te[5]; flat[ 6 ] = te[6]; flat[ 7 ] = te[7];
-		flat[ 8 ] = te[8]; flat[ 9 ] = te[9]; flat[ 10 ] = te[10]; flat[ 11 ] = te[11];
-		flat[ 12 ] = te[12]; flat[ 13 ] = te[13]; flat[ 14 ] = te[14]; flat[ 15 ] = te[15];
 
-		return flat;
+		array[ offset     ] = te[0];
+		array[ offset + 1 ] = te[1];
+		array[ offset + 2 ] = te[2];
+		array[ offset + 3 ] = te[3];
 
-	},
+		array[ offset + 4 ] = te[4];
+		array[ offset + 5 ] = te[5];
+		array[ offset + 6 ] = te[6];
+		array[ offset + 7 ] = te[7];
 
-	flattenToArrayOffset: function( flat, offset ) {
+		array[ offset + 8 ]  = te[8];
+		array[ offset + 9 ]  = te[9];
+		array[ offset + 10 ] = te[10];
+		array[ offset + 11 ] = te[11];
 
-		var te = this.elements;
-		flat[ offset ] = te[0];
-		flat[ offset + 1 ] = te[1];
-		flat[ offset + 2 ] = te[2];
-		flat[ offset + 3 ] = te[3];
+		array[ offset + 12 ] = te[12];
+		array[ offset + 13 ] = te[13];
+		array[ offset + 14 ] = te[14];
+		array[ offset + 15 ] = te[15];
 
-		flat[ offset + 4 ] = te[4];
-		flat[ offset + 5 ] = te[5];
-		flat[ offset + 6 ] = te[6];
-		flat[ offset + 7 ] = te[7];
-
-		flat[ offset + 8 ]  = te[8];
-		flat[ offset + 9 ]  = te[9];
-		flat[ offset + 10 ] = te[10];
-		flat[ offset + 11 ] = te[11];
-
-		flat[ offset + 12 ] = te[12];
-		flat[ offset + 13 ] = te[13];
-		flat[ offset + 14 ] = te[14];
-		flat[ offset + 15 ] = te[15];
-
-		return flat;
+		return array;
 
 	},
 

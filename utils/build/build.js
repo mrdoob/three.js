@@ -11,6 +11,7 @@ function main() {
 	var parser = new argparse.ArgumentParser();
 	parser.addArgument( ['--include'], { action: 'append', required: true } );
 	parser.addArgument( ['--externs'], { action: 'append', defaultValue: ['./externs/common.js'] } );
+	parser.addArgument( ['--amd'], { action: 'storeTrue', defaultValue: false } );
 	parser.addArgument( ['--minify'], { action: 'storeTrue', defaultValue: false } );
 	parser.addArgument( ['--output'], { defaultValue: '../../build/three.js' } );
 	parser.addArgument( ['--sourcemaps'], { action: 'storeTrue', defaultValue: false } );
@@ -33,7 +34,11 @@ function main() {
 
 	var buffer = [];
 	var sources = [];
-
+	
+	if ( args.amd ){
+		buffer.push('function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
+	};
+	
 	for ( var i = 0; i < args.include.length; i ++ ){
 		
 		var contents = fs.readFileSync( './includes/' + args.include[i] + '.json', 'utf8' );
@@ -48,8 +53,11 @@ function main() {
 		}
 
 	}
-
-	console.log( buffer.length );
+	
+	if ( args.amd ){
+		buffer.push('exports.THREE = THREE;\n\n} ) );');
+	};
+	
 	var temp = buffer.join( '' );
 	
 	if ( !args.minify ){
@@ -60,7 +68,7 @@ function main() {
 
 		var result = uglify.minify( sources, { outSourceMap: sourcemap } );
 		
-		fs.writeFileSync( output, result.code + sourcemapping, 'utf8' );
+		fs.writeFileSync( output, 'three.js / threejs.org/license\n' + result.code + sourcemapping, 'utf8' );
 
 		if ( args.sourcemaps ) {
 

@@ -6,14 +6,23 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	THREE.Geometry.call( this );
 
-	this.radiusTop = radiusTop = radiusTop !== undefined ? radiusTop : 20;
-	this.radiusBottom = radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-	this.height = height = height !== undefined ? height : 100;
+	this.parameters = {
+		radiusTop: radiusTop,
+		radiusBottom: radiusBottom,
+		height: height,
+		radialSegments: radialSegments,
+		heightSegments: heightSegments,
+		openEnded: openEnded
+	};
 
-	this.radialSegments = radialSegments = radialSegments || 8;
-	this.heightSegments = heightSegments = heightSegments || 1;
+	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	height = height !== undefined ? height : 100;
 
-	this.openEnded = openEnded = openEnded !== undefined ? openEnded : false;
+	radialSegments = radialSegments || 8;
+	heightSegments = heightSegments || 1;
+
+	openEnded = openEnded !== undefined ? openEnded : false;
 
 	var heightHalf = height / 2;
 
@@ -149,7 +158,6 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	}
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 }

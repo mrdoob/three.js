@@ -6,14 +6,32 @@ global proc int ThreeJsExportScript(string $parent, string $action, string $sett
 {
     if ($action == "post")
     {
-        setParent $parent;
-        columnLayout -adj true;
-        checkBox -v true -l "Vertices" vertsCb;
-        checkBox -v true -l "Faces" facesCb;
-        checkBox -v true -l "Normals" normalsCb;
-        checkBox -v true -l "UVs" uvsCb;
-        checkBox -v false -l "Material Indices" materialsCb;
-        checkBox -v false -l "Colors" colorsCb;
+        
+        
+        columnLayout -adj true -rs 10;
+            frameLayout -collapsable true -label "Mesh";
+                columnLayout -adj true -cal "center";
+                    checkBox -v true -l "Vertices" vertsCb;
+                    checkBox -v true -l "Faces" facesCb;
+                    checkBox -v true -l "Normals" normalsCb;
+                    checkBox -v true -l "UVs" uvsCb;
+                    checkBox -v false -l "Material Indices" materialsCb;
+                    checkBox -v false -l "Colors" colorsCb;
+                    checkBox -v false -l "Skin Weights" skinWeightsCb;
+                    
+                setParent ..;
+            setParent ..;
+            
+            frameLayout -collapsable true -label "Animations";
+                columnLayout -adj true;
+                    checkBox -v false -l "Animations" animationsCb;
+                    
+                    intSliderGrp -label "Vertex Weight Count" -field true
+                        -fieldMinValue 2 -fieldMaxValue 8
+                        -minValue 2 -maxValue 8 -value 2 weightCountCb; 
+                                            
+                setParent ..;
+            setParent ..;
     }
     else if ($action == "query")
     {
@@ -30,6 +48,13 @@ global proc int ThreeJsExportScript(string $parent, string $action, string $sett
             $option += "materials ";
         if (`checkBox -q -v colorsCb`)
             $option += "colors ";
+        if (`checkBox -q -v skinWeightsCb`)
+            $option += "skinWeights ";
+        if (`checkBox -q -v animationsCb`)
+            $option += "animation ";
+        
+        $option += `intSliderGrp -query -value weightCountCb`;
+            
         $option += "\"";
         eval($callback + $option);
     }

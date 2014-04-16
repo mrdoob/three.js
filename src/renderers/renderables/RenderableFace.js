@@ -10,8 +10,6 @@ THREE.RenderableFace = function () {
 	this.v2 = new THREE.RenderableVertex();
 	this.v3 = new THREE.RenderableVertex();
 
-	this.centroidModel = new THREE.Vector3();
-
 	this.normalModel = new THREE.Vector3();
 
 	this.vertexNormalsModel = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
@@ -19,7 +17,7 @@ THREE.RenderableFace = function () {
 
 	this.color = null;
 	this.material = null;
-	this.uvs = [[]];
+	this.uvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
 
 	this.z = 0;
 

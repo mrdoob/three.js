@@ -9,15 +9,9 @@ THREE.BufferGeometry = function () {
 
 	this.name = '';
 
-	// attributes
-
 	this.attributes = {};
-
-	// offsets for chunks when using indexed elements
-
-	this.offsets = [];
-
-	// boundings
+	this.drawcalls = [];
+	this.offsets = this.drawcalls; // backwards compatibility
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -28,16 +22,37 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, type, numItems, itemSize ) {
+	addAttribute: function ( name, attribute ) {
 
-		this.attributes[ name ] = {
+		if ( attribute instanceof THREE.BufferAttribute === false ) {
 
-			array: new type( numItems * itemSize ),
-			itemSize: itemSize
+			console.warn( 'DEPRECATED: BufferGeometry\'s addAttribute() now expects ( name, attribute ).' );
 
-		};
+			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+
+			return;
+
+		}
+
+		this.attributes[ name ] = attribute;
+
+	},
+
+	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
+
+	},
+
+	addDrawCall: function ( start, count, indexOffset ) {
+
+		this.drawcalls.push( {
+
+			start: start,
+			count: count,
+			index: indexOffset !== undefined ? indexOffset : 0
+
+		} );
 
 	},
 
@@ -47,7 +62,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( position !== undefined ) {
 
-			matrix.multiplyVector3Array( position.array );
+			matrix.applyToVector3Array( position.array );
 			position.needsUpdate = true;
 
 		}
@@ -58,7 +73,7 @@ THREE.BufferGeometry.prototype = {
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.multiplyVector3Array( normal.array );
+			normalMatrix.applyToVector3Array( normal.array );
 			normal.needsUpdate = true;
 
 		}
@@ -166,6 +181,9 @@ THREE.BufferGeometry.prototype = {
 
 				box.center( center );
 
+				// hoping to find a boundingSphere with a radius smaller than the
+				// boundingSphere of the boundingBox:  sqrt(3) smaller in the best case
+
 				var maxRadiusSq = 0;
 
 				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
@@ -182,6 +200,12 @@ THREE.BufferGeometry.prototype = {
 		}
 
 	}(),
+
+	computeFaceNormals: function () {
+
+		// backwards compatibility
+
+	},
 
 	computeVertexNormals: function () {
 
@@ -231,7 +255,7 @@ THREE.BufferGeometry.prototype = {
 
 				var indices = this.attributes[ "index" ].array;
 
-				var offsets = this.offsets;
+				var offsets = (this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ]);
 
 				for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
 
@@ -324,28 +348,6 @@ THREE.BufferGeometry.prototype = {
 			this.normalizeNormals();
 
 			this.normalsNeedUpdate = true;
-
-		}
-
-	},
-
-	normalizeNormals: function () {
-
-		var normals = this.attributes[ "normal" ].array;
-
-		var x, y, z, n;
-
-		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
-
-			x = normals[ i ];
-			y = normals[ i + 1 ];
-			z = normals[ i + 2 ];
-
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-			normals[ i     ] *= n;
-			normals[ i + 1 ] *= n;
-			normals[ i + 2 ] *= n;
 
 		}
 
@@ -659,6 +661,34 @@ THREE.BufferGeometry.prototype = {
 		*/
 
 		return offsets;
+	},
+
+	merge: function () {
+
+		console.log( 'BufferGeometry.merge(): TODO' );
+
+	},
+
+	normalizeNormals: function () {
+
+		var normals = this.attributes[ "normal" ].array;
+
+		var x, y, z, n;
+
+		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
+
+			x = normals[ i ];
+			y = normals[ i + 1 ];
+			z = normals[ i + 2 ];
+
+			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+
+			normals[ i     ] *= n;
+			normals[ i + 1 ] *= n;
+			normals[ i + 2 ] *= n;
+
+		}
+
 	},
 
 	/*

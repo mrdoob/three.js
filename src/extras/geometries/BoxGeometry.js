@@ -7,26 +7,31 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 	THREE.Geometry.call( this );
 
-	var scope = this;
-
-	this.width = width;
-	this.height = height;
-	this.depth = depth;
+	this.parameters = {
+		width: width,
+		height: height,
+		depth: depth,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments,
+		depthSegments: depthSegments
+	};
 
 	this.widthSegments = widthSegments || 1;
 	this.heightSegments = heightSegments || 1;
 	this.depthSegments = depthSegments || 1;
 
-	var width_half = this.width / 2;
-	var height_half = this.height / 2;
-	var depth_half = this.depth / 2;
+	var scope = this;
 
-	buildPlane( 'z', 'y', - 1, - 1, this.depth, this.height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, this.depth, this.height, - width_half, 1 ); // nx
-	buildPlane( 'x', 'z',   1,   1, this.width, this.depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, this.width, this.depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, this.width, this.height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, this.width, this.height, - depth_half, 5 ); // nz
+	var width_half = width / 2;
+	var height_half = height / 2;
+	var depth_half = depth / 2;
+
+	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
+	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
+	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
+	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
+	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
+	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
 
@@ -112,7 +117,6 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 	}
 
-	this.computeCentroids();
 	this.mergeVertices();
 
 };

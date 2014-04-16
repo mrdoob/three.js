@@ -60,7 +60,7 @@ THREE.VTKLoader.prototype = {
 
 		// float float float
 
-		pattern = /([\+|\-]?[\d]+[\.][\d|\-|e]+)[ ]+([\+|\-]?[\d]+[\.][\d|\-|e]+)[ ]+([\+|\-]?[\d]+[\.][\d|\-|e]+)/g;
+		pattern = /([\+|\-]?[\d]+[\.]*[\d|\-|e]*)[ ]+([\+|\-]?[\d]+[\.]*[\d|\-|e]*)[ ]+([\+|\-]?[\d]+[\.]*[\d|\-|e]*)/g;
 
 		while ( ( result = pattern.exec( data ) ) !== null ) {
 
@@ -95,7 +95,6 @@ THREE.VTKLoader.prototype = {
 
 		}
 
-		geometry.computeCentroids();
 		geometry.computeFaceNormals();
 		geometry.computeVertexNormals();
 		geometry.computeBoundingSphere();

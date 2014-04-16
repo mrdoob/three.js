@@ -99,45 +99,38 @@ THREE.STLLoader.prototype.parse = function ( data ) {
 
 };
 
-THREE.STLLoader.prototype.parseBinary = function (data) {
+THREE.STLLoader.prototype.parseBinary = function ( data ) {
 
-	var face, geometry, n_faces, reader, length, normal, i, dataOffset, faceLength, start, vertexstart;
+	var reader = new DataView( data );
+	var faces = reader.getUint32( 80, true );
+	var dataOffset = 84;
+	var faceLength = 12 * 4 + 2;
 
-	reader = new DataView( data );
-	n_faces = reader.getUint32(80,true);
-	geometry = new THREE.Geometry();
-	dataOffset = 84;
-	faceLength = 12 * 4 + 2;
+	var offset = 0;
 
-	for (face = 0; face < n_faces; face++) {
+	var geometry = new THREE.Geometry2( faces );
 
-		start = dataOffset + face * faceLength;
-		normal = new THREE.Vector3(
-			reader.getFloat32(start,true),
-			reader.getFloat32(start + 4,true),
-			reader.getFloat32(start + 8,true)
-		);
+	for ( var face = 0; face < faces; face ++ ) {
 
-		for (i = 1; i <= 3; i++) {
+		var start = dataOffset + face * faceLength;
 
-			vertexstart = start + i * 12;
-			geometry.vertices.push(
-				new THREE.Vector3(
-					reader.getFloat32(vertexstart,true),
-					reader.getFloat32(vertexstart +4,true),
-					reader.getFloat32(vertexstart + 8,true)
-				)
-			);
+		for ( var i = 1; i <= 3; i ++ ) {
+
+			var vertexstart = start + i * 12;
+
+			geometry.vertices[ offset     ] = reader.getFloat32( vertexstart, true );
+			geometry.vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true );
+			geometry.vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true );
+
+			geometry.normals[ offset     ] = reader.getFloat32( start    , true );
+			geometry.normals[ offset + 1 ] = reader.getFloat32( start + 4, true );
+			geometry.normals[ offset + 2 ] = reader.getFloat32( start + 8, true );
+
+			offset += 3;
 
 		}
 
-		length = geometry.vertices.length;
-		geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
-
 	}
-
-	geometry.computeCentroids();
-	geometry.computeBoundingSphere();
 
 	return geometry;
 
@@ -174,7 +167,6 @@ THREE.STLLoader.prototype.parseASCII = function (data) {
 
 	}
 
-	geometry.computeCentroids();
 	geometry.computeBoundingBox();
 	geometry.computeBoundingSphere();
 

@@ -109,9 +109,15 @@
 
 				if ( attributes.index !== undefined ) {
 
-					var offsets = geometry.offsets;
 					var indices = attributes.index.array;
 					var positions = attributes.position.array;
+					var offsets = geometry.offsets;
+
+					if ( offsets.length === 0 ) {
+
+						offsets = [ { start: 0, count: positions.length, index: 0 } ];
+
+					}
 
 					for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
 

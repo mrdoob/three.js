@@ -34,7 +34,7 @@ function generateGeometry(objectType, numObjects) {
 
 		var scale = new THREE.Vector3();
 
-		var geom, color=new THREE.Color();
+		var geom, color = new THREE.Color();
 
 		scale.x = Math.random() * 200 + 100;
 
@@ -55,12 +55,13 @@ function generateGeometry(objectType, numObjects) {
 		// give the geom's vertices a random color, to be displayed
 		applyVertexColors( geom, color );
 
-		var cube = new THREE.Mesh( geom );
-		cube.position.copy( position );
-		cube.rotation.copy( rotation );
-		cube.scale.copy( scale );
+		var mesh = new THREE.Mesh( geom );
+		mesh.position.copy( position );
+		mesh.rotation.copy( rotation );
+		mesh.scale.copy( scale );
+		mesh.updateMatrix();
 
-		THREE.GeometryUtils.merge( geometry, cube );
+		geometry.merge( mesh.geometry, mesh.matrix );
 
 	}
 

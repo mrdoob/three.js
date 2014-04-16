@@ -377,6 +377,7 @@ THREE.Shape.Utils = {
 
 			}
 
+			var minShapeIndex = 0;
 			var counter = indepHoles.length * 2;
 			while ( indepHoles.length > 0 ) {
 				counter --;
@@ -387,7 +388,7 @@ THREE.Shape.Utils = {
 
 				// search for shape-vertex and hole-vertex,
 				// which can be connected without intersections
-				for ( shapeIndex = 0; shapeIndex < shape.length; shapeIndex++ ) {
+				for ( shapeIndex = minShapeIndex; shapeIndex < shape.length; shapeIndex++ ) {
 
 					shapePt = shape[ shapeIndex ];
 					holeIndex	= -1;
@@ -416,6 +417,8 @@ THREE.Shape.Utils = {
 							tmpHole2 = hole.slice( 0, holeIndex+1 );
 
 							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
+
+							minShapeIndex = shapeIndex;
 
 							// Debug only, to show the selected cuts
 							// glob_CutLines.push( [ shapePt, holePt ] );

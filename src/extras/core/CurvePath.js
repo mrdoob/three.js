@@ -134,7 +134,7 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 
 
-// Returns min and max coordinates, as well as centroid
+// Returns min and max coordinates
 
 THREE.CurvePath.prototype.getBoundingBox = function () {
 
@@ -178,8 +178,7 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 		minX: minX,
 		minY: minY,
 		maxX: maxX,
-		maxY: maxY,
-		centroid: sum.divideScalar( il )
+		maxY: maxY
 
 	};
 
