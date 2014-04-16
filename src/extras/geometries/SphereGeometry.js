@@ -113,13 +113,13 @@ THREE.SphereGeometry.prototype.toJSON = function ( exporters ) {
 
 	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'SphereGeometry';
-	data.radius = this.radius;
-	data.widthSegments = this.widthSegments;
-	data.heightSegments = this.heightSegments;
-	data.phiStart = this.phiStart;
-	data.phiLength = this.phiLength;
-	data.thetaStart = this.thetaStart;
-	data.thetaLength = this.thetaLength;
+	data.radius = this.parameters.radius;
+	data.widthSegments = this.parameters.widthSegments;
+	data.heightSegments = this.parameters.heightSegments;
+	data.phiStart = this.parameters.phiStart;
+	data.phiLength = this.parameters.phiLength;
+	data.thetaStart = this.parameters.thetaStart;
+	data.thetaLength = this.parameters.thetaLength;
 
 	return data;
 

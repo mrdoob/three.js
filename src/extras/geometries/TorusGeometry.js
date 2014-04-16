@@ -79,11 +79,11 @@ THREE.TorusGeometry.prototype.toJSON = function ( exporters ) {
 
 	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'TorusGeometry';
-	data.radius = this.radius;
-	data.tube = this.tube;
-	data.radialSegments = this.radialSegments;
-	data.tubularSegments = this.tubularSegments;
-	data.arc = this.arc;
+	data.radius = this.parameters.radius;
+	data.tube = this.parameters.tube;
+	data.radialSegments = this.parameters.radialSegments;
+	data.tubularSegments = this.parameters.tubularSegments;
+	data.arc = this.parameters.arc;
 
 	return data;
 

@@ -34,8 +34,8 @@ THREE.IcosahedronGeometry.prototype.toJSON = function ( exporters ) {
 
 	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'IcosahedronGeometry';
-	data.radius = this.radius;
-	data.detail = this.detail;
+	data.radius = this.parameters.radius;
+	data.detail = this.parameters.detail;
 
 	return data;
 

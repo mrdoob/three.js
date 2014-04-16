@@ -91,10 +91,10 @@ THREE.PlaneGeometry.prototype.toJSON = function ( exporters ) {
 
 	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'PlaneGeometry';
-	data.width = this.width;
-	data.height = this.height;
-	data.widthSegments = this.widthSegments;
-	data.heightSegments = this.heightSegments;
+	data.width = this.parameters.width;
+	data.height = this.parameters.height;
+	data.widthSegments = this.parameters.widthSegments;
+	data.heightSegments = this.parameters.heightSegments;
 
 	return data;
 

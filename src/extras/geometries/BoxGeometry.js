@@ -127,12 +127,12 @@ THREE.BoxGeometry.prototype.toJSON = function ( exporters ) {
 
 	var data = THREE.Geometry.toJSONCommon.call( this );
 	data.type = 'BoxGeometry';
-	data.width = this.width;
-	data.height = this.height;
-	data.depth = this.depth;
-	data.widthSegments = this.widthSegments;
-	data.heightSegments = this.heightSegments;
-	data.depthSegments = this.depthSegments;
+	data.width = this.parameters.width;
+	data.height = this.parameters.height;
+	data.depth = this.parameters.depth;
+	data.widthSegments = this.parameters.widthSegments;
+	data.heightSegments = this.parameters.heightSegments;
+	data.depthSegments = this.parameters.depthSegments;
 
 	return data;
 	
