@@ -665,7 +665,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( attributes[ key ].buffer !== undefined ) {
 
 					_gl.deleteBuffer( attributes[ key ].buffer );
-		
+
 				}
 
 			}
@@ -844,7 +844,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					attribute.__webglInitialized = true;
 
-					var size = 1;		// "f" and "i"
+					var size = 1;   // "f" and "i"
 
 					if ( attribute.type === "v2" ) size = 2;
 					else if ( attribute.type === "v3" ) size = 3;
@@ -1043,7 +1043,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					attribute.__webglInitialized = true;
 
-					var size = 1;		// "f" and "i"
+					var size = 1;   // "f" and "i"
 
 					if( attribute.type === "v2" ) size = 2;
 					else if( attribute.type === "v3" ) size = 3;
@@ -1125,11 +1125,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// material must use some texture to require uvs
 
 		if ( material.map ||
-		     material.lightMap ||
-		     material.bumpMap ||
-		     material.normalMap ||
-		     material.specularMap ||
-		     material instanceof THREE.ShaderMaterial ) {
+				 material.lightMap ||
+				 material.bumpMap ||
+				 material.normalMap ||
+				 material.specularMap ||
+				 material instanceof THREE.ShaderMaterial ) {
 
 			return true;
 
@@ -1273,7 +1273,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							value = customAttribute.value[ index ];
 
-							customAttribute.array[ offset ] 	= value.x;
+							customAttribute.array[ offset ]   = value.x;
 							customAttribute.array[ offset + 1 ] = value.y;
 
 							offset += 2;
@@ -1306,7 +1306,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								value = customAttribute.value[ index ];
 
-								customAttribute.array[ offset ] 	= value.x;
+								customAttribute.array[ offset ]   = value.x;
 								customAttribute.array[ offset + 1 ] = value.y;
 								customAttribute.array[ offset + 2 ] = value.z;
 
@@ -1381,7 +1381,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( customAttribute.needsUpdate &&
 						 ( customAttribute.boundTo === undefined ||
-						   customAttribute.boundTo === "vertices") ) {
+							 customAttribute.boundTo === "vertices") ) {
 
 						cal = customAttribute.value.length;
 
@@ -1401,7 +1401,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								value = customAttribute.value[ ca ];
 
-								customAttribute.array[ offset ] 	= value.x;
+								customAttribute.array[ offset ]   = value.x;
 								customAttribute.array[ offset + 1 ] = value.y;
 
 								offset += 2;
@@ -1416,7 +1416,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 									value = customAttribute.value[ ca ];
 
-									customAttribute.array[ offset ] 	= value.r;
+									customAttribute.array[ offset ]   = value.r;
 									customAttribute.array[ offset + 1 ] = value.g;
 									customAttribute.array[ offset + 2 ] = value.b;
 
@@ -1430,7 +1430,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 									value = customAttribute.value[ ca ];
 
-									customAttribute.array[ offset ] 	= value.x;
+									customAttribute.array[ offset ]   = value.x;
 									customAttribute.array[ offset + 1 ] = value.y;
 									customAttribute.array[ offset + 2 ] = value.z;
 
@@ -1583,7 +1583,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( customAttribute.needsUpdate &&
 					 ( customAttribute.boundTo === undefined ||
-					   customAttribute.boundTo === "vertices" ) ) {
+						 customAttribute.boundTo === "vertices" ) ) {
 
 					offset = 0;
 
@@ -1603,7 +1603,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							value = customAttribute.value[ ca ];
 
-							customAttribute.array[ offset ] 	= value.x;
+							customAttribute.array[ offset ]   = value.x;
 							customAttribute.array[ offset + 1 ] = value.y;
 
 							offset += 2;
@@ -1618,7 +1618,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								value = customAttribute.value[ ca ];
 
-								customAttribute.array[ offset ] 	= value.r;
+								customAttribute.array[ offset ]   = value.r;
 								customAttribute.array[ offset + 1 ] = value.g;
 								customAttribute.array[ offset + 2 ] = value.b;
 
@@ -1632,7 +1632,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								value = customAttribute.value[ ca ];
 
-								customAttribute.array[ offset ] 	= value.x;
+								customAttribute.array[ offset ]   = value.x;
 								customAttribute.array[ offset + 1 ] = value.y;
 								customAttribute.array[ offset + 2 ] = value.z;
 
@@ -1648,7 +1648,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							value = customAttribute.value[ ca ];
 
-							customAttribute.array[ offset ] 	 = value.x;
+							customAttribute.array[ offset ]    = value.x;
 							customAttribute.array[ offset + 1  ] = value.y;
 							customAttribute.array[ offset + 2  ] = value.z;
 							customAttribute.array[ offset + 3  ] = value.w;
@@ -1811,7 +1811,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					vka = morphTargetsArrays[ vk ];
 
-					vka[ offset_morphTarget ] 	  = v1.x;
+					vka[ offset_morphTarget ]     = v1.x;
 					vka[ offset_morphTarget + 1 ] = v1.y;
 					vka[ offset_morphTarget + 2 ] = v1.z;
 
@@ -1845,7 +1845,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						nka = morphNormalsArrays[ vk ];
 
-						nka[ offset_morphTarget ] 	  = n1.x;
+						nka[ offset_morphTarget ]     = n1.x;
 						nka[ offset_morphTarget + 1 ] = n1.y;
 						nka[ offset_morphTarget + 2 ] = n1.z;
 
@@ -1883,7 +1883,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ]	];
+				face = obj_faces[ chunk_faces3[ f ] ];
 
 				// weights
 
@@ -1947,7 +1947,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ]	];
+				face = obj_faces[ chunk_faces3[ f ] ];
 
 				vertexColors = face.vertexColors;
 				faceColor = face.color;
@@ -1995,7 +1995,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ]	];
+				face = obj_faces[ chunk_faces3[ f ] ];
 
 				vertexTangents = face.vertexTangents;
 
@@ -2031,7 +2031,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ]	];
+				face = obj_faces[ chunk_faces3[ f ] ];
 
 				vertexNormals = face.vertexNormals;
 				faceNormal = face.normal;
@@ -2195,9 +2195,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ]	];
+							face = obj_faces[ chunk_faces3[ f ] ];
 
-							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
+							customAttribute.array[ offset_custom ]     = customAttribute.value[ face.a ];
 							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
 							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
 
@@ -2211,7 +2211,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							value = customAttribute.value[ chunk_faces3[ f ] ];
 
-							customAttribute.array[ offset_custom ] 	   = value;
+							customAttribute.array[ offset_custom ]     = value;
 							customAttribute.array[ offset_custom + 1 ] = value;
 							customAttribute.array[ offset_custom + 2 ] = value;
 
@@ -2227,13 +2227,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ]	];
+							face = obj_faces[ chunk_faces3[ f ] ];
 
 							v1 = customAttribute.value[ face.a ];
 							v2 = customAttribute.value[ face.b ];
 							v3 = customAttribute.value[ face.c ];
 
-							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom ]     = v1.x;
 							customAttribute.array[ offset_custom + 1 ] = v1.y;
 
 							customAttribute.array[ offset_custom + 2 ] = v2.x;
@@ -2256,7 +2256,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							v2 = value;
 							v3 = value;
 
-							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom ]     = v1.x;
 							customAttribute.array[ offset_custom + 1 ] = v1.y;
 
 							customAttribute.array[ offset_custom + 2 ] = v2.x;
@@ -2289,13 +2289,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ]	];
+							face = obj_faces[ chunk_faces3[ f ] ];
 
 							v1 = customAttribute.value[ face.a ];
 							v2 = customAttribute.value[ face.b ];
 							v3 = customAttribute.value[ face.c ];
 
-							customAttribute.array[ offset_custom ] 	   = v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom ]     = v1[ pp[ 0 ] ];
 							customAttribute.array[ offset_custom + 1 ] = v1[ pp[ 1 ] ];
 							customAttribute.array[ offset_custom + 2 ] = v1[ pp[ 2 ] ];
 
@@ -2321,7 +2321,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							v2 = value;
 							v3 = value;
 
-							customAttribute.array[ offset_custom ] 	   = v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom ]     = v1[ pp[ 0 ] ];
 							customAttribute.array[ offset_custom + 1 ] = v1[ pp[ 1 ] ];
 							customAttribute.array[ offset_custom + 2 ] = v1[ pp[ 2 ] ];
 
@@ -2347,7 +2347,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							v2 = value[ 1 ];
 							v3 = value[ 2 ];
 
-							customAttribute.array[ offset_custom ] 	   = v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom ]     = v1[ pp[ 0 ] ];
 							customAttribute.array[ offset_custom + 1 ] = v1[ pp[ 1 ] ];
 							customAttribute.array[ offset_custom + 2 ] = v1[ pp[ 2 ] ];
 
@@ -2371,13 +2371,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ]	];
+							face = obj_faces[ chunk_faces3[ f ] ];
 
 							v1 = customAttribute.value[ face.a ];
 							v2 = customAttribute.value[ face.b ];
 							v3 = customAttribute.value[ face.c ];
 
-							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom  ]   = v1.x;
 							customAttribute.array[ offset_custom + 1  ] = v1.y;
 							customAttribute.array[ offset_custom + 2  ] = v1.z;
 							customAttribute.array[ offset_custom + 3  ] = v1.w;
@@ -2406,7 +2406,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							v2 = value;
 							v3 = value;
 
-							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom  ]   = v1.x;
 							customAttribute.array[ offset_custom + 1  ] = v1.y;
 							customAttribute.array[ offset_custom + 2  ] = v1.z;
 							customAttribute.array[ offset_custom + 3  ] = v1.w;
@@ -2435,7 +2435,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							v2 = value[ 1 ];
 							v3 = value[ 2 ];
 
-							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom  ]   = v1.x;
 							customAttribute.array[ offset_custom + 1  ] = v1.y;
 							customAttribute.array[ offset_custom + 2  ] = v1.z;
 							customAttribute.array[ offset_custom + 3  ] = v1.w;
@@ -2566,7 +2566,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					ny = ( nay + nby + ncy ) / 3;
 					nz = ( naz + nbz + ncz ) / 3;
 
-					normalArray[ i ] 	 = nx;
+					normalArray[ i ]   = nx;
 					normalArray[ i + 1 ] = ny;
 					normalArray[ i + 2 ] = nz;
 
@@ -2652,7 +2652,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		disableUnusedAttributes();
-		
+
 	}
 
 	// START_VEROLD_MOD - materialIndex in offsets
@@ -2708,17 +2708,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// indexed triangles
 
 				var type, size;
-			
+
 				if ( index.array instanceof Uint32Array ) {
-					
+
 					type = _gl.UNSIGNED_INT;
 					size = 4;
-					
+
 				} else {
-					
+
 					type = _gl.UNSIGNED_SHORT;
 					size = 2;
-					
+
 				}
 
 				var offsets = geometry.offsets;
@@ -2838,23 +2838,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setLineWidth( material.linewidth );
 
 			var index = geometryAttributes[ "index" ];
-			
+
 			if ( index ) {
 
 				// indexed lines
 
 				var type, size;
-				
+
 				if ( index.array instanceof Uint32Array ){
-					
+
 					type = _gl.UNSIGNED_INT;
 					size = 4;
-					
+
 				} else {
-					
+
 					type = _gl.UNSIGNED_SHORT;
 					size = 2;
-					
+
 				}
 
 				var offsets = geometry.offsets;
@@ -2867,7 +2867,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
-					
+
 					_gl.drawElements( _gl.LINES, index.array.length, type, 0 ); // 2 bytes per Uint16Array
 
 					_this.info.render.calls ++;
@@ -2893,7 +2893,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						// render indexed lines
-						
+
 						_gl.drawElements( _gl.LINES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
 
 						_this.info.render.calls ++;
@@ -3108,7 +3108,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var type = geometryGroup.__typeArray === Uint32Array ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
 			// wireframe
-			
+
 			if ( material.wireframe ) {
 
 				setLineWidth( material.wireframeLinewidth );
@@ -4383,7 +4383,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			skinning: material.skinning,
 			maxBones: maxBones,
-			useVertexTexture: _supportsBoneTextures && object && object.useVertexTexture,
+			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -4596,26 +4596,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			if ( _supportsBoneTextures && object.useVertexTexture ) {
+			if ( _supportsBoneTextures && object.skeleton.useVertexTexture ) {
 
 				if ( p_uniforms.boneTexture !== null ) {
 
 					var textureUnit = getTextureUnit();
 
 					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
-					_this.setTexture( object.boneTexture, textureUnit );
+					_this.setTexture( object.skeleton.boneTexture, textureUnit );
 
 				}
 
 				if ( p_uniforms.boneTextureWidth !== null ) {
 
-					_gl.uniform1i( p_uniforms.boneTextureWidth, object.boneTextureWidth );
+					_gl.uniform1i( p_uniforms.boneTextureWidth, object.skeleton.boneTextureWidth );
 
 				}
 
 				if ( p_uniforms.boneTextureHeight !== null ) {
 
-					_gl.uniform1i( p_uniforms.boneTextureHeight, object.boneTextureHeight );
+					_gl.uniform1i( p_uniforms.boneTextureHeight, object.skeleton.boneTextureHeight );
 
 				}
 
@@ -4623,7 +4623,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.boneGlobalMatrices !== null ) {
 
-					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
+					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );
 
 				}
 
@@ -4787,10 +4787,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// uv repeat and offset setting priorities
-		//	1. color map
-		//	2. specular map
-		//	3. normal map
-		//	4. bump map
+		//  1. color map
+		//  2. specular map
+		//  3. normal map
+		//  4. bump map
 
 		var uvScaleMap;
 
@@ -5084,7 +5084,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset = i * 2;
 
-					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset ]   = value[ i ].x;
 					uniform._array[ offset + 1 ] = value[ i ].y;
 
 				}
@@ -5103,7 +5103,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset = i * 3;
 
-					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset ]   = value[ i ].x;
 					uniform._array[ offset + 1 ] = value[ i ].y;
 					uniform._array[ offset + 2 ] = value[ i ].z;
 
@@ -5123,7 +5123,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset = i * 4;
 
-					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset ]   = value[ i ].x;
 					uniform._array[ offset + 1 ] = value[ i ].y;
 					uniform._array[ offset + 2 ] = value[ i ].z;
 					uniform._array[ offset + 3 ] = value[ i ].w;
@@ -5955,7 +5955,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
 
 					} else {
-						
+
 						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
 
 						for( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
@@ -6304,7 +6304,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateBones ( object ) {
 
-		if ( _supportsBoneTextures && object && object.useVertexTexture ) {
+		if ( _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
 
 			return 1024;
 
@@ -6314,7 +6314,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// ( for example when prebuilding shader
 			//   to be used with multiple objects )
 			//
-			// 	- leave some extra space for other uniforms
+			//  - leave some extra space for other uniforms
 			//  - limit here is ANGLE's 254 max uniform vectors
 			//    (up to 54 should be safe)
 
@@ -6325,11 +6325,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
 
-				maxBones = Math.min( object.bones.length, maxBones );
+				maxBones = Math.min( object.skeleton.bones.length, maxBones );
 
-				if ( maxBones < object.bones.length ) {
+				if ( maxBones < object.skeleton.bones.length ) {
 
-					console.warn( "WebGLRenderer: too many bones - " + object.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
+					console.warn( "WebGLRenderer: too many bones - " + object.skeleton.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
 
 				}
 
@@ -6431,8 +6431,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 											_gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
-		
-		
+
+
 		if ( _glExtensionTextureFloat === null ) {
 
 			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
@@ -6520,7 +6520,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
-		
+
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};

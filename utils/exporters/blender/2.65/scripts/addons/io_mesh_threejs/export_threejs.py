@@ -1216,6 +1216,10 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
                                         m.ambient * material['colorDiffuse'][1],
                                         m.ambient * material['colorDiffuse'][2]]
 
+            material['colorEmissive'] = [m.emit * material['colorDiffuse'][0],
+                                         m.emit * material['colorDiffuse'][1],
+                                         m.emit * material['colorDiffuse'][2]]
+
             material['transparency'] = m.alpha
 
             # not sure about mapping values to Blinn-Phong shader
@@ -1924,6 +1928,10 @@ def extract_material_data(m, option_colors):
                                 m.ambient * material['colorDiffuse'][1],
                                 m.ambient * material['colorDiffuse'][2]]
 
+    material['colorEmissive'] = [m.emit * material['colorDiffuse'][0],
+                                 m.emit * material['colorDiffuse'][1],
+                                 m.emit * material['colorDiffuse'][2]]
+
     material['transparency'] = m.alpha
 
     # not sure about mapping values to Blinn-Phong shader
@@ -2038,10 +2046,12 @@ def generate_material_string(material):
 
     parameters = '"color": %d' % rgb2int(material["colorDiffuse"])
     parameters += ', "ambient": %d' % rgb2int(material["colorDiffuse"])
+    parameters += ', "emissive": %d' % rgb2int(material["colorEmissive"])
     parameters += ', "opacity": %.2g' % material["transparency"]
 
     if shading == "Phong":
         parameters += ', "ambient": %d' % rgb2int(material["colorAmbient"])
+        parameters += ', "emissive": %d' % rgb2int(material["colorEmissive"])
         parameters += ', "specular": %d' % rgb2int(material["colorSpecular"])
         parameters += ', "shininess": %.1g' % material["specularCoef"]
 

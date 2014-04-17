@@ -7,10 +7,11 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
-	//
+	this.skeleton = new THREE.Skeleton( this.geometry && this.geometry.bones, useVertexTexture );
 
-	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
+  // Add root level bones as children of the mesh
 
+<<<<<<< HEAD
 	// START_VEROLD_MOD - bind matrix
 	this.bindMatrix = new THREE.Matrix4();
 	this.boneMatricesNeedUpdate = true;
@@ -92,10 +93,20 @@ THREE.SkinnedMesh.prototype.addBone = function( bone ) {
 
 	// START_VEROLD_MOD - bind matrix
 	this.boneMatricesNeedUpdate = true;
+=======
+	for ( var b = 0; b < this.skeleton.bones.length; ++b ) {
+
+		var bone = this.skeleton.bones[ b ];
+
+		if ( bone.parent === undefined ) {
+
+			this.add( bone );
+>>>>>>> 447e51f79432b7af63ae2f2f034ad12d05ce8aee
 
 	this.boneInverses = undefined;
 	// END_VEROLD_MOD - bind matrix
 
+<<<<<<< HEAD
 	return bone;
 
 };
@@ -121,9 +132,15 @@ THREE.SkinnedMesh.prototype.initBoneMatrices = function () {
 
 		this.boneTexture.dispose();
 		this.boneTexture = undefined;
-
+=======
 	}
 
+	this.identityMatrix = new THREE.Matrix4();
+>>>>>>> 447e51f79432b7af63ae2f2f034ad12d05ce8aee
+
+	this.pose();
+
+<<<<<<< HEAD
 	if ( this.useVertexTexture ) {
 
 		// layout (1 matrix = 4 pixels)
@@ -163,8 +180,12 @@ THREE.SkinnedMesh.prototype.initBoneMatrices = function () {
 	this.boneMatricesNeedUpdate = false;
 
 	this.pose();
-
+=======
 };
+
+>>>>>>> 447e51f79432b7af63ae2f2f034ad12d05ce8aee
+
+THREE.SkinnedMesh.prototype = Object.create( THREE.Mesh.prototype );
 
 // START_VEROLD_MOD - bind matrix
 THREE.SkinnedMesh.prototype.updateBoneMatrices = function() {
@@ -242,6 +263,7 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 
 		this.matrixAutoUpdate && this.updateMatrix();
 
+<<<<<<< HEAD
 		// update matrixWorld
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
@@ -255,6 +277,11 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 				this.matrixWorld.copy( this.matrix );
 
 			}
+=======
+		if ( this.skeleton.boneInverses === undefined ) {
+
+			this.skeleton.calculateInverses();
+>>>>>>> 447e51f79432b7af63ae2f2f034ad12d05ce8aee
 
 			this.matrixWorldNeedsUpdate = false;
 
@@ -264,19 +291,34 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 
 		// update children
 
+<<<<<<< HEAD
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+=======
+		for ( var b = 0, bl = this.skeleton.bones.length; b < bl; b ++ ) {
+>>>>>>> 447e51f79432b7af63ae2f2f034ad12d05ce8aee
 
 			var child = this.children[ i ];
 
 			if ( child instanceof THREE.Bone ) {
 
+<<<<<<< HEAD
 				child.update( this.identityMatrix, false );
+=======
+			offsetMatrix.multiplyMatrices( this.skeleton.bones[ b ].skinMatrix, this.skeleton.boneInverses[ b ] );
+			offsetMatrix.flattenToArrayOffset( this.skeleton.boneMatrices, b * 16 );
+>>>>>>> 447e51f79432b7af63ae2f2f034ad12d05ce8aee
 
 			} else {
 
+<<<<<<< HEAD
 				child.updateMatrixWorld( true );
 
 			}
+=======
+		if ( this.skeleton.useVertexTexture ) {
+
+			this.skeleton.boneTexture.needsUpdate = true;
+>>>>>>> 447e51f79432b7af63ae2f2f034ad12d05ce8aee
 
 		}
 
