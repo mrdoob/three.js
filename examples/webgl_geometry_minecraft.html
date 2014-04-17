@@ -107,6 +107,8 @@
 				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
+				pyGeometry.uvs[ 5 ] = 0.5;
+				pyGeometry.uvs[ 7 ] = 0.5;
 				// pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
 				// pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
 				// pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
@@ -128,11 +130,7 @@
 
 				//
 
-				var vertices = new Float32Array( worldWidth * worldDepth * 3 * 3 * 2 );
-				var normals = new Float32Array( worldWidth * worldDepth * 3 * 3 * 2 );
-				var uvs = new Float32Array( worldWidth * worldDepth * 3 * 2 * 2 );
-
-				var geometry = new THREE.Geometry2( vertices, normals, uvs );
+				var geometry = new THREE.Geometry2( worldWidth * worldDepth * 2 ); // 2 triangles
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -180,6 +178,8 @@
 					}
 
 				}
+
+				geometry.computeBoundingSphere();
 
 				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;

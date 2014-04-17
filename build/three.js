@@ -4144,23 +4144,26 @@ THREE.Matrix3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( a ) {
+		return function ( array, offset, length ) {
 
-			for ( var i = 0, il = a.length; i < il; i += 3 ) {
+			if ( offset === undefined ) offset = 0;
+			if ( length === undefined ) length = array.length;
 
-				v1.x = a[ i ];
-				v1.y = a[ i + 1 ];
-				v1.z = a[ i + 2 ];
+			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+
+				v1.x = array[ j ];
+				v1.y = array[ j + 1 ];
+				v1.z = array[ j + 2 ];
 
 				v1.applyMatrix3( this );
 
-				a[ i ]     = v1.x;
-				a[ i + 1 ] = v1.y;
-				a[ i + 2 ] = v1.z;
+				array[ j ]     = v1.x;
+				array[ j + 1 ] = v1.y;
+				array[ j + 2 ] = v1.z;
 
 			}
 
-			return a;
+			return array;
 
 		};
 
@@ -4774,23 +4777,26 @@ THREE.Matrix4.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( a ) {
+		return function ( array, offset, length ) {
 
-			for ( var i = 0, il = a.length; i < il; i += 3 ) {
+			if ( offset === undefined ) offset = 0;
+			if ( length === undefined ) length = array.length;
 
-				v1.x = a[ i ];
-				v1.y = a[ i + 1 ];
-				v1.z = a[ i + 2 ];
+			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+
+				v1.x = array[ j ];
+				v1.y = array[ j + 1 ];
+				v1.z = array[ j + 2 ];
 
 				v1.applyMatrix4( this );
 
-				a[ i ]     = v1.x;
-				a[ i + 1 ] = v1.y;
-				a[ i + 2 ] = v1.z;
+				array[ j ]     = v1.x;
+				array[ j + 1 ] = v1.y;
+				array[ j + 2 ] = v1.z;
 
 			}
 
-			return a;
+			return array;
 
 		};
 
@@ -9966,60 +9972,150 @@ THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Geometry2 = function ( vertices, normals, uvs ) {
+THREE.Geometry2 = function ( size ) {
 
 	THREE.BufferGeometry.call( this );
 
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };	
+	if ( size !== undefined ) {
+
+		this.vertices = new Float32Array( size * 3 * 3 );
+		this.normals = new Float32Array( size * 3 * 3 );
+		this.uvs = new Float32Array( size * 3 * 2 );
+
+		this.attributes[ 'position' ] = { array: this.vertices, itemSize: 3 };
+		this.attributes[ 'normal' ] = { array: this.normals, itemSize: 3 };
+		this.attributes[ 'uv' ] = { array: this.uvs, itemSize: 2 };
+
+	}
 
 };
 
 THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-THREE.Geometry2.prototype.merge = function ( geometry, matrix, offset ) {
+THREE.Geometry2.prototype.setArrays = function ( vertices, normals, uvs ) {
 
-	if ( offset === undefined ) offset = 0;
+	this.vertices = vertices;
+	this.normals = normals;
+	this.uvs = uvs;
 
-	var vertices = this.attributes[ 'position' ].array;
-	var normals = this.attributes[ 'normal' ].array;
-	var uvs = this.attributes[ 'uv' ].array;
+	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
+	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
+	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
 
-	if ( geometry instanceof THREE.Geometry2 ) {
+	return this;
 
-		var vertices2 = geometry.attributes[ 'position' ].array;
-		var normals2 = geometry.attributes[ 'normal' ].array;
-		var uvs2 = geometry.attributes[ 'uv' ].array;
+};
 
-		for ( var i = 0, l = vertices2.length; i < l; i ++ ) {
+THREE.Geometry2.prototype.merge = ( function () {
 
-			vertices[ i + offset ] = vertices2[ i ];
-			normals[ i + offset ] = normals2[ i ];
-			uvs[ i + offset ] = uvs2[ i ];
+	var offset = 0;
+	var normalMatrix = new THREE.Matrix3();
+
+	return function ( geometry, matrix, startOffset ) {
+
+		if ( startOffset !== undefined ) offset = startOffset;
+
+		var offset2 = offset * 2;
+		var offset3 = offset * 3;
+
+		var vertices = this.attributes[ 'position' ].array;
+		var normals = this.attributes[ 'normal' ].array;
+		var uvs = this.attributes[ 'uv' ].array;
+
+		if ( geometry instanceof THREE.Geometry2 ) {
+
+			var vertices2 = geometry.attributes[ 'position' ].array;
+			var normals2 = geometry.attributes[ 'normal' ].array;
+			var uvs2 = geometry.attributes[ 'uv' ].array;
+
+			for ( var i = 0, l = vertices2.length; i < l; i += 3 ) {
+
+				vertices[ i + offset3     ] = vertices2[ i     ];
+				vertices[ i + offset3 + 1 ] = vertices2[ i + 1 ];
+				vertices[ i + offset3 + 2 ] = vertices2[ i + 2 ];
+
+				normals[ i + offset3     ] = normals2[ i     ];
+				normals[ i + offset3 + 1 ] = normals2[ i + 1 ];
+				normals[ i + offset3 + 2 ] = normals2[ i + 2 ];
+
+				uvs[ i + offset2     ] = uvs2[ i     ];
+				uvs[ i + offset2 + 1 ] = uvs2[ i + 1 ];
+
+			}
+
+		} else if ( geometry instanceof THREE.IndexedGeometry2 ) {
+
+			var indices2 = geometry.attributes[ 'index' ].array;
+			var vertices2 = geometry.attributes[ 'position' ].array;
+			var normals2 = geometry.attributes[ 'normal' ].array;
+			var uvs2 = geometry.attributes[ 'uv' ].array;
+
+			for ( var i = 0, l = indices2.length; i < l; i ++ ) {
+
+				var index = indices2[ i ];
+
+				var index3 = index * 3;
+				var i3 = i * 3;
+
+				vertices[ i3 + offset3 ] = vertices2[ index3 ];
+				vertices[ i3 + offset3 + 1 ] = vertices2[ index3 + 1 ];
+				vertices[ i3 + offset3 + 2 ] = vertices2[ index3 + 2 ];
+
+				normals[ i3 + offset3 ] = normals2[ index3 ];
+				normals[ i3 + offset3 + 1 ] = normals2[ index3 + 1 ];
+				normals[ i3 + offset3 + 2 ] = normals2[ index3 + 2 ];
+
+				var index2 = index * 2;
+				var i2 = i * 2;
+
+				uvs[ i2 + offset2 ] = uvs2[ index2 ];
+				uvs[ i2 + offset2 + 1 ] = uvs2[ index2 + 1 ];
+
+			}
+
+			if ( matrix !== undefined ) {
+
+				matrix.applyToVector3Array( vertices, offset3, indices2.length * 3 );
+
+				normalMatrix.getNormalMatrix( matrix );
+				normalMatrix.applyToVector3Array( normals, offset3, indices2.length * 3 );
+
+			}
+
+			offset += indices2.length;
 
 		}
 
-	}
+	};
 
-};
+} )();
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.IndexedGeometry2 = function ( indices, vertices, normals, uvs ) {
+THREE.IndexedGeometry2 = function () {
 
 	THREE.BufferGeometry.call( this );
+
+};
+
+THREE.IndexedGeometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+
+THREE.IndexedGeometry2.prototype.setArrays = function ( indices, vertices, normals, uvs ) {
+
+	this.indices = indices;
+	this.vertices = vertices;
+	this.normals = normals;
+	this.uvs = uvs;
 
 	this.attributes[ 'index' ] = { array: indices, itemSize: 1 };
 	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
 	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
 	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };	
 
+	return this;
+
 };
-
-THREE.IndexedGeometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
-
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
@@ -10271,8 +10367,6 @@ THREE.Geometry.prototype = {
 				var faceNormal, vertexNormals;
 
 				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-					face = this.faces[ f ];
 
 					faceNormal = new THREE.Vector3();
 					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
@@ -28996,6 +29090,9 @@ THREE.WebGLShader = ( function () {
 
 		}
 
+		// --enable-privileged-webgl-extension
+		// console.log( type, gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
+
 		return shader;
 
 	};
@@ -29407,8 +29504,12 @@ THREE.ImageUtils = {
 		var images = [];
 		images.loadCount = 0;
 
+		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
+		
 		var texture = new THREE.Texture();
 		texture.image = images;
+		
 		if ( mapping !== undefined ) texture.mapping = mapping;
 
 		// no flipping needed for cube textures
@@ -29417,10 +29518,7 @@ THREE.ImageUtils = {
 
 		for ( var i = 0, il = array.length; i < il; ++ i ) {
 
-			var cubeImage = new Image();
-			images[ i ] = cubeImage;
-
-			cubeImage.onload = function () {
+			var cubeImage = loader.load( array[i], function () {
 
 				images.loadCount += 1;
 
@@ -29433,15 +29531,11 @@ THREE.ImageUtils = {
 
 				}
 
-			};
-
-			cubeImage.onerror = onError;
-
-			cubeImage.crossOrigin = this.crossOrigin;
-			cubeImage.src = array[ i ];
-
+			} );
+			
+			images[ i ] = cubeImage;
 		}
-
+		
 		return texture;
 
 	},
@@ -34334,7 +34428,9 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
   }
 
-  THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
+  THREE.IndexedGeometry2.call( this );
+
+  this.setArrays( indices, vertices, normals, uvs );
 
   this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
@@ -35460,77 +35556,90 @@ THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
-	THREE.Geometry.call( this );
+	this.parameters = {
+		width: width,
+		height: height,
+		widthSegments: widthSegments,
+		heightSegments: heightSegments
+	};
 
-	this.width = width;
-	this.height = height;
-
-	this.widthSegments = widthSegments || 1;
-	this.heightSegments = heightSegments || 1;
-
-	var ix, iz;
 	var width_half = width / 2;
 	var height_half = height / 2;
 
-	var gridX = this.widthSegments;
-	var gridZ = this.heightSegments;
+	var gridX = widthSegments || 1;
+	var gridY = heightSegments || 1;
 
 	var gridX1 = gridX + 1;
-	var gridZ1 = gridZ + 1;
+	var gridY1 = gridY + 1;
 
-	var segment_width = this.width / gridX;
-	var segment_height = this.height / gridZ;
+	var segment_width = width / gridX;
+	var segment_height = height / gridY;
 
-	var normal = new THREE.Vector3( 0, 0, 1 );
+	var vertices = new Float32Array( gridX1 * gridY1 * 3 );
+	var normals = new Float32Array( gridX1 * gridY1 * 3 );
+	var uvs = new Float32Array( gridX1 * gridY1 * 2 );
 
-	for ( iz = 0; iz < gridZ1; iz ++ ) {
+	var offset = 0;
+	var offset2 = 0;
 
-		for ( ix = 0; ix < gridX1; ix ++ ) {
+	for ( var iy = 0; iy < gridY1; iy ++ ) {
+
+		var y = iy * segment_height - height_half;
+
+		for ( var ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
-			var y = iz * segment_height - height_half;
 
-			this.vertices.push( new THREE.Vector3( x, - y, 0 ) );
+			vertices[ offset     ] = x;
+			vertices[ offset + 1 ] = - y;
+
+			normals[ offset + 2 ] = 1;
+
+			uvs[ offset2     ] = ix / gridX;
+			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
+
+			offset += 3;
+			offset2 += 2;
+
+		}
+
+	}
+
+	offset = 0;
+
+	var indices = new ( vertices.length > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
+
+	for ( var iy = 0; iy < gridY; iy ++ ) {
+
+		for ( var ix = 0; ix < gridX; ix ++ ) {
+
+			var a = ix + gridX1 * iy;
+			var b = ix + gridX1 * ( iy + 1 );
+			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
+			var d = ( ix + 1 ) + gridX1 * iy;
+
+			indices[ offset     ] = a;
+			indices[ offset + 1 ] = b;
+			indices[ offset + 2 ] = d;
+
+			indices[ offset + 3 ] = b;
+			indices[ offset + 4 ] = c;
+			indices[ offset + 5 ] = d;
+
+			offset += 6;
 
 		}
 
 	}
 
-	for ( iz = 0; iz < gridZ; iz ++ ) {
+	THREE.IndexedGeometry2.call( this );
 
-		for ( ix = 0; ix < gridX; ix ++ ) {
-
-			var a = ix + gridX1 * iz;
-			var b = ix + gridX1 * ( iz + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
-			var d = ( ix + 1 ) + gridX1 * iz;
-
-			var uva = new THREE.Vector2( ix / gridX, 1 - iz / gridZ );
-			var uvb = new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ );
-			var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ );
-			var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ );
-
-			var face = new THREE.Face3( a, b, d );
-			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
-
-			face = new THREE.Face3( b, c, d );
-			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
-
-		}
-
-	}
+	this.setArrays( indices, vertices, normals, uvs );
+	this.computeBoundingSphere();
 
 };
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
 
 /**
  * @author Kaleb Murphy
@@ -38915,6 +39024,8 @@ THREE.ShadowMapPlugin = function () {
 						material = _depthMaterial;
 
 					}
+
+					_renderer.setMaterialFaces( objectMaterial );
 
 					if ( buffer instanceof THREE.BufferGeometry ) {
 

@@ -298,6 +298,8 @@ THREE.ShadowMapPlugin = function () {
 
 					}
 
+					_renderer.setMaterialFaces( objectMaterial );
+
 					if ( buffer instanceof THREE.BufferGeometry ) {
 
 						// START_VEROLD_MOD - materialIndex in offsets
