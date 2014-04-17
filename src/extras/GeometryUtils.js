@@ -69,12 +69,12 @@ THREE.GeometryUtils = {
 
 	}(),
 
-	// Get random point in face (triangle / quad)
+	// Get random point in face (triangle)
 	// (uniform distribution)
 
 	randomPointInFace: function ( face, geometry, useCachedAreas ) {
 
-		var vA, vB, vC, vD;
+		var vA, vB, vC;
 
 		vA = geometry.vertices[ face.a ];
 		vB = geometry.vertices[ face.b ];
