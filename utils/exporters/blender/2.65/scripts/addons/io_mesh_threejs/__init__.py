@@ -25,7 +25,7 @@ bl_info = {
     "name": "three.js format",
     "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k",
     "version": (1, 4, 0),
-    "blender": (2, 6, 6),
+    "blender": (2, 7, 0),
     "api": 35622,
     "location": "File > Import-Export",
     "description": "Import-Export three.js meshes",

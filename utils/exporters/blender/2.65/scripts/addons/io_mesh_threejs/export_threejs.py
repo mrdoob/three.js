@@ -42,7 +42,7 @@ DEFAULTS = {
 "bgalpha" : 1.0,
 
 "position" : [0, 0, 0],
-"rotation" : [-math.pi/2, 0, 0],
+"rotation" : [0, 0, 0],
 "scale"    : [1, 1, 1],
 
 "camera"  :
@@ -308,8 +308,7 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"skinWeights" : [%(weights)s],
 
-	"animation"  : {%(animation)s},
-        "animations" : [%(animations)s]
+  "animations" : [%(animations)s]
 """
 
 TEMPLATE_VERTEX = "%g,%g,%g"
@@ -1573,7 +1572,6 @@ def generate_ascii_model(meshes, morphs,
     "bones"     : bones_string,
     "indices"   : indices_string,
     "weights"   : weights_string,
-    "animation" : generate_animation(option_animation_skeletal, option_frame_step, flipyz, 0),
     "animations" : generate_all_animations(option_animation_skeletal, option_frame_step, flipyz, option_frame_index_as_time)
     }
 
@@ -2569,7 +2567,6 @@ def save(operator, context, filepath = "",
          option_copy_textures = False,
          option_animation_morph = False,
          option_animation_skeletal = False,
-         option_all_animations = False,
          option_frame_step = 1,
          option_all_meshes = True,
          option_frame_index_as_time = False):
