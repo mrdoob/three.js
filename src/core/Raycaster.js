@@ -435,11 +435,17 @@
 
 	};
 
-	THREE.Raycaster.prototype.intersectObjects = function ( objects, recursive ) {
+	THREE.Raycaster.prototype.intersectObjects = function ( objects, recursive, test ) {
 
 		var intersects = [];
 
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+			if ( test !== undefined && !test(objects[i]) ) {
+
+				continue;
+
+			}
 
 			intersectObject( objects[ i ], this, intersects );
 
