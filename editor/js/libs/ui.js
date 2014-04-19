@@ -495,13 +495,13 @@ UI.FancySelect = function () {
 					// Highlight selected dom elem and scroll parent if needed
 					scope.setValue( scope.options[ scope.selectedIndex ].value );
 
-					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
 
 				}
 
 				break;
 		}
+
 	}, false);
 
 	this.dom = dom;

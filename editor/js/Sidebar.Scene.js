@@ -7,10 +7,16 @@ Sidebar.Scene = function ( editor ) {
 	container.addStatic( new UI.Text( 'SCENE' ) );
 	container.add( new UI.Break() );
 
+	var ignoreObjectSelectedSignal = false;
+
 	var outliner = new UI.FancySelect().setId( 'outliner' );
 	outliner.onChange( function () {
 
+		ignoreObjectSelectedSignal = true;
+
 		editor.selectById( parseInt( outliner.getValue() ) );
+
+		ignoreObjectSelectedSignal = false;
 
 	} );
 	container.add( outliner );
@@ -193,6 +199,8 @@ Sidebar.Scene = function ( editor ) {
 	} );
 
 	signals.objectSelected.add( function ( object ) {
+
+		if ( ignoreObjectSelectedSignal === true ) return;
 
 		outliner.setValue( object !== null ? object.id : null );
 
