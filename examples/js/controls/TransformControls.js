@@ -149,9 +149,11 @@
 			// reset Transformations
 
 			this.traverse(function ( child ) {
-				if (child instanceof THREE.Mesh) {			
+				if (child instanceof THREE.Mesh) {
+					child.updateMatrix();
+
 					var tempGeometry = new THREE.Geometry();
-					tempGeometry.merge( child );
+					tempGeometry.merge( child.geometry, child.matrix );
 
 					child.geometry = tempGeometry;
 					child.position.set( 0, 0, 0 );
