@@ -455,6 +455,13 @@ THREE.Geometry.prototype = {
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
 
+		if ( geometry instanceof THREE.Geometry === false ) {
+
+			console.error( 'THREE.Geometry.merge():', 'geometry supplied is not an instance of THREE.Geometry' );
+			return;
+
+		}
+
 		var normalMatrix,
 		vertexOffset = this.vertices.length,
 		uvPosition = this.faceVertexUvs[ 0 ].length,
