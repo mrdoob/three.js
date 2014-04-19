@@ -194,7 +194,9 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		outliner.setValue( object !== null ? object.id : null );
+		// Prevent chaining calls to setValue when signals originate from the outliner control
+		if ( !outliner.signalingChange )
+			outliner.setValue( object !== null ? object.id : null );
 
 	} );
 
