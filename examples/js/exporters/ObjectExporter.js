@@ -220,6 +220,7 @@ THREE.ObjectExporter.prototype = {
 				data.type = 'DirectionalLight';
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
+				data.targetUuid = object.target.uuid;
 
 			} else if ( object instanceof THREE.PointLight ) {
 
@@ -236,6 +237,7 @@ THREE.ObjectExporter.prototype = {
 				data.distance = object.distance;
 				data.angle = object.angle;
 				data.exponent = object.exponent;
+				data.targetUuid = object.target.uuid;
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 

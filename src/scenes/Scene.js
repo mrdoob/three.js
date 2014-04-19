@@ -31,11 +31,23 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 		}
 
-		if ( object.target && object.target.parent === undefined ) {
 
-			this.add( object.target );
+		if ( object.target && object.target.parent === undefined) {
 
+			if(!object.targetUuid){
+
+				// Add a new target to the scene for this light
+
+				this.add( object.target );
+				object.targetUuid = object.target.uuid;
+
+			}
+
+			// If the light has a targetUuid, then it is likely being loaded from JSON and already had a target.
+			// its target will be loaded later, after which we can link this light to its target.
+			
 		}
+		
 
 	} else if ( !( object instanceof THREE.Camera || object instanceof THREE.Bone ) ) {
 
