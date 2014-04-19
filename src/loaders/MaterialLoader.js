@@ -58,6 +58,10 @@ THREE.MaterialLoader.prototype = {
 
 		}
 
+		material.uuid = json.uuid;
+
+		if ( json.name !== undefined ) material.name = json.name;
+
 		return material;
 
 	}

@@ -764,3 +764,41 @@ THREE.Geometry.prototype = {
 THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
 
 THREE.GeometryIdCount = 0;
+
+THREE.Geometry.prototype.toJSON = function ( exporters ) {
+
+	if ( exporters === undefined ) exporters = {};
+
+	if ( exporters.geometryExporter === undefined ) {
+		exporters.geometryExporter = new THREE.GeometryExporter();
+	}
+
+	var data = THREE.Geometry.toJSONCommon.call( this );
+
+	data.type = 'Geometry';
+	data.data = exporters.geometryExporter.parse( this );
+
+	delete data.data.metadata;
+
+	return data
+
+};
+
+THREE.Geometry.toJSONCommon = function() {
+	
+	var data = {};
+
+	data.uuid = this.uuid;
+	if ( this.name !== "" ) data.name = this.name;
+
+	return data;
+
+};
+
+
+THREE.Geometry.fromJSON = function (data, loaders) {
+
+	var geometry = loaders.geometryLoader.parse( data.data ).geometry;
+	return geometry;
+
+};

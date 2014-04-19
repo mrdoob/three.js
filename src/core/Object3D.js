@@ -545,3 +545,76 @@ THREE.Object3D.prototype = {
 THREE.EventDispatcher.prototype.apply( THREE.Object3D.prototype );
 
 THREE.Object3DIdCount = 0;
+
+THREE.Object3D.prototype.toJSON = function( exporters ) {
+
+	var data = {};
+
+	data.type = 'Object3D';
+
+	data.uuid = this.uuid;
+	if ( this.name !== '' ) data.name = this.name;
+	if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
+	if ( this.visible !== true ) data.visible = this.visible;
+
+	data.matrix = this.matrix.toArray();
+
+	if ( this.children.length > 0 ) {
+
+		data.children = [];
+
+		for ( var i = 0; i < this.children.length; i ++ ) {
+
+			data.children.push( this.children[ i ].toJSON( exporters ) );
+
+		}
+
+	}
+
+	return data;
+
+};
+
+THREE.Object3D.fromJSON = function( data, geometries, materials ) {
+
+	var object = new THREE.Object3D();
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
+
+};
+
+THREE.Object3D.fromJSONCommon = function( data, geometries, materials ) {
+
+	var parseObject = THREE.ObjectLoader.prototype.parseObject;
+	var matrix = new THREE.Matrix4();
+
+	this.uuid = data.uuid;
+
+	if ( data.name !== undefined ) this.name = data.name;
+	if ( data.matrix !== undefined ) {
+
+		matrix.fromArray( data.matrix );
+		matrix.decompose( this.position, this.quaternion, this.scale );
+
+	} else {
+
+		if ( data.position !== undefined ) this.position.fromArray( data.position );
+		if ( data.rotation !== undefined ) this.rotation.fromArray( data.rotation );
+		if ( data.scale !== undefined ) this.scale.fromArray( data.scale );
+
+	}
+
+	if ( data.visible !== undefined ) this.visible = data.visible;
+	if ( data.userData !== undefined ) this.userData = data.userData;
+
+	if ( data.children !== undefined ) {
+
+		for ( var child in data.children ) {
+
+			this.add( parseObject.call( null, data.children[ child ], geometries, materials ) );
+
+		}
+
+	}
+
+};

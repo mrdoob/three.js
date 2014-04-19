@@ -42,3 +42,27 @@ THREE.OrthographicCamera.prototype.clone = function () {
 
 	return camera;
 };
+
+THREE.OrthographicCamera.prototype.toJSON = function( exporters ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, exporters );
+	
+	data.type = 'OrthographicCamera';
+	data.left = this.left;
+	data.right = this.right;
+	data.top = this.top;
+	data.bottom = this.bottom;
+	data.near = this.near;
+	data.far = this.far;
+
+	return data;
+
+};
+
+THREE.OrthographicCamera.fromJSON = function( data, geometries, materials ) {
+
+	var object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
+
+};

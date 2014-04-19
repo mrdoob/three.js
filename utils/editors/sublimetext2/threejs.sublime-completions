@@ -49,7 +49,6 @@
 		{ "trigger": "THREE.LoadingManager", "contents": "THREE.LoadingManager( ${1:onLoad}, ${2:onProgress}, ${3:onError} )$0" },
 		{ "trigger": "THREE.BufferGeometryLoader", "contents": "THREE.BufferGeometryLoader( ${1:manager} )$0" },
 		{ "trigger": "THREE.GeometryLoader", "contents": "THREE.GeometryLoader( ${1:manager} )$0" },
-		{ "trigger": "THREE.MaterialLoader", "contents": "THREE.MaterialLoader( ${1:manager} )$0" },
 		{ "trigger": "THREE.ObjectLoader", "contents": "THREE.ObjectLoader( ${1:manager} )$0" },
 		{ "trigger": "THREE.SceneLoader", "contents": "THREE.SceneLoader()$0" },
 		{ "trigger": "THREE.TextureLoader", "contents": "THREE.TextureLoader( ${1:manager} )$0" },

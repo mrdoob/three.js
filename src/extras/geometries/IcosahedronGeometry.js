@@ -29,3 +29,24 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
+THREE.IcosahedronGeometry.prototype.toJSON = function ( exporters ) {
+
+	var data = THREE.Geometry.toJSONCommon.call( this );
+	data.type = 'IcosahedronGeometry';
+	data.radius = this.parameters.radius;
+	data.detail = this.parameters.detail;
+
+	return data;
+
+};
+
+THREE.IcosahedronGeometry.fromJSON = function (data, loaders) {
+
+	var geometry = new THREE.IcosahedronGeometry(
+		data.radius,
+		data.detail
+	);
+	return geometry;
+
+};

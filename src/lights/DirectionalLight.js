@@ -108,3 +108,24 @@ THREE.DirectionalLight.prototype.clone = function () {
 	return light;
 
 };
+
+THREE.DirectionalLight.prototype.toJSON = function( exporters ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call(this, exporters);
+	
+	data.type = 'DirectionalLight';
+	data.color = this.color.getHex();
+	data.intensity = this.intensity;
+
+	return data;
+
+};
+
+
+THREE.DirectionalLight.fromJSON = function( data, geometries, materials ) {
+  
+	var object = new THREE.DirectionalLight( data.color, data.intensity );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
+
+};

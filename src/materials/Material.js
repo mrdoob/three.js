@@ -131,3 +131,14 @@ THREE.Material.prototype = {
 THREE.EventDispatcher.prototype.apply( THREE.Material.prototype );
 
 THREE.MaterialIdCount = 0;
+
+THREE.Material.prototype.toJSON = function () {
+
+	var data = {};
+
+	data.uuid = this.uuid;
+	if ( this.name !== "" ) data.name = this.name;
+
+	return data;
+
+};

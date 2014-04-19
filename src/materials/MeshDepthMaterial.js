@@ -40,3 +40,17 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.MeshDepthMaterial.prototype.toJSON = function () {
+
+	var data = THREE.Material.prototype.toJSON.call(this);
+	data.type = 'MeshDepthMaterial';
+	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+	if ( this.side !== THREE.FrontSide ) data.side = this.side;
+	data.opacity = this.opacity;
+	data.transparent = this.transparent;
+	data.wireframe = this.wireframe;
+	
+	return data;
+
+};

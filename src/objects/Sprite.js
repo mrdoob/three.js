@@ -46,6 +46,33 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
+THREE.Sprite.prototype.toJSON = function( exporters ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, data, exporters )
+
+	data.type = 'Sprite';
+	data.material = exporters.parseMaterial( this.material );
+
+	return data;
+
+};
+
+THREE.Sprite.fromJSON = function( data, geometries, materials ) {
+
+	var material = materials[ data.material ];
+
+	if ( material === undefined ) {
+
+		console.error( 'THREE.Sprite.fromJSON: Undefined material ' + data.material );
+
+	}
+
+	var object = new THREE.Sprite( material );
+	THREE.Object3D.fromJSONCommon.call( object, data, geometries, materials );
+	return object;
+
+};
+
 // Backwards compatibility
 
 THREE.Particle = THREE.Sprite;
