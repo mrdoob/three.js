@@ -72,4 +72,4 @@ THREE.CircleGeometry2 = function ( radius, segments, thetaStart, thetaLength ) {
 
 };
 
-THREE.CircleGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.CircleGeometry2.prototype = Object.create( THREE.IndexedGeometry2.prototype );

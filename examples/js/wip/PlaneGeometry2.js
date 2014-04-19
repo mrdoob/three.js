@@ -88,4 +88,4 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 
 };
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.PlaneGeometry2.prototype = Object.create( THREE.IndexedGeometry2.prototype );
