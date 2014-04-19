@@ -15,52 +15,36 @@ THREE.ImageLoader.prototype = {
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var image = document.createElement( 'img' );
+		var request = new XMLHttpRequest();
+		var image = new Image();
 
 		if ( onLoad !== undefined ) {
 
-			image.addEventListener( 'load', function ( event ) {
+			request.onload = function () {
 
-				scope.manager.itemEnd( url );
-				onLoad( this );
+				image.src = window.URL.createObjectURL( request.response );
+				
+				image.onload = function () {
 
-			}, false );
+					scope.manager.itemEnd( url );
+					onLoad( this );
 
-		}
+				}
 
-		if ( onProgress !== undefined ) {
-
-			image.addEventListener( 'progress', function ( event ) {
-
-				onProgress( event );
-
-			}, false );
+			}
 
 		}
 
-		if ( onError !== undefined ) {
+		request.onprogress = onProgress;
+		request.onerror = onError;
 
-			image.addEventListener( 'error', function ( event ) {
-
-				onError( event );
-
-			}, false );
-
-		}
-
-		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
-
-		image.src = url;
+		request.open( 'GET', url, true );
+		request.responseType = 'blob';
+		request.send( null );
 
 		scope.manager.itemStart( url );
 
 		return image;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
 
 	}
 
