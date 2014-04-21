@@ -2181,7 +2181,7 @@ def generate_cameras(data):
                     "target"    : generate_vec3([0, 0, 0])
                     }
 
-            elif camera.id_data.type == "ORTHO":
+                elif camera.id_data.type == "ORTHO":
 
                     camera_string = TEMPLATE_CAMERA_ORTHO % {
                     "camera_id" : generate_string(camera.name),
