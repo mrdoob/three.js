@@ -91,11 +91,17 @@ THREE.EventDispatcher.prototype = {
 
 				var length = listenerArray.length;
 
-				for ( var i = 0; i < length; i ++ ) {
-
-					array[ i ] = listenerArray[ i ];
-					array[ i ].call( this, event );
-
+			        for ( var i = 0; i < length; i ++ ) {
+			          
+					array.unshift(listenerArray[ i ]);
+			          
+			        }
+				
+				for ( var j = length - 1; j > -1; j -- ) {
+					
+					array[ j ].call( this, event );
+					array.splice( j, 1 );
+					
 				}
 
 			}
