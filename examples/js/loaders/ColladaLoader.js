@@ -124,9 +124,10 @@ THREE.ColladaLoader = function () {
 
 		if ( url !== undefined ) {
 
-			var parts = url.split( '/' );
+            		var separator = url.indexOf( '\\' ) >= 0 ? '\\' : '/';
+			var parts = url.split( separator );
 			parts.pop();
-			baseUrl = ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+			baseUrl = ( parts.length < 1 ? '.' : parts.join( separator ) ) + separator;
 
 		}
 
