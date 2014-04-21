@@ -23,6 +23,8 @@ THREE.PointerLockControls = function ( camera ) {
 	var isOnObject = false;
 	var canJump = false;
 
+	var prevTime = performance.now();
+
 	var velocity = new THREE.Vector3();
 
 	var PI_2 = Math.PI / 2;
@@ -65,7 +67,7 @@ THREE.PointerLockControls = function ( camera ) {
 				break;
 
 			case 32: // space
-				if ( canJump === true ) velocity.y += 10;
+				if ( canJump === true ) velocity.y += 350;
 				canJump = false;
 				break;
 
@@ -139,22 +141,23 @@ THREE.PointerLockControls = function ( camera ) {
 
 	}();
 
-	this.update = function ( delta ) {
+	this.update = function () {
 
 		if ( scope.enabled === false ) return;
 
-		delta *= 0.1;
+		var time = performance.now();
+		var delta = ( time - prevTime ) / 1000;
 
-		velocity.x += ( - velocity.x ) * 0.08 * delta;
-		velocity.z += ( - velocity.z ) * 0.08 * delta;
+		velocity.x -= velocity.x * 10.0 * delta;
+		velocity.z -= velocity.z * 10.0 * delta;
 
-		velocity.y -= 0.25 * delta;
+		velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
-		if ( moveForward ) velocity.z -= 0.12 * delta;
-		if ( moveBackward ) velocity.z += 0.12 * delta;
+		if ( moveForward ) velocity.z -= 400.0 * delta;
+		if ( moveBackward ) velocity.z += 400.0 * delta;
 
-		if ( moveLeft ) velocity.x -= 0.12 * delta;
-		if ( moveRight ) velocity.x += 0.12 * delta;
+		if ( moveLeft ) velocity.x -= 400.0 * delta;
+		if ( moveRight ) velocity.x += 400.0 * delta;
 
 		if ( isOnObject === true ) {
 
@@ -162,9 +165,9 @@ THREE.PointerLockControls = function ( camera ) {
 
 		}
 
-		yawObject.translateX( velocity.x );
-		yawObject.translateY( velocity.y ); 
-		yawObject.translateZ( velocity.z );
+		yawObject.translateX( velocity.x * delta );
+		yawObject.translateY( velocity.y * delta ); 
+		yawObject.translateZ( velocity.z * delta );
 
 		if ( yawObject.position.y < 10 ) {
 
@@ -174,6 +177,8 @@ THREE.PointerLockControls = function ( camera ) {
 			canJump = true;
 
 		}
+
+		prevTime = time;
 
 	};
 

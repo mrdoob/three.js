@@ -31,7 +31,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	}
 
 	delete geometry.__tmpVertices;
-	geometry.computeCentroids();
+
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
 

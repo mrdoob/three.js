@@ -85,9 +85,11 @@
 				
 					scene.add( geometry.scene );
 
-					camera.lookAt(geometry.scene.children[0].children[1].position);
+					// T.P. adapted this to use un-flattened DAE hierarchy; see ColladaLoader.js
+					// for more information
+					var skin = geometry.scene.children[0].children[1].children[0];
+					camera.lookAt(skin.position);
 
-					var skin = geometry.scene.children[0].children[1];
 					
 					if ( skin.geometry.animation ) {
 

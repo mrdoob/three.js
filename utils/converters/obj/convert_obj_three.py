@@ -399,6 +399,7 @@ def parse_mtl(fname):
             # Transparency
             # Tr 0.9 or d 0.9
             if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
+                materials[identifier]["transparent"] = True
                 if TRANSPARENCY == "invert":
                     materials[identifier]["transparency"] = 1.0 - float(chunks[1])
                 else:

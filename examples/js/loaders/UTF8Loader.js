@@ -34,9 +34,13 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 
 	var geometry = new THREE.BufferGeometry();
 
-	var positionArray = new Float32Array( 3 * 3 * ntris );
-	var normalArray = new Float32Array( 3 * 3 * ntris );
-	var uvArray = new Float32Array( 2 * 3 * ntris );
+    var positions = new THREE.Float32Attribute( ntris * 3, 3 );
+    var normals = new THREE.Float32Attribute( ntris * 3, 3 );
+    var uvs = new THREE.Float32Attribute( ntris * 3, 2 );
+
+	var positionsArray = positions.array;
+	var normalsArray = normals.array;
+	var uvsArray = uvs.array;
 
 	var i, j, offset;
 	var x, y, z;
@@ -56,9 +60,9 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 		y = attribArray[ i + 1 ];
 		z = attribArray[ i + 2 ];
 
-		positionArray[ j++ ] = x;
-		positionArray[ j++ ] = y;
-		positionArray[ j++ ] = z;
+		positionsArray[ j++ ] = x;
+		positionsArray[ j++ ] = y;
+		positionsArray[ j++ ] = z;
 
 	}
 
@@ -72,8 +76,8 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 		u = attribArray[ i ];
 		v = attribArray[ i + 1 ];
 
-		uvArray[ j++ ] = u;
-		uvArray[ j++ ] = v;
+		uvsArray[ j++ ] = u;
+		uvsArray[ j++ ] = v;
 
 	}
 
@@ -88,189 +92,22 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 		y = attribArray[ i + 1 ];
 		z = attribArray[ i + 2 ];
 
-		normalArray[ j++ ] = x;
-		normalArray[ j++ ] = y;
-		normalArray[ j++ ] = z;
+		normalsArray[ j++ ] = x;
+		normalsArray[ j++ ] = y;
+		normalsArray[ j++ ] = z;
 
 	}
 
-	// create attributes
+    geometry.addAttribute( 'index', indexArray, 1 );
+    geometry.addAttribute( 'position', positions );
+    geometry.addAttribute( 'normal', normals );
+    geometry.addAttribute( 'uv', uvs );
 
-	var attributes = geometry.attributes;
-
-	attributes[ "index" ]    = { itemSize: 1, array: indexArray };
-	attributes[ "position" ] = { itemSize: 3, array: positionArray };
-	attributes[ "normal" ]   = { itemSize: 3, array: normalArray };
-	attributes[ "uv" ] 		 = { itemSize: 2, array: uvArray };
-
-	// create offsets
-	// (all triangles should fit in a single chunk)
-
-	geometry.offsets = [ { start: 0, count: indexArray.length, index: 0 } ];
+    geometry.offsets.push( { start: 0, count: indexArray.length, index: 0 } );
 
 	geometry.computeBoundingSphere();
 
 	return geometry;
-
-};
-
-// GeometryCreator
-
-THREE.UTF8Loader.GeometryCreator = function () {
-};
-
-THREE.UTF8Loader.GeometryCreator.prototype = {
-
-    create: function ( attribArray, indexArray ) {
-
-        var geometry = new THREE.Geometry();
-
-        this.init_vertices( geometry, attribArray, 8, 0 );
-
-        var uvs = this.init_uvs( attribArray, 8, 3 );
-        var normals = this.init_normals( attribArray, 8, 5 );
-
-        this.init_faces( geometry, normals, uvs, indexArray );
-
-        geometry.computeCentroids();
-        geometry.computeFaceNormals();
-
-        return geometry;
-
-    },
-
-    init_vertices: function ( scope, data, stride, offset ) {
-
-        var i, x, y, z;
-		var end = data.length;
-
-        for( i = offset; i < end; i += stride ) {
-
-            x = data[ i ];
-            y = data[ i + 1 ];
-            z = data[ i + 2 ];
-
-            this.addVertex( scope, x, y, z );
-
-        }
-
-    },
-
-    init_normals: function( data, stride, offset ) {
-
-        var normals = [];
-
-        var i, x, y, z;
-		var end = data.length;
-
-        for( i = offset; i < end; i += stride ) {
-
-            // Assumes already normalized to <-1,1> (unlike previous version of UTF8Loader)
-
-            x = data[ i ];
-            y = data[ i + 1 ];
-            z = data[ i + 2 ];
-
-            normals.push( x, y, z );
-
-        }
-
-        return normals;
-
-    },
-
-    init_uvs: function( data, stride, offset ) {
-
-        var uvs = [];
-
-        var i, u, v;
-		var end = data.length;
-
-        for( i = offset; i < end; i += stride ) {
-
-            // Assumes uvs are already normalized (unlike previous version of UTF8Loader)
-            // uvs can be negative, need to set wrap for texture map later on ...
-
-            u = data[ i ];
-            v = data[ i + 1 ];
-
-            uvs.push( u, v );
-        }
-
-        return uvs;
-
-    },
-
-    init_faces: function( scope, normals, uvs, indices ) {
-
-        var i,
-            a, b, c,
-            u1, v1, u2, v2, u3, v3;
-
-		var end = indices.length;
-
-        var m = 0; // all faces defaulting to material 0
-
-        for( i = 0; i < end; i += 3 ) {
-
-            a = indices[ i ];
-            b = indices[ i + 1 ];
-            c = indices[ i + 2 ];
-
-            this.f3n( scope, normals, a, b, c, m, a, b, c );
-
-            u1 = uvs[ a * 2 ];
-            v1 = uvs[ a * 2 + 1 ];
-
-            u2 = uvs[ b * 2 ];
-            v2 = uvs[ b * 2 + 1 ];
-
-            u3 = uvs[ c * 2 ];
-            v3 = uvs[ c * 2 + 1 ];
-
-            this.uv3( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3 );
-
-        }
-
-    },
-
-    addVertex: function ( scope, x, y, z ) {
-
-        scope.vertices.push( new THREE.Vector3( x, y, z ) );
-
-    },
-
-    f3n: function( scope, normals, a, b, c, mi, nai, nbi, nci ) {
-
-        var nax = normals[ nai * 3 ],
-            nay = normals[ nai * 3 + 1 ],
-            naz = normals[ nai * 3 + 2 ],
-
-            nbx = normals[ nbi * 3 ],
-            nby = normals[ nbi * 3 + 1 ],
-            nbz = normals[ nbi * 3 + 2 ],
-
-            ncx = normals[ nci * 3 ],
-            ncy = normals[ nci * 3 + 1 ],
-            ncz = normals[ nci * 3 + 2 ];
-
-        var na = new THREE.Vector3( nax, nay, naz ),
-            nb = new THREE.Vector3( nbx, nby, nbz ),
-            nc = new THREE.Vector3( ncx, ncy, ncz );
-
-        scope.faces.push( new THREE.Face3( a, b, c, [ na, nb, nc ], null, mi ) );
-
-    },
-
-    uv3: function ( where, u1, v1, u2, v2, u3, v3 ) {
-
-        var uv = [];
-        uv.push( new THREE.Vector2( u1, v1 ) );
-        uv.push( new THREE.Vector2( u2, v2 ) );
-        uv.push( new THREE.Vector2( u3, v3 ) );
-        where.push( uv );
-
-    }
 
 };
 
@@ -805,7 +642,6 @@ THREE.UTF8Loader.prototype.createMeshCallback = function( materialBaseUrl, loadM
 
 	// Create callback for creating mesh parts
 
-    var geometryCreator = new THREE.UTF8Loader.GeometryCreator();
 	var bufferGeometryCreator = new THREE.UTF8Loader.BufferGeometryCreator();
 
 	var meshCallback = function( name, idx, attribArray, indexArray, bboxen, meshParams ) {
@@ -819,18 +655,7 @@ THREE.UTF8Loader.prototype.createMeshCallback = function( materialBaseUrl, loadM
         // bboxen defines the bounding box
         // meshParams contains the material info
 
-		var useBuffers = loadModelInfo.options.useBuffers !== undefined ? loadModelInfo.options.useBuffers : true;
-
-		if ( useBuffers ) {
-
-			var geometry = bufferGeometryCreator.create( attribArray, indexArray );
-
-		} else {
-
-			var geometry = geometryCreator.create( attribArray, indexArray );
-
-		}
-
+		var geometry = bufferGeometryCreator.create( attribArray, indexArray );
         var material = materialCreator.create( meshParams.material );
 
 		var mesh = new THREE.Mesh( geometry, material );

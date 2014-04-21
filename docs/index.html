@@ -17,7 +17,7 @@
 
 			body {
 				margin: 0;
-				padding: 0;
+				padding: 0 0 0 260px;
 				height: 100%;
 				color: #555;
 				font-family: 'inconsolata';
@@ -33,13 +33,15 @@
 
 			#panel	{
 				position: fixed;
+				left: 0px;
 				width: 260px;
 				height: 100%;
 				overflow: auto;
+				background: #fafafa;
 			}
 
 				#panel h1 {
-					margin-top: 20px;
+					margin-top: 30px;
 					margin-bottom: 40px;
 					margin-left: 20px;
 					font-size: 25px;
@@ -72,10 +74,7 @@
 
 			#viewer {
 				border: 0px;
-				margin-left: 260px;
-				width: -webkit-calc(100% - 260px);
-				width: -moz-calc(100% - 260px);
-				width: calc(100% - 260px);
+				width: 100%;
 				height: 100%;
 				overflow: auto;
 			}

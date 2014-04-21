@@ -347,7 +347,7 @@
 			var looptime = 20 * 1000;
 			var t = ( time % looptime ) / looptime;
 
-			var pos = tube.path.getPointAt( t );
+			var pos = tube.parameters.path.getPointAt( t );
 			pos.multiplyScalar( scale );
 
 			// interpolation
@@ -360,7 +360,7 @@
 			binormal.multiplyScalar( pickt - pick ).add( tube.binormals[ pick ] );
 
 
-			var dir = tube.path.getTangentAt( t );
+			var dir = tube.parameters.path.getTangentAt( t );
 
 			var offset = 15;
 
@@ -377,7 +377,7 @@
 			// splineCamera.lookAt( lookAt );
 
 			// Using arclength for stablization in look ahead.
-			var lookAt = tube.path.getPointAt( ( t + 30 / tube.path.getLength() ) % 1 ).multiplyScalar( scale );
+			var lookAt = tube.parameters.path.getPointAt( ( t + 30 / tube.parameters.path.getLength() ) % 1 ).multiplyScalar( scale );
 
 			// Camera Orientation 2 - up orientation via normal
 			if (!lookAhead)

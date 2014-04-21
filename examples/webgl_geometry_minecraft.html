@@ -49,6 +49,10 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<script src="js/wip/Geometry2.js"></script>
+		<script src="js/wip/IndexedGeometry2.js"></script>
+		<script src="js/wip/PlaneGeometry2.js"></script>
+
 		<script>
 
 			if ( ! Detector.webgl ) {
@@ -92,44 +96,45 @@
 
 				var matrix = new THREE.Matrix4();
 
-				var pxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				pxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				var pxGeometry = new THREE.PlaneGeometry2( 100, 100 );
+				// pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				// pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				// pxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
 				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
 
-				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				nxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				var nxGeometry = new THREE.PlaneGeometry2( 100, 100 );
+				// nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				// nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				// nxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
 				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
 
-				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
-				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
-				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
+				var pyGeometry = new THREE.PlaneGeometry2( 100, 100 );
+				pyGeometry.uvs[ 5 ] = 0.5;
+				pyGeometry.uvs[ 7 ] = 0.5;
+				// pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
+				// pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
+				// pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
 				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
 				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
 
-				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				pzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				var pzGeometry = new THREE.PlaneGeometry2( 100, 100 );
+				// pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				// pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				// pzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
 
-				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
-				nzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
+				var nzGeometry = new THREE.PlaneGeometry2( 100, 100 );
+				// nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				// nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				// nzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
 				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
 
 				//
 
-				var geometry = new THREE.Geometry();
-				var dummy = new THREE.Mesh();
+				var geometry = new THREE.Geometry2( worldWidth * worldDepth * 2 ); // 2 triangles
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -137,49 +142,48 @@
 
 						var h = getY( x, z );
 
-						dummy.position.x = x * 100 - worldHalfWidth * 100;
-						dummy.position.y = h * 100;
-						dummy.position.z = z * 100 - worldHalfDepth * 100;
+						matrix.makeTranslation(
+							x * 100 - worldHalfWidth * 100,
+							h * 100,
+							z * 100 - worldHalfDepth * 100
+						);
 
 						var px = getY( x + 1, z );
 						var nx = getY( x - 1, z );
 						var pz = getY( x, z + 1 );
 						var nz = getY( x, z - 1 );
 
-						dummy.geometry = pyGeometry;
-						THREE.GeometryUtils.merge( geometry, dummy );
+						geometry.merge( pyGeometry, matrix );
 
 						if ( ( px != h && px != h + 1 ) || x == 0 ) {
 
-							dummy.geometry = pxGeometry;
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( pxGeometry, matrix );
 
 						}
 
 						if ( ( nx != h && nx != h + 1 ) || x == worldWidth - 1 ) {
 
-							dummy.geometry = nxGeometry;
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( nxGeometry, matrix );
 
 						}
 
 						if ( ( pz != h && pz != h + 1 ) || z == worldDepth - 1 ) {
 
-							dummy.geometry = pzGeometry;
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( pzGeometry, matrix );
 
 						}
 
 						if ( ( nz != h && nz != h + 1 ) || z == 0 ) {
 
-							dummy.geometry = nzGeometry;
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( nzGeometry, matrix );
 
 						}
 
 					}
 
 				}
+
+				geometry.computeBoundingSphere();
 
 				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;

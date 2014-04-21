@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
@@ -182,7 +182,6 @@
 
 				// in case of duplicated vertices
 				geometry.mergeVertices();
-				geometry.computeCentroids();
 				geometry.computeFaceNormals();
 				geometry.computeVertexNormals( true );
 
@@ -225,9 +224,16 @@
 
 				for( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 					var face = geometry.faces[ f ];
+
+					var centroid = new THREE.Vector3()
+						.add( geometry.vertices[ face.a ] )
+						.add( geometry.vertices[ face.b ] )
+						.add( geometry.vertices[ face.c ] )
+						.divideScalar( 3 );
+
 					var arrow = new THREE.ArrowHelper( 
 							face.normal,
-							face.centroid,
+							centroid,
 							normalLength,
 							0x3333FF );
 					mesh.add( arrow );

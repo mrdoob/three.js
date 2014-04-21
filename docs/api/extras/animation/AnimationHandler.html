@@ -9,7 +9,11 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">
+		The AnimationHandler handles the initialisation of the Animation data and 
+		the animations itself. It keeps track of every animation and if it's active or not.
+		It also update all animations which are active if its method *update* is called.
+		</div>
 
 
 		<h2>Constructor</h2>
@@ -17,7 +21,7 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		The animationHandler can't be called as constructor.
 		</div>
 
 		<h2>Properties</h2>
@@ -25,69 +29,69 @@
 
 		<h3>.[page:number CATMULLROM]</h3>
 		<div>
-		todo
+		Enum Value to indicate that the animation needs to be interpolated as CATMULLROM.
 		</div> 
 
 		<h3>.[page:number CATMULLROM_FORWARD]</h3>
 		<div>
-		todo
+		Enum Value to indicate that the animation needs to be interpolated as CATMULLROM_FORWARD.
 		</div> 
 
 		<h3>.[page:number LINEAR]</h3>
 		<div>
-		todo
+		Enum Value to indicate that the animation needs to be interpolated as LINEAR.
 		</div> 
 
 		<h2>Methods</h2>
 
 
 
-		<h3>.removeFromUpdate([page:todo animation]) [page:todo]</h3>
+		<h3>.removeFromUpdate([page:Animation animation])</h3>
 		<div>
-		animation -- todo
+		animation -- The Animation to remove from the update. 
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.get([page:todo name]) [page:todo]</h3>
-		<div>
-		name -- todo
-		</div>
-		<div>
-		todo
+		Removes the animation from the update cycle. This gets called when the animation stops. This shouldn't be called by usercode.
 		</div>
 
-		<h3>.update([page:todo deltaTimeMS]) [page:todo]</h3>
+		<h3>.get([page:String name]) [page:Object]</h3>
 		<div>
-		deltaTimeMS -- todo
+		name -- The name of the animationData
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.parse([page:todo root]) [page:todo]</h3>
-		<div>
-		root -- todo
-		</div>
-		<div>
-		todo
+		Gets the animationData from its library.
 		</div>
 
-		<h3>.add([page:todo data]) [page:todo]</h3>
+		<h3>.update([page:Number deltaTimeMS]) </h3>
 		<div>
-		data -- todo
+		deltaTimeMS -- Time elapsed since last update in milliseconds.
 		</div>
 		<div>
-		todo
+		Updates all active animations with deltaTime.
 		</div>
 
-		<h3>.addToUpdate([page:todo animation]) [page:todo]</h3>
+		<h3>.parse([page:Object root])</h3>
 		<div>
-		animation -- todo
+		root -- object
 		</div>
 		<div>
-		todo
+		Parses the object to get the hierachy.
+		</div>
+
+		<h3>.add([page:object data])</h3>
+		<div>
+		data -- The animationData
+		</div>
+		<div>
+		Adds the animationData from its library.
+		</div>
+
+		<h3>.addToUpdate([page:Animation animation]) </h3>
+		<div>
+		animation -- The Animation to add from the update. 
+		</div>
+		<div>
+		Adds the animation from the update cycle. This gets called when the animation starts. This shouldn't be called by user code.
 		</div>
 
 		<h2>Source</h2>

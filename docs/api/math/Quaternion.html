@@ -57,22 +57,29 @@
 		Copies values of *q* to this quaternion.
 		</div>
 
-		<h3>.setFromEuler( [page:Vector3 vector] ) [page:Quaternion]</h3>
+		<h3>.setFromEuler( [page:Euler euler] ) [page:Quaternion]</h3>
 		<div>
-		Sets this quaternion from rotation specified by Euler angles.
+		Sets this quaternion from rotation specified by Euler angle.
 		</div>
 
 		<h3>.setFromAxisAngle( [page:Vector3 axis], [page:Float angle] ) [page:Quaternion]</h3>
 		<div>
 		Sets this quaternion from rotation specified by axis and angle.<br />
 		Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm].<br />
-		*Axis* have to be normalized, *angle* is in radians.
+		*Axis* is asumed to be normalized, *angle* is in radians.
 		</div>
 
 		<h3>.setFromRotationMatrix( [page:Matrix4 m] ) [page:Quaternion]</h3>
 		<div>
-		Sets this quaternion from rotation component of *m*.
+		Sets this quaternion from rotation component of *m*.<br />
 		Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm].
+		</div>
+
+		<h3>.setFromUnitVectors( [page:Vector3 vFrom], [page:Vector3 vTo] ) [page:Quaternion]</h3>
+		<div>
+		Sets this quaternion to the rotation required to rotate direction vector *vFrom* to direction vector *vTo*.<br />
+		Adapted from [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors].<br />
+		*vFrom* and *vTo* are assumed to be normalized.
 		</div>
 
 		<h3>.inverse() [page:Quaternion]</h3>

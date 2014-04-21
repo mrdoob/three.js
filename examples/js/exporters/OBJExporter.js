@@ -10,8 +10,6 @@ THREE.OBJExporter.prototype = {
 
 	parse: function ( geometry ) {
 
-		console.log( geometry );
-
 		var output = '';
 
 		for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
