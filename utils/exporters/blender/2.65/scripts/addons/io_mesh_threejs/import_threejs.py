@@ -130,7 +130,6 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
     if face_data["hasVertexNormals"]:
 
         print("setting vertex normals")
-        me.update(calc_tessface = True)
 
         for fi in range(len(faces)):
 
@@ -269,7 +268,6 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
             me.materials.append(m)
 
         print("setting materials (faces)")
-        me.update(calc_tessface = True)
 
         for fi in range(len(faces)):
 
