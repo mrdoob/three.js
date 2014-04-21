@@ -269,7 +269,7 @@ TEMPLATE_FILE_ASCII = """\
 	"metadata" :
 	{
 		"formatVersion" : 3.1,
-		"generatedBy"   : "Blender 2.66 Exporter",
+		"generatedBy"   : "Blender 2.7 Exporter",
 		"vertices"      : %(nvertex)d,
 		"faces"         : %(nface)d,
 		"normals"       : %(nnormal)d,

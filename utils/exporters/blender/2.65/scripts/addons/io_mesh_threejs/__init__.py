@@ -23,10 +23,9 @@
 
 bl_info = {
     "name": "three.js format",
-    "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k",
-    "version": (1, 4, 0),
+    "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k, crobi",
+    "version": (1, 5, 0),
     "blender": (2, 7, 0),
-    "api": 35622,
     "location": "File > Import-Export",
     "description": "Import-Export three.js meshes",
     "warning": "",
@@ -222,7 +221,7 @@ def save_settings_export(properties):
     "option_vertices_truncate" : properties.option_vertices_truncate,
     "option_scale"        : properties.option_scale,
 
-    "align_model"         : properties.align_model,
+    "align_model"         : properties.align_model
     }
 
     fname = get_settings_fullpath()
