@@ -76,7 +76,8 @@ THREE.EventDispatcher.prototype = {
 
 	dispatchEvent: function () {
 
-		var array = [];
+		var array = [],
+		    arrayIndex = 0;
 
 		return function ( event ) {
 
@@ -93,16 +94,19 @@ THREE.EventDispatcher.prototype = {
 
 			        for ( var i = 0; i < length; i ++ ) {
 			          
-					array.unshift(listenerArray[ i ]);
+					//a.k.a. .push(..), but faster
+					array[ arrayIndex ++ ] = listenerArray[ i ];
 			          
 			        }
+			        //arrayIndex became now equal to (arrayIndex + length)
 				
-				for ( var j = length - 1; j > -1; j -- ) {
+				for ( var j = arrayIndex - length; j < arrayIndex; j ++ ) {
 					
 					array[ j ].call( this, event );
-					array.splice( j, 1 );
-					
+
 				}
+				
+				arrayIndex -= length;
 
 			}
 
