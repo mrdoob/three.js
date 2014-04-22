@@ -55,6 +55,28 @@ button {
 	user-select: none;
 }
 
+.CollapsiblePanel .CollapsiblePanelButton {
+	float: left;
+	margin-right: 6px;
+	width: 0px;
+	height: 0px;
+	border: 6px solid transparent;
+}
+
+.CollapsiblePanel.collapsed .CollapsiblePanelButton {
+	margin-top: 2px;
+	border-left-color: #555;
+}
+
+.CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
+	margin-top: 6px;
+	border-top-color: #555;
+}
+
+.CollapsiblePanel.collapsed .CollapsibleContent {
+	display: none;
+}
+
 .FancySelect {
 	background: #222;
 	border: 1px solid #3C3C3C;
@@ -156,6 +178,10 @@ input.Number {
 
 	#sidebar .Panel {
 		margin-bottom: 10px;
+	}
+
+	#sidebar .Panel.collapsed {
+		margin-bottom: 0px;
 	}
 
 	#sidebar > .Panel {

@@ -250,8 +250,6 @@ THREE.Geometry.prototype = {
 
 				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-					face = this.faces[ f ];
-
 					faceNormal = new THREE.Vector3();
 					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
 
@@ -456,6 +454,13 @@ THREE.Geometry.prototype = {
 	},
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
+
+		if ( geometry instanceof THREE.Geometry === false ) {
+
+			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
+			return;
+
+		}
 
 		var normalMatrix,
 		vertexOffset = this.vertices.length,

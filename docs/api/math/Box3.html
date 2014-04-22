@@ -17,11 +17,11 @@
 
 		<h3>[name]([page:Vector3 min], [page:Vector3 max])</h3>
 		<div>
-		min -- Lower (x, y, z) boundary of the box.  <br />
+		min -- Lower (x, y, z) boundary of the box.<br />
 		max -- Upper (x, y, z) boundary of the box.
 		</div>
 		<div>
-		Creates a box bounded by min and max
+		Creates a box bounded by min and max. 
 		</div>
 
 		<h2>Properties</h2>
@@ -36,7 +36,7 @@
 		<h3>.[page:Vector3 min]</h3>
 		<div>
 		Lower (x, y, z) boundary of this box.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -44,113 +44,134 @@
 
 		<h3>.set([page:Vector3 min], [page:Vector3 max]) [page:Box3 this]</h3>
 		<div>
-		min -- Upper (x, y, z) boundary of this box. <br />
-		max -- Lower (x, y, z) boundary of this box.
+		min -- Lower (x, y, z) boundary of the box. <br />
+		max -- Upper (x, y, z) boundary of the box.
 		</div>
 		<div>
 		Sets the lower and upper (x, y, z) boundaries of this box.
 		</div>
-
+		
+		<h3>.addPoint([page:Vector3 point]) [page:Box3 this]</h3>
+		<div>
+		point -- [page:Vector3] to add to the box <br />
+		</div>
+		<div>
+		If the *point* is outside the bounds of the box, the bounds are expanded
+		so that the point is within the bounds.
+		</div>
+		
 		<h3>.applyMatrix4([page:Matrix4 matrix]) [page:Box3 this]</h3>
 		<div>
-		matrix -- [page:Matrix4].
+		matrix -- The [page:Matrix4] to apply
 		</div>
 		<div>
-		Transform the box with a Matrix4.
-		</div>
-
-		<h3>.expandByPoint([page:Vector3 point]) [page:Box3 this]</h3>
-		<div>
-		Expands the box outwards by the point. It takes the min and max values of the box.
+		Transforms this Box3 with the supplied matrix.
 		</div>
 
 		<h3>.clampPoint([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		point -- [page:Vector3] <br />
-		optionalTarget -- [page:Vector3] An optional target point.
+		point -- Position to clamp. <br />
+		optionalTarget -- If specified, the clamped result will be copied here.
 		</div>
 		<div>
-		Clamp a point within the min and max boundaries of the box. Returns either a new point or the modified passed target.
+		Clamps *point* within the bounds of this box.
 		</div>
 
 		<h3>.isIntersectionBox([page:Box3 box]) [page:Boolean]</h3>
 		<div>
-		box -- [page:Box3]
+		box -- Box to check for intersection against.
 		</div>
 		<div>
-		Return whether or not the passed box intersects with this Box3.
+		Determines whether or not this box intersects *box*.
 		</div>
 
-		<h3>.setFromPoints([page:Array points])</h3>
+		<h3>.setFromPoints([page:Array points]) [page:Box3 this]</h3>
 		<div>
-		points -- [page:Array] of [page:Vector3] points
+		points -- Set of points that the resulting box will envelop.
 		</div>
 		<div>
-		Sets this box to the min value and max value of all the points in the array. If the array is empty, then it sets the box as empty.
+		Sets the upper and lower bounds of this box to include all of the points in *points*.
 		</div>
+		
+		<h3>.setFromObject([page:Object3D object]) [page:Box3 this]</h3>
+		<div>
+		object -- [page:Object3D] to compute the bounding box for.
+		</div>
+		<div>
+		Computes the world-axis-aligned bounding box of an object (including its children),
+		accounting for both the object's, and childrens', world transforms
+		</div>
+		
+		
 
 		<h3>.size([page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		optionalTarget -- [page:Vector3] (optional)
+		optionalTarget -- If specified, the result will be copied here.
 		</div>
 		<div>
-		Returns either a new Vector3 or the target Vector3 that represents the size of the box from the min point to max point.
+		Returns the width, height, and depth of this box.
 		</div>
 
-		<h3>.union([page:Box3 box]) [page:Box3 this]</h3>
+		<h3>.union([page:Box3 box]) [page:Box3]</h3>
 		<div>
-		box -- [page:Box3]
+		box -- Box that will be unioned with this box.
 		</div>
 		<div>
-		Sets the box's min and max boundaries to union of the two boxes.
+		Unions this box with *box* setting the upper bound of this box to the greater of the 
+		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes'
+		lower bounds.
 		</div>
 
 		<h3>.getParameter([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		point -- [page:Vector3]<br/>
-		optionalTarget -- [page:Vector3]
+		point -- Point to parametrize.
+		optionalTarget -- If specified, the result will be copied here.
 		</div>
 		<div>
-		Returns a point as a proportion of this box's width, height, and depth. If the point is contained by the box the x, y, and z of the returned vector will be between 0 and 1.
-		</div>
-
-		<h3>.expandByScalar([page:Float scalar]) [page:Box3 this]</h3>
-		<div>
-		scalar -- [page:Float] representing the distance to expand
-		</div>
-		<div>
-		Expands or contracts the box by adding the scalar value to the box's min and max vectors.
+		Returns point as a proportion of this box's width and height.
 		</div>
 
 		<h3>.intersect([page:Box3 box]) [page:Box3 this]</h3>
 		<div>
-		box -- [page:Box3]
+		box -- Box to intersect with.
 		</div>
 		<div>
-		Returns the intersection of the two boxes, setting the upper bound of this box to the lesser of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes' lower bounds.
- 
+		Returns the intersection of this and *box*, setting the upper bound of this box to the lesser </br>
+		of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes' </br>
+		lower bounds.
 		</div>
 
 		<h3>.containsBox([page:Box3 box]) [page:Boolean]</h3>
 		<div>
-		box -- [page:Box3]
+		box -- Box to test for inclusion.
 		</div>
 		<div>
-		Returns true if this box includes the entirety of box. If this and box overlap exactly, this function also returns true.
- 
+		Returns true if this box includes the entirety of *box*. If this and *box* overlap exactly,</br>
+		this function also returns true. 
 		</div>
 
-		<h3>.translate([page:Vector3 offset]) [page:Box3 this]</h3>
+		<h3>.containsPoint([page:Vector3 point]) [page:Boolean]</h3>
 		<div>
-		offset -- [page:Vector3]
+		point -- [page:Vector3] to check for inclusion.
 		</div>
 		<div>
-		Translates the box the distance of the offset.
+		Returns true if the specified point lies within the boundaries of this box.
+		</div>
+		
+		<h3>.translate([page:Vector3 offset]) [page:Box3 this]</h3>
+		<div>
+		offset -- Direction and distance of offset.
+		</div>
+		<div>
+		Adds *offset* to both the upper and lower bounds of this box, effectively moving this box </br>
+		*offset* units in 3D space.
 		</div>
 
 		<h3>.empty() [page:Boolean]</h3>
 		<div>
-		Checks to see if the box is empty. If the lower and upper bounds of the box are equal, this function still returns false as the box would still contain one point.
+		Returns true if this box includes zero points within its bounds.</br>
+		Note that a box with equal lower and upper bounds still includes one point, the
+		one both bounds share.
 		</div>
 
 		<h3>.clone() [page:Box3]</h3>
@@ -160,72 +181,87 @@
 
 		<h3>.equals([page:Box3 box]) [page:Boolean]</h3>
 		<div>
-		box -- [page:Box3]
+		box -- Box to compare.
 		</div>
 		<div>
-		Returns true if the boes share the same lower and upper bounds. 
+		Returns true if this box and *box* share the same lower and upper bounds.
 		</div>
 
-		<h3>.expandByVector([page:Vector3 vector]) [page:Box3 this]</h3>
+		<h3>.expandByPoint([page:Vector3 point]) [page:Box3 this]</h3>
 		<div>
-		vector -- [page:Vector3] representing the amount to expand this box in each dimension.
+		point -- Point that should be included in the box.
 		</div>
 		<div>
-		Adds the passed vector to the upper boundary, and subtracts it from the lower boundary.
+		Expands the boundaries of this box to include *point*.
+		</div>
+		
+		<h3>.expandByScalar([page:float scalar]) [page:Box3 this]</h3>
+		<div>
+		scalar -- Distance to expand.
+		</div>
+		<div>
+		Expands each dimension of the box by *scalar*. If negative, the dimensions of the box <br/>
+		will be contracted.
+		</div>
+		
+		<h3>.expandByVector([page:Vector3 vector]) [page:Box3 this]</h3>
+		<div>
+		vector -- Amount to expand this box in each dimension.
+		</div>
+		<div>
+		Expands this box equilaterally by *vector*. The width of this box will be
+		expanded by the x component of *vector* in both directions. The height of 
+		this box will be expanded by the y component of *vector* in both directions.
+		The depth of this box will be expanded by the z component of *vector* in
+		both directions.
 		</div>
 
 		<h3>.copy([page:Box3 box]) [page:Box3 this]</h3>
 		<div>
-		box -- [page:Box3] to copy.
+		box -- Box to copy.
 		</div>
 		<div>
-		Copies the values of the passed box to this box.
+		Copies the values of *box* to this box.
 		</div>
 
 		<h3>.makeEmpty() [page:Box3 this]</h3>
 		<div>
-		Makes this box empty so that it cannot contain any points.
+		Makes this box empty.
 		</div>
 
 		<h3>.center([page:Vector3 optionalTarget]) [page:Vector3]</h3>
 		<div>
-		optionalTarget -- [page:Vector3] If specified, the result will be copied here.
+		optionalTarget -- If specified, the result will be copied here.
 		</div>
 		<div>
-		Returns the center point of this box. 
+		Returns the center point of this box.
 		</div>
 
 		<h3>.getBoundingSphere([page:Sphere optionalTarget]) [page:Sphere]</h3>
 		<div>
-		optionalTarget -- [page:Sphere]
+		optionalTarget -- [page:Sphere] to optionally set the result to.
 		</div>
 		<div>
-		Returns a bounding sphere.
+		Gets a sphere that bounds the box.
 		</div>
 
 		<h3>.distanceToPoint([page:Vector3 point]) [page:Float]</h3>
 		<div>
-		point -- [page:Vector3]
+		point -- Point to measure distance to.
 		</div>
 		<div>
-		Returns the distance from any edge of this box to the specified point. If the point lies inside of this box, the distance will be 0.
-		</div>
-
-		<h3>.containsPoint([page:Vector3 point]) [page:Boolean]</h3>
-		<div>
-		point -- [page:Vector3]
-		</div>
-		<div>
-		Returns true if the specified point lies within the boundaries of this box.
+		Returns the distance from any edge of this box to the specified point. </br>
+		If the point lies inside of this box, the distance will be 0.
 		</div>
 
 		<h3>.setFromCenterAndSize([page:Vector3 center], [page:Vector3 size]) [page:Box3 this]</h3>
 		<div>
-		center -- [page:Vector3] representing the center position.<br />
-		size -- [page:Vector3] representing the dimensions of the box.
+		center -- Desired center position of the box. <br />
+		size -- Desired x and y dimensions of the box. 
 		</div>
 		<div>
-		Sets this box based on a center vector, and width, height, and depth vector.
+		Centers this box on *center* and sets this box's width and height to the values specified
+		in *size*.
 		</div>
 
 		<h2>Source</h2>

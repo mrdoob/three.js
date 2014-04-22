@@ -137,6 +137,134 @@ UI.Panel.prototype.clear = function () {
 
 };
 
+
+// Collapsible Panel
+
+UI.CollapsiblePanel = function () {
+
+	UI.Panel.call( this );
+
+	this.dom.className = 'Panel CollapsiblePanel';
+
+	this.button = document.createElement( 'div' );
+	this.button.className = 'CollapsiblePanelButton';
+	this.dom.appendChild( this.button );
+
+	var scope = this;
+	this.button.addEventListener( 'click', function ( event ) {
+
+		scope.toggle();
+
+	}, false );
+
+	this.content = document.createElement( 'div' );
+	this.content.className = 'CollapsibleContent';
+	this.dom.appendChild( this.content );
+
+	this.isCollapsed = false;
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
+
+UI.CollapsiblePanel.prototype.addStatic = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.dom.insertBefore( arguments[ i ].dom, this.content );
+
+	}
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.removeStatic = UI.Panel.prototype.remove;
+
+UI.CollapsiblePanel.prototype.clearStatic = function () {
+
+	this.dom.childNodes.forEach( function ( child ) {
+
+		if ( child !== this.content ) {
+
+			this.dom.removeChild( child );
+
+		}
+
+	});
+
+};
+
+UI.CollapsiblePanel.prototype.add = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.content.appendChild( arguments[ i ].dom );
+
+	}
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.remove = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.content.removeChild( arguments[ i ].dom );
+
+	}
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.clear = function () {
+
+	while ( this.content.children.length ) {
+
+		this.content.removeChild( this.content.lastChild );
+
+	}
+
+};
+
+UI.CollapsiblePanel.prototype.toggle = function() {
+
+	this.setCollapsed( !this.isCollapsed );
+
+};
+
+UI.CollapsiblePanel.prototype.collapse = function() {
+
+	this.setCollapsed( true );
+
+};
+
+UI.CollapsiblePanel.prototype.expand = function() {
+
+	this.setCollapsed( false );
+
+};
+
+UI.CollapsiblePanel.prototype.setCollapsed = function( setCollapsed ) {
+
+	if ( setCollapsed ) {
+
+		this.dom.classList.add('collapsed');
+
+	} else {
+
+		this.dom.classList.remove('collapsed');
+
+	}
+
+	this.isCollapsed = setCollapsed;
+
+};
+
 // Text
 
 UI.Text = function ( text ) {
@@ -367,13 +495,13 @@ UI.FancySelect = function () {
 					// Highlight selected dom elem and scroll parent if needed
 					scope.setValue( scope.options[ scope.selectedIndex ].value );
 
-					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
 
 				}
 
 				break;
 		}
+
 	}, false);
 
 	this.dom = dom;

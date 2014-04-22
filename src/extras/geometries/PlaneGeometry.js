@@ -5,6 +5,8 @@
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
+	THREE.Geometry.call( this );
+
 	this.parameters = {
 		width: width,
 		height: height,
@@ -12,77 +14,67 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 		heightSegments: heightSegments
 	};
 
+	var ix, iz;
 	var width_half = width / 2;
 	var height_half = height / 2;
 
 	var gridX = widthSegments || 1;
-	var gridY = heightSegments || 1;
+	var gridZ = heightSegments || 1;
 
 	var gridX1 = gridX + 1;
-	var gridY1 = gridY + 1;
+	var gridZ1 = gridZ + 1;
 
 	var segment_width = width / gridX;
-	var segment_height = height / gridY;
+	var segment_height = height / gridZ;
 
-	var vertices = new Float32Array( gridX1 * gridY1 * 3 );
-	var normals = new Float32Array( gridX1 * gridY1 * 3 );
-	var uvs = new Float32Array( gridX1 * gridY1 * 2 );
+	var normal = new THREE.Vector3( 0, 0, 1 );
 
-	var offset = 0;
-	var offset2 = 0;
+	for ( iz = 0; iz < gridZ1; iz ++ ) {
 
-	for ( var iy = 0; iy < gridY1; iy ++ ) {
+		var y = iz * segment_height - height_half;
 
-		var y = iy * segment_height - height_half;
-
-		for ( var ix = 0; ix < gridX1; ix ++ ) {
+		for ( ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
 
-			vertices[ offset     ] = x;
-			vertices[ offset + 1 ] = - y;
-
-			normals[ offset + 2 ] = 1;
-
-			uvs[ offset2     ] = ix / gridX;
-			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
-
-			offset += 3;
-			offset2 += 2;
+			this.vertices.push( new THREE.Vector3( x, - y, 0 ) );
 
 		}
 
 	}
 
-	offset = 0;
+	for ( iz = 0; iz < gridZ; iz ++ ) {
 
-	var indices = new ( vertices.length > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
+		for ( ix = 0; ix < gridX; ix ++ ) {
 
-	for ( var iy = 0; iy < gridY; iy ++ ) {
+			var a = ix + gridX1 * iz;
+			var b = ix + gridX1 * ( iz + 1 );
+			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
+			var d = ( ix + 1 ) + gridX1 * iz;
 
-		for ( var ix = 0; ix < gridX; ix ++ ) {
+			var uva = new THREE.Vector2( ix / gridX, 1 - iz / gridZ );
+			var uvb = new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ );
 
-			var a = ix + gridX1 * iy;
-			var b = ix + gridX1 * ( iy + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-			var d = ( ix + 1 ) + gridX1 * iy;
+			var face = new THREE.Face3( a, b, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
-			indices[ offset     ] = a;
-			indices[ offset + 1 ] = b;
-			indices[ offset + 2 ] = d;
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-			indices[ offset + 3 ] = b;
-			indices[ offset + 4 ] = c;
-			indices[ offset + 5 ] = d;
+			face = new THREE.Face3( b, c, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
-			offset += 6;
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 
 	}
-
-	THREE.IndexedGeometry2.call( this, indices, vertices, normals, uvs );
 
 };
 
-THREE.PlaneGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );

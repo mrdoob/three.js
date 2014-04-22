@@ -2,11 +2,11 @@ Sidebar.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text().setValue( 'GEOMETRY' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text().setValue( 'GEOMETRY' ) );
+	container.add( new UI.Break() );
 
 	// uuid
 
