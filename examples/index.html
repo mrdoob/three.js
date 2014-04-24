@@ -75,7 +75,7 @@
 
 			#button {
 				position: fixed;
-				bottom: 20px;
+				top: 20px;
 				right: 20px;
 				padding: 8px;
 				color: #fff;
@@ -351,13 +351,13 @@
 
 		var button = document.createElement( 'div' );
 		button.id = 'button';
-		button.textContent = '#';
+		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
 			var array = location.href.split( '/' );
 			array.pop();
 
-			window.open( array.join( '/' ) + '/' + selected + '.html' );
+			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
 
 		}, false );
 		button.style.display = 'none';
