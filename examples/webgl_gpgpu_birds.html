@@ -381,7 +381,6 @@
 				var points = triangles * 3;
 
 				THREE.BufferGeometry.call( this );
-				// THREE.Geometry2.call( this, points );
 
 				var vertices = new THREE.Float32Attribute( points, 3 );
 				var birdColors = new THREE.Float32Attribute( points, 3 );
@@ -457,7 +456,7 @@
 
 			}
 
-			THREE.BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype ); // Geometry2
+			THREE.BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
 
 			var container, stats;

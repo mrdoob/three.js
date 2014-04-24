@@ -2,15 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.IndexedGeometry2 = function () {
+THREE.IndexedTypedGeometry = function () {
 
 	THREE.BufferGeometry.call( this );
 
 };
 
-THREE.IndexedGeometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.IndexedTypedGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-THREE.IndexedGeometry2.prototype.setArrays = function ( indices, vertices, normals, uvs ) {
+THREE.IndexedTypedGeometry.prototype.setArrays = function ( indices, vertices, normals, uvs ) {
 
 	this.indices = indices;
 	this.vertices = vertices;

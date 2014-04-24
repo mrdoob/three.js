@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Geometry2 = function ( size ) {
+THREE.TypedGeometry = function ( size ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -20,9 +20,9 @@ THREE.Geometry2 = function ( size ) {
 
 };
 
-THREE.Geometry2.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.TypedGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-THREE.Geometry2.prototype.setArrays = function ( vertices, normals, uvs ) {
+THREE.TypedGeometry.prototype.setArrays = function ( vertices, normals, uvs ) {
 
 	this.vertices = vertices;
 	this.normals = normals;
@@ -36,7 +36,7 @@ THREE.Geometry2.prototype.setArrays = function ( vertices, normals, uvs ) {
 
 };
 
-THREE.Geometry2.prototype.merge = ( function () {
+THREE.TypedGeometry.prototype.merge = ( function () {
 
 	var offset = 0;
 	var normalMatrix = new THREE.Matrix3();
@@ -52,7 +52,7 @@ THREE.Geometry2.prototype.merge = ( function () {
 		var normals = this.attributes[ 'normal' ].array;
 		var uvs = this.attributes[ 'uv' ].array;
 
-		if ( geometry instanceof THREE.Geometry2 ) {
+		if ( geometry instanceof THREE.TypedGeometry ) {
 
 			var vertices2 = geometry.attributes[ 'position' ].array;
 			var normals2 = geometry.attributes[ 'normal' ].array;
@@ -73,7 +73,7 @@ THREE.Geometry2.prototype.merge = ( function () {
 
 			}
 
-		} else if ( geometry instanceof THREE.IndexedGeometry2 ) {
+		} else if ( geometry instanceof THREE.IndexedTypedGeometry ) {
 
 			var indices2 = geometry.attributes[ 'index' ].array;
 			var vertices2 = geometry.attributes[ 'position' ].array;

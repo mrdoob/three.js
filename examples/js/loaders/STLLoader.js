@@ -108,7 +108,7 @@ THREE.STLLoader.prototype.parseBinary = function ( data ) {
 
 	var offset = 0;
 
-	var geometry = new THREE.Geometry2( faces );
+	var geometry = new THREE.TypedGeometry( faces );
 
 	for ( var face = 0; face < faces; face ++ ) {
 
