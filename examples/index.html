@@ -26,7 +26,7 @@
 			}
 
 			h1 {
-				margin-top: 20px;
+				margin-top: 30px;
 				margin-bottom: 40px;
 				font-size: 25px;
 				font-weight: normal;
@@ -42,6 +42,7 @@
 				width: 310px;
 				height: 100%;
 				overflow: scroll;
+				background: #fafafa;
 			}
 
 				#panel #list {
@@ -90,19 +91,6 @@
 		</style>
 	</head>
 	<body>
-		<script type="text/javascript">
-
-		  var _gaq = _gaq || [];
-		  _gaq.push(['_setAccount', 'UA-86951-15']);
-		  _gaq.push(['_trackPageview']);
-
-		  (function() {
-		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		  })();
-
-		</script>
 
 		<div id="panel">
 			<div id="list">
@@ -116,14 +104,17 @@
 		var files = {
 			"webgl": [
 				"webgl_animation_cloth",
-				"webgl_animation_skinning",
+				"webgl_animation_skinning_blending",
 				"webgl_animation_skinning_morph",
 				"webgl_buffergeometry",
 				"webgl_buffergeometry_custom_attributes_particles",
 				"webgl_buffergeometry_lines",
 				"webgl_buffergeometry_lines_indexed",
 				"webgl_buffergeometry_particles",
+				"webgl_buffergeometry_rawshader",
+				"webgl_buffergeometry_uint",
 				"webgl_camera",
+				"webgl_camera_logarithmicdepthbuffer",
 				"webgl_custom_attributes",
 				"webgl_custom_attributes_lines",
 				"webgl_custom_attributes_particles",
@@ -137,6 +128,7 @@
 				"webgl_geometries2",
 				"webgl_geometry_colors",
 				"webgl_geometry_colors_blender",
+				"webgl_geometry_colors_lookuptable",
 				"webgl_geometry_convex",
 				"webgl_geometry_cube",
 				"webgl_geometry_dynamic",
@@ -187,6 +179,7 @@
 				"webgl_loader_json_objconverter",
 				"webgl_loader_obj",
 				"webgl_loader_obj_mtl",
+				"webgl_loader_pdb",	
 				"webgl_loader_ply",
 				"webgl_loader_scene",
 				"webgl_loader_scene_blender",
@@ -287,6 +280,7 @@
 			],
 			"misc": [
 				"misc_animation_keys",
+				"misc_controls_deviceorientation",
 				"misc_controls_fly",
 				"misc_controls_oculusrift",
 				"misc_controls_orbit",
@@ -315,16 +309,15 @@
 				"canvas_geometry_shapes",
 				"canvas_geometry_terrain",
 				"canvas_geometry_text",
-				"canvas_geometry2_sandbox",
 				"canvas_interactive_cubes",
 				"canvas_interactive_cubes_tween",
 				"canvas_interactive_lines",
 				"canvas_interactive_particles",
 				"canvas_interactive_voxelpainter",
 				"canvas_lights_pointlights",
-				"canvas_lights_pointlights_smooth",
 				"canvas_lines",
 				"canvas_lines_colors",
+				"canvas_lines_dashed",
 				"canvas_lines_sphere",
 				"canvas_materials",
 				"canvas_materials_depth",
@@ -339,6 +332,9 @@
 				"canvas_particles_waves",
 				"canvas_performance",
 				"canvas_sandbox"
+			],
+			"raytracing": [
+				"raytracing_sandbox"
 			],
 			"software": [
 				"software_sandbox"

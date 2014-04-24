@@ -89,7 +89,7 @@
 
 		var noise = [];
 		var values_size;
-		//500000
+
 		var particles = 100000;
 
 		var WIDTH = window.innerWidth;
@@ -137,14 +137,13 @@
 
 			geometry = new THREE.BufferGeometry();
 
-			geometry.addAttribute( 'position', Float32Array, particles, 3 );
-			geometry.addAttribute( 'customColor', Float32Array, particles, 3 );
-			geometry.addAttribute( 'size', Float32Array, particles, 1 );
-			geometry.attributes.size.dynamic = true;
+			geometry.addAttribute( 'position', new Float32Array( particles * 3 ), 3 );
+			geometry.addAttribute( 'customColor', new Float32Array( particles * 3 ), 3 );
+			geometry.addAttribute( 'size', new Float32Array( particles ), 1 );
 
-			values_size = geometry.attributes.size.array;
-			var positions = geometry.attributes.position.array;
-			var values_color = geometry.attributes.customColor.array;
+			var positions = geometry.getAttribute( 'position' ).array;
+			var values_color = geometry.getAttribute( 'customColor' ).array;
+			values_size = geometry.getAttribute( 'size' ).array;
 
 			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
 

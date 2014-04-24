@@ -27,6 +27,8 @@
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/SceneExporter.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/exporters/STLExporter.js"></script>
+		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
@@ -35,7 +37,7 @@
 		<script src="../examples/js/BufferGeometryUtils.js"></script>
 
 		<script src="../examples/js/exporters/BufferGeometryExporter.js"></script>
-		<script src="../examples/js/exporters/Geometry2Exporter.js"></script>
+		<script src="../examples/js/exporters/TypedGeometryExporter.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/MaterialExporter.js"></script>
 		<script src="../examples/js/exporters/ObjectExporter.js"></script>
@@ -43,6 +45,7 @@
 
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
+		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/Storage.js"></script>
@@ -171,8 +174,9 @@
 						event.preventDefault();
 						break;
 					case 46: // delete
+						var parent = editor.selected.parent;
 						editor.removeObject( editor.selected );
-						editor.deselect();
+						editor.select( parent );
 						break;
 
 				}

@@ -84,13 +84,13 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'position', Float32Array, triangles * 3, 3 );
-				geometry.addAttribute( 'normal', Float32Array, triangles * 3, 3 );
-				geometry.addAttribute( 'color', Float32Array, triangles * 3, 3 );
+				geometry.addAttribute( 'position', new Float32Array( triangles * 3 * 3 ), 3 );
+				geometry.addAttribute( 'normal', new Float32Array( triangles * 3 * 3 ), 3 );
+				geometry.addAttribute( 'color', new Float32Array( triangles * 3 * 3 ), 3 );
 
-				var positions = geometry.attributes.position.array;
-				var normals = geometry.attributes.normal.array;
-				var colors = geometry.attributes.color.array;
+				var positions = geometry.getAttribute( 'position' ).array;
+				var normals = geometry.getAttribute( 'normal' ).array;
+				var colors = geometry.getAttribute( 'color' ).array;
 
 				var color = new THREE.Color();
 
@@ -204,7 +204,7 @@
 				mouse = new THREE.Vector2();
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', Float32Array, 4, 3 );
+				geometry.addAttribute( 'position', new Float32Array( 4 * 3 ), 3 );
 
 				var material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2, transparent: true } );
 

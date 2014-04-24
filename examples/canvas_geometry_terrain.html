@@ -68,23 +68,21 @@
 				var texture = new THREE.Texture( generateTexture( data, 1024, 1024 ) );
 				texture.needsUpdate = true;
 
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var quality = 16, step = 1024 / quality;
 
-				var plane = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
-				plane.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				var geometry = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				for ( var i = 0, l = plane.vertices.length; i < l; i ++ ) {
+				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-					var x = i % quality, y = ~~ ( i / quality );
-					plane.vertices[ i ].y = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
+					var x = i % quality, y = Math.floor( i / quality );
+					geometry.vertices[ i ].y = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
 
 				}
 
-				plane.computeCentroids();
-
-				mesh = new THREE.Mesh( plane, material );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
@@ -122,14 +120,8 @@
 
 			function generateHeight( width, height ) {
 
-				var data = Float32Array ? new Float32Array( width * height ) : [], perlin = new ImprovedNoise(),
+				var data = new Uint8Array( width * height ), perlin = new ImprovedNoise(),
 				size = width * height, quality = 2, z = Math.random() * 100;
-
-				for ( var i = 0; i < size; i ++ ) {
-
-					data[ i ] = 0
-
-				}
 
 				for ( var j = 0; j < 4; j ++ ) {
 
@@ -138,8 +130,7 @@
 					for ( var i = 0; i < size; i ++ ) {
 
 						var x = i % width, y = ~~ ( i / width );
-						data[ i ] += Math.floor( Math.abs( perlin.noise( x / quality, y / quality, z ) * 0.5 ) * quality + 10 );
-
+						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * 0.5 ) * quality + 10;
 
 					}
 
@@ -212,7 +203,7 @@
 			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05 + 15;
 				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );

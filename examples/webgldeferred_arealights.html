@@ -177,7 +177,7 @@
 				var emitter = new THREE.Mesh( geometry, material );
 
 				emitter.position = light.position;
-				emitter.quaternion = light.quaternion;
+				emitter.quaternion.copy( light.quaternion );
 				emitter.scale.set( light.width * 2, 0.2, light.height * 2 );
 
 				return emitter;

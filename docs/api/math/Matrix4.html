@@ -113,11 +113,6 @@
 		Transposes this matrix.
 		</div>
 
-		<h3>.flattenToArray( [page:Array flat] ) [page:Array]</h3>
-		<div>
-		Flattens this matrix into supplied *flat* array.
-		</div>
-
 		<h3>.flattenToArrayOffset( [page:Array flat], [page:Integer offset] ) [page:Array]</h3>
 		<div>
 		Flattens this matrix into supplied *flat* array starting from *offset* position in the array.
@@ -229,12 +224,12 @@
 		Clones this matrix.
 		</div>
 
-		<h3>.multiplyVector3Array([page:Array a]) [page:Array]</h3>
+		<h3>.applyToVector3Array([page:Array a]) [page:Array]</h3>
 		<div>
 		array -- An array in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...]
 		</div>
 		<div>
-		Multiply (apply) this matrix against every vector3 in the array.
+		Multiply (apply) this matrix to every vector3 in the array.
 		</div>
 
 		<h3>.getMaxScaleOnAxis() [page:Float]</h3>

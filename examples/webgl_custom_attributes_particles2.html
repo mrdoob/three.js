@@ -132,8 +132,7 @@
 			vc1 = geometry.vertices.length;
 
 			var geometry2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
-
-			THREE.GeometryUtils.merge( geometry, geometry2 );
+			geometry.merge( geometry2 );
 
 			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
 

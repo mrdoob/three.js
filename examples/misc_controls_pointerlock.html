@@ -75,7 +75,7 @@
 
 			var camera, scene, renderer;
 			var geometry, material, mesh;
-			var controls,time = Date.now();
+			var controls;
 
 			var objects = [];
 
@@ -279,8 +279,6 @@
 
 				requestAnimationFrame( animate );
 
-				//
-
 				controls.isOnObject( false );
 
 				ray.ray.origin.copy( controls.getObject().position );
@@ -300,11 +298,9 @@
 
 				}
 
-				controls.update( Date.now() - time );
+				controls.update();
 
 				renderer.render( scene, camera );
-
-				time = Date.now();
 
 			}
 

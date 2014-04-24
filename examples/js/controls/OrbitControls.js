@@ -108,6 +108,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.target0 = this.target.clone();
 	this.position0 = this.object.position.clone();
 
+	// so camera.up is the orbit axis
+
+	var quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
+	var quatInverse = quat.clone().inverse();
+
 	// events
 
 	var changeEvent = { type: 'change' };
@@ -229,6 +234,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		offset.copy( position ).sub( this.target );
 
+		// rotate offset to "y-axis-is-up" space
+		offset.applyQuaternion( quat );
+
 		// angle from z-axis around y-axis
 
 		var theta = Math.atan2( offset.x, offset.z );
@@ -264,6 +272,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
 
+		// rotate offset back to "camera-up-vector-is-up" space
+		offset.applyQuaternion( quatInverse );
+
 		position.copy( this.target ).add( offset );
 
 		this.object.lookAt( this.target );
@@ -273,7 +284,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scale = 1;
 		pan.set( 0, 0, 0 );
 
-		if ( lastPosition.distanceTo( this.object.position ) > 0 ) {
+		if ( lastPosition.distanceToSquared( this.object.position ) > EPS ) {
 
 			this.dispatchEvent( changeEvent );
 
@@ -416,6 +427,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( scope.enabled === false || scope.noZoom === true ) return;
 
 		event.preventDefault();
+		event.stopPropagation();
 
 		var delta = 0;
 
@@ -619,6 +631,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
 
 	window.addEventListener( 'keydown', onKeyDown, false );
+
+	// force an update at start
+	this.update();
 
 };
 

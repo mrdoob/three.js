@@ -15,15 +15,13 @@
 				text-align: center;
 			}
 
-			#info { margin-top: 2em	}
+			#info { position: absolute; top: 10px; width: 100%; }
 
 			a { color: #fb0; }
 
-			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
+			#footer { position: absolute; bottom: 10px; width: 100%; }
 			.h { color: #fb0 }
 			.c { display: inline; margin-left: 1em }
-
-			#loading { width: 100%; margin: 2em auto; text-align: center; position: absolute; top: 25em  }
 
 			#oldie a { color:#da0 }
 
@@ -46,8 +44,6 @@
 			music by <a href="http://incompetech.com/m/c/royalty-free/index.html?keywords=00875">Kevin MacLeod</a>
 		</div>
 
-		<div id="loading">Loading...</div>
-
 		<div id="footer">
 			<div class="c">
 			day / night: <span class="h">n</span>
@@ -56,17 +52,8 @@
 			<div class="c">
 			animate terrain: <span class="h">m</span>
 			</div>
-
-			<div class="c">
-			toggle soundtrack: <span class="h">b</span>
-			</div>
 		</div>
-<!--
-		<audio id="soundtrack" autoplay loop style="display:none">
-			<source src="sounds/Five_Armies.mp3" type='audio/mp3'>
-			<source src="sounds/Five_Armies.ogg" type='audio/ogg'>
-		</audio>
--->
+
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
@@ -238,10 +225,8 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var MARGIN = 100;
-
 			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var SCREEN_HEIGHT = window.innerHeight;
 
 			var renderer, container, stats;
 
@@ -260,7 +245,6 @@
 
 			var animDelta = 0, animDeltaDir = -1;
 			var lightVal = 0, lightDir = 1;
-			var soundVal = 0, oldSoundVal = 0, soundDir = 1;
 
 			var clock = new THREE.Clock();
 
@@ -280,8 +264,6 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
-
-				soundtrack = document.getElementById( "soundtrack" );
 
 				// SCENE (RENDER TARGET)
 
@@ -406,10 +388,10 @@
 				uniformsTerrain[ "uRepeatOverlay" ].value.set( 6, 6 );
 
 				var params = [
-								[ 'heightmap', 	document.getElementById( 'fragmentShaderNoise' ).textContent, 	vertexShader, uniformsNoise, false ],
-								[ 'normal', 	normalShader.fragmentShader,  normalShader.vertexShader, uniformsNormal, false ],
-								[ 'terrain', 	terrainShader.fragmentShader, terrainShader.vertexShader, uniformsTerrain, true ]
-							 ];
+					[ 'heightmap', 	document.getElementById( 'fragmentShaderNoise' ).textContent, 	vertexShader, uniformsNoise, false ],
+					[ 'normal', 	normalShader.fragmentShader,  normalShader.vertexShader, uniformsNormal, false ],
+					[ 'terrain', 	terrainShader.fragmentShader, terrainShader.vertexShader, uniformsTerrain, true ]
+				 ];
 
 				for( var i = 0; i < params.length; i ++ ) {
 
@@ -436,9 +418,6 @@
 				// TERRAIN MESH
 
 				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
-
-				geometryTerrain.computeFaceNormals();
-				geometryTerrain.computeVertexNormals();
 				geometryTerrain.computeTangents();
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ "terrain" ] );
@@ -452,11 +431,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.setClearColor( scene.fog.color, 1 );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = MARGIN + "px";
-				renderer.domElement.style.left = "0px";
-
 				container.appendChild( renderer.domElement );
 
 				//
@@ -597,7 +571,7 @@
 			function onWindowResize( event ) {
 
 				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+				SCREEN_HEIGHT = window.innerHeight;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -614,7 +588,6 @@
 
 					case 78: /*N*/  lightDir *= -1; break;
 					case 77: /*M*/  animDeltaDir *= -1; break;
-					case 66: /*B*/  soundDir *= -1; break;
 
 				}
 
@@ -655,8 +628,6 @@
 
 					terrain.visible = true;
 
-					document.getElementById( "loading" ).style.display = "none";
-
 				}
 
 			}
@@ -675,19 +646,6 @@
 			function render() {
 
 				var delta = clock.getDelta();
-
-				soundVal = THREE.Math.clamp( soundVal + delta * soundDir, 0, 1 );
-
-				if ( soundVal !== oldSoundVal ) {
-
-					if ( soundtrack ) {
-
-						soundtrack.volume = soundVal;
-						oldSoundVal = soundVal;
-
-					}
-
-				}
 
 				if ( terrain.visible ) {
 

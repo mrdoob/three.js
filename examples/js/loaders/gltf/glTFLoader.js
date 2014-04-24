@@ -133,7 +133,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         // Allow Three.js to calculate some values for us
         geometry.computeBoundingBox();
         geometry.computeBoundingSphere();
-        geometry.computeCentroids();
         geometry.computeFaceNormals();
         if(!normals) {
             geometry.computeVertexNormals();
@@ -1094,13 +1093,14 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
                 var m = description.matrix;
                 if(m) {
-                    threeNode.matrixAutoUpdate = false;
                     threeNode.applyMatrix(new THREE.Matrix4(
                         m[0],  m[4],  m[8],  m[12],
                         m[1],  m[5],  m[9],  m[13],
                         m[2],  m[6],  m[10], m[14],
                         m[3],  m[7],  m[11], m[15]
-                    ));                    
+                    ));
+                    threeNode.matrixAutoUpdate = false;
+                    threeNode.matrixWorldNeedsUpdate = true;
                 }
                 else {
                 	var t = description.translation;
@@ -1120,6 +1120,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 	var matrix = new THREE.Matrix4;
                 	matrix.compose(position, rotation, scale);
                     threeNode.matrixAutoUpdate = false;
+                    threeNode.matrixWorldNeedsUpdate = true;
                     threeNode.applyMatrix(matrix);                    
                 }
 
@@ -1275,7 +1276,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                	
         	                                	joint.skin = threeMesh;
         	                                    joints.push(joint);
-        	                                    threeMesh.bones.push(joint);
+        	                                    threeMesh.skeleton.bones.push(joint);
         	                                    
         	                                    var m = skin.inverseBindMatrices;
         	                    	            var mat = new THREE.Matrix4(
@@ -1284,7 +1285,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                            m[i * 16 + 2],  m[i * 16 + 6],  m[i * 16 + 10], m[i * 16 + 14],
         	                                            m[i * 16 + 3],  m[i * 16 + 7],  m[i * 16 + 11], m[i * 16 + 15]
         	                                        );
-        	                                    threeMesh.boneInverses.push(mat);
+        	                                    threeMesh.skeleton.boneInverses.push(mat);
         	                                    threeMesh.pose();
         	                                    
         	                                } else {
