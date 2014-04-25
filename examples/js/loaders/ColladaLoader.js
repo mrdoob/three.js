@@ -1,7 +1,7 @@
 /**
- * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
- * @author Tony Parisi / http://www.tonyparisi.com/ 
- */
+* @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
+* @author Tony Parisi / http://www.tonyparisi.com/
+*/
 
 THREE.ColladaLoader = function () {
 
@@ -141,7 +141,7 @@ THREE.ColladaLoader = function () {
 		controllers = parseLib( "library_controllers controller", Controller, "controller" );
 		animations = parseLib( "library_animations animation", Animation, "animation" );
 		visualScenes = parseLib( "library_visual_scenes visual_scene", VisualScene, "visual_scene" );
-		
+
 		morphs = [];
 		skins = [];
 
@@ -260,9 +260,9 @@ THREE.ColladaLoader = function () {
 	}
 
 	function parseScene() {
-	
+
 		var sceneElement = COLLADA.querySelectorAll('scene instance_visual_scene')[0];
-		
+
 		if ( sceneElement ) {
 
 			var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
@@ -351,11 +351,11 @@ THREE.ColladaLoader = function () {
 		for ( var id in animations ) {
 
 			var animation = animations[ id ];
-			ID = ID || animation.id; 
+			ID = ID || animation.id;
 			for ( var i = 0; i < animation.sampler.length; i ++ ) {
 
 				var sampler = animation.sampler[ i ];
-				
+
 				sampler.create();
 
 				start = Math.min( start, sampler.startTime );
@@ -502,9 +502,9 @@ THREE.ColladaLoader = function () {
 	function setupSkinningMatrices ( bones, skin ) {
 
 		// FIXME: this is dumb...
-		
+
 		for ( var i = 0; i < bones.length; i ++ ) {
-		
+
 			var bone = bones[ i ];
 			var found = -1;
 
@@ -534,7 +534,7 @@ THREE.ColladaLoader = function () {
 				bone.weights = [];
 
 				for ( var j = 0; j < skin.weights.length; j ++ ) {
-					
+
 					for (var k = 0; k < skin.weights[ j ].length; k ++ ) {
 
 						var w = skin.weights[ j ][ k ];
@@ -573,9 +573,9 @@ THREE.ColladaLoader = function () {
 			bone.matrix = node.matrix;
 			var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
 			bone.matrix.decompose(data[0],data[1],data[2]);
-							
+
 			bone.pos = [data[0].x,data[0].y,data[0].z];
-							
+
 			bone.scl = [data[2].x,data[2].y,data[2].z];
 			bone.rotq = [data[1].x,data[1].y,data[1].z,data[1].w];
 			list.push(bone);
@@ -620,7 +620,7 @@ THREE.ColladaLoader = function () {
 
 				o = geometry.vertices[vidx];
 				s = skinned[vidx];
-				
+
 				v.x = o.x;
 				v.y = o.y;
 				v.z = o.z;
@@ -646,7 +646,7 @@ THREE.ColladaLoader = function () {
 
 		// TODO: get this from the renderer or options
 		var maxbones = 30;
-		
+
 		var skinController = controllers[ instanceCtrl.url ];
 
 		frame = frame !== undefined ? frame : 40;
@@ -668,7 +668,7 @@ THREE.ColladaLoader = function () {
 		var animationBounds = calcAnimationBounds();
 		var skeleton = daeScene.getChildById( instanceCtrl.skeleton[0], true ) ||
 					   daeScene.getChildBySid( instanceCtrl.skeleton[0], true );
-		
+
 		//flatten the skeleton into a list of bones
 		var bonelist = flattenSkeleton(skeleton);
 		var joints = skinController.skin.joints;
@@ -723,7 +723,7 @@ THREE.ColladaLoader = function () {
 
 			var indicies = new THREE.Vector4(weights[i][0]?weights[i][0].joint:0,weights[i][1]?weights[i][1].joint:0,weights[i][2]?weights[i][2].joint:0,weights[i][3]?weights[i][3].joint:0);
 			var weight = new THREE.Vector4(weights[i][0]?weights[i][0].weight:0,weights[i][1]?weights[i][1].weight:0,weights[i][2]?weights[i][2].weight:0,weights[i][3]?weights[i][3].weight:0);
-			
+
 			skinIndices.push(indicies);
 			skinWeights.push(weight);
 
@@ -733,7 +733,7 @@ THREE.ColladaLoader = function () {
 		geometry.skinWeights = skinWeights;
 		geometry.bones = sortedbones;
 		// process animation, or simply pose the rig if no animation
-		
+
 		//create an animation for the animated bones
 		//NOTE: this has no effect when using morphtargets
 		var animationdata = {"name":animationBounds.ID,"fps":30,"length":animationBounds.frames/30,"hierarchy":[]};
@@ -773,15 +773,15 @@ THREE.ColladaLoader = function () {
 							var key = {};
 							key.time = (frame/30);
 							key.matrix = bones[i].animatrix;
-							
+
 							if(frame == 0)
 								bones[i].matrix = key.matrix;
-							
+
 							var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
 							key.matrix.decompose(data[0],data[1],data[2]);
-							
+
 							key.pos = [data[0].x,data[0].y,data[0].z];
-							
+
 							key.scl = [data[2].x,data[2].y,data[2].z];
 							key.rot = data[1];
 
@@ -798,7 +798,7 @@ THREE.ColladaLoader = function () {
 			} else {
 
 				// otherwise, process the animation into morphtargets
-				
+
 				for ( i = 0; i < geometry.vertices.length; i++ ) {
 
 					skinned.push( new THREE.Vector3() );
@@ -997,7 +997,7 @@ THREE.ColladaLoader = function () {
 
 				if ( skinController !== undefined ) {
 
-					
+
 					applySkin( geom, skinController );
 
 					if(geom.morphTargets.length > 0) {
@@ -1010,8 +1010,8 @@ THREE.ColladaLoader = function () {
 						material.morphTargets = false;
 						material.skinning = true;
 
-					}				
-					
+					}
+
 
 					mesh = new THREE.SkinnedMesh( geom, material, false );
 
@@ -1021,8 +1021,8 @@ THREE.ColladaLoader = function () {
 					//mesh.skinInstanceController = skinController;
 					mesh.name = 'skin_' + skins.length;
 
-					
-					
+
+
 					//mesh.animationHandle.setKey(0);
 					skins.push( mesh );
 
@@ -1060,7 +1060,7 @@ THREE.ColladaLoader = function () {
 			var instance_camera = node.cameras[i];
 			var cparams = cameras[instance_camera.url];
 
-			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio), 
+			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio),
 					parseFloat(cparams.znear), parseFloat(cparams.zfar));
 
 			obj.add(cam);
@@ -2442,14 +2442,14 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'bind_material':
-			
+
 					var instances = child.querySelectorAll('instance_material');
-					
+
 					for ( var j = 0; j < instances.length; j ++ ){
 
 						var instance = instances[j];
 						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
-						
+
 					}
 
 
@@ -2503,7 +2503,7 @@ THREE.ColladaLoader = function () {
 			if ( child.nodeName == 'bind_material' ) {
 
 				var instances = child.querySelectorAll('instance_material');
-					
+
 				for ( var j = 0; j < instances.length; j ++ ) {
 
 					var instance = instances[j];
@@ -2652,7 +2652,7 @@ THREE.ColladaLoader = function () {
 		var source, numParams;
 		var vcIndex = 0, vcount = 3, maxOffset = 0;
 		var texture_sets = [];
-		
+
 		for ( j = 0; j < inputs.length; j ++ ) {
 
 			input = inputs[ j ];
@@ -2821,7 +2821,7 @@ THREE.ColladaLoader = function () {
 				} else if ( vcount === 4 ) {
 
 					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], [ns[0], ns[1], ns[3]], cs.length ? [cs[0], cs[1], cs[3]] : new THREE.Color() ) );
-					
+
 					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], [ns[1], ns[2], ns[3]], cs.length ? [cs[1], cs[2], cs[3]] : new THREE.Color() ) );
 
 				} else if ( vcount > 4 && options.subdivideFaces ) {
@@ -3242,7 +3242,7 @@ THREE.ColladaLoader = function () {
 			this.opaque = element.getAttribute('opaque');
 
 		}
-		
+
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[ i ];
@@ -3321,17 +3321,17 @@ THREE.ColladaLoader = function () {
 
 				case 'wrapU':
 				case 'wrapV':
-					
+
 					// some dae have a value of true which becomes NaN via parseInt
 
 					if ( child.textContent.toUpperCase() === 'TRUE' ) {
-					
+
 						this.texOpts[ child.nodeName ] = 1;
-					
+
 					} else {
-					
+
 						this.texOpts[ child.nodeName ] = parseInt( child.textContent );
-					
+
 					}
 					break;
 
@@ -3387,7 +3387,7 @@ THREE.ColladaLoader = function () {
 						} else if ( bumpType.toLowerCase() === "normalmap" ) {
 							this[ 'normal' ] = ( new ColorOrTexture() ).parse( child );
 						} else {
-							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType + 
+							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType +
 								           ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
 							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
 						}
@@ -3432,10 +3432,10 @@ THREE.ColladaLoader = function () {
 			// convert transparent color RBG to average value
 			var transparentColor = this['transparent'];
 			var transparencyLevel = (this.transparent.color.r +
-										this.transparent.color.g + 
+										this.transparent.color.g +
 										this.transparent.color.b)
 										/ 3 * this.transparency;
-			
+
 			if (transparencyLevel > 0) {
 				transparent = true;
 				props[ 'transparent' ] = true;
@@ -3444,16 +3444,16 @@ THREE.ColladaLoader = function () {
 			}
 
 		}
-		
+
 		var keys = {
-			'diffuse':'map', 
+			'diffuse':'map',
 			'ambient':'lightMap' ,
 			'specular':'specularMap',
 			'emission':'emissionMap',
 			'bump':'bumpMap',
 			'normal':'normalMap'
 			};
-		
+
 		for ( var prop in this ) {
 
 			switch ( prop ) {
@@ -3833,7 +3833,7 @@ THREE.ColladaLoader = function () {
 					this.shader = ( new Shader( child.nodeName, this ) ).parse( child );
 					break;
 				case 'extra':
-					this.parseExtra(child);	
+					this.parseExtra(child);
 					break;
 				default:
 					break;
@@ -3843,7 +3843,7 @@ THREE.ColladaLoader = function () {
 		}
 
 	};
-	
+
 	Effect.prototype.parseExtra = function ( element ) {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
@@ -3864,7 +3864,7 @@ THREE.ColladaLoader = function () {
 		}
 
 	};
-	
+
 	Effect.prototype.parseExtraTechnique= function ( element ) {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
@@ -4185,7 +4185,7 @@ THREE.ColladaLoader = function () {
 			if ( member && type == 'translate' ) {
 				data = getConvertedTranslation( member, data );
 			}
-			
+
 		}
 
 		return data;
@@ -4515,6 +4515,8 @@ THREE.ColladaLoader = function () {
 
 								this.falloff_angle = parseFloat( child.textContent );
 								break;
+
+
 						}
 
 					}
@@ -4726,7 +4728,7 @@ THREE.ColladaLoader = function () {
 		obj.doubleSided = false;
 
 		var node = element.querySelectorAll('extra double_sided')[0];
-	
+
 		if ( node ) {
 
 			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
