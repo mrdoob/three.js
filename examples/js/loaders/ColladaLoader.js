@@ -1076,7 +1076,7 @@ THREE.ColladaLoader = function () {
 
 				var color = lparams.color.getHex();
 				var intensity = lparams.intensity;
-				var distance = 0;
+				var distance = lparams.distance;
 				var angle = lparams.falloff_angle;
 				var exponent; // Intentionally undefined, don't know what this is yet
 
@@ -4516,7 +4516,9 @@ THREE.ColladaLoader = function () {
 								this.falloff_angle = parseFloat( child.textContent );
 								break;
 
-
+							case 'quadratic_attenuation':
+								var f = parseFloat( child.textContent );
+								this.distance = f ? Math.sqrt( 1/f ) : 0;
 						}
 
 					}
