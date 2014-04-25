@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '67' };
+var THREE = { REVISION: '68dev' };
 
 self.console = self.console || {
 
@@ -9299,6 +9299,12 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+
+			console.error( 'THREE.BufferGeometry.computeBoundingBox()', 'Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
+
+		}
+
 	},
 
 	computeBoundingSphere: function () {
@@ -9344,6 +9350,12 @@ THREE.BufferGeometry.prototype = {
 				}
 
 				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+				if ( isNaN( this.boundingSphere.radius ) ) {
+
+					console.error( 'THREE.BufferGeometry.computeBoundingSphere()', 'Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
+
+				}
 
 			}
 
