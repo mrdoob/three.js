@@ -10,7 +10,6 @@ THREE.ParticleSystem = function ( geometry, material ) {
 	this.material = material !== undefined ? material : new THREE.ParticleSystemMaterial( { color: Math.random() * 0xffffff } );
 
 	this.sortParticles = false;
-	this.frustumCulled = false;
 
 };
 
