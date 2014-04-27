@@ -5,22 +5,24 @@ Sidebar.Animation = function ( editor ) {
 	var options = {};
 	var possibleAnimations = {};
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text( 'Animation' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text( 'ANIMATION' ) );
+	container.add( new UI.Break() );
 
 	var AnimationsRow = new UI.Panel();
 	var Animations = new UI.Select().setOptions( options ).setWidth( '130px' ).setColor( '#444' ).setFontSize( '12px' );
 	AnimationsRow.add( new UI.Text( 'animations' ).setWidth( '90px' ) );
 	AnimationsRow.add( Animations );
+
 	container.add( AnimationsRow );
 	container.add( new UI.Break() );
 
 	var PlayRow = new UI.Panel();
-	var playButton = new UI.Button().setLabel("Play").onClick(play);
+	var playButton = new UI.Button().setLabel( 'Play' ).onClick( play );
 	PlayRow.add( playButton );
+
 	container.add( PlayRow );
 	container.add( new UI.Break() );
 
@@ -46,28 +48,30 @@ Sidebar.Animation = function ( editor ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		if ( object instanceof THREE.Mesh ) {
+		if ( object instanceof THREE.SkinnedMesh ) {
 
-			if ( object.geometry && object.geometry.animation ) {
+			var geometry = object.geometry;
+			var material = object.material;
 
-				var name = object.geometry.animation.name;
-				options[name] = name
+			material.skinning = true;
 
-				Animations.setOptions( options );
+			var name = geometry.animation.name;
 
-				THREE.AnimationHandler.add( object.geometry.animation );
+			options[ name ] = name
 
-				var animation = new THREE.Animation( object, name, THREE.AnimationHandler.CATMULLROM );
+			Animations.setOptions( options );
 
-				if ( possibleAnimations[ name ] ){
+			THREE.AnimationHandler.add( geometry.animation );
 
-					possibleAnimations[ name ].push( animation );
+			var animation = new THREE.Animation( object, name );
 
-				} else {
+			if ( possibleAnimations[ name ] ){
 
-					possibleAnimations[ name ] = [ animation ];
+				possibleAnimations[ name ].push( animation );
 
-				}
+			} else {
+
+				possibleAnimations[ name ] = [ animation ];
 
 			}
 
