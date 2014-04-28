@@ -31602,10 +31602,10 @@ THREE.AnimationHandler = {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Animation = function ( root ) {
+THREE.Animation = function ( root, data ) {
 
 	this.root = root;
-	this.data = THREE.AnimationHandler.init( root.geometry.animation );
+	this.data = THREE.AnimationHandler.init( data );
 	this.hierarchy = THREE.AnimationHandler.parse( root );
 
 	this.currentTime = 0;
