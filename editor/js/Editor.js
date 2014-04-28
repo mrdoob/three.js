@@ -6,7 +6,8 @@ var Editor = function () {
 
 		// actions
 
-		playAnimations: new SIGNALS.Signal(),
+		playAnimation: new SIGNALS.Signal(),
+		stopAnimation: new SIGNALS.Signal(),
 
 		// notifications
 
@@ -321,6 +322,7 @@ Editor.prototype = {
 			'HemisphereLight': THREE.HemisphereLight,
 			'PointLight': THREE.PointLight,
 			'SpotLight': THREE.SpotLight,
+			'SkinnedMesh': THREE.SkinnedMesh,
 			'Mesh': THREE.Mesh,
 			'Sprite': THREE.Sprite,
 			'Object3D': THREE.Object3D

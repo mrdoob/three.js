@@ -429,22 +429,23 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.playAnimations.add( function (animations) {
-		
-		function animate() {
+	var animations = [];
 
-			requestAnimationFrame( animate );
-			
-			for ( var i = 0; i < animations.length ; i ++ ) {
+	signals.playAnimation.add( function ( animation ) {
 
-				animations[i].update(0.016);
+		animations.push( animation );
 
-			} 
+	} );
 
-			render();
+	signals.stopAnimation.add( function ( animation ) {
+
+		var index = animations.indexOf( animation );
+
+		if ( index !== -1 ) {
+
+			animations.splice( index, 1 );
+
 		}
-
-		animate();
 
 	} );
 
@@ -562,6 +563,16 @@ var Viewport = function ( editor ) {
 	function animate() {
 
 		requestAnimationFrame( animate );
+
+		// animations
+
+		if ( THREE.AnimationHandler.animations.length > 0 ) {
+
+			THREE.AnimationHandler.update( 0.016 );
+
+			render();
+
+		}
 
 	}
 
