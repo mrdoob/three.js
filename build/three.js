@@ -31397,129 +31397,25 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.AnimationHandler = ( function () {
+THREE.AnimationHandler = {
 
-	var playing = [];
-	var library = {};
-	var that    = {};
+	LINEAR: 0,
+	CATMULLROM: 1,
+	CATMULLROM_FORWARD: 2,
 
-	that.update = function ( deltaTimeMS ) {
+	//
 
-		for ( var i = 0; i < playing.length; i ++ ) {
+	add: function () { console.warn( 'THREE.AnimationHandler.add() has been deprecated.' ); },
+	get: function () { console.warn( 'THREE.AnimationHandler.get() has been deprecated.' ); },
+	remove: function () { console.warn( 'THREE.AnimationHandler.remove() has been deprecated.' ); },
 
-			playing[ i ].update( deltaTimeMS );
+	//
 
-		}
+	animations: [],
 
-	};
+	init: function ( data ) {
 
-	that.addToUpdate = function ( animation ) {
-
-		if ( playing.indexOf( animation ) === -1 ) {
-
-			playing.push( animation );
-
-		}
-
-	};
-
-	that.removeFromUpdate = function ( animation ) {
-
-		var index = playing.indexOf( animation );
-
-		if ( index !== -1 ) {
-
-			playing.splice( index, 1 );
-
-		}
-
-	};
-
-	that.add = function ( data ) {
-
-		if ( library[ data.name ] !== undefined ) {
-
-			console.log( "THREE.AnimationHandler.add: Warning! " + data.name + " already exists in library. Overwriting." );
-
-		}
-
-		library[ data.name ] = data;
-		initData( data );
-
-	};
-
-	that.remove = function ( name ) {
-
-		if ( library[ name ] === undefined ) {
-
-			console.log( "THREE.AnimationHandler.add: Warning! " + name + " doesn't exists in library. Doing nothing." );
-
-		}
-
-		library[ name ] = undefined;
-
-	};
-
-	that.get = function ( name ) {
-
-		if ( typeof name === "string" ) {
-
-			if ( library[ name ] ) {
-
-				return library[ name ];
-
-			} else {
-
-				return null;
-
-			}
-
-		} else {
-
-			// todo: add simple tween library
-
-		}
-
-	};
-
-	that.parse = function ( root ) {
-
-		// setup hierarchy
-
-		var hierarchy = [];
-
-		if ( root instanceof THREE.SkinnedMesh ) {
-
-			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
-
-				hierarchy.push( root.skeleton.bones[ b ] );
-
-			}
-
-		} else {
-
-			parseRecurseHierarchy( root, hierarchy );
-
-		}
-
-		return hierarchy;
-
-	};
-
-	var parseRecurseHierarchy = function ( root, hierarchy ) {
-
-		hierarchy.push( root );
-
-		for ( var c = 0; c < root.children.length; c++ )
-			parseRecurseHierarchy( root.children[ c ], hierarchy );
-
-	}
-
-	var initData = function ( data ) {
-
-		if ( data.initialized === true )
-			return;
-
+		if ( data.initialized === true ) return;
 
 		// loop through all keys
 
@@ -31629,18 +31525,76 @@ THREE.AnimationHandler = ( function () {
 
 		data.initialized = true;
 
-	};
+		return data;
 
+	},
 
-	// interpolation types
+	parse: function ( root ) {
 
-	that.LINEAR = 0;
-	that.CATMULLROM = 1;
-	that.CATMULLROM_FORWARD = 2;
+		var parseRecurseHierarchy = function ( root, hierarchy ) {
 
-	return that;
+			hierarchy.push( root );
 
-}() );
+			for ( var c = 0; c < root.children.length; c++ )
+				parseRecurseHierarchy( root.children[ c ], hierarchy );
+
+		};
+
+		// setup hierarchy
+
+		var hierarchy = [];
+
+		if ( root instanceof THREE.SkinnedMesh ) {
+
+			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
+
+				hierarchy.push( root.skeleton.bones[ b ] );
+
+			}
+
+		} else {
+
+			parseRecurseHierarchy( root, hierarchy );
+
+		}
+
+		return hierarchy;
+
+	},
+
+	play: function ( animation ) {
+
+		if ( this.animations.indexOf( animation ) === -1 ) {
+
+			this.animations.push( animation );
+
+		}
+
+	},
+
+	stop: function ( animation ) {
+
+		var index = this.animations.indexOf( animation );
+
+		if ( index !== -1 ) {
+
+			this.animations.splice( index, 1 );
+
+		}
+
+	},
+
+	update: function ( deltaTimeMS ) {
+
+		for ( var i = 0; i < this.animations.length; i ++ ) {
+
+			this.animations[ i ].update( deltaTimeMS );
+
+		}
+
+	}
+
+};
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -31648,17 +31602,16 @@ THREE.AnimationHandler = ( function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Animation = function ( root, name ) {
+THREE.Animation = function ( root ) {
 
 	this.root = root;
-	this.data = THREE.AnimationHandler.get( name );
+	this.data = THREE.AnimationHandler.init( root.geometry.animation );
 	this.hierarchy = THREE.AnimationHandler.parse( root );
 
 	this.currentTime = 0;
 	this.timeScale = 1;
 
 	this.isPlaying = false;
-	this.isPaused = true;
 	this.loop = true;
 	this.weight = 0;
 
@@ -31676,28 +31629,10 @@ THREE.Animation.prototype.play = function ( startTime, weight ) {
 	this.weight = weight !== undefined ? weight: 1;
 
 	this.isPlaying = true;
-	this.isPaused = false;
 
 	this.reset();
 
-	THREE.AnimationHandler.addToUpdate( this );
-
-};
-
-
-THREE.Animation.prototype.pause = function() {
-
-	if ( this.isPaused === true ) {
-
-		THREE.AnimationHandler.addToUpdate( this );
-
-	} else {
-
-		THREE.AnimationHandler.removeFromUpdate( this );
-
-	}
-
-	this.isPaused = !this.isPaused;
+	THREE.AnimationHandler.play( this );
 
 };
 
@@ -31705,8 +31640,8 @@ THREE.Animation.prototype.pause = function() {
 THREE.Animation.prototype.stop = function() {
 
 	this.isPlaying = false;
-	this.isPaused  = false;
-	THREE.AnimationHandler.removeFromUpdate( this );
+
+	THREE.AnimationHandler.stop( this );
 
 };
 
@@ -32070,11 +32005,11 @@ THREE.Animation.prototype.getPrevKeyWith = function ( type, h, key ) {
  * @author erik kitson
  */
 
-THREE.KeyFrameAnimation = function ( root, data ) {
+THREE.KeyFrameAnimation = function ( data ) {
 
-	this.root = root;
-	this.data = THREE.AnimationHandler.get( data );
-	this.hierarchy = THREE.AnimationHandler.parse( root );
+	this.root = data.node;
+	this.data = THREE.AnimationHandler.init( data );
+	this.hierarchy = THREE.AnimationHandler.parse( this.root );
 	this.currentTime = 0;
 	this.timeScale = 0.001;
 	this.isPlaying = false;
@@ -32114,7 +32049,6 @@ THREE.KeyFrameAnimation = function ( root, data ) {
 
 };
 
-// Play
 
 THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 
@@ -32164,39 +32098,17 @@ THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 
 	this.isPaused = false;
 
-	THREE.AnimationHandler.addToUpdate( this );
+	THREE.AnimationHandler.play( this );
 
 };
 
-
-
-// Pause
-
-THREE.KeyFrameAnimation.prototype.pause = function() {
-
-	if( this.isPaused ) {
-
-		THREE.AnimationHandler.addToUpdate( this );
-
-	} else {
-
-		THREE.AnimationHandler.removeFromUpdate( this );
-
-	}
-
-	this.isPaused = !this.isPaused;
-
-};
-
-
-// Stop
 
 THREE.KeyFrameAnimation.prototype.stop = function() {
 
 	this.isPlaying = false;
 	this.isPaused  = false;
 
-	THREE.AnimationHandler.removeFromUpdate( this );
+	THREE.AnimationHandler.stop( this );
 
 	// reset JIT matrix and remove cache
 
@@ -32366,6 +32278,7 @@ THREE.MorphAnimation.prototype = {
 	pause: function () {
 
 		this.isPlaying = false;
+
 	},
 
 	update: ( function () {
