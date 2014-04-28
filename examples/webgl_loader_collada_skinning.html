@@ -82,23 +82,21 @@
 				var loader = new THREE.ColladaLoader();
 				loader.load( "./models/collada/avatar.dae", function ( collada ) {
 				
+					collada.scene.traverse( function ( child ) {
+
+						if ( child instanceof THREE.SkinnedMesh ) {
+
+							var animation = new THREE.Animation( child );
+							animation.play();
+
+							camera.lookAt( child.position );
+
+						}
+
+					} );
+
 					scene.add( collada.scene );
 
-					// T.P. adapted this to use un-flattened DAE hierarchy; see ColladaLoader.js
-					// for more information
-					var skin = collada.scene.children[0].children[1].children[0];
-					camera.lookAt(skin.position);
-
-					
-					if ( skin.geometry.animation ) {
-
-						THREE.AnimationHandler.add( skin.geometry.animation );
-
-						var animation = new THREE.Animation( skin, skin.geometry.animation.name );
-						// animation.loop = false;
-						animation.play();
-						
-					}
 				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );

@@ -53,7 +53,7 @@
 
 			var camera, scene, renderer, objects;
 			var particleLight, pointLight;
-			var dae, skin;
+			var dae;
 
 			var clock = new THREE.Clock();
 			var morphs = [];
@@ -65,7 +65,17 @@
 			loader.load( 'models/collada/monster/monster.dae', function ( collada ) {
 
 				dae = collada.scene;
-				skin = collada.skins[ 0 ];
+
+				dae.traverse( function ( child ) {
+
+					if ( child instanceof THREE.SkinnedMesh ) {
+
+						var animation = new THREE.Animation( child );
+						animation.play();
+
+					}
+
+				} );
 
 				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
 				dae.position.x = -1;
@@ -183,45 +193,20 @@
 
 			//
 
-			var t = 0;
 			function animate() {
 
 				requestAnimationFrame( animate );
 
+				var delta = clock.getDelta();
+
 				// animate Collada model
 
-				if ( t > 30 ) t = 0;
-
-				if ( skin ) {
-
-					// guess this can be done smarter...
-
-					// (Indeed, there are way more frames than needed and interpolation is not used at all
-					//  could be something like - one morph per each skinning pose keyframe, or even less,
-					//  animation could be resampled, morphing interpolation handles sparse keyframes quite well.
-					//  Simple animation cycles like this look ok with 10-15 frames instead of 100 ;)
-
-					for ( var i = 0; i < skin.morphTargetInfluences.length; i++ ) {
-
-						skin.morphTargetInfluences[ i ] = 0;
-
-					}
-
-					skin.morphTargetInfluences[ Math.floor( t ) ] = 1;
-
-					t += 0.5;
-
-				}
-
-				// animate morphs
-
-				var delta = clock.getDelta();
+				THREE.AnimationHandler.update( delta );
 
 				if ( morphs.length ) {
 
 					for ( var i = 0; i < morphs.length; i ++ )
 						morphs[ i ].updateAnimation( 1000 * delta );
-
 
 				}
 
