@@ -18,11 +18,15 @@ THREE.BufferAttribute.prototype = {
 
 		this.array.set( value );
 
+		return this;
+
 	},
 
 	setX: function ( index, x ) {
 
 		this.array[ index * this.itemSize ] = x;
+
+		return this;
 
 	},
 
@@ -30,11 +34,15 @@ THREE.BufferAttribute.prototype = {
 
 		this.array[ index * this.itemSize + 1 ] = y;
 
+		return this;
+
 	},
 
 	setZ: function ( index, z ) {
 
 		this.array[ index * this.itemSize + 2 ] = z;
+
+		return this;
 
 	},
 
@@ -44,6 +52,8 @@ THREE.BufferAttribute.prototype = {
 
 		this.array[ index     ] = x;
 		this.array[ index + 1 ] = y;
+
+		return this;
 
 	},
 
@@ -55,6 +65,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 
+		return this;
+
 	},
 
 	setXYZW: function ( index, x, y, z, w ) {
@@ -65,6 +77,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 		this.array[ index + 3 ] = w;
+
+		return this;
 
 	}
 
