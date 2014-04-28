@@ -86,7 +86,7 @@
 
 						if ( child instanceof THREE.SkinnedMesh ) {
 
-							var animation = new THREE.Animation( child );
+							var animation = new THREE.Animation( child, child.geometry.animation );
 							animation.play();
 
 							camera.lookAt( child.position );

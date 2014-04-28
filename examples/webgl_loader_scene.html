@@ -328,9 +328,7 @@
 
 							if ( object.geometry.animation ) {
 
-								THREE.AnimationHandler.add( object.geometry.animation );
-
-								var animation = new THREE.Animation( object, object.geometry.animation.name );
+								var animation = new THREE.Animation( object, object.geometry.animation );
 								animation.play();
 
 							}

@@ -38,9 +38,7 @@ Sidebar.Animation = function ( editor ) {
 
 				}
 
-				console.log( child.geometry );
-
-				animations[ child.id ] = new THREE.Animation( child );
+				animations[ child.id ] = new THREE.Animation( child, child.geometry.animation );
 
 			}
 
