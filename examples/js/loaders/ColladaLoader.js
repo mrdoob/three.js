@@ -832,7 +832,7 @@ THREE.ColladaLoader = function () {
 
 				}
 
-			geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
+				geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
 
 			}
 

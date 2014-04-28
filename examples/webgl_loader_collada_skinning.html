@@ -61,14 +61,13 @@
 				camera.up.set( 0, 0, 1 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xfff4e5, 0.0003 );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, -4, -4 ).normalize();
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( 0xfff4e5 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 
@@ -81,13 +80,13 @@
 				
 
 				var loader = new THREE.ColladaLoader();
-				loader.load( "./models/collada/avatar.dae", function ( geometry, materials ) {
+				loader.load( "./models/collada/avatar.dae", function ( collada ) {
 				
-					scene.add( geometry.scene );
+					scene.add( collada.scene );
 
 					// T.P. adapted this to use un-flattened DAE hierarchy; see ColladaLoader.js
 					// for more information
-					var skin = geometry.scene.children[0].children[1].children[0];
+					var skin = collada.scene.children[0].children[1].children[0];
 					camera.lookAt(skin.position);
 
 					
@@ -121,9 +120,7 @@
 
 				requestAnimationFrame( animate, renderer.domElement );
 
-				var delta = clock.getDelta();
-
-				THREE.AnimationHandler.update( delta );
+				THREE.AnimationHandler.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
 
