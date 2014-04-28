@@ -198,6 +198,10 @@ Editor.prototype = {
 
 				helper = new THREE.HemisphereLightHelper( object, 10 );
 
+			} else if ( object instanceof THREE.SkinnedMesh ) {
+
+				helper = new THREE.SkeletonHelper( object );
+
 			} else {
 
 				// no helper for this object type

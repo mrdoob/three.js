@@ -570,6 +570,18 @@ var Viewport = function ( editor ) {
 
 			THREE.AnimationHandler.update( 0.016 );
 
+			for ( var i = 0, l = sceneHelpers.children.length; i < l; i ++ ) {
+
+				var helper = sceneHelpers.children[ i ];
+
+				if ( helper instanceof THREE.SkeletonHelper ) {
+
+					helper.update();
+
+				}
+
+			}
+
 			render();
 
 		}
