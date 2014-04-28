@@ -735,7 +735,7 @@ THREE.AWDLoader = (function (){
         // ------------------
         if ( str_type === 1 ) {
 
-          attrib = new THREE.Float32Attribute( str_len/12, 3 );
+          attrib = new THREE.Float32Attribute( ( str_len / 12 ) * 3, 3 );
           buffer = attrib.array;
 
           geom.addAttribute( 'position', attrib );
@@ -754,7 +754,7 @@ THREE.AWDLoader = (function (){
         // -----------------
         else if (str_type === 2) {
 
-          attrib = new THREE.Uint16Attribute( str_len/2, 1 );
+          attrib = new THREE.Uint16Attribute( ( str_len / 2 ), 1 );
           geom.addAttribute( 'index', attrib );
 
           geom.offsets.push({
@@ -778,7 +778,7 @@ THREE.AWDLoader = (function (){
         // -------------------
         else if (str_type === 3) {
 
-          attrib = new THREE.Float32Attribute( str_len/8, 2 );
+          attrib = new THREE.Float32Attribute( ( str_len / 8 ) * 2, 2 );
           buffer = attrib.array;
 
           geom.addAttribute( 'uv', attrib );
@@ -794,7 +794,7 @@ THREE.AWDLoader = (function (){
         // NORMALS
         else if (str_type === 4) {
 
-          attrib = new THREE.Float32Attribute( str_len/12, 3 );
+          attrib = new THREE.Float32Attribute( ( str_len / 12 ) * 3, 3 );
           geom.addAttribute( 'normal', attrib );
           buffer = attrib.array
           idx = 0

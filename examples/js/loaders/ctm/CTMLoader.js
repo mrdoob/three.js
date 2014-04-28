@@ -211,17 +211,17 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 			colors = file.body.attrMaps[ 0 ].attr;
 		}
 
-		this.addAttribute( 'index', new THREE.Uint32Attribute( indices.length, 1 ).set( indices ) );
-		this.addAttribute( 'position', new THREE.Float32Attribute( positions.length, 3 ).set( positions ) );
+		this.addAttribute( 'index', new THREE.Uint32Attribute( indices, 1 ) );
+		this.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
 
 		if ( normals !== undefined ) 
-			this.addAttribute( 'normal', new THREE.Float32Attribute( normals.length, 3 ).set( normals ) );
+			this.addAttribute( 'normal', new THREE.Float32Attribute( normals, 3 ) );
 
 		if ( uvs !== undefined ) 
-			this.addAttribute( 'uv', new THREE.Float32Attribute( uvs.length, 2 ).set( uvs ) );
+			this.addAttribute( 'uv', new THREE.Float32Attribute( uvs, 2 ) );
 
 		if ( colors !== undefined ) 
-			this.addAttribute( 'color', new THREE.Float32Attribute( colors.length, 4 ).set( colors ) );
+			this.addAttribute( 'color', new THREE.Float32Attribute( colors, 4 ) );
 
 	}
 

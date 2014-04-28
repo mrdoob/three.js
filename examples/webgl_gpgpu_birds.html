@@ -382,9 +382,9 @@
 
 				THREE.BufferGeometry.call( this );
 
-				var vertices = new THREE.Float32Attribute( points, 3 );
-				var birdColors = new THREE.Float32Attribute( points, 3 );
-				var references = new THREE.Float32Attribute( points, 2 );
+				var vertices = new THREE.Float32Attribute( points * 3, 3 );
+				var birdColors = new THREE.Float32Attribute( points * 3, 3 );
+				var references = new THREE.Float32Attribute( points * 2, 2 );
 				var birdVertex = new THREE.Float32Attribute( points, 1 );
 
 				this.addAttribute( 'position', vertices );

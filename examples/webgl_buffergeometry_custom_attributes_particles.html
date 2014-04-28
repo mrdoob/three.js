@@ -137,17 +137,9 @@
 
 			geometry = new THREE.BufferGeometry();
 
-			geometry.addAttribute( 'position', new Float32Array( particles * 3 ), 3 );
-			geometry.addAttribute( 'customColor', new Float32Array( particles * 3 ), 3 );
-			geometry.addAttribute( 'size', new Float32Array( particles ), 1 );
-
-			var positions = geometry.getAttribute( 'position' ).array;
-			var values_color = geometry.getAttribute( 'customColor' ).array;
-			values_size = geometry.getAttribute( 'size' ).array;
-
-			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
-
-			// sphere.sortParticles = true;
+			var positions = new Float32Array( particles * 3 );
+			var values_color = new Float32Array( particles * 3 );
+			values_size = new Float32Array( particles );
 
 			var color = new THREE.Color( 0xffaa00 );;
 
@@ -169,6 +161,14 @@
 				values_color[ v * 3 + 2 ] = color.b;
 
 			}
+
+			geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
+			geometry.addAttribute( 'customColor', new THREE.Float32Attribute( values_color, 3 ) );
+			geometry.addAttribute( 'size', new THREE.Float32Attribute( values_size, 1 ) );
+
+			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
+
+			// sphere.sortParticles = true;
 
 			scene.add( sphere );
 
