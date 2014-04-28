@@ -9014,11 +9014,15 @@ THREE.BufferAttribute.prototype = {
 
 		this.array.set( value );
 
+		return this;
+
 	},
 
 	setX: function ( index, x ) {
 
 		this.array[ index * this.itemSize ] = x;
+
+		return this;
 
 	},
 
@@ -9026,11 +9030,15 @@ THREE.BufferAttribute.prototype = {
 
 		this.array[ index * this.itemSize + 1 ] = y;
 
+		return this;
+
 	},
 
 	setZ: function ( index, z ) {
 
 		this.array[ index * this.itemSize + 2 ] = z;
+
+		return this;
 
 	},
 
@@ -9041,6 +9049,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index     ] = x;
 		this.array[ index + 1 ] = y;
 
+		return this;
+
 	},
 
 	setXYZ: function ( index, x, y, z ) {
@@ -9050,6 +9060,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index     ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
+
+		return this;
 
 	},
 
@@ -9062,87 +9074,89 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 2 ] = z;
 		this.array[ index + 3 ] = w;
 
+		return this;
+
 	}
 
 };
 
 //
 
-THREE.Int8Attribute = function ( size, itemSize ) {
+THREE.Int8Attribute = function ( data, itemSize ) {
 
-	this.array = new Int8Array( size * itemSize );
+	this.array = new Int8Array( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Int8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Uint8Attribute = function ( size, itemSize ) {
+THREE.Uint8Attribute = function ( data, itemSize ) {
 
-	this.array = new Uint8Array( size * itemSize );
+	this.array = new Uint8Array( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Uint8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Uint8ClampedAttribute = function ( size, itemSize ) {
+THREE.Uint8ClampedAttribute = function ( data, itemSize ) {
 
-	this.array = new Uint8ClampedArray( size * itemSize );
+	this.array = new Uint8ClampedArray( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Uint8ClampedAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Int16Attribute = function ( size, itemSize ) {
+THREE.Int16Attribute = function ( data, itemSize ) {
 
-	this.array = new Int16Array( size * itemSize );
+	this.array = new Int16Array( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Int16Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Uint16Attribute = function ( size, itemSize ) {
+THREE.Uint16Attribute = function ( data, itemSize ) {
 
-	this.array = new Uint16Array( size * itemSize );
+	this.array = new Uint16Array( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Uint16Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Int32Attribute = function ( size, itemSize ) {
+THREE.Int32Attribute = function ( data, itemSize ) {
 
-	this.array = new Int32Array( size * itemSize );
+	this.array = new Int32Array( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Int32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Uint32Attribute = function ( size, itemSize ) {
+THREE.Uint32Attribute = function ( data, itemSize ) {
 
-	this.array = new Uint32Array( size * itemSize );
+	this.array = new Uint32Array( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Uint32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Float32Attribute = function ( size, itemSize ) {
+THREE.Float32Attribute = function ( data, itemSize ) {
 
-	this.array = new Float32Array( size * itemSize );
+	this.array = new Float32Array( data );
 	this.itemSize = itemSize;
 
 };
 
 THREE.Float32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
-THREE.Float64Attribute = function ( size, itemSize ) {
+THREE.Float64Attribute = function ( data, itemSize ) {
 
-	this.array = new Float64Array( size * itemSize );
+	this.array = new Float64Array( data );
 	this.itemSize = itemSize;
 
 };
@@ -16311,7 +16325,7 @@ THREE.LOD.prototype.clone = function ( object ) {
 
 THREE.Sprite = ( function () {
 
-	var vertices = new THREE.Float32Attribute( 3, 3 );
+	var vertices = new THREE.Float32Attribute( 3 * 3, 3 );
 	vertices.set( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
 
 	var geometry = new THREE.BufferGeometry();
@@ -35673,7 +35687,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	}
 
-	geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2, 3 ) );
+	geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
 
 	var coords = geometry.attributes.position.array;
 
@@ -36331,7 +36345,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2, 3 ) );
+		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
 
 		var coords = geometry.attributes.position.array;
 
@@ -36391,7 +36405,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2, 3 ) );
+		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
 
 		var coords = geometry.attributes.position.array;
 
@@ -36415,7 +36429,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 		var numEdges = vertices.length / 3;
 		var numTris = numEdges / 3;
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2, 3 ) );
+		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
 
 		var coords = geometry.attributes.position.array;
 
