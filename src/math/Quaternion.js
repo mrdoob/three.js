@@ -321,7 +321,7 @@ THREE.Quaternion.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w );
+		return Math.sqrt( this.lengthSq() );
 
 	},
 
