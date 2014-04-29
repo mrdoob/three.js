@@ -53,7 +53,6 @@
 
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-				//gl_PointSize = size;
 				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
 
 				gl_Position = projectionMatrix * mvPosition;
@@ -72,6 +71,7 @@
 			void main() {
 
 				gl_FragColor = vec4( color * vColor, 1.0 );
+
 				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
 
 			}
@@ -85,10 +85,7 @@
 
 		var renderer, scene, camera, stats;
 
-		var sphere, uniforms, geometry;
-
-		var noise = [];
-		var values_size;
+		var particleSystem, uniforms, geometry;
 
 		var particles = 100000;
 
@@ -107,7 +104,7 @@
 
 			var attributes = {
 
-				size: {	type: 'f', value: null },
+				size:        { type: 'f', value: null },
 				customColor: { type: 'c', value: null }
 
 			};
@@ -115,7 +112,7 @@
 			uniforms = {
 
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) }
 
 			};
 
@@ -139,22 +136,19 @@
 
 			var positions = new Float32Array( particles * 3 );
 			var values_color = new Float32Array( particles * 3 );
-			values_size = new Float32Array( particles );
+			var values_size = new Float32Array( particles );
 
-			var color = new THREE.Color( 0xffaa00 );;
+			var color = new THREE.Color();
 
 			for( var v = 0; v < particles; v++ ) {
 
-				values_size[ v ] = 10;
+				values_size[ v ] = 20;
 
-				positions[ v * 3 + 0 ] = (Math.random() * 2 - 1) * radius;
-				positions[ v * 3 + 1 ] = (Math.random() * 2 - 1) * radius;
-				positions[ v * 3 + 2 ] = (Math.random() * 2 - 1) * radius;
+				positions[ v * 3 + 0 ] = ( Math.random() * 2 - 1 ) * radius;
+				positions[ v * 3 + 1 ] = ( Math.random() * 2 - 1 ) * radius;
+				positions[ v * 3 + 2 ] = ( Math.random() * 2 - 1 ) * radius;
 
-				if ( positions[ v * 3 + 0 ] < 0 )
-					color.setHSL( 0.5 + 0.1 * ( v / particles ), 0.7, 0.1 );
-				else
-					color.setHSL( 0.0 + 0.1 * ( v / particles ), 0.9, 0.1 );
+				color.setHSL( v / particles, 1.0, 0.5 );
 
 				values_color[ v * 3 + 0 ] = color.r;
 				values_color[ v * 3 + 1 ] = color.g;
@@ -166,11 +160,9 @@
 			geometry.addAttribute( 'customColor', new THREE.Float32Attribute( values_color, 3 ) );
 			geometry.addAttribute( 'size', new THREE.Float32Attribute( values_size, 1 ) );
 
-			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
+			particleSystem = new THREE.ParticleSystem( geometry, shaderMaterial );
 
-			// sphere.sortParticles = true;
-
-			scene.add( sphere );
+			scene.add( particleSystem );
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.setSize( WIDTH, HEIGHT );
@@ -211,11 +203,13 @@
 
 			var time = Date.now() * 0.005;
 
-			sphere.rotation.z = 0.01 * time;
+			particleSystem.rotation.z = 0.01 * time;
+
+			var size = geometry.attributes.size.array;
 
 			for( var i = 0; i < particles; i++ ) {
 
-				values_size[ i ] = 14 + 13 * Math.sin( 0.1 * i + time );
+				size[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
 
 			}
 
