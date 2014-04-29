@@ -22,7 +22,6 @@ THREE.Sphere.prototype = {
 		return this;
 	},
 
-
 	setFromPoints: function () {
 
 		var box = new THREE.Box3();

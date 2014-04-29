@@ -1,38 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - buffer geometry custom attributes [particles]</title>
+		<title>three.js webgl - buffer geometry custom attributes - particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
 			}
 			#info {
-				color: #fff;
-				background-color: rgba( 0, 0, 0, 0.75 );
-				position: relative;
-				top: 0px; width: 100%;
+				position: absolute;
+				top: 0px;
+				width: 100%;
 				padding: 5px;
-				z-index:100;
-				width:33em;
-				margin:0 auto -2em;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
 			}
-			a { color: #ff0000 }
+			a {
+				color: #00f;
+			}
 		</style>
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - buffergeometry custom attributes example - particles</div>
 		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> wengl - buffergeometry custom attributes - particles</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="../src/renderers/WebGLRenderer.js"></script>
