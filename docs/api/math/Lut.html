@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.
+		</div>
+
+
+		<h2>Example</h2>
+		<code>var lut = new THREE.Lut( "rainbow", 512 );</code>
+		<code>var data = [0, 10.1, 4.2, 3.4, 63, 28];</code>
+		<code>lut.setMax(63);</code>
+		<code>color = lut.getColor(10);</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( colormap, numberOfColors )</h3>
+    <div>
+    colormap - optional argument that sets a colormap from prefefined colormaps. Available colormaps are : "rainbow", "cooltowarm", "blackbody", "grayscale".<br />
+    numberOfColors - optional argument that sets the number of colors used to represent the data array.
+		</div>
+
+		<h2>Properties</h2>
+
+
+		<h3>.[page:Float minV]</h3>
+		<div>
+		The minimum value to be represented with the lookup table. Default is 0.
+		</div>
+
+		<h3>.[page:Float maxV]</h3>
+		<div>
+		The maximum value to be represented with the lookup table. Default is 1.
+		</div>
+
+		<h3>.[page:Lut legend]</h3>
+		<div>
+		The legend of the lookup table. Default is null.
+		</div>
+
+		<h2>Methods</h2>
+
+
+		<h3>.copy( [page:Lut lut] ) [page:Lut this]</h3>
+		<div>
+		color — Lut to copy.
+		</div>
+		<div>
+		Copies given lut.
+		</div>
+
+		<h3>.setminV( [page:Float minV] ) [page:Lut this]</h3>
+		<div>
+		minV — The minimum value to be represented with the lookup table.<br />
+		</div>
+		<div>
+		Sets this Lut with the minimum value to be represented.
+		</div>
+
+		<h3>.setmaxV( [page:Float maxV] ) [page:Lut this]</h3>
+		<div>
+		maxV — The maximum value to be represented with the lookup table.<br />
+		</div>
+		<div>
+		Sets this Lut with the maximum value to be represented.
+		</div>
+
+		<h3>.changeNumberOfColors( [page:Float numberOfColors] ) [page:Lut this]</h3>
+		<div>
+		numberOfColors — The number of colors to be used to represent the data array.<br />
+		</div>
+		<div>
+		Sets this Lut with the number of colors to be used.
+    </div>
+
+		<h3>.changeColorMap( [page:Float colorMap] ) [page:Lut this]</h3>
+		<div>
+		colorMap — The name of the color map to be used to represent the data array.<br />
+		</div>
+		<div>
+		Sets this Lut with the colormap to be used.
+		</div>
+
+		<h3>.setLegendOn( parameters ) [page:Lut legend]</h3>
+		<div>
+		parameters - An object with optional settings : layout, position and dimensions.<br />
+		layout - horizontal or vertical.<br />
+		position - x, y, z coordinates.<br />
+		dimensions - width and height of the legend bar.<br />
+		</div>
+		<div>
+		Toggle legend on for the current color map.
+		</div>
+
+		<h3>.setLegendOff() [page:Lut legend]</h3>
+		<div>
+		</div>
+		<div>
+		Toggle legend off for the current color map.
+		</div>
+
+		<h3>.setLegendLabels( parameters, callback ) [page:Lut legend]</h3>
+		<div>
+		parameters - An object with optional settings : fontsize, fontface, title, um, ticks, decimal and notation.<br />
+		callback - An optional callback function to format labels.<br />
+		fontsize - Size of the font used for labels.<br />
+		fontface - Type of the font used for labels.<br />
+		title - Title to be used for the color bar.<br />
+		um - Unit of measurements to be used along the title.<br />
+		ticks - Number of ticks to be displayed.<br />
+		decimal - Number of decimals after integer.<br />
+		notation - standard or scientific.<br />
+		</div>
+		<div>
+		Set legend label for the current color map legend.
+		</div>
+
+		<h3>.setLegendPosition( position ) [page:Lut legend]</h3>
+		<div>
+		position - x, y, z coordinates.<br />
+		</div>
+		<div>
+		Sets the position of the legend Lut.
+		</div>
+
+		<h3>.setLegendPosition( layout ) [page:Lut legend]</h3>
+		<div>
+		layout - horizontal or vertical.<br />
+		</div>
+		<div>
+		Sets the layout of the legend Lut.
+		</div>
+
+		<h3>.addColorMap( colorMapName, arrayOfColors ) [page:Lut this]</h3>
+		<div>
+		Insert a new color map into the set of available color maps.
+		</div>
+
+		<h3>.getColor( value ) [page:Lut this]</h3>
+		<div>
+		value -- the data value to be displayed as a color.
+		</div>
+		<div>
+		Returns a [page:Color THREE.Color].
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
