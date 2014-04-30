@@ -14,14 +14,14 @@ var Viewport = function ( editor ) {
 	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
 	container.add( info );
 
-	//
+	// components + code editor
 
 	var codeEditor = new UI.CodeEditor();
 	container.add( codeEditor );
 
 	var currentComponentClass = null;
 
-	//
+	// scene graph
 
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
@@ -80,34 +80,7 @@ var Viewport = function ( editor ) {
 	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
 
-	// animations
-
-	var animations = [];
-
 	// events
-
-	signals.sidebarModeChanged.add( function ( mode ) {
-
-		if ( mode === 'components' ) {
-			codeEditor.setDisplay('block');
-		} else {
-			codeEditor.setDisplay('none');
-		}
-
-	} );
-
-	signals.currentComponentClassChanged.add( function ( componentClass ) {
-
-		// if a class is already open, save the contents
-		if ( currentComponentClass ) {
-			currentComponentClass.setCode( codeEditor.getValue() );
-		}
-
-		codeEditor.setValue( componentClass.getCode() );
-
-		currentComponentClass = componentClass;
-
-	} );
 
 	var getIntersects = function ( event, object ) {
 
@@ -465,16 +438,50 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.playAnimations.add( function (newAnimations) {
+	var animations = [];
 
-		animations = newAnimations;
+	signals.playAnimation.add( function ( animation ) {
+
+		animations.push( animation );
 
 	} );
 
+	signals.stopAnimation.add( function ( animation ) {
 
-	signals.mainLoop.add( function (newAnimations) {
+		var index = animations.indexOf( animation );
 
-		animate();
+		if ( index !== -1 ) {
+
+			animations.splice( index, 1 );
+
+		}
+
+	} );
+
+	signals.sidebarModeChanged.add( function ( mode ) {
+
+		if ( mode === 'components' ) {
+			
+			codeEditor.setDisplay('block');
+
+		} else {
+			
+			codeEditor.setDisplay('none');
+			
+		}
+
+	} );
+
+	signals.currentComponentClassChanged.add( function ( componentClass ) {
+
+		// if a class is already open, save the contents
+		if ( currentComponentClass ) {
+			currentComponentClass.setCode( codeEditor.getValue() );
+		}
+
+		codeEditor.setValue( componentClass.getCode() );
+
+		currentComponentClass = componentClass;
 
 	} );
 
@@ -503,6 +510,8 @@ var Viewport = function ( editor ) {
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
+
+	animate();
 
 	//
 
@@ -587,6 +596,34 @@ var Viewport = function ( editor ) {
 
 	}
 
+	function animate() {
+
+		requestAnimationFrame( animate );
+
+		// animations
+
+		if ( THREE.AnimationHandler.animations.length > 0 ) {
+
+			THREE.AnimationHandler.update( 0.016 );
+
+			for ( var i = 0, l = sceneHelpers.children.length; i < l; i ++ ) {
+
+				var helper = sceneHelpers.children[ i ];
+
+				if ( helper instanceof THREE.SkeletonHelper ) {
+
+					helper.update();
+
+				}
+
+			}
+
+			render();
+
+		}
+
+	}
+
 	function render() {
 
 		sceneHelpers.updateMatrixWorld();
@@ -601,17 +638,6 @@ var Viewport = function ( editor ) {
 
 		}
 
-	}
-
-	function animate() {
-
-		for ( var i = 0; i < animations.length ; i ++ ) {
-
-			animations[i].update(0.016);
-
-		}
-
-		render();
 	}
 
 	return container;
