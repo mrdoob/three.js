@@ -40,7 +40,6 @@
 	"src/loaders/ImageLoader.js",
 	"src/loaders/JSONLoader.js",
 	"src/loaders/MaterialLoader.js",
-	"src/loaders/SceneLoader.js",
 	"src/loaders/TextureLoader.js",
 	"src/materials/Material.js",
 	"src/materials/LineBasicMaterial.js",
