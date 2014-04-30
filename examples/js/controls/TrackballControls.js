@@ -6,7 +6,7 @@
 THREE.TrackballControls = function ( object, domElement ) {
 
 	var _this = this;
-	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4, TOUCH_PAN: 5 };
+	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4 };
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -504,11 +504,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 				var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
 				var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
 				_touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt( dx * dx + dy * dy );
-				break;
-
-			case 3:
-				_state = STATE.TOUCH_PAN;
-				_panEnd.copy( _this.getMouseOnScreen( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, _panStart ));
+				var x = (event.touches[ 0 ].pageX + event.touches[ 1 ].pageX) / 2;
+                		var y = (event.touches[ 0 ].pageY + event.touches[ 1 ].pageY) / 2;
+                		_panEnd.copy( _this.getMouseOnScreen( x, y, _panStart ));
 				break;
 
 			default:
@@ -536,11 +534,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 			case 2:
 				var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
 				var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
-				_touchZoomDistanceEnd = Math.sqrt( dx * dx + dy * dy )
-				break;
-
-			case 3:
-				_this.getMouseOnScreen( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, _panEnd );
+				_touchZoomDistanceEnd = Math.sqrt( dx * dx + dy * dy );
+				var x = (event.touches[ 0 ].pageX + event.touches[ 1 ].pageX) / 2;
+                		var y = (event.touches[ 0 ].pageY + event.touches[ 1 ].pageY) / 2;
+                		_this.getMouseOnScreen( x, y, _panEnd );
 				break;
 
 			default:
@@ -562,10 +559,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			case 2:
 				_touchZoomDistanceStart = _touchZoomDistanceEnd = 0;
-				break;
-
-			case 3:
-				_panStart.copy( _this.getMouseOnScreen( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, _panEnd ));
+				var x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX ) / 2;
+                		var y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY ) / 2;
+                		_panStart.copy( _this.getMouseOnScreen(x, y, _panEnd ));
 				break;
 
 		}
