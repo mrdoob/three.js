@@ -19,7 +19,7 @@
  * }
  */
 
-THREE.ParticleSystemMaterial = function ( parameters ) {
+THREE.PointsMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -38,11 +38,11 @@ THREE.ParticleSystemMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleSystemMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.PointsMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleSystemMaterial.prototype.clone = function () {
+THREE.PointsMaterial.prototype.clone = function () {
 
-	var material = new THREE.ParticleSystemMaterial();
+	var material = new THREE.PointsSystemMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -63,4 +63,9 @@ THREE.ParticleSystemMaterial.prototype.clone = function () {
 
 // backwards compatibility
 
-THREE.ParticleBasicMaterial = THREE.ParticleSystemMaterial;
+THREE.ParticleSystemMaterial = function ( parameters ) {
+
+	console.warn( 'THREE.ParticleSystemMaterial has been DEPRECATED. Use THREE.PointsMaterial instead.' );
+	return new THREE.PointsMaterial( parameters );
+
+}

@@ -197,7 +197,7 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
  *	Create Geometries Helpers
  **************************************************************/
 
-/// Generate geometry from path points (for Line or ParticleSystem objects)
+/// Generate geometry from path points (for Line or Points objects)
 
 THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 

@@ -2674,7 +2674,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		} else if ( object instanceof THREE.ParticleSystem ) {
+		} else if ( object instanceof THREE.Points ) {
 
 			// render particles
 
@@ -3006,7 +3006,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// render particles
 
-		} else if ( object instanceof THREE.ParticleSystem ) {
+		} else if ( object instanceof THREE.Points ) {
 
 			_gl.drawArrays( _gl.POINTS, 0, geometryGroup.__webglParticleCount );
 
@@ -3762,7 +3762,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-				} else if ( object instanceof THREE.ParticleSystem ) {
+				} else if ( object instanceof THREE.Points ) {
 
 					if ( ! geometry.__webglVertexBuffer ) {
 
@@ -3803,7 +3803,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			} else if ( object instanceof THREE.Line ||
-						object instanceof THREE.ParticleSystem ) {
+						object instanceof THREE.Points ) {
 
 				geometry = object.geometry;
 				addBuffer( scene.__webglObjects, geometry, object );
@@ -3927,7 +3927,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			material.attributes && clearCustomAttributes( material );
 
 
-		} else if ( object instanceof THREE.ParticleSystem ) {
+		} else if ( object instanceof THREE.Points ) {
 
 			material = getBufferMaterial( object, geometry );
 
@@ -3977,7 +3977,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function removeObject( object, scene ) {
 
 		if ( object instanceof THREE.Mesh  ||
-			 object instanceof THREE.ParticleSystem ||
+			 object instanceof THREE.Points ||
 			 object instanceof THREE.Line ) {
 
 			removeInstances( scene.__webglObjects, object );
@@ -4064,7 +4064,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			shaderID = 'dashed';
 
-		} else if ( material instanceof THREE.ParticleSystemMaterial ) {
+		} else if ( material instanceof THREE.PointsMaterial ) {
 
 			shaderID = 'particle_basic';
 
@@ -4400,7 +4400,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				refreshUniformsLine( m_uniforms, material );
 				refreshUniformsDash( m_uniforms, material );
 
-			} else if ( material instanceof THREE.ParticleSystemMaterial ) {
+			} else if ( material instanceof THREE.PointsMaterial ) {
 
 				refreshUniformsParticle( m_uniforms, material );
 
