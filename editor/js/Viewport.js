@@ -467,7 +467,7 @@ var Viewport = function ( editor ) {
 		} else {
 			
 			codeEditor.setDisplay('none');
-			
+
 		}
 
 	} );
@@ -482,6 +482,13 @@ var Viewport = function ( editor ) {
 		codeEditor.setValue( componentClass.getCode() );
 
 		currentComponentClass = componentClass;
+
+	} );
+
+	signals.mainLoop.add( function () {
+
+		animate();
+		render();
 
 	} );
 
@@ -510,8 +517,6 @@ var Viewport = function ( editor ) {
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
-
-	animate();
 
 	//
 
@@ -598,8 +603,6 @@ var Viewport = function ( editor ) {
 
 	function animate() {
 
-		requestAnimationFrame( animate );
-
 		// animations
 
 		if ( THREE.AnimationHandler.animations.length > 0 ) {
@@ -617,8 +620,6 @@ var Viewport = function ( editor ) {
 				}
 
 			}
-
-			render();
 
 		}
 
