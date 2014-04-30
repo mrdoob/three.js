@@ -382,6 +382,56 @@ UI.TextArea.prototype.setValue = function ( value ) {
 
 };
 
+// CodeEditor
+
+UI.CodeEditor = function () {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom;
+
+	var setDom = function(element) {
+		dom = element;
+	}
+
+	var codeMirrorOptions = {
+		mode: 'javascript',
+		theme: 'monokai',
+		lineNumbers: true
+	}
+
+	var codeMirror = CodeMirror(setDom, codeMirrorOptions);
+
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
+
+	this.dom = dom;
+	this.codeMirror = codeMirror;
+
+	return this;
+
+};
+
+UI.CodeEditor.prototype = Object.create( UI.Element.prototype );
+
+UI.CodeEditor.prototype.getValue = function () {
+
+	return this.codeMirror.getValue();
+
+};
+
+UI.CodeEditor.prototype.setValue = function ( value ) {
+
+	this.codeMirror.setValue( value );
+
+	return this;
+
+};
 
 // Select
 

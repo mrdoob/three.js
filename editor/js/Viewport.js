@@ -14,6 +14,10 @@ var Viewport = function ( editor ) {
 	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
 	container.add( info );
 
+	var codeEditor = new UI.CodeEditor();
+	// codeEditor.setDisplay('none');
+	container.add( codeEditor );
+
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
 
