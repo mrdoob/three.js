@@ -1,3 +1,21 @@
+function ComponentClass ( opts ) {
+
+	opts = opts || {};
+
+	var defaultSrc = [
+		'// hello world',
+		'this.update = function () {',
+		'  ',
+		'}',
+	].join('\n');
+
+	this.uuid = THREE.Math.generateUUID();
+	this.name = opts.name || 'Unnamed Component';
+	this.src = opts.src || defaultSrc;
+	this.instances = [];
+
+}
+
 Sidebar.ComponentClasses = function ( editor ) {
 
 	//
@@ -6,8 +24,7 @@ Sidebar.ComponentClasses = function ( editor ) {
 
 	if (!Object.keys(editor.componentClasses).length) {
 
-		editor.componentClasses = [{
-			uuid: 0,
+		var bobber = new ComponentClass({
 			name: 'Bobber',
 			src: [
 				'// bobber',
@@ -18,7 +35,11 @@ Sidebar.ComponentClasses = function ( editor ) {
 				'  this.target.position.setY( y );',
 				'}',
 			].join('\n'),
-		},{
+		});
+
+		editor.registerComponentClass( bobber );
+
+		var spinner = new ComponentClass({
 			uuid: 1,
 			name: 'Spinner',
 			src: [
@@ -28,7 +49,9 @@ Sidebar.ComponentClasses = function ( editor ) {
 				'  this.target.rotateY( y );',
 				'}',
 			].join('\n'),
-		}];
+		});
+
+		editor.registerComponentClass( spinner );
 
 	}
 	
@@ -39,18 +62,41 @@ Sidebar.ComponentClasses = function ( editor ) {
 	var container = new UI.Panel();
 	container.setId('componentPanel');
 
-	drawComponentPanels();
+	drawNewComponentsPanel();
 
 	// events
 
-	editor.signals.componentClassNameChanged.add( function (componentClass) {
+	editor.signals.componentClassRegistryChanged.add( function (componentClass) {
 
 		container.clear();
-		drawComponentPanels();
+		drawNewComponentsPanel();
 
 	} );
 
 	return container;
+
+	function drawNewComponentsPanel() {
+
+		drawNewComponent();
+		drawComponentPanels();
+
+	}
+
+	function drawNewComponent () {
+		
+		var newComponentPanel = new UI.Panel();
+		var newComponentButton = new UI.Button( 'New Component' ).onClick( function () {
+
+			var newComponentClass = new ComponentClass();
+			editor.registerComponentClass( newComponentClass );
+			editor.signals.currentComponentClassChanged.dispatch( newComponentClass );
+
+		} );
+
+		newComponentPanel.add( newComponentButton );
+		container.add( newComponentPanel );
+
+	}
 
 	function drawComponentPanels () {
 
@@ -84,7 +130,7 @@ function createComponentPanel (componentClass) {
 		// An error occurs if you do this immediately
 		setTimeout( function () {
 
-			editor.signals.componentClassNameChanged.dispatch( componentClass );
+			editor.signals.componentClassRegistryChanged.dispatch( componentClass );
 
 		} );
 
@@ -98,12 +144,42 @@ function createComponentPanel (componentClass) {
 	// stats
 
 	var componentStatsRow = new UI.Panel();
-	var componentStats = new UI.Text( 0 ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+	var componentStats = new UI.Text( componentClass.instances.length ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	componentStatsRow.add( new UI.Text( 'Instances' ).setWidth( '90px' ) );
 	componentStatsRow.add( componentStats );
 
 	panel.add( componentStatsRow );
+
+	// CRUD
+
+	var componentCrudRow = new UI.Panel();
+
+	var componentDuplicateButton = new UI.Button( 'Duplicate' ).onClick( function () {
+
+		var newName = incrementComponentName( componentClass.name );
+
+		var newComponentClass = new ComponentClass({
+			name: newName,
+			src: componentClass.src,
+		});
+
+		editor.registerComponentClass( newComponentClass );
+		editor.signals.currentComponentClassChanged.dispatch( newComponentClass );
+
+	} );
+
+	var componentDeleteButton = new UI.Button( 'Delete' ).onClick( function () {
+		
+		editor.deleteComponentClass( componentClass );
+
+	} );
+
+	componentCrudRow.add( componentDuplicateButton );
+	componentCrudRow.add( componentDeleteButton );
+
+
+	panel.add( componentCrudRow );
 
 	// events
 
@@ -114,5 +190,42 @@ function createComponentPanel (componentClass) {
 	} );
 
 	return panel;
+
+	//
+
+	function incrementComponentName( name ) {
+
+		var digits = 0;
+		var endsInNumber = 0;
+
+		while (true) {
+		
+			var tryDigits = digits + 1;
+			var endOfName = name.slice( -tryDigits );
+			var isNumber = !Number.isNaN( Number( endOfName ) );
+			if (isNumber && tryDigits < name.length ) { 
+				endsInNumber = Number( endOfName );
+				digits++;
+			} else {
+				break;
+			}
+
+		}
+		
+		if ( digits > 0 ) {
+			name = name.slice( 0, -digits );
+		}
+
+		if ( endsInNumber === 0) {
+			endsInNumber = 2;
+		} else {
+			endsInNumber++;
+		}
+
+		name += endsInNumber;
+
+		return name;
+		
+	}
 
 }

@@ -16,7 +16,7 @@ var Editor = function () {
 		sidebarModeChanged: new SIGNALS.Signal(),
 		
 		currentComponentClassChanged: new SIGNALS.Signal(),
-		componentClassNameChanged: new SIGNALS.Signal(),
+		componentClassRegistryChanged: new SIGNALS.Signal(),
 
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
@@ -99,6 +99,29 @@ Editor.prototype = {
 
 		this.signals.sceneGraphChanged.active = true;
 		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	//
+
+	registerComponentClass: function ( componentClass ) {
+
+		this.componentClasses[ componentClass.uuid ] = componentClass;
+		this.signals.componentClassRegistryChanged.dispatch( componentClass );
+
+	},
+
+	deleteComponentClass: function ( componentClass ) {
+		
+		delete this.componentClasses[ componentClass.uuid ];
+
+		// componentClass.instances.forEach( function ( componentInstance ) {
+
+		// 	componentInstance.target.removeComponent( componentInstance );
+
+		// } )
+
+		this.signals.componentClassRegistryChanged.dispatch();
 
 	},
 
