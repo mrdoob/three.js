@@ -119,6 +119,7 @@ input.Number {
 	background-color: #111;
 	padding: 0px;
 	margin: 0px;
+	z-index: 10;
 }
 
 	#menubar .menu {
