@@ -80,6 +80,10 @@ var Viewport = function ( editor ) {
 	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
 
+	// animations
+
+	var animations = [];
+
 	// events
 
 	signals.sidebarModeChanged.add( function ( mode ) {
@@ -96,10 +100,10 @@ var Viewport = function ( editor ) {
 
 		// if a class is already open, save the contents
 		if ( currentComponentClass ) {
-			currentComponentClass.src = codeEditor.getValue();
+			currentComponentClass.setCode( codeEditor.getValue() );
 		}
 
-		codeEditor.setValue( componentClass.src );
+		codeEditor.setValue( componentClass.getCode() );
 
 		currentComponentClass = componentClass;
 
@@ -461,23 +465,16 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	var animations = [];
+	signals.playAnimations.add( function (newAnimations) {
 
-	signals.playAnimation.add( function ( animation ) {
-
-		animations.push( animation );
+		animations = newAnimations;
 
 	} );
 
-	signals.stopAnimation.add( function ( animation ) {
 
-		var index = animations.indexOf( animation );
+	signals.mainLoop.add( function (newAnimations) {
 
-		if ( index !== -1 ) {
-
-			animations.splice( index, 1 );
-
-		}
+		animate();
 
 	} );
 
@@ -506,8 +503,6 @@ var Viewport = function ( editor ) {
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
-
-	animate();
 
 	//
 
@@ -592,34 +587,6 @@ var Viewport = function ( editor ) {
 
 	}
 
-	function animate() {
-
-		requestAnimationFrame( animate );
-
-		// animations
-
-		if ( THREE.AnimationHandler.animations.length > 0 ) {
-
-			THREE.AnimationHandler.update( 0.016 );
-
-			for ( var i = 0, l = sceneHelpers.children.length; i < l; i ++ ) {
-
-				var helper = sceneHelpers.children[ i ];
-
-				if ( helper instanceof THREE.SkeletonHelper ) {
-
-					helper.update();
-
-				}
-
-			}
-
-			render();
-
-		}
-
-	}
-
 	function render() {
 
 		sceneHelpers.updateMatrixWorld();
@@ -634,6 +601,17 @@ var Viewport = function ( editor ) {
 
 		}
 
+	}
+
+	function animate() {
+
+		for ( var i = 0; i < animations.length ; i ++ ) {
+
+			animations[i].update(0.016);
+
+		}
+
+		render();
 	}
 
 	return container;

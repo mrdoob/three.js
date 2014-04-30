@@ -39,7 +39,9 @@ var Editor = function () {
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
-		windowResize: new SIGNALS.Signal()
+		windowResize: new SIGNALS.Signal(),
+
+		mainLoop: new SIGNALS.Signal()
 
 	};
 	
@@ -58,10 +60,12 @@ var Editor = function () {
 	this.textures = {};
 	
 	this.componentClasses = {};
-	this.components = {};
+	this.componentsLookupByObject = {};
 
 	this.selected = null;
 	this.helpers = {};
+
+	this.mainLoop();
 
 };
 
@@ -112,16 +116,86 @@ Editor.prototype = {
 	},
 
 	deleteComponentClass: function ( componentClass ) {
+
+		var scope = this;
 		
+		componentClass.instances.slice().forEach( function ( componentInstance ) {
+
+			scope.deleteComponentInstance( componentInstance );
+
+		} )
+
 		delete this.componentClasses[ componentClass.uuid ];
 
-		// componentClass.instances.forEach( function ( componentInstance ) {
+		this.signals.componentClassRegistryChanged.dispatch();
 
-		// 	componentInstance.target.removeComponent( componentInstance );
+	},
 
-		// } )
+	deleteComponentInstance: function ( component ) {
+
+		// remove component instance from object 
+		var objectComponents = this.componentsLookupByObject[ component.target.uuid ];
+
+		var index = objectComponents.indexOf( component )
+		if (index > -1) {
+		    objectComponents.splice(index, 1);
+		}
+
+		// remove component instance from component class
+		var classInstances = this.componentClasses[ component.class.uuid ].instances;
+
+		var index = classInstances.indexOf( component )
+		if (index > -1) {
+		    classInstances.splice(index, 1);
+		}
+
+	},
+
+	componentsForObject: function ( target ) {
+
+		var components = this.componentsLookupByObject[ target.uuid ];
+
+		if ( components === undefined ) {
+			components = components || [];			
+		}
+
+		return components
+
+	},
+
+	instantiateComponent: function ( componentClass, target ) {
+
+		var components = this.componentsLookupByObject[ target.uuid ];
+
+		if ( components === undefined ) {
+			components = components || [];	
+			this.componentsLookupByObject[ target.uuid ] = components;		
+		}
+
+		var newInstance = componentClass.instantiate( target );
+		components.push( newInstance );
 
 		this.signals.componentClassRegistryChanged.dispatch();
+
+		return newInstance;
+
+	},
+
+	runComponentUpdate: function () {
+
+		var componentClasses = this.componentClasses;
+
+		Object.keys( this.componentClasses ).forEach( function (uuid) {
+
+			var componentClass = componentClasses[ uuid ];
+			
+			componentClass.instances.forEach( function (instance) {
+
+				instance.run('update');
+
+			})
+
+		} );
 
 	},
 
@@ -441,6 +515,15 @@ Editor.prototype = {
 
 		}
 
-	}
+	},
+
+	mainLoop: function () {
+
+		requestAnimationFrame( this.mainLoop.bind( this ) );
+
+		this.runComponentUpdate();
+		this.signals.mainLoop.dispatch();
+
+	},
 
 }
