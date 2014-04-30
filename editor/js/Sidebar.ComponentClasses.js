@@ -1,63 +1,4 @@
-function ComponentClass ( opts ) {
-
-	opts = opts || {};
-
-	var defaultSrc = [
-		'// hello world',
-		'this.update = function () {',
-		'  ',
-		'}',
-	].join('\n');
-
-	this.uuid = THREE.Math.generateUUID();
-	this.name = opts.name || 'Unnamed Component';
-	this.src = opts.src || defaultSrc;
-	this.instances = [];
-
-}
-
 Sidebar.ComponentClasses = function ( editor ) {
-
-	//
-	// Temp Component Def
-	//
-
-	if (!Object.keys(editor.componentClasses).length) {
-
-		var bobber = new ComponentClass({
-			name: 'Bobber',
-			src: [
-				'// bobber',
-				'var t = 0;',
-				'this.update = function () {',
-				'  t++;',
-				'  var y = 100 * sin( t / 50 );',
-				'  this.target.position.setY( y );',
-				'}',
-			].join('\n'),
-		});
-
-		editor.registerComponentClass( bobber );
-
-		var spinner = new ComponentClass({
-			uuid: 1,
-			name: 'Spinner',
-			src: [
-				'// spinner',
-				'this.update = function () {',
-				'  var y = 1 / 50;',
-				'  this.target.rotateY( y );',
-				'}',
-			].join('\n'),
-		});
-
-		editor.registerComponentClass( spinner );
-
-	}
-	
-	//
-	// Temp Component Def
-	//
 
 	var container = new UI.Panel();
 	container.setId('componentPanel');
@@ -113,6 +54,8 @@ Sidebar.ComponentClasses = function ( editor ) {
 
 }
 
+//
+
 function createComponentPanel (componentClass) {
 		
 	var panel = new UI.CollapsiblePanel();
@@ -157,7 +100,7 @@ function createComponentPanel (componentClass) {
 
 	var componentDuplicateButton = new UI.Button( 'Duplicate' ).onClick( function () {
 
-		var newName = incrementComponentName( componentClass.name );
+		var newName = incrementName( componentClass.name );
 
 		var newComponentClass = new ComponentClass({
 			name: newName,
@@ -191,41 +134,39 @@ function createComponentPanel (componentClass) {
 
 	return panel;
 
-	//
+}
 
-	function incrementComponentName( name ) {
+function incrementName( name ) {
 
-		var digits = 0;
-		var endsInNumber = 0;
+	var digits = 0;
+	var endsInNumber = 0;
 
-		while (true) {
-		
-			var tryDigits = digits + 1;
-			var endOfName = name.slice( -tryDigits );
-			var isNumber = !Number.isNaN( Number( endOfName ) );
-			if (isNumber && tryDigits < name.length ) { 
-				endsInNumber = Number( endOfName );
-				digits++;
-			} else {
-				break;
-			}
-
-		}
-		
-		if ( digits > 0 ) {
-			name = name.slice( 0, -digits );
-		}
-
-		if ( endsInNumber === 0) {
-			endsInNumber = 2;
+	while (true) {
+	
+		var tryDigits = digits + 1;
+		var endOfName = name.slice( -tryDigits );
+		var isNumber = !Number.isNaN( Number( endOfName ) );
+		if (isNumber && tryDigits < name.length ) { 
+			endsInNumber = Number( endOfName );
+			digits++;
 		} else {
-			endsInNumber++;
+			break;
 		}
 
-		name += endsInNumber;
-
-		return name;
-		
+	}
+	
+	if ( digits > 0 ) {
+		name = name.slice( 0, -digits );
 	}
 
+	if ( endsInNumber === 0) {
+		endsInNumber = 2;
+	} else {
+		endsInNumber++;
+	}
+
+	name += endsInNumber;
+
+	return name;
+	
 }
