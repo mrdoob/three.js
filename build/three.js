@@ -6857,17 +6857,6 @@ THREE.Triangle.prototype = {
 };
 
 /**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Vertex = function ( v ) {
-
-	console.warn( 'THREE.Vertex has been DEPRECATED. Use THREE.Vector3 instead.')
-	return v;
-
-};
-
-/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -9995,7 +9984,7 @@ THREE.Geometry = function () {
 	this.name = '';
 
 	this.vertices = [];
-	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem and Line
+	this.colors = [];  // one-to-one vertex colors, used in Points and Line
 
 	this.faces = [];
 
@@ -13843,7 +13832,7 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
  * }
  */
 
-THREE.ParticleSystemMaterial = function ( parameters ) {
+THREE.PointsMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -13862,11 +13851,11 @@ THREE.ParticleSystemMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleSystemMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.PointsMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleSystemMaterial.prototype.clone = function () {
+THREE.PointsMaterial.prototype.clone = function () {
 
-	var material = new THREE.ParticleSystemMaterial();
+	var material = new THREE.PointsSystemMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -13887,8 +13876,12 @@ THREE.ParticleSystemMaterial.prototype.clone = function () {
 
 // backwards compatibility
 
-THREE.ParticleBasicMaterial = THREE.ParticleSystemMaterial;
+THREE.ParticleSystemMaterial = function ( parameters ) {
 
+	console.warn( 'THREE.ParticleSystemMaterial has been DEPRECATED. Use THREE.PointsMaterial instead.' );
+	return new THREE.PointsMaterial( parameters );
+
+}
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -14282,22 +14275,22 @@ THREE.DataTexture.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ParticleSystem = function ( geometry, material ) {
+THREE.Points = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
-	this.material = material !== undefined ? material : new THREE.ParticleSystemMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
 
 	this.sortParticles = false;
 
 };
 
-THREE.ParticleSystem.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Points.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.ParticleSystem.prototype.clone = function ( object ) {
+THREE.Points.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.ParticleSystem( this.geometry, this.material );
+	if ( object === undefined ) object = new THREE.Points( this.geometry, this.material );
 
 	object.sortParticles = this.sortParticles;
 
@@ -14307,6 +14300,14 @@ THREE.ParticleSystem.prototype.clone = function ( object ) {
 
 };
 
+// Backwards compatibility
+
+THREE.ParticleSystem = function ( geometry, material ) {
+
+	console.warn( 'THREE.ParticleSystem has been DEPRECATED. Use THREE.Points instead.' );
+	return new THREE.Points( geometry, material );
+
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -15745,8 +15746,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
 		_elemBox.max.set( v1.x + dist, v1.y + dist );
 
-		if ( material instanceof THREE.SpriteMaterial ||
-			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
+		if ( material instanceof THREE.SpriteMaterial ) {
 
 			var texture = material.map;
 
@@ -15798,7 +15798,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_context.fillRect( ox, oy, sx, sy );
 				_context.restore();
 
-			} else { // no texture
+			} else {
+
+				// no texture
 
 				setFillStyle( material.color.getStyle() );
 
@@ -22255,7 +22257,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		} else if ( object instanceof THREE.ParticleSystem ) {
+		} else if ( object instanceof THREE.Points ) {
 
 			// render particles
 
@@ -22587,7 +22589,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// render particles
 
-		} else if ( object instanceof THREE.ParticleSystem ) {
+		} else if ( object instanceof THREE.Points ) {
 
 			_gl.drawArrays( _gl.POINTS, 0, geometryGroup.__webglParticleCount );
 
@@ -23343,7 +23345,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-				} else if ( object instanceof THREE.ParticleSystem ) {
+				} else if ( object instanceof THREE.Points ) {
 
 					if ( ! geometry.__webglVertexBuffer ) {
 
@@ -23384,7 +23386,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			} else if ( object instanceof THREE.Line ||
-						object instanceof THREE.ParticleSystem ) {
+						object instanceof THREE.Points ) {
 
 				geometry = object.geometry;
 				addBuffer( scene.__webglObjects, geometry, object );
@@ -23508,7 +23510,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			material.attributes && clearCustomAttributes( material );
 
 
-		} else if ( object instanceof THREE.ParticleSystem ) {
+		} else if ( object instanceof THREE.Points ) {
 
 			material = getBufferMaterial( object, geometry );
 
@@ -23558,7 +23560,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function removeObject( object, scene ) {
 
 		if ( object instanceof THREE.Mesh  ||
-			 object instanceof THREE.ParticleSystem ||
+			 object instanceof THREE.Points ||
 			 object instanceof THREE.Line ) {
 
 			removeInstances( scene.__webglObjects, object );
@@ -23645,7 +23647,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			shaderID = 'dashed';
 
-		} else if ( material instanceof THREE.ParticleSystemMaterial ) {
+		} else if ( material instanceof THREE.PointsMaterial ) {
 
 			shaderID = 'particle_basic';
 
@@ -23981,7 +23983,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				refreshUniformsLine( m_uniforms, material );
 				refreshUniformsDash( m_uniforms, material );
 
-			} else if ( material instanceof THREE.ParticleSystemMaterial ) {
+			} else if ( material instanceof THREE.PointsMaterial ) {
 
 				refreshUniformsParticle( m_uniforms, material );
 
@@ -28325,7 +28327,7 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
  *	Create Geometries Helpers
  **************************************************************/
 
-/// Generate geometry from path points (for Line or ParticleSystem objects)
+/// Generate geometry from path points (for Line or Points objects)
 
 THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
@@ -36183,7 +36185,7 @@ THREE.ShadowMapPlugin = function () {
 
 				if ( object.visible && object.castShadow ) {
 
-					if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
+					if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 						object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
@@ -36890,7 +36892,7 @@ THREE.DepthPassPlugin = function () {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 					object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
@@ -36917,7 +36919,7 @@ THREE.DepthPassPlugin = function () {
 
 				// todo: create proper depth material for particles
 
-				if ( object instanceof THREE.ParticleSystem && !object.customDepthMaterial ) continue;
+				if ( object instanceof THREE.Points && !object.customDepthMaterial ) continue;
 
 				objectMaterial = getObjectMaterial( object );
 
