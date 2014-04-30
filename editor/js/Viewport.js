@@ -15,7 +15,6 @@ var Viewport = function ( editor ) {
 	container.add( info );
 
 	var codeEditor = new UI.CodeEditor();
-	// codeEditor.setDisplay('none');
 	container.add( codeEditor );
 
 	var scene = editor.scene;
@@ -76,6 +75,16 @@ var Viewport = function ( editor ) {
 	var projector = new THREE.Projector();
 
 	// events
+
+	signals.sidebarModeChanged.add( function ( mode ) {
+
+		if ( mode === 'components' ) {
+			codeEditor.setDisplay('block');
+		} else {
+			codeEditor.setDisplay('none');
+		}
+
+	} );
 
 	var getIntersects = function ( event, object ) {
 

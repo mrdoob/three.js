@@ -7,6 +7,8 @@ var Menubar = function ( editor ) {
 	container.add( new Menubar.Add( editor ) );
 	container.add( new Menubar.View( editor ) );
 	container.add( new Menubar.Help( editor ) );
+	
+	container.add( new Menubar.SidebarController( editor ).setFloat('right') );
 
 	return container;
 

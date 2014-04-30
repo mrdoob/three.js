@@ -13,6 +13,8 @@ var Editor = function () {
 
 		themeChanged: new SIGNALS.Signal(),
 
+		sidebarModeChanged: new SIGNALS.Signal(),
+
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
 		spaceChanged: new SIGNALS.Signal(),
@@ -42,6 +44,8 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
+	this.currentSidebarMode = null;
+
 	this.scene = new THREE.Scene();
 	this.sceneHelpers = new THREE.Scene();
 
@@ -62,6 +66,13 @@ Editor.prototype = {
 		document.getElementById( 'theme' ).href = value;
 
 		this.signals.themeChanged.dispatch( value );
+
+	},
+
+	setSidebarMode: function ( mode ) {
+
+		this.currentSidebarMode = mode;
+		this.signals.sidebarModeChanged.dispatch( mode );
 
 	},
 

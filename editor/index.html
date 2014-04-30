@@ -69,6 +69,7 @@
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
+		<script src="js/Menubar.SidebarController.js"></script>
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Renderer.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
@@ -100,11 +101,11 @@
 			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor ).setId( 'menubar' );
-			document.body.appendChild( menubar.dom );
-
 			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
 			document.body.appendChild( sidebar.dom );
+
+			var menubar = new Menubar( editor ).setId( 'menubar' );
+			document.body.appendChild( menubar.dom );
 
 			//
 
