@@ -15,7 +15,7 @@ var Sidebar = function ( editor ) {
 
 	var showComponents = function() {
 
-		// container.add( new Sidebar.ComponentClass( editor ) );
+		container.add( new Sidebar.ComponentClasses( editor ) );
 
 	};
 

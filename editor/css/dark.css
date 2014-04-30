@@ -204,6 +204,17 @@ input.Number {
 
 	}
 
+	#sidebar > #componentPanel {
+		padding: 0px;
+		border-top: 0px;
+	}
+
+		#sidebar > #componentPanel > .Panel {
+			color: #888;
+			padding: 10px;
+			border-top: 1px solid #ccc;
+		}
+
 #toolbar {
 	position: absolute;
 	left: 0px;

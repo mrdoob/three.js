@@ -17,7 +17,8 @@ Menubar.SidebarController = function ( editor ) {
 	container.add(inspectorButton);
 	container.add(componentsButton);
 
-	editor.setSidebarMode('inspector');
+	editor.setSidebarMode('components');
+	// editor.setSidebarMode('inspector');
 
 	return container;
 }

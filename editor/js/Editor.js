@@ -14,6 +14,9 @@ var Editor = function () {
 		themeChanged: new SIGNALS.Signal(),
 
 		sidebarModeChanged: new SIGNALS.Signal(),
+		
+		currentComponentClassChanged: new SIGNALS.Signal(),
+		componentClassNameChanged: new SIGNALS.Signal(),
 
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
@@ -53,6 +56,9 @@ var Editor = function () {
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
+	
+	this.componentClasses = {};
+	this.components = {};
 
 	this.selected = null;
 	this.helpers = {};

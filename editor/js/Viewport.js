@@ -14,8 +14,14 @@ var Viewport = function ( editor ) {
 	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
 	container.add( info );
 
+	//
+
 	var codeEditor = new UI.CodeEditor();
 	container.add( codeEditor );
+
+	var currentComponentClass = null;
+
+	//
 
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
@@ -83,6 +89,19 @@ var Viewport = function ( editor ) {
 		} else {
 			codeEditor.setDisplay('none');
 		}
+
+	} );
+
+	signals.currentComponentClassChanged.add( function ( componentClass ) {
+
+		// if a class is already open, save the contents
+		if ( currentComponentClass ) {
+			currentComponentClass.src = codeEditor.getValue();
+		}
+
+		codeEditor.setValue( componentClass.src );
+
+		currentComponentClass = componentClass;
 
 	} );
 
