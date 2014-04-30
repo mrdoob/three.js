@@ -71,6 +71,17 @@ var Editor = function () {
 
 Editor.prototype = {
 
+	mainLoop: function () {
+
+		requestAnimationFrame( this.mainLoop.bind( this ) );
+
+		this.runComponentUpdate();
+		this.signals.mainLoop.dispatch();
+
+	},
+
+	//
+
 	setTheme: function ( value ) {
 
 		document.getElementById( 'theme' ).href = value;
@@ -391,33 +402,15 @@ Editor.prototype = {
 
 	selectById: function ( id ) {
 
-		var scope = this;
-
-		this.scene.traverse( function ( child ) {
-
-			if ( child.id === id ) {
-
-				scope.select( child );
-
-			}
-
-		} );
+		var target = this.objectById( id );
+		this.select( target );
 
 	},
 
 	selectByUuid: function ( uuid ) {
 
-		var scope = this;
-
-		this.scene.traverse( function ( child ) {
-
-			if ( child.uuid === uuid ) {
-
-				scope.select( child );
-
-			}
-
-		} );
+		var target = this.objectByUuid( uuid );
+		this.select( target );
 
 	},
 
@@ -428,6 +421,42 @@ Editor.prototype = {
 	},
 
 	// utils
+
+	objectById: function ( id ) {
+
+		var target = null;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.id === id ) {
+
+				target = child;
+
+			}
+
+		} );
+
+		return target;
+
+	},
+
+	objectByUuid: function ( uuid ) {
+
+		var target = null;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.uuid === uuid ) {
+
+				target = child;
+
+			}
+
+		} );
+
+		return target;
+
+	},
 
 	getObjectType: function ( object ) {
 
@@ -517,12 +546,33 @@ Editor.prototype = {
 
 	},
 
-	mainLoop: function () {
+	serializeScene: function () {
 
-		requestAnimationFrame( this.mainLoop.bind( this ) );
+		// export scene
+		var exporter = new THREE.ObjectExporter();
+		var data = exporter.parse( editor.scene );
 
-		this.runComponentUpdate();
-		this.signals.mainLoop.dispatch();
+		// append components
+		data.components = this.serializeComponents();
+
+		return data;
+
+	},
+
+	serializeComponents: function () {
+
+		var data = [];
+		var componentClasses = this.componentClasses;
+
+		Object.keys( this.componentClasses ).forEach( function (uuid) {
+
+			var componentClass = componentClasses[ uuid ];
+			
+			data.push( componentClass.toJSON() );
+
+		} );
+
+		return data;
 
 	},
 

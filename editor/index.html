@@ -120,13 +120,36 @@
 
 					if ( state !== undefined ) {
 
+						// load scene
+						
 						var loader = new THREE.ObjectLoader();
 						var scene = loader.parse( state );
 
 						editor.setScene( scene );
 
+						// load components
+
+						if ( state.components !== undefined ) {
+
+							state.components.forEach( function ( classData ) {
+
+								var componentClass = new ComponentClass( classData );
+								editor.registerComponentClass( componentClass );
+
+								classData.instances.forEach( function ( instanceData ) {
+
+									var target = editor.objectByUuid( instanceData.target );
+									editor.instantiateComponent( componentClass, target );
+
+								} );
+
+							} );
+
+						}
+
 					}
 
+					// load config
 					var selected = editor.config.getKey( 'selected' );
 
 					if ( selected !== undefined ) {
@@ -140,7 +163,6 @@
 				//
 
 				var timeout;
-				var exporter = new THREE.ObjectExporter();
 
 				var saveState = function ( scene ) {
 
@@ -148,7 +170,7 @@
 
 					timeout = setTimeout( function () {
 
-						editor.storage.set( exporter.parse( editor.scene ) );
+						editor.storage.set( editor.serializeScene() );
 
 					}, 1000 );
 
@@ -161,6 +183,7 @@
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
+				signals.componentClassRegistryChanged.add( saveState );
 
 			} );
 

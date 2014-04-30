@@ -1,19 +1,19 @@
 // ComponentClass
 
+var _defaultSrc = [
+	'// hello world',
+	'this.update = function () {',
+	'  // target.position',
+	'};',
+].join('\n');
+
 function ComponentClass ( opts ) {
 
 	opts = opts || {};
 
-	var defaultSrc = [
-		'// hello world',
-		'this.update = function () {',
-		'  // target.position',
-		'};',
-	].join('\n');
-
-	this.uuid = THREE.Math.generateUUID();
+	this.uuid = opts.uuid || THREE.Math.generateUUID();
 	this.name = opts.name || 'Unnamed Component';
-	this.src = opts.src || defaultSrc;
+	this.src = opts.src || _defaultSrc;
 	this.instances = [];
 
 }
@@ -56,7 +56,26 @@ ComponentClass.prototype = {
 
 		} );
 
-	}
+	},
+
+	toJSON: function () {
+
+		var data = {};
+
+		data.uuid = this.uuid;
+		data.name = this.name;
+		data.src = this.src;
+
+		data.instances = [];
+		this.instances.forEach( function (instance) {
+
+			data.instances.push( instance.toJSON() );
+
+		} );
+
+		return data;
+
+	},
 
 }
 
@@ -91,6 +110,18 @@ ComponentInstance.prototype = {
 		var args = [].slice.call( arguments, 1 );
 		fn.apply( this.instance, args );
 
-	}
+	},
+
+	toJSON: function () {
+
+		var data = {};
+
+		data.uuid = this.uuid;
+		data.target = this.target.uuid;
+		data.class = this.class.uuid;
+
+		return data;
+
+	},
 
 }
