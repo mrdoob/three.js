@@ -16,7 +16,6 @@
 	"src/math/Frustum.js",
 	"src/math/Math.js",
 	"src/math/Triangle.js",
-	"src/math/Vertex.js",
 	"src/core/EventDispatcher.js",
 	"src/core/Raycaster.js",
 	"src/core/Object3D.js",

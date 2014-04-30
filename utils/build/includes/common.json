@@ -18,7 +18,6 @@
 	"src/math/Math.js",
 	"src/math/Spline.js",
 	"src/math/Triangle.js",
-	"src/math/Vertex.js",
 	"src/core/Clock.js",
 	"src/core/EventDispatcher.js",
 	"src/core/Raycaster.js",
