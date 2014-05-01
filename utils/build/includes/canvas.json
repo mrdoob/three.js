@@ -43,7 +43,6 @@
 	"src/materials/MeshDepthMaterial.js",
 	"src/materials/MeshNormalMaterial.js",
 	"src/materials/MeshFaceMaterial.js",
-	"src/materials/PointsMaterial.js",
 	"src/materials/SpriteMaterial.js",
 	"src/materials/SpriteCanvasMaterial.js",
 	"src/textures/Texture.js",

@@ -115,7 +115,7 @@ THREE.DepthPassPlugin = function () {
 
 				// todo: create proper depth material for particles
 
-				if ( object instanceof THREE.Points && !object.customDepthMaterial ) continue;
+				if ( object instanceof THREE.PointCloud && !object.customDepthMaterial ) continue;
 
 				objectMaterial = getObjectMaterial( object );
 
