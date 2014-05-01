@@ -13832,7 +13832,7 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
  * }
  */
 
-THREE.PointsMaterial = function ( parameters ) {
+THREE.PointCloudMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -13851,11 +13851,11 @@ THREE.PointsMaterial = function ( parameters ) {
 
 };
 
-THREE.PointsMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.PointCloudMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.PointsMaterial.prototype.clone = function () {
+THREE.PointCloudMaterial.prototype.clone = function () {
 
-	var material = new THREE.PointsSystemMaterial();
+	var material = new THREE.PointCloudMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -13878,8 +13878,8 @@ THREE.PointsMaterial.prototype.clone = function () {
 
 THREE.ParticleSystemMaterial = function ( parameters ) {
 
-	console.warn( 'THREE.ParticleSystemMaterial has been DEPRECATED. Use THREE.PointsMaterial instead.' );
-	return new THREE.PointsMaterial( parameters );
+	console.warn( 'THREE.ParticleSystemMaterial has been DEPRECATED. Use THREE.PointCloudMaterial instead.' );
+	return new THREE.PointCloudMaterial( parameters );
 
 }
 /**
@@ -14275,22 +14275,22 @@ THREE.DataTexture.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Points = function ( geometry, material ) {
+THREE.PointCloud = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
-	this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new THREE.PointCloudMaterial( { color: Math.random() * 0xffffff } );
 
 	this.sortParticles = false;
 
 };
 
-THREE.Points.prototype = Object.create( THREE.Object3D.prototype );
+THREE.PointCloud.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Points.prototype.clone = function ( object ) {
+THREE.PointCloud.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.Points( this.geometry, this.material );
+	if ( object === undefined ) object = new THREE.PointCloud( this.geometry, this.material );
 
 	object.sortParticles = this.sortParticles;
 
@@ -14304,8 +14304,8 @@ THREE.Points.prototype.clone = function ( object ) {
 
 THREE.ParticleSystem = function ( geometry, material ) {
 
-	console.warn( 'THREE.ParticleSystem has been DEPRECATED. Use THREE.Points instead.' );
-	return new THREE.Points( geometry, material );
+	console.warn( 'THREE.ParticleSystem has been DEPRECATED. Use THREE.PointCloud instead.' );
+	return new THREE.PointCloud( geometry, material );
 
 };
 /**
@@ -22257,7 +22257,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		} else if ( object instanceof THREE.Points ) {
+		} else if ( object instanceof THREE.PointCloud ) {
 
 			// render particles
 
@@ -22589,7 +22589,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// render particles
 
-		} else if ( object instanceof THREE.Points ) {
+		} else if ( object instanceof THREE.PointCloud ) {
 
 			_gl.drawArrays( _gl.POINTS, 0, geometryGroup.__webglParticleCount );
 
@@ -23345,7 +23345,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-				} else if ( object instanceof THREE.Points ) {
+				} else if ( object instanceof THREE.PointCloud ) {
 
 					if ( ! geometry.__webglVertexBuffer ) {
 
@@ -23386,7 +23386,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			} else if ( object instanceof THREE.Line ||
-						object instanceof THREE.Points ) {
+						object instanceof THREE.PointCloud ) {
 
 				geometry = object.geometry;
 				addBuffer( scene.__webglObjects, geometry, object );
@@ -23510,7 +23510,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			material.attributes && clearCustomAttributes( material );
 
 
-		} else if ( object instanceof THREE.Points ) {
+		} else if ( object instanceof THREE.PointCloud ) {
 
 			material = getBufferMaterial( object, geometry );
 
@@ -23560,7 +23560,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function removeObject( object, scene ) {
 
 		if ( object instanceof THREE.Mesh  ||
-			 object instanceof THREE.Points ||
+			 object instanceof THREE.PointCloud ||
 			 object instanceof THREE.Line ) {
 
 			removeInstances( scene.__webglObjects, object );
@@ -23647,7 +23647,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			shaderID = 'dashed';
 
-		} else if ( material instanceof THREE.PointsMaterial ) {
+		} else if ( material instanceof THREE.PointCloudMaterial ) {
 
 			shaderID = 'particle_basic';
 
@@ -23983,7 +23983,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				refreshUniformsLine( m_uniforms, material );
 				refreshUniformsDash( m_uniforms, material );
 
-			} else if ( material instanceof THREE.PointsMaterial ) {
+			} else if ( material instanceof THREE.PointCloudMaterial ) {
 
 				refreshUniformsParticle( m_uniforms, material );
 
@@ -36919,7 +36919,7 @@ THREE.DepthPassPlugin = function () {
 
 				// todo: create proper depth material for particles
 
-				if ( object instanceof THREE.Points && !object.customDepthMaterial ) continue;
+				if ( object instanceof THREE.PointCloud && !object.customDepthMaterial ) continue;
 
 				objectMaterial = getObjectMaterial( object );
 
