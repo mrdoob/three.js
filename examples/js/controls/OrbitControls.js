@@ -60,15 +60,24 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
 	// How far you can orbit vertically, upper and lower limits.
-	// Range is 0 to Math.PI radians.
-	this.minPolarAngle = 0; // radians
-	this.maxPolarAngle = Math.PI; // radians
+	// Range is 0.01 to Math.PI-0.01 radians, which is sufficient to avoid
+	// noticable gimbal lock.
+	this.minPolarAngle = 0.01; // radians
+	this.maxPolarAngle = Math.PI - 0.01; // radians
 
 	// Set to true to disable use of the keys
 	this.noKeys = false;
 
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
+
+	// A little bit of damping, as if the mouse movement imparts momentum which
+	// is carried away by kinetic friction. On each update, a step is taken
+	// proportional to this factor times the requested angle change.
+	//   0.0: don't move at all
+	//   0.2: feels physically responsive at about 60 FPS
+	//   1.0: track mouse motion immediately
+	this.damping = 1.0;
 
 	////////////
 	// internals
@@ -94,7 +103,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var phiDelta = 0;
 	var thetaDelta = 0;
-	var scale = 1;
+	var radius = object.position.length();
 	var pan = new THREE.Vector3();
 
 	var lastPosition = new THREE.Vector3();
@@ -204,29 +213,29 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	this.dollyIn = function ( dollyScale ) {
+	this.dollyIn = function ( dolly ) {
 
-		if ( dollyScale === undefined ) {
-
-			dollyScale = getZoomScale();
-
-		}
-
-		scale /= dollyScale;
+		radius -= getZoomSpeed() * dolly;
 
 	};
 
-	this.dollyOut = function ( dollyScale ) {
+	this.dollyOut = function ( dolly ) {
 
-		if ( dollyScale === undefined ) {
-
-			dollyScale = getZoomScale();
-
-		}
-
-		scale *= dollyScale;
+		radius += getZoomSpeed() * dolly;
 
 	};
+
+	this.getThetaPhi = function() {
+		// angle from z-axis around y-axis
+
+		var theta = Math.atan2( offset.x, offset.z );
+
+		// angle from y-axis
+
+		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+
+		return [theta, phi];
+	}
 
 	this.update = function () {
 
@@ -237,30 +246,26 @@ THREE.OrbitControls = function ( object, domElement ) {
 		// rotate offset to "y-axis-is-up" space
 		offset.applyQuaternion( quat );
 
-		// angle from z-axis around y-axis
+		var thetaPhi = this.getThetaPhi();
+		var theta = thetaPhi[0];
+		var phi = thetaPhi[1];
 
-		var theta = Math.atan2( offset.x, offset.z );
-
-		// angle from y-axis
-
-		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+		theta += this.damping * thetaDelta;
+		phi += this.damping * phiDelta;
+		thetaDelta *= (1 - this.damping);
+		phiDelta *= (1 - this.damping);
 
 		if ( this.autoRotate ) {
 
-			this.rotateLeft( getAutoRotationAngle() );
+			theta += getAutoRotationAngle();
 
 		}
-
-		theta += thetaDelta;
-		phi += phiDelta;
 
 		// restrict phi to be between desired limits
 		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
 
 		// restrict phi to be betwee EPS and PI-EPS
 		phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
-
-		var radius = offset.length() * scale;
 
 		// restrict radius to be between desired limits
 		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
@@ -279,9 +284,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		this.object.lookAt( this.target );
 
-		thetaDelta = 0;
-		phiDelta = 0;
-		scale = 1;
 		pan.set( 0, 0, 0 );
 
 		if ( lastPosition.distanceToSquared( this.object.position ) > EPS ) {
@@ -312,9 +314,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function getZoomScale() {
+	function getZoomSpeed() {
 
-		return Math.pow( 0.95, scope.zoomSpeed );
+		var distanceRange = this.maxDistance - this.minDistance;
+
+		if ( distanceRange < Infinity )
+			return distanceRange * scope.zoomSpeed;
+		else
+			return scope.zoomSpeed;
 
 	}
 
@@ -384,11 +391,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			if ( dollyDelta.y > 0 ) {
 
-				scope.dollyIn();
+				scope.dollyIn( dollyDelta.y );
 
 			} else {
 
-				scope.dollyOut();
+				scope.dollyOut( -dollyDelta.y );
 
 			}
 
@@ -415,6 +422,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
+		_state = STATE.NONE;
+
 		scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
 		scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
 		scope.dispatchEvent( endEvent );
@@ -433,21 +442,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( event.wheelDelta !== undefined ) { // WebKit / Opera / Explorer 9
 
-			delta = event.wheelDelta;
+			delta = event.wheelDelta / 40;
 
 		} else if ( event.detail !== undefined ) { // Firefox
 
-			delta = - event.detail;
+			delta = - event.detail / 3;
 
 		}
 
 		if ( delta > 0 ) {
 
-			scope.dollyOut();
+			scope.dollyOut( delta );
 
 		} else {
 
-			scope.dollyIn();
+			scope.dollyIn( -delta );
 
 		}
 
