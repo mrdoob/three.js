@@ -103,7 +103,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var phiDelta = 0;
 	var thetaDelta = 0;
-	var scale = 1;
+	var radius = object.position.length();
 	var pan = new THREE.Vector3();
 
 	var lastPosition = new THREE.Vector3();
@@ -213,27 +213,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
-	this.dollyIn = function ( dollyScale ) {
+	this.dollyIn = function ( dolly ) {
 
-		if ( dollyScale === undefined ) {
-
-			dollyScale = getZoomScale();
-
-		}
-
-		scale /= dollyScale;
+		radius -= getZoomSpeed() * dolly;
 
 	};
 
-	this.dollyOut = function ( dollyScale ) {
+	this.dollyOut = function ( dolly ) {
 
-		if ( dollyScale === undefined ) {
-
-			dollyScale = getZoomScale();
-
-		}
-
-		scale *= dollyScale;
+		radius += getZoomSpeed() * dolly;
 
 	};
 
@@ -279,8 +267,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 		// restrict phi to be betwee EPS and PI-EPS
 		phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
 
-		var radius = offset.length() * scale;
-
 		// restrict radius to be between desired limits
 		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
 		
@@ -298,7 +284,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		this.object.lookAt( this.target );
 
-		scale = 1;
 		pan.set( 0, 0, 0 );
 
 		if ( lastPosition.distanceToSquared( this.object.position ) > EPS ) {
@@ -329,9 +314,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function getZoomScale() {
+	function getZoomSpeed() {
 
-		return Math.pow( 0.95, scope.zoomSpeed );
+		var distanceRange = this.maxDistance - this.minDistance;
+
+		if ( distanceRange < Infinity )
+			return distanceRange * scope.zoomSpeed;
+		else
+			return scope.zoomSpeed;
 
 	}
 
@@ -401,11 +391,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			if ( dollyDelta.y > 0 ) {
 
-				scope.dollyIn();
+				scope.dollyIn( dollyDelta.y );
 
 			} else {
 
-				scope.dollyOut();
+				scope.dollyOut( -dollyDelta.y );
 
 			}
 
@@ -432,6 +422,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
+		_state = STATE.NONE;
+
 		scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
 		scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
 		scope.dispatchEvent( endEvent );
@@ -450,21 +442,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( event.wheelDelta !== undefined ) { // WebKit / Opera / Explorer 9
 
-			delta = event.wheelDelta;
+			delta = event.wheelDelta / 40;
 
 		} else if ( event.detail !== undefined ) { // Firefox
 
-			delta = - event.detail;
+			delta = - event.detail / 3;
 
 		}
 
 		if ( delta > 0 ) {
 
-			scope.dollyOut();
+			scope.dollyOut( delta );
 
 		} else {
 
-			scope.dollyIn();
+			scope.dollyIn( -delta );
 
 		}
 
