@@ -71,6 +71,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// The four arrow keys
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
+	// A little bit of damping, as if the mouse movement imparts momentum which
+	// is carried away by kinetic friction. On each update, a step is taken
+	// proportional to this factor times the requested angle change.
+	//   0.0: don't move at all
+	//   0.2: feels physically responsive at about 60 FPS
+	//   1.0: track mouse motion immediately
+	this.damping = 1.0;
+
 	////////////
 	// internals
 
@@ -229,6 +237,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+	this.getThetaPhi = function() {
+		// angle from z-axis around y-axis
+
+		var theta = Math.atan2( offset.x, offset.z );
+
+		// angle from y-axis
+
+		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+
+		return [theta, phi];
+	}
+
 	this.update = function () {
 
 		var position = this.object.position;
@@ -238,22 +258,20 @@ THREE.OrbitControls = function ( object, domElement ) {
 		// rotate offset to "y-axis-is-up" space
 		offset.applyQuaternion( quat );
 
-		// angle from z-axis around y-axis
+		var thetaPhi = this.getThetaPhi();
+		var theta = thetaPhi[0];
+		var phi = thetaPhi[1];
 
-		var theta = Math.atan2( offset.x, offset.z );
-
-		// angle from y-axis
-
-		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+		theta += this.damping * thetaDelta;
+		phi += this.damping * phiDelta;
+		thetaDelta *= (1 - this.damping);
+		phiDelta *= (1 - this.damping);
 
 		if ( this.autoRotate ) {
 
-			this.rotateLeft( getAutoRotationAngle() );
+			theta += getAutoRotationAngle();
 
 		}
-
-		theta += thetaDelta;
-		phi += phiDelta;
 
 		// restrict phi to be between desired limits
 		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
@@ -280,8 +298,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		this.object.lookAt( this.target );
 
-		thetaDelta = 0;
-		phiDelta = 0;
 		scale = 1;
 		pan.set( 0, 0, 0 );
 
