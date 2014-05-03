@@ -120,7 +120,7 @@
 					var distanceToRay = raycaster.ray.distanceToPoint( matrixPosition );
 					var distance = raycaster.ray.origin.distanceTo( matrixPosition );
 
-					if ( distanceToRay < 1 ) { // needs a better test; particle size?
+					if ( distanceToRay < threshold ) {
 
 						intersects.push( {
 						
