@@ -645,7 +645,7 @@ THREE.ColladaLoader = function () {
 	function applySkin ( geometry, instanceCtrl, frame ) {
 
 		// TODO: get this from the renderer or options
-		var maxbones = 30;
+		var maxbones = 64;
 
 		var skinController = controllers[ instanceCtrl.url ];
 
@@ -744,6 +744,8 @@ THREE.ColladaLoader = function () {
 
 		}
 
+		console.log( 'ColladaLoader:', animationBounds.ID + ' has ' + sortedbones.length + ' bones.' );
+
 		//if using hardware skinning, move the vertices into the binding pose
 		if(sortedbones.length < maxbones) {
 
@@ -832,7 +834,7 @@ THREE.ColladaLoader = function () {
 
 				}
 
-			geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
+				geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
 
 			}
 
