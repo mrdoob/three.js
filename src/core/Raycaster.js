@@ -14,6 +14,12 @@
 		this.near = near || 0;
 		this.far = far || Infinity;
 
+		this.params = {};
+		this.params.Sprite = {};
+		this.params.Mesh = {};
+		this.params.PointCloud = {threshold: 1};
+		this.params.LOD = {};
+		this.params.Line = {};
 	};
 
 	var sphere = new THREE.Sphere();
@@ -59,30 +65,81 @@
 
 
 		} else if ( object instanceof THREE.PointCloud ) {
+		
+			var geometry = object.geometry;
+			var threshold = raycaster.params.PointCloud.threshold;
 
-			var vertices = object.geometry.vertices;
+			inverseMatrix.getInverse( object.matrixWorld );  
+			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+			if(geometry.boundingBox !== null){
+				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
+					return intersects;
+				}
+			}
 
-			for ( var i = 0; i < vertices.length; i ++ ) {
+			if(geometry instanceof THREE.BufferGeometry){
 
-				var v = vertices[ i ];
+				var positions = object.geometry.attributes.position.array;
+				var pos = new THREE.Vector3();
 
-				matrixPosition.copy( v ).applyMatrix4( object.matrixWorld );
+				for (var i = 0; i < positions.length; i++ ) {
+				
+					pos.set(
+						positions[3*i], 
+						positions[3*i+1], 
+						positions[3*i+2]
+					);
+					
+					var distanceToRay = localRay.distanceToPoint( pos );
 
-				var distance = raycaster.ray.distanceToPoint( matrixPosition );
+					if ( distanceToRay < threshold ) {
+					
+						//var intersectionPoint = new THREE.Vector3().copy(pos).applyMatrix4(object.matrixWorld);
+						matrixPosition.copy( pos ).applyMatrix4( object.matrixWorld );
+						var distance = raycaster.ray.origin.distanceTo(matrixPosition);
+						var intersectionPoint = raycaster.ray.direction.clone().multiplyScalar(distance).add(raycaster.ray.origin);
+						
+						intersects.push( {
+						
+							distance: distance,
+							distanceToRay: distanceToRay,
+							point: intersectionPoint,
+							index: 3*i,
+							face: null,
+							object: object
+							
+						} );
+					}
+				}
+			}else{
+				var vertices = object.geometry.vertices;
 
-				if ( distance < 1 ) { // needs a better test; particle size?
+				for ( var i = 0; i < vertices.length; i ++ ) {
 
-					intersects.push( {
+					var v = vertices[ i ];
 
-						distance: distance,
-						index: i,
-						face: null,
-						object: object
+					matrixPosition.copy( v ).applyMatrix4( object.matrixWorld );
 
-					} );
+					var distanceToRay = raycaster.ray.distanceToPoint( matrixPosition );
+					var distance = raycaster.ray.origin.distanceTo( matrixPosition );
+					var intersectionPoint = raycaster.ray.direction.clone().multiplyScalar(distance).add(raycaster.ray.origin);
+
+					if ( distanceToRay < threshold ) {
+
+						intersects.push( {
+						
+							distance: distance,
+							distanceToRay: distanceToRay,
+							point: intersectionPoint,
+							index: i,
+							face: null,
+							object: object
+
+						} );
+
+					}
 
 				}
-
 			}
 
 		} else if ( object instanceof THREE.LOD ) {
