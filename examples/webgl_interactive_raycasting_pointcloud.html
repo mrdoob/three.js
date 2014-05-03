@@ -101,28 +101,23 @@
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.x = 5;
-				camera.position.y = 3;
-				camera.position.z = 5;
-				camera.lookAt(new THREE.Vector3(0,0,0));
+				camera.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,9));
+				camera.applyMatrix(new THREE.Matrix4().makeRotationX(-0.5));
 
 				//
 				
 				pointcloud = generatePointCloud();
+				pointcloud.scale.x = 1.2;
+				pointcloud.scale.z = 1.2;
+				pointcloud.position.y = 0.3;
 				scene.add( pointcloud );
 				
 				//
 				
-				var light = new THREE.PointLight(0xffffff);
-				light.position.set(10,10,10);
-				scene.add(light);
-				
-				//
-				
 				var sphereGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-				var sphereMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
+				var sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, shading: THREE.FlatShading});
 				pickLocation = new THREE.Mesh(sphereGeometry, sphereMaterial);
-				pointcloud.add(pickLocation);
+				scene.add(pickLocation);
 
 				//
 
@@ -179,8 +174,10 @@
 			}
 
 			function render() { 
-				pointcloud.rotation.y += 0.002;
-
+				
+				camera.applyMatrix(new THREE.Matrix4().makeRotationY(0.005));
+				camera.updateMatrixWorld(true);
+				
 				vector = new THREE.Vector3( mouse.x, mouse.y, 0.1 );
 
 				projector.unprojectVector( vector, camera );
@@ -188,19 +185,9 @@
 				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 			
 				var intersections = raycaster.intersectObject(pointcloud);
-				var closest = intersections.length > 0 ? intersections[0] : null;
-				for(var i = 1; i < intersections.length; i++){
-					var I = intersections[i];
-					if(I.distance < closest.distance){
-						closest = I;
-					}
-				}
 				
-				if(closest != null){
-					var local = new THREE.Matrix4().getInverse(pointcloud.matrixWorld);
-					var pos = raycaster.ray.direction.clone().multiplyScalar(closest.distance).add(camera.position);
-					pos.applyMatrix4(local);
-					pickLocation.position = pos;
+				if(intersections.length > 0){
+					pickLocation.position = intersections[0].point;
 				}
 				
 

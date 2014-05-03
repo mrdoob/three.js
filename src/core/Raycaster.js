@@ -94,11 +94,14 @@
 
 					if ( distanceToRay < threshold ) {
 					
-						var intersectionPoint = new THREE.Vector3().copy(pos).applyMatrix4(object.matrixWorld);
+						//var intersectionPoint = new THREE.Vector3().copy(pos).applyMatrix4(object.matrixWorld);
+						matrixPosition.copy( pos ).applyMatrix4( object.matrixWorld );
+						var distance = raycaster.ray.origin.distanceTo(matrixPosition);
+						var intersectionPoint = raycaster.ray.direction.clone().multiplyScalar(distance).add(raycaster.ray.origin);
 						
 						intersects.push( {
 						
-							distance: localRay.origin.distanceTo(pos),
+							distance: distance,
 							distanceToRay: distanceToRay,
 							point: intersectionPoint,
 							index: 3*i,
@@ -119,6 +122,7 @@
 
 					var distanceToRay = raycaster.ray.distanceToPoint( matrixPosition );
 					var distance = raycaster.ray.origin.distanceTo( matrixPosition );
+					var intersectionPoint = raycaster.ray.direction.clone().multiplyScalar(distance).add(raycaster.ray.origin);
 
 					if ( distanceToRay < threshold ) {
 
@@ -126,7 +130,7 @@
 						
 							distance: distance,
 							distanceToRay: distanceToRay,
-							point: matrixPosition.clone(),
+							point: intersectionPoint,
 							index: i,
 							face: null,
 							object: object
