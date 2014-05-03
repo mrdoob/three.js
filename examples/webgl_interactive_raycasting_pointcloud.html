@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - interactive - raycasting - pointcloud</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
+			}
+			a {
+				color: #fff;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive - raycasting - pointcloud </div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var renderer, scene, camera, stats;
+
+			var pointcloud;
+			var pickLocation;
+
+			var projector, raycaster, intersects;
+			var mouse = { x: 1, y: 1 };
+			var vector = new THREE.Vector3();
+			var threshold = 0.1;
+
+			init();
+			animate();
+			
+			function generatePointCloud(){
+				var geometry = new THREE.BufferGeometry();
+				var width = 100;
+				var length = 100;
+				var numPoints = width*length;
+				
+				var positions = new Float32Array(numPoints*3);
+				var colors = new Float32Array(numPoints*3);
+				
+				var color = new THREE.Color();
+				var k = 0;
+				for(var i = 0; i < width; i++){
+					for(var j = 0; j < length; j++){
+						var u = i/width;
+						var v = j/length;
+						var x = 10*u - 5;
+						var y = (Math.cos(u*Math.PI*8) + Math.sin(v*Math.PI*8))/2;
+						var z = 10*v - 5;
+						
+						positions[3*k] = x;
+						positions[3*k+1] = y;
+						positions[3*k+2] = z;
+						
+						var intensity = y+1;
+						color.setRGB(u*intensity, v*intensity, 0);
+						colors[3*k] = color.r;
+						colors[3*k+1] = color.g;
+						colors[3*k+2] = color.b;
+						k++;
+					}
+				}
+				
+				geometry.addAttribute('position', new THREE.Float32Attribute(positions, 3));
+				geometry.addAttribute('color', new THREE.Float32Attribute(colors, 3));
+				
+				var material = new THREE.PointCloudMaterial({ size: 0.05, vertexColors: true });
+				var pointcloud = new THREE.PointCloud(geometry, material);
+				
+				return pointcloud;
+			}
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.x = 5;
+				camera.position.y = 3;
+				camera.position.z = 5;
+				camera.lookAt(new THREE.Vector3(0,0,0));
+
+				//
+				
+				pointcloud = generatePointCloud();
+				scene.add( pointcloud );
+				
+				//
+				
+				var light = new THREE.PointLight(0xffffff);
+				light.position.set(10,10,10);
+				scene.add(light);
+				
+				//
+				
+				var sphereGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
+				pickLocation = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				pointcloud.add(pickLocation);
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				projector = new THREE.Projector();
+				raycaster = new THREE.Raycaster();
+				raycaster.params.PointCloud.threshold = threshold;
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() { 
+				pointcloud.rotation.y += 0.002;
+
+				vector = new THREE.Vector3( mouse.x, mouse.y, 0.1 );
+
+				projector.unprojectVector( vector, camera );
+
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+			
+				var intersections = raycaster.intersectObject(pointcloud);
+				var closest = intersections.length > 0 ? intersections[0] : null;
+				for(var i = 1; i < intersections.length; i++){
+					var I = intersections[i];
+					if(I.distance < closest.distance){
+						closest = I;
+					}
+				}
+				
+				if(closest != null){
+					var local = new THREE.Matrix4().getInverse(pointcloud.matrixWorld);
+					var pos = raycaster.ray.direction.clone().multiplyScalar(closest.distance).add(camera.position);
+					pos.applyMatrix4(local);
+					pickLocation.position = pos;
+				}
+				
+
+				renderer.render( scene, camera );
+			}
+
+		</script>
+
+	</body>
+
+</html>
