@@ -7182,7 +7182,7 @@ THREE.EventDispatcher.prototype = {
 
 					if ( offsets.length === 0 ) {
 
-						offsets = [ { start: 0, count: positions.length, index: 0 } ];
+						offsets = [ { start: 0, count: indices.length, index: 0 } ];
 
 					}
 
@@ -13229,7 +13229,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
-	this.vertexColors = false;
+	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
 
@@ -13860,7 +13860,7 @@ THREE.PointCloudMaterial = function ( parameters ) {
 	this.size = 1;
 	this.sizeAttenuation = true;
 
-	this.vertexColors = false;
+	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
 
