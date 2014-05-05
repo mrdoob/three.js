@@ -177,7 +177,7 @@ THREE.Lut.prototype = {
 				var max = this.map[ j ][ 0 ];
 				var color = new THREE.Color( 0xffffff );
 				var minColor = new THREE.Color( 0xffffff ).setHex( this.map[ j - 1][ 1 ] );
-				
+				var maxColor = new THREE.Color( 0xffffff ).setHex( this.map[ j ][ 1 ] );
 				color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
 				data[ k * 4     ] = Math.round( color.r * 255 );
