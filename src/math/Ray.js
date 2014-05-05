@@ -73,21 +73,25 @@ THREE.Ray.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function ( point, optionalIntersectionPoint ) {
+		
+			var v = ( optionalIntersectionPoint !== undefined ) ? optionalIntersectionPoint : v1;
 
-			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
+			var directionDistance = v.subVectors( point, this.origin ).dot( this.direction );
 
 			// point behind the ray
 
 			if ( directionDistance < 0 ) {
 
-				return this.origin.distanceTo( point );
+				v.copy( this.origin );
 
+			} else {
+			
+				v.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+			
 			}
 
-			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
-
-			return v1.distanceTo( point );
+			return v.distanceTo( point );
 
 		};
 
