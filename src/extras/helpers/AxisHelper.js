@@ -9,8 +9,8 @@ THREE.AxisHelper = function ( size ) {
 
 	var geometry = new THREE.BufferGeometry();
 
-	geometry.addAttribute( 'position', new THREE.Float32Attribute( 6, 3 ) );
-	geometry.addAttribute( 'color', new THREE.Float32Attribute( 6, 3 ) );
+	geometry.addAttribute( 'position', new THREE.Float32Attribute( 6 * 3, 3 ) );
+	geometry.addAttribute( 'color', new THREE.Float32Attribute( 6 * 3, 3 ) );
 
 	var positions = geometry.attributes.position.array;
 	var colors = geometry.attributes.color.array;
