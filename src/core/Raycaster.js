@@ -143,7 +143,7 @@
 
 					if ( offsets.length === 0 ) {
 
-						offsets = [ { start: 0, count: positions.length, index: 0 } ];
+						offsets = [ { start: 0, count: indices.length, index: 0 } ];
 
 					}
 
