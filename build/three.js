@@ -9014,7 +9014,12 @@ THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferAttribute = function () {};
+THREE.BufferAttribute = function ( array, itemSize ) {
+
+	this.array = array;
+	this.itemSize = itemSize;
+
+};
 
 THREE.BufferAttribute.prototype = {
 
@@ -9100,84 +9105,68 @@ THREE.BufferAttribute.prototype = {
 
 THREE.Int8Attribute = function ( data, itemSize ) {
 
-	this.array = new Int8Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Int8Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
-
-THREE.Int8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Uint8Attribute = function ( data, itemSize ) {
 
-	this.array = new Uint8Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Uint8Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
-
-THREE.Uint8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Uint8ClampedAttribute = function ( data, itemSize ) {
 
-	this.array = new Uint8ClampedArray( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Uint8ClampedAttribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
+
 
 };
-
-THREE.Uint8ClampedAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Int16Attribute = function ( data, itemSize ) {
 
-	this.array = new Int16Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Int16Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
-
-THREE.Int16Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Uint16Attribute = function ( data, itemSize ) {
 
-	this.array = new Uint16Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Uint16Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
-
-THREE.Uint16Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Int32Attribute = function ( data, itemSize ) {
 
-	this.array = new Int32Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Int32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
-
-THREE.Int32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Uint32Attribute = function ( data, itemSize ) {
 
-	this.array = new Uint32Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Uint32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
-
-THREE.Uint32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Float32Attribute = function ( data, itemSize ) {
 
-	this.array = new Float32Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Float32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
-
-THREE.Float32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 
 THREE.Float64Attribute = function ( data, itemSize ) {
 
-	this.array = new Float64Array( data );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Float64Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
-THREE.Float64Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -15114,11 +15103,10 @@ THREE.LOD.prototype.clone = function ( object ) {
 
 THREE.Sprite = ( function () {
 
-	var vertices = new THREE.Float32Attribute( 3 * 3, 3 );
-	vertices.set( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
+	var vertices = new Float32Array( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
 
 	var geometry = new THREE.BufferGeometry();
-	geometry.addAttribute( 'position', vertices );
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 	return function ( material ) {
 
@@ -15158,6 +15146,7 @@ THREE.Sprite.prototype.clone = function ( object ) {
 // Backwards compatibility
 
 THREE.Particle = THREE.Sprite;
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -33915,19 +33904,21 @@ THREE.AxisHelper = function ( size ) {
 
 	size = size || 1;
 
-	var geometry = new THREE.Geometry();
+	var vertices = new Float32Array( [
+		0, 0, 0,  size, 0, 0,
+		0, 0, 0,  0, size, 0,
+		0, 0, 0,  0, 0, size
+	] );
 
-	geometry.vertices.push(
-		new THREE.Vector3(), new THREE.Vector3( size, 0, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, size, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, 0, size )
-	);
+	var colors = new Float32Array( [
+		1, 0, 0,  1, 0.6, 0,
+		0, 1, 0,  0.6, 1, 0,
+		0, 0, 1,  0, 0.6, 1
+	] );
 
-	geometry.colors.push(
-		new THREE.Color( 0xff0000 ), new THREE.Color( 0xffaa00 ),
-		new THREE.Color( 0x00ff00 ), new THREE.Color( 0xaaff00 ),
-		new THREE.Color( 0x0000ff ), new THREE.Color( 0x00aaff )
-	);
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
