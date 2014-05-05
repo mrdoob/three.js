@@ -98,6 +98,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var pan = new THREE.Vector3();
 
 	var lastPosition = new THREE.Vector3();
+	var lastQuaternion = new THREE.Vector4();
 
 	var STATE = { NONE : -1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
 
@@ -284,11 +285,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scale = 1;
 		pan.set( 0, 0, 0 );
 
-		if ( lastPosition.distanceToSquared( this.object.position ) > EPS ) {
+		// update condition is:
+		// (camera displacement)^2 + (camera rotation in radians)^2 > EPS
+		// using small-angle approximation cos(x/2) = 1 - x^2 / 8
+
+		if ( lastPosition.distanceToSquared( this.object.position )
+		   + 8 * (1 - lastQuaternion.dot(this.object.quaternion)) > EPS ) {
 
 			this.dispatchEvent( changeEvent );
 
 			lastPosition.copy( this.object.position );
+			lastQuaternion.copy (this.object.quaternion );
 
 		}
 
