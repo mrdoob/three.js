@@ -61,7 +61,7 @@ THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fp
 
 THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 
-	var pattern = /([a-z]+)(\d+)/;
+    var pattern = /([a-z]+)_?(\d+)/;
 
 	var firstAnimation, frameRanges = {};
 
