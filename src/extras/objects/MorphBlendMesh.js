@@ -11,6 +11,7 @@ THREE.MorphBlendMesh = function( geometry, material ) {
 
 	// prepare default animation
 	// (all frames played together in 1 second)
+
 	var numFrames = this.geometry.morphTargets.length;
 
 	var name = "__default";
