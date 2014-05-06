@@ -11,7 +11,7 @@ THREE.MorphBlendMesh = function( geometry, material ) {
 
 	// prepare default animation
 	// (all frames played together in 1 second)
-
+                                           p
 	var numFrames = this.geometry.morphTargets.length;
 
 	var name = "__default";
@@ -61,7 +61,7 @@ THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fp
 
 THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 
-    var pattern = /([a-z]+)_?(\d+)/;
+	var pattern = /([a-z]+)_?(\d+)/;
 
 	var firstAnimation, frameRanges = {};
 
