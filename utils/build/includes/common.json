@@ -64,6 +64,7 @@
 	"src/materials/SpriteCanvasMaterial.js",
 	"src/textures/Texture.js",
 	"src/textures/CompressedTexture.js",
+        "src/textures/TGATexture.js",
 	"src/textures/DataTexture.js",
 	"src/objects/PointCloud.js",
 	"src/objects/Line.js",
