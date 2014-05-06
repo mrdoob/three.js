@@ -153,6 +153,7 @@
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
+		<script src="js/loaders/SceneLoader.js"></script>
 		<script src="js/loaders/BinaryLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
@@ -328,9 +329,7 @@
 
 							if ( object.geometry.animation ) {
 
-								THREE.AnimationHandler.add( object.geometry.animation );
-
-								var animation = new THREE.Animation( object, object.geometry.animation.name );
+								var animation = new THREE.Animation( object, object.geometry.animation );
 								animation.play();
 
 							}

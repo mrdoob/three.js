@@ -2,7 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferAttribute = function () {};
+THREE.BufferAttribute = function ( array, itemSize ) {
+
+	this.array = array;
+	this.itemSize = itemSize;
+
+};
 
 THREE.BufferAttribute.prototype = {
 
@@ -18,11 +23,15 @@ THREE.BufferAttribute.prototype = {
 
 		this.array.set( value );
 
+		return this;
+
 	},
 
 	setX: function ( index, x ) {
 
 		this.array[ index * this.itemSize ] = x;
+
+		return this;
 
 	},
 
@@ -30,11 +39,15 @@ THREE.BufferAttribute.prototype = {
 
 		this.array[ index * this.itemSize + 1 ] = y;
 
+		return this;
+
 	},
 
 	setZ: function ( index, z ) {
 
 		this.array[ index * this.itemSize + 2 ] = z;
+
+		return this;
 
 	},
 
@@ -45,6 +58,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index     ] = x;
 		this.array[ index + 1 ] = y;
 
+		return this;
+
 	},
 
 	setXYZ: function ( index, x, y, z ) {
@@ -54,6 +69,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index     ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
+
+		return this;
 
 	},
 
@@ -66,89 +83,74 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 2 ] = z;
 		this.array[ index + 3 ] = w;
 
+		return this;
+
 	}
 
 };
 
 //
 
-THREE.Int8Attribute = function ( size, itemSize ) {
+THREE.Int8Attribute = function ( data, itemSize ) {
 
-	this.array = new Int8Array( size * itemSize );
-	this.itemSize = itemSize;
-
-};
-
-THREE.Int8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
-
-THREE.Uint8Attribute = function ( size, itemSize ) {
-
-	this.array = new Uint8Array( size * itemSize );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Int8Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
-THREE.Uint8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.Uint8Attribute = function ( data, itemSize ) {
 
-THREE.Uint8ClampedAttribute = function ( size, itemSize ) {
-
-	this.array = new Uint8ClampedArray( size * itemSize );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Uint8Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
-THREE.Uint8ClampedAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.Uint8ClampedAttribute = function ( data, itemSize ) {
 
-THREE.Int16Attribute = function ( size, itemSize ) {
+	console.log( 'THREE.Uint8ClampedAttribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
-	this.array = new Int16Array( size * itemSize );
-	this.itemSize = itemSize;
-
-};
-
-THREE.Int16Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
-
-THREE.Uint16Attribute = function ( size, itemSize ) {
-
-	this.array = new Uint16Array( size * itemSize );
-	this.itemSize = itemSize;
 
 };
 
-THREE.Uint16Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.Int16Attribute = function ( data, itemSize ) {
 
-THREE.Int32Attribute = function ( size, itemSize ) {
-
-	this.array = new Int32Array( size * itemSize );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Int16Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
-THREE.Int32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.Uint16Attribute = function ( data, itemSize ) {
 
-THREE.Uint32Attribute = function ( size, itemSize ) {
-
-	this.array = new Uint32Array( size * itemSize );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Uint16Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
-THREE.Uint32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.Int32Attribute = function ( data, itemSize ) {
 
-THREE.Float32Attribute = function ( size, itemSize ) {
-
-	this.array = new Float32Array( size * itemSize );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Int32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
-THREE.Float32Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.Uint32Attribute = function ( data, itemSize ) {
 
-THREE.Float64Attribute = function ( size, itemSize ) {
-
-	this.array = new Float64Array( size * itemSize );
-	this.itemSize = itemSize;
+	console.log( 'THREE.Uint32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
-THREE.Float64Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.Float32Attribute = function ( data, itemSize ) {
+
+	console.log( 'THREE.Float32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
+
+};
+
+THREE.Float64Attribute = function ( data, itemSize ) {
+
+	console.log( 'THREE.Float64Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	return new THREE.BufferAttribute( data, itemSize );
+
+};

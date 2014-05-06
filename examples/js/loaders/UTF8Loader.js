@@ -28,19 +28,15 @@ THREE.UTF8Loader.prototype.load = function ( jsonUrl, callback, options ) {
 THREE.UTF8Loader.BufferGeometryCreator = function () {
 };
 
-THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray, indexArray ) {
+THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray, indices ) {
 
-	var ntris = indexArray.length / 3;
+	var ntris = indices.length / 3;
 
 	var geometry = new THREE.BufferGeometry();
 
-    var positions = new THREE.Float32Attribute( ntris * 3, 3 );
-    var normals = new THREE.Float32Attribute( ntris * 3, 3 );
-    var uvs = new THREE.Float32Attribute( ntris * 3, 2 );
-
-	var positionsArray = positions.array;
-	var normalsArray = normals.array;
-	var uvsArray = uvs.array;
+	var positions = new Float32Array( ntris * 3 * 3 );
+	var normals = new Float32Array( ntris * 3 * 3 );
+	var uvs = new Float32Array( ntris * 3 * 2 );
 
 	var i, j, offset;
 	var x, y, z;
@@ -60,9 +56,9 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 		y = attribArray[ i + 1 ];
 		z = attribArray[ i + 2 ];
 
-		positionsArray[ j++ ] = x;
-		positionsArray[ j++ ] = y;
-		positionsArray[ j++ ] = z;
+		positions[ j++ ] = x;
+		positions[ j++ ] = y;
+		positions[ j++ ] = z;
 
 	}
 
@@ -76,8 +72,8 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 		u = attribArray[ i ];
 		v = attribArray[ i + 1 ];
 
-		uvsArray[ j++ ] = u;
-		uvsArray[ j++ ] = v;
+		uvs[ j++ ] = u;
+		uvs[ j++ ] = v;
 
 	}
 
@@ -92,18 +88,18 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 		y = attribArray[ i + 1 ];
 		z = attribArray[ i + 2 ];
 
-		normalsArray[ j++ ] = x;
-		normalsArray[ j++ ] = y;
-		normalsArray[ j++ ] = z;
+		normals[ j++ ] = x;
+		normals[ j++ ] = y;
+		normals[ j++ ] = z;
 
 	}
 
-    geometry.addAttribute( 'index', indexArray, 1 );
-    geometry.addAttribute( 'position', positions );
-    geometry.addAttribute( 'normal', normals );
-    geometry.addAttribute( 'uv', uvs );
+    geometry.addAttribute( 'index', new THREE.Uint32Attribute( indices, 1 ) );
+    geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
+    geometry.addAttribute( 'normal', new THREE.Float32Attribute( normals, 3 ) );
+    geometry.addAttribute( 'uv', new THREE.Float32Attribute( uvs, 2 ) );
 
-    geometry.offsets.push( { start: 0, count: indexArray.length, index: 0 } );
+    geometry.offsets.push( { start: 0, count: indices.length, index: 0 } );
 
 	geometry.computeBoundingSphere();
 

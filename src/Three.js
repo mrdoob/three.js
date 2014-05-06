@@ -4,7 +4,12 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '67' };
+var THREE = { REVISION: '68dev' };
+
+// browserify support
+if (typeof module === 'object') {
+	module.exports = THREE;
+}
 
 self.console = self.console || {
 

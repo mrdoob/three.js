@@ -197,31 +197,31 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 		this.materials = [];
 
 		// init GL buffers
-		var vertexIndexArray = file.body.indices,
-		vertexPositionArray = file.body.vertices,
-		vertexNormalArray = file.body.normals;
+		var indices = file.body.indices,
+		positions = file.body.vertices,
+		normals = file.body.normals;
 
-		var vertexUvArray, vertexColorArray;
+		var uvs, colors;
 
 		if ( file.body.uvMaps !== undefined && file.body.uvMaps.length > 0 ) {
-			vertexUvArray = file.body.uvMaps[ 0 ].uv;
+			uvs = file.body.uvMaps[ 0 ].uv;
 		}
 
 		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
-			vertexColorArray = file.body.attrMaps[ 0 ].attr;
+			colors = file.body.attrMaps[ 0 ].attr;
 		}
 
-		this.addAttribute( 'index', vertexIndexArray, 1 );
-		this.addAttribute( 'position', vertexPositionArray, 3 );
+		this.addAttribute( 'index', new THREE.Uint32Attribute( indices, 1 ) );
+		this.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
 
-		if ( vertexNormalArray !== undefined ) 
-			this.addAttribute( 'normal', vertexNormalArray, 3 );
+		if ( normals !== undefined ) 
+			this.addAttribute( 'normal', new THREE.Float32Attribute( normals, 3 ) );
 
-		if ( vertexUvArray !== undefined ) 
-			this.addAttribute( 'uv', vertexUvArray, 2 );
+		if ( uvs !== undefined ) 
+			this.addAttribute( 'uv', new THREE.Float32Attribute( uvs, 2 ) );
 
-		if ( vertexColorArray !== undefined ) 
-			this.addAttribute( 'color', vertexColorArray, 4 );
+		if ( colors !== undefined ) 
+			this.addAttribute( 'color', new THREE.Float32Attribute( colors, 4 ) );
 
 	}
 

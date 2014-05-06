@@ -57,6 +57,34 @@
 
 			} );
 
+
+		} else if ( object instanceof THREE.PointCloud ) {
+
+			var vertices = object.geometry.vertices;
+
+			for ( var i = 0; i < vertices.length; i ++ ) {
+
+				var v = vertices[ i ];
+
+				matrixPosition.copy( v ).applyMatrix4( object.matrixWorld );
+
+				var distance = raycaster.ray.distanceToPoint( matrixPosition );
+
+				if ( distance < 1 ) { // needs a better test; particle size?
+
+					intersects.push( {
+
+						distance: distance,
+						index: i,
+						face: null,
+						object: object
+
+					} );
+
+				}
+
+			}
+
 		} else if ( object instanceof THREE.LOD ) {
 
 			matrixPosition.setFromMatrixPosition( object.matrixWorld );
@@ -115,7 +143,7 @@
 
 					if ( offsets.length === 0 ) {
 
-						offsets = [ { start: 0, count: positions.length, index: 0 } ];
+						offsets = [ { start: 0, count: indices.length, index: 0 } ];
 
 					}
 

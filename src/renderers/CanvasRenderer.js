@@ -441,8 +441,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
 		_elemBox.max.set( v1.x + dist, v1.y + dist );
 
-		if ( material instanceof THREE.SpriteMaterial ||
-			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
+		if ( material instanceof THREE.SpriteMaterial ) {
 
 			var texture = material.map;
 
@@ -494,7 +493,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_context.fillRect( ox, oy, sx, sy );
 				_context.restore();
 
-			} else { // no texture
+			} else {
+
+				// no texture
 
 				setFillStyle( material.color.getStyle() );
 
