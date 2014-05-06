@@ -5,6 +5,9 @@
  */
 
 var THREE = { REVISION: '67' };
+if (typeof module === 'object') {
+    module.exports = THREE;
+}
 
 self.console = self.console || {
 
