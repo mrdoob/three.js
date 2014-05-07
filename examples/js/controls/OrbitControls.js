@@ -286,11 +286,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 		pan.set( 0, 0, 0 );
 
 		// update condition is:
-		// (camera displacement)^2 + (camera rotation in radians)^2 > EPS
+		// min(camera displacement, camera rotation in radians)^2 > EPS
 		// using small-angle approximation cos(x/2) = 1 - x^2 / 8
 
-		if ( lastPosition.distanceToSquared( this.object.position )
-		   + 8 * (1 - lastQuaternion.dot(this.object.quaternion)) > EPS ) {
+		if ( lastPosition.distanceToSquared( this.object.position ) > EPS
+		    || 8 * (1 - lastQuaternion.dot(this.object.quaternion)) > EPS ) {
 
 			this.dispatchEvent( changeEvent );
 
