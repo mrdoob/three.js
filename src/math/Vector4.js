@@ -569,7 +569,7 @@ THREE.Vector4.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
+		return Math.sqrt( this.lengthSq() );
 
 	},
 

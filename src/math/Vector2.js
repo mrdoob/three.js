@@ -321,7 +321,7 @@ THREE.Vector2.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.x * this.x + this.y * this.y );
+		return Math.sqrt( this.lengthSq() );
 
 	},
 
