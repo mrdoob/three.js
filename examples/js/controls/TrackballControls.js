@@ -109,7 +109,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	var getMouseOnScreen = ( function () {
 
-		var vector = new THREE.Vector3();
+		var vector = new THREE.Vector2();
 
 		return function ( pageX, pageY ) {
 
@@ -517,7 +517,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 				var x = ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX ) / 2;
 				var y = ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY ) / 2;
-				_panStart.copy( getMouseOnScreen( dx, dy ) );
+				_panStart.copy( getMouseOnScreen( x, y ) );
 				_panEnd.copy( _panStart );
 				break;
 
