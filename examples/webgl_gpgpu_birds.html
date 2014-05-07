@@ -35,7 +35,7 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="birds"></span> webgl gpgpu birds<br/>
 			Select <span id="options"></span> birds<br/>
 			Move mouse to disturb birds.
-			
+
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -122,7 +122,7 @@
 			uniform float delta; // about 0.016
 			uniform float seperationDistance; // 20
 			uniform float alignmentDistance; // 40
-			uniform float cohesionDistance; // 
+			uniform float cohesionDistance; //
 			uniform float freedomFactor;
 			uniform vec3 predator;
 
@@ -189,7 +189,7 @@
 				float preyRadius = 150.0;
 				float preyRadiusSq = preyRadius * preyRadius;
 
-				
+
 				// move birds away from predator
 				if (dist < preyRadius) {
 
@@ -240,7 +240,7 @@
 								float adjustedPercent = ( percent - separationThresh ) / threshDelta;
 
 								birdVelocity = texture2D( textureVelocity, vec2(x/resolution.x, y/resolution.y) ).xyz;
-								
+
 								f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * delta;
 								velocity += normalize(birdVelocity) * f;
 
@@ -262,7 +262,7 @@
 
 				}
 
-				
+
 
 				// this make tends to fly around than down or up
 				// if (velocity.y > 0.) velocity.y *= (1. - 0.2 * delta);
@@ -284,7 +284,7 @@
 			attribute float birdVertex;
 
 			attribute vec3 birdColor;
-			
+
 			uniform sampler2D texturePosition;
 			uniform sampler2D textureVelocity;
 
@@ -313,7 +313,7 @@
 				float xz = length( velocity.xz );
 				float xyz = 1.;
 				float x = sqrt( 1. - velocity.y * velocity.y );
-				
+
 				float cosry = velocity.x / xz;
 				float sinry = velocity.z / xz;
 
@@ -337,7 +337,7 @@
 				newPosition += pos;
 
 				z = newPosition.z;
-				
+
 				vColor = vec4( birdColor, 1.0 );
 				gl_Position = projectionMatrix *  viewMatrix  * vec4( newPosition, 1.0 );
 			}
@@ -370,7 +370,7 @@
 			if (hash) hash = parseInt(hash, 0);
 
 			/* TEXTURE WIDTH FOR SIMULATION */
-			var WIDTH = hash || 32; 
+			var WIDTH = hash || 32;
 
 			var BIRDS = WIDTH * WIDTH;
 
@@ -382,10 +382,10 @@
 
 				THREE.BufferGeometry.call( this );
 
-				var vertices = new THREE.Float32Attribute( points * 3, 3 );
-				var birdColors = new THREE.Float32Attribute( points * 3, 3 );
-				var references = new THREE.Float32Attribute( points * 2, 2 );
-				var birdVertex = new THREE.Float32Attribute( points, 1 );
+				var vertices = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
+				var birdColors = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
+				var references = new THREE.BufferAttribute( new Float32Array( points * 2 ), 2 );
+				var birdVertex = new THREE.BufferAttribute( new Float32Array( points ), 1 );
 
 				this.addAttribute( 'position', vertices );
 				this.addAttribute( 'birdColor', birdColors );
@@ -465,7 +465,7 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-			
+
 			var PARTICLES = WIDTH * WIDTH;
 			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
@@ -555,7 +555,7 @@
 				gui.close();
 
 				initBirds();
-				
+
 			}
 
 
@@ -594,7 +594,7 @@
 				});
 
 
-				// var 
+				// var
 				birdMesh = new THREE.Mesh( geometry, shaderMaterial );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
