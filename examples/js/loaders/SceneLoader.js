@@ -970,6 +970,7 @@ THREE.SceneLoader.prototype = {
 			} else {
 
 				var isCompressed = /\.dds$/i.test( textureJSON.url );
+                                var isTGA = /\.tga$/i.test( textureJSON.url );
 				var fullUrl = get_url( textureJSON.url, data.urlBaseType );
 				var textureCallback = generateTextureCallback( 1 );
 
@@ -977,7 +978,11 @@ THREE.SceneLoader.prototype = {
 
 					texture = THREE.ImageUtils.loadCompressedTexture( fullUrl, textureJSON.mapping, textureCallback );
 
-				} else {
+				} else if ( isTGA ) {
+                                    
+                                        texture = THREE.ImageUtils.loadTGATexture( fullUrl, textureJSON.mapping, textureCallback );
+                                    
+                                } else {
 
 					texture = THREE.ImageUtils.loadTexture( fullUrl, textureJSON.mapping, textureCallback );
 

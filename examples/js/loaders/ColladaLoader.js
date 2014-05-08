@@ -3482,8 +3482,20 @@ THREE.ColladaLoader = function () {
 								var image = images[surface.init_from];
 
 								if (image) {
-
-									var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+                                                                        var texture = null;
+                                                                        var isCompressed = /\.dds$/i.test( image.init_from );
+                                                                        var isTGA = /\.tga$/i.test( image.init_from );
+                                                                        
+                                                                        if ( isCompressed ) {
+                                                                            texture = THREE.ImageUtils.loadCompressedTexture( baseUrl + image.init_from );
+                                                                        }
+                                                                        else if ( isTGA ) {
+                                                                            texture = THREE.ImageUtils.loadTGATexture( baseUrl + image.init_from );
+                                                                        }
+                                                                        else {
+                                                                            texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+                                                                        }
+                                                                        									
 									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.offset.x = cot.texOpts.offsetU;
