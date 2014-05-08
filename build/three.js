@@ -27056,7 +27056,7 @@ THREE.ImageUtils = {
                     
                  // Read palettes
                  if ( use_pal ) {
-                     palettes = data.subarray( offset, offset += header.colormap_length * 3 );
+                     palettes = data.subarray( offset, offset += header.colormap_length * ( header.colormap_size >> 3 ) );
                  }
                  
                  // Read RLE
