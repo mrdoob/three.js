@@ -14,12 +14,14 @@
 		this.near = near || 0;
 		this.far = far || Infinity;
 
-		this.params = {};
-		this.params.Sprite = {};
-		this.params.Mesh = {};
-		this.params.PointCloud = {threshold: 1};
-		this.params.LOD = {};
-		this.params.Line = {};
+		this.params = {
+			Sprite: {},
+			Mesh: {},
+			PointCloud: { threshold: 1 },
+			LOD: {},
+			Line: {}
+		};
+		
 	};
 
 	var sphere = new THREE.Sphere();
@@ -82,8 +84,8 @@
 				
 			}
 			
+			var localThreshold = threshold / ( ( object.scale.x + object.scale.y + object.scale.z ) / 3 );
 			var pos = new THREE.Vector3();
-			var intersectPoint = new THREE.Vector3();
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 			
@@ -123,10 +125,11 @@
 								positions[ a * 3 + 2 ]
 							);
 							
-							var rayPointDistance = localRay.distanceToPoint( pos, intersectPoint );
-							
-							if ( rayPointDistance < threshold ) {
-							
+							var rayPointDistance = localRay.distanceToPoint( pos );
+
+							if ( rayPointDistance < localThreshold ) {
+								
+								var intersectPoint = localRay.closestPointToPoint( pos );
 								intersectPoint.applyMatrix4( object.matrixWorld );
 								var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 							
@@ -158,11 +161,12 @@
 							positions[ 3 * i + 1 ], 
 							positions[ 3 * i + 2 ]
 						);
-						
-						var rayPointDistance = localRay.distanceToPoint( pos, intersectPoint );
 
-						if ( rayPointDistance < threshold ) {
-						
+						var rayPointDistance = localRay.distanceToPoint( pos );
+
+						if ( rayPointDistance < localThreshold ) {
+							
+							var intersectPoint = localRay.closestPointToPoint( pos );
 							intersectPoint.applyMatrix4( object.matrixWorld );
 							var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 							
@@ -170,7 +174,7 @@
 							
 								distance: distance,
 								distanceToRay: rayPointDistance,
-								point: intersectPoint.clone(),
+								point: intersectPoint,
 								index: i,
 								face: null,
 								object: object
@@ -189,12 +193,13 @@
 
 				for ( var i = 0; i < vertices.length; i ++ ) {
 
-					var v = vertices[ i ];
+					pos = vertices[ i ];
 					
-					var rayPointDistance = localRay.distanceToPoint( v, intersectPoint );
-					
-					if ( rayPointDistance < threshold ) {
-					
+					var rayPointDistance = localRay.distanceToPoint( pos );
+
+					if ( rayPointDistance < localThreshold ) {
+						
+						var intersectPoint = localRay.closestPointToPoint( pos );
 						intersectPoint.applyMatrix4( object.matrixWorld );
 						var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 						
