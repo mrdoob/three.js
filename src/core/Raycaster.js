@@ -71,7 +71,7 @@
 			var geometry = object.geometry;
 			var threshold = raycaster.params.PointCloud.threshold;
 
-			inverseMatrix.getInverse( object.matrixWorld );  
+			inverseMatrix.getInverse( object.matrixWorld );
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 			
 			if ( geometry.boundingBox !== null ) {
@@ -99,9 +99,9 @@
 					
 					if ( offsets.length === 0 ) {
 
-						var offset = { 
-							start: 0, 
-							count: indices.length, 
+						var offset = {
+							start: 0,
+							count: indices.length,
 							index: 0
 						};
 						
@@ -157,8 +157,8 @@
 					for (var i = 0; i < pointCount; i++ ) {
 					
 						pos.set(
-							positions[ 3 * i ], 
-							positions[ 3 * i + 1 ], 
+							positions[ 3 * i ],
+							positions[ 3 * i + 1 ],
 							positions[ 3 * i + 2 ]
 						);
 
