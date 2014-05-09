@@ -14282,25 +14282,6 @@ THREE.CompressedTexture.prototype.clone = function () {
 };
 
 /**
- * @author Daosheng Mu / https://github.com/DaoshengMu/
- */
-
-THREE.TGATexture = function ( format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
-    
-    THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
-};
-
-THREE.TGATexture.prototype = Object.create( THREE.Texture.prototype );
-
-THREE.TGATexture.prototype.clone = function() {
-    
-    var texture = new THREE.TGATexture();
-    
-    THREE.Texture.prototype.clone.all( this. texture );
-    
-    return texture;
-};
-/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -25182,11 +25163,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( texture instanceof THREE.TGATexture ) {
-                               var tgaImg = texture.image;
-                               _gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, tgaImg.width, tgaImg.height, 0, glFormat, glType, tgaImg.data );
-                
-                        } else { // regular Texture (image, video, canvas)
+			} else { // regular Texture (image, video, canvas)
 
 				// use manually created mipmaps if available
 				// if there are no manual mipmaps
@@ -27326,7 +27303,7 @@ THREE.ImageUtils = {
 
         loadTGATexture: function ( url, mapping, onLoad, onError ) {
                
-                var texture = new THREE.TGATexture();                
+                var texture = new THREE.DataTexture();                
                 {
                     var request = new XMLHttpRequest();
 

@@ -5546,11 +5546,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( texture instanceof THREE.TGATexture ) {
-                               var tgaImg = texture.image;
-                               _gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, tgaImg.width, tgaImg.height, 0, glFormat, glType, tgaImg.data );
-                
-                        } else { // regular Texture (image, video, canvas)
+			} else { // regular Texture (image, video, canvas)
 
 				// use manually created mipmaps if available
 				// if there are no manual mipmaps

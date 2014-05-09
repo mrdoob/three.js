@@ -638,7 +638,7 @@ THREE.ImageUtils = {
 
         loadTGATexture: function ( url, mapping, onLoad, onError ) {
                
-                var texture = new THREE.TGATexture();                
+                var texture = new THREE.DataTexture();                
                 {
                     var request = new XMLHttpRequest();
 
