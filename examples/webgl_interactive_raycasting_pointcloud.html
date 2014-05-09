@@ -68,8 +68,11 @@
 				var colors = new Float32Array( numPoints*3 );
 				
 				var k = 0;
-				for( var i = 0; i < width; i++ ) { 
+
+				for( var i = 0; i < width; i++ ) {
+
 					for( var j = 0; j < length; j++ ) {
+
 						var u = i / width;
 						var v = j / length;
 						var x = u - 0.5;
@@ -84,16 +87,19 @@
 						colors[ 3 * k ] = color.r * intensity;
 						colors[ 3 * k + 1 ] = color.g * intensity;
 						colors[ 3 * k + 2 ] = color.b * intensity;
+
 						k++;
+
 					}
+
 				}
 				
-				geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32Attribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				geometry.computeBoundingBox();
 				
 				return geometry;
-				
+			
 			}
 			
 			function generatePointcloud( color, width, length ) {
@@ -114,14 +120,19 @@
 				var indices = new Uint16Array( numPoints );
 				
 				var k = 0;
+
 				for( var i = 0; i < width; i++ ) {
+
 					for( var j = 0; j < length; j++ ) {
+
 						indices[ k ] = k;
 						k++;
+
 					}
+
 				}
 				
-				geometry.addAttribute( 'index', new THREE.Uint16Attribute( indices, 1 ) );
+				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 				
 				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: true } );
 				var pointcloud = new THREE.PointCloud( geometry, material );
@@ -137,14 +148,19 @@
 				var indices = new Uint16Array( numPoints );
 				
 				var k = 0;
+
 				for( var i = 0; i < width; i++ ){
+
 					for( var j = 0; j < length; j++ ) {
+
 						indices[ k ] = k;
 						k++;
+
 					}
+
 				}
 				
-				geometry.addAttribute( 'index', new THREE.Uint16Attribute( indices, 1 ) );
+				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 				
 				var offset = { start: 0, count: indices.length, index: 0 };
 				geometry.offsets.push( offset );
@@ -153,7 +169,7 @@
 				var pointcloud = new THREE.PointCloud( geometry, material );
 				
 				return pointcloud;
-				
+			
 			}
 			
 			function generateRegularPointcloud( color, width, length ) {
@@ -164,8 +180,11 @@
 				var colors = [];
 				
 				var k = 0;
+
 				for( var i = 0; i < width; i++ ) {
+
 					for( var j = 0; j < length; j++ ) {
+
 						var u = i / width;
 						var v = j / length;
 						var x = u - 0.5;
@@ -182,7 +201,9 @@
 						colors[ k ] = ( color.clone().multiplyScalar( intensity ) );
 						
 						k++;
+
 					}
+
 				}
 				
 				geometry.colors = colors;
@@ -192,7 +213,7 @@
 				var pointcloud = new THREE.PointCloud( geometry, material );
 				
 				return pointcloud;
-				
+			
 			}
 
 			function init() {
@@ -228,7 +249,7 @@
 				pcRegular.scale.set( 10,10,10 );
 				pcRegular.position.set( -5,0,-5 );
 				scene.add( pcRegular );
-                
+
 				pointclouds = [ pcBuffer, pcIndexed, pcIndexedOffset, pcRegular ];
 				
 				//
@@ -268,7 +289,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				
+			
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -310,12 +331,12 @@
 				projector.unprojectVector( vector, camera );
 
 				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
-			    
+				
 				var intersections = raycaster.intersectObjects( pointclouds );
 				intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
 				
 				if ( toggle > 0.02 && intersection !== null) {
-					
+				
 					spheres[ spheresIndex ].position.copy( intersection.point );
 					spheres[ spheresIndex ].scale.set( 1, 1, 1 );
 					spheresIndex = ( spheresIndex + 1 ) % spheres.length;
@@ -335,6 +356,7 @@
 				toggle += clock.getDelta();
 
 				renderer.render( scene, camera );
+
 			}
 
 		</script>
