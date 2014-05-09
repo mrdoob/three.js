@@ -14,6 +14,14 @@
 		this.near = near || 0;
 		this.far = far || Infinity;
 
+		this.params = {
+			Sprite: {},
+			Mesh: {},
+			PointCloud: { threshold: 1 },
+			LOD: {},
+			Line: {}
+		};
+		
 	};
 
 	var sphere = new THREE.Sphere();
@@ -59,30 +67,157 @@
 
 
 		} else if ( object instanceof THREE.PointCloud ) {
+		
+			var geometry = object.geometry;
+			var threshold = raycaster.params.PointCloud.threshold;
 
-			var vertices = object.geometry.vertices;
+			inverseMatrix.getInverse( object.matrixWorld );  
+			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+			
+			if ( geometry.boundingBox !== null ) {
+			
+				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
+				
+					return intersects;
+					
+				}
+				
+			}
+			
+			var localThreshold = threshold / ( ( object.scale.x + object.scale.y + object.scale.z ) / 3 );
+			var pos = new THREE.Vector3();
 
-			for ( var i = 0; i < vertices.length; i ++ ) {
+			if ( geometry instanceof THREE.BufferGeometry ) {
+			
+				var attributes = geometry.attributes;
+				var positions = attributes.position.array;
+				
+				if ( attributes.index !== undefined ) {
+				
+					var indices = attributes.index.array;
+					var offsets = geometry.offsets;
+					
+					if ( offsets.length === 0 ) {
 
-				var v = vertices[ i ];
+						var offset = { 
+							start: 0, 
+							count: indices.length, 
+							index: 0
+						};
+						
+						offsets = [ offset ];
 
-				matrixPosition.copy( v ).applyMatrix4( object.matrixWorld );
+					}
+					
+					for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
 
-				var distance = raycaster.ray.distanceToPoint( matrixPosition );
+						var start = offsets[ oi ].start;
+						var count = offsets[ oi ].count;
+						var index = offsets[ oi ].index;
 
-				if ( distance < 1 ) { // needs a better test; particle size?
+						for ( var i = start, il = start + count; i < il; i++ ) {
+						
+							var a = index + indices[ i ];
+						
+							pos.set(
+								positions[ a * 3 ],
+								positions[ a * 3 + 1 ],
+								positions[ a * 3 + 2 ]
+							);
+							
+							var rayPointDistance = localRay.distanceToPoint( pos );
 
-					intersects.push( {
+							if ( rayPointDistance < localThreshold ) {
+								
+								var intersectPoint = localRay.closestPointToPoint( pos );
+								intersectPoint.applyMatrix4( object.matrixWorld );
+								var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+							
+								intersects.push( {
+							
+									distance: distance,
+									distanceToRay: rayPointDistance,
+									point: intersectPoint.clone(),
+									index: a,
+									face: null,
+									object: object
+									
+								} );
+							
+							}
+						
+						}
+						
+					}
+				
+				}else{
+				
+					var pointCount = positions.length / 3;
 
-						distance: distance,
-						index: i,
-						face: null,
-						object: object
+					for (var i = 0; i < pointCount; i++ ) {
+					
+						pos.set(
+							positions[ 3 * i ], 
+							positions[ 3 * i + 1 ], 
+							positions[ 3 * i + 2 ]
+						);
 
-					} );
+						var rayPointDistance = localRay.distanceToPoint( pos );
+
+						if ( rayPointDistance < localThreshold ) {
+							
+							var intersectPoint = localRay.closestPointToPoint( pos );
+							intersectPoint.applyMatrix4( object.matrixWorld );
+							var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+							
+							intersects.push( {
+							
+								distance: distance,
+								distanceToRay: rayPointDistance,
+								point: intersectPoint,
+								index: i,
+								face: null,
+								object: object
+								
+							} );
+							
+						}
+						
+					}
+					
+				}
+				
+			} else {
+			
+				var vertices = object.geometry.vertices;
+
+				for ( var i = 0; i < vertices.length; i ++ ) {
+
+					pos = vertices[ i ];
+					
+					var rayPointDistance = localRay.distanceToPoint( pos );
+
+					if ( rayPointDistance < localThreshold ) {
+						
+						var intersectPoint = localRay.closestPointToPoint( pos );
+						intersectPoint.applyMatrix4( object.matrixWorld );
+						var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+						
+						intersects.push( {
+						
+							distance: distance,
+							distanceToRay: rayPointDistance,
+							point: intersectPoint.clone(),
+							index: i,
+							face: null,
+							object: object
+							
+						} );
+						
+					}
 
 				}
-
+				
 			}
 
 		} else if ( object instanceof THREE.LOD ) {
