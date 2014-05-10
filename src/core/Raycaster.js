@@ -46,25 +46,7 @@
 
 		if ( object instanceof THREE.Sprite ) {
 
-			matrixPosition.setFromMatrixPosition( object.matrixWorld );
-			
-			var distance = raycaster.ray.distanceToPoint( matrixPosition );
-
-			if ( distance > object.scale.x ) {
-
-				return intersects;
-
-			}
-
-			intersects.push( {
-
-				distance: distance,
-				point: object.position,
-				face: null,
-				object: object
-
-			} );
-
+			object.raycast( raycaster, intersects );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 		
