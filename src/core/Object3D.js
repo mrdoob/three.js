@@ -357,6 +357,12 @@ THREE.Object3D.prototype = {
 		}
 
 	},
+	
+	raycast: function ( raycaster, intersects ) {
+	
+		return intersects;
+	
+	},
 
 	traverse: function ( callback ) {
 
