@@ -328,10 +328,9 @@
 
 				} else {
 
-					var offsets = geometry.offsets;
 					var positions = attributes.position.array;
 
-					for ( var i = 0, il = attributes.position.array.length; i < il; i += 3 ) {
+					for ( var i = 0, il = positions.length / 3; i < il; i += 3 ) {
 
 						a = i;
 						b = i + 1;
