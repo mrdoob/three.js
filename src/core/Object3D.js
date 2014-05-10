@@ -17,26 +17,61 @@ THREE.Object3D = function () {
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
-	this.position = new THREE.Vector3();
-
 	var scope = this;
+	
+	var position = new THREE.Vector3();
+	var rotation = new THREE.Euler();
+	var quaternion = new THREE.Quaternion();
+	var scale = new THREE.Vector3( 1, 1, 1 );
+
+	rotation.onChange( function () {
+		quaternion.setFromEuler( rotation, false );
+	} );
+	
+	quaternion.onChange( function () {
+		rotation.setFromQuaternion( quaternion, undefined, false );
+	} );
 
 	Object.defineProperties( this, {
+		position: {
+			enumerable: true,
+			get: function () {
+				return position;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE: .position = new THREE.Vector3() pattern no longer works. Use .position.set() instead.' );
+				position.copy( value );
+			}
+		},
 		rotation: {
 			enumerable: true,
-			value: new THREE.Euler().onChange( function () {
-				scope.quaternion.setFromEuler( scope.rotation, false );
-			} )
+			get: function () {
+				return rotation;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.set() instead.' );
+				rotation.copy( value );
+			}
 		},
 		quaternion: {
 			enumerable: true,
-			value: new THREE.Quaternion().onChange( function () {
-				scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
-			} )
+			get: function () {
+				return quaternion;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.set() instead.' );
+				quaternion.copy( value );
+			}
 		},
 		scale: {
 			enumerable: true,
-			value: new THREE.Vector3( 1, 1, 1 )
+			get: function () {
+				return scale;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE: .scale = new THREE.Vector3() pattern no longer works. Use .scale.set() instead.' );
+				scale.copy( value );
+			}
 		}
 	} );
 
