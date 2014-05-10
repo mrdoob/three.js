@@ -70,7 +70,7 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'BoxGeometry':
-					case 'CubeGeometry': // DEPRECATED
+					case 'CubeGeometry': // backwards compatible
 
 						geometry = new THREE.BoxGeometry(
 							data.width,

@@ -419,14 +419,14 @@ THREE.ImageUtils = {
 
 		if ( header[ off_magic ] !== DDS_MAGIC ) {
 
-			console.error( "ImageUtils.parseDDS(): Invalid magic number in DDS header" );
+			console.error( "THREE.ImageUtils.parseDDS: Invalid magic number in DDS header" );
 			return dds;
 
 		}
 
 		if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
 
-			console.error( "ImageUtils.parseDDS(): Unsupported format, must contain a FourCC code" );
+			console.error( "THREE.ImageUtils.parseDDS: Unsupported format, must contain a FourCC code" );
 			return dds;
 
 		}
@@ -468,7 +468,7 @@ THREE.ImageUtils = {
 					blockBytes = 64;
 					dds.format = THREE.RGBAFormat;
 				} else {
-					console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+					console.error( "THREE.ImageUtils.parseDDS: Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
 					return dds;
 				}
 		}

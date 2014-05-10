@@ -39,7 +39,7 @@ THREE.Object3D = function () {
 				return position;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE: .position = new THREE.Vector3() pattern no longer works. Use .position.set() instead.' );
+				console.warn( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.set() instead.' );
 				position.copy( value );
 			}
 		},
@@ -49,7 +49,7 @@ THREE.Object3D = function () {
 				return rotation;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.set() instead.' );
+				console.warn( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.set() instead.' );
 				rotation.copy( value );
 			}
 		},
@@ -59,7 +59,7 @@ THREE.Object3D = function () {
 				return quaternion;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.set() instead.' );
+				console.warn( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.set() instead.' );
 				quaternion.copy( value );
 			}
 		},
@@ -69,7 +69,7 @@ THREE.Object3D = function () {
 				return scale;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE: .scale = new THREE.Vector3() pattern no longer works. Use .scale.set() instead.' );
+				console.warn( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.set() instead.' );
 				scale.copy( value );
 			}
 		}
@@ -104,7 +104,7 @@ THREE.Object3D.prototype = {
 
 	get eulerOrder () {
 
-		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		return this.rotation.order;
 
@@ -112,7 +112,7 @@ THREE.Object3D.prototype = {
 
 	set eulerOrder ( value ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		this.rotation.order = value;
 
@@ -120,13 +120,13 @@ THREE.Object3D.prototype = {
 
 	get useQuaternion () {
 
-		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
 	set useQuaternion ( value ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
@@ -246,7 +246,7 @@ THREE.Object3D.prototype = {
 
 	translate: function ( distance, axis ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .translate() has been removed. Use .translateOnAxis( axis, distance ) instead. Note args have been changed.' );
+		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
 		return this.translateOnAxis( axis, distance );
 
 	},
@@ -474,7 +474,7 @@ THREE.Object3D.prototype = {
 
 	getChildByName: function ( name, recursive ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .getChildByName() has been renamed to .getObjectByName().' );
+		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name, recursive );
 
 	},

@@ -93,7 +93,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -130,7 +130,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -157,7 +157,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
 			return this.multiplyVectors( v, w );
 
 		}
@@ -198,7 +198,7 @@ THREE.Vector3.prototype = {
 
 			if ( euler instanceof THREE.Euler === false ) {
 
-				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+				console.error( 'THREE.Vector3: .applyEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
 			}
 
@@ -567,7 +567,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
 			return this.crossVectors( v, w );
 
 		}
@@ -674,19 +674,19 @@ THREE.Vector3.prototype = {
 
 	setEulerFromRotationMatrix: function ( m, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromRotationMatrix has been removed in favor of Euler.setFromRotationMatrix(), please update your code.");
+		console.error( "THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.");
 
 	},
 
 	setEulerFromQuaternion: function ( q, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromQuaternion: has been removed in favor of Euler.setFromQuaternion(), please update your code.");
+		console.error( "THREE.Vector3: .setEulerFromQuaternion() has been removed. Use Euler.setFromQuaternion() instead.");
 
 	},
 
 	getPositionFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getPositionFromMatrix() has been renamed to .setFromMatrixPosition(). Please update your code." );
+		console.warn( "THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition()." );
 
 		return this.setFromMatrixPosition( m );
 
@@ -694,14 +694,14 @@ THREE.Vector3.prototype = {
 
 	getScaleFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getScaleFromMatrix() has been renamed to .setFromMatrixScale(). Please update your code." );
+		console.warn( "THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale()." );
 
 		return this.setFromMatrixScale( m );
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getColumnFromMatrix() has been renamed to .setFromMatrixColumn(). Please update your code." );
+		console.warn( "THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn()." );
 
 		return this.setFromMatrixColumn( index, matrix );
 

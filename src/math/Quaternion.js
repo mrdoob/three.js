@@ -102,7 +102,7 @@ THREE.Quaternion.prototype = {
 
 		if ( euler instanceof THREE.Euler === false ) {
 
-			throw new Error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
@@ -357,7 +357,7 @@ THREE.Quaternion.prototype = {
 
 		if ( p !== undefined ) {
 
-			console.warn( 'DEPRECATED: Quaternion\'s .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
 			return this.multiplyQuaternions( q, p );
 
 		}
@@ -386,7 +386,7 @@ THREE.Quaternion.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Quaternion\'s .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
 		return vector.applyQuaternion( this );
 
 	},
