@@ -7646,7 +7646,7 @@ THREE.Object3D = function () {
 				return position;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.copy() instead.' );
+				console.error( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.copy() instead.' );
 				position.copy( value );
 			}
 		},
@@ -7656,7 +7656,7 @@ THREE.Object3D = function () {
 				return rotation;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.copy() instead.' );
+				console.error( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.copy() instead.' );
 				rotation.copy( value );
 			}
 		},
@@ -7666,7 +7666,7 @@ THREE.Object3D = function () {
 				return quaternion;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.copy() instead.' );
+				console.error( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.copy() instead.' );
 				quaternion.copy( value );
 			}
 		},
@@ -7676,7 +7676,7 @@ THREE.Object3D = function () {
 				return scale;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.copy() instead.' );
+				console.error( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.copy() instead.' );
 				scale.copy( value );
 			}
 		}
@@ -34097,42 +34097,45 @@ THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
  *  headWidth - Number
  */
 
-THREE.ArrowHelper = function ( dir, origin, length, color, headLength, headWidth ) {
-
-	// dir is assumed to be normalized
-
-	THREE.Object3D.call( this );
-
-	if ( color === undefined ) color = 0xffff00;
-	if ( length === undefined ) length = 1;
-	if ( headLength === undefined ) headLength = 0.2 * length;
-	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
-
-	this.position = origin;
+THREE.ArrowHelper = ( function () {
 
 	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 1, 0 ) );
-
-	this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
-	this.line.matrixAutoUpdate = false;
-	this.add( this.line );
+	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 
 	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
 	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
 
-	this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: color } ) );
-	this.cone.matrixAutoUpdate = false;
-	this.add( this.cone );
+	return function ( dir, origin, length, color, headLength, headWidth ) {
 
-	this.setDirection( dir );
-	this.setLength( length, headLength, headWidth );
+		// dir is assumed to be normalized
 
-};
+		THREE.Object3D.call( this );
+
+		if ( color === undefined ) color = 0xffff00;
+		if ( length === undefined ) length = 1;
+		if ( headLength === undefined ) headLength = 0.2 * length;
+		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+
+		this.position.copy( origin );
+
+		this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
+		this.line.matrixAutoUpdate = false;
+		this.add( this.line );
+
+		this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: color } ) );
+		this.cone.matrixAutoUpdate = false;
+		this.add( this.cone );
+
+		this.setDirection( dir );
+		this.setLength( length, headLength, headWidth );
+
+	}
+
+}() );
 
 THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.ArrowHelper.prototype.setDirection = function () {
+THREE.ArrowHelper.prototype.setDirection = ( function () {
 
 	var axis = new THREE.Vector3();
 	var radians;
@@ -34161,7 +34164,7 @@ THREE.ArrowHelper.prototype.setDirection = function () {
 
 	};
 
-}();
+}() );
 
 THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
@@ -35060,8 +35063,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 		for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
-			geometry.vertices.push( new THREE.Vector3() );
-			geometry.vertices.push( new THREE.Vector3() );
+			geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
 
 		}
 
@@ -35279,9 +35281,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new Float32Array( numEdges * 2 * 3 );
 
 		for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
@@ -35298,7 +35298,9 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-	} else if ( object.geometry instanceof THREE.BufferGeometry && object.geometry.attributes.index !== undefined ) { // indexed BufferGeometry
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+
+	} else if ( object.geometry instanceof THREE.BufferGeometry && object.geometry.attributes.index !== undefined ) { // Indexed BufferGeometry
 
 		var vertices = object.geometry.attributes.position.array;
 		var indices = object.geometry.attributes.index.array;
@@ -35339,9 +35341,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new Float32Array( numEdges * 2 * 3 );
 
 		for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
@@ -35357,15 +35357,15 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-	} else if ( object.geometry instanceof THREE.BufferGeometry	) { // non-indexed BufferGeometry
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+
+	} else if ( object.geometry instanceof THREE.BufferGeometry ) { // non-indexed BufferGeometry
 
 		var vertices = object.geometry.attributes.position.array;
 		var numEdges = vertices.length / 3;
 		var numTris = numEdges / 3;
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new Float32Array( numEdges * 2 * 3 );
 
 		for ( var i = 0, l = numTris; i < l; i ++ ) {
 
@@ -35386,6 +35386,8 @@ THREE.WireframeHelper = function ( object, hex ) {
 			}
 
 		}
+
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
 	}
 
