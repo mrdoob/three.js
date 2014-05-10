@@ -337,7 +337,7 @@ THREE.ShaderLib = {
 
 	'particle_basic': {
 
-		uniforms:  THREE.UniformsUtils.merge( [
+		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "particle" ],
 			THREE.UniformsLib[ "shadowmap" ]
@@ -411,8 +411,8 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 
 			{
-				"scale":     { type: "f", value: 1 },
-				"dashSize":  { type: "f", value: 1 },
+				"scale"    : { type: "f", value: 1 },
+				"dashSize" : { type: "f", value: 1 },
 				"totalSize": { type: "f", value: 2 }
 			}
 
@@ -596,18 +596,18 @@ THREE.ShaderLib = {
 
 			{
 
-			"enableAO"		  : { type: "i", value: 0 },
-			"enableDiffuse"	  : { type: "i", value: 0 },
-			"enableSpecular"  : { type: "i", value: 0 },
-			"enableReflection": { type: "i", value: 0 },
+			"enableAO"          : { type: "i", value: 0 },
+			"enableDiffuse"     : { type: "i", value: 0 },
+			"enableSpecular"    : { type: "i", value: 0 },
+			"enableReflection"  : { type: "i", value: 0 },
 			"enableDisplacement": { type: "i", value: 0 },
 
 			"tDisplacement": { type: "t", value: null }, // must go first as this is vertex texture
-			"tDiffuse"	   : { type: "t", value: null },
-			"tCube"		   : { type: "t", value: null },
-			"tNormal"	   : { type: "t", value: null },
-			"tSpecular"	   : { type: "t", value: null },
-			"tAO"		   : { type: "t", value: null },
+			"tDiffuse"     : { type: "t", value: null },
+			"tCube"        : { type: "t", value: null },
+			"tNormal"      : { type: "t", value: null },
+			"tSpecular"    : { type: "t", value: null },
+			"tAO"          : { type: "t", value: null },
 
 			"uNormalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
@@ -627,7 +627,7 @@ THREE.ShaderLib = {
 			"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
 			"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
-			"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
+			"wrapRGB" : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 
 			}
 
@@ -935,7 +935,7 @@ THREE.ShaderLib = {
 
 			"	#if MAX_HEMI_LIGHTS > 0",
 
-			"		vec3 hemiDiffuse  = vec3( 0.0 );",
+			"		vec3 hemiDiffuse = vec3( 0.0 );",
 			"		vec3 hemiSpecular = vec3( 0.0 );" ,
 
 			"		for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
@@ -1131,12 +1131,13 @@ THREE.ShaderLib = {
 
 			"				vec4 skinVertex = vec4( position, 1.0 );",
 
-			"				vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
-			"				skinned 	  += boneMatY * skinVertex * skinWeight.y;",
-			"				skinned 	  += boneMatZ * skinVertex * skinWeight.z;",
-			"				skinned 	  += boneMatW * skinVertex * skinWeight.w;",
+			"				vec4 skinned = vec4( 0.0 );",
+			"				skinned += boneMatX * skinVertex * skinWeight.x;",
+			"				skinned += boneMatY * skinVertex * skinWeight.y;",
+			"				skinned += boneMatZ * skinVertex * skinWeight.z;",
+			"				skinned += boneMatW * skinVertex * skinWeight.w;",
 
-			"				displacedPosition  = skinned.xyz;",
+			"				displacedPosition = skinned.xyz;",
 
 			"			#else",
 
@@ -1152,12 +1153,13 @@ THREE.ShaderLib = {
 
 			"			vec4 skinVertex = vec4( position, 1.0 );",
 
-			"			vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
-			"			skinned 	  += boneMatY * skinVertex * skinWeight.y;",
-			"			skinned 	  += boneMatZ * skinVertex * skinWeight.z;",
-			"			skinned 	  += boneMatW * skinVertex * skinWeight.w;",
+			"			vec4 skinned = vec4( 0.0 );",
+			"			skinned += boneMatX * skinVertex * skinWeight.x;",
+			"			skinned += boneMatY * skinVertex * skinWeight.y;",
+			"			skinned += boneMatZ * skinVertex * skinWeight.z;",
+			"			skinned += boneMatW * skinVertex * skinWeight.w;",
 
-			"			displacedPosition  = skinned.xyz;",
+			"			displacedPosition = skinned.xyz;",
 
 			"		#else",
 
@@ -1248,13 +1250,17 @@ THREE.ShaderLib = {
 
 	},
 
-	// Depth encoding into RGBA texture
-	// 	based on SpiderGL shadow map example
-	// 		http://spidergl.org/example.php?id=6
-	// 	originally from
-	//		http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/page__whichpage__1%25EF%25BF%25BD
-	// 	see also here:
-	//		http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	/* Depth encoding into RGBA texture
+	 *
+	 * based on SpiderGL shadow map example
+	 * http://spidergl.org/example.php?id=6
+	 *
+	 * originally from
+	 * http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/page__whichpage__1%25EF%25BF%25BD
+	 *
+	 * see also
+	 * http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	 */
 
 	'depthRGBA': {
 
@@ -1285,7 +1291,7 @@ THREE.ShaderLib = {
 			"vec4 pack_depth( const in float depth ) {",
 
 			"	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
-			"	const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+			"	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
 			"	vec4 res = mod( depth * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );", // "	vec4 res = fract( depth * bit_shift );",
 			"	res -= res.xxyz * bit_mask;",
 			"	return res;",

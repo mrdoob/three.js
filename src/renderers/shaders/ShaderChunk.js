@@ -406,7 +406,7 @@ THREE.ShaderChunk = {
 		"		vec2 st0 = dFdx( vUv.st );",
 		"		vec2 st1 = dFdy( vUv.st );",
 
-		"		vec3 S = normalize(  q0 * st1.t - q1 * st0.t );",
+		"		vec3 S = normalize( q0 * st1.t - q1 * st0.t );",
 		"		vec3 T = normalize( -q0 * st1.s + q1 * st0.s );",
 		"		vec3 N = normalize( surf_norm );",
 
@@ -812,7 +812,7 @@ THREE.ShaderChunk = {
 
 		"#if MAX_POINT_LIGHTS > 0",
 
-		"	vec3 pointDiffuse  = vec3( 0.0 );",
+		"	vec3 pointDiffuse = vec3( 0.0 );",
 		"	vec3 pointSpecular = vec3( 0.0 );",
 
 		"	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
@@ -843,7 +843,7 @@ THREE.ShaderChunk = {
 
 		"		#endif",
 
-		"		pointDiffuse  += diffuse * pointLightColor[ i ] * pointDiffuseWeight * lDistance;",
+		"		pointDiffuse += diffuse * pointLightColor[ i ] * pointDiffuseWeight * lDistance;",
 
 				// specular
 
@@ -864,7 +864,7 @@ THREE.ShaderChunk = {
 
 		"#if MAX_SPOT_LIGHTS > 0",
 
-		"	vec3 spotDiffuse  = vec3( 0.0 );",
+		"	vec3 spotDiffuse = vec3( 0.0 );",
 		"	vec3 spotSpecular = vec3( 0.0 );",
 
 		"	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
@@ -924,7 +924,7 @@ THREE.ShaderChunk = {
 
 		"#if MAX_DIR_LIGHTS > 0",
 
-		"	vec3 dirDiffuse  = vec3( 0.0 );",
+		"	vec3 dirDiffuse = vec3( 0.0 );",
 		"	vec3 dirSpecular = vec3( 0.0 );" ,
 
 		"	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
@@ -949,38 +949,38 @@ THREE.ShaderChunk = {
 
 		"		#endif",
 
-		"		dirDiffuse  += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
+		"		dirDiffuse += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
 
-				// specular
+		// specular
 
 		"		vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 		"		float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 		"		float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
-					/*
-				// fresnel term from skin shader
+		/*
+		// fresnel term from skin shader
 		"		const float F0 = 0.128;",
 
 		"		float base = 1.0 - dot( viewPosition, dirHalfVector );",
 		"		float exponential = pow( base, 5.0 );",
 
 		"		float fresnel = exponential + F0 * ( 1.0 - exponential );",
-				*/
+		*/
 
-				/*
-				// fresnel term from fresnel shader
+		/*
+		// fresnel term from fresnel shader
 		"		const float mFresnelBias = 0.08;",
 		"		const float mFresnelScale = 0.3;",
 		"		const float mFresnelPower = 5.0;",
 
 		"		float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
-				*/
+		*/
 
-				// 2.0 => 2.0001 is hack to work around ANGLE bug
+		// 2.0 => 2.0001 is hack to work around ANGLE bug
 
 		"		float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-				//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
+		// "		dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
 
 		"		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );",
 		"		dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
@@ -992,7 +992,7 @@ THREE.ShaderChunk = {
 
 		"#if MAX_HEMI_LIGHTS > 0",
 
-		"	vec3 hemiDiffuse  = vec3( 0.0 );",
+		"	vec3 hemiDiffuse = vec3( 0.0 );",
 		"	vec3 hemiSpecular = vec3( 0.0 );" ,
 
 		"	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
@@ -1000,7 +1000,7 @@ THREE.ShaderChunk = {
 		"		vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
 		"		vec3 lVector = normalize( lDirection.xyz );",
 
-				// diffuse
+		// diffuse
 
 		"		float dotProduct = dot( normal, lVector );",
 		"		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
@@ -1009,13 +1009,13 @@ THREE.ShaderChunk = {
 
 		"		hemiDiffuse += diffuse * hemiColor;",
 
-				// specular (sky light)
+		// specular (sky light)
 
 		"		vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
 		"		float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
 		"		float hemiSpecularWeightSky = specularStrength * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
 
-				// specular (ground light)
+		// specular (ground light)
 
 		"		vec3 lVectorGround = -lVector;",
 
@@ -1025,7 +1025,7 @@ THREE.ShaderChunk = {
 
 		"		float dotProductGround = dot( normal, lVectorGround );",
 
-				// 2.0 => 2.0001 is hack to work around ANGLE bug
+		// 2.0 => 2.0001 is hack to work around ANGLE bug
 
 		"		float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
@@ -1210,10 +1210,11 @@ THREE.ShaderChunk = {
 
 		"	#endif",
 
-		"	vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
-		"	skinned      += boneMatY * skinVertex * skinWeight.y;",
-		"	skinned      += boneMatZ * skinVertex * skinWeight.z;",
-		"	skinned      += boneMatW * skinVertex * skinWeight.w;",
+		"	vec4 skinned = vec4( 0.0 )'",
+		"	skinned += boneMatX * skinVertex * skinWeight.x;",
+		"	skinned += boneMatY * skinVertex * skinWeight.y;",
+		"	skinned += boneMatZ * skinVertex * skinWeight.z;",
+		"	skinned += boneMatW * skinVertex * skinWeight.w;",
 
 		"#endif"
 
@@ -1296,10 +1297,10 @@ THREE.ShaderChunk = {
 
 		"	vec3 morphedNormal = vec3( 0.0 );",
 
-		"	morphedNormal +=  ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];",
-		"	morphedNormal +=  ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];",
-		"	morphedNormal +=  ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];",
-		"	morphedNormal +=  ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];",
+		"	morphedNormal += ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];",
+		"	morphedNormal += ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];",
+		"	morphedNormal += ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];",
+		"	morphedNormal += ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];",
 
 		"	morphedNormal += normal;",
 
@@ -1311,10 +1312,11 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SKINNING",
 
-		"	mat4 skinMatrix = skinWeight.x * boneMatX;",
-		"	skinMatrix 	+= skinWeight.y * boneMatY;",
-		"	skinMatrix 	+= skinWeight.z * boneMatZ;",
-		"	skinMatrix 	+= skinWeight.w * boneMatW;",
+		"	mat4 skinMatrix = mat4( 0.0 );",
+		"	skinMatrix += skinWeight.x * boneMatX;",
+		"	skinMatrix += skinWeight.y * boneMatY;",
+		"	skinMatrix += skinWeight.z * boneMatZ;",
+		"	skinMatrix += skinWeight.w * boneMatW;",
 
 		"	#ifdef USE_MORPHNORMALS",
 
@@ -1365,8 +1367,8 @@ THREE.ShaderChunk = {
 	// SHADOW MAP
 
 	// based on SpiderGL shadow map and Fabien Sanglard's GLSL shadow mapping examples
-	//  http://spidergl.org/example.php?id=6
-	// 	http://fabiensanglard.net/shadowmapping
+	// http://spidergl.org/example.php?id=6
+	// http://fabiensanglard.net/shadowmapping
 
 	shadowmap_pars_fragment: [
 
@@ -1418,8 +1420,8 @@ THREE.ShaderChunk = {
 
 		"		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
 
-				// "if ( something && something )" 		 breaks ATI OpenGL shader compiler
-				// "if ( all( something, something ) )"  using this instead
+				// "if ( something && something )" breaks ATI OpenGL shader compiler
+				// "if ( all( something, something ) )" using this instead
 
 		"		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );",
 		"		bool inFrustum = all( inFrustumVec );",
@@ -1453,7 +1455,7 @@ THREE.ShaderChunk = {
 
 		"				float shadow = 0.0;",
 
-						/*
+		/*
 						// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL
 						// must enroll loop manually
 
@@ -1474,7 +1476,7 @@ THREE.ShaderChunk = {
 
 		"				shadow /= 9.0;",
 
-						*/
+		*/
 
 		"				const float shadowDelta = 1.0 / 9.0;",
 
@@ -1576,13 +1578,13 @@ THREE.ShaderChunk = {
 
 		"				if ( fDepth < shadowCoord.z )",
 
-							// spot with multiple shadows is darker
+		// spot with multiple shadows is darker
 
 		"					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );",
 
-							// spot with multiple shadows has the same color as single shadow spot
+		// spot with multiple shadows has the same color as single shadow spot
 
-							//"shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );",
+		// "					shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );",
 
 		"			#endif",
 
@@ -1728,6 +1730,7 @@ THREE.ShaderChunk = {
 	].join('\n'),
 
 	logdepthbuf_fragment: [
+
 		"#if defined(USE_LOGDEPTHBUF) && defined(USE_LOGDEPTHBUF_EXT)",
 
 		"	gl_FragDepthEXT = log2(vFragDepth) * logDepthBufFC * 0.5;",
