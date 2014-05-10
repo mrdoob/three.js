@@ -39,7 +39,7 @@ THREE.Object3D = function () {
 				return position;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.set() instead.' );
+				console.warn( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.copy() instead.' );
 				position.copy( value );
 			}
 		},
@@ -49,7 +49,7 @@ THREE.Object3D = function () {
 				return rotation;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.set() instead.' );
+				console.warn( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.copy() instead.' );
 				rotation.copy( value );
 			}
 		},
@@ -59,7 +59,7 @@ THREE.Object3D = function () {
 				return quaternion;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.set() instead.' );
+				console.warn( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.copy() instead.' );
 				quaternion.copy( value );
 			}
 		},
@@ -69,7 +69,7 @@ THREE.Object3D = function () {
 				return scale;
 			},
 			set: function ( value ) {
-				console.warn( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.set() instead.' );
+				console.warn( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.copy() instead.' );
 				scale.copy( value );
 			}
 		}
