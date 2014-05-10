@@ -7323,10 +7323,9 @@ THREE.EventDispatcher.prototype = {
 
 				} else {
 
-					var offsets = geometry.offsets;
 					var positions = attributes.position.array;
 
-					for ( var i = 0, il = attributes.position.array.length; i < il; i += 3 ) {
+					for ( var i = 0, il = positions.length / 3; i < il; i += 3 ) {
 
 						a = i;
 						b = i + 1;
@@ -9043,7 +9042,7 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 	this.c = c;
 
 	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
-	this.vertexNormals = normal instanceof Array ? normal : [ ];
+	this.vertexNormals = normal instanceof Array ? normal : [];
 
 	this.color = color instanceof THREE.Color ? color : new THREE.Color();
 	this.vertexColors = color instanceof Array ? color : [];
@@ -9067,10 +9066,23 @@ THREE.Face3.prototype = {
 
 		face.materialIndex = this.materialIndex;
 
-		var i, il;
-		for ( i = 0, il = this.vertexNormals.length; i < il; i ++ ) face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
-		for ( i = 0, il = this.vertexColors.length; i < il; i ++ ) face.vertexColors[ i ] = this.vertexColors[ i ].clone();
-		for ( i = 0, il = this.vertexTangents.length; i < il; i ++ ) face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
+		for ( var i = 0, il = this.vertexNormals.length; i < il; i ++ ) {
+		
+			face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
+		
+		}
+
+		for ( var i = 0, il = this.vertexColors.length; i < il; i ++ ) {
+		
+			face.vertexColors[ i ] = this.vertexColors[ i ].clone();
+		
+		}
+
+		for ( var i = 0, il = this.vertexTangents.length; i < il; i ++ ) {
+		
+			face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
+		
+		}
 
 		return face;
 
@@ -9085,7 +9097,6 @@ THREE.Face3.prototype = {
 THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
 
 	console.warn( 'THREE.Face4 has been removed. A THREE.Face3 will be created instead.')
-
 	return new THREE.Face3( a, b, c, normal, color, materialIndex );
 
 };
@@ -14454,10 +14465,6 @@ THREE.Mesh = function ( geometry, material ) {
 };
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
-
-THREE.Mesh.prototype.raycast = function () {
-
-};
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
