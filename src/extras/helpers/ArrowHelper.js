@@ -14,11 +14,10 @@
  *  headWidth - Number
  */
 
-THREE.ArrowHelper = ( function (){
+THREE.ArrowHelper = ( function () {
 
 	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 1, 0 ) );
+	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 
 	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
 	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
@@ -53,7 +52,7 @@ THREE.ArrowHelper = ( function (){
 
 THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.ArrowHelper.prototype.setDirection = function () {
+THREE.ArrowHelper.prototype.setDirection = ( function () {
 
 	var axis = new THREE.Vector3();
 	var radians;
@@ -82,7 +81,7 @@ THREE.ArrowHelper.prototype.setDirection = function () {
 
 	};
 
-}();
+}() );
 
 THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 

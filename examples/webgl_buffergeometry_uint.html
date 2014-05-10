@@ -190,10 +190,10 @@
 
 				}
 
-				geometry.addAttribute( 'index', new THREE.Uint32Attribute( indices, 1 ) );
-				geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
-				geometry.addAttribute( 'normal', new THREE.Float32Attribute( normals, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32Attribute( colors, 3 ) );
+				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 

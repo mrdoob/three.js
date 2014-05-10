@@ -25,8 +25,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 		for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
-			geometry.vertices.push( new THREE.Vector3() );
-			geometry.vertices.push( new THREE.Vector3() );
+			geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
 
 		}
 

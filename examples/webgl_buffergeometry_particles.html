@@ -102,16 +102,16 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32Attribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 
 				//
 
-				var material = new THREE.ParticleSystemMaterial( { size: 15, vertexColors: true } );
+				var material = new THREE.PointCloudMaterial( { size: 15, vertexColors: true } );
 
-				particleSystem = new THREE.ParticleSystem( geometry, material );
+				particleSystem = new THREE.PointCloud( geometry, material );
 				scene.add( particleSystem );
 
 				//
