@@ -94,10 +94,10 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 
 	}
 
-    geometry.addAttribute( 'index', new THREE.Uint32Attribute( indices, 1 ) );
-    geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
-    geometry.addAttribute( 'normal', new THREE.Float32Attribute( normals, 3 ) );
-    geometry.addAttribute( 'uv', new THREE.Float32Attribute( uvs, 2 ) );
+    geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+    geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+    geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+    geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
     geometry.offsets.push( { start: 0, count: indices.length, index: 0 } );
 
