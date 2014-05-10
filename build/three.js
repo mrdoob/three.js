@@ -670,7 +670,7 @@ THREE.Quaternion.prototype = {
 
 		if ( euler instanceof THREE.Euler === false ) {
 
-			throw new Error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
@@ -925,7 +925,7 @@ THREE.Quaternion.prototype = {
 
 		if ( p !== undefined ) {
 
-			console.warn( 'DEPRECATED: Quaternion\'s .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
 			return this.multiplyQuaternions( q, p );
 
 		}
@@ -954,7 +954,7 @@ THREE.Quaternion.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Quaternion\'s .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
 		return vector.applyQuaternion( this );
 
 	},
@@ -1150,7 +1150,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector2\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -1184,7 +1184,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector2\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -1562,7 +1562,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -1599,7 +1599,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -1626,7 +1626,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
 			return this.multiplyVectors( v, w );
 
 		}
@@ -1667,7 +1667,7 @@ THREE.Vector3.prototype = {
 
 			if ( euler instanceof THREE.Euler === false ) {
 
-				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+				console.error( 'THREE.Vector3: .applyEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
 			}
 
@@ -2036,7 +2036,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
 			return this.crossVectors( v, w );
 
 		}
@@ -2143,19 +2143,19 @@ THREE.Vector3.prototype = {
 
 	setEulerFromRotationMatrix: function ( m, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromRotationMatrix has been removed in favor of Euler.setFromRotationMatrix(), please update your code.");
+		console.error( "THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.");
 
 	},
 
 	setEulerFromQuaternion: function ( q, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromQuaternion: has been removed in favor of Euler.setFromQuaternion(), please update your code.");
+		console.error( "THREE.Vector3: .setEulerFromQuaternion() has been removed. Use Euler.setFromQuaternion() instead.");
 
 	},
 
 	getPositionFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getPositionFromMatrix() has been renamed to .setFromMatrixPosition(). Please update your code." );
+		console.warn( "THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition()." );
 
 		return this.setFromMatrixPosition( m );
 
@@ -2163,14 +2163,14 @@ THREE.Vector3.prototype = {
 
 	getScaleFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getScaleFromMatrix() has been renamed to .setFromMatrixScale(). Please update your code." );
+		console.warn( "THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale()." );
 
 		return this.setFromMatrixScale( m );
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getColumnFromMatrix() has been renamed to .setFromMatrixColumn(). Please update your code." );
+		console.warn( "THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn()." );
 
 		return this.setFromMatrixColumn( index, matrix );
 
@@ -2242,6 +2242,7 @@ THREE.Vector3.prototype = {
 	}
 
 };
+
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
@@ -2349,7 +2350,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector4\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -2389,7 +2390,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector4\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -3099,7 +3100,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			console.warn( 'WARNING: Euler.setFromRotationMatrix() given unsupported order: ' + order )
+			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
 
 		}
 
@@ -3164,7 +3165,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			console.warn( 'WARNING: Euler.setFromQuaternion() given unsupported order: ' + order )
+			console.warn( 'THREE.Euler: .setFromQuaternion() given unsupported order: ' + order )
 
 		}
 
@@ -4075,14 +4076,14 @@ THREE.Matrix3.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix3\'s .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
+		console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
 		return vector.applyMatrix3( this );
 
 	},
 
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'DEPRECATED: Matrix3\'s .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
 		return this.applyToVector3Array( a );
 
 	},
@@ -4356,7 +4357,7 @@ THREE.Matrix4.prototype = {
 
 	extractPosition: function ( m ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
+		console.warn( 'THREEMatrix4: .extractPosition() has been renamed to .copyPosition().' );
 		return this.copyPosition( m );
 
 	},
@@ -4409,7 +4410,7 @@ THREE.Matrix4.prototype = {
 
 		if ( euler instanceof THREE.Euler === false ) {
 
-			console.error( 'ERROR: Matrix\'s .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+			console.error( 'THREE.Matrix: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
 		}
 
@@ -4535,7 +4536,7 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromQuaternion: function ( q ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromQuaternion() has been deprecated in favor of makeRotationFromQuaternion.  Please update your code.' );
+		console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
 
 		return this.makeRotationFromQuaternion( q );
 
@@ -4622,7 +4623,7 @@ THREE.Matrix4.prototype = {
 
 		if ( n !== undefined ) {
 
-			console.warn( 'DEPRECATED: Matrix4\'s .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
+			console.warn( 'THREE.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
 			return this.multiplyMatrices( m, n );
 
 		}
@@ -4701,21 +4702,21 @@ THREE.Matrix4.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
 		return vector.applyProjection( this );
 
 	},
 
 	multiplyVector4: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
 		return vector.applyMatrix4( this );
 
 	},
 
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		console.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
 		return this.applyToVector3Array( a );
 
 	},
@@ -4751,7 +4752,7 @@ THREE.Matrix4.prototype = {
 
 	rotateAxis: function ( v ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
 
 		v.transformDirection( this );
 
@@ -4759,7 +4760,7 @@ THREE.Matrix4.prototype = {
 
 	crossVector: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
 		return vector.applyMatrix4( this );
 
 	},
@@ -4865,7 +4866,7 @@ THREE.Matrix4.prototype = {
 
 		return function () {
 
-			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
+			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
 			var te = this.elements;
 			return v1.set( te[12], te[13], te[14] );
@@ -4943,31 +4944,31 @@ THREE.Matrix4.prototype = {
 
 	translate: function ( v ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .translate() has been removed.');
+		console.warn( 'THREE.Matrix4: .translate() has been removed.');
 
 	},
 
 	rotateX: function ( angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateX() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateX() has been removed.');
 
 	},
 
 	rotateY: function ( angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateY() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateY() has been removed.');
 
 	},
 
 	rotateZ: function ( angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateZ() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateZ() has been removed.');
 
 	},
 
 	rotateByAxis: function ( axis, angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateByAxis() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateByAxis() has been removed.');
 
 	},
 
@@ -7623,26 +7624,61 @@ THREE.Object3D = function () {
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
-	this.position = new THREE.Vector3();
-
 	var scope = this;
+	
+	var position = new THREE.Vector3();
+	var rotation = new THREE.Euler();
+	var quaternion = new THREE.Quaternion();
+	var scale = new THREE.Vector3( 1, 1, 1 );
+
+	rotation.onChange( function () {
+		quaternion.setFromEuler( rotation, false );
+	} );
+	
+	quaternion.onChange( function () {
+		rotation.setFromQuaternion( quaternion, undefined, false );
+	} );
 
 	Object.defineProperties( this, {
+		position: {
+			enumerable: true,
+			get: function () {
+				return position;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.set() instead.' );
+				position.copy( value );
+			}
+		},
 		rotation: {
 			enumerable: true,
-			value: new THREE.Euler().onChange( function () {
-				scope.quaternion.setFromEuler( scope.rotation, false );
-			} )
+			get: function () {
+				return rotation;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.set() instead.' );
+				rotation.copy( value );
+			}
 		},
 		quaternion: {
 			enumerable: true,
-			value: new THREE.Quaternion().onChange( function () {
-				scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
-			} )
+			get: function () {
+				return quaternion;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.set() instead.' );
+				quaternion.copy( value );
+			}
 		},
 		scale: {
 			enumerable: true,
-			value: new THREE.Vector3( 1, 1, 1 )
+			get: function () {
+				return scale;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.set() instead.' );
+				scale.copy( value );
+			}
 		}
 	} );
 
@@ -7675,7 +7711,7 @@ THREE.Object3D.prototype = {
 
 	get eulerOrder () {
 
-		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		return this.rotation.order;
 
@@ -7683,7 +7719,7 @@ THREE.Object3D.prototype = {
 
 	set eulerOrder ( value ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		this.rotation.order = value;
 
@@ -7691,13 +7727,13 @@ THREE.Object3D.prototype = {
 
 	get useQuaternion () {
 
-		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
 	set useQuaternion ( value ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
@@ -7817,7 +7853,7 @@ THREE.Object3D.prototype = {
 
 	translate: function ( distance, axis ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .translate() has been removed. Use .translateOnAxis( axis, distance ) instead. Note args have been changed.' );
+		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
 		return this.translateOnAxis( axis, distance );
 
 	},
@@ -8045,7 +8081,7 @@ THREE.Object3D.prototype = {
 
 	getChildByName: function ( name, recursive ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .getChildByName() has been renamed to .getObjectByName().' );
+		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name, recursive );
 
 	},
@@ -9196,21 +9232,21 @@ THREE.BufferAttribute.prototype = {
 
 THREE.Int8Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Int8Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Int8Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
 THREE.Uint8Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Uint8Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Uint8Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
 THREE.Uint8ClampedAttribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Uint8ClampedAttribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Uint8ClampedAttribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 
@@ -9218,42 +9254,42 @@ THREE.Uint8ClampedAttribute = function ( data, itemSize ) {
 
 THREE.Int16Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Int16Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Int16Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
 THREE.Uint16Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Uint16Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Uint16Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
 THREE.Int32Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Int32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Int32Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
 THREE.Uint32Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Uint32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Uint32Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
 THREE.Float32Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Float32Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Float32Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
 
 THREE.Float64Attribute = function ( data, itemSize ) {
 
-	console.log( 'THREE.Float64Attribute has been DEPRECATED. Use THREE.BufferAttribute( array, itemSize ) instead.' );
+	console.warn( 'THREE.Float64Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
 
 };
@@ -9286,7 +9322,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( attribute instanceof THREE.BufferAttribute === false ) {
 
-			console.warn( 'DEPRECATED: BufferGeometry\'s addAttribute() now expects ( name, attribute ).' );
+			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
 			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
 
@@ -12836,7 +12872,7 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'BoxGeometry':
-					case 'CubeGeometry': // DEPRECATED
+					case 'CubeGeometry': // backwards compatible
 
 						geometry = new THREE.BoxGeometry(
 							data.width,
@@ -13986,10 +14022,11 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 THREE.ParticleSystemMaterial = function ( parameters ) {
 
-	console.warn( 'THREE.ParticleSystemMaterial has been DEPRECATED. Use THREE.PointCloudMaterial instead.' );
+	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
 	return new THREE.PointCloudMaterial( parameters );
 
 }
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -14412,10 +14449,11 @@ THREE.PointCloud.prototype.clone = function ( object ) {
 
 THREE.ParticleSystem = function ( geometry, material ) {
 
-	console.warn( 'THREE.ParticleSystem has been DEPRECATED. Use THREE.PointCloud instead.' );
+	console.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
 	return new THREE.PointCloud( geometry, material );
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -15616,7 +15654,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		console.warn( 'DEPRECATED: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
+		console.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
 		this.setClearColor( hex, alpha );
 
 	};
@@ -19954,12 +19992,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( mediumpAvailable ) {
 
 			_precision = "mediump";
-			console.warn( "WebGLRenderer: highp not supported, using mediump" );
+			console.warn( 'THREE.WebGLRenderer: highp not supported, using mediump.' );
 
 		} else {
 
 			_precision = "lowp";
-			console.warn( "WebGLRenderer: highp and mediump not supported, using lowp" );
+			console.warn( 'THREE.WebGLRenderer: highp and mediump not supported, using lowp.' );
 
 		}
 
@@ -19968,7 +20006,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	if ( _precision === "mediump" && ! mediumpAvailable ) {
 
 		_precision = "lowp";
-		console.warn( "WebGLRenderer: mediump not supported, using lowp" );
+		console.warn( 'THREE.WebGLRenderer: mediump not supported, using lowp.' );
 
 	}
 
@@ -20074,7 +20112,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		console.warn( 'DEPRECATED: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
+		console.warn( 'THREE.WebGLRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
 		this.setClearColor( hex, alpha );
 
 	};
@@ -26295,7 +26333,7 @@ THREE.WebGLProgram = ( function () {
 
 		if ( _gl.getProgramParameter( program, _gl.LINK_STATUS ) === false ) {
 
-			console.error( 'Could not initialise shader' );
+			console.error( 'THREE.WebGLProgram: Could not initialise shader.' );
 			console.error( 'gl.VALIDATE_STATUS', _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) );
 			console.error( 'gl.getError()', _gl.getError() );
 
@@ -26545,7 +26583,7 @@ THREE.GeometryUtils = {
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
-		console.warn( 'DEPRECATED: GeometryUtils\'s .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
+		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
 
 		var matrix;
 
@@ -27183,14 +27221,14 @@ THREE.ImageUtils = {
 
 		if ( header[ off_magic ] !== DDS_MAGIC ) {
 
-			console.error( "ImageUtils.parseDDS(): Invalid magic number in DDS header" );
+			console.error( "THREE.ImageUtils.parseDDS: Invalid magic number in DDS header" );
 			return dds;
 
 		}
 
 		if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
 
-			console.error( "ImageUtils.parseDDS(): Unsupported format, must contain a FourCC code" );
+			console.error( "THREE.ImageUtils.parseDDS: Unsupported format, must contain a FourCC code" );
 			return dds;
 
 		}
@@ -27232,7 +27270,7 @@ THREE.ImageUtils = {
 					blockBytes = 64;
 					dds.format = THREE.RGBAFormat;
 				} else {
-					console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+					console.error( "THREE.ImageUtils.parseDDS: Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
 					return dds;
 				}
 		}
@@ -31729,12 +31767,18 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-// DEPRECATED
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 
 THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-	console.warn( 'DEPRECATED: THREE.CubeGeometry is deprecated. Use THREE.BoxGeometry instead.' );
- 	return new THREE.BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+
+	console.warn( 'THEE.CubeGeometry has been renamed to THREE.BoxGeometry.' );
+	return new THREE.BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+
  };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
