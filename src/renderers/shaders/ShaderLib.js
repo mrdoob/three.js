@@ -814,9 +814,7 @@ THREE.ShaderLib = {
 			"			float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 			"			float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-			"			float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( pointVector, pointHalfVector ), 5.0 );",
 			"			pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance * specularNormalization;",
@@ -872,9 +870,7 @@ THREE.ShaderLib = {
 			"				float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
 			"				float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-			"				float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+			"				float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 			"				vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
 			"				spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
@@ -920,9 +916,7 @@ THREE.ShaderLib = {
 			"			float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 			"			float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-			"			float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
 			"			dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
@@ -969,9 +963,7 @@ THREE.ShaderLib = {
 
 			"			float dotProductGround = dot( normal, lVectorGround );",
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-			"			float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 			"			vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
 			"			vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",

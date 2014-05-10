@@ -851,9 +851,7 @@ THREE.ShaderChunk = {
 		"		float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 		"		float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-				// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-		"		float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+		"		float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 		"		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );",
 		"		pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
@@ -909,9 +907,7 @@ THREE.ShaderChunk = {
 		"			float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
 		"			float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
-					// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-		"			float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+		"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 		"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );",
 		"			spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
@@ -976,9 +972,7 @@ THREE.ShaderChunk = {
 		"		float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
 		*/
 
-		// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-		"		float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+		"		float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 		// "		dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
 
@@ -1025,9 +1019,7 @@ THREE.ShaderChunk = {
 
 		"		float dotProductGround = dot( normal, lVectorGround );",
 
-		// 2.0 => 2.0001 is hack to work around ANGLE bug
-
-		"		float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+		"		float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 		"		vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );",
 		"		vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );",
