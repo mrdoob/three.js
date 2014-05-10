@@ -25,7 +25,7 @@ THREE.ArrowHelper = function ( dir, origin, length, color, headLength, headWidth
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.position = origin;
+	this.position.copy( origin );
 
 	var lineGeometry = new THREE.Geometry();
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
