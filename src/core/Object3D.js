@@ -15,7 +15,7 @@ THREE.Object3D = function () {
 	this.parent = undefined;
 	this.children = [];
 
-	this.up = new THREE.Vector3( 0, 1, 0 );
+	this.up = THREE.Object3D.DefaultUp.clone();
 
 	this.position = new THREE.Vector3();
 
@@ -61,6 +61,7 @@ THREE.Object3D = function () {
 
 };
 
+THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
 
 THREE.Object3D.prototype = {
 
