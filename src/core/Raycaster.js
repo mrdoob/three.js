@@ -132,7 +132,7 @@
 						
 					}
 				
-				}else{
+				} else {
 				
 					var pointCount = positions.length / 3;
 
@@ -330,26 +330,26 @@
 
 					var positions = attributes.position.array;
 
-					for ( var i = 0, il = positions.length / 3; i < il; i += 3 ) {
+					for ( var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9 ) {
 
 						a = i;
 						b = i + 1;
 						c = i + 2;
 
 						vA.set(
-							positions[ a * 3 ],
-							positions[ a * 3 + 1 ],
-							positions[ a * 3 + 2 ]
+							positions[ j ],
+							positions[ j + 1 ],
+							positions[ j + 2 ]
 						);
 						vB.set(
-							positions[ b * 3 ],
-							positions[ b * 3 + 1 ],
-							positions[ b * 3 + 2 ]
+							positions[ j + 3 ],
+							positions[ j + 4 ],
+							positions[ j + 5 ]
 						);
 						vC.set(
-							positions[ c * 3 ],
-							positions[ c * 3 + 1 ],
-							positions[ c * 3 + 2 ]
+							positions[ j + 6 ],
+							positions[ j + 7 ],
+							positions[ j + 8 ]
 						);
 
 						
@@ -375,7 +375,7 @@
 
 							distance: distance,
 							point: intersectionPoint,
-							indices: [a, b, c],
+							indices: [ a, b, c ],
 							face: null,
 							faceIndex: null,
 							object: object
