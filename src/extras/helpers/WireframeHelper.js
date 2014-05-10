@@ -46,24 +46,24 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new THREE.BufferAttribute( new Float32Array( numEdges * 2 * 3 ), 3 );
 
 		for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
 			for ( var j = 0; j < 2; j ++ ) {
 
-				var vertex = vertices[ edges [ 2 * i + j] ];
+				var index = 2 * i + j;
 
-				var index = 6 * i + 3 * j;
-				coords[ index + 0 ] = vertex.x;
-				coords[ index + 1 ] = vertex.y;
-				coords[ index + 2 ] = vertex.z;
+				var vertex = vertices[ edges[ index ] ];
+
+				coords.setXYZ( index, vertex.x, vertex.y, vertex.z );
 
 			}
 
 		}
+
+		geometry.addAttribute( 'position', coords );
+
 
 	} else if ( object.geometry instanceof THREE.BufferGeometry && object.geometry.attributes.index !== undefined ) { // indexed BufferGeometry
 
@@ -106,23 +106,24 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new THREE.BufferAttribute( new Float32Array( numEdges * 2 * 3 ), 3 );
 
 		for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
 			for ( var j = 0; j < 2; j ++ ) {
 
-				var index = 6 * i + 3 * j;
-				var index2 = 3 * edges[ 2 * i + j];
-				coords[ index + 0 ] = vertices[ index2 ];
-				coords[ index + 1 ] = vertices[ index2 + 1 ];
-				coords[ index + 2 ] = vertices[ index2 + 2 ];
+				var index = 2 * i + j;
+
+				var index1 = 3 * edges[ index ];
+
+				coords.setXYZ( index, vertices[ index1 ], vertices[ index1 + 1 ], vertices[ index1 + 2 ] );
 
 			}
 
 		}
+
+		geometry.addAttribute( 'position', coords );
+
 
 	} else if ( object.geometry instanceof THREE.BufferGeometry	) { // non-indexed BufferGeometry
 
@@ -130,29 +131,27 @@ THREE.WireframeHelper = function ( object, hex ) {
 		var numEdges = vertices.length / 3;
 		var numTris = numEdges / 3;
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new THREE.BufferAttribute( new Float32Array( numEdges * 2 * 3 ), 3 );
 
 		for ( var i = 0, l = numTris; i < l; i ++ ) {
 
 			for ( var j = 0; j < 3; j ++ ) {
 
-				var index = 18 * i + 6 * j;
+				var index = 6 * i + 2 * j;
 
 				var index1 = 9 * i + 3 * j;
-				coords[ index + 0 ] = vertices[ index1 ];
-				coords[ index + 1 ] = vertices[ index1 + 1 ];
-				coords[ index + 2 ] = vertices[ index1 + 2 ];
+
+				coords.setXYZ( index, vertices[ index1 ], vertices[ index1 + 1 ], vertices[ index1 + 2 ] );
 
 				var index2 = 9 * i + 3 * ( ( j + 1 ) % 3 );
-				coords[ index + 3 ] = vertices[ index2 ];
-				coords[ index + 4 ] = vertices[ index2 + 1 ];
-				coords[ index + 5 ] = vertices[ index2 + 2 ];
+
+				coords.setXYZ( index + 1, vertices[ index2 ], vertices[ index2 + 1 ], vertices[ index2 + 2 ] );
 
 			}
 
 		}
+
+		geometry.addAttribute( 'position', coords );
 
 	}
 
