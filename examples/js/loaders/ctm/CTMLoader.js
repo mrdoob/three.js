@@ -190,38 +190,54 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
-	var Model = function ( ) {
+	var Model = function () {
 
 		THREE.BufferGeometry.call( this );
 
 		this.materials = [];
 
-		// init GL buffers
 		var indices = file.body.indices,
 		positions = file.body.vertices,
 		normals = file.body.normals;
 
 		var uvs, colors;
 
-		if ( file.body.uvMaps !== undefined && file.body.uvMaps.length > 0 ) {
-			uvs = file.body.uvMaps[ 0 ].uv;
+		var uvMaps = file.body.uvMaps;
+
+		if ( uvMaps !== undefined && uvMaps.length > 0 ) {
+
+			uvs = uvMaps[ 0 ].uv;
+
 		}
 
-		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
-			colors = file.body.attrMaps[ 0 ].attr;
+		var attrMaps = file.body.attrMaps;
+
+		if ( attrMaps !== undefined && attrMaps.length > 0 && attrMaps[ 0 ].name === 'Color' ) {
+
+			colors = attrMaps[ 0 ].attr;
+
 		}
 
-		this.addAttribute( 'index', new THREE.Uint32Attribute( indices, 1 ) );
-		this.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
+		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-		if ( normals !== undefined ) 
-			this.addAttribute( 'normal', new THREE.Float32Attribute( normals, 3 ) );
+		if ( normals !== undefined ) {
 
-		if ( uvs !== undefined ) 
-			this.addAttribute( 'uv', new THREE.Float32Attribute( uvs, 2 ) );
+			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
-		if ( colors !== undefined ) 
-			this.addAttribute( 'color', new THREE.Float32Attribute( colors, 4 ) );
+		}
+
+		if ( uvs !== undefined ) {
+
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+		}
+
+		if ( colors !== undefined ) {
+
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
+
+		}
 
 	}
 
