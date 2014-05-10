@@ -7092,25 +7092,7 @@ THREE.EventDispatcher.prototype = {
 
 		if ( object instanceof THREE.Sprite ) {
 
-			matrixPosition.setFromMatrixPosition( object.matrixWorld );
-			
-			var distance = raycaster.ray.distanceToPoint( matrixPosition );
-
-			if ( distance > object.scale.x ) {
-
-				return intersects;
-
-			}
-
-			intersects.push( {
-
-				distance: distance,
-				point: object.position,
-				face: null,
-				object: object
-
-			} );
-
+			object.raycast( raycaster, intersects );
 
 		} else if ( object instanceof THREE.PointCloud ) {
 		
@@ -14517,6 +14499,10 @@ THREE.Mesh = function ( geometry, material ) {
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 
+THREE.Mesh.prototype.raycast = function () {
+
+};
+
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
 	if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
@@ -15263,9 +15249,34 @@ THREE.Sprite = ( function () {
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 
-/*
- * Custom update matrix
- */
+THREE.Sprite.prototype.raycast = ( function () {
+
+	var matrixPosition = new THREE.Vector3();
+
+	return function ( raycaster, intersects ) {
+
+		matrixPosition.setFromMatrixPosition( this.matrixWorld );
+			
+		var distance = raycaster.ray.distanceToPoint( matrixPosition );
+
+		if ( distance > this.scale.x ) {
+
+			return intersects;
+
+		}
+
+		intersects.push( {
+
+			distance: distance,
+			point: this.position,
+			face: null,
+			object: this
+
+		} );
+		
+	};
+
+} )();
 
 THREE.Sprite.prototype.updateMatrix = function () {
 
