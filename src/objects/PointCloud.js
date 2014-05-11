@@ -130,7 +130,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 							distance: distance,
 							distanceToRay: rayPointDistance,
-							point: intersectPoint,
+							point: intersectPoint.clone(),
 							index: i,
 							face: null,
 							object: this

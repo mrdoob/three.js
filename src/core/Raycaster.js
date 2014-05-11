@@ -21,47 +21,12 @@
 			LOD: {},
 			Line: {}
 		};
-		
+
 	};
-
-	var sphere = new THREE.Sphere();
-	var localRay = new THREE.Ray();
-	var facePlane = new THREE.Plane();
-	var intersectPoint = new THREE.Vector3();
-	var matrixPosition = new THREE.Vector3();
-
-	var inverseMatrix = new THREE.Matrix4();
 
 	var descSort = function ( a, b ) {
 
 		return a.distance - b.distance;
-
-	};
-
-
-	var intersectObject = function ( object, raycaster, intersects ) {
-
-		if ( object instanceof THREE.Sprite ) {
-
-			object.raycast( raycaster, intersects );
-
-		} else if ( object instanceof THREE.PointCloud ) {
-		
-			object.raycast( raycaster, intersects );
-
-		} else if ( object instanceof THREE.LOD ) {
-
-			object.raycast( raycaster, intersects );
-
-		} else if ( object instanceof THREE.Mesh ) {
-
-			object.raycast( raycaster, intersects );
-
-		} else if ( object instanceof THREE.Line ) {
-
-			object.raycast( raycaster, intersects );
-
-		}
 
 	};
 
@@ -71,9 +36,10 @@
 
 		for ( var i = 0, l = descendants.length; i < l; i ++ ) {
 
-			intersectObject( descendants[ i ], raycaster, intersects );
+			descendants[ i ].raycast( raycaster, intersects );
 
 		}
+
 	};
 
 	//
@@ -92,13 +58,13 @@
 
 		var intersects = [];
 
+		object.raycast( this, intersects );
+
 		if ( recursive === true ) {
 
 			intersectDescendants( object, this, intersects );
 
 		}
-
-		intersectObject( object, this, intersects );
 
 		intersects.sort( descSort );
 
@@ -112,11 +78,13 @@
 
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-			intersectObject( objects[ i ], this, intersects );
+			var object = objects[ i ];
+			
+			object.raycast( this, intersects );
 
 			if ( recursive === true ) {
 
-				intersectDescendants( objects[ i ], this, intersects );
+				intersectDescendants( object, this, intersects );
 
 			}
 
