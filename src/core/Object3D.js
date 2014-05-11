@@ -394,11 +394,7 @@ THREE.Object3D.prototype = {
 
 	},
 	
-	raycast: function ( raycaster, intersects ) {
-	
-		return intersects;
-	
-	},
+	raycast: function () {},
 
 	traverse: function ( callback ) {
 
