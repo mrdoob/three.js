@@ -66,7 +66,7 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 
 	var hyperfocus = ( near + far ) / 2;
 
-	var halfHeight = Math.tan( fov / 2 ) * hyperfocus;
+	var halfHeight = Math.tan( THREE.Math.degToRad(fov) / 2 ) * hyperfocus;
 	var planeHeight = 2 * halfHeight;
 	var planeWidth = planeHeight * aspect;
 	var halfWidth = planeWidth / 2;
