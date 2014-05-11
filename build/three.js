@@ -13905,7 +13905,8 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 	return function ( raycaster, intersects ) {
 
-		var geometry = this.geometry;
+		var object = this;
+		var geometry = object.geometry;
 		var threshold = raycaster.params.PointCloud.threshold;
 
 		inverseMatrix.getInverse( this.matrixWorld );
@@ -13922,7 +13923,33 @@ THREE.PointCloud.prototype.raycast = ( function () {
 		}
 	
 		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-		var pos = new THREE.Vector3();
+		var position = new THREE.Vector3();
+
+		var testPoint = function ( point, index ) {
+
+			var rayPointDistance = ray.distanceToPoint( point );
+
+			if ( rayPointDistance < localThreshold ) {
+
+				var intersectPoint = ray.closestPointToPoint( point );
+				intersectPoint.applyMatrix4( object.matrixWorld );
+
+				var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+
+				intersects.push( {
+
+					distance: distance,
+					distanceToRay: rayPointDistance,
+					point: intersectPoint.clone(),
+					index: index,
+					face: null,
+					object: object
+
+				} );
+
+			}
+
+		};
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 	
@@ -13956,33 +13983,13 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 						var a = index + indices[ i ];
 
-						pos.set(
+						position.set(
 							positions[ a * 3 ],
 							positions[ a * 3 + 1 ],
 							positions[ a * 3 + 2 ]
 						);
-
-						var rayPointDistance = ray.distanceToPoint( pos );
-
-						if ( rayPointDistance < localThreshold ) {
-
-							var intersectPoint = ray.closestPointToPoint( pos );
-							intersectPoint.applyMatrix4( this.matrixWorld );
-
-							var distance = raycaster.ray.origin.distanceTo( intersectPoint );
-
-							intersects.push( {
-
-								distance: distance,
-								distanceToRay: rayPointDistance,
-								point: intersectPoint.clone(),
-								index: a,
-								face: null,
-								object: this
-
-							} );
-
-						}
+						
+						testPoint( position, a );
 
 					}
 
@@ -13994,33 +14001,13 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				for ( var i = 0; i < pointCount; i ++ ) {
 
-					pos.set(
+					position.set(
 						positions[ 3 * i ],
 						positions[ 3 * i + 1 ],
 						positions[ 3 * i + 2 ]
 					);
 
-					var rayPointDistance = ray.distanceToPoint( pos );
-
-					if ( rayPointDistance < localThreshold ) {
-
-						var intersectPoint = ray.closestPointToPoint( pos );
-						intersectPoint.applyMatrix4( this.matrixWorld );
-
-						var distance = raycaster.ray.origin.distanceTo( intersectPoint );
-
-						intersects.push( {
-
-							distance: distance,
-							distanceToRay: rayPointDistance,
-							point: intersectPoint.clone(),
-							index: i,
-							face: null,
-							object: this
-
-						} );
-
-					}
+					testPoint( position, i );
 
 				}
 
@@ -14032,29 +14019,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 			for ( var i = 0; i < vertices.length; i ++ ) {
 
-				pos = vertices[ i ];
-
-				var rayPointDistance = ray.distanceToPoint( pos );
-
-				if ( rayPointDistance < localThreshold ) {
-
-					var intersectPoint = ray.closestPointToPoint( pos );
-					intersectPoint.applyMatrix4( this.matrixWorld );
-
-					var distance = raycaster.ray.origin.distanceTo( intersectPoint );
-
-					intersects.push( {
-
-						distance: distance,
-						distanceToRay: rayPointDistance,
-						point: intersectPoint.clone(),
-						index: i,
-						face: null,
-						object: this
-
-					} );
-
-				}
+				testPoint( vertices[ i ], i );
 
 			}
 
