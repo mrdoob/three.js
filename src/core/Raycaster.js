@@ -60,7 +60,7 @@
 			
 				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
 				
-					return intersects;
+					return;
 					
 				}
 				
@@ -222,7 +222,7 @@
 
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
-				return intersects;
+				return;
 
 			}
 
@@ -235,7 +235,7 @@
 
 				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
 
-					return intersects;
+					return;
 
 				}
 
@@ -245,7 +245,7 @@
 
 				var material = object.material;
 
-				if ( material === undefined ) return intersects;
+				if ( material === undefined ) return;
 
 				var attributes = geometry.attributes;
 
@@ -497,7 +497,7 @@
 			
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
-				return intersects;
+				return;
 
 			}
 			

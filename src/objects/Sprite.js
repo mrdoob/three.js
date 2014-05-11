@@ -35,7 +35,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 		if ( distance > this.scale.x ) {
 
-			return intersects;
+			return;
 
 		}
 
@@ -50,7 +50,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 		
 	};
 
-} )();
+}() );
 
 THREE.Sprite.prototype.updateMatrix = function () {
 
