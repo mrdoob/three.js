@@ -204,10 +204,7 @@
 
 		} else if ( object instanceof THREE.LOD ) {
 
-			matrixPosition.setFromMatrixPosition( object.matrixWorld );
-			var distance = raycaster.ray.origin.distanceTo( matrixPosition );
-
-			intersectObject( object.getObjectForDistance( distance ), raycaster, intersects );
+			object.raycast( raycaster, intersects );
 
 		} else if ( object instanceof THREE.Mesh ) {
 
