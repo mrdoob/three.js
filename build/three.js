@@ -7026,13 +7026,19 @@ THREE.EventDispatcher.prototype = {
 
 	};
 
-	var intersectDescendants = function ( object, raycaster, intersects ) {
+	var intersectObject = function ( object, raycaster, intersects, recursive ) {
 
-		var descendants = object.getDescendants();
+		object.raycast( raycaster, intersects );
 
-		for ( var i = 0, l = descendants.length; i < l; i ++ ) {
+		if ( recursive === true ) {
 
-			descendants[ i ].raycast( raycaster, intersects );
+			var children = object.children;
+
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+				intersectObject( children[ i ], raycaster, intersects, true );
+
+			}
 
 		}
 
@@ -7053,14 +7059,8 @@ THREE.EventDispatcher.prototype = {
 	THREE.Raycaster.prototype.intersectObject = function ( object, recursive ) {
 
 		var intersects = [];
-
-		object.raycast( this, intersects );
-
-		if ( recursive === true ) {
-
-			intersectDescendants( object, this, intersects );
-
-		}
+		
+		intersectObject( object, this, intersects, recursive );
 
 		intersects.sort( descSort );
 
@@ -7074,15 +7074,7 @@ THREE.EventDispatcher.prototype = {
 
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-			var object = objects[ i ];
-			
-			object.raycast( this, intersects );
-
-			if ( recursive === true ) {
-
-				intersectDescendants( object, this, intersects );
-
-			}
+			intersectObject( objects[ i ], this, intersects, recursive );
 
 		}
 
@@ -7572,22 +7564,6 @@ THREE.Object3D.prototype = {
 
 		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name, recursive );
-
-	},
-
-	getDescendants: function ( array ) {
-
-		if ( array === undefined ) array = [];
-
-		Array.prototype.push.apply( array, this.children );
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].getDescendants( array );
-
-		}
-
-		return array;
 
 	},
 
