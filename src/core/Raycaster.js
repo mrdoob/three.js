@@ -297,11 +297,11 @@
 					}
 
 					if ( material.side === THREE.BackSide ) {
-							
+
 						var intersectionPoint = localRay.intersectTriangle( c, b, a, true );
 
 					} else {
-								
+
 						var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
 
 					}
@@ -330,62 +330,7 @@
 
 		} else if ( object instanceof THREE.Line ) {
 
-			var precision = raycaster.linePrecision;
-			var precisionSq = precision * precision;
-
-			var geometry = object.geometry;
-
-			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
-			// Checking boundingSphere distance to ray
-
-			sphere.copy( geometry.boundingSphere );
-			sphere.applyMatrix4( object.matrixWorld );
-			
-			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
-
-				return;
-
-			}
-			
-			inverseMatrix.getInverse( object.matrixWorld );
-			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
-
-			/* if ( geometry instanceof THREE.BufferGeometry ) {
-
-			} else */ if ( geometry instanceof THREE.Geometry ) {
-
-				var vertices = geometry.vertices;
-				var nbVertices = vertices.length;
-				var interSegment = new THREE.Vector3();
-				var interRay = new THREE.Vector3();
-				var step = object.type === THREE.LineStrip ? 1 : 2;
-
-				for ( var i = 0; i < nbVertices - 1; i = i + step ) {
-
-					var distSq = localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
-
-					if ( distSq > precisionSq ) continue;
-
-					var distance = localRay.origin.distanceTo( interRay );
-
-					if ( distance < raycaster.near || distance > raycaster.far ) continue;
-
-					intersects.push( {
-
-						distance: distance,
-						// What do we want? intersection point on the ray or on the segment??
-						// point: raycaster.ray.at( distance ),
-						point: interSegment.clone().applyMatrix4( object.matrixWorld ),
-						face: null,
-						faceIndex: null,
-						object: object
-
-					} );
-
-				}
-
-			}
+			object.raycast( raycaster, intersects );
 
 		}
 

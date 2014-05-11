@@ -17,8 +17,8 @@ THREE.PointCloud.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.PointCloud.prototype.raycast = ( function () {
 
-	var ray = new THREE.Ray();
 	var inverseMatrix = new THREE.Matrix4();
+	var ray = new THREE.Ray();
 
 	return function ( raycaster, intersects ) {
 
