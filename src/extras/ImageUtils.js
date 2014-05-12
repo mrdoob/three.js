@@ -669,6 +669,7 @@ THREE.ImageUtils = {
 
 		var texture = new THREE.CompressedTexture();
 		texture.image = images;
+
 		if ( mapping !== undefined ) texture.mapping = mapping;
 
 		// no flipping for cube textures
@@ -681,53 +682,45 @@ THREE.ImageUtils = {
 
 		texture.generateMipmaps = false;
 
-		{
-			var request = new XMLHttpRequest();
+		var loader = new THREE.XHRLoader();
+		loader.setResponseType( 'arraybuffer' );
+		loader.load( url, function ( buffer ) {
 
-			request.onload = function( ) {
+			var dds = THREE.ImageUtils.parseDDS( buffer, true );
 
-				var buffer = request.response;
-				var dds = THREE.ImageUtils.parseDDS( buffer, true );
+			if ( dds.isCubemap ) {
 
-				if ( dds.isCubemap ) {
+				var faces = dds.mipmaps.length / dds.mipmapCount;
 
-					var faces = dds.mipmaps.length / dds.mipmapCount;
+				for ( var f = 0; f < faces; f ++ ) {
 
-					for ( var f = 0; f < faces; f ++ ) {
+					images[ f ] = { mipmaps : [] };
 
-						images[ f ] = { mipmaps : [] };
+					for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
-						for ( var i = 0; i < dds.mipmapCount; i ++ ) {
-
-							images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
-							images[ f ].format = dds.format;
-							images[ f ].width = dds.width;
-							images[ f ].height = dds.height;
-
-						}
+						images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
+						images[ f ].format = dds.format;
+						images[ f ].width = dds.width;
+						images[ f ].height = dds.height;
 
 					}
 
-
-				} else {
-					texture.image.width = dds.width;
-					texture.image.height = dds.height;
-					texture.mipmaps = dds.mipmaps;
 				}
 
-				texture.format = dds.format;
-				texture.needsUpdate = true;
-				if ( onLoad ) onLoad( texture );
+			} else {
+
+				texture.image.width = dds.width;
+				texture.image.height = dds.height;
+				texture.mipmaps = dds.mipmaps;
 
 			}
 
-			request.onerror = onError;
+			texture.format = dds.format;
+			texture.needsUpdate = true;
 
-			request.open( 'GET', url, true );
-			request.responseType = "arraybuffer";
-			request.send( null );
+			if ( onLoad ) onLoad( texture );
 
-		}
+		} );
 
 		return texture;
 

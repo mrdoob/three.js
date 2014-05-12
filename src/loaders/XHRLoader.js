@@ -27,14 +27,15 @@ THREE.XHRLoader.prototype = {
 		}
 
 		var request = new XMLHttpRequest();
+		request.open( 'GET', url, true );
 
 		if ( onLoad !== undefined ) {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				scope.cache.add( url, event.target.responseText );
+				scope.cache.add( url, this.response );
 
-				onLoad( event.target.responseText );
+				onLoad( this.response );
 				scope.manager.itemEnd( url );
 
 			}, false );
@@ -62,11 +63,17 @@ THREE.XHRLoader.prototype = {
 		}
 
 		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
+		if ( this.responseType !== undefined ) request.responseType = this.responseType;
 
-		request.open( 'GET', url, true );
 		request.send( null );
 
 		scope.manager.itemStart( url );
+
+	},
+
+	setResponseType: function ( value ) {
+
+		this.responseType = value;
 
 	},
 
