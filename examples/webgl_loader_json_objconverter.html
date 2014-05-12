@@ -36,6 +36,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -181,6 +182,8 @@
 
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
+
+				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var loader = new THREE.JSONLoader();
 				var callbackMale = function ( geometry, materials ) { createScene( geometry, materials, 90, FLOOR, 50, 105 ) };

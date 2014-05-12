@@ -3433,10 +3433,7 @@ THREE.ColladaLoader = function () {
 		if (this['transparency'] !== undefined && this['transparent'] !== undefined) {
 			// convert transparent color RBG to average value
 			var transparentColor = this['transparent'];
-			var transparencyLevel = (this.transparent.color.r +
-										this.transparent.color.g +
-										this.transparent.color.b)
-										/ 3 * this.transparency;
+			var transparencyLevel = (this.transparent.color.r + this.transparent.color.g + this.transparent.color.b) / 3 * this.transparency;
 
 			if (transparencyLevel > 0) {
 				transparent = true;
@@ -3482,20 +3479,29 @@ THREE.ColladaLoader = function () {
 								var image = images[surface.init_from];
 
 								if (image) {
-                                                                        var texture = null;
-                                                                        var isCompressed = /\.dds$/i.test( image.init_from );
-                                                                        var isTGA = /\.tga$/i.test( image.init_from );
-                                                                        
-                                                                        if ( isCompressed ) {
-                                                                            texture = THREE.ImageUtils.loadCompressedTexture( baseUrl + image.init_from );
-                                                                        }
-                                                                        else if ( isTGA ) {
-                                                                            texture = THREE.ImageUtils.loadTGATexture( baseUrl + image.init_from );
-                                                                        }
-                                                                        else {
-                                                                            texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-                                                                        }
-                                                                        									
+
+									var url = baseUrl + image.init_from;
+
+									var texture;
+									var loader = THREE.Loader.Handlers.get( url );
+
+									if ( loader !== null ) {
+
+										texture = loader.load( url );
+
+									} else {
+
+										texture = new THREE.Texture( new Image() );
+										loader = new THREE.ImageLoader();
+										loader.load( url, function ( image ) {
+
+											texture.image = image;
+											texture.needsUpdate = true;
+
+										} );
+
+									}
+									
 									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.offset.x = cot.texOpts.offsetU;

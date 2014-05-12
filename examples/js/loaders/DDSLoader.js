@@ -27,45 +27,55 @@ THREE.DDSLoader.prototype = {
 
 		texture.generateMipmaps = false;
 
-		var loader = new THREE.XHRLoader();
-		loader.setResponseType( 'arraybuffer' );
-		loader.load( url, function ( buffer ) {
+		if ( url instanceof Array ) {
 
-			var dds = scope.parse( buffer, true );
-
-			if ( dds.isCubemap ) {
-
-				var faces = dds.mipmaps.length / dds.mipmapCount;
-
-				for ( var f = 0; f < faces; f ++ ) {
-
-					images[ f ] = { mipmaps : [] };
-
-					for ( var i = 0; i < dds.mipmapCount; i ++ ) {
-
-						images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
-						images[ f ].format = dds.format;
-						images[ f ].width = dds.width;
-						images[ f ].height = dds.height;
-
-					}
-
-				}
-
-			} else {
-
-				texture.image.width = dds.width;
-				texture.image.height = dds.height;
-				texture.mipmaps = dds.mipmaps;
-
-			}
-
-			texture.format = dds.format;
-			texture.needsUpdate = true;
+			// TODO
 
 			if ( onLoad ) onLoad( texture );
 
-		} );
+		} else {
+
+			var loader = new THREE.XHRLoader();
+			loader.setResponseType( 'arraybuffer' );
+			loader.load( url, function ( buffer ) {
+
+				var dds = scope.parse( buffer, true );
+
+				if ( dds.isCubemap ) {
+
+					var faces = dds.mipmaps.length / dds.mipmapCount;
+
+					for ( var f = 0; f < faces; f ++ ) {
+
+						images[ f ] = { mipmaps : [] };
+
+						for ( var i = 0; i < dds.mipmapCount; i ++ ) {
+
+							images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
+							images[ f ].format = dds.format;
+							images[ f ].width = dds.width;
+							images[ f ].height = dds.height;
+
+						}
+
+					}
+
+				} else {
+
+					texture.image.width = dds.width;
+					texture.image.height = dds.height;
+					texture.mipmaps = dds.mipmaps;
+
+				}
+
+				texture.format = dds.format;
+				texture.needsUpdate = true;
+
+				if ( onLoad ) onLoad( texture );
+
+			} );
+
+		}
 
 		return texture;
 
