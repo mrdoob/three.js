@@ -638,41 +638,29 @@ THREE.ImageUtils = {
 
         loadTGATexture: function ( url, mapping, onLoad, onError ) {
                
-                var texture = new THREE.DataTexture();                
-                {
-                    var request = new XMLHttpRequest();
+            var texture = new THREE.DataTexture();
 
-                    request.open( 'GET', url, true );
-                    request.responseType = "arraybuffer";
-                    
-                    request.addEventListener( 'load', function ( event ) {
+            var loader = new THREE.XHRLoader();
+            loader.setResponseType( 'arraybuffer' );
+            loader.load( url, function ( buffer ) {
 
-                            var imageData = THREE.ImageUtils.decodeTGA( this.response );
+                var imageData = THREE.ImageUtils.decodeTGA( buffer );
 
-                            if ( imageData ) {
-                                texture.image = imageData;
-                                texture.sourceFile = url;
-                                texture.needsUpdate = true;
+                if ( imageData ) {
+                    texture.image = imageData;
+                    texture.sourceFile = url;
+                    texture.needsUpdate = true;
 
-                                if ( onLoad ) onLoad( texture );
+                    if ( onLoad ) onLoad( texture );
+				}            	
 
-                            }
+            } );
+	              
+			texture.sourceFile = url;
 
-			}, false );
-                        
-                    request.addEventListener( 'error', function ( event ) {
+			return texture;
 
-                            if ( onError ) onError( event );
-
-			}, false );
-                    
-                    request.send(null);
-                }
-              
-		texture.sourceFile = url;
-
-		return texture;
-        },
+	    },
 
 	loadDDSTexture: function ( url, mapping, onLoad, onError ) {
 
