@@ -13,7 +13,6 @@ THREE.DDSLoader.prototype = {
 		var scope = this;
 
 		var images = [];
-		images.loadCount = 0;
 
 		var texture = new THREE.CompressedTexture();
 		texture.image = images;

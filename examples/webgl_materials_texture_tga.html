@@ -31,6 +31,8 @@
 				<a href="http://threejs.org" target="_blank">three.js</a> - tga texture example
 		</div>
 		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/TGALoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		
@@ -69,8 +71,10 @@
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 				
+				var loader = new THREE.TGALoader();
+
 				// add box 1 - grey8 texture
-				var texture1 = THREE.ImageUtils.loadTGATexture( "textures/crate_grey8.tga" );
+				var texture1 = loader.load( 'textures/crate_grey8.tga' );
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 				
 				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
@@ -81,7 +85,7 @@
 				scene.add( mesh1 );
 				
 				// add box 2 - tga texture
-				var texture2 = THREE.ImageUtils.loadTGATexture( "textures/crate_color8.tga" );
+				var texture2 = loader.load( 'textures/crate_color8.tga' );
 				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 					   
 				var mesh2 = new THREE.Mesh( geometry, material2 );
