@@ -11128,21 +11128,58 @@ THREE.Loader.prototype = {
 
 			var fullPath = texturePath + sourceFile;
 
-			where[ name ] = new THREE.Texture( document.createElement( 'canvas' ) );
-			where[ name ].sourceFile = sourceFile;
+			var texture;
+
+			var loader = THREE.Loader.Handlers.get( fullPath );
+
+			if ( loader !== null ) {
+
+				texture = loader.load( fullPath );
+
+			} else {
+
+				texture = new THREE.Texture( document.createElement( 'canvas' ) );
+
+				loader = scope.imageLoader;
+				loader.crossOrigin = scope.crossOrigin;
+				loader.load( fullPath, function ( image ) {
+
+					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
+						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
+
+						var width = nearest_pow2( image.width );
+						var height = nearest_pow2( image.height );
+
+						texture.image.width = width;
+						texture.image.height = height;
+						texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
+
+					} else {
+
+						texture.image = image;
+
+					}
+
+					texture.needsUpdate = true;
+
+				} );
+
+			}
+
+			texture.sourceFile = sourceFile;
 
 			if ( repeat ) {
 
-				where[ name ].repeat.set( repeat[ 0 ], repeat[ 1 ] );
+				texture.repeat.set( repeat[ 0 ], repeat[ 1 ] );
 
-				if ( repeat[ 0 ] !== 1 ) where[ name ].wrapS = THREE.RepeatWrapping;
-				if ( repeat[ 1 ] !== 1 ) where[ name ].wrapT = THREE.RepeatWrapping;
+				if ( repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
+				if ( repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
 
 			}
 
 			if ( offset ) {
 
-				where[ name ].offset.set( offset[ 0 ], offset[ 1 ] );
+				texture.offset.set( offset[ 0 ], offset[ 1 ] );
 
 			}
 
@@ -11153,41 +11190,18 @@ THREE.Loader.prototype = {
 					"mirror": THREE.MirroredRepeatWrapping
 				}
 
-				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) where[ name ].wrapS = wrapMap[ wrap[ 0 ] ];
-				if ( wrapMap[ wrap[ 1 ] ] !== undefined ) where[ name ].wrapT = wrapMap[ wrap[ 1 ] ];
+				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ wrap[ 0 ] ];
+				if ( wrapMap[ wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ wrap[ 1 ] ];
 
 			}
 
 			if ( anisotropy ) {
 
-				where[ name ].anisotropy = anisotropy;
+				texture.anisotropy = anisotropy;
 
 			}
 
-			var texture = where[ name ];
-
-			scope.imageLoader.crossOrigin = scope.crossOrigin;
-			scope.imageLoader.load( fullPath, function ( image ) {
-
-				if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
-					 THREE.Math.isPowerOfTwo( image.height ) === false ) {
-
-					var width = nearest_pow2( image.width );
-					var height = nearest_pow2( image.height );
-
-					texture.image.width = width;
-					texture.image.height = height;
-					texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
-
-				} else {
-
-					texture.image = image;
-
-				}
-
-				texture.needsUpdate = true;
-
-			} );
+			where[ name ] = texture;
 
 		}
 
@@ -11427,6 +11441,37 @@ THREE.Loader.prototype = {
 		if ( m.DbgName !== undefined ) material.name = m.DbgName;
 
 		return material;
+
+	}
+
+};
+
+THREE.Loader.Handlers = {
+
+	handlers: [],
+
+	add: function ( regex, loader ) {
+
+		this.handlers.push( regex, loader );
+
+	},
+
+	get: function ( file ) {
+
+		for ( var i = 0, l = this.handlers.length; i < l; i += 2 ) {
+
+			var regex = this.handlers[ i ];
+			var loader  = this.handlers[ i + 1 ];
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
 
 	}
 
