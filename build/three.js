@@ -27487,24 +27487,19 @@ THREE.ImageUtils = {
 
                     request.open( 'GET', url, true );
                     request.responseType = "arraybuffer";
-                    request.onload = function() {
-                        if ( this.status === 200 ) {
+                    
+                    request.addEventListener( 'load', function ( event ) {
+
                             var imageData = THREE.ImageUtils.decodeTGA( this.response );
 
                             if ( imageData ) {
                                 texture.image = imageData;
                                 texture.sourceFile = url;
                                 texture.needsUpdate = true;
-                                
-                                return texture;
+
+                                if ( onLoad ) onLoad( texture );
+
                             }
-
-                        }
-                    };
-                    
-                    request.addEventListener( 'load', function ( event ) {
-
-                            if ( onLoad ) onLoad( texture );
 
 			}, false );
                         
