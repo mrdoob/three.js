@@ -114,33 +114,12 @@ THREE.Loader.prototype = {
 
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
-			var isCompressed = /\.dds$/i.test( sourceFile );
-                        var isTGA = /\.tga$/i.test( sourceFile );
-
 			var fullPath = texturePath + sourceFile;
 
-			if ( isCompressed ) {
-
-				var texture = THREE.ImageUtils.loadCompressedTexture( fullPath );
-
-				where[ name ] = texture;
-
-			} else if ( isTGA ) {
-                            
-                                var texture = THREE.ImageUtils.loadTGATexture( fullPath );
-
-				where[ name ] = texture;
-                        } else {
-
-				var texture = document.createElement( 'canvas' );
-
-				where[ name ] = new THREE.Texture( texture );
-
-			}
-
+			where[ name ] = new THREE.Texture( document.createElement( 'canvas' ) );
 			where[ name ].sourceFile = sourceFile;
 
-			if( repeat ) {
+			if ( repeat ) {
 
 				where[ name ].repeat.set( repeat[ 0 ], repeat[ 1 ] );
 
@@ -173,34 +152,30 @@ THREE.Loader.prototype = {
 
 			}
 
-			if ( ! isCompressed ) {
+			var texture = where[ name ];
 
-				var texture = where[ name ];
+			scope.imageLoader.crossOrigin = scope.crossOrigin;
+			scope.imageLoader.load( fullPath, function ( image ) {
 
-				scope.imageLoader.crossOrigin = scope.crossOrigin;
-				scope.imageLoader.load( fullPath, function ( image ) {
+				if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
+					 THREE.Math.isPowerOfTwo( image.height ) === false ) {
 
-					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
-						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
+					var width = nearest_pow2( image.width );
+					var height = nearest_pow2( image.height );
 
-						var width = nearest_pow2( image.width );
-						var height = nearest_pow2( image.height );
+					texture.image.width = width;
+					texture.image.height = height;
+					texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
 
-						texture.image.width = width;
-						texture.image.height = height;
-						texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
+				} else {
 
-					} else {
+					texture.image = image;
 
-						texture.image = image;
+				}
 
-					}
+				texture.needsUpdate = true;
 
-					texture.needsUpdate = true;
-
-				} );
-
-			}
+			} );
 
 		}
 
