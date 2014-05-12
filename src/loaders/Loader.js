@@ -115,6 +115,7 @@ THREE.Loader.prototype = {
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
 			var isCompressed = /\.dds$/i.test( sourceFile );
+                        var isTGA = /\.tga$/i.test( sourceFile );
 
 			var fullPath = texturePath + sourceFile;
 
@@ -124,7 +125,12 @@ THREE.Loader.prototype = {
 
 				where[ name ] = texture;
 
-			} else {
+			} else if ( isTGA ) {
+                            
+                                var texture = THREE.ImageUtils.loadTGATexture( fullPath );
+
+				where[ name ] = texture;
+                        } else {
 
 				var texture = document.createElement( 'canvas' );
 

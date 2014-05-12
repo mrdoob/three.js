@@ -364,12 +364,19 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
 		var isCompressed = /\.dds$/i.test( url );
+                var isTGA = /\.tga$/i.test( url );
 
 		if ( isCompressed ) {
 
 			var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
 
-		} else {
+		}  
+                else if ( isTGA ) {
+                        
+                        var texture = THREE.ImageUtils.loadTGATexture( url, mapping, onLoad, onError );
+                        
+                }
+                else {
 
 			var image = new Image();
 			var texture = new THREE.Texture( image, mapping );
