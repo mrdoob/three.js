@@ -114,65 +114,23 @@ THREE.Loader.prototype = {
 
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
-			var isCompressed = /\.dds$/i.test( sourceFile );
-
 			var fullPath = texturePath + sourceFile;
 
-			if ( isCompressed ) {
+			var texture;
 
-				var texture = THREE.ImageUtils.loadCompressedTexture( fullPath );
+			var loader = THREE.Loader.Handlers.get( fullPath );
 
-				where[ name ] = texture;
+			if ( loader !== null ) {
+
+				texture = loader.load( fullPath );
 
 			} else {
 
-				var texture = document.createElement( 'canvas' );
+				texture = new THREE.Texture( document.createElement( 'canvas' ) );
 
-				where[ name ] = new THREE.Texture( texture );
-
-			}
-
-			where[ name ].sourceFile = sourceFile;
-
-			if( repeat ) {
-
-				where[ name ].repeat.set( repeat[ 0 ], repeat[ 1 ] );
-
-				if ( repeat[ 0 ] !== 1 ) where[ name ].wrapS = THREE.RepeatWrapping;
-				if ( repeat[ 1 ] !== 1 ) where[ name ].wrapT = THREE.RepeatWrapping;
-
-			}
-
-			if ( offset ) {
-
-				where[ name ].offset.set( offset[ 0 ], offset[ 1 ] );
-
-			}
-
-			if ( wrap ) {
-
-				var wrapMap = {
-					"repeat": THREE.RepeatWrapping,
-					"mirror": THREE.MirroredRepeatWrapping
-				}
-
-				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) where[ name ].wrapS = wrapMap[ wrap[ 0 ] ];
-				if ( wrapMap[ wrap[ 1 ] ] !== undefined ) where[ name ].wrapT = wrapMap[ wrap[ 1 ] ];
-
-			}
-
-			if ( anisotropy ) {
-
-				where[ name ].anisotropy = anisotropy;
-
-			}
-
-			if ( ! isCompressed ) {
-
-				var texture = where[ name ];
-
-				scope.imageLoader.crossOrigin = scope.crossOrigin;
-				scope.imageLoader.load( fullPath, function ( image ) {
+				loader = scope.imageLoader;
+				loader.crossOrigin = scope.crossOrigin;
+				loader.load( fullPath, function ( image ) {
 
 					if ( THREE.Math.isPowerOfTwo( image.width ) === false ||
 						 THREE.Math.isPowerOfTwo( image.height ) === false ) {
@@ -195,6 +153,43 @@ THREE.Loader.prototype = {
 				} );
 
 			}
+
+			texture.sourceFile = sourceFile;
+
+			if ( repeat ) {
+
+				texture.repeat.set( repeat[ 0 ], repeat[ 1 ] );
+
+				if ( repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
+				if ( repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
+
+			}
+
+			if ( offset ) {
+
+				texture.offset.set( offset[ 0 ], offset[ 1 ] );
+
+			}
+
+			if ( wrap ) {
+
+				var wrapMap = {
+					"repeat": THREE.RepeatWrapping,
+					"mirror": THREE.MirroredRepeatWrapping
+				}
+
+				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ wrap[ 0 ] ];
+				if ( wrapMap[ wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ wrap[ 1 ] ];
+
+			}
+
+			if ( anisotropy ) {
+
+				texture.anisotropy = anisotropy;
+
+			}
+
+			where[ name ] = texture;
 
 		}
 
@@ -434,6 +429,37 @@ THREE.Loader.prototype = {
 		if ( m.DbgName !== undefined ) material.name = m.DbgName;
 
 		return material;
+
+	}
+
+};
+
+THREE.Loader.Handlers = {
+
+	handlers: [],
+
+	add: function ( regex, loader ) {
+
+		this.handlers.push( regex, loader );
+
+	},
+
+	get: function ( file ) {
+
+		for ( var i = 0, l = this.handlers.length; i < l; i += 2 ) {
+
+			var regex = this.handlers[ i ];
+			var loader  = this.handlers[ i + 1 ];
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
 
 	}
 

@@ -65,7 +65,7 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 THREE.ParticleSystemMaterial = function ( parameters ) {
 
-	console.warn( 'THREE.ParticleSystemMaterial has been DEPRECATED. Use THREE.PointCloudMaterial instead.' );
+	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
 	return new THREE.PointCloudMaterial( parameters );
 
 }

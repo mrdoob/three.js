@@ -114,14 +114,14 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
+				uniforms:       uniforms,
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-				blending: 		THREE.AdditiveBlending,
-				depthTest: 		false,
-				transparent:	true
+				blending:       THREE.AdditiveBlending,
+				depthTest:      false,
+				transparent:    true
 
 			});
 
@@ -152,11 +152,11 @@
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
-			geometry.addAttribute( 'customColor', new THREE.Float32Attribute( values_color, 3 ) );
-			geometry.addAttribute( 'size', new THREE.Float32Attribute( values_size, 1 ) );
+			geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'customColor', new THREE.BufferAttribute( values_color, 3 ) );
+			geometry.addAttribute( 'size', new THREE.BufferAttribute( values_size, 1 ) );
 
-			particleSystem = new THREE.ParticleSystem( geometry, shaderMaterial );
+			particleSystem = new THREE.PointCloud( geometry, shaderMaterial );
 
 			scene.add( particleSystem );
 

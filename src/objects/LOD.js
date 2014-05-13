@@ -52,6 +52,22 @@ THREE.LOD.prototype.getObjectForDistance = function ( distance ) {
 
 };
 
+THREE.LOD.prototype.raycast = ( function () {
+
+	var matrixPosition = new THREE.Vector3();
+
+	return function ( raycaster, intersects ) {
+
+		matrixPosition.setFromMatrixPosition( this.matrixWorld );
+
+		var distance = raycaster.ray.origin.distanceTo( matrixPosition );
+
+		this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+
+	};
+
+}() );
+
 THREE.LOD.prototype.update = function () {
 
 	var v1 = new THREE.Vector3();

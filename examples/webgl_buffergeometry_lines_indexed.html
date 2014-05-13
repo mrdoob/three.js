@@ -182,9 +182,9 @@
 				);
 				// --------------------------------
 
-				geometry.addAttribute( 'index', new THREE.Uint16Attribute( indices_array, 1 ) );
-				geometry.addAttribute( 'position', new THREE.Float32Attribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32Attribute( colors, 3 ) );
+				geometry.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array( indices_array ), 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 				geometry.computeBoundingSphere();
 
 				mesh = new THREE.Line( geometry, material, THREE.LinePieces );

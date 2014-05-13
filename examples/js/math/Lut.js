@@ -11,9 +11,9 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 	var step = 1.0 / this.n;
 
-	for ( var i = 0; i <= 1; i+=step ) {
+	for ( var i = 0; i <= 1; i += step ) {
 
-		for ( var j = 0; j < this.map.length - 1; j++ ) {
+		for ( var j = 0; j < this.map.length - 1; j ++ ) {
 
 			if ( i >= this.map[ j ][ 0 ] && i < this.map[ j + 1 ][ 0 ] ) {
 
@@ -28,9 +28,9 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 				this.lut.push(color);
 
-			}         
+			}
 
-		}   
+		}
 
 	}
 
@@ -88,7 +88,7 @@ THREE.Lut.prototype = {
 
 	},
 
-  copy: function ( lut ) {
+	copy: function ( lut ) {
 
 		this.lut = lut.lut;
 		this.mapname = lut.mapname;
@@ -101,371 +101,362 @@ THREE.Lut.prototype = {
 
 	},
 
-  getColor: function ( alpha ) {
+	getColor: function ( alpha ) {
 
-	if ( alpha <= this.minV ) {
+		if ( alpha <= this.minV ) {
 
-		alpha = this.minV;
+			alpha = this.minV;
 
-	}   
+		} else if ( alpha >= this.maxV ) {
 
-	 else if ( alpha >= this.maxV ) {
+			alpha = this.maxV;
 
-		alpha = this.maxV;
+		}
 
-	}
+		alpha = ( alpha - this.minV ) / ( this.maxV - this.minV );
 
-	alpha = ( alpha - this.minV ) / ( this.maxV - this.minV );
+		var colorPosition = Math.round ( alpha * this.n );
+		colorPosition == this.n ? colorPosition -= 1 : colorPosition;
 
-	var colorPosition = Math.round ( alpha * this.n );
-	colorPosition == this.n ? colorPosition -= 1 : colorPosition;
+		return this.lut[ colorPosition ];
 
-	return this.lut[ colorPosition ];
+	},
 
-  },
+	addColorMap: function ( colormapName, arrayOfColors ) {
 
-  addColorMap: function ( colormapName, arrayOfColors ) {
+		THREE.ColorMapKeywords[ colormapName ] = arrayOfColors;
 
-	THREE.ColorMapKeywords[ colormapName ] = arrayOfColors;
+	},
 
-  },
+	setLegendOn: function ( parameters ) {
 
-  setLegendOn: function ( parameters ) {
+		if ( parameters === undefined ) { parameters = {}; }
 
-	if ( parameters === undefined ) { parameters = {}; }
+		this.legend = {};
 
-	this.legend = {};
+		this.legend.layout = parameters.hasOwnProperty( 'layout' ) ? parameters[ 'layout' ] : 'vertical';
 
-	this.legend.layout = parameters.hasOwnProperty( 'layout' ) ? parameters[ 'layout' ] : 'vertical';
+		this.legend.position = parameters.hasOwnProperty( 'position' ) ? parameters[ 'position' ] : { 'x': 21.5, 'y': 8, 'z': 5 };
 
-	this.legend.position = parameters.hasOwnProperty( 'position' ) ? parameters[ 'position' ] : { 'x': 21.5, 'y': 8, 'z': 5 };
+		this.legend.dimensions = parameters.hasOwnProperty( 'dimensions' ) ? parameters[ 'dimensions' ] : { 'width': 0.5, 'height': 3 };
 
-	this.legend.dimensions = parameters.hasOwnProperty( 'dimensions' ) ? parameters[ 'dimensions' ] : { 'width': 0.5, 'height': 3 };
+		this.legend.canvas = document.createElement( 'canvas' );
 
-	this.legend.canvas = document.createElement( 'canvas' );
+		this.legend.canvas.setAttribute( 'id', 'legend' );
+		this.legend.canvas.setAttribute( 'hidden', true );
 
-	this.legend.canvas.setAttribute( 'id', 'legend' );
-	this.legend.canvas.setAttribute( 'hidden', true );
+		document.body.appendChild( this.legend.canvas );
 
-	document.body.appendChild( this.legend.canvas );
+		this.legend.ctx = this.legend.canvas.getContext( '2d' );
 
-	this.legend.ctx = this.legend.canvas.getContext( '2d' );
+		this.legend.canvas.setAttribute( 'width',  1 );
+		this.legend.canvas.setAttribute( 'height', this.n );
 
-	this.legend.canvas.setAttribute( 'width',  1 );
-	this.legend.canvas.setAttribute( 'height', this.n );
+		this.legend.texture = new THREE.Texture( this.legend.canvas );
 
-	this.legend.texture = new THREE.Texture( this.legend.canvas );
+		imageData = this.legend.ctx.getImageData( 0, 0, 1, this.n );
 
-	imageData = this.legend.ctx.getImageData( 0, 0, 1, this.n );
+		data = imageData.data;
+		len = data.length;
 
-	data = imageData.data;
-	len = data.length;
+		this.map = THREE.ColorMapKeywords[ this.mapname ];
 
-	this.map = THREE.ColorMapKeywords[ this.mapname ];
+		var k = 0;
 
-	var k = 0;
+		var step = 1.0 / this.n;
 
-	var step = 1.0 / this.n;
+		for ( var i = 1; i >= 0; i-=step ) {
 
-	for ( var i = 1; i >= 0; i-=step ) {
+			for ( var j = this.map.length - 1; j >= 0; j-- ) {
 
-		for ( var j = this.map.length - 1; j >= 0; j-- ) {
+				if ( i < this.map[ j ][ 0 ] && i >= this.map[ j - 1 ][ 0 ]  ) {
 
-			if ( i < this.map[ j ][ 0 ] && i >= this.map[ j - 1 ][ 0 ]  ) {
+					var min = this.map[ j - 1 ][ 0 ];
+					var max = this.map[ j ][ 0 ];
+					var color = new THREE.Color( 0xffffff );
+					var minColor = new THREE.Color( 0xffffff ).setHex( this.map[ j - 1][ 1 ] );
+					var maxColor = new THREE.Color( 0xffffff ).setHex( this.map[ j ][ 1 ] );
+					color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
-				var min = this.map[ j - 1 ][ 0 ];
-				var max = this.map[ j ][ 0 ];
-				var color = new THREE.Color( 0xffffff );
-				var minColor = new THREE.Color( 0xffffff ).setHex( this.map[ j - 1][ 1 ] );
-				var maxColor = new THREE.Color( 0xffffff ).setHex( this.map[ j ][ 1 ] );
-				color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
+					data[ k * 4     ] = Math.round( color.r * 255 );
+					data[ k * 4 + 1 ] = Math.round( color.g * 255 );
+					data[ k * 4 + 2 ] = Math.round( color.b * 255 );
+					data[ k * 4 + 3 ] = 255;
 
-				data[ k * 4     ] = Math.round( color.r * 255 );
-				data[ k * 4 + 1 ] = Math.round( color.g * 255 );
-				data[ k * 4 + 2 ] = Math.round( color.b * 255 );
-				data[ k * 4 + 3 ] = 255;
+					k+=1;
 
-				k+=1;
+				}
 
 			}
 
 		}
 
-	}   
+		this.legend.ctx.putImageData( imageData, 0, 0 );
+		this.legend.texture.needsUpdate = true;
 
-	this.legend.ctx.putImageData( imageData, 0, 0 );
-	this.legend.texture.needsUpdate = true;
+		this.legend.legendGeometry = new THREE.PlaneGeometry( this.legend.dimensions.width , this.legend.dimensions.height );
+		this.legend.legendMaterial = new THREE.MeshBasicMaterial( { map : this.legend.texture, side : THREE.DoubleSide } );
 
-	this.legend.legendGeometry = new THREE.PlaneGeometry( this.legend.dimensions.width , this.legend.dimensions.height  );
-	this.legend.legendMaterial = new THREE.MeshBasicMaterial( { map : this.legend.texture, side : THREE.DoubleSide } );
+		this.legend.mesh = new THREE.Mesh( this.legend.legendGeometry, this.legend.legendMaterial );
 
-	this.legend.mesh = new THREE.Mesh( this.legend.legendGeometry, this.legend.legendMaterial );
+		if ( this.legend.layout == 'horizontal') {
 
-	if ( this.legend.layout == 'horizontal') {
+			this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
 
-		this.legend.mesh.rotation.z = - 90 * ( Math.PI / 180 );
+		}
 
-		this.legend.mesh.position = new THREE.Vector3( this.legend.position.x, this.legend.position.y, this.legend.position.z );
+		this.legend.mesh.position.copy( this.legend.position );
 
-	}   
+		return this.legend.mesh;
 
-	else {
+	},
 
-		this.legend.mesh.position = new THREE.Vector3( this.legend.position.x, this.legend.position.y, this.legend.position.z );
+	setLegendOff: function () {
 
-	}
+		this.legend = null;
 
-	return this.legend.mesh;
+		return this.legend;
 
-  },
+	},
 
-  setLegendOff: function () {
+	setLegendLayout: function ( layout ) {
 
-	this.legend = null;
+		if ( ! this.legend ) { return false; }
 
-	return this.legend;
+		if ( this.legend.layout == layout ) { return false; }
 
-  },
+		if ( layout != 'horizontal' && layout != 'vertical' ) { return false; }
 
-  setLegendLayout: function ( layout ) {
+		this.layout = layout;
 
-	if ( ! this.legend ) { return false; }
+		if ( layout == 'horizontal' ) {
 
-	if ( this.legend.layout == layout ) { return false; }
+			this.legend.mesh.rotation.z = 90 * ( Math.PI / 180 );
 
-	if ( layout != 'horizontal' && layout != 'vertical' ) { return false; }
+		}
 
-	this.layout = layout;
+		if ( layout == 'vertical' ) {
 
-	if ( layout == 'horizontal' ) {
+			this.legend.mesh.rotation.z = -90 * ( Math.PI / 180 );
 
-		this.legend.mesh.rotation.z = 90 * ( Math.PI / 180 );
+		}
 
-	}
+		return this.legend.mesh;
 
-	if ( layout == 'vertical' ) {
+	},
 
-		this.legend.mesh.rotation.z = -90 * ( Math.PI / 180 );
+	setLegendPosition: function ( position ) {
 
-	}
+		this.legend.position = new THREE.Vector3( position.x, position.y, position.z );
 
-	return this.legend.mesh;
+		return this.legend;
 
-  },
+	},
 
-  setLegendPosition: function ( position ) {
+	setLegendLabels: function ( parameters, callback ) {
 
-	this.legend.position = new THREE.Vector3( position.x, position.y, position.z );
+		if ( ! this.legend ) { return false; }
 
-	return this.legend;
+		if ( typeof parameters === 'function') { callback = parameters; }
 
-  },
+		if ( parameters === undefined ) { parameters = {}; }
 
+		this.legend.labels = {};
 
-  setLegendLabels: function ( parameters, callback ) {
+		this.legend.labels.fontsize = parameters.hasOwnProperty( 'fontsize' ) ? parameters[ 'fontsize' ] : 24;
 
-	if ( ! this.legend ) { return false; }
+		this.legend.labels.fontface = parameters.hasOwnProperty( 'fontface' ) ? parameters[ 'fontface' ] : 'Arial';
 
-	if ( typeof parameters === 'function') { callback = parameters; }
+		this.legend.labels.title = parameters.hasOwnProperty( 'title' ) ? parameters[ 'title' ] : '';
 
-	if ( parameters === undefined ) { parameters = {}; }
+		this.legend.labels.um = parameters.hasOwnProperty( 'um' ) ? ' [ '+ parameters[ 'um' ] + ' ]': '';
 
-	this.legend.labels = {};
+		this.legend.labels.ticks = parameters.hasOwnProperty( 'ticks' ) ? parameters[ 'ticks' ] : 0;
 
-	this.legend.labels.fontsize = parameters.hasOwnProperty( 'fontsize' ) ? parameters[ 'fontsize' ] : 24;
+		this.legend.labels.decimal = parameters.hasOwnProperty( 'decimal' ) ? parameters[ 'decimal' ] : 2;
 
-	this.legend.labels.fontface = parameters.hasOwnProperty( 'fontface' ) ? parameters[ 'fontface' ] : 'Arial';
+		this.legend.labels.notation = parameters.hasOwnProperty( 'notation' ) ? parameters[ 'notation' ] : 'standard';
 
-	this.legend.labels.title = parameters.hasOwnProperty( 'title' ) ? parameters[ 'title' ] : '';
+		var backgroundColor = { r: 255, g: 100, b: 100, a: 0.8 };
+		var borderColor =  { r: 255, g: 0, b: 0, a: 1.0 };
+		var borderThickness = 4;
 
-	this.legend.labels.um = parameters.hasOwnProperty( 'um' ) ? ' [ '+ parameters[ 'um' ] + ' ]': '';
+		var canvasTitle = document.createElement( 'canvas' );
+		var contextTitle = canvasTitle.getContext( '2d' );
 
-	this.legend.labels.ticks = parameters.hasOwnProperty( 'ticks' ) ? parameters[ 'ticks' ] : 0;
+		contextTitle.font = 'Normal ' + this.legend.labels.fontsize * 1.2 + 'px ' + this.legend.labels.fontface;
 
-	this.legend.labels.decimal = parameters.hasOwnProperty( 'decimal' ) ? parameters[ 'decimal' ] : 2;
+		var metrics = contextTitle.measureText( this.legend.labels.title.toString() + this.legend.labels.um.toString() );
+		var textWidth = metrics.width;
 
-	this.legend.labels.notation = parameters.hasOwnProperty( 'notation' ) ? parameters[ 'notation' ] : 'standard';
+		contextTitle.fillStyle   = 'rgba(' + backgroundColor.r + ',' + backgroundColor.g + ',' + backgroundColor.b + ',' + backgroundColor.a + ')';
 
-	var backgroundColor = { r: 255, g: 100, b: 100, a: 0.8 };
-	var borderColor =  { r: 255, g: 0, b: 0, a: 1.0 };
-	var borderThickness = 4;
+		contextTitle.strokeStyle = 'rgba(' + borderColor.r + ',' + borderColor.g + ',' + borderColor.b + ',' + borderColor.a + ')';
 
-	var canvasTitle = document.createElement( 'canvas' );
-	var contextTitle = canvasTitle.getContext( '2d' );
+		contextTitle.lineWidth = borderThickness;
 
-	contextTitle.font = 'Normal ' + this.legend.labels.fontsize * 1.2 + 'px ' + this.legend.labels.fontface;
+		contextTitle.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 
-	var metrics = contextTitle.measureText( this.legend.labels.title.toString() + this.legend.labels.um.toString() );
-	var textWidth = metrics.width;
+		contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
-	contextTitle.fillStyle   = 'rgba(' + backgroundColor.r + ',' + backgroundColor.g + ',' + backgroundColor.b + ',' + backgroundColor.a + ')';
+		var txtTitle = new THREE.Texture( canvasTitle );
 
-	contextTitle.strokeStyle = 'rgba(' + borderColor.r + ',' + borderColor.g + ',' + borderColor.b + ',' + borderColor.a + ')';
+		txtTitle.needsUpdate = true;
 
-	contextTitle.lineWidth = borderThickness;
+		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
 
-	contextTitle.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
+		var spriteTitle = new THREE.Sprite( spriteMaterialTitle );
 
-	contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
-
-	var txtTitle = new THREE.Texture( canvasTitle );
-
-	txtTitle.needsUpdate = true;
-
-	var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
-
-	var spriteTitle = new THREE.Sprite( spriteMaterialTitle );
-
-	spriteTitle.scale.set( 2, 1, 1.0 );
-
-	if ( this.legend.layout == 'vertical' ) {
-
-		spriteTitle.position.set( this.legend.position.x + this.legend.dimensions.width, this.legend.position.y + ( this.legend.dimensions.height * 0.45 ), this.legend.position.z );
-
-	}
-
-	if ( this.legend.layout == 'horizontal' ) {
-
-		spriteTitle.position.set( this.legend.position.x * 1.015, this.legend.position.y + ( this.legend.dimensions.height * 0.03 ), this.legend.position.z );
-
-	}
-
-	if ( this.legend.labels.ticks > 0 ) {
-
-		var ticks = {};
-		var lines = {};
+		spriteTitle.scale.set( 2, 1, 1.0 );
 
 		if ( this.legend.layout == 'vertical' ) {
 
-			var topPositionY = this.legend.position.y + ( this.legend.dimensions.height * 0.36 );
-			var bottomPositionY = this.legend.position.y - ( this.legend.dimensions.height * 0.61 );
+			spriteTitle.position.set( this.legend.position.x + this.legend.dimensions.width, this.legend.position.y + ( this.legend.dimensions.height * 0.45 ), this.legend.position.z );
 
 		}
 
 		if ( this.legend.layout == 'horizontal' ) {
 
-			var topPositionX = this.legend.position.x + ( this.legend.dimensions.height * 0.75 );
-			var bottomPositionX = this.legend.position.x - ( this.legend.dimensions.width * 1.2  ) ;
+			spriteTitle.position.set( this.legend.position.x * 1.015, this.legend.position.y + ( this.legend.dimensions.height * 0.03 ), this.legend.position.z );
 
 		}
 
-		for ( var i = 0; i < this.legend.labels.ticks; i++ ) {
+		if ( this.legend.labels.ticks > 0 ) {
 
-			var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1  ) * i ;
+			var ticks = {};
+			var lines = {};
 
-			if ( callback ) {
+			if ( this.legend.layout == 'vertical' ) {
 
-				value = callback ( value );
+				var topPositionY = this.legend.position.y + ( this.legend.dimensions.height * 0.36 );
+				var bottomPositionY = this.legend.position.y - ( this.legend.dimensions.height * 0.61 );
 
 			}
 
-			else {
+			if ( this.legend.layout == 'horizontal' ) {
 
-				if ( this.legend.labels.notation == 'scientific' ) {
+				var topPositionX = this.legend.position.x + ( this.legend.dimensions.height * 0.75 );
+				var bottomPositionX = this.legend.position.x - ( this.legend.dimensions.width * 1.2  ) ;
 
-					value = value.toExponential( this.legend.labels.decimal );
+			}
+
+			for ( var i = 0; i < this.legend.labels.ticks; i++ ) {
+
+				var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1  ) * i ;
+
+				if ( callback ) {
+
+					value = callback ( value );
 
 				}
 
 				else {
 
-					value = value.toFixed( this.legend.labels.decimal );
+					if ( this.legend.labels.notation == 'scientific' ) {
+
+						value = value.toExponential( this.legend.labels.decimal );
+
+					}
+
+					else {
+
+						value = value.toFixed( this.legend.labels.decimal );
+
+					}
 
 				}
 
-			}       
+				var canvasTick = document.createElement( 'canvas' );
+				var contextTick = canvasTick.getContext( '2d' );
 
-			var canvasTick = document.createElement( 'canvas' );
-			var contextTick = canvasTick.getContext( '2d' );
+				contextTick.font = 'Normal ' + this.legend.labels.fontsize + 'px ' + this.legend.labels.fontface;
 
-			contextTick.font = 'Normal ' + this.legend.labels.fontsize + 'px ' + this.legend.labels.fontface;
+				var metrics = contextTick.measureText( value.toString() );
+				var textWidth = metrics.width;
 
-			var metrics = contextTick.measureText( value.toString() );
-			var textWidth = metrics.width;
+				contextTick.fillStyle   = 'rgba(' + backgroundColor.r + ',' + backgroundColor.g + ',' + backgroundColor.b + ',' + backgroundColor.a + ')';
 
-			contextTick.fillStyle   = 'rgba(' + backgroundColor.r + ',' + backgroundColor.g + ',' + backgroundColor.b + ',' + backgroundColor.a + ')';
+				contextTick.strokeStyle = 'rgba(' + borderColor.r + ',' + borderColor.g + ',' + borderColor.b + ',' + borderColor.a + ')';
 
-			contextTick.strokeStyle = 'rgba(' + borderColor.r + ',' + borderColor.g + ',' + borderColor.b + ',' + borderColor.a + ')';
+				contextTick.lineWidth = borderThickness;
 
-			contextTick.lineWidth = borderThickness;
+				contextTick.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
 
-			contextTick.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
+				contextTick.fillText( value.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
-			contextTick.fillText( value.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
+				var txtTick = new THREE.Texture( canvasTick );
 
-			var txtTick = new THREE.Texture( canvasTick );
+				txtTick.needsUpdate = true;
 
-			txtTick.needsUpdate = true;
+				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
 
-			var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
+				var spriteTick = new THREE.Sprite( spriteMaterialTick );
 
-			var spriteTick = new THREE.Sprite( spriteMaterialTick );
+				spriteTick.scale.set( 2, 1, 1.0 );
 
-			spriteTick.scale.set( 2, 1, 1.0 );
+				if ( this.legend.layout == 'vertical' ) {
 
-			if ( this.legend.layout == 'vertical' ) {
+					var position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( value / ( this.maxV - this.minV ) );
 
-				var position = bottomPositionY + ( topPositionY - bottomPositionY ) * ( value / ( this.maxV - this.minV ) );
+					spriteTick.position.set( this.legend.position.x + ( this.legend.dimensions.width * 2.7 ), position, this.legend.position.z );
 
-				spriteTick.position.set( this.legend.position.x + ( this.legend.dimensions.width * 2.7 ), position, this.legend.position.z );
+				}
+
+				if ( this.legend.layout == 'horizontal' ) {
+
+					var position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( value / ( this.maxV - this.minV ) );
+
+					if ( this.legend.labels.ticks > 5 ) {
+
+						if ( i % 2 === 0 ) { var offset = 1.7; }
+
+						else { var offset = 2.1; }
+
+					}
+
+					else { var offset = 1.7; }
+
+					spriteTick.position.set( position, this.legend.position.y - this.legend.dimensions.width * offset, this.legend.position.z );
+
+				}
+
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
+
+				var geometry = new THREE.Geometry();
+
+
+				if ( this.legend.layout == 'vertical' ) {
+
+					var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
+
+					geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition , this.legend.position.z  ) );
+
+					geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.7, linePosition, this.legend.position.z  ) );
+
+				}
+
+				if ( this.legend.layout == 'horizontal' ) {
+
+					var linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
+
+					geometry.vertices.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.55, this.legend.position.z  ) );
+
+					geometry.vertices.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.7, this.legend.position.z  ) );
+
+				}
+
+				var line = new THREE.Line( geometry, material );
+
+				lines[ i ] = line;
+				ticks[ i ] = spriteTick;
 
 			}
-
-			if ( this.legend.layout == 'horizontal' ) {
-
-				var position = bottomPositionX + ( topPositionX - bottomPositionX ) * ( value / ( this.maxV - this.minV ) );
-
-				if ( this.legend.labels.ticks > 5 ) {
-
-					if ( i % 2 === 0 ) { var offset = 1.7; }
-
-					else { var offset = 2.1; }
-
-				}             
-
-				else { var offset = 1.7; }
-
-				spriteTick.position.set( position, this.legend.position.y - this.legend.dimensions.width * offset, this.legend.position.z );
-
-			}       
-
-			var material = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
-
-			var geometry = new THREE.Geometry();
-
-
-			if ( this.legend.layout == 'vertical' ) {
-
-				var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
-
-				geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition , this.legend.position.z  ) );
-
-				geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.7, linePosition, this.legend.position.z  ) );
-
-			}
-
-			if ( this.legend.layout == 'horizontal' ) {
-
-				var linePosition = ( this.legend.position.x - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
-
-				geometry.vertices.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.55, this.legend.position.z  ) );
-
-				geometry.vertices.push( new THREE.Vector3( linePosition, this.legend.position.y - this.legend.dimensions.width * 0.7, this.legend.position.z  ) );
-
-			}       
-
-			var line = new THREE.Line( geometry, material );
-
-			lines[ i ] = line;
-			ticks[ i ] = spriteTick;
 
 		}
 
+		return { 'title': spriteTitle,  'ticks': ticks, 'lines': lines };
+
 	}
-
-	return { 'title': spriteTitle,  'ticks': ticks, 'lines': lines };
-
-  }
 
 };
 

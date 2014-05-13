@@ -15,7 +15,7 @@ THREE.RenderableFace = function () {
 	this.vertexNormalsModel = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 	this.vertexNormalsLength = 0;
 
-	this.color = null;
+	this.color = new THREE.Color();
 	this.material = null;
 	this.uvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
 

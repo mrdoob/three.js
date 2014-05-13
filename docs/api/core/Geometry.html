@@ -225,11 +225,17 @@
 		
 		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
 
+		<h3>.merge( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
+		<div>Merge two geometries or geometry and geometry from object (using object's transform)</div>
+
 		<h3>.mergeVertices()</h3>
 		<div>
 		Checks for duplicate vertices using hashmap.<br />
 		Duplicated vertices are removed and faces' vertices are updated.
 		</div>
+		
+		<h3>.makeGroups()</h3>
+		<div>Geometry splitting</div>
 		
 		<h3>.clone()</h3>
 		<div>
