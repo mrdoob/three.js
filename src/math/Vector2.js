@@ -345,10 +345,9 @@ THREE.Vector2.prototype = {
 	},
 	
 	angleTo : function( v, signed ) {
-		if ( signed ) {
-			return Math.atan2( this.x * v.y - this.y * v.x, this.dot( v ) );
-		}
-		return Math.acos( this.dot( v ) / ( this.length() * v.length() ) );
+		
+		return Math.atan2( this.x * v.y - this.y * v.x, this.dot( v ) );
+		
 	};
 
 	setLength: function ( l ) {
