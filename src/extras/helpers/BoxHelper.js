@@ -25,23 +25,25 @@ THREE.BoxHelper = function ( object ) {
 
 	// TODO: Wouldn't be nice if Line had .segments?
 
-	var geometry = new THREE.Geometry();
-	geometry.vertices.push(
-		vertices[ 0 ], vertices[ 1 ],
-		vertices[ 1 ], vertices[ 2 ],
-		vertices[ 2 ], vertices[ 3 ],
-		vertices[ 3 ], vertices[ 0 ],
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new THREE.BufferAttribute(
+		new Float32Array([
+			vertices[ 0 ], vertices[ 1 ],
+			vertices[ 1 ], vertices[ 2 ],
+			vertices[ 2 ], vertices[ 3 ],
+			vertices[ 3 ], vertices[ 0 ],
 
-		vertices[ 4 ], vertices[ 5 ],
-		vertices[ 5 ], vertices[ 6 ],
-		vertices[ 6 ], vertices[ 7 ],
-		vertices[ 7 ], vertices[ 4 ],
+			vertices[ 4 ], vertices[ 5 ],
+			vertices[ 5 ], vertices[ 6 ],
+			vertices[ 6 ], vertices[ 7 ],
+			vertices[ 7 ], vertices[ 4 ],
 
-		vertices[ 0 ], vertices[ 4 ],
-		vertices[ 1 ], vertices[ 5 ],
-		vertices[ 2 ], vertices[ 6 ],
-		vertices[ 3 ], vertices[ 7 ]
-	);
+			vertices[ 0 ], vertices[ 4 ],
+			vertices[ 1 ], vertices[ 5 ],
+			vertices[ 2 ], vertices[ 6 ],
+			vertices[ 3 ], vertices[ 7 ]
+		])
+	, 3 ) );
 
 	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ), THREE.LinePieces );
 
