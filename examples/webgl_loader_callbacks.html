@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<title>three.js webgl - loader callbacks</title>
+		<title>three.js webgl - TextureLoader callbacks</title>
 		<style>
 
 			body {
@@ -66,7 +66,7 @@
 		<script src="js/controls/TrackballControls.js"></script>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - molecules</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - TextureLoader callbacks</div>
 
 		<script>
 			var camera, scene, renderer;
@@ -109,13 +109,12 @@
 					var sp = new THREE.Sprite(material);
 					scene.add(sp)
 
-				}, function(progress) {
-					console.log('do we have progress?')
 				})
 				textureLoader.load('textures/404-texture-doesnt-exist.bmp', function(texture) {
 
 				},function () {
 					//progress callback
+					//this 
 				}, function (error) {
 					console.log('error caught - image not loaded')
 					console.log(error)
