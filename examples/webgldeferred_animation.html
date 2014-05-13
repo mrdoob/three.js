@@ -255,7 +255,6 @@
 					geometry.computeBoundingBox();
 
 					ensureLoop( geometry.animation );
-					THREE.AnimationHandler.add( geometry.animation );
 
 					for ( var i = 0, il = materials.length; i < il; i ++ ) {
 
@@ -292,7 +291,7 @@
 					skins.push( mesh );
 
 
-					animation = new THREE.Animation( mesh, "ActionFemale" );
+					animation = new THREE.Animation( mesh, geometry.animation );
 					animation.play();
 					animation.update( 0 );
 

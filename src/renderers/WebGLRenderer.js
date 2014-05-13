@@ -3255,6 +3255,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
+		// update SkinnedMesh objects
+		function updateSkinnedMesh( object ) {
+
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				object.updateBoneMatrices();
+
+			}
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				updateSkinnedMesh( object.children[ i ] );
+
+			}
+
+		}
+
+		updateSkinnedMesh( scene );
+
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
@@ -4108,7 +4127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			skinning: material.skinning,
 			maxBones: maxBones,
-			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: _supportsBoneTextures && object && object.useVertexTexture,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -4321,26 +4340,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			if ( _supportsBoneTextures && object.skeleton.useVertexTexture ) {
+			if ( _supportsBoneTextures && object.useVertexTexture ) {
 
 				if ( p_uniforms.boneTexture !== null ) {
 
 					var textureUnit = getTextureUnit();
 
 					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
-					_this.setTexture( object.skeleton.boneTexture, textureUnit );
+					_this.setTexture( object.boneTexture, textureUnit );
 
 				}
 
 				if ( p_uniforms.boneTextureWidth !== null ) {
 
-					_gl.uniform1i( p_uniforms.boneTextureWidth, object.skeleton.boneTextureWidth );
+					_gl.uniform1i( p_uniforms.boneTextureWidth, object.boneTextureWidth );
 
 				}
 
 				if ( p_uniforms.boneTextureHeight !== null ) {
 
-					_gl.uniform1i( p_uniforms.boneTextureHeight, object.skeleton.boneTextureHeight );
+					_gl.uniform1i( p_uniforms.boneTextureHeight, object.boneTextureHeight );
 
 				}
 
@@ -4348,7 +4367,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.boneGlobalMatrices !== null ) {
 
-					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );
+					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 				}
 
@@ -5997,7 +6016,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateBones ( object ) {
 
-		if ( _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+		if ( _supportsBoneTextures && object && object.useVertexTexture ) {
 
 			return 1024;
 
@@ -6018,11 +6037,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
 
-				maxBones = Math.min( object.skeleton.bones.length, maxBones );
+				maxBones = Math.min( object.bones.length, maxBones );
 
-				if ( maxBones < object.skeleton.bones.length ) {
+				if ( maxBones < object.bones.length ) {
 
-					console.warn( "WebGLRenderer: too many bones - " + object.skeleton.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
+					console.warn( "WebGLRenderer: too many bones - " + object.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
 
 				}
 

@@ -8,7 +8,6 @@ THREE.Bone = function( belongsToSkin ) {
 	THREE.Object3D.call( this );
 
 	this.skin = belongsToSkin;
-	this.skinMatrix = new THREE.Matrix4();
 
 	this.accumulatedRotWeight = 0;
 	this.accumulatedPosWeight = 0;
@@ -18,7 +17,7 @@ THREE.Bone = function( belongsToSkin ) {
 
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
+THREE.Bone.prototype.update = function ( forceUpdate ) {
 
 	// update local
 
@@ -31,16 +30,6 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 	// update skin matrix
 
 	if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
-
-		if ( parentSkinMatrix ) {
-
-			this.skinMatrix.multiplyMatrices( parentSkinMatrix, this.matrix );
-
-		} else {
-
-			this.skinMatrix.copy( this.matrix );
-
-		}
 
 		this.matrixWorldNeedsUpdate = false;
 		forceUpdate = true;
@@ -57,7 +46,7 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 
 	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		this.children[ i ].update( this.skinMatrix, forceUpdate );
+		this.children[ i ].update( forceUpdate );
 
 	}
 

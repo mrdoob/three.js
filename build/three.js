@@ -6,6 +6,11 @@
 
 var THREE = { REVISION: '68dev' };
 
+// browserify support
+if (typeof module === 'object') {
+	module.exports = THREE;
+}
+
 self.console = self.console || {
 
 	info: function () {},
@@ -14429,7 +14434,6 @@ THREE.Bone = function( belongsToSkin ) {
 	THREE.Object3D.call( this );
 
 	this.skin = belongsToSkin;
-	this.skinMatrix = new THREE.Matrix4();
 
 	this.accumulatedRotWeight = 0;
 	this.accumulatedPosWeight = 0;
@@ -14439,7 +14443,7 @@ THREE.Bone = function( belongsToSkin ) {
 
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
+THREE.Bone.prototype.update = function ( forceUpdate ) {
 
 	// update local
 
@@ -14452,16 +14456,6 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 	// update skin matrix
 
 	if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
-
-		if ( parentSkinMatrix ) {
-
-			this.skinMatrix.multiplyMatrices( parentSkinMatrix, this.matrix );
-
-		} else {
-
-			this.skinMatrix.copy( this.matrix );
-
-		}
 
 		this.matrixWorldNeedsUpdate = false;
 		forceUpdate = true;
@@ -14478,7 +14472,7 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 
 	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		this.children[ i ].update( this.skinMatrix, forceUpdate );
+		this.children[ i ].update( forceUpdate );
 
 	}
 
@@ -14488,31 +14482,41 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
- * @author michael guerrero / http://realitymeltdown.com
  */
 
-THREE.Skeleton = function ( boneList, useVertexTexture ) {
+THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
-	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
+	THREE.Mesh.call( this, geometry, material );
+
+	this.useVertexTexture = useVertexTexture;
+
+	this.identityMatrix = new THREE.Matrix4();
+
+	this.bones = [];
+
+	this.boneMatrices = null;
 
 	// init bones
 
-	this.bones = [];
-	this.boneMatrices = [];
+	// TODO: remove bone creation as there is no reason (other than
+	// convenience) for THREE.SkinnedMesh to do this.
 
 	var bone, gbone, p, q, s;
 
-	if ( boneList !== undefined ) {
+	var bones = [];
 
-		for ( var b = 0; b < boneList.length; ++b ) {
+	if ( this.geometry && this.geometry.bones !== undefined ) {
 
-			gbone = boneList[ b ];
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
+
+			gbone = this.geometry.bones[ b ];
 
 			p = gbone.pos;
 			q = gbone.rotq;
 			s = gbone.scl;
 
-			bone = this.addBone();
+			bone = new Bone( this );
+			bones.push( bone );
 
 			bone.name = gbone.name;
 			bone.position.set( p[0], p[1], p[2] );
@@ -14530,90 +14534,58 @@ THREE.Skeleton = function ( boneList, useVertexTexture ) {
 
 		}
 
-		for ( var b = 0; b < boneList.length; ++b ) {
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
 
-			gbone = boneList[ b ];
+			gbone = this.geometry.bones[ b ];
 
 			if ( gbone.parent !== -1 ) {
 
-				this.bones[ gbone.parent ].add( this.bones[ b ] );
+				bones[ gbone.parent ].add( bones[ b ] );
 
 			}
 
 		}
 
-		//
-
-		var nBones = this.bones.length;
-
-		if ( this.useVertexTexture ) {
-
-			// layout (1 matrix = 4 pixels)
-			//  RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-			//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
-			//     16x16 pixel texture max   64 bones (16 * 16 / 4)
-			//     32x32 pixel texture max  256 bones (32 * 32 / 4)
-			//     64x64 pixel texture max 1024 bones (64 * 64 / 4)
-
-			var size;
-
-			if ( nBones > 256 )
-				size = 64;
-			else if ( nBones > 64 )
-				size = 32;
-			else if ( nBones > 16 )
-				size = 16;
-			else
-				size = 8;
-
-			this.boneTextureWidth = size;
-			this.boneTextureHeight = size;
-
-			this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
-			this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
-			this.boneTexture.minFilter = THREE.NearestFilter;
-			this.boneTexture.magFilter = THREE.NearestFilter;
-			this.boneTexture.generateMipmaps = false;
-			this.boneTexture.flipY = false;
-
-		} else {
-
-			this.boneMatrices = new Float32Array( 16 * nBones );
-
-		}
-
 	}
+
+	this.bind( bones );
 
 };
 
 
-THREE.Skeleton.prototype = Object.create( THREE.Mesh.prototype );
+THREE.SkinnedMesh.prototype = Object.create( THREE.Mesh.prototype );
 
+THREE.SkinnedMesh.prototype.bind = function( bones ) {
 
-THREE.Skeleton.prototype.addBone = function( bone ) {
+	bones = bones || [];
+	this.bones = bones.slice( 0 );
+	this.boneInverses = undefined;
 
-	if ( bone === undefined ) {
+	// update bone matrices and/or texture
 
-		bone = new THREE.Bone( this );
+	this.initBoneMatrices();
 
-	}
+	// update bone inverses
 
-	this.bones.push( bone );
-
-	return bone;
+	this.pose();
 
 };
 
-
-THREE.Skeleton.prototype.calculateInverses = function( bone ) {
+THREE.SkinnedMesh.prototype.initBoneInverses = function () {
 
 	this.boneInverses = [];
 
-	for ( var b = 0, bl = this.bones.length; b < bl; ++b ) {
+	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
 		var inverse = new THREE.Matrix4();
 
-		inverse.getInverse( this.bones[ b ].skinMatrix );
+		if ( this.bones[ b ] ) {
+
+			inverse.getInverse( this.bones[ b ].matrixWorld );
+
+		}
+
+		inverse.multiply( this.matrixWorld );
 
 		this.boneInverses.push( inverse );
 
@@ -14621,122 +14593,107 @@ THREE.Skeleton.prototype.calculateInverses = function( bone ) {
 
 };
 
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- */
+THREE.SkinnedMesh.prototype.initBoneMatrices = function () {
 
-THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
+	var nBones = this.bones.length;
 
-	THREE.Mesh.call( this, geometry, material );
+	// clear the old bone texture and float array
 
-	this.skeleton = new THREE.Skeleton( this.geometry && this.geometry.bones, useVertexTexture );
+	this.boneMatrices = null;
+	this.boneTextureWidth = undefined;
+	this.boneTextureHeight = undefined;
 
-  // Add root level bones as children of the mesh
+	if ( this.boneTexture ) {
 
-	for ( var b = 0; b < this.skeleton.bones.length; ++b ) {
-
-		var bone = this.skeleton.bones[ b ];
-
-		if ( bone.parent === undefined ) {
-
-			this.add( bone );
-
-		}
+		this.boneTexture.dispose();
+		this.boneTexture = undefined;
 
 	}
 
-	this.identityMatrix = new THREE.Matrix4();
+	// create a bone texture or an array of floats
 
-	this.pose();
+	if ( this.useVertexTexture ) {
+
+		// layout (1 matrix = 4 pixels)
+		//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+		//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
+		//       16x16 pixel texture max   64 bones (16 * 16 / 4)
+		//       32x32 pixel texture max  256 bones (32 * 32 / 4)
+		//       64x64 pixel texture max 1024 bones (64 * 64 / 4)
+
+		var size;
+
+		if ( nBones > 256 )
+			size = 64;
+		else if ( nBones > 64 )
+			size = 32;
+		else if ( nBones > 16 )
+			size = 16;
+		else
+			size = 8;
+
+		this.boneTextureWidth = size;
+		this.boneTextureHeight = size;
+
+		this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
+		this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
+		this.boneTexture.minFilter = THREE.NearestFilter;
+		this.boneTexture.magFilter = THREE.NearestFilter;
+		this.boneTexture.generateMipmaps = false;
+		this.boneTexture.flipY = false;
+
+	} else {
+
+		this.boneMatrices = new Float32Array( 16 * nBones );
+
+	}
 
 };
 
-
-THREE.SkinnedMesh.prototype = Object.create( THREE.Mesh.prototype );
-
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
+THREE.SkinnedMesh.prototype.updateBoneMatrices = function () {
 
 	var offsetMatrix = new THREE.Matrix4();
 
-	return function ( force ) {
+	var invMatrixWorld = new THREE.Matrix4().getInverse( this.matrixWorld );
 
-		this.matrixAutoUpdate && this.updateMatrix();
+	// make a snapshot of the bones' rest position
 
-		// update matrixWorld
+	if ( this.boneInverses === undefined ) {
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+		this.initBoneInverses();
 
-			if ( this.parent ) {
+	}
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+	// flatten bone matrices to array
 
-			} else {
+	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
-				this.matrixWorld.copy( this.matrix );
+		// compute the offset between the current and the original transform;
 
-			}
+		var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
 
-			this.matrixWorldNeedsUpdate = false;
+		offsetMatrix.multiplyMatrices( invMatrixWorld, matrix );
+		offsetMatrix.multiply( this.boneInverses[ b ] );
+		offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
 
-			force = true;
+	}
 
-		}
+	if ( this.useVertexTexture ) {
 
-		// update children
+		this.boneTexture.needsUpdate = true;
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+	}
 
-			var child = this.children[ i ];
-
-			if ( child instanceof THREE.Bone ) {
-
-				child.update( this.identityMatrix, false );
-
-			} else {
-
-				child.updateMatrixWorld( true );
-
-			}
-
-		}
-
-		// make a snapshot of the bones' rest position
-
-		if ( this.skeleton.boneInverses === undefined ) {
-
-			this.skeleton.calculateInverses();
-
-		}
-
-		// flatten bone matrices to array
-
-		for ( var b = 0, bl = this.skeleton.bones.length; b < bl; b ++ ) {
-
-			// compute the offset between the current and the original transform;
-
-			// TODO: we could get rid of this multiplication step if the skinMatrix
-			// was already representing the offset; however, this requires some
-			// major changes to the animation system
-
-			offsetMatrix.multiplyMatrices( this.skeleton.bones[ b ].skinMatrix, this.skeleton.boneInverses[ b ] );
-			offsetMatrix.flattenToArrayOffset( this.skeleton.boneMatrices, b * 16 );
-
-		}
-
-		if ( this.skeleton.useVertexTexture ) {
-
-			this.skeleton.boneTexture.needsUpdate = true;
-
-		}
-
-	};
-
-}();
+};
 
 THREE.SkinnedMesh.prototype.pose = function () {
 
 	this.updateMatrixWorld( true );
+
+	// force recomputation of bone inverses
+
+	this.boneInverses = undefined;
+	this.updateBoneMatrices();
 
 	this.normalizeSkinWeights();
 
@@ -14785,6 +14742,7 @@ THREE.SkinnedMesh.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -14845,7 +14803,7 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 
 	var firstAnimation, animations = geometry.animations;
 
-	var pattern = /([a-z]+)(\d+)/;
+	var pattern = /([a-z]+)_?(\d+)/;
 
 	for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
 
@@ -20571,10 +20529,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var size = 1;   // "f" and "i"
 
-					if( attribute.type === "v2" ) size = 2;
-					else if( attribute.type === "v3" ) size = 3;
-					else if( attribute.type === "v4" ) size = 4;
-					else if( attribute.type === "c"  ) size = 3;
+					if ( attribute.type === "v2" ) size = 2;
+					else if ( attribute.type === "v3" ) size = 3;
+					else if ( attribute.type === "v4" ) size = 4;
+					else if ( attribute.type === "c"  ) size = 3;
 
 					attribute.size = size;
 
@@ -22044,7 +22002,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					normalArray,
 					i, il = object.count * 3;
 
-				for( i = 0; i < il; i += 9 ) {
+				for ( i = 0; i < il; i += 9 ) {
 
 					normalArray = object.normalArray;
 
@@ -22307,7 +22265,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var type, size;
 
-				if ( index.array instanceof Uint32Array ){
+				if ( index.array instanceof Uint32Array ) {
 
 					type = _gl.UNSIGNED_INT;
 					size = 4;
@@ -22854,6 +22812,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// update camera matrices and frustum
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+
+		// update SkinnedMesh objects
+		function updateSkinnedMesh( object ) {
+
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				object.updateBoneMatrices();
+
+			}
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				updateSkinnedMesh( object.children[ i ] );
+
+			}
+
+		}
+
+		updateSkinnedMesh( scene );
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
@@ -23472,7 +23449,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// check all geometry groups
 
-			for( var i = 0, il = geometry.geometryGroupsList.length; i < il; i ++ ) {
+			for ( var i = 0, il = geometry.geometryGroupsList.length; i < il; i ++ ) {
 
 				geometryGroup = geometry.geometryGroupsList[ i ];
 
@@ -23708,7 +23685,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			skinning: material.skinning,
 			maxBones: maxBones,
-			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
+			useVertexTexture: _supportsBoneTextures && object && object.useVertexTexture,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -23921,26 +23898,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			if ( _supportsBoneTextures && object.skeleton.useVertexTexture ) {
+			if ( _supportsBoneTextures && object.useVertexTexture ) {
 
 				if ( p_uniforms.boneTexture !== null ) {
 
 					var textureUnit = getTextureUnit();
 
 					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
-					_this.setTexture( object.skeleton.boneTexture, textureUnit );
+					_this.setTexture( object.boneTexture, textureUnit );
 
 				}
 
 				if ( p_uniforms.boneTextureWidth !== null ) {
 
-					_gl.uniform1i( p_uniforms.boneTextureWidth, object.skeleton.boneTextureWidth );
+					_gl.uniform1i( p_uniforms.boneTextureWidth, object.boneTextureWidth );
 
 				}
 
 				if ( p_uniforms.boneTextureHeight !== null ) {
 
-					_gl.uniform1i( p_uniforms.boneTextureHeight, object.skeleton.boneTextureHeight );
+					_gl.uniform1i( p_uniforms.boneTextureHeight, object.boneTextureHeight );
 
 				}
 
@@ -23948,7 +23925,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.boneGlobalMatrices !== null ) {
 
-					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );
+					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 				}
 
@@ -24528,7 +24505,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for( i = 0, il = uniform.value.length; i < il; i ++ ) {
+				for ( i = 0, il = uniform.value.length; i < il; i ++ ) {
 
 					uniform._array[ i ] = getTextureUnit();
 
@@ -24536,7 +24513,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform1iv( location, uniform._array );
 
-				for( i = 0, il = uniform.value.length; i < il; i ++ ) {
+				for ( i = 0, il = uniform.value.length; i < il; i ++ ) {
 
 					texture = uniform.value[ i ];
 					textureUnit = uniform._array[ i ];
@@ -25135,10 +25112,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( texture instanceof THREE.CompressedTexture ) {
 
-				for( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					if ( texture.format!==THREE.RGBAFormat ) {
+					if ( texture.format !== THREE.RGBAFormat ) {
 						_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 					} else {
 						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
@@ -25260,7 +25237,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					if( !isCompressed ) {
+					if ( !isCompressed ) {
 
 						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
 
@@ -25268,10 +25245,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
 
-						for( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
+						for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
 							mipmap = mipmaps[ j ];
-							if ( texture.format!==THREE.RGBAFormat ) {
+							if ( texture.format !== THREE.RGBAFormat ) {
 
 								_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -25330,7 +25307,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 		/* For some reason this is not working. Defaulting to RGBA4.
-		} else if( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
+		} else if ( ! renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
@@ -25597,7 +25574,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateBones ( object ) {
 
-		if ( _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+		if ( _supportsBoneTextures && object && object.useVertexTexture ) {
 
 			return 1024;
 
@@ -25618,11 +25595,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
 
-				maxBones = Math.min( object.skeleton.bones.length, maxBones );
+				maxBones = Math.min( object.bones.length, maxBones );
 
-				if ( maxBones < object.skeleton.bones.length ) {
+				if ( maxBones < object.bones.length ) {
 
-					console.warn( "WebGLRenderer: too many bones - " + object.skeleton.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
+					console.warn( "WebGLRenderer: too many bones - " + object.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
 
 				}
 
@@ -25662,7 +25639,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var maxShadows = 0;
 
-		for ( var l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			var light = lights[ l ];
 
@@ -30337,19 +30314,7 @@ THREE.AnimationHandler = {
 
 		var hierarchy = [];
 
-		if ( root instanceof THREE.SkinnedMesh ) {
-
-			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
-
-				hierarchy.push( root.skeleton.bones[ b ] );
-
-			}
-
-		} else {
-
-			parseRecurseHierarchy( root, hierarchy );
-
-		}
+		parseRecurseHierarchy( root, hierarchy );
 
 		return hierarchy;
 
@@ -30457,7 +30422,7 @@ THREE.Animation.prototype.reset = function () {
 			object.animationCache[this.data.name] = {};
 			object.animationCache[this.data.name].prevKey = { pos: 0, rot: 0, scl: 0 };
 			object.animationCache[this.data.name].nextKey = { pos: 0, rot: 0, scl: 0 };
-			object.animationCache[this.data.name].originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+			object.animationCache[this.data.name].originalMatrix = object.matrix;
 
 		}
 
@@ -30626,7 +30591,7 @@ THREE.Animation.prototype.update = (function(){
 							object.accumulatedPosWeight += this.weight;
 
 						} else
-							vector = newVector;
+							vector.copy( newVector );
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
 						this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
@@ -30709,7 +30674,7 @@ THREE.Animation.prototype.update = (function(){
 						object.accumulatedSclWeight += this.weight;
 
 					} else
-						vector = newVector;
+						vector.copy( newVector );
 
 				}
 
@@ -30867,7 +30832,7 @@ THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 				node.animationCache = {};
 				node.animationCache.prevKey = null;
 				node.animationCache.nextKey = null;
-				node.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+				node.animationCache.originalMatrix = object.matrix;
 
 			}
 
@@ -30914,17 +30879,8 @@ THREE.KeyFrameAnimation.prototype.stop = function() {
 
 			var original = node.animationCache.originalMatrix;
 
-			if( obj instanceof THREE.Bone ) {
-
-				original.copy( obj.skinMatrix );
-				obj.skinMatrix = original;
-
-			} else {
-
-				original.copy( obj.matrix );
-				obj.matrix = original;
-
-			}
+			original.copy( obj.matrix );
+			obj.matrix = original;
 
 			delete node.animationCache;
 
@@ -34751,76 +34707,6 @@ THREE.PointLightHelper.prototype.update = function () {
 
 
 /**
- * @author Sean Griffin / http://twitter.com/sgrif
- * @author Michael Guerrero / http://realitymeltdown.com
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.SkeletonHelper = function ( object ) {
-
-	var skeleton = object.skeleton;
-
-	var geometry = new THREE.Geometry();
-
-	for ( var i = 0; i < skeleton.bones.length; i ++ ) {
-
-		var bone = skeleton.bones[ i ];
-
-		if ( bone.parent instanceof THREE.Bone ) {
-
-			geometry.vertices.push( new THREE.Vector3() );
-			geometry.vertices.push( new THREE.Vector3() );
-			geometry.colors.push( new THREE.Color( 0, 0, 1 ) );
-			geometry.colors.push( new THREE.Color( 0, 1, 0 ) );
-
-		}
-
-	}
-
-	var material = new THREE.LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, transparent: true } );
-
-	THREE.Line.call( this, geometry, material, THREE.LinePieces );
-
-	this.skeleton = skeleton;
-
-	this.matrixWorld = object.matrixWorld;
-	this.matrixAutoUpdate = false;
-
-	this.update();
-
-};
-
-
-THREE.SkeletonHelper.prototype = Object.create( THREE.Line.prototype );
-
-THREE.SkeletonHelper.prototype.update = function () {
-
-	var geometry = this.geometry;
-
-	var j = 0;
-
-	for ( var i = 0; i < this.skeleton.bones.length; i ++ ) {
-
-		var bone = this.skeleton.bones[ i ];
-
-		if ( bone.parent instanceof THREE.Bone ) {
-
-			geometry.vertices[ j ].setFromMatrixPosition( bone.skinMatrix );
-			geometry.vertices[ j + 1 ].setFromMatrixPosition( bone.parent.skinMatrix );
-
-			j += 2;
-
-		}
-
-	}
-
-	geometry.verticesNeedUpdate = true;
-
-	geometry.computeBoundingSphere();
-
-};
-
-/**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -35412,7 +35298,7 @@ THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fp
 
 THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 
-	var pattern = /([a-z]+)(\d+)/;
+	var pattern = /([a-z]+)_?(\d+)/;
 
 	var firstAnimation, frameRanges = {};
 
