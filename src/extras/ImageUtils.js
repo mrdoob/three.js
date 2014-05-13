@@ -67,7 +67,7 @@ THREE.ImageUtils = {
 		request.onerror = onError;
 
 		request.open( 'GET', url, true );
-		request.responseType = "arraybuffer";
+		request.responseType = 'arraybuffer';
 		request.send( null );
 
 		return texture;
@@ -93,7 +93,7 @@ THREE.ImageUtils = {
 
 		for ( var i = 0, il = array.length; i < il; ++ i ) {
 
-			var cubeImage = loader.load( array[i], function () {
+			var cubeImage = loader.load( array[ i ], function () {
 
 				images.loadCount += 1;
 
@@ -176,7 +176,7 @@ THREE.ImageUtils = {
 				var url = array[ i ];
 
 				request.open( 'GET', url, true );
-				request.responseType = "arraybuffer";
+				request.responseType = 'arraybuffer';
 				request.send( null );
 
 			}
@@ -188,7 +188,7 @@ THREE.ImageUtils = {
 			var url = array;
 			var request = new XMLHttpRequest();
 
-			request.onload = function( ) {
+			request.onload = function () {
 
 				var buffer = request.response;
 				var dds = THREE.ImageUtils.parseDDS( buffer, true );
@@ -199,7 +199,7 @@ THREE.ImageUtils = {
 
 					for ( var f = 0; f < faces; f ++ ) {
 
-						images[ f ] = { mipmaps : [] };
+						images[ f ] = { mipmaps: [] };
 
 						for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
@@ -223,7 +223,7 @@ THREE.ImageUtils = {
 			request.onerror = onError;
 
 			request.open( 'GET', url, true );
-			request.responseType = "arraybuffer";
+			request.responseType = 'arraybuffer';
 			request.send( null );
 
 		}
@@ -231,11 +231,11 @@ THREE.ImageUtils = {
 		return texture;
 
 	},
-                
-        
+
+
         // reference from vthibault, https://github.com/vthibault/roBrowser/blob/master/src/Loaders/Targa.js
         decodeTGA: function ( arrayBuffer ) {
-                   
+
             // TGA Constants
             var TGA_TYPE_NO_DATA = 0,
             TGA_TYPE_INDEXED = 1,
@@ -251,38 +251,38 @@ THREE.ImageUtils = {
             TGA_ORIGIN_BR = 0x01,
             TGA_ORIGIN_UL = 0x02,
             TGA_ORIGIN_UR = 0x03;
-    
-            
+
+
             if ( arrayBuffer.length < 19 )
                 console.error( 'ImageUtils::decodeTGA()- Not enough data to contain header.' );
-            
+
             var content = new Uint8Array( arrayBuffer ),
                 offset = 0,
                 header = {
-                  id_length: content[ offset++ ], 
+                  id_length: content[ offset++ ],
                   colormap_type: content[ offset++ ],
-                  image_type:      content[offset++],
-                  colormap_index:  content[offset++] | content[offset++] << 8,
-                  colormap_length: content[offset++] | content[offset++] << 8,
-                  colormap_size:   content[offset++],
+                  image_type:      content[ offset++ ],
+                  colormap_index:  content[ offset++ ] | content[ offset++ ] << 8,
+                  colormap_length: content[ offset++ ] | content[ offset++ ] << 8,
+                  colormap_size:   content[ offset++ ],
 
                   origin: [
-                            content[offset++] | content[offset++] << 8,
-                            content[offset++] | content[offset++] << 8
+                            content[ offset++ ] | content[ offset++ ] << 8,
+                            content[ offset++ ] | content[ offset++ ] << 8
                     ],
-                    width:      content[offset++] | content[offset++] << 8,
-                    height:     content[offset++] | content[offset++] << 8,
-                    pixel_size: content[offset++],
-                    flags:      content[offset++]
+                    width:      content[ offset++ ] | content[ offset++ ] << 8,
+                    height:     content[ offset++ ] | content[ offset++ ] << 8,
+                    pixel_size: content[ offset++ ],
+                    flags:      content[ offset++ ]
                 };
-                    
+
             function tgaCheckHeader( header ) {
-                switch( header.image_type ) {
+                switch ( header.image_type ) {
                     // Check indexed type
                 case TGA_TYPE_INDEXED:
                 case TGA_TYPE_RLE_INDEXED:
-                    if ( header.colormap_length > 256 || header.colormap_size !== 24 || header.colormap_type !== 1) {
-                        console.error('Targa::tgaCheckHeader() - Invalid type colormap data for indexed type');
+                    if ( header.colormap_length > 256 || header.colormap_size !== 24 || header.colormap_type !== 1 ) {
+                        console.error( 'Targa::tgaCheckHeader() - Invalid type colormap data for indexed type' );
                     }
                     break;
 
@@ -291,31 +291,31 @@ THREE.ImageUtils = {
                 case TGA_TYPE_GREY:
                 case TGA_TYPE_RLE_RGB:
                 case TGA_TYPE_RLE_GREY:
-                    if (header.colormap_type) {
-                        console.error('ImageUtils::tgaCheckHeader() - Invalid type colormap data for colormap type');
+                    if ( header.colormap_type ) {
+                        console.error( 'ImageUtils::tgaCheckHeader() - Invalid type colormap data for colormap type' );
                     }
                     break;
 
                 // What the need of a file without data ?
                 case TGA_TYPE_NO_DATA:
-                    console.error('ImageUtils::tgaCheckHeader() - No data');
+                    console.error( 'ImageUtils::tgaCheckHeader() - No data' );
 
                 // Invalid type ?
                 default:
-                    console.error('ImageUtils::tgaCheckHeader() - Invalid type " '+ header.image_type + '"');
+                    console.error( 'ImageUtils::tgaCheckHeader() - Invalid type " ' + header.image_type + '"' );
                 }
 
                 // Check image width and height
-                if ( header.width <= 0 || header.height <=0 ) {
+                if ( header.width <= 0 || header.height <= 0 ) {
                     console.error( 'ImageUtils::tgaCheckHeader() - Invalid image size' );
                 }
 
                 // Check image pixel size 
-                if (header.pixel_size !== 8  &&
+                if ( header.pixel_size !== 8  &&
                     header.pixel_size !== 16 &&
                     header.pixel_size !== 24 &&
-                    header.pixel_size !== 32) {
-                    console.error('ImageUtils::tgaCheckHeader() - Invalid pixel size "' + header.pixel_size + '"');
+                    header.pixel_size !== 32 ) {
+                    console.error( 'ImageUtils::tgaCheckHeader() - Invalid pixel size "' + header.pixel_size + '"' );
                 }
             }
 
@@ -323,17 +323,17 @@ THREE.ImageUtils = {
             tgaCheckHeader( header );
 
             if ( header.id_length + offset > arrayBuffer.length ) {
-                console.error('ImageUtils::load() - No data');
+                console.error( 'ImageUtils::load() - No data' );
             }
 
             // Skip the needn't data
             offset += header.id_length;
 
             // Get targa information about RLE compression and palette
-            var use_rle = false, 
-                use_pal = false, 
+            var use_rle = false,
+                use_pal = false,
                 use_grey = false;
-        
+
             switch ( header.image_type ) {
                 case TGA_TYPE_RLE_INDEXED:
                     use_rle = true;
@@ -343,7 +343,7 @@ THREE.ImageUtils = {
                 case TGA_TYPE_INDEXED:
                     use_pal = true;
                     break;
-                    
+
                 case TGA_TYPE_RLE_RGB:
                     use_rle = true;
                     break;
@@ -360,45 +360,45 @@ THREE.ImageUtils = {
                     use_grey = true;
                     break;
             }
-            
+
             // Parse tga image buffer
             function tgaParse( use_rle, use_pal, header, offset, data ) {
-                
+
                 var pixel_data,
                     pixel_size,
                     pixel_total,
                     palettes;
-            
+
                     pixel_size = header.pixel_size >> 3;
                     pixel_total = header.width * header.height * pixel_size;
-                    
+
                  // Read palettes
                  if ( use_pal ) {
                      palettes = data.subarray( offset, offset += header.colormap_length * ( header.colormap_size >> 3 ) );
                  }
-                 
+
                  // Read RLE
                  if ( use_rle ) {
-                     pixel_data = new Uint8Array(pixel_total);
-                     
+                     pixel_data = new Uint8Array( pixel_total );
+
                     var c, count, i;
                     var shift = 0;
-                    var pixels = new Uint8Array(pixel_size);
+                    var pixels = new Uint8Array( pixel_size );
 
-                    while (shift < pixel_total) {
-                        c     = data[offset++];
-                        count = (c & 0x7f) + 1;
+                    while ( shift < pixel_total ) {
+                        c     = data[ offset++ ];
+                        count = ( c & 0x7f ) + 1;
 
                         // RLE pixels.
-                        if (c & 0x80) {
+                        if ( c & 0x80 ) {
                             // Bind pixel tmp array
-                            for (i = 0; i < pixel_size; ++i) {
-                                    pixels[i] = data[offset++];
+                            for ( i = 0; i < pixel_size; ++i ) {
+                                    pixels[ i ] = data[ offset++ ];
                             }
 
                             // Copy pixel array
-                            for (i = 0; i < count; ++i) {
-                                    pixel_data.set(pixels, shift + i * pixel_size);
+                            for ( i = 0; i < count; ++i ) {
+                                    pixel_data.set( pixels, shift + i * pixel_size );
                             }
 
                             shift += pixel_size * count;
@@ -407,8 +407,8 @@ THREE.ImageUtils = {
                         // Raw pixels.
                         else {
                             count *= pixel_size;
-                            for (i = 0; i < count; ++i) {
-                                    pixel_data[shift + i] = data[offset++];
+                            for ( i = 0; i < count; ++i ) {
+                                    pixel_data[ shift + i ] = data[ offset++ ];
                             }
                            shift += count;
                         }
@@ -417,79 +417,79 @@ THREE.ImageUtils = {
                  // RAW Pixels
                  else {
                     pixel_data = data.subarray(
-                         offset, offset += (use_pal ? header.width * header.height : pixel_total)
+                         offset, offset += ( use_pal ? header.width * header.height : pixel_total )
                     );
                  }
-                
-                 return { 
-                    pixel_data: pixel_data, 
-                    palettes: palettes 
+
+                 return {
+                    pixel_data: pixel_data,
+                    palettes: palettes
                  };
             }
-            
-	    function tgaGetImageData8bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end
+
+	    function tgaGetImageData8bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end
                                     , image, palettes ) {
-		var colormap = palettes;		
+		var colormap = palettes;
 		var color, i = 0, x, y;
                 var width = header.width;
-                
-		for (y = y_start; y !== y_end; y += y_step) {
-                    for (x = x_start; x !== x_end; x += x_step, i++) {
-                        color = image[i];
-                        imageData[(x + width * y) * 4 + 3] = 255;
-                        imageData[(x + width * y) * 4 + 2] = colormap[(color * 3) + 0];
-                        imageData[(x + width * y) * 4 + 1] = colormap[(color * 3) + 1];
-                        imageData[(x + width * y) * 4 + 0] = colormap[(color * 3) + 2];
+
+		for ( y = y_start; y !== y_end; y += y_step ) {
+                    for ( x = x_start; x !== x_end; x += x_step, i++ ) {
+                        color = image[ i ];
+                        imageData[ ( x + width * y ) * 4 + 3 ] = 255;
+                        imageData[ ( x + width * y ) * 4 + 2 ] = colormap[ ( color * 3 ) + 0 ];
+                        imageData[ ( x + width * y ) * 4 + 1 ] = colormap[ ( color * 3 ) + 1 ];
+                        imageData[ ( x + width * y ) * 4 + 0 ] = colormap[ ( color * 3 ) + 2 ];
                     }
 		}
 
 		return imageData;
 	    };
 
-	    function tgaGetImageData16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end
-                                        , image) {
+	    function tgaGetImageData16bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end
+                                        , image ) {
                 var color, i = 0, x, y;
                 var width = header.width;
 
-                for (y = y_start; y !== y_end; y += y_step) {
-                    for (x = x_start; x !== x_end; x += x_step, i += 2) {
-                        color = image[i + 0] + (image[i + 1] << 8); // Inversed ?
-                        imageData[(x + width * y) * 4 + 0] = (color & 0x7C00) >> 7;
-                        imageData[(x + width * y) * 4 + 1] = (color & 0x03E0) >> 2;
-                        imageData[(x + width * y) * 4 + 2] = (color & 0x001F) >> 3;
-                        imageData[(x + width * y) * 4 + 3] = (color & 0x8000) ? 0 : 255;
+                for ( y = y_start; y !== y_end; y += y_step ) {
+                    for ( x = x_start; x !== x_end; x += x_step, i += 2 ) {
+                        color = image[ i + 0 ] + ( image[ i + 1 ] << 8 ); // Inversed ?
+                        imageData[ ( x + width * y ) * 4 + 0 ] = ( color & 0x7C00 ) >> 7;
+                        imageData[ ( x + width * y ) * 4 + 1 ] = ( color & 0x03E0 ) >> 2;
+                        imageData[ ( x + width * y ) * 4 + 2 ] = ( color & 0x001F ) >> 3;
+                        imageData[ ( x + width * y ) * 4 + 3 ] = ( color & 0x8000 ) ? 0 : 255;
                     }
                 }
 
                 return imageData;
 	    };
 
-	    function tgaGetImageData24bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
+	    function tgaGetImageData24bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
                 var i = 0, x, y;
                 var width = header.width;
 
-                for (y = y_start; y !== y_end; y += y_step) {
-                    for (x = x_start; x !== x_end; x += x_step, i += 3) {
-                        imageData[(x + width * y) * 4 + 3] = 255;
-                        imageData[(x + width * y) * 4 + 2] = image[i + 0];
-                        imageData[(x + width * y) * 4 + 1] = image[i + 1];
-                        imageData[(x + width * y) * 4 + 0] = image[i + 2];
+                for ( y = y_start; y !== y_end; y += y_step ) {
+                    for ( x = x_start; x !== x_end; x += x_step, i += 3 ) {
+                        imageData[ ( x + width * y ) * 4 + 3 ] = 255;
+                        imageData[ ( x + width * y ) * 4 + 2 ] = image[ i + 0 ];
+                        imageData[ ( x + width * y ) * 4 + 1 ] = image[ i + 1 ];
+                        imageData[ ( x + width * y ) * 4 + 0 ] = image[ i + 2 ];
                     }
                 }
 
                 return imageData;
 	    };
-        
-	    function tgaGetImageData32bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {		
+
+	    function tgaGetImageData32bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
                 var i = 0, x, y;
                 var width = header.width;
 
-                for (y = y_start; y !== y_end; y += y_step) {
-                    for (x = x_start; x !== x_end; x += x_step, i += 4) {
-                        imageData[(x + width * y) * 4 + 2] = image[i + 0];
-                        imageData[(x + width * y) * 4 + 1] = image[i + 1];
-                        imageData[(x + width * y) * 4 + 0] = image[i + 2];
-                        imageData[(x + width * y) * 4 + 3] = image[i + 3];
+                for ( y = y_start; y !== y_end; y += y_step ) {
+                    for ( x = x_start; x !== x_end; x += x_step, i += 4 ) {
+                        imageData[ ( x + width * y ) * 4 + 2 ] = image[ i + 0 ];
+                        imageData[ ( x + width * y ) * 4 + 1 ] = image[ i + 1 ];
+                        imageData[ ( x + width * y ) * 4 + 0 ] = image[ i + 2 ];
+                        imageData[ ( x + width * y ) * 4 + 3 ] = image[ i + 3 ];
                     }
                 }
 
@@ -500,45 +500,45 @@ THREE.ImageUtils = {
                 var color, i = 0, x, y;
                 var width = header.width;
 
-                for (y = y_start; y !== y_end; y += y_step) {
-                    for (x = x_start; x !== x_end; x += x_step, i++) {
-                        color = image[i];
-                        imageData[(x + width * y) * 4 + 0] = color;
-                        imageData[(x + width * y) * 4 + 1] = color;
-                        imageData[(x + width * y) * 4 + 2] = color;
-                        imageData[(x + width * y) * 4 + 3] = 255;
+                for ( y = y_start; y !== y_end; y += y_step ) {
+                    for ( x = x_start; x !== x_end; x += x_step, i++ ) {
+                        color = image[ i ];
+                        imageData[ ( x + width * y ) * 4 + 0 ] = color;
+                        imageData[ ( x + width * y ) * 4 + 1 ] = color;
+                        imageData[ ( x + width * y ) * 4 + 2 ] = color;
+                        imageData[ ( x + width * y ) * 4 + 3 ] = 255;
                     }
                 }
 
                 return imageData;
 	    };
 
-	    function tgaGetImageDataGrey16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {		
+	    function tgaGetImageDataGrey16bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
                 var i = 0, x, y;
                 var width = header.width;
 
-                for (y = y_start; y !== y_end; y += y_step) {
-                    for (x = x_start; x !== x_end; x += x_step, i += 2) {
-                        imageData[(x + width * y) * 4 + 0] = image[i + 0];
-                        imageData[(x + width * y) * 4 + 1] = image[i + 0];
-                        imageData[(x + width * y) * 4 + 2] = image[i + 0];
-                        imageData[(x + width * y) * 4 + 3] = image[i + 1];
+                for ( y = y_start; y !== y_end; y += y_step ) {
+                    for ( x = x_start; x !== x_end; x += x_step, i += 2 ) {
+                        imageData[ ( x + width * y ) * 4 + 0 ] = image[ i + 0 ];
+                        imageData[ ( x + width * y ) * 4 + 1 ] = image[ i + 0 ];
+                        imageData[ ( x + width * y ) * 4 + 2 ] = image[ i + 0 ];
+                        imageData[ ( x + width * y ) * 4 + 3 ] = image[ i + 1 ];
                     }
                 }
 
                 return imageData;
 	    };
-        
+
             function getTgaRGBA( width, height, image, palette ) {
                 var x_start,
                     y_start,
                     x_step,
                     y_step,
                     x_end,
-                    y_end,                    
-                    data = new Uint8Array(width * height * 4);
-                    
-                    switch( (header.flags & TGA_ORIGIN_MASK) >> TGA_ORIGIN_SHIFT ) {
+                    y_end,
+                    data = new Uint8Array( width * height * 4 );
+
+                    switch ( ( header.flags & TGA_ORIGIN_MASK ) >> TGA_ORIGIN_SHIFT ) {
                         default:
                         case TGA_ORIGIN_UL:
                             x_start = 0;
@@ -548,7 +548,7 @@ THREE.ImageUtils = {
                             y_step = 1;
                             y_end = height;
                             break;
-                            
+
                         case TGA_ORIGIN_BL:
                             x_start = 0;
                             x_step = 1;
@@ -557,7 +557,7 @@ THREE.ImageUtils = {
                             y_step = -1;
                             y_end = -1;
                             break;
-                            
+
                         case TGA_ORIGIN_UR:
                             x_start = width - 1;
                             x_step = -1;
@@ -566,7 +566,7 @@ THREE.ImageUtils = {
                             y_step = 1;
                             y_end = height;
                             break;
-                            
+
                         case TGA_ORIGIN_BR:
                             x_start = width - 1;
                             x_step = -1;
@@ -576,11 +576,11 @@ THREE.ImageUtils = {
                             y_end = -1;
                             break;
                     }
-                    
-                    
+
+
                 if ( use_grey ) {
-                    
-                    switch( header.pixel_size )
+
+                    switch ( header.pixel_size )
                     {
                         case 8:
                             tgaGetImageDataGrey8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
@@ -592,20 +592,20 @@ THREE.ImageUtils = {
                             console.error( 'ImageUtils::getTgaRGBA() - not support this format' );
                             break;
                     }
-                    
+
                 }
                 else {
-                    
-                    switch( header.pixel_size )
+
+                    switch ( header.pixel_size )
                     {
                         case 8:
                             tgaGetImageData8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image, palette );
                             break;
-                            
+
                         case 16:
                             tgaGetImageData16bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
                             break;
-                            
+
                         case 24:
                             tgaGetImageData24bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
                             break;
@@ -613,10 +613,10 @@ THREE.ImageUtils = {
                         case 32:
                             tgaGetImageData32bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
                             break;
-                            
+
                         default:
                             console.error( 'ImageUtils::getTgaRGBA() - not support this format' );
-                            break;  
+                            break;
                     }
                 }
                 // Load image data according to specific method
@@ -624,11 +624,11 @@ THREE.ImageUtils = {
                 //func(data, y_start, y_step, y_end, x_start, x_step, x_end, width, image, palette );
                 return data;
             }
-            
+
             var result = tgaParse( use_rle, use_pal, header, offset, content );
             var rgbaData = getTgaRGBA( header.width, header.height, result.pixel_data, result.palettes );
-           
-            
+
+
             return {
                 width: header.width,
                 height: header.height,
@@ -637,14 +637,14 @@ THREE.ImageUtils = {
         },
 
         loadTGATexture: function ( url, mapping, onLoad, onError ) {
-               
-                var texture = new THREE.DataTexture();                
+
+                var texture = new THREE.DataTexture();
                 {
                     var request = new XMLHttpRequest();
 
                     request.open( 'GET', url, true );
-                    request.responseType = "arraybuffer";
-                    
+                    request.responseType = 'arraybuffer';
+
                     request.addEventListener( 'load', function ( event ) {
 
                             var imageData = THREE.ImageUtils.decodeTGA( this.response );
@@ -659,16 +659,16 @@ THREE.ImageUtils = {
                             }
 
 			}, false );
-                        
+
                     request.addEventListener( 'error', function ( event ) {
 
                             if ( onError ) onError( event );
 
 			}, false );
-                    
-                    request.send(null);
+
+                    request.send( null );
                 }
-              
+
 		texture.sourceFile = url;
 
 		return texture;
@@ -696,7 +696,7 @@ THREE.ImageUtils = {
 		{
 			var request = new XMLHttpRequest();
 
-			request.onload = function( ) {
+			request.onload = function () {
 
 				var buffer = request.response;
 				var dds = THREE.ImageUtils.parseDDS( buffer, true );
@@ -707,7 +707,7 @@ THREE.ImageUtils = {
 
 					for ( var f = 0; f < faces; f ++ ) {
 
-						images[ f ] = { mipmaps : [] };
+						images[ f ] = { mipmaps: [] };
 
 						for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
@@ -736,7 +736,7 @@ THREE.ImageUtils = {
 			request.onerror = onError;
 
 			request.open( 'GET', url, true );
-			request.responseType = "arraybuffer";
+			request.responseType = 'arraybuffer';
 			request.send( null );
 
 		}
@@ -788,10 +788,10 @@ THREE.ImageUtils = {
 
 		function fourCCToInt32( value ) {
 
-			return value.charCodeAt(0) +
-				(value.charCodeAt(1) << 8) +
-				(value.charCodeAt(2) << 16) +
-				(value.charCodeAt(3) << 24);
+			return value.charCodeAt( 0 ) +
+				( value.charCodeAt( 1 ) << 8 ) +
+				( value.charCodeAt( 2 ) << 16 ) +
+				( value.charCodeAt( 3 ) << 24 );
 
 		}
 
@@ -799,36 +799,36 @@ THREE.ImageUtils = {
 
 			return String.fromCharCode(
 				value & 0xff,
-				(value >> 8) & 0xff,
-				(value >> 16) & 0xff,
-				(value >> 24) & 0xff
+				( value >> 8 ) & 0xff,
+				( value >> 16 ) & 0xff,
+				( value >> 24 ) & 0xff
 			);
 		}
 
 		function loadARGBMip( buffer, dataOffset, width, height ) {
-			var dataLength = width*height*4;
+			var dataLength = width * height * 4;
 			var srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
 			var byteArray = new Uint8Array( dataLength );
 			var dst = 0;
 			var src = 0;
 			for ( var y = 0; y < height; y++ ) {
 				for ( var x = 0; x < width; x++ ) {
-					var b = srcBuffer[src]; src++;
-					var g = srcBuffer[src]; src++;
-					var r = srcBuffer[src]; src++;
-					var a = srcBuffer[src]; src++;
-					byteArray[dst] = r; dst++;	//r
-					byteArray[dst] = g; dst++;	//g
-					byteArray[dst] = b; dst++;	//b
-					byteArray[dst] = a; dst++;	//a
+					var b = srcBuffer[ src ]; src++;
+					var g = srcBuffer[ src ]; src++;
+					var r = srcBuffer[ src ]; src++;
+					var a = srcBuffer[ src ]; src++;
+					byteArray[ dst ] = r; dst++;	//r
+					byteArray[ dst ] = g; dst++;	//g
+					byteArray[ dst ] = b; dst++;	//b
+					byteArray[ dst ] = a; dst++;	//a
 				}
 			}
 			return byteArray;
 		}
 
-		var FOURCC_DXT1 = fourCCToInt32("DXT1");
-		var FOURCC_DXT3 = fourCCToInt32("DXT3");
-		var FOURCC_DXT5 = fourCCToInt32("DXT5");
+		var FOURCC_DXT1 = fourCCToInt32( 'DXT1' );
+		var FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
+		var FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
 
 		var headerLengthInt = 31; // The header length in 32 bit ints
 
@@ -862,14 +862,14 @@ THREE.ImageUtils = {
 
 		if ( header[ off_magic ] !== DDS_MAGIC ) {
 
-			console.error( "THREE.ImageUtils.parseDDS: Invalid magic number in DDS header" );
+			console.error( 'THREE.ImageUtils.parseDDS: Invalid magic number in DDS header' );
 			return dds;
 
 		}
 
-		if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
+		if ( !header[ off_pfFlags ] & DDPF_FOURCC ) {
 
-			console.error( "THREE.ImageUtils.parseDDS: Unsupported format, must contain a FourCC code" );
+			console.error( 'THREE.ImageUtils.parseDDS: Unsupported format, must contain a FourCC code' );
 			return dds;
 
 		}
@@ -902,16 +902,16 @@ THREE.ImageUtils = {
 
 			default:
 
-				if( header[off_RGBBitCount] ==32 
-					&& header[off_RBitMask]&0xff0000
-					&& header[off_GBitMask]&0xff00 
-					&& header[off_BBitMask]&0xff
-					&& header[off_ABitMask]&0xff000000  ) {
+				if ( header[ off_RGBBitCount ] == 32
+					 && header[ off_RBitMask ] & 0xff0000
+					 && header[ off_GBitMask ] & 0xff00
+					 && header[ off_BBitMask ] & 0xff
+					 && header[ off_ABitMask ] & 0xff000000  ) {
 					isRGBAUncompressed = true;
 					blockBytes = 64;
 					dds.format = THREE.RGBAFormat;
 				} else {
-					console.error( "THREE.ImageUtils.parseDDS: Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+					console.error( 'THREE.ImageUtils.parseDDS: Unsupported FourCC code: ', int32ToFourCC( fourCC ) );
 					return dds;
 				}
 		}
@@ -944,15 +944,15 @@ THREE.ImageUtils = {
 
 			for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
-				if( isRGBAUncompressed ) {
+				if ( isRGBAUncompressed ) {
 					var byteArray = loadARGBMip( buffer, dataOffset, width, height );
 					var dataLength = byteArray.length;
 				} else {
 					var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
 					var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
 				}
-				
-				var mipmap = { "data": byteArray, "width": width, "height": height };
+
+				var mipmap = { 'data': byteArray, 'width': width, 'height': height };
 				dds.mipmaps.push( mipmap );
 
 				dataOffset += dataLength;
@@ -1021,14 +1021,14 @@ THREE.ImageUtils = {
 
 				var points = [];
 				var origin = [ 0, 0, data[ ( y * width + x ) * 4 ] / 255 * depth ];
-				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [  1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
+				points.push( [ -1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ -1, -1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ 0, -1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
+				points.push( [  1, -1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 0, data[ ( y * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 1, data[ ( uy * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [ - 1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ -1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
 
 				var normals = [];
 				var num_points = points.length;
@@ -1085,7 +1085,7 @@ THREE.ImageUtils = {
 
 		for ( var i = 0; i < size; i ++ ) {
 
-			data[ i * 3 ] 	  = r;
+			data[ i * 3 ] 	   = r;
 			data[ i * 3 + 1 ] = g;
 			data[ i * 3 + 2 ] = b;
 

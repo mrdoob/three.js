@@ -28,12 +28,12 @@ THREE.Skeleton = function ( boneList, useVertexTexture ) {
 			bone = this.addBone();
 
 			bone.name = gbone.name;
-			bone.position.set( p[0], p[1], p[2] );
-			bone.quaternion.set( q[0], q[1], q[2], q[3] );
+			bone.position.set( p[ 0 ], p[ 1 ], p[ 2 ] );
+			bone.quaternion.set( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 
 			if ( s !== undefined ) {
 
-				bone.scale.set( s[0], s[1], s[2] );
+				bone.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
 
 			} else {
 
@@ -103,7 +103,7 @@ THREE.Skeleton = function ( boneList, useVertexTexture ) {
 THREE.Skeleton.prototype = Object.create( THREE.Mesh.prototype );
 
 
-THREE.Skeleton.prototype.addBone = function( bone ) {
+THREE.Skeleton.prototype.addBone = function ( bone ) {
 
 	if ( bone === undefined ) {
 
@@ -118,7 +118,7 @@ THREE.Skeleton.prototype.addBone = function( bone ) {
 };
 
 
-THREE.Skeleton.prototype.calculateInverses = function( bone ) {
+THREE.Skeleton.prototype.calculateInverses = function ( bone ) {
 
 	this.boneInverses = [];
 

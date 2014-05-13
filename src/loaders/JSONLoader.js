@@ -19,7 +19,7 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	// todo: unify load API to for easier SceneLoader use
 
-	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
+	texturePath = texturePath && ( typeof texturePath === 'string' ) ? texturePath : this.extractUrlBase( url );
 
 	this.onLoadStart();
 	this.loadAjaxJSON( this, url, callback, texturePath );
@@ -88,7 +88,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			if ( callbackProgress !== undefined ) {
 
-				length = xhr.getResponseHeader( "Content-Length" );
+				length = xhr.getResponseHeader( 'Content-Length' );
 
 			}
 
@@ -96,7 +96,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 	};
 
-	xhr.open( "GET", url, true );
+	xhr.open( 'GET', url, true );
 	xhr.withCredentials = this.withCredentials;
 	xhr.send( null );
 
@@ -194,7 +194,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 			hasFaceVertexUv     = isBitSet( type, 3 );
 			hasFaceNormal       = isBitSet( type, 4 );
 			hasFaceVertexNormal = isBitSet( type, 5 );
-			hasFaceColor	    = isBitSet( type, 6 );
+			hasFaceColor	     = isBitSet( type, 6 );
 			hasFaceVertexColor  = isBitSet( type, 7 );
 
 			// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
@@ -460,7 +460,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 
 		// could change this to json.animations[0] or remove completely
-		
+
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
 
@@ -481,7 +481,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 				dstVertices = geometry.morphTargets[ i ].vertices;
 				srcVertices = json.morphTargets [ i ].vertices;
 
-				for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
+				for ( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
 					var vertex = new THREE.Vector3();
 					vertex.x = srcVertices[ v ] * scale;

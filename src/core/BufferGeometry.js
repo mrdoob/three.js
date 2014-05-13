@@ -88,13 +88,13 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var positions = this.attributes[ "position" ].array;
+		var positions = this.attributes[ 'position' ].array;
 
 		if ( positions ) {
 
 			var bb = this.boundingBox;
 
-			if( positions.length >= 3 ) {
+			if ( positions.length >= 3 ) {
 				bb.min.x = bb.max.x = positions[ 0 ];
 				bb.min.y = bb.max.y = positions[ 1 ];
 				bb.min.z = bb.max.z = positions[ 2 ];
@@ -571,19 +571,19 @@ THREE.BufferGeometry.prototype = {
 		WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
 		indexBufferSize - Defaults to 65535, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function(indexBufferSize) {
+	computeOffsets: function ( indexBufferSize ) {
 
 		var size = indexBufferSize;
-		if(indexBufferSize === undefined)
+		if ( indexBufferSize === undefined )
 			size = 65535; //WebGL limits type of index buffer values to 16-bit.
 
 		var s = Date.now();
 
-		var indices = this.attributes['index'].array;
-		var vertices = this.attributes['position'].array;
+		var indices = this.attributes[ 'index' ].array;
+		var vertices = this.attributes[ 'position' ].array;
 
-		var verticesCount = (vertices.length/3);
-		var facesCount = (indices.length/3);
+		var verticesCount = ( vertices.length / 3 );
+		var facesCount = ( indices.length / 3 );
 
 		/*
 		console.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
@@ -596,72 +596,72 @@ THREE.BufferGeometry.prototype = {
 		var vertexPtr = 0;
 
 		var offsets = [ { start:0, count:0, index:0 } ];
-		var offset = offsets[0];
+		var offset = offsets[ 0 ];
 
 		var duplicatedVertices = 0;
 		var newVerticeMaps = 0;
-		var faceVertices = new Int32Array(6);
+		var faceVertices = new Int32Array( 6 );
 		var vertexMap = new Int32Array( vertices.length );
 		var revVertexMap = new Int32Array( vertices.length );
-		for(var j = 0; j < vertices.length; j++) { vertexMap[j] = -1; revVertexMap[j] = -1; }
+		for ( var j = 0; j < vertices.length; j++ ) { vertexMap[ j ] = -1; revVertexMap[ j ] = -1; }
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
 			We can have more than 65k entries in the index buffer per offset, but only reference 65k values.
 		*/
-		for(var findex = 0; findex < facesCount; findex++) {
+		for ( var findex = 0; findex < facesCount; findex++ ) {
 			newVerticeMaps = 0;
 
-			for(var vo = 0; vo < 3; vo++) {
-				var vid = indices[ findex*3 + vo ];
-				if(vertexMap[vid] == -1) {
+			for ( var vo = 0; vo < 3; vo++ ) {
+				var vid = indices[ findex * 3 + vo ];
+				if ( vertexMap[ vid ] == -1 ) {
 					//Unmapped vertice
-					faceVertices[vo*2] = vid;
-					faceVertices[vo*2+1] = -1;
+					faceVertices[ vo * 2 ] = vid;
+					faceVertices[ vo * 2 + 1 ] = -1;
 					newVerticeMaps++;
-				} else if(vertexMap[vid] < offset.index) {
+				} else if ( vertexMap[ vid ] < offset.index ) {
 					//Reused vertices from previous block (duplicate)
-					faceVertices[vo*2] = vid;
-					faceVertices[vo*2+1] = -1;
+					faceVertices[ vo * 2 ] = vid;
+					faceVertices[ vo * 2 + 1 ] = -1;
 					duplicatedVertices++;
 				} else {
 					//Reused vertice in the current block
-					faceVertices[vo*2] = vid;
-					faceVertices[vo*2+1] = vertexMap[vid];
+					faceVertices[ vo * 2 ] = vid;
+					faceVertices[ vo * 2 + 1 ] = vertexMap[ vid ];
 				}
 			}
 
 			var faceMax = vertexPtr + newVerticeMaps;
-			if(faceMax > (offset.index + size)) {
+			if ( faceMax > ( offset.index + size ) ) {
 				var new_offset = { start:indexPtr, count:0, index:vertexPtr };
-				offsets.push(new_offset);
+				offsets.push( new_offset );
 				offset = new_offset;
 
 				//Re-evaluate reused vertices in light of new offset.
-				for(var v = 0; v < 6; v+=2) {
-					var new_vid = faceVertices[v+1];
-					if(new_vid > -1 && new_vid < offset.index)
-						faceVertices[v+1] = -1;
+				for ( var v = 0; v < 6; v += 2 ) {
+					var new_vid = faceVertices[ v + 1 ];
+					if ( new_vid > -1 && new_vid < offset.index )
+						faceVertices[ v + 1 ] = -1;
 				}
 			}
 
 			//Reindex the face.
-			for(var v = 0; v < 6; v+=2) {
-				var vid = faceVertices[v];
-				var new_vid = faceVertices[v+1];
+			for ( var v = 0; v < 6; v += 2 ) {
+				var vid = faceVertices[ v ];
+				var new_vid = faceVertices[ v + 1 ];
 
-				if(new_vid === -1)
+				if ( new_vid === -1 )
 					new_vid = vertexPtr++;
 
-				vertexMap[vid] = new_vid;
-				revVertexMap[new_vid] = vid;
-				sortedIndices[indexPtr++] = new_vid - offset.index; //XXX overflows at 16bit
+				vertexMap[ vid ] = new_vid;
+				revVertexMap[ new_vid ] = vid;
+				sortedIndices[ indexPtr++ ] = new_vid - offset.index; //XXX overflows at 16bit
 				offset.count++;
 			}
 		}
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
-		this.reorderBuffers(sortedIndices, revVertexMap, vertexPtr);
+		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
 		this.offsets = offsets;
 
 		/*
@@ -710,45 +710,45 @@ THREE.BufferGeometry.prototype = {
 		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
 		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertice stack).
 	*/
-	reorderBuffers: function(indexBuffer, indexMap, vertexCount) {
+	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
 
 		/* Create a copy of all attributes for reordering. */
 		var sortedAttributes = {};
 		var types = [ Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array ];
-		for( var attr in this.attributes ) {
-			if(attr == 'index')
+		for ( var attr in this.attributes ) {
+			if ( attr == 'index' )
 				continue;
-			var sourceArray = this.attributes[attr].array;
+			var sourceArray = this.attributes[ attr ].array;
 			for ( var i = 0, il = types.length; i < il; i++ ) {
-				var type = types[i];
-				if (sourceArray instanceof type) {
-					sortedAttributes[attr] = new type( this.attributes[attr].itemSize * vertexCount );
+				var type = types[ i ];
+				if ( sourceArray instanceof type ) {
+					sortedAttributes[ attr ] = new type( this.attributes[ attr ].itemSize * vertexCount );
 					break;
 				}
 			}
 		}
 
 		/* Move attribute positions based on the new index map */
-		for(var new_vid = 0; new_vid < vertexCount; new_vid++) {
-			var vid = indexMap[new_vid];
+		for ( var new_vid = 0; new_vid < vertexCount; new_vid++ ) {
+			var vid = indexMap[ new_vid ];
 			for ( var attr in this.attributes ) {
-				if(attr == 'index')
+				if ( attr == 'index' )
 					continue;
-				var attrArray = this.attributes[attr].array;
-				var attrSize = this.attributes[attr].itemSize;
-				var sortedAttr = sortedAttributes[attr];
-				for(var k = 0; k < attrSize; k++)
+				var attrArray = this.attributes[ attr ].array;
+				var attrSize = this.attributes[ attr ].itemSize;
+				var sortedAttr = sortedAttributes[ attr ];
+				for ( var k = 0; k < attrSize; k++ )
 					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
 			}
 		}
 
 		/* Carry the new sorted buffers locally */
-		this.attributes['index'].array = indexBuffer;
+		this.attributes[ 'index' ].array = indexBuffer;
 		for ( var attr in this.attributes ) {
-			if(attr == 'index')
+			if ( attr == 'index' )
 				continue;
-			this.attributes[attr].array = sortedAttributes[attr];
-			this.attributes[attr].numItems = this.attributes[attr].itemSize * vertexCount;
+			this.attributes[ attr ].array = sortedAttributes[ attr ];
+			this.attributes[ attr ].numItems = this.attributes[ attr ].itemSize * vertexCount;
 		}
 	},
 
