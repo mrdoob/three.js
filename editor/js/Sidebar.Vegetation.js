@@ -93,7 +93,7 @@ Sidebar.Vegetation = function ( editor ) {
                 mesh.position.set( 128, -64, 256 );
                 mesh.scale.set( 1.5, 1.5, 1.5 );
                 mesh.castShadow = true;
-                mesh.receiveShadow = true;
+                mesh.receiveShadow = false;
                 mesh.material = new THREE.MeshLambertMaterial( {
                     map: diffuseTex,
                     transparent: true,
