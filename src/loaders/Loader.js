@@ -138,9 +138,14 @@ THREE.Loader.prototype = {
 						var width = nearest_pow2( image.width );
 						var height = nearest_pow2( image.height );
 
-						texture.image.width = width;
-						texture.image.height = height;
-						texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
+						var canvas = document.createElement( 'canvas' );
+						canvas.width = width;
+						canvas.height = height;
+						
+						var context = canvas.getContext( '2d' );
+						context.drawImage( image, 0, 0, width, height );
+
+						texture.image = canvas;
 
 					} else {
 

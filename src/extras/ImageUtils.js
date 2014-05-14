@@ -38,7 +38,6 @@ THREE.ImageUtils = {
 	loadTextureCube: function ( array, mapping, onLoad, onError ) {
 
 		var images = [];
-		images.loadCount = 0;
 
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
@@ -48,27 +47,49 @@ THREE.ImageUtils = {
 		// no flipping needed for cube textures
 
 		texture.flipY = false;
+		
+		var loaded = 0;
+		
+		var loadTexture = function ( i ) {
+		
+			loader.load( array[ i ], function ( image ) {
 
-		for ( var i = 0, il = array.length; i < il; ++ i ) {
+				texture.images[ i ] = image;
 
-			var cubeImage = loader.load( array[i], function () {
+				loaded += 1;
 
-				images.loadCount += 1;
-
-				if ( images.loadCount === 6 ) {
+				if ( loaded === 6 ) {
 
 					texture.needsUpdate = true;
+
 					if ( onLoad ) onLoad( texture );
 
 				}
 
 			} );
-			
-			images[ i ] = cubeImage;
+
 		}
-		
+
+		for ( var i = 0, il = array.length; i < il; ++ i ) {
+
+			loadTexture( i );
+
+		}
+
 		return texture;
 
+	},
+	
+	loadCompressedTexture: function () {
+	
+		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.')
+	
+	},
+	
+	loadCompressedTextureCube: function () {
+	
+		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.')
+	
 	},
 
 	getNormalMap: function ( image, depth ) {
