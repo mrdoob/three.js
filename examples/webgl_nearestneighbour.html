@@ -157,7 +157,7 @@
 				positions = _particleGeom.attributes.position.array;
 				alphas = _particleGeom.attributes.alpha.array;
 				
-				particles = new THREE.ParticleSystem( _particleGeom, pointShaderMaterial );
+				particles = new THREE.PointCloud( _particleGeom, pointShaderMaterial );
 				particles.dynamic = true;
 				
 				for (var x = 0; x < amountOfParticles; x++) {
