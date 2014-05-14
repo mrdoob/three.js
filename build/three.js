@@ -881,6 +881,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	dot: function ( v ) {
+
+		return this._x * v._x + this._y * v._y + this._z * v._z + this._w * v._w;
+
+	},
+
 	lengthSq: function () {
 
 		return this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w;
@@ -11138,7 +11144,7 @@ THREE.Loader.prototype = {
 
 			} else {
 
-				texture = new THREE.Texture( document.createElement( 'canvas' ) );
+				texture = new THREE.Texture();
 
 				loader = scope.imageLoader;
 				loader.crossOrigin = scope.crossOrigin;
@@ -11150,9 +11156,14 @@ THREE.Loader.prototype = {
 						var width = nearest_pow2( image.width );
 						var height = nearest_pow2( image.height );
 
-						texture.image.width = width;
-						texture.image.height = height;
-						texture.image.getContext( '2d' ).drawImage( image, 0, 0, width, height );
+						var canvas = document.createElement( 'canvas' );
+						canvas.width = width;
+						canvas.height = height;
+						
+						var context = canvas.getContext( '2d' );
+						context.drawImage( image, 0, 0, width, height );
+
+						texture.image = canvas;
 
 					} else {
 
@@ -13840,10 +13851,10 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this.name = '';
 
-	this.image = image;
+	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
+	this.mapping = mapping !== undefined ? mapping : THREE.Texture.DEFAULT_MAPPING;
 
 	this.wrapS = wrapS !== undefined ? wrapS : THREE.ClampToEdgeWrapping;
 	this.wrapT = wrapT !== undefined ? wrapT : THREE.ClampToEdgeWrapping;
@@ -13868,6 +13879,9 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.onUpdate = null;
 
 };
+
+THREE.Texture.DEFAULT_IMAGE = undefined;
+THREE.Texture.DEFAULT_MAPPING = new THREE.UVMapping();
 
 THREE.Texture.prototype = {
 
@@ -13937,6 +13951,31 @@ THREE.EventDispatcher.prototype.apply( THREE.Texture.prototype );
 
 THREE.TextureIdCount = 0;
 
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
+
+	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+	this.images = images;
+
+};
+
+THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
+
+THREE.CubeTexture.clone = function ( texture ) {
+
+	if ( texture === undefined ) texture = new THREE.CubeTexture();
+
+	THREE.Texture.prototype.clone.call( this, texture );
+
+	texture.images = this.images;
+
+	return texture;
+
+};
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -24728,7 +24767,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( !texture ) continue;
 
-				if ( texture.image instanceof Array && texture.image.length === 6 ) {
+				if ( texture instanceof THREE.CubeTexture ||
+				   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
 
 					setCubeTexture( texture, textureUnit );
 
@@ -26883,10 +26923,12 @@ THREE.ImageUtils = {
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
 
-		var texture = new THREE.Texture( undefined, mapping );
+		var texture = new THREE.Texture();
+		texture.mapping = mapping;
 
-		var image = loader.load( url, function () {
+		loader.load( url, function ( image ) {
 
+			texture.image = image;
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture );
@@ -26897,7 +26939,6 @@ THREE.ImageUtils = {
 
 		} );
 
-		texture.image = image;
 		texture.sourceFile = url;
 
 		return texture;
@@ -26907,40 +26948,58 @@ THREE.ImageUtils = {
 	loadTextureCube: function ( array, mapping, onLoad, onError ) {
 
 		var images = [];
-		images.loadCount = 0;
 
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
 		
-		var texture = new THREE.Texture();
-		texture.image = images;
-		
-		if ( mapping !== undefined ) texture.mapping = mapping;
+		var texture = new THREE.CubeTexture( images, mapping );
 
 		// no flipping needed for cube textures
 
 		texture.flipY = false;
+		
+		var loaded = 0;
+		
+		var loadTexture = function ( i ) {
+		
+			loader.load( array[ i ], function ( image ) {
 
-		for ( var i = 0, il = array.length; i < il; ++ i ) {
+				texture.images[ i ] = image;
 
-			var cubeImage = loader.load( array[i], function () {
+				loaded += 1;
 
-				images.loadCount += 1;
-
-				if ( images.loadCount === 6 ) {
+				if ( loaded === 6 ) {
 
 					texture.needsUpdate = true;
+
 					if ( onLoad ) onLoad( texture );
 
 				}
 
 			} );
-			
-			images[ i ] = cubeImage;
+
 		}
-		
+
+		for ( var i = 0, il = array.length; i < il; ++ i ) {
+
+			loadTexture( i );
+
+		}
+
 		return texture;
 
+	},
+	
+	loadCompressedTexture: function () {
+	
+		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.')
+	
+	},
+	
+	loadCompressedTextureCube: function () {
+	
+		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.')
+	
 	},
 
 	getNormalMap: function ( image, depth ) {
@@ -35990,16 +36049,7 @@ THREE.SpritePlugin = function () {
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
 
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = 8;
-		canvas.height = 8;
-
-		var context = canvas.getContext( '2d' );
-		context.fillStyle = '#ffffff';
-		context.fillRect( 0, 0, canvas.width, canvas.height );
-
-		_texture = new THREE.Texture( canvas );
-		_texture.needsUpdate = true;
+		_texture = new THREE.Texture();
 
 	};
 
