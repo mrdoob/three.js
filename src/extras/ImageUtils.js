@@ -8,7 +8,7 @@ THREE.ImageUtils = {
 
 	crossOrigin: undefined,
 
-	loadTexture: function ( url, mapping, onLoad, onError ) {
+	loadTexture: function ( url, mapping, onLoad, onError, defaultColor ) {
 
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
@@ -18,6 +18,7 @@ THREE.ImageUtils = {
 		var image = loader.load( url, function () {
 
 			texture.needsUpdate = true;
+			texture.defaultColor = undefined;
 
 			if ( onLoad ) onLoad( texture );
 
@@ -27,8 +28,10 @@ THREE.ImageUtils = {
 
 		} );
 
+		texture.defaultColor = defaultColor || [ 128, 128, 128, 255 ];
 		texture.image = image;
 		texture.sourceFile = url;
+		texture.needsUpdate = true;
 
 		return texture;
 

@@ -5498,6 +5498,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
+			// If there is a default color the texture's image has not yet loaded.
+			if ( texture.defaultColor ) {
+
+				// set up a 1 pixel texture so rendering can happen immediately without WebGL errors.
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(texture.defaultColor));
+				return;
+
+			}
+
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
