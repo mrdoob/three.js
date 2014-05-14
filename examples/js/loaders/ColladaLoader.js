@@ -3491,7 +3491,7 @@ THREE.ColladaLoader = function () {
 
 									} else {
 
-										texture = new THREE.Texture( new Image() );
+										texture = new THREE.Texture();
 										loader = new THREE.ImageLoader();
 										loader.load( url, function ( image ) {
 

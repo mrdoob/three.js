@@ -126,7 +126,7 @@ THREE.Loader.prototype = {
 
 			} else {
 
-				texture = new THREE.Texture( document.createElement( 'canvas' ) );
+				texture = new THREE.Texture();
 
 				loader = scope.imageLoader;
 				loader.crossOrigin = scope.crossOrigin;

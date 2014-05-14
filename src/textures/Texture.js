@@ -11,10 +11,10 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this.name = '';
 
-	this.image = image;
+	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
+	this.mapping = mapping !== undefined ? mapping : THREE.Texture.DEFAULT_MAPPING;
 
 	this.wrapS = wrapS !== undefined ? wrapS : THREE.ClampToEdgeWrapping;
 	this.wrapT = wrapT !== undefined ? wrapT : THREE.ClampToEdgeWrapping;
@@ -35,10 +35,26 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.flipY = true;
 	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-	this._needsUpdate = false;
+	this._needsUpdate = true;
 	this.onUpdate = null;
 
 };
+
+THREE.Texture.DEFAULT_IMAGE = ( function () {
+
+	var canvas = document.createElement( 'canvas' );
+	canvas.width = 8;
+	canvas.height = 8;
+
+	var context = canvas.getContext( '2d' );
+	context.fillStyle = '#ff0000';
+	context.fillRect( 0, 0, canvas.width, canvas.height );
+
+	return canvas;
+
+}() );
+
+THREE.Texture.DEFAULT_MAPPING = new THREE.UVMapping();
 
 THREE.Texture.prototype = {
 

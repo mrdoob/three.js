@@ -983,7 +983,7 @@ THREE.SceneLoader.prototype = {
 
 				} else {
 
-					texture = new THREE.Texture( new Image() );
+					texture = new THREE.Texture();
 					loader = new THREE.ImageLoader();
 					loader.load( fullUrl, function ( image ) {
 
