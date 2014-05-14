@@ -42,10 +42,7 @@ THREE.ImageUtils = {
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
 		
-		var texture = new THREE.Texture();
-		texture.image = images;
-		
-		if ( mapping !== undefined ) texture.mapping = mapping;
+		var texture = new THREE.CubeTexture( images, mapping );
 
 		// no flipping needed for cube textures
 

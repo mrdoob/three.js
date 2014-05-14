@@ -121,7 +121,7 @@
 
 				// load skybox
 
-				var cubeMap = new THREE.Texture( [] );
+				var cubeMap = new THREE.CubeTexture( [] );
 				cubeMap.format = THREE.RGBFormat;
 				cubeMap.flipY = false;
 
@@ -143,12 +143,12 @@
 
 					};
 
-					cubeMap.image[ 0 ] = getSide( 2, 1 ); // px
-					cubeMap.image[ 1 ] = getSide( 0, 1 ); // nx
-					cubeMap.image[ 2 ] = getSide( 1, 0 ); // py
-					cubeMap.image[ 3 ] = getSide( 1, 2 ); // ny
-					cubeMap.image[ 4 ] = getSide( 1, 1 ); // pz
-					cubeMap.image[ 5 ] = getSide( 3, 1 ); // nz
+					cubeMap.images[ 0 ] = getSide( 2, 1 ); // px
+					cubeMap.images[ 1 ] = getSide( 0, 1 ); // nx
+					cubeMap.images[ 2 ] = getSide( 1, 0 ); // py
+					cubeMap.images[ 3 ] = getSide( 1, 2 ); // ny
+					cubeMap.images[ 4 ] = getSide( 1, 1 ); // pz
+					cubeMap.images[ 5 ] = getSide( 3, 1 ); // nz
 					cubeMap.needsUpdate = true;
 
 				} );

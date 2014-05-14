@@ -4906,7 +4906,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( !texture ) continue;
 
-				if ( texture.image instanceof Array && texture.image.length === 6 ) {
+				if ( texture instanceof THREE.CubeTexture /* || ( texture.image instanceof Array && texture.image.length === 6 ) */ ) {
 
 					setCubeTexture( texture, textureUnit );
 
