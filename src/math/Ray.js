@@ -216,6 +216,45 @@ THREE.Ray.prototype = {
 		return this.distanceToPoint( sphere.center ) <= sphere.radius;
 
 	},
+	
+	intersectSphere: function ( sphere, optionalTarget ) {
+
+		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
+		var L = new THREE.Vector3();
+		var radius = sphere.radius;
+		var radius2 = radius * radius;
+
+		L.subVectors( sphere.center, this.origin );
+
+		var tca = L.dot( this.direction );
+
+		if ( tca < 0 ) {
+
+			return null;
+
+		}
+
+		var d2 = L.dot( L ) - tca * tca;
+
+		if ( d2 > radius2 ) {
+
+			return null;
+
+		}
+
+		var thc = Math.sqrt( radius2 - d2 );
+		// t0 = first collision point entrance on front of sphere
+		var t0 = tca - thc;
+
+		// t1 = exit point on back of sphere.  Rarely needed, so it is commented out
+		// var t1 = tca + thc; 
+
+		// Now return the THREE.Vector3() location (collision point) of this Ray,
+		//   scaled by amount t0 along Ray.direction  
+		// This collision point will always be located somewhere on the sphere
+		return this.at( t0, optionalTarget );
+	
+	},
 
 	isIntersectionPlane: function ( plane ) {
 
@@ -233,7 +272,7 @@ THREE.Ray.prototype = {
 
 		if ( denominator * distToPoint < 0 ) {
 
-			return true
+			return true;
 
 		}
 
@@ -290,7 +329,7 @@ THREE.Ray.prototype = {
 
 			return this.intersectBox( box, v ) !== null;
 
-		}
+		};
 
 	}(),
 
@@ -441,7 +480,7 @@ THREE.Ray.prototype = {
 			// Ray intersects triangle.
 			return this.at( QdN / DdN, optionalTarget );
 	
-		}
+		};
 	
 	}(),
 
