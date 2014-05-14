@@ -4906,7 +4906,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( !texture ) continue;
 
-				if ( texture instanceof THREE.CubeTexture /* || ( texture.image instanceof Array && texture.image.length === 6 ) */ ) {
+				if ( texture instanceof THREE.CubeTexture ||
+				   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
 
 					setCubeTexture( texture, textureUnit );
 

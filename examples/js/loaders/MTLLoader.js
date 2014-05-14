@@ -369,10 +369,12 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		if ( loader !== null ) {
 
 			texture = loader.load( url, onLoad );
+			texture.mapping = mapping;
 
 		} else {
 
 			texture = new THREE.Texture( new Image() );
+			texture.mapping = mapping;
 
 			loader = new THREE.ImageLoader();
 			loader.crossOrigin = this.crossOrigin;

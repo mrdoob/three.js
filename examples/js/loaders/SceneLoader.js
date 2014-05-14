@@ -962,6 +962,7 @@ THREE.SceneLoader.prototype = {
 				if ( loader !== null ) {
 
 					texture = loader.load( url_array, generateTextureCallback( count ) );
+					texture.mapping = textureJSON.mapping;
 
 				} else {
 

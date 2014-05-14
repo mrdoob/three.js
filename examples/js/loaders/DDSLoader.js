@@ -29,11 +29,48 @@ THREE.DDSLoader.prototype = {
 
 		if ( url instanceof Array ) {
 
-			// TODO
+			var loaded = 0;
 
-			if ( onLoad ) onLoad( texture );
+			var loader = new THREE.XHRLoader();
+			loader.setResponseType( 'arraybuffer' );
+
+			var loadNext = function () {
+
+				loader.load( url[ loaded ], function ( buffer ) {
+
+					var dds = scope.parse( buffer, true );
+
+					images[ loaded ] = {
+						width: dds.width,
+						height: dds.height,
+						format: dds.format,
+						mipmaps: dds.mipmaps
+					}
+
+					loaded += 1;
+
+					if ( loaded === url.length ) {
+
+						texture.format = dds.format;
+						texture.needsUpdate = true;
+
+						if ( onLoad ) onLoad( texture );
+
+					} else {
+
+						loadNext();
+
+					}
+
+				} );
+
+			};
+
+			loadNext();
 
 		} else {
+
+			// compressed cubemap texture stored in a single DDS file
 
 			var loader = new THREE.XHRLoader();
 			loader.setResponseType( 'arraybuffer' );
