@@ -54,8 +54,14 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( scale );
 
-	// grid
 
+	var sendToRhessys = new UI.Button( 'Send to RHESSYS' ).onClick( function() {
+
+	} );
+	buttons.add( sendToRhessys );
+
+
+	// grid
 	var grid = new UI.Number( 25 ).onChange( update );
 	grid.dom.style.width = '42px';
 	//buttons.add( new UI.Text( 'Grid: ' ) );
