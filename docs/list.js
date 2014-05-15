@@ -53,7 +53,6 @@ var list = {
 			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
-			[ "SceneLoader", "api/loaders/SceneLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
 			[ "XHRLoader", "api/loaders/XHRLoader" ]
 		],
