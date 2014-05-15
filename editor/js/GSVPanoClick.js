@@ -85,6 +85,8 @@ GSVPANO.PanoLoader = function (parameters) {
 				console.log( 'New canvas of ' + c.width + 'x' + c.height );
 				_canvas.push( c );
 				_ctx.push( c.getContext('2d') );
+				_ctx[_ctx.length-1].translate(c.width,0);
+				_ctx[_ctx.length-1].scale(-1,1);
 				ptr++;
 			}
 		}
