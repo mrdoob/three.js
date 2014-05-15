@@ -123,11 +123,14 @@ Sidebar.Vegetation = function ( editor ) {
         vegParamContainer.add( new UI.Text( 'Common name' ).setWidth( '110px' ) );
         vegParamContainer.add( new UI.Text( vegInfo.common ) );
         vegParamContainer.add( new UI.Break() );
-        vegParamContainer.add( new UI.Text( 'Crown diameter' ).setWidth( '110px' ) );
+        vegParamContainer.add( new UI.Text( 'Diameter' ).setWidth( '110px' ) );
         vegParamContainer.add( new UI.Number( vegInfo.diameter) );
         vegParamContainer.add( new UI.Break() );
         vegParamContainer.add( new UI.Text( 'Height' ).setWidth( '110px' ) );
         vegParamContainer.add( new UI.Number( vegInfo.height) );
+        vegParamContainer.add( new UI.Break() );
+        vegParamContainer.add( new UI.Text( 'Crown height' ).setWidth( '110px' ) );
+        vegParamContainer.add( new UI.Number( vegInfo.crownHeight) );
         vegParamContainer.add( new UI.Break() );
         vegParamContainer.add( vegAddButton );
 
