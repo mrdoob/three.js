@@ -2,257 +2,508 @@
  * @author bhouston / http://exocortex.com
  */
 
-module( "Ray" );
+THREE.Ray = function ( origin, direction ) {
 
-test( "constructor/equals", function() {
-	var a = new THREE.Ray();
-	ok( a.origin.equals( zero3 ), "Passed!" );
-	ok( a.direction.equals( zero3 ), "Passed!" );
+	this.origin = ( origin !== undefined ) ? origin : new THREE.Vector3();
+	this.direction = ( direction !== undefined ) ? direction : new THREE.Vector3();
 
-	a = new THREE.Ray( two3.clone(), one3.clone() );
-	ok( a.origin.equals( two3 ), "Passed!" );
-	ok( a.direction.equals( one3 ), "Passed!" );
-});
+};
 
-test( "copy/equals", function() {
-	var a = new THREE.Ray( zero3.clone(), one3.clone() );
-	var b = new THREE.Ray().copy( a );
-	ok( b.origin.equals( zero3 ), "Passed!" );
-	ok( b.direction.equals( one3 ), "Passed!" );
+THREE.Ray.prototype = {
 
-	// ensure that it is a true copy
-	a.origin = zero3;
-	a.direction = one3;
-	ok( b.origin.equals( zero3 ), "Passed!" );
-	ok( b.direction.equals( one3 ), "Passed!" );
-});
+	constructor: THREE.Ray,
 
-test( "set", function() {
-	var a = new THREE.Ray();
+	set: function ( origin, direction ) {
 
-	a.set( one3, one3 );
-	ok( a.origin.equals( one3 ), "Passed!" );
-	ok( a.direction.equals( one3 ), "Passed!" );
-});
+		this.origin.copy( origin );
+		this.direction.copy( direction );
 
-test( "at", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+		return this;
 
-	ok( a.at( 0 ).equals( one3 ), "Passed!" );
-	ok( a.at( -1 ).equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
-	ok( a.at( 1 ).equals( new THREE.Vector3( 1, 1, 2 ) ), "Passed!" );
-});
+	},
 
-test( "recast/clone", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+	copy: function ( ray ) {
 
-	ok( a.recast( 0 ).equals( a ), "Passed!" );
+		this.origin.copy( ray.origin );
+		this.direction.copy( ray.direction );
 
-	var b = a.clone();
-	ok( b.recast( -1 ).equals( new THREE.Ray( new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ) ), "Passed!" );
+		return this;
 
-	var c = a.clone();
-	ok( c.recast( 1 ).equals( new THREE.Ray( new THREE.Vector3( 1, 1, 2 ), new THREE.Vector3( 0, 0, 1 ) ) ), "Passed!" );
+	},
 
-	var d = a.clone();
-	var e = d.clone().recast( 1 );
-	ok( d.equals( a ), "Passed!" );
-	ok( ! e.equals( d ), "Passed!" );
-	ok( e.equals( c ), "Passed!" );
-});
+	at: function ( t, optionalTarget ) {
 
-test( "closestPointToPoint", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+		var result = optionalTarget || new THREE.Vector3();
 
-	// behind the ray
-	var b = a.closestPointToPoint( zero3 );
-	ok( b.equals( one3 ), "Passed!" );
+		return result.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
-	// front of the ray
-	var c = a.closestPointToPoint( new THREE.Vector3( 0, 0, 50 ) );
-	ok( c.equals( new THREE.Vector3( 1, 1, 50 ) ), "Passed!" );
+	},
 
-	// exactly on the ray
-	var d = a.closestPointToPoint( one3 );
-	ok( d.equals( one3 ), "Passed!" );
-});
+	recast: function () {
 
-test( "distanceToPoint", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+		var v1 = new THREE.Vector3();
 
-	// behind the ray
-	var b = a.distanceToPoint( zero3 );
-	ok( b === Math.sqrt( 3 ), "Passed!" );
+		return function ( t ) {
 
-	// front of the ray
-	var c = a.distanceToPoint( new THREE.Vector3( 0, 0, 50 ) );
-	ok( c === Math.sqrt( 2 ), "Passed!" );
+			this.origin.copy( this.at( t, v1 ) );
 
-	// exactly on the ray
-	var d = a.distanceToPoint( one3 );
-	ok( d === 0, "Passed!" );
-});
+			return this;
 
-test( "isIntersectionSphere", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
-	var b = new THREE.Sphere( zero3, 0.5 );
-	var c = new THREE.Sphere( zero3, 1.5 );
-	var d = new THREE.Sphere( one3, 0.1 );
-	var e = new THREE.Sphere( two3, 0.1 );
-	var f = new THREE.Sphere( two3, 1 );
+		};
 
-	ok( ! a.isIntersectionSphere( b ), "Passed!" );
-	ok( ! a.isIntersectionSphere( c ), "Passed!" );
-	ok( a.isIntersectionSphere( d ), "Passed!" );
-	ok( ! a.isIntersectionSphere( e ), "Passed!" );
-	ok( ! a.isIntersectionSphere( f ), "Passed!" );
-});
+	}(),
 
-test( "isIntersectionPlane", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+	closestPointToPoint: function ( point, optionalTarget ) {
 
-	// parallel plane in front of the ray
-	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, -1 ) ) );
-	ok( a.isIntersectionPlane( b ), "Passed!" );
+		var result = optionalTarget || new THREE.Vector3();
+		result.subVectors( point, this.origin );
+		var directionDistance = result.dot( this.direction );
 
-	// parallel plane coincident with origin
-	var c = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, 0 ) ) );
-	ok( a.isIntersectionPlane( c ), "Passed!" );
+		if ( directionDistance < 0 ) {
 
-	// parallel plane behind the ray
-	var d = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, 1 ) ) );
-	ok( ! a.isIntersectionPlane( d ), "Passed!" );
+			return result.copy( this.origin );
 
-	// perpendical ray that overlaps exactly
-	var e = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), one3 );
-	ok( a.isIntersectionPlane( e ), "Passed!" );
+		}
 
-	// perpendical ray that doesn't overlap
-	var f = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), zero3 );
-	ok( ! a.isIntersectionPlane( f ), "Passed!" );
-});
+		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-test( "intersectPlane", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+	},
 
-	// parallel plane behind
-	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 1, 1, -1 ) );
-	ok( a.intersectPlane( b ) === null, "Passed!" );
+	distanceToPoint: function () {
 
-	// parallel plane coincident with origin
-	var c = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 1, 1, 0 ) );
-	ok( a.intersectPlane( c ) === null, "Passed!" );
+		var v1 = new THREE.Vector3();
 
-	// parallel plane infront
-	var d = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 1, 1, 1 ) );
-	ok( a.intersectPlane( d ).equals( a.origin ), "Passed!" );
+		return function ( point ) {
 
-	// perpendical ray that overlaps exactly
-	var e = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), one3 );
-	ok( a.intersectPlane( e ).equals( a.origin ), "Passed!" );
+			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
 
-	// perpendical ray that doesn't overlap
-	var f = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), zero3 );
-	ok( a.intersectPlane( f ) === null, "Passed!" );
-});
+			// point behind the ray
 
+			if ( directionDistance < 0 ) {
 
-test( "applyMatrix4", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
-	var m = new THREE.Matrix4();
+				return this.origin.distanceTo( point );
 
-	ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
+			}
 
-	a = new THREE.Ray( zero3.clone(), new THREE.Vector3( 0, 0, 1 ) );
-	m.makeRotationZ( Math.PI );
-	ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
+			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-	m.makeRotationX( Math.PI );
-	var b = a.clone();
-	b.direction.negate();
-	var a2 = a.clone().applyMatrix4( m );
-	ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
-	ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
+			return v1.distanceTo( point );
 
-	a.origin = new THREE.Vector3( 0, 0, 1 );
-	b.origin = new THREE.Vector3( 0, 0, -1 );
-	var a2 = a.clone().applyMatrix4( m );
-	ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
-	ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
-});
+		};
 
+	}(),
 
-test( "distanceSqToSegment", function() {
-	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
-	var ptOnLine = new THREE.Vector3();
-	var ptOnSegment = new THREE.Vector3();
+	distanceSqToSegment: function( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-	//segment in front of the ray
-	var v0 = new THREE.Vector3( 3, 5, 50 );
-	var v1 = new THREE.Vector3( 50, 50, 50 ); // just a far away point
-	var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistRay3Segment3.cpp
+		// It returns the min distance between the ray and the segment
+		// defined by v0 and v1
+		// It can also set two optional targets :
+		// - The closest point on the ray
+		// - The closest point on the segment
 
-	ok( ptOnSegment.distanceTo( v0 ) < 0.0001, "Passed!" );
-	ok( ptOnLine.distanceTo( new THREE.Vector3(1, 1, 50) ) < 0.0001, "Passed!" );
-	// ((3-1) * (3-1) + (5-1) * (5-1) = 4 + 16 = 20
-	ok( Math.abs( distSqr - 20 ) < 0.0001, "Passed!" );
+		var segCenter = v0.clone().add( v1 ).multiplyScalar( 0.5 );
+		var segDir = v1.clone().sub( v0 ).normalize();
+		var segExtent = v0.distanceTo( v1 ) * 0.5;
+		var diff = this.origin.clone().sub( segCenter );
+		var a01 = - this.direction.dot( segDir );
+		var b0 = diff.dot( this.direction );
+		var b1 = - diff.dot( segDir );
+		var c = diff.lengthSq();
+		var det = Math.abs( 1 - a01 * a01 );
+		var s0, s1, sqrDist, extDet;
 
-	//segment behind the ray
-	v0 = new THREE.Vector3( -50, -50, -50 ); // just a far away point
-	v1 = new THREE.Vector3( -3, -5, -4 );
-	distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+		if ( det >= 0 ) {
 
-	ok( ptOnSegment.distanceTo( v1 ) < 0.0001, "Passed!" );
-	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
-	// ((-3-1) * (-3-1) + (-5-1) * (-5-1) + (-4-1) + (-4-1) = 16 + 36 + 25 = 77
-	ok( Math.abs( distSqr - 77 ) < 0.0001, "Passed!" );
+			// The ray and segment are not parallel.
 
-	//exact intersection between the ray and the segment
-	v0 = new THREE.Vector3( -50, -50, -50 );
-	v1 = new THREE.Vector3( 50, 50, 50 );
-	distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
+			s0 = a01 * b1 - b0;
+			s1 = a01 * b0 - b1;
+			extDet = segExtent * det;
 
-	ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
-	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
-	ok( distSqr < 0.0001, "Passed!" );
-});
+			if ( s0 >= 0 ) {
 
-test( "intersectBox", function() {
+				if ( s1 >= - extDet ) {
 
-	var TOL = 0.0001;
+					if ( s1 <= extDet ) {
+
+						// region 0
+						// Minimum at interior points of ray and segment.
+
+						var invDet = 1 / det;
+						s0 *= invDet;
+						s1 *= invDet;
+						sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
+
+					} else {
+
+						// region 1
+
+						s1 = segExtent;
+						s0 = Math.max( 0, - ( a01 * s1 + b0) );
+						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+					}
+
+				} else {
+
+					// region 5
+
+					s1 = - segExtent;
+					s0 = Math.max( 0, - ( a01 * s1 + b0) );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				}
+
+			} else {
+
+				if ( s1 <= - extDet) {
+
+					// region 4
+
+					s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				} else if ( s1 <= extDet ) {
+
+					// region 3
+
+					s0 = 0;
+					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
+
+				} else {
+
+					// region 2
+
+					s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				}
+
+			}
+
+		} else {
+
+			// Ray and segment are parallel.
+
+			s1 = ( a01 > 0 ) ? - segExtent : segExtent;
+			s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+			sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+		}
+
+		if ( optionalPointOnRay ) {
+
+			optionalPointOnRay.copy( this.direction.clone().multiplyScalar( s0 ).add( this.origin ) );
+
+		}
+
+		if ( optionalPointOnSegment ) {
+
+			optionalPointOnSegment.copy( segDir.clone().multiplyScalar( s1 ).add( segCenter ) );
+
+		}
+
+		return sqrDist;
+
+	},
+
+	isIntersectionSphere: function ( sphere ) {
+
+		return this.distanceToPoint( sphere.center ) <= sphere.radius;
+
+	},
 	
-	var box = new THREE.Box3( new THREE.Vector3(  -1, -1, -1 ), new THREE.Vector3( 1, 1, 1 ) );
+	intersectSphere: function ( sphere, optionalTarget ) {
 
-	var a = new THREE.Ray( new THREE.Vector3( -2, 0, 0 ), new THREE.Vector3( 1, 0, 0) );
-	//ray should intersect box at -1,0,0
-	ok( a.isIntersectionBox(box) === true, "Passed!" );
-	ok( a.intersectBox(box).distanceTo( new THREE.Vector3( -1, 0, 0 ) ) < TOL, "Passed!" );
+		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
+		var L = new THREE.Vector3();
+		var radius = sphere.radius;
+		var radius2 = radius * radius;
 
-	var b = new THREE.Ray( new THREE.Vector3( -2, 0, 0 ), new THREE.Vector3( -1, 0, 0) );
-	//ray is point away from box, it should not intersect
-	ok( b.isIntersectionBox(box) === false, "Passed!" );
-	ok( b.intersectBox(box) === null, "Passed!" );
+		L.subVectors( sphere.center, this.origin );
 
-	var c = new THREE.Ray( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0) );
-	// ray is inside box, should return exit point
-	ok( c.isIntersectionBox(box) === true, "Passed!" );
-	ok( c.intersectBox(box).distanceTo( new THREE.Vector3( 1, 0, 0 ) ) < TOL, "Passed!" );
+		var tca = L.dot( this.direction );
 
-	var d = new THREE.Ray( new THREE.Vector3( 0, 2, 1 ), new THREE.Vector3( 0, -1, -1).normalize() );
-	//tilted ray should intersect box at 0,1,0
-	ok( d.isIntersectionBox(box) === true, "Passed!" );
-	ok( d.intersectBox(box).distanceTo( new THREE.Vector3( 0, 1, 0 ) ) < TOL, "Passed!" );	
+		if ( tca < 0 ) {
 
-	var e = new THREE.Ray( new THREE.Vector3( 1, -2, 1 ), new THREE.Vector3( 0, 1, 0).normalize() );
-	//handle case where ray is coplanar with one of the boxes side - box in front of ray
-	ok( e.isIntersectionBox(box) === true, "Passed!" );
-	ok( e.intersectBox(box).distanceTo( new THREE.Vector3( 1, -1, 1 ) ) < TOL, "Passed!" );	
+			return null;
+
+		}
+
+		var d2 = L.dot( L ) - tca * tca;
+
+		if ( d2 > radius2 ) {
+
+			return null;
+
+		}
+
+		var thc = Math.sqrt( radius2 - d2 );
+		// t0 = first collision point entrance on front of sphere
+		var t0 = tca - thc;
+
+		// t1 = exit point on back of sphere.  Rarely needed, so it is commented out
+		// var t1 = tca + thc; 
+
+		// Now return the THREE.Vector3() location (collision point) of this Ray,
+		//   scaled by amount t0 along Ray.direction  
+		// This collision point will always be located somewhere on the sphere
+		return this.at( t0, optionalTarget );
 	
-	var f = new THREE.Ray( new THREE.Vector3( 1, -2, 0 ), new THREE.Vector3( 0, -1, 0).normalize() );
-	//handle case where ray is coplanar with one of the boxes side - box behind ray
-	ok( f.isIntersectionBox(box) === false, "Passed!" );
-	ok( f.intersectBox(box) == null, "Passed!" );		
+	},
+
+	isIntersectionPlane: function ( plane ) {
+
+		// check if the ray lies on the plane first
+
+		var distToPoint = plane.distanceToPoint( this.origin );
+
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
+
+		var denominator = plane.normal.dot( this.direction );
+
+		if ( denominator * distToPoint < 0 ) {
+
+			return true;
+
+		}
+
+		// ray origin is behind the plane (and is pointing behind it)
+
+		return false;
+
+	},
+
+	distanceToPlane: function ( plane ) {
+
+		var denominator = plane.normal.dot( this.direction );
+		if ( denominator == 0 ) {
+
+			// line is coplanar, return origin
+			if( plane.distanceToPoint( this.origin ) == 0 ) {
+
+				return 0;
+
+			}
+
+			// Null is preferable to undefined since undefined means.... it is undefined
+
+			return null;
+
+		}
+
+		var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
+
+		// Return if the ray never intersects the plane
+
+		return t >= 0 ? t :  null;
+
+	},
+
+	intersectPlane: function ( plane, optionalTarget ) {
+
+		var t = this.distanceToPlane( plane );
+
+		if ( t === null ) {
+
+			return null;
+		}
+
+		return this.at( t, optionalTarget );
+
+	},
+
+	isIntersectionBox: function () {
+		
+		var v = new THREE.Vector3();
+
+		return function ( box ) {
+
+			return this.intersectBox( box, v ) !== null;
+
+		};
+
+	}(),
+
+	intersectBox: function ( box , optionalTarget ) {
+
+		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
+
+		var tmin,tmax,tymin,tymax,tzmin,tzmax;
+
+		var invdirx = 1/this.direction.x,
+			invdiry = 1/this.direction.y,
+			invdirz = 1/this.direction.z;
+
+		var origin = this.origin;
+
+		if (invdirx >= 0) {
+				
+			tmin = (box.min.x - origin.x) * invdirx;
+			tmax = (box.max.x - origin.x) * invdirx;
+
+		} else { 
+
+			tmin = (box.max.x - origin.x) * invdirx;
+			tmax = (box.min.x - origin.x) * invdirx;
+		}			
+
+		if (invdiry >= 0) {
+		
+			tymin = (box.min.y - origin.y) * invdiry;
+			tymax = (box.max.y - origin.y) * invdiry;
+
+		} else {
+
+			tymin = (box.max.y - origin.y) * invdiry;
+			tymax = (box.min.y - origin.y) * invdiry;
+		}
+
+		if ((tmin > tymax) || (tymin > tmax)) return null;
+
+		// These lines also handle the case where tmin or tmax is NaN
+		// (result of 0 * Infinity). x !== x returns true if x is NaN
+		
+		if (tymin > tmin || tmin !== tmin ) tmin = tymin;
+
+		if (tymax < tmax || tmax !== tmax ) tmax = tymax;
+
+		if (invdirz >= 0) {
+		
+			tzmin = (box.min.z - origin.z) * invdirz;
+			tzmax = (box.max.z - origin.z) * invdirz;
+
+		} else {
+
+			tzmin = (box.max.z - origin.z) * invdirz;
+			tzmax = (box.min.z - origin.z) * invdirz;
+		}
+
+		if ((tmin > tzmax) || (tzmin > tmax)) return null;
+
+		if (tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+
+		if (tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+
+		//return point closest to the ray (positive side)
+
+		if ( tmax < 0 ) return null;
+
+		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
+
+	},
+
+	intersectTriangle: function() {
+
+		// Compute the offset origin, edges, and normal.
+		var diff = new THREE.Vector3();
+		var edge1 = new THREE.Vector3();
+		var edge2 = new THREE.Vector3();
+		var normal = new THREE.Vector3();
+
+		return function ( a, b, c, backfaceCulling, optionalTarget ) {
+
+			// from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+
+			edge1.subVectors( b, a );
+			edge2.subVectors( c, a );
+			normal.crossVectors( edge1, edge2 );
+
+			// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+			// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+			var DdN = this.direction.dot( normal );
+			var sign;
+
+			if ( DdN > 0 ) {
+
+				if ( backfaceCulling ) return null;
+				sign = 1;
+
+			} else if ( DdN < 0 ) {
+
+				sign = - 1;
+				DdN = - DdN;
+
+			} else {
+
+				return null;
+
+			}
+
+			diff.subVectors( this.origin, a );
+			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
+
+			// b1 < 0, no intersection
+			if ( DdQxE2 < 0 ) {
+
+				return null;
+
+			}
+
+			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+
+			// b2 < 0, no intersection
+			if ( DdE1xQ < 0 ) {
+
+				return null;
+
+			}
+
+			// b1+b2 > 1, no intersection
+			if ( DdQxE2 + DdE1xQ > DdN ) {
+
+				return null;
+
+			}
+
+			// Line intersects triangle, check if ray does.
+			var QdN = - sign * diff.dot( normal );
+
+			// t < 0, no intersection
+			if ( QdN < 0 ) {
+
+				return null;
+
+			}
+
+			// Ray intersects triangle.
+			return this.at( QdN / DdN, optionalTarget );
 	
-});
+		};
+	
+	}(),
 
+	applyMatrix4: function ( matrix4 ) {
 
+		this.direction.add( this.origin ).applyMatrix4( matrix4 );
+		this.origin.applyMatrix4( matrix4 );
+		this.direction.sub( this.origin );
+		this.direction.normalize();
+
+		return this;
+	},
+
+	equals: function ( ray ) {
+
+		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Ray().copy( this );
+
+	}
+
+};
