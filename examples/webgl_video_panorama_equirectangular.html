@@ -73,15 +73,9 @@
 				video.src = "textures/pano.webm";
 
 				videoTexture = new THREE.Texture( video );
+				videoTexture.generateMipmaps = false;
 
-				var material   = new THREE.MeshBasicMaterial({
-				  map : videoTexture, overdraw: true
-				});
-
-
-				//var material = new THREE.MeshBasicMaterial( {
-				//	map: THREE.ImageUtils.loadTexture( 'pano.jpeg' )
-				//} );
+				var material   = new THREE.MeshBasicMaterial( { map : videoTexture } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				
