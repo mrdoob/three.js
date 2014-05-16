@@ -21,7 +21,7 @@ THREE.XHRLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			onLoad( cached );
+			if ( onLoad ) onLoad( cached );
 			return;
 
 		}
@@ -29,18 +29,15 @@ THREE.XHRLoader.prototype = {
 		var request = new XMLHttpRequest();
 		request.open( 'GET', url, true );
 
-		if ( onLoad !== undefined ) {
+		request.addEventListener( 'load', function ( event ) {
 
-			request.addEventListener( 'load', function ( event ) {
+			scope.cache.add( url, this.response );
 
-				scope.cache.add( url, this.response );
+			if ( onLoad ) onLoad( this.response );
 
-				onLoad( this.response );
-				scope.manager.itemEnd( url );
+			scope.manager.itemEnd( url );
 
-			}, false );
-
-		}
+		}, false );
 
 		if ( onProgress !== undefined ) {
 
