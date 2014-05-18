@@ -6,6 +6,8 @@
 
 var THREE = { REVISION: '67' };
 
+var self = self || {};
+
 self.console = self.console || {
 
 	info: function () {},
