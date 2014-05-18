@@ -18,7 +18,7 @@ THREE.Object3D = function () {
 	this.up = THREE.Object3D.DefaultUp.clone();
 
 	var scope = this;
-	
+
 	var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
@@ -27,7 +27,7 @@ THREE.Object3D = function () {
 	rotation.onChange( function () {
 		quaternion.setFromEuler( rotation, false );
 	} );
-	
+
 	quaternion.onChange( function () {
 		rotation.setFromQuaternion( quaternion, undefined, false );
 	} );
@@ -72,6 +72,11 @@ THREE.Object3D = function () {
 				console.error( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.copy() instead.' );
 				scale.copy( value );
 			}
+		},
+		visible: {
+			enumerable : true,
+			set : this.visibleSet,
+			get : this.visibleGet
 		}
 	} );
 
@@ -393,7 +398,7 @@ THREE.Object3D.prototype = {
 		}
 
 	},
-	
+
 	raycast: function () {},
 
 	traverse: function ( callback ) {
@@ -512,6 +517,56 @@ THREE.Object3D.prototype = {
 			this.children[ i ].updateMatrixWorld( force );
 
 		}
+
+	},
+
+	visibleSet: function ( visible,drawableOnly ) {
+
+		visible = visible ? true : false;
+		this._visible = visible;
+		this._visibleWas = visible;
+
+		if( visible )
+		{
+
+			this.traverse( function( node ) {
+
+				if( drawableOnly )
+				{
+					if( node instanceof THREE.Camera ) return;
+					if( node instanceof THREE.Light ) return;
+				}
+
+				if( node._visibleWas !== undefined ) node._visible = node._visibleWas
+				delete node._visibleWas;
+
+			});
+
+		}
+		else
+		{
+
+			this.traverse( function( node ) {
+
+				if( drawableOnly )
+				{
+					if( node instanceof THREE.Camera ) return;
+					if( node instanceof THREE.Light ) return;
+				}
+
+				if( node._visibleWas === undefined ) node._visibleWas = node._visible;
+				node._visible = false;
+
+			});
+
+		}
+	},
+
+	visibleGet: function () {
+
+		if ( this._visible === undefined ) return true;
+
+		return this._visible;
 
 	},
 
