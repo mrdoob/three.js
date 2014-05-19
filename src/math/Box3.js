@@ -122,7 +122,7 @@ THREE.Box3.prototype = {
 
 					var vertices = node.geometry.vertices;
 
-					for ( var i = 0, il = vertices.length; i < il; i++ ) {
+					for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 						v1.copy( vertices[ i ] );
 

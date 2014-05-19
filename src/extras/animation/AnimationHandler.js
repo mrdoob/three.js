@@ -140,7 +140,7 @@ THREE.AnimationHandler = {
 
 			hierarchy.push( root );
 
-			for ( var c = 0; c < root.children.length; c++ )
+			for ( var c = 0; c < root.children.length; c ++ )
 				parseRecurseHierarchy( root.children[ c ], hierarchy );
 
 		};
@@ -151,7 +151,7 @@ THREE.AnimationHandler = {
 
 		if ( root instanceof THREE.SkinnedMesh ) {
 
-			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
+			for ( var b = 0; b < root.skeleton.bones.length; b ++ ) {
 
 				hierarchy.push( root.skeleton.bones[ b ] );
 

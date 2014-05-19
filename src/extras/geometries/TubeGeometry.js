@@ -67,7 +67,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 
 	// consruct the grid
 
-	for ( i = 0; i < numpoints; i++ ) {
+	for ( i = 0; i < numpoints; i ++ ) {
 
 		grid[ i ] = [];
 
@@ -79,7 +79,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 		normal = normals[ i ];
 		binormal = binormals[ i ];
 
-		for ( j = 0; j < radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j ++ ) {
 
 			v = j / radialSegments * 2 * Math.PI;
 
@@ -99,9 +99,9 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 
 	// construct the mesh
 
-	for ( i = 0; i < segments; i++ ) {
+	for ( i = 0; i < segments; i ++ ) {
 
-		for ( j = 0; j < radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j ++ ) {
 
 			ip = ( closed ) ? (i + 1) % segments : i + 1;
 			jp = (j + 1) % radialSegments;
@@ -163,7 +163,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	// compute the tangent vectors for each segment on the path
 
-	for ( i = 0; i < numpoints; i++ ) {
+	for ( i = 0; i < numpoints; i ++ ) {
 
 		u = i / ( numpoints - 1 );
 
@@ -230,7 +230,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	// compute the slowly-varying normal and binormal vectors for each segment on the path
 
-	for ( i = 1; i < numpoints; i++ ) {
+	for ( i = 1; i < numpoints; i ++ ) {
 
 		normals[ i ] = normals[ i-1 ].clone();
 
@@ -266,7 +266,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 		}
 
-		for ( i = 1; i < numpoints; i++ ) {
+		for ( i = 1; i < numpoints; i ++ ) {
 
 			// twist a little...
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );

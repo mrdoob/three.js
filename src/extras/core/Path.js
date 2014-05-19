@@ -519,7 +519,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		//  with the horizontal line through inPt, left of inPt
 		//  not counting lowerY endpoints of edges and whole edges on that line
 		var inside = false;
-		for( var p = polyLen - 1, q = 0; q < polyLen; p = q++ ) {
+		for( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
 			var edgeLowPt  = inPolygon[ p ];
 			var edgeHighPt = inPolygon[ q ];
 
@@ -599,13 +599,13 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		if ( solid ) {
 
-			if ( (! holesFirst ) && ( newShapes[mainIdx] ) )	mainIdx++;
+			if ( (! holesFirst ) && ( newShapes[mainIdx] ) )	mainIdx ++;
 
 			newShapes[mainIdx] = { s: new THREE.Shape(), p: tmpPoints };
 			newShapes[mainIdx].s.actions = tmpPath.actions;
 			newShapes[mainIdx].s.curves = tmpPath.curves;
 			
-			if ( holesFirst )	mainIdx++;
+			if ( holesFirst )	mainIdx ++;
 			newShapeHoles[mainIdx] = [];
 
 			//console.log('cw', i);
@@ -628,16 +628,16 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		var ambigious = false;
 		var toChange = [];
 
-		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++ ) {
+		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
 			betterShapeHoles[sIdx] = [];
 		}
-		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++ ) {
+		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
 			var sh = newShapes[sIdx];
 			var sho = newShapeHoles[sIdx];
-			for (var hIdx = 0; hIdx < sho.length; hIdx++ ) {
+			for (var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 				var ho = sho[hIdx];
 				var hole_unassigned = true;
-				for (var s2Idx = 0; s2Idx < newShapes.length; s2Idx++ ) {
+				for (var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
 					if ( isPointInsidePolygon( ho.p, newShapes[s2Idx].p ) ) {
 						if ( sIdx != s2Idx )		toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
 						if ( hole_unassigned ) {

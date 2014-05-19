@@ -136,8 +136,8 @@ THREE.FontUtils = {
 
 					// Move To
 
-					x = outline[ i++ ] * scaleX + offset;
-					y = outline[ i++ ] * scaleY;
+					x = outline[ i ++ ] * scaleX + offset;
+					y = outline[ i ++ ] * scaleY;
 
 					path.moveTo( x, y );
 					break;
@@ -146,8 +146,8 @@ THREE.FontUtils = {
 
 					// Line To
 
-					x = outline[ i++ ] * scaleX + offset;
-					y = outline[ i++ ] * scaleY;
+					x = outline[ i ++ ] * scaleX + offset;
+					y = outline[ i ++ ] * scaleY;
 					path.lineTo( x,y );
 					break;
 
@@ -155,10 +155,10 @@ THREE.FontUtils = {
 
 					// QuadraticCurveTo
 
-					cpx  = outline[ i++ ] * scaleX + offset;
-					cpy  = outline[ i++ ] * scaleY;
-					cpx1 = outline[ i++ ] * scaleX + offset;
-					cpy1 = outline[ i++ ] * scaleY;
+					cpx  = outline[ i ++ ] * scaleX + offset;
+					cpy  = outline[ i ++ ] * scaleY;
+					cpx1 = outline[ i ++ ] * scaleX + offset;
+					cpy1 = outline[ i ++ ] * scaleY;
 
 					path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
 
@@ -184,12 +184,12 @@ THREE.FontUtils = {
 
 					// Cubic Bezier Curve
 
-					cpx  = outline[ i++ ] *  scaleX + offset;
-					cpy  = outline[ i++ ] *  scaleY;
-					cpx1 = outline[ i++ ] *  scaleX + offset;
-					cpy1 = outline[ i++ ] * - scaleY;
-					cpx2 = outline[ i++ ] *  scaleX + offset;
-					cpy2 = outline[ i++ ] * - scaleY;
+					cpx  = outline[ i ++ ] *  scaleX + offset;
+					cpy  = outline[ i ++ ] *  scaleY;
+					cpx1 = outline[ i ++ ] *  scaleX + offset;
+					cpy1 = outline[ i ++ ] * - scaleY;
+					cpx2 = outline[ i ++ ] *  scaleX + offset;
+					cpy2 = outline[ i ++ ] * - scaleY;
 
 					path.bezierCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
 
@@ -300,11 +300,11 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 		if ( area( contour ) > 0.0 ) {
 
-			for ( v = 0; v < n; v++ ) verts[ v ] = v;
+			for ( v = 0; v < n; v ++ ) verts[ v ] = v;
 
 		} else {
 
-			for ( v = 0; v < n; v++ ) verts[ v ] = ( n - 1 ) - v;
+			for ( v = 0; v < n; v ++ ) verts[ v ] = ( n - 1 ) - v;
 
 		}
 
@@ -318,7 +318,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 			/* if we loop, it is probably a non-simple polygon */
 
-			if ( ( count-- ) <= 0 ) {
+			if ( ( count -- ) <= 0 ) {
 
 				//** Triangulate: ERROR - probable bad polygon!
 
@@ -365,7 +365,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 				}
 
-				nv--;
+				nv --;
 
 				/* reset error detection counter */
 
@@ -387,7 +387,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 		var n = contour.length;
 		var a = 0.0;
 
-		for ( var p = n - 1, q = 0; q < n; p = q++ ) {
+		for ( var p = n - 1, q = 0; q < n; p = q ++ ) {
 
 			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
 
@@ -422,7 +422,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 		bX = ax - cx;  bY = ay - cy;
 		cX = bx - ax;  cY = by - ay;
 
-		for ( p = 0; p < n; p++ ) {
+		for ( p = 0; p < n; p ++ ) {
 
 			px = contour[ verts[ p ] ].x
 			py = contour[ verts[ p ] ].y

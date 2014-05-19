@@ -353,12 +353,12 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		// expand holes
 
-		for ( h = 0, hl = holes.length; h < hl; h++ ) {
+		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 			ahole = holes[ h ];
 			oneHoleMovements = holesMovements[ h ];
 
-			for ( i = 0, il = ahole.length; i < il; i++ ) {
+			for ( i = 0, il = ahole.length; i < il; i ++ ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
@@ -521,7 +521,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			// Bottom faces
 
-			for ( i = 0; i < flen; i++ ) {
+			for ( i = 0; i < flen; i ++ ) {
 
 				face = faces[ i ];
 				f3( face[ 2 ], face[ 1 ], face[ 0 ], true );

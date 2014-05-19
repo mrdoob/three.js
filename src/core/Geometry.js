@@ -381,7 +381,7 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			for ( i = 0; i < Math.min( face.vertexNormals.length, 3 ); i++ ) {
+			for ( i = 0; i < Math.min( face.vertexNormals.length, 3 ); i ++ ) {
 
 				n.copy( face.vertexNormals[ i ] );
 

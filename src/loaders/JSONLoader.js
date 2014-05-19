@@ -152,13 +152,13 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			// disregard empty arrays
 
-			for ( i = 0; i < json.uvs.length; i++ ) {
+			for ( i = 0; i < json.uvs.length; i ++ ) {
 
 				if ( json.uvs[ i ].length ) nUvLayers ++;
 
 			}
 
-			for ( i = 0; i < nUvLayers; i++ ) {
+			for ( i = 0; i < nUvLayers; i ++ ) {
 
 				geometry.faceVertexUvs[ i ] = [];
 
@@ -227,7 +227,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasFaceVertexUv ) {
 
-					for ( i = 0; i < nUvLayers; i++ ) {
+					for ( i = 0; i < nUvLayers; i ++ ) {
 
 						uvLayer = json.uvs[ i ];
 
@@ -268,7 +268,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasFaceVertexNormal ) {
 
-					for ( i = 0; i < 4; i++ ) {
+					for ( i = 0; i < 4; i ++ ) {
 
 						normalIndex = faces[ offset ++ ] * 3;
 
@@ -300,7 +300,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasFaceVertexColor ) {
 
-					for ( i = 0; i < 4; i++ ) {
+					for ( i = 0; i < 4; i ++ ) {
 
 						colorIndex = faces[ offset ++ ];
 						hex = colors[ colorIndex ];
@@ -335,7 +335,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasFaceVertexUv ) {
 
-					for ( i = 0; i < nUvLayers; i++ ) {
+					for ( i = 0; i < nUvLayers; i ++ ) {
 
 						uvLayer = json.uvs[ i ];
 
@@ -372,7 +372,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasFaceVertexNormal ) {
 
-					for ( i = 0; i < 3; i++ ) {
+					for ( i = 0; i < 3; i ++ ) {
 
 						normalIndex = faces[ offset ++ ] * 3;
 
@@ -399,7 +399,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasFaceVertexColor ) {
 
-					for ( i = 0; i < 3; i++ ) {
+					for ( i = 0; i < 3; i ++ ) {
 
 						colorIndex = faces[ offset ++ ];
 						face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
@@ -500,7 +500,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			var i, l, c, cl, dstColors, srcColors, color;
 
-			for ( i = 0, l = json.morphColors.length; i < l; i++ ) {
+			for ( i = 0, l = json.morphColors.length; i < l; i ++ ) {
 
 				geometry.morphColors[ i ] = {};
 				geometry.morphColors[ i ].name = json.morphColors[ i ].name;

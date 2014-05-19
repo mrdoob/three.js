@@ -603,27 +603,27 @@ THREE.BufferGeometry.prototype = {
 		var faceVertices = new Int32Array( 6 );
 		var vertexMap = new Int32Array( vertices.length );
 		var revVertexMap = new Int32Array( vertices.length );
-		for ( var j = 0; j < vertices.length; j++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
+		for ( var j = 0; j < vertices.length; j ++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
 			We can have more than 65k entries in the index buffer per offset, but only reference 65k values.
 		*/
-		for ( var findex = 0; findex < facesCount; findex++ ) {
+		for ( var findex = 0; findex < facesCount; findex ++ ) {
 			newVerticeMaps = 0;
 
-			for ( var vo = 0; vo < 3; vo++ ) {
+			for ( var vo = 0; vo < 3; vo ++ ) {
 				var vid = indices[ findex * 3 + vo ];
 				if ( vertexMap[ vid ] == - 1 ) {
 					//Unmapped vertice
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
-					newVerticeMaps++;
+					newVerticeMaps ++;
 				} else if ( vertexMap[ vid ] < offset.index ) {
 					//Reused vertices from previous block (duplicate)
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
-					duplicatedVertices++;
+					duplicatedVertices ++;
 				} else {
 					//Reused vertice in the current block
 					faceVertices[ vo * 2 ] = vid;
@@ -651,12 +651,12 @@ THREE.BufferGeometry.prototype = {
 				var new_vid = faceVertices[ v + 1 ];
 
 				if ( new_vid === - 1 )
-					new_vid = vertexPtr++;
+					new_vid = vertexPtr ++;
 
 				vertexMap[ vid ] = new_vid;
 				revVertexMap[ new_vid ] = vid;
-				sortedIndices[ indexPtr++ ] = new_vid - offset.index; //XXX overflows at 16bit
-				offset.count++;
+				sortedIndices[ indexPtr ++ ] = new_vid - offset.index; //XXX overflows at 16bit
+				offset.count ++;
 			}
 		}
 
@@ -719,7 +719,7 @@ THREE.BufferGeometry.prototype = {
 			if ( attr == 'index' )
 				continue;
 			var sourceArray = this.attributes[ attr ].array;
-			for ( var i = 0, il = types.length; i < il; i++ ) {
+			for ( var i = 0, il = types.length; i < il; i ++ ) {
 				var type = types[ i ];
 				if ( sourceArray instanceof type ) {
 					sortedAttributes[ attr ] = new type( this.attributes[ attr ].itemSize * vertexCount );
@@ -729,7 +729,7 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		/* Move attribute positions based on the new index map */
-		for ( var new_vid = 0; new_vid < vertexCount; new_vid++ ) {
+		for ( var new_vid = 0; new_vid < vertexCount; new_vid ++ ) {
 			var vid = indexMap[ new_vid ];
 			for ( var attr in this.attributes ) {
 				if ( attr == 'index' )
@@ -737,7 +737,7 @@ THREE.BufferGeometry.prototype = {
 				var attrArray = this.attributes[ attr ].array;
 				var attrSize = this.attributes[ attr ].itemSize;
 				var sortedAttr = sortedAttributes[ attr ];
-				for ( var k = 0; k < attrSize; k++ )
+				for ( var k = 0; k < attrSize; k ++ )
 					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
 			}
 		}

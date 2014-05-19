@@ -96,7 +96,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 					var count = offsets[ oi ].count;
 					var index = offsets[ oi ].index;
 
-					for ( var i = start, il = start + count; i < il; i++ ) {
+					for ( var i = start, il = start + count; i < il; i ++ ) {
 
 						var a = index + indices[ i ];
 

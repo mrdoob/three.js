@@ -353,7 +353,7 @@ THREE.Animation.prototype.getNextKeyWith = function ( type, h, key ) {
 
 	}
 
-	for ( ; key < keys.length; key++ ) {
+	for ( ; key < keys.length; key ++ ) {
 
 		if ( keys[ key ][ type ] !== undefined ) {
 

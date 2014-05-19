@@ -259,21 +259,21 @@ THREE.ImageUtils = {
             var content = new Uint8Array( arrayBuffer ),
                 offset = 0,
                 header = {
-                  id_length: content[ offset++ ],
-                  colormap_type: content[ offset++ ],
-                  image_type:      content[ offset++ ],
-                  colormap_index:  content[ offset++ ] | content[ offset++ ] << 8,
-                  colormap_length: content[ offset++ ] | content[ offset++ ] << 8,
-                  colormap_size:   content[ offset++ ],
+                  id_length: content[ offset ++ ],
+                  colormap_type: content[ offset ++ ],
+                  image_type:      content[ offset ++ ],
+                  colormap_index:  content[ offset ++ ] | content[ offset ++ ] << 8,
+                  colormap_length: content[ offset ++ ] | content[ offset ++ ] << 8,
+                  colormap_size:   content[ offset ++ ],
 
                   origin: [
-                            content[ offset++ ] | content[ offset++ ] << 8,
-                            content[ offset++ ] | content[ offset++ ] << 8
+                            content[ offset ++ ] | content[ offset ++ ] << 8,
+                            content[ offset ++ ] | content[ offset ++ ] << 8
                     ],
-                    width:      content[ offset++ ] | content[ offset++ ] << 8,
-                    height:     content[ offset++ ] | content[ offset++ ] << 8,
-                    pixel_size: content[ offset++ ],
-                    flags:      content[ offset++ ]
+                    width:      content[ offset ++ ] | content[ offset ++ ] << 8,
+                    height:     content[ offset ++ ] | content[ offset ++ ] << 8,
+                    pixel_size: content[ offset ++ ],
+                    flags:      content[ offset ++ ]
                 };
 
             function tgaCheckHeader( header ) {
@@ -386,14 +386,14 @@ THREE.ImageUtils = {
                     var pixels = new Uint8Array( pixel_size );
 
                     while ( shift < pixel_total ) {
-                        c     = data[ offset++ ];
+                        c     = data[ offset ++ ];
                         count = ( c & 0x7f ) + 1;
 
                         // RLE pixels.
                         if ( c & 0x80 ) {
                             // Bind pixel tmp array
                             for ( i = 0; i < pixel_size; ++ i ) {
-                                    pixels[ i ] = data[ offset++ ];
+                                    pixels[ i ] = data[ offset ++ ];
                             }
 
                             // Copy pixel array
@@ -408,7 +408,7 @@ THREE.ImageUtils = {
                         else {
                             count *= pixel_size;
                             for ( i = 0; i < count; ++ i ) {
-                                    pixel_data[ shift + i ] = data[ offset++ ];
+                                    pixel_data[ shift + i ] = data[ offset ++ ];
                             }
                            shift += count;
                         }
@@ -811,16 +811,16 @@ THREE.ImageUtils = {
 			var byteArray = new Uint8Array( dataLength );
 			var dst = 0;
 			var src = 0;
-			for ( var y = 0; y < height; y++ ) {
-				for ( var x = 0; x < width; x++ ) {
-					var b = srcBuffer[ src ]; src++;
-					var g = srcBuffer[ src ]; src++;
-					var r = srcBuffer[ src ]; src++;
-					var a = srcBuffer[ src ]; src++;
-					byteArray[ dst ] = r; dst++;	//r
-					byteArray[ dst ] = g; dst++;	//g
-					byteArray[ dst ] = b; dst++;	//b
-					byteArray[ dst ] = a; dst++;	//a
+			for ( var y = 0; y < height; y ++ ) {
+				for ( var x = 0; x < width; x ++ ) {
+					var b = srcBuffer[ src ]; src ++;
+					var g = srcBuffer[ src ]; src ++;
+					var r = srcBuffer[ src ]; src ++;
+					var a = srcBuffer[ src ]; src ++;
+					byteArray[ dst ] = r; dst ++;	//r
+					byteArray[ dst ] = g; dst ++;	//g
+					byteArray[ dst ] = b; dst ++;	//b
+					byteArray[ dst ] = a; dst ++;	//a
 				}
 			}
 			return byteArray;
