@@ -533,7 +533,7 @@ THREE.BufferGeometry.prototype = {
 
 			tmp2.crossVectors( n2, t );
 			test = tmp2.dot( tan2[ v ] );
-			w = ( test < 0.0 ) ? -1.0 : 1.0;
+			w = ( test < 0.0 ) ? - 1.0 : 1.0;
 
 			tangents[ v * 4     ] = tmp.x;
 			tangents[ v * 4 + 1 ] = tmp.y;
@@ -603,7 +603,7 @@ THREE.BufferGeometry.prototype = {
 		var faceVertices = new Int32Array( 6 );
 		var vertexMap = new Int32Array( vertices.length );
 		var revVertexMap = new Int32Array( vertices.length );
-		for ( var j = 0; j < vertices.length; j++ ) { vertexMap[ j ] = -1; revVertexMap[ j ] = -1; }
+		for ( var j = 0; j < vertices.length; j++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
@@ -614,15 +614,15 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var vo = 0; vo < 3; vo++ ) {
 				var vid = indices[ findex * 3 + vo ];
-				if ( vertexMap[ vid ] == -1 ) {
+				if ( vertexMap[ vid ] == - 1 ) {
 					//Unmapped vertice
 					faceVertices[ vo * 2 ] = vid;
-					faceVertices[ vo * 2 + 1 ] = -1;
+					faceVertices[ vo * 2 + 1 ] = - 1;
 					newVerticeMaps++;
 				} else if ( vertexMap[ vid ] < offset.index ) {
 					//Reused vertices from previous block (duplicate)
 					faceVertices[ vo * 2 ] = vid;
-					faceVertices[ vo * 2 + 1 ] = -1;
+					faceVertices[ vo * 2 + 1 ] = - 1;
 					duplicatedVertices++;
 				} else {
 					//Reused vertice in the current block
@@ -640,8 +640,8 @@ THREE.BufferGeometry.prototype = {
 				//Re-evaluate reused vertices in light of new offset.
 				for ( var v = 0; v < 6; v += 2 ) {
 					var new_vid = faceVertices[ v + 1 ];
-					if ( new_vid > -1 && new_vid < offset.index )
-						faceVertices[ v + 1 ] = -1;
+					if ( new_vid > - 1 && new_vid < offset.index )
+						faceVertices[ v + 1 ] = - 1;
 				}
 			}
 
@@ -650,7 +650,7 @@ THREE.BufferGeometry.prototype = {
 				var vid = faceVertices[ v ];
 				var new_vid = faceVertices[ v + 1 ];
 
-				if ( new_vid === -1 )
+				if ( new_vid === - 1 )
 					new_vid = vertexPtr++;
 
 				vertexMap[ vid ] = new_vid;

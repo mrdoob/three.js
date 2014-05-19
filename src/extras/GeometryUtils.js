@@ -215,7 +215,7 @@ THREE.GeometryUtils = {
 		var offset = new THREE.Vector3();
 
 		offset.addVectors( bb.min, bb.max );
-		offset.multiplyScalar( -0.5 );
+		offset.multiplyScalar( - 0.5 );
 
 		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
 		geometry.computeBoundingBox();

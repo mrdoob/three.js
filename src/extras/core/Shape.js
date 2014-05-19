@@ -391,7 +391,7 @@ THREE.Shape.Utils = {
 				for ( shapeIndex = minShapeIndex; shapeIndex < shape.length; shapeIndex++ ) {
 
 					shapePt = shape[ shapeIndex ];
-					holeIndex	= -1;
+					holeIndex	= - 1;
 
 					// search for hole which can be reached without intersections
 					for ( var h = 0; h < indepHoles.length; h ++ ) {

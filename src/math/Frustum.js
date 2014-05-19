@@ -95,7 +95,7 @@ THREE.Frustum.prototype = {
 
 		var planes = this.planes;
 		var center = sphere.center;
-		var negRadius = -sphere.radius;
+		var negRadius = - sphere.radius;
 
 		for ( var i = 0; i < 6; i ++ ) {
 

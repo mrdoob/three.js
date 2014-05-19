@@ -187,9 +187,9 @@ THREE.FontUtils = {
 					cpx  = outline[ i++ ] *  scaleX + offset;
 					cpy  = outline[ i++ ] *  scaleY;
 					cpx1 = outline[ i++ ] *  scaleX + offset;
-					cpy1 = outline[ i++ ] * -scaleY;
+					cpy1 = outline[ i++ ] * - scaleY;
 					cpx2 = outline[ i++ ] *  scaleX + offset;
-					cpy2 = outline[ i++ ] * -scaleY;
+					cpy2 = outline[ i++ ] * - scaleY;
 
 					path.bezierCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
 
@@ -441,7 +441,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 			cCROSSap = cX * apy - cY * apx;
 			bCROSScp = bX * cpy - bY * cpx;
 
-			if ( ( aCROSSbp >= -EPSILON ) && ( bCROSScp >= -EPSILON ) && ( cCROSSap >= -EPSILON ) ) return false;
+			if ( ( aCROSSbp >= - EPSILON ) && ( bCROSScp >= - EPSILON ) && ( cCROSSap >= - EPSILON ) ) return false;
 
 		}
 

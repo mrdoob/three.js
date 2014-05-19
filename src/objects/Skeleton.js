@@ -17,7 +17,7 @@ THREE.Skeleton = function ( boneList, useVertexTexture ) {
 
 	if ( boneList !== undefined ) {
 
-		for ( var b = 0; b < boneList.length; ++b ) {
+		for ( var b = 0; b < boneList.length; ++ b ) {
 
 			gbone = boneList[ b ];
 
@@ -43,11 +43,11 @@ THREE.Skeleton = function ( boneList, useVertexTexture ) {
 
 		}
 
-		for ( var b = 0; b < boneList.length; ++b ) {
+		for ( var b = 0; b < boneList.length; ++ b ) {
 
 			gbone = boneList[ b ];
 
-			if ( gbone.parent !== -1 ) {
+			if ( gbone.parent !== - 1 ) {
 
 				this.bones[ gbone.parent ].add( this.bones[ b ] );
 
@@ -122,7 +122,7 @@ THREE.Skeleton.prototype.calculateInverses = function ( bone ) {
 
 	this.boneInverses = [];
 
-	for ( var b = 0, bl = this.bones.length; b < bl; ++b ) {
+	for ( var b = 0, bl = this.bones.length; b < bl; ++ b ) {
 
 		var inverse = new THREE.Matrix4();
 

@@ -169,7 +169,7 @@ THREE.Spline = function ( points ) {
 		var v0 = ( p2 - p0 ) * 0.5,
 			v1 = ( p3 - p1 ) * 0.5;
 
-		return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( -3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
+		return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
 
 	};
 

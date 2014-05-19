@@ -45,7 +45,7 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 		var i = this.__objectsRemoved.indexOf( object );
 
-		if ( i !== -1 ) {
+		if ( i !== - 1 ) {
 
 			this.__objectsRemoved.splice( i, 1 );
 
@@ -70,7 +70,7 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 		var i = this.__lights.indexOf( object );
 
-		if ( i !== -1 ) {
+		if ( i !== - 1 ) {
 
 			this.__lights.splice( i, 1 );
 
@@ -94,7 +94,7 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 		var i = this.__objectsAdded.indexOf( object );
 
-		if ( i !== -1 ) {
+		if ( i !== - 1 ) {
 
 			this.__objectsAdded.splice( i, 1 );
 

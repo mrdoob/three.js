@@ -266,11 +266,11 @@ THREE.Quaternion.prototype = {
 
 				if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
 
-					v1.set( -vFrom.y, vFrom.x, 0 );
+					v1.set( - vFrom.y, vFrom.x, 0 );
 
 				} else {
 
-					v1.set( 0, -vFrom.z, vFrom.y );
+					v1.set( 0, - vFrom.z, vFrom.y );
 
 				}
 
@@ -303,9 +303,9 @@ THREE.Quaternion.prototype = {
 
 	conjugate: function () {
 
-		this._x *= -1;
-		this._y *= -1;
-		this._z *= -1;
+		this._x *= - 1;
+		this._y *= - 1;
+		this._z *= - 1;
 
 		this.onChangeCallback();
 
@@ -401,12 +401,12 @@ THREE.Quaternion.prototype = {
 
 		if ( cosHalfTheta < 0 ) {
 
-			this._w = -qb._w;
-			this._x = -qb._x;
-			this._y = -qb._y;
-			this._z = -qb._z;
+			this._w = - qb._w;
+			this._x = - qb._x;
+			this._y = - qb._y;
+			this._z = - qb._z;
 
-			cosHalfTheta = -cosHalfTheta;
+			cosHalfTheta = - cosHalfTheta;
 
 		} else {
 

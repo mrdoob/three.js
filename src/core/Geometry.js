@@ -398,7 +398,7 @@ THREE.Geometry.prototype = {
 
 				tmp2.crossVectors( face.vertexNormals[ i ], t );
 				test = tmp2.dot( tan2[ vertexIndex ] );
-				w = ( test < 0.0 ) ? -1.0 : 1.0;
+				w = ( test < 0.0 ) ? - 1.0 : 1.0;
 
 				face.vertexTangents[ i ] = new THREE.Vector4( tmp.x, tmp.y, tmp.z, w );
 
@@ -616,7 +616,7 @@ THREE.Geometry.prototype = {
 
 			indices = [ face.a, face.b, face.c ];
 
-			var dupIndex = -1;
+			var dupIndex = - 1;
 
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved

@@ -11,7 +11,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
   // Add root level bones as children of the mesh
 
-	for ( var b = 0; b < this.skeleton.bones.length; ++b ) {
+	for ( var b = 0; b < this.skeleton.bones.length; ++ b ) {
 
 		var bone = this.skeleton.bones[ b ];
 

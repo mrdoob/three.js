@@ -551,7 +551,7 @@ THREE.Vector4.prototype = {
 
 	negate: function () {
 
-		return this.multiplyScalar( -1 );
+		return this.multiplyScalar( - 1 );
 
 	},
 

@@ -528,8 +528,8 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 			if ( Math.abs(edgeDy) > EPSILON ) {			// not parallel
 				if ( edgeDy < 0 ) {
-					edgeLowPt  = inPolygon[ q ]; edgeDx = -edgeDx;
-					edgeHighPt = inPolygon[ p ]; edgeDy = -edgeDy;
+					edgeLowPt  = inPolygon[ q ]; edgeDx = - edgeDx;
+					edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
 				}
 				if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
 

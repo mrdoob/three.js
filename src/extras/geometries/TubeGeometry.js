@@ -83,7 +83,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 
 			v = j / radialSegments * 2 * Math.PI;
 
-			cx = -radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+			cx = - radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = radius * Math.sin( v );
 
 			pos2.copy( pos );
@@ -242,7 +242,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 			vec.normalize();
 
-			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), -1, 1 ) ); // clamp for floating pt errors
+			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -257,12 +257,12 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	if ( closed ) {
 
-		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), -1, 1 ) );
+		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
 
 		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
 
-			theta = -theta;
+			theta = - theta;
 
 		}
 

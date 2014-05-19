@@ -12,13 +12,13 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 	var fov = 90, aspect = 1;
 
 	var cameraPX = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	cameraPX.up.set( 0, -1, 0 );
+	cameraPX.up.set( 0, - 1, 0 );
 	cameraPX.lookAt( new THREE.Vector3( 1, 0, 0 ) );
 	this.add( cameraPX );
 
 	var cameraNX = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	cameraNX.up.set( 0, -1, 0 );
-	cameraNX.lookAt( new THREE.Vector3( -1, 0, 0 ) );
+	cameraNX.up.set( 0, - 1, 0 );
+	cameraNX.lookAt( new THREE.Vector3( - 1, 0, 0 ) );
 	this.add( cameraNX );
 
 	var cameraPY = new THREE.PerspectiveCamera( fov, aspect, near, far );
@@ -27,18 +27,18 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 	this.add( cameraPY );
 
 	var cameraNY = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	cameraNY.up.set( 0, 0, -1 );
-	cameraNY.lookAt( new THREE.Vector3( 0, -1, 0 ) );
+	cameraNY.up.set( 0, 0, - 1 );
+	cameraNY.lookAt( new THREE.Vector3( 0, - 1, 0 ) );
 	this.add( cameraNY );
 
 	var cameraPZ = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	cameraPZ.up.set( 0, -1, 0 );
+	cameraPZ.up.set( 0, - 1, 0 );
 	cameraPZ.lookAt( new THREE.Vector3( 0, 0, 1 ) );
 	this.add( cameraPZ );
 
 	var cameraNZ = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	cameraNZ.up.set( 0, -1, 0 );
-	cameraNZ.lookAt( new THREE.Vector3( 0, 0, -1 ) );
+	cameraNZ.up.set( 0, - 1, 0 );
+	cameraNZ.lookAt( new THREE.Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
 	this.renderTarget = new THREE.WebGLRenderTargetCube( cubeResolution, cubeResolution, { format: THREE.RGBFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } );

@@ -312,7 +312,7 @@ THREE.CurvePath.prototype.getWrapPoints = function ( oldPts, path ) {
 
 		var pathPt = path.getPoint( xNorm );
 		var normal = path.getTangent( xNorm );
-		normal.set( -normal.y, normal.x ).multiplyScalar( oldY );
+		normal.set( - normal.y, normal.x ).multiplyScalar( oldY );
 
 		p.x = pathPt.x + normal.x;
 		p.y = pathPt.y + normal.y;

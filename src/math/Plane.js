@@ -83,7 +83,7 @@ THREE.Plane.prototype = {
 
 	negate: function () {
 
-		this.constant *= -1;
+		this.constant *= - 1;
 		this.normal.negate();
 
 		return this;
@@ -154,7 +154,7 @@ THREE.Plane.prototype = {
 
 			}
 
-			var t = -( line.start.dot( this.normal ) + this.constant ) / denominator;
+			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
 			if ( t < 0 || t > 1 ) {
 
@@ -172,7 +172,7 @@ THREE.Plane.prototype = {
 	coplanarPoint: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return result.copy( this.normal ).multiplyScalar( -this.constant );
+		return result.copy( this.normal ).multiplyScalar( - this.constant );
 
 	},
 

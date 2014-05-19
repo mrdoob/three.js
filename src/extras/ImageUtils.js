@@ -392,12 +392,12 @@ THREE.ImageUtils = {
                         // RLE pixels.
                         if ( c & 0x80 ) {
                             // Bind pixel tmp array
-                            for ( i = 0; i < pixel_size; ++i ) {
+                            for ( i = 0; i < pixel_size; ++ i ) {
                                     pixels[ i ] = data[ offset++ ];
                             }
 
                             // Copy pixel array
-                            for ( i = 0; i < count; ++i ) {
+                            for ( i = 0; i < count; ++ i ) {
                                     pixel_data.set( pixels, shift + i * pixel_size );
                             }
 
@@ -407,7 +407,7 @@ THREE.ImageUtils = {
                         // Raw pixels.
                         else {
                             count *= pixel_size;
-                            for ( i = 0; i < count; ++i ) {
+                            for ( i = 0; i < count; ++ i ) {
                                     pixel_data[ shift + i ] = data[ offset++ ];
                             }
                            shift += count;
@@ -554,14 +554,14 @@ THREE.ImageUtils = {
                             x_step = 1;
                             x_end = width;
                             y_start = height - 1;
-                            y_step = -1;
-                            y_end = -1;
+                            y_step = - 1;
+                            y_end = - 1;
                             break;
 
                         case TGA_ORIGIN_UR:
                             x_start = width - 1;
-                            x_step = -1;
-                            x_end = -1;
+                            x_step = - 1;
+                            x_end = - 1;
                             y_start = 0;
                             y_step = 1;
                             y_end = height;
@@ -569,11 +569,11 @@ THREE.ImageUtils = {
 
                         case TGA_ORIGIN_BR:
                             x_start = width - 1;
-                            x_step = -1;
-                            x_end = -1;
+                            x_step = - 1;
+                            x_end = - 1;
                             y_start = height - 1;
-                            y_step = -1;
-                            y_end = -1;
+                            y_step = - 1;
+                            y_end = - 1;
                             break;
                     }
 
@@ -1021,14 +1021,14 @@ THREE.ImageUtils = {
 
 				var points = [];
 				var origin = [ 0, 0, data[ ( y * width + x ) * 4 ] / 255 * depth ];
-				points.push( [ -1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ -1, -1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
-				points.push( [ 0, -1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [  1, -1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
+				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
+				points.push( [  1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 0, data[ ( y * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 1, data[ ( uy * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [ -1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
+				points.push( [ - 1, 1, data[ ( uy * width + lx ) * 4 ] / 255 * depth ] );
 
 				var normals = [];
 				var num_points = points.length;

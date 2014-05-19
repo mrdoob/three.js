@@ -112,7 +112,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_currentProgram = null,
 	_currentFramebuffer = null,
-	_currentMaterialId = -1,
+	_currentMaterialId = - 1,
 	_currentGeometryGroupHash = null,
 	_currentCamera = null,
 
@@ -120,17 +120,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// GL state cache
 
-	_oldDoubleSided = -1,
-	_oldFlipSided = -1,
+	_oldDoubleSided = - 1,
+	_oldFlipSided = - 1,
 
-	_oldBlending = -1,
+	_oldBlending = - 1,
 
-	_oldBlendEquation = -1,
-	_oldBlendSrc = -1,
-	_oldBlendDst = -1,
+	_oldBlendEquation = - 1,
+	_oldBlendSrc = - 1,
+	_oldBlendDst = - 1,
 
-	_oldDepthTest = -1,
-	_oldDepthWrite = -1,
+	_oldDepthTest = - 1,
+	_oldDepthWrite = - 1,
 
 	_oldPolygonOffset = null,
 	_oldPolygonOffsetFactor = null,
@@ -433,14 +433,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.updateShadowMap = function ( scene, camera ) {
 
 		_currentProgram = null;
-		_oldBlending = -1;
-		_oldDepthTest = -1;
-		_oldDepthWrite = -1;
-		_currentGeometryGroupHash = -1;
-		_currentMaterialId = -1;
+		_oldBlending = - 1;
+		_oldDepthTest = - 1;
+		_oldDepthWrite = - 1;
+		_currentGeometryGroupHash = - 1;
+		_currentMaterialId = - 1;
 		_lightsNeedUpdate = true;
-		_oldDoubleSided = -1;
-		_oldFlipSided = -1;
+		_oldDoubleSided = - 1;
+		_oldFlipSided = - 1;
 
 		this.shadowMapPlugin.update( scene, camera );
 
@@ -3061,7 +3061,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = material.program.attributes;
 
-		if ( object.morphTargetBase !== -1 && attributes.position >= 0 ) {
+		if ( object.morphTargetBase !== - 1 && attributes.position >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ object.morphTargetBase ] );
 			enableAttribute( attributes.position );
@@ -3244,7 +3244,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// reset caching for this frame
 
-		_currentMaterialId = -1;
+		_currentMaterialId = - 1;
 		_lightsNeedUpdate = true;
 
 		// update scene graph
@@ -3416,13 +3416,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_currentProgram = null;
 			_currentCamera = null;
 
-			_oldBlending = -1;
-			_oldDepthTest = -1;
-			_oldDepthWrite = -1;
-			_oldDoubleSided = -1;
-			_oldFlipSided = -1;
-			_currentGeometryGroupHash = -1;
-			_currentMaterialId = -1;
+			_oldBlending = - 1;
+			_oldDepthTest = - 1;
+			_oldDepthWrite = - 1;
+			_oldDoubleSided = - 1;
+			_oldFlipSided = - 1;
+			_currentGeometryGroupHash = - 1;
+			_currentMaterialId = - 1;
 
 			_lightsNeedUpdate = true;
 
@@ -3433,13 +3433,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_currentProgram = null;
 			_currentCamera = null;
 
-			_oldBlending = -1;
-			_oldDepthTest = -1;
-			_oldDepthWrite = -1;
-			_oldDoubleSided = -1;
-			_oldFlipSided = -1;
-			_currentGeometryGroupHash = -1;
-			_currentMaterialId = -1;
+			_oldBlending = - 1;
+			_oldDepthTest = - 1;
+			_oldDepthWrite = - 1;
+			_oldDoubleSided = - 1;
+			_oldFlipSided = - 1;
+			_currentGeometryGroupHash = - 1;
+			_currentMaterialId = - 1;
 
 			_lightsNeedUpdate = true;
 
@@ -3454,8 +3454,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( reverse ) {
 
 			start = renderList.length - 1;
-			end = -1;
-			delta = -1;
+			end = - 1;
+			delta = - 1;
 
 		} else {
 
@@ -3550,7 +3550,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = setProgram( camera, lights, fog, material, object );
 
-		_currentGeometryGroupHash = -1;
+		_currentGeometryGroupHash = - 1;
 
 		_this.setMaterialFaces( material );
 
@@ -4547,7 +4547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.envMap.value = material.envMap;
-		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
+		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
 		if ( _this.gammaInput ) {
 
