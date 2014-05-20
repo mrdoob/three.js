@@ -229,8 +229,6 @@ THREE.Ray.prototype = {
 
 			var tca = v1.dot( this.direction );
 
-			if ( tca < 0 ) return null;
-
 			var d2 = v1.dot( v1 ) - tca * tca;
 
 			var radius2 = sphere.radius * sphere.radius;
@@ -244,6 +242,9 @@ THREE.Ray.prototype = {
 
 			// t1 = second intersect point - exit point on back of sphere
 			var t1 = tca + thc;
+			
+			// test to see if both t0 and t1 are behind the ray - if so, return null
+			if ( t0 < 0 && t1 < 0 ) return null;
 		
 			// test to see if t0 is behind the ray:
 			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
