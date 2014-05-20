@@ -112,46 +112,44 @@ test( "intersectSphere", function() {
 	
 	var TOL = 0.0001;
 	
-	// ray origin located at ( 0, 0, 0 ) and points outward in negative-z direction
-	var a = new THREE.Ray( zero3.clone(), new THREE.Vector3( 0, 0, -1 ) );
+	// ray a0 origin located at ( 0, 0, 0 ) and points outward in negative-z direction
+	var a0 = new THREE.Ray( zero3.clone(), new THREE.Vector3( 0, 0, -1 ) );
+	// ray a1 origin located at ( 1, 1, 1 ) and points left in negative-x direction
+	var a1 = new THREE.Ray( one3.clone(), new THREE.Vector3( -1, 0, 0 ) );
 
-	// sphere (radius of 2) located behind ray, should result in null
+	// sphere (radius of 2) located behind ray a0, should result in null
 	var b = new THREE.Sphere( new THREE.Vector3( 0, 0, 1 ), 2 );
-	ok( a.intersectSphere( b ) === null, "Passed!" );
+	ok( a0.intersectSphere( b ) === null, "Passed!" );
 	
-	// sphere (radius of 2) located in front of, but too far right of ray, should result in null
+	// sphere (radius of 2) located in front of, but too far right of ray a0, should result in null
 	var b = new THREE.Sphere( new THREE.Vector3( 3, 0, -1 ), 2 );
-	ok( a.intersectSphere( b ) === null, "Passed!" );
+	ok( a0.intersectSphere( b ) === null, "Passed!" );
 	
-	// sphere (radius of 2) located in front of, but too far left of ray, should result in null
-	var b = new THREE.Sphere( new THREE.Vector3( -3, 0, -1 ), 2 );
-	ok( a.intersectSphere( b ) === null, "Passed!" );
+	// sphere (radius of 2) located below ray a1, should result in null
+	var b = new THREE.Sphere( new THREE.Vector3( 1, -2, 1 ), 2 );
+	ok( a1.intersectSphere( b ) === null, "Passed!" );
 	
-	// sphere (radius of 2) located in front of, but too far above the ray, should result in null
-	var b = new THREE.Sphere( new THREE.Vector3( 0, 3, -1 ), 2 );
-	ok( a.intersectSphere( b ) === null, "Passed!" );
+	// sphere (radius of 1) located to the left of ray a1, should result in intersection at 0, 1, 1 
+	var b = new THREE.Sphere( new THREE.Vector3( -1, 1, 1 ), 1 );
+	ok( a1.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 1, 1 ) ) < TOL, "Passed!" );
 	
-	// sphere (radius of 2) located in front of, but too far below the ray, should result in null
-	var b = new THREE.Sphere( new THREE.Vector3( 0, -3, -1 ), 2 );
-	ok( a.intersectSphere( b ) === null, "Passed!" );
-	
-	// sphere (radius of 1) located in front of ray, should result in intersection at 0, 0, -1 
+	// sphere (radius of 1) located in front of ray a0, should result in intersection at 0, 0, -1 
 	var b = new THREE.Sphere( new THREE.Vector3( 0, 0, -2 ), 1 );
-	ok( a.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
+	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
 	
-	// sphere (radius of 2) located in front & right of ray, should result in intersection at 0, 0, -1, or left-most edge of sphere 
+	// sphere (radius of 2) located in front & right of ray a0, should result in intersection at 0, 0, -1, or left-most edge of sphere 
 	var b = new THREE.Sphere( new THREE.Vector3( 2, 0, -1 ), 2 );
-	ok( a.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
+	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
 	
-	// same situation as above, but move the sphere a fraction more to the right, and ray should now just miss 
+	// same situation as above, but move the sphere a fraction more to the right, and ray a0 should now just miss 
 	var b = new THREE.Sphere( new THREE.Vector3( 2.01, 0, -1 ), 2 );
-	ok( a.intersectSphere( b ) === null, "Passed!" );
+	ok( a0.intersectSphere( b ) === null, "Passed!" );
 	
-	// sphere (radius of 1) center located at ray origin / sphere surrounds ray origin, should result in intersection at 0, 0, 1, or entrance point on front of sphere, but behind ray
-	// if exit point on sphere ( 0, 0, -1 ) is desired in this rare situation, commented lines in Ray.js 'intersectSphere' method will need to be uncommented,
-	// and exit point on back of sphere will be returned instead.
+	// sphere (radius of 1) center located at ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 1, 
+	// is behind ray a0.  Therefore, second exit point on back of sphere will be returned: 0, 0, -1
+	// thus keeping the intersection point always in front of the ray.
 	var b = new THREE.Sphere( zero3.clone(), 1 );
-	ok( a.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, 1 ) ) < TOL, "Passed!" );
+	ok( a0.intersectSphere( b ).distanceTo( new THREE.Vector3( 0, 0, -1 ) ) < TOL, "Passed!" );
 	
 });
 
