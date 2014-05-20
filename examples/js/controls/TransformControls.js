@@ -698,7 +698,11 @@
 			camPosition.setFromMatrixPosition( camera.matrixWorld );
 			camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );
 
-			scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
+			if (camera instanceof THREE.PerspectiveCamera) {
+				scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
+			} else {
+				scale = scope.size;
+			}
 			this.position.copy( worldPosition );
 			this.scale.set( scale, scale, scale );
 
@@ -966,10 +970,17 @@
 			var y = (pointer.clientY - rect.top) / rect.height;
 			pointerVector.set( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
-			projector.unprojectVector( pointerVector, camera );
-			ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
+			var raycaster;
 
-			var intersections = ray.intersectObjects( objects, true );
+			if (camera instanceof THREE.PerspectiveCamera) {
+				projector.unprojectVector( pointerVector, camera );
+				raycaster = ray;
+				ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
+			} else {
+				raycaster = projector.pickingRay( pointerVector, camera );
+			}
+
+			var intersections = raycaster.intersectObjects( objects, true );
 			return intersections[0] ? intersections[0] : false;
 
 		}
