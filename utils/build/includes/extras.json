@@ -53,6 +53,7 @@
 	"src/extras/helpers/GridHelper.js",
 	"src/extras/helpers/HemisphereLightHelper.js",
 	"src/extras/helpers/PointLightHelper.js",
+	"src/extras/helpers/SkeletonHelper.js",
 	"src/extras/helpers/SpotLightHelper.js",
 	"src/extras/helpers/VertexNormalsHelper.js",
 	"src/extras/helpers/VertexTangentsHelper.js",
