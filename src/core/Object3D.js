@@ -15,63 +15,33 @@ THREE.Object3D = function () {
 	this.parent = undefined;
 	this.children = [];
 
-	this.up = THREE.Object3D.DefaultUp.clone();
+	this.up = new THREE.Vector3( 0, 1, 0 );
+
+	this.position = new THREE.Vector3();
 
 	var scope = this;
-	
-	var position = new THREE.Vector3();
-	var rotation = new THREE.Euler();
-	var quaternion = new THREE.Quaternion();
-	var scale = new THREE.Vector3( 1, 1, 1 );
-
-	rotation.onChange( function () {
-		quaternion.setFromEuler( rotation, false );
-	} );
-	
-	quaternion.onChange( function () {
-		rotation.setFromQuaternion( quaternion, undefined, false );
-	} );
 
 	Object.defineProperties( this, {
-		position: {
-			enumerable: true,
-			get: function () {
-				return position;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.copy() instead.' );
-				position.copy( value );
-			}
-		},
 		rotation: {
 			enumerable: true,
-			get: function () {
-				return rotation;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.copy() instead.' );
-				rotation.copy( value );
-			}
+			value: new THREE.Euler().onChange( function () {
+				scope.quaternion.setFromEuler( scope.rotation, false );
+			} )
 		},
 		quaternion: {
 			enumerable: true,
-			get: function () {
-				return quaternion;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.copy() instead.' );
-				quaternion.copy( value );
-			}
+			value: new THREE.Quaternion().onChange( function () {
+				scope.rotation.setFromQuaternion( scope.quaternion, undefined, false );
+			} )
 		},
 		scale: {
 			enumerable: true,
-			get: function () {
-				return scale;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.copy() instead.' );
-				scale.copy( value );
-			}
+			value: new THREE.Vector3( 1, 1, 1 )
+		},
+		visible: {
+			enumerable : true,
+			set : this.visibleSet,
+			get : this.visibleGet
 		}
 	} );
 
@@ -96,7 +66,6 @@ THREE.Object3D = function () {
 
 };
 
-THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
 
 THREE.Object3D.prototype = {
 
@@ -104,7 +73,7 @@ THREE.Object3D.prototype = {
 
 	get eulerOrder () {
 
-		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
 
 		return this.rotation.order;
 
@@ -112,7 +81,7 @@ THREE.Object3D.prototype = {
 
 	set eulerOrder ( value ) {
 
-		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
 
 		this.rotation.order = value;
 
@@ -120,13 +89,13 @@ THREE.Object3D.prototype = {
 
 	get useQuaternion () {
 
-		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
 	set useQuaternion ( value ) {
 
-		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
@@ -246,7 +215,7 @@ THREE.Object3D.prototype = {
 
 	translate: function ( distance, axis ) {
 
-		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
+		console.warn( 'DEPRECATED: Object3D\'s .translate() has been removed. Use .translateOnAxis( axis, distance ) instead. Note args have been changed.' );
 		return this.translateOnAxis( axis, distance );
 
 	},
@@ -393,8 +362,6 @@ THREE.Object3D.prototype = {
 		}
 
 	},
-	
-	raycast: function () {},
 
 	traverse: function ( callback ) {
 
@@ -470,8 +437,24 @@ THREE.Object3D.prototype = {
 
 	getChildByName: function ( name, recursive ) {
 
-		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
+		console.warn( 'DEPRECATED: Object3D\'s .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name, recursive );
+
+	},
+
+	getDescendants: function ( array ) {
+
+		if ( array === undefined ) array = [];
+
+		Array.prototype.push.apply( array, this.children );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].getDescendants( array );
+
+		}
+
+		return array;
 
 	},
 
@@ -512,6 +495,56 @@ THREE.Object3D.prototype = {
 			this.children[ i ].updateMatrixWorld( force );
 
 		}
+
+	},
+
+	visibleSet: function ( visible,drawableOnly ) {
+
+		visible = visible ? true : false;
+		this._visible = visible;
+		this._visibleWas = visible;
+
+		if( visible )
+		{
+
+			this.traverse( function( node ) {
+
+				if( drawableOnly )
+				{
+					if( node instanceof THREE.Camera ) return;
+					if( node instanceof THREE.Light ) return;
+				}
+
+				if( node._visibleWas !== undefined ) node._visible = node._visibleWas
+				delete node._visibleWas;
+
+			});
+
+		}
+		else
+		{
+
+			this.traverse( function( node ) {
+
+				if( drawableOnly )
+				{
+					if( node instanceof THREE.Camera ) return;
+					if( node instanceof THREE.Light ) return;
+				}
+
+				if( node._visibleWas === undefined ) node._visibleWas = node._visible;
+				node._visible = false;
+
+			});
+
+		}
+	},
+
+	visibleGet: function () {
+
+		if ( this._visible === undefined ) return true;
+
+		return this._visible;
 
 	},
 
