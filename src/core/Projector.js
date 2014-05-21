@@ -588,7 +588,9 @@ THREE.Projector = function () {
 
 						} else {
 
-							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i ++ ) {
+							var step = object.type === THREE.LinePieces ? 2 : 1;
+
+							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
 								renderList.pushLine( i, i + 1 );
 

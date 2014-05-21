@@ -12,7 +12,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshLambertMaterial': THREE.MeshLambertMaterial,
 		'MeshNormalMaterial': THREE.MeshNormalMaterial,
 		'MeshPhongMaterial': THREE.MeshPhongMaterial,
-		'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
+		'PointCloudMaterial': THREE.PointCloudMaterial,
 		'ShaderMaterial': THREE.ShaderMaterial,
 		'SpriteMaterial': THREE.SpriteMaterial,
 		'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,

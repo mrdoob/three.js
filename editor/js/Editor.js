@@ -387,7 +387,7 @@ Editor.prototype = {
 			'MeshLambertMaterial': THREE.MeshLambertMaterial,
 			'MeshNormalMaterial': THREE.MeshNormalMaterial,
 			'MeshPhongMaterial': THREE.MeshPhongMaterial,
-			'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
+			'PointCloudMaterial': THREE.PointCloudMaterial,
 			'ShaderMaterial': THREE.ShaderMaterial,
 			'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
 			'SpriteMaterial': THREE.SpriteMaterial,
