@@ -91,9 +91,9 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 	vertices[ 66 ] = max.x; vertices[ 67 ] = min.y; vertices[ 68 ] = max.z;
 	vertices[ 69 ] = max.x; vertices[ 70 ] = min.y; vertices[ 71 ] = min.z;
 
+	this.geometry.attributes.position.needsUpdate = true;
 
 	this.geometry.computeBoundingSphere();
-	this.geometry.verticesNeedUpdate = true;
 
 	this.matrixAutoUpdate = false;
 	this.matrixWorld = object.matrixWorld;
