@@ -2,6 +2,7 @@
  * @author Sean Griffin / http://twitter.com/sgrif
  * @author Michael Guerrero / http://realitymeltdown.com
  * @author mrdoob / http://mrdoob.com/
+ * @author ikerr / http://verold.com
  */
 
 THREE.SkeletonHelper = function ( object ) {
@@ -65,9 +66,9 @@ THREE.SkeletonHelper.prototype.update = function () {
 
 	var geometry = this.geometry;
 
-	var matrixWorldInv = new Matrix4().getInverse( this.root.matrixWorld );
+	var matrixWorldInv = new THREE.Matrix4().getInverse( this.root.matrixWorld );
 
-	var boneMatrix = new Matrix4();
+	var boneMatrix = new THREE.Matrix4();
 
 	var j = 0;
 
@@ -81,7 +82,7 @@ THREE.SkeletonHelper.prototype.update = function () {
 			geometry.vertices[ j ].setFromMatrixPosition( boneMatrix );
 
 			boneMatrix.multiplyMatrices( matrixWorldInv, bone.parent.matrixWorld );
-			geometry.vertices[ j + 1 ].setFromMatrixPosition( parentMatrix );
+			geometry.vertices[ j + 1 ].setFromMatrixPosition( boneMatrix );
 
 			j += 2;
 

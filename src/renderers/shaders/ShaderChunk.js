@@ -1130,6 +1130,9 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SKINNING",
 
+		"	uniform mat4 bindMatrix;",
+		"	uniform mat4 bindMatrixInverse;",
+
 		"	#ifdef BONE_TEXTURE",
 
 		"		uniform sampler2D boneTexture;",
@@ -1194,11 +1197,11 @@ THREE.ShaderChunk = {
 
 		"	#ifdef USE_MORPHTARGETS",
 
-		"	vec4 skinVertex = vec4( morphed, 1.0 );",
+		"	vec4 skinVertex = bindMatrix * vec4( morphed, 1.0 );",
 
 		"	#else",
 
-		"	vec4 skinVertex = vec4( position, 1.0 );",
+		"	vec4 skinVertex = bindMatrix * vec4( position, 1.0 );",
 
 		"	#endif",
 
@@ -1207,6 +1210,7 @@ THREE.ShaderChunk = {
 		"	skinned += boneMatY * skinVertex * skinWeight.y;",
 		"	skinned += boneMatZ * skinVertex * skinWeight.z;",
 		"	skinned += boneMatW * skinVertex * skinWeight.w;",
+		"	skinned  = bindMatrixInverse * skinned;",
 
 		"#endif"
 
@@ -1309,6 +1313,7 @@ THREE.ShaderChunk = {
 		"	skinMatrix += skinWeight.y * boneMatY;",
 		"	skinMatrix += skinWeight.z * boneMatZ;",
 		"	skinMatrix += skinWeight.w * boneMatW;",
+		"	skinMatrix  = bindMatrixInverse * skinMatrix * bindMatrix;",
 
 		"	#ifdef USE_MORPHNORMALS",
 
