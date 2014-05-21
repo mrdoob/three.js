@@ -2,15 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferGeometryLoader = function ( manager ) {
+THREE.GeometryLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.BufferGeometryLoader.prototype = {
+THREE.GeometryLoader.prototype = {
 
-	constructor: THREE.BufferGeometryLoader,
+	constructor: THREE.GeometryLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -34,28 +34,12 @@ THREE.BufferGeometryLoader.prototype = {
 
 	parse: function ( json ) {
 
-		var geometry = new THREE.BufferGeometry();
+		var geometry = new THREE.Geometry();
 
-		var attributes = json.attributes;
-
-		for ( var key in attributes ) {
-
-			var attribute = attributes[ key ];
-
-			geometry.attributes[ key ] = {
-				itemSize: attribute.itemSize,
-				array: new self[ attribute.type ]( attribute.array )
-			}
-
-		}
-
-		var offsets = json.offsets;
-
-		if ( offsets !== undefined ) {
-
-			geometry.offsets = JSON.parse( JSON.stringify( offsets ) );
-
-		}
+		geometry.indices = json.indices;
+		geometry.vertices = json.vertices;
+		geometry.normals = json.normals;
+		geometry.uvs = json.uvs;
 
 		var boundingSphere = json.boundingSphere;
 
