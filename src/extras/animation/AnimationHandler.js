@@ -149,7 +149,19 @@ THREE.AnimationHandler = {
 
 		var hierarchy = [];
 
-		parseRecurseHierarchy( root, hierarchy );
+		if ( root instanceof THREE.SkinnedMesh ) {
+
+			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
+
+				hierarchy.push( root.skeleton.bones[ b ] );
+
+			}
+
+		} else {
+
+			parseRecurseHierarchy( root, hierarchy );
+
+		}
 
 		return hierarchy;
 
