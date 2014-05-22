@@ -29,7 +29,8 @@ THREE.Box3.prototype = {
 
 			this.min.x = point.x;
 
-		} else if ( point.x > this.max.x ) {
+		}
+		if ( point.x > this.max.x ) {
 
 			this.max.x = point.x;
 
@@ -39,7 +40,8 @@ THREE.Box3.prototype = {
 
 			this.min.y = point.y;
 
-		} else if ( point.y > this.max.y ) {
+		}
+		if ( point.y > this.max.y ) {
 
 			this.max.y = point.y;
 
@@ -49,12 +51,13 @@ THREE.Box3.prototype = {
 
 			this.min.z = point.z;
 
-		} else if ( point.z > this.max.z ) {
+		}
+		if ( point.z > this.max.z ) {
 
 			this.max.z = point.z;
 
 		}
-		
+
 		return this;
 
 	},

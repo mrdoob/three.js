@@ -274,3 +274,13 @@ test( "translate", function() {
 	ok( d.clone().translate( one3 ).equals( b ), "Passed!" );
 	ok( b.clone().translate( one3.clone().negate() ).equals( d ), "Passed!" );
 });
+
+test( "addPoint", function() {
+	var a = new THREE.Box3();
+	a.addPoint( two3 );
+	a.addPoint( one3 );
+	a.addPoint( zero3 );
+
+	ok( a.min.equals( zero3 ), "Passed!" );
+	ok( a.max.equals( two3 ), "Passed!" );
+});
