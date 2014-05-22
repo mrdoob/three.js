@@ -11511,7 +11511,7 @@ THREE.XHRLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			onLoad( cached );
+			if ( onLoad ) onLoad( cached );
 			return;
 
 		}
@@ -11519,18 +11519,15 @@ THREE.XHRLoader.prototype = {
 		var request = new XMLHttpRequest();
 		request.open( 'GET', url, true );
 
-		if ( onLoad !== undefined ) {
+		request.addEventListener( 'load', function ( event ) {
 
-			request.addEventListener( 'load', function ( event ) {
+			scope.cache.add( url, this.response );
 
-				scope.cache.add( url, this.response );
+			if ( onLoad ) onLoad( this.response );
 
-				onLoad( this.response );
-				scope.manager.itemEnd( url );
+			scope.manager.itemEnd( url );
 
-			}, false );
-
-		}
+		}, false );
 
 		if ( onProgress !== undefined ) {
 
@@ -22649,6 +22646,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	//propagates object's materialUniforms to the material uniformsList
+	function setObjectUniforms( material, object ){
+		var uniforms = object.materialUniforms;
+		if (typeof(material.uniformsList) === 'undefined' || typeof(uniforms) === 'undefined'){
+			return;
+		}
+		
+		if (uniforms.length == 0){
+			return;
+		}
+
+		for(var uniform in uniforms){
+			var value = uniforms[uniform];
+			var idx = material.uniforms[uniform].listIndex;
+			material.uniformsList[idx][0].value = value;
+		}
+
+		material.uniforms.needsUpdate = true;
+	}
+
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
 
 		if ( material.visible === false ) return;
@@ -24100,9 +24117,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniformsList = [];
 
+		var index = 0;
 		for ( u in material.uniforms ) {
 
 			material.uniformsList.push( [ material.uniforms[ u ], u ] );
+			material.uniforms[ u ].listIndex = index++;
 
 		}
 
@@ -24291,10 +24310,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			// load common uniforms
-
-			loadUniformsGeneric( program, material.uniformsList );
-
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
 
@@ -24332,6 +24347,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.modelMatrix, false, object.matrixWorld.elements );
 
+		}
+
+		//load generic uniforms
+		setObjectUniforms(material, object);
+		if (refreshMaterial || material.uniforms.needsUpdate){
+			loadUniformsGeneric( program, material.uniformsList );
 		}
 
 		return program;

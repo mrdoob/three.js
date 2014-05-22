@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
+ * @author bicubic / http://messymind.net
  */
 
 THREE.WebGLRenderer = function ( parameters ) {
@@ -2788,6 +2789,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	//propagates object's materialUniforms to the material uniformsList
+	function setObjectUniforms( material, object ){
+		var uniforms = object.materialUniforms;
+		if (typeof(material.uniformsList) === 'undefined' || typeof(uniforms) === 'undefined'){
+			return;
+		}
+		
+		if (uniforms.length == 0){
+			return;
+		}
+
+		for(var uniform in uniforms){
+			var value = uniforms[uniform];
+			var idx = material.uniforms[uniform].listIndex;
+			material.uniformsList[idx][0].value = value;
+		}
+
+		material.uniforms.needsUpdate = true;
+	}
+
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
 
 		if ( material.visible === false ) return;
@@ -4239,9 +4260,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniformsList = [];
 
+		var index = 0;
 		for ( u in material.uniforms ) {
 
 			material.uniformsList.push( [ material.uniforms[ u ], u ] );
+			material.uniforms[ u ].listIndex = index++;
 
 		}
 
@@ -4430,10 +4453,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			// load common uniforms
-
-			loadUniformsGeneric( program, material.uniformsList );
-
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
 
@@ -4471,6 +4490,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.modelMatrix, false, object.matrixWorld.elements );
 
+		}
+
+		//load generic uniforms
+		setObjectUniforms(material, object);
+		if (refreshMaterial || material.uniforms.needsUpdate){
+			loadUniformsGeneric( program, material.uniformsList );
 		}
 
 		return program;
