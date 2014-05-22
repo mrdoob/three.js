@@ -93,6 +93,22 @@ THREE.Geometry.prototype = {
 
 	},
 
+	center: function () {
+
+		this.computeBoundingBox();
+
+		var offset = new THREE.Vector3();
+
+		offset.addVectors( this.boundingBox.min, this.boundingBox.max );
+		offset.multiplyScalar( - 0.5 );
+
+		this.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+		this.computeBoundingBox();
+
+		return offset;
+
+	},
+
 	computeFaceNormals: function () {
 
 		var cb = new THREE.Vector3(), ab = new THREE.Vector3();
