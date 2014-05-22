@@ -2,7 +2,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.PDBLoader = function () {};
+THREE.PDBLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.PDBLoader.prototype = {
 
@@ -63,7 +67,7 @@ THREE.PDBLoader.prototype = {
 					// doesn't really work as almost all PDBs
 					// have just normal bonds appearing multiple
 					// times instead of being double/triple bonds
-					//bonds[bhash[h]][2] += 1;
+					// bonds[bhash[h]][2] += 1;
 
 				}
 
@@ -143,6 +147,7 @@ THREE.PDBLoader.prototype = {
 			var r = atom[ 3 ][ 0 ] / 255;
 			var g = atom[ 3 ][ 1 ] / 255;
 			var b = atom[ 3 ][ 2 ] / 255;
+
 			var color = new THREE.Color();
 			color.setRGB( r, g, b );
 
@@ -167,7 +172,7 @@ THREE.PDBLoader.prototype = {
 
 		}
 
-		callback( geometryAtoms, geometryBonds );
+		callback( geometryAtoms, geometryBonds, json );
 
 	}
 

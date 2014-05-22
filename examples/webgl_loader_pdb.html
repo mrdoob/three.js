@@ -53,26 +53,29 @@
 				background-color: rgba(0,255,255,1);
 			}
 
-			.bond {
-				width: 5px;
-				height: 10px;
-				background: #eee;
-				display: block;
+			.label {
+				text-shadow: -1px 1px 1px rgb(0,0,0);
+				margin-left: 25px;
 			}
+
+
 		</style>
 	</head>
 	<body>
 		<script src="../build/three.min.js"></script>
+
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/loaders/PDBLoader.js"></script>
+		<script src="js/renderers/CSS2DRenderer.js"></script>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - molecules</div>
 		<div id="menu"></div>
 
 		<script>
-			var camera, scene, renderer;
+			var camera, scene, renderer, labelsRenderer;
 			var controls;
+
 			var root;
 
 			var MOLECULES = {
@@ -97,8 +100,6 @@
 			};
 
 			var loader = new THREE.PDBLoader();
-			var colorSpriteMap = {};
-			var baseSprite = document.createElement( 'img' );
 
 			var menu = document.getElementById( "menu" );
 
@@ -126,6 +127,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
+				labelRenderer = new THREE.CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = '0';
+				labelRenderer.domElement.style.pointerEvents = 'none';
+				document.getElementById( 'container' ).appendChild( labelRenderer.domElement );
+
 				//
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
@@ -134,14 +142,8 @@
 
 				//
 
-				baseSprite.onload = function () {
-
-					loadMolecule( "models/molecules/caffeine.pdb" );
-					createMenu();
-
-				};
-
-				baseSprite.src = 'textures/sprites/ball.png';
+				loadMolecule( "models/molecules/caffeine.pdb" );
+				createMenu();
 
 				//
 
@@ -188,7 +190,9 @@
 
 				}
 
-				loader.load( url, function ( geometry, geometryBonds ) {
+				loader.load( url, function ( geometry, geometryBonds, json ) {
+
+					console.log( geometry, geometryBonds, json );
 
 					var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 					var sphereGeometry = new THREE.IcosahedronGeometry( 1, 2 );
@@ -209,6 +213,17 @@
 						object.position.multiplyScalar( 75 );
 						object.scale.multiplyScalar( 25 );
 						root.add( object );
+
+						var atom = json.atoms[ i ];
+
+						var text = document.createElement( 'div' );
+						text.className = 'label';
+						text.style.color = 'rgb(' + atom[ 3 ][ 0 ] + ',' + atom[ 3 ][ 1 ] + ',' + atom[ 3 ][ 2 ] + ')';
+						text.textContent = atom[ 4 ];
+
+						var label = new THREE.CSS2DObject( text );
+						label.position.copy( object.position );
+						root.add( label );
 
 					}
 
@@ -244,6 +259,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 
 				render();
 
@@ -266,6 +282,7 @@
 			function render() {
 
 				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
 
 			}
 

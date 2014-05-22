@@ -16,12 +16,6 @@ THREE.CSS3DObject = function ( element ) {
 
 			this.element.parentNode.removeChild( this.element );
 
-			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-				this.children[ i ].dispatchEvent( event );
-
-			}
-
 		}
 
 	} );
