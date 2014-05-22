@@ -5480,6 +5480,47 @@ THREE.Ray.prototype = {
 		return this.distanceToPoint( sphere.center ) <= sphere.radius;
 
 	},
+	
+	intersectSphere: function () {
+
+		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
+		
+		var v1 = new THREE.Vector3();
+		
+		return function ( sphere, optionalTarget ) {
+
+			v1.subVectors( sphere.center, this.origin );
+
+			var tca = v1.dot( this.direction );
+
+			var d2 = v1.dot( v1 ) - tca * tca;
+
+			var radius2 = sphere.radius * sphere.radius;
+			
+			if ( d2 > radius2 ) return null;
+
+			var thc = Math.sqrt( radius2 - d2 );
+			
+			// t0 = first intersect point - entrance on front of sphere
+			var t0 = tca - thc;
+
+			// t1 = second intersect point - exit point on back of sphere
+			var t1 = tca + thc;
+			
+			// test to see if both t0 and t1 are behind the ray - if so, return null
+			if ( t0 < 0 && t1 < 0 ) return null;
+		
+			// test to see if t0 is behind the ray:
+			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
+			// in order to always return an intersect point that is in front of the ray.
+			if ( t0 < 0 ) return this.at( t1, optionalTarget );
+
+			// else t0 is in front of the ray, so return the first collision point scaled by t0 
+			return this.at( t0, optionalTarget );
+			
+		}
+	
+	}(),
 
 	isIntersectionPlane: function ( plane ) {
 
@@ -5497,7 +5538,7 @@ THREE.Ray.prototype = {
 
 		if ( denominator * distToPoint < 0 ) {
 
-			return true
+			return true;
 
 		}
 
@@ -5554,7 +5595,7 @@ THREE.Ray.prototype = {
 
 			return this.intersectBox( box, v ) !== null;
 
-		}
+		};
 
 	}(),
 
@@ -5705,7 +5746,7 @@ THREE.Ray.prototype = {
 			// Ray intersects triangle.
 			return this.at( QdN / DdN, optionalTarget );
 	
-		}
+		};
 	
 	}(),
 
@@ -9064,7 +9105,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-			console.error( 'THREE.BufferGeometry.computeBoundingBox()', 'Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
+			console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
 
 		}
 
@@ -9116,7 +9157,7 @@ THREE.BufferGeometry.prototype = {
 
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
-					console.error( 'THREE.BufferGeometry.computeBoundingSphere()', 'Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
+					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
 
 				}
 
