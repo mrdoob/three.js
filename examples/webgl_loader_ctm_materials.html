@@ -270,7 +270,8 @@
 
 				loader.statusDomElement.style.display = "none";
 
-				THREE.GeometryUtils.center( geometry );
+				geometry.center();
+				
 				hackMaterials( materials );
 
 				var material = new THREE.MeshFaceMaterial( materials );

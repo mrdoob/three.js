@@ -193,7 +193,7 @@
 					var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 					var sphereGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 
-					var offset = THREE.GeometryUtils.center( geometry );
+					var offset = geometry.center();
 					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
 
 					for ( var i = 0; i < geometry.vertices.length; i ++ ) {

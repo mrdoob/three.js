@@ -271,7 +271,7 @@ THREE.GeometryUtils = {
 	},
 
 	// Get triangle area (half of parallelogram)
-	//	http://mathworld.wolfram.com/TriangleArea.html
+	// http://mathworld.wolfram.com/TriangleArea.html
 
 	triangleArea: function () {
 
@@ -289,9 +289,6 @@ THREE.GeometryUtils = {
 		};
 
 	}(),
-
-
-	,
 
 	center: function ( geometry ) {
 
