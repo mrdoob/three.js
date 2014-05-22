@@ -32,7 +32,6 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 	var min = geometry.boundingBox.min;
 	var max = geometry.boundingBox.max;
 
-
 	/*
 	  5____4
 	1/___0/|
