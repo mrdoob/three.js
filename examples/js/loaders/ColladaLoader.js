@@ -3451,8 +3451,13 @@ THREE.ColladaLoader = function () {
 				} else { // A_ZERO (default in collada 1.5.0) - http://www.khronos.org/files/collada_1_5_release_notes.pdf (pg 16)
 					transparencyLevel = this.transparent.color.a;
 				}
-			
-				props[ 'transparent' ] = true;
+				
+				// Assumes all texures in the 'transparent' field will have an alpha channel
+				if ( transparentColor.isTexture() || transparencyLevel > 0 ) {
+					props[ 'transparent' ] = true;
+				} else {
+					props[ 'transparent' ] = false;
+				}
 				
 			} else {
 				props[ 'transparent' ] = false;
