@@ -329,7 +329,7 @@ THREE.BufferGeometry.prototype = {
 				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
 					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-					box.addPoint( vector );
+					box.expandByPoint( vector );
 
 				}
 
