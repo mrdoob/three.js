@@ -3452,7 +3452,7 @@ THREE.ColladaLoader = function () {
 					transparencyLevel = this.transparent.color.a;
 				}
 				
-				// Assumes all texures in the 'transparent' field will have an alpha channel
+				// Assumes all textures in the 'transparent' field will have an alpha channel
 				if ( transparentColor.isTexture() || transparencyLevel > 0 ) {
 					props[ 'transparent' ] = true;
 				} else {
