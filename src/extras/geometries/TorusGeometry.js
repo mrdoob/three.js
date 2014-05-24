@@ -22,13 +22,22 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 	tubularSegments = tubularSegments || 6;
 	arc = arc || Math.PI * 2;
 
+        var startTubularSegments = 0;
+
+        if ( arc < 0 ) {
+
+            startTubularSegments = arc;
+            arc *= -1;
+
+        }
+
 	var center = new THREE.Vector3(), uvs = [], normals = [];
 
 	for ( var j = 0; j <= radialSegments; j ++ ) {
 
 		for ( var i = 0; i <= tubularSegments; i ++ ) {
 
-			var u = i / tubularSegments * arc;
+			var u = startTubularSegments + i / tubularSegments * arc;
 			var v = j / radialSegments * Math.PI * 2;
 
 			center.x = radius * Math.cos( u );
