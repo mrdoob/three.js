@@ -374,7 +374,14 @@ var Loader = function ( editor ) {
 
 		} else if ( data.metadata.type.toLowerCase() === 'scene' ) {
 
-			console.error( 'Editor: Scene format 3 is no longer supported.' );
+			// DEPRECATED
+
+			var loader = new THREE.SceneLoader();
+			loader.parse( data, function ( result ) {
+
+				editor.setScene( result.scene );
+
+			}, '' );
 
 		}
 
