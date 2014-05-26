@@ -1,6 +1,6 @@
 /**
  * Shader chunks for WebLG Shader library
- * 
+ *
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -621,7 +621,7 @@ THREE.ShaderChunk = {
 		"		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
 		"		vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-		"		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - worldPosition.xyz ) );",
+		"		float spotEffect = max( dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - worldPosition.xyz ) ), 0.0 );",
 
 		"		if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
@@ -878,7 +878,7 @@ THREE.ShaderChunk = {
 
 		"		lVector = normalize( lVector );",
 
-		"		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
+		"		float spotEffect = max( dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) ), 0.0 );",
 
 		"		if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
@@ -973,7 +973,7 @@ THREE.ShaderChunk = {
 		"		const float mFresnelScale = 0.3;",
 		"		const float mFresnelPower = 5.0;",
 
-		"		float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
+		"		float fresnel = mFresnelBias + mFresnelScale * pow( max( 1.0 + dot( normalize( -viewPosition ), normal ), 0.0 ), mFresnelPower );",
 				*/
 
 				// 2.0 => 2.0001 is hack to work around ANGLE bug
@@ -1012,7 +1012,7 @@ THREE.ShaderChunk = {
 				// specular (sky light)
 
 		"		vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
-		"		float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
+		"		float hemiDotNormalHalfSky = 0.5 * max( dot( normal, hemiHalfVectorSky ), 0.0 ) + 0.5;",
 		"		float hemiSpecularWeightSky = specularStrength * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
 
 				// specular (ground light)
@@ -1020,7 +1020,7 @@ THREE.ShaderChunk = {
 		"		vec3 lVectorGround = -lVector;",
 
 		"		vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
-		"		float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
+		"		float hemiDotNormalHalfGround = 0.5 * max( dot( normal, hemiHalfVectorGround ), 0.0 ) + 0.5;",
 		"		float hemiSpecularWeightGround = specularStrength * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
 
 		"		float dotProductGround = dot( normal, lVectorGround );",
@@ -1547,7 +1547,7 @@ THREE.ShaderChunk = {
 		"				vec3 shadowZ = vec3( shadowCoord.z );",
 		"				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));",
 		"				shadowKernel[0] *= vec3(0.25);",
-													
+
 		"				shadowKernel[1] = vec3(lessThan(depthKernel[1], shadowZ ));",
 		"				shadowKernel[1] *= vec3(0.25);",
 
@@ -1670,7 +1670,7 @@ THREE.ShaderChunk = {
 	// http://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html
 
 	// WebGL doesn't support gl_FragDepth out of the box, unless the EXT_frag_depth extension is available.  On platforms
-	// without EXT_frag_depth, we have to fall back on linear z-buffer in the fragment shader, which means that some long 
+	// without EXT_frag_depth, we have to fall back on linear z-buffer in the fragment shader, which means that some long
 	// faces close to the camera may have issues.	This can be worked around by tesselating the model more finely when
 	// the camera is near the surface.
 
