@@ -257,8 +257,8 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		var glVertexShader = new THREE.WebGLShader( _gl, _gl.VERTEX_SHADER, prefix_vertex + vertexShader );
-		var glFragmentShader = new THREE.WebGLShader( _gl, _gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
+		var glVertexShader = new THREE.WebGLShader( _gl, _gl.VERTEX_SHADER, prefix_vertex + vertexShader, parameters.debugMode );
+		var glFragmentShader = new THREE.WebGLShader( _gl, _gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader, parameters.debugMode );
 
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
@@ -283,7 +283,7 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		if ( _gl.getProgramInfoLog( program ) !== '' ) {
+		if ( parameters.debugMode && _gl.getProgramInfoLog( program ) !== '' ) {
 
 			console.error( 'gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
 
