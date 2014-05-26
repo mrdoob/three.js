@@ -25,6 +25,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 	_logarithmicDepthBuffer = parameters.logarithmicDepthBuffer !== undefined ? parameters.logarithmicDepthBuffer : false,
+	_debugShaders = parameters.debugShaders !== undefined ? parameters.debugShaders : true,
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -4089,6 +4090,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			precision: _precision,
 			supportsVertexTextures: _supportsVertexTextures,
+			debugMode: _debugShaders,
 
 			map: !!material.map,
 			envMap: !!material.envMap,
