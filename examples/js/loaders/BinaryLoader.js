@@ -108,7 +108,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 			if ( event.lengthComputable ) {
 
-				callbackProgress( event );
+				callbackProgress( event, scope.statusDomElement );
 
 			}
 

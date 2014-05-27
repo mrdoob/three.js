@@ -42,7 +42,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	updateProgress: function ( progress ) {
+	updateProgress: function ( progress, statusDomElement ) {
 
 		var message = "Loaded ";
 
@@ -57,7 +57,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		this.statusDomElement.innerHTML = message;
+		statusDomElement.innerHTML = message;
 
 	},
 
