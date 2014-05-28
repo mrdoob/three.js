@@ -16767,7 +16767,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 /**
  * Shader chunks for WebLG Shader library
- * 
+ *
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -17392,7 +17392,7 @@ THREE.ShaderChunk = {
 
 		"		if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
-		"			spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
+		"			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );",
 
 		"			float lDistance = 1.0;",
 		"			if ( spotLightDistance[ i ] > 0.0 )",
@@ -17647,7 +17647,7 @@ THREE.ShaderChunk = {
 
 		"		if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
-		"			spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
+		"			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );",
 
 					// diffuse
 
@@ -17774,7 +17774,7 @@ THREE.ShaderChunk = {
 
 		"		vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
 		"		float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
-		"		float hemiSpecularWeightSky = specularStrength * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
+		"		float hemiSpecularWeightSky = specularStrength * max( pow( max( hemiDotNormalHalfSky, 0.0 ), shininess ), 0.0 );",
 
 		// specular (ground light)
 
@@ -17782,7 +17782,7 @@ THREE.ShaderChunk = {
 
 		"		vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 		"		float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
-		"		float hemiSpecularWeightGround = specularStrength * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
+		"		float hemiSpecularWeightGround = specularStrength * max( pow( max( hemiDotNormalHalfGround, 0.0 ), shininess ), 0.0 );",
 
 		"		float dotProductGround = dot( normal, lVectorGround );",
 
@@ -18308,7 +18308,7 @@ THREE.ShaderChunk = {
 		"				vec3 shadowZ = vec3( shadowCoord.z );",
 		"				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));",
 		"				shadowKernel[0] *= vec3(0.25);",
-													
+
 		"				shadowKernel[1] = vec3(lessThan(depthKernel[1], shadowZ ));",
 		"				shadowKernel[1] *= vec3(0.25);",
 
@@ -18431,7 +18431,7 @@ THREE.ShaderChunk = {
 	// http://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html
 
 	// WebGL doesn't support gl_FragDepth out of the box, unless the EXT_frag_depth extension is available.  On platforms
-	// without EXT_frag_depth, we have to fall back on linear z-buffer in the fragment shader, which means that some long 
+	// without EXT_frag_depth, we have to fall back on linear z-buffer in the fragment shader, which means that some long
 	// faces close to the camera may have issues.	This can be worked around by tesselating the model more finely when
 	// the camera is near the surface.
 
@@ -19177,7 +19177,7 @@ THREE.ShaderLib = {
 			"uniform float mNear;",
 			"uniform float mFar;",
 			"uniform float opacity;",
-			
+
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
 			"void main() {",
@@ -19486,7 +19486,7 @@ THREE.ShaderLib = {
 
 			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( pointVector, pointHalfVector ), 5.0 );",
+			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( pointVector, pointHalfVector ), 0.0 ), 5.0 );",
 			"			pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance * specularNormalization;",
 
 			"		}",
@@ -19515,7 +19515,7 @@ THREE.ShaderLib = {
 
 			"			if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
-			"				spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
+			"				spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );",
 
 							// diffuse
 
@@ -19542,7 +19542,7 @@ THREE.ShaderLib = {
 
 			"				float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"				vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
+			"				vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( spotVector, spotHalfVector ), 0.0 ), 5.0 );",
 			"				spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
 
 			"			}",
@@ -19588,7 +19588,7 @@ THREE.ShaderLib = {
 
 			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );",
 			"			dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
 			"		}",
@@ -19621,7 +19621,7 @@ THREE.ShaderLib = {
 
 			"			vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
 			"			float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
-			"			float hemiSpecularWeightSky = specularTex.r * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
+			"			float hemiSpecularWeightSky = specularTex.r * max( pow( max( hemiDotNormalHalfSky, 0.0 ), shininess ), 0.0 );",
 
 						// specular (ground light)
 
@@ -19629,14 +19629,14 @@ THREE.ShaderLib = {
 
 			"			vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 			"			float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
-			"			float hemiSpecularWeightGround = specularTex.r * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
+			"			float hemiSpecularWeightGround = specularTex.r * max( pow( max( hemiDotNormalHalfGround, 0.0 ), shininess ), 0.0 );",
 
 			"			float dotProductGround = dot( normal, lVectorGround );",
 
 			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"			vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
-			"			vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+			"			vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );",
+			"			vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );",
 			"			hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 			"		}",
