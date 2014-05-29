@@ -9,7 +9,9 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 	// API
 
 	this.duration = 1000; // milliseconds
-	this.mirroredLoop = false;
+	this.reverseOnEnd = false;
+	this.loop = true;
+	this.finished = false;
 	this.time = 0;
 
 	// internals
@@ -97,6 +99,7 @@ THREE.MorphAnimMesh.prototype.setAnimationLabel = function ( label, start, end )
 THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	var animation = this.geometry.animations[ label ];
+	this.finished = false;
 
 	if ( animation ) {
 
@@ -116,35 +119,28 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	var frameTime = this.duration / this.length;
 
-	this.time += this.direction * delta;
-
-	if ( this.mirroredLoop ) {
-
-		if ( this.time > this.duration || this.time < 0 ) {
-
-			this.direction *= -1;
-
-			if ( this.time > this.duration ) {
-
-				this.time = this.duration;
-				this.directionBackwards = true;
-
-			}
-
-			if ( this.time < 0 ) {
-
-				this.time = 0;
-				this.directionBackwards = false;
-
-			}
-
-		}
-
-	} else {
+	if ( this.loop || !this.finished ) this.time += this.direction * delta;
+	
+	if ( this.loop && !this.reverseOnEnd ) {
 
 		this.time = this.time % this.duration;
-
 		if ( this.time < 0 ) this.time += this.duration;
+
+	} else if ( this.time < 0 ) {
+
+		this.direction = 1;
+		this.time = 0;
+		this.directionBackwards = false;
+
+		if (!this.loop) this.finished = true;
+
+	} else if ( this.time > this.duration ) {
+
+		this.direction = -1;
+		this.time = this.duration;
+		this.directionBackwards = true;
+
+		if (!this.reverseOnEnd && !this.loop) this.finished = true;
 
 	}
 
@@ -180,7 +176,9 @@ THREE.MorphAnimMesh.prototype.clone = function ( object ) {
 	if ( object === undefined ) object = new THREE.MorphAnimMesh( this.geometry, this.material );
 
 	object.duration = this.duration;
-	object.mirroredLoop = this.mirroredLoop;
+	object.reverseOnEnd = this.reverseOnEnd;
+	object.loop = this.loop;
+	object.finished = this.finished;
 	object.time = this.time;
 
 	object.lastKeyframe = this.lastKeyframe;
