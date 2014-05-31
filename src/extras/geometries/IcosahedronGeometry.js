@@ -12,9 +12,9 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
 	var vertices = [
-		-1,  t,  0,    1,  t,  0,   -1, -t,  0,    1, -t,  0,
-		 0, -1,  t,    0,  1,  t,    0, -1, -t,    0,  1, -t,
-		 t,  0, -1,    t,  0,  1,   -t,  0, -1,   -t,  0,  1
+		- 1,  t,  0,    1,  t,  0,   - 1, - t,  0,    1, - t,  0,
+		 0, - 1,  t,    0,  1,  t,    0, - 1, - t,    0,  1, - t,
+		 t,  0, - 1,    t,  0,  1,   - t,  0, - 1,   - t,  0,  1
 	];
 
 	var indices = [

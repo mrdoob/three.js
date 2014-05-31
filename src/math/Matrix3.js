@@ -10,9 +10,9 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 	var te = this.elements;
 
-	te[0] = ( n11 !== undefined ) ? n11 : 1; te[3] = n12 || 0; te[6] = n13 || 0;
-	te[1] = n21 || 0; te[4] = ( n22 !== undefined ) ? n22 : 1; te[7] = n23 || 0;
-	te[2] = n31 || 0; te[5] = n32 || 0; te[8] = ( n33 !== undefined ) ? n33 : 1;
+	te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 3 ] = n12 || 0; te[ 6 ] = n13 || 0;
+	te[ 1 ] = n21 || 0; te[ 4 ] = ( n22 !== undefined ) ? n22 : 1; te[ 7 ] = n23 || 0;
+	te[ 2 ] = n31 || 0; te[ 5 ] = n32 || 0; te[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
 
 };
 
@@ -24,9 +24,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[0] = n11; te[3] = n12; te[6] = n13;
-		te[1] = n21; te[4] = n22; te[7] = n23;
-		te[2] = n31; te[5] = n32; te[8] = n33;
+		te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
+		te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
+		te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
 
 		return this;
 
@@ -52,9 +52,9 @@ THREE.Matrix3.prototype = {
 
 		this.set(
 
-			me[0], me[3], me[6],
-			me[1], me[4], me[7],
-			me[2], me[5], me[8]
+			me[ 0 ], me[ 3 ], me[ 6 ],
+			me[ 1 ], me[ 4 ], me[ 7 ],
+			me[ 2 ], me[ 5 ], me[ 8 ]
 
 		);
 
@@ -76,7 +76,7 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	applyToVector3Array: function() {
+	applyToVector3Array: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -109,9 +109,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[0] *= s; te[3] *= s; te[6] *= s;
-		te[1] *= s; te[4] *= s; te[7] *= s;
-		te[2] *= s; te[5] *= s; te[8] *= s;
+		te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
+		te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
+		te[ 2 ] *= s; te[ 5 ] *= s; te[ 8 ] *= s;
 
 		return this;
 
@@ -121,11 +121,11 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		var a = te[0], b = te[1], c = te[2],
-			d = te[3], e = te[4], f = te[5],
-			g = te[6], h = te[7], i = te[8];
+		var a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
+			d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
+			g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
 
-		return a*e*i - a*f*h - b*d*i + b*f*g + c*d*h - c*e*g;
+		return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 
 	},
 
@@ -137,15 +137,15 @@ THREE.Matrix3.prototype = {
 		var me = matrix.elements;
 		var te = this.elements;
 
-		te[ 0 ] =   me[10] * me[5] - me[6] * me[9];
-		te[ 1 ] = - me[10] * me[1] + me[2] * me[9];
-		te[ 2 ] =   me[6] * me[1] - me[2] * me[5];
-		te[ 3 ] = - me[10] * me[4] + me[6] * me[8];
-		te[ 4 ] =   me[10] * me[0] - me[2] * me[8];
-		te[ 5 ] = - me[6] * me[0] + me[2] * me[4];
-		te[ 6 ] =   me[9] * me[4] - me[5] * me[8];
-		te[ 7 ] = - me[9] * me[0] + me[1] * me[8];
-		te[ 8 ] =   me[5] * me[0] - me[1] * me[4];
+		te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
+		te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
+		te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
+		te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
+		te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
+		te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
+		te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
+		te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
+		te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
 
 		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
 
@@ -181,29 +181,29 @@ THREE.Matrix3.prototype = {
 
 		var tmp, m = this.elements;
 
-		tmp = m[1]; m[1] = m[3]; m[3] = tmp;
-		tmp = m[2]; m[2] = m[6]; m[6] = tmp;
-		tmp = m[5]; m[5] = m[7]; m[7] = tmp;
+		tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
+		tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
+		tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
 
 		return this;
 
 	},
 
-	flattenToArrayOffset: function( array, offset ) {
+	flattenToArrayOffset: function ( array, offset ) {
 
 		var te = this.elements;
 
-		array[ offset     ] = te[0];
-		array[ offset + 1 ] = te[1];
-		array[ offset + 2 ] = te[2];
-		
-		array[ offset + 3 ] = te[3];
-		array[ offset + 4 ] = te[4];
-		array[ offset + 5 ] = te[5];
-		
-		array[ offset + 6 ] = te[6];
-		array[ offset + 7 ] = te[7];
-		array[ offset + 8 ]  = te[8];
+		array[ offset     ] = te[ 0 ];
+		array[ offset + 1 ] = te[ 1 ];
+		array[ offset + 2 ] = te[ 2 ];
+
+		array[ offset + 3 ] = te[ 3 ];
+		array[ offset + 4 ] = te[ 4 ];
+		array[ offset + 5 ] = te[ 5 ];
+
+		array[ offset + 6 ] = te[ 6 ];
+		array[ offset + 7 ] = te[ 7 ];
+		array[ offset + 8 ]  = te[ 8 ];
 
 		return array;
 
@@ -263,9 +263,9 @@ THREE.Matrix3.prototype = {
 
 		return new THREE.Matrix3(
 
-			te[0], te[3], te[6],
-			te[1], te[4], te[7],
-			te[2], te[5], te[8]
+			te[ 0 ], te[ 3 ], te[ 6 ],
+			te[ 1 ], te[ 4 ], te[ 7 ],
+			te[ 2 ], te[ 5 ], te[ 8 ]
 
 		);
 

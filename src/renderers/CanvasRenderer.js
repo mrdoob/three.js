@@ -15,14 +15,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_projector = new THREE.Projector(),
 
 	_canvas = parameters.canvas !== undefined
-			? parameters.canvas
-			: document.createElement( 'canvas' ),
+			 ? parameters.canvas
+			 : document.createElement( 'canvas' ),
 
 	_canvasWidth = _canvas.width,
 	_canvasHeight = _canvas.height,
 	_canvasWidthHalf = Math.floor( _canvasWidth / 2 ),
 	_canvasHeightHalf = Math.floor( _canvasHeight / 2 ),
-	
+
 	_context = _canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
 	} ),
@@ -89,10 +89,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 	this.domElement = _canvas;
 
 	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
-				? parameters.devicePixelRatio
-				: self.devicePixelRatio !== undefined
-					? self.devicePixelRatio
-					: 1;
+				 ? parameters.devicePixelRatio
+				 : self.devicePixelRatio !== undefined
+					 ? self.devicePixelRatio
+					 : 1;
 
 	this.autoClear = true;
 	this.sortObjects = true;
@@ -132,7 +132,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf ),
+		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf ),
 		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
@@ -302,9 +302,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
-				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
-				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
-				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
+				if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
 
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
@@ -557,8 +557,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else {
 
-				var colorStyle1 = element.vertexColors[0].getStyle();
-				var colorStyle2 = element.vertexColors[1].getStyle();
+				var colorStyle1 = element.vertexColors[ 0 ].getStyle();
+				var colorStyle2 = element.vertexColors[ 1 ].getStyle();
 
 				if ( colorStyle1 === colorStyle2 ) {
 
@@ -644,8 +644,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 			material.wireframe === true
-				? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-				: fillPath( _color );
+				 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+				 : fillPath( _color );
 
 		} else if ( material instanceof THREE.MeshBasicMaterial || material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
 
@@ -706,8 +706,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 				}
 
 				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+					 : fillPath( _color );
 
 			}
 
@@ -716,8 +716,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_color.r = _color.g = _color.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _camera.near, _camera.far );
 
 			material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+					 : fillPath( _color );
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
@@ -726,16 +726,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 			material.wireframe === true
-				? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-				: fillPath( _color );
+				 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+				 : fillPath( _color );
 
 		} else {
 
 			_color.setRGB( 1, 1, 1 );
 
 			material.wireframe === true
-				? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-				: fillPath( _color );
+				 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+				 : fillPath( _color );
 
 		}
 
@@ -796,12 +796,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		_patterns[ texture.id ] = _context.createPattern(
 			canvas, repeatX === true && repeatY === true
-				? 'repeat'
-				: repeatX === true && repeatY === false
-					? 'repeat-x'
-					: repeatX === false && repeatY === true
-						? 'repeat-y'
-						: 'no-repeat'
+				 ? 'repeat'
+				 : repeatX === true && repeatY === false
+					 ? 'repeat-x'
+					 : repeatX === false && repeatY === true
+						 ? 'repeat-y'
+						 : 'no-repeat'
 		);
 
 	}
@@ -835,7 +835,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			return;
 
-		}	
+		}
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 

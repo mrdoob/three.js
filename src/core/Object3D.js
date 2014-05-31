@@ -18,7 +18,7 @@ THREE.Object3D = function () {
 	this.up = THREE.Object3D.DefaultUp.clone();
 
 	var scope = this;
-	
+
 	var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
@@ -27,7 +27,7 @@ THREE.Object3D = function () {
 	rotation.onChange( function () {
 		quaternion.setFromEuler( rotation, false );
 	} );
-	
+
 	quaternion.onChange( function () {
 		rotation.setFromQuaternion( quaternion, undefined, false );
 	} );
@@ -168,7 +168,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	rotateOnAxis: function() {
+	rotateOnAxis: function () {
 
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
@@ -325,7 +325,7 @@ THREE.Object3D.prototype = {
 
 		if ( object === this ) {
 
-			console.warn( 'THREE.Object3D.add: An object can\'t be added as a child of itself.' );
+			console.warn( "THREE.Object3D.add: An object can't be added as a child of itself." );
 			return;
 
 		}
@@ -393,7 +393,7 @@ THREE.Object3D.prototype = {
 		}
 
 	},
-	
+
 	raycast: function () {},
 
 	traverse: function ( callback ) {

@@ -18,7 +18,7 @@ THREE.SceneUtils = {
 
 	},
 
-	detach : function ( child, parent, scene ) {
+	detach: function ( child, parent, scene ) {
 
 		child.applyMatrix( parent.matrixWorld );
 		parent.remove( child );

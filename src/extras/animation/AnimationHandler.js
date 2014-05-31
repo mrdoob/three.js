@@ -39,7 +39,7 @@ THREE.AnimationHandler = {
 				// create quaternions
 
 				if ( data.hierarchy[ h ].keys[ k ].rot !== undefined &&
-				  !( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
+				  ! ( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
 
 					var quat = data.hierarchy[ h ].keys[ k ].rot;
 					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion().fromArray( quat );
@@ -61,7 +61,7 @@ THREE.AnimationHandler = {
 					for ( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
 
 						var morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
-						usedMorphTargets[ morphTargetName ] = -1;
+						usedMorphTargets[ morphTargetName ] = - 1;
 
 					}
 
@@ -140,7 +140,7 @@ THREE.AnimationHandler = {
 
 			hierarchy.push( root );
 
-			for ( var c = 0; c < root.children.length; c++ )
+			for ( var c = 0; c < root.children.length; c ++ )
 				parseRecurseHierarchy( root.children[ c ], hierarchy );
 
 		};
@@ -151,7 +151,7 @@ THREE.AnimationHandler = {
 
 		if ( root instanceof THREE.SkinnedMesh ) {
 
-			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
+			for ( var b = 0; b < root.skeleton.bones.length; b ++ ) {
 
 				hierarchy.push( root.skeleton.bones[ b ] );
 
@@ -169,7 +169,7 @@ THREE.AnimationHandler = {
 
 	play: function ( animation ) {
 
-		if ( this.animations.indexOf( animation ) === -1 ) {
+		if ( this.animations.indexOf( animation ) === - 1 ) {
 
 			this.animations.push( animation );
 
@@ -181,7 +181,7 @@ THREE.AnimationHandler = {
 
 		var index = this.animations.indexOf( animation );
 
-		if ( index !== -1 ) {
+		if ( index !== - 1 ) {
 
 			this.animations.splice( index, 1 );
 
