@@ -19,7 +19,7 @@
  * }
  */
 
-THREE.ParticleSystemMaterial = function ( parameters ) {
+THREE.PointCloudMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -30,7 +30,7 @@ THREE.ParticleSystemMaterial = function ( parameters ) {
 	this.size = 1;
 	this.sizeAttenuation = true;
 
-	this.vertexColors = false;
+	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
 
@@ -38,11 +38,11 @@ THREE.ParticleSystemMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleSystemMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.PointCloudMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleSystemMaterial.prototype.clone = function () {
+THREE.PointCloudMaterial.prototype.clone = function () {
 
-	var material = new THREE.ParticleSystemMaterial();
+	var material = new THREE.PointCloudMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -63,4 +63,9 @@ THREE.ParticleSystemMaterial.prototype.clone = function () {
 
 // backwards compatibility
 
-THREE.ParticleBasicMaterial = THREE.ParticleSystemMaterial;
+THREE.ParticleSystemMaterial = function ( parameters ) {
+
+	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
+	return new THREE.PointCloudMaterial( parameters );
+
+}

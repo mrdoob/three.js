@@ -288,7 +288,7 @@
 					if ( intersector ) {
 
 						setVoxelPosition( intersector );
-						rollOverMesh.position = voxelPosition;
+						rollOverMesh.position.copy( voxelPosition );
 
 					}
 

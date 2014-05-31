@@ -2,129 +2,25 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.AnimationHandler = ( function () {
+THREE.AnimationHandler = {
 
-	var playing = [];
-	var library = {};
-	var that    = {};
+	LINEAR: 0,
+	CATMULLROM: 1,
+	CATMULLROM_FORWARD: 2,
 
-	that.update = function ( deltaTimeMS ) {
+	//
 
-		for ( var i = 0; i < playing.length; i ++ ) {
+	add: function () { console.warn( 'THREE.AnimationHandler.add() has been deprecated.' ); },
+	get: function () { console.warn( 'THREE.AnimationHandler.get() has been deprecated.' ); },
+	remove: function () { console.warn( 'THREE.AnimationHandler.remove() has been deprecated.' ); },
 
-			playing[ i ].update( deltaTimeMS );
+	//
 
-		}
+	animations: [],
 
-	};
+	init: function ( data ) {
 
-	that.addToUpdate = function ( animation ) {
-
-		if ( playing.indexOf( animation ) === -1 ) {
-
-			playing.push( animation );
-
-		}
-
-	};
-
-	that.removeFromUpdate = function ( animation ) {
-
-		var index = playing.indexOf( animation );
-
-		if ( index !== -1 ) {
-
-			playing.splice( index, 1 );
-
-		}
-
-	};
-
-	that.add = function ( data ) {
-
-		if ( library[ data.name ] !== undefined ) {
-
-			console.log( "THREE.AnimationHandler.add: Warning! " + data.name + " already exists in library. Overwriting." );
-
-		}
-
-		library[ data.name ] = data;
-		initData( data );
-
-	};
-
-	that.remove = function ( name ) {
-
-		if ( library[ name ] === undefined ) {
-
-			console.log( "THREE.AnimationHandler.add: Warning! " + name + " doesn't exists in library. Doing nothing." );
-
-		}
-
-		library[ name ] = undefined;
-
-	};
-
-	that.get = function ( name ) {
-
-		if ( typeof name === "string" ) {
-
-			if ( library[ name ] ) {
-
-				return library[ name ];
-
-			} else {
-
-				return null;
-
-			}
-
-		} else {
-
-			// todo: add simple tween library
-
-		}
-
-	};
-
-	that.parse = function ( root ) {
-
-		// setup hierarchy
-
-		var hierarchy = [];
-
-		if ( root instanceof THREE.SkinnedMesh ) {
-
-			for ( var b = 0; b < root.skeleton.bones.length; b++ ) {
-
-				hierarchy.push( root.skeleton.bones[ b ] );
-
-			}
-
-		} else {
-
-			parseRecurseHierarchy( root, hierarchy );
-
-		}
-
-		return hierarchy;
-
-	};
-
-	var parseRecurseHierarchy = function ( root, hierarchy ) {
-
-		hierarchy.push( root );
-
-		for ( var c = 0; c < root.children.length; c++ )
-			parseRecurseHierarchy( root.children[ c ], hierarchy );
-
-	}
-
-	var initData = function ( data ) {
-
-		if ( data.initialized === true )
-			return;
-
+		if ( data.initialized === true ) return;
 
 		// loop through all keys
 
@@ -143,7 +39,7 @@ THREE.AnimationHandler = ( function () {
 				// create quaternions
 
 				if ( data.hierarchy[ h ].keys[ k ].rot !== undefined &&
-				  !( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
+				  ! ( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
 
 					var quat = data.hierarchy[ h ].keys[ k ].rot;
 					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion().fromArray( quat );
@@ -165,7 +61,7 @@ THREE.AnimationHandler = ( function () {
 					for ( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
 
 						var morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
-						usedMorphTargets[ morphTargetName ] = -1;
+						usedMorphTargets[ morphTargetName ] = - 1;
 
 					}
 
@@ -234,15 +130,73 @@ THREE.AnimationHandler = ( function () {
 
 		data.initialized = true;
 
-	};
+		return data;
 
+	},
 
-	// interpolation types
+	parse: function ( root ) {
 
-	that.LINEAR = 0;
-	that.CATMULLROM = 1;
-	that.CATMULLROM_FORWARD = 2;
+		var parseRecurseHierarchy = function ( root, hierarchy ) {
 
-	return that;
+			hierarchy.push( root );
 
-}() );
+			for ( var c = 0; c < root.children.length; c ++ )
+				parseRecurseHierarchy( root.children[ c ], hierarchy );
+
+		};
+
+		// setup hierarchy
+
+		var hierarchy = [];
+
+		if ( root instanceof THREE.SkinnedMesh ) {
+
+			for ( var b = 0; b < root.skeleton.bones.length; b ++ ) {
+
+				hierarchy.push( root.skeleton.bones[ b ] );
+
+			}
+
+		} else {
+
+			parseRecurseHierarchy( root, hierarchy );
+
+		}
+
+		return hierarchy;
+
+	},
+
+	play: function ( animation ) {
+
+		if ( this.animations.indexOf( animation ) === - 1 ) {
+
+			this.animations.push( animation );
+
+		}
+
+	},
+
+	stop: function ( animation ) {
+
+		var index = this.animations.indexOf( animation );
+
+		if ( index !== - 1 ) {
+
+			this.animations.splice( index, 1 );
+
+		}
+
+	},
+
+	update: function ( deltaTimeMS ) {
+
+		for ( var i = 0; i < this.animations.length; i ++ ) {
+
+			this.animations[ i ].update( deltaTimeMS );
+
+		}
+
+	}
+
+};

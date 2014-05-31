@@ -207,8 +207,6 @@
 				geometry.computeBoundingBox();
 				var bb = geometry.boundingBox;
 
-				THREE.AnimationHandler.add( geometry.animation );
-
 				var path = "textures/cube/Park2/";
 				var format = '.jpg';
 				var urls = [
@@ -261,7 +259,7 @@
 				helper.visible = false;
 				scene.add( helper );
 
-				var animation = new THREE.Animation( mesh, geometry.animation.name );
+				var animation = new THREE.Animation( mesh, geometry.animation );
 				animation.play();
 
 			}

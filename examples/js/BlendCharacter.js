@@ -8,7 +8,7 @@ THREE.BlendCharacter = function () {
 	this.weightSchedule = [];
 	this.warpSchedule = [];
 
-	this.load = function( url, onLoad ) {
+	this.load = function ( url, onLoad ) {
 
 		var scope = this;
 
@@ -24,10 +24,8 @@ THREE.BlendCharacter = function () {
 
 			for ( var i = 0; i < geometry.animations.length; ++i ) {
 
-				THREE.AnimationHandler.add( geometry.animations[ i ] );
-
 				var animName = geometry.animations[ i ].name;
-				scope.animations[ animName ] = new THREE.Animation( scope, animName );
+				scope.animations[ animName ] = new THREE.Animation( scope, geometry.animations[ i ] );
 
 			}
 

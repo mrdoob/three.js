@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CircleGeometry2 = function ( radius, segments, thetaStart, thetaLength ) {
+THREE.CircleTypedGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	this.parameters = {
 		radius: radius,
@@ -64,7 +64,7 @@ THREE.CircleGeometry2 = function ( radius, segments, thetaStart, thetaLength ) {
 
 	}
 
-	THREE.IndexedGeometry2.call( this );
+	THREE.IndexedTypedGeometry.call( this );
 
 	this.setArrays( indices, vertices, normals, uvs );
 
@@ -72,4 +72,4 @@ THREE.CircleGeometry2 = function ( radius, segments, thetaStart, thetaLength ) {
 
 };
 
-THREE.CircleGeometry2.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.CircleTypedGeometry.prototype = Object.create( THREE.IndexedTypedGeometry.prototype );

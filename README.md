@@ -37,8 +37,8 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 
 		geometry = new THREE.BoxGeometry( 200, 200, 200 );
 		material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+
 		mesh = new THREE.Mesh( geometry, material );
-		
 		scene.add( mesh );
 
 		renderer = new THREE.CanvasRenderer();
@@ -50,7 +50,6 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 
 	function animate() {
 
-		// note: three.js includes requestAnimationFrame shim
 		requestAnimationFrame( animate );
 
 		mesh.rotation.x += 0.01;
@@ -62,7 +61,7 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 
 </script>
 ```
-If everything went well you should see [this](http://jsfiddle.net/Gy4w7/).
+If everything went well you should see [this](http://jsfiddle.net/Q7DLQ/).
 
 ### Change log ###
 

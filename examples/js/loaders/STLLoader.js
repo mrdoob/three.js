@@ -108,7 +108,10 @@ THREE.STLLoader.prototype.parseBinary = function ( data ) {
 
 	var offset = 0;
 
-	var geometry = new THREE.Geometry2( faces );
+	var geometry = new THREE.BufferGeometry();
+
+	var vertices = new Float32Array( faces * 3 * 3 );
+	var normals = new Float32Array( faces * 3 * 3 );
 
 	for ( var face = 0; face < faces; face ++ ) {
 
@@ -118,19 +121,22 @@ THREE.STLLoader.prototype.parseBinary = function ( data ) {
 
 			var vertexstart = start + i * 12;
 
-			geometry.vertices[ offset     ] = reader.getFloat32( vertexstart, true );
-			geometry.vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true );
-			geometry.vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true );
+			vertices[ offset     ] = reader.getFloat32( vertexstart, true );
+			vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true );
+			vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true );
 
-			geometry.normals[ offset     ] = reader.getFloat32( start    , true );
-			geometry.normals[ offset + 1 ] = reader.getFloat32( start + 4, true );
-			geometry.normals[ offset + 2 ] = reader.getFloat32( start + 8, true );
+			normals[ offset     ] = reader.getFloat32( start    , true );
+			normals[ offset + 1 ] = reader.getFloat32( start + 4, true );
+			normals[ offset + 2 ] = reader.getFloat32( start + 8, true );
 
 			offset += 3;
 
 		}
 
 	}
+
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 	return geometry;
 

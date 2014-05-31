@@ -61,12 +61,10 @@
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
 				var light = new THREE.PointLight( 0xffffff );
-				light.position = camera.position;
+				light.position.copy( camera.position );
 				scene.add( light );
 
-
 				//
-
 
 				var closedSpline = new THREE.ClosedSplineCurve3( [
 					new THREE.Vector3( -60, -100,  60 ),

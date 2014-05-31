@@ -46,9 +46,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new Float32Array( numEdges * 2 * 3 );
 
 		for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
@@ -65,7 +63,9 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-	} else if ( object.geometry instanceof THREE.BufferGeometry && object.geometry.attributes.index !== undefined ) { // indexed BufferGeometry
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+
+	} else if ( object.geometry instanceof THREE.BufferGeometry && object.geometry.attributes.index !== undefined ) { // Indexed BufferGeometry
 
 		var vertices = object.geometry.attributes.position.array;
 		var indices = object.geometry.attributes.index.array;
@@ -106,9 +106,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new Float32Array( numEdges * 2 * 3 );
 
 		for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
@@ -124,15 +122,15 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-	} else if ( object.geometry instanceof THREE.BufferGeometry	) { // non-indexed BufferGeometry
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+
+	} else if ( object.geometry instanceof THREE.BufferGeometry ) { // non-indexed BufferGeometry
 
 		var vertices = object.geometry.attributes.position.array;
 		var numEdges = vertices.length / 3;
 		var numTris = numEdges / 3;
 
-		geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2, 3 ) );
-
-		var coords = geometry.attributes.position.array;
+		var coords = new Float32Array( numEdges * 2 * 3 );
 
 		for ( var i = 0, l = numTris; i < l; i ++ ) {
 
@@ -153,6 +151,8 @@ THREE.WireframeHelper = function ( object, hex ) {
 			}
 
 		}
+
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
 	}
 

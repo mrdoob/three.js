@@ -88,7 +88,7 @@ THREE.DepthPassPlugin = function () {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 					object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
@@ -115,7 +115,7 @@ THREE.DepthPassPlugin = function () {
 
 				// todo: create proper depth material for particles
 
-				if ( object instanceof THREE.ParticleSystem && !object.customDepthMaterial ) continue;
+				if ( object instanceof THREE.PointCloud && ! object.customDepthMaterial ) continue;
 
 				objectMaterial = getObjectMaterial( object );
 

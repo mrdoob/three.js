@@ -69,11 +69,8 @@
 				var geometry = new THREE.BufferGeometry();
 				var material = new THREE.LineBasicMaterial({ vertexColors: true });
 
-				geometry.addAttribute( 'position', new Float32Array( segments * 3 ), 3 );
-				geometry.addAttribute( 'color', new Float32Array( segments * 3 ), 3 );
-
-				var positions = geometry.getAttribute( 'position' ).array;
-				var colors = geometry.getAttribute( 'color' ).array;
+				var positions = new Float32Array( segments * 3 );
+				var colors = new Float32Array( segments * 3 );
 
 				var r = 800;
 
@@ -96,6 +93,9 @@
 					colors[ i * 3 + 2 ] = ( z / r ) + 0.5;
 
 				}
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 

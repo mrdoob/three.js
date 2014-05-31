@@ -190,38 +190,54 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
-	var Model = function ( ) {
+	var Model = function () {
 
 		THREE.BufferGeometry.call( this );
 
 		this.materials = [];
 
-		// init GL buffers
-		var vertexIndexArray = file.body.indices,
-		vertexPositionArray = file.body.vertices,
-		vertexNormalArray = file.body.normals;
+		var indices = file.body.indices,
+		positions = file.body.vertices,
+		normals = file.body.normals;
 
-		var vertexUvArray, vertexColorArray;
+		var uvs, colors;
 
-		if ( file.body.uvMaps !== undefined && file.body.uvMaps.length > 0 ) {
-			vertexUvArray = file.body.uvMaps[ 0 ].uv;
+		var uvMaps = file.body.uvMaps;
+
+		if ( uvMaps !== undefined && uvMaps.length > 0 ) {
+
+			uvs = uvMaps[ 0 ].uv;
+
 		}
 
-		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
-			vertexColorArray = file.body.attrMaps[ 0 ].attr;
+		var attrMaps = file.body.attrMaps;
+
+		if ( attrMaps !== undefined && attrMaps.length > 0 && attrMaps[ 0 ].name === 'Color' ) {
+
+			colors = attrMaps[ 0 ].attr;
+
 		}
 
-		this.addAttribute( 'index', vertexIndexArray, 1 );
-		this.addAttribute( 'position', vertexPositionArray, 3 );
+		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-		if ( vertexNormalArray !== undefined ) 
-			this.addAttribute( 'normal', vertexNormalArray, 3 );
+		if ( normals !== undefined ) {
 
-		if ( vertexUvArray !== undefined ) 
-			this.addAttribute( 'uv', vertexUvArray, 2 );
+			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
-		if ( vertexColorArray !== undefined ) 
-			this.addAttribute( 'color', vertexColorArray, 4 );
+		}
+
+		if ( uvs !== undefined ) {
+
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+		}
+
+		if ( colors !== undefined ) {
+
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
+
+		}
 
 	}
 

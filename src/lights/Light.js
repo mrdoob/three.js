@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
- 
+
 THREE.Light = function ( color ) {
 
 	THREE.Object3D.call( this );

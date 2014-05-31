@@ -53,7 +53,6 @@ var list = {
 			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
-			[ "SceneLoader", "api/loaders/SceneLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
 			[ "XHRLoader", "api/loaders/XHRLoader" ]
 		],
@@ -68,7 +67,7 @@ var list = {
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
-			[ "ParticleSystemMaterial", "api/materials/ParticleSystemMaterial" ],
+			[ "PointCloudMaterial", "api/materials/PointCloudMaterial" ],
 			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
 			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ],
@@ -102,7 +101,7 @@ var list = {
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
-			[ "ParticleSystem", "api/objects/ParticleSystem" ],
+			[ "PointCloud", "api/objects/PointCloud" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Sprite", "api/objects/Sprite" ]
 		],

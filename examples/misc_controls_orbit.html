@@ -55,12 +55,20 @@
 			init();
 			render();
 
+			function animate() {
+
+				requestAnimationFrame(animate);
+				controls.update();
+
+			}
+
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera );
+				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
 				scene = new THREE.Scene();
@@ -116,6 +124,9 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				controls.addEventListener('change', render);
+				animate();
 
 			}
 

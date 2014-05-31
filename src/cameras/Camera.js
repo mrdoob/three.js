@@ -31,7 +31,7 @@ THREE.Camera.prototype.lookAt = function () {
 
 }();
 
-THREE.Camera.prototype.clone = function (camera) {
+THREE.Camera.prototype.clone = function ( camera ) {
 
 	if ( camera === undefined ) camera = new THREE.Camera();
 

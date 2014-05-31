@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneTypedGeometry = function ( width, height, widthSegments, heightSegments ) {
 
 	this.parameters = {
 		width: width,
@@ -81,11 +81,11 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 
 	}
 
-	THREE.IndexedGeometry2.call( this );
+	THREE.IndexedTypedGeometry.call( this );
 
 	this.setArrays( indices, vertices, normals, uvs );
 	this.computeBoundingSphere();
 
 };
 
-THREE.PlaneGeometry2.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.PlaneTypedGeometry.prototype = Object.create( THREE.IndexedTypedGeometry.prototype );

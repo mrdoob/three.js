@@ -2,19 +2,19 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Geometry2Exporter = function () {};
+THREE.TypedGeometryExporter = function () {};
 
-THREE.Geometry2Exporter.prototype = {
+THREE.TypedGeometryExporter.prototype = {
 
-	constructor: THREE.Geometry2Exporter,
+	constructor: THREE.TypedGeometryExporter,
 
 	parse: function ( geometry ) {
 
 		var output = {
 			metadata: {
 				version: 4.0,
-				type: 'Geometry2',
-				generator: 'Geometry2Exporter'
+				type: 'TypedGeometry',
+				generator: 'TypedGeometryExporter'
 			}
 		};
 
