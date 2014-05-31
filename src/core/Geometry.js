@@ -19,7 +19,7 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
-	this.faceVertexUvs = [[]];
+	this.faceVertexUvs = [ [] ];
 
 	this.morphTargets = [];
 	this.morphColors = [];
@@ -397,7 +397,7 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			for ( i = 0; i < Math.min( face.vertexNormals.length, 3 ); i++ ) {
+			for ( i = 0; i < Math.min( face.vertexNormals.length, 3 ); i ++ ) {
 
 				n.copy( face.vertexNormals[ i ] );
 
@@ -414,7 +414,7 @@ THREE.Geometry.prototype = {
 
 				tmp2.crossVectors( face.vertexNormals[ i ], t );
 				test = tmp2.dot( tan2[ vertexIndex ] );
-				w = (test < 0.0) ? -1.0 : 1.0;
+				w = ( test < 0.0 ) ? - 1.0 : 1.0;
 
 				face.vertexTangents[ i ] = new THREE.Vector4( tmp.x, tmp.y, tmp.z, w );
 
@@ -426,7 +426,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeLineDistances: function ( ) {
+	computeLineDistances: function () {
 
 		var d = 0;
 		var vertices = this.vertices;
@@ -561,11 +561,11 @@ THREE.Geometry.prototype = {
 		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
 
 			var uv = uvs2[ i ], uvCopy = [];
-			
+
 			if ( uv === undefined ) {
-				
+
 				continue;
-				
+
 			}
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
@@ -622,7 +622,7 @@ THREE.Geometry.prototype = {
 		// have to remove them from the geometry.
 		var faceIndicesToRemove = [];
 
-		for( i = 0, il = this.faces.length; i < il; i ++ ) {
+		for ( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			face = this.faces[ i ];
 
@@ -632,7 +632,7 @@ THREE.Geometry.prototype = {
 
 			indices = [ face.a, face.b, face.c ];
 
-			var dupIndex = -1;
+			var dupIndex = - 1;
 
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
@@ -674,7 +674,7 @@ THREE.Geometry.prototype = {
 	makeGroups: ( function () {
 
 		var geometryGroupCounter = 0;
-		
+
 		return function ( usesFaceMaterial, maxVerticesInGroup ) {
 
 			var f, fl, face, materialIndex,
@@ -733,7 +733,7 @@ THREE.Geometry.prototype = {
 			}
 
 		};
-		
+
 	} )(),
 
 	clone: function () {

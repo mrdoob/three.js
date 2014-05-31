@@ -77,7 +77,7 @@ THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 			var name = chunks[ 1 ];
 			var num = chunks[ 2 ];
 
-			if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: -Infinity };
+			if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: - Infinity };
 
 			var range = frameRanges[ name ];
 
@@ -120,7 +120,7 @@ THREE.MorphBlendMesh.prototype.setAnimationDirectionBackward = function ( name )
 
 	if ( animation ) {
 
-		animation.direction = -1;
+		animation.direction = - 1;
 		animation.directionBackwards = true;
 
 	}
@@ -195,7 +195,7 @@ THREE.MorphBlendMesh.prototype.getAnimationTime = function ( name ) {
 
 THREE.MorphBlendMesh.prototype.getAnimationDuration = function ( name ) {
 
-	var duration = -1;
+	var duration = - 1;
 
 	var animation = this.animationsMap[ name ];
 
@@ -254,7 +254,7 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 
 			if ( animation.time > animation.duration || animation.time < 0 ) {
 
-				animation.direction *= -1;
+				animation.direction *= - 1;
 
 				if ( animation.time > animation.duration ) {
 

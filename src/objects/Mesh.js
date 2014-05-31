@@ -22,7 +22,7 @@ THREE.Mesh.prototype.updateMorphTargets = function () {
 
 	if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
 
-		this.morphTargetBase = -1;
+		this.morphTargetBase = - 1;
 		this.morphTargetForcedOrder = [];
 		this.morphTargetInfluences = [];
 		this.morphTargetDictionary = {};
@@ -46,7 +46,7 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 	}
 
-	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
+	console.log( 'THREE.Mesh.getMorphTargetIndexByName: morph target ' + name + ' does not exist. Returning 0.' );
 
 	return 0;
 
@@ -146,7 +146,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 							positions[ c * 3 + 2 ]
 						);
 
-						
+
 						if ( material.side === THREE.BackSide ) {
 
 							var intersectionPoint = ray.intersectTriangle( vC, vB, vA, true );
@@ -169,7 +169,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 							distance: distance,
 							point: intersectionPoint,
-							indices: [a, b, c],
+							indices: [ a, b, c ],
 							face: null,
 							faceIndex: null,
 							object: this
@@ -206,7 +206,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 						positions[ j + 8 ]
 					);
 
-					
+
 					if ( material.side === THREE.BackSide ) {
 
 						var intersectionPoint = ray.intersectTriangle( vC, vB, vA, true );

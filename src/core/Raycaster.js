@@ -63,7 +63,7 @@
 	THREE.Raycaster.prototype.intersectObject = function ( object, recursive ) {
 
 		var intersects = [];
-		
+
 		intersectObject( object, this, intersects, recursive );
 
 		intersects.sort( descSort );

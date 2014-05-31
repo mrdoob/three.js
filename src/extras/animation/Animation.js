@@ -284,7 +284,7 @@ THREE.Animation.prototype.update = (function(){
 					THREE.Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
 
 					// Avoid paying the cost of an additional slerp if we don't have to
-					if ( !( object instanceof THREE.Bone ) ) {
+					if ( ! ( object instanceof THREE.Bone ) ) {
 
 						object.quaternion.copy(newQuat);
 
@@ -353,7 +353,7 @@ THREE.Animation.prototype.getNextKeyWith = function ( type, h, key ) {
 
 	}
 
-	for ( ; key < keys.length; key++ ) {
+	for ( ; key < keys.length; key ++ ) {
 
 		if ( keys[ key ][ type ] !== undefined ) {
 
