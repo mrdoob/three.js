@@ -11,6 +11,8 @@
 				font-style: normal;
 			}
 
+			*{ box-sizing: border-box;}
+
 			html {
 				height: 100%;
 			}
@@ -80,10 +82,58 @@
 				overflow: auto;
 			}
 
+			.filterBlock{
+				margin: 20px;
+				position: relative;
+			}
+			.filterBlock p {
+				margin: 0;
+			}
+			#filterInput {
+				width: 100%;
+				padding: 5px;
+				font-family: 'inconsolata';
+				font-size: 15px;
+				outline: none;
+				border: 1px solid #dedede;
+			}
+			#filterInput:focus{
+				border: 1px solid #2194CE;
+			}
+			#clearFilterButton {
+				position: absolute; 
+				right: 6px;
+				top: 50%;
+				margin-top: -8px;
+				width: 16px;
+				height: 16px;
+				font-size: 14px;
+				background-color: #b70000;
+				border-radius: 16px;
+				color: white;
+				text-align: center;
+				line-height: 0;
+				padding-top: 7px;
+				opacity: .5;
+				transition: opacity 150ms ease-out, transform 150ms ease-out;
+			}
+			#clearFilterButton:hover{
+				opacity: 1;
+				transform: scale( 1.2 );
+			}
+			.filtered{
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
-		<div id="panel"></div>
+		<div id="panel">
+			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
+			<div class="filterBlock" >
+				<input type="text" id="filterInput" placeholder="Type to filter"/>
+				<a href="#" id="clearFilterButton" >x</a>
+			</div>
+		</div>
 		<iframe id="viewer"></iframe>
 
 		<script src="list.js"></script>
@@ -91,46 +141,106 @@
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
-			var html = '<h1><a href="http://threejs.org">three.js</a> / docs</h1>';
+			var filterInput = document.getElementById( 'filterInput' );
+			filterInput.focus();
 
 			var DELIMITER = '/';
 			var nameCategoryMap = {};
+			var sections = [];
+
+			var content = document.createDocumentFragment();
 
 			for ( var section in list ) {
 
-				html += '<h2>' + section + '</h2>';
+				var h2 = document.createElement( 'h2' );
+				h2.textContent = section;
 
-				html += '<ul>';
+				content.appendChild( h2 );
 
 				for ( var category in list[ section ] ) {
 
-					html += '<h3>' + category + '</h3>';
+					var div = document.createElement( 'div' );
 
-					html += '<ul>';
+					var h3 = document.createElement( 'h3' );
+					h3.textContent = category;
+
+					div.appendChild( h3 );
+
+					var ul = document.createElement( 'ul' );
+					div.appendChild( ul );
 
 					for ( var i = 0; i < list[ section ][ category ].length; i ++ ) {
 
 						var page = list[ section ][ category ][ i ];
 
-						html += '<li><a href="javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+						var li = document.createElement( 'li' );
+						var a = document.createElement( 'a' );
+						a.setAttribute( 'href', 'javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')');
+						a.textContent = page[ 0 ];
+						li.appendChild( a );
+						ul.appendChild( li );
 
 						nameCategoryMap[page[0]] = {
 							section: section,
 							category: category,
-							name: page[0]
+							name: page[0],
+							element: li
 						};
 
 					}
 
-					html += '</ul>';
+					content.appendChild( div );
+					sections.push( ul );
 
 				}
 
-				html += '</ul>';
 
 			}
 
-			panel.innerHTML += html;
+			panel.appendChild( content )
+
+			function layoutList() {
+
+				sections.forEach( function( el ) {
+					var collapsed = true;
+					Array.prototype.slice.apply( el.children ).forEach( function( item ) {
+						if( !item.classList.contains( 'filtered' ) ) {
+							collapsed = false;
+							return;
+						}
+					} );
+					if( collapsed ) {
+						el.parentElement.classList.add( 'filtered' );
+					} else {
+						el.parentElement.classList.remove( 'filtered' );
+					}
+				} );
+			}
+
+			filterInput.addEventListener( 'input', function( e ) {
+				updateFilter();
+			} );
+
+			document.getElementById( 'clearFilterButton' ).addEventListener( 'click', function( e ) {
+				filterInput.value = '';
+				updateFilter();
+				e.preventDefault();
+			} );
+
+			function updateFilter() {
+
+				var exp = new RegExp( filterInput.value, 'gi' );
+				for( var j in nameCategoryMap ) {
+					var res = nameCategoryMap[ j ].name.match( exp );
+					if( res && res.length > 0 ) {
+						nameCategoryMap[ j ].element.classList.remove( 'filtered' );
+					} else {
+						nameCategoryMap[ j ].element.classList.add( 'filtered' );
+					}
+				}
+				layoutList();
+
+			}
 
 			function encodeUrl( path ) {
 
