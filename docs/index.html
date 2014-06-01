@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>three.js - documentation</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			@font-face {
 				font-family: 'inconsolata';
@@ -92,7 +93,7 @@
 			#filterInput {
 				width: 100%;
 				padding: 5px;
-				font-family: 'inconsolata';
+				font-family: inherit;
 				font-size: 15px;
 				outline: none;
 				border: 1px solid #dedede;
@@ -124,14 +125,37 @@
 			.filtered{
 				display: none;
 			}
+			#panel li b{
+				font-weight: bold;
+			}
+			#expandButton{ display: none; position: absolute; right: 20px; top: 12px; width: 32px; height: 32px; background-color: #2194CE; }
+			#expandButton span{ height: 3px; background-color: white; width: 16px; position: absolute; left: 8px; top: 8px;}
+			#expandButton span:nth-child(1) { top: 14px ;}
+			#expandButton span:nth-child(2) { top: 20px; width: 12px; }
+			
+			@media all and ( max-width: 640px ) {
+				#panel{ position: absolute; left: 0; top: 0; height: 480px; width: 100%; right: 0; z-index: 100; overflow: hidden; border-bottom: 1px solid #dedede; xtransition: height 150ms ease-out;}
+				#content{ overflow: auto ; position: absolute; left: 0; top: 120px; right: 0; bottom: 0;} 
+				#viewer{ position: absolute; left: 0; top: 48px;}
+				#expandButton{ display: block; }
+				#panel.collapsed{ height: 56px; }
+				#panel h1{ margin-top: 20px; margin-bottom: 20px;}
+				#content{ top: 90px;}
+			}
 		</style>
 	</head>
 	<body>
-		<div id="panel">
+
+		<div id="panel" class="collapsed">
+			<a id="expandButton" href="#" >
+				<span></span><span></span><span></span>
+			</a>
 			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
 			<div class="filterBlock" >
 				<input type="text" id="filterInput" placeholder="Type to filter"/>
 				<a href="#" id="clearFilterButton" >x</a>
+			</div>
+			<div id="content" >
 			</div>
 		</div>
 		<iframe id="viewer"></iframe>
@@ -141,14 +165,28 @@
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
+			var clearFilterButton = document.getElementById( 'clearFilterButton' );
 			var filterInput = document.getElementById( 'filterInput' );
-			filterInput.focus();
+			//filterInput.focus();
+
+			panel.addEventListener( 'click', function( e ) {
+				//filterInput.focus();
+				e.preventDefault();
+			} );
+
+			document.getElementById( 'expandButton' ).addEventListener( 'click', function( e ) {
+				panel.classList.toggle( 'collapsed' );
+				if( !panel.classList.contains( 'collapsed' ) ) {
+					//filterInput.focus();
+				}
+				e.preventDefault();
+			} );
 
 			var DELIMITER = '/';
 			var nameCategoryMap = {};
 			var sections = [];
 
-			var content = document.createDocumentFragment();
+			var content = document.getElementById( 'content' );
 
 			for ( var section in list ) {
 
@@ -175,7 +213,13 @@
 
 						var li = document.createElement( 'li' );
 						var a = document.createElement( 'a' );
-						a.setAttribute( 'href', 'javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')');
+						a.setAttribute( 'href', '#' );
+						( function( s, c, p ) { 
+							a.addEventListener( 'click', function( e ) {
+								goTo( s, c, p );
+								e.preventDefault();
+							} ) 
+						} )( section, category, page[ 0 ] )
 						a.textContent = page[ 0 ];
 						li.appendChild( a );
 						ul.appendChild( li );
@@ -184,7 +228,7 @@
 							section: section,
 							category: category,
 							name: page[0],
-							element: li
+							element: a
 						};
 
 					}
@@ -221,7 +265,7 @@
 				updateFilter();
 			} );
 
-			document.getElementById( 'clearFilterButton' ).addEventListener( 'click', function( e ) {
+			clearFilterButton.addEventListener( 'click', function( e ) {
 				filterInput.value = '';
 				updateFilter();
 				e.preventDefault();
@@ -233,9 +277,15 @@
 				for( var j in nameCategoryMap ) {
 					var res = nameCategoryMap[ j ].name.match( exp );
 					if( res && res.length > 0 ) {
-						nameCategoryMap[ j ].element.classList.remove( 'filtered' );
+						nameCategoryMap[ j ].element.parentElement.classList.remove( 'filtered' );
+						var str = nameCategoryMap[ j ].name;
+						for( var i = 0; i < res.length; i++ ) {
+							str = str.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
+						}
+						nameCategoryMap[ j ].element.innerHTML = str;
 					} else {
-						nameCategoryMap[ j ].element.classList.add( 'filtered' );
+						nameCategoryMap[ j ].element.parentElement.classList.add( 'filtered' );
+						nameCategoryMap[ j ].element.textContent = nameCategoryMap[ j ].name;
 					}
 				}
 				layoutList();
@@ -272,8 +322,8 @@
 				window.location.hash = url;
 				window.document.title = title;
 
-
 				viewer.src = pages[ section ][ category ][ name ] + '.html';
+				panel.classList.add( 'collapsed' );
 
 			}
 
