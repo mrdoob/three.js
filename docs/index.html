@@ -109,18 +109,14 @@
 				width: 16px;
 				height: 16px;
 				font-size: 14px;
-				background-color: #b70000;
-				border-radius: 16px;
-				color: white;
+				color: grey;
 				text-align: center;
 				line-height: 0;
 				padding-top: 7px;
 				opacity: .5;
-				transition: opacity 150ms ease-out, transform 150ms ease-out;
 			}
 			#clearFilterButton:hover{
 				opacity: 1;
-				transform: scale( 1.2 );
 			}
 			.filtered{
 				display: none;
@@ -128,19 +124,68 @@
 			#panel li b{
 				font-weight: bold;
 			}
-			#expandButton{ display: none; position: absolute; right: 20px; top: 12px; width: 32px; height: 32px; background-color: #2194CE; }
-			#expandButton span{ height: 3px; background-color: white; width: 16px; position: absolute; left: 8px; top: 8px;}
-			#expandButton span:nth-child(1) { top: 14px ;}
-			#expandButton span:nth-child(2) { top: 20px; width: 12px; }
-			
+			#expandButton{
+				display: none;
+				position: absolute;
+				right: 20px;
+				top: 12px;
+				width: 32px;
+				height: 32px;
+				background-color: #2194CE;
+			}
+			#expandButton span{
+				height: 3px;
+				background-color: white;
+				width: 16px;
+				position: absolute;
+				left: 8px;
+				top: 8px;
+			}
+			#expandButton span:nth-child(1) {
+				top: 14px;
+			}
+			#expandButton span:nth-child(2) {
+				top: 20px;
+				width: 12px;
+			}
 			@media all and ( max-width: 640px ) {
-				#panel{ position: absolute; left: 0; top: 0; height: 480px; width: 100%; right: 0; z-index: 100; overflow: hidden; border-bottom: 1px solid #dedede; xtransition: height 150ms ease-out;}
-				#content{ overflow: auto ; position: absolute; left: 0; top: 120px; right: 0; bottom: 0;} 
-				#viewer{ position: absolute; left: 0; top: 48px;}
-				#expandButton{ display: block; }
-				#panel.collapsed{ height: 56px; }
-				#panel h1{ margin-top: 20px; margin-bottom: 20px;}
-				#content{ top: 90px;}
+				#panel{
+					position: absolute;
+					left: 0;
+					top: 0;
+					height: 480px;
+					width: 100%;
+					right: 0;
+					z-index: 100;
+					overflow: hidden;
+					border-bottom: 1px solid #dedede;
+				}
+				#content{
+					overflow: auto;
+					position: absolute;
+					left: 0;
+					top: 120px;
+					right: 0;
+					bottom: 0;
+				}
+				#viewer{
+					position: absolute;
+					left: 0;
+					top: 48px;
+				}
+				#expandButton{
+					display: block;
+				}
+				#panel.collapsed{
+					height: 56px;
+				}
+				#panel h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
+				#content{
+					top: 90px;
+				}
 			}
 		</style>
 	</head>
