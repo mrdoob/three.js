@@ -87,10 +87,10 @@ THREE.Quaternion.prototype = {
 
 	copy: function ( quaternion ) {
 
-		this._x = quaternion._x;
-		this._y = quaternion._y;
-		this._z = quaternion._z;
-		this._w = quaternion._w;
+		this._x = quaternion.x;
+		this._y = quaternion.y;
+		this._z = quaternion.z;
+		this._w = quaternion.w;
 
 		this.onChangeCallback();
 
