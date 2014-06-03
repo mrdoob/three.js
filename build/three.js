@@ -32286,17 +32286,16 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
 	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 8;
-	phiSegments = phiSegments !== undefined ? Math.max( 3, phiSegments ) : 8;
+	phiSegments = phiSegments !== undefined ? Math.max( 1, phiSegments ) : 8;
 
 	var i, o, uvs = [], radius = innerRadius, radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
 
-	for ( i = 0; i <= phiSegments; i ++ ) { // concentric circles inside ring
+	for ( i = 0; i < phiSegments + 1; i ++ ) { // concentric circles inside ring
 
-		for ( o = 0; o <= thetaSegments; o ++ ) { // number of segments per circle
+		for ( o = 0; o < thetaSegments + 1; o ++ ) { // number of segments per circle
 
 			var vertex = new THREE.Vector3();
 			var segment = thetaStart + o / thetaSegments * thetaLength;
-
 			vertex.x = radius * Math.cos( segment );
 			vertex.y = radius * Math.sin( segment );
 
@@ -32312,22 +32311,22 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 
 	for ( i = 0; i < phiSegments; i ++ ) { // concentric circles inside ring
 
-		var thetaSegment = i * thetaSegments;
+		var thetaSegment = i * (thetaSegments + 1);
 
-		for ( o = 0; o <= thetaSegments; o ++ ) { // number of segments per circle
+		for ( o = 0; o < thetaSegments ; o ++ ) { // number of segments per circle
 
 			var segment = o + thetaSegment;
 
-			var v1 = segment + i;
-			var v2 = segment + thetaSegments + i;
-			var v3 = segment + thetaSegments + 1 + i;
+			var v1 = segment;
+			var v2 = segment + thetaSegments + 1;
+			var v3 = segment + thetaSegments + 2;
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
 
-			v1 = segment + i;
-			v2 = segment + thetaSegments + 1 + i;
-			v3 = segment + 1 + i;
+			v1 = segment;
+			v2 = segment + thetaSegments + 2;
+			v3 = segment + 1;
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
@@ -32342,6 +32341,7 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 };
 
 THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 
 /**
  * @author mrdoob / http://mrdoob.com/
