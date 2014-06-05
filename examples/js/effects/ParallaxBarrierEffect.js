@@ -60,7 +60,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 			"	vec2 uv = vUv;",
 
-			"	if ( ( mod( gl_FragCoord.x, 2.0 ) ) > 1.00 ) {",
+			"	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {",
 
 			"		gl_FragColor = texture2D( mapLeft, uv );",
 

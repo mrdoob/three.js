@@ -1,80 +1,115 @@
 Menubar.File = function ( editor ) {
 
-	var container = new UI.Panel();
-	container.setClass( 'menu' );
-	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
-	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'block' ) } );
+	// helpers
+	
+	function exportGeometry ( exporterClass ) {
 
-	var title = new UI.Panel();
-	title.setTextContent( 'File' );
-	title.setMargin( '0px' );
-	title.setPadding( '8px' );
-	container.add( title );
+		var object = editor.selected;
+		var exporter = new exporterClass();
 
-	//
+		var output = exporter.parse( object.geometry );
 
-	var options = new UI.Panel();
-	options.setClass( 'options' );
-	options.setDisplay( 'none' );
-	container.add( options );
+		if ( exporter instanceof THREE.BufferGeometryExporter ||
+		     exporter instanceof THREE.GeometryExporter ) {
 
-	// new
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'New' );
-	option.onClick( function () {
-
-		if ( confirm( 'Are you sure?' ) ) {
-
-			if ( localStorage.threejsEditor !== undefined ) {
-
-				delete localStorage.threejsEditor;
-
-			}
-
-			location.href = location.pathname;
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		}
 
-	} );
-	options.add( option );
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
 
-	options.add( new UI.HorizontalRule() );
+		window.open( objectURL, '_blank' );
+		window.focus();
 
+	};
 
-	// import
+	function exportObject ( exporterClass ) {
 
-	var input = document.createElement( 'input' );
-	input.type = 'file';
-	input.addEventListener( 'change', function ( event ) {
+		var object = editor.selected;
+		var exporter = new exporterClass();
 
-		editor.loader.loadFile( input.files[ 0 ] );
+		var output = JSON.stringify( exporter.parse( object ), null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-	} );
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Import' );
-	option.onClick( function () {
+		window.open( objectURL, '_blank' );
+		window.focus();
 
-		input.click();
+	}
 
-	} );
-	options.add( option );
+	function exportScene ( exporterClass ) {
 
-	options.add( new UI.HorizontalRule() );
+		var exporter = new exporterClass();
 
+		var output = exporter.parse( editor.scene );
 
-	// export geometry
+		if ( exporter instanceof THREE.ObjectExporter ) {
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export Geometry' );
-	option.onClick( function () {
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		var geometry = editor.selected.geometry;
+		}
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	}
+
+	// event handlers
+
+	function onNewOptionClick () {
+
+		if ( confirm( 'Are you sure?' ) ) {
+
+			editor.config.clear();
+			editor.storage.clear( function () {
+
+				location.href = location.pathname;
+
+			} );
+
+		}
+
+	}
+
+	function onImportOptionClick () {
+
+		fileInput.click();
+
+	}
+
+	function onFileInputChange ( event ) {
+
+		editor.loader.loadFile( fileInput.files[ 0 ] );
+
+	}
+
+	function onExportGeometryOptionClick () {
+		
+		var object = editor.selected;
+
+		if ( object === null ) {
+
+			alert( 'No object selected.' );
+			return;
+
+		}
+
+		var geometry = object.geometry;
+
+		if ( geometry === undefined ) {
+
+			alert( 'The selected object doesn\'t have geometry.' );
+			return;
+
+		}
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -86,145 +121,66 @@ Menubar.File = function ( editor ) {
 
 		}
 
-	} );
-	options.add( option );
+	}
 
-	/*
+	function onExportObjectOptionClick () {
 
-	// export scene
+		if ( editor.selected === null ) {
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export Scene' );
-	option.onClick( function () {
-
-		exportScene( THREE.SceneExporter );
-
-	} );
-	options.add( option );
-
-	*/
-
-	// export object
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export Object' );
-	option.onClick( function () {
-
-		exportObject( THREE.ObjectExporter );
-
-	} );
-	options.add( option );
-
-	// export scene
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export Scene' );
-	option.onClick( function () {
-
-		exportScene( THREE.ObjectExporter );
-
-	} );
-	options.add( option );
-
-	// export OBJ
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export OBJ' );
-	option.onClick( function () {
-
-		exportGeometry( THREE.OBJExporter );
-
-	} );
-	options.add( option );
-
-	var exportGeometry = function ( exporterClass ) {
-
-		var object = editor.selected;
-
-		if ( object.geometry === undefined ) {
-
-			alert( "Selected object doesn't have any geometry" );
+			alert( 'No object selected' );
 			return;
 
 		}
 
-		var exporter = new exporterClass();
+		exportObject( THREE.ObjectExporter );
 
-		var output;
+	}
 
-		if ( exporter instanceof THREE.BufferGeometryExporter || exporter instanceof THREE.GeometryExporter ) {
+	function onExportSceneOptionClick () {
 
-			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+		exportScene( THREE.ObjectExporter );
 
-		} else {
+	}
 
-			output = exporter.parse( object.geometry );
+	function onExportOBJOptionClick () {
 
-		}
+		exportGeometry( THREE.OBJExporter );
 
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
+	}
 
-		window.open( objectURL, '_blank' );
-		window.focus();
+	function onExportSTLOptionClick () {
 
-	};
+		exportScene( THREE.STLExporter );
 
-	var exportObject = function ( exporterClass ) {
+	}
 
-		var exporter = new exporterClass();
+	// create file input element for scene import
 
-		var object = editor.selected;
+	var fileInput = document.createElement( 'input' );
+	fileInput.type = 'file';
+	fileInput.addEventListener( 'change', onFileInputChange);
 
-		var output = JSON.stringify( exporter.parse( object ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+	// configure menu contents
 
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
+	var createOption = UI.MenubarHelper.createOption;
+	var createDivider = UI.MenubarHelper.createDivider;
+	
+	var menuConfig = [
+		createOption( 'New', onNewOptionClick ),
+		createDivider(),
 
-		window.open( objectURL, '_blank' );
-		window.focus();
+		createOption( 'Import', onImportOptionClick ),
+		createDivider(),
 
-	};
+		createOption( 'Export Geometry', onExportGeometryOptionClick ),
+		createOption( 'Export Object', onExportObjectOptionClick ),
+		createOption( 'Export Scene', onExportSceneOptionClick ),
+		createOption( 'Export OBJ', onExportOBJOptionClick ),
+		createOption( 'Export STL', onExportSTLOptionClick )
+	];
 
-	var exportScene = function ( exporterClass ) {
+	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
-		var exporter = new exporterClass();
-
-		var output = JSON.stringify( exporter.parse( editor.scene ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	};
-
-	options.add( new UI.HorizontalRule() );
-
-
-	// share
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Share' );
-	option.onClick( function () {
-
-		var exporter = new THREE.ObjectExporter();
-		var string = JSON.stringify( exporter.parse( editor.scene ) );
-		window.location.hash = 'A/' + window.btoa( RawDeflate.deflate( string ) );
-
-	} );
-	options.add( option );
-
-
-	return container;
+	return UI.MenubarHelper.createMenuContainer( 'File', optionsPanel );
 
 }

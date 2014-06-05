@@ -30,7 +30,10 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Jón Ragnarsson</a>.</div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Jón Ragnarsson</a>.<br />
+			drag equirectangular texture into the page.
+		</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -38,9 +41,7 @@
 
 			var camera, scene, renderer;
 
-			var fov = 70,
-			texture_placeholder,
-			isUserInteracting = false,
+			var isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
 			lon = 0, onMouseDownLon = 0,
 			lat = 0, onMouseDownLat = 0,
@@ -55,7 +56,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
@@ -80,6 +81,44 @@
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
+
+				//
+
+				document.addEventListener( 'dragover', function ( event ) {
+
+					event.preventDefault();
+					event.dataTransfer.dropEffect = 'copy';
+
+				}, false );
+
+				document.addEventListener( 'dragenter', function ( event ) {
+
+					document.body.style.opacity = 0.5;
+
+				}, false );
+
+				document.addEventListener( 'dragleave', function ( event ) {
+
+					document.body.style.opacity = 1;
+
+				}, false );
+
+				document.addEventListener( 'drop', function ( event ) {
+
+					event.preventDefault();
+
+					var reader = new FileReader();
+					reader.addEventListener( 'load', function ( event ) {
+
+						material.map.image.src = event.target.result;
+						material.map.needsUpdate = true;
+
+					}, false );
+					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
+
+					document.body.style.opacity = 1;
+
+				}, false );
 
 				//
 
@@ -112,12 +151,13 @@
 
 			function onDocumentMouseMove( event ) {
 
-				if ( isUserInteracting ) {
+				if ( isUserInteracting === true ) {
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
 					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 
 				}
+
 			}
 
 			function onDocumentMouseUp( event ) {
@@ -132,35 +172,40 @@
 
 				if ( event.wheelDeltaY ) {
 
-					fov -= event.wheelDeltaY * 0.05;
+					camera.fov -= event.wheelDeltaY * 0.05;
 
 				// Opera / Explorer 9
 
 				} else if ( event.wheelDelta ) {
 
-					fov -= event.wheelDelta * 0.05;
+					camera.fov -= event.wheelDelta * 0.05;
 
 				// Firefox
 
 				} else if ( event.detail ) {
 
-					fov += event.detail * 1.0;
+					camera.fov += event.detail * 1.0;
 
 				}
 
-				camera.projectionMatrix.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
-				render();
+				camera.updateProjectionMatrix();
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-				render();
+				update();
 
 			}
 
-			function render() {
+			function update() {
+
+				if ( isUserInteracting === false ) {
+
+					lon += 0.1;
+
+				}
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.Math.degToRad( 90 - lat );
@@ -174,9 +219,7 @@
 
 				/*
 				// distortion
-				camera.position.x = - camera.target.x;
-				camera.position.y = - camera.target.y;
-				camera.position.z = - camera.target.z;
+				camera.position.copy( camera.target ).negate();
 				*/
 
 				renderer.render( scene, camera );

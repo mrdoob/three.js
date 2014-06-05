@@ -61,7 +61,7 @@
 
 				// Plane
 
-				var material = new THREE.MeshDepthMaterial( { side: THREE.DoubleSide, overdraw: true } );
+				var material = new THREE.MeshDepthMaterial( { side: THREE.DoubleSide, overdraw: 0.5 } );
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
 				plane.position.y = - 100;
@@ -70,8 +70,8 @@
 
 				// Cubes
 
-				geometry = new THREE.CubeGeometry( 100, 100, 100 );
-				material = new THREE.MeshDepthMaterial( { overdraw: true } );
+				geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				material = new THREE.MeshDepthMaterial( { overdraw: 0.5 } );
 
 				for ( var i = 0; i < 20; i ++ ) {
 

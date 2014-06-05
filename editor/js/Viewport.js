@@ -26,9 +26,9 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
-	camera.position.set( 500, 250, 500 );
-	camera.lookAt( scene.position );
+	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
+	camera.position.fromArray( editor.config.getKey( 'camera' ).position );
+	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
 
 	//
 
@@ -43,7 +43,7 @@ var Viewport = function ( editor ) {
 
 		controls.enabled = true;
 
-		if ( transformControls.axis !== undefined ) {
+		if ( transformControls.axis !== null ) {
 
 			controls.enabled = false;
 
@@ -76,8 +76,8 @@ var Viewport = function ( editor ) {
 	var getIntersects = function ( event, object ) {
 
 		var rect = container.dom.getBoundingClientRect();
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
+		x = ( event.clientX - rect.left ) / rect.width;
+		y = ( event.clientY - rect.top ) / rect.height;
 		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
@@ -139,7 +139,7 @@ var Viewport = function ( editor ) {
 
 			} else {
 
-				editor.select( camera );
+				editor.select( null );
 
 			}
 
@@ -170,6 +170,7 @@ var Viewport = function ( editor ) {
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
+	controls.center.fromArray( editor.config.getKey( 'camera' ).target )
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
@@ -178,6 +179,27 @@ var Viewport = function ( editor ) {
 	} );
 
 	// signals
+
+	signals.themeChanged.add( function ( value ) {
+
+		switch ( value ) {
+
+			case 'css/light.css':
+				grid.setColors( 0x444444, 0x888888 );
+				clearColor = 0xaaaaaa;
+				break;
+			case 'css/dark.css':
+				grid.setColors( 0xbbbbbb, 0x888888 );
+				clearColor = 0x333333;
+				break;
+
+		}
+		
+		renderer.setClearColor( clearColor );
+
+		render();
+
+	} );
 
 	signals.transformModeChanged.add( function ( mode ) {
 
@@ -197,13 +219,14 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( object ) {
+	signals.rendererChanged.add( function ( type ) {
 
 		container.dom.removeChild( renderer.domElement );
 
-		renderer = object;
+		renderer = new THREE[ type ]( { antialias: true } );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
+		renderer.setClearColor( clearColor );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
@@ -219,7 +242,24 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	var saveTimeout;
+
 	signals.cameraChanged.add( function () {
+
+		if ( saveTimeout !== undefined ) {
+
+			clearTimeout( saveTimeout );
+
+		}
+
+		saveTimeout = setTimeout( function () {
+
+			editor.config.setKey( 'camera', {
+				position: camera.position.toArray(),
+				target: controls.center.toArray()
+			} );
+
+		}, 1000 );
 
 		render();
 
@@ -232,7 +272,8 @@ var Viewport = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.geometry !== undefined ) {
+			if ( object.geometry !== undefined &&
+				 object instanceof THREE.Sprite === false ) {
 
 				selectionBox.update( object );
 				selectionBox.visible = true;
@@ -388,36 +429,45 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.playAnimations.add( function (animations) {
-		
-		function animate() {
+	var animations = [];
 
-			requestAnimationFrame( animate );
-			
-			for ( var i = 0; i < animations.length ; i ++ ) {
+	signals.playAnimation.add( function ( animation ) {
 
-				animations[i].update(0.016);
+		animations.push( animation );
 
-			} 
+	} );
 
-			render();
+	signals.stopAnimation.add( function ( animation ) {
+
+		var index = animations.indexOf( animation );
+
+		if ( index !== -1 ) {
+
+			animations.splice( index, 1 );
+
 		}
-
-		animate();
 
 	} );
 
 	//
 
-	var renderer;
+	var clearColor, renderer;
 
-	if ( System.support.webgl === true ) {
+	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer = new THREE[ editor.config.getKey( 'renderer' ) ]( { antialias: true } );
 
 	} else {
 
-		renderer = new THREE.CanvasRenderer();
+		if ( System.support.webgl === true ) {
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+		} else {
+
+			renderer = new THREE.CanvasRenderer();
+
+		}
 
 	}
 
@@ -458,7 +508,7 @@ var Viewport = function ( editor ) {
 
 					} else {
 
-						faces += vertices / 3;
+						faces += geometry.attributes.position.array.length / 9;
 
 					}
 
@@ -514,6 +564,28 @@ var Viewport = function ( editor ) {
 
 		requestAnimationFrame( animate );
 
+		// animations
+
+		if ( THREE.AnimationHandler.animations.length > 0 ) {
+
+			THREE.AnimationHandler.update( 0.016 );
+
+			for ( var i = 0, l = sceneHelpers.children.length; i < l; i ++ ) {
+
+				var helper = sceneHelpers.children[ i ];
+
+				if ( helper instanceof THREE.SkeletonHelper ) {
+
+					helper.update();
+
+				}
+
+			}
+
+			render();
+
+		}
+
 	}
 
 	function render() {
@@ -523,9 +595,12 @@ var Viewport = function ( editor ) {
 
 		renderer.clear();
 		renderer.render( scene, camera );
-		renderer.render( sceneHelpers, camera );
 
-		//console.trace();
+		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+
+			renderer.render( sceneHelpers, camera );
+
+		}
 
 	}
 

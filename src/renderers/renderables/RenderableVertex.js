@@ -4,6 +4,7 @@
 
 THREE.RenderableVertex = function () {
 
+	this.position = new THREE.Vector3();
 	this.positionWorld = new THREE.Vector3();
 	this.positionScreen = new THREE.Vector4();
 

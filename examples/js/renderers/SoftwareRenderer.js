@@ -4,12 +4,16 @@
  * @author mraleph / http://mrale.ph/
  */
 
-THREE.SoftwareRenderer = function () {
+THREE.SoftwareRenderer = function ( parameters ) {
 
 	console.log( 'THREE.SoftwareRenderer', THREE.REVISION );
 
+	parameters = parameters || {};
+
 	var canvas = document.createElement( 'canvas' );
-	var context = canvas.getContext( '2d' );
+	var context = canvas.getContext( '2d', {
+		alpha: parameters.alpha === true
+	} );
 
 	var shaders = {};
 
@@ -17,6 +21,8 @@ THREE.SoftwareRenderer = function () {
 	var canvasWBlocks, canvasHBlocks;
 	var viewportXScale, viewportYScale, viewportZScale;
 	var viewportXOffs, viewportYOffs, viewportZOffs;
+
+	var clearColor = new THREE.Color( 0x000000 );
 
 	var imagedata, data, zbuffer;
 	var numBlocks, blockMaxZ, blockFlags;
@@ -38,6 +44,10 @@ THREE.SoftwareRenderer = function () {
 
 	var projector = new THREE.Projector();
 
+	var vector1 = new THREE.Vector3();
+	var vector2 = new THREE.Vector3();
+	var vector3 = new THREE.Vector3();
+
 	this.domElement = canvas;
 
 	this.autoClear = true;
@@ -49,7 +59,7 @@ THREE.SoftwareRenderer = function () {
 
 	this.setClearColor = function ( color, alpha ) {
 
-		// TODO
+		clearColor.set( color );
 
 	};
 
@@ -72,8 +82,12 @@ THREE.SoftwareRenderer = function () {
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
 
+		context.fillStyle = clearColor.getStyle();
+		context.fillRect( 0, 0, canvasWidth, canvasHeight );
+
 		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
 		data = imagedata.data;
+
 		zbuffer = new Int32Array( data.length / 4 );
 
 		numBlocks = canvasWBlocks * canvasHBlocks;
@@ -116,7 +130,7 @@ THREE.SoftwareRenderer = function () {
 
 		if ( this.autoClear === true ) this.clear();
 
-		var renderData = projector.projectScene( scene, camera );
+		var renderData = projector.projectScene( scene, camera, false, false );
 		var elements = renderData.elements;
 
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
@@ -125,14 +139,53 @@ THREE.SoftwareRenderer = function () {
 			var material = element.material;
 			var shader = getMaterialShader( material );
 
-			if ( element instanceof THREE.RenderableFace3 ) {
+			if ( element instanceof THREE.RenderableFace ) {
 
 				drawTriangle(
 					element.v1.positionScreen,
 					element.v2.positionScreen,
 					element.v3.positionScreen,
 					shader, element, material
-				)
+				);
+
+			} else if ( element instanceof THREE.RenderableSprite ) {
+
+				var scaleX = element.scale.x * 0.5;
+				var scaleY = element.scale.y * 0.5;
+
+				vector1.copy( element );
+				vector1.x -= scaleX;
+				vector1.y += scaleY;
+
+				vector2.copy( element );
+				vector2.x -= scaleX;
+				vector2.y -= scaleY;
+
+				vector3.copy( element );
+				vector3.x += scaleX;
+				vector3.y += scaleY;
+
+				drawTriangle(
+					vector1, vector2, vector3,
+					shader, element, material
+				);
+
+				vector1.copy( element );
+				vector1.x += scaleX;
+				vector1.y += scaleY;
+
+				vector2.copy( element );
+				vector2.x -= scaleX;
+				vector2.y -= scaleY;
+
+				vector3.copy( element );
+				vector3.x += scaleX;
+				vector3.y -= scaleY;
+
+				drawTriangle(
+					vector1, vector2, vector3,
+					shader, element, material
+				);
 
 			}
 
@@ -179,7 +232,8 @@ THREE.SoftwareRenderer = function () {
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 			     material instanceof THREE.MeshLambertMaterial ||
-			     material instanceof THREE.MeshPhongMaterial ) {
+			     material instanceof THREE.MeshPhongMaterial ||
+			     material instanceof THREE.SpriteMaterial ) {
 
 				var string;
 
@@ -525,7 +579,7 @@ THREE.SoftwareRenderer = function () {
 	function clearBlock( blockX, blockY ) {
 
 		var zoffset = blockX * blockSize + blockY * blockSize * canvasWidth;
-		var poffset = zoffset * 4 + 3;
+		var poffset = zoffset * 4;
 
 		var zlinestep = canvasWidth - blockSize;
 		var plinestep = zlinestep * 4;
@@ -534,11 +588,12 @@ THREE.SoftwareRenderer = function () {
 
 			for ( var x = 0; x < blockSize; x ++ ) {
 
-				zbuffer[ zoffset ] = maxZVal;
-				data[ poffset ] = 0;
+				zbuffer[ zoffset ++ ] = maxZVal;
 
-				zoffset ++;
-				poffset += 4;
+				data[ poffset ++ ] = clearColor.r * 255 | 0;
+				data[ poffset ++ ] = clearColor.g * 255 | 0;
+				data[ poffset ++ ] = clearColor.b * 255 | 0;
+				data[ poffset ++ ] = 255;
 
 			}
 

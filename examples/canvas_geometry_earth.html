@@ -69,7 +69,7 @@
 
 					var geometry = new THREE.SphereGeometry( 200, 20, 20 );
 
-					var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+					var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
 
@@ -100,7 +100,7 @@
 				texture.needsUpdate = true;
 
 				var geometry = new THREE.PlaneGeometry( 300, 300, 3, 3 );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;
@@ -108,6 +108,7 @@
 				group.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

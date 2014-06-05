@@ -28,13 +28,16 @@ scene.add( directionalLight );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo hex], [page:todo intensity])</h3>
+		<h3>[name]([page:Integer hex], [page:Float intensity])</h3>
 		<div>
-		hex -- todo <br />
-		intensity -- todo
+		[page:Integer hex] -- Numeric value of the RGB component of the color. <br />
+		[page:Float intensity] -- Numeric value of the light's strength/intensity.
 		</div>
 		<div>
-		todo
+		Creates a light that shines from a specific direction not from a specific position.  This light will behave
+		as though it is infinitely far away and the rays produced from it are all parallel.  The best
+		analogy would be a light source that acts like the sun: the sun is so far away that all sunlight
+		hitting objects comes from the same angle.
 		</div>
 
 		<h2>Properties</h2>

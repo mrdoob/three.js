@@ -22,8 +22,8 @@
 	"src/extras/animation/AnimationHandler.js",
 	"src/extras/animation/Animation.js",
 	"src/extras/animation/KeyFrameAnimation.js",
-	"src/extras/cameras/CubeCamera.js",
-	"src/extras/cameras/CombinedCamera.js",
+	"src/extras/animation/MorphAnimation.js",
+	"src/extras/geometries/BoxGeometry.js",
 	"src/extras/geometries/CircleGeometry.js",
 	"src/extras/geometries/CubeGeometry.js",
 	"src/extras/geometries/CylinderGeometry.js",
@@ -48,10 +48,12 @@
 	"src/extras/helpers/BoundingBoxHelper.js",
 	"src/extras/helpers/CameraHelper.js",
 	"src/extras/helpers/DirectionalLightHelper.js",
+	"src/extras/helpers/EdgesHelper.js",
 	"src/extras/helpers/FaceNormalsHelper.js",
 	"src/extras/helpers/GridHelper.js",
 	"src/extras/helpers/HemisphereLightHelper.js",
 	"src/extras/helpers/PointLightHelper.js",
+	"src/extras/helpers/SkeletonHelper.js",
 	"src/extras/helpers/SpotLightHelper.js",
 	"src/extras/helpers/VertexNormalsHelper.js",
 	"src/extras/helpers/VertexTangentsHelper.js",
@@ -63,6 +65,5 @@
 	"src/extras/renderers/plugins/ShadowMapPlugin.js",
 	"src/extras/renderers/plugins/SpritePlugin.js",
 	"src/extras/renderers/plugins/DepthPassPlugin.js",
-	"src/extras/shaders/ShaderFlares.js",
-	"src/extras/shaders/ShaderSprite.js"
+	"src/extras/shaders/ShaderFlares.js"
 ]

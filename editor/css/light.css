@@ -19,14 +19,35 @@ button {
 }
 
 .Panel {
-
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
 
-		/* No support for these yet */
+	/* No support for these yet */
 	-o-user-select: none;
 	user-select: none;
+}
+
+.CollapsiblePanel .CollapsiblePanelButton {
+	float: left;
+	margin-right: 6px;
+	width: 0px;
+	height: 0px;
+	border: 6px solid transparent;
+}
+
+.CollapsiblePanel.collapsed .CollapsiblePanelButton {
+	margin-top: 2px;
+	border-left-color: #bbb;
+}
+
+.CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
+	margin-top: 6px;
+	border-top-color: #bbb;
+}
+
+.CollapsiblePanel.collapsed .CollapsibleContent {
+	display: none;
 }
 
 .FancySelect {
@@ -40,11 +61,12 @@ button {
 
 	.FancySelect .option {
 		padding: 4px;
+		color: #666;
 		white-space: nowrap;
 	}
 
 	.FancySelect .option.active {
-		background-color: #F0F0F0;
+		background-color: #f8f8f8;
 	}
 
 input.Number {
@@ -57,11 +79,11 @@ input.Number {
 }
 
 #viewport {
+	position: absolute;
 	top: 32px;
 	left: 0px;
 	right: 300px;
 	bottom: 32px;
-	background-color: #aaaaaa;
 }
 
 #menubar {
@@ -84,9 +106,14 @@ input.Number {
 	}
 
 		#menubar .menu .options {
+			display: none;
 			padding: 5px 0px;
 			background: #eee;
 			width: 140px;
+		}
+
+		#menubar .menu:hover .options {
+			display: block;
 		}
 
 			#menubar .menu .options hr {
@@ -126,6 +153,10 @@ input.Number {
 		margin-bottom: 10px;
 	}
 
+	#sidebar .Panel.collapsed {
+		margin-bottom: 0px;
+	}
+
 	#sidebar > .Panel {
 		color: #888;
 		padding: 10px;
@@ -137,13 +168,6 @@ input.Number {
 		height: 140px;
 		color: #444;
 		font-size: 12px;
-	}
-
-	#sidebar #outliner .type {
-		padding: 2px 4px;
-		font-size: 10px;
-		background: #eee;
-		color: #aaa;
 	}
 
 #toolbar {

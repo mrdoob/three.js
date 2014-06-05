@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -53,18 +53,18 @@
 				var program = function ( context ) {
 
 					context.beginPath();
-					context.arc( 0, 0, 1, 0, PI2, true );
+					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
 				}
 
-				sphereInter = new THREE.Particle(
-					new THREE.ParticleCanvasMaterial( {
+				sphereInter = new THREE.Sprite(
+					new THREE.SpriteCanvasMaterial( {
 						color: 0xff0000,
 						program: program }
 					)
 				);
-				sphereInter.scale.x = sphereInter.scale.y = 5;
+				sphereInter.scale.x = sphereInter.scale.y = 10;
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
@@ -127,7 +127,7 @@
 				raycaster.linePrecision = 3;
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.sortObjects = false;
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild(renderer.domElement);

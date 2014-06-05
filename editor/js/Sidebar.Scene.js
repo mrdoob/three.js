@@ -2,15 +2,21 @@ Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 
-	container.add( new UI.Text( 'SCENE' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text( 'SCENE' ) );
+	container.add( new UI.Break() );
+
+	var ignoreObjectSelectedSignal = false;
 
 	var outliner = new UI.FancySelect().setId( 'outliner' );
 	outliner.onChange( function () {
 
+		ignoreObjectSelectedSignal = true;
+
 		editor.selectById( parseInt( outliner.getValue() ) );
+
+		ignoreObjectSelectedSignal = false;
 
 	} );
 	container.add( outliner );
@@ -121,30 +127,35 @@ Sidebar.Scene = function ( editor ) {
 	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
+		var sceneType = editor.getObjectType( scene );
 
-		var options = {};
+		var options = [];
 
-		options[ scene.id ] = '<span class="type">' + editor.getObjectType( scene ).replace( /[a-z]/g, '' ) + '</span> ' + scene.name;
+		options.push( { value: scene.id, html: '<span class="type ' + sceneType + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				var object = objects[ i ];
+				var objectType = editor.getObjectType( object );
 
-				var option = pad + '<span class="type">' + editor.getObjectType( object ).replace( /[a-z]/g, '' ) + '</span> ' + object.name;
+				var html = pad + '<span class="type ' + objectType + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
 					var geometry = object.geometry;
 					var material = object.material;
 
-					option += ' — <span class="type">' + editor.getGeometryType( geometry ).replace( /[a-z]/g, '' ) + '</span> ' + geometry.name + ', ';
-					option += ' <span class="type">' + editor.getMaterialType( material ).replace( /[a-z]/g, '' ) + '</span> ' + material.name;
+					var geometryType = editor.getGeometryType( geometry );
+					var materialType = editor.getMaterialType( material );
+
+					html += ' <span class="type ' + geometryType + '"></span> ' + geometry.name;
+					html += ' <span class="type ' + materialType + '"></span> ' + material.name;
 
 				}
 
-				options[ object.id ] = option;
+				options.push( { value: object.id, html: html } );
 
 				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
 
@@ -188,6 +199,8 @@ Sidebar.Scene = function ( editor ) {
 	} );
 
 	signals.objectSelected.add( function ( object ) {
+
+		if ( ignoreObjectSelectedSignal === true ) return;
 
 		outliner.setValue( object !== null ? object.id : null );
 

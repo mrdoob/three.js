@@ -10,7 +10,7 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 	this.c = c;
 
 	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
-	this.vertexNormals = normal instanceof Array ? normal : [ ];
+	this.vertexNormals = normal instanceof Array ? normal : [];
 
 	this.color = color instanceof THREE.Color ? color : new THREE.Color();
 	this.vertexColors = color instanceof Array ? color : [];
@@ -18,8 +18,6 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 	this.vertexTangents = [];
 
 	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
-
-	this.centroid = new THREE.Vector3();
 
 };
 
@@ -33,14 +31,26 @@ THREE.Face3.prototype = {
 
 		face.normal.copy( this.normal );
 		face.color.copy( this.color );
-		face.centroid.copy( this.centroid );
 
 		face.materialIndex = this.materialIndex;
 
-		var i, il;
-		for ( i = 0, il = this.vertexNormals.length; i < il; i ++ ) face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
-		for ( i = 0, il = this.vertexColors.length; i < il; i ++ ) face.vertexColors[ i ] = this.vertexColors[ i ].clone();
-		for ( i = 0, il = this.vertexTangents.length; i < il; i ++ ) face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
+		for ( var i = 0, il = this.vertexNormals.length; i < il; i ++ ) {
+
+			face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
+
+		}
+
+		for ( var i = 0, il = this.vertexColors.length; i < il; i ++ ) {
+
+			face.vertexColors[ i ] = this.vertexColors[ i ].clone();
+
+		}
+
+		for ( var i = 0, il = this.vertexTangents.length; i < il; i ++ ) {
+
+			face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
+
+		}
 
 		return face;
 

@@ -2,11 +2,11 @@ Sidebar.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text().setValue( 'GEOMETRY' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text().setValue( 'GEOMETRY' ) );
+	container.add( new UI.Break() );
 
 	// uuid
 
@@ -100,14 +100,14 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-			if ( geometry instanceof THREE.CircleGeometry ) {
+			if ( geometry instanceof THREE.BoxGeometry ) {
 
-				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
+				parameters = new Sidebar.Geometry.BoxGeometry( signals, object );
 				container.add( parameters );
 
-			} else if ( geometry instanceof THREE.CubeGeometry ) {
+			} else if ( geometry instanceof THREE.CircleGeometry ) {
 
-				parameters = new Sidebar.Geometry.CubeGeometry( signals, object );
+				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
 				container.add( parameters );
 
 			} else if ( geometry instanceof THREE.CylinderGeometry ) {
@@ -167,18 +167,17 @@ Sidebar.Geometry = function ( editor ) {
 
 		} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-			geometryVertices.setValue( geometry.attributes.position.numItems / 3 );
+			geometryVertices.setValue( geometry.attributes.position.array.length / 3 );
 
 			if ( geometry.attributes.index !== undefined ) {
 
-				geometryFaces.setValue( geometry.attributes.index.numItems / 3 );
+				geometryFaces.setValue( geometry.attributes.index.array.length / 3 );
 
 			} else {
 
-				geometryFaces.setValue( geometry.attributes.position.numItems / 3 / 3 );
+				geometryFaces.setValue( geometry.attributes.position.array.length / 9 );
 
 			}
-
 
 		}
 

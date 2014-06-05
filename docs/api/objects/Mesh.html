@@ -14,18 +14,16 @@
 		<div class="desc">Base class for Mesh objects, such as [page:MorphAnimMesh] and [page:SkinnedMesh].</div>
 
 
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+
 		<h2>Constructor</h2>
-
-
-		<h3>[name]([page:todo geometry], [page:todo material])</h3>
-		<div>
-		geometry -- todo <br />
-		material -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
 
 		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
 
@@ -52,28 +50,14 @@
 		<div>
 		name — a morph target name<br />
 		</div>
-
+		<div>
 		Returns the index of a morph target defined by name.
-
-		<h3>.setMaterial([page:todo material]) [page:todo]</h3>
-		<div>
-		material -- todo
-		</div>
-		<div>
-		todo
 		</div>
 
-		<h3>.setGeometry([page:todo geometry]) [page:todo]</h3>
-		<div>
-		geometry -- todo
-		</div>
-		<div>
-		todo
-		</div>
 
-		<h3>.updateMorphTargets() [page:todo]</h3>
+		<h3>.updateMorphTargets()</h3>
 		<div>
-		todo
+		Updates the morphtargets to have no influence on the object.
 		</div>
 
 		<h2>Source</h2>

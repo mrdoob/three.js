@@ -36,6 +36,7 @@
 
 		<script src="js/loaders/UTF8Loader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -125,7 +126,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapType = THREE.PCFShadowMap;
@@ -139,6 +139,8 @@
 				container.appendChild( stats.domElement );
 
 				var start = Date.now();
+
+				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var loader = new THREE.UTF8Loader();
 

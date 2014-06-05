@@ -17,10 +17,10 @@
 
 		<h3>[name]([page:Boolean showStatus])</h3>
 		<div>
-		showStatus -- todo
+		showStatus -- Show the status of loading div.
 		</div>
 		<div>
-		todo
+		Creates a new [name]. This should be called as base class.
 		</div>
 
 
@@ -46,56 +46,56 @@
 		
 		<h3>.[page:string crossOrigin]</h3>
 		<div>
-		todo
+		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div> 
 
 		<h2>Methods</h2>
 
-		<h3>.needsTangents([page:todo materials]) [page:todo]</h3>
+		<h3>.needsTangents([page:Array materials]) [page:Boolean]</h3>
 		<div>
-		materials -- todo
+		materials -- an array of [page:Material]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.updateProgress([page:todo progress]) [page:todo]</h3>
-		<div>
-		progress -- todo
-		</div>
-		<div>
-		todo
+		Checks if the loaded object needs tangents based on its materials.
 		</div>
 
-		<h3>.createMaterial([page:todo m], [page:todo texturePath]) [page:todo]</h3>
+		<h3>.updateProgress([page:object progress])</h3>
 		<div>
-		m -- todo <br />
-		texturePath -- todo
+		progress -- an object containing loaded(contains the amount of bytes loaded) and optionally total (containing the total amount of bytes).
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.initMaterials([page:todo materials], [page:todo texturePath]) [page:todo]</h3>
-		<div>
-		materials -- todo <br />
-		texturePath -- todo
-		</div>
-		<div>
-		todo
+		Updates the DOM object with the progress made.
 		</div>
 
-		<h3>.extractUrlBase([page:todo url]) [page:todo]</h3>
+		<h3>.createMaterial([page:object m], [page:string texturePath]) [page:Material]</h3>
 		<div>
-		url -- todo
+		m -- The parameters to create the material. <br />
+		texturePath -- The base path of the textures.
 		</div>
 		<div>
-		todo
+		Creates the Material based on the parameters m.
 		</div>
 
-		<h3>.addStatusElement() [page:todo]</h3>
+		<h3>.initMaterials([page:Array materials], [page:string texturePath]) [page:Array]</h3>
 		<div>
-		todo
+		materials -- an array of parameters to create materials. <br />
+		texturePath --  The base path of the textures.
+		</div>
+		<div>
+		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
+		</div>
+
+		<h3>.extractUrlBase([page:string url])</h3>
+		<div>
+		url --  The url to extract the base url from.
+		</div>
+		<div>
+		Extract the base from the URL. 
+		</div>
+
+		<h3>.addStatusElement() [page:DOMElement]</h3>
+		<div>
+		Add a DOM element to indicate the progress and returns the DOMElement
 		</div>
 
 

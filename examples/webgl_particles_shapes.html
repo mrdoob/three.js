@@ -343,7 +343,7 @@
 
 				});
 
-				particleCloud = new THREE.ParticleSystem( particles, shaderMaterial );
+				particleCloud = new THREE.PointCloud( particles, shaderMaterial );
 
 				particleCloud.dynamic = true;
 				// particleCloud.sortParticles = true;
@@ -472,7 +472,6 @@
 
 
 				sparksEmitter.addInitializer( new SPARKS.Velocity( new SPARKS.PointZone( new THREE.Vector3( 0, -5, 1 ) ) ) );
-				// TOTRY Set velocity to move away from centroid
 
 				sparksEmitter.addAction( new SPARKS.Age() );
 				sparksEmitter.addAction( new SPARKS.Accelerate( 0, 0, -50 ) );
@@ -488,7 +487,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000, 1 );
 
 				container.appendChild( renderer.domElement );
 

@@ -71,7 +71,7 @@
 
 				scene.add( light );
 
-				var geometry = new THREE.CubeGeometry( 40, 40, 40 );
+				var geometry = new THREE.BoxGeometry( 40, 40, 40 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -107,8 +107,9 @@
 				projector = new THREE.Projector();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.sortObjects = false;
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapType = THREE.PCFShadowMap;

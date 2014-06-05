@@ -18,6 +18,7 @@
 		<code>var color = new THREE.Color();</code>
 		<code>var color = new THREE.Color( 0xff0000 );</code>
 		<code>var color = new THREE.Color("rgb(255,0,0)");</code>
+		<code>var color = new THREE.Color( 1, 0, 0 );</code>
 
 
 		<h2>Constructor</h2>
@@ -25,7 +26,7 @@
 
 		<h3>[name]( value )</h3>
 		<div>
-		value — optional argument that sets initial color.  Can be a hexadecimal or a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "#ff0000", "#f00", or "red"
+		value — optional argument that sets initial color.  Can be a hexadecimal or a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "#ff0000", "#f00", or "red", or three arguments that represent color channels.
 		</div>
 
 		<h2>Properties</h2>
@@ -47,7 +48,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>.copy( [page:Color color] ) [page:this]</h3>
+		<h3>.copy( [page:Color color] ) [page:Color this]</h3>
 		<div>
 		color — Color to copy.
 		</div>
@@ -55,7 +56,7 @@
 		Copies given color.
 		</div>
 
-		<h3>.copyGammaToLinear( [page:Color color] ) [page:this]</h3>
+		<h3>.copyGammaToLinear( [page:Color color] ) [page:Color this]</h3>
 		<div>
 		color — Color to copy.
 		</div>
@@ -63,7 +64,7 @@
 		Copies given color making conversion from gamma to linear space.
 		</div>
 
-		<h3>.copyLinearToGamma( [page:Color color] ) [page:this]</h3>
+		<h3>.copyLinearToGamma( [page:Color color] ) [page:Color this]</h3>
 		<div>
 		color — Color to copy.
 		</div>
@@ -71,17 +72,17 @@
 		Copies given color making conversion from linear to gamma space.
 		</div>
 
-		<h3>.convertGammaToLinear() [page:this]</h3>
+		<h3>.convertGammaToLinear() [page:Color this]</h3>
 		<div>
 		Converts this color from gamma to linear space.
 		</div>
 
-		<h3>.convertLinearToGamma() [page:this]</h3>
+		<h3>.convertLinearToGamma() [page:Color this]</h3>
 		<div>
 		Converts this color from linear to gamma space.
 		</div>
 
-		<h3>.setRGB( [page:Float r], [page:Float g], [page:Float b] ) [page:this]</h3>
+		<h3>.setRGB( [page:Float r], [page:Float g], [page:Float b] ) [page:Color this]</h3>
 		<div>
 		r — Red channel value between 0 and 1.<br />
 		g — Green channel value between 0 and 1.<br />
@@ -101,7 +102,7 @@
 		Returns the string formated hexadecimal value of this color.
 		</div>
 
-		<h3>.setHex( [page:Integer hex] ) [page:this]</h3>
+		<h3>.setHex( [page:Integer hex] ) [page:Color this]</h3>
 		<div>
 		hex — Color in hexadecimal.<br />
 		</div>
@@ -109,7 +110,7 @@
 		Sets this color from a hexadecimal value.
 		</div>
 
-		<h3>.setStyle( [page:String style] ) [page:this]</h3>
+		<h3>.setStyle( [page:String style] ) [page:Color this]</h3>
 		<div>
 		style — color as a CSS-style string, for example, "rgb(250, 0,0)", "rgb(100%,0%,0%)", "#ff0000", "#f00", or "red"
 		</div>
@@ -122,7 +123,7 @@
 		Returns the value of this color as a CSS-style string. Example: rgb(255,0,0)
 		</div>
 
-		<h3>.setHSL( [page:Float h], [page:Float s], [page:Float l] ) [page:this]</h3>
+		<h3>.setHSL( [page:Float h], [page:Float s], [page:Float l] ) [page:Color this]</h3>
 		<div>
 		h — hue value between 0.0 and 1.0 <br />
 		s — saturation value between 0.0 and 1.0 <br />
@@ -137,37 +138,37 @@
 		Returns an object with properties h, s, and l.
 		</div>
 
-		<h3>.offsetHSL( [page:Float h], [page:Float s], [page:Float l] ) [page:this]</h3>
+		<h3>.offsetHSL( [page:Float h], [page:Float s], [page:Float l] ) [page:Color this]</h3>
 		<div>
 		Adds given h, s, and l to this color's existing h, s, and l values.
 		</div>
 
-		<h3>.add ( [page:Color color] ) [page:this]</h3>
+		<h3>.add ( [page:Color color] ) [page:Color this]</h3>
 		<div>
 		Adds rgb values of given color to rgb values of this color
 		</div>
 
-		<h3>.addColors( [page:Color color1], [page:Color color2] ) [page:this]</h3>
+		<h3>.addColors( [page:Color color1], [page:Color color2] ) [page:Color this]</h3>
 		<div>
 		Sets this color to the sum of color1 and color2
 		</div>
 
-		<h3>.addScalar( [page:Number s] ) [page:this]</h3>
+		<h3>.addScalar( [page:Number s] ) [page:Color this]</h3>
 		<div>
 		Adds s to the rgb values of this color
 		</div>
 
-		<h3>.multiply( [page:Color color] ) [page:this]</h3>
+		<h3>.multiply( [page:Color color] ) [page:Color this]</h3>
 		<div>
 		Multiplies this color's rgb values by given color's rgb values
 		</div>
 
-		<h3>.multiplyScalar( [page:Number s] ) [page:this]</h3>
+		<h3>.multiplyScalar( [page:Number s] ) [page:Color this]</h3>
 		<div>
 		Multiplies this color's rgb values by s
 		</div>
 
-		<h3>.lerp( [page:Color color], alpha ) [page:this]</h3>
+		<h3>.lerp( [page:Color color], alpha ) [page:Color this]</h3>
 		<div>
 		alpha -- a number between 0 and 1.
 		</div>
@@ -175,7 +176,7 @@
 		Linear interpolation of this colors rgb values and the rgb values of the first argument. The alpha argument can be thought of as the percent between the two colors, where 0 is this color and 1 is the first argument.
 		</div>
 
-		<h3>.equals( [page:Color c] ) [page:this]</h3>
+		<h3>.equals( [page:Color c] ) [page:Color this]</h3>
 		<div>
 		Compares this color and c and returns true if they are the same, false otherwise.
 		</div>
@@ -185,9 +186,9 @@
 		Clones this color.
 		</div>
 
-		<h3>.set([page:todo value]) [page:this]</h3>
+		<h3>.set( value ) [page:Color this]</h3>
 		<div>
-		value -- either an instance of Color, a hexadecimal value, or a css style string
+		value -- either an instance of [page:Color], a [page:Integer hexadecimal] value, or a css style [page:String string]
 		</div>
 		<div>
 		Delegates to .copy, .setStyle, or .setHex depending on input type.

@@ -1,0 +1,50 @@
+﻿.type {
+	position:relative;
+	top:-2px;
+	padding: 0px 2px;
+	color: #ddd;
+}
+.type:after {
+	content: '■';
+}
+
+.Scene {
+	color: #ccccff;
+}
+
+.Object3D {
+	color: #aaaaee;
+}
+
+.Mesh {
+	color: #8888ee;
+}
+
+/* */
+
+.PointLight {
+	color: #dddd00;
+}
+
+/* */
+
+.Geometry {
+	color: #88ff88;
+}
+
+.BoxGeometry {
+	color: #bbeebb;
+}
+.TorusGeometry {
+	color: #aaeeaa;	
+}
+
+/* */
+
+.Material {
+	color: #ff8888;
+}
+
+.MeshPhongMaterial {
+	color: #ffaa88;
+}

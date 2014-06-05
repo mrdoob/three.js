@@ -378,7 +378,7 @@ THREE.SceneExporter.prototype = {
 
 				];
 
-			} else if ( g instanceof THREE.CubeGeometry ) {
+			} else if ( g instanceof THREE.BoxGeometry ) {
 
 				var output = [
 

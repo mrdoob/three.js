@@ -92,7 +92,7 @@
 			void main() {
 
 				vec4 color = texture2D( map, vUv );
-				gl_FragColor = vec4( color.r, color.g, color.b, smoothstep( 8000.0, -8000.0, gl_FragCoord.z / gl_FragCoord.w ) );
+				gl_FragColor = vec4( color.r, color.g, color.b, 0.2 );
 
 			}
 
@@ -146,21 +146,23 @@
 				video.addEventListener( 'loadedmetadata', function ( event ) {
 
 					texture = new THREE.Texture( video );
-
+					texture.generateMipmaps = false;
+					
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
 
-					geometry = new THREE.Geometry();
+					geometry = new THREE.BufferGeometry();
 
-					for ( var i = 0, l = width * height; i < l; i ++ ) {
+					var vertices = new Float32Array( width * height * 3 );
 
-						var vertex = new THREE.Vector3();
-						vertex.x = ( i % width );
-						vertex.y = Math.floor( i / width );
+					for ( var i = 0, j = 0, l = vertices.length; i < l; i += 3, j ++ ) {
 
-						geometry.vertices.push( vertex );
+						vertices[ i ] = j % width;
+						vertices[ i + 1 ] = Math.floor( j / width );
 
 					}
+
+					geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 					material = new THREE.ShaderMaterial( {
 
@@ -178,14 +180,13 @@
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
 						fragmentShader: document.getElementById( 'fs' ).textContent,
+						blending: THREE.AdditiveBlending,
 						depthTest: false, depthWrite: false,
 						transparent: true
 
 					} );
 
-					mesh = new THREE.ParticleSystem( geometry, material );
-					mesh.position.x = 0;
-					mesh.position.y = 0;
+					mesh = new THREE.PointCloud( geometry, material );
 					scene.add( mesh );
 
 					setInterval( function () {

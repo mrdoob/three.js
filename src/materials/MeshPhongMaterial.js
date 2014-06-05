@@ -56,7 +56,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.shininess = 30;
 
 	this.metal = false;
-	this.perPixel = true;
 
 	this.wrapAround = false;
 	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
@@ -112,7 +111,6 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	material.shininess = this.shininess;
 
 	material.metal = this.metal;
-	material.perPixel = this.perPixel;
 
 	material.wrapAround = this.wrapAround;
 	material.wrapRGB.copy( this.wrapRGB );

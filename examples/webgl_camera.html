@@ -130,13 +130,13 @@
 
 				}
 
-				var particles = new THREE.ParticleSystem( geometry, new THREE.ParticleBasicMaterial( { color: 0x888888 } ) );
+				var particles = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
 
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );

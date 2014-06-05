@@ -22,7 +22,7 @@ THREE.GeometryLoader.prototype = {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -34,7 +34,25 @@ THREE.GeometryLoader.prototype = {
 
 	parse: function ( json ) {
 
-		
+		var geometry = new THREE.Geometry();
+
+		geometry.indices = json.indices;
+		geometry.vertices = json.vertices;
+		geometry.normals = json.normals;
+		geometry.uvs = json.uvs;
+
+		var boundingSphere = json.boundingSphere;
+
+		if ( boundingSphere !== undefined ) {
+
+			geometry.boundingSphere = new THREE.Sphere(
+				new THREE.Vector3().fromArray( boundingSphere.center !== undefined ? boundingSphere.center : [ 0, 0, 0 ] ),
+				boundingSphere.radius
+			);
+
+		}
+
+		return geometry;
 
 	}
 

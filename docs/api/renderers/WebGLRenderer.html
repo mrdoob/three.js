@@ -23,13 +23,11 @@
 		<div>
 		canvas — A [page:Canvas] where the renderer draws its output.<br />
 		precision — shader precision. Can be *"highp"*, *"mediump"* or *"lowp"*.<br />
-		alpha — [page:Boolean], default is *true*.<br />
+		alpha — [page:Boolean], default is *false*.<br />
 		premultipliedAlpha — [page:Boolean], default is *true*.<br />
 		antialias — [page:Boolean], default is *false*.<br />
 		stencil — [page:Boolean], default is *true*.<br />
 		preserveDrawingBuffer — [page:Boolean], default is *false*.<br />
-		clearColor — [page:Integer], default is *0x000000*.<br />
-		clearAlpha — [page:Float], default is *0*.<br />
 		maxLights — [page:Integer], default is *4*.<br />
 		</div>
 
@@ -40,7 +38,7 @@
 		<div>A [page:Canvas] where the renderer draws its output.<br />
 		This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.</div>
 
-		<h3>.[page:todo context]</h3>
+		<h3>.[page:WebGLRenderingContext context]</h3>
 
 		<div>The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.</div>
 
@@ -68,40 +66,31 @@
 
 		<div>Defines whether the renderer should sort objects. Default is true.</div>
 
-		<div>TODO</div>
+		<div>Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.</div>
 
 
 		<h3>.[page:Boolean autoUpdateObjects]</h3>
 
 		<div>Defines whether the renderer should auto update objects. Default is true.</div>
 
-		<div>TODO</div>
-
-		<!-- Physically based shading -->
-
 		<h3>.[page:Boolean gammaInput]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If set, then it expects that all textures and colors are premultiplied gamma.</div>
 
 
 		<h3>.[page:Boolean gammaOutput]</h3>
 
-		<div>Default is false. TODO</div>
-
-
-		<h3>.[page:Boolean physicallyBasedShading]</h3>
-
-		<div>Default is false. TODO</div>
+		<div>Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma.</div>
 
 
 		<h3>.[page:Boolean shadowMapEnabled]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If set, use shadow maps in the scene.</div>
 
 
 		<h3>.[page:Boolean shadowMapAutoUpdate]</h3>
 
-		<div>Default is true. TODO</div>
+		<div>Default is true. If set, autoupdate the shadowmaps every frame.</div>
 
 
 		<h3>.[page:Integer shadowMapType]</h3>
@@ -110,34 +99,34 @@
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
 
-		<h3>.[page:Boolean shadowMapCullFace]</h3>
+		<h3>.[page:Integer shadowMapCullFace]</h3>
 
-		<div>Default is true. TODO</div>
+		<div>Default is THREE.CullFaceFront. The faces that needed to be culled. Possible values: THREE.CullFaceFront and THREE.CullFaceBack</div>
 
 
-		<h3>.[page:Boolean shadowMapDebug]</h3>
+		<h3>[page:Boolean shadowMapDebug]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If set, then the shadowmaps get a specific color to identify which shadow is from which shadowmap.</div>
 
 
 		<h3>.[page:Boolean shadowMapCascade]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If Set, use cascaded shadowmaps. See [link:http://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf cascaded shadowmaps] for more information.</div>
 
 
 		<h3>.[page:Integer maxMorphTargets]</h3>
 
-		<div>Default is 8. TODO</div>
+		<div>Default is 8. The maximum number of MorphTargets allowed in a shader. Keep in mind that the standard materials only allow 8 MorphTargets.</div>
 
 
 		<h3>.[page:Integer maxMorphNormals]</h3>
 
-		<div>Default is 4. TODO</div>
+		<div>Default is 4. The maximum number of MorphNormals allowed in a shader. Keep in mind that the standard materials only allow 4 MorphNormals. </div>
 
 
 		<h3>.[page:Boolean autoScaleCubemaps]</h3>
 
-		<div>Default is true. TODO</div>
+		<div>Default is true. If set, then Cubemaps are scaled, when they are bigger than the maximum size, to make sure that they aren't bigger than the maximum size.</div>
 
 
 		<h3>.[page:Boolean renderPluginsPre]</h3>
@@ -177,17 +166,13 @@
 
 		<h3>.[page:ShadowMapPlugin shadowMapPlugin]</h3>
 		<div>
-		todo
+		This contains the reference to the shadowMapPlugin.
 		</div> 
 
-		<h3>.[page:number shadowMapCullFace]</h3>
-		<div>
-		todo
-		</div> 
 
 		<h3>.[page:number devicePixelRatio]</h3>
 		<div>
-		todo
+		The pixel ration of the devices. 
 		</div> 
 
 		<h2>Methods</h2>
@@ -247,121 +232,150 @@
 		<div>Tells the shadow map plugin to update using the passed scene and camera parameters.</div>
 
 
-		<h3>.renderBufferImmediate( [page:Object3D object], [page:??? program], [page:??? shading] )</h3>
+		<h3>.renderBufferImmediate( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
 		<div>object — an instance of [page:Object3D]]<br />
-		program — an instance of ???<br />
-		shading — an instance of ???<br />
+		program — an instance of shaderProgram<br />
+		shading — an instance of Material<br />
 		</div>
-		<div>TODO.</div>
+		<div>
+        Render an immediate buffer. Gets called by renderImmediateObject.
+        </div>
 
 
-		<h3>.renderBufferDirect(  camera, lights, fog, material, geometryGroup, object )</h3>
-		<div>TODO.</div>
+		<h3>.renderBufferDirect( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
+		<div>Render a buffer geometry group using the camera and with the correct material.</div>
 
 
-		<h3>.renderBuffer( camera, lights, fog, material, geometryGroup, object )</h3>
-		<div>TODO.</div>
+		<h3>.renderBuffer( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
+		<div>Render a geometry group using the camera and with the correct material.</div>
 
 
 		<h3>.render( [page:Scene scene], [page:Camera camera], [page:WebGLRenderTarget renderTarget], [page:Boolean forceClear] )</h3>
 		<div>Render a scene using a camera.</div>
 		<div>The render is done to the renderTarget (if specified) or to the canvas as usual.</div>
-		<div>If forceClear is true, the canvas will be cleared before rendering, even if the renderer's autoClear property is false.</div>
-
+        <div>If forceClear is true, the depth, stencil and color buffers will be cleared before rendering even if the renderer's autoClear property is false.</div>
+        <div>Even with forceClear set to true you can prevent certain buffers being cleared by setting either the .autoClearColor, .autoClearStencil or .autoClearDepth properties to false.</div>
 
 		<h3>.renderImmediateObject( camera, lights, fog, material, object )</h3>
-		<div>TODO.</div>
+		<div>Renders an immediate Object using a camera.</div>
 
 
 		<h3>.initWebGLObjects( [page:Scene scene] )</h3>
-		<div>TODO.</div>
+		<div>
+		[page:Scene scene] -- The scene to initialize.
+		</div>
+		<div>
+		This method initializes the scene. This means adding and removing all objects from the scene and updating them to make sure we have the correct webgl buffers. 
+		</div>
 
 
-		<h3>.initMaterial( material, lights, fog, object )</h3>
-		<div>TODO.</div>
-
+		<h3>.initMaterial( [page:Material material], [page:Array lights], [page:Fog fog], [page:Object3D object])</h3>
+		<div>
+		[page:Material material] -- The material to initialize.<br />
+		[page:Array lights] -- An array of lights that influence the material.<br />
+		[page:Fog fog] -- The fog of the scene.<br />
+		[page:Object3D object] -- The object of the material that needs init.
+		</div>
+		<div>
+		This method initializes the material as a webgl program to be used.
+		</div>
 
 		<h3>.setFaceCulling( cullFace, frontFace )</h3>
 		<div>
-		[page:String cullFace] — "back", "front", "front_and_back", or false.<br />
-		[page:String frontFace] — "ccw" or "cw<br />
+		[page:String cullFace] —- "back", "front", "front_and_back", or false.<br />
+		[page:String frontFace] —- "ccw" or "cw<br />
 		</div>
 		<div>Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.</div>
 		<div>If cullFace is false, culling will be disabled.</div>
 
 
-		<h3>.setDepthTest( depthTest )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setDepthWrite( depthWrite )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setBlending( blending, blendEquation, blendSrc, blendDst )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setTexture( texture, slot )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setRenderTarget( renderTarget )</h3>
-		<div>TODO.</div>
-
-
-
-		<h3>.supportsCompressedTextureS3TC() [page:todo]</h3>
+		<h3>.setDepthTest( [page:boolean depthTest] )</h3>
 		<div>
-		todo
-		</div>
-
-		<h3>.getMaxAnisotropy() [page:todo]</h3>
-		<div>
-		todo
-		</div>
-
-		<h3>.getPrecision() [page:todo]</h3>
-		<div>
-		todo
-		</div>
-
-		<h3>.setMaterialFaces([page:todo material]) [page:todo]</h3>
-		<div>
-		material -- todo
+		depthTest -- The boolean to decide if depth of a fragment needs to be tested against the depth buffer . <br />
 		</div>
 		<div>
-		todo
+		This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer.
 		</div>
 
-		<h3>.supportsStandardDerivatives() [page:todo]</h3>
+		<h3>.setDepthWrite( [page:boolean depthWrite] )</h3>
 		<div>
-		todo
+		depthWrite -- The boolean to decide if depth of a fragment needs to be kept. <br />
+		</div>
+		<div>
+		This sets, based on depthWrite, whether or not the depth data needs to be written in the depth buffer.
 		</div>
 
-		<h3>.supportsFloatTextures() [page:todo]</h3>
+
+		<h3>.setBlending( [page:number blending], [page:number blendEquation], [page:number blendSrc], [page:number blendDst] )</h3>
 		<div>
-		todo
+		blending -- A number indicating the blending mode. Possible value are THREE.NoBlending, THREE.NormalBlending, THREE.AdditiveBlending, THREE.SubtractiveBlending, THREE.MultiplyBlending or THREE.CustomBlending <br />
+		blendEquation -- When blending is THREE.CustomBlending, then you can set the blendEquation. Possible values are THREE.AddEquation, THREE.SubtractEquation or THREE.ReverseSubtractEquation.<br />
+		blendSrc -- When blending is THREE.CustomBlending, then you can set the blendSrc. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor<br />
+		blendDst -- When blending is THREE.CustomBlending, then you can set the blendDst. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor
+		</div>
+		<div>
+		This method sets the correct blending.
+		</div>
+		
+		<h3>.setTexture( [page:Texture texture], [page:number slot] )</h3>
+		<div>
+		texture -- The [page:Texture texture] that needs to be set.<br />
+		slot -- The number indicating which slot should be used by the texture.
+		</div>
+		<div>
+		This method sets the correct texture to the correct slot for the wegl shader. The slot number can be found as a value of the uniform of the sampler.
+		</div>
+		
+		<h3>.setRenderTarget( [page:WebGLRenderTarget renderTarget] )</h3>
+		<div>
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated.<br />
+		</div>
+		<div>
+		This method sets the active rendertarget.
 		</div>
 
-		<h3>.clearTarget([page:todo renderTarget], [page:todo color], [page:todo depth], [page:todo stencil]) [page:todo]</h3>
+		<h3>.supportsCompressedTextureS3TC() [page:boolean]</h3>
 		<div>
-		renderTarget -- todo <br />
-		color -- todo <br />
-		depth -- todo <br />
-		stencil -- todo
-		</div>
-		<div>
-		todo
+		This method returns true if the webgl implementation supports compressed textures of the format S3TC.
 		</div>
 
-		<h3>.setClearColorHex([page:todo hex], [page:todo alpha]) [page:todo]</h3>
+		<h3>.getMaxAnisotropy() [page:number]</h3>
 		<div>
-		hex -- todo <br />
-		alpha -- todo
+		This returns the anisotropy level of the textures.
+		</div>
+
+		<h3>.getPrecision() [page:string]</h3>
+		<div>
+		This gets the precision used by the shaders. It returns "highp","mediump" or "lowp".
+		</div>
+
+		<h3>.setMaterialFaces([page:Material material])</h3>
+		<div>
+		material -- The [page:Material material] with side that shouldn't be culled.  
 		</div>
 		<div>
-		todo
+		This sets which side needs to be culled in the webgl renderer.
+		</div>
+
+		<h3>.supportsStandardDerivatives() [page:boolean]</h3>
+		<div>
+		This method returns true if the webgl implementation supports standard derivatives.
+		</div>
+
+		<h3>.supportsFloatTextures() [page:boolean]</h3>
+		<div>
+		This method returns true if the webgl implementation supports float textures.
+		</div>
+
+		<h3>.clearTarget([page:WebGLRenderTarget renderTarget], [page:boolean color], [page:boolean depth], [page:boolean stencil]) </h3>
+		<div>
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be cleared.<br />
+		color -- If set, then the color gets cleared. <br />
+		depth -- If set, then the depth gets cleared. <br />
+		stencil -- If set, then the stencil gets cleared.
+		</div>
+		<div>
+		This method clears a rendertarget. To do this, it activates the rendertarget.
 		</div>
 
 		<h2>Source</h2>

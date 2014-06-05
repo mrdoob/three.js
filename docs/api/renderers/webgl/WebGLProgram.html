@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Constructor for the GLSL program sent to vertex and fragment shaders, including default uniforms and attributes.</div>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:WebGLRenderer renderer], [page:Object code], [page:Material material], [page:Object parameters] )</h3>
+		<div>For parameters see [page:WebGLRenderer WebGLRenderer]</div>
+		<div>Standard defaults for vertex shader:<br/><br/>
+		uniform mat4 modelMatrix;<br/>
+		uniform mat4 modelViewMatrix;<br/>
+		uniform mat4 projectionMatrix;<br/>
+		uniform mat4 viewMatrix;<br/>
+		uniform mat3 normalMatrix;<br/>
+		uniform vec3 cameraPosition;<br/><br/>
+		attribute vec3 position;<br/>
+		attribute vec3 normal;<br/>
+		attribute vec2 uv;<br/>
+		attribute vec2 uv2;</div>
+		
+		<div>Conditional defaults for vertex shader:<br/><br/>
+		attribute vec3 color;<br/><br/>
+		attribute vec3 morphTarget0;<br/>
+		attribute vec3 morphTarget1;<br/>
+		attribute vec3 morphTarget2;<br/>
+		attribute vec3 morphTarget3;<br/><br/>
+		attribute vec3 morphNormal0;<br/>
+		attribute vec3 morphNormal1;<br/>
+		attribute vec3 morphNormal2;<br/>
+		attribute vec3 morphNormal3;<br/><br/>
+		attribute vec3 morphTarget4;<br/>
+		attribute vec3 morphTarget5;<br/>
+		attribute vec3 morphTarget6;<br/>
+		attribute vec3 morphTarget7;<br/><br/>
+		attribute vec4 skinIndex;<br/>
+		attribute vec4 skinWeight;</div>
+		
+		<div>Standard defaults for fragment shader:<br/><br/>
+		uniform mat4 viewMatrix;<br/>
+		uniform vec3 cameraPosition;</div>
+		
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Object uniforms]</h3>
+		<div></div> 
+
+		<h3>.[page:Object attributes]</h3>
+		<div></div> 
+
+		<h3>.[page:Integer id]</h3>
+		<div></div> 
+
+		<h3>.[page:Object code]</h3>
+		<div></div> 
+
+		<h3>.[page:Integer usedTimes]</h3>
+		<div></div> 
+
+		<h3>.[page:Object program]</h3>
+		<div></div> 
+
+		<h3>.[page:Object vertexShader]</h3>
+		<div></div> 
+
+		<h3>.[page:Object fragmentShader]</h3>
+		<div></div> 
+
+
+		<h2>Methods</h2>
+		
+		<h3>none</h3>
+		<div></div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

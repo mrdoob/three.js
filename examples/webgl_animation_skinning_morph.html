@@ -47,6 +47,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<script src="js/libs/dat.gui.min.js"></script>
+
 		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
@@ -58,7 +60,7 @@
 			var camera, scene;
 			var renderer;
 
-			var mesh;
+			var mesh, helper;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -141,7 +143,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				renderer.shadowMapEnabled = true;
 
@@ -154,7 +155,15 @@
 				//
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "models/skinned/knight.js", function ( geometry, materials ) { createScene( geometry, materials, 0, FLOOR, -300, 60 ) } );
+				loader.load( "models/skinned/knight.js", function ( geometry, materials ) {
+
+					createScene( geometry, materials, 0, FLOOR, -300, 60 )
+
+				} );
+
+				// GUI
+
+				initGUI();
 
 				//
 
@@ -198,8 +207,6 @@
 				geometry.computeBoundingBox();
 				var bb = geometry.boundingBox;
 
-				THREE.AnimationHandler.add( geometry.animation );
-
 				var path = "textures/cube/Park2/";
 				var format = '.jpg';
 				var urls = [
@@ -211,7 +218,7 @@
 
 				//var envMap = THREE.ImageUtils.loadTextureCube( urls );
 
-				//var map = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
+				//var map = THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" );
 
 				//var bumpMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color() );
 				//var bumpMap = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
@@ -247,11 +254,28 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				animation = new THREE.Animation( mesh, geometry.animation.name );
-				animation.JITCompile = false;
-				animation.interpolationType = THREE.AnimationHandler.LINEAR;
+				helper = new THREE.SkeletonHelper( mesh );
+				helper.material.linewidth = 3;
+				helper.visible = false;
+				scene.add( helper );
 
+				var animation = new THREE.Animation( mesh, geometry.animation );
 				animation.play();
+
+			}
+
+			function initGUI() {
+
+				var API = {
+					'show model'    : true,
+					'show skeleton' : false
+				};
+
+				var gui = new dat.GUI();
+
+				gui.add( API, 'show model' ).onChange( function() { mesh.visible = API[ 'show model' ]; } );
+
+				gui.add( API, 'show skeleton' ).onChange( function() { helper.visible = API[ 'show skeleton' ]; } );
 
 			}
 
@@ -285,6 +309,8 @@
 				// update skinning
 
 				THREE.AnimationHandler.update( delta );
+
+				if ( helper !== undefined ) helper.update();
 
 				// update morphs
 

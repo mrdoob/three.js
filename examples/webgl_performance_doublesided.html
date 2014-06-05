@@ -44,8 +44,6 @@
 			var windowHalfX = SCREEN_WIDTH / 2;
 			var windowHalfY = SCREEN_HEIGHT / 2;
 
-			var FANCY = true;
-
 			init();
 			animate();
 
@@ -68,32 +66,24 @@
 				light.position.set( -4000, 0, 0 );
 				scene.add( light );
 
-				if ( FANCY ) {
+				var light = new THREE.PointLight( 0xffaa00, 2, 3000 );
+				light.position.set( 0, 0, 0 );
+				scene.add( light );
 
-					var light = new THREE.PointLight( 0xffaa00, 2, 3000 );
-					light.position.set( 0, 0, 0 );
-					scene.add( light );
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
 
-					var path = "textures/cube/SwedishRoyalCastle/";
-					var format = '.jpg';
-					var urls = [
-							path + 'px' + format, path + 'nx' + format,
-							path + 'py' + format, path + 'ny' + format,
-							path + 'pz' + format, path + 'nz' + format
-						];
+				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+				reflectionCube.format = THREE.RGBFormat;
 
-					var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
-					reflectionCube.format = THREE.RGBFormat;
-
-					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
-					material.wrapAround = true;
-					material.wrapRGB.set( 0.5, 0.5, 0.5 );
-
-				} else {
-
-					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.SmoothShading, doubleSided: true } );
-
-				}
+				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
+				material.wrapAround = true;
+				material.wrapRGB.set( 0.5, 0.5, 0.5 );
 
 				var geometry = new THREE.SphereGeometry( 1, 32, 16, 0, Math.PI );
 
@@ -116,13 +106,12 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: FANCY, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0x050505, 1 );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = FANCY;
 
 				container.appendChild( renderer.domElement );
 

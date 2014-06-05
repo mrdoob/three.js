@@ -19,9 +19,11 @@
 
 		<code>var geometry = new THREE.Geometry();
 
-		geometry.vertices.push( new THREE.Vector3( -10,  10, 0 ) );
-		geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
-		geometry.vertices.push( new THREE.Vector3(  10, -10, 0 ) );
+		geometry.vertices.push(
+			new THREE.Vector3( -10,  10, 0 ),
+			new THREE.Vector3( -10, -10, 0 ),
+			new THREE.Vector3(  10, -10, 0 )
+		);
 
 		geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
 
@@ -33,7 +35,7 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		The constructor takes no arguments.
 		</div>
 
 
@@ -52,14 +54,14 @@
 		<h3>.[page:Array vertices]</h3>
 		<div>
 		Array of [page:Vector3 vertices].<br />
-		The array of vertices hold every position of points of the model.<br />
+		The array of vertices holds every position of points in the model.<br />
 		To signal an update in this array, [page:Geometry Geometry.verticesNeedUpdate] needs to be set to true.
 		</div>
 
 		<h3>.[page:Array colors]</h3>
 		<div>
 		Array of vertex [page:Color colors], matching number and order of vertices.<br />
-		Used in [page:ParticleSystem] and [page:Line].<br />
+		Used in [page:PointCloud] and [page:Line].<br />
 		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.<br />
 		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
 		</div>
@@ -74,7 +76,7 @@
 		<h3>.[page:Array faceVertexUvs]</h3>
 		<div>
 		Array of face [page:UV] layers.<br />
-		Each UV layer is an array of [page:UV] matching order and number of vertices in faces.<br />
+		Each UV layer is an array of [page:UV]s matching the order and number of vertices in faces.<br />
 		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
 		</div>
 
@@ -89,7 +91,7 @@
 		<div>
 		Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:
 		<code>morphColor = { name: "colorName", colors: [ new THREE.Color(), ... ] }</code>
-		Morph colors can match either number and order of faces (face colors) or number of vertices (vertex colors).
+		Morph colors can match either the number and order of faces (face colors) or the number of vertices (vertex colors).
 		</div>
 
 		<h3>.[page:Array morphNormals]</h3>
@@ -172,26 +174,20 @@
 		Set to *true* if an array has changed in length.
 		</div>
 
-		<h3>.[page:array morphNormals]</h3>
-		<div>
-		todo
-		</div> 
-
 		<h3>.[page:array lineDistances]</h3>
 		<div>
-		todo
+		An array containing distances between vertices for Line geometries.
+		This is required for LinePieces/LineDashedMaterial to render correctly.
+		Line distances can also be generated with computeLineDistances.
 		</div> 
 
 		<h2>Methods</h2>
+		
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
 		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
 		<div>
 		Bakes matrix transform directly into vertex coordinates.
-		</div>
-
-		<h3>.computeCentroids()</h3>
-		<div>
-		Computes centroids for all faces.
 		</div>
 
 		<h3>.computeFaceNormals()</h3>
@@ -229,11 +225,17 @@
 		
 		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
 
+		<h3>.merge( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
+		<div>Merge two geometries or geometry and geometry from object (using object's transform)</div>
+
 		<h3>.mergeVertices()</h3>
 		<div>
 		Checks for duplicate vertices using hashmap.<br />
 		Duplicated vertices are removed and faces' vertices are updated.
 		</div>
+		
+		<h3>.makeGroups()</h3>
+		<div>Geometry splitting</div>
 		
 		<h3>.clone()</h3>
 		<div>
@@ -243,49 +245,14 @@
 		<h3>.dispose()</h3>
 		<div>
 		Removes The object from memory. <br />
-		Don't forget to call this method when you remove an geometry because it can cuase meomory leaks. 
+		Don't forget to call this method when you remove a geometry because it can cause memory leaks. 
 		</div>
 
-
-		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
+		<h3>.computeLineDistances()</h3>
 		<div>
-		event -- todo
-		</div>
-		<div>
-		todo
+		Compute distances between vertices for Line geometries.
 		</div>
 
-		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.computeLineDistances() [page:todo]</h3>
-		<div>
-		todo
-		</div>
-
-		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
 
 		<h2>Source</h2>
 

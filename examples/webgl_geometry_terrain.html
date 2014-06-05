@@ -79,7 +79,7 @@
 
 				data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
+				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
 				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
@@ -97,6 +97,7 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xbfd1e5 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
@@ -127,14 +128,8 @@
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Float32Array( size ),
+				var size = width * height, data = new Uint8Array( size ),
 				perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
-
-				for ( var i = 0; i < size; i ++ ) {
-
-					data[ i ] = 0
-
-				}
 
 				for ( var j = 0; j < 4; j ++ ) {
 
@@ -142,7 +137,6 @@
 
 						var x = i % width, y = ~~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
-
 
 					}
 

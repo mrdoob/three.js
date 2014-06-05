@@ -7,6 +7,8 @@
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
 	</head>
 	<body>
+        [page:Object3D] &rarr; [page:Light] &rarr;
+
 		<h1>[name]</h1>
 
 		<div class="desc">This illuminates the scene from a complete surface. This light only works in the [page:WebGLDeferredRenderer deferredrenderer]. </div>
@@ -24,10 +26,10 @@ scene.add( areaLight1 );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Float hex], [page:Float intensity])</h3>
+		<h3>[name]( [page:Integer hex], [page:Float intensity])</h3>
 		<div>
 		[page:Integer hex] — Numeric value of the RGB component of the color.<br />
-		[page:Integer intensity] — The intensity of the light.
+		[page:Float intensity] — Numeric value of the light's strength/intensity.
 		</div>
 		<div>
 		This creates a arealight with color.
@@ -40,42 +42,43 @@ scene.add( areaLight1 );</code>
 
 		<h3>.[page:Vector3 right]</h3>
 		<div>
-		todo
+		Sets or gets an unit vector that indicates the right side of the light. This is calculated in local space. 
 		</div> 
 
 		<h3>.[page:Vector3 normal]</h3>
 		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number quadraticAttenuation]</h3>
-		<div>
-		todo
+		Sets or gets an unit vectorSets or gets an unit vector that indicates the right side of the light. This is calculated in local space.
 		</div> 
 
 		<h3>.[page:number height]</h3>
 		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number linearAttenuation]</h3>
-		<div>
-		todo
+		Sets or gets the height of the illuminating plane. 
 		</div> 
 
 		<h3>.[page:number width]</h3>
 		<div>
-		todo
+		Sets or gets the width of the illuminating plane. 
 		</div> 
 
-		<h3>.[page:number intensity]</h3>
+		<h3>.[page:Float intensity]</h3>
 		<div>
-		todo
-		</div> 
+		Light's intensity.<br />
+		Default — *1.0*.
+		</div>
 
 		<h3>.[page:number constantAttenuation]</h3>
 		<div>
-		todo
+		Sets or gets the attention of the light in constant space. This is independant of the distance of the light. 
+		</div> 
+
+		<h3>.[page:number linearAttenuation]</h3>
+		<div>
+		Sets or gets the attention of the light in linear space. This increases the attenuation linearly with the distance from the light.
+		</div> 
+
+		<h3>.[page:number quadraticAttenuation]</h3>
+		<div>
+		Sets or gets the attention of the light in linear space. This increases the attenuation quadratic with the distance from the light.
 		</div> 
 
 

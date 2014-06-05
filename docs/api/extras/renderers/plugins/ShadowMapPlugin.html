@@ -9,7 +9,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">The Webglrenderer plugin class that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.</div>
+
+
 
 
 		<h2>Constructor</h2>
@@ -17,7 +19,7 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		Creates a new [name]. 
 		</div>
 
 
@@ -25,30 +27,30 @@
 
 
 
-		<h3>.init([page:todo renderer]) [page:todo]</h3>
+		<h3>.init([page:WebglRenderer renderer])</h3>
 		<div>
-		renderer -- todo
+		renderer -- The WebglRenderer that uses the plugin.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.update([page:todo scene], [page:todo camera]) [page:todo]</h3>
-		<div>
-		scene -- todo <br />
-		camera -- todo
-		</div>
-		<div>
-		todo
+		Initializes the plugin to work with the renderer. This gets called when the plugin gets added as a plugin to the renderer.
 		</div>
 
-		<h3>.render([page:todo scene], [page:todo camera]) [page:todo]</h3>
+		<h3>.update([page:Scene scene], [page:Camera camera]) </h3>
 		<div>
-		scene -- todo <br />
-		camera -- todo
+		scene -- The scene to render. <br />
+		camera -- The camera to render.
 		</div>
 		<div>
-		todo
+		Updates the textures nessecary for the shadowmaps. This gets called by updateShadowMap in [page:WebglRenderer].
+		</div>
+
+		<h3>.render([page:Scene scene], [page:Camera camera])</h3>
+		<div>
+		scene -- The scene to render. <br />
+		camera -- The camera to render.
+		</div>
+		<div>
+		Prepares the shadowmaps to be rendered defined in the scene. This gets automatically called as pre render function to draw the lensflares.
 		</div>
 
 		<h2>Source</h2>

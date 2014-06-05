@@ -171,17 +171,9 @@
 
 			var container, stats;
 
-			var start_time;
-
 			var camera, scene, renderer;
 
-			var uniforms1, uniforms2, material1, material2, mesh, meshes = [];
-
-			var mouseX = 0, mouseY = 0,
-			lat = 0, lon = 0, phy = 0, theta = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var uniforms1, uniforms2;
 
 			var clock = new THREE.Clock();
 
@@ -192,12 +184,12 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 40, windowHalfX / windowHalfY, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
 
-				start_time = Date.now();
+				var geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
 					time: { type: "f", value: 1.0 },
@@ -212,12 +204,16 @@
 
 				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
 
-				var size = 0.75, mlib = [],
-					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];
+				var params = [
+					[ 'fragment_shader1', uniforms1 ],
+					[ 'fragment_shader2', uniforms2 ],
+					[ 'fragment_shader3', uniforms1 ],
+					[ 'fragment_shader4', uniforms1 ]
+				];
 
 				for( var i = 0; i < params.length; i++ ) {
 
-					material = new THREE.ShaderMaterial( {
+					var material = new THREE.ShaderMaterial( {
 
 						uniforms: params[ i ][ 1 ],
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -225,14 +221,10 @@
 
 						} );
 
-					mlib[ i ] = material;
-
-					mesh = new THREE.Mesh( new THREE.CubeGeometry( size, size, size ), new THREE.MeshFaceMaterial( [ mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ] ] ) );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = i - ( params.length - 1 ) / 2;
 					mesh.position.y = i % 2 - 0.5;
 					scene.add( mesh );
-
-					meshes[ i ] = mesh;
 
 				}
 
@@ -283,10 +275,12 @@
 				uniforms1.time.value += delta * 5;
 				uniforms2.time.value = clock.elapsedTime;
 
-				for( var i = 0; i < meshes.length; ++ i ) {
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
-					meshes[ i ].rotation.y += delta * 0.5 * ( i % 2 ? 1 : -1 );
-					meshes[ i ].rotation.x += delta * 0.5 * ( i % 2 ? -1 : 1 );
+					var object = scene.children[ i ];
+
+					object.rotation.y += delta * 0.5 * ( i % 2 ? 1 : -1 );
+					object.rotation.x += delta * 0.5 * ( i % 2 ? -1 : 1 );
 
 				}
 

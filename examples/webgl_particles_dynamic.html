@@ -139,7 +139,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 				renderer.sortObjects = false;
@@ -152,7 +152,7 @@
 				parent = new THREE.Object3D();
 				scene.add( parent );
 
-				var grid = new THREE.ParticleSystem( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.ParticleBasicMaterial( { color: 0xff0000, size: 10 } ) );
+				var grid = new THREE.PointCloud( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.PointCloudMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.position.y = -400;
 				grid.rotation.x = - Math.PI / 2;
 				parent.add( grid );
@@ -245,7 +245,7 @@
 
 						c = ( i < clones.length -1 ) ? 0x252525 : color;
 
-						mesh = new THREE.ParticleSystem( geometry, new THREE.ParticleBasicMaterial( { size: 3, color: c } ) );
+						mesh = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { size: 3, color: c } ) );
 						mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
 
 						mesh.position.x = x + clones[ i ][ 0 ];
@@ -263,7 +263,7 @@
 
 				} else {
 
-					mesh = new THREE.ParticleSystem( geometry, new THREE.ParticleBasicMaterial( { size: 3, color: color } ) );
+					mesh = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { size: 3, color: color } ) );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
 
 					mesh.position.x = x;

@@ -32,7 +32,7 @@ THREE.STLLoader.prototype = {
 
 };
 
-THREE.STLLoader.prototype.load = function (url, callback) {
+THREE.STLLoader.prototype.load = function ( url, callback ) {
 
 	var scope = this;
 
@@ -42,16 +42,15 @@ THREE.STLLoader.prototype.load = function (url, callback) {
 
 		if ( event.target.status === 200 || event.target.status === 0 ) {
 
-				var geometry = scope.parse( event.target.response || event.target.responseText );
+			var geometry = scope.parse( event.target.response || event.target.responseText );
 
-				scope.dispatchEvent( { type: 'load', content: geometry } );
+			scope.dispatchEvent( { type: 'load', content: geometry } );
 
-				if ( callback ) callback( geometry );
+			if ( callback ) callback( geometry );
 
 		} else {
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']',
-				response: event.target.responseText } );
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']', response: event.target.responseText } );
 
 		}
 
@@ -71,14 +70,14 @@ THREE.STLLoader.prototype.load = function (url, callback) {
 
 	}, false );
 
-	xhr.overrideMimeType('text/plain; charset=x-user-defined');
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( 'text/plain; charset=x-user-defined' );
 	xhr.open( 'GET', url, true );
-	xhr.responseType = "arraybuffer";
+	xhr.responseType = 'arraybuffer';
 	xhr.send( null );
 
 };
 
-THREE.STLLoader.prototype.parse = function (data) {
+THREE.STLLoader.prototype.parse = function ( data ) {
 
 
 	var isBinary = function () {
@@ -100,45 +99,44 @@ THREE.STLLoader.prototype.parse = function (data) {
 
 };
 
-THREE.STLLoader.prototype.parseBinary = function (data) {
+THREE.STLLoader.prototype.parseBinary = function ( data ) {
 
-	var face, geometry, n_faces, reader, length, normal, i, dataOffset, faceLength, start, vertexstart;
+	var reader = new DataView( data );
+	var faces = reader.getUint32( 80, true );
+	var dataOffset = 84;
+	var faceLength = 12 * 4 + 2;
 
-	reader = new DataView( data );
-	n_faces = reader.getUint32(80,true);
-	geometry = new THREE.Geometry();
-	dataOffset = 84;
-	faceLength = 12 * 4 + 2;
+	var offset = 0;
 
-	for (face = 0; face < n_faces; face++) {
+	var geometry = new THREE.BufferGeometry();
 
-		start = dataOffset + face * faceLength;
-		normal = new THREE.Vector3(
-			reader.getFloat32(start,true),
-			reader.getFloat32(start + 4,true),
-			reader.getFloat32(start + 8,true)
-		);
+	var vertices = new Float32Array( faces * 3 * 3 );
+	var normals = new Float32Array( faces * 3 * 3 );
 
-		for (i = 1; i <= 3; i++) {
+	for ( var face = 0; face < faces; face ++ ) {
 
-			vertexstart = start + i * 12;
-			geometry.vertices.push(
-				new THREE.Vector3(
-					reader.getFloat32(vertexstart,true),
-					reader.getFloat32(vertexstart +4,true),
-					reader.getFloat32(vertexstart + 8,true)
-				)
-			);
+		var start = dataOffset + face * faceLength;
+
+		for ( var i = 1; i <= 3; i ++ ) {
+
+			var vertexstart = start + i * 12;
+
+			vertices[ offset     ] = reader.getFloat32( vertexstart, true );
+			vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true );
+			vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true );
+
+			normals[ offset     ] = reader.getFloat32( start    , true );
+			normals[ offset + 1 ] = reader.getFloat32( start + 4, true );
+			normals[ offset + 2 ] = reader.getFloat32( start + 8, true );
+
+			offset += 3;
 
 		}
 
-		length = geometry.vertices.length;
-		geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
-
 	}
 
-	geometry.computeCentroids();
-	geometry.computeBoundingSphere();
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 	return geometry;
 
@@ -150,31 +148,31 @@ THREE.STLLoader.prototype.parseASCII = function (data) {
 	geometry = new THREE.Geometry();
 	patternFace = /facet([\s\S]*?)endfacet/g;
 
-	while (((result = patternFace.exec(data)) != null)) {
+	while ( ( result = patternFace.exec( data ) ) !== null ) {
 
 		text = result[0];
 		patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
 
-		while (((result = patternNormal.exec(text)) != null)) {
+		while ( ( result = patternNormal.exec( text ) ) !== null ) {
 
-			normal = new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5]));
+			normal = new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
 
 		}
 
 		patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
 
-		while (((result = patternVertex.exec(text)) != null)) {
+		while ( ( result = patternVertex.exec( text ) ) !== null ) {
 
-			geometry.vertices.push(new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5])));
+			geometry.vertices.push( new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) ) );
 
 		}
 
 		length = geometry.vertices.length;
-		geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
+
+		geometry.faces.push( new THREE.Face3( length - 3, length - 2, length - 1, normal ) );
 
 	}
 
-	geometry.computeCentroids();
 	geometry.computeBoundingBox();
 	geometry.computeBoundingSphere();
 

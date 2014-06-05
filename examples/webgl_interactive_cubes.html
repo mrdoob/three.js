@@ -55,7 +55,7 @@
 				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.CubeGeometry( 20, 20, 20 );
+				var geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
 				for ( var i = 0; i < 2000; i ++ ) {
 
@@ -81,9 +81,9 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.sortObjects = false;
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.sortObjects = false;
 				container.appendChild(renderer.domElement);
 
 				stats = new Stats();

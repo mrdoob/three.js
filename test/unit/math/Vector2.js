@@ -124,6 +124,32 @@ test( "min/max/clamp", function() {
 	c.clamp( b, a );
 	ok( c.x == -x, "Passed!" );
 	ok( c.y == y, "Passed!" );
+
+	c.set(-2*x, 2*x);
+	c.clampScalar( -x, x );
+	equal( c.x, -x, "scalar clamp x" );
+	equal( c.y,  x, "scalar clamp y" );
+});
+
+test( "rounding", function() {
+	deepEqual( new THREE.Vector2( -0.1, 0.1 ).floor(), new THREE.Vector2( -1, 0 ), "floor .1" );
+	deepEqual( new THREE.Vector2( -0.5, 0.5 ).floor(), new THREE.Vector2( -1, 0 ), "floor .5" );
+	deepEqual( new THREE.Vector2( -0.9, 0.9 ).floor(), new THREE.Vector2( -1, 0 ), "floor .9" );
+
+	deepEqual( new THREE.Vector2( -0.1, 0.1 ).ceil(), new THREE.Vector2( 0, 1 ), "ceil .1" );
+	deepEqual( new THREE.Vector2( -0.5, 0.5 ).ceil(), new THREE.Vector2( 0, 1 ), "ceil .5" );
+	deepEqual( new THREE.Vector2( -0.9, 0.9 ).ceil(), new THREE.Vector2( 0, 1 ), "ceil .9" );
+
+	deepEqual( new THREE.Vector2( -0.1, 0.1 ).round(), new THREE.Vector2( 0, 0 ), "round .1" );
+	deepEqual( new THREE.Vector2( -0.5, 0.5 ).round(), new THREE.Vector2( 0, 1 ), "round .5" );
+	deepEqual( new THREE.Vector2( -0.9, 0.9 ).round(), new THREE.Vector2( -1, 1 ), "round .9" );
+
+	deepEqual( new THREE.Vector2( -0.1, 0.1 ).roundToZero(), new THREE.Vector2( 0, 0 ), "roundToZero .1" );
+	deepEqual( new THREE.Vector2( -0.5, 0.5 ).roundToZero(), new THREE.Vector2( 0, 0 ), "roundToZero .5" );
+	deepEqual( new THREE.Vector2( -0.9, 0.9 ).roundToZero(), new THREE.Vector2( 0, 0 ), "roundToZero .9" );
+	deepEqual( new THREE.Vector2( -1.1, 1.1 ).roundToZero(), new THREE.Vector2( -1, 1 ), "roundToZero 1.1" );
+	deepEqual( new THREE.Vector2( -1.5, 1.5 ).roundToZero(), new THREE.Vector2( -1, 1 ), "roundToZero 1.5" );
+	deepEqual( new THREE.Vector2( -1.9, 1.9 ).roundToZero(), new THREE.Vector2( -1, 1 ), "roundToZero 1.9" );
 });
 
 test( "negate", function() {

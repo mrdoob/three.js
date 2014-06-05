@@ -72,42 +72,44 @@
 		Returns -1 if *x* is less than 0, 1 if *x* is greater than 0, and 0 if *x* is zero.
 		</div>
 
-		<h3>.degToRad([page:todo degrees]) [page:todo]</h3>
+		<h3>.degToRad([page:Float degrees]) [page:Float]</h3>
 		<div>
-		degrees -- todo
+		degrees -- [page:Float]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.smoothstep([page:todo x], [page:todo min], [page:todo max]) [page:todo]</h3>
-		<div>
-		x -- todo <br />
-		min -- todo <br />
-		max -- todo
-		</div>
-		<div>
-		todo
+		Converts degrees to radians.
 		</div>
 
-		<h3>.smootherstep([page:todo x], [page:todo min], [page:todo max]) [page:todo]</h3>
+		<h3>.radToDeg([page:Float radians]) [page:Float]</h3>
 		<div>
-		x -- todo <br />
-		min -- todo <br />
-		max -- todo
+		radians -- [page:Float]
 		</div>
 		<div>
-		todo
+		Converts radians to degrees
 		</div>
 
-		<h3>.radToDeg([page:todo radians]) [page:todo]</h3>
+		<h3>.smoothstep([page:Float x], [page:Float min], [page:Float max]) [page:Float]</h3>
 		<div>
-		radians -- todo
+		x -- The value to evaluate based on its position between min and max. <br />
+		min -- Any x value below min will be 0 <br />
+		max -- Any x value above max will be 1
 		</div>
 		<div>
-		todo
+		Returns a value between 0-1 that represents the percentage that x has moved between min and max, but smoothed or slowed down the closer X is to the min and max.<br/><br/>
+		
+		[link:http://en.wikipedia.org/wiki/Smoothstep Wikipedia]
 		</div>
 
+		<h3>.smootherstep([page:Float x], [page:Float min], [page:Float max]) [page:Float]</h3>
+		<div>
+		x -- The value to evaluate based on its position between min and max. <br />
+		min -- Any x value below min will be 0 <br />
+		max --  Any x value above max will be 1
+		</div>
+		<div>
+		Returns a value between 0-1. It works the same as smoothstep, but more smooth.
+		</div>
+		
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

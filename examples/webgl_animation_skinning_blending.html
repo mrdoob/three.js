@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - skinning</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Skeletal Animation Blending
+			<br><br> Adjust blend weights to affect the animations that are currently playing.
+			<br> Cross fades (and warping) blend between 2 animations and end with a single animation.
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/BlendCharacter.js"></script>
+		<script src="js/BlendCharacterGui.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var blendMesh, camera, scene, renderer, controls;
+
+			var clock = new THREE.Clock();
+			var gui = null;
+
+			var isFrameStepping = false;
+			var timeToStep = 0;
+
+			init();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				scene = new THREE.Scene();
+				scene.add ( new THREE.AmbientLight( 0xaaaaaa ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				light.position.set( 0, 0, 1000 );
+				scene.add( light );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setClearColor( '#777777', 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = true;
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// listen for messages from the gui
+				window.addEventListener( 'start-animation', onStartAnimation );
+				window.addEventListener( 'stop-animation', onStopAnimation );
+				window.addEventListener( 'pause-animation', onPauseAnimation );
+				window.addEventListener( 'step-animation', onStepAnimation );
+				window.addEventListener( 'weight-animation', onWeightAnimation );
+				window.addEventListener( 'crossfade', onCrossfade );
+				window.addEventListener( 'warp', onWarp );
+				window.addEventListener( 'toggle-lock-camera', onLockCameraToggle );
+				window.addEventListener( 'toggle-show-skeleton', onShowSkeleton );
+				window.addEventListener( 'toggle-show-model', onShowModel );
+
+				blendMesh = new THREE.BlendCharacter();
+				blendMesh.load( "models/skinned/marine/marine_anims.js", start );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onStartAnimation( event ) {
+
+				var data = event.detail;
+
+				blendMesh.stopAll();
+
+				// the blend mesh will combine 1 or more animations
+				for ( var i = 0; i < data.anims.length; ++i ) {
+
+					blendMesh.play(data.anims[i], data.weights[i]);
+
+				}
+
+				isFrameStepping = false;
+
+			}
+
+			function onStopAnimation( event ) {
+
+				blendMesh.stopAll();
+				isFrameStepping = false;
+
+			}
+
+			function onPauseAnimation( event ) {
+
+				( isFrameStepping ) ? blendMesh.unPauseAll(): blendMesh.pauseAll();
+
+				isFrameStepping = false;
+
+			}
+
+			function onStepAnimation( event ) {
+
+				blendMesh.unPauseAll();
+				isFrameStepping = true;
+				timeToStep = event.detail.stepSize;
+			}
+
+			function onWeightAnimation(event) {
+
+				var data = event.detail;
+				for ( var i = 0; i < data.anims.length; ++i ) {
+
+					blendMesh.applyWeight(data.anims[i], data.weights[i]);
+
+				}
+
+			}
+
+			function onCrossfade(event) {
+
+				var data = event.detail;
+
+				blendMesh.stopAll();
+				blendMesh.crossfade( data.from, data.to, data.time );
+
+				isFrameStepping = false;
+
+			}
+
+			function onWarp( event ) {
+
+				var data = event.detail;
+
+				blendMesh.stopAll();
+				blendMesh.warp( data.from, data.to, data.time );
+
+				isFrameStepping = false;
+
+			}
+
+
+			function onLockCameraToggle( event ) {
+
+				var shouldLock = event.detail.shouldLock;
+				controls.enabled = !shouldLock;
+
+			}
+
+			function onShowSkeleton( event ) {
+
+				var shouldShow = event.detail.shouldShow;
+				blendMesh.showSkeleton( shouldShow );
+
+			}
+
+			function onShowModel( event ) {
+
+				var shouldShow = event.detail.shouldShow;
+				blendMesh.showModel( shouldShow );
+
+			}
+
+			function start() {
+
+				blendMesh.rotation.y = Math.PI * -135 / 180;
+				scene.add( blendMesh );
+
+				var aspect = window.innerWidth / window.innerHeight;
+				var radius = blendMesh.geometry.boundingSphere.radius;
+
+				camera = new THREE.PerspectiveCamera( 45, aspect, 1, 10000 );
+				camera.position.set( 0.0, radius, radius * 3.5 );
+
+				controls = new THREE.OrbitControls( camera );
+				controls.target = new THREE.Vector3( 0, radius, 0 );
+				controls.update();
+
+				// Set default weights
+
+				blendMesh.animations[ 'idle' ].weight = 1 / 3;
+				blendMesh.animations[ 'walk' ].weight = 1 / 3;
+				blendMesh.animations[ 'run' ].weight = 1 / 3;
+
+				gui = new BlendCharacterGui(blendMesh.animations);
+
+				animate();
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate, renderer.domElement );
+
+				// step forward in time based on whether we're stepping and scale
+
+				var scale = gui.getTimeScale();
+				var delta = clock.getDelta();
+				var stepSize = (!isFrameStepping) ? delta * scale: timeToStep;
+
+				// modify blend weights
+
+				blendMesh.update( stepSize );
+				gui.update();
+
+				THREE.AnimationHandler.update( stepSize );
+
+				renderer.render( scene, camera );
+				stats.update();
+
+				// if we are stepping, consume time
+				// ( will equal step size next time a single step is desired )
+
+				timeToStep = 0;
+
+			}
+
+		</script>
+
+	</body>
+</html>
+

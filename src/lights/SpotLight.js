@@ -2,9 +2,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
+THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 	this.position.set( 0, 1, 0 );
 	this.target = new THREE.Object3D();
@@ -57,6 +57,20 @@ THREE.SpotLight.prototype.clone = function () {
 
 	light.castShadow = this.castShadow;
 	light.onlyShadow = this.onlyShadow;
+
+	//
+
+	light.shadowCameraNear = this.shadowCameraNear;
+	light.shadowCameraFar = this.shadowCameraFar;
+	light.shadowCameraFov = this.shadowCameraFov;
+
+	light.shadowCameraVisible = this.shadowCameraVisible;
+
+	light.shadowBias = this.shadowBias;
+	light.shadowDarkness = this.shadowDarkness;
+
+	light.shadowMapWidth = this.shadowMapWidth;
+	light.shadowMapHeight = this.shadowMapHeight;
 
 	return light;
 

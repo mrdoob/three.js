@@ -163,7 +163,7 @@
 
 			function createAreaEmitter( light ) {
 
-				var geometry = new THREE.CubeGeometry( 1, 1, 1 );
+				var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 				var material = new THREE.MeshBasicMaterial( { color: light.color.getHex(), vertexColors: THREE.FaceColors } );
 
 				var backColor = 0x222222;
@@ -177,7 +177,7 @@
 				var emitter = new THREE.Mesh( geometry, material );
 
 				emitter.position = light.position;
-				emitter.quaternion = light.quaternion;
+				emitter.quaternion.copy( light.quaternion );
 				emitter.scale.set( light.width * 2, 0.2, light.height * 2 );
 
 				return emitter;

@@ -161,7 +161,7 @@
 
 			geometry.dynamic = true;
 
-			THREE.GeometryUtils.center( geometry );
+			geometry.center();
 
 			var tessellateModifier = new THREE.TessellateModifier( 4 );
 
@@ -228,7 +228,7 @@
 
 			scene.add( mesh );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x050505, 1 );
 			renderer.setSize( WIDTH, HEIGHT );
 

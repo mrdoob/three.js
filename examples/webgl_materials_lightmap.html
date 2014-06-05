@@ -58,7 +58,7 @@
 			void main() {
 
 				float h = normalize( vWorldPosition + offset ).y;
-				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( h, exponent ), 0.0 ) ), 1.0 );
+				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h, 0.0 ), exponent ), 0.0 ) ), 1.0 );
 
 			}
 
@@ -134,7 +134,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -142,7 +142,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				// STATS
 

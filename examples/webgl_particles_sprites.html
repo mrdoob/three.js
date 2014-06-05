@@ -99,10 +99,10 @@
 					sprite = parameters[i][1];
 					size   = parameters[i][2];
 
-					materials[i] = new THREE.ParticleBasicMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
+					materials[i] = new THREE.PointCloudMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
 					materials[i].color.setHSL( color[0], color[1], color[2] );
 
-					particles = new THREE.ParticleSystem( geometry, materials[i] );
+					particles = new THREE.PointCloud( geometry, materials[i] );
 
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
@@ -200,7 +200,7 @@
 
 					var object = scene.children[ i ];
 
-					if ( object instanceof THREE.ParticleSystem ) {
+					if ( object instanceof THREE.PointCloud ) {
 
 						object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
 

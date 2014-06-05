@@ -2,11 +2,12 @@
 <html lang="en" id="html-el">
 	<head>
 		<title>three.js webgl - UV mapped ExtrudeGeometry</title>
-		
+
 		<script type="text/javascript" src="../build/three.min.js"></script>
-		<script type="text/javascript" src="js/UVsUtils.js"></script>
+		<script type="text/javascript" src="js/utils/UVsUtils.js"></script>
 
 		<script type="text/javascript">
+
 (function(){
 	'use strict';
 
@@ -26,7 +27,7 @@
 
 	window.launch = function() {
 
-		camera = new THREE.PerspectiveCamera(30, WIDTH / HEIGHT);
+		camera = new THREE.PerspectiveCamera(30, WIDTH / HEIGHT, 1, 10000);
 		camera.position.z = 20;
 
 		scene = new THREE.Scene();
@@ -45,8 +46,10 @@
 
 		// show canvas
 		targetCanvas = renderer.domElement;
-		targetCanvas.width  = WIDTH;
-		targetCanvas.height = HEIGHT;
+
+		/// Don't add it
+		//targetCanvas.width  = WIDTH;
+		//targetCanvas.height = HEIGHT;
 		document.getElementById('canvas-container').appendChild(targetCanvas);
 
 		setupAnimation();
@@ -174,10 +177,11 @@
 	'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';
 
 })();
+
 		</script>
 	</head>
 	
-	<body onload="void launch()">
+	<body onload="launch()">
 		<div>
 			<form id="repeat-setting">
 				U repeat: &nbsp;

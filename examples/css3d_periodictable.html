@@ -12,7 +12,7 @@
 			body {
 				background-color: #000000;
 				margin: 0;
-				font-family: Arial;
+				font-family: Helvetica, sans-serif;;
 				overflow: hidden;
 			}
 
@@ -69,12 +69,7 @@
 					font-size: 60px;
 					font-weight: bold;
 					color: rgba(255,255,255,0.75);
-
-					-webkit-filter: drop-shadow(0px 0px 20px rgba(0,255,255,0.95));
-					-moz-filter: drop-shadow(0px 0px 20px rgba(0,255,255,0.95));
-					-o-filter: drop-shadow(0px 0px 20px rgba(0,255,255,0.95));
-					-ms-filter: drop-shadow(0px 0px 20px rgba(0,255,255,0.95));
-					filter: drop-shadow(0px 0px 20px rgba(0,255,255,0.95));
+					text-shadow: 0 0 10px rgba(0,255,255,0.95);
 				}
 
 				.element .details {
@@ -252,8 +247,8 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 1500;
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 3000;
 
 				scene = new THREE.Scene();
 
@@ -267,7 +262,7 @@
 
 					var number = document.createElement( 'div' );
 					number.className = 'number';
-					number.textContent = i + 1;
+					number.textContent = (i/5) + 1;
 					element.appendChild( number );
 
 					var symbol = document.createElement( 'div' );
@@ -370,6 +365,8 @@
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 0.5;
+				controls.minDistance = 500;
+				controls.maxDistance = 6000;
 				controls.addEventListener( 'change', render );
 
 				var button = document.getElementById( 'table' );
@@ -452,6 +449,7 @@
 				requestAnimationFrame( animate );
 
 				TWEEN.update();
+
 				controls.update();
 
 			}

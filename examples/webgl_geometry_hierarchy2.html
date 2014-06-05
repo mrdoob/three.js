@@ -47,7 +47,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
 
 				root = new THREE.Mesh( geometry, material );
@@ -127,6 +127,7 @@
 				}
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );

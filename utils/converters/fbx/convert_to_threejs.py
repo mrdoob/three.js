@@ -1375,12 +1375,21 @@ def generate_scene_output(node):
                 uvs_to_indices_list, 
                 vertex_offsets, 
                 material_offsets)
+<<<<<<< HEAD
 
     # Generate counts for uvs, vertices, normals, colors, and faces
     nuvs = []
     for layer_index, uvs in enumerate(uv_values):
         nuvs.append(str(len(uvs)))
 
+=======
+
+    # Generate counts for uvs, vertices, normals, colors, and faces
+    nuvs = []
+    for layer_index, uvs in enumerate(uv_values):
+        nuvs.append(str(len(uvs)))
+
+>>>>>>> dcabe1092456c68e48a139558d6176ba720e07e1
     nvertices = len(vertices)
     nnormals = len(normal_values)
     ncolors = len(color_values)
@@ -1637,6 +1646,7 @@ def generate_light_object(node):
             rotation = transform.GetR()
             matrix = FbxMatrix(translation, rotation, scale)
             direction = matrix.MultNormalize(FbxVector4(0,1,0,1)) 
+<<<<<<< HEAD
 
         output = {
 
@@ -1646,6 +1656,17 @@ def generate_light_object(node):
           'direction': serializeVector3( direction ),
           'target': getObjectName( node.GetTarget() ) 
 
+=======
+
+        output = {
+
+          'type': 'DirectionalLight',
+          'color': getHex(light.Color.Get()),
+          'intensity': light.Intensity.Get()/100.0,
+          'direction': serializeVector3( direction ),
+          'target': getObjectName( node.GetTarget() ) 
+
+>>>>>>> dcabe1092456c68e48a139558d6176ba720e07e1
         }
 
     elif light_type == "point":
@@ -1687,10 +1708,17 @@ def generate_ambient_light(scene):
         return None
 
     output = {
+<<<<<<< HEAD
 
       'type': 'AmbientLight',
       'color': getHex(ambient_color)
 
+=======
+
+      'type': 'AmbientLight',
+      'color': getHex(ambient_color)
+
+>>>>>>> dcabe1092456c68e48a139558d6176ba720e07e1
     }
 
     return output
@@ -1760,6 +1788,7 @@ def generate_camera_object(node):
           'near': near,
           'far': far,
           'position': serializeVector3( position )
+<<<<<<< HEAD
 
         }
 
@@ -1779,6 +1808,27 @@ def generate_camera_name_list_from_hierarchy(node, camera_list):
     for i in range(node.GetChildCount()):
         generate_camera_name_list_from_hierarchy(node.GetChild(i), camera_list)
 
+=======
+
+        }
+
+    return output
+
+# #####################################################
+# Generate Camera Names
+# #####################################################
+def generate_camera_name_list_from_hierarchy(node, camera_list):
+    if node.GetNodeAttribute() == None:
+        pass
+    else:
+        attribute_type = (node.GetNodeAttribute().GetAttributeType())
+        if attribute_type == FbxNodeAttribute.eCamera:
+            camera_string = getObjectName(node) 
+            camera_list.append(camera_string)
+    for i in range(node.GetChildCount()):
+        generate_camera_name_list_from_hierarchy(node.GetChild(i), camera_list)
+
+>>>>>>> dcabe1092456c68e48a139558d6176ba720e07e1
 def generate_camera_name_list(scene):
     camera_list = []
     node = scene.GetRootNode()
@@ -1881,11 +1931,19 @@ def generate_object_hierarchy(node, object_dict):
 
     object_count += 1
     object_name = getObjectName(node)
+<<<<<<< HEAD
 
     object_children = {}
     for i in range(node.GetChildCount()):
         object_count += generate_object_hierarchy(node.GetChild(i), object_children)
 
+=======
+
+    object_children = {}
+    for i in range(node.GetChildCount()):
+        object_count += generate_object_hierarchy(node.GetChild(i), object_children)
+
+>>>>>>> dcabe1092456c68e48a139558d6176ba720e07e1
     if node.GetChildCount() > 0:
         # Having 'children' above other attributes is hard to read.
         # We can send it to the bottom using the last letter of the alphabet 'z'. 
@@ -1993,6 +2051,7 @@ def extract_scene(scene, filename):
         output['metadata'] = metadata
 
     return output
+<<<<<<< HEAD
 
 # #####################################################
 # Generate Non-Scene Output 
@@ -2004,6 +2063,19 @@ def extract_geometry(scene, filename):
 # #####################################################
 # File Helpers
 # #####################################################
+=======
+
+# #####################################################
+# Generate Non-Scene Output 
+# #####################################################
+def extract_geometry(scene, filename):
+    output = generate_non_scene_output(scene)
+    return output
+
+# #####################################################
+# File Helpers
+# #####################################################
+>>>>>>> dcabe1092456c68e48a139558d6176ba720e07e1
 def write_file(filepath, content):
     index = filepath.rfind('/')
     dir = filepath[0:index]

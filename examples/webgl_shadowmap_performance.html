@@ -48,10 +48,8 @@
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
-			var MARGIN = 100;
-
 			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
 			var camera, controls, scene, renderer;
@@ -128,10 +126,8 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-				renderer.domElement.style.top = MARGIN + 'px';
 				container.appendChild( renderer.domElement );
 
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -159,7 +155,7 @@
 			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+				SCREEN_HEIGHT = window.innerHeight;
 
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
@@ -246,7 +242,7 @@
 
 				// CUBES
 
-				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1500, 220, 150 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1500, 220, 150 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -256,7 +252,7 @@
 
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1600, 170, 250 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1600, 170, 250 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;

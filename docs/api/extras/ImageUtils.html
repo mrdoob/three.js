@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A Helper class to ease the loading of images of different types.</div>
 		
 
 		<h2>Properties</h2>
@@ -18,30 +18,30 @@
 
 		<h3>.[page:string crossOrigin]</h3>
 		<div>
-		todo
+		The crossOrigin string to implement CORS for loading the image from a different domain that allows CORS.
 		</div> 
 
 		<h2>Methods</h2>
 
 
 
-		<h3>.generateDataTexture([page:todo width], [page:todo height], [page:todo color]) [page:todo]</h3>
+		<h3>.generateDataTexture([page:Number width], [page:Number height], [page:Number color]) [page:DataTexture]</h3>
 		<div>
-		width -- todo <br />
-		height -- todo <br />
-		color -- todo
+		width -- The width of the texture. <br />
+		height -- The width of the texture. <br />
+		color -- The hexadecimal value of the color.
 		</div>
 		<div>
-		todo
+		Generates a texture of a single color. It is a DataTexture with format, RGBFormat.
 		</div>
 
-		<h3>.parseDDS([page:todo buffer], [page:todo loadMipmaps]) [page:todo]</h3>
+		<h3>.parseDDS([page:String buffer], [page:boolean loadMipmaps]) [page:CompressedTexture]</h3>
 		<div>
-		buffer -- todo <br />
-		loadMipmaps -- todo
+		buffer -- A string containing the data of the dds. <br />
+		loadMipmaps -- A boolean to indicate if you need to load the mipmaps. Default is True.
 		</div>
 		<div>
-		todo
+		Parses a DDS Image from the string into a CompressedTexture. 
 		</div>
 
 		<h3>.loadCompressedTexture([page:todo url], [page:todo mapping], [page:todo onLoad], [page:todo onError]) [page:todo]</h3>
@@ -55,12 +55,12 @@
 		todo
 		</div>
 
-		<h3>.loadTexture([page:todo url], [page:todo mapping], [page:todo onLoad], [page:todo onError]) [page:todo]</h3>
+		<h3>.loadTexture([page:String url], [page:UVMapping mapping], [page:Function onLoad], [page:Function onError]) [page:todo]</h3>
 		<div>
-		url -- todo <br />
-		mapping -- todo <br />
-		onLoad -- todo <br />
-		onError -- todo
+		url -- the url of the texture<br />
+		mapping -- Can be an instance of [page:UVMapping THREE.UVMapping], [page:CubeReflectionMapping THREE.CubeReflectionMapping], [page:SphericalReflectionMapping THREE.SphericalReflectionMapping] or [page:SphericalRefractionMapping THREE.SphericalRefractionMapping]. Describes how the image is applied to the object.<br />Use undefined instead of null as a default value. See mapping property of [page:Texture texture] for more details.
+		onLoad -- callback function<br />
+		onError -- callback function
 		</div>
 		<div>
 		todo

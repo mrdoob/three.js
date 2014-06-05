@@ -7,9 +7,11 @@
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
 	</head>
 	<body>
+		[page:Object3D] &rarr;
+		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">base class for immediate rendering objects.</div>
 
 
 		<h2>Constructor</h2>
@@ -17,19 +19,19 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		This creates a new [name]. 
 		</div>
 
 
 		<h2>Methods</h2>
 
 
-		<h3>.render([page:todo renderCallback]) [page:todo]</h3>
+		<h3>.render([page:Function renderCallback])</h3>
 		<div>
-		renderCallback -- todo
+		renderCallback -- A function to render the generated object.
 		</div>
 		<div>
-		todo
+		This function needs to be overridden to start the creation of the object and should call renderCallback when finished.
 		</div>
 
 		<h2>Source</h2>

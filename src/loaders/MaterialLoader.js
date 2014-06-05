@@ -22,7 +22,7 @@ THREE.MaterialLoader.prototype = {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -43,6 +43,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 		if ( json.blending !== undefined ) material.blending = json.blending;
+		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;

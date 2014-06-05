@@ -10,7 +10,7 @@
 		<h1>[name]</h1>
 
 		<div class="desc">
-		This is a superefficent class for geometries because it saves all data in buffers. <br />
+		This is a super efficient class for geometries because it saves all data in buffers. <br />
 		It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the necessary buffer calculations.<br />
 		It is mainly interesting when working with static objects.
 		</div>
@@ -21,7 +21,7 @@
 
 		<h3>[name]()</h3>
 		<div>
-			This creates a new [name]. It also sets several properties to an default value.
+		This creates a new [name]. It also sets several properties to a default value.
 		</div>
 
 
@@ -68,11 +68,13 @@
 
 		<h3>.[page:boolean hasTangents]</h3>
 		<div>
-		todo
+		True if BufferGeometry has tangents. Set in [page:BufferGeometry BufferGeometry.computeTangents].
 		</div> 
 
 		<h2>Methods</h2>
 
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		
 		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
 		<div>
 		Bakes matrix transform directly into vertex coordinates.
@@ -108,45 +110,10 @@
 		You need to call this when you want the bufferGeometry removed while the application is running.
 		</div>
 
-
-		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<h3>.normalizeNormals()</h3>
 		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.normalizeNormals() [page:todo]</h3>
-		<div>
-		todo
-		</div>
-
-		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
-		<div>
-		event -- todo
-		</div>
-		<div>
-		todo
+		Every normal vector in a geometry will have a magnitude of 1.
+		This will correct lighting on the geometry surfaces.
 		</div>
 
 		<h2>Source</h2>

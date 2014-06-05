@@ -74,7 +74,7 @@
 
 				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "AdditiveAlphaBlending" ];
 
-				var map0 = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				var map0 = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
 				var map1 = THREE.ImageUtils.loadTexture( 'textures/sprite0.jpg' );
 				var map2 = THREE.ImageUtils.loadTexture( 'textures/sprite0.png' );
 				var map3 = THREE.ImageUtils.loadTexture( 'textures/lensflare/lensflare0.png' );
@@ -117,7 +117,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

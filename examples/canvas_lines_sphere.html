@@ -59,13 +59,13 @@
 				// particles
 
 				var PI2 = Math.PI * 2;
-				var material = new THREE.ParticleCanvasMaterial( {
+				var material = new THREE.SpriteCanvasMaterial( {
 
 					color: 0xffffff,
 					program: function ( context ) {
 
 						context.beginPath();
-						context.arc( 0, 0, 1, 0, PI2, true );
+						context.arc( 0, 0, 0.5, 0, PI2, true );
 						context.fill();
 
 					}
@@ -74,12 +74,13 @@
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
-					particle = new THREE.Particle( material );
+					particle = new THREE.Sprite( material );
 					particle.position.x = Math.random() * 2 - 1;
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
 					particle.position.multiplyScalar( Math.random() * 10 + 450 );
+					particle.scale.multiplyScalar( 2 );
 					scene.add( particle );
 
 				}

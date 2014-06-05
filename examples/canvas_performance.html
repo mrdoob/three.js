@@ -67,7 +67,7 @@
 				// Spheres
 
 				geometry = new THREE.SphereGeometry( 100, 26, 18 );
-				material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
+				material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
@@ -93,6 +93,7 @@
 				scene.add( light );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

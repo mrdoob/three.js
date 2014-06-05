@@ -233,3 +233,67 @@ test( "clone", function() {
 	a.elements[0] = 2;
 	ok( ! matrixEquals4( a, b ), "Passed!" );
 });
+
+
+test( "compose/decompose", function() {
+	var tValues = [
+		new THREE.Vector3(),
+		new THREE.Vector3( 3, 0, 0 ),
+		new THREE.Vector3( 0, 4, 0 ),
+		new THREE.Vector3( 0, 0, 5 ),
+		new THREE.Vector3( -6, 0, 0 ),
+		new THREE.Vector3( 0, -7, 0 ),
+		new THREE.Vector3( 0, 0, -8 ),
+		new THREE.Vector3( -2, 5, -9 ),
+		new THREE.Vector3( -2, -5, -9 )
+	];
+
+	var sValues = [
+		new THREE.Vector3( 1, 1, 1 ),
+		new THREE.Vector3( 2, 2, 2 ),
+		new THREE.Vector3( 1, -1, 1 ),
+		new THREE.Vector3( -1, 1, 1 ),
+		new THREE.Vector3( 1, 1, -1 ),
+		new THREE.Vector3( 2, -2, 1 ),
+		new THREE.Vector3( -1, 2, -2 ),
+		new THREE.Vector3( -1, -1, -1 ),
+		new THREE.Vector3( -2, -2, -2 )
+	];
+
+	var rValues = [
+		new THREE.Quaternion(),
+		new THREE.Quaternion().setFromEuler( new THREE.Euler( 1, 1, 0 ) ),
+		new THREE.Quaternion().setFromEuler( new THREE.Euler( 1, -1, 1 ) ),
+		new THREE.Quaternion( 0, 0.9238795292366128, 0, 0.38268342717215614 )
+	];
+
+
+	for( var ti = 0; ti < tValues.length; ti ++ ) {
+		for( var si = 0; si < sValues.length; si ++ ) {
+			for( var ri = 0; ri < rValues.length; ri ++ ) {
+				var t = tValues[ti];
+				var s = sValues[si];
+				var r = rValues[ri];
+
+				var m = new THREE.Matrix4().compose( t, r, s );
+				var t2 = new THREE.Vector3();
+				var r2 = new THREE.Quaternion();
+				var s2 = new THREE.Vector3();
+
+				m.decompose( t2, r2, s2 );
+
+				var m2 = new THREE.Matrix4().compose( t2, r2, s2 );
+			
+				var matrixIsSame = matrixEquals4( m, m2 );
+				/* debug code
+				if( ! matrixIsSame ) {
+					console.log( t, s, r );
+					console.log( t2, s2, r2 );
+					console.log( m, m2 );
+				}*/
+				ok( matrixEquals4( m, m2 ), "Passed!" );
+
+			}
+		}
+	}
+});

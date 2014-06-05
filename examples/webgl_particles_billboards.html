@@ -81,10 +81,10 @@
 
 				}
 
-				material = new THREE.ParticleBasicMaterial( { size: 35, sizeAttenuation: false, map: sprite, transparent: true } );
+				material = new THREE.PointCloudMaterial( { size: 35, sizeAttenuation: false, map: sprite, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7 );
 
-				particles = new THREE.ParticleSystem( geometry, material );
+				particles = new THREE.PointCloud( geometry, material );
 				particles.sortParticles = true;
 				scene.add( particles );
 

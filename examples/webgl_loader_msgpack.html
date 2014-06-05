@@ -1,0 +1,162 @@
+<!doctype html>
+<!--
+Requires msgpack-js.js
+
+https://github.com/creationix/msgpack-js-browser
+(ported from https://github.com/creationix/msgpack-js)
+-->
+<html lang='en'>
+  <head>
+    <title>three.js webgl - msgpack loader</title>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>
+    <style>
+      body {
+        margin: 0px;
+      }
+      #viewport {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #1b1c1e;
+        background-image: linear-gradient(#7d8fa3, #1b1c1e);
+      }
+    
+      #info {
+        color: #fff;
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        z-index: 100;
+        display:block;
+      }
+
+      a { color: orange }
+    </style>
+    <script src='../build/three.min.js'></script>
+    <script src='js/controls/OrbitControls.js'></script>
+    <script src='js/Detector.js'></script>
+    <script src='js/libs/stats.min.js'></script>
+    <script src='js/libs/require.js'></script>
+  </head>
+  <body>
+    <div id='info'>
+      <p>Robo Pigeon, from <a href='http://www.tearsofsteel.org' target='_blank'>Tears of Steel</a>, is licensed under 
+      <a href='http://creativecommons.org/licenses/by/3.0/' target='_blank'>Creative Commons Attribution 3.0</a>.
+      </p>
+    </div>
+    <div id='viewport'></div>
+    <script>
+      
+      if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+      requirejs.config( { baseUrl: 'js/libs' } );
+
+      var container, scene, camera, renderer;
+ 
+      function render() {
+        
+        renderer.render( scene, camera );
+      
+      }
+
+      function threePointLight() {
+
+          var directionalLight = new THREE.DirectionalLight( 0xb8b8b8 );
+          directionalLight.position.set(1, 1, 1).normalize();
+          directionalLight.intensity = 1.0;
+          scene.add( directionalLight );
+     
+          directionalLight = new THREE.DirectionalLight( 0xb8b8b8 );
+          directionalLight.position.set(-1, 0.6, 0.5).normalize();
+          directionalLight.intensity = 0.5;
+          scene.add(directionalLight);
+
+          directionalLight = new THREE.DirectionalLight();
+          directionalLight.position.set(-0.3, 0.6, -0.8).normalize( 0xb8b8b8 );
+          directionalLight.intensity = 0.45;
+          scene.add(directionalLight);
+
+      }
+
+      function setupScene( result ) {
+
+          scene = result;
+          scene.add( new THREE.GridHelper( 10, 2.5 ) );
+
+          threePointLight();
+
+          render();
+
+      }
+
+      function loadMSGPack() {
+
+          require(['msgpack-js'], function ( msgpack ) {
+              
+              var xhr = new XMLHttpRequest();
+              xhr.open('GET', 'scenes/robo_pigeon.pack', true);
+              xhr.responseType = 'arraybuffer';
+
+              xhr.onload = function( e ) {
+
+                  var decoded = msgpack.decode( this.response );
+
+                  var loader = new THREE.ObjectLoader();
+                  
+                  setupScene( loader.parse( decoded ) );
+
+              };
+
+              xhr.send();
+        
+          } );
+
+      }
+
+      function onWindowResize() {
+
+            camera.aspect = container.offsetWidth / container.offsetHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( container.offsetWidth, container.offsetHeight );
+
+            render();
+
+	  }
+
+      function init() {
+
+          scene = new THREE.Scene();
+
+          scene.add( new THREE.GridHelper( 10, 2.5 ) );
+          container = document.getElementById('viewport');
+
+          renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true  } );
+          renderer.setSize( container.offsetWidth, container.offsetHeight );
+          renderer.setClearColor( 0x000000, 0 );
+          container.appendChild( renderer.domElement );
+
+          var aspect = container.offsetWidth / container.offsetHeight;
+          camera = new THREE.PerspectiveCamera( 60, aspect, 0.01, 50 );
+          orbit = new THREE.OrbitControls( camera, container );
+          orbit.addEventListener( 'change', render );
+          camera.position.z = 5;
+          camera.position.x = 5;
+          camera.position.y = 5;
+          var target = new THREE.Vector3( 0, 1, 0 );
+          camera.lookAt( target );
+          orbit.target = target;
+          camera.updateProjectionMatrix();
+
+          window.addEventListener( 'resize', onWindowResize, false );
+
+          loadMSGPack();
+
+      }
+
+      init();
+    </script>
+  </body>
+</html>

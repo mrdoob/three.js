@@ -29,6 +29,11 @@ By default, this should look like:
 
     /home/USERNAME/.config/blender/2.6X/scripts/addons
 
+For Ubuntu users who installed Blender 2.68 via apt-get, this is the location:
+
+    /usr/lib/blender/scripts/addons
+    
+
 ## Usage
 
-Use the regular Import and Export menu within Blender, select `Three.js (js)`.
+Activate the Import-Export addon under "User Preferences" > "Addons" and then use the regular Import and Export menu within Blender, select `Three.js (js)`.

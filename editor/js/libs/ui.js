@@ -77,7 +77,8 @@ events.forEach( function ( event ) {
 
 	UI.Element.prototype[ method ] = function ( callback ) {
 
-		this.dom.addEventListener( event.toLowerCase(), callback, false );
+		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
+
 		return this;
 
 	};
@@ -123,6 +124,144 @@ UI.Panel.prototype.remove = function () {
 	}
 
 	return this;
+
+};
+
+UI.Panel.prototype.clear = function () {
+
+	while ( this.dom.children.length ) {
+
+		this.dom.removeChild( this.dom.lastChild );
+
+	}
+
+};
+
+
+// Collapsible Panel
+
+UI.CollapsiblePanel = function () {
+
+	UI.Panel.call( this );
+
+	this.dom.className = 'Panel CollapsiblePanel';
+
+	this.button = document.createElement( 'div' );
+	this.button.className = 'CollapsiblePanelButton';
+	this.dom.appendChild( this.button );
+
+	var scope = this;
+	this.button.addEventListener( 'click', function ( event ) {
+
+		scope.toggle();
+
+	}, false );
+
+	this.content = document.createElement( 'div' );
+	this.content.className = 'CollapsibleContent';
+	this.dom.appendChild( this.content );
+
+	this.isCollapsed = false;
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
+
+UI.CollapsiblePanel.prototype.addStatic = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.dom.insertBefore( arguments[ i ].dom, this.content );
+
+	}
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.removeStatic = UI.Panel.prototype.remove;
+
+UI.CollapsiblePanel.prototype.clearStatic = function () {
+
+	this.dom.childNodes.forEach( function ( child ) {
+
+		if ( child !== this.content ) {
+
+			this.dom.removeChild( child );
+
+		}
+
+	});
+
+};
+
+UI.CollapsiblePanel.prototype.add = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.content.appendChild( arguments[ i ].dom );
+
+	}
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.remove = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.content.removeChild( arguments[ i ].dom );
+
+	}
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.clear = function () {
+
+	while ( this.content.children.length ) {
+
+		this.content.removeChild( this.content.lastChild );
+
+	}
+
+};
+
+UI.CollapsiblePanel.prototype.toggle = function() {
+
+	this.setCollapsed( !this.isCollapsed );
+
+};
+
+UI.CollapsiblePanel.prototype.collapse = function() {
+
+	this.setCollapsed( true );
+
+};
+
+UI.CollapsiblePanel.prototype.expand = function() {
+
+	this.setCollapsed( false );
+
+};
+
+UI.CollapsiblePanel.prototype.setCollapsed = function( setCollapsed ) {
+
+	if ( setCollapsed ) {
+
+		this.dom.classList.add('collapsed');
+
+	} else {
+
+		this.dom.classList.remove('collapsed');
+
+	}
+
+	this.isCollapsed = setCollapsed;
 
 };
 
@@ -356,13 +495,13 @@ UI.FancySelect = function () {
 					// Highlight selected dom elem and scroll parent if needed
 					scope.setValue( scope.options[ scope.selectedIndex ].value );
 
-					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
 
 				}
 
 				break;
 		}
+
 	}, false);
 
 	this.dom = dom;
@@ -392,17 +531,19 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	scope.options = [];
 
-	for ( var key in options ) {
+	for ( var i = 0; i < options.length; i ++ ) {
 
-		var option = document.createElement('div');
-		option.className = 'option';
-		option.innerHTML = options[ key ];
-		option.value = key;
-		scope.dom.appendChild( option );
+		var option = options[ i ];
 
-		scope.options.push( option );
+		var div = document.createElement( 'div' );
+		div.className = 'option';
+		div.innerHTML = option.html;
+		div.value = option.value;
+		scope.dom.appendChild( div );
 
-		option.addEventListener( 'click', function ( event ) {
+		scope.options.push( div );
+
+		div.addEventListener( 'click', function ( event ) {
 
 			scope.setValue( this.value );
 			scope.dom.dispatchEvent( changeEvent );
@@ -422,8 +563,6 @@ UI.FancySelect.prototype.getValue = function () {
 };
 
 UI.FancySelect.prototype.setValue = function ( value ) {
-
-	if ( typeof value === 'number' ) value = value.toString();
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
@@ -522,7 +661,12 @@ UI.Color = function () {
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
 
-	try { dom.type = 'color'; } catch ( exception ) {}
+	try {
+
+		dom.type = 'color';
+		dom.value = '#ffffff';
+
+	} catch ( exception ) {}
 
 	this.dom = dom;
 
@@ -596,6 +740,9 @@ UI.Number = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -603,6 +750,8 @@ UI.Number = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -613,16 +762,17 @@ UI.Number = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 
@@ -644,11 +794,7 @@ UI.Number = function ( number ) {
 
 		var number = parseFloat( dom.value );
 
-		if ( isNaN( number ) === false ) {
-
-			dom.value = number;
-
-		}
+		dom.value = isNaN( number ) === false ? number : 0;
 
 	};
 
@@ -747,6 +893,9 @@ UI.Integer = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -754,6 +903,8 @@ UI.Integer = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -764,16 +915,17 @@ UI.Integer = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ) | 0;
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 

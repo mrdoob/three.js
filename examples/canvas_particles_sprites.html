@@ -45,11 +45,14 @@
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.ParticleBasicMaterial( { map: new THREE.Texture( generateSprite() ), blending: THREE.AdditiveBlending } );
+				var material = new THREE.SpriteMaterial( {
+					map: new THREE.Texture( generateSprite() ),
+					blending: THREE.AdditiveBlending
+				} );
 
 				for ( var i = 0; i < 1000; i++ ) {
 
-					particle = new THREE.Particle( material );
+					particle = new THREE.Sprite( material );
 
 					initParticle( particle, i * 10 );
 
@@ -57,9 +60,8 @@
 				}
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0x000040 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortElements = false;
-				renderer.setClearColor( 0x0000ff, 0.25 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -111,13 +113,11 @@
 
 			function initParticle( particle, delay ) {
 
-				var particle = this instanceof THREE.Particle ? this : particle;
+				var particle = this instanceof THREE.Sprite ? this : particle;
 				var delay = delay !== undefined ? delay : 0;
 
-				particle.position.x = 0;
-				particle.position.y = 0;
-				particle.position.z = 0;
-				particle.scale.x = particle.scale.y = Math.random() * 3 + 1;
+				particle.position.set( 0, 0, 0 )
+				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
 
 				new TWEEN.Tween( particle )
 					.delay( delay )

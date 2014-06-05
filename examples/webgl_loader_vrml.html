@@ -83,20 +83,17 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var material = new THREE.MeshLambertMaterial( { color:0xffffff, side: THREE.DoubleSide } );
-
 				var loader = new THREE.VRMLLoader();
 				loader.addEventListener( 'load', function ( event ) {
 
-					scene = event.content;
+					scene.add(event.content);
 
 				} );
-				loader.load( "models/vrml/simple.wrl" );
+				loader.load( "models/vrml/house.wrl" );
 
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container = document.createElement( 'div' );

@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">The Webglrenderer plugin class that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.</div>
 
 
 		<h2>Constructor</h2>
@@ -17,31 +17,32 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		Creates a new [name]. 
 		</div>
+
 
 
 		<h2>Methods</h2>
 
 
 
-		<h3>.init([page:todo renderer]) [page:todo]</h3>
+		<h3>.init([page:WebglRenderer renderer])</h3>
 		<div>
-		renderer -- todo
+		renderer -- The WebglRenderer that uses the plugin.
 		</div>
 		<div>
-		todo
+		Initializes the plugin to work with the renderer. This gets called when the plugin gets added as a plugin to the renderer.
 		</div>
 
-		<h3>.render([page:todo scene], [page:todo camera], [page:todo viewportWidth], [page:todo viewportHeight]) [page:todo]</h3>
+		<h3>.render([page:Scene scene], [page:Camera camera], [page:Number viewportWidth], [page:Number viewportHeight])</h3>
 		<div>
-		scene -- todo <br />
-		camera -- todo <br />
-		viewportWidth -- todo <br />
-		viewportHeight -- todo
+		scene -- The scene to render. <br />
+		camera -- The camera to render. <br />
+		viewportWidth -- The width of the viewport. <br />
+		viewportHeight -- The height of the viewport.
 		</div>
 		<div>
-		todo
+		Renders the sprites defined in the scene. This gets automatically called as post-render function to draw the lensflares.
 		</div>
 
 		<h2>Source</h2>

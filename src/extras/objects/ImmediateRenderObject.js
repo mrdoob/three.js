@@ -6,7 +6,7 @@ THREE.ImmediateRenderObject = function () {
 
 	THREE.Object3D.call( this );
 
-	this.render = function ( renderCallback ) { };
+	this.render = function ( renderCallback ) {};
 
 };
 

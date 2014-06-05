@@ -293,10 +293,7 @@
 
 
 					animation = new THREE.Animation( mesh, "ActionFemale" );
-					animation.JITCompile = false;
-					animation.interpolationType = THREE.AnimationHandler.LINEAR;
-
-					animation.play( true );
+					animation.play();
 					animation.update( 0 );
 
 				} );

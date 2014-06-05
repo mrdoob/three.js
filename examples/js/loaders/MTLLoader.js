@@ -363,18 +363,18 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		var isCompressed = /\.dds$/i.test( url );
+		var texture;
+		var loader = THREE.Loader.Handlers.get( url );
 
-		if ( isCompressed ) {
+		if ( loader !== null ) {
 
-			var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
+			texture = loader.load( url, onLoad );
 
 		} else {
 
-			var image = new Image();
-			var texture = new THREE.Texture( image, mapping );
+			texture = new THREE.Texture();
 
-			var loader = new THREE.ImageLoader();
+			loader = new THREE.ImageLoader();
 			loader.crossOrigin = this.crossOrigin;
 			loader.load( url, function ( image ) {
 
@@ -387,6 +387,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		}
 
+		texture.mapping = mapping;
+
 		return texture;
 
 	}
@@ -395,7 +397,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 
-	if ( ! THREE.MTLLoader.isPowerOfTwo_( image.width ) || ! THREE.MTLLoader.isPowerOfTwo_( image.height ) ) {
+	if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
 
 		var canvas = document.createElement( "canvas" );
 		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
@@ -408,12 +410,6 @@ THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 	}
 
 	return image;
-
-};
-
-THREE.MTLLoader.isPowerOfTwo_ = function ( x ) {
-
-	return ( x & ( x - 1 ) ) === 0;
 
 };
 

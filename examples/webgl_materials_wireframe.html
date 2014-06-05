@@ -17,8 +17,8 @@
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
-			attribute vec4 center;
-			varying vec4 vCenter;
+			attribute vec3 center;
+			varying vec3 vCenter;
 
 			void main() {
 
@@ -33,7 +33,7 @@
 
 			#extension GL_OES_standard_derivatives : enable
 
-			varying vec4 vCenter;
+			varying vec3 vCenter;
 
 			float edgeFactorTri() {
 
@@ -43,37 +43,10 @@
 
 			}
 
-			float edgeFactorQuad1() {
-
-				vec2 d = fwidth( vCenter.xy );
-				vec2 a2 = smoothstep( vec2( 0.0 ), d * 1.5, vCenter.xy );
-
-				return min( a2.x, a2.y );
-
-			}
-
-			float edgeFactorQuad2() {
-
-				vec2 d = fwidth( 1.0 - vCenter.xy );
-				vec2 a2 = smoothstep( vec2( 0.0 ), d * 1.5, 1.0 - vCenter.xy );
-
-				return min( a2.x, a2.y );
-			}
-
 			void main() {
 
-				if ( vCenter.w == 0.0 ) {
-
-					gl_FragColor.rgb = mix( vec3( 1.0 ), vec3( 0.2 ), edgeFactorTri() );
-
-				} else {
-
-					gl_FragColor.rgb = mix( vec3( 1.0 ), vec3( 0.2 ), min( edgeFactorQuad1(), edgeFactorQuad2() ) );
-
-				}
-
+				gl_FragColor.rgb = mix( vec3( 1.0 ), vec3( 0.2 ), edgeFactorTri() );
 				gl_FragColor.a = 1.0;
-
 			}
 
 		</script>
@@ -81,7 +54,7 @@
 		<script>
 
 			var camera, scene, renderer;
-			var meshTris, meshQuads, meshLines, meshMixed;
+			var meshTris, meshLines, meshMixed;
 
 			init();
 			animate();
@@ -95,18 +68,15 @@
 
 				var size = 150;
 
-				var geometryLines = new THREE.CubeGeometry( size, size, size );
-				var geometryQuads = new THREE.CubeGeometry( size, size, size );
-				var geometryTris = new THREE.CubeGeometry( size, size, size );
-
-				THREE.GeometryUtils.triangulateQuads( geometryTris );
+				var geometryLines = new THREE.BoxGeometry( size, size, size );
+				var geometryTris = new THREE.BoxGeometry( size, size, size );
 
 				// wireframe using gl.LINES
 
 				var materialLines = new THREE.MeshBasicMaterial( { wireframe: true } );
 
 				meshLines = new THREE.Mesh( geometryLines, materialLines );
-				meshLines.position.x = 0;
+				meshLines.position.x = -150;
 				scene.add( meshLines );
 
 				//
@@ -114,22 +84,9 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 
-				// wireframe using gl.TRIANGLES (interpreted as quads)
-
-				var attributesQuads = { center: { type: 'v4', boundTo: 'faceVertices', value: [] } };
-				var valuesQuads = attributesQuads.center.value;
-
-				setupAttributes( geometryQuads, valuesQuads );
-
-				var materialQuads = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesQuads, vertexShader: vertexShader, fragmentShader: fragmentShader } );
-
-				meshQuads = new THREE.Mesh( geometryQuads, materialQuads );
-				meshQuads.position.x = 300;
-				scene.add( meshQuads );
-
 				// wireframe using gl.TRIANGLES (interpreted as triangles)
 
-				var attributesTris = { center: { type: 'v4', boundTo: 'faceVertices', value: [] } };
+				var attributesTris = { center: { type: 'v3', boundTo: 'faceVertices', value: [] } };
 				var valuesTris = attributesTris.center.value;
 
 				setupAttributes( geometryTris, valuesTris );
@@ -137,14 +94,14 @@
 				var materialTris = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesTris, vertexShader: vertexShader, fragmentShader: fragmentShader } );
 
 				meshTris = new THREE.Mesh( geometryTris, materialTris );
-				meshTris.position.x = -300;
+				meshTris.position.x = 150;
 				scene.add( meshTris );
 
 				// wireframe using gl.TRIANGLES (mixed triangles and quads)
 
 				var mixedGeometry = new THREE.SphereGeometry( size / 2, 32, 16 );
 
-				var attributesMixed = { center: { type: 'v4', boundTo: 'faceVertices', value: [] } };
+				var attributesMixed = { center: { type: 'v3', boundTo: 'faceVertices', value: [] } };
 				var valuesMixed = attributesMixed.center.value;
 
 				setupAttributes( mixedGeometry, valuesMixed );
@@ -152,7 +109,7 @@
 				var materialMixed = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesMixed, vertexShader: vertexShader, fragmentShader: fragmentShader } );
 
 				meshMixed = new THREE.Mesh( mixedGeometry, materialMixed );
-				meshMixed.position.x = 0;
+				meshMixed.position.x = -150;
 				scene.add( meshMixed );
 
 
@@ -172,17 +129,7 @@
 
 				for( var f = 0; f < geometry.faces.length; f ++ ) {
 
-					var face = geometry.faces[ f ];
-
-					if ( face instanceof THREE.Face3 ) {
-
-						values[ f ] = [ new THREE.Vector4( 1, 0, 0, 0 ), new THREE.Vector4( 0, 1, 0, 0 ), new THREE.Vector4( 0, 0, 1, 0 ) ];
-
-					} else {
-
-						values[ f ] = [ new THREE.Vector4( 1, 0, 0, 1 ), new THREE.Vector4( 1, 1, 0, 1 ), new THREE.Vector4( 0, 1, 0, 1 ), new THREE.Vector4( 0, 0, 0, 1 ) ];
-
-					}
+					values[ f ] = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
 
 				}
 
@@ -203,9 +150,6 @@
 
 				meshLines.rotation.x += 0.005;
 				meshLines.rotation.y += 0.01;
-
-				meshQuads.rotation.x += 0.005;
-				meshQuads.rotation.y += 0.01;
 
 				meshTris.rotation.x += 0.005;
 				meshTris.rotation.y += 0.01;

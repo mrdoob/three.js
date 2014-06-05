@@ -7,15 +7,17 @@ Sidebar.Renderer = function ( editor ) {
 		'WebGLRenderer': THREE.WebGLRenderer,
 		'WebGLRenderer3': THREE.WebGLRenderer3,
 		'CanvasRenderer': THREE.CanvasRenderer,
+		'SVGRenderer': THREE.SVGRenderer,
 		'SoftwareRenderer': THREE.SoftwareRenderer,
-		'SVGRenderer': THREE.SVGRenderer
+		'RaytracingRenderer': THREE.RaytracingRenderer
 
 	};
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( true );
 
-	container.add( new UI.Text( 'RENDERER' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text( 'RENDERER' ) );
+	container.add( new UI.Break() );
 
 	// class
 
@@ -37,37 +39,18 @@ Sidebar.Renderer = function ( editor ) {
 
 	container.add( rendererTypeRow );
 
-	// Quick hack to expose a user control to switch themes - for easy review purposes only
+	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
 
-	var themeLink = document.getElementById( 'theme' );
-	var themeRow = new UI.Panel();
-	var originalColor;
+		rendererType.setValue( editor.config.getKey( 'renderer' ) );
 
-	var theme = new UI.Select().setOptions( [ 'Light', 'Dark' ] ).setWidth( '150px ').setColor( '#444' ).setFontSize( '12px ');
-	theme.onChange( function () {
-
-		switch ( this.value ) {
-
-			case '0': themeLink.href = 'css/light.css'; break;
-			case '1': themeLink.href = 'css/dark.css'; break;
-
-		}
-
-	} );
-
-	themeRow.add( new UI.Text('Theme').setWidth('90px') );
-	themeRow.add( theme );
-
-	container.add( themeRow );
+	}
 
 	//
 
 	function updateRenderer() {
 
-		var renderer = new rendererTypes[ rendererType.getValue() ]( {
-			antialias: true
-		} );
-		signals.rendererChanged.dispatch( renderer );
+		signals.rendererChanged.dispatch( rendererType.getValue() );
+		editor.config.setKey( 'renderer', rendererType.getValue() );
 
 	}
 

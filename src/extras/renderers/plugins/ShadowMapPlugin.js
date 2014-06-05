@@ -100,7 +100,7 @@ THREE.ShadowMapPlugin = function () {
 						virtualLight.originalCamera = camera;
 
 						var gyro = new THREE.Gyroscope();
-						gyro.position = light.shadowCascadeOffset;
+						gyro.position.copy( light.shadowCascadeOffset );
 
 						gyro.add( virtualLight );
 						gyro.add( virtualLight.target );
@@ -198,8 +198,8 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
-			shadowCamera.position.getPositionFromMatrix( light.matrixWorld );
-			_matrixPosition.getPositionFromMatrix( light.target.matrixWorld );
+			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
+			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
 			shadowCamera.updateMatrixWorld();
 
@@ -241,7 +241,7 @@ THREE.ShadowMapPlugin = function () {
 
 				if ( object.visible && object.castShadow ) {
 
-					if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
+					if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 						object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
@@ -277,7 +277,7 @@ THREE.ShadowMapPlugin = function () {
 
 					objectMaterial = getObjectMaterial( object );
 
-					useMorphing = object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
+					useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
 					useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
 
 					if ( object.customDepthMaterial ) {
@@ -297,6 +297,8 @@ THREE.ShadowMapPlugin = function () {
 						material = _depthMaterial;
 
 					}
+
+					_renderer.setMaterialFaces( objectMaterial );
 
 					if ( buffer instanceof THREE.BufferGeometry ) {
 
@@ -390,14 +392,14 @@ THREE.ShadowMapPlugin = function () {
 		var nearZ = light.shadowCascadeNearZ[ cascade ];
 		var farZ = light.shadowCascadeFarZ[ cascade ];
 
-		pointsFrustum[ 0 ].set( -1, -1, nearZ );
-		pointsFrustum[ 1 ].set(  1, -1, nearZ );
-		pointsFrustum[ 2 ].set( -1,  1, nearZ );
+		pointsFrustum[ 0 ].set( - 1, - 1, nearZ );
+		pointsFrustum[ 1 ].set(  1, - 1, nearZ );
+		pointsFrustum[ 2 ].set( - 1,  1, nearZ );
 		pointsFrustum[ 3 ].set(  1,  1, nearZ );
 
-		pointsFrustum[ 4 ].set( -1, -1, farZ );
-		pointsFrustum[ 5 ].set(  1, -1, farZ );
-		pointsFrustum[ 6 ].set( -1,  1, farZ );
+		pointsFrustum[ 4 ].set( - 1, - 1, farZ );
+		pointsFrustum[ 5 ].set(  1, - 1, farZ );
+		pointsFrustum[ 6 ].set( - 1,  1, farZ );
 		pointsFrustum[ 7 ].set(  1,  1, farZ );
 
 		return virtualLight;
@@ -445,7 +447,7 @@ THREE.ShadowMapPlugin = function () {
 			pointsWorld = light.pointsWorld;
 
 		_min.set( Infinity, Infinity, Infinity );
-		_max.set( -Infinity, -Infinity, -Infinity );
+		_max.set( - Infinity, - Infinity, - Infinity );
 
 		for ( var i = 0; i < 8; i ++ ) {
 

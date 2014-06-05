@@ -2,12 +2,12 @@ Sidebar.Object3D = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );
-	container.add( objectType );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( objectType );
+	container.add( new UI.Break() );
 
 	// uuid
 
@@ -416,30 +416,6 @@ Sidebar.Object3D = function ( editor ) {
 
 	}
 
-	function getObjectInstanceName( object ) {
-
-		var objects = {
-
-			'Scene': THREE.Scene,
-			'PerspectiveCamera': THREE.PerspectiveCamera,
-			'AmbientLight': THREE.AmbientLight,
-			'DirectionalLight': THREE.DirectionalLight,
-			'HemisphereLight': THREE.HemisphereLight,
-			'PointLight': THREE.PointLight,
-			'SpotLight': THREE.SpotLight,
-			'Mesh': THREE.Mesh,
-			'Object3D': THREE.Object3D
-
-		};
-
-		for ( var key in objects ) {
-
-			if ( object instanceof objects[ key ] ) return key;
-
-		}
-
-	}
-
 	// events
 
 	signals.objectSelected.add( function ( object ) {
@@ -492,7 +468,7 @@ Sidebar.Object3D = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			objectType.setValue( getObjectInstanceName( object ) );
+			objectType.setValue( editor.getObjectType( object ) );
 
 			objectUUID.setValue( object.uuid );
 			objectName.setValue( object.name );
@@ -541,13 +517,13 @@ Sidebar.Object3D = function ( editor ) {
 
 			if ( object.color !== undefined ) {
 
-				objectColor.setValue( '#' + object.color.getHexString() );
+				objectColor.setHexValue( object.color.getHexString() );
 
 			}
 
 			if ( object.groundColor !== undefined ) {
 
-				objectGroundColor.setValue( '#' + object.groundColor.getHexString() );
+				objectGroundColor.setHexValue( object.groundColor.getHexString() );
 
 			}
 

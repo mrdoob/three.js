@@ -107,7 +107,7 @@
 				scene.add( light );
 
 
-				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
 
 				// construct 8 blend shapes
@@ -140,7 +140,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x222222, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;

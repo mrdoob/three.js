@@ -28,10 +28,18 @@ THREE.BufferGeometryExporter.prototype = {
 
 			var attribute = attributes[ key ];
 
+			var array = [], typeArray = attribute.array;
+
+			for ( var i = 0, l = typeArray.length; i < l; i ++ ) {
+
+				array[ i ] = typeArray[ i ];
+
+			}
+
 			output.attributes[ key ] = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
-				array: Array.apply( [], attribute.array )
+				array: array
 			}
 
 		}

@@ -241,12 +241,9 @@
 				renderer.clear();
 				renderer.enableScissorTest( true );
 
-				//renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
 
-
-				//renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
 				renderer.render( scene2, camera );
 

@@ -27,12 +27,12 @@ THREE.Frustum.prototype = {
 
 		var planes = this.planes;
 
-		planes[0].copy( p0 );
-		planes[1].copy( p1 );
-		planes[2].copy( p2 );
-		planes[3].copy( p3 );
-		planes[4].copy( p4 );
-		planes[5].copy( p5 );
+		planes[ 0 ].copy( p0 );
+		planes[ 1 ].copy( p1 );
+		planes[ 2 ].copy( p2 );
+		planes[ 3 ].copy( p3 );
+		planes[ 4 ].copy( p4 );
+		planes[ 5 ].copy( p5 );
 
 		return this;
 
@@ -42,9 +42,9 @@ THREE.Frustum.prototype = {
 
 		var planes = this.planes;
 
-		for( var i = 0; i < 6; i ++ ) {
+		for ( var i = 0; i < 6; i ++ ) {
 
-			planes[i].copy( frustum.planes[i] );
+			planes[ i ].copy( frustum.planes[ i ] );
 
 		}
 
@@ -56,10 +56,10 @@ THREE.Frustum.prototype = {
 
 		var planes = this.planes;
 		var me = m.elements;
-		var me0 = me[0], me1 = me[1], me2 = me[2], me3 = me[3];
-		var me4 = me[4], me5 = me[5], me6 = me[6], me7 = me[7];
-		var me8 = me[8], me9 = me[9], me10 = me[10], me11 = me[11];
-		var me12 = me[12], me13 = me[13], me14 = me[14], me15 = me[15];
+		var me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
+		var me4 = me[ 4 ], me5 = me[ 5 ], me6 = me[ 6 ], me7 = me[ 7 ];
+		var me8 = me[ 8 ], me9 = me[ 9 ], me10 = me[ 10 ], me11 = me[ 11 ];
+		var me12 = me[ 12 ], me13 = me[ 13 ], me14 = me[ 14 ], me15 = me[ 15 ];
 
 		planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
 		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
@@ -95,7 +95,7 @@ THREE.Frustum.prototype = {
 
 		var planes = this.planes;
 		var center = sphere.center;
-		var negRadius = -sphere.radius;
+		var negRadius = - sphere.radius;
 
 		for ( var i = 0; i < 6; i ++ ) {
 
@@ -113,19 +113,19 @@ THREE.Frustum.prototype = {
 
 	},
 
-	intersectsBox : function() {
+	intersectsBox: function () {
 
 		var p1 = new THREE.Vector3(),
 			p2 = new THREE.Vector3();
 
-		return function( box ) {
+		return function ( box ) {
 
 			var planes = this.planes;
-			
+
 			for ( var i = 0; i < 6 ; i ++ ) {
-			
-				var plane = planes[i];
-				
+
+				var plane = planes[ i ];
+
 				p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
 				p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
 				p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
@@ -135,13 +135,13 @@ THREE.Frustum.prototype = {
 
 				var d1 = plane.distanceToPoint( p1 );
 				var d2 = plane.distanceToPoint( p2 );
-				
+
 				// if both outside plane, no intersection
 
 				if ( d1 < 0 && d2 < 0 ) {
-					
+
 					return false;
-		
+
 				}
 			}
 

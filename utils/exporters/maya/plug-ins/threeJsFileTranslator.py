@@ -1,11 +1,14 @@
-__author__ = 'Chris Lewis'
-__version__ = '0.1.0'
-__email__ = 'clewis1@c.ringling.edu'
+__author__ = 'Sean Griffin'
+__version__ = '1.0.0'
+__email__ = 'sean@thoughtbot.com'
 
 import sys
-import json
 
-import maya.cmds as mc
+import os.path
+import json
+import shutil
+
+from pymel.core import *
 from maya.OpenMaya import *
 from maya.OpenMayaMPx import *
 
@@ -15,222 +18,369 @@ kDefaultOptionsString = '0'
 
 FLOAT_PRECISION = 8
 
-
-# adds decimal precision to JSON encoding
-class DecimalEncoder(json.JSONEncoder):
-    def _iterencode(self, o, markers=None):
-        if isinstance(o, float):
-            s = str(o)
-            if '.' in s and len(s[s.index('.'):]) > FLOAT_PRECISION - 1:
-                s = '%.{0}f'.format(FLOAT_PRECISION) % o
-                while '.' in s and s[-1] == '0':
-                    s = s[:-1] # this actually removes the last "0" from the string
-                if s[-1] == '.': # added this test to avoid leaving "0." instead of "0.0",
-                    s += '0'    # which would throw an error while loading the file
-            return (s for s in [s])
-        return super(DecimalEncoder, self)._iterencode(o, markers)
-
-
-class ThreeJsError(Exception):
-    pass
-
-
 class ThreeJsWriter(object):
     def __init__(self):
-        self.componentKeys = ['vertices', 'normals', 'colors', 'uvs', 'materials', 'faces']
-
-    def _parseOptions(self, optionsString):
-        self.options = dict([(x, False) for x in self.componentKeys])
-        optionsString = optionsString[2:] # trim off the "0;" that Maya adds to the options string
-        for option in optionsString.split(' '):
-            self.options[option] = True
-
-    def _updateOffsets(self):
-        for key in self.componentKeys:
-            if key == 'uvs':
-                continue
-            self.offsets[key] = len(getattr(self, key))
-        for i in range(len(self.uvs)):
-            self.offsets['uvs'][i] = len(self.uvs[i])
-
-    def _getTypeBitmask(self, options):
-        bitmask = 0
-        if options['materials']:
-            bitmask |= 2
-        if options['uvs']:
-            bitmask |= 8
-        if options['normals']:
-            bitmask |= 32
-        if options['colors']:
-            bitmask |= 128
-        return bitmask
-
-    def _exportMesh(self, dagPath, component):
-        mesh = MFnMesh(dagPath)
-        options = self.options.copy()
-        self._updateOffsets()
-
-        # export vertex data
-        if options['vertices']:
-            try:
-                iterVerts = MItMeshVertex(dagPath, component)
-                while not iterVerts.isDone():
-                    point = iterVerts.position(MSpace.kWorld)
-                    self.vertices += [point.x, point.y, point.z]
-                    iterVerts.next()
-            except:
-                options['vertices'] = False
-
-        # export material data
-        # TODO: actually parse material data
-        materialIndices = MIntArray()
-        if options['materials']:
-            try:
-                shaders = MObjectArray()
-                mesh.getConnectedShaders(0, shaders, materialIndices)
-                while len(self.materials) < shaders.length():
-                    self.materials.append({}) # placeholder material definition
-            except:
-                self.materials = [{}]
-
-        # export uv data
-        if options['uvs']:
-            try:
-                uvLayers = []
-                mesh.getUVSetNames(uvLayers)
-                while len(uvLayers) > len(self.uvs):
-                    self.uvs.append([])
-                    self.offsets['uvs'].append(0)
-                for i, layer in enumerate(uvLayers):
-                    uList = MFloatArray()
-                    vList = MFloatArray()
-                    mesh.getUVs(uList, vList, layer)
-                    for j in xrange(uList.length()):
-                        self.uvs[i] += [uList[j], vList[j]]
-            except:
-                options['uvs'] = False
-
-        # export normal data
-        if options['normals']:
-            try:
-                normals = MFloatVectorArray()
-                mesh.getNormals(normals, MSpace.kWorld)
-                for i in xrange(normals.length()):
-                    point = normals[i]
-                    self.normals += [point.x, point.y, point.z]
-            except:
-                options['normals'] = False
-
-        # export color data
-        if options['colors']:
-            try:
-                colors = MColorArray()
-                mesh.getColors(colors)
-                for i in xrange(colors.length()):
-                    color = colors[i]
-                    # uncolored vertices are set to (-1, -1, -1).  Clamps colors to (0, 0, 0).
-                    self.colors += [max(color.r, 0), max(color.g, 0), max(color.b, 0)]
-            except:
-                options['colors'] = False
-
-        # export face data
-        if not options['vertices']:
-            return
-        bitmask = self._getTypeBitmask(options)
-        iterPolys = MItMeshPolygon(dagPath, component)
-        while not iterPolys.isDone():
-            self.faces.append(bitmask)
-            # export face vertices
-            verts = MIntArray()
-            iterPolys.getVertices(verts)
-            for i in xrange(verts.length()):
-                self.faces.append(verts[i] + self.offsets['vertices'])
-            # export face vertex materials
-            if options['materials']:
-                if materialIndices.length():
-                    self.faces.append(materialIndices[iterPolys.index()])
-            # export face vertex uvs
-            if options['uvs']:
-                util = MScriptUtil()
-                uvPtr = util.asIntPtr()
-                for i, layer in enumerate(uvLayers):
-                    for j in xrange(verts.length()):
-                        iterPolys.getUVIndex(j, uvPtr, layer)
-                        uvIndex = util.getInt(uvPtr)
-                        self.faces.append(uvIndex + self.offsets['uvs'][i])
-            # export face vertex normals
-            if options['normals']:
-                for i in xrange(3):
-                    normalIndex = iterPolys.normalIndex(i)
-                    self.faces.append(normalIndex + self.offsets['normals'])
-            # export face vertex colors
-            if options['colors']:
-                colors = MIntArray()
-                iterPolys.getColorIndices(colors)
-                for i in xrange(colors.length()):
-                    self.faces.append(colors[i] + self.offsets['colors'])
-            iterPolys.next()
-
-    def _getMeshes(self, nodes):
-        meshes = []
-        for node in nodes:
-            if mc.nodeType(node) == 'mesh':
-                meshes.append(node)
-            else:
-                for child in mc.listRelatives(node, s=1):
-                    if mc.nodeType(child) == 'mesh':
-                        meshes.append(child)
-        return meshes
-
-    def _exportMeshes(self):
-        # export all
-        if self.accessMode == MPxFileTranslator.kExportAccessMode:
-            mc.select(self._getMeshes(mc.ls(typ='mesh')))
-        # export selection
-        elif self.accessMode == MPxFileTranslator.kExportActiveAccessMode:
-            mc.select(self._getMeshes(mc.ls(sl=1)))
-        else:
-            raise ThreeJsError('Unsupported access mode: {0}'.format(self.accessMode))
-        dups = [mc.duplicate(mesh)[0] for mesh in mc.ls(sl=1)]
-        combined = mc.polyUnite(dups, mergeUVSets=1, ch=0) if len(dups) > 1 else dups[0]
-        mc.polyTriangulate(combined)
-        mc.select(combined)
-        sel = MSelectionList()
-        MGlobal.getActiveSelectionList(sel)
-        mDag = MDagPath()
-        mComp = MObject()
-        sel.getDagPath(0, mDag, mComp)
-        self._exportMesh(mDag, mComp)
-        mc.delete(combined)
+        self.componentKeys = ['vertices', 'normals', 'colors', 'uvs', 'faces',
+                'materials', 'diffuseMaps', 'specularMaps', 'bumpMaps', 'copyTextures',
+                'bones', 'skeletalAnim', 'bakeAnimations', 'prettyOutput']
 
     def write(self, path, optionString, accessMode):
         self.path = path
         self._parseOptions(optionString)
-        self.accessMode = accessMode
-        self.root = dict(metadata=dict(formatVersion=3))
-        self.offsets = dict()
-        for key in self.componentKeys:
-            setattr(self, key, [])
-            self.offsets[key] = 0
-        self.offsets['uvs'] = []
+
+        self.verticeOffset = 0
+        self.uvOffset = 0
+        self.vertices = []
+        self.materials = []
+        self.faces = []
+        self.normals = []
         self.uvs = []
-        
+        self.morphTargets = []
+        self.bones = []
+        self.animations = []
+        self.skinIndices = []
+        self.skinWeights = []
+
+        if self.options["bakeAnimations"]:
+            print("exporting animations")
+            self._exportAnimations()
+            self._goToFrame(self.options["startFrame"])
+        if self.options["materials"]:
+            print("exporting materials")
+            self._exportMaterials()
+        if self.options["bones"]:
+            print("exporting bones")
+            select(map(lambda m: m.getParent(), ls(type='mesh')))
+            runtime.GoToBindPose()
+            self._exportBones()
+            print("exporting skins")
+            self._exportSkins()
+        print("exporting meshes")
         self._exportMeshes()
+        if self.options["skeletalAnim"]:
+            print("exporting keyframe animations")
+            self._exportKeyframeAnimations()
 
-        # add the component buffers to the root JSON object
+        print("writing file")
+        output = {
+            'metadata': {
+                'formatVersion': 3.1,
+                'generatedBy': 'Maya Exporter'
+            },
+
+            'vertices': self.vertices,
+            'uvs': [self.uvs],
+            'faces': self.faces,
+            'normals': self.normals,
+            'materials': self.materials,
+        }
+
+        if self.options['bakeAnimations']:
+            output['morphTargets'] = self.morphTargets
+
+        if self.options['bones']:
+            output['bones'] = self.bones
+            output['skinIndices'] = self.skinIndices
+            output['skinWeights'] = self.skinWeights
+            output['influencesPerVertex'] = self.options["influencesPerVertex"]
+
+        if self.options['skeletalAnim']:
+            output['animations'] = self.animations
+
+        with file(path, 'w') as f:
+            if self.options['prettyOutput']:
+                f.write(json.dumps(output, sort_keys=True, indent=4, separators=(',', ': ')))
+            else:
+                f.write(json.dumps(output, separators=(",",":")))
+
+    def _allMeshes(self):
+        if not hasattr(self, '__allMeshes'):
+            self.__allMeshes = filter(lambda m: len(m.listConnections()) > 0, ls(type='mesh'))
+        return self.__allMeshes
+
+    def _parseOptions(self, optionsString):
+        self.options = dict([(x, False) for x in self.componentKeys])
         for key in self.componentKeys:
-            buffer_ = getattr(self, key)
-            if buffer_:
-                self.root[key] = buffer_
+            self.options[key] = key in optionsString
 
-        # materials are required for parsing
-        if not self.root.has_key('materials'):
-            self.root['materials'] = [{}]
+        if self.options["bones"]:
+            boneOptionsString = optionsString[optionsString.find("bones"):]
+            boneOptions = boneOptionsString.split(' ')
+            self.options["influencesPerVertex"] = int(boneOptions[1])
 
-        # write the file
-        with file(self.path, 'w') as f:
-            f.write(json.dumps(self.root, separators=(',',':'), cls=DecimalEncoder))
+        if self.options["bakeAnimations"]:
+            bakeAnimOptionsString = optionsString[optionsString.find("bakeAnimations"):]
+            bakeAnimOptions = bakeAnimOptionsString.split(' ')
+            self.options["startFrame"] = int(bakeAnimOptions[1])
+            self.options["endFrame"] = int(bakeAnimOptions[2])
+            self.options["stepFrame"] = int(bakeAnimOptions[3])
 
+    def _exportMeshes(self):
+        if self.options['vertices']:
+            self._exportVertices()
+        for mesh in self._allMeshes():
+            self._exportMesh(mesh)
+
+    def _exportMesh(self, mesh):
+        print("Exporting " + mesh.name())
+        if self.options['faces']:
+            print("Exporting faces")
+            self._exportFaces(mesh)
+            self.verticeOffset += len(mesh.getPoints())
+            self.uvOffset += mesh.numUVs()
+        if self.options['normals']:
+            print("Exporting normals")
+            self._exportNormals(mesh)
+        if self.options['uvs']:
+            print("Exporting UVs")
+            self._exportUVs(mesh)
+
+    def _getMaterialIndex(self, face, mesh):
+        if not hasattr(self, '_materialIndices'):
+            self._materialIndices = dict([(mat['DbgName'], i) for i, mat in enumerate(self.materials)])
+
+        if self.options['materials']:
+            for engine in mesh.listConnections(type='shadingEngine'):
+                if sets(engine, isMember=face):
+                    for material in engine.listConnections(type='lambert'):
+                        if self._materialIndices.has_key(material.name()):
+                            return self._materialIndices[material.name()]
+        return -1
+
+
+    def _exportVertices(self):
+        self.vertices += self._getVertices()
+
+    def _exportAnimations(self):
+        for frame in self._framesToExport():
+            self._exportAnimationForFrame(frame)
+
+    def _framesToExport(self):
+        return range(self.options["startFrame"], self.options["endFrame"], self.options["stepFrame"])
+
+    def _exportAnimationForFrame(self, frame):
+        print("exporting frame " + str(frame))
+        self._goToFrame(frame)
+        self.morphTargets.append({
+            'name': "frame_" + str(frame),
+            'vertices': self._getVertices()
+        })
+
+    def _getVertices(self):
+        return [coord for mesh in self._allMeshes() for point in mesh.getPoints(space='world') for coord in [round(point.x, FLOAT_PRECISION), round(point.y, FLOAT_PRECISION), round(point.z, FLOAT_PRECISION)]]
+
+    def _goToFrame(self, frame):
+        currentTime(frame)
+
+    def _exportFaces(self, mesh):
+        typeBitmask = self._getTypeBitmask()
+
+        for face in mesh.faces:
+            materialIndex = self._getMaterialIndex(face, mesh)
+            hasMaterial = materialIndex != -1
+            self._exportFaceBitmask(face, typeBitmask, hasMaterial=hasMaterial)
+            self.faces += map(lambda x: x + self.verticeOffset, face.getVertices())
+            if self.options['materials']:
+                if hasMaterial:
+                    self.faces.append(materialIndex)
+            if self.options['uvs'] and face.hasUVs():
+                self.faces += map(lambda v: face.getUVIndex(v) + self.uvOffset, range(face.polygonVertexCount()))
+            if self.options['normals']:
+                self._exportFaceVertexNormals(face)
+
+    def _exportFaceBitmask(self, face, typeBitmask, hasMaterial=True):
+        if face.polygonVertexCount() == 4:
+            faceBitmask = 1
+        else:
+            faceBitmask = 0
+
+        if hasMaterial:
+            faceBitmask |= (1 << 1)
+
+        if self.options['uvs'] and face.hasUVs():
+            faceBitmask |= (1 << 3)
+
+        self.faces.append(typeBitmask | faceBitmask)
+
+    def _exportFaceVertexNormals(self, face):
+        for i in range(face.polygonVertexCount()):
+            self.faces.append(face.normalIndex(i))
+
+    def _exportNormals(self, mesh):
+        for normal in mesh.getNormals():
+            self.normals += [round(normal.x, FLOAT_PRECISION), round(normal.y, FLOAT_PRECISION), round(normal.z, FLOAT_PRECISION)]
+
+    def _exportUVs(self, mesh):
+        us, vs = mesh.getUVs()
+        for i, u in enumerate(us):
+            self.uvs.append(u)
+            self.uvs.append(vs[i])
+
+    def _getTypeBitmask(self):
+        bitmask = 0
+        if self.options['normals']:
+            bitmask |= 32
+        return bitmask
+
+    def _exportMaterials(self):
+        for mat in ls(type='lambert'):
+            self.materials.append(self._exportMaterial(mat))
+
+    def _exportMaterial(self, mat):
+        result = {
+            "DbgName": mat.name(),
+            "blending": "NormalBlending",
+            "colorDiffuse": map(lambda i: i * mat.getDiffuseCoeff(), mat.getColor().rgb),
+            "colorAmbient": mat.getAmbientColor().rgb,
+            "depthTest": True,
+            "depthWrite": True,
+            "shading": mat.__class__.__name__,
+            "transparency": mat.getTransparency().a,
+            "transparent": mat.getTransparency().a != 1.0,
+            "vertexColors": False
+        }
+        if isinstance(mat, nodetypes.Phong):
+            result["colorSpecular"] = mat.getSpecularColor().rgb
+            result["specularCoef"] = mat.getCosPower()
+            if self.options["specularMaps"]:
+                self._exportSpecularMap(result, mat)
+        if self.options["bumpMaps"]:
+            self._exportBumpMap(result, mat)
+        if self.options["diffuseMaps"]:
+            self._exportDiffuseMap(result, mat)
+
+        return result
+
+    def _exportBumpMap(self, result, mat):
+        for bump in mat.listConnections(type='bump2d'):
+            for f in bump.listConnections(type='file'):
+                result["mapNormalFactor"] = 1
+                self._exportFile(result, f, "Normal")
+
+    def _exportDiffuseMap(self, result, mat):
+        for f in mat.attr('color').inputs():
+            result["colorDiffuse"] = f.attr('defaultColor').get()
+            self._exportFile(result, f, "Diffuse")
+
+    def _exportSpecularMap(self, result, mat):
+        for f in mat.attr('specularColor').inputs():
+            result["colorSpecular"] = f.attr('defaultColor').get()
+            self._exportFile(result, f, "Specular")
+
+    def _exportFile(self, result, mapFile, mapType):
+        fName = os.path.basename(mapFile.ftn.get())
+        if self.options['copyTextures']:
+            shutil.copy2(mapFile.ftn.get(), os.path.dirname(self.path) + "/" + fName)
+        result["map" + mapType] = fName
+        result["map" + mapType + "Repeat"] = [1, 1]
+        result["map" + mapType + "Wrap"] = ["repeat", "repeat"]
+        result["map" + mapType + "Anistropy"] = 4
+
+    def _exportBones(self):
+        for joint in ls(type='joint'):
+            if joint.getParent():
+                parentIndex = self._indexOfJoint(joint.getParent().name())
+            else:
+                parentIndex = -1
+            rotq = joint.getRotation(quaternion=True) * joint.getOrientation()
+            pos = joint.getTranslation()
+
+            self.bones.append({
+                "parent": parentIndex,
+                "name": joint.name(),
+                "pos": self._roundPos(pos),
+                "rotq": self._roundQuat(rotq)
+            })
+
+    def _indexOfJoint(self, name):
+        if not hasattr(self, '_jointNames'):
+            self._jointNames = dict([(joint.name(), i) for i, joint in enumerate(ls(type='joint'))])
+
+        if name in self._jointNames:
+            return self._jointNames[name]
+        else:
+            return -1
+
+    def _exportKeyframeAnimations(self):
+        hierarchy = []
+        i = -1
+        frameRate = FramesPerSecond(currentUnit(query=True, time=True)).value()
+        for joint in ls(type='joint'):
+            hierarchy.append({
+                "parent": i,
+                "keys": self._getKeyframes(joint, frameRate)
+            })
+            i += 1
+
+        self.animations.append({
+            "name": "skeletalAction.001",
+            "length": (playbackOptions(maxTime=True, query=True) - playbackOptions(minTime=True, query=True)) / frameRate,
+            "fps": 1,
+            "hierarchy": hierarchy
+        })
+
+
+    def _getKeyframes(self, joint, frameRate):
+        firstFrame = playbackOptions(minTime=True, query=True)
+        lastFrame = playbackOptions(maxTime=True, query=True)
+        frames = sorted(list(set(keyframe(joint, query=True) + [firstFrame, lastFrame])))
+        keys = []
+
+        print("joint " + joint.name() + " has " + str(len(frames)) + " keyframes")
+        for frame in frames:
+            self._goToFrame(frame)
+            keys.append(self._getCurrentKeyframe(joint, frame, frameRate))
+        return keys
+
+    def _getCurrentKeyframe(self, joint, frame, frameRate):
+        pos = joint.getTranslation()
+        rot = joint.getRotation(quaternion=True) * joint.getOrientation()
+
+        return {
+            'time': (frame - playbackOptions(minTime=True, query=True)) / frameRate,
+            'pos': self._roundPos(pos),
+            'rot': self._roundQuat(rot),
+            'scl': [1,1,1]
+        }
+
+    def _roundPos(self, pos):
+        return map(lambda x: round(x, FLOAT_PRECISION), [pos.x, pos.y, pos.z])
+
+    def _roundQuat(self, rot):
+        return map(lambda x: round(x, FLOAT_PRECISION), [rot.x, rot.y, rot.z, rot.w])
+
+    def _exportSkins(self):
+        for mesh in self._allMeshes():
+            print("exporting skins for mesh: " + mesh.name())
+            skins = filter(lambda skin: mesh in skin.getOutputGeometry(), ls(type='skinCluster'))
+            if len(skins) > 0:
+                print("mesh has " + str(len(skins)) + " skins")
+                skin = skins[0]
+                joints = skin.influenceObjects()
+                for weights in skin.getWeights(mesh.vtx):
+                    numWeights = 0
+
+                    for i in range(0, len(weights)):
+                        if weights[i] > 0:
+                            self.skinWeights.append(weights[i])
+                            self.skinIndices.append(self._indexOfJoint(joints[i].name()))
+                            numWeights += 1
+
+                    if numWeights > self.options["influencesPerVertex"]:
+                        raise Exception("More than " + str(self.options["influencesPerVertex"]) + " influences on a vertex in " + mesh.name() + ".")
+
+                    for i in range(0, self.options["influencesPerVertex"] - numWeights):
+                        self.skinWeights.append(0)
+                        self.skinIndices.append(0)
+            else:
+                print("mesh has no skins, appending 0")
+                for i in range(0, len(mesh.getPoints()) * self.options["influencesPerVertex"]):
+                    self.skinWeights.append(0)
+                    self.skinIndices.append(0)
+
+class NullAnimCurve(object):
+    def getValue(self, index):
+        return 0.0
 
 class ThreeJsTranslator(MPxFileTranslator):
     def __init__(self):
@@ -254,7 +404,6 @@ class ThreeJsTranslator(MPxFileTranslator):
 def translatorCreator():
     return asMPxPtr(ThreeJsTranslator())
 
-
 def initializePlugin(mobject):
     mplugin = MFnPlugin(mobject)
     try:
@@ -262,7 +411,6 @@ def initializePlugin(mobject):
     except:
         sys.stderr.write('Failed to register translator: %s' % kPluginTranslatorTypeName)
         raise
-        
 
 def uninitializePlugin(mobject):
     mplugin = MFnPlugin(mobject)
@@ -271,3 +419,23 @@ def uninitializePlugin(mobject):
     except:
         sys.stderr.write('Failed to deregister translator: %s' % kPluginTranslatorTypeName)
         raise
+
+class FramesPerSecond(object):
+    MAYA_VALUES = {
+        'game': 15,
+        'film': 24,
+        'pal': 25,
+        'ntsc': 30,
+        'show': 48,
+        'palf': 50,
+        'ntscf': 60
+    }
+
+    def __init__(self, fpsString):
+        self.fpsString = fpsString
+
+    def value(self):
+        if self.fpsString in FramesPerSecond.MAYA_VALUES:
+            return FramesPerSecond.MAYA_VALUES[self.fpsString]
+        else:
+            return int(filter(lambda c: c.isdigit(), self.fpsString))

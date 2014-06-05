@@ -17,7 +17,7 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		The constructor takes no arguments.
 		</div>
 
 
@@ -48,9 +48,9 @@
 		Object's local position.
 		</div>
 
-		<h3>.[page:Vector3 rotation]</h3>
+		<h3>.[page:Euler rotation]</h3>
 		<div>
-		Object's local rotation (<a href="https://en.wikipedia.org/wiki/Euler_angles">Euler angles</a>), in radians.
+		Object's local rotation (<a href="https://en.wikipedia.org/wiki/Euler_angles" target="_blank">Euler angles</a>), in radians.
 		</div>
 
 		<h3>.[page:String eulerOrder]</h3>
@@ -125,15 +125,18 @@
 
 		<h3>.[page:object userData]</h3>
 		<div>
-		todo
+		An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
 		</div> 
 
 		<h3>.[page:Matrix4 matrixWorld]</h3>
 		<div>
-		todo
+		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
 		</div> 
 
+		
 		<h2>Methods</h2>
+		
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 		
 		<h3>.applyMatrix( [page:Matrix4 matrix])</h3>
 		<div>
@@ -215,14 +218,6 @@
 		Executes the callback on this object and all descendants. 
 		</div>
 
-		<h3>.getDescendants( [page:Array array] )</h3>
-		<div>
-		array - optional argument that returns the the array with descendants.<br />
-		</div>
-		<div>
-		Searches whole subgraph recursively to add all objects in the array.
-		</div>
-
 		<h3>.updateMatrix()</h3>
 		<div>
 		Updates local transform.
@@ -239,40 +234,40 @@
 		</div>
 
 
-		<h3>.getObjectByName([page:todo name], [page:todo recursive]) [page:todo]</h3>
+		<h3>.getObjectByName([page:String name], [page:Boolean recursive]) [page:Object3d Object3d]</h3>
 		<div>
-		name -- todo <br />
-		recursive -- todo
+		name -- String to match to the children's Object3d.name property. <br />
+		recursive -- Boolean whether to search through the children's children. Default is false.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.translateOnAxis([page:todo axis], [page:todo distance]) [page:todo]</h3>
-		<div>
-		axis -- todo <br />
-		distance -- todo
-		</div>
-		<div>
-		todo
+		Searches through the object's children and returns the first with a matching name, optionally recursive.
 		</div>
 
-		<h3>.getObjectById([page:todo id], [page:todo recursive]) [page:todo]</h3>
+		<h3>.getObjectById([page:Integer id], [page:Boolean recursive]) [page:Object3D]</h3>
 		<div>
-		id -- todo <br />
-		recursive -- todo
+		id -- Unique number of the object instance<br />
+		recursive -- Boolean whether to search through the children's children. Default is false.
 		</div>
 		<div>
-		todo
+		Searches through the object's children and returns the first with a matching id, optionally recursive.
 		</div>
-
-		<h3>.rotateOnAxis([page:todo axis], [page:todo angle]) [page:todo]</h3>
+		
+		<h3>.translateOnAxis([page:Vector3 axis], [page:Float distance]) [page:Object3D]</h3>
 		<div>
-		axis -- todo <br />
-		angle -- todo
+		axis -- A normalized vector in object space.<br />
+		distance -- The distance to translate.
 		</div>
 		<div>
-		todo
+		Translate an object by distance along an axis in object space. The axis is assumed to be normalized.
+		</div>
+		
+		<h3>.rotateOnAxis([page:Vector3 axis], [page:Float angle]) [page:Object3D]</h3>
+		<div>
+		axis -- A normalized vector in object space. <br />
+		angle -- The angle in radians.
+		</div>
+		<div>
+		Rotate an object along an axis in object space. The axis is assumed to be normalized.
 		</div>
 
 		<h2>Source</h2>

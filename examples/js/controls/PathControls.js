@@ -217,7 +217,10 @@ THREE.PathControls = function ( object, domElement ) {
 
 		THREE.AnimationHandler.add( animationData );
 
-		return new THREE.Animation( parent, name, THREE.AnimationHandler.CATMULLROM_FORWARD, false );
+		var animation = new THREE.Animation( parent, name );
+		animation.interpolationType = THREE.AnimationHandler.CATMULLROM_FORWARD;
+
+		return animation;
 
 	};
 
@@ -246,7 +249,7 @@ THREE.PathControls = function ( object, domElement ) {
 			particleGeo = createSplineGeometry( spline, 10 ),
 			lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 3 } ),
 			lineObj = new THREE.Line( lineGeo, lineMat ),
-			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleBasicMaterial( { color: 0xffaa00, size: 3 } ) );
+			particleObj = new THREE.PointCloud( particleGeo, new THREE.PointCloudMaterial( { color: 0xffaa00, size: 3 } ) );
 
 		lineObj.scale.set( 1, 1, 1 );
 		parent.add( lineObj );
@@ -285,8 +288,8 @@ THREE.PathControls = function ( object, domElement ) {
 
 			var dummyParentMaterial = new THREE.MeshLambertMaterial( { color: 0x0077ff } ),
 			dummyChildMaterial  = new THREE.MeshLambertMaterial( { color: 0x00ff00 } ),
-			dummyParentGeo = new THREE.CubeGeometry( 10, 10, 20 ),
-			dummyChildGeo  = new THREE.CubeGeometry( 2, 2, 10 );
+			dummyParentGeo = new THREE.BoxGeometry( 10, 10, 20 ),
+			dummyChildGeo  = new THREE.BoxGeometry( 2, 2, 10 );
 
 			this.animationParent = new THREE.Mesh( dummyParentGeo, dummyParentMaterial );
 

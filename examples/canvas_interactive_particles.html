@@ -29,16 +29,16 @@
 			var programFill = function ( context ) {
 
 				context.beginPath();
-				context.arc( 0, 0, 1, 0, PI2, true );
+				context.arc( 0, 0, 0.5, 0, PI2, true );
 				context.fill();
 
 			}
 
 			var programStroke = function ( context ) {
 
-				context.lineWidth = 0.05;
+				context.lineWidth = 0.025;
 				context.beginPath();
-				context.arc( 0, 0, 1, 0, PI2, true );
+				context.arc( 0, 0, 0.5, 0, PI2, true );
 				context.stroke();
 
 			}
@@ -68,11 +68,11 @@
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808080 + 0x808080, program: programStroke } ) );
+					var particle = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: Math.random() * 0x808080 + 0x808080, program: programStroke } ) );
 					particle.position.x = Math.random() * 800 - 400;
 					particle.position.y = Math.random() * 800 - 400;
 					particle.position.z = Math.random() * 800 - 400;
-					particle.scale.x = particle.scale.y = Math.random() * 10 + 10;
+					particle.scale.x = particle.scale.y = Math.random() * 20 + 20;
 					scene.add( particle );
 
 				}
@@ -80,8 +80,8 @@
 				projector = new THREE.Projector();
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

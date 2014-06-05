@@ -7,20 +7,25 @@
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
 	</head>
 	<body>
+		[page:Line] &rarr;
+		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">
+		The camera Helper is an Object3D which helps visualizing what a camera contains in its frustum.<br />
+		It visualizes the frustum with an line Geometry.	
+		</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo camera])</h3>
+		<h3>[name]([page:Camera camera])</h3>
 		<div>
-		camera -- todo
+		camera -- The camera to visualize.
 		</div>
 		<div>
-		todo
+		This create a new [Name] for the specified camera.
 		</div>
 
 
@@ -29,20 +34,20 @@
 
 		<h3>.[page:object pointMap]</h3>
 		<div>
-		todo
+		This contains the points to viualize the cameraHelper
 		</div> 
 
-		<h3>.[page:PerspectiveCamera camera]</h3>
+		<h3>.[page:Camera camera]</h3>
 		<div>
-		todo
+		The camera to visualize.
 		</div> 
 
 		<h2>Methods</h2>
 
 
-		<h3>.update() [page:todo]</h3>
+		<h3>.update()</h3>
 		<div>
-		todo
+		Updates the helper based on the projectionMatrix of the camera.
 		</div>
 
 		<h2>Source</h2>

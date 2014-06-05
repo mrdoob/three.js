@@ -21,7 +21,7 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
-		<script src="../src/extras/cameras/CombinedCamera.js"></script>
+		<script src="js/cameras/CombinedCamera.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -138,7 +138,7 @@
 
 				// Cubes
 
-				var geometry = new THREE.CubeGeometry( 50, 50, 50 );
+				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 100; i ++ ) {
@@ -175,6 +175,7 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

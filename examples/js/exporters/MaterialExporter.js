@@ -28,6 +28,7 @@ THREE.MaterialExporter.prototype = {
 			output.color = material.color.getHex();
 			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
+			if ( material.side !== THREE.FrontSide ) output.side = material.side;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -40,6 +41,7 @@ THREE.MaterialExporter.prototype = {
 			output.emissive = material.emissive.getHex();
 			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
+			if ( material.side !== THREE.FrontSide ) output.side = material.side;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -54,6 +56,7 @@ THREE.MaterialExporter.prototype = {
 			output.shininess = material.shininess;
 			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
+			if ( material.side !== THREE.FrontSide ) output.side = material.side;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -62,6 +65,7 @@ THREE.MaterialExporter.prototype = {
 
 			output.type = 'MeshNormalMaterial';
 			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
+			if ( material.side !== THREE.FrontSide ) output.side = material.side;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -70,6 +74,7 @@ THREE.MaterialExporter.prototype = {
 
 			output.type = 'MeshDepthMaterial';
 			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
+			if ( material.side !== THREE.FrontSide ) output.side = material.side;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -84,6 +89,13 @@ THREE.MaterialExporter.prototype = {
 				output.materials.push( this.parse( material.materials[ i ] ) );
 
 			}
+
+		} else if ( material instanceof THREE.SpriteMaterial ) {
+
+			output.type = 'SpriteMaterial';
+			output.color = material.color.getHex();
+			output.opacity = material.opacity;
+			output.transparent = material.transparent;
 
 		}
 

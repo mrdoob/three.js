@@ -130,11 +130,11 @@
 				uniforms[ "enableDiffuse" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
 
-				uniforms[ "uDiffuseColor" ].value.setHex( 0xffffff );
-				uniforms[ "uSpecularColor" ].value.setHex( 0x333333 );
-				uniforms[ "uAmbientColor" ].value.setHex( 0x000000 );
+				uniforms[ "diffuse" ].value.setHex( 0xffffff );
+				uniforms[ "specular" ].value.setHex( 0x333333 );
+				uniforms[ "ambient" ].value.setHex( 0x000000 );
 
-				uniforms[ "uShininess" ].value = 15;
+				uniforms[ "shininess" ].value = 15;
 
 				var parameters = {
 
@@ -206,17 +206,17 @@
 
 				var stars;
 				var starsMaterials = [
-					new THREE.ParticleBasicMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-					new THREE.ParticleBasicMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-					new THREE.ParticleBasicMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-					new THREE.ParticleBasicMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-					new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-					new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+					new THREE.PointCloudMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+					new THREE.PointCloudMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+					new THREE.PointCloudMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+					new THREE.PointCloudMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+					new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+					new THREE.PointCloudMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 				];
 
 				for ( i = 10; i < 30; i ++ ) {
 
-					stars = new THREE.ParticleSystem( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+					stars = new THREE.PointCloud( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
 
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
@@ -232,7 +232,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.sortObjects = false;
 

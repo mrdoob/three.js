@@ -15,17 +15,17 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo p0], [page:todo p1], [page:todo p2], [page:todo p3], [page:todo p4], [page:todo p5])</h3>
+		<h3>[name]([page:Plane p0], [page:Plane p1], [page:Plane p2], [page:Plane p3], [page:Plane p4], [page:Plane p5])</h3>
 		<div>
-		p0 -- todo <br />
-		p1 -- todo <br />
-		p2 -- todo <br />
-		p3 -- todo <br />
-		p4 -- todo <br />
-		p5 -- todo
+		p0 -- [page:Plane] <br />
+		p1 -- [page:Plane] <br />
+		p2 -- [page:Plane] <br />
+		p3 -- [page:Plane] <br />
+		p4 -- [page:Plane] <br />
+		p5 -- [page:Plane]
 		</div>
 		<div>
-		todo
+		Creates a frustum from the designated planes.
 		</div>
 
 
@@ -33,7 +33,7 @@
 
 		<h3>.[page:Array planes]</h3>
 		<div>
-		Array of 6 [page:Vector4 vectors].
+		Array of 6 [page:Plane planes].
 		</div>
 
 
@@ -46,46 +46,46 @@
 		Checks whether the object is inside the Frustum.
 		</div>
 
-		<h3>.clone() [page:todo]</h3>
+		<h3>.clone() [page:Frustum]</h3>
 		<div>
-		todo
+		Return a copy of this Frustum
 		</div>
 
-		<h3>.set([page:todo p0], [page:todo p1], [page:todo p2], [page:todo p3], [page:todo p4], [page:todo p5]) [page:todo]</h3>
+		<h3>.set([page:Plane p0], [page:Plane p1], [page:Plane p2], [page:Plane p3], [page:Plane p4], [page:Plane p5]) [page:Boolean]</h3>
 		<div>
-		p0 -- todo <br />
-		p1 -- todo <br />
-		p2 -- todo <br />
-		p3 -- todo <br />
-		p4 -- todo <br />
-		p5 -- todo
+		p0 -- [page:Plane] <br />
+		p1 -- [page:Plane] <br />
+		p2 -- [page:Plane] <br />
+		p3 -- [page:Plane] <br />
+		p4 -- [page:Plane] <br />
+		p5 -- [page:Plane]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.copy([page:todo frustum]) [page:todo]</h3>
-		<div>
-		frustum -- todo
-		</div>
-		<div>
-		todo
+		Sets the current frustum from the passed planes. No plane order is implicitely implied.
 		</div>
 
-		<h3>.containsPoint([page:todo point]) [page:todo]</h3>
+		<h3>.copy([page:Frustum frustum]) [page:Frustum this]</h3>
 		<div>
-		point -- todo
+		frustum -- The frustum to copy
 		</div>
 		<div>
-		todo
+		Copies the values of the passed frustum.
 		</div>
 
-		<h3>.intersectsSphere([page:todo sphere]) [page:todo]</h3>
+		<h3>.containsPoint([page:Vector3 point]) [page:Boolean]</h3>
 		<div>
-		sphere -- todo
+		point -- [page:Vector3] to test
 		</div>
 		<div>
-		todo
+		Checks to see if the frustum contains the point.
+		</div>
+
+		<h3>.intersectsSphere([page:Sphere sphere]) [page:Boolean]</h3>
+		<div>
+		sphere -- [page:Sphere]
+		</div>
+		<div>
+		Check to see if the sphere intersects with the frustum.
 		</div>
 
 		<h2>Source</h2>

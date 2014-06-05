@@ -47,63 +47,63 @@
 
 		<h2>Methods</h2>
 
-		<h3>.set( [page:Float x], [page:Float y], [page:Float z] ) [page:this]</h3>
+		<h3>.set( [page:Float x], [page:Float y], [page:Float z] ) [page:Vector3 this]</h3>
 		<div>
 		Sets value of this vector.
 		</div>
 
-		<h3>.setX( [page:Float x] ) [page:this]</h3>
+		<h3>.setX( [page:Float x] ) [page:Vector3 this]</h3>
 		<div>
 		Sets x value of this vector.
 		</div>
 
-		<h3>.setY( [page:Float y] ) [page:this]</h3>
+		<h3>.setY( [page:Float y] ) [page:Vector3 this]</h3>
 		<div>
 		Sets y value of this vector.
 		</div>
 
-		<h3>.setZ( [page:Float z] ) [page:this]</h3>
+		<h3>.setZ( [page:Float z] ) [page:Vector3 this]</h3>
 		<div>
 		Sets z value of this vector.
 		</div>
 
-		<h3>.copy( [page:Vector3 v] ) [page:this]</h3>
+		<h3>.copy( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
 		</div>
 
-		<h3>.add( [page:Vector3 v] ) [page:this]</h3>
+		<h3>.add( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Adds *v* to this vector.
 		</div>
 
-		<h3>.addVectors( [page:Vector3 a], [page:Vector3 b] ) [page:this]</h3>
+		<h3>.addVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector to *a + b*.
 		</div>
 
-		<h3>.sub( [page:Vector3 v] ) [page:this]</h3>
+		<h3>.sub( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Subtracts *v* from this vector.
 		</div>
 
-		<h3>.subVectors( [page:Vector3 a], [page:Vector3 b] ) [page:this]</h3>
+		<h3>.subVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector to *a - b*.
 		</div>
 
-		<h3>.multiplyScalar( [page:Float s] ) [page:this]</h3>
+		<h3>.multiplyScalar( [page:Float s] ) [page:Vector3 this]</h3>
 		<div>
 		Multiplies this vector by scalar *s*.
 		</div>
 
-		<h3>.divideScalar( [page:Float s] ) [page:this]</h3>
+		<h3>.divideScalar( [page:Float s] ) [page:Vector3 this]</h3>
 		<div>
 		Divides this vector by scalar *s*.<br />
 		Set vector to *( 0, 0, 0 )* if *s == 0*.
 		</div>
 
-		<h3>.negate() [page:this]</h3>
+		<h3>.negate() [page:Vector3 this]</h3>
 		<div>
 		Inverts this vector.
 		</div>
@@ -129,7 +129,7 @@
 		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
 		</div>
 
-		<h3>.normalize() [page:this]</h3>
+		<h3>.normalize() [page:Vector3 this]</h3>
 		<div>
 		Normalizes this vector. Transforms this Vector into a Unit vector by dividing the vector by it's length.
 		</div>
@@ -144,27 +144,27 @@
 		Computes squared distance of this vector to *v*.
 		</div>
 
-		<h3>.setLength( [page:Float l] ) [page:this]</h3>
+		<h3>.setLength( [page:Float l] ) [page:Vector3 this]</h3>
 		<div>
 		Normalizes this vector and multiplies it by *l*.
 		</div>
 
-		<h3>.cross( [page:Vector3 v] ) [page:this]</h3>
+		<h3>.cross( [page:Vector3 v] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector to cross product of itself and *v*.
 		</div>
 
-		<h3>.crossVectors( [page:Vector3 a], [page:Vector3 b] ) [page:this]</h3>
+		<h3>.crossVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector to cross product of *a* and *b*.
 		</div>
 
-		<h3>.getPositionFromMatrix( [page:Matrix4 m] ) [page:this]</h3>
+		<h3>.setFromMatrixPosition( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector extracting position from matrix transform.
 		</div>
 
-		<h3>.getScaleFromMatrix( [page:Matrix4 m] ) [page:this]</h3>
+		<h3>.setFromMatrixScale( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector extracting scale from matrix transform.
 		</div>
@@ -180,16 +180,46 @@
 		</div>
 
 
-		<h3>.clamp([page:todo min], [page:todo max]) [page:this]</h3>
+		<h3>.clamp([page:Vector3 min], [page:Vector3 max]) [page:Vector3 this]</h3>
 		<div>
 		min -- [page:Vector3] <br />
 		max -- [page:Vector3]
 		</div>
 		<div>
-		If this vector's x, y or z value is greater than the max vector's x, y or z value, it is replaced by the corresponding value. <br />  If this vector's x, y or z value is less than the min vector's x, y or z value, it is replace by the corresponding value.
+		If this vector's x, y or z value is greater than the max vector's x, y or z value, it is replaced by the corresponding value. <br /><br />
+		If this vector's x, y or z value is less than the min vector's x, y or z value, it is replace by the corresponding value.
 		</div>
 
-		<h3>.applyMatrix3([page:todo m]) [page:this]</h3>
+		<h3>.clampScalar([page:Float min], [page:Float max]) [page:Vector3 this]</h3>
+		<div>
+		min -- [page:Float] the minimum value the components will be clamped to <br />
+		max -- [page:Float] the maximum value the components will be clamped to
+		</div>
+		<div>
+		If this vector's x, y or z values are greater than the max value, they are replaced by the max value. <br />  If this vector's x, y or z values are less than the min value, they are replace by the min value.
+		</div>
+
+		<h3>.floor() [page:Vector3]</h3>
+		<div>
+		The components of the vector are rounded downwards (towards negative infinity) to an integer value.
+		</div>
+
+		<h3>.ceil() [page:Vector3]</h3>
+		<div>
+		The components of the vector are rounded upwards (towards positive infinity) to an integer value.
+		</div>
+
+		<h3>.round() [page:Vector3]</h3>
+		<div>
+		The components of the vector are rounded towards the nearest integer value.
+		</div>
+
+		<h3>.roundToZero() [page:Vector3]</h3>
+		<div>
+		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
+		</div>
+
+		<h3>.applyMatrix3([page:Matrix3 m]) [page:Vector3 this]</h3>
 		<div>
 		m -- [page:Matrix3]
 		</div>
@@ -197,58 +227,66 @@
 		Multiplies this vector times a 3 x 3 matrix.
 		</div>
 
-		<h3>.applyMatrix4([page:todo m]) [page:todo this]</h3>
+		<h3>.applyMatrix4([page:Matrix3 m]) [page:Vector3 this]</h3>
 		<div>
-		m -- [page:todo Matrix4]
+		m -- [page:Matrix4]
 		</div>
 		<div>
 		Multiplies this vector by 4 x 3 subset of a Matrix4.
 		</div>
 
-		<h3>.projectOnPlane([page:todo planeNormal]) [page:todo this]</h3>
+		<h3>.projectOnPlane([page:Vector3 planeNormal]) [page:Vector3 this]</h3>
 		<div>
-		planeNormal -- [page:todo Plane.normal]
+		planeNormal -- [page:Vector3 planeNormal] A vector representing a plane normal.
 		</div>
 		<div>
 		Projects this vector onto a plane by subtracting this vector projected onto the plane's normal from this vector.
 		</div>
 
-		<h3>.projectOnVector([page:todo vector]) [page:todo this]</h3>
+		<h3>.projectOnVector([page:Vector3]) [page:Vector3 this]</h3>
 		<div>
-		vector -- [page:todo Vector3]
+		vector -- [page:Vector3]
 		</div>
 		<div>
 		Projects this vector onto another vector.
 		</div>
 
-		<h3>.addScalar([page:todo s]) [page:todo this]</h3>
+		<h3>.addScalar([page:Float]) [page:Vector3 this]</h3>
 		<div>
-		s -- [page:todo Float]
+		s -- [page:Float]
 		</div>
 		<div>
 		Adds a s to this vector.
 		</div>
 
-		<h3>.divide([page:todo v]) [page:todo this]</h3>
+		<h3>.divide([page:Vector3 v]) [page:Vector3 this]</h3>
 		<div>
-		v -- [page:todo Vector3]
+		v -- [page:Vector3]
 		</div>
 		<div>
 		Divides this vector by vector v.
 		</div>
 
-		<h3>.min([page:todo v]) [page:todo]</h3>
+		<h3>.min([page:Vector3 v]) [page:Vector3 this]</h3>
 		<div>
-		v -- [page:todo Vector3]
+		v -- [page:Vector3]
 		</div>
 		<div>
 		If this vector's x, y, or z value is less than vector v's x, y, or z value, that value is replaced by the corresponding vector v value.
 		</div>
 
-		<h3>.setComponent([page:todo index], [page:todo value]) [page:todo this]</h3>
+		<h3>.max([page:Vector3 v]) [page:Vector3 this]</h3>
+		<div>
+		v -- [page:Vector3]
+		</div>
+		<div>
+		If this vector's x, y, or z value is greater than vector v's x, y, or z value, that value is replaced by the corresponding vector v value.
+		</div>
+
+		<h3>.setComponent([page:Integer index], [page:Float value]) [page:Vector3 this]</h3>
 		<div>
 		index -- 0, 1, or 2 <br />
-		value -- [page:todo Float]
+		value -- [page:Float]
 		</div>
 		<div>
 		If index equals 0 the method sets this vector's x value to value <br />
@@ -256,111 +294,104 @@
 		If index equals 2 the method sets this vector's z value to value
 		</div>
 
-		<h3>.transformDirection([page:todo m]) [page:todo this]</h3>
+		<h3>.transformDirection([page:Matrix4 m]) [page:Vector3 this]</h3>
 		<div>
-		m -- [page:todo Matrix4]
+		m -- [page:Matrix4]
 		</div>
 		<div>
-		Multiplies this vector by a 3 x 3 subset of a Matrix4 and then normalizes the results.
-		</div>
-
-		<h3>.multiplyVectors([page:todo a], [page:todo b]) [page:todo this]</h3>
-		<div>
-		a -- [page:todo Vector3] <br />
-		b -- [page:todo Vector3]
-		</div>
-		<div>
-		Sets this vector equal the result of multiplying vector a by vector b.
+		Transforms the direction of this vector by a matrix (a 3 x 3 subset of a Matrix4) and then normalizes the result.
 		</div>
 
-		<h3>.getComponent([page:todo index]) [page:todo Float]</h3>
+		<h3>.multiplyVectors([page:Vector3 a], [page:Vector3 b]) [page:Vector3 this]</h3>
 		<div>
-		index -- 0, 1, or 2
+		a -- [page:Vector3] <br />
+		b -- [page:Vector3]
 		</div>
 		<div>
-		If index equals 0 the method returns this vector's x value <br />
-		If index equals 1 the method returns this vector's y value <br />
-		If index equals 2 the method returns this vector's z value
+		Sets this vector equal to the result of multiplying vector a by vector b.
 		</div>
 
-		<h3>.applyAxisAngle([page:todo axis], [page:todo angle]) [page:todo this]</h3>
+		<h3>.getComponent([page:Integer index]) [page:Float]</h3>
 		<div>
-		axis -- a normalized [page:todo Vector3] <br />
-		angle -- an angle in radians
+		index -- [page:Integer] 0, 1, or 2
+		</div>
+		<div>
+		
+		Returns the value of the vector component x, y, or z by an index. <br /><br />
+		
+		Index 0: x <br />
+		Index 1: y <br />
+		Index 2: z <br />
+		</div>
+
+		<h3>.applyAxisAngle([page:Vector3 axis], [page:Float angle]) [page:Vector3 this]</h3>
+		<div>
+		axis -- A normalized [page:Vector3] <br />
+		angle -- An angle in radians
 		</div>
 		<div>
 		Applies a rotation specified by an axis and an angle to this vector.
 		</div>
 
-		<h3>.lerp([page:todo v], [page:todo alpha]) [page:todo this]</h3>
+		<h3>.lerp([page:Vector3 v], [page:Float alpha]) [page:Vector3 this]</h3>
 		<div>
-		v -- [page:todo Vector3] <br />
-		alpha -- [page:todo Float] between 0 and 1.
+		v -- [page:Vector3] <br />
+		alpha -- [page:Float] between 0 and 1.
 		</div>
 		<div>
 		Linear Interpolation between this vector and vector v, where alpha is the percent along the line.
 		</div>
 
-		<h3>.max([page:todo v]) [page:todo this]</h3>
+		<h3>.angleTo([page:Vector3 v]) [page:Float]</h3>
 		<div>
-		v -- [page:todo Vector3]
-		</div>
-		<div>
-		If this vector's x, y, or z value is greater than vector v's x, y, or z value, that value is replaced by the corresponding vector v value.
-		</div>
-
-		<h3>.angleTo([page:todo v]) [page:todo Float]</h3>
-		<div>
-		v -- [page:todo Vector3]
+		v -- [page:Vector3]
 		</div>
 		<div>
 		Returns the angle between this vector and vector v in radians.
 		</div>
 
-		<h3>.getColumnFromMatrix([page:todo index], [page:todo matrix]) [page:todo this]</h3>
+		<h3>.setFromMatrixColumn([page:Integer index], [page:Matrix4 matrix]) [page:Vector3 this]</h3>
 		<div>
 		index -- 0, 1, 2, or 3 <br />
-		matrix -- [page:todo Matrix4]
+		matrix -- [page:Matrix4]
 		</div>
 		<div>
 		Sets this vector's x, y, and z equal to the column of the matrix specified by the index.
 		</div>
 
-		<h3>.reflect([page:todo vector]) [page:todo this]</h3>
+		<h3>.reflect([page:Vector3 normal]) [page:Vector3 this]</h3>
 		<div>
-		vector -- [page:todo Vector3] the vector to reflect about
+		normal -- [page:Vector3] the normal to the reflecting plane
 		</div>
 		<div>
-		Reflects this vector about a vector.
-		</div>
-
-		<h3>.fromArray([page:todo array]) [page:todo this]</h3>
-		<div>
-		array -- [page:todo Array]
-		</div>
-		<div>
-		Assigns this vectors x value to array[0]. <br />
-		Assigns this vectors y value to array[1]. <br />
-		Assigns this vectors z value to array[2]. <br />
+		Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length.
 		</div>
 
-		<h3>.multiply([page:todo v]) [page:todo this]</h3>
+		<h3>.fromArray([page:Array array]) [page:Vector3 this]</h3>
 		<div>
-		v -- [page:todo Vector3] <br />
+		array -- [page:Array] [x, y, z]
+		</div>
+		<div>
+		Sets the vector's components based on an array formatted like [x, y, z]
+		</div>
+
+		<h3>.multiply([page:Vector3 v]) [page:Vector3 this]</h3>
+		<div>
+		v -- [page:Vector3] <br />
 		</div>
 		<div>
 		Multipies this vector by vector v.
 		</div>
 
-		<h3>.applyProjection([page:todo m]) [page:todo ths]</h3>
+		<h3>.applyProjection([page:Matrix4 m]) [page:Vector3 this]</h3>
 		<div>
-		m -- [page:todo Matrix4] projection matrix.
+		m -- [page:Matrix4] projection matrix.
 		</div>
 		<div>
 		Multiplies this vector and m, and divides by perspective.
 		</div>
 
-		<h3>.toArray() [page:todo Array]</h3>
+		<h3>.toArray() [page:Array]</h3>
 		<div>
 		Assigns this vector's x value to array[0]. <br />
 		Assigns this vector's y value to array[1]. <br />
@@ -368,17 +399,17 @@
 		Returns the created array.
 		</div>
 
-		<h3>.applyEuler( [page:todo euler] ) [page:todo this]</h3>
+		<h3>.applyEuler([page:Euler euler]) [page:Vector3 this]</h3>
 		<div>
-		euler -- [page:todo Euler]
+		euler -- [page:Euler]
 		</div>
 		<div>
 		Applies euler transform to this vector by converting the [page:Euler] obect to a [page:Quaternion] and applying.
 		</div>
 
-		<h3>.applyQuaternion([page:todo q]) [page:todo this]</h3>
+		<h3>.applyQuaternion([page:Quaternion quaternion]) [page:Vector3 this]</h3>
 		<div>
-		q -- [page:Quaternion]
+		quaternion -- [page:Quaternion]
 		</div>
 		<div>
 		Applies a [page:Quaternion] transform to this vector.

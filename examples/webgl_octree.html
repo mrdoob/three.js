@@ -51,6 +51,7 @@
 				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				document.body.appendChild( renderer.domElement );
@@ -126,7 +127,7 @@
 				
 					// create new object
 				
-					geometry = new THREE.CubeGeometry( 50, 50, 50 );
+					geometry = new THREE.BoxGeometry( 50, 50, 50 );
 					material = new THREE.MeshBasicMaterial();
 					material.color.setRGB( baseR, baseG, baseB );
 				

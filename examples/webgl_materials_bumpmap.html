@@ -176,7 +176,7 @@
 
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( 0x060708, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -188,7 +188,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				//
 

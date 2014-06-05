@@ -341,15 +341,15 @@
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;
 
-				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniforms[ "uSpecularColor" ].value.setHex( specular );
-				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+				uniforms[ "diffuse" ].value.setHex( diffuse );
+				uniforms[ "specular" ].value.setHex( specular );
+				uniforms[ "ambient" ].value.setHex( ambient );
 
-				uniforms[ "uShininess" ].value = shininess;
+				uniforms[ "shininess" ].value = shininess;
 
-				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
-				uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
-				uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
+				uniforms[ "diffuse" ].value.convertGammaToLinear();
+				uniforms[ "specular" ].value.convertGammaToLinear();
+				uniforms[ "ambient" ].value.convertGammaToLinear();
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var mat2 = new THREE.ShaderMaterial( parameters );

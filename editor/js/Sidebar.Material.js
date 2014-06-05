@@ -12,19 +12,20 @@ Sidebar.Material = function ( editor ) {
 		'MeshLambertMaterial': THREE.MeshLambertMaterial,
 		'MeshNormalMaterial': THREE.MeshNormalMaterial,
 		'MeshPhongMaterial': THREE.MeshPhongMaterial,
-		'ParticleBasicMaterial': THREE.ParticleBasicMaterial,
-		'ParticleCanvasMaterial': THREE.ParticleCanvasMaterial,
+		'PointCloudMaterial': THREE.PointCloudMaterial,
 		'ShaderMaterial': THREE.ShaderMaterial,
+		'SpriteMaterial': THREE.SpriteMaterial,
+		'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
 		'Material': THREE.Material
 
 	};
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 	container.dom.classList.add( 'Material' );
 
-	container.add( new UI.Text().setValue( 'MATERIAL' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	container.addStatic( new UI.Text().setValue( 'MATERIAL' ) );
+	container.add( new UI.Break() );
 
 	// uuid
 
@@ -69,7 +70,8 @@ Sidebar.Material = function ( editor ) {
 		'MeshFaceMaterial': 'MeshFaceMaterial',
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
-		'MeshPhongMaterial': 'MeshPhongMaterial'
+		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'SpriteMaterial': 'SpriteMaterial'
 
 	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
@@ -143,6 +145,17 @@ Sidebar.Material = function ( editor ) {
 	materialVertexColorsRow.add( materialVertexColors );
 
 	container.add( materialVertexColorsRow );
+
+
+	// skinning
+
+	var materialSkinningRow = new UI.Panel();
+	var materialSkinning = new UI.Checkbox( false ).onChange( update );
+
+	materialSkinningRow.add( new UI.Text( 'Skinning' ).setWidth( '90px' ) );
+	materialSkinningRow.add( materialSkinning );
+
+	container.add( materialSkinningRow );
 
 
 	// map
@@ -309,6 +322,7 @@ Sidebar.Material = function ( editor ) {
 		var textureWarning = false;
 		var objectHasUvs = false;
 
+		if ( object instanceof THREE.Sprite ) objectHasUvs = true;
 		if ( geometry instanceof THREE.Geometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
 		if ( geometry instanceof THREE.BufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
@@ -367,14 +381,24 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.skinning !== undefined ) {
+
+				material.skinning = materialSkinning.getValue();
+
+			}
+
 			if ( material.map !== undefined ) {
 
 				var mapEnabled = materialMapEnabled.getValue() === true;
 
 				if ( objectHasUvs )  {
 
-					geometry.buffersNeedUpdate = true;
-					geometry.uvsNeedUpdate = true;
+					if ( geometry !== undefined ) {
+
+						geometry.buffersNeedUpdate = true;
+						geometry.uvsNeedUpdate = true;
+
+					}
 
 					material.map = mapEnabled ? materialMap.getValue() : null;
 					material.needsUpdate = true;
@@ -551,6 +575,7 @@ Sidebar.Material = function ( editor ) {
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
 			'vertexColors': materialVertexColorsRow,
+			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'lightMap': materialLightMapRow,
 			'bumpMap': materialBumpMapRow,
@@ -562,28 +587,17 @@ Sidebar.Material = function ( editor ) {
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
 			'wireframe': materialWireframeRow
-
 		};
 
-		var object = editor.selected;
+		var material = editor.selected.material;
 
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( object.material[ property ] !== undefined ? '' : 'none' );
+			properties[ property ].setDisplay( material[ property ] !== undefined ? '' : 'none' );
 
 		}
 
 	};
-
-	function getMaterialInstanceName( material ) {
-
-		for ( var key in materialClasses ) {
-
-			if ( material instanceof materialClasses[ key ] ) return key;
-
-		}
-
-	}
 
 	// events
 
@@ -607,29 +621,29 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			materialClass.setValue( getMaterialInstanceName( material ) );
+			materialClass.setValue( editor.getMaterialType( material ) );
 
 			if ( material.color !== undefined ) {
 
-				materialColor.setValue( '#' + material.color.getHexString() );
+				materialColor.setHexValue( material.color.getHexString() );
 
 			}
 
 			if ( material.ambient !== undefined ) {
 
-				materialAmbient.setValue( '#' + material.ambient.getHexString() );
+				materialAmbient.setHexValue( material.ambient.getHexString() );
 
 			}
 
 			if ( material.emissive !== undefined ) {
 
-				materialEmissive.setValue( '#' + material.emissive.getHexString() );
+				materialEmissive.setHexValue( material.emissive.getHexString() );
 
 			}
 
 			if ( material.specular !== undefined ) {
 
-				materialSpecular.setValue( '#' + material.specular.getHexString() );
+				materialSpecular.setHexValue( material.specular.getHexString() );
 
 			}
 
@@ -642,6 +656,12 @@ Sidebar.Material = function ( editor ) {
 			if ( material.vertexColors !== undefined ) {
 
 				materialVertexColors.setValue( material.vertexColors );
+
+			}
+
+			if ( material.skinning !== undefined ) {
+
+				materialSkinning.setValue( material.skinning );
 
 			}
 

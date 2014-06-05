@@ -2,79 +2,55 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
-
+		<div class="desc">A loader for loading an [page:Material material].</div>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]([page:LoadingManager manager])</h3>
+        <div>
+        manager -- The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+        </div>
 		<div>
-		todo
+		Creates a new [name].
 		</div>
 
 
 		<h2>Methods</h2>
 
+		<h3>.load( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] ) [page:Image]</h3>
+		<div>
+        onLoad -- Will be called when load completes. The argument will be the loaded Imageloader.
+        onProgress -- Will be called while load progresses. The argument will be the progress event.
+        onError -- Will be called when load errors.
+		url — required
+		</div>
+		<div>
+        Begin loading from url and return the [page:Material material] object that will contain the data.
+        </div>
 
+        <h3>.setCrossOrigin([page:String value])</h3>
+		<div>
+        value -- The crossOrigin string.
+		</div>
+		<div>
+        The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+        </div>
 
-		<h3>.load([page:todo url]) [page:todo]</h3>
-		<div>
-		url -- todo
+        <h3>.parse([page:Object json]) {
+        <div>
+        json -- The json object containing the parameters of the Material.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.parse([page:todo json]) [page:todo]</h3>
-		<div>
-		json -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
-		<div>
-		event -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
+        Creates a new [page:Material material] of the type 'json.type' and with parameters defined in the json object.
+        </div>
 
 		<h2>Source</h2>
 

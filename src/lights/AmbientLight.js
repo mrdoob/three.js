@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( hex ) {
+THREE.AmbientLight = function ( color ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 };
 

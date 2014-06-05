@@ -52,10 +52,15 @@
 
 			var camera, controls, scene, renderer;
 
-			var cross;
-
 			init();
-			animate();
+			render();
+
+			function animate() {
+
+				requestAnimationFrame(animate);
+				controls.update();
+
+			}
 
 			function init() {
 
@@ -63,6 +68,7 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera );
+				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
 				scene = new THREE.Scene();
@@ -119,6 +125,9 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				controls.addEventListener('change', render);
+				animate();
+
 			}
 
 			function onWindowResize() {
@@ -129,13 +138,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				render();
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				controls.update();
 
 			}
 
