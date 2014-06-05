@@ -657,6 +657,9 @@ def extract_fbx_vertex_colors(mesh):
 
                 vertexId += 1
             color_indices.append(poly_colors)
+        
+        layered_color_indices.append( color_indices )
+        layered_color_values.append( color_values )            
 
     color_values = []
     color_indices = []
