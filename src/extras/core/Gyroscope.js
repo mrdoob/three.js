@@ -10,7 +10,7 @@ THREE.Gyroscope = function () {
 
 THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
+THREE.Gyroscope.prototype.updateMatrixWorld = function ( force, updateChildren ) {
 
 	this.matrixAutoUpdate && this.updateMatrix();
 
@@ -43,10 +43,14 @@ THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
 
 	// update children
 
-	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+	if (updateChildren === false) { 
+		
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		this.children[ i ].updateMatrixWorld( force );
+			this.children[ i ].updateMatrixWorld( force, updateChildren );
 
+		}
+		
 	}
 
 };
