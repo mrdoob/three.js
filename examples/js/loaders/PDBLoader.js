@@ -10,7 +10,7 @@ THREE.PDBLoader = function ( manager ) {
 
 THREE.PDBLoader.prototype = {
 
-	constructor: THREE.OBJLoader,
+	constructor: THREE.PDBLoader,
 
 	load: function ( url, onLoad ) {
 
