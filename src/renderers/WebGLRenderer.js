@@ -3249,7 +3249,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorldAndVisibleWorld();
 
 		// update camera matrices and frustum
 
@@ -3295,7 +3295,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			webglObject.id = i;
 			webglObject.render = false;
 
-			if ( object.visible ) {
+			if ( object.visibleWorld ) {
 
 				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
 
