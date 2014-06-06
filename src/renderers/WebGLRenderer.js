@@ -3343,7 +3343,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			webglObject = renderList[ i ];
 			object = webglObject.object;
 
-			if ( object.visible ) {
+			if ( object.visibleWorld ) {
 
 				setupMatrices( object, camera );
 
@@ -3518,7 +3518,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			webglObject = renderList[ i ];
 			object = webglObject.object;
 
-			if ( object.visible ) {
+			if ( object.visibleWorld ) {
 
 				if ( overrideMaterial ) {
 
@@ -5038,7 +5038,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				if ( ! light.visible ) continue;
+				if ( ! light.visibleWorld ) continue;
 
 				if ( _this.gammaInput ) {
 
@@ -5058,7 +5058,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dirCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( ! light.visibleWorld ) continue;
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
@@ -5092,7 +5092,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				pointCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( ! light.visibleWorld ) continue;
 
 				pointOffset = pointLength * 3;
 
@@ -5120,7 +5120,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( ! light.visibleWorld ) continue;
 
 				spotOffset = spotLength * 3;
 
@@ -5160,7 +5160,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				hemiCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( ! light.visibleWorld ) continue;
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_direction.normalize();
@@ -6045,7 +6045,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var light = lights[ l ];
 
-			if ( light.onlyShadow || light.visible === false ) continue;
+			if ( light.onlyShadow || light.visibleWorld === false ) continue;
 
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
