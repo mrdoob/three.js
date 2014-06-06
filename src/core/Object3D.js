@@ -500,7 +500,15 @@ THREE.Object3D.prototype = {
 	
 	updateVisibleWorld: function ( updateChildren ) {
 
-		this.visibleWorld =  this.parent.visibleWorld && this.visible ;
+		if ( this.parent === undefined ) {
+			
+			this.visibleWorld = this.visible;
+			
+		} else {
+
+			this.visibleWorld = this.parent.visibleWorld && this.visible;
+			
+		}
 
 		// update children
 		
