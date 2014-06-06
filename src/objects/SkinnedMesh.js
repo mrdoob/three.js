@@ -111,6 +111,13 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 
 }();
 
+THREE.SkinnedMesh.prototype.updateMatrixWorldAndVisibleWorld = function ( force ) {
+
+		this.updateMatrixWorld( force , false );
+		this.updateVisibleWorld( false );
+
+};
+
 THREE.SkinnedMesh.prototype.pose = function () {
 
 	this.updateMatrixWorld( true );
