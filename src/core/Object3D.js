@@ -535,7 +535,7 @@ THREE.Object3D.prototype = {
 
 		};
 		
-	};
+	},
 
 	clone: function ( object, recursive ) {
 
