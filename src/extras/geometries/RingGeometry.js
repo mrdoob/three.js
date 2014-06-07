@@ -62,7 +62,7 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
 			
 			this.faces.push( new THREE.Face3( v1, v3, v4, [ n.clone(), n.clone(), n.clone() ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
+			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v3 ].clone(), uvs[ v4 ].clone() ]);
 
 		}
 	}
