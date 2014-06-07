@@ -37,12 +37,7 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: new THREE.Vector3( 1, 1, 1 )
-		},
-		visible: {
-			enumerable : true,
-			set : this.visibleSet,
-			get : this.visibleGet
-  		}
+		}
 	} );
 
 	this.renderDepth = null;
@@ -312,18 +307,6 @@ THREE.Object3D.prototype = {
 
 			this.children.push( object );
 
-			// set visibility
-			var realVisibility = (object._visibleWas !== undefined) ? object._visibleWas : object.visible;
-			if (this.visible)
-			{
-				object.visible = realVisibility;
-			}
-			else
-			{
-				object.visible = false;
-				object._visibleWas = realVisibility;
-			}
-						
 			// add to scene
 
 			var scene = this;
@@ -354,10 +337,6 @@ THREE.Object3D.prototype = {
 			object.dispatchEvent( { type: 'removed' } );
 
 			this.children.splice( index, 1 );
-			
-			// restore default visibility
-			var realVisibility = (object._visibleWas !== undefined) ? object._visibleWas : object.visible;
-			object.visible = realVisibility;
 
 			// remove from scene
 
@@ -558,62 +537,6 @@ THREE.Object3D.prototype = {
 		}
 
 		return object;
-
-	},
-	
-	visibleSet: function ( visible,drawableOnly ) {
-
-		visible = visible ? true : false;
-		this._visible = visible;
-		this._visibleWas = visible;
-
-		var parentVisible = true;
-		if (this.parent){
-			if (!this.parent.visible)
-				parentVisible = false;
-		}
-		
-		if( visible && parentVisible )
-		{
-
-			this.traverse( function( node ) {
-
-				if( drawableOnly )
-				{
-					if( node instanceof THREE.Camera ) return;
-					if( node instanceof THREE.Light ) return;
-				}
-
-				if( node._visibleWas !== undefined ) node._visible = node._visibleWas;
-				delete node._visibleWas;
-
-			});
-
-		}
-		else
-		{
-
-			this.traverse( function( node ) {
-
-				if( drawableOnly )
-				{
-					if( node instanceof THREE.Camera ) return;
-					if( node instanceof THREE.Light ) return;
-				}
-
-				if( node._visibleWas === undefined ) node._visibleWas = node._visible;
-				node._visible = false;
-
-			});
-
-		}
-	},
-
-	visibleGet: function () {
-
-		if ( this._visible === undefined ) return true;
-
-		return this._visible;
 
 	}
 
