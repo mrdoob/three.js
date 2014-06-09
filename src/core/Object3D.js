@@ -35,44 +35,20 @@ THREE.Object3D = function () {
 	Object.defineProperties( this, {
 		position: {
 			enumerable: true,
-			get: function () {
-				return position;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.copy() instead.' );
-				position.copy( value );
-			}
+			value: position
 		},
 		rotation: {
 			enumerable: true,
-			get: function () {
-				return rotation;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.copy() instead.' );
-				rotation.copy( value );
-			}
+			value: rotation
 		},
 		quaternion: {
 			enumerable: true,
-			get: function () {
-				return quaternion;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.copy() instead.' );
-				quaternion.copy( value );
-			}
+			value: quaternion
 		},
 		scale: {
 			enumerable: true,
-			get: function () {
-				return scale;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.copy() instead.' );
-				scale.copy( value );
-			}
-		}
+			value: scale
+		},
 	} );
 
 	this.renderDepth = null;
