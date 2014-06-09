@@ -445,11 +445,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			var texture = material.map;
 
-			if ( texture !== null ) {
+			if ( texture !== null && texture.image !== undefined ) {
 
 				if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
 
-					if ( texture.image !== undefined && texture.image.width > 0 ) {
+					if ( texture.image.width > 0 ) {
 
 						textureToPattern( texture );
 
@@ -647,7 +647,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				 ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
 				 : fillPath( _color );
 
-		} else if ( material instanceof THREE.MeshBasicMaterial || material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
+		} else if ( material instanceof THREE.MeshBasicMaterial ||
+				    material instanceof THREE.MeshLambertMaterial ||
+				    material instanceof THREE.MeshPhongMaterial ) {
 
 			if ( material.map !== null ) {
 
