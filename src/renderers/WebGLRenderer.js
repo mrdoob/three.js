@@ -704,7 +704,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateMaterial = function ( material ) {
 
-		var program = material.program;
+		var program = material.program.program;
 
 		if ( program === undefined ) return;
 
