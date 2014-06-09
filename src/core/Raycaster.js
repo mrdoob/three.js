@@ -49,42 +49,48 @@
 	};
 
 	//
+	
+	THREE.Raycaster.prototype = {
 
-	THREE.Raycaster.prototype.precision = 0.0001;
-	THREE.Raycaster.prototype.linePrecision = 1;
+		constructor: THREE.Raycaster,
 
-	THREE.Raycaster.prototype.set = function ( origin, direction ) {
+		precision: 0.0001,
+		linePrecision: 1,
 
-		this.ray.set( origin, direction );
-		// direction is assumed to be normalized (for accurate distance calculations)
+		set: function ( origin, direction ) {
 
-	};
+			this.ray.set( origin, direction );
+			// direction is assumed to be normalized (for accurate distance calculations)
 
-	THREE.Raycaster.prototype.intersectObject = function ( object, recursive ) {
+		},
 
-		var intersects = [];
+		intersectObject: function ( object, recursive ) {
 
-		intersectObject( object, this, intersects, recursive );
+			var intersects = [];
 
-		intersects.sort( descSort );
+			intersectObject( object, this, intersects, recursive );
 
-		return intersects;
+			intersects.sort( descSort );
 
-	};
+			return intersects;
 
-	THREE.Raycaster.prototype.intersectObjects = function ( objects, recursive ) {
+		},
 
-		var intersects = [];
+		intersectObjects: function ( objects, recursive ) {
 
-		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+			var intersects = [];
 
-			intersectObject( objects[ i ], this, intersects, recursive );
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+				intersectObject( objects[ i ], this, intersects, recursive );
+
+			}
+
+			intersects.sort( descSort );
+
+			return intersects;
 
 		}
-
-		intersects.sort( descSort );
-
-		return intersects;
 
 	};
 
