@@ -4034,7 +4034,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.addEventListener( 'dispose', onMaterialDispose );
 
-		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
+		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID, flipNormals;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -4073,6 +4073,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( shaderID ) {
 
 			setMaterialShaders( material, THREE.ShaderLib[ shaderID ] );
+
+		}
+
+		if ( material.flipSide === THREE.NoFlip ) {
+
+			flipNormals = material.side === THREE.BackSide;
+
+		} else {
+
+			flipNormals = ( material.flipSide === THREE.FlipNormals || material.flipSide === THREE.FlipFacesNormals );
 
 		}
 
@@ -4130,7 +4140,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			metal: material.metal,
 			wrapAround: material.wrapAround,
 			doubleSided: material.side === THREE.DoubleSide,
-			flipSided: material.side === THREE.BackSide
+			flipSided: flipNormals
 
 		};
 
@@ -5262,8 +5272,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setMaterialFaces = function ( material ) {
 
+		var flipFaces
 		var doubleSided = material.side === THREE.DoubleSide;
-		var flipSided = material.side === THREE.BackSide;
+
+		if ( material.flipSide === THREE.NoFlip ) {
+
+			flipFaces = material.side === THREE.BackSide;
+
+		} else {
+
+			flipFaces = ( material.flipSide === THREE.FlipFaces || material.flipSide === THREE.FlipFacesNormals );
+
+		}
 
 		if ( _oldDoubleSided !== doubleSided ) {
 
@@ -5281,9 +5301,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( _oldFlipSided !== flipSided ) {
+		if ( _oldFlipSided !== flipFaces ) {
 
-			if ( flipSided ) {
+			if ( flipFaces ) {
 
 				_gl.frontFace( _gl.CW );
 
@@ -5293,7 +5313,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldFlipSided = flipSided;
+			_oldFlipSided = flipFaces;
 
 		}
 
