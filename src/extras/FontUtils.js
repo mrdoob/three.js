@@ -187,11 +187,11 @@ THREE.FontUtils = {
 					cpx  = outline[ i ++ ] *  scaleX + offset;
 					cpy  = outline[ i ++ ] *  scaleY;
 					cpx1 = outline[ i ++ ] *  scaleX + offset;
-					cpy1 = outline[ i ++ ] * - scaleY;
+					cpy1 = outline[ i ++ ] *  scaleY;
 					cpx2 = outline[ i ++ ] *  scaleX + offset;
-					cpy2 = outline[ i ++ ] * - scaleY;
+					cpy2 = outline[ i ++ ] *  scaleY;
 
-					path.bezierCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
+					path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
 
 					laste = pts[ pts.length - 1 ];
 
