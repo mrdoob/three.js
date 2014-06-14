@@ -985,14 +985,20 @@ THREE.SceneLoader.prototype = {
 
 					texture = new THREE.Texture();
 					loader = new THREE.ImageLoader();
-					loader.load( fullUrl, function ( image ) {
+					
+					( function ( texture ) {
 
-						texture.image = image;
-						texture.needsUpdate = true;
+						loader.load( fullUrl, function ( image ) {
 
-						textureCallback();
+							texture.image = image;
+							texture.needsUpdate = true;
 
-					} );
+							textureCallback();
+
+						} );
+					
+					} )( texture )
+					
 
 				}
 
