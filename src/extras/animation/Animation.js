@@ -148,6 +148,7 @@ THREE.Animation.prototype.update = (function(){
 	};
 
 	return function ( delta ) {
+
 		if ( this.isPlaying === false ) return;
 
 		this.currentTime += delta * this.timeScale;
@@ -157,7 +158,6 @@ THREE.Animation.prototype.update = (function(){
 
 		//
 
-		var vector;
 		var duration = this.data.length;
 
 		if ( this.loop === true && this.currentTime > duration ) {
@@ -219,8 +219,6 @@ THREE.Animation.prototype.update = (function(){
 
 				if ( type === "pos" ) {
 
-					vector = object.position;
-
 					if ( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
 
 						newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
@@ -228,17 +226,21 @@ THREE.Animation.prototype.update = (function(){
 						newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 						// blend
-						if (object instanceof THREE.Bone) {
+						if ( object instanceof THREE.Bone ) {
 
 							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
-							vector.lerp( newVector, proportionalWeight );
+							object.position.lerp( newVector, proportionalWeight );
 							object.accumulatedPosWeight += this.weight;
 
-						} else
-							vector = newVector;
+						} else {
+
+							object.position.copy( newVector );
+
+						}
+
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-						this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+								this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
 						points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
 						points[ 1 ] = prevXYZ;
@@ -248,17 +250,19 @@ THREE.Animation.prototype.update = (function(){
 						scale = scale * 0.33 + 0.33;
 
 						var currentPoint = interpolateCatmullRom( points, scale );
-
+						var proportionalWeight = 1;
+						
 						if ( object instanceof THREE.Bone ) {
 
-							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
+							proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
 							object.accumulatedPosWeight += this.weight;
 
 						}
-						else
-							var proportionalWeight = 1;
 
 						// blend
+
+						var vector = object.position;
+						
 						vector.x = vector.x + ( currentPoint[ 0 ] - vector.x ) * proportionalWeight;
 						vector.y = vector.y + ( currentPoint[ 1 ] - vector.y ) * proportionalWeight;
 						vector.z = vector.z + ( currentPoint[ 2 ] - vector.z ) * proportionalWeight;
@@ -288,14 +292,12 @@ THREE.Animation.prototype.update = (function(){
 
 						object.quaternion.copy(newQuat);
 
-					}
-					else if ( object.accumulatedRotWeight === 0) {
+					} else if ( object.accumulatedRotWeight === 0 ) {
 
 						object.quaternion.copy(newQuat);
 						object.accumulatedRotWeight = this.weight;
 
-					}
-					else {
+					} else {
 
 						var proportionalWeight = this.weight / ( this.weight + object.accumulatedRotWeight );
 						THREE.Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
@@ -305,8 +307,6 @@ THREE.Animation.prototype.update = (function(){
 
 				} else if ( type === "scl" ) {
 
-					vector = object.scale;
-
 					newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 					newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 					newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
@@ -314,11 +314,14 @@ THREE.Animation.prototype.update = (function(){
 					if ( object instanceof THREE.Bone ) {
 
 						var proportionalWeight = this.weight / ( this.weight + object.accumulatedSclWeight);
-						vector.lerp( newVector, proportionalWeight );
+						object.scale.lerp( newVector, proportionalWeight );
 						object.accumulatedSclWeight += this.weight;
 
-					} else
-						vector = newVector;
+					} else {
+
+						object.scale.copy( newVector );
+
+					}
 
 				}
 
