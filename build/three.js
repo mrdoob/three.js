@@ -7271,9 +7271,7 @@ THREE.Object3D.prototype = {
 
 		return function ( axis, distance ) {
 
-			v1.copy( axis );
-
-			v1.applyQuaternion( this.quaternion );
+			v1.copy( axis ).applyQuaternion( this.quaternion );
 
 			this.position.add( v1.multiplyScalar( distance ) );
 
@@ -21575,7 +21573,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertexColors, faceColor,
 		vertexTangents,
 		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
-		c1, c2, c3, c4,
+		c1, c2, c3,
 		sw1, sw2, sw3, sw4,
 		si1, si2, si3, si4,
 		sa1, sa2, sa3, sa4,
@@ -27284,11 +27282,11 @@ THREE.FontUtils = {
 					cpx  = outline[ i ++ ] *  scaleX + offset;
 					cpy  = outline[ i ++ ] *  scaleY;
 					cpx1 = outline[ i ++ ] *  scaleX + offset;
-					cpy1 = outline[ i ++ ] * - scaleY;
+					cpy1 = outline[ i ++ ] *  scaleY;
 					cpx2 = outline[ i ++ ] *  scaleX + offset;
-					cpy2 = outline[ i ++ ] * - scaleY;
+					cpy2 = outline[ i ++ ] *  scaleY;
 
-					path.bezierCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
+					path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
 
 					laste = pts[ pts.length - 1 ];
 
@@ -30297,6 +30295,7 @@ THREE.Animation.prototype.update = (function(){
 	};
 
 	return function ( delta ) {
+
 		if ( this.isPlaying === false ) return;
 
 		this.currentTime += delta * this.timeScale;
@@ -30306,7 +30305,6 @@ THREE.Animation.prototype.update = (function(){
 
 		//
 
-		var vector;
 		var duration = this.data.length;
 
 		if ( this.loop === true && this.currentTime > duration ) {
@@ -30368,8 +30366,6 @@ THREE.Animation.prototype.update = (function(){
 
 				if ( type === "pos" ) {
 
-					vector = object.position;
-
 					if ( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
 
 						newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
@@ -30377,17 +30373,21 @@ THREE.Animation.prototype.update = (function(){
 						newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 						// blend
-						if (object instanceof THREE.Bone) {
+						if ( object instanceof THREE.Bone ) {
 
 							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
-							vector.lerp( newVector, proportionalWeight );
+							object.position.lerp( newVector, proportionalWeight );
 							object.accumulatedPosWeight += this.weight;
 
-						} else
-							vector = newVector;
+						} else {
+
+							object.position.copy( newVector );
+
+						}
+
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-						this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+								this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
 						points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
 						points[ 1 ] = prevXYZ;
@@ -30397,17 +30397,19 @@ THREE.Animation.prototype.update = (function(){
 						scale = scale * 0.33 + 0.33;
 
 						var currentPoint = interpolateCatmullRom( points, scale );
-
+						var proportionalWeight = 1;
+						
 						if ( object instanceof THREE.Bone ) {
 
-							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
+							proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
 							object.accumulatedPosWeight += this.weight;
 
 						}
-						else
-							var proportionalWeight = 1;
 
 						// blend
+
+						var vector = object.position;
+						
 						vector.x = vector.x + ( currentPoint[ 0 ] - vector.x ) * proportionalWeight;
 						vector.y = vector.y + ( currentPoint[ 1 ] - vector.y ) * proportionalWeight;
 						vector.z = vector.z + ( currentPoint[ 2 ] - vector.z ) * proportionalWeight;
@@ -30437,14 +30439,12 @@ THREE.Animation.prototype.update = (function(){
 
 						object.quaternion.copy(newQuat);
 
-					}
-					else if ( object.accumulatedRotWeight === 0) {
+					} else if ( object.accumulatedRotWeight === 0 ) {
 
 						object.quaternion.copy(newQuat);
 						object.accumulatedRotWeight = this.weight;
 
-					}
-					else {
+					} else {
 
 						var proportionalWeight = this.weight / ( this.weight + object.accumulatedRotWeight );
 						THREE.Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
@@ -30454,8 +30454,6 @@ THREE.Animation.prototype.update = (function(){
 
 				} else if ( type === "scl" ) {
 
-					vector = object.scale;
-
 					newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 					newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 					newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
@@ -30463,11 +30461,14 @@ THREE.Animation.prototype.update = (function(){
 					if ( object instanceof THREE.Bone ) {
 
 						var proportionalWeight = this.weight / ( this.weight + object.accumulatedSclWeight);
-						vector.lerp( newVector, proportionalWeight );
+						object.scale.lerp( newVector, proportionalWeight );
 						object.accumulatedSclWeight += this.weight;
 
-					} else
-						vector = newVector;
+					} else {
+
+						object.scale.copy( newVector );
+
+					}
 
 				}
 
