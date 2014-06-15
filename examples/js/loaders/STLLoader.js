@@ -50,7 +50,7 @@ THREE.STLLoader.prototype.load = function ( url, callback ) {
 
 		} else {
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']', response: event.target.responseText } );
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']', response: event.target.statusText } );
 
 		}
 
