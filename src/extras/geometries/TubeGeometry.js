@@ -11,7 +11,7 @@
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed ) {
+THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, capped ) {
 
 	THREE.Geometry.call( this );
 
@@ -20,13 +20,15 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 		segments: segments,
 		radius: radius,
 		radialSegments: radialSegments,
-		closed: closed
+		closed: closed,
+		capped: capped
 	};
 
 	segments = segments || 64;
 	radius = radius || 1;
 	radialSegments = radialSegments || 8;
 	closed = closed || false;
+	capped = capped || false;
 
 	var grid = [];
 
@@ -122,7 +124,36 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 			this.faces.push( new THREE.Face3( b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
+			// add vertices, faces, and uvs for the start cap
+			if ( capped && i === 0) {
+
+				// get the first point on the path
+				var faceCenter = path.getPointAt( 0 ).clone();
+
+				var v = vert( faceCenter.x, faceCenter.y, faceCenter.z );
+				var uvv = new THREE.Vector2( 0, 0 );
+
+				this.faces.push( new THREE.Face3( a, d, v ) );
+				this.faceVertexUvs[ 0 ].push( [ uva.clone(), uvd.clone(), uvv ] );
+
+			}
+
+			// add vertices, faces, and uvs for the end cap
+			if ( capped && i === segments - 1) {
+
+				// get the last point on the path
+				var faceCenter = path.getPointAt( 1 ).clone();
+
+				var v = vert( faceCenter.x, faceCenter.y, faceCenter.z );
+				var uvv = new THREE.Vector2( 1, 1 );
+
+				this.faces.push( new THREE.Face3( c, b, v ) );
+				this.faceVertexUvs[ 0 ].push( [ uvc.clone(), uvb.clone(), uvv ] );
+
+			}
+
 		}
+
 	}
 
 	this.computeFaceNormals();
@@ -275,4 +306,5 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		}
 
 	}
+
 };
