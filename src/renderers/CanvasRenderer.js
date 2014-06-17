@@ -37,8 +37,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_contextLineWidth = null,
 	_contextLineCap = null,
 	_contextLineJoin = null,
-	_contextDashSize = null,
-	_contextGapSize = 0,
+	_contextLineDash = [],
 
 	_camera,
 
@@ -598,13 +597,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 			setLineCap( material.linecap );
 			setLineJoin( material.linejoin );
 			setStrokeStyle( material.color.getStyle() );
-			setDashAndGap( material.dashSize, material.gapSize );
+			setDashAndGap( [ material.dashSize, material.gapSize ] );
 
 			_context.stroke();
 
 			_elemBox.expandByScalar( material.linewidth * 2 );
 
-			setDashAndGap( null, null );
+			setDashAndGap( [] );
 
 		}
 
@@ -1035,13 +1034,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
-	function setDashAndGap( dashSizeValue, gapSizeValue ) {
+	function setDashAndGap( value ) {
 
-		if ( _contextDashSize !== dashSizeValue || _contextGapSize !== gapSizeValue ) {
+		if ( _contextLineDash.length !== value.length ) {
 
-			_context.setLineDash( [ dashSizeValue, gapSizeValue ] );
-			_contextDashSize = dashSizeValue;
-			_contextGapSize = gapSizeValue;
+			_context.setLineDash( value );
+			_contextLineDash = value;
 
 		}
 
