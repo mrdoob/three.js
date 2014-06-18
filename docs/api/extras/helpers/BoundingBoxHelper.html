@@ -21,7 +21,7 @@
 		var length = 1;
 		var hex = 0xffff00;
 
-		var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+		var arrowHelper = new THREE.BoundingBoxHelper( dir, origin, length, hex );
 		scene.add( arrowHelper );
 		</code>
 
