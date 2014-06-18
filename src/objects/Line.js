@@ -25,7 +25,7 @@ THREE.Line.prototype.raycast = ( function () {
 	var sphere = new THREE.Sphere();
 
 	return function ( raycaster, intersects ) {
-	
+
 		var precision = raycaster.linePrecision;
 		var precisionSq = precision * precision;
 
@@ -37,13 +37,13 @@ THREE.Line.prototype.raycast = ( function () {
 
 		sphere.copy( geometry.boundingSphere );
 		sphere.applyMatrix4( this.matrixWorld );
-	
+
 		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
 			return;
 
 		}
-	
+
 		inverseMatrix.getInverse( this.matrixWorld );
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 

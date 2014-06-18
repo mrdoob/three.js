@@ -18,7 +18,7 @@ THREE.Object3D = function () {
 	this.up = THREE.Object3D.DefaultUp.clone();
 
 	var scope = this;
-	
+
 	var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
@@ -27,7 +27,7 @@ THREE.Object3D = function () {
 	rotation.onChange( function () {
 		quaternion.setFromEuler( rotation, false );
 	} );
-	
+
 	quaternion.onChange( function () {
 		rotation.setFromQuaternion( quaternion, undefined, false );
 	} );
@@ -35,44 +35,20 @@ THREE.Object3D = function () {
 	Object.defineProperties( this, {
 		position: {
 			enumerable: true,
-			get: function () {
-				return position;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .position = new THREE.Vector3() pattern no longer works. Use .position.copy() instead.' );
-				position.copy( value );
-			}
+			value: position
 		},
 		rotation: {
 			enumerable: true,
-			get: function () {
-				return rotation;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .rotation = new THREE.Euler() pattern no longer works. Use .rotation.copy() instead.' );
-				rotation.copy( value );
-			}
+			value: rotation
 		},
 		quaternion: {
 			enumerable: true,
-			get: function () {
-				return quaternion;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .quaternion = new THREE.Quaternion() pattern no longer works. Use .quaternion.copy() instead.' );
-				quaternion.copy( value );
-			}
+			value: quaternion
 		},
 		scale: {
 			enumerable: true,
-			get: function () {
-				return scale;
-			},
-			set: function ( value ) {
-				console.error( 'THREE.Object3D: .scale = new THREE.Vector3() pattern no longer works. Use .scale.copy() instead.' );
-				scale.copy( value );
-			}
-		}
+			value: scale
+		},
 	} );
 
 	this.renderDepth = null;
@@ -168,7 +144,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	rotateOnAxis: function() {
+	rotateOnAxis: function () {
 
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
@@ -232,9 +208,7 @@ THREE.Object3D.prototype = {
 
 		return function ( axis, distance ) {
 
-			v1.copy( axis );
-
-			v1.applyQuaternion( this.quaternion );
+			v1.copy( axis ).applyQuaternion( this.quaternion );
 
 			this.position.add( v1.multiplyScalar( distance ) );
 
@@ -325,7 +299,7 @@ THREE.Object3D.prototype = {
 
 		if ( object === this ) {
 
-			console.warn( 'THREE.Object3D.add: An object can\'t be added as a child of itself.' );
+			console.warn( "THREE.Object3D.add: An object can't be added as a child of itself." );
 			return;
 
 		}
@@ -393,7 +367,7 @@ THREE.Object3D.prototype = {
 		}
 
 	},
-	
+
 	raycast: function () {},
 
 	traverse: function ( callback ) {

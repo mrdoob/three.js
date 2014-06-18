@@ -46,13 +46,13 @@
 					<a href="#" onclick="camera.setZoom(2);return false;">2x</a> |
 
 				<br/>
-			Views: <a href="#" onclick="camera.toTopView();return false;">Top view</a> |
-				<a href="#" onclick="camera.toBottomView();return false;">Bottom view</a> |
-				<a href="#" onclick="camera.toLeftView();return false;">Left view</a> |
-				<a href="#" onclick="camera.toRightView();return false;">Right view</a> |
-				<a href="#" onclick="camera.toFrontView();return false;">Front view</a> |
-				<a href="#" onclick="camera.toBackView();return false;">Back view</a> |
-				<a href="#" onclick="camera.rotationAutoUpdate = true;return false;">Look at Scene</a>
+			Views: <a href="#" onclick="camera.toTopView();lookAtScene=false;return false;">Top view</a> |
+				<a href="#" onclick="camera.toBottomView();lookAtScene=false;return false;">Bottom view</a> |
+				<a href="#" onclick="camera.toLeftView();lookAtScene=false;return false;">Left view</a> |
+				<a href="#" onclick="camera.toRightView();lookAtScene=false;return false;">Right view</a> |
+				<a href="#" onclick="camera.toFrontView();lookAtScene=false;return false;">Front view</a> |
+				<a href="#" onclick="camera.toBackView();lookAtScene=false;return false;">Back view</a> |
+				<a href="#" onclick="lookAtScene=true;return false;">Look at Scene</a>
 				<br/>
 			<div id="fov"></div>
 		</div>
@@ -63,6 +63,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
+			var lookAtScene = true;
 
 			init();
 			animate();
@@ -215,7 +216,7 @@
 
 				camera.position.x = Math.cos( timer ) * 200;
 				camera.position.z = Math.sin( timer ) * 200;
-				camera.lookAt( scene.position );
+				if ( lookAtScene ) camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

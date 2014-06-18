@@ -27,7 +27,7 @@ THREE.KeyFrameAnimation = function ( data ) {
 
 		if ( keys.length && sids ) {
 
-			for ( var s = 0; s < sids.length; s++ ) {
+			for ( var s = 0; s < sids.length; s ++ ) {
 
 				var sid = sids[ s ],
 					next = this.getNextKeyWith( sid, h, 0 );
@@ -65,7 +65,7 @@ THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 			object,
 			node;
 
-		for ( h = 0; h < hl; h++ ) {
+		for ( h = 0; h < hl; h ++ ) {
 
 			object = this.hierarchy[ h ];
 			node = this.data.hierarchy[ h ];
@@ -113,7 +113,7 @@ THREE.KeyFrameAnimation.prototype.stop = function() {
 
 	// reset JIT matrix and remove cache
 
-	for ( var h = 0; h < this.data.hierarchy.length; h++ ) {
+	for ( var h = 0; h < this.data.hierarchy.length; h ++ ) {
 		
 		var obj = this.hierarchy[ h ];
 		var node = this.data.hierarchy[ h ];
@@ -154,7 +154,7 @@ THREE.KeyFrameAnimation.prototype.update = function ( delta ) {
 
 	this.currentTime = Math.min( this.currentTime, duration );
 
-	for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
+	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
 		var object = this.hierarchy[ h ];
 		var node = this.data.hierarchy[ h ];
@@ -208,7 +208,7 @@ THREE.KeyFrameAnimation.prototype.getNextKeyWith = function( sid, h, key ) {
 	var keys = this.data.hierarchy[ h ].keys;
 	key = key % keys.length;
 
-	for ( ; key < keys.length; key++ ) {
+	for ( ; key < keys.length; key ++ ) {
 
 		if ( keys[ key ].hasTarget( sid ) ) {
 
@@ -229,7 +229,7 @@ THREE.KeyFrameAnimation.prototype.getPrevKeyWith = function( sid, h, key ) {
 	var keys = this.data.hierarchy[ h ].keys;
 	key = key >= 0 ? key : key + keys.length;
 
-	for ( ; key >= 0; key-- ) {
+	for ( ; key >= 0; key -- ) {
 
 		if ( keys[ key ].hasTarget( sid ) ) {
 

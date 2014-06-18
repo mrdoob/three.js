@@ -13,8 +13,7 @@ THREE.ImageUtils = {
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
 
-		var texture = new THREE.Texture();
-		texture.mapping = mapping;
+		var texture = new THREE.Texture( undefined, mapping );
 
 		loader.load( url, function ( image ) {
 
@@ -41,17 +40,17 @@ THREE.ImageUtils = {
 
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
-		
+
 		var texture = new THREE.CubeTexture( images, mapping );
 
 		// no flipping needed for cube textures
 
 		texture.flipY = false;
-		
+
 		var loaded = 0;
-		
+
 		var loadTexture = function ( i ) {
-		
+
 			loader.load( array[ i ], function ( image ) {
 
 				texture.images[ i ] = image;
@@ -79,17 +78,17 @@ THREE.ImageUtils = {
 		return texture;
 
 	},
-	
+
 	loadCompressedTexture: function () {
-	
-		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.')
-	
+
+		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' )
+
 	},
-	
+
 	loadCompressedTextureCube: function () {
-	
-		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.')
-	
+
+		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
+
 	},
 
 	getNormalMap: function ( image, depth ) {
@@ -206,7 +205,7 @@ THREE.ImageUtils = {
 
 		for ( var i = 0; i < size; i ++ ) {
 
-			data[ i * 3 ] 	  = r;
+			data[ i * 3 ] 	   = r;
 			data[ i * 3 + 1 ] = g;
 			data[ i * 3 + 2 ] = b;
 

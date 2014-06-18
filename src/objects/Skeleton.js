@@ -61,15 +61,13 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 		this.calculateInverses();
 
-	}
-	else {
+	} else {
 
 		if ( this.bones.length === boneInverses.length ) {
 
 			this.boneInverses = boneInverses.slice( 0 );
 
-		}
-		else {
+		} else {
 
 			console.warn( 'THREE.Skeleton bonInverses is the wrong length.' );
 

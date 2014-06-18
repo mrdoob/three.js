@@ -30,7 +30,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 		if ( geometry.boundingBox !== null ) {
-	
+
 			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) {
 
 				return;
@@ -38,7 +38,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 			}
 
 		}
-	
+
 		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		var position = new THREE.Vector3();
 
@@ -69,7 +69,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 		};
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
-	
+
 			var attributes = geometry.attributes;
 			var positions = attributes.position.array;
 
@@ -96,7 +96,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 					var count = offsets[ oi ].count;
 					var index = offsets[ oi ].index;
 
-					for ( var i = start, il = start + count; i < il; i++ ) {
+					for ( var i = start, il = start + count; i < il; i ++ ) {
 
 						var a = index + indices[ i ];
 
@@ -105,7 +105,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 							positions[ a * 3 + 1 ],
 							positions[ a * 3 + 2 ]
 						);
-						
+
 						testPoint( position, a );
 
 					}

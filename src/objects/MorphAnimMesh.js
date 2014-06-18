@@ -44,7 +44,7 @@ THREE.MorphAnimMesh.prototype.setDirectionForward = function () {
 
 THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
 
-	this.direction = -1;
+	this.direction = - 1;
 	this.directionBackwards = true;
 
 };
@@ -69,7 +69,7 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 			var label = parts[ 1 ];
 			var num = parts[ 2 ];
 
-			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: -Infinity };
+			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: - Infinity };
 
 			var animation = animations[ label ];
 
@@ -106,7 +106,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		console.warn( "animation[" + label + "] undefined" );
+		console.warn( 'animation[' + label + '] undefined' );
 
 	}
 
@@ -122,7 +122,7 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 		if ( this.time > this.duration || this.time < 0 ) {
 
-			this.direction *= -1;
+			this.direction *= - 1;
 
 			if ( this.time > this.duration ) {
 

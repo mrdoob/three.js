@@ -35,12 +35,12 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 			bones.push( bone );
 
 			bone.name = gbone.name;
-			bone.position.set( p[0], p[1], p[2] );
-			bone.quaternion.set( q[0], q[1], q[2], q[3] );
+			bone.position.set( p[ 0 ], p[ 1 ], p[ 2 ] );
+			bone.quaternion.set( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
 
 			if ( s !== undefined ) {
 
-				bone.scale.set( s[0], s[1], s[2] );
+				bone.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
 
 			} else {
 
@@ -54,7 +54,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			if ( gbone.parent !== -1 ) {
+			if ( gbone.parent !== - 1 ) {
 
 				bones[ gbone.parent ].add( bones[ b ] );
 

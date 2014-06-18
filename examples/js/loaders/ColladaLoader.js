@@ -1123,7 +1123,7 @@ THREE.ColladaLoader = function () {
 
 		if ( options.centerGeometry && obj.geometry ) {
 
-			var delta = THREE.GeometryUtils.center( obj.geometry );
+			var delta = obj.geometry.center();
 			delta.multiply( obj.scale );
 			delta.applyQuaternion( obj.quaternion );
 

@@ -40,6 +40,7 @@ Menubar.Edit = function ( editor ) {
 		// convert to BufferGeometry
 		
 		var object = editor.selected;
+
 		if ( object.geometry instanceof THREE.Geometry ) {
 
 			if ( object.parent === undefined ) return; // avoid flattening the camera or scene
@@ -48,9 +49,10 @@ Menubar.Edit = function ( editor ) {
 
 			delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
 
-			object.geometry = THREE.BufferGeometryUtils.fromGeometry( object.geometry );
+			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
 
 			editor.signals.objectChanged.dispatch( object );
+
 		}
 
 	}

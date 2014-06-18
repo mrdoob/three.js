@@ -285,7 +285,7 @@ THREE.WebGLProgram = ( function () {
 
 		if ( _gl.getProgramInfoLog( program ) !== '' ) {
 
-			console.error( 'gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
+			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
 
 		}
 

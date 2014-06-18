@@ -4,7 +4,7 @@
  * @author ikerr / http://verold.com
  */
 
-THREE.Bone = function( belongsToSkin ) {
+THREE.Bone = function ( belongsToSkin ) {
 
 	THREE.Object3D.call( this );
 
