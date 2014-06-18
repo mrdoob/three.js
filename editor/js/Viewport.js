@@ -566,9 +566,9 @@ var Viewport = function ( editor ) {
 	}
 
 	var vrstate = new vr.State();
-	var riftCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-	riftCamera.position.fromArray( editor.config.getKey( 'camera' ).position );
-	riftCamera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
+	// var riftCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+	// riftCamera.position.fromArray( editor.config.getKey( 'camera' ).position );
+	// riftCamera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
 
 	function render() {
 

@@ -37,7 +37,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100% !important;
-  height: 100% !important;
+  width: 1280px !important;
+  height: 800px !important;
   z-index: 1000;
 }
