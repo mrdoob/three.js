@@ -168,10 +168,15 @@ THREE.CSS3DRenderer = function () {
 
 			var element = object.element;
 
-			element.style.WebkitTransform = style;
-			element.style.MozTransform = style;
-			element.style.oTransform = style;
-			element.style.transform = style;
+            // Check if we need to change transform before we trigger a CSS style invalidation / layout
+            if(object.CSStransform === undefined || object.CSStransform !== style) {
+                var elementStyle = element.style;
+                elementStyle.WebkitTransform = style;
+                elementStyle.MozTransform = style;
+                elementStyle.oTransform = style;
+                elementStyle.transform = style;
+                object.CSStransform = style;
+            }
 
 			if ( element.parentNode !== cameraElement ) {
 
@@ -189,14 +194,22 @@ THREE.CSS3DRenderer = function () {
 
 	};
 
+    var domElementData = {},
+        cameraElementData = {};
+
 	this.render = function ( scene, camera ) {
 
 		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * _height;
 
-		domElement.style.WebkitPerspective = fov + "px";
-		domElement.style.MozPerspective = fov + "px";
-		domElement.style.oPerspective = fov + "px";
-		domElement.style.perspective = fov + "px";
+        // Check if we need to change perspective before we trigger a CSS style invalidation / layout
+        if(domElementData.perspective === undefined || (fov + "px") !== domElementData.perspective) {
+            var domElementStyle = domElement.style;
+            domElementStyle.WebkitPerspective = fov + "px";
+            domElementStyle.MozPerspective = fov + "px";
+            domElementStyle.oPerspective = fov + "px";
+            domElementStyle.perspective = fov + "px";
+            domElementData.perspective = fov + "px";
+        }
 
 		scene.updateMatrixWorld();
 
@@ -207,10 +220,15 @@ THREE.CSS3DRenderer = function () {
 		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) +
 			" translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
 
-		cameraElement.style.WebkitTransform = style;
-		cameraElement.style.MozTransform = style;
-		cameraElement.style.oTransform = style;
-		cameraElement.style.transform = style;
+        // Check if we need to change transform before we trigger a CSS style invalidation / layout
+        if(cameraElementData.transform === undefined || cameraElementData.transform !== style) {
+            var cameraElementStyle = cameraElement.style;
+            cameraElementStyle.WebkitTransform = style;
+            cameraElementStyle.MozTransform = style;
+            cameraElementStyle.oTransform = style;
+            cameraElementStyle.transform = style;
+            cameraElementData.transform = style;
+        }
 
 		renderObject( scene, camera );
 
