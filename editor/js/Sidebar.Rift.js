@@ -3,7 +3,7 @@ Sidebar.Rift = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.CollapsiblePanel();
-	var viewport = document.querySelector('#viewport canvas');
+	var viewportEl = document.querySelector('#viewport canvas');
 
 	container.addStatic( new UI.Text( 'RIFT' ) );
 	container.add( new UI.Break() );
@@ -11,18 +11,20 @@ Sidebar.Rift = function ( editor ) {
 	var objectRiftButton = new UI.Button( 'Push to Rift' ).
 		setWidth('100%').
 		onClick( function () {
-			//viewport.classList.add('fullscreen')
+			//viewportE.classList.add('fullscreen')
 		} );
+
 
 		objectRiftButton.dom.addEventListener( 'mousedown', onMouseDown, false );
 		function onMouseDown() {
-			viewport.classList.add('fullscreen')
+			viewport.startRiftMode();
 		}
 
-		objectRiftButton.dom.addEventListener( 'mouseup', onMouseUp, false );
+		document.body.addEventListener( 'mouseup', onMouseUp, false );
 		function onMouseUp() {
-			viewport.classList.remove('fullscreen')
+			viewport.stopRiftMode();
 		}
+
 	objectRiftButton.dom.className = 'Button Rift';
 
 	var objectUUIDRow = new UI.Panel();

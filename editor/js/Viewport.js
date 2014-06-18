@@ -194,7 +194,7 @@ var Viewport = function ( editor ) {
 				break;
 
 		}
-		
+
 		renderer.setClearColor( clearColor );
 
 		render();
@@ -228,7 +228,6 @@ var Viewport = function ( editor ) {
 		renderer.autoUpdateScene = false;
 		renderer.setClearColor( clearColor );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
-
 		container.dom.appendChild( renderer.domElement );
 
 		render();
@@ -430,16 +429,16 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.playAnimations.add( function (animations) {
-		
+
 		function animate() {
 
 			requestAnimationFrame( animate );
-			
+
 			for ( var i = 0; i < animations.length ; i ++ ) {
 
 				animations[i].update(0.016);
 
-			} 
+			}
 
 			render();
 		}
@@ -461,6 +460,7 @@ var Viewport = function ( editor ) {
 		if ( System.support.webgl === true ) {
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			container.renderer = renderer;
 
 		} else {
 
@@ -565,20 +565,59 @@ var Viewport = function ( editor ) {
 
 	}
 
+	var vrstate = new vr.State();
+	var riftCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+	riftCamera.position.fromArray( editor.config.getKey( 'camera' ).position );
+	riftCamera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
+
 	function render() {
+
+		var polled;
 
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		renderer.clear();
-		renderer.render( scene, camera );
+		if (riftRenderer) {
+			polled = vr.pollState(vrstate);
+			// Poll VR, if it's ready.
+			riftRenderer.render(scene, camera, polled ? vrstate : null);
 
-		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+		} else {
 
-			renderer.render( sceneHelpers, camera );
+			renderer.clear();
+			renderer.render( scene, camera );
+
+			if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+
+				renderer.render( sceneHelpers, camera );
+
+			}
 
 		}
 
+	}
+
+	var riftRenderer;
+	var rendererDevicePixelRatio;
+
+	container.startRiftMode = function() {
+		if (!riftRenderer) {
+			renderer.domElement.classList.add('fullscreen');
+			rendererDevicePixelRatio = renderer.devicePixelRatio;
+			renderer.devicePixelRatio = 1;
+			riftRenderer = new THREE.OculusRiftEffect(renderer);
+		}
+		render();
+	}
+
+	container.stopRiftMode = function() {
+		if (riftRenderer) {
+			renderer.domElement.classList.remove('fullscreen');
+			renderer.devicePixelRatio = rendererDevicePixelRatio;
+			riftRenderer = undefined;
+			renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		}
+		render();
 	}
 
 	return container;
