@@ -19,6 +19,20 @@ var Viewport = function ( editor ) {
 
 	var objects = [];
 
+	function startVR() {
+		if (!vr.isInstalled()) {
+			//statusEl.innerText = 'NPVR plugin not installed!';
+			alert('NPVR plugin not installed!');
+		}
+		vr.load(function(error) {
+				if (error) {
+					alert('Plugin load failed: ' + error.toString());
+				}
+		});
+	}
+
+	startVR();
+
 	// helpers
 
 	var grid = new THREE.GridHelper( 500, 25 );
@@ -476,8 +490,6 @@ var Viewport = function ( editor ) {
 
 	animate();
 
-	//
-
 	function updateInfo() {
 
 		var objects = 0;
@@ -573,15 +585,12 @@ var Viewport = function ( editor ) {
 	function render() {
 
 		var polled;
-
+		var vrRenderer = riftRenderer;
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		if (riftRenderer) {
-			polled = vr.pollState(vrstate);
-			// Poll VR, if it's ready.
-			riftRenderer.render(scene, camera, polled ? vrstate : null);
-
+		if (vrRenderer) {
+			animate();
 		} else {
 
 			renderer.clear();
@@ -594,7 +603,11 @@ var Viewport = function ( editor ) {
 			}
 
 		}
-
+		function animate() {
+			polled = vr.pollState(vrstate);
+			riftRenderer.render( scene, camera, polled ? vrstate : null );
+			vr.requestAnimationFrame(render);
+		}
 	}
 
 	var riftRenderer;
