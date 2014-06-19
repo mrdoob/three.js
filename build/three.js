@@ -15738,8 +15738,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_contextLineWidth = null,
 	_contextLineCap = null,
 	_contextLineJoin = null,
-	_contextDashSize = null,
-	_contextGapSize = 0,
+	_contextLineDash = [],
 
 	_camera,
 
@@ -16299,13 +16298,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 			setLineCap( material.linecap );
 			setLineJoin( material.linejoin );
 			setStrokeStyle( material.color.getStyle() );
-			setDashAndGap( material.dashSize, material.gapSize );
+			setLineDash( [ material.dashSize, material.gapSize ] );
 
 			_context.stroke();
 
 			_elemBox.expandByScalar( material.linewidth * 2 );
 
-			setDashAndGap( null, null );
+			setLineDash( [] );
 
 		}
 
@@ -16736,13 +16735,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
-	function setDashAndGap( dashSizeValue, gapSizeValue ) {
+	function setLineDash( value ) {
 
-		if ( _contextDashSize !== dashSizeValue || _contextGapSize !== gapSizeValue ) {
+		if ( _contextLineDash.length !== value.length ) {
 
-			_context.setLineDash( [ dashSizeValue, gapSizeValue ] );
-			_contextDashSize = dashSizeValue;
-			_contextGapSize = gapSizeValue;
+			_context.setLineDash( value );
+			_contextLineDash = value;
 
 		}
 
@@ -35994,8 +35992,17 @@ THREE.SpritePlugin = function () {
 
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
+		
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = 8;
+		canvas.height = 8;
+		
+		var context = canvas.getContext( '2d' );
+		context.fillStyle = 'white';
+		context.fillRect( 0, 0, 8, 8 );
 
-		_texture = new THREE.Texture();
+		_texture = new THREE.Texture( canvas );
+		_texture.needsUpdate = true;
 
 	};
 
