@@ -31,13 +31,30 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	this.update = function() {
 
+		var compassHeading, fixedAlpha;
 		var alpha, beta, gamma;
 
 		return function () {
 
 			if ( this.freeze ) return;
 
-			alpha  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.alpha ) : 0; // Z
+                        //
+                        // iOS compass-calibrated 'alpha' fix
+                        // see: http://lists.w3.org/Archives/Public/public-geolocation/2011Jul/0014.html
+                        //
+                        compassHeading = this.deviceOrientation.webkitCompassHeading || this.deviceOrientation.compassHeading;
+                        if ( compassHeading ) {
+
+                                // Switch compassHeading back to 'alpha' representation
+                                fixedAlpha = 360 - compassHeading;
+
+                        } else {
+
+                                fixedAlpha = this.deviceOrientation.alpha || 0;
+
+                        }
+
+                        alpha  = THREE.Math.degToRad( fixedAlpha );                                                      // Z
 			beta   = this.deviceOrientation.beta  ? THREE.Math.degToRad( this.deviceOrientation.beta  ) : 0; // X'
 			gamma  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.gamma ) : 0; // Y''
 			orient = this.screenOrientation       ? THREE.Math.degToRad( this.screenOrientation       ) : 0; // O
