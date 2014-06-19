@@ -63,19 +63,12 @@
 
 				scene = new THREE.Scene();
 
-				var sprite = document.createElement( 'img' );
-				sprite.addEventListener( 'load', function ( event ) {
+				var image = document.createElement( 'img' );
+				image.addEventListener( 'load', function ( event ) {
 
-					for ( var i = 0, j = 0; i < particlesTotal; i ++, j += 3 ) {
+					for ( var i = 0; i < particlesTotal; i ++ ) {
 
-						var canvas = document.createElement( 'canvas' );
-						canvas.width = sprite.width;
-						canvas.height = sprite.height;
-
-						var context = canvas.getContext( '2d' );
-						context.drawImage( sprite, 0, 0 );
-
-						var object = new THREE.CSS3DSprite( canvas );
+						var object = new THREE.CSS3DSprite( image.cloneNode() );
 						object.position.x = Math.random() * 4000 - 2000,
 						object.position.y = Math.random() * 4000 - 2000,
 						object.position.z = Math.random() * 4000 - 2000
@@ -88,7 +81,7 @@
 					transition();
 
 				}, false );
-				sprite.src = 'textures/sprite.png';
+				image.src = 'textures/sprite.png';
 
 				// Plane
 
