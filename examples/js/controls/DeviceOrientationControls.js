@@ -29,24 +29,18 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	};
 
-	this.update = function() {
+	this.update = function () {
 
-		var alpha, beta, gamma;
+		if ( this.freeze ) return;
 
-		return function () {
+		var alpha  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.alpha ) : 0; // Z
+		var beta   = this.deviceOrientation.beta  ? THREE.Math.degToRad( this.deviceOrientation.beta  ) : 0; // X'
+		var gamma  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.gamma ) : 0; // Y''
+		var orient = this.screenOrientation       ? THREE.Math.degToRad( this.screenOrientation       ) : 0; // O
 
-			if ( this.freeze ) return;
+		setObjectQuaternion( this.object.quaternion, alpha, beta, gamma, orient );
 
-			alpha  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.alpha ) : 0; // Z
-			beta   = this.deviceOrientation.beta  ? THREE.Math.degToRad( this.deviceOrientation.beta  ) : 0; // X'
-			gamma  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.gamma ) : 0; // Y''
-			orient = this.screenOrientation       ? THREE.Math.degToRad( this.screenOrientation       ) : 0; // O
-
-			setObjectQuaternion( this.object.quaternion, alpha, beta, gamma, orient );
-
-		}
-
-	}();
+	};
 
 	function bind( scope, fn ) {
 
