@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - geometry - hierarchy</title>
+		<title>three.js canvas - effects - stereo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -17,6 +17,7 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/effects/StereoEffect.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -27,6 +28,8 @@
 			var camera, scene, renderer;
 
 			var geometry, group;
+
+			var effect;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -74,6 +77,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				effect = new THREE.StereoEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
@@ -95,6 +101,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -127,7 +134,7 @@
 				group.rotation.y = Math.sin( currentSeconds * 0.0003 ) * 0.5;
 				group.rotation.z = Math.sin( currentSeconds * 0.0002 ) * 0.5;
 
-				renderer.render( scene, camera );
+				effect.render( scene, camera );
 
 			}
 
