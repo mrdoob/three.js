@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - effects - crosseyed</title>
+		<title>three.js webgl - effects - stereo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -34,13 +34,12 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - effects - crosseyed. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>
-			- O, P : change eye separation
+			<a href="http://threejs.org" target="_blank">three.js</a> - effects - stereo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/effects/CrosseyedEffect.js"></script>
+		<script src="js/effects/StereoEffect.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -74,8 +73,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
-
-				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -127,11 +124,10 @@
 				renderer = new THREE.WebGLRenderer();
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.CrosseyedEffect( renderer );
+				effect = new THREE.StereoEffect( renderer );
+				effect.separation = 10;
+				effect.targetDistance = 200;
 				effect.setSize( window.innerWidth, window.innerHeight );
-				effect.separation = 90;
-
-				document.addEventListener( 'keydown', onKeyDown, false );
 
 				//
 
@@ -158,22 +154,6 @@
 
 			}
 
-			function onKeyDown ( event ) {
-
-				switch( event.keyCode ) {
-
-					/* O */
-					case 79: effect.separation -= 0.5; break;
-
-					/* P */
-					case 80: effect.separation += 0.5; break;
-
-				}
-
-				console.log( effect.separation );
-
-			};
-
 			//
 
 			function animate() {
@@ -190,6 +170,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( scene.position );
 
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 

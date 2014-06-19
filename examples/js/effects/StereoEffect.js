@@ -1,22 +1,22 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @authod mrdoob / http://mrdoob.com/
  */
 
-THREE.CrosseyedEffect = function ( renderer ) {
+THREE.StereoEffect = function ( renderer ) {
 
 	// API
 
-	this.separation = 10;
+	this.separation = 6;
+	this.targetDistance = 100;
 
 	// internals
 
 	var _width, _height;
 
 	var _cameraL = new THREE.PerspectiveCamera();
-	_cameraL.target = new THREE.Vector3();
-
 	var _cameraR = new THREE.PerspectiveCamera();
-	_cameraR.target = new THREE.Vector3();
+	var _target = new THREE.Vector3();
 
 	// initialization
 
@@ -33,33 +33,37 @@ THREE.CrosseyedEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
+		_target.set( 0, 0, - this.targetDistance );
+		_target.applyQuaternion( camera.quaternion );
+		_target.add( camera.position );
+
 		// left
 
 		_cameraL.fov = camera.fov;
 		_cameraL.aspect = 0.5 * camera.aspect;
-		_cameraL.near = camera.near;
-		_cameraL.far = camera.far;
 		_cameraL.updateProjectionMatrix();
 
+		_cameraL.near = camera.near;
+		_cameraL.far = camera.far;
+
 		_cameraL.position.copy( camera.position );
-		_cameraL.target.copy( camera.target );
-		_cameraL.translateX( this.separation );
-		_cameraL.lookAt( _cameraL.target );
+		_cameraL.translateX( - this.separation );
+		_cameraL.lookAt( _target );
 
 		// right
+
+		_cameraR.projectionMatrix = _cameraL.projectionMatrix;
 
 		_cameraR.near = camera.near;
 		_cameraR.far = camera.far;
 
-		_cameraR.projectionMatrix = _cameraL.projectionMatrix;
-
 		_cameraR.position.copy( camera.position );
-		_cameraR.target.copy( camera.target );
-		_cameraR.translateX( - this.separation );
-		_cameraR.lookAt( _cameraR.target );
+		_cameraR.translateX( this.separation );
+		_cameraR.lookAt( _target );
 
 		//
 
+		renderer.setViewport( 0, 0, _width * 2, _height );
 		renderer.clear();
 
 		renderer.setViewport( 0, 0, _width, _height );
