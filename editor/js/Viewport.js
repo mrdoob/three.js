@@ -578,6 +578,7 @@ var Viewport = function ( editor ) {
 	}
 
 	var vrstate = new vr.State();
+	var vrCamera = camera;
 	// var riftCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 	// riftCamera.position.fromArray( editor.config.getKey( 'camera' ).position );
 	// riftCamera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
@@ -589,8 +590,11 @@ var Viewport = function ( editor ) {
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		if (vrRenderer) {
-			animate();
+		if (riftRenderer) {
+			polled = vr.pollState(vrstate);
+			// Poll VR, if it's ready.
+			riftRenderer.render(scene, vrCamera, polled ? vrstate : null);
+
 		} else {
 
 			renderer.clear();
@@ -603,18 +607,29 @@ var Viewport = function ( editor ) {
 			}
 
 		}
+
 		function animate() {
 			polled = vr.pollState(vrstate);
-			riftRenderer.render( scene, camera, polled ? vrstate : null );
+			vrRenderer.render( scene, vrCamera, polled ? vrstate : null );
 			vr.requestAnimationFrame(render);
 		}
 	}
 
 	var riftRenderer;
 	var rendererDevicePixelRatio;
+	var riftCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 
 	container.startRiftMode = function() {
 		if (!riftRenderer) {
+			riftCamera.position.copy(camera.position);
+			vrCamera = camera;
+			if (editor.avatar) {
+				//riftCamera.position.copy( editor.avatar.position );
+				editor.avatar.add(riftCamera);
+				riftCamera.position.set(0, 0, 100);
+				vrCamera = riftCamera;
+				//avatarCamera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
+			}
 			renderer.domElement.classList.add('fullscreen');
 			rendererDevicePixelRatio = renderer.devicePixelRatio;
 			renderer.devicePixelRatio = 1;

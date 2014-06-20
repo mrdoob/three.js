@@ -38,7 +38,7 @@ Menubar.Edit = function ( editor ) {
 	function onConvertOptionClick () {
 
 		// convert to BufferGeometry
-		
+
 		var object = editor.selected;
 		if ( object.geometry instanceof THREE.Geometry ) {
 
@@ -78,6 +78,13 @@ Menubar.Edit = function ( editor ) {
 
 	}
 
+	function onResetSceneOptionClick() {
+		window.indexedDB.deleteDatabase('threejs-editor').onsuccess = function() {
+			console.log("Scene Removed in indexedDB");
+		}
+		localStorage.removeItem('threejs-editor');
+	}
+
 	// configure menu contents
 
 	var createOption = UI.MenubarHelper.createOption;
@@ -93,9 +100,12 @@ Menubar.Edit = function ( editor ) {
 		createDivider(),
 
 		createOption( 'Convert', onConvertOptionClick ),
-		createOption( 'Flatten', onFlattenOptionClick )
-	];
+		createOption( 'Flatten', onFlattenOptionClick ),
+		createDivider(),
 
+		createOption( 'Reset Scene', onResetSceneOptionClick ),
+
+	];
 	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
 	return UI.MenubarHelper.createMenuContainer( 'Edit', optionsPanel );
