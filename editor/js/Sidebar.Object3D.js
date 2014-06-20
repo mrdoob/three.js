@@ -232,8 +232,16 @@ Sidebar.Object3D = function ( editor ) {
 
 				var scale = objectScaleX.getValue() / object.scale.x;
 
-				objectScaleY.setValue( objectScaleY.getValue() * scale );
-				objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+				if ( Math.abs( scale ) < 1e-300 ) {
+
+					objectScaleX.setValue( object.scale.x );
+
+				} else {
+
+					objectScaleY.setValue( objectScaleY.getValue() * scale );
+					objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+
+				}
 
 			}
 
@@ -257,8 +265,16 @@ Sidebar.Object3D = function ( editor ) {
 
 				var scale = objectScaleY.getValue() / object.scale.y;
 
-				objectScaleX.setValue( objectScaleX.getValue() * scale );
-				objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+				if ( Math.abs( scale ) < 1e-300 ) {
+
+					objectScaleY.setValue( object.scale.y );
+
+				} else {
+
+					objectScaleX.setValue( objectScaleX.getValue() * scale );
+					objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+
+				}
 
 			}
 
@@ -282,8 +298,16 @@ Sidebar.Object3D = function ( editor ) {
 
 				var scale = objectScaleZ.getValue() / object.scale.z;
 
-				objectScaleX.setValue( objectScaleX.getValue() * scale );
-				objectScaleY.setValue( objectScaleY.getValue() * scale );
+				if ( Math.abs( scale ) < 1e-300 ) {
+
+					objectScaleZ.setValue( object.scale.z );
+
+				} else {
+
+					objectScaleX.setValue( objectScaleX.getValue() * scale );
+					objectScaleY.setValue( objectScaleY.getValue() * scale );
+
+				}
 
 			}
 
