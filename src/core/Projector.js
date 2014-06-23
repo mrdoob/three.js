@@ -82,7 +82,7 @@ THREE.Projector = function () {
 
 	var projectObject = function ( object ) {
 
-		if ( object.visible === false ) return;
+		if ( object.visibleWorld === false ) return;
 
 		if ( object instanceof THREE.Light ) {
 
@@ -312,7 +312,7 @@ THREE.Projector = function () {
 
 		_renderData.elements.length = 0;
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorldAndVisibleWorld();
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );

@@ -62,6 +62,7 @@ THREE.Object3D = function () {
 	this.matrixWorldNeedsUpdate = false;
 
 	this.visible = true;
+	this.visibleWorld = true;
 
 	this.castShadow = false;
 	this.receiveShadow = false;
@@ -457,7 +458,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld: function ( force, updateChildren ) {
 
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
@@ -480,13 +481,56 @@ THREE.Object3D.prototype = {
 		}
 
 		// update children
+		
+		if (updateChildren === false) { 
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-			this.children[ i ].updateMatrixWorld( force );
+				this.children[ i ].updateMatrixWorld( force, updateChildren );
 
+			}
+			
+		}
+		
+	},
+	
+	updateVisibleWorld: function ( updateChildren ) {
+
+		if ( this.parent === undefined ) {
+			
+			this.visibleWorld = this.visible;
+			
+		} else {
+
+			this.visibleWorld = this.parent.visibleWorld && this.visible;
+			
 		}
 
+		// update children
+		
+		if (updateChildren === false) { 
+			
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+				this.children[ i ].updateVisibleWorld( updateChildren );
+
+			}
+			
+		}
+
+	},
+	
+	updateMatrixWorldAndVisibleWorld: function ( force ) {
+		
+		this.updateMatrixWorld( force , false );
+		this.updateVisibleWorld( false );
+		
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].updateMatrixWorldAndVisibleWorld( force );
+
+		};
+		
 	},
 
 	clone: function ( object, recursive ) {

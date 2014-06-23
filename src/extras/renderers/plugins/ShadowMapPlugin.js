@@ -239,7 +239,7 @@ THREE.ShadowMapPlugin = function () {
 
 				webglObject.render = false;
 
-				if ( object.visible && object.castShadow ) {
+				if ( object.visibleWorld && object.castShadow ) {
 
 					if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
@@ -323,7 +323,7 @@ THREE.ShadowMapPlugin = function () {
 				webglObject = renderList[ j ];
 				object = webglObject.object;
 
-				if ( object.visible && object.castShadow ) {
+				if ( object.visibleWorld && object.castShadow ) {
 
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
