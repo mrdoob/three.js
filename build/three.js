@@ -31270,8 +31270,6 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	shapes = shapes instanceof Array ? shapes : [ shapes ];
 
-	this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
-
 	this.addShapeList( shapes, options );
 
 	this.computeFaceNormals();
@@ -31319,11 +31317,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	// Use default WorldUVGenerator if no UV generators are specified.
 	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
-
-	var shapebb = this.shapebb;
-	//shapebb = shape.getBoundingBox();
-
-
 
 	var splineTube, binormal, normal, position2;
 	if ( extrudePath ) {
@@ -31962,8 +31955,6 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	if ( shapes instanceof Array === false ) shapes = [ shapes ];
 
-	this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
-
 	this.addShapeList( shapes, options );
 
 	this.computeFaceNormals();
@@ -31997,8 +31988,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var material = options.material;
 	var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
-
-	var shapebb = this.shapebb;
 
 	//
 
