@@ -82,7 +82,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		function meshN( meshName, materialName ) {
 
-			if ( vertices.length > 0 ) {
+			if ( geometry.faces.length > 0 ) {
 
 				geometry.vertices = vertices;
 
