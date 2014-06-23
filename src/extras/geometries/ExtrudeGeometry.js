@@ -35,8 +35,6 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	shapes = shapes instanceof Array ? shapes : [ shapes ];
 
-	this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
-
 	this.addShapeList( shapes, options );
 
 	this.computeFaceNormals();
@@ -84,11 +82,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	// Use default WorldUVGenerator if no UV generators are specified.
 	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
-
-	var shapebb = this.shapebb;
-	//shapebb = shape.getBoundingBox();
-
-
 
 	var splineTube, binormal, normal, position2;
 	if ( extrudePath ) {
