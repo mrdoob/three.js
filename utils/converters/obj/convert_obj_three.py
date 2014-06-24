@@ -362,7 +362,14 @@ def parse_mtl(fname):
 
     materials = {}
 
+    previous_line = ""
     for line in fileinput.input(fname):
+        line = previous_line + line
+        if line[-2:-1] == '\\':
+            previous_line = line[:-2]
+            continue
+        previous_line = ""
+
         chunks = line.split()
         if len(chunks) > 0:
 
@@ -505,7 +512,14 @@ def parse_obj(fname):
     object = 0
     smooth = 0
 
+    previous_line = ""
     for line in fileinput.input(fname):
+        line = previous_line + line
+        if line[-2:-1] == '\\':
+            previous_line = line[:-2]
+            continue
+        previous_line = ""
+
         chunks = line.split()
         if len(chunks) > 0:
 
