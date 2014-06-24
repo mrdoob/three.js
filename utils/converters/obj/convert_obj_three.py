@@ -363,8 +363,13 @@ def parse_mtl(fname):
     materials = {}
 
     for line in fileinput.input(fname):
-        chunks = line.split()
+        # Only split once initially for single-parameter tags that might have additional spaces in
+        # their values (i.e. "newmtl Material with spaces").
+        chunks = line.split(None, 1)
         if len(chunks) > 0:
+
+            if len(chunks) > 1:
+                chunks[1] = chunks[1].strip()
 
             # Material start
             # newmtl identifier
@@ -375,6 +380,35 @@ def parse_mtl(fname):
                     identifier = ""
                 if not identifier in materials:
                     materials[identifier] = {}
+
+            # Diffuse texture
+            # map_Kd texture_diffuse.jpg
+            if chunks[0] == "map_Kd" and len(chunks) == 2:
+                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
+
+            # Ambient texture
+            # map_Ka texture_ambient.jpg
+            if chunks[0] == "map_Ka" and len(chunks) == 2:
+                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
+
+            # Specular texture
+            # map_Ks texture_specular.jpg
+            if chunks[0] == "map_Ks" and len(chunks) == 2:
+                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
+
+            # Alpha texture
+            # map_d texture_alpha.png
+            if chunks[0] == "map_d" and len(chunks) == 2:
+                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
+
+            # Bump texture
+            # map_bump texture_bump.jpg or bump texture_bump.jpg
+            if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
+                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
+
+            # Split the remaining parameters.
+            if len(chunks) > 1:
+                chunks = [chunks[0]] + chunks[1].split()
 
             # Diffuse color
             # Kd 1.000 1.000 1.000
@@ -409,31 +443,6 @@ def parse_mtl(fname):
             # Ni 1.0
             if chunks[0] == "Ni" and len(chunks) == 2:
                 materials[identifier]["opticalDensity"] = float(chunks[1])
-
-            # Diffuse texture
-            # map_Kd texture_diffuse.jpg
-            if chunks[0] == "map_Kd" and len(chunks) == 2:
-                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
-
-            # Ambient texture
-            # map_Ka texture_ambient.jpg
-            if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
-
-            # Specular texture
-            # map_Ks texture_specular.jpg
-            if chunks[0] == "map_Ks" and len(chunks) == 2:
-                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
-
-            # Alpha texture
-            # map_d texture_alpha.png
-            if chunks[0] == "map_d" and len(chunks) == 2:
-                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
-
-            # Bump texture
-            # map_bump texture_bump.jpg or bump texture_bump.jpg
-            if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
-                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
 
             # Illumination
             # illum 2
@@ -506,8 +515,42 @@ def parse_obj(fname):
     smooth = 0
 
     for line in fileinput.input(fname):
-        chunks = line.split()
+        # Only split once initially for single-parameter tags that might have additional spaces in
+        # their values (i.e. "usemtl Material with spaces").
+        chunks = line.split(None, 1)
         if len(chunks) > 0:
+
+            if len(chunks) > 1:
+                chunks[1] = chunks[1].strip()
+
+            # Group
+            if chunks[0] == "g" and len(chunks) == 2:
+                group = chunks[1]
+
+            # Object
+            if chunks[0] == "o" and len(chunks) == 2:
+                object = chunks[1]
+
+            # Materials definition
+            if chunks[0] == "mtllib" and len(chunks) == 2:
+                mtllib = chunks[1]
+
+            # Material
+            if chunks[0] == "usemtl":
+                if len(chunks) > 1:
+                    material = chunks[1]
+                else:
+                    material = ""
+                if not material in materials:
+                    mcurrent = mcounter
+                    materials[material] = mcounter
+                    mcounter += 1
+                else:
+                    mcurrent = materials[material]
+
+            # Split the remaining parameters.
+            if len(chunks) > 1:
+                chunks = [chunks[0]] + chunks[1].split()
 
             # Vertices as (x,y,z) coordinates
             # v 0.123 0.234 0.345
@@ -572,31 +615,6 @@ def parse_obj(fname):
                     'object':object,
                     'smooth':smooth,
                     })
-
-            # Group
-            if chunks[0] == "g" and len(chunks) == 2:
-                group = chunks[1]
-
-            # Object
-            if chunks[0] == "o" and len(chunks) == 2:
-                object = chunks[1]
-
-            # Materials definition
-            if chunks[0] == "mtllib" and len(chunks) == 2:
-                mtllib = chunks[1]
-
-            # Material
-            if chunks[0] == "usemtl":
-                if len(chunks) > 1:
-                    material = chunks[1]
-                else:
-                    material = ""
-                if not material in materials:
-                    mcurrent = mcounter
-                    materials[material] = mcounter
-                    mcounter += 1
-                else:
-                    mcurrent = materials[material]
 
             # Smooth shading
             if chunks[0] == "s" and len(chunks) == 2:
