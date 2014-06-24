@@ -34,6 +34,9 @@ function main() {
 
 	var buffer = [];
 	var sources = [];
+		
+	buffer.push('// You shouldn\'t edit this build file. \n');
+	buffer.push('// The following source code is build from the src folder. \n');
 	
 	if ( args.amd ){
 		buffer.push('function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
@@ -49,9 +52,7 @@ function main() {
 			var file = '../../' + files[ j ];
 			
 			sources.push( file );
-			buffer.push('// You shouldn\'t edit this build file. \n');
-			buffer.push('// The following source code should be edited in \n');
-			buffer.push('// ' + files[ j ]);
+			buffer.push('// File:' + files[ j ]);
 			buffer.push('\n\n');
 			buffer.push( fs.readFileSync( file, 'utf8' ) );
 			buffer.push('\n');
