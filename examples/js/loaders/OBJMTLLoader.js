@@ -94,7 +94,6 @@ THREE.OBJMTLLoader.prototype = {
 
 				geometry = new THREE.Geometry();
 				mesh = new THREE.Mesh( geometry, material );
-				verticesCount = 0;
 
 			}
 
@@ -119,7 +118,6 @@ THREE.OBJMTLLoader.prototype = {
 		var mesh = new THREE.Mesh( geometry, material );
 
 		var vertices = [];
-		var verticesCount = 0;
 		var normals = [];
 		var uvs = [];
 
