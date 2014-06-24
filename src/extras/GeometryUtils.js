@@ -83,14 +83,86 @@ THREE.GeometryUtils = {
 		return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 	},
+	
+	// Get random point in segment
+	// (uniform distribution)
+	
+	randomPointInSegment: function ( v1, v2 ){
+	var t, p = new THREE.Vector3();
+	t = THREE.GeometryUtils.random();
+	
+	return		p.copy(v2).subSelf(v1).multiplyScalar(t).addSelf(v1);
+	
+	},
+
+	// Get random points in perimeter weighted by segment length
+	// (uniform distribution)
+	
+	randomPointInPerimeter: function ( face, geometry ) {
+
+		var vA, vB, vC, vD;
+		var r, a, b, c, d=0,
+			tmp = THREE.GeometryUtils.__v1;
+		
+		if ( face instanceof THREE.Face3 ) {
+
+			vA = geometry.vertices[ face.a ];
+			vB = geometry.vertices[ face.b ];
+			vC = geometry.vertices[ face.c ];
+			
+			tmp.sub( vA, vB );
+			a = tmp.length();
+
+			tmp.sub( vB, vC );
+			b = tmp.length() + a;
+
+			tmp.sub( vC, vA );
+			c = tmp.length() + b;
+			
+			r = THREE.GeometryUtils.random() * c;
+			
+			if(r < a) 		return	THREE.GeometryUtils.randomPointInSegment(vA, vB);
+			else if(r< b) 	return 	THREE.GeometryUtils.randomPointInSegment(vB, vC);
+			else 			return 	THREE.GeometryUtils.randomPointInSegment(vC, vA);
+
+		} else if ( face instanceof THREE.Face4 ) {
+
+			vA = geometry.vertices[ face.a ];
+			vB = geometry.vertices[ face.b ];
+			vC = geometry.vertices[ face.c ];
+			vD = geometry.vertices[ face.d ];
+			
+			tmp.sub( vA, vB );
+			a = tmp.length();
+
+			tmp.sub( vB, vC );
+			b = tmp.length() + a;
+
+			tmp.sub( vC, vD );
+			c = tmp.length() + b;
+			
+			tmp.sub( vD, vA );
+			d = tmp.length() + c;
+			
+			r = THREE.GeometryUtils.random() * d;
+			
+			if(r < a) 		return 	THREE.GeometryUtils.randomPointInSegment(vA, vB);
+			else if(r< b) 	return 	THREE.GeometryUtils.randomPointInSegment(vB, vC);
+			else if(r<c)	return 	THREE.GeometryUtils.randomPointInSegment(vC, vD);
+			else 			return 	THREE.GeometryUtils.randomPointInSegment(vD, vA);
+			
+		}
+		
+	},
 
 	// Get uniformly distributed random points in mesh
-	// 	- create array with cumulative sums of face areas
+	//  - create array with cumulative sums of face areas
 	//  - pick random number from 0 to total area
 	//  - find corresponding place in area array by binary search
-	//	- get random point in face
+	//  - get random point in face if primary dimension n1 is passed
+	//  - get random point in wireframe if secondary dimension n2 is passed
 
-	randomPointsInGeometry: function ( geometry, n ) {
+	randomPointsInGeometry: function ( geometry, n1, n2 ) {
 
 		var face, i,
 			faces = geometry.faces,
@@ -160,13 +232,33 @@ THREE.GeometryUtils = {
 
 		var stats = {};
 
-		for ( i = 0; i < n; i ++ ) {
+		for ( i = 0; i < n1; i ++ ) {
 
 			r = THREE.Math.random16() * totalArea;
 
 			index = binarySearchIndices( r );
 
 			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
+
+			if ( ! stats[ index ] ) {
+
+				stats[ index ] = 1;
+
+			} else {
+
+				stats[ index ] += 1;
+
+			}
+
+		}
+
+		for ( i = n1; i < (n1+n2); i ++ ) {
+	
+			r = THREE.GeometryUtils.random() * totalArea;
+
+			index = binarySearchIndices( r );
+
+			result[ i ] = THREE.GeometryUtils.randomPointInPerimeter( faces[ index ], geometry );
 
 			if ( ! stats[ index ] ) {
 
