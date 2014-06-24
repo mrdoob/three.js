@@ -32,8 +32,16 @@ THREE.FontUtils = {
 	divisions : 10,
 
 	getFace : function() {
-
-		return this.faces[ this.face ][ this.weight ][ this.style ];
+		
+		try {
+			
+			return this.faces[ this.face ][ this.weight ][ this.style ];
+			
+		} catch (e) {
+			
+			throw "The font " + this.face + " with " + this.weight + " weight and " + this.style + " style is missing."
+			 
+		};
 
 	},
 
