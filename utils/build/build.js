@@ -47,8 +47,14 @@ function main() {
 		for ( var j = 0; j < files.length; j ++ ){
 
 			var file = '../../' + files[ j ];
+			
 			sources.push( file );
+			buffer.push('// You shouldn\'t edit this build file. \n');
+			buffer.push('// The following source code should be edited in \n');
+			buffer.push('// ' + files[ j ]);
+			buffer.push('\n\n');
 			buffer.push( fs.readFileSync( file, 'utf8' ) );
+			buffer.push('\n');
 
 		}
 
