@@ -297,10 +297,22 @@ THREE.Object3D.prototype = {
 
 	add: function ( object ) {
 
+		if ( arguments.length > 1 ) {
+
+			for ( var i = 0; i < arguments.length; i++ ) {
+
+				this.add( arguments[ i ] );
+
+			}
+
+			return this;
+
+		};
+
 		if ( object === this ) {
 
 			console.warn( "THREE.Object3D.add: An object can't be added as a child of itself." );
-			return;
+			return this;
 
 		}
 
@@ -334,6 +346,8 @@ THREE.Object3D.prototype = {
 			}
 
 		}
+
+		return this;
 
 	},
 
