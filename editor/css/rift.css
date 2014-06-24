@@ -1,0 +1,43 @@
+.Button.Rift {
+  border: 1px solid #4cae4c;
+  color: white;
+  background-color: #5CB85C;
+  display: inline-block;
+  margin-bottom: 0px;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857;
+  border-radius: 4px;
+  -moz-user-select: none;
+}
+
+.Button.Rift:hover {
+  background-color:#47a447;
+  border-color:#398439;
+}
+
+.Button.Rift:active{
+  outline:0;
+  background-image:none;
+  -webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);
+  box-shadow:inset 0 3px 5px rgba(0,0,0,.125)
+}
+
+.Button.Rift:focus {
+  outline: none;
+}
+
+#viewport canvas.fullscreen{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1280px !important;
+  height: 800px !important;
+  z-index: 1000;
+}

@@ -51,7 +51,7 @@ Menubar.Add = function ( editor ) {
 		editor.select( mesh );
 
 	}
-	
+
 	function onCircleOptionClick () {
 
 		var radius = 20;
@@ -148,6 +148,21 @@ Menubar.Add = function ( editor ) {
 		editor.select( mesh );
 
 	}
+
+	 	function onAvatarOptionClick () {
+	 		if (editor.avatar) {
+	 			return;
+	 		}
+			var manager = new THREE.LoadingManager();
+			var loader = new THREE.OBJLoader( manager );
+			loader.load( '../examples/obj/male02/male02.obj', function ( object ) {
+				editor.avatar = object;
+				editor.addObject( object );
+				editor.select( object );
+
+			} );
+
+		}
 
 	function onSpriteOptionClick () {
 
@@ -253,6 +268,7 @@ Menubar.Add = function ( editor ) {
 		createOption( 'Icosahedron', onIcosahedronOptionClick ),
 		createOption( 'Torus', onTorusOptionClick ),
 		createOption( 'Torus Knot', onTorusKnotOptionClick ),
+		createOption( 'Avatar', onAvatarOptionClick ),
 		createDivider(),
 
 		createOption( 'Sprite', onSpriteOptionClick  ),

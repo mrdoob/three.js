@@ -19,6 +19,20 @@ var Viewport = function ( editor ) {
 
 	var objects = [];
 
+	function startVR() {
+		if (!vr.isInstalled()) {
+			//statusEl.innerText = 'NPVR plugin not installed!';
+			alert('NPVR plugin not installed!');
+		}
+		vr.load(function(error) {
+				if (error) {
+					alert('Plugin load failed: ' + error.toString());
+				}
+		});
+	}
+
+	startVR();
+
 	// helpers
 
 	var grid = new THREE.GridHelper( 500, 25 );
@@ -194,7 +208,7 @@ var Viewport = function ( editor ) {
 				break;
 
 		}
-		
+
 		renderer.setClearColor( clearColor );
 
 		render();
@@ -228,7 +242,6 @@ var Viewport = function ( editor ) {
 		renderer.autoUpdateScene = false;
 		renderer.setClearColor( clearColor );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
-
 		container.dom.appendChild( renderer.domElement );
 
 		render();
@@ -430,16 +443,16 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.playAnimations.add( function (animations) {
-		
+
 		function animate() {
 
 			requestAnimationFrame( animate );
-			
+
 			for ( var i = 0; i < animations.length ; i ++ ) {
 
 				animations[i].update(0.016);
 
-			} 
+			}
 
 			render();
 		}
@@ -461,6 +474,7 @@ var Viewport = function ( editor ) {
 		if ( System.support.webgl === true ) {
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			container.renderer = renderer;
 
 		} else {
 
@@ -475,8 +489,6 @@ var Viewport = function ( editor ) {
 	container.dom.appendChild( renderer.domElement );
 
 	animate();
-
-	//
 
 	function updateInfo() {
 
@@ -565,20 +577,75 @@ var Viewport = function ( editor ) {
 
 	}
 
+	var vrstate = new vr.State();
+	var vrCamera = camera;
+	// var riftCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+	// riftCamera.position.fromArray( editor.config.getKey( 'camera' ).position );
+	// riftCamera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
+
 	function render() {
 
+		var polled;
+		var vrRenderer = riftRenderer;
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		renderer.clear();
-		renderer.render( scene, camera );
+		if (riftRenderer) {
+			polled = vr.pollState(vrstate);
+			// Poll VR, if it's ready.
+			riftRenderer.render(scene, vrCamera, polled ? vrstate : null);
 
-		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+		} else {
 
-			renderer.render( sceneHelpers, camera );
+			renderer.clear();
+			renderer.render( scene, camera );
+
+			if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+
+				renderer.render( sceneHelpers, camera );
+
+			}
 
 		}
 
+		function animate() {
+			polled = vr.pollState(vrstate);
+			vrRenderer.render( scene, vrCamera, polled ? vrstate : null );
+			vr.requestAnimationFrame(render);
+		}
+	}
+
+	var riftRenderer;
+	var rendererDevicePixelRatio;
+	var riftCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+
+	container.startRiftMode = function() {
+		if (!riftRenderer) {
+			riftCamera.position.copy(camera.position);
+			vrCamera = camera;
+			if (editor.avatar) {
+				//riftCamera.position.copy( editor.avatar.position );
+				editor.avatar.add(riftCamera);
+				riftCamera.position.set(0, 0, 100);
+				vrCamera = riftCamera;
+				//avatarCamera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
+			}
+			renderer.domElement.classList.add('fullscreen');
+			rendererDevicePixelRatio = renderer.devicePixelRatio;
+			renderer.devicePixelRatio = 1;
+			riftRenderer = new THREE.OculusRiftEffect(renderer);
+		}
+		render();
+	}
+
+	container.stopRiftMode = function() {
+		if (riftRenderer) {
+			renderer.domElement.classList.remove('fullscreen');
+			renderer.devicePixelRatio = rendererDevicePixelRatio;
+			riftRenderer = undefined;
+			renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		}
+		render();
 	}
 
 	return container;
