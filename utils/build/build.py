@@ -5,7 +5,7 @@ import sys
 if sys.version_info < (2, 7):
 	print("This script requires at least Python 2.7.")
 	print("Please, update to a newer version: http://www.python.org/download/releases/")
-	exit()
+#	exit()
 
 import argparse
 import json
@@ -44,7 +44,10 @@ def main(argv=None):
 	fd, path = tempfile.mkstemp()
 	tmp = open(path, 'w')
 	sources = []
-
+	
+	tmp.write('// You shouldn\'t edit this build file. \n')
+	tmp.write('// The following source code is build from the src folder. \n')
+	
 	if args.amd:
 		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
@@ -52,6 +55,8 @@ def main(argv=None):
 		with open('includes/' + include + '.json','r') as f:
 			files = json.load(f)
 		for filename in files:
+			tmp.write('// File:' + filename)
+			tmp.write('\n\n')
 			filename = '../../' + filename;
 			sources.append(filename)
 			with open(filename, 'r') as f:
