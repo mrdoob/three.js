@@ -353,6 +353,16 @@ THREE.Object3D.prototype = {
 
 	remove: function ( object ) {
 
+		if ( arguments.length > 1 ) {
+
+			for ( var i = 0; i < arguments.length; i++ ) {
+
+				this.remove( arguments[ i ] );
+
+			}
+
+		};
+
 		var index = this.children.indexOf( object );
 
 		if ( index !== - 1 ) {
