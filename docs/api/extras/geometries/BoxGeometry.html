@@ -11,34 +11,57 @@
 		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">BoxGeometry is the quadrilateral primitive geometry class. It is typically used for creating a cube or cuboid with the dimensions provided in the 'width', 'height', and 'depth' constructor arguments.</div>
 
 		<h2>Example</h2>
 
-		<code>todo</code>
+		<code>var material = new THREE.MeshBasicMaterial({
+			color: 0x0000ff
+		});
+
+		var width = 5,
+			height = 5,
+			depth = 5;
+
+		var boxGeometry = new THREE.BoxGeometry( width, height, depth );
+		var box = new THREE.Mesh( boxGeometry, material );
+		scene.add( box );
+		</code>
+
 
 		<h2>Constructor</h2>
 
-
-		<h3>todo</h3>
-		<div></div>
+		<h3>[name]([page:Float width], [page:Float height], [page:Float depth], [page:Integer widthSegments], [page:Integer heightSegments], [page:Integer depthSegments])</h3>
+		<div>
+		width - width of the box
+		height - height of the box
+		depth - depth of the box
+		widthSegments - number of width-wise segments (default 1)
+		heightSegments - number of height-wise segments (default 1)
+		depthSegments - number of depth-wise segments (default 1)
+		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>todo</h3>
+		<h3>parameters</h3>
 		<div>
-		todo
+		the parameters property contains the original arguments passed to the constructor.
 		</div> 
 
-
-		<h2>Methods</h2>
-		
-
-		<h3>todo</h3>
-		<div>todo</div>
+		<h3>widthSegments</h3>
 		<div>
-		todo
+		the number of width-wise segments of the geometry
+		</div>
+
+		<h3>heightSegments</h3>
+		<div>
+		the number of height-wise segments of the geometry
+		</div>
+
+		<h3>depthSegments</h3>
+		<div>
+		the number of depth-wise segments of the geometry
 		</div>
 		
 		<h2>Source</h2>
