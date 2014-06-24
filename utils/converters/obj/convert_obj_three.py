@@ -362,7 +362,14 @@ def parse_mtl(fname):
 
     materials = {}
 
+    previous_line = ""
     for line in fileinput.input(fname):
+        line = previous_line + line
+        if line[-2:-1] == '\\':
+            previous_line = line[:-2]
+            continue
+        previous_line = ""
+
         # Only split once initially for single-parameter tags that might have additional spaces in
         # their values (i.e. "newmtl Material with spaces").
         chunks = line.split(None, 1)
@@ -514,7 +521,14 @@ def parse_obj(fname):
     object = 0
     smooth = 0
 
+    previous_line = ""
     for line in fileinput.input(fname):
+        line = previous_line + line
+        if line[-2:-1] == '\\':
+            previous_line = line[:-2]
+            continue
+        previous_line = ""
+
         # Only split once initially for single-parameter tags that might have additional spaces in
         # their values (i.e. "usemtl Material with spaces").
         chunks = line.split(None, 1)
