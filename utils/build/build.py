@@ -52,6 +52,10 @@ def main(argv=None):
 		with open('includes/' + include + '.json','r') as f:
 			files = json.load(f)
 		for filename in files:
+			tmp.write('// You shouldn\'t edit this build file. \n')
+			tmp.write('// The following source code should be edited in \n')
+			tmp.write('// ' + filename)
+			tmp.write('\n\n')
 			filename = '../../' + filename;
 			sources.append(filename)
 			with open(filename, 'r') as f:
