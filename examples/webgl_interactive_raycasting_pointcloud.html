@@ -106,7 +106,7 @@
 			
 				var geometry = generatePointCloudGeometry( color, width, length );
 				
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: true } );
+				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 				var pointcloud = new THREE.PointCloud( geometry, material );
 				
 				return pointcloud;
@@ -134,7 +134,7 @@
 				
 				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 				
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: true } );
+				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 				var pointcloud = new THREE.PointCloud( geometry, material );
 				
 				return pointcloud;
@@ -165,7 +165,7 @@
 				var offset = { start: 0, count: indices.length, index: 0 };
 				geometry.offsets.push( offset );
 				
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: true } );
+				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 				var pointcloud = new THREE.PointCloud( geometry, material );
 				
 				return pointcloud;
@@ -209,7 +209,7 @@
 				geometry.colors = colors;
 				geometry.computeBoundingBox();
 				
-				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: true } );
+				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 				var pointcloud = new THREE.PointCloud( geometry, material );
 				
 				return pointcloud;
