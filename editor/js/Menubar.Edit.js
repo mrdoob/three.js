@@ -47,7 +47,7 @@ Menubar.Edit = function ( editor ) {
 
 			if ( confirm( 'Convert ' + object.name + ' to BufferGeometry?' ) === false ) return;
 
-			delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+			delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring) This is not yet fixed for buffergeometry
 
 			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
 
@@ -65,17 +65,19 @@ Menubar.Edit = function ( editor ) {
 
 		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+		//delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
 
 		var geometry = object.geometry.clone();
 		geometry.applyMatrix( object.matrix );
+
 
 		object.geometry = geometry;
 
 		object.position.set( 0, 0, 0 );
 		object.rotation.set( 0, 0, 0 );
 		object.scale.set( 1, 1, 1 );
-
+		
+		object.geometry.buffersNeedUpdate = true;
 		editor.signals.objectChanged.dispatch( object );
 
 	}

@@ -49,7 +49,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+		//delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
 
 		object.geometry.dispose();
 
@@ -60,6 +60,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 			heightSegments.getValue()
 		);
 
+		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );

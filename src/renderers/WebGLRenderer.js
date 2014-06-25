@@ -3680,7 +3680,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			updateObject( object );
+			updateObject(scene, object );
 
 		}
 
@@ -3690,7 +3690,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function addObject( object, scene ) {
 
-		var g, geometry, material, geometryGroup;
+		var g, geometry, geometryGroup;
 
 		if ( object.__webglInit === undefined ) {
 
@@ -3715,39 +3715,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 					initDirectBuffers( geometry );
 
 				} else if ( object instanceof THREE.Mesh ) {
+					
+					if ( object.__webglActive !== undefined ) {
 
-					material = object.material;
-
-					if ( geometry.geometryGroups === undefined ) {
-
-						geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
+						removeObject( object, scene );
 
 					}
-
-					// create separate VBOs per geometry chunk
-
-					for ( g in geometry.geometryGroups ) {
-
-						geometryGroup = geometry.geometryGroups[ g ];
-
-						// initialise VBO on the first access
-
-						if ( ! geometryGroup.__webglVertexBuffer ) {
-
-							createMeshBuffers( geometryGroup );
-							initMeshBuffers( geometryGroup, object );
-
-							geometry.verticesNeedUpdate = true;
-							geometry.morphTargetsNeedUpdate = true;
-							geometry.elementsNeedUpdate = true;
-							geometry.uvsNeedUpdate = true;
-							geometry.normalsNeedUpdate = true;
-							geometry.tangentsNeedUpdate = true;
-							geometry.colorsNeedUpdate = true;
-
-						}
-
-					}
+					
+					initGeometryGroups(scene, object, geometry);
 
 				} else if ( object instanceof THREE.Line ) {
 
@@ -3790,16 +3765,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					addBuffer( scene.__webglObjects, geometry, object );
 
-				} else if ( geometry instanceof THREE.Geometry ) {
-
-					for ( g in geometry.geometryGroups ) {
-
-						geometryGroup = geometry.geometryGroups[ g ];
-
-						addBuffer( scene.__webglObjects, geometryGroup, object );
-
-					}
-
 				}
 
 			} else if ( object instanceof THREE.Line ||
@@ -3827,6 +3792,54 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+	
+	function initGeometryGroups(scene,object,geometry) {
+		
+		var g, geometryGroup, material,addBuffers = false;
+		material = object.material;
+
+		if ( geometry.geometryGroups === undefined ) {
+
+			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
+			
+		}
+
+		// create separate VBOs per geometry chunk
+
+		for ( g in geometry.geometryGroups ) {
+
+			geometryGroup = geometry.geometryGroups[ g ];
+
+			// initialise VBO on the first access
+
+			if ( ! geometryGroup.__webglVertexBuffer ) {
+
+				createMeshBuffers( geometryGroup );
+				initMeshBuffers( geometryGroup, object );
+
+				geometry.verticesNeedUpdate = true;
+				geometry.morphTargetsNeedUpdate = true;
+				geometry.elementsNeedUpdate = true;
+				geometry.uvsNeedUpdate = true;
+				geometry.normalsNeedUpdate = true;
+				geometry.tangentsNeedUpdate = true;
+				geometry.colorsNeedUpdate = true;
+				
+				addBuffers = true;
+				
+			} else {
+				
+				addBuffers = false;
+				
+			}
+			
+			if ( addBuffers || object.__webglActive === undefined ) {
+				addBuffer( scene.__webglObjects, geometryGroup, object );
+			}
+
+		}
+		object.__webglActive = true;
+	}
 
 	function addBuffer( objlist, buffer, object ) {
 
@@ -3859,7 +3872,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Objects updates
 
-	function updateObject( object ) {
+	function updateObject(scene, object ) {
 
 		var geometry = object.geometry,
 			geometryGroup, customAttributesDirty, material;
@@ -3871,6 +3884,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Mesh ) {
 
 			// check all geometry groups
+			if ( geometry.buffersNeedUpdate ) {
+				initGeometryGroups(scene, object,geometry);
+			}
 
 			for ( var i = 0, il = geometry.geometryGroupsList.length; i < il; i ++ ) {
 

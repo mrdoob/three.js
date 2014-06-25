@@ -59,7 +59,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+		//delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
 
 		object.geometry.dispose();
 
@@ -71,6 +71,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 			arc.getValue()
 		);
 
+		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );
