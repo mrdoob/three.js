@@ -1055,6 +1055,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material.bumpMap ||
 				 material.normalMap ||
 				 material.specularMap ||
+				 material.alphaMap ||
 				 material instanceof THREE.ShaderMaterial ) {
 
 			return true;
@@ -4096,6 +4097,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			specularMap: !! material.specularMap,
+			alphaMap: !! material.alphaMap,
 
 			vertexColors: material.vertexColors,
 
@@ -4496,6 +4498,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.map.value = material.map;
 		uniforms.lightMap.value = material.lightMap;
 		uniforms.specularMap.value = material.specularMap;
+		uniforms.alphaMap.value = material.alphaMap;
 
 		if ( material.bumpMap ) {
 
@@ -4516,6 +4519,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		//  2. specular map
 		//  3. normal map
 		//  4. bump map
+		//  5. alpha map
 
 		var uvScaleMap;
 
@@ -4534,6 +4538,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material.bumpMap ) {
 
 			uvScaleMap = material.bumpMap;
+
+		} else if ( material.alphaMap ) {
+
+			uvScaleMap = material.alphaMap;
 
 		}
 

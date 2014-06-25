@@ -244,7 +244,7 @@ THREE.ShaderChunk = {
 
 	map_pars_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP )",
 
 		"	varying vec2 vUv;",
 		"	uniform vec4 offsetRepeat;",
@@ -255,7 +255,7 @@ THREE.ShaderChunk = {
 
 	map_pars_fragment: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP )",
 
 		"	varying vec2 vUv;",
 
@@ -271,7 +271,7 @@ THREE.ShaderChunk = {
 
 	map_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP ) || defined( USE_ALPHAMAP )",
 
 		"	vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -445,6 +445,29 @@ THREE.ShaderChunk = {
 		"#else",
 
 		"	specularStrength = 1.0;",
+
+		"#endif"
+
+	].join("\n"),
+
+	// ALPHA MAP
+
+	alphamap_pars_fragment: [
+
+		"#ifdef USE_ALPHAMAP",
+
+		"	uniform sampler2D alphaMap;",
+
+		"#endif"
+
+	].join("\n"),
+
+	alphamap_fragment: [
+
+		"#ifdef USE_ALPHAMAP",
+
+		"	vec4 texelAlpha = texture2D( alphaMap, vUv );",
+		"	gl_FragColor.a *= texelAlpha.r;",
 
 		"#endif"
 
