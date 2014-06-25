@@ -11,7 +11,7 @@
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, capped ) {
+THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closedPath, openEnded ) {
 
 	THREE.Geometry.call( this );
 
@@ -20,15 +20,15 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 		segments: segments,
 		radius: radius,
 		radialSegments: radialSegments,
-		closed: closed,
-		capped: capped
+		closedPath: closedPath,
+		openEnded: openEnded
 	};
 
 	segments = segments || 64;
 	radius = radius || 1;
 	radialSegments = radialSegments || 8;
-	closed = closed || false;
-	capped = capped || false;
+	closedPath = closedPath || false;
+	openEnded = openEnded !== undefined ? openEnded : true;
 
 	var grid = [];
 
@@ -49,9 +49,12 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 		i, j,
 		ip, jp,
 		a, b, c, d,
-		uva, uvb, uvc, uvd;
+		uva, uvb, uvc, uvd,
 
-	var frames = new THREE.TubeGeometry.FrenetFrames( path, segments, closed ),
+		// UV for end cap center
+		ccUV = new THREE.Vector2( 0.5, 0.5 );
+
+	var frames = new THREE.TubeGeometry.FrenetFrames( path, segments, closedPath ),
 		tangents = frames.tangents,
 		normals = frames.normals,
 		binormals = frames.binormals;
@@ -103,9 +106,36 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 	for ( i = 0; i < segments; i ++ ) {
 
+		// only create one center vertex for each end cap
+		
+		var ccv = null;
+		var cc = null;
+
+		if ( openEnded === false ) {
+
+			if ( i === 0 ) {
+
+				cc = path.getPointAt( 0 ).clone();
+
+			} else if ( i === segments - 1 ) {
+
+				cc = path.getPointAt( 1 ).clone();
+
+			};
+
+			// only assign the center vertex for the first or last point in the path
+			
+			if ( cc !== null ) {
+
+				ccv = vert( cc.x, cc.y, cc.z );
+
+			};
+
+		}
+
 		for ( j = 0; j < radialSegments; j ++ ) {
 
-			ip = ( closed ) ? (i + 1) % segments : i + 1;
+			ip = ( closedPath ) ? (i + 1) % segments : i + 1;
 			jp = (j + 1) % radialSegments;
 
 			a = grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
@@ -118,39 +148,30 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 			uvc = new THREE.Vector2( ( i + 1 ) / segments, ( j + 1 ) / radialSegments );
 			uvd = new THREE.Vector2( i / segments, ( j + 1 ) / radialSegments );
 
-			this.faces.push( new THREE.Face3( a, b, d ) );
+			this.faces.push( new THREE.Face3( a, b, d, null, null, 0 ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-			this.faces.push( new THREE.Face3( b, c, d ) );
+			this.faces.push( new THREE.Face3( b, c, d, null, null, 0 ) );
 			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
-			// add vertices, faces, and uvs for the start cap
-			if ( capped && i === 0) {
+			// add faces and uvs for the start and end caps
+			
+			if ( ccv !== null ) {
 
-				// get the first point on the path
-				var faceCenter = path.getPointAt( 0 ).clone();
+				// set the correct vertices for the beginning or end of the tube
+				
+				var cv1 = ( i === 0 ) ? a : c;
+				var cv2 = ( i === 0 ) ? d : b;
 
-				var v = vert( faceCenter.x, faceCenter.y, faceCenter.z );
-				var uvv = new THREE.Vector2( 0, 0 );
+				var cuv1 = new THREE.Vector2( ( cv1.x / radius + 1 ) / 2, ( cv1.y / radius + 1 ) / 2 );
+				var cuv2 = new THREE.Vector2( ( cv2.x / radius + 1 ) / 2, ( cv2.y / radius + 1 ) / 2 );
 
-				this.faces.push( new THREE.Face3( a, d, v ) );
-				this.faceVertexUvs[ 0 ].push( [ uva.clone(), uvd.clone(), uvv ] );
+				// use a different material index for the end cap faces
+				
+				this.faces.push( new THREE.Face3( cv1, cv2, ccv, null, null, 1 ) );
+				this.faceVertexUvs[ 0 ].push( [ cuv1, cuv2, ccUV ] );
 
-			}
-
-			// add vertices, faces, and uvs for the end cap
-			if ( capped && i === segments - 1) {
-
-				// get the last point on the path
-				var faceCenter = path.getPointAt( 1 ).clone();
-
-				var v = vert( faceCenter.x, faceCenter.y, faceCenter.z );
-				var uvv = new THREE.Vector2( 1, 1 );
-
-				this.faces.push( new THREE.Face3( c, b, v ) );
-				this.faceVertexUvs[ 0 ].push( [ uvc.clone(), uvb.clone(), uvv ] );
-
-			}
+			};
 
 		}
 
@@ -165,7 +186,7 @@ THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
-THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
+THREE.TubeGeometry.FrenetFrames = function ( path, segments, closedPath ) {
 
 	var	tangent = new THREE.Vector3(),
 		normal = new THREE.Vector3(),
@@ -286,7 +307,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
 
-	if ( closed ) {
+	if ( closedPath ) {
 
 		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
