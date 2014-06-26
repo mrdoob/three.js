@@ -12,7 +12,8 @@ THREE.DepthPassPlugin = function () {
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
-	_projScreenMatrix = new THREE.Matrix4();
+	_projScreenMatrix = new THREE.Matrix4(),
+	_renderList = [];
 
 	this.init = function ( renderer ) {
 
@@ -76,8 +77,11 @@ THREE.DepthPassPlugin = function () {
 		_renderer.clear();
 
 		// set object matrices & frustum culling
-
-		renderList = scene.__webglObjects;
+		
+		_renderList.length = 0;
+		projectObject(scene,scene,camera);
+			
+		/*_renderList = scene.__webglObjects;
 
 		for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
@@ -98,7 +102,8 @@ THREE.DepthPassPlugin = function () {
 
 			}
 
-		}
+		}*/
+
 
 		// render regular objects
 
@@ -106,53 +111,50 @@ THREE.DepthPassPlugin = function () {
 
 		for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
-			webglObject = renderList[ j ];
+			webglObject = _renderList[ j ];
 
-			if ( webglObject.render ) {
+			object = webglObject.object;
+			buffer = webglObject.buffer;
 
-				object = webglObject.object;
-				buffer = webglObject.buffer;
+			// todo: create proper depth material for particles
 
-				// todo: create proper depth material for particles
+			if ( object instanceof THREE.PointCloud && ! object.customDepthMaterial ) continue;
 
-				if ( object instanceof THREE.PointCloud && ! object.customDepthMaterial ) continue;
+			objectMaterial = getObjectMaterial( object );
 
-				objectMaterial = getObjectMaterial( object );
+			if ( objectMaterial ) _renderer.setMaterialFaces( object.material );
 
-				if ( objectMaterial ) _renderer.setMaterialFaces( object.material );
+			useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
+			useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
 
-				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
-				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
+			if ( object.customDepthMaterial ) {
 
-				if ( object.customDepthMaterial ) {
+				material = object.customDepthMaterial;
 
-					material = object.customDepthMaterial;
+			} else if ( useSkinning ) {
 
-				} else if ( useSkinning ) {
+				material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
-					material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
+			} else if ( useMorphing ) {
 
-				} else if ( useMorphing ) {
+				material = _depthMaterialMorph;
 
-					material = _depthMaterialMorph;
+			} else {
 
-				} else {
-
-					material = _depthMaterial;
-
-				}
-
-				if ( buffer instanceof THREE.BufferGeometry ) {
-
-					_renderer.renderBufferDirect( camera, scene.__lights, fog, material, buffer, object );
-
-				} else {
-
-					_renderer.renderBuffer( camera, scene.__lights, fog, material, buffer, object );
-
-				}
+				material = _depthMaterial;
 
 			}
+
+			if ( buffer instanceof THREE.BufferGeometry ) {
+
+				_renderer.renderBufferDirect( camera, scene.__lights, fog, material, buffer, object );
+
+			} else {
+
+				_renderer.renderBuffer( camera, scene.__lights, fog, material, buffer, object );
+
+			}
+
 
 		}
 
@@ -184,6 +186,33 @@ THREE.DepthPassPlugin = function () {
 		_gl.enable( _gl.BLEND );
 
 	};
+	
+	function projectObject(scene, object,camera){
+		
+		if ( object.visible ) {
+	
+			var webglObjects = scene.__webglObjects[object.uuid];
+	
+			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+		
+		
+				for (var i = 0, l = webglObjects.length; i < l; i++){
+			
+					var webglObject = webglObjects[i];
+					
+					object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+					_renderList.push(webglObject);
+					
+				}
+			}
+	
+			for(var i = 0, l = object.children.length; i < l; i++) {
+				
+				projectObject(scene, object.children[i], camera);
+			}
+		
+		}
+	}
 
 	// For the moment just ignore objects that have multiple materials with different animation methods
 	// Only the first material will be taken into account for deciding which depth material to use
