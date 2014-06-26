@@ -3407,16 +3407,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 					unrollBufferMaterial( webglObject );
 					
-					if (webglObject.isTransparent){
-						
-						transparentObjects.push(webglObject);
-						
-					} else {
-						
-						opaqueObjects.push(webglObject);
-						
-					}
-					
+
 					webglObject.render = true;
 	
 					if ( _sortObjects === true ) {
@@ -3625,17 +3616,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.transparent ) {
 
-				globject.transparent = material;
-				globject.opaque = null;
 				globject.material = material; 
-				globject.isTransparent = true;
+				transparentObjects.push(globject);
 
 			} else {
 
-				globject.opaque = material;
-				globject.transparent = null;
 				globject.material = material; 
-				globject.isTransparent = false;
+				opaqueObjects.push(globject);
 
 			}
 
@@ -3645,17 +3632,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( material.transparent ) {
 
-					globject.transparent = material;
-					globject.opaque = null;
 					globject.material = material; 
-					globject.isTransparent = true;
+					transparentObjects.push(globject);
 
 				} else {
 
-					globject.opaque = material;
-					globject.transparent = null;
 					globject.material = material; 
-					globject.isTransparent = false;
+					opaqueObjects.push(globject);
 
 				}
 
@@ -3882,16 +3865,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 	
 	function addBuffer( objlist, buffer, object ) {
-		objlist[object.uuid] = objlist[object.uuid] || [];
-		objlist[object.uuid].push(
+		var uuid = object.uuid;
+		objlist[uuid] = objlist[uuid] || [];
+		objlist[uuid].push(
 			{
 				id: null,
 				buffer: buffer,
 				object: object,
-				opaque: null,
-				transparent: null,
 				material: null,
-				isTransparent: false,
 				z: 0
 			}
 		);
