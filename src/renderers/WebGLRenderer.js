@@ -29,7 +29,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
 	
-	var OpaqueObjects = [];
+	var opaqueObjects = [];
 	var transparentObjects = [];
 	var _sortObjects = true;
 
@@ -3304,7 +3304,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// set matrices for regular objects (frustum culled)
 
 		
-		OpaqueObjects.length = 0;
+		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
 		_sortObjects = this.sortObjects;
 		
@@ -3312,7 +3312,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.sortObjects ) {
 
-			OpaqueObjects.sort( painterSortStable );
+			opaqueObjects.sort( painterSortStable );
 			transparentObjects.sort( reversePainterSortStable );
 
 		}
@@ -3345,7 +3345,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setDepthWrite( material.depthWrite );
 			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-			renderObjects( OpaqueObjects, camera, lights, fog, true, material );
+			renderObjects( opaqueObjects, camera, lights, fog, true, material );
 			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, '', camera, lights, fog, false, material );
 
@@ -3357,7 +3357,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 
-			renderObjects( OpaqueObjects, camera, lights, fog, false, material );
+			renderObjects( opaqueObjects, camera, lights, fog, false, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
 
 			// transparent pass (back-to-front order)
@@ -3413,7 +3413,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						
 					} else {
 						
-						OpaqueObjects.push(webglObject);
+						opaqueObjects.push(webglObject);
 						
 					}
 					
