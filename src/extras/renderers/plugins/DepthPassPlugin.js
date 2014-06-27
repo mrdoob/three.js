@@ -191,7 +191,7 @@ THREE.DepthPassPlugin = function () {
 		
 		if ( object.visible ) {
 	
-			var webglObjects = scene.__webglObjects[object.uuid];
+			var webglObjects = scene.__webglObjects[object.id];
 	
 			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 		

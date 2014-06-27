@@ -3393,7 +3393,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		if ( object.visible ) {
 			
-			var webglObjects = scene.__webglObjects[object.uuid];
+			var webglObjects = scene.__webglObjects[object.id];
 			
 			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 				
@@ -3822,7 +3822,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometry.geometryGroups === undefined ) {
 			
-			delete scene.__webglObjects[object.uuid];
+			delete scene.__webglObjects[object.id];
 			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
 			
 		}
@@ -3865,9 +3865,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 	
 	function addBuffer( objlist, buffer, object ) {
-		var uuid = object.uuid;
-		objlist[uuid] = objlist[uuid] || [];
-		objlist[uuid].push(
+		var id = object.id;
+		objlist[id] = objlist[id] || [];
+		objlist[id].push(
 			{
 				id: null,
 				buffer: buffer,
