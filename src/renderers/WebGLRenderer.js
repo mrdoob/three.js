@@ -3675,30 +3675,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// update must be called after objects adding / removal
-
-		//for ( var o = 0, ol = scene.__webglObjects.length; o < ol; o ++ ) {
-
-		//	var object = scene.__webglObjects[ o ].object;
-
-			// TODO: Remove this hack (WebGLRenderer refactoring)
-
-		//	if ( object.__webglInit === undefined ) {
-
-		//		if ( object.__webglActive !== undefined ) {
-
-		//			removeObject( object, scene );
-
-		//		}
-
-		//		addObject( object, scene );
-
-		//	}
-
-		//	updateObject(scene, object );
-
-		//}
-
 	};
 
 	// Objects adding

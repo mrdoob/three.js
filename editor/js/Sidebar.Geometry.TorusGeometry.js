@@ -59,8 +59,6 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 
 	function update() {
 
-		//delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
 		object.geometry.dispose();
 
 		object.geometry = new THREE.TorusGeometry(
