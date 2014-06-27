@@ -466,8 +466,7 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_ALPHAMAP",
 
-		"	vec4 texelAlpha = texture2D( alphaMap, vUv );",
-		"	gl_FragColor.a *= texelAlpha.r;",
+		"	gl_FragColor.a *= texture2D( alphaMap, vUv ).g;",
 
 		"#endif"
 
