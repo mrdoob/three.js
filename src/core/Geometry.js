@@ -678,12 +678,13 @@ THREE.Geometry.prototype = {
 		return function ( usesFaceMaterial, maxVerticesInGroup ) {
 
 			var f, fl, face, materialIndex,
-				groupHash, hash_map = {};
+				groupHash, hash_map = {},geometryGroup;
 
 			var numMorphTargets = this.morphTargets.length;
 			var numMorphNormals = this.morphNormals.length;
 
 			this.geometryGroups = {};
+			this.geometryGroupsList = [];
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -700,8 +701,9 @@ THREE.Geometry.prototype = {
 
 				if ( ! ( groupHash in this.geometryGroups ) ) {
 
-					this.geometryGroups[ groupHash ] = { 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
-
+					geometryGroup = { 'id': geometryGroupCounter++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+					this.geometryGroups[ groupHash ] = geometryGroup;
+					this.geometryGroupsList.push(geometryGroup);
 				}
 
 				if ( this.geometryGroups[ groupHash ].vertices + 3 > maxVerticesInGroup ) {
@@ -711,24 +713,16 @@ THREE.Geometry.prototype = {
 
 					if ( ! ( groupHash in this.geometryGroups ) ) {
 
-						this.geometryGroups[ groupHash ] = { 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
-
+						geometryGroup = { 'id': geometryGroupCounter++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+						this.geometryGroups[ groupHash ] = geometryGroup;
+						this.geometryGroupsList.push(geometryGroup);
+						
 					}
 
 				}
 
 				this.geometryGroups[ groupHash ].faces3.push( f );
 				this.geometryGroups[ groupHash ].vertices += 3;
-
-			}
-
-			this.geometryGroupsList = [];
-
-			for ( var g in this.geometryGroups ) {
-
-				this.geometryGroups[ g ].id = geometryGroupCounter ++;
-
-				this.geometryGroupsList.push( this.geometryGroups[ g ] );
 
 			}
 

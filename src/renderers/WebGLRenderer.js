@@ -619,9 +619,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups !== undefined ) {
 
-				for ( var g in geometry.geometryGroups ) {
+				for ( var i = 0,l = geometry.geometryGroupsList.length; i<l;i++ ) {
 
-					var geometryGroup = geometry.geometryGroups[ g ];
+					var geometryGroup = geometry.geometryGroupsList[ i ];
 
 					if ( geometryGroup.numMorphTargets !== undefined ) {
 
@@ -3726,9 +3726,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// create separate VBOs per geometry chunk
 
-					for ( g in geometry.geometryGroups ) {
-
-						geometryGroup = geometry.geometryGroups[ g ];
+					for ( var i = 0,l = geometry.geometryGroupsList.length; i<l;i++ ) {
+	
+						geometryGroup = geometry.geometryGroupsList[ i ];
 
 						// initialise VBO on the first access
 
@@ -3792,9 +3792,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
-					for ( g in geometry.geometryGroups ) {
-
-						geometryGroup = geometry.geometryGroups[ g ];
+					for ( var i = 0,l = geometry.geometryGroupsList.length; i<l;i++ ) {
+	
+						geometryGroup = geometry.geometryGroupsList[ i ];
 
 						addBuffer( scene.__webglObjects, geometryGroup, object );
 
