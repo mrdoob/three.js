@@ -47,8 +47,6 @@ Menubar.Edit = function ( editor ) {
 
 			if ( confirm( 'Convert ' + object.name + ' to BufferGeometry?' ) === false ) return;
 
-			delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring) This is not yet fixed for buffergeometry
-
 			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
 
 			editor.signals.objectChanged.dispatch( object );
@@ -64,8 +62,6 @@ Menubar.Edit = function ( editor ) {
 		if ( object.parent === undefined ) return; // avoid flattening the camera or scene
 
 		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
-
-		//delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
 
 		var geometry = object.geometry.clone();
 		geometry.applyMatrix( object.matrix );
