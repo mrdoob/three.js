@@ -1881,7 +1881,7 @@ def generate_objects(data):
             receiveShadow = obj.THREE_receiveShadow
             doubleSided = obj.THREE_doubleSided
 
-            visible = True
+            visible = obj.THREE_visible
 
             geometry_string = generate_string(geometry_id)
 

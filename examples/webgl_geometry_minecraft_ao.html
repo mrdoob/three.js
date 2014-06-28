@@ -167,9 +167,11 @@
 
 						var h = getY( x, z );
 
-						dummy.position.x = x * 100 - worldHalfWidth * 100;
-						dummy.position.y = h * 100;
-						dummy.position.z = z * 100 - worldHalfDepth * 100;
+						matrix.makeTranslation(
+							x * 100 - worldHalfWidth * 100,
+							h * 100,
+							z * 100 - worldHalfDepth * 100
+						);
 
 						var px = getY( x + 1, z );
 						var nx = getY( x - 1, z );
@@ -188,93 +190,83 @@
 
 						if ( a + c > b + d ) {
 
-							dummy.geometry = py2Geometry;
-
-							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							var colors = py2Geometry.faces[ 0 ].vertexColors;
 							colors[ 0 ] = b === 0 ? shadow : light;
 							colors[ 1 ] = c === 0 ? shadow : light;
 							colors[ 2 ] = a === 0 ? shadow : light;
 
-							var colors = dummy.geometry.faces[ 1 ].vertexColors;
+							var colors = py2Geometry.faces[ 1 ].vertexColors;
 							colors[ 0 ] = c === 0 ? shadow : light;
 							colors[ 1 ] = d === 0 ? shadow : light;
 							colors[ 2 ] = a === 0 ? shadow : light;
+							
+							geometry.merge( py2Geometry, matrix );
 
 						} else {
 
-							dummy.geometry = pyGeometry;
-
-							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							var colors = pyGeometry.faces[ 0 ].vertexColors;
 							colors[ 0 ] = a === 0 ? shadow : light;
 							colors[ 1 ] = b === 0 ? shadow : light;
 							colors[ 2 ] = d === 0 ? shadow : light;
 
-							var colors = dummy.geometry.faces[ 1 ].vertexColors;
+							var colors = pyGeometry.faces[ 1 ].vertexColors;
 							colors[ 0 ] = b === 0 ? shadow : light;
 							colors[ 1 ] = c === 0 ? shadow : light;
 							colors[ 2 ] = d === 0 ? shadow : light;
+							
+							geometry.merge( pyGeometry, matrix );
 
 						}
 
-						THREE.GeometryUtils.merge( geometry, dummy );
-
 						if ( ( px != h && px != h + 1 ) || x == 0 ) {
 
-							dummy.geometry = pxGeometry;
-
-							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							var colors = pxGeometry.faces[ 0 ].vertexColors;
 							colors[ 0 ] = pxpz > px && x > 0 ? shadow : light;
 							colors[ 2 ] = pxnz > px && x > 0 ? shadow : light;
 
-							var colors = dummy.geometry.faces[ 1 ].vertexColors;
+							var colors = pxGeometry.faces[ 1 ].vertexColors;
 							colors[ 2 ] = pxnz > px && x > 0 ? shadow : light;
 
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( pxGeometry, matrix );
 
 						}
 
 						if ( ( nx != h && nx != h + 1 ) || x == worldWidth - 1 ) {
 
-							dummy.geometry = nxGeometry;
-
-							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							var colors = nxGeometry.faces[ 0 ].vertexColors;
 							colors[ 0 ] = nxnz > nx && x < worldWidth - 1 ? shadow : light;
 							colors[ 2 ] = nxpz > nx && x < worldWidth - 1 ? shadow : light;
 
-							var colors = dummy.geometry.faces[ 1 ].vertexColors;
+							var colors = nxGeometry.faces[ 1 ].vertexColors;
 							colors[ 2 ] = nxpz > nx && x < worldWidth - 1 ? shadow : light;
 
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( nxGeometry, matrix );
 
 						}
 
 						if ( ( pz != h && pz != h + 1 ) || z == worldDepth - 1 ) {
 
-							dummy.geometry = pzGeometry;
-
-							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							var colors = pzGeometry.faces[ 0 ].vertexColors;
 							colors[ 0 ] = nxpz > pz && z < worldDepth - 1 ? shadow : light;
 							colors[ 2 ] = pxpz > pz && z < worldDepth - 1 ? shadow : light;
 
-							var colors = dummy.geometry.faces[ 1 ].vertexColors;
+							var colors = pzGeometry.faces[ 1 ].vertexColors;
 							colors[ 2 ] = pxpz > pz && z < worldDepth - 1 ? shadow : light;
 
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( pzGeometry, matrix );
 
 						}
 
 						if ( ( nz != h && nz != h + 1 ) || z == 0 ) {
 
-							dummy.geometry = nzGeometry;
-
-							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							var colors = nzGeometry.faces[ 0 ].vertexColors;
 							colors[ 0 ] = pxnz > nz && z > 0 ? shadow : light;
 							colors[ 2 ] = nxnz > nz && z > 0 ? shadow : light;
 
-							var colors = dummy.geometry.faces[ 1 ].vertexColors;
+							var colors = nzGeometry.faces[ 1 ].vertexColors;
 							colors[ 2 ] = nxnz > nz && z > 0 ? shadow : light;
 
-							THREE.GeometryUtils.merge( geometry, dummy );
+							geometry.merge( nzGeometry, matrix );
 
 						}
 

@@ -111,25 +111,19 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x101010 );
-				scene.add( ambient );
-
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 1, 1, 2 ).normalize();
 				scene.add( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.set( 0, 0, 0 );
+				pointLight = new THREE.PointLight( 0xffffff, 3, 1000 );
 				scene.add( pointLight );
 
 				// light representation
 
-				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				lightMesh.scale.set( 0.05, 0.05, 0.05 );
-				lightMesh.position = pointLight.position;
-				scene.add( lightMesh );
+				sphere = new THREE.SphereGeometry( 10, 16, 8, 1 );
 
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				scene.add( lightMesh );
 
 				if ( render_gl ) {
 					try {
@@ -164,12 +158,10 @@
 				bwebgl.addEventListener( "click", toggleWebGL, false );
 
 				loader = new THREE.BinaryLoader( true );
-				//loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
 				var start = Date.now();
 
-				//loader.load( 'obj/lucy/Lucy100k_slim.js', callback );
 				loader.load( 'obj/lucy/Lucy100k_bin.js', function ( geometry, materials ) {
 
 					addMesh( geometry, 0.75, 900, 0, 0,  0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x990000, shininess: 30 } ) );
@@ -223,19 +215,20 @@
 
 			}
 
-			var r = 0;
-
 			function render() {
+			
+				var time = Date.now() * 0.001;
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
 
-				lightMesh.position.x = 700 * Math.cos( r );
-				lightMesh.position.z = 700 * Math.sin( r );
+				pointLight.position.x = 600 * Math.cos( time );
+				pointLight.position.y = 400 * Math.cos( time * 1.25 );
+				pointLight.position.z = 300 * Math.sin( time );
 
-				r += 0.01;
+				lightMesh.position.copy( pointLight.position );
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );

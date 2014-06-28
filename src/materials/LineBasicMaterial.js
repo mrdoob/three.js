@@ -30,7 +30,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
-	this.vertexColors = false;
+	this.vertexColors = THREE.NoColors;
 
 	this.fog = true;
 

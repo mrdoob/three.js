@@ -33,8 +33,8 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.fragmentShader = "void main() {}";
-	this.vertexShader = "void main() {}";
+	this.fragmentShader = 'void main() {}';
+	this.vertexShader = 'void main() {}';
 	this.uniforms = {};
 	this.defines = {};
 	this.attributes = null;
@@ -60,9 +60,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
 	this.defaultAttributeValues = {
-		"color" : [ 1, 1, 1 ],
-		"uv" : [ 0, 0 ],
-		"uv2" : [ 0, 0 ]
+		'color': [ 1, 1, 1 ],
+		'uv': [ 0, 0 ],
+		'uv2': [ 0, 0 ]
 	};
 
 	this.index0AttributeName = undefined;

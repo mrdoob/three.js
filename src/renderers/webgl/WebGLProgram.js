@@ -277,7 +277,7 @@ THREE.WebGLProgram = ( function () {
 
 		if ( _gl.getProgramParameter( program, _gl.LINK_STATUS ) === false ) {
 
-			console.error( 'Could not initialise shader' );
+			console.error( 'THREE.WebGLProgram: Could not initialise shader.' );
 			console.error( 'gl.VALIDATE_STATUS', _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) );
 			console.error( 'gl.getError()', _gl.getError() );
 
@@ -285,7 +285,7 @@ THREE.WebGLProgram = ( function () {
 
 		if ( _gl.getProgramInfoLog( program ) !== '' ) {
 
-			console.error( 'gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
+			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
 
 		}
 

@@ -84,58 +84,12 @@
 			a { color:red }
 			canvas { pointer-events:none; z-index:10; }
 
-			#scene_explorer {
-				background:transparent;
-				color:#fff;
-				width:200px;
-				position:absolute;
-				text-align:left;
-				top:0px;
-				z-index:200;
-				overflow:auto;
-			}
-
-			#section_exp {
-				background:rgba(0,0,50,0.5);
-				padding:0.5em 0;
-				display:none;
-			}
-
-			#scene_explorer h3 {
-				font-size:1em;
-				padding:0;
-				margin:0;
-				color:orange;
-			}
-
-			#scene_explorer a {
-				color:#555;
-				font-weight:bold;
-				text-decoration:none;
-				font-size:1.2em;
-				font-family:Monospace;
-			}
-			#scene_explorer a:hover {
-				background:#555;
-				color:rgba(0,0,50,1);
-			}
-
-			.part {
-				display:none;
-				padding:0 0 0.5em 2em;
-			}
-
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
 			<a href="http://threejs.org">three.js</a> - scene loader test
-		</div>
-
-		<div id="scene_explorer">
-			<a id="plus_exp" href="#">[+]</a>
-			<div id="section_exp"></div>
 		</div>
 
 		<div id="progress">
@@ -149,10 +103,13 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/loaders/DDSLoader.js"></script>
+
 		<script src="js/loaders/ctm/lzma.js"></script>
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
+		<script src="js/loaders/SceneLoader.js"></script>
 		<script src="js/loaders/BinaryLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
@@ -205,7 +162,6 @@
 
 			function handle_update( result, pieces ) {
 
-				refreshSceneView( result );
 				//renderer.initWebGLObjects( result.scene );
 
 				var m, material, count = 0;
@@ -328,9 +284,7 @@
 
 							if ( object.geometry.animation ) {
 
-								THREE.AnimationHandler.add( object.geometry.animation );
-
-								var animation = new THREE.Animation( object, object.geometry.animation.name );
+								var animation = new THREE.Animation( object, object.geometry.animation );
 								animation.play();
 
 							}
@@ -342,6 +296,8 @@
 				}
 
 				$( "progress" ).style.display = "block";
+
+				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var loader = new THREE.SceneLoader();
 
@@ -358,8 +314,6 @@
 				loader.callbackProgress = callbackProgress;
 
 				loader.load( "scenes/test_scene.js", callbackFinished );
-
-				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 
 				//
 
@@ -495,79 +449,6 @@
 				}
 
 				renderer.render( scene, camera );
-
-			}
-
-			// Scene explorer user interface
-
-			function toggle( id ) {
-
-				var scn = $( "section_" + id ).style,
-					btn = $( "plus_" + id );
-
-				if ( scn.display == "block" ) {
-
-					scn.display = "none";
-					btn.innerHTML = "[+]";
-
-				}
-				else {
-
-					scn.display = "block";
-					btn.innerHTML = "[-]";
-
-				}
-
-			}
-
-			function createToggle( label ) { return function() { toggle( label ) } };
-
-			function refreshSceneView( result ) {
-
-				$( "section_exp" ).innerHTML = generateSceneView( result );
-
-				var config = [ "obj", "geo", "mat", "tex", "lit", "cam" ];
-
-				for ( var i = 0; i < config.length; i++ )
-					$( "plus_" + config[i] ).addEventListener( 'click', createToggle( config[i] ), false );
-
-			}
-
-			function generateSection( label, id, objects ) {
-
-				var html = "";
-
-				html += "<h3><a id='plus_" + id + "' href='#'>[+]</a> " + label + "</h3>";
-				html += "<div id='section_" + id + "' class='part'>";
-
-				for( var o in objects ) {
-
-					html += o + "<br/>";
-
-				}
-				html += "</div>";
-
-				return html;
-
-			}
-
-			function generateSceneView( result ) {
-
-				var config = [
-				[ "Objects",    "obj", result.objects ],
-				[ "Geometries", "geo", result.geometries ],
-				[ "Materials",  "mat", result.materials ],
-				[ "Textures",   "tex", result.textures ],
-				[ "Lights",     "lit", result.lights ],
-				[ "Cameras",    "cam", result.cameras ]
-				];
-
-				var html = "";
-
-				for ( var i = 0; i < config.length; i++ )
-					html += generateSection( config[i][0], config[i][1], config[i][2] );
-
-				return html;
 
 			}
 

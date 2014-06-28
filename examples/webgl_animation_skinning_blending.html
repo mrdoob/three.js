@@ -64,7 +64,7 @@
 				scene.add ( new THREE.AmbientLight( 0xaaaaaa ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position = new THREE.Vector3( 0, 0, 1000.0 );
+				light.position.set( 0, 0, 1000 );
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );

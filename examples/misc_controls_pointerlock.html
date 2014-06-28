@@ -79,7 +79,7 @@
 
 			var objects = [];
 
-			var ray;
+			var raycaster;
 
 			var blocker = document.getElementById( 'blocker' );
 			var instructions = document.getElementById( 'instructions' );
@@ -192,8 +192,7 @@
 				controls = new THREE.PointerLockControls( camera );
 				scene.add( controls.getObject() );
 
-				ray = new THREE.Raycaster();
-				ray.ray.direction.set( 0, -1, 0 );
+				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
 				// floor
 
@@ -281,20 +280,14 @@
 
 				controls.isOnObject( false );
 
-				ray.ray.origin.copy( controls.getObject().position );
-				ray.ray.origin.y -= 10;
+				raycaster.ray.origin.copy( controls.getObject().position );
+				raycaster.ray.origin.y -= 10;
 
-				var intersections = ray.intersectObjects( objects );
+				var intersections = raycaster.intersectObjects( objects );
 
 				if ( intersections.length > 0 ) {
 
-					var distance = intersections[ 0 ].distance;
-
-					if ( distance > 0 && distance < 10 ) {
-
-						controls.isOnObject( true );
-
-					}
+					controls.isOnObject( true );
 
 				}
 

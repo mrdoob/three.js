@@ -944,22 +944,25 @@ THREE.SceneLoader.prototype = {
 
 			}
 
+			var texture;
+
 			if ( textureJSON.url instanceof Array ) {
 
 				var count = textureJSON.url.length;
 				var url_array = [];
 
-				for( var i = 0; i < count; i ++ ) {
+				for ( var i = 0; i < count; i ++ ) {
 
 					url_array[ i ] = get_url( textureJSON.url[ i ], data.urlBaseType );
 
 				}
 
-				var isCompressed = /\.dds$/i.test( url_array[ 0 ] );
+				var loader = THREE.Loader.Handlers.get( url_array[ 0 ] );
 
-				if ( isCompressed ) {
+				if ( loader !== null ) {
 
-					texture = THREE.ImageUtils.loadCompressedTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
+					texture = loader.load( url_array, generateTextureCallback( count ) );
+					texture.mapping = textureJSON.mapping;
 
 				} else {
 
@@ -969,19 +972,37 @@ THREE.SceneLoader.prototype = {
 
 			} else {
 
-				var isCompressed = /\.dds$/i.test( textureJSON.url );
 				var fullUrl = get_url( textureJSON.url, data.urlBaseType );
 				var textureCallback = generateTextureCallback( 1 );
 
-				if ( isCompressed ) {
+				var loader = THREE.Loader.Handlers.get( fullUrl );
 
-					texture = THREE.ImageUtils.loadCompressedTexture( fullUrl, textureJSON.mapping, textureCallback );
+				if ( loader !== null ) {
+
+					texture = loader.load( fullUrl, textureCallback );
 
 				} else {
 
-					texture = THREE.ImageUtils.loadTexture( fullUrl, textureJSON.mapping, textureCallback );
+					texture = new THREE.Texture();
+					loader = new THREE.ImageLoader();
+					
+					( function ( texture ) {
+
+						loader.load( fullUrl, function ( image ) {
+
+							texture.image = image;
+							texture.needsUpdate = true;
+
+							textureCallback();
+
+						} );
+					
+					} )( texture )
+					
 
 				}
+
+				texture.mapping = textureJSON.mapping;
 
 				if ( THREE[ textureJSON.minFilter ] !== undefined )
 					texture.minFilter = THREE[ textureJSON.minFilter ];

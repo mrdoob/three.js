@@ -14,36 +14,31 @@
 		<div class="desc">Material rendered with custom shaders</div>
 
 
-		<h2>Constructor</h2>
+		<h2>Example</h2>
 
+		<code>
+		var material = new THREE.ShaderMaterial( {
+
+			uniforms: {
+				time: { type: "f", value: 1.0 },
+				resolution: { type: "v2", value: new THREE.Vector2() }
+			},
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+		} );
+		</code>
+
+
+		<h2>Constructor</h2>
 
 		<h3>[name]([page:Object parameters])</h3>
 		<div>
 		parameters -- An object containing various parameters setting up shaders and their uniforms.
 		</div>
-		<div>
-		<br>
-		Example:<br>
-		<br>
-		uniforms = {
-			time: { type: "f", value: 1.0 },
-			resolution: { type: "v2", value: new THREE.Vector2() }
-		};
-
-		material = new THREE.ShaderMaterial( {
-
-			uniforms: uniforms,
-			vertexShader: document.getElementById( 'vertexShader' ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-
-		} );
-
-		</div>
 
 
 		<h2>Properties</h2>
-
-
 
 		<h3>.[page:object uniforms]</h3>
 		<div>

@@ -337,7 +337,7 @@ THREE.ShaderLib = {
 
 	'particle_basic': {
 
-		uniforms:  THREE.UniformsUtils.merge( [
+		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "particle" ],
 			THREE.UniformsLib[ "shadowmap" ]
@@ -411,8 +411,8 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 
 			{
-				"scale":     { type: "f", value: 1 },
-				"dashSize":  { type: "f", value: 1 },
+				"scale"    : { type: "f", value: 1 },
+				"dashSize" : { type: "f", value: 1 },
 				"totalSize": { type: "f", value: 2 }
 			}
 
@@ -507,7 +507,7 @@ THREE.ShaderLib = {
 			"uniform float mNear;",
 			"uniform float mFar;",
 			"uniform float opacity;",
-			
+
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
 			"void main() {",
@@ -596,18 +596,18 @@ THREE.ShaderLib = {
 
 			{
 
-			"enableAO"		  : { type: "i", value: 0 },
-			"enableDiffuse"	  : { type: "i", value: 0 },
-			"enableSpecular"  : { type: "i", value: 0 },
-			"enableReflection": { type: "i", value: 0 },
+			"enableAO"          : { type: "i", value: 0 },
+			"enableDiffuse"     : { type: "i", value: 0 },
+			"enableSpecular"    : { type: "i", value: 0 },
+			"enableReflection"  : { type: "i", value: 0 },
 			"enableDisplacement": { type: "i", value: 0 },
 
 			"tDisplacement": { type: "t", value: null }, // must go first as this is vertex texture
-			"tDiffuse"	   : { type: "t", value: null },
-			"tCube"		   : { type: "t", value: null },
-			"tNormal"	   : { type: "t", value: null },
-			"tSpecular"	   : { type: "t", value: null },
-			"tAO"		   : { type: "t", value: null },
+			"tDiffuse"     : { type: "t", value: null },
+			"tCube"        : { type: "t", value: null },
+			"tNormal"      : { type: "t", value: null },
+			"tSpecular"    : { type: "t", value: null },
+			"tAO"          : { type: "t", value: null },
 
 			"uNormalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
@@ -627,7 +627,7 @@ THREE.ShaderLib = {
 			"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
 			"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
-			"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
+			"wrapRGB" : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 
 			}
 
@@ -814,11 +814,9 @@ THREE.ShaderLib = {
 			"			float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 			"			float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
+			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"			float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( pointVector, pointHalfVector ), 5.0 );",
+			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( pointVector, pointHalfVector ), 0.0 ), 5.0 );",
 			"			pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance * specularNormalization;",
 
 			"		}",
@@ -847,7 +845,7 @@ THREE.ShaderLib = {
 
 			"			if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
-			"				spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
+			"				spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );",
 
 							// diffuse
 
@@ -872,11 +870,9 @@ THREE.ShaderLib = {
 			"				float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
 			"				float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
+			"				float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"				float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-			"				vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
+			"				vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( spotVector, spotHalfVector ), 0.0 ), 5.0 );",
 			"				spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
 
 			"			}",
@@ -920,11 +916,9 @@ THREE.ShaderLib = {
 			"			float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 			"			float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
+			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"			float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+			"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );",
 			"			dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
 			"		}",
@@ -935,7 +929,7 @@ THREE.ShaderLib = {
 
 			"	#if MAX_HEMI_LIGHTS > 0",
 
-			"		vec3 hemiDiffuse  = vec3( 0.0 );",
+			"		vec3 hemiDiffuse = vec3( 0.0 );",
 			"		vec3 hemiSpecular = vec3( 0.0 );" ,
 
 			"		for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
@@ -957,7 +951,7 @@ THREE.ShaderLib = {
 
 			"			vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
 			"			float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
-			"			float hemiSpecularWeightSky = specularTex.r * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
+			"			float hemiSpecularWeightSky = specularTex.r * max( pow( max( hemiDotNormalHalfSky, 0.0 ), shininess ), 0.0 );",
 
 						// specular (ground light)
 
@@ -965,16 +959,14 @@ THREE.ShaderLib = {
 
 			"			vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 			"			float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
-			"			float hemiSpecularWeightGround = specularTex.r * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
+			"			float hemiSpecularWeightGround = specularTex.r * max( pow( max( hemiDotNormalHalfGround, 0.0 ), shininess ), 0.0 );",
 
 			"			float dotProductGround = dot( normal, lVectorGround );",
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
+			"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
-			"			float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-			"			vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
-			"			vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+			"			vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );",
+			"			vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );",
 			"			hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 			"		}",
@@ -1131,12 +1123,13 @@ THREE.ShaderLib = {
 
 			"				vec4 skinVertex = vec4( position, 1.0 );",
 
-			"				vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
-			"				skinned 	  += boneMatY * skinVertex * skinWeight.y;",
-			"				skinned 	  += boneMatZ * skinVertex * skinWeight.z;",
-			"				skinned 	  += boneMatW * skinVertex * skinWeight.w;",
+			"				vec4 skinned = vec4( 0.0 );",
+			"				skinned += boneMatX * skinVertex * skinWeight.x;",
+			"				skinned += boneMatY * skinVertex * skinWeight.y;",
+			"				skinned += boneMatZ * skinVertex * skinWeight.z;",
+			"				skinned += boneMatW * skinVertex * skinWeight.w;",
 
-			"				displacedPosition  = skinned.xyz;",
+			"				displacedPosition = skinned.xyz;",
 
 			"			#else",
 
@@ -1152,12 +1145,13 @@ THREE.ShaderLib = {
 
 			"			vec4 skinVertex = vec4( position, 1.0 );",
 
-			"			vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
-			"			skinned 	  += boneMatY * skinVertex * skinWeight.y;",
-			"			skinned 	  += boneMatZ * skinVertex * skinWeight.z;",
-			"			skinned 	  += boneMatW * skinVertex * skinWeight.w;",
+			"			vec4 skinned = vec4( 0.0 );",
+			"			skinned += boneMatX * skinVertex * skinWeight.x;",
+			"			skinned += boneMatY * skinVertex * skinWeight.y;",
+			"			skinned += boneMatZ * skinVertex * skinWeight.z;",
+			"			skinned += boneMatW * skinVertex * skinWeight.w;",
 
-			"			displacedPosition  = skinned.xyz;",
+			"			displacedPosition = skinned.xyz;",
 
 			"		#else",
 
@@ -1206,7 +1200,7 @@ THREE.ShaderLib = {
 	'cube': {
 
 		uniforms: { "tCube": { type: "t", value: null },
-					"tFlip": { type: "f", value: -1 } },
+					"tFlip": { type: "f", value: - 1 } },
 
 		vertexShader: [
 
@@ -1248,13 +1242,17 @@ THREE.ShaderLib = {
 
 	},
 
-	// Depth encoding into RGBA texture
-	// 	based on SpiderGL shadow map example
-	// 		http://spidergl.org/example.php?id=6
-	// 	originally from
-	//		http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/page__whichpage__1%25EF%25BF%25BD
-	// 	see also here:
-	//		http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	/* Depth encoding into RGBA texture
+	 *
+	 * based on SpiderGL shadow map example
+	 * http://spidergl.org/example.php?id=6
+	 *
+	 * originally from
+	 * http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/page__whichpage__1%25EF%25BF%25BD
+	 *
+	 * see also
+	 * http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+	 */
 
 	'depthRGBA': {
 
@@ -1285,7 +1283,7 @@ THREE.ShaderLib = {
 			"vec4 pack_depth( const in float depth ) {",
 
 			"	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
-			"	const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+			"	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
 			"	vec4 res = mod( depth * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );", // "	vec4 res = fract( depth * bit_shift );",
 			"	res -= res.xxyz * bit_mask;",
 			"	return res;",

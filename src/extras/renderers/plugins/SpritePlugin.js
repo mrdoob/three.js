@@ -65,14 +65,14 @@ THREE.SpritePlugin = function () {
 
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
-
+		
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 8;
 		canvas.height = 8;
-
+		
 		var context = canvas.getContext( '2d' );
-		context.fillStyle = '#ffffff';
-		context.fillRect( 0, 0, canvas.width, canvas.height );
+		context.fillStyle = 'white';
+		context.fillRect( 0, 0, 8, 8 );
 
 		_texture = new THREE.Texture( canvas );
 		_texture.needsUpdate = true;
