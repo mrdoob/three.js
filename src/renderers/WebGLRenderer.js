@@ -4030,7 +4030,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function removeInstancesWebglObjects( objlist, object ) {
 
-		delete objlist[object]; 
+		delete objlist[object.id]; 
 
 	};
 
