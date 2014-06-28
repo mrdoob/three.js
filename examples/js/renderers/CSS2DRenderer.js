@@ -33,7 +33,7 @@ THREE.CSS2DObject.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.CSS2DRenderer = function () {
 
-	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
+	console.log( 'THREE.CSS2DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
