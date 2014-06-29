@@ -16665,6 +16665,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function textureToPattern( texture ) {
 
+		if ( texture instanceof THREE.CompressedTexture ) return;
+
 		var repeatX = texture.wrapS === THREE.RepeatWrapping;
 		var repeatY = texture.wrapT === THREE.RepeatWrapping;
 
@@ -20388,16 +20390,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
 	var _fragmentShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_FLOAT );
 
-	/*
-	var _vertexShaderPrecisionHighpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_INT );
-	var _vertexShaderPrecisionMediumpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_INT );
-	var _vertexShaderPrecisionLowpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_INT );
-
-	var _fragmentShaderPrecisionHighpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_INT );
-	var _fragmentShaderPrecisionMediumpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_INT );
-	var _fragmentShaderPrecisionLowpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_INT );
-	*/
-
 	// clamp precision to maximum available
 
 	var highpAvailable = _vertexShaderPrecisionHighpFloat.precision > 0 && _fragmentShaderPrecisionHighpFloat.precision > 0;
@@ -23445,11 +23437,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_frustum.setFromMatrix( _projScreenMatrix );
 
 		// update WebGL objects
-
 		if ( this.autoUpdateObjects ) this.initWebGLObjects( scene );
 
-		// custom render plugins (pre pass)
 
+		opaqueObjects.length = 0;
+		transparentObjects.length = 0;
+		_sortObjects = this.sortObjects;
+		
+		projectObject(scene,scene,camera);
+
+		if ( this.sortObjects ) {
+
+			opaqueObjects.sort( painterSortStable );
+			transparentObjects.sort( reversePainterSortStable );
+
+		}
+
+		// custom render plugins (pre pass)
+		
 		renderPlugins( this.renderPluginsPre, scene, camera );
 
 		//
@@ -23470,18 +23475,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// set matrices for regular objects (frustum culled)
 
 		
-		opaqueObjects.length = 0;
-		transparentObjects.length = 0;
-		_sortObjects = this.sortObjects;
-		
-		projectObject(scene,scene,camera);
 
-		if ( this.sortObjects ) {
-
-			opaqueObjects.sort( painterSortStable );
-			transparentObjects.sort( reversePainterSortStable );
-
-		}
 
 		// set matrices for immediate objects
 
@@ -23565,14 +23559,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				updateObject(scene, object);
 				
-				setupMatrices( object, camera );
-				
 				for (var i = 0, l = webglObjects.length; i < l; i++){
 					
 					var webglObject = webglObjects[i];
 					
 					unrollBufferMaterial( webglObject );
-					
 
 					webglObject.render = true;
 	
@@ -23655,6 +23646,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object = webglObject.object;
 			buffer = webglObject.buffer;
+							
+			setupMatrices( object, camera );
 
 			if ( overrideMaterial ) {
 
@@ -24196,7 +24189,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function removeInstancesWebglObjects( objlist, object ) {
 
-		delete objlist[object]; 
+		delete objlist[object.id]; 
 
 	};
 
@@ -36752,36 +36745,12 @@ THREE.DepthPassPlugin = function () {
 		
 		_renderList.length = 0;
 		projectObject(scene,scene,camera);
-			
-		/*_renderList = scene.__webglObjects;
-
-		for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-			webglObject = renderList[ j ];
-			object = webglObject.object;
-
-			webglObject.render = false;
-
-			if ( object.visible ) {
-
-				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
-
-					object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
-					webglObject.render = true;
-
-				}
-
-			}
-
-		}*/
-
 
 		// render regular objects
 
 		var objectMaterial, useMorphing, useSkinning;
 
-		for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
+		for ( j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
 			webglObject = _renderList[ j ];
 
