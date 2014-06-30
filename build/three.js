@@ -7525,7 +7525,7 @@ THREE.Object3D.prototype = {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-			this.children[ i ].traverse( callback );
+			this.children[ i ].traverseVisible( callback );
 
 		}
 
@@ -7775,65 +7775,6 @@ THREE.Projector = function () {
 
 	};
 
-	var projectObject = function ( object ) {
-
-		if ( object.visible === false ) return;
-
-		if ( object instanceof THREE.Light ) {
-
-			_renderData.lights.push( object );
-
-		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
-
-			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
-
-				_object = getNextObjectInPool();
-				_object.id = object.id;
-				_object.object = object;
-
-				if ( object.renderDepth !== null ) {
-
-					_object.z = object.renderDepth;
-
-				} else {
-
-					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyProjection( _viewProjectionMatrix );
-					_object.z = _vector3.z;
-
-				}
-
-				_renderData.objects.push( _object );
-
-			}
-
-		}
-
-		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-			projectObject( object.children[ i ] );
-
-		}
-
-	};
-
-	var projectGraph = function ( root, sortObjects ) {
-
-		_objectCount = 0;
-
-		_renderData.objects.length = 0;
-		_renderData.lights.length = 0;
-
-		projectObject( root );
-
-		if ( sortObjects === true ) {
-
-			_renderData.objects.sort( painterSort );
-
-		}
-
-	};
-
 	var RenderList = function () {
 
 		var normals = [];
@@ -7998,9 +7939,6 @@ THREE.Projector = function () {
 
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
-		var object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs,
-		isFaceMaterial, objectMaterials;
-
 		_faceCount = 0;
 		_lineCount = 0;
 		_spriteCount = 0;
@@ -8015,12 +7953,59 @@ THREE.Projector = function () {
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
-		projectGraph( scene, sortObjects );
+		//
+
+		_objectCount = 0;
+
+		_renderData.objects.length = 0;
+		_renderData.lights.length = 0;
+
+		scene.traverseVisible( function ( object ) {
+
+			if ( object instanceof THREE.Light ) {
+
+				_renderData.lights.push( object );
+
+			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
+
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+
+					_object = getNextObjectInPool();
+					_object.id = object.id;
+					_object.object = object;
+
+					if ( object.renderDepth !== null ) {
+
+						_object.z = object.renderDepth;
+
+					} else {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _viewProjectionMatrix );
+						_object.z = _vector3.z;
+
+					}
+
+					_renderData.objects.push( _object );
+
+				}
+
+			}
+
+		} );
+
+		if ( sortObjects === true ) {
+
+			_renderData.objects.sort( painterSort );
+
+		}
+
+		//
 
 		for ( var o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
-			object = _renderData.objects[ o ].object;
-			geometry = object.geometry;
+			var object = _renderData.objects[ o ].object;
+			var geometry = object.geometry;
 
 			renderList.setObject( object );
 
@@ -8110,14 +8095,14 @@ THREE.Projector = function () {
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
-					vertices = geometry.vertices;
-					faces = geometry.faces;
-					faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+					var vertices = geometry.vertices;
+					var faces = geometry.faces;
+					var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
 
 					_normalMatrix.getNormalMatrix( _modelMatrix );
 
-					isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-					objectMaterials = isFaceMaterial === true ? object.material : null;
+					var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+					var objectMaterials = isFaceMaterial === true ? object.material : null;
 
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
@@ -8128,7 +8113,7 @@ THREE.Projector = function () {
 
 					for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
-						face = faces[ f ];
+						var face = faces[ f ];
 
 						var material = isFaceMaterial === true
 							 ? objectMaterials.materials[ face.materialIndex ]
@@ -8213,7 +8198,7 @@ THREE.Projector = function () {
 
 						_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-						faceVertexNormals = face.vertexNormals;
+						var faceVertexNormals = face.vertexNormals;
 
 						for ( var n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
 
@@ -8299,7 +8284,7 @@ THREE.Projector = function () {
 
 					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-					vertices = object.geometry.vertices;
+					var vertices = object.geometry.vertices;
 
 					if ( vertices.length === 0 ) continue;
 
