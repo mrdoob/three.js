@@ -192,7 +192,7 @@ THREE.OBJLoader.prototype = {
 
 		//
 
-		var lines = text.split( '\n' );
+		var lines = text.replace(/\\\n/g,' ').split( '\n' );
 
 		for ( var i = 0; i < lines.length; i ++ ) {
 
