@@ -60,8 +60,15 @@ def main(argv=None):
 			filename = '../../' + filename;
 			sources.append(filename)
 			with open(filename, 'r') as f:
-				tmp.write(f.read())
-				tmp.write('\n')
+				if filename.endswith(".glsl"):
+					tmp.write('THREE.ShaderChunk = THREE.ShaderChunk || {};')
+					tmp.write('THREE.ShaderChunk.' + os.path.splitext(os.path.basename(filename))[0] + '= "') 
+					tmp.write(f.read().replace('\n','\\n'))
+					tmp.write('";')
+					tmp.write('\n')
+				else:
+					tmp.write(f.read())
+					tmp.write('\n')
 
 	if args.amd:
 		tmp.write('exports.THREE = THREE;\n\n} ) );')
@@ -78,7 +85,7 @@ def main(argv=None):
 
 		externs = ' --externs '.join(args.externs)
 		source = ' '.join(sources)
-		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, source, output, sourcemapargs)
+		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, path, output, sourcemapargs)
 		os.system(cmd)
 
 		# header
