@@ -435,7 +435,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldDoubleSided = - 1;
 		_oldFlipSided = - 1;
 
-		this.initWebGLObjects( scene );
+		initObjects( scene );
 
 		this.shadowMapPlugin.update( scene, camera );
 
@@ -3269,7 +3269,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
-		this.initWebGLObjects( scene );
+		initObjects( scene );
 
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
@@ -3642,7 +3642,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Objects refresh
 
-	this.initWebGLObjects = function ( scene ) {
+	var initObjects = function ( scene ) {
 
 		if ( ! scene.__webglObjects ) {
 
