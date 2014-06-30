@@ -16,7 +16,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	_canvas = parameters.canvas !== undefined
 			? parameters.canvas
-			: document.createElement( 'canvas' ),
+			: THREE.createCanvasElement(),
 
 	_canvasWidth = _canvas.width,
 	_canvasHeight = _canvas.height,
@@ -785,7 +785,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		var image = texture.image;
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = image.width;
 		canvas.height = image.height;
 

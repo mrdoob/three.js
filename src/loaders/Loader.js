@@ -126,7 +126,7 @@ THREE.Loader.prototype = {
 
 			} else {
 
-				var texture = document.createElement( 'canvas' );
+				var texture = THREE.createCanvasElement();
 
 				where[ name ] = new THREE.Texture( texture );
 

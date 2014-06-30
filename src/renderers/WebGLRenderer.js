@@ -11,7 +11,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	var _canvas = parameters.canvas !== undefined ? parameters.canvas : THREE.createCanvasElement(),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
@@ -5601,7 +5601,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var newWidth = Math.floor( image.width * maxSize / maxDimension );
 		var newHeight = Math.floor( image.height * maxSize / maxDimension );
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = newWidth;
 		canvas.height = newHeight;
 

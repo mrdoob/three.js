@@ -203,6 +203,11 @@ THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 */
 
+// Overridable generator for creating canvas Elements
+THREE.createCanvasElement = function() {
+	return THREE.createCanvasElement();
+}
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -11441,7 +11446,7 @@ THREE.Loader.prototype = {
 
 			} else {
 
-				var texture = document.createElement( 'canvas' );
+				var texture = THREE.createCanvasElement();
 
 				where[ name ] = new THREE.Texture( texture );
 
@@ -16535,7 +16540,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	_canvas = parameters.canvas !== undefined
 			? parameters.canvas
-			: document.createElement( 'canvas' ),
+			: THREE.createCanvasElement(),
 
 	_canvasWidth = _canvas.width,
 	_canvasHeight = _canvas.height,
@@ -17304,7 +17309,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		var image = texture.image;
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = image.width;
 		canvas.height = image.height;
 
@@ -20807,7 +20812,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	var _canvas = parameters.canvas !== undefined ? parameters.canvas : THREE.createCanvasElement(),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
@@ -26397,7 +26402,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var newWidth = Math.floor( image.width * maxSize / maxDimension );
 		var newHeight = Math.floor( image.height * maxSize / maxDimension );
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = newWidth;
 		canvas.height = newHeight;
 
@@ -28400,7 +28405,7 @@ THREE.ImageUtils = {
 		var width = image.width;
 		var height = image.height;
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = width;
 		canvas.height = height;
 
@@ -37809,7 +37814,7 @@ THREE.SpritePlugin = function () {
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = 8;
 		canvas.height = 8;
 

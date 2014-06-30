@@ -66,7 +66,7 @@ THREE.SpritePlugin = function () {
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = 8;
 		canvas.height = 8;
 

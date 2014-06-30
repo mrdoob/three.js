@@ -556,7 +556,7 @@ THREE.ImageUtils = {
 		var width = image.width;
 		var height = image.height;
 
-		var canvas = document.createElement( 'canvas' );
+		var canvas = THREE.createCanvasElement();
 		canvas.width = width;
 		canvas.height = height;
 
