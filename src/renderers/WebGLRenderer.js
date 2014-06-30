@@ -3837,7 +3837,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		objlist[id] = objlist[id] || [];
 		objlist[id].push(
 			{
-				id: null,
+				id: id,
 				buffer: buffer,
 				object: object,
 				material: null,
