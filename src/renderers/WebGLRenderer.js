@@ -3382,52 +3382,54 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	function projectObject(scene, object,camera){
 		
-		if ( object.visible ) {
+		if ( object.visible === false ) return;
 			
-			var webglObjects = scene.__webglObjects[object.id];
+		var webglObjects = scene.__webglObjects[ object.id ];
+		
+		if ( webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 			
-			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+			updateObject( scene, object );
+			
+			for ( var i = 0, l = webglObjects.length; i < l; i ++ ) {
 				
-				updateObject(scene, object);
+				var webglObject = webglObjects[i];
 				
-				for (var i = 0, l = webglObjects.length; i < l; i++){
-					
-					var webglObject = webglObjects[i];
-					
-					unrollBufferMaterial( webglObject );
+				unrollBufferMaterial( webglObject );
 
-					webglObject.render = true;
-	
-					if ( _sortObjects === true ) {
-	
-						if ( object.renderDepth !== null ) {
-	
-							webglObject.z = object.renderDepth;
-	
-						} else {
-	
-							_vector3.setFromMatrixPosition( object.matrixWorld );
-							_vector3.applyProjection( _projScreenMatrix );
-	
-							webglObject.z = _vector3.z;
-	
-						}
-	
+				webglObject.render = true;
+
+				if ( _sortObjects === true ) {
+
+					if ( object.renderDepth !== null ) {
+
+						webglObject.z = object.renderDepth;
+
+					} else {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _projScreenMatrix );
+
+						webglObject.z = _vector3.z;
+
 					}
+
 				}
+
 			}
-			
-			for(var i = 0, l = object.children.length; i < l; i++) {
-				projectObject(scene, object.children[i],camera);
-			}
-				
+
+		}
+		
+		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+			projectObject( scene, object.children[ i ], camera );
+
 		}
 				
 	}
 
 	function renderPlugins( plugins, scene, camera ) {
 
-		if ( ! plugins.length ) return;
+		if ( plugins.length === 0 ) return;
 
 		for ( var i = 0, il = plugins.length; i < il; i ++ ) {
 
@@ -3772,15 +3774,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 	
-	function initGeometryGroups(scene,object,geometry) {
+	function initGeometryGroups( scene, object, geometry ) {
 		
 		var g, geometryGroup, material,addBuffers = false;
 		material = object.material;
 
 		if ( geometry.geometryGroups === undefined ) {
 			
-			delete scene.__webglObjects[object.id];
-			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
+			delete scene.__webglObjects[ object.id ];
+			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535 );
 			
 		}
 
@@ -3818,10 +3820,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
 		object.__webglActive = true;
+
 	}
 	
 	function addBuffer( objlist, buffer, object ) {
+
 		var id = object.id;
 		objlist[id] = objlist[id] || [];
 		objlist[id].push(
