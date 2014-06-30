@@ -406,6 +406,20 @@ THREE.Object3D.prototype = {
 
 	},
 
+	traverseVisible: function ( callback ) {
+
+		if ( this.visible === false ) return;
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
 	getObjectById: function ( id, recursive ) {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
