@@ -53,7 +53,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
-	this.autoUpdateObjects = true;
 
 	// physically based shading
 
@@ -435,6 +434,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lightsNeedUpdate = true;
 		_oldDoubleSided = - 1;
 		_oldFlipSided = - 1;
+
+		this.initWebGLObjects( scene );
 
 		this.shadowMapPlugin.update( scene, camera );
 
@@ -3268,9 +3269,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
-		// update WebGL objects
-		if ( this.autoUpdateObjects ) this.initWebGLObjects( scene );
-
+		this.initWebGLObjects( scene );
 
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
