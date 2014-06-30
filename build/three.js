@@ -7517,6 +7517,20 @@ THREE.Object3D.prototype = {
 
 	},
 
+	traverseVisible: function ( callback ) {
+
+		if ( this.visible === false ) return;
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
 	getObjectById: function ( id, recursive ) {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
@@ -23815,8 +23829,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			scene.__webglObjects = {};
 			scene.__webglObjectsImmediate = [];
-			scene.__webglSprites = [];
-			scene.__webglFlares = [];
 
 		}
 
@@ -23934,14 +23946,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
 
 				addBufferImmediate( scene.__webglObjectsImmediate, object );
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				scene.__webglSprites.push( object );
-
-			} else if ( object instanceof THREE.LensFlare ) {
-
-				scene.__webglFlares.push( object );
 
 			}
 
@@ -24167,14 +24171,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			removeInstancesWebglObjects( scene.__webglObjects, object );
 
-		} else if ( object instanceof THREE.Sprite ) {
-
-			removeInstancesDirect( scene.__webglSprites, object );
-
-		} else if ( object instanceof THREE.LensFlare ) {
-
-			removeInstancesDirect( scene.__webglFlares, object );
-
 		} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
 
 			removeInstances( scene.__webglObjectsImmediate, object );
@@ -24189,7 +24185,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function removeInstancesWebglObjects( objlist, object ) {
 
-		delete objlist[object.id]; 
+		delete objlist[ object.id ]; 
 
 	};
 
@@ -35493,6 +35489,8 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 
 THREE.LensFlarePlugin = function () {
 
+	var flares = [];
+
 	var _gl, _renderer, _precision, _lensFlare = {};
 
 	this.init = function ( renderer ) {
@@ -35593,10 +35591,19 @@ THREE.LensFlarePlugin = function () {
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
-		var flares = scene.__webglFlares,
-			nFlares = flares.length;
+		flares.length = 0;
 
-		if ( ! nFlares ) return;
+		scene.traverseVisible( function ( child ) {
+
+			if ( child instanceof THREE.LensFlare ) {
+
+				flares.push( child );
+
+			}
+
+		} );
+
+		if ( flares.length === 0 ) return;
 
 		var tempPosition = new THREE.Vector3();
 
@@ -35635,18 +35642,14 @@ THREE.LensFlarePlugin = function () {
 		_gl.disable( _gl.CULL_FACE );
 		_gl.depthMask( false );
 
-		var i, j, jl, flare, sprite;
-
-		for ( i = 0; i < nFlares; i ++ ) {
+		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
 			size = 16 / viewportHeight;
 			scale.set( size * invAspect, size );
 
 			// calc object screen position
 
-			flare = flares[ i ];
-
-			if ( flare.visible === false ) continue;
+			var flare = flares[ i ];
 			
 			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
@@ -35723,9 +35726,9 @@ THREE.LensFlarePlugin = function () {
 				_gl.uniform1i( uniforms.renderType, 2 );
 				_gl.enable( _gl.BLEND );
 
-				for ( j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
-					sprite = flare.lensFlares[ j ];
+					var sprite = flare.lensFlares[ j ];
 
 					if ( sprite.opacity > 0.001 && sprite.scale > 0.001 ) {
 
@@ -36309,6 +36312,8 @@ THREE.SpritePlugin = function () {
 
 	var _gl, _renderer, _texture;
 
+	var sprites = [];
+
 	var vertices, faces, vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
 
@@ -36383,10 +36388,19 @@ THREE.SpritePlugin = function () {
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
-		var sprites = scene.__webglSprites,
-			nSprites = sprites.length;
+		sprites.length = 0;
 
-		if ( ! nSprites ) return;
+		scene.traverseVisible( function ( child ) {
+
+			if ( child instanceof THREE.Sprite ) {
+
+				sprites.push( child );
+
+			}
+
+		} );
+
+		if ( sprites.length === 0 ) return;
 
 		// setup gl
 
@@ -36447,14 +36461,10 @@ THREE.SpritePlugin = function () {
 
 		// update positions and sort
 
-		var i, sprite, material, fogType, scale = [];
+		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
-		for( i = 0; i < nSprites; i ++ ) {
-
-			sprite = sprites[ i ];
-			material = sprite.material;
-
-			if ( sprite.visible === false ) continue;
+			var sprite = sprites[ i ];
+			var material = sprite.material;
 
 			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
 			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
@@ -36465,13 +36475,12 @@ THREE.SpritePlugin = function () {
 
 		// render all sprites
 
-		for( i = 0; i < nSprites; i ++ ) {
+		var scale = [];
 
-			sprite = sprites[ i ];
+		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
-			if ( sprite.visible === false ) continue;
-
-			material = sprite.material;
+			var sprite = sprites[ i ];
+			var material = sprite.material;
 
 			_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
@@ -36479,13 +36488,11 @@ THREE.SpritePlugin = function () {
 			scale[ 0 ] = sprite.scale.x;
 			scale[ 1 ] = sprite.scale.y;
 
+			var fogType = 0;
+
 			if ( scene.fog && material.fog ) {
 
 				fogType = sceneFogType;
-
-			} else {
-
-				fogType = 0;
 
 			}
 
