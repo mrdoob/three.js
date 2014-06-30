@@ -9804,6 +9804,7 @@ THREE.Geometry = function () {
 	this.lineDistancesNeedUpdate = false;
 
 	this.buffersNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 
@@ -23946,11 +23947,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var g, geometryGroup, material,addBuffers = false;
 		material = object.material;
 
-		if ( geometry.geometryGroups === undefined ) {
+		if ( geometry.geometryGroups === undefined || geometry.groupsNeedUpdate ) {
 			
-			delete scene.__webglObjects[ object.id ];
-			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535 );
-			
+			delete scene.__webglObjects[object.id];
+			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
+			geometry.groupsNeedUpdate = false;
+
 		}
 
 		// create separate VBOs per geometry chunk
@@ -23998,7 +24000,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		objlist[id] = objlist[id] || [];
 		objlist[id].push(
 			{
-				id: null,
+				id: id,
 				buffer: buffer,
 				object: object,
 				material: null,
@@ -24036,7 +24038,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Mesh ) {
 
 			// check all geometry groups
-			if ( geometry.buffersNeedUpdate ) {
+			if ( geometry.buffersNeedUpdate || geometry.groupsNeedUpdate ) {
 				
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -24056,7 +24058,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				material = getBufferMaterial( object, geometryGroup );
 
-				if ( geometry.buffersNeedUpdate ) {
+				if ( geometry.buffersNeedUpdate || geometry.groupsNeedUpdate) {
 
 					initMeshBuffers( geometryGroup, object );
 
@@ -24183,20 +24185,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( var o = objlist.length - 1; o >= 0; o -- ) {
 
 			if ( objlist[ o ].object === object ) {
-
-				objlist.splice( o, 1 );
-
-			}
-
-		}
-
-	};
-
-	function removeInstancesDirect( objlist, object ) {
-
-		for ( var o = objlist.length - 1; o >= 0; o -- ) {
-
-			if ( objlist[ o ] === object ) {
 
 				objlist.splice( o, 1 );
 
