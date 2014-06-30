@@ -4025,20 +4025,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function removeInstancesDirect( objlist, object ) {
-
-		for ( var o = objlist.length - 1; o >= 0; o -- ) {
-
-			if ( objlist[ o ] === object ) {
-
-				objlist.splice( o, 1 );
-
-			}
-
-		}
-
-	};
-
 	// Materials
 
 	this.initMaterial = function ( material, lights, fog, object ) {
