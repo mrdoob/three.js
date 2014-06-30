@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -174,7 +174,6 @@
 					object.geometry.faces[i].materialIndex = Math.floor(Math.random() * 6);
 					
 				}
-				object.geometry.buffersNeedUpdate = true;
 				object.geometry.groupsNeedUpdate = true;
 			};
 
