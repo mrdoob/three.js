@@ -4743,17 +4743,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsGeneric ( program, uniforms ) {
 
-		var uniform, value, type, location, texture, textureUnit, i, il, j, jl, offset;
+		var texture, textureUnit, offset;
 
-		for ( j = 0, jl = uniforms.length; j < jl; j ++ ) {
+		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
-			location = program.uniforms[ uniforms[ j ][ 1 ] ];
+			var location = program.uniforms[ uniforms[ j ][ 1 ] ];
+
 			if ( ! location ) continue;
 
-			uniform = uniforms[ j ][ 0 ];
+			var uniform = uniforms[ j ][ 0 ];
 
-			type = uniform.type;
-			value = uniform.value;
+			var type = uniform.type;
+			var value = uniform.value;
 
 			if ( type === 'i' ) { // single integer
 
@@ -4803,7 +4804,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( i = 0, il = value.length; i < il; i ++ ) {
+				for ( var i = 0, il = value.length; i < il; i ++ ) {
 
 					offset = i * 2;
 
@@ -4822,7 +4823,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( i = 0, il = value.length; i < il; i ++ ) {
+				for ( var i = 0, il = value.length; i < il; i ++ ) {
 
 					offset = i * 3;
 
@@ -4842,7 +4843,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( i = 0, il = value.length; i < il; i ++ ) {
+				for ( var i = 0, il = value.length; i < il; i ++ ) {
 
 					offset = i * 4;
 
@@ -4867,7 +4868,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( i = 0, il = value.length; i < il; i ++ ) {
+				for ( var i = 0, il = value.length; i < il; i ++ ) {
 
 					value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
 
@@ -4887,7 +4888,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( i = 0, il = value.length; i < il; i ++ ) {
+				for ( var i = 0, il = value.length; i < il; i ++ ) {
 
 					value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
 
@@ -4927,7 +4928,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( i = 0, il = uniform.value.length; i < il; i ++ ) {
+				for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
 
 					uniform._array[ i ] = getTextureUnit();
 
@@ -4935,7 +4936,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform1iv( location, uniform._array );
 
-				for ( i = 0, il = uniform.value.length; i < il; i ++ ) {
+				for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
 
 					texture = uniform.value[ i ];
 					textureUnit = uniform._array[ i ];
