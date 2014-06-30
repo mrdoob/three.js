@@ -3647,7 +3647,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			scene.__webglObjects = {};
 			scene.__webglObjectsImmediate = [];
-			scene.__webglFlares = [];
 
 		}
 
@@ -3765,10 +3764,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
 
 				addBufferImmediate( scene.__webglObjectsImmediate, object );
-
-			} else if ( object instanceof THREE.LensFlare ) {
-
-				scene.__webglFlares.push( object );
 
 			}
 
@@ -3994,10 +3989,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			removeInstancesWebglObjects( scene.__webglObjects, object );
 
-		} else if ( object instanceof THREE.LensFlare ) {
-
-			removeInstancesDirect( scene.__webglFlares, object );
-
 		} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
 
 			removeInstances( scene.__webglObjectsImmediate, object );
@@ -4012,7 +4003,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function removeInstancesWebglObjects( objlist, object ) {
 
-		delete objlist[object.id]; 
+		delete objlist[ object.id ]; 
 
 	};
 
