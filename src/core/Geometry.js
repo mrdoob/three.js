@@ -48,6 +48,7 @@ THREE.Geometry = function () {
 	this.lineDistancesNeedUpdate = false;
 
 	this.buffersNeedUpdate = false;
+	this.groupsNeedUpdate = false;
 
 };
 

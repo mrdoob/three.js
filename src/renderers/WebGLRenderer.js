@@ -3788,11 +3788,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var g, geometryGroup, material,addBuffers = false;
 		material = object.material;
 
-		if ( geometry.geometryGroups === undefined ) {
+		if ( geometry.geometryGroups === undefined || geometry.groupsNeedUpdate ) {
 			
 			delete scene.__webglObjects[object.id];
 			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
-			
+			geometry.groupsNeedUpdate = false;
 		}
 
 		// create separate VBOs per geometry chunk
@@ -3875,7 +3875,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Mesh ) {
 
 			// check all geometry groups
-			if ( geometry.buffersNeedUpdate ) {
+			if ( geometry.buffersNeedUpdate || geometry.groupsNeedUpdate ) {
 				
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
