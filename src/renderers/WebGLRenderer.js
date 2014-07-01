@@ -5065,11 +5065,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_direction.sub( _vector3 );
 				_direction.normalize();
 
-				// skip lights with undefined direction
-				// these create troubles in OpenGL (making pixel black)
-
-				if ( _direction.x === 0 && _direction.y === 0 && _direction.z === 0 ) continue;
-
 				dirOffset = dirLength * 3;
 
 				dirPositions[ dirOffset ]     = _direction.x;
@@ -5164,11 +5159,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_direction.normalize();
-
-				// skip lights with undefined direction
-				// these create troubles in OpenGL (making pixel black)
-
-				if ( _direction.x === 0 && _direction.y === 0 && _direction.z === 0 ) continue;
 
 				hemiOffset = hemiLength * 3;
 
