@@ -171,10 +171,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lights = {
 
 		ambient: [ 0, 0, 0 ],
-		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() },
-		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), anglesCos: new Array(), exponents: new Array() },
-		hemi: { length: 0, skyColors: new Array(), groundColors: new Array(), positions: new Array() }
+		directional: { length: 0, colors:[], positions: [] },
+		point: { length: 0, colors: [], positions: [], distances: [] },
+		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [] },
+		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
 
 	};
 
