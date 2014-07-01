@@ -205,5 +205,5 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
 // Overridable generator for creating canvas elements
 THREE.createCanvasElement = function() {
-	return THREE.createCanvasElement();
+	return document.createElement('canvas');
 }
