@@ -44,10 +44,7 @@ def main(argv=None):
 	fd, path = tempfile.mkstemp()
 	tmp = open(path, 'w')
 	sources = []
-	
-	tmp.write('// You shouldn\'t edit this build file. \n')
-	tmp.write('// The following source code is build from the src folder. \n')
-	
+		
 	if args.amd:
 		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
@@ -61,11 +58,9 @@ def main(argv=None):
 			sources.append(filename)
 			with open(filename, 'r') as f:
 				if filename.endswith(".glsl"):
-					tmp.write('THREE.ShaderChunk = THREE.ShaderChunk || {};')
-					tmp.write('THREE.ShaderChunk.' + os.path.splitext(os.path.basename(filename))[0] + '= "') 
+					tmp.write('THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + '\'] = "') 
 					tmp.write(f.read().replace('\n','\\n'))
-					tmp.write('";')
-					tmp.write('\n')
+					tmp.write('";\n\n')
 				else:
 					tmp.write(f.read())
 					tmp.write('\n')
