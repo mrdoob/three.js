@@ -41,6 +41,8 @@
 
 		<script src="js/effects/StereoEffect.js"></script>
 
+  	<script src="js/controls/DeviceOrientationControls.js"></script>
+  
 		<script src="js/Detector.js"></script>
 
 		<script>
@@ -49,7 +51,7 @@
 
 			var container;
 
-			var camera, scene, renderer, effect;
+			var camera, scene, renderer, effect, controls;
 
 			var mesh, lightMesh, geometry;
 			var spheres = [];
@@ -66,13 +68,43 @@
 			init();
 			animate();
 
+			function initControls( event ) {
+
+				if ( event.alpha ) {
+
+					window.removeEventListener('deviceorientation', initControls, false);
+
+					renderer.domElement.addEventListener('click', fullscreen, false);
+
+					controls = new THREE.DeviceOrientationControls(camera, true);
+					controls.connect();
+					controls.update();
+
+				}
+
+			}
+			
+			function fullscreen() {
+
+				if (renderer.domElement.requestFullscreen) {
+					renderer.domElement.requestFullscreen();
+				} else if (renderer.domElement.msRequestFullscreen) {
+					renderer.domElement.msRequestFullscreen();
+				} else if (renderer.domElement.mozRequestFullScreen) {
+					renderer.domElement.mozRequestFullScreen();
+				} else if (renderer.domElement.webkitRequestFullscreen) {
+					renderer.domElement.webkitRequestFullscreen();
+				}
+
+			}
+
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 3200;
+				camera.position.z = -3200;
 
 				scene = new THREE.Scene();
 
@@ -132,12 +164,14 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				window.addEventListener('deviceorientation', initControls, false);
+
 			}
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -153,6 +187,7 @@
 
 			}
 
+
 			//
 
 			function animate() {
@@ -167,9 +202,17 @@
 
 				var timer = 0.0001 * Date.now();
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.lookAt( scene.position );
+				if ( controls !== undefined ) {
+
+					controls.update();
+
+				} else {
+
+					camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+					camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+					camera.lookAt( scene.position );
+				
+				}
 
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 
