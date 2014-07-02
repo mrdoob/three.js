@@ -32,6 +32,7 @@
 		fog — Define whether the material color is affected by global fog settings. Default is true.<br />
 		lightMap — Set light map. Default is null.<br />
 		specularMap — Set specular map. Default is null.<br />
+		alphaMap — Set alpha map. Default is null.<br />
 		envMap — Set env map. Default is null.<br />
 		skinning — Define whether the material uses skinning. Default is false.<br />
 		morphTargets — Define whether the material uses morphTargets. Default is false.
@@ -73,6 +74,10 @@
 
 		<h3>.[page:Texture specularMap]</h3>
 		<div>Set specular map. Default is null.</div>
+
+		<h3>.[page:Texture alphaMap]</h3>
+		<div>The alpha map is a grayscale texture that controls the opacity across the surface (black: fully transparent; white: fully opaque). Default is null.</div>
+		<div>Only the color of the texture is used, ignoring the alpha channel if one exists. For RGB and RGBA textures, the [page:WebGLRenderer WebGL] renderer will use the green channel when sampling this texture due to the extra bit of precision provided for green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and luminance/alpha textures will also still work as expected.</div>
 
 		<h3>.[page:TextureCube envMap]</h3>
 		<div>Set env map. Default is null.</div>
