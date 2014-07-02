@@ -106,21 +106,20 @@ THREE.VREffect = function ( renderer, done ) {
 	this.setFullScreen = function( enable ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
-		var fullScreen = this._fullScreen;
 		var canvasOriginalSize = this._canvasOriginalSize;
 		if (!vrHMD) {
 			return;
 		}
 		// If state doesn't change we do nothing
-		if ( enable && fullScreen ||
-				!enable && !fullScreen ) {
+		if ( enable === this._fullScreen ) {
 			return;
 		}
+		this._fullScreen = !!enable;
+
 		// VR Mode disabled
-		if ( !enable && fullScreen ) {
+		if ( !enable ) {
 			// Restores canvas original size
 			renderer.setSize( canvasOriginalSize.width, canvasOriginalSize.height );
-			fullScreen = false;
 			return;
 		}
 		// VR Mode enabled
@@ -131,13 +130,13 @@ THREE.VREffect = function ( renderer, done ) {
 		fullScreen = true;
 		// Hardcoded Rift display size
 		renderer.setSize( 1280, 800 );
+		vrHMD.xxxToggleElementVR( renderer.domElement );
 		this.startFullscreen( vrHMD );
 	};
 
 	this.startFullscreen = function( vrHMD ) {
 		var self = this;
 		var renderer = this._renderer;
-		vrHMD.xxxToggleElementVR( renderer.domElement );
 		document.addEventListener( "mozfullscreenchange", function() {
 			if ( !document.mozFullScreenElement ) {
 				self.setFullScreen( false );
