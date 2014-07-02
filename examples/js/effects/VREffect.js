@@ -1,7 +1,20 @@
 /**
  * @author dmarcos / https://github.com/dmarcos
+ *
+ * It handles stereo rendering
+ * If mozGetVRDevices API is not available it gracefuly falls back to a
+ * regular renderer
+ *
+ * The HMD supported is the Oculus DK1 and The Web API doesn't currently allow
+ * to query for the display resolution. The dimensions of the screen are temporarly
+ * hardcoded (1280 x 800).
+ *
+ * For VR mode to work it has to be used with the Oculus enabled builds of Firefox:
+ *
+ * OSX: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.mac.dmg
+ * WIN: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.win64-x86_64.zip
+ *
  */
-
 THREE.VREffect = function ( renderer, done ) {
 
 	this._renderer = renderer;
