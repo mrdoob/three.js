@@ -34,10 +34,7 @@ function main() {
 
 	var buffer = [];
 	var sources = [];
-		
-	buffer.push('// You shouldn\'t edit this build file. \n');
-	buffer.push('// The following source code is build from the src folder. \n');
-	
+			
 	if ( args.amd ){
 		buffer.push('function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
 	};

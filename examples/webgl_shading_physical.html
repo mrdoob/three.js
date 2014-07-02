@@ -565,9 +565,6 @@
 
 				// render shadow map
 
-				renderer.autoUpdateObjects = false;
-
-				renderer.initWebGLObjects( scene );
 				renderer.updateShadowMap( scene, camera );
 
 				// render cube map
@@ -582,8 +579,6 @@
 				mesh.visible = true;
 
 				// render scene
-
-				renderer.autoUpdateObjects = true;
 
 				//renderer.render( scene, camera );
 				//renderer.clearTarget( null, 1, 1, 1 );
