@@ -1,5 +1,3 @@
-// You shouldn't edit this build file. 
-// The following source code is build from the src folder. 
 // File:src/Three.js
 
 /**
@@ -16934,1740 +16932,207 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 // File:src/renderers/shaders/ShaderChunk.js
 
-/**
- * Shader chunks for WebLG Shader library
- *
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author mikael emtinger / http://gomo.se/
- */
+THREE.ShaderChunk = {};
 
-THREE.ShaderChunk = {
+// File:src/renderers/shaders/ShaderChunk/alphatest_fragment.glsl
 
-	// FOG
+THREE.ShaderChunk[ 'alphatest_fragment'] = "#ifdef ALPHATEST\n\n	if ( gl_FragColor.a < ALPHATEST ) discard;\n\n#endif\n";
 
-	fog_pars_fragment: [
+// File:src/renderers/shaders/ShaderChunk/lights_lambert_vertex.glsl
 
-		"#ifdef USE_FOG",
+THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vLightFront = vec3( 0.0 );\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack = vec3( 0.0 );\n\n#endif\n\ntransformedNormal = normalize( transformedNormal );\n\n#if MAX_DIR_LIGHTS > 0\n\nfor( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n	vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );\n	vec3 dirVector = normalize( lDirection.xyz );\n\n	float dotProduct = dot( transformedNormal, dirVector );\n	vec3 directionalLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n	#ifdef DOUBLE_SIDED\n\n		vec3 directionalLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n		#ifdef WRAP_AROUND\n\n			vec3 directionalLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n		#endif\n\n	#endif\n\n	#ifdef WRAP_AROUND\n\n		vec3 directionalLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n		directionalLightWeighting = mix( directionalLightWeighting, directionalLightWeightingHalf, wrapRGB );\n\n		#ifdef DOUBLE_SIDED\n\n			directionalLightWeightingBack = mix( directionalLightWeightingBack, directionalLightWeightingHalfBack, wrapRGB );\n\n		#endif\n\n	#endif\n\n	vLightFront += directionalLightColor[ i ] * directionalLightWeighting;\n\n	#ifdef DOUBLE_SIDED\n\n		vLightBack += directionalLightColor[ i ] * directionalLightWeightingBack;\n\n	#endif\n\n}\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n\n		float lDistance = 1.0;\n		if ( pointLightDistance[ i ] > 0.0 )\n			lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );\n\n		lVector = normalize( lVector );\n		float dotProduct = dot( transformedNormal, lVector );\n\n		vec3 pointLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n		#ifdef DOUBLE_SIDED\n\n			vec3 pointLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n			#ifdef WRAP_AROUND\n\n				vec3 pointLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n			#endif\n\n		#endif\n\n		#ifdef WRAP_AROUND\n\n			vec3 pointLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n			pointLightWeighting = mix( pointLightWeighting, pointLightWeightingHalf, wrapRGB );\n\n			#ifdef DOUBLE_SIDED\n\n				pointLightWeightingBack = mix( pointLightWeightingBack, pointLightWeightingHalfBack, wrapRGB );\n\n			#endif\n\n		#endif\n\n		vLightFront += pointLightColor[ i ] * pointLightWeighting * lDistance;\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += pointLightColor[ i ] * pointLightWeightingBack * lDistance;\n\n		#endif\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - worldPosition.xyz ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );\n\n			float lDistance = 1.0;\n			if ( spotLightDistance[ i ] > 0.0 )\n				lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );\n\n			lVector = normalize( lVector );\n\n			float dotProduct = dot( transformedNormal, lVector );\n			vec3 spotLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n			#ifdef DOUBLE_SIDED\n\n				vec3 spotLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n				#ifdef WRAP_AROUND\n\n					vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n				#endif\n\n			#endif\n\n			#ifdef WRAP_AROUND\n\n				vec3 spotLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n				spotLightWeighting = mix( spotLightWeighting, spotLightWeightingHalf, wrapRGB );\n\n				#ifdef DOUBLE_SIDED\n\n					spotLightWeightingBack = mix( spotLightWeightingBack, spotLightWeightingHalfBack, wrapRGB );\n\n				#endif\n\n			#endif\n\n			vLightFront += spotLightColor[ i ] * spotLightWeighting * lDistance * spotEffect;\n\n			#ifdef DOUBLE_SIDED\n\n				vLightBack += spotLightColor[ i ] * spotLightWeightingBack * lDistance * spotEffect;\n\n			#endif\n\n		}\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );\n		vec3 lVector = normalize( lDirection.xyz );\n\n		float dotProduct = dot( transformedNormal, lVector );\n\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n		float hemiDiffuseWeightBack = -0.5 * dotProduct + 0.5;\n\n		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );\n\n		#endif\n\n	}\n\n#endif\n\nvLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack = vLightBack * diffuse + ambient * ambientLightColor + emissive;\n\n#endif";
 
-		"	uniform vec3 fogColor;",
+// File:src/renderers/shaders/ShaderChunk/map_particle_pars_fragment.glsl
 
-		"	#ifdef FOG_EXP2",
+THREE.ShaderChunk[ 'map_particle_pars_fragment'] = "#ifdef USE_MAP\n\n	uniform sampler2D map;\n\n#endif";
 
-		"		uniform float fogDensity;",
+// File:src/renderers/shaders/ShaderChunk/default_vertex.glsl
 
-		"	#else",
+THREE.ShaderChunk[ 'default_vertex'] = "vec4 mvPosition;\n\n#ifdef USE_SKINNING\n\n	mvPosition = modelViewMatrix * skinned;\n\n#endif\n\n#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )\n\n	mvPosition = modelViewMatrix * vec4( morphed, 1.0 );\n\n#endif\n\n#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )\n\n	mvPosition = modelViewMatrix * vec4( position, 1.0 );\n\n#endif\n\ngl_Position = projectionMatrix * mvPosition;";
 
-		"		uniform float fogNear;",
-		"		uniform float fogFar;",
+// File:src/renderers/shaders/ShaderChunk/map_pars_fragment.glsl
 
-		"	#endif",
+THREE.ShaderChunk[ 'map_pars_fragment'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )\n\n	varying vec2 vUv;\n\n#endif\n\n#ifdef USE_MAP\n\n	uniform sampler2D map;\n\n#endif";
 
-		"#endif"
+// File:src/renderers/shaders/ShaderChunk/skinnormal_vertex.glsl
 
-	].join("\n"),
+THREE.ShaderChunk[ 'skinnormal_vertex'] = "#ifdef USE_SKINNING\n\n	mat4 skinMatrix = mat4( 0.0 );\n	skinMatrix += skinWeight.x * boneMatX;\n	skinMatrix += skinWeight.y * boneMatY;\n	skinMatrix += skinWeight.z * boneMatZ;\n	skinMatrix += skinWeight.w * boneMatW;\n\n	#ifdef USE_MORPHNORMALS\n\n	vec4 skinnedNormal = skinMatrix * vec4( morphedNormal, 0.0 );\n\n	#else\n\n	vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );\n\n	#endif\n\n#endif";
 
-	fog_fragment: [
+// File:src/renderers/shaders/ShaderChunk/logdepthbuf_pars_vertex.glsl
 
-		"#ifdef USE_FOG",
+THREE.ShaderChunk[ 'logdepthbuf_pars_vertex'] = "#ifdef USE_LOGDEPTHBUF\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		varying float vFragDepth;\n\n	#endif\n\n	uniform float logDepthBufFC;\n\n#endif";
 
-		"	#ifdef USE_LOGDEPTHBUF_EXT",
+// File:src/renderers/shaders/ShaderChunk/lightmap_pars_vertex.glsl
 
-		"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+THREE.ShaderChunk[ 'lightmap_pars_vertex'] = "#ifdef USE_LIGHTMAP\n\n	varying vec2 vUv2;\n\n#endif";
 
-		"	#else",
+// File:src/renderers/shaders/ShaderChunk/lights_phong_fragment.glsl
 
-		"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+THREE.ShaderChunk[ 'lights_phong_fragment'] = "vec3 normal = normalize( vNormal );\nvec3 viewPosition = normalize( vViewPosition );\n\n#ifdef DOUBLE_SIDED\n\n	normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n\n#endif\n\n#ifdef USE_NORMALMAP\n\n	normal = perturbNormal2Arb( -vViewPosition, normal );\n\n#elif defined( USE_BUMPMAP )\n\n	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	vec3 pointDiffuse = vec3( 0.0 );\n	vec3 pointSpecular = vec3( 0.0 );\n\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n\n		float lDistance = 1.0;\n		if ( pointLightDistance[ i ] > 0.0 )\n			lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );\n\n		lVector = normalize( lVector );\n\n				// diffuse\n\n		float dotProduct = dot( normal, lVector );\n\n		#ifdef WRAP_AROUND\n\n			float pointDiffuseWeightFull = max( dotProduct, 0.0 );\n			float pointDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n			vec3 pointDiffuseWeight = mix( vec3( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );\n\n		#else\n\n			float pointDiffuseWeight = max( dotProduct, 0.0 );\n\n		#endif\n\n		pointDiffuse += diffuse * pointLightColor[ i ] * pointDiffuseWeight * lDistance;\n\n				// specular\n\n		vec3 pointHalfVector = normalize( lVector + viewPosition );\n		float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );\n		float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );\n		pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	vec3 spotDiffuse = vec3( 0.0 );\n	vec3 spotSpecular = vec3( 0.0 );\n\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n\n		float lDistance = 1.0;\n		if ( spotLightDistance[ i ] > 0.0 )\n			lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );\n\n		lVector = normalize( lVector );\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );\n\n					// diffuse\n\n			float dotProduct = dot( normal, lVector );\n\n			#ifdef WRAP_AROUND\n\n				float spotDiffuseWeightFull = max( dotProduct, 0.0 );\n				float spotDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n				vec3 spotDiffuseWeight = mix( vec3( spotDiffuseWeightFull ), vec3( spotDiffuseWeightHalf ), wrapRGB );\n\n			#else\n\n				float spotDiffuseWeight = max( dotProduct, 0.0 );\n\n			#endif\n\n			spotDiffuse += diffuse * spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;\n\n					// specular\n\n			vec3 spotHalfVector = normalize( lVector + viewPosition );\n			float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );\n			float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );\n\n			float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );\n			spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;\n\n		}\n\n	}\n\n#endif\n\n#if MAX_DIR_LIGHTS > 0\n\n	vec3 dirDiffuse = vec3( 0.0 );\n	vec3 dirSpecular = vec3( 0.0 );\n\n	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n		vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );\n		vec3 dirVector = normalize( lDirection.xyz );\n\n				// diffuse\n\n		float dotProduct = dot( normal, dirVector );\n\n		#ifdef WRAP_AROUND\n\n			float dirDiffuseWeightFull = max( dotProduct, 0.0 );\n			float dirDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n			vec3 dirDiffuseWeight = mix( vec3( dirDiffuseWeightFull ), vec3( dirDiffuseWeightHalf ), wrapRGB );\n\n		#else\n\n			float dirDiffuseWeight = max( dotProduct, 0.0 );\n\n		#endif\n\n		dirDiffuse += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;\n\n		// specular\n\n		vec3 dirHalfVector = normalize( dirVector + viewPosition );\n		float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );\n		float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );\n\n		/*\n		// fresnel term from skin shader\n		const float F0 = 0.128;\n\n		float base = 1.0 - dot( viewPosition, dirHalfVector );\n		float exponential = pow( base, 5.0 );\n\n		float fresnel = exponential + F0 * ( 1.0 - exponential );\n		*/\n\n		/*\n		// fresnel term from fresnel shader\n		const float mFresnelBias = 0.08;\n		const float mFresnelScale = 0.3;\n		const float mFresnelPower = 5.0;\n\n		float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );\n		*/\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		// 		dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;\n\n		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );\n		dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;\n\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	vec3 hemiDiffuse = vec3( 0.0 );\n	vec3 hemiSpecular = vec3( 0.0 );\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );\n		vec3 lVector = normalize( lDirection.xyz );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lVector );\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n\n		vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		hemiDiffuse += diffuse * hemiColor;\n\n		// specular (sky light)\n\n		vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );\n		float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;\n		float hemiSpecularWeightSky = specularStrength * max( pow( max( hemiDotNormalHalfSky, 0.0 ), shininess ), 0.0 );\n\n		// specular (ground light)\n\n		vec3 lVectorGround = -lVector;\n\n		vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );\n		float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;\n		float hemiSpecularWeightGround = specularStrength * max( pow( max( hemiDotNormalHalfGround, 0.0 ), shininess ), 0.0 );\n\n		float dotProductGround = dot( normal, lVectorGround );\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );\n		vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );\n		hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );\n\n	}\n\n#endif\n\nvec3 totalDiffuse = vec3( 0.0 );\nvec3 totalSpecular = vec3( 0.0 );\n\n#if MAX_DIR_LIGHTS > 0\n\n	totalDiffuse += dirDiffuse;\n	totalSpecular += dirSpecular;\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	totalDiffuse += hemiDiffuse;\n	totalSpecular += hemiSpecular;\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	totalDiffuse += pointDiffuse;\n	totalSpecular += pointSpecular;\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	totalDiffuse += spotDiffuse;\n	totalSpecular += spotSpecular;\n\n#endif\n\n#ifdef METAL\n\n	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient + totalSpecular );\n\n#else\n\n	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient ) + totalSpecular;\n\n#endif";
 
-		"	#endif",
+// File:src/renderers/shaders/ShaderChunk/fog_pars_fragment.glsl
 
-		"	#ifdef FOG_EXP2",
+THREE.ShaderChunk[ 'fog_pars_fragment'] = "#ifdef USE_FOG\n\n	uniform vec3 fogColor;\n\n	#ifdef FOG_EXP2\n\n		uniform float fogDensity;\n\n	#else\n\n		uniform float fogNear;\n		uniform float fogFar;\n	#endif\n\n#endif";
 
-		"		const float LOG2 = 1.442695;",
-		"		float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );",
-		"		fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );",
+// File:src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl
 
-		"	#else",
+THREE.ShaderChunk[ 'morphnormal_vertex'] = "#ifdef USE_MORPHNORMALS\n\n	vec3 morphedNormal = vec3( 0.0 );\n\n	morphedNormal += ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];\n	morphedNormal += ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];\n	morphedNormal += ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];\n	morphedNormal += ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];\n\n	morphedNormal += normal;\n\n#endif";
 
-		"		float fogFactor = smoothstep( fogNear, fogFar, depth );",
+// File:src/renderers/shaders/ShaderChunk/envmap_pars_fragment.glsl
 
-		"	#endif",
+THREE.ShaderChunk[ 'envmap_pars_fragment'] = "#ifdef USE_ENVMAP\n\n	uniform float reflectivity;\n	uniform samplerCube envMap;\n	uniform float flipEnvMap;\n	uniform int combine;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\n		uniform bool useRefract;\n		uniform float refractionRatio;\n\n	#else\n\n		varying vec3 vReflect;\n\n	#endif\n\n#endif";
 
-		"	gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );",
+// File:src/renderers/shaders/ShaderChunk/logdepthbuf_fragment.glsl
 
-		"#endif"
+THREE.ShaderChunk[ 'logdepthbuf_fragment'] = "#if defined(USE_LOGDEPTHBUF) && defined(USE_LOGDEPTHBUF_EXT)\n\n	gl_FragDepthEXT = log2(vFragDepth) * logDepthBufFC * 0.5;\n\n#endif";
 
-	].join("\n"),
+// File:src/renderers/shaders/ShaderChunk/normalmap_pars_fragment.glsl
 
-	// ENVIRONMENT MAP
+THREE.ShaderChunk[ 'normalmap_pars_fragment'] = "#ifdef USE_NORMALMAP\n\n	uniform sampler2D normalMap;\n	uniform vec2 normalScale;\n\n			// Per-Pixel Tangent Space Normal Mapping\n			// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html\n\n	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {\n\n		vec3 q0 = dFdx( eye_pos.xyz );\n		vec3 q1 = dFdy( eye_pos.xyz );\n		vec2 st0 = dFdx( vUv.st );\n		vec2 st1 = dFdy( vUv.st );\n\n		vec3 S = normalize( q0 * st1.t - q1 * st0.t );\n		vec3 T = normalize( -q0 * st1.s + q1 * st0.s );\n		vec3 N = normalize( surf_norm );\n\n		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n		mapN.xy = normalScale * mapN.xy;\n		mat3 tsn = mat3( S, T, N );\n		return normalize( tsn * mapN );\n\n	}\n\n#endif\n";
 
-	envmap_pars_fragment: [
+// File:src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl
 
-		"#ifdef USE_ENVMAP",
+THREE.ShaderChunk[ 'lights_phong_pars_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )\n\n	varying vec3 vWorldPosition;\n\n#endif\n";
 
-		"	uniform float reflectivity;",
-		"	uniform samplerCube envMap;",
-		"	uniform float flipEnvMap;",
-		"	uniform int combine;",
+// File:src/renderers/shaders/ShaderChunk/lightmap_pars_fragment.glsl
 
-		"	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )",
+THREE.ShaderChunk[ 'lightmap_pars_fragment'] = "#ifdef USE_LIGHTMAP\n\n	varying vec2 vUv2;\n	uniform sampler2D lightMap;\n\n#endif";
 
-		"		uniform bool useRefract;",
-		"		uniform float refractionRatio;",
+// File:src/renderers/shaders/ShaderChunk/shadowmap_vertex.glsl
 
-		"	#else",
+THREE.ShaderChunk[ 'shadowmap_vertex'] = "#ifdef USE_SHADOWMAP\n\n	for( int i = 0; i < MAX_SHADOWS; i ++ ) {\n\n		vShadowCoord[ i ] = shadowMatrix[ i ] * worldPosition;\n\n	}\n\n#endif";
 
-		"		varying vec3 vReflect;",
+// File:src/renderers/shaders/ShaderChunk/lights_phong_vertex.glsl
 
-		"	#endif",
+THREE.ShaderChunk[ 'lights_phong_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )\n\n	vWorldPosition = worldPosition.xyz;\n\n#endif";
 
-		"#endif"
+// File:src/renderers/shaders/ShaderChunk/map_fragment.glsl
 
-	].join("\n"),
+THREE.ShaderChunk[ 'map_fragment'] = "#ifdef USE_MAP\n\n	vec4 texelColor = texture2D( map, vUv );\n\n	#ifdef GAMMA_INPUT\n\n		texelColor.xyz *= texelColor.xyz;\n\n	#endif\n\n	gl_FragColor = gl_FragColor * texelColor;\n\n#endif";
 
-	envmap_fragment: [
+// File:src/renderers/shaders/ShaderChunk/lightmap_vertex.glsl
 
-		"#ifdef USE_ENVMAP",
+THREE.ShaderChunk[ 'lightmap_vertex'] = "#ifdef USE_LIGHTMAP\n\n	vUv2 = uv2;\n\n#endif";
 
-		"	vec3 reflectVec;",
+// File:src/renderers/shaders/ShaderChunk/map_particle_fragment.glsl
 
-		"	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )",
+THREE.ShaderChunk[ 'map_particle_fragment'] = "#ifdef USE_MAP\n\n	gl_FragColor = gl_FragColor * texture2D( map, vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y ) );\n\n#endif";
 
-		"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
+// File:src/renderers/shaders/ShaderChunk/color_pars_fragment.glsl
 
-				// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
-				// "Transforming Normal Vectors with the Inverse Transformation"
+THREE.ShaderChunk[ 'color_pars_fragment'] = "#ifdef USE_COLOR\n\n	varying vec3 vColor;\n\n#endif\n";
 
-		"		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );",
+// File:src/renderers/shaders/ShaderChunk/color_vertex.glsl
 
-		"		if ( useRefract ) {",
+THREE.ShaderChunk[ 'color_vertex'] = "#ifdef USE_COLOR\n\n	#ifdef GAMMA_INPUT\n\n		vColor = color * color;\n\n	#else\n\n		vColor = color;\n\n	#endif\n\n#endif";
 
-		"			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );",
+// File:src/renderers/shaders/ShaderChunk/skinning_vertex.glsl
 
-		"		} else { ",
+THREE.ShaderChunk[ 'skinning_vertex'] = "#ifdef USE_SKINNING\n\n	#ifdef USE_MORPHTARGETS\n\n	vec4 skinVertex = vec4( morphed, 1.0 );\n\n	#else\n\n	vec4 skinVertex = vec4( position, 1.0 );\n\n	#endif\n\n	vec4 skinned = vec4( 0.0 );\n	skinned += boneMatX * skinVertex * skinWeight.x;\n	skinned += boneMatY * skinVertex * skinWeight.y;\n	skinned += boneMatZ * skinVertex * skinWeight.z;\n	skinned += boneMatW * skinVertex * skinWeight.w;\n\n#endif";
 
-		"			reflectVec = reflect( cameraToVertex, worldNormal );",
+// File:src/renderers/shaders/ShaderChunk/envmap_pars_vertex.glsl
 
-		"		}",
+THREE.ShaderChunk[ 'envmap_pars_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP )\n\n	varying vec3 vReflect;\n\n	uniform float refractionRatio;\n	uniform bool useRefract;\n\n#endif\n";
 
-		"	#else",
+// File:src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl
 
-		"		reflectVec = vReflect;",
+THREE.ShaderChunk[ 'linear_to_gamma_fragment'] = "#ifdef GAMMA_OUTPUT\n\n	gl_FragColor.xyz = sqrt( gl_FragColor.xyz );\n\n#endif";
 
-		"	#endif",
+// File:src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl
 
-		"	#ifdef DOUBLE_SIDED",
+THREE.ShaderChunk[ 'color_pars_vertex'] = "#ifdef USE_COLOR\n\n	varying vec3 vColor;\n\n#endif";
 
-		"		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
-		"		vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+// File:src/renderers/shaders/ShaderChunk/lights_lambert_pars_vertex.glsl
 
-		"	#else",
+THREE.ShaderChunk[ 'lights_lambert_pars_vertex'] = "uniform vec3 ambient;\nuniform vec3 diffuse;\nuniform vec3 emissive;\n\nuniform vec3 ambientLightColor;\n\n#if MAX_DIR_LIGHTS > 0\n\n	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];\n	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];\n	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];\n\n#endif\n\n#ifdef WRAP_AROUND\n\n	uniform vec3 wrapRGB;\n\n#endif\n";
 
-		"		vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+// File:src/renderers/shaders/ShaderChunk/map_pars_vertex.glsl
 
-		"	#endif",
+THREE.ShaderChunk[ 'map_pars_vertex'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )\n\n	varying vec2 vUv;\n	uniform vec4 offsetRepeat;\n\n#endif\n";
 
-		"	#ifdef GAMMA_INPUT",
+// File:src/renderers/shaders/ShaderChunk/envmap_fragment.glsl
 
-		"		cubeColor.xyz *= cubeColor.xyz;",
+THREE.ShaderChunk[ 'envmap_fragment'] = "#ifdef USE_ENVMAP\n\n	vec3 reflectVec;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )\n\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\n		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations\n		// Transforming Normal Vectors with the Inverse Transformation\n\n		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );\n\n		if ( useRefract ) {\n\n			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\n		} else { \n\n			reflectVec = reflect( cameraToVertex, worldNormal );\n\n		}\n\n	#else\n\n		reflectVec = vReflect;\n\n	#endif\n\n	#ifdef DOUBLE_SIDED\n\n		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n		vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#else\n\n		vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#endif\n\n	#ifdef GAMMA_INPUT\n\n		cubeColor.xyz *= cubeColor.xyz;\n\n	#endif\n\n	if ( combine == 1 ) {\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularStrength * reflectivity );\n\n	} else if ( combine == 2 ) {\n\n		gl_FragColor.xyz += cubeColor.xyz * specularStrength * reflectivity;\n\n	} else {\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * cubeColor.xyz, specularStrength * reflectivity );\n\n	}\n\n#endif";
 
-		"	#endif",
+// File:src/renderers/shaders/ShaderChunk/specularmap_pars_fragment.glsl
 
-		"	if ( combine == 1 ) {",
+THREE.ShaderChunk[ 'specularmap_pars_fragment'] = "#ifdef USE_SPECULARMAP\n\n	uniform sampler2D specularMap;\n\n#endif";
 
-		"		gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularStrength * reflectivity );",
+// File:src/renderers/shaders/ShaderChunk/logdepthbuf_vertex.glsl
 
-		"	} else if ( combine == 2 ) {",
+THREE.ShaderChunk[ 'logdepthbuf_vertex'] = "#ifdef USE_LOGDEPTHBUF\n\n	gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC;\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		vFragDepth = 1.0 + gl_Position.w;\n\n#else\n\n		gl_Position.z = (gl_Position.z - 1.0) * gl_Position.w;\n\n	#endif\n\n#endif";
 
-		"		gl_FragColor.xyz += cubeColor.xyz * specularStrength * reflectivity;",
+// File:src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl
 
-		"	} else {",
+THREE.ShaderChunk[ 'morphtarget_pars_vertex'] = "#ifdef USE_MORPHTARGETS\n\n	#ifndef USE_MORPHNORMALS\n\n	uniform float morphTargetInfluences[ 8 ];\n\n	#else\n\n	uniform float morphTargetInfluences[ 4 ];\n\n	#endif\n\n#endif";
 
-		"		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * cubeColor.xyz, specularStrength * reflectivity );",
+// File:src/renderers/shaders/ShaderChunk/specularmap_fragment.glsl
 
-		"	}",
+THREE.ShaderChunk[ 'specularmap_fragment'] = "float specularStrength;\n\n#ifdef USE_SPECULARMAP\n\n	vec4 texelSpecular = texture2D( specularMap, vUv );\n	specularStrength = texelSpecular.r;\n\n#else\n\n	specularStrength = 1.0;\n\n#endif";
 
-		"#endif"
+// File:src/renderers/shaders/ShaderChunk/fog_fragment.glsl
 
-	].join("\n"),
+THREE.ShaderChunk[ 'fog_fragment'] = "#ifdef USE_FOG\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		float depth = gl_FragDepthEXT / gl_FragCoord.w;\n\n	#else\n\n		float depth = gl_FragCoord.z / gl_FragCoord.w;\n\n	#endif\n\n	#ifdef FOG_EXP2\n\n		const float LOG2 = 1.442695;\n		float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );\n		fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );\n\n	#else\n\n		float fogFactor = smoothstep( fogNear, fogFar, depth );\n\n	#endif\n	\n	gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );\n\n#endif";
 
-	envmap_pars_vertex: [
+// File:src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl
 
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP )",
+THREE.ShaderChunk[ 'bumpmap_pars_fragment'] = "#ifdef USE_BUMPMAP\n\n	uniform sampler2D bumpMap;\n	uniform float bumpScale;\n\n			// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen\n			//	http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html\n\n			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)\n\n	vec2 dHdxy_fwd() {\n\n		vec2 dSTdx = dFdx( vUv );\n		vec2 dSTdy = dFdy( vUv );\n\n		float Hll = bumpScale * texture2D( bumpMap, vUv ).x;\n		float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;\n		float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;\n\n		return vec2( dBx, dBy );\n\n	}\n\n	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {\n\n		vec3 vSigmaX = dFdx( surf_pos );\n		vec3 vSigmaY = dFdy( surf_pos );\n		vec3 vN = surf_norm;		// normalized\n\n		vec3 R1 = cross( vSigmaY, vN );\n		vec3 R2 = cross( vN, vSigmaX );\n\n		float fDet = dot( vSigmaX, R1 );\n\n		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n		return normalize( abs( fDet ) * surf_norm - vGrad );\n\n	}\n\n#endif";
 
-		"	varying vec3 vReflect;",
+// File:src/renderers/shaders/ShaderChunk/defaultnormal_vertex.glsl
 
-		"	uniform float refractionRatio;",
-		"	uniform bool useRefract;",
+THREE.ShaderChunk[ 'defaultnormal_vertex'] = "vec3 objectNormal;\n\n#ifdef USE_SKINNING\n\n	objectNormal = skinnedNormal.xyz;\n\n#endif\n\n#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )\n\n	objectNormal = morphedNormal;\n\n#endif\n\n#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )\n\n	objectNormal = normal;\n\n#endif\n\n#ifdef FLIP_SIDED\n\n	objectNormal = -objectNormal;\n\n#endif\n\nvec3 transformedNormal = normalMatrix * objectNormal;";
 
-		"#endif"
+// File:src/renderers/shaders/ShaderChunk/lights_phong_pars_fragment.glsl
 
-	].join("\n"),
+THREE.ShaderChunk[ 'lights_phong_pars_fragment'] = "uniform vec3 ambientLightColor;\n\n#if MAX_DIR_LIGHTS > 0\n\n	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];\n	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];\n\n	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];\n\n	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )\n\n	varying vec3 vWorldPosition;\n\n#endif\n\n#ifdef WRAP_AROUND\n\n	uniform vec3 wrapRGB;\n\n#endif\n\nvarying vec3 vViewPosition;\nvarying vec3 vNormal;";
 
-	worldpos_vertex : [
+// File:src/renderers/shaders/ShaderChunk/skinbase_vertex.glsl
 
-		"#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )",
+THREE.ShaderChunk[ 'skinbase_vertex'] = "#ifdef USE_SKINNING\n\n	mat4 boneMatX = getBoneMatrix( skinIndex.x );\n	mat4 boneMatY = getBoneMatrix( skinIndex.y );\n	mat4 boneMatZ = getBoneMatrix( skinIndex.z );\n	mat4 boneMatW = getBoneMatrix( skinIndex.w );\n\n#endif";
 
-		"	#ifdef USE_SKINNING",
+// File:src/renderers/shaders/ShaderChunk/map_vertex.glsl
 
-		"		vec4 worldPosition = modelMatrix * skinned;",
+THREE.ShaderChunk[ 'map_vertex'] = "#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )\n\n	vUv = uv * offsetRepeat.zw + offsetRepeat.xy;\n\n#endif";
 
-		"	#endif",
+// File:src/renderers/shaders/ShaderChunk/lightmap_fragment.glsl
 
-		"	#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+THREE.ShaderChunk[ 'lightmap_fragment'] = "#ifdef USE_LIGHTMAP\n\n	gl_FragColor = gl_FragColor * texture2D( lightMap, vUv2 );\n\n#endif";
 
-		"		vec4 worldPosition = modelMatrix * vec4( morphed, 1.0 );",
+// File:src/renderers/shaders/ShaderChunk/shadowmap_pars_vertex.glsl
 
-		"	#endif",
+THREE.ShaderChunk[ 'shadowmap_pars_vertex'] = "#ifdef USE_SHADOWMAP\n\n	varying vec4 vShadowCoord[ MAX_SHADOWS ];\n	uniform mat4 shadowMatrix[ MAX_SHADOWS ];\n\n#endif";
 
-		"	#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+// File:src/renderers/shaders/ShaderChunk/color_fragment.glsl
 
-		"		vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+THREE.ShaderChunk[ 'color_fragment'] = "#ifdef USE_COLOR\n\n	gl_FragColor = gl_FragColor * vec4( vColor, 1.0 );\n\n#endif";
 
-		"	#endif",
+// File:src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl
 
-		"#endif"
+THREE.ShaderChunk[ 'morphtarget_vertex'] = "#ifdef USE_MORPHTARGETS\n\n	vec3 morphed = vec3( 0.0 );\n	morphed += ( morphTarget0 - position ) * morphTargetInfluences[ 0 ];\n	morphed += ( morphTarget1 - position ) * morphTargetInfluences[ 1 ];\n	morphed += ( morphTarget2 - position ) * morphTargetInfluences[ 2 ];\n	morphed += ( morphTarget3 - position ) * morphTargetInfluences[ 3 ];\n\n	#ifndef USE_MORPHNORMALS\n\n	morphed += ( morphTarget4 - position ) * morphTargetInfluences[ 4 ];\n	morphed += ( morphTarget5 - position ) * morphTargetInfluences[ 5 ];\n	morphed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];\n	morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];\n\n	#endif\n\n	morphed += position;\n\n#endif";
 
-	].join("\n"),
+// File:src/renderers/shaders/ShaderChunk/envmap_vertex.glsl
 
-	envmap_vertex : [
+THREE.ShaderChunk[ 'envmap_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP )\n\n	vec3 worldNormal = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;\n	worldNormal = normalize( worldNormal );\n\n	vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n\n	if ( useRefract ) {\n\n		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n\n	} else {\n\n		vReflect = reflect( cameraToVertex, worldNormal );\n\n	}\n\n#endif";
 
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP )",
+// File:src/renderers/shaders/ShaderChunk/shadowmap_fragment.glsl
 
-		"	vec3 worldNormal = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;",
-		"	worldNormal = normalize( worldNormal );",
+THREE.ShaderChunk[ 'shadowmap_fragment'] = "#ifdef USE_SHADOWMAP\n\n	#ifdef SHADOWMAP_DEBUG\n\n		vec3 frustumColors[3];\n		frustumColors[0] = vec3( 1.0, 0.5, 0.0 );\n		frustumColors[1] = vec3( 0.0, 1.0, 0.8 );\n		frustumColors[2] = vec3( 0.0, 0.5, 1.0 );\n\n	#endif\n\n	#ifdef SHADOWMAP_CASCADE\n\n		int inFrustumCount = 0;\n\n	#endif\n\n	float fDepth;\n	vec3 shadowColor = vec3( 1.0 );\n\n	for( int i = 0; i < MAX_SHADOWS; i ++ ) {\n\n		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;\n\n				// if ( something && something ) breaks ATI OpenGL shader compiler\n				// if ( all( something, something ) ) using this instead\n\n		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n		bool inFrustum = all( inFrustumVec );\n\n				// don't shadow pixels outside of light frustum\n				// use just first frustum (for cascades)\n				// don't shadow pixels behind far plane of light frustum\n\n		#ifdef SHADOWMAP_CASCADE\n\n			inFrustumCount += int( inFrustum );\n			bvec3 frustumTestVec = bvec3( inFrustum, inFrustumCount == 1, shadowCoord.z <= 1.0 );\n\n		#else\n\n			bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n\n		#endif\n\n		bool frustumTest = all( frustumTestVec );\n\n		if ( frustumTest ) {\n\n			shadowCoord.z += shadowBias[ i ];\n\n			#if defined( SHADOWMAP_TYPE_PCF )\n\n						// Percentage-close filtering\n						// (9 pixel kernel)\n						// http://fabiensanglard.net/shadowmappingPCF/\n\n				float shadow = 0.0;\n\n		/*\n						// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL\n						// must enroll loop manually\n\n				for ( float y = -1.25; y <= 1.25; y += 1.25 )\n					for ( float x = -1.25; x <= 1.25; x += 1.25 ) {\n\n						vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );\n\n								// doesn't seem to produce any noticeable visual difference compared to simple texture2D lookup\n								//vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );\n\n						float fDepth = unpackDepth( rgbaDepth );\n\n						if ( fDepth < shadowCoord.z )\n							shadow += 1.0;\n\n				}\n\n				shadow /= 9.0;\n\n		*/\n\n				const float shadowDelta = 1.0 / 9.0;\n\n				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;\n				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;\n\n				float dx0 = -1.25 * xPixelOffset;\n				float dy0 = -1.25 * yPixelOffset;\n				float dx1 = 1.25 * xPixelOffset;\n				float dy1 = 1.25 * yPixelOffset;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );\n\n			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n\n						// Percentage-close filtering\n						// (9 pixel kernel)\n						// http://fabiensanglard.net/shadowmappingPCF/\n\n				float shadow = 0.0;\n\n				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;\n				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;\n\n				float dx0 = -1.0 * xPixelOffset;\n				float dy0 = -1.0 * yPixelOffset;\n				float dx1 = 1.0 * xPixelOffset;\n				float dy1 = 1.0 * yPixelOffset;\n\n				mat3 shadowKernel;\n				mat3 depthKernel;\n\n				depthKernel[0][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				depthKernel[0][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				depthKernel[0][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				depthKernel[1][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				depthKernel[1][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				depthKernel[1][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				depthKernel[2][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				depthKernel[2][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				depthKernel[2][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n\n				vec3 shadowZ = vec3( shadowCoord.z );\n				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));\n				shadowKernel[0] *= vec3(0.25);\n\n				shadowKernel[1] = vec3(lessThan(depthKernel[1], shadowZ ));\n				shadowKernel[1] *= vec3(0.25);\n\n				shadowKernel[2] = vec3(lessThan(depthKernel[2], shadowZ ));\n				shadowKernel[2] *= vec3(0.25);\n\n				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[i].xy );\n\n				shadowKernel[0] = mix( shadowKernel[1], shadowKernel[0], fractionalCoord.x );\n				shadowKernel[1] = mix( shadowKernel[2], shadowKernel[1], fractionalCoord.x );\n\n				vec4 shadowValues;\n				shadowValues.x = mix( shadowKernel[0][1], shadowKernel[0][0], fractionalCoord.y );\n				shadowValues.y = mix( shadowKernel[0][2], shadowKernel[0][1], fractionalCoord.y );\n				shadowValues.z = mix( shadowKernel[1][1], shadowKernel[1][0], fractionalCoord.y );\n				shadowValues.w = mix( shadowKernel[1][2], shadowKernel[1][1], fractionalCoord.y );\n\n				shadow = dot( shadowValues, vec4( 1.0 ) );\n\n				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );\n\n			#else\n\n				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );\n				float fDepth = unpackDepth( rgbaDepth );\n\n				if ( fDepth < shadowCoord.z )\n\n		// spot with multiple shadows is darker\n\n					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );\n\n		// spot with multiple shadows has the same color as single shadow spot\n\n		// 					shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );\n\n			#endif\n\n		}\n\n\n		#ifdef SHADOWMAP_DEBUG\n\n			#ifdef SHADOWMAP_CASCADE\n\n				if ( inFrustum && inFrustumCount == 1 ) gl_FragColor.xyz *= frustumColors[ i ];\n\n			#else\n\n				if ( inFrustum ) gl_FragColor.xyz *= frustumColors[ i ];\n\n			#endif\n\n		#endif\n\n	}\n\n	#ifdef GAMMA_OUTPUT\n\n		shadowColor *= shadowColor;\n\n	#endif\n\n	gl_FragColor.xyz = gl_FragColor.xyz * shadowColor;\n\n#endif\n";
 
-		"	vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );",
+// File:src/renderers/shaders/ShaderChunk/worldpos_vertex.glsl
 
-		"	if ( useRefract ) {",
+THREE.ShaderChunk[ 'worldpos_vertex'] = "#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )\n\n	#ifdef USE_SKINNING\n\n		vec4 worldPosition = modelMatrix * skinned;\n\n	#endif\n\n	#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )\n\n		vec4 worldPosition = modelMatrix * vec4( morphed, 1.0 );\n\n	#endif\n\n	#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )\n\n		vec4 worldPosition = modelMatrix * vec4( position, 1.0 );\n\n	#endif\n\n#endif";
 
-		"		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );",
+// File:src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl
 
-		"	} else {",
+THREE.ShaderChunk[ 'shadowmap_pars_fragment'] = "#ifdef USE_SHADOWMAP\n\n	uniform sampler2D shadowMap[ MAX_SHADOWS ];\n	uniform vec2 shadowMapSize[ MAX_SHADOWS ];\n\n	uniform float shadowDarkness[ MAX_SHADOWS ];\n	uniform float shadowBias[ MAX_SHADOWS ];\n\n	varying vec4 vShadowCoord[ MAX_SHADOWS ];\n\n	float unpackDepth( const in vec4 rgba_depth ) {\n\n		const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );\n		float depth = dot( rgba_depth, bit_shift );\n		return depth;\n\n	}\n\n#endif";
 
-		"		vReflect = reflect( cameraToVertex, worldNormal );",
+// File:src/renderers/shaders/ShaderChunk/skinning_pars_vertex.glsl
 
-		"	}",
+THREE.ShaderChunk[ 'skinning_pars_vertex'] = "#ifdef USE_SKINNING\n\n	#ifdef BONE_TEXTURE\n\n		uniform sampler2D boneTexture;\n		uniform int boneTextureWidth;\n		uniform int boneTextureHeight;\n\n		mat4 getBoneMatrix( const in float i ) {\n\n			float j = i * 4.0;\n			float x = mod( j, float( boneTextureWidth ) );\n			float y = floor( j / float( boneTextureWidth ) );\n\n			float dx = 1.0 / float( boneTextureWidth );\n			float dy = 1.0 / float( boneTextureHeight );\n\n			y = dy * ( y + 0.5 );\n\n			vec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );\n			vec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );\n			vec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );\n			vec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );\n\n			mat4 bone = mat4( v1, v2, v3, v4 );\n\n			return bone;\n\n		}\n\n	#else\n\n		uniform mat4 boneGlobalMatrices[ MAX_BONES ];\n\n		mat4 getBoneMatrix( const in float i ) {\n\n			mat4 bone = boneGlobalMatrices[ int(i) ];\n			return bone;\n\n		}\n\n	#endif\n\n#endif";
 
-		"#endif"
+// File:src/renderers/shaders/ShaderChunk/logdepthbuf_pars_fragment.glsl
 
-	].join("\n"),
-
-	// COLOR MAP (particles)
-
-	map_particle_pars_fragment: [
-
-		"#ifdef USE_MAP",
-
-		"	uniform sampler2D map;",
-
-		"#endif"
-
-	].join("\n"),
-
-
-	map_particle_fragment: [
-
-		"#ifdef USE_MAP",
-
-		"	gl_FragColor = gl_FragColor * texture2D( map, vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y ) );",
-
-		"#endif"
-
-	].join("\n"),
-
-	// COLOR MAP (triangles)
-
-	map_pars_vertex: [
-
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
-
-		"	varying vec2 vUv;",
-		"	uniform vec4 offsetRepeat;",
-
-		"#endif"
-
-	].join("\n"),
-
-	map_pars_fragment: [
-
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
-
-		"	varying vec2 vUv;",
-
-		"#endif",
-
-		"#ifdef USE_MAP",
-
-		"	uniform sampler2D map;",
-
-		"#endif"
-
-	].join("\n"),
-
-	map_vertex: [
-
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
-
-		"	vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
-
-		"#endif"
-
-	].join("\n"),
-
-	map_fragment: [
-
-		"#ifdef USE_MAP",
-
-		"	vec4 texelColor = texture2D( map, vUv );",
-
-		"	#ifdef GAMMA_INPUT",
-
-		"		texelColor.xyz *= texelColor.xyz;",
-
-		"	#endif",
-
-		"	gl_FragColor = gl_FragColor * texelColor;",
-
-		"#endif"
-
-	].join("\n"),
-
-	// LIGHT MAP
-
-	lightmap_pars_fragment: [
-
-		"#ifdef USE_LIGHTMAP",
-
-		"	varying vec2 vUv2;",
-		"	uniform sampler2D lightMap;",
-
-		"#endif"
-
-	].join("\n"),
-
-	lightmap_pars_vertex: [
-
-		"#ifdef USE_LIGHTMAP",
-
-		"	varying vec2 vUv2;",
-
-		"#endif"
-
-	].join("\n"),
-
-	lightmap_fragment: [
-
-		"#ifdef USE_LIGHTMAP",
-
-		"	gl_FragColor = gl_FragColor * texture2D( lightMap, vUv2 );",
-
-		"#endif"
-
-	].join("\n"),
-
-	lightmap_vertex: [
-
-		"#ifdef USE_LIGHTMAP",
-
-		"	vUv2 = uv2;",
-
-		"#endif"
-
-	].join("\n"),
-
-	// BUMP MAP
-
-	bumpmap_pars_fragment: [
-
-		"#ifdef USE_BUMPMAP",
-
-		"	uniform sampler2D bumpMap;",
-		"	uniform float bumpScale;",
-
-			// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
-			//	http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
-
-			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
-
-		"	vec2 dHdxy_fwd() {",
-
-		"		vec2 dSTdx = dFdx( vUv );",
-		"		vec2 dSTdy = dFdy( vUv );",
-
-		"		float Hll = bumpScale * texture2D( bumpMap, vUv ).x;",
-		"		float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;",
-		"		float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;",
-
-		"		return vec2( dBx, dBy );",
-
-		"	}",
-
-		"	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {",
-
-		"		vec3 vSigmaX = dFdx( surf_pos );",
-		"		vec3 vSigmaY = dFdy( surf_pos );",
-		"		vec3 vN = surf_norm;",		// normalized
-
-		"		vec3 R1 = cross( vSigmaY, vN );",
-		"		vec3 R2 = cross( vN, vSigmaX );",
-
-		"		float fDet = dot( vSigmaX, R1 );",
-
-		"		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
-		"		return normalize( abs( fDet ) * surf_norm - vGrad );",
-
-		"	}",
-
-		"#endif"
-
-	].join("\n"),
-
-	// NORMAL MAP
-
-	normalmap_pars_fragment: [
-
-		"#ifdef USE_NORMALMAP",
-
-		"	uniform sampler2D normalMap;",
-		"	uniform vec2 normalScale;",
-
-			// Per-Pixel Tangent Space Normal Mapping
-			// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
-
-		"	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {",
-
-		"		vec3 q0 = dFdx( eye_pos.xyz );",
-		"		vec3 q1 = dFdy( eye_pos.xyz );",
-		"		vec2 st0 = dFdx( vUv.st );",
-		"		vec2 st1 = dFdy( vUv.st );",
-
-		"		vec3 S = normalize( q0 * st1.t - q1 * st0.t );",
-		"		vec3 T = normalize( -q0 * st1.s + q1 * st0.s );",
-		"		vec3 N = normalize( surf_norm );",
-
-		"		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;",
-		"		mapN.xy = normalScale * mapN.xy;",
-		"		mat3 tsn = mat3( S, T, N );",
-		"		return normalize( tsn * mapN );",
-
-		"	}",
-
-		"#endif"
-
-	].join("\n"),
-
-	// SPECULAR MAP
-
-	specularmap_pars_fragment: [
-
-		"#ifdef USE_SPECULARMAP",
-
-		"	uniform sampler2D specularMap;",
-
-		"#endif"
-
-	].join("\n"),
-
-	specularmap_fragment: [
-
-		"float specularStrength;",
-
-		"#ifdef USE_SPECULARMAP",
-
-		"	vec4 texelSpecular = texture2D( specularMap, vUv );",
-		"	specularStrength = texelSpecular.r;",
-
-		"#else",
-
-		"	specularStrength = 1.0;",
-
-		"#endif"
-
-	].join("\n"),
-
-	// LIGHTS LAMBERT
-
-	lights_lambert_pars_vertex: [
-
-		"uniform vec3 ambient;",
-		"uniform vec3 diffuse;",
-		"uniform vec3 emissive;",
-
-		"uniform vec3 ambientLightColor;",
-
-		"#if MAX_DIR_LIGHTS > 0",
-
-		"	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
-		"	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_HEMI_LIGHTS > 0",
-
-		"	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
-		"	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-		"	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_POINT_LIGHTS > 0",
-
-		"	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
-		"	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
-		"	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0",
-
-		"	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
-		"	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
-		"	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
-		"	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
-		"	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
-		"	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
-
-		"#endif",
-
-		"#ifdef WRAP_AROUND",
-
-		"	uniform vec3 wrapRGB;",
-
-		"#endif"
-
-	].join("\n"),
-
-	lights_lambert_vertex: [
-
-		"vLightFront = vec3( 0.0 );",
-
-		"#ifdef DOUBLE_SIDED",
-
-		"	vLightBack = vec3( 0.0 );",
-
-		"#endif",
-
-		"transformedNormal = normalize( transformedNormal );",
-
-		"#if MAX_DIR_LIGHTS > 0",
-
-		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
-
-		"	vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-		"	vec3 dirVector = normalize( lDirection.xyz );",
-
-		"	float dotProduct = dot( transformedNormal, dirVector );",
-		"	vec3 directionalLightWeighting = vec3( max( dotProduct, 0.0 ) );",
-
-		"	#ifdef DOUBLE_SIDED",
-
-		"		vec3 directionalLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );",
-
-		"		#ifdef WRAP_AROUND",
-
-		"			vec3 directionalLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );",
-
-		"		#endif",
-
-		"	#endif",
-
-		"	#ifdef WRAP_AROUND",
-
-		"		vec3 directionalLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );",
-		"		directionalLightWeighting = mix( directionalLightWeighting, directionalLightWeightingHalf, wrapRGB );",
-
-		"		#ifdef DOUBLE_SIDED",
-
-		"			directionalLightWeightingBack = mix( directionalLightWeightingBack, directionalLightWeightingHalfBack, wrapRGB );",
-
-		"		#endif",
-
-		"	#endif",
-
-		"	vLightFront += directionalLightColor[ i ] * directionalLightWeighting;",
-
-		"	#ifdef DOUBLE_SIDED",
-
-		"		vLightBack += directionalLightColor[ i ] * directionalLightWeightingBack;",
-
-		"	#endif",
-
-		"}",
-
-		"#endif",
-
-		"#if MAX_POINT_LIGHTS > 0",
-
-		"	for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
-
-		"		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-		"		vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-		"		float lDistance = 1.0;",
-		"		if ( pointLightDistance[ i ] > 0.0 )",
-		"			lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
-
-		"		lVector = normalize( lVector );",
-		"		float dotProduct = dot( transformedNormal, lVector );",
-
-		"		vec3 pointLightWeighting = vec3( max( dotProduct, 0.0 ) );",
-
-		"		#ifdef DOUBLE_SIDED",
-
-		"			vec3 pointLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );",
-
-		"			#ifdef WRAP_AROUND",
-
-		"				vec3 pointLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );",
-
-		"			#endif",
-
-		"		#endif",
-
-		"		#ifdef WRAP_AROUND",
-
-		"			vec3 pointLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );",
-		"			pointLightWeighting = mix( pointLightWeighting, pointLightWeightingHalf, wrapRGB );",
-
-		"			#ifdef DOUBLE_SIDED",
-
-		"				pointLightWeightingBack = mix( pointLightWeightingBack, pointLightWeightingHalfBack, wrapRGB );",
-
-		"			#endif",
-
-		"		#endif",
-
-		"		vLightFront += pointLightColor[ i ] * pointLightWeighting * lDistance;",
-
-		"		#ifdef DOUBLE_SIDED",
-
-		"			vLightBack += pointLightColor[ i ] * pointLightWeightingBack * lDistance;",
-
-		"		#endif",
-
-		"	}",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0",
-
-		"	for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
-
-		"		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
-		"		vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-		"		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - worldPosition.xyz ) );",
-
-		"		if ( spotEffect > spotLightAngleCos[ i ] ) {",
-
-		"			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );",
-
-		"			float lDistance = 1.0;",
-		"			if ( spotLightDistance[ i ] > 0.0 )",
-		"				lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
-
-		"			lVector = normalize( lVector );",
-
-		"			float dotProduct = dot( transformedNormal, lVector );",
-		"			vec3 spotLightWeighting = vec3( max( dotProduct, 0.0 ) );",
-
-		"			#ifdef DOUBLE_SIDED",
-
-		"				vec3 spotLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );",
-
-		"				#ifdef WRAP_AROUND",
-
-		"					vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );",
-
-		"				#endif",
-
-		"			#endif",
-
-		"			#ifdef WRAP_AROUND",
-
-		"				vec3 spotLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );",
-		"				spotLightWeighting = mix( spotLightWeighting, spotLightWeightingHalf, wrapRGB );",
-
-		"				#ifdef DOUBLE_SIDED",
-
-		"					spotLightWeightingBack = mix( spotLightWeightingBack, spotLightWeightingHalfBack, wrapRGB );",
-
-		"				#endif",
-
-		"			#endif",
-
-		"			vLightFront += spotLightColor[ i ] * spotLightWeighting * lDistance * spotEffect;",
-
-		"			#ifdef DOUBLE_SIDED",
-
-		"				vLightBack += spotLightColor[ i ] * spotLightWeightingBack * lDistance * spotEffect;",
-
-		"			#endif",
-
-		"		}",
-
-		"	}",
-
-		"#endif",
-
-		"#if MAX_HEMI_LIGHTS > 0",
-
-		"	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
-
-		"		vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
-		"		vec3 lVector = normalize( lDirection.xyz );",
-
-		"		float dotProduct = dot( transformedNormal, lVector );",
-
-		"		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
-		"		float hemiDiffuseWeightBack = -0.5 * dotProduct + 0.5;",
-
-		"		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
-
-		"		#ifdef DOUBLE_SIDED",
-
-		"			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );",
-
-		"		#endif",
-
-		"	}",
-
-		"#endif",
-
-		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;",
-
-		"#ifdef DOUBLE_SIDED",
-
-		"	vLightBack = vLightBack * diffuse + ambient * ambientLightColor + emissive;",
-
-		"#endif"
-
-	].join("\n"),
-
-	// LIGHTS PHONG
-
-	lights_phong_pars_vertex: [
-
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
-
-		"	varying vec3 vWorldPosition;",
-
-		"#endif"
-
-	].join("\n"),
-
-
-	lights_phong_vertex: [
-
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
-
-		"	vWorldPosition = worldPosition.xyz;",
-
-		"#endif"
-
-	].join("\n"),
-
-	lights_phong_pars_fragment: [
-
-		"uniform vec3 ambientLightColor;",
-
-		"#if MAX_DIR_LIGHTS > 0",
-
-		"	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
-		"	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_HEMI_LIGHTS > 0",
-
-		"	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
-		"	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-		"	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_POINT_LIGHTS > 0",
-
-		"	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
-
-		"	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
-		"	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0",
-
-		"	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
-		"	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
-		"	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
-		"	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
-		"	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
-
-		"	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )",
-
-		"	varying vec3 vWorldPosition;",
-
-		"#endif",
-
-		"#ifdef WRAP_AROUND",
-
-		"	uniform vec3 wrapRGB;",
-
-		"#endif",
-
-		"varying vec3 vViewPosition;",
-		"varying vec3 vNormal;"
-
-	].join("\n"),
-
-	lights_phong_fragment: [
-
-		"vec3 normal = normalize( vNormal );",
-		"vec3 viewPosition = normalize( vViewPosition );",
-
-		"#ifdef DOUBLE_SIDED",
-
-		"	normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
-
-		"#endif",
-
-		"#ifdef USE_NORMALMAP",
-
-		"	normal = perturbNormal2Arb( -vViewPosition, normal );",
-
-		"#elif defined( USE_BUMPMAP )",
-
-		"	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
-
-		"#endif",
-
-		"#if MAX_POINT_LIGHTS > 0",
-
-		"	vec3 pointDiffuse = vec3( 0.0 );",
-		"	vec3 pointSpecular = vec3( 0.0 );",
-
-		"	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
-
-		"		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-		"		vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
-
-		"		float lDistance = 1.0;",
-		"		if ( pointLightDistance[ i ] > 0.0 )",
-		"			lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
-
-		"		lVector = normalize( lVector );",
-
-				// diffuse
-
-		"		float dotProduct = dot( normal, lVector );",
-
-		"		#ifdef WRAP_AROUND",
-
-		"			float pointDiffuseWeightFull = max( dotProduct, 0.0 );",
-		"			float pointDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
-
-		"			vec3 pointDiffuseWeight = mix( vec3( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );",
-
-		"		#else",
-
-		"			float pointDiffuseWeight = max( dotProduct, 0.0 );",
-
-		"		#endif",
-
-		"		pointDiffuse += diffuse * pointLightColor[ i ] * pointDiffuseWeight * lDistance;",
-
-				// specular
-
-		"		vec3 pointHalfVector = normalize( lVector + viewPosition );",
-		"		float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-		"		float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
-
-		"		float specularNormalization = ( shininess + 2.0 ) / 8.0;",
-
-		"		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );",
-		"		pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
-
-		"	}",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0",
-
-		"	vec3 spotDiffuse = vec3( 0.0 );",
-		"	vec3 spotSpecular = vec3( 0.0 );",
-
-		"	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
-
-		"		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
-		"		vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
-
-		"		float lDistance = 1.0;",
-		"		if ( spotLightDistance[ i ] > 0.0 )",
-		"			lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
-
-		"		lVector = normalize( lVector );",
-
-		"		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
-
-		"		if ( spotEffect > spotLightAngleCos[ i ] ) {",
-
-		"			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );",
-
-					// diffuse
-
-		"			float dotProduct = dot( normal, lVector );",
-
-		"			#ifdef WRAP_AROUND",
-
-		"				float spotDiffuseWeightFull = max( dotProduct, 0.0 );",
-		"				float spotDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
-
-		"				vec3 spotDiffuseWeight = mix( vec3( spotDiffuseWeightFull ), vec3( spotDiffuseWeightHalf ), wrapRGB );",
-
-		"			#else",
-
-		"				float spotDiffuseWeight = max( dotProduct, 0.0 );",
-
-		"			#endif",
-
-		"			spotDiffuse += diffuse * spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;",
-
-					// specular
-
-		"			vec3 spotHalfVector = normalize( lVector + viewPosition );",
-		"			float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
-		"			float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
-
-		"			float specularNormalization = ( shininess + 2.0 ) / 8.0;",
-
-		"			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );",
-		"			spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
-
-		"		}",
-
-		"	}",
-
-		"#endif",
-
-		"#if MAX_DIR_LIGHTS > 0",
-
-		"	vec3 dirDiffuse = vec3( 0.0 );",
-		"	vec3 dirSpecular = vec3( 0.0 );" ,
-
-		"	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
-
-		"		vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-		"		vec3 dirVector = normalize( lDirection.xyz );",
-
-				// diffuse
-
-		"		float dotProduct = dot( normal, dirVector );",
-
-		"		#ifdef WRAP_AROUND",
-
-		"			float dirDiffuseWeightFull = max( dotProduct, 0.0 );",
-		"			float dirDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
-
-		"			vec3 dirDiffuseWeight = mix( vec3( dirDiffuseWeightFull ), vec3( dirDiffuseWeightHalf ), wrapRGB );",
-
-		"		#else",
-
-		"			float dirDiffuseWeight = max( dotProduct, 0.0 );",
-
-		"		#endif",
-
-		"		dirDiffuse += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
-
-		// specular
-
-		"		vec3 dirHalfVector = normalize( dirVector + viewPosition );",
-		"		float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-		"		float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
-
-		/*
-		// fresnel term from skin shader
-		"		const float F0 = 0.128;",
-
-		"		float base = 1.0 - dot( viewPosition, dirHalfVector );",
-		"		float exponential = pow( base, 5.0 );",
-
-		"		float fresnel = exponential + F0 * ( 1.0 - exponential );",
-		*/
-
-		/*
-		// fresnel term from fresnel shader
-		"		const float mFresnelBias = 0.08;",
-		"		const float mFresnelScale = 0.3;",
-		"		const float mFresnelPower = 5.0;",
-
-		"		float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
-		*/
-
-		"		float specularNormalization = ( shininess + 2.0 ) / 8.0;",
-
-		// "		dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
-
-		"		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );",
-		"		dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
-
-
-		"	}",
-
-		"#endif",
-
-		"#if MAX_HEMI_LIGHTS > 0",
-
-		"	vec3 hemiDiffuse = vec3( 0.0 );",
-		"	vec3 hemiSpecular = vec3( 0.0 );" ,
-
-		"	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
-
-		"		vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
-		"		vec3 lVector = normalize( lDirection.xyz );",
-
-		// diffuse
-
-		"		float dotProduct = dot( normal, lVector );",
-		"		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
-
-		"		vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
-
-		"		hemiDiffuse += diffuse * hemiColor;",
-
-		// specular (sky light)
-
-		"		vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
-		"		float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
-		"		float hemiSpecularWeightSky = specularStrength * max( pow( max( hemiDotNormalHalfSky, 0.0 ), shininess ), 0.0 );",
-
-		// specular (ground light)
-
-		"		vec3 lVectorGround = -lVector;",
-
-		"		vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
-		"		float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
-		"		float hemiSpecularWeightGround = specularStrength * max( pow( max( hemiDotNormalHalfGround, 0.0 ), shininess ), 0.0 );",
-
-		"		float dotProductGround = dot( normal, lVectorGround );",
-
-		"		float specularNormalization = ( shininess + 2.0 ) / 8.0;",
-
-		"		vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );",
-		"		vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );",
-		"		hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
-
-		"	}",
-
-		"#endif",
-
-		"vec3 totalDiffuse = vec3( 0.0 );",
-		"vec3 totalSpecular = vec3( 0.0 );",
-
-		"#if MAX_DIR_LIGHTS > 0",
-
-		"	totalDiffuse += dirDiffuse;",
-		"	totalSpecular += dirSpecular;",
-
-		"#endif",
-
-		"#if MAX_HEMI_LIGHTS > 0",
-
-		"	totalDiffuse += hemiDiffuse;",
-		"	totalSpecular += hemiSpecular;",
-
-		"#endif",
-
-		"#if MAX_POINT_LIGHTS > 0",
-
-		"	totalDiffuse += pointDiffuse;",
-		"	totalSpecular += pointSpecular;",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0",
-
-		"	totalDiffuse += spotDiffuse;",
-		"	totalSpecular += spotSpecular;",
-
-		"#endif",
-
-		"#ifdef METAL",
-
-		"	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient + totalSpecular );",
-
-		"#else",
-
-		"	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient ) + totalSpecular;",
-
-		"#endif"
-
-	].join("\n"),
-
-	// VERTEX COLORS
-
-	color_pars_fragment: [
-
-		"#ifdef USE_COLOR",
-
-		"	varying vec3 vColor;",
-
-		"#endif"
-
-	].join("\n"),
-
-
-	color_fragment: [
-
-		"#ifdef USE_COLOR",
-
-		"	gl_FragColor = gl_FragColor * vec4( vColor, 1.0 );",
-
-		"#endif"
-
-	].join("\n"),
-
-	color_pars_vertex: [
-
-		"#ifdef USE_COLOR",
-
-		"	varying vec3 vColor;",
-
-		"#endif"
-
-	].join("\n"),
-
-
-	color_vertex: [
-
-		"#ifdef USE_COLOR",
-
-		"	#ifdef GAMMA_INPUT",
-
-		"		vColor = color * color;",
-
-		"	#else",
-
-		"		vColor = color;",
-
-		"	#endif",
-
-		"#endif"
-
-	].join("\n"),
-
-	// SKINNING
-
-	skinning_pars_vertex: [
-
-		"#ifdef USE_SKINNING",
-
-		"	#ifdef BONE_TEXTURE",
-
-		"		uniform sampler2D boneTexture;",
-		"		uniform int boneTextureWidth;",
-		"		uniform int boneTextureHeight;",
-
-		"		mat4 getBoneMatrix( const in float i ) {",
-
-		"			float j = i * 4.0;",
-		"			float x = mod( j, float( boneTextureWidth ) );",
-		"			float y = floor( j / float( boneTextureWidth ) );",
-
-		"			float dx = 1.0 / float( boneTextureWidth );",
-		"			float dy = 1.0 / float( boneTextureHeight );",
-
-		"			y = dy * ( y + 0.5 );",
-
-		"			vec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );",
-		"			vec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );",
-		"			vec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );",
-		"			vec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );",
-
-		"			mat4 bone = mat4( v1, v2, v3, v4 );",
-
-		"			return bone;",
-
-		"		}",
-
-		"	#else",
-
-		"		uniform mat4 boneGlobalMatrices[ MAX_BONES ];",
-
-		"		mat4 getBoneMatrix( const in float i ) {",
-
-		"			mat4 bone = boneGlobalMatrices[ int(i) ];",
-		"			return bone;",
-
-		"		}",
-
-		"	#endif",
-
-		"#endif"
-
-	].join("\n"),
-
-	skinbase_vertex: [
-
-		"#ifdef USE_SKINNING",
-
-		"	mat4 boneMatX = getBoneMatrix( skinIndex.x );",
-		"	mat4 boneMatY = getBoneMatrix( skinIndex.y );",
-		"	mat4 boneMatZ = getBoneMatrix( skinIndex.z );",
-		"	mat4 boneMatW = getBoneMatrix( skinIndex.w );",
-
-		"#endif"
-
-	].join("\n"),
-
-	skinning_vertex: [
-
-		"#ifdef USE_SKINNING",
-
-		"	#ifdef USE_MORPHTARGETS",
-
-		"	vec4 skinVertex = vec4( morphed, 1.0 );",
-
-		"	#else",
-
-		"	vec4 skinVertex = vec4( position, 1.0 );",
-
-		"	#endif",
-
-		"	vec4 skinned = vec4( 0.0 );",
-		"	skinned += boneMatX * skinVertex * skinWeight.x;",
-		"	skinned += boneMatY * skinVertex * skinWeight.y;",
-		"	skinned += boneMatZ * skinVertex * skinWeight.z;",
-		"	skinned += boneMatW * skinVertex * skinWeight.w;",
-
-		"#endif"
-
-	].join("\n"),
-
-	// MORPHING
-
-	morphtarget_pars_vertex: [
-
-		"#ifdef USE_MORPHTARGETS",
-
-		"	#ifndef USE_MORPHNORMALS",
-
-		"	uniform float morphTargetInfluences[ 8 ];",
-
-		"	#else",
-
-		"	uniform float morphTargetInfluences[ 4 ];",
-
-		"	#endif",
-
-		"#endif"
-
-	].join("\n"),
-
-	morphtarget_vertex: [
-
-		"#ifdef USE_MORPHTARGETS",
-
-		"	vec3 morphed = vec3( 0.0 );",
-		"	morphed += ( morphTarget0 - position ) * morphTargetInfluences[ 0 ];",
-		"	morphed += ( morphTarget1 - position ) * morphTargetInfluences[ 1 ];",
-		"	morphed += ( morphTarget2 - position ) * morphTargetInfluences[ 2 ];",
-		"	morphed += ( morphTarget3 - position ) * morphTargetInfluences[ 3 ];",
-
-		"	#ifndef USE_MORPHNORMALS",
-
-		"	morphed += ( morphTarget4 - position ) * morphTargetInfluences[ 4 ];",
-		"	morphed += ( morphTarget5 - position ) * morphTargetInfluences[ 5 ];",
-		"	morphed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];",
-		"	morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];",
-
-		"	#endif",
-
-		"	morphed += position;",
-
-		"#endif"
-
-	].join("\n"),
-
-	default_vertex : [
-
-		"vec4 mvPosition;",
-
-		"#ifdef USE_SKINNING",
-
-		"	mvPosition = modelViewMatrix * skinned;",
-
-		"#endif",
-
-		"#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )",
-
-		"	mvPosition = modelViewMatrix * vec4( morphed, 1.0 );",
-
-		"#endif",
-
-		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )",
-
-		"	mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
-		"#endif",
-
-		"gl_Position = projectionMatrix * mvPosition;"
-
-	].join("\n"),
-
-	morphnormal_vertex: [
-
-		"#ifdef USE_MORPHNORMALS",
-
-		"	vec3 morphedNormal = vec3( 0.0 );",
-
-		"	morphedNormal += ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];",
-		"	morphedNormal += ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];",
-		"	morphedNormal += ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];",
-		"	morphedNormal += ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];",
-
-		"	morphedNormal += normal;",
-
-		"#endif"
-
-	].join("\n"),
-
-	skinnormal_vertex: [
-
-		"#ifdef USE_SKINNING",
-
-		"	mat4 skinMatrix = mat4( 0.0 );",
-		"	skinMatrix += skinWeight.x * boneMatX;",
-		"	skinMatrix += skinWeight.y * boneMatY;",
-		"	skinMatrix += skinWeight.z * boneMatZ;",
-		"	skinMatrix += skinWeight.w * boneMatW;",
-
-		"	#ifdef USE_MORPHNORMALS",
-
-		"	vec4 skinnedNormal = skinMatrix * vec4( morphedNormal, 0.0 );",
-
-		"	#else",
-
-		"	vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );",
-
-		"	#endif",
-
-		"#endif"
-
-	].join("\n"),
-
-	defaultnormal_vertex: [
-
-		"vec3 objectNormal;",
-
-		"#ifdef USE_SKINNING",
-
-		"	objectNormal = skinnedNormal.xyz;",
-
-		"#endif",
-
-		"#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )",
-
-		"	objectNormal = morphedNormal;",
-
-		"#endif",
-
-		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )",
-
-		"	objectNormal = normal;",
-
-		"#endif",
-
-		"#ifdef FLIP_SIDED",
-
-		"	objectNormal = -objectNormal;",
-
-		"#endif",
-
-		"vec3 transformedNormal = normalMatrix * objectNormal;"
-
-	].join("\n"),
-
-	// SHADOW MAP
-
-	// based on SpiderGL shadow map and Fabien Sanglard's GLSL shadow mapping examples
-	// http://spidergl.org/example.php?id=6
-	// http://fabiensanglard.net/shadowmapping
-
-	shadowmap_pars_fragment: [
-
-		"#ifdef USE_SHADOWMAP",
-
-		"	uniform sampler2D shadowMap[ MAX_SHADOWS ];",
-		"	uniform vec2 shadowMapSize[ MAX_SHADOWS ];",
-
-		"	uniform float shadowDarkness[ MAX_SHADOWS ];",
-		"	uniform float shadowBias[ MAX_SHADOWS ];",
-
-		"	varying vec4 vShadowCoord[ MAX_SHADOWS ];",
-
-		"	float unpackDepth( const in vec4 rgba_depth ) {",
-
-		"		const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
-		"		float depth = dot( rgba_depth, bit_shift );",
-		"		return depth;",
-
-		"	}",
-
-		"#endif"
-
-	].join("\n"),
-
-	shadowmap_fragment: [
-
-		"#ifdef USE_SHADOWMAP",
-
-		"	#ifdef SHADOWMAP_DEBUG",
-
-		"		vec3 frustumColors[3];",
-		"		frustumColors[0] = vec3( 1.0, 0.5, 0.0 );",
-		"		frustumColors[1] = vec3( 0.0, 1.0, 0.8 );",
-		"		frustumColors[2] = vec3( 0.0, 0.5, 1.0 );",
-
-		"	#endif",
-
-		"	#ifdef SHADOWMAP_CASCADE",
-
-		"		int inFrustumCount = 0;",
-
-		"	#endif",
-
-		"	float fDepth;",
-		"	vec3 shadowColor = vec3( 1.0 );",
-
-		"	for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
-
-		"		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
-
-				// "if ( something && something )" breaks ATI OpenGL shader compiler
-				// "if ( all( something, something ) )" using this instead
-
-		"		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );",
-		"		bool inFrustum = all( inFrustumVec );",
-
-				// don't shadow pixels outside of light frustum
-				// use just first frustum (for cascades)
-				// don't shadow pixels behind far plane of light frustum
-
-		"		#ifdef SHADOWMAP_CASCADE",
-
-		"			inFrustumCount += int( inFrustum );",
-		"			bvec3 frustumTestVec = bvec3( inFrustum, inFrustumCount == 1, shadowCoord.z <= 1.0 );",
-
-		"		#else",
-
-		"			bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );",
-
-		"		#endif",
-
-		"		bool frustumTest = all( frustumTestVec );",
-
-		"		if ( frustumTest ) {",
-
-		"			shadowCoord.z += shadowBias[ i ];",
-
-		"			#if defined( SHADOWMAP_TYPE_PCF )",
-
-						// Percentage-close filtering
-						// (9 pixel kernel)
-						// http://fabiensanglard.net/shadowmappingPCF/
-
-		"				float shadow = 0.0;",
-
-		/*
-						// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL
-						// must enroll loop manually
-
-		"				for ( float y = -1.25; y <= 1.25; y += 1.25 )",
-		"					for ( float x = -1.25; x <= 1.25; x += 1.25 ) {",
-
-		"						vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );",
-
-								// doesn't seem to produce any noticeable visual difference compared to simple "texture2D" lookup
-								//"vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );",
-
-		"						float fDepth = unpackDepth( rgbaDepth );",
-
-		"						if ( fDepth < shadowCoord.z )",
-		"							shadow += 1.0;",
-
-		"				}",
-
-		"				shadow /= 9.0;",
-
-		*/
-
-		"				const float shadowDelta = 1.0 / 9.0;",
-
-		"				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;",
-		"				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;",
-
-		"				float dx0 = -1.25 * xPixelOffset;",
-		"				float dy0 = -1.25 * yPixelOffset;",
-		"				float dx1 = 1.25 * xPixelOffset;",
-		"				float dy1 = 1.25 * yPixelOffset;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
-		"				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
-
-		"				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
-
-		"			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )",
-
-						// Percentage-close filtering
-						// (9 pixel kernel)
-						// http://fabiensanglard.net/shadowmappingPCF/
-
-		"				float shadow = 0.0;",
-
-		"				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;",
-		"				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;",
-
-		"				float dx0 = -1.0 * xPixelOffset;",
-		"				float dy0 = -1.0 * yPixelOffset;",
-		"				float dx1 = 1.0 * xPixelOffset;",
-		"				float dy1 = 1.0 * yPixelOffset;",
-
-		"				mat3 shadowKernel;",
-		"				mat3 depthKernel;",
-
-		"				depthKernel[0][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );",
-		"				depthKernel[0][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );",
-		"				depthKernel[0][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );",
-		"				depthKernel[1][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );",
-		"				depthKernel[1][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );",
-		"				depthKernel[1][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );",
-		"				depthKernel[2][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );",
-		"				depthKernel[2][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );",
-		"				depthKernel[2][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
-
-		"				vec3 shadowZ = vec3( shadowCoord.z );",
-		"				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));",
-		"				shadowKernel[0] *= vec3(0.25);",
-
-		"				shadowKernel[1] = vec3(lessThan(depthKernel[1], shadowZ ));",
-		"				shadowKernel[1] *= vec3(0.25);",
-
-		"				shadowKernel[2] = vec3(lessThan(depthKernel[2], shadowZ ));",
-		"				shadowKernel[2] *= vec3(0.25);",
-
-		"				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[i].xy );",
-
-		"				shadowKernel[0] = mix( shadowKernel[1], shadowKernel[0], fractionalCoord.x );",
-		"				shadowKernel[1] = mix( shadowKernel[2], shadowKernel[1], fractionalCoord.x );",
-
-		"				vec4 shadowValues;",
-		"				shadowValues.x = mix( shadowKernel[0][1], shadowKernel[0][0], fractionalCoord.y );",
-		"				shadowValues.y = mix( shadowKernel[0][2], shadowKernel[0][1], fractionalCoord.y );",
-		"				shadowValues.z = mix( shadowKernel[1][1], shadowKernel[1][0], fractionalCoord.y );",
-		"				shadowValues.w = mix( shadowKernel[1][2], shadowKernel[1][1], fractionalCoord.y );",
-
-		"				shadow = dot( shadowValues, vec4( 1.0 ) );",
-
-		"				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
-
-		"			#else",
-
-		"				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );",
-		"				float fDepth = unpackDepth( rgbaDepth );",
-
-		"				if ( fDepth < shadowCoord.z )",
-
-		// spot with multiple shadows is darker
-
-		"					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );",
-
-		// spot with multiple shadows has the same color as single shadow spot
-
-		// "					shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );",
-
-		"			#endif",
-
-		"		}",
-
-
-		"		#ifdef SHADOWMAP_DEBUG",
-
-		"			#ifdef SHADOWMAP_CASCADE",
-
-		"				if ( inFrustum && inFrustumCount == 1 ) gl_FragColor.xyz *= frustumColors[ i ];",
-
-		"			#else",
-
-		"				if ( inFrustum ) gl_FragColor.xyz *= frustumColors[ i ];",
-
-		"			#endif",
-
-		"		#endif",
-
-		"	}",
-
-		"	#ifdef GAMMA_OUTPUT",
-
-		"		shadowColor *= shadowColor;",
-
-		"	#endif",
-
-		"	gl_FragColor.xyz = gl_FragColor.xyz * shadowColor;",
-
-		"#endif"
-
-	].join("\n"),
-
-	shadowmap_pars_vertex: [
-
-		"#ifdef USE_SHADOWMAP",
-
-		"	varying vec4 vShadowCoord[ MAX_SHADOWS ];",
-		"	uniform mat4 shadowMatrix[ MAX_SHADOWS ];",
-
-		"#endif"
-
-	].join("\n"),
-
-	shadowmap_vertex: [
-
-		"#ifdef USE_SHADOWMAP",
-
-		"	for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
-
-		"		vShadowCoord[ i ] = shadowMatrix[ i ] * worldPosition;",
-
-		"	}",
-
-		"#endif"
-
-	].join("\n"),
-
-	// ALPHATEST
-
-	alphatest_fragment: [
-
-		"#ifdef ALPHATEST",
-
-		"	if ( gl_FragColor.a < ALPHATEST ) discard;",
-
-		"#endif"
-
-	].join("\n"),
-
-	// LINEAR SPACE
-
-	linear_to_gamma_fragment: [
-
-		"#ifdef GAMMA_OUTPUT",
-
-		"	gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
-
-		"#endif"
-
-	].join("\n"),
-
-	// LOGARITHMIC DEPTH BUFFER
-	// http://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html
-
-	// WebGL doesn't support gl_FragDepth out of the box, unless the EXT_frag_depth extension is available.  On platforms
-	// without EXT_frag_depth, we have to fall back on linear z-buffer in the fragment shader, which means that some long
-	// faces close to the camera may have issues.	This can be worked around by tesselating the model more finely when
-	// the camera is near the surface.
-
-	logdepthbuf_pars_vertex: [
-
-		"#ifdef USE_LOGDEPTHBUF",
-
-		"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-		"		varying float vFragDepth;",
-
-		"	#endif",
-
-		"	uniform float logDepthBufFC;",
-
-		"#endif",
-
-	].join('\n'),
-
-	logdepthbuf_vertex: [
-
-		"#ifdef USE_LOGDEPTHBUF",
-
-		"	gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC;",
-
-		"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-		"		vFragDepth = 1.0 + gl_Position.w;",
-
-		"#else",
-
-		"		gl_Position.z = (gl_Position.z - 1.0) * gl_Position.w;",
-
-		"	#endif",
-
-		"#endif"
-
-	].join("\n"),
-
-	logdepthbuf_pars_fragment: [
-
-		"#ifdef USE_LOGDEPTHBUF",
-
-		"	uniform float logDepthBufFC;",
-
-		"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-		"		#extension GL_EXT_frag_depth : enable",
-		"		varying float vFragDepth;",
-
-		"	#endif",
-
-		"#endif"
-
-	].join('\n'),
-
-	logdepthbuf_fragment: [
-
-		"#if defined(USE_LOGDEPTHBUF) && defined(USE_LOGDEPTHBUF_EXT)",
-
-		"	gl_FragDepthEXT = log2(vFragDepth) * logDepthBufFC * 0.5;",
-
-		"#endif"
-
-	].join("\n")
-
-};
+THREE.ShaderChunk[ 'logdepthbuf_pars_fragment'] = "#ifdef USE_LOGDEPTHBUF\n\n	uniform float logDepthBufFC;\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		#extension GL_EXT_frag_depth : enable\n		varying float vFragDepth;\n\n	#endif\n\n#endif";
 
 // File:src/renderers/shaders/UniformsUtils.js
 
