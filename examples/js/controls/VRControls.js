@@ -23,7 +23,7 @@ THREE.VRControls = function ( camera, done ) {
 				if ( devices[i] instanceof PositionSensorVRDevice ) {
 					vrInput = devices[i]
 					self._vrInput = vrInput;
-					break; // We keep the firs we encounter
+					break; // We keep the first we encounter
 				}
 			}
 			if ( done ) {
@@ -47,10 +47,10 @@ THREE.VRControls = function ( camera, done ) {
 		// Applies head rotation from sensors data.
 		if ( camera ) {
 			quat = new THREE.Quaternion(
+				vrState.hmd.rotation[0],
 				vrState.hmd.rotation[1],
 				vrState.hmd.rotation[2],
-				vrState.hmd.rotation[3],
-				vrState.hmd.rotation[0]
+				vrState.hmd.rotation[3]
 			);
 			camera.setRotationFromQuaternion( quat );
 		}
@@ -60,17 +60,17 @@ THREE.VRControls = function ( camera, done ) {
 		var vrInput = this._vrInput;
 		var orientation;
 		var vrState;
-		if (!vrInput) {
+		if ( !vrInput ) {
 			return null;
 		}
 		orientation	= vrInput.getState().orientation;
 		vrState = {
 			hmd : {
 				rotation : [
-					orientation.w,
 					orientation.x,
 					orientation.y,
-					orientation.z
+					orientation.z,
+					orientation.w
 				]
 			}
 		};
