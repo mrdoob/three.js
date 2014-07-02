@@ -37,14 +37,16 @@
 		<div class="button">Start VR Mode</div>
 
 		<script src="../build/three.js"></script>
-		<script src="../src/extras/renderers/plugins/VRPlugin.js"></script>
+		<script src="js/effects/VREffect.js"></script>
+		<script src="js/controls/VRControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			var container, stats;
 			var camera, scene, projector, raycaster, renderer;
-			var vrPlugin = new THREE.VRPlugin();
+			var vrEffect;
+			var vrControls;
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
@@ -105,12 +107,13 @@
 				renderer = new THREE.WebGLRenderer();
 				var fullScreenButton = document.querySelector( '.button' );
 				fullScreenButton.onclick = function() {
-					vrPlugin.enableVRMode( true );
+					vrEffect.setFullScreen( true );
 				};
 
-				vrPlugin.init( renderer, vrPluginStarted );
+				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
+				vrControls = new THREE.VRControls(camera);
 
-				function vrPluginStarted(error) {
+				function VREffectLoaded(error) {
 					if (error) {
 						fullScreenButton.innerHTML = error;
 						fullScreenButton.classList.add('error');
@@ -202,7 +205,8 @@
 
 				}
 
-				vrPlugin.render( scene, camera );
+				vrControls.update();
+				vrEffect.render( scene, camera );
 
 			}
 
