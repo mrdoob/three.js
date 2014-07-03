@@ -63,9 +63,16 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 // backwards compatibility
 
+THREE.ParticleBasicMaterial = function ( parameters ) {
+
+	console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointCloudMaterial.' );
+	return new THREE.PointCloudMaterial( parameters );
+
+};
+
 THREE.ParticleSystemMaterial = function ( parameters ) {
 
 	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
 	return new THREE.PointCloudMaterial( parameters );
 
-}
+};
