@@ -642,7 +642,7 @@ THREE.ColladaLoader = function () {
 
 	}
 
-	function applySkin ( geometry, instanceCtrl, frame ) 
+	function applySkin ( geometry, instanceCtrl, frame ) {
 
 		var skinController = controllers[ instanceCtrl.url ];
 
