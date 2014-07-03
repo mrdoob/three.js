@@ -128,6 +128,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
 				parameters.specularMap ? "#define USE_SPECULARMAP" : "",
+				parameters.alphaMap ? "#define USE_ALPHAMAP" : "",
 				parameters.vertexColors ? "#define USE_COLOR" : "",
 
 				parameters.skinning ? "#define USE_SKINNING" : "",
@@ -234,6 +235,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
 				parameters.specularMap ? "#define USE_SPECULARMAP" : "",
+				parameters.alphaMap ? "#define USE_ALPHAMAP" : "",
 				parameters.vertexColors ? "#define USE_COLOR" : "",
 
 				parameters.metal ? "#define METAL" : "",

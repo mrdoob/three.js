@@ -11,6 +11,8 @@
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
+ *  alphaMap: new THREE.Texture( <Image> ),
+ *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
@@ -44,6 +46,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.lightMap = null;
 
 	this.specularMap = null;
+
+	this.alphaMap = null;
 
 	this.envMap = null;
 	this.combine = THREE.MultiplyOperation;
@@ -83,6 +87,8 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 	material.lightMap = this.lightMap;
 
 	material.specularMap = this.specularMap;
+
+	material.alphaMap = this.alphaMap;
 
 	material.envMap = this.envMap;
 	material.combine = this.combine;

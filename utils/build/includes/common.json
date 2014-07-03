@@ -131,6 +131,8 @@
 	"src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/skinning_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_pars_fragment.glsl",
+	"src/renderers/shaders/ShaderChunk/alphamap_fragment.glsl",
+	"src/renderers/shaders/ShaderChunk/alphamap_pars_fragment.glsl",
 	"src/renderers/shaders/UniformsUtils.js",
 	"src/renderers/shaders/UniformsLib.js",
 	"src/renderers/shaders/ShaderLib.js",

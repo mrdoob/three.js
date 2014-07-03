@@ -14,6 +14,7 @@ THREE.UniformsLib = {
 
 		"lightMap" : { type: "t", value: null },
 		"specularMap" : { type: "t", value: null },
+		"alphaMap" : { type: "t", value: null },
 
 		"envMap" : { type: "t", value: null },
 		"flipEnvMap" : { type: "f", value: - 1 },
