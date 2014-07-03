@@ -8,7 +8,6 @@ THREE.VRControls = function ( camera, done ) {
 
 	this._init = function () {
 		var self = this;
-		this._renderer = renderer;
 		if ( !navigator.mozGetVRDevices ) {
 			if ( done ) {
 				done("Your browser is not VR Ready");
