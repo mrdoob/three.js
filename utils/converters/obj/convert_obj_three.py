@@ -406,6 +406,7 @@ def parse_mtl(fname):
             # Alpha texture
             # map_d texture_alpha.png
             if chunks[0] == "map_d" and len(chunks) == 2:
+                materials[identifier]["transparent"] = True
                 materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
 
             # Bump texture
