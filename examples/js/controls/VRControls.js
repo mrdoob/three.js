@@ -45,13 +45,7 @@ THREE.VRControls = function ( camera, done ) {
 		}
 		// Applies head rotation from sensors data.
 		if ( camera ) {
-			quat = new THREE.Quaternion(
-				vrState.hmd.rotation[0],
-				vrState.hmd.rotation[1],
-				vrState.hmd.rotation[2],
-				vrState.hmd.rotation[3]
-			);
-			camera.setRotationFromQuaternion( quat );
+			camera.quaternion.fromArray( vrState.hmd.rotation );
 		}
 	};
 
