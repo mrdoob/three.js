@@ -72,6 +72,9 @@ THREE.VREffect = function ( renderer, done ) {
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
+		var rendererWidth = renderer.domElement.width / renderer.devicePixelRatio;
+		var rendererHeight = renderer.domElement.height / renderer.devicePixelRatio;
+		var eyeDivisionLine = rendererWidth / 2;
 		renderer.enableScissorTest( true );
 		renderer.clear();
 
@@ -92,13 +95,13 @@ THREE.VREffect = function ( renderer, done ) {
 			rightEyeTranslation.x, rightEyeTranslation.y, rightEyeTranslation.z) );
 
 		// render left eye
-		renderer.setViewport( 0, 0, 640, 800 );
-		renderer.setScissor( 0, 0, 640, 800 );
+		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
+		renderer.setScissor( 0, 0, eyeDivisionLine, rendererHeight );
 		renderer.render( scene, cameraLeft );
 
 		// render right eye
-		renderer.setViewport( 640, 0, 640, 800 );
-		renderer.setScissor( 640, 0, 640, 800 );
+		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
+		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.render( scene, cameraRight );
 
 	};
