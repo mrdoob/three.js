@@ -2,32 +2,41 @@
  * @author dmarcos / https://github.com/dmarcos
  *
  * It handles stereo rendering
- * If mozGetVRDevices API is not available it gracefuly falls back to a
+ * If mozGetVRDevices and getVRDevices APIs are not available it gracefuly falls back to a
  * regular renderer
  *
  * The HMD supported is the Oculus DK1 and The Web API doesn't currently allow
- * to query for the display resolution. The dimensions of the screen are temporarly
- * hardcoded (1280 x 800).
+ * to query for the display resolution (only the chrome API allows it).
+ * The dimensions of the screen are temporarly hardcoded (1280 x 800).
  *
- * For VR mode to work it has to be used with the Oculus enabled builds of Firefox:
+ * For VR mode to work it has to be used with the Oculus enabled builds of Firefox or Chrome:
+ *
+ * Firefox:
  *
  * OSX: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.mac.dmg
  * WIN: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.win64-x86_64.zip
  *
+ * Chrome builds:
+ *
+ * https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
+ *
  */
 THREE.VREffect = function ( renderer, done ) {
-
 	this._renderer = renderer;
 
 	this._init = function() {
 		var self = this;
-		if ( !navigator.mozGetVRDevices ) {
+		if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
 			if ( done ) {
 				done("Your browser is not VR Ready");
 			}
 			return;
 		}
-		navigator.mozGetVRDevices( gotVRDevices );
+		if ( navigator.getVRDevices ) {
+			navigator.getVRDevices().then( gotVRDevices );
+		} else {
+			navigator.mozGetVRDevices( gotVRDevices );
+		}
 		function gotVRDevices( devices ) {
 			var vrHMD;
 			var error;
@@ -130,22 +139,30 @@ THREE.VREffect = function ( renderer, done ) {
 			width: renderer.domElement.width,
 			height: renderer.domElement.height
 		};
-		fullScreen = true;
 		// Hardcoded Rift display size
-		renderer.setSize( 1280, 800 );
-		vrHMD.xxxToggleElementVR( renderer.domElement );
-		this.startFullscreen( vrHMD );
+		renderer.setSize( 1280, 800, false );
+		this.startFullscreen();
 	};
 
-	this.startFullscreen = function( vrHMD ) {
+	this.startFullscreen = function() {
 		var self = this;
 		var renderer = this._renderer;
-		document.addEventListener( "mozfullscreenchange", function() {
-			if ( !document.mozFullScreenElement ) {
+		var vrHMD = this._vrHMD;
+		var canvas = renderer.domElement;
+		var fullScreenChange =
+			canvas.mozRequestFullScreen? 'mozfullscreenchange' : 'webkitfullscreenchange';
+
+		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
+		function onFullScreenChanged() {
+			if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
 				self.setFullScreen( false );
 			}
-		},false );
-		renderer.domElement.mozRequestFullScreen( { vrDisplay: vrHMD } );
+		}
+		if ( canvas.mozRequestFullScreen ) {
+			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
+		} else {
+			canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
+		}
 	};
 
 	this.FovToNDCScaleOffset = function( fov ) {
