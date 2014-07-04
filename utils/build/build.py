@@ -54,7 +54,7 @@ def main(argv=None):
 		for filename in files:
 			tmp.write('// File:' + filename)
 			tmp.write('\n\n')
-			filename = '../../' + filename;
+			filename = '../../' + filename
 			sources.append(filename)
 			with open(filename, 'r') as f:
 				if filename.endswith(".glsl"):
@@ -74,9 +74,13 @@ def main(argv=None):
 
 	if args.minify is False:
 		shutil.copy(path, output)
-		os.chmod(output, 0o664); # temp files would usually get 0600
+		os.chmod(output, 0o664) # temp files would usually get 0600
 
 	else:
+		backup = ''
+		if os.path.exists(output):
+			with open(output,'r') as f: backup = f.read()
+			os.remove(output)
 
 		externs = ' --externs '.join(args.externs)
 		source = ' '.join(sources)
@@ -85,12 +89,18 @@ def main(argv=None):
 
 		# header
 
-		with open(output,'r') as f: text = f.read()
-		with open(output,'w') as f: f.write('// three.js / threejs.org/license\n' + text + sourcemapping)
+		if os.path.exists(output):
+			with open(output,'r') as f: text = f.read()
+			with open(output,'w') as f: f.write('// three.js / threejs.org/license\n' + text + sourcemapping)
+		else:
+			print("Minification with Closure compiler failed. Check your Java runtime version.")
+			with open(output,'w') as f: f.write(backup)
 
 	os.close(fd)
 	os.remove(path)
 
 
 if __name__ == "__main__":
+	script_dir = os.path.dirname(os.path.abspath(__file__))
+	os.chdir(script_dir)
 	main()
