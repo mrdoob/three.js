@@ -4287,6 +4287,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var refreshProgram = false;
 		var refreshMaterial = false;
+		var refreshLights = false;
 
 		var program = material.program,
 			p_uniforms = program.uniforms,
@@ -4299,12 +4300,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			refreshProgram = true;
 			refreshMaterial = true;
+			refreshLights = true;
 
 		}
 
 		if ( material.id !== _currentMaterialId ) {
 
+			refreshLights = ( refreshLights || _currentMaterialId === - 1 );
 			_currentMaterialId = material.id;
+
 			refreshMaterial = true;
 
 		}
@@ -4408,14 +4412,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
 
+				refreshLights = ( refreshLights || _lightsNeedUpdate );
+
 				if ( _lightsNeedUpdate ) {
 
-					setupLights( program, lights );
+					setupLights( lights );
 					_lightsNeedUpdate = false;
-
 				}
 
-				refreshUniformsLights( m_uniforms, _lights );
+				if ( refreshLights ) {
+					refreshUniformsLights( m_uniforms, _lights );
+					markUniformsLightsClean( m_uniforms, false );
+				} else {
+					markUniformsLightsClean( m_uniforms, true );
+				}
 
 			}
 
@@ -4696,6 +4706,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
+
+	function markUniformsLightsClean ( uniforms, clean ) {
+
+		uniforms.ambientLightColor.clean = clean;
+
+		uniforms.directionalLightColor.clean = clean;
+		uniforms.directionalLightDirection.clean = clean;
+
+		uniforms.pointLightColor.clean = clean;
+		uniforms.pointLightPosition.clean = clean;
+		uniforms.pointLightDistance.clean = clean;
+
+		uniforms.spotLightColor.clean = clean;
+		uniforms.spotLightPosition.clean = clean;
+		uniforms.spotLightDistance.clean = clean;
+		uniforms.spotLightDirection.clean = clean;
+		uniforms.spotLightAngleCos.clean = clean;
+		uniforms.spotLightExponent.clean = clean;
+
+		uniforms.hemisphereLightSkyColor.clean = clean;
+		uniforms.hemisphereLightGroundColor.clean = clean;
+		uniforms.hemisphereLightDirection.clean = clean;
+
+	};
+
 	function refreshUniformsShadow ( uniforms, lights ) {
 
 		if ( uniforms.shadowMatrix ) {
@@ -4769,6 +4805,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( ! location ) continue;
 
 			var uniform = uniforms[ j ][ 0 ];
+
+			if ( uniform.clean ) continue;
 
 			var type = uniform.type;
 			var value = uniform.value;
@@ -4999,7 +5037,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setupLights ( program, lights ) {
+	function setupLights ( lights ) {
 
 		var l, ll, light, n,
 		r = 0, g = 0, b = 0,
