@@ -763,6 +763,8 @@ THREE.ShaderLib = {
 			"		#endif",
 
 			"	}",
+			
+			THREE.ShaderChunk[ "alphatest_fragment" ],
 
 			"	if( enableSpecular )",
 			"		specularTex = texture2D( tSpecular, vUv ).xyz;",
