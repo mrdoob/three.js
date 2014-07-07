@@ -2,11 +2,11 @@
 
 	#ifdef USE_MORPHTARGETS
 
-	vec4 skinVertex = vec4( morphed, 1.0 );
+	vec4 skinVertex = bindMatrix * vec4( morphed, 1.0 );
 
 	#else
 
-	vec4 skinVertex = vec4( position, 1.0 );
+	vec4 skinVertex = bindMatrix * vec4( position, 1.0 );
 
 	#endif
 
@@ -15,5 +15,6 @@
 	skinned += boneMatY * skinVertex * skinWeight.y;
 	skinned += boneMatZ * skinVertex * skinWeight.z;
 	skinned += boneMatW * skinVertex * skinWeight.w;
+	skinned  = bindMatrixInverse * skinned;
 
 #endif
