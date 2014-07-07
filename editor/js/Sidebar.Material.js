@@ -71,6 +71,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'ShaderMaterial': 'ShaderMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
 	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
@@ -130,6 +131,26 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialShininessRow );
 
+	// vertex shader
+
+	var materialVertexShaderRow = new UI.Panel();
+	var materialVertexShader = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).onChange( update );
+
+	materialVertexShaderRow.add( new UI.Text( 'Vertex Shader' ).setWidth( '90px' ) );
+	materialVertexShaderRow.add( materialVertexShader );
+
+	container.add( materialVertexShaderRow );
+
+	// fragment shader
+
+	var materialFragmentShaderRow = new UI.Panel();
+	var materialFragmentShader = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).onChange( update );
+
+	materialFragmentShaderRow.add( new UI.Text( 'Fragment Shader' ).setWidth( '90px' ) );
+	materialFragmentShaderRow.add( materialFragmentShader );
+
+	container.add( materialFragmentShaderRow );
+
 	// vertex colors
 
 	var materialVertexColorsRow = new UI.Panel();
@@ -146,7 +167,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
-
 	// skinning
 
 	var materialSkinningRow = new UI.Panel();
@@ -156,7 +176,6 @@ Sidebar.Material = function ( editor ) {
 	materialSkinningRow.add( materialSkinning );
 
 	container.add( materialSkinningRow );
-
 
 	// map
 
@@ -170,7 +189,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialMapRow );
 
-
 	// light map
 
 	var materialLightMapRow = new UI.Panel();
@@ -182,7 +200,6 @@ Sidebar.Material = function ( editor ) {
 	materialLightMapRow.add( materialLightMap );
 
 	container.add( materialLightMapRow );
-
 
 	// bump map
 
@@ -198,7 +215,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialBumpMapRow );
 
-
 	// normal map
 
 	var materialNormalMapRow = new UI.Panel();
@@ -211,7 +227,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialNormalMapRow );
 
-
 	// specular map
 
 	var materialSpecularMapRow = new UI.Panel();
@@ -223,7 +238,6 @@ Sidebar.Material = function ( editor ) {
 	materialSpecularMapRow.add( materialSpecularMap );
 
 	container.add( materialSpecularMapRow );
-
 
 	// env map
 
@@ -238,7 +252,6 @@ Sidebar.Material = function ( editor ) {
 	materialEnvMapRow.add( materialReflectivity );
 
 	container.add( materialEnvMapRow );
-
 
 	// blending
 
@@ -259,7 +272,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialBlendingRow );
 
-
 	// side
 
 	var materialSideRow = new UI.Panel();
@@ -276,7 +288,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialSideRow );
 
-
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
@@ -287,7 +298,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialOpacityRow );
 
-
 	// transparent
 
 	var materialTransparentRow = new UI.Panel();
@@ -297,7 +307,6 @@ Sidebar.Material = function ( editor ) {
 	materialTransparentRow.add( materialTransparent );
 
 	container.add( materialTransparentRow );
-
 
 	// wireframe
 
@@ -310,7 +319,6 @@ Sidebar.Material = function ( editor ) {
 	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
-
 
 	//
 
@@ -574,6 +582,8 @@ Sidebar.Material = function ( editor ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
+			'vertexShader': materialVertexShader,
+			'fragmentShader': materialFragmentShader,
 			'vertexColors': materialVertexColorsRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
@@ -650,6 +660,18 @@ Sidebar.Material = function ( editor ) {
 			if ( material.shininess !== undefined ) {
 
 				materialShininess.setValue( material.shininess );
+
+			}
+
+			if ( material.vertexShader !== undefined ) {
+
+				materialVertexShader.setValue( material.vertexShader );
+
+			}
+
+			if ( material.fragmentShader !== undefined ) {
+
+				materialFragmentShader.setValue( material.fragmentShader );
 
 			}
 

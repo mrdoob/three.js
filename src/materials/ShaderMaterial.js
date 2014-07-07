@@ -2,12 +2,11 @@
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
- *  fragmentShader: <string>,
- *  vertexShader: <string>,
- *
+ *  defines: { "label" : "value" },
  *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
  *
- *  defines: { "label" : "value" },
+ *  fragmentShader: <string>,
+ *  vertexShader: <string>,
  *
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
