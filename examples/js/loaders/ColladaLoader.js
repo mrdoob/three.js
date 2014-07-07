@@ -644,9 +644,6 @@ THREE.ColladaLoader = function () {
 
 	function applySkin ( geometry, instanceCtrl, frame ) {
 
-		// TODO: get this from the renderer or options
-		var maxbones = 64;
-
 		var skinController = controllers[ instanceCtrl.url ];
 
 		frame = frame !== undefined ? frame : 40;
@@ -746,12 +743,10 @@ THREE.ColladaLoader = function () {
 
 		console.log( 'ColladaLoader:', animationBounds.ID + ' has ' + sortedbones.length + ' bones.' );
 
-		//if using hardware skinning, move the vertices into the binding pose
-		if(sortedbones.length < maxbones) {
 
-			skinToBindPose(geometry,skeleton,skinController);
 
-		}
+		skinToBindPose(geometry,skeleton,skinController);
+
 
 		for ( frame = 0; frame < animationBounds.frames; frame ++ ) {
 
@@ -763,80 +758,36 @@ THREE.ColladaLoader = function () {
 			setupSkeleton( skeleton, bones, frame );
 			setupSkinningMatrices( bones, skinController.skin );
 
-			//if using hardware skinning, just hook up the animiation data
-			if(sortedbones.length < maxbones) {
+			for(var i = 0; i < bones.length; i ++) {
 
-				for(var i = 0; i < bones.length; i ++) {
+				for(var j = 0; j < animationdata.hierarchy.length; j ++) {
 
-					for(var j = 0; j < animationdata.hierarchy.length; j ++) {
+					if(animationdata.hierarchy[j].name == bones[i].sid) {
 
-						if(animationdata.hierarchy[j].name == bones[i].sid) {
+						var key = {};
+						key.time = (frame/30);
+						key.matrix = bones[i].animatrix;
 
-							var key = {};
-							key.time = (frame/30);
-							key.matrix = bones[i].animatrix;
+						if(frame == 0)
+							bones[i].matrix = key.matrix;
 
-							if(frame == 0)
-								bones[i].matrix = key.matrix;
+						var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
+						key.matrix.decompose(data[0],data[1],data[2]);
 
-							var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
-							key.matrix.decompose(data[0],data[1],data[2]);
+						key.pos = [data[0].x,data[0].y,data[0].z];
 
-							key.pos = [data[0].x,data[0].y,data[0].z];
+						key.scl = [data[2].x,data[2].y,data[2].z];
+						key.rot = data[1];
 
-							key.scl = [data[2].x,data[2].y,data[2].z];
-							key.rot = data[1];
-
-							animationdata.hierarchy[j].keys.push(key);
-
-						}
+						animationdata.hierarchy[j].keys.push(key);
 
 					}
 
 				}
-
-				geometry.animation = animationdata;
-
-			} else {
-
-				// otherwise, process the animation into morphtargets
-
-				for ( i = 0; i < geometry.vertices.length; i++ ) {
-
-					skinned.push( new THREE.Vector3() );
-
-				}
-
-				for ( i = 0; i < bones.length; i ++ ) {
-
-					if ( bones[ i ].type != 'JOINT' ) continue;
-
-					for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
-
-						w = bones[ i ].weights[ j ];
-						vidx = w.index;
-						weight = w.weight;
-
-						o = geometry.vertices[vidx];
-						s = skinned[vidx];
-
-						v.x = o.x;
-						v.y = o.y;
-						v.z = o.z;
-
-						v.applyMatrix4( bones[i].skinningMatrix );
-
-						s.x += (v.x * weight);
-						s.y += (v.y * weight);
-						s.z += (v.z * weight);
-
-					}
-
-				}
-
-				geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
 
 			}
+
+			geometry.animation = animationdata;
 
 		}
 

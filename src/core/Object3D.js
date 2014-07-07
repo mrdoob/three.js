@@ -297,10 +297,22 @@ THREE.Object3D.prototype = {
 
 	add: function ( object ) {
 
+		if ( arguments.length > 1 ) {
+
+			for ( var i = 0; i < arguments.length; i++ ) {
+
+				this.add( arguments[ i ] );
+
+			}
+
+			return this;
+
+		};
+
 		if ( object === this ) {
 
 			console.warn( "THREE.Object3D.add: An object can't be added as a child of itself." );
-			return;
+			return this;
 
 		}
 
@@ -335,9 +347,21 @@ THREE.Object3D.prototype = {
 
 		}
 
+		return this;
+
 	},
 
 	remove: function ( object ) {
+
+		if ( arguments.length > 1 ) {
+
+			for ( var i = 0; i < arguments.length; i++ ) {
+
+				this.remove( arguments[ i ] );
+
+			}
+
+		};
 
 		var index = this.children.indexOf( object );
 
@@ -377,6 +401,20 @@ THREE.Object3D.prototype = {
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
+	traverseVisible: function ( callback ) {
+
+		if ( this.visible === false ) return;
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverseVisible( callback );
 
 		}
 

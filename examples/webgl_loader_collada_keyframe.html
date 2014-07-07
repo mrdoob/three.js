@@ -47,6 +47,7 @@
 
 			var stats;
 			var scene;
+			var pointLight;
 			var camera;
 			var renderer;
 			var model;
@@ -126,8 +127,6 @@
 				// Lights
 
 				pointLight = new THREE.PointLight( 0xffffff, 1.75 );
-				pointLight.position = camera.position;
-
 				scene.add( pointLight );
 
 				// Renderer
@@ -223,6 +222,8 @@
 					start();
 
 				}
+
+				pointLight.position.copy( camera.position );
 
 				progress += frameTime;
 				lastTimestamp = timestamp;

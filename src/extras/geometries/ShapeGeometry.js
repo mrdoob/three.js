@@ -20,8 +20,6 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	if ( shapes instanceof Array === false ) shapes = [ shapes ];
 
-	this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
-
 	this.addShapeList( shapes, options );
 
 	this.computeFaceNormals();
@@ -55,8 +53,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var material = options.material;
 	var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
-
-	var shapebb = this.shapebb;
 
 	//
 

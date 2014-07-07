@@ -782,6 +782,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function textureToPattern( texture ) {
 
+		if ( texture instanceof THREE.CompressedTexture ) return;
+
 		var repeatX = texture.wrapS === THREE.RepeatWrapping;
 		var repeatY = texture.wrapT === THREE.RepeatWrapping;
 

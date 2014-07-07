@@ -7,6 +7,8 @@ THREE.SpritePlugin = function () {
 
 	var _gl, _renderer, _texture;
 
+	var sprites = [];
+
 	var vertices, faces, vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
 
@@ -65,17 +67,35 @@ THREE.SpritePlugin = function () {
 
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
+		
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = 8;
+		canvas.height = 8;
+		
+		var context = canvas.getContext( '2d' );
+		context.fillStyle = 'white';
+		context.fillRect( 0, 0, 8, 8 );
 
-		_texture = new THREE.Texture();
+		_texture = new THREE.Texture( canvas );
+		_texture.needsUpdate = true;
 
 	};
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
-		var sprites = scene.__webglSprites,
-			nSprites = sprites.length;
+		sprites.length = 0;
 
-		if ( ! nSprites ) return;
+		scene.traverseVisible( function ( child ) {
+
+			if ( child instanceof THREE.Sprite ) {
+
+				sprites.push( child );
+
+			}
+
+		} );
+
+		if ( sprites.length === 0 ) return;
 
 		// setup gl
 
@@ -136,14 +156,10 @@ THREE.SpritePlugin = function () {
 
 		// update positions and sort
 
-		var i, sprite, material, fogType, scale = [];
+		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
-		for( i = 0; i < nSprites; i ++ ) {
-
-			sprite = sprites[ i ];
-			material = sprite.material;
-
-			if ( sprite.visible === false ) continue;
+			var sprite = sprites[ i ];
+			var material = sprite.material;
 
 			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
 			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
@@ -154,13 +170,12 @@ THREE.SpritePlugin = function () {
 
 		// render all sprites
 
-		for( i = 0; i < nSprites; i ++ ) {
+		var scale = [];
 
-			sprite = sprites[ i ];
+		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
-			if ( sprite.visible === false ) continue;
-
-			material = sprite.material;
+			var sprite = sprites[ i ];
+			var material = sprite.material;
 
 			_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
@@ -168,13 +183,11 @@ THREE.SpritePlugin = function () {
 			scale[ 0 ] = sprite.scale.x;
 			scale[ 1 ] = sprite.scale.y;
 
+			var fogType = 0;
+
 			if ( scene.fog && material.fog ) {
 
 				fogType = sceneFogType;
-
-			} else {
-
-				fogType = 0;
 
 			}
 

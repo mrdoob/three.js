@@ -174,6 +174,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	initialNormal3();
 
+	/*
 	function initialNormal1(lastBinormal) {
 		// fixed start binormal. Has dangers of 0 vectors
 		normals[ 0 ] = new THREE.Vector3();
@@ -195,6 +196,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
 
 	}
+	*/
 
 	function initialNormal3() {
 		// select an initial normal vector perpenicular to the first tangent vector,

@@ -86,7 +86,7 @@
 
 				geometry.colors = colors;
 
-				material = new THREE.PointCloudMaterial( { size: 85, map: sprite, vertexColors: true, transparent: true } );
+				material = new THREE.PointCloudMaterial( { size: 85, map: sprite, vertexColors: THREE.VertexColors, transparent: true } );
 				material.color.setHSL( 1.0, 0.2, 0.7 );
 
 				particles = new THREE.PointCloud( geometry, material );

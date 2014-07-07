@@ -109,7 +109,7 @@
 
 				//
 
-				var material = new THREE.PointCloudMaterial( { size: 15, vertexColors: true } );
+				var material = new THREE.PointCloudMaterial( { size: 15, vertexColors: THREE.VertexColors } );
 
 				particleSystem = new THREE.PointCloud( geometry, material );
 				scene.add( particleSystem );
