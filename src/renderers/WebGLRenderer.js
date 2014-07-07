@@ -4306,7 +4306,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.id !== _currentMaterialId ) {
 
-			refreshLights = ( refreshLights || _currentMaterialId === - 1 );
+			if ( _currentMaterialId === -1 ) refreshLights = true;
 			_currentMaterialId = material.id;
 
 			refreshMaterial = true;
@@ -4412,19 +4412,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
 
-				refreshLights = ( refreshLights || _lightsNeedUpdate );
-
 				if ( _lightsNeedUpdate ) {
 
+					refreshLights = true;
 					setupLights( lights );
 					_lightsNeedUpdate = false;
 				}
 
 				if ( refreshLights ) {
 					refreshUniformsLights( m_uniforms, _lights );
-					markUniformsLightsClean( m_uniforms, false );
+					markUniformsLightsSkipUpdate( m_uniforms, false );
 				} else {
-					markUniformsLightsClean( m_uniforms, true );
+					markUniformsLightsSkipUpdate( m_uniforms, true );
 				}
 
 			}
@@ -4708,27 +4707,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
-	function markUniformsLightsClean ( uniforms, clean ) {
+	function markUniformsLightsSkipUpdate ( uniforms, boolean ) {
 
-		uniforms.ambientLightColor.clean = clean;
+		uniforms.ambientLightColor.skipUpdate = boolean;
 
-		uniforms.directionalLightColor.clean = clean;
-		uniforms.directionalLightDirection.clean = clean;
+		uniforms.directionalLightColor.skipUpdate = boolean;
+		uniforms.directionalLightDirection.skipUpdate = boolean;
 
-		uniforms.pointLightColor.clean = clean;
-		uniforms.pointLightPosition.clean = clean;
-		uniforms.pointLightDistance.clean = clean;
+		uniforms.pointLightColor.skipUpdate = boolean;
+		uniforms.pointLightPosition.skipUpdate = boolean;
+		uniforms.pointLightDistance.skipUpdate = boolean;
 
-		uniforms.spotLightColor.clean = clean;
-		uniforms.spotLightPosition.clean = clean;
-		uniforms.spotLightDistance.clean = clean;
-		uniforms.spotLightDirection.clean = clean;
-		uniforms.spotLightAngleCos.clean = clean;
-		uniforms.spotLightExponent.clean = clean;
+		uniforms.spotLightColor.skipUpdate = boolean;
+		uniforms.spotLightPosition.skipUpdate = boolean;
+		uniforms.spotLightDistance.skipUpdate = boolean;
+		uniforms.spotLightDirection.skipUpdate = boolean;
+		uniforms.spotLightAngleCos.skipUpdate = boolean;
+		uniforms.spotLightExponent.skipUpdate = boolean;
 
-		uniforms.hemisphereLightSkyColor.clean = clean;
-		uniforms.hemisphereLightGroundColor.clean = clean;
-		uniforms.hemisphereLightDirection.clean = clean;
+		uniforms.hemisphereLightSkyColor.skipUpdate = boolean;
+		uniforms.hemisphereLightGroundColor.skipUpdate = boolean;
+		uniforms.hemisphereLightDirection.skipUpdate = boolean;
 
 	};
 
@@ -4806,7 +4805,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var uniform = uniforms[ j ][ 0 ];
 
-			if ( uniform.clean ) continue;
+			if ( uniform.skipUpdate ) continue;
 
 			var type = uniform.type;
 			var value = uniform.value;
