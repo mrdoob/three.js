@@ -118,7 +118,7 @@ THREE.Skeleton.prototype.addBone = function ( bone ) {
 };
 
 
-THREE.Skeleton.prototype.calculateInverses = function ( bone ) {
+THREE.Skeleton.prototype.calculateInverses = function () {
 
 	this.boneInverses = [];
 
