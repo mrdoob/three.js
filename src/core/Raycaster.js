@@ -39,8 +39,8 @@
 		if ( object instanceof THREE.Sprite ) {
 
 			matrixPosition.setFromMatrixPosition( object.matrixWorld );
-			var distanceX = raycaster.ray.distanceToPoint( matrixPosition , 'x' );
-			var distanceY = raycaster.ray.distanceToPoint( matrixPosition , 'y' );
+			var distanceX = raycaster.ray.distanceToPoint( matrixPosition, 'x' );
+			var distanceY = raycaster.ray.distanceToPoint( matrixPosition, 'y' );
 
 			if ( distanceX > object.scale.x / 2 || distanceY > object.scale.y / 2 ) {
 
