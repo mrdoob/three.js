@@ -73,7 +73,7 @@ THREE.Ray.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( point ) {
+		return function ( point, vector ) {
 
 			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
 
@@ -86,6 +86,12 @@ THREE.Ray.prototype = {
 			}
 
 			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+
+			if (vector) {
+
+				return Math.abs( v1[vector] - point[vector] );
+
+			}
 
 			return v1.distanceTo( point );
 
