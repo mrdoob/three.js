@@ -4421,9 +4421,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( refreshLights ) {
 					refreshUniformsLights( m_uniforms, _lights );
-					markUniformsLightsSkipUpdate( m_uniforms, false );
+					markUniformsLightsNeedsUpdate( m_uniforms, true );
 				} else {
-					markUniformsLightsSkipUpdate( m_uniforms, true );
+					markUniformsLightsNeedsUpdate( m_uniforms, false );
 				}
 
 			}
@@ -4707,27 +4707,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
-	function markUniformsLightsSkipUpdate ( uniforms, boolean ) {
+	function markUniformsLightsNeedsUpdate ( uniforms, boolean ) {
 
-		uniforms.ambientLightColor.skipUpdate = boolean;
+		uniforms.ambientLightColor.needsUpdate = boolean;
 
-		uniforms.directionalLightColor.skipUpdate = boolean;
-		uniforms.directionalLightDirection.skipUpdate = boolean;
+		uniforms.directionalLightColor.needsUpdate = boolean;
+		uniforms.directionalLightDirection.needsUpdate = boolean;
 
-		uniforms.pointLightColor.skipUpdate = boolean;
-		uniforms.pointLightPosition.skipUpdate = boolean;
-		uniforms.pointLightDistance.skipUpdate = boolean;
+		uniforms.pointLightColor.needsUpdate = boolean;
+		uniforms.pointLightPosition.needsUpdate = boolean;
+		uniforms.pointLightDistance.needsUpdate = boolean;
 
-		uniforms.spotLightColor.skipUpdate = boolean;
-		uniforms.spotLightPosition.skipUpdate = boolean;
-		uniforms.spotLightDistance.skipUpdate = boolean;
-		uniforms.spotLightDirection.skipUpdate = boolean;
-		uniforms.spotLightAngleCos.skipUpdate = boolean;
-		uniforms.spotLightExponent.skipUpdate = boolean;
+		uniforms.spotLightColor.needsUpdate = boolean;
+		uniforms.spotLightPosition.needsUpdate = boolean;
+		uniforms.spotLightDistance.needsUpdate = boolean;
+		uniforms.spotLightDirection.needsUpdate = boolean;
+		uniforms.spotLightAngleCos.needsUpdate = boolean;
+		uniforms.spotLightExponent.needsUpdate = boolean;
 
-		uniforms.hemisphereLightSkyColor.skipUpdate = boolean;
-		uniforms.hemisphereLightGroundColor.skipUpdate = boolean;
-		uniforms.hemisphereLightDirection.skipUpdate = boolean;
+		uniforms.hemisphereLightSkyColor.needsUpdate = boolean;
+		uniforms.hemisphereLightGroundColor.needsUpdate = boolean;
+		uniforms.hemisphereLightDirection.needsUpdate = boolean;
 
 	};
 
@@ -4805,7 +4805,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var uniform = uniforms[ j ][ 0 ];
 
-			if ( uniform.skipUpdate ) continue;
+			// needsUpdate property is not added to all uniforms.
+			if ( uniform.needsUpdate === false ) continue;
 
 			var type = uniform.type;
 			var value = uniform.value;
