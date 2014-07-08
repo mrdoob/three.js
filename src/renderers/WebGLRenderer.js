@@ -4256,7 +4256,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( u in material.__webglShader.uniforms ) {
 
-			material.uniformsList.push( [ material.__webglShader.uniforms[ u ], u ] );
+			var location = material.program.uniforms[ u ];
+
+			if ( location ) {
+				material.uniformsList.push( [ material.__webglShader.uniforms[ u ], location ] );
+			}
 
 		}
 
@@ -4470,7 +4474,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// load common uniforms
 
-			loadUniformsGeneric( program, material.uniformsList );
+			loadUniformsGeneric( material.uniformsList );
 
 		}
 
@@ -4758,15 +4762,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function loadUniformsGeneric ( program, uniforms ) {
+	function loadUniformsGeneric ( uniforms ) {
 
 		var texture, textureUnit, offset;
 
 		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
-			var location = program.uniforms[ uniforms[ j ][ 1 ] ];
-
-			if ( ! location ) continue;
+			var location = uniforms[ j ][ 1 ];
 
 			var uniform = uniforms[ j ][ 0 ];
 
