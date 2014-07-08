@@ -39,10 +39,10 @@
 		if ( object instanceof THREE.Sprite ) {
 
 			matrixPosition.setFromMatrixPosition( object.matrixWorld );
-			
-			var distance = raycaster.ray.distanceToPoint( matrixPosition );
+			var distanceX = raycaster.ray.distanceToPoint( matrixPosition, 'x' );
+			var distanceY = raycaster.ray.distanceToPoint( matrixPosition, 'y' );
 
-			if ( distance > object.scale.x ) {
+			if ( distanceX > object.scale.x / 2 || distanceY > object.scale.y / 2 ) {
 
 				return intersects;
 
