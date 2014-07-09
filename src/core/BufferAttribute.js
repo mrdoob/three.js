@@ -77,7 +77,7 @@ THREE.Int8Attribute = function ( size, itemSize ) {
 	this.array = new Int8Array( size * itemSize );
 	this.itemSize = itemSize;
 	this.updateElements = [];
-	
+
 };
 
 THREE.Int8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
