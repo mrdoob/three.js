@@ -2393,18 +2393,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributeItem.needsUpdate ) {
 
-				if ( attributeName === 'index' ) {
+				var target = attributeName === 'index' ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
-					_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
+				var updateElements = attributeItem.updateElements;
 
-				} else {
-
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-					_gl.bufferData( _gl.ARRAY_BUFFER, attributeItem.array, hint );
-
+				if ( updateElements instanceof Array && updateElements.length > 0 ) {
+					for ( var i = 0; i < updateElements.length; i++ ) {
+						var offset = updateElements[i];
+						var view = attributeItem.array.subarray( offset[0], offset[1] );
+						_gl.bindBuffer( target, attributeItem.buffer );
+						_gl.bufferSubData( target, offset[0] * attributeItem.array.BYTES_PER_ELEMENT, view );
+					}
+				}
+				else {
+					_gl.bindBuffer( target, attributeItem.buffer );
+					_gl.bufferData( target, attributeItem.array, hint );
 				}
 
+				attributeItem.updateElements = [];
 				attributeItem.needsUpdate = false;
 
 			}
