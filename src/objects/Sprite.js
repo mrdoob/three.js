@@ -5,11 +5,10 @@
 
 THREE.Sprite = ( function () {
 
-	var vertices = new THREE.Float32Attribute( 3, 3 );
-	vertices.set( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
+	var vertices = new Float32Array( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
 
 	var geometry = new THREE.BufferGeometry();
-	geometry.addAttribute( 'position', vertices );
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 	return function ( material ) {
 
@@ -24,9 +23,34 @@ THREE.Sprite = ( function () {
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 
-/*
- * Custom update matrix
- */
+THREE.Sprite.prototype.raycast = ( function () {
+
+	var matrixPosition = new THREE.Vector3();
+
+	return function ( raycaster, intersects ) {
+
+		matrixPosition.setFromMatrixPosition( this.matrixWorld );
+
+		var distance = raycaster.ray.distanceToPoint( matrixPosition );
+
+		if ( distance > this.scale.x ) {
+
+			return;
+
+		}
+
+		intersects.push( {
+
+			distance: distance,
+			point: this.position,
+			face: null,
+			object: this
+
+		} );
+
+	};
+
+}() );
 
 THREE.Sprite.prototype.updateMatrix = function () {
 

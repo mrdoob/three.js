@@ -29,7 +29,7 @@ THREE.LensFlare.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.LensFlare.prototype.add = function ( texture, size, distance, blending, color, opacity ) {
 
-	if( size === undefined ) size = -1;
+	if( size === undefined ) size = - 1;
 	if( distance === undefined ) distance = 0;
 	if( opacity === undefined ) opacity = 1;
 	if( color === undefined ) color = new THREE.Color( 0xffffff );
@@ -59,8 +59,8 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 
 	var f, fl = this.lensFlares.length;
 	var flare;
-	var vecX = -this.positionScreen.x * 2;
-	var vecY = -this.positionScreen.y * 2;
+	var vecX = - this.positionScreen.x * 2;
+	var vecY = - this.positionScreen.y * 2;
 
 	for( f = 0; f < fl; f ++ ) {
 

@@ -68,8 +68,6 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
 		object.geometry.dispose();
 
 		object.geometry = new THREE.CylinderGeometry(
@@ -81,6 +79,7 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 			openEnded.getValue()
 		);
 
+		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );

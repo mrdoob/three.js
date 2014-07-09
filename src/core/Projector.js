@@ -21,7 +21,7 @@ THREE.Projector = function () {
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 
-	_clipBox = new THREE.Box3( new THREE.Vector3( -1, -1, -1 ), new THREE.Vector3( 1, 1, 1 ) ),
+	_clipBox = new THREE.Box3( new THREE.Vector3( - 1, - 1, - 1 ), new THREE.Vector3( 1, 1, 1 ) ),
 	_boundingBox = new THREE.Box3(),
 	_points3 = new Array( 3 ),
 	_points4 = new Array( 4 ),
@@ -67,7 +67,7 @@ THREE.Projector = function () {
 	this.pickingRay = function ( vector, camera ) {
 
 		// set two vectors with opposing z values
-		vector.z = -1.0;
+		vector.z = - 1.0;
 		var end = new THREE.Vector3( vector.x, vector.y, 1.0 );
 
 		this.unprojectVector( vector, camera );
@@ -77,65 +77,6 @@ THREE.Projector = function () {
 		end.sub( vector ).normalize();
 
 		return new THREE.Raycaster( vector, end );
-
-	};
-
-	var projectObject = function ( object ) {
-
-		if ( object.visible === false ) return;
-
-		if ( object instanceof THREE.Light ) {
-
-			_renderData.lights.push( object );
-
-		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
-
-			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
-
-				_object = getNextObjectInPool();
-				_object.id = object.id;
-				_object.object = object;
-
-				if ( object.renderDepth !== null ) {
-
-					_object.z = object.renderDepth;
-
-				} else {
-
-					_vector3.setFromMatrixPosition( object.matrixWorld );
-					_vector3.applyProjection( _viewProjectionMatrix );
-					_object.z = _vector3.z;
-
-				}
-
-				_renderData.objects.push( _object );
-
-			}
-
-		}
-
-		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-			projectObject( object.children[ i ] );
-
-		}
-
-	};
-
-	var projectGraph = function ( root, sortObjects ) {
-
-		_objectCount = 0;
-
-		_renderData.objects.length = 0;
-		_renderData.lights.length = 0;
-
-		projectObject( root );
-
-		if ( sortObjects === true ) {
-
-			_renderData.objects.sort( painterSort );
-
-		}
 
 	};
 
@@ -176,9 +117,9 @@ THREE.Projector = function () {
 			positionScreen.y *= invW;
 			positionScreen.z *= invW;
 
-			vertex.visible = positionScreen.x >= -1 && positionScreen.x <= 1 &&
-					 positionScreen.y >= -1 && positionScreen.y <= 1 &&
-					 positionScreen.z >= -1 && positionScreen.z <= 1;
+			vertex.visible = positionScreen.x >= - 1 && positionScreen.x <= 1 &&
+					 positionScreen.y >= - 1 && positionScreen.y <= 1 &&
+					 positionScreen.z >= - 1 && positionScreen.z <= 1;
 
 		};
 
@@ -303,9 +244,6 @@ THREE.Projector = function () {
 
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
-		var object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs,
-		isFaceMaterial, objectMaterials;
-
 		_faceCount = 0;
 		_lineCount = 0;
 		_spriteCount = 0;
@@ -320,12 +258,59 @@ THREE.Projector = function () {
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
-		projectGraph( scene, sortObjects );
+		//
+
+		_objectCount = 0;
+
+		_renderData.objects.length = 0;
+		_renderData.lights.length = 0;
+
+		scene.traverseVisible( function ( object ) {
+
+			if ( object instanceof THREE.Light ) {
+
+				_renderData.lights.push( object );
+
+			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
+
+				if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
+
+					_object = getNextObjectInPool();
+					_object.id = object.id;
+					_object.object = object;
+
+					if ( object.renderDepth !== null ) {
+
+						_object.z = object.renderDepth;
+
+					} else {
+
+						_vector3.setFromMatrixPosition( object.matrixWorld );
+						_vector3.applyProjection( _viewProjectionMatrix );
+						_object.z = _vector3.z;
+
+					}
+
+					_renderData.objects.push( _object );
+
+				}
+
+			}
+
+		} );
+
+		if ( sortObjects === true ) {
+
+			_renderData.objects.sort( painterSort );
+
+		}
+
+		//
 
 		for ( var o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
-			object = _renderData.objects[ o ].object;
-			geometry = object.geometry;
+			var object = _renderData.objects[ o ].object;
+			var geometry = object.geometry;
 
 			renderList.setObject( object );
 
@@ -415,14 +400,14 @@ THREE.Projector = function () {
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
-					vertices = geometry.vertices;
-					faces = geometry.faces;
-					faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+					var vertices = geometry.vertices;
+					var faces = geometry.faces;
+					var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
 
 					_normalMatrix.getNormalMatrix( _modelMatrix );
 
-					isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-					objectMaterials = isFaceMaterial === true ? object.material : null;
+					var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+					var objectMaterials = isFaceMaterial === true ? object.material : null;
 
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
@@ -433,11 +418,11 @@ THREE.Projector = function () {
 
 					for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
-						face = faces[ f ];
+						var face = faces[ f ];
 
 						var material = isFaceMaterial === true
-							? objectMaterials.materials[ face.materialIndex ]
-							: object.material;
+							 ? objectMaterials.materials[ face.materialIndex ]
+							 : object.material;
 
 						if ( material === undefined ) continue;
 
@@ -518,7 +503,7 @@ THREE.Projector = function () {
 
 						_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-						faceVertexNormals = face.vertexNormals;
+						var faceVertexNormals = face.vertexNormals;
 
 						for ( var n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
 
@@ -588,7 +573,9 @@ THREE.Projector = function () {
 
 						} else {
 
-							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i ++ ) {
+							var step = object.type === THREE.LinePieces ? 2 : 1;
+
+							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
 								renderList.pushLine( i, i + 1 );
 
@@ -602,7 +589,7 @@ THREE.Projector = function () {
 
 					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-					vertices = object.geometry.vertices;
+					var vertices = object.geometry.vertices;
 
 					if ( vertices.length === 0 ) continue;
 
@@ -657,14 +644,14 @@ THREE.Projector = function () {
 
 			} else if ( object instanceof THREE.Sprite ) {
 
-				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
+				_vector4.set( _modelMatrix.elements[ 12 ], _modelMatrix.elements[ 13 ], _modelMatrix.elements[ 14 ], 1 );
 				_vector4.applyMatrix4( _viewProjectionMatrix );
 
 				var invW = 1 / _vector4.w;
 
 				_vector4.z *= invW;
 
-				if ( _vector4.z >= -1 && _vector4.z <= 1 ) {
+				if ( _vector4.z >= - 1 && _vector4.z <= 1 ) {
 
 					_sprite = getNextSpriteInPool();
 					_sprite.id = object.id;
@@ -675,8 +662,8 @@ THREE.Projector = function () {
 
 					_sprite.rotation = object.rotation;
 
-					_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
-					_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
+					_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[ 0 ] ) / ( _vector4.w + camera.projectionMatrix.elements[ 12 ] ) );
+					_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[ 5 ] ) / ( _vector4.w + camera.projectionMatrix.elements[ 13 ] ) );
 
 					_sprite.material = object.material;
 
@@ -813,7 +800,7 @@ THREE.Projector = function () {
 			// Both vertices lie entirely within all clip planes.
 			return true;
 
-		} else if ( ( bc1near < 0 && bc2near < 0) || (bc1far < 0 && bc2far < 0 ) ) {
+		} else if ( ( bc1near < 0 && bc2near < 0 ) || ( bc1far < 0 && bc2far < 0 ) ) {
 
 			// Both vertices lie entirely outside one of the clip planes.
 			return false;

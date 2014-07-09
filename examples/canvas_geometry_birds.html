@@ -359,7 +359,6 @@
 
 					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshBasicMaterial( { color:Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 					bird.phase = Math.floor( Math.random() * 62.83 );
-					bird.position = boids[ i ].position;
 					scene.add( bird );
 
 
@@ -429,6 +428,7 @@
 					boid.run( boids );
 
 					bird = birds[ i ];
+					bird.position.copy( boids[ i ].position );
 
 					color = bird.material.color;
 					color.r = color.g = color.b = ( 500 - bird.position.z ) / 1000;

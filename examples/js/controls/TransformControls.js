@@ -720,7 +720,7 @@
 
 			event.preventDefault();
 
-			var pointer = event.touches ? event.touches[ 0 ] : event;
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
@@ -747,7 +747,7 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var pointer = event.touches ? event.touches[ 0 ] : event;
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
 
@@ -791,7 +791,7 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var pointer = event.touches? event.touches[0] : event;
+			var pointer = event.changedTouches? event.changedTouches[0] : event;
 
 			var planeIntersect = intersectObjects( pointer, [scope.gizmo[_mode].activePlane] );
 

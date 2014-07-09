@@ -25,6 +25,7 @@ THREE.MorphAnimation.prototype = {
 	pause: function () {
 
 		this.isPlaying = false;
+
 	},
 
 	update: ( function () {

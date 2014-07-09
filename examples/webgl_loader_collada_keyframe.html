@@ -47,6 +47,7 @@
 
 			var stats;
 			var scene;
+			var pointLight;
 			var camera;
 			var renderer;
 			var model;
@@ -87,14 +88,12 @@
 
 				// KeyFrame Animations
 
-				var animHandler = THREE.AnimationHandler;
-
 				for ( var i = 0; i < kfAnimationsLength; ++i ) {
 
 					var animation = animations[ i ];
-					animHandler.add( animation );
+					THREE.AnimationHandler.add( animation );
 
-					var kfAnimation = new THREE.KeyFrameAnimation( animation.node, animation.name );
+					var kfAnimation = new THREE.KeyFrameAnimation( animation );
 					kfAnimation.timeScale = 1;
 					kfAnimations.push( kfAnimation );
 
@@ -128,8 +127,6 @@
 				// Lights
 
 				pointLight = new THREE.PointLight( 0xffffff, 1.75 );
-				pointLight.position = camera.position;
-
 				scene.add( pointLight );
 
 				// Renderer
@@ -225,6 +222,8 @@
 					start();
 
 				}
+
+				pointLight.position.copy( camera.position );
 
 				progress += frameTime;
 				lastTimestamp = timestamp;

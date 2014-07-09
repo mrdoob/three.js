@@ -8,6 +8,6 @@ To build the npm modules:
 6. add "-dev" to the version number if this is a development branch.
 7. run the follow to build both the three and three-math node modules
  * node build.js 0.54.3-dev
-8. npm publish node_module/three
-9. npm publish node_module/three-math
+8. npm publish node_modules/three
+9. npm publish node_modules/three-math
 

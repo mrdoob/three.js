@@ -5,7 +5,7 @@
 THREE.TetrahedronGeometry = function ( radius, detail ) {
 
 	var vertices = [
-		 1,  1,  1,   -1, -1,  1,   -1,  1, -1,    1, -1, -1
+		 1,  1,  1,   - 1, - 1,  1,   - 1,  1, - 1,    1, - 1, - 1
 	];
 
 	var indices = [

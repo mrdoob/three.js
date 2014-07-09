@@ -37,7 +37,7 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 		}
 
-	} else if ( !( object instanceof THREE.Camera || object instanceof THREE.Bone ) ) {
+	} else if ( ! ( object instanceof THREE.Camera || object instanceof THREE.Bone ) ) {
 
 		this.__objectsAdded.push( object );
 
@@ -45,7 +45,7 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 		var i = this.__objectsRemoved.indexOf( object );
 
-		if ( i !== -1 ) {
+		if ( i !== - 1 ) {
 
 			this.__objectsRemoved.splice( i, 1 );
 
@@ -70,7 +70,7 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 		var i = this.__lights.indexOf( object );
 
-		if ( i !== -1 ) {
+		if ( i !== - 1 ) {
 
 			this.__lights.splice( i, 1 );
 
@@ -86,7 +86,7 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 		}
 
-	} else if ( !( object instanceof THREE.Camera ) ) {
+	} else if ( ! ( object instanceof THREE.Camera ) ) {
 
 		this.__objectsRemoved.push( object );
 
@@ -94,7 +94,7 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 		var i = this.__objectsAdded.indexOf( object );
 
-		if ( i !== -1 ) {
+		if ( i !== - 1 ) {
 
 			this.__objectsAdded.splice( i, 1 );
 
@@ -117,7 +117,7 @@ THREE.Scene.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) object = new THREE.Scene();
 
-	THREE.Object3D.prototype.clone.call(this, object);
+	THREE.Object3D.prototype.clone.call( this, object );
 
 	if ( this.fog !== null ) object.fog = this.fog.clone();
 	if ( this.overrideMaterial !== null ) object.overrideMaterial = this.overrideMaterial.clone();

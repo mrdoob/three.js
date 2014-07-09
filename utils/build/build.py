@@ -5,7 +5,7 @@ import sys
 if sys.version_info < (2, 7):
 	print("This script requires at least Python 2.7.")
 	print("Please, update to a newer version: http://www.python.org/download/releases/")
-	exit()
+#	exit()
 
 import argparse
 import json
@@ -44,7 +44,7 @@ def main(argv=None):
 	fd, path = tempfile.mkstemp()
 	tmp = open(path, 'w')
 	sources = []
-
+		
 	if args.amd:
 		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
@@ -52,11 +52,18 @@ def main(argv=None):
 		with open('includes/' + include + '.json','r') as f:
 			files = json.load(f)
 		for filename in files:
-			filename = '../../' + filename;
+			tmp.write('// File:' + filename)
+			tmp.write('\n\n')
+			filename = '../../' + filename
 			sources.append(filename)
 			with open(filename, 'r') as f:
-				tmp.write(f.read())
-				tmp.write('\n')
+				if filename.endswith(".glsl"):
+					tmp.write('THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + '\'] = "') 
+					tmp.write(f.read().replace('\n','\\n'))
+					tmp.write('";\n\n')
+				else:
+					tmp.write(f.read())
+					tmp.write('\n')
 
 	if args.amd:
 		tmp.write('exports.THREE = THREE;\n\n} ) );')
@@ -67,23 +74,33 @@ def main(argv=None):
 
 	if args.minify is False:
 		shutil.copy(path, output)
-		os.chmod(output, 0o664); # temp files would usually get 0600
+		os.chmod(output, 0o664) # temp files would usually get 0600
 
 	else:
+		backup = ''
+		if os.path.exists(output):
+			with open(output,'r') as f: backup = f.read()
+			os.remove(output)
 
 		externs = ' --externs '.join(args.externs)
 		source = ' '.join(sources)
-		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, source, output, sourcemapargs)
+		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, path, output, sourcemapargs)
 		os.system(cmd)
 
 		# header
 
-		with open(output,'r') as f: text = f.read()
-		with open(output,'w') as f: f.write('// three.js / threejs.org/license\n' + text + sourcemapping)
+		if os.path.exists(output):
+			with open(output,'r') as f: text = f.read()
+			with open(output,'w') as f: f.write('// three.js / threejs.org/license\n' + text + sourcemapping)
+		else:
+			print("Minification with Closure compiler failed. Check your Java runtime version.")
+			with open(output,'w') as f: f.write(backup)
 
 	os.close(fd)
 	os.remove(path)
 
 
 if __name__ == "__main__":
+	script_dir = os.path.dirname(os.path.abspath(__file__))
+	os.chdir(script_dir)
 	main()
