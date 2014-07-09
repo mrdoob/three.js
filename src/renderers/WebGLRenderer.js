@@ -2398,10 +2398,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var updateElements = attributeItem.updateElements;
 
 				if ( updateElements instanceof Array && updateElements.length > 0 ) {
+					_gl.bindBuffer( target, attributeItem.buffer );
 					for ( var i = 0; i < updateElements.length; i++ ) {
 						var offset = updateElements[i];
 						var view = attributeItem.array.subarray( offset[0], offset[1] );
-						_gl.bindBuffer( target, attributeItem.buffer );
 						_gl.bufferSubData( target, offset[0] * attributeItem.array.BYTES_PER_ELEMENT, view );
 					}
 				}
@@ -2410,7 +2410,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.bufferData( target, attributeItem.array, hint );
 				}
 
-				attributeItem.updateElements = [];
+				attributeItem.updateElements.length = 0;
 				attributeItem.needsUpdate = false;
 
 			}

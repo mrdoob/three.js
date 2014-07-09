@@ -76,7 +76,8 @@ THREE.Int8Attribute = function ( size, itemSize ) {
 
 	this.array = new Int8Array( size * itemSize );
 	this.itemSize = itemSize;
-
+	this.updateElements = [];
+	
 };
 
 THREE.Int8Attribute.prototype = Object.create( THREE.BufferAttribute.prototype );
@@ -85,6 +86,7 @@ THREE.Uint8Attribute = function ( size, itemSize ) {
 
 	this.array = new Uint8Array( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -94,6 +96,7 @@ THREE.Uint8ClampedAttribute = function ( size, itemSize ) {
 
 	this.array = new Uint8ClampedArray( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -103,6 +106,7 @@ THREE.Int16Attribute = function ( size, itemSize ) {
 
 	this.array = new Int16Array( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -112,6 +116,7 @@ THREE.Uint16Attribute = function ( size, itemSize ) {
 
 	this.array = new Uint16Array( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -121,6 +126,7 @@ THREE.Int32Attribute = function ( size, itemSize ) {
 
 	this.array = new Int32Array( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -130,6 +136,7 @@ THREE.Uint32Attribute = function ( size, itemSize ) {
 
 	this.array = new Uint32Array( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -139,6 +146,7 @@ THREE.Float32Attribute = function ( size, itemSize ) {
 
 	this.array = new Float32Array( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -148,6 +156,7 @@ THREE.Float64Attribute = function ( size, itemSize ) {
 
 	this.array = new Float64Array( size * itemSize );
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
