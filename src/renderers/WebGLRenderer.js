@@ -2405,13 +2405,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-				}
-
-				else {
+				} else {
 
 					_gl.bindBuffer( target, attributeItem.buffer );
 					_gl.bufferData( target, attributeItem.array, hint );
-					
+
 				}
 
 				attributeItem.updateElements.length = 0;
