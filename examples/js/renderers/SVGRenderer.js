@@ -32,7 +32,8 @@ THREE.SVGRenderer = function () {
 	_svgPathPool = [], _svgLinePool = [], _svgRectPool = [],
 	_svgNode, _pathCount = 0, _lineCount = 0, _rectCount = 0,
 	_quality = 1;
-
+	
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = _svg;
 
 	this.autoClear = true;
