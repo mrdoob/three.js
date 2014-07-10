@@ -39,6 +39,7 @@ THREE.CSS2DRenderer = function () {
 	var domElement = document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
 
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = domElement;
 
 	this.setSize = function ( width, height ) {
