@@ -55,7 +55,8 @@ THREE.CSS3DRenderer = function () {
 	domElement.style.MozTransformStyle = 'preserve-3d';
 	domElement.style.oTransformStyle = 'preserve-3d';
 	domElement.style.transformStyle = 'preserve-3d';
-
+	
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = domElement;
 
 	var cameraElement = document.createElement( 'div' );
