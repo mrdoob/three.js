@@ -66,7 +66,7 @@ THREE.Animation.prototype.reset = function () {
 			object.animationCache[this.data.name] = {};
 			object.animationCache[this.data.name].prevKey = { pos: 0, rot: 0, scl: 0 };
 			object.animationCache[this.data.name].nextKey = { pos: 0, rot: 0, scl: 0 };
-			object.animationCache[this.data.name].originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+			object.animationCache[this.data.name].originalMatrix = object.matrix;
 
 		}
 
@@ -237,7 +237,6 @@ THREE.Animation.prototype.update = (function(){
 							object.position.copy( newVector );
 
 						}
-
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
 								this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {

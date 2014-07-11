@@ -3266,6 +3266,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
+		// update Skeleton objects
+		function updateSkeletons( object ) {
+
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				object.skeleton.update();
+
+			}
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				updateSkeletons( object.children[ i ] );
+
+			}
+
+		}
+
+		updateSkeletons( scene );
+
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
@@ -4367,7 +4386,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			if ( _supportsBoneTextures && object.skeleton.useVertexTexture ) {
+			if ( object.bindMatrix && p_uniforms.bindMatrix !== null ) {
+
+				_gl.uniformMatrix4fv( p_uniforms.bindMatrix, false, object.bindMatrix.elements );
+
+			}
+
+			if ( object.bindMatrixInverse && p_uniforms.bindMatrixInverse !== null ) {
+
+				_gl.uniformMatrix4fv( p_uniforms.bindMatrixInverse, false, object.bindMatrixInverse.elements );
+
+			}
+
+			if ( _supportsBoneTextures && object.skeleton && object.skeleton.useVertexTexture ) {
 
 				if ( p_uniforms.boneTexture !== null ) {
 
@@ -4390,7 +4421,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			} else {
+			} else if ( object.skeleton && object.skeleton.boneMatrices ) {
 
 				if ( p_uniforms.boneGlobalMatrices !== null ) {
 

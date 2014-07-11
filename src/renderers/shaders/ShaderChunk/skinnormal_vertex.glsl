@@ -5,6 +5,7 @@
 	skinMatrix += skinWeight.y * boneMatY;
 	skinMatrix += skinWeight.z * boneMatZ;
 	skinMatrix += skinWeight.w * boneMatW;
+	skinMatrix  = bindMatrixInverse * skinMatrix * bindMatrix;
 
 	#ifdef USE_MORPHNORMALS
 
