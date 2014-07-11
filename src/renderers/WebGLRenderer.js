@@ -2393,7 +2393,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var updateElements = attributeItem.updateElements;
 
-				if ( updateElements instanceof Array && updateElements.length > 0 ) {
+				if ( updateElements.length > 0 ) {
 
 					_gl.bindBuffer( target, attributeItem.buffer );
 					
