@@ -95,7 +95,6 @@
 		dropdown += '</select>';
 
 		var closed2 = true;
-		var debug = true;
 		var parent;
 		var tube, tubeMesh;
 		var animation = false, lookAhead = false;
@@ -108,16 +107,15 @@
 
 			var segments = parseInt(document.getElementById('segments').value);
 			closed2 = document.getElementById('closed').checked;
-			debug = document.getElementById('debug').checked;
 
 			var radiusSegments = parseInt(document.getElementById('radiusSegments').value);
 
-			console.log('adding tube', value, closed2, debug, radiusSegments);
+			console.log('adding tube', value, closed2, radiusSegments);
 			if (tubeMesh) parent.remove(tubeMesh);
 
 			extrudePath = splines[value];
 
-			tube = new THREE.TubeGeometry(extrudePath, segments, 2, radiusSegments, closed2, debug);
+			tube = new THREE.TubeGeometry(extrudePath, segments, 2, radiusSegments, closed2);
 
 			addGeometry(tube, 0xff00ff);
 			setScale();
@@ -138,8 +136,7 @@
 
 			tubeMesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [
 				new THREE.MeshLambertMaterial({
-					color: color,
-					transparent: true
+					color: color
 				}),
 				new THREE.MeshBasicMaterial({
 					color: 0x000000,
@@ -147,8 +144,6 @@
 					wireframe: true,
 					transparent: true
 			})]);
-
-			if ( geometry.debug ) tubeMesh.add( geometry.debug );
 
 			parent.add( tubeMesh );
 
@@ -192,7 +187,7 @@
 			info.innerHTML += '<br/>Scale: <select id="scale" onchange="setScale()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
 			info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
 			info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>12</option></select>';
-			info.innerHTML += '<br/>Debug normals: <input id="debug" type="checkbox" onchange="addTube()"  /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
+			info.innerHTML += '<br/>Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
 
 			info.innerHTML += '<br/><br/><input id="animation" type="button" onclick="animateCamera(true)" value="Camera Spline Animation View: OFF"/><br/> Look Ahead <input id="lookAhead" type="checkbox" onchange="animateCamera()" /> Camera Helper <input id="cameraHelper" type="checkbox" onchange="animateCamera()" />';
 
@@ -369,8 +364,8 @@
 			// We move on a offset on its binormal
 			pos.add( normal.clone().multiplyScalar( offset ) );
 
-			splineCamera.position = pos;
-			cameraEye.position = pos;
+			splineCamera.position.copy( pos );
+			cameraEye.position.copy( pos );
 
 
 			// Camera Orientation 1 - default look at

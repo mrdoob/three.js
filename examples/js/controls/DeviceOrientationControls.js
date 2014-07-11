@@ -7,6 +7,8 @@
 
 THREE.DeviceOrientationControls = function ( object ) {
 
+	var scope = this;
+
 	this.object = object;
 
 	this.object.rotation.reorder( "YXZ" );
@@ -17,70 +19,21 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	this.screenOrientation = 0;
 
-	this.onDeviceOrientationChangeEvent = function( rawEvtData ) {
+	var onDeviceOrientationChangeEvent = function ( event ) {
 
-		this.deviceOrientation = rawEvtData;
-
-	};
-
-	this.onScreenOrientationChangeEvent = function() {
-
-		this.screenOrientation = window.orientation || 0;
+		scope.deviceOrientation = event;
 
 	};
 
-	this.update = function() {
+	var onScreenOrientationChangeEvent = function () {
 
-		var alpha, beta, gamma;
-
-		return function () {
-
-			if ( this.freeze ) return;
-
-			alpha  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.alpha ) : 0; // Z
-			beta   = this.deviceOrientation.beta  ? THREE.Math.degToRad( this.deviceOrientation.beta  ) : 0; // X'
-			gamma  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.gamma ) : 0; // Y''
-			orient = this.screenOrientation       ? THREE.Math.degToRad( this.screenOrientation       ) : 0; // O
-
-			setObjectQuaternion( this.object.quaternion, alpha, beta, gamma, orient );
-
-		}
-
-	}();
-
-	function bind( scope, fn ) {
-
-		return function () {
-
-			fn.apply( scope, arguments );
-
-		};
-
-	};
-
-	this.connect = function() {
-
-		this.onScreenOrientationChangeEvent(); // run once on load
-
-		window.addEventListener( 'orientationchange', bind( this, this.onScreenOrientationChangeEvent ), false );
-		window.addEventListener( 'deviceorientation', bind( this, this.onDeviceOrientationChangeEvent ), false );
-
-		this.freeze = false;
-
-	};
-
-	this.disconnect = function() {
-
-		this.freeze = true;
-
-		window.removeEventListener( 'orientationchange', bind( this, this.onScreenOrientationChangeEvent ), false );
-		window.removeEventListener( 'deviceorientation', bind( this, this.onDeviceOrientationChangeEvent ), false );
+		scope.screenOrientation = window.orientation || 0;
 
 	};
 
 	// The angles alpha, beta and gamma form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
 
-	setObjectQuaternion = function () {
+	var setObjectQuaternion = function () {
 
 		var zee = new THREE.Vector3( 0, 0, 1 );
 
@@ -103,5 +56,38 @@ THREE.DeviceOrientationControls = function ( object ) {
 		}
 
 	}();
+
+	this.connect = function() {
+
+		onScreenOrientationChangeEvent(); // run once on load
+
+		window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+		scope.freeze = false;
+
+	};
+
+	this.disconnect = function() {
+
+		scope.freeze = true;
+
+		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+	};
+
+	this.update = function () {
+
+		if ( scope.freeze ) return;
+
+		var alpha  = scope.deviceOrientation.gamma ? THREE.Math.degToRad( scope.deviceOrientation.alpha ) : 0; // Z
+		var beta   = scope.deviceOrientation.beta  ? THREE.Math.degToRad( scope.deviceOrientation.beta  ) : 0; // X'
+		var gamma  = scope.deviceOrientation.gamma ? THREE.Math.degToRad( scope.deviceOrientation.gamma ) : 0; // Y''
+		var orient = scope.screenOrientation       ? THREE.Math.degToRad( scope.screenOrientation       ) : 0; // O
+
+		setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
+
+	};
 
 };

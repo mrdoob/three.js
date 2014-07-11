@@ -85,6 +85,7 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 		// read texture coordinates - three.js attaches them to its faces
+		json.texturecoords = json.texturecoords || [];
 		for(i = 0, e = json.texturecoords.length; i < e; ++i) {
 
 			function convertTextureCoords(in_uv, out_faces, out_vertex_uvs) {
@@ -219,7 +220,9 @@ THREE.AssimpJSONLoader.prototype = {
 						has_textures.push(keyname);
 
 						loader.setCrossOrigin(this.crossOrigin);
-						loader.load(scope.texturePath + '/' + prop.value, function(tex) {
+						var material_url = scope.texturePath + '/' + prop.value
+						material_url = material_url.replace(/\\/g, '/');
+						loader.load(material_url, function(tex) {
 							if(tex) {
 								// TODO: read texture settings from assimp.
 								// Wrapping is the default, though.

@@ -4,17 +4,16 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Animation = function ( root, name ) {
+THREE.Animation = function ( root, data ) {
 
 	this.root = root;
-	this.data = THREE.AnimationHandler.get( name );
+	this.data = THREE.AnimationHandler.init( data );
 	this.hierarchy = THREE.AnimationHandler.parse( root );
 
 	this.currentTime = 0;
 	this.timeScale = 1;
 
 	this.isPlaying = false;
-	this.isPaused = true;
 	this.loop = true;
 	this.weight = 0;
 
@@ -32,28 +31,10 @@ THREE.Animation.prototype.play = function ( startTime, weight ) {
 	this.weight = weight !== undefined ? weight: 1;
 
 	this.isPlaying = true;
-	this.isPaused = false;
 
 	this.reset();
 
-	THREE.AnimationHandler.addToUpdate( this );
-
-};
-
-
-THREE.Animation.prototype.pause = function() {
-
-	if ( this.isPaused === true ) {
-
-		THREE.AnimationHandler.addToUpdate( this );
-
-	} else {
-
-		THREE.AnimationHandler.removeFromUpdate( this );
-
-	}
-
-	this.isPaused = !this.isPaused;
+	THREE.AnimationHandler.play( this );
 
 };
 
@@ -61,8 +42,8 @@ THREE.Animation.prototype.pause = function() {
 THREE.Animation.prototype.stop = function() {
 
 	this.isPlaying = false;
-	this.isPaused  = false;
-	THREE.AnimationHandler.removeFromUpdate( this );
+
+	THREE.AnimationHandler.stop( this );
 
 };
 
@@ -85,7 +66,7 @@ THREE.Animation.prototype.reset = function () {
 			object.animationCache[this.data.name] = {};
 			object.animationCache[this.data.name].prevKey = { pos: 0, rot: 0, scl: 0 };
 			object.animationCache[this.data.name].nextKey = { pos: 0, rot: 0, scl: 0 };
-			object.animationCache[this.data.name].originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+			object.animationCache[this.data.name].originalMatrix = object.matrix;
 
 		}
 
@@ -167,6 +148,7 @@ THREE.Animation.prototype.update = (function(){
 	};
 
 	return function ( delta ) {
+
 		if ( this.isPlaying === false ) return;
 
 		this.currentTime += delta * this.timeScale;
@@ -176,7 +158,6 @@ THREE.Animation.prototype.update = (function(){
 
 		//
 
-		var vector;
 		var duration = this.data.length;
 
 		if ( this.loop === true && this.currentTime > duration ) {
@@ -238,8 +219,6 @@ THREE.Animation.prototype.update = (function(){
 
 				if ( type === "pos" ) {
 
-					vector = object.position;
-
 					if ( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
 
 						newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
@@ -247,17 +226,20 @@ THREE.Animation.prototype.update = (function(){
 						newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 						// blend
-						if (object instanceof THREE.Bone) {
+						if ( object instanceof THREE.Bone ) {
 
 							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
-							vector.lerp( newVector, proportionalWeight );
+							object.position.lerp( newVector, proportionalWeight );
 							object.accumulatedPosWeight += this.weight;
 
-						} else
-							vector = newVector;
+						} else {
+
+							object.position.copy( newVector );
+
+						}
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-						this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+								this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
 						points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
 						points[ 1 ] = prevXYZ;
@@ -267,17 +249,19 @@ THREE.Animation.prototype.update = (function(){
 						scale = scale * 0.33 + 0.33;
 
 						var currentPoint = interpolateCatmullRom( points, scale );
-
+						var proportionalWeight = 1;
+						
 						if ( object instanceof THREE.Bone ) {
 
-							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
+							proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
 							object.accumulatedPosWeight += this.weight;
 
 						}
-						else
-							var proportionalWeight = 1;
 
 						// blend
+
+						var vector = object.position;
+						
 						vector.x = vector.x + ( currentPoint[ 0 ] - vector.x ) * proportionalWeight;
 						vector.y = vector.y + ( currentPoint[ 1 ] - vector.y ) * proportionalWeight;
 						vector.z = vector.z + ( currentPoint[ 2 ] - vector.z ) * proportionalWeight;
@@ -303,18 +287,16 @@ THREE.Animation.prototype.update = (function(){
 					THREE.Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
 
 					// Avoid paying the cost of an additional slerp if we don't have to
-					if ( !( object instanceof THREE.Bone ) ) {
+					if ( ! ( object instanceof THREE.Bone ) ) {
 
 						object.quaternion.copy(newQuat);
 
-					}
-					else if ( object.accumulatedRotWeight === 0) {
+					} else if ( object.accumulatedRotWeight === 0 ) {
 
 						object.quaternion.copy(newQuat);
 						object.accumulatedRotWeight = this.weight;
 
-					}
-					else {
+					} else {
 
 						var proportionalWeight = this.weight / ( this.weight + object.accumulatedRotWeight );
 						THREE.Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
@@ -324,8 +306,6 @@ THREE.Animation.prototype.update = (function(){
 
 				} else if ( type === "scl" ) {
 
-					vector = object.scale;
-
 					newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 					newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 					newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
@@ -333,11 +313,14 @@ THREE.Animation.prototype.update = (function(){
 					if ( object instanceof THREE.Bone ) {
 
 						var proportionalWeight = this.weight / ( this.weight + object.accumulatedSclWeight);
-						vector.lerp( newVector, proportionalWeight );
+						object.scale.lerp( newVector, proportionalWeight );
 						object.accumulatedSclWeight += this.weight;
 
-					} else
-						vector = newVector;
+					} else {
+
+						object.scale.copy( newVector );
+
+					}
 
 				}
 
@@ -372,7 +355,7 @@ THREE.Animation.prototype.getNextKeyWith = function ( type, h, key ) {
 
 	}
 
-	for ( ; key < keys.length; key++ ) {
+	for ( ; key < keys.length; key ++ ) {
 
 		if ( keys[ key ][ type ] !== undefined ) {
 

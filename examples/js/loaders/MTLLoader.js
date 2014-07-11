@@ -363,18 +363,18 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		var isCompressed = /\.dds$/i.test( url );
+		var texture;
+		var loader = THREE.Loader.Handlers.get( url );
 
-		if ( isCompressed ) {
+		if ( loader !== null ) {
 
-			var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
+			texture = loader.load( url, onLoad );
 
 		} else {
 
-			var image = new Image();
-			var texture = new THREE.Texture( image, mapping );
+			texture = new THREE.Texture();
 
-			var loader = new THREE.ImageLoader();
+			loader = new THREE.ImageLoader();
 			loader.crossOrigin = this.crossOrigin;
 			loader.load( url, function ( image ) {
 
@@ -386,6 +386,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 			} );
 
 		}
+
+		texture.mapping = mapping;
 
 		return texture;
 

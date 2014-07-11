@@ -11,10 +11,10 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this.name = '';
 
-	this.image = image;
+	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
 
-	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
+	this.mapping = mapping !== undefined ? mapping : THREE.Texture.DEFAULT_MAPPING;
 
 	this.wrapS = wrapS !== undefined ? wrapS : THREE.ClampToEdgeWrapping;
 	this.wrapT = wrapT !== undefined ? wrapT : THREE.ClampToEdgeWrapping;
@@ -40,6 +40,9 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 };
 
+THREE.Texture.DEFAULT_IMAGE = undefined;
+THREE.Texture.DEFAULT_MAPPING = new THREE.UVMapping();
+
 THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
@@ -63,7 +66,7 @@ THREE.Texture.prototype = {
 		if ( texture === undefined ) texture = new THREE.Texture();
 
 		texture.image = this.image;
-		texture.mipmaps = this.mipmaps.slice(0);
+		texture.mipmaps = this.mipmaps.slice( 0 );
 
 		texture.mapping = this.mapping;
 

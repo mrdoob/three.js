@@ -56,7 +56,7 @@ THREE.PlaneTypedGeometry = function ( width, height, widthSegments, heightSegmen
 
 	offset = 0;
 
-	var indices = new ( vertices.length > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
+	var indices = new ( ( vertices.length / 3 ) > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
 
 	for ( var iy = 0; iy < gridY; iy ++ ) {
 

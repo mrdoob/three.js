@@ -6,11 +6,11 @@
  * @author erik kitson
  */
 
-THREE.KeyFrameAnimation = function ( root, data ) {
+THREE.KeyFrameAnimation = function ( data ) {
 
-	this.root = root;
-	this.data = THREE.AnimationHandler.get( data );
-	this.hierarchy = THREE.AnimationHandler.parse( root );
+	this.root = data.node;
+	this.data = THREE.AnimationHandler.init( data );
+	this.hierarchy = THREE.AnimationHandler.parse( this.root );
 	this.currentTime = 0;
 	this.timeScale = 0.001;
 	this.isPlaying = false;
@@ -27,7 +27,7 @@ THREE.KeyFrameAnimation = function ( root, data ) {
 
 		if ( keys.length && sids ) {
 
-			for ( var s = 0; s < sids.length; s++ ) {
+			for ( var s = 0; s < sids.length; s ++ ) {
 
 				var sid = sids[ s ],
 					next = this.getNextKeyWith( sid, h, 0 );
@@ -50,7 +50,6 @@ THREE.KeyFrameAnimation = function ( root, data ) {
 
 };
 
-// Play
 
 THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 
@@ -66,7 +65,7 @@ THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 			object,
 			node;
 
-		for ( h = 0; h < hl; h++ ) {
+		for ( h = 0; h < hl; h ++ ) {
 
 			object = this.hierarchy[ h ];
 			node = this.data.hierarchy[ h ];
@@ -76,7 +75,7 @@ THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 				node.animationCache = {};
 				node.animationCache.prevKey = null;
 				node.animationCache.nextKey = null;
-				node.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+				node.animationCache.originalMatrix = object.matrix;
 
 			}
 
@@ -100,43 +99,21 @@ THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 
 	this.isPaused = false;
 
-	THREE.AnimationHandler.addToUpdate( this );
+	THREE.AnimationHandler.play( this );
 
 };
 
-
-
-// Pause
-
-THREE.KeyFrameAnimation.prototype.pause = function() {
-
-	if( this.isPaused ) {
-
-		THREE.AnimationHandler.addToUpdate( this );
-
-	} else {
-
-		THREE.AnimationHandler.removeFromUpdate( this );
-
-	}
-
-	this.isPaused = !this.isPaused;
-
-};
-
-
-// Stop
 
 THREE.KeyFrameAnimation.prototype.stop = function() {
 
 	this.isPlaying = false;
 	this.isPaused  = false;
 
-	THREE.AnimationHandler.removeFromUpdate( this );
+	THREE.AnimationHandler.stop( this );
 
 	// reset JIT matrix and remove cache
 
-	for ( var h = 0; h < this.data.hierarchy.length; h++ ) {
+	for ( var h = 0; h < this.data.hierarchy.length; h ++ ) {
 		
 		var obj = this.hierarchy[ h ];
 		var node = this.data.hierarchy[ h ];
@@ -145,17 +122,8 @@ THREE.KeyFrameAnimation.prototype.stop = function() {
 
 			var original = node.animationCache.originalMatrix;
 
-			if( obj instanceof THREE.Bone ) {
-
-				original.copy( obj.skinMatrix );
-				obj.skinMatrix = original;
-
-			} else {
-
-				original.copy( obj.matrix );
-				obj.matrix = original;
-
-			}
+			original.copy( obj.matrix );
+			obj.matrix = original;
 
 			delete node.animationCache;
 
@@ -186,7 +154,7 @@ THREE.KeyFrameAnimation.prototype.update = function ( delta ) {
 
 	this.currentTime = Math.min( this.currentTime, duration );
 
-	for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
+	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
 		var object = this.hierarchy[ h ];
 		var node = this.data.hierarchy[ h ];
@@ -240,7 +208,7 @@ THREE.KeyFrameAnimation.prototype.getNextKeyWith = function( sid, h, key ) {
 	var keys = this.data.hierarchy[ h ].keys;
 	key = key % keys.length;
 
-	for ( ; key < keys.length; key++ ) {
+	for ( ; key < keys.length; key ++ ) {
 
 		if ( keys[ key ].hasTarget( sid ) ) {
 
@@ -261,7 +229,7 @@ THREE.KeyFrameAnimation.prototype.getPrevKeyWith = function( sid, h, key ) {
 	var keys = this.data.hierarchy[ h ].keys;
 	key = key >= 0 ? key : key + keys.length;
 
-	for ( ; key >= 0; key-- ) {
+	for ( ; key >= 0; key -- ) {
 
 		if ( keys[ key ].hasTarget( sid ) ) {
 

@@ -1,14 +1,14 @@
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
+ * @author ikerr / http://verold.com
  */
 
-THREE.Bone = function( belongsToSkin ) {
+THREE.Bone = function ( belongsToSkin ) {
 
 	THREE.Object3D.call( this );
 
 	this.skin = belongsToSkin;
-	this.skinMatrix = new THREE.Matrix4();
 
 	this.accumulatedRotWeight = 0;
 	this.accumulatedPosWeight = 0;
@@ -18,48 +18,15 @@ THREE.Bone = function( belongsToSkin ) {
 
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
+THREE.Bone.prototype.updateMatrixWorld = function ( force ) {
 
-	// update local
+	THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
-	if ( this.matrixAutoUpdate ) {
+	// Reset weights to be re-accumulated in the next frame
 
-		forceUpdate |= this.updateMatrix();
-
-	}
-
-	// update skin matrix
-
-	if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
-
-		if ( parentSkinMatrix ) {
-
-			this.skinMatrix.multiplyMatrices( parentSkinMatrix, this.matrix );
-
-		} else {
-
-			this.skinMatrix.copy( this.matrix );
-
-		}
-
-		this.matrixWorldNeedsUpdate = false;
-		forceUpdate = true;
-
-		// Reset weights to be re-accumulated in the next frame
-
-		this.accumulatedRotWeight = 0;
-		this.accumulatedPosWeight = 0;
-		this.accumulatedSclWeight = 0;
-
-	}
-
-	// update children
-
-	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-		this.children[ i ].update( this.skinMatrix, forceUpdate );
-
-	}
+	this.accumulatedRotWeight = 0;
+	this.accumulatedPosWeight = 0;
+	this.accumulatedSclWeight = 0;
 
 };
 

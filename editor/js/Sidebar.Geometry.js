@@ -91,7 +91,6 @@ Sidebar.Geometry = function ( editor ) {
 
 			updateFields( geometry );
 
-			//
 
 			if ( parameters !== undefined ) {
 

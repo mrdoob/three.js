@@ -44,7 +44,7 @@ THREE.MorphAnimMesh.prototype.setDirectionForward = function () {
 
 THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
 
-	this.direction = -1;
+	this.direction = - 1;
 	this.directionBackwards = true;
 
 };
@@ -57,7 +57,7 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 
 	var firstAnimation, animations = geometry.animations;
 
-	var pattern = /([a-z]+)(\d+)/;
+	var pattern = /([a-z]+)_?(\d+)/;
 
 	for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
 
@@ -69,7 +69,7 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 			var label = parts[ 1 ];
 			var num = parts[ 2 ];
 
-			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: -Infinity };
+			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: - Infinity };
 
 			var animation = animations[ label ];
 
@@ -106,7 +106,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		console.warn( "animation[" + label + "] undefined" );
+		console.warn( 'animation[' + label + '] undefined' );
 
 	}
 
@@ -122,7 +122,7 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 		if ( this.time > this.duration || this.time < 0 ) {
 
-			this.direction *= -1;
+			this.direction *= - 1;
 
 			if ( this.time > this.duration ) {
 
@@ -172,6 +172,21 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	this.morphTargetInfluences[ this.currentKeyframe ] = mix;
 	this.morphTargetInfluences[ this.lastKeyframe ] = 1 - mix;
+
+};
+
+THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
+
+	var influences = this.morphTargetInfluences;
+
+	for ( var i = 0, l = influences.length; i < l; i ++ ) {
+
+		influences[ i ] = 0;
+
+	}
+
+	if ( a > -1 ) influences[ a ] = 1 - t;
+	if ( b > -1 ) influences[ b ] = t;
 
 };
 

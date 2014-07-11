@@ -119,14 +119,14 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
+				uniforms:       uniforms,
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-				blending: 		THREE.AdditiveBlending,
-				depthTest: 		false,
-				transparent:	true
+				blending:       THREE.AdditiveBlending,
+				depthTest:      false,
+				transparent:    true
 
 			});
 
@@ -134,7 +134,7 @@
 			var radius = 200;
 			var geometry = new THREE.Geometry();
 
-			for ( var i = 0; i < 100000; i++ ) {
+			for ( var i = 0; i < 100000; i ++ ) {
 
 				var vertex = new THREE.Vector3();
 				vertex.x = Math.random() * 2 - 1;
@@ -146,7 +146,7 @@
 
 			}
 
-			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
+			sphere = new THREE.PointCloud( geometry, shaderMaterial );
 
 			sphere.dynamic = true;
 			//sphere.sortParticles = true;
@@ -155,8 +155,7 @@
 			var values_size = attributes.size.value;
 			var values_color = attributes.customColor.value;
 
-
-			for( var v = 0; v < vertices.length; v++ ) {
+			for ( var v = 0; v < vertices.length; v++ ) {
 
 				values_size[ v ] = 10;
 				values_color[ v ] = new THREE.Color( 0xffaa00 );
