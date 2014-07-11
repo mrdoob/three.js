@@ -175,6 +175,14 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 };
 
+THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
+	for ( var i = 0, n = this.morphTargetInfluences.length; i < n; i++ ) {
+		this.morphTargetInfluences[ i ] = 0;
+	}
+	if ( a > -1 ) this.morphTargetInfluences[ a ] = 1 - t;
+	if ( b > -1 ) this.morphTargetInfluences[ b ] = t;
+};
+
 THREE.MorphAnimMesh.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) object = new THREE.MorphAnimMesh( this.geometry, this.material );
