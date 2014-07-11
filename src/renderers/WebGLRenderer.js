@@ -850,7 +850,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material = getBufferMaterial( object, geometryGroup ),
 
-			uvType = bufferGuessUVType( material ),
+			uvType = true,
 			normalType = bufferGuessNormalType( material ),
 			vertexColorType = bufferGuessVertexColorType( material );
 
