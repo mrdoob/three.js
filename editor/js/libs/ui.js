@@ -359,6 +359,18 @@ UI.TextArea = function () {
 
 		event.stopPropagation();
 
+		if ( event.keyCode === 9 ) {
+
+			event.preventDefault();
+
+			var cursor = dom.selectionStart;
+
+			dom.value = dom.value.substring( 0, cursor ) + '\t' + dom.value.substring( cursor );
+			dom.selectionStart = cursor + 1;
+			dom.selectionEnd = dom.selectionStart;
+
+		}
+
 	}, false );
 
 	this.dom = dom;
