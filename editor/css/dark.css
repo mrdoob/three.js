@@ -44,6 +44,12 @@ button {
 	position: relative;
 }
 
+textarea {
+	white-space: pre;
+	word-wrap: normal;
+	overflow: scroll;
+}
+
 .Panel {
 
 	-moz-user-select: none;
