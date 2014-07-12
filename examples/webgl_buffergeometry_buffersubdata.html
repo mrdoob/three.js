@@ -267,8 +267,8 @@
 
 						geometry.attributes.position.array[ index * 3 ] += direction * 800;
 
-						// +3 to get the full vertex. Only need to do this so that I can benchmark by verts copied.
-						right = index * 3 + 3; 
+						// +2 to get the full vertex. Only need to do this so that I can benchmark by verts copied.
+						right = index * 3 + 2; 
 
 						index++;
 
