@@ -89,28 +89,13 @@
 
 				geometry = new THREE.BufferGeometry();
 
-				// break geometry into
-				// chunks of 21,845 triangles (3 unique vertices per triangle)
-				// for indices to fit into 16 bit integer number
-				// floor(2^16 / 3) = 21845
-
-				var chunkSize = 21845;
-
-				var indices = new Uint16Array( triangles * 3 );
-
-				for ( var i = 0; i < indices.length; i ++ ) {
-
-					indices[ i ] = i % ( 3 * chunkSize );
-
-				}
-
 				var positions = new Float32Array( triangles * 3 * 3 );
 				var normals = new Float32Array( triangles * 3 * 3 );
 				var colors = new Float32Array( triangles * 3 * 3 );
 
 				var color = new THREE.Color();
 
-				var n = 800, n2 = n/2;	// triangles spread in the cube
+				var n = 800, n2 = n/2;	// triangles spread in the sphere
 				var d = 12, d2 = d/2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
@@ -209,24 +194,9 @@
 
 				}
 
-				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-
-				var offsets = triangles / chunkSize;
-
-				for ( var i = 0; i < offsets; i ++ ) {
-
-					var offset = {
-						start: i * chunkSize * 3,
-						index: i * chunkSize * 3,
-						count: Math.min( triangles - ( i * chunkSize ), chunkSize ) * 3
-					};
-
-					geometry.offsets.push( offset );
-
-				}
 
 				geometry.computeBoundingSphere();
 
@@ -277,37 +247,52 @@
 
 				requestAnimationFrame( animate );
 
+				// The least and greatest indices of vertices that needs their coordinates updated.
 				var left = index * 3;
 				var right = undefined;
 
-				var count = Math.ceil(0.1 * (500000 * 3 - index));
-				while (count % 3 != 0) {
+				// Calculate the number of vertices to move in this frame.
+				var count = Math.ceil( 0.1 * ( 500000 * 3 - index ) );
+
+				// Make sure the count is a multiple of 3 so that we don't stretch triangles between spheres.
+				while ( count % 3 != 0 ) {
+
 					count++;
+
 				} 
-				for (var i = 0; i < count; i++) {
 
-					if (index < 500000 * 3) {
+				for ( var i = 0; i < count; i++ ) {
 
-						geometry.attributes.position.array[index * 3] += direction * 800;
-						right = index * 3 + 4;
+					if ( index < 500000 * 3 ) {
+
+						geometry.attributes.position.array[ index * 3 ] += direction * 800;
+
+						// +3 to get the full vertex. Only need to do this so that I can benchmark by verts copied.
+						right = index * 3 + 3; 
+
 						index++;
 
 					}
 
 				}
 
-				if (index >= 500000 * 3) {
+				// Swap the direction and reset the index if we've moved all the triangles.
+				if ( index >= 500000 * 3 ) {
+
 					direction *= -1;
 					index = 0;
+
 				}
 
-				if (right) {
+				// If right is undefined, we didn't move any triangles this frame, so don't update.
+				if ( right ) {
 	
 					geometry.attributes.position.needsUpdate = true;
 	
-					if (document.getElementById("bufferSubData").checked) {
+					if ( document.getElementById( "bufferSubData" ).checked ) {
 	
-						geometry.attributes.position.updateElements.push([left, right]);
+						// Copy elements from the first to last elements updated, +1 for correct behavior w/ subarray.
+						geometry.attributes.position.updateElements.push( [ left, right + 1 ] );
 	
 					}
 	
