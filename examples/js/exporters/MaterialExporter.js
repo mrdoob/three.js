@@ -90,6 +90,12 @@ THREE.MaterialExporter.prototype = {
 
 			}
 
+		} else if ( material instanceof THREE.ShaderMaterial ) {
+
+			output.type = 'ShaderMaterial';
+			output.vertexShader = material.vertexShader;
+			output.fragmentShader = material.fragmentShader;
+
 		} else if ( material instanceof THREE.SpriteMaterial ) {
 
 			output.type = 'SpriteMaterial';
