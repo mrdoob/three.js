@@ -4843,6 +4843,60 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			switch ( type ) {
 
+				case '1i':
+					_gl.uniform1i( location, value );
+					break;
+
+				case '1f':
+					_gl.uniform1f( location, value );
+					break;
+
+				case '2f':
+					_gl.uniform2f( location, value[ 0 ], value[ 1 ] );
+					break;
+
+				case '3f':
+					_gl.uniform3f( location, value[ 0 ], value[ 1 ], value[ 2 ] );
+					break;
+
+				case '4f':
+					_gl.uniform4f( location, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
+					break;
+
+				case '1iv':
+					_gl.uniform1iv( location, value );
+					break;
+
+				case '3iv':
+					_gl.uniform3iv( location, value );
+					break;
+
+				case '1fv':
+					_gl.uniform1fv( location, value );
+					break;
+
+				case '2fv':
+					_gl.uniform2fv( location, value );
+					break;
+
+				case '3fv':
+					_gl.uniform3fv( location, value );
+					break;
+
+				case '4fv':
+					_gl.uniform4fv( location, value );
+					break;
+
+				case 'Matrix3fv':
+					_gl.uniformMatrix3fv( location, false, value );
+					break;
+
+				case 'Matrix4fv':
+					_gl.uniformMatrix4fv( location, false, value );
+					break;
+
+				//
+
 				case 'i': 
 
 					// single integer
