@@ -697,7 +697,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.uniforms !== undefined ) {
 
-				materialUniforms.setValue( JSON.stringify( material.uniforms ) );
+				materialUniforms.setValue( JSON.stringify( material.uniforms, null, '  ' ) );
 
 			}
 
