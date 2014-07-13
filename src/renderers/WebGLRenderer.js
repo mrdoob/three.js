@@ -4842,200 +4842,266 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var type = uniform.type;
 			var value = uniform.value;
 
-			if ( type === 'i' ) { // single integer
+			switch ( type ) {
 
-				_gl.uniform1i( location, value );
+				case 'i': 
 
-			} else if ( type === 'f' ) { // single float
+					// single integer
+					_gl.uniform1i( location, value );
 
-				_gl.uniform1f( location, value );
+					break;
 
-			} else if ( type === 'v2' ) { // single THREE.Vector2
+				case 'f':
 
-				_gl.uniform2f( location, value.x, value.y );
+					// single float
+					_gl.uniform1f( location, value );
 
-			} else if ( type === 'v3' ) { // single THREE.Vector3
+					break;
 
-				_gl.uniform3f( location, value.x, value.y, value.z );
+				case 'v2':
 
-			} else if ( type === 'v4' ) { // single THREE.Vector4
+					// single THREE.Vector2
+					_gl.uniform2f( location, value.x, value.y );
 
-				_gl.uniform4f( location, value.x, value.y, value.z, value.w );
+					break;
 
-			} else if ( type === 'c' ) { // single THREE.Color
+				case 'v3':
 
-				_gl.uniform3f( location, value.r, value.g, value.b );
+					// single THREE.Vector3
+					_gl.uniform3f( location, value.x, value.y, value.z );
 
-			} else if ( type === 'iv1' ) { // flat array of integers (JS or typed array)
+					break;
 
-				_gl.uniform1iv( location, value );
+				case 'v4': 
 
-			} else if ( type === 'iv' ) { // flat array of integers with 3 x N size (JS or typed array)
+					// single THREE.Vector4
+					_gl.uniform4f( location, value.x, value.y, value.z, value.w );
 
-				_gl.uniform3iv( location, value );
+					break;
 
-			} else if ( type === 'fv1' ) { // flat array of floats (JS or typed array)
+				case 'c':
 
-				_gl.uniform1fv( location, value );
+					// single THREE.Color
+					_gl.uniform3f( location, value.r, value.g, value.b );
 
-			} else if ( type === 'fv' ) { // flat array of floats with 3 x N size (JS or typed array)
+					break;
 
-				_gl.uniform3fv( location, value );
+				case 'iv1':
 
-			} else if ( type === 'v2v' ) { // array of THREE.Vector2
+					// flat array of integers (JS or typed array)
+					_gl.uniform1iv( location, value );
 
-				if ( uniform._array === undefined ) {
+					break;
 
-					uniform._array = new Float32Array( 2 * value.length );
+				case 'iv':
 
-				}
+					// flat array of integers with 3 x N size (JS or typed array)
+					_gl.uniform3iv( location, value );
 
-				for ( var i = 0, il = value.length; i < il; i ++ ) {
+					break;
 
-					offset = i * 2;
+				case 'fv1':
 
-					uniform._array[ offset ]   = value[ i ].x;
-					uniform._array[ offset + 1 ] = value[ i ].y;
+					// flat array of floats (JS or typed array)
+					_gl.uniform1fv( location, value );
 
-				}
+					break;
 
-				_gl.uniform2fv( location, uniform._array );
+				case 'fv':
 
-			} else if ( type === 'v3v' ) { // array of THREE.Vector3
+					// flat array of floats with 3 x N size (JS or typed array)
+					_gl.uniform3fv( location, value );
 
-				if ( uniform._array === undefined ) {
+					break;
 
-					uniform._array = new Float32Array( 3 * value.length );
+				case 'v2v':
 
-				}
+					// array of THREE.Vector2
 
-				for ( var i = 0, il = value.length; i < il; i ++ ) {
+					if ( uniform._array === undefined ) {
 
-					offset = i * 3;
+						uniform._array = new Float32Array( 2 * value.length );
 
-					uniform._array[ offset ]   = value[ i ].x;
-					uniform._array[ offset + 1 ] = value[ i ].y;
-					uniform._array[ offset + 2 ] = value[ i ].z;
+					}
 
-				}
+					for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-				_gl.uniform3fv( location, uniform._array );
+						offset = i * 2;
 
-			} else if ( type === 'v4v' ) { // array of THREE.Vector4
+						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 1 ] = value[ i ].y;
 
-				if ( uniform._array === undefined ) {
+					}
 
-					uniform._array = new Float32Array( 4 * value.length );
+					_gl.uniform2fv( location, uniform._array );
 
-				}
+					break;
 
-				for ( var i = 0, il = value.length; i < il; i ++ ) {
+				case 'v3v':
 
-					offset = i * 4;
+					// array of THREE.Vector3
 
-					uniform._array[ offset ]   = value[ i ].x;
-					uniform._array[ offset + 1 ] = value[ i ].y;
-					uniform._array[ offset + 2 ] = value[ i ].z;
-					uniform._array[ offset + 3 ] = value[ i ].w;
+					if ( uniform._array === undefined ) {
 
-				}
+						uniform._array = new Float32Array( 3 * value.length );
 
-				_gl.uniform4fv( location, uniform._array );
+					}
 
-			} else if ( type === 'm3' ) { // single THREE.Matrix3
+					for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-				_gl.uniformMatrix3fv( location, false, value.elements );
+						offset = i * 3;
 
-			} else if ( type === 'm3v' ) { // array of THREE.Matrix3
+						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 1 ] = value[ i ].y;
+						uniform._array[ offset + 2 ] = value[ i ].z;
 
-				if ( uniform._array === undefined ) {
+					}
 
-					uniform._array = new Float32Array( 9 * value.length );
+					_gl.uniform3fv( location, uniform._array );
 
-				}
+					break;
 
-				for ( var i = 0, il = value.length; i < il; i ++ ) {
+				case 'v4v':
 
-					value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
+					// array of THREE.Vector4
 
-				}
+					if ( uniform._array === undefined ) {
 
-				_gl.uniformMatrix3fv( location, false, uniform._array );
+						uniform._array = new Float32Array( 4 * value.length );
 
-			} else if ( type === 'm4' ) { // single THREE.Matrix4
+					}
 
-				_gl.uniformMatrix4fv( location, false, value.elements );
+					for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-			} else if ( type === 'm4v' ) { // array of THREE.Matrix4
+						offset = i * 4;
 
-				if ( uniform._array === undefined ) {
+						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 1 ] = value[ i ].y;
+						uniform._array[ offset + 2 ] = value[ i ].z;
+						uniform._array[ offset + 3 ] = value[ i ].w;
 
-					uniform._array = new Float32Array( 16 * value.length );
+					}
 
-				}
+					_gl.uniform4fv( location, uniform._array );
 
-				for ( var i = 0, il = value.length; i < il; i ++ ) {
+					break;
 
-					value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
+				case 'm3':
 
-				}
+					// single THREE.Matrix3
+					_gl.uniformMatrix3fv( location, false, value.elements );
 
-				_gl.uniformMatrix4fv( location, false, uniform._array );
+					break;
 
-			} else if ( type === 't' ) { // single THREE.Texture (2d or cube)
+				case 'm3v':
 
-				texture = value;
-				textureUnit = getTextureUnit();
+					// array of THREE.Matrix3
 
-				_gl.uniform1i( location, textureUnit );
+					if ( uniform._array === undefined ) {
 
-				if ( ! texture ) continue;
+						uniform._array = new Float32Array( 9 * value.length );
 
-				if ( texture instanceof THREE.CubeTexture ||
-				   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
+					}
 
-					setCubeTexture( texture, textureUnit );
+					for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-				} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
+						value[ i ].flattenToArrayOffset( uniform._array, i * 9 );
 
-					setCubeTextureDynamic( texture, textureUnit );
+					}
 
-				} else {
+					_gl.uniformMatrix3fv( location, false, uniform._array );
 
-					_this.setTexture( texture, textureUnit );
+					break;
 
-				}
+				case 'm4':
 
-			} else if ( type === 'tv' ) { // array of THREE.Texture (2d)
+					// single THREE.Matrix4
+					_gl.uniformMatrix4fv( location, false, value.elements );
 
-				if ( uniform._array === undefined ) {
+					break;
 
-					uniform._array = [];
+				case 'm4v':
 
-				}
+					// array of THREE.Matrix4
 
-				for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+					if ( uniform._array === undefined ) {
 
-					uniform._array[ i ] = getTextureUnit();
+						uniform._array = new Float32Array( 16 * value.length );
 
-				}
+					}
 
-				_gl.uniform1iv( location, uniform._array );
+					for ( var i = 0, il = value.length; i < il; i ++ ) {
 
-				for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+						value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
 
-					texture = uniform.value[ i ];
-					textureUnit = uniform._array[ i ];
+					}
+
+					_gl.uniformMatrix4fv( location, false, uniform._array );
+
+					break;
+
+				case 't':
+
+					// single THREE.Texture (2d or cube)
+
+					texture = value;
+					textureUnit = getTextureUnit();
+
+					_gl.uniform1i( location, textureUnit );
 
 					if ( ! texture ) continue;
 
-					_this.setTexture( texture, textureUnit );
+					if ( texture instanceof THREE.CubeTexture ||
+					   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
 
-				}
+						setCubeTexture( texture, textureUnit );
 
-			} else {
+					} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
-				console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
+						setCubeTextureDynamic( texture, textureUnit );
+
+					} else {
+
+						_this.setTexture( texture, textureUnit );
+
+					}
+
+					break;
+
+				case 'tv':
+
+					// array of THREE.Texture (2d)
+
+					if ( uniform._array === undefined ) {
+
+						uniform._array = [];
+
+					}
+
+					for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+
+						uniform._array[ i ] = getTextureUnit();
+
+					}
+
+					_gl.uniform1iv( location, uniform._array );
+
+					for ( var i = 0, il = uniform.value.length; i < il; i ++ ) {
+
+						texture = uniform.value[ i ];
+						textureUnit = uniform._array[ i ];
+
+						if ( ! texture ) continue;
+
+						_this.setTexture( texture, textureUnit );
+
+					}
+
+					break;
+
+				default:
+
+					console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
 
 			}
 
