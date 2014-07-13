@@ -72,7 +72,7 @@ function main() {
 
 		var result = uglify.minify( sources, { outSourceMap: sourcemap } );
 		
-		fs.writeFileSync( output, '// three.js / threejs.org/license\n' + result.code + sourcemapping, 'utf8' );
+		fs.writeFileSync( output, '// threejs.org/license\n' + result.code + sourcemapping, 'utf8' );
 
 		if ( args.sourcemaps ) {
 

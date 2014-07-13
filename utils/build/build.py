@@ -91,7 +91,7 @@ def main(argv=None):
 
 		if os.path.exists(output):
 			with open(output,'r') as f: text = f.read()
-			with open(output,'w') as f: f.write('// three.js / threejs.org/license\n' + text + sourcemapping)
+			with open(output,'w') as f: f.write('// threejs.org/license\n' + text + sourcemapping)
 		else:
 			print("Minification with Closure compiler failed. Check your Java runtime version.")
 			with open(output,'w') as f: f.write(backup)
