@@ -12601,6 +12601,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
+		if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;		
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
