@@ -16,8 +16,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
-	_buffers = {},
-
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 	_depth = parameters.depth !== undefined ? parameters.depth : true,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
