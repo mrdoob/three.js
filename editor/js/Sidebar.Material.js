@@ -131,6 +131,17 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialShininessRow );
 
+	// uniforms
+
+	var materialUniformsRow = new UI.Panel();
+	var materialUniforms = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' );
+	materialUniforms.setValue( '' ).onChange( update );
+
+	materialUniformsRow.add( new UI.Text( 'Uniforms' ).setWidth( '90px' ) );
+	materialUniformsRow.add( materialUniforms );
+
+	container.add( materialUniformsRow );
+
 	// vertex shader
 
 	var materialVertexShaderRow = new UI.Panel();
@@ -381,6 +392,12 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.uniforms !== undefined ) {
+
+				material.uniforms = JSON.parse( materialUniforms.getValue() );
+
+			}
+
 			if ( material.vertexShader !== undefined ) {
 
 				material.vertexShader = materialVertexShader.getValue();
@@ -596,6 +613,7 @@ Sidebar.Material = function ( editor ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
+			'uniforms': materialUniformsRow,
 			'vertexShader': materialVertexShaderRow,
 			'fragmentShader': materialFragmentShaderRow,
 			'vertexColors': materialVertexColorsRow,
@@ -674,6 +692,12 @@ Sidebar.Material = function ( editor ) {
 			if ( material.shininess !== undefined ) {
 
 				materialShininess.setValue( material.shininess );
+
+			}
+
+			if ( material.uniforms !== undefined ) {
+
+				materialUniforms.setValue( JSON.stringify( material.uniforms ) );
 
 			}
 
