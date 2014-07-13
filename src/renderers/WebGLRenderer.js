@@ -4832,8 +4832,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
-			var location = uniforms[ j ][ 1 ];
-
 			var uniform = uniforms[ j ][ 0 ];
 
 			// needsUpdate property is not added to all uniforms.
@@ -4841,6 +4839,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var type = uniform.type;
 			var value = uniform.value;
+			var location = uniforms[ j ][ 1 ];
 
 			switch ( type ) {
 
