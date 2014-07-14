@@ -1,16 +1,17 @@
 /**
  * @author hughes
- * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
-  this.parameters = {
-    radius: radius,
-    segments: segments,
-    thetaStart: thetaStart,
-    thetaLength: thetaLength
-  };
+	THREE.Geometry.call( this );
+
+	this.parameters = {
+		radius: radius,
+		segments: segments,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
 
   radius = radius || 50;
   segments = segments !== undefined ? Math.max( 3, segments ) : 8;
@@ -18,58 +19,38 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
   thetaStart = thetaStart !== undefined ? thetaStart : 0;
   thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
-  //
+	var i, uvs = [],
+	center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
 
-  var elements = segments + 2;
+	this.vertices.push(center);
+	uvs.push( centerUV );
 
-  var indices = new Uint16Array( segments * 3 );
-  var vertices = new Float32Array( elements * 3 );
-  var normals = new Float32Array( elements * 3 );
-  var uvs = new Float32Array( elements * 2 );
+	for ( i = 0; i <= segments; i ++ ) {
 
-  // center
+		var vertex = new THREE.Vector3();
+		var segment = thetaStart + i / segments * thetaLength;
 
-  normals[ 2 ] = 1;
+		vertex.x = radius * Math.cos( segment );
+		vertex.y = radius * Math.sin( segment );
 
-  uvs[ 0 ] = 0.5;
-  uvs[ 1 ] = 0.5;
+		this.vertices.push( vertex );
+		uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, ( vertex.y / radius + 1 ) / 2 ) );
 
-  var offset = 0, offset2 = 2, offset3 = 3;
+	}
 
-  for ( var i = 0; i <= segments; i ++ ) {
+	var n = new THREE.Vector3( 0, 0, 1 );
 
-    var segment = thetaStart + i / segments * thetaLength;
+	for ( i = 1; i <= segments; i ++ ) {
 
-    var x = radius * Math.cos( segment );
-    var y = radius * Math.sin( segment );
-
-    vertices[ offset3     ] = x;
-    vertices[ offset3 + 1 ] = y;
-
-    normals[ offset3 + 2 ] = 1;
-
-    uvs[ offset2     ] = ( x / radius + 1 ) / 2;
-    uvs[ offset2 + 1 ] = ( y / radius + 1 ) / 2;
-
-    offset2 += 2;
-    offset3 += 3;
-
-    //
-
-    indices[ offset     ] = 0;
-    indices[ offset + 1 ] = i + 1;
-    indices[ offset + 2 ] = i + 2;
-
-    offset  += 3;
+		this.faces.push( new THREE.Face3( i, i + 1, 0, [ n.clone(), n.clone(), n.clone() ] ) );
+		this.faceVertexUvs[ 0 ].push( [ uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ] );
 
   }
 
-  THREE.IndexedGeometry2.call( this );
-
-  this.setArrays( indices, vertices, normals, uvs );
+	this.computeFaceNormals();
 
   this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 
-THREE.CircleGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );

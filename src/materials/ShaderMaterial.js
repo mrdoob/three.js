@@ -2,12 +2,11 @@
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
- *  fragmentShader: <string>,
- *  vertexShader: <string>,
- *
+ *  defines: { "label" : "value" },
  *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
  *
- *  defines: { "label" : "value" },
+ *  fragmentShader: <string>,
+ *  vertexShader: <string>,
  *
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
@@ -33,11 +32,12 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.fragmentShader = "void main() {}";
-	this.vertexShader = "void main() {}";
-	this.uniforms = {};
 	this.defines = {};
+	this.uniforms = {};
 	this.attributes = null;
+
+	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
+	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
 
 	this.shading = THREE.SmoothShading;
 
@@ -60,9 +60,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
 	this.defaultAttributeValues = {
-		"color" : [ 1, 1, 1 ],
-		"uv" : [ 0, 0 ],
-		"uv2" : [ 0, 0 ]
+		'color': [ 1, 1, 1 ],
+		'uv': [ 0, 0 ],
+		'uv2': [ 0, 0 ]
 	};
 
 	this.index0AttributeName = undefined;

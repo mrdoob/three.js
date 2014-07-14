@@ -372,9 +372,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	}
 
-	function updateRows() {
-
-		var object = editor.selected;
+	function updateRows( object ) {
 
 		var properties = {
 			'parent': objectParentRow,
@@ -397,9 +395,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	}
 
-	function updateTransformRows() {
-
-		var object = editor.selected;
+	function updateTransformRows( object ) {
 
 		if ( object instanceof THREE.Light ||
 		   ( object instanceof THREE.Object3D && object.userData.targetInverse ) ) {
@@ -420,7 +416,18 @@ Sidebar.Object3D = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		updateUI();
+		if ( object !== null ) {
+
+			container.setDisplay( 'block' );
+
+			updateRows( object );
+			updateUI( object );
+
+		} else {
+
+			container.setDisplay( 'none' );
+
+		}
 
 	} );
 
@@ -454,116 +461,105 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== editor.selected ) return;
 
-		updateUI();
+		updateUI( object );
 
 	} );
 
-	function updateUI() {
+	function updateUI( object ) {
 
-		container.setDisplay( 'none' );
+		objectType.setValue( editor.getObjectType( object ) );
 
-		var object = editor.selected;
+		objectUUID.setValue( object.uuid );
+		objectName.setValue( object.name );
 
-		if ( object !== null ) {
+		if ( object.parent !== undefined ) {
 
-			container.setDisplay( 'block' );
-
-			objectType.setValue( editor.getObjectType( object ) );
-
-			objectUUID.setValue( object.uuid );
-			objectName.setValue( object.name );
-
-			if ( object.parent !== undefined ) {
-
-				objectParent.setValue( object.parent.id );
-
-			}
-
-			objectPositionX.setValue( object.position.x );
-			objectPositionY.setValue( object.position.y );
-			objectPositionZ.setValue( object.position.z );
-
-			objectRotationX.setValue( object.rotation.x );
-			objectRotationY.setValue( object.rotation.y );
-			objectRotationZ.setValue( object.rotation.z );
-
-			objectScaleX.setValue( object.scale.x );
-			objectScaleY.setValue( object.scale.y );
-			objectScaleZ.setValue( object.scale.z );
-
-			if ( object.fov !== undefined ) {
-
-				objectFov.setValue( object.fov );
-
-			}
-
-			if ( object.near !== undefined ) {
-
-				objectNear.setValue( object.near );
-
-			}
-
-			if ( object.far !== undefined ) {
-
-				objectFar.setValue( object.far );
-
-			}
-
-			if ( object.intensity !== undefined ) {
-
-				objectIntensity.setValue( object.intensity );
-
-			}
-
-			if ( object.color !== undefined ) {
-
-				objectColor.setHexValue( object.color.getHexString() );
-
-			}
-
-			if ( object.groundColor !== undefined ) {
-
-				objectGroundColor.setHexValue( object.groundColor.getHexString() );
-
-			}
-
-			if ( object.distance !== undefined ) {
-
-				objectDistance.setValue( object.distance );
-
-			}
-
-			if ( object.angle !== undefined ) {
-
-				objectAngle.setValue( object.angle );
-
-			}
-
-			if ( object.exponent !== undefined ) {
-
-				objectExponent.setValue( object.exponent );
-
-			}
-
-			objectVisible.setValue( object.visible );
-
-			try {
-
-				objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
-
-			} catch ( error ) {
-
-				console.log( error );
-
-			}
-
-			objectUserData.setBorderColor( '#ccc' );
-			objectUserData.setBackgroundColor( '' );
-
-			updateRows();
-			updateTransformRows();
+			objectParent.setValue( object.parent.id );
 
 		}
+
+		objectPositionX.setValue( object.position.x );
+		objectPositionY.setValue( object.position.y );
+		objectPositionZ.setValue( object.position.z );
+
+		objectRotationX.setValue( object.rotation.x );
+		objectRotationY.setValue( object.rotation.y );
+		objectRotationZ.setValue( object.rotation.z );
+
+		objectScaleX.setValue( object.scale.x );
+		objectScaleY.setValue( object.scale.y );
+		objectScaleZ.setValue( object.scale.z );
+
+		if ( object.fov !== undefined ) {
+
+			objectFov.setValue( object.fov );
+
+		}
+
+		if ( object.near !== undefined ) {
+
+			objectNear.setValue( object.near );
+
+		}
+
+		if ( object.far !== undefined ) {
+
+			objectFar.setValue( object.far );
+
+		}
+
+		if ( object.intensity !== undefined ) {
+
+			objectIntensity.setValue( object.intensity );
+
+		}
+
+		if ( object.color !== undefined ) {
+
+			objectColor.setHexValue( object.color.getHexString() );
+
+		}
+
+		if ( object.groundColor !== undefined ) {
+
+			objectGroundColor.setHexValue( object.groundColor.getHexString() );
+
+		}
+
+		if ( object.distance !== undefined ) {
+
+			objectDistance.setValue( object.distance );
+
+		}
+
+		if ( object.angle !== undefined ) {
+
+			objectAngle.setValue( object.angle );
+
+		}
+
+		if ( object.exponent !== undefined ) {
+
+			objectExponent.setValue( object.exponent );
+
+		}
+
+		objectVisible.setValue( object.visible );
+
+		try {
+
+			objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
+
+		} catch ( error ) {
+
+			console.log( error );
+
+		}
+
+		objectUserData.setBorderColor( '#ccc' );
+		objectUserData.setBackgroundColor( '' );
+
+		updateTransformRows( object );
 
 	}
 

@@ -75,7 +75,7 @@ THREE.EventDispatcher.prototype = {
 	},
 
 	dispatchEvent: function ( event ) {
-			
+
 		if ( this._listeners === undefined ) return;
 
 		var listeners = this._listeners;

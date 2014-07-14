@@ -14,7 +14,9 @@ THREE.ShadowMapPlugin = function () {
 	_min = new THREE.Vector3(),
 	_max = new THREE.Vector3(),
 
-	_matrixPosition = new THREE.Vector3();
+	_matrixPosition = new THREE.Vector3(),
+	
+	_renderList = [];
 
 	this.init = function ( renderer ) {
 
@@ -51,7 +53,6 @@ THREE.ShadowMapPlugin = function () {
 		shadowMap, shadowMatrix, shadowCamera,
 		program, buffer, material,
 		webglObject, object, light,
-		renderList,
 
 		lights = [],
 		k = 0,
@@ -230,87 +231,63 @@ THREE.ShadowMapPlugin = function () {
 
 			// set object matrices & frustum culling
 
-			renderList = scene.__webglObjects;
+			_renderList.length = 0;
+			projectObject(scene,scene,shadowCamera);
 
-			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-				webglObject = renderList[ j ];
-				object = webglObject.object;
-
-				webglObject.render = false;
-
-				if ( object.visible && object.castShadow ) {
-
-					if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
-
-						object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-
-						webglObject.render = true;
-
-					}
-
-				}
-
-			}
 
 			// render regular objects
 
 			var objectMaterial, useMorphing, useSkinning;
 
-			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
+			for ( j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
-				webglObject = renderList[ j ];
+				webglObject = _renderList[ j ];
 
-				if ( webglObject.render ) {
+				object = webglObject.object;
+				buffer = webglObject.buffer;
 
-					object = webglObject.object;
-					buffer = webglObject.buffer;
+				// culling is overriden globally for all objects
+				// while rendering depth map
 
-					// culling is overriden globally for all objects
-					// while rendering depth map
+				// need to deal with MeshFaceMaterial somehow
+				// in that case just use the first of material.materials for now
+				// (proper solution would require to break objects by materials
+				//  similarly to regular rendering and then set corresponding
+				//  depth materials per each chunk instead of just once per object)
 
-					// need to deal with MeshFaceMaterial somehow
-					// in that case just use the first of material.materials for now
-					// (proper solution would require to break objects by materials
-					//  similarly to regular rendering and then set corresponding
-					//  depth materials per each chunk instead of just once per object)
+				objectMaterial = getObjectMaterial( object );
 
-					objectMaterial = getObjectMaterial( object );
+				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
+				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
 
-					useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
-					useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
+				if ( object.customDepthMaterial ) {
 
-					if ( object.customDepthMaterial ) {
+					material = object.customDepthMaterial;
 
-						material = object.customDepthMaterial;
+				} else if ( useSkinning ) {
 
-					} else if ( useSkinning ) {
+					material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
-						material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
+				} else if ( useMorphing ) {
 
-					} else if ( useMorphing ) {
+					material = _depthMaterialMorph;
 
-						material = _depthMaterialMorph;
+				} else {
 
-					} else {
+					material = _depthMaterial;
 
-						material = _depthMaterial;
+				}
 
-					}
+				_renderer.setMaterialFaces( objectMaterial );
 
-					_renderer.setMaterialFaces( objectMaterial );
+				if ( buffer instanceof THREE.BufferGeometry ) {
+					// START_VEROLD_MOD - materialIndex in offsets
+					_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object, webglObject.offsetIndices );
+					// END_VEROLD_MOD - materialIndex in offsets
 
-					if ( buffer instanceof THREE.BufferGeometry ) {
+				} else {
 
-						// START_VEROLD_MOD - materialIndex in offsets
-						_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object, webglObject.offsetIndices );
-						// END_VEROLD_MOD - materialIndex in offsets
-
-					} else {
-
-						_renderer.renderBuffer( shadowCamera, scene.__lights, fog, material, buffer, object );
-
-					}
+					_renderer.renderBuffer( shadowCamera, scene.__lights, fog, material, buffer, object );
 
 				}
 
@@ -318,7 +295,7 @@ THREE.ShadowMapPlugin = function () {
 
 			// set matrices and render immediate objects
 
-			renderList = scene.__webglObjectsImmediate;
+			var renderList = scene.__webglObjectsImmediate;
 
 			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
@@ -352,6 +329,33 @@ THREE.ShadowMapPlugin = function () {
 		}
 
 	};
+	
+	function projectObject(scene, object,shadowCamera){
+		
+		if ( object.visible ) {
+	
+			var webglObjects = scene.__webglObjects[object.id];
+	
+			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+		
+		
+				for (var i = 0, l = webglObjects.length; i < l; i++){
+			
+					var webglObject = webglObjects[i];
+					
+					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+					_renderList.push(webglObject);
+					
+				}
+			}
+	
+			for(var i = 0, l = object.children.length; i < l; i++) {
+				
+				projectObject(scene, object.children[i],shadowCamera);
+			}
+		
+		}
+	}
 
 	function createVirtualLight( light, cascade ) {
 
@@ -394,14 +398,14 @@ THREE.ShadowMapPlugin = function () {
 		var nearZ = light.shadowCascadeNearZ[ cascade ];
 		var farZ = light.shadowCascadeFarZ[ cascade ];
 
-		pointsFrustum[ 0 ].set( -1, -1, nearZ );
-		pointsFrustum[ 1 ].set(  1, -1, nearZ );
-		pointsFrustum[ 2 ].set( -1,  1, nearZ );
+		pointsFrustum[ 0 ].set( - 1, - 1, nearZ );
+		pointsFrustum[ 1 ].set(  1, - 1, nearZ );
+		pointsFrustum[ 2 ].set( - 1,  1, nearZ );
 		pointsFrustum[ 3 ].set(  1,  1, nearZ );
 
-		pointsFrustum[ 4 ].set( -1, -1, farZ );
-		pointsFrustum[ 5 ].set(  1, -1, farZ );
-		pointsFrustum[ 6 ].set( -1,  1, farZ );
+		pointsFrustum[ 4 ].set( - 1, - 1, farZ );
+		pointsFrustum[ 5 ].set(  1, - 1, farZ );
+		pointsFrustum[ 6 ].set( - 1,  1, farZ );
 		pointsFrustum[ 7 ].set(  1,  1, farZ );
 
 		return virtualLight;
@@ -449,7 +453,7 @@ THREE.ShadowMapPlugin = function () {
 			pointsWorld = light.pointsWorld;
 
 		_min.set( Infinity, Infinity, Infinity );
-		_max.set( -Infinity, -Infinity, -Infinity );
+		_max.set( - Infinity, - Infinity, - Infinity );
 
 		for ( var i = 0; i < 8; i ++ ) {
 

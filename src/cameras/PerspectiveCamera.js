@@ -92,7 +92,7 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 		var aspect = this.fullWidth / this.fullHeight;
 		var top = Math.tan( THREE.Math.degToRad( this.fov * 0.5 ) ) * this.near;
-		var bottom = -top;
+		var bottom = - top;
 		var left = aspect * bottom;
 		var right = aspect * top;
 		var width = Math.abs( right - left );

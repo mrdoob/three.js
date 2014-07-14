@@ -353,10 +353,23 @@ UI.TextArea = function () {
 	dom.className = 'TextArea';
 	dom.style.padding = '2px';
 	dom.style.border = '1px solid #ccc';
+	dom.spellcheck = false;
 
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		event.stopPropagation();
+
+		if ( event.keyCode === 9 ) {
+
+			event.preventDefault();
+
+			var cursor = dom.selectionStart;
+
+			dom.value = dom.value.substring( 0, cursor ) + '\t' + dom.value.substring( cursor );
+			dom.selectionStart = cursor + 1;
+			dom.selectionEnd = dom.selectionStart;
+
+		}
 
 	}, false );
 
@@ -495,13 +508,13 @@ UI.FancySelect = function () {
 					// Highlight selected dom elem and scroll parent if needed
 					scope.setValue( scope.options[ scope.selectedIndex ].value );
 
-					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
 
 				}
 
 				break;
 		}
+
 	}, false);
 
 	this.dom = dom;

@@ -23,9 +23,9 @@
 
 bl_info = {
     "name": "three.js format",
-    "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k",
-    "version": (1, 4, 0),
-    "blender": (2, 65, 0),
+    "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k, crobi",
+    "version": (1, 5, 0),
+    "blender": (2, 7, 0),
     "location": "File > Import-Export",
     "description": "Import-Export three.js meshes",
     "warning": "",
@@ -56,6 +56,7 @@ bpy.types.Object.THREE_castShadow = bpy.props.BoolProperty()
 bpy.types.Object.THREE_receiveShadow = bpy.props.BoolProperty()
 bpy.types.Object.THREE_doubleSided = bpy.props.BoolProperty()
 bpy.types.Object.THREE_exportGeometry = bpy.props.BoolProperty(default = True)
+bpy.types.Object.THREE_visible = bpy.props.BoolProperty(default = True)
 
 bpy.types.Material.THREE_useVertexColors = bpy.props.BoolProperty()
 bpy.types.Material.THREE_depthWrite = bpy.props.BoolProperty(default = True)
@@ -94,6 +95,9 @@ class OBJECT_PT_hello( bpy.types.Panel ):
 
         row = layout.row()
         row.prop( obj, "THREE_doubleSided", text="Double sided" )
+        
+        row = layout.row()
+        row.prop( obj, "THREE_visible", text="Visible" )
 
 class MATERIAL_PT_hello( bpy.types.Panel ):
 
@@ -201,6 +205,7 @@ def save_settings_export(properties):
 
     "option_animation_morph" : properties.option_animation_morph,
     "option_animation_skeletal" : properties.option_animation_skeletal,
+    "option_frame_index_as_time" : properties.option_frame_index_as_time,
 
     "option_frame_step" : properties.option_frame_step,
     "option_all_meshes" : properties.option_all_meshes,
@@ -263,6 +268,7 @@ def restore_settings_export(properties):
 
     properties.option_animation_morph = settings.get("option_animation_morph", False)
     properties.option_animation_skeletal = settings.get("option_animation_skeletal", False)
+    properties.option_frame_index_as_time = settings.get("option_frame_index_as_time", False)
 
     properties.option_frame_step = settings.get("option_frame_step", 1)
     properties.option_all_meshes = settings.get("option_all_meshes", True)
@@ -311,6 +317,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     option_animation_morph = BoolProperty(name = "Morph animation", description = "Export animation (morphs)", default = False)
     option_animation_skeletal = BoolProperty(name = "Skeletal animation", description = "Export animation (skeletal)", default = False)
+    option_frame_index_as_time = BoolProperty(name = "Frame index as time", description = "Use (original) frame index as frame time", default = False)
 
     option_frame_step = IntProperty(name = "Frame step", description = "Animation frame step", min = 1, max = 1000, soft_min = 1, soft_max = 1000, default = 1)
     option_all_meshes = BoolProperty(name = "All meshes", description = "All meshes (merged)", default = True)
@@ -321,7 +328,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object is not None
+        return context.active_object != None
 
     def execute(self, context):
         print("Selected: " + context.active_object.name)
@@ -409,6 +416,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, "option_animation_morph")
         row = layout.row()
         row.prop(self.properties, "option_animation_skeletal")
+        row = layout.row()
+        row.prop(self.properties, "option_frame_index_as_time")
         row = layout.row()
         row.prop(self.properties, "option_frame_step")
         layout.separator()

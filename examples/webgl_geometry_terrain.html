@@ -84,11 +84,9 @@
 				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				var editor = new THREE.GeometryEditor( geometry );
+				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-				for ( var i = 0, l = editor.vertices.length; i < l; i ++ ) {
-
-					editor.vertices[ i ].y = data[ i ] * 10;
+					geometry.vertices[ i ].y = data[ i ] * 10;
 
 				}
 

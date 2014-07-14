@@ -67,7 +67,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 
 	// consruct the grid
 
-	for ( i = 0; i < numpoints; i++ ) {
+	for ( i = 0; i < numpoints; i ++ ) {
 
 		grid[ i ] = [];
 
@@ -79,11 +79,11 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 		normal = normals[ i ];
 		binormal = binormals[ i ];
 
-		for ( j = 0; j < radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j ++ ) {
 
 			v = j / radialSegments * 2 * Math.PI;
 
-			cx = -radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+			cx = - radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = radius * Math.sin( v );
 
 			pos2.copy( pos );
@@ -99,9 +99,9 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 
 	// construct the mesh
 
-	for ( i = 0; i < segments; i++ ) {
+	for ( i = 0; i < segments; i ++ ) {
 
-		for ( j = 0; j < radialSegments; j++ ) {
+		for ( j = 0; j < radialSegments; j ++ ) {
 
 			ip = ( closed ) ? (i + 1) % segments : i + 1;
 			jp = (j + 1) % radialSegments;
@@ -163,7 +163,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	// compute the tangent vectors for each segment on the path
 
-	for ( i = 0; i < numpoints; i++ ) {
+	for ( i = 0; i < numpoints; i ++ ) {
 
 		u = i / ( numpoints - 1 );
 
@@ -174,6 +174,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	initialNormal3();
 
+	/*
 	function initialNormal1(lastBinormal) {
 		// fixed start binormal. Has dangers of 0 vectors
 		normals[ 0 ] = new THREE.Vector3();
@@ -195,6 +196,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
 
 	}
+	*/
 
 	function initialNormal3() {
 		// select an initial normal vector perpenicular to the first tangent vector,
@@ -230,7 +232,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	// compute the slowly-varying normal and binormal vectors for each segment on the path
 
-	for ( i = 1; i < numpoints; i++ ) {
+	for ( i = 1; i < numpoints; i ++ ) {
 
 		normals[ i ] = normals[ i-1 ].clone();
 
@@ -242,7 +244,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 			vec.normalize();
 
-			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), -1, 1 ) ); // clamp for floating pt errors
+			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -257,16 +259,16 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	if ( closed ) {
 
-		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), -1, 1 ) );
+		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
 
 		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
 
-			theta = -theta;
+			theta = - theta;
 
 		}
 
-		for ( i = 1; i < numpoints; i++ ) {
+		for ( i = 1; i < numpoints; i ++ ) {
 
 			// twist a little...
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );

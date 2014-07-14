@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lines - cubes - colors</title>
+		<title>three.js canvas - lines - colors</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -40,7 +40,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - color lines WebGL demo
+			<a href="http://threejs.org" target="_blank">three.js</a> - color lines
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
@@ -139,8 +139,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				composer.reset();
 
 			}
 

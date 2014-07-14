@@ -60,7 +60,7 @@ THREE.Vector3.prototype = {
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
 			case 2: this.z = value; break;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -73,7 +73,7 @@ THREE.Vector3.prototype = {
 			case 0: return this.x;
 			case 1: return this.y;
 			case 2: return this.z;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -93,7 +93,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -130,7 +130,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -157,7 +157,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
 			return this.multiplyVectors( v, w );
 
 		}
@@ -198,7 +198,7 @@ THREE.Vector3.prototype = {
 
 			if ( euler instanceof THREE.Euler === false ) {
 
-				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+				console.error( 'THREE.Vector3: .applyEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
 			}
 
@@ -236,9 +236,9 @@ THREE.Vector3.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[0] * x + e[3] * y + e[6] * z;
-		this.y = e[1] * x + e[4] * y + e[7] * z;
-		this.z = e[2] * x + e[5] * y + e[8] * z;
+		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
+		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
+		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
 
 		return this;
 
@@ -252,9 +252,9 @@ THREE.Vector3.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[0] * x + e[4] * y + e[8]  * z + e[12];
-		this.y = e[1] * x + e[5] * y + e[9]  * z + e[13];
-		this.z = e[2] * x + e[6] * y + e[10] * z + e[14];
+		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
+		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ];
+		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
 
 		return this;
 
@@ -267,11 +267,11 @@ THREE.Vector3.prototype = {
 		var x = this.x, y = this.y, z = this.z;
 
 		var e = m.elements;
-		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] ); // perspective divide
+		var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
 
-		this.x = ( e[0] * x + e[4] * y + e[8]  * z + e[12] ) * d;
-		this.y = ( e[1] * x + e[5] * y + e[9]  * z + e[13] ) * d;
-		this.z = ( e[2] * x + e[6] * y + e[10] * z + e[14] ) * d;
+		this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ] ) * d;
+		this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ] ) * d;
+		this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * d;
 
 		return this;
 
@@ -293,13 +293,13 @@ THREE.Vector3.prototype = {
 		var ix =  qw * x + qy * z - qz * y;
 		var iy =  qw * y + qz * x - qx * z;
 		var iz =  qw * z + qx * y - qy * x;
-		var iw = -qx * x - qy * y - qz * z;
+		var iw = - qx * x - qy * y - qz * z;
 
 		// calculate result * inverse quat
 
-		this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-		this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-		this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+		this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+		this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+		this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
 
 		return this;
 
@@ -314,9 +314,9 @@ THREE.Vector3.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[0] * x + e[4] * y + e[8]  * z;
-		this.y = e[1] * x + e[5] * y + e[9]  * z;
-		this.z = e[2] * x + e[6] * y + e[10] * z;
+		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z;
+		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z;
+		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
 
 		this.normalize();
 
@@ -506,7 +506,11 @@ THREE.Vector3.prototype = {
 
 	negate: function () {
 
-		return this.multiplyScalar( - 1 );
+		this.x = - this.x;
+		this.y = - this.y;
+		this.z = - this.z;
+
+		return this;
 
 	},
 
@@ -567,7 +571,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
 			return this.crossVectors( v, w );
 
 		}
@@ -652,7 +656,7 @@ THREE.Vector3.prototype = {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( THREE.Math.clamp( theta, -1, 1 ) );
+		return Math.acos( THREE.Math.clamp( theta, - 1, 1 ) );
 
 	},
 
@@ -674,19 +678,19 @@ THREE.Vector3.prototype = {
 
 	setEulerFromRotationMatrix: function ( m, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromRotationMatrix has been removed in favor of Euler.setFromRotationMatrix(), please update your code.");
+		console.error( 'THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.' );
 
 	},
 
 	setEulerFromQuaternion: function ( q, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromQuaternion: has been removed in favor of Euler.setFromQuaternion(), please update your code.");
+		console.error( 'THREE.Vector3: .setEulerFromQuaternion() has been removed. Use Euler.setFromQuaternion() instead.' );
 
 	},
 
 	getPositionFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getPositionFromMatrix() has been renamed to .setFromMatrixPosition(). Please update your code." );
+		console.warn( 'THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition().' );
 
 		return this.setFromMatrixPosition( m );
 
@@ -694,14 +698,14 @@ THREE.Vector3.prototype = {
 
 	getScaleFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getScaleFromMatrix() has been renamed to .setFromMatrixScale(). Please update your code." );
+		console.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
 
 		return this.setFromMatrixScale( m );
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getColumnFromMatrix() has been renamed to .setFromMatrixColumn(). Please update your code." );
+		console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 
 		return this.setFromMatrixColumn( index, matrix );
 

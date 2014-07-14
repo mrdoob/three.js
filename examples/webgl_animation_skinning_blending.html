@@ -35,7 +35,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/Controls/OrbitControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/BlendCharacter.js"></script>
 		<script src="js/BlendCharacterGui.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
@@ -64,7 +64,7 @@
 				scene.add ( new THREE.AmbientLight( 0xaaaaaa ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position = new THREE.Vector3( 0, 0, 1000.0 );
+				light.position.set( 0, 0, 1000 );
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );

@@ -161,7 +161,7 @@
 					lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
 
 					lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-					lensFlare.position = light.position;
+					lensFlare.position.copy( light.position );
 
 					scene.add( lensFlare );
 

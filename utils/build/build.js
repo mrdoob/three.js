@@ -34,7 +34,7 @@ function main() {
 
 	var buffer = [];
 	var sources = [];
-	
+			
 	if ( args.amd ){
 		buffer.push('function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
 	};
@@ -47,8 +47,12 @@ function main() {
 		for ( var j = 0; j < files.length; j ++ ){
 
 			var file = '../../' + files[ j ];
+			
 			sources.push( file );
+			buffer.push('// File:' + files[ j ]);
+			buffer.push('\n\n');
 			buffer.push( fs.readFileSync( file, 'utf8' ) );
+			buffer.push('\n');
 
 		}
 
@@ -68,7 +72,7 @@ function main() {
 
 		var result = uglify.minify( sources, { outSourceMap: sourcemap } );
 		
-		fs.writeFileSync( output, 'three.js / threejs.org/license\n' + result.code + sourcemapping, 'utf8' );
+		fs.writeFileSync( output, '// threejs.org/license\n' + result.code + sourcemapping, 'utf8' );
 
 		if ( args.sourcemaps ) {
 

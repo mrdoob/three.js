@@ -149,13 +149,12 @@
 			// reset Transformations
 
 			this.traverse(function ( child ) {
-				if (child instanceof THREE.Mesh) {			
+				if (child instanceof THREE.Mesh) {
+					child.updateMatrix();
+
 					var tempGeometry = new THREE.Geometry();
-					child.updateMatrix();
 					tempGeometry.merge( child.geometry, child.matrix );
-					// THREE.GeometryUtils.merge( tempGeometry, child );
-					child.updateMatrix();
-					tempGeometry.merge( child.geometry, child.matrix );
+
 					child.geometry = tempGeometry;
 					child.position.set( 0, 0, 0 );
 					child.rotation.set( 0, 0, 0 );
@@ -219,8 +218,8 @@
 		var arrowGeometry = new THREE.Geometry();
 		var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );
 		mesh.position.y = 0.5;
-		// THREE.GeometryUtils.merge( arrowGeometry, mesh );
 		mesh.updateMatrix();
+
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 		
 		var lineXGeometry = new THREE.Geometry();
@@ -455,8 +454,8 @@
 		var arrowGeometry = new THREE.Geometry();
 		var mesh = new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ) );
 		mesh.position.y = 0.5;
-		// THREE.GeometryUtils.merge( arrowGeometry, mesh );
 		mesh.updateMatrix();
+
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 
 		var lineXGeometry = new THREE.Geometry();
@@ -721,7 +720,7 @@
 
 			event.preventDefault();
 
-			var pointer = event.touches ? event.touches[ 0 ] : event;
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
@@ -748,7 +747,7 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var pointer = event.touches ? event.touches[ 0 ] : event;
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
 
@@ -792,7 +791,7 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var pointer = event.touches? event.touches[0] : event;
+			var pointer = event.changedTouches? event.changedTouches[0] : event;
 
 			var planeIntersect = intersectObjects( pointer, [scope.gizmo[_mode].activePlane] );
 

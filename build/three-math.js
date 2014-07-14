@@ -1,59 +1,17 @@
+// File:src/Three.js
+
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author Larry Battle / http://bateru.com/news
- * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '67dev' };
+var THREE = { REVISION: '68dev' };
 
-self.console = self.console || {
+// browserify support
+if ( typeof module === 'object' ) {
 
-	info: function () {},
-	log: function () {},
-	debug: function () {},
-	warn: function () {},
-	error: function () {}
+	module.exports = THREE;
 
-};
-
-// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-
-// requestAnimationFrame polyfill by Erik Möller
-// fixes from Paul Irish and Tino Zijdel
-// using 'self' instead of 'window' for compatibility with both NodeJS and IE10.
-( function () {
-
-	var lastTime = 0;
-	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
-
-	for ( var x = 0; x < vendors.length && !self.requestAnimationFrame; ++ x ) {
-
-		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
-		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-
-	}
-
-	if ( self.requestAnimationFrame === undefined && self['setTimeout'] !== undefined ) {
-
-		self.requestAnimationFrame = function ( callback ) {
-
-			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-			var id = self.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
-			lastTime = currTime + timeToCall;
-			return id;
-
-		};
-
-	}
-
-	if( self.cancelAnimationFrame === undefined && self['clearTimeout'] !== undefined ) {
-
-		self.cancelAnimationFrame = function ( id ) { self.clearTimeout( id ) };
-
-	}
-
-}() );
+}
 
 // GL STATE CONSTANTS
 
@@ -205,6 +163,8 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 THREE.RGB_ATC_Format = 2200;
 THREE.RGBA_ATC_EXPLICIT_ALPHA_Format = 2201;
 THREE.RGBA_ATC_INTERP_ALPHA_Format = 2202;
+
+// File:src/math/Color.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -588,30 +548,32 @@ THREE.Color.prototype = {
 
 };
 
-THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua": 0x00FFFF, "aquamarine": 0x7FFFD4, "azure": 0xF0FFFF,
-"beige": 0xF5F5DC, "bisque": 0xFFE4C4, "black": 0x000000, "blanchedalmond": 0xFFEBCD, "blue": 0x0000FF, "blueviolet": 0x8A2BE2,
-"brown": 0xA52A2A, "burlywood": 0xDEB887, "cadetblue": 0x5F9EA0, "chartreuse": 0x7FFF00, "chocolate": 0xD2691E, "coral": 0xFF7F50,
-"cornflowerblue": 0x6495ED, "cornsilk": 0xFFF8DC, "crimson": 0xDC143C, "cyan": 0x00FFFF, "darkblue": 0x00008B, "darkcyan": 0x008B8B,
-"darkgoldenrod": 0xB8860B, "darkgray": 0xA9A9A9, "darkgreen": 0x006400, "darkgrey": 0xA9A9A9, "darkkhaki": 0xBDB76B, "darkmagenta": 0x8B008B,
-"darkolivegreen": 0x556B2F, "darkorange": 0xFF8C00, "darkorchid": 0x9932CC, "darkred": 0x8B0000, "darksalmon": 0xE9967A, "darkseagreen": 0x8FBC8F,
-"darkslateblue": 0x483D8B, "darkslategray": 0x2F4F4F, "darkslategrey": 0x2F4F4F, "darkturquoise": 0x00CED1, "darkviolet": 0x9400D3,
-"deeppink": 0xFF1493, "deepskyblue": 0x00BFFF, "dimgray": 0x696969, "dimgrey": 0x696969, "dodgerblue": 0x1E90FF, "firebrick": 0xB22222,
-"floralwhite": 0xFFFAF0, "forestgreen": 0x228B22, "fuchsia": 0xFF00FF, "gainsboro": 0xDCDCDC, "ghostwhite": 0xF8F8FF, "gold": 0xFFD700,
-"goldenrod": 0xDAA520, "gray": 0x808080, "green": 0x008000, "greenyellow": 0xADFF2F, "grey": 0x808080, "honeydew": 0xF0FFF0, "hotpink": 0xFF69B4,
-"indianred": 0xCD5C5C, "indigo": 0x4B0082, "ivory": 0xFFFFF0, "khaki": 0xF0E68C, "lavender": 0xE6E6FA, "lavenderblush": 0xFFF0F5, "lawngreen": 0x7CFC00,
-"lemonchiffon": 0xFFFACD, "lightblue": 0xADD8E6, "lightcoral": 0xF08080, "lightcyan": 0xE0FFFF, "lightgoldenrodyellow": 0xFAFAD2, "lightgray": 0xD3D3D3,
-"lightgreen": 0x90EE90, "lightgrey": 0xD3D3D3, "lightpink": 0xFFB6C1, "lightsalmon": 0xFFA07A, "lightseagreen": 0x20B2AA, "lightskyblue": 0x87CEFA,
-"lightslategray": 0x778899, "lightslategrey": 0x778899, "lightsteelblue": 0xB0C4DE, "lightyellow": 0xFFFFE0, "lime": 0x00FF00, "limegreen": 0x32CD32,
-"linen": 0xFAF0E6, "magenta": 0xFF00FF, "maroon": 0x800000, "mediumaquamarine": 0x66CDAA, "mediumblue": 0x0000CD, "mediumorchid": 0xBA55D3,
-"mediumpurple": 0x9370DB, "mediumseagreen": 0x3CB371, "mediumslateblue": 0x7B68EE, "mediumspringgreen": 0x00FA9A, "mediumturquoise": 0x48D1CC,
-"mediumvioletred": 0xC71585, "midnightblue": 0x191970, "mintcream": 0xF5FFFA, "mistyrose": 0xFFE4E1, "moccasin": 0xFFE4B5, "navajowhite": 0xFFDEAD,
-"navy": 0x000080, "oldlace": 0xFDF5E6, "olive": 0x808000, "olivedrab": 0x6B8E23, "orange": 0xFFA500, "orangered": 0xFF4500, "orchid": 0xDA70D6,
-"palegoldenrod": 0xEEE8AA, "palegreen": 0x98FB98, "paleturquoise": 0xAFEEEE, "palevioletred": 0xDB7093, "papayawhip": 0xFFEFD5, "peachpuff": 0xFFDAB9,
-"peru": 0xCD853F, "pink": 0xFFC0CB, "plum": 0xDDA0DD, "powderblue": 0xB0E0E6, "purple": 0x800080, "red": 0xFF0000, "rosybrown": 0xBC8F8F,
-"royalblue": 0x4169E1, "saddlebrown": 0x8B4513, "salmon": 0xFA8072, "sandybrown": 0xF4A460, "seagreen": 0x2E8B57, "seashell": 0xFFF5EE,
-"sienna": 0xA0522D, "silver": 0xC0C0C0, "skyblue": 0x87CEEB, "slateblue": 0x6A5ACD, "slategray": 0x708090, "slategrey": 0x708090, "snow": 0xFFFAFA,
-"springgreen": 0x00FF7F, "steelblue": 0x4682B4, "tan": 0xD2B48C, "teal": 0x008080, "thistle": 0xD8BFD8, "tomato": 0xFF6347, "turquoise": 0x40E0D0,
-"violet": 0xEE82EE, "wheat": 0xF5DEB3, "white": 0xFFFFFF, "whitesmoke": 0xF5F5F5, "yellow": 0xFFFF00, "yellowgreen": 0x9ACD32 };
+THREE.ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
+'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
+'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
+'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
+'darkgoldenrod': 0xB8860B, 'darkgray': 0xA9A9A9, 'darkgreen': 0x006400, 'darkgrey': 0xA9A9A9, 'darkkhaki': 0xBDB76B, 'darkmagenta': 0x8B008B,
+'darkolivegreen': 0x556B2F, 'darkorange': 0xFF8C00, 'darkorchid': 0x9932CC, 'darkred': 0x8B0000, 'darksalmon': 0xE9967A, 'darkseagreen': 0x8FBC8F,
+'darkslateblue': 0x483D8B, 'darkslategray': 0x2F4F4F, 'darkslategrey': 0x2F4F4F, 'darkturquoise': 0x00CED1, 'darkviolet': 0x9400D3,
+'deeppink': 0xFF1493, 'deepskyblue': 0x00BFFF, 'dimgray': 0x696969, 'dimgrey': 0x696969, 'dodgerblue': 0x1E90FF, 'firebrick': 0xB22222,
+'floralwhite': 0xFFFAF0, 'forestgreen': 0x228B22, 'fuchsia': 0xFF00FF, 'gainsboro': 0xDCDCDC, 'ghostwhite': 0xF8F8FF, 'gold': 0xFFD700,
+'goldenrod': 0xDAA520, 'gray': 0x808080, 'green': 0x008000, 'greenyellow': 0xADFF2F, 'grey': 0x808080, 'honeydew': 0xF0FFF0, 'hotpink': 0xFF69B4,
+'indianred': 0xCD5C5C, 'indigo': 0x4B0082, 'ivory': 0xFFFFF0, 'khaki': 0xF0E68C, 'lavender': 0xE6E6FA, 'lavenderblush': 0xFFF0F5, 'lawngreen': 0x7CFC00,
+'lemonchiffon': 0xFFFACD, 'lightblue': 0xADD8E6, 'lightcoral': 0xF08080, 'lightcyan': 0xE0FFFF, 'lightgoldenrodyellow': 0xFAFAD2, 'lightgray': 0xD3D3D3,
+'lightgreen': 0x90EE90, 'lightgrey': 0xD3D3D3, 'lightpink': 0xFFB6C1, 'lightsalmon': 0xFFA07A, 'lightseagreen': 0x20B2AA, 'lightskyblue': 0x87CEFA,
+'lightslategray': 0x778899, 'lightslategrey': 0x778899, 'lightsteelblue': 0xB0C4DE, 'lightyellow': 0xFFFFE0, 'lime': 0x00FF00, 'limegreen': 0x32CD32,
+'linen': 0xFAF0E6, 'magenta': 0xFF00FF, 'maroon': 0x800000, 'mediumaquamarine': 0x66CDAA, 'mediumblue': 0x0000CD, 'mediumorchid': 0xBA55D3,
+'mediumpurple': 0x9370DB, 'mediumseagreen': 0x3CB371, 'mediumslateblue': 0x7B68EE, 'mediumspringgreen': 0x00FA9A, 'mediumturquoise': 0x48D1CC,
+'mediumvioletred': 0xC71585, 'midnightblue': 0x191970, 'mintcream': 0xF5FFFA, 'mistyrose': 0xFFE4E1, 'moccasin': 0xFFE4B5, 'navajowhite': 0xFFDEAD,
+'navy': 0x000080, 'oldlace': 0xFDF5E6, 'olive': 0x808000, 'olivedrab': 0x6B8E23, 'orange': 0xFFA500, 'orangered': 0xFF4500, 'orchid': 0xDA70D6,
+'palegoldenrod': 0xEEE8AA, 'palegreen': 0x98FB98, 'paleturquoise': 0xAFEEEE, 'palevioletred': 0xDB7093, 'papayawhip': 0xFFEFD5, 'peachpuff': 0xFFDAB9,
+'peru': 0xCD853F, 'pink': 0xFFC0CB, 'plum': 0xDDA0DD, 'powderblue': 0xB0E0E6, 'purple': 0x800080, 'red': 0xFF0000, 'rosybrown': 0xBC8F8F,
+'royalblue': 0x4169E1, 'saddlebrown': 0x8B4513, 'salmon': 0xFA8072, 'sandybrown': 0xF4A460, 'seagreen': 0x2E8B57, 'seashell': 0xFFF5EE,
+'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
+'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
+'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
+
+// File:src/math/Quaternion.js
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -702,10 +664,10 @@ THREE.Quaternion.prototype = {
 
 	copy: function ( quaternion ) {
 
-		this._x = quaternion._x;
-		this._y = quaternion._y;
-		this._z = quaternion._z;
-		this._w = quaternion._w;
+		this._x = quaternion.x;
+		this._y = quaternion.y;
+		this._z = quaternion.z;
+		this._w = quaternion.w;
 
 		this.onChangeCallback();
 
@@ -717,7 +679,7 @@ THREE.Quaternion.prototype = {
 
 		if ( euler instanceof THREE.Euler === false ) {
 
-			throw new Error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
@@ -808,9 +770,9 @@ THREE.Quaternion.prototype = {
 
 		var te = m.elements,
 
-			m11 = te[0], m12 = te[4], m13 = te[8],
-			m21 = te[1], m22 = te[5], m23 = te[9],
-			m31 = te[2], m32 = te[6], m33 = te[10],
+			m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ],
+			m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
+			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ],
 
 			trace = m11 + m22 + m33,
 			s;
@@ -828,19 +790,19 @@ THREE.Quaternion.prototype = {
 
 			s = 2.0 * Math.sqrt( 1.0 + m11 - m22 - m33 );
 
-			this._w = (m32 - m23 ) / s;
+			this._w = ( m32 - m23 ) / s;
 			this._x = 0.25 * s;
-			this._y = (m12 + m21 ) / s;
-			this._z = (m13 + m31 ) / s;
+			this._y = ( m12 + m21 ) / s;
+			this._z = ( m13 + m31 ) / s;
 
 		} else if ( m22 > m33 ) {
 
 			s = 2.0 * Math.sqrt( 1.0 + m22 - m11 - m33 );
 
-			this._w = (m13 - m31 ) / s;
-			this._x = (m12 + m21 ) / s;
+			this._w = ( m13 - m31 ) / s;
+			this._x = ( m12 + m21 ) / s;
 			this._y = 0.25 * s;
-			this._z = (m23 + m32 ) / s;
+			this._z = ( m23 + m32 ) / s;
 
 		} else {
 
@@ -869,7 +831,7 @@ THREE.Quaternion.prototype = {
 
 		var EPS = 0.000001;
 
-		return function( vFrom, vTo ) {
+		return function ( vFrom, vTo ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
@@ -918,13 +880,19 @@ THREE.Quaternion.prototype = {
 
 	conjugate: function () {
 
-		this._x *= -1;
-		this._y *= -1;
-		this._z *= -1;
+		this._x *= - 1;
+		this._y *= - 1;
+		this._z *= - 1;
 
 		this.onChangeCallback();
 
 		return this;
+
+	},
+
+	dot: function ( v ) {
+
+		return this._x * v._x + this._y * v._y + this._z * v._z + this._w * v._w;
 
 	},
 
@@ -972,7 +940,7 @@ THREE.Quaternion.prototype = {
 
 		if ( p !== undefined ) {
 
-			console.warn( 'DEPRECATED: Quaternion\'s .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
 			return this.multiplyQuaternions( q, p );
 
 		}
@@ -1001,7 +969,7 @@ THREE.Quaternion.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Quaternion\'s .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		console.warn( 'THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
 		return vector.applyQuaternion( this );
 
 	},
@@ -1016,12 +984,12 @@ THREE.Quaternion.prototype = {
 
 		if ( cosHalfTheta < 0 ) {
 
-			this._w = -qb._w;
-			this._x = -qb._x;
-			this._y = -qb._y;
-			this._z = -qb._z;
+			this._w = - qb._w;
+			this._x = - qb._x;
+			this._y = - qb._y;
+			this._z = - qb._z;
 
-			cosHalfTheta = -cosHalfTheta;
+			cosHalfTheta = - cosHalfTheta;
 
 		} else {
 
@@ -1117,6 +1085,8 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
 }
 
+// File:src/math/Vector2.js
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
@@ -1166,7 +1136,7 @@ THREE.Vector2.prototype = {
 
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -1178,7 +1148,7 @@ THREE.Vector2.prototype = {
 
 			case 0: return this.x;
 			case 1: return this.y;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -1197,7 +1167,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector2\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -1231,7 +1201,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector2\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -1251,7 +1221,7 @@ THREE.Vector2.prototype = {
 		return this;
 
 	},
-	
+
 	multiply: function ( v ) {
 
 		this.x *= v.x;
@@ -1381,7 +1351,7 @@ THREE.Vector2.prototype = {
 			return this.clamp( min, max );
 
 		};
-		
+
 	} )(),
 
 	floor: function () {
@@ -1422,7 +1392,10 @@ THREE.Vector2.prototype = {
 
 	negate: function () {
 
-		return this.multiplyScalar( - 1 );
+		this.x = - this.x;
+		this.y = - this.y;
+
+		return this;
 
 	},
 
@@ -1493,7 +1466,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	equals: function( v ) {
+	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
 
@@ -1521,6 +1494,8 @@ THREE.Vector2.prototype = {
 	}
 
 };
+
+// File:src/math/Vector3.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -1584,7 +1559,7 @@ THREE.Vector3.prototype = {
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
 			case 2: this.z = value; break;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -1597,7 +1572,7 @@ THREE.Vector3.prototype = {
 			case 0: return this.x;
 			case 1: return this.y;
 			case 2: return this.z;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -1617,7 +1592,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -1654,7 +1629,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -1681,7 +1656,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
 			return this.multiplyVectors( v, w );
 
 		}
@@ -1722,7 +1697,7 @@ THREE.Vector3.prototype = {
 
 			if ( euler instanceof THREE.Euler === false ) {
 
-				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+				console.error( 'THREE.Vector3: .applyEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
 			}
 
@@ -1760,9 +1735,9 @@ THREE.Vector3.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[0] * x + e[3] * y + e[6] * z;
-		this.y = e[1] * x + e[4] * y + e[7] * z;
-		this.z = e[2] * x + e[5] * y + e[8] * z;
+		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
+		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
+		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
 
 		return this;
 
@@ -1776,9 +1751,9 @@ THREE.Vector3.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[0] * x + e[4] * y + e[8]  * z + e[12];
-		this.y = e[1] * x + e[5] * y + e[9]  * z + e[13];
-		this.z = e[2] * x + e[6] * y + e[10] * z + e[14];
+		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
+		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ];
+		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
 
 		return this;
 
@@ -1791,11 +1766,11 @@ THREE.Vector3.prototype = {
 		var x = this.x, y = this.y, z = this.z;
 
 		var e = m.elements;
-		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] ); // perspective divide
+		var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
 
-		this.x = ( e[0] * x + e[4] * y + e[8]  * z + e[12] ) * d;
-		this.y = ( e[1] * x + e[5] * y + e[9]  * z + e[13] ) * d;
-		this.z = ( e[2] * x + e[6] * y + e[10] * z + e[14] ) * d;
+		this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ] ) * d;
+		this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ] ) * d;
+		this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * d;
 
 		return this;
 
@@ -1817,13 +1792,13 @@ THREE.Vector3.prototype = {
 		var ix =  qw * x + qy * z - qz * y;
 		var iy =  qw * y + qz * x - qx * z;
 		var iz =  qw * z + qx * y - qy * x;
-		var iw = -qx * x - qy * y - qz * z;
+		var iw = - qx * x - qy * y - qz * z;
 
 		// calculate result * inverse quat
 
-		this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-		this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-		this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+		this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+		this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+		this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
 
 		return this;
 
@@ -1838,9 +1813,9 @@ THREE.Vector3.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[0] * x + e[4] * y + e[8]  * z;
-		this.y = e[1] * x + e[5] * y + e[9]  * z;
-		this.z = e[2] * x + e[6] * y + e[10] * z;
+		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z;
+		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z;
+		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
 
 		this.normalize();
 
@@ -2030,7 +2005,11 @@ THREE.Vector3.prototype = {
 
 	negate: function () {
 
-		return this.multiplyScalar( - 1 );
+		this.x = - this.x;
+		this.y = - this.y;
+		this.z = - this.z;
+
+		return this;
 
 	},
 
@@ -2091,7 +2070,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector3\'s .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
 			return this.crossVectors( v, w );
 
 		}
@@ -2176,7 +2155,7 @@ THREE.Vector3.prototype = {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( THREE.Math.clamp( theta, -1, 1 ) );
+		return Math.acos( THREE.Math.clamp( theta, - 1, 1 ) );
 
 	},
 
@@ -2198,19 +2177,19 @@ THREE.Vector3.prototype = {
 
 	setEulerFromRotationMatrix: function ( m, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromRotationMatrix has been removed in favor of Euler.setFromRotationMatrix(), please update your code.");
+		console.error( 'THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.' );
 
 	},
 
 	setEulerFromQuaternion: function ( q, order ) {
 
-		console.error( "REMOVED: Vector3\'s setEulerFromQuaternion: has been removed in favor of Euler.setFromQuaternion(), please update your code.");
+		console.error( 'THREE.Vector3: .setEulerFromQuaternion() has been removed. Use Euler.setFromQuaternion() instead.' );
 
 	},
 
 	getPositionFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getPositionFromMatrix() has been renamed to .setFromMatrixPosition(). Please update your code." );
+		console.warn( 'THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition().' );
 
 		return this.setFromMatrixPosition( m );
 
@@ -2218,14 +2197,14 @@ THREE.Vector3.prototype = {
 
 	getScaleFromMatrix: function ( m ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getScaleFromMatrix() has been renamed to .setFromMatrixScale(). Please update your code." );
+		console.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
 
 		return this.setFromMatrixScale( m );
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
 
-		console.warn( "DEPRECATED: Vector3\'s .getColumnFromMatrix() has been renamed to .setFromMatrixColumn(). Please update your code." );
+		console.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 
 		return this.setFromMatrixColumn( index, matrix );
 
@@ -2297,6 +2276,9 @@ THREE.Vector3.prototype = {
 	}
 
 };
+
+// File:src/math/Vector4.js
+
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
@@ -2369,7 +2351,7 @@ THREE.Vector4.prototype = {
 			case 1: this.y = value; break;
 			case 2: this.z = value; break;
 			case 3: this.w = value; break;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -2383,7 +2365,7 @@ THREE.Vector4.prototype = {
 			case 1: return this.y;
 			case 2: return this.z;
 			case 3: return this.w;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -2404,7 +2386,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector4\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -2444,7 +2426,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector4\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -2489,10 +2471,10 @@ THREE.Vector4.prototype = {
 
 		var e = m.elements;
 
-		this.x = e[0] * x + e[4] * y + e[8] * z + e[12] * w;
-		this.y = e[1] * x + e[5] * y + e[9] * z + e[13] * w;
-		this.z = e[2] * x + e[6] * y + e[10] * z + e[14] * w;
-		this.w = e[3] * x + e[7] * y + e[11] * z + e[15] * w;
+		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] * w;
+		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] * w;
+		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] * w;
+		this.w = e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] * w;
 
 		return this;
 
@@ -2562,22 +2544,22 @@ THREE.Vector4.prototype = {
 
 			te = m.elements,
 
-			m11 = te[0], m12 = te[4], m13 = te[8],
-			m21 = te[1], m22 = te[5], m23 = te[9],
-			m31 = te[2], m32 = te[6], m33 = te[10];
+			m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ],
+			m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
+			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
 		if ( ( Math.abs( m12 - m21 ) < epsilon )
-		  && ( Math.abs( m13 - m31 ) < epsilon )
-		  && ( Math.abs( m23 - m32 ) < epsilon ) ) {
+		   && ( Math.abs( m13 - m31 ) < epsilon )
+		   && ( Math.abs( m23 - m32 ) < epsilon ) ) {
 
 			// singularity found
 			// first check for identity matrix which must have +1 for all terms
 			// in leading diagonal and zero in other terms
 
 			if ( ( Math.abs( m12 + m21 ) < epsilon2 )
-			  && ( Math.abs( m13 + m31 ) < epsilon2 )
-			  && ( Math.abs( m23 + m32 ) < epsilon2 )
-			  && ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
+			   && ( Math.abs( m13 + m31 ) < epsilon2 )
+			   && ( Math.abs( m23 + m32 ) < epsilon2 )
+			   && ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
 
 				// this singularity is identity matrix so angle = 0
 
@@ -2657,8 +2639,8 @@ THREE.Vector4.prototype = {
 		// as we have reached here there are no singularities so we can handle normally
 
 		var s = Math.sqrt( ( m32 - m23 ) * ( m32 - m23 )
-						 + ( m13 - m31 ) * ( m13 - m31 )
-						 + ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
+						  + ( m13 - m31 ) * ( m13 - m31 )
+						  + ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
 
 		if ( Math.abs( s ) < 0.001 ) s = 1;
 
@@ -2850,7 +2832,12 @@ THREE.Vector4.prototype = {
 
 	negate: function () {
 
-		return this.multiplyScalar( -1 );
+		this.x = - this.x;
+		this.y = - this.y;
+		this.z = - this.z;
+		this.w = - this.w;
+
+		return this;
 
 	},
 
@@ -2939,6 +2926,8 @@ THREE.Vector4.prototype = {
 	}
 
 };
+
+// File:src/math/Euler.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -3050,15 +3039,15 @@ THREE.Euler.prototype = {
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		var te = m.elements;
-		var m11 = te[0], m12 = te[4], m13 = te[8];
-		var m21 = te[1], m22 = te[5], m23 = te[9];
-		var m31 = te[2], m32 = te[6], m33 = te[10];
+		var m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
+		var m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ];
+		var m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
 		order = order || this._order;
 
 		if ( order === 'XYZ' ) {
 
-			this._y = Math.asin( clamp( m13, -1, 1 ) );
+			this._y = Math.asin( clamp( m13, - 1, 1 ) );
 
 			if ( Math.abs( m13 ) < 0.99999 ) {
 
@@ -3074,7 +3063,7 @@ THREE.Euler.prototype = {
 
 		} else if ( order === 'YXZ' ) {
 
-			this._x = Math.asin( - clamp( m23, -1, 1 ) );
+			this._x = Math.asin( - clamp( m23, - 1, 1 ) );
 
 			if ( Math.abs( m23 ) < 0.99999 ) {
 
@@ -3090,7 +3079,7 @@ THREE.Euler.prototype = {
 
 		} else if ( order === 'ZXY' ) {
 
-			this._x = Math.asin( clamp( m32, -1, 1 ) );
+			this._x = Math.asin( clamp( m32, - 1, 1 ) );
 
 			if ( Math.abs( m32 ) < 0.99999 ) {
 
@@ -3106,7 +3095,7 @@ THREE.Euler.prototype = {
 
 		} else if ( order === 'ZYX' ) {
 
-			this._y = Math.asin( - clamp( m31, -1, 1 ) );
+			this._y = Math.asin( - clamp( m31, - 1, 1 ) );
 
 			if ( Math.abs( m31 ) < 0.99999 ) {
 
@@ -3122,7 +3111,7 @@ THREE.Euler.prototype = {
 
 		} else if ( order === 'YZX' ) {
 
-			this._z = Math.asin( clamp( m21, -1, 1 ) );
+			this._z = Math.asin( clamp( m21, - 1, 1 ) );
 
 			if ( Math.abs( m21 ) < 0.99999 ) {
 
@@ -3138,7 +3127,7 @@ THREE.Euler.prototype = {
 
 		} else if ( order === 'XZY' ) {
 
-			this._z = Math.asin( - clamp( m12, -1, 1 ) );
+			this._z = Math.asin( - clamp( m12, - 1, 1 ) );
 
 			if ( Math.abs( m12 ) < 0.99999 ) {
 
@@ -3154,7 +3143,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			console.warn( 'WARNING: Euler.setFromRotationMatrix() given unsupported order: ' + order )
+			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
 
 		}
 
@@ -3184,42 +3173,42 @@ THREE.Euler.prototype = {
 		if ( order === 'XYZ' ) {
 
 			this._x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( sqw - sqx - sqy + sqz ) );
-			this._y = Math.asin(  clamp( 2 * ( q.x * q.z + q.y * q.w ), -1, 1 ) );
+			this._y = Math.asin(  clamp( 2 * ( q.x * q.z + q.y * q.w ), - 1, 1 ) );
 			this._z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw + sqx - sqy - sqz ) );
 
 		} else if ( order ===  'YXZ' ) {
 
-			this._x = Math.asin(  clamp( 2 * ( q.x * q.w - q.y * q.z ), -1, 1 ) );
+			this._x = Math.asin(  clamp( 2 * ( q.x * q.w - q.y * q.z ), - 1, 1 ) );
 			this._y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw - sqx - sqy + sqz ) );
 			this._z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw - sqx + sqy - sqz ) );
 
 		} else if ( order === 'ZXY' ) {
 
-			this._x = Math.asin(  clamp( 2 * ( q.x * q.w + q.y * q.z ), -1, 1 ) );
+			this._x = Math.asin(  clamp( 2 * ( q.x * q.w + q.y * q.z ), - 1, 1 ) );
 			this._y = Math.atan2( 2 * ( q.y * q.w - q.z * q.x ), ( sqw - sqx - sqy + sqz ) );
 			this._z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw - sqx + sqy - sqz ) );
 
 		} else if ( order === 'ZYX' ) {
 
 			this._x = Math.atan2( 2 * ( q.x * q.w + q.z * q.y ), ( sqw - sqx - sqy + sqz ) );
-			this._y = Math.asin(  clamp( 2 * ( q.y * q.w - q.x * q.z ), -1, 1 ) );
+			this._y = Math.asin(  clamp( 2 * ( q.y * q.w - q.x * q.z ), - 1, 1 ) );
 			this._z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw + sqx - sqy - sqz ) );
 
 		} else if ( order === 'YZX' ) {
 
 			this._x = Math.atan2( 2 * ( q.x * q.w - q.z * q.y ), ( sqw - sqx + sqy - sqz ) );
 			this._y = Math.atan2( 2 * ( q.y * q.w - q.x * q.z ), ( sqw + sqx - sqy - sqz ) );
-			this._z = Math.asin(  clamp( 2 * ( q.x * q.y + q.z * q.w ), -1, 1 ) );
+			this._z = Math.asin(  clamp( 2 * ( q.x * q.y + q.z * q.w ), - 1, 1 ) );
 
 		} else if ( order === 'XZY' ) {
 
 			this._x = Math.atan2( 2 * ( q.x * q.w + q.y * q.z ), ( sqw - sqx + sqy - sqz ) );
 			this._y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw + sqx - sqy - sqz ) );
-			this._z = Math.asin(  clamp( 2 * ( q.z * q.w - q.x * q.y ), -1, 1 ) );
+			this._z = Math.asin(  clamp( 2 * ( q.z * q.w - q.x * q.y ), - 1, 1 ) );
 
 		} else {
 
-			console.warn( 'WARNING: Euler.setFromQuaternion() given unsupported order: ' + order )
+			console.warn( 'THREE.Euler: .setFromQuaternion() given unsupported order: ' + order )
 
 		}
 
@@ -3290,6 +3279,8 @@ THREE.Euler.prototype = {
 
 };
 
+// File:src/math/Line3.js
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -3357,7 +3348,7 @@ THREE.Line3.prototype = {
 
 	},
 
-	closestPointToPointParameter: function() {
+	closestPointToPointParameter: function () {
 
 		var startP = new THREE.Vector3();
 		var startEnd = new THREE.Vector3();
@@ -3417,6 +3408,8 @@ THREE.Line3.prototype = {
 
 };
 
+// File:src/math/Box2.js
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -3424,7 +3417,7 @@ THREE.Line3.prototype = {
 THREE.Box2 = function ( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new THREE.Vector2( Infinity, Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector2( -Infinity, -Infinity );
+	this.max = ( max !== undefined ) ? max : new THREE.Vector2( - Infinity, - Infinity );
 
 };
 
@@ -3443,42 +3436,11 @@ THREE.Box2.prototype = {
 
 	setFromPoints: function ( points ) {
 
-		if ( points.length > 0 ) {
+		this.makeEmpty();
 
-			var point = points[ 0 ];
+		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.min.copy( point );
-			this.max.copy( point );
-
-			for ( var i = 1, il = points.length; i < il; i ++ ) {
-
-				point = points[ i ];
-
-				if ( point.x < this.min.x ) {
-
-					this.min.x = point.x;
-
-				} else if ( point.x > this.max.x ) {
-
-					this.max.x = point.x;
-
-				}
-
-				if ( point.y < this.min.y ) {
-
-					this.min.y = point.y;
-
-				} else if ( point.y > this.max.y ) {
-
-					this.max.y = point.y;
-
-				}
-
-			}
-
-		} else {
-
-			this.makeEmpty();
+			this.expandByPoint( points[ i ] )
 
 		}
 
@@ -3514,7 +3476,7 @@ THREE.Box2.prototype = {
 	makeEmpty: function () {
 
 		this.min.x = this.min.y = Infinity;
-		this.max.x = this.max.y = -Infinity;
+		this.max.x = this.max.y = - Infinity;
 
 		return this;
 
@@ -3560,7 +3522,7 @@ THREE.Box2.prototype = {
 
 	expandByScalar: function ( scalar ) {
 
-		this.min.addScalar( -scalar );
+		this.min.addScalar( - scalar );
 		this.max.addScalar( scalar );
 
 		return this;
@@ -3682,6 +3644,8 @@ THREE.Box2.prototype = {
 
 };
 
+// File:src/math/Box3.js
+
 /**
  * @author bhouston / http://exocortex.com
  * @author WestLangley / http://github.com/WestLangley
@@ -3690,7 +3654,7 @@ THREE.Box2.prototype = {
 THREE.Box3 = function ( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector3( -Infinity, -Infinity, -Infinity );
+	this.max = ( max !== undefined ) ? max : new THREE.Vector3( - Infinity, - Infinity, - Infinity );
 
 };
 
@@ -3707,58 +3671,13 @@ THREE.Box3.prototype = {
 
 	},
 
-	addPoint: function ( point ) {
-
-		if ( point.x < this.min.x ) {
-
-			this.min.x = point.x;
-
-		} else if ( point.x > this.max.x ) {
-
-			this.max.x = point.x;
-
-		}
-
-		if ( point.y < this.min.y ) {
-
-			this.min.y = point.y;
-
-		} else if ( point.y > this.max.y ) {
-
-			this.max.y = point.y;
-
-		}
-
-		if ( point.z < this.min.z ) {
-
-			this.min.z = point.z;
-
-		} else if ( point.z > this.max.z ) {
-
-			this.max.z = point.z;
-
-		}
-
-	},
-
 	setFromPoints: function ( points ) {
 
-		if ( points.length > 0 ) {
+		this.makeEmpty();
 
-			var point = points[ 0 ];
+		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			this.min.copy( point );
-			this.max.copy( point );
-
-			for ( var i = 1, il = points.length; i < il; i ++ ) {
-
-				this.addPoint( points[ i ] )
-
-			}
-
-		} else {
-
-			this.makeEmpty();
+			this.expandByPoint( points[ i ] )
 
 		}
 
@@ -3766,7 +3685,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	setFromCenterAndSize: function() {
+	setFromCenterAndSize: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -3783,14 +3702,14 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	setFromObject: function() {
+	setFromObject: function () {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and childrens', world transforms
 
 		var v1 = new THREE.Vector3();
 
-		return function( object ) {
+		return function ( object ) {
 
 			var scope = this;
 
@@ -3804,7 +3723,7 @@ THREE.Box3.prototype = {
 
 					var vertices = node.geometry.vertices;
 
-					for ( var i = 0, il = vertices.length; i < il; i++ ) {
+					for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 						v1.copy( vertices[ i ] );
 
@@ -3836,7 +3755,7 @@ THREE.Box3.prototype = {
 	makeEmpty: function () {
 
 		this.min.x = this.min.y = this.min.z = Infinity;
-		this.max.x = this.max.y = this.max.z = -Infinity;
+		this.max.x = this.max.y = this.max.z = - Infinity;
 
 		return this;
 
@@ -3884,7 +3803,7 @@ THREE.Box3.prototype = {
 
 	expandByScalar: function ( scalar ) {
 
-		this.min.addScalar( -scalar );
+		this.min.addScalar( - scalar );
 		this.max.addScalar( scalar );
 
 		return this;
@@ -3957,7 +3876,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	distanceToPoint: function() {
+	distanceToPoint: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -3970,7 +3889,7 @@ THREE.Box3.prototype = {
 
 	}(),
 
-	getBoundingSphere: function() {
+	getBoundingSphere: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -4005,7 +3924,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	applyMatrix4: function() {
+	applyMatrix4: function () {
 
 		var points = [
 			new THREE.Vector3(),
@@ -4021,14 +3940,14 @@ THREE.Box3.prototype = {
 		return function ( matrix ) {
 
 			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-			points[0].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-			points[1].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-			points[2].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-			points[3].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-			points[4].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-			points[5].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-			points[6].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[7].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
+			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+			points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+			points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
 
 			this.makeEmpty();
 			this.setFromPoints( points );
@@ -4062,6 +3981,8 @@ THREE.Box3.prototype = {
 
 };
 
+// File:src/math/Matrix3.js
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -4074,9 +3995,9 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 	var te = this.elements;
 
-	te[0] = ( n11 !== undefined ) ? n11 : 1; te[3] = n12 || 0; te[6] = n13 || 0;
-	te[1] = n21 || 0; te[4] = ( n22 !== undefined ) ? n22 : 1; te[7] = n23 || 0;
-	te[2] = n31 || 0; te[5] = n32 || 0; te[8] = ( n33 !== undefined ) ? n33 : 1;
+	te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 3 ] = n12 || 0; te[ 6 ] = n13 || 0;
+	te[ 1 ] = n21 || 0; te[ 4 ] = ( n22 !== undefined ) ? n22 : 1; te[ 7 ] = n23 || 0;
+	te[ 2 ] = n31 || 0; te[ 5 ] = n32 || 0; te[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
 
 };
 
@@ -4088,9 +4009,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[0] = n11; te[3] = n12; te[6] = n13;
-		te[1] = n21; te[4] = n22; te[7] = n23;
-		te[2] = n31; te[5] = n32; te[8] = n33;
+		te[ 0 ] = n11; te[ 3 ] = n12; te[ 6 ] = n13;
+		te[ 1 ] = n21; te[ 4 ] = n22; te[ 7 ] = n23;
+		te[ 2 ] = n31; te[ 5 ] = n32; te[ 8 ] = n33;
 
 		return this;
 
@@ -4116,9 +4037,9 @@ THREE.Matrix3.prototype = {
 
 		this.set(
 
-			me[0], me[3], me[6],
-			me[1], me[4], me[7],
-			me[2], me[5], me[8]
+			me[ 0 ], me[ 3 ], me[ 6 ],
+			me[ 1 ], me[ 4 ], me[ 7 ],
+			me[ 2 ], me[ 5 ], me[ 8 ]
 
 		);
 
@@ -4128,19 +4049,19 @@ THREE.Matrix3.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix3\'s .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
+		console.warn( 'THREE.Matrix3: .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
 		return vector.applyMatrix3( this );
 
 	},
 
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'DEPRECATED: Matrix3\'s .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		console.warn( 'THREE.Matrix3: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
 		return this.applyToVector3Array( a );
 
 	},
 
-	applyToVector3Array: function() {
+	applyToVector3Array: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -4173,9 +4094,9 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		te[0] *= s; te[3] *= s; te[6] *= s;
-		te[1] *= s; te[4] *= s; te[7] *= s;
-		te[2] *= s; te[5] *= s; te[8] *= s;
+		te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
+		te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
+		te[ 2 ] *= s; te[ 5 ] *= s; te[ 8 ] *= s;
 
 		return this;
 
@@ -4185,11 +4106,11 @@ THREE.Matrix3.prototype = {
 
 		var te = this.elements;
 
-		var a = te[0], b = te[1], c = te[2],
-			d = te[3], e = te[4], f = te[5],
-			g = te[6], h = te[7], i = te[8];
+		var a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
+			d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
+			g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
 
-		return a*e*i - a*f*h - b*d*i + b*f*g + c*d*h - c*e*g;
+		return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 
 	},
 
@@ -4201,15 +4122,15 @@ THREE.Matrix3.prototype = {
 		var me = matrix.elements;
 		var te = this.elements;
 
-		te[ 0 ] =   me[10] * me[5] - me[6] * me[9];
-		te[ 1 ] = - me[10] * me[1] + me[2] * me[9];
-		te[ 2 ] =   me[6] * me[1] - me[2] * me[5];
-		te[ 3 ] = - me[10] * me[4] + me[6] * me[8];
-		te[ 4 ] =   me[10] * me[0] - me[2] * me[8];
-		te[ 5 ] = - me[6] * me[0] + me[2] * me[4];
-		te[ 6 ] =   me[9] * me[4] - me[5] * me[8];
-		te[ 7 ] = - me[9] * me[0] + me[1] * me[8];
-		te[ 8 ] =   me[5] * me[0] - me[1] * me[4];
+		te[ 0 ] =   me[ 10 ] * me[ 5 ] - me[ 6 ] * me[ 9 ];
+		te[ 1 ] = - me[ 10 ] * me[ 1 ] + me[ 2 ] * me[ 9 ];
+		te[ 2 ] =   me[ 6 ] * me[ 1 ] - me[ 2 ] * me[ 5 ];
+		te[ 3 ] = - me[ 10 ] * me[ 4 ] + me[ 6 ] * me[ 8 ];
+		te[ 4 ] =   me[ 10 ] * me[ 0 ] - me[ 2 ] * me[ 8 ];
+		te[ 5 ] = - me[ 6 ] * me[ 0 ] + me[ 2 ] * me[ 4 ];
+		te[ 6 ] =   me[ 9 ] * me[ 4 ] - me[ 5 ] * me[ 8 ];
+		te[ 7 ] = - me[ 9 ] * me[ 0 ] + me[ 1 ] * me[ 8 ];
+		te[ 8 ] =   me[ 5 ] * me[ 0 ] - me[ 1 ] * me[ 4 ];
 
 		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
 
@@ -4245,29 +4166,29 @@ THREE.Matrix3.prototype = {
 
 		var tmp, m = this.elements;
 
-		tmp = m[1]; m[1] = m[3]; m[3] = tmp;
-		tmp = m[2]; m[2] = m[6]; m[6] = tmp;
-		tmp = m[5]; m[5] = m[7]; m[7] = tmp;
+		tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
+		tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
+		tmp = m[ 5 ]; m[ 5 ] = m[ 7 ]; m[ 7 ] = tmp;
 
 		return this;
 
 	},
 
-	flattenToArrayOffset: function( array, offset ) {
+	flattenToArrayOffset: function ( array, offset ) {
 
 		var te = this.elements;
 
-		array[ offset     ] = te[0];
-		array[ offset + 1 ] = te[1];
-		array[ offset + 2 ] = te[2];
-		
-		array[ offset + 3 ] = te[3];
-		array[ offset + 4 ] = te[4];
-		array[ offset + 5 ] = te[5];
-		
-		array[ offset + 6 ] = te[6];
-		array[ offset + 7 ] = te[7];
-		array[ offset + 8 ]  = te[8];
+		array[ offset     ] = te[ 0 ];
+		array[ offset + 1 ] = te[ 1 ];
+		array[ offset + 2 ] = te[ 2 ];
+
+		array[ offset + 3 ] = te[ 3 ];
+		array[ offset + 4 ] = te[ 4 ];
+		array[ offset + 5 ] = te[ 5 ];
+
+		array[ offset + 6 ] = te[ 6 ];
+		array[ offset + 7 ] = te[ 7 ];
+		array[ offset + 8 ]  = te[ 8 ];
 
 		return array;
 
@@ -4327,15 +4248,17 @@ THREE.Matrix3.prototype = {
 
 		return new THREE.Matrix3(
 
-			te[0], te[3], te[6],
-			te[1], te[4], te[7],
-			te[2], te[5], te[8]
+			te[ 0 ], te[ 3 ], te[ 6 ],
+			te[ 1 ], te[ 4 ], te[ 7 ],
+			te[ 2 ], te[ 5 ], te[ 8 ]
 
 		);
 
 	}
 
 };
+
+// File:src/math/Matrix4.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -4360,10 +4283,10 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 	var te = this.elements;
 
-	te[0] = ( n11 !== undefined ) ? n11 : 1; te[4] = n12 || 0; te[8] = n13 || 0; te[12] = n14 || 0;
-	te[1] = n21 || 0; te[5] = ( n22 !== undefined ) ? n22 : 1; te[9] = n23 || 0; te[13] = n24 || 0;
-	te[2] = n31 || 0; te[6] = n32 || 0; te[10] = ( n33 !== undefined ) ? n33 : 1; te[14] = n34 || 0;
-	te[3] = n41 || 0; te[7] = n42 || 0; te[11] = n43 || 0; te[15] = ( n44 !== undefined ) ? n44 : 1;
+	te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 4 ] = n12 || 0; te[ 8 ] = n13 || 0; te[ 12 ] = n14 || 0;
+	te[ 1 ] = n21 || 0; te[ 5 ] = ( n22 !== undefined ) ? n22 : 1; te[ 9 ] = n23 || 0; te[ 13 ] = n24 || 0;
+	te[ 2 ] = n31 || 0; te[ 6 ] = n32 || 0; te[ 10 ] = ( n33 !== undefined ) ? n33 : 1; te[ 14 ] = n34 || 0;
+	te[ 3 ] = n41 || 0; te[ 7 ] = n42 || 0; te[ 11 ] = n43 || 0; te[ 15 ] = ( n44 !== undefined ) ? n44 : 1;
 
 };
 
@@ -4375,10 +4298,10 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		te[0] = n11; te[4] = n12; te[8] = n13; te[12] = n14;
-		te[1] = n21; te[5] = n22; te[9] = n23; te[13] = n24;
-		te[2] = n31; te[6] = n32; te[10] = n33; te[14] = n34;
-		te[3] = n41; te[7] = n42; te[11] = n43; te[15] = n44;
+		te[ 0 ] = n11; te[ 4 ] = n12; te[ 8 ] = n13; te[ 12 ] = n14;
+		te[ 1 ] = n21; te[ 5 ] = n22; te[ 9 ] = n23; te[ 13 ] = n24;
+		te[ 2 ] = n31; te[ 6 ] = n32; te[ 10 ] = n33; te[ 14 ] = n34;
+		te[ 3 ] = n41; te[ 7 ] = n42; te[ 11 ] = n43; te[ 15 ] = n44;
 
 		return this;
 
@@ -4409,7 +4332,7 @@ THREE.Matrix4.prototype = {
 
 	extractPosition: function ( m ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
+		console.warn( 'THREEMatrix4: .extractPosition() has been renamed to .copyPosition().' );
 		return this.copyPosition( m );
 
 	},
@@ -4419,9 +4342,9 @@ THREE.Matrix4.prototype = {
 		var te = this.elements;
 		var me = m.elements;
 
-		te[12] = me[12];
-		te[13] = me[13];
-		te[14] = me[14];
+		te[ 12 ] = me[ 12 ];
+		te[ 13 ] = me[ 13 ];
+		te[ 14 ] = me[ 14 ];
 
 		return this;
 
@@ -4436,21 +4359,21 @@ THREE.Matrix4.prototype = {
 			var te = this.elements;
 			var me = m.elements;
 
-			var scaleX = 1 / v1.set( me[0], me[1], me[2] ).length();
-			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
-			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
+			var scaleX = 1 / v1.set( me[ 0 ], me[ 1 ], me[ 2 ] ).length();
+			var scaleY = 1 / v1.set( me[ 4 ], me[ 5 ], me[ 6 ] ).length();
+			var scaleZ = 1 / v1.set( me[ 8 ], me[ 9 ], me[ 10 ] ).length();
 
-			te[0] = me[0] * scaleX;
-			te[1] = me[1] * scaleX;
-			te[2] = me[2] * scaleX;
+			te[ 0 ] = me[ 0 ] * scaleX;
+			te[ 1 ] = me[ 1 ] * scaleX;
+			te[ 2 ] = me[ 2 ] * scaleX;
 
-			te[4] = me[4] * scaleY;
-			te[5] = me[5] * scaleY;
-			te[6] = me[6] * scaleY;
+			te[ 4 ] = me[ 4 ] * scaleY;
+			te[ 5 ] = me[ 5 ] * scaleY;
+			te[ 6 ] = me[ 6 ] * scaleY;
 
-			te[8] = me[8] * scaleZ;
-			te[9] = me[9] * scaleZ;
-			te[10] = me[10] * scaleZ;
+			te[ 8 ] = me[ 8 ] * scaleZ;
+			te[ 9 ] = me[ 9 ] * scaleZ;
+			te[ 10 ] = me[ 10 ] * scaleZ;
 
 			return this;
 
@@ -4462,7 +4385,7 @@ THREE.Matrix4.prototype = {
 
 		if ( euler instanceof THREE.Euler === false ) {
 
-			console.error( 'ERROR: Matrix\'s .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+			console.error( 'THREE.Matrix: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
 
 		}
 
@@ -4477,110 +4400,110 @@ THREE.Matrix4.prototype = {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-			te[0] = c * e;
-			te[4] = - c * f;
-			te[8] = d;
+			te[ 0 ] = c * e;
+			te[ 4 ] = - c * f;
+			te[ 8 ] = d;
 
-			te[1] = af + be * d;
-			te[5] = ae - bf * d;
-			te[9] = - b * c;
+			te[ 1 ] = af + be * d;
+			te[ 5 ] = ae - bf * d;
+			te[ 9 ] = - b * c;
 
-			te[2] = bf - ae * d;
-			te[6] = be + af * d;
-			te[10] = a * c;
+			te[ 2 ] = bf - ae * d;
+			te[ 6 ] = be + af * d;
+			te[ 10 ] = a * c;
 
 		} else if ( euler.order === 'YXZ' ) {
 
 			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-			te[0] = ce + df * b;
-			te[4] = de * b - cf;
-			te[8] = a * d;
+			te[ 0 ] = ce + df * b;
+			te[ 4 ] = de * b - cf;
+			te[ 8 ] = a * d;
 
-			te[1] = a * f;
-			te[5] = a * e;
-			te[9] = - b;
+			te[ 1 ] = a * f;
+			te[ 5 ] = a * e;
+			te[ 9 ] = - b;
 
-			te[2] = cf * b - de;
-			te[6] = df + ce * b;
-			te[10] = a * c;
+			te[ 2 ] = cf * b - de;
+			te[ 6 ] = df + ce * b;
+			te[ 10 ] = a * c;
 
 		} else if ( euler.order === 'ZXY' ) {
 
 			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-			te[0] = ce - df * b;
-			te[4] = - a * f;
-			te[8] = de + cf * b;
+			te[ 0 ] = ce - df * b;
+			te[ 4 ] = - a * f;
+			te[ 8 ] = de + cf * b;
 
-			te[1] = cf + de * b;
-			te[5] = a * e;
-			te[9] = df - ce * b;
+			te[ 1 ] = cf + de * b;
+			te[ 5 ] = a * e;
+			te[ 9 ] = df - ce * b;
 
-			te[2] = - a * d;
-			te[6] = b;
-			te[10] = a * c;
+			te[ 2 ] = - a * d;
+			te[ 6 ] = b;
+			te[ 10 ] = a * c;
 
 		} else if ( euler.order === 'ZYX' ) {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-			te[0] = c * e;
-			te[4] = be * d - af;
-			te[8] = ae * d + bf;
+			te[ 0 ] = c * e;
+			te[ 4 ] = be * d - af;
+			te[ 8 ] = ae * d + bf;
 
-			te[1] = c * f;
-			te[5] = bf * d + ae;
-			te[9] = af * d - be;
+			te[ 1 ] = c * f;
+			te[ 5 ] = bf * d + ae;
+			te[ 9 ] = af * d - be;
 
-			te[2] = - d;
-			te[6] = b * c;
-			te[10] = a * c;
+			te[ 2 ] = - d;
+			te[ 6 ] = b * c;
+			te[ 10 ] = a * c;
 
 		} else if ( euler.order === 'YZX' ) {
 
 			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-			te[0] = c * e;
-			te[4] = bd - ac * f;
-			te[8] = bc * f + ad;
+			te[ 0 ] = c * e;
+			te[ 4 ] = bd - ac * f;
+			te[ 8 ] = bc * f + ad;
 
-			te[1] = f;
-			te[5] = a * e;
-			te[9] = - b * e;
+			te[ 1 ] = f;
+			te[ 5 ] = a * e;
+			te[ 9 ] = - b * e;
 
-			te[2] = - d * e;
-			te[6] = ad * f + bc;
-			te[10] = ac - bd * f;
+			te[ 2 ] = - d * e;
+			te[ 6 ] = ad * f + bc;
+			te[ 10 ] = ac - bd * f;
 
 		} else if ( euler.order === 'XZY' ) {
 
 			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-			te[0] = c * e;
-			te[4] = - f;
-			te[8] = d * e;
+			te[ 0 ] = c * e;
+			te[ 4 ] = - f;
+			te[ 8 ] = d * e;
 
-			te[1] = ac * f + bd;
-			te[5] = a * e;
-			te[9] = ad * f - bc;
+			te[ 1 ] = ac * f + bd;
+			te[ 5 ] = a * e;
+			te[ 9 ] = ad * f - bc;
 
-			te[2] = bc * f - ad;
-			te[6] = b * e;
-			te[10] = bd * f + ac;
+			te[ 2 ] = bc * f - ad;
+			te[ 6 ] = b * e;
+			te[ 10 ] = bd * f + ac;
 
 		}
 
 		// last column
-		te[3] = 0;
-		te[7] = 0;
-		te[11] = 0;
+		te[ 3 ] = 0;
+		te[ 7 ] = 0;
+		te[ 11 ] = 0;
 
 		// bottom row
-		te[12] = 0;
-		te[13] = 0;
-		te[14] = 0;
-		te[15] = 1;
+		te[ 12 ] = 0;
+		te[ 13 ] = 0;
+		te[ 14 ] = 0;
+		te[ 15 ] = 1;
 
 		return this;
 
@@ -4588,7 +4511,7 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromQuaternion: function ( q ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromQuaternion() has been deprecated in favor of makeRotationFromQuaternion.  Please update your code.' );
+		console.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
 
 		return this.makeRotationFromQuaternion( q );
 
@@ -4604,34 +4527,34 @@ THREE.Matrix4.prototype = {
 		var yy = y * y2, yz = y * z2, zz = z * z2;
 		var wx = w * x2, wy = w * y2, wz = w * z2;
 
-		te[0] = 1 - ( yy + zz );
-		te[4] = xy - wz;
-		te[8] = xz + wy;
+		te[ 0 ] = 1 - ( yy + zz );
+		te[ 4 ] = xy - wz;
+		te[ 8 ] = xz + wy;
 
-		te[1] = xy + wz;
-		te[5] = 1 - ( xx + zz );
-		te[9] = yz - wx;
+		te[ 1 ] = xy + wz;
+		te[ 5 ] = 1 - ( xx + zz );
+		te[ 9 ] = yz - wx;
 
-		te[2] = xz - wy;
-		te[6] = yz + wx;
-		te[10] = 1 - ( xx + yy );
+		te[ 2 ] = xz - wy;
+		te[ 6 ] = yz + wx;
+		te[ 10 ] = 1 - ( xx + yy );
 
 		// last column
-		te[3] = 0;
-		te[7] = 0;
-		te[11] = 0;
+		te[ 3 ] = 0;
+		te[ 7 ] = 0;
+		te[ 11 ] = 0;
 
 		// bottom row
-		te[12] = 0;
-		te[13] = 0;
-		te[14] = 0;
-		te[15] = 1;
+		te[ 12 ] = 0;
+		te[ 13 ] = 0;
+		te[ 14 ] = 0;
+		te[ 15 ] = 1;
 
 		return this;
 
 	},
 
-	lookAt: function() {
+	lookAt: function () {
 
 		var x = new THREE.Vector3();
 		var y = new THREE.Vector3();
@@ -4661,9 +4584,9 @@ THREE.Matrix4.prototype = {
 			y.crossVectors( z, x );
 
 
-			te[0] = x.x; te[4] = y.x; te[8] = z.x;
-			te[1] = x.y; te[5] = y.y; te[9] = z.y;
-			te[2] = x.z; te[6] = y.z; te[10] = z.z;
+			te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
+			te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
+			te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
 
 			return this;
 
@@ -4675,7 +4598,7 @@ THREE.Matrix4.prototype = {
 
 		if ( n !== undefined ) {
 
-			console.warn( 'DEPRECATED: Matrix4\'s .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
+			console.warn( 'THREE.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
 			return this.multiplyMatrices( m, n );
 
 		}
@@ -4690,35 +4613,35 @@ THREE.Matrix4.prototype = {
 		var be = b.elements;
 		var te = this.elements;
 
-		var a11 = ae[0], a12 = ae[4], a13 = ae[8], a14 = ae[12];
-		var a21 = ae[1], a22 = ae[5], a23 = ae[9], a24 = ae[13];
-		var a31 = ae[2], a32 = ae[6], a33 = ae[10], a34 = ae[14];
-		var a41 = ae[3], a42 = ae[7], a43 = ae[11], a44 = ae[15];
+		var a11 = ae[ 0 ], a12 = ae[ 4 ], a13 = ae[ 8 ], a14 = ae[ 12 ];
+		var a21 = ae[ 1 ], a22 = ae[ 5 ], a23 = ae[ 9 ], a24 = ae[ 13 ];
+		var a31 = ae[ 2 ], a32 = ae[ 6 ], a33 = ae[ 10 ], a34 = ae[ 14 ];
+		var a41 = ae[ 3 ], a42 = ae[ 7 ], a43 = ae[ 11 ], a44 = ae[ 15 ];
 
-		var b11 = be[0], b12 = be[4], b13 = be[8], b14 = be[12];
-		var b21 = be[1], b22 = be[5], b23 = be[9], b24 = be[13];
-		var b31 = be[2], b32 = be[6], b33 = be[10], b34 = be[14];
-		var b41 = be[3], b42 = be[7], b43 = be[11], b44 = be[15];
+		var b11 = be[ 0 ], b12 = be[ 4 ], b13 = be[ 8 ], b14 = be[ 12 ];
+		var b21 = be[ 1 ], b22 = be[ 5 ], b23 = be[ 9 ], b24 = be[ 13 ];
+		var b31 = be[ 2 ], b32 = be[ 6 ], b33 = be[ 10 ], b34 = be[ 14 ];
+		var b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
 
-		te[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
-		te[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
-		te[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
-		te[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+		te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		te[ 4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+		te[ 8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+		te[ 12 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
 
-		te[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
-		te[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
-		te[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
-		te[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+		te[ 1 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+		te[ 5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+		te[ 9 ] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+		te[ 13 ] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
 
-		te[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
-		te[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
-		te[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
-		te[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+		te[ 2 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+		te[ 6 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+		te[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		te[ 14 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
 
-		te[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
-		te[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
-		te[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
-		te[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+		te[ 3 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+		te[ 7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+		te[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+		te[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
 
 		return this;
 
@@ -4730,10 +4653,10 @@ THREE.Matrix4.prototype = {
 
 		this.multiplyMatrices( a, b );
 
-		r[ 0 ] = te[0]; r[ 1 ] = te[1]; r[ 2 ] = te[2]; r[ 3 ] = te[3];
-		r[ 4 ] = te[4]; r[ 5 ] = te[5]; r[ 6 ] = te[6]; r[ 7 ] = te[7];
-		r[ 8 ]  = te[8]; r[ 9 ]  = te[9]; r[ 10 ] = te[10]; r[ 11 ] = te[11];
-		r[ 12 ] = te[12]; r[ 13 ] = te[13]; r[ 14 ] = te[14]; r[ 15 ] = te[15];
+		r[ 0 ] = te[ 0 ]; r[ 1 ] = te[ 1 ]; r[ 2 ] = te[ 2 ]; r[ 3 ] = te[ 3 ];
+		r[ 4 ] = te[ 4 ]; r[ 5 ] = te[ 5 ]; r[ 6 ] = te[ 6 ]; r[ 7 ] = te[ 7 ];
+		r[ 8 ]  = te[ 8 ]; r[ 9 ]  = te[ 9 ]; r[ 10 ] = te[ 10 ]; r[ 11 ] = te[ 11 ];
+		r[ 12 ] = te[ 12 ]; r[ 13 ] = te[ 13 ]; r[ 14 ] = te[ 14 ]; r[ 15 ] = te[ 15 ];
 
 		return this;
 
@@ -4743,10 +4666,10 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		te[0] *= s; te[4] *= s; te[8] *= s; te[12] *= s;
-		te[1] *= s; te[5] *= s; te[9] *= s; te[13] *= s;
-		te[2] *= s; te[6] *= s; te[10] *= s; te[14] *= s;
-		te[3] *= s; te[7] *= s; te[11] *= s; te[15] *= s;
+		te[ 0 ] *= s; te[ 4 ] *= s; te[ 8 ] *= s; te[ 12 ] *= s;
+		te[ 1 ] *= s; te[ 5 ] *= s; te[ 9 ] *= s; te[ 13 ] *= s;
+		te[ 2 ] *= s; te[ 6 ] *= s; te[ 10 ] *= s; te[ 14 ] *= s;
+		te[ 3 ] *= s; te[ 7 ] *= s; te[ 11 ] *= s; te[ 15 ] *= s;
 
 		return this;
 
@@ -4754,26 +4677,26 @@ THREE.Matrix4.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
 		return vector.applyProjection( this );
 
 	},
 
 	multiplyVector4: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
 		return vector.applyMatrix4( this );
 
 	},
 
 	multiplyVector3Array: function ( a ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		console.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
 		return this.applyToVector3Array( a );
 
 	},
 
-	applyToVector3Array: function() {
+	applyToVector3Array: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -4804,7 +4727,7 @@ THREE.Matrix4.prototype = {
 
 	rotateAxis: function ( v ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
 
 		v.transformDirection( this );
 
@@ -4812,7 +4735,7 @@ THREE.Matrix4.prototype = {
 
 	crossVector: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		console.warn( 'THREE.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
 		return vector.applyMatrix4( this );
 
 	},
@@ -4821,46 +4744,46 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		var n11 = te[0], n12 = te[4], n13 = te[8], n14 = te[12];
-		var n21 = te[1], n22 = te[5], n23 = te[9], n24 = te[13];
-		var n31 = te[2], n32 = te[6], n33 = te[10], n34 = te[14];
-		var n41 = te[3], n42 = te[7], n43 = te[11], n44 = te[15];
+		var n11 = te[ 0 ], n12 = te[ 4 ], n13 = te[ 8 ], n14 = te[ 12 ];
+		var n21 = te[ 1 ], n22 = te[ 5 ], n23 = te[ 9 ], n24 = te[ 13 ];
+		var n31 = te[ 2 ], n32 = te[ 6 ], n33 = te[ 10 ], n34 = te[ 14 ];
+		var n41 = te[ 3 ], n42 = te[ 7 ], n43 = te[ 11 ], n44 = te[ 15 ];
 
 		//TODO: make this more efficient
 		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
 
 		return (
 			n41 * (
-				+n14 * n23 * n32
-				-n13 * n24 * n32
-				-n14 * n22 * n33
-				+n12 * n24 * n33
-				+n13 * n22 * n34
-				-n12 * n23 * n34
+				+ n14 * n23 * n32
+				 - n13 * n24 * n32
+				 - n14 * n22 * n33
+				 + n12 * n24 * n33
+				 + n13 * n22 * n34
+				 - n12 * n23 * n34
 			) +
 			n42 * (
-				+n11 * n23 * n34
-				-n11 * n24 * n33
-				+n14 * n21 * n33
-				-n13 * n21 * n34
-				+n13 * n24 * n31
-				-n14 * n23 * n31
+				+ n11 * n23 * n34
+				 - n11 * n24 * n33
+				 + n14 * n21 * n33
+				 - n13 * n21 * n34
+				 + n13 * n24 * n31
+				 - n14 * n23 * n31
 			) +
 			n43 * (
-				+n11 * n24 * n32
-				-n11 * n22 * n34
-				-n14 * n21 * n32
-				+n12 * n21 * n34
-				+n14 * n22 * n31
-				-n12 * n24 * n31
+				+ n11 * n24 * n32
+				 - n11 * n22 * n34
+				 - n14 * n21 * n32
+				 + n12 * n21 * n34
+				 + n14 * n22 * n31
+				 - n12 * n24 * n31
 			) +
 			n44 * (
-				-n13 * n22 * n31
-				-n11 * n23 * n32
-				+n11 * n22 * n33
-				+n13 * n21 * n32
-				-n12 * n21 * n33
-				+n12 * n23 * n31
+				- n13 * n22 * n31
+				 - n11 * n23 * n32
+				 + n11 * n22 * n33
+				 + n13 * n21 * n32
+				 - n12 * n21 * n33
+				 + n12 * n23 * n31
 			)
 
 		);
@@ -4872,56 +4795,56 @@ THREE.Matrix4.prototype = {
 		var te = this.elements;
 		var tmp;
 
-		tmp = te[1]; te[1] = te[4]; te[4] = tmp;
-		tmp = te[2]; te[2] = te[8]; te[8] = tmp;
-		tmp = te[6]; te[6] = te[9]; te[9] = tmp;
+		tmp = te[ 1 ]; te[ 1 ] = te[ 4 ]; te[ 4 ] = tmp;
+		tmp = te[ 2 ]; te[ 2 ] = te[ 8 ]; te[ 8 ] = tmp;
+		tmp = te[ 6 ]; te[ 6 ] = te[ 9 ]; te[ 9 ] = tmp;
 
-		tmp = te[3]; te[3] = te[12]; te[12] = tmp;
-		tmp = te[7]; te[7] = te[13]; te[13] = tmp;
-		tmp = te[11]; te[11] = te[14]; te[14] = tmp;
+		tmp = te[ 3 ]; te[ 3 ] = te[ 12 ]; te[ 12 ] = tmp;
+		tmp = te[ 7 ]; te[ 7 ] = te[ 13 ]; te[ 13 ] = tmp;
+		tmp = te[ 11 ]; te[ 11 ] = te[ 14 ]; te[ 14 ] = tmp;
 
 		return this;
 
 	},
 
-	flattenToArrayOffset: function( array, offset ) {
+	flattenToArrayOffset: function ( array, offset ) {
 
 		var te = this.elements;
 
-		array[ offset     ] = te[0];
-		array[ offset + 1 ] = te[1];
-		array[ offset + 2 ] = te[2];
-		array[ offset + 3 ] = te[3];
+		array[ offset     ] = te[ 0 ];
+		array[ offset + 1 ] = te[ 1 ];
+		array[ offset + 2 ] = te[ 2 ];
+		array[ offset + 3 ] = te[ 3 ];
 
-		array[ offset + 4 ] = te[4];
-		array[ offset + 5 ] = te[5];
-		array[ offset + 6 ] = te[6];
-		array[ offset + 7 ] = te[7];
+		array[ offset + 4 ] = te[ 4 ];
+		array[ offset + 5 ] = te[ 5 ];
+		array[ offset + 6 ] = te[ 6 ];
+		array[ offset + 7 ] = te[ 7 ];
 
-		array[ offset + 8 ]  = te[8];
-		array[ offset + 9 ]  = te[9];
-		array[ offset + 10 ] = te[10];
-		array[ offset + 11 ] = te[11];
+		array[ offset + 8 ]  = te[ 8 ];
+		array[ offset + 9 ]  = te[ 9 ];
+		array[ offset + 10 ] = te[ 10 ];
+		array[ offset + 11 ] = te[ 11 ];
 
-		array[ offset + 12 ] = te[12];
-		array[ offset + 13 ] = te[13];
-		array[ offset + 14 ] = te[14];
-		array[ offset + 15 ] = te[15];
+		array[ offset + 12 ] = te[ 12 ];
+		array[ offset + 13 ] = te[ 13 ];
+		array[ offset + 14 ] = te[ 14 ];
+		array[ offset + 15 ] = te[ 15 ];
 
 		return array;
 
 	},
 
-	getPosition: function() {
+	getPosition: function () {
 
 		var v1 = new THREE.Vector3();
 
 		return function () {
 
-			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
+			console.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
 			var te = this.elements;
-			return v1.set( te[12], te[13], te[14] );
+			return v1.set( te[ 12 ], te[ 13 ], te[ 14 ] );
 
 		};
 
@@ -4931,9 +4854,9 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		te[12] = v.x;
-		te[13] = v.y;
-		te[14] = v.z;
+		te[ 12 ] = v.x;
+		te[ 13 ] = v.y;
+		te[ 14 ] = v.z;
 
 		return this;
 
@@ -4945,27 +4868,27 @@ THREE.Matrix4.prototype = {
 		var te = this.elements;
 		var me = m.elements;
 
-		var n11 = me[0], n12 = me[4], n13 = me[8], n14 = me[12];
-		var n21 = me[1], n22 = me[5], n23 = me[9], n24 = me[13];
-		var n31 = me[2], n32 = me[6], n33 = me[10], n34 = me[14];
-		var n41 = me[3], n42 = me[7], n43 = me[11], n44 = me[15];
+		var n11 = me[ 0 ], n12 = me[ 4 ], n13 = me[ 8 ], n14 = me[ 12 ];
+		var n21 = me[ 1 ], n22 = me[ 5 ], n23 = me[ 9 ], n24 = me[ 13 ];
+		var n31 = me[ 2 ], n32 = me[ 6 ], n33 = me[ 10 ], n34 = me[ 14 ];
+		var n41 = me[ 3 ], n42 = me[ 7 ], n43 = me[ 11 ], n44 = me[ 15 ];
 
-		te[0] = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
-		te[4] = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
-		te[8] = n13*n24*n42 - n14*n23*n42 + n14*n22*n43 - n12*n24*n43 - n13*n22*n44 + n12*n23*n44;
-		te[12] = n14*n23*n32 - n13*n24*n32 - n14*n22*n33 + n12*n24*n33 + n13*n22*n34 - n12*n23*n34;
-		te[1] = n24*n33*n41 - n23*n34*n41 - n24*n31*n43 + n21*n34*n43 + n23*n31*n44 - n21*n33*n44;
-		te[5] = n13*n34*n41 - n14*n33*n41 + n14*n31*n43 - n11*n34*n43 - n13*n31*n44 + n11*n33*n44;
-		te[9] = n14*n23*n41 - n13*n24*n41 - n14*n21*n43 + n11*n24*n43 + n13*n21*n44 - n11*n23*n44;
-		te[13] = n13*n24*n31 - n14*n23*n31 + n14*n21*n33 - n11*n24*n33 - n13*n21*n34 + n11*n23*n34;
-		te[2] = n22*n34*n41 - n24*n32*n41 + n24*n31*n42 - n21*n34*n42 - n22*n31*n44 + n21*n32*n44;
-		te[6] = n14*n32*n41 - n12*n34*n41 - n14*n31*n42 + n11*n34*n42 + n12*n31*n44 - n11*n32*n44;
-		te[10] = n12*n24*n41 - n14*n22*n41 + n14*n21*n42 - n11*n24*n42 - n12*n21*n44 + n11*n22*n44;
-		te[14] = n14*n22*n31 - n12*n24*n31 - n14*n21*n32 + n11*n24*n32 + n12*n21*n34 - n11*n22*n34;
-		te[3] = n23*n32*n41 - n22*n33*n41 - n23*n31*n42 + n21*n33*n42 + n22*n31*n43 - n21*n32*n43;
-		te[7] = n12*n33*n41 - n13*n32*n41 + n13*n31*n42 - n11*n33*n42 - n12*n31*n43 + n11*n32*n43;
-		te[11] = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
-		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
+		te[ 0 ] = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44;
+		te[ 4 ] = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44;
+		te[ 8 ] = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44;
+		te[ 12 ] = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34;
+		te[ 1 ] = n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44;
+		te[ 5 ] = n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44;
+		te[ 9 ] = n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44;
+		te[ 13 ] = n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34;
+		te[ 2 ] = n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44;
+		te[ 6 ] = n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44;
+		te[ 10 ] = n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44;
+		te[ 14 ] = n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34;
+		te[ 3 ] = n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43;
+		te[ 7 ] = n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43;
+		te[ 11 ] = n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43;
+		te[ 15 ] = n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33;
 
 		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
 
@@ -4975,7 +4898,7 @@ THREE.Matrix4.prototype = {
 
 			if ( throwOnInvertible || false ) {
 
-				throw new Error( msg ); 
+				throw new Error( msg );
 
 			} else {
 
@@ -4996,31 +4919,31 @@ THREE.Matrix4.prototype = {
 
 	translate: function ( v ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .translate() has been removed.');
+		console.warn( 'THREE.Matrix4: .translate() has been removed.' );
 
 	},
 
 	rotateX: function ( angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateX() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateX() has been removed.' );
 
 	},
 
 	rotateY: function ( angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateY() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateY() has been removed.' );
 
 	},
 
 	rotateZ: function ( angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateZ() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateZ() has been removed.' );
 
 	},
 
 	rotateByAxis: function ( axis, angle ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .rotateByAxis() has been removed.');
+		console.warn( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	},
 
@@ -5029,10 +4952,10 @@ THREE.Matrix4.prototype = {
 		var te = this.elements;
 		var x = v.x, y = v.y, z = v.z;
 
-		te[0] *= x; te[4] *= y; te[8] *= z;
-		te[1] *= x; te[5] *= y; te[9] *= z;
-		te[2] *= x; te[6] *= y; te[10] *= z;
-		te[3] *= x; te[7] *= y; te[11] *= z;
+		te[ 0 ] *= x; te[ 4 ] *= y; te[ 8 ] *= z;
+		te[ 1 ] *= x; te[ 5 ] *= y; te[ 9 ] *= z;
+		te[ 2 ] *= x; te[ 6 ] *= y; te[ 10 ] *= z;
+		te[ 3 ] *= x; te[ 7 ] *= y; te[ 11 ] *= z;
 
 		return this;
 
@@ -5042,9 +4965,9 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		var scaleXSq = te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
-		var scaleYSq = te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
-		var scaleZSq = te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
+		var scaleXSq = te[ 0 ] * te[ 0 ] + te[ 1 ] * te[ 1 ] + te[ 2 ] * te[ 2 ];
+		var scaleYSq = te[ 4 ] * te[ 4 ] + te[ 5 ] * te[ 5 ] + te[ 6 ] * te[ 6 ];
+		var scaleZSq = te[ 8 ] * te[ 8 ] + te[ 9 ] * te[ 9 ] + te[ 10 ] * te[ 10 ];
 
 		return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
 
@@ -5072,7 +4995,7 @@ THREE.Matrix4.prototype = {
 		this.set(
 
 			1, 0,  0, 0,
-			0, c, -s, 0,
+			0, c, - s, 0,
 			0, s,  c, 0,
 			0, 0,  0, 1
 
@@ -5090,7 +5013,7 @@ THREE.Matrix4.prototype = {
 
 			 c, 0, s, 0,
 			 0, 1, 0, 0,
-			-s, 0, c, 0,
+			- s, 0, c, 0,
 			 0, 0, 0, 1
 
 		);
@@ -5105,7 +5028,7 @@ THREE.Matrix4.prototype = {
 
 		this.set(
 
-			c, -s, 0, 0,
+			c, - s, 0, 0,
 			s,  c, 0, 0,
 			0,  0, 1, 0,
 			0,  0, 0, 1
@@ -5173,19 +5096,19 @@ THREE.Matrix4.prototype = {
 
 			var te = this.elements;
 
-			var sx = vector.set( te[0], te[1], te[2] ).length();
-			var sy = vector.set( te[4], te[5], te[6] ).length();
-			var sz = vector.set( te[8], te[9], te[10] ).length();
+			var sx = vector.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
+			var sy = vector.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
+			var sz = vector.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
 			// if determine is negative, we need to invert one scale
 			var det = this.determinant();
-			if( det < 0 ) {
-				sx = -sx;
+			if ( det < 0 ) {
+				sx = - sx;
 			}
 
-			position.x = te[12];
-			position.y = te[13];
-			position.z = te[14];
+			position.x = te[ 12 ];
+			position.y = te[ 13 ];
+			position.z = te[ 14 ];
 
 			// scale the rotation part
 
@@ -5195,17 +5118,17 @@ THREE.Matrix4.prototype = {
 			var invSY = 1 / sy;
 			var invSZ = 1 / sz;
 
-			matrix.elements[0] *= invSX;
-			matrix.elements[1] *= invSX;
-			matrix.elements[2] *= invSX;
+			matrix.elements[ 0 ] *= invSX;
+			matrix.elements[ 1 ] *= invSX;
+			matrix.elements[ 2 ] *= invSX;
 
-			matrix.elements[4] *= invSY;
-			matrix.elements[5] *= invSY;
-			matrix.elements[6] *= invSY;
+			matrix.elements[ 4 ] *= invSY;
+			matrix.elements[ 5 ] *= invSY;
+			matrix.elements[ 6 ] *= invSY;
 
-			matrix.elements[8] *= invSZ;
-			matrix.elements[9] *= invSZ;
-			matrix.elements[10] *= invSZ;
+			matrix.elements[ 8 ] *= invSZ;
+			matrix.elements[ 9 ] *= invSZ;
+			matrix.elements[ 10 ] *= invSZ;
 
 			quaternion.setFromRotationMatrix( matrix );
 
@@ -5230,10 +5153,10 @@ THREE.Matrix4.prototype = {
 		var c = - ( far + near ) / ( far - near );
 		var d = - 2 * far * near / ( far - near );
 
-		te[0] = x;	te[4] = 0;	te[8] = a;	te[12] = 0;
-		te[1] = 0;	te[5] = y;	te[9] = b;	te[13] = 0;
-		te[2] = 0;	te[6] = 0;	te[10] = c;	te[14] = d;
-		te[3] = 0;	te[7] = 0;	te[11] = - 1;	te[15] = 0;
+		te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
+		te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
+		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
+		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
 
 		return this;
 
@@ -5261,10 +5184,10 @@ THREE.Matrix4.prototype = {
 		var y = ( top + bottom ) / h;
 		var z = ( far + near ) / p;
 
-		te[0] = 2 / w;	te[4] = 0;	te[8] = 0;	te[12] = -x;
-		te[1] = 0;	te[5] = 2 / h;	te[9] = 0;	te[13] = -y;
-		te[2] = 0;	te[6] = 0;	te[10] = -2/p;	te[14] = -z;
-		te[3] = 0;	te[7] = 0;	te[11] = 0;	te[15] = 1;
+		te[ 0 ] = 2 / w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
+		te[ 1 ] = 0;	te[ 5 ] = 2 / h;	te[ 9 ] = 0;	te[ 13 ] = - y;
+		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 2 / p;	te[ 14 ] = - z;
+		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
 
 		return this;
 
@@ -5297,16 +5220,18 @@ THREE.Matrix4.prototype = {
 
 		return new THREE.Matrix4(
 
-			te[0], te[4], te[8], te[12],
-			te[1], te[5], te[9], te[13],
-			te[2], te[6], te[10], te[14],
-			te[3], te[7], te[11], te[15]
+			te[ 0 ], te[ 4 ], te[ 8 ], te[ 12 ],
+			te[ 1 ], te[ 5 ], te[ 9 ], te[ 13 ],
+			te[ 2 ], te[ 6 ], te[ 10 ], te[ 14 ],
+			te[ 3 ], te[ 7 ], te[ 11 ], te[ 15 ]
 
 		);
 
 	}
 
 };
+
+// File:src/math/Ray.js
 
 /**
  * @author bhouston / http://exocortex.com
@@ -5403,7 +5328,7 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	distanceSqToSegment: function( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+	distanceSqToSegment: function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
 		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistRay3Segment3.cpp
 		// It returns the min distance between the ray and the segment
@@ -5450,7 +5375,7 @@ THREE.Ray.prototype = {
 						// region 1
 
 						s1 = segExtent;
-						s0 = Math.max( 0, - ( a01 * s1 + b0) );
+						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
 						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 					}
@@ -5460,14 +5385,14 @@ THREE.Ray.prototype = {
 					// region 5
 
 					s1 = - segExtent;
-					s0 = Math.max( 0, - ( a01 * s1 + b0) );
+					s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
 					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 				}
 
 			} else {
 
-				if ( s1 <= - extDet) {
+				if ( s1 <= - extDet ) {
 
 					// region 4
 
@@ -5527,6 +5452,47 @@ THREE.Ray.prototype = {
 
 	},
 
+	intersectSphere: function () {
+
+		// from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
+
+		var v1 = new THREE.Vector3();
+
+		return function ( sphere, optionalTarget ) {
+
+			v1.subVectors( sphere.center, this.origin );
+
+			var tca = v1.dot( this.direction );
+
+			var d2 = v1.dot( v1 ) - tca * tca;
+
+			var radius2 = sphere.radius * sphere.radius;
+
+			if ( d2 > radius2 ) return null;
+
+			var thc = Math.sqrt( radius2 - d2 );
+
+			// t0 = first intersect point - entrance on front of sphere
+			var t0 = tca - thc;
+
+			// t1 = second intersect point - exit point on back of sphere
+			var t1 = tca + thc;
+
+			// test to see if both t0 and t1 are behind the ray - if so, return null
+			if ( t0 < 0 && t1 < 0 ) return null;
+
+			// test to see if t0 is behind the ray:
+			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
+			// in order to always return an intersect point that is in front of the ray.
+			if ( t0 < 0 ) return this.at( t1, optionalTarget );
+
+			// else t0 is in front of the ray, so return the first collision point scaled by t0 
+			return this.at( t0, optionalTarget );
+
+		}
+
+	}(),
+
 	isIntersectionPlane: function ( plane ) {
 
 		// check if the ray lies on the plane first
@@ -5543,7 +5509,7 @@ THREE.Ray.prototype = {
 
 		if ( denominator * distToPoint < 0 ) {
 
-			return true
+			return true;
 
 		}
 
@@ -5559,7 +5525,7 @@ THREE.Ray.prototype = {
 		if ( denominator == 0 ) {
 
 			// line is coplanar, return origin
-			if( plane.distanceToPoint( this.origin ) == 0 ) {
+			if ( plane.distanceToPoint( this.origin ) == 0 ) {
 
 				return 0;
 
@@ -5593,14 +5559,14 @@ THREE.Ray.prototype = {
 	},
 
 	isIntersectionBox: function () {
-		
+
 		var v = new THREE.Vector3();
 
 		return function ( box ) {
 
 			return this.intersectBox( box, v ) !== null;
 
-		}
+		};
 
 	}(),
 
@@ -5610,59 +5576,59 @@ THREE.Ray.prototype = {
 
 		var tmin,tmax,tymin,tymax,tzmin,tzmax;
 
-		var invdirx = 1/this.direction.x,
-			invdiry = 1/this.direction.y,
-			invdirz = 1/this.direction.z;
+		var invdirx = 1 / this.direction.x,
+			invdiry = 1 / this.direction.y,
+			invdirz = 1 / this.direction.z;
 
 		var origin = this.origin;
 
-		if (invdirx >= 0) {
-				
-			tmin = (box.min.x - origin.x) * invdirx;
-			tmax = (box.max.x - origin.x) * invdirx;
+		if ( invdirx >= 0 ) {
 
-		} else { 
-
-			tmin = (box.max.x - origin.x) * invdirx;
-			tmax = (box.min.x - origin.x) * invdirx;
-		}			
-
-		if (invdiry >= 0) {
-		
-			tymin = (box.min.y - origin.y) * invdiry;
-			tymax = (box.max.y - origin.y) * invdiry;
+			tmin = ( box.min.x - origin.x ) * invdirx;
+			tmax = ( box.max.x - origin.x ) * invdirx;
 
 		} else {
 
-			tymin = (box.max.y - origin.y) * invdiry;
-			tymax = (box.min.y - origin.y) * invdiry;
+			tmin = ( box.max.x - origin.x ) * invdirx;
+			tmax = ( box.min.x - origin.x ) * invdirx;
 		}
 
-		if ((tmin > tymax) || (tymin > tmax)) return null;
+		if ( invdiry >= 0 ) {
+
+			tymin = ( box.min.y - origin.y ) * invdiry;
+			tymax = ( box.max.y - origin.y ) * invdiry;
+
+		} else {
+
+			tymin = ( box.max.y - origin.y ) * invdiry;
+			tymax = ( box.min.y - origin.y ) * invdiry;
+		}
+
+		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
 
 		// These lines also handle the case where tmin or tmax is NaN
 		// (result of 0 * Infinity). x !== x returns true if x is NaN
-		
-		if (tymin > tmin || tmin !== tmin ) tmin = tymin;
 
-		if (tymax < tmax || tmax !== tmax ) tmax = tymax;
+		if ( tymin > tmin || tmin !== tmin ) tmin = tymin;
 
-		if (invdirz >= 0) {
-		
-			tzmin = (box.min.z - origin.z) * invdirz;
-			tzmax = (box.max.z - origin.z) * invdirz;
+		if ( tymax < tmax || tmax !== tmax ) tmax = tymax;
+
+		if ( invdirz >= 0 ) {
+
+			tzmin = ( box.min.z - origin.z ) * invdirz;
+			tzmax = ( box.max.z - origin.z ) * invdirz;
 
 		} else {
 
-			tzmin = (box.max.z - origin.z) * invdirz;
-			tzmax = (box.min.z - origin.z) * invdirz;
+			tzmin = ( box.max.z - origin.z ) * invdirz;
+			tzmax = ( box.min.z - origin.z ) * invdirz;
 		}
 
-		if ((tmin > tzmax) || (tzmin > tmax)) return null;
+		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
 
-		if (tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
 
-		if (tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
 
 		//return point closest to the ray (positive side)
 
@@ -5672,7 +5638,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectTriangle: function() {
+	intersectTriangle: function () {
 
 		// Compute the offset origin, edges, and normal.
 		var diff = new THREE.Vector3();
@@ -5750,9 +5716,9 @@ THREE.Ray.prototype = {
 
 			// Ray intersects triangle.
 			return this.at( QdN / DdN, optionalTarget );
-	
-		}
-	
+
+		};
+
 	}(),
 
 	applyMatrix4: function ( matrix4 ) {
@@ -5779,408 +5745,7 @@ THREE.Ray.prototype = {
 
 };
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author bhouston / http://exocortex.com
- */
-
-THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
-
-	this.planes = [
-
-		( p0 !== undefined ) ? p0 : new THREE.Plane(),
-		( p1 !== undefined ) ? p1 : new THREE.Plane(),
-		( p2 !== undefined ) ? p2 : new THREE.Plane(),
-		( p3 !== undefined ) ? p3 : new THREE.Plane(),
-		( p4 !== undefined ) ? p4 : new THREE.Plane(),
-		( p5 !== undefined ) ? p5 : new THREE.Plane()
-
-	];
-
-};
-
-THREE.Frustum.prototype = {
-
-	constructor: THREE.Frustum,
-
-	set: function ( p0, p1, p2, p3, p4, p5 ) {
-
-		var planes = this.planes;
-
-		planes[0].copy( p0 );
-		planes[1].copy( p1 );
-		planes[2].copy( p2 );
-		planes[3].copy( p3 );
-		planes[4].copy( p4 );
-		planes[5].copy( p5 );
-
-		return this;
-
-	},
-
-	copy: function ( frustum ) {
-
-		var planes = this.planes;
-
-		for( var i = 0; i < 6; i ++ ) {
-
-			planes[i].copy( frustum.planes[i] );
-
-		}
-
-		return this;
-
-	},
-
-	setFromMatrix: function ( m ) {
-
-		var planes = this.planes;
-		var me = m.elements;
-		var me0 = me[0], me1 = me[1], me2 = me[2], me3 = me[3];
-		var me4 = me[4], me5 = me[5], me6 = me[6], me7 = me[7];
-		var me8 = me[8], me9 = me[9], me10 = me[10], me11 = me[11];
-		var me12 = me[12], me13 = me[13], me14 = me[14], me15 = me[15];
-
-		planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
-		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
-		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
-		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
-		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
-		planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
-
-		return this;
-
-	},
-
-	intersectsObject: function () {
-
-		var sphere = new THREE.Sphere();
-
-		return function ( object ) {
-
-			var geometry = object.geometry;
-
-			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
-			sphere.copy( geometry.boundingSphere );
-			sphere.applyMatrix4( object.matrixWorld );
-
-			return this.intersectsSphere( sphere );
-
-		};
-
-	}(),
-
-	intersectsSphere: function ( sphere ) {
-
-		var planes = this.planes;
-		var center = sphere.center;
-		var negRadius = -sphere.radius;
-
-		for ( var i = 0; i < 6; i ++ ) {
-
-			var distance = planes[ i ].distanceToPoint( center );
-
-			if ( distance < negRadius ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
-
-	},
-
-	intersectsBox : function() {
-
-		var p1 = new THREE.Vector3(),
-			p2 = new THREE.Vector3();
-
-		return function( box ) {
-
-			var planes = this.planes;
-			
-			for ( var i = 0; i < 6 ; i ++ ) {
-			
-				var plane = planes[i];
-				
-				p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
-				p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
-				p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
-				p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-
-				var d1 = plane.distanceToPoint( p1 );
-				var d2 = plane.distanceToPoint( p2 );
-				
-				// if both outside plane, no intersection
-
-				if ( d1 < 0 && d2 < 0 ) {
-					
-					return false;
-		
-				}
-			}
-
-			return true;
-		};
-
-	}(),
-
-
-	containsPoint: function ( point ) {
-
-		var planes = this.planes;
-
-		for ( var i = 0; i < 6; i ++ ) {
-
-			if ( planes[ i ].distanceToPoint( point ) < 0 ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
-
-	},
-
-	clone: function () {
-
-		return new THREE.Frustum().copy( this );
-
-	}
-
-};
-
-/**
- * @author bhouston / http://exocortex.com
- */
-
-THREE.Plane = function ( normal, constant ) {
-
-	this.normal = ( normal !== undefined ) ? normal : new THREE.Vector3( 1, 0, 0 );
-	this.constant = ( constant !== undefined ) ? constant : 0;
-
-};
-
-THREE.Plane.prototype = {
-
-	constructor: THREE.Plane,
-
-	set: function ( normal, constant ) {
-
-		this.normal.copy( normal );
-		this.constant = constant;
-
-		return this;
-
-	},
-
-	setComponents: function ( x, y, z, w ) {
-
-		this.normal.set( x, y, z );
-		this.constant = w;
-
-		return this;
-
-	},
-
-	setFromNormalAndCoplanarPoint: function ( normal, point ) {
-
-		this.normal.copy( normal );
-		this.constant = - point.dot( this.normal );	// must be this.normal, not normal, as this.normal is normalized
-
-		return this;
-
-	},
-
-	setFromCoplanarPoints: function() {
-
-		var v1 = new THREE.Vector3();
-		var v2 = new THREE.Vector3();
-
-		return function ( a, b, c ) {
-
-			var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
-
-			// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
-
-			this.setFromNormalAndCoplanarPoint( normal, a );
-
-			return this;
-
-		};
-
-	}(),
-
-
-	copy: function ( plane ) {
-
-		this.normal.copy( plane.normal );
-		this.constant = plane.constant;
-
-		return this;
-
-	},
-
-	normalize: function () {
-
-		// Note: will lead to a divide by zero if the plane is invalid.
-
-		var inverseNormalLength = 1.0 / this.normal.length();
-		this.normal.multiplyScalar( inverseNormalLength );
-		this.constant *= inverseNormalLength;
-
-		return this;
-
-	},
-
-	negate: function () {
-
-		this.constant *= -1;
-		this.normal.negate();
-
-		return this;
-
-	},
-
-	distanceToPoint: function ( point ) {
-
-		return this.normal.dot( point ) + this.constant;
-
-	},
-
-	distanceToSphere: function ( sphere ) {
-
-		return this.distanceToPoint( sphere.center ) - sphere.radius;
-
-	},
-
-	projectPoint: function ( point, optionalTarget ) {
-
-		return this.orthoPoint( point, optionalTarget ).sub( point ).negate();
-
-	},
-
-	orthoPoint: function ( point, optionalTarget ) {
-
-		var perpendicularMagnitude = this.distanceToPoint( point );
-
-		var result = optionalTarget || new THREE.Vector3();
-		return result.copy( this.normal ).multiplyScalar( perpendicularMagnitude );
-
-	},
-
-	isIntersectionLine: function ( line ) {
-
-		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
-
-		var startSign = this.distanceToPoint( line.start );
-		var endSign = this.distanceToPoint( line.end );
-
-		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
-
-	},
-
-	intersectLine: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function ( line, optionalTarget ) {
-
-			var result = optionalTarget || new THREE.Vector3();
-
-			var direction = line.delta( v1 );
-
-			var denominator = this.normal.dot( direction );
-
-			if ( denominator == 0 ) {
-
-				// line is coplanar, return origin
-				if( this.distanceToPoint( line.start ) == 0 ) {
-
-					return result.copy( line.start );
-
-				}
-
-				// Unsure if this is the correct method to handle this case.
-				return undefined;
-
-			}
-
-			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
-
-			if( t < 0 || t > 1 ) {
-
-				return undefined;
-
-			}
-
-			return result.copy( direction ).multiplyScalar( t ).add( line.start );
-
-		};
-
-	}(),
-
-
-	coplanarPoint: function ( optionalTarget ) {
-
-		var result = optionalTarget || new THREE.Vector3();
-		return result.copy( this.normal ).multiplyScalar( - this.constant );
-
-	},
-
-	applyMatrix4: function() {
-
-		var v1 = new THREE.Vector3();
-		var v2 = new THREE.Vector3();
-		var m1 = new THREE.Matrix3();
-
-		return function ( matrix, optionalNormalMatrix ) {
-
-			// compute new normal based on theory here:
-			// http://www.songho.ca/opengl/gl_normaltransform.html
-			var normalMatrix = optionalNormalMatrix || m1.getNormalMatrix( matrix );
-			var newNormal = v1.copy( this.normal ).applyMatrix3( normalMatrix );
-			
-			var newCoplanarPoint = this.coplanarPoint( v2 );
-			newCoplanarPoint.applyMatrix4( matrix );
-
-			this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
-
-			return this;
-
-		};
-
-	}(),
-
-	translate: function ( offset ) {
-
-		this.constant = this.constant - offset.dot( this.normal );
-
-		return this;
-
-	},
-
-	equals: function ( plane ) {
-
-		return plane.normal.equals( this.normal ) && ( plane.constant == this.constant );
-
-	},
-
-	clone: function () {
-
-		return new THREE.Plane().copy( this );
-
-	}
-
-};
+// File:src/math/Sphere.js
 
 /**
  * @author bhouston / http://exocortex.com
@@ -6205,7 +5770,6 @@ THREE.Sphere.prototype = {
 
 		return this;
 	},
-
 
 	setFromPoints: function () {
 
@@ -6235,8 +5799,8 @@ THREE.Sphere.prototype = {
 
 			this.radius = Math.sqrt( maxRadiusSq );
 
-			return this;			
- 		
+			return this;
+
  		};
 
 	}(),
@@ -6336,6 +5900,415 @@ THREE.Sphere.prototype = {
 
 };
 
+// File:src/math/Frustum.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
+
+	this.planes = [
+
+		( p0 !== undefined ) ? p0 : new THREE.Plane(),
+		( p1 !== undefined ) ? p1 : new THREE.Plane(),
+		( p2 !== undefined ) ? p2 : new THREE.Plane(),
+		( p3 !== undefined ) ? p3 : new THREE.Plane(),
+		( p4 !== undefined ) ? p4 : new THREE.Plane(),
+		( p5 !== undefined ) ? p5 : new THREE.Plane()
+
+	];
+
+};
+
+THREE.Frustum.prototype = {
+
+	constructor: THREE.Frustum,
+
+	set: function ( p0, p1, p2, p3, p4, p5 ) {
+
+		var planes = this.planes;
+
+		planes[ 0 ].copy( p0 );
+		planes[ 1 ].copy( p1 );
+		planes[ 2 ].copy( p2 );
+		planes[ 3 ].copy( p3 );
+		planes[ 4 ].copy( p4 );
+		planes[ 5 ].copy( p5 );
+
+		return this;
+
+	},
+
+	copy: function ( frustum ) {
+
+		var planes = this.planes;
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			planes[ i ].copy( frustum.planes[ i ] );
+
+		}
+
+		return this;
+
+	},
+
+	setFromMatrix: function ( m ) {
+
+		var planes = this.planes;
+		var me = m.elements;
+		var me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
+		var me4 = me[ 4 ], me5 = me[ 5 ], me6 = me[ 6 ], me7 = me[ 7 ];
+		var me8 = me[ 8 ], me9 = me[ 9 ], me10 = me[ 10 ], me11 = me[ 11 ];
+		var me12 = me[ 12 ], me13 = me[ 13 ], me14 = me[ 14 ], me15 = me[ 15 ];
+
+		planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
+		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
+		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
+		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
+		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
+		planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+
+		return this;
+
+	},
+
+	intersectsObject: function () {
+
+		var sphere = new THREE.Sphere();
+
+		return function ( object ) {
+
+			var geometry = object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
+
+			return this.intersectsSphere( sphere );
+
+		};
+
+	}(),
+
+	intersectsSphere: function ( sphere ) {
+
+		var planes = this.planes;
+		var center = sphere.center;
+		var negRadius = - sphere.radius;
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			var distance = planes[ i ].distanceToPoint( center );
+
+			if ( distance < negRadius ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	},
+
+	intersectsBox: function () {
+
+		var p1 = new THREE.Vector3(),
+			p2 = new THREE.Vector3();
+
+		return function ( box ) {
+
+			var planes = this.planes;
+
+			for ( var i = 0; i < 6 ; i ++ ) {
+
+				var plane = planes[ i ];
+
+				p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+				p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+				p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+				p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+				p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+				p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+
+				var d1 = plane.distanceToPoint( p1 );
+				var d2 = plane.distanceToPoint( p2 );
+
+				// if both outside plane, no intersection
+
+				if ( d1 < 0 && d2 < 0 ) {
+
+					return false;
+
+				}
+			}
+
+			return true;
+		};
+
+	}(),
+
+
+	containsPoint: function ( point ) {
+
+		var planes = this.planes;
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			if ( planes[ i ].distanceToPoint( point ) < 0 ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	},
+
+	clone: function () {
+
+		return new THREE.Frustum().copy( this );
+
+	}
+
+};
+
+// File:src/math/Plane.js
+
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Plane = function ( normal, constant ) {
+
+	this.normal = ( normal !== undefined ) ? normal : new THREE.Vector3( 1, 0, 0 );
+	this.constant = ( constant !== undefined ) ? constant : 0;
+
+};
+
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
+
+	set: function ( normal, constant ) {
+
+		this.normal.copy( normal );
+		this.constant = constant;
+
+		return this;
+
+	},
+
+	setComponents: function ( x, y, z, w ) {
+
+		this.normal.set( x, y, z );
+		this.constant = w;
+
+		return this;
+
+	},
+
+	setFromNormalAndCoplanarPoint: function ( normal, point ) {
+
+		this.normal.copy( normal );
+		this.constant = - point.dot( this.normal );	// must be this.normal, not normal, as this.normal is normalized
+
+		return this;
+
+	},
+
+	setFromCoplanarPoints: function () {
+
+		var v1 = new THREE.Vector3();
+		var v2 = new THREE.Vector3();
+
+		return function ( a, b, c ) {
+
+			var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
+
+			// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+
+			this.setFromNormalAndCoplanarPoint( normal, a );
+
+			return this;
+
+		};
+
+	}(),
+
+
+	copy: function ( plane ) {
+
+		this.normal.copy( plane.normal );
+		this.constant = plane.constant;
+
+		return this;
+
+	},
+
+	normalize: function () {
+
+		// Note: will lead to a divide by zero if the plane is invalid.
+
+		var inverseNormalLength = 1.0 / this.normal.length();
+		this.normal.multiplyScalar( inverseNormalLength );
+		this.constant *= inverseNormalLength;
+
+		return this;
+
+	},
+
+	negate: function () {
+
+		this.constant *= - 1;
+		this.normal.negate();
+
+		return this;
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return this.normal.dot( point ) + this.constant;
+
+	},
+
+	distanceToSphere: function ( sphere ) {
+
+		return this.distanceToPoint( sphere.center ) - sphere.radius;
+
+	},
+
+	projectPoint: function ( point, optionalTarget ) {
+
+		return this.orthoPoint( point, optionalTarget ).sub( point ).negate();
+
+	},
+
+	orthoPoint: function ( point, optionalTarget ) {
+
+		var perpendicularMagnitude = this.distanceToPoint( point );
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( perpendicularMagnitude );
+
+	},
+
+	isIntersectionLine: function ( line ) {
+
+		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
+		var startSign = this.distanceToPoint( line.start );
+		var endSign = this.distanceToPoint( line.end );
+
+		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
+	},
+
+	intersectLine: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( line, optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Vector3();
+
+			var direction = line.delta( v1 );
+
+			var denominator = this.normal.dot( direction );
+
+			if ( denominator == 0 ) {
+
+				// line is coplanar, return origin
+				if ( this.distanceToPoint( line.start ) == 0 ) {
+
+					return result.copy( line.start );
+
+				}
+
+				// Unsure if this is the correct method to handle this case.
+				return undefined;
+
+			}
+
+			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+
+			if ( t < 0 || t > 1 ) {
+
+				return undefined;
+
+			}
+
+			return result.copy( direction ).multiplyScalar( t ).add( line.start );
+
+		};
+
+	}(),
+
+
+	coplanarPoint: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( - this.constant );
+
+	},
+
+	applyMatrix4: function () {
+
+		var v1 = new THREE.Vector3();
+		var v2 = new THREE.Vector3();
+		var m1 = new THREE.Matrix3();
+
+		return function ( matrix, optionalNormalMatrix ) {
+
+			// compute new normal based on theory here:
+			// http://www.songho.ca/opengl/gl_normaltransform.html
+			var normalMatrix = optionalNormalMatrix || m1.getNormalMatrix( matrix );
+			var newNormal = v1.copy( this.normal ).applyMatrix3( normalMatrix );
+
+			var newCoplanarPoint = this.coplanarPoint( v2 );
+			newCoplanarPoint.applyMatrix4( matrix );
+
+			this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
+
+			return this;
+
+		};
+
+	}(),
+
+	translate: function ( offset ) {
+
+		this.constant = this.constant - offset.dot( this.normal );
+
+		return this;
+
+	},
+
+	equals: function ( plane ) {
+
+		return plane.normal.equals( this.normal ) && ( plane.constant == this.constant );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Plane().copy( this );
+
+	}
+
+};
+
+// File:src/math/Math.js
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -6346,9 +6319,9 @@ THREE.Math = {
 	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
-		
-		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-		var uuid = new Array(36);
+
+		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split( '' );
+		var uuid = new Array( 36 );
 		var rnd = 0, r;
 
 		return function () {
@@ -6356,24 +6329,24 @@ THREE.Math = {
 			for ( var i = 0; i < 36; i ++ ) {
 
 				if ( i == 8 || i == 13 || i == 18 || i == 23 ) {
-			
+
 					uuid[ i ] = '-';
-			
+
 				} else if ( i == 14 ) {
-			
+
 					uuid[ i ] = '4';
-			
+
 				} else {
-			
-					if (rnd <= 0x02) rnd = 0x2000000 + (Math.random()*0x1000000)|0;
+
+					if ( rnd <= 0x02 ) rnd = 0x2000000 + ( Math.random() * 0x1000000 ) | 0;
 					r = rnd & 0xf;
 					rnd = rnd >> 4;
-					uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+					uuid[ i ] = chars[ ( i == 19 ) ? ( r & 0x3 ) | 0x8 : r ];
 
 				}
 			}
-			
-			return uuid.join('');
+
+			return uuid.join( '' );
 
 		};
 
@@ -6410,9 +6383,9 @@ THREE.Math = {
 		if ( x <= min ) return 0;
 		if ( x >= max ) return 1;
 
-		x = ( x - min )/( max - min );
+		x = ( x - min ) / ( max - min );
 
-		return x*x*(3 - 2*x);
+		return x * x * ( 3 - 2 * x );
 
 	},
 
@@ -6421,9 +6394,9 @@ THREE.Math = {
 		if ( x <= min ) return 0;
 		if ( x >= max ) return 1;
 
-		x = ( x - min )/( max - min );
+		x = ( x - min ) / ( max - min );
 
-		return x*x*x*(x*(x*6 - 15) + 10);
+		return x * x * x * ( x * ( x * 6 - 15 ) + 10 );
 
 	},
 
@@ -6466,7 +6439,7 @@ THREE.Math = {
 
 	},
 
-	degToRad: function() {
+	degToRad: function () {
 
 		var degreeToRadiansFactor = Math.PI / 180;
 
@@ -6478,7 +6451,7 @@ THREE.Math = {
 
 	}(),
 
-	radToDeg: function() {
+	radToDeg: function () {
 
 		var radianToDegreesFactor = 180 / Math.PI;
 
@@ -6498,6 +6471,8 @@ THREE.Math = {
 
 };
 
+// File:src/math/Spline.js
+
 /**
  * Spline from Tween.js, slightly optimized (and trashed)
  * http://sole.github.com/tween.js/examples/05_spline.html
@@ -6514,11 +6489,11 @@ THREE.Spline = function ( points ) {
 	point, intPoint, weight, w2, w3,
 	pa, pb, pc, pd;
 
-	this.initFromArray = function( a ) {
+	this.initFromArray = function ( a ) {
 
 		this.points = [];
 
-		for ( var i = 0; i < a.length; i++ ) {
+		for ( var i = 0; i < a.length; i ++ ) {
 
 			this.points[ i ] = { x: a[ i ][ 0 ], y: a[ i ][ 1 ], z: a[ i ][ 2 ] };
 
@@ -6584,7 +6559,7 @@ THREE.Spline = function ( points ) {
 
 		chunkLengths[ 0 ] = 0;
 
-		if ( !nSubDivisions ) nSubDivisions = 100;
+		if ( ! nSubDivisions ) nSubDivisions = 100;
 
 		nSamples = this.points.length * nSubDivisions;
 
@@ -6633,7 +6608,7 @@ THREE.Spline = function ( points ) {
 
 		newpoints.push( tmpVec.copy( this.points[ 0 ] ).clone() );
 
-		for ( i = 1; i < this.points.length; i++ ) {
+		for ( i = 1; i < this.points.length; i ++ ) {
 
 			//tmpVec.copy( this.points[ i - 1 ] );
 			//linearDistance = tmpVec.distanceTo( this.points[ i ] );
@@ -6645,7 +6620,7 @@ THREE.Spline = function ( points ) {
 			indexCurrent = ( i - 1 ) / ( this.points.length - 1 );
 			indexNext = i / ( this.points.length - 1 );
 
-			for ( j = 1; j < sampling - 1; j++ ) {
+			for ( j = 1; j < sampling - 1; j ++ ) {
 
 				index = indexCurrent + j * ( 1 / sampling ) * ( indexNext - indexCurrent );
 
@@ -6675,6 +6650,8 @@ THREE.Spline = function ( points ) {
 
 };
 
+// File:src/math/Triangle.js
+
 /**
  * @author bhouston / http://exocortex.com
  * @author mrdoob / http://mrdoob.com/
@@ -6688,7 +6665,7 @@ THREE.Triangle = function ( a, b, c ) {
 
 };
 
-THREE.Triangle.normal = function() {
+THREE.Triangle.normal = function () {
 
 	var v0 = new THREE.Vector3();
 
@@ -6701,7 +6678,7 @@ THREE.Triangle.normal = function() {
 		result.cross( v0 );
 
 		var resultLengthSq = result.lengthSq();
-		if( resultLengthSq > 0 ) {
+		if ( resultLengthSq > 0 ) {
 
 			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
 
@@ -6715,7 +6692,7 @@ THREE.Triangle.normal = function() {
 
 // static/instance method to calculate barycoordinates
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-THREE.Triangle.barycoordFromPoint = function() {
+THREE.Triangle.barycoordFromPoint = function () {
 
 	var v0 = new THREE.Vector3();
 	var v1 = new THREE.Vector3();
@@ -6738,10 +6715,10 @@ THREE.Triangle.barycoordFromPoint = function() {
 		var result = optionalTarget || new THREE.Vector3();
 
 		// colinear or singular triangle
-		if( denom == 0 ) {
+		if ( denom == 0 ) {
 			// arbitrary location outside of triangle?
 			// not sure if this is the best idea, maybe should be returning undefined
-			return result.set( -2, -1, -1 );
+			return result.set( - 2, - 1, - 1 );
 		}
 
 		var invDenom = 1 / denom;
@@ -6755,7 +6732,7 @@ THREE.Triangle.barycoordFromPoint = function() {
 
 }();
 
-THREE.Triangle.containsPoint = function() {
+THREE.Triangle.containsPoint = function () {
 
 	var v1 = new THREE.Vector3();
 
@@ -6785,9 +6762,9 @@ THREE.Triangle.prototype = {
 
 	setFromPointsAndIndices: function ( points, i0, i1, i2 ) {
 
-		this.a.copy( points[i0] );
-		this.b.copy( points[i1] );
-		this.c.copy( points[i2] );
+		this.a.copy( points[ i0 ] );
+		this.b.copy( points[ i1 ] );
+		this.c.copy( points[ i2 ] );
 
 		return this;
 
@@ -6803,7 +6780,7 @@ THREE.Triangle.prototype = {
 
 	},
 
-	area: function() {
+	area: function () {
 
 		var v0 = new THREE.Vector3();
 		var v1 = new THREE.Vector3();

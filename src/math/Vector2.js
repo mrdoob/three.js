@@ -47,7 +47,7 @@ THREE.Vector2.prototype = {
 
 			case 0: this.x = value; break;
 			case 1: this.y = value; break;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -59,7 +59,7 @@ THREE.Vector2.prototype = {
 
 			case 0: return this.x;
 			case 1: return this.y;
-			default: throw new Error( "index is out of range: " + index );
+			default: throw new Error( 'index is out of range: ' + index );
 
 		}
 
@@ -78,7 +78,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector2\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -112,7 +112,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'DEPRECATED: Vector2\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -132,7 +132,7 @@ THREE.Vector2.prototype = {
 		return this;
 
 	},
-	
+
 	multiply: function ( v ) {
 
 		this.x *= v.x;
@@ -262,7 +262,7 @@ THREE.Vector2.prototype = {
 			return this.clamp( min, max );
 
 		};
-		
+
 	} )(),
 
 	floor: function () {
@@ -303,7 +303,10 @@ THREE.Vector2.prototype = {
 
 	negate: function () {
 
-		return this.multiplyScalar( - 1 );
+		this.x = - this.x;
+		this.y = - this.y;
+
+		return this;
 
 	},
 
@@ -374,7 +377,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	equals: function( v ) {
+	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
 

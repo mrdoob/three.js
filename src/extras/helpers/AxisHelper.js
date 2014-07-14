@@ -7,19 +7,21 @@ THREE.AxisHelper = function ( size ) {
 
 	size = size || 1;
 
-	var geometry = new THREE.Geometry();
+	var vertices = new Float32Array( [
+		0, 0, 0,  size, 0, 0,
+		0, 0, 0,  0, size, 0,
+		0, 0, 0,  0, 0, size
+	] );
 
-	geometry.vertices.push(
-		new THREE.Vector3(), new THREE.Vector3( size, 0, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, size, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, 0, size )
-	);
+	var colors = new Float32Array( [
+		1, 0, 0,  1, 0.6, 0,
+		0, 1, 0,  0.6, 1, 0,
+		0, 0, 1,  0, 0.6, 1
+	] );
 
-	geometry.colors.push(
-		new THREE.Color( 0xff0000 ), new THREE.Color( 0xffaa00 ),
-		new THREE.Color( 0x00ff00 ), new THREE.Color( 0xaaff00 ),
-		new THREE.Color( 0x0000ff ), new THREE.Color( 0x00aaff )
-	);
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
