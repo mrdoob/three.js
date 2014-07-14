@@ -1,3 +1,8 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author Dennis Wilson / http://www.abakia.de/
+ */
+
 Menubar.File = function ( editor ) {
 
 	// helpers

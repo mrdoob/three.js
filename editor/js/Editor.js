@@ -37,61 +37,149 @@ var Editor = function () {
 		windowResize: new SIGNALS.Signal()
 
 	};
-	
+
+	this.data = {
+		scene: new THREE.Scene(),
+		helpersScene: new THREE.Scene(),
+
+		geometries: {},
+		materials: {},
+		textures: {},
+		helpers: {},
+
+		selectedObject: null,
+		object: {},
+	};
+
+
 	this.config = new Config();
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.scene = new THREE.Scene();
-	this.sceneHelpers = new THREE.Scene();
+	// this.scene = new THREE.Scene();
+	// this.sceneHelpers = new THREE.Scene();
 
-	this.object = {};
-	this.geometries = {};
-	this.materials = {};
-	this.textures = {};
+	// this.object = {};
+	// this.geometries = {};
+	// this.materials = {};
+	// this.textures = {};
 
-	this.selected = null;
-	this.helpers = {};
+	// this.selected = null;
+	// this.helpers = {};
+
+	this.history = new Editor.ChangeHistory(this);
+
+	// this creates the root history transaction.
+	// this update is important when the last 
+	// scene element leaves the scene, in order
+	// to display the scene as 'empty'.
+    var emptySceneTransaction = (function (scope) {
+	    return function emptySceneTransaction() {
+	        scope.signals.sceneGraphChanged.dispatch();
+	        scope.select(null);
+	    };
+	})(this);
+    this.history.addAndApplyChange(emptySceneTransaction);
+
+	window.hist = this.history;
 
 };
 
 Editor.prototype = {
 
+	// getters and setters
+
 	setTheme: function ( value ) {
 
 		document.getElementById( 'theme' ).href = value;
-
 		this.signals.themeChanged.dispatch( value );
 
 	},
 
-	setScene: function ( scene ) {
-
-		this.scene.name = scene.name;
-		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
-
-		// avoid render per object
-
-		this.signals.sceneGraphChanged.active = false;
-
-		while ( scene.children.length > 0 ) {
-
-			this.addObject( scene.children[ 0 ] );
-
-		}
-
-		this.signals.sceneGraphChanged.active = true;
-		this.signals.sceneGraphChanged.dispatch();
-
+	getScene: function () {
+		return this.data.scene;
 	},
 
-	//
+	setScene: function ( scene, silent ) {
+
+		// this.scene.name = scene.name;
+		// this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
+
+		// // avoid render per object
+
+		// this.signals.sceneGraphChanged.active = false;
+
+		// while ( scene.children.length > 0 ) {
+
+		// 	this.addObject( scene.children[ 0 ] );
+
+		// }
+		
+		this.data.scene = scene;
+		window.sceneGraphChanged = this.signals.sceneGraphChanged;
+
+		if(silent === false) {
+			this.signals.sceneGraphChanged.active = true;
+			this.signals.sceneGraphChanged.dispatch();
+		}
+	},
+
+	setHelpersScene: function ( scene ) {
+		this.data.helpersScene = scene;
+	},
+
+	getHelpersScene: function () {
+		return this.data.helpersScene;
+	},
+
+	setGeometries: function ( geometries ) {
+		this.data.geometries = geometries;
+	},
+
+	getGeometries: function () {
+		return this.data.geometries;
+	},
+
+	setMaterials: function ( materials ) {
+		this.data.materials = materials;
+	},
+
+	getMaterials: function () {
+		return this.data.materials;
+	},
+
+	setTextures: function( textures ) {
+		this.data.textures = textures;
+	},
+
+	getTextures: function() {
+		return this.data.textures;
+	},
+
+	setSelectedObject: function( selected ) {
+		this.data.selected = selected;
+	},
+
+	getSelectedObject: function() {
+		return this.data.selected;
+	},
+
+	setHelpers: function ( helpers ) {
+		this.data.helpers = helpers;
+	},
+
+	getHelpers: function () {
+		return this.data.helpers;
+	},
+
+
+	// complex helpers
 
 	addObject: function ( object ) {
+		var scope       = this,
+			addedObject = object;
 
-		var scope = this;
-
-		object.traverse( function ( child ) {
+		addedObject.traverse( function ( child ) {
 
 			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
 			if ( child.material !== undefined ) scope.addMaterial( child.material );
@@ -100,11 +188,29 @@ Editor.prototype = {
 
 		} );
 
-		this.scene.add( object );
+		scope.getScene().add( addedObject );
 
-		this.signals.objectAdded.dispatch( object );
-		this.signals.sceneGraphChanged.dispatch();
+		// scope.signals.objectAdded.dispatch( addedObject );
+		scope.signals.sceneGraphChanged.dispatch();
+	},
 
+	addAndSelectObject: function( object ) {
+		var transaction;
+
+		// use scope isolation to make a 'frozen' transaction,
+		// that can be applied any time again, without
+		// the need to know detailed parameters
+
+		transaction = (function (scope, addedObject) {
+
+			return function addAndSelectObject() {
+				scope.addObject(addedObject);
+				scope.select(addedObject);
+			};
+
+		})(this, object);
+
+		this.history.addAndApplyChange(transaction);
 	},
 
 	setObjectName: function ( object, name ) {
@@ -137,7 +243,8 @@ Editor.prototype = {
 
 	addGeometry: function ( geometry ) {
 
-		this.geometries[ geometry.uuid ] = geometry;
+		var geometries = this.getGeometries();
+		geometries[ geometry.uuid ] = geometry;
 
 	},
 
@@ -150,7 +257,8 @@ Editor.prototype = {
 
 	addMaterial: function ( material ) {
 
-		this.materials[ material.uuid ] = material;
+		var materials = this.getMaterials();
+		materials[ material.uuid ] = material;
 
 	},
 
@@ -163,16 +271,21 @@ Editor.prototype = {
 
 	addTexture: function ( texture ) {
 
-		this.textures[ texture.uuid ] = texture;
+		var textures = this.getTextures();
+		textures[ texture.uuid ] = texture;
 
 	},
 
 	//
 
 	addHelper: function () {
+		var scope,
+			geometry,
+			material;
 
-		var geometry = new THREE.SphereGeometry( 20, 4, 2 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		scope    = this; 
+		geometry = new THREE.SphereGeometry( 20, 4, 2 );
+		material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
 		return function ( object ) {
 
@@ -215,10 +328,10 @@ Editor.prototype = {
 			picker.visible = false;
 			helper.add( picker );
 
-			this.sceneHelpers.add( helper );
-			this.helpers[ object.id ] = helper;
+			scope.sceneHelpers.add( helper );
+			scope.helpers[ object.id ] = helper;
 
-			this.signals.helperAdded.dispatch( helper );
+			scope.signals.helperAdded.dispatch( helper );
 
 		};
 
@@ -226,15 +339,18 @@ Editor.prototype = {
 
 	removeHelper: function ( object ) {
 
-		if ( this.helpers[ object.id ] !== undefined ) {
+		var helpers,
+			helper;
 
-			var helper = this.helpers[ object.id ];
+		helpers = this.getHelpers();
+
+		if ( helpers !== undefined) {
+			helper = helpers[ object.id ];
+
 			helper.parent.remove( helper );
-
-			delete this.helpers[ object.id ];
+			delete helpers[ object.id ];
 
 			this.signals.helperRemoved.dispatch( helper );
-
 		}
 
 	},
@@ -245,7 +361,7 @@ Editor.prototype = {
 
 		if ( parent === undefined ) {
 
-			parent = this.scene;
+			parent = this.getScene();
 
 		}
 
@@ -259,17 +375,17 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		this.selected = object;
+		this.setSelectedObject( object );
 
-		if ( object !== null ) {
+		// if ( object !== null ) {
 
-			this.config.setKey( 'selected', object.uuid );
+		// 	this.config.setKey( 'selected', object.uuid );
 
-		} else {
+		// } else {
 
-			this.config.setKey( 'selected', null );
+		// 	this.config.setKey( 'selected', null );
 
-		}
+		// }
 
 		this.signals.objectSelected.dispatch( object );
 
@@ -277,9 +393,13 @@ Editor.prototype = {
 
 	selectById: function ( id ) {
 
-		var scope = this;
+		var scope,
+			scene;
 
-		this.scene.traverse( function ( child ) {
+		scope = this;
+		scene = scope.getScene();
+
+		scene.traverse( function ( child ) {
 
 			if ( child.id === id ) {
 
@@ -293,9 +413,13 @@ Editor.prototype = {
 
 	selectByUuid: function ( uuid ) {
 
-		var scope = this;
+		var scope,
+			scene;
 
-		this.scene.traverse( function ( child ) {
+		scope = this;
+		scene = scope.getScene();
+
+		scene.traverse( function ( child ) {
 
 			if ( child.uuid === uuid ) {
 

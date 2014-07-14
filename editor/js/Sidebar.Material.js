@@ -49,7 +49,7 @@ Sidebar.Material = function ( editor ) {
 	var materialNameRow = new UI.Panel();
 	var materialName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.setMaterialName( editor.selected.material, materialName.getValue() );
+		editor.setMaterialName( editor.getSelectedObject().material, materialName.getValue() );
 
 	} );
 
@@ -326,7 +326,7 @@ Sidebar.Material = function ( editor ) {
 
 	function update() {
 
-		var object = editor.selected;
+		var object = editor.getSelectedObject();
 		var geometry = object.geometry;
 		var material = object.material;
 		var textureWarning = false;
@@ -613,7 +613,7 @@ Sidebar.Material = function ( editor ) {
 			'wireframe': materialWireframeRow
 		};
 
-		var material = editor.selected.material;
+		var material = editor.getSelectedObject().material;
 
 		for ( var property in properties ) {
 

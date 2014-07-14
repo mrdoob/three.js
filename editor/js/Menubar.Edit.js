@@ -1,18 +1,25 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author Dennis Wilson / http://www.abakia.de/
+ */
+
 Menubar.Edit = function ( editor ) {
 
 	// event handlers
 
-	// function onUndoOptionClick () {
+	function onUndoOptionClick () {
 
-	// 	console.log( 'UNDO not implemented yet' );
+		// console.log( 'UNDO not implemented yet' );
+		editor.history.undo();
 
-	// }
+	}
 
-	// function onRedoOptionClick () {
+	function onRedoOptionClick () {
 
-	// 	console.log( 'REDO not implemented yet' );
+		// console.log( 'REDO not implemented yet' );
+		editor.history.redo();
 
-	// }
+	}
 
 	function onCloneOptionClick () {
 
@@ -84,9 +91,9 @@ Menubar.Edit = function ( editor ) {
 	var createDivider = UI.MenubarHelper.createDivider;
 
 	var menuConfig = [
-		// createOption( 'Undo', onUndoOptionClick ),
-		// createOption( 'Redo', onRedoOptionClick ),
-		// createDivider(),
+		createOption( 'Undo', onUndoOptionClick ),
+		createOption( 'Redo', onRedoOptionClick ),
+		createDivider(),
 
 		createOption( 'Clone', onCloneOptionClick ),
 		createOption( 'Delete', onDeleteOptionClick ),

@@ -126,7 +126,7 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
-		var scene = editor.scene;
+		var scene = editor.getScene();
 		var sceneType = editor.getObjectType( scene );
 
 		var options = [];
@@ -134,7 +134,9 @@ Sidebar.Scene = function ( editor ) {
 		options.push( { value: scene.id, html: '<span class="type ' + sceneType + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {
-
+			// @TODO this gets called ways to often with empty objects. fix it!
+			// console.log((new Date()).getTime(), 'addObjects', objects);
+			
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				var object = objects[ i ];
@@ -165,9 +167,9 @@ Sidebar.Scene = function ( editor ) {
 
 		outliner.setOptions( options );
 
-		if ( editor.selected !== null ) {
+		if ( editor.getSelectedObject() !== null ) {
 
-			outliner.setValue( editor.selected.id );
+			outliner.setValue( editor.getSelectedObject().id );
 
 		}
 
