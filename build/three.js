@@ -18777,7 +18777,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	var opaqueObjects = [];
 	var transparentObjects = [];
-	var _sortObjects = true;
 
 	// public properties
 
@@ -22040,11 +22039,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
-		_sortObjects = this.sortObjects;
 		
-		projectObject(scene,scene,camera);
+		projectObject( scene, scene, camera );
 
-		if ( this.sortObjects ) {
+		if ( _this.sortObjects === true ) {
 
 			opaqueObjects.sort( painterSortStable );
 			transparentObjects.sort( reversePainterSortStable );
@@ -22153,7 +22151,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 		var webglObjects = scene.__webglObjects[ object.id ];
 		
-		if ( webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+		if ( webglObjects && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 			
 			updateObject( scene, object );
 			
@@ -22165,7 +22163,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				webglObject.render = true;
 
-				if ( _sortObjects === true ) {
+				if ( _this.sortObjects === true ) {
 
 					if ( object.renderDepth !== null ) {
 
@@ -22376,12 +22374,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material.transparent ) {
 
 				globject.material = material; 
-				transparentObjects.push(globject);
+				transparentObjects.push( globject );
 
 			} else {
 
 				globject.material = material; 
-				opaqueObjects.push(globject);
+				opaqueObjects.push( globject );
 
 			}
 
@@ -22392,12 +22390,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( material.transparent ) {
 
 					globject.material = material; 
-					transparentObjects.push(globject);
+					transparentObjects.push( globject );
 
 				} else {
 
-					globject.material = material; 
-					opaqueObjects.push(globject);
+					globject.material = material;
+					opaqueObjects.push( globject );
 
 				}
 
