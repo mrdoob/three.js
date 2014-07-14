@@ -385,6 +385,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	//START_VEROLD_MOD
+	this.getViewport = function () {
+		var viewport = {
+			x: _viewportX / this.devicePixelRatio,
+			y: _viewportY / this.devicePixelRatio,
+			width: _viewportWidth / this.devicePixelRatio,
+			height: _viewportHeight / this.devicePixelRatio,
+		}
+		return viewport;
+	};
+	//END_VEROLD_MOD
+
 	this.setScissor = function ( x, y, width, height ) {
 
 		_gl.scissor(
