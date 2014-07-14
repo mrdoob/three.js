@@ -183,6 +183,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 		this.setClearColor( hex, alpha );
 
 	};
+	
+	this.getClearColor = function () {
+
+		return _clearColor;
+
+	};
+
+	this.getClearAlpha = function () {
+
+		return _clearAlpha;
+
+	};
 
 	this.getMaxAnisotropy = function () {
 
