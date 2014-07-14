@@ -5,7 +5,8 @@ Sidebar.Geometry = function ( editor ) {
 	var container = new UI.CollapsiblePanel();
 	container.setDisplay( 'none' );
 
-	container.addStatic( new UI.Text().setValue( 'GEOMETRY' ) );
+	var geometryType = new UI.Text().setTextTransform( 'uppercase' );
+	container.addStatic( geometryType );
 	container.add( new UI.Break() );
 
 	// uuid
@@ -40,35 +41,13 @@ Sidebar.Geometry = function ( editor ) {
 
 	container.add( geometryNameRow );
 
-	// class
+	// geometry
 
-	var geometryTypeRow = new UI.Panel();
-	var geometryType = new UI.Text().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+	container.add( new Sidebar.Geometry.Geometry( signals ) );
 
-	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
-	geometryTypeRow.add( geometryType );
+	// buffergeometry
 
-	container.add( geometryTypeRow );
-
-	// vertices
-
-	var geometryVerticesRow = new UI.Panel();
-	var geometryVertices = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
-
-	geometryVerticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
-	geometryVerticesRow.add( geometryVertices );
-
-	container.add( geometryVerticesRow );
-
-	// faces
-
-	var geometryFacesRow = new UI.Panel();
-	var geometryFaces = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
-
-	geometryFacesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
-	geometryFacesRow.add( geometryFaces );
-
-	container.add( geometryFacesRow );
+	container.add( new Sidebar.Geometry.BufferGeometry( signals ) );
 
 	// parameters
 
@@ -89,8 +68,10 @@ Sidebar.Geometry = function ( editor ) {
 
 			geometryType.setValue( editor.getGeometryType( object.geometry ) );
 
-			updateFields( geometry );
+			geometryUUID.setValue( geometry.uuid );
+			geometryName.setValue( geometry.name );
 
+			//
 
 			if ( parameters !== undefined ) {
 
@@ -151,36 +132,6 @@ Sidebar.Geometry = function ( editor ) {
 
 	signals.objectSelected.add( build );
 	signals.objectChanged.add( build );
-
-	//
-
-	function updateFields( geometry ) {
-
-		geometryUUID.setValue( geometry.uuid );
-		geometryName.setValue( geometry.name );
-
-		if ( geometry instanceof THREE.Geometry ) {
-
-			geometryVertices.setValue( geometry.vertices.length );
-			geometryFaces.setValue( geometry.faces.length );
-
-		} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-			geometryVertices.setValue( geometry.attributes.position.array.length / 3 );
-
-			if ( geometry.attributes.index !== undefined ) {
-
-				geometryFaces.setValue( geometry.attributes.index.array.length / 3 );
-
-			} else {
-
-				geometryFaces.setValue( geometry.attributes.position.array.length / 9 );
-
-			}
-
-		}
-
-	}
 
 	return container;
 

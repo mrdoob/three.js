@@ -134,7 +134,7 @@ Sidebar.Material = function ( editor ) {
 	// uniforms
 
 	var materialUniformsRow = new UI.Panel();
-	var materialUniforms = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' );
+	var materialUniforms = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
 	materialUniforms.setValue( '' ).onChange( update );
 
 	materialUniformsRow.add( new UI.Text( 'Uniforms' ).setWidth( '90px' ) );
@@ -145,7 +145,7 @@ Sidebar.Material = function ( editor ) {
 	// vertex shader
 
 	var materialVertexShaderRow = new UI.Panel();
-	var materialVertexShader = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' );
+	var materialVertexShader = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
 	materialVertexShader.setValue( 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}' ).onChange( update );
 
 	materialVertexShaderRow.add( new UI.Text( 'Vertex Shader' ).setWidth( '90px' ) );
@@ -156,7 +156,7 @@ Sidebar.Material = function ( editor ) {
 	// fragment shader
 
 	var materialFragmentShaderRow = new UI.Panel();
-	var materialFragmentShader = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' );
+	var materialFragmentShader = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
 	materialFragmentShader.setValue( 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}' ).onChange( update );
 
 	materialFragmentShaderRow.add( new UI.Text( 'Fragment Shader' ).setWidth( '90px' ) );
