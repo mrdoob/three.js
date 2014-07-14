@@ -105,6 +105,12 @@ THREE.CameraHelper = function ( camera ) {
 
 THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
 
+THREE.CameraHelper.prototype.dispose = function () {
+	
+	this.geometry.dispose();
+	this.material.dispose();
+};
+
 THREE.CameraHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
