@@ -26,6 +26,8 @@ Sidebar.Geometry.Geometry = function ( signals ) {
 
 	var update = function ( object ) {
 
+		if ( object === null ) return;
+
 		var geometry = object.geometry;
 
 		if ( geometry instanceof THREE.Geometry ) { 
