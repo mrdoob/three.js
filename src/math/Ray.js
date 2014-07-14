@@ -317,6 +317,7 @@ THREE.Ray.prototype = {
 		if ( t === null ) {
 
 			return null;
+		
 		}
 
 		return this.at( t, optionalTarget );
@@ -335,7 +336,7 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	intersectBox: function ( box , optionalTarget ) {
+	intersectBox: function ( box, optionalTarget ) {
 
 		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
@@ -356,6 +357,7 @@ THREE.Ray.prototype = {
 
 			tmin = ( box.max.x - origin.x ) * invdirx;
 			tmax = ( box.min.x - origin.x ) * invdirx;
+		
 		}
 
 		if ( invdiry >= 0 ) {
@@ -367,6 +369,7 @@ THREE.Ray.prototype = {
 
 			tymin = ( box.max.y - origin.y ) * invdiry;
 			tymax = ( box.min.y - origin.y ) * invdiry;
+		
 		}
 
 		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
@@ -387,6 +390,7 @@ THREE.Ray.prototype = {
 
 			tzmin = ( box.max.z - origin.z ) * invdirz;
 			tzmax = ( box.min.z - origin.z ) * invdirz;
+		
 		}
 
 		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
@@ -494,6 +498,7 @@ THREE.Ray.prototype = {
 		this.direction.normalize();
 
 		return this;
+	
 	},
 
 	equals: function ( ray ) {

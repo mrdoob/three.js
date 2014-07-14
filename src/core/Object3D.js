@@ -25,11 +25,15 @@ THREE.Object3D = function () {
 	var scale = new THREE.Vector3( 1, 1, 1 );
 
 	rotation.onChange( function () {
+
 		quaternion.setFromEuler( rotation, false );
+	
 	} );
 
 	quaternion.onChange( function () {
+
 		rotation.setFromQuaternion( quaternion, undefined, false );
+	
 	} );
 
 	Object.defineProperties( this, {
@@ -299,7 +303,7 @@ THREE.Object3D.prototype = {
 
 		if ( arguments.length > 1 ) {
 
-			for ( var i = 0; i < arguments.length; i++ ) {
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
 				this.add( arguments[ i ] );
 
@@ -355,7 +359,7 @@ THREE.Object3D.prototype = {
 
 		if ( arguments.length > 1 ) {
 
-			for ( var i = 0; i < arguments.length; i++ ) {
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
 				this.remove( arguments[ i ] );
 

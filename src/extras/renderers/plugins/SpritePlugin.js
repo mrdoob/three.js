@@ -265,21 +265,21 @@ THREE.SpritePlugin = function () {
 
 			'void main() {',
 
-				'vUV = uvOffset + uv * uvScale;',
+			'vUV = uvOffset + uv * uvScale;',
 
-				'vec2 alignedPosition = position * scale;',
+			'vec2 alignedPosition = position * scale;',
 
-				'vec2 rotatedPosition;',
-				'rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
-				'rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;',
+			'vec2 rotatedPosition;',
+			'rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;',
+			'rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;',
 
-				'vec4 finalPosition;',
+			'vec4 finalPosition;',
 
-				'finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
-				'finalPosition.xy += rotatedPosition;',
-				'finalPosition = projectionMatrix * finalPosition;',
+			'finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );',
+			'finalPosition.xy += rotatedPosition;',
+			'finalPosition = projectionMatrix * finalPosition;',
 
-				'gl_Position = finalPosition;',
+			'gl_Position = finalPosition;',
 
 			'}'
 
@@ -304,32 +304,32 @@ THREE.SpritePlugin = function () {
 
 			'void main() {',
 
-				'vec4 texture = texture2D( map, vUV );',
+			'vec4 texture = texture2D( map, vUV );',
 
-				'if ( texture.a < alphaTest ) discard;',
+			'if ( texture.a < alphaTest ) discard;',
 
-				'gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
+			'gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );',
 
-				'if ( fogType > 0 ) {',
+			'if ( fogType > 0 ) {',
 
-					'float depth = gl_FragCoord.z / gl_FragCoord.w;',
-					'float fogFactor = 0.0;',
+			'float depth = gl_FragCoord.z / gl_FragCoord.w;',
+			'float fogFactor = 0.0;',
 
-					'if ( fogType == 1 ) {',
+			'if ( fogType == 1 ) {',
 
-						'fogFactor = smoothstep( fogNear, fogFar, depth );',
+			'fogFactor = smoothstep( fogNear, fogFar, depth );',
 
-					'} else {',
+			'} else {',
 
-						'const float LOG2 = 1.442695;',
-						'float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
-						'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
+			'const float LOG2 = 1.442695;',
+			'float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
+			'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
 
-					'}',
+			'}',
 
-					'gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );',
+			'gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );',
 
-				'}',
+			'}',
 
 			'}'
 

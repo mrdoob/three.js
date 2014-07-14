@@ -241,6 +241,7 @@ THREE.Vector2.prototype = {
 		}
 
 		return this;
+	
 	},
 
 	clampScalar: ( function () {
@@ -354,6 +355,7 @@ THREE.Vector2.prototype = {
 		if ( oldLength !== 0 && l !== oldLength ) {
 
 			this.multiplyScalar( l / oldLength );
+		
 		}
 
 		return this;

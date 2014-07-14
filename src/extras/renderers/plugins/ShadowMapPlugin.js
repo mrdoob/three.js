@@ -329,7 +329,7 @@ THREE.ShadowMapPlugin = function () {
 
 	};
 	
-	function projectObject(scene, object,shadowCamera){
+	function projectObject(scene, object,shadowCamera) {
 		
 		if ( object.visible ) {
 	
@@ -338,7 +338,7 @@ THREE.ShadowMapPlugin = function () {
 			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 		
 		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
+				for (var i = 0, l = webglObjects.length; i < l; i ++) {
 			
 					var webglObject = webglObjects[i];
 					
@@ -346,14 +346,17 @@ THREE.ShadowMapPlugin = function () {
 					_renderList.push(webglObject);
 					
 				}
+			
 			}
 	
-			for(var i = 0, l = object.children.length; i < l; i++) {
+			for (var i = 0, l = object.children.length; i < l; i ++) {
 				
 				projectObject(scene, object.children[i],shadowCamera);
+			
 			}
 		
 		}
+	
 	}
 
 	function createVirtualLight( light, cascade ) {

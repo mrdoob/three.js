@@ -31,8 +31,10 @@ THREE.SpotLightHelper = function ( light ) {
 THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.SpotLightHelper.prototype.dispose = function () {
+
 	this.cone.geometry.dispose();
 	this.cone.material.dispose();
+
 };
 
 THREE.SpotLightHelper.prototype.update = function () {

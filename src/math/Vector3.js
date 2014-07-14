@@ -551,6 +551,7 @@ THREE.Vector3.prototype = {
 		if ( oldLength !== 0 && l !== oldLength  ) {
 
 			this.multiplyScalar( l / oldLength );
+		
 		}
 
 		return this;
@@ -701,6 +702,7 @@ THREE.Vector3.prototype = {
 		console.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
 
 		return this.setFromMatrixScale( m );
+	
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
@@ -732,6 +734,7 @@ THREE.Vector3.prototype = {
 		this.z = sz;
 
 		return this;
+	
 	},
 
 	setFromMatrixColumn: function ( index, matrix ) {

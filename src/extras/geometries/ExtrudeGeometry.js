@@ -27,8 +27,10 @@
 THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	if ( typeof( shapes ) === "undefined" ) {
+
 		shapes = [];
 		return;
+	
 	}
 
 	THREE.Geometry.call( this );
@@ -52,12 +54,16 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 THREE.ExtrudeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
+
 	var sl = shapes.length;
 
 	for ( var s = 0; s < sl; s ++ ) {
+
 		var shape = shapes[ s ];
 		this.addShape( shape, options );
+	
 	}
+
 };
 
 THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
@@ -243,22 +249,46 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			//  but prevent crazy spikes
 			var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y )
 			if ( v_trans_lensq <= 2 ) {
+
 				return	new THREE.Vector2( v_trans_x, v_trans_y );
+			
 			} else {
+
 				shrink_by = Math.sqrt( v_trans_lensq / 2 );
+			
 			}
 			
 		} else {		// handle special case of colinear edges
 
 			var direction_eq = false;		// assumes: opposite
 			if ( v_prev_x > EPSILON ) {
-				if ( v_next_x > EPSILON ) { direction_eq = true; }
-			} else {
-				if ( v_prev_x < - EPSILON ) {
-					if ( v_next_x < - EPSILON ) { direction_eq = true; }
-				} else {
-					if ( sign(v_prev_y) == sign(v_next_y) ) { direction_eq = true; }
+
+				if ( v_next_x > EPSILON ) {
+
+					 direction_eq = true; 
+
 				}
+			
+			} else {
+
+				if ( v_prev_x < - EPSILON ) {
+
+					if ( v_next_x < - EPSILON ) {
+
+						 direction_eq = true; 
+
+					}
+				
+				} else {
+
+					if ( sign(v_prev_y) == sign(v_next_y) ) {
+
+						 direction_eq = true; 
+
+					}
+				
+				}
+			
 			}
 
 			if ( direction_eq ) {
@@ -266,11 +296,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 				v_trans_x = - v_prev_y;
 				v_trans_y =  v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
+			
 			} else {
 				// console.log("Warning: lines are a straight spike");
 				v_trans_x = v_prev_x;
 				v_trans_y = v_prev_y;
 				shrink_by = Math.sqrt( v_prev_lensq / 2 );
+			
 			}
 
 		}
@@ -294,7 +326,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		var pt_j = contour[ j ];
 		var pt_k = contour[ k ];
 
-		contourMovements[ i ]= getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
+		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
 	}
 
@@ -312,7 +344,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			if ( k === il ) k = 0;
 
 			//  (j)---(i)---(k)
-			oneHoleMovements[ i ]= getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
+			oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
 
 		}
 
@@ -331,7 +363,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		z = bevelThickness * ( 1 - t );
 
 		//z = bevelThickness * t;
-		bs = bevelSize * ( Math.sin ( t * Math.PI/2 ) ) ; // curved
+		bs = bevelSize * ( Math.sin ( t * Math.PI / 2 ) ) ; // curved
 		//bs = bevelSize * t ; // linear
 
 		// contract shape
@@ -431,7 +463,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		t = b / bevelSegments;
 		z = bevelThickness * ( 1 - t );
 		//bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
-		bs = bevelSize * Math.sin ( t * Math.PI/2 ) ;
+		bs = bevelSize * Math.sin ( t * Math.PI / 2 ) ;
 
 		// contract shape
 
@@ -494,7 +526,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			for ( i = 0; i < flen; i ++ ) {
 
 				face = faces[ i ];
-				f3( face[ 2 ]+ offset, face[ 1 ]+ offset, face[ 0 ] + offset, true );
+				f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset, true );
 
 			}
 
@@ -529,6 +561,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps, false );
 
 			}
+		
 		}
 
 	}
@@ -558,7 +591,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		var j, k;
 		i = contour.length;
 
-		while ( --i >= 0 ) {
+		while ( -- i >= 0 ) {
 
 			j = i;
 			k = i - 1;
@@ -581,6 +614,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 				f4( a, b, c, d, contour, s, sl, j, k );
 
 			}
+		
 		}
 
 	}
@@ -603,7 +637,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		var uvs = isBottom ? uvgen.generateBottomUV( scope, shape, options, a, b, c ) : uvgen.generateTopUV( scope, shape, options, a, b, c );
 
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+		 		scope.faceVertexUvs[ 0 ].push( uvs );
 
 	}
 
@@ -614,14 +648,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
- 		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
+		 		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+		 		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
- 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
+		 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
  		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
 
- 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
- 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
+		 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+		 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
 
 	}
 
@@ -630,6 +664,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 	generateTopUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC ) {
+
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
 
@@ -674,20 +709,25 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 			dz = geometry.vertices[ indexD ].z;
 
 		if ( Math.abs( ay - by ) < 0.01 ) {
+
 			return [
 				new THREE.Vector2( ax, 1 - az ),
 				new THREE.Vector2( bx, 1 - bz ),
 				new THREE.Vector2( cx, 1 - cz ),
 				new THREE.Vector2( dx, 1 - dz )
 			];
+		
 		} else {
+
 			return [
 				new THREE.Vector2( ay, 1 - az ),
 				new THREE.Vector2( by, 1 - bz ),
 				new THREE.Vector2( cy, 1 - cz ),
 				new THREE.Vector2( dy, 1 - dz )
 			];
+		
 		}
+	
 	}
 };
 

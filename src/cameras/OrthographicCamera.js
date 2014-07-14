@@ -41,4 +41,5 @@ THREE.OrthographicCamera.prototype.clone = function () {
 	camera.far = this.far;
 
 	return camera;
+
 };

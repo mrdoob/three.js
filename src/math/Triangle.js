@@ -65,6 +65,7 @@ THREE.Triangle.barycoordFromPoint = function () {
 			// arbitrary location outside of triangle?
 			// not sure if this is the best idea, maybe should be returning undefined
 			return result.set( - 2, - 1, - 1 );
+		
 		}
 
 		var invDenom = 1 / denom;

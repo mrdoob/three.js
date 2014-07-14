@@ -24,33 +24,33 @@ THREE.ShaderFlares = {
 
 			"void main() {",
 
-				"vUV = uv;",
+			"vUV = uv;",
 
-				"vec2 pos = position;",
+			"vec2 pos = position;",
 
-				"if( renderType == 2 ) {",
+			"if( renderType == 2 ) {",
 
-					"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
-					"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
+			"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );",
+			"visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );",
 
-					"vVisibility =        visibility.r / 9.0;",
-					"vVisibility *= 1.0 - visibility.g / 9.0;",
-					"vVisibility *=       visibility.b / 9.0;",
-					"vVisibility *= 1.0 - visibility.a / 9.0;",
+			"vVisibility =        visibility.r / 9.0;",
+			"vVisibility *= 1.0 - visibility.g / 9.0;",
+			"vVisibility *=       visibility.b / 9.0;",
+			"vVisibility *= 1.0 - visibility.a / 9.0;",
 
-					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-					"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+			"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+			"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
 
-				"}",
+			"}",
 
-				"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+			"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
 
 			"}"
 
@@ -71,26 +71,26 @@ THREE.ShaderFlares = {
 
 				// pink square
 
-				"if( renderType == 0 ) {",
+			"if( renderType == 0 ) {",
 
-					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+			"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
 
 				// restore
 
-				"} else if( renderType == 1 ) {",
+			"} else if( renderType == 1 ) {",
 
-					"gl_FragColor = texture2D( map, vUV );",
+			"gl_FragColor = texture2D( map, vUV );",
 
 				// flare
 
-				"} else {",
+			"} else {",
 
-					"vec4 texture = texture2D( map, vUV );",
-					"texture.a *= opacity * vVisibility;",
-					"gl_FragColor = texture;",
-					"gl_FragColor.rgb *= color;",
+			"vec4 texture = texture2D( map, vUV );",
+			"texture.a *= opacity * vVisibility;",
+			"gl_FragColor = texture;",
+			"gl_FragColor.rgb *= color;",
 
-				"}",
+			"}",
 
 			"}"
 		].join( "\n" )
@@ -115,18 +115,18 @@ THREE.ShaderFlares = {
 
 			"void main() {",
 
-				"vUV = uv;",
+			"vUV = uv;",
 
-				"vec2 pos = position;",
+			"vec2 pos = position;",
 
-				"if( renderType == 2 ) {",
+			"if( renderType == 2 ) {",
 
-					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-					"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+			"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+			"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
 
-				"}",
+			"}",
 
-				"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+			"gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
 
 			"}"
 
@@ -149,32 +149,32 @@ THREE.ShaderFlares = {
 
 				// pink square
 
-				"if( renderType == 0 ) {",
+			"if( renderType == 0 ) {",
 
-					"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
+			"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
 
 				// restore
 
-				"} else if( renderType == 1 ) {",
+			"} else if( renderType == 1 ) {",
 
-					"gl_FragColor = texture2D( map, vUV );",
+			"gl_FragColor = texture2D( map, vUV );",
 
 				// flare
 
-				"} else {",
+			"} else {",
 
-					"float visibility = texture2D( occlusionMap, vec2( 0.5, 0.1 ) ).a;",
-					"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) ).a;",
-					"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) ).a;",
-					"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) ).a;",
-					"visibility = ( 1.0 - visibility / 4.0 );",
+			"float visibility = texture2D( occlusionMap, vec2( 0.5, 0.1 ) ).a;",
+			"visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) ).a;",
+			"visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) ).a;",
+			"visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) ).a;",
+			"visibility = ( 1.0 - visibility / 4.0 );",
 
-					"vec4 texture = texture2D( map, vUV );",
-					"texture.a *= opacity * visibility;",
-					"gl_FragColor = texture;",
-					"gl_FragColor.rgb *= color;",
+			"vec4 texture = texture2D( map, vUV );",
+			"texture.a *= opacity * visibility;",
+			"gl_FragColor = texture;",
+			"gl_FragColor.rgb *= color;",
 
-				"}",
+			"}",
 
 			"}"
 
