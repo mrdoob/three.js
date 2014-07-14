@@ -47,6 +47,7 @@
 			var camera, scene, projector, raycaster, renderer;
 			var vrEffect;
 			var vrControls;
+			var fullScreenButton = document.querySelector( '.button' );
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
@@ -105,6 +106,7 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer();
+
 				var fullScreenButton = document.querySelector( '.button' );
 				fullScreenButton.onclick = function() {
 					vrEffect.setFullScreen( true );
@@ -112,7 +114,6 @@
 
 				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
 				vrControls = new THREE.VRControls(camera);
-
 				function VREffectLoaded(error) {
 					if (error) {
 						fullScreenButton.innerHTML = error;
