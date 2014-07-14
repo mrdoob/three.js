@@ -26,8 +26,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer,
-			mesh, levels = [];
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -45,8 +44,17 @@
 
 				for ( var i = 0; i < 15; i ++ ) {
 
-					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( bitmap ) ), transparent: true, depthWrite: false, depthTest: false } ) );
-					mesh.material.map.needsUpdate = true;
+					var texture = new THREE.Texture( generateTextureLevel( bitmap ) );
+					texture.needsUpdate = true;
+
+					var material = new THREE.MeshBasicMaterial( {
+						map: texture,
+						depthTest: false,
+						depthWrite: false,
+						transparent: true
+					} );
+
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = i * 0.25;
 					mesh.rotation.x = - Math.PI / 2;
@@ -135,9 +143,9 @@
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = levels.length; i < l; i ++ ) {
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
-					mesh = levels[ i ];
+					var mesh = scene.children[ i ];
 					mesh.position.x = Math.sin( time * 4 ) * i * i * 0.005;
 					mesh.position.z = Math.cos( time * 6 ) * i * i * 0.005;
 
