@@ -40,14 +40,13 @@
 
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
 
-				var bitmap = generateTextureBase();
+				var texture = new THREE.Texture( generateTexture() );
+				texture.needsUpdate = true;
 
 				for ( var i = 0; i < 15; i ++ ) {
 
-					var texture = new THREE.Texture( generateTextureLevel( bitmap ) );
-					texture.needsUpdate = true;
-
 					var material = new THREE.MeshBasicMaterial( {
+						color: new THREE.Color().setHSL( 0.3, 0.75, ( i / 15 ) * 0.4 + 0.1 ),
 						map: texture,
 						depthTest: false,
 						depthWrite: false,
@@ -86,7 +85,7 @@
 
 			}
 
-			function generateTextureBase() {
+			function generateTexture() {
 
 				var canvas = document.createElement( 'canvas' );
 				canvas.width = 512;
@@ -96,29 +95,15 @@
 
 				for ( var i = 0; i < 20000; i ++ ) {
 
-					context.fillStyle = 'rgba(0,' + Math.floor( Math.random() * 64 + 32 ) + ',16,1)';
+					context.fillStyle = 'hsl(0,0%,' + ( Math.random() * 50 + 50 ) + '%)';
 					context.beginPath();
-					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1 + 0.5, 0, Math.PI * 2, true );
+					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() + 0.15, 0, Math.PI * 2, true );
 					context.fill();
 
 				}
 
 				context.globalAlpha = 0.075;
 				context.globalCompositeOperation = 'lighter';
-
-				return canvas;
-
-			}
-
-			function generateTextureLevel( texture ) {
-
-				texture.getContext( '2d' ).drawImage( texture, 0, 0 );
-
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = texture.width;
-				canvas.height = texture.height;
-
-				canvas.getContext( '2d' ).drawImage( texture, 0, 0 );
 
 				return canvas;
 
