@@ -130,15 +130,15 @@ THREE.CameraHelper.prototype.update = function () {
 
 		// center / target
 
-		setPoint( "c", 0, 0, - 1 );
+		setPoint( "c", 0, 0, - 1.00001 );
 		setPoint( "t", 0, 0,  1 );
 
 		// near
 
-		setPoint( "n1", - w, - h, - 1 );
-		setPoint( "n2",  w, - h, - 1 );
-		setPoint( "n3", - w,  h, - 1 );
-		setPoint( "n4",  w,  h, - 1 );
+		setPoint( "n1", - w, - h, - 1.00001 );
+		setPoint( "n2",  w, - h, - 1.00001 );
+		setPoint( "n3", - w,  h, - 1.00001 );
+		setPoint( "n4",  w,  h, - 1.00001 );
 
 		// far
 
@@ -149,9 +149,9 @@ THREE.CameraHelper.prototype.update = function () {
 
 		// up
 
-		setPoint( "u1",  w * 0.7, h * 1.1, - 1 );
-		setPoint( "u2", - w * 0.7, h * 1.1, - 1 );
-		setPoint( "u3",        0, h * 2,   - 1 );
+		setPoint( "u1",  w * 0.7, h * 1.1, - 1.00001 );
+		setPoint( "u2", - w * 0.7, h * 1.1, - 1.00001 );
+		setPoint( "u3",        0, h * 2,   - 1.00001 );
 
 		// cross
 
@@ -160,10 +160,10 @@ THREE.CameraHelper.prototype.update = function () {
 		setPoint( "cf3",  0, - h, 1 );
 		setPoint( "cf4",  0,  h, 1 );
 
-		setPoint( "cn1", - w,  0, - 1 );
-		setPoint( "cn2",  w,  0, - 1 );
-		setPoint( "cn3",  0, - h, - 1 );
-		setPoint( "cn4",  0,  h, - 1 );
+		setPoint( "cn1", - w,  0, - 1.00001 );
+		setPoint( "cn2",  w,  0, - 1.00001 );
+		setPoint( "cn3",  0, - h, - 1.00001 );
+		setPoint( "cn4",  0,  h, - 1.00001 );
 
 		function setPoint( point, x, y, z ) {
 
