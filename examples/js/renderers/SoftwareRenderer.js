@@ -236,26 +236,45 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			     material instanceof THREE.SpriteMaterial ) {
 
 				var string;
+                
+                if ( material.map ) {
+                    var texture = new THREE.SoftwareRenderer.Texture();
+                    texture.CreateFromImage( material.map.image );
+                    material.texture = texture;
+                     
+                    string = [
+                            'var tdim = material.texture.width;',
+                            'var tbound = tdim - 1;',
+                            'var tdata = material.texture.data;',
+                            'var texel = tdata[((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)];',
+                            'buffer[ offset ] = (texel & 0xff0000) >> 16;',
+                            'buffer[ offset + 1 ] = (texel & 0xff00) >> 8;',
+                            'buffer[ offset + 2 ] = (texel & 0xff);',
+                            'buffer[ offset + 3 ] = material.opacity * 255;',
+                        ].join('\n');
+                    
+                } else {
+                    
+                    if ( material.vertexColors === THREE.FaceColors ) {
 
-				if ( material.vertexColors === THREE.FaceColors ) {
+                        string = [
+                            'buffer[ offset ] = face.color.r * 255;',
+                            'buffer[ offset + 1 ] = face.color.g * 255;',
+                            'buffer[ offset + 2 ] = face.color.b * 255;',
+                            'buffer[ offset + 3 ] = material.opacity * 255;',
+                        ].join('\n');
 
-					string = [
-						'buffer[ offset ] = face.color.r * 255;',
-						'buffer[ offset + 1 ] = face.color.g * 255;',
-						'buffer[ offset + 2 ] = face.color.b * 255;',
-						'buffer[ offset + 3 ] = material.opacity * 255;',
-					].join('\n');
+                    } else {
 
-				} else {
+                        string = [
+                            'buffer[ offset ] = material.color.r * 255;',
+                            'buffer[ offset + 1 ] = material.color.g * 255;',
+                            'buffer[ offset + 2 ] = material.color.b * 255;',
+                            'buffer[ offset + 3 ] = material.opacity * 255;',
+                        ].join('\n');
 
-					string = [
-						'buffer[ offset ] = material.color.r * 255;',
-						'buffer[ offset + 1 ] = material.color.g * 255;',
-						'buffer[ offset + 2 ] = material.color.b * 255;',
-						'buffer[ offset + 3 ] = material.opacity * 255;',
-					].join('\n');
-
-				}
+                    }
+                }
 
 				shader = new Function( 'buffer, offset, u, v, face, material', string );
 
@@ -626,4 +645,75 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	}
 
+};
+
+THREE.SoftwareRenderer.Texture = function() {
+    var canvas = null;
+    
+    this.CreateFromImage = function( image ) {
+        
+        if(image.width <=0 || image.height <=0)
+            return;
+    
+        var isCanvasClean = false;
+        var canvas = THREE.SoftwareRenderer.Texture.canvas;
+        if ( !canvas ) {
+
+            try {
+
+                canvas = document.createElement('canvas');
+                THREE.SoftwareRenderer.Texture.canvas = canvas;
+                isCanvasClean = true;
+            } catch( e ) {
+                return;
+            }
+
+        }
+
+        var dim = image.width > image.height ? image.width : image.height;
+        if(dim <= 32)
+            dim = 32;
+        else if(dim <= 64)
+            dim = 64;
+        else if(dim <= 128)
+            dim = 128;
+        else if(dim <= 256)
+            dim = 256;
+        else if(dim <= 512)
+            dim = 512;
+        else
+            dim = 1024;
+
+        if(canvas.width != dim || canvas.height != dim) {
+            canvas.width = canvas.height = dim;
+            isCanvasClean = true;
+        }
+
+        var data;
+        try {
+            var ctx = canvas.getContext('2d');
+            if(!isCanvasClean)
+                ctx.clearRect(0, 0, dim, dim);
+            ctx.drawImage(image, 0, 0, dim, dim);
+            var imgData = ctx.getImageData(0, 0, dim, dim);
+            data = imgData.data;
+        }
+        catch(e) {
+            return;
+        }
+
+        var size = data.length / 4;
+        this.data = new Array(size);
+        var alpha;
+        for(var i=0, j=0; i<size; i++, j+=4) {
+            alpha = data[j + 3];
+            this.data[i] = alpha << 24 | data[j] << 16 | data[j+1] << 8 | data[j+2];
+            if(alpha < 255)
+                this.hasTransparency = true;
+        }
+
+        this.width = dim;
+        this.height = dim;
+        this.srcUrl = image.src;
+    };
 };
