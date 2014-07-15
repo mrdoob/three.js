@@ -384,9 +384,9 @@ THREE.SceneExporter.prototype = {
 
 				'\t' + LabelString( getGeometryName( g ) ) + ': {',
 				'	"type"    : "cube",',
-				'	"width"  : '  + g.width  + ',',
-				'	"height"  : ' + g.height + ',',
-				'	"depth"  : '  + g.depth  + ',',
+				'	"width"  : '  + g.parameters.width  + ',',
+				'	"height"  : ' + g.parameters.height + ',',
+				'	"depth"  : '  + g.parameters.depth  + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
 				'	"heightSegments" : ' + g.heightSegments + ',',
 				'	"depthSegments" : '  + g.depthSegments,
