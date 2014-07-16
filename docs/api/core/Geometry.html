@@ -19,9 +19,11 @@
 
 		<code>var geometry = new THREE.Geometry();
 
-		geometry.vertices.push( new THREE.Vector3( -10,  10, 0 ) );
-		geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
-		geometry.vertices.push( new THREE.Vector3(  10, -10, 0 ) );
+		geometry.vertices.push(
+			new THREE.Vector3( -10,  10, 0 ),
+			new THREE.Vector3( -10, -10, 0 ),
+			new THREE.Vector3(  10, -10, 0 )
+		);
 
 		geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
 
@@ -59,7 +61,7 @@
 		<h3>.[page:Array colors]</h3>
 		<div>
 		Array of vertex [page:Color colors], matching number and order of vertices.<br />
-		Used in [page:ParticleSystem] and [page:Line].<br />
+		Used in [page:PointCloud] and [page:Line].<br />
 		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.<br />
 		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
 		</div>
@@ -223,11 +225,17 @@
 		
 		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
 
+		<h3>.merge( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
+		<div>Merge two geometries or geometry and geometry from object (using object's transform)</div>
+
 		<h3>.mergeVertices()</h3>
 		<div>
 		Checks for duplicate vertices using hashmap.<br />
 		Duplicated vertices are removed and faces' vertices are updated.
 		</div>
+		
+		<h3>.makeGroups()</h3>
+		<div>Geometry splitting</div>
 		
 		<h3>.clone()</h3>
 		<div>

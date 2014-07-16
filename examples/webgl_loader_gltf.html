@@ -35,7 +35,7 @@
             	width:250px;
             	bottom:0%;
             	right:0%;
-            	height:134px;
+            	height:100px;
             	background-color:White;
             	opacity:.9;
             	font: 13px/1.231 "Lucida Grande", Lucida, Verdana, sans-serif;
@@ -78,12 +78,7 @@
             	position:absolute;
             	top:72px;
             }
-            
-            #buffer_geometry_control {
-            	position:absolute;
-            	top:104px;
-            }
-                        
+
             #info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
         </style>
     </head>
@@ -116,19 +111,13 @@
 				Animations
 				<div class="controlValue"><input type="checkbox" checked onclick="toggleAnimations();">Play</input></div>
 			</div>
-			<div class="control" id="buffer_geometry_control">
-				Geometry
-				<div class="controlValue">
-				<input type="checkbox" id="buffer_geometry_checkbox" checked onclick="toggleBufferGeometry();">BufferGeometry</input>
-				</div>
-			</div>
 		</div>
-        <script src="../build/three.js"></script>
-        <script src="./js/controls/OrbitControls.js"></script>
-        <script src="./js/loaders/gltf/glTF-parser.js"></script>
-        <script src="./js/loaders/gltf/glTFLoader.js"></script>
-        <script src="./js/loaders/gltf/glTFLoaderUtils.js"></script>
-        <script src="./js/loaders/gltf/glTFAnimation.js"></script>
+        <script src="../build/three.min.js"></script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/loaders/gltf/glTF-parser.js"></script>
+        <script src="js/loaders/gltf/glTFLoader.js"></script>
+        <script src="js/loaders/gltf/glTFLoaderUtils.js"></script>
+        <script src="js/loaders/gltf/glTFAnimation.js"></script>
 
         <script>
         	var orbitControls = null;
@@ -230,7 +219,7 @@
 				}
 				
                 loader = new THREE.glTFLoader;
-                loader.useBufferGeometry = useBufferGeometry;
+
                 var loadStartTime = Date.now();
                 var status = document.getElementById("status");
                 status.innerHTML = "Loading...";
@@ -475,14 +464,6 @@
 				}
 			}
 
-			var usebuf = document.getElementById("buffer_geometry_checkbox");
-			var useBufferGeometry = usebuf.hasAttribute("checked");
-			function toggleBufferGeometry()
-			{
-				useBufferGeometry = !useBufferGeometry;
-				selectScene();
-			}
-			
 			function cleanup() {
 
 				if (container && renderer)
@@ -490,7 +471,7 @@
 					container.removeChild(renderer.domElement);
 				}
 
-	            cameraIndex = 0;
+				cameraIndex = 0;
 				cameras = [];
 				cameraNames = [];
 				defaultCamera = null;

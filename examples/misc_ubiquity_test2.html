@@ -76,9 +76,9 @@
 						tex.repeat.y = 0.1 * THREE.Math.randInt( 1, 3 );
 
 						var material = new THREE.SpriteMaterial( { map: tex } );
-						var sprite = new THREE.Sprite( material );
+						material.rotation = 0.5 * Math.PI * ( Math.random() - 0.5 );
 
-						sprite.material.rotation = 0.5 * Math.PI * ( Math.random() - 0.5 );
+						var sprite = new THREE.Sprite( material );
 
 						sprite.position.x = Math.random() * 1000 - 500;
 						sprite.position.y = Math.random() * 1000 - 500;
@@ -119,16 +119,16 @@
 
 				// SPRITES - PNG
 
+				texture3 = THREE.ImageUtils.loadTexture( 'textures/sprite1.png' );
+				texture3.wrapS = THREE.ClampToEdgeWrapping;
+				texture3.wrapT = THREE.ClampToEdgeWrapping;
+
 				for ( var i = 0; i < 20; i ++ ) {
 
-					texture3 = THREE.ImageUtils.loadTexture( 'textures/sprite1.png' );
-					texture3.wrapS = THREE.ClampToEdgeWrapping;
-					texture3.wrapT = THREE.ClampToEdgeWrapping;
-
 					var material = new THREE.SpriteMaterial( { map: texture3 } );
+					material.rotation = 2 * Math.PI * ( Math.random() - 0.5 );
+					
 					var sprite = new THREE.Sprite( material );
-
-					sprite.material.rotation = 2 * Math.PI * ( Math.random() - 0.5 );
 
 					sprite.position.x = Math.random() * 1000 - 500;
 					sprite.position.y = Math.random() * 1000 - 500;

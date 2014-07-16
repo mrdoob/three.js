@@ -21,7 +21,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer;
-			var mesh;
+			var mesh, mapBg;
 
 			init();
 			animate();
@@ -53,7 +53,7 @@
 				xc.fillStyle = "#777";
 				xc.fillRect( 96, 96, 32, 32 );
 
-				var mapBg = new THREE.Texture( x );
+				mapBg = new THREE.Texture( x );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 128, 64 );
 				mapBg.needsUpdate = true;
@@ -167,6 +167,13 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				
+				var time = Date.now() * 0.00025;
+				var ox = ( time * -0.01 * mapBg.repeat.x ) % 1;
+				var oy = ( time * -0.01 * mapBg.repeat.y ) % 1;
+
+				mapBg.offset.set( ox, oy );
+
 				renderer.render( scene, camera );
 
 			}

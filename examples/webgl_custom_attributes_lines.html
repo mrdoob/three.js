@@ -163,7 +163,7 @@
 
 			geometry.dynamic = true;
 
-			THREE.GeometryUtils.center( geometry );
+			geometry.center();
 
 			object = new THREE.Line( geometry, shaderMaterial, THREE.LineStrip );
 

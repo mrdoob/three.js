@@ -82,12 +82,9 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'index', new Uint32Array( triangles * 3 ), 1 );
-				geometry.addAttribute( 'position', new Float32Array( triangles * 3 * 3 ), 3 );
-				geometry.addAttribute( 'normal', new Float32Array( triangles * 3 * 3 ), 3 );
-				geometry.addAttribute( 'color', new Float32Array( triangles * 3 * 3 ), 3 );
 
-				var indices = geometry.getAttribute( 'index' ).array;
+
+				var indices = new Uint32Array( triangles * 3 );
 
 				for ( var i = 0; i < indices.length; i ++ ) {
 
@@ -95,9 +92,9 @@
 
 				}
 
-				var positions = geometry.getAttribute( 'position' ).array;
-				var normals = geometry.getAttribute( 'normal' ).array;
-				var colors = geometry.getAttribute( 'color' ).array;
+				var positions = new Float32Array( triangles * 3 * 3 );
+				var normals = new Float32Array( triangles * 3 * 3 );
+				var colors = new Float32Array( triangles * 3 * 3 );
 
 				var color = new THREE.Color();
 
@@ -192,6 +189,11 @@
 					colors[ i + 8 ] = color.b;
 
 				}
+
+				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 

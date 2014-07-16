@@ -174,8 +174,7 @@
 
 				var onParticleCreated = function( p ) {
 
-					var position = p.position;
-					p.target.position = position;
+					p.target.position.copy( p.position );
 
 				};
 

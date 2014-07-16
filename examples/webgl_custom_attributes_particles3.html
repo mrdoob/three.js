@@ -125,7 +125,7 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
+				uniforms:       uniforms,
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
@@ -193,8 +193,7 @@
 
 			// particle system
 
-			object = new THREE.ParticleSystem( geometry, shaderMaterial );
-			object.dynamic = true;
+			object = new THREE.PointCloud( geometry, shaderMaterial );
 
 			// custom attributes
 
@@ -203,7 +202,7 @@
 			var values_size = attributes.size.value;
 			var values_color = attributes.ca.value;
 
-			for( var v = 0; v < vertices.length; v ++ ) {
+			for ( var v = 0; v < vertices.length; v ++ ) {
 
 				values_size[ v ] = 10;
 				values_color[ v ] = new THREE.Color( 0xffffff );

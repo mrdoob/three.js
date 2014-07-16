@@ -79,8 +79,6 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
 		object.geometry.dispose();
 
 		object.geometry = new THREE.TorusKnotGeometry(
@@ -93,6 +91,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 			heightScale.getValue()
 		);
 
+		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );

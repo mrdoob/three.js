@@ -193,9 +193,7 @@
 					material.color = light.color;
 
 					var emitter = new THREE.Mesh( geometry, material );
-					emitter.position = light.position;
-
-					scene.add( emitter );
+					light.add( emitter );
 
 				}
 

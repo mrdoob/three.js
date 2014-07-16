@@ -12,7 +12,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshLambertMaterial': THREE.MeshLambertMaterial,
 		'MeshNormalMaterial': THREE.MeshNormalMaterial,
 		'MeshPhongMaterial': THREE.MeshPhongMaterial,
-		'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
+		'PointCloudMaterial': THREE.PointCloudMaterial,
 		'ShaderMaterial': THREE.ShaderMaterial,
 		'SpriteMaterial': THREE.SpriteMaterial,
 		'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
@@ -71,6 +71,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'ShaderMaterial': 'ShaderMaterial',
 		'SpriteMaterial': 'SpriteMaterial'
 
 	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
@@ -130,6 +131,39 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialShininessRow );
 
+	// uniforms
+
+	var materialUniformsRow = new UI.Panel();
+	var materialUniforms = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
+	materialUniforms.setValue( '' ).onChange( update );
+
+	materialUniformsRow.add( new UI.Text( 'Uniforms' ).setWidth( '90px' ) );
+	materialUniformsRow.add( materialUniforms );
+
+	container.add( materialUniformsRow );
+
+	// vertex shader
+
+	var materialVertexShaderRow = new UI.Panel();
+	var materialVertexShader = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
+	materialVertexShader.setValue( 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}' ).onChange( update );
+
+	materialVertexShaderRow.add( new UI.Text( 'Vertex Shader' ).setWidth( '90px' ) );
+	materialVertexShaderRow.add( materialVertexShader );
+
+	container.add( materialVertexShaderRow );
+
+	// fragment shader
+
+	var materialFragmentShaderRow = new UI.Panel();
+	var materialFragmentShader = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
+	materialFragmentShader.setValue( 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}' ).onChange( update );
+
+	materialFragmentShaderRow.add( new UI.Text( 'Fragment Shader' ).setWidth( '90px' ) );
+	materialFragmentShaderRow.add( materialFragmentShader );
+
+	container.add( materialFragmentShaderRow );
+
 	// vertex colors
 
 	var materialVertexColorsRow = new UI.Panel();
@@ -146,6 +180,15 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
+	// skinning
+
+	var materialSkinningRow = new UI.Panel();
+	var materialSkinning = new UI.Checkbox( false ).onChange( update );
+
+	materialSkinningRow.add( new UI.Text( 'Skinning' ).setWidth( '90px' ) );
+	materialSkinningRow.add( materialSkinning );
+
+	container.add( materialSkinningRow );
 
 	// map
 
@@ -159,7 +202,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialMapRow );
 
-
 	// light map
 
 	var materialLightMapRow = new UI.Panel();
@@ -171,7 +213,6 @@ Sidebar.Material = function ( editor ) {
 	materialLightMapRow.add( materialLightMap );
 
 	container.add( materialLightMapRow );
-
 
 	// bump map
 
@@ -187,7 +228,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialBumpMapRow );
 
-
 	// normal map
 
 	var materialNormalMapRow = new UI.Panel();
@@ -200,7 +240,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialNormalMapRow );
 
-
 	// specular map
 
 	var materialSpecularMapRow = new UI.Panel();
@@ -212,7 +251,6 @@ Sidebar.Material = function ( editor ) {
 	materialSpecularMapRow.add( materialSpecularMap );
 
 	container.add( materialSpecularMapRow );
-
 
 	// env map
 
@@ -227,7 +265,6 @@ Sidebar.Material = function ( editor ) {
 	materialEnvMapRow.add( materialReflectivity );
 
 	container.add( materialEnvMapRow );
-
 
 	// blending
 
@@ -248,7 +285,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialBlendingRow );
 
-
 	// side
 
 	var materialSideRow = new UI.Panel();
@@ -265,7 +301,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialSideRow );
 
-
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
@@ -276,7 +311,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialOpacityRow );
 
-
 	// transparent
 
 	var materialTransparentRow = new UI.Panel();
@@ -286,7 +320,6 @@ Sidebar.Material = function ( editor ) {
 	materialTransparentRow.add( materialTransparent );
 
 	container.add( materialTransparentRow );
-
 
 	// wireframe
 
@@ -299,7 +332,6 @@ Sidebar.Material = function ( editor ) {
 	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
-
 
 	//
 
@@ -360,6 +392,24 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.uniforms !== undefined ) {
+
+				material.uniforms = JSON.parse( materialUniforms.getValue() );
+
+			}
+
+			if ( material.vertexShader !== undefined ) {
+
+				material.vertexShader = materialVertexShader.getValue();
+
+			}
+
+			if ( material.fragmentShader !== undefined ) {
+
+				material.fragmentShader = materialFragmentShader.getValue();
+
+			}
+
 			if ( material.vertexColors !== undefined ) {
 
 				geometry.buffersNeedUpdate = true;
@@ -367,6 +417,12 @@ Sidebar.Material = function ( editor ) {
 
 				material.vertexColors = parseInt( materialVertexColors.getValue() );
 				material.needsUpdate = true;
+
+			}
+
+			if ( material.skinning !== undefined ) {
+
+				material.skinning = materialSkinning.getValue();
 
 			}
 
@@ -557,7 +613,11 @@ Sidebar.Material = function ( editor ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
+			'uniforms': materialUniformsRow,
+			'vertexShader': materialVertexShaderRow,
+			'fragmentShader': materialFragmentShaderRow,
 			'vertexColors': materialVertexColorsRow,
+			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'lightMap': materialLightMapRow,
 			'bumpMap': materialBumpMapRow,
@@ -635,9 +695,33 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.uniforms !== undefined ) {
+
+				materialUniforms.setValue( JSON.stringify( material.uniforms, null, '  ' ) );
+
+			}
+
+			if ( material.vertexShader !== undefined ) {
+
+				materialVertexShader.setValue( material.vertexShader );
+
+			}
+
+			if ( material.fragmentShader !== undefined ) {
+
+				materialFragmentShader.setValue( material.fragmentShader );
+
+			}
+
 			if ( material.vertexColors !== undefined ) {
 
 				materialVertexColors.setValue( material.vertexColors );
+
+			}
+
+			if ( material.skinning !== undefined ) {
+
+				materialSkinning.setValue( material.skinning );
 
 			}
 

@@ -1,8 +1,6 @@
 /*
  * @author gyuque / http://github.com/gyuque
- *
  * Cylinder Mapping for ExtrudeGeometry
- *
  */
 
 THREE.UVsUtils = {
