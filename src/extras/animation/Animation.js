@@ -81,13 +81,12 @@ THREE.Animation.prototype.reset = function () {
 			var prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 			var nextKey = this.getNextKeyWith( type, h, 1 );
 
-		// START_VEROLD_MOD - robust keyframes
-		if ( this.data.hierarchy[ h ].keys !== undefined && this.data.hierarchy[ h ].keys.length > 0 ) {
-			prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.rot = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.scl = this.data.hierarchy[ h ].keys[ 0 ];
-		}
-		// END_VEROLD_MOD - robust keyframes
+			// START_VEROLD_MOD - robust keyframes
+			if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
+				continue;
+			}
+			// END_VEROLD_MOD - robust keyframes
+
 			while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
 
 				prevKey = nextKey;
