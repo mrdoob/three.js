@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '68dev' };
+var THREE = { REVISION: '68' };
 
 // browserify support
 if ( typeof module === 'object' ) {
@@ -7432,7 +7432,7 @@ THREE.Object3D.prototype = {
 
 		if ( object === this ) {
 
-			console.warn( "THREE.Object3D.add: An object can't be added as a child of itself." );
+			console.error( "THREE.Object3D.add:", object, "can't be added as a child of itself." );
 			return this;
 
 		}
@@ -7466,6 +7466,10 @@ THREE.Object3D.prototype = {
 
 			}
 
+		} else {
+		
+			console.error( "THREE.Object3D.add:", object, "is not an instance of THREE.Object3D." );
+		
 		}
 
 		return this;

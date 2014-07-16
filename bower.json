@@ -1,6 +1,6 @@
 {
 	"name": "three.js",
-	"version": "0.0.67",
+	"version": "0.0.68",
 	"homepage": "http://threejs.org/",
 	"description": "JavaScript 3D library",
 	"main": "build/three.min.js",
