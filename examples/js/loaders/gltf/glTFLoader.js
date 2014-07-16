@@ -1216,7 +1216,8 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                            
                                     	threeMesh.boneInverses = [];
         	                            var jointsIds = skin.jointsIds;
-        	                            var joints = [];
+        	                            var bones = [];
+        	                            var boneInverses = [];
         	                            var i, len = jointsIds.length;
         	                            for (i = 0; i < len; i++) {
         	                            	var jointId = jointsIds[i];
@@ -1225,8 +1226,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                if (joint) {
         	                                	
         	                                	joint.skin = threeMesh;
-        	                                    joints.push(joint);
-        	                                    threeMesh.skeleton.bones.push(joint);
+        	                                    bones.push(joint);
         	                                    
         	                                    var m = skin.inverseBindMatrices;
         	                    	            var mat = new THREE.Matrix4(
@@ -1235,13 +1235,14 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                            m[i * 16 + 2],  m[i * 16 + 6],  m[i * 16 + 10], m[i * 16 + 14],
         	                                            m[i * 16 + 3],  m[i * 16 + 7],  m[i * 16 + 11], m[i * 16 + 15]
         	                                        );
-        	                                    threeMesh.skeleton.boneInverses.push(mat);
-        	                                    threeMesh.pose();
+        	                                    boneInverses.push(mat);
         	                                    
         	                                } else {
         	                                    console.log("WARNING: jointId:"+jointId+" cannot be found in skeleton:"+skeleton);
         	                                }
         	                            }
+
+                                        threeMesh.bind(new THREE.Skeleton(bones, boneInverses, false));
                                     }
                                     
                                     if (threeMesh) {
