@@ -85,9 +85,14 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );
 
-		if ( spotEffect > spotLightAngleCos[ i ] ) {
+		if ( spotEffect > spotLightOuterAngleCos[ i ] ) {
+
+			float falloff = 0.0;
+			falloff = (spotEffect - spotLightOuterAngleCos[ i ]) / spotLightAngleCosDiff[ i ];
+			falloff = clamp( falloff, 0.0, 1.0 );
 
 			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );
+			spotEffect *= falloff;
 
 					// diffuse
 
