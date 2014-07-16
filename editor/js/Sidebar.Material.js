@@ -135,7 +135,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialUniformsRow = new UI.Panel();
 	var materialUniforms = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
-	materialUniforms.setValue( '' ).onChange( update );
+	materialUniforms.setValue( '{\n  "uColor": {\n    "type": "3f",\n    "value": [1, 0, 0]\n  }\n}' ).onChange( update );
 
 	materialUniformsRow.add( new UI.Text( 'Uniforms' ).setWidth( '90px' ) );
 	materialUniformsRow.add( materialUniforms );
@@ -157,7 +157,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialFragmentShaderRow = new UI.Panel();
 	var materialFragmentShader = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
-	materialFragmentShader.setValue( 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}' ).onChange( update );
+	materialFragmentShader.setValue( 'uniform vec3 uColor;\n\nvoid main() {\n\tgl_FragColor = vec4( uColor, 1.0 );\n}' ).onChange( update );
 
 	materialFragmentShaderRow.add( new UI.Text( 'Fragment Shader' ).setWidth( '90px' ) );
 	materialFragmentShaderRow.add( materialFragmentShader );
