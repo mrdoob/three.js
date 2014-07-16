@@ -3417,28 +3417,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		// VEROLD_START_MOD - bind matrix
-
-		// update SkinnedMesh objects
-		function updateSkinnedMesh( object ) {
-
-			if ( object instanceof THREE.SkinnedMesh ) {
-
-				object.updateBoneMatrices();
-
-			}
-
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-				updateSkinnedMesh( object.children[ i ] );
-
-			}
-
-		}
-
-		updateSkinnedMesh( scene );
-		// VEROLD_END_MOD - bind matrix
-
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
