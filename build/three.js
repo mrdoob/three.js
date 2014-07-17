@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '68' };
+var THREE = { REVISION: '69dev' };
 
 // browserify support
 if ( typeof module === 'object' ) {
@@ -8910,7 +8910,7 @@ THREE.BufferGeometry.prototype = {
 		if ( hasFaceVertexUv === true ) {
 
 			var uvs = new Float32Array( faces.length * 3 * 2 );
-			this.addAttribute( 'uvs', new THREE.BufferAttribute( uvs, 2 ) );
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 		}
 
