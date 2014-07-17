@@ -30,6 +30,8 @@ uniform vec3 ambientLightColor;
 	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];
 	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];
 	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];
+	uniform float spotLightOuterAngleCos[ MAX_SPOT_LIGHTS ];
+	uniform float spotLightAngleCosDiff[ MAX_SPOT_LIGHTS ];
 	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];
 
 	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];
