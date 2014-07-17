@@ -3199,8 +3199,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( a.material.id !== b.material.id ) {
 		
-			// sort by material first (save on state changes)
-
 			return b.material.id - a.material.id;
 
 		} else if ( a.z !== b.z ) {
@@ -3502,7 +3500,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object = webglObject.object;
 			buffer = webglObject.buffer;
-							
+
 			setupMatrices( object, camera );
 
 			if ( overrideMaterial ) {
@@ -3629,33 +3627,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material = material.materials[ materialIndex ];
 
+			globject.material = material;
+
 			if ( material.transparent ) {
 
-				globject.material = material; 
 				transparentObjects.push( globject );
 
 			} else {
 
-				globject.material = material; 
 				opaqueObjects.push( globject );
 
 			}
 
-		} else {
+		} else if ( material ) {
 
-			if ( material ) {
+			globject.material = material;
 
-				if ( material.transparent ) {
+			if ( material.transparent ) {
 
-					globject.material = material; 
-					transparentObjects.push( globject );
+				transparentObjects.push( globject );
 
-				} else {
+			} else {
 
-					globject.material = material;
-					opaqueObjects.push( globject );
-
-				}
+				opaqueObjects.push( globject );
 
 			}
 
