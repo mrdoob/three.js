@@ -228,9 +228,10 @@ THREE.SVGRenderer = function () {
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
-
-				var amount = normal.dot( lightPosition );
+				//var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();				
+				var lightDirection = light.getWorldDirection();
+				
+				var amount = normal.dot( lightDirection );
 
 				if ( amount <= 0 ) continue;
 

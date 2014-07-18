@@ -24,3 +24,23 @@ THREE.Light.prototype.clone = function ( light ) {
 	return light;
 
 };
+
+
+THREE.Light._getWorldDirectionClosure = function() {
+
+	var targetPosition = new THREE.Vector3();
+
+	return function ( optionalTarget ) {
+
+		var direction = optionalTarget || new THREE.Vector3();
+
+		direction.setFromMatrixPosition( this.matrixWorld );
+		targetPosition.setFromMatrixPosition( this.target.matrixWorld );
+		direction.sub( targetPosition );
+		direction.normalize();
+
+		return direction;
+
+	};
+
+};

@@ -60,6 +60,8 @@ THREE.DirectionalLight = function ( color, intensity ) {
 
 THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
 
+THREE.DirectionalLight.prototype.getWorldDirection = THREE.Light._getWorldDirectionClosure();
+
 THREE.DirectionalLight.prototype.clone = function () {
 
 	var light = new THREE.DirectionalLight();

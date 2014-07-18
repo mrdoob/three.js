@@ -42,6 +42,8 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
 
 THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
 
+THREE.SpotLight.prototype.getWorldDirection = THREE.Light._getWorldDirectionClosure();
+
 THREE.SpotLight.prototype.clone = function () {
 
 	var light = new THREE.SpotLight();
