@@ -226,17 +226,9 @@ THREE.Animation.prototype.update = (function(){
 						newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 						// blend
-						if ( object instanceof THREE.Bone ) {
-
-							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
-							object.position.lerp( newVector, proportionalWeight );
-							object.accumulatedPosWeight += this.weight;
-
-						} else {
-
-							object.position.copy( newVector );
-
-						}
+						var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
+						object.position.lerp( newVector, proportionalWeight );
+						object.accumulatedPosWeight += this.weight;
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
 								this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
@@ -249,14 +241,8 @@ THREE.Animation.prototype.update = (function(){
 						scale = scale * 0.33 + 0.33;
 
 						var currentPoint = interpolateCatmullRom( points, scale );
-						var proportionalWeight = 1;
-						
-						if ( object instanceof THREE.Bone ) {
-
-							proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
-							object.accumulatedPosWeight += this.weight;
-
-						}
+						var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
+						object.accumulatedPosWeight += this.weight;
 
 						// blend
 
@@ -287,11 +273,7 @@ THREE.Animation.prototype.update = (function(){
 					THREE.Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
 
 					// Avoid paying the cost of an additional slerp if we don't have to
-					if ( ! ( object instanceof THREE.Bone ) ) {
-
-						object.quaternion.copy(newQuat);
-
-					} else if ( object.accumulatedRotWeight === 0 ) {
+					if ( object.accumulatedRotWeight === 0 ) {
 
 						object.quaternion.copy(newQuat);
 						object.accumulatedRotWeight = this.weight;
@@ -310,17 +292,9 @@ THREE.Animation.prototype.update = (function(){
 					newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 					newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
-					if ( object instanceof THREE.Bone ) {
-
-						var proportionalWeight = this.weight / ( this.weight + object.accumulatedSclWeight);
-						object.scale.lerp( newVector, proportionalWeight );
-						object.accumulatedSclWeight += this.weight;
-
-					} else {
-
-						object.scale.copy( newVector );
-
-					}
+					var proportionalWeight = this.weight / ( this.weight + object.accumulatedSclWeight);
+					object.scale.lerp( newVector, proportionalWeight );
+					object.accumulatedSclWeight += this.weight;
 
 				}
 

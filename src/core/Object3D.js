@@ -61,6 +61,10 @@ THREE.Object3D = function () {
 	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = false;
 
+	this.accumulatedRotWeight = 0;
+	this.accumulatedPosWeight = 0;
+	this.accumulatedSclWeight = 0;
+
 	this.visible = true;
 
 	this.castShadow = false;
@@ -528,6 +532,12 @@ THREE.Object3D.prototype = {
 			this.children[ i ].updateMatrixWorld( force );
 
 		}
+
+		// Reset weights to be re-accumulated in the next frame
+
+		this.accumulatedRotWeight = 0;
+		this.accumulatedPosWeight = 0;
+		this.accumulatedSclWeight = 0;
 
 	},
 
