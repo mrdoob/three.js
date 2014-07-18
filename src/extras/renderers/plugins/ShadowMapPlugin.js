@@ -38,6 +38,19 @@ THREE.ShadowMapPlugin = function () {
 
 	};
 
+	this.dispose = function() {
+		_depthMaterial.dispose();
+		_depthMaterial = null;
+		_depthMaterialSkin.dispose();
+		_depthMaterialSkin = null;
+		_depthMaterialMorph.dispose();
+		_depthMaterialMorph = null;
+		_depthMaterialMorphSkin.dispose();
+		_depthMaterialMorphSkin = null;
+		_renderer = null;
+		_renderList.splice(0, _renderList.length);
+	}
+
 	this.render = function ( scene, camera ) {
 
 		if ( ! ( _renderer.shadowMapEnabled && _renderer.shadowMapAutoUpdate ) ) return;

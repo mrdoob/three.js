@@ -240,6 +240,16 @@ THREE.SpritePlugin = function () {
 
 	};
 
+	this.dispose = function () {
+		_texture.dispose();
+		_gl.deleteProgram( program );
+		for ( var i in sprites ) {
+			sprites[i].material.dispose();
+		}
+		_gl.deleteBuffer( vertexBuffer );
+		_gl.deleteBuffer( elementBuffer );
+	};
+
 	function createProgram () {
 
 		var program = _gl.createProgram();

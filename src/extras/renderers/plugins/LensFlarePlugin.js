@@ -285,6 +285,12 @@ THREE.LensFlarePlugin = function () {
 
 	};
 
+	this.dispose = function () {
+		_gl.deleteProgram( _lensFlare.program );
+		_gl.deleteTexture( _lensFlare.tempTexture );
+		_gl.deleteTexture( _lensFlare.occlusionTexture );
+	};
+
 	function createProgram ( shader, precision ) {
 
 		var program = _gl.createProgram();

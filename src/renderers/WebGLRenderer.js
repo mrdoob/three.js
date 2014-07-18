@@ -350,6 +350,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.dispose = function() {
+		var i;
+		for ( i in this.renderPluginsPre ) {
+		   this.renderPluginsPre[i].dispose();
+		}
+		for ( i in this.renderPluginsPost ) {
+		   this.renderPluginsPost[i].dispose();
+		}
+		this.renderPluginsPre = null;
+		this.renderPluginsPost = null;
+		opaqueObjects = null;
+		transparentObjects = null;
+		_programs = null;
+		_this = null;
+		_renderer = null;
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
 
 		_canvas.width = width * this.devicePixelRatio;
