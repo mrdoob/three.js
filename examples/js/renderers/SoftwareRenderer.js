@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author ryg / http://farbrausch.de/~fg
  * @author mraleph / http://mrale.ph/
+ * @author daoshengmu / http://dsmu.me/
  */
 
 THREE.SoftwareRenderer = function ( parameters ) {
@@ -248,13 +249,28 @@ THREE.SoftwareRenderer = function ( parameters ) {
                      
                     string = [
                             'var tdim = material.texture.width;',
+                            'var isTransparent = material.transparent',
                             'var tbound = tdim - 1;',
                             'var tdata = material.texture.data;',
                             'var texel = tdata[((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)];',
-                            'buffer[ offset ] = (texel & 0xff0000) >> 16;',
-                            'buffer[ offset + 1 ] = (texel & 0xff00) >> 8;',
-                            'buffer[ offset + 2 ] = (texel & 0xff);',
-                            'buffer[ offset + 3 ] = material.opacity * 255;',
+                            'if ( !isTransparent ) {',
+                            '  buffer[ offset ] = (texel & 0xff0000) >> 16;',
+                            '  buffer[ offset + 1 ] = (texel & 0xff00) >> 8;',
+                            '  buffer[ offset + 2 ] = (texel & 0xff);',
+                            '  buffer[ offset + 3 ] = material.opacity * 255;',
+                            '} else { ',
+                            '  var opaci = ((texel >> 24) & 0xff) * material.opacity;',
+                            '  if(opaci > 250) { ',
+                            '    zbuf[pix] = z; ',
+							'  } else {',
+                            '    var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8 ',
+                            '    texel = texel * opaci + backcolor * (1-opaci); ',                            
+                            '  }',
+                            '  buffer[ offset ] = (texel & 0xff0000) >> 16;',
+                            '  buffer[ offset + 1 ] = (texel & 0xff00) >> 8;',
+                            '  buffer[ offset + 2 ] = (texel & 0xff);',
+                            '  buffer[ offset + 3 ] = material.opacity * 255;',
+                            '}'
                         ].join('\n');
                     
                 } else {
