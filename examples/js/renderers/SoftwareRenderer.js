@@ -425,35 +425,28 @@ THREE.SoftwareRenderer = function ( parameters ) {
         
         // UV interpolation setup
         
-       var dtu12 = tu1 - tu2, dtu23 = tu2 - tu3, dtu31 = tu3 - tu1;
-//       var dtudx = (invDet * (dtu12*dy31 - du31*dy12)); // dtu per one subpixel step in x
-//       var dtudy = (invDet * (dtu12*dx31 - dx12*du31)); // dtu per one subpixel step in y
-       var dtv12 = tv1 - tv2, dtv23 = tv2 - tv3, dtv31 = tv3 - tv1;
-//       var dtvdx = (invDet * (dtv12*dy31 - dtv31*dy12)); // dtv per one subpixel step in x
-//       var dtvdy = (invDet * (dtv12*dx31 - dx12*dtv31)); // dtv per one subpixel step in y
+        var dtu12 = tu1 - tu2, du31 = tu3 - tu1;
+        var dtudx = (invDet * (dtu12*dy31 - du31*dy12)); // dtu per one subpixel step in x
+        var dtudy = (invDet * (dtu12*dx31 - dx12*du31)); // dtu per one subpixel step in y
+        var dtv12 = tv1 - tv2, dtv31 = tv3 - tv1;
+        var dtvdx = (invDet * (dtv12*dy31 - dtv31*dy12)); // dtv per one subpixel step in x
+        var dtvdy = (invDet * (dtv12*dx31 - dx12*dtv31)); // dtv per one subpixel step in y
        
-       // UV at top/left corner of rast area
-//        var minXfixscale = (minx << subpixelBits);
-//        var minYfixscale = (miny << subpixelBits);
-//		var ctu = ( tu1 + (minXfixscale - x1) * dtudx + (minYfixscale - y1) * dtudy );
-//        var ctv = ( tv1 + (minXfixscale - x1) * dtvdx + (minYfixscale - y1) * dtvdy );
-        var mintu = Math.min( tu1, tu2, tu3 );
-		var maxtu = Math.max( tu1, tu2, tu3 );
-		var mintv = Math.min( tv1, tv2, tv3 );
-		var maxtv = Math.max( tv1, tv2, tv3 );
-
-        var cuv1 = dtv12 * (mintu- tu1) + dtu12 * (mintv - tv1);
-		var cuv2 = dtv23 * (mintu - tu2) + dtu23 * (mintv - tv2);
-        var cuv3 = dtv31 * (mintu - tu3) + dtu31 * (mintv - tv3);
+        // UV at top/left corner of rast area
         
+        var minXfixscale = (minx << subpixelBits);
+        var minYfixscale = (miny << subpixelBits);
+		var ctu = ( tu1 + (minXfixscale - x1) * dtudx + (minYfixscale - y1) * dtudy );
+        var ctv = ( tv1 + (minXfixscale - x1) * dtvdx + (minYfixscale - y1) * dtvdy );
+
 		// UV pixel steps
 
-//		var tufixscale = (1 << subpixelBits);
-//		dtudx = dtudx * tufixscale;
-//		dtudy = dtudy * tufixscale;
-//        var tvfixscale = (1 << subpixelBits);
-//		dtvdx = (dtvdx * tvfixscale);
-//		dtvdy = (dtvdy * tvfixscale);
+		var tufixscale = (1 << subpixelBits);
+		dtudx = dtudx * tufixscale;
+		dtudy = dtudy * tufixscale;
+        var tvfixscale = (1 << subpixelBits);
+		dtvdx = (dtvdx * tvfixscale);
+		dtvdy = (dtvdy * tvfixscale);
 
 		// Set up min/max corners
 		var qm1 = q - 1; // for convenience
@@ -461,8 +454,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var nmin2 = 0, nmax2 = 0;
 		var nmin3 = 0, nmax3 = 0;
 		var nminz = 0, nmaxz = 0;
-//        var nmintu = 0, nmaxtu = 0;
-//        var nmintv = 0, nmaxtv = 0;
+        var nmintu = 0, nmaxtu = 0;
+        var nmintv = 0, nmaxtv = 0;
 		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
 		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
 		if (dx23 >= 0) nmax2 -= qm1*dx23; else nmin2 -= qm1*dx23;
@@ -471,8 +464,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		if (dy31 >= 0) nmax3 -= qm1*dy31; else nmin3 -= qm1*dy31;
 		if (dzdx >= 0) nmaxz += qm1*dzdx; else nminz += qm1*dzdx;
 		if (dzdy >= 0) nmaxz += qm1*dzdy; else nminz += qm1*dzdy;
-//        if (dtudx >= 0) nmaxtu += qm1*dtudx; else nmintu += qm1*dtudx;
-//		if (dtudy >= 0) nmaxtu += qm1*dtudy; else nmintu += qm1*dtudy;
+        if (dtudx >= 0) nmaxtu += qm1*dtudx; else nmintu += qm1*dtudx;
+		if (dtudy >= 0) nmaxtu += qm1*dtudy; else nmintu += qm1*dtudy;
 
 		// Loop through blocks
 		var linestep = canvasWidth - q;
@@ -482,17 +475,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var cb2 = c2;
 		var cb3 = c3;
 		var cbz = cz;
-        var cbtuv1 = cuv1;
-        var cbtuv2 = cuv2;
-        var cbtuv3 = cuv3;
+        var cbtu = ctu;
+        var cbtv = ctv;
 		var qstep = -q;
 		var e1x = qstep * dy12;
 		var e2x = qstep * dy23;
 		var e3x = qstep * dy31;
 		var ezx = qstep * dzdx;
-        var e1tu = qstep * dtv12;
-        var e2tu = qstep * dtv23;
-        var e3tu = qstep * dtv31;
+        var etux = qstep * dtudx;
+        var etvx = qstep * dtvdx;
 		var x0 = minx;
 
 		for ( var y0 = miny; y0 < maxy; y0 += q ) {
@@ -505,9 +496,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cb2 += e2x;
 				cb3 += e3x;
 				cbz += ezx;
-                cbtuv1 += e1tu;
-                cbtuv2 += e2tu;
-                cbtuv3 += e3tu;
+                cbtu += etux;
+                cbtv += etvx;
 
 			}
 
@@ -517,9 +507,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			e2x = -e2x;
 			e3x = -e3x;
 			ezx = -ezx;
-            e1tu = -e1tu;
-            e2tu = -e2tu;
-            e3tu = -e3tu;
+            etux = -etux;
+            etvx = -etvx;
 
 			while ( 1 ) {
 
@@ -529,9 +518,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cb2 += e2x;
 				cb3 += e3x;
 				cbz += ezx;
-                cbtuv1 += e1tu;
-                cbtuv2 += e2tu;
-                cbtuv3 += e3tu;
+                cbtu += etux;
+                cbtv += etvx;
 
 				// We're done with this block line when at least one edge completely out
 				// If an edge function is too small and decreasing in the current traversal
@@ -567,50 +555,34 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cy1 = cb1;
 					var cy2 = cb2;
 					var cyz = cbz;
-                    var ctv1 = cbtuv1;
-                    var ctv2 = cbtuv2;
+                    var cytu = cbtu;
+                    var cytv = cbtv;
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
 						var cx1 = cy1;
 						var cx2 = cy2;
 						var cxz = cyz;
-                        var ctu1 = ctv1;
-                        var ctu2 = ctv2;
+                        var cxtu = cytu;
+                        var cxtv = cytv;
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
 							var z = cxz;
-                            
+                           
 							if ( z < zbuffer[ offset ] ) {
 								zbuffer[ offset ] = z;
 								var u = cx1 * scale;
-								var v = cx2 * scale;
-                                                              
-//                                // Compute UV                                   
-//                                var xPos = x0 + ix;
-//                                var yPos = y0 + iy;
-//                                var dist1 = Math.sqrt((xPos-x1)*(xPos-x1)+(yPos-y1)*(yPos-y1));
-//                                var dist2 = Math.sqrt((xPos-x2)*(xPos-x2)+(yPos-y2)*(yPos-y2));
-//                                var dist3 = Math.sqrt((xPos-x3)*(xPos-x3)+(yPos-y3)*(yPos-y3));
-//                                var distTotal = dist1 + dist2 + dist3;
-//
-//                                var dist1Ratio = dist1 / distTotal;
-//                                var dist2Ratio = dist2 / distTotal;
-//                                var dist3Ratio = dist3 / distTotal;
-//
-//                                u = tu1 * dist1Ratio + tu2 * dist2Ratio + tu3 * dist3Ratio;
-//                                v = tv1 * dist1Ratio + tv2 * dist2Ratio + tv3 * dist3Ratio;
-//                                
-                                                                 
-								shader( data, offset * 4, ctu1, ctu2, face, material );
+								var v = cx2 * scale;                                        
+                                
+								shader( data, offset * 4, cxtu, cxtv, face, material );
 							}
 
 							cx1 += dy12;
 							cx2 += dy23;
 							cxz += dzdx;
-                            ctu1 += dtv12;
-                            ctu2 += dtv23;
+                            cxtu += dtudx;
+                            cxtv += dtvdx;
 							offset++;
 
 						}
@@ -618,8 +590,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cy1 += dx12;
 						cy2 += dx23;
 						cyz += dzdy;
-                        ctv1 += dtv12;
-						ctv2 += dtv23;
+                        cytu += dtudy;
+                        cytv += dtvdy;
 						offset += linestep;
 
 					}
@@ -630,9 +602,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cy2 = cb2;
 					var cy3 = cb3;
 					var cyz = cbz;
-                    var ctv1 = cbtuv1;
-                    var ctv2 = cbtuv2;
-                    var ctv3 = cbtuv3;
+                    var cytu = cbtu;
+                    var cytv = cbtv;
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
@@ -640,38 +611,21 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						var cx2 = cy2;
 						var cx3 = cy3;
 						var cxz = cyz;
-                        var ctu1 = ctv1;
-                        var ctu2 = ctv2;                        
-                        var ctu3 = ctv3;
+                        var cxtu = cytu;
+                        var cxtv = cytv;                        
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
 							if ( ( cx1 | cx2 | cx3 ) >= 0 ) {
 
-								var z = cxz;                               
+								var z = cxz;                              
 
 								if ( z < zbuffer[ offset ] ) {
 									var u = cx1 * scale;
 									var v = cx2 * scale;
 
-									zbuffer[ offset ] = z;
-                                    
-//                                    // Compute UV                                   
-//                                    var xPos = x0 + ix;
-//                                    var yPos = y0 + iy;
-//                                    var dist1 = Math.sqrt((xPos-x1)*(xPos-x1)+(yPos-y1)*(yPos-y1));
-//                                    var dist2 = Math.sqrt((xPos-x2)*(xPos-x2)+(yPos-y2)*(yPos-y2));
-//                                    var dist3 = Math.sqrt((xPos-x3)*(xPos-x3)+(yPos-y3)*(yPos-y3));
-//                                    var distTotal = dist1 + dist2 + dist3;
-//
-//                                    var dist1Ratio = dist1 / distTotal;
-//                                    var dist2Ratio = dist2 / distTotal;
-//                                    var dist3Ratio = dist3 / distTotal;
-//                                    
-//                                    u = tu1 * dist1Ratio + tu2 * dist2Ratio + tu3 * dist3Ratio;
-//                                    v = tv1 * dist1Ratio + tv2 * dist2Ratio + tv3 * dist3Ratio;
-//                                
-									shader( data, offset * 4, ctu1, ctu2, face, material );
+									zbuffer[ offset ] = z;                                    
+									shader( data, offset * 4, cxtu, cxtv, face, material );
 
 								}
 
@@ -681,9 +635,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							cx2 += dy23;
 							cx3 += dy31;
 							cxz += dzdx;
-                            ctu1 += dtv12;
-                            ctu2 += dtv23;
-                            ctu3 += dtv31;
+                            cxtu += dtudx;
+                            cxtv += dtvdx;
 							offset++;
 
 						}
@@ -692,9 +645,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cy2 += dx23;
 						cy3 += dx31;
 						cyz += dzdy;
-                        ctv1 += dtu12;
-                        ctv2 += dtu23;
-                        ctv3 += dtu31;
+                        cytu += dtudy;
+                        cytv += dtvdy;
 						offset += linestep;
 
 					}
@@ -708,9 +660,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			cb2 += q*dx23;
 			cb3 += q*dx31;
 			cbz += q*dzdy;
-            cbtuv1 += q*dtu12;
-            cbtuv2 += q*dtu23;
-            cbtuv3 += q*dtu31;
+            cbtu += q*dtudy;
+            cbtv += q*dtvdy;
 		}
 
 	}
