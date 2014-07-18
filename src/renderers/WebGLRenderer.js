@@ -5332,15 +5332,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_vector3.setFromMatrixPosition( light.matrixWorld );
+				_direction.setFromMatrixPosition( light.matrixWorld );
 
-				spotPositions[ spotOffset ]     = _vector3.x;
-				spotPositions[ spotOffset + 1 ] = _vector3.y;
-				spotPositions[ spotOffset + 2 ] = _vector3.z;
+				spotPositions[ spotOffset ]     = _direction.x;
+				spotPositions[ spotOffset + 1 ] = _direction.y;
+				spotPositions[ spotOffset + 2 ] = _direction.z;
 
 				spotDistances[ spotLength ] = distance;
 
-				_direction.copy( _vector3 );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.normalize();
