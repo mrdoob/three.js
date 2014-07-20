@@ -107,7 +107,7 @@ THREE.BufferGeometry.prototype = {
 		if ( hasFaceVertexUv === true ) {
 
 			var uvs = new Float32Array( faces.length * 3 * 2 );
-			this.addAttribute( 'uvs', new THREE.BufferAttribute( uvs, 2 ) );
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 		}
 
