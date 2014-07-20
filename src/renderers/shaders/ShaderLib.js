@@ -293,6 +293,8 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
+			"#define PHONG",
+
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
