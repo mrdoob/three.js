@@ -38,7 +38,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var blockShift = 3;
 	var blockSize = 1 << blockShift;
 	var maxZVal = (1 << 24); // Note: You want to size this so you don't get overflows.
-    var maxTexCoordVal = 1; // Note: You want to size this so you don't get overflows.
 
 	var rectx1 = Infinity, recty1 = Infinity;
 	var rectx2 = 0, recty2 = 0;
@@ -79,13 +78,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		viewportXScale =  fixScale * canvasWidth  / 2;
 		viewportYScale = -fixScale * canvasHeight / 2;
 		viewportZScale =             maxZVal      / 2;
-        viewportTexCoordScale =      maxTexCoordVal;
-        
+              
 		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
 		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
 		viewportZOffs  =             maxZVal      / 2 + 0.5;
-        viewportTexCoordOffs  =      0;
-
+        
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
 
@@ -566,9 +563,12 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// Constant part of half-edge functions
 
-		var c1 = dy12 * ((minx << subpixelBits) - x1) + dx12 * ((miny << subpixelBits) - y1);
-		var c2 = dy23 * ((minx << subpixelBits) - x2) + dx23 * ((miny << subpixelBits) - y2);
-		var c3 = dy31 * ((minx << subpixelBits) - x3) + dx31 * ((miny << subpixelBits) - y3);
+		var minXfixscale = (minx << subpixelBits);
+        var minYfixscale = (miny << subpixelBits);
+
+		var c1 = dy12 * ((minXfixscale) - x1) + dx12 * ((minYfixscale) - y1);
+		var c2 = dy23 * ((minXfixscale) - x2) + dx23 * ((minYfixscale) - y2);
+		var c3 = dy31 * ((minXfixscale) - x3) + dx31 * ((minYfixscale) - y3);
 
 		// Correct for fill convention
 
@@ -591,13 +591,13 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// Z at top/left corner of rast area
 
-		var cz = ( z1 + ((minx << subpixelBits) - x1) * dzdx + ((miny << subpixelBits) - y1) * dzdy ) | 0;
+		var cz = ( z1 + ((minXfixscale) - x1) * dzdx + ((minYfixscale) - y1) * dzdy ) | 0;
 
 		// Z pixel steps
 
-		var zfixscale = (1 << subpixelBits);
-		dzdx = (dzdx * zfixscale) | 0;
-		dzdy = (dzdy * zfixscale) | 0;
+		var fixscale = (1 << subpixelBits);
+		dzdx = (dzdx * fixscale) | 0;
+		dzdy = (dzdy * fixscale) | 0;
         
         // UV interpolation setup
         
@@ -610,19 +610,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
        
         // UV at top/left corner of rast area
         
-        var minXfixscale = (minx << subpixelBits);
-        var minYfixscale = (miny << subpixelBits);
 		var ctu = ( tu1 + (minXfixscale - x1) * dtudx + (minYfixscale - y1) * dtudy );
         var ctv = ( tv1 + (minXfixscale - x1) * dtvdx + (minYfixscale - y1) * dtvdy );
 
 		// UV pixel steps
-
-		var tufixscale = (1 << subpixelBits);
-		dtudx = dtudx * tufixscale;
-		dtudy = dtudy * tufixscale;
-        var tvfixscale = (1 << subpixelBits);
-		dtvdx = (dtvdx * tvfixscale);
-		dtvdy = (dtvdy * tvfixscale);
+		
+		dtudx = dtudx * fixscale;
+		dtudy = dtudy * fixscale;        
+		dtvdx = (dtvdx * fixscale);
+		dtvdy = (dtvdy * fixscale);
 
         // Normal interpolation setup
         
@@ -636,8 +632,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// UV pixel steps
 
-        dnzdx = (dnzdx * tvfixscale);
-		dnzdy = (dnzdy * tvfixscale);
+        dnzdx = (dnzdx * fixscale);
+		dnzdy = (dnzdy * fixscale);
         
 		// Set up min/max corners
 		var qm1 = q - 1; // for convenience
