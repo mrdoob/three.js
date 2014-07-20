@@ -771,7 +771,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 								var u = cx1 * scale;
 								var v = cx2 * scale;                                        
                                 
-								shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );                                
+								shader( data, offset * 4, cxtu, 1-cxtv, cxnz * 255, face, material );                                
 							}
 
 							cx1 += dy12;
@@ -825,7 +825,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 									var v = cx2 * scale;
 
 									zbuffer[ offset ] = z;                                    
-									shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );
+									shader( data, offset * 4, cxtu, 1-cxtv, cxnz * 255, face, material );
 
 								}
 
