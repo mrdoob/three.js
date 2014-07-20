@@ -11,7 +11,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	var canvas = document.createElement( 'canvas' );
+	var canvas = parameters.canvas !== undefined
+			 ? parameters.canvas
+			 : document.createElement( 'canvas' );
 	var context = canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
 	} );
@@ -62,7 +64,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	this.setClearColor = function ( color, alpha ) {
 
 		clearColor.set( color );
-
+		cleanColorBuffer();
 	};
 
 	this.setSize = function ( width, height ) {
@@ -110,6 +112,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			blockFlags[ i ] = BLOCK_ISCLEAR;
 
 		}
+
+		cleanColorBuffer();
 
 	};
 
@@ -228,6 +232,22 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	};
 
+	function cleanColorBuffer() {
+
+		var size = canvasWidth * canvasHeight * 4;
+
+		for ( var i = 0; i < size; i+=4 ) {
+			
+			data[ i ] = clearColor.r * 255 | 0;
+			data[ i+1 ] = clearColor.g * 255 | 0;
+			data[ i+2 ] = clearColor.b * 255 | 0;
+			data[ i+3 ] = 255; 
+		}
+
+		context.fillStyle = clearColor.getStyle();
+		context.fillRect( 0, 0, canvasWidth, canvasHeight );
+	}
+
     function getPalette( color, bSimulateSpecular ) {
         var diffuseR = color.r * 149;
         var diffuseG = color.g * 149;
@@ -294,6 +314,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
     }
     
     function basicMaterialShader( buffer, offset, u, v, n, face, material ) {
+
+    	if ( material.map.needsUpdate ) {
+    		material.texture.CreateFromImage( material.map.image );
+    		material.map.needsUpdate = false;
+    	}
+
+    	if ( !material.texture.data )
+    		return;
+
         var tdim = material.texture.width;
         var isTransparent = material.transparent;
         var tbound = tdim - 1;
@@ -322,6 +351,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
     
     function lightingMaterialShader( buffer, offset, u, v, n, face, material ) {
         
+    	if ( material.map.needsUpdate ) {
+    		material.texture.CreateFromImage( material.map.image );
+    		material.map.needsUpdate = false;
+
+    		return;
+    	}
+
+    	if ( !material.texture.data )
+    		return;
+
         var tdim = material.texture.width;
         var isTransparent = material.transparent;
         var color = material.palette[ n > 0 ? (~~n) : 0 ];
@@ -376,9 +415,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				var string;
                 
                 if ( material.map ) {
-                    var texture = new THREE.SoftwareRenderer.Texture();
-                    texture.CreateFromImage( material.map.image );
-                    material.texture = texture;
+                    
+					var texture = new THREE.SoftwareRenderer.Texture();
+					material.texture = texture;					
                      
                     if ( material instanceof THREE.MeshBasicMaterial ) {
                         
@@ -607,7 +646,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var nmin3 = 0, nmax3 = 0;
 		var nminz = 0, nmaxz = 0;
         var nmintu = 0, nmaxtu = 0;
-        var nmintv = 0, nmaxtv = 0;
 		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
 		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
 		if (dx23 >= 0) nmax2 -= qm1*dx23; else nmin2 -= qm1*dx23;
@@ -653,7 +691,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
                 cbtu += etux;
                 cbtv += etvx;
                 cbnz += enzx;
-
 			}
 
 			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
@@ -734,15 +771,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 								var u = cx1 * scale;
 								var v = cx2 * scale;                                        
                                 
-								shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );
-                                
-                                if ( material.palette ) {                                    
-                                
-                                    var color = material.palette[ (cxnz * 255) > 0 ? (~~(cxnz * 255)) : 0 ];
-                                    var r = (color & 0xff0000) >> 16;
-                                    var test = 0;
-                                 }
-                                
+								shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );                                
 							}
 
 							cx1 += dy12;
