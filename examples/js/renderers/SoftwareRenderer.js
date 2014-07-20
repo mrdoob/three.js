@@ -20,8 +20,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	var canvasWidth, canvasHeight;
 	var canvasWBlocks, canvasHBlocks;
-	var viewportXScale, viewportYScale, viewportZScale, viewportTexCoordScale;
-	var viewportXOffs, viewportYOffs, viewportZOffs, viewportTexCoordOffs;
+	var viewportXScale, viewportYScale, viewportZScale;
+	var viewportXOffs, viewportYOffs, viewportZOffs;
 
 	var clearColor = new THREE.Color( 0x000000 );
 
@@ -228,17 +228,150 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	};
 
+    function getPalette( color, bSimulateSpecular ) {
+        var diffuseR = color.r * 149;
+        var diffuseG = color.g * 149;
+        var diffuseB = color.b * 149;
+        var palette = new Array(256);
+        
+        if ( bSimulateSpecular ) {
+            
+            var i = 0;
+            while(i < 204) {
+                var r = i * diffuseR / 204;
+                var g = i * diffuseG / 204;
+                var b = i * diffuseB / 204;
+                if(r > 255)
+                    r = 255;
+                if(g > 255)
+                    g = 255;
+                if(b > 255)
+                    b = 255;
+
+                palette[i++] = r << 16 | g << 8 | b;
+            }
+
+            while(i < 256) { // plus specular highlight
+                var r = diffuseR + (i - 204) * (255 - diffuseR) / 82;
+                var g = diffuseG + (i - 204) * (255 - diffuseG) / 82;
+                var b = diffuseB + (i - 204) * (255 - diffuseB) / 82;
+                if(r > 255)
+                    r = 255;
+                if(g > 255)
+                    g = 255;
+                if(b > 255)
+                    b = 255;
+
+                if ( (r<<16) < 16777215   )
+				{
+					 var test = 0;
+					 ++test;
+				}
+				
+                palette[i++] = r << 16 | g << 8 | b;
+            }
+            
+        } else {
+          
+            var i = 0;
+            while(i < 256) {
+                var r = i * diffuseR / 255;
+                var g = i * diffuseG / 255;
+                var b = i * diffuseB / 255;
+                if(r > 255)
+                    r = 255;
+                if(g > 255)
+                    g = 255;
+                if(b > 255)
+                    b = 255;
+
+                palette[i++] = r << 16 | g << 8 | b;
+            }           
+            
+        }
+        
+        return palette;
+    }
+    
+    function basicMaterialShader( buffer, offset, u, v, n, face, material ) {
+        var tdim = material.texture.width;
+        var isTransparent = material.transparent;
+        var tbound = tdim - 1;
+        var tdata = material.texture.data;
+        var texel = tdata[((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)];
+        
+        if ( !isTransparent ) {
+            buffer[ offset ] = (texel & 0xff0000) >> 16;
+            buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
+            buffer[ offset + 2 ] = texel & 0xff;
+            buffer[ offset + 3 ] = material.opacity * 255;
+        }
+        else { 
+            var opaci = ((texel >> 24) & 0xff) * material.opacity;
+            if(opaci < 250) {
+                var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
+                texel = texel * opaci + backColor * (1-opaci);                         
+            }
+            
+            buffer[ offset ] = (texel & 0xff0000) >> 16;
+            buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
+            buffer[ offset + 2 ] = (texel & 0xff);
+            buffer[ offset + 3 ] = material.opacity * 255;
+        }
+    }
+    
+    function lightingMaterialShader( buffer, offset, u, v, n, face, material ) {
+        
+        var tdim = material.texture.width;
+        var isTransparent = material.transparent;
+        var color = material.palette[ n > 0 ? (~~n) : 0 ];
+        var tbound = tdim - 1;
+        var tdata = material.texture.data;
+        var texel = tdata[((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)];
+        
+        if ( !isTransparent ) {
+          buffer[ offset ] = (((color & 0xff0000) >> 16) * ((texel & 0xff0000) >> 16)) >> 8;
+          buffer[ offset + 1 ] = (((color & 0xff00) >> 8) * ((texel & 0xff00) >> 8)) >> 8;
+          buffer[ offset + 2 ] = ((color & 0xff) * (texel & 0xff)) >> 8;
+          buffer[ offset + 3 ] = material.opacity * 255;
+        } else { 
+          var opaci = ((texel >> 24) & 0xff) * material.opacity;
+          if(opaci < 250) {
+            var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
+            texel = texel * opaci + backColor * (1-opaci);                          
+          }
+          buffer[ offset ] = (texel & 0xff0000) >> 16;
+          buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
+          buffer[ offset + 2 ] = (texel & 0xff);
+          buffer[ offset + 3 ] = material.opacity * 255;
+        }
+        
+    }
+    
 	function getMaterialShader( material ) {
 
 		var id = material.id;
 		var shader = shaders[ id ];
 
 		if ( shaders[ id ] === undefined ) {
-
+            
 			if ( material instanceof THREE.MeshBasicMaterial ||
 			     material instanceof THREE.MeshLambertMaterial ||
 			     material instanceof THREE.MeshPhongMaterial ||
 			     material instanceof THREE.SpriteMaterial ) {
+
+                if ( material instanceof THREE.MeshLambertMaterial ) {             
+                    // Generate color palette
+                    if ( !material.palette ) {
+                        material.palette = getPalette( material.color, false );
+                    }
+                    
+                } else if ( material instanceof THREE.MeshPhongMaterial ) {             
+                    // Generate color palette
+                    if ( !material.palette ) {
+                        material.palette = getPalette( material.color, true );
+                    }
+                }
 
 				var string;
                 
@@ -247,31 +380,14 @@ THREE.SoftwareRenderer = function ( parameters ) {
                     texture.CreateFromImage( material.map.image );
                     material.texture = texture;
                      
-                    string = [
-                            'var tdim = material.texture.width;',
-                            'var isTransparent = material.transparent',
-                            'var tbound = tdim - 1;',
-                            'var tdata = material.texture.data;',
-                            'var texel = tdata[((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)];',
-                            'if ( !isTransparent ) {',
-                            '  buffer[ offset ] = (texel & 0xff0000) >> 16;',
-                            '  buffer[ offset + 1 ] = (texel & 0xff00) >> 8;',
-                            '  buffer[ offset + 2 ] = (texel & 0xff);',
-                            '  buffer[ offset + 3 ] = material.opacity * 255;',
-                            '} else { ',
-                            '  var opaci = ((texel >> 24) & 0xff) * material.opacity;',
-                            '  if(opaci > 250) { ',
-                            '    zbuf[pix] = z; ',
-							'  } else {',
-                            '    var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8 ',
-                            '    texel = texel * opaci + backcolor * (1-opaci); ',                            
-                            '  }',
-                            '  buffer[ offset ] = (texel & 0xff0000) >> 16;',
-                            '  buffer[ offset + 1 ] = (texel & 0xff00) >> 8;',
-                            '  buffer[ offset + 2 ] = (texel & 0xff);',
-                            '  buffer[ offset + 3 ] = material.opacity * 255;',
-                            '}'
-                        ].join('\n');
+                    if ( material instanceof THREE.MeshBasicMaterial ) {
+                        
+                        shader = basicMaterialShader;
+                    } else {
+                        
+                        shader = lightingMaterialShader;
+                    }
+                    
                     
                 } else {
                     
@@ -281,7 +397,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
                             'buffer[ offset ] = face.color.r * 255;',
                             'buffer[ offset + 1 ] = face.color.g * 255;',
                             'buffer[ offset + 2 ] = face.color.b * 255;',
-                            'buffer[ offset + 3 ] = material.opacity * 255;',
+                            'buffer[ offset + 3 ] = material.opacity * 255;'
                         ].join('\n');
 
                     } else {
@@ -290,13 +406,13 @@ THREE.SoftwareRenderer = function ( parameters ) {
                             'buffer[ offset ] = material.color.r * 255;',
                             'buffer[ offset + 1 ] = material.color.g * 255;',
                             'buffer[ offset + 2 ] = material.color.b * 255;',
-                            'buffer[ offset + 3 ] = material.opacity * 255;',
+                            'buffer[ offset + 3 ] = material.opacity * 255;'
                         ].join('\n');
 
                     }
-                }
-
-				shader = new Function( 'buffer, offset, u, v, face, material', string );
+                    
+                    shader = new Function( 'buffer, offset, u, v, n, face, material', string );
+                }			
 
 			} else {
 
@@ -370,13 +486,18 @@ THREE.SoftwareRenderer = function ( parameters ) {
         
         // UV values
         
-        var tu1 = (face.uvs[0].x * viewportTexCoordScale + viewportTexCoordOffs); 
-        var tv1 = (face.uvs[0].y * viewportTexCoordScale + viewportTexCoordOffs); 
-        var tu2 = (face.uvs[1].x * viewportTexCoordScale + viewportTexCoordOffs); 
-        var tv2 = (face.uvs[1].y * viewportTexCoordScale + viewportTexCoordOffs); 
-        var tu3 = (face.uvs[2].x * viewportTexCoordScale + viewportTexCoordOffs); 
-        var tv3 = (face.uvs[2].y * viewportTexCoordScale + viewportTexCoordOffs); 
-		
+        var tu1 = face.uvs[0].x; 
+        var tv1 = face.uvs[0].y; 
+        var tu2 = face.uvs[1].x; 
+        var tv2 = face.uvs[1].y; 
+        var tu3 = face.uvs[2].x; 
+        var tv3 = face.uvs[2].y; 
+        
+        // Normal values
+        var n1 = face.vertexNormalsModel[0], n2 = face.vertexNormalsModel[1], n3 = face.vertexNormalsModel[2];        
+        var nz1 = n1.z;
+        var nz2 = n2.z;
+        var nz3 = n3.z;
         // Deltas
 
 		var dx12 = x1 - x2, dy12 = y2 - y1;
@@ -441,9 +562,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
         
         // UV interpolation setup
         
-        var dtu12 = tu1 - tu2, du31 = tu3 - tu1;
-        var dtudx = (invDet * (dtu12*dy31 - du31*dy12)); // dtu per one subpixel step in x
-        var dtudy = (invDet * (dtu12*dx31 - dx12*du31)); // dtu per one subpixel step in y
+        var dtu12 = tu1 - tu2, dtu31 = tu3 - tu1;
+        var dtudx = (invDet * (dtu12*dy31 - dtu31*dy12)); // dtu per one subpixel step in x
+        var dtudy = (invDet * (dtu12*dx31 - dx12*dtu31)); // dtu per one subpixel step in y
         var dtv12 = tv1 - tv2, dtv31 = tv3 - tv1;
         var dtvdx = (invDet * (dtv12*dy31 - dtv31*dy12)); // dtv per one subpixel step in x
         var dtvdy = (invDet * (dtv12*dx31 - dx12*dtv31)); // dtv per one subpixel step in y
@@ -464,6 +585,21 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		dtvdx = (dtvdx * tvfixscale);
 		dtvdy = (dtvdy * tvfixscale);
 
+        // Normal interpolation setup
+        
+        var dnz12 = nz1 - nz2, dnz31 = nz3 - nz1;
+        var dnzdx = (invDet * (dnz12*dy31 - dnz31*dy12)); // dnz per one subpixel step in x
+        var dnzdy = (invDet * (dnz12*dx31 - dx12*dnz31)); // dnz per one subpixel step in y
+        
+         // Normal at top/left corner of rast area
+       
+        var cnz = ( nz1 + (minXfixscale - x1) * dnzdx + (minYfixscale - y1) * dnzdy );
+
+		// UV pixel steps
+
+        dnzdx = (dnzdx * tvfixscale);
+		dnzdy = (dnzdy * tvfixscale);
+        
 		// Set up min/max corners
 		var qm1 = q - 1; // for convenience
 		var nmin1 = 0, nmax1 = 0;
@@ -493,6 +629,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var cbz = cz;
         var cbtu = ctu;
         var cbtv = ctv;
+        var cbnz = cnz;
 		var qstep = -q;
 		var e1x = qstep * dy12;
 		var e2x = qstep * dy23;
@@ -500,6 +637,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var ezx = qstep * dzdx;
         var etux = qstep * dtudx;
         var etvx = qstep * dtvdx;
+        var enzx = qstep * dnzdx;
 		var x0 = minx;
 
 		for ( var y0 = miny; y0 < maxy; y0 += q ) {
@@ -514,6 +652,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cbz += ezx;
                 cbtu += etux;
                 cbtv += etvx;
+                cbnz += enzx;
 
 			}
 
@@ -525,6 +664,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			ezx = -ezx;
             etux = -etux;
             etvx = -etvx;
+            enzx = -enzx;
 
 			while ( 1 ) {
 
@@ -536,6 +676,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cbz += ezx;
                 cbtu += etux;
                 cbtv += etvx;
+                cbnz += enzx;
 
 				// We're done with this block line when at least one edge completely out
 				// If an edge function is too small and decreasing in the current traversal
@@ -573,6 +714,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cyz = cbz;
                     var cytu = cbtu;
                     var cytv = cbtv;
+                    var cynz = cbnz;
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
@@ -581,6 +723,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						var cxz = cyz;
                         var cxtu = cytu;
                         var cxtv = cytv;
+                        var cxnz = cynz;                        
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
@@ -591,7 +734,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 								var u = cx1 * scale;
 								var v = cx2 * scale;                                        
                                 
-								shader( data, offset * 4, cxtu, cxtv, face, material );
+								shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );
+                                
+                                if ( material.palette ) {                                    
+                                
+                                    var color = material.palette[ (cxnz * 255) > 0 ? (~~(cxnz * 255)) : 0 ];
+                                    var r = (color & 0xff0000) >> 16;
+                                    var test = 0;
+                                 }
+                                
 							}
 
 							cx1 += dy12;
@@ -599,6 +750,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							cxz += dzdx;
                             cxtu += dtudx;
                             cxtv += dtvdx;
+                            cxnz += dnzdx;
 							offset++;
 
 						}
@@ -608,6 +760,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cyz += dzdy;
                         cytu += dtudy;
                         cytv += dtvdy;
+                        cynz += dnzdy;
 						offset += linestep;
 
 					}
@@ -620,6 +773,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cyz = cbz;
                     var cytu = cbtu;
                     var cytv = cbtv;
+                    var cynz = cbnz;
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
@@ -628,7 +782,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						var cx3 = cy3;
 						var cxz = cyz;
                         var cxtu = cytu;
-                        var cxtv = cytv;                        
+                        var cxtv = cytv;    
+                        var cxnz = cynz;     
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
@@ -641,7 +796,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 									var v = cx2 * scale;
 
 									zbuffer[ offset ] = z;                                    
-									shader( data, offset * 4, cxtu, cxtv, face, material );
+									shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );
 
 								}
 
@@ -653,6 +808,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							cxz += dzdx;
                             cxtu += dtudx;
                             cxtv += dtvdx;
+                            cxnz += dnzdx;
 							offset++;
 
 						}
@@ -663,6 +819,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cyz += dzdy;
                         cytu += dtudy;
                         cytv += dtvdy;
+                        cynz += dnzdy;
 						offset += linestep;
 
 					}
@@ -678,6 +835,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			cbz += q*dzdy;
             cbtu += q*dtudy;
             cbtv += q*dtvdy;
+            cbnz += q*dnzdy;
 		}
 
 	}
