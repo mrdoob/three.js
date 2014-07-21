@@ -182,26 +182,11 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 	    for( var i = 0; i < mesh.geometry.faces.length; i++ ) {
 
 	        var f = mesh.geometry.faces[ i ];
-	        var n = ( f instanceof THREE.Face3 ) ? 3 : 4;
 	        var vertices = [];
 
-	        if( n === 3 ) {
-
-	            this.pushVertex( vertices, f[ this.faceIndices[ 0 ] ], f.vertexNormals[ 0 ] );
-	            this.pushVertex( vertices, f[ this.faceIndices[ 1 ] ], f.vertexNormals[ 1 ] );
-	            this.pushVertex( vertices, f[ this.faceIndices[ 2 ] ], f.vertexNormals[ 2 ] );
-
-	        } else {
-
-	            this.pushVertex( vertices, f[ this.faceIndices[ 0 ] ], f.vertexNormals[ 0 ] );
-	            this.pushVertex( vertices, f[ this.faceIndices[ 1 ] ], f.vertexNormals[ 1 ] );
-	            this.pushVertex( vertices, f[ this.faceIndices[ 2 ] ], f.vertexNormals[ 2 ] );
-
-	            this.pushVertex( vertices, f[ this.faceIndices[ 3 ] ], f.vertexNormals[ 3 ] );
-	            this.pushVertex( vertices, f[ this.faceIndices[ 0 ] ], f.vertexNormals[ 0 ] );
-	            this.pushVertex( vertices, f[ this.faceIndices[ 2 ] ], f.vertexNormals[ 2 ] );
-
-	        }
+            this.pushVertex( vertices, f[ this.faceIndices[ 0 ] ], f.vertexNormals[ 0 ] );
+            this.pushVertex( vertices, f[ this.faceIndices[ 1 ] ], f.vertexNormals[ 1 ] );
+            this.pushVertex( vertices, f[ this.faceIndices[ 2 ] ], f.vertexNormals[ 2 ] );
 
 	        if( check.x ) {
 	        	vertices = this.clipFace( vertices, new THREE.Vector3( 1, 0, 0 ) );
