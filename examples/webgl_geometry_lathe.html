@@ -1,0 +1,666 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry LatheGeometry </title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="author" content="Vildanov Almaz">	
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#000;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - geometry Lathe
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		
+		<script src="js/Mirror.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+			var light1;
+			var CircleMirror;
+			
+			init();
+			animate();
+
+			function init() {
+
+				// camera		
+				AddCamera(0, 400, 2300); 		
+
+				scene = new THREE.Scene();
+				
+				// lights
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( -500, 200, 500 );
+				scene.add( light );
+				
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 500, -200, -500 );
+				scene.add( light );			
+				
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x203668 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+	
+				// world
+
+
+				// plate
+
+				var points = [];	
+				
+				points.push( new THREE.Vector3( 0, 0, 0 ) ); 
+				points.push( new THREE.Vector3( 90, 0, 0 ) ); 
+				points.push( new THREE.Vector3( 90, 0, 5 ) ); 				
+		
+				v0 = new THREE.Vector2( 90, 5 ); v1 = new THREE.Vector2( 154 , 17 );  
+				v2 = new THREE.Vector2( 132, 59 ); v3 = new THREE.Vector2( 219, 66 ); 
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				for (var i = 0; i <= 1; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x, 0, curve.getPoint( i ).y ) ); 
+					}	
+	
+				var geometry = new THREE.LatheGeometry( points, 48 );	
+				geometry.computeBoundingBox();	
+				
+				var material = new THREE.MeshPhongMaterial( { color: 0x00CED1, side: THREE.DoubleSide } );
+			
+				var plate = new THREE.Mesh( geometry, material );
+
+				plate.position.set( 0, 0, 0);
+				plate.rotation.x = -Math.PI/2;				
+				scene.add( plate );					
+				
+
+				
+				// egg
+				
+				v0 = new THREE.Vector2( 0, 0 ); v1 = new THREE.Vector2( 81, 0 );
+				v2 = new THREE.Vector2( 47, 125 ); v3 = new THREE.Vector2( 0, 125 );
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				var points = [];
+				for (var i = 0; i <= 1.11; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x ,  0, curve.getPoint( i ).y ) ); 
+					}	
+	
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				geometry.computeBoundingBox();	
+				
+				var material = new THREE.MeshPhongMaterial( { color: 0xD29A81 } );	
+
+				var egg = new THREE.Mesh( geometry, material );
+
+				egg.rotation.y = Math.PI/3;	
+				egg.position.set( 200, geometry.boundingBox.max.y, 200);
+				scene.add( egg );
+				
+	
+	
+				// apple
+				
+				apple = new THREE.Object3D; 
+				
+				v0 = new THREE.Vector2( 0, 30 ); v1 = new THREE.Vector2( 108, -40);
+				v2 = new THREE.Vector2( 61.5, 180 ); v3 = new THREE.Vector2( 0, 120 );
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				var points = [];
+				for (var i = 0; i <= 1.11; i+=0.01)  {
+						points.push( new THREE.Vector3( curve.getPoint( i ).x,  0, curve.getPoint( i ).y ) ); 
+					}	
+	
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+	
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/lathe/pear.jpg' );
+				var material = new THREE.MeshPhongMaterial( { map: Texture } );	
+				
+				var apple_ = new THREE.Mesh( geometry, material );
+
+				apple_.rotation.x = Math.PI/2;	
+				apple.add( apple_ );
+
+				chain = new THREE.Curve.create( function(){},
+					function(t) 
+						{
+							t = 3 * t;
+							var a = 10, b = 2;
+							var x = (30-a*t)/3 ;
+							var y = -b* t* t ; 
+							var z = 0;
+							return new THREE.Vector3(x, y, z).multiplyScalar(2);
+						}
+					);
+				mychain = new chain; 
+				var tubegeo = new THREE.TubeGeometry( mychain, 128, 4, 12, closed = false );
+
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/terrain/backgrounddetailed6.jpg' );
+				var material2 = new THREE.MeshPhongMaterial( { map: Texture , side: THREE.DoubleSide } );				
+			
+				var pod = new THREE.Mesh( tubegeo, material2 );
+				apple.add( pod );
+
+				apple.position.set( 0, 170/1.3, 0 );				
+				scene.add( apple );				
+	
+
+				// pear
+				
+				pear = new THREE.Object3D; 
+				
+				var points = [];			
+				v0 = new THREE.Vector2( 0, -104 ); v1 = new THREE.Vector2( 100, -104 );  
+				v2 = new THREE.Vector2( 117, 12 ); v3 = new THREE.Vector2( 75, 65 ); 
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				for (var i = 0; i < 1; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
+					}	
+
+ 
+				v4 = new THREE.Vector2( 32, 121 );  
+				v5 = new THREE.Vector2( 60, 182 ); 	
+				v6 = new THREE.Vector2(  0, 184 ); 
+
+				var curve = new THREE.CubicBezierCurve( v3, v4, v5, v6 );
+	
+				for (var i = 0.01; i <=  1.005; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
+					}	
+
+					
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				geometry.computeBoundingBox();	
+			
+				var pear_ = new THREE.Mesh( geometry, material );
+
+
+				pear_.rotation.x = -Math.PI/2; 
+				pear.add( pear_ );	
+				var pod = pod.clone();
+				pod.position.set( 0, 170/1.4, 0 );
+				pear.add( pod );				
+				
+				pear.position.set( 80, -geometry.boundingBox.min.z+30, -80);				
+				scene.add( pear );
+				
+
+				var pear2 = pear.clone();
+				pear2.position.set( 80, -geometry.boundingBox.min.z+30, 80);				
+				scene.add( pear2 );
+				
+				var pear3 = pear.clone();
+				pear3.position.set( -80, -geometry.boundingBox.min.z+30, 80);				
+				scene.add( pear3 );
+
+				var pear4 = pear.clone();
+				pear4.position.set( -80, -geometry.boundingBox.min.z+30, -80);				
+				scene.add( pear4 );
+
+				
+				// glass
+				
+				var points = [];
+	
+				v0 = new THREE.Vector2( 44, 239 );    
+				v1 = new THREE.Vector2( 80, 155 );
+				v2 = new THREE.Vector2( 0, 119 );	
+
+				var BezierCurve = new THREE.QuadraticBezierCurve( v0, v1, v2 );
+
+				for ( var i = 0; i < 1; i = i + 0.05 ) {
+					points.push( new THREE.Vector3( BezierCurve.getPoint( i ).x , 0,  BezierCurve.getPoint( i ).y ) ); 
+					}
+
+				for ( var i = - 4; i < 1.2; i = i + 0.1 ) {
+					points.push( new THREE.Vector3( 5 + 30*Math.atan(Math.exp(3*i)), 0, 24 - 24*i ) );
+					}
+
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+
+				var materialBack = new THREE.MeshPhongMaterial( {
+					color: 0xd53044, 
+					ambient: 0x00b2fc, 
+					shininess: 8,
+					side: THREE.BackSide,
+					transparent: true, 
+					//shading: THREE.FlatShading,					
+					blending: THREE.NormalBlending, 
+					depthTest: true,
+					opacity: 0.9
+				} );
+
+				var materialFront = new THREE.MeshPhongMaterial( {
+					color: 0xd53044, 
+					ambient: 0x00b2fc, 
+					shininess: 8,
+					side: THREE.FrontSide,
+					transparent: true, 
+					//shading: THREE.FlatShading,
+					blending: THREE.NormalBlending, 
+					depthTest: true,
+					opacity: 0.9
+				} );
+				
+				var material = new THREE.MeshPhongMaterial( 
+					{ color: 0xd53044, specular: 0x00b2fc, shininess: 3, side: THREE.DoubleSide, transparent: false, opacity: 0.6 ,
+						blending: THREE.NormalBlending, depthTest: true } );	
+				geometry.computeBoundingBox();
+	
+				var glass = new THREE.Mesh( geometry, materialBack );
+				glass.position.set( -300, -geometry.boundingBox.min.z, 100 );
+				glass.rotation.x = -Math.PI/2;
+	
+				scene.add( glass );
+				
+				var glass = new THREE.Mesh( geometry, materialFront );
+				glass.position.set( -300, -geometry.boundingBox.min.z, 100 );
+				glass.rotation.x = -Math.PI/2;
+	
+				scene.add( glass );
+				
+
+		
+				// vase
+				
+				vase = new THREE.Object3D; 
+
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/terrain/backgrounddetailed6.jpg' );
+
+				var material = new THREE.MeshPhongMaterial( { map: Texture , side: THREE.DoubleSide } );
+				Texture.wrapS = Texture.wrapT = THREE.RepeatWrapping;				
+				Texture.repeat.set( 1, 1 );
+				var points = [];		
+		
+				v0 = new THREE.Vector2( 16, 0 );    
+				v1 = new THREE.Vector2( 44, 44 );
+				v2 = new THREE.Vector2( 6, 42 );	
+				v3 = new THREE.Vector2( 8, 60 );	
+	
+				var BezierCurve = new THREE.CubicBezierCurve3( v0, v1, v2, v3 );
+
+				for ( var i = 0; i <= 1.11; i = i + 0.01 ) {
+					points.push( new THREE.Vector3( 4*BezierCurve.getPoint( i ).x,  0, 5*BezierCurve.getPoint( i ).y ) ); 	
+					}
+
+				tank = new THREE.Mesh( new THREE.LatheGeometry( points, 32 ), material );
+				tank.rotation.x = -Math.PI/2;			
+				vase.add( tank );
+
+				
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/terrain/backgrounddetailed6.jpg' );
+				Texture.repeat.set( 1/4, 1/4 );
+				var material = new THREE.MeshPhongMaterial( { map: Texture , side: THREE.DoubleSide } );
+				
+				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 64, 64 ), material);
+				bottom.rotation.x = -Math.PI/2;							   
+				vase.add( bottom ); 
+	
+				vase.position.set( 400, 0, 0 );	
+				scene.add( vase );	
+				
+				
+				
+				// bottle
+				
+				var points = [];	
+				for ( var i = - 4; i <= 9.2; i = i + 0.1 ) {
+					points.push( new THREE.Vector3( 15 + 30*Math.atan(Math.exp(3*i)), 0, 24 - 24*i ) );
+					}
+				 var i = 9.2;	points.push( new THREE.Vector3( 0, 0, 24 - 24*i ) );
+					
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				geometry.computeBoundingBox();
+				var materialBack = new THREE.MeshPhongMaterial( {
+					color: 0x006400, 
+					ambient: 0x00cc00, 
+					shininess: 8,
+					side: THREE.BackSide,
+					transparent: true, 
+					blending: THREE.NormalBlending, 
+					depthTest: true,
+					opacity: 0.9
+				} );
+
+				var materialFront = new THREE.MeshPhongMaterial( {
+					color: 0x006400, 
+					ambient: 0x00cc00, 
+					shininess: 8,
+					side: THREE.FrontSide,
+					transparent: true, 
+					blending: THREE.NormalBlending, 
+					depthTest: true,
+					opacity: 0.9
+				} );			
+						
+	
+				var bottle = new THREE.Mesh( geometry, materialBack );
+				bottle.position.set( -180, -geometry.boundingBox.min.z, 250 );
+				bottle.rotation.x = -Math.PI/2;
+	
+				scene.add( bottle );				
+				
+				var bottle = new THREE.Mesh( geometry, materialFront );
+				bottle.position.set( -180, -geometry.boundingBox.min.z, 250 );
+				bottle.rotation.x = -Math.PI/2;
+	
+				scene.add( bottle );							
+
+
+
+				// table with Mirror
+				
+				var points = [];	
+				
+				var i = - 4;		
+				//points.push( new THREE.Vector3( 0, 0, 100 - 46*i ) );	//not with Mirror			
+				points.push( new THREE.Vector3( 525 + 90*Math.atan(Math.exp(3*i)), 0, 100 - 46*i ) );				
+				points.push( new THREE.Vector3( 525 + 90*Math.atan(Math.exp(3*i)), 0, 84 - 46*i ) );
+				points.push( new THREE.Vector3( 0, 0, 84 - 46*i ) );					
+				for ( var i = - 4; i < 1.2; i = i + 0.1 ) {
+					points.push( new THREE.Vector3( 25 + 90*Math.atan(Math.exp(3*i)), 0, 84 - 46*i ) );
+					}
+					
+				var geometry = new THREE.LatheGeometry( points, 64 );	
+				geometry.computeBoundingBox();
+				var material = new THREE.MeshPhongMaterial( 
+					{ color: 0x000012,  specular: 0x000012, shininess: 1, side: THREE.DoubleSide, transparent: false, opacity: 0.6 ,
+						blending: THREE.NormalBlending, depthTest: true } );	
+	
+				var table = new THREE.Mesh( geometry, material ); var h = geometry.boundingBox.max.z;
+				table.position.set( 0, -geometry.boundingBox.max.z-1, 0 );
+				table.rotation.x = -Math.PI/2;
+	
+				scene.add( table );
+				
+				CircleMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.002, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x000012 } );
+				var Radius = 525;				
+				var geometry = new THREE.CircleGeometry( Radius, 64 );
+				var mirrorMesh = new THREE.Mesh(geometry, CircleMirror.material);
+				mirrorMesh.add( CircleMirror );
+				
+				mirrorMesh.rotation.x = -Math.PI/2;
+				mirrorMesh.position.y = -1;
+				scene.add( mirrorMesh );			
+
+				
+				
+				// barrel
+				
+				var barrel = new THREE.Object3D; 
+								
+				var points = [];	
+						
+				for ( var i = - 1; i <= 1.0; i = i + 0.1 ) {
+					points.push( new THREE.Vector3( 150 - 20*(i*i), 0, 160 - 160*i ) );
+					} 
+	
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				
+				var Texture = new THREE.ImageUtils.loadTexture(  'textures/crate.gif' );
+				Texture.wrapS = Texture.wrapT = THREE.RepeatWrapping;
+				Texture.repeat.set( 3, 1 );
+				
+				var material = new THREE.MeshLambertMaterial( { map: Texture , side: THREE.DoubleSide } );	
+	
+				var barrel_ = new THREE.Mesh( geometry, material );
+				barrel.position.set( -500, -h, 500 );
+				barrel.rotation.x = -Math.PI/2;
+	
+				barrel.add( barrel_);			
+								
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/crate.gif' );				
+				var material = new THREE.MeshLambertMaterial( { map: Texture , side: THREE.DoubleSide } );
+				
+				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 130, 64 ), material );						   
+				barrel.add( bottom ); 				
+								
+				scene.add( barrel );
+	
+	
+
+				// matrioshka
+				
+				var points = [];			
+				v0 = new THREE.Vector2( 90, 0 ); v1 = new THREE.Vector2( 160, 240 );
+				v2 = new THREE.Vector2( 50, 180 ); v3 = new THREE.Vector2( 70, 270 );
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				for (var i = 0; i <1.0; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x,  0, curve.getPoint( i ).y ) ); 
+					}	
+  
+				v4 = new THREE.Vector2( 81, 321 );
+				v5 = new THREE.Vector2( 65, 385 );	
+				v6 = new THREE.Vector2( 0, 385 );
+
+				var curve = new THREE.CubicBezierCurve( v3, v4, v5, v6 );
+	
+				for (var i = 0; i <=  1.005; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x,  0, curve.getPoint( i ).y ) ); 
+					}	
+
+					
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				geometry.computeBoundingBox();	
+				
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/lathe/matrioshka.jpg' );
+				Texture.wrapS = Texture.wrapT = THREE.RepeatWrapping;
+				Texture.repeat.set( 1, 1 );	
+				
+				var material = new THREE.MeshPhongMaterial( 
+					{ map: Texture, shininess: 5, blending: THREE.NormalBlending, depthTest: true } );	
+	
+			
+				var matrioshka = new THREE.Mesh( geometry, material );
+
+				matrioshka.position.set( -100, -geometry.boundingBox.min.z, -350);
+				matrioshka.rotation.x = -Math.PI/2;				
+				scene.add( matrioshka );				
+					
+				
+				
+				// candle
+				
+				var candle = new THREE.Object3D; 
+							
+				var points = [];			
+				v0 = new THREE.Vector2( 93, 0 ); v1 = new THREE.Vector2( 86, 23 );
+				v2 = new THREE.Vector2( 39, 1 ); v3 = new THREE.Vector2( 34, 43 );
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				for (var i = 0; i < 1; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
+					}	
+ 
+				v4 = new THREE.Vector2( 26, 102 );
+				v5 = new THREE.Vector2( 26, 155 );	
+				v6 = new THREE.Vector2( 25, 175 );
+
+				var curve = new THREE.CubicBezierCurve( v3, v4, v5, v6 );
+	
+				for (var i = 0; i <=  1.005; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
+					}	
+				points.push( new THREE.Vector3( 9, 0, 81 ) ); 					
+				points.push( new THREE.Vector3( 9, 0, 142 ) ); 
+				points.push( new THREE.Vector3( 1, 0, 142 ) ); 
+				points.push( new THREE.Vector3( 1, 0, 149 ) ); 				
+				
+				
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				geometry.computeBoundingBox();	
+
+				var Texture = new THREE.ImageUtils.loadTexture('textures/lathe/candlestick.jpg'); 
+				
+				var material = new THREE.MeshLambertMaterial( { map: Texture } );		
+	
+				var candlestick = new THREE.Mesh( geometry, material );
+					var h = Math.abs( geometry.boundingBox.max.z - geometry.boundingBox.min.z );
+				candlestick.position.set( 0, 0, 0);
+				candlestick.rotation.x = -Math.PI/2;						
+				candle.add( candlestick );
+
+			  	//flame for candle
+				v0 = new THREE.Vector2( 0, 43 ); v1 = new THREE.Vector2( 15, 46 );
+				v2 = new THREE.Vector2( 7, 86 ); v3 = new THREE.Vector2( 0, 96 );
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				var points = [];
+				for (var i = 0; i <= 1; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x , 0, curve.getPoint( i ).y ) ); 
+					}	
+	
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				geometry.computeBoundingBox();	
+				
+				var material = new THREE.MeshBasicMaterial( { color: 0xFFFFFC } );	
+
+				var flame = new THREE.Mesh( geometry, material );
+
+				flame.rotation.x = -Math.PI/2;	
+				flame.position.set( 0, geometry.boundingBox.max.z+7, 0);
+				candle.add( flame );
+
+				var spriteMaterial = new THREE.SpriteMaterial( 
+					{ 
+						map: new THREE.ImageUtils.loadTexture( 'textures/sprites/circle.png' ), 
+						useScreenCoordinates: false, 
+						color: 0xffaa00, transparent: false, blending: THREE.AdditiveBlending
+					});
+				var sprite = new THREE.Sprite( spriteMaterial );
+				sprite.scale.set(100, 100, 1.0); 	sprite.position.z = (v3.y+v0.y)/2;
+				flame.add( sprite );
+					var R = 320;
+				candle.position.set( R*Math.cos(Math.PI/2), 0, R*Math.sin(Math.PI/2) );				
+				
+				scene.add( candle );	
+				
+				var light = new THREE.PointLight( 0xFFFFFF, 1/2, 100 );
+				light.position = candle.position; light.y = (v3.y+v0.y)/2;
+				scene.add( light );
+
+				var candle2 = candle.clone();
+				candle2.position.set( R*Math.cos(2*Math.PI/3+Math.PI/2), 0, R*Math.sin(2*Math.PI/3+Math.PI/2) );			
+				
+				scene.add( candle2 );
+				
+				var light2 = new THREE.PointLight( 0xFFFFFF, 1/2, 100 );
+				light2.position = candle2.position; light.y = (v3.y+v0.y)/2;
+				scene.add( light2 );
+				
+				var candle3 = candle.clone();
+				candle3.position.set( R*Math.cos(4*Math.PI/3+Math.PI/2), 0, R*Math.sin(4*Math.PI/3+Math.PI/2) );					
+				
+				scene.add( candle3 );
+				
+				var light3= new THREE.PointLight( 0xFFFFFF, 1/2, 100 );
+				light3.position = candle3.position; light.y = (v3.y+v0.y)/2;
+				scene.add( light3 );
+				
+			}			
+			
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate()
+				{
+					requestAnimationFrame(animate);
+					render();
+				}		
+		
+
+			function render() 
+				{
+					stats.update();
+					controls.update(); 
+					//CircleMirror.updateTextureMatrix();	
+					CircleMirror.render();					
+					renderer.render(scene, camera);
+				}	
+
+			function AddCamera(X,Y,Z)
+				{		
+				camera = new THREE.PerspectiveCamera( 24, window.innerWidth / window.innerHeight, 1, 10000 );
+				
+				camera.position.set(X,Y,Z);
+				  
+				controls = new THREE.TrackballControls( camera, container );
+			
+				controls.rotateSpeed = 2; 
+				controls.noZoom = false; 
+				controls.zoomSpeed = 1.2; 
+				controls.staticMoving = true; 	
+			
+				}	
+		</script>
+
+	</body>
+</html>
