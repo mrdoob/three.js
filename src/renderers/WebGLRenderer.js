@@ -362,6 +362,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		this.renderPluginsPost = null;
 		opaqueObjects = null;
 		transparentObjects = null;
+		_canvas = null;
 		_programs = null;
 		_this = null;
 		_renderer = null;
@@ -3526,13 +3527,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setBlending( THREE.NoBlending );
 
 			//START_VEROLD_MOD
-			renderObjects( opaqueObjects, camera, lights, fog, false, material, scene.overrideUniforms );
+			renderObjects( opaqueObjects, camera, lights, fog, false, material );
 			//END_VEROLD_MOD
 			renderObjectsImmediate( scene.__webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
 
 			// transparent pass (back-to-front order)
 			//START_VEROLD_MOD
-			renderObjects( transparentObjects, camera, lights, fog, true, material, scene.overrideUniforms );
+			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			//END_VEROLD_MOD
 			renderObjectsImmediate( scene.__webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
 
@@ -3650,7 +3651,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 //START_VEROLD_MOD
-	function renderObjects( renderList, camera, lights, fog, useBlending, overrideMaterial, overrideUniforms ) {
+	function renderObjects( renderList, camera, lights, fog, useBlending, overrideMaterial ) {
 //END_VEROLD_MOD
 
 		var webglObject, object, buffer, material;
@@ -3679,16 +3680,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			//END_VEROLD_MOD
 				material = webglObject.material;
 				if ( ! material ) continue;
-				//START_VEROLD_MOD
-				else if (overrideUniforms) {
-					for (var x = 0; x < overrideUniforms.length; x++) {
-						if ( material.uniforms && material.uniforms[ overrideUniforms[x].name ] ) {
-							overrideUniforms[x].previousValue = material.uniforms[ overrideUniforms[x].name ].value;
-							material.uniforms[ overrideUniforms[x].name ].value = overrideUniforms[x].value;
-						}
-					}
-				}
-				//END_VEROLD_MOD
 
 				if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 
@@ -3708,15 +3699,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				_this.renderBuffer( camera, lights, fog, material, buffer, object );
-
-				//START_VEROLD_MOD
-				if (overrideUniforms) {
-					for (var x = 0; x < overrideUniforms.length; x++) {
-						if ( material.uniforms && material.uniforms[ overrideUniforms[x].name ] ) {
-							material.uniforms[ overrideUniforms[x].name ].value = overrideUniforms[x].previousValue;
-						}
-					}
-				}
 
 			}
 

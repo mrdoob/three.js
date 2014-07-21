@@ -19102,6 +19102,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.dispose = function() {
+		var i;
+		for ( i in this.renderPluginsPre ) {
+		   this.renderPluginsPre[i].dispose();
+		}
+		for ( i in this.renderPluginsPost ) {
+		   this.renderPluginsPost[i].dispose();
+		}
+		this.renderPluginsPre = null;
+		this.renderPluginsPost = null;
+		opaqueObjects = null;
+		transparentObjects = null;
+		_canvas = null;
+		_programs = null;
+		_this = null;
+		_renderer = null;
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
 
 		_canvas.width = width * this.devicePixelRatio;
@@ -22169,28 +22187,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		// VEROLD_START_MOD - bind matrix
-
-		// update SkinnedMesh objects
-		function updateSkinnedMesh( object ) {
-
-			if ( object instanceof THREE.SkinnedMesh ) {
-
-				object.updateBoneMatrices();
-
-			}
-
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-				updateSkinnedMesh( object.children[ i ] );
-
-			}
-
-		}
-
-		updateSkinnedMesh( scene );
-		// VEROLD_END_MOD - bind matrix
-
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -22283,13 +22279,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setBlending( THREE.NoBlending );
 
 			//START_VEROLD_MOD
-			renderObjects( opaqueObjects, camera, lights, fog, false, material, scene.overrideUniforms );
+			renderObjects( opaqueObjects, camera, lights, fog, false, material );
 			//END_VEROLD_MOD
 			renderObjectsImmediate( scene.__webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
 
 			// transparent pass (back-to-front order)
 			//START_VEROLD_MOD
-			renderObjects( transparentObjects, camera, lights, fog, true, material, scene.overrideUniforms );
+			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			//END_VEROLD_MOD
 			renderObjectsImmediate( scene.__webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
 
@@ -22407,7 +22403,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 //START_VEROLD_MOD
-	function renderObjects( renderList, camera, lights, fog, useBlending, overrideMaterial, overrideUniforms ) {
+	function renderObjects( renderList, camera, lights, fog, useBlending, overrideMaterial ) {
 //END_VEROLD_MOD
 
 		var webglObject, object, buffer, material;
@@ -22436,16 +22432,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			//END_VEROLD_MOD
 				material = webglObject.material;
 				if ( ! material ) continue;
-				//START_VEROLD_MOD
-				else if (overrideUniforms) {
-					for (var x = 0; x < overrideUniforms.length; x++) {
-						if ( material.uniforms && material.uniforms[ overrideUniforms[x].name ] ) {
-							overrideUniforms[x].previousValue = material.uniforms[ overrideUniforms[x].name ].value;
-							material.uniforms[ overrideUniforms[x].name ].value = overrideUniforms[x].value;
-						}
-					}
-				}
-				//END_VEROLD_MOD
 
 				if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 
@@ -22465,15 +22451,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				_this.renderBuffer( camera, lights, fog, material, buffer, object );
-
-				//START_VEROLD_MOD
-				if (overrideUniforms) {
-					for (var x = 0; x < overrideUniforms.length; x++) {
-						if ( material.uniforms && material.uniforms[ overrideUniforms[x].name ] ) {
-							material.uniforms[ overrideUniforms[x].name ].value = overrideUniforms[x].previousValue;
-						}
-					}
-				}
 
 			}
 
@@ -29594,13 +29571,12 @@ THREE.Animation.prototype.reset = function () {
 			var prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 			var nextKey = this.getNextKeyWith( type, h, 1 );
 
-		// START_VEROLD_MOD - robust keyframes
-		if ( this.data.hierarchy[ h ].keys !== undefined && this.data.hierarchy[ h ].keys.length > 0 ) {
-			prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.rot = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.scl = this.data.hierarchy[ h ].keys[ 0 ];
-		}
-		// END_VEROLD_MOD - robust keyframes
+			// START_VEROLD_MOD - robust keyframes
+			if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
+				continue;
+			}
+			// END_VEROLD_MOD - robust keyframes
+
 			while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
 
 				prevKey = nextKey;
@@ -33190,15 +33166,15 @@ THREE.CameraHelper.prototype.update = function () {
 
 		// center / target
 
-		setPoint( "c", 0, 0, - 1 );
+		setPoint( "c", 0, 0, - 1.00001 );
 		setPoint( "t", 0, 0,  1 );
 
 		// near
 
-		setPoint( "n1", - w, - h, - 1 );
-		setPoint( "n2",  w, - h, - 1 );
-		setPoint( "n3", - w,  h, - 1 );
-		setPoint( "n4",  w,  h, - 1 );
+		setPoint( "n1", - w, - h, - 1.00001 );
+		setPoint( "n2",  w, - h, - 1.00001 );
+		setPoint( "n3", - w,  h, - 1.00001 );
+		setPoint( "n4",  w,  h, - 1.00001 );
 
 		// far
 
@@ -33209,9 +33185,9 @@ THREE.CameraHelper.prototype.update = function () {
 
 		// up
 
-		setPoint( "u1",  w * 0.7, h * 1.1, - 1 );
-		setPoint( "u2", - w * 0.7, h * 1.1, - 1 );
-		setPoint( "u3",        0, h * 2,   - 1 );
+		setPoint( "u1",  w * 0.7, h * 1.1, - 1.00001 );
+		setPoint( "u2", - w * 0.7, h * 1.1, - 1.00001 );
+		setPoint( "u3",        0, h * 2,   - 1.00001 );
 
 		// cross
 
@@ -33220,10 +33196,10 @@ THREE.CameraHelper.prototype.update = function () {
 		setPoint( "cf3",  0, - h, 1 );
 		setPoint( "cf4",  0,  h, 1 );
 
-		setPoint( "cn1", - w,  0, - 1 );
-		setPoint( "cn2",  w,  0, - 1 );
-		setPoint( "cn3",  0, - h, - 1 );
-		setPoint( "cn4",  0,  h, - 1 );
+		setPoint( "cn1", - w,  0, - 1.00001 );
+		setPoint( "cn2",  w,  0, - 1.00001 );
+		setPoint( "cn3",  0, - h, - 1.00001 );
+		setPoint( "cn4",  0,  h, - 1.00001 );
 
 		function setPoint( point, x, y, z ) {
 
@@ -34920,6 +34896,12 @@ THREE.LensFlarePlugin = function () {
 
 	};
 
+	this.dispose = function () {
+		_gl.deleteProgram( _lensFlare.program );
+		_gl.deleteTexture( _lensFlare.tempTexture );
+		_gl.deleteTexture( _lensFlare.occlusionTexture );
+	};
+
 	function createProgram ( shader, precision ) {
 
 		var program = _gl.createProgram();
@@ -34987,6 +34969,19 @@ THREE.ShadowMapPlugin = function () {
 		_depthMaterialMorphSkin._shadowPass = true;
 
 	};
+
+	this.dispose = function() {
+		_depthMaterial.dispose();
+		_depthMaterial = null;
+		_depthMaterialSkin.dispose();
+		_depthMaterialSkin = null;
+		_depthMaterialMorph.dispose();
+		_depthMaterialMorph = null;
+		_depthMaterialMorphSkin.dispose();
+		_depthMaterialMorphSkin = null;
+		_renderer = null;
+		_renderList.splice(0, _renderList.length);
+	}
 
 	this.render = function ( scene, camera ) {
 
@@ -35695,6 +35690,16 @@ THREE.SpritePlugin = function () {
 
 		_gl.enable( _gl.CULL_FACE );
 
+	};
+
+	this.dispose = function () {
+		_texture.dispose();
+		_gl.deleteProgram( program );
+		for ( var i in sprites ) {
+			sprites[i].material.dispose();
+		}
+		_gl.deleteBuffer( vertexBuffer );
+		_gl.deleteBuffer( elementBuffer );
 	};
 
 	function createProgram () {
