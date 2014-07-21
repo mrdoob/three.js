@@ -432,7 +432,7 @@
 	
 				scene.add( table );
 				
-				CircleMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x000012 } );
+				CircleMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: 512, textureHeight: 512, color: 0x202030} );
 				var Radius = 525;				
 				var geometry = new THREE.CircleGeometry( Radius, 64 );
 				var mirrorMesh = new THREE.Mesh(geometry, CircleMirror.material);
