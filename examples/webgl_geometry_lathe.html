@@ -42,7 +42,7 @@
 		<script src="../build/three.min.js"></script>
 		
 		<script src="js/Mirror.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -432,7 +432,7 @@
 	
 				scene.add( table );
 				
-				CircleMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.002, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x000012 } );
+				CircleMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x000012 } );
 				var Radius = 525;				
 				var geometry = new THREE.CircleGeometry( Radius, 64 );
 				var mirrorMesh = new THREE.Mesh(geometry, CircleMirror.material);
@@ -652,9 +652,9 @@
 				
 				camera.position.set(X,Y,Z);
 				  
-				controls = new THREE.TrackballControls( camera, container );
+				controls = new THREE.OrbitControls( camera, container );
 			
-				controls.rotateSpeed = 2; 
+				controls.rotateSpeed = 1; 
 				controls.noZoom = false; 
 				controls.zoomSpeed = 1.2; 
 				controls.staticMoving = true; 	
