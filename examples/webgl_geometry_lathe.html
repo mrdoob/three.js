@@ -280,7 +280,8 @@
 				var materialBack = new THREE.MeshPhongMaterial( {
 					color: 0xd53044, 
 					ambient: 0x00b2fc, 
-					shininess: 8,
+					specular: 0xFA8072, 
+					shininess: 5,
 					side: THREE.BackSide,
 					transparent: true, 
 					//shading: THREE.FlatShading,					
@@ -292,7 +293,8 @@
 				var materialFront = new THREE.MeshPhongMaterial( {
 					color: 0xd53044, 
 					ambient: 0x00b2fc, 
-					shininess: 8,
+					specular: 0xFA8072,
+					shininess: 5,
 					side: THREE.FrontSide,
 					transparent: true, 
 					//shading: THREE.FlatShading,
@@ -373,7 +375,8 @@
 				var materialBack = new THREE.MeshPhongMaterial( {
 					color: 0x006400, 
 					ambient: 0x00cc00, 
-					shininess: 8,
+					specular: 0x7CFC00,
+					shininess: 5,
 					side: THREE.BackSide,
 					transparent: true, 
 					blending: THREE.NormalBlending, 
@@ -384,7 +387,8 @@
 				var materialFront = new THREE.MeshPhongMaterial( {
 					color: 0x006400, 
 					ambient: 0x00cc00, 
-					shininess: 8,
+					specular: 0x7CFC00,				
+					shininess: 5,
 					side: THREE.FrontSide,
 					transparent: true, 
 					blending: THREE.NormalBlending, 
@@ -423,7 +427,7 @@
 				var geometry = new THREE.LatheGeometry( points, 64 );	
 				geometry.computeBoundingBox();
 				var material = new THREE.MeshPhongMaterial( 
-					{ color: 0x000012,  specular: 0x000012, shininess: 1, side: THREE.DoubleSide, transparent: false, opacity: 0.6 ,
+					{ color: 0x000012,  specular: 0x202030, shininess: 2, side: THREE.DoubleSide, transparent: false, opacity: 0.6 ,
 						blending: THREE.NormalBlending, depthTest: true } );	
 	
 				var table = new THREE.Mesh( geometry, material ); var h = geometry.boundingBox.max.z;
@@ -508,8 +512,7 @@
 				Texture.wrapS = Texture.wrapT = THREE.RepeatWrapping;
 				Texture.repeat.set( 1, 1 );	
 				
-				var material = new THREE.MeshPhongMaterial( 
-					{ map: Texture, shininess: 5, blending: THREE.NormalBlending, depthTest: true } );	
+				var material = new THREE.MeshPhongMaterial( { map: Texture } );	
 	
 			
 				var matrioshka = new THREE.Mesh( geometry, material );
