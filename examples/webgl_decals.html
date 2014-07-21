@@ -153,16 +153,22 @@ function init() {
 	var moved = false;
 
 	controls.addEventListener( 'change', function() {
+
 		moved = true;
+
 	} );
 
-	controls.addEventListener( 'start', function() {
+	window.addEventListener( 'mousedown', function () {
+
 		moved = false;
-	} );
+	
+	}, false );
 
-	controls.addEventListener( 'end', function() {
+	window.addEventListener( 'mouseup', function() {
+
 		checkIntersection();
 		if( !moved ) shoot();
+
 	} );
 
     window.addEventListener( 'mousemove', onTouchMove );
