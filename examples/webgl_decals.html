@@ -38,7 +38,6 @@
 		var mesh, decal;
 		var projector, raycaster;
 		var line;
-		var spotLight, pointLight, ambientLight;
 
 		var intersection = {
 			intersects: false,
@@ -48,12 +47,14 @@
 		var controls, renderHelpers = false;
 		var mouseVector = new THREE.Vector3();
 		var mouse = new THREE.Vector2();
+		
+		var decalDiffuse = THREE.ImageUtils.loadTexture( 'textures/decal/decal-diffuse.png' );
+		var decalNormal = THREE.ImageUtils.loadTexture( 'textures/decal/decal-normal.jpg' );
 
 		var decalMaterial = new THREE.MeshPhongMaterial( {
-			specular: 0xffffff,
-			shininess: 10,
-			map: THREE.ImageUtils.loadTexture( 'textures/decal/decal-diffuse.png' ),
-			normalMap: THREE.ImageUtils.loadTexture( 'textures/decal/decal-normal.jpg' ),
+			specular: 0x444444,
+			map: decalDiffuse,
+			normalMap: decalNormal,
 			normalScale: new THREE.Vector2( .15, .15 ),
 			shininess: 30,
 			transparent: true,
@@ -108,28 +109,9 @@
 	
 			scene.add( camera );
 
-			ambientLight = new THREE.AmbientLight( 0x111111 );
-			scene.add( ambientLight );
-
-			pointLight = new THREE.PointLight( 0xff0000 );
-			pointLight.position.z = 10000;
-			pointLight.distance = 4000;
-			scene.add( pointLight );
-
-			pointLight2 = new THREE.PointLight( 0xff5500 );
-			pointLight2.position.z = 1000;
-			pointLight2.distance = 2000;
-			scene.add( pointLight2 );
-
-			pointLight3 = new THREE.PointLight( 0x0000ff );
-			pointLight3.position.x = -1000;
-			pointLight3.position.z = 1000;
-			pointLight3.distance = 2000;
-			scene.add( pointLight3 );
-
-			spotLight = new THREE.SpotLight( 0xaaaaaa );
-			spotLight.position.set( 100, 50, 100 );
-			scene.add( spotLight );
+			var light = new THREE.HemisphereLight( 0xffbbbb, 0x000011 );
+			light.position.set( 1, 0.75, 0.5 );
+			scene.add( light );
 
 			line = new THREE.Line( new THREE.Geometry( ), new THREE.LineBasicMaterial( { linewidth: 4 }) );
 			line.geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
@@ -302,8 +284,11 @@
 			s.set( scale, scale, scale );
 
 			if( params.rotate) r.z = Math.random() * 2 * Math.PI;
+			
+			var material = decalMaterial.clone();
+			material.color.setHex( Math.random() * 0xffffff );
 
-			var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, p, r, s, check ), decalMaterial );
+			var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, p, r, s, check ), material );
 			decals.push( m );
 			scene.add( m );
 
