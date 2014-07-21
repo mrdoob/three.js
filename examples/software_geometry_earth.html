@@ -70,7 +70,7 @@
 
 					var geometry = new THREE.SphereGeometry( 200, 20, 20 );
 
-					var material = new THREE.MeshPhongMaterial( { map: texture, overdraw: 0.5 } );
+					var material = new THREE.MeshLambertMaterial( { map: texture, overdraw: 0.5 } );
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
 

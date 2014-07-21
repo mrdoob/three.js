@@ -245,10 +245,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		context.fillRect( 0, 0, canvasWidth, canvasHeight );
 	}
 
-    function getPalette( color, bSimulateSpecular ) {
-        var diffuseR = color.r * 149;
-        var diffuseG = color.g * 149;
-        var diffuseB = color.b * 149;
+    function getPalette( material, bSimulateSpecular ) {
+        var diffuseR = material.ambient.r + material.color.r * 255;
+        var diffuseG = material.ambient.g + material.color.g * 255;
+        var diffuseB = material.ambient.b + material.color.b * 255;
         var palette = new Array(256);
         
         if ( bSimulateSpecular ) {
@@ -399,13 +399,13 @@ THREE.SoftwareRenderer = function ( parameters ) {
                 if ( material instanceof THREE.MeshLambertMaterial ) {             
                     // Generate color palette
                     if ( !material.palette ) {
-                        material.palette = getPalette( material.color, false );
+                        material.palette = getPalette( material, false );
                     }
                     
                 } else if ( material instanceof THREE.MeshPhongMaterial ) {             
                     // Generate color palette
                     if ( !material.palette ) {
-                        material.palette = getPalette( material.color, true );
+                        material.palette = getPalette( material, true );
                     }
                 }
 
@@ -523,11 +523,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
         // UV values
         
         var tu1 = face.uvs[0].x; 
-        var tv1 = face.uvs[0].y; 
+        var tv1 = 1-face.uvs[0].y; 
         var tu2 = face.uvs[1].x; 
-        var tv2 = face.uvs[1].y; 
+        var tv2 = 1-face.uvs[1].y; 
         var tu3 = face.uvs[2].x; 
-        var tv3 = face.uvs[2].y; 
+        var tv3 = 1-face.uvs[2].y; 
         
         // Normal values
         var n1 = face.vertexNormalsModel[0], n2 = face.vertexNormalsModel[1], n3 = face.vertexNormalsModel[2];        
@@ -767,7 +767,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 								var u = cx1 * scale;
 								var v = cx2 * scale;                                        
                                 
-								shader( data, offset * 4, cxtu, 1-cxtv, cxnz * 255, face, material );                                
+								shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );                                
 							}
 
 							cx1 += dy12;
@@ -821,7 +821,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 									var v = cx2 * scale;
 
 									zbuffer[ offset ] = z;                                    
-									shader( data, offset * 4, cxtu, 1-cxtv, cxnz * 255, face, material );
+									shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );
 
 								}
 
