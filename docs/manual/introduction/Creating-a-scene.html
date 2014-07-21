@@ -68,7 +68,7 @@
 		<div><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</div>
 
 		<code>
-		var geometry = new THREE.BoxGeometry(1,1,1);
+		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -90,8 +90,8 @@
 
 		<code>
 		function render() {
-			requestAnimationFrame(render);
-			renderer.render(scene, camera);
+			requestAnimationFrame( render );
+			renderer.render( scene, camera );
 		}
 		render();
 		</code>
@@ -130,21 +130,21 @@
 				&lt;script src="js/three.min.js"&gt;&lt;/script&gt;
 				&lt;script&gt;
 					var scene = new THREE.Scene();
-					var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+					var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
 					var renderer = new THREE.WebGLRenderer();
-					renderer.setSize(window.innerWidth, window.innerHeight);
-					document.body.appendChild(renderer.domElement);
+					renderer.setSize( window.innerWidth, window.innerHeight );
+					document.body.appendChild( renderer.domElement );
 
-					var geometry = new THREE.BoxGeometry(1,1,1);
-					var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-					var cube = new THREE.Mesh(geometry, material);
-					scene.add(cube);
+					var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+					var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+					var cube = new THREE.Mesh( geometry, material );
+					scene.add( cube );
 
 					camera.position.z = 5;
 
 					var render = function () {
-						requestAnimationFrame(render);
+						requestAnimationFrame( render );
 
 						cube.rotation.x += 0.1;
 						cube.rotation.y += 0.1;
