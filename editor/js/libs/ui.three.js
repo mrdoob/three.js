@@ -98,7 +98,7 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 		var image = texture.image;
 
-		if ( image.width > 0 ) {
+		if ( image !== undefined && image.width > 0 ) {
 
 			name.value = texture.sourceFile;
 
@@ -232,7 +232,7 @@ UI.CubeTexture.prototype.setValue = function ( texture ) {
 
 		var image = texture.image[ 0 ];
 
-		if ( image.width > 0 ) {
+		if ( image !== undefined && image.width > 0 ) {
 
 			name.value = texture.sourceFile;
 
