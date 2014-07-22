@@ -75,7 +75,7 @@
 				
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 500, -200, -500 );
-				scene.add( light );			
+				scene.add( light );				
 				
 				// renderer
 
@@ -416,7 +416,7 @@
 				var points = [];	
 				
 				var i = - 4;		
-				//points.push( new THREE.Vector3( 0, 0, 100 - 46*i ) );	//not with Mirror			
+				//points.push( new THREE.Vector3( 0, 0, 100 - 46*i ) );	// it is necessary, if there is no mirror			
 				points.push( new THREE.Vector3( 525 + 90*Math.atan(Math.exp(3*i)), 0, 100 - 46*i ) );				
 				points.push( new THREE.Vector3( 525 + 90*Math.atan(Math.exp(3*i)), 0, 84 - 46*i ) );
 				points.push( new THREE.Vector3( 0, 0, 84 - 46*i ) );					
@@ -521,7 +521,46 @@
 				matrioshka.rotation.x = -Math.PI/2;				
 				scene.add( matrioshka );				
 					
+
+					
+				// pawn
 				
+				var points = [];			
+				v0 = new THREE.Vector2( 63, 0 ); v1 = new THREE.Vector2( 82, 31 );
+				v2 = new THREE.Vector2( 9, 69 ); v3 = new THREE.Vector2( 14, 151 );
+
+				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
+	
+				for (var i = 0; i <1.0; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
+					}	
+				points.push( new THREE.Vector3( 0, 0, 147 ).multiplyScalar(1/2) ); 
+				points.push( new THREE.Vector3( 34, 0, 147 ).multiplyScalar(1/2) ); 
+				points.push( new THREE.Vector3( 34, 0, 157 ).multiplyScalar(1/2) ); 				
+				points.push( new THREE.Vector3( 0, 0, 157 ).multiplyScalar(1/2) ); 
+				
+				v4 = new THREE.Vector2( 9, 157 );				
+				v5 = new THREE.Vector2( 38, 169 );
+				v6 = new THREE.Vector2( 27, 207 );	
+				v7 = new THREE.Vector2( 0, 207 );
+				
+				var curve = new THREE.CubicBezierCurve( v4, v5, v6, v7 );
+	
+				for (var i = 0; i <=  1.001; i+=0.01)  {
+					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
+					}	
+		
+				var geometry = new THREE.LatheGeometry( points, 32 );	
+				geometry.computeBoundingBox();	
+				
+				var material = new THREE.MeshPhongMaterial( { color: 0xFFFFFF, } );				
+				var pawn = new THREE.Mesh( geometry, material );
+
+				pawn.position.set( 140, -geometry.boundingBox.min.z, -330);
+				pawn.rotation.x = -Math.PI/2;				
+				scene.add( pawn );	
+
+					
 				
 				// candle
 				
