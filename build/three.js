@@ -13061,8 +13061,6 @@ THREE.Material = function () {
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
-	this.visible = true;
-
 	this.needsUpdate = true;
 
 };
@@ -13142,8 +13140,6 @@ THREE.Material.prototype = {
 		material.alphaTest = this.alphaTest;
 
 		material.overdraw = this.overdraw;
-
-		material.visible = this.visible;
 
 		return material;
 
@@ -21220,8 +21216,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
 
-		if ( material.visible === false ) return;
-
 		var linewidth, a, attribute;
 		var attributeItem, attributeName, attributePointer, attributeSize;
 
@@ -21456,8 +21450,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
-
-		if ( material.visible === false ) return;
 
 		var linewidth, a, attribute, i, il;
 
