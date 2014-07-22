@@ -3185,7 +3185,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		// update Skeleton objects
-		function updateSkeletons( object ) {
+
+		scene.traverse( function ( object ) {
 
 			if ( object instanceof THREE.SkinnedMesh ) {
 
@@ -3193,15 +3194,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-				updateSkeletons( object.children[ i ] );
-
-			}
-
-		}
-
-		updateSkeletons( scene );
+		} );
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
