@@ -249,11 +249,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
         var diffuseR = material.ambient.r + material.color.r * 255;
         var diffuseG = material.ambient.g + material.color.g * 255;
         var diffuseB = material.ambient.b + material.color.b * 255;
-        var palette = new Array(256);
+        var palette = new Uint8Array(256*3);
         
         if ( bSimulateSpecular ) {
             
-            var i = 0;
+            var i = 0, j = 0;
             while(i < 204) {
                 var r = i * diffuseR / 204;
                 var g = i * diffuseG / 204;
@@ -265,7 +265,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
                 if(b > 255)
                     b = 255;
 
-                palette[i++] = r << 16 | g << 8 | b;
+                palette[j++] = r;
+                palette[j++] = g;
+                palette[j++] = b;
+                ++i;
             }
 
             while(i < 256) { // plus specular highlight
@@ -278,19 +281,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
                     g = 255;
                 if(b > 255)
                     b = 255;
-
-                if ( (r<<16) < 16777215   )
-				{
-					 var test = 0;
-					 ++test;
-				}
 				
-                palette[i++] = r << 16 | g << 8 | b;
+                palette[j++] = r;
+                palette[j++] = g;
+                palette[j++] = b;
+                ++i;
             }
             
         } else {
           
-            var i = 0;
+            var i = 0, j = 0;
             while(i < 256) {
                 var r = i * diffuseR / 255;
                 var g = i * diffuseG / 255;
@@ -302,7 +302,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
                 if(b > 255)
                     b = 255;
 
-                palette[i++] = r << 16 | g << 8 | b;
+                palette[j++] = r;
+                palette[j++] = g;
+                palette[j++] = b;
+                ++i;
             }           
             
         }
@@ -324,16 +327,17 @@ THREE.SoftwareRenderer = function ( parameters ) {
         var isTransparent = material.transparent;
         var tbound = tdim - 1;
         var tdata = material.texture.data;
-        var texel = tdata[((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)];
+        var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
         
         if ( !isTransparent ) {
-            buffer[ offset ] = (texel & 0xff0000) >> 16;
-            buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
-            buffer[ offset + 2 ] = texel & 0xff;
+            buffer[ offset ] = tdata[tIndex];
+            buffer[ offset + 1 ] = tdata[tIndex+1];
+            buffer[ offset + 2 ] = tdata[tIndex+2];
             buffer[ offset + 3 ] = material.opacity * 255;
         }
         else { 
-            var opaci = ((texel >> 24) & 0xff) * material.opacity;
+            var opaci = tdata[tIndex+3] * material.opacity;
+            var texel = tdata[tIndex] << 16 + tdata[tIndex+1] << 8 + tdata[tIndex+2];
             if(opaci < 250) {
                 var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
                 texel = texel * opaci + backColor * (1-opaci);                         
@@ -360,25 +364,30 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
         var tdim = material.texture.width;
         var isTransparent = material.transparent;
-        var color = material.palette[ n > 0 ? (~~n) : 0 ];
+        var cIndex = (n > 0 ? (~~n) : 0) * 3;
         var tbound = tdim - 1;
         var tdata = material.texture.data;
-        var texel = tdata[((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)];
+        var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
         
         if ( !isTransparent ) {
-          buffer[ offset ] = (((color & 0xff0000) >> 16) * ((texel & 0xff0000) >> 16)) >> 8;
-          buffer[ offset + 1 ] = (((color & 0xff00) >> 8) * ((texel & 0xff00) >> 8)) >> 8;
-          buffer[ offset + 2 ] = ((color & 0xff) * (texel & 0xff)) >> 8;
+          buffer[ offset ] = (material.palette[cIndex] * tdata[tIndex]) >> 8;
+          buffer[ offset + 1 ] = (material.palette[cIndex+1] * tdata[tIndex+1]) >> 8;
+          buffer[ offset + 2 ] = (material.palette[cIndex+2] * tdata[tIndex+2]) >> 8;
           buffer[ offset + 3 ] = material.opacity * 255;
         } else { 
-          var opaci = ((texel >> 24) & 0xff) * material.opacity;
+          var opaci = tdata[tIndex+3] * material.opacity;
+          var foreColor = ((material.palette[cIndex] * tdata[tIndex]) << 16) 
+          				+ ((material.palette[cIndex+1] * tdata[tIndex+1]) << 8 )
+          				+ (material.palette[cIndex+2] * tdata[tIndex+2]);
+
+          
           if(opaci < 250) {
             var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
-            texel = texel * opaci + backColor * (1-opaci);                          
+            foreColor = foreColor * opaci + backColor * (1-opaci);                          
           }
-          buffer[ offset ] = (texel & 0xff0000) >> 16;
-          buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
-          buffer[ offset + 2 ] = (texel & 0xff);
+          buffer[ offset ] = (foreColor & 0xff0000) >> 16;
+          buffer[ offset + 1 ] = (foreColor & 0xff00) >> 8;
+          buffer[ offset + 2 ] = (foreColor & 0xff);
           buffer[ offset + 3 ] = material.opacity * 255;
         }
         
@@ -531,9 +540,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
         
         // Normal values
         var n1 = face.vertexNormalsModel[0], n2 = face.vertexNormalsModel[1], n3 = face.vertexNormalsModel[2];        
-        var nz1 = n1.z;
-        var nz2 = n2.z;
-        var nz3 = n3.z;
+        var nz1 = n1.z * 255;
+        var nz2 = n2.z * 255;
+        var nz3 = n3.z * 255;
         // Deltas
 
 		var dx12 = x1 - x2, dy12 = y2 - y1;
@@ -617,8 +626,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		
 		dtudx = dtudx * fixscale;
 		dtudy = dtudy * fixscale;        
-		dtvdx = (dtvdx * fixscale);
-		dtvdy = (dtvdy * fixscale);
+		dtvdx = dtvdx * fixscale;
+		dtvdy = dtvdy * fixscale;
 
         // Normal interpolation setup
         
@@ -630,7 +639,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
        
         var cnz = ( nz1 + (minXfixscale - x1) * dnzdx + (minYfixscale - y1) * dnzdy );
 
-		// UV pixel steps
+		// Normal pixel steps
 
         dnzdx = (dnzdx * fixscale);
 		dnzdy = (dnzdy * fixscale);
@@ -641,7 +650,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var nmin2 = 0, nmax2 = 0;
 		var nmin3 = 0, nmax3 = 0;
 		var nminz = 0, nmaxz = 0;
-        var nmintu = 0, nmaxtu = 0;
 		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
 		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
 		if (dx23 >= 0) nmax2 -= qm1*dx23; else nmin2 -= qm1*dx23;
@@ -650,8 +658,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		if (dy31 >= 0) nmax3 -= qm1*dy31; else nmin3 -= qm1*dy31;
 		if (dzdx >= 0) nmaxz += qm1*dzdx; else nminz += qm1*dzdx;
 		if (dzdy >= 0) nmaxz += qm1*dzdy; else nminz += qm1*dzdy;
-        if (dtudx >= 0) nmaxtu += qm1*dtudx; else nmintu += qm1*dtudx;
-		if (dtudy >= 0) nmaxtu += qm1*dtudy; else nmintu += qm1*dtudy;
 
 		// Loop through blocks
 		var linestep = canvasWidth - q;
@@ -763,11 +769,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							var z = cxz;
                            
 							if ( z < zbuffer[ offset ] ) {
-								zbuffer[ offset ] = z;
-								var u = cx1 * scale;
-								var v = cx2 * scale;                                        
-                                
-								shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );                                
+								zbuffer[ offset ] = z;            
+								shader( data, offset * 4, cxtu, cxtv, cxnz, face, material );                                
 							}
 
 							cx1 += dy12;
@@ -817,12 +820,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 								var z = cxz;                              
 
 								if ( z < zbuffer[ offset ] ) {
-									var u = cx1 * scale;
-									var v = cx2 * scale;
-
 									zbuffer[ offset ] = z;                                    
-									shader( data, offset * 4, cxtu, cxtv, cxnz * 255, face, material );
-
+									shader( data, offset * 4, cxtu, cxtv, cxnz, face, material );
 								}
 
 							}
@@ -972,12 +971,16 @@ THREE.SoftwareRenderer.Texture = function() {
             return;
         }
 
-        var size = data.length / 4;
-        this.data = new Array(size);
+        var size = data.length;
+        this.data = new Uint8Array(size);
         var alpha;
-        for(var i=0, j=0; i<size; i++, j+=4) {
-            alpha = data[j + 3];
-            this.data[i] = alpha << 24 | data[j] << 16 | data[j+1] << 8 | data[j+2];
+        for(var i=0, j=0; i<size; ) {
+            this.data[i++] = data[j++];
+            this.data[i++] = data[j++];
+            this.data[i++] = data[j++];
+            alpha = data[j++];
+            this.data[i++] = alpha;
+
             if(alpha < 255)
                 this.hasTransparency = true;
         }
