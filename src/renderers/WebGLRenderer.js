@@ -510,6 +510,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	// Events
+	
+	var onObjectDispose = function ( event ) {
+
+		var object = event.target;
+
+		object.removeEventListener( 'dispose', onObjectDispose );
+
+		removeObject( object )
+
+	};
 
 	var onGeometryDispose = function ( event ) {
 
@@ -3578,6 +3588,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object.__webglInit === undefined ) {
 
 			object.__webglInit = true;
+			object.addEventListener( 'dispose', onObjectDispose );
 
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();

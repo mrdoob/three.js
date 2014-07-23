@@ -544,6 +544,12 @@ THREE.Object3D.prototype = {
 
 		return object;
 
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
 };
