@@ -15791,8 +15791,6 @@ THREE.Scene = function () {
 	this.autoUpdate = true; // checked by the renderer
 	this.matrixAutoUpdate = false;
 
-	this.__lights = [];
-
 	this.__objectsAdded = [];
 	this.__objectsRemoved = [];
 
@@ -15803,12 +15801,6 @@ THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Scene.prototype.__addObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
-
-		if ( this.__lights.indexOf( object ) === - 1 ) {
-
-			this.__lights.push( object );
-
-		}
 
 		if ( object.target && object.target.parent === undefined ) {
 
@@ -15846,14 +15838,6 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 THREE.Scene.prototype.__removeObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
-
-		var i = this.__lights.indexOf( object );
-
-		if ( i !== - 1 ) {
-
-			this.__lights.splice( i, 1 );
-
-		}
 
 		if ( object.shadowCascadeArray ) {
 
@@ -18780,6 +18764,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
 	
+	var lights = [];
+	
 	var opaqueObjects = [];
 	var transparentObjects = [];
 
@@ -19159,14 +19145,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.addPostPlugin = function ( plugin ) {
 
-		plugin.init( this );
+		plugin.init( this, lights );
 		this.renderPluginsPost.push( plugin );
 
 	};
 
 	this.addPrePlugin = function ( plugin ) {
 
-		plugin.init( this );
+		plugin.init( this, lights );
 		this.renderPluginsPre.push( plugin );
 
 	};
@@ -21916,7 +21902,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		webglObject, object,
 		renderList,
 
-		lights = scene.__lights,
 		fog = scene.fog;
 
 		// reset caching for this frame
@@ -21952,6 +21937,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		initObjects( scene );
 
+		lights.length = 0;
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
 		
@@ -22063,7 +22049,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function projectObject(scene, object,camera){
 		
 		if ( object.visible === false ) return;
-			
+		
+		if ( object instanceof THREE.Light ) {
+
+			lights.push( object );
+
+		}
+		
 		var webglObjects = scene.__webglObjects[ object.id ];
 		
 		if ( webglObjects && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
@@ -34487,6 +34479,7 @@ THREE.ShadowMapPlugin = function () {
 
 	var _gl,
 	_renderer,
+	_lights,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
@@ -34499,10 +34492,11 @@ THREE.ShadowMapPlugin = function () {
 	
 	_renderList = [];
 
-	this.init = function ( renderer ) {
+	this.init = function ( renderer, lights ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+		_lights = lights;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -34564,9 +34558,9 @@ THREE.ShadowMapPlugin = function () {
 		// 	- skip lights that are not casting shadows
 		//	- create virtual lights for cascaded shadow maps
 
-		for ( i = 0, il = scene.__lights.length; i < il; i ++ ) {
+		for ( i = 0, il = _lights.length; i < il; i ++ ) {
 
-			light = scene.__lights[ i ];
+			light = _lights[ i ];
 
 			if ( ! light.castShadow ) continue;
 
@@ -34763,11 +34757,11 @@ THREE.ShadowMapPlugin = function () {
 
 				if ( buffer instanceof THREE.BufferGeometry ) {
 
-					_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object );
+					_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object );
 
 				} else {
 
-					_renderer.renderBuffer( shadowCamera, scene.__lights, fog, material, buffer, object );
+					_renderer.renderBuffer( shadowCamera, _lights, fog, material, buffer, object );
 
 				}
 
@@ -34786,7 +34780,7 @@ THREE.ShadowMapPlugin = function () {
 
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
-					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
+					_renderer.renderImmediateObject( shadowCamera, _lights, fog, _depthMaterial, object );
 
 				}
 
@@ -35363,16 +35357,18 @@ THREE.DepthPassPlugin = function () {
 
 	var _gl,
 	_renderer,
+	_lights,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_renderList = [];
 
-	this.init = function ( renderer ) {
+	this.init = function ( renderer, lights ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+		_lights = lights;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -35477,11 +35473,11 @@ THREE.DepthPassPlugin = function () {
 
 			if ( buffer instanceof THREE.BufferGeometry ) {
 
-				_renderer.renderBufferDirect( camera, scene.__lights, fog, material, buffer, object );
+				_renderer.renderBufferDirect( camera, _lights, fog, material, buffer, object );
 
 			} else {
 
-				_renderer.renderBuffer( camera, scene.__lights, fog, material, buffer, object );
+				_renderer.renderBuffer( camera, _lights, fog, material, buffer, object );
 
 			}
 
@@ -35501,7 +35497,7 @@ THREE.DepthPassPlugin = function () {
 
 				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
-				_renderer.renderImmediateObject( camera, scene.__lights, fog, _depthMaterial, object );
+				_renderer.renderImmediateObject( camera, _lights, fog, _depthMaterial, object );
 
 			}
 
