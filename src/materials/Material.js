@@ -32,8 +32,6 @@ THREE.Material = function () {
 
 	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
-	this.visible = true;
-
 	this.needsUpdate = true;
 
 };
@@ -113,8 +111,6 @@ THREE.Material.prototype = {
 		material.alphaTest = this.alphaTest;
 
 		material.overdraw = this.overdraw;
-
-		material.visible = this.visible;
 
 		return material;
 
