@@ -12,7 +12,7 @@ THREE.LensFlare = function ( texture, size, distance, blending, color ) {
 	this.positionScreen = new THREE.Vector3();
 	this.customUpdateCallback = undefined;
 
-	if( texture !== undefined ) {
+	if ( texture !== undefined ) {
 
 		this.add( texture, size, distance, blending, color );
 
@@ -29,11 +29,11 @@ THREE.LensFlare.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.LensFlare.prototype.add = function ( texture, size, distance, blending, color, opacity ) {
 
-	if( size === undefined ) size = - 1;
-	if( distance === undefined ) distance = 0;
-	if( opacity === undefined ) opacity = 1;
-	if( color === undefined ) color = new THREE.Color( 0xffffff );
-	if( blending === undefined ) blending = THREE.NormalBlending;
+	if ( size === undefined ) size = - 1;
+	if ( distance === undefined ) distance = 0;
+	if ( opacity === undefined ) opacity = 1;
+	if ( color === undefined ) color = new THREE.Color( 0xffffff );
+	if ( blending === undefined ) blending = THREE.NormalBlending;
 
 	distance = Math.min( distance, Math.max( 0, distance ) );
 
@@ -44,8 +44,8 @@ THREE.LensFlare.prototype.add = function ( texture, size, distance, blending, co
 		                    scale: 1, 					// scale
 		                    rotation: 1, 				// rotation
 		                    opacity: opacity,			// opacity
-							color: color,				// color
-		                    blending: blending } );		// blending
+		color: color,				// color
+	                    blending: blending } );		// blending
 
 };
 
@@ -62,7 +62,7 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 	var vecX = - this.positionScreen.x * 2;
 	var vecY = - this.positionScreen.y * 2;
 
-	for( f = 0; f < fl; f ++ ) {
+	for ( f = 0; f < fl; f ++ ) {
 
 		flare = this.lensFlares[ f ];
 

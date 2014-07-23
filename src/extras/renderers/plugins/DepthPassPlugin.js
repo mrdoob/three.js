@@ -165,7 +165,7 @@ THREE.DepthPassPlugin = function () {
 
 	};
 	
-	function projectObject(scene, object,camera){
+	function projectObject(scene, object,camera) {
 		
 		if ( object.visible ) {
 	
@@ -174,7 +174,7 @@ THREE.DepthPassPlugin = function () {
 			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 		
 		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
+				for (var i = 0, l = webglObjects.length; i < l; i ++) {
 			
 					var webglObject = webglObjects[i];
 					
@@ -182,14 +182,17 @@ THREE.DepthPassPlugin = function () {
 					_renderList.push(webglObject);
 					
 				}
+			
 			}
 	
-			for(var i = 0, l = object.children.length; i < l; i++) {
+			for (var i = 0, l = object.children.length; i < l; i ++) {
 				
 				projectObject(scene, object.children[i], camera);
+			
 			}
 		
 		}
+	
 	}
 
 	// For the moment just ignore objects that have multiple materials with different animation methods

@@ -127,4 +127,5 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 	camera.far = this.far;
 
 	return camera;
+
 };

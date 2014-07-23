@@ -49,7 +49,8 @@ THREE.Line.prototype.raycast = ( function () {
 
 		/* if ( geometry instanceof THREE.BufferGeometry ) {
 
-		} else */ if ( geometry instanceof THREE.Geometry ) {
+		} else */
+		 if ( geometry instanceof THREE.Geometry ) {
 
 			var vertices = geometry.vertices;
 			var nbVertices = vertices.length;

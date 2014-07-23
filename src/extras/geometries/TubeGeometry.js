@@ -94,6 +94,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 			grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
 
 		}
+	
 	}
 
 
@@ -123,6 +124,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
+	
 	}
 
 	this.computeFaceNormals();
@@ -210,23 +212,30 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		tz = Math.abs( tangents[ 0 ].z );
 
 		if ( tx <= smallest ) {
+
 			smallest = tx;
 			normal.set( 1, 0, 0 );
+		
 		}
 
 		if ( ty <= smallest ) {
+
 			smallest = ty;
 			normal.set( 0, 1, 0 );
+		
 		}
 
 		if ( tz <= smallest ) {
+
 			normal.set( 0, 0, 1 );
+		
 		}
 
 		vec.crossVectors( tangents[ 0 ], normal ).normalize();
 
 		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
 		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
+	
 	}
 
 
@@ -234,17 +243,17 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	for ( i = 1; i < numpoints; i ++ ) {
 
-		normals[ i ] = normals[ i-1 ].clone();
+		normals[ i ] = normals[ i - 1 ].clone();
 
-		binormals[ i ] = binormals[ i-1 ].clone();
+		binormals[ i ] = binormals[ i - 1 ].clone();
 
-		vec.crossVectors( tangents[ i-1 ], tangents[ i ] );
+		vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
 
 		if ( vec.length() > epsilon ) {
 
 			vec.normalize();
 
-			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+			theta = Math.acos( THREE.Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -259,10 +268,10 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	if ( closed ) {
 
-		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), - 1, 1 ) );
+		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
 
-		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
+		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
 
 			theta = - theta;
 
@@ -277,4 +286,5 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		}
 
 	}
+
 };

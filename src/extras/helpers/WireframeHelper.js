@@ -7,7 +7,11 @@ THREE.WireframeHelper = function ( object, hex ) {
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+	var sortFunction = function ( a, b ) {
+
+	 return a - b 
+
+};
 
 	var keys = [ 'a', 'b', 'c' ];
 	var geometry = new THREE.BufferGeometry();

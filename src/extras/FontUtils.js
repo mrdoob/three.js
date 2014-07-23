@@ -182,11 +182,12 @@ THREE.FontUtils = {
 							var t = i2 / divisions;
 							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
 							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+						  
+						}
+
 					  }
 
-				  }
-
-				  break;
+					  break;
 
 				case 'b':
 
@@ -223,11 +224,13 @@ THREE.FontUtils = {
 				}
 
 			}
+		
 		}
 
 
 
 		return { offset: glyph.ha * scale, path:path };
+	
 	}
 
 };
@@ -360,7 +363,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 				result.push( [ contour[ a ],
 					contour[ b ],
-					contour[ c ] ] );
+				contour[ c ] ] );
 
 
 				vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );

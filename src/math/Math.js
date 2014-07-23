@@ -33,6 +33,7 @@ THREE.Math = {
 					uuid[ i ] = chars[ ( i == 19 ) ? ( r & 0x3 ) | 0x8 : r ];
 
 				}
+			
 			}
 
 			return uuid.join( '' );

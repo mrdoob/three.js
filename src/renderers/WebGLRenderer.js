@@ -611,7 +611,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups !== undefined ) {
 
-				for ( var i = 0,l = geometry.geometryGroupsList.length; i<l;i++ ) {
+				for ( var i = 0,l = geometry.geometryGroupsList.length; i < l;i ++ ) {
 
 					var geometryGroup = geometry.geometryGroupsList[ i ];
 
@@ -3010,6 +3010,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object.__webglMorphTargetInfluences[ m ] = influences[ order[ m ] ];
 
 				m ++;
+			
 			}
 
 		} else {
@@ -3312,7 +3313,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 	
-	function projectObject(scene, object,camera){
+	function projectObject(scene, object,camera) {
 		
 		if ( object.visible === false ) return;
 		
@@ -3507,7 +3508,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			object.render( function ( object ) { _this.renderBufferImmediate( object, program, material ); } );
+			object.render( function ( object ) {
+
+				 _this.renderBufferImmediate( object, program, material ); 
+
+			} );
 
 		}
 
@@ -3651,12 +3656,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
-					for ( var i = 0,l = geometry.geometryGroupsList.length; i<l;i++ ) {
+					for ( var i = 0,l = geometry.geometryGroupsList.length; i < l;i ++ ) {
 	
 						var geometryGroup = geometry.geometryGroupsList[ i ];
 						addBuffer( scene.__webglObjects, geometryGroup, object );
 						
 					}
+				
 				}
 
 			} else if ( object instanceof THREE.Line ||
@@ -3719,7 +3725,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 			
 			if ( addBuffers || object.__webglActive === undefined ) {
+
 				addBuffer( scene.__webglObjects, geometryGroup, object );
+			
 			}
 
 		}
@@ -4159,7 +4167,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var location = material.program.uniforms[ u ];
 
 			if ( location ) {
+
 				material.uniformsList.push( [ material.__webglShader.uniforms[ u ], location ] );
+			
 			}
 
 		}
@@ -4333,13 +4343,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 					refreshLights = true;
 					setupLights( lights );
 					_lightsNeedUpdate = false;
+				
 				}
 
 				if ( refreshLights ) {
+
 					refreshUniformsLights( m_uniforms, _lights );
 					markUniformsLightsNeedsUpdate( m_uniforms, true );
+				
 				} else {
+
 					markUniformsLightsNeedsUpdate( m_uniforms, false );
+				
 				}
 
 			}
@@ -5616,9 +5631,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					mipmap = mipmaps[ i ];
 					if ( texture.format !== THREE.RGBAFormat ) {
+
 						_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+					
 					} else {
+
 						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					
 					}
 
 				}
@@ -5753,11 +5772,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 								_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
 							} else {
+
 								_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+							
 							}
 
 						}
+					
 					}
+				
 				}
 
 				if ( texture.generateMipmaps && isImagePowerOfTwo ) {
@@ -6235,6 +6258,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				};
 
 			}
+		
 		}
 
 		if ( _logarithmicDepthBuffer ) {

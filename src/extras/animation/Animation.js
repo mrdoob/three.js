@@ -98,7 +98,7 @@ THREE.Animation.prototype.reset = function () {
 };
 
 
-THREE.Animation.prototype.update = (function(){
+THREE.Animation.prototype.update = (function() {
 
 	var points = [];
 	var target = new THREE.Vector3();

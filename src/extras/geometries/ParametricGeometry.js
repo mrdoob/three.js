@@ -33,6 +33,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 			verts.push( p );
 
 		}
+	
 	}
 
 	var a, b, c, d;

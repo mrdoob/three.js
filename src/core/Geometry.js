@@ -638,6 +638,7 @@ THREE.Geometry.prototype = {
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
 			for ( var n = 0; n < 3; n ++ ) {
+
 				if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
 
 					dupIndex = n;
@@ -645,11 +646,13 @@ THREE.Geometry.prototype = {
 					break;
 
 				}
+			
 			}
 
 		}
 
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+
 			var idx = faceIndicesToRemove[ i ];
 
 			this.faces.splice( idx, 1 );
@@ -702,9 +705,10 @@ THREE.Geometry.prototype = {
 
 				if ( ! ( groupHash in this.geometryGroups ) ) {
 
-					geometryGroup = { 'id': geometryGroupCounter++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+					geometryGroup = { 'id': geometryGroupCounter ++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
 					this.geometryGroups[ groupHash ] = geometryGroup;
 					this.geometryGroupsList.push(geometryGroup);
+				
 				}
 
 				if ( this.geometryGroups[ groupHash ].vertices + 3 > maxVerticesInGroup ) {
@@ -714,7 +718,7 @@ THREE.Geometry.prototype = {
 
 					if ( ! ( groupHash in this.geometryGroups ) ) {
 
-						geometryGroup = { 'id': geometryGroupCounter++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+						geometryGroup = { 'id': geometryGroupCounter ++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
 						this.geometryGroups[ groupHash ] = geometryGroup;
 						this.geometryGroupsList.push(geometryGroup);
 						

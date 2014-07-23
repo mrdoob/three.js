@@ -41,4 +41,5 @@ THREE.Camera.prototype.clone = function ( camera ) {
 	camera.projectionMatrix.copy( this.projectionMatrix );
 
 	return camera;
+
 };
