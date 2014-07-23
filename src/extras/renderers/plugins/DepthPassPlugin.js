@@ -9,18 +9,21 @@ THREE.DepthPassPlugin = function () {
 
 	var _gl,
 	_renderer,
-	_lights,
+	_lights, _webglObjects, _webglObjectsImmediate,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_renderList = [];
 
-	this.init = function ( renderer, lights ) {
+	this.init = function ( renderer, lights, webglObjects, webglObjectsImmediate ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
 		_lights = lights;
+
+		_webglObjects = webglObjects;
+		_webglObjectsImmediate = webglObjectsImmediate;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -138,11 +141,9 @@ THREE.DepthPassPlugin = function () {
 
 		// set matrices and render immediate objects
 
-		renderList = scene.__webglObjectsImmediate;
+		for ( j = 0, jl = _webglObjectsImmediate.length; j < jl; j ++ ) {
 
-		for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-			webglObject = renderList[ j ];
+			webglObject = _webglObjectsImmediate[ j ];
 			object = webglObject.object;
 
 			if ( object.visible ) {
@@ -169,7 +170,7 @@ THREE.DepthPassPlugin = function () {
 		
 		if ( object.visible ) {
 	
-			var webglObjects = scene.__webglObjects[object.id];
+			var webglObjects = _webglObjects[object.id];
 	
 			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 		
