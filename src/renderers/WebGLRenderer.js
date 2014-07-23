@@ -3930,7 +3930,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Materials
 
-	this.initMaterial = function ( material, lights, fog, object ) {
+	this.initMaterial = function () {
+	
+		console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
+	
+	};
+
+	function initMaterial( material, lights, fog, object ) {
 
 		material.addEventListener( 'dispose', onMaterialDispose );
 
@@ -4027,8 +4033,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
-			maxMorphTargets: this.maxMorphTargets,
-			maxMorphNormals: this.maxMorphNormals,
+			maxMorphTargets: _this.maxMorphTargets,
+			maxMorphNormals: _this.maxMorphNormals,
 
 			maxDirLights: maxLightCount.directional,
 			maxPointLights: maxLightCount.point,
@@ -4036,10 +4042,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxHemiLights: maxLightCount.hemi,
 
 			maxShadows: maxShadows,
-			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow && maxShadows > 0,
-			shadowMapType: this.shadowMapType,
-			shadowMapDebug: this.shadowMapDebug,
-			shadowMapCascade: this.shadowMapCascade,
+			shadowMapEnabled: _this.shadowMapEnabled && object.receiveShadow && maxShadows > 0,
+			shadowMapType: _this.shadowMapType,
+			shadowMapDebug: _this.shadowMapDebug,
+			shadowMapCascade: _this.shadowMapCascade,
 
 			alphaTest: material.alphaTest,
 			metal: material.metal,
@@ -4101,7 +4107,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( program === undefined ) {
 
-			program = new THREE.WebGLProgram( this, code, material, parameters );
+			program = new THREE.WebGLProgram( _this, code, material, parameters );
 			_programs.push( program );
 
 			_this.info.memory.programs = _programs.length;
@@ -4118,7 +4124,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var id, base = 'morphTarget';
 
-			for ( i = 0; i < this.maxMorphTargets; i ++ ) {
+			for ( i = 0; i < _this.maxMorphTargets; i ++ ) {
 
 				id = base + i;
 
@@ -4138,7 +4144,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var id, base = 'morphNormal';
 
-			for ( i = 0; i < this.maxMorphNormals; i ++ ) {
+			for ( i = 0; i < _this.maxMorphNormals; i ++ ) {
 
 				id = base + i;
 
@@ -4174,7 +4180,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.program ) deallocateMaterial( material );
 
-			_this.initMaterial( material, lights, fog, object );
+			initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
 
 		}
