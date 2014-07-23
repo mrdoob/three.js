@@ -27,6 +27,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
 	
+	var lights = [];
+	
 	var opaqueObjects = [];
 	var transparentObjects = [];
 
@@ -406,14 +408,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.addPostPlugin = function ( plugin ) {
 
-		plugin.init( this );
+		plugin.init( this, lights );
 		this.renderPluginsPost.push( plugin );
 
 	};
 
 	this.addPrePlugin = function ( plugin ) {
 
-		plugin.init( this );
+		plugin.init( this, lights );
 		this.renderPluginsPre.push( plugin );
 
 	};
@@ -3163,7 +3165,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		webglObject, object,
 		renderList,
 
-		lights = scene.__lights,
 		fog = scene.fog;
 
 		// reset caching for this frame
@@ -3199,6 +3200,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		initObjects( scene );
 
+		lights.length = 0;
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
 		
@@ -3310,7 +3312,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function projectObject(scene, object,camera){
 		
 		if ( object.visible === false ) return;
-			
+		
+		if ( object instanceof THREE.Light ) {
+
+			lights.push( object );
+
+		}
+		
 		var webglObjects = scene.__webglObjects[ object.id ];
 		
 		if ( webglObjects && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {

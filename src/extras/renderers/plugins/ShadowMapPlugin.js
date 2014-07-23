@@ -6,6 +6,7 @@ THREE.ShadowMapPlugin = function () {
 
 	var _gl,
 	_renderer,
+	_lights,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
@@ -18,10 +19,11 @@ THREE.ShadowMapPlugin = function () {
 	
 	_renderList = [];
 
-	this.init = function ( renderer ) {
+	this.init = function ( renderer, lights ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+		_lights = lights;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -83,9 +85,9 @@ THREE.ShadowMapPlugin = function () {
 		// 	- skip lights that are not casting shadows
 		//	- create virtual lights for cascaded shadow maps
 
-		for ( i = 0, il = scene.__lights.length; i < il; i ++ ) {
+		for ( i = 0, il = _lights.length; i < il; i ++ ) {
 
-			light = scene.__lights[ i ];
+			light = _lights[ i ];
 
 			if ( ! light.castShadow ) continue;
 
@@ -282,11 +284,11 @@ THREE.ShadowMapPlugin = function () {
 
 				if ( buffer instanceof THREE.BufferGeometry ) {
 
-					_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object );
+					_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object );
 
 				} else {
 
-					_renderer.renderBuffer( shadowCamera, scene.__lights, fog, material, buffer, object );
+					_renderer.renderBuffer( shadowCamera, _lights, fog, material, buffer, object );
 
 				}
 
@@ -305,7 +307,7 @@ THREE.ShadowMapPlugin = function () {
 
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
-					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
+					_renderer.renderImmediateObject( shadowCamera, _lights, fog, _depthMaterial, object );
 
 				}
 

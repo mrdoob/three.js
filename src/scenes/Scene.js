@@ -12,8 +12,6 @@ THREE.Scene = function () {
 	this.autoUpdate = true; // checked by the renderer
 	this.matrixAutoUpdate = false;
 
-	this.__lights = [];
-
 	this.__objectsAdded = [];
 	this.__objectsRemoved = [];
 
@@ -24,12 +22,6 @@ THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Scene.prototype.__addObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
-
-		if ( this.__lights.indexOf( object ) === - 1 ) {
-
-			this.__lights.push( object );
-
-		}
 
 		if ( object.target && object.target.parent === undefined ) {
 
@@ -67,14 +59,6 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 THREE.Scene.prototype.__removeObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
-
-		var i = this.__lights.indexOf( object );
-
-		if ( i !== - 1 ) {
-
-			this.__lights.splice( i, 1 );
-
-		}
 
 		if ( object.shadowCascadeArray ) {
 

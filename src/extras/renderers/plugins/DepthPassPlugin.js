@@ -9,16 +9,18 @@ THREE.DepthPassPlugin = function () {
 
 	var _gl,
 	_renderer,
+	_lights,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_renderList = [];
 
-	this.init = function ( renderer ) {
+	this.init = function ( renderer, lights ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+		_lights = lights;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -123,11 +125,11 @@ THREE.DepthPassPlugin = function () {
 
 			if ( buffer instanceof THREE.BufferGeometry ) {
 
-				_renderer.renderBufferDirect( camera, scene.__lights, fog, material, buffer, object );
+				_renderer.renderBufferDirect( camera, _lights, fog, material, buffer, object );
 
 			} else {
 
-				_renderer.renderBuffer( camera, scene.__lights, fog, material, buffer, object );
+				_renderer.renderBuffer( camera, _lights, fog, material, buffer, object );
 
 			}
 
@@ -147,7 +149,7 @@ THREE.DepthPassPlugin = function () {
 
 				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
-				_renderer.renderImmediateObject( camera, scene.__lights, fog, _depthMaterial, object );
+				_renderer.renderImmediateObject( camera, _lights, fog, _depthMaterial, object );
 
 			}
 
