@@ -434,8 +434,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldDoubleSided = - 1;
 		_oldFlipSided = - 1;
 
-		initObjects( scene );
-
 		this.shadowMapPlugin.update( scene, camera );
 
 	};
@@ -3198,7 +3196,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
-		initObjects( scene );
+		if ( ! scene.__webglObjects ) {
+
+			scene.__webglObjects = {};
+			scene.__webglObjectsImmediate = [];
+
+		}
 
 		lights.length = 0;
 		opaqueObjects.length = 0;
@@ -3319,11 +3322,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
+		initObject( object, scene );
+		
 		var webglObjects = scene.__webglObjects[ object.id ];
 		
 		if ( webglObjects && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 			
-			updateObject( scene, object );
+			updateObject( object, scene );
 			
 			for ( var i = 0, l = webglObjects.length; i < l; i ++ ) {
 				
@@ -3571,38 +3576,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	// Objects refresh
-
-	var initObjects = function ( scene ) {
-
-		if ( ! scene.__webglObjects ) {
-
-			scene.__webglObjects = {};
-			scene.__webglObjectsImmediate = [];
-
-		}
-
-		while ( scene.__objectsAdded.length ) {
-
-			addObject( scene.__objectsAdded[ 0 ], scene );
-			scene.__objectsAdded.splice( 0, 1 );
-
-		}
-
-		while ( scene.__objectsRemoved.length ) {
-
-			removeObject( scene.__objectsRemoved[ 0 ], scene );
-			scene.__objectsRemoved.splice( 0, 1 );
-
-		}
-
-	};
-
-	// Objects adding
-
-	function addObject( object, scene ) {
-
-		var g, geometry, geometryGroup;
+	function initObject( object, scene ) {
 
 		if ( object.__webglInit === undefined ) {
 
@@ -3613,7 +3587,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
-		geometry = object.geometry;
+		var geometry = object.geometry;
 		
 		if ( geometry === undefined ) {
 
@@ -3671,8 +3645,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object instanceof THREE.Mesh ) {
 
-				geometry = object.geometry;
-
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					addBuffer( scene.__webglObjects, geometry, object );
@@ -3681,7 +3653,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( var i = 0,l = geometry.geometryGroupsList.length; i<l;i++ ) {
 	
-						geometryGroup = geometry.geometryGroupsList[ i ];
+						var geometryGroup = geometry.geometryGroupsList[ i ];
 						addBuffer( scene.__webglObjects, geometryGroup, object );
 						
 					}
@@ -3690,7 +3662,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( object instanceof THREE.Line ||
 						object instanceof THREE.PointCloud ) {
 
-				geometry = object.geometry;
 				addBuffer( scene.__webglObjects, geometry, object );
 
 			} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
@@ -3789,7 +3760,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Objects updates
 
-	function updateObject(scene, object ) {
+	function updateObject( object, scene ) {
 
 		var geometry = object.geometry,
 			geometryGroup, customAttributesDirty, material;
