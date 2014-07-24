@@ -31,9 +31,10 @@ THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight 
 	if ( frameHeight === undefined ) frameHeight = 24;
 
 	this.fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
+
 	this.updateProjectionMatrix();
 
-}
+};
 
 
 /**
@@ -115,6 +116,14 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 };
 
+THREE.PerspectiveCamera.prototype.zoom = function ( factor ) {
+
+	this.fov /= factor;
+
+	this.updateProjectionMatrix();
+
+};
+
 THREE.PerspectiveCamera.prototype.clone = function () {
 
 	var camera = new THREE.PerspectiveCamera();
@@ -127,4 +136,5 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 	camera.far = this.far;
 
 	return camera;
+
 };

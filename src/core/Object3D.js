@@ -281,7 +281,7 @@ THREE.Object3D.prototype = {
 
 	lookAt: function () {
 
-		// This routine does not support objects with rotated and/or translated parent(s)
+		// This method does not support objects with rotated and/or translated parent(s)
 
 		var m1 = new THREE.Matrix4();
 
