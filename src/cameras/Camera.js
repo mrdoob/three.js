@@ -17,7 +17,7 @@ THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Camera.prototype.lookAt = function () {
 
-	// This routine does not support cameras with rotated and/or translated parent(s)
+	// This method does not support cameras with rotated and/or translated parent(s)
 
 	var m1 = new THREE.Matrix4();
 
