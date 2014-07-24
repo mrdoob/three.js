@@ -369,7 +369,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_canvas = null;
 		_programs = null;
 		_this = null;
-		_renderer = null;
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
@@ -945,11 +944,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			ntris     = faces3.length * 1,
 			nlines    = faces3.length * 3,
 
-			material = getBufferMaterial( object, geometryGroup ),
-
-			uvType = bufferGuessUVType( material ),
-			normalType = bufferGuessNormalType( material ),
-			vertexColorType = bufferGuessVertexColorType( material );
+			material = getBufferMaterial( object, geometryGroup );
 
 		// START_VEROLD_MOD - quad wireframes
 		if ( geometry.faceEdgeMasks !== undefined ) {
@@ -969,8 +964,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		// END_VEROLD_MOD - quad wireframes
-
-		// console.log( "uvType", uvType, "normalType", normalType, "vertexColorType", vertexColorType, object, geometryGroup, material );
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
 		geometryGroup.__normalArray = new Float32Array( nvertices * 3 );
