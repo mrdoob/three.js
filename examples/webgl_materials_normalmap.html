@@ -63,7 +63,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var mesh, zmesh, geometry;
 			var mesh1, mesh2;
 
 			var spotLight, pointLight, ambientLight;
@@ -134,10 +134,6 @@
 				// light representation
 
 				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				lightMesh.position = pointLight.position;
-				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				//scene.add( lightMesh );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
@@ -322,8 +318,8 @@
 
 				}
 
-				lightMesh.position.x = 2500 * Math.cos( r );
-				lightMesh.position.z = 2500 * Math.sin( r );
+				pointLight.position.x = 2500 * Math.cos( r );
+				pointLight.position.z = 2500 * Math.sin( r );
 
 				r += 0.01;
 

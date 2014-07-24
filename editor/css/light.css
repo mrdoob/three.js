@@ -21,7 +21,6 @@ button {
 textarea {
 	white-space: pre;
 	word-wrap: normal;
-	overflow: scroll;
 }
 
 .Panel {
