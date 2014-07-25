@@ -98,6 +98,7 @@ input.Number {
 	background: #eee;
 	padding: 0px;
 	margin: 0px;
+	z-index: 10;
 }
 
 	#menubar .menu {
@@ -174,6 +175,17 @@ input.Number {
 		color: #444;
 		font-size: 12px;
 	}
+
+	#sidebar > #componentPanel {
+		padding: 0px;
+		border-top: 0px;
+	}
+
+		#sidebar > #componentPanel > .Panel {
+			color: #888;
+			padding: 10px;
+			border-top: 1px solid #ccc;
+		}
 
 #toolbar {
 	position: absolute;

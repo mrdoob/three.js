@@ -6,6 +6,16 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
 	<body>
+		<!-- CodeMirror -->
+
+		<link rel="stylesheet" href="css/libs/codemirror.css">
+		<link rel="stylesheet" href="css/libs/codemirror-monokai.css">
+		<link rel="stylesheet" href="css/ui-codeeditor.css">
+		<script src="js/libs/codemirror.js"></script>
+		<script src="js/libs/codemirror-javascript.js"></script>
+
+		<!-- Editor -->
+
 		<link href="css/types.css" rel="stylesheet" />
 		<link id="theme" href="css/light.css" rel="stylesheet" />
 
@@ -52,12 +62,14 @@
 		<script src="js/Editor.js"></script>
 		<script src="js/Config.js"></script>
 		<script src="js/Loader.js"></script>
+		<script src="js/Component.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
+		<script src="js/Menubar.SidebarController.js"></script>
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Renderer.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
@@ -75,6 +87,8 @@
 		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
+		<script src="js/Sidebar.ComponentClasses.js"></script>
+		<script src="js/Sidebar.ComponentInstances.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 
@@ -91,11 +105,11 @@
 			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor ).setId( 'menubar' );
-			document.body.appendChild( menubar.dom );
-
 			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
 			document.body.appendChild( sidebar.dom );
+
+			var menubar = new Menubar( editor ).setId( 'menubar' );
+			document.body.appendChild( menubar.dom );
 
 			//
 
@@ -107,13 +121,36 @@
 
 					if ( state !== undefined ) {
 
+						// load scene
+						
 						var loader = new THREE.ObjectLoader();
 						var scene = loader.parse( state );
 
 						editor.setScene( scene );
 
+						// load components
+
+						if ( state.components !== undefined ) {
+
+							state.components.forEach( function ( classData ) {
+
+								var componentClass = new ComponentClass( classData );
+								editor.registerComponentClass( componentClass );
+
+								classData.instances.forEach( function ( instanceData ) {
+
+									var target = editor.objectByUuid( instanceData.target );
+									editor.instantiateComponent( componentClass, target );
+
+								} );
+
+							} );
+
+						}
+
 					}
 
+					// load config
 					var selected = editor.config.getKey( 'selected' );
 
 					if ( selected !== undefined ) {
@@ -127,7 +164,6 @@
 				//
 
 				var timeout;
-				var exporter = new THREE.ObjectExporter();
 
 				var saveState = function ( scene ) {
 
@@ -135,7 +171,7 @@
 
 					timeout = setTimeout( function () {
 
-						editor.storage.set( exporter.parse( editor.scene ) );
+						editor.storage.set( editor.serializeScene() );
 
 					}, 1000 );
 
@@ -148,6 +184,7 @@
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
+				signals.componentClassRegistryChanged.add( saveState );
 
 			} );
 

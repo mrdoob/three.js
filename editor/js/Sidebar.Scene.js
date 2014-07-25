@@ -124,7 +124,7 @@ Sidebar.Scene = function ( editor ) {
 
 	// events
 
-	signals.sceneGraphChanged.add( function () {
+	function updateSceneGraph () {
 
 		var scene = editor.scene;
 		var sceneType = editor.getObjectType( scene );
@@ -196,15 +196,21 @@ Sidebar.Scene = function ( editor ) {
 
 		refreshFogUI();
 
-	} );
+	}
 
-	signals.objectSelected.add( function ( object ) {
+	function setSelectedObject ( object ) {
 
 		if ( ignoreObjectSelectedSignal === true ) return;
 
 		outliner.setValue( object !== null ? object.id : null );
 
-	} );
+	}
+
+	signals.sceneGraphChanged.add( updateSceneGraph );
+	signals.objectSelected.add( setSelectedObject );
+
+	// trigger view update
+	updateSceneGraph();
 
 	return container;
 

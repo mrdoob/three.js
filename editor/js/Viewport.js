@@ -14,6 +14,15 @@ var Viewport = function ( editor ) {
 	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
 	container.add( info );
 
+	// components + code editor
+
+	var codeEditor = new UI.CodeEditor();
+	container.add( codeEditor );
+
+	var currentComponentClass = null;
+
+	// scene graph
+
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
 
@@ -449,6 +458,40 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.sidebarModeChanged.add( function ( mode ) {
+
+		if ( mode === 'components' ) {
+			
+			codeEditor.setDisplay('block');
+
+		} else {
+			
+			codeEditor.setDisplay('none');
+
+		}
+
+	} );
+
+	signals.currentComponentClassChanged.add( function ( componentClass ) {
+
+		// if a class is already open, save the contents
+		if ( currentComponentClass ) {
+			currentComponentClass.setCode( codeEditor.getValue() );
+		}
+
+		codeEditor.setValue( componentClass.getCode() );
+
+		currentComponentClass = componentClass;
+
+	} );
+
+	signals.mainLoop.add( function () {
+
+		animate();
+		render();
+
+	} );
+
 	//
 
 	var clearColor, renderer;
@@ -474,8 +517,6 @@ var Viewport = function ( editor ) {
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
-
-	animate();
 
 	//
 
@@ -562,8 +603,6 @@ var Viewport = function ( editor ) {
 
 	function animate() {
 
-		requestAnimationFrame( animate );
-
 		// animations
 
 		if ( THREE.AnimationHandler.animations.length > 0 ) {
@@ -581,8 +620,6 @@ var Viewport = function ( editor ) {
 				}
 
 			}
-
-			render();
 
 		}
 

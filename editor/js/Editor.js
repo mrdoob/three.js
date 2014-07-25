@@ -13,6 +13,11 @@ var Editor = function () {
 
 		themeChanged: new SIGNALS.Signal(),
 
+		sidebarModeChanged: new SIGNALS.Signal(),
+		
+		currentComponentClassChanged: new SIGNALS.Signal(),
+		componentClassRegistryChanged: new SIGNALS.Signal(),
+
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
 		spaceChanged: new SIGNALS.Signal(),
@@ -34,13 +39,17 @@ var Editor = function () {
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
-		windowResize: new SIGNALS.Signal()
+		windowResize: new SIGNALS.Signal(),
+
+		mainLoop: new SIGNALS.Signal()
 
 	};
 	
 	this.config = new Config();
 	this.storage = new Storage();
 	this.loader = new Loader( this );
+
+	this.currentSidebarMode = null;
 
 	this.scene = new THREE.Scene();
 	this.sceneHelpers = new THREE.Scene();
@@ -49,19 +58,42 @@ var Editor = function () {
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
+	
+	this.componentClasses = {};
+	this.componentsLookupByObject = {};
 
 	this.selected = null;
 	this.helpers = {};
 
+	this.mainLoop();
+
 };
 
 Editor.prototype = {
+
+	mainLoop: function () {
+
+		requestAnimationFrame( this.mainLoop.bind( this ) );
+
+		this.runComponentUpdate();
+		this.signals.mainLoop.dispatch();
+
+	},
+
+	//
 
 	setTheme: function ( value ) {
 
 		document.getElementById( 'theme' ).href = value;
 
 		this.signals.themeChanged.dispatch( value );
+
+	},
+
+	setSidebarMode: function ( mode ) {
+
+		this.currentSidebarMode = mode;
+		this.signals.sidebarModeChanged.dispatch( mode );
 
 	},
 
@@ -82,6 +114,99 @@ Editor.prototype = {
 
 		this.signals.sceneGraphChanged.active = true;
 		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	//
+
+	registerComponentClass: function ( componentClass ) {
+
+		this.componentClasses[ componentClass.uuid ] = componentClass;
+		this.signals.componentClassRegistryChanged.dispatch( componentClass );
+
+	},
+
+	deleteComponentClass: function ( componentClass ) {
+
+		var scope = this;
+		
+		componentClass.instances.slice().forEach( function ( componentInstance ) {
+
+			scope.deleteComponentInstance( componentInstance );
+
+		} )
+
+		delete this.componentClasses[ componentClass.uuid ];
+
+		this.signals.componentClassRegistryChanged.dispatch();
+
+	},
+
+	deleteComponentInstance: function ( component ) {
+
+		// remove component instance from object 
+		var objectComponents = this.componentsLookupByObject[ component.target.uuid ];
+
+		var index = objectComponents.indexOf( component )
+		if (index > -1) {
+		    objectComponents.splice(index, 1);
+		}
+
+		// remove component instance from component class
+		var classInstances = this.componentClasses[ component.class.uuid ].instances;
+
+		var index = classInstances.indexOf( component )
+		if (index > -1) {
+		    classInstances.splice(index, 1);
+		}
+
+	},
+
+	componentsForObject: function ( target ) {
+
+		var components = this.componentsLookupByObject[ target.uuid ];
+
+		if ( components === undefined ) {
+			components = components || [];			
+		}
+
+		return components
+
+	},
+
+	instantiateComponent: function ( componentClass, target ) {
+
+		var components = this.componentsLookupByObject[ target.uuid ];
+
+		if ( components === undefined ) {
+			components = components || [];	
+			this.componentsLookupByObject[ target.uuid ] = components;		
+		}
+
+		var newInstance = componentClass.instantiate( target );
+		components.push( newInstance );
+
+		this.signals.componentClassRegistryChanged.dispatch();
+
+		return newInstance;
+
+	},
+
+	runComponentUpdate: function () {
+
+		var componentClasses = this.componentClasses;
+
+		Object.keys( this.componentClasses ).forEach( function (uuid) {
+
+			var componentClass = componentClasses[ uuid ];
+			
+			componentClass.instances.forEach( function (instance) {
+
+				instance.run('update');
+
+			})
+
+		} );
 
 	},
 
@@ -277,33 +402,15 @@ Editor.prototype = {
 
 	selectById: function ( id ) {
 
-		var scope = this;
-
-		this.scene.traverse( function ( child ) {
-
-			if ( child.id === id ) {
-
-				scope.select( child );
-
-			}
-
-		} );
+		var target = this.objectById( id );
+		this.select( target );
 
 	},
 
 	selectByUuid: function ( uuid ) {
 
-		var scope = this;
-
-		this.scene.traverse( function ( child ) {
-
-			if ( child.uuid === uuid ) {
-
-				scope.select( child );
-
-			}
-
-		} );
+		var target = this.objectByUuid( uuid );
+		this.select( target );
 
 	},
 
@@ -314,6 +421,42 @@ Editor.prototype = {
 	},
 
 	// utils
+
+	objectById: function ( id ) {
+
+		var target = null;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.id === id ) {
+
+				target = child;
+
+			}
+
+		} );
+
+		return target;
+
+	},
+
+	objectByUuid: function ( uuid ) {
+
+		var target = null;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.uuid === uuid ) {
+
+				target = child;
+
+			}
+
+		} );
+
+		return target;
+
+	},
 
 	getObjectType: function ( object ) {
 
@@ -402,6 +545,36 @@ Editor.prototype = {
 
 		}
 
-	}
+	},
+
+	serializeScene: function () {
+
+		// export scene
+		var exporter = new THREE.ObjectExporter();
+		var data = exporter.parse( editor.scene );
+
+		// append components
+		data.components = this.serializeComponents();
+
+		return data;
+
+	},
+
+	serializeComponents: function () {
+
+		var data = [];
+		var componentClasses = this.componentClasses;
+
+		Object.keys( this.componentClasses ).forEach( function (uuid) {
+
+			var componentClass = componentClasses[ uuid ];
+			
+			data.push( componentClass.toJSON() );
+
+		} );
+
+		return data;
+
+	},
 
 }
