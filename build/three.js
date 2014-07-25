@@ -12879,6 +12879,12 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
+				case 'Group':
+
+					object = new THREE.Group();
+
+					break;
+
 				default:
 
 					object = new THREE.Object3D();
