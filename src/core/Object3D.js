@@ -312,7 +312,7 @@ THREE.Object3D.prototype = {
 
 		if ( object === this ) {
 
-			console.warn( "THREE.Object3D.add: An object can't be added as a child of itself." );
+			console.error( "THREE.Object3D.add:", object, "can't be added as a child of itself." );
 			return this;
 
 		}
@@ -330,22 +330,10 @@ THREE.Object3D.prototype = {
 
 			this.children.push( object );
 
-			// add to scene
-
-			var scene = this;
-
-			while ( scene.parent !== undefined ) {
-
-				scene = scene.parent;
-
-			}
-
-			if ( scene !== undefined && scene instanceof THREE.Scene )  {
-
-				scene.__addObject( object );
-
-			}
-
+		} else {
+		
+			console.error( "THREE.Object3D.add:", object, "is not an instance of THREE.Object3D." );
+		
 		}
 
 		return this;
@@ -372,22 +360,6 @@ THREE.Object3D.prototype = {
 			object.dispatchEvent( { type: 'removed' } );
 
 			this.children.splice( index, 1 );
-
-			// remove from scene
-
-			var scene = this;
-
-			while ( scene.parent !== undefined ) {
-
-				scene = scene.parent;
-
-			}
-
-			if ( scene !== undefined && scene instanceof THREE.Scene ) {
-
-				scene.__removeObject( object );
-
-			}
 
 		}
 
@@ -572,6 +544,12 @@ THREE.Object3D.prototype = {
 		}
 
 		return object;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

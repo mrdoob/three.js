@@ -50,8 +50,6 @@
 
 			var camera, scene, renderer;
 
-			var lightMesh;
-
 			var directionalLight, pointLight;
 
 			var mouseX = 0, mouseY = 0;
@@ -84,14 +82,13 @@
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
-				sphere = new THREE.SphereGeometry( 100, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				lightMesh.scale.set( 0.05, 0.05, 0.05 );
-				lightMesh.position = pointLight.position;
-				scene.add( lightMesh );
+				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
+				
+				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				mesh.scale.set( 0.05, 0.05, 0.05 );
+				pointLight.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -311,8 +308,8 @@
 
 				camera.lookAt( scene.position );
 
-				lightMesh.position.x = 1500 * Math.cos( timer );
-				lightMesh.position.z = 1500 * Math.sin( timer );
+				pointLight.position.x = 1500 * Math.cos( timer );
+				pointLight.position.z = 1500 * Math.sin( timer );
 
 				renderer.render( scene, camera );
 
