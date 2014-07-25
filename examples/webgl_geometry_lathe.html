@@ -213,7 +213,7 @@
 
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
-				for (var i = 0; i < 1; i+=0.01)  {
+				for (var i = 0; i < 1; i+=0.1)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
 					}	
 
@@ -224,7 +224,7 @@
 
 				var curve = new THREE.CubicBezierCurve( v3, v4, v5, v6 );
 	
-				for (var i = 0.01; i <=  1.005; i+=0.01)  {
+				for (var i = 0.1; i <=  1.05; i+=0.1)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
 					}	
 
