@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -112,11 +113,11 @@
 
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
-				for (var i = 0; i <= 1; i+=0.01)  {
+				for (var i = 0; i <= 1.01; i+=0.1)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x, 0, curve.getPoint( i ).y ) ); 
 					}	
 	
-				var geometry = new THREE.LatheGeometry( points, 48 );	
+				var geometry = new THREE.LatheGeometry( points, 42 );	
 				geometry.computeBoundingBox();	
 				
 				var material = new THREE.MeshPhongMaterial( { color: 0x00CED1, side: THREE.DoubleSide } );
@@ -137,11 +138,11 @@
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
 				var points = [];
-				for (var i = 0; i <= 1.11; i+=0.01)  {
+				for (var i = 0; i <= 1.11; i+=0.05)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x ,  0, curve.getPoint( i ).y ) ); 
 					}	
 	
-				var geometry = new THREE.LatheGeometry( points, 32 );	
+				var geometry = new THREE.LatheGeometry( points, 24 );	
 				geometry.computeBoundingBox();	
 				
 				var material = new THREE.MeshPhongMaterial( { color: 0xD29A81 } );	
@@ -168,7 +169,7 @@
 						points.push( new THREE.Vector3( curve.getPoint( i ).x,  0, curve.getPoint( i ).y ) ); 
 					}	
 	
-				var geometry = new THREE.LatheGeometry( points, 32 );	
+				var geometry = new THREE.LatheGeometry( points, 28 );	
 	
 				var Texture = new THREE.ImageUtils.loadTexture( 'textures/lathe/pear.jpg' );
 				var material = new THREE.MeshPhongMaterial( { map: Texture } );	
@@ -198,7 +199,7 @@
 				var pod = new THREE.Mesh( tubegeo, material2 );
 				apple.add( pod );
 
-				apple.position.set( 0, 170/1.3, 0 );				
+				apple.position.set( 0, 130, 0 );				
 				scene.add( apple );				
 	
 
@@ -271,7 +272,7 @@
 					points.push( new THREE.Vector3( BezierCurve.getPoint( i ).x , 0,  BezierCurve.getPoint( i ).y ) ); 
 					}
 
-				for ( var i = - 4; i < 1.2; i = i + 0.1 ) {
+				for ( var i = - 4.1; i < 1.3; i = i + 0.05 ) {
 					points.push( new THREE.Vector3( 5 + 30*Math.atan(Math.exp(3*i)), 0, 24 - 24*i ) );
 					}
 
@@ -340,11 +341,11 @@
 	
 				var BezierCurve = new THREE.CubicBezierCurve3( v0, v1, v2, v3 );
 
-				for ( var i = 0; i <= 1.11; i = i + 0.01 ) {
+				for ( var i = 0; i <= 1.11; i = i + 0.1 ) {
 					points.push( new THREE.Vector3( 4*BezierCurve.getPoint( i ).x,  0, 5*BezierCurve.getPoint( i ).y ) ); 	
 					}
 
-				tank = new THREE.Mesh( new THREE.LatheGeometry( points, 32 ), material );
+				tank = new THREE.Mesh( new THREE.LatheGeometry( points, 28 ), material );
 				tank.rotation.x = -Math.PI/2;			
 				vase.add( tank );
 
@@ -353,7 +354,7 @@
 				Texture.repeat.set( 1/4, 1/4 );
 				var material = new THREE.MeshPhongMaterial( { map: Texture , side: THREE.DoubleSide } );
 				
-				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 64, 64 ), material);
+				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 64, 36 ), material);
 				bottom.rotation.x = -Math.PI/2;							   
 				vase.add( bottom ); 
 	
@@ -370,7 +371,7 @@
 					}
 				 var i = 9.2;	points.push( new THREE.Vector3( 0, 0, 24 - 24*i ) );
 					
-				var geometry = new THREE.LatheGeometry( points, 32 );	
+				var geometry = new THREE.LatheGeometry( points, 28 );	
 				geometry.computeBoundingBox();
 				var materialBack = new THREE.MeshPhongMaterial( {
 					color: 0x006400, 
@@ -424,7 +425,7 @@
 					points.push( new THREE.Vector3( 25 + 90*Math.atan(Math.exp(3*i)), 0, 84 - 46*i ) );
 					}
 					
-				var geometry = new THREE.LatheGeometry( points, 64 );	
+				var geometry = new THREE.LatheGeometry( points, 56 );	
 				geometry.computeBoundingBox();
 				var material = new THREE.MeshPhongMaterial( 
 					{ color: 0x000012,  specular: 0x202030, shininess: 2, side: THREE.DoubleSide, transparent: false, opacity: 0.6 ,
@@ -438,7 +439,7 @@
 				
 				CircleMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: 512, textureHeight: 512, color: 0x202030} );
 				var Radius = 525;				
-				var geometry = new THREE.CircleGeometry( Radius, 64 );
+				var geometry = new THREE.CircleGeometry( Radius, 56 );
 				var mirrorMesh = new THREE.Mesh(geometry, CircleMirror.material);
 				mirrorMesh.add( CircleMirror );
 				
@@ -475,7 +476,7 @@
 				var Texture = new THREE.ImageUtils.loadTexture( 'textures/crate.gif' );				
 				var material = new THREE.MeshLambertMaterial( { map: Texture , side: THREE.DoubleSide } );
 				
-				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 130, 64 ), material );						   
+				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 130, 32 ), material );						   
 				barrel.add( bottom ); 				
 								
 				scene.add( barrel );
@@ -490,7 +491,7 @@
 
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
-				for (var i = 0; i <1.0; i+=0.01)  {
+				for (var i = 0; i <1.0; i+=0.05)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x,  0, curve.getPoint( i ).y ) ); 
 					}	
   
@@ -500,12 +501,12 @@
 
 				var curve = new THREE.CubicBezierCurve( v3, v4, v5, v6 );
 	
-				for (var i = 0; i <=  1.005; i+=0.01)  {
+				for (var i = 0; i <=  1.005; i+=0.05)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x,  0, curve.getPoint( i ).y ) ); 
 					}	
 
 					
-				var geometry = new THREE.LatheGeometry( points, 32 );	
+				var geometry = new THREE.LatheGeometry( points, 28 );	
 				geometry.computeBoundingBox();	
 				
 				var Texture = new THREE.ImageUtils.loadTexture( 'textures/lathe/matrioshka.jpg' );
@@ -519,7 +520,7 @@
 
 				matrioshka.position.set( -100, -geometry.boundingBox.min.z, -350);
 				matrioshka.rotation.x = -Math.PI/2;				
-				scene.add( matrioshka );				
+				scene.add( matrioshka );			
 					
 
 					
@@ -531,7 +532,7 @@
 
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
-				for (var i = 0; i <1.0; i+=0.01)  {
+				for (var i = 0; i <1.0; i+=0.1)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
 					}	
 				points.push( new THREE.Vector3( 0, 0, 147 ).multiplyScalar(1/2) ); 
@@ -546,11 +547,11 @@
 				
 				var curve = new THREE.CubicBezierCurve( v4, v5, v6, v7 );
 	
-				for (var i = 0; i <=  1.001; i+=0.01)  {
+				for (var i = 0; i <=  1.01; i+=0.1)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
 					}	
 		
-				var geometry = new THREE.LatheGeometry( points, 32 );	
+				var geometry = new THREE.LatheGeometry( points, 24 );	
 				geometry.computeBoundingBox();	
 				
 				var material = new THREE.MeshPhongMaterial( { color: 0xFFFFFF, } );				
@@ -572,7 +573,7 @@
 
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
-				for (var i = 0; i < 1; i+=0.01)  {
+				for (var i = 0; i < 1; i+=0.05)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
 					}	
  
@@ -582,7 +583,7 @@
 
 				var curve = new THREE.CubicBezierCurve( v3, v4, v5, v6 );
 	
-				for (var i = 0; i <=  1.005; i+=0.01)  {
+				for (var i = 0; i <=  1.005; i+=0.05)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x/2,  0, curve.getPoint( i ).y/2 ) ); 
 					}	
 				points.push( new THREE.Vector3( 9, 0, 81 ) ); 					
@@ -591,7 +592,7 @@
 				points.push( new THREE.Vector3( 1, 0, 149 ) ); 				
 				
 				
-				var geometry = new THREE.LatheGeometry( points, 32 );	
+				var geometry = new THREE.LatheGeometry( points, 24 );	
 				geometry.computeBoundingBox();	
 
 				var Texture = new THREE.ImageUtils.loadTexture('textures/lathe/candlestick.jpg'); 
@@ -611,11 +612,11 @@
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
 				var points = [];
-				for (var i = 0; i <= 1; i+=0.01)  {
+				for (var i = 0; i <= 1.01; i+=0.05)  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x , 0, curve.getPoint( i ).y ) ); 
 					}	
 	
-				var geometry = new THREE.LatheGeometry( points, 32 );	
+				var geometry = new THREE.LatheGeometry( points, 16 );	
 				geometry.computeBoundingBox();	
 				
 				var material = new THREE.MeshBasicMaterial( { color: 0xFFFFFC } );	
