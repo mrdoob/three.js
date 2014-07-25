@@ -169,9 +169,9 @@ THREE.AnimationHandler = {
 
 	play: function ( animation ) {
 
-		if ( this.animations.indexOf( animation ) === - 1 ) {
+		if ( THREE.AnimationHandler.animations.indexOf( animation ) === - 1 ) {
 
-			this.animations.push( animation );
+			THREE.AnimationHandler.animations.push( animation );
 
 		}
 
@@ -179,11 +179,11 @@ THREE.AnimationHandler = {
 
 	stop: function ( animation ) {
 
-		var index = this.animations.indexOf( animation );
+		var index = THREE.AnimationHandler.animations.indexOf( animation );
 
 		if ( index !== - 1 ) {
 
-			this.animations.splice( index, 1 );
+			THREE.AnimationHandler.animations.splice( index, 1 );
 
 		}
 
@@ -191,9 +191,9 @@ THREE.AnimationHandler = {
 
 	update: function ( deltaTimeMS ) {
 
-		for ( var i = 0; i < this.animations.length; i ++ ) {
+		for ( var i = 0; i < THREE.AnimationHandler.animations.length; i ++ ) {
 
-			this.animations[ i ].update( deltaTimeMS );
+			THREE.AnimationHandler.animations[ i ].update( deltaTimeMS );
 
 		}
 
