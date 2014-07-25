@@ -341,6 +341,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setPrecision = function( precision ) {
 		_precision = precision !== undefined ? precision : 'highp';
 	};
+
+	this.getLights = function () {
+		return _lights;
+	};
 	//END_VEROLD_MOD
 
 
