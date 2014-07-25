@@ -9,6 +9,8 @@ var Editor = function () {
 		playAnimation: new SIGNALS.Signal(),
 		stopAnimation: new SIGNALS.Signal(),
 
+		showDialog: new SIGNALS.Signal(),
+
 		// notifications
 
 		themeChanged: new SIGNALS.Signal(),
@@ -64,6 +66,14 @@ Editor.prototype = {
 		this.signals.themeChanged.dispatch( value );
 
 	},
+
+	showDialog: function ( value ) {
+	
+		this.signals.showDialog.dispatch( value );
+	
+	},
+	
+	//
 
 	setScene: function ( scene ) {
 

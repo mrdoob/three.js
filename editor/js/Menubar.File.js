@@ -154,6 +154,13 @@ Menubar.File = function ( editor ) {
 
 	}
 
+	function onExportTestOptionClick() {
+
+		var text = new UI.Text( 'blah' );
+		editor.showDialog( text );
+
+	}
+
 	// create file input element for scene import
 
 	var fileInput = document.createElement( 'input' );
@@ -176,7 +183,10 @@ Menubar.File = function ( editor ) {
 		createOption( 'Export Object', onExportObjectOptionClick ),
 		createOption( 'Export Scene', onExportSceneOptionClick ),
 		createOption( 'Export OBJ', onExportOBJOptionClick ),
-		createOption( 'Export STL', onExportSTLOptionClick )
+		createOption( 'Export STL', onExportSTLOptionClick ),
+		createDivider(),
+		
+		createOption( 'Export Test', onExportTestOptionClick )
 	];
 
 	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );

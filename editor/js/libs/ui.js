@@ -106,7 +106,17 @@ UI.Panel.prototype.add = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
 
-		this.dom.appendChild( arguments[ i ].dom );
+		var argument = arguments[ i ];
+
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.appendChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
@@ -118,8 +128,18 @@ UI.Panel.prototype.add = function () {
 UI.Panel.prototype.remove = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
+	
+		var argument = arguments[ i ];
 
-		this.dom.removeChild( arguments[ i ].dom );
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.removeChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
@@ -1082,6 +1102,52 @@ UI.Button.prototype = Object.create( UI.Element.prototype );
 UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
+
+	return this;
+
+};
+
+
+// Dialog
+
+UI.Dialog = function ( value ) {
+
+	var scope = this;
+	
+	var dom = document.createElement( 'dialog' );
+
+	if ( dom.showModal === undefined ) {
+
+		// fallback
+
+		dom = document.createElement( 'div' );
+		dom.style.display = 'none';
+
+		dom.showModal = function () {
+
+			dom.style.position = 'absolute';
+			dom.style.left = '100px';
+			dom.style.top = '100px';
+			dom.style.zIndex = 1;
+			dom.style.display = '';
+
+		};
+
+	}
+
+	dom.className = 'Dialog';
+
+	this.dom = dom;
+
+	return this;
+
+};
+
+UI.Dialog.prototype = Object.create( UI.Panel.prototype );
+
+UI.Dialog.prototype.showModal = function () {
+
+	this.dom.showModal();
 
 	return this;
 
