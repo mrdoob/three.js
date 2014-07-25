@@ -329,6 +329,7 @@ Editor.prototype = {
 			'SkinnedMesh': THREE.SkinnedMesh,
 			'Mesh': THREE.Mesh,
 			'Sprite': THREE.Sprite,
+			'Group': THREE.Group,
 			'Object3D': THREE.Object3D
 
 		};

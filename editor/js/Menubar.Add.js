@@ -5,10 +5,10 @@ Menubar.Add = function ( editor ) {
 
 	// event handlers
 
-	function onObject3DOptionClick () {
+	function onGroupOptionClick () {
 
-		var mesh = new THREE.Object3D();
-		mesh.name = 'Object3D ' + ( ++ meshCount );
+		var mesh = new THREE.Group();
+		mesh.name = 'Group ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
 		editor.select( mesh );
@@ -242,7 +242,7 @@ Menubar.Add = function ( editor ) {
 	var createDivider = UI.MenubarHelper.createDivider;
 
 	var menuConfig = [
-		createOption( 'Object3D', onObject3DOptionClick ),
+		createOption( 'Group', onGroupOptionClick ),
 		createDivider(),
 
 		createOption( 'Plane', onPlaneOptionClick ),
