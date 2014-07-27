@@ -446,6 +446,9 @@ THREE.SceneLoader.prototype = {
 							camera.rotation.fromArray( rot );
 
 						}
+						else if (objJSON.target) {
+						    camera.lookAt(new THREE.Vector3().fromArray(objJSON.target));
+						}						
 
 						parent.add( camera );
 
