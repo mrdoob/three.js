@@ -106,9 +106,11 @@ input.Number {
 		cursor: pointer;
 	}
 
-	#menubar .Panel {
-		color: #888;
-	}
+		#menubar .menu .title {
+			color: #888;
+			margin: 0px;
+			padding: 8px;
+		}
 
 		#menubar .menu .options {
 			display: none;
