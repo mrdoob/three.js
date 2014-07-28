@@ -3444,13 +3444,12 @@ THREE.ColladaLoader = function () {
 
 										texture = new THREE.Texture();
 										loader = new THREE.ImageLoader();
-										loader.load( url, function ( image ) {
-
-											texture.image = image;
-											texture.needsUpdate = true;
-
-										} );
-
+										(function(tex, url) { 
+											loader.load( url, function ( image ) {
+												tex.image = image;
+												tex.needsUpdate = true;
+											});
+										})(texture, url);
 									}
 									
 									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
