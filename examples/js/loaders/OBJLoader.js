@@ -192,7 +192,7 @@ THREE.OBJLoader.prototype = {
 
 		// fixes
 
-		text = text.replace( /\\\r\n/g, '' ); // handles line continuations \
+		text = text.replace( /\\\r?\n/g, '' ); // handles line continuations \
 
 		var lines = text.split( '\n' );
 
