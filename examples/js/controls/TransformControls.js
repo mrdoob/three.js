@@ -568,6 +568,7 @@
 		var _plane = "XY";
 
 		var changeEvent = { type: "change" };
+		var gizmoSelectEvent = { type: "gizmoSelect" };
 
 		var ray = new THREE.Raycaster();
 		var projector = new THREE.Projector();
@@ -754,6 +755,8 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+
+					scope.dispatchEvent( gizmoSelectEvent );
 
 					scope.axis = intersect.object.name;
 
