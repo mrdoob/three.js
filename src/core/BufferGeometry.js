@@ -337,151 +337,151 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
-        var positionAttr = this.getAttribute( 'position' );
+		var positionAttr = this.getAttribute( 'position' );
 
-        if ( !positionAttr ) {
-            // If there are no positions, we cannot proceed.
-            return
-        }
+		if ( positionAttr === undefined ) {
+			// If there are no positions, we cannot proceed.
+			return
+		}
 
-        var nVertexElements = positionAttr.array.length;
+		var nVertexElements = positionAttr.array.length;
 
-        var normalAttr  = this.getAttribute( 'normal' );
+		var normalAttr  = this.getAttribute( 'normal' );
 
-        var i, il;
-        var j, jl;
+		var i, il;
+		var j, jl;
 
-        if ( !normalAttr ) {
+		if ( normalAttr === undefined ) {
 
-            // add a normal attribute
+			// add a normal attribute
 
-            this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( nVertexElements ), 3 ) );
+			this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( nVertexElements ), 3 ) );
 
-        } else {
+		} else {
 
-            // reset existing normals to zero
+			// reset existing normals to zero
 
-            for ( i = 0, il = normalAttr.array.length; i < il; i ++ ) {
+			for ( i = 0, il = normalAttr.array.length; i < il; i ++ ) {
 
-                normalAttr.array[ i ] = 0;
+				normalAttr.array[ i ] = 0;
 
-            }
+			}
 
-        }
+		}
 
-        // by here we definitely have position and normal attributes.
+		// by here we definitely have position and normal attributes.
 
-        var positions = this.getAttribute( 'position' ).array;
-        var normals = this.getAttribute( 'normal' ).array;
+		var positions = this.getAttribute( 'position' ).array;
+		var normals = this.getAttribute( 'normal' ).array;
 
-        var vA, vB, vC, x, y, z,
+		var vA, vB, vC, x, y, z,
 
-        pA = new THREE.Vector3(),
-        pB = new THREE.Vector3(),
-        pC = new THREE.Vector3(),
+		pA = new THREE.Vector3(),
+		pB = new THREE.Vector3(),
+		pC = new THREE.Vector3(),
 
-        cb = new THREE.Vector3(),
-        ab = new THREE.Vector3();
+		cb = new THREE.Vector3(),
+		ab = new THREE.Vector3();
 
-        // indexed elements
+		// indexed elements
 
-        if ( this.getAttribute( 'index' ) ) {
+		if ( this.getAttribute( 'index' ) ) {
 
-            var indices = this.getAttribute( 'index' ).array;
+			var indices = this.getAttribute( 'index' ).array;
 
-            var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
+			var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
 
-            for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+			for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
 
-                var start = offsets[ j ].start;
-                var count = offsets[ j ].count;
-                var index = offsets[ j ].index;
+				var start = offsets[ j ].start;
+				var count = offsets[ j ].count;
+				var index = offsets[ j ].index;
 
-                for ( i = start, il = start + count; i < il; i += 3 ) {
+				for ( i = start, il = start + count; i < il; i += 3 ) {
 
-                    vA = index + indices[ i ];
-                    vB = index + indices[ i + 1 ];
-                    vC = index + indices[ i + 2 ];
+					vA = index + indices[ i ];
+					vB = index + indices[ i + 1 ];
+					vC = index + indices[ i + 2 ];
 
-                    x = positions[ vA * 3 ];
-                    y = positions[ vA * 3 + 1 ];
-                    z = positions[ vA * 3 + 2 ];
-                    pA.set( x, y, z );
+					x = positions[ vA * 3 ];
+					y = positions[ vA * 3 + 1 ];
+					z = positions[ vA * 3 + 2 ];
+					pA.set( x, y, z );
 
-                    x = positions[ vB * 3 ];
-                    y = positions[ vB * 3 + 1 ];
-                    z = positions[ vB * 3 + 2 ];
-                    pB.set( x, y, z );
+					x = positions[ vB * 3 ];
+					y = positions[ vB * 3 + 1 ];
+					z = positions[ vB * 3 + 2 ];
+					pB.set( x, y, z );
 
-                    x = positions[ vC * 3 ];
-                    y = positions[ vC * 3 + 1 ];
-                    z = positions[ vC * 3 + 2 ];
-                    pC.set( x, y, z );
+					x = positions[ vC * 3 ];
+					y = positions[ vC * 3 + 1 ];
+					z = positions[ vC * 3 + 2 ];
+					pC.set( x, y, z );
 
-                    cb.subVectors( pC, pB );
-                    ab.subVectors( pA, pB );
-                    cb.cross( ab );
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
 
-                    normals[ vA * 3     ] += cb.x;
-                    normals[ vA * 3 + 1 ] += cb.y;
-                    normals[ vA * 3 + 2 ] += cb.z;
+					normals[ vA * 3     ] += cb.x;
+					normals[ vA * 3 + 1 ] += cb.y;
+					normals[ vA * 3 + 2 ] += cb.z;
 
-                    normals[ vB * 3     ] += cb.x;
-                    normals[ vB * 3 + 1 ] += cb.y;
-                    normals[ vB * 3 + 2 ] += cb.z;
+					normals[ vB * 3     ] += cb.x;
+					normals[ vB * 3 + 1 ] += cb.y;
+					normals[ vB * 3 + 2 ] += cb.z;
 
-                    normals[ vC * 3     ] += cb.x;
-                    normals[ vC * 3 + 1 ] += cb.y;
-                    normals[ vC * 3 + 2 ] += cb.z;
+					normals[ vC * 3     ] += cb.x;
+					normals[ vC * 3 + 1 ] += cb.y;
+					normals[ vC * 3 + 2 ] += cb.z;
 
-                }
+				}
 
-            }
+			}
 
-        // non-indexed elements (unconnected triangle soup)
+		// non-indexed elements (unconnected triangle soup)
 
-        } else {
+		} else {
 
-            for ( i = 0, il = positions.length; i < il; i += 9 ) {
+			for ( i = 0, il = positions.length; i < il; i += 9 ) {
 
-                x = positions[ i ];
-                y = positions[ i + 1 ];
-                z = positions[ i + 2 ];
-                pA.set( x, y, z );
+				x = positions[ i ];
+				y = positions[ i + 1 ];
+				z = positions[ i + 2 ];
+				pA.set( x, y, z );
 
-                x = positions[ i + 3 ];
-                y = positions[ i + 4 ];
-                z = positions[ i + 5 ];
-                pB.set( x, y, z );
+				x = positions[ i + 3 ];
+				y = positions[ i + 4 ];
+				z = positions[ i + 5 ];
+				pB.set( x, y, z );
 
-                x = positions[ i + 6 ];
-                y = positions[ i + 7 ];
-                z = positions[ i + 8 ];
-                pC.set( x, y, z );
+				x = positions[ i + 6 ];
+				y = positions[ i + 7 ];
+				z = positions[ i + 8 ];
+				pC.set( x, y, z );
 
-                cb.subVectors( pC, pB );
-                ab.subVectors( pA, pB );
-                cb.cross( ab );
+				cb.subVectors( pC, pB );
+				ab.subVectors( pA, pB );
+				cb.cross( ab );
 
-                normals[ i     ] = cb.x;
-                normals[ i + 1 ] = cb.y;
-                normals[ i + 2 ] = cb.z;
+				normals[ i     ] = cb.x;
+				normals[ i + 1 ] = cb.y;
+				normals[ i + 2 ] = cb.z;
 
-                normals[ i + 3 ] = cb.x;
-                normals[ i + 4 ] = cb.y;
-                normals[ i + 5 ] = cb.z;
+				normals[ i + 3 ] = cb.x;
+				normals[ i + 4 ] = cb.y;
+				normals[ i + 5 ] = cb.z;
 
-                normals[ i + 6 ] = cb.x;
-                normals[ i + 7 ] = cb.y;
-                normals[ i + 8 ] = cb.z;
+				normals[ i + 6 ] = cb.x;
+				normals[ i + 7 ] = cb.y;
+				normals[ i + 8 ] = cb.z;
 
-            }
+			}
 
-        }
+		}
 
-        this.normalizeNormals();
+		this.normalizeNormals();
 
-        this.normalsNeedUpdate = true;
+		this.normalsNeedUpdate = true;
 
 	},
 
