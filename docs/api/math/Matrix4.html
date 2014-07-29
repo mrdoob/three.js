@@ -129,10 +129,9 @@
 		Based on [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm].
 		</div>
 
-		<h3>.makeRotationFromEuler( [page:Vector3 v], [page:String order] ) [page:Matrix4 this]</h3>
+		<h3>.makeRotationFromEuler( [page:Euler euler] ) [page:Matrix4 this]</h3>
 		<div>
-		v — Rotation vector.
-		order — The order of rotations. Eg. "XYZ".
+		euler — Rotation vector followed by order of rotations. Eg. "XYZ".
 		</div>
 		<div>
 		Sets the rotation submatrix of this matrix to the rotation specified by Euler angles, the rest of the matrix is identity.<br />
