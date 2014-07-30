@@ -224,10 +224,26 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleX.getValue() / object.scale.x;
+			if ( Math.abs( object.scale.x ) < 1e-300 ) {
 
-			objectScaleY.setValue( objectScaleY.getValue() * scale );
-			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+				objectScaleX.setValue( 0 );
+
+			} else {
+
+				var scale = objectScaleX.getValue() / object.scale.x;
+
+				if ( Math.abs( scale ) < 1e-300 ) {
+
+					objectScaleX.setValue( object.scale.x );
+
+				} else {
+
+					objectScaleY.setValue( objectScaleY.getValue() * scale );
+					objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+
+				}
+
+			}
 
 		}
 
@@ -241,10 +257,26 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleY.getValue() / object.scale.y;
+			if ( Math.abs( object.scale.y ) < 1e-300 ) {
 
-			objectScaleX.setValue( objectScaleX.getValue() * scale );
-			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+				objectScaleY.setValue( 0 );
+
+			} else {
+
+				var scale = objectScaleY.getValue() / object.scale.y;
+
+				if ( Math.abs( scale ) < 1e-300 ) {
+
+					objectScaleY.setValue( object.scale.y );
+
+				} else {
+
+					objectScaleX.setValue( objectScaleX.getValue() * scale );
+					objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+
+				}
+
+			}
 
 		}
 
@@ -258,10 +290,26 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleZ.getValue() / object.scale.z;
+			if ( Math.abs( object.scale.z ) < 1e-300 ) {
 
-			objectScaleX.setValue( objectScaleX.getValue() * scale );
-			objectScaleY.setValue( objectScaleY.getValue() * scale );
+				objectScaleZ.setValue( 0 );
+
+			} else {
+
+				var scale = objectScaleZ.getValue() / object.scale.z;
+
+				if ( Math.abs( scale ) < 1e-300 ) {
+
+					objectScaleZ.setValue( object.scale.z );
+
+				} else {
+
+					objectScaleX.setValue( objectScaleX.getValue() * scale );
+					objectScaleY.setValue( objectScaleY.getValue() * scale );
+
+				}
+
+			}
 
 		}
 
