@@ -379,7 +379,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
           var foreColor = ((material.palette[cIndex] * tdata[tIndex]) << 16) 
           				+ ((material.palette[cIndex+1] * tdata[tIndex+1]) << 8 )
           				+ (material.palette[cIndex+2] * tdata[tIndex+2]);
-
           
           if(opaci < 250) {
             var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
@@ -425,8 +424,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var texture = new THREE.SoftwareRenderer.Texture();
 					material.texture = texture;					
                      
-                    if ( material instanceof THREE.MeshBasicMaterial ) {
-                        
+                    if ( material instanceof THREE.MeshBasicMaterial || 
+						material instanceof THREE.SpriteMaterial ) { 
+						
                         shader = basicMaterialShader;
                     } else {
                         
@@ -530,19 +530,35 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var z3 = (v3.z * viewportZScale + viewportZOffs) | 0;
         
         // UV values
+        var bHasUV = false;
+        var tu1, tv1, tu2, tv2, tu3, tv3;
         
-        var tu1 = face.uvs[0].x; 
-        var tv1 = 1-face.uvs[0].y; 
-        var tu2 = face.uvs[1].x; 
-        var tv2 = 1-face.uvs[1].y; 
-        var tu3 = face.uvs[2].x; 
-        var tv3 = 1-face.uvs[2].y; 
+        if ( face.uvs ) {
+            bHasUV = true;
+            
+            tu1 = face.uvs[0].x; 
+            tv1 = 1-face.uvs[0].y; 
+            tu2 = face.uvs[1].x; 
+            tv2 = 1-face.uvs[1].y; 
+            tu3 = face.uvs[2].x; 
+            tv3 = 1-face.uvs[2].y; 
+        }             
         
         // Normal values
-        var n1 = face.vertexNormalsModel[0], n2 = face.vertexNormalsModel[1], n3 = face.vertexNormalsModel[2];        
-        var nz1 = n1.z * 255;
-        var nz2 = n2.z * 255;
-        var nz3 = n3.z * 255;
+        var bHasNormal = false;
+        var n1, n2, n3, nz1, nz2, nz3;
+        
+        if ( face.vertexNormalsModel ) {            
+            bHasNormal = true;
+            
+            n1 = face.vertexNormalsModel[0];
+            n2 = face.vertexNormalsModel[1];
+            n3 = face.vertexNormalsModel[2]; 
+            nz1 = n1.z * 255;
+            nz2 = n2.z * 255;
+            nz3 = n3.z * 255;
+        }
+        
         // Deltas
 
 		var dx12 = x1 - x2, dy12 = y2 - y1;
@@ -608,41 +624,41 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		dzdx = (dzdx * fixscale) | 0;
 		dzdy = (dzdy * fixscale) | 0;
         
-        // UV interpolation setup
-        
-        var dtu12 = tu1 - tu2, dtu31 = tu3 - tu1;
-        var dtudx = (invDet * (dtu12*dy31 - dtu31*dy12)); // dtu per one subpixel step in x
-        var dtudy = (invDet * (dtu12*dx31 - dx12*dtu31)); // dtu per one subpixel step in y
-        var dtv12 = tv1 - tv2, dtv31 = tv3 - tv1;
-        var dtvdx = (invDet * (dtv12*dy31 - dtv31*dy12)); // dtv per one subpixel step in x
-        var dtvdy = (invDet * (dtv12*dx31 - dx12*dtv31)); // dtv per one subpixel step in y
-       
-        // UV at top/left corner of rast area
-        
-		var ctu = ( tu1 + (minXfixscale - x1) * dtudx + (minYfixscale - y1) * dtudy );
-        var ctv = ( tv1 + (minXfixscale - x1) * dtvdx + (minYfixscale - y1) * dtvdy );
+        var dtvdx, dtvdy, cbtu, cbtv;
+        if ( bHasUV ) {
+            // UV interpolation setup
+            var dtu12 = tu1 - tu2, dtu31 = tu3 - tu1;
+            var dtudx = (invDet * (dtu12*dy31 - dtu31*dy12)); // dtu per one subpixel step in x
+            var dtudy = (invDet * (dtu12*dx31 - dx12*dtu31)); // dtu per one subpixel step in y
+            var dtv12 = tv1 - tv2, dtv31 = tv3 - tv1;
+            dtvdx = (invDet * (dtv12*dy31 - dtv31*dy12)); // dtv per one subpixel step in x
+            dtvdy = (invDet * (dtv12*dx31 - dx12*dtv31)); // dtv per one subpixel step in y   
+            
+            // UV at top/left corner of rast area
+            cbtu = ( tu1 + (minXfixscale - x1) * dtudx + (minYfixscale - y1) * dtudy );
+            cbtv = ( tv1 + (minXfixscale - x1) * dtvdx + (minYfixscale - y1) * dtvdy );
+            
+            // UV pixel steps            
+            dtudx = dtudx * fixscale;
+            dtudy = dtudy * fixscale;        
+            dtvdx = dtvdx * fixscale;
+            dtvdy = dtvdy * fixscale;
+        }              
 
-		// UV pixel steps
-		
-		dtudx = dtudx * fixscale;
-		dtudy = dtudy * fixscale;        
-		dtvdx = dtvdx * fixscale;
-		dtvdy = dtvdy * fixscale;
+        var dnxdx, dnzdy, cbnz;
+        if ( bHasNormal ) {
+             // Normal interpolation setup        
+            var dnz12 = nz1 - nz2, dnz31 = nz3 - nz1;
+            var dnzdx = (invDet * (dnz12*dy31 - dnz31*dy12)); // dnz per one subpixel step in x
+            var dnzdy = (invDet * (dnz12*dx31 - dx12*dnz31)); // dnz per one subpixel step in y
+            
+            // Normal at top/left corner of rast area       
+            cbnz = ( nz1 + (minXfixscale - x1) * dnzdx + (minYfixscale - y1) * dnzdy );
 
-        // Normal interpolation setup
-        
-        var dnz12 = nz1 - nz2, dnz31 = nz3 - nz1;
-        var dnzdx = (invDet * (dnz12*dy31 - dnz31*dy12)); // dnz per one subpixel step in x
-        var dnzdy = (invDet * (dnz12*dx31 - dx12*dnz31)); // dnz per one subpixel step in y
-        
-         // Normal at top/left corner of rast area
-       
-        var cnz = ( nz1 + (minXfixscale - x1) * dnzdx + (minYfixscale - y1) * dnzdy );
-
-		// Normal pixel steps
-
-        dnzdx = (dnzdx * fixscale);
-		dnzdy = (dnzdy * fixscale);
+            // Normal pixel steps
+            dnzdx = (dnzdx * fixscale);
+            dnzdy = (dnzdy * fixscale);
+        }
         
 		// Set up min/max corners
 		var qm1 = q - 1; // for convenience
@@ -667,17 +683,23 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var cb2 = c2;
 		var cb3 = c3;
 		var cbz = cz;
-        var cbtu = ctu;
-        var cbtv = ctv;
-        var cbnz = cnz;
 		var qstep = -q;
 		var e1x = qstep * dy12;
 		var e2x = qstep * dy23;
 		var e3x = qstep * dy31;
 		var ezx = qstep * dzdx;
-        var etux = qstep * dtudx;
-        var etvx = qstep * dtvdx;
-        var enzx = qstep * dnzdx;
+        
+        var etux, etvx; 
+        if ( bHasUV ) {
+            etux = qstep * dtudx;
+            etvx = qstep * dtvdx;
+        }
+
+        var enzx; 
+        if ( bHasNormal ) {
+            enzx = qstep * dnzdx;
+        }
+                
 		var x0 = minx;
 
 		for ( var y0 = miny; y0 < maxy; y0 += q ) {
@@ -690,9 +712,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cb2 += e2x;
 				cb3 += e3x;
 				cbz += ezx;
-                cbtu += etux;
-                cbtv += etvx;
-                cbnz += enzx;
+                
+                if ( bHasUV ) {
+                    cbtu += etux;
+                    cbtv += etvx;
+                }
+                
+                if ( bHasNormal ) {
+                    cbnz += enzx;
+                }                
+                
 			}
 
 			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
@@ -701,9 +730,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			e2x = -e2x;
 			e3x = -e3x;
 			ezx = -ezx;
-            etux = -etux;
-            etvx = -etvx;
-            enzx = -enzx;
+            
+            if ( bHasUV ) {                
+                etux = -etux;
+                etvx = -etvx;
+            }
+           
+            if ( bHasNormal ) {
+                enzx = -enzx;
+            }            
 
 			while ( 1 ) {
 
@@ -713,9 +748,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cb2 += e2x;
 				cb3 += e3x;
 				cbz += ezx;
-                cbtu += etux;
-                cbtv += etvx;
-                cbnz += enzx;
+                
+                if ( bHasUV ) {
+                    cbtu += etux;
+                    cbtv += etvx;
+                }
+               
+                if ( bHasNormal ) {
+                    cbnz += enzx;
+                }              
 
 				// We're done with this block line when at least one edge completely out
 				// If an edge function is too small and decreasing in the current traversal
@@ -751,18 +792,36 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cy1 = cb1;
 					var cy2 = cb2;
 					var cyz = cbz;
-                    var cytu = cbtu;
-                    var cytv = cbtv;
-                    var cynz = cbnz;
+                    
+                    var cytu, cytv;                    
+                    if ( bHasUV ) {
+                        cytu = cbtu;
+                        cytv = cbtv;
+                    }
+                    
+                    var cynz;
+                    if ( bHasNormal ) {
+                        cynz = cbnz;
+                    }
+                    
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
 						var cx1 = cy1;
 						var cx2 = cy2;
 						var cxz = cyz;
-                        var cxtu = cytu;
-                        var cxtv = cytv;
-                        var cxnz = cynz;                        
+                        
+                        var cxtu;
+                        var cxtv;                        
+                        if ( bHasUV ) {
+                            cxtu = cytu;
+                            cxtv = cytv;
+                        }
+                        
+                        var cxnz; 
+                        if ( bHasNormal ) {
+                            cxnz = cynz; 
+                        }                                               
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
@@ -776,9 +835,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							cx1 += dy12;
 							cx2 += dy23;
 							cxz += dzdx;
-                            cxtu += dtudx;
-                            cxtv += dtvdx;
-                            cxnz += dnzdx;
+                            
+                            if ( bHasUV ) {
+                                cxtu += dtudx;
+                                cxtv += dtvdx;
+                            }
+                            
+                            if ( bHasNormal ) {
+                                cxnz += dnzdx;
+                            }                            
+                            
 							offset++;
 
 						}
@@ -786,9 +852,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cy1 += dx12;
 						cy2 += dx23;
 						cyz += dzdy;
-                        cytu += dtudy;
-                        cytv += dtvdy;
-                        cynz += dnzdy;
+                        
+                        if ( bHasUV ) {
+                            cytu += dtudy;
+                            cytv += dtvdy;
+                        }
+                        
+                        if ( bHasNormal ) {
+                            cynz += dnzdy;
+                        }                        
+                        
 						offset += linestep;
 
 					}
@@ -799,9 +872,17 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cy2 = cb2;
 					var cy3 = cb3;
 					var cyz = cbz;
-                    var cytu = cbtu;
-                    var cytv = cbtv;
-                    var cynz = cbnz;
+                    
+                    var cytu, cytv;
+                    if ( bHasUV ) {
+                        cytu = cbtu;
+                        cytv = cbtv;
+                    }
+                    
+                    var cynz;
+                    if ( bHasNormal ) {
+                        cynz = cbnz;
+                    }                    
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
@@ -809,9 +890,18 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						var cx2 = cy2;
 						var cx3 = cy3;
 						var cxz = cyz;
-                        var cxtu = cytu;
-                        var cxtv = cytv;    
-                        var cxnz = cynz;     
+                        
+                        var cxtu;
+                        var cxtv;                            
+                        if ( bHasUV ) {
+                            cxtu = cytu;
+                            cxtv = cytv;
+                        }
+                        
+                        var cxnz;                        
+                        if ( bHasNormal ) {
+                            cxnz = cynz;     
+                        }                         
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
@@ -830,9 +920,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							cx2 += dy23;
 							cx3 += dy31;
 							cxz += dzdx;
-                            cxtu += dtudx;
-                            cxtv += dtvdx;
-                            cxnz += dnzdx;
+                            
+                            if ( bHasUV ) {
+                                cxtu += dtudx;
+                                cxtv += dtvdx;
+                            }
+                            
+                            if ( bHasNormal ) {
+                                cxnz += dnzdx;
+                            }
+                            
 							offset++;
 
 						}
@@ -841,9 +938,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cy2 += dx23;
 						cy3 += dx31;
 						cyz += dzdy;
-                        cytu += dtudy;
-                        cytv += dtvdy;
-                        cynz += dnzdy;
+                        
+                        if ( bHasUV ) {
+                            cytu += dtudy;
+                            cytv += dtvdy;
+                        }
+                        
+                        if ( bHasNormal ) {
+                            cynz += dnzdy;
+                        }                        
+                        
 						offset += linestep;
 
 					}
@@ -857,9 +961,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			cb2 += q*dx23;
 			cb3 += q*dx31;
 			cbz += q*dzdy;
-            cbtu += q*dtudy;
-            cbtv += q*dtvdy;
-            cbnz += q*dnzdy;
+            
+            if ( bHasUV ) {
+                cbtu += q*dtudy;
+                cbtv += q*dtvdy;
+            }
+            
+            if ( bHasNormal ) {
+                cbnz += q*dnzdy;
+            }            
+            
 		}
 
 	}
