@@ -125,7 +125,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 							scope.createModel( ctmFile, callback );
 
 							var e = Date.now();
-							console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
+							if (!parameters.silent) console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
 
 						}
 
