@@ -84,8 +84,8 @@
 					if( !motion.airborne ) {
 
 						// look around
-						var sx = keysPressed[keys.UP] ? 0.04 : ( keysPressed[keys.DN] ? -0.04 : 0 );
-						var sy = keysPressed[keys.LT] ? 0.04 : ( keysPressed[keys.RT] ? -0.04 : 0 );
+						var sx = keysPressed[keys.UP] ? 0.03 : ( keysPressed[keys.DN] ? -0.03 : 0 );
+						var sy = keysPressed[keys.LT] ? 0.03 : ( keysPressed[keys.RT] ? -0.03 : 0 );
 
 						if( Math.abs( sx ) >= Math.abs( motion.spinning.x ) ) motion.spinning.x = sx;
 						if( Math.abs( sy ) >= Math.abs( motion.spinning.y ) ) motion.spinning.y = sy;
@@ -252,7 +252,7 @@
 
 			var renderer = new THREE.WebGLRenderer({ antialias : true });
 
-			var camera = new THREE.PerspectiveCamera( 90, 1, 0.1, 9000 );
+			var camera = new THREE.PerspectiveCamera( 60, 1, 0.1, 9000 );
 
 			var scene = new THREE.Scene();
 			
