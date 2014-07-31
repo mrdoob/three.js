@@ -38,7 +38,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var cache = {};
 
 	var animationFrameId = null;
-
+	
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = canvas;
 
 	this.autoClear = true;

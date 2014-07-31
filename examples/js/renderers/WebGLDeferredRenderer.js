@@ -29,7 +29,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		this.renderer.autoClear = false;
 
 	}
-
+	
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = this.renderer.domElement;
 
 	//

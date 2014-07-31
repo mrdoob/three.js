@@ -90,6 +90,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
+
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = _canvas;
 
 	this.devicePixelRatio = parameters.devicePixelRatio !== undefined

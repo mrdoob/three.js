@@ -326,7 +326,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		}
 
 	};
-
+	
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = canvas;
 	this.extensions = extensions;
 

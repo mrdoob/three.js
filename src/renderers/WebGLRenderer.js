@@ -36,7 +36,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var transparentObjects = [];
 
 	// public properties
-
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = _canvas;
 	this.context = null;
 	this.devicePixelRatio = parameters.devicePixelRatio !== undefined

@@ -50,7 +50,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var vector1 = new THREE.Vector3();
 	var vector2 = new THREE.Vector3();
 	var vector3 = new THREE.Vector3();
-
+	
+	this.id = THREE.RendererIdCount ++;
 	this.domElement = canvas;
 
 	this.autoClear = true;
