@@ -190,20 +190,17 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				vector3.y += scaleY;
 				
 				if ( material.map ) {
-					texCoord1.x = 0;
-					texCoord1.y = 1;
 
-					texCoord2.x = 0;
-					texCoord2.y = 0;
-
-					texCoord3.x = 1;
-					texCoord3.y = 1;
+					texCoord1.set( 0, 1 );
+					texCoord2.set( 0, 0 );
+					texCoord3.set( 1, 1 );
 				
 					drawTriangle(
 						vector1, vector2, vector3,
 						texCoord1, texCoord2, texCoord3,
 						shader, element, material
 					);
+
 				} else {
 					
 					drawTriangle(
@@ -211,6 +208,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						null, null, null,
 						shader, element, material
 					);
+
 				}			
 
 				vector1.copy( element );
@@ -226,20 +224,17 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				vector3.y -= scaleY;
 				
 				if ( material.map ) {
-					texCoord1.x = 1;
-					texCoord1.y = 1;
 
-					texCoord2.x = 0;
-					texCoord2.y = 0;
-
-					texCoord3.x = 1;
-					texCoord3.y = 0;
+					texCoord1.set( 1, 1 );
+					texCoord2.set( 0, 0 );
+					texCoord3.set( 1, 0 );
 
 					drawTriangle(
 						vector1, vector2, vector3,
 						texCoord1, texCoord2, texCoord3,
 						shader, element, material
 					);
+
 				} else {
 					
 					drawTriangle(
@@ -247,6 +242,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						null, null, null,
 						shader, element, material
 					);
+
 				}				
 
 			}
