@@ -15703,14 +15703,6 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Sprite.prototype.updateMatrix = function () {
-
-	this.matrix.compose( this.position, this.quaternion, this.scale );
-
-	this.matrixWorldNeedsUpdate = true;
-
-};
-
 THREE.Sprite.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) object = new THREE.Sprite( this.material );
