@@ -369,7 +369,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
         return palette;
     }
     
-    function basicMaterialShader( buffer, offset, u, v, n, face, material ) {
+    function basicMaterialShader( buffer, depthBuf, offset, depth, u, v, n, face, material ) {
+	
+		var colorOffset = offset * 4;
 
     	if ( material.needsUpdate && !material.texture.data ) {
     		material.texture.CreateFromImage( material.map.image );
@@ -385,78 +387,33 @@ THREE.SoftwareRenderer = function ( parameters ) {
         var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
         
         if ( !isTransparent ) {
-            buffer[ offset ] = tdata[tIndex];
-            buffer[ offset + 1 ] = tdata[tIndex+1];
-            buffer[ offset + 2 ] = tdata[tIndex+2];
-            buffer[ offset + 3 ] = material.opacity * 255;
-        }
+            buffer[ colorOffset ] = tdata[tIndex];
+            buffer[ colorOffset + 1 ] = tdata[tIndex+1];
+            buffer[ colorOffset + 2 ] = tdata[tIndex+2];
+            buffer[ colorOffset + 3 ] = material.opacity * 255;
+			depthBuf[ offset ] = depth;
+		}
         else { 
             var opaci = tdata[tIndex+3] * material.opacity;
             var texel = (tdata[tIndex] << 16) + (tdata[tIndex+1] << 8) + tdata[tIndex+2];
             if(opaci < 250) {
-                var backColor = (buffer[offset] << 16) + (buffer[offset + 1] << 8) + buffer[offset + 2];
+                var backColor = (buffer[colorOffset] << 16) + (buffer[colorOffset + 1] << 8) + buffer[colorOffset + 2];
                 texel = texel * opaci + backColor * (1-opaci);                         
-            }
+            } 
             
-            buffer[ offset ] = (texel & 0xff0000) >> 16;
-            buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
-            buffer[ offset + 2 ] = texel & 0xff;
-            buffer[ offset + 3 ] = material.opacity * 255;
-        }
-    }
-	
-	function spriteMaterialShader( buffer, offset, u, v, n, face, material ) {
-
-    	if ( material.needsUpdate && !material.texture.data ) {
-    		material.texture.CreateFromImage( material.map.image );
-    	}
-
-    	if ( !material.texture.data )
-    		return;
-
-        var tdim = material.texture.width;
-        var isTransparent = material.transparent;
-        var tbound = tdim - 1;
-        var tdata = material.texture.data;
-		
-// 		var scaleX = face.scale.x * canvasWidth * 0.5;
-// 		var scaleY = face.scale.y * canvasHeight * 0.5;
-// 		var ox = material.texture.width * material.map.offset.x;
-// 		var oy = material.texture.height * material.map.offset.y;
-// 		var sx = material.texture.width * material.map.repeat.x;
-// 		var sy = material.texture.height * material.map.repeat.y;
-// 		var cx = scaleX / sx;
-// 		var cy = scaleY / sy;
-//         var tIndex = (((cy * tdim) & tbound) * tdim + ((cx * tdim) & tbound)) * 4;
-        var tIndex = 0;
-        if ( !isTransparent ) {
-            buffer[ offset ] = tdata[tIndex];
-            buffer[ offset + 1 ] = tdata[tIndex+1];
-            buffer[ offset + 2 ] = tdata[tIndex+2];
-            buffer[ offset + 3 ] = material.opacity * 255;
-        }
-        else { 
-            var opaci = tdata[tIndex+3] * material.opacity;
-            var texel = tdata[tIndex] << 16 + tdata[tIndex+1] << 8 + tdata[tIndex+2];
-            if(opaci < 250) {
-                var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
-                texel = texel * opaci + backColor * (1-opaci);                         
-            }
-            
-            buffer[ offset ] = (texel & 0xff0000) >> 16;
-            buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
-            buffer[ offset + 2 ] = (texel & 0xff);
-            buffer[ offset + 3 ] = material.opacity * 255;
+            buffer[ colorOffset ] = (texel & 0xff0000) >> 16;
+            buffer[ colorOffset + 1 ] = (texel & 0xff00) >> 8;
+            buffer[ colorOffset + 2 ] = texel & 0xff;
+            buffer[ colorOffset + 3 ] = material.opacity * 255;
         }
     }
     
-    function lightingMaterialShader( buffer, offset, u, v, n, face, material ) {
+    function lightingMaterialShader( buffer, depthBuf, offset, depth, u, v, n, face, material ) {
         
+        var colorOffset = offset * 4;
+		
     	if ( material.map.needsUpdate && !material.texture.data ) {
     		material.texture.CreateFromImage( material.map.image );
-    		//material.map.needsUpdate = false;
-
-    		return;
     	}
 
     	if ( !material.texture.data )
@@ -470,10 +427,11 @@ THREE.SoftwareRenderer = function ( parameters ) {
         var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
         
         if ( !isTransparent ) {
-          buffer[ offset ] = (material.palette[cIndex] * tdata[tIndex]) >> 8;
-          buffer[ offset + 1 ] = (material.palette[cIndex+1] * tdata[tIndex+1]) >> 8;
-          buffer[ offset + 2 ] = (material.palette[cIndex+2] * tdata[tIndex+2]) >> 8;
-          buffer[ offset + 3 ] = material.opacity * 255;
+          buffer[ colorOffset ] = (material.palette[cIndex] * tdata[tIndex]) >> 8;
+          buffer[ colorOffset + 1 ] = (material.palette[cIndex+1] * tdata[tIndex+1]) >> 8;
+          buffer[ colorOffset + 2 ] = (material.palette[cIndex+2] * tdata[tIndex+2]) >> 8;
+          buffer[ colorOffset + 3 ] = material.opacity * 255;		  
+		  depthBuf[ offset ] = depth;
         } else { 
           var opaci = tdata[tIndex+3] * material.opacity;
           var foreColor = ((material.palette[cIndex] * tdata[tIndex]) << 16) 
@@ -481,13 +439,14 @@ THREE.SoftwareRenderer = function ( parameters ) {
           				+ (material.palette[cIndex+2] * tdata[tIndex+2]);
           
           if(opaci < 250) {
-            var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
+            var backColor = buffer[ colorOffset ] << 24 + buffer[ colorOffset + 1 ] << 16 + buffer[ colorOffset + 2 ] << 8;
             foreColor = foreColor * opaci + backColor * (1-opaci);                          
-          }
-          buffer[ offset ] = (foreColor & 0xff0000) >> 16;
-          buffer[ offset + 1 ] = (foreColor & 0xff00) >> 8;
-          buffer[ offset + 2 ] = (foreColor & 0xff);
-          buffer[ offset + 3 ] = material.opacity * 255;
+          } 
+		  
+          buffer[ colorOffset ] = (foreColor & 0xff0000) >> 16;
+          buffer[ colorOffset + 1 ] = (foreColor & 0xff00) >> 8;
+          buffer[ colorOffset + 2 ] = (foreColor & 0xff);
+          buffer[ colorOffset + 3 ] = material.opacity * 255;
         }
         
     }
@@ -524,12 +483,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var texture = new THREE.SoftwareRenderer.Texture();
 					material.texture = texture;					
                      
-                    if ( material instanceof THREE.MeshBasicMaterial ) { 
+                    if ( material instanceof THREE.MeshBasicMaterial 
+						|| material instanceof THREE.SpriteMaterial ) { 
 						
                         shader = basicMaterialShader;
-                    } else if ( material instanceof THREE.SpriteMaterial ) {
-                    
-                    	shader = basicMaterialShader;
                     } else {
                         
                         shader = lightingMaterialShader;
@@ -541,36 +498,42 @@ THREE.SoftwareRenderer = function ( parameters ) {
                     if ( material.vertexColors === THREE.FaceColors ) {
 
                         string = [
-                            'buffer[ offset ] = face.color.r * 255;',
-                            'buffer[ offset + 1 ] = face.color.g * 255;',
-                            'buffer[ offset + 2 ] = face.color.b * 255;',
-                            'buffer[ offset + 3 ] = material.opacity * 255;'
+						    'var colorOffset = offset * 4;',
+                            'buffer[ colorOffset ] = face.color.r * 255;',
+                            'buffer[ colorOffset + 1 ] = face.color.g * 255;',
+                            'buffer[ colorOffset + 2 ] = face.color.b * 255;',
+                            'buffer[ colorOffset + 3 ] = material.opacity * 255;',
+							'depthBuf[ offset ] = depth;'
                         ].join('\n');
 
                     } else {
 
                         string = [
-                            'buffer[ offset ] = material.color.r * 255;',
-                            'buffer[ offset + 1 ] = material.color.g * 255;',
-                            'buffer[ offset + 2 ] = material.color.b * 255;',
-                            'buffer[ offset + 3 ] = material.opacity * 255;'
+							'var colorOffset = offset * 4;',
+                            'buffer[ colorOffset ] = material.color.r * 255;',
+                            'buffer[ colorOffset + 1 ] = material.color.g * 255;',
+                            'buffer[ colorOffset + 2 ] = material.color.b * 255;',
+                            'buffer[ colorOffset + 3 ] = material.opacity * 255;',
+							'depthBuf[ offset ] = depth;'
                         ].join('\n');
 
                     }
                     
-                    shader = new Function( 'buffer, offset, u, v, n, face, material', string );
+                    shader = new Function( 'buffer, depthBuf, offset, depth, u, v, n, face, material', string );
                 }			
 
 			} else {
 
 				var string = [
-					'buffer[ offset ] = u * 255;',
-					'buffer[ offset + 1 ] = v * 255;',
-					'buffer[ offset + 2 ] = 0;',
-					'buffer[ offset + 3 ] = 255;'
+					'var colorOffset = offset * 4;',
+					'buffer[ colorOffset ] = u * 255;',
+					'buffer[ colorOffset + 1 ] = v * 255;',
+					'buffer[ colorOffset + 2 ] = 0;',
+					'buffer[ colorOffset + 3 ] = 255;',
+					'depthBuf[ offset ] = depth;'
 				].join('\n');
 
-				shader = new Function( 'buffer, offset, u, v', string );
+				shader = new Function( 'buffer, depthBuf, offset, depth, u, v', string );
 
 			}
 
@@ -929,9 +892,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 							var z = cxz;
                            
-							if ( z < zbuffer[ offset ] ) {
-								zbuffer[ offset ] = z;            
-								shader( data, offset * 4, cxtu, cxtv, cxnz, face, material );                                
+							if ( z < zbuffer[ offset ] ) {         
+								shader( data, zbuffer, offset, z, cxtu, cxtv, cxnz, face, material );                                
 							}
 
 							cx1 += dy12;
@@ -1011,9 +973,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 								var z = cxz;                              
 
-								if ( z < zbuffer[ offset ] ) {
-									zbuffer[ offset ] = z;                                    
-									shader( data, offset * 4, cxtu, cxtv, cxnz, face, material );
+								if ( z < zbuffer[ offset ] ) {                       
+									shader( data, zbuffer, offset, z, cxtu, cxtv, cxnz, face, material );
 								}
 
 							}
