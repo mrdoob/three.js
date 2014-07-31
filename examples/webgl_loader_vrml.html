@@ -34,7 +34,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/loaders/VRMLLoader.js"></script>
 
@@ -59,7 +59,7 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 6;
 
-				controls = new THREE.TrackballControls( camera );
+				controls = new THREE.OrbitControls( camera );
 
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;

@@ -56,7 +56,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
@@ -279,7 +279,7 @@
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( -1200, 800, 1200 );
 
-				controls = new THREE.TrackballControls( camera );
+				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 0, 0 );
 
 				controls.rotateSpeed = 1.0;
