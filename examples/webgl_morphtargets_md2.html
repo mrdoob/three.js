@@ -161,6 +161,7 @@
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 50, 0 );
+				controls.update();
 
 				// GUI
 
@@ -340,7 +341,6 @@
 
 				var delta = clock.getDelta();
 
-				controls.update();
 				character.update( delta );
 
 				renderer.render( scene, camera );
