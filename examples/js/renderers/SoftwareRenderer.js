@@ -50,6 +50,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var vector1 = new THREE.Vector3();
 	var vector2 = new THREE.Vector3();
 	var vector3 = new THREE.Vector3();
+	
+	var texCoord1 = new THREE.Vector2();
+	var texCoord2 = new THREE.Vector2();
+	var texCoord3 = new THREE.Vector2();
 
 	this.domElement = canvas;
 
@@ -77,12 +81,12 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		viewportXScale =  fixScale * canvasWidth  / 2;
 		viewportYScale = -fixScale * canvasHeight / 2;
-		viewportZScale =			 maxZVal	  / 2;
-
+		viewportZScale =             maxZVal      / 2;
+              
 		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
 		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
-		viewportZOffs  =			 maxZVal	  / 2 + 0.5;
-
+		viewportZOffs  =             maxZVal      / 2 + 0.5;
+        
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
 
@@ -146,13 +150,27 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			var shader = getMaterialShader( material );
 
 			if ( element instanceof THREE.RenderableFace ) {
-
-				drawTriangle(
-					element.v1.positionScreen,
-					element.v2.positionScreen,
-					element.v3.positionScreen,
-					shader, element, material
-				);
+				
+				if ( !element.uvs ) {
+					
+					drawTriangle(
+						element.v1.positionScreen,
+						element.v2.positionScreen,
+						element.v3.positionScreen,
+						null, null, null,
+						shader, element, material
+					);
+				} else {
+					
+					drawTriangle(
+						element.v1.positionScreen,
+						element.v2.positionScreen,
+						element.v3.positionScreen,
+						element.uvs[0], element.uvs[1], element.uvs[2],
+						shader, element, material
+					);					
+				}
+				
 
 			} else if ( element instanceof THREE.RenderableSprite ) {
 
@@ -170,11 +188,30 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				vector3.copy( element );
 				vector3.x += scaleX;
 				vector3.y += scaleY;
+				
+				if ( material.map ) {
+					texCoord1.x = 0;
+					texCoord1.y = 1;
 
-				drawTriangle(
-					vector1, vector2, vector3,
-					shader, element, material
-				);
+					texCoord2.x = 0;
+					texCoord2.y = 0;
+
+					texCoord3.x = 1;
+					texCoord3.y = 1;
+				
+					drawTriangle(
+						vector1, vector2, vector3,
+						texCoord1, texCoord2, texCoord3,
+						shader, element, material
+					);
+				} else {
+					
+					drawTriangle(
+						vector1, vector2, vector3,
+						null, null, null,
+						shader, element, material
+					);
+				}			
 
 				vector1.copy( element );
 				vector1.x += scaleX;
@@ -187,11 +224,30 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				vector3.copy( element );
 				vector3.x += scaleX;
 				vector3.y -= scaleY;
+				
+				if ( material.map ) {
+					texCoord1.x = 1;
+					texCoord1.y = 1;
 
-				drawTriangle(
-					vector1, vector2, vector3,
-					shader, element, material
-				);
+					texCoord2.x = 0;
+					texCoord2.y = 0;
+
+					texCoord3.x = 1;
+					texCoord3.y = 0;
+
+					drawTriangle(
+						vector1, vector2, vector3,
+						texCoord1, texCoord2, texCoord3,
+						shader, element, material
+					);
+				} else {
+					
+					drawTriangle(
+						vector1, vector2, vector3,
+						null, null, null,
+						shader, element, material
+					);
+				}				
 
 			}
 
@@ -234,237 +290,250 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var size = canvasWidth * canvasHeight * 4;
 
 		for ( var i = 0; i < size; i+=4 ) {
-
+			
 			data[ i ] = clearColor.r * 255 | 0;
 			data[ i+1 ] = clearColor.g * 255 | 0;
 			data[ i+2 ] = clearColor.b * 255 | 0;
-			data[ i+3 ] = 255;
-
+			data[ i+3 ] = 255; 
 		}
 
 		context.fillStyle = clearColor.getStyle();
 		context.fillRect( 0, 0, canvasWidth, canvasHeight );
-
 	}
 
-	function getPalette( material, bSimulateSpecular ) {
-		var diffuseR = material.ambient.r + material.color.r * 255;
-		var diffuseG = material.ambient.g + material.color.g * 255;
-		var diffuseB = material.ambient.b + material.color.b * 255;
-		var palette = new Uint8Array(256*3);
+    function getPalette( material, bSimulateSpecular ) {
+        var diffuseR = material.ambient.r + material.color.r * 255;
+        var diffuseG = material.ambient.g + material.color.g * 255;
+        var diffuseB = material.ambient.b + material.color.b * 255;
+        var palette = new Uint8Array(256*3);
+        
+        if ( bSimulateSpecular ) {
+            
+            var i = 0, j = 0;
+            while(i < 204) {
+                var r = i * diffuseR / 204;
+                var g = i * diffuseG / 204;
+                var b = i * diffuseB / 204;
+                if(r > 255)
+                    r = 255;
+                if(g > 255)
+                    g = 255;
+                if(b > 255)
+                    b = 255;
 
-		if ( bSimulateSpecular ) {
+                palette[j++] = r;
+                palette[j++] = g;
+                palette[j++] = b;
+                ++i;
+            }
 
-			var i = 0, j = 0;
+            while(i < 256) { // plus specular highlight
+                var r = diffuseR + (i - 204) * (255 - diffuseR) / 82;
+                var g = diffuseG + (i - 204) * (255 - diffuseG) / 82;
+                var b = diffuseB + (i - 204) * (255 - diffuseB) / 82;
+                if(r > 255)
+                    r = 255;
+                if(g > 255)
+                    g = 255;
+                if(b > 255)
+                    b = 255;
+				
+                palette[j++] = r;
+                palette[j++] = g;
+                palette[j++] = b;
+                ++i;
+            }
+            
+        } else {
+          
+            var i = 0, j = 0;
+            while(i < 256) {
+                var r = i * diffuseR / 255;
+                var g = i * diffuseG / 255;
+                var b = i * diffuseB / 255;
+                if(r > 255)
+                    r = 255;
+                if(g > 255)
+                    g = 255;
+                if(b > 255)
+                    b = 255;
 
-			while(i < 204) {
+                palette[j++] = r;
+                palette[j++] = g;
+                palette[j++] = b;
+                ++i;
+            }           
+            
+        }
+        
+        return palette;
+    }
+    
+    function basicMaterialShader( buffer, depthBuf, offset, depth, u, v, n, face, material ) {
+	
+		var colorOffset = offset * 4;
 
-				var r = i * diffuseR / 204;
-				var g = i * diffuseG / 204;
-				var b = i * diffuseB / 204;
+    	if ( material.needsUpdate && !material.texture.data ) {
+    		material.texture.CreateFromImage( material.map.image );
+    	}
 
-				palette[j++] = r > 255 ? 255 : r;
-				palette[j++] = g > 255 ? 255 : g;
-				palette[j++] = b > 255 ? 255 : b;
+    	if ( !material.texture.data )
+    		return;
 
-				++i;
-
-			}
-
-			while(i < 256) { // plus specular highlight
-
-				var r = diffuseR + (i - 204) * (255 - diffuseR) / 82;
-				var g = diffuseG + (i - 204) * (255 - diffuseG) / 82;
-				var b = diffuseB + (i - 204) * (255 - diffuseB) / 82;
-
-				palette[j++] = r > 255 ? 255 : r;
-				palette[j++] = g > 255 ? 255 : g;
-				palette[j++] = b > 255 ? 255 : b;
-
-				++i;
-
-			}
-
-		} else {
-
-			var i = 0, j = 0;
-			while(i < 256) {
-				var r = i * diffuseR / 255;
-				var g = i * diffuseG / 255;
-				var b = i * diffuseB / 255;
-				if(r > 255)
-					r = 255;
-				if(g > 255)
-					g = 255;
-				if(b > 255)
-					b = 255;
-
-				palette[j++] = r;
-				palette[j++] = g;
-				palette[j++] = b;
-				++i;
-			}
-
+        var tdim = material.texture.width;
+        var isTransparent = material.transparent;
+        var tbound = tdim - 1;
+        var tdata = material.texture.data;
+        var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
+        
+        if ( !isTransparent ) {
+            buffer[ colorOffset ] = tdata[tIndex];
+            buffer[ colorOffset + 1 ] = tdata[tIndex+1];
+            buffer[ colorOffset + 2 ] = tdata[tIndex+2];
+            buffer[ colorOffset + 3 ] = material.opacity * 255;
+			depthBuf[ offset ] = depth;
 		}
+        else { 
+            var opaci = tdata[tIndex+3] * material.opacity;
+            var texel = (tdata[tIndex] << 16) + (tdata[tIndex+1] << 8) + tdata[tIndex+2];
+            if(opaci < 250) {
+                var backColor = (buffer[colorOffset] << 16) + (buffer[colorOffset + 1] << 8) + buffer[colorOffset + 2];
+                texel = texel * opaci + backColor * (1-opaci);                         
+            } 
+            
+            buffer[ colorOffset ] = (texel & 0xff0000) >> 16;
+            buffer[ colorOffset + 1 ] = (texel & 0xff00) >> 8;
+            buffer[ colorOffset + 2 ] = texel & 0xff;
+            buffer[ colorOffset + 3 ] = material.opacity * 255;
+        }
+    }
+    
+    function lightingMaterialShader( buffer, depthBuf, offset, depth, u, v, n, face, material ) {
+        
+        var colorOffset = offset * 4;
+		
+    	if ( material.map.needsUpdate && !material.texture.data ) {
+    		material.texture.CreateFromImage( material.map.image );
+    	}
 
-		return palette;
-	}
+    	if ( !material.texture.data )
+    		return;
 
-	function basicMaterialShader( buffer, offset, u, v, n, face, material ) {
-
-		if ( material.map.needsUpdate ) {
-			material.texture.CreateFromImage( material.map.image );
-			material.map.needsUpdate = false;
-		}
-
-		if ( !material.texture.data )
-			return;
-
-		var tdim = material.texture.width;
-		var isTransparent = material.transparent;
-		var tbound = tdim - 1;
-		var tdata = material.texture.data;
-		var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
-
-		if ( !isTransparent ) {
-			buffer[ offset ] = tdata[tIndex];
-			buffer[ offset + 1 ] = tdata[tIndex+1];
-			buffer[ offset + 2 ] = tdata[tIndex+2];
-			buffer[ offset + 3 ] = material.opacity * 255;
-		} else {
-			var opaci = tdata[tIndex+3] * material.opacity;
-			var texel = tdata[tIndex] << 16 + tdata[tIndex+1] << 8 + tdata[tIndex+2];
-			if(opaci < 250) {
-				var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
-				texel = texel * opaci + backColor * (1-opaci);
-			}
-
-			buffer[ offset ] = (texel & 0xff0000) >> 16;
-			buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
-			buffer[ offset + 2 ] = (texel & 0xff);
-			buffer[ offset + 3 ] = material.opacity * 255;
-		}
-	}
-
-	function lightingMaterialShader( buffer, offset, u, v, n, face, material ) {
-
-		if ( material.map.needsUpdate ) {
-			material.texture.CreateFromImage( material.map.image );
-			material.map.needsUpdate = false;
-
-			return;
-		}
-
-		if ( !material.texture.data )
-			return;
-
-		var tdim = material.texture.width;
-		var isTransparent = material.transparent;
-		var cIndex = (n > 0 ? (~~n) : 0) * 3;
-		var tbound = tdim - 1;
-		var tdata = material.texture.data;
-		var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
-
-		if ( !isTransparent ) {
-			buffer[ offset ] = (material.palette[cIndex] * tdata[tIndex]) >> 8;
-			buffer[ offset + 1 ] = (material.palette[cIndex+1] * tdata[tIndex+1]) >> 8;
-			buffer[ offset + 2 ] = (material.palette[cIndex+2] * tdata[tIndex+2]) >> 8;
-			buffer[ offset + 3 ] = material.opacity * 255;
-		} else {
-			var opaci = tdata[tIndex+3] * material.opacity;
-			var foreColor = ((material.palette[cIndex] * tdata[tIndex]) << 16)
-						+ ((material.palette[cIndex+1] * tdata[tIndex+1]) << 8 )
-						+ (material.palette[cIndex+2] * tdata[tIndex+2]);
-
-			if(opaci < 250) {
-				var backColor = buffer[ offset ] << 24 + buffer[ offset + 1 ] << 16 + buffer[ offset + 2 ] << 8;
-				foreColor = foreColor * opaci + backColor * (1-opaci);
-			}
-			buffer[ offset ] = (foreColor & 0xff0000) >> 16;
-			buffer[ offset + 1 ] = (foreColor & 0xff00) >> 8;
-			buffer[ offset + 2 ] = (foreColor & 0xff);
-			buffer[ offset + 3 ] = material.opacity * 255;
-		}
-
-	}
-
+        var tdim = material.texture.width;
+        var isTransparent = material.transparent;
+        var cIndex = (n > 0 ? (~~n) : 0) * 3;
+        var tbound = tdim - 1;
+        var tdata = material.texture.data;
+        var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
+        
+        if ( !isTransparent ) {
+          buffer[ colorOffset ] = (material.palette[cIndex] * tdata[tIndex]) >> 8;
+          buffer[ colorOffset + 1 ] = (material.palette[cIndex+1] * tdata[tIndex+1]) >> 8;
+          buffer[ colorOffset + 2 ] = (material.palette[cIndex+2] * tdata[tIndex+2]) >> 8;
+          buffer[ colorOffset + 3 ] = material.opacity * 255;		  
+		  depthBuf[ offset ] = depth;
+        } else { 
+          var opaci = tdata[tIndex+3] * material.opacity;
+          var foreColor = ((material.palette[cIndex] * tdata[tIndex]) << 16) 
+          				+ ((material.palette[cIndex+1] * tdata[tIndex+1]) << 8 )
+          				+ (material.palette[cIndex+2] * tdata[tIndex+2]);
+          
+          if(opaci < 250) {
+            var backColor = buffer[ colorOffset ] << 24 + buffer[ colorOffset + 1 ] << 16 + buffer[ colorOffset + 2 ] << 8;
+            foreColor = foreColor * opaci + backColor * (1-opaci);                          
+          } 
+		  
+          buffer[ colorOffset ] = (foreColor & 0xff0000) >> 16;
+          buffer[ colorOffset + 1 ] = (foreColor & 0xff00) >> 8;
+          buffer[ colorOffset + 2 ] = (foreColor & 0xff);
+          buffer[ colorOffset + 3 ] = material.opacity * 255;
+        }
+        
+    }
+    
 	function getMaterialShader( material ) {
 
 		var id = material.id;
 		var shader = shaders[ id ];
 
-		if ( shader === undefined ) {
-
+		if ( shaders[ id ] === undefined ) {
+            
 			if ( material instanceof THREE.MeshBasicMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.SpriteMaterial ) {
+			     material instanceof THREE.MeshLambertMaterial ||
+			     material instanceof THREE.MeshPhongMaterial ||
+			     material instanceof THREE.SpriteMaterial ) {
 
-				if ( material instanceof THREE.MeshLambertMaterial ) {
-					// Generate color palette
-					if ( !material.palette ) {
-						material.palette = getPalette( material, false );
-					}
-
-				} else if ( material instanceof THREE.MeshPhongMaterial ) {
-					// Generate color palette
-					if ( !material.palette ) {
-						material.palette = getPalette( material, true );
-					}
-				}
+                if ( material instanceof THREE.MeshLambertMaterial ) {             
+                    // Generate color palette
+                    if ( !material.palette ) {
+                        material.palette = getPalette( material, false );
+                    }
+                    
+                } else if ( material instanceof THREE.MeshPhongMaterial ) {             
+                    // Generate color palette
+                    if ( !material.palette ) {
+                        material.palette = getPalette( material, true );
+                    }
+                }
 
 				var string;
-
-				if ( material.map ) {
-
+                
+                if ( material.map ) {
+                    
 					var texture = new THREE.SoftwareRenderer.Texture();
-					material.texture = texture;
+					material.texture = texture;					
+                     
+                    if ( material instanceof THREE.MeshBasicMaterial 
+						|| material instanceof THREE.SpriteMaterial ) { 
+						
+                        shader = basicMaterialShader;
+                    } else {
+                        
+                        shader = lightingMaterialShader;
+                    }
+                    
+                    
+                } else {
+                    
+                    if ( material.vertexColors === THREE.FaceColors ) {
 
-					if ( material instanceof THREE.MeshBasicMaterial ) {
+                        string = [
+						    'var colorOffset = offset * 4;',
+                            'buffer[ colorOffset ] = face.color.r * 255;',
+                            'buffer[ colorOffset + 1 ] = face.color.g * 255;',
+                            'buffer[ colorOffset + 2 ] = face.color.b * 255;',
+                            'buffer[ colorOffset + 3 ] = material.opacity * 255;',
+							'depthBuf[ offset ] = depth;'
+                        ].join('\n');
 
-						shader = basicMaterialShader;
+                    } else {
 
-					} else {
+                        string = [
+							'var colorOffset = offset * 4;',
+                            'buffer[ colorOffset ] = material.color.r * 255;',
+                            'buffer[ colorOffset + 1 ] = material.color.g * 255;',
+                            'buffer[ colorOffset + 2 ] = material.color.b * 255;',
+                            'buffer[ colorOffset + 3 ] = material.opacity * 255;',
+							'depthBuf[ offset ] = depth;'
+                        ].join('\n');
 
-						shader = lightingMaterialShader;
-
-					}
-
-				} else {
-
-					if ( material.vertexColors === THREE.FaceColors ) {
-
-						string = [
-							'buffer[ offset ] = face.color.r * 255;',
-							'buffer[ offset + 1 ] = face.color.g * 255;',
-							'buffer[ offset + 2 ] = face.color.b * 255;',
-							'buffer[ offset + 3 ] = material.opacity * 255;'
-						].join('\n');
-
-					} else {
-
-						string = [
-							'buffer[ offset ] = material.color.r * 255;',
-							'buffer[ offset + 1 ] = material.color.g * 255;',
-							'buffer[ offset + 2 ] = material.color.b * 255;',
-							'buffer[ offset + 3 ] = material.opacity * 255;'
-						].join('\n');
-
-					}
-
-					shader = new Function( 'buffer, offset, u, v, n, face, material', string );
-				}
+                    }
+                    
+                    shader = new Function( 'buffer, depthBuf, offset, depth, u, v, n, face, material', string );
+                }			
 
 			} else {
 
 				var string = [
-					'buffer[ offset ] = u * 255;',
-					'buffer[ offset + 1 ] = v * 255;',
-					'buffer[ offset + 2 ] = 0;',
-					'buffer[ offset + 3 ] = 255;'
+					'var colorOffset = offset * 4;',
+					'buffer[ colorOffset ] = u * 255;',
+					'buffer[ colorOffset + 1 ] = v * 255;',
+					'buffer[ colorOffset + 2 ] = 0;',
+					'buffer[ colorOffset + 3 ] = 255;',
+					'depthBuf[ offset ] = depth;'
 				].join('\n');
 
-				shader = new Function( 'buffer, offset, u, v', string );
+				shader = new Function( 'buffer, depthBuf, offset, depth, u, v', string );
 
 			}
 
@@ -500,7 +569,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	}
 
-	function drawTriangle( v1, v2, v3, shader, face, material ) {
+	function drawTriangle( v1, v2, v3, uv1, uv2, uv3, shader, face, material ) {
 
 		// TODO: Implement per-pixel z-clipping
 
@@ -524,22 +593,38 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
 		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
 		var z3 = (v3.z * viewportZScale + viewportZOffs) | 0;
-
-		// UV values
-
-		var tu1 = face.uvs[0].x;
-		var tv1 = 1-face.uvs[0].y;
-		var tu2 = face.uvs[1].x;
-		var tv2 = 1-face.uvs[1].y;
-		var tu3 = face.uvs[2].x;
-		var tv3 = 1-face.uvs[2].y;
-
-		// Normal values
-		var n1 = face.vertexNormalsModel[0], n2 = face.vertexNormalsModel[1], n3 = face.vertexNormalsModel[2];
-		var nz1 = n1.z * 255;
-		var nz2 = n2.z * 255;
-		var nz3 = n3.z * 255;
-		// Deltas
+        
+        // UV values
+        var bHasUV = false;
+        var tu1, tv1, tu2, tv2, tu3, tv3;
+        
+        if ( uv1 && uv2 && uv3 ) {
+            bHasUV = true;
+            
+            tu1 = uv1.x; 
+            tv1 = 1-uv1.y; 
+            tu2 = uv2.x; 
+            tv2 = 1-uv2.y; 
+            tu3 = uv3.x; 
+            tv3 = 1-uv3.y; 
+        }             
+        
+        // Normal values
+        var bHasNormal = false;
+        var n1, n2, n3, nz1, nz2, nz3;
+        
+        if ( face.vertexNormalsModel ) {            
+            bHasNormal = true;
+            
+            n1 = face.vertexNormalsModel[0];
+            n2 = face.vertexNormalsModel[1];
+            n3 = face.vertexNormalsModel[2]; 
+            nz1 = n1.z * 255;
+            nz2 = n2.z * 255;
+            nz3 = n3.z * 255;
+        }
+        
+        // Deltas
 
 		var dx12 = x1 - x2, dy12 = y2 - y1;
 		var dx23 = x2 - x3, dy23 = y3 - y2;
@@ -569,7 +654,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		// Constant part of half-edge functions
 
 		var minXfixscale = (minx << subpixelBits);
-		var minYfixscale = (miny << subpixelBits);
+        var minYfixscale = (miny << subpixelBits);
 
 		var c1 = dy12 * ((minXfixscale) - x1) + dx12 * ((minYfixscale) - y1);
 		var c2 = dy23 * ((minXfixscale) - x2) + dx23 * ((minYfixscale) - y2);
@@ -603,43 +688,43 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var fixscale = (1 << subpixelBits);
 		dzdx = (dzdx * fixscale) | 0;
 		dzdy = (dzdy * fixscale) | 0;
+        
+        var dtvdx, dtvdy, cbtu, cbtv;
+        if ( bHasUV ) {
+            // UV interpolation setup
+            var dtu12 = tu1 - tu2, dtu31 = tu3 - tu1;
+            var dtudx = (invDet * (dtu12*dy31 - dtu31*dy12)); // dtu per one subpixel step in x
+            var dtudy = (invDet * (dtu12*dx31 - dx12*dtu31)); // dtu per one subpixel step in y
+            var dtv12 = tv1 - tv2, dtv31 = tv3 - tv1;
+            dtvdx = (invDet * (dtv12*dy31 - dtv31*dy12)); // dtv per one subpixel step in x
+            dtvdy = (invDet * (dtv12*dx31 - dx12*dtv31)); // dtv per one subpixel step in y   
+            
+            // UV at top/left corner of rast area
+            cbtu = ( tu1 + (minXfixscale - x1) * dtudx + (minYfixscale - y1) * dtudy );
+            cbtv = ( tv1 + (minXfixscale - x1) * dtvdx + (minYfixscale - y1) * dtvdy );
+            
+            // UV pixel steps            
+            dtudx = dtudx * fixscale;
+            dtudy = dtudy * fixscale;        
+            dtvdx = dtvdx * fixscale;
+            dtvdy = dtvdy * fixscale;
+        }              
 
-		// UV interpolation setup
+        var dnxdx, dnzdy, cbnz;
+        if ( bHasNormal ) {
+             // Normal interpolation setup        
+            var dnz12 = nz1 - nz2, dnz31 = nz3 - nz1;
+            var dnzdx = (invDet * (dnz12*dy31 - dnz31*dy12)); // dnz per one subpixel step in x
+            var dnzdy = (invDet * (dnz12*dx31 - dx12*dnz31)); // dnz per one subpixel step in y
+            
+            // Normal at top/left corner of rast area       
+            cbnz = ( nz1 + (minXfixscale - x1) * dnzdx + (minYfixscale - y1) * dnzdy );
 
-		var dtu12 = tu1 - tu2, dtu31 = tu3 - tu1;
-		var dtudx = (invDet * (dtu12*dy31 - dtu31*dy12)); // dtu per one subpixel step in x
-		var dtudy = (invDet * (dtu12*dx31 - dx12*dtu31)); // dtu per one subpixel step in y
-		var dtv12 = tv1 - tv2, dtv31 = tv3 - tv1;
-		var dtvdx = (invDet * (dtv12*dy31 - dtv31*dy12)); // dtv per one subpixel step in x
-		var dtvdy = (invDet * (dtv12*dx31 - dx12*dtv31)); // dtv per one subpixel step in y
-
-		// UV at top/left corner of rast area
-
-		var ctu = ( tu1 + (minXfixscale - x1) * dtudx + (minYfixscale - y1) * dtudy );
-		var ctv = ( tv1 + (minXfixscale - x1) * dtvdx + (minYfixscale - y1) * dtvdy );
-
-		// UV pixel steps
-
-		dtudx = dtudx * fixscale;
-		dtudy = dtudy * fixscale;
-		dtvdx = dtvdx * fixscale;
-		dtvdy = dtvdy * fixscale;
-
-		// Normal interpolation setup
-
-		var dnz12 = nz1 - nz2, dnz31 = nz3 - nz1;
-		var dnzdx = (invDet * (dnz12*dy31 - dnz31*dy12)); // dnz per one subpixel step in x
-		var dnzdy = (invDet * (dnz12*dx31 - dx12*dnz31)); // dnz per one subpixel step in y
-
-		 // Normal at top/left corner of rast area
-
-		var cnz = ( nz1 + (minXfixscale - x1) * dnzdx + (minYfixscale - y1) * dnzdy );
-
-		// Normal pixel steps
-
-		dnzdx = (dnzdx * fixscale);
-		dnzdy = (dnzdy * fixscale);
-
+            // Normal pixel steps
+            dnzdx = (dnzdx * fixscale);
+            dnzdy = (dnzdy * fixscale);
+        }
+        
 		// Set up min/max corners
 		var qm1 = q - 1; // for convenience
 		var nmin1 = 0, nmax1 = 0;
@@ -663,17 +748,23 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var cb2 = c2;
 		var cb3 = c3;
 		var cbz = cz;
-		var cbtu = ctu;
-		var cbtv = ctv;
-		var cbnz = cnz;
 		var qstep = -q;
 		var e1x = qstep * dy12;
 		var e2x = qstep * dy23;
 		var e3x = qstep * dy31;
 		var ezx = qstep * dzdx;
-		var etux = qstep * dtudx;
-		var etvx = qstep * dtvdx;
-		var enzx = qstep * dnzdx;
+        
+        var etux, etvx; 
+        if ( bHasUV ) {
+            etux = qstep * dtudx;
+            etvx = qstep * dtvdx;
+        }
+
+        var enzx; 
+        if ( bHasNormal ) {
+            enzx = qstep * dnzdx;
+        }
+                
 		var x0 = minx;
 
 		for ( var y0 = miny; y0 < maxy; y0 += q ) {
@@ -686,9 +777,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cb2 += e2x;
 				cb3 += e3x;
 				cbz += ezx;
-				cbtu += etux;
-				cbtv += etvx;
-				cbnz += enzx;
+                
+                if ( bHasUV ) {
+                    cbtu += etux;
+                    cbtv += etvx;
+                }
+                
+                if ( bHasNormal ) {
+                    cbnz += enzx;
+                }                
+                
 			}
 
 			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
@@ -697,9 +795,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			e2x = -e2x;
 			e3x = -e3x;
 			ezx = -ezx;
-			etux = -etux;
-			etvx = -etvx;
-			enzx = -enzx;
+            
+            if ( bHasUV ) {                
+                etux = -etux;
+                etvx = -etvx;
+            }
+           
+            if ( bHasNormal ) {
+                enzx = -enzx;
+            }            
 
 			while ( 1 ) {
 
@@ -709,9 +813,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				cb2 += e2x;
 				cb3 += e3x;
 				cbz += ezx;
-				cbtu += etux;
-				cbtv += etvx;
-				cbnz += enzx;
+                
+                if ( bHasUV ) {
+                    cbtu += etux;
+                    cbtv += etvx;
+                }
+               
+                if ( bHasNormal ) {
+                    cbnz += enzx;
+                }              
 
 				// We're done with this block line when at least one edge completely out
 				// If an edge function is too small and decreasing in the current traversal
@@ -737,7 +847,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				// Offset at top-left corner
 				var offset = x0 + y0 * canvasWidth;
-
+                
 				// Accept whole block when fully covered
 				if ( cb1 >= nmin1 && cb2 >= nmin2 && cb3 >= nmin3 ) {
 
@@ -747,34 +857,58 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cy1 = cb1;
 					var cy2 = cb2;
 					var cyz = cbz;
-					var cytu = cbtu;
-					var cytv = cbtv;
-					var cynz = cbnz;
+                    
+                    var cytu, cytv;                    
+                    if ( bHasUV ) {
+                        cytu = cbtu;
+                        cytv = cbtv;
+                    }
+                    
+                    var cynz;
+                    if ( bHasNormal ) {
+                        cynz = cbnz;
+                    }
+                    
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
 						var cx1 = cy1;
 						var cx2 = cy2;
 						var cxz = cyz;
-						var cxtu = cytu;
-						var cxtv = cytv;
-						var cxnz = cynz;
+                        
+                        var cxtu;
+                        var cxtv;                        
+                        if ( bHasUV ) {
+                            cxtu = cytu;
+                            cxtv = cytv;
+                        }
+                        
+                        var cxnz; 
+                        if ( bHasNormal ) {
+                            cxnz = cynz; 
+                        }                                               
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
 							var z = cxz;
-
-							if ( z < zbuffer[ offset ] ) {
-								zbuffer[ offset ] = z;
-								shader( data, offset * 4, cxtu, cxtv, cxnz, face, material );
+                           
+							if ( z < zbuffer[ offset ] ) {         
+								shader( data, zbuffer, offset, z, cxtu, cxtv, cxnz, face, material );                                
 							}
 
 							cx1 += dy12;
 							cx2 += dy23;
 							cxz += dzdx;
-							cxtu += dtudx;
-							cxtv += dtvdx;
-							cxnz += dnzdx;
+                            
+                            if ( bHasUV ) {
+                                cxtu += dtudx;
+                                cxtv += dtvdx;
+                            }
+                            
+                            if ( bHasNormal ) {
+                                cxnz += dnzdx;
+                            }                            
+                            
 							offset++;
 
 						}
@@ -782,9 +916,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cy1 += dx12;
 						cy2 += dx23;
 						cyz += dzdy;
-						cytu += dtudy;
-						cytv += dtvdy;
-						cynz += dnzdy;
+                        
+                        if ( bHasUV ) {
+                            cytu += dtudy;
+                            cytv += dtvdy;
+                        }
+                        
+                        if ( bHasNormal ) {
+                            cynz += dnzdy;
+                        }                        
+                        
 						offset += linestep;
 
 					}
@@ -795,9 +936,17 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var cy2 = cb2;
 					var cy3 = cb3;
 					var cyz = cbz;
-					var cytu = cbtu;
-					var cytv = cbtv;
-					var cynz = cbnz;
+                    
+                    var cytu, cytv;
+                    if ( bHasUV ) {
+                        cytu = cbtu;
+                        cytv = cbtv;
+                    }
+                    
+                    var cynz;
+                    if ( bHasNormal ) {
+                        cynz = cbnz;
+                    }                    
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
@@ -805,19 +954,27 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						var cx2 = cy2;
 						var cx3 = cy3;
 						var cxz = cyz;
-						var cxtu = cytu;
-						var cxtv = cytv;
-						var cxnz = cynz;
+                        
+                        var cxtu;
+                        var cxtv;                            
+                        if ( bHasUV ) {
+                            cxtu = cytu;
+                            cxtv = cytv;
+                        }
+                        
+                        var cxnz;                        
+                        if ( bHasNormal ) {
+                            cxnz = cynz;     
+                        }                         
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
 							if ( ( cx1 | cx2 | cx3 ) >= 0 ) {
 
-								var z = cxz;
+								var z = cxz;                              
 
-								if ( z < zbuffer[ offset ] ) {
-									zbuffer[ offset ] = z;
-									shader( data, offset * 4, cxtu, cxtv, cxnz, face, material );
+								if ( z < zbuffer[ offset ] ) {                       
+									shader( data, zbuffer, offset, z, cxtu, cxtv, cxnz, face, material );
 								}
 
 							}
@@ -826,9 +983,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							cx2 += dy23;
 							cx3 += dy31;
 							cxz += dzdx;
-							cxtu += dtudx;
-							cxtv += dtvdx;
-							cxnz += dnzdx;
+                            
+                            if ( bHasUV ) {
+                                cxtu += dtudx;
+                                cxtv += dtvdx;
+                            }
+                            
+                            if ( bHasNormal ) {
+                                cxnz += dnzdx;
+                            }
+                            
 							offset++;
 
 						}
@@ -837,9 +1001,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						cy2 += dx23;
 						cy3 += dx31;
 						cyz += dzdy;
-						cytu += dtudy;
-						cytv += dtvdy;
-						cynz += dnzdy;
+                        
+                        if ( bHasUV ) {
+                            cytu += dtudy;
+                            cytv += dtvdy;
+                        }
+                        
+                        if ( bHasNormal ) {
+                            cynz += dnzdy;
+                        }                        
+                        
 						offset += linestep;
 
 					}
@@ -853,9 +1024,16 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			cb2 += q*dx23;
 			cb3 += q*dx31;
 			cbz += q*dzdy;
-			cbtu += q*dtudy;
-			cbtv += q*dtvdy;
-			cbnz += q*dnzdy;
+            
+            if ( bHasUV ) {
+                cbtu += q*dtudy;
+                cbtv += q*dtvdy;
+            }
+            
+            if ( bHasNormal ) {
+                cbnz += q*dnzdy;
+            }            
+            
 		}
 
 	}
@@ -913,77 +1091,76 @@ THREE.SoftwareRenderer = function ( parameters ) {
 };
 
 THREE.SoftwareRenderer.Texture = function() {
+    var canvas = null;
+    
+    this.CreateFromImage = function( image ) {
+        
+        if( !image || image.width <=0 || image.height <=0 )
+            return;
+    
+        var isCanvasClean = false;
+        var canvas = THREE.SoftwareRenderer.Texture.canvas;
+        if ( !canvas ) {
 
-	var canvas = null;
+            try {
 
-	this.CreateFromImage = function( image ) {
+                canvas = document.createElement('canvas');
+                THREE.SoftwareRenderer.Texture.canvas = canvas;
+                isCanvasClean = true;
+            } catch( e ) {
+                return;
+            }
 
-		if(image.width <=0 || image.height <=0)
-			return;
+        }
 
-		var isCanvasClean = false;
-		var canvas = THREE.SoftwareRenderer.Texture.canvas;
-		if ( !canvas ) {
+        var dim = image.width > image.height ? image.width : image.height;
+        if(dim <= 32)
+            dim = 32;
+        else if(dim <= 64)
+            dim = 64;
+        else if(dim <= 128)
+            dim = 128;
+        else if(dim <= 256)
+            dim = 256;
+        else if(dim <= 512)
+            dim = 512;
+        else
+            dim = 1024;
 
-			try {
+        if(canvas.width != dim || canvas.height != dim) {
+            canvas.width = canvas.height = dim;
+            isCanvasClean = true;
+        }
 
-				canvas = document.createElement('canvas');
-				THREE.SoftwareRenderer.Texture.canvas = canvas;
-				isCanvasClean = true;
-			} catch( e ) {
-				return;
-			}
+        var data;
+        try {
+            var ctx = canvas.getContext('2d');
+            if(!isCanvasClean)
+                ctx.clearRect(0, 0, dim, dim);
+            ctx.drawImage(image, 0, 0, dim, dim);
+            var imgData = ctx.getImageData(0, 0, dim, dim);
+            data = imgData.data;
+        }
+        catch(e) {
+            return;
+        }
 
-		}
+        var size = data.length;
+        this.data = new Uint8Array(size);
+        var alpha;
+        for(var i=0, j=0; i<size; ) {
+            this.data[i++] = data[j++];
+            this.data[i++] = data[j++];
+            this.data[i++] = data[j++];
+            alpha = data[j++];
+            this.data[i++] = alpha;
 
-		var dim = image.width > image.height ? image.width : image.height;
-		if(dim <= 32)
-			dim = 32;
-		else if(dim <= 64)
-			dim = 64;
-		else if(dim <= 128)
-			dim = 128;
-		else if(dim <= 256)
-			dim = 256;
-		else if(dim <= 512)
-			dim = 512;
-		else
-			dim = 1024;
+            if(alpha < 255)
+                this.hasTransparency = true;
+        }
 
-		if(canvas.width != dim || canvas.height != dim) {
-			canvas.width = canvas.height = dim;
-			isCanvasClean = true;
-		}
-
-		var data;
-		try {
-			var ctx = canvas.getContext('2d');
-			if(!isCanvasClean)
-				ctx.clearRect(0, 0, dim, dim);
-			ctx.drawImage(image, 0, 0, dim, dim);
-			var imgData = ctx.getImageData(0, 0, dim, dim);
-			data = imgData.data;
-		}
-		catch(e) {
-			return;
-		}
-
-		var size = data.length;
-		this.data = new Uint8Array(size);
-		var alpha;
-		for(var i=0, j=0; i<size; ) {
-			this.data[i++] = data[j++];
-			this.data[i++] = data[j++];
-			this.data[i++] = data[j++];
-			alpha = data[j++];
-			this.data[i++] = alpha;
-
-			if(alpha < 255)
-				this.hasTransparency = true;
-		}
-
-		this.width = dim;
-		this.height = dim;
-		this.srcUrl = image.src;
-	};
+        this.width = dim;
+        this.height = dim;
+        this.srcUrl = image.src;
+    };
 };
