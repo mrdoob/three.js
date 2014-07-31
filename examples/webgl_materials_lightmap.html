@@ -97,7 +97,6 @@
 				// CONTROLS
 
 				controls = new THREE.OrbitControls( camera );
-				controls.target.z = 150;
 
 				// LIGHTS
 
@@ -127,7 +126,12 @@
 				scene.fog.color.copy( uniforms.bottomColor.value );
 
 				var skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
-				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
+				var skyMat = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: vertexShader,
+					fragmentShader: fragmentShader,
+					side: THREE.BackSide
+				} );
 
 				var sky = new THREE.Mesh( skyGeo, skyMat );
 				scene.add( sky );
@@ -151,9 +155,13 @@
 				// MODEL
 
 				var loader = new THREE.JSONLoader();
-				var callback = function ( geometry, materials ) { createScene( geometry, materials, 0, 0, 0, 0, 100 ) };
+				loader.load( "obj/lightmap/lightmap.js", function ( geometry, materials ) {
 
-				loader.load( "obj/lightmap/lightmap.js", callback );
+					var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					mesh.scale.multiplyScalar( 100 );
+					scene.add( mesh );
+
+				} );
 
 				//
 
@@ -170,32 +178,14 @@
 
 			}
 
-			function createScene( geometry, materials, x, y, z, b, s ) {
-
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-				mesh.position.set( x, y, z );
-				mesh.scale.set( s, s, s );
-				scene.add( mesh );
-
-			}
-
 			//
 
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				var delta = clock.getDelta();
-				controls.update( delta );
-
 				renderer.render( scene, camera );
+				stats.update();
 
 			}
 
