@@ -50,6 +50,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var vector1 = new THREE.Vector3();
 	var vector2 = new THREE.Vector3();
 	var vector3 = new THREE.Vector3();
+	
+	var texCoord1 = new THREE.Vector2();
+	var texCoord2 = new THREE.Vector2();
+	var texCoord3 = new THREE.Vector2();
 
 	this.domElement = canvas;
 
@@ -146,13 +150,27 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			var shader = getMaterialShader( material );
 
 			if ( element instanceof THREE.RenderableFace ) {
-
-				drawTriangle(
-					element.v1.positionScreen,
-					element.v2.positionScreen,
-					element.v3.positionScreen,
-					shader, element, material
-				);
+				
+				if ( !element.uvs ) {
+					
+					drawTriangle(
+						element.v1.positionScreen,
+						element.v2.positionScreen,
+						element.v3.positionScreen,
+						null, null, null,
+						shader, element, material
+					);
+				} else {
+					
+					drawTriangle(
+						element.v1.positionScreen,
+						element.v2.positionScreen,
+						element.v3.positionScreen,
+						element.uvs[0], element.uvs[1], element.uvs[2],
+						shader, element, material
+					);					
+				}
+				
 
 			} else if ( element instanceof THREE.RenderableSprite ) {
 
@@ -170,11 +188,30 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				vector3.copy( element );
 				vector3.x += scaleX;
 				vector3.y += scaleY;
+				
+				if ( material.map ) {
+					texCoord1.x = 0;
+					texCoord1.y = 1;
 
-				drawTriangle(
-					vector1, vector2, vector3,
-					shader, element, material
-				);
+					texCoord2.x = 0;
+					texCoord2.y = 0;
+
+					texCoord3.x = 1;
+					texCoord3.y = 1;
+				
+					drawTriangle(
+						vector1, vector2, vector3,
+						texCoord1, texCoord2, texCoord3,
+						shader, element, material
+					);
+				} else {
+					
+					drawTriangle(
+						vector1, vector2, vector3,
+						null, null, null,
+						shader, element, material
+					);
+				}			
 
 				vector1.copy( element );
 				vector1.x += scaleX;
@@ -187,11 +224,30 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				vector3.copy( element );
 				vector3.x += scaleX;
 				vector3.y -= scaleY;
+				
+				if ( material.map ) {
+					texCoord1.x = 1;
+					texCoord1.y = 1;
 
-				drawTriangle(
-					vector1, vector2, vector3,
-					shader, element, material
-				);
+					texCoord2.x = 0;
+					texCoord2.y = 0;
+
+					texCoord3.x = 1;
+					texCoord3.y = 0;
+
+					drawTriangle(
+						vector1, vector2, vector3,
+						texCoord1, texCoord2, texCoord3,
+						shader, element, material
+					);
+				} else {
+					
+					drawTriangle(
+						vector1, vector2, vector3,
+						null, null, null,
+						shader, element, material
+					);
+				}				
 
 			}
 
@@ -315,9 +371,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
     
     function basicMaterialShader( buffer, offset, u, v, n, face, material ) {
 
-    	if ( material.map.needsUpdate ) {
+    	if ( material.needsUpdate && !material.texture.data ) {
     		material.texture.CreateFromImage( material.map.image );
-    		material.map.needsUpdate = false;
     	}
 
     	if ( !material.texture.data )
@@ -329,6 +384,51 @@ THREE.SoftwareRenderer = function ( parameters ) {
         var tdata = material.texture.data;
         var tIndex = (((v * tdim) & tbound) * tdim + ((u * tdim) & tbound)) * 4;
         
+        if ( !isTransparent ) {
+            buffer[ offset ] = tdata[tIndex];
+            buffer[ offset + 1 ] = tdata[tIndex+1];
+            buffer[ offset + 2 ] = tdata[tIndex+2];
+            buffer[ offset + 3 ] = material.opacity * 255;
+        }
+        else { 
+            var opaci = tdata[tIndex+3] * material.opacity;
+            var texel = (tdata[tIndex] << 16) + (tdata[tIndex+1] << 8) + tdata[tIndex+2];
+            if(opaci < 250) {
+                var backColor = (buffer[offset] << 16) + (buffer[offset + 1] << 8) + buffer[offset + 2];
+                texel = texel * opaci + backColor * (1-opaci);                         
+            }
+            
+            buffer[ offset ] = (texel & 0xff0000) >> 16;
+            buffer[ offset + 1 ] = (texel & 0xff00) >> 8;
+            buffer[ offset + 2 ] = texel & 0xff;
+            buffer[ offset + 3 ] = material.opacity * 255;
+        }
+    }
+	
+	function spriteMaterialShader( buffer, offset, u, v, n, face, material ) {
+
+    	if ( material.needsUpdate && !material.texture.data ) {
+    		material.texture.CreateFromImage( material.map.image );
+    	}
+
+    	if ( !material.texture.data )
+    		return;
+
+        var tdim = material.texture.width;
+        var isTransparent = material.transparent;
+        var tbound = tdim - 1;
+        var tdata = material.texture.data;
+		
+// 		var scaleX = face.scale.x * canvasWidth * 0.5;
+// 		var scaleY = face.scale.y * canvasHeight * 0.5;
+// 		var ox = material.texture.width * material.map.offset.x;
+// 		var oy = material.texture.height * material.map.offset.y;
+// 		var sx = material.texture.width * material.map.repeat.x;
+// 		var sy = material.texture.height * material.map.repeat.y;
+// 		var cx = scaleX / sx;
+// 		var cy = scaleY / sy;
+//         var tIndex = (((cy * tdim) & tbound) * tdim + ((cx * tdim) & tbound)) * 4;
+        var tIndex = 0;
         if ( !isTransparent ) {
             buffer[ offset ] = tdata[tIndex];
             buffer[ offset + 1 ] = tdata[tIndex+1];
@@ -352,9 +452,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
     
     function lightingMaterialShader( buffer, offset, u, v, n, face, material ) {
         
-    	if ( material.map.needsUpdate ) {
+    	if ( material.map.needsUpdate && !material.texture.data ) {
     		material.texture.CreateFromImage( material.map.image );
-    		material.map.needsUpdate = false;
+    		//material.map.needsUpdate = false;
 
     		return;
     	}
@@ -424,10 +524,12 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					var texture = new THREE.SoftwareRenderer.Texture();
 					material.texture = texture;					
                      
-                    if ( material instanceof THREE.MeshBasicMaterial || 
-						material instanceof THREE.SpriteMaterial ) { 
+                    if ( material instanceof THREE.MeshBasicMaterial ) { 
 						
                         shader = basicMaterialShader;
+                    } else if ( material instanceof THREE.SpriteMaterial ) {
+                    
+                    	shader = basicMaterialShader;
                     } else {
                         
                         shader = lightingMaterialShader;
@@ -504,7 +606,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	}
 
-	function drawTriangle( v1, v2, v3, shader, face, material ) {
+	function drawTriangle( v1, v2, v3, uv1, uv2, uv3, shader, face, material ) {
 
 		// TODO: Implement per-pixel z-clipping
 
@@ -533,15 +635,15 @@ THREE.SoftwareRenderer = function ( parameters ) {
         var bHasUV = false;
         var tu1, tv1, tu2, tv2, tu3, tv3;
         
-        if ( face.uvs ) {
+        if ( uv1 && uv2 && uv3 ) {
             bHasUV = true;
             
-            tu1 = face.uvs[0].x; 
-            tv1 = 1-face.uvs[0].y; 
-            tu2 = face.uvs[1].x; 
-            tv2 = 1-face.uvs[1].y; 
-            tu3 = face.uvs[2].x; 
-            tv3 = 1-face.uvs[2].y; 
+            tu1 = uv1.x; 
+            tv1 = 1-uv1.y; 
+            tu2 = uv2.x; 
+            tv2 = 1-uv2.y; 
+            tu3 = uv3.x; 
+            tv3 = 1-uv3.y; 
         }             
         
         // Normal values
@@ -1032,7 +1134,7 @@ THREE.SoftwareRenderer.Texture = function() {
     
     this.CreateFromImage = function( image ) {
         
-        if(image.width <=0 || image.height <=0)
+        if( !image || image.width <=0 || image.height <=0 )
             return;
     
         var isCanvasClean = false;
