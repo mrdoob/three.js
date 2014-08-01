@@ -330,18 +330,29 @@
 				Texture.wrapS = Texture.wrapT = THREE.RepeatWrapping;
 				Texture.repeat.set( 1, 1 );
 				var points = [];
-		
-				v0 = new THREE.Vector2( 16, 0 );
-				v1 = new THREE.Vector2( 44, 44 );
-				v2 = new THREE.Vector2( 6, 42 );
-				v3 = new THREE.Vector2( 8, 60 );
+
+				v0 = new THREE.Vector2( 75, 0 );
+				v1 = new THREE.Vector2( 132, 168 );
+				v2 = new THREE.Vector2( 104, 181 );
+				v3 = new THREE.Vector2( 80, 210 );
 	
 				var BezierCurve = new THREE.CubicBezierCurve3( v0, v1, v2, v3 );
 
-				for ( var i = 0; i <= 1; i = i + 0.1 )  {
-					points.push( new THREE.Vector3( 4*BezierCurve.getPoint( i ).x,  0, 5*BezierCurve.getPoint( i ).y ) ); 
+				for ( var i = 0; i < 1; i = i + 0.1 )  {
+					points.push( new THREE.Vector3( BezierCurve.getPoint( i ).x/1.5,  0, BezierCurve.getPoint( i ).y/1.5 ) ); 
 					}
+					
+				v4 = new THREE.Vector2( 52, 244 );
+				v5 = new THREE.Vector2( 86, 270 );
+				v6 = new THREE.Vector2( 84, 280 );
+	
+				var BezierCurve = new THREE.CubicBezierCurve3( v3, v4, v5, v6 );
 
+				for ( var i = 0; i <= 1; i = i + 0.1 )  {
+					points.push( new THREE.Vector3( BezierCurve.getPoint( i ).x/1.5,  0, BezierCurve.getPoint( i ).y/1.5 ) ); 
+					}	
+					
+					
 				tank = new THREE.Mesh( new THREE.LatheGeometry( points, 28 ), material );
 				tank.rotation.x = -Math.PI/2;
 				vase.add( tank );
@@ -351,11 +362,11 @@
 				Texture.repeat.set( 1/4, 1/4 );
 				var material = new THREE.MeshPhongMaterial( { map: Texture , side: THREE.DoubleSide } );
 				
-				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 64, 36 ), material);
+				var bottom = new THREE.Mesh(  new THREE.CircleGeometry( 50, 36 ), material);
 				bottom.rotation.x = -Math.PI/2;
 				vase.add( bottom );
 	
-				vase.position.set( 400, 0, 0 );
+				vase.position.set( 350, 0, 50 );
 				scene.add( vase );
 				
 				
