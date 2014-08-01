@@ -163,7 +163,7 @@
 				var curve = new THREE.CubicBezierCurve( v0, v1, v2, v3 );
 	
 				var points = [];
-				for (var i = 0; i <= 1; i += 0.0625 )  {
+				for (var i = 0; i <= 1; i += 0.01 )  {
 					points.push( new THREE.Vector3( curve.getPoint( i ).x,  0, curve.getPoint( i ).y ) );
 					}
 	
