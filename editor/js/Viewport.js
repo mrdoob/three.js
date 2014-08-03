@@ -30,6 +30,8 @@ var Viewport = function ( editor ) {
 	camera.position.fromArray( editor.config.getKey( 'camera' ).position );
 	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
 
+	editor.camera = camera;
+
 	//
 
 	var selectionBox = new THREE.BoxHelper();
@@ -124,6 +126,20 @@ var Viewport = function ( editor ) {
 			if ( intersects.length > 0 ) {
 
 				var object = intersects[ 0 ].object;
+
+				// priority selection, e.g. for geometry helpers
+
+				for( var i = 0, l = intersects.length; i < l; ++i ) {
+
+					var other = intersects[i].object;
+
+					if(other.editorData && other.editorData.selectFirst ) {
+
+						object = other;
+						break;
+
+					}
+				}
 
 				if ( object.userData.object !== undefined ) {
 

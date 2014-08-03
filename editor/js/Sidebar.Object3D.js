@@ -275,7 +275,11 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.parent !== undefined ) {
+			// never change parent for helpers
+
+			helper = object.editorData && object.editorData.helper;
+
+			if ( object.parent !== undefined && !helper ) {
 
 				var newParentId = parseInt( objectParent.getValue() );
 
