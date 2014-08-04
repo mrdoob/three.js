@@ -146,13 +146,17 @@
 				
 				scene.add( Cube );				
 				
+				directionShow( Cube.position, axis, 1000 );
+				directionShow( Cube.position, direction, 1000 );	
+
+				
 							
 				var geometry = new THREE.PlaneGeometry( 758, 600, 10, 10 ); 
 				var material = new THREE.MeshLambertMaterial( { map: new THREE.ImageUtils.loadTexture( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg' ), side: THREE.DoubleSide, transparent: false, opacity: 0.6  } );		
 				
 				Plane = new THREE.Mesh( geometry, material );
 				Plane.position.set( 0, -400, 500 ); Plane.rotation.x = -Math.PI/2; 
-				scene.add( Plane );						
+				scene.add( Plane );			
 			
 			
 				var text = "THREE.BendModifier";
@@ -204,12 +208,12 @@
 				var material = new THREE.MeshBasicMaterial( {color: 0x00000f, wireframe: true} ) ;
 				var Cube = new THREE.Mesh( geometry, material );
 				
-				var direction = new THREE.Vector3(0,0,-1); 
-				var axis =  new THREE.Vector3(1,0,0);	
+				var direction = new THREE.Vector3( 0, 0, -1 ); 
+				var axis =  new THREE.Vector3( 1, 0, 0);	
 				var angle = Math.PI/3;	
 				
 				modifier.set( direction, axis, angle ).modify( Cube );	
-				Cube.position.set(0,-700,100);
+				Cube.position.set( 0, -700, 100 );
 				scene.add( Cube );
 				
 				vnh = new THREE.VertexNormalsHelper( Cube, 20, 0xff0000, 2 );
@@ -217,6 +221,17 @@
 				
 			}
 
+			function directionShow( origin, direction, length, text ) {
+				
+				var material =  0x1a4780;
+				var arrow = new THREE.ArrowHelper( direction, origin, length, material, 100 );
+				//var rotation = new THREE.Euler().setFromQuaternion( arrow.quaternion );
+				//arrow.setRotationFromEuler( arrow.rotation );
+				scene.add( arrow );
+	
+			}
+			
+			
 			function onDocumentMouseDown( event ) {
 
 				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
