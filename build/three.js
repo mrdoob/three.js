@@ -15652,10 +15652,14 @@ THREE.LOD.prototype.clone = function ( object ) {
 
 THREE.Sprite = ( function () {
 
-	var vertices = new Float32Array( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
+	var indices = new Uint16Array( [ 0, 1, 2,  0, 2, 3 ] );
+	var vertices = new Float32Array( [ - 0.5, - 0.5, 0,   0.5, - 0.5, 0,   0.5, 0.5, 0,   - 0.5, 0.5, 0 ] );
+	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
 
 	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 	return function ( material ) {
 
@@ -15698,14 +15702,6 @@ THREE.Sprite.prototype.raycast = ( function () {
 	};
 
 }() );
-
-THREE.Sprite.prototype.updateMatrix = function () {
-
-	this.matrix.compose( this.position, this.quaternion, this.scale );
-
-	this.matrixWorldNeedsUpdate = true;
-
-};
 
 THREE.Sprite.prototype.clone = function ( object ) {
 
@@ -29849,7 +29845,7 @@ THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
-	console.warn( 'THEE.CubeGeometry has been renamed to THREE.BoxGeometry.' );
+	console.warn( 'THREE.CubeGeometry has been renamed to THREE.BoxGeometry.' );
 	return new THREE.BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
 
  };

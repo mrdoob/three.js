@@ -146,7 +146,7 @@ THREE.ColladaLoader = function () {
 		skins = [];
 
 		daeScene = parseScene();
-		scene = new THREE.Object3D();
+		scene = new THREE.Scene();
 
 		for ( var i = 0; i < daeScene.nodes.length; i ++ ) {
 
