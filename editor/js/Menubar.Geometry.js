@@ -253,7 +253,6 @@ Menubar.Geometry = function ( editor ) {
 	function vertexEditGeometry( object ) {
 
 		var pickers = [];
-		var pickerMap = {};
 
 		var geometry = object.geometry;
 		var vertices = geometry.vertices;
@@ -261,24 +260,26 @@ Menubar.Geometry = function ( editor ) {
 		for ( var i = 0, l = vertices.length; i < l; ++i ) {
 
 			var vertex = vertices[i];
+			var exists = false;
 
-			var x = vertex.x;
-			var y = vertex.y;
-			var z = vertex.z;
+			for ( var j = 0, l2 = pickers.length; j < l2; ++j ) {
 
-			var key = x + ',' + y + ',' + z;
+				if ( pickers[j].editorData.vertices[0].distanceTo( vertex ) < 0.0001 ) {
 
-			if ( pickerMap[key] ) {
+					pickers[j].editorData.vertices.push( vertex );
+					exists = true;
+					break;
 
-				pickerMap[key].editorData.vertices.push( vertex );
-				continue;
+				}
 
 			}
 
-			var picker = addPicker( { vertices: [vertex], object: object } );
+			if ( !exists ) {
 
-			pickers.push( picker );
-			pickerMap[key] = picker;
+				var picker = addPicker( { vertices: [vertex], object: object } );
+				pickers.push( picker );
+
+			}
 
 		}
 
@@ -294,7 +295,6 @@ Menubar.Geometry = function ( editor ) {
 
 	function vertexEditBufferGeometry( object ) {
 
-		var pickerMap = {};
 		var pickers = [];
 
 		var geometry = object.geometry;
@@ -309,20 +309,28 @@ Menubar.Geometry = function ( editor ) {
 			var x = positionArray[ 3 * i ];
 			var y = positionArray[ 3 * i + 1 ];
 			var z = positionArray[ 3 * i + 2 ];
+			var vertex = new THREE.Vector3( x, y, z );
 
-			var key = x + ',' + y + ',' + z;
+			var exists = false;
 
-			if ( pickerMap[key] ) {
+			for ( var j = 0, l2 = pickers.length; j < l2; ++j ) {
 
-				pickerMap[key].editorData.indices.push( i );
-				continue;
+				if ( pickers[j].editorData.vertex.distanceTo( vertex ) < 0.0001 ) {
+
+					pickers[j].editorData.indices.push( i );
+					exists = true;
+					break;
+
+				}
 
 			}
 
-			var picker = addPicker( { indices: [i], object: object } );
+			if ( !exists ) {
 
-			pickers.push( picker );
-			pickerMap[key] = picker;
+				var picker = addPicker( { indices: [i], vertex: vertex, object: object } );
+				pickers.push( picker );
+
+			}
 
 		}
 
