@@ -133,12 +133,13 @@ var Viewport = function ( editor ) {
 
 					var other = intersects[i].object;
 
-					if(other.editorData && other.editorData.selectFirst ) {
+					if ( other.editorData && other.editorData.selectFirst ) {
 
 						object = other;
 						break;
 
 					}
+
 				}
 
 				if ( object.userData.object !== undefined ) {
@@ -210,7 +211,7 @@ var Viewport = function ( editor ) {
 				break;
 
 		}
-		
+
 		renderer.setClearColor( clearColor );
 
 		render();
