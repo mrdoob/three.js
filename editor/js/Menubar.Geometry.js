@@ -12,111 +12,6 @@ Menubar.Geometry = function ( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	// Convert to Geometry
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Convert to Geometry' );
-	option.onClick( function () {
-
-
-
-		var object = editor.selected;
-
-		if ( object.geometry instanceof THREE.Geometry ) {
-
-			// convert BoxGeometry and similar to basic Geometry
-
-			if ( confirm( 'Convert ' + object.name + ' to Geometry?' ) === false ) return;
-
-			var original = object.geometry;
-
-			var geometry = new THREE.Geometry();
-
-			geometry.name = original.name;
-
-			geometry.vertices = original.vertices;
-			geometry.colors = original.colors;
-
-			geometry.faces = original.faces;
-
-			geometry.faceVertexUvs = original.faceVertexUvs;
-
-			geometry.morphTargets = original.morphTargets;
-			geometry.morphColors = original.morphColors;
-			geometry.morphNormals = original.morphNormals;
-
-			geometry.skinWeights = original.skinWeights;
-			geometry.skinIndices = original.skinIndices;
-
-			geometry.lineDistances = original.lineDistances;
-
-			geometry.boundingBox = original.boundingBox;
-			geometry.boundingSphere = original.boundingSphere;
-
-			geometry.hasTangents = original.hasTangents;
-
-			geometry.dynamic = original.dynamic;
-
-			// replace in scene
-			editor.scene.traverse( function(obj) {
-
-				if ( obj.geometry === original ) {
-
-					obj.geometry = geometry;
-					editor.signals.objectChanged.dispatch( obj );
-
-				}
-
-			} );
-
-		} else if ( object.geometry instanceof THREE.BufferGeometry ) {
-
-			// TODO convert BufferGeometry to Geometry
-
-		}
-
-	} );
-	options.add( option );
-
-	// Convert to BufferGeometry
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Convert to BufferGeometry' );
-	option.onClick( function () {
-
-		// convert to BufferGeometry
-
-		var object = editor.selected;
-
-		if ( object.geometry instanceof THREE.Geometry ) {
-
-			if ( object.parent === undefined ) return; // avoid flattening the camera or scene
-
-			if ( confirm( 'Convert ' + object.name + ' to BufferGeometry?' ) === false ) return;
-
-			var original = object.geometry;
-
-			var geometry = new THREE.BufferGeometry().fromGeometry( original );
-
-			// replace in scene
-			editor.scene.traverse( function(obj) {
-
-				if ( obj.geometry === original ) {
-
-					obj.geometry = geometry;
-					editor.signals.objectChanged.dispatch( obj );
-
-				}
-
-			} );
-
-		}
-
-	} );
-	options.add( option );
-
 	// Compute face normals
 
 	var option = new UI.Panel();
@@ -176,7 +71,7 @@ Menubar.Geometry = function ( editor ) {
 		} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 			geometry.computeVertexNormals();
-			geometry.getAttribute( 'normal' ).needsUpdate = true;
+			geometry.attributes.normal.needsUpdate = true;
 
 		}
 
@@ -225,7 +120,7 @@ Menubar.Geometry = function ( editor ) {
 
 	function vertexEdit( object ) {
 
-		if ( !object || !object.geometry ) return;
+		if ( !object || !(object.geometry instanceof THREE.BufferGeometry) ) return;
 
 		object.editorData = object.editorData || {};
 
@@ -238,63 +133,6 @@ Menubar.Geometry = function ( editor ) {
 
 		}
 
-		if ( object.geometry instanceof THREE.Geometry ) {
-
-			vertexEditGeometry( object );
-
-		} else if ( object.geometry instanceof THREE.BufferGeometry ) {
-
-			vertexEditBufferGeometry( object );
-
-		}
-
-	}
-
-	function vertexEditGeometry( object ) {
-
-		var pickers = [];
-
-		var geometry = object.geometry;
-		var vertices = geometry.vertices;
-
-		for ( var i = 0, l = vertices.length; i < l; ++i ) {
-
-			var vertex = vertices[i];
-			var exists = false;
-
-			for ( var j = 0, l2 = pickers.length; j < l2; ++j ) {
-
-				if ( pickers[j].editorData.vertices[0].distanceTo( vertex ) < 0.0001 ) {
-
-					pickers[j].editorData.vertices.push( vertex );
-					exists = true;
-					break;
-
-				}
-
-			}
-
-			if ( !exists ) {
-
-				var picker = addPicker( { vertices: [vertex], object: object } );
-				pickers.push( picker );
-
-			}
-
-		}
-
-		object.editorData.pickers = pickers;
-		object.editorData.geometry = geometry;
-		object.editorData.vertexEdit = true;
-
-		updatePickers( object );
-
-		editor.signals.cameraChanged.dispatch( editor.camera );
-
-	}
-
-	function vertexEditBufferGeometry( object ) {
-
 		var pickers = [];
 
 		var geometry = object.geometry;
@@ -306,31 +144,8 @@ Menubar.Geometry = function ( editor ) {
 
 		for ( var i = 0, l = positionArray.length / 3; i < l; ++i ) {
 
-			var x = positionArray[ 3 * i ];
-			var y = positionArray[ 3 * i + 1 ];
-			var z = positionArray[ 3 * i + 2 ];
-			var vertex = new THREE.Vector3( x, y, z );
-
-			var exists = false;
-
-			for ( var j = 0, l2 = pickers.length; j < l2; ++j ) {
-
-				if ( pickers[j].editorData.vertex.distanceTo( vertex ) < 0.0001 ) {
-
-					pickers[j].editorData.indices.push( i );
-					exists = true;
-					break;
-
-				}
-
-			}
-
-			if ( !exists ) {
-
-				var picker = addPicker( { indices: [i], vertex: vertex, object: object } );
-				pickers.push( picker );
-
-			}
+			var picker = addPicker( { index: i, object: object } );
+			pickers.push( picker );
 
 		}
 
@@ -356,39 +171,19 @@ Menubar.Geometry = function ( editor ) {
 		var inverse = (new THREE.Matrix4).getInverse( object.matrixWorld );
 		var vertex = picker.position.clone().applyMatrix4( inverse );
 
-		if ( geometry instanceof THREE.Geometry ) {
+		var positionBuffer = object.geometry.getAttribute( 'position' );
 
-			var vertices = picker.editorData.vertices;
+		if ( !positionBuffer ) return;
 
-			for ( var i = 0, l = vertices.length; i < l; ++i ) {
+		var positionArray = positionBuffer.array;
 
-				vertices[i].copy( vertex );
+		var index = picker.editorData.index;
 
-			}
+		positionArray[ 3 * index ] = vertex.x;
+		positionArray[ 3 * index + 1 ] = vertex.y;
+		positionArray[ 3 * index + 2 ] = vertex.z;
 
-			geometry.verticesNeedUpdate = true;
-
-		} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-			var positionBuffer = object.geometry.getAttribute( 'position' );
-
-			if ( !positionBuffer ) return;
-
-			var positionArray = positionBuffer.array;
-
-			var indices = picker.editorData.indices;
-
-			for ( var i = 0, l = indices.length; i < l; ++i ) {
-
-				positionArray[ 3 * indices[i] ] = vertex.x;
-				positionArray[ 3 * indices[i] + 1 ] = vertex.y;
-				positionArray[ 3 * indices[i] + 2 ] = vertex.z;
-
-			}
-
-			positionBuffer.needsUpdate = true;
-
-		}
+		positionBuffer.needsUpdate = true;
 
 		object.geometry.computeBoundingBox();
 
@@ -398,54 +193,37 @@ Menubar.Geometry = function ( editor ) {
 
 	function updatePickers( object ) {
 
-		if ( object.editorData && object.editorData.pickers ) {
+		if ( !object.editorData || !object.editorData.pickers ) return;
 
-			var pickers = object.editorData.pickers;
+		var pickers = object.editorData.pickers;
 
-			if( object.editorData.geometry !== object.geometry ) {
+		if( object.editorData.geometry !== object.geometry ) {
 
-				// object geometry has changed in the mean time, stop vertex editing
-				removePickers( object );
-				object.editorData.vertexEdit = false;
+			// object geometry has changed in the mean time, stop vertex editing
+			removePickers( object );
+			object.editorData.vertexEdit = false;
 
-				return;
+			return;
 
-			}
+		}
 
-			if ( object.geometry instanceof THREE.Geometry ) {
+		var positionBuffer = object.geometry.getAttribute( 'position' );
 
-				for ( var i = 0, l = pickers.length; i < l; ++i ) {
+		if ( !positionBuffer ) return;
 
-					var picker = pickers[i];
+		var positionArray = positionBuffer.array;
 
-					picker.position.copy( picker.editorData.vertices[0] );
-					picker.position.applyMatrix4( picker.editorData.object.matrixWorld );
+		for ( var i = 0, l = pickers.length; i < l; ++i ) {
 
-				}
+			var picker = pickers[i];
+			var index = picker.editorData.index;
 
-			} else if ( object.geometry instanceof THREE.BufferGeometry ) {
+			var x = positionArray[ 3 * index ];
+			var y = positionArray[ 3 * index + 1 ];
+			var z = positionArray[ 3 * index + 2 ];
 
-				var positionBuffer = object.geometry.getAttribute( 'position' );
-
-				if ( !positionBuffer ) return;
-
-				var positionArray = positionBuffer.array;
-
-				for ( var i = 0, l = pickers.length; i < l; ++i ) {
-
-					var picker = pickers[i];
-					var index = picker.editorData.indices[0];
-
-					var x = positionArray[ 3 * index ];
-					var y = positionArray[ 3 * index + 1 ];
-					var z = positionArray[ 3 * index + 2 ];
-
-					picker.position.set( x, y, z );
-					picker.position.applyMatrix4( picker.editorData.object.matrixWorld );
-
-				}
-
-			}
+			picker.position.set( x, y, z );
+			picker.position.applyMatrix4( picker.editorData.object.matrixWorld );
 
 		}
 
@@ -493,7 +271,7 @@ Menubar.Geometry = function ( editor ) {
 			editor.sceneHelpers.add( picker );
 			editor.signals.objectAdded.dispatch( picker );
 
-			return picker
+			return picker;
 
 		}
 
@@ -513,6 +291,7 @@ Menubar.Geometry = function ( editor ) {
 				object.scale.set( factor, factor, factor );
 
 			}
+
 		} );
 
 	}
