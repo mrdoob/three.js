@@ -8637,6 +8637,19 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	copyAt: function ( index1, attribute, index2 ) {
+
+		index1 *= this.itemSize;
+		index2 *= attribute.itemSize;
+
+		for ( var i = 0, l = this.itemSize; i < l; i ++ ) {
+
+			this.array[ index1 + i ] = attribute.array[ index2 + i ];
+
+		}
+
+	},
+
 	set: function ( value ) {
 
 		this.array.set( value );
@@ -14745,8 +14758,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 							distance: distance,
 							point: intersectionPoint,
-							indices: [ a, b, c ],
-							face: null,
+							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
 							faceIndex: null,
 							object: this
 
@@ -14805,8 +14817,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						distance: distance,
 						point: intersectionPoint,
-						indices: [ a, b, c ],
-						face: null,
+						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
 						faceIndex: null,
 						object: this
 
