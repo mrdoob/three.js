@@ -42,7 +42,6 @@ Menubar.Geometry = function ( editor ) {
 
 			// TODO not supported
 			geometry.computeVertexNormals();
-			geometry.attributes.normal.needsUpdate = true;
 
 		}
 
@@ -73,7 +72,6 @@ Menubar.Geometry = function ( editor ) {
 		} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 			geometry.computeVertexNormals();
-			geometry.attributes.normal.needsUpdate = true;
 
 		}
 

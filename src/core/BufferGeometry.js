@@ -475,7 +475,7 @@ THREE.BufferGeometry.prototype = {
 
 			this.normalizeNormals();
 
-			this.normalsNeedUpdate = true;
+			this.attributes[ 'normal' ].needsUpdate = true;
 
 		}
 
