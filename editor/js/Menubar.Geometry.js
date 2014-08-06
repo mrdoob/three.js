@@ -41,6 +41,8 @@ Menubar.Geometry = function ( editor ) {
 		} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 			// TODO not supported
+			geometry.computeVertexNormals();
+			geometry.attributes.normal.needsUpdate = true;
 
 		}
 
@@ -96,6 +98,33 @@ Menubar.Geometry = function ( editor ) {
 	} );
 	options.add( option );
 
+	// toggle linking of pickers
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Disable Linking' );
+
+	var linkOption = option;
+	var linkPickersEnabled = true;
+
+	option.onClick( function () {
+
+		linkPickersEnabled = !linkPickersEnabled;
+		linkOption.setTextContent( linkPickersEnabled ? 'Disable Linking' : 'Enable Linking' );
+
+		if ( linkPickersEnabled ) {
+
+			linkPickers();
+
+		} else {
+
+			unlinkPickers();
+
+		}
+
+	} );
+	options.add( option );
+
 	// events
 
 	// update pickers whenever an object is changed
@@ -120,7 +149,19 @@ Menubar.Geometry = function ( editor ) {
 
 	function vertexEdit( object ) {
 
-		if ( !object || !(object.geometry instanceof THREE.BufferGeometry) ) return;
+		if ( !object || !object.geometry ) return;
+
+		// ask to convert to buffer geometry first
+
+		if ( !(object.geometry instanceof THREE.BufferGeometry) ) {
+
+			if ( confirm( 'Convert ' + object.name + ' to BufferGeometry?' ) === false ) return;
+
+			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
+
+			editor.signals.objectChanged.dispatch( object );
+
+		}
 
 		object.editorData = object.editorData || {};
 
@@ -157,13 +198,21 @@ Menubar.Geometry = function ( editor ) {
 
 		editor.signals.cameraChanged.dispatch( editor.camera );
 
+		if ( linkPickersEnabled ) {
+
+			linkPickers();
+
+		}
+
 	}
 
 	// apply picker to its geometry
 
-	function applyPicker( picker ) {
+	function applyPicker( picker, linkedPosition ) {
 
 		if ( !picker.editorData || !picker.editorData.vertexPicker ) return;
+
+		if ( linkedPosition ) picker.position.copy( linkedPosition );
 
 		var object = picker.editorData.object;
 		var geometry = object.geometry;
@@ -186,6 +235,16 @@ Menubar.Geometry = function ( editor ) {
 		positionBuffer.needsUpdate = true;
 
 		object.geometry.computeBoundingBox();
+
+		if ( linkPickersEnabled && !linkedPosition ) {
+
+			for ( var i = 0; i < picker.editorData.linked.length; ++i ) {
+
+				applyPicker( picker.editorData.linked[i], picker.position );
+
+			}
+
+		}
 
 	}
 
@@ -276,6 +335,46 @@ Menubar.Geometry = function ( editor ) {
 		}
 
 	})();
+
+	// link pickers
+
+	function linkPickers() {
+
+		editor.sceneHelpers.traverse( function ( object ) {
+
+			if ( !object.editorData || !object.editorData.vertexPicker ) return;
+
+			object.editorData.linked = [];
+
+			editor.sceneHelpers.traverse( function ( other ) {
+
+				if ( other === object || !other.editorData || !other.editorData.vertexPicker ) return;
+
+				if ( object.position.distanceTo( other.position ) < 0.0001 ) {
+
+					object.editorData.linked.push( other );
+
+				}
+
+			} );
+
+		} );
+
+	}
+
+	// unlink pickers
+
+	function unlinkPickers() {
+
+		editor.sceneHelpers.traverse( function ( object ) {
+
+			if ( !object.editorData || !object.editorData.vertexPicker ) return;
+
+			object.editorData.linked = [];
+
+		} );
+
+	}
 
 	// scale helpers
 
