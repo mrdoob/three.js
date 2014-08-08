@@ -67,7 +67,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		var geometry = this.geometry;
 
-		// Checking boundingSphere distance to ray
+		// Checking if ray intersects boundingSphere
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
@@ -75,6 +75,14 @@ THREE.Mesh.prototype.raycast = ( function () {
 		sphere.applyMatrix4( this.matrixWorld );
 
 		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
+
+			return;
+
+		}
+
+		// Checking boundingSphere distance to ray
+
+		if ( sphere.distanceToPoint( raycaster.ray.origin ) > raycaster.far ) {
 
 			return;
 
@@ -88,6 +96,12 @@ THREE.Mesh.prototype.raycast = ( function () {
 		if ( geometry.boundingBox !== null ) {
 
 			if ( ray.isIntersectionBox( geometry.boundingBox ) === false )  {
+
+				return;
+
+			}
+
+			if ( geometry.boundingBox.distanceToPoint( ray.origin ) > raycaster.far ) {
 
 				return;
 
