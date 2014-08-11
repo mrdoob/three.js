@@ -159,7 +159,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
@@ -214,7 +214,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		}
+		};
 
 	}(),
 
@@ -307,7 +307,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		};
+		}
 
 		if ( object === this ) {
 
@@ -325,7 +325,7 @@ THREE.Object3D.prototype = {
 			}
 
 			object.parent = this;
-			object.dispatchEvent( { type: 'added' } );
+			object.dispatchEvent( { type: 'added', bubbles: true } );
 
 			this.children.push( object );
 
@@ -349,14 +349,14 @@ THREE.Object3D.prototype = {
 
 			}
 
-		};
+		}
 
 		var index = this.children.indexOf( object );
 
 		if ( index !== - 1 ) {
 
 			object.parent = undefined;
-			object.dispatchEvent( { type: 'removed' } );
+			object.dispatchEvent( { type: 'removed', bubbles: true } );
 
 			this.children.splice( index, 1 );
 

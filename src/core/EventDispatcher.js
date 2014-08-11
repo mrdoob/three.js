@@ -76,6 +76,14 @@ THREE.EventDispatcher.prototype = {
 
 	dispatchEvent: function ( event ) {
 
+		if ( event.bubbles === true && this.parent !== undefined ) {
+
+			event.target = event.target || this;
+			
+			this.parent.dispatchEvent( event );
+
+		}
+
 		if ( this._listeners === undefined ) return;
 
 		var listeners = this._listeners;
@@ -83,7 +91,7 @@ THREE.EventDispatcher.prototype = {
 
 		if ( listenerArray !== undefined ) {
 
-			event.target = this;
+			event.target = event.target || this;
 
 			var array = [];
 			var length = listenerArray.length;
