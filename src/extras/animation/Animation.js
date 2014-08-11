@@ -183,15 +183,23 @@ THREE.Animation.prototype.update = (function(){
 
 		var duration = this.data.length;
 
-		if ( this.loop === true && this.currentTime > duration ) {
+		if ( this.currentTime > duration || this.currentTime < 0 ) {
 
-			this.currentTime %= duration;
-			this.reset();
+			if ( this.loop ) {
 
-		} else if ( this.loop === false && this.currentTime > duration ) {
+				this.currentTime %= duration;
 
-			this.stop();
-			return;
+				if ( this.currentTime < 0 )
+					this.currentTime += duration;
+
+				this.reset();
+
+			} else {
+
+				this.stop();
+				return;
+
+			}
 
 		}
 
@@ -211,7 +219,8 @@ THREE.Animation.prototype.update = (function(){
 				var prevKey = animationCache.prevKey[ type ];
 				var nextKey = animationCache.nextKey[ type ];
 
-				if ( nextKey.time <= this.currentTime ) {
+				if ( ( this.timeScale > 0 && nextKey.time <= this.currentTime ) ||
+					( this.timeScale < 0 && prevKey.time >= this.currentTime ) ) {
 
 					prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 					nextKey = this.getNextKeyWith( type, h, 1 );
