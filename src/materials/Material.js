@@ -11,6 +11,7 @@ THREE.Material = function () {
 	this.name = '';
 
 	this.side = THREE.FrontSide;
+	this.flipSide = THREE.NoFlip;
 
 	this.opacity = 1;
 	this.transparent = false;

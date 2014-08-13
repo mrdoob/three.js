@@ -35,6 +35,13 @@ THREE.FrontSide = 0;
 THREE.BackSide = 1;
 THREE.DoubleSide = 2;
 
+// flip side
+
+THREE.NoFlip = 0;
+THREE.FlipFaces = 1;
+THREE.FlipNormals = 2;
+THREE.FlipFacesNormals = 3;
+
 // shading
 
 THREE.NoShading = 0;

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - flipSide</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+
+		<script>
+
+			var camera, scene, renderer, material;
+			var light1, light2;
+			var meshes = [];
+			var helpers = [];
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.x = 500;
+				camera.position.z = 600;
+
+				scene = new THREE.Scene();
+
+				// Lights
+				var sphere = new THREE.SphereGeometry( 20, 16, 8 );
+
+				scene.add( new THREE.AmbientLight( 0x777777 ) );
+
+				light1 = new THREE.PointLight( 0xffffff, 1, 10000 );
+				light1.position.set( 500, 300, 0 );
+				scene.add( light1 );
+
+				var helperL1 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				helperL1.position.copy(light1.position);
+				scene.add( helperL1 );
+
+				light2 = new THREE.PointLight( 0xff0040, 1, 10000 );
+				light2.position.set( 500, -300, 0 );
+				scene.add( light2 );
+
+				var helperL2 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) );
+				helperL2.position.copy(light2.position);
+				scene.add( helperL2 );
+
+				// Meshes
+				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+
+				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
+				texture.anisotropy = renderer.getMaxAnisotropy();
+
+				// Side
+				var side = THREE.FrontSide; // Try it with THREE.DoubleSide or THREE.BackSide
+
+				material = new THREE.MeshPhongMaterial( { map: texture, side: side} ); // default: THREE.NoFlip
+				meshes.push( new THREE.Mesh( geometry, material ) );
+
+				material = new THREE.MeshPhongMaterial( { map: texture, side: side, flipSide: THREE.FlipFaces} );
+				meshes.push( new THREE.Mesh( geometry, material ) );
+
+				material = new THREE.MeshPhongMaterial( { map: texture, side: side, flipSide: THREE.FlipNormals} );
+				meshes.push( new THREE.Mesh( geometry, material ) );
+
+				material = new THREE.MeshPhongMaterial( { map: texture, side: side, flipSide: THREE.FlipFacesNormals} );
+				meshes.push( new THREE.Mesh( geometry, material ) );
+
+				// Add Meshes and normal helpers
+      			for( var i = 0, il = meshes.length; i < il; i ++ ) {
+
+					helpers.push( new THREE.FaceNormalsHelper( meshes[i], 30 ) );
+
+      				meshes[i].position.x += i * 300.0;
+					scene.add( meshes[i] );
+					scene.add( helpers[i] );
+				}
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				var time = Date.now() * 0.0005;
+
+  				for( var i = 0, il = meshes.length; i < il; i ++ ) {
+
+					meshes[i].rotation.x += 0.005;
+					meshes[i].rotation.y += 0.01;
+
+					helpers[i].update();
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

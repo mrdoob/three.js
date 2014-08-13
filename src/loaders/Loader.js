@@ -256,6 +256,12 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.flipSide !== undefined ) {
+
+			mpars.flipSide = m.flipSide;
+
+		}
+
 		if ( m.doubleSided !== undefined ) {
 
 			mpars.side = THREE.DoubleSide;
