@@ -71,17 +71,35 @@ THREE.Box3.prototype = {
 
 			object.traverse( function ( node ) {
 
-				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+				if ( node.geometry !== undefined ) {
 
-					var vertices = node.geometry.vertices;
+					if ( node.geometry instanceof THREE.Geometry ) {
 
-					for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+						var vertices = node.geometry.vertices;
 
-						v1.copy( vertices[ i ] );
+						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
-						v1.applyMatrix4( node.matrixWorld );
+							v1.copy( vertices[ i ] );
 
-						scope.expandByPoint( v1 );
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
+
+					} else if ( node.geometry instanceof THREE.BufferGeometry && node.geometry.attributes[ 'position' ] !== undefined ) {
+
+						var positions = node.geometry.attributes[ 'position' ].array;
+
+						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
 
 					}
 
