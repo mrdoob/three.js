@@ -71,11 +71,13 @@ THREE.Box3.prototype = {
 
 			object.traverse( function ( node ) {
 
-				if ( node.geometry !== undefined ) {
+				var geometry = node.geometry;
 
-					if ( node.geometry instanceof THREE.Geometry ) {
+				if ( geometry !== undefined ) {
 
-						var vertices = node.geometry.vertices;
+					if ( geometry instanceof THREE.Geometry ) {
+
+						var vertices = geometry.vertices;
 
 						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
@@ -87,9 +89,9 @@ THREE.Box3.prototype = {
 
 						}
 
-					} else if ( node.geometry instanceof THREE.BufferGeometry && node.geometry.attributes[ 'position' ] !== undefined ) {
+					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
 
-						var positions = node.geometry.attributes[ 'position' ].array;
+						var positions = geometry.attributes[ 'position' ].array;
 
 						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
