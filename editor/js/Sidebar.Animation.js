@@ -6,9 +6,10 @@ Sidebar.Animation = function ( editor ) {
 	var possibleAnimations = {};
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( true );
 	container.setDisplay( 'none' );
 
-	container.addStatic( new UI.Text( 'ANIMATION' ) );
+	container.addStatic( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 
 	var animationsRow = new UI.Panel();

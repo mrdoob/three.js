@@ -51,6 +51,8 @@ var Editor = function () {
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
+	
+	this.scripts = {};
 
 	this.selected = null;
 	this.helpers = {};

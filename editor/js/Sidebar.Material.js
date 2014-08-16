@@ -21,6 +21,7 @@ Sidebar.Material = function ( editor ) {
 	};
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( true );
 	container.setDisplay( 'none' );
 	container.dom.classList.add( 'Material' );
 
