@@ -45,6 +45,8 @@ var Editor = function () {
 	this.loader = new Loader( this );
 
 	this.scene = new THREE.Scene();
+	this.scene.name = 'Scene';
+	
 	this.sceneHelpers = new THREE.Scene();
 
 	this.object = {};

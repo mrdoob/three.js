@@ -480,7 +480,13 @@ UI.Select.prototype.getValue = function () {
 
 UI.Select.prototype.setValue = function ( value ) {
 
-	this.dom.value = value;
+	value = String( value );
+
+	if ( this.dom.value !== value ) {
+
+		this.dom.value = value;
+
+	}
 
 	return this;
 

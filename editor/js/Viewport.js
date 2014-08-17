@@ -591,8 +591,6 @@ var Viewport = function ( editor ) {
 
 	function render() {
 
-		console.trace();
-
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 

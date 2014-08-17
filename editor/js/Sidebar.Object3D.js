@@ -434,24 +434,13 @@ Sidebar.Object3D = function ( editor ) {
 	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
-
 		var options = {};
 
-		options[ scene.id ] = 'Scene';
+		scene.traverse( function ( object ) {
 
-		( function addObjects( objects ) {
+			options[ object.id ] = object.name;
 
-			for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-				var object = objects[ i ];
-
-				options[ object.id ] = object.name;
-
-				addObjects( object.children );
-
-			}
-
-		} )( scene.children );
+		} );
 
 		objectParent.setOptions( options );
 
