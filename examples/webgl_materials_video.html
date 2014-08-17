@@ -123,10 +123,7 @@
 				xsize = 480 / xgrid;
 				ysize = 204 / ygrid;
 
-				var parameters = { color: 0xffffff, map: texture },
-					material_base = new THREE.MeshLambertMaterial( parameters );
-
-				renderer.initMaterial( material_base, scene.__lights, scene.fog );
+				var parameters = { color: 0xffffff, map: texture };
 
 				cube_count = 0;
 
