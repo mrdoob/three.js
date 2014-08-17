@@ -64,6 +64,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.minPolarAngle = 0; // radians
 	this.maxPolarAngle = Math.PI; // radians
 
+	// How far you can orbit horizontally, upper and lower limits.
+	// Range is -Math.PI to Math.PI radians.
+	this.constrainAzimuth = false;
+	this.minAzimuthAngle = - 0.5 * Math.PI; // radians
+	this.maxAzimuthAngle = 0.5 * Math.PI; // radians
+
 	// Set to true to disable use of the keys
 	this.noKeys = false;
 
@@ -254,6 +260,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		theta += thetaDelta;
 		phi += phiDelta;
+
+		// restrict theta to be between desired limits
+		if ( this.constrainAzimuth ) theta = Math.max( this.minAzimuthAngle, Math.min( this.maxAzimuthAngle, theta ) );
 
 		// restrict phi to be between desired limits
 		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
