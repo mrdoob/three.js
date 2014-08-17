@@ -111,20 +111,7 @@ Sidebar.Scene = function ( editor ) {
 
 	//
 
-	var refreshFogUI = function () {
-
-		var type = fogType.getValue();
-
-		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
-		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
-
-	};
-
-	// events
-
-	signals.sceneGraphChanged.add( function () {
+	var refreshUI = function () {
 
 		var scene = editor.scene;
 		var sceneType = editor.getObjectType( scene );
@@ -196,7 +183,24 @@ Sidebar.Scene = function ( editor ) {
 
 		refreshFogUI();
 
-	} );
+	};
+
+	var refreshFogUI = function () {
+
+		var type = fogType.getValue();
+
+		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
+		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
+
+	};
+
+	refreshUI();
+
+	// events
+
+	signals.sceneGraphChanged.add( refreshUI );
 
 	signals.objectSelected.add( function ( object ) {
 
