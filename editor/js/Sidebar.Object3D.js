@@ -456,7 +456,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	function updateUI( object ) {
 
-		objectType.setValue( editor.getObjectType( object ) );
+		objectType.setValue( object.type );
 
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );

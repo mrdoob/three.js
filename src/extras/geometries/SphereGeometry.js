@@ -6,6 +6,8 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 	THREE.Geometry.call( this );
 
+	this.type = 'SphereGeometry';
+
 	this.parameters = {
 		radius: radius,
 		widthSegments: widthSegments,

@@ -4,6 +4,7 @@
 
 THREE.MeshFaceMaterial = function ( materials ) {
 
+	this.type = 'MeshFaceMaterial';
 	this.materials = materials instanceof Array ? materials : [];
 
 };

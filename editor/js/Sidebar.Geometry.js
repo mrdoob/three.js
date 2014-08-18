@@ -67,7 +67,7 @@ Sidebar.Geometry = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			geometryType.setValue( editor.getGeometryType( object.geometry ) );
+			geometryType.setValue( geometry.type );
 
 			geometryUUID.setValue( geometry.uuid );
 			geometryName.setValue( geometry.name );

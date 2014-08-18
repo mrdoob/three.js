@@ -114,31 +114,26 @@ Sidebar.Scene = function ( editor ) {
 	var refreshUI = function () {
 
 		var scene = editor.scene;
-		var sceneType = editor.getObjectType( scene );
 
 		var options = [];
 
-		options.push( { value: scene.id, html: '<span class="type ' + sceneType + '"></span> ' + scene.name } );
+		options.push( { value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				var object = objects[ i ];
-				var objectType = editor.getObjectType( object );
 
-				var html = pad + '<span class="type ' + objectType + '"></span> ' + object.name;
+				var html = pad + '<span class="type ' + object.type + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
 					var geometry = object.geometry;
 					var material = object.material;
 
-					var geometryType = editor.getGeometryType( geometry );
-					var materialType = editor.getMaterialType( material );
-
-					html += ' <span class="type ' + geometryType + '"></span> ' + geometry.name;
-					html += ' <span class="type ' + materialType + '"></span> ' + material.name;
+					html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
+					html += ' <span class="type ' + material.type + '"></span> ' + material.name;
 
 				}
 

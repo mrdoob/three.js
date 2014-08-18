@@ -8,6 +8,7 @@ THREE.BufferGeometry = function () {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.type = 'BufferGeometry';
 
 	this.attributes = {};
 	this.drawcalls = [];

@@ -8,6 +8,8 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 	THREE.Geometry.call( this );
 
+	this.type = 'TorusGeometry';
+
 	this.parameters = {
 		radius: radius,
 		tube: tube,
