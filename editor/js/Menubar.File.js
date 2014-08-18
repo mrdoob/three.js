@@ -86,15 +86,11 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		var output = geometry.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-			exportGeometry( THREE.BufferGeometryExporter );
-
-		} else if ( geometry instanceof THREE.Geometry ) {
-
-			exportGeometry( THREE.GeometryExporter );
-
-		}
+		exportString( output );
 
 	} );
 	options.add( option );
@@ -106,14 +102,20 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export Object' );
 	option.onClick( function () {
 
-		if ( editor.selected === null ) {
+		var object = editor.selected;
+
+		if ( object === null ) {
 
 			alert( 'No object selected' );
 			return;
 
 		}
 
-		exportObject( THREE.ObjectExporter );
+		var output = object.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		exportString( output );
 
 	} );
 	options.add( option );
@@ -125,7 +127,11 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export Scene' );
 	option.onClick( function () {
 
-		exportScene( THREE.ObjectExporter );
+		var output = editor.scene.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		exportString( output );
 
 	} );
 	options.add( option );
@@ -137,7 +143,27 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export OBJ' );
 	option.onClick( function () {
 
-		exportGeometry( THREE.OBJExporter );
+		var object = editor.selected;
+
+		if ( object === null ) {
+
+			alert( 'No object selected.' );
+			return;
+
+		}
+
+		var geometry = object.geometry;
+
+		if ( geometry === undefined ) {
+
+			alert( 'The selected object doesn\'t have geometry.' );
+			return;
+
+		}
+
+		var exporter = new OBJExporter();
+
+		exportString( exporter.parse( geometry ) );
 
 	} );
 	options.add( option );
@@ -149,7 +175,9 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export STL' );
 	option.onClick( function () {
 
-		exportScene( THREE.STLExporter );
+		var exporter = new STLExporter();
+
+		exportString( exporter.parse( editor.scene ) );
 
 	} );
 	options.add( option );
@@ -157,6 +185,8 @@ Menubar.File = function ( editor ) {
 	//
 
 	options.add( new UI.HorizontalRule() );
+
+	/*
 
 	// Test
 
@@ -170,61 +200,22 @@ Menubar.File = function ( editor ) {
 
 	} );
 	options.add( option );
+	*/
+
+	// Publish
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish' );
+	option.onClick( function () {
+
+	} );
+	options.add( option );
 
 
 	//
-	
-	var exportGeometry = function ( exporterClass ) {
 
-		var object = editor.selected;
-		var exporter = new exporterClass();
-
-		var output = exporter.parse( object.geometry );
-
-		if ( exporter instanceof THREE.BufferGeometryExporter ||
-		     exporter instanceof THREE.GeometryExporter ) {
-
-			output = JSON.stringify( output, null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		}
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	};
-
-	var exportObject = function ( exporterClass ) {
-
-		var object = editor.selected;
-		var exporter = new exporterClass();
-
-		var output = JSON.stringify( exporter.parse( object ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	};
-
-	var exportScene = function ( exporterClass ) {
-
-		var exporter = new exporterClass();
-
-		var output = exporter.parse( editor.scene );
-
-		if ( exporter instanceof THREE.ObjectExporter ) {
-
-			output = JSON.stringify( output, null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		}
+	var exportString = function ( output ) {
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
