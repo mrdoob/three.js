@@ -45,12 +45,27 @@ var Toolbar = function ( editor ) {
 	buttons.add( local );
 	buttons.add( new UI.Text( 'local' ) );
 
+	var showGrid = new UI.Checkbox().onChange( updateShowGrid ).setValue( true );
+	buttons.add( showGrid );
+	buttons.add( new UI.Text( 'show' ) );
+
 	function update() {
 
 		signals.snapChanged.dispatch( snap.getValue() === true ? grid.getValue() : null );
 		signals.spaceChanged.dispatch( local.getValue() === true ? "local" : "world" );
 
 	}
+
+	function updateShowGrid() {
+
+		signals.showGridChanged.dispatch( showGrid.getValue() );
+	}
+
+	signals.showGridChanged.add( function ( showGridValue ) {
+
+		showGrid.setValue( showGridValue );
+
+	} );
 
 	update();
 

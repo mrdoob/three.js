@@ -368,6 +368,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.showGridChanged.add( function ( showGrid ) {
+
+		grid.visible = showGrid;
+		render();
+
+	} );
+
 	signals.fogTypeChanged.add( function ( fogType ) {
 
 		if ( fogType !== oldFogType ) {
