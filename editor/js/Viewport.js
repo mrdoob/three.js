@@ -430,6 +430,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.showGridChanged.add( function ( showGrid ) {
+
+		grid.visible = showGrid;
+		render();
+
+	} );
+
 	var animations = [];
 
 	signals.playAnimation.add( function ( animation ) {
