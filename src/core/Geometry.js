@@ -147,8 +147,6 @@ THREE.Geometry.prototype = {
 
 		if ( indices !== undefined ) {
 
-			var indices = attributes.index.array;
-
 			for ( var i = 0; i < indices.length; i += 3 ) {
 
 				addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
