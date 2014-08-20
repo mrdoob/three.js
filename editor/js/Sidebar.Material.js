@@ -21,6 +21,12 @@ Sidebar.Material = function ( editor ) {
 	};
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/material/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/material/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 	container.dom.classList.add( 'Material' );
 
@@ -201,6 +207,18 @@ Sidebar.Material = function ( editor ) {
 	materialMapRow.add( materialMap );
 
 	container.add( materialMapRow );
+
+	// alpha map
+
+	var materialAlphaMapRow = new UI.Panel();
+	var materialAlphaMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialAlphaMap = new UI.Texture().setColor( '#444' ).onChange( update );
+
+	materialAlphaMapRow.add( new UI.Text( 'Alpha Map' ).setWidth( '90px' ) );
+	materialAlphaMapRow.add( materialAlphaMapEnabled );
+	materialAlphaMapRow.add( materialAlphaMap );
+
+	container.add( materialAlphaMapRow );
 
 	// light map
 
@@ -450,6 +468,30 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.alphaMap !== undefined ) {
+
+				var mapEnabled = materialAlphaMapEnabled.getValue() === true;
+
+				if ( objectHasUvs )  {
+
+					if ( geometry !== undefined ) {
+
+						geometry.buffersNeedUpdate = true;
+						geometry.uvsNeedUpdate = true;
+
+					}
+
+					material.alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
+					material.needsUpdate = true;
+
+				} else {
+
+					if ( mapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
 			/*
 			if ( material.lightMap !== undefined ) {
 
@@ -619,6 +661,7 @@ Sidebar.Material = function ( editor ) {
 			'vertexColors': materialVertexColorsRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
+			'alphaMap': materialAlphaMapRow,
 			'lightMap': materialLightMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
@@ -663,7 +706,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			materialClass.setValue( editor.getMaterialType( material ) );
+			materialClass.setValue( material.type );
 
 			if ( material.color !== undefined ) {
 
@@ -729,6 +772,13 @@ Sidebar.Material = function ( editor ) {
 
 				materialMapEnabled.setValue( material.map !== null );
 				materialMap.setValue( material.map );
+
+			}
+
+			if ( material.alphaMap !== undefined ) {
+
+				materialAlphaMapEnabled.setValue( material.alphaMap !== null );
+				materialAlphaMap.setValue( material.alphaMap );
 
 			}
 

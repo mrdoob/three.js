@@ -52,7 +52,7 @@ UI.Element.prototype = {
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
+'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
 
@@ -106,7 +106,17 @@ UI.Panel.prototype.add = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
 
-		this.dom.appendChild( arguments[ i ].dom );
+		var argument = arguments[ i ];
+
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.appendChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
@@ -118,8 +128,18 @@ UI.Panel.prototype.add = function () {
 UI.Panel.prototype.remove = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
+	
+		var argument = arguments[ i ];
 
-		this.dom.removeChild( arguments[ i ].dom );
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.removeChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
@@ -249,19 +269,31 @@ UI.CollapsiblePanel.prototype.expand = function() {
 
 };
 
-UI.CollapsiblePanel.prototype.setCollapsed = function( setCollapsed ) {
+UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
 
-	if ( setCollapsed ) {
+	if ( boolean ) {
 
-		this.dom.classList.add('collapsed');
+		this.dom.classList.add( 'collapsed' );
 
 	} else {
 
-		this.dom.classList.remove('collapsed');
+		this.dom.classList.remove( 'collapsed' );
 
 	}
 
-	this.isCollapsed = setCollapsed;
+	this.isCollapsed = boolean;
+
+	if ( this.onCollapsedChangeCallback !== undefined ) {
+
+		this.onCollapsedChangeCallback( boolean );
+
+	}
+
+};
+
+UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
+
+	this.onCollapsedChangeCallback = callback;
 
 };
 
@@ -460,7 +492,13 @@ UI.Select.prototype.getValue = function () {
 
 UI.Select.prototype.setValue = function ( value ) {
 
-	this.dom.value = value;
+	value = String( value );
+
+	if ( this.dom.value !== value ) {
+
+		this.dom.value = value;
+
+	}
 
 	return this;
 
@@ -1082,6 +1120,52 @@ UI.Button.prototype = Object.create( UI.Element.prototype );
 UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
+
+	return this;
+
+};
+
+
+// Dialog
+
+UI.Dialog = function ( value ) {
+
+	var scope = this;
+	
+	var dom = document.createElement( 'dialog' );
+
+	if ( dom.showModal === undefined ) {
+
+		// fallback
+
+		dom = document.createElement( 'div' );
+		dom.style.display = 'none';
+
+		dom.showModal = function () {
+
+			dom.style.position = 'absolute';
+			dom.style.left = '100px';
+			dom.style.top = '100px';
+			dom.style.zIndex = 1;
+			dom.style.display = '';
+
+		};
+
+	}
+
+	dom.className = 'Dialog';
+
+	this.dom = dom;
+
+	return this;
+
+};
+
+UI.Dialog.prototype = Object.create( UI.Panel.prototype );
+
+UI.Dialog.prototype.showModal = function () {
+
+	this.dom.showModal();
 
 	return this;
 

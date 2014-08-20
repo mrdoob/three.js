@@ -117,8 +117,6 @@
 
 				var start = Date.now();
 
-				renderer.initMaterial( cubeMaterial, scene.__lights, scene.fog );
-
 				var xgrid = 14,
 					ygrid = 9,
 					zgrid = 14;
@@ -142,7 +140,6 @@
 
 						materials[ c ] = new THREE.MeshBasicMaterial( parameters );
 						mesh = new THREE.Mesh( geo, materials[ c ] );
-						renderer.initMaterial( materials[ c ], scene.__lights, scene.fog, mesh );
 
 					}
 

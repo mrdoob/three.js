@@ -47,6 +47,7 @@
 	"src/materials/SpriteCanvasMaterial.js",
 	"src/textures/Texture.js",
 	"src/textures/DataTexture.js",
+	"src/objects/Group.js",
 	"src/objects/Line.js",
 	"src/objects/Mesh.js",
 	"src/objects/Bone.js",

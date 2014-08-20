@@ -3388,6 +3388,12 @@ THREE.AnimationHandler = {
 
 		for ( var i = 0; i < this.animations.length; i ++ ) {
 
+			this.animations[ i ].resetBlendWeights( );
+
+		}
+
+		for ( var i = 0; i < this.animations.length; i ++ ) {
+
 			this.animations[ i ].update( deltaTimeMS );
 
 		}
@@ -3457,20 +3463,26 @@ THREE.Animation.prototype.reset = function () {
 
 		if ( object.animationCache === undefined ) {
 
-			object.animationCache = {};
+			object.animationCache = {
+				animations: {},
+				blending: {
+					positionWeight: 0.0,
+					quaternionWeight: 0.0,
+					scaleWeight: 0.0
+				}
+			};
+		}
+
+		if ( object.animationCache.animations[this.data.name] === undefined ) {
+
+			object.animationCache.animations[this.data.name] = {};
+			object.animationCache.animations[this.data.name].prevKey = { pos: 0, rot: 0, scl: 0 };
+			object.animationCache.animations[this.data.name].nextKey = { pos: 0, rot: 0, scl: 0 };
+			object.animationCache.animations[this.data.name].originalMatrix = object.matrix;
 
 		}
 
-		if ( object.animationCache[this.data.name] === undefined ) {
-
-			object.animationCache[this.data.name] = {};
-			object.animationCache[this.data.name].prevKey = { pos: 0, rot: 0, scl: 0 };
-			object.animationCache[this.data.name].nextKey = { pos: 0, rot: 0, scl: 0 };
-			object.animationCache[this.data.name].originalMatrix = object.matrix;
-
-		}
-
-		var animationCache = object.animationCache[this.data.name];
+		var animationCache = object.animationCache.animations[this.data.name];
 
 		// Get keys to match our current time
 
@@ -3503,6 +3515,23 @@ THREE.Animation.prototype.reset = function () {
 
 };
 
+THREE.Animation.prototype.resetBlendWeights = function () {
+
+	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
+
+		var object = this.hierarchy[ h ];
+
+		if ( object.animationCache !== undefined ) {
+
+			object.animationCache.blending.positionWeight = 0.0;
+			object.animationCache.blending.quaternionWeight = 0.0;
+			object.animationCache.blending.scaleWeight = 0.0;
+
+		}
+
+	}
+
+};
 
 THREE.Animation.prototype.update = (function(){
 
@@ -3566,22 +3595,31 @@ THREE.Animation.prototype.update = (function(){
 
 		var duration = this.data.length;
 
-		if ( this.loop === true && this.currentTime > duration ) {
+		if ( this.currentTime > duration || this.currentTime < 0 ) {
 
-			this.currentTime %= duration;
-			this.reset();
+			if ( this.loop ) {
 
-		} else if ( this.loop === false && this.currentTime > duration ) {
+				this.currentTime %= duration;
 
-			this.stop();
-			return;
+				if ( this.currentTime < 0 )
+					this.currentTime += duration;
+
+				this.reset();
+
+			} else {
+
+				this.stop();
+				return;
+
+			}
 
 		}
 
 		for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
 			var object = this.hierarchy[ h ];
-			var animationCache = object.animationCache[this.data.name];
+			var animationCache = object.animationCache.animations[this.data.name];
+			var blending = object.animationCache.blending;
 
 			// loop through pos/rot/scl
 
@@ -3593,14 +3631,8 @@ THREE.Animation.prototype.update = (function(){
 				var prevKey = animationCache.prevKey[ type ];
 				var nextKey = animationCache.nextKey[ type ];
 
-				// START_VEROLD_MOD - robust keyframes
-				if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
-
-					continue;
-
-				}
-				// END_VEROLD_MOD - robust keyframes
-				if ( nextKey.time <= this.currentTime ) {
+				if ( ( this.timeScale > 0 && nextKey.time <= this.currentTime ) ||
+					( this.timeScale < 0 && prevKey.time >= this.currentTime ) ) {
 
 					prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 					nextKey = this.getNextKeyWith( type, h, 1 );
@@ -3639,17 +3671,9 @@ THREE.Animation.prototype.update = (function(){
 						newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 						// blend
-						if ( object instanceof THREE.Bone ) {
-
-							var proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
-							object.position.lerp( newVector, proportionalWeight );
-							object.accumulatedPosWeight += this.weight;
-
-						} else {
-
-							object.position.copy( newVector );
-
-						}
+						var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
+						object.position.lerp( newVector, proportionalWeight );
+						blending.positionWeight += this.weight;
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
 								this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
@@ -3662,14 +3686,8 @@ THREE.Animation.prototype.update = (function(){
 						scale = scale * 0.33 + 0.33;
 
 						var currentPoint = interpolateCatmullRom( points, scale );
-						var proportionalWeight = 1;
-						
-						if ( object instanceof THREE.Bone ) {
-
-							proportionalWeight = this.weight / ( this.weight + object.accumulatedPosWeight );
-							object.accumulatedPosWeight += this.weight;
-
-						}
+						var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
+						blending.positionWeight += this.weight;
 
 						// blend
 
@@ -3700,20 +3718,16 @@ THREE.Animation.prototype.update = (function(){
 					THREE.Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
 
 					// Avoid paying the cost of an additional slerp if we don't have to
-					if ( ! ( object instanceof THREE.Bone ) ) {
+					if ( blending.quaternionWeight === 0 ) {
 
 						object.quaternion.copy(newQuat);
-
-					} else if ( object.accumulatedRotWeight === 0 ) {
-
-						object.quaternion.copy(newQuat);
-						object.accumulatedRotWeight = this.weight;
+						blending.quaternionWeight = this.weight;
 
 					} else {
 
-						var proportionalWeight = this.weight / ( this.weight + object.accumulatedRotWeight );
+						var proportionalWeight = this.weight / ( this.weight + blending.quaternionWeight );
 						THREE.Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
-						object.accumulatedRotWeight += this.weight;
+						blending.quaternionWeight += this.weight;
 
 					}
 
@@ -3723,17 +3737,9 @@ THREE.Animation.prototype.update = (function(){
 					newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 					newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
-					if ( object instanceof THREE.Bone ) {
-
-						var proportionalWeight = this.weight / ( this.weight + object.accumulatedSclWeight);
-						object.scale.lerp( newVector, proportionalWeight );
-						object.accumulatedSclWeight += this.weight;
-
-					} else {
-
-						object.scale.copy( newVector );
-
-					}
+					var proportionalWeight = this.weight / ( this.weight + blending.scaleWeight );
+					object.scale.lerp( newVector, proportionalWeight );
+					blending.scaleWeight += this.weight;
 
 				}
 
@@ -4176,6 +4182,8 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 	THREE.Geometry.call( this );
 
+	this.type = 'BoxGeometry';
+
 	this.parameters = {
 		width: width,
 		height: height,
@@ -4302,6 +4310,8 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 	THREE.Geometry.call( this );
 
+	this.type = 'CircleGeometry';
+
 	this.parameters = {
 		radius: radius,
 		segments: segments,
@@ -4360,7 +4370,7 @@ THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
-	console.warn( 'THEE.CubeGeometry has been renamed to THREE.BoxGeometry.' );
+	console.warn( 'THREE.CubeGeometry has been renamed to THREE.BoxGeometry.' );
 	return new THREE.BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
 
  };
@@ -4374,6 +4384,8 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'CylinderGeometry';
 
 	this.parameters = {
 		radiusTop: radiusTop,
@@ -4569,6 +4581,8 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 	}
 
 	THREE.Geometry.call( this );
+
+	this.type = 'ExtrudeGeometry';
 
 	shapes = shapes instanceof Array ? shapes : [ shapes ];
 
@@ -5257,6 +5271,8 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	THREE.Geometry.call( this );
 
+	this.type = 'ShapeGeometry';
+
 	if ( shapes instanceof Array === false ) shapes = [ shapes ];
 
 	this.addShapeList( shapes, options );
@@ -5383,9 +5399,19 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 // phiStart - the starting radian
 // phiLength - the radian (0 to 2*PI) range of the lathed section
 //    2*pi is a closed lathe, less than 2PI is a portion.
+
 THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'LatheGeometry';
+
+	this.parameters = {
+		points: points,
+		segments: segments,
+		phiStart: phiStart,
+		phiLength: phiLength
+	};
 
 	segments = segments || 12;
 	phiStart = phiStart || 0;
@@ -5478,6 +5504,8 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	THREE.Geometry.call( this );
 
+	this.type = 'PlaneGeometry';
+	
 	this.parameters = {
 		width: width,
 		height: height,
@@ -5560,6 +5588,17 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 
 	THREE.Geometry.call( this );
 
+	this.type = 'RingGeometry';
+
+	this.parameters = {
+		innerRadius: innerRadius,
+		outerRadius: outerRadius,
+		thetaSegments: thetaSegments,
+		phiSegments: phiSegments,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
+	};
+
 	innerRadius = innerRadius || 0;
 	outerRadius = outerRadius || 50;
 
@@ -5633,6 +5672,8 @@ THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'SphereGeometry';
 
 	this.parameters = {
 		radius: radius,
@@ -5795,6 +5836,8 @@ THREE.TextGeometry = function ( text, parameters ) {
 
 	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
+	this.type = 'TextGeometry';
+
 };
 
 THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
@@ -5810,6 +5853,8 @@ THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
 THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'TorusGeometry';
 
 	this.parameters = {
 		radius: radius,
@@ -5888,6 +5933,8 @@ THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegments, p, q, heightScale ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'TorusKnotGeometry';
 
 	this.parameters = {
 		radius: radius,
@@ -6009,6 +6056,8 @@ THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'TubeGeometry';
 
 	this.parameters = {
 		path: path,
@@ -6286,6 +6335,15 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	THREE.Geometry.call( this );
 
+	this.type = 'PolyhedronGeometry';
+
+	this.parameters = {
+		vertices: vertices,
+		indices: indices,
+		radius: radius,
+		detail: detail
+	};
+
 	radius = radius || 1;
 	detail = detail || 0;
 
@@ -6511,11 +6569,6 @@ THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.IcosahedronGeometry = function ( radius, detail ) {
 
-	this.parameters = {
-		radius: radius,
-		detail: detail
-	};
-
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
 	var vertices = [
@@ -6533,6 +6586,12 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
+	this.type = 'IcosahedronGeometry';
+
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
 };
 
 THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
@@ -6559,6 +6618,13 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 	];
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+
+	this.type = 'OctahedronGeometry';
+
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
 };
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
@@ -6581,6 +6647,13 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
+	this.type = 'TetrahedronGeometry';
+
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
+
 };
 
 THREE.TetrahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
@@ -6599,6 +6672,14 @@ THREE.TetrahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 	THREE.Geometry.call( this );
+
+	this.type = 'ParametricGeometry';
+
+	this.parameters = {
+		func: func,
+		slices: slices,
+		stacks: stacks
+	};
 
 	var verts = this.vertices;
 	var faces = this.faces;
@@ -7273,7 +7354,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	}
 
-	geometry.addAttribute( 'position', new THREE.Float32Attribute( numEdges * 2 * 3, 3 ) );
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( numEdges * 2 * 3 ), 3 ) );
 
 	var coords = geometry.attributes.position.array;
 
@@ -8848,6 +8929,7 @@ THREE.ShadowMapPlugin = function () {
 
 	var _gl,
 	_renderer,
+	_lights, _webglObjects, _webglObjectsImmediate,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
@@ -8860,10 +8942,14 @@ THREE.ShadowMapPlugin = function () {
 	
 	_renderList = [];
 
-	this.init = function ( renderer ) {
+	this.init = function ( renderer, lights, webglObjects, webglObjectsImmediate ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+		_lights = lights;
+
+		_webglObjects = webglObjects;
+		_webglObjectsImmediate = webglObjectsImmediate;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -8938,9 +9024,9 @@ THREE.ShadowMapPlugin = function () {
 		// 	- skip lights that are not casting shadows
 		//	- create virtual lights for cascaded shadow maps
 
-		for ( i = 0, il = scene.__lights.length; i < il; i ++ ) {
+		for ( i = 0, il = _lights.length; i < il; i ++ ) {
 
-			light = scene.__lights[ i ];
+			light = _lights[ i ];
 
 			if ( ! light.castShadow ) continue;
 
@@ -9137,12 +9223,12 @@ THREE.ShadowMapPlugin = function () {
 
 				if ( buffer instanceof THREE.BufferGeometry ) {
 					// START_VEROLD_MOD - materialIndex in offsets
-					_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object, webglObject.offsetIndices );
+					_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object, webglObject.offsetIndices );
 					// END_VEROLD_MOD - materialIndex in offsets
 
 				} else {
 
-					_renderer.renderBuffer( shadowCamera, scene.__lights, fog, material, buffer, object );
+					_renderer.renderBuffer( shadowCamera, _lights, fog, material, buffer, object );
 
 				}
 
@@ -9150,18 +9236,16 @@ THREE.ShadowMapPlugin = function () {
 
 			// set matrices and render immediate objects
 
-			var renderList = scene.__webglObjectsImmediate;
+			for ( j = 0, jl = _webglObjectsImmediate.length; j < jl; j ++ ) {
 
-			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-				webglObject = renderList[ j ];
+				webglObject = _webglObjectsImmediate[ j ];
 				object = webglObject.object;
 
 				if ( object.visible && object.castShadow ) {
 
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
-					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
+					_renderer.renderImmediateObject( shadowCamera, _lights, fog, _depthMaterial, object );
 
 				}
 
@@ -9189,7 +9273,7 @@ THREE.ShadowMapPlugin = function () {
 		
 		if ( object.visible ) {
 	
-			var webglObjects = scene.__webglObjects[object.id];
+			var webglObjects = _webglObjects[object.id];
 	
 			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 		
@@ -9748,16 +9832,21 @@ THREE.DepthPassPlugin = function () {
 
 	var _gl,
 	_renderer,
+	_lights, _webglObjects, _webglObjectsImmediate,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_renderList = [];
 
-	this.init = function ( renderer ) {
+	this.init = function ( renderer, lights, webglObjects, webglObjectsImmediate ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+		_lights = lights;
+
+		_webglObjects = webglObjects;
+		_webglObjectsImmediate = webglObjectsImmediate;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -9862,12 +9951,12 @@ THREE.DepthPassPlugin = function () {
 
 			if ( buffer instanceof THREE.BufferGeometry ) {
 				// START_VEROLD_MOD - materialIndex in offsets
-				_renderer.renderBufferDirect( camera, scene.__lights, fog, material, buffer, object, webglObject.offsetIndices );
+				_renderer.renderBufferDirect( camera, _lights, fog, material, buffer, object, webglObject.offsetIndices );
 				// END_VEROLD_MOD - materialIndex in offsets
 
 			} else {
 
-				_renderer.renderBuffer( camera, scene.__lights, fog, material, buffer, object );
+				_renderer.renderBuffer( camera, _lights, fog, material, buffer, object );
 
 			}
 
@@ -9876,18 +9965,16 @@ THREE.DepthPassPlugin = function () {
 
 		// set matrices and render immediate objects
 
-		renderList = scene.__webglObjectsImmediate;
+		for ( j = 0, jl = _webglObjectsImmediate.length; j < jl; j ++ ) {
 
-		for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-			webglObject = renderList[ j ];
+			webglObject = _webglObjectsImmediate[ j ];
 			object = webglObject.object;
 
 			if ( object.visible ) {
 
 				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
-				_renderer.renderImmediateObject( camera, scene.__lights, fog, _depthMaterial, object );
+				_renderer.renderImmediateObject( camera, _lights, fog, _depthMaterial, object );
 
 			}
 
@@ -9907,7 +9994,7 @@ THREE.DepthPassPlugin = function () {
 		
 		if ( object.visible ) {
 	
-			var webglObjects = scene.__webglObjects[object.id];
+			var webglObjects = _webglObjects[object.id];
 	
 			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 		

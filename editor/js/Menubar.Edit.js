@@ -1,20 +1,23 @@
 Menubar.Edit = function ( editor ) {
 
-	// event handlers
+	var container = new UI.Panel();
+	container.setClass( 'menu' );
 
-	// function onUndoOptionClick () {
+	var title = new UI.Panel();
+	title.setClass( 'title' );
+	title.setTextContent( 'Edit' );
+	container.add( title );
 
-	// 	console.log( 'UNDO not implemented yet' );
+	var options = new UI.Panel();
+	options.setClass( 'options' );
+	container.add( options );
 
-	// }
+	// Clone
 
-	// function onRedoOptionClick () {
-
-	// 	console.log( 'REDO not implemented yet' );
-
-	// }
-
-	function onCloneOptionClick () {
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Clone' );
+	option.onClick( function () {
 
 		var object = editor.selected;
 
@@ -25,17 +28,33 @@ Menubar.Edit = function ( editor ) {
 		editor.addObject( object );
 		editor.select( object );
 
-	}
+	} );
+	options.add( option );
 
-	function onDeleteOptionClick () {
+	// Delete
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Delete' );
+	option.onClick( function () {
 
 		var parent = editor.selected.parent;
 		editor.removeObject( editor.selected );
 		editor.select( parent );
 
-	}
+	} );
+	options.add( option );
 
-	function onConvertOptionClick () {
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// Convert
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Convert' );
+	option.onClick( function () {
 
 		// convert to BufferGeometry
 		
@@ -53,9 +72,15 @@ Menubar.Edit = function ( editor ) {
 
 		}
 
-	}
+	} );
+	options.add( option );
 
-	function onFlattenOptionClick () {
+	// Flatten
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Flatten' );
+	option.onClick( function () {
 
 		var object = editor.selected;
 
@@ -66,7 +91,6 @@ Menubar.Edit = function ( editor ) {
 		var geometry = object.geometry.clone();
 		geometry.applyMatrix( object.matrix );
 
-
 		object.geometry = geometry;
 
 		object.position.set( 0, 0, 0 );
@@ -76,27 +100,9 @@ Menubar.Edit = function ( editor ) {
 		object.geometry.buffersNeedUpdate = true;
 		editor.signals.objectChanged.dispatch( object );
 
-	}
+	} );
+	options.add( option );
 
-	// configure menu contents
+	return container;
 
-	var createOption = UI.MenubarHelper.createOption;
-	var createDivider = UI.MenubarHelper.createDivider;
-
-	var menuConfig = [
-		// createOption( 'Undo', onUndoOptionClick ),
-		// createOption( 'Redo', onRedoOptionClick ),
-		// createDivider(),
-
-		createOption( 'Clone', onCloneOptionClick ),
-		createOption( 'Delete', onDeleteOptionClick ),
-		createDivider(),
-
-		createOption( 'Convert', onConvertOptionClick ),
-		createOption( 'Flatten', onFlattenOptionClick )
-	];
-
-	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
-
-	return UI.MenubarHelper.createMenuContainer( 'Edit', optionsPanel );
-}
+};

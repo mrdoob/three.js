@@ -1,70 +1,23 @@
 Menubar.File = function ( editor ) {
 
-	// helpers
-	
-	function exportGeometry ( exporterClass ) {
+	var container = new UI.Panel();
+	container.setClass( 'menu' );
 
-		var object = editor.selected;
-		var exporter = new exporterClass();
+	var title = new UI.Panel();
+	title.setClass( 'title' );
+	title.setTextContent( 'File' );
+	container.add( title );
 
-		var output = exporter.parse( object.geometry );
+	var options = new UI.Panel();
+	options.setClass( 'options' );
+	container.add( options );
 
-		if ( exporter instanceof THREE.BufferGeometryExporter ||
-		     exporter instanceof THREE.GeometryExporter ) {
+	// New
 
-			output = JSON.stringify( output, null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		}
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	};
-
-	function exportObject ( exporterClass ) {
-
-		var object = editor.selected;
-		var exporter = new exporterClass();
-
-		var output = JSON.stringify( exporter.parse( object ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	}
-
-	function exportScene ( exporterClass ) {
-
-		var exporter = new exporterClass();
-
-		var output = exporter.parse( editor.scene );
-
-		if ( exporter instanceof THREE.ObjectExporter ) {
-
-			output = JSON.stringify( output, null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		}
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	}
-
-	// event handlers
-
-	function onNewOptionClick () {
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'New' );
+	option.onClick( function () {
 
 		if ( confirm( 'Are you sure?' ) ) {
 
@@ -77,21 +30,43 @@ Menubar.File = function ( editor ) {
 
 		}
 
-	}
+	} );
+	options.add( option );
 
-	function onImportOptionClick () {
+	//
 
-		fileInput.click();
+	options.add( new UI.HorizontalRule() );
 
-	}
+	// Import
 
-	function onFileInputChange ( event ) {
+	var fileInput = document.createElement( 'input' );
+	fileInput.type = 'file';
+	fileInput.addEventListener( 'change', function ( event ) {
 
 		editor.loader.loadFile( fileInput.files[ 0 ] );
 
-	}
+	} );
 
-	function onExportGeometryOptionClick () {
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Import' );
+	option.onClick( function () {
+
+		fileInput.click();
+
+	} );
+	options.add( option );
+
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// Export Geometry
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export Geometry' );
+	option.onClick( function () {
 		
 		var object = editor.selected;
 
@@ -111,76 +86,145 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		var output = geometry.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-			exportGeometry( THREE.BufferGeometryExporter );
+		exportString( output );
 
-		} else if ( geometry instanceof THREE.Geometry ) {
+	} );
+	options.add( option );
 
-			exportGeometry( THREE.GeometryExporter );
+	// Export Object
 
-		}
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export Object' );
+	option.onClick( function () {
 
-	}
+		var object = editor.selected;
 
-	function onExportObjectOptionClick () {
-
-		if ( editor.selected === null ) {
+		if ( object === null ) {
 
 			alert( 'No object selected' );
 			return;
 
 		}
 
-		exportObject( THREE.ObjectExporter );
+		var output = object.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-	}
+		exportString( output );
 
-	function onExportSceneOptionClick () {
+	} );
+	options.add( option );
 
-		exportScene( THREE.ObjectExporter );
+	// Export Scene
 
-	}
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export Scene' );
+	option.onClick( function () {
 
-	function onExportOBJOptionClick () {
+		var output = editor.scene.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportGeometry( THREE.OBJExporter );
+		exportString( output );
 
-	}
+	} );
+	options.add( option );
 
-	function onExportSTLOptionClick () {
+	// Export OBJ
 
-		exportScene( THREE.STLExporter );
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export OBJ' );
+	option.onClick( function () {
 
-	}
+		var object = editor.selected;
 
-	// create file input element for scene import
+		if ( object === null ) {
 
-	var fileInput = document.createElement( 'input' );
-	fileInput.type = 'file';
-	fileInput.addEventListener( 'change', onFileInputChange);
+			alert( 'No object selected.' );
+			return;
 
-	// configure menu contents
+		}
 
-	var createOption = UI.MenubarHelper.createOption;
-	var createDivider = UI.MenubarHelper.createDivider;
-	
-	var menuConfig = [
-		createOption( 'New', onNewOptionClick ),
-		createDivider(),
+		var geometry = object.geometry;
 
-		createOption( 'Import', onImportOptionClick ),
-		createDivider(),
+		if ( geometry === undefined ) {
 
-		createOption( 'Export Geometry', onExportGeometryOptionClick ),
-		createOption( 'Export Object', onExportObjectOptionClick ),
-		createOption( 'Export Scene', onExportSceneOptionClick ),
-		createOption( 'Export OBJ', onExportOBJOptionClick ),
-		createOption( 'Export STL', onExportSTLOptionClick )
-	];
+			alert( 'The selected object doesn\'t have geometry.' );
+			return;
 
-	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+		}
 
-	return UI.MenubarHelper.createMenuContainer( 'File', optionsPanel );
+		var exporter = new OBJExporter();
 
-}
+		exportString( exporter.parse( geometry ) );
+
+	} );
+	options.add( option );
+
+	// Export STL
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export STL' );
+	option.onClick( function () {
+
+		var exporter = new STLExporter();
+
+		exportString( exporter.parse( editor.scene ) );
+
+	} );
+	options.add( option );
+
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	/*
+
+	// Test
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Test' );
+	option.onClick( function () {
+
+		var text = new UI.Text( 'blah' );
+		editor.showDialog( text );
+
+	} );
+	options.add( option );
+	*/
+
+	// Publish
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish' );
+	option.onClick( function () {
+
+	} );
+	options.add( option );
+
+
+	//
+
+	var exportString = function ( output ) {
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	};
+
+	return container;
+
+};

@@ -4,15 +4,21 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+THREE.Matrix3 = function () {
 
-	this.elements = new Float32Array( 9 );
+	this.elements = new Float32Array( [
 
-	var te = this.elements;
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1
 
-	te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 3 ] = n12 || 0; te[ 6 ] = n13 || 0;
-	te[ 1 ] = n21 || 0; te[ 4 ] = ( n22 !== undefined ) ? n22 : 1; te[ 7 ] = n23 || 0;
-	te[ 2 ] = n31 || 0; te[ 5 ] = n32 || 0; te[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
+	] );
+
+	if ( arguments.length > 0 ) {
+
+		console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+
+	}
 
 };
 
@@ -259,15 +265,7 @@ THREE.Matrix3.prototype = {
 
 	clone: function () {
 
-		var te = this.elements;
-
-		return new THREE.Matrix3(
-
-			te[ 0 ], te[ 3 ], te[ 6 ],
-			te[ 1 ], te[ 4 ], te[ 7 ],
-			te[ 2 ], te[ 5 ], te[ 8 ]
-
-		);
+		return new THREE.Matrix3().fromArray( this.elements );
 
 	}
 

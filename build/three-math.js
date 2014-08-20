@@ -976,6 +976,9 @@ THREE.Quaternion.prototype = {
 
 	slerp: function ( qb, t ) {
 
+		if ( t === 0 ) return this;
+		if ( t === 1 ) return this.copy( qb );
+
 		var x = this._x, y = this._y, z = this._z, w = this._w;
 
 		// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
@@ -3719,17 +3722,37 @@ THREE.Box3.prototype = {
 
 			object.traverse( function ( node ) {
 
-				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+				var geometry = node.geometry;
 
-					var vertices = node.geometry.vertices;
+				if ( geometry !== undefined ) {
 
-					for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+					if ( geometry instanceof THREE.Geometry ) {
 
-						v1.copy( vertices[ i ] );
+						var vertices = geometry.vertices;
 
-						v1.applyMatrix4( node.matrixWorld );
+						for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
-						scope.expandByPoint( v1 );
+							v1.copy( vertices[ i ] );
+
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
+
+					} else if ( geometry instanceof THREE.BufferGeometry && geometry.attributes[ 'position' ] !== undefined ) {
+
+						var positions = geometry.attributes[ 'position' ].array;
+
+						for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+
+							v1.applyMatrix4( node.matrixWorld );
+
+							scope.expandByPoint( v1 );
+
+						}
 
 					}
 
@@ -3989,15 +4012,21 @@ THREE.Box3.prototype = {
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+THREE.Matrix3 = function () {
 
-	this.elements = new Float32Array( 9 );
+	this.elements = new Float32Array( [
 
-	var te = this.elements;
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1
 
-	te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 3 ] = n12 || 0; te[ 6 ] = n13 || 0;
-	te[ 1 ] = n21 || 0; te[ 4 ] = ( n22 !== undefined ) ? n22 : 1; te[ 7 ] = n23 || 0;
-	te[ 2 ] = n31 || 0; te[ 5 ] = n32 || 0; te[ 8 ] = ( n33 !== undefined ) ? n33 : 1;
+	] );
+
+	if ( arguments.length > 0 ) {
+
+		console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+
+	}
 
 };
 
@@ -4244,15 +4273,7 @@ THREE.Matrix3.prototype = {
 
 	clone: function () {
 
-		var te = this.elements;
-
-		return new THREE.Matrix3(
-
-			te[ 0 ], te[ 3 ], te[ 6 ],
-			te[ 1 ], te[ 4 ], te[ 7 ],
-			te[ 2 ], te[ 5 ], te[ 8 ]
-
-		);
+		return new THREE.Matrix3().fromArray( this.elements );
 
 	}
 
@@ -4273,20 +4294,22 @@ THREE.Matrix3.prototype = {
  * @author WestLangley / http://github.com/WestLangley
  */
 
+THREE.Matrix4 = function () {
 
-THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+	this.elements = new Float32Array( [
 
-	this.elements = new Float32Array( 16 );
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
 
-	// TODO: if n11 is undefined, then just set to identity, otherwise copy all other values into matrix
-	//   we should not support semi specification of Matrix4, it is just weird.
+	] );
 
-	var te = this.elements;
+	if ( arguments.length > 0 ) {
 
-	te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 4 ] = n12 || 0; te[ 8 ] = n13 || 0; te[ 12 ] = n14 || 0;
-	te[ 1 ] = n21 || 0; te[ 5 ] = ( n22 !== undefined ) ? n22 : 1; te[ 9 ] = n23 || 0; te[ 13 ] = n24 || 0;
-	te[ 2 ] = n31 || 0; te[ 6 ] = n32 || 0; te[ 10 ] = ( n33 !== undefined ) ? n33 : 1; te[ 14 ] = n34 || 0;
-	te[ 3 ] = n41 || 0; te[ 7 ] = n42 || 0; te[ 11 ] = n43 || 0; te[ 15 ] = ( n44 !== undefined ) ? n44 : 1;
+		console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
+
+	}
 
 };
 
@@ -4332,7 +4355,7 @@ THREE.Matrix4.prototype = {
 
 	extractPosition: function ( m ) {
 
-		console.warn( 'THREEMatrix4: .extractPosition() has been renamed to .copyPosition().' );
+		console.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
 		return this.copyPosition( m );
 
 	},
@@ -5216,16 +5239,7 @@ THREE.Matrix4.prototype = {
 
 	clone: function () {
 
-		var te = this.elements;
-
-		return new THREE.Matrix4(
-
-			te[ 0 ], te[ 4 ], te[ 8 ], te[ 12 ],
-			te[ 1 ], te[ 5 ], te[ 9 ], te[ 13 ],
-			te[ 2 ], te[ 6 ], te[ 10 ], te[ 14 ],
-			te[ 3 ], te[ 7 ], te[ 11 ], te[ 15 ]
-
-		);
+		return new THREE.Matrix4().fromArray( this.elements );
 
 	}
 

@@ -8,6 +8,8 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	THREE.Camera.call( this );
 
+	this.type = 'PerspectiveCamera';
+
 	this.fov = fov !== undefined ? fov : 50;
 	this.aspect = aspect !== undefined ? aspect : 1;
 	this.near = near !== undefined ? near : 0.1;

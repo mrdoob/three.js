@@ -45,6 +45,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;		
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
+		if ( json.shading !== undefined ) material.shading = json.shading;
 		if ( json.blending !== undefined ) material.blending = json.blending;
 		if ( json.side !== undefined ) material.side = json.side;
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;

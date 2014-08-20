@@ -18,6 +18,8 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 
 	THREE.Material.call( this, parameters );
 
+	this.type = 'MeshNormalMaterial';
+
 	this.shading = THREE.FlatShading;
 
 	this.wireframe = false;

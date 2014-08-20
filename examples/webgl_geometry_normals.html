@@ -212,11 +212,11 @@
 
 				}
 
+				group = new THREE.Group();
+				scene.add( group );
 
-				group = new THREE.Object3D();
 				var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } ) );
 				group.add( mesh );
-				scene.add( group );
 
 				var fvNames = [ 'a', 'b', 'c', 'd' ];
 

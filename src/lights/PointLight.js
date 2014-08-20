@@ -6,6 +6,8 @@ THREE.PointLight = function ( color, intensity, distance ) {
 
 	THREE.Light.call( this, color );
 
+	this.type = 'PointLight';
+
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
 

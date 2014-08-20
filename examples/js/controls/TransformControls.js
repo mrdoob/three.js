@@ -568,6 +568,7 @@
 		var _plane = "XY";
 
 		var changeEvent = { type: "change" };
+		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
 		var projector = new THREE.Projector();
@@ -724,15 +725,17 @@
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
+			var axis = null;
+
 			if ( intersect ) {
 
-				scope.axis = intersect.object.name;
-				scope.update();
-				scope.dispatchEvent( changeEvent );
+				axis = intersect.object.name;
 
-			} else if ( scope.axis !== null ) {
+			}
 
-				scope.axis = null;
+			if ( scope.axis !== axis ) {
+
+				scope.axis = axis;
 				scope.update();
 				scope.dispatchEvent( changeEvent );
 
@@ -948,7 +951,7 @@
 			}
 
 			scope.update();
-			scope.dispatchEvent( changeEvent );
+			scope.dispatchEvent( objectChangeEvent );
 
 		}
 
