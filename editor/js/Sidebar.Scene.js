@@ -3,6 +3,12 @@ Sidebar.Scene = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/scene/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/scene/collapsed', boolean );
+
+	} );
 
 	container.addStatic( new UI.Text( 'SCENE' ) );
 	container.add( new UI.Break() );

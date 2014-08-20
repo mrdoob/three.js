@@ -21,7 +21,12 @@ Sidebar.Material = function ( editor ) {
 	};
 
 	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( true );
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/material/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/material/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 	container.dom.classList.add( 'Material' );
 

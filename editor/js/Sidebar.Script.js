@@ -3,7 +3,12 @@ Sidebar.Script = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( true );
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/script/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/script/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 
 	container.addStatic( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );

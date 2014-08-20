@@ -3,7 +3,12 @@ Sidebar.Geometry = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( true );
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/geometry/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/geometry/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 
 	var geometryType = new UI.Text().setTextTransform( 'uppercase' );

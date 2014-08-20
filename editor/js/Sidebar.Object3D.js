@@ -3,6 +3,12 @@ Sidebar.Object3D = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/object3d/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/object3d/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );

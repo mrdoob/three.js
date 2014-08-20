@@ -6,7 +6,12 @@ Sidebar.Animation = function ( editor ) {
 	var possibleAnimations = {};
 
 	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( true );
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/animation/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/animation/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 
 	container.addStatic( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );

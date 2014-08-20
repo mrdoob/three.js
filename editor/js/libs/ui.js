@@ -269,19 +269,31 @@ UI.CollapsiblePanel.prototype.expand = function() {
 
 };
 
-UI.CollapsiblePanel.prototype.setCollapsed = function( setCollapsed ) {
+UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
 
-	if ( setCollapsed ) {
+	if ( boolean ) {
 
-		this.dom.classList.add('collapsed');
+		this.dom.classList.add( 'collapsed' );
 
 	} else {
 
-		this.dom.classList.remove('collapsed');
+		this.dom.classList.remove( 'collapsed' );
 
 	}
 
-	this.isCollapsed = setCollapsed;
+	this.isCollapsed = boolean;
+
+	if ( this.onCollapsedChangeCallback !== undefined ) {
+
+		this.onCollapsedChangeCallback( boolean );
+
+	}
+
+};
+
+UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
+
+	this.onCollapsedChangeCallback = callback;
 
 };
 

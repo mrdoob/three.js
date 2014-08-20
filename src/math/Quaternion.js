@@ -400,7 +400,6 @@ THREE.Quaternion.prototype = {
 	slerp: function ( qb, t ) {
 
 		if ( t === 0 ) return this;
-
 		if ( t === 1 ) return this.copy( qb );
 
 		var x = this._x, y = this._y, z = this._z, w = this._w;
