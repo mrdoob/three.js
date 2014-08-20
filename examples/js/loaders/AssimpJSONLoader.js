@@ -87,7 +87,7 @@ THREE.AssimpJSONLoader.prototype = {
 		// read texture coordinates - three.js attaches them to its faces
 		json.texturecoords = json.texturecoords || [];
 		for(i = 0, e = json.texturecoords.length; i < e; ++i) {
-
+			//note: does it really make sense to have this function def inside the for here? is it a closure?
 			function convertTextureCoords(in_uv, out_faces, out_vertex_uvs) {
 				var i, e, face, a, b, c;
 
@@ -104,7 +104,12 @@ THREE.AssimpJSONLoader.prototype = {
 				}
 			}
 
-			convertTextureCoords(json.texturecoords[i], geometry.faces, geometry.faceVertexUvs[i]);
+                        var uvs = geometry.faceVertexUvs[i];
+                        if (!uvs) {
+                            console.log("no uvs in: " + geometry + " at " + i);
+                        } else {
+			    convertTextureCoords(json.texturecoords[i], geometry.faces, geometry.faceVertexUvs[i]);
+                        }
 		}
 
 		// read normals - three.js also attaches them to its faces
