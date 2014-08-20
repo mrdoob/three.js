@@ -102,10 +102,12 @@ THREE.Line3.prototype = {
 
 	},
 
-	applyMatrix4: function ( matrix ) {
+	applyMatrix4: function ( matrix, matrix2 ) {
+
+		var matrix2 = ( matrix2 instanceof THREE.Matrix4 ) ? matrix2 : matrix;
 
 		this.start.applyMatrix4( matrix );
-		this.end.applyMatrix4( matrix );
+		this.end.applyMatrix4( matrix2 );
 
 		return this;
 
