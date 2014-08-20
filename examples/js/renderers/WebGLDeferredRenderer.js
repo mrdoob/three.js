@@ -7,13 +7,22 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var _this = this;
 
-	var fullWidth = parameters.width !== undefined ? parameters.width : 800;
-	var fullHeight = parameters.height !== undefined ? parameters.height : 600;
+	var pixelWidth = parameters.width !== undefined ? parameters.width : 800;
+	var pixelHeight = parameters.height !== undefined ? parameters.height : 600;
 	var currentScale = parameters.scale !== undefined ? parameters.scale : 1;
+    
+	var devicePixelRatio = parameters.devicePixelRatio !== undefined
+		? parameters.devicePixelRatio
+			: self.devicePixelRatio !== undefined
+				? self.devicePixelRatio
+				: 1;
 
+	var fullWidth = pixelWidth * devicePixelRatio;
+	var fullHeight = pixelHeight * devicePixelRatio;
+	
 	var scaledWidth = Math.floor( currentScale * fullWidth );
 	var scaledHeight = Math.floor( currentScale * fullHeight );
-
+	
 	var brightness = parameters.brightness !== undefined ? parameters.brightness : 1;
 	var tonemapping = parameters.tonemapping !== undefined ? parameters.tonemapping : THREE.SimpleOperator;
 	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
@@ -22,7 +31,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	if ( this.renderer === undefined ) {
 
-		this.renderer = new THREE.WebGLRenderer( { antialias: false } );
+		this.renderer = new THREE.WebGLRenderer( { antialias: false, devicePixelRatio : devicePixelRatio } );
 		this.renderer.setSize( fullWidth, fullHeight );
 		this.renderer.setClearColor( 0x000000, 0 );
 
