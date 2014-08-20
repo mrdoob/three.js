@@ -105,9 +105,7 @@ THREE.AssimpJSONLoader.prototype = {
 			}
 
 			var uvs = geometry.faceVertexUvs[i];
-			if (!uvs) {
-			    console.log("no uvs in: " + geometry + " at " + i);
-			} else {
+			if (uvs) {
 			    convertTextureCoords(json.texturecoords[i], geometry.faces, uvs);
 			}
 		}
