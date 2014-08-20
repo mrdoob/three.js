@@ -31,7 +31,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	if ( this.renderer === undefined ) {
 
-		this.renderer = new THREE.WebGLRenderer( { antialias: false } );
+		this.renderer = new THREE.WebGLRenderer( { antialias: false, devicePixelRatio : devicePixelRatio } );
 		this.renderer.setSize( fullWidth, fullHeight );
 		this.renderer.setClearColor( 0x000000, 0 );
 
