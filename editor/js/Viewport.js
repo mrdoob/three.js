@@ -255,10 +255,8 @@ var Viewport = function ( editor ) {
 
 		saveTimeout = setTimeout( function () {
 
-			editor.config.setKey( 'camera', {
-				position: camera.position.toArray(),
-				target: controls.center.toArray()
-			} );
+			editor.config.setKey( 'camera/position', camera.position.toArray() );
+			editor.config.setKey( 'camera/target', controls.center.toArray() );
 
 		}, 1000 );
 
