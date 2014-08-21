@@ -13,6 +13,9 @@ Menubar.Play = function ( editor ) {
 		player.play();
 
 		var popup = window.open( '', 'preview', 'width=800,height=600' );
+		popup.addEventListener( 'beforeunload', function () {
+			player.stop();
+		} );
 		popup.document.body.style.margin = 0;
 		popup.document.body.appendChild( player.dom );
 

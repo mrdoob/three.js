@@ -16,7 +16,7 @@ var Player = function ( json ) {
 
 		if ( child.script !== undefined ) {
 
-			child.script.compiled = new Function( 'object', 'scene', child.script.source );
+			child.script.compiled = new Function( 'scene', child.script.source ).bind( child );
 
 			scriptObjects.push( child );
 
@@ -35,10 +35,18 @@ var Player = function ( json ) {
 
 	};
 
+	var request;
+
 	var play = function () {
 
-		requestAnimationFrame( play );
+		request = requestAnimationFrame( play );
 		update();
+
+	};
+
+	var stop = function () {
+
+		cancelAnimationFrame( request );
 
 	};
 
@@ -47,7 +55,7 @@ var Player = function ( json ) {
 		for ( var i = 0; i < scriptObjects.length; i ++ ) {
 
 			var object = scriptObjects[ i ];
-			object.script.compiled( object, scene );
+			object.script.compiled( scene );
 
 		}
 
@@ -58,7 +66,8 @@ var Player = function ( json ) {
 	return {
 		dom: renderer.domElement,
 		setSize: setSize,
-		play: play
+		play: play,
+		stop: stop
 	}
 
 };
