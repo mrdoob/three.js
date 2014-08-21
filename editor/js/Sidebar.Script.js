@@ -24,8 +24,24 @@ Sidebar.Script = function ( editor ) {
 	scriptSource.onChange( function () {
 
 		var object = editor.selected;
+		var source = scriptSource.getValue();
 
-		object.script = new THREE.Script( scriptSource.getValue() );
+		try {
+
+			var script = new Function( 'scene', source ).bind( object.clone() );
+			script( new THREE.Scene() );
+
+			scriptSource.setBorderColor( '#ccc' );
+			scriptSource.setBackgroundColor( '' );
+
+		} catch ( error ) {
+
+			scriptSource.setBorderColor( '#f00' );
+			scriptSource.setBackgroundColor( 'rgba(255,0,0,0.25)' );
+
+		}
+
+		object.script = new THREE.Script( source );
 
 		editor.signals.objectChanged.dispatch( object );
 
