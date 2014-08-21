@@ -974,7 +974,6 @@ THREE.Quaternion.prototype = {
 	slerp: function ( qb, t ) {
 
 		if ( t === 0 ) return this;
-
 		if ( t === 1 ) return this.copy( qb );
 
 		var x = this._x, y = this._y, z = this._z, w = this._w;
@@ -11028,6 +11027,18 @@ THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
 
 THREE.GeometryIdCount = 0;
 
+// File:src/core/Script.js
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Script = function ( source ) {
+
+	this.uuid = THREE.Math.generateUUID();
+	this.source = source;
+
+};
 // File:src/cameras/Camera.js
 
 /**
