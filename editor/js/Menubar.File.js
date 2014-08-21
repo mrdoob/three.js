@@ -209,6 +209,14 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Publish' );
 	option.onClick( function () {
 
+		var preview = new Player( editor.scene.toJSON() );
+		preview.setSize( 800, 600 );
+		preview.update();
+
+		var popup = window.open( '', 'preview', 'width=800,height=600' );
+		popup.document.body.style.margin = 0;
+		popup.document.body.appendChild( preview.dom );
+
 	} );
 	options.add( option );
 
