@@ -30228,6 +30228,13 @@ THREE.Animation.prototype.update = (function(){
 				var prevKey = animationCache.prevKey[ type ];
 				var nextKey = animationCache.nextKey[ type ];
 
+				// START_VEROLD_MOD - robust keyframes
+				if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
+
+					continue;
+
+				}
+				// END_VEROLD_MOD - robust keyframes
 				if ( ( this.timeScale > 0 && nextKey.time <= this.currentTime ) ||
 					( this.timeScale < 0 && prevKey.time >= this.currentTime ) ) {
 
