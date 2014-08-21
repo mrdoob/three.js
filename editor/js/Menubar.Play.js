@@ -1,25 +1,30 @@
 Menubar.Play = function ( editor ) {
 
+	var signals = editor.signals;
+
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 
-	var player = new Player();
+	var isPlaying = false;
 
 	var title = new UI.Panel();
 	title.setClass( 'title' );
 	title.setTextContent( 'Play' );
 	title.onClick( function () {
 
-		player.load( editor.scene.toJSON() );
-		player.setSize( 800, 600 );
-		player.play();
+		if ( isPlaying === false ) {
 
-		var popup = window.open( '', 'preview', 'width=800,height=600' );
-		popup.addEventListener( 'beforeunload', function () {
-			player.stop();
-		} );
-		popup.document.body.style.margin = 0;
-		popup.document.body.appendChild( player.dom );
+			isPlaying = true;
+			title.setTextContent( 'Stop' );
+			signals.startPlayer.dispatch( editor.scene.toJSON() );
+
+		} else {
+
+			isPlaying = false;
+			title.setTextContent( 'Play' );
+			signals.stopPlayer.dispatch();
+
+		}
 
 	} );
 	container.add( title );

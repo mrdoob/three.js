@@ -26,7 +26,7 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
+	var camera = editor.camera;
 	camera.position.fromArray( editor.config.getKey( 'camera/position' ) );
 	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera/target' ) ) );
 

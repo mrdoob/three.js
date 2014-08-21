@@ -1,21 +1,33 @@
-var Player = function () {
+var Player = function ( editor ) {
 
-	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 1000 );
-	camera.position.set( 500, 250, 500 );
-	camera.lookAt( new THREE.Vector3() );
+	var signals = editor.signals;
 
-	var loader = new THREE.ObjectLoader();
-	var scene = new THREE.Scene();
+	var container = new UI.Panel();
+	container.setPosition( 'absolute' );
+	container.setDisplay( 'none' );
 
+	//
+
+	var camera, scene, renderer;
 	var scripts;
-
-	var renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 	//
 
 	var load = function ( json ) {
 
-		scene = loader.parse( json );
+		if ( renderer !== undefined ) {
+
+			container.dom.removeChild( renderer.domElement );
+
+		}
+
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		container.dom.appendChild( renderer.domElement );
+
+		camera = editor.camera.clone();
+
+		scene = new THREE.ObjectLoader().parse( json );
 
 		//
 
@@ -39,7 +51,9 @@ var Player = function () {
 	var play = function () {
 
 		request = requestAnimationFrame( play );
+
 		update();
+		render();
 
 	};
 
@@ -49,12 +63,9 @@ var Player = function () {
 
 	};
 
-	var setSize = function ( width, height ) {
+	var render = function () {
 
-		camera.aspect = width / height;
-		camera.updateProjectionMatrix();
-
-		renderer.setSize( width, height );
+		renderer.render( scene, camera );
 
 	};
 
@@ -66,16 +77,27 @@ var Player = function () {
 
 		}
 
-		renderer.render( scene, camera );
+		render();
 
 	};
 
-	return {
-		dom: renderer.domElement,
-		load: load,
-		play: play,
-		stop: stop,
-		setSize: setSize
-	}
+	signals.startPlayer.add( function ( json ) {
+
+		container.setDisplay( '' );
+
+		load( json );
+		play();
+
+	} );
+
+	signals.stopPlayer.add( function () {
+
+		container.setDisplay( 'none' );
+
+		stop();
+
+	} );
+
+	return container;
 
 };

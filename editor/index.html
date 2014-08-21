@@ -86,6 +86,9 @@
 			var viewport = new Viewport( editor ).setId( 'viewport' );
 			document.body.appendChild( viewport.dom );
 
+			var player = new Player( editor ).setId( 'player' );
+			document.body.appendChild( player.dom );
+
 			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
 			document.body.appendChild( toolbar.dom );
 
