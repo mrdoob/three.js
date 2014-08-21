@@ -7712,6 +7712,7 @@ THREE.Object3D.prototype = {
 
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
+			if ( object.script !== undefined ) data.script = object.script.source;
 			if ( object.visible !== true ) data.visible = object.visible;
 
 			if ( object instanceof THREE.PerspectiveCamera ) {
@@ -7824,6 +7825,8 @@ THREE.Object3D.prototype = {
 		object.frustumCulled = this.frustumCulled;
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
+
+		if ( this.script !== undefined ) object.script = this.script.clone();
 
 		if ( recursive === true ) {
 
@@ -11039,6 +11042,18 @@ THREE.Script = function ( source ) {
 	this.source = source;
 
 };
+
+THREE.Script.prototype = {
+
+	constructor: THREE.Script,
+
+	clone: function () {
+
+		return new THREE.Script( this.source );
+
+	}
+
+}
 // File:src/cameras/Camera.js
 
 /**
@@ -13476,6 +13491,7 @@ THREE.ObjectLoader.prototype = {
 
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
+			if ( data.script !== undefined ) object.script = new THREE.Script( data.script );
 
 			if ( data.children !== undefined ) {
 
