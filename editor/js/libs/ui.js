@@ -843,9 +843,19 @@ UI.Number = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseFloat( dom.value );
+		var value = 0;
 
-		dom.value = isNaN( number ) === false ? number : 0;
+		try {
+
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
+
+		}
+
+		dom.value = parseFloat( value );
 
 	};
 
@@ -996,13 +1006,19 @@ UI.Integer = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseInt( dom.value );
+		var value = 0;
 
-		if ( isNaN( number ) === false ) {
+		try {
 
-			dom.value = number;
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
 
 		}
+
+		dom.value = parseInt( value );
 
 	};
 
