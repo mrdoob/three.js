@@ -577,6 +577,7 @@ THREE.Object3D.prototype = {
 
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
+			if ( object.script !== undefined ) data.script = object.script.source;
 			if ( object.visible !== true ) data.visible = object.visible;
 
 			if ( object instanceof THREE.PerspectiveCamera ) {
@@ -689,6 +690,8 @@ THREE.Object3D.prototype = {
 		object.frustumCulled = this.frustumCulled;
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
+
+		if ( this.script !== undefined ) object.script = this.script.clone();
 
 		if ( recursive === true ) {
 

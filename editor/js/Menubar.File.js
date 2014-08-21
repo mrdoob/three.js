@@ -211,7 +211,7 @@ Menubar.File = function ( editor ) {
 
 		var preview = new Player( editor.scene.toJSON() );
 		preview.setSize( 800, 600 );
-		preview.update();
+		preview.play();
 
 		var popup = window.open( '', 'preview', 'width=800,height=600' );
 		popup.document.body.style.margin = 0;

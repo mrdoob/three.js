@@ -17,11 +17,41 @@ Sidebar.Script = function ( editor ) {
 	var scriptsRow = new UI.Panel();
 	container.add( scriptsRow );
 
+	// source
+
+	var scriptSourceRow = new UI.Panel();
+	var scriptSource = new UI.TextArea().setWidth( '240px' ).setHeight( '180px' ).setColor( '#444' ).setFontSize( '12px' );
+	scriptSource.onChange( function () {
+
+		var object = editor.selected;
+
+		object.script = new THREE.Script( scriptSource.getValue() );
+
+		editor.signals.objectChanged.dispatch( object );
+
+	} );
+
+	scriptSourceRow.add( scriptSource );
+
+	container.add( scriptSourceRow );
+
+	//
+
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object !== null ) {
 
 			container.setDisplay( 'block' );
+
+			if ( object.script !== undefined ) {
+
+				scriptSource.setValue( object.script.source );
+
+			} else {
+
+				scriptSource.setValue( '' );
+
+			}
 
 		} else {
 
