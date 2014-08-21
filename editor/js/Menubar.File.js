@@ -182,11 +182,9 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	//
+	/*
 
 	options.add( new UI.HorizontalRule() );
-
-	/*
 
 	// Test
 
@@ -201,24 +199,6 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 	*/
-
-	// Publish
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Publish' );
-	option.onClick( function () {
-
-		var preview = new Player( editor.scene.toJSON() );
-		preview.setSize( 800, 600 );
-		preview.play();
-
-		var popup = window.open( '', 'preview', 'width=800,height=600' );
-		popup.document.body.style.margin = 0;
-		popup.document.body.appendChild( preview.dom );
-
-	} );
-	options.add( option );
 
 
 	//
