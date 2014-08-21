@@ -1,37 +1,36 @@
-var Player = function ( json ) {
+var Player = function () {
 
 	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 1000 );
 	camera.position.set( 500, 250, 500 );
 	camera.lookAt( new THREE.Vector3() );
 
-	var scene = new THREE.ObjectLoader().parse( json );
+	var loader = new THREE.ObjectLoader();
+	var scene = new THREE.Scene();
+
+	var scripts;
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 	//
 
-	var scriptObjects = [];
+	var load = function ( json ) {
 
-	scene.traverse( function ( child ) {
+		scene = loader.parse( json );
 
-		if ( child.script !== undefined ) {
+		//
 
-			child.script.compiled = new Function( 'scene', child.script.source ).bind( child );
+		scripts = [];
 
-			scriptObjects.push( child );
+		scene.traverse( function ( child ) {
 
-		}
+			if ( child.script !== undefined ) {
 
-	} );
+				var script = new Function( 'scene', child.script.source ).bind( child );
+				scripts.push( script );
 
-	//
+			}
 
-	var setSize = function ( width, height ) {
-
-		camera.aspect = width / height;
-		camera.updateProjectionMatrix();
-
-		renderer.setSize( width, height );
+		} );
 
 	};
 
@@ -50,12 +49,20 @@ var Player = function ( json ) {
 
 	};
 
+	var setSize = function ( width, height ) {
+
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( width, height );
+
+	};
+
 	var update = function () {
 
-		for ( var i = 0; i < scriptObjects.length; i ++ ) {
+		for ( var i = 0; i < scripts.length; i ++ ) {
 
-			var object = scriptObjects[ i ];
-			object.script.compiled( scene );
+			scripts[ i ]( scene );
 
 		}
 
@@ -65,9 +72,10 @@ var Player = function ( json ) {
 
 	return {
 		dom: renderer.domElement,
-		setSize: setSize,
+		load: load,
 		play: play,
-		stop: stop
+		stop: stop,
+		setSize: setSize
 	}
 
 };

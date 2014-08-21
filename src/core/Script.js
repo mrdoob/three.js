@@ -19,4 +19,4 @@ THREE.Script.prototype = {
 
 	}
 
-}
+};

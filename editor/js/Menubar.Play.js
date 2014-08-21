@@ -3,12 +3,14 @@ Menubar.Play = function ( editor ) {
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 
+	var player = new Player();
+
 	var title = new UI.Panel();
 	title.setClass( 'title' );
 	title.setTextContent( 'Play' );
 	title.onClick( function () {
 
-		var player = new Player( editor.scene.toJSON() );
+		player.load( editor.scene.toJSON() );
 		player.setSize( 800, 600 );
 		player.play();
 
