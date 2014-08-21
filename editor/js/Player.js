@@ -16,7 +16,7 @@ var Player = function ( json ) {
 
 		if ( child.script !== undefined ) {
 
-			child.script.compiled = new Function( 'object', child.script.source );
+			child.script.compiled = new Function( 'object', 'scene', child.script.source );
 
 			scriptObjects.push( child );
 
@@ -47,7 +47,7 @@ var Player = function ( json ) {
 		for ( var i = 0; i < scriptObjects.length; i ++ ) {
 
 			var object = scriptObjects[ i ];
-			object.script.compiled( object );
+			object.script.compiled( object, scene );
 
 		}
 
