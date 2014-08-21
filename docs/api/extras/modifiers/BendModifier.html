@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+		
+		<h1>[name]</h1>
+
+		<div class="desc">The Bend modifier lets you bend the current selection up to 90 degrees about a single axis, producing a uniform bend in an object's geometry.</div>
+
+
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.BoxGeometry( 1500, 800, 300, 200, 10, 4 );
+		var material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
+		var Cube = new THREE.Mesh( geometry, material );
+
+		scene.add( Cube );
+
+		var modifier = new THREE.BendModifier();
+		var direction = new THREE.Vector3( 0, 0, -1 );
+		var axis =  new THREE.Vector3( 1, 0, 0 );
+		var angle = Math.PI / 6;
+
+		modifier.set( direction, axis, angle ).modify( Cube );
+
+		</code>
+
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+
+
+		<h2>Methods</h2>
+
+
+		<h3>.set( [page:Vector3 direction], [page:Vector3 axis], [page:Float angle] )</h3>
+		<div>
+		direction -- longitudinal axis<br />
+		axis -- deformation direction<br />
+		angle -- deformation angle<br />
+		</div>
+
+		<h3>.modify( [page:Mesh mesh] )</h3>
+		<div>
+		mesh -- mesh to which deformation is applied
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/tree/master/examples/js/modifiers/modifiers.js examples/js/modifiers/modifiers.js]
+	</body>
+</html>

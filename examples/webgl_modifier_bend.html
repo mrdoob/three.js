@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - BendModifier</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#000;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - BendModifier example</br>
+			Click the mouse on the plane
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/modifiers/BendModifier.js"></script>
+		<script src="fonts/gentilis_bold.typeface.js"></script>
+
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var mouse = new THREE.Vector2();
+			var projector = new THREE.Projector();
+			var modifier = new THREE.BendModifier();
+			var Plane;
+
+			init();
+			animate();
+
+			function init() {
+
+				// camera
+
+				AddCamera(0, 0, 2000);
+
+				scene = new THREE.Scene();
+
+				// lights
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 100, 200 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, -100, -200 );
+				scene.add( light );
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xffffff );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+				// world
+
+				var geometry = new THREE.BoxGeometry( 1500, 800, 300, 200, 10, 4 );
+
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/house.jpg' );
+				Texture.wrapS = THREE.RepeatWrapping;
+				Texture.wrapT = THREE.RepeatWrapping;
+				Texture.repeat.set( 2, 1 );
+
+				var front_Texture = new THREE.ImageUtils.loadTexture( 'textures/house.jpg' );
+				front_Texture.wrapS = THREE.RepeatWrapping;
+				front_Texture.wrapT = THREE.RepeatWrapping;
+				front_Texture.repeat.set( 9, 1 );
+
+				var header_Texture = new THREE.ImageUtils.loadTexture( 'textures/house_top.jpg' );
+				header_Texture.wrapS = THREE.RepeatWrapping;
+				header_Texture.wrapT = THREE.RepeatWrapping;
+				header_Texture.repeat.set( 18, 4 );
+
+				var materials = [
+				new THREE.MeshLambertMaterial( { map: Texture } ),
+				new THREE.MeshLambertMaterial( { map: Texture } ),
+				new THREE.MeshLambertMaterial( { map: header_Texture } ),
+				new THREE.MeshLambertMaterial( { map: header_Texture } ),
+				new THREE.MeshLambertMaterial( { map: front_Texture } ),
+				new THREE.MeshLambertMaterial( { map: front_Texture } )
+							];
+
+				var material = new THREE.MeshFaceMaterial( materials );
+
+
+				var Cube = new THREE.Mesh( geometry, material );
+
+				var direction = new THREE.Vector3( 0, 0, -1 );
+				var axis =  new THREE.Vector3( 1, 0, 0 );
+				var angle = Math.PI / 6;
+
+				modifier.set( direction, axis, angle ).modify( Cube );
+
+				scene.add( Cube );
+
+				directionShow( Cube.position, axis, 1000 );
+				directionShow( Cube.position, direction, 1000 );
+
+
+				var geometry = new THREE.PlaneGeometry( 758, 600, 10, 10 );
+				var material = new THREE.MeshLambertMaterial( { map: new THREE.ImageUtils.loadTexture( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg' ), side: THREE.DoubleSide, transparent: false, opacity: 0.6  } );
+
+				Plane = new THREE.Mesh( geometry, material );
+				Plane.position.set( 0, -400, 500 ); Plane.rotation.x = -Math.PI/2;
+				scene.add( Plane );
+
+
+				var text = "THREE.BendModifier";
+				var textGeometry = new THREE.TextGeometry( text,
+					{
+						size: 128,
+						height: 50,
+						curveSegments: 4,
+						font: "gentilis",
+						weight: "bold",
+						style: "normal",
+						bevelEnabled: true,
+						bevelThickness: 2,
+						bevelSize: 1,
+					});
+
+							
+				var textMaterial = new THREE.MeshPhongMaterial( { color: 0x62254a } );
+				var text3D = new THREE.Mesh( textGeometry, textMaterial );
+				modifier.set( direction, axis, angle ).modify( text3D );
+	
+				textGeometry.computeBoundingBox();
+				var textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
+				text3D.position.set( -0.5 * textWidth, 500, 0 );
+				scene.add( text3D );
+
+
+				var geometry = new THREE.CylinderGeometry( 36, 36, 1240, 24, 24 );
+				var material = new THREE.MeshLambertMaterial( { color: 0x33CCFF, wireframe: false } );
+
+				var cylinder = new THREE.Mesh( geometry, material );
+				cylinder.position.set( 0, 750, 100 );
+				cylinder.rotation.z = Math.PI / 2;
+
+
+				var direction = new THREE.Vector3( 0, 0, -1 );
+				var axis =  new THREE.Vector3( 0, 1, 0 );
+				var angle = Math.PI / 4;
+
+				modifier.set( direction, axis, angle ).modify( cylinder );
+				scene.add( cylinder );
+
+
+
+				// test vertex normals
+				
+				var geometry = new THREE.BoxGeometry( 1300, 200, 100, 12, 4, 4 );
+				var material = new THREE.MeshBasicMaterial( { color: 0x00000f, wireframe: true } );
+				var Cube = new THREE.Mesh( geometry, material );
+
+				var direction = new THREE.Vector3( 0, 0, -1 );
+				var axis =  new THREE.Vector3( 1, 0, 0 );
+				var angle = Math.PI / 3;
+
+				modifier.set( direction, axis, angle ).modify( Cube );
+				Cube.position.set( 0, -700, 100 );
+				scene.add( Cube );
+
+				vnh = new THREE.VertexNormalsHelper( Cube, 20, 0xff0000, 2 );
+				scene.add( vnh );
+
+			}
+
+			function directionShow( origin, direction, length, text ) {
+
+				var material =  0x1a4780;
+				var arrow = new THREE.ArrowHelper( direction, origin, length, material, 100 );
+				scene.add( arrow );
+
+			}
+			
+			
+			function onDocumentMouseDown( event ) {
+
+				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+				projector.unprojectVector( vector, camera );
+
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+				var intersects = raycaster.intersectObject( Plane );
+
+				if ( intersects.length > 0 ) {
+
+					var direction = new THREE.Vector3( 0, 0, 1 );
+					var axis =  new THREE.Vector3( 1, 0, 0 );
+					var angle = Math.PI / 12;
+
+					modifier.set( direction, axis, angle ).modify( Plane );
+				}
+			}
+			
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+					requestAnimationFrame(animate);
+					render();
+
+			}
+
+			function render() {
+
+					vnh.update();
+					stats.update();
+					controls.update();
+					renderer.render(scene, camera);
+
+			}
+
+			function AddCamera( X, Y, Z ) {
+
+					camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+					camera.position.set( X, Y, Z );
+
+					controls = new THREE.TrackballControls( camera, container );
+					controls.rotateSpeed = 2;
+					controls.noZoom = false;
+					controls.zoomSpeed = 1.2;
+					controls.staticMoving = true;
+
+			}
+
+		</script>
+
+	</body>
+</html>

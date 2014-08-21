@@ -232,6 +232,10 @@ var list = {
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
 		],
 
+		"Extras / Modifiers": [
+			[ "BendModifier", "api/extras/modifiers/BendModifier" ]
+		],
+
 		"Extras / Renderers / Plugins": [
 			[ "DepthPassPlugin", "api/extras/renderers/plugins/DepthPassPlugin" ],
 			[ "LensFlarePlugin", "api/extras/renderers/plugins/LensFlarePlugin" ],
