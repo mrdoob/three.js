@@ -30,8 +30,8 @@ THREE.Geometry = function () {
 	this.skinIndices = [];
 
 	this.vertexGroups = [];
-	this.vertexGroupWeights = [];
-	this.vertexGroupIndices = [];
+	this.vertexGroupsWeights = [];
+	this.vertexGroupsIndices = [];
 
 	this.lineDistances = [];
 

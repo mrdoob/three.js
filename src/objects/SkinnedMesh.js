@@ -138,9 +138,9 @@ THREE.SkinnedMesh.prototype.normalizeVertexGroupWeights = function () {
 
 	if ( this.geometry instanceof THREE.Geometry ) {
 
-		for ( var i = 0; i < this.geometry.vertexGroupIndices.length; i ++ ) {
+		for ( var i = 0; i < this.geometry.vertexGroupsIndices.length; i ++ ) {
 
-			var sw = this.geometry.vertexGroupWeights[ i ];
+			var sw = this.geometry.vertexGroupsWeights[ i ];
 
 			var scale = 1.0 / sw.lengthManhattan();
 

@@ -111,6 +111,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 	parseModel( scale );
 
 	parseSkin();
+	parseVertexGroups();
 	parseMorphing( scale );
 
 	geometry.computeFaceNormals();
@@ -469,31 +470,31 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 	function parseVertexGroups() {
 		var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
 
-		if ( json.vertexGroupWeights ) {
+		if ( json.vertexGroupsWeights ) {
 
-			for ( var i = 0, l = json.vertexGroupWeights.length; i < l; i += influencesPerVertex ) {
+			for ( var i = 0, l = json.vertexGroupsWeights.length; i < l; i += influencesPerVertex ) {
 
-				var x =                               json.vertexGroupWeights[ i     ];
-				var y = ( influencesPerVertex > 1 ) ? json.vertexGroupWeights[ i + 1 ] : 0;
-				var z = ( influencesPerVertex > 2 ) ? json.vertexGroupWeights[ i + 2 ] : 0;
-				var w = ( influencesPerVertex > 3 ) ? json.vertexGroupWeights[ i + 3 ] : 0;
+				var x =                               json.vertexGroupsWeights[ i     ];
+				var y = ( influencesPerVertex > 1 ) ? json.vertexGroupsWeights[ i + 1 ] : 0;
+				var z = ( influencesPerVertex > 2 ) ? json.vertexGroupsWeights[ i + 2 ] : 0;
+				var w = ( influencesPerVertex > 3 ) ? json.vertexGroupsWeights[ i + 3 ] : 0;
 
-				geometry.vertexGroupWeights.push( new THREE.Vector4( x, y, z, w ) );
+				geometry.vertexGroupsWeights.push( new THREE.Vector4( x, y, z, w ) );
 
 			}
 
 		}
 
-		if ( json.vertexGroupIndices ) {
+		if ( json.vertexGroupsIndices ) {
 
-			for ( var i = 0, l = json.vertexGroupIndices.length; i < l; i += influencesPerVertex ) {
+			for ( var i = 0, l = json.vertexGroupsIndices.length; i < l; i += influencesPerVertex ) {
 
-				var a =                               json.vertexGroupIndices[ i     ];
-				var b = ( influencesPerVertex > 1 ) ? json.vertexGroupIndices[ i + 1 ] : 0;
-				var c = ( influencesPerVertex > 2 ) ? json.vertexGroupIndices[ i + 2 ] : 0;
-				var d = ( influencesPerVertex > 3 ) ? json.vertexGroupIndices[ i + 3 ] : 0;
+				var a =                               json.vertexGroupsIndices[ i     ];
+				var b = ( influencesPerVertex > 1 ) ? json.vertexGroupsIndices[ i + 1 ] : 0;
+				var c = ( influencesPerVertex > 2 ) ? json.vertexGroupsIndices[ i + 2 ] : 0;
+				var d = ( influencesPerVertex > 3 ) ? json.vertexGroupsIndices[ i + 3 ] : 0;
 
-				geometry.vertexGroupIndices.push( new THREE.Vector4( a, b, c, d ) );
+				geometry.vertexGroupsIndices.push( new THREE.Vector4( a, b, c, d ) );
 
 			}
 
