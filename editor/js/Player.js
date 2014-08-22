@@ -15,12 +15,6 @@ var Player = function ( editor ) {
 
 	var load = function ( json ) {
 
-		if ( renderer !== undefined ) {
-
-			container.dom.removeChild( renderer.domElement );
-
-		}
-
 		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 		container.dom.appendChild( renderer.domElement );
@@ -60,6 +54,12 @@ var Player = function ( editor ) {
 	var stop = function () {
 
 		cancelAnimationFrame( request );
+
+		if ( renderer !== undefined ) {
+
+			container.dom.removeChild( renderer.domElement );
+
+		}
 
 	};
 

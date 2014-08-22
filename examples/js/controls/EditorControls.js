@@ -183,6 +183,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	function onMouseWheel( event ) {
 
+		event.preventDefault();
+
 		// if ( scope.enabled === false ) return;
 
 		var delta = 0;
