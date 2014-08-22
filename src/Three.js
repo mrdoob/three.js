@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '68' };
+var THREE = { REVISION: '69dev' };
 
 // browserify support
 if ( typeof module === 'object' ) {

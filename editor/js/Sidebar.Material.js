@@ -202,6 +202,18 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialMapRow );
 
+	// alpha map
+
+	var materialAlphaMapRow = new UI.Panel();
+	var materialAlphaMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialAlphaMap = new UI.Texture().setColor( '#444' ).onChange( update );
+
+	materialAlphaMapRow.add( new UI.Text( 'Alpha Map' ).setWidth( '90px' ) );
+	materialAlphaMapRow.add( materialAlphaMapEnabled );
+	materialAlphaMapRow.add( materialAlphaMap );
+
+	container.add( materialAlphaMapRow );
+
 	// light map
 
 	var materialLightMapRow = new UI.Panel();
@@ -450,6 +462,30 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.alphaMap !== undefined ) {
+
+				var mapEnabled = materialAlphaMapEnabled.getValue() === true;
+
+				if ( objectHasUvs )  {
+
+					if ( geometry !== undefined ) {
+
+						geometry.buffersNeedUpdate = true;
+						geometry.uvsNeedUpdate = true;
+
+					}
+
+					material.alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
+					material.needsUpdate = true;
+
+				} else {
+
+					if ( mapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
 			/*
 			if ( material.lightMap !== undefined ) {
 
@@ -619,6 +655,7 @@ Sidebar.Material = function ( editor ) {
 			'vertexColors': materialVertexColorsRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
+			'alphaMap': materialAlphaMapRow,
 			'lightMap': materialLightMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
@@ -729,6 +766,13 @@ Sidebar.Material = function ( editor ) {
 
 				materialMapEnabled.setValue( material.map !== null );
 				materialMap.setValue( material.map );
+
+			}
+
+			if ( material.alphaMap !== undefined ) {
+
+				materialAlphaMapEnabled.setValue( material.alphaMap !== null );
+				materialAlphaMap.setValue( material.alphaMap );
 
 			}
 

@@ -44,7 +44,6 @@
 
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
-		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/Storage.js"></script>
@@ -96,7 +95,10 @@
 
 			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
 			document.body.appendChild( sidebar.dom );
-
+			
+			var dialog = new UI.Dialog();
+			document.body.appendChild( dialog.dom );
+			
 			//
 
 			editor.setTheme( editor.config.getKey( 'theme' ) );
@@ -148,6 +150,17 @@
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
+
+				var showDialog = function ( content ) {
+
+					dialog.clear();
+
+					dialog.add( content );
+					dialog.showModal();
+
+				};
+
+				signals.showDialog.add( showDialog );
 
 			} );
 

@@ -60,7 +60,7 @@
 
 	<script src="../build/three.min.js"></script>
 
-	<script src="js/controls/TrackballControls.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
 
 	<script src="js/shaders/CopyShader.js"></script>
 	<script src="js/shaders/FXAAShader.js"></script>
@@ -174,7 +174,7 @@
 
 			// CONTROLS
 
-			controls = new THREE.TrackballControls( camera, renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 			// STATS
 

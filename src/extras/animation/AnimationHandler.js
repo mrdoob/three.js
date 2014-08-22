@@ -193,6 +193,12 @@ THREE.AnimationHandler = {
 
 		for ( var i = 0; i < this.animations.length; i ++ ) {
 
+			this.animations[ i ].resetBlendWeights( );
+
+		}
+
+		for ( var i = 0; i < this.animations.length; i ++ ) {
+
 			this.animations[ i ].update( deltaTimeMS );
 
 		}

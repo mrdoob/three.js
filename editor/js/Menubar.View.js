@@ -1,37 +1,43 @@
 Menubar.View = function ( editor ) {
-	
-	var menuConfig,
-		optionsPanel,
-		createOption,
-		createDivider;
 
-	function onLightThemeOptionClick () {
+	var container = new UI.Panel();
+	container.setClass( 'menu' );
+
+	var title = new UI.Panel();
+	title.setClass( 'title' );
+	title.setTextContent( 'View' );
+	container.add( title );
+
+	var options = new UI.Panel();
+	options.setClass( 'options' );
+	container.add( options );
+
+	// Light theme
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Light theme' );
+	option.onClick( function () {
 
 		editor.setTheme( 'css/light.css' );
 		editor.config.setKey( 'theme', 'css/light.css' );
 
-	}
+	} );
+	options.add( option );
 
-	function onDarkThemeOptionClick () {
+	// Dark theme
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Dark theme' );
+	option.onClick( function () {
 
 		editor.setTheme( 'css/dark.css' );
 		editor.config.setKey( 'theme', 'css/dark.css' );
 
-	}
-	
+	} );
+	options.add( option );
 
-	// configure menu contents
+	return container;
 
-	createOption  = UI.MenubarHelper.createOption;
-	createDivider = UI.MenubarHelper.createDivider;
-
-	menuConfig    = [
-		createOption( 'Light theme', onLightThemeOptionClick ),
-		createOption( 'Dark theme', onDarkThemeOptionClick )
-	];
-
-	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
-
-	return UI.MenubarHelper.createMenuContainer( 'View', optionsPanel );
-
-}
+};

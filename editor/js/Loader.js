@@ -310,7 +310,17 @@ var Loader = function ( editor ) {
 
 		}
 
-		if ( data.metadata.type.toLowerCase() === 'geometry' ) {
+		if ( data.metadata.type === 'BufferGeometry' ) {
+
+			var loader = new THREE.BufferGeometryLoader();
+			var result = loader.parse( data );
+
+			var mesh = new THREE.Mesh( result );
+
+			editor.addObject( mesh );
+			editor.select( mesh );
+
+		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
 			var result = loader.parse( data );
