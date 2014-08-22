@@ -466,6 +466,43 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	};
 
+	function parseVertexGroups() {
+		var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
+
+		if ( json.vertexGroupWeights ) {
+
+			for ( var i = 0, l = json.vertexGroupWeights.length; i < l; i += influencesPerVertex ) {
+
+				var x =                               json.vertexGroupWeights[ i     ];
+				var y = ( influencesPerVertex > 1 ) ? json.vertexGroupWeights[ i + 1 ] : 0;
+				var z = ( influencesPerVertex > 2 ) ? json.vertexGroupWeights[ i + 2 ] : 0;
+				var w = ( influencesPerVertex > 3 ) ? json.vertexGroupWeights[ i + 3 ] : 0;
+
+				geometry.vertexGroupWeights.push( new THREE.Vector4( x, y, z, w ) );
+
+			}
+
+		}
+
+		if ( json.vertexGroupIndices ) {
+
+			for ( var i = 0, l = json.vertexGroupIndices.length; i < l; i += influencesPerVertex ) {
+
+				var a =                               json.vertexGroupIndices[ i     ];
+				var b = ( influencesPerVertex > 1 ) ? json.vertexGroupIndices[ i + 1 ] : 0;
+				var c = ( influencesPerVertex > 2 ) ? json.vertexGroupIndices[ i + 2 ] : 0;
+				var d = ( influencesPerVertex > 3 ) ? json.vertexGroupIndices[ i + 3 ] : 0;
+
+				geometry.vertexGroupIndices.push( new THREE.Vector4( a, b, c, d ) );
+
+			}
+
+		}
+
+		geometry.vertexGroups = json.vertexGroups;
+
+	};
+
 	function parseMorphing( scale ) {
 
 		if ( json.morphTargets !== undefined ) {

@@ -71,6 +71,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 	}
 
 	this.normalizeSkinWeights();
+	this.normalizeVertexGroupWeights();
 
 	this.updateMatrixWorld( true );
 	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ) );
@@ -130,6 +131,32 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 		// skinning weights assumed to be normalized for THREE.BufferGeometry
 
 	}
+
+};
+
+THREE.SkinnedMesh.prototype.normalizeVertexGroupWeights = function () {
+
+	if ( this.geometry instanceof THREE.Geometry ) {
+
+		for ( var i = 0; i < this.geometry.vertexGroupIndices.length; i ++ ) {
+
+			var sw = this.geometry.vertexGroupWeights[ i ];
+
+			var scale = 1.0 / sw.lengthManhattan();
+
+			if ( scale !== Infinity ) {
+
+				sw.multiplyScalar( scale );
+
+			} else {
+
+				sw.set( 1 ); // this will be normalized by the shader anyway
+
+			}
+
+		}
+
+	} 
 
 };
 

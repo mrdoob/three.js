@@ -29,6 +29,10 @@ THREE.Geometry = function () {
 	this.skinWeights = [];
 	this.skinIndices = [];
 
+	this.vertexGroups = [];
+	this.vertexGroupWeights = [];
+	this.vertexGroupIndices = [];
+
 	this.lineDistances = [];
 
 	this.boundingBox = null;
