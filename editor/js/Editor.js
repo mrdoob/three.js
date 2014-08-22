@@ -4,6 +4,11 @@ var Editor = function () {
 
 	this.signals = {
 
+		// player
+
+		startPlayer: new SIGNALS.Signal(),
+		stopPlayer: new SIGNALS.Signal(),
+
 		// actions
 
 		playAnimation: new SIGNALS.Signal(),
@@ -46,6 +51,7 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
 	

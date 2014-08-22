@@ -1,37 +1,48 @@
-var Player = function ( json ) {
+var Player = function ( editor ) {
 
-	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 1000 );
-	camera.position.set( 500, 250, 500 );
-	camera.lookAt( new THREE.Vector3() );
+	var signals = editor.signals;
 
-	var scene = new THREE.ObjectLoader().parse( json );
-
-	var renderer = new THREE.WebGLRenderer( { antialias: true } );
+	var container = new UI.Panel();
+	container.setPosition( 'absolute' );
+	container.setDisplay( 'none' );
 
 	//
 
-	var scriptObjects = [];
+	var camera, scene, renderer;
+	var scripts;
 
-	scene.traverse( function ( child ) {
+	//
 
-		if ( child.script !== undefined ) {
+	var load = function ( json ) {
 
-			child.script.compiled = new Function( 'scene', child.script.source ).bind( child );
+		if ( renderer !== undefined ) {
 
-			scriptObjects.push( child );
+			container.dom.removeChild( renderer.domElement );
 
 		}
 
-	} );
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		container.dom.appendChild( renderer.domElement );
 
-	//
+		camera = editor.camera.clone();
 
-	var setSize = function ( width, height ) {
+		scene = new THREE.ObjectLoader().parse( json );
 
-		camera.aspect = width / height;
-		camera.updateProjectionMatrix();
+		//
 
-		renderer.setSize( width, height );
+		scripts = [];
+
+		scene.traverse( function ( child ) {
+
+			if ( child.script !== undefined ) {
+
+				var script = new Function( 'scene', child.script.source ).bind( child );
+				scripts.push( script );
+
+			}
+
+		} );
 
 	};
 
@@ -40,7 +51,9 @@ var Player = function ( json ) {
 	var play = function () {
 
 		request = requestAnimationFrame( play );
+
 		update();
+		render();
 
 	};
 
@@ -50,24 +63,41 @@ var Player = function ( json ) {
 
 	};
 
-	var update = function () {
-
-		for ( var i = 0; i < scriptObjects.length; i ++ ) {
-
-			var object = scriptObjects[ i ];
-			object.script.compiled( scene );
-
-		}
+	var render = function () {
 
 		renderer.render( scene, camera );
 
 	};
 
-	return {
-		dom: renderer.domElement,
-		setSize: setSize,
-		play: play,
-		stop: stop
-	}
+	var update = function () {
+
+		for ( var i = 0; i < scripts.length; i ++ ) {
+
+			scripts[ i ]( scene );
+
+		}
+
+		render();
+
+	};
+
+	signals.startPlayer.add( function ( json ) {
+
+		container.setDisplay( '' );
+
+		load( json );
+		play();
+
+	} );
+
+	signals.stopPlayer.add( function () {
+
+		container.setDisplay( 'none' );
+
+		stop();
+
+	} );
+
+	return container;
 
 };
