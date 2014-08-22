@@ -568,6 +568,7 @@
 		var _plane = "XY";
 
 		var changeEvent = { type: "change" };
+		var clickEvent = { type: "click" };
 		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
@@ -757,6 +758,8 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+
+					scope.dispatchEvent( clickEvent );
 
 					scope.axis = intersect.object.name;
 
