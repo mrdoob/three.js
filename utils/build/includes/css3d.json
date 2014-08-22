@@ -15,6 +15,7 @@
 	"src/math/Plane.js",
 	"src/core/EventDispatcher.js",
 	"src/core/Object3D.js",
+	"src/core/Script.js",
 	"src/cameras/Camera.js",
 	"src/cameras/PerspectiveCamera.js",
 	"src/lights/Light.js",

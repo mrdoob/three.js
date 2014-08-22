@@ -278,7 +278,7 @@ def generate_texture_bindings(material_property, material_params):
         "DiffuseFactor": "diffuseFactor", 
         "EmissiveColor": "emissiveMap", 
         "EmissiveFactor": "emissiveFactor", 
-        "AmbientColor": "ambientMap", 
+        "AmbientColor": "lightMap", # "ambientMap", 
         "AmbientFactor": "ambientFactor", 
         "SpecularColor": "specularMap", 
         "SpecularFactor": "specularFactor", 
@@ -340,7 +340,8 @@ def generate_material_object(material):
         transparent = False
         reflectivity = 1
 
-        material_type = 'MeshLambertMaterial'
+        material_type = 'MeshBasicMaterial'
+#        material_type = 'MeshLambertMaterial'
         material_params = {
 
           'color' : diffuse,
@@ -510,11 +511,18 @@ def generate_texture_object(texture):
     else:
         url = getTextureName( texture )
         
-    url = replace_inFolder2OutFolder( url )
+    #url = replace_inFolder2OutFolder( url )
+    #print( url )
+
+    index = url.rfind( '/' )
+    if index == -1:
+        index = url.rfind( '\\' )
+    filename = url[ index+1 : len(url) ]
 
     output = {
 
-      'url': url,
+      'url': filename,
+      'fullpath': url,
       'repeat': serializeVector2( (1,1) ),
       'offset': serializeVector2( texture.GetUVTranslation() ),
       'magFilter': 'LinearFilter',
@@ -2008,8 +2016,8 @@ def write_file(filepath, content):
     index = filepath.rfind('/')
     dir = filepath[0:index]
     
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+    #if not os.path.exists(dir):
+        #os.makedirs(dir)
     
     out = open(filepath, "w")
     out.write(content.encode('utf8', 'replace'))
@@ -2025,25 +2033,35 @@ def copy_textures(textures):
     texture_dict = {}
     
     for key in textures:
-        url = textures[key]['url']        
-        src = replace_OutFolder2inFolder(url)
-        
+        url = textures[key]['fullpath']        
+        #src = replace_OutFolder2inFolder(url)
+
+        #print( src )
+        #print( url )
+
         if url in texture_dict:  # texture has been copied
             continue
         
-        if not os.path.exists(src):
-            print("copy_texture error: we can't find this texture at " + src)
+        if not os.path.exists(url):
+            print("copy_texture error: we can't find this texture at " + url)
             continue
         
         try:
             index = url.rfind('/')
-            folder = url[0:index]            
-            if len(folder) and not os.path.exists(folder):
-                os.makedirs(folder)                
-            shutil.copyfile(src, url)
+            if index == -1:
+                index = url.rfind( '\\' )
+            filename = url[index+1:len(url)]
+            saveFolder = "maps"
+            saveFilename = saveFolder + "/" + filename
+            #print( src )
+            #print( url )
+            #print( saveFilename )
+            if not os.path.exists(saveFolder):
+                os.makedirs(saveFolder)                
+            shutil.copyfile(url, saveFilename)
             texture_dict[url] = True
         except IOError as e:
-            print "I/O error({0}): {1} {2}".format(e.errno, e.strerror, src)
+            print "I/O error({0}): {1} {2}".format(e.errno, e.strerror, url)
 
 def findFilesWithExt(directory, ext, include_path = True):
     ext = ext.lower()

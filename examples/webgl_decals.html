@@ -109,7 +109,7 @@
 	
 			scene.add( camera );
 
-			var light = new THREE.HemisphereLight( 0xffbbbb, 0x000011 );
+			var light = new THREE.HemisphereLight( 0xffddcc, 0x111122 );
 			light.position.set( 1, 0.75, 0.5 );
 			scene.add( light );
 
@@ -289,6 +289,7 @@
 			material.color.setHex( Math.random() * 0xffffff );
 
 			var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, p, r, s, check ), material );
+			m.renderDepth = - scene.children.length;
 			decals.push( m );
 			scene.add( m );
 

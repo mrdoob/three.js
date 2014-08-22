@@ -14,6 +14,7 @@
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
+		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
@@ -26,7 +27,6 @@
 		<script src="../examples/js/loaders/ctm/lzma.js"></script>
 		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
-		<script src="../examples/js/exporters/SceneExporter.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
 		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
@@ -35,11 +35,6 @@
 
 		<!-- WIP -->
 
-		<script src="../examples/js/exporters/BufferGeometryExporter.js"></script>
-		<script src="../examples/js/exporters/TypedGeometryExporter.js"></script>
-		<script src="../examples/js/exporters/GeometryExporter.js"></script>
-		<script src="../examples/js/exporters/MaterialExporter.js"></script>
-		<script src="../examples/js/exporters/ObjectExporter.js"></script>
 		<script src="../examples/js/renderers/WebGLRenderer3.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
@@ -48,6 +43,8 @@
 
 		<script src="js/Storage.js"></script>
 
+		<script src="js/Player.js"></script>
+
 		<script src="js/Editor.js"></script>
 		<script src="js/Config.js"></script>
 		<script src="js/Loader.js"></script>
@@ -55,6 +52,7 @@
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
+		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -74,6 +72,7 @@
 		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
+		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 
@@ -86,6 +85,9 @@
 
 			var viewport = new Viewport( editor ).setId( 'viewport' );
 			document.body.appendChild( viewport.dom );
+
+			var player = new Player( editor ).setId( 'player' );
+			document.body.appendChild( player.dom );
 
 			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
 			document.body.appendChild( toolbar.dom );
@@ -129,7 +131,6 @@
 				//
 
 				var timeout;
-				var exporter = new THREE.ObjectExporter();
 
 				var saveState = function ( scene ) {
 
@@ -137,7 +138,7 @@
 
 					timeout = setTimeout( function () {
 
-						editor.storage.set( exporter.parse( editor.scene ) );
+						editor.storage.set( editor.scene.toJSON() );
 
 					}, 1000 );
 

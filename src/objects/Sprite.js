@@ -18,6 +18,8 @@ THREE.Sprite = ( function () {
 
 		THREE.Object3D.call( this );
 
+		this.type = 'Sprite';
+
 		this.geometry = geometry;
 		this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 

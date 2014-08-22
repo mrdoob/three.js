@@ -10,6 +10,21 @@ var Loader = function ( editor ) {
 
 		switch ( extension ) {
 
+			case 'awd':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.AWDLoader();
+					var scene = loader.parse( event.target.result );
+
+					editor.setScene( scene );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'babylon':
 
 				var reader = new FileReader();

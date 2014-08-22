@@ -52,7 +52,7 @@ UI.Element.prototype = {
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
+'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
 
@@ -269,19 +269,31 @@ UI.CollapsiblePanel.prototype.expand = function() {
 
 };
 
-UI.CollapsiblePanel.prototype.setCollapsed = function( setCollapsed ) {
+UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
 
-	if ( setCollapsed ) {
+	if ( boolean ) {
 
-		this.dom.classList.add('collapsed');
+		this.dom.classList.add( 'collapsed' );
 
 	} else {
 
-		this.dom.classList.remove('collapsed');
+		this.dom.classList.remove( 'collapsed' );
 
 	}
 
-	this.isCollapsed = setCollapsed;
+	this.isCollapsed = boolean;
+
+	if ( this.onCollapsedChangeCallback !== undefined ) {
+
+		this.onCollapsedChangeCallback( boolean );
+
+	}
+
+};
+
+UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
+
+	this.onCollapsedChangeCallback = callback;
 
 };
 
@@ -480,7 +492,13 @@ UI.Select.prototype.getValue = function () {
 
 UI.Select.prototype.setValue = function ( value ) {
 
-	this.dom.value = value;
+	value = String( value );
+
+	if ( this.dom.value !== value ) {
+
+		this.dom.value = value;
+
+	}
 
 	return this;
 
@@ -825,9 +843,19 @@ UI.Number = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseFloat( dom.value );
+		var value = 0;
 
-		dom.value = isNaN( number ) === false ? number : 0;
+		try {
+
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
+
+		}
+
+		dom.value = parseFloat( value );
 
 	};
 
@@ -978,13 +1006,19 @@ UI.Integer = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseInt( dom.value );
+		var value = 0;
 
-		if ( isNaN( number ) === false ) {
+		try {
 
-			dom.value = number;
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
 
 		}
+
+		dom.value = parseInt( value );
 
 	};
 

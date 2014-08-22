@@ -4,6 +4,11 @@ var Editor = function () {
 
 	this.signals = {
 
+		// player
+
+		startPlayer: new SIGNALS.Signal(),
+		stopPlayer: new SIGNALS.Signal(),
+
 		// actions
 
 		playAnimation: new SIGNALS.Signal(),
@@ -36,7 +41,9 @@ var Editor = function () {
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
-		windowResize: new SIGNALS.Signal()
+		windowResize: new SIGNALS.Signal(),
+
+		showGridChanged: new SIGNALS.Signal()
 
 	};
 	
@@ -44,13 +51,18 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
 	this.scene = new THREE.Scene();
+	this.scene.name = 'Scene';
+	
 	this.sceneHelpers = new THREE.Scene();
 
 	this.object = {};
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
+	
+	this.scripts = {};
 
 	this.selected = null;
 	this.helpers = {};
@@ -320,97 +332,6 @@ Editor.prototype = {
 	deselect: function () {
 
 		this.select( null );
-
-	},
-
-	// utils
-
-	getObjectType: function ( object ) {
-
-		var types = {
-
-			'Scene': THREE.Scene,
-			'PerspectiveCamera': THREE.PerspectiveCamera,
-			'AmbientLight': THREE.AmbientLight,
-			'DirectionalLight': THREE.DirectionalLight,
-			'HemisphereLight': THREE.HemisphereLight,
-			'PointLight': THREE.PointLight,
-			'SpotLight': THREE.SpotLight,
-			'SkinnedMesh': THREE.SkinnedMesh,
-			'Mesh': THREE.Mesh,
-			'Sprite': THREE.Sprite,
-			'Group': THREE.Group,
-			'Object3D': THREE.Object3D
-
-		};
-
-		for ( var type in types ) {
-
-			if ( object instanceof types[ type ] ) return type;
-
-		}
-
-	},
-
-	getGeometryType: function ( geometry ) {
-
-		var types = {
-
-			'BoxGeometry': THREE.BoxGeometry,
-			'CircleGeometry': THREE.CircleGeometry,
-			'CylinderGeometry': THREE.CylinderGeometry,
-			'ExtrudeGeometry': THREE.ExtrudeGeometry,
-			'IcosahedronGeometry': THREE.IcosahedronGeometry,
-			'LatheGeometry': THREE.LatheGeometry,
-			'OctahedronGeometry': THREE.OctahedronGeometry,
-			'ParametricGeometry': THREE.ParametricGeometry,
-			'PlaneGeometry': THREE.PlaneGeometry,
-			'PolyhedronGeometry': THREE.PolyhedronGeometry,
-			'ShapeGeometry': THREE.ShapeGeometry,
-			'SphereGeometry': THREE.SphereGeometry,
-			'TetrahedronGeometry': THREE.TetrahedronGeometry,
-			'TextGeometry': THREE.TextGeometry,
-			'TorusGeometry': THREE.TorusGeometry,
-			'TorusKnotGeometry': THREE.TorusKnotGeometry,
-			'TubeGeometry': THREE.TubeGeometry,
-			'Geometry': THREE.Geometry,
-			'BufferGeometry': THREE.BufferGeometry
-
-		};
-
-		for ( var type in types ) {
-
-			if ( geometry instanceof types[ type ] ) return type;
-
-		}
-
-	},
-
-	getMaterialType: function ( material ) {
-
-		var types = {
-
-			'LineBasicMaterial': THREE.LineBasicMaterial,
-			'LineDashedMaterial': THREE.LineDashedMaterial,
-			'MeshBasicMaterial': THREE.MeshBasicMaterial,
-			'MeshDepthMaterial': THREE.MeshDepthMaterial,
-			'MeshFaceMaterial': THREE.MeshFaceMaterial,
-			'MeshLambertMaterial': THREE.MeshLambertMaterial,
-			'MeshNormalMaterial': THREE.MeshNormalMaterial,
-			'MeshPhongMaterial': THREE.MeshPhongMaterial,
-			'PointCloudMaterial': THREE.PointCloudMaterial,
-			'ShaderMaterial': THREE.ShaderMaterial,
-			'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
-			'SpriteMaterial': THREE.SpriteMaterial,
-			'Material': THREE.Material
-
-		};
-
-		for ( var type in types ) {
-
-			if ( material instanceof types[ type ] ) return type;
-
-		}
 
 	}
 

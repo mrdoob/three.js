@@ -117,6 +117,14 @@ input.Number {
 	bottom: 32px;
 }
 
+#player {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+}
+
 #menubar {
 	position: absolute;
 	width: 100%;
