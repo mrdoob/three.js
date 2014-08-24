@@ -147,6 +147,10 @@ input.Number {
 					background-color: #08f;
 				}
 
+				#menubar .menu .options .option:active {
+					color: #666;
+					background: transparent;
+				}
 
 #sidebar {
 	position: absolute;
