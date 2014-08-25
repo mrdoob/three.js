@@ -675,7 +675,11 @@ THREE.Projector = function () {
 
 		}
 
-		if ( sortElements === true ) _renderData.elements.sort( painterSort );
+		if ( sortElements === true ) {
+
+			_renderData.elements.sort( painterSort );
+
+		}
 
 		return _renderData;
 
