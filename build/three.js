@@ -8534,7 +8534,11 @@ THREE.Projector = function () {
 
 		}
 
-		if ( sortElements === true ) _renderData.elements.sort( painterSort );
+		if ( sortElements === true ) {
+
+			_renderData.elements.sort( painterSort );
+
+		}
 
 		return _renderData;
 
@@ -10062,12 +10066,11 @@ THREE.Geometry.prototype = {
 
 		var attributes = geometry.attributes;
 
-		var indices = attributes.index !== undefined && attributes.index.array;
-		var normals = attributes.normal !== undefined && attributes.normal.array;
-		var colors = attributes.color !== undefined && attributes.color.array;
-		var uvs = attributes.uv !== undefined && attributes.uv.array;
-
 		var vertices = attributes.position.array;
+		var indices = attributes.index !== undefined ? attributes.index.array : undefined;
+		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
+		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
+		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 
 		var tempNormals = [];
 		var tempUVs = [];
@@ -11053,7 +11056,7 @@ THREE.Script.prototype = {
 
 	}
 
-}
+};
 // File:src/cameras/Camera.js
 
 /**
