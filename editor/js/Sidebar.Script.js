@@ -19,33 +19,43 @@ Sidebar.Script = function ( editor ) {
 
 	// source
 
+	var timeout;
+
 	var scriptSourceRow = new UI.Panel();
-	var scriptSource = new UI.TextArea().setWidth( '240px' ).setHeight( '180px' ).setColor( '#444' ).setFontSize( '12px' );
+	var scriptSource = new UI.CodeEditor( 'javascript' ).setWidth( '240px' ).setHeight( '180px' ).setFontSize( '12px' );
 	scriptSource.onChange( function () {
 
-		var object = editor.selected;
-		var source = scriptSource.getValue();
+		clearTimeout( timeout );
 
-		try {
+		timeout = setTimeout( function () {
 
-			var script = new Function( 'scene', source ).bind( object.clone() );
-			script( new THREE.Scene() );
+			var object = editor.selected;
+			var source = scriptSource.getValue();
 
-			scriptSource.setBorderColor( '#ccc' );
-			scriptSource.setBackgroundColor( '' );
+			try {
 
-		} catch ( error ) {
+				var script = new Function( 'scene', 'time', source ).bind( object.clone() );
+				script( new THREE.Scene(), 0 );
 
-			scriptSource.setBorderColor( '#f00' );
-			scriptSource.setBackgroundColor( 'rgba(255,0,0,0.25)' );
+				scriptSource.editor.display.wrapper.classList.add( 'success' );
+				scriptSource.editor.display.wrapper.classList.remove( 'fail' );
 
-		}
+			} catch ( error ) {
 
-		object.script = new THREE.Script( source );
+				scriptSource.editor.display.wrapper.classList.remove( 'success' );
+				scriptSource.editor.display.wrapper.classList.add( 'fail' );
 
-		editor.signals.objectChanged.dispatch( object );
+				return;
 
-	} );
+			}
+
+			object.script = new THREE.Script( source );
+
+			editor.signals.objectChanged.dispatch( object );
+
+		}, 300 );
+
+	} );	
 
 	scriptSourceRow.add( scriptSource );
 
