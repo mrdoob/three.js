@@ -6,6 +6,7 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 
 	this.array = array;
 	this.itemSize = itemSize;
+	this.updateElements = [];
 
 };
 
@@ -122,7 +123,6 @@ THREE.Uint8ClampedAttribute = function ( data, itemSize ) {
 
 	console.warn( 'THREE.Uint8ClampedAttribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
-
 
 };
 
