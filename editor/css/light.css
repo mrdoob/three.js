@@ -53,8 +53,8 @@ input.Number {
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		position: relative;
 	}
 
 		#menubar .menu .title {
@@ -68,6 +68,8 @@ input.Number {
 			padding: 5px 0px;
 			background: #eee;
 			width: 140px;
+			position: absolute;
+			top: 33px;
 		}
 
 		#menubar .menu:hover .options {
