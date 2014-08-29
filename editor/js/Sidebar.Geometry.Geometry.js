@@ -34,8 +34,8 @@ Sidebar.Geometry.Geometry = function ( signals ) {
 
 			container.setDisplay( 'block' );
 
-			vertices.setValue( geometry.vertices.length );
-			faces.setValue( geometry.faces.length );
+			vertices.setValue( ( geometry.vertices.length ).format() );
+			faces.setValue( ( geometry.faces.length ).format() );
 
 		} else {
 

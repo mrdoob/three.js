@@ -524,7 +524,7 @@ var Viewport = function ( editor ) {
 
 		} );
 
-		info.setValue( 'objects: ' + objects + ', vertices: ' + vertices + ', faces: ' + faces );
+		info.setValue( 'objects: ' + objects.format() + ', vertices: ' + vertices.format() + ', faces: ' + faces.format() );
 
 	}
 
