@@ -829,7 +829,7 @@ def generate_vertex_groups_with_indices_and_weights(meshes, option_vertex_group)
     if not option_vertex_group:
         return "", "", ""
 
-    vertex_groups = [] 
+    vertex_groups_names = []
     indices = []
     weights = []
 
@@ -850,37 +850,19 @@ def generate_vertex_groups_with_indices_and_weights(meshes, option_vertex_group)
             continue
 
         object = bpy.data.objects[mesh_index]
-
-        for vertex_group in object.vertex_groups:
-            vertex_groups.append('"%s"' % vertex_group.name)
+        vertex_groups_names += ['"%s"' % vertex_group.name for vertex_group in object.vertex_groups]
 
         for vertex in mesh.vertices:
-
-            # sort vertex_groups by influence
-
-            vertex_group_array = []
-
+            vertex_groups = []
+            vertex_groups_weights = []
             for group in vertex.groups:
-                index = group.group
-                weight = group.weight
+                vertex_groups.append('%d' % group.group)
+                vertex_groups_weights.append('%g' % group.weight)
 
-                vertex_group_array.append( (index, weight) )
-                
-            vertex_group_array.sort(key = operator.itemgetter(1), reverse=True)
-            
-            # select first N vertex_groups
+            indices.append('[%s]' % ",".join(vertex_groups))
+            weights.append('[%s]' % ",".join(vertex_groups_weights))
 
-            for i in range(MAX_INFLUENCES):
-
-                if i < len(vertex_group_array):
-                    indices.append('%d' % vertex_group_array[i][0])
-                    weights.append('%g' % vertex_group_array[i][1])
-                else:
-                    indices.append('0')
-                    weights.append('0')
-    
-    
-    vertex_groups_string = ",".join(vertex_groups)
+    vertex_groups_string = ",".join(vertex_groups_names)
     indices_string = ",".join(indices)
     weights_string = ",".join(weights)
 
