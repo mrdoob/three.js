@@ -815,6 +815,55 @@ def generate_bones(meshes, option_bones, flipyz):
 
 
 # ##############################################################################
+# Model exporter - vertex groups
+# ##############################################################################
+
+def generate_vertex_groups_with_indices_and_weights(meshes, option_vertex_group):
+
+    if not option_vertex_group:
+        return "", "", ""
+
+    vertex_groups_names = []
+    indices = []
+    weights = []
+
+    for mesh, object in meshes:
+
+        i = 0
+        mesh_index = -1
+
+        # find the original object
+
+        for obj in bpy.data.objects:
+            if obj.name == mesh.name or obj == object:
+                mesh_index = i
+            i += 1
+
+        if mesh_index == -1:
+            print("generate_vertex_groups: couldn't find object for mesh", mesh.name)
+            continue
+
+        object = bpy.data.objects[mesh_index]
+        vertex_groups_names += ['"%s"' % vertex_group.name for vertex_group in object.vertex_groups]
+
+        for vertex in mesh.vertices:
+            vertex_groups = []
+            vertex_groups_weights = []
+            for group in vertex.groups:
+                vertex_groups.append('%d' % group.group)
+                vertex_groups_weights.append('%g' % group.weight)
+
+            indices.append('[%s]' % ",".join(vertex_groups))
+            weights.append('[%s]' % ",".join(vertex_groups_weights))
+
+    vertex_groups_string = ",".join(vertex_groups_names)
+    indices_string = ",".join(indices)
+    weights_string = ",".join(weights)
+
+    return vertex_groups_string, indices_string, weights_string
+
+
+# ##############################################################################
 # Model exporter - skin indices and weights
 # ##############################################################################
 
