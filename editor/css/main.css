@@ -44,27 +44,31 @@ textarea, input { outline: none; } /* osx */
 	user-select: none;
 }
 
-.CollapsiblePanel .CollapsiblePanelButton {
-	float: left;
-	margin-right: 6px;
-	width: 0px;
-	height: 0px;
-	border: 6px solid transparent;
-}
+	.Panel.Collapsible .Static {
+		margin: 0px;
+	}
 
-.CollapsiblePanel.collapsed .CollapsiblePanelButton {
-	margin-top: 2px;
-	border-left-color: #bbb;
-}
+	.Panel.Collapsible .Static .Button {
+		float: left;
+		margin-right: 6px;
+		width: 0px;
+		height: 0px;
+		border: 6px solid transparent;
+	}
 
-.CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
-	margin-top: 6px;
-	border-top-color: #bbb;
-}
+	.Panel.Collapsible.collapsed .Static .Button {
+		margin-top: 2px;
+		border-left-color: #bbb;
+	}
 
-.CollapsiblePanel.collapsed .CollapsibleContent {
-	display: none;
-}
+	.Panel.Collapsible:not(.collapsed) .Static .Button {
+		margin-top: 6px;
+		border-top-color: #bbb;
+	}
+
+	.Panel.Collapsible.collapsed .Content {
+		display: none;
+	}
 
 /* scene types */
 
