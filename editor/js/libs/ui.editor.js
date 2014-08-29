@@ -10,11 +10,11 @@ UI.CodeEditor = function ( mode ) {
 	dom.className = 'CodeEditor';
 
 	var editor = CodeMirror( dom, { mode: mode, indentWithTabs: true, lineWrapping: true, matchBrackets: true } );
-	editor.on( 'change', function () {
+	editor.onKeyUp( 'keyup', function () {
 
-		if ( scope.onChangeCallback !== undefined ) {
+		if ( scope.onKeyUpCallback !== undefined ) {
 
-			scope.onChangeCallback();
+			scope.onKeyUpCallback();
 
 		}
 
@@ -63,9 +63,9 @@ UI.CodeEditor.prototype.setValue = function ( value ) {
 
 };
 
-UI.CodeEditor.prototype.onChange = function ( callback ) {
+UI.CodeEditor.prototype.onKeyUp = function ( callback ) {
 
-	this.onChangeCallback = callback;
+	this.onKeyUpCallback = callback;
 
 	return this;
 

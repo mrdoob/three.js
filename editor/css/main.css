@@ -23,6 +23,17 @@ textarea {
 	word-wrap: normal;
 }
 
+	textarea.success {
+		border-color: #8b8 !important;
+	}
+
+	textarea.fail {
+		border-color: #f00 !important;
+		background-color: rgba(255,0,0,0.05);
+	}
+
+textarea, input { outline: none; } /* osx */
+
 .Panel {
 	-moz-user-select: none;
 	-webkit-user-select: none;
@@ -54,21 +65,6 @@ textarea {
 .CollapsiblePanel.collapsed .CollapsibleContent {
 	display: none;
 }
-
-/* codemirror */
-
-.CodeMirror {
-	border: 1px solid #ccc;
-}
-
-	.CodeMirror.success {
-		border-color: #8b8;
-	}
-
-	.CodeMirror.fail {
-		border-color: #f00;
-		background-color: rgba(255,0,0,0.05);
-	}
 
 /* scene types */
 

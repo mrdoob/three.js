@@ -22,8 +22,8 @@ Sidebar.Script = function ( editor ) {
 	var timeout;
 
 	var scriptSourceRow = new UI.Panel();
-	var scriptSource = new UI.CodeEditor( 'javascript' ).setWidth( '240px' ).setHeight( '180px' ).setFontSize( '12px' );
-	scriptSource.onChange( function () {
+	var scriptSource = new UI.TextArea( 'javascript' ).setWidth( '240px' ).setHeight( '180px' ).setFontSize( '12px' );
+	scriptSource.onKeyUp( function () {
 
 		clearTimeout( timeout );
 
@@ -37,13 +37,13 @@ Sidebar.Script = function ( editor ) {
 				var script = new Function( 'scene', 'time', source ).bind( object.clone() );
 				script( new THREE.Scene(), 0 );
 
-				scriptSource.editor.display.wrapper.classList.add( 'success' );
-				scriptSource.editor.display.wrapper.classList.remove( 'fail' );
+				scriptSource.dom.classList.add( 'success' );
+				scriptSource.dom.classList.remove( 'fail' );
 
 			} catch ( error ) {
 
-				scriptSource.editor.display.wrapper.classList.remove( 'success' );
-				scriptSource.editor.display.wrapper.classList.add( 'fail' );
+				scriptSource.dom.classList.remove( 'success' );
+				scriptSource.dom.classList.add( 'fail' );
 
 				return;
 
@@ -53,7 +53,7 @@ Sidebar.Script = function ( editor ) {
 
 			editor.signals.objectChanged.dispatch( object );
 
-		}, 300 );
+		}, 500 );
 
 	} );	
 
