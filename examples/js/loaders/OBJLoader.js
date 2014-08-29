@@ -31,7 +31,7 @@ THREE.OBJLoader.prototype = {
 		console.time( 'OBJLoader' );
 
 		var object, objects = [];
-		var geometry, material, mesh;
+		var geometry, material;
 
 		function parseVertexIndex( value ) {
 
