@@ -111,6 +111,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 	parseModel( scale );
 
 	parseSkin();
+	parseVertexGroups();
 	parseMorphing( scale );
 
 	geometry.computeFaceNormals();

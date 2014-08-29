@@ -292,6 +292,12 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"vertices" : [%(vertices)s],
 
+	"vertexGroups" : [%(vertexGroups)s],
+
+	"vertexGroupsIndices" : [%(vertexGroupsIndices)s],
+
+	"vertexGroupsWeights" : [%(vertexGroupsWeights)s],
+
 	"morphTargets" : [%(morphTargets)s],
 
 	"normals" : [%(normals)s],
@@ -308,7 +314,7 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"skinWeights" : [%(weights)s],
 
-  "animations" : [%(animations)s]
+        "animations" : [%(animations)s]
 """
 
 TEMPLATE_VERTEX = "%g,%g,%g"
@@ -1507,6 +1513,7 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
 def generate_ascii_model(meshes, morphs,
                          scene,
                          option_vertices,
+                         option_vertex_groups,
                          option_vertices_truncate,
                          option_faces,
                          option_normals,
@@ -1602,6 +1609,7 @@ def generate_ascii_model(meshes, morphs,
 
     bones_string, nbone = generate_bones(meshes, option_bones, flipyz)
     indices_string, weights_string = generate_indices_and_weights(meshes, option_skinning)
+    vertex_groups, vertex_groups_indices_string, vertex_groups_weights_string = generate_vertex_groups_with_indices_and_weights(meshes, option_vertex_groups)
 
     materials_string = ",\n\n".join(materials)
 
@@ -1615,6 +1623,9 @@ def generate_ascii_model(meshes, morphs,
     "materials" : materials_string,
 
     "vertices" : generate_vertices(vertices, option_vertices_truncate, option_vertices),
+    "vertexGroups" : vertex_groups,
+    "vertexGroupsIndices"   : vertex_groups_indices_string,
+    "vertexGroupsWeights"   : vertex_groups_weights_string,
 
     "faces"    : faces_string,
 
@@ -1690,6 +1701,7 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
 
 def generate_mesh_string(objects, scene,
                 option_vertices,
+                option_vertex_groups,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
@@ -1756,6 +1768,7 @@ def generate_mesh_string(objects, scene,
     text, model_string = generate_ascii_model(meshes, morphs,
                                 scene,
                                 option_vertices,
+                                option_vertex_groups,
                                 option_vertices_truncate,
                                 option_faces,
                                 option_normals,
@@ -1784,6 +1797,7 @@ def generate_mesh_string(objects, scene,
 def export_mesh(objects,
                 scene, filepath,
                 option_vertices,
+                option_vertex_groups,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
@@ -1807,6 +1821,7 @@ def export_mesh(objects,
     text, model_string = generate_mesh_string(objects,
                 scene,
                 option_vertices,
+                option_vertex_groups,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
@@ -2600,6 +2615,7 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
 def save(operator, context, filepath = "",
          option_flip_yz = True,
          option_vertices = True,
+         option_vertex_groups = False,
          option_vertices_truncate = False,
          option_faces = True,
          option_normals = True,
@@ -2668,6 +2684,7 @@ def save(operator, context, filepath = "",
 
                         text, model_string = generate_mesh_string([object], scene,
                                                         option_vertices,
+                                                        option_vertex_groups,
                                                         option_vertices_truncate,
                                                         option_faces,
                                                         option_normals,
@@ -2695,6 +2712,7 @@ def save(operator, context, filepath = "",
                         export_mesh([object], scene,
                                     fname,
                                     option_vertices,
+                                    option_vertex_groups,
                                     option_vertices_truncate,
                                     option_faces,
                                     option_normals,
@@ -2729,6 +2747,7 @@ def save(operator, context, filepath = "",
 
         export_mesh(objects, scene, filepath,
                     option_vertices,
+                    option_vertex_groups,
                     option_vertices_truncate,
                     option_faces,
                     option_normals,
