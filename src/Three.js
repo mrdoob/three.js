@@ -5,10 +5,23 @@
 var THREE = { REVISION: '69dev' };
 
 // browserify support
+
 if ( typeof module === 'object' ) {
 
 	module.exports = THREE;
 
+}
+
+// polyfills
+
+if ( Math.sign === undefined ) {
+
+	Math.sign = function ( x ) {
+
+		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
+
+	};
+	
 }
 
 // GL STATE CONSTANTS
