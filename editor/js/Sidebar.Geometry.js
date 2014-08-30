@@ -142,7 +142,6 @@ Sidebar.Geometry = function ( editor ) {
 	}
 
 	signals.objectSelected.add( build );
-	signals.objectChanged.add( build );
 
 	return container;
 

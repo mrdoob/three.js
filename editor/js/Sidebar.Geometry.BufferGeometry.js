@@ -55,7 +55,7 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 	};
 
 	signals.objectSelected.add( update );
-	signals.objectChanged.add( update );
+	signals.geometryChanged.add( update );
 
 	return container;
 

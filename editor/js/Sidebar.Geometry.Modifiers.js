@@ -21,7 +21,7 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 		}
 
-		signals.objectChanged.dispatch( object );
+		signals.geometryChanged.dispatch( object );
 
 	} );
 
@@ -40,7 +40,7 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 			object.geometry = new THREE.Geometry().fromBufferGeometry( object.geometry );
 
-			signals.objectChanged.dispatch( object );
+			signals.geometryChanged.dispatch( object );
 
 		} );
 		container.add( button );
@@ -54,7 +54,7 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
 
-			signals.objectChanged.dispatch( object );
+			signals.geometryChanged.dispatch( object );
 
 		} );
 		container.add( button );

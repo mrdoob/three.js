@@ -17,27 +17,11 @@ Viewport.Info = function ( editor ) {
 	container.add( new UI.Text( 'vertices' ), verticesText, new UI.Break() );
 	container.add( new UI.Text( 'triangles' ), trianglesText, new UI.Break() );
 
-	signals.sceneGraphChanged.add( function () {
-
-		update();
-
-	} );
-
-	signals.objectChanged.add( function ( object ) {
-
-		// TODO: geometryChanged
-
-		if ( object !== editor.camera ) {
-
-			update();
-
-		}
-
-	} );
+	signals.objectAdded.add( update );
+	signals.objectRemoved.add( update );
+	signals.geometryChanged.add( update );
 
 	//
-
-
 
 	function update() {
 

@@ -283,6 +283,8 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.geometryChanged.add( render );
+
 	signals.objectAdded.add( function ( object ) {
 
 		var materialsNeedUpdate = false;
