@@ -5,14 +5,7 @@ var Viewport = function ( editor ) {
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
 
-	var info = new UI.Text();
-	info.setPosition( 'absolute' );
-	info.setRight( '5px' );
-	info.setBottom( '5px' );
-	info.setFontSize( '12px' );
-	info.setColor( '#ffffff' );
-	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
-	container.add( info );
+	container.add( new Viewport.Info( editor ) );
 
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
@@ -239,7 +232,6 @@ var Viewport = function ( editor ) {
 	signals.sceneGraphChanged.add( function () {
 
 		render();
-		updateInfo();
 
 	} );
 
@@ -291,6 +283,8 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.geometryChanged.add( render );
+
 	signals.objectAdded.add( function ( object ) {
 
 		var materialsNeedUpdate = false;
@@ -324,8 +318,6 @@ var Viewport = function ( editor ) {
 				editor.helpers[ object.id ].update();
 
 			}
-
-			updateInfo();
 
 		}
 
@@ -484,49 +476,6 @@ var Viewport = function ( editor ) {
 	animate();
 
 	//
-
-	function updateInfo() {
-
-		var objects = 0;
-		var vertices = 0;
-		var faces = 0;
-
-		scene.traverse( function ( object ) {
-
-			if ( object instanceof THREE.Mesh ) {
-
-				objects ++;
-
-				var geometry = object.geometry;
-
-				if ( geometry instanceof THREE.Geometry ) {
-
-					vertices += geometry.vertices.length;
-					faces += geometry.faces.length;
-
-				} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-					vertices += geometry.attributes.position.array.length / 3;
-
-					if ( geometry.attributes.index !== undefined ) {
-
-						faces += geometry.attributes.index.array.length / 3;
-
-					} else {
-
-						faces += geometry.attributes.position.array.length / 9;
-
-					}
-
-				}
-
-			}
-
-		} );
-
-		info.setValue( 'objects: ' + objects + ', vertices: ' + vertices + ', faces: ' + faces );
-
-	}
 
 	function updateMaterials() {
 
