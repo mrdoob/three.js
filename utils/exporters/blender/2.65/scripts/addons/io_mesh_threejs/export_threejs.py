@@ -853,14 +853,12 @@ def generate_vertex_groups_with_indices_and_weights(meshes, option_vertex_group)
         vertex_groups_names += ['"%s"' % vertex_group.name for vertex_group in object.vertex_groups]
 
         for vertex in mesh.vertices:
-            vertex_groups = []
-            vertex_groups_weights = []
-            for group in vertex.groups:
-                vertex_groups.append('%d' % group.group)
-                vertex_groups_weights.append('%g' % group.weight)
+            vertex_groups = [(group.group, group.weight) for group in vertex.groups]
 
-            indices.append('[%s]' % ",".join(vertex_groups))
-            weights.append('[%s]' % ",".join(vertex_groups_weights))
+            vertex_groups.sort(key = operator.itemgetter(1), reverse=True)
+
+            indices.append("[%s]" % ",".join("%d" % g[0] for g in vertex_groups))
+            weights.append("[%s]" % ",".join("%g" % g[1] for g in vertex_groups))
 
     vertex_groups_string = ",".join(vertex_groups_names)
     indices_string = ",".join(indices)
