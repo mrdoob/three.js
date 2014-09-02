@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js simple skinned animation</title>
+		<title>three.js - skinning - simple</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -16,18 +16,15 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
-
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
 
 			var container, stats, controls;
-
 			var camera, scene, renderer, loader, clock, light;
-
 			var skinnedMesh, animation, groundMaterial, planeGeometry;
+
 			init();
 			animate();
 
@@ -61,20 +58,25 @@
 				ground.rotation.x = -Math.PI/2;
 				scene.add( ground );
 
-				light = new THREE.HemisphereLight(0xffffff, 0x003300, 1);
-				light.position.set(-80,500,50);
-				scene.add(light);
+				light = new THREE.HemisphereLight( 0xffffff, 0x003300, 1 );
+				light.position.set( - 80, 500, 50 );
+				scene.add( light );
 
-				loader.load('./models/skinned/simple/simple.js', function (geometry, materials) {
-				    for (var k in materials) {
-				    materials[k].skinning = true;
-				    }
-				    skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
-				    skinnedMesh.scale.set(1, 1, 1);
-				    scene.add(skinnedMesh);
-				    animation = new THREE.Animation(skinnedMesh,skinnedMesh.geometry.animations[0]);
-				    animation.play();
-				    });
+				loader.load( './models/skinned/simple/simple.js', function ( geometry, materials ) {
+
+					for ( var k in materials ) {
+
+						materials[k].skinning = true;
+
+					}
+
+					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+					skinnedMesh.scale.set( 1, 1, 1 );
+					scene.add( skinnedMesh );
+					animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[ 0 ] );
+					animation.play();
+
+				});
 
 			}
 
@@ -82,8 +84,8 @@
 
 				requestAnimationFrame( animate );
 
-				var delta = clock.getDelta();
-				THREE.AnimationHandler.update( delta );
+				THREE.AnimationHandler.update( clock.getDelta() );
+
 				controls.update();
 
 				render();
@@ -98,6 +100,5 @@
 			}
 
 		</script>
-
 	</body>
 </html>
