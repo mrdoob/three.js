@@ -136,7 +136,7 @@ THREE.Geometry.prototype = {
 
 		var addFace = function ( a, b, c ) {
 
-			var vertexNormals = normals !== undefined ? [ tempNormals[ a ], tempNormals[ b ], tempNormals[ c ] ] : [];
+			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ], scope.colors[ b ], scope.colors[ c ] ] : [];
 
 			scope.faces.push( new THREE.Face3( a, b, c, vertexNormals, vertexColors ) );
