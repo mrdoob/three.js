@@ -24,7 +24,7 @@
 THREE.OrbitControls = function ( object, domElement ) {
 
 	// MouseEvent.button codes per https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
-	var MOUSEBUTTONS = { LEFT: 0, WHEEL: 1, RIGHT: 2 };
+	var MOUSEBUTTONS = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -74,7 +74,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
 	// Mouse buttons
-	this.mouseButtons = { ORBIT: MOUSEBUTTONS.LEFT, ZOOM: MOUSEBUTTONS.WHEEL, PAN: MOUSEBUTTONS.RIGHT };
+	this.mouseButtons = { ORBIT: MOUSEBUTTONS.LEFT, ZOOM: MOUSEBUTTONS.MIDDLE, PAN: MOUSEBUTTONS.RIGHT };
 
 	////////////
 	// internals
