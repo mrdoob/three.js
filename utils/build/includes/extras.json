@@ -31,6 +31,7 @@
 	"src/extras/geometries/ShapeGeometry.js",
 	"src/extras/geometries/LatheGeometry.js",
 	"src/extras/geometries/PlaneGeometry.js",
+	"src/extras/geometries/PlaneBufferGeometry.js",
 	"src/extras/geometries/RingGeometry.js",
 	"src/extras/geometries/SphereGeometry.js",
 	"src/extras/geometries/TextGeometry.js",
