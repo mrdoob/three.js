@@ -209,10 +209,7 @@
 				
 				for ( i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
 					var object = imagePositionsInRange[i];
-					var objectPoint = new THREE.Vector3(0,0,0);
-					objectPoint.x = object[0].obj[0];
-					objectPoint.y = object[0].obj[1];
-					objectPoint.z = object[0].obj[2];
+					var objectPoint = new THREE.Vector3().fromArray( object[ 0 ].obj );
 					
 					if (_frustum.containsPoint(objectPoint)){
 					
