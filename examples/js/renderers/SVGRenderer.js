@@ -38,6 +38,8 @@ THREE.SVGRenderer = function () {
 	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 	_centroid = new THREE.Vector3(),
+	_normal = new THREE.Vector3(),
+	_normalViewMatrix = new THREE.Matrix3(),
 
 	_viewMatrix = new THREE.Matrix4(),
 	_viewProjectionMatrix = new THREE.Matrix4(),
@@ -136,6 +138,8 @@ THREE.SVGRenderer = function () {
 		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
+
+		_normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
 
 		calculateLights( _lights );
 
@@ -383,9 +387,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			var normal = element.normalModelView;
+			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
 
-			_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+			_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 		}
 

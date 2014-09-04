@@ -82,7 +82,7 @@ Sidebar.Geometry.BoxGeometry = function ( signals, object ) {
 		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
-		signals.objectChanged.dispatch( object );
+		signals.geometryChanged.dispatch( object );
 
 	}
 

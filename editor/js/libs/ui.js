@@ -164,22 +164,24 @@ UI.CollapsiblePanel = function () {
 
 	UI.Panel.call( this );
 
-	this.dom.className = 'Panel CollapsiblePanel';
-
-	this.button = document.createElement( 'div' );
-	this.button.className = 'CollapsiblePanelButton';
-	this.dom.appendChild( this.button );
+	this.setClass( 'Panel Collapsible' );
 
 	var scope = this;
-	this.button.addEventListener( 'click', function ( event ) {
 
+	this.static = new UI.Panel();
+	this.static.setClass( 'Static' );
+	this.static.onClick( function () {
 		scope.toggle();
+	} );
+	this.dom.appendChild( this.static.dom );
 
-	}, false );
+	this.contents = new UI.Panel();
+	this.contents.setClass( 'Content' );
+	this.dom.appendChild( this.contents.dom );
 
-	this.content = document.createElement( 'div' );
-	this.content.className = 'CollapsibleContent';
-	this.dom.appendChild( this.content );
+	var button = new UI.Panel();
+	button.setClass( 'Button' );
+	this.static.add( button );
 
 	this.isCollapsed = false;
 
@@ -191,63 +193,43 @@ UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
 
 UI.CollapsiblePanel.prototype.addStatic = function () {
 
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		this.dom.insertBefore( arguments[ i ].dom, this.content );
-
-	}
-
+	this.static.add.apply( this.static, arguments );
 	return this;
 
 };
 
-UI.CollapsiblePanel.prototype.removeStatic = UI.Panel.prototype.remove;
+UI.CollapsiblePanel.prototype.removeStatic = function () {
+
+	this.static.remove.apply( this.static, arguments );
+	return this;
+
+};
 
 UI.CollapsiblePanel.prototype.clearStatic = function () {
 
-	this.dom.childNodes.forEach( function ( child ) {
-
-		if ( child !== this.content ) {
-
-			this.dom.removeChild( child );
-
-		}
-
-	});
+	this.static.clear();
+	return this;
 
 };
 
 UI.CollapsiblePanel.prototype.add = function () {
 
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		this.content.appendChild( arguments[ i ].dom );
-
-	}
-
+	this.contents.add.apply( this.contents, arguments );
 	return this;
 
 };
 
 UI.CollapsiblePanel.prototype.remove = function () {
 
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		this.content.removeChild( arguments[ i ].dom );
-
-	}
-
+	this.contents.remove.apply( this.contents, arguments );
 	return this;
 
 };
 
 UI.CollapsiblePanel.prototype.clear = function () {
 
-	while ( this.content.children.length ) {
-
-		this.content.removeChild( this.content.lastChild );
-
-	}
+	this.contents.clear();
+	return this;
 
 };
 

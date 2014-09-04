@@ -248,7 +248,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 	geometry.computeOffsets();
 
 	// compute vertex normals if not present in the CTM model
-	if ( geometry.attributes[ "normal" ] === undefined ) {
+	if ( geometry.attributes.normal === undefined ) {
 		geometry.computeVertexNormals();
 	}
 

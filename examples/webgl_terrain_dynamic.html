@@ -317,7 +317,10 @@
 				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
+				heightMap.generateMipmaps = false;
+
 				normalMap = new THREE.WebGLRenderTarget( rx, ry, pars );
+				normalMap.generateMipmaps = false;
 
 				uniformsNoise = {
 
@@ -338,6 +341,7 @@
 				// TEXTURES
 
 				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
+				specularMap.generateMipmaps = false;
 
 				var diffuseTexture1 = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, function () {
 
@@ -414,7 +418,7 @@
 
 				// TERRAIN MESH
 
-				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
+				var geometryTerrain = new THREE.PlaneBufferGeometry( 6000, 6000, 256, 256 );
 				geometryTerrain.computeTangents();
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ "terrain" ] );
@@ -454,7 +458,9 @@
 				renderer.autoClear = false;
 
 				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+				renderTarget.generateMipmaps = false;
 
 				effectBloom = new THREE.BloomPass( 0.6 );
 				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
