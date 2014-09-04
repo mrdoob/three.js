@@ -54,6 +54,8 @@ THREE.TextGeometry = function ( text, parameters ) {
 
 	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
+	this.type = 'TextGeometry';
+
 };
 
 THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );

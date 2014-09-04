@@ -139,26 +139,15 @@
 				var distanceFunction = function(a, b){
 					return Math.pow(a[0] - b[0], 2) +  Math.pow(a[1] - b[1], 2) +  Math.pow(a[2] - b[2], 2);
 				};
+
+				positions = new Float32Array( amountOfParticles * 3 );
+				alphas = new Float32Array( amountOfParticles );
 				
 				_particleGeom = new THREE.BufferGeometry();
-				_particleGeom.attributes = {
-
-					position: {
-						itemSize: 3,
-						array: new Float32Array( amountOfParticles * 3 )
-					},
-					
-					alpha: {
-						itemSize: 1,
-						array: new Float32Array( amountOfParticles )
-					}
-
-				};
-				positions = _particleGeom.attributes.position.array;
-				alphas = _particleGeom.attributes.alpha.array;
+				_particleGeom.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				_particleGeom.addAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
 				
 				particles = new THREE.PointCloud( _particleGeom, pointShaderMaterial );
-				particles.dynamic = true;
 				
 				for (var x = 0; x < amountOfParticles; x++) {
 					positions[ x * 3 + 0 ] = Math.random() * 1000;
@@ -220,10 +209,7 @@
 				
 				for ( i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
 					var object = imagePositionsInRange[i];
-					var objectPoint = new THREE.Vector3(0,0,0);
-					objectPoint.x = object[0].obj[0];
-					objectPoint.y = object[0].obj[1];
-					objectPoint.z = object[0].obj[2];
+					var objectPoint = new THREE.Vector3().fromArray( object[ 0 ].obj );
 					
 					if (_frustum.containsPoint(objectPoint)){
 					

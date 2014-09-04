@@ -292,6 +292,12 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"vertices" : [%(vertices)s],
 
+	"vertexGroups" : [%(vertexGroups)s],
+
+	"vertexGroupsIndices" : [%(vertexGroupsIndices)s],
+
+	"vertexGroupsWeights" : [%(vertexGroupsWeights)s],
+
 	"morphTargets" : [%(morphTargets)s],
 
 	"normals" : [%(normals)s],
@@ -308,7 +314,7 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"skinWeights" : [%(weights)s],
 
-  "animations" : [%(animations)s]
+        "animations" : [%(animations)s]
 """
 
 TEMPLATE_VERTEX = "%g,%g,%g"
@@ -815,6 +821,53 @@ def generate_bones(meshes, option_bones, flipyz):
 
 
 # ##############################################################################
+# Model exporter - vertex groups
+# ##############################################################################
+
+def generate_vertex_groups_with_indices_and_weights(meshes, option_vertex_group):
+
+    if not option_vertex_group:
+        return "", "", ""
+
+    vertex_groups_names = []
+    indices = []
+    weights = []
+
+    for mesh, object in meshes:
+
+        i = 0
+        mesh_index = -1
+
+        # find the original object
+
+        for obj in bpy.data.objects:
+            if obj.name == mesh.name or obj == object:
+                mesh_index = i
+            i += 1
+
+        if mesh_index == -1:
+            print("generate_vertex_groups: couldn't find object for mesh", mesh.name)
+            continue
+
+        object = bpy.data.objects[mesh_index]
+        vertex_groups_names += ['"%s"' % vertex_group.name for vertex_group in object.vertex_groups]
+
+        for vertex in mesh.vertices:
+            vertex_groups = [(group.group, group.weight) for group in vertex.groups]
+
+            vertex_groups.sort(key = operator.itemgetter(1), reverse=True)
+
+            indices.append("[%s]" % ",".join("%d" % g[0] for g in vertex_groups))
+            weights.append("[%s]" % ",".join("%g" % g[1] for g in vertex_groups))
+
+    vertex_groups_string = ",".join(vertex_groups_names)
+    indices_string = ",".join(indices)
+    weights_string = ",".join(weights)
+
+    return vertex_groups_string, indices_string, weights_string
+
+
+# ##############################################################################
 # Model exporter - skin indices and weights
 # ##############################################################################
 
@@ -827,6 +880,7 @@ def generate_indices_and_weights(meshes, option_skinning):
     weights = []
 
     armature, armature_object = get_armature()
+    bone_names = [bone.name for bone in armature_object.pose.bones]
 
     for mesh, object in meshes:
 
@@ -854,9 +908,10 @@ def generate_indices_and_weights(meshes, option_skinning):
 
             for group in vertex.groups:
                 index = group.group
-                weight = group.weight
+                if object.vertex_groups[index].name in bone_names:
+                    weight = group.weight 
 
-                bone_array.append( (index, weight) )
+                    bone_array.append( (index, weight) )
                 
             bone_array.sort(key = operator.itemgetter(1), reverse=True)
             
@@ -879,11 +934,11 @@ def generate_indices_and_weights(meshes, option_skinning):
                             break
 
                     if found != 1:
-                        indices.append('0')
+                        indices.append('-1')
                         weights.append('0')
 
                 else:
-                    indices.append('0')
+                    indices.append('-1')
                     weights.append('0')
     
     
@@ -1456,6 +1511,7 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
 def generate_ascii_model(meshes, morphs,
                          scene,
                          option_vertices,
+                         option_vertex_groups,
                          option_vertices_truncate,
                          option_faces,
                          option_normals,
@@ -1551,6 +1607,7 @@ def generate_ascii_model(meshes, morphs,
 
     bones_string, nbone = generate_bones(meshes, option_bones, flipyz)
     indices_string, weights_string = generate_indices_and_weights(meshes, option_skinning)
+    vertex_groups, vertex_groups_indices_string, vertex_groups_weights_string = generate_vertex_groups_with_indices_and_weights(meshes, option_vertex_groups)
 
     materials_string = ",\n\n".join(materials)
 
@@ -1564,6 +1621,9 @@ def generate_ascii_model(meshes, morphs,
     "materials" : materials_string,
 
     "vertices" : generate_vertices(vertices, option_vertices_truncate, option_vertices),
+    "vertexGroups" : vertex_groups,
+    "vertexGroupsIndices"   : vertex_groups_indices_string,
+    "vertexGroupsWeights"   : vertex_groups_weights_string,
 
     "faces"    : faces_string,
 
@@ -1639,6 +1699,7 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
 
 def generate_mesh_string(objects, scene,
                 option_vertices,
+                option_vertex_groups,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
@@ -1705,6 +1766,7 @@ def generate_mesh_string(objects, scene,
     text, model_string = generate_ascii_model(meshes, morphs,
                                 scene,
                                 option_vertices,
+                                option_vertex_groups,
                                 option_vertices_truncate,
                                 option_faces,
                                 option_normals,
@@ -1733,6 +1795,7 @@ def generate_mesh_string(objects, scene,
 def export_mesh(objects,
                 scene, filepath,
                 option_vertices,
+                option_vertex_groups,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
@@ -1756,6 +1819,7 @@ def export_mesh(objects,
     text, model_string = generate_mesh_string(objects,
                 scene,
                 option_vertices,
+                option_vertex_groups,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
@@ -2549,6 +2613,7 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
 def save(operator, context, filepath = "",
          option_flip_yz = True,
          option_vertices = True,
+         option_vertex_groups = False,
          option_vertices_truncate = False,
          option_faces = True,
          option_normals = True,
@@ -2617,6 +2682,7 @@ def save(operator, context, filepath = "",
 
                         text, model_string = generate_mesh_string([object], scene,
                                                         option_vertices,
+                                                        option_vertex_groups,
                                                         option_vertices_truncate,
                                                         option_faces,
                                                         option_normals,
@@ -2644,6 +2710,7 @@ def save(operator, context, filepath = "",
                         export_mesh([object], scene,
                                     fname,
                                     option_vertices,
+                                    option_vertex_groups,
                                     option_vertices_truncate,
                                     option_faces,
                                     option_normals,
@@ -2678,6 +2745,7 @@ def save(operator, context, filepath = "",
 
         export_mesh(objects, scene, filepath,
                     option_vertices,
+                    option_vertex_groups,
                     option_vertices_truncate,
                     option_faces,
                     option_normals,

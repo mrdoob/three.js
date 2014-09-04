@@ -111,6 +111,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 	parseModel( scale );
 
 	parseSkin();
+	parseVertexGroups();
 	parseMorphing( scale );
 
 	geometry.computeFaceNormals();
@@ -463,6 +464,24 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
+
+	};
+
+	function parseVertexGroups() {
+
+		if ( json.vertexGroupsWeights ) {
+
+                        geometry.vertexGroupsWeights = json.vertexGroupsWeights;
+
+		}
+
+		if ( json.vertexGroupsIndices ) {
+
+                        geometry.vertexGroupsIndices = json.vertexGroupsIndices;
+
+		}
+
+		geometry.vertexGroups = json.vertexGroups;
 
 	};
 

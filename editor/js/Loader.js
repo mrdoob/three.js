@@ -10,6 +10,21 @@ var Loader = function ( editor ) {
 
 		switch ( extension ) {
 
+			case 'awd':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.AWDLoader();
+					var scene = loader.parse( event.target.result );
+
+					editor.setScene( scene );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'babylon':
 
 				var reader = new FileReader();
@@ -310,7 +325,17 @@ var Loader = function ( editor ) {
 
 		}
 
-		if ( data.metadata.type.toLowerCase() === 'geometry' ) {
+		if ( data.metadata.type === 'BufferGeometry' ) {
+
+			var loader = new THREE.BufferGeometryLoader();
+			var result = loader.parse( data );
+
+			var mesh = new THREE.Mesh( result );
+
+			editor.addObject( mesh );
+			editor.select( mesh );
+
+		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
 			var result = loader.parse( data );

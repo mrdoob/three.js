@@ -23,6 +23,7 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		distortionK : [1.0, 0.22, 0.24, 0.0],
 		chromaAbParameter: [ 0.996, -0.004, 1.014, 0.0]
 	};
+	this.HMD = HMD;
 
 	// Perspective camera
 	var pCamera = new THREE.PerspectiveCamera();
@@ -137,7 +138,7 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 
 		// Create render target
 		if ( renderTarget ) renderTarget.dispose();
-		renderTarget = new THREE.WebGLRenderTarget( HMD.hResolution*distScale/2, HMD.vResolution*distScale, RTParams );
+		renderTarget = new THREE.WebGLRenderTarget( ( HMD.hResolution * distScale / 2 ) * renderer.devicePixelRatio, ( HMD.vResolution * distScale ) * renderer.devicePixelRatio, RTParams );
 		RTMaterial.uniforms[ "texid" ].value = renderTarget;
 
 	}	

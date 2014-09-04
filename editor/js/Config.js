@@ -3,14 +3,24 @@ var Config = function () {
 	var name = 'threejs-editor';
 
 	var storage = {
-		theme: 'css/light.css',
-		camera: {
-			position: [ 500, 250, 500 ],
-			target: [ 0, 0, 0 ] 
-		}
+		'theme': 'css/light.css',
+		'camera/position': [ 500, 250, 500 ],
+		'camera/target': [ 0, 0, 0 ],
+
+		'ui/sidebar/animation/collapsed': true,
+		'ui/sidebar/geometry/collapsed': true,
+		'ui/sidebar/material/collapsed': true,
+		'ui/sidebar/object3d/collapsed': false,
+		'ui/sidebar/renderer/collapsed': true,
+		'ui/sidebar/scene/collapsed': false,
+		'ui/sidebar/script/collapsed': true
 	};
 
-	if ( window.localStorage[ name ] !== undefined ) {
+	if ( window.localStorage[ name ] === undefined ) {
+
+		window.localStorage[ name ] = JSON.stringify( storage );
+
+	} else {
 
 		var data = JSON.parse( window.localStorage[ name ] );
 
