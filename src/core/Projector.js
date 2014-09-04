@@ -64,6 +64,20 @@ THREE.Projector = function () {
 
 	}();
 
+	this.unprojectDirection = (function(){
+                var deg2radHalf = Math.PI/360;
+                var tang = 0;
+                return function ( vector, camera ) {
+                	//unprojects direction from camera, no need to sub cam from unprojected vector
+                	//takes only x and y since our scene extends into camera's negative z
+                        tang = Math.tan(camera.fov * deg2radHalf);
+                        vector.x*=tang*camera.aspect; 
+                        vector.y*=tang; 
+                        vector.z = -1;
+                        return vector.transformDirection(camera.matrixWorld);
+                };
+        })();
+
 	this.pickingRay = function ( vector, camera ) {
 
 		// set two vectors with opposing z values
