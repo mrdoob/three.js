@@ -569,6 +569,7 @@
 
 		var changeEvent = { type: "change" };
 		var clickEvent = { type: "click" };
+		var clickDoneEvent = { type: "clickDone", mode: _mode };
 		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
@@ -960,6 +961,10 @@
 
 		function onPointerUp( event ) {
 
+			if (_dragging){
+				clickDoneEvent.mode = _mode;
+				scope.dispatchEvent( clickDoneEvent )
+			}
 			_dragging = false;
 			onPointerHover( event );
 
