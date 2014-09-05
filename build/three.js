@@ -8907,6 +8907,31 @@ THREE.BufferAttribute.prototype = {
 
 		return this;
 
+	},
+
+	clone: function () {
+
+		var attribute = new THREE.BufferAttribute( null, this.itemSize );
+
+		var types = [ Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array ];
+
+		var sourceArray = this.array;
+
+		for ( var i = 0, il = types.length; i < il; i ++ ) {
+
+			var type = types[ i ];
+
+			if ( sourceArray instanceof type ) {
+
+				attribute.array = new type( sourceArray );
+				break;
+
+			}
+
+		}
+
+		return attribute;
+
 	}
 
 };
@@ -9910,34 +9935,10 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
-		var types = [ Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array ];
-
 		for ( var attr in this.attributes ) {
 
 			var sourceAttr = this.attributes[ attr ];
-			var sourceArray = sourceAttr.array;
-
-			var attribute = {
-
-				itemSize: sourceAttr.itemSize,
-				array: null
-
-			};
-
-			for ( var i = 0, il = types.length; i < il; i ++ ) {
-
-				var type = types[ i ];
-
-				if ( sourceArray instanceof type ) {
-
-					attribute.array = new type( sourceArray );
-					break;
-
-				}
-
-			}
-
-			geometry.attributes[ attr ] = attribute;
+			geometry.addAttribute( attr, sourceAttr.clone() );
 
 		}
 
@@ -19748,6 +19749,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.addPostPlugin = function ( plugin ) {
 
 		plugin.init( this, lights, _webglObjects, _webglObjectsImmediate );
+
 		this.renderPluginsPost.push( plugin );
 
 	};
@@ -19755,6 +19757,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.addPrePlugin = function ( plugin ) {
 
 		plugin.init( this, lights, _webglObjects, _webglObjectsImmediate );
+
 		this.renderPluginsPre.push( plugin );
 
 	};
@@ -22486,7 +22489,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
@@ -22707,37 +22709,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, il = plugins.length; i < il; i ++ ) {
 
-			// reset state for plugin (to start from clean slate)
-
-			_currentProgram = null;
-			_currentCamera = null;
-
-			_oldBlending = - 1;
-			_oldDepthTest = - 1;
-			_oldDepthWrite = - 1;
-			_oldDoubleSided = - 1;
-			_oldFlipSided = - 1;
-			_currentGeometryGroupHash = - 1;
-			_currentMaterialId = - 1;
-
-			_lightsNeedUpdate = true;
-
 			plugins[ i ].render( scene, camera, _currentWidth, _currentHeight );
-
-			// reset state after plugin (anything could have changed)
-
-			_currentProgram = null;
-			_currentCamera = null;
-
-			_oldBlending = - 1;
-			_oldDepthTest = - 1;
-			_oldDepthWrite = - 1;
-			_oldDoubleSided = - 1;
-			_oldFlipSided = - 1;
-			_currentGeometryGroupHash = - 1;
-			_currentMaterialId = - 1;
-
-			_lightsNeedUpdate = true;
 
 		}
 
@@ -25578,7 +25550,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	function setDefaultGLState () {
 
@@ -25601,7 +25573,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
+
+	function resetGLState() {
+
+		_currentProgram = null;
+		_currentCamera = null;
+
+		_oldBlending = - 1;
+		_oldDepthTest = - 1;
+		_oldDepthWrite = - 1;
+		_oldDoubleSided = - 1;
+		_oldFlipSided = - 1;
+		_currentGeometryGroupHash = - 1;
+		_currentMaterialId = - 1;
+
+		_lightsNeedUpdate = true;
+
+	}
+
+	this.resetGLState = resetGLState;
 
 	// default plugins (order is important)
 
@@ -35266,6 +35257,8 @@ THREE.LensFlarePlugin = function () {
 		_gl.enable( _gl.DEPTH_TEST );
 		_gl.depthMask( true );
 
+		_renderer.resetGLState();
+
 	};
 
 	function createProgram ( shader, precision ) {
@@ -35343,7 +35336,7 @@ THREE.ShadowMapPlugin = function () {
 
 	this.render = function ( scene, camera ) {
 
-		if ( ! ( _renderer.shadowMapEnabled && _renderer.shadowMapAutoUpdate ) ) return;
+		if ( _renderer.shadowMapEnabled === false || _renderer.shadowMapAutoUpdate === false ) return;
 
 		this.update( scene, camera );
 
@@ -35627,6 +35620,8 @@ THREE.ShadowMapPlugin = function () {
 			_gl.cullFace( _gl.BACK );
 
 		}
+
+		_renderer.resetGLState();
 
 	};
 	
