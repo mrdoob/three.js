@@ -104,26 +104,7 @@ THREE.BufferAttribute.prototype = {
 
 	clone: function () {
 
-		var attribute = new THREE.BufferAttribute( null, this.itemSize );
-
-		var types = [ Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array ];
-
-		var sourceArray = this.array;
-
-		for ( var i = 0, il = types.length; i < il; i ++ ) {
-
-			var type = types[ i ];
-
-			if ( sourceArray instanceof type ) {
-
-				attribute.array = new type( sourceArray );
-				break;
-
-			}
-
-		}
-
-		return attribute;
+		return new THREE.BufferAttribute( new this.array.constructor( this.array ), this.itemSize );
 
 	}
 
