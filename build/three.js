@@ -7848,12 +7848,6 @@ THREE.Object3D.prototype = {
 
 		return object;
 
-	},
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
 	}
 
 };
@@ -17809,13 +17803,13 @@ THREE.UniformsUtils = {
 
 	merge: function ( uniforms ) {
 
-		var u, p, tmp, merged = {};
+		var merged = {};
 
-		for ( u = 0; u < uniforms.length; u ++ ) {
+		for ( var u = 0; u < uniforms.length; u ++ ) {
 
-			tmp = this.clone( uniforms[ u ] );
+			var tmp = this.clone( uniforms[ u ] );
 
-			for ( p in tmp ) {
+			for ( var p in tmp ) {
 
 				merged[ p ] = tmp[ p ];
 
@@ -17829,15 +17823,15 @@ THREE.UniformsUtils = {
 
 	clone: function ( uniforms_src ) {
 
-		var u, p, parameter, parameter_src, uniforms_dst = {};
+		var uniforms_dst = {};
 
-		for ( u in uniforms_src ) {
+		for ( var u in uniforms_src ) {
 
 			uniforms_dst[ u ] = {};
 
-			for ( p in uniforms_src[ u ] ) {
+			for ( var p in uniforms_src[ u ] ) {
 
-				parameter_src = uniforms_src[ u ][ p ];
+				var parameter_src = uniforms_src[ u ][ p ];
 
 				if ( parameter_src instanceof THREE.Color ||
 					 parameter_src instanceof THREE.Vector2 ||
@@ -19824,11 +19818,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 	
-	var onObjectDispose = function ( event ) {
+	var onObjectRemoved = function ( event ) {
 
 		var object = event.target;
 
-		object.removeEventListener( 'dispose', onObjectDispose );
+		object.removeEventListener( 'removed', onObjectRemoved );
 
 		removeObject( object )
 
@@ -22861,10 +22855,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object.__webglInit === undefined ) {
 
 			object.__webglInit = true;
-			object.addEventListener( 'dispose', onObjectDispose );
-
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
+
+			object.addEventListener( 'removed', onObjectRemoved );
 
 		}
 		
@@ -23174,6 +23168,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			removeInstances( _webglObjectsImmediate, object );
 
 		}
+
+		delete object.__webglInit;
+		delete object._modelViewMatrix;
+		delete object._normalMatrix;
 
 		delete object.__webglActive;
 
