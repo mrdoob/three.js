@@ -1,4 +1,4 @@
-﻿THREE.WebGLOptimizedRenderer = function (parameters) {
+THREE.WebGLOptimizedRenderer = function (parameters) {
 
     console.log('THREE.WebGLOptimizedRenderer', THREE.REVISION);
 
@@ -104,10 +104,10 @@
 
         _currentProgram = null,
         _currentFramebuffer = null,
-        _currentArrayBuffer = null,
-        _currentVAO = null,
-        _currentElementArrayBuffer = null,
-        _currentTextureUnit = null,
+        _currentArrayBuffer = null,         // _gl.bindBuffer(ARRAY_BUFFER, value)
+        _currentElementArrayBuffer = null,  // _gl.bindBuffer(ELEMENT_ARRAY_BUFFER, value)
+        _currentVertexAttribPointer = null, // _gl.vertexAttribPointer(value, 3, _gl.FLOAT, false, 0, 0);
+        _currentTextureUnit = null,         // _gl.activeTexture(_gl.TEXTURE0 + value)
         _currentMaterialId = -1,
         _currentGeometryGroupHash = null,
         _currentCamera = null,
@@ -134,19 +134,18 @@
 
         _oldLineWidth = null,
 
-        // Uniform value samplers
-
-        //      The renderer contains a list of programs (_programs) which contains the 
+        //  Uniform value samplers
+        //
+        //  The renderer contains a list of programs (_programs) which contains the 
         //  uniforms set by each program during the render step. Each program sets
         //  uniforms for the:
-
+        //
         //  - Projection Matrix (Camera)
         //  - Model Matrix (Matrix World)
         //  - View Matrix (Matrix World Inverse)
         //  - Model View Matrix
         //  - Normal Matrix
-
-         // 
+        
         _projectionMatrixSampler = [],
         _modelMatrixSampler = [],
         _viewMatrixSampler = [],
@@ -2872,7 +2871,7 @@
 
             if (updateBuffers) {
 
-                if (_currentArrayBuffer !== geometryGroup.__webglVertexBuffer) {
+                if (_currentArrayBuffer != geometryGroup.__webglVertexBuffer) {
 
                     _currentArrayBuffer = geometryGroup.__webglVertexBuffer;
 
@@ -2880,7 +2879,15 @@
 
                 }
                 enableAttribute(attributes.position);
-                _gl.vertexAttribPointer(attributes.position, 3, _gl.FLOAT, false, 0, 0);
+
+                if (_currentVertexAttribPointer != geometryGroup.__webglVertexBuffer) {
+
+                    _currentVertexAttribPointer = geometryGroup.__webglVertexBuffer;
+
+                    _gl.vertexAttribPointer(attributes.position, 3, _gl.FLOAT, false, 0, 0);
+
+                }
+                
 
             }
 
@@ -4974,6 +4981,8 @@
         }
 
     };
+
+    // Samplers (filter out redundant calls)
 
     function sampleUniform(samplerArray, type, programIndex, uniformIndex, value) {
 
