@@ -322,6 +322,97 @@ THREE.Geometry.prototype = {
 
 	},
 
+	computeMorphFaceNormals: function () {
+
+		var i, il, f, fl, face;
+
+		// save original normals
+		// - create temp variables on first access
+		//   otherwise just copy (for faster repeated calls)
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			if ( ! face.__originalFaceNormal ) {
+
+				face.__originalFaceNormal = face.normal.clone();
+
+			} else {
+
+				face.__originalFaceNormal.copy( face.normal );
+
+			}
+
+		}
+
+		// use temp geometry to compute face and vertex normals for each morph
+
+		var tmpGeo = new THREE.Geometry();
+		tmpGeo.faces = this.faces;
+
+		for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
+
+			// create on first access
+
+			if ( ! this.morphNormals[ i ] ) {
+
+				this.morphNormals[ i ] = {};
+				this.morphNormals[ i ].faceNormals = [];
+
+				var dstNormalsFace = this.morphNormals[ i ].faceNormals;
+
+				var faceNormal;
+
+				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+					face = this.faces[ f ];
+
+					faceNormal = new THREE.Vector3();
+					dstNormalsFace.push( faceNormal );
+
+				}
+
+			}
+
+			var morphNormals = this.morphNormals[ i ];
+
+			// set vertices to morph target
+
+			tmpGeo.vertices = this.morphTargets[ i ].vertices;
+
+			// compute morph normals
+
+			tmpGeo.computeFaceNormals();
+
+			// store morph normals
+
+			var faceNormal;
+
+			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+				face = this.faces[ f ];
+
+				faceNormal = morphNormals.faceNormals[ f ];
+
+				faceNormal.copy( face.normal );
+
+			}
+
+		}
+
+		// restore original normals
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			face.normal = face.__originalFaceNormal;
+
+		}
+
+	},
+
 	computeTangents: function () {
 
 		// based on http://www.terathon.com/code/tangent.html
