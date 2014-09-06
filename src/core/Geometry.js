@@ -205,7 +205,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeMorphNormals: function () {
+	computeMorphNormals: function (skipVertex) {
 
 		var i, il, f, fl, face;
 
@@ -227,17 +227,21 @@ THREE.Geometry.prototype = {
 
 			}
 
-			if ( ! face.__originalVertexNormals ) face.__originalVertexNormals = [];
+			if ( ! skipVertex) {
 
-			for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
+				if ( ! face.__originalVertexNormals ) face.__originalVertexNormals = [];
 
-				if ( ! face.__originalVertexNormals[ i ] ) {
+				for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
 
-					face.__originalVertexNormals[ i ] = face.vertexNormals[ i ].clone();
+					if ( ! face.__originalVertexNormals[ i ] ) {
 
-				} else {
+						face.__originalVertexNormals[ i ] = face.vertexNormals[ i ].clone();
 
-					face.__originalVertexNormals[ i ].copy( face.vertexNormals[ i ] );
+					} else {
+
+						face.__originalVertexNormals[ i ].copy( face.vertexNormals[ i ] );
+
+					}
 
 				}
 
@@ -268,10 +272,14 @@ THREE.Geometry.prototype = {
 				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 					faceNormal = new THREE.Vector3();
-					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
-
 					dstNormalsFace.push( faceNormal );
-					dstNormalsVertex.push( vertexNormals );
+
+					if ( ! skipVertex) {
+
+						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
+						dstNormalsVertex.push( vertexNormals );
+
+					}
 
 				}
 
@@ -286,7 +294,7 @@ THREE.Geometry.prototype = {
 			// compute morph normals
 
 			tmpGeo.computeFaceNormals();
-			tmpGeo.computeVertexNormals();
+			if ( ! skipVertex) tmpGeo.computeVertexNormals();
 
 			// store morph normals
 
@@ -297,13 +305,18 @@ THREE.Geometry.prototype = {
 				face = this.faces[ f ];
 
 				faceNormal = morphNormals.faceNormals[ f ];
-				vertexNormals = morphNormals.vertexNormals[ f ];
 
 				faceNormal.copy( face.normal );
 
-				vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-				vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-				vertexNormals.c.copy( face.vertexNormals[ 2 ] );
+				if ( ! skipVertex) {
+
+					vertexNormals = morphNormals.vertexNormals[ f ];
+
+					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
+
+				}
 
 			}
 
@@ -316,8 +329,7 @@ THREE.Geometry.prototype = {
 			face = this.faces[ f ];
 
 			face.normal = face.__originalFaceNormal;
-			face.vertexNormals = face.__originalVertexNormals;
-
+			if ( ! skipVertex) face.vertexNormals = face.__originalVertexNormals;
 		}
 
 	},
