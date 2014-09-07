@@ -82,7 +82,7 @@
 
 			// Load jeep model using the AssimpJSONLoader
 			var loader1 = new THREE.AssimpJSONLoader();
-			loader1.load( 'models/assimp/jeep/jeep1.ms3d.json', function ( assimpjson ) {
+			loader1.load( 'models/assimp/jeep/jeep.assimp.json', function ( assimpjson ) {
 
 				assimpjson.scale.x = assimpjson.scale.y = assimpjson.scale.z = 0.2;
 				assimpjson.updateMatrix();
@@ -93,7 +93,7 @@
 
 			// load interior model
 			var loader2 = new THREE.AssimpJSONLoader();
-			loader2.load( 'models/assimp/interior/interior.3ds.json', function ( assimpjson ) {
+			loader2.load( 'models/assimp/interior/interior.assimp.json', function ( assimpjson ) {
 
 				assimpjson.scale.x = assimpjson.scale.y = assimpjson.scale.z = 1;
 				assimpjson.updateMatrix();

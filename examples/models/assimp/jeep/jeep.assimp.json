@@ -1,5 +1,9 @@
 {
-	 "rootnode": {
+	 "__metadata__": {
+	 	 "format" : "assimp2json"
+	 	,"version": 100
+	}
+	,"rootnode": {
 		 "name": "<MS3DRoot>"
 		,"transformation": [
 			 1

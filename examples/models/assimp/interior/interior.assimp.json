@@ -1,5 +1,9 @@
 {
-	 "rootnode": {
+	 "__metadata__": {
+	 	 "format" : "assimp2json"
+	 	,"version": 100
+	}
+	,"rootnode": {
 		 "name": "<3DSRoot>"
 		,"transformation": [
 			 1
