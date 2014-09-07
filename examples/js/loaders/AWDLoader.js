@@ -94,7 +94,7 @@ THREE.AWDLoader = (function (){
     this.materialFactory = undefined;
 
     this._resourceLoader = null;
-    this._url = null;
+    this._url = '';
 
     this._data;
     this._ptr = 0;
@@ -170,6 +170,8 @@ THREE.AWDLoader = (function (){
     while ( this._ptr < blen ) {
       this.parseNextBlock();
     }
+
+    return this.trunk;
 
   }
 

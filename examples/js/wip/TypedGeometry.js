@@ -8,13 +8,11 @@ THREE.TypedGeometry = function ( size ) {
 
 	if ( size !== undefined ) {
 
-		this.vertices = new Float32Array( size * 3 * 3 );
-		this.normals = new Float32Array( size * 3 * 3 );
-		this.uvs = new Float32Array( size * 3 * 2 );
-
-		this.attributes[ 'position' ] = { array: this.vertices, itemSize: 3 };
-		this.attributes[ 'normal' ] = { array: this.normals, itemSize: 3 };
-		this.attributes[ 'uv' ] = { array: this.uvs, itemSize: 2 };
+		this.setArrays( 
+			new Float32Array( size * 3 * 3 ),
+			new Float32Array( size * 3 * 3 ),
+			new Float32Array( size * 3 * 2 )
+		);
 
 	}
 
@@ -28,9 +26,9 @@ THREE.TypedGeometry.prototype.setArrays = function ( vertices, normals, uvs ) {
 	this.normals = normals;
 	this.uvs = uvs;
 
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 	return this;
 
@@ -48,15 +46,15 @@ THREE.TypedGeometry.prototype.merge = ( function () {
 		var offset2 = offset * 2;
 		var offset3 = offset * 3;
 
-		var vertices = this.attributes[ 'position' ].array;
-		var normals = this.attributes[ 'normal' ].array;
-		var uvs = this.attributes[ 'uv' ].array;
+		var vertices = this.attributes.position.array;
+		var normals = this.attributes.normal.array;
+		var uvs = this.attributes.uv.array;
 
 		if ( geometry instanceof THREE.TypedGeometry ) {
 
-			var vertices2 = geometry.attributes[ 'position' ].array;
-			var normals2 = geometry.attributes[ 'normal' ].array;
-			var uvs2 = geometry.attributes[ 'uv' ].array;
+			var vertices2 = geometry.attributes.position.array;
+			var normals2 = geometry.attributes.normal.array;
+			var uvs2 = geometry.attributes.uv.array;
 
 			for ( var i = 0, l = vertices2.length; i < l; i += 3 ) {
 
@@ -75,10 +73,10 @@ THREE.TypedGeometry.prototype.merge = ( function () {
 
 		} else if ( geometry instanceof THREE.IndexedTypedGeometry ) {
 
-			var indices2 = geometry.attributes[ 'index' ].array;
-			var vertices2 = geometry.attributes[ 'position' ].array;
-			var normals2 = geometry.attributes[ 'normal' ].array;
-			var uvs2 = geometry.attributes[ 'uv' ].array;
+			var indices2 = geometry.attributes.index.array;
+			var vertices2 = geometry.attributes.position.array;
+			var normals2 = geometry.attributes.normal.array;
+			var uvs2 = geometry.attributes.uv.array;
 
 			for ( var i = 0, l = indices2.length; i < l; i ++ ) {
 

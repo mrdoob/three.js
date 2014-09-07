@@ -67,8 +67,8 @@
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
 				control = new THREE.TransformControls( camera, renderer.domElement );
-
 				control.addEventListener( 'change', render );
+				control.addEventListener( 'objectChange', render );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );

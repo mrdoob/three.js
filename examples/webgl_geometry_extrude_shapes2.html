@@ -331,10 +331,7 @@ var init3d = function(){
 	camera.position.set( 0, 0, 200 );
 
 	/// Global : group
-	group = new THREE.Object3D();
-	group.position.x = 0.0;
-	group.position.y = 0.0;
-	group.position.z = 0.0;
+	group = new THREE.Group();
 	scene.add( group );
 
 	/// direct light

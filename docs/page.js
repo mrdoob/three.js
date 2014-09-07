@@ -49,7 +49,7 @@ var onDocumentLoad = function ( event ) {
 
 	var button = document.createElement( 'div' );
 	button.id = 'button';
-	button.textContent = 'Edit this page';
+	button.textContent = 'Edit';
 
 	button.addEventListener( 'click', function ( event ) {
 

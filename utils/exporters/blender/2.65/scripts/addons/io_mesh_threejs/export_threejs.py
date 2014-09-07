@@ -827,6 +827,7 @@ def generate_indices_and_weights(meshes, option_skinning):
     weights = []
 
     armature, armature_object = get_armature()
+    bone_names = [bone.name for bone in armature_object.pose.bones]
 
     for mesh, object in meshes:
 
@@ -854,9 +855,10 @@ def generate_indices_and_weights(meshes, option_skinning):
 
             for group in vertex.groups:
                 index = group.group
-                weight = group.weight
+                if object.vertex_groups[index].name in bone_names:
+                    weight = group.weight 
 
-                bone_array.append( (index, weight) )
+                    bone_array.append( (index, weight) )
                 
             bone_array.sort(key = operator.itemgetter(1), reverse=True)
             
@@ -879,11 +881,11 @@ def generate_indices_and_weights(meshes, option_skinning):
                             break
 
                     if found != 1:
-                        indices.append('0')
+                        indices.append('-1')
                         weights.append('0')
 
                 else:
-                    indices.append('0')
+                    indices.append('-1')
                     weights.append('0')
     
     

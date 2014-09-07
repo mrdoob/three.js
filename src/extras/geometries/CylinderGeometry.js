@@ -6,6 +6,8 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	THREE.Geometry.call( this );
 
+	this.type = 'CylinderGeometry';
+
 	this.parameters = {
 		radiusTop: radiusTop,
 		radiusBottom: radiusBottom,
