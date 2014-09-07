@@ -7546,25 +7546,16 @@ THREE.Object3D.prototype = {
 
 	getObjectById: function ( id, recursive ) {
 
+		if ( this.id === id ) return this;
+
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			var child = this.children[ i ];
+			var object = child.getObjectById( id, recursive );
 
-			if ( child.id === id ) {
+			if ( object !== undefined ) {
 
-				return child;
-
-			}
-
-			if ( recursive === true ) {
-
-				child = child.getObjectById( id, recursive );
-
-				if ( child !== undefined ) {
-
-					return child;
-
-				}
+				return object;
 
 			}
 
@@ -7576,25 +7567,16 @@ THREE.Object3D.prototype = {
 
 	getObjectByName: function ( name, recursive ) {
 
+		if ( this.name === name ) return this;
+
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			var child = this.children[ i ];
+			var object = child.getObjectByName( name, recursive );
 
-			if ( child.name === name ) {
+			if ( object !== undefined ) {
 
-				return child;
-
-			}
-
-			if ( recursive === true ) {
-
-				child = child.getObjectByName( name, recursive );
-
-				if ( child !== undefined ) {
-
-					return child;
-
-				}
+				return object;
 
 			}
 
