@@ -31,7 +31,27 @@ THREE.AssimpJSONLoader.prototype = {
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
-			var scene = scope.parse( JSON.parse( text ) );
+			var json = JSON.parse( text ), scene, metadata;
+
+			// Check __metadata__ meta header if present
+			// This header is used to disambiguate between
+			// different JSON-based file formats.
+			metadata = json.__metadata__;
+			if ( typeof metadata !== 'undefined' )
+			{
+				// Check if assimp2json at all
+				if ( metadata.format !== 'assimp2json' ) {
+					onError('Not an assimp2json scene');
+					return;
+				}
+				// Check major format version
+				else if ( metadata.version < 100 && metadata.version >= 200 ) {
+					onError('Unsupported assimp2json file format version');
+					return;
+				}
+			}
+
+			scene = scope.parse( json );
 			onLoad( scene );
 		} );
 	},

@@ -7499,9 +7499,18 @@ THREE.Object3D.prototype = {
 		if ( index !== - 1 ) {
 
 			object.parent = undefined;
-			object.dispatchEvent( { type: 'removed' } );
 
 			this.children.splice( index, 1 );
+
+			object.dispatchEvent( { type: 'removed' } );
+
+			// notify renderer object and descendants were removed.
+
+			object.traverse( function ( child ) {
+
+				child.dispatchEvent( { type: 'removedFromScene' } );
+
+			} );
 
 		}
 
@@ -19818,11 +19827,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 	
-	var onObjectRemoved = function ( event ) {
+	var onObjectRemovedFromScene = function ( event ) {
 
 		var object = event.target;
 
-		object.removeEventListener( 'removed', onObjectRemoved );
+		object.removeEventListener( 'removedFromScene', onObjectRemovedFromScene );
 
 		removeObject( object )
 
@@ -22858,7 +22867,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
-			object.addEventListener( 'removed', onObjectRemoved );
+			object.addEventListener( 'removedFromScene', onObjectRemovedFromScene );
 
 		}
 		
