@@ -357,9 +357,18 @@ THREE.Object3D.prototype = {
 		if ( index !== - 1 ) {
 
 			object.parent = undefined;
-			object.dispatchEvent( { type: 'removed' } );
 
 			this.children.splice( index, 1 );
+
+			object.dispatchEvent( { type: 'removed' } );
+
+			// notify renderer object and descendants were removed.
+
+			object.traverse( function ( child ) {
+
+				child.dispatchEvent( { type: 'removedFromScene' } );
+
+			} );
 
 		}
 
