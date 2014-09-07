@@ -4839,7 +4839,7 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                 }
 
-                if (sampleUniform(_uniformSampler, type, program.id, j, uniform._array))
+                if (sampleUniformArray(_uniformSampler, type, program.id, j, uniform._array))
 
                     _gl.uniform2fv(location, uniform._array);
 
@@ -4861,7 +4861,7 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                 }
 
-                if (sampleUniform(_uniformSampler, type, program.id, j, uniform._array))
+                if (sampleUniformArray(_uniformSampler, type, program.id, j, uniform._array))
 
                     _gl.uniform3fv(location, uniform._array);
 
@@ -4884,7 +4884,7 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                 }
 
-                if (sampleUniform(_uniformSampler, type, program.id, j, uniform._array))
+                if (sampleUniformArray(_uniformSampler, type, program.id, j, uniform._array))
 
                     _gl.uniform4fv(location, uniform._array);
 
