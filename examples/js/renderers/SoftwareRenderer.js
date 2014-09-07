@@ -245,7 +245,19 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				}				
 
-			}
+			} else if ( element instanceof THREE.RenderableLine ) {
+               
+               var shader = getMaterialShader( material );
+               
+               drawLine(
+						element.v1.positionScreen,
+						element.v2.positionScreen,
+                        element.vertexColors[0],
+                        element.vertexColors[1],
+                        shader,
+                        material
+					);
+            }
 
 		}
 
@@ -1033,6 +1045,241 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		}
 
 	}
+    
+    function drawLine( v1, v2, color1, color2, shader, material ) {
+        
+        // TODO: Implement per-pixel z-clipping
+
+		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
+
+		// https://gist.github.com/2486101
+		// explanation: http://pouet.net/topic.php?which=8760&page=1
+
+		// 28.4 fixed-point coordinates
+
+		var x1 = (v1.x * viewportXScale + viewportXOffs) | 0;
+		var x2 = (v2.x * viewportXScale + viewportXOffs) | 0;
+
+		var y1 = (v1.y * viewportYScale + viewportYOffs) | 0;
+		var y2 = (v2.y * viewportYScale + viewportYOffs) | 0;
+
+		// Z values (.28 fixed-point)
+
+		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
+		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
+		
+		// Deltas
+
+		var dx12 = x1 - x2, dy12 = y2 - y1;
+
+		// Bounding rectangle
+
+		var minx = Math.max( ( Math.min( x1, x2 ) + subpixelBias ) >> subpixelBits, 0 );
+		var maxx = Math.min( ( Math.max( x1, x2 ) + subpixelBias ) >> subpixelBits, canvasWidth );
+		var miny = Math.max( ( Math.min( y1, y2 ) + subpixelBias ) >> subpixelBits, 0 );
+		var maxy = Math.min( ( Math.max( y1, y2 ) + subpixelBias ) >> subpixelBits, canvasHeight );
+
+		rectx1 = Math.min( minx, rectx1 );
+		rectx2 = Math.max( maxx, rectx2 );
+		recty1 = Math.min( miny, recty1 );
+		recty2 = Math.max( maxy, recty2 );
+
+		// Block size, standard 8x8 (must be power of two)
+
+		var q = blockSize;
+
+		// Start in corner of 8x8 block
+
+		minx &= ~(q - 1);
+		miny &= ~(q - 1);
+
+		// Constant part of half-edge functions
+
+		var minXfixscale = (minx << subpixelBits);
+		var minYfixscale = (miny << subpixelBits);
+
+		var c1 = dy12 * ((minXfixscale) - x1) + dx12 * ((minYfixscale) - y1);
+
+		// Correct for fill convention
+
+		if ( dy12 > 0 || ( dy12 == 0 && dx12 > 0 ) ) c1 ++;
+
+		// Note this doesn't kill subpixel precision, but only because we test for >=0 (not >0).
+		// It's a bit subtle. :)
+		c1 = (c1 - 1) >> subpixelBits;
+
+		// Z interpolation setup
+
+		var dz12 = z1 - z2;
+		var invDet = 1.0 / dx12;
+		var dzdx = invDet * dz12; // dz per one subpixel step in x
+		var dzdy = invDet * dz12; // dz per one subpixel step in y
+
+		// Z at top/left corner of rast area
+
+		var cz = ( z1 + ((minXfixscale) - x1) * dzdx + ((minYfixscale) - y1) * dzdy ) | 0;
+
+		// Z pixel steps
+
+		var fixscale = (1 << subpixelBits);
+		dzdx = (dzdx * fixscale) | 0;
+		dzdy = (dzdy * fixscale) | 0;
+		
+		// Set up min/max corners
+		var qm1 = q - 1; // for convenience
+		var nmin1 = 0, nmax1 = 0;
+		var nmin2 = 0, nmax2 = 0;
+		var nmin3 = 0, nmax3 = 0;
+		var nminz = 0, nmaxz = 0;
+		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
+		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
+		if (dzdx >= 0) nmaxz += qm1*dzdx; else nminz += qm1*dzdx;
+		if (dzdy >= 0) nmaxz += qm1*dzdy; else nminz += qm1*dzdy;
+
+		// Loop through blocks
+		var linestep = canvasWidth - q;
+		var scale = 1.0 / c1;
+
+		var cb1 = c1;
+		var cbz = cz;
+		var qstep = -q;
+		var e1x = qstep * dy12;
+		var ezx = qstep * dzdx;
+			
+		var x0 = minx;
+
+		for ( var y0 = miny; y0 < maxy; y0 += q ) {
+
+			// New block line - keep hunting for tri outer edge in old block line dir
+			while ( x0 >= minx && x0 < maxx && cb1 >= nmax1 ) {
+
+				x0 += qstep;
+				cb1 += e1x;
+				cbz += ezx;	
+			}
+
+			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
+			qstep = -qstep;
+			e1x = -e1x;
+			ezx = -ezx;
+			
+			while ( 1 ) {
+
+				// Step everything
+				x0 += qstep;
+				cb1 += e1x;
+				cbz += ezx;
+				
+				// We're done with this block line when at least one edge completely out
+				// If an edge function is too small and decreasing in the current traversal
+				// dir, we're done with this line.
+				if (x0 < minx || x0 >= maxx) break;
+				if (cb1 < nmax1) if (e1x < 0) break; else continue;
+				
+				// We can skip this block if it's already fully covered
+				var blockX = x0 >> blockShift;
+				var blockY = y0 >> blockShift;
+				var blockId = blockX + blockY * canvasWBlocks;
+				var minz = cbz + nminz;
+
+				// farthest point in block closer than closest point in our tri?
+				if ( blockMaxZ[ blockId ] < minz ) continue;
+
+				// Need to do a deferred clear?
+				var bflags = blockFlags[ blockId ];
+				if ( bflags & BLOCK_NEEDCLEAR) clearBlock( blockX, blockY );
+				blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
+
+				// Offset at top-left corner
+				var offset = x0 + y0 * canvasWidth;
+				
+				// Accept whole block when fully covered
+				if ( cb1 >= nmin1 ) {
+
+					var maxz = cbz + nmaxz;
+					blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );
+
+					var cy1 = cb1;
+					var cyz = cbz;
+
+					for ( var iy = 0; iy < q; iy ++ ) {
+
+						var cx1 = cy1;
+						var cx2 = cy2;
+						var cxz = cyz;										 
+
+						for ( var ix = 0; ix < q; ix ++ ) {
+
+							var z = cxz;
+							 
+							if ( z < zbuffer[ offset ] ) {		 
+								shader( data, zbuffer, offset, z, 1, 1, null, null, material );								
+							}
+
+							cx1 += dy12;
+							cxz += dzdx;
+							
+							offset++;
+
+						}
+
+						cy1 += dx12;
+						cyz += dzdy;										
+						
+						offset += linestep;
+
+					}
+
+				} else { // Partially covered block
+
+					var cy1 = cb1;
+					var cyz = cbz;
+					
+					for ( var iy = 0; iy < q; iy ++ ) {
+
+						var cx1 = cy1;
+						var cxz = cyz;
+						
+						for ( var ix = 0; ix < q; ix ++ ) {
+
+							if ( ( cx1 | cx2 ) >= 0 ) {
+
+								var z = cxz;								
+
+								if ( z < zbuffer[ offset ] ) {						 
+									shader( data, zbuffer, offset, z, 1, 1, null, null, material );
+								}
+
+							}
+
+							cx1 += dy12;
+							cxz += dzdx;
+														
+							offset++;
+
+						}
+
+						cy1 += dx12;
+						cyz += dzdy;
+						
+						offset += linestep;
+
+					}
+
+				}
+
+			}
+
+			// Advance to next row of blocks
+			cb1 += q*dx12;
+			cbz += q*dzdy;
+			
+		}
+        
+        // interpolation pixel postion from vertices
+        
+        // interpolation pixel color from vertices
+    }
 
 	function clearBlock( blockX, blockY ) {
 
