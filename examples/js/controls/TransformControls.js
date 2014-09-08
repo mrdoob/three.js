@@ -568,8 +568,8 @@
 		var _plane = "XY";
 
 		var changeEvent = { type: "change" };
-		var clickEvent = { type: "click" };
-		var clickDoneEvent = { type: "clickDone", mode: _mode };
+		var mouseDownEvent = { type: "mouseDown" };
+		var mouseUpEvent = { type: "mouseUp", mode: _mode };
 		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
@@ -760,7 +760,7 @@
 
 				if ( intersect ) {
 
-					scope.dispatchEvent( clickEvent );
+					scope.dispatchEvent( mouseDownEvent );
 
 					scope.axis = intersect.object.name;
 
@@ -961,9 +961,9 @@
 
 		function onPointerUp( event ) {
 
-			if ( _dragging ) {
-				clickDoneEvent.mode = _mode;
-				scope.dispatchEvent( clickDoneEvent )
+			if ( _dragging && !!scope.axis ) {
+				mouseUpEvent.mode = _mode;
+				scope.dispatchEvent( mouseUpEvent )
 			}
 			_dragging = false;
 			onPointerHover( event );
