@@ -111,11 +111,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
 	_currentProgram = null,
 	_currentFramebuffer = null,
+	
     _currentArrayBuffer = null,         // _gl.bindBuffer(ARRAY_BUFFER, value)
     _currentElementArrayBuffer = null,  // _gl.bindBuffer(ELEMENT_ARRAY_BUFFER, value)
     _currentVertexAttribPointer = null, // _gl.vertexAttribPointer(value, 3, _gl.FLOAT, false, 0, 0);
     _currentTextureUnit = null,         // _gl.activeTexture(_gl.TEXTURE0 + value)
     _currentTexture = null,             // _gl.bindTexture(_gl.TEXTURE0, value)
+    
 	_currentMaterialId = -1,
 	_currentGeometryGroupHash = null,
 	_currentCamera = null,
@@ -141,6 +143,7 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 	_oldPolygonOffsetUnits = null,
 
 	_oldLineWidth = null,
+	
     //  Uniform value samplers
     //
     //  The renderer contains a list of programs (_programs) which contains the 
@@ -5208,6 +5211,7 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
         object._normalMatrix.getNormalMatrix(object._modelViewMatrix);
 
     };
+
 
     // Samplers
 
