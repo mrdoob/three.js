@@ -149,9 +149,11 @@ var Viewport = function ( editor ) {
 
 		var intersects = getIntersects( event, objects );
 
-		if ( intersects.length > 0 && intersects[ 0 ].object === editor.selected ) {
+		if ( intersects.length > 0 ) {
 
-			controls.focus( editor.selected );
+			var intersect = intersects[ 0 ];
+
+			signals.objectFocused.dispatch( intersect.object );
 
 		}
 
@@ -164,7 +166,7 @@ var Viewport = function ( editor ) {
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
-	controls.center.fromArray( editor.config.getKey( 'camera/target' ) )
+	controls.center.fromArray( editor.config.getKey( 'camera/target' ) );
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
@@ -280,6 +282,12 @@ var Viewport = function ( editor ) {
 		}
 
 		render();
+
+	} );
+
+	signals.objectFocused.add( function ( object ) {
+
+		controls.focus( object );
 
 	} );
 
