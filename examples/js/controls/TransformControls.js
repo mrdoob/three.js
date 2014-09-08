@@ -822,7 +822,7 @@
 					scope.object.position.copy( oldPosition );
 					scope.object.position.add( point );
 
-				} 
+				}
 
 				if ( scope.space == "world" || scope.axis.search("XYZ") != -1 ) {
 
@@ -961,7 +961,7 @@
 
 		function onPointerUp( event ) {
 
-			if (_dragging){
+			if ( _dragging ) {
 				clickDoneEvent.mode = _mode;
 				scope.dispatchEvent( clickDoneEvent )
 			}
