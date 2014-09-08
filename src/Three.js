@@ -24,6 +24,10 @@ if ( Math.sign === undefined ) {
 	
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
+
+THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
+
 // GL STATE CONSTANTS
 
 THREE.CullFaceNone = 0;
@@ -171,11 +175,3 @@ THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 */
-
-// MouseEvent.button codes per https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
-
-THREE.MOUSE = {
-	LEFT: 0,
-	MIDDLE: 1, 
-	RIGHT: 2
-};
