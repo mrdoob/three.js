@@ -513,13 +513,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 	
-	var onObjectRemovedFromScene = function ( event ) {
+	var onObjectRemoved = function ( event ) {
 
 		var object = event.target;
 
-		object.removeEventListener( 'removedFromScene', onObjectRemovedFromScene );
+		object.removeEventListener( 'remove', onObjectRemoved );
 
-		removeObject( object )
+		object.traverse( function ( child ) {
+
+			removeObject( child );
+
+		} );
 
 	};
 
@@ -3553,7 +3557,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
-			object.addEventListener( 'removedFromScene', onObjectRemovedFromScene );
+			object.addEventListener( 'removed', onObjectRemoved );
 
 		}
 		
