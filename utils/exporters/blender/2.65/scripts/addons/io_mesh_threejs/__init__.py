@@ -22,12 +22,12 @@
 
 
 bl_info = {
-    "name": "three.js format grgr",
+    "name": "three.js format",
     "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k, crobi",
     "version": (1, 5, 0),
     "blender": (2, 7, 0),
     "location": "File > Import-Export",
-    "description": "Import-Export three.js meshes grgr",
+    "description": "Import-Export three.js meshes",
     "warning": "",
     "wiki_url": "https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender",
     "tracker_url": "https://github.com/mrdoob/three.js/issues",
