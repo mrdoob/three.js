@@ -111,6 +111,11 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
     _currentProgram = null,
     _currentFramebuffer = null,
+    _currentArrayBuffer = null,         // _gl.bindBuffer(ARRAY_BUFFER, value)
+    _currentElementArrayBuffer = null,  // _gl.bindBuffer(ELEMENT_ARRAY_BUFFER, value)
+    _currentVertexAttribPointer = null, // _gl.vertexAttribPointer(value, 3, _gl.FLOAT, false, 0, 0);
+    _currentTextureUnit = null,         // _gl.activeTexture(_gl.TEXTURE0 + value)
+    _currentTexture = null,             // _gl.bindTexture(_gl.TEXTURE0, value)
     _currentMaterialId = -1,
     _currentGeometryGroupHash = null,
     _currentCamera = null,
@@ -136,6 +141,24 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
     _oldPolygonOffsetUnits = null,
 
     _oldLineWidth = null,
+    //  Uniform value samplers
+    //
+    //  The renderer contains a list of programs (_programs) which contains the 
+    //  uniforms set by each program during the render step. Each program sets
+    //  uniforms for the:
+    //
+    //  - Projection Matrix (Camera)
+    //  - Model Matrix (Matrix World)
+    //  - View Matrix (Matrix World Inverse)
+    //  - Model View Matrix
+    //  - Normal Matrix
+
+    _projectionMatrixSampler = [],
+    _modelMatrixSampler = [],
+    _viewMatrixSampler = [],
+    _modelViewMatrixSampler = [],
+    _normalMatrixSampler = [],
+    _uniformSampler = [],
 
     _viewportX = 0,
     _viewportY = 0,
@@ -1966,7 +1989,23 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
                 vertexIndex += 3;
 
             }
-            
+            if (_currentElementArrayBuffer != geometryGroup.__webglFaceBuffer) {
+
+                _currentElementArrayBuffer = geometryGroup.__webglFaceBuffer;
+
+                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer);
+
+            }
+
+            _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, faceArray, hint);
+
+            if (_currentElementArrayBuffer != geometryGroup.__webglLineBuffer) {
+
+                _currentElementArrayBuffer = geometryGroup.__webglLineBuffer;
+
+                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer);
+
+            } 
             _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, lineArray, hint);
 
         }
@@ -2514,7 +2553,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                         setupVertexAttributes(material, program, geometry, 0);
 
-                        
+                        if (_currentElementArrayBuffer != index.buffer) {
+
+                            _currentElementArrayBuffer = index.buffer;
+
+                            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
+
+                        };
 
                     }
 
@@ -2540,7 +2585,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                             setupVertexAttributes(material, program, geometry, startIndex);
 
-                            
+                            if (_currentElementArrayBuffer != index.buffer) {
+
+                                _currentElementArrayBuffer = index.buffer;
+
+                                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
+
+                            };
 
                         }
 
@@ -2631,7 +2682,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                         setupVertexAttributes(material, program, geometry, 0);
 
-                       
+                        if (_currentElementArrayBuffer != index.buffer) {
+
+                            _currentElementArrayBuffer = index.buffer;
+
+                            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
+
+                        };
 
                     }
 
@@ -2656,7 +2713,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                             setupVertexAttributes(material, program, geometry, startIndex);
 
-                            
+                            if (_currentElementArrayBuffer != index.buffer) {
+
+                                _currentElementArrayBuffer = index.buffer;
+
+                                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
+
+                            };
 
                         }
 
@@ -2726,6 +2789,24 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
         if (!material.morphTargets && attributes.position >= 0) {
 
             if (updateBuffers) {
+
+                if (_currentArrayBuffer != geometryGroup.__webglVertexBuffer) {
+
+                    _currentArrayBuffer = geometryGroup.__webglVertexBuffer;
+
+                    _gl.bindBuffer(_gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer);
+                   
+                }
+
+                enableAttribute(attributes.position);
+
+                if (_currentVertexAttribPointer != geometryGroup.__webglVertexBuffer){
+
+                    _currentVertexAttribPointer = geometryGroup.__webglVertexBuffer;
+                    
+                    _gl.vertexAttribPointer(attributes.position, 3, _gl.FLOAT, false, 0, 0);
+
+                }
             }
 
         } else {
@@ -2879,7 +2960,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
                 setLineWidth(material.wireframeLinewidth);
                 if (updateBuffers)
 
-                    
+                    if (_currentElementArrayBuffer != geometryGroup.__webglLineBuffer) {
+
+                        _currentElementArrayBuffer = geometryGroup.__webglLineBuffer;
+
+                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer);
+
+                    };
 
                 _gl.drawElements(_gl.LINES, geometryGroup.__webglLineCount, type, 0);
 
@@ -2889,7 +2976,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                 if (updateBuffers)
 
-                   
+                    if (_currentElementArrayBuffer != geometryGroup.__webglFaceBuffer) {
+
+                        _currentElementArrayBuffer = geometryGroup.__webglFaceBuffer;
+
+                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer);
+
+                    };
 
                 _gl.drawElements(_gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0);
 
@@ -4181,7 +4274,8 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
         if (refreshProgram || camera !== _currentCamera) {
 
-            
+            if (sampleUniform(_projectionMatrixSampler, 'm4v', program.id, 0, camera.projectionMatrix.elements))
+
                 _gl.uniformMatrix4fv(p_uniforms.projectionMatrix, false, camera.projectionMatrix.elements);
 
             if (_logarithmicDepthBuffer) {
@@ -4216,7 +4310,7 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
                 if (p_uniforms.viewMatrix !== null) {
 
-                   
+                    if (sampleUniform(_viewMatrixSampler, 'm4', program.id, 0, camera.matrixWorldInverse.elements))
 
                         _gl.uniformMatrix4fv(p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements);
 
@@ -4368,7 +4462,8 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
         if (p_uniforms.modelMatrix !== null) {
 
-            
+            if (sampleUniform(_modelMatrixSampler, 'm4', program.id, 0, object.matrixWorld.elements))
+
                 _gl.uniformMatrix4fv(p_uniforms.modelMatrix, false, object.matrixWorld.elements);
 
         }
@@ -4649,11 +4744,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
     function loadUniformsMatrices(uniforms, object) {
 
-        
+        if (sampleUniform(_modelViewMatrixSampler, 'm4v', _currentMaterialId.id, 0, object._modelViewMatrix.elements))
 
             _gl.uniformMatrix4fv(uniforms.modelViewMatrix, false, object._modelViewMatrix.elements);
 
         if (uniforms.normalMatrix) {
+
+            if (sampleUniform(_normalMatrixSampler, '3fv', _currentMaterialId.id, 0, object._normalMatrix.elements))
 
                 _gl.uniformMatrix3fv(uniforms.normalMatrix, false, object._normalMatrix.elements);
 
@@ -4692,7 +4789,412 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
             var value = uniform.value;
             var location = uniforms[j][1];
 
-           
+            switch (type) {
+
+                case '1i':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1i(location, value);
+
+                    break;
+
+                case '1f':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1f(location, value);
+                    break;
+
+                case '2f':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform2f(location, value[0], value[1]);
+
+                    break;
+
+                case '3f':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform3f(location, value[0], value[1], value[2]);
+
+                    break;
+
+                case '4f':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform4f(location, value[0], value[1], value[2], value[3]);
+                    break;
+
+                case '1iv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1iv(location, value);
+                    break;
+
+                case '3iv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform3iv(location, value);
+                    break;
+
+                case '1fv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1fv(location, value);
+                    break;
+
+                case '2fv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform2fv(location, value);
+                    break;
+
+                case '3fv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform3fv(location, value);
+                    break;
+
+                case '4fv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform4fv(location, value);
+                    break;
+
+                case 'Matrix3fv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniformMatrix3fv(location, false, value);
+                    break;
+
+                case 'Matrix4fv':
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniformMatrix4fv(location, false, value);
+                    break;
+
+                    //
+
+                case 'i':
+
+                    // single integer
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1i(location, value);
+
+                    break;
+
+                case 'f':
+
+                    // single float
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1f(location, value);
+
+                    break;
+
+                case 'v2':
+
+                    // single THREE.Vector2
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [ value.x, value.y ]))
+
+                        _gl.uniform2f(location, value.x, value.y);
+
+                    break;
+
+                case 'v3':
+
+                    // single THREE.Vector3
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [value.x, value.y, value.z]))
+
+                        _gl.uniform3f(location, value.x, value.y, value.z);
+
+                    break;
+
+                case 'v4':
+
+                    // single THREE.Vector4
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [value.x, value.y, value.z, value.w]))
+
+                        _gl.uniform4f(location, value.x, value.y, value.z, value.w);
+
+                    break;
+
+                case 'c':
+
+                    // single THREE.Color
+
+                    //if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [ value.r, value.g, value.b ]))
+
+                        _gl.uniform3f(location, value.r, value.g, value.b);
+
+                    break;
+
+                case 'iv1':
+
+                    // flat array of integers (JS or typed array)
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1iv(location, value);
+
+                    break;
+
+                case 'iv':
+
+                    // flat array of integers with 3 x N size (JS or typed array)
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform3iv(location, value);
+
+                    break;
+
+                case 'fv1':
+
+                    // flat array of floats (JS or typed array)
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform1fv(location, value);
+
+                    break;
+
+                case 'fv':
+
+                    // flat array of floats with 3 x N size (JS or typed array)
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
+
+                        _gl.uniform3fv(location, value);
+
+                    break;
+
+                case 'v2v':
+
+                    // array of THREE.Vector2
+
+                    if (uniform._array === undefined) {
+
+                        uniform._array = new Float32Array(2 * value.length);
+
+                    }
+
+                    for (var i = 0, il = value.length; i < il; i++) {
+
+                        offset = i * 2;
+
+                        uniform._array[offset] = value[i].x;
+                        uniform._array[offset + 1] = value[i].y;
+
+                    }
+
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
+
+                        _gl.uniform2fv(location, uniform._array);
+
+                    break;
+
+                case 'v3v':
+
+                    // array of THREE.Vector3
+
+                    if (uniform._array === undefined) {
+
+                        uniform._array = new Float32Array(3 * value.length);
+
+                    }
+
+                    for (var i = 0, il = value.length; i < il; i++) {
+
+                        offset = i * 3;
+
+                        uniform._array[offset] = value[i].x;
+                        uniform._array[offset + 1] = value[i].y;
+                        uniform._array[offset + 2] = value[i].z;
+
+                    }
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
+
+                        _gl.uniform3fv(location, uniform._array);
+
+                    break;
+
+                case 'v4v':
+
+                    // array of THREE.Vector4
+
+                    if (uniform._array === undefined) {
+
+                        uniform._array = new Float32Array(4 * value.length);
+
+                    }
+
+                    for (var i = 0, il = value.length; i < il; i++) {
+
+                        offset = i * 4;
+
+                        uniform._array[offset] = value[i].x;
+                        uniform._array[offset + 1] = value[i].y;
+                        uniform._array[offset + 2] = value[i].z;
+                        uniform._array[offset + 3] = value[i].w;
+
+                    }
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
+
+                        _gl.uniform4fv(location, uniform._array);
+
+                    break;
+
+                case 'm3':
+
+                    // single THREE.Matrix3
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value.elements))
+
+                        _gl.uniformMatrix3fv(location, false, value.elements);
+
+                    break;
+
+                case 'm3v':
+
+                    // array of THREE.Matrix3
+
+                    if (uniform._array === undefined) {
+
+                        uniform._array = new Float32Array(9 * value.length);
+
+                    }
+
+                    for (var i = 0, il = value.length; i < il; i++) {
+
+                        value[i].flattenToArrayOffset(uniform._array, i * 9);
+
+                    }
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
+
+                        _gl.uniformMatrix3fv(location, false, uniform._array);
+
+                    break;
+
+                case 'm4':
+
+                    // single THREE.Matrix4
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
+
+                    _gl.uniformMatrix4fv(location, false, value.elements);
+
+                    break;
+
+                case 'm4v':
+
+                    // array of THREE.Matrix4
+
+                    if (uniform._array === undefined) {
+
+                        uniform._array = new Float32Array(16 * value.length);
+
+                    }
+
+                    for (var i = 0, il = value.length; i < il; i++) {
+
+                        value[i].flattenToArrayOffset(uniform._array, i * 16);
+
+                    }
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
+
+                    _gl.uniformMatrix4fv(location, false, uniform._array);
+
+                    break;
+
+                case 't':
+
+                    // single THREE.Texture (2d or cube)
+
+                    texture = value;
+                    textureUnit = getTextureUnit();
+
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, textureUnit))
+
+                        _gl.uniform1i(location, textureUnit);
+
+                    if (!texture) continue;
+
+                    if (texture instanceof THREE.CubeTexture ||
+                       (texture.image instanceof Array && texture.image.length === 6)) { // CompressedTexture can have Array in image :/
+
+                        setCubeTexture(texture, textureUnit);
+
+                    } else if (texture instanceof THREE.WebGLRenderTargetCube) {
+
+                        setCubeTextureDynamic(texture, textureUnit);
+
+                    } else {
+
+                        _this.setTexture(texture, textureUnit);
+
+                    }
+
+                    break;
+
+                case 'tv':
+
+                    // array of THREE.Texture (2d)
+
+                    if (uniform._array === undefined) {
+
+                        uniform._array = [];
+
+                    }
+
+                    for (var i = 0, il = uniform.value.length; i < il; i++) {
+
+                        uniform._array[i] = getTextureUnit();
+
+                    }
+
+                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
+
+                        _gl.uniform1iv(location, uniform._array);
+
+                    for (var i = 0, il = uniform.value.length; i < il; i++) {
+
+                        texture = uniform.value[i];
+                        textureUnit = uniform._array[i];
+
+                        if (!texture) continue;
+
+                        _this.setTexture(texture, textureUnit);
+
+                    }
+
+                    break;
+
+                default:
+
+                    console.warn('THREE.WebGLRenderer: Unknown uniform type: ' + type);
 
             }
 
@@ -4709,7 +5211,62 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
     // Samplers
 
-    
+    function sampleUniform(samplerArray, type, renderId, uniformIndex, value) {
+
+        if (!samplerArray[type])
+
+            samplerArray[type] = [];
+
+        if (!samplerArray[type][renderId])
+
+            samplerArray[type][renderId] = [];
+
+        if (samplerArray[type][renderId][uniformIndex] !== undefined) {
+
+            switch (type) {
+
+                // Single valued uniforms
+                case '1i': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
+                case 'if': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
+                case 'i': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
+                case 'f': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
+                case 't': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
+
+                // Array uniforms
+                default:
+
+                    if (arraysEqual(samplerArray[type][renderId][uniformIndex], value)) return false;
+
+                    break;
+
+            }
+
+        }
+
+        samplerArray[type][renderId][uniformIndex] = value;
+
+        return true;
+        
+    }
+
+    function arraysEqual(arrayA, arrayB) {
+
+        if (arrayA.length !== arrayB.length)
+            return false;
+        for (var i = arrayA.length; i--;) {
+            if (!areEqualNumeric(arrayA[i], arrayB[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    function areEqualNumeric(val1, val2) {
+
+        return val1 === val2 || (val1 !== val1 && val2 !== val2);
+
+    }
+
     //
 
     function setColorGamma(array, offset, color, intensitySq) {
@@ -5227,7 +5784,14 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
         }
 
-               
+        if (_currentTexture != texture.__webglTexture) {
+
+            _currentTexture = texture.__webglTexture;
+
+            _gl.bindTexture(_gl.TEXTURE_2D, texture.__webglTexture);
+
+        }
+        
 
         _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
         _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
@@ -5315,7 +5879,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
     this.setTexture = function (texture, slot) {
 
-        
+        if (slot != _currentTextureUnit) {
+
+            _currentTextureUnit = slot;
+
+            _gl.activeTexture(_gl.TEXTURE0 + slot);
+
+        }
 
         if (texture.needsUpdate) {
 
@@ -5323,7 +5893,13 @@ THREE.WebGLOptimizedRenderer = function (parameters) {
 
         } else {
 
-            
+            if (_currentTexture != texture.__webglTexture) {
+
+                _currentTexture = texture.__webglTexture;
+
+                _gl.bindTexture(_gl.TEXTURE_2D, texture.__webglTexture);
+
+            }
 
         }
 
