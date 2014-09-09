@@ -11324,16 +11324,12 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 THREE.PerspectiveCamera.prototype.clone = function () {
 
-	var camera = new THREE.PerspectiveCamera();
+	var camera = new THREE.PerspectiveCamera( this.fov, this.aspect, this.near, this.far );
 
 	THREE.Camera.prototype.clone.call( this, camera );
 
-	camera.fov = this.fov;
-	camera.aspect = this.aspect;
-	camera.near = this.near;
-	camera.far = this.far;
-
 	return camera;
+
 };
 
 // File:src/lights/Light.js
