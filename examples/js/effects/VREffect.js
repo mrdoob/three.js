@@ -101,11 +101,13 @@ THREE.VREffect = function ( renderer, done ) {
 		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV );
 		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV );
 
-		cameraLeft.position.x = camera.position.x + leftEyeTranslation.x;
+		cameraLeft.position.copy( camera.position );
 		cameraLeft.quaternion.copy( camera.quaternion );
+		cameraLeft.translateX( leftEyeTranslation.x );
 
-		cameraRight.position.x = camera.position.x + rightEyeTranslation.x;
+		cameraRight.position.copy( camera.position );
 		cameraRight.quaternion.copy( camera.quaternion );
+		cameraRight.translateX( rightEyeTranslation.x );
 
 		// render left eye
 		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
