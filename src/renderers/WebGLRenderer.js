@@ -76,7 +76,6 @@ THREE.WebGLRenderer = function (parameters) {
 
     this.renderPluginsPre = [];
     this.renderPluginsPost = [];
-    this._renderPlugins = true;
 
     // info
 
@@ -110,12 +109,7 @@ THREE.WebGLRenderer = function (parameters) {
 	// internal state cache
 
 	_currentProgram = null,
-	_currentFramebuffer = null,
-    _currentArrayBuffer = null,         // _gl.bindBuffer(ARRAY_BUFFER, value)
-    _currentElementArrayBuffer = null,  // _gl.bindBuffer(ELEMENT_ARRAY_BUFFER, value)
-    _currentVertexAttribPointer = null, // _gl.vertexAttribPointer(value, 3, _gl.FLOAT, false, 0, 0);
-    _currentTextureUnit = null,         // _gl.activeTexture(_gl.TEXTURE0 + value)
-    _currentTexture = null,             // _gl.bindTexture(_gl.TEXTURE0, value)
+	_currentFramebuffer = null,    
 	_currentMaterialId = -1,
 	_currentGeometryGroupHash = null,
 	_currentCamera = null,
@@ -142,23 +136,6 @@ THREE.WebGLRenderer = function (parameters) {
 
 	_oldLineWidth = null,
 	
-    //  Uniform value samplers
-    //
-    //  The renderer contains a list of programs (_programs) which contains the 
-    //  uniforms set by each program during the render step. Each program sets
-    //  uniforms for the:
-    //
-    //  - Projection Matrix (Camera)
-    //  - Model Matrix (Matrix World)
-    //  - View Matrix (Matrix World Inverse)
-    //  - Model View Matrix
-    //  - Normal Matrix
-
-    _projectionMatrixSampler = [],
-    _modelMatrixSampler = [],
-    _viewMatrixSampler = [],
-    _modelViewMatrixSampler = [],
-    _normalMatrixSampler = [],
     _uniformSampler = [],
 
 	_viewportX = 0,
@@ -1990,23 +1967,12 @@ THREE.WebGLRenderer = function (parameters) {
                 vertexIndex += 3;
 
             }
-            if (_currentElementArrayBuffer != geometryGroup.__webglFaceBuffer) {
-
-                _currentElementArrayBuffer = geometryGroup.__webglFaceBuffer;
-
-                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer);
-
-            }
+            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer);            
 
             _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, faceArray, hint);
 
-            if (_currentElementArrayBuffer != geometryGroup.__webglLineBuffer) {
-
-                _currentElementArrayBuffer = geometryGroup.__webglLineBuffer;
-
-                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer);
-
-            } 
+            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer);
+            
             _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, lineArray, hint);
 
         }
@@ -2554,13 +2520,7 @@ THREE.WebGLRenderer = function (parameters) {
 
                         setupVertexAttributes(material, program, geometry, 0);
 
-                        if (_currentElementArrayBuffer != index.buffer) {
-
-                            _currentElementArrayBuffer = index.buffer;
-
-                            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
-
-                        };
+                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
 
                     }
 
@@ -2586,13 +2546,7 @@ THREE.WebGLRenderer = function (parameters) {
 
                             setupVertexAttributes(material, program, geometry, startIndex);
 
-                            if (_currentElementArrayBuffer != index.buffer) {
-
-                                _currentElementArrayBuffer = index.buffer;
-
-                                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
-
-                            };
+                            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
 
                         }
 
@@ -2683,13 +2637,7 @@ THREE.WebGLRenderer = function (parameters) {
 
                         setupVertexAttributes(material, program, geometry, 0);
 
-                        if (_currentElementArrayBuffer != index.buffer) {
-
-                            _currentElementArrayBuffer = index.buffer;
-
-                            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
-
-                        };
+                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
 
                     }
 
@@ -2714,13 +2662,7 @@ THREE.WebGLRenderer = function (parameters) {
 
                             setupVertexAttributes(material, program, geometry, startIndex);
 
-                            if (_currentElementArrayBuffer != index.buffer) {
-
-                                _currentElementArrayBuffer = index.buffer;
-
-                                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
-
-                            };
+                            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
 
                         }
 
@@ -2791,23 +2733,12 @@ THREE.WebGLRenderer = function (parameters) {
 
             if (updateBuffers) {
 
-                if (_currentArrayBuffer != geometryGroup.__webglVertexBuffer) {
-
-                    _currentArrayBuffer = geometryGroup.__webglVertexBuffer;
-
-                    _gl.bindBuffer(_gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer);
-                   
-                }
-
+                _gl.bindBuffer(_gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer);
+                      
                 enableAttribute(attributes.position);
 
-                if (_currentVertexAttribPointer != geometryGroup.__webglVertexBuffer){
-
-                    _currentVertexAttribPointer = geometryGroup.__webglVertexBuffer;
-                    
-                    _gl.vertexAttribPointer(attributes.position, 3, _gl.FLOAT, false, 0, 0);
-
-                }
+                _gl.vertexAttribPointer(attributes.position, 3, _gl.FLOAT, false, 0, 0);
+                
             }
 
         } else {
@@ -2961,13 +2892,7 @@ THREE.WebGLRenderer = function (parameters) {
                 setLineWidth(material.wireframeLinewidth);
                 if (updateBuffers)
 
-                    if (_currentElementArrayBuffer != geometryGroup.__webglLineBuffer) {
-
-                        _currentElementArrayBuffer = geometryGroup.__webglLineBuffer;
-
-                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer);
-
-                    };
+                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer);
 
                 _gl.drawElements(_gl.LINES, geometryGroup.__webglLineCount, type, 0);
 
@@ -2977,13 +2902,8 @@ THREE.WebGLRenderer = function (parameters) {
 
                 if (updateBuffers)
 
-                    if (_currentElementArrayBuffer != geometryGroup.__webglFaceBuffer) {
-
-                        _currentElementArrayBuffer = geometryGroup.__webglFaceBuffer;
-
-                        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer);
-
-                    };
+                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer);
+                    
 
                 _gl.drawElements(_gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0);
 
@@ -4275,9 +4195,7 @@ THREE.WebGLRenderer = function (parameters) {
 
         if (refreshProgram || camera !== _currentCamera) {
 
-            if (sampleUniform(_projectionMatrixSampler, 'm4v', program.id, 0, camera.projectionMatrix.elements))
-
-                _gl.uniformMatrix4fv(p_uniforms.projectionMatrix, false, camera.projectionMatrix.elements);
+            _gl.uniformMatrix4fv(p_uniforms.projectionMatrix, false, camera.projectionMatrix.elements);
 
             if (_logarithmicDepthBuffer) {
 
@@ -4311,9 +4229,7 @@ THREE.WebGLRenderer = function (parameters) {
 
                 if (p_uniforms.viewMatrix !== null) {
 
-                    if (sampleUniform(_viewMatrixSampler, 'm4', program.id, 0, camera.matrixWorldInverse.elements))
-
-                        _gl.uniformMatrix4fv(p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements);
+                    _gl.uniformMatrix4fv(p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements);
 
                 }
 
@@ -4463,9 +4379,8 @@ THREE.WebGLRenderer = function (parameters) {
 
         if (p_uniforms.modelMatrix !== null) {
 
-            if (sampleUniform(_modelMatrixSampler, 'm4', program.id, 0, object.matrixWorld.elements))
-
-                _gl.uniformMatrix4fv(p_uniforms.modelMatrix, false, object.matrixWorld.elements);
+            
+            _gl.uniformMatrix4fv(p_uniforms.modelMatrix, false, object.matrixWorld.elements);
 
         }
 
@@ -4745,15 +4660,11 @@ THREE.WebGLRenderer = function (parameters) {
 
     function loadUniformsMatrices(uniforms, object) {
 
-        if (sampleUniform(_modelViewMatrixSampler, 'm4v', _currentMaterialId.id, 0, object._modelViewMatrix.elements))
-
-            _gl.uniformMatrix4fv(uniforms.modelViewMatrix, false, object._modelViewMatrix.elements);
+        _gl.uniformMatrix4fv(uniforms.modelViewMatrix, false, object._modelViewMatrix.elements);
 
         if (uniforms.normalMatrix) {
 
-            if (sampleUniform(_normalMatrixSampler, '3fv', _currentMaterialId.id, 0, object._normalMatrix.elements))
-
-                _gl.uniformMatrix3fv(uniforms.normalMatrix, false, object._normalMatrix.elements);
+            _gl.uniformMatrix3fv(uniforms.normalMatrix, false, object._normalMatrix.elements);
 
         }
 
@@ -5785,14 +5696,8 @@ THREE.WebGLRenderer = function (parameters) {
 
         }
 
-        if (_currentTexture != texture.__webglTexture) {
-
-            _currentTexture = texture.__webglTexture;
-
-            _gl.bindTexture(_gl.TEXTURE_2D, texture.__webglTexture);
-
-        }
-        
+        _gl.bindTexture(_gl.TEXTURE_2D, texture.__webglTexture);
+               
 
         _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
         _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
@@ -5880,13 +5785,7 @@ THREE.WebGLRenderer = function (parameters) {
 
     this.setTexture = function (texture, slot) {
 
-        if (slot != _currentTextureUnit) {
-
-            _currentTextureUnit = slot;
-
-            _gl.activeTexture(_gl.TEXTURE0 + slot);
-
-        }
+        _gl.activeTexture(_gl.TEXTURE0 + slot);        
 
         if (texture.needsUpdate) {
 
@@ -5894,13 +5793,7 @@ THREE.WebGLRenderer = function (parameters) {
 
         } else {
 
-            if (_currentTexture != texture.__webglTexture) {
-
-                _currentTexture = texture.__webglTexture;
-
-                _gl.bindTexture(_gl.TEXTURE_2D, texture.__webglTexture);
-
-            }
+            _gl.bindTexture(_gl.TEXTURE_2D, texture.__webglTexture);            
 
         }
 
@@ -6207,16 +6100,7 @@ THREE.WebGLRenderer = function (parameters) {
 
             _gl.bindFramebuffer(_gl.FRAMEBUFFER, framebuffer);
 
-            if (vx != _viewportX || vy != _viewportY || width != _currentWidth || height != _currentHeight) {
-
-                _currentWidth = width;
-                _currentHeight = height;
-                _viewportX = vx;
-                _viewportY = vy;
-
-                _gl.viewport(vx, vy, width, height);
-
-            }
+            _gl.viewport(vx, vy, width, height);            
 
             _currentFramebuffer = framebuffer;
 
