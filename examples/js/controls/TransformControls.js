@@ -961,7 +961,7 @@
 
 		function onPointerUp( event ) {
 
-			if ( _dragging && !!scope.axis ) {
+			if ( _dragging && ( scope.axis !== null ) ) {
 				mouseUpEvent.mode = _mode;
 				scope.dispatchEvent( mouseUpEvent )
 			}
