@@ -1,10 +1,10 @@
-THREE.WebGLRenderer = function (parameters) {
+THREE.WebGLRenderer = function ( parameters ) {
 
-    console.log('THREE.WebGLRenderer', THREE.REVISION);
+	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
 
-    parameters = parameters || {};
+	parameters = parameters || {};
 
-    var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement('canvas'),
+	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
@@ -17,16 +17,16 @@ THREE.WebGLRenderer = function (parameters) {
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 	_logarithmicDepthBuffer = parameters.logarithmicDepthBuffer !== undefined ? parameters.logarithmicDepthBuffer : false,
 
-	_clearColor = new THREE.Color(0x000000),
+	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
-
-    var lights = [];
-
-    var _webglObjects = {};
-    var _webglObjectsImmediate = [];
-
-    var opaqueObjects = [];
-    var transparentObjects = [];
+	
+	var lights = [];
+	
+	var _webglObjects = {};
+	var _webglObjectsImmediate = [];
+	
+	var opaqueObjects = [];
+	var transparentObjects = [];
 
     // public properties
 
@@ -136,7 +136,6 @@ THREE.WebGLRenderer = function (parameters) {
 
 	_oldLineWidth = null,
 	
-    _uniformSampler = [],
 
 	_viewportX = 0,
 	_viewportY = 0,
@@ -508,13 +507,17 @@ THREE.WebGLRenderer = function (parameters) {
 
     // Events
 
-    var onObjectRemovedFromScene = function (event) {
+	var onObjectRemoved = function ( event ) {
 
         var object = event.target;
 
-        object.removeEventListener('removedFromScene', onObjectRemovedFromScene);
+		object.traverse( function ( child ) {
 
-        removeObject(object)
+			child.removeEventListener( 'remove', onObjectRemoved );
+
+			removeObject( child );
+
+		} );
 
     };
 
@@ -2890,9 +2893,7 @@ THREE.WebGLRenderer = function (parameters) {
             if (material.wireframe) {
 
                 setLineWidth(material.wireframeLinewidth);
-                if (updateBuffers)
-
-                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer);
+				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
 
                 _gl.drawElements(_gl.LINES, geometryGroup.__webglLineCount, type, 0);
 
@@ -2900,9 +2901,7 @@ THREE.WebGLRenderer = function (parameters) {
 
             } else {
 
-                if (updateBuffers)
-
-                    _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer);
+				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
                     
 
                 _gl.drawElements(_gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0);
@@ -3563,7 +3562,7 @@ THREE.WebGLRenderer = function (parameters) {
             object._modelViewMatrix = new THREE.Matrix4();
             object._normalMatrix = new THREE.Matrix3();
 
-            object.addEventListener('removedFromScene', onObjectRemovedFromScene);
+			object.addEventListener( 'removed', onObjectRemoved );
 
         }
 
@@ -3584,11 +3583,6 @@ THREE.WebGLRenderer = function (parameters) {
 
             } else if (object instanceof THREE.Mesh) {
 
-                if (object.__webglActive !== undefined) {
-
-                    removeObject(object, scene);
-
-                }
 
                 initGeometryGroups(scene, object, geometry);
 
@@ -4705,7 +4699,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                 case '1i':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1i(location, value);
 
@@ -4713,14 +4706,12 @@ THREE.WebGLRenderer = function (parameters) {
 
                 case '1f':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1f(location, value);
                     break;
 
                 case '2f':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform2f(location, value[0], value[1]);
 
@@ -4728,7 +4719,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                 case '3f':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform3f(location, value[0], value[1], value[2]);
 
@@ -4736,63 +4726,54 @@ THREE.WebGLRenderer = function (parameters) {
 
                 case '4f':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform4f(location, value[0], value[1], value[2], value[3]);
                     break;
 
                 case '1iv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1iv(location, value);
                     break;
 
                 case '3iv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform3iv(location, value);
                     break;
 
                 case '1fv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1fv(location, value);
                     break;
 
                 case '2fv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform2fv(location, value);
                     break;
 
                 case '3fv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform3fv(location, value);
                     break;
 
                 case '4fv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform4fv(location, value);
                     break;
 
                 case 'Matrix3fv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniformMatrix3fv(location, false, value);
                     break;
 
                 case 'Matrix4fv':
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniformMatrix4fv(location, false, value);
                     break;
@@ -4803,7 +4784,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // single integer
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1i(location, value);
 
@@ -4813,7 +4793,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // single float
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1f(location, value);
 
@@ -4823,7 +4802,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // single THREE.Vector2
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [ value.x, value.y ]))
 
                         _gl.uniform2f(location, value.x, value.y);
 
@@ -4833,7 +4811,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // single THREE.Vector3
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [value.x, value.y, value.z]))
 
                         _gl.uniform3f(location, value.x, value.y, value.z);
 
@@ -4843,7 +4820,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // single THREE.Vector4
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [value.x, value.y, value.z, value.w]))
 
                         _gl.uniform4f(location, value.x, value.y, value.z, value.w);
 
@@ -4853,7 +4829,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // single THREE.Color
 
-                    //if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, [ value.r, value.g, value.b ]))
 
                         _gl.uniform3f(location, value.r, value.g, value.b);
 
@@ -4863,7 +4838,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // flat array of integers (JS or typed array)
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1iv(location, value);
 
@@ -4873,7 +4847,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // flat array of integers with 3 x N size (JS or typed array)
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform3iv(location, value);
 
@@ -4883,7 +4856,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // flat array of floats (JS or typed array)
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform1fv(location, value);
 
@@ -4893,7 +4865,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     // flat array of floats with 3 x N size (JS or typed array)
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value))
 
                         _gl.uniform3fv(location, value);
 
@@ -4919,7 +4890,6 @@ THREE.WebGLRenderer = function (parameters) {
                     }
 
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
 
                         _gl.uniform2fv(location, uniform._array);
 
@@ -4945,7 +4915,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     }
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
 
                         _gl.uniform3fv(location, uniform._array);
 
@@ -4972,7 +4941,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     }
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
 
                         _gl.uniform4fv(location, uniform._array);
 
@@ -4981,7 +4949,6 @@ THREE.WebGLRenderer = function (parameters) {
                 case 'm3':
 
                     // single THREE.Matrix3
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, value.elements))
 
                         _gl.uniformMatrix3fv(location, false, value.elements);
 
@@ -5003,7 +4970,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     }
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
 
                         _gl.uniformMatrix3fv(location, false, uniform._array);
 
@@ -5012,7 +4978,6 @@ THREE.WebGLRenderer = function (parameters) {
                 case 'm4':
 
                     // single THREE.Matrix4
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
 
                     _gl.uniformMatrix4fv(location, false, value.elements);
 
@@ -5034,7 +4999,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     }
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
 
                     _gl.uniformMatrix4fv(location, false, uniform._array);
 
@@ -5048,7 +5012,6 @@ THREE.WebGLRenderer = function (parameters) {
                     textureUnit = getTextureUnit();
 
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, textureUnit))
 
                         _gl.uniform1i(location, textureUnit);
 
@@ -5087,7 +5050,6 @@ THREE.WebGLRenderer = function (parameters) {
 
                     }
 
-                    if (sampleUniform(_uniformSampler, type, _currentMaterialId, j, uniform._array))
 
                         _gl.uniform1iv(location, uniform._array);
 
@@ -5121,63 +5083,6 @@ THREE.WebGLRenderer = function (parameters) {
 
     };
 
-    // Samplers
-
-    function sampleUniform(samplerArray, type, renderId, uniformIndex, value) {
-
-        if (!samplerArray[type])
-
-            samplerArray[type] = [];
-
-        if (!samplerArray[type][renderId])
-
-            samplerArray[type][renderId] = [];
-
-        if (samplerArray[type][renderId][uniformIndex] !== undefined) {
-
-            switch (type) {
-
-                // Single valued uniforms
-                case '1i': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
-                case 'if': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
-                case 'i': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
-                case 'f': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
-                case 't': if (samplerArray[type][renderId][uniformIndex] == value) return false; break;
-
-                // Array uniforms
-                default:
-
-                    if (arraysEqual(samplerArray[type][renderId][uniformIndex], value)) return false;
-
-                    break;
-
-            }
-
-        }
-
-        samplerArray[type][renderId][uniformIndex] = value;
-
-        return true;
-        
-    }
-
-    function arraysEqual(arrayA, arrayB) {
-
-        if (arrayA.length !== arrayB.length)
-            return false;
-        for (var i = arrayA.length; i--;) {
-            if (!areEqualNumeric(arrayA[i], arrayB[i]))
-                return false;
-        }
-
-        return true;
-    }
-
-    function areEqualNumeric(val1, val2) {
-
-        return val1 === val2 || (val1 !== val1 && val2 !== val2);
-
-    }
 
     //
 
