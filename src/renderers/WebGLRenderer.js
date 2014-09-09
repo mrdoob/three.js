@@ -5,9 +5,9 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.WebGLOptimizedRenderer = function (parameters) {
+THREE.WebGLRenderer = function (parameters) {
 
-    console.log('THREE.WebGLOptimizedRenderer', THREE.REVISION);
+    console.log('THREE.WebGLRenderer', THREE.REVISION);
 
     parameters = parameters || {};
 
