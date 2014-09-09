@@ -119,5 +119,10 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 THREE.PerspectiveCamera.prototype.clone = function () {
 
-	return new THREE.PerspectiveCamera( this.fov, this.aspect, this.near, this.far );
+	var camera = new THREE.PerspectiveCamera( this.fov, this.aspect, this.near, this.far );
+
+	THREE.Camera.prototype.clone.call( this, camera );
+
+	return camera;
+
 };

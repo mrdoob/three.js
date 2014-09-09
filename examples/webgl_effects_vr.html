@@ -105,7 +105,7 @@
 				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 				var fullScreenButton = document.querySelector( '.button' );
 				fullScreenButton.onclick = function() {
