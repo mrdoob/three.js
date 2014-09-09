@@ -19809,9 +19809,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var object = event.target;
 
-		object.removeEventListener( 'remove', onObjectRemoved );
-
 		object.traverse( function ( child ) {
+
+			child.removeEventListener( 'remove', onObjectRemoved );
 
 			removeObject( child );
 
@@ -22869,12 +22869,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				//
 
 			} else if ( object instanceof THREE.Mesh ) {
-				
-				if ( object.__webglActive !== undefined ) {
-
-					removeObject( object, scene );
-
-				}
 				
 				initGeometryGroups(scene, object, geometry);
 
