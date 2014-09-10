@@ -38,14 +38,18 @@ THREE.BufferGeometryLoader.prototype = {
 
 		var attributes = json.attributes;
 
+		var attributesKeys = [];
+
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
 			var typedArray = new self[ attribute.type ]( attribute.array );
 
 			geometry.attributes[ key ] = new THREE.BufferAttribute( typedArray, attribute.itemSize );
-
+			attributesKeys.push( key );
 		}
+
+		geometry.attributesKeys = attributesKeys;
 
 		var offsets = json.offsets;
 
