@@ -568,6 +568,8 @@
 		var _plane = "XY";
 
 		var changeEvent = { type: "change" };
+		var mouseDownEvent = { type: "mouseDown" };
+		var mouseUpEvent = { type: "mouseUp", mode: _mode };
 		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
@@ -758,6 +760,8 @@
 
 				if ( intersect ) {
 
+					scope.dispatchEvent( mouseDownEvent );
+
 					scope.axis = intersect.object.name;
 
 					scope.update();
@@ -818,7 +822,7 @@
 					scope.object.position.copy( oldPosition );
 					scope.object.position.add( point );
 
-				} 
+				}
 
 				if ( scope.space == "world" || scope.axis.search("XYZ") != -1 ) {
 
@@ -957,6 +961,10 @@
 
 		function onPointerUp( event ) {
 
+			if ( _dragging && ( scope.axis !== null ) ) {
+				mouseUpEvent.mode = _mode;
+				scope.dispatchEvent( mouseUpEvent )
+			}
 			_dragging = false;
 			onPointerHover( event );
 
