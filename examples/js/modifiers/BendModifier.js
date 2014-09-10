@@ -24,6 +24,10 @@ THREE.BendModifier.prototype = {
         return this
     },
 
+	_sign: function (a) {
+        return 0 > a ? -1 : 0 < a ? 1 : 0
+    },
+
 	_cosh: function( x )  {
 		return ( Math.exp( x ) + Math.exp( -x ) ) / 2;
 	},
@@ -68,7 +72,7 @@ THREE.BendModifier.prototype = {
 		for (var i = 0; i < geometry.vertices.length; i++ )  {
 
 			oldVertices[i] = new THREE.Vector3(); oldVertices[i].copy( newVertices[i] );
-			newVertices[i].x = THREE.Math.sign( newVertices[i].x - oldMiddlex ) * 1 / ParamB * this._sinhInverse( ( newVertices[i].x - oldMiddlex ) * ParamB );
+			newVertices[i].x = this._sign( newVertices[i].x - oldMiddlex ) * 1 / ParamB * this._sinhInverse( ( newVertices[i].x - oldMiddlex ) * ParamB );
 
 		}
 
@@ -83,7 +87,7 @@ THREE.BendModifier.prototype = {
 
 		for ( var i = 0; i < geometry.vertices.length; i++ )  {
 
-			var x0 = THREE.Math.sign( oldVertices[i].x - oldMiddlex ) * 1 / ParamB * this._sinhInverse( ( oldVertices[i].x - oldMiddlex ) * ParamB );
+			var x0 = this._sign( oldVertices[i].x - oldMiddlex ) * 1 / ParamB * this._sinhInverse( ( oldVertices[i].x - oldMiddlex ) * ParamB );
 			var y0 = 1 / NewParamB * this._cosh( NewParamB * x0 ) - 1 / NewParamB;
 
 			var k = new THREE.Vector3( bendCenter.x - x0, bendCenter.y - ( y0 - meshDepth / 2 ), bendCenter.z ).normalize();
@@ -102,7 +106,7 @@ THREE.BendModifier.prototype = {
 			var p = new THREE.Vector3(); p.subVectors( oldVertices[i], O );
 			var q = new THREE.Vector3(); q.subVectors( newVertices[i], O );			
 
-			anglesBetweenOldandNewVertices[i] = Math.acos( 1 / this._cosh( ParamB * geometry.vertices[i].x ) )  * THREE.Math.sign( newVertices[i].x );
+			anglesBetweenOldandNewVertices[i] = Math.acos( 1 / this._cosh( ParamB * geometry.vertices[i].x ) )  * this._sign( newVertices[i].x );
 
 			newVertices[i].x = newVertices[i].x + middle;
 			geometry.vertices[i].copy( newVertices[i].applyMatrix4( P ) );
