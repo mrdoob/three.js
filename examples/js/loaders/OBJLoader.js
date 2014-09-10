@@ -125,14 +125,6 @@ THREE.OBJLoader.prototype = {
 
 				}
 
-			} else {
-
-				geometry.uvs.push( 0, 0,  0, 0,  0, 0 );
-
-				if ( d !== undefined ) {
-					geometry.uvs.push( 0, 0,  0, 0,  0, 0 );
-				}
-
 			}
 
 			if ( na !== undefined ) {
@@ -152,14 +144,6 @@ THREE.OBJLoader.prototype = {
 					addNormal( ia, ib, id );
 					addNormal( ib, ic, id );
 
-				}
-
-			} else {
-
-				geometry.normals.push( 0, 0, 0,  0, 0, 0,  0, 0, 0 );
-
-				if ( d !== undefined) {
-					geometry.normals.push( 0, 0, 0,  0, 0, 0,  0, 0, 0 );					
 				}
 
 			}
@@ -354,16 +338,24 @@ THREE.OBJLoader.prototype = {
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 			var object = objects[ i ];
+			var geometry = object.geometry;
 
-			var geometry = new THREE.BufferGeometry();
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( object.geometry.vertices ), 3 ) );
-			geometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( object.geometry.normals ), 3 ) );
-			geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( object.geometry.uvs ), 2 ) );
+			var buffergeometry = new THREE.BufferGeometry();
+
+			buffergeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( geometry.vertices ), 3 ) );
+
+			if ( geometry.normals.length > 0 ) {
+				buffergeometry.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( geometry.normals ), 3 ) );
+			}
+
+			if ( geometry.uvs.length > 0 ) {
+				buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
+			}
 
 			var material = new THREE.MeshLambertMaterial();
 			material.name = object.material.name;
 
-			var mesh = new THREE.Mesh( geometry, material );
+			var mesh = new THREE.Mesh( buffergeometry, material );
 			mesh.name = object.name;
 
 			container.add( mesh );
