@@ -31,7 +31,7 @@ var Player = function ( editor ) {
 
 			if ( child.script !== undefined ) {
 
-				var script = new Function( 'scene', child.script.source ).bind( child );
+				var script = new Function( 'scene', 'time', child.script.source ).bind( child );
 				scripts.push( script );
 
 			}
@@ -71,9 +71,11 @@ var Player = function ( editor ) {
 
 	var update = function () {
 
+		var time = performance.now();
+
 		for ( var i = 0; i < scripts.length; i ++ ) {
 
-			scripts[ i ]( scene );
+			scripts[ i ]( scene, time );
 
 		}
 

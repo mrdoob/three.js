@@ -41,14 +41,6 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-		controls.enabled = true;
-
-		if ( transformControls.axis !== null ) {
-
-			controls.enabled = false;
-
-		}
-
 		render();
 
 	} );
@@ -57,6 +49,17 @@ var Viewport = function ( editor ) {
 		signals.objectChanged.dispatch( transformControls.object );
 
 	} );
+	transformControls.addEventListener( 'mouseDown', function () {
+
+		controls.enabled = false;
+
+	} );
+	transformControls.addEventListener( 'mouseUp', function () {
+
+		controls.enabled = true;
+
+	} );
+
 	sceneHelpers.add( transformControls );
 
 	// fog

@@ -339,36 +339,29 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		if ( this.attributes[ 'position' ] ) {
+		var attributes = this.attributes;
 
-			var i, il;
-			var j, jl;
+		if ( attributes.position ) {
 
-			var nVertexElements = this.attributes[ 'position' ].array.length;
+			var positions = attributes.position.array;
 
-			if ( this.attributes[ 'normal' ] === undefined ) {
+			if ( attributes.normal === undefined ) {
 
-				this.attributes[ 'normal' ] = {
-
-					itemSize: 3,
-					array: new Float32Array( nVertexElements )
-
-				};
+				attributes.normal = new THREE.BufferAttribute( new Float32Array( positions.length ), 3 );
 
 			} else {
 
 				// reset existing normals to zero
 
-				for ( i = 0, il = this.attributes[ 'normal' ].array.length; i < il; i ++ ) {
+				for ( var i = 0, il = attributes.normal.array.length; i < il; i ++ ) {
 
-					this.attributes[ 'normal' ].array[ i ] = 0;
+					attributes.normal.array[ i ] = 0;
 
 				}
 
 			}
 
-			var positions = this.attributes[ 'position' ].array;
-			var normals = this.attributes[ 'normal' ].array;
+			var normals = attributes.normal.array;
 
 			var vA, vB, vC, x, y, z,
 
@@ -381,19 +374,19 @@ THREE.BufferGeometry.prototype = {
 
 			// indexed elements
 
-			if ( this.attributes[ 'index' ] ) {
+			if ( attributes.index ) {
 
-				var indices = this.attributes[ 'index' ].array;
+				var indices = attributes.index.array;
 
 				var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
 
-				for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+				for ( var j = 0, jl = offsets.length; j < jl; ++ j ) {
 
 					var start = offsets[ j ].start;
 					var count = offsets[ j ].count;
 					var index = offsets[ j ].index;
 
-					for ( i = start, il = start + count; i < il; i += 3 ) {
+					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
 						vA = index + indices[ i ];
 						vB = index + indices[ i + 1 ];
@@ -434,11 +427,11 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-			// non-indexed elements (unconnected triangle soup)
-
 			} else {
 
-				for ( i = 0, il = positions.length; i < il; i += 9 ) {
+				// non-indexed elements (unconnected triangle soup)
+
+				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
 					x = positions[ i ];
 					y = positions[ i + 1 ];
@@ -477,7 +470,7 @@ THREE.BufferGeometry.prototype = {
 
 			this.normalizeNormals();
 
-			this.normalsNeedUpdate = true;
+			attributes.normal.needsUpdate = true;
 
 		}
 
