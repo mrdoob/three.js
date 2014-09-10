@@ -310,7 +310,16 @@ THREE.ObjectLoader.prototype = {
 
 				default:
 
-					object = new THREE.Object3D();
+					if ( THREE.CustomTypes && THREE.CustomTypes.hasOwnProperty ( data.type ) ) {
+
+						object = THREE.CustomTypes[ data.type ].parse(data);
+
+					} else {
+
+						object = new THREE.Object3D();
+
+					}
+
 
 			}
 

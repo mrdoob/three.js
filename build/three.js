@@ -7629,6 +7629,14 @@ THREE.Object3D.prototype = {
 
 	},
 
+	// provide funciton to override for custom types
+
+	customData: function() {
+
+		return ( {} );
+
+	},
+
 	toJSON: function () {
 
 		var output = {
@@ -7699,7 +7707,7 @@ THREE.Object3D.prototype = {
 
 		var parseObject = function ( object ) {
 
-			var data = {};
+			var data = object.customData();
 
 			data.uuid = object.uuid;
 			data.type = object.type;
@@ -13430,7 +13438,16 @@ THREE.ObjectLoader.prototype = {
 
 				default:
 
-					object = new THREE.Object3D();
+					if ( THREE.CustomTypes && THREE.CustomTypes.hasOwnProperty ( data.type ) ) {
+
+						object = THREE.CustomTypes[ data.type ].parse(data);
+
+					} else {
+
+						object = new THREE.Object3D();
+
+					}
+
 
 			}
 
