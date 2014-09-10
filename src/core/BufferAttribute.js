@@ -100,6 +100,12 @@ THREE.BufferAttribute.prototype = {
 
 		return this;
 
+	},
+
+	clone: function () {
+
+		return new THREE.BufferAttribute( new this.array.constructor( this.array ), this.itemSize );
+
 	}
 
 };

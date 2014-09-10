@@ -102,18 +102,9 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     ClassicGeometry.prototype.buildBufferGeometry = function() {
         // Build indexed mesh
         var geometry = this.geometry;
-        geometry.attributes.index = {
-        		itemSize: 1,
-        		array : this.indexArray
-        };
 
-		var offset = {
-				start: 0,
-				index: 0,
-				count: this.indexArray.length
-			};
-
-		geometry.offsets.push( offset );
+        geometry.addAttribute( 'index', new THREE.BufferAttribute( this.indexArray, 1 ) );
+        geometry.addDrawCall( 0, this.indexArray.length, 0 );
 
         geometry.computeBoundingSphere();
     }
@@ -226,16 +217,10 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         if(semantic == "POSITION") {
             // TODO: Should be easy to take strides into account here
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
-            geom.geometry.attributes.position = {
-            		itemSize: 3,
-            		array : floatArray
-            };
+            geom.geometry.addAttribute( 'position', new THREE.BufferAttribute( floatArray, 3 ) );
         } else if(semantic == "NORMAL") {
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
-            geom.geometry.attributes.normal = {
-            		itemSize: 3,
-            		array : floatArray
-            };
+            geom.geometry.addAttribute( 'normal', new THREE.BufferAttribute( floatArray, 3 ) );
         } else if ((semantic == "TEXCOORD_0") || (semantic == "TEXCOORD" )) {
         	
         	nComponents = componentsPerElementForGLType(attribute.type);
@@ -244,26 +229,17 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
             for (i = 0; i < floatArray.length / 2; i++) {
             	floatArray[i*2+1] = 1.0 - floatArray[i*2+1];
             }
-            geom.geometry.attributes.uv = {
-            		itemSize: nComponents,
-            		array : floatArray
-            };
+            geom.geometry.addAttribute( 'uv', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
         else if (semantic == "WEIGHT") {
         	nComponents = componentsPerElementForGLType(attribute.type);
             floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
-            geom.geometry.attributes.skinWeight = {
-            		itemSize: nComponents,
-            		array : floatArray
-            };        	
+            geom.geometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
         else if (semantic == "JOINT") {
         	nComponents = componentsPerElementForGLType(attribute.type);
             floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
-            geom.geometry.attributes.skinIndex = {
-            		itemSize: nComponents,
-            		array : floatArray
-            };        	
+            geom.geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
     }
     

@@ -59,6 +59,7 @@
 	"src/textures/CubeTexture.js",
 	"src/textures/CompressedTexture.js",
 	"src/textures/DataTexture.js",
+	"src/textures/VideoTexture.js",
 	"src/objects/PointCloud.js",
 	"src/objects/Group.js",
 	"src/objects/Line.js",

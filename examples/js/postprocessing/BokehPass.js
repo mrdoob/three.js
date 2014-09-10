@@ -61,7 +61,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.camera2 = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 	this.scene2  = new THREE.Scene();
 
-	this.quad2 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.scene2.add( this.quad2 );
 
 };

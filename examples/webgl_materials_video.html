@@ -105,11 +105,10 @@
 
 				video = document.getElementById( 'video' );
 
-				texture = new THREE.Texture( video );
+				texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.format = THREE.RGBFormat;
-				texture.generateMipmaps = false;
 
 				//
 
@@ -251,12 +250,6 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
-
-				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
-					if ( texture ) texture.needsUpdate = true;
-
-				}
 
 				for ( i = 0; i < cube_count; i ++ ) {
 

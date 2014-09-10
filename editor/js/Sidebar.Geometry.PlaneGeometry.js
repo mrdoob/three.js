@@ -2,12 +2,12 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
 
-	var geometry = object.geometry;
+	var parameters = object.geometry.parameters;
 
 	// width
 
 	var widthRow = new UI.Panel();
-	var width = new UI.Number( geometry.parameters.width ).onChange( update );
+	var width = new UI.Number( parameters.width ).onChange( update );
 
 	widthRow.add( new UI.Text( 'Width' ).setWidth( '90px' ) );
 	widthRow.add( width );
@@ -17,7 +17,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 	// height
 
 	var heightRow = new UI.Panel();
-	var height = new UI.Number( geometry.parameters.height ).onChange( update );
+	var height = new UI.Number( parameters.height ).onChange( update );
 
 	heightRow.add( new UI.Text( 'Height' ).setWidth( '90px' ) );
 	heightRow.add( height );
@@ -27,7 +27,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 	// widthSegments
 
 	var widthSegmentsRow = new UI.Panel();
-	var widthSegments = new UI.Integer( geometry.parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
+	var widthSegments = new UI.Integer( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
 	widthSegmentsRow.add( new UI.Text( 'Width segments' ).setWidth( '90px' ) );
 	widthSegmentsRow.add( widthSegments );
@@ -37,7 +37,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 	// heightSegments
 
 	var heightSegmentsRow = new UI.Panel();
-	var heightSegments = new UI.Integer( geometry.parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+	var heightSegments = new UI.Integer( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
@@ -61,7 +61,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
-		signals.objectChanged.dispatch( object );
+		signals.geometryChanged.dispatch( object );
 
 	}
 
