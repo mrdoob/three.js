@@ -284,7 +284,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'SpotLight ' + ( ++ lightCount );
 		light.target.name = 'SpotLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
@@ -306,7 +306,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'DirectionalLight ' + ( ++ lightCount );
 		light.target.name = 'DirectionalLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
@@ -328,7 +328,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
 		light.name = 'HemisphereLight ' + ( ++ lightCount );
 
-		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
