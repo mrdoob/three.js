@@ -302,6 +302,12 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
+				case 'Group':
+
+					object = new THREE.Group();
+
+					break;
+
 				default:
 
 					object = new THREE.Object3D();
@@ -326,6 +332,7 @@ THREE.ObjectLoader.prototype = {
 
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
+			if ( data.script !== undefined ) object.script = new THREE.Script( data.script );
 
 			if ( data.children !== undefined ) {
 

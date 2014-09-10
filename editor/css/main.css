@@ -1,0 +1,124 @@
+﻿* {
+	vertical-align: middle;
+}
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	margin: 0;
+	overflow: hidden;
+}
+
+hr {
+	border: 0px;
+	border-top: 1px solid #ccc;
+}
+
+button {
+	position: relative;
+}
+
+textarea {
+	white-space: pre;
+	word-wrap: normal;
+}
+
+	textarea.success {
+		border-color: #8b8 !important;
+	}
+
+	textarea.fail {
+		border-color: #f00 !important;
+		background-color: rgba(255,0,0,0.05);
+	}
+
+textarea, input { outline: none; } /* osx */
+
+.Panel {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+
+	/* No support for these yet */
+	-o-user-select: none;
+	user-select: none;
+}
+
+	.Panel.Collapsible .Static {
+		margin: 0px;
+	}
+
+	.Panel.Collapsible .Static .Button {
+		float: left;
+		margin-right: 6px;
+		width: 0px;
+		height: 0px;
+		border: 6px solid transparent;
+	}
+
+	.Panel.Collapsible.collapsed .Static .Button {
+		margin-top: 2px;
+		border-left-color: #bbb;
+	}
+
+	.Panel.Collapsible:not(.collapsed) .Static .Button {
+		margin-top: 6px;
+		border-top-color: #bbb;
+	}
+
+	.Panel.Collapsible.collapsed .Content {
+		display: none;
+	}
+
+/* scene types */
+
+.type {
+	position:relative;
+	top:-2px;
+	padding: 0px 2px;
+	color: #ddd;
+}
+.type:after {
+	content: '■';
+}
+
+.Scene {
+	color: #ccccff;
+}
+
+.Object3D {
+	color: #aaaaee;
+}
+
+.Mesh {
+	color: #8888ee;
+}
+
+/* */
+
+.PointLight {
+	color: #dddd00;
+}
+
+/* */
+
+.Geometry {
+	color: #88ff88;
+}
+
+.BoxGeometry {
+	color: #bbeebb;
+}
+.TorusGeometry {
+	color: #aaeeaa;	
+}
+
+/* */
+
+.Material {
+	color: #ff8888;
+}
+
+.MeshPhongMaterial {
+	color: #ffaa88;
+}

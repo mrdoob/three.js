@@ -7,6 +7,8 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	THREE.BufferGeometry.call( this );
 
+	this.type = 'PlaneBufferGeometry';
+
 	this.parameters = {
 		width: width,
 		height: height,
@@ -58,7 +60,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	offset = 0;
 
-	var indices = new Uint16Array( gridX * gridY * 6 );
+	var indices = new ( ( vertices.length / 3 ) > 65535 ? Uint32Array : Uint16Array )( gridX * gridY * 6 );
 
 	for ( var iy = 0; iy < gridY; iy ++ ) {
 
@@ -83,10 +85,10 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 	}
 
-	this.attributes[ 'index' ] = { array: indices, itemSize: 1 };
-	this.attributes[ 'position' ] = { array: vertices, itemSize: 3 };
-	this.attributes[ 'normal' ] = { array: normals, itemSize: 3 };
-	this.attributes[ 'uv' ] = { array: uvs, itemSize: 2 };
+	this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 };
 

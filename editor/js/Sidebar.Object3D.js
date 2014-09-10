@@ -3,6 +3,12 @@ Sidebar.Object3D = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/object3d/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/object3d/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );
@@ -79,9 +85,9 @@ Sidebar.Object3D = function ( editor ) {
 
 	var objectScaleRow = new UI.Panel();
 	var objectScaleLock = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '75px' );
-	var objectScaleX = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleX );
-	var objectScaleY = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleY );
-	var objectScaleZ = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleZ );
+	var objectScaleX = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
+	var objectScaleY = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
+	var objectScaleZ = new UI.Number( 1 ).setRange( 0.01, Infinity ).setWidth( '50px' ).onChange( updateScaleZ );
 
 	objectScaleRow.add( new UI.Text( 'Scale' ).setWidth( '90px' ) );
 	objectScaleRow.add( objectScaleLock );
@@ -190,6 +196,8 @@ Sidebar.Object3D = function ( editor ) {
 	container.add( objectVisibleRow );
 
 	// user data
+	
+	var timeout;
 
 	var objectUserDataRow = new UI.Panel();
 	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
@@ -198,13 +206,14 @@ Sidebar.Object3D = function ( editor ) {
 		try {
 
 			JSON.parse( objectUserData.getValue() );
-			objectUserData.setBorderColor( '#ccc' );
-			objectUserData.setBackgroundColor( '' );
+
+			objectUserData.dom.classList.add( 'success' );
+			objectUserData.dom.classList.remove( 'fail' );
 
 		} catch ( error ) {
 
-			objectUserData.setBorderColor( '#f00' );
-			objectUserData.setBackgroundColor( 'rgba(255,0,0,0.25)' );
+			objectUserData.dom.classList.remove( 'success' );
+			objectUserData.dom.classList.add( 'fail' );
 
 		}
 
@@ -434,24 +443,13 @@ Sidebar.Object3D = function ( editor ) {
 	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
-
 		var options = {};
 
-		options[ scene.id ] = 'Scene';
+		scene.traverse( function ( object ) {
 
-		( function addObjects( objects ) {
+			options[ object.id ] = object.name;
 
-			for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-				var object = objects[ i ];
-
-				options[ object.id ] = object.name;
-
-				addObjects( object.children );
-
-			}
-
-		} )( scene.children );
+		} );
 
 		objectParent.setOptions( options );
 
@@ -467,7 +465,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	function updateUI( object ) {
 
-		objectType.setValue( editor.getObjectType( object ) );
+		objectType.setValue( object.type );
 
 		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );

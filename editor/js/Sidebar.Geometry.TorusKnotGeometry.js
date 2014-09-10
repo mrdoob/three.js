@@ -2,12 +2,12 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
 
-	var geometry = object.geometry;
+	var parameters = object.geometry.parameters;
 
 	// radius
 
 	var radiusRow = new UI.Panel();
-	var radius = new UI.Number( geometry.parameters.radius ).onChange( update );
+	var radius = new UI.Number( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
 	radiusRow.add( radius );
@@ -17,7 +17,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 	// tube
 
 	var tubeRow = new UI.Panel();
-	var tube = new UI.Number( geometry.parameters.tube ).onChange( update );
+	var tube = new UI.Number( parameters.tube ).onChange( update );
 
 	tubeRow.add( new UI.Text( 'Tube' ).setWidth( '90px' ) );
 	tubeRow.add( tube );
@@ -27,7 +27,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 	// radialSegments
 
 	var radialSegmentsRow = new UI.Panel();
-	var radialSegments = new UI.Integer( geometry.parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegments = new UI.Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -37,7 +37,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 	// tubularSegments
 
 	var tubularSegmentsRow = new UI.Panel();
-	var tubularSegments = new UI.Integer( geometry.parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
+	var tubularSegments = new UI.Integer( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
 	tubularSegmentsRow.add( new UI.Text( 'Tubular segments' ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
@@ -47,7 +47,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 	// p
 
 	var pRow = new UI.Panel();
-	var p = new UI.Number( geometry.parameters.p ).onChange( update );
+	var p = new UI.Number( parameters.p ).onChange( update );
 
 	pRow.add( new UI.Text( 'P' ).setWidth( '90px' ) );
 	pRow.add( p );
@@ -57,7 +57,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 	// q
 
 	var qRow = new UI.Panel();
-	var q = new UI.Number( geometry.parameters.q ).onChange( update );
+	var q = new UI.Number( parameters.q ).onChange( update );
 
 	pRow.add( new UI.Text( 'Q' ).setWidth( '90px' ) );
 	pRow.add( q );
@@ -67,7 +67,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 	// heightScale
 
 	var heightScaleRow = new UI.Panel();
-	var heightScale = new UI.Number( geometry.parameters.heightScale ).onChange( update );
+	var heightScale = new UI.Number( parameters.heightScale ).onChange( update );
 
 	pRow.add( new UI.Text( 'Height scale' ).setWidth( '90px' ) );
 	pRow.add( heightScale );
@@ -94,7 +94,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
-		signals.objectChanged.dispatch( object );
+		signals.geometryChanged.dispatch( object );
 
 	}
 

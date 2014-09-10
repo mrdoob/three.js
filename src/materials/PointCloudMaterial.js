@@ -23,6 +23,8 @@ THREE.PointCloudMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
+	this.type = 'PointCloudMaterial';
+
 	this.color = new THREE.Color( 0xffffff );
 
 	this.map = null;

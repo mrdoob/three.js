@@ -39,6 +39,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
+	this.type = 'MeshBasicMaterial';
+
 	this.color = new THREE.Color( 0xffffff ); // emissive
 
 	this.map = null;

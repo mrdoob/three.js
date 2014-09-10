@@ -6,6 +6,8 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
+	this.type = 'MorphAnimMesh';
+
 	// API
 
 	this.duration = 1000; // milliseconds
