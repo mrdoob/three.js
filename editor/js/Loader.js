@@ -61,7 +61,7 @@ var Loader = function ( editor ) {
 
 						var material = new THREE.MeshPhongMaterial();
 
-						var mesh = new THREE.Mesh( geometry, material );
+						var mesh = new Loader.MeshClass( geometry, material );
 						mesh.name = filename;
 
 						editor.addObject( mesh );
@@ -189,7 +189,7 @@ var Loader = function ( editor ) {
 
 					var material = new THREE.MeshPhongMaterial();
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Loader.MeshClass( geometry, material );
 					mesh.name = filename;
 
 					editor.addObject( mesh );
@@ -213,7 +213,7 @@ var Loader = function ( editor ) {
 
 					var material = new THREE.MeshPhongMaterial();
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Loader.MeshClass( geometry, material );
 					mesh.name = filename;
 
 					editor.addObject( mesh );
@@ -244,7 +244,7 @@ var Loader = function ( editor ) {
 					var geometry = new THREE.UTF8Loader().parse( contents );
 					var material = new THREE.MeshLambertMaterial();
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Loader.MeshClass( geometry, material );
 
 					editor.addObject( mesh );
 					editor.select( mesh );
@@ -268,7 +268,7 @@ var Loader = function ( editor ) {
 
 					var material = new THREE.MeshPhongMaterial();
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Loader.MeshClass( geometry, material );
 					mesh.name = filename;
 
 					editor.addObject( mesh );
@@ -330,7 +330,7 @@ var Loader = function ( editor ) {
 			var loader = new THREE.BufferGeometryLoader();
 			var result = loader.parse( data );
 
-			var mesh = new THREE.Mesh( result );
+			var mesh = new Loader.MeshClass( result );
 
 			editor.addObject( mesh );
 			editor.select( mesh );
@@ -372,7 +372,7 @@ var Loader = function ( editor ) {
 
 			} else {
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Loader.MeshClass( geometry, material );
 
 			}
 
@@ -413,3 +413,5 @@ var Loader = function ( editor ) {
 	};
 
 }
+
+Loader.MeshClass = THREE.Mesh;

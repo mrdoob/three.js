@@ -312,7 +312,7 @@ THREE.ObjectLoader.prototype = {
 
 					if ( THREE.CustomTypes && THREE.CustomTypes.hasOwnProperty ( data.type ) ) {
 
-						object = THREE.CustomTypes[ data.type ].parse(data);
+						object = THREE.CustomTypes[ data.type ].parse(data, geometries, materials);
 
 					} else {
 
