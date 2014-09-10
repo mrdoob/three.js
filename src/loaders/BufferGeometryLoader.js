@@ -43,7 +43,7 @@ THREE.BufferGeometryLoader.prototype = {
 			var attribute = attributes[ key ];
 			var typedArray = new self[ attribute.type ]( attribute.array );
 
-			geometry.attributes[ key ] = new THREE.BufferAttribute( typedArray, attribute.itemSize );
+			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize ) );
 
 		}
 
