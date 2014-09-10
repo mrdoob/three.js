@@ -185,6 +185,33 @@ THREE.Triangle.prototype = {
 
 		return new THREE.Triangle().copy( this );
 
+	},
+	distanceToPointSquared: function(point, optionalTarget){
+		//project the point to the triangle
+		var normal = this.normal();
+		var p = [this.a.clone(), this.b.clone(), this.c.clone()];
+		var projected = point.clone().add(normal.clone().multiplyScalar(p[0].clone().sub(point).dot(normal)) );
+		//if the point is inside the triangle
+		if(this.containsPoint(projected)){
+			optionalTarget = projected;
+			return projected.distanceToSquared(point);
+		} else {//calculate the closet point on the triangle edges
+			var dis_squared = Number.MAX_VALUE;
+			var start, end, line, closest, temp;
+			for(var i = 0; i < 3; ++i){
+				start = i;
+				end = (i+1)%3;
+				line = new THREE.Line3(p[start], p[end]);
+				closest = line.closestPointToPoint(projected, true);
+				temp = closest.distanceToSquared(projected);
+				if(temp < dis_squared){
+					dis_squared = temp;
+					optionalTarget = closest;
+				}
+			}
+			return dis_squared + projected.distanceToSquared(point);
+		}
+		return Number.MAX_VALUE;
 	}
 
 };
