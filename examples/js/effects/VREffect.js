@@ -91,22 +91,17 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.enableScissorTest( true );
 		renderer.clear();
 
-		// Grab camera matrix from user.
-		// This is interpreted as the head base.
-
-		if ( camera.matrixAutoUpdate ) {
-			camera.updateMatrix();
+		if ( camera.parent === undefined ) {
+			camera.updateMatrixWorld();
 		}
 
 		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV );
 		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV );
 
-		cameraLeft.position.copy( camera.position );
-		cameraLeft.quaternion.copy( camera.quaternion );
-		cameraLeft.translateX( leftEyeTranslation.x );
+		camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
+		camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
 
-		cameraRight.position.copy( camera.position );
-		cameraRight.quaternion.copy( camera.quaternion );
+		cameraLeft.translateX( leftEyeTranslation.x );
 		cameraRight.translateX( rightEyeTranslation.x );
 
 		// render left eye
