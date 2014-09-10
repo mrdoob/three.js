@@ -193,7 +193,7 @@ THREE.BlendCharacter = function () {
 
 			if ( this.animations[ a ].isPlaying ) {
 
-				this.animations[ a ].pause();
+				this.animations[ a ].stop();
 
 			}
 

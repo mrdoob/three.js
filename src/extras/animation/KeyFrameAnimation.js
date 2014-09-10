@@ -75,7 +75,7 @@ THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
 				node.animationCache = {};
 				node.animationCache.prevKey = null;
 				node.animationCache.nextKey = null;
-				node.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+				node.animationCache.originalMatrix = object.matrix;
 
 			}
 
@@ -122,17 +122,8 @@ THREE.KeyFrameAnimation.prototype.stop = function() {
 
 			var original = node.animationCache.originalMatrix;
 
-			if( obj instanceof THREE.Bone ) {
-
-				original.copy( obj.skinMatrix );
-				obj.skinMatrix = original;
-
-			} else {
-
-				original.copy( obj.matrix );
-				obj.matrix = original;
-
-			}
+			original.copy( obj.matrix );
+			obj.matrix = original;
 
 			delete node.animationCache;
 

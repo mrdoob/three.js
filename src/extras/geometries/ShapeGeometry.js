@@ -18,9 +18,9 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	THREE.Geometry.call( this );
 
-	if ( shapes instanceof Array === false ) shapes = [ shapes ];
+	this.type = 'ShapeGeometry';
 
-	this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
+	if ( shapes instanceof Array === false ) shapes = [ shapes ];
 
 	this.addShapeList( shapes, options );
 
@@ -55,8 +55,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var material = options.material;
 	var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
-
-	var shapebb = this.shapebb;
 
 	//
 

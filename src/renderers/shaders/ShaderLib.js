@@ -65,6 +65,7 @@ THREE.ShaderLib = {
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
+			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -78,6 +79,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
@@ -173,6 +175,7 @@ THREE.ShaderLib = {
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
+			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -186,6 +189,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 
@@ -289,6 +293,8 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
+			"#define PHONG",
+
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
@@ -299,6 +305,7 @@ THREE.ShaderLib = {
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
+			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -315,6 +322,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 
@@ -757,6 +765,8 @@ THREE.ShaderLib = {
 			"		#endif",
 
 			"	}",
+			
+			THREE.ShaderChunk[ "alphatest_fragment" ],
 
 			"	if( enableSpecular )",
 			"		specularTex = texture2D( tSpecular, vUv ).xyz;",
@@ -1121,13 +1131,14 @@ THREE.ShaderLib = {
 
 			"			#ifdef USE_SKINNING",
 
-			"				vec4 skinVertex = vec4( position, 1.0 );",
+			"				vec4 skinVertex = bindMatrix * vec4( position, 1.0 );",
 
 			"				vec4 skinned = vec4( 0.0 );",
 			"				skinned += boneMatX * skinVertex * skinWeight.x;",
 			"				skinned += boneMatY * skinVertex * skinWeight.y;",
 			"				skinned += boneMatZ * skinVertex * skinWeight.z;",
 			"				skinned += boneMatW * skinVertex * skinWeight.w;",
+			"				skinned  = bindMatrixInverse * skinned;",
 
 			"				displacedPosition = skinned.xyz;",
 
@@ -1143,13 +1154,14 @@ THREE.ShaderLib = {
 
 			"		#ifdef USE_SKINNING",
 
-			"			vec4 skinVertex = vec4( position, 1.0 );",
+			"			vec4 skinVertex = bindMatrix * vec4( position, 1.0 );",
 
 			"			vec4 skinned = vec4( 0.0 );",
 			"			skinned += boneMatX * skinVertex * skinWeight.x;",
 			"			skinned += boneMatY * skinVertex * skinWeight.y;",
 			"			skinned += boneMatZ * skinVertex * skinWeight.z;",
 			"			skinned += boneMatW * skinVertex * skinWeight.w;",
+			"			skinned  = bindMatrixInverse * skinned;",
 
 			"			displacedPosition = skinned.xyz;",
 

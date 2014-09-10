@@ -18,6 +18,13 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 	];
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
+
+	this.type = 'OctahedronGeometry';
+
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
 };
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );

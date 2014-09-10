@@ -6,6 +6,8 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
+	this.type = 'MorphAnimMesh';
+
 	// API
 
 	this.duration = 1000; // milliseconds
@@ -172,6 +174,21 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	this.morphTargetInfluences[ this.currentKeyframe ] = mix;
 	this.morphTargetInfluences[ this.lastKeyframe ] = 1 - mix;
+
+};
+
+THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
+
+	var influences = this.morphTargetInfluences;
+
+	for ( var i = 0, l = influences.length; i < l; i ++ ) {
+
+		influences[ i ] = 0;
+
+	}
+
+	if ( a > -1 ) influences[ a ] = 1 - t;
+	if ( b > -1 ) influences[ b ] = t;
 
 };
 

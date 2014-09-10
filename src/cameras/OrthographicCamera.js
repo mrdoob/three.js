@@ -6,6 +6,8 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 	THREE.Camera.call( this );
 
+	this.type = 'OrthographicCamera';
+
 	this.left = left;
 	this.right = right;
 	this.top = top;

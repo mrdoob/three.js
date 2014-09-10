@@ -86,16 +86,13 @@
 				var material = new THREE.MeshLambertMaterial( { color:0xffffff, side: THREE.DoubleSide } );
 
 				var loader = new THREE.VTKLoader();
-				loader.addEventListener( 'load', function ( event ) {
-
-					var geometry = event.content;
+				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.setY( - 0.09 );
 					scene.add( mesh );
 
 				} );
-				loader.load( "models/vtk/bunny.vtk" );
 
 				// renderer
 

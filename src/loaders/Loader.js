@@ -358,6 +358,12 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.mapAlpha && texturePath ) {
+
+			create_texture( mpars, 'alphaMap', m.mapAlpha, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy );
+
+		}
+
 		//
 
 		if ( m.mapBumpScale ) {

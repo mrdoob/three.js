@@ -303,7 +303,10 @@ THREE.Vector2.prototype = {
 
 	negate: function () {
 
-		return this.multiplyScalar( - 1 );
+		this.x = - this.x;
+		this.y = - this.y;
+
+		return this;
 
 	},
 

@@ -1,5 +1,6 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.BufferGeometry = function () {
@@ -8,8 +9,11 @@ THREE.BufferGeometry = function () {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.type = 'BufferGeometry';
 
 	this.attributes = {};
+	this.attributesKeys = [];
+
 	this.drawcalls = [];
 	this.offsets = this.drawcalls; // backwards compatibility
 
@@ -35,6 +39,7 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		this.attributes[ name ] = attribute;
+		this.attributesKeys = Object.keys( this.attributes );
 
 	},
 
@@ -107,7 +112,7 @@ THREE.BufferGeometry.prototype = {
 		if ( hasFaceVertexUv === true ) {
 
 			var uvs = new Float32Array( faces.length * 3 * 2 );
-			this.addAttribute( 'uvs', new THREE.BufferAttribute( uvs, 2 ) );
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 		}
 
@@ -230,80 +235,48 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( this.boundingBox === null ) {
+		var vector = new THREE.Vector3();
 
-			this.boundingBox = new THREE.Box3();
+		return function () {
 
-		}
+			if ( this.boundingBox === null ) {
 
-		var positions = this.attributes[ 'position' ].array;
+				this.boundingBox = new THREE.Box3();
 
-		if ( positions ) {
-
-			var bb = this.boundingBox;
-
-			if ( positions.length >= 3 ) {
-				bb.min.x = bb.max.x = positions[ 0 ];
-				bb.min.y = bb.max.y = positions[ 1 ];
-				bb.min.z = bb.max.z = positions[ 2 ];
 			}
 
-			for ( var i = 3, il = positions.length; i < il; i += 3 ) {
+			var positions = this.attributes.position.array;
 
-				var x = positions[ i ];
-				var y = positions[ i + 1 ];
-				var z = positions[ i + 2 ];
+			if ( positions ) {
 
-				// bounding box
+				var bb = this.boundingBox;
+				bb.makeEmpty();
 
-				if ( x < bb.min.x ) {
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-					bb.min.x = x;
-
-				} else if ( x > bb.max.x ) {
-
-					bb.max.x = x;
-
-				}
-
-				if ( y < bb.min.y ) {
-
-					bb.min.y = y;
-
-				} else if ( y > bb.max.y ) {
-
-					bb.max.y = y;
-
-				}
-
-				if ( z < bb.min.z ) {
-
-					bb.min.z = z;
-
-				} else if ( z > bb.max.z ) {
-
-					bb.max.z = z;
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					bb.expandByPoint( vector );
 
 				}
 
 			}
 
+			if ( positions === undefined || positions.length === 0 ) {
+
+				this.boundingBox.min.set( 0, 0, 0 );
+				this.boundingBox.max.set( 0, 0, 0 );
+
+			}
+
+			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+
+				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
+
+			}
+
 		}
 
-		if ( positions === undefined || positions.length === 0 ) {
-
-			this.boundingBox.min.set( 0, 0, 0 );
-			this.boundingBox.max.set( 0, 0, 0 );
-
-		}
-
-		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
-
-			console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
-
-		}
-
-	},
+	}(),
 
 	computeBoundingSphere: function () {
 
@@ -318,7 +291,7 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes[ 'position' ].array;
+			var positions = this.attributes.position.array;
 
 			if ( positions ) {
 
@@ -369,36 +342,31 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		if ( this.attributes[ 'position' ] ) {
+		var attributes = this.attributes;
 
-			var i, il;
-			var j, jl;
+		if ( attributes.position ) {
 
-			var nVertexElements = this.attributes[ 'position' ].array.length;
+			var positions = attributes.position.array;
 
-			if ( this.attributes[ 'normal' ] === undefined ) {
+			if ( attributes.normal === undefined ) {
 
-				this.attributes[ 'normal' ] = {
-
-					itemSize: 3,
-					array: new Float32Array( nVertexElements )
-
-				};
+				this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( positions.length ), 3 ) );
 
 			} else {
 
 				// reset existing normals to zero
 
-				for ( i = 0, il = this.attributes[ 'normal' ].array.length; i < il; i ++ ) {
+				var normals = attributes.normal.array;
 
-					this.attributes[ 'normal' ].array[ i ] = 0;
+				for ( var i = 0, il = normals.length; i < il; i ++ ) {
+
+					normals[ i ] = 0;
 
 				}
 
 			}
 
-			var positions = this.attributes[ 'position' ].array;
-			var normals = this.attributes[ 'normal' ].array;
+			var normals = attributes.normal.array;
 
 			var vA, vB, vC, x, y, z,
 
@@ -411,19 +379,19 @@ THREE.BufferGeometry.prototype = {
 
 			// indexed elements
 
-			if ( this.attributes[ 'index' ] ) {
+			if ( attributes.index ) {
 
-				var indices = this.attributes[ 'index' ].array;
+				var indices = attributes.index.array;
 
 				var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
 
-				for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+				for ( var j = 0, jl = offsets.length; j < jl; ++ j ) {
 
 					var start = offsets[ j ].start;
 					var count = offsets[ j ].count;
 					var index = offsets[ j ].index;
 
-					for ( i = start, il = start + count; i < il; i += 3 ) {
+					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
 						vA = index + indices[ i ];
 						vB = index + indices[ i + 1 ];
@@ -464,11 +432,11 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-			// non-indexed elements (unconnected triangle soup)
-
 			} else {
 
-				for ( i = 0, il = positions.length; i < il; i += 9 ) {
+				// non-indexed elements (unconnected triangle soup)
+
+				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
 					x = positions[ i ];
 					y = positions[ i + 1 ];
@@ -507,7 +475,7 @@ THREE.BufferGeometry.prototype = {
 
 			this.normalizeNormals();
 
-			this.normalsNeedUpdate = true;
+			attributes.normal.needsUpdate = true;
 
 		}
 
@@ -518,37 +486,30 @@ THREE.BufferGeometry.prototype = {
 		// based on http://www.terathon.com/code/tangent.html
 		// (per vertex tangents)
 
-		if ( this.attributes[ 'index' ] === undefined ||
-			 this.attributes[ 'position' ] === undefined ||
-			 this.attributes[ 'normal' ] === undefined ||
-			 this.attributes[ 'uv' ] === undefined ) {
+		if ( this.attributes.index === undefined ||
+			 this.attributes.position === undefined ||
+			 this.attributes.normal === undefined ||
+			 this.attributes.uv === undefined ) {
 
 			console.warn( 'Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
 			return;
 
 		}
 
-		var indices = this.attributes[ 'index' ].array;
-		var positions = this.attributes[ 'position' ].array;
-		var normals = this.attributes[ 'normal' ].array;
-		var uvs = this.attributes[ 'uv' ].array;
+		var indices = this.attributes.index.array;
+		var positions = this.attributes.position.array;
+		var normals = this.attributes.normal.array;
+		var uvs = this.attributes.uv.array;
 
 		var nVertices = positions.length / 3;
 
-		if ( this.attributes[ 'tangent' ] === undefined ) {
+		if ( this.attributes.tangent === undefined ) {
 
-			var nTangentElements = 4 * nVertices;
-
-			this.attributes[ 'tangent' ] = {
-
-				itemSize: 4,
-				array: new Float32Array( nTangentElements )
-
-			};
+			this.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
 
 		}
 
-		var tangents = this.attributes[ 'tangent' ].array;
+		var tangents = this.attributes.tangent.array;
 
 		var tan1 = [], tan2 = [];
 
@@ -638,13 +599,19 @@ THREE.BufferGeometry.prototype = {
 		var j, jl;
 		var iA, iB, iC;
 
-		var offsets = this.offsets;
+		if ( this.drawcalls.length === 0 ) {
 
-		for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+			this.addDrawCall( 0, indices.length, 0 );
 
-			var start = offsets[ j ].start;
-			var count = offsets[ j ].count;
-			var index = offsets[ j ].index;
+		}
+
+		var drawcalls = this.drawcalls;
+
+		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+
+			var start = drawcalls[ j ].start;
+			var count = drawcalls[ j ].count;
+			var index = drawcalls[ j ].index;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -690,11 +657,11 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
 
-			var start = offsets[ j ].start;
-			var count = offsets[ j ].count;
-			var index = offsets[ j ].index;
+			var start = drawcalls[ j ].start;
+			var count = drawcalls[ j ].count;
+			var index = drawcalls[ j ].index;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -727,8 +694,8 @@ THREE.BufferGeometry.prototype = {
 
 		var s = Date.now();
 
-		var indices = this.attributes[ 'index' ].array;
-		var vertices = this.attributes[ 'position' ].array;
+		var indices = this.attributes.index.array;
+		var vertices = this.attributes.position.array;
 
 		var verticesCount = ( vertices.length / 3 );
 		var facesCount = ( indices.length / 3 );
@@ -831,7 +798,7 @@ THREE.BufferGeometry.prototype = {
 
 	normalizeNormals: function () {
 
-		var normals = this.attributes[ 'normal' ].array;
+		var normals = this.attributes.normal.array;
 
 		var x, y, z, n;
 
@@ -862,18 +829,11 @@ THREE.BufferGeometry.prototype = {
 
 		/* Create a copy of all attributes for reordering. */
 		var sortedAttributes = {};
-		var types = [ Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array ];
 		for ( var attr in this.attributes ) {
 			if ( attr == 'index' )
 				continue;
 			var sourceArray = this.attributes[ attr ].array;
-			for ( var i = 0, il = types.length; i < il; i ++ ) {
-				var type = types[ i ];
-				if ( sourceArray instanceof type ) {
-					sortedAttributes[ attr ] = new type( this.attributes[ attr ].itemSize * vertexCount );
-					break;
-				}
-			}
+			sortedAttributes[ attr ] = new sourceArray.constructor( this.attributes[ attr ].itemSize * vertexCount );
 		}
 
 		/* Move attribute positions based on the new index map */
@@ -900,38 +860,72 @@ THREE.BufferGeometry.prototype = {
 		}
 	},
 
+	toJSON: function () {
+
+		var output = {
+			metadata: {
+				version: 4.0,
+				type: 'BufferGeometry',
+				generator: 'BufferGeometryExporter'
+			},
+			uuid: this.uuid,
+			type: this.type,
+			data: {
+				attributes: {}
+			}
+		};
+
+		var attributes = this.attributes;
+		var offsets = this.offsets;
+		var boundingSphere = this.boundingSphere;
+
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
+
+			var array = [], typeArray = attribute.array;
+
+			for ( var i = 0, l = typeArray.length; i < l; i ++ ) {
+
+				array[ i ] = typeArray[ i ];
+
+			}
+
+			output.data.attributes[ key ] = {
+				itemSize: attribute.itemSize,
+				type: attribute.array.constructor.name,
+				array: array
+			}
+
+		}
+
+		if ( offsets.length > 0 ) {
+
+			output.data.offsets = JSON.parse( JSON.stringify( offsets ) );
+
+		}
+
+		if ( boundingSphere !== null ) {
+
+			output.data.boundingSphere = {
+				center: boundingSphere.center.toArray(),
+				radius: boundingSphere.radius
+			}
+
+		}
+
+		return output;
+
+	},
+
 	clone: function () {
 
 		var geometry = new THREE.BufferGeometry();
 
-		var types = [ Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array ];
-
 		for ( var attr in this.attributes ) {
 
 			var sourceAttr = this.attributes[ attr ];
-			var sourceArray = sourceAttr.array;
-
-			var attribute = {
-
-				itemSize: sourceAttr.itemSize,
-				array: null
-
-			};
-
-			for ( var i = 0, il = types.length; i < il; i ++ ) {
-
-				var type = types[ i ];
-
-				if ( sourceArray instanceof type ) {
-
-					attribute.array = new type( sourceArray );
-					break;
-
-				}
-
-			}
-
-			geometry.attributes[ attr ] = attribute;
+			geometry.addAttribute( attr, sourceAttr.clone() );
 
 		}
 

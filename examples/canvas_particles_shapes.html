@@ -69,7 +69,7 @@
 
 				scene = new THREE.Scene();
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				scene.add( group );
 
 				// Get text from hash
@@ -174,8 +174,7 @@
 
 				var onParticleCreated = function( p ) {
 
-					var position = p.position;
-					p.target.position = position;
+					p.target.position.copy( p.position );
 
 				};
 
@@ -205,6 +204,12 @@
 
 				sparksEmitter.addCallback("created", onParticleCreated);
 				sparksEmitter.addCallback("dead", onParticleDead);
+				sparksEmitter.addCallback("updated", function( particle ) {
+
+					particle.target.position.copy( particle.position );
+
+				});
+
 				sparksEmitter.start();
 
 				// End Particles

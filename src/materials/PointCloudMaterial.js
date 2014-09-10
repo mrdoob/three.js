@@ -23,6 +23,8 @@ THREE.PointCloudMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
+	this.type = 'PointCloudMaterial';
+
 	this.color = new THREE.Color( 0xffffff );
 
 	this.map = null;
@@ -63,9 +65,16 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 // backwards compatibility
 
+THREE.ParticleBasicMaterial = function ( parameters ) {
+
+	console.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointCloudMaterial.' );
+	return new THREE.PointCloudMaterial( parameters );
+
+};
+
 THREE.ParticleSystemMaterial = function ( parameters ) {
 
 	console.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
 	return new THREE.PointCloudMaterial( parameters );
 
-}
+};

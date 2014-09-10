@@ -52,7 +52,7 @@ UI.Element.prototype = {
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
+'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
 
@@ -69,7 +69,7 @@ properties.forEach( function ( property ) {
 
 // events
 
-var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'Change' ];
+var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change' ];
 
 events.forEach( function ( event ) {
 
@@ -106,7 +106,17 @@ UI.Panel.prototype.add = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
 
-		this.dom.appendChild( arguments[ i ].dom );
+		var argument = arguments[ i ];
+
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.appendChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
@@ -118,8 +128,18 @@ UI.Panel.prototype.add = function () {
 UI.Panel.prototype.remove = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
+	
+		var argument = arguments[ i ];
 
-		this.dom.removeChild( arguments[ i ].dom );
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.removeChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
@@ -144,22 +164,24 @@ UI.CollapsiblePanel = function () {
 
 	UI.Panel.call( this );
 
-	this.dom.className = 'Panel CollapsiblePanel';
-
-	this.button = document.createElement( 'div' );
-	this.button.className = 'CollapsiblePanelButton';
-	this.dom.appendChild( this.button );
+	this.setClass( 'Panel Collapsible' );
 
 	var scope = this;
-	this.button.addEventListener( 'click', function ( event ) {
 
+	this.static = new UI.Panel();
+	this.static.setClass( 'Static' );
+	this.static.onClick( function () {
 		scope.toggle();
+	} );
+	this.dom.appendChild( this.static.dom );
 
-	}, false );
+	this.contents = new UI.Panel();
+	this.contents.setClass( 'Content' );
+	this.dom.appendChild( this.contents.dom );
 
-	this.content = document.createElement( 'div' );
-	this.content.className = 'CollapsibleContent';
-	this.dom.appendChild( this.content );
+	var button = new UI.Panel();
+	button.setClass( 'Button' );
+	this.static.add( button );
 
 	this.isCollapsed = false;
 
@@ -171,63 +193,43 @@ UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
 
 UI.CollapsiblePanel.prototype.addStatic = function () {
 
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		this.dom.insertBefore( arguments[ i ].dom, this.content );
-
-	}
-
+	this.static.add.apply( this.static, arguments );
 	return this;
 
 };
 
-UI.CollapsiblePanel.prototype.removeStatic = UI.Panel.prototype.remove;
+UI.CollapsiblePanel.prototype.removeStatic = function () {
+
+	this.static.remove.apply( this.static, arguments );
+	return this;
+
+};
 
 UI.CollapsiblePanel.prototype.clearStatic = function () {
 
-	this.dom.childNodes.forEach( function ( child ) {
-
-		if ( child !== this.content ) {
-
-			this.dom.removeChild( child );
-
-		}
-
-	});
+	this.static.clear();
+	return this;
 
 };
 
 UI.CollapsiblePanel.prototype.add = function () {
 
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		this.content.appendChild( arguments[ i ].dom );
-
-	}
-
+	this.contents.add.apply( this.contents, arguments );
 	return this;
 
 };
 
 UI.CollapsiblePanel.prototype.remove = function () {
 
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		this.content.removeChild( arguments[ i ].dom );
-
-	}
-
+	this.contents.remove.apply( this.contents, arguments );
 	return this;
 
 };
 
 UI.CollapsiblePanel.prototype.clear = function () {
 
-	while ( this.content.children.length ) {
-
-		this.content.removeChild( this.content.lastChild );
-
-	}
+	this.contents.clear();
+	return this;
 
 };
 
@@ -249,19 +251,31 @@ UI.CollapsiblePanel.prototype.expand = function() {
 
 };
 
-UI.CollapsiblePanel.prototype.setCollapsed = function( setCollapsed ) {
+UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
 
-	if ( setCollapsed ) {
+	if ( boolean ) {
 
-		this.dom.classList.add('collapsed');
+		this.dom.classList.add( 'collapsed' );
 
 	} else {
 
-		this.dom.classList.remove('collapsed');
+		this.dom.classList.remove( 'collapsed' );
 
 	}
 
-	this.isCollapsed = setCollapsed;
+	this.isCollapsed = boolean;
+
+	if ( this.onCollapsedChangeCallback !== undefined ) {
+
+		this.onCollapsedChangeCallback( boolean );
+
+	}
+
+};
+
+UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
+
+	this.onCollapsedChangeCallback = callback;
 
 };
 
@@ -353,10 +367,23 @@ UI.TextArea = function () {
 	dom.className = 'TextArea';
 	dom.style.padding = '2px';
 	dom.style.border = '1px solid #ccc';
+	dom.spellcheck = false;
 
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		event.stopPropagation();
+
+		if ( event.keyCode === 9 ) {
+
+			event.preventDefault();
+
+			var cursor = dom.selectionStart;
+
+			dom.value = dom.value.substring( 0, cursor ) + '\t' + dom.value.substring( cursor );
+			dom.selectionStart = cursor + 1;
+			dom.selectionEnd = dom.selectionStart;
+
+		}
 
 	}, false );
 
@@ -447,7 +474,13 @@ UI.Select.prototype.getValue = function () {
 
 UI.Select.prototype.setValue = function ( value ) {
 
-	this.dom.value = value;
+	value = String( value );
+
+	if ( this.dom.value !== value ) {
+
+		this.dom.value = value;
+
+	}
 
 	return this;
 
@@ -792,9 +825,19 @@ UI.Number = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseFloat( dom.value );
+		var value = 0;
 
-		dom.value = isNaN( number ) === false ? number : 0;
+		try {
+
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
+
+		}
+
+		dom.value = parseFloat( value );
 
 	};
 
@@ -945,13 +988,19 @@ UI.Integer = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseInt( dom.value );
+		var value = 0;
 
-		if ( isNaN( number ) === false ) {
+		try {
 
-			dom.value = number;
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
 
 		}
+
+		dom.value = parseInt( value );
 
 	};
 
@@ -1069,6 +1118,52 @@ UI.Button.prototype = Object.create( UI.Element.prototype );
 UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
+
+	return this;
+
+};
+
+
+// Dialog
+
+UI.Dialog = function ( value ) {
+
+	var scope = this;
+	
+	var dom = document.createElement( 'dialog' );
+
+	if ( dom.showModal === undefined ) {
+
+		// fallback
+
+		dom = document.createElement( 'div' );
+		dom.style.display = 'none';
+
+		dom.showModal = function () {
+
+			dom.style.position = 'absolute';
+			dom.style.left = '100px';
+			dom.style.top = '100px';
+			dom.style.zIndex = 1;
+			dom.style.display = '';
+
+		};
+
+	}
+
+	dom.className = 'Dialog';
+
+	this.dom = dom;
+
+	return this;
+
+};
+
+UI.Dialog.prototype = Object.create( UI.Panel.prototype );
+
+UI.Dialog.prototype.showModal = function () {
+
+	this.dom.showModal();
 
 	return this;
 

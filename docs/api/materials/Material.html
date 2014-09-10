@@ -106,9 +106,9 @@
 		Sets the alpha value to be used when running an alpha test. Default is *0*.
 		</div>
 
-		<h3>.[page:Boolean overdraw]</h3>
+		<h3>.[page:Float overdraw]</h3>
 		<div>
-		Enables/disables overdraw. If enabled, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the [page:CanvasRenderer]. Default is *false*.
+		Amount of triangle expansion at draw time. This is a workaround for cases when gaps appear between triangles when using [page:CanvasRenderer]. *0.5* tends to give good results across browsers. Default is *0*.
 		</div>
 
 		<h3>.[page:Boolean visible]</h3>

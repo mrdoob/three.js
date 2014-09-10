@@ -6,6 +6,7 @@ THREE.ShadowMapPlugin = function () {
 
 	var _gl,
 	_renderer,
+	_lights, _webglObjects, _webglObjectsImmediate,
 	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
@@ -14,12 +15,18 @@ THREE.ShadowMapPlugin = function () {
 	_min = new THREE.Vector3(),
 	_max = new THREE.Vector3(),
 
-	_matrixPosition = new THREE.Vector3();
+	_matrixPosition = new THREE.Vector3(),
+	
+	_renderList = [];
 
-	this.init = function ( renderer ) {
+	this.init = function ( renderer, lights, webglObjects, webglObjectsImmediate ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+		_lights = lights;
+
+		_webglObjects = webglObjects;
+		_webglObjectsImmediate = webglObjectsImmediate;
 
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -38,7 +45,7 @@ THREE.ShadowMapPlugin = function () {
 
 	this.render = function ( scene, camera ) {
 
-		if ( ! ( _renderer.shadowMapEnabled && _renderer.shadowMapAutoUpdate ) ) return;
+		if ( _renderer.shadowMapEnabled === false || _renderer.shadowMapAutoUpdate === false ) return;
 
 		this.update( scene, camera );
 
@@ -51,7 +58,6 @@ THREE.ShadowMapPlugin = function () {
 		shadowMap, shadowMatrix, shadowCamera,
 		program, buffer, material,
 		webglObject, object, light,
-		renderList,
 
 		lights = [],
 		k = 0,
@@ -82,9 +88,9 @@ THREE.ShadowMapPlugin = function () {
 		// 	- skip lights that are not casting shadows
 		//	- create virtual lights for cascaded shadow maps
 
-		for ( i = 0, il = scene.__lights.length; i < il; i ++ ) {
+		for ( i = 0, il = _lights.length; i < il; i ++ ) {
 
-			light = scene.__lights[ i ];
+			light = _lights[ i ];
 
 			if ( ! light.castShadow ) continue;
 
@@ -230,85 +236,62 @@ THREE.ShadowMapPlugin = function () {
 
 			// set object matrices & frustum culling
 
-			renderList = scene.__webglObjects;
+			_renderList.length = 0;
+			projectObject(scene,scene,shadowCamera);
 
-			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-				webglObject = renderList[ j ];
-				object = webglObject.object;
-
-				webglObject.render = false;
-
-				if ( object.visible && object.castShadow ) {
-
-					if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
-
-						object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-
-						webglObject.render = true;
-
-					}
-
-				}
-
-			}
 
 			// render regular objects
 
 			var objectMaterial, useMorphing, useSkinning;
 
-			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
+			for ( j = 0, jl = _renderList.length; j < jl; j ++ ) {
 
-				webglObject = renderList[ j ];
+				webglObject = _renderList[ j ];
 
-				if ( webglObject.render ) {
+				object = webglObject.object;
+				buffer = webglObject.buffer;
 
-					object = webglObject.object;
-					buffer = webglObject.buffer;
+				// culling is overriden globally for all objects
+				// while rendering depth map
 
-					// culling is overriden globally for all objects
-					// while rendering depth map
+				// need to deal with MeshFaceMaterial somehow
+				// in that case just use the first of material.materials for now
+				// (proper solution would require to break objects by materials
+				//  similarly to regular rendering and then set corresponding
+				//  depth materials per each chunk instead of just once per object)
 
-					// need to deal with MeshFaceMaterial somehow
-					// in that case just use the first of material.materials for now
-					// (proper solution would require to break objects by materials
-					//  similarly to regular rendering and then set corresponding
-					//  depth materials per each chunk instead of just once per object)
+				objectMaterial = getObjectMaterial( object );
 
-					objectMaterial = getObjectMaterial( object );
+				useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
+				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
 
-					useMorphing = object.geometry.morphTargets !== undefined && object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
-					useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
+				if ( object.customDepthMaterial ) {
 
-					if ( object.customDepthMaterial ) {
+					material = object.customDepthMaterial;
 
-						material = object.customDepthMaterial;
+				} else if ( useSkinning ) {
 
-					} else if ( useSkinning ) {
+					material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
-						material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
+				} else if ( useMorphing ) {
 
-					} else if ( useMorphing ) {
+					material = _depthMaterialMorph;
 
-						material = _depthMaterialMorph;
+				} else {
 
-					} else {
+					material = _depthMaterial;
 
-						material = _depthMaterial;
+				}
 
-					}
+				_renderer.setMaterialFaces( objectMaterial );
 
-					_renderer.setMaterialFaces( objectMaterial );
+				if ( buffer instanceof THREE.BufferGeometry ) {
 
-					if ( buffer instanceof THREE.BufferGeometry ) {
+					_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object );
 
-						_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object );
+				} else {
 
-					} else {
-
-						_renderer.renderBuffer( shadowCamera, scene.__lights, fog, material, buffer, object );
-
-					}
+					_renderer.renderBuffer( shadowCamera, _lights, fog, material, buffer, object );
 
 				}
 
@@ -316,18 +299,16 @@ THREE.ShadowMapPlugin = function () {
 
 			// set matrices and render immediate objects
 
-			renderList = scene.__webglObjectsImmediate;
+			for ( j = 0, jl = _webglObjectsImmediate.length; j < jl; j ++ ) {
 
-			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-				webglObject = renderList[ j ];
+				webglObject = _webglObjectsImmediate[ j ];
 				object = webglObject.object;
 
 				if ( object.visible && object.castShadow ) {
 
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
-					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
+					_renderer.renderImmediateObject( shadowCamera, _lights, fog, _depthMaterial, object );
 
 				}
 
@@ -349,7 +330,36 @@ THREE.ShadowMapPlugin = function () {
 
 		}
 
+		_renderer.resetGLState();
+
 	};
+	
+	function projectObject(scene, object,shadowCamera){
+		
+		if ( object.visible ) {
+	
+			var webglObjects = _webglObjects[object.id];
+	
+			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+		
+		
+				for (var i = 0, l = webglObjects.length; i < l; i++){
+			
+					var webglObject = webglObjects[i];
+					
+					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+					_renderList.push(webglObject);
+					
+				}
+			}
+	
+			for(var i = 0, l = object.children.length; i < l; i++) {
+				
+				projectObject(scene, object.children[i],shadowCamera);
+			}
+		
+		}
+	}
 
 	function createVirtualLight( light, cascade ) {
 

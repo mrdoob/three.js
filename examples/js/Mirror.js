@@ -171,8 +171,6 @@ THREE.Mirror.prototype.renderWithMirror = function ( otherMirror ) {
 
 THREE.Mirror.prototype.updateTextureMatrix = function () {
 
-	var sign = THREE.Math.sign;
-
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
 
@@ -228,8 +226,8 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	var q = new THREE.Vector4();
 	var projectionMatrix = this.mirrorCamera.projectionMatrix;
 
-	q.x = ( sign(this.clipPlane.x) + projectionMatrix.elements[8] ) / projectionMatrix.elements[0];
-	q.y = ( sign(this.clipPlane.y) + projectionMatrix.elements[9] ) / projectionMatrix.elements[5];
+	q.x = ( Math.sign(this.clipPlane.x) + projectionMatrix.elements[8] ) / projectionMatrix.elements[0];
+	q.y = ( Math.sign(this.clipPlane.y) + projectionMatrix.elements[9] ) / projectionMatrix.elements[5];
 	q.z = - 1.0;
 	q.w = ( 1.0 + projectionMatrix.elements[10] ) / projectionMatrix.elements[14];
 
