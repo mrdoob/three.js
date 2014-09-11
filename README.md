@@ -41,7 +41,7 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 		mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
-		renderer = new THREE.CanvasRenderer();
+		renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 
 		document.body.appendChild( renderer.domElement );
@@ -61,7 +61,7 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 
 </script>
 ```
-If everything went well you should see [this](http://jsfiddle.net/Q7DLQ/).
+If everything went well you should see [this](http://jsfiddle.net/f17Lz5ux/).
 
 ### Change log ###
 
