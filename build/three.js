@@ -21763,7 +21763,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributeItem.needsUpdate === true ) {
 
-				var bufferType = ( attributeName === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
+				var bufferType = ( attributeName === 'index' || attributeName === 'index_wireframe' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
 				_gl.bindBuffer( bufferType, attributeItem.buffer );
 				_gl.bufferData( bufferType, attributeItem.array, _gl.STATIC_DRAW );
@@ -22046,7 +22046,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						// render indexed triangles
-						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+						_gl.drawElements( mode, offset.count, type, offset.start * size );
+						// _gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
 
 						_this.info.render.calls ++;
 						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
