@@ -91,7 +91,7 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		].join("\n")
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), RTMaterial );
+	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), RTMaterial );
 
 	// Final scene
 	var finalScene = new THREE.Scene();
