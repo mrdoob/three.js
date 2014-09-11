@@ -22,6 +22,10 @@
  *
  */
 THREE.VREffect = function ( renderer, done ) {
+
+	var cameraLeft = new THREE.PerspectiveCamera();
+	var cameraRight = new THREE.PerspectiveCamera();
+
 	this._renderer = renderer;
 
 	this._init = function() {
@@ -72,36 +76,33 @@ THREE.VREffect = function ( renderer, done ) {
 			return;
 		}
 		// Regular render mode if not HMD
-		renderer.render.apply( this._renderer , arguments );
+		renderer.render.apply( this._renderer, arguments );
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
-		var cameraLeft;
-		var cameraRight;
+
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
 		var rendererWidth = renderer.domElement.width / renderer.devicePixelRatio;
 		var rendererHeight = renderer.domElement.height / renderer.devicePixelRatio;
 		var eyeDivisionLine = rendererWidth / 2;
+
 		renderer.enableScissorTest( true );
 		renderer.clear();
 
-		// Grab camera matrix from user.
-		// This is interpreted as the head base.
-		if ( camera.matrixAutoUpdate ) {
-			camera.updateMatrix();
+		if ( camera.parent === undefined ) {
+			camera.updateMatrixWorld();
 		}
-		var eyeWorldMatrix = camera.matrixWorld.clone();
 
-		cameraLeft = camera.clone();
-		cameraRight = camera.clone();
 		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV );
 		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV );
-		cameraLeft.position.add(new THREE.Vector3(
-			leftEyeTranslation.x, leftEyeTranslation.y, leftEyeTranslation.z) );
-		cameraRight.position.add(new THREE.Vector3(
-			rightEyeTranslation.x, rightEyeTranslation.y, rightEyeTranslation.z) );
+
+		camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
+		camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
+
+		cameraLeft.translateX( leftEyeTranslation.x );
+		cameraRight.translateX( rightEyeTranslation.x );
 
 		// render left eye
 		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );

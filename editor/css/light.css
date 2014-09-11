@@ -1,61 +1,4 @@
-﻿* {
-	vertical-align: middle;
-}
-
-body {
-	font-family: Arial, sans-serif;
-	font-size: 14px;
-	margin: 0;
-	overflow: hidden;
-}
-
-hr {
-	border: 0px;
-	border-top: 1px solid #ccc;
-}
-
-button {
-	position: relative;
-}
-
-textarea {
-	white-space: pre;
-	word-wrap: normal;
-}
-
-.Panel {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-
-	/* No support for these yet */
-	-o-user-select: none;
-	user-select: none;
-}
-
-.CollapsiblePanel .CollapsiblePanelButton {
-	float: left;
-	margin-right: 6px;
-	width: 0px;
-	height: 0px;
-	border: 6px solid transparent;
-}
-
-.CollapsiblePanel.collapsed .CollapsiblePanelButton {
-	margin-top: 2px;
-	border-left-color: #bbb;
-}
-
-.CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
-	margin-top: 6px;
-	border-top-color: #bbb;
-}
-
-.CollapsiblePanel.collapsed .CollapsibleContent {
-	display: none;
-}
-
-.FancySelect {
+﻿.FancySelect {
 	background: #fff;
 	border: 1px solid #ccc;
 	padding: 0;
@@ -84,6 +27,14 @@ input.Number {
 }
 
 #viewport {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+}
+
+#player {
 	position: absolute;
 	top: 32px;
 	left: 0px;
@@ -139,6 +90,10 @@ input.Number {
 					background-color: #08f;
 				}
 
+				#menubar .menu .options .option:active {
+					color: #666;
+					background: transparent;
+				}
 
 #sidebar {
 	position: absolute;

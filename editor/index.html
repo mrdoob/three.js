@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
 	<body>
-		<link href="css/types.css" rel="stylesheet" />
+		<link href="css/main.css" rel="stylesheet" />
 		<link id="theme" href="css/light.css" rel="stylesheet" />
 
 		<script src="../build/three.min.js"></script>
@@ -37,11 +37,19 @@
 
 		<script src="../examples/js/renderers/WebGLRenderer3.js"></script>
 
+		<link href="js/libs/codemirror/codemirror.css" rel="stylesheet" />
+		<script src="js/libs/codemirror/codemirror.js"></script>
+		<script src="js/libs/codemirror/modes/javascript.js"></script>
+
+
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
+		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/Storage.js"></script>
+
+		<script src="js/Player.js"></script>
 
 		<script src="js/Editor.js"></script>
 		<script src="js/Config.js"></script>
@@ -50,6 +58,7 @@
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
+		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -60,6 +69,7 @@
 		<script src="js/Sidebar.Geometry.js"></script>
 		<script src="js/Sidebar.Geometry.Geometry.js"></script>
 		<script src="js/Sidebar.Geometry.BufferGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.Modifiers.js"></script>
 		<script src="js/Sidebar.Geometry.BoxGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.CircleGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.CylinderGeometry.js"></script>
@@ -72,16 +82,26 @@
 		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
+		<script src="js/Viewport.Info.js"></script>
 
 		<script>
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
+			Number.prototype.format = function (){
+				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			};
+
+			//
+
 			var editor = new Editor();
 
 			var viewport = new Viewport( editor ).setId( 'viewport' );
 			document.body.appendChild( viewport.dom );
+
+			var player = new Player( editor ).setId( 'player' );
+			document.body.appendChild( player.dom );
 
 			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
 			document.body.appendChild( toolbar.dom );
@@ -140,6 +160,7 @@
 
 				var signals = editor.signals;
 
+				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );

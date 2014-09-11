@@ -504,6 +504,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.addPostPlugin = function ( plugin ) {
 
 		plugin.init( this, lights, _webglObjects, _webglObjectsImmediate );
+
 		this.renderPluginsPost.push( plugin );
 
 	};
@@ -511,6 +512,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.addPrePlugin = function ( plugin ) {
 
 		plugin.init( this, lights, _webglObjects, _webglObjectsImmediate );
+
 		this.renderPluginsPre.push( plugin );
 
 	};
@@ -603,13 +605,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 	
-	var onObjectDispose = function ( event ) {
+	var onObjectRemoved = function ( event ) {
 
 		var object = event.target;
 
-		object.removeEventListener( 'dispose', onObjectDispose );
+		object.traverse( function ( child ) {
 
-		removeObject( object )
+			child.removeEventListener( 'remove', onObjectRemoved );
+
+			removeObject( child );
+
+		} );
 
 	};
 
@@ -680,14 +686,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometry.__webglCustomAttributesList !== undefined ) {
 
-			var attributes = geometry.__webglCustomAttributesList;
-			var keys = Object.keys( attributes );
+			for ( var name in geometry.__webglCustomAttributesList ) {
 
-			for ( var i = 0; i < keys.length; i ++ ) {
-
-				var name = keys[ i ];
-
-				_gl.deleteBuffer( attributes[ name ].buffer );
+				_gl.deleteBuffer( geometry.__webglCustomAttributesList[ name ].buffer );
 
 			}
 
@@ -703,16 +704,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			var attributes = geometry.attributes;
-			var keys = Object.keys( attributes );
+			for ( var name in geometry.attributes ) {
 
-			for ( var i = 0; i < keys.length; i ++ ) {
+				if ( geometry.attributes[ name ].buffer !== undefined ) {
 
-				var name = keys[ i ];
-
-				if ( attributes[ name ].buffer !== undefined ) {
-
-					_gl.deleteBuffer( attributes[ name ].buffer );
+					_gl.deleteBuffer( geometry.attributes[ name ].buffer );
 
 				}
 
@@ -884,11 +880,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var keys = Object.keys( material.attributes );
+			for ( var name in material.attributes ) {
 
-			for ( var i = 0; i < keys.length; i ++ ) {
-
-				var name = keys[ i ];
 				var attribute = material.attributes[ name ];
 
 				if ( ! attribute.__webglInitialized || attribute.createUniqueBuffers ) {
@@ -1050,23 +1043,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var keys = Object.keys( material.attributes );
-
-			for ( var i = 0; i < keys.length; i ++ ) {
+			for ( var name in material.attributes ) {
 
 				// Do a shallow copy of the attribute object so different geometryGroup chunks use different
 				// attribute buffers which are correctly indexed in the setMeshBuffers function
 
-				var name = keys[ i ];
 				var originalAttribute = material.attributes[ name ];
 
 				var attribute = {};
 
-				var keys2 = Object.keys( originalAttribute );
+				for ( var property in originalAttribute ) {
 
-				for ( var j = 0; j < keys2.length; j ++ ) {
-
-					var property = keys2[ j ];
 					attribute[ property ] = originalAttribute[ property ];
 
 				}
@@ -1117,28 +1104,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		return material && material.shading !== undefined && material.shading === THREE.SmoothShading;
 
 	};
-
-	//
-
-	function initDirectBuffers( geometry ) {
-
-		var keys = Object.keys( geometry.attributes );
-
-		for ( var i = 0; i < keys.length; i ++ ) {
-
-			var name = keys[ i ];
-
-			var bufferType = ( name === 'index' || name === "index_wireframe" ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
-
-			var attribute = geometry.attributes[ name ];
-			attribute.buffer = _gl.createBuffer();
-
-			_gl.bindBuffer( bufferType, attribute.buffer );
-			_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
-
-		}
-
-	}
 
 	// Buffer setting
 
@@ -2444,30 +2409,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setDirectBuffers( geometry, hint ) {
+	function setDirectBuffers( geometry ) {
 
 		var attributes = geometry.attributes;
+		var attributesKeys = geometry.attributesKeys;
 
-		var keys = Object.keys( attributes );
+		for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
 
-		for ( var i = 0; i < keys.length; i ++ ) {
-
-			var attributeName = keys[ i ];
+			var attributeName = attributesKeys[ i ];
 			var attributeItem = attributes[ attributeName ];
 
-			if ( attributeItem.needsUpdate ) {
+			if ( attributeItem.buffer === undefined ) {
 
-				if ( attributeName === 'index' || attributeName === 'index_wireframe' ) {
+				attributeItem.buffer = _gl.createBuffer();
+				attributeItem.needsUpdate = true;
+			}
 
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
-					_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
+			if ( attributeItem.needsUpdate === true ) {
 
-				} else {
+				var bufferType = ( attributeName === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-					_gl.bufferData( _gl.ARRAY_BUFFER, attributeItem.array, hint );
-
-				}
+				_gl.bindBuffer( bufferType, attributeItem.buffer );
+				_gl.bufferData( bufferType, attributeItem.array, _gl.STATIC_DRAW );
 
 				attributeItem.needsUpdate = false;
 
@@ -2576,13 +2539,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setupVertexAttributes( material, programAttributes, geometryAttributes, startIndex ) {
+	function setupVertexAttributes( material, program, geometry, startIndex ) {
 
-		var keys = Object.keys( programAttributes );
+		var geometryAttributes = geometry.attributes;
 
-		for ( var i = 0; i < keys.length; i ++ ) {
+		var programAttributes = program.attributes;
+		var programAttributesKeys = program.attributesKeys;
 
-			var attributeName = keys[ i ];
+		for ( var i = 0, l = programAttributesKeys.length; i < l; i ++ ) {
+
+			var attributeName = programAttributesKeys[ i ];
 
 			if ( attributeName === 'index' || attributeName === 'index_wireframe') continue;
 
@@ -2591,15 +2557,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributePointer >= 0 ) {
 
-				if ( attributeItem ) {
+				attributeItem = geometryAttributes[ attributeName ];
+
+				if ( attributeItem !== undefined ) {
 
 					var attributeSize = attributeItem.itemSize;
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+
 					enableAttribute( attributePointer );
+
 					_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
 
-				} else if ( material.defaultAttributeValues ) {
+				} else if ( material.defaultAttributeValues !== undefined ) {
 
 					if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
 
@@ -2625,13 +2595,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object, offsetIndices ) {
 	// END_VEROLD_MOD - materialIndex in offsets
 
+		if ( material.visible === false ) return;
+
 		var linewidth, a, attribute;
 		var attributeItem, attributeName, attributePointer, attributeSize;
 
 		var program = setProgram( camera, lights, fog, material, object );
-
-		var programAttributes = program.attributes;
-		var geometryAttributes = geometry.attributes;
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -2654,14 +2623,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var index = geometryAttributes[ 'index' ];
+			var mode = material.wireframe === true ? _gl.LINES : _gl.TRIANGLES;
+
+			var index = geometry.attributes.index;
 
 			// START_VEROLD_MOD - wireframe
-			var mode = _gl.TRIANGLES;
 
-			if ( wireframeBit && geometryAttributes[ "index_wireframe" ] ) {
+			if ( wireframeBit && geometry.attributes.index_wireframe ) {
 
-				index = geometryAttributes[ "index_wireframe" ];
+				index = geometry.attributes.index_wireframe;
 				mode = _gl.LINES;
 
 			}
@@ -2691,14 +2661,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
-						setupVertexAttributes( material, programAttributes, geometryAttributes, 0 );
+						setupVertexAttributes( material, program, geometry, 0 );
 						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
 
-					// START_VEROLD_MOD - wireframe
 					_gl.drawElements( mode, index.array.length, type, 0 );
-					// END_VEROLD_MOD - wireframe
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
@@ -2736,15 +2704,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( updateBuffers ) {
 
-							setupVertexAttributes( material, programAttributes, geometryAttributes, startIndex );
+							setupVertexAttributes( material, program, geometry, startIndex );
 							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 						}
 
 						// render indexed triangles
-						// START_VEROLD_MOD - wireframe
-						_gl.drawElements( mode, offset.count, type, offset.start * size );
-						// END_VEROLD_MOD - wireframe
+						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
 
 						_this.info.render.calls ++;
 						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -2760,7 +2726,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( updateBuffers ) {
 
-					setupVertexAttributes( material, programAttributes, geometryAttributes, 0 );
+					setupVertexAttributes( material, program, geometry, 0 );
 
 				}
 
@@ -2768,7 +2734,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
 
-				_gl.drawArrays( _gl.TRIANGLES, 0, position.numItems / 3 );
+				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
 				_this.info.render.calls ++;
 				_this.info.render.vertices += position.numItems / 3;
@@ -2782,11 +2748,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
-				setupVertexAttributes( material, programAttributes, geometryAttributes, 0 );
+				setupVertexAttributes( material, program, geometry, 0 );
 
 			}
 
-			var position = geometryAttributes[ 'position' ];
+			var position = geometry.attributes.position;
 
 			// render particles
 
@@ -2801,7 +2767,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setLineWidth( material.linewidth );
 
-			var index = geometryAttributes[ 'index' ];
+			var index = geometry.attributes.index;
 
 			if ( index ) {
 
@@ -2827,7 +2793,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
-						setupVertexAttributes( material, programAttributes, geometryAttributes, 0 );
+						setupVertexAttributes( material, program, geometry, 0 );
 						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
@@ -2851,7 +2817,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( updateBuffers ) {
 
-							setupVertexAttributes( material, programAttributes, geometryAttributes, startIndex );
+							setupVertexAttributes( material, program, geometry, startIndex );
 							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 						}
@@ -2873,11 +2839,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( updateBuffers ) {
 
-					setupVertexAttributes( material, programAttributes, geometryAttributes, 0 );
+					setupVertexAttributes( material, program, geometry, 0 );
 
 				}
 
-				var position = geometryAttributes[ 'position' ];
+				var position = geometry.attributes.position;
 
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
@@ -2891,6 +2857,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
+
+		if ( material.visible === false ) return;
 
 		var linewidth, a, attribute, i, il;
 
@@ -2973,7 +2941,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					enableAttribute( attributes.color );
 					_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
-				} else if ( material.defaultAttributeValues ) {
+				} else if ( material.defaultAttributeValues !== undefined ) {
 
 
 					_gl.vertexAttrib3fv( attributes.color, material.defaultAttributeValues.color );
@@ -3011,7 +2979,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					enableAttribute( attributes.uv );
 					_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
-				} else if ( material.defaultAttributeValues ) {
+				} else if ( material.defaultAttributeValues !== undefined ) {
 
 
 					_gl.vertexAttrib2fv( attributes.uv, material.defaultAttributeValues.uv );
@@ -3028,7 +2996,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					enableAttribute( attributes.uv2 );
 					_gl.vertexAttribPointer( attributes.uv2, 2, _gl.FLOAT, false, 0, 0 );
 
-				} else if ( material.defaultAttributeValues ) {
+				} else if ( material.defaultAttributeValues !== undefined ) {
 
 
 					_gl.vertexAttrib2fv( attributes.uv2, material.defaultAttributeValues.uv2 );
@@ -3338,7 +3306,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
@@ -3571,37 +3538,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, il = plugins.length; i < il; i ++ ) {
 
-			// reset state for plugin (to start from clean slate)
-
-			_currentProgram = null;
-			_currentCamera = null;
-
-			_oldBlending = - 1;
-			_oldDepthTest = - 1;
-			_oldDepthWrite = - 1;
-			_oldDoubleSided = - 1;
-			_oldFlipSided = - 1;
-			_currentGeometryGroupHash = - 1;
-			_currentMaterialId = - 1;
-
-			_lightsNeedUpdate = true;
-
 			plugins[ i ].render( scene, camera, _currentWidth, _currentHeight );
-
-			// reset state after plugin (anything could have changed)
-
-			_currentProgram = null;
-			_currentCamera = null;
-
-			_oldBlending = - 1;
-			_oldDepthTest = - 1;
-			_oldDepthWrite = - 1;
-			_oldDoubleSided = - 1;
-			_oldFlipSided = - 1;
-			_currentGeometryGroupHash = - 1;
-			_currentMaterialId = - 1;
-
-			_lightsNeedUpdate = true;
 
 		}
 
@@ -3821,10 +3758,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object.__webglInit === undefined ) {
 
 			object.__webglInit = true;
-			object.addEventListener( 'dispose', onObjectDispose );
-
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
+
+			object.addEventListener( 'removed', onObjectRemoved );
 
 		}
 		
@@ -3841,15 +3778,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				initDirectBuffers( geometry );
+				//
 
 			} else if ( object instanceof THREE.Mesh ) {
-				
-				if ( object.__webglActive !== undefined ) {
-
-					removeObject( object, scene );
-
-				}
 				
 				initGeometryGroups(scene, object, geometry);
 
@@ -4046,22 +3977,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			setDirectBuffers( geometry, _gl.DYNAMIC_DRAW );
+			setDirectBuffers( geometry );
 
 		} else if ( object instanceof THREE.Mesh ) {
 
 			// check all geometry groups
 			if ( geometry.buffersNeedUpdate || geometry.groupsNeedUpdate ) {
 				
-				if ( geometry instanceof THREE.BufferGeometry ) {
-
-					initDirectBuffers( geometry );
-
-				} else if ( object instanceof THREE.Mesh ) {
-				
-					initGeometryGroups(scene, object,geometry);
-					
-				}
+				initGeometryGroups(scene, object,geometry);
 				
 			}
 
@@ -4145,11 +4068,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function areCustomAttributesDirty( material ) {
 
-		var keys = Object.keys( material.attributes );
-
-		for ( var i = 0; i < keys.length; i ++ ) {
-
-			var name = keys[ i ];
+		for ( var name in material.attributes ) {
 
 			if ( material.attributes[ name ].needsUpdate ) return true;
 
@@ -4161,11 +4080,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function clearCustomAttributes( material ) {
 
-		var keys = Object.keys( material.attributes );
-
-		for ( var i = 0; i < keys.length; i ++ ) {
-
-			var name = keys[ i ];
+		for ( var name in material.attributes ) {
 
 			material.attributes[ name ].needsUpdate = false;
 
@@ -4188,6 +4103,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			removeInstances( _webglObjectsImmediate, object );
 
 		}
+
+		delete object.__webglInit;
+		delete object._modelViewMatrix;
+		delete object._normalMatrix;
 
 		delete object.__webglActive;
 
@@ -4347,31 +4266,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var keys;
-
 		if ( material.defines !== undefined ) {
 
-			keys = Object.keys( material.defines );
+			for ( var name in material.defines ) {
 
-			for ( var i = 0; i < keys.length; i ++ ) {
-
-				var d = keys[ i ];
-
-				chunks.push( d );
-				chunks.push( material.defines[ d ] );
+				chunks.push( name );
+				chunks.push( material.defines[ name ] );
 
 			}
 
 		}
 
-		keys = Object.keys( parameters );
+		for ( var name in parameters ) {
 
-		for ( var i = 0; i < keys.length; i ++ ) {
-
-			var p = keys[ i ];
-
-			chunks.push( p );
-			chunks.push( parameters[ p ] );
+			chunks.push( name );
+			chunks.push( parameters[ name ] );
 
 		}
 
@@ -4407,7 +4316,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.program = program;
 
-		var attributes = material.program.attributes;
+		var attributes = program.attributes;
 
 		if ( material.morphTargets ) {
 
@@ -4415,7 +4324,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var id, base = 'morphTarget';
 
-			for ( i = 0; i < _this.maxMorphTargets; i ++ ) {
+			for ( var i = 0; i < _this.maxMorphTargets; i ++ ) {
 
 				id = base + i;
 
@@ -4451,11 +4360,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniformsList = [];
 
-		keys = Object.keys( material.__webglShader.uniforms );
+		for ( var u in material.__webglShader.uniforms ) {
 
-		for ( var i = 0; i < keys.length; i ++ ) {
-
-			var u = keys[ i ];
 			var location = material.program.uniforms[ u ];
 
 			if ( location ) {
@@ -6610,7 +6516,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	function setDefaultGLState () {
 
@@ -6633,7 +6539,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
+
+	function resetGLState() {
+
+		_currentProgram = null;
+		_currentCamera = null;
+
+		_oldBlending = - 1;
+		_oldDepthTest = - 1;
+		_oldDepthWrite = - 1;
+		_oldDoubleSided = - 1;
+		_oldFlipSided = - 1;
+		_currentGeometryGroupHash = - 1;
+		_currentMaterialId = - 1;
+
+		_lightsNeedUpdate = true;
+
+	}
+
+	this.resetGLState = resetGLState;
 
 	// default plugins (order is important)
 

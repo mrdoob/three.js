@@ -101,12 +101,11 @@ THREE.Geometry.prototype = {
 
 		var attributes = geometry.attributes;
 
-		var indices = attributes.index !== undefined && attributes.index.array;
-		var normals = attributes.normal !== undefined && attributes.normal.array;
-		var colors = attributes.color !== undefined && attributes.color.array;
-		var uvs = attributes.uv !== undefined && attributes.uv.array;
-
 		var vertices = attributes.position.array;
+		var indices = attributes.index !== undefined ? attributes.index.array : undefined;
+		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
+		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
+		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
 
 		var tempNormals = [];
 		var tempUVs = [];
@@ -137,8 +136,8 @@ THREE.Geometry.prototype = {
 
 		var addFace = function ( a, b, c ) {
 
-			var vertexNormals = normals !== undefined ? [ tempNormals[ a ], tempNormals[ b ], tempNormals[ c ] ] : [];
-			var vertexColors = colors !== undefined ? [ scope.colors[ a ], scope.colors[ b ], scope.colors[ c ] ] : [];
+			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
+			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
 			scope.faces.push( new THREE.Face3( a, b, c, vertexNormals, vertexColors ) );
 			scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ], tempUVs[ b ], tempUVs[ c ] ] );

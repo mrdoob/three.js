@@ -37,8 +37,6 @@
 
 			var camera, scene, renderer;
 
-			var videoTexture;
-
 			var texture_placeholder,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
@@ -63,19 +61,16 @@
 				var geometry = new THREE.SphereGeometry( 500, 60, 40 );
 				geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
-				video = document.createElement('video');
+				var video = document.createElement( 'video' );
 				video.width = 640;
 				video.height = 360;
 				video.autoplay = true;
 				video.loop = true; 
-
-				video.crossOrigin='anonymous'
 				video.src = "textures/pano.webm";
 
-				videoTexture = new THREE.Texture( video );
-				videoTexture.generateMipmaps = false;
+				var texture = new THREE.VideoTexture( video );
 
-				var material   = new THREE.MeshBasicMaterial( { map : videoTexture } );
+				var material   = new THREE.MeshBasicMaterial( { map : texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				
@@ -171,18 +166,6 @@
 			}
 
 			function update() {
-
-
-				if( video.readyState === video.HAVE_ENOUGH_DATA ){
-				  videoTexture.needsUpdate = true;
-				}
-
-
-			        //if ( isUserInteracting === false ) {
-
-				//	lon += 0.5;
-
-				//}
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.Math.degToRad( 90 - lat );

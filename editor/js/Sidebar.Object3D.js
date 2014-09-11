@@ -196,6 +196,8 @@ Sidebar.Object3D = function ( editor ) {
 	container.add( objectVisibleRow );
 
 	// user data
+	
+	var timeout;
 
 	var objectUserDataRow = new UI.Panel();
 	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
@@ -204,13 +206,14 @@ Sidebar.Object3D = function ( editor ) {
 		try {
 
 			JSON.parse( objectUserData.getValue() );
-			objectUserData.setBorderColor( '#ccc' );
-			objectUserData.setBackgroundColor( '' );
+
+			objectUserData.dom.classList.add( 'success' );
+			objectUserData.dom.classList.remove( 'fail' );
 
 		} catch ( error ) {
 
-			objectUserData.setBorderColor( '#f00' );
-			objectUserData.setBackgroundColor( 'rgba(255,0,0,0.25)' );
+			objectUserData.dom.classList.remove( 'success' );
+			objectUserData.dom.classList.add( 'fail' );
 
 		}
 

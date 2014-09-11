@@ -32,7 +32,7 @@
 		t: toggle HUD</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
@@ -58,7 +58,7 @@
 			var camera, controls, scene, renderer;
 			var container, stats;
 
-			var NEAR = 10, FAR = 3000;
+			var NEAR = 1, FAR = 3000;
 
 			var sceneHUD, cameraOrtho, hudMesh;
 
@@ -107,20 +107,24 @@
 				var ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2, 1 );
+				light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 
 				light.castShadow = true;
 
-				light.shadowCameraNear = 1200;
-				light.shadowCameraFar = 2500;
-				light.shadowCameraFov = 50;
+				light.shadowCameraNear = NEAR;
+				light.shadowCameraFar = FAR;
+				light.shadowCameraLeft = -1000;
+				light.shadowCameraRight = 1000;
+				light.shadowCameraTop = 1000;
+				light.shadowCameraBottom = -1000;
+				// light.shadowCameraFov = 50;
 
-				//light.shadowCameraVisible = true;
+				light.shadowCameraVisible = true;
 
-				light.shadowBias = 0.0001;
-				light.shadowDarkness = 0.5;
+				light.shadowBias = -0.01;
+				light.shadowDarkness = 0.95;
 
 				light.shadowMapWidth = SHADOW_MAP_WIDTH;
 				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
@@ -132,7 +136,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
@@ -143,6 +147,7 @@
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapType = THREE.PCFShadowMap;
+				renderer.shadowMapCullFace = THREE.CullFaceFront;
 
 				// STATS
 
@@ -230,7 +235,7 @@
 
 				// GROUND
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneGeometry( 100, 100, 40, 40);
 				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 				planeMaterial.ambient = planeMaterial.color;
 
@@ -240,7 +245,7 @@
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 100, 100, 100 );
 
-				ground.castShadow = false;
+				ground.castShadow = true;
 				ground.receiveShadow = true;
 
 				scene.add( ground );
@@ -303,7 +308,7 @@
 
 				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true } );
 
 					if ( fudgeColor ) {
 
@@ -404,11 +409,11 @@
 
 					morph.updateAnimation( 1000 * delta );
 
-					morph.position.x += morph.speed * delta;
+					// morph.position.x += morph.speed * delta;
 
 					if ( morph.position.x  > 2000 )  {
 
-						morph.position.x = -1000 - Math.random() * 500;
+						// morph.position.x = -1000 - Math.random() * 500;
 
 					}
 

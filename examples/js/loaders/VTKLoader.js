@@ -8,53 +8,24 @@ THREE.VTKLoader.prototype = {
 
 	constructor: THREE.VTKLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		var loader = new THREE.XHRLoader( scope.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			var geometry = scope.parse( event.target.responseText );
+			onLoad( scope.parse( text ) );
 
-			scope.dispatchEvent( { type: 'load', content: geometry } );
-
-			if ( callback ) callback( geometry );
-
-		}, false );
-
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		} );
 
 	},
 
 	parse: function ( data ) {
 
-		var geometry = new THREE.Geometry();
-
-		var vertex = function ( x, y, z ) {
-
-			geometry.vertices.push( new THREE.Vector3( x, y, z ) );
-
-		}
-
-		var face3 = function ( a, b, c ) {
-
-			geometry.faces.push( new THREE.Face3( a, b, c ) );
-
-		}
+		var indices = [];
+		var positions = [];
 
 		var pattern, result;
 
@@ -66,7 +37,7 @@ THREE.VTKLoader.prototype = {
 
 			// ["1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-			vertex( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+			positions.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
 
 		}
 
@@ -78,7 +49,7 @@ THREE.VTKLoader.prototype = {
 
 			// ["3 1 2 3", "1", "2", "3"]
 
-			face3( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
+			indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
 
 		}
 
@@ -90,14 +61,15 @@ THREE.VTKLoader.prototype = {
 
 			// ["4 1 2 3 4", "1", "2", "3", "4"]
 
-			face3( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 4 ] ) );
-			face3( parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
+			indices.push( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 4 ] ) );
+			indices.push( parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
 
 		}
 
-		geometry.computeFaceNormals();
+		var geometry = new THREE.BufferGeometry();
+		geometry.addAttribute( 'index', new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
 		geometry.computeVertexNormals();
-		geometry.computeBoundingSphere();
 
 		return geometry;
 

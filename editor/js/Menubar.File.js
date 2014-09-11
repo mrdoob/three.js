@@ -209,6 +209,8 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Publish' );
 	option.onClick( function () {
 
+		alert( 'Not yet...' );
+
 	} );
 	options.add( option );
 

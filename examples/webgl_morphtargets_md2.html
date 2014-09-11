@@ -48,11 +48,11 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src='js/MD2Character.js'></script>
+		<!-- <script src='js/MD2Character.js'></script> -->
 
 		<script src='js/Detector.js'></script>
 		<script src='js/libs/stats.min.js'></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+		<!-- <script src='js/libs/dat.gui.min.js'></script> -->
 
 		<script>
 
@@ -147,6 +147,7 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				renderer.shadowMapEnabled = true;
+				renderer.shadowMapCullFace = 2;
 
 				// STATS
 
@@ -162,59 +163,66 @@
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 50, 0 );
 
-				// GUI
+				var sphereMat = new THREE.MeshPhongMaterial();
+				var sphereGeo = new THREE.SphereGeometry( 50.0, 12, 12 );
+				var sphereMesh = new THREE.Mesh( sphereGeo, sphereMat );
+				sphereMesh.castShadow = true;
+				sphereMesh.position.y = 25;
+				scene.add( sphereMesh );
 
-				gui = new dat.GUI();
+				// // GUI
 
-				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function() {
+				// gui = new dat.GUI();
 
-					character.setPlaybackRate( playbackConfig.speed );
+				// gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function() {
 
-				} );
+				// 	character.setPlaybackRate( playbackConfig.speed );
 
-				gui.add( playbackConfig, 'wireframe', false ).onChange( function() {
+				// } );
 
-					character.setWireframe( playbackConfig.wireframe );
+				// gui.add( playbackConfig, 'wireframe', false ).onChange( function() {
 
-				} );
+				// 	character.setWireframe( playbackConfig.wireframe );
+
+				// } );
 
 				// CHARACTER
 
-				var config = {
+				// var config = {
 
-					baseUrl: "models/animated/ratamahatta/",
+				// 	baseUrl: "models/animated/ratamahatta/",
 
-					body: "ratamahatta.js",
-					skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
-					weapons:  [  [ "weapon.js", "weapon.png" ],
-								 [ "w_bfg.js", "w_bfg.png" ],
-								 [ "w_blaster.js", "w_blaster.png" ],
-								 [ "w_chaingun.js", "w_chaingun.png" ],
-								 [ "w_glauncher.js", "w_glauncher.png" ],
-								 [ "w_hyperblaster.js", "w_hyperblaster.png" ],
-								 [ "w_machinegun.js", "w_machinegun.png" ],
-								 [ "w_railgun.js", "w_railgun.png" ],
-								 [ "w_rlauncher.js", "w_rlauncher.png" ],
-								 [ "w_shotgun.js", "w_shotgun.png" ],
-								 [ "w_sshotgun.js", "w_sshotgun.png" ]
-								]
+				// 	body: "ratamahatta.js",
+				// 	skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
+				// 	weapons:  [  [ "weapon.js", "weapon.png" ],
+				// 				 [ "w_bfg.js", "w_bfg.png" ],
+				// 				 [ "w_blaster.js", "w_blaster.png" ],
+				// 				 [ "w_chaingun.js", "w_chaingun.png" ],
+				// 				 [ "w_glauncher.js", "w_glauncher.png" ],
+				// 				 [ "w_hyperblaster.js", "w_hyperblaster.png" ],
+				// 				 [ "w_machinegun.js", "w_machinegun.png" ],
+				// 				 [ "w_railgun.js", "w_railgun.png" ],
+				// 				 [ "w_rlauncher.js", "w_rlauncher.png" ],
+				// 				 [ "w_shotgun.js", "w_shotgun.png" ],
+				// 				 [ "w_sshotgun.js", "w_sshotgun.png" ]
+				// 				]
 
-				};
+				// };
 
-				character = new THREE.MD2Character();
-				character.scale = 3;
+				// character = new THREE.MD2Character();
+				// character.scale = 3;
 
-				character.onLoadComplete = function() {
+				// character.onLoadComplete = function() {
 
-					setupSkinsGUI( character );
-					setupWeaponsGUI( character );
-					setupGUIAnimations( character );
+				// 	setupSkinsGUI( character );
+				// 	setupWeaponsGUI( character );
+				// 	setupGUIAnimations( character );
 
-				}
+				// }
 
-				character.loadParts( config );
+				// character.loadParts( config );
 
-				scene.add( character.root );
+				// scene.add( character.root );
 
 			}
 
@@ -231,100 +239,6 @@
 				camera.updateProjectionMatrix();
 
 			}
-
-			// GUI
-
-			function labelize( text ) {
-
-				var parts = text.split( "." );
-
-				if ( parts.length > 1 ) {
-
-					parts.length -= 1;
-					return parts.join( "." );
-
-				}
-
-				return text;
-
-			}
-
-			//
-
-			function setupWeaponsGUI( character ) {
-
-				var folder = gui.addFolder( "Weapons" );
-
-				var generateCallback = function( index ) {
-
-					return function () { character.setWeapon( index ); };
-
-				}
-
-				var guiItems = [];
-
-				for ( var i = 0; i < character.weapons.length; i ++ ) {
-
-					var name = character.weapons[ i ].name;
-
-					playbackConfig[ name ] = generateCallback( i );
-					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
-
-				}
-
-			}
-
-			//
-
-			function setupSkinsGUI( character ) {
-
-				var folder = gui.addFolder( "Skins" );
-
-				var generateCallback = function( index ) {
-
-					return function () { character.setSkin( index ); };
-
-				}
-
-				var guiItems = [];
-
-				for ( var i = 0; i < character.skinsBody.length; i ++ ) {
-
-					var name = character.skinsBody[ i ].name;
-
-					playbackConfig[ name ] = generateCallback( i );
-					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
-
-				}
-
-			}
-
-			//
-
-			function setupGUIAnimations( character ) {
-
-				var folder = gui.addFolder( "Animations" );
-
-				var generateCallback = function( animationName ) {
-
-					return function () { character.setAnimation( animationName ); };
-
-				}
-
-				var i = 0, guiItems = [];
-				var animations = character.meshBody.geometry.animations;
-
-				for ( var a in animations ) {
-
-					playbackConfig[ a ] = generateCallback( a );
-					guiItems[ i ] = folder.add( playbackConfig, a, a );
-
-					i ++;
-
-				}
-
-			}
-
 			//
 
 			function animate() {
@@ -341,7 +255,7 @@
 				var delta = clock.getDelta();
 
 				controls.update();
-				character.update( delta );
+				// character.update( delta );
 
 				renderer.render( scene, camera );
 

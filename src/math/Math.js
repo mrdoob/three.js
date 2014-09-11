@@ -122,12 +122,6 @@ THREE.Math = {
 
 	},
 
-	sign: function ( x ) {
-
-		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
-
-	},
-
 	degToRad: function () {
 
 		var degreeToRadiansFactor = Math.PI / 180;

@@ -5,14 +5,7 @@ var Viewport = function ( editor ) {
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
 
-	var info = new UI.Text();
-	info.setPosition( 'absolute' );
-	info.setRight( '5px' );
-	info.setBottom( '5px' );
-	info.setFontSize( '12px' );
-	info.setColor( '#ffffff' );
-	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
-	container.add( info );
+	container.add( new Viewport.Info( editor ) );
 
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
@@ -26,7 +19,7 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
+	var camera = editor.camera;
 	camera.position.fromArray( editor.config.getKey( 'camera/position' ) );
 	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera/target' ) ) );
 
@@ -41,14 +34,6 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-		controls.enabled = true;
-
-		if ( transformControls.axis !== null ) {
-
-			controls.enabled = false;
-
-		}
-
 		render();
 
 	} );
@@ -57,6 +42,17 @@ var Viewport = function ( editor ) {
 		signals.objectChanged.dispatch( transformControls.object );
 
 	} );
+	transformControls.addEventListener( 'mouseDown', function () {
+
+		controls.enabled = false;
+
+	} );
+	transformControls.addEventListener( 'mouseUp', function () {
+
+		controls.enabled = true;
+
+	} );
+
 	sceneHelpers.add( transformControls );
 
 	// fog
@@ -156,9 +152,11 @@ var Viewport = function ( editor ) {
 
 		var intersects = getIntersects( event, objects );
 
-		if ( intersects.length > 0 && intersects[ 0 ].object === editor.selected ) {
+		if ( intersects.length > 0 ) {
 
-			controls.focus( editor.selected );
+			var intersect = intersects[ 0 ];
+
+			signals.objectFocused.dispatch( intersect.object );
 
 		}
 
@@ -171,7 +169,7 @@ var Viewport = function ( editor ) {
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
-	controls.center.fromArray( editor.config.getKey( 'camera/target' ) )
+	controls.center.fromArray( editor.config.getKey( 'camera/target' ) );
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
@@ -239,7 +237,6 @@ var Viewport = function ( editor ) {
 	signals.sceneGraphChanged.add( function () {
 
 		render();
-		updateInfo();
 
 	} );
 
@@ -291,6 +288,14 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.objectFocused.add( function ( object ) {
+
+		controls.focus( object );
+
+	} );
+
+	signals.geometryChanged.add( render );
+
 	signals.objectAdded.add( function ( object ) {
 
 		var materialsNeedUpdate = false;
@@ -324,8 +329,6 @@ var Viewport = function ( editor ) {
 				editor.helpers[ object.id ].update();
 
 			}
-
-			updateInfo();
 
 		}
 
@@ -484,49 +487,6 @@ var Viewport = function ( editor ) {
 	animate();
 
 	//
-
-	function updateInfo() {
-
-		var objects = 0;
-		var vertices = 0;
-		var faces = 0;
-
-		scene.traverse( function ( object ) {
-
-			if ( object instanceof THREE.Mesh ) {
-
-				objects ++;
-
-				var geometry = object.geometry;
-
-				if ( geometry instanceof THREE.Geometry ) {
-
-					vertices += geometry.vertices.length;
-					faces += geometry.faces.length;
-
-				} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-					vertices += geometry.attributes.position.array.length / 3;
-
-					if ( geometry.attributes.index !== undefined ) {
-
-						faces += geometry.attributes.index.array.length / 3;
-
-					} else {
-
-						faces += geometry.attributes.position.array.length / 9;
-
-					}
-
-				}
-
-			}
-
-		} );
-
-		info.setValue( 'objects: ' + objects + ', vertices: ' + vertices + ', faces: ' + faces );
-
-	}
 
 	function updateMaterials() {
 

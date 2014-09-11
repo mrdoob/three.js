@@ -49,32 +49,6 @@ Menubar.Edit = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
-	// Convert
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Convert' );
-	option.onClick( function () {
-
-		// convert to BufferGeometry
-		
-		var object = editor.selected;
-
-		if ( object.geometry instanceof THREE.Geometry ) {
-
-			if ( object.parent === undefined ) return; // avoid flattening the camera or scene
-
-			if ( confirm( 'Convert ' + object.name + ' to BufferGeometry?' ) === false ) return;
-
-			object.geometry = new THREE.BufferGeometry().fromGeometry( object.geometry );
-
-			editor.signals.objectChanged.dispatch( object );
-
-		}
-
-	} );
-	options.add( option );
-
 	// Flatten
 
 	var option = new UI.Panel();

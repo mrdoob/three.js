@@ -25,6 +25,11 @@ Sidebar.Scene = function ( editor ) {
 		ignoreObjectSelectedSignal = false;
 
 	} );
+	outliner.onDblClick( function () {
+
+		editor.focusById( parseInt( outliner.getValue() ) );
+
+	} );
 	container.add( outliner );
 	container.add( new UI.Break() );
 

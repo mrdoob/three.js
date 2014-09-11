@@ -7,6 +7,8 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
+	this.needsUpdate = false;
+
 };
 
 THREE.BufferAttribute.prototype = {
@@ -97,6 +99,12 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 3 ] = w;
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new THREE.BufferAttribute( new this.array.constructor( this.array ), this.itemSize );
 
 	}
 

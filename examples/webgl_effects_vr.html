@@ -36,7 +36,7 @@
 	<body>
 		<div class="button">Start VR Mode</div>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -105,7 +105,7 @@
 				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 				var fullScreenButton = document.querySelector( '.button' );
 				fullScreenButton.onclick = function() {

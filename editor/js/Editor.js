@@ -4,6 +4,11 @@ var Editor = function () {
 
 	this.signals = {
 
+		// player
+
+		startPlayer: new SIGNALS.Signal(),
+		stopPlayer: new SIGNALS.Signal(),
+
 		// actions
 
 		playAnimation: new SIGNALS.Signal(),
@@ -24,7 +29,11 @@ var Editor = function () {
 
 		cameraChanged: new SIGNALS.Signal(),
 
+		geometryChanged: new SIGNALS.Signal(),
+
 		objectSelected: new SIGNALS.Signal(),
+		objectFocused: new SIGNALS.Signal(),
+
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
 		objectRemoved: new SIGNALS.Signal(),
@@ -46,6 +55,7 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
 	
@@ -275,35 +285,26 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		this.selected = object;
+		if ( this.selected === object ) return;
+
+		var uuid = null;
 
 		if ( object !== null ) {
 
-			this.config.setKey( 'selected', object.uuid );
-
-		} else {
-
-			this.config.setKey( 'selected', null );
+			uuid = object.uuid;
 
 		}
 
+		this.selected = object;
+
+		this.config.setKey( 'selected', uuid );
 		this.signals.objectSelected.dispatch( object );
 
 	},
 
 	selectById: function ( id ) {
 
-		var scope = this;
-
-		this.scene.traverse( function ( child ) {
-
-			if ( child.id === id ) {
-
-				scope.select( child );
-
-			}
-
-		} );
+		this.select( this.scene.getObjectById( id, true ) );
 
 	},
 
@@ -326,6 +327,18 @@ Editor.prototype = {
 	deselect: function () {
 
 		this.select( null );
+
+	},
+
+	focus: function ( object ) {
+
+		this.signals.objectFocused.dispatch( object );
+
+	},
+
+	focusById: function ( id ) {
+
+		this.focus( this.scene.getObjectById( id, true ) );
 
 	}
 

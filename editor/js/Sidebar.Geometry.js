@@ -126,6 +126,11 @@ Sidebar.Geometry = function ( editor ) {
 				parameters = new Sidebar.Geometry.TorusKnotGeometry( signals, object );
 				container.add( parameters );
 
+			} else {
+
+				parameters = new Sidebar.Geometry.Modifiers( signals, object );
+				container.add( parameters );
+
 			}
 
 		} else {
@@ -137,7 +142,6 @@ Sidebar.Geometry = function ( editor ) {
 	}
 
 	signals.objectSelected.add( build );
-	signals.objectChanged.add( build );
 
 	return container;
 
