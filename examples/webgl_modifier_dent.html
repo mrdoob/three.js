@@ -124,7 +124,7 @@
 
 				geometry3 = new THREE.BoxGeometry( 300, 300, 300, 16, 16, 16 ); 
 				var Texture = new THREE.ImageUtils.loadTexture( 'textures/kote.jpg' );
-				var material3 = new THREE.MeshBasicMaterial( { map: Texture } );
+				var material3 = new THREE.MeshLambertMaterial( { map: Texture } );
 
 				var Cube = new THREE.Mesh( geometry3, material3 );
 				Cube.position.set( 600, 0, -300 );
@@ -175,7 +175,7 @@
 					if ( index < 3) { direction.multiplyScalar( -1 ); }
 
 					var obj = intersects[ 0 ].object; 
-					modifier.set( intersects[ 0 ].point, direction, 80, 1 ).modify( obj );
+					modifier.set( intersects[ 0 ].point, direction, 80, 2/3 ).modify( obj );
 
 				}
 
