@@ -2,6 +2,7 @@
  * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / http://github.com/zz85
  * @author bhouston / http://exocortex.com
+ * @author deignacio
  *
  * Creates an arrow for visualizing directions
  *
@@ -9,7 +10,7 @@
  *  dir - Vector3
  *  origin - Vector3
  *  length - Number
- *  color - color in hex value
+ *  hex - color in hex value
  *  headLength - Number
  *  headWidth - Number
  */
@@ -22,13 +23,13 @@ THREE.ArrowHelper = ( function () {
 	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
 	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
 
-	return function ( dir, origin, length, color, headLength, headWidth ) {
+	return function ( dir, origin, length, hex, headLength, headWidth ) {
 
 		// dir is assumed to be normalized
 
 		THREE.Object3D.call( this );
 
-		if ( color === undefined ) color = 0xffff00;
+		var color = ( hex !== undefined ) ? hex : 0xffff00;
 		if ( length === undefined ) length = 1;
 		if ( headLength === undefined ) headLength = 0.2 * length;
 		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
