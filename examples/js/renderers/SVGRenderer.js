@@ -18,7 +18,7 @@ THREE.SVGRenderer = function () {
 
 	var _this = this,
 	_renderData, _elements, _lights,
-	_projector = new THREE.Projector(),
+	_renderer = new THREE.Renderer(),
 	_svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
 
@@ -113,7 +113,7 @@ THREE.SVGRenderer = function () {
 			_svg.removeChild( _svg.childNodes[ 0 ] );
 
 		}
-		
+
 		_svg.style.backgroundColor = 'rgba(' + ( ( _clearColor.r * 255 ) | 0 ) + ',' + ( ( _clearColor.g * 255 ) | 0 ) + ',' + ( ( _clearColor.b * 255 ) | 0 ) + ',' + _clearAlpha + ')';
 
 	};
@@ -135,7 +135,7 @@ THREE.SVGRenderer = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
+		_renderData = _renderer.projectScene( scene, camera, this.sortObjects, this.sortElements );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 

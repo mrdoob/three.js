@@ -134,11 +134,6 @@
 	"src/renderers/WebGLRenderTargetCube.js",
 	"src/renderers/webgl/WebGLProgram.js",
 	"src/renderers/webgl/WebGLShader.js",
-	"src/renderers/renderables/RenderableVertex.js",
-	"src/renderers/renderables/RenderableFace.js",
-	"src/renderers/renderables/RenderableObject.js",
-	"src/renderers/renderables/RenderableSprite.js",
-	"src/renderers/renderables/RenderableLine.js",
 	"src/extras/core/Gyroscope.js",
 	"src/extras/helpers/CameraHelper.js",
 	"src/extras/helpers/DirectionalLightHelper.js",
@@ -152,4 +147,3 @@
 	"src/extras/renderers/plugins/SpritePlugin.js",
 	"src/extras/shaders/ShaderFlares.js"
 ]
-

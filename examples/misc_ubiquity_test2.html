@@ -15,6 +15,10 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/renderers/Renderer.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<div id='container1' style='float: left '></div>
@@ -127,7 +131,7 @@
 
 					var material = new THREE.SpriteMaterial( { map: texture3 } );
 					material.rotation = 2 * Math.PI * ( Math.random() - 0.5 );
-					
+
 					var sprite = new THREE.Sprite( material );
 
 					sprite.position.x = Math.random() * 1000 - 500;

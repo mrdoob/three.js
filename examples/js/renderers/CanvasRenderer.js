@@ -2,6 +2,36 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+THREE.SpriteCanvasMaterial = function ( parameters ) {
+
+	THREE.Material.call( this );
+
+	this.type = 'SpriteCanvasMaterial';
+
+	this.color = new THREE.Color( 0xffffff );
+	this.program = function ( context, color ) {};
+
+	this.setValues( parameters );
+
+};
+
+THREE.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.SpriteCanvasMaterial.prototype.clone = function () {
+
+	var material = new THREE.SpriteCanvasMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+	material.program = this.program;
+
+	return material;
+
+};
+
+//
+
 THREE.CanvasRenderer = function ( parameters ) {
 
 	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
@@ -12,7 +42,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	var _this = this,
 	_renderData, _elements, _lights,
-	_projector = new THREE.Projector(),
+	_renderer = new THREE.Renderer(),
 
 	_canvas = parameters.canvas !== undefined
 			 ? parameters.canvas
@@ -183,7 +213,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		this.setClearColor( hex, alpha );
 
 	};
-	
+
 	this.getClearColor = function () {
 
 		return _clearColor;
@@ -270,7 +300,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_context.setTransform( _viewportWidth / _canvasWidth, 0, 0, - _viewportHeight / _canvasHeight, _viewportX, _canvasHeight - _viewportY );
 		_context.translate( _canvasWidthHalf, _canvasHeightHalf );
 
-		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
+		_renderData = _renderer.projectScene( scene, camera, this.sortObjects, this.sortElements );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 		_camera = camera;

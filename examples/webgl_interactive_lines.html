@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - interactive lines</title>
+		<title>three.js webgl - interactive lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -58,12 +58,7 @@
 
 				}
 
-				sphereInter = new THREE.Sprite(
-					new THREE.SpriteCanvasMaterial( {
-						color: 0xff0000,
-						program: program }
-					)
-				);
+				sphereInter = new THREE.Sprite( new THREE.SpriteMaterial( { color: 0xff0000 } ) );
 				sphereInter.scale.x = sphereInter.scale.y = 10;
 				sphereInter.visible = false;
 				scene.add( sphereInter );
@@ -103,7 +98,7 @@
 
 					var type = Math.random() > 0.5 ? THREE.LineStrip : THREE.LinePieces;
 					var object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } ), type );
-					
+
 					object.position.x = Math.random() * 400 - 200;
 					object.position.y = Math.random() * 400 - 200;
 					object.position.z = Math.random() * 400 - 200;
@@ -126,7 +121,7 @@
 				raycaster = new THREE.Raycaster();
 				raycaster.linePrecision = 3;
 
-				renderer = new THREE.CanvasRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
