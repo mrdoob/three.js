@@ -36,11 +36,11 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
     function buildPlane( u, v, uDir, vDir, uDist, vDist, wDist_half, materialIndex ) {
 
         var w, iu, iv,
-            segU = constructee.widthSegments,  // number of segments along u   // width  = x
-            segV = constructee.heightSegments, // number of segments along v   // height = y
-            uDist_half = uDist / 2,  // the extent of the plane along u, divided by two
-            vDist_half = vDist / 2,  // the extent of the plane along v, divided by two
-            offset = constructee.vertices.length;
+        segU = constructee.widthSegments,  // number of segments along u   // width  = x
+        segV = constructee.heightSegments, // number of segments along v   // height = y
+        uDist_half = uDist / 2,  // the extent of the plane along u, divided by two
+        vDist_half = vDist / 2,  // the extent of the plane along v, divided by two
+        offset = constructee.vertices.length;
 
         if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
