@@ -3,9 +3,9 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.BoxGeometry = function (width, height, depth, widthSegments, heightSegments, depthSegments) {
+THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
-    THREE.Geometry.call(this);
+    THREE.Geometry.call( this );
 
     this.parameters = {
         width: width,
@@ -26,14 +26,14 @@ THREE.BoxGeometry = function (width, height, depth, widthSegments, heightSegment
     var height_half = height / 2;  // height = the distance along y in the absolute 3D space
     var depth_half = depth / 2;    // depth  = the distance along z in the absolute 3D space
 
-    buildPlane('z', 'y', -1, -1, depth, height, width_half, 0); // px
-    buildPlane('z', 'y', 1, -1, depth, height, -width_half, 1); // nx
-    buildPlane('x', 'z', 1, 1, width, depth, height_half, 2); // py
-    buildPlane('x', 'z', 1, -1, width, depth, -height_half, 3); // ny
-    buildPlane('x', 'y', 1, -1, width, height, depth_half, 4); // pz
-    buildPlane('x', 'y', -1, -1, width, height, -depth_half, 5); // nz
+    buildPlane( 'z', 'y', -1, -1, depth, height, width_half, 0 ); // px
+    buildPlane( 'z', 'y', 1, -1, depth, height, -width_half, 1 ); // nx
+    buildPlane( 'x', 'z', 1, 1, width, depth, height_half, 2 ); // py
+    buildPlane( 'x', 'z', 1, -1, width, depth, -height_half, 3 ); // ny
+    buildPlane( 'x', 'y', 1, -1, width, height, depth_half, 4 ); // pz
+    buildPlane( 'x', 'y', -1, -1, width, height, -depth_half, 5 ); // nz
 
-    function buildPlane(u, v, uDir, vDir, uDist, vDist, wDist_half, materialIndex) {
+    function buildPlane( u, v, uDir, vDir, uDist, vDist, wDist_half, materialIndex ) {
 
         var w, iu, iv,
             segU = constructee.widthSegments,  // number of segments along u   // width  = x
@@ -42,16 +42,16 @@ THREE.BoxGeometry = function (width, height, depth, widthSegments, heightSegment
             vDist_half = vDist / 2,  // the extent of the plane along v, divided by two
             offset = constructee.vertices.length;
 
-        if (( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' )) {
+        if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
             w = 'z';
 
-        } else if (( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' )) {
+        } else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
             w = 'y';
             segV = constructee.depthSegments;
 
-        } else if (( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' )) {
+        } else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
             w = 'x';
             segU = constructee.depthSegments;
@@ -67,54 +67,54 @@ THREE.BoxGeometry = function (width, height, depth, widthSegments, heightSegment
         normal[ w ] = wDist_half > 0 ? 1 : -1;
 
         var iterCount = 0;
-        for (iv = 0; iv < segVi; iv++) {
+        for ( iv = 0; iv < segVi; iv++ ) {
 
-            for (iu = 0; iu < segUi; iu++) {
+            for ( iu = 0; iu < segUi; iu++ ) {
 
                 var vertex = new THREE.Vector3();
                 vertex[ u ] = ( iu * segmentDist_u - uDist_half ) * uDir;
                 vertex[ v ] = ( iv * segmentDist_v - vDist_half ) * vDir;
                 vertex[ w ] = wDist_half;
 
-                constructee.vertices.push(vertex);
+                constructee.vertices.push( vertex );
 
                 iterCount++;
             }
 
         }
 
-        for (iv = 0; iv < segV; iv++) {
+        for ( iv = 0; iv < segV; iv++ ) {
 
-            for (iu = 0; iu < segU; iu++) {
+            for ( iu = 0; iu < segU; iu++ ) {
 
                 var a = iu         + segUi * iv;
                 var b = iu         + segUi * ( iv + 1 );
                 var c = ( iu + 1 ) + segUi * ( iv + 1 );
                 var d = ( iu + 1 ) + segUi * iv;
 
-                var uva = new THREE.Vector2(iu / segU, 1 - iv / segV);
-                var uvb = new THREE.Vector2(iu / segU, 1 - ( iv + 1 ) / segV);
-                var uvc = new THREE.Vector2(( iu + 1 ) / segU, 1 - ( iv + 1 ) / segV);
-                var uvd = new THREE.Vector2(( iu + 1 ) / segU, 1 - iv / segV);
+                var uva = new THREE.Vector2( iu / segU, 1 - iv / segV );
+                var uvb = new THREE.Vector2( iu / segU, 1 - ( iv + 1 ) / segV );
+                var uvc = new THREE.Vector2( ( iu + 1 ) / segU, 1 - ( iv + 1 ) / segV );
+                var uvd = new THREE.Vector2( ( iu + 1 ) / segU, 1 - iv / segV );
 
-                var face1 = new THREE.Face3(a + offset, b + offset, d + offset);
-                face1.normal.copy(normal);
-                face1.vertexNormals.push(normal.clone(), normal.clone(), normal.clone());
+                var face1 = new THREE.Face3( a + offset, b + offset, d + offset );
+                face1.normal.copy( normal );
+                face1.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
                 face1.materialIndex = materialIndex;
 
-                constructee.faces.push(face1);
-                constructee.faceVertexUvs[ 0 ].push([ uva, uvb, uvd ]);
+                constructee.faces.push( face1 );
+                constructee.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-                var face2 = new THREE.Face3(b + offset, c + offset, d + offset);
-                face2.normal.copy(normal);
-                face2.vertexNormals.push(normal.clone(), normal.clone(), normal.clone());
+                var face2 = new THREE.Face3( b + offset, c + offset, d + offset );
+                face2.normal.copy( normal );
+                face2.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
                 face2.materialIndex = materialIndex;
 
-                constructee.faces.push(face2);
-                constructee.faceVertexUvs[ 0 ].push([ uvb.clone(), uvc, uvd.clone() ]);
+                constructee.faces.push( face2 );
+                constructee.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
             }
         }
     }
     this.mergeVertices();
 };
-THREE.BoxGeometry.prototype = Object.create(THREE.Geometry.prototype);
+THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
