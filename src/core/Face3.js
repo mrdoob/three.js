@@ -25,6 +25,16 @@ THREE.Face3.prototype = {
 
 	constructor: THREE.Face3,
 
+	invert: function() {
+	
+	    var a = face.a;
+
+            face.a = face.c;
+
+            face.c = a;
+		
+	},
+
 	clone: function () {
 
 		var face = new THREE.Face3( this.a, this.b, this.c );
