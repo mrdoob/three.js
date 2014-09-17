@@ -27,10 +27,10 @@
 		<div>
 		Identifier of this object instance.
 		</div>
-		
+
 		<h3>.[page:String uuid]</h3>
 		<div>
-		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance. 
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
 		This gets automatically assigned, so this shouldn't be edited.
 		</div>
 
@@ -132,18 +132,18 @@
 		<h3>.[page:object userData]</h3>
 		<div>
 		An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
-		</div> 
+		</div>
 
 		<h3>.[page:Matrix4 matrixWorld]</h3>
 		<div>
 		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
-		</div> 
+		</div>
 
-		
+
 		<h2>Methods</h2>
-		
+
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
-		
+
 		<h3>.applyMatrix( [page:Matrix4 matrix])</h3>
 		<div>
 		matrix - matrix
@@ -151,7 +151,7 @@
 		<div>
 		This updates the position, rotation and scale with the matrix.
 		</div>
-		
+
 		<h3>.translateX( [page:Float distance] )</h3>
 		<div>
 		distance - Distance.<br />
@@ -175,7 +175,7 @@
 		<div>
 		Translates object along z axis by distance.
 		</div>
-		
+
 		<h3>.localToWorld( [page:Vector3 vector] )</h3>
 		<div>
 		vector - A local vector.<br />
@@ -221,7 +221,7 @@
 		callback - An Function with as first argument an object3D object.<br />
 		</div>
 		<div>
-		Executes the callback on this object and all descendants. 
+		Executes the callback on this object and all descendants.
 		</div>
 
 		<h3>.updateMatrix()</h3>
@@ -257,7 +257,7 @@
 		<div>
 		Searches through the object's children and returns the first with a matching id, optionally recursive.
 		</div>
-		
+
 		<h3>.translateOnAxis([page:Vector3 axis], [page:Float distance]) [page:Object3D]</h3>
 		<div>
 		axis -- A normalized vector in object space.<br />
@@ -266,7 +266,7 @@
 		<div>
 		Translate an object by distance along an axis in object space. The axis is assumed to be normalized.
 		</div>
-		
+
 		<h3>.rotateOnAxis([page:Vector3 axis], [page:Float angle]) [page:Object3D]</h3>
 		<div>
 		axis -- A normalized vector in object space. <br />
