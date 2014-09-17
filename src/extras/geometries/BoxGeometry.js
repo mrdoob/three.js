@@ -20,27 +20,27 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	this.heightSegments = heightSegments || 1;
 	this.depthSegments = depthSegments || 1;
 
-	var scope = this;
+	var constructee = this;  // constructee = the instance currently being constructed by the BoxGeometry constructor
 
-	var width_half = width / 2;
-	var height_half = height / 2;
-	var depth_half = depth / 2;
+	var width_half = width / 2;    // width  = the distance along x in the absolute 3D space
+	var height_half = height / 2;  // height = the distance along y in the absolute 3D space
+	var depth_half = depth / 2;    // depth  = the distance along z in the absolute 3D space
 
-	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
-	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
+	buildPlane( 'z', 'y', -1, -1, depth, height, width_half, 0 ); // px
+	buildPlane( 'z', 'y',  1, -1, depth, height, -width_half, 1 ); // nx
+	buildPlane( 'x', 'z',  1,  1, width, depth, height_half, 2 ); // py
+	buildPlane( 'x', 'z',  1, -1, width, depth, -height_half, 3 ); // ny
+	buildPlane( 'x', 'y',  1, -1, width, height, depth_half, 4 ); // pz
+	buildPlane( 'x', 'y', -1, -1, width, height, -depth_half, 5 ); // nz
 
-	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
+	function buildPlane( u, v, uDir, vDir, uDist, vDist, wDist_half, materialIndex ) {
 
-		var w, ix, iy,
-		gridX = scope.widthSegments,
-		gridY = scope.heightSegments,
-		width_half = width / 2,
-		height_half = height / 2,
-		offset = scope.vertices.length;
+		var w, iu, iv,
+			segU = constructee.widthSegments,  // number of segments along u   // width  = x
+			segV = constructee.heightSegments, // number of segments along v   // height = y
+			uDist_half = uDist / 2,  // the extent of the plane along u, divided by two
+			vDist_half = vDist / 2,  // the extent of the plane along v, divided by two
+			offset = constructee.vertices.length;
 
 		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
@@ -49,67 +49,67 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
 			w = 'y';
-			gridY = scope.depthSegments;
+			segV = constructee.depthSegments;
 
 		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
 			w = 'x';
-			gridX = scope.depthSegments;
+			segU = constructee.depthSegments;
 
 		}
 
-		var gridX1 = gridX + 1,
-		gridY1 = gridY + 1,
-		segment_width = width / gridX,
-		segment_height = height / gridY,
-		normal = new THREE.Vector3();
+		var segUi = segU + 1,  // i = inc = incremented (by one)
+			segVi = segV + 1,  // i = inc = incremented (by one)
+			segmentDist_u = uDist / segU,
+			segmentDist_v = vDist / segV,
+			normal = new THREE.Vector3();
 
-		normal[ w ] = depth > 0 ? 1 : - 1;
+		normal[ w ] = wDist_half > 0 ? 1 : -1;
 
-		for ( iy = 0; iy < gridY1; iy ++ ) {
+		for ( iv = 0; iv < segVi; iv++ ) {
 
-			for ( ix = 0; ix < gridX1; ix ++ ) {
+			for ( iu = 0; iu < segUi; iu++ ) {
 
-				var vector = new THREE.Vector3();
-				vector[ u ] = ( ix * segment_width - width_half ) * udir;
-				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
-				vector[ w ] = depth;
+				var vertex = new THREE.Vector3();
+				vertex[ u ] = ( iu * segmentDist_u - uDist_half ) * uDir;
+				vertex[ v ] = ( iv * segmentDist_v - vDist_half ) * vDir;
+				vertex[ w ] = wDist_half;
 
-				scope.vertices.push( vector );
+				constructee.vertices.push( vertex );
 
 			}
 
 		}
 
-		for ( iy = 0; iy < gridY; iy ++ ) {
+		for ( iv = 0; iv < segV; iv++ ) {
 
-			for ( ix = 0; ix < gridX; ix ++ ) {
+			for ( iu = 0; iu < segU; iu++ ) {
 
-				var a = ix + gridX1 * iy;
-				var b = ix + gridX1 * ( iy + 1 );
-				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-				var d = ( ix + 1 ) + gridX1 * iy;
+				var a = iu         + segUi *   iv;
+				var b = iu         + segUi * ( iv + 1 );
+				var c = ( iu + 1 ) + segUi * ( iv + 1 );
+				var d = ( iu + 1 ) + segUi *   iv;
 
-				var uva = new THREE.Vector2( ix / gridX, 1 - iy / gridY );
-				var uvb = new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iy + 1 ) / gridY );
-				var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY );
+				var uva = new THREE.Vector2(   iu       / segU, 1 -   iv       / segV );
+				var uvb = new THREE.Vector2(   iu       / segU, 1 - ( iv + 1 ) / segV );
+				var uvc = new THREE.Vector2( ( iu + 1 ) / segU, 1 - ( iv + 1 ) / segV );
+				var uvd = new THREE.Vector2( ( iu + 1 ) / segU, 1 -   iv       / segV );
 
-				var face = new THREE.Face3( a + offset, b + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
+				var face1 = new THREE.Face3( a + offset, b + offset, d + offset );
+				face1.normal.copy( normal );
+				face1.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+				face1.materialIndex = materialIndex;
 
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+				constructee.faces.push( face1 );
+				constructee.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-				face = new THREE.Face3( b + offset, c + offset, d + offset );
-				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
+				var face2 = new THREE.Face3( b + offset, c + offset, d + offset );
+				face2.normal.copy( normal );
+				face2.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+				face2.materialIndex = materialIndex;
 
-				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
+				constructee.faces.push( face2 );
+				constructee.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 			}
 
@@ -118,7 +118,5 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	}
 
 	this.mergeVertices();
-
 };
-
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
