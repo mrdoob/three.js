@@ -45,7 +45,6 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/intersectSphere.js"></script>
 		<script src="js/modifiers/DentModifier.js"></script>
 		
 		<script>
@@ -146,10 +145,10 @@
 				bustCat = new THREE.Mesh( geometry3.clone(), material3 );			
 				
 				
-				modifier.set( new THREE.Vector3( 0, 0, 150 ), new THREE.Vector3( 0, 0, 1 ), 90, 1 ).modify( bustCat );
-				modifier.set( new THREE.Vector3( 150, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), 90, 1 ).modify( bustCat );	
-				modifier.set( new THREE.Vector3( -150, 0, 0 ), new THREE.Vector3( -1, 0, 0 ), 90, 1 ).modify( bustCat );		
-				modifier.set( new THREE.Vector3( 0, 0, -150 ), new THREE.Vector3( 0, 0, -1 ), 90, 1 ).modify( bustCat );
+				modifier.set( new THREE.Vector3( 0, 0, 150 ), new THREE.Vector3( 0, 0, 1 ), 90, 1 ).modify( bustCat.geometry );
+				modifier.set( new THREE.Vector3( 150, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), 90, 1 ).modify( bustCat.geometry );	
+				modifier.set( new THREE.Vector3( -150, 0, 0 ), new THREE.Vector3( -1, 0, 0 ), 90, 1 ).modify( bustCat.geometry );		
+				modifier.set( new THREE.Vector3( 0, 0, -150 ), new THREE.Vector3( 0, 0, -1 ), 90, 1 ).modify( bustCat.geometry );
 
 				bustCat.position.set( 0, 0, 800 ); 
 				scene.add( bustCat );	
@@ -175,7 +174,7 @@
 					if ( index < 3) { direction.multiplyScalar( -1 ); }
 
 					var obj = intersects[ 0 ].object; 
-					modifier.set( intersects[ 0 ].point, direction, 80, 2/3 ).modify( obj );
+					modifier.set( obj.worldToLocal( intersects[ 0 ].point ), direction, 80, 2/3 ).modify( obj.geometry );
 
 				}
 
