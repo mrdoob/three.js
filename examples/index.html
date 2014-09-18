@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
 		<title>three.js - examples</title>
+		<meta charset="utf-8">
 		<style>
 
 			@font-face {
@@ -67,7 +67,6 @@
 			#viewer {
 				position: absolute;
 				left: 310px;
-				width: -webkit-calc(100% - 310px); /* Safari */
 				width: calc(100% - 310px);
 				height: 100%;
 				border: 0px;
@@ -354,6 +353,17 @@
 
 		var list = document.getElementById( 'list' );
 		var viewer = document.getElementById( 'viewer' );
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			viewer.addEventListener( 'load', function ( event ) {
+
+				viewer.contentWindow.innerWidth -= 10;
+				viewer.contentWindow.innerHeight -= 2;
+
+			} );
+
+		}
 
 		var container = document.createElement( 'div' );
 		list.appendChild( container );
