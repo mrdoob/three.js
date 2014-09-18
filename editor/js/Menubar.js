@@ -11,4 +11,4 @@ var Menubar = function ( editor ) {
 
 	return container;
 
-}
+};
