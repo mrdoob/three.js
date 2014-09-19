@@ -60,7 +60,7 @@
 
 			loader.load( './models/collada/pump/pump.dae', function ( collada ) {
 
-				model = collada.scene;
+				model = collada.rootObject;
 				animations = collada.animations;
 				kfAnimationsLength = animations.length;
 				model.scale.x = model.scale.y = model.scale.z = 0.125; // 1/8 scale, modeled in cm
