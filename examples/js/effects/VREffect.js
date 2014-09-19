@@ -95,8 +95,8 @@ THREE.VREffect = function ( renderer, done ) {
 			camera.updateMatrixWorld();
 		}
 
-		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV );
-		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV );
+		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV, true, camera.near, camera.far );
+		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV, true, camera.near, camera.far );
 
 		camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
 		camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
@@ -114,6 +114,10 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.render( scene, cameraRight );
 
+	};
+
+	this.setSize = function( width, height ) {
+		renderer.setSize( width, height );
 	};
 
 	this.setFullScreen = function( enable ) {
