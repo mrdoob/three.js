@@ -340,7 +340,7 @@ THREE.ColladaLoader = function () {
 
 			}
 
-		} else  {
+		} else {
 
 			newData = {
 				hierarchy: [ {
@@ -978,8 +978,8 @@ THREE.ColladaLoader = function () {
 						threejsNode.matrix.set.apply( threejsNode.matrix, elementsRowMajor );
 						threejsNode.matrix.decompose( threejsNode.position, threejsNode.quaternion, threejsNode.scale );
 					}
-				}
-				else {
+
+				} else {
 
 					console.log( 'setJointValue: joint ' + jointIndex + ' doesn\'t exist' );
 
@@ -993,9 +993,10 @@ THREE.ColladaLoader = function () {
 
 		if ( element ) {
 
-			for (var i = 0; i < element.childNodes.length; i++ ) {
+			for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 				var child = element.childNodes[ i ];
+
 				if ( child.nodeType != 1 ) continue;
 
 				switch ( child.nodeName ) {
@@ -1185,7 +1186,7 @@ THREE.ColladaLoader = function () {
 
 					applySkin( geom, skinController );
 
-					if(geom.morphTargets.length > 0) {
+					if ( geom.morphTargets.length > 0 ) {
 
 						material.morphTargets = true;
 						material.skinning = false;
@@ -3684,7 +3685,7 @@ THREE.ColladaLoader = function () {
 										} );
 
 									}
-									
+
 									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.offset.x = cot.texOpts.offsetU;

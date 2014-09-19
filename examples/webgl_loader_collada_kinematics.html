@@ -68,7 +68,7 @@
 				jointIndex = 0;
 				joint = kinematics.joints[jointIndex];
 				jointValue = joint.limits.min;
-				jointStep = makeJointStep();
+				jointStep = ( joint.limits.max - joint.limits.min ) / 100.0;
 
 				init();
 				animate();
@@ -161,7 +161,7 @@
 
 						joint = kinematics.joints[ jointIndex ];
 						jointValue = joint.limits.min;
-						jointStep = makeJointStep();
+						jointStep = ( joint.limits.max - joint.limits.min ) / 100.0;
 
 					}
 
@@ -169,12 +169,6 @@
 
 				jointValue += jointStep;
 				kinematics.setJointValue( jointIndex, jointValue );
-
-			};
-
-			function makeJointStep() {
-
-				return ( joint.limits.max - joint.limits.min ) / 100.0;
 
 			};
 
