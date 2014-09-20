@@ -66,9 +66,9 @@ var Viewport = function ( editor ) {
 
 	// events
 
-	var getIntersects = function ( x, y, object ) {
+	var getIntersects = function ( point, object ) {
 
-		var vector = new THREE.Vector3( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
+		var vector = new THREE.Vector3( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
 
@@ -86,15 +86,21 @@ var Viewport = function ( editor ) {
 
 	var onMouseDownPosition = new THREE.Vector2();
 	var onMouseUpPosition = new THREE.Vector2();
+	var onMouseDoubleClickPosition = new THREE.Vector2();
+
+	var getMousePosition = function ( dom, x, y ) {
+
+		var rect = dom.getBoundingClientRect();
+		return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+
+	};
 
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
 
-		var rect = container.dom.getBoundingClientRect();
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
-		onMouseDownPosition.set( x, y );
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onMouseDownPosition.fromArray( array );
 
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
@@ -102,14 +108,12 @@ var Viewport = function ( editor ) {
 
 	var onMouseUp = function ( event ) {
 
-		var rect = container.dom.getBoundingClientRect();
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
-		onMouseUpPosition.set( x, y );
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onMouseUpPosition.fromArray( array );
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
 
-			var intersects = getIntersects( x, y, objects );
+			var intersects = getIntersects( onMouseUpPosition, objects );
 
 			if ( intersects.length > 0 ) {
 
@@ -143,11 +147,10 @@ var Viewport = function ( editor ) {
 
 	var onDoubleClick = function ( event ) {
 
-		var rect = container.dom.getBoundingClientRect();
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onMouseDoubleClickPosition.fromArray( array );
 
-		var intersects = getIntersects( x, y, objects );
+		var intersects = getIntersects( onMouseDoubleClickPosition, objects );
 
 		if ( intersects.length > 0 ) {
 
