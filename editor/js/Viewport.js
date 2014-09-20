@@ -34,6 +34,18 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
+		var object = transformControls.object;
+
+		if ( object !== undefined ) {
+
+			if ( editor.helpers[ object.id ] !== undefined ) {
+
+				editor.helpers[ object.id ].update();
+
+			}
+
+		}
+
 		render();
 
 	} );
@@ -84,9 +96,9 @@ var Viewport = function ( editor ) {
 
 	};
 
-	var onMouseDownPosition = new THREE.Vector2();
-	var onMouseUpPosition = new THREE.Vector2();
-	var onMouseDoubleClickPosition = new THREE.Vector2();
+	var onDownPosition = new THREE.Vector2();
+	var onUpPosition = new THREE.Vector2();
+	var onDoubleClickPosition = new THREE.Vector2();
 
 	var getMousePosition = function ( dom, x, y ) {
 
@@ -95,25 +107,11 @@ var Viewport = function ( editor ) {
 
 	};
 
-	var onMouseDown = function ( event ) {
+	var handleClick = function () {
 
-		event.preventDefault();
+		if ( onDownPosition.distanceTo( onUpPosition ) == 0 ) {
 
-		var array = getMousePosition( container.dom, event.clientX, event.clientY );
-		onMouseDownPosition.fromArray( array );
-
-		document.addEventListener( 'mouseup', onMouseUp, false );
-
-	};
-
-	var onMouseUp = function ( event ) {
-
-		var array = getMousePosition( container.dom, event.clientX, event.clientY );
-		onMouseUpPosition.fromArray( array );
-
-		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
-
-			var intersects = getIntersects( onMouseUpPosition, objects );
+			var intersects = getIntersects( onUpPosition, objects );
 
 			if ( intersects.length > 0 ) {
 
@@ -141,16 +139,60 @@ var Viewport = function ( editor ) {
 
 		}
 
-		document.removeEventListener( 'mouseup', onMouseUp );
+	};
+
+	var onMouseDown = function ( event ) {
+
+		event.preventDefault();
+
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onDownPosition.fromArray( array );
+
+		document.addEventListener( 'mouseup', onMouseUp, false );
+
+	};
+
+	var onMouseUp = function ( event ) {
+
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onUpPosition.fromArray( array );
+
+		handleClick();
+
+		document.removeEventListener( 'mouseup', onMouseUp, false );
+
+	};
+
+	var onTouchStart = function ( event ) {
+
+		var touch = event.changedTouches[ 0 ];
+
+		var array = getMousePosition( container.dom, touch.clientX, touch.clientY );
+		onDownPosition.fromArray( array );
+
+		document.addEventListener( 'touchend', onTouchEnd, false );
+
+	};
+
+	var onTouchEnd = function ( event ) {
+
+		var touch = event.changedTouches[ 0 ];
+
+		var array = getMousePosition( container.dom, touch.clientX, touch.clientY );
+		onUpPosition.fromArray( array );
+
+		handleClick();
+
+		document.removeEventListener( 'touchend', onTouchEnd, false );
 
 	};
 
 	var onDoubleClick = function ( event ) {
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
-		onMouseDoubleClickPosition.fromArray( array );
+		onDoubleClickPosition.fromArray( array );
 
-		var intersects = getIntersects( onMouseDoubleClickPosition, objects );
+		var intersects = getIntersects( onDoubleClickPosition, objects );
 
 		if ( intersects.length > 0 ) {
 
@@ -163,6 +205,7 @@ var Viewport = function ( editor ) {
 	};
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'touchstart', onTouchStart, false );
 	container.dom.addEventListener( 'dblclick', onDoubleClick, false );
 
 	// controls need to be added *after* main logic,
