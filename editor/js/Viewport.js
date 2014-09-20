@@ -37,11 +37,6 @@ var Viewport = function ( editor ) {
 		render();
 
 	} );
-	transformControls.addEventListener( 'objectChange', function () {
-
-		signals.objectChanged.dispatch( transformControls.object );
-
-	} );
 	transformControls.addEventListener( 'mouseDown', function () {
 
 		controls.enabled = false;
@@ -49,6 +44,7 @@ var Viewport = function ( editor ) {
 	} );
 	transformControls.addEventListener( 'mouseUp', function () {
 
+		signals.objectChanged.dispatch( transformControls.object );
 		controls.enabled = true;
 
 	} );
@@ -193,7 +189,7 @@ var Viewport = function ( editor ) {
 				break;
 
 		}
-		
+
 		renderer.setClearColor( clearColor );
 
 		render();
