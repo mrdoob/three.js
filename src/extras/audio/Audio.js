@@ -45,6 +45,12 @@ THREE.Audio.prototype.load = function ( file ) {
 
 };
 
+THREE.Audio.prototype.setLoop = function ( value ) {
+
+	this.source.loop = value;
+
+};
+
 THREE.Audio.prototype.setRefDistance = function ( value ) {
 
 	this.panner.refDistance = value;
