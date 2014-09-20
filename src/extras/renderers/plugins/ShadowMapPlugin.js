@@ -109,7 +109,6 @@ THREE.ShadowMapPlugin = function () {
 						gyro.position.copy( light.shadowCascadeOffset );
 
 						gyro.add( virtualLight );
-						gyro.add( virtualLight.target );
 
 						camera.add( gyro );
 
@@ -204,10 +203,13 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
-			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
-			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
-			shadowCamera.lookAt( _matrixPosition );
-			shadowCamera.updateMatrixWorld();
+			shadowCamera.matrixWorld.copy(light.matrixWorld);
+			shadowCamera.matrixWorld.elements[0] = -shadowCamera.matrixWorld.elements[0];
+			shadowCamera.matrixWorld.elements[1] = -shadowCamera.matrixWorld.elements[1];
+			shadowCamera.matrixWorld.elements[2] = -shadowCamera.matrixWorld.elements[2];
+			shadowCamera.matrixWorld.elements[8] = -shadowCamera.matrixWorld.elements[8];
+			shadowCamera.matrixWorld.elements[9] = -shadowCamera.matrixWorld.elements[9];
+			shadowCamera.matrixWorld.elements[10] = -shadowCamera.matrixWorld.elements[10];
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
@@ -422,10 +424,9 @@ THREE.ShadowMapPlugin = function () {
 
 		var virtualLight = light.shadowCascadeArray[ cascade ];
 
-		virtualLight.position.copy( light.position );
-		virtualLight.target.position.copy( light.target.position );
-		virtualLight.lookAt( virtualLight.target );
-
+		virtualLight.matrixWorld.copy( light.matrixWorld )
+		virtualLight.matrixAutoUpdate = false;
+		
 		virtualLight.shadowCameraVisible = light.shadowCameraVisible;
 		virtualLight.shadowDarkness = light.shadowDarkness;
 

@@ -9,7 +9,6 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
 	this.type = 'SpotLight';
 
 	this.position.set( 0, 1, 0 );
-	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
@@ -50,8 +49,6 @@ THREE.SpotLight.prototype.clone = function () {
 
 	THREE.Light.prototype.clone.call( this, light );
 
-	light.target = this.target.clone();
-
 	light.intensity = this.intensity;
 	light.distance = this.distance;
 	light.angle = this.angle;
@@ -59,8 +56,6 @@ THREE.SpotLight.prototype.clone = function () {
 
 	light.castShadow = this.castShadow;
 	light.onlyShadow = this.onlyShadow;
-
-	//
 
 	light.shadowCameraNear = this.shadowCameraNear;
 	light.shadowCameraFar = this.shadowCameraFar;

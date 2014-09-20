@@ -79,4 +79,3 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	}
 
 }();
-
