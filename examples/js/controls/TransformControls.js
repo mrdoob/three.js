@@ -642,7 +642,7 @@
 		this.detach = function ( object ) {
 
 			scope.object = undefined;
-			this.axis = undefined;
+			this.axis = null;
 
 			this.gizmo["translate"].hide();
 			this.gizmo["rotate"].hide();
