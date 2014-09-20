@@ -66,12 +66,9 @@ var Viewport = function ( editor ) {
 
 	// events
 
-	var getIntersects = function ( event, object ) {
+	var getIntersects = function ( x, y, object ) {
 
-		var rect = container.dom.getBoundingClientRect();
-		x = ( event.clientX - rect.left ) / rect.width;
-		y = ( event.clientY - rect.top ) / rect.height;
-		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
+		var vector = new THREE.Vector3( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
 
@@ -112,7 +109,7 @@ var Viewport = function ( editor ) {
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
 
-			var intersects = getIntersects( event, objects );
+			var intersects = getIntersects( x, y, objects );
 
 			if ( intersects.length > 0 ) {
 
@@ -146,7 +143,11 @@ var Viewport = function ( editor ) {
 
 	var onDoubleClick = function ( event ) {
 
-		var intersects = getIntersects( event, objects );
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
+
+		var intersects = getIntersects( x, y, objects );
 
 		if ( intersects.length > 0 ) {
 
