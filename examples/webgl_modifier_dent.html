@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - DentModifier</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#000;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - DentModifier example</br>
+			Click the mouse on the objects
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/modifiers/DentModifier.js"></script>
+		
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var objects = [ ];
+			var mouse = new THREE.Vector2();
+			var projector = new THREE.Projector();
+			var modifier = new THREE.DentModifier();
+			var bust_cat;
+			
+			init();
+			animate();
+
+			function init() {
+
+				// camera		
+				AddCamera( 0, 900, 2100 ); 		
+
+				scene = new THREE.Scene();
+				
+				// lights
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 70, 70, 200 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( -70, -70, -200 );
+				scene.add( light );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xffffff );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+	
+				// world
+
+				var geometry = new THREE.BoxGeometry( 500, 300, 450, 20, 20, 20 ); 
+
+				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				var Cube = new THREE.Mesh( geometry, material );
+				Cube.position.set( 0, 0, -300 );
+				objects.push( Cube ); scene.add( Cube );
+
+
+				var material2 = new THREE.MeshPhongMaterial( { color: 0x00ffff } );	
+				var geometry2 = new THREE.SphereGeometry( 200, 50, 50 );
+				geometry2.mergeVertices();	
+
+				var Sphere1 = new THREE.Mesh( geometry2, material2 );	
+				Sphere1.position.set( -500, 0, -300 ); 
+				scene.add ( Sphere1 ); objects.push( Sphere1 ); 
+
+
+				geometry3 = new THREE.BoxGeometry( 300, 300, 300, 16, 16, 16 ); 
+				var Texture = new THREE.ImageUtils.loadTexture( 'textures/kote.jpg' );
+				var material3 = new THREE.MeshLambertMaterial( { map: Texture } );
+
+				var Cube = new THREE.Mesh( geometry3, material3 );
+				Cube.position.set( 600, 0, -300 );
+				scene.add( Cube );	objects.push( Cube ); 
+	
+
+				var Cube = new THREE.Mesh( geometry.clone(), material );
+				Cube.position.set( 0, 0, 300 );
+				scene.add( Cube );	objects.push( Cube ); 
+	
+				var Sphere2 = new THREE.Mesh( geometry2.clone(), material2 );	
+				Sphere2.position.set( -500, 0, 300 ); 
+				scene.add ( Sphere2 ); objects.push( Sphere2 ); 
+	
+				var Cube = new THREE.Mesh( geometry3.clone(), material3 );
+				Cube.position.set( 600, 0, 300 );
+				scene.add( Cube );	objects.push( Cube ); 	
+
+				bustCat = new THREE.Mesh( geometry3.clone(), material3 );			
+				
+				
+				modifier.set( new THREE.Vector3( 0, 0, 150 ), new THREE.Vector3( 0, 0, 1 ), 90, 1 ).modify( bustCat.geometry );
+				modifier.set( new THREE.Vector3( 150, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), 90, 1 ).modify( bustCat.geometry );	
+				modifier.set( new THREE.Vector3( -150, 0, 0 ), new THREE.Vector3( -1, 0, 0 ), 90, 1 ).modify( bustCat.geometry );		
+				modifier.set( new THREE.Vector3( 0, 0, -150 ), new THREE.Vector3( 0, 0, -1 ), 90, 1 ).modify( bustCat.geometry );
+
+				bustCat.position.set( 0, 0, 800 ); 
+				scene.add( bustCat );	
+
+
+			}
+
+			function onDocumentMouseDown( event ) {
+
+				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+				projector.unprojectVector( vector, camera );
+
+				var raycaster = new THREE.Raycaster( 
+				camera.position, vector.sub( camera.position ).normalize() );
+
+				var intersects = raycaster.intersectObjects( objects );
+
+				if ( intersects.length > 0 ) {
+
+					var face = intersects[ 0 ].face; 
+					var direction = new THREE.Vector3(); direction.copy( face.normal );
+					index = objects.indexOf( intersects[ 0 ].object );
+					if ( index < 3) { direction.multiplyScalar( -1 ); }
+
+					var obj = intersects[ 0 ].object; 
+					modifier.set( obj.worldToLocal( intersects[ 0 ].point ), direction, 80, 2/3 ).modify( obj.geometry );
+
+				}
+
+			}			
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+					requestAnimationFrame(animate);
+					render();
+
+			}
+		
+
+			function render() {
+
+					bustCat.rotation.y += 0.01;
+					stats.update();
+					controls.update();
+					renderer.render(scene, camera);
+
+				}
+
+			function AddCamera( X, Y, Z ) {
+
+					camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+					camera.position.set( X, Y, Z );
+
+					controls = new THREE.TrackballControls( camera, container );
+					controls.rotateSpeed = 2;
+					controls.noZoom = false;
+					controls.zoomSpeed = 1.2;
+					controls.staticMoving = true;
+
+			}
+
+		</script>
+
+	</body>
+</html>
