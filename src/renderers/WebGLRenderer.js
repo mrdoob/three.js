@@ -6180,7 +6180,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
 
 		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
-		_glExtensionCompressedTexturePVRTC = _gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_pvrtc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		_glExtensionCompressedTexturePVRTC = _gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
 
