@@ -9,7 +9,7 @@
  */		
 		
 THREE.DentModifier = function () {
- 
+
 };
 
 THREE.DentModifier.prototype = {
@@ -29,14 +29,14 @@ THREE.DentModifier.prototype = {
 		var R_Squared = this.radius * this.radius;
 
         var normal = new THREE.Vector3(); normal.copy( this.direction );
-        normal.multiplyScalar( -this.radius*( 1 - this.depth ) ); 
+        normal.multiplyScalar( -this.radius*( 1 - this.depth ) );
 
         var centerSphere = new THREE.Vector3(); centerSphere.addVectors( this.origin, normal );  
         var Sphere = new THREE.Sphere( centerSphere, this.radius );
 
 		var NewVertexNormals = [];
 
-		for (var i=0; i< geometry.vertices.length; i++) {       
+		for ( var i = 0; i < geometry.vertices.length; i++ ) {
 
 			NewVertexNormals[i] = null;
             if ( centerSphere.distanceToSquared( geometry.vertices[i] ) < R_Squared ) {
@@ -45,7 +45,7 @@ THREE.DentModifier.prototype = {
                     var punct = Ray.intersectSphere( Sphere );
                     geometry.vertices[i] = punct;
 					var newNormal = new THREE.Vector3(); newNormal.subVectors( punct, centerSphere );
-					NewVertexNormals[i] = newNormal.normalize(); 
+					NewVertexNormals[i] = newNormal.normalize();
 
                }
 		}
@@ -59,19 +59,26 @@ THREE.DentModifier.prototype = {
 			if ( face.vertexNormals === undefined ) {
 				continue;
 			}
+
 			for ( var v = 0, vl = face.vertexNormals.length; v < vl; v ++ ) {
 
 				var angle = NewVertexNormals[ face[ fvNames[ v ] ] ];
-				if ( angle != null) { face.vertexNormals[ v ].copy( angle ); }
+				if ( angle != null) {
+					
+					scalarProduct = face.vertexNormals[ v ].dot( angle );
+					if ( scalarProduct < 0 ) { angle.multiplyScalar( -1 ); }
+					face.vertexNormals[ v ].copy( angle );
 
 				}
 
 			}
+
+		}
 		// end compute Vertex Normals
 
 		geometry.computeFaceNormals();
 		geometry.verticesNeedUpdate = true;
-		geometry.normalsNeedUpdate = true; 
+		geometry.normalsNeedUpdate = true;
         return this
 
     },

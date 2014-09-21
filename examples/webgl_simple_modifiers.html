@@ -111,7 +111,7 @@
 				var geometry1 = new THREE.SphereGeometry( 200, 50, 50 );
 				var Sphere1 = new THREE.Mesh( geometry1, material1 );
 				Sphere1.position.set( -800, 0, -300 );
-				scene.add ( Sphere1 ); objects.push( Sphere1 ); 
+				scene.add ( Sphere1 ); objects.push( Sphere1 );
 
 				var material2 = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 				var geometry2 = new THREE.BoxGeometry( 500, 300, 450, 20, 20, 20 );
@@ -193,8 +193,7 @@
 				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var raycaster = new THREE.Raycaster( 
-				camera.position, vector.sub( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -205,7 +204,7 @@
 					index = objects.indexOf( intersects[ 0 ].object );
 					if ( index < 2) { direction.multiplyScalar( -1 ); }
 
-					var obj = intersects[ 0 ].object; 
+					var obj = intersects[ 0 ].object;
 					DentModifier.set( obj.worldToLocal( intersects[ 0 ].point ), direction, 80, 2/3 ).modify( obj.geometry );
 
 				}
