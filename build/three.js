@@ -82,6 +82,8 @@ THREE.CustomBlending = 5;
 THREE.AddEquation = 100;
 THREE.SubtractEquation = 101;
 THREE.ReverseSubtractEquation = 102;
+THREE.MinEquation = 103;
+THREE.MaxEquation = 104;
 
 // custom blending destination factors
 
@@ -17585,6 +17587,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionCompressedTexturePVRTC;
 	var _glExtensionElementIndexUint;
 	var _glExtensionFragDepth;
+	var _glExtensionBlendMinMax;
 
 
 	initGL();
@@ -17607,7 +17610,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// COMPRESSED_TEXTURE_FORMATS return IntArray
 	// but we need Array.indexOf to test formats availabilities
-
 	var _compressedTextureFormats = [];
 
 	if( _glExtensionCompressedTexturePVRTC || _glExtensionCompressedTextureS3TC ) {
@@ -17691,6 +17693,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.supportsCompressedTexturePVRTC = function () {
 
 		return _glExtensionCompressedTexturePVRTC;
+
+	};
+
+	this.supportsBlendMinMax = function () {
+
+		return _glExtensionBlendMinMax;
 
 	};
 
@@ -22991,14 +22999,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 			for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 				mipmap = mipmaps[ i ];
-				if ( texture.format !== THREE.RGBAFormat ) {
+
+				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
+
 					if ( _compressedTextureFormats.indexOf( glFormat ) > -1 ) {
+
 						_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
 					} else {
+
 						console.warn( "Attempt to load unsupported compressed texture format" );
+
 					}
+
 				} else {
+
 					_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
 				}
 
 			}
@@ -23137,20 +23154,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 						for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
 							mipmap = mipmaps[ j ];
-							if ( texture.format !== THREE.RGBAFormat ) {
+
+							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
 								if ( _compressedTextureFormats.indexOf( glFormat ) > -1 ) {
+
 									_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
 								} else {
+
 									console.warn( "Attempt to load unsupported compressed texture format" );
+
 								}
 
 							} else {
+
 								_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
 							}
 
 						}
+
 					}
+
 				}
 
 				if ( texture.generateMipmaps && isImagePowerOfTwo ) {
@@ -23468,6 +23494,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( _glExtensionBlendMinMax !== undefined ) {
+
+			if ( p === THREE.MinEquation ) return _glExtensionBlendMinMax.MIN_EXT;
+			if ( p === THREE.MaxEquation ) return _glExtensionBlendMinMax.MAX_EXT;
+
+		}
+
 		return 0;
 
 	};
@@ -23596,6 +23629,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
 
+		_glExtensionBlendMinMax = _gl.getExtension( 'EXT_blend_minmax' );
+
 
 		if ( _glExtensionTextureFloat === null ) {
 
@@ -23630,6 +23665,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( _glExtensionElementIndexUint === null ) {
 
 			console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
+
+		}
+
+		if ( _glExtensionBlendMinMax === null ) {
+
+			console.log( 'THREE.WebGLRenderer: min max blend equations not supported.' );
 
 		}
 
