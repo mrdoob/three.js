@@ -59,24 +59,27 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
-	var sphere = new THREE.Sphere();
 
 	var vA = new THREE.Vector3();
 	var vB = new THREE.Vector3();
 	var vC = new THREE.Vector3();
 
+	var vBox1 = new THREE.Vector3();
+	var vBox2 = new THREE.Vector3();
+
 	return function ( raycaster, intersects ) {
 
 		var geometry = this.geometry;
+
+		inverseMatrix.getInverse( this.matrixWorld );
+		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
 
 		// Checking boundingSphere distance to ray
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		sphere.copy( geometry.boundingSphere );
-		sphere.applyMatrix4( this.matrixWorld );
-
-		if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
+		if ( ray.isIntersectionSphere( geometry.boundingSphere ) === false ) {
 
 			return;
 
@@ -84,18 +87,23 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		// Check boundingBox before continuing
 
-		inverseMatrix.getInverse( this.matrixWorld );
-		ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
-
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false )  {
+			if ( ray.intersectBox( geometry.boundingBox, undefined, vBox1, vBox2 ) === null )  {
 
 				return;
 
 			}
 
 		}
+		
+		var minX = Math.min(vBox1.x, vBox2.x);
+		var minY = Math.min(vBox1.y, vBox2.y);
+		var minZ = Math.min(vBox1.z, vBox2.z);
+		var maxX = Math.max(vBox1.x, vBox2.x);
+		var maxY = Math.max(vBox1.y, vBox2.y);
+		var maxZ = Math.max(vBox1.z, vBox2.z);
+		
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -128,24 +136,32 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-						a = index + indices[ i ];
-						b = index + indices[ i + 1 ];
-						c = index + indices[ i + 2 ];
+						a = ( index + indices[ i ] ) * 3;
+						b = ( index + indices[ i + 1 ] ) * 3;
+						c = ( index + indices[ i + 2 ] ) * 3;
+
+						// Test if the triangl eis near the ray.
+                        if (positions[ a     ] < minX && positions[ b     ] < minX && positions[ c     ] < minX) continue;
+                        if (positions[ a + 1 ] < minY && positions[ b + 1 ] < minY && positions[ c + 1 ] < minY) continue;
+                        if (positions[ a + 2 ] < minZ && positions[ b + 2 ] < minZ && positions[ c + 2 ] < minZ) continue;
+                        if (positions[ a     ] > maxX && positions[ b     ] > maxX && positions[ c     ] > maxX) continue;
+                        if (positions[ a + 1 ] > maxY && positions[ b + 1 ] > maxY && positions[ c + 1 ] > maxY) continue;
+                        if (positions[ a + 2 ] > maxZ && positions[ b + 2 ] > maxZ && positions[ c + 2 ] > maxZ) continue;
 
 						vA.set(
-							positions[ a * 3 ],
-							positions[ a * 3 + 1 ],
-							positions[ a * 3 + 2 ]
+							positions[ a ],
+							positions[ a + 1 ],
+							positions[ a + 2 ]
 						);
 						vB.set(
-							positions[ b * 3 ],
-							positions[ b * 3 + 1 ],
-							positions[ b * 3 + 2 ]
+							positions[ b ],
+							positions[ b + 1 ],
+							positions[ b + 2 ]
 						);
 						vC.set(
-							positions[ c * 3 ],
-							positions[ c * 3 + 1 ],
-							positions[ c * 3 + 2 ]
+							positions[ c ],
+							positions[ c + 1 ],
+							positions[ c + 2 ]
 						);
 
 
@@ -171,7 +187,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 							distance: distance,
 							point: intersectionPoint,
-							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
+							face: new THREE.Face3( a/3, b/3, c/3, THREE.Triangle.normal( vA, vB, vC ) ),
 							faceIndex: null,
 							object: this
 

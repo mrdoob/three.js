@@ -329,13 +329,13 @@ THREE.Ray.prototype = {
 
 		return function ( box ) {
 
-			return this.intersectBox( box, v ) !== null;
+			return this.intersectBox( box, v, v, v ) !== null;
 
 		};
 
 	}(),
 
-	intersectBox: function ( box , optionalTarget ) {
+	intersectBox: function ( box , optionalTargetVisibleNearest, optionalTargetNear, optionalTargetFar ) {
 
 		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
@@ -399,7 +399,11 @@ THREE.Ray.prototype = {
 
 		if ( tmax < 0 ) return null;
 
-		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
+		this.at( tmin, optionalTargetNear );
+		this.at( tmax, optionalTargetFar );
+
+        optionalTargetVisibleNearest = (tmin >= 0 ? optionalTargetNear : optionalTargetFar);
+		return optionalTargetVisibleNearest;
 
 	},
 
