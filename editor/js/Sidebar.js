@@ -12,4 +12,4 @@ var Sidebar = function ( editor ) {
 
 	return container;
 
-}
+};

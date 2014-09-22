@@ -21,7 +21,7 @@ if ( Math.sign === undefined ) {
 		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
 
 	};
-	
+
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button

@@ -8,7 +8,7 @@ THREE.AudioListener = function () {
 
 	this.type = 'AudioListener';
 
-	this.context = new AudioContext();
+	this.context = new ( window.AudioContext || window.webkitAudioContext )();
 
 };
 
@@ -26,7 +26,7 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 	var positionPrev = new THREE.Vector3();
 
 	return function ( force ) {
-	
+
 		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
 		var listener = this.context.listener;
