@@ -192,6 +192,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionCompressedTexturePVRTC;
 	var _glExtensionElementIndexUint;
 	var _glExtensionFragDepth;
+	var _glExtensionBlendMinMax;
 
 
 	initGL();
@@ -287,6 +288,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.supportsCompressedTexturePVRTC = function () {
 
 		return _glExtensionCompressedTexturePVRTC;
+
+	};
+
+	this.supportsBlendMinMax = function () {
+
+		return _glExtensionBlendMinMax;
 
 	};
 
@@ -6056,6 +6063,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( _glExtensionBlendMinMax !== undefined ) {
+
+			if ( p === THREE.MinEquation ) return _glExtensionBlendMinMax.MIN_EXT;
+			if ( p === THREE.MaxEquation ) return _glExtensionBlendMinMax.MAX_EXT;
+
+		}
+
 		return 0;
 
 	};
@@ -6184,6 +6198,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
 
+		_glExtensionBlendMinMax = _gl.getExtension( 'EXT_blend_minmax' );
+
 
 		if ( _glExtensionTextureFloat === null ) {
 
@@ -6218,6 +6234,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( _glExtensionElementIndexUint === null ) {
 
 			console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
+
+		}
+
+		if ( _glExtensionBlendMinMax === null ) {
+
+			console.log( 'THREE.WebGLRenderer: min max blend equations not supported.' );
 
 		}
 
