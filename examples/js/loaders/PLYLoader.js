@@ -96,7 +96,7 @@ THREE.PLYLoader.prototype = {
 
 	parseHeader: function ( data ) {
 		
-		var patternHeader = /ply([\s\S]*)end_header\n/;
+		var patternHeader = /ply([\s\S]*)end_header\s/;
 		var headerText = "";
 		if ( ( result = patternHeader.exec( data ) ) != null ) {
 			headerText = result [ 1 ];
@@ -257,7 +257,7 @@ THREE.PLYLoader.prototype = {
 
 		var header = this.parseHeader( data );
 
-		var patternBody = /end_header\n([\s\S]*)$/;
+		var patternBody = /end_header\s([\s\S]*)$/;
 		var body = "";
 		if ( ( result = patternBody.exec( data ) ) != null ) {
 			body = result [ 1 ];
