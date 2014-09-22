@@ -570,6 +570,7 @@
 		var changeEvent = { type: "change" };
 		var mouseDownEvent = { type: "mouseDown" };
 		var mouseUpEvent = { type: "mouseUp", mode: _mode };
+		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
 		var projector = new THREE.Projector();
@@ -955,6 +956,7 @@
 
 			scope.update();
 			scope.dispatchEvent( changeEvent );
+			scope.dispatchEvent( objectChangeEvent );
 
 		}
 
