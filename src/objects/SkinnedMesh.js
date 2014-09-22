@@ -157,7 +157,7 @@ THREE.SkinnedMesh.prototype.clone = function( object ) {
 
 	if ( object === undefined ) {
 
-		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
+		object = new THREE.SkinnedMesh( this.geometry, this.material, this.skeleton.useVertexTexture );
 
 	}
 
