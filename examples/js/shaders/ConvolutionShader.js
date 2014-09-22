@@ -19,8 +19,8 @@ THREE.ConvolutionShader = {
 
 		"tDiffuse":        { type: "t", value: null },
 		"uImageIncrement": { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
-		"cKernel":         { type: "fv1", value: [] }
-
+		"cKernel":         { type: "fv1", value: [] },
+		"averageLuminance":        { type: "f", value: 5 }
 	},
 
 	vertexShader: [
@@ -47,19 +47,52 @@ THREE.ConvolutionShader = {
 
 		"varying vec2 vUv;",
 
+		THREE.ShaderChunk['hdr_decode_pars_fragment'],
+		THREE.ShaderChunk['hdr_encode_pars_fragment'],
+
+		"uniform float averageLuminance;",
+		"float g_fMiddleGrey = 0.6;",
+		"float g_fMaxLuminance = 16.0;",
+		"const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);",
+
+		"vec3 ToneMap( vec3 vColor )",
+		"{",
+			// Get the calculated average luminance 
+			"float fLumAvg = averageLuminance;//texture2D(PointSampler1, float2(0.5, 0.5)).r;",
+
+			// Calculate the luminance of the current pixel
+			"float fLumPixel = dot(vColor, LUM_CONVERT);",
+
+			// Apply the modified operator (Eq. 4)
+			"float fLumScaled = (fLumPixel * g_fMiddleGrey) / fLumAvg;",
+
+			"float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled);",
+			"return fLumCompressed * vColor;",
+		"}",
+
 		"void main() {",
 
 			"vec2 imageCoord = vUv;",
 			"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
+			"vec4 hdr = vec4( 0.0, 0.0, 0.0, 0.0 );",
 
 			"for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {",
 
-				"sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
+				"hdr = texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
+				"#ifdef LOGLUV_HDR",
+					"hdr.xyz = LogLuvDecode( hdr );",
+				"#elif defined( RGBM_HDR )",
+					"hdr.xyz = RGBMDecode( hdr );",
+				"#endif",
+				// "sum += vec4( ToneMap( hdr.xyz ), 1.0 );",
+				"sum += hdr;",
+
 				"imageCoord += uImageIncrement;",
 
 			"}",
 
 			"gl_FragColor = sum;",
+			THREE.ShaderChunk['hdr_encode_fragment'],
 
 		"}"
 

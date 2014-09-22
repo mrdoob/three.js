@@ -61,6 +61,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
+	// hdr rendering
+	
+	this.hdrEnabled = false;
+	this.hdrType = THREE.LogLuvHDR;
+
 	// shadow map
 
 	this.shadowMapEnabled = false;

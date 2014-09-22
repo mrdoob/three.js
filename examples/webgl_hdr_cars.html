@@ -55,12 +55,22 @@
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/HDRDecodeShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
 
 		<script>
 
@@ -139,7 +149,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, effectComposer;
 			var cameraCube, sceneCube;
 
 			var m, mi;
@@ -165,6 +175,9 @@
 				// CAMERAS
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.x = 700;
+				camera.position.y = 400;
+				camera.position.z = 700;
 				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
 				// SCENE
@@ -213,8 +226,38 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
+				renderer.hdrEnabled = true;
+				renderer.hdrType = THREE.RGBMHDR;
+				renderer.gammaInput = false;
+				renderer.gammaOutput = false;
 
 				container.appendChild( renderer.domElement );
+
+				var width = window.innerWidth || 1;
+				var height = window.innerHeight || 1;
+				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
+
+				var renderTarget = new THREE.WebGLRenderTarget( width, height, parameters );
+				effectComposer = new THREE.EffectComposer( renderer, renderTarget );
+  			effectComposer.setSize( window.innerWidth, window.innerHeight );
+				var scenePass = new THREE.RenderPass( scene, camera );
+				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
+  			scenePass.clear = false;
+  			
+  			effectComposer.addPass( skyboxPass );
+  			effectComposer.addPass( scenePass );
+
+  			var bloomPass = new THREE.BloomPass();
+  			effectComposer.addPass( bloomPass );
+  			
+  			var hdrDecodePass = new THREE.ShaderPass( THREE.HDRDecodeShader );
+  			hdrDecodePass.renderToScreen = true;
+
+  			effectComposer.addPass( hdrDecodePass );
+  			
+  			// var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+  			// copyPass.renderToScreen = true;
+  			// effectComposer.addPass( copyPass );
 
 				if ( STATS_ENABLED ) {
 
@@ -626,15 +669,17 @@
 
 				var timer = -0.0002 * Date.now();
 
-				camera.position.x = 1000 * Math.cos( timer );
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.position.z = 1000 * Math.sin( timer );
+				// camera.position.x = 1000 * Math.cos( timer );
+				// camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				// camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );
 				cameraCube.rotation.copy( camera.rotation );
 
-				renderer.render( sceneCube, cameraCube );
-				renderer.render( scene, camera );
+				// renderer.render( sceneCube, cameraCube );
+				effectComposer.render()
+				
+				// renderer.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
 

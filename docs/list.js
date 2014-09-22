@@ -12,6 +12,7 @@ var list = {
 			[ "GLState", "api/constants/GLState"],
 			[ "Materials", "api/constants/Materials"],
 			[ "ShadowingTypes", "api/constants/ShadowingTypes"],
+			[ "HDRTypes", "api/constants/HDRTypes"],
 			[ "Textures", "api/constants/Textures"]
 		],
 
