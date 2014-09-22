@@ -65,7 +65,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
-	} else if ( object.geometry instanceof THREE.BufferGeometry ) {
+	} else {
 
 		if ( object.geometry.attributes.index !== undefined ) { // Indexed BufferGeometry
 
