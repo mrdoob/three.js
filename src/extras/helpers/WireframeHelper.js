@@ -12,7 +12,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 	var keys = [ 'a', 'b', 'c' ];
 	var geometry = new THREE.BufferGeometry();
 
-	if ( object.geometry instanceof THREE.Geometry ) {
+	if ( !object.geometry.attributes ) {
 
 		var vertices = object.geometry.vertices;
 		var faces = object.geometry.faces;
@@ -65,7 +65,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
-	} else if ( object.geometry instanceof THREE.BufferGeometry ) {
+	} else {
 
 		if ( object.geometry.attributes.index !== undefined ) { // Indexed BufferGeometry
 
