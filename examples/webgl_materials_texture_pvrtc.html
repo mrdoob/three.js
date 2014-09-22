@@ -70,22 +70,31 @@
 
 				*/
               
-    			var onCubeLoaded = function(texture){
-					texture.magFilter = THREE.LinearFilter
+    			var onCube1Loaded = function(texture){
+					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = new THREE.CubeReflectionMapping();
 					material6.needsUpdate = true;
+    			};
+    			var onCube2Loaded = function(texture){
+					texture.magFilter = THREE.LinearFilter;
+					// texture.minFilter = THREE.LinearMipMapNearestFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = new THREE.CubeReflectionMapping();
+					material8.needsUpdate = true;
     			};
      
     
 				var loader = new THREE.PVRLoader();
 
 				var disturb_4bpp_rgb            = loader.load( 'textures/compressed/disturb_4bpp_rgb.pvr');
+				var disturb_4bpp_rgb_v3         = loader.load( 'textures/compressed/disturb_4bpp_rgb_v3.pvr');
 				var disturb_4bpp_rgb_mips       = loader.load( 'textures/compressed/disturb_4bpp_rgb_mips.pvr');
 				var disturb_2bpp_rgb            = loader.load( 'textures/compressed/disturb_2bpp_rgb.pvr');
 				var flare_4bpp_rgba             = loader.load( 'textures/compressed/flare_4bpp_rgba.pvr');
 				var flare_2bpp_rgba             = loader.load( 'textures/compressed/flare_2bpp_rgba.pvr');
-				var park3_cube_nomip_4bpp_rgb   = loader.load( 'textures/compressed/park3_cube_nomip_4bpp_rgb.pvr', onCubeLoaded );
+				var park3_cube_nomip_4bpp_rgb   = loader.load( 'textures/compressed/park3_cube_nomip_4bpp_rgb.pvr', onCube1Loaded );
+				var park3_cube_mip_2bpp_rgb_v3  = loader.load( 'textures/compressed/park3_cube_mip_2bpp_rgb_v3.pvr', onCube2Loaded );
 
 
 				disturb_2bpp_rgb.minFilter = 
@@ -94,6 +103,8 @@
 				flare_4bpp_rgba.magFilter  =
 				disturb_4bpp_rgb.minFilter =
 				disturb_4bpp_rgb.magFilter =
+				disturb_4bpp_rgb_v3.minFilter =
+				disturb_4bpp_rgb_v3.magFilter =
 				flare_2bpp_rgba.minFilter  =
 				flare_2bpp_rgba.magFilter  = THREE.LinearFilter;
 
@@ -103,41 +114,57 @@
 				var material4 = new THREE.MeshBasicMaterial( { map: flare_4bpp_rgba       , side: THREE.DoubleSide, depthTest: false, transparent: true } );
 				var material5 = new THREE.MeshBasicMaterial( { map: flare_2bpp_rgba       , side: THREE.DoubleSide, depthTest: false, transparent: true } );
 				var material6 = new THREE.MeshBasicMaterial( { envMap: park3_cube_nomip_4bpp_rgb } );
+				var material8 = new THREE.MeshBasicMaterial( { envMap: park3_cube_mip_2bpp_rgb_v3 } );
 
+				var material7 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_v3       } );
 			
 
 				var mesh = new THREE.Mesh( geometry, material1 );
-				mesh.position.x = -400;
+				mesh.position.x = -500;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material2 );
-				mesh.position.x = 0;
+				mesh.position.x = -166;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material3 );
-				mesh.position.x = 400;
+				mesh.position.x = 166;
+				mesh.position.y = 200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material7 );
+				mesh.position.x = 500;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material4 );
-				mesh.position.x = -400;
+				mesh.position.x = -500;
 				mesh.position.y = -200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material5 );
-				mesh.position.x = 0;
+				mesh.position.x = -166;
 				mesh.position.y = -200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 50, 32, 16 ), material6 );
-				mesh.position.x = 400;
+				var torus =  new THREE.TorusGeometry( 100, 50, 32, 24 )
+
+				mesh = new THREE.Mesh( torus, material6 );
+				mesh.position.x = 166;
+				mesh.position.y = -200;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( torus, material8 );
+				mesh.position.x = 500;
 				mesh.position.y = -200;
 				scene.add( mesh );
 				meshes.push( mesh );
