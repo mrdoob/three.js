@@ -140,13 +140,13 @@ THREE.Mesh.prototype.raycast = ( function () {
 						b = ( index + indices[ i + 1 ] ) * 3;
 						c = ( index + indices[ i + 2 ] ) * 3;
 
-						// Test if the triangl eis near the ray.
-                        if (positions[ a     ] < minX && positions[ b     ] < minX && positions[ c     ] < minX) continue;
-                        if (positions[ a + 1 ] < minY && positions[ b + 1 ] < minY && positions[ c + 1 ] < minY) continue;
-                        if (positions[ a + 2 ] < minZ && positions[ b + 2 ] < minZ && positions[ c + 2 ] < minZ) continue;
-                        if (positions[ a     ] > maxX && positions[ b     ] > maxX && positions[ c     ] > maxX) continue;
-                        if (positions[ a + 1 ] > maxY && positions[ b + 1 ] > maxY && positions[ c + 1 ] > maxY) continue;
-                        if (positions[ a + 2 ] > maxZ && positions[ b + 2 ] > maxZ && positions[ c + 2 ] > maxZ) continue;
+						// Test if the triangle is near the ray.
+						if (positions[ a     ] < minX && positions[ b     ] < minX && positions[ c     ] < minX) continue;
+						if (positions[ a + 1 ] < minY && positions[ b + 1 ] < minY && positions[ c + 1 ] < minY) continue;
+						if (positions[ a + 2 ] < minZ && positions[ b + 2 ] < minZ && positions[ c + 2 ] < minZ) continue;
+						if (positions[ a     ] > maxX && positions[ b     ] > maxX && positions[ c     ] > maxX) continue;
+						if (positions[ a + 1 ] > maxY && positions[ b + 1 ] > maxY && positions[ c + 1 ] > maxY) continue;
+						if (positions[ a + 2 ] > maxZ && positions[ b + 2 ] > maxZ && positions[ c + 2 ] > maxZ) continue;
 
 						vA.set(
 							positions[ a ],
@@ -206,6 +206,14 @@ THREE.Mesh.prototype.raycast = ( function () {
 					a = i;
 					b = i + 1;
 					c = i + 2;
+
+					// Test if the triangle is near the ray.
+					if (positions[ j     ] < minX && positions[ j + 3 ] < minX && positions[ j + 6 ] < minX) continue;
+					if (positions[ j + 1 ] < minY && positions[ j + 4 ] < minY && positions[ j + 7 ] < minY) continue;
+					if (positions[ j + 2 ] < minZ && positions[ j + 5 ] < minZ && positions[ j + 8 ] < minZ) continue;
+					if (positions[ j     ] > maxX && positions[ j + 3 ] > maxX && positions[ j + 6 ] > maxX) continue;
+					if (positions[ j + 1 ] > maxY && positions[ j + 4 ] > maxY && positions[ j + 7 ] > maxY) continue;
+					if (positions[ j + 2 ] > maxZ && positions[ j + 5 ] > maxZ && positions[ j + 8 ] > maxZ) continue;
 
 					vA.set(
 						positions[ j ],
