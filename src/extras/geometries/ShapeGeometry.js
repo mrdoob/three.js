@@ -50,7 +50,8 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	if ( options === undefined ) options = {};
 	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
-
+	var autoReverse = options.autoReverse !== undefined ? options.autoReverse : true;
+	
 	var material = options.material;
 	var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
 
@@ -66,7 +67,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var reverse = ! THREE.Shape.Utils.isClockWise( vertices );
 
-	if ( reverse ) {
+	if ( reverse && autoReverse ) {
 
 		vertices = vertices.reverse();
 
