@@ -23,22 +23,12 @@ THREE.CompressedTextureLoader.prototype = {
 		var texture = new THREE.CompressedTexture();
 		texture.image = images;
 
-		// no flipping for cube textures
-		// (also flipping doesn't work for compressed textures )
-
-		texture.flipY = false;
-
-		// can't generate mipmaps for compressed textures
-		// mips must be embedded in DDS files
-
-		texture.generateMipmaps = false;
+	var loader = new THREE.XHRLoader();
+	loader.setResponseType( 'arraybuffer' );
 
 		if ( url instanceof Array ) {
 
 			var loaded = 0;
-
-			var loader = new THREE.XHRLoader();
-			loader.setResponseType( 'arraybuffer' );
 
 			var loadTexture = function ( i ) {
 
@@ -78,8 +68,6 @@ THREE.CompressedTextureLoader.prototype = {
 
 			// compressed cubemap texture stored in a single DDS file
 
-			var loader = new THREE.XHRLoader();
-			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( buffer ) {
 
 				var texDatas = scope._parser( buffer, true );
