@@ -50,6 +50,7 @@
 	"src/loaders/MaterialLoader.js",
 	"src/loaders/ObjectLoader.js",
 	"src/loaders/TextureLoader.js",
+	"src/loaders/CompressedTextureLoader.js",
 	"src/materials/Material.js",
 	"src/materials/LineBasicMaterial.js",
 	"src/materials/LineDashedMaterial.js",
