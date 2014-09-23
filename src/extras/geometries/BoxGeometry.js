@@ -22,11 +22,11 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	this.heightSegments = heightSegments || 1;
 	this.depthSegments = depthSegments || 1;
 
-	var constructee = this;  // constructee = the instance currently being constructed by the BoxGeometry constructor
+	var scope = this;
 
-	var width_half = width / 2;    // width  = the distance along x in the absolute 3D space
-	var height_half = height / 2;  // height = the distance along y in the absolute 3D space
-	var depth_half = depth / 2;    // depth  = the distance along z in the absolute 3D space
+	var width_half = width / 2;    // width  = the distance along x in the global 3D space
+	var height_half = height / 2;  // height = the distance along y in the global 3D space
+	var depth_half = depth / 2;    // depth  = the distance along z in the global 3D space
 
 	buildPlane( 'z', 'y', -1, -1, depth, height, width_half, 0 ); // px
 	buildPlane( 'z', 'y',  1, -1, depth, height, -width_half, 1 ); // nx
@@ -36,13 +36,14 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	buildPlane( 'x', 'y', -1, -1, width, height, -depth_half, 5 ); // nz
 
 	function buildPlane( u, v, uDir, vDir, uDist, vDist, wDist_half, materialIndex ) {
+	    // u and v are axes in a local 2D space defined by each call to buildPlane
 
 		var w, iu, iv,
-			segU = constructee.widthSegments,  // number of segments along u   // width  = x
-			segV = constructee.heightSegments, // number of segments along v   // height = y
+			segU = scope.widthSegments,  // number of segments along u   // width  = x
+			segV = scope.heightSegments, // number of segments along v   // height = y
 			uDist_half = uDist / 2,  // the extent of the plane along u, divided by two
 			vDist_half = vDist / 2,  // the extent of the plane along v, divided by two
-			offset = constructee.vertices.length;
+			offset = scope.vertices.length;
 
 		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
@@ -51,12 +52,12 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
 			w = 'y';
-			segV = constructee.depthSegments;
+			segV = scope.depthSegments;
 
 		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
 			w = 'x';
-			segU = constructee.depthSegments;
+			segU = scope.depthSegments;
 
 		}
 
@@ -77,7 +78,7 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 				vertex[ v ] = ( iv * segmentDist_v - vDist_half ) * vDir;
 				vertex[ w ] = wDist_half;
 
-				constructee.vertices.push( vertex );
+				scope.vertices.push( vertex );
 
 			}
 
@@ -102,16 +103,16 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 				face1.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 				face1.materialIndex = materialIndex;
 
-				constructee.faces.push( face1 );
-				constructee.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+				scope.faces.push( face1 );
+				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
 				var face2 = new THREE.Face3( b + offset, c + offset, d + offset );
 				face2.normal.copy( normal );
 				face2.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 				face2.materialIndex = materialIndex;
 
-				constructee.faces.push( face2 );
-				constructee.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
+				scope.faces.push( face2 );
+				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 			}
 
