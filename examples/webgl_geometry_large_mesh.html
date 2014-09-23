@@ -49,6 +49,9 @@
 
 		<script src="js/loaders/BinaryLoader.js"></script>
 
+		<script src="js/renderers/Renderer.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -216,7 +219,7 @@
 			}
 
 			function render() {
-			
+
 				var time = Date.now() * 0.001;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;

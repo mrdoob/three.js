@@ -149,7 +149,7 @@ Use WEBGL Depth buffer support?
 
 				// Focusing Floor
 
-				// var planeGeometry = new THREE.PlaneGeometry( 500, 500, 1, 1 );
+				// var planeGeometry = new THREE.PlaneBufferGeometry( 500, 500, 1, 1 );
 
 				// var planeMat = new THREE.MeshPhongMaterial(
 				// 	{  map: texture }
@@ -161,14 +161,15 @@ Use WEBGL Depth buffer support?
 				// scene.add(plane);
 
 				// Plane particles
-				var planePiece = new THREE.PlaneGeometry( 10, 10, 1, 1 );
+				var planePiece = new THREE.PlaneBufferGeometry( 10, 10, 1, 1 );
 
 				var planeMat = new THREE.MeshPhongMaterial( {
 						color: 0xffffff * 0.4,
 						shininess: 0.5,
-						specular: 0xffffff ,
+						specular: 0xffffff,
 						envMap: textureCube,
-						side: THREE.DoubleSide } );
+						side: THREE.DoubleSide
+				} );
 
 				var rand = Math.random;
 
@@ -238,7 +239,7 @@ Use WEBGL Depth buffer support?
 
 					mesh.position.set(
 						(Math.random() - 0.5) * 200,
-						Math.random() * 50, 
+						Math.random() * 50,
 						(Math.random() - 0.5)  * 200
 					);
 
@@ -444,7 +445,7 @@ Use WEBGL Depth buffer support?
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.add( postprocessing.quad );
 

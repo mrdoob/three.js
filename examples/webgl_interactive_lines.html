@@ -49,17 +49,10 @@
 
 				scene = new THREE.Scene();
 
-				var PI2 = Math.PI * 2;
-				var program = function ( context ) {
+				var geometry = new THREE.SphereGeometry( 5 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
-					context.beginPath();
-					context.arc( 0, 0, 0.5, 0, PI2, true );
-					context.fill();
-
-				}
-
-				sphereInter = new THREE.Sprite( new THREE.SpriteMaterial( { color: 0xff0000 } ) );
-				sphereInter.scale.x = sphereInter.scale.y = 10;
+				sphereInter = new THREE.Mesh( geometry, material );
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
@@ -115,7 +108,7 @@
 
 				}
 
-				scene.add(parentTransform);
+				scene.add( parentTransform );
 
 				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
