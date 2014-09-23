@@ -393,40 +393,40 @@ THREE.BufferGeometry.prototype = {
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-						vA = index + indices[ i ];
-						vB = index + indices[ i + 1 ];
-						vC = index + indices[ i + 2 ];
+						vA = ( index + indices[ i     ] ) * 3;
+						vB = ( index + indices[ i + 1 ] ) * 3;
+						vC = ( index + indices[ i + 2 ] ) * 3;
 
-						x = positions[ vA * 3 ];
-						y = positions[ vA * 3 + 1 ];
-						z = positions[ vA * 3 + 2 ];
+						x = positions[ vA     ];
+						y = positions[ vA + 1 ];
+						z = positions[ vA + 2 ];
 						pA.set( x, y, z );
 
-						x = positions[ vB * 3 ];
-						y = positions[ vB * 3 + 1 ];
-						z = positions[ vB * 3 + 2 ];
+						x = positions[ vB     ];
+						y = positions[ vB + 1 ];
+						z = positions[ vB + 2 ];
 						pB.set( x, y, z );
 
-						x = positions[ vC * 3 ];
-						y = positions[ vC * 3 + 1 ];
-						z = positions[ vC * 3 + 2 ];
+						x = positions[ vC     ];
+						y = positions[ vC + 1 ];
+						z = positions[ vC + 2 ];
 						pC.set( x, y, z );
 
 						cb.subVectors( pC, pB );
 						ab.subVectors( pA, pB );
 						cb.cross( ab );
 
-						normals[ vA * 3     ] += cb.x;
-						normals[ vA * 3 + 1 ] += cb.y;
-						normals[ vA * 3 + 2 ] += cb.z;
+						normals[ vA     ] += cb.x;
+						normals[ vA + 1 ] += cb.y;
+						normals[ vA + 2 ] += cb.z;
 
-						normals[ vB * 3     ] += cb.x;
-						normals[ vB * 3 + 1 ] += cb.y;
-						normals[ vB * 3 + 2 ] += cb.z;
+						normals[ vB     ] += cb.x;
+						normals[ vB + 1 ] += cb.y;
+						normals[ vB + 2 ] += cb.z;
 
-						normals[ vC * 3     ] += cb.x;
-						normals[ vC * 3 + 1 ] += cb.y;
-						normals[ vC * 3 + 2 ] += cb.z;
+						normals[ vC     ] += cb.x;
+						normals[ vC + 1 ] += cb.y;
+						normals[ vC + 2 ] += cb.z;
 
 					}
 
@@ -438,7 +438,7 @@ THREE.BufferGeometry.prototype = {
 
 				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-					x = positions[ i ];
+					x = positions[ i     ];
 					y = positions[ i + 1 ];
 					z = positions[ i + 2 ];
 					pA.set( x, y, z );
