@@ -14,6 +14,17 @@ THREE.CTMLoader = function ( showStatus ) {
 
 };
 
+// Get the url of this script (CTMWorker.js) at loading time
+(function() {
+	var scriptEls = document.getElementsByTagName( 'script' );
+	var thisScriptEl = scriptEls[scriptEls.length - 1];
+	var scriptPath = thisScriptEl.src;
+	var scriptFolder = scriptPath.substr(0, scriptPath.lastIndexOf( '/' )+1 );
+
+	THREE.CTMLoader.WorkerJSUrl = scriptFolder + "CTMWorker.js" ;
+})();
+
+
 THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
 
 // Load multiple CTM parts defined in JSON
@@ -109,7 +120,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 				if ( parameters.useWorker ) {
 
-					var worker = new Worker( "js/loaders/ctm/CTMWorker.js" );
+					var worker = new Worker( THREE.CTMLoader.WorkerJSUrl );
 
 					worker.onmessage = function( event ) {
 
