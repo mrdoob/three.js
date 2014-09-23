@@ -1,7 +1,7 @@
-/*
+/**
  * @author mrdoob / http://mrdoob.com/
  *
- * Abstract Base class to block based textures loader (dds, pvr, ...) 
+ * Abstract Base class to block based textures loader (dds, pvr, ...)
  */
 
 THREE.CompressedTextureLoader = function () {
@@ -41,7 +41,7 @@ THREE.CompressedTextureLoader.prototype = {
 			loader.setResponseType( 'arraybuffer' );
 
 			var loadTexture = function ( i ) {
-		
+
 				loader.load( url[ i ], function ( buffer ) {
 
 					var texDatas = scope._parser( buffer, true );
@@ -123,5 +123,5 @@ THREE.CompressedTextureLoader.prototype = {
 		return texture;
 
 	}
-	
+
 };
