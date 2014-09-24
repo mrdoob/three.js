@@ -21,7 +21,11 @@ Menubar.File = function ( editor ) {
 
 		if ( confirm( 'Are you sure?' ) ) {
 
-			editor.config.clear();
+			editor.config.setKey(
+				'camera/position', [ 500, 250, 500 ],
+				'camera/target', [ 0, 0, 0 ]
+			);
+
 			editor.storage.clear( function () {
 
 				location.href = location.pathname;
@@ -67,7 +71,7 @@ Menubar.File = function ( editor ) {
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Geometry' );
 	option.onClick( function () {
-		
+
 		var object = editor.selected;
 
 		if ( object === null ) {
