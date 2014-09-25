@@ -22,6 +22,7 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 THREE.OrthographicCamera.prototype = Object.create( THREE.Camera.prototype );
 
+
 THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 	this.projectionMatrix.makeOrthographic( this.left, this.right, this.top, this.bottom, this.near, this.far );

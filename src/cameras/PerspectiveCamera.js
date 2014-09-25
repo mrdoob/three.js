@@ -87,7 +87,6 @@ THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeig
 
 };
 
-
 THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 	if ( this.fullWidth ) {

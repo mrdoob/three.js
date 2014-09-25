@@ -24,7 +24,8 @@
 THREE.OrbitControls = function ( object, domElement ) {
 
 	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	this.domElement = ( domElement !== undefined ) ? domElement : document.body;
+	this.domElement.setAttribute('tabindex', 0);
 
 	// API
 
@@ -159,8 +160,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// get X column of matrix
 		panOffset.set( te[ 0 ], te[ 1 ], te[ 2 ] );
-		panOffset.multiplyScalar( - distance );
-		
+		panOffset.multiplyScalar( - distance / scope.object.zoom );
+
 		pan.add( panOffset );
 
 	};
@@ -172,12 +173,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// get Y column of matrix
 		panOffset.set( te[ 4 ], te[ 5 ], te[ 6 ] );
-		panOffset.multiplyScalar( distance );
-		
+		panOffset.multiplyScalar( distance / scope.object.zoom );
+
 		pan.add( panOffset );
 
 	};
-	
+
 	// pass in x,y of change desired in pixel space,
 	// right and down are positive
 	this.pan = function ( deltaX, deltaY ) {
@@ -198,7 +199,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			scope.panLeft( 2 * deltaX * targetDistance / element.clientHeight );
 			scope.panUp( 2 * deltaY * targetDistance / element.clientHeight );
 
-		} else if ( scope.object.top !== undefined ) {
+		} else if ( scope.object instanceof THREE.OrthographicCamera ) {
 
 			// orthographic
 			scope.panLeft( deltaX * (scope.object.right - scope.object.left) / element.clientWidth );
@@ -276,7 +277,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// restrict radius to be between desired limits
 		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
-		
+
+		// zoom orthographic instead dolly.
+		if ( scope.object instanceof THREE.OrthographicCamera ) {
+			this.object.zoom *= scale;
+			this.object.updateProjectionMatrix();
+			radius = 1;
+			// TODO: hack to trigger update condition below
+			lastPosition.x += 1;
+		}
+
 		// move target to panned location
 		this.target.add( pan );
 
@@ -286,6 +296,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// rotate offset back to "camera-up-vector-is-up" space
 		offset.applyQuaternion( quatInverse );
+
 
 		position.copy( this.target ).add( offset );
 
@@ -418,7 +429,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			panEnd.set( event.clientX, event.clientY );
 			panDelta.subVectors( panEnd, panStart );
-			
+
 			scope.pan( panDelta.x, panDelta.y );
 
 			panStart.copy( panEnd );
@@ -478,7 +489,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	function onKeyDown( event ) {
 
 		if ( scope.enabled === false || scope.noKeys === true || scope.noPan === true ) return;
-		
+
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
@@ -614,7 +625,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 				panDelta.subVectors( panEnd, panStart );
-				
+
 				scope.pan( panDelta.x, panDelta.y );
 
 				panStart.copy( panEnd );
@@ -648,7 +659,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'touchend', touchend, false );
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
 
-	window.addEventListener( 'keydown', onKeyDown, false );
+	this.domElement.addEventListener( 'keydown', onKeyDown, false );
 
 	// force an update at start
 	this.update();
