@@ -56,6 +56,12 @@ input.Number {
 		cursor: pointer;
 	}
 
+	#menubar .menu.right {
+		float: right;
+		width: 100px;
+		text-align: right;
+	}
+
 		#menubar .menu .title {
 			color: #888;
 			margin: 0px;
@@ -156,5 +162,3 @@ input.Number {
 	#toolbar button {
 		margin-right: 6px;
 	}
-
-

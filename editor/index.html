@@ -55,6 +55,7 @@
 		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
+		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Renderer.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
@@ -144,9 +145,13 @@
 
 					clearTimeout( timeout );
 
+					editor.signals.savingStarted.dispatch();
+
 					timeout = setTimeout( function () {
 
 						editor.storage.set( editor.scene.toJSON() );
+
+						editor.signals.savingFinished.dispatch();
 
 					}, 1000 );
 

@@ -18,6 +18,9 @@ var Editor = function () {
 
 		// notifications
 
+		savingStarted: new SIGNALS.Signal(),
+		savingFinished: new SIGNALS.Signal(),
+
 		themeChanged: new SIGNALS.Signal(),
 
 		transformModeChanged: new SIGNALS.Signal(),
