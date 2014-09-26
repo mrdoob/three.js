@@ -89,7 +89,6 @@ THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeig
 
 };
 
-
 THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 	var fov = THREE.Math.radToDeg( 2 * Math.atan( Math.tan( THREE.Math.degToRad( this.fov ) * 0.5 ) / this.zoom ) );

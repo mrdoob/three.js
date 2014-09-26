@@ -24,6 +24,7 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 THREE.OrthographicCamera.prototype = Object.create( THREE.Camera.prototype );
 
+
 THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 	var dx = ( this.right - this.left ) / ( 2 * this.zoom );
