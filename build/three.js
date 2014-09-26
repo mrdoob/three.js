@@ -31588,8 +31588,8 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 
 	this.geometry.computeBoundingSphere();
 
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
-	this.matrixWorld = object.matrixWorld;
 
 };
 
@@ -31723,7 +31723,7 @@ THREE.CameraHelper = function ( camera ) {
 	THREE.Line.call( this, geometry, material, THREE.LinePieces );
 
 	this.camera = camera;
-	this.matrixWorld = camera.matrixWorld;
+	this.matrix = camera.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.pointMap = pointMap;
@@ -31828,7 +31828,7 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrixWorld = light.matrixWorld;
+	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	size = size || 1;
@@ -31977,8 +31977,8 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
 
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
-	this.matrixWorld = object.matrixWorld;
 
 };
 
@@ -32117,7 +32117,7 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrixWorld = light.matrixWorld;
+	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.colors = [ new THREE.Color(), new THREE.Color() ];
@@ -32163,7 +32163,6 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 
 }();
 
-
 // File:src/extras/helpers/PointLightHelper.js
 
 /**
@@ -32182,7 +32181,7 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
-	this.matrixWorld = this.light.matrixWorld;
+	this.matrix = this.light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	/*
@@ -32212,7 +32211,7 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
 
 THREE.PointLightHelper.prototype.dispose = function () {
-	
+
 	this.geometry.dispose();
 	this.material.dispose();
 };
@@ -32237,7 +32236,6 @@ THREE.PointLightHelper.prototype.update = function () {
 	*/
 
 };
-
 
 // File:src/extras/helpers/SkeletonHelper.js
 
@@ -32275,7 +32273,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	this.root = object;
 
-	this.matrixWorld = object.matrixWorld;
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.update();
@@ -32354,7 +32352,7 @@ THREE.SpotLightHelper = function ( light ) {
 	this.light = light;
 	this.light.updateMatrixWorld();
 
-	this.matrixWorld = light.matrixWorld;
+	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	var geometry = new THREE.CylinderGeometry( 0, 1, 1, 8, 1, true );
@@ -32363,7 +32361,7 @@ THREE.SpotLightHelper = function ( light ) {
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
 	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
-	
+
 	this.cone = new THREE.Mesh( geometry, material );
 	this.add( this.cone );
 
@@ -32768,8 +32766,8 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
 
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
-	this.matrixWorld = object.matrixWorld;
 
 };
 
