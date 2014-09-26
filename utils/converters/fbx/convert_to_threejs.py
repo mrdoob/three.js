@@ -14,8 +14,10 @@ import shutil
 # #####################################################
 option_triangulate = True
 option_textures = True
+option_copy_textures = True
 option_prefix = True
 option_geometry = False
+option_forced_y_up = False
 option_default_camera = False
 option_default_light = False
 option_pretty_print = False
@@ -1245,7 +1247,7 @@ def process_mesh_polygons(mesh_list, normals_to_indices, colors_to_indices, uvs_
                     faces.append(face)
             else:
                 face = generate_mesh_face(mesh, 
-                          poly_index, 
+                          poly_index,
                           face_vertices,
                           face_normals,
                           face_colors,
@@ -1311,7 +1313,7 @@ def generate_mesh_face(mesh, polygon_index, vertex_indices, normals, colors, uv_
                 for polygon_uvs in uv_layers:
                     tmp.append([polygon_uvs[0], polygon_uvs[2], polygon_uvs[1]])
                 uv_layers = tmp
-        else: 
+        else:
             vertex_indices = [vertex_indices[0], vertex_indices[3], vertex_indices[2], vertex_indices[1]]
             if hasFaceVertexNormals:
                 normals = [normals[0], normals[3], normals[2], normals[1]]
@@ -1378,9 +1380,9 @@ def generate_scene_output(node):
 
     # Generate mesh faces for the Three.js file format
     faces = process_mesh_polygons(mesh_list, 
-                normals_to_indices, 
+                normals_to_indices,
                 colors_to_indices, 
-                uvs_to_indices_list, 
+                uvs_to_indices_list,
                 vertex_offsets, 
                 material_offsets)
 
@@ -1454,9 +1456,9 @@ def generate_non_scene_output(scene):
 
     # Generate mesh faces for the Three.js file format
     faces = process_mesh_polygons(mesh_list, 
-                normals_to_indices, 
+                normals_to_indices,
                 colors_to_indices, 
-                uvs_to_indices_list, 
+                uvs_to_indices_list,
                 vertex_offsets, 
                 material_offsets)
 
@@ -2057,7 +2059,7 @@ def copy_textures(textures):
             #print( url )
             #print( saveFilename )
             if not os.path.exists(saveFolder):
-                os.makedirs(saveFolder)                
+                os.makedirs(saveFolder)
             shutil.copyfile(url, saveFilename)
             texture_dict[url] = True
         except IOError as e:
@@ -2073,7 +2075,7 @@ def findFilesWithExt(directory, ext, include_path = True):
                 if include_path:
                     found.append(os.path.join(root, filename))    
                 else:
-                    found.append(filename)    
+                    found.append(filename)
     return found
 
 # #####################################################
@@ -2095,7 +2097,7 @@ if __name__ == "__main__":
         elif platform.system() == 'Darwin':
             msg += '"/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages"'        
         msg += ' folder.'
-        print(msg) 
+        print(msg)
         sys.exit(1)
     
     usage = "Usage: %prog [source_file.fbx] [output_file.js] [options]"
@@ -2103,8 +2105,10 @@ if __name__ == "__main__":
 
     parser.add_option('-t', '--triangulate', action='store_true', dest='triangulate', help="force quad geometry into triangles", default=False)
     parser.add_option('-x', '--ignore-textures', action='store_true', dest='notextures', help="don't include texture references in output file", default=False)
+    parser.add_option('-n', '--no-texture-copy', action='store_true', dest='notexturecopy', help="don't copy texture files", default=False)
     parser.add_option('-u', '--force-prefix', action='store_true', dest='prefix', help="prefix all object names in output file to ensure uniqueness", default=False)
     parser.add_option('-f', '--flatten-scene', action='store_true', dest='geometry', help="merge all geometries and apply node transforms", default=False)
+    parser.add_option('-y', '--force-y-up', action='store_true', dest='forceyup', help="ensure that the y axis shows up", default=False)
     parser.add_option('-c', '--add-camera', action='store_true', dest='defcamera', help="include default camera in output scene", default=False)
     parser.add_option('-l', '--add-light', action='store_true', dest='deflight', help="include default light in output scene", default=False)
     parser.add_option('-p', '--pretty-print', action='store_true', dest='pretty', help="prefix all object names in output file", default=False)
@@ -2113,8 +2117,10 @@ if __name__ == "__main__":
 
     option_triangulate = options.triangulate 
     option_textures = True if not options.notextures else False
+    option_copy_textures = True if not options.notexturecopy else False
     option_prefix = options.prefix
     option_geometry = options.geometry 
+    option_forced_y_up = options.forceyup
     option_default_camera = options.defcamera 
     option_default_light = options.deflight 
     option_pretty_print = options.pretty 
@@ -2138,12 +2144,13 @@ if __name__ == "__main__":
             print("\nForcing geometry to triangles")
             triangulate_scene(scene)
             
-        # According to asset's coordinate to convert scene 
-        upVector = scene.GetGlobalSettings().GetAxisSystem().GetUpVector();
-        
         axis_system = FbxAxisSystem.MayaYUp
-        if upVector[0] == 3:
-            axis_system = FbxAxisSystem.MayaZUp
+        
+        if not option_forced_y_up:
+            # According to asset's coordinate to convert scene 
+            upVector = scene.GetGlobalSettings().GetAxisSystem().GetUpVector();
+            if upVector[0] == 3:
+                axis_system = FbxAxisSystem.MayaZUp
         
         axis_system.ConvertScene(scene)
         
@@ -2169,7 +2176,9 @@ if __name__ == "__main__":
 
         output_path = os.path.join(os.getcwd(), args[1])
         write_file(output_path, output_string)
-        copy_textures( output_content['textures'] )       
+        
+        if option_copy_textures:
+            copy_textures( output_content['textures'] )       
 
         print("\nExported Three.js file to:\n%s\n" % output_path)
 
