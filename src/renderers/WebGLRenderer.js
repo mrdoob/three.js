@@ -3343,9 +3343,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( object instanceof THREE.Scene ) {
+		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
 
-			//
+			// skip
 
 		} else {
 
