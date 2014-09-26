@@ -26,7 +26,12 @@ THREE.OrthographicCamera.prototype = Object.create( THREE.Camera.prototype );
 
 THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
-	this.projectionMatrix.makeOrthographic( this.left / this.zoom, this.right / this.zoom, this.top / this.zoom, this.bottom / this.zoom, this.near, this.far );
+	var dx = ( this.right - this.left ) / ( 2 * this.zoom );
+	var dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
+	var cx = ( this.right + this.left ) / 2;
+	var cy = ( this.top + this.bottom ) / 2;
+
+	this.projectionMatrix.makeOrthographic( cx - dx, cx + dx, cy + dy, cy - dy, this.near, this.far );
 
 };
 
