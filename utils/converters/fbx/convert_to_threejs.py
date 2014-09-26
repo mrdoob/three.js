@@ -1247,7 +1247,7 @@ def process_mesh_polygons(mesh_list, normals_to_indices, colors_to_indices, uvs_
                     faces.append(face)
             else:
                 face = generate_mesh_face(mesh, 
-                          poly_index, 
+                          poly_index,
                           face_vertices,
                           face_normals,
                           face_colors,
@@ -1313,7 +1313,7 @@ def generate_mesh_face(mesh, polygon_index, vertex_indices, normals, colors, uv_
                 for polygon_uvs in uv_layers:
                     tmp.append([polygon_uvs[0], polygon_uvs[2], polygon_uvs[1]])
                 uv_layers = tmp
-        else: 
+        else:
             vertex_indices = [vertex_indices[0], vertex_indices[3], vertex_indices[2], vertex_indices[1]]
             if hasFaceVertexNormals:
                 normals = [normals[0], normals[3], normals[2], normals[1]]
@@ -1380,9 +1380,9 @@ def generate_scene_output(node):
 
     # Generate mesh faces for the Three.js file format
     faces = process_mesh_polygons(mesh_list, 
-                normals_to_indices, 
+                normals_to_indices,
                 colors_to_indices, 
-                uvs_to_indices_list, 
+                uvs_to_indices_list,
                 vertex_offsets, 
                 material_offsets)
 
@@ -1456,9 +1456,9 @@ def generate_non_scene_output(scene):
 
     # Generate mesh faces for the Three.js file format
     faces = process_mesh_polygons(mesh_list, 
-                normals_to_indices, 
+                normals_to_indices,
                 colors_to_indices, 
-                uvs_to_indices_list, 
+                uvs_to_indices_list,
                 vertex_offsets, 
                 material_offsets)
 
@@ -2059,7 +2059,7 @@ def copy_textures(textures):
             #print( url )
             #print( saveFilename )
             if not os.path.exists(saveFolder):
-                os.makedirs(saveFolder)                
+                os.makedirs(saveFolder)
             shutil.copyfile(url, saveFilename)
             texture_dict[url] = True
         except IOError as e:
@@ -2075,7 +2075,7 @@ def findFilesWithExt(directory, ext, include_path = True):
                 if include_path:
                     found.append(os.path.join(root, filename))    
                 else:
-                    found.append(filename)    
+                    found.append(filename)
     return found
 
 # #####################################################
@@ -2097,7 +2097,7 @@ if __name__ == "__main__":
         elif platform.system() == 'Darwin':
             msg += '"/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages"'        
         msg += ' folder.'
-        print(msg) 
+        print(msg)
         sys.exit(1)
     
     usage = "Usage: %prog [source_file.fbx] [output_file.js] [options]"
