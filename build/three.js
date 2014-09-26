@@ -15729,7 +15729,6 @@ THREE.Scene = function () {
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
-	this.matrixAutoUpdate = false;
 
 };
 
@@ -20756,7 +20755,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
 
-		projectObject( scene, scene, camera );
+		projectObject( scene, scene );
 
 		if ( _this.sortObjects === true ) {
 
@@ -20854,7 +20853,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function projectObject(scene, object,camera){
+	function projectObject( scene, object ) {
 
 		if ( object.visible === false ) return;
 
@@ -20911,7 +20910,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			projectObject( scene, object.children[ i ], camera );
+			projectObject( scene, object.children[ i ] );
 
 		}
 
