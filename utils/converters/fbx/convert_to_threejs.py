@@ -17,6 +17,7 @@ option_textures = True
 option_copy_textures = True
 option_prefix = True
 option_geometry = False
+option_forced_y_up = False
 option_default_camera = False
 option_default_light = False
 option_pretty_print = False
@@ -2107,6 +2108,7 @@ if __name__ == "__main__":
     parser.add_option('-n', '--no-texture-copy', action='store_true', dest='notexturecopy', help="don't copy texture files", default=False)
     parser.add_option('-u', '--force-prefix', action='store_true', dest='prefix', help="prefix all object names in output file to ensure uniqueness", default=False)
     parser.add_option('-f', '--flatten-scene', action='store_true', dest='geometry', help="merge all geometries and apply node transforms", default=False)
+    parser.add_option('-y', '--force-y-up', action='store_true', dest='forceyup', help="ensure that the y axis shows up", default=False)
     parser.add_option('-c', '--add-camera', action='store_true', dest='defcamera', help="include default camera in output scene", default=False)
     parser.add_option('-l', '--add-light', action='store_true', dest='deflight', help="include default light in output scene", default=False)
     parser.add_option('-p', '--pretty-print', action='store_true', dest='pretty', help="prefix all object names in output file", default=False)
@@ -2118,6 +2120,7 @@ if __name__ == "__main__":
     option_copy_textures = True if not options.notexturecopy else False
     option_prefix = options.prefix
     option_geometry = options.geometry 
+    option_forced_y_up = options.forceyup
     option_default_camera = options.defcamera 
     option_default_light = options.deflight 
     option_pretty_print = options.pretty 
@@ -2141,12 +2144,13 @@ if __name__ == "__main__":
             print("\nForcing geometry to triangles")
             triangulate_scene(scene)
             
-        # According to asset's coordinate to convert scene 
-        upVector = scene.GetGlobalSettings().GetAxisSystem().GetUpVector();
-        
         axis_system = FbxAxisSystem.MayaYUp
-        if upVector[0] == 3:
-            axis_system = FbxAxisSystem.MayaZUp
+        
+        if not option_forced_y_up:
+            # According to asset's coordinate to convert scene 
+            upVector = scene.GetGlobalSettings().GetAxisSystem().GetUpVector();
+            if upVector[0] == 3:
+                axis_system = FbxAxisSystem.MayaZUp
         
         axis_system.ConvertScene(scene)
         
