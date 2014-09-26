@@ -484,11 +484,11 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				DumpColor mat.ambient  "colorAmbient"
 				DumpColor mat.specular "colorSpecular"
 
-				t = mat.opacity / 100
-				s = mat.glossiness
+				transparency = mat.opacity / 100
 
-				Format "\"transparency\"  : %,\n" t to:ostream
-				Format "\"specularCoef\"  : %,\n" s to:ostream
+				Format "\"transparency\"  : %,\n" transparency to:ostream
+				Format "\"specularCoef\"  : %,\n" mat.specularLevel to:ostream
+				Format "\"shininess\"  : %,\n" mat.glossiness to:ostream
 
 				-- maps
 
@@ -497,6 +497,11 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				DumpMap mat.specularMap "mapSpecular"
 				DumpMap mat.bumpMap 	"mapBump"
 				DumpMap mat.opacityMap 	"mapAlpha"
+				
+				if mat.shaderByName == "Phong" then
+				(
+					Format "\"shading\" : \"phong\",\n" to:ostream
+				)
 
 			)
 			else
