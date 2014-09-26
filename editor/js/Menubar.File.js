@@ -165,7 +165,7 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		var exporter = new OBJExporter();
+		var exporter = new THREE.OBJExporter();
 
 		exportString( exporter.parse( geometry ) );
 
@@ -179,7 +179,7 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export STL' );
 	option.onClick( function () {
 
-		var exporter = new STLExporter();
+		var exporter = new THREE.STLExporter();
 
 		exportString( exporter.parse( editor.scene ) );
 
