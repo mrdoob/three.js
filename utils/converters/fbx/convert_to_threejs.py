@@ -14,6 +14,7 @@ import shutil
 # #####################################################
 option_triangulate = True
 option_textures = True
+option_copy_textures = True
 option_prefix = True
 option_geometry = False
 option_default_camera = False
@@ -2103,6 +2104,7 @@ if __name__ == "__main__":
 
     parser.add_option('-t', '--triangulate', action='store_true', dest='triangulate', help="force quad geometry into triangles", default=False)
     parser.add_option('-x', '--ignore-textures', action='store_true', dest='notextures', help="don't include texture references in output file", default=False)
+    parser.add_option('-n', '--no-texture-copy', action='store_true', dest='notexturecopy', help="don't copy texture files", default=False)
     parser.add_option('-u', '--force-prefix', action='store_true', dest='prefix', help="prefix all object names in output file to ensure uniqueness", default=False)
     parser.add_option('-f', '--flatten-scene', action='store_true', dest='geometry', help="merge all geometries and apply node transforms", default=False)
     parser.add_option('-c', '--add-camera', action='store_true', dest='defcamera', help="include default camera in output scene", default=False)
@@ -2113,6 +2115,7 @@ if __name__ == "__main__":
 
     option_triangulate = options.triangulate 
     option_textures = True if not options.notextures else False
+    option_copy_textures = True if not options.notexturecopy else False
     option_prefix = options.prefix
     option_geometry = options.geometry 
     option_default_camera = options.defcamera 
@@ -2169,7 +2172,9 @@ if __name__ == "__main__":
 
         output_path = os.path.join(os.getcwd(), args[1])
         write_file(output_path, output_string)
-        copy_textures( output_content['textures'] )       
+        
+        if option_copy_textures:
+            copy_textures( output_content['textures'] )       
 
         print("\nExported Three.js file to:\n%s\n" % output_path)
 
