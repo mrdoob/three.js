@@ -330,6 +330,41 @@ THREE.Box3.prototype = {
 
 	}(),
 
+	getTransformedBox: function(matrix, dstBox) {
+
+		var min = this.min, max = this.max;
+		var e = matrix.elements;
+
+		var minx = Infinity, miny = Infinity, minz = Infinity;
+		var maxx = -Infinity, maxy = -Infinity, maxz = -Infinity;
+
+		function tr(px, py, pz) {
+			var x = e[0] * px + e[4] * py + e[8]  * pz + e[12];
+			var y = e[1] * px + e[5] * py + e[9]  * pz + e[13];
+			var z = e[2] * px + e[6] * py + e[10] * pz + e[14];
+
+			if (x < minx) minx = x;
+			if (y < miny) miny = y;
+			if (z < minz) minz = z;
+
+			if (x > maxx) maxx = x;
+			if (y > maxy) maxy = y;
+			if (z > maxz) maxz = z;
+		}
+
+		tr( min.x, min.y, min.z ); // 000
+		tr( min.x, min.y, max.z ); // 001
+		tr( min.x, max.y, min.z ); // 010
+		tr( min.x, max.y, max.z ); // 011
+		tr( max.x, min.y, min.z ); // 100
+		tr( max.x, min.y, max.z ); // 101
+		tr( max.x, max.y, min.z ); // 110
+		tr( max.x, max.y, max.z ); // 111
+
+		dstBox.min.set(minx, miny, minz);
+		dstBox.max.set(maxx, maxy, maxz);
+	},
+
 	translate: function ( offset ) {
 
 		this.min.add( offset );
