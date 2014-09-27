@@ -565,7 +565,6 @@ THREE.Geometry.prototype = {
 
 		var normalMatrix,
 		vertexOffset = this.vertices.length,
-		uvPosition = this.faceVertexUvs[ 0 ].length,
 		vertices1 = this.vertices,
 		vertices2 = geometry.vertices,
 		faces1 = this.faces,
