@@ -41,11 +41,14 @@ THREE.CompressedTextureLoader.prototype = {
 						height: texDatas.height,
 						format: texDatas.format,
 						mipmaps: texDatas.mipmaps
-					}
+					};
 
 					loaded += 1;
 
 					if ( loaded === 6 ) {
+
+ 						if (texDatas.mipmapCount == 1)
+ 							texture.minFilter = THREE.LinearFilter;
 
 						texture.format = texDatas.format;
 						texture.needsUpdate = true;
@@ -56,7 +59,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 				} );
 
-			}
+			};
 
 			for ( var i = 0, il = url.length; i < il; ++ i ) {
 
@@ -98,6 +101,9 @@ THREE.CompressedTextureLoader.prototype = {
 					texture.mipmaps = texDatas.mipmaps;
 
 				}
+
+				if (texDatas.mipmapCount == 1)
+	 				texture.minFilter = THREE.LinearFilter;
 
 				texture.format = texDatas.format;
 				texture.needsUpdate = true;
