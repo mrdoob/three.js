@@ -25,13 +25,16 @@ THREE.Object3D = function () {
 	var quaternion = new THREE.Quaternion();
 	var scale = new THREE.Vector3( 1, 1, 1 );
 
-	rotation.onChange( function () {
+	var onRotationChange = function () {
 		quaternion.setFromEuler( rotation, false );
-	} );
+	};
 
-	quaternion.onChange( function () {
+	var onQuaternionChange = function () {
 		rotation.setFromQuaternion( quaternion, undefined, false );
-	} );
+	};
+
+	rotation.onChange( onRotationChange );
+	quaternion.onChange( onQuaternionChange );
 
 	Object.defineProperties( this, {
 		position: {
@@ -331,9 +334,9 @@ THREE.Object3D.prototype = {
 			this.children.push( object );
 
 		} else {
-		
+
 			console.error( "THREE.Object3D.add:", object, "is not an instance of THREE.Object3D." );
-		
+
 		}
 
 		return this;
