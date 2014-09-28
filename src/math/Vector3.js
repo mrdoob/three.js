@@ -305,6 +305,38 @@ THREE.Vector3.prototype = {
 
 	},
 
+	projectCamera: function () {
+
+		var viewProjectionMatrix = new THREE.Matrix4();
+
+		return function ( vector, camera ) {
+
+			camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
+			viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
+			return this.applyProjection( viewProjectionMatrix );
+
+		};
+
+	}(),
+
+	unprojectCamera: function () {
+
+		var projectionMatrixInverse = new THREE.Matrix4();
+		var viewProjectionMatrix = new THREE.Matrix4();
+
+		return function ( vector, camera ) {
+
+			projectionMatrixInverse.getInverse( camera.projectionMatrix );
+			viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, projectionMatrixInverse );
+
+			return this.applyProjection( viewProjectionMatrix );
+
+		};
+
+	}(),
+
 	transformDirection: function ( m ) {
 
 		// input: THREE.Matrix4 affine matrix
