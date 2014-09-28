@@ -307,15 +307,14 @@ THREE.Vector3.prototype = {
 
 	projectCamera: function () {
 
-		var viewProjectionMatrix = new THREE.Matrix4();
+		var matrix;
 
-		return function ( vector, camera ) {
+		return function ( camera ) {
 
-			camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
 
-			viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
-			return this.applyProjection( viewProjectionMatrix );
+			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
+			return this.applyProjection( matrix );
 
 		};
 
@@ -323,15 +322,14 @@ THREE.Vector3.prototype = {
 
 	unprojectCamera: function () {
 
-		var projectionMatrixInverse = new THREE.Matrix4();
-		var viewProjectionMatrix = new THREE.Matrix4();
+		var matrix;
 
-		return function ( vector, camera ) {
+		return function ( camera ) {
 
-			projectionMatrixInverse.getInverse( camera.projectionMatrix );
-			viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, projectionMatrixInverse );
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
 
-			return this.applyProjection( viewProjectionMatrix );
+			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
+			return this.applyProjection( matrix );
 
 		};
 
