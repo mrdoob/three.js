@@ -18,7 +18,7 @@ THREE.ArrowHelper = ( function () {
 
 	return function ( dir, origin, length, material, headLength, headWidth ) {
 
-		if ( parseInt( material, 16 ) ) { 
+		if ( !isNaN( parseInt( material, 16 ) ) ) {
 			material = new THREE.LineBasicMaterial( { color: 0xffff00 } );
 			console.log( 'Please, for ArrowHelper use a LineBasicMaterial or LineDashedMaterial instead of the HEX' ); 
 		}
