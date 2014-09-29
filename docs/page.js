@@ -62,18 +62,18 @@ var onDocumentLoad = function ( event ) {
 	// Syntax highlighting
 
 	var styleBase = document.createElement( 'link' );
-	styleBase.href = '../../prettify/prettify.css';
+	styleBase.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.css';
 	styleBase.rel = 'stylesheet';
 
 	var styleCustom = document.createElement( 'link' );
-	styleCustom.href = '../../prettify/threejs.css';
+	styleCustom.href = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/threejs.css';
 	styleCustom.rel = 'stylesheet';
 
 	document.head.appendChild( styleBase );
 	document.head.appendChild( styleCustom );
 
 	var prettify = document.createElement( 'script' );
-	prettify.src = '../../prettify/prettify.js';
+	prettify.src = pathname.substring( 0, pathname.indexOf( 'docs' ) + 4 ) + '/prettify/prettify.js';
 
 	prettify.onload = function () {
 
