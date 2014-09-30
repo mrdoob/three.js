@@ -202,7 +202,7 @@ THREE.OBJLoader.prototype = {
 
 		var face_pattern3 = /f( +(-?\d+)\/(-?\d+)\/(-?\d+))( +(-?\d+)\/(-?\d+)\/(-?\d+))( +(-?\d+)\/(-?\d+)\/(-?\d+))( +(-?\d+)\/(-?\d+)\/(-?\d+))?/;
 
-		// f vertex//normal vertex//normal vertex//normal ... 
+		// f vertex//normal vertex//normal vertex//normal ...
 
 		var face_pattern4 = /f( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))?/
 
@@ -261,7 +261,7 @@ THREE.OBJLoader.prototype = {
 			} else if ( ( result = face_pattern2.exec( line ) ) !== null ) {
 
 				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-				
+
 				addFace(
 					result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
 					result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
@@ -353,6 +353,9 @@ THREE.OBJLoader.prototype = {
 			}
 
 			var material = new THREE.MeshLambertMaterial();
+
+			buffergeometry.computeVertexNormals();
+
 			material.name = object.material.name;
 
 			var mesh = new THREE.Mesh( buffergeometry, material );
