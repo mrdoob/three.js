@@ -1816,7 +1816,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	projectCamera: function () {
+	project: function () {
 
 		var matrix;
 
@@ -1831,7 +1831,7 @@ THREE.Vector3.prototype = {
 
 	}(),
 
-	unprojectCamera: function () {
+	unproject: function () {
 
 		var matrix;
 
@@ -7896,17 +7896,17 @@ THREE.Projector = function () {
 
 	this.projectVector = function ( vector, camera ) {
 
-		console.warn( 'THREE.Projector: .projectVector() is now vector.projectCamera().' );
+		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
 
-		vector.projectCamera( camera );
+		vector.project( camera );
 
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unprojectCamera().' );
+		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
 
-		vector.unprojectCamera( camera );
+		vector.unproject( camera );
 
 	};
 
