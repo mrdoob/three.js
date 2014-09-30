@@ -655,6 +655,12 @@ THREE.Geometry.prototype = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
+				if ( uv[ j ] === undefined ){
+
+					continue;
+
+				}
+
 				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
 
 			}
@@ -801,7 +807,7 @@ THREE.Geometry.prototype = {
 						geometryGroup = { 'id': geometryGroupCounter++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
 						this.geometryGroups[ groupHash ] = geometryGroup;
 						this.geometryGroupsList.push(geometryGroup);
-						
+
 					}
 
 				}
