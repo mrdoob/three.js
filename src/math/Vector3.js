@@ -305,7 +305,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	projectCamera: function () {
+	project: function () {
 
 		var matrix;
 
@@ -320,7 +320,7 @@ THREE.Vector3.prototype = {
 
 	}(),
 
-	unprojectCamera: function () {
+	unproject: function () {
 
 		var matrix;
 
