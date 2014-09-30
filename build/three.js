@@ -31797,7 +31797,6 @@ THREE.CameraHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
 	var camera = new THREE.Camera();
-	var projector = new THREE.Projector();
 
 	return function () {
 
@@ -31849,8 +31848,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 		function setPoint( point, x, y, z ) {
 
-			vector.set( x, y, z );
-			projector.unprojectVector( vector, camera );
+			vector.set( x, y, z ).unproject( camera );
 
 			var points = scope.pointMap[ point ];
 
@@ -34035,7 +34033,7 @@ THREE.ShadowMapPlugin = function () {
 			var p = pointsWorld[ i ];
 
 			p.copy( pointsFrustum[ i ] );
-			THREE.ShadowMapPlugin.__projector.unprojectVector( p, camera );
+			p.unproject( camera );
 
 			p.applyMatrix4( shadowCamera.matrixWorldInverse );
 
@@ -34075,8 +34073,6 @@ THREE.ShadowMapPlugin = function () {
 	};
 
 };
-
-THREE.ShadowMapPlugin.__projector = new THREE.Projector();
 
 // File:src/extras/renderers/plugins/SpritePlugin.js
 
