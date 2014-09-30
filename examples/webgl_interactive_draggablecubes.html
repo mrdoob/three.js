@@ -24,7 +24,7 @@
 		<script>
 
 			var container, stats;
-			var camera, controls, scene, projector, renderer;
+			var camera, controls, scene, renderer;
 			var objects = [], plane;
 
 			var mouse = new THREE.Vector2(),
@@ -104,8 +104,6 @@
 				plane.visible = false;
 				scene.add( plane );
 
-				projector = new THREE.Projector();
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -157,11 +155,9 @@
 
 				//
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
 
 				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
-
 
 				if ( SELECTED ) {
 
@@ -170,7 +166,6 @@
 					return;
 
 				}
-
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -206,8 +201,7 @@
 
 				event.preventDefault();
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
 
 				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 

@@ -42,7 +42,7 @@
 
 			var renderer, scene, camera, stats;
 			var pointclouds;
-			var projector, raycaster, intersects;
+			var raycaster, intersects;
 			var mouse = { x: 1, y: 1 };
 			var vector = new THREE.Vector3();
 			var intersection = null;
@@ -274,7 +274,6 @@
 
 				//
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 				raycaster.params.PointCloud.threshold = threshold;
 
@@ -326,9 +325,7 @@
 				camera.applyMatrix( rotateY );
 				camera.updateMatrixWorld( true );
 
-				vector.set( mouse.x, mouse.y, 0.1 );
-
-				projector.unprojectVector( vector, camera );
+				vector.set( mouse.x, mouse.y, 0.1 ).unproject( camera );
 
 				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 

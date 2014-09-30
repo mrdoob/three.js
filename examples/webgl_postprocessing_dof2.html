@@ -80,7 +80,6 @@ Use WEBGL Depth buffer support?
 				samples: 4
 			};
 
-			var projector;
 			var singleMaterial = false;
 			var vector = new THREE.Vector3();
 			var distance = 100;
@@ -102,16 +101,12 @@ Use WEBGL Depth buffer support?
 				camera.position.y = 150;
 				camera.position.z = 450;
 
-
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, height );
-				container.appendChild( renderer.domElement );
-
-				projector = new THREE.Projector();
-
 				renderer.sortObjects = false;
+				container.appendChild( renderer.domElement );
 
 				material_depth = new THREE.MeshDepthMaterial();
 
@@ -492,15 +487,12 @@ Use WEBGL Depth buffer support?
 				camera.position.z = Math.sin(time) * 500;
 				camera.position.y = Math.sin(time / 1.4) * 100;
 
-
 				camera.lookAt( target );
 
-				vector.set( mouseX / windowHalfX, -mouseY / windowHalfY, 1 );
+				if ( effectController.jsDepthCalculation ) {
 
-
-				if (effectController.jsDepthCalculation) {
-
-					projector.unprojectVector( vector, camera );
+					vector.set( mouseX / windowHalfX, -mouseY / windowHalfY, 1 );
+					vector.unproject( camera );
 
 					var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 

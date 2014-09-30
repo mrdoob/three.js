@@ -573,7 +573,6 @@
 		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
-		var projector = new THREE.Projector();
 		var pointerVector = new THREE.Vector3();
 
 		var point = new THREE.Vector3();
@@ -974,11 +973,12 @@
 		function intersectObjects( pointer, objects ) {
 
 			var rect = domElement.getBoundingClientRect();
-			var x = (pointer.clientX - rect.left) / rect.width;
-			var y = (pointer.clientY - rect.top) / rect.height;
-			pointerVector.set( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
+			var x = ( pointer.clientX - rect.left ) / rect.width;
+			var y = ( pointer.clientY - rect.top ) / rect.height;
 
-			projector.unprojectVector( pointerVector, camera );
+			pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
+			pointerVector.unproject( camera );
+
 			ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
 
 			var intersections = ray.intersectObjects( objects, true );

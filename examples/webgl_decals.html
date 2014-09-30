@@ -36,7 +36,7 @@
 
 		var renderer, scene, helperScene, camera, fov = 45;
 		var mesh, decal;
-		var projector, raycaster;
+		var raycaster;
 		var line;
 
 		var intersection = {
@@ -120,7 +120,6 @@
 
 			loadLeePerrySmith();
 
-			projector = new THREE.Projector();
 			raycaster = new THREE.Raycaster();
 
 			mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
@@ -174,8 +173,7 @@
 
 				if( !mesh ) return;
 		
-				mouseVector.set( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( mouseVector, camera );
+				mouseVector.set( mouse.x, mouse.y, 1 ).unproject( camera );
 
 				raycaster.set( camera.position, mouseVector.sub( camera.position ).normalize() );
 

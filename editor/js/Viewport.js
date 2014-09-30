@@ -73,26 +73,25 @@ var Viewport = function ( editor ) {
 
 	// object picking
 
-	var ray = new THREE.Raycaster();
-	var projector = new THREE.Projector();
+	var raycaster = new THREE.Raycaster();
 
 	// events
 
 	var getIntersects = function ( point, object ) {
 
-		var vector = new THREE.Vector3( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1, 0.5 );
+		var vector = new THREE.Vector3();
+		vector.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1, 0.5 );
+		vector.unproject( camera );
 
-		projector.unprojectVector( vector, camera );
-
-		ray.set( camera.position, vector.sub( camera.position ).normalize() );
+		raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 
 		if ( object instanceof Array ) {
 
-			return ray.intersectObjects( object );
+			return raycaster.intersectObjects( object );
 
 		}
 
-		return ray.intersectObject( object );
+		return raycaster.intersectObject( object );
 
 	};
 
