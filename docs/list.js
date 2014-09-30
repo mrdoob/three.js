@@ -113,14 +113,6 @@ var list = {
 			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
 		],
 
-		"Renderers / Renderables": [
-			[ "RenderableFace", "api/renderers/renderables/RenderableFace" ],
-			[ "RenderableLine", "api/renderers/renderables/RenderableLine" ],
-			[ "RenderableObject", "api/renderers/renderables/RenderableObject" ],
-			[ "RenderableSprite", "api/renderers/renderables/RenderableSprite" ],
-			[ "RenderableVertex", "api/renderers/renderables/RenderableVertex" ]
-		],
-
 		"Renderers / Shaders": [
 			[ "ShaderChunk", "api/renderers/shaders/ShaderChunk" ],
 			[ "ShaderLib", "api/renderers/shaders/ShaderLib" ],
