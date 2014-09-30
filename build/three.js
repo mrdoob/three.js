@@ -1816,6 +1816,36 @@ THREE.Vector3.prototype = {
 
 	},
 
+	projectCamera: function () {
+
+		var matrix;
+
+		return function ( camera ) {
+
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+
+			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
+			return this.applyProjection( matrix );
+
+		};
+
+	}(),
+
+	unprojectCamera: function () {
+
+		var matrix;
+
+		return function ( camera ) {
+
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+
+			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
+			return this.applyProjection( matrix );
+
+		};
+
+	}(),
+
 	transformDirection: function ( m ) {
 
 		// input: THREE.Matrix4 affine matrix
@@ -7098,7 +7128,7 @@ THREE.EventDispatcher.prototype = {
 	};
 
 	//
-	
+
 	THREE.Raycaster.prototype = {
 
 		constructor: THREE.Raycaster,
@@ -7128,6 +7158,13 @@ THREE.EventDispatcher.prototype = {
 		intersectObjects: function ( objects, recursive ) {
 
 			var intersects = [];
+
+			if ( objects instanceof Array === false ) {
+
+				console.log( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
+				return intersects;
+
+			}
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
@@ -7859,35 +7896,19 @@ THREE.Projector = function () {
 
 	this.projectVector = function ( vector, camera ) {
 
-		var viewProjectionMatrix = new THREE.Matrix4();
+		console.warn( 'THREE.Projector: .projectVector() is now vector.projectCamera().' );
 
-		return function ( vector, camera ) {
+		vector.projectCamera( camera );
 
-			camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+	};
 
-			viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+	this.unprojectVector = function ( vector, camera ) {
 
-			return vector.applyProjection( viewProjectionMatrix );
+		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unprojectCamera().' );
 
-		};
+		vector.unprojectCamera( camera );
 
-	}();
-
-	this.unprojectVector = function () {
-
-		var projectionMatrixInverse = new THREE.Matrix4();
-		var viewProjectionMatrix = new THREE.Matrix4();
-
-		return function ( vector, camera ) {
-
-			projectionMatrixInverse.getInverse( camera.projectionMatrix );
-			viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, projectionMatrixInverse );
-
-			return vector.applyProjection( viewProjectionMatrix );
-
-		};
-
-	}();
+	};
 
 	this.pickingRay = function ( vector, camera ) {
 
