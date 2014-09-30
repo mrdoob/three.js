@@ -34,6 +34,7 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/libs/tween.min.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -50,10 +51,8 @@
 			var dae;
 
 			var kinematics;
-			var jointIndex;
-			var joint;
-			var jointValue;
-			var jointStep;
+			var kinematicsTween;
+			var tweenParameters = {};
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
@@ -65,10 +64,6 @@
 				dae.updateMatrix();
 
 				kinematics = collada.kinematics;
-				jointIndex = 0;
-				joint = kinematics.joints[jointIndex];
-				jointValue = joint.limits.min;
-				jointStep = ( joint.limits.max - joint.limits.min ) / 100.0;
 
 				init();
 				animate();
@@ -132,6 +127,7 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
+				setupTween();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
@@ -142,35 +138,43 @@
 
 			}
 
-			function moveJoints() {
+			function setupTween() {
 
-				if ( jointValue >= joint.limits.max || joint.static ) {
+				var duration = getRandomInt(1000, 5000);
 
-					if ( !joint.static ) {
-						kinematics.setJointValue( jointIndex, joint.zeroPosition );
-					}
+				var target = {}
 
-					jointIndex++;
+				for ( var i = 0; i < kinematics.joints.length; i++ ) {
 
-					// go back to the beginning if we're past the number of joints
-					if ( jointIndex >= kinematics.joints.length ) {
+						var joint = kinematics.joints[ i ];
 
-						jointIndex = 0;
+						var old = tweenParameters[ i ];
 
-					} else {
+						var position = old ? old : joint.zeroPosition
 
-						joint = kinematics.joints[ jointIndex ];
-						jointValue = joint.limits.min;
-						jointStep = ( joint.limits.max - joint.limits.min ) / 100.0;
+						tweenParameters[ i ] = position
 
-					}
+						target[ i ] = getRandomInt(joint.limits.min, joint.limits.max)
 
 				}
 
-				jointValue += jointStep;
-				kinematics.setJointValue( jointIndex, jointValue );
+				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-			};
+				kinematicsTween.onUpdate(function() {
+
+					for ( var i = 0; i < kinematics.joints.length; i++ ) {
+
+						kinematics.setJointValue( i, this[ i ] );
+
+					}
+
+				} )
+
+				kinematicsTween.start();
+
+				setTimeout( setupTween, duration );
+
+			}
 
 			function onWindowResize() {
 
@@ -189,6 +193,7 @@
 
 				render();
 				stats.update();
+				TWEEN.update();
 
 			}
 
@@ -206,9 +211,16 @@
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
 				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
-				moveJoints();
-
 				renderer.render( scene, camera );
+
+			}
+
+			// Returns a random integer between min (inclusive) and max (inclusive)
+			// Using Math.round() will give you a non-uniform distribution!
+
+			function getRandomInt( min, max ) {
+
+					return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
 
 			}
 
