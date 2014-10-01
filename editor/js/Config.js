@@ -3,6 +3,8 @@ var Config = function () {
 	var name = 'threejs-editor';
 
 	var storage = {
+		'autosave': true,
+	
 		'theme': 'css/light.css',
 		'camera/position': [ 500, 250, 500 ],
 		'camera/target': [ 0, 0, 0 ],

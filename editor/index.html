@@ -142,16 +142,26 @@
 				var timeout;
 
 				var saveState = function ( scene ) {
+				
+					if ( editor.config.getKey( 'autosave' ) === false ) {
+
+						return;
+
+					}
 
 					clearTimeout( timeout );
 
-					editor.signals.savingStarted.dispatch();
-
 					timeout = setTimeout( function () {
 
-						editor.storage.set( editor.scene.toJSON() );
+						editor.signals.savingStarted.dispatch();
 
-						editor.signals.savingFinished.dispatch();
+						timeout = setTimeout( function () {
+
+							editor.storage.set( editor.scene.toJSON() );
+
+							editor.signals.savingFinished.dispatch();
+
+						}, 100 );
 
 					}, 1000 );
 
