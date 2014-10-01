@@ -53,17 +53,18 @@ input.Number {
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
 	}
 
 	#menubar .menu.right {
 		float: right;
-		width: 100px;
+		cursor: auto;
 		text-align: right;
 	}
 
 		#menubar .menu .title {
+			display: inline-block;
 			color: #888;
 			margin: 0px;
 			padding: 8px;
@@ -71,6 +72,7 @@ input.Number {
 
 		#menubar .menu .options {
 			display: none;
+			position: absolute;
 			padding: 5px 0px;
 			background: #eee;
 			width: 140px;

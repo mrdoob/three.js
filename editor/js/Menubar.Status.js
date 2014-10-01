@@ -5,18 +5,18 @@ Menubar.Status = function ( editor ) {
 
 	var title = new UI.Panel();
 	title.setClass( 'title' );
-	title.setTextContent( '' );
+	title.setTextContent( '...' );
 	container.add( title );
 
 	editor.signals.savingStarted.add( function () {
 
-		title.setTextContent( '...' );
+		title.setTextContent( 'Saving' );
 
 	} );
 
 	editor.signals.savingFinished.add( function () {
 
-		title.setTextContent( '' );
+		title.setTextContent( 'Saved' );
 
 	} );
 

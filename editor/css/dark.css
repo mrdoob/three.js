@@ -45,24 +45,25 @@ input.Number {
 	position: absolute;
 	width: 100%;
 	height: 32px;
-	background-color: #111;
+	background: #111;
 	padding: 0px;
 	margin: 0px;
 }
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
 	}
 
 	#menubar .menu.right {
 		float: right;
-		width: 100px;
+		cursor: auto;
 		text-align: right;
 	}
 
 		#menubar .menu .title {
+			display: inline-block;
 			color: #888;
 			margin: 0px;
 			padding: 8px;
@@ -70,10 +71,10 @@ input.Number {
 
 		#menubar .menu .options {
 			display: none;
+			position: absolute;
 			padding: 5px 0px;
-			background-color: #111;
+			background: #111;
 			width: 140px;
-			border-top: solid 1px #1D1D1D;
 		}
 
 		#menubar .menu:hover .options {
