@@ -371,9 +371,9 @@ THREE.SceneExporter.prototype = {
 
 				'\t' + LabelString( getGeometryName( g ) ) + ': {',
 				'	"type"    : "sphere",',
-				'	"radius"  : ' 		 + g.radius + ',',
-				'	"widthSegments"  : ' + g.widthSegments + ',',
-				'	"heightSegments" : ' + g.heightSegments,
+				'	"radius"  : ' 		 + g.parameters.radius + ',',
+				'	"widthSegments"  : ' + g.parameters.widthSegments + ',',
+				'	"heightSegments" : ' + g.parameters.heightSegments,
 				'}'
 
 				];
@@ -384,9 +384,9 @@ THREE.SceneExporter.prototype = {
 
 				'\t' + LabelString( getGeometryName( g ) ) + ': {',
 				'	"type"    : "cube",',
-				'	"width"  : '  + g.width  + ',',
-				'	"height"  : ' + g.height + ',',
-				'	"depth"  : '  + g.depth  + ',',
+				'	"width"  : '  + g.parameters.width  + ',',
+				'	"height"  : ' + g.parameters.height + ',',
+				'	"depth"  : '  + g.parameters.depth  + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
 				'	"heightSegments" : ' + g.heightSegments + ',',
 				'	"depthSegments" : '  + g.depthSegments,
