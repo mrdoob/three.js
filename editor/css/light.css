@@ -71,8 +71,8 @@ input.Number {
 		}
 
 		#menubar .menu .options {
-			display: none;
 			position: absolute;
+			display: none;
 			padding: 5px 0px;
 			background: #eee;
 			width: 140px;
