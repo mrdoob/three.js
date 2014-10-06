@@ -74,9 +74,9 @@ THREE.WireframeHelper = function ( object, hex ) {
 			var offsets = object.geometry.offsets;
 			var numEdges = 0;
 
-			if (!offsets.length) {
+			if ( offsets.length === 0 ) {
 
-				offsets = [{count : indices.length, index : 0, start : 0}];
+				offsets = [ { count : indices.length, index : 0, start : 0 } ];
 
 			}
 
