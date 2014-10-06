@@ -24,30 +24,33 @@
 		<h3>Example</h3>
 		<code>
 		var geometry = new THREE.BufferGeometry();
-
 		// create a simple square shape. We duplicate the top left and bottom right
 		// vertices because each vertex needs to appear once per triangle. 
-		var vertexCount = 6;
-		var vertices = new Float32Array( vertexCount * 3 ); // three components per vertex
-		var vertexPositions = [ [-1, 1, 0], [1, 1, 0], [1, -1, 0], 
-								[-1, 1, 0], [1,-1, 0], [-1,-1, 0] ];
-		
+		var vertexPositions = [ 
+			[-1.0, -1.0,  1.0],
+			[ 1.0, -1.0,  1.0],
+			[ 1.0,  1.0,  1.0],
+
+			[ 1.0,  1.0,  1.0],
+			[-1.0,  1.0,  1.0],
+			[-1.0, -1.0,  1.0]
+		];
+		var vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex
+
 		// components of the position vector for each vertex are stored
 		// contiguously in the buffer.
-		for ( var i = 0; i < vertexPosition.length; i++ )
+		for ( var i = 0; i < vertexPositions.length; i++ )
 		{
-			vertices[ i + 0 ] = vertexPositions[i][0];
-			vertices[ i + 1 ] = vertexPositions[i][1];
-			vertices[ i + 2 ] = vertexPositions[i][2];
+			vertices[ i*3 + 0 ] = vertexPositions[i][0];
+			vertices[ i*3 + 1 ] = vertexPositions[i][1];
+			vertices[ i*3 + 2 ] = vertexPositions[i][2];
 		}
 
 		// itemSize = 3 because there are 3 values (components) per vertex
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
-		View the source of the fromGeometry method for 
 
 		<h3>Accessing attributes</h3>
 		<p>
