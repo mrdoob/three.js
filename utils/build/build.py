@@ -42,21 +42,21 @@ def main(argv=None):
 		sourcemap = sourcemapping = sourcemapargs = ''
 
 	fd, path = tempfile.mkstemp()
-	tmp = open(path, 'w')
+	tmp = open(path, 'w', encoding="utf-8")
 	sources = []
 		
 	if args.amd:
 		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n')
 
 	for include in args.include:
-		with open('includes/' + include + '.json','r') as f:
+		with open('includes/' + include + '.json','r', encoding="utf-8") as f:
 			files = json.load(f)
 		for filename in files:
 			tmp.write('// File:' + filename)
 			tmp.write('\n\n')
 			filename = '../../' + filename
 			sources.append(filename)
-			with open(filename, 'r') as f:
+			with open(filename, 'r', encoding="utf-8") as f:
 				if filename.endswith(".glsl"):
 					tmp.write('THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + '\'] = "') 
 					tmp.write(f.read().replace('\n','\\n'))
@@ -79,7 +79,7 @@ def main(argv=None):
 	else:
 		backup = ''
 		if os.path.exists(output):
-			with open(output,'r') as f: backup = f.read()
+			with open(output, 'r', encoding="utf-8") as f: backup = f.read()
 			os.remove(output)
 
 		externs = ' --externs '.join(args.externs)
@@ -90,11 +90,11 @@ def main(argv=None):
 		# header
 
 		if os.path.exists(output):
-			with open(output,'r') as f: text = f.read()
-			with open(output,'w') as f: f.write('// threejs.org/license\n' + text + sourcemapping)
+			with open(output, 'r', encoding="utf-8") as f: text = f.read()
+			with open(output, 'w', encoding="utf-8") as f: f.write('// threejs.org/license\n' + text + sourcemapping)
 		else:
 			print("Minification with Closure compiler failed. Check your Java runtime version.")
-			with open(output,'w') as f: f.write(backup)
+			with open(output, 'w', encoding="utf-8") as f: f.write(backup)
 
 	os.close(fd)
 	os.remove(path)
