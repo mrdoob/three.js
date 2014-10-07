@@ -51,7 +51,9 @@
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
+		<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>
 
+		
 		<h3>Accessing attributes</h3>
 		<p>
 		WebGL stores data associated with individual vertices of a geometry in <emph>attributes</emph>. 
@@ -60,7 +62,7 @@
 		up this information into typed array buffers and sending this data to the shader. With 
 		BufferGeometry, all of this data is stored in buffers associated with an individual attributes.
 		This means that to get the position data associated with a vertex (for instance), you must call
-		getAttribute to access the 'position' [page:BufferAttribute attribute], then access the individual 
+		[member:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual 
 		x, y, and z coordinates of the position.  
 		</p>
 		<p>
@@ -68,24 +70,24 @@
 		</p>
 		<h4>[page:BufferAttribute position] (itemSize: 3)</h4>
 		<div>
-		Stores the x, y, and z coordinates of each vertex in this geometry. Set by fromGeometry().
+		Stores the x, y, and z coordinates of each vertex in this geometry. Set by [member:.fromGeometry]().
 		</div>
 
 		<h4>[page:BufferAttribute normal] (itemSize: 3)</h4>
 		<div>
 		Stores the x, y, and z components of the face or vertex normal vector of each vertex in this geometry.
-		Set by fromGeometry().
+		Set by [member:.fromGeometry]().
 		</div>
 
 		<h4>[page:BufferAttribute color] (itemSize: 3)</h4>
 		<div>
 		Stores the red, green, and blue channels of vertex color of each vertex in this geometry.
-		Set by fromGeometry().
+		Set by [member:.fromGeometry]().
 		</div>
 
 		<h4>[page:BufferAttribute tangent] (itemSize: 3)</h4>
 		<div>
-		Stores the x, y, and z components of the tangent vector of each vertex in this geometry. Set by computeTangents().
+		Stores the x, y, and z components of the tangent vector of each vertex in this geometry. Set by [member:.computeTangents]().
 		</div>
 
 		<h4>[page:BufferAttribute index] (itemSize: 3)</h4>
@@ -157,67 +159,72 @@
 
 		<h3>.[page:boolean hasTangents]</h3>
 		<div>
-		True if BufferGeometry has tangents. Set in [page:BufferGeometry BufferGeometry.computeTangents].
+		True if BufferGeometry has tangents. Set in [member:.computeTangents].
 		</div> 
 
 		<h2>Methods</h2>
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 		
-		<h3>addAttribute( [page:String name], [page:BufferAttribute: attribute] )</h3>
+		<h3>.[page:null addAttribute]( [page:String name], [page:BufferAttribute attribute] )</h3>
 		<div>
 		Adds an attribute to this geometry. Use this rather than the attributes property, 
 		because an internal array of attributes is maintained to speed up iterating over
 		attributes.
 		</div>
 
-		<h3>addDrawCall( [page:Integer start], [page:Integer count], [page:Integer indexOffset] )</h3>
+		<h3>.[page:null addDrawCall]( [page:Integer start], [page:Integer count], [page:Integer indexOffset] )</h3>
 		<div>
 		Adds a draw call to this geometry; see the drawcalls property for details.
 		</div>
 
 
-		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
+		<h3>.[page:null applyMatrix]( [page:Matrix4 matrix] )</h3>
 		<div>
 		Bakes matrix transform directly into vertex coordinates.
 		</div>
 
-		<h3>.computeVertexNormals()</h3>
+		<h3>.[page:null computeVertexNormals]()</h3>
 		<div>
 		Computes vertex normals by averaging face normals.<br />
 		</div>
 
-		<h3>.computeTangents()</h3>
+		<h3>.[page:null computeTangents]()</h3>
 		<div>
 		Computes vertex tangents.<br />
 		Based on [link:http://www.terathon.com/code/tangent.html]<br />
 		Geometry must have vertex [page:UV UVs] (layer 0 will be used).
 		</div>
 
-		<h3>.computeBoundingBox()</h3>
+		<h3>.[page:null computeBoundingBox]()</h3>
 		<div>
 		Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.<br />
 		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</div>
 
-		<h3>.computeBoundingSphere()</h3>
+		<h3>.[page:null computeBoundingSphere]()</h3>
 		<div>
 		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.<br />
 		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</div>
 		
-		<h3>.dispose()</h3>
+		<h3>.[page:null dispose]()</h3>
 		<div>
 		Disposes the object from memory. <br />
 		You need to call this when you want the bufferGeometry removed while the application is running.
 		</div>
 
-		<h3>getAttribute( [page:String name] )</h3>
+		<h3>.[page:null fromGeometry]( [page:Geometry] )</h3>
+		<div>
+		Populates this BufferGeometry with data from a [page:Geometry] object.
+		</div>
+
+		<h3>.[page:BufferAttribute getAttribute]( [page:String name] )</h3>
 		<div>
 		Returns the [page:BufferAttribute attribute] with the specified name.
 		</div>
 
-		<h3>.normalizeNormals()</h3>
+		<h3>.[page:null normalizeNormals]()</h3>
 		<div>
 		Every normal vector in a geometry will have a magnitude of 1.
 		This will correct lighting on the geometry surfaces.
