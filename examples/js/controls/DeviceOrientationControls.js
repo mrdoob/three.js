@@ -15,7 +15,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	this.freeze = true;
 
-	this.deviceOrientation = {};
+	this.deviceOrientation = { beta: 90 };
 
 	this.screenOrientation = 0;
 
