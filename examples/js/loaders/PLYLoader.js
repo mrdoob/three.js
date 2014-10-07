@@ -19,15 +19,21 @@
  */
 
 
-THREE.PLYLoader = function ( propertyNameTranslation ) {
+THREE.PLYLoader = function () {
 
-	this.propertyNameTranslation = propertyNameTranslation === undefined? {} : propertyNameTranslation;
+	this.propertyNameMapping = {};
 	
 };
 
 THREE.PLYLoader.prototype = {
 
 	constructor: THREE.PLYLoader,
+	
+	setPropertyNameMapping: function ( mapping ) {
+	
+		this.propertyNameMapping = mapping;
+	
+	},
 
 	load: function ( url, callback ) {
 
@@ -115,7 +121,7 @@ THREE.PLYLoader.prototype = {
 		var currentElement = undefined;
 		var lineType, lineValues;
 
-		function make_ply_element_property(propertValues, propertyNameTranslation) {
+		function make_ply_element_property(propertValues, propertyNameMapping) {
 			
 			var property = Object();
 
@@ -133,8 +139,8 @@ THREE.PLYLoader.prototype = {
 
 			}
 			
-			if ( property.name in propertyNameTranslation ) {
-				property.name = propertyNameTranslation[property.name];
+			if ( property.name in propertyNameMapping ) {
+				property.name = propertyNameMapping[property.name];
 			}
 
 			return property
@@ -182,7 +188,7 @@ THREE.PLYLoader.prototype = {
 				
 			case "property":
 
-				currentElement.properties.push( make_ply_element_property( lineValues, this.propertyNameTranslation ) );
+				currentElement.properties.push( make_ply_element_property( lineValues, this.propertyNameMapping ) );
 
 				break;
 				
