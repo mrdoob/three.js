@@ -218,6 +218,7 @@ def save_settings_export(properties):
     "option_uv_coords"       : properties.option_uv_coords,
     "option_faces"           : properties.option_faces,
     "option_vertices"        : properties.option_vertices,
+    "option_vertex_groups"   : properties.option_vertex_groups,
 
     "option_skinning"        : properties.option_skinning,
     "option_bones"           : properties.option_bones,
@@ -242,6 +243,7 @@ def restore_settings_export(properties):
         settings = json.load(f)
 
     properties.option_vertices = settings.get("option_vertices", True)
+    properties.option_vertex_groups = settings.get("option_vertex_groups", False)
     properties.option_vertices_truncate = settings.get("option_vertices_truncate", False)
     properties.option_faces = settings.get("option_faces", True)
     properties.option_normals = settings.get("option_normals", True)
@@ -286,6 +288,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     filename_ext = ".js"
 
     option_vertices = BoolProperty(name = "Vertices", description = "Export vertices", default = True)
+    option_vertex_groups = BoolProperty(name = "Vertex groups", description = "Export vertex groups", default = True)
     option_vertices_deltas = BoolProperty(name = "Deltas", description = "Delta vertices", default = False)
     option_vertices_truncate = BoolProperty(name = "Truncate", description = "Truncate vertices", default = False)
 
@@ -355,6 +358,10 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         # row.enabled = self.properties.option_vertices
         # row.prop(self.properties, "option_vertices_deltas")
         row.prop(self.properties, "option_vertices_truncate")
+        layout.separator()
+
+        row = layout.row()
+        row.prop(self.properties, "option_vertex_groups")
         layout.separator()
 
         row = layout.row()
