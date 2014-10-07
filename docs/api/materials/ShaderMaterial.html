@@ -11,10 +11,16 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">Material rendered with custom shaders</div>
+		<div class="desc">Material rendered with custom shaders. A shader is a small program written in [link:https://www.opengl.org/documentation/glsl/ GLSL] to run on the GPU. You may want to use a custom shader if you need to: 
+		<ul>
+			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
+			<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>
+			<li>associate custom data with individual vertices ("custom attributes")</li>
+		</ul>
+		Note that a ShaderMaterial will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the vertexShader and fragmentShader properties must be compiled and run on the GPU using WebGL. 
+		</div>
 
-
-		<h2>Example</h2>
+		<h3>Example</h3>
 
 		<code>
 		var material = new THREE.ShaderMaterial( {
@@ -29,6 +35,157 @@
 		} );
 		</code>
 
+		<h3>Vertex shaders and fragment shaders</h3>
+		<p>You can specify two different types of shaders for each material: 
+		<ul>
+			<li>The *vertex shader* runs first; it recieves *attributes*, calculates/manipulates the position of each individual vertex, and passes additional data (*varying*s) to the fragment shader.</li>
+			<li>The *fragment shader* runs second; it sets the color of each individual "fragment" (pixel) rendered to the screen.</li>
+		</ul>
+		</p>
+		<h3>Built-in attributes and uniforms</h3>
+		<p>
+		[page:WebGLRenderer] provides many attributes and uniforms to shaders by default; definitions of these variables are prepended to your *fragmentShader* and *vertexShader* code by [page:WebGLProgram] when the shader is compiled; you don't need to declare them yourself. These variables are described in [page:WebGLProgram].
+		</p>
+		<p>
+		Some of these uniforms or attributes (e.g. those pertaining lighting, fog, etc.) require properties to be set on the material in order for [page:WebGLRenderer] to copy the appropriate values to the GPU---make sure to set these flags if you want to use these features in your own shader.
+		</p>
+		<p>
+		If you don't want [page:WebGLProgram] to add anything to your shader code, you can use [page:RawShaderMaterial] instead of this class.
+		</p>
+
+		<h3>Custom attributes and uniforms</h3>
+		<p>
+		There are two ways to pass data to the shaders: uniforms and attributes.
+		<ul>
+			<li>*Uniforms* are variables that have the same value for all vertices---lighting, fog, and shadow maps are examples of data that would be stored in uniforms.</li>
+			<li>*Attributes* are variables associated with each vertex---for instance, the vertex position, face normal, and vertex color are all examples of data that would be stored in attributes.</li>
+		</ul>
+		Custom attributes and uniforms must be declared both in your GLSL shader code (within *vertexShader* and *fragmentShader*), <emph>and</emph> in the *attributes* and *uniforms* properties of your ShaderMaterial. The declaration in the material is necessary to ensure [page:WebGLRenderer] knows to pass your attribute/uniform data in a buffer to the GPU when the shader is run.
+		</p>
+		<p>
+		To declare a custom attribute, use the *attributes* property of the material: 
+		<code>
+		attributes: {
+			vertexOpacity: { type: 'f', value: [] }
+		}
+		</code>
+		Each attribute must have a *type* property and a *value* property. 
+		<table>
+			<caption>Attribute types</caption>
+			<thead>
+				<tr>
+					<th>Attribute *type* string</th>
+					<th>GLSL type</th>
+					<th>JavaScript type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>'f'</code></td>
+					<td>float</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td><code>'v2'</code></td>
+					<td>vec2</td>
+					<td>[page:Vector2 THREE.Vector2]</td>
+				</tr>
+				<tr>
+					<td><code>'v3'</code></td>
+					<td>vec3</td>
+					<td>[page:Vector3 THREE.Vector3]</td>
+				</tr>
+				<tr>
+					<td><code>'c'</code></td>
+					<td>vec3</td>
+					<td>[page:Color THREE.Color]</td>
+				</tr>
+				<tr>
+					<td><code>'v4'</code></td>
+					<td>vec4</td>
+					<td>[page:Vector4 THREE.Vector4]</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		[page:BufferGeometry] and [page:Geometry] differ in their handling of attribute data. When using [page:Geometry], attribute data is specified directly on the <emph>material</emph>, using the attribute's *value* array; each element of *value* should correspond to one vertex. When using [page:BufferGeometry], attribute data is stored within a [page:BufferAttribute] on the geometry itself, and the *value* within the material is ignored. See [page:BufferGeometry] for details.
+		</p>
+
+		<p>
+		To declare a custom uniform, use the *uniforms* property:
+		<code>
+		uniforms: {
+			time: { type: "f", value: 1.0 },
+			resolution: { type: "v2", value: new THREE.Vector2() }
+		}
+		</code> 
+		Each uniform must have a *type* and a *value*:
+		<table>
+			<caption>Uniform types</caption>
+			<thead>
+				<tr>
+					<th>Uniform *type* string</th>
+					<th>GLSL type</th>
+					<th>JavaScript type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>'i', '1i'</code></td>
+					<td>int</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td><code>'f', '1f'</code></td>
+					<td>float</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td><code>'v2'</code></td>
+					<td>vec2</td>
+					<td>[page:Vector2 THREE.Vector2]</td>
+				</tr>
+				<tr>
+					<td><code>'v3'</code></td>
+					<td>vec3</td>
+					<td>[page:Vector3 THREE.Vector3]</td>
+				</tr>
+				<tr>
+					<td><code>'c'</code></td>
+					<td>vec3</td>
+					<td>[page:Color THREE.Color]</td>
+				</tr>
+
+				<tr>
+					<td><code>'v4'</code></td>
+					<td>vec4</td>
+					<td>[page:Vector4 THREE.Vector4]</td>
+				</tr>
+
+				<tr>
+					<td><code>'m3'</code></td>
+					<td>mat3</td>
+					<td>[page:Matrix3 THREE.Matrix3]</td>
+				</tr>
+
+				<tr>
+					<td><code>'m4'</code></td>
+					<td>mat4</td>
+					<td>[page:Matrix4 THREE.Matrix4]</td>
+				</tr>
+				<tr>
+					<td><code>'t'</code></td>
+					<td>sampler2D</td>
+					<td>[page:Texture THREE.Texture]</td>
+				</tr>
+				<tr>
+					<td><code>'t'</code></td>
+					<td>samplerCube</td>
+					<td>[page:Texture THREE.CubeTexture]</td>
+				</tr>
+			</tbody>
+		</table>
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -40,77 +197,77 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:object uniforms]</h3>
+		<h3>.[page:Object uniforms]</h3>
 		<div>
 		Uniforms defined inside GLSL shader code.
 		</div> 
 
-		<h3>.[page:string fragmentShader]</h3>
+		<h3>.[page:String fragmentShader]</h3>
 		<div>
 		Fragment shader GLSL code.  This is the actual code for the shader.  In the example above the code is retrieved from DOM elements emnbedded directly in the page although other methods can be used including specifying a string directly.  
 		</div> 
 
-		<h3>.[page:string vertexShader]</h3>
+		<h3>.[page:String vertexShader]</h3>
 		<div>
 		Vertex shader GLSL code.  This is the actual code for the shader.  In the example above the code is retrieved from DOM elements embedded directly in the page although other methods can be used including specifying a string directly.  
 		</div> 
 
-		<h3>.[page:boolean morphTargets]</h3>
+		<h3>.[page:Boolean morphTargets]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:boolean lights]</h3>
+		<h3>.[page:Boolean lights]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:boolean morphNormals]</h3>
+		<h3>.[page:Boolean morphNormals]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:boolean wireframe]</h3>
+		<h3>.[page:Boolean wireframe]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:number vertexColors]</h3>
+		<h3>.[page:Number vertexColors]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:boolean skinning]</h3>
+		<h3>.[page:Boolean skinning]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:boolean fog]</h3>
+		<h3>.[page:Boolean fog]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:object attributes]</h3>
+		<h3>.[page:Object attributes]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:number shading]</h3>
+		<h3>.[page:Number shading]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:number linewidth]</h3>
+		<h3>.[page:Number linewidth]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:number wireframeLinewidth]</h3>
+		<h3>.[page:Number wireframeLinewidth]</h3>
 		<div>
 		todo
 		</div> 
 
-		<h3>.[page:object defines]</h3>
+		<h3>.[page:Object defines]</h3>
 		<div>
 		todo
 		</div> 
