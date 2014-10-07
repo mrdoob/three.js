@@ -71,23 +71,23 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 			var vertices = object.geometry.attributes.position.array;
 			var indices = object.geometry.attributes.index.array;
-			var offsets = object.geometry.offsets;
+			var drawcalls = object.geometry.drawcalls;
 			var numEdges = 0;
 
-			if ( offsets.length === 0 ) {
+			if ( drawcalls.length === 0 ) {
 
-				offsets = [ { count : indices.length, index : 0, start : 0 } ];
+				drawcalls = [ { count : indices.length, index : 0, start : 0 } ];
 
 			}
 
 			// allocate maximal size
 			var edges = new Uint32Array( 2 * indices.length );
 
-			for ( var o = 0, ol = offsets.length; o < ol; ++ o ) {
+			for ( var o = 0, ol = drawcalls.length; o < ol; ++ o ) {
 
-				var start = offsets[ o ].start;
-				var count = offsets[ o ].count;
-				var index = offsets[ o ].index;
+				var start = drawcalls[ o ].start;
+				var count = drawcalls[ o ].count;
+				var index = drawcalls[ o ].index;
 
 				for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -119,7 +119,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 			for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
 				for ( var j = 0; j < 2; j ++ ) {
-
+o
 					var index = 6 * i + 3 * j;
 					var index2 = 3 * edges[ 2 * i + j];
 					coords[ index + 0 ] = vertices[ index2 ];
