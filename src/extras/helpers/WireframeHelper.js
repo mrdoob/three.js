@@ -119,7 +119,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 			for ( var i = 0, l = numEdges; i < l; i ++ ) {
 
 				for ( var j = 0; j < 2; j ++ ) {
-o
+
 					var index = 6 * i + 3 * j;
 					var index2 = 3 * edges[ 2 * i + j];
 					coords[ index + 0 ] = vertices[ index2 ];
