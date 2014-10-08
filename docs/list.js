@@ -29,7 +29,6 @@ var list = {
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
-			[ "Projector", "api/core/Projector" ],
 			[ "Raycaster", "api/core/Raycaster" ],
 		],
 
