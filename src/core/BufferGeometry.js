@@ -5,7 +5,8 @@
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.GeometryIdCount ++;
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';

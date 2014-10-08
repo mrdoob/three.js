@@ -7,7 +7,8 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DIdCount ++;
+	Object.defineProperty( this, 'id', { value: THREE.Object3DIdCount ++ } );
+
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
