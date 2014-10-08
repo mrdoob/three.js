@@ -7912,18 +7912,8 @@ THREE.Projector = function () {
 	};
 
 	this.pickingRay = function ( vector, camera ) {
-
-		// set two vectors with opposing z values
-		vector.z = - 1.0;
-		var end = new THREE.Vector3( vector.x, vector.y, 1.0 );
-
-		this.unprojectVector( vector, camera );
-		this.unprojectVector( end, camera );
-
-		// find direction from vector to end
-		end.sub( vector ).normalize();
-
-		return new THREE.Raycaster( vector, end );
+	
+		console.error( 'THREE.Projector: .pickingRay() has been removed.' );
 
 	};
 
@@ -9311,6 +9301,8 @@ THREE.Geometry.prototype = {
 			}
 
 		}
+		
+		this.computeFaceNormals();
 
 		if ( geometry.boundingBox !== null ) {
 
