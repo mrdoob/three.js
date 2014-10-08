@@ -4,6 +4,8 @@
 
 THREE.Projector = function () {
 
+	console.warn( 'THREE.Projector has been moved to /examples/renderers/Projector.js.' );
+
 	this.projectVector = function ( vector, camera ) {
 
 		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );

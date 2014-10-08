@@ -45,7 +45,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var prevrectx1 = Infinity, prevrecty1 = Infinity;
 	var prevrectx2 = 0, prevrecty2 = 0;
 
-	var renderer = new THREE.Renderer();
+	var projector = new THREE.Projector();
 
 	var vector1 = new THREE.Vector3();
 	var vector2 = new THREE.Vector3();
@@ -140,7 +140,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		if ( this.autoClear === true ) this.clear();
 
-		var renderData = renderer.projectScene( scene, camera, false, false );
+		var renderData = projector.projectScene( scene, camera, false, false );
 		var elements = renderData.elements;
 
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
