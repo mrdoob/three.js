@@ -655,10 +655,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			for ( var name in geometry.attributes ) {
+			
+				var attribute = geometry.attributes[ name ];
 
-				if ( geometry.attributes[ name ].buffer !== undefined ) {
+				if ( attribute.buffer !== undefined ) {
 
-					_gl.deleteBuffer( geometry.attributes[ name ].buffer );
+					_gl.deleteBuffer( attribute.buffer );
+					delete attribute.buffer;
 
 				}
 
@@ -822,11 +825,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer initialization
 
-	function initCustomAttributes ( geometry, object ) {
+	function initCustomAttributes ( object ) {
+
+		var geometry = object.geometry;
+		var material = object.material;
 
 		var nvertices = geometry.vertices.length;
-
-		var material = object.material;
 
 		if ( material.attributes ) {
 
@@ -881,7 +885,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglParticleCount = nvertices;
 
-		initCustomAttributes ( geometry, object );
+		initCustomAttributes( object );
 
 	};
 
@@ -895,7 +899,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglLineCount = nvertices;
 
-		initCustomAttributes ( geometry, object );
+		initCustomAttributes( object );
 
 	};
 
