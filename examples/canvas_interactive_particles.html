@@ -27,6 +27,8 @@
 			var container, stats;
 			var camera, scene, renderer;
 
+			var raycaster;
+
 			var PI2 = Math.PI * 2;
 
 			var programFill = function ( context ) {
@@ -79,6 +81,10 @@
 					scene.add( particle );
 
 				}
+				
+				//
+				
+				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
@@ -147,7 +153,7 @@
 
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

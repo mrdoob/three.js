@@ -27,6 +27,8 @@
 
 			var container, stats;
 			var camera, scene, renderer;
+			
+			var raycaster;
 
 			init();
 			animate();
@@ -67,6 +69,10 @@
 					scene.add( object );
 
 				}
+				
+				//
+				
+				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
@@ -104,7 +110,7 @@
 				vector.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
 				vector.unproject( camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

@@ -161,6 +161,8 @@ THREE.Geometry.prototype = {
 			}
 
 		}
+		
+		this.computeFaceNormals();
 
 		if ( geometry.boundingBox !== null ) {
 
