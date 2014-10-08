@@ -614,6 +614,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry.__webglLineBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineBuffer );
 
 		if ( geometry.__webglLineDistanceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineDistanceBuffer );
+		
 		// custom attributes
 
 		if ( geometry.__webglCustomAttributesList !== undefined ) {
@@ -3604,11 +3605,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Mesh ) {
 
-				initGeometryGroups(scene, object, geometry);
+				initGeometryGroups( scene, object, geometry );
 
 			} else if ( object instanceof THREE.Line ) {
 
-				if ( ! geometry.__webglVertexBuffer ) {
+				if ( geometry.__webglVertexBuffer === undefined ) {
 
 					createLineBuffers( geometry );
 					initLineBuffers( geometry, object );
@@ -3621,7 +3622,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				if ( ! geometry.__webglVertexBuffer ) {
+				if ( geometry.__webglVertexBuffer === undefined ) {
 
 					createParticleBuffers( geometry );
 					initParticleBuffers( geometry, object );
@@ -3637,6 +3638,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.__webglActive === undefined) {
 
+			object.__webglActive = true;
+
 			if ( object instanceof THREE.Mesh ) {
 
 				if ( geometry instanceof THREE.BufferGeometry ) {
@@ -3645,16 +3648,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
-					for ( var i = 0,l = geometry.geometryGroupsList.length; i<l;i++ ) {
+					for ( var i = 0,l = geometry.geometryGroupsList.length; i < l; i ++ ) {
 
-						var geometryGroup = geometry.geometryGroupsList[ i ];
-						addBuffer( _webglObjects, geometryGroup, object );
+						addBuffer( _webglObjects, geometry.geometryGroupsList[ i ], object );
 
 					}
+
 				}
 
-			} else if ( object instanceof THREE.Line ||
-						object instanceof THREE.PointCloud ) {
+			} else if ( object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
 				addBuffer( _webglObjects, geometry, object );
 
@@ -3664,20 +3666,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			object.__webglActive = true;
-
 		}
 
 	};
 
 	function initGeometryGroups( scene, object, geometry ) {
 
-		var g, geometryGroup, material,addBuffers = false;
-		material = object.material;
+		var g, geometryGroup, material = object.material, addBuffers = false;
 
-		if ( geometry.geometryGroups === undefined || geometry.groupsNeedUpdate ) {
+		if ( geometry.geometryGroups === undefined || geometry.groupsNeedUpdate === true ) {
 
-			delete _webglObjects[object.id];
+			delete _webglObjects[ object.id ];
+
 			geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
 			geometry.groupsNeedUpdate = false;
 
@@ -3691,7 +3691,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// initialise VBO on the first access
 
-			if ( ! geometryGroup.__webglVertexBuffer ) {
+			if ( geometryGroup.__webglVertexBuffer === undefined ) {
 
 				createMeshBuffers( geometryGroup );
 				initMeshBuffers( geometryGroup, object );
@@ -3713,7 +3713,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			if ( addBuffers || object.__webglActive === undefined ) {
+
 				addBuffer( _webglObjects, geometryGroup, object );
+
 			}
 
 		}
@@ -3766,9 +3768,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Mesh ) {
 
 			// check all geometry groups
-			if ( geometry.buffersNeedUpdate || geometry.groupsNeedUpdate ) {
 
-				initGeometryGroups(scene, object,geometry);
+			if ( geometry.groupsNeedUpdate === true ) {
+
+				initGeometryGroups( scene, object, geometry );
 
 			}
 
@@ -3778,7 +3781,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				material = getBufferMaterial( object, geometryGroup );
 
-				if ( geometry.buffersNeedUpdate || geometry.groupsNeedUpdate) {
+				if ( geometry.groupsNeedUpdate === true ) {
 
 					initMeshBuffers( geometryGroup, object );
 
@@ -3803,8 +3806,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.tangentsNeedUpdate = false;
-
-			geometry.buffersNeedUpdate = false;
 
 			material.attributes && clearCustomAttributes( material );
 
