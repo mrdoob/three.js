@@ -706,6 +706,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// TOFIX: Workaround for deleted geometry being currently bound
+
+		_currentGeometryGroupHash = -1;
+
 	};
 
 	var deallocateTexture = function ( texture ) {
