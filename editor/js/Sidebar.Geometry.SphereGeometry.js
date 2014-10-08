@@ -91,7 +91,6 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 			thetaLength.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

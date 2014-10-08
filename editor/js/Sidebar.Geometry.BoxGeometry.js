@@ -79,7 +79,6 @@ Sidebar.Geometry.BoxGeometry = function ( signals, object ) {
 			depthSegments.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

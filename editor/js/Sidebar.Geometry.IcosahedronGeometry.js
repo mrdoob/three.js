@@ -36,7 +36,6 @@ Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
 			detail.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );

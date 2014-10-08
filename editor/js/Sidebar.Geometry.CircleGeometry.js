@@ -34,7 +34,7 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 			radius.getValue(),
 			segments.getValue()
 		);
-		object.geometry.buffersNeedUpdate = true;
+
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

@@ -69,7 +69,6 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 			arc.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );
