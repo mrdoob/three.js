@@ -9,7 +9,7 @@ THREE.TGALoader.prototype = {
 
 	constructor: THREE.TGALoader,
 
-	load: function ( url, onLoad, onError ) {
+	load: function ( url, onLoad, onError, onProgress ) {
 		
 		var scope = this;
 		
@@ -24,7 +24,7 @@ THREE.TGALoader.prototype = {
 
 			if ( onLoad ) onLoad( texture );
 
-		} );
+		}, onProgress, onError );
 
 		return texture;
 

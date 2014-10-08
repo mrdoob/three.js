@@ -76,6 +76,17 @@
 
 				// model
 
+				var onProgress = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+					}
+				};
+
+				var onError = function ( xhr ) {
+				};
+
+
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var loader = new THREE.OBJMTLLoader();
@@ -84,7 +95,7 @@
 					object.position.y = - 80;
 					scene.add( object );
 
-				} );
+				}, onProgress, onError );
 
 				//
 
