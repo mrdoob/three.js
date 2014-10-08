@@ -18173,22 +18173,37 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Buffer deallocation
 
 	var deleteBuffers = function ( geometry ) {
+	
+		var buffers = [
+			'__webglVertexBuffer',
+			'__webglNormalBuffer',
+			'__webglTangentBuffer',
+			'__webglColorBuffer',
+			'__webglUVBuffer',
+			'__webglUV2Buffer',
+			
+			'__webglSkinIndicesBuffer',
+			'__webglSkinWeightsBuffer',
+			
+			'__webglFaceBuffer',
+			'__webglLineBuffer',
+			
+			'__webglLineDistanceBuffer'
+		];
 
-		if ( geometry.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglVertexBuffer );
-		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
-		if ( geometry.__webglTangentBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglTangentBuffer );
-		if ( geometry.__webglColorBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglColorBuffer );
-		if ( geometry.__webglUVBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglUVBuffer );
-		if ( geometry.__webglUV2Buffer !== undefined ) _gl.deleteBuffer( geometry.__webglUV2Buffer );
+		for ( var i = 0, l = buffers.length; i < l; i ++ ) {
 
-		if ( geometry.__webglSkinIndicesBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglSkinIndicesBuffer );
-		if ( geometry.__webglSkinWeightsBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglSkinWeightsBuffer );
+			var name = buffers[ i ];
 
-		if ( geometry.__webglFaceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglFaceBuffer );
-		if ( geometry.__webglLineBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineBuffer );
+			if ( geometry[ name ] !== undefined ) {
 
-		if ( geometry.__webglLineDistanceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineDistanceBuffer );
-		
+				_gl.deleteBuffer( geometry[ name ] );
+				delete geometry[ name ];
+
+			}
+
+		}
+
 		// custom attributes
 
 		if ( geometry.__webglCustomAttributesList !== undefined ) {
@@ -18199,6 +18214,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			delete geometry.__webglCustomAttributesList;
+
 		}
 
 		_this.info.memory.geometries --;
@@ -18207,15 +18224,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateGeometry = function ( geometry ) {
 
-		geometry.__webglInit = undefined;
+		delete geometry.__webglInit;
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			for ( var name in geometry.attributes ) {
+			
+				var attribute = geometry.attributes[ name ];
 
-				if ( geometry.attributes[ name ].buffer !== undefined ) {
+				if ( attribute.buffer !== undefined ) {
 
-					_gl.deleteBuffer( geometry.attributes[ name ].buffer );
+					_gl.deleteBuffer( attribute.buffer );
+					delete attribute.buffer;
 
 				}
 
@@ -18262,6 +18282,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		// TOFIX: Workaround for deleted geometry being currently bound
+
+		_currentGeometryGroupHash = -1;
 
 	};
 
@@ -18375,11 +18399,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer initialization
 
-	function initCustomAttributes ( geometry, object ) {
+	function initCustomAttributes ( object ) {
+
+		var geometry = object.geometry;
+		var material = object.material;
 
 		var nvertices = geometry.vertices.length;
-
-		var material = object.material;
 
 		if ( material.attributes ) {
 
@@ -18434,7 +18459,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglParticleCount = nvertices;
 
-		initCustomAttributes ( geometry, object );
+		initCustomAttributes( object );
 
 	};
 
@@ -18448,7 +18473,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglLineCount = nvertices;
 
-		initCustomAttributes ( geometry, object );
+		initCustomAttributes( object );
 
 	};
 
