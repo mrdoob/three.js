@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Material = function ( editor ) {
 
 	var signals = editor.signals;

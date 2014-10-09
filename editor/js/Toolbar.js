@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Toolbar = function ( editor ) {
 
 	var signals = editor.signals;

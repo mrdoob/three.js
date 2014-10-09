@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Player = function ( editor ) {
 
 	var signals = editor.signals;

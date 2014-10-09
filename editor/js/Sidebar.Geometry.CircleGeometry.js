@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
