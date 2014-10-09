@@ -5,7 +5,8 @@
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialIdCount ++;
+	Object.defineProperty( this, 'id', { value: THREE.MaterialIdCount ++ } );
+
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';

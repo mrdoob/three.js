@@ -91,7 +91,6 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 			heightScale.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

@@ -32,7 +32,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	this.root = object;
 
-	this.matrixWorld = object.matrixWorld;
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.update();

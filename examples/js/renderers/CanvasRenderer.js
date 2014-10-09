@@ -2,6 +2,36 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+THREE.SpriteCanvasMaterial = function ( parameters ) {
+
+	THREE.Material.call( this );
+
+	this.type = 'SpriteCanvasMaterial';
+
+	this.color = new THREE.Color( 0xffffff );
+	this.program = function ( context, color ) {};
+
+	this.setValues( parameters );
+
+};
+
+THREE.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.SpriteCanvasMaterial.prototype.clone = function () {
+
+	var material = new THREE.SpriteCanvasMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+	material.program = this.program;
+
+	return material;
+
+};
+
+//
+
 THREE.CanvasRenderer = function ( parameters ) {
 
 	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
@@ -183,7 +213,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		this.setClearColor( hex, alpha );
 
 	};
-	
+
 	this.getClearColor = function () {
 
 		return _clearColor;

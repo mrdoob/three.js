@@ -256,10 +256,8 @@
 					var mouseY = -( event.clientY / window.innerHeight ) * 2 + 1;
 
 					var vector = new THREE.Vector3( mouseX, mouseY, camera.near );
-
 					// Convert the [-1, 1] screen coordinate into a world coordinate on the near plane
-					var projector = new THREE.Projector();
-					projector.unprojectVector( vector, camera );
+					vector.unproject( camera );
 
 					var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 

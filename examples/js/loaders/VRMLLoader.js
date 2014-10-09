@@ -65,7 +65,7 @@ THREE.VRMLLoader.prototype = {
 		var parseV2 = function ( lines, scene ) {
 			var defines = {};
 			var float_pattern = /(\b|\-|\+)([\d\.e]+)/;
-			var float3_pattern = /([\d\.\+\-e]+),?\s+([\d\.\+\-e]+),?\s+([\d\.\+\-e]+)/;
+			var float3_pattern = /([\d\.\+\-e]+)\s+([\d\.\+\-e]+)\s+([\d\.\+\-e]+)/g;
 
 			/**
 			* Interpolates colors a and b following their relative distance
@@ -279,10 +279,7 @@ THREE.VRMLLoader.prototype = {
 
 				} else if (this.isRecordingPoints) {
 
-					parts = float3_pattern.exec(line);
-
-					// parts may be empty on first and last line
-					if (null != parts) {
+					while ( null !== ( parts = float3_pattern.exec(line) ) ) {
 						point = {
 							x: parseFloat(parts[1]),
 							y: parseFloat(parts[2]),
@@ -322,10 +319,8 @@ THREE.VRMLLoader.prototype = {
 					}
 
 				} else if (this.isRecordingColors) {
-					// this is the float3 regex with the g modifier added, you could also explode the line by comma first (faster probably)
-					var float3_repeatable = /([\d\.\+\-e]+),?\s+([\d\.\+\-e]+),?\s+([\d\.\+\-e]+)/g;
 
-					while( null !== (parts = float3_repeatable.exec(line) ) ) {
+					while( null !== ( parts = float3_pattern.exec(line) ) ) {
 
 						color = {
 							r: parseFloat(parts[1]),

@@ -87,7 +87,7 @@
 
 			var PARTICLE_SIZE = 20;
 
-			var projector, raycaster, intersects;
+			var raycaster, intersects;
 			var mouse = { x: 1, y: 1 }, INTERSECTED;
 			var vector = new THREE.Vector3();
 
@@ -158,7 +158,6 @@
 
 				//
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
 				//
@@ -207,9 +206,7 @@
 				particles.rotation.x += 0.0005;
 				particles.rotation.y += 0.001;
 
-				vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-
-				projector.unprojectVector( vector, camera );
+				vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
 
 				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 

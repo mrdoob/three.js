@@ -41,6 +41,7 @@
 	"src/extras/geometries/TorusKnotGeometry.js",
 	"src/extras/geometries/TubeGeometry.js",
 	"src/extras/geometries/PolyhedronGeometry.js",
+	"src/extras/geometries/DodecahedronGeometry.js",
 	"src/extras/geometries/IcosahedronGeometry.js",
 	"src/extras/geometries/OctahedronGeometry.js",
 	"src/extras/geometries/TetrahedronGeometry.js",

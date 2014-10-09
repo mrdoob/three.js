@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
-	<body>
+	<body ontouchstart="">
 		<link href="css/main.css" rel="stylesheet" />
 		<link id="theme" href="css/light.css" rel="stylesheet" />
 
@@ -29,18 +29,12 @@
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
+
+		<script src="../examples/js/renderers/Projector.js"></script>
+		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
 		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
-
-		<!-- WIP -->
-
-		<script src="../examples/js/renderers/WebGLRenderer3.js"></script>
-
-		<link href="js/libs/codemirror/codemirror.css" rel="stylesheet" />
-		<script src="js/libs/codemirror/codemirror.js"></script>
-		<script src="js/libs/codemirror/modes/javascript.js"></script>
-
 
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
@@ -61,6 +55,7 @@
 		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
+		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Renderer.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
@@ -111,10 +106,10 @@
 
 			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
 			document.body.appendChild( sidebar.dom );
-			
+
 			var dialog = new UI.Dialog();
 			document.body.appendChild( dialog.dom );
-			
+
 			//
 
 			editor.setTheme( editor.config.getKey( 'theme' ) );
@@ -147,12 +142,26 @@
 				var timeout;
 
 				var saveState = function ( scene ) {
+				
+					if ( editor.config.getKey( 'autosave' ) === false ) {
+
+						return;
+
+					}
 
 					clearTimeout( timeout );
 
 					timeout = setTimeout( function () {
 
-						editor.storage.set( editor.scene.toJSON() );
+						editor.signals.savingStarted.dispatch();
+
+						timeout = setTimeout( function () {
+
+							editor.storage.set( editor.scene.toJSON() );
+
+							editor.signals.savingFinished.dispatch();
+
+						}, 100 );
 
 					}, 1000 );
 
@@ -200,7 +209,7 @@
 
 				switch ( event.keyCode ) {
 
-					case 8: // prevent browser back 
+					case 8: // prevent browser back
 						event.preventDefault();
 						break;
 					case 46: // delete

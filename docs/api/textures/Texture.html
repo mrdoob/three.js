@@ -28,6 +28,11 @@
 
 		<h2>Properties</h2>
 
+		<h3>.[page:Integer id]</h3>
+		<div>
+		Unique number for this texture instance.
+		</div>
+
 		<h3>.[page:Image image]</h3>
 		<div>
 		An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing.
@@ -123,10 +128,6 @@
 		A callback function, called when the texture is updated (e.g., when needsUpdate has been set to true and then the texture is used).
 		</div>
 
-		<h3>.[page:number id]</h3>
-		<div>
-		An internal ID number, starting from 0; should not be modified. THREE.TextureIdCount is the number of textures created so far.
-		</div>
 
 		<h2>Methods</h2>
 

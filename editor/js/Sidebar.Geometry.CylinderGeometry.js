@@ -79,7 +79,6 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 			openEnded.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

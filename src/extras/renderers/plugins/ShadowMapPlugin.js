@@ -478,7 +478,7 @@ THREE.ShadowMapPlugin = function () {
 			var p = pointsWorld[ i ];
 
 			p.copy( pointsFrustum[ i ] );
-			THREE.ShadowMapPlugin.__projector.unprojectVector( p, camera );
+			p.unproject( camera );
 
 			p.applyMatrix4( shadowCamera.matrixWorldInverse );
 
@@ -518,5 +518,3 @@ THREE.ShadowMapPlugin = function () {
 	};
 
 };
-
-THREE.ShadowMapPlugin.__projector = new THREE.Projector();

@@ -21,7 +21,11 @@ Menubar.File = function ( editor ) {
 
 		if ( confirm( 'Are you sure?' ) ) {
 
-			editor.config.clear();
+			editor.config.setKey(
+				'camera/position', [ 500, 250, 500 ],
+				'camera/target', [ 0, 0, 0 ]
+			);
+
 			editor.storage.clear( function () {
 
 				location.href = location.pathname;
@@ -67,7 +71,7 @@ Menubar.File = function ( editor ) {
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Geometry' );
 	option.onClick( function () {
-		
+
 		var object = editor.selected;
 
 		if ( object === null ) {
@@ -161,7 +165,7 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		var exporter = new OBJExporter();
+		var exporter = new THREE.OBJExporter();
 
 		exportString( exporter.parse( geometry ) );
 
@@ -175,7 +179,7 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export STL' );
 	option.onClick( function () {
 
-		var exporter = new STLExporter();
+		var exporter = new THREE.STLExporter();
 
 		exportString( exporter.parse( editor.scene ) );
 

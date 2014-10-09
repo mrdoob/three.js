@@ -56,8 +56,6 @@
 
 			var treeMesh, sphereMesh;
 
-			var projector = new THREE.Projector();
-
 			var sunPosition = new THREE.Vector3( 0, 1000, -1000 );
 			var screenSpacePosition = new THREE.Vector3();
 
@@ -65,9 +63,6 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-			var margin = 100;
-			var height = window.innerHeight - 2 * margin;
 
 			var postprocessing = { enabled : true };
 
@@ -86,7 +81,7 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / height, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
@@ -129,17 +124,12 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setSize( window.innerWidth, height );
+				renderer.setClearColor( bgColor, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.sortObjects = false;
-
 				renderer.autoClear = false;
-				renderer.setClearColor( bgColor, 1 );
-
-				renderer.domElement.style.position = 'absolute';
-				renderer.domElement.style.top = margin + "px";
-				renderer.domElement.style.left = "0px";
+				renderer.sortObjects = false;
 
 				//
 
@@ -199,13 +189,13 @@
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  height / 2, height / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				postprocessing.scene.add( postprocessing.camera );
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
+				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Switching the depth formats to luminance from rgb doesn't seem to work. I didn't
 				// investigate further for now.
@@ -214,12 +204,12 @@
 				// I would have this quarter size and use it as one of the ping-pong render
 				// targets but the aliasing causes some temporal flickering
 
-				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
+				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				// Aggressive downsize god-ray ping-pong render targets to minimize cost
 
 				var w = window.innerWidth / 4.0;
-				var h = height / 4.0;
+				var h = window.innerHeight / 4.0;
 				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( w, h, pars );
 				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( w, h, pars );
 
@@ -260,7 +250,7 @@
 
 				postprocessing.godrayCombineUniforms.fGodRayIntensity.value = 0.75;
 
-				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, height ), postprocessing.materialGodraysGenerate );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialGodraysGenerate );
 				postprocessing.quad.position.z = -9900;
 				postprocessing.scene.add( postprocessing.quad );
 
@@ -292,8 +282,7 @@
 
 					// Find the screenspace position of the sun
 
-					screenSpacePosition.copy( sunPosition );
-					projector.projectVector( screenSpacePosition, camera );
+					screenSpacePosition.copy( sunPosition ).project( camera );
 
 					screenSpacePosition.x = ( screenSpacePosition.x + 1 ) / 2;
 					screenSpacePosition.y = ( screenSpacePosition.y + 1 ) / 2;
@@ -316,16 +305,16 @@
 					// space distance to the sun. Not very efficient, so i make a scissor
 					// rectangle around the suns position to avoid rendering surrounding pixels.
 
-					var sunsqH = 0.74 * height; // 0.74 depends on extent of sun from shader
-					var sunsqW = 0.74 * height; // both depend on height because sun is aspect-corrected
+					var sunsqH = 0.74 * window.innerHeight; // 0.74 depends on extent of sun from shader
+					var sunsqW = 0.74 * window.innerHeight; // both depend on height because sun is aspect-corrected
 
 					screenSpacePosition.x *= window.innerWidth;
-					screenSpacePosition.y *= height;
+					screenSpacePosition.y *= window.innerHeight;
 
 					renderer.setScissor( screenSpacePosition.x - sunsqW / 2, screenSpacePosition.y - sunsqH / 2, sunsqW, sunsqH );
 					renderer.enableScissorTest( true );
 
-					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / height;
+					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
 					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );

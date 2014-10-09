@@ -44,7 +44,7 @@
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, raycaster, renderer;
+			var camera, scene, raycaster, renderer;
 			var vrEffect;
 			var vrControls;
 			var fullScreenButton = document.querySelector( '.button' );
@@ -102,7 +102,6 @@
 
 				}
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -144,7 +143,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				vrEffect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -179,8 +178,7 @@
 
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
 
 				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 

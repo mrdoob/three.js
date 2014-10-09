@@ -58,7 +58,6 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 			heightSegments.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

@@ -67,10 +67,9 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var SCALE = 0.75;
-			var MARGIN = 100;
 
 			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight - 2 * MARGIN;
+			var HEIGHT = window.innerHeight;
 
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
@@ -116,10 +115,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, brightness: 2, antialias: true } );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = MARGIN + "px";
-				renderer.domElement.style.left = "0px";
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );

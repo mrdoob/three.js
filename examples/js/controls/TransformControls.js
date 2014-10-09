@@ -125,7 +125,7 @@
 				for ( var name in gizmoMap ) {
 
 					for ( i = gizmoMap[name].length; i--;) {
-						
+
 						var object = gizmoMap[name][i][0];
 						var position = gizmoMap[name][i][1];
 						var rotation = gizmoMap[name][i][2];
@@ -134,7 +134,7 @@
 
 						if ( position ) object.position.set( position[0], position[1], position[2] );
 						if ( rotation ) object.rotation.set( rotation[0], rotation[1], rotation[2] );
-						
+
 						parent.add( object );
 
 					}
@@ -221,7 +221,7 @@
 		mesh.updateMatrix();
 
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
-		
+
 		var lineXGeometry = new THREE.Geometry();
 		lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
 
@@ -562,7 +562,7 @@
 		this.axis = null;
 
 		var scope = this;
-		
+
 		var _dragging = false;
 		var _mode = "translate";
 		var _plane = "XY";
@@ -573,7 +573,6 @@
 		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
-		var projector = new THREE.Projector();
 		var pointerVector = new THREE.Vector3();
 
 		var point = new THREE.Vector3();
@@ -643,7 +642,7 @@
 		this.detach = function ( object ) {
 
 			scope.object = undefined;
-			this.axis = undefined;
+			this.axis = null;
 
 			this.gizmo["translate"].hide();
 			this.gizmo["rotate"].hide();
@@ -659,7 +658,7 @@
 
 			this.gizmo["translate"].hide();
 			this.gizmo["rotate"].hide();
-			this.gizmo["scale"].hide();	
+			this.gizmo["scale"].hide();
 			this.gizmo[_mode].show();
 
 			this.update();
@@ -678,7 +677,7 @@
 			scope.size = size;
 			this.update();
 			scope.dispatchEvent( changeEvent );
-			
+
 		};
 
 		this.setSpace = function ( space ) {
@@ -836,13 +835,13 @@
 					scope.object.position.add( point );
 
 				}
-				
+
 				if ( scope.snap !== null ) {
-				
+
 					if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
 					if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
 					if ( scope.axis.search("Z") != -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
-				
+
 				}
 
 			} else if ( _mode == "scale" ) {
@@ -955,6 +954,7 @@
 			}
 
 			scope.update();
+			scope.dispatchEvent( changeEvent );
 			scope.dispatchEvent( objectChangeEvent );
 
 		}
@@ -973,11 +973,12 @@
 		function intersectObjects( pointer, objects ) {
 
 			var rect = domElement.getBoundingClientRect();
-			var x = (pointer.clientX - rect.left) / rect.width;
-			var y = (pointer.clientY - rect.top) / rect.height;
-			pointerVector.set( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
+			var x = ( pointer.clientX - rect.left ) / rect.width;
+			var y = ( pointer.clientY - rect.top ) / rect.height;
 
-			projector.unprojectVector( pointerVector, camera );
+			pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
+			pointerVector.unproject( camera );
+
 			ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
 
 			var intersections = ray.intersectObjects( objects, true );

@@ -631,19 +631,15 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 	generateTopUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC ) {
-		var ax = geometry.vertices[ indexA ].x,
-			ay = geometry.vertices[ indexA ].y,
-
-			bx = geometry.vertices[ indexB ].x,
-			by = geometry.vertices[ indexB ].y,
-
-			cx = geometry.vertices[ indexC ].x,
-			cy = geometry.vertices[ indexC ].y;
+	
+		var a = geometry.vertices[ indexA ];
+		var b = geometry.vertices[ indexB ];
+		var c = geometry.vertices[ indexC ];
 
 		return [
-			new THREE.Vector2( ax, ay ),
-			new THREE.Vector2( bx, by ),
-			new THREE.Vector2( cx, cy )
+			new THREE.Vector2( a.x, a.y ),
+			new THREE.Vector2( b.x, b.y ),
+			new THREE.Vector2( c.x, c.y )
 		];
 
 	},
@@ -658,43 +654,25 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength,
 	                              contourIndex1, contourIndex2 ) {
 
-		var ax = geometry.vertices[ indexA ].x,
-			ay = geometry.vertices[ indexA ].y,
-			az = geometry.vertices[ indexA ].z,
+		var a = geometry.vertices[ indexA ];
+		var b = geometry.vertices[ indexB ];
+		var c = geometry.vertices[ indexC ];
+		var d = geometry.vertices[ indexD ];
 
-			bx = geometry.vertices[ indexB ].x,
-			by = geometry.vertices[ indexB ].y,
-			bz = geometry.vertices[ indexB ].z,
-
-			cx = geometry.vertices[ indexC ].x,
-			cy = geometry.vertices[ indexC ].y,
-			cz = geometry.vertices[ indexC ].z,
-
-			dx = geometry.vertices[ indexD ].x,
-			dy = geometry.vertices[ indexD ].y,
-			dz = geometry.vertices[ indexD ].z;
-
-		if ( Math.abs( ay - by ) < 0.01 ) {
+		if ( Math.abs( a.y - b.y ) < 0.01 ) {
 			return [
-				new THREE.Vector2( ax, 1 - az ),
-				new THREE.Vector2( bx, 1 - bz ),
-				new THREE.Vector2( cx, 1 - cz ),
-				new THREE.Vector2( dx, 1 - dz )
+				new THREE.Vector2( a.x, 1 - a.z ),
+				new THREE.Vector2( b.x, 1 - b.z ),
+				new THREE.Vector2( c.x, 1 - c.z ),
+				new THREE.Vector2( d.x, 1 - d.z )
 			];
 		} else {
 			return [
-				new THREE.Vector2( ay, 1 - az ),
-				new THREE.Vector2( by, 1 - bz ),
-				new THREE.Vector2( cy, 1 - cz ),
-				new THREE.Vector2( dy, 1 - dz )
+				new THREE.Vector2( a.y, 1 - a.z ),
+				new THREE.Vector2( b.y, 1 - b.z ),
+				new THREE.Vector2( c.y, 1 - c.z ),
+				new THREE.Vector2( d.y, 1 - d.z )
 			];
 		}
 	}
 };
-
-THREE.ExtrudeGeometry.__v1 = new THREE.Vector2();
-THREE.ExtrudeGeometry.__v2 = new THREE.Vector2();
-THREE.ExtrudeGeometry.__v3 = new THREE.Vector2();
-THREE.ExtrudeGeometry.__v4 = new THREE.Vector2();
-THREE.ExtrudeGeometry.__v5 = new THREE.Vector2();
-THREE.ExtrudeGeometry.__v6 = new THREE.Vector2();

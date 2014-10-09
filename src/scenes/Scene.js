@@ -12,7 +12,6 @@ THREE.Scene = function () {
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
-	this.matrixAutoUpdate = false;
 
 };
 

@@ -3,6 +3,8 @@ var Config = function () {
 	var name = 'threejs-editor';
 
 	var storage = {
+		'autosave': true,
+	
 		'theme': 'css/light.css',
 		'camera/position': [ 500, 250, 500 ],
 		'camera/target': [ 0, 0, 0 ],
@@ -40,9 +42,13 @@ var Config = function () {
 
 		},
 
-		setKey: function ( key, value ) {
+		setKey: function () { // key, value, key, value ...
 
-			storage[ key ] = value;
+			for ( var i = 0, l = arguments.length; i < l; i += 2 ) {
+
+				storage[ arguments[ i ] ] = arguments[ i + 1 ];
+
+			}
 
 			window.localStorage[ name ] = JSON.stringify( storage );
 
