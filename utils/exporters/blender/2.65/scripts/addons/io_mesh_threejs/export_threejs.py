@@ -1802,7 +1802,7 @@ def generate_section(label, content):
 
 def get_mesh_filename(mesh):
     object_id = mesh["data"]["name"]
-    filename = "%s.js" % sanitize(object_id)
+    filename = "%s.json" % sanitize(object_id)
     return filename
 
 def generate_material_id_list(materials):
@@ -2563,7 +2563,7 @@ def save(operator, context, filepath = "",
 
     #print("URL TYPE", option_url_base_html)
 
-    filepath = ensure_extension(filepath, '.js')
+    filepath = ensure_extension(filepath, '.json')
 
     scene = context.scene
 
