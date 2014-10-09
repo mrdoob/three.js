@@ -9,7 +9,7 @@ THREE.TGALoader.prototype = {
 
 	constructor: THREE.TGALoader,
 
-	load: function ( url, onLoad, onError, onProgress ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 		
 		var scope = this;
 		
