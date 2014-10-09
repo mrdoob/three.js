@@ -181,6 +181,16 @@
 
 			//
 
+			var onProgress = function ( xhr ) {
+				if ( xhr.lengthComputable ) {
+					var percentComplete = xhr.loaded / xhr.total * 100;
+					console.log( Math.round(percentComplete, 2) + '% downloaded' );
+				}
+			};
+
+			var onError = function ( xhr ) {
+			};
+
 			function loadMolecule( url ) {
 
 				while( root.children.length > 0 ) {
@@ -244,7 +254,7 @@
 
 					render();
 
-				} );
+				}, onProgress, onError );
 
 
 			}
