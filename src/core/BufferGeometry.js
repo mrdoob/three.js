@@ -86,6 +86,12 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	center: function () {
+
+		// TODO
+
+	},
+
 	fromGeometry: function ( geometry, settings ) {
 
 		settings = settings || { 'vertexColors': THREE.NoColors };
