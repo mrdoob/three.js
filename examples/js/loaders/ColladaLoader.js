@@ -3676,13 +3676,8 @@ THREE.ColladaLoader = function () {
 									} else {
 
 										texture = new THREE.Texture();
-										loader = new THREE.ImageLoader();
-										loader.load( url, function ( image ) {
 
-											texture.image = image;
-											texture.needsUpdate = true;
-
-										} );
+										loadTextureImage( texture, url );
 
 									}
 
@@ -5151,6 +5146,19 @@ THREE.ColladaLoader = function () {
 		}
 
 		return parts.join( '.' );
+
+	};
+
+	function loadTextureImage ( texture, url ) {
+
+		loader = new THREE.ImageLoader();
+
+		loader.load( url, function ( image ) {
+
+			texture.image = image;
+			texture.needsUpdate = true;
+
+		} );
 
 	};
 
