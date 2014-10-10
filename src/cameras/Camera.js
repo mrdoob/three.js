@@ -33,6 +33,22 @@ THREE.Camera.prototype.lookAt = function () {
 
 }();
 
+THREE.Camera.prototype.worldDirection = function () {
+
+	var quaternion = new THREE.Quaternion();
+
+	return function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+
+		this.worldQuaternion( quaternion );
+
+		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+
+	}
+
+}();
+
 THREE.Camera.prototype.clone = function ( camera ) {
 
 	if ( camera === undefined ) camera = new THREE.Camera();
