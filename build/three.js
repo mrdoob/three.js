@@ -7642,7 +7642,7 @@ THREE.Object3D.prototype = {
 
 			var result = optionalTarget || new THREE.Euler();
 
-			this.worldQuaternion( quaternion );
+			this.getWorldQuaternion( quaternion );
 
 			return result.setFromQuaternion( quaternion, this.rotation.order, false );
 
@@ -7677,7 +7677,7 @@ THREE.Object3D.prototype = {
 
 			var result = optionalTarget || new THREE.Vector3();
 
-			this.worldQuaternion( quaternion );
+			this.getWorldQuaternion( quaternion );
 
 			return result.set( 0, 0, 1 ).applyQuaternion( quaternion );
 
@@ -10260,7 +10260,7 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		this.worldQuaternion( quaternion );
+		this.getWorldQuaternion( quaternion );
 
 		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
@@ -18295,6 +18295,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					deleteBuffers( geometryGroup );
 
 				}
+
+				delete geometryGroups[ geometry.id ];
 
 			} else {
 
