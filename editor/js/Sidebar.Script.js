@@ -53,7 +53,7 @@ Sidebar.Script = function ( editor ) {
 
 			}
 
-			object.script = new THREE.Script( source );
+			editor.scripts[ object.uuid ] = [ source ];
 
 			editor.signals.objectChanged.dispatch( object );
 
@@ -72,10 +72,12 @@ Sidebar.Script = function ( editor ) {
 		if ( object !== null ) {
 
 			container.setDisplay( 'block' );
+			
+			var scripts = editor.scripts[ object.uuid ];
 
-			if ( object.script !== undefined ) {
+			if ( scripts !== undefined ) {
 
-				scriptSource.setValue( object.script.source );
+				scriptSource.setValue( scripts[ 0 ] );
 
 			} else {
 
