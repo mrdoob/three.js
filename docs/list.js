@@ -53,6 +53,8 @@ var list = {
 			[ "Loader", "api/loaders/Loader" ],
 			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
+			[ "OBJLoader", "api/loaders/OBJLoader" ],
+			[ "MTLLoader", "api/loaders/MTLLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
 			[ "XHRLoader", "api/loaders/XHRLoader" ]
@@ -157,7 +159,7 @@ var list = {
 			[ "CubeCamera", "api/extras/cameras/CubeCamera" ]
 		],
 
-		
+
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
 			[ "CurvePath", "api/extras/core/CurvePath" ],
