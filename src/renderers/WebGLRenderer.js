@@ -709,6 +709,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
+				delete geometryGroups[ geometry.id ];
+
 			} else {
 
 				deleteBuffers( geometry );
