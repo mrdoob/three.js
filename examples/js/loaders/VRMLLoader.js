@@ -625,13 +625,7 @@ THREE.VRMLLoader.prototype = {
 
 						var groundGeometry = new THREE.SphereGeometry( radius, segments, segments, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
 
-						var groundMaterial = new THREE.MeshBasicMaterial( { color: 'white', vertexColors: THREE.VertexColors } );
-
-						groundMaterial.side = THREE.BackSide;
-
-						groundMaterial.fog = false;
-
-						groundMaterial.color = new THREE.Color();
+						var groundMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, fog: false, side: THREE.BackSide, vertexColors: THREE.VertexColors } );
 
 						paintFaces( groundGeometry, radius, data.groundAngle, data.groundColor, false );
 
