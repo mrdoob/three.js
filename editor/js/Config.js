@@ -8,8 +8,11 @@ var Config = function () {
 
 	var storage = {
 		'autosave': true,
-	
 		'theme': 'css/light.css',
+		
+		'renderer': 'WebGLRenderer',
+		'renderer/antialias': true,
+	
 		'camera/position': [ 500, 250, 500 ],
 		'camera/target': [ 0, 0, 0 ],
 

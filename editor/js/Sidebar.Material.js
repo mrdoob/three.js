@@ -338,6 +338,7 @@ Sidebar.Material = function ( editor ) {
 	materialBlendingRow.add( materialBlending );
 
 	container.add( materialBlendingRow );
+
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
