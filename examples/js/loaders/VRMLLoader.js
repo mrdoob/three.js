@@ -63,6 +63,7 @@ THREE.VRMLLoader.prototype = {
 		};
 
 		var parseV2 = function ( lines, scene ) {
+
 			var defines = {};
 			var float_pattern = /(\b|\-|\+)([\d\.e]+)/;
 			var float3_pattern = /([\d\.\+\-e]+)\s+([\d\.\+\-e]+)\s+([\d\.\+\-e]+)/g;
@@ -77,17 +78,17 @@ THREE.VRMLLoader.prototype = {
 			* @returns {Color}
 			*/
 			var interpolateColors = function(a, b, t) {
-			   var deltaR = a.r - b.r;
-			   var deltaG = a.g - b.g;
-			   var deltaB = a.b - b.b;
+				var deltaR = a.r - b.r;
+				var deltaG = a.g - b.g;
+				var deltaB = a.b - b.b;
 
-			   var c = new THREE.Color();
+				var c = new THREE.Color();
 
-			   c.r = a.r - t * deltaR;
-			   c.g = a.g - t * deltaG;
-			   c.b = a.b - t * deltaB;
+				c.r = a.r - t * deltaR;
+				c.g = a.g - t * deltaG;
+				c.b = a.b - t * deltaB;
 
-			   return c;
+				return c;
 			};
 
 			/**
@@ -353,9 +354,9 @@ THREE.VRMLLoader.prototype = {
 							}
 
 							property = {
-								'r'         : parseFloat(parts[1]),
-								'g'         : parseFloat(parts[2]),
-								'b'         : parseFloat(parts[3])
+								r: parseFloat(parts[1]),
+								g: parseFloat(parts[2]),
+								b: parseFloat(parts[3])
 							}
 
 							break;
@@ -369,9 +370,9 @@ THREE.VRMLLoader.prototype = {
 							}
 
 							property = {
-								'x'         : parseFloat(parts[1]),
-								'y'         : parseFloat(parts[2]),
-								'z'         : parseFloat(parts[3])
+								x: parseFloat(parts[1]),
+								y: parseFloat(parts[2]),
+								z: parseFloat(parts[3])
 							}
 
 							break;
@@ -399,10 +400,10 @@ THREE.VRMLLoader.prototype = {
 							}
 
 							property = {
-								'x'         : parseFloat(parts[1]),
-								'y'         : parseFloat(parts[2]),
-								'z'         : parseFloat(parts[3]),
-								'w'         : parseFloat(parts[4])
+								x: parseFloat(parts[1]),
+								y: parseFloat(parts[2]),
+								z: parseFloat(parts[3]),
+								w: parseFloat(parts[4])
 							}
 
 							break;
@@ -597,10 +598,11 @@ THREE.VRMLLoader.prototype = {
 					var segments = 20;
 
 					// sky (full sphere):
+
 					var radius = 2e4;
 
 					var skyGeometry = new THREE.SphereGeometry( radius, segments, segments );
-					var skyMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, fog: false, side: THREE.BackSide } );
+					var skyMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide } );
 
 					if ( data.skyColor.length > 1 ) {
 
@@ -624,8 +626,7 @@ THREE.VRMLLoader.prototype = {
 						radius = 1.2e4;
 
 						var groundGeometry = new THREE.SphereGeometry( radius, segments, segments, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
-
-						var groundMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, fog: false, side: THREE.BackSide, vertexColors: THREE.VertexColors } );
+						var groundMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, vertexColors: THREE.VertexColors } );
 
 						paintFaces( groundGeometry, radius, data.groundAngle, data.groundColor, false );
 
