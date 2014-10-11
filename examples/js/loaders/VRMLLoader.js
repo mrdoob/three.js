@@ -600,40 +600,44 @@ THREE.VRMLLoader.prototype = {
 					var radius = 2e4;
 
 					var skyGeometry = new THREE.SphereGeometry( radius, segments, segments );
+					var skyMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, fog: false, side: THREE.BackSide } );
 
-					var skyMaterial = new THREE.MeshBasicMaterial( { color: 'white', vertexColors: THREE.VertexColors, shading: THREE.NoShading } );
+					if ( data.skyColor.length > 1 ) {
 
-					skyMaterial.side = THREE.BackSide;
+						paintFaces( skyGeometry, radius, data.skyAngle, data.skyColor, true );
 
-					skyMaterial.fog = false;
+						skyMaterial.vertexColors = THREE.VertexColors
 
-					skyMaterial.color = new THREE.Color();
+					} else {
 
-					paintFaces( skyGeometry, radius, data.skyAngle, data.skyColor, true );
+						var color = data.skyColor[ 0 ];
+						skyMaterial.color.setRGB( color.r, color.b, color.g );
 
-					var sky = new THREE.Mesh( skyGeometry, skyMaterial );
+					}
 
-					scene.add( sky );
+					scene.add( new THREE.Mesh( skyGeometry, skyMaterial ) );
 
 					// ground (half sphere):
 
-					radius = 1.2e4;
+					if ( data.groundColor !== undefined ) {
 
-					var groundGeometry = new THREE.SphereGeometry( radius, segments, segments, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
+						radius = 1.2e4;
 
-					var groundMaterial = new THREE.MeshBasicMaterial( { color: 'white', vertexColors: THREE.VertexColors, shading: THREE.NoShading } );
+						var groundGeometry = new THREE.SphereGeometry( radius, segments, segments, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
 
-					groundMaterial.side = THREE.BackSide;
+						var groundMaterial = new THREE.MeshBasicMaterial( { color: 'white', vertexColors: THREE.VertexColors } );
 
-					groundMaterial.fog = false;
+						groundMaterial.side = THREE.BackSide;
 
-					groundMaterial.color = new THREE.Color();
+						groundMaterial.fog = false;
 
-					paintFaces( groundGeometry, radius, data.groundAngle, data.groundColor, false );
+						groundMaterial.color = new THREE.Color();
 
-					var ground = new THREE.Mesh( groundGeometry, groundMaterial );
+						paintFaces( groundGeometry, radius, data.groundAngle, data.groundColor, false );
 
-					scene.add( ground );
+						scene.add( new THREE.Mesh( groundGeometry, groundMaterial ) );
+
+					}
 
 				} else if ( /geometry/.exec( data.string ) ) {
 
