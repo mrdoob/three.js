@@ -22375,15 +22375,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material = material.materials[ materialIndex ];
 
-			if ( material.transparent ) {
+			if ( material ) {
 
-				globject.material = material; 
-				transparentObjects.push( globject );
+				if ( material.transparent ) {
 
-			} else {
+					globject.material = material; 
+					transparentObjects.push( globject );
 
-				globject.material = material; 
-				opaqueObjects.push( globject );
+				} else {
+
+					globject.material = material; 
+					opaqueObjects.push( globject );
+
+				}
 
 			}
 
