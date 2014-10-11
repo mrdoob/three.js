@@ -569,17 +569,9 @@ Sidebar.Material = function ( editor ) {
 
 				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
 
-				if ( objectHasUvs )  {
-
-					material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
-					material.reflectivity = materialReflectivity.getValue();
-					material.needsUpdate = true;
-
-				} else {
-
-					if ( envMapEnabled ) textureWarning = true;
-
-				}
+				material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
+				material.reflectivity = materialReflectivity.getValue();
+				material.needsUpdate = true;
 
 			}
 
