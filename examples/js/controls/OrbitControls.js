@@ -51,6 +51,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.rotateSpeed = 1.0;
 
+	// Set to true to circular camera
+	this.circular = false;
+
 	// Set to true to disable this control
 	this.noPan = false;
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
@@ -261,7 +264,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 		theta += thetaDelta;
-		phi += phiDelta;
+		if ( !this.circular ) phi += phiDelta;
 
 		// restrict theta to be between desired limits
 		theta = Math.max( this.minAzimuthAngle, Math.min( this.maxAzimuthAngle, theta ) );
