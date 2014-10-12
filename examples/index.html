@@ -20,6 +20,31 @@
 				overflow: hidden;
 			}
 
+.marquee {
+width:130px;
+height:40px;
+padding:5px;
+background-color: yellowgreen;
+border: 20px solid rgba(0,0,0,0.3);
+white-space: nowrap; 
+overflow: hidden;
+
+/* Safari and Chrome  */
+overflow-x:-webkit-marquee;
+-webkit-marquee-direction: backwards;
+-webkit-marquee-style: scroll;
+-webkit-marquee-speed: fast;
+-webkit-marquee-increment: small;
+-webkit-marquee-repetition: infinite;
+
+/* W3C  */
+overflow-x: marquee-line;
+marquee-direction: forward;
+marquee-style: scroll;
+marquee-speed: fast;
+marquee-play-count: infinite;
+}
+
 			a {
 				color: #2194CE;
 				text-decoration: none;
@@ -97,7 +122,7 @@
 				<h1><a href="http://threejs.org">three.js</a> / examples</h1>
 			</div>
 		</div>
-		<iframe id="viewer"></iframe>
+		<iframe id="viewer" width="670" ></iframe>
 
 		<script>
 
@@ -431,6 +456,8 @@
 		}
 
 		</script>
+		/*refresh hack for android*/
+		<div class="marquee"><p>FREEDOM</p></div>
 
 	</body>
 </html>
