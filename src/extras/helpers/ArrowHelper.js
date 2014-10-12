@@ -9,42 +9,47 @@
  *  dir - Vector3
  *  origin - Vector3
  *  length - Number
- *  color - color in hex value
+ *  material - Material ( LineBasicMaterial or LineDashedMaterial )
  *  headLength - Number
  *  headWidth - Number
  */
 
 THREE.ArrowHelper = ( function () {
 
-	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+	return function ( dir, origin, length, material, headLength, headWidth ) {
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
-	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
+		if ( !isNaN( parseInt( material, 16 ) ) ) {
+			material = new THREE.LineBasicMaterial( { color: 0xffff00 } );
+			console.log( 'Please, for ArrowHelper use a LineBasicMaterial or LineDashedMaterial instead of the HEX' ); 
+		}
+		if ( material === undefined ) material = new THREE.LineBasicMaterial( { color: 0xffff00 } );
+		if ( length === undefined ) { this.length = 1 } else { this.length = length; }
+		if ( headLength === undefined ) headLength = 0.2 * this.length;
+		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	return function ( dir, origin, length, color, headLength, headWidth ) {
+		var lineGeometry = new THREE.Geometry();
+		lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, this.length, 0 ) );
+		lineGeometry.computeLineDistances();
+
+		var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
+		coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
 
 		// dir is assumed to be normalized
 
 		THREE.Object3D.call( this );
 
-		if ( color === undefined ) color = 0xffff00;
-		if ( length === undefined ) length = 1;
-		if ( headLength === undefined ) headLength = 0.2 * length;
-		if ( headWidth === undefined ) headWidth = 0.2 * headLength;
-
 		this.position.copy( origin );
 
-		this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: color } ) );
+		this.line = new THREE.Line( lineGeometry, material );
 		this.line.matrixAutoUpdate = false;
 		this.add( this.line );
 
-		this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: color } ) );
+		this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: material.color } ) );
 		this.cone.matrixAutoUpdate = false;
 		this.add( this.cone );
 
 		this.setDirection( dir );
-		this.setLength( length, headLength, headWidth );
+		this.setLength( this.length, headLength, headWidth );
 
 	}
 
@@ -88,7 +93,7 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.line.scale.set( 1, length, 1 );
+	this.line.scale.set( 1, length / this.length, 1 );
 	this.line.updateMatrix();
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
