@@ -1,0 +1,8 @@
+{
+  "name": "orbitcontrols",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "threejs": ">0.0.68"
+  }
+}
