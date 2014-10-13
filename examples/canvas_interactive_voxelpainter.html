@@ -81,7 +81,7 @@
 
 				vector = new THREE.Vector3();
 				raycaster = new THREE.Raycaster();
-				
+
 				var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
@@ -174,9 +174,9 @@
 
 					}
 
-				}
+					render();
 
-				render();
+				}
 
 			}
 
