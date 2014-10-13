@@ -4,51 +4,25 @@
 
 THREE.Projector = function () {
 
+	console.warn( 'THREE.Projector has been moved to /examples/renderers/Projector.js.' );
+
 	this.projectVector = function ( vector, camera ) {
 
-		var viewProjectionMatrix = new THREE.Matrix4();
+		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
+		vector.project( camera );
 
-		return function ( vector, camera ) {
+	};
 
-			camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+	this.unprojectVector = function ( vector, camera ) {
 
-			viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
+		vector.unproject( camera );
 
-			return vector.applyProjection( viewProjectionMatrix );
-
-		};
-
-	}();
-
-	this.unprojectVector = function () {
-
-		var projectionMatrixInverse = new THREE.Matrix4();
-		var viewProjectionMatrix = new THREE.Matrix4();
-
-		return function ( vector, camera ) {
-
-			projectionMatrixInverse.getInverse( camera.projectionMatrix );
-			viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, projectionMatrixInverse );
-
-			return vector.applyProjection( viewProjectionMatrix );
-
-		};
-
-	}();
+	};
 
 	this.pickingRay = function ( vector, camera ) {
 
-		// set two vectors with opposing z values
-		vector.z = - 1.0;
-		var end = new THREE.Vector3( vector.x, vector.y, 1.0 );
-
-		this.unprojectVector( vector, camera );
-		this.unprojectVector( end, camera );
-
-		// find direction from vector to end
-		end.sub( vector ).normalize();
-
-		return new THREE.Raycaster( vector, end );
+		console.error( 'THREE.Projector: .pickingRay() has been removed.' );
 
 	};
 

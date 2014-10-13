@@ -1,4 +1,6 @@
-// Texture
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
 UI.Texture = function () {
 
@@ -132,7 +134,7 @@ UI.Texture.prototype.onChange = function ( callback ) {
 };
 
 
-// CubeTexture
+//
 
 UI.CubeTexture = function () {
 

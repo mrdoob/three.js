@@ -53,17 +53,25 @@ input.Number {
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
+	}
+
+	#menubar .menu.right {
+		float: right;
+		cursor: auto;
+		text-align: right;
 	}
 
 		#menubar .menu .title {
+			display: inline-block;
 			color: #888;
 			margin: 0px;
 			padding: 8px;
 		}
 
 		#menubar .menu .options {
+			position: absolute;
 			display: none;
 			padding: 5px 0px;
 			background: #eee;
@@ -150,5 +158,3 @@ input.Number {
 	#toolbar button {
 		margin-right: 6px;
 	}
-
-

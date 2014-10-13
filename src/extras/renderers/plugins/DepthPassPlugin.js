@@ -28,10 +28,33 @@ THREE.DepthPassPlugin = function () {
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
-		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
-		_depthMaterialSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, skinning: true } );
-		_depthMaterialMorphSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true, skinning: true } );
+		_depthMaterial = new THREE.ShaderMaterial( {
+			fragmentShader: depthShader.fragmentShader,
+			vertexShader: depthShader.vertexShader,
+			uniforms: depthUniforms
+		} );
+		
+		_depthMaterialMorph = new THREE.ShaderMaterial( {
+			fragmentShader: depthShader.fragmentShader,
+			vertexShader: depthShader.vertexShader,
+			uniforms: depthUniforms,
+			morphTargets: true
+		} );
+		
+		_depthMaterialSkin = new THREE.ShaderMaterial( {
+			fragmentShader: depthShader.fragmentShader,
+			vertexShader: depthShader.vertexShader,
+			uniforms: depthUniforms,
+			skinning: true
+		} );
+		
+		_depthMaterialMorphSkin = new THREE.ShaderMaterial( {
+			fragmentShader: depthShader.fragmentShader,
+			vertexShader: depthShader.vertexShader,
+			uniforms: depthUniforms,
+			morphTargets: true,
+			skinning: true
+		} );
 
 		_depthMaterial._shadowPass = true;
 		_depthMaterialMorph._shadowPass = true;

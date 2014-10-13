@@ -45,9 +45,9 @@ THREE.OBJMTLLoader.prototype = {
 
 				onLoad( object );
 
-			} );
+			}, onProgress, onError );
 
-		} );
+		}, onProgress, onError );
 
 	},
 

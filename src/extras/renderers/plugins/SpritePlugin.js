@@ -9,7 +9,7 @@ THREE.SpritePlugin = function () {
 
 	var sprites = [];
 
-	var vertices, faces, vertexBuffer, elementBuffer;
+	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
 
 	this.init = function ( renderer ) {
@@ -17,14 +17,14 @@ THREE.SpritePlugin = function () {
 		_gl = renderer.context;
 		_renderer = renderer;
 
-		vertices = new Float32Array( [
-			- 0.5, - 0.5, 0, 0, 
-			  0.5, - 0.5, 1, 0,
-			  0.5,   0.5, 1, 1,
-			- 0.5,   0.5, 0, 1
+		var vertices = new Float32Array( [
+			- 0.5, - 0.5,  0, 0,
+			  0.5, - 0.5,  1, 0,
+			  0.5,   0.5,  1, 1,
+			- 0.5,   0.5,  0, 1
 		] );
 
-		faces = new Uint16Array( [
+		var faces = new Uint16Array( [
 			0, 1, 2,
 			0, 2, 3
 		] );
@@ -67,11 +67,11 @@ THREE.SpritePlugin = function () {
 
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
-		
+
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 8;
 		canvas.height = 8;
-		
+
 		var context = canvas.getContext( '2d' );
 		context.fillStyle = 'white';
 		context.fillRect( 0, 0, 8, 8 );
@@ -237,6 +237,8 @@ THREE.SpritePlugin = function () {
 		// restore gl
 
 		_gl.enable( _gl.CULL_FACE );
+		
+		_renderer.resetGLState();
 
 	};
 

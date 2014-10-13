@@ -22,7 +22,7 @@
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, raycaster, renderer, parentTransform, sphereInter;
+			var camera, scene, raycaster, renderer, parentTransform, sphereInter;
 
 			var mouse = new THREE.Vector2();
 			var radius = 100, theta = 0;
@@ -49,17 +49,10 @@
 
 				scene = new THREE.Scene();
 
-				var PI2 = Math.PI * 2;
-				var program = function ( context ) {
+				var geometry = new THREE.SphereGeometry( 5 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
-					context.beginPath();
-					context.arc( 0, 0, 0.5, 0, PI2, true );
-					context.fill();
-
-				}
-
-				sphereInter = new THREE.Sprite( new THREE.SpriteMaterial( { color: 0xff0000 } ) );
-				sphereInter.scale.x = sphereInter.scale.y = 10;
+				sphereInter = new THREE.Mesh( geometry, material );
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
@@ -115,13 +108,12 @@
 
 				}
 
-				scene.add(parentTransform);
+				scene.add( parentTransform );
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 				raycaster.linePrecision = 3;
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -180,8 +172,7 @@
 
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
 
 				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 

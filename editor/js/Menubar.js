@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Menubar = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -8,6 +12,8 @@ var Menubar = function ( editor ) {
 	container.add( new Menubar.Play( editor ) );
 	container.add( new Menubar.View( editor ) );
 	container.add( new Menubar.Help( editor ) );
+
+	container.add( new Menubar.Status( editor ) );
 
 	return container;
 

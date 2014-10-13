@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Loader = function ( editor ) {
 
 	var scope = this;
@@ -181,8 +185,6 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					console.log( contents );
-
 					var geometry = new THREE.PLYLoader().parse( contents );
 					geometry.sourceType = "ply";
 					geometry.sourceFile = file.name;
@@ -297,7 +299,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				alert( 'Unsupported file format.' );
+				alert( 'Unsupported file format (' + extension +  ').' );
 
 				break;
 

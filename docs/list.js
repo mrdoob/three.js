@@ -29,7 +29,6 @@ var list = {
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
-			[ "Projector", "api/core/Projector" ],
 			[ "Raycaster", "api/core/Raycaster" ],
 		],
 
@@ -113,14 +112,6 @@ var list = {
 			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
 		],
 
-		"Renderers / Renderables": [
-			[ "RenderableFace", "api/renderers/renderables/RenderableFace" ],
-			[ "RenderableLine", "api/renderers/renderables/RenderableLine" ],
-			[ "RenderableObject", "api/renderers/renderables/RenderableObject" ],
-			[ "RenderableSprite", "api/renderers/renderables/RenderableSprite" ],
-			[ "RenderableVertex", "api/renderers/renderables/RenderableVertex" ]
-		],
-
 		"Renderers / Shaders": [
 			[ "ShaderChunk", "api/renderers/shaders/ShaderChunk" ],
 			[ "ShaderLib", "api/renderers/shaders/ShaderLib" ],
@@ -192,6 +183,7 @@ var list = {
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
+			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],
 			[ "LatheGeometry", "api/extras/geometries/LatheGeometry" ],

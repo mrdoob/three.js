@@ -17,6 +17,22 @@ THREE.Camera = function () {
 
 THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
 
+THREE.Camera.prototype.getWorldDirection = function () {
+
+	var quaternion = new THREE.Quaternion();
+
+	return function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+
+		this.getWorldQuaternion( quaternion );
+
+		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
+
+	}
+
+}();
+
 THREE.Camera.prototype.lookAt = function () {
 
 	// This routine does not support cameras with rotated and/or translated parent(s)

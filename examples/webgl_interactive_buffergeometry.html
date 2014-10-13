@@ -47,7 +47,7 @@
 
 			var camera, scene, renderer;
 
-			var projector, raycaster, mouse, points = [];
+			var raycaster, mouse, points = [];
 
 			var mesh, line;
 
@@ -198,7 +198,6 @@
 
 				//
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
 				mouse = new THREE.Vector2();
@@ -269,8 +268,7 @@
 				mesh.rotation.x = time * 0.15;
 				mesh.rotation.y = time * 0.25;
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
 
 				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 

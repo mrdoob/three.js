@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Edit = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -62,16 +66,16 @@ Menubar.Edit = function ( editor ) {
 
 		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
 
-		var geometry = object.geometry.clone();
-		geometry.applyMatrix( object.matrix );
+		var geometry = object.geometry;
 
-		object.geometry = geometry;
+		geometry.applyMatrix( object.matrix );
+		geometry.verticesNeedUpdate = true;
+		geometry.normalsNeedUpdate = true;
 
 		object.position.set( 0, 0, 0 );
 		object.rotation.set( 0, 0, 0 );
 		object.scale.set( 1, 1, 1 );
-		
-		object.geometry.buffersNeedUpdate = true;
+
 		editor.signals.objectChanged.dispatch( object );
 
 	} );
