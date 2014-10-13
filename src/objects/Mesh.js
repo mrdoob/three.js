@@ -86,23 +86,25 @@ THREE.Mesh.prototype.raycast = ( function () {
 		}
 
 		// Check boundingBox before continuing
+		if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
 
-		if ( geometry.boundingBox !== null ) {
+		if ( ray.intersectBox( geometry.boundingBox, undefined, vBox1, vBox2 ) === null )  {
 
-			if ( ray.intersectBox( geometry.boundingBox, undefined, vBox1, vBox2 ) === null )  {
-
-				return;
-
-			}
+			return;
 
 		}
+
 		
-		var minX = Math.min(vBox1.x, vBox2.x);
-		var minY = Math.min(vBox1.y, vBox2.y);
-		var minZ = Math.min(vBox1.z, vBox2.z);
-		var maxX = Math.max(vBox1.x, vBox2.x);
-		var maxY = Math.max(vBox1.y, vBox2.y);
-		var maxZ = Math.max(vBox1.z, vBox2.z);
+		
+		// calculate hitbox positions. 
+		// we add or substarct 0.0001 for floating point errors
+		// (http://en.wikipedia.org/wiki/Round-off_error)
+		var minX = Math.min(vBox1.x, vBox2.x) - 0.0001;
+		var minY = Math.min(vBox1.y, vBox2.y) - 0.0001;
+		var minZ = Math.min(vBox1.z, vBox2.z) - 0.0001;
+		var maxX = Math.max(vBox1.x, vBox2.x) + 0.0001;
+		var maxY = Math.max(vBox1.y, vBox2.y) + 0.0001;
+		var maxZ = Math.max(vBox1.z, vBox2.z) + 0.0001;
 		
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
@@ -203,10 +205,6 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				for ( var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9 ) {
 
-					a = i;
-					b = i + 1;
-					c = i + 2;
-
 					// Test if the triangle is near the ray.
 					if (positions[ j     ] < minX && positions[ j + 3 ] < minX && positions[ j + 6 ] < minX) continue;
 					if (positions[ j + 1 ] < minY && positions[ j + 4 ] < minY && positions[ j + 7 ] < minY) continue;
@@ -254,7 +252,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						distance: distance,
 						point: intersectionPoint,
-						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
+						face: new THREE.Face3( i, i+1, i+2, THREE.Triangle.normal( vA, vB, vC ) ),
 						faceIndex: null,
 						object: this
 
@@ -326,6 +324,17 @@ THREE.Mesh.prototype.raycast = ( function () {
 					c = vC;
 
 				}
+				
+				
+				// Test if the triangle is near the ray.
+				if (a.x < minX && b.x < minX && c.x < minX) continue;
+				if (a.y < minY && b.y < minY && c.y < minY) continue;
+				if (a.z < minZ && b.z < minZ && c.z < minZ) continue;
+				if (a.x > maxX && b.x > maxX && c.x > maxX) continue;
+				if (a.y > maxY && b.y > maxY && c.y > maxY) continue;
+				if (a.z > maxZ && b.z > maxZ && c.z > maxZ) continue;
+				
+				
 
 				if ( material.side === THREE.BackSide ) {
 
