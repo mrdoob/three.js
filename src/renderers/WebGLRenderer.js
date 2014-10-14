@@ -220,9 +220,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			};
 
 		}
+
 	}
 
 	var extensions = new THREE.WebGLExtensions( _gl );
+
+	extensions.get( 'OES_texture_float' );
+	extensions.get( 'OES_texture_float_linear' );
+	extensions.get( 'OES_standard_derivatives' );
 
 	if ( _logarithmicDepthBuffer ) {
 
