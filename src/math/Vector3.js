@@ -798,21 +798,14 @@ THREE.Vector3.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array ) {
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
-			if ( offset === undefined ) offset = 0;
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+		array[ offset + 2 ] = this.z;
 
-			array[ offset ] = this.x;
-			array[ offset + 1 ] = this.y;
-			array[ offset + 2 ] = this.z;
-			
-			return array;
-
-		} else {
-
-			return [ this.x, this.y, this.z ];
-
-		}
+		return array;
 
 	},
 

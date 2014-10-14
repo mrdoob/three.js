@@ -633,25 +633,18 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
-	
+
 	toArray: function ( array, offset ) {
 
-		if ( array ) {
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
-			if ( offset === undefined ) offset = 0;
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+		array[ offset + 2 ] = this.z;
+		array[ offset + 3 ] = this.w;
 
-			array[ offset ] = this.x;
-			array[ offset + 1 ] = this.y;
-			array[ offset + 2 ] = this.z;
-			array[ offset + 3 ] = this.w;
-			
-			return array;
-
-		} else {
-
-			return [ this.x, this.y, this.z, this.w ];
-
-		}
+		return array;
 
 	},
 

@@ -388,20 +388,13 @@ THREE.Vector2.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array ) {
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
-			if ( offset === undefined ) offset = 0;
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
 
-			array[ offset ] = this.x;
-			array[ offset + 1 ] = this.y;
-			
-			return array;
-
-		} else {
-
-			return [ this.x, this.y ];
-
-		}
+		return array;
 
 	},
 
