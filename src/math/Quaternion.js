@@ -482,10 +482,23 @@ THREE.Quaternion.prototype = {
 		return this;
 
 	},
+	
+	toArray: function ( array, offset ) {
 
-	toArray: function () {
+		if ( array ) {
 
-		return [ this._x, this._y, this._z, this._w ];
+			if ( offset === undefined ) offset = 0;
+
+			array[ offset ] = this.x;
+			array[ offset + 1 ] = this.y;
+			array[ offset + 2 ] = this.z;
+			array[ offset + 3 ] = this.w;
+
+		} else {
+
+			return [ this.x, this.y, this.z, this.w ];
+
+		}
 
 	},
 
