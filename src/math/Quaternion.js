@@ -489,14 +489,16 @@ THREE.Quaternion.prototype = {
 
 			if ( offset === undefined ) offset = 0;
 
-			array[ offset ] = this.x;
-			array[ offset + 1 ] = this.y;
-			array[ offset + 2 ] = this.z;
-			array[ offset + 3 ] = this.w;
+			array[ offset ] = this._x;
+			array[ offset + 1 ] = this._y;
+			array[ offset + 2 ] = this._z;
+			array[ offset + 3 ] = this._w;
+			
+			return array;
 
 		} else {
 
-			return [ this.x, this.y, this.z, this.w ];
+			return [ this._x, this._y, this._z, this._w ];
 
 		}
 
