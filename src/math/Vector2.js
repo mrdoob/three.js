@@ -394,6 +394,8 @@ THREE.Vector2.prototype = {
 
 			array[ offset ] = this.x;
 			array[ offset + 1 ] = this.y;
+			
+			return array;
 
 		} else {
 
