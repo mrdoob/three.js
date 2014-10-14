@@ -644,6 +644,8 @@ THREE.Vector4.prototype = {
 			array[ offset + 1 ] = this.y;
 			array[ offset + 2 ] = this.z;
 			array[ offset + 3 ] = this.w;
+			
+			return array;
 
 		} else {
 
