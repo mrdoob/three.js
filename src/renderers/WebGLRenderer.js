@@ -269,23 +269,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _supportsVertexTextures = _maxVertexTextures > 0;
 	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
 
-	// COMPRESSED_TEXTURE_FORMATS return IntArray
-	// but we need Array.indexOf to test formats availabilities
-	var _compressedTextureFormats = [];
-
-	if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) || extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
-
-		var compressedfmts = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
-
-		for ( var i = 0; i < compressedfmts.length; i ++ ){
-
-			_compressedTextureFormats.push( compressedfmts[ i ] );
-
-		}
-
-	}
-
-
 	//
 
 	var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
@@ -295,6 +278,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
 	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
 	var _fragmentShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_FLOAT );
+
+	var getCompressedTextureFormats = ( function () {
+
+		var array;
+
+		return function () {
+
+			if ( array !== undefined ) {
+
+				return array;
+
+			}
+
+			array = [];
+
+			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) || extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
+
+				var formats = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
+
+				for ( var i = 0; i < formats.length; i ++ ){
+
+					array.push( formats[ i ] );
+
+				}
+
+			}
+			
+			return array;
+
+		};
+
+	} )();
 
 	// clamp precision to maximum available
 
@@ -5835,7 +5850,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-					if ( _compressedTextureFormats.indexOf( glFormat ) > -1 ) {
+					if ( getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
 
 						_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -5999,7 +6014,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-								if ( _compressedTextureFormats.indexOf( glFormat ) > -1 ) {
+								if ( getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
 
 									_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
