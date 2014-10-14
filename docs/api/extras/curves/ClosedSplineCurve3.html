@@ -11,38 +11,41 @@
 		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Create a smooth 3d spline curve from a series of points that loops back onto itself</div>
 
 		<h2>Example</h2>
 
-		<code>todo</code>
+<code>
+//Create a closed wavey loop
+var curve = new THREE.ClosedSplineCurve3([
+	new THREE.Vector3(-10, 0, 10),
+	new THREE.Vector3(-5,  5, 5),
+	new THREE.Vector3( 0,  0, 0),
+	new THREE.Vector3( 5, -5, 5),
+	new THREE.Vector3(10,  0, 10)
+]);
+
+var geometry = new THREE.Geometry();
+geometry.vertices = curve.getPoints(50);
+
+var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+</code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>todo</h3>
-		<div></div>
+		<h3>[name]([page:Array points])</h3>
+		<div>points – An array of [page:Vector3] points</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>todo</h3>
-		<div>
-		todo
-		</div> 
-
+		<h3>.[page:Array points]</h3>
 
 		<h2>Methods</h2>
 		
-
-		<h3>todo</h3>
-		<div>todo</div>
-		<div>
-		todo
-		</div>
+		<h3>See [page:Curve] for inherited methods</h3>
 		
-		<h2>Source</h2>
-
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>
 </html>
