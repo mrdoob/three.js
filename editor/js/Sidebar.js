@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Sidebar = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -8,7 +12,8 @@ var Sidebar = function ( editor ) {
 	container.add( new Sidebar.Geometry( editor ) );
 	container.add( new Sidebar.Material( editor ) );
 	container.add( new Sidebar.Animation( editor ) );
+	container.add( new Sidebar.Script( editor ) );
 
 	return container;
 
-}
+};

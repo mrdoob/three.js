@@ -36,7 +36,7 @@
 	<body>
 		<div class="button">Start VR Mode</div>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -44,7 +44,7 @@
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, raycaster, renderer;
+			var camera, scene, raycaster, renderer;
 			var vrEffect;
 			var vrControls;
 			var fullScreenButton = document.querySelector( '.button' );
@@ -72,12 +72,8 @@
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
-				scene.add( light );
-
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
 				var geometry = new THREE.BoxGeometry( 20, 20, 20 );
@@ -102,10 +98,9 @@
 
 				}
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 				var fullScreenButton = document.querySelector( '.button' );
 				fullScreenButton.onclick = function() {
@@ -144,7 +139,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				vrEffect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -179,8 +174,7 @@
 
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
 
 				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 

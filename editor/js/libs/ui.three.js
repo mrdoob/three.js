@@ -1,4 +1,6 @@
-// Texture
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
 UI.Texture = function () {
 
@@ -98,7 +100,7 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 		var image = texture.image;
 
-		if ( image.width > 0 ) {
+		if ( image !== undefined && image.width > 0 ) {
 
 			name.value = texture.sourceFile;
 
@@ -132,7 +134,7 @@ UI.Texture.prototype.onChange = function ( callback ) {
 };
 
 
-// CubeTexture
+//
 
 UI.CubeTexture = function () {
 
@@ -232,7 +234,7 @@ UI.CubeTexture.prototype.setValue = function ( texture ) {
 
 		var image = texture.image[ 0 ];
 
-		if ( image.width > 0 ) {
+		if ( image !== undefined && image.width > 0 ) {
 
 			name.value = texture.sourceFile;
 

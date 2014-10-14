@@ -1,15 +1,29 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Editor = function () {
 
 	var SIGNALS = signals;
 
 	this.signals = {
 
+		// player
+
+		startPlayer: new SIGNALS.Signal(),
+		stopPlayer: new SIGNALS.Signal(),
+
 		// actions
 
 		playAnimation: new SIGNALS.Signal(),
 		stopAnimation: new SIGNALS.Signal(),
 
+		showDialog: new SIGNALS.Signal(),
+
 		// notifications
+
+		savingStarted: new SIGNALS.Signal(),
+		savingFinished: new SIGNALS.Signal(),
 
 		themeChanged: new SIGNALS.Signal(),
 
@@ -22,7 +36,11 @@ var Editor = function () {
 
 		cameraChanged: new SIGNALS.Signal(),
 
+		geometryChanged: new SIGNALS.Signal(),
+
 		objectSelected: new SIGNALS.Signal(),
+		objectFocused: new SIGNALS.Signal(),
+
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
 		objectRemoved: new SIGNALS.Signal(),
@@ -34,21 +52,28 @@ var Editor = function () {
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
-		windowResize: new SIGNALS.Signal()
+		windowResize: new SIGNALS.Signal(),
+
+		showGridChanged: new SIGNALS.Signal()
 
 	};
-	
+
 	this.config = new Config();
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
 	this.scene = new THREE.Scene();
+	this.scene.name = 'Scene';
+
 	this.sceneHelpers = new THREE.Scene();
 
 	this.object = {};
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
+
+	this.scripts = {};
 
 	this.selected = null;
 	this.helpers = {};
@@ -64,6 +89,14 @@ Editor.prototype = {
 		this.signals.themeChanged.dispatch( value );
 
 	},
+
+	showDialog: function ( value ) {
+
+		this.signals.showDialog.dispatch( value );
+
+	},
+
+	//
 
 	setScene: function ( scene ) {
 
@@ -259,35 +292,26 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		this.selected = object;
+		if ( this.selected === object ) return;
+
+		var uuid = null;
 
 		if ( object !== null ) {
 
-			this.config.setKey( 'selected', object.uuid );
-
-		} else {
-
-			this.config.setKey( 'selected', null );
+			uuid = object.uuid;
 
 		}
 
+		this.selected = object;
+
+		this.config.setKey( 'selected', uuid );
 		this.signals.objectSelected.dispatch( object );
 
 	},
 
 	selectById: function ( id ) {
 
-		var scope = this;
-
-		this.scene.traverse( function ( child ) {
-
-			if ( child.id === id ) {
-
-				scope.select( child );
-
-			}
-
-		} );
+		this.select( this.scene.getObjectById( id, true ) );
 
 	},
 
@@ -313,93 +337,15 @@ Editor.prototype = {
 
 	},
 
-	// utils
+	focus: function ( object ) {
 
-	getObjectType: function ( object ) {
-
-		var types = {
-
-			'Scene': THREE.Scene,
-			'PerspectiveCamera': THREE.PerspectiveCamera,
-			'AmbientLight': THREE.AmbientLight,
-			'DirectionalLight': THREE.DirectionalLight,
-			'HemisphereLight': THREE.HemisphereLight,
-			'PointLight': THREE.PointLight,
-			'SpotLight': THREE.SpotLight,
-			'SkinnedMesh': THREE.SkinnedMesh,
-			'Mesh': THREE.Mesh,
-			'Sprite': THREE.Sprite,
-			'Object3D': THREE.Object3D
-
-		};
-
-		for ( var type in types ) {
-
-			if ( object instanceof types[ type ] ) return type;
-
-		}
+		this.signals.objectFocused.dispatch( object );
 
 	},
 
-	getGeometryType: function ( geometry ) {
+	focusById: function ( id ) {
 
-		var types = {
-
-			'BoxGeometry': THREE.BoxGeometry,
-			'CircleGeometry': THREE.CircleGeometry,
-			'CylinderGeometry': THREE.CylinderGeometry,
-			'ExtrudeGeometry': THREE.ExtrudeGeometry,
-			'IcosahedronGeometry': THREE.IcosahedronGeometry,
-			'LatheGeometry': THREE.LatheGeometry,
-			'OctahedronGeometry': THREE.OctahedronGeometry,
-			'ParametricGeometry': THREE.ParametricGeometry,
-			'PlaneGeometry': THREE.PlaneGeometry,
-			'PolyhedronGeometry': THREE.PolyhedronGeometry,
-			'ShapeGeometry': THREE.ShapeGeometry,
-			'SphereGeometry': THREE.SphereGeometry,
-			'TetrahedronGeometry': THREE.TetrahedronGeometry,
-			'TextGeometry': THREE.TextGeometry,
-			'TorusGeometry': THREE.TorusGeometry,
-			'TorusKnotGeometry': THREE.TorusKnotGeometry,
-			'TubeGeometry': THREE.TubeGeometry,
-			'Geometry': THREE.Geometry,
-			'BufferGeometry': THREE.BufferGeometry
-
-		};
-
-		for ( var type in types ) {
-
-			if ( geometry instanceof types[ type ] ) return type;
-
-		}
-
-	},
-
-	getMaterialType: function ( material ) {
-
-		var types = {
-
-			'LineBasicMaterial': THREE.LineBasicMaterial,
-			'LineDashedMaterial': THREE.LineDashedMaterial,
-			'MeshBasicMaterial': THREE.MeshBasicMaterial,
-			'MeshDepthMaterial': THREE.MeshDepthMaterial,
-			'MeshFaceMaterial': THREE.MeshFaceMaterial,
-			'MeshLambertMaterial': THREE.MeshLambertMaterial,
-			'MeshNormalMaterial': THREE.MeshNormalMaterial,
-			'MeshPhongMaterial': THREE.MeshPhongMaterial,
-			'PointCloudMaterial': THREE.PointCloudMaterial,
-			'ShaderMaterial': THREE.ShaderMaterial,
-			'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
-			'SpriteMaterial': THREE.SpriteMaterial,
-			'Material': THREE.Material
-
-		};
-
-		for ( var type in types ) {
-
-			if ( material instanceof types[ type ] ) return type;
-
-		}
+		this.focus( this.scene.getObjectById( id, true ) );
 
 	}
 

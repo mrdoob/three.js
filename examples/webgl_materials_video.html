@@ -105,11 +105,10 @@
 
 				video = document.getElementById( 'video' );
 
-				texture = new THREE.Texture( video );
+				texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.format = THREE.RGBFormat;
-				texture.generateMipmaps = false;
 
 				//
 
@@ -123,10 +122,7 @@
 				xsize = 480 / xgrid;
 				ysize = 204 / ygrid;
 
-				var parameters = { color: 0xffffff, map: texture },
-					material_base = new THREE.MeshLambertMaterial( parameters );
-
-				renderer.initMaterial( material_base, scene.__lights, scene.fog );
+				var parameters = { color: 0xffffff, map: texture };
 
 				cube_count = 0;
 
@@ -254,12 +250,6 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
-
-				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
-					if ( texture ) texture.needsUpdate = true;
-
-				}
 
 				for ( i = 0; i < cube_count; i ++ ) {
 

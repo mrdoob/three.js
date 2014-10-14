@@ -86,12 +86,14 @@
 				camera.position.y =  controls.center.y + 2000;
 				camera.position.x = 2000;
 
-				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+				var vertices = geometry.attributes.position.array;
 
-					geometry.vertices[ i ].y = data[ i ] * 10;
+				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+
+					vertices[ j + 1 ] = data[ i ] * 10;
 
 				}
 
@@ -254,10 +256,8 @@
 					var mouseY = -( event.clientY / window.innerHeight ) * 2 + 1;
 
 					var vector = new THREE.Vector3( mouseX, mouseY, camera.near );
-
 					// Convert the [-1, 1] screen coordinate into a world coordinate on the near plane
-					var projector = new THREE.Projector();
-					projector.unprojectVector( vector, camera );
+					vector.unproject( camera );
 
 					var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 

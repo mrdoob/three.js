@@ -11,20 +11,22 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
+THREE.Matrix4 = function () {
 
-THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+	this.elements = new Float32Array( [
 
-	this.elements = new Float32Array( 16 );
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
 
-	// TODO: if n11 is undefined, then just set to identity, otherwise copy all other values into matrix
-	//   we should not support semi specification of Matrix4, it is just weird.
+	] );
 
-	var te = this.elements;
+	if ( arguments.length > 0 ) {
 
-	te[ 0 ] = ( n11 !== undefined ) ? n11 : 1; te[ 4 ] = n12 || 0; te[ 8 ] = n13 || 0; te[ 12 ] = n14 || 0;
-	te[ 1 ] = n21 || 0; te[ 5 ] = ( n22 !== undefined ) ? n22 : 1; te[ 9 ] = n23 || 0; te[ 13 ] = n24 || 0;
-	te[ 2 ] = n31 || 0; te[ 6 ] = n32 || 0; te[ 10 ] = ( n33 !== undefined ) ? n33 : 1; te[ 14 ] = n34 || 0;
-	te[ 3 ] = n41 || 0; te[ 7 ] = n42 || 0; te[ 11 ] = n43 || 0; te[ 15 ] = ( n44 !== undefined ) ? n44 : 1;
+		console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
+
+	}
 
 };
 
@@ -70,7 +72,7 @@ THREE.Matrix4.prototype = {
 
 	extractPosition: function ( m ) {
 
-		console.warn( 'THREEMatrix4: .extractPosition() has been renamed to .copyPosition().' );
+		console.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
 		return this.copyPosition( m );
 
 	},
@@ -954,16 +956,7 @@ THREE.Matrix4.prototype = {
 
 	clone: function () {
 
-		var te = this.elements;
-
-		return new THREE.Matrix4(
-
-			te[ 0 ], te[ 4 ], te[ 8 ], te[ 12 ],
-			te[ 1 ], te[ 5 ], te[ 9 ], te[ 13 ],
-			te[ 2 ], te[ 6 ], te[ 10 ], te[ 14 ],
-			te[ 3 ], te[ 7 ], te[ 11 ], te[ 15 ]
-
-		);
+		return new THREE.Matrix4().fromArray( this.elements );
 
 	}
 

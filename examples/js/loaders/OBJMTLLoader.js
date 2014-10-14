@@ -45,9 +45,9 @@ THREE.OBJMTLLoader.prototype = {
 
 				onLoad( object );
 
-			} );
+			}, onProgress, onError );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -110,7 +110,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		}
 
-		var group = new THREE.Object3D();
+		var group = new THREE.Group();
 		var object = group;
 
 		var geometry = new THREE.Geometry();

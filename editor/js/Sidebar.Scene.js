@@ -1,8 +1,18 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
 
 	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/scene/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/scene/collapsed', boolean );
+
+	} );
 
 	container.addStatic( new UI.Text( 'SCENE' ) );
 	container.add( new UI.Break() );
@@ -17,6 +27,11 @@ Sidebar.Scene = function ( editor ) {
 		editor.selectById( parseInt( outliner.getValue() ) );
 
 		ignoreObjectSelectedSignal = false;
+
+	} );
+	outliner.onDblClick( function () {
+
+		editor.focusById( parseInt( outliner.getValue() ) );
 
 	} );
 	container.add( outliner );
@@ -111,47 +126,29 @@ Sidebar.Scene = function ( editor ) {
 
 	//
 
-	var refreshFogUI = function () {
-
-		var type = fogType.getValue();
-
-		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
-		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
-
-	};
-
-	// events
-
-	signals.sceneGraphChanged.add( function () {
+	var refreshUI = function () {
 
 		var scene = editor.scene;
-		var sceneType = editor.getObjectType( scene );
 
 		var options = [];
 
-		options.push( { value: scene.id, html: '<span class="type ' + sceneType + '"></span> ' + scene.name } );
+		options.push( { value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				var object = objects[ i ];
-				var objectType = editor.getObjectType( object );
 
-				var html = pad + '<span class="type ' + objectType + '"></span> ' + object.name;
+				var html = pad + '<span class="type ' + object.type + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
 					var geometry = object.geometry;
 					var material = object.material;
 
-					var geometryType = editor.getGeometryType( geometry );
-					var materialType = editor.getMaterialType( material );
-
-					html += ' <span class="type ' + geometryType + '"></span> ' + geometry.name;
-					html += ' <span class="type ' + materialType + '"></span> ' + material.name;
+					html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
+					html += ' <span class="type ' + material.type + '"></span> ' + material.name;
 
 				}
 
@@ -196,7 +193,24 @@ Sidebar.Scene = function ( editor ) {
 
 		refreshFogUI();
 
-	} );
+	};
+
+	var refreshFogUI = function () {
+
+		var type = fogType.getValue();
+
+		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
+		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
+
+	};
+
+	refreshUI();
+
+	// events
+
+	signals.sceneGraphChanged.add( refreshUI );
 
 	signals.objectSelected.add( function ( object ) {
 

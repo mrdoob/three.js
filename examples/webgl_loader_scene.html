@@ -160,36 +160,6 @@
 
 			}
 
-			function handle_update( result, pieces ) {
-
-				var m, material, count = 0;
-
-				for ( m in result.materials ) {
-
-					material = result.materials[ m ];
-					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial || material.morphTargets ) ) {
-
-						if( !material.program ) {
-
-							renderer.initMaterial( material, result.scene.__lights, result.scene.fog );
-
-							count += 1;
-
-							if( count > pieces ) {
-
-								//console.log("xxxxxxxxx");
-								break;
-
-							}
-
-						}
-
-					}
-
-				}
-
-			}
-
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -228,29 +198,6 @@
 
 					$( "bar" ).style.width = bar + "px";
 
-					count = 0;
-					for ( var m in result.materials ) count++;
-
-					handle_update( result, Math.floor( count/total ) );
-
-				}
-
-				var callbackSync = function( result ) {
-
-					/*
-
-					// uncomment to see progressive scene loading
-
-					scene = result.scene;
-					camera = result.currentCamera;
-
-					camera.aspect = window.innerWidth / window.innerHeight;
-					camera.updateProjectionMatrix();
-
-					*/
-
-					//handle_update( result, 1 );
-
 				}
 
 				var callbackFinished = function ( result ) {
@@ -261,8 +208,6 @@
 					$( "progressbar" ).style.display = "none";
 					$( "start" ).style.display = "block";
 					$( "start" ).className = "enabled";
-
-					handle_update( result, 1 );
 
 					result.scene.traverse( function ( object ) {
 
@@ -308,7 +253,6 @@
 				loader.addHierarchyHandler( "dae", THREE.ColladaLoader );
 				loader.addHierarchyHandler( "utf8", THREE.UTF8Loader );
 
-				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
 
 				loader.load( "scenes/test_scene.js", callbackFinished );

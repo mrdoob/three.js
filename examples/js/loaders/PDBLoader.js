@@ -12,7 +12,7 @@ THREE.PDBLoader.prototype = {
 
 	constructor: THREE.PDBLoader,
 
-	load: function ( url, onLoad ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -23,7 +23,7 @@ THREE.PDBLoader.prototype = {
 			var json = scope.parsePDB( text );
 			scope.createModel( json, onLoad );
 
-		} );
+		}, onProgress, onError );
 
 	},
 

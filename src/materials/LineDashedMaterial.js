@@ -25,6 +25,8 @@ THREE.LineDashedMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
+	this.type = 'LineDashedMaterial';
+
 	this.color = new THREE.Color( 0xffffff );
 
 	this.linewidth = 1;

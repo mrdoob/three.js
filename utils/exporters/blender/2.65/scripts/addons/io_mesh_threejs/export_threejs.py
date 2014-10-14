@@ -85,172 +85,166 @@ MAX_INFLUENCES = 2
 TEMPLATE_SCENE_ASCII = """\
 {
 
-"metadata" :
-{
-	"formatVersion" : 3.2,
-	"type"          : "scene",
-	"sourceFile"    : "%(fname)s",
-	"generatedBy"   : "Blender 2.7 Exporter",
-	"objects"       : %(nobjects)s,
-	"geometries"    : %(ngeometries)s,
-	"materials"     : %(nmaterials)s,
-	"textures"      : %(ntextures)s
-},
+	"urlBaseType": %(basetype)s,
 
-"urlBaseType" : %(basetype)s,
-
+	"metadata": {
+		"formatVersion" : 3.2,
+		"type"          : "scene",
+		"sourceFile"    : "%(fname)s",
+		"generatedBy"   : "Blender 2.7 Exporter",
+		"objects"       : %(nobjects)s,
+		"geometries"    : %(ngeometries)s,
+		"materials"     : %(nmaterials)s,
+		"textures"      : %(ntextures)s
+	},
 %(sections)s
+	"transform": {
+		"position" : %(position)s,
+		"rotation" : %(rotation)s,
+		"scale"    : %(scale)s
+	},
 
-"transform" :
-{
-	"position"  : %(position)s,
-	"rotation"  : %(rotation)s,
-	"scale"     : %(scale)s
-},
-
-"defaults" :
-{
-	"bgcolor" : %(bgcolor)s,
-	"bgalpha" : %(bgalpha)f,
-	"camera"  : %(defcamera)s
-}
+	"defaults": {
+		"bgcolor" : %(bgcolor)s,
+		"bgalpha" : %(bgalpha)f,
+		"camera"  : %(defcamera)s
+	}
 
 }
 """
 
 TEMPLATE_SECTION = """
-"%s" :
-{
+	"%s": {
 %s
-},
+	},
 """
 
 TEMPLATE_OBJECT = """\
-	%(object_id)s : {
-		"geometry"  : %(geometry_id)s,
-		"groups"    : [ %(group_id)s ],
-		"material"  : %(material_id)s,
-		"position"  : %(position)s,
-		"rotation"  : %(rotation)s,
-		"quaternion": %(quaternion)s,
-		"scale"     : %(scale)s,
-		"visible"       : %(visible)s,
-		"castShadow"    : %(castShadow)s,
-		"receiveShadow" : %(receiveShadow)s,
-		"doubleSided"   : %(doubleSided)s
-	}"""
+		%(object_id)s: {
+			"geometry"      : %(geometry_id)s,
+			"groups"        : [ %(group_id)s ],
+			"material"      : %(material_id)s,
+			"position"      : %(position)s,
+			"rotation"      : %(rotation)s,
+			"quaternion"    : %(quaternion)s,
+			"scale"         : %(scale)s,
+			"visible"       : %(visible)s,
+			"castShadow"    : %(castShadow)s,
+			"receiveShadow" : %(receiveShadow)s,
+			"doubleSided"   : %(doubleSided)s
+		}"""
 
 TEMPLATE_EMPTY = """\
-	%(object_id)s : {
-		"groups"    : [ %(group_id)s ],
-		"position"  : %(position)s,
-		"rotation"  : %(rotation)s,
-		"quaternion": %(quaternion)s,
-		"scale"     : %(scale)s
-	}"""
+		%(object_id)s: {
+			"groups"     : [ %(group_id)s ],
+			"position"   : %(position)s,
+			"rotation"   : %(rotation)s,
+			"quaternion" : %(quaternion)s,
+			"scale"      : %(scale)s
+		}"""
 
 TEMPLATE_GEOMETRY_LINK = """\
-	%(geometry_id)s : {
-		"type" : "ascii",
-		"url"  : %(model_file)s
-	}"""
+		%(geometry_id)s: {
+			"type" : "ascii",
+			"url"  : %(model_file)s
+		}"""
 
 TEMPLATE_GEOMETRY_EMBED = """\
-	%(geometry_id)s : {
-		"type" : "embedded",
-		"id"  : %(embed_id)s
-	}"""
+		%(geometry_id)s: {
+			"type" : "embedded",
+			"id"   : %(embed_id)s
+		}"""
 
 TEMPLATE_TEXTURE = """\
-	%(texture_id)s : {
-		"url": %(texture_file)s%(extras)s
-	}"""
+		%(texture_id)s: {
+			"url" : %(texture_file)s%(extras)s
+		}"""
 
 TEMPLATE_MATERIAL_SCENE = """\
-	%(material_id)s : {
-		"type": %(type)s,
-		"parameters": { %(parameters)s }
-	}"""
+		%(material_id)s: {
+			"type"       : %(type)s,
+			"parameters" : { %(parameters)s }
+		}"""
 
 TEMPLATE_CAMERA_PERSPECTIVE = """\
-	%(camera_id)s : {
-		"type"  : "PerspectiveCamera",
-		"fov"   : %(fov)f,
-		"aspect": %(aspect)f,
-		"near"  : %(near)f,
-		"far"   : %(far)f,
-		"position": %(position)s,
-		"target"  : %(target)s
-	}"""
+		%(camera_id)s: {
+			"type"     : "PerspectiveCamera",
+			"fov"      : %(fov)f,
+			"aspect"   : %(aspect)f,
+			"near"     : %(near)f,
+			"far"      : %(far)f,
+			"position" : %(position)s,
+			"target"   : %(target)s
+		}"""
 
 TEMPLATE_CAMERA_ORTHO = """\
-	%(camera_id)s : {
-		"type"  : "OrthographicCamera",
-		"left"  : %(left)f,
-		"right" : %(right)f,
-		"top"   : %(top)f,
-		"bottom": %(bottom)f,
-		"near"  : %(near)f,
-		"far"   : %(far)f,
-		"position": %(position)s,
-		"target"  : %(target)s
-	}"""
+		%(camera_id)s: {
+			"type"     : "OrthographicCamera",
+			"left"     : %(left)f,
+			"right"    : %(right)f,
+			"top"      : %(top)f,
+			"bottom"   : %(bottom)f,
+			"near"     : %(near)f,
+			"far"      : %(far)f,
+			"position" : %(position)s,
+			"target"   : %(target)s
+		}"""
 
 TEMPLATE_LIGHT_POINT = """\
-	%(light_id)s : {
-		"type"       : "PointLight",
-		"position"   : %(position)s,
-		"rotation"   : %(rotation)s,
-		"color"      : %(color)d,
-		"distance"   : %(distance).3f,
-		"intensity"  : %(intensity).3f
-	}"""
+		%(light_id)s: {
+			"type"      : "PointLight",
+			"position"  : %(position)s,
+			"rotation"  : %(rotation)s,
+			"color"     : %(color)d,
+			"distance"  : %(distance).3f,
+			"intensity" : %(intensity).3f
+		}"""
 
 TEMPLATE_LIGHT_SUN = """\
-	%(light_id)s : {
-		"type"       : "AmbientLight",
-		"position"   : %(position)s,
-		"rotation"   : %(rotation)s,
-		"color"      : %(color)d,
-		"distance"   : %(distance).3f,
-		"intensity"  : %(intensity).3f
-	}"""
+		%(light_id)s: {
+			"type"      : "AmbientLight",
+			"position"  : %(position)s,
+			"rotation"  : %(rotation)s,
+			"color"     : %(color)d,
+			"distance"  : %(distance).3f,
+			"intensity" : %(intensity).3f
+		}"""
 
 TEMPLATE_LIGHT_SPOT = """\
-	%(light_id)s : {
-		"type"       : "SpotLight",
-		"position"   : %(position)s,
-		"rotation"   : %(rotation)s,
-		"color"      : %(color)d,
-		"distance"   : %(distance).3f,
-		"intensity"  : %(intensity).3f,
-		"use_shadow" : %(use_shadow)d,
-		"angle"      : %(angle).3f
-	}"""
+		%(light_id)s: {
+			"type"       : "SpotLight",
+			"position"   : %(position)s,
+			"rotation"   : %(rotation)s,
+			"color"      : %(color)d,
+			"distance"   : %(distance).3f,
+			"intensity"  : %(intensity).3f,
+			"use_shadow" : %(use_shadow)d,
+			"angle"      : %(angle).3f
+		}"""
 
 TEMPLATE_LIGHT_HEMI = """\
-	%(light_id)s : {
-		"type"       : "HemisphereLight",
-		"position"   : %(position)s,
-		"rotation"   : %(rotation)s,
-		"color"      : %(color)d,
-		"distance"   : %(distance).3f,
-		"intensity"  : %(intensity).3f
-	}"""
+		%(light_id)s: {
+			"type"      : "HemisphereLight",
+			"position"  : %(position)s,
+			"rotation"  : %(rotation)s,
+			"color"     : %(color)d,
+			"distance"  : %(distance).3f,
+			"intensity" : %(intensity).3f
+		}"""
 
 TEMPLATE_LIGHT_AREA = """\
-	%(light_id)s : {
-		"type"       : "AreaLight",
-		"position"   : %(position)s,
-		"rotation"   : %(rotation)s,
-		"color"      : %(color)d,
-		"distance"   : %(distance).3f,
-		"intensity"  : %(intensity).3f,
-		"gamma"      : %(gamma).3f,
-		"shape"      : "%(shape)s",
-		"size"       : %(size).3f,
-		"size_y"     : %(size_y).3f
-	}"""
+		%(light_id)s: {
+			"type"      : "AreaLight",
+			"position"  : %(position)s,
+			"rotation"  : %(rotation)s,
+			"color"     : %(color)d,
+			"distance"  : %(distance).3f,
+			"intensity" : %(intensity).3f,
+			"gamma"     : %(gamma).3f,
+			"shape"     : "%(shape)s",
+			"size"      : %(size).3f,
+			"size_y"    : %(size_y).3f
+		}"""
 
 
 TEMPLATE_VEC4 = '[ %g, %g, %g, %g ]'
@@ -264,51 +258,45 @@ TEMPLATE_HEX = "0x%06x"
 # #####################################################
 
 TEMPLATE_FILE_ASCII = """\
-{
-
-	"metadata" :
 	{
-		"formatVersion" : 3.1,
-		"generatedBy"   : "Blender 2.7 Exporter",
-		"vertices"      : %(nvertex)d,
-		"faces"         : %(nface)d,
-		"normals"       : %(nnormal)d,
-		"colors"        : %(ncolor)d,
-		"uvs"           : [%(nuvs)s],
-		"materials"     : %(nmaterial)d,
-		"morphTargets"  : %(nmorphTarget)d,
-		"bones"         : %(nbone)d
-	},
+
+		"metadata": {
+			"formatVersion" : 3.1,
+			"generatedBy"   : "Blender 2.7 Exporter",
+			"vertices"      : %(nvertex)d,
+			"faces"         : %(nface)d,
+			"normals"       : %(nnormal)d,
+			"colors"        : %(ncolor)d,
+			"uvs"           : [%(nuvs)s],
+			"materials"     : %(nmaterial)d,
+			"morphTargets"  : %(nmorphTarget)d,
+			"bones"         : %(nbone)d
+		},
 
 %(model)s
 
-}
+	}
 """
 
 TEMPLATE_MODEL_ASCII = """\
-	"scale" : %(scale)f,
-
-	"materials" : [%(materials)s],
-
-	"vertices" : [%(vertices)s],
-
-	"morphTargets" : [%(morphTargets)s],
-
-	"normals" : [%(normals)s],
-
-	"colors" : [%(colors)s],
-
-	"uvs" : [%(uvs)s],
-
-	"faces" : [%(faces)s],
-
-	"bones" : [%(bones)s],
-
-	"skinIndices" : [%(indices)s],
-
-	"skinWeights" : [%(weights)s],
-
-  "animations" : [%(animations)s]
+			"scale" : %(scale)f,
+			
+			"vertices" : [%(vertices)s],
+			"faces"    : [%(faces)s],
+			"uvs"      : [%(uvs)s],
+			"normals"  : [%(normals)s],
+			
+			"skinIndices"  : [%(indices)s],
+			"skinWeights"  : [%(weights)s],
+			"morphTargets" : [%(morphTargets)s],
+			
+			"bones"      : [%(bones)s],
+			"animations" : [%(animations)s],
+			
+			"colors"    : [%(colors)s],
+			"materials" : [
+%(materials)s
+			]
 """
 
 TEMPLATE_VERTEX = "%g,%g,%g"
@@ -827,6 +815,7 @@ def generate_indices_and_weights(meshes, option_skinning):
     weights = []
 
     armature, armature_object = get_armature()
+    bone_names = [bone.name for bone in armature_object.pose.bones]
 
     for mesh, object in meshes:
 
@@ -854,9 +843,10 @@ def generate_indices_and_weights(meshes, option_skinning):
 
             for group in vertex.groups:
                 index = group.group
-                weight = group.weight
+                if object.vertex_groups[index].name in bone_names:
+                    weight = group.weight 
 
-                bone_array.append( (index, weight) )
+                    bone_array.append( (index, weight) )
                 
             bone_array.sort(key = operator.itemgetter(1), reverse=True)
             
@@ -879,11 +869,11 @@ def generate_indices_and_weights(meshes, option_skinning):
                             break
 
                     if found != 1:
-                        indices.append('0')
+                        indices.append('-1')
                         weights.append('0')
 
                 else:
-                    indices.append('0')
+                    indices.append('-1')
                     weights.append('0')
     
     
@@ -1316,11 +1306,11 @@ def generate_materials(mtl, materials, draw_type):
             mtl[m]['wireframe'] = True
             mtl[m]['DbgColor'] = 0xff0000
 
-        mtl_raw = ",\n".join(['\t\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
-        mtl_string = "\t{\n%s\n\t}" % mtl_raw
+        mtl_raw = ",\n".join(['\t\t\t\t\t"%s": %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
+        mtl_string = "\t\t\t\t{\n%s\n\t\t\t\t}" % mtl_raw
         mtl_array.append([index, mtl_string])
 
-    return ",\n\n".join([m for i,m in sorted(mtl_array)]), len(mtl_array)
+    return ",\n".join([m for i,m in sorted(mtl_array)]), len(mtl_array)
 
 def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath):
     world = scene.world
@@ -1552,7 +1542,7 @@ def generate_ascii_model(meshes, morphs,
     bones_string, nbone = generate_bones(meshes, option_bones, flipyz)
     indices_string, weights_string = generate_indices_and_weights(meshes, option_skinning)
 
-    materials_string = ",\n\n".join(materials)
+    materials_string = ",\n".join(materials)
 
     model_string = TEMPLATE_MODEL_ASCII % {
     "scale" : option_scale,
@@ -1812,7 +1802,7 @@ def generate_section(label, content):
 
 def get_mesh_filename(mesh):
     object_id = mesh["data"]["name"]
-    filename = "%s.js" % sanitize(object_id)
+    filename = "%s.json" % sanitize(object_id)
     return filename
 
 def generate_material_id_list(materials):
@@ -1931,7 +1921,7 @@ def generate_objects(data):
             }
             chunks.append(object_string)
 
-    return ",\n\n".join(chunks), len(chunks)
+    return ",\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - geometries
@@ -1976,7 +1966,7 @@ def generate_geometries(data):
 
                 geo_set.add(name)
 
-    return ",\n\n".join(chunks), len(chunks)
+    return ",\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - textures
@@ -2013,7 +2003,7 @@ def generate_textures_scene(data):
                 if texture.use_mirror_y:
                     wrap_y = "mirror"
 
-                extras += ',\n        "wrap": ["%s", "%s"]' % (wrap_x, wrap_y)
+                extras += ',\n\t\t\t"wrap": ["%s", "%s"]' % (wrap_x, wrap_y)
 
             texture_string = TEMPLATE_TEXTURE % {
             "texture_id"   : generate_string(texture_id),
@@ -2022,7 +2012,7 @@ def generate_textures_scene(data):
             }
             chunks.append(texture_string)
 
-    return ",\n\n".join(chunks), len(chunks)
+    return ",\n".join(chunks), len(chunks)
 
 def extract_texture_filename(image):
     fn = bpy.path.abspath(image.filepath)
@@ -2255,7 +2245,7 @@ def generate_materials_scene(data):
         material_string = generate_material_string(material)
         chunks.append(material_string)
 
-    return ",\n\n".join(chunks), len(chunks)
+    return ",\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - cameras
@@ -2333,7 +2323,7 @@ def generate_cameras(data):
                     
                 chunks.append(camera_string)
 
-    return ",\n\n".join(chunks), len(chunks)
+    return ",\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - lights
@@ -2407,7 +2397,7 @@ def generate_lights(data):
         if not lamps:
             lamps.append(DEFAULTS["light"])
 
-    return ",\n\n".join(chunks), len(chunks)
+    return ",\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - embedded meshes
@@ -2421,10 +2411,10 @@ def generate_embeds(data):
 
         for e in data["embeds"]:
 
-            embed = '"emb_%s": {%s}' % (e, data["embeds"][e])
+            embed = '\t\t"emb_%s": {\n%s\t\t}' % (e, data["embeds"][e])
             chunks.append(embed)
 
-        return ",\n\n".join(chunks)
+        return ",\n".join(chunks)
 
     return ""
 
@@ -2445,14 +2435,14 @@ def generate_ascii_scene(data):
 
     if nlights > 0:
         if nobjects > 0:
-            objects = objects + ",\n\n" + lights
+            objects = objects + ",\n" + lights
         else:
             objects = lights
         nobjects += nlights
 
     if ncameras > 0:
         if nobjects > 0:
-            objects = objects + ",\n\n" + cameras
+            objects = objects + ",\n" + cameras
         else:
             objects = cameras
         nobjects += ncameras
@@ -2477,7 +2467,7 @@ def generate_ascii_scene(data):
         if content:
             chunks.append(generate_section(label, content))
 
-    sections_string = "\n".join(chunks)
+    sections_string = "".join(chunks)
 
     default_camera = ""
     if data["use_cameras"]:
@@ -2573,7 +2563,7 @@ def save(operator, context, filepath = "",
 
     #print("URL TYPE", option_url_base_html)
 
-    filepath = ensure_extension(filepath, '.js')
+    filepath = ensure_extension(filepath, '.json')
 
     scene = context.scene
 

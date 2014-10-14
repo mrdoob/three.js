@@ -396,7 +396,12 @@
 
 				renderer.autoClear = false;
 
-				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				var renderTargetParameters = {
+					minFilter: THREE.LinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBFormat,
+					stencilBuffer: false
+				};
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 				effectSave = new THREE.SavePass( new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters ) );
@@ -495,7 +500,7 @@
 				groundBasic = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texture } );
 				groundBasic.color.setHSL( 0.1, 0.9, 0.7 );
 
-				ground = new THREE.Mesh( new THREE.PlaneGeometry( 50000, 50000 ), groundBasic );
+				ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 50000, 50000 ), groundBasic );
 				ground.position.y = - 215;
 				ground.rotation.x = - Math.PI / 2;
 				scene.add( ground );
@@ -525,6 +530,31 @@
 
 			//
 
+			var canvas = document.createElement( 'canvas' );
+			canvas.width = 128;
+			canvas.height = 128;
+
+			var context = canvas.getContext( '2d' );
+			var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+			gradient.addColorStop( 0.1, 'rgba(0,0,0,1)' );
+			gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
+
+			context.fillStyle = gradient;
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+
+			//
+
+			var shadowTexture = new THREE.Texture( canvas );
+			shadowTexture.needsUpdate = true;
+
+			var shadowPlane = new THREE.PlaneBufferGeometry( 400, 400 );
+			var shadowMaterial = new THREE.MeshBasicMaterial( {
+
+				opacity: 0.35, transparent: true, map: shadowTexture,
+				polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
+
+			} );
+
 			function addObject( geometry, color, x, y, z, sy ) {
 
 				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, ambient: color } ) );
@@ -533,37 +563,9 @@
 				object.receiveShadow = true;
 				scene.add( object );
 
-				//
-
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = 128;
-				canvas.height = 128;
-
-				var context = canvas.getContext( '2d' );
-				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
-				gradient.addColorStop( 0.1, 'rgba(0,0,0,1)' );
-				gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
-
-				context.fillStyle = gradient;
-				context.fillRect( 0, 0, canvas.width, canvas.height );
-
-				//
-
-				var shadowTexture = new THREE.Texture( canvas );
-				shadowTexture.needsUpdate = true;
-
-				var shadowPlane = new THREE.PlaneGeometry( 400, 400 );
-				var shadowMaterial = new THREE.MeshBasicMaterial( {
-
-					opacity: 0.35, transparent: true, map: shadowTexture,
-					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
-
-				} );
-
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
 				shadow.position.y = sy;
 				shadow.rotation.x = - Math.PI / 2;
-
 				object.add( shadow );
 
 			}
@@ -572,7 +574,12 @@
 
 			function generateDropShadowTexture( object, width, height, bluriness ) {
 
-				var renderTargetParameters = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
+				var renderTargetParameters = {
+					minFilter: THREE.LinearMipmapLinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBAFormat,
+					stencilBuffer: false
+				};
 				var shadowTarget = new THREE.WebGLRenderTarget( width, height, renderTargetParameters );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
@@ -639,7 +646,6 @@
 
 			}
 
-
 			//
 
 			function addCar( object, x, y, z, s ) {
@@ -672,7 +678,7 @@
 				var shadowWidth  =        ss * ( bb.max.z - bb.min.z );
 				var shadowHeight = 1.25 * ss * ( bb.max.x - bb.min.x );
 
-				var shadowPlane = new THREE.PlaneGeometry( shadowWidth, shadowHeight );
+				var shadowPlane = new THREE.PlaneBufferGeometry( shadowWidth, shadowHeight );
 				var shadowMaterial = new THREE.MeshBasicMaterial( {
 					color: 0xffffff, opacity: 0.5, transparent: true, map: shadowTexture,
 					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
@@ -979,7 +985,9 @@
 
 				camera.lookAt( cameraTarget );
 
-				renderer.clearTarget( null );
+				renderer.setRenderTarget( null );
+
+				renderer.clear();
 				composer.render( 0.1 );
 
 				renderer.shadowMapEnabled = false;

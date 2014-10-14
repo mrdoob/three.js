@@ -32,7 +32,7 @@
 
 		<h3>[name]([page:Vector3 dir], [page:Vector3 origin], [page:Number length], [page:Number hex], [page:Number headLength], [page:Number headWidth] )</h3>
 		<div>
-		dir -- Vector3 -- direction from origin <br />
+		dir -- Vector3 -- direction from origin. Must be a unit vector. <br />
 		origin -- Vector3 <br />
 		length -- scalar <br />
 		hex -- hexadecimal value to define color ex:0xffff00<br />
@@ -70,9 +70,11 @@
 		Sets the color of the arrowHelper.
 		</div>
 
-		<h3>.setLength([page:Number length])</h3>
+		<h3>.setLength([page:Number length], [page:Number headLength], [page:Number headWidth])</h3>
 		<div>
-		length -- The desired length
+		length -- The desired length<br />
+		headLength -- The length of the head of the arrow<br />
+		headWidth -- The length of the width of the arrow		
 		</div>
 		<div>
 		Sets the length of the arrowhelper.

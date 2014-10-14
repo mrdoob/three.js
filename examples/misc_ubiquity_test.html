@@ -16,8 +16,11 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 		<script src="js/renderers/SVGRenderer.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="obj/Qrcode.js"></script>
@@ -143,7 +146,7 @@
 				// SPRITES
 
 				var texture = THREE.ImageUtils.loadTexture( 'textures/sprite.png' );
-				var material = new THREE.SpriteMaterial( { map: texture } );
+				var material = new THREE.SpriteMaterial( { map: texture, transparent: true } );
 
 				for ( var i = 0; i < 50; i ++ ) {
 

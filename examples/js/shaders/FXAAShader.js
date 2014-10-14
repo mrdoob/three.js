@@ -19,11 +19,8 @@ THREE.FXAAShader = {
 
 	vertexShader: [
 
-		"varying vec2 vUv;",
-
 		"void main() {",
 
-			"vUv = uv;",
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
@@ -34,8 +31,6 @@ THREE.FXAAShader = {
 
 		"uniform sampler2D tDiffuse;",
 		"uniform vec2 resolution;",
-
-		"varying vec2 vUv;",
 
 		"#define FXAA_REDUCE_MIN   (1.0/128.0)",
 		"#define FXAA_REDUCE_MUL   (1.0/8.0)",

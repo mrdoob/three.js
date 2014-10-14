@@ -7,6 +7,8 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
+	this.needsUpdate = false;
+
 };
 
 THREE.BufferAttribute.prototype = {
@@ -16,6 +18,19 @@ THREE.BufferAttribute.prototype = {
 	get length () {
 
 		return this.array.length;
+
+	},
+
+	copyAt: function ( index1, attribute, index2 ) {
+
+		index1 *= this.itemSize;
+		index2 *= attribute.itemSize;
+
+		for ( var i = 0, l = this.itemSize; i < l; i ++ ) {
+
+			this.array[ index1 + i ] = attribute.array[ index2 + i ];
+
+		}
 
 	},
 
@@ -84,6 +99,12 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 3 ] = w;
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new THREE.BufferAttribute( new this.array.constructor( this.array ), this.itemSize );
 
 	}
 

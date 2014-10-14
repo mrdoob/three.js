@@ -20,6 +20,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -53,7 +56,7 @@
 
 				}
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				scene.add( group );
 
 				for ( var i = 0; i < 1000; i++ ) {
