@@ -805,6 +805,8 @@ THREE.Vector3.prototype = {
 			array[ offset ] = this.x;
 			array[ offset + 1 ] = this.y;
 			array[ offset + 2 ] = this.z;
+			
+			return array;
 
 		} else {
 
