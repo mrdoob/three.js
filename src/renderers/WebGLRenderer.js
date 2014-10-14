@@ -194,8 +194,131 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionFragDepth;
 	var _glExtensionBlendMinMax;
 
+	try {
 
-	initGL();
+		var attributes = {
+			alpha: _alpha,
+			depth: _depth,
+			stencil: _stencil,
+			antialias: _antialias,
+			premultipliedAlpha: _premultipliedAlpha,
+			preserveDrawingBuffer: _preserveDrawingBuffer
+		};
+
+		_gl = _context || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+
+		if ( _gl === null ) {
+
+			throw 'Error creating WebGL context.';
+
+		}
+
+	} catch ( error ) {
+
+		console.error( error );
+
+	}
+
+	_glExtensionTextureFloat = _gl.getExtension( 'OES_texture_float' );
+	_glExtensionTextureFloatLinear = _gl.getExtension( 'OES_texture_float_linear' );
+
+	if ( _glExtensionTextureFloat === null ) {
+
+		console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
+
+	}
+
+	_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
+
+	if ( _glExtensionStandardDerivatives === null ) {
+
+		console.log( 'THREE.WebGLRenderer: Standard derivatives not supported.' );
+
+	}
+
+	_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+
+	if ( _glExtensionTextureFilterAnisotropic === null ) {
+
+		console.log( 'THREE.WebGLRenderer: Anisotropic texture filtering not supported.' );
+
+	}
+
+	_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
+
+	if ( _glExtensionCompressedTextureS3TC === null ) {
+
+		console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
+
+	}
+
+	_glExtensionCompressedTexturePVRTC = _gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+
+	if ( _glExtensionCompressedTexturePVRTC === null ) {
+
+		console.log( 'THREE.WebGLRenderer: PVRTC compressed textures not supported.' );
+
+	}
+
+	_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
+
+	if ( _glExtensionElementIndexUint === null ) {
+
+		console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
+
+	}
+
+	_glExtensionBlendMinMax = _gl.getExtension( 'EXT_blend_minmax' );
+
+	if ( _glExtensionBlendMinMax === null ) {
+
+		console.log( 'THREE.WebGLRenderer: min max blend equations not supported.' );
+
+	}
+
+	if ( _gl.getShaderPrecisionFormat === undefined ) {
+
+		_gl.getShaderPrecisionFormat = function () {
+
+			return {
+				'rangeMin': 1,
+				'rangeMax': 1,
+				'precision': 1
+			};
+
+		}
+	}
+
+	if ( _logarithmicDepthBuffer ) {
+
+		_glExtensionFragDepth = _gl.getExtension( 'EXT_frag_depth' );
+
+	}
+
+	//
+
+	function setDefaultGLState() {
+
+		_gl.clearColor( 0, 0, 0, 1 );
+		_gl.clearDepth( 1 );
+		_gl.clearStencil( 0 );
+
+		_gl.enable( _gl.DEPTH_TEST );
+		_gl.depthFunc( _gl.LEQUAL );
+
+		_gl.frontFace( _gl.CCW );
+		_gl.cullFace( _gl.BACK );
+		_gl.enable( _gl.CULL_FACE );
+
+		_gl.enable( _gl.BLEND );
+		_gl.blendEquation( _gl.FUNC_ADD );
+		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
+
+		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
+
+		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+
+	}
 
 	setDefaultGLState();
 
@@ -446,6 +569,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 		plugin.init( this, lights, _webglObjects, _webglObjectsImmediate );
 
 		this.renderPluginsPre.push( plugin );
+
+	};
+
+	// Reset
+
+	this.resetGLState = function () {
+
+		_currentProgram = null;
+		_currentCamera = null;
+
+		_oldBlending = - 1;
+		_oldDepthTest = - 1;
+		_oldDepthWrite = - 1;
+		_oldDoubleSided = - 1;
+		_oldFlipSided = - 1;
+		_currentGeometryGroupHash = - 1;
+		_currentMaterialId = - 1;
+
+		_lightsNeedUpdate = true;
 
 	};
 
@@ -6151,7 +6293,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	// Fallback filters for non-power-of-2 textures
 
@@ -6165,7 +6307,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return _gl.LINEAR;
 
-	};
+	}
 
 	// Map three.js constants to WebGL constants
 
@@ -6245,7 +6387,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return 0;
 
-	};
+	}
 
 	// Allocations
 
@@ -6286,7 +6428,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	function allocateLights( lights ) {
 
@@ -6310,7 +6452,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
 
-	};
+	}
 
 	function allocateShadows( lights ) {
 
@@ -6329,156 +6471,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return maxShadows;
 
-	};
-
-	// Initialization
-
-	function initGL() {
-
-		try {
-
-			var attributes = {
-				alpha: _alpha,
-				depth: _depth,
-				stencil: _stencil,
-				antialias: _antialias,
-				premultipliedAlpha: _premultipliedAlpha,
-				preserveDrawingBuffer: _preserveDrawingBuffer
-			};
-
-			_gl = _context || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
-
-			if ( _gl === null ) {
-
-				throw 'Error creating WebGL context.';
-
-			}
-
-		} catch ( error ) {
-
-			console.error( error );
-
-		}
-
-		_glExtensionTextureFloat = _gl.getExtension( 'OES_texture_float' );
-		_glExtensionTextureFloatLinear = _gl.getExtension( 'OES_texture_float_linear' );
-
-		if ( _glExtensionTextureFloat === null ) {
-
-			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
-
-		}
-
-		_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
-
-		if ( _glExtensionStandardDerivatives === null ) {
-
-			console.log( 'THREE.WebGLRenderer: Standard derivatives not supported.' );
-
-		}
-
-		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
-
-		if ( _glExtensionTextureFilterAnisotropic === null ) {
-
-			console.log( 'THREE.WebGLRenderer: Anisotropic texture filtering not supported.' );
-
-		}
-
-		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
-
-		if ( _glExtensionCompressedTextureS3TC === null ) {
-
-			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
-
-		}
-
-		_glExtensionCompressedTexturePVRTC = _gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
-
-		if ( _glExtensionCompressedTexturePVRTC === null ) {
-
-			console.log( 'THREE.WebGLRenderer: PVRTC compressed textures not supported.' );
-
-		}
-
-		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
-
-		if ( _glExtensionElementIndexUint === null ) {
-
-			console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
-
-		}
-
-		_glExtensionBlendMinMax = _gl.getExtension( 'EXT_blend_minmax' );
-
-		if ( _glExtensionBlendMinMax === null ) {
-
-			console.log( 'THREE.WebGLRenderer: min max blend equations not supported.' );
-
-		}
-
-		if ( _gl.getShaderPrecisionFormat === undefined ) {
-
-			_gl.getShaderPrecisionFormat = function () {
-
-				return {
-					'rangeMin': 1,
-					'rangeMax': 1,
-					'precision': 1
-				};
-
-			}
-		}
-
-		if ( _logarithmicDepthBuffer ) {
-
-			_glExtensionFragDepth = _gl.getExtension( 'EXT_frag_depth' );
-
-		}
-
 	}
-
-	function setDefaultGLState () {
-
-		_gl.clearColor( 0, 0, 0, 1 );
-		_gl.clearDepth( 1 );
-		_gl.clearStencil( 0 );
-
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthFunc( _gl.LEQUAL );
-
-		_gl.frontFace( _gl.CCW );
-		_gl.cullFace( _gl.BACK );
-		_gl.enable( _gl.CULL_FACE );
-
-		_gl.enable( _gl.BLEND );
-		_gl.blendEquation( _gl.FUNC_ADD );
-		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
-
-		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
-
-		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
-
-	}
-
-	function resetGLState() {
-
-		_currentProgram = null;
-		_currentCamera = null;
-
-		_oldBlending = - 1;
-		_oldDepthTest = - 1;
-		_oldDepthWrite = - 1;
-		_oldDoubleSided = - 1;
-		_oldFlipSided = - 1;
-		_currentGeometryGroupHash = - 1;
-		_currentMaterialId = - 1;
-
-		_lightsNeedUpdate = true;
-
-	}
-
-	this.resetGLState = resetGLState;
 
 	// default plugins (order is important)
 
