@@ -20,6 +20,32 @@
 				overflow: hidden;
 			}
 
+			
+				.marquee {
+				width: 130px;
+				height: 40px;
+				padding: 5px;
+				background-color: yellowgreen;
+				border: 20px solid rgba ( 0, 0, 0, 0.3 );
+				white-space: nowrap; 
+				overflow: hidden;
+
+				/* Safari and Chrome  */
+				overflow-x:-webkit-marquee;
+				-webkit-marquee-direction: backwards;
+				-webkit-marquee-style: scroll;
+				-webkit-marquee-speed: fast;
+				-webkit-marquee-increment: small;
+				-webkit-marquee-repetition: infinite;
+
+				/* W3C  */
+				overflow-x: marquee-line;
+				marquee-direction: forward;
+				marquee-style: scroll;
+				marquee-speed: fast;
+				marquee-play-count: infinite;
+			}
+
 			a {
 				color: #2194CE;
 				text-decoration: none;
@@ -67,6 +93,7 @@
 			#viewer {
 				position: absolute;
 				left: 310px;
+				width: -webkit-calc(100% - 310px); /* Safari */
 				width: calc(100% - 310px);
 				height: 100%;
 				border: 0px;
@@ -451,5 +478,7 @@
 
 		</script>
 
-	</body>
+		<div class="marquee"><p>hidden refresh fix</p></div>
+
+		</body>
 </html>
