@@ -139,8 +139,8 @@ class ImportTHREEJS(bpy.types.Operator, ImportHelper):
     bl_idname = "import.threejs"
     bl_label = "Import Three.js"
 
-    filename_ext = ".js"
-    filter_glob = StringProperty(default="*.js", options={'HIDDEN'})
+    filename_ext = ".json"
+    filter_glob = StringProperty(default="*.json", options={'HIDDEN'})
 
     option_flip_yz = BoolProperty(name="Flip YZ", description="Flip YZ", default=True)
     recalculate_normals = BoolProperty(name="Recalculate normals", description="Recalculate vertex normals", default=True)
@@ -283,7 +283,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     bl_idname = "export.threejs"
     bl_label = "Export Three.js"
 
-    filename_ext = ".js"
+    filename_ext = ".json"
 
     option_vertices = BoolProperty(name = "Vertices", description = "Export vertices", default = True)
     option_vertices_deltas = BoolProperty(name = "Deltas", description = "Delta vertices", default = False)
@@ -442,11 +442,11 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 # ################################################################
 
 def menu_func_export(self, context):
-    default_path = bpy.data.filepath.replace(".blend", ".js")
-    self.layout.operator(ExportTHREEJS.bl_idname, text="Three.js (.js)").filepath = default_path
+    default_path = bpy.data.filepath.replace(".blend", ".json")
+    self.layout.operator(ExportTHREEJS.bl_idname, text="Three.js (.json)").filepath = default_path
 
 def menu_func_import(self, context):
-    self.layout.operator(ImportTHREEJS.bl_idname, text="Three.js (.js)")
+    self.layout.operator(ImportTHREEJS.bl_idname, text="Three.js (.json)")
 
 def register():
     bpy.utils.register_module(__name__)

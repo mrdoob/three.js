@@ -11,77 +11,84 @@
 		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Creates a tube that extrudes along a 3d curve</div>
 
+		<h2>Example</h2>
+		
+<code>
+var CustomSinCurve = THREE.Curve.create(
+    function ( scale ) { //custom curve constructor
+        this.scale = (scale === undefined) ? 1 : scale;
+    },
+    
+    function ( t ) { //getPoint: t is between 0-1
+        var tx = t * 3 - 1.5,
+            ty = Math.sin( 2 * Math.PI * t ),
+            tz = 0;
+        
+        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+    }
+);
+
+var path = new CustomSinCurve( 10 );
+
+var geometry = new THREE.TubeGeometry(
+    path,  //path
+    20,    //segments
+    2,     //radius
+    8,     //radiusSegments
+    false  //closed
+);
+</code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo path], [page:Integer segments], [page:Float radius], [page:Integer radiusSegments], [page:Boolean closed], [page:Boolean debug])</h3>
+		<h3>[name]([page:Curve path], [page:Integer segments], [page:Float radius], [page:Integer radiusSegments], [page:Boolean closed])</h3>
 		<div>
-		path — todo <br />
-		segments — todo <br />
-		radius — todo <br />
-		radiusSegments — todo <br />
-		closed — todo <br />
-		debug — todo
+		path — [page:Curve] - A path that inherits from the [page:Curve] base class<br />
+		segments — [page:Integer] - The number of segments that make up the tube, default is 64<br />
+		radius — [page:Float] - The radius of the tube, default is 1<br />
+		radiusSegments — [page:Integer] - The number of segments that make up the cross-section, default is 8 <br />
+		closed — [page:Float] Is the tube open or closed, default is false <br />
 		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>.[page:todo path]</h3>
+		<h3>.[page:Object parameters]</h3>
 		<div>
-		todo
-		</div> 
-
-		<h3>.[page:Integer segments]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:Float radius]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:Integer radiusSegments]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:Boolean closed]</h3>
-		<div>
-		todo
+		An object with all of the parameters that were used to generate the geometry.
 		</div> 
 
 		<h3>.[page:Array tangents]</h3>
 		<div>
-		todo
+		An array of [page:Vector3] tangents
 		</div> 
 
 		<h3>.[page:Array normals]</h3>
 		<div>
-		todo
+		An array of [page:Vector3] normals
 		</div> 
 
 		<h3>.[page:Array binormals]</h3>
 		<div>
-		todo
+		An array of [page:Vector3] binormals
 		</div> 
 
 
 		<h2>Methods</h2>
 		
 
-		<h3>.FrenetFrames([page:todo path], [page:Integer segments], [page:Boolean closed])</h3>
+		<h3>THREE.TubeGeometry.FrenetFrames([page:Curve path], [page:Integer segments], [page:Boolean closed])</h3>
 		<div>
-		path — todo <br />
-		segments — todo <br />
-		closed — todo
+		path — A path that inherits from the [page:Curve] base class <br />
+		segments — The number of segments that make up the tube <br />
+		closed — Is the tube open or closed
 		</div>
 		<div>
-		todo
+		A static method that generates the Frenet Frames. This is internally run on any new TubeGeometry and then the
+		generated tangents, normals, and binormals are exposed as properties on the TubeGeometry object.
 		</div>
 		
 		<h2>Source</h2>

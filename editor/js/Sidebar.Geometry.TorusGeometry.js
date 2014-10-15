@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
@@ -69,7 +73,6 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 			arc.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 	var container = new UI.Panel();

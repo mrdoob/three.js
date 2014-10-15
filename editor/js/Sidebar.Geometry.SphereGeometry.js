@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
@@ -91,7 +95,6 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 			thetaLength.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

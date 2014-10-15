@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Viewport.Info = function ( editor ) {
 
 	var signals = editor.signals;

@@ -3,27 +3,45 @@
  *
  * Description: A THREE loader for PLY ASCII files (known as the Polygon File Format or the Stanford Triangle Format).
  *
- * Currently only supports ASCII encoded files.
  *
  * Limitations: ASCII decoding assumes file is UTF-8.
  *
  * Usage:
  *	var loader = new THREE.PLYLoader();
- *	loader.addEventListener( 'load', function ( event ) {
+ *	loader.load('./models/ply/ascii/dolphins.ply', function (geometry) {
  *
- *		var geometry = event.content;
  *		scene.add( new THREE.Mesh( geometry ) );
  *
  *	} );
- *	loader.load( './models/ply/ascii/dolphins.ply' );
+ *
+ * If the PLY file uses non standard property names, they can be mapped while
+ * loading. For example, the following maps the properties
+ * “diffuse_(red|green|blue)” in the file to standard color names.
+ *
+ * loader.setPropertyNameMapping( {
+ *	diffuse_red: 'red',
+ *	diffuse_green: 'green',
+ *	diffuse_blue: 'blue'
+ * } );
+ *
  */
 
 
-THREE.PLYLoader = function () {};
+THREE.PLYLoader = function () {
+
+	this.propertyNameMapping = {};
+
+};
 
 THREE.PLYLoader.prototype = {
 
 	constructor: THREE.PLYLoader,
+
+	setPropertyNameMapping: function ( mapping ) {
+
+		this.propertyNameMapping = mapping;
+
+	},
 
 	load: function ( url, callback ) {
 
@@ -105,32 +123,38 @@ THREE.PLYLoader.prototype = {
 		var header = {
 			comments: [],
 			elements: [],
-			headerLength: result[0].length
+			headerLength: result[ 0 ].length
 		};
 
 		var lines = headerText.split( '\n' );
 		var currentElement = undefined;
 		var lineType, lineValues;
 
-		function make_ply_element_property(propertValues) {
+		function make_ply_element_property( propertValues, propertyNameMapping ) {
 
-			var property = Object();
+			var property = {
+				type: propertValues[ 0 ]
+			};
 
-			property.type = propertValues[0]
+			if ( property.type === 'list' ) {
 
-			if ( property.type === "list" ) {
-
-				property.name = propertValues[3]
-				property.countType = propertValues[1]
-				property.itemType = propertValues[2]
+				property.name = propertValues[ 3 ];
+				property.countType = propertValues[ 1 ];
+				property.itemType = propertValues[ 2 ];
 
 			} else {
 
-				property.name = propertValues[1]
+				property.name = propertValues[ 1 ];
 
 			}
 
-			return property
+			if ( property.name in propertyNameMapping ) {
+
+				property.name = propertyNameMapping[ property.name ];
+
+			}
+
+			return property;
 
 		}
 
@@ -175,7 +199,7 @@ THREE.PLYLoader.prototype = {
 
 			case "property":
 
-				currentElement.properties.push( make_ply_element_property( lineValues ) );
+				currentElement.properties.push( make_ply_element_property( lineValues, this.propertyNameMapping ) );
 
 				break;
 
@@ -260,7 +284,7 @@ THREE.PLYLoader.prototype = {
 
 		var patternBody = /end_header\s([\s\S]*)$/;
 		var body = "";
-		if ( ( result = patternBody.exec( data ) ) != null ) {
+		if ( ( result = patternBody.exec( data ) ) !== null ) {
 			body = result [ 1 ];
 		}
 

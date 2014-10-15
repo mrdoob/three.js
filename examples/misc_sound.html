@@ -117,12 +117,11 @@
 
 				// ground
 
-				var material = new THREE.MeshLambertMaterial( { color: 0x7f7566, wireframe: true, wireframeLinewidth: 1 } );
-
-				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 100, 100 ), material );
-				mesh.position.y = 0.1;
-				mesh.rotation.x = - Math.PI / 2;
-				scene.add( mesh );
+				var helper = new THREE.GridHelper( 500, 10 );
+				helper.color1.setHex( 0x444444 );
+				helper.color2.setHex( 0x444444 );
+				helper.position.y = 0.1
+				scene.add( helper );
 
 				//
 
