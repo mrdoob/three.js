@@ -250,7 +250,10 @@
 
 				postprocessing.godrayCombineUniforms.fGodRayIntensity.value = 0.75;
 
-				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialGodraysGenerate );
+				postprocessing.quad = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ),
+					postprocessing.materialGodraysGenerate
+				);
 				postprocessing.quad.position.z = -9900;
 				postprocessing.scene.add( postprocessing.quad );
 

@@ -72,12 +72,8 @@
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
-				scene.add( light );
-
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
 				var geometry = new THREE.BoxGeometry( 20, 20, 20 );

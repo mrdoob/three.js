@@ -83,9 +83,9 @@ function Transition ( sceneA, sceneB ) {
 
 		].join("\n")
 
-	});		
+	});
 
-	quadgeometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
+	quadgeometry = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight);
 	
 	this.quad = new THREE.Mesh(quadgeometry, this.quadmaterial);
 	this.scene.add(this.quad);

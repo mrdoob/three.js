@@ -13,6 +13,7 @@ import os
 import shutil
 import tempfile
 
+from io import open
 
 def main(argv=None):
 
@@ -53,17 +54,17 @@ def main(argv=None):
 			files = json.load(f)
 		for filename in files:
 			tmp.write('// File:' + filename)
-			tmp.write('\n\n')
+			tmp.write(u'\n\n')
 			filename = '../../' + filename
 			sources.append(filename)
 			with open(filename, 'r', encoding='utf-8') as f:
 				if filename.endswith(".glsl"):
 					tmp.write('THREE.ShaderChunk[ \'' + os.path.splitext(os.path.basename(filename))[0] + '\'] = "')
 					tmp.write(f.read().replace('\n','\\n'))
-					tmp.write('";\n\n')
+					tmp.write(u'";\n\n')
 				else:
 					tmp.write(f.read())
-					tmp.write('\n')
+					tmp.write(u'\n')
 
 	if args.amd:
 		tmp.write('exports.THREE = THREE;\n\n} ) );')

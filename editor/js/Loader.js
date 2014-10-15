@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Loader = function ( editor ) {
 
 	var scope = this;

@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
@@ -260,13 +264,11 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( type ) {
+	signals.rendererChanged.add( function ( type, antialias ) {
 
 		container.dom.removeChild( renderer.domElement );
 
-		renderer = new THREE[ type ]( { antialias: true } );
-		renderer.autoClear = false;
-		renderer.autoUpdateScene = false;
+		renderer = createRenderer( type, antialias );
 		renderer.setClearColor( clearColor );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -504,28 +506,24 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var clearColor, renderer;
+	var createRenderer = function ( type, antialias ) {
 
-	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
+		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
 
-		renderer = new THREE[ editor.config.getKey( 'renderer' ) ]( { antialias: true } );
-
-	} else {
-
-		if ( System.support.webgl === true ) {
-
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-
-		} else {
-
-			renderer = new THREE.CanvasRenderer();
+			type = 'CanvasRenderer';
 
 		}
 
-	}
+		var renderer = new THREE[ type ]( { antialias: antialias } );
+		renderer.autoClear = false;
+		renderer.autoUpdateScene = false;
 
-	renderer.autoClear = false;
-	renderer.autoUpdateScene = false;
+		return renderer;
+
+	};
+
+	var clearColor;
+	var renderer = createRenderer( editor.config.getKey( 'renderer' ), editor.config.getKey( 'renderer/antialias' ) );
 	container.dom.appendChild( renderer.domElement );
 
 	animate();

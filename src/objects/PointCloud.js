@@ -102,11 +102,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 						var a = index + indices[ i ];
 
-						position.set(
-							positions[ a * 3 ],
-							positions[ a * 3 + 1 ],
-							positions[ a * 3 + 2 ]
-						);
+						position.fromArray( positions, a * 3 );
 
 						testPoint( position, a );
 

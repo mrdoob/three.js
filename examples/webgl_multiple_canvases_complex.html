@@ -148,7 +148,7 @@
 					shadowTexture.needsUpdate = true;
 
 					var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
-					var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
+					var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;

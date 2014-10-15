@@ -36,7 +36,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/renderers/Renderer.js"></script>
+		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -103,7 +103,7 @@
 				var texture = new THREE.Texture( canvas );
 				texture.needsUpdate = true;
 
-				var geometry = new THREE.PlaneGeometry( 300, 300, 3, 3 );
+				var geometry = new THREE.PlaneBufferGeometry( 300, 300, 3, 3 );
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var mesh = new THREE.Mesh( geometry, material );

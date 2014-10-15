@@ -32,7 +32,7 @@ THREE.SceneLoader.prototype = {
 
 			scope.parse( JSON.parse( text ), onLoad, url );
 
-		} );
+		}, onProgress, onError );
 
 	},
 

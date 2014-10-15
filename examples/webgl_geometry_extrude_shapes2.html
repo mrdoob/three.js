@@ -315,8 +315,6 @@ var addGeoObject = function( group, svgObject ) {
 };
 
 var init3d = function(){
-	var near = 1.0;
-	var far = 10000.0;
 
 	/// Global : renderer
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -327,7 +325,7 @@ var init3d = function(){
 	scene = new THREE.Scene();
 
 	/// Global : camera
-	camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, near, far );
+	camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.set( 0, 0, 200 );
 
 	/// Global : group
@@ -344,11 +342,9 @@ var init3d = function(){
 	scene.add( ambientLight );
 
 	/// backgroup grids
-	var plane = new THREE.Mesh(
-			new THREE.PlaneGeometry(160, 160, 20, 20), 
-			new THREE.MeshBasicMaterial({ color: 0x7f7f7f, wireframe: true }));
-	plane.rotation.x = Math.PI;
-	group.add( plane );
+	var helper = new THREE.GridHelper( 80, 10 );
+	helper.rotation.x = Math.PI / 2;
+	group.add( helper );
 
 	var obj = initSVGObject();
 	addGeoObject( group, obj );

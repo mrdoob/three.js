@@ -100,7 +100,10 @@
 
 				}
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
+				plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 2000, 2000, 8, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true } )
+				);
 				plane.visible = false;
 				scene.add( plane );
 

@@ -28,7 +28,6 @@
 	"src/core/BufferAttribute.js",
 	"src/core/BufferGeometry.js",
 	"src/core/Geometry.js",
-	"src/core/Script.js",
 	"src/cameras/Camera.js",
 	"src/cameras/CubeCamera.js",
 	"src/cameras/OrthographicCamera.js",
@@ -141,6 +140,7 @@
 	"src/renderers/WebGLRenderer.js",
 	"src/renderers/WebGLRenderTarget.js",
 	"src/renderers/WebGLRenderTargetCube.js",
+	"src/renderers/webgl/WebGLExtensions.js",
 	"src/renderers/webgl/WebGLProgram.js",
 	"src/renderers/webgl/WebGLShader.js"
 ]

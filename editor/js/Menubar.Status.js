@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Status = function ( editor ) {
 
 	var container = new UI.Panel();

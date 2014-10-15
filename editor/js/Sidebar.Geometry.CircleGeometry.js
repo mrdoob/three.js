@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
@@ -34,7 +38,7 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 			radius.getValue(),
 			segments.getValue()
 		);
-		object.geometry.buffersNeedUpdate = true;
+
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

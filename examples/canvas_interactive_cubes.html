@@ -17,7 +17,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/renderers/Renderer.js"></script>
+		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -27,6 +27,8 @@
 			var container, stats;
 			var camera, scene, renderer;
 			var particleMaterial;
+
+			var raycaster;
 
 			var objects = [];
 
@@ -87,6 +89,10 @@
 					}
 
 				} );
+				
+				//
+				
+				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
@@ -124,7 +130,7 @@
 				vector.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
 				vector.unproject( camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( objects );
 
