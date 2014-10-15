@@ -51,7 +51,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>.needsTangents([page:Array materials]) [page:Boolean]</h3>
+		<h3>[method:Boolean needsTangents]([page:Array materials])</h3>
 		<div>
 		materials -- an array of [page:Material]
 		</div>
@@ -59,7 +59,7 @@
 		Checks if the loaded object needs tangents based on its materials.
 		</div>
 
-		<h3>.updateProgress([page:object progress])</h3>
+		<h3>[method:todo updateProgress]([page:object progress])</h3>
 		<div>
 		progress -- an object containing loaded(contains the amount of bytes loaded) and optionally total (containing the total amount of bytes).
 		</div>
@@ -67,7 +67,7 @@
 		Updates the DOM object with the progress made.
 		</div>
 
-		<h3>.createMaterial([page:object m], [page:string texturePath]) [page:Material]</h3>
+		<h3>[method:Material createMaterial]([page:object m], [page:string texturePath])</h3>
 		<div>
 		m -- The parameters to create the material. <br />
 		texturePath -- The base path of the textures.
@@ -76,7 +76,7 @@
 		Creates the Material based on the parameters m.
 		</div>
 
-		<h3>.initMaterials([page:Array materials], [page:string texturePath]) [page:Array]</h3>
+		<h3>[method:Array initMaterials]([page:Array materials], [page:string texturePath])</h3>
 		<div>
 		materials -- an array of parameters to create materials. <br />
 		texturePath --  The base path of the textures.
@@ -85,7 +85,7 @@
 		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
 		</div>
 
-		<h3>.extractUrlBase([page:string url])</h3>
+		<h3>[method:todo extractUrlBase]([page:string url])</h3>
 		<div>
 		url --  The url to extract the base url from.
 		</div>
@@ -93,7 +93,7 @@
 		Extract the base from the URL. 
 		</div>
 
-		<h3>.addStatusElement() [page:DOMElement]</h3>
+		<h3>[method:DOMElement addStatusElement]()</h3>
 		<div>
 		Add a DOM element to indicate the progress and returns the DOMElement
 		</div>

@@ -180,67 +180,67 @@
 		
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
 		<div>
 		Bakes matrix transform directly into vertex coordinates.
 		</div>
 
-		<h3>.computeFaceNormals()</h3>
+		<h3>[method:null computeFaceNormals]()</h3>
 		<div>
 		Computes face normals.
 		</div>
 
-		<h3>.computeVertexNormals()</h3>
+		<h3>[method:null computeVertexNormals]()</h3>
 		<div>
 		Computes vertex normals by averaging face normals.<br />
 		Face normals must be existing / computed beforehand.
 		</div>
 
-		<h3>.computeMorphNormals()</h3>
+		<h3>[method:null computeMorphNormals]()</h3>
 		<div>
 		Computes morph normals.
 		</div>
 
-		<h3>.computeTangents()</h3>
+		<h3>[method:null computeTangents]()</h3>
 		<div>
 		Computes vertex tangents.<br />
 		Based on [link:http://www.terathon.com/code/tangent.html]<br />
 		Geometry must have vertex [page:UV UVs] (layer 0 will be used).
 		</div>
 
-		<h3>.computeBoundingBox()</h3>
+		<h3>[method:null computeBoundingBox]()</h3>
 		<div>
 		Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.
 		</div>
 
-		<h3>.computeBoundingSphere()</h3>
+		<h3>[method:null computeBoundingSphere]()</h3>
 		<div>
 		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.
 		</div>
 		
 		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
 
-		<h3>.merge( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
+		<h3>[method:null merge]( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
 		<div>Merge two geometries or geometry and geometry from object (using object's transform)</div>
 
-		<h3>.mergeVertices()</h3>
+		<h3>[method:null mergeVertices]()</h3>
 		<div>
 		Checks for duplicate vertices using hashmap.<br />
 		Duplicated vertices are removed and faces' vertices are updated.
 		</div>
 		
-		<h3>.clone()</h3>
+		<h3>[method:Geometry clone]()</h3>
 		<div>
 		Creates a new clone of the Geometry.
 		</div>
 		
-		<h3>.dispose()</h3>
+		<h3>[method:null dispose]()</h3>
 		<div>
 		Removes The object from memory. <br />
 		Don't forget to call this method when you remove a geometry because it can cause memory leaks. 
 		</div>
 
-		<h3>.computeLineDistances()</h3>
+		<h3>[method:null computeLineDistances]()</h3>
 		<div>
 		Compute distances between vertices for Line geometries.
 		</div>

@@ -49,12 +49,12 @@
 
 		<h2>Methods</h2>
 
-		<h3>.transpose() [page:Matrix3]</h3>
+		<h3>[method:Matrix3 transpose]()</h3>
 		<div>
 		Transposes this matrix in place.
 		</div>
 
-		<h3>.transposeIntoArray( [page:Array array] ) [page:Matrix3]</h3>
+		<h3>[method:Matrix3 transposeIntoArray]( [page:Array array] )</h3>
 		<div>
 		array -- [page:Array] <br />
 		</div>
@@ -63,12 +63,12 @@
 		</div>
 
 
-		<h3>.determinant() [page:Float]</h3>
+		<h3>[method:Float determinant]()</h3>
 		<div>
 		Returns the matrix's determinant.
 		</div>
 
-		<h3>.set([page:Float n11], [page:Float n12], [page:Float n13], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n31], [page:Float n32], [page:Float n33]) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 set]([page:Float n11], [page:Float n12], [page:Float n13], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n31], [page:Float n32], [page:Float n33]) [page:Matrix3 this]</h3>
 		<div>
 		n11 -- [page:Float] <br />
 		n12 -- [page:Float] <br />
@@ -84,7 +84,7 @@
 		Set the 3x3 matrix values to the given row-major sequence of values.
 		</div>
 
-		<h3>.multiplyScalar([page:Float scalar]) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 multiplyScalar]([page:Float scalar]) [page:Matrix3 this]</h3>
 		<div>
 		scalar -- [page:Float]
 		</div>
@@ -92,7 +92,7 @@
 		Multiply every component of the matrix by a scalar value.
 		</div>
 
-		<h3>.applyToVector3Array([page:Array array]) [page:Array]</h3>
+		<h3>[method:Array applyToVector3Array]([page:Array array])</h3>
 		<div>
 		array -- An array in the form [vector1x, vector1y, vector1z, vector2x, vector2y, vector2z, ...]
 		</div>
@@ -100,7 +100,7 @@
 		Multiply (apply) this matrix to every vector3 in the array.
 		</div>
 
-		<h3>.getNormalMatrix([page:Matrix4 matrix4]) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 getNormalMatrix]([page:Matrix4 matrix4]) [page:Matrix3 this]</h3>
 		<div>
 		matrix4 -- [page:Matrix4]
 		</div>
@@ -108,7 +108,7 @@
 		Set this matrix as the normal matrix of the passed [page:Matrix4 matrix4]. The normal matrix is the inverse transpose of the matrix.
 		</div>
 
-		<h3>.getInverse([page:Matrix4 matrix4], [page:Boolean throwOnInvertible]) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 getInverse]([page:Matrix4 matrix4], [page:Boolean throwOnInvertible]) [page:Matrix3 this]</h3>
 		<div>
 		matrix4 -- [page:Matrix4] <br />
 		throwOnInvertible -- [Page:Boolean] If true, throw an error if the matrix is invertible.
@@ -117,7 +117,7 @@
 		Set this matrix to the inverse of the passed matrix.
 		</div>
 
-		<h3>.copy([page:Matrix3 matrix]) [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 copy]([page:Matrix3 matrix]) [page:Matrix3 this]</h3>
 		<div>
 		matrix -- [page:Matrix3]
 		</div>
@@ -125,12 +125,12 @@
 		Copy the values of the passed matrix.
 		</div>
 
-		<h3>.clone() [page:Matrix3]</h3>
+		<h3>[method:Matrix3 clone]()</h3>
 		<div>
 		Create a copy of the matrix.
 		</div>
 
-		<h3>.identity() [page:Matrix3 this]</h3>
+		<h3>[method:Matrix3 identity]() [page:Matrix3 this]</h3>
 		<div>
 		Set as an identity matrix.<br/><br/>
 		
