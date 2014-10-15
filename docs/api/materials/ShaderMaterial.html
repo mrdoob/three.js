@@ -77,7 +77,7 @@
 		</code>
 		Each attribute must have a *type* property and a *value* property. 
 		<table>
-			<caption>Attribute types</caption>
+			<caption><a id="attribute-types">Attribute types</a></caption>
 			<thead>
 				<tr>
 					<th>Attribute *type* string</th>
@@ -136,9 +136,9 @@
 			resolution: { type: "v2", value: new THREE.Vector2() }
 		}
 		</code> 
-		Each uniform must have a *type* and a *value*:
+		Each uniform must have a <a href="#uniform-types">*type*</a> and a *value*:
 		<table>
-			<caption>Uniform types</caption>
+			<caption><a id="uniform-types">Uniform types</a></caption>
 			<thead>
 				<tr>
 					<th>Uniform *type* string</th>
@@ -216,12 +216,25 @@
 
 		<h3>.[page:Object uniforms]</h3>
 		<div>
-		Uniforms defined inside GLSL shader code.
+		Object specifying the uniforms to be passed to the shader code; keys are uniform names, values are definitions of the form
+		<code>
+		{ type: 'f', value: 1.0 }
+		</code>
+		where *type* is a <a href="#uniform-types">uniform type string</a>, and *value* is the value of the uniform. Names must match the name of the uniform, as defined in the GLSL code. Note that uniforms are refreshed on every frame, so updating the value of the uniform will immediately update the value available to the GLSL code.
 		</div> 
 
 		<h3>.[page:Object attributes]</h3>
 		<div>
-		Attributes defined inside GLSL shader code.
+		<p>
+		Object specifying the custom attributes to be passed to the shader code; keys are attribute names, values are definitions of the form
+		<code>
+		{ type: 'f', value: [1.0, 0.5, 2.0, ...] }
+		</code>
+		where *type* is an <a href="#attribute-types">attribute type string</a>, and *value* is an array containing an attribute value for each vertex in the geometry (or *undefined* if using [page:BufferGeometry]). Names must match the name of the attribute, as defined in the GLSL code. 
+		</p>
+		<p>
+		Note that attribute buffers are <emph>not</emph> refreshed automatically when their values change; if using [page:Geometry], set <code>needsUpdate = true</code> on the attribute definition. If using [page:BufferGeometry], set <code>needsUpdate = true</code> on the [page:BufferAttribute].
+		</p>
 		</div> 
 
 		<h3>.[page:Object defines]</h3>
