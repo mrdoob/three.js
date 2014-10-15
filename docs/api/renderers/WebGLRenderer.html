@@ -33,73 +33,73 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:DOMElement domElement]</h3>
+		<h3>[property:DOMElement domElement]</h3>
 
 		<div>A [page:Canvas] where the renderer draws its output.<br />
 		This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.</div>
 
-		<h3>.[page:WebGLRenderingContext context]</h3>
+		<h3>[property:WebGLRenderingContext context]</h3>
 
 		<div>The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.</div>
 
-		<h3>.[page:Boolean autoClear]</h3>
+		<h3>[property:Boolean autoClear]</h3>
 
 		<div>Defines whether the renderer should automatically clear its output before rendering.</div>
 
 
-		<h3>.[page:Boolean autoClearColor]</h3>
+		<h3>[property:Boolean autoClearColor]</h3>
 
 		<div>If autoClear is true, defines whether the renderer should clear the color buffer. Default is true.</div>
 
 
-		<h3>.[page:Boolean autoClearDepth]</h3>
+		<h3>[property:Boolean autoClearDepth]</h3>
 
 		<div>If autoClear is true, defines whether the renderer should clear the depth buffer. Default is true.</div>
 
 
-		<h3>.[page:Boolean autoClearStencil]</h3>
+		<h3>[property:Boolean autoClearStencil]</h3>
 
 		<div>If autoClear is true, defines whether the renderer should clear the stencil buffer. Default is true.</div>
 
 
-		<h3>.[page:Boolean sortObjects]</h3>
+		<h3>[property:Boolean sortObjects]</h3>
 
 		<div>Defines whether the renderer should sort objects. Default is true.</div>
 
 		<div>Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.</div>
 
 
-		<h3>.[page:Boolean autoUpdateObjects]</h3>
+		<h3>[property:Boolean autoUpdateObjects]</h3>
 
 		<div>Defines whether the renderer should auto update objects. Default is true.</div>
 
-		<h3>.[page:Boolean gammaInput]</h3>
+		<h3>[property:Boolean gammaInput]</h3>
 
 		<div>Default is false. If set, then it expects that all textures and colors are premultiplied gamma.</div>
 
 
-		<h3>.[page:Boolean gammaOutput]</h3>
+		<h3>[property:Boolean gammaOutput]</h3>
 
 		<div>Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma.</div>
 
 
-		<h3>.[page:Boolean shadowMapEnabled]</h3>
+		<h3>[property:Boolean shadowMapEnabled]</h3>
 
 		<div>Default is false. If set, use shadow maps in the scene.</div>
 
 
-		<h3>.[page:Boolean shadowMapAutoUpdate]</h3>
+		<h3>[property:Boolean shadowMapAutoUpdate]</h3>
 
 		<div>Default is true. If set, autoupdate the shadowmaps every frame.</div>
 
 
-		<h3>.[page:Integer shadowMapType]</h3>
+		<h3>[property:Integer shadowMapType]</h3>
 
 		<div>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</div>
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
 
-		<h3>.[page:Integer shadowMapCullFace]</h3>
+		<h3>[property:Integer shadowMapCullFace]</h3>
 
 		<div>Default is THREE.CullFaceFront. The faces that needed to be culled. Possible values: THREE.CullFaceFront and THREE.CullFaceBack</div>
 
@@ -109,39 +109,39 @@
 		<div>Default is false. If set, then the shadowmaps get a specific color to identify which shadow is from which shadowmap.</div>
 
 
-		<h3>.[page:Boolean shadowMapCascade]</h3>
+		<h3>[property:Boolean shadowMapCascade]</h3>
 
 		<div>Default is false. If Set, use cascaded shadowmaps. See [link:http://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf cascaded shadowmaps] for more information.</div>
 
 
-		<h3>.[page:Integer maxMorphTargets]</h3>
+		<h3>[property:Integer maxMorphTargets]</h3>
 
 		<div>Default is 8. The maximum number of MorphTargets allowed in a shader. Keep in mind that the standard materials only allow 8 MorphTargets.</div>
 
 
-		<h3>.[page:Integer maxMorphNormals]</h3>
+		<h3>[property:Integer maxMorphNormals]</h3>
 
 		<div>Default is 4. The maximum number of MorphNormals allowed in a shader. Keep in mind that the standard materials only allow 4 MorphNormals. </div>
 
 
-		<h3>.[page:Boolean autoScaleCubemaps]</h3>
+		<h3>[property:Boolean autoScaleCubemaps]</h3>
 
 		<div>Default is true. If set, then Cubemaps are scaled, when they are bigger than the maximum size, to make sure that they aren't bigger than the maximum size.</div>
 
 
-		<h3>.[page:Boolean renderPluginsPre]</h3>
+		<h3>[property:Boolean renderPluginsPre]</h3>
 
 		<div>An array with render plugins to be applied before rendering.</div>
 		<div>Default is an empty array, or [].</div>
 
 
-		<h3>.[page:Boolean renderPluginsPost]</h3>
+		<h3>[property:Boolean renderPluginsPost]</h3>
 
 		<div>An array with render plugins to be applied after rendering.</div>
 		<div>Default is an empty array, or [].</div>
 
 
-		<h3>.[page:Object info]</h3>
+		<h3>[property:Object info]</h3>
 
 		<div>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</div>
 		<div>
@@ -164,13 +164,13 @@
 		</ul>
 		</div>
 
-		<h3>.[page:ShadowMapPlugin shadowMapPlugin]</h3>
+		<h3>[property:ShadowMapPlugin shadowMapPlugin]</h3>
 		<div>
 		This contains the reference to the shadowMapPlugin.
 		</div> 
 
 
-		<h3>.[page:number devicePixelRatio]</h3>
+		<h3>[property:number devicePixelRatio]</h3>
 		<div>
 		The pixel ration of the devices. 
 		</div> 

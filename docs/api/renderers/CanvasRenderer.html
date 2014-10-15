@@ -40,7 +40,7 @@
 		<h2>Properties</h2>
 
 
-        <h3>.[page:Object info]</h3>
+        <h3>[property:Object info]</h3>
 
 		<div>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</div>
 		<div>
@@ -54,22 +54,22 @@
 		</ul>
 		</div>
 
-        <h3>.[page:DOMElement domElement]</h3>
+        <h3>[property:DOMElement domElement]</h3>
 
 		<div>A [page:Canvas] where the renderer draws its output.<br />
 		This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.</div>
 
-		<h3>.[page:number devicePixelRatio]</h3>
+		<h3>[property:number devicePixelRatio]</h3>
 		<div>
 		The pixel ration of the devices.
 		</div> 
 
-		<h3>.[page:Boolean autoClear]</h3>
+		<h3>[property:Boolean autoClear]</h3>
 		<div>
         Defines whether the renderer should automatically clear its output before rendering.
         </div>
 
-		<h3>.[page:Boolean sortObjects]</h3>
+		<h3>[property:Boolean sortObjects]</h3>
 		<div>
         Defines whether the renderer should sort objects. Default is true.
         </div>
@@ -77,7 +77,7 @@
         Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.
         </div>
 
-		<h3>.[page:boolean sortElements]</h3>
+		<h3>[property:boolean sortElements]</h3>
 		<div>
 		Defines whether the renderer should sort the face of each object. Default is true.
 		</div> 

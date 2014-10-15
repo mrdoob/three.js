@@ -23,118 +23,118 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Integer id]</h3>
+		<h3>[property:Integer id]</h3>
 		<div>
 		Unique number for this object instance.
 		</div>
 
-		<h3>.[page:String uuid]</h3>
+		<h3>[property:String uuid]</h3>
 		<div>
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
 		This gets automatically assigned, so this shouldn't be edited.
 		</div>
 
-		<h3>.[page:String name]</h3>
+		<h3>[property:String name]</h3>
 		<div>
 		Optional name of the object (doesn't need to be unique).
 		</div>
 
-		<h3>.[page:Object3D parent]</h3>
+		<h3>[property:Object3D parent]</h3>
 		<div>
 		Object's parent in the scene graph.
 		</div>
 
-		<h3>.[page:Object3D children]</h3>
+		<h3>[property:Object3D children]</h3>
 		<div>
 		Array with object's children.
 		</div>
 
-		<h3>.[page:Vector3 position]</h3>
+		<h3>[property:Vector3 position]</h3>
 		<div>
 		Object's local position.
 		</div>
 
-		<h3>.[page:Euler rotation]</h3>
+		<h3>[property:Euler rotation]</h3>
 		<div>
 		Object's local rotation (<a href="https://en.wikipedia.org/wiki/Euler_angles" target="_blank">Euler angles</a>), in radians.
 		</div>
 
-		<h3>.[page:String eulerOrder]</h3>
+		<h3>[property:String eulerOrder]</h3>
 		<div>
 		Order of axis for Euler angles.
 		</div>
 
-		<h3>.[page:Vector3 scale]</h3>
+		<h3>[property:Vector3 scale]</h3>
 		<div>
 		Object's local scale.
 		</div>
 
-		<h3>.[page:Vector3 up]</h3>
+		<h3>[property:Vector3 up]</h3>
 		<div>
 		Up direction.
 		</div>
 
-		<h3>.[page:Matrix4 matrix]</h3>
+		<h3>[property:Matrix4 matrix]</h3>
 		<div>
 		Local transform.
 		</div>
 
-		<h3>.[page:Quaternion quaternion]</h3>
+		<h3>[property:Quaternion quaternion]</h3>
 		<div>
 		Object's local rotation as [page:Quaternion Quaternion]. Only used when useQuaternion is set to true.
 		</div>
 
-		<h3>.[page:Boolean useQuaternion]</h3>
+		<h3>[property:Boolean useQuaternion]</h3>
 		<div>
 		Use quaternion instead of Euler angles for specifying local rotation.
 		</div>
 
-		<h3>.[page:Float renderDepth]</h3>
+		<h3>[property:Float renderDepth]</h3>
 		<div>
 		Override depth-sorting order if non *null*.
 		</div>
 
-		<h3>.[page:Boolean visible]</h3>
+		<h3>[property:Boolean visible]</h3>
 		<div>
 		Object gets rendered if *true*.
 		</div>
 
-		<h3>.[page:Boolean castShadow]</h3>
+		<h3>[property:Boolean castShadow]</h3>
 		<div>
 		Gets rendered into shadow map.
 		</div>
 
-		<h3>.[page:Boolean receiveShadow]</h3>
+		<h3>[property:Boolean receiveShadow]</h3>
 		<div>
 		Material gets baked in shadow receiving.
 		</div>
 
-		<h3>.[page:Boolean frustumCulled]</h3>
+		<h3>[property:Boolean frustumCulled]</h3>
 		<div>
 		When this is set, it checks every frame if the object is in the frustum of the camera. Otherwise the object gets drawn every frame even if it isn't visible.
 		</div>
 
-		<h3>.[page:Boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<div>
 		When this is set, it calculates the matrix of position, (rotation or quaternion) and scale every frame and also recalculates the matrixWorld property.
 		</div>
 
-		<h3>.[page:Boolean matrixWorldNeedsUpdate]</h3>
+		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
 		<div>
 		When this is set, it calculates the matrixWorld in that frame and resets this property to false.
 		</div>
 
-		<h3>.[page:Boolean rotationAutoUpdate]</h3>
+		<h3>[property:Boolean rotationAutoUpdate]</h3>
 		<div>
 		When this is set, then the rotationMatrix gets calculated every frame.
 		</div>
 
-		<h3>.[page:object userData]</h3>
+		<h3>[property:object userData]</h3>
 		<div>
 		An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
 		</div>
 
-		<h3>.[page:Matrix4 matrixWorld]</h3>
+		<h3>[property:Matrix4 matrixWorld]</h3>
 		<div>
 		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
 		</div>
