@@ -6,64 +6,101 @@ THREE.OBJExporter = function () {};
 
 THREE.OBJExporter.prototype = {
 
-	constructor: THREE.OBJExporter,
+    constructor: THREE.OBJExporter,
 
-	parse: function ( geometry ) {
+    indexVertex: 0,
+    indexVertexUvs: 0,
+    indexNormals: 0,
 
-		var output = '';
+    parse: function ( object, scaleFactor ) {
+        var output = '';
 
-		for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+        var nbVertex, nbVertexUvs, nbNormals;
+        nbVertex = nbVertexUvs = nbNormals = 0;
 
-			var vertex = geometry.vertices[ i ];
-			output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+        var geometry = object.geometry;
 
-		}
+        if (scaleFactor === undefined) {
+            scaleFactor = 1;
+        }
 
-		// uvs
+        output += 'g ' + object.id + '\n';
 
-		for ( var i = 0, l = geometry.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+        if (object.geometry) {
+            for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-			var vertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
+                var vertex = geometry.vertices[ i ].clone();
+                vertex.applyMatrix4( object.matrixWorld );
 
-			for ( var j = 0; j < vertexUvs.length; j ++ ) {
+                output += 'v ' + scaleFactor * vertex.x + ' ' + scaleFactor * vertex.y + ' ' + scaleFactor * vertex.z + '\n';
 
-				var uv = vertexUvs[ j ];
-				output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+                nbVertex++;
+            }
 
-			}
+            // uvs
 
-		}
+            for ( var i = 0, l = geometry.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
 
-		// normals
+                var vertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
 
-		for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+                for ( var j = 0; j < vertexUvs.length; j ++ ) {
 
-			var normals = geometry.faces[ i ].vertexNormals;
+                    var uv = vertexUvs[ j ];
+                    vertex.applyMatrix4( object.matrixWorld );
 
-			for ( var j = 0; j < normals.length; j ++ ) {
+                    output += 'vt ' + scaleFactor * uv.x + ' ' + scaleFactor * uv.y + '\n';
 
-				var normal = normals[ j ];
-				output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+                    nbVertexUvs++;
+                }
 
-			}
+            }
 
-		}
+            // normals
 
-		// faces
+            for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
-		for ( var i = 0, j = 1, l = geometry.faces.length; i < l; i ++, j += 3 ) {
+                var normals = geometry.faces[ i ].vertexNormals;
 
-			var face = geometry.faces[ i ];
+                for ( var j = 0; j < normals.length; j ++ ) {
 
-			output += 'f ';
-			output += ( face.a + 1 ) + '/' + ( j ) + '/' + ( j ) + ' ';
-			output += ( face.b + 1 ) + '/' + ( j + 1 ) + '/' + ( j + 1 ) + ' ';
-			output += ( face.c + 1 ) + '/' + ( j + 2 ) + '/' + ( j + 2 ) + '\n';
+                    var normal = normals[ j ];
+                    output += 'vn ' + scaleFactor * normal.x + ' ' + scaleFactor * normal.y + ' ' + scaleFactor * normal.z + '\n';
 
-		}
+                    nbNormals++;
+                }
 
-		return output;
+            }
 
-	}
+            // faces
+
+            for ( var i = 0, j = 1, l = geometry.faces.length; i < l; i ++, j += 3 ) {
+
+                var face = geometry.faces[ i ];
+
+                output += 'f ';
+                output += ( this.indexVertex + face.a + 1 ) + '/' + ( this.indexVertexUvs + j ) + '/' + ( this.indexNormals + j ) + ' ';
+                output += ( this.indexVertex + face.b + 1 ) + '/' + ( this.indexVertexUvs + j + 1 ) + '/' + ( this.indexNormals + j + 1 ) + ' ';
+                output += ( this.indexVertex + face.c + 1 ) + '/' + ( this.indexVertexUvs + j + 2 ) + '/' + ( this.indexNormals + j + 2 ) + '\n';
+
+            }
+        }
+
+        // update index
+        this.indexVertex += nbVertex;
+        this.indexVertexUvs += nbVertexUvs
+        this.indexNormals += nbNormals
+
+        // Create children objects
+        if (object.children && object.children.length > 0) {
+
+            for ( var i in object.children ) {
+                output += '# new children object: ' + object.children[i].id + '\n';
+                output += this.parse( object.children[i], scaleFactor );
+            }
+        }
+
+        return output;
+
+    }
 
 }
