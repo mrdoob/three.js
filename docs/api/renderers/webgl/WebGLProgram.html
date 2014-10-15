@@ -35,15 +35,28 @@
 		uniform vec3 cameraPosition;
 		</code>
 		<code>
+		// default vertex attributes provided by Geometry and BufferGeometry
 		attribute vec3 position;
 		attribute vec3 normal;
 		attribute vec2 uv;
 		attribute vec2 uv2;
-		</code></div>
+		</code>
+		<p>
+		Note that you can therefore calculate the position of a vertex in the vertex shader by:
+		<code>
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		</code>
+		or alternatively
+		<code>
+		gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( position, 1.0 );
+		</code>
+		</p>
+		</div>
 		
 		<h3>Vertex shader (conditional):</h3>
 		<code>
 		#ifdef USE_COLOR
+			// vertex color attribute
 			attribute vec3 color;
 		#endif
 		</code>
