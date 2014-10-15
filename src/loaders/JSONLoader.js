@@ -13,7 +13,7 @@ THREE.JSONLoader = function ( showStatus ) {
 
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
 
-THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
+THREE.JSONLoader.prototype.load = function ( url, callback, texturePath, callbackProgress ) {
 
 	var scope = this;
 
@@ -22,7 +22,7 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 	texturePath = texturePath && ( typeof texturePath === 'string' ) ? texturePath : this.extractUrlBase( url );
 
 	this.onLoadStart();
-	this.loadAjaxJSON( this, url, callback, texturePath );
+	this.loadAjaxJSON( this, url, callback, texturePath, callbackProgress );
 
 };
 
