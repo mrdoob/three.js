@@ -9,36 +9,56 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A loader for loading a JSON resource. Unlike the [page:JSONLoader JSONLoader], this one make use of the <em>.type</em> attributes of objects to map them to their original classes.</div>
 
-		<h2>Example</h2>
-
-		<code>todo</code>
 
 		<h2>Constructor</h2>
 
-
-		<h3>todo</h3>
-		<div></div>
+		<h3>[name]([page:LoadingManager manager])</h3>
+		<div>
+		manager — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>todo</h3>
-		<div>
-		todo
-		</div> 
-
 
 		<h2>Methods</h2>
-		
 
-		<h3>todo</h3>
-		<div>todo</div>
+		<h3>.load( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		todo
+		url — required<br />
+		onLoad — Will be called when load completes. The argument will be the loaded [page:Object3D object].<br />
+		onProgress — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		onError — Will be called when load errors.<br />
 		</div>
-		
+		<div>
+		Begin loading from url and call onLoad with the parsed response content.
+		</div>
+
+
+		<h3>.parse( [page:String json] )</h3>
+		<div>
+		json — required. The JSON source to parse<br />
+		</div>
+		<div>
+		Parses a JSON content and return a threejs object.
+		</div>
+
+		<h3>.setCrossOrigin([page:String value]</h3>
+		<div>
+		value — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
+
+
+		<h2>Example</h2>
+
+		<a target="_parent" href="http://threejs.org/examples/#webgl_loader_msgpack">webgl_loader_msgpack</a>
+
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

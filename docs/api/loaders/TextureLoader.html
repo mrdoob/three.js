@@ -10,35 +10,19 @@
 		<h1>[name]</h1>
 
 		<div class="desc">Class for loading a [page:Texture texture].</div>
-		<div class="desc">Unlike other loaders, this one emits events instead of using predefined callbacks. So if you're interested in getting notified when <em>things</em> happen, you need to add listeners to the object.</div>
+
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]()</h3>
+		<h3>[name]([page:LoadingManager manager])</h3>
 		<div>
-		todo
-		</div>
-
-
-		<h2>Events</h2>
-		
-		<h3>load</h3>
-		<div class="desc">
-		Dispatched when the texture has completed loading
+		manager — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
 		</div>
 		<div>
-		content — loaded texture object
+		Creates a new [name].
 		</div>
-		
-		<h3>error</h3>
-		<div class="desc">
-		Dispatched when the texture can't be loaded
-		</div>
-		<div>
-		message — error message
-		</div>
-		
+
+
 		<h2>Properties</h2>
 
 		<h3>.[page:todo crossOrigin]</h3>
@@ -46,50 +30,26 @@
 		default — *null*.<br />
 		If set, assigns the *crossOrigin* attribute of the image to the value of *crossOrigin*, prior to starting the load.
 		</div>
-		
+
+
 		<h2>Methods</h2>
 
-		<h3>.load( [page:String url] )</h3>
+		<h3>.load( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		url — required
-		</div>
-		
-		<div class="desc">Begin loading from <em>url</em></div>
-
-		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
-		<div>
-		event -- todo
+		url — required<br />
+		onLoad — Will be called when load completes. The argument will be the loaded text response.<br />
+		onProgress — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		onError — Will be called when load errors.<br />
 		</div>
 		<div>
-		todo
+		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
 		</div>
 
-		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
 
-		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
+		<h2>Example</h2>
 
-		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
+		<a target="_parent" href="http://threejs.org/examples/#canvas_geometry_earth">canvas_geometry_earth</a>
+
 
 		<h2>Source</h2>
 
