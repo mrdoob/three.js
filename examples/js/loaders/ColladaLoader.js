@@ -315,7 +315,7 @@ THREE.ColladaLoader = function () {
 
 	function recurseHierarchy( node ) {
 
-		var n = visualScene.getChildById( node.id, true ),
+		var n = visualScene.getChildById( node.colladaId, true ),
 			newData = null;
 
 		if ( n && n.keys ) {
@@ -838,7 +838,7 @@ THREE.ColladaLoader = function () {
 
 			scene.traverse(function( node ) {
 
-				if ( node.id == parentVisualElementId ) {
+				if ( node.colladaId == parentVisualElementId ) {
 
 					jointMap[ jointIndex ] = {
 						node: node,
@@ -1300,7 +1300,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		obj.name = node.name || node.id || "";
-		obj.id = node.id || "";
+		obj.colladaId = node.id || "";
 		obj.layer = node.layer || "";
 		obj.matrix = node.matrix;
 		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
