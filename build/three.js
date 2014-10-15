@@ -17771,18 +17771,81 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _gl;
 
-	var _glExtensionTextureFloat;
-	var _glExtensionTextureFloatLinear;
-	var _glExtensionStandardDerivatives;
-	var _glExtensionTextureFilterAnisotropic;
-	var _glExtensionCompressedTextureS3TC;
-	var _glExtensionCompressedTexturePVRTC;
-	var _glExtensionElementIndexUint;
-	var _glExtensionFragDepth;
-	var _glExtensionBlendMinMax;
+	try {
 
+		var attributes = {
+			alpha: _alpha,
+			depth: _depth,
+			stencil: _stencil,
+			antialias: _antialias,
+			premultipliedAlpha: _premultipliedAlpha,
+			preserveDrawingBuffer: _preserveDrawingBuffer
+		};
 
-	initGL();
+		_gl = _context || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+
+		if ( _gl === null ) {
+
+			throw 'Error creating WebGL context.';
+
+		}
+
+	} catch ( error ) {
+
+		console.error( error );
+
+	}
+
+	if ( _gl.getShaderPrecisionFormat === undefined ) {
+
+		_gl.getShaderPrecisionFormat = function () {
+
+			return {
+				'rangeMin': 1,
+				'rangeMax': 1,
+				'precision': 1
+			};
+
+		}
+
+	}
+
+	var extensions = new THREE.WebGLExtensions( _gl );
+
+	extensions.get( 'OES_texture_float' );
+	extensions.get( 'OES_texture_float_linear' );
+	extensions.get( 'OES_standard_derivatives' );
+
+	if ( _logarithmicDepthBuffer ) {
+
+		extensions.get( 'EXT_frag_depth' );
+
+	}
+
+	//
+
+	function setDefaultGLState() {
+
+		_gl.clearColor( 0, 0, 0, 1 );
+		_gl.clearDepth( 1 );
+		_gl.clearStencil( 0 );
+
+		_gl.enable( _gl.DEPTH_TEST );
+		_gl.depthFunc( _gl.LEQUAL );
+
+		_gl.frontFace( _gl.CCW );
+		_gl.cullFace( _gl.BACK );
+		_gl.enable( _gl.CULL_FACE );
+
+		_gl.enable( _gl.BLEND );
+		_gl.blendEquation( _gl.FUNC_ADD );
+		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
+
+		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
+
+		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+
+	}
 
 	setDefaultGLState();
 
@@ -17795,22 +17858,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE );
 	var _maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
 
-	var _maxAnisotropy = _glExtensionTextureFilterAnisotropic ? _gl.getParameter( _glExtensionTextureFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT ) : 0;
-
-	var _supportsVertexTextures = ( _maxVertexTextures > 0 );
-	var _supportsBoneTextures = _supportsVertexTextures && _glExtensionTextureFloat;
-
-	// COMPRESSED_TEXTURE_FORMATS return IntArray
-	// but we need Array.indexOf to test formats availabilities
-	var _compressedTextureFormats = [];
-
-	if( _glExtensionCompressedTexturePVRTC || _glExtensionCompressedTextureS3TC ) {
-		var compressedfmts = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
-		for( var i = 0; i < compressedfmts.length; i++ ){
-			_compressedTextureFormats.push( compressedfmts[i] );
-		}
-	}
-
+	var _supportsVertexTextures = _maxVertexTextures > 0;
+	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
 
 	//
 
@@ -17821,6 +17870,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
 	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
 	var _fragmentShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_FLOAT );
+
+	var getCompressedTextureFormats = ( function () {
+
+		var array;
+
+		return function () {
+
+			if ( array !== undefined ) {
+
+				return array;
+
+			}
+
+			array = [];
+
+			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) || extensions.get( 'WEBGL_compressed_texture_s3tc' ) ) {
+
+				var formats = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
+
+				for ( var i = 0; i < formats.length; i ++ ){
+
+					array.push( formats[ i ] );
+
+				}
+
+			}
+			
+			return array;
+
+		};
+
+	} )();
 
 	// clamp precision to maximum available
 
@@ -17866,39 +17947,55 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.supportsFloatTextures = function () {
 
-		return _glExtensionTextureFloat;
+		return extensions.get( 'OES_texture_float' );
 
 	};
 
 	this.supportsStandardDerivatives = function () {
 
-		return _glExtensionStandardDerivatives;
+		return extensions.get( 'OES_standard_derivatives' );
 
 	};
 
 	this.supportsCompressedTextureS3TC = function () {
 
-		return _glExtensionCompressedTextureS3TC;
+		return extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
 	};
 
 	this.supportsCompressedTexturePVRTC = function () {
 
-		return _glExtensionCompressedTexturePVRTC;
+		return extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
 	};
 
 	this.supportsBlendMinMax = function () {
 
-		return _glExtensionBlendMinMax;
+		return extensions.get( 'EXT_blend_minmax' );
 
 	};
 
-	this.getMaxAnisotropy  = function () {
+	this.getMaxAnisotropy = ( function () {
 
-		return _maxAnisotropy;
+		var value;
 
-	};
+		return function () {
+
+			if ( value !== undefined ) {
+
+				return value;
+
+			}
+
+			var extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+
+			value = extension !== null ? _gl.getParameter( extension.MAX_TEXTURE_MAX_ANISOTROPY_EXT ) : 0;
+
+			return value;
+
+		}
+
+	} )();
 
 	this.getPrecision = function () {
 
@@ -18033,6 +18130,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 		plugin.init( this, lights, _webglObjects, _webglObjectsImmediate );
 
 		this.renderPluginsPre.push( plugin );
+
+	};
+
+	// Reset
+
+	this.resetGLState = function () {
+
+		_currentProgram = null;
+		_currentCamera = null;
+
+		_oldBlending = - 1;
+		_oldDepthTest = - 1;
+		_oldDepthWrite = - 1;
+		_oldDoubleSided = - 1;
+		_oldFlipSided = - 1;
+		_currentGeometryGroupHash = - 1;
+		_currentMaterialId = - 1;
+
+		_lightsNeedUpdate = true;
 
 	};
 
@@ -18544,7 +18660,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var UintArray = _glExtensionElementIndexUint !== null && ntris > 21845 ? Uint32Array : Uint16Array; // 65535 / 3
+		var UintArray = extensions.get( 'OES_element_index_uint' ) !== null && ntris > 21845 ? Uint32Array : Uint16Array; // 65535 / 3
 
 		geometryGroup.__typeArray = UintArray;
 		geometryGroup.__faceArray = new UintArray( ntris * 3 );
@@ -20166,7 +20282,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var type, size;
 
-				if ( index.array instanceof Uint32Array ) {
+				if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
 
 					type = _gl.UNSIGNED_INT;
 					size = 4;
@@ -21308,7 +21424,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var geometryGroups = {};
 	var geometryGroupCounter = 0;
 
-	function makeGroups( geometry, usesFaceMaterial, maxVerticesInGroup ) {
+	function makeGroups( geometry, usesFaceMaterial ) {
+
+		var maxVerticesInGroup = extensions.get( 'OES_element_index_uint' ) ? 4294967296 : 65535;
 
 		var groupHash, hash_map = {};
 
@@ -21388,7 +21506,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			delete _webglObjects[ object.id ];
 
-			geometryGroups[ geometry.id ] = makeGroups( geometry, material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535 );
+			geometryGroups[ geometry.id ] = makeGroups( geometry, material instanceof THREE.MeshFaceMaterial );
 
 			geometry.groupsNeedUpdate = false;
 
@@ -23229,6 +23347,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
 
+		var extension;
+
 		if ( isImagePowerOfTwo ) {
 
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
@@ -23247,11 +23367,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( _glExtensionTextureFilterAnisotropic && texture.type !== THREE.FloatType ) {
+		extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+
+		if ( extension && texture.type !== THREE.FloatType ) {
 
 			if ( texture.anisotropy > 1 || texture.__oldAnisotropy ) {
 
-				_gl.texParameterf( textureType, _glExtensionTextureFilterAnisotropic.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, _maxAnisotropy ) );
+				_gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, _this.getMaxAnisotropy() ) );
 				texture.__oldAnisotropy = texture.anisotropy;
 
 			}
@@ -23322,7 +23444,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-					if ( _compressedTextureFormats.indexOf( glFormat ) > -1 ) {
+					if ( getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
 
 						_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -23486,7 +23608,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-								if ( _compressedTextureFormats.indexOf( glFormat ) > -1 ) {
+								if ( getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
 
 									_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -23738,7 +23860,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	// Fallback filters for non-power-of-2 textures
 
@@ -23752,11 +23874,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return _gl.LINEAR;
 
-	};
+	}
 
 	// Map three.js constants to WebGL constants
 
 	function paramThreeToGL ( p ) {
+
+		var extension;
 
 		if ( p === THREE.RepeatWrapping ) return _gl.REPEAT;
 		if ( p === THREE.ClampToEdgeWrapping ) return _gl.CLAMP_TO_EDGE;
@@ -23805,34 +23929,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( p === THREE.OneMinusDstColorFactor ) return _gl.ONE_MINUS_DST_COLOR;
 		if ( p === THREE.SrcAlphaSaturateFactor ) return _gl.SRC_ALPHA_SATURATE;
 
-		if ( _glExtensionCompressedTextureS3TC !== null ) {
+		extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
-			if ( p === THREE.RGB_S3TC_DXT1_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGB_S3TC_DXT1_EXT;
-			if ( p === THREE.RGBA_S3TC_DXT1_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT1_EXT;
-			if ( p === THREE.RGBA_S3TC_DXT3_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT3_EXT;
-			if ( p === THREE.RGBA_S3TC_DXT5_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		if ( extension !== null ) {
 
-		}
-
-		if ( _glExtensionCompressedTexturePVRTC !== null ) {
-
-			if ( p === THREE.RGB_PVRTC_4BPPV1_Format  ) return _glExtensionCompressedTexturePVRTC.COMPRESSED_RGB_PVRTC_4BPPV1_IMG  ;
-			if ( p === THREE.RGB_PVRTC_2BPPV1_Format  ) return _glExtensionCompressedTexturePVRTC.COMPRESSED_RGB_PVRTC_2BPPV1_IMG  ;
-			if ( p === THREE.RGBA_PVRTC_4BPPV1_Format ) return _glExtensionCompressedTexturePVRTC.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG ;
-			if ( p === THREE.RGBA_PVRTC_2BPPV1_Format ) return _glExtensionCompressedTexturePVRTC.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG ;
+			if ( p === THREE.RGB_S3TC_DXT1_Format ) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
+			if ( p === THREE.RGBA_S3TC_DXT1_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
+			if ( p === THREE.RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+			if ( p === THREE.RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
 		}
 
-		if ( _glExtensionBlendMinMax !== undefined ) {
+		extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
-			if ( p === THREE.MinEquation ) return _glExtensionBlendMinMax.MIN_EXT;
-			if ( p === THREE.MaxEquation ) return _glExtensionBlendMinMax.MAX_EXT;
+		if ( extension !== null ) {
+
+			if ( p === THREE.RGB_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+			if ( p === THREE.RGB_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+			if ( p === THREE.RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+			if ( p === THREE.RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+
+		}
+
+		extension = extensions.get( 'EXT_blend_minmax' );
+
+		if ( extension !== null ) {
+
+			if ( p === THREE.MinEquation ) return extension.MIN_EXT;
+			if ( p === THREE.MaxEquation ) return extension.MAX_EXT;
 
 		}
 
 		return 0;
 
-	};
+	}
 
 	// Allocations
 
@@ -23873,7 +24003,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	function allocateLights( lights ) {
 
@@ -23897,7 +24027,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
 
-	};
+	}
 
 	function allocateShadows( lights ) {
 
@@ -23916,156 +24046,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return maxShadows;
 
-	};
-
-	// Initialization
-
-	function initGL() {
-
-		try {
-
-			var attributes = {
-				alpha: _alpha,
-				depth: _depth,
-				stencil: _stencil,
-				antialias: _antialias,
-				premultipliedAlpha: _premultipliedAlpha,
-				preserveDrawingBuffer: _preserveDrawingBuffer
-			};
-
-			_gl = _context || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
-
-			if ( _gl === null ) {
-
-				throw 'Error creating WebGL context.';
-
-			}
-
-		} catch ( error ) {
-
-			console.error( error );
-
-		}
-
-		_glExtensionTextureFloat = _gl.getExtension( 'OES_texture_float' );
-		_glExtensionTextureFloatLinear = _gl.getExtension( 'OES_texture_float_linear' );
-
-		if ( _glExtensionTextureFloat === null ) {
-
-			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
-
-		}
-
-		_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
-
-		if ( _glExtensionStandardDerivatives === null ) {
-
-			console.log( 'THREE.WebGLRenderer: Standard derivatives not supported.' );
-
-		}
-
-		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
-
-		if ( _glExtensionTextureFilterAnisotropic === null ) {
-
-			console.log( 'THREE.WebGLRenderer: Anisotropic texture filtering not supported.' );
-
-		}
-
-		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
-
-		if ( _glExtensionCompressedTextureS3TC === null ) {
-
-			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
-
-		}
-
-		_glExtensionCompressedTexturePVRTC = _gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
-
-		if ( _glExtensionCompressedTexturePVRTC === null ) {
-
-			console.log( 'THREE.WebGLRenderer: PVRTC compressed textures not supported.' );
-
-		}
-
-		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
-
-		if ( _glExtensionElementIndexUint === null ) {
-
-			console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
-
-		}
-
-		_glExtensionBlendMinMax = _gl.getExtension( 'EXT_blend_minmax' );
-
-		if ( _glExtensionBlendMinMax === null ) {
-
-			console.log( 'THREE.WebGLRenderer: min max blend equations not supported.' );
-
-		}
-
-		if ( _gl.getShaderPrecisionFormat === undefined ) {
-
-			_gl.getShaderPrecisionFormat = function () {
-
-				return {
-					'rangeMin': 1,
-					'rangeMax': 1,
-					'precision': 1
-				};
-
-			}
-		}
-
-		if ( _logarithmicDepthBuffer ) {
-
-			_glExtensionFragDepth = _gl.getExtension( 'EXT_frag_depth' );
-
-		}
-
 	}
-
-	function setDefaultGLState () {
-
-		_gl.clearColor( 0, 0, 0, 1 );
-		_gl.clearDepth( 1 );
-		_gl.clearStencil( 0 );
-
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthFunc( _gl.LEQUAL );
-
-		_gl.frontFace( _gl.CCW );
-		_gl.cullFace( _gl.BACK );
-		_gl.enable( _gl.CULL_FACE );
-
-		_gl.enable( _gl.BLEND );
-		_gl.blendEquation( _gl.FUNC_ADD );
-		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
-
-		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
-
-		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
-
-	}
-
-	function resetGLState() {
-
-		_currentProgram = null;
-		_currentCamera = null;
-
-		_oldBlending = - 1;
-		_oldDepthTest = - 1;
-		_oldDepthWrite = - 1;
-		_oldDoubleSided = - 1;
-		_oldFlipSided = - 1;
-		_currentGeometryGroupHash = - 1;
-		_currentMaterialId = - 1;
-
-		_lightsNeedUpdate = true;
-
-	}
-
-	this.resetGLState = resetGLState;
 
 	// default plugins (order is important)
 
@@ -24179,6 +24160,76 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 };
 
 THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
+
+// File:src/renderers/webgl/WebGLExtensions.js
+
+THREE.WebGLExtensions = function ( gl ) {
+
+	var extensions = {};
+
+	this.get = function ( name ) {
+
+		if ( extensions[ name ] !== undefined ) {
+
+			return extensions[ name ];
+
+		}
+
+		var extension;
+
+		switch ( name ) {
+		
+			case 'OES_texture_float':
+				extension = gl.getExtension( 'OES_texture_float' );
+				break;
+
+			case 'OES_texture_float_linear':
+				extension = gl.getExtension( 'OES_texture_float_linear' );
+				break;
+
+			case 'OES_standard_derivatives':
+				extension = gl.getExtension( 'OES_standard_derivatives' );
+				break;
+
+			case 'EXT_texture_filter_anisotropic':
+				extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+				break;
+
+			case 'WEBGL_compressed_texture_s3tc':
+				extension = gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
+				break;
+
+			case 'WEBGL_compressed_texture_pvrtc':
+				extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+				break;
+
+			case 'OES_element_index_uint':
+				extension = gl.getExtension( 'OES_element_index_uint' );
+				break;
+
+			case 'EXT_blend_minmax':
+				extension = gl.getExtension( 'EXT_blend_minmax' );
+				break;
+
+			case 'EXT_frag_depth':
+				extension = gl.getExtension( 'EXT_frag_depth' );
+				break;
+
+		}
+
+		if ( extension === null ) {
+
+			console.log( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
+
+		}
+
+		extensions[ name ] = extension;
+
+		return extension;
+
+	};
+
+};
 
 // File:src/renderers/webgl/WebGLProgram.js
 

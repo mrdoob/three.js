@@ -3660,37 +3660,42 @@ THREE.ColladaLoader = function () {
 							if ( surfaceId !== undefined && surfaceId.source !== undefined ) {
 
 								var surface = this.effect.surface[surfaceId.source];
-								var image = images[surface.init_from];
 
-								if (image) {
+								if ( surface !== undefined ) {
 
-									var url = baseUrl + image.init_from;
+									var image = images[ surface.init_from ];
 
-									var texture;
-									var loader = THREE.Loader.Handlers.get( url );
+									if ( image ) {
 
-									if ( loader !== null ) {
+										var url = baseUrl + image.init_from;
 
-										texture = loader.load( url );
+										var texture;
+										var loader = THREE.Loader.Handlers.get( url );
 
-									} else {
+										if ( loader !== null ) {
 
-										texture = new THREE.Texture();
+											texture = loader.load( url );
 
-										loadTextureImage( texture, url );
+										} else {
+
+											texture = new THREE.Texture();
+
+											loadTextureImage( texture, url );
+
+										}
+
+										texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+										texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+										texture.offset.x = cot.texOpts.offsetU;
+										texture.offset.y = cot.texOpts.offsetV;
+										texture.repeat.x = cot.texOpts.repeatU;
+										texture.repeat.y = cot.texOpts.repeatV;
+										props[keys[prop]] = texture;
+
+										// Texture with baked lighting?
+										if (prop === 'emission') props['emissive'] = 0xffffff;
 
 									}
-
-									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-									texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-									texture.offset.x = cot.texOpts.offsetU;
-									texture.offset.y = cot.texOpts.offsetV;
-									texture.repeat.x = cot.texOpts.repeatU;
-									texture.repeat.y = cot.texOpts.repeatV;
-									props[keys[prop]] = texture;
-
-									// Texture with baked lighting?
-									if (prop === 'emission') props['emissive'] = 0xffffff;
 
 								}
 

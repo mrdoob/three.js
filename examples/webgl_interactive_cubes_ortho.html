@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - native vr demo</title>
+		<title>three.js webgl - interactive cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -11,43 +11,18 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-
-			.button {
-				position: fixed;
-				bottom: 20px;
-				right: 20px;
-				padding: 8px;
-				color: #FFF;
-				background-color: #555;
-			}
-
-			.button:hover {
-				cursor: pointer;
-				background-color: rgb(18, 36, 70);
-			}
-
-			.button.error {
-				pointer-events: none;
-				background-color: red;
-			}
-
 		</style>
 	</head>
 	<body>
-		<div class="button">Start VR Mode</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/effects/VREffect.js"></script>
-		<script src="js/controls/VRControls.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			var container, stats;
 			var camera, scene, raycaster, renderer;
-			var vrEffect;
-			var vrControls;
-			var fullScreenButton = document.querySelector( '.button' );
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
@@ -68,7 +43,7 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 500, 1000 );
 
 				scene = new THREE.Scene();
 
@@ -100,26 +75,11 @@
 
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-
-				var fullScreenButton = document.querySelector( '.button' );
-				fullScreenButton.onclick = function() {
-					vrEffect.setFullScreen( true );
-				};
-
-				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
-				vrControls = new THREE.VRControls(camera);
-				function VREffectLoaded(error) {
-					if (error) {
-						fullScreenButton.innerHTML = error;
-						fullScreenButton.classList.add('error');
-					}
-				}
-
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
-				container.appendChild( renderer.domElement );
+				container.appendChild(renderer.domElement);
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -139,7 +99,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				vrEffect.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -174,9 +134,10 @@
 
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, - 1 ).unproject( camera );
+				var direction = new THREE.Vector3( 0, 0, -1 ).transformDirection( camera.matrixWorld );
 
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.set( vector, direction );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 
@@ -200,11 +161,11 @@
 
 				}
 
-				vrControls.update();
-				vrEffect.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 
 		</script>
+
 	</body>
 </html>
