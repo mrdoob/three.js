@@ -85,3 +85,8 @@ strong {
 		cursor: pointer;
 		opacity: 1;
 	}
+
+a.permalink {
+	float: right;
+	margin-left: 5px;
+}
