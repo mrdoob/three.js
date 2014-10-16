@@ -6453,10 +6453,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// default plugins (order is important)
 
-	this.shadowMapPlugin = new THREE.ShadowMapPlugin();
+	this.shadowMapPlugin = new THREE.ShadowMapPlugin( this );
 	this.addPrePlugin( this.shadowMapPlugin );
 
-	this.addPostPlugin( new THREE.SpritePlugin() );
-	this.addPostPlugin( new THREE.LensFlarePlugin() );
+	this.addPostPlugin( new THREE.SpritePlugin( this ) );
+	this.addPostPlugin( new THREE.LensFlarePlugin( this ) );
 
 };
