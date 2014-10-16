@@ -68,11 +68,11 @@ THREE.LensFlarePlugin = function () {
 
 		if ( hasVertexTexture ) {
 
-			program = createProgram( THREE.ShaderFlares[ "lensFlare" ], _precision );
+			program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ], _precision );
 
 		} else {
 
-			program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ], _precision );
+			program = createProgram( THREE.ShaderFlares[ "lensFlare" ], _precision );
 
 		}
 
