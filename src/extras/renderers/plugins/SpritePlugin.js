@@ -13,8 +13,8 @@ THREE.SpritePlugin = function ( renderer ) {
 	var program, attributes, uniforms;
 
 	var texture;
-
-	this.init = function () {
+	
+	var init = function () {
 
 		var vertices = new Float32Array( [
 			- 0.5, - 0.5,  0, 0,
@@ -80,6 +80,8 @@ THREE.SpritePlugin = function ( renderer ) {
 
 	};
 
+	this.init = function () {}; // TODO: Remove
+
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
 		sprites.length = 0;
@@ -97,6 +99,12 @@ THREE.SpritePlugin = function ( renderer ) {
 		if ( sprites.length === 0 ) return;
 
 		// setup gl
+
+		if ( program === undefined ) {
+
+			init();
+
+		}
 
 		gl.useProgram( program );
 
