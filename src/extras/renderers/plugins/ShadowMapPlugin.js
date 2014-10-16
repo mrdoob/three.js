@@ -31,10 +31,33 @@ THREE.ShadowMapPlugin = function () {
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
-		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
-		_depthMaterialSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, skinning: true } );
-		_depthMaterialMorphSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true, skinning: true } );
+		_depthMaterial = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader
+		 } );
+
+		_depthMaterialMorph = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			morphTargets: true
+		} );
+
+		_depthMaterialSkin = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			skinning: true
+		} );
+
+		_depthMaterialMorphSkin = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			morphTargets: true,
+			skinning: true
+		} );
 
 		_depthMaterial._shadowPass = true;
 		_depthMaterialMorph._shadowPass = true;
@@ -216,10 +239,12 @@ THREE.ShadowMapPlugin = function () {
 
 			// compute shadow matrix
 
-			shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
-							  0.0, 0.5, 0.0, 0.5,
-							  0.0, 0.0, 0.5, 0.5,
-							  0.0, 0.0, 0.0, 1.0 );
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 0.5, 0.5,
+				0.0, 0.0, 0.0, 1.0
+			);
 
 			shadowMatrix.multiply( shadowCamera.projectionMatrix );
 			shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
