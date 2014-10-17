@@ -1,88 +1,32 @@
 <!DOCTYPE html>
 <!--
-	ProjectEchelon
-    	Modifications suggested by stackoverflow user vals
+    Modifications suggested by stackoverflow user vals
 	Text scrambler designed by jnrbsn: https://github.com/jnrbsn/rubiks-cube-scrambler
-    	Three.js version: r68 -->
+    Three.js version: r68 -->
 
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-		<style>
-			#txtbttcontainer
-			{
-				position: absolute;
-				top: 100px;
-				left: 900px;
-				z-index: 10;
-				display: inline;
-			}
-			
-			#orientationBtns
-			{
-				position: absolute;
-				top: 500px;
-				left: 100px;
-				z-index: 10;
-				display: inline;
-			}
-			
-			.axesButtons
-			{
-				display: block;
-			}
-			
-			#main 
-			{
-				position: absolute;
-				top: 0px;
-				left: 500px;
-				padding: 30px;
-				max-width: 300px;
-				z-index: 10;
-			}
-
-			#scramble 
-			{
-				font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
-				font-size: 20px;
-				line-height: 20px;
-				margin-bottom: 20px;
-			}
-
-			#btn-refresh 
-			{
-				background-color: #428bca;
-				border: 1px solid #357ebd;
-				border-radius: 5px;
-				color: #fff;
-				cursor: pointer;
-				display: inline-block;
-				font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
-				font-size: 15px;
-				line-height: 10px;
-				margin: 0;
-				outline: none;
-				padding: 20px 0;
-				width: 100px;
-				position: relative;
-				left: 300px;
-			}
-		</style>
-		<title>Animated Rubik's Cube Scrambler</title>
+		<link rel="stylesheet" type="text/css" href="../examples/js/rubiksCube/styles.css">
+		<title>WebGL 3x3x3 Rubiks Cube</title>
     </head>
     <body>
 		<div id="container"></div>
-		
-		<div id="orientationBtns">
-			<input type="button" onclick="rotateX()" value="Rotate Along X" class="axesButtons"></input>
-			<input type="button" onclick="rotateY()" value="Rotate Along Y" class="axesButtons"></input>
-			<input type="button" onclick="rotateZ()" value="Rotate Along Z" class="axesButtons"></input>
-		</div>
 		<div id="main">
 			<div id="scramble"></div>
 			<button id="btn-refresh">SCRAMBLE</button>
 		</div>
+		<div id="info">
+			<p>three.js-- WebGL 3x3x3 Rubiks Cube</p>
+			<p>Controls-- Keyboard Keys (R, U, F, B, L, or M) control clockwise rotation for a face.</p>
+			<p>X, Y and Z rotate the whole cube about that axis.</p> 
+			<p>Shift + (R, U, F, B, L, D or M) controls anti-clockwise rotation for a face.</p>
+			<p>@Author: XanderWraik</p>    
+        </div>
+		<div style="position: absolute; top:500px; left:10px; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 15px;">
+			Toggle Orientation Labels Display <input type="checkbox" id="dispOrientationLabels"  />
+		</div>
+		
     </body>
     <script src="../build/three.min.js"></script>
     <script src="../examples/js/libs/stats.min.js"></script>
@@ -90,10 +34,14 @@
     <script src="../examples/js/controls/OrbitControls.js"></script>
 	<script src="../src/extras/SceneUtils.js"></script>
 	<script src="../examples/js/rubiksCube/cubies.js"></script>
-    <script src="../examples/js/rubiksCube/faceRotations.js"></script>
+    <script src="../examples/js/rubiksCube/faceRotator.js"></script>
+    <script src="../examples/js/rubiksCube/EventListeners.js"></script>
 	<script src="../examples/js/rubiksCube/scrambleEngine.js"></script>
+	<script src="../examples/js/rubiksCube/scrambleGenerator.js"></script>
+	<script src="../examples/js/rubiksCube/CreateText.js"></script>
+	<script src="../examples/js/rubiksCube/helvetiker_regular.typeface.js"></script>
     <script>
-        //Global variables
+	
 		window.onload = function()
 		{
 			init();
@@ -102,18 +50,15 @@
 			animate();
 		}
 		
+		//Global variables
         var renderer, scene;
         var camera, cameraControls;
         var clock = new THREE.Clock();
-        var activeCount = 0;
         var stats;
 
         var cubies = [];
-        var active = [];
-        var planes = [];
         var objects = [];
-
-        var pivot;
+		var text = [];
 		
         //Scene initialisation code:
         function init()
@@ -136,11 +81,7 @@
             //CameraControls:
             cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
 			
-            //onWindowResize
-			window.addEventListener("resize", onWindowResize, false);
-	
-			//scramble
-			document.getElementById("btn-refresh").addEventListener("click", displayScramble);
+            addEventListeners();
         }
 
 
@@ -156,13 +97,21 @@
             createLights();
 
             cubies = new createCubies();
-
+			text = new createTextValues();
+			
             pivot = new THREE.Object3D();
             scene.add(pivot);
 
             //Add cubies (Child cubes) to scene
             for (var i = 0; i < cubies.length; i++)
-                scene.add(cubies[i]);
+			{
+			    scene.add(cubies[i]);
+				if(i >= text.length)
+					continue;
+				
+				scene.add(text[i]);
+			}
+			
         }
 
 		var obj;
@@ -185,26 +134,9 @@
 			spotlight.exponent = 100;
 			spotlight.target.position.set(0,0,0);
 			
-
 			obj.add(spotlight);
 			obj.add(spotlight2);
 			scene.add(obj);
-        }
-
-        //Find cubies' position in world coordinates
-        function pos(object)
-        {
-            scene.updateMatrixWorld(true);
-            var position = new THREE.Vector3();
-            position.setFromMatrixPosition(object.matrixWorld);
-            return position;
-        }
-
-        function onWindowResize(event)
-        {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
         }
 
         function addToDOM()
@@ -232,56 +164,13 @@
 
             active.length = 0;
             activeCount = 0;
-
-            attachedR = false;
-            attachedU = false;
-            attachedF = false;
-
-            attachedR_P = false;
-            attachedU_P = false;
-            attachedF_P = false;
-
-            attachedL = false;
-            attachedD = false;
-            attachedB = false;
-
-            attachedL_P = false;
-            attachedD_P = false;
-            attachedB_P = false;
-
-            attachedM = false;
-            attachedM_P = false;
-			attachedS = false;
-			attachedS_P = false;
-			attachedE = false;
-			attachedE_P = false;
 			
-			attachedX = false;
-			attachedY = false;
-			attachedZ = false;
-			
-			attachedX_P = false;
-			attachedY_P = false;
-			attachedZ_P = false;
-			
-			attachedr = false;
-			attachedr_P = false;
-			attachedu = false;
-			attachedu_P = false;
-			attachedf = false;
-			attachedf_P = false;
-			
-			attachedb = false;
-			attachedb_P = false;
-			attachedl = false;
-			attachedl_P = false;
-			attachedd = false;
-			attachedd_P = false;
-			
+			for(var i in attached)
+				attached[i] = false;
+				
             pivot.rotation.x = 0;
             pivot.rotation.y = 0;
             pivot.rotation.z = 0;
-
         }
 
         function render()
@@ -294,9 +183,22 @@
 
 			obj.position.copy(camera.position);
             var endAnimation = false;
+			if(document.getElementById("dispOrientationLabels").checked)
+				for(var i = 0; i < text.length; i++)	
+					scene.add(text[i]);
+			else
+				for(var i = 0; i < text.length; i++)	
+					scene.remove(text[i]);
+			
+			if(document.getElementById("dispOrientationLabels").checked)
+				for(var i = 0; i < text.length; i++)	
+					text[i].lookAt(camera.position);
+			
+					
+				
             //Math.PI / 2 == 1.580000000000001
             //Rotate Right face of cube
-            if (attachedR === true)
+            if (attached["right"] === true)
             {
                 pivot.rotation.x -= 0.091;
 				 
@@ -309,7 +211,7 @@
 
             //Math.PI / 2 == 1.580000000000001
             //Rotate Upper face of cube
-            if (attachedU === true)
+            if (attached["up"] === true)
             {
                 pivot.rotation.y -= 0.091;
 				
@@ -321,7 +223,7 @@
             }
 
             //Rotate Front Face of cube
-            if (attachedF === true)
+            if (attached["front"] === true)
             {
                 pivot.rotation.z -= 0.091;
 				
@@ -333,7 +235,7 @@
             }
 
             //Rotate Right_Prime face of cube primen
-            if (attachedR_P === true)
+            if (attached["rightP"] === true)
             {
                 pivot.rotation.x += 0.091;
 				
@@ -346,7 +248,7 @@
 
             //Math.PI / 2 == 1.580000000000001
             //Rotate Upper_Prime face of cube
-            if (attachedU_P === true)
+            if (attached["upP"] === true)
             {
                 pivot.rotation.y += 0.091;
 				
@@ -358,7 +260,7 @@
             }
 
             //Rotate Front_Prime Face of cube
-            if (attachedF_P === true)
+            if (attached["frontP"] === true)
             {
                 pivot.rotation.z += 0.091;
 				
@@ -370,7 +272,7 @@
             }
 
             //Rotate Left Face of cube
-            if (attachedL === true)
+            if (attached["left"] === true)
             {
                 pivot.rotation.x += 0.091;
 				
@@ -382,7 +284,7 @@
             }
 
             //Rotate Down Face of cube
-            if (attachedD === true)
+            if (attached["down"] === true)
             {
                 pivot.rotation.y += 0.091;
 				
@@ -394,7 +296,7 @@
             }
 
             //Rotate Back face of cube
-            if (attachedB === true)
+            if (attached["back"] === true)
             {
                 pivot.rotation.z += 0.091;
                 if (pivot.rotation.z >= Math.PI / 2.0)
@@ -405,7 +307,7 @@
             }
 
             //LDB_Prime
-            if (attachedL_P === true)
+            if (attached["leftP"] === true)
             {
                 pivot.rotation.x -= 0.091;
 				 
@@ -417,7 +319,7 @@
             }
 
             //Rotate Down Face of cube
-            if (attachedD_P === true)
+            if (attached["downP"] === true)
             {
                 pivot.rotation.y -= 0.091;
 			
@@ -429,7 +331,7 @@
             }
 
             //Rotate Back face of cube
-            if (attachedB_P === true)
+            if (attached["backP"] === true)
             {
                 pivot.rotation.z -= 0.091;
 				
@@ -441,7 +343,7 @@
             }
 
             //Rotate Middle Face of cube
-            if (attachedM === true)
+            if (attached["middle"] === true)
             {
                 pivot.rotation.x -= 0.091;
 				
@@ -453,7 +355,7 @@
             }
 
             //Rotate Middle face prime of cube
-            if (attachedM_P === true)
+            if (attached["middleP"] === true)
             {
                 pivot.rotation.x += 0.091;
 				
@@ -464,7 +366,7 @@
                 }
             }
 
-			if (attachedX === true)
+			if (attached["X"] === true)
             {
                 pivot.rotation.x -= 0.091;
                 if (pivot.rotation.x <= -Math.PI / 2.0)
@@ -474,7 +376,7 @@
                 }
             }
 			
-			if (attachedY === true)
+			if (attached["Y"] === true)
             {
                 pivot.rotation.y -= 0.091;
                 if (pivot.rotation.y <= -Math.PI / 2.0)
@@ -484,42 +386,12 @@
                 }
             }
 			
-			if (attachedZ === true)
+			if (attached["Z"] === true)
             {
                 pivot.rotation.z -= 0.091;
                 if (pivot.rotation.z <= -Math.PI / 2.0)
                 {
                     pivot.rotation.z = -Math.PI / 2.0;
-                    endAnimation = true;
-                }
-            }
-			
-			if (attachedX_P === true)
-            {
-                pivot.rotation.x += 0.091;
-                if (pivot.rotation.x >= Math.PI / 2.0)
-                {
-                    pivot.rotation.x = Math.PI / 2.0;
-                    endAnimation = true;
-                }
-            }
-			
-			if (attachedY_P === true)
-            {
-                pivot.rotation.y += 0.091;
-                if (pivot.rotation.y >= Math.PI / 2.0)
-                {
-                    pivot.rotation.y = Math.PI / 2.0;
-                    endAnimation = true;
-                }
-            }
-			
-			if (attachedZ_P === true)
-            {
-                pivot.rotation.z += 0.091;
-                if (pivot.rotation.z >= Math.PI / 2.0)
-                {
-                    pivot.rotation.z = Math.PI / 2.0;
                     endAnimation = true;
                 }
             }

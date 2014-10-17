@@ -1,0 +1,49 @@
+#info
+{
+	position: absolute;
+	top: 10px;
+	left: 400px;
+	z-index: 10;
+	text-align: center;
+    	line-height: 0.3;
+	background-color: #B6F2DF;
+	border-radius: 6px;
+	opacity: 0.7;
+}
+			
+#main 
+{
+	position: absolute;
+	top: 530px;
+	left: 550px;
+	padding: 30px;
+	max-width: 300px;
+	z-index: 10;
+}
+
+#scramble 
+{
+	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+	font-size: 20px;
+	line-height: 20px;
+	margin-bottom: 20px;
+}
+
+#btn-refresh 
+{
+	background-color: #428bca;
+	border: 1px solid #357ebd;
+	border-radius: 5px;
+	color: #fff;
+	cursor: pointer;
+	display: inline-block;
+	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+	font-size: 15px;
+	line-height: 10px;
+	margin: 0;
+	outline: none;
+	padding: 20px 0;
+	width: 100px;
+	position: relative;
+	left: 300px;
+}
