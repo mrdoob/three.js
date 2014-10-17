@@ -110,16 +110,11 @@
 
 				} );
 
-				//
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -142,8 +137,6 @@
 				mouseY = ( event.clientY - windowHalfY ) / 2;
 
 			}
-
-			//
 
 			function animate() {
 
