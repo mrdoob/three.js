@@ -46,6 +46,7 @@ var list = {
 
 
 		"Loaders": [
+			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
