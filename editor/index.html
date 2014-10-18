@@ -93,19 +93,19 @@
 
 			var editor = new Editor();
 
-			var viewport = new Viewport( editor ).setId( 'viewport' );
+			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var player = new Player( editor ).setId( 'player' );
+			var player = new Player( editor );
 			document.body.appendChild( player.dom );
 
-			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
+			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor ).setId( 'menubar' );
+			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
 
-			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
+			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
 			var dialog = new UI.Dialog();
