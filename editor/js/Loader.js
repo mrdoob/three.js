@@ -47,6 +47,30 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'babylonmeshdata':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+					var json = JSON.parse( contents );
+
+					var loader = new THREE.BabylonLoader();
+
+					var geometry = loader.parseGeometry( json );
+					var material = new THREE.MeshPhongMaterial();
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.name = filename;
+
+					editor.addObject( mesh );
+					editor.select( mesh );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
 			case 'ctm':
 
 				var reader = new FileReader();
