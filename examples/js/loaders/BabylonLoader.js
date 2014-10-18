@@ -121,17 +121,15 @@ THREE.BabylonLoader.prototype = {
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.attributes.index = {
-					itemSize: 1,
-					array: new Uint16Array( data.indices )
-				};
+				// indices
 
-				geometry.attributes.position = {
-					itemSize: 3,
-					array: new Float32Array( data.positions )
-				};
+				var indices = new Uint16Array( data.indices );
 
-				var positions = geometry.attributes.position.array;
+				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+
+				// positions
+
+				var positions = new Float32Array( data.positions );
 
 				for ( var j = 2, jl = positions.length; j < jl; j += 3 ) {
 
@@ -139,12 +137,11 @@ THREE.BabylonLoader.prototype = {
 
 				}
 
-				geometry.attributes.normal = {
-					itemSize: 3,
-					array: new Float32Array( data.normals )
-				};
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-				var normals = geometry.attributes.normal.array;
+				// normals
+
+				var normals = new Float32Array( data.normals );
 
 				for ( var j = 2, jl = normals.length; j < jl; j += 3 ) {
 
@@ -152,10 +149,15 @@ THREE.BabylonLoader.prototype = {
 
 				}
 
-				geometry.attributes.uv = {
-					itemSize: 2,
-					array: new Float32Array( data.uvs )
-				};
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+
+				// uvs
+
+				var uvs = new Float32Array( data.uvs );
+
+				geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+				// offsets
 
 				var subMeshes = data.subMeshes;
 
@@ -165,31 +167,21 @@ THREE.BabylonLoader.prototype = {
 
 						var subMesh = subMeshes[ j ];
 
-						geometry.offsets.push( {
-							start: subMesh.indexStart,
-							index: 0,
-							count: subMesh.indexCount
-						} );
+						geometry.addDrawCall( subMesh.indexStart, subMesh.indexCount );
 
 					}
 
 				} else {
 
-					geometry.offsets.push( {
-						start: 0,
-						index: 0,
-						count: data.indices.length
-					} );
+					geometry.addDrawCall( 0, data.indices.length );
 
 				}
 
-				var material = materials[ data.materialId ];
-
-				object = new THREE.Mesh( geometry, material );
+				object = new THREE.Mesh( geometry, materials[ data.materialId ] );
 
 			} else {
 
-				object = new THREE.Object3D();
+				object = new THREE.Group();
 
 			}
 
