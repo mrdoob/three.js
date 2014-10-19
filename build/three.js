@@ -31938,12 +31938,33 @@ THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
 
 THREE.CameraHelper.prototype.update = function () {
 
+	var geometry, pointMap;
+	
 	var vector = new THREE.Vector3();
 	var camera = new THREE.Camera();
 
+	var setPoint = function ( point, x, y, z ) {
+
+		vector.set( x, y, z ).unproject( camera );
+
+		var points = pointMap[ point ];
+
+		if ( points !== undefined ) {
+
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				geometry.vertices[ points[ i ] ].copy( vector );
+
+			}
+
+		}
+
+	};
+
 	return function () {
 
-		var scope = this;
+		geometry = this.geometry;
+		pointMap = this.pointMap;
 
 		var w = 1, h = 1;
 
@@ -31960,54 +31981,36 @@ THREE.CameraHelper.prototype.update = function () {
 		// near
 
 		setPoint( "n1", - w, - h, - 1 );
-		setPoint( "n2",  w, - h, - 1 );
-		setPoint( "n3", - w,  h, - 1 );
-		setPoint( "n4",  w,  h, - 1 );
+		setPoint( "n2",   w, - h, - 1 );
+		setPoint( "n3", - w,   h, - 1 );
+		setPoint( "n4",   w,   h, - 1 );
 
 		// far
 
 		setPoint( "f1", - w, - h, 1 );
-		setPoint( "f2",  w, - h, 1 );
-		setPoint( "f3", - w,  h, 1 );
-		setPoint( "f4",  w,  h, 1 );
+		setPoint( "f2",   w, - h, 1 );
+		setPoint( "f3", - w,   h, 1 );
+		setPoint( "f4",   w,   h, 1 );
 
 		// up
 
-		setPoint( "u1",  w * 0.7, h * 1.1, - 1 );
+		setPoint( "u1",   w * 0.7, h * 1.1, - 1 );
 		setPoint( "u2", - w * 0.7, h * 1.1, - 1 );
-		setPoint( "u3",        0, h * 2,   - 1 );
+		setPoint( "u3",         0, h * 2,   - 1 );
 
 		// cross
 
-		setPoint( "cf1", - w,  0, 1 );
-		setPoint( "cf2",  w,  0, 1 );
-		setPoint( "cf3",  0, - h, 1 );
-		setPoint( "cf4",  0,  h, 1 );
+		setPoint( "cf1", - w,   0, 1 );
+		setPoint( "cf2",   w,   0, 1 );
+		setPoint( "cf3",   0, - h, 1 );
+		setPoint( "cf4",   0,   h, 1 );
 
-		setPoint( "cn1", - w,  0, - 1 );
-		setPoint( "cn2",  w,  0, - 1 );
-		setPoint( "cn3",  0, - h, - 1 );
-		setPoint( "cn4",  0,  h, - 1 );
+		setPoint( "cn1", - w,   0, - 1 );
+		setPoint( "cn2",   w,   0, - 1 );
+		setPoint( "cn3",   0, - h, - 1 );
+		setPoint( "cn4",   0,   h, - 1 );
 
-		function setPoint( point, x, y, z ) {
-
-			vector.set( x, y, z ).unproject( camera );
-
-			var points = scope.pointMap[ point ];
-
-			if ( points !== undefined ) {
-
-				for ( var i = 0, il = points.length; i < il; i ++ ) {
-
-					scope.geometry.vertices[ points[ i ] ].copy( vector );
-
-				}
-
-			}
-
-		}
-
-		this.geometry.verticesNeedUpdate = true;
+		geometry.verticesNeedUpdate = true;
 
 	};
 
@@ -33908,7 +33911,7 @@ THREE.ShadowMapPlugin = function () {
 			if ( light.shadowCameraVisible && ! light.cameraHelper ) {
 
 				light.cameraHelper = new THREE.CameraHelper( light.shadowCamera );
-				light.shadowCamera.add( light.cameraHelper );
+				scene.add( light.cameraHelper );
 
 			}
 
@@ -33922,12 +33925,16 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
+			//
+
 			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
 			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
 			shadowCamera.updateMatrixWorld();
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+
+			//
 
 			if ( light.cameraHelper ) light.cameraHelper.visible = light.shadowCameraVisible;
 			if ( light.shadowCameraVisible ) light.cameraHelper.update();
@@ -33957,7 +33964,8 @@ THREE.ShadowMapPlugin = function () {
 			// set object matrices & frustum culling
 
 			_renderList.length = 0;
-			projectObject(scene,scene,shadowCamera);
+
+			projectObject( scene, scene, shadowCamera );
 
 
 			// render regular objects
@@ -34053,32 +34061,34 @@ THREE.ShadowMapPlugin = function () {
 		_renderer.resetGLState();
 
 	};
-	
-	function projectObject(scene, object,shadowCamera){
-		
+
+	function projectObject( scene, object, shadowCamera ){
+
 		if ( object.visible ) {
-	
-			var webglObjects = _webglObjects[object.id];
-	
-			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
-		
-		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
-			
-					var webglObject = webglObjects[i];
-					
+
+			var webglObjects = _webglObjects[ object.id ];
+
+			if ( webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+
+				for (var i = 0, l = webglObjects.length; i < l; i ++ ) {
+
+					var webglObject = webglObjects[ i ];
+
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push(webglObject);
-					
+					_renderList.push( webglObject );
+
 				}
+
 			}
-	
-			for(var i = 0, l = object.children.length; i < l; i++) {
-				
-				projectObject(scene, object.children[i],shadowCamera);
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				projectObject( scene, object.children[ i ], shadowCamera );
+
 			}
-		
+
 		}
+
 	}
 
 	function createVirtualLight( light, cascade ) {
