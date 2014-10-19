@@ -227,12 +227,16 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
+			//
+
 			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
 			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
 			shadowCamera.updateMatrixWorld();
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+
+			//
 
 			if ( light.cameraHelper ) light.cameraHelper.visible = light.shadowCameraVisible;
 			if ( light.shadowCameraVisible ) light.cameraHelper.update();
@@ -262,7 +266,8 @@ THREE.ShadowMapPlugin = function () {
 			// set object matrices & frustum culling
 
 			_renderList.length = 0;
-			projectObject(scene,scene,shadowCamera);
+
+			projectObject( scene, scene, shadowCamera );
 
 
 			// render regular objects
@@ -358,32 +363,34 @@ THREE.ShadowMapPlugin = function () {
 		_renderer.resetGLState();
 
 	};
-	
-	function projectObject(scene, object,shadowCamera){
-		
+
+	function projectObject( scene, object, shadowCamera ){
+
 		if ( object.visible ) {
-	
-			var webglObjects = _webglObjects[object.id];
-	
-			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
-		
-		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
-			
-					var webglObject = webglObjects[i];
-					
+
+			var webglObjects = _webglObjects[ object.id ];
+
+			if ( webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+
+				for (var i = 0, l = webglObjects.length; i < l; i ++ ) {
+
+					var webglObject = webglObjects[ i ];
+
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push(webglObject);
-					
+					_renderList.push( webglObject );
+
 				}
+
 			}
-	
-			for(var i = 0, l = object.children.length; i < l; i++) {
-				
-				projectObject(scene, object.children[i],shadowCamera);
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				projectObject( scene, object.children[ i ], shadowCamera );
+
 			}
-		
+
 		}
+
 	}
 
 	function createVirtualLight( light, cascade ) {
