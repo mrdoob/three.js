@@ -213,7 +213,7 @@ THREE.ShadowMapPlugin = function () {
 			if ( light.shadowCameraVisible && ! light.cameraHelper ) {
 
 				light.cameraHelper = new THREE.CameraHelper( light.shadowCamera );
-				light.shadowCamera.add( light.cameraHelper );
+				scene.add( light.cameraHelper );
 
 			}
 
