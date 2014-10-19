@@ -175,7 +175,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors:[], positions: [] },
 		point: { length: 0, colors: [], positions: [], distances: [] },
-		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [] },
+		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], outerAnglesCos: [], angleCosDiffs: [], exponents: [] },
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
 
 	};
@@ -4839,6 +4839,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.spotLightDistance.value = lights.spot.distances;
 		uniforms.spotLightDirection.value = lights.spot.directions;
 		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
+		uniforms.spotLightOuterAngleCos.value = lights.spot.outerAnglesCos;
+		uniforms.spotLightAngleCosDiff.value = lights.spot.angleCosDiffs;
 		uniforms.spotLightExponent.value = lights.spot.exponents;
 
 		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
@@ -5319,6 +5321,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotDistances = zlights.spot.distances,
 		spotDirections = zlights.spot.directions,
 		spotAnglesCos = zlights.spot.anglesCos,
+		spotOuterAnglesCos = zlights.spot.outerAnglesCos,
+		spotAngleCosDiffs = zlights.spot.angleCosDiffs,
 		spotExponents = zlights.spot.exponents,
 
 		hemiSkyColors = zlights.hemi.skyColors,
@@ -5460,6 +5464,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				spotDirections[ spotOffset + 2 ] = _direction.z;
 
 				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
+				spotOuterAnglesCos[ spotLength ] = Math.cos( light.angle + light.penumbraAngle );
+				spotAngleCosDiffs[ spotLength ] = spotAnglesCos[ spotLength ] - spotOuterAnglesCos[ spotLength ]
 				spotExponents[ spotLength ] = light.exponent;
 
 				spotLength += 1;
