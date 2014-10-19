@@ -31,10 +31,33 @@ THREE.ShadowMapPlugin = function () {
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
-		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
-		_depthMaterialSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, skinning: true } );
-		_depthMaterialMorphSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true, skinning: true } );
+		_depthMaterial = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader
+		 } );
+
+		_depthMaterialMorph = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			morphTargets: true
+		} );
+
+		_depthMaterialSkin = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			skinning: true
+		} );
+
+		_depthMaterialMorphSkin = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			morphTargets: true,
+			skinning: true
+		} );
 
 		_depthMaterial._shadowPass = true;
 		_depthMaterialMorph._shadowPass = true;
@@ -190,7 +213,7 @@ THREE.ShadowMapPlugin = function () {
 			if ( light.shadowCameraVisible && ! light.cameraHelper ) {
 
 				light.cameraHelper = new THREE.CameraHelper( light.shadowCamera );
-				light.shadowCamera.add( light.cameraHelper );
+				scene.add( light.cameraHelper );
 
 			}
 
@@ -204,6 +227,8 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
+			//
+
 			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
 			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
@@ -211,15 +236,19 @@ THREE.ShadowMapPlugin = function () {
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
+			//
+
 			if ( light.cameraHelper ) light.cameraHelper.visible = light.shadowCameraVisible;
 			if ( light.shadowCameraVisible ) light.cameraHelper.update();
 
 			// compute shadow matrix
 
-			shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
-							  0.0, 0.5, 0.0, 0.5,
-							  0.0, 0.0, 0.5, 0.5,
-							  0.0, 0.0, 0.0, 1.0 );
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 0.5, 0.5,
+				0.0, 0.0, 0.0, 1.0
+			);
 
 			shadowMatrix.multiply( shadowCamera.projectionMatrix );
 			shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
@@ -237,7 +266,8 @@ THREE.ShadowMapPlugin = function () {
 			// set object matrices & frustum culling
 
 			_renderList.length = 0;
-			projectObject(scene,scene,shadowCamera);
+
+			projectObject( scene, scene, shadowCamera );
 
 
 			// render regular objects
@@ -333,32 +363,34 @@ THREE.ShadowMapPlugin = function () {
 		_renderer.resetGLState();
 
 	};
-	
-	function projectObject(scene, object,shadowCamera){
-		
+
+	function projectObject( scene, object, shadowCamera ){
+
 		if ( object.visible ) {
-	
-			var webglObjects = _webglObjects[object.id];
-	
-			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
-		
-		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
-			
-					var webglObject = webglObjects[i];
-					
+
+			var webglObjects = _webglObjects[ object.id ];
+
+			if ( webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+
+				for (var i = 0, l = webglObjects.length; i < l; i ++ ) {
+
+					var webglObject = webglObjects[ i ];
+
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push(webglObject);
-					
+					_renderList.push( webglObject );
+
 				}
+
 			}
-	
-			for(var i = 0, l = object.children.length; i < l; i++) {
-				
-				projectObject(scene, object.children[i],shadowCamera);
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				projectObject( scene, object.children[ i ], shadowCamera );
+
 			}
-		
+
 		}
+
 	}
 
 	function createVirtualLight( light, cascade ) {

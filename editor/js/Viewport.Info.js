@@ -7,6 +7,7 @@ Viewport.Info = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
+	container.setId( 'info' );
 	container.setPosition( 'absolute' );
 	container.setLeft( '10px' );
 	container.setBottom( '10px' );

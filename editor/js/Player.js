@@ -7,6 +7,7 @@ var Player = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
+	container.setId( 'player' );
 	container.setPosition( 'absolute' );
 	container.setDisplay( 'none' );
 

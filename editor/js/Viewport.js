@@ -7,6 +7,7 @@ var Viewport = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
+	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
 	container.add( new Viewport.Info( editor ) );
