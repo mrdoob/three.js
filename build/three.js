@@ -12648,13 +12648,13 @@ THREE.ObjectLoader.prototype = {
 
 					if ( geometry === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined geometry ' + data.geometry );
+						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
 
 					}
 
 					if ( material === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
@@ -12668,7 +12668,7 @@ THREE.ObjectLoader.prototype = {
 
 					if ( material === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
