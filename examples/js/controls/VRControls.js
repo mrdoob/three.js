@@ -5,6 +5,11 @@
 THREE.VRControls = function ( camera, done ) {
 
 	this._camera = camera;
+	this._vrState = {
+		hmd : {
+			orientation: new THREE.Quaternion()
+		}
+	};
 
 	this._init = function () {
 		var self = this;
@@ -49,28 +54,20 @@ THREE.VRControls = function ( camera, done ) {
 		}
 		// Applies head rotation from sensors data.
 		if ( camera ) {
-			camera.quaternion.fromArray( vrState.hmd.rotation );
+			camera.quaternion.copy( vrState.hmd.orientation );
 		}
 	};
 
 	this.getVRState = function() {
 		var vrInput = this._vrInput;
+		var vrState = this._vrState;
 		var orientation;
-		var vrState;
 		if ( !vrInput ) {
 			return null;
 		}
-		orientation	= vrInput.getState().orientation;
-		vrState = {
-			hmd : {
-				rotation : [
-					orientation.x,
-					orientation.y,
-					orientation.z,
-					orientation.w
-				]
-			}
-		};
+		// If orientation is not available we return the identity quaternion (no rotation)
+		orientation = vrInput.getState().orientation || { x: 0, y: 0, z:0, w:1 };
+		vrState.hmd.orientation.set( orientation.x, orientation.y, orientation.z, orientation.w );
 		return vrState;
 	};
 
