@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com
  */
 
-THREE.VRControls = function ( object, done ) {
+THREE.VRControls = function ( object, callback ) {
 
 	var vrInput;
 
@@ -22,9 +22,9 @@ THREE.VRControls = function ( object, done ) {
 
 		}
 
-		if ( done !== undefined ) {
+		if ( callback !== undefined ) {
 
-			done( 'HMD not available' );
+			callback( 'HMD not available' );
 
 		}
 
@@ -34,13 +34,13 @@ THREE.VRControls = function ( object, done ) {
 
 		navigator.getVRDevices().then( onVRDevices );
 
-	} else if ( navigator.getVRDevices !== undefined ) {
+	} else if ( navigator.mozGetVRDevices !== undefined ) {
 
 		navigator.mozGetVRDevices( onVRDevices );
 
-	} else if ( done !== undefined ) {
+	} else if ( callback !== undefined ) {
 
-		done( 'Your browser is not VR Ready' );
+		callback( 'Your browser is not VR Ready' );
 
 	}
 
