@@ -25,7 +25,7 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:todo crossOrigin]</h3>
+		<h3>[property:String crossOrigin]</h3>
 		<div>
 		default — *null*.<br />
 		If set, assigns the *crossOrigin* attribute of the image to the value of *crossOrigin*, prior to starting the load.
@@ -34,7 +34,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>.load( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
 		url — required<br />
 		onLoad — Will be called when load completes. The argument will be the loaded text response.<br />
@@ -46,9 +46,36 @@
 		</div>
 
 
+
 		<h2>Example</h2>
 
-		<a target="_parent" href="http://threejs.org/examples/#canvas_geometry_earth">canvas_geometry_earth</a>
+		<code>
+		// instantiate a loader
+		var loader = new THREE.TextureLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'textures/land_ocean_ice_cloud_2048.jpg,
+			// Function when resource is loaded
+			function ( texture ) {
+				// do something with the texture
+				var material = new THREE.MeshBasicMaterial( {
+					map: texture
+				 } );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		[example:canvas_geometry_earth]
 
 
 		<h2>Source</h2>

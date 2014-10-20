@@ -83,6 +83,7 @@ APP.Player = function () {
 
 APP.Script = function ( source ) {
 
+	this.uuid = THREE.Math.generateUUID();
 	this.source = source;
 
 };
