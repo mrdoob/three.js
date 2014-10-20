@@ -54,4 +54,12 @@ THREE.VRControls = function ( object, callback ) {
 
 	};
 
+	this.zeroSensor = function () {
+
+		if ( vrInput === undefined ) return;
+
+		vrInput.zeroSensor();
+
+	};
+
 };
