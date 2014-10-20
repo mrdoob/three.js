@@ -34,10 +34,6 @@ THREE.VRControls = function ( object, callback ) {
 
 		navigator.getVRDevices().then( onVRDevices );
 
-	} else if ( navigator.mozGetVRDevices !== undefined ) {
-
-		navigator.mozGetVRDevices( onVRDevices );
-
 	} else if ( callback !== undefined ) {
 
 		callback( 'Your browser is not VR Ready' );
