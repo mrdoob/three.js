@@ -94,17 +94,9 @@
 				// model
 
 				var loader = new THREE.BabylonLoader( manager );
-				loader.load( 'models/babylon/skull.babylon', function ( object ) {
+				loader.load( 'models/babylon/skull.babylon', function ( babylonScene ) {
 
-					object.traverse( function ( child ) {
-
-						if ( child instanceof THREE.Mesh ) {
-
-							scene.add( child );
-
-						}
-
-					} );
+					scene.add( babylonScene );
 
 				}, onProgress, onError );
 

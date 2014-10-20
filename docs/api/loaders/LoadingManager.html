@@ -11,19 +11,19 @@
 
 		<div class="desc">Handles and keeps track of loaded and pending data.</div>
 		<code>
-var manager = new THREE.LoadingManager();
-manager.onProgress = function ( item, loaded, total ) {
+		var manager = new THREE.LoadingManager();
+		manager.onProgress = function ( item, loaded, total ) {
 
-	console.log( item, loaded, total );
+			console.log( item, loaded, total );
 
-};
+		};
 
-var loader = new THREE.OBJLoader( manager );
-loader.load( 'file.obj', function ( object ) {
+		var loader = new THREE.OBJLoader( manager );
+		loader.load( 'file.obj', function ( object ) {
 
-	//
+			//
 
-} );
+		} );
 		</code>
 
 
@@ -31,8 +31,8 @@ loader.load( 'file.obj', function ( object ) {
 
 		<h3>[name]([page:function onLoad], [page:function onProgress], [page:function onError])</h3>
 		<div>
-		[page:function onLoad] -- The function that needs to be called when all loaders are done.
-		[page:function onProgress] -- The function that needs to be called when an item is complete.
+		[page:function onLoad] -- The function that needs to be called when all loaders are done.<br />
+		[page:function onProgress] -- The function that needs to be called when an item is complete.<br />
 		[page:function onError] -- The function that needs to be called when an item is errors.
 		</div>
 		<div>
@@ -61,7 +61,7 @@ loader.load( 'file.obj', function ( object ) {
 
 		<h2>Methods</h2>
 
-		<h3>[method:todo itemStart]( [page:String url] )</h3>
+		<h3>[method:null itemStart]( [page:String url] )</h3>
 		<div>
 		url — the url to load
 		</div>
@@ -69,7 +69,7 @@ loader.load( 'file.obj', function ( object ) {
 		This should be called by any loader used by the manager when the loader starts loading an url. These shouldn't be called outside a loader.
 		</div>
 
-		<h3>[method:todo itemEnd]( [page:String url] )</h3>
+		<h3>[method:null itemEnd]( [page:String url] )</h3>
 		<div>
 		url — the url to load
 		</div>
@@ -80,7 +80,7 @@ loader.load( 'file.obj', function ( object ) {
 
 		<h2>Example</h2>
 
-		<a target="_parent" href="http://threejs.org/examples/#webgl_loader_obj">webgl_loader_obj</a>
+		[example:webgl_loader_obj]
 
 
 		<h2>Source</h2>

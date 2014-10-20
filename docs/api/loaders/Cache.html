@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A simple caching classe.</div>
+		<div class="desc">A simple caching classe, used internaly by [page:XHRLoader].</div>
 
 
 		<h2>Constructor</h2>
@@ -22,7 +22,7 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Object files]</h3>
+		<h3>[property:Object files]</h3>
 		<div>
 		An [page:Object object] that hold cached values.
 		</div>
@@ -30,7 +30,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>.add( [page:String key], value )</h3>
+		<h3>[method:null add]( [page:String key], value )</h3>
 		<div>
 		key — required. A string key <br />
 		value — <br />
@@ -39,7 +39,7 @@
 		Adds a cache entry with that key to hold the value. If this key already holds a value, it is overwritten.
 		</div>
 
-		<h3>.get( [page:String key] )</h3>
+		<h3>[method:null get]( [page:String key] )</h3>
 		<div>
 		key — required. A string key <br />
 		</div>
@@ -47,7 +47,7 @@
 		Get the value of key. If the key does not exist the null value is returned.
 		</div>
 
-		<h3>.remove( [page:String key] )</h3>
+		<h3>[method:null remove]( [page:String key] )</h3>
 		<div>
 		key — required. A string key <br />
 		</div>
@@ -55,7 +55,7 @@
 		Remove the cached value associated with the key.
 		</div>
 
-		<h3>.clear()</h3>
+		<h3>[method:null clear]()</h3>
 		<div>
 		Remove all values from the cache.
 		</div>

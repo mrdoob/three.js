@@ -9,36 +9,72 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A loader for loading an [page:BufferGeometry].</div>
 
-		<h2>Example</h2>
-
-		<code>todo</code>
 
 		<h2>Constructor</h2>
 
-
-		<h3>todo</h3>
-		<div></div>
+		<h3>[name]([page:LoadingManager manager])</h3>
+		<div>
+		manager -- The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>todo</h3>
-		<div>
-		todo
-		</div> 
-
 
 		<h2>Methods</h2>
-		
 
-		<h3>todo</h3>
-		<div>todo</div>
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		todo
+		url — required<br />
+		onLoad — Will be called when load completes. The argument will be the loaded [page:BufferGeometry].<br />
+		onProgress — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		onError — Will be called when load errors.<br />
 		</div>
-		
+		<div>
+		Begin loading from url and call onLoad with the parsed response content.
+		</div>
+
+		<h3>[method:BufferGeometry parse]([page:Object json])</h3>
+		<div>
+		text — The <em>JSON</em> structure to parse.
+		</div>
+		<div>
+		Parse a <em>JSON</em> structure and returns an [page:BufferGeometry].
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.BabylonLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'models/json/pressure.json',
+			// Function when resource is loaded
+			function ( geometry ) {
+				var material = new THREE.MeshLambertMaterial( { color: 0xF5F5F5 } );
+				var object = new THREE.Mesh( geometry, material );
+				scene.add( object );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
