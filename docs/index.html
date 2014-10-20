@@ -351,23 +351,35 @@
 
 			// Page loading
 
-			function goTo( section, category, name ) {
+			function goTo( section, category, name, member ) {
+				var parts, location;
+				var MEMBER_DELIMITER = '.'
 
 				// Fully resolve links that only provide a name
 				if(arguments.length == 1) {
-					var location = nameCategoryMap[section];
+
+					// Resolve links of the form 'Class.member'
+					if(section.indexOf(MEMBER_DELIMITER) !== -1) {
+						parts = section.split(MEMBER_DELIMITER)
+						section = parts[0]; 
+						member = parts[1];
+					}
+
+					location = nameCategoryMap[section];
+					if (!location) return;
 					section = location.section;
 					category = location.category;
 					name = location.name;
-				}
+				} 
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
-				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name);
+				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? DELIMITER + encodeUrl(member) : '');
 
 				window.location.hash = url;
 				window.document.title = title;
 
-				viewer.src = pages[ section ][ category ][ name ] + '.html';
+				viewer.src = pages[ section ][ category ][ name ] + '.html' + (!!member ? '#'+member : '');
+
 				panel.classList.add( 'collapsed' );
 
 			}
@@ -375,7 +387,7 @@
 			function goToHash() {
 
 				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
-				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]) );
+				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]), decodeUrl(hash.length > 3 ? hash[3] : '') );
 
 			}
 
