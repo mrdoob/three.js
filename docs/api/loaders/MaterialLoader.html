@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCT]YPE html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
@@ -14,9 +14,9 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([page:LoadingManager manager])</h3>
+		<h3>[name]( [page:LoadingManager manager] )</h3>
 		<div>
-		manager -- The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
 		</div>
 		<div>
 		Creates a new [name].
@@ -27,29 +27,29 @@
 
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-		onLoad -- Will be called when load completes. The argument will be the loaded [page:Material].<br />
-		onProgress -- Will be called while load progresses. The argument will be the progress event.<br />
-		onError -- Will be called when load errors.<br />
-		url — required
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Material].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the progress event.<br />
+		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
 		Begin loading from url and return the [page:Material] object that will contain the data.
 		</div>
 
-		<h3>[method:null setCrossOrigin]([page:String value])</h3>
+		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
 		<div>
-		value -- The crossOrigin string.
+		[page:String value] — The crossOrigin string.
 		</div>
 		<div>
 		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
 		</div>
 
-		<h3>[method:Material parse]([page:Object json])</h3>
+		<h3>[method:Material parse]( [page:Object json] )</h3>
 		<div>
-		json -- The json object containing the parameters of the Material.
+		[page:Object json] — The json object containing the parameters of the Material.
 		</div>
 		<div>
-		Creates a new [page:Material] of the type [page:String json.type] with parameters defined in the json object.
+		Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object.
 		</div>
 
 
@@ -63,10 +63,10 @@
 		// load a resource
 		loader.load(
 			// resource URL
-			'models/babylon/skull.babylon',
+			'path/to/material.json',
 			// Function when resource is loaded
-			function ( object ) {
-				scene.add( object );
+			function ( material ) {
+				object.material = material;
 			},
 			// Function called when download progresses
 			function ( xhr ) {
