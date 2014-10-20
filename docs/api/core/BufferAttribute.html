@@ -22,23 +22,23 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Array array]</h3>
+		<h3>[property:Array array]</h3>
 		<div>
 		Stores the data associated with this attribute; can be an Array or a Typed Array. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry]. 
 		</div>
 
-		<h3>.[page:Integer itemSize]</h3>
+		<h3>[property:Integer itemSize]</h3>
 		<div>
 		Records how many items of the array are associated with a particular vertex. For instance, if this
 		attribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3.
 		</div>
 
-		<h3>.[page:Integer length]</h3>
+		<h3>[property:Integer length]</h3>
 		<div>
 		Gives the total number of elements in the array.
 		</div>
 
-		<h3>.[page:Boolean needsUpdate]</h3>
+		<h3>[property:Boolean needsUpdate]</h3>
 		<div>
 		Flag to indicate that this attribute has changed and should be re-send to the GPU. Set this to true when you modify the value of the array.
 		</div>
@@ -47,45 +47,45 @@
 
 		<h2>Methods</h2>
 		
-		<h3>.copyAt ( [page:Integer index1], attribute, [page:Integer index2] ) </h3>
+		<h3>[method:null copyAt] ( [page:Integer index1], attribute, [page:Integer index2] ) </h3>
 		<div>
 		Copies itemSize values in the array from the vertex at index2 to the vertex at index1.
 		</div>
 
-		<h3>.set ( [page:Array value] ) </h3>
+		<h3>[method:null set] ( [page:Array value] ) </h3>
 		<div>
 		Sets the associated array with values from the passed array.
 		</div>
 
-		<h3>.setX ( index, x ) </h3>
+		<h3>[method:null setX]( index, x ) </h3>
 		<div>
 		Sets the value of the array at <code>index * itemSize</code> to x
 		</div>
 
-		<h3>.setY ( index, y ) </h3>
+		<h3>[method:null setY]( index, y ) </h3>
 		<div>
 		Sets the value of the array at <code>index * itemSize + 1</code> to y
 		</div>
 
-		<h3>.setZ ( index, z ) </h3>
+		<h3>[method:null setZ]( index, z ) </h3>
 		<div>
 		Sets the value of the array at <code>index * itemSize + 2</code> to z
 		</div>
 
-		<h3>.setXY ( index, x, y ) </h3>
+		<h3>[method:null setXY]( index, x, y ) </h3>
 		<div>
 		Sets the value of the array at <code>index * itemSize</code> to x and 
 		sets the value of the array at <code>index * itemSize + 1</code> to y
 		</div>
 
-		<h3>.setXYZ ( index, x, y, z ) </h3>
+		<h3>[method:null setXYZ]( index, x, y, z ) </h3>
 		<div>
 		Sets the value of the array at <code>index * itemSize</code> to x,
 		the value of the array at <code>index * itemSize + 1</code> to y, and
 		the value of the array at <code>index * itemSize + 2</code> to z.
 		</div>
 
-		<h3>.setXYZW ( index, x, y, z, w ) </h3>
+		<h3>[method:null setXYZW]( index, x, y, z, w ) </h3>
 		<div>
 		Sets the value of the array at <code>index * itemSize</code> to x,
 		the value of the array at <code>index * itemSize + 1</code> to y, 
@@ -93,7 +93,7 @@
 		the value of the array at <code>index * itemSize + 3</code> to w.
 		</div>
 
-		<h3>.clone () </h3>
+		<h3>[method:BufferAttribute clone]() </h3>
 		<div>
 		Copies this attribute.
 		</div>

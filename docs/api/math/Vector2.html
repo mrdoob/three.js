@@ -35,106 +35,106 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Float x]</h3>
+		<h3>[property:Float x]</h3>
 
-		<h3>.[page:Float y]</h3>
+		<h3>[property:Float y]</h3>
 
 
 		<h2>Methods</h2>
 
-		<h3>.set( [page:Float x], [page:Float y] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 set]( [page:Float x], [page:Float y] ) [page:Vector2 this]</h3>
 		<div>
 		Sets value of this vector.
 		</div>
 
-		<h3>.copy( [page:Vector2 v] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 copy]( [page:Vector2 v] ) [page:Vector2 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
 		</div>
 
-		<h3>.add( [page:Vector2 v] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 add]( [page:Vector2 v] ) [page:Vector2 this]</h3>
 		<div>
 		Adds *v* to this vector.
 		</div>
 
-		<h3>.addVectors( [page:Vector2 a], [page:Vector2 b] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 addVectors]( [page:Vector2 a], [page:Vector2 b] ) [page:Vector2 this]</h3>
 		<div>
 		Sets this vector to *a + b*.
 		</div>
 
-		<h3>.sub( [page:Vector2 v] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 sub]( [page:Vector2 v] ) [page:Vector2 this]</h3>
 		<div>
 		Subtracts *v* from this vector.
 		</div>
 
-		<h3>.subVectors( [page:Vector2 a], [page:Vector2 b] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 subVectors]( [page:Vector2 a], [page:Vector2 b] ) [page:Vector2 this]</h3>
 		<div>
 		Sets this vector to *a - b*.
 		</div>
 
-		<h3>.multiplyScalar( [page:Float s] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 multiplyScalar]( [page:Float s] ) [page:Vector2 this]</h3>
 		<div>
 		Multiplies this vector by scalar *s*.
 		</div>
 
-		<h3>.divideScalar( [page:Float s] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 divideScalar]( [page:Float s] ) [page:Vector2 this]</h3>
 		<div>
 		Divides this vector by scalar *s*.<br />
 		Set vector to *( 0, 0 )* if *s == 0*.
 		</div>
 
-		<h3>.negate() [page:Vector2 this]</h3>
+		<h3>[method:Vector2 negate]() [page:Vector2 this]</h3>
 		<div>
 		Inverts this vector.
 		</div>
 
-		<h3>.dot( [page:Vector2 v] ) [page:Float]</h3>
+		<h3>[method:Float dot]( [page:Vector2 v] )</h3>
 		<div>
 		Computes dot product of this vector and *v*.
 		</div>
 
-		<h3>.lengthSq() [page:Float]</h3>
+		<h3>[method:Float lengthSq]()</h3>
 		<div>
 		Computes squared length of this vector.
 		</div>
 
-		<h3>.length() [page:Float]</h3>
+		<h3>[method:Float length]()</h3>
 		<div>
 		Computes length of this vector.
 		</div>
 
-		<h3>.normalize() [page:Vector2 this]</h3>
+		<h3>[method:Vector2 normalize]() [page:Vector2 this]</h3>
 		<div>
 		Normalizes this vector.
 		</div>
 
-		<h3>.distanceTo( [page:Vector2 v] ) [page:Float]</h3>
+		<h3>[method:Float distanceTo]( [page:Vector2 v] )</h3>
 		<div>
 		Computes distance of this vector to *v*.
 		</div>
 
-		<h3>.distanceToSquared( [page:Vector2 v] ) [page:Float]</h3>
+		<h3>[method:Float distanceToSquared]( [page:Vector2 v] )</h3>
 		<div>
 		Computes squared distance of this vector to *v*.
 		</div>
 
-		<h3>.setLength( [page:Float l] ) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 setLength]( [page:Float l] ) [page:Vector2 this]</h3>
 		<div>
 		Normalizes this vector and multiplies it by *l*.
 		</div>
 
-		<h3>.equals( [page:Vector2 v] ) [page:Boolean]</h3>
+		<h3>[method:Boolean equals]( [page:Vector2 v] )</h3>
 		<div>
 		Checks for strict equality of this vector and *v*.
 		</div>
 
-		<h3>.clone() [page:Vector2]</h3>
+		<h3>[method:Vector2 clone]()</h3>
 		<div>
 		Clones this vector.
 		</div>
 
 
-		<h3>.clamp([page:Vector2 min], [page:Vector2 max]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 clamp]([page:Vector2 min], [page:Vector2 max]) [page:Vector2 this]</h3>
 		<div>
 		min -- [page:Vector2] containing the min x and y values in the desired range <br />
 		max -- [page:Vector2] containing the max x and y values in the desired range
@@ -143,7 +143,7 @@
 		If this vector's x or y value is greater than the max vector's x or y value, it is replaced by the corresponding value. <br />	If this vector's x or y value is less than the min vector's x or y value, it is replace by the corresponding value.
 		</div>
 
-		<h3>.clampScalar([page:Float min], [page:Float max]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 clampScalar]([page:Float min], [page:Float max]) [page:Vector2 this]</h3>
 		<div>
 		min -- [page:Float] the minimum value the components will be clamped to <br />
 		max -- [page:Float] the maximum value the components will be clamped to
@@ -152,27 +152,27 @@
 		If this vector's x or y values are greater than the max value, they are replaced by the max value. <br />  If this vector's x or y values are less than the min value, they are replace by the min value.
 		</div>
 
-		<h3>.floor() [page:Vector2]</h3>
+		<h3>[method:Vector2 floor]()</h3>
 		<div>
 		The components of the vector are rounded downwards (towards negative infinity) to an integer value.
 		</div>
 
-		<h3>.ceil() [page:Vector2]</h3>
+		<h3>[method:Vector2 ceil]()</h3>
 		<div>
 		The components of the vector are rounded upwards (towards positive infinity) to an integer value.
 		</div>
 
-		<h3>.round() [page:Vector2]</h3>
+		<h3>[method:Vector2 round]()</h3>
 		<div>
 		The components of the vector are rounded towards the nearest integer value.
 		</div>
 
-		<h3>.roundToZero() [page:Vector2]</h3>
+		<h3>[method:Vector2 roundToZero]()</h3>
 		<div>
 		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</div>
 
-		<h3>.lerp([page:Vector2 v], [page:Float alpha]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 lerp]([page:Vector2 v], [page:Float alpha]) [page:Vector2 this]</h3>
 		<div>
 		v -- [page:Vector2] <br />
 		alpha -- [page:Float] between 0 and 1;
@@ -181,7 +181,7 @@
 		Linear interpolation between this vector and v, where alpha is the percent along the line.
 		</div>
 
-		<h3>.setComponent([page:Integer index], [page:Float value]) [page:undefined]</h3>
+		<h3>[method:undefined setComponent]([page:Integer index], [page:Float value])</h3>
 		<div>
 		index -- 0 or 1 <br />
 		value -- [page:Float]
@@ -191,7 +191,7 @@
 		if index equals 1 method replaces this.y with value.
 		</div>
 
-		<h3>.addScalar([page:Float s]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 addScalar]([page:Float s]) [page:Vector2 this]</h3>
 		<div>
 		s -- [page:Float]
 		</div>
@@ -199,7 +199,7 @@
 		Add the scalar value s to this vector's x and y values.
 		</div>
 
-		<h3>.getComponent([page:Integer index]) [page:Float]</h3>
+		<h3>[method:Float getComponent]([page:Integer index])</h3>
 		<div>
 		index -- 0 or 1
 		</div>
@@ -208,7 +208,7 @@
 		if index equals 1 returns the y value.
 		</div>
 
-		<h3>.fromArray([page:Array array]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 fromArray]([page:Array array]) [page:Vector2 this]</h3>
 		<div>
 		array -- [page:Array] of length 2
 		</div>
@@ -216,12 +216,12 @@
 		Sets this vector's x value to be array[0] and y value to be array[1].
 		</div>
 
-		<h3>.toArray() [page:Array]</h3>
+		<h3>[method:Array toArray]()</h3>
 		<div>
 		Returns an array [x, y].
 		</div>
 
-		<h3>.min([page:Vector2 v]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 min]([page:Vector2 v]) [page:Vector2 this]</h3>
 		<div>
 		v -- [page:Vector2]
 		</div>
@@ -229,7 +229,7 @@
 		If this vector's x or y value is less than v's x or y value, replace that value with the corresponding min value.
 		</div>
 
-		<h3>.max([page:Vector2 v]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 max]([page:Vector2 v]) [page:Vector2 this]</h3>
 		<div>
 		v -- [page:Vector2]
 		</div>
@@ -237,7 +237,7 @@
 		If this vector's x or y value is greater than v's x or y value, replace that value with the corresponding max value.
 		</div>
 
-		<h3>.setX([page:Float x]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 setX]([page:Float x]) [page:Vector2 this]</h3>
 		<div>
 		x -- [page:Float]
 		</div>
@@ -245,7 +245,7 @@
 		replace this vector's x value with x.
 		</div>
 
-		<h3>.setY([page:Float y]) [page:Vector2 this]</h3>
+		<h3>[method:Vector2 setY]([page:Float y]) [page:Vector2 this]</h3>
 		<div>
 		y -- [page:Float]
 		</div>
