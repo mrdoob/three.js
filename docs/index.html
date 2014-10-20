@@ -228,6 +228,7 @@
 			} );
 
 			var DELIMITER = '/';
+			var MEMBER_DELIMITER = '.';
 			var nameCategoryMap = {};
 			var sections = [];
 
@@ -353,7 +354,6 @@
 
 			function goTo( section, category, name, member ) {
 				var parts, location;
-				var MEMBER_DELIMITER = '.'
 
 				// Fully resolve links that only provide a name
 				if(arguments.length == 1) {
@@ -373,7 +373,7 @@
 				} 
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
-				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? DELIMITER + encodeUrl(member) : '');
+				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
 
 				window.location.hash = url;
 				window.document.title = title;
@@ -387,7 +387,8 @@
 			function goToHash() {
 
 				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
-				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]), decodeUrl(hash.length > 3 ? hash[3] : '') );
+				var member = hash[2].split(MEMBER_DELIMITER)
+				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(member[0]), decodeUrl(member.length > 1 ? member[1] : '') );
 
 			}
 
