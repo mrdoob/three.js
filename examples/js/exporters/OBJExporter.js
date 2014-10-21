@@ -91,13 +91,10 @@ THREE.OBJExporter.prototype = {
 		this.indexNormals += nbNormals
 
 		// Create children objects
-		if (object.children && object.children.length > 0) {
-
-			for ( var i in object.children ) {
-				output += '# new children object: ' + object.children[i].id + '\n';
-				output += this.parse( object.children[i], scaleFactor );
-			}
-		}
+        for ( var i in object.children ) {
+            output += '# new children object: ' + object.children[i].id + '\n';
+            output += this.parse( object.children[i], scaleFactor );
+        }
 
 		return output;
 
