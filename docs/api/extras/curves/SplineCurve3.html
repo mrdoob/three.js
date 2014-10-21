@@ -29,6 +29,9 @@ var geometry = new THREE.Geometry();
 geometry.vertices = curve.getPoints(50);
 
 var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+//Create the final Object3d to add to the scene
+var splineObject = new THREE.Line( geometry, material );
 </code>
 
 		<h2>Constructor</h2>
@@ -40,7 +43,7 @@ var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 		<h2>Properties</h2>
 
-		<h3>[property:Array points]</h3>
+		<h3>.[property:Array points]</h3>
 
 		<h2>Methods</h2>
 		
