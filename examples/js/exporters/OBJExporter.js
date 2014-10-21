@@ -12,17 +12,13 @@ THREE.OBJExporter.prototype = {
 	indexVertexUvs: 0,
 	indexNormals: 0,
 
-	parse: function ( object, scaleFactor ) {
+	parse: function ( object ) {
 		var output = '';
 
 		var nbVertex, nbVertexUvs, nbNormals;
 		nbVertex = nbVertexUvs = nbNormals = 0;
 
 		var geometry = object.geometry;
-
-		if (scaleFactor === undefined) {
-			scaleFactor = 1;
-		}
 
 		output += 'g ' + object.id + '\n';
 
@@ -32,7 +28,7 @@ THREE.OBJExporter.prototype = {
 				var vertex = geometry.vertices[ i ].clone();
 				vertex.applyMatrix4( object.matrixWorld );
 
-				output += 'v ' + scaleFactor * vertex.x + ' ' + scaleFactor * vertex.y + ' ' + scaleFactor * vertex.z + '\n';
+				output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
 
 				nbVertex++;
 			}
@@ -48,7 +44,7 @@ THREE.OBJExporter.prototype = {
 					var uv = vertexUvs[ j ];
 					vertex.applyMatrix4( object.matrixWorld );
 
-					output += 'vt ' + scaleFactor * uv.x + ' ' + scaleFactor * uv.y + '\n';
+					output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
 					nbVertexUvs++;
 				}
@@ -64,7 +60,7 @@ THREE.OBJExporter.prototype = {
 				for ( var j = 0; j < normals.length; j ++ ) {
 
 					var normal = normals[ j ];
-					output += 'vn ' + scaleFactor * normal.x + ' ' + scaleFactor * normal.y + ' ' + scaleFactor * normal.z + '\n';
+					output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
 
 					nbNormals++;
 				}
@@ -91,10 +87,10 @@ THREE.OBJExporter.prototype = {
 		this.indexNormals += nbNormals
 
 		// Create children objects
-        for ( var i in object.children ) {
-            output += '# new children object: ' + object.children[i].id + '\n';
-            output += this.parse( object.children[i], scaleFactor );
-        }
+		for ( var i in object.children ) {
+			output += '# new children object: ' + object.children[i].id + '\n';
+			output += this.parse( object.children[i] );
+		}
 
 		return output;
 
