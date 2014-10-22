@@ -195,7 +195,6 @@ Menubar.File = function ( editor ) {
 	options.add( new UI.HorizontalRule() );
 
 	/*
-
 	// Test
 
 	var option = new UI.Panel();
@@ -210,6 +209,7 @@ Menubar.File = function ( editor ) {
 	options.add( option );
 	*/
 
+	/*
 	// Publish
 
 	var option = new UI.Panel();
@@ -221,6 +221,7 @@ Menubar.File = function ( editor ) {
 
 	} );
 	options.add( option );
+	*/
 
 
 	//
