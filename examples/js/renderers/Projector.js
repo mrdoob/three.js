@@ -646,7 +646,7 @@ THREE.Projector = function () {
 
 						} else {
 
-							var step = object.type === THREE.LinePieces ? 2 : 1;
+							var step = object.mode === THREE.LinePieces ? 2 : 1;
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
@@ -670,7 +670,7 @@ THREE.Projector = function () {
 					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
 					// Handle LineStrip and LinePieces
-					var step = object.type === THREE.LinePieces ? 2 : 1;
+					var step = object.mode === THREE.LinePieces ? 2 : 1;
 
 					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
 
