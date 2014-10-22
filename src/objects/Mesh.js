@@ -150,21 +150,10 @@ THREE.Mesh.prototype.raycast = ( function () {
 						if (positions[ a + 1 ] > maxY && positions[ b + 1 ] > maxY && positions[ c + 1 ] > maxY) continue;
 						if (positions[ a + 2 ] > maxZ && positions[ b + 2 ] > maxZ && positions[ c + 2 ] > maxZ) continue;
 
-						vA.set(
-							positions[ a ],
-							positions[ a + 1 ],
-							positions[ a + 2 ]
-						);
-						vB.set(
-							positions[ b ],
-							positions[ b + 1 ],
-							positions[ b + 2 ]
-						);
-						vC.set(
-							positions[ c ],
-							positions[ c + 1 ],
-							positions[ c + 2 ]
-						);
+
+						vA.fromArray( positions, a );
+						vB.fromArray( positions, b );
+						vC.fromArray( positions, c );
 
 
 						if ( material.side === THREE.BackSide ) {
@@ -213,22 +202,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 					if (positions[ j + 1 ] > maxY && positions[ j + 4 ] > maxY && positions[ j + 7 ] > maxY) continue;
 					if (positions[ j + 2 ] > maxZ && positions[ j + 5 ] > maxZ && positions[ j + 8 ] > maxZ) continue;
 
-					vA.set(
-						positions[ j ],
-						positions[ j + 1 ],
-						positions[ j + 2 ]
-					);
-					vB.set(
-						positions[ j + 3 ],
-						positions[ j + 4 ],
-						positions[ j + 5 ]
-					);
-					vC.set(
-						positions[ j + 6 ],
-						positions[ j + 7 ],
-						positions[ j + 8 ]
-					);
-
+					vA.fromArray( positions, j );
+					vB.fromArray( positions, j + 3 );
+					vC.fromArray( positions, j + 6 );
 
 					if ( material.side === THREE.BackSide ) {
 

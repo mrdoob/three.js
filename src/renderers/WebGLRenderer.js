@@ -118,7 +118,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentProgram = null,
 	_currentFramebuffer = null,
 	_currentMaterialId = - 1,
-	_currentGeometryGroupHash = null,
+	_currentGeometryGroupHash = - 1,
 	_currentCamera = null,
 
 	_usedTextureUnits = 0,
@@ -199,7 +199,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _gl === null ) {
 
-			throw 'Error creating WebGL context.';
+			if ( _canvas.getContext( 'webgl') !== null ) {
+
+				throw 'Error creating WebGL context with your selected attributes.';
+
+			} else {
+
+				throw 'Error creating WebGL context.';
+
+			}
 
 		}
 
@@ -837,7 +845,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// TOFIX: Workaround for deleted geometry being currently bound
 
-		_currentGeometryGroupHash = -1;
+		_currentGeometryGroupHash = - 1;
 
 	};
 
@@ -2482,24 +2490,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
 
-			var attributeName = attributesKeys[ i ];
-			var attributeItem = attributes[ attributeName ];
+			var key = attributesKeys[ i ];
+			var attribute = attributes[ key ];
 
-			if ( attributeItem.buffer === undefined ) {
+			if ( attribute.buffer === undefined ) {
 
-				attributeItem.buffer = _gl.createBuffer();
-				attributeItem.needsUpdate = true;
+				attribute.buffer = _gl.createBuffer();
+				attribute.needsUpdate = true;
 
 			}
 
-			if ( attributeItem.needsUpdate === true ) {
+			if ( attribute.needsUpdate === true ) {
 
-				var bufferType = ( attributeName === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
+				var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-				_gl.bindBuffer( bufferType, attributeItem.buffer );
-				_gl.bufferData( bufferType, attributeItem.array, _gl.STATIC_DRAW );
+				_gl.bindBuffer( bufferType, attribute.buffer );
+				_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
 
-				attributeItem.needsUpdate = false;
+				attribute.needsUpdate = false;
 
 			}
 
@@ -2615,33 +2623,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = programAttributesKeys.length; i < l; i ++ ) {
 
-			var attributeName = programAttributesKeys[ i ];
+			var key = programAttributesKeys[ i ];
+			var programAttribute = programAttributes[ key ];
 
-			var attributePointer = programAttributes[ attributeName ];
+			if ( programAttribute >= 0 ) {
 
-			if ( attributePointer >= 0 ) {
+				var geometryAttribute = geometryAttributes[ key ];
 
-				var attributeItem = geometryAttributes[ attributeName ];
+				if ( geometryAttribute !== undefined ) {
 
-				if ( attributeItem !== undefined ) {
+					var size = geometryAttribute.itemSize;
 
-					var attributeSize = attributeItem.itemSize;
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+					enableAttribute( programAttribute );
 
-					enableAttribute( attributePointer );
-
-					_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+					_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
 
 				} else if ( material.defaultAttributeValues !== undefined ) {
 
-					if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+					if ( material.defaultAttributeValues[ key ].length === 2 ) {
 
-						_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+						_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ key ] );
 
-					} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+					} else if ( material.defaultAttributeValues[ key ].length === 3 ) {
 
-						_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+						_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ key ] );
 
 					}
 
@@ -2658,9 +2665,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
 
 		if ( material.visible === false ) return;
-
-		var linewidth, a, attribute;
-		var attributeItem, attributeName, attributePointer, attributeSize;
 
 		var program = setProgram( camera, lights, fog, material, object );
 
@@ -2895,8 +2899,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var linewidth, a, attribute, i, il;
-
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var attributes = program.attributes;
@@ -2949,9 +2951,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometryGroup.__webglCustomAttributesList ) {
 
-				for ( i = 0, il = geometryGroup.__webglCustomAttributesList.length; i < il; i ++ ) {
+				for ( var i = 0, il = geometryGroup.__webglCustomAttributesList.length; i < il; i ++ ) {
 
-					attribute = geometryGroup.__webglCustomAttributesList[ i ];
+					var attribute = geometryGroup.__webglCustomAttributesList[ i ];
 
 					if ( attributes[ attribute.buffer.belongsToAttribute ] >= 0 ) {
 
@@ -3354,15 +3356,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var i, il,
-
-		webglObject, object,
-		renderList,
-
-		fog = scene.fog;
+		var fog = scene.fog;
 
 		// reset caching for this frame
 
+		_currentGeometryGroupHash = - 1;
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 		_lightsNeedUpdate = true;
@@ -3426,10 +3424,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// set matrices for immediate objects
 
-		for ( i = 0, il = _webglObjectsImmediate.length; i < il; i ++ ) {
+		for ( var i = 0, il = _webglObjectsImmediate.length; i < il; i ++ ) {
 
-			webglObject = _webglObjectsImmediate[ i ];
-			object = webglObject.object;
+			var webglObject = _webglObjectsImmediate[ i ];
+			var object = webglObject.object;
 
 			if ( object.visible ) {
 
@@ -3571,14 +3569,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjects( renderList, camera, lights, fog, useBlending, overrideMaterial ) {
 
-		var webglObject, object, buffer, material;
+		var material;
 
 		for ( var i = renderList.length - 1; i !== - 1; i -- ) {
 
-			webglObject = renderList[ i ];
+			var webglObject = renderList[ i ];
 
-			object = webglObject.object;
-			buffer = webglObject.buffer;
+			var object = webglObject.object;
+			var buffer = webglObject.buffer;
 
 			setupMatrices( object, camera );
 
@@ -3618,12 +3616,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
 
-		var webglObject, object, material, program;
+		var material;
 
 		for ( var i = 0, il = renderList.length; i < il; i ++ ) {
 
-			webglObject = renderList[ i ];
-			object = webglObject.object;
+			var webglObject = renderList[ i ];
+			var object = webglObject.object;
 
 			if ( object.visible ) {
 
@@ -6463,10 +6461,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// default plugins (order is important)
 
-	this.shadowMapPlugin = new THREE.ShadowMapPlugin();
+	this.shadowMapPlugin = new THREE.ShadowMapPlugin( this );
 	this.addPrePlugin( this.shadowMapPlugin );
 
-	this.addPostPlugin( new THREE.SpritePlugin() );
-	this.addPostPlugin( new THREE.LensFlarePlugin() );
+	this.addPostPlugin( new THREE.SpritePlugin( this ) );
+	this.addPostPlugin( new THREE.LensFlarePlugin( this ) );
 
 };

@@ -231,7 +231,7 @@ options/arguments in your CUI application.</td>
 
   <tr>
     <td>Version</td>
-    <td>17.0</td>
+    <td>18.0</td>
   </tr>
 
   <tr>

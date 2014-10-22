@@ -5,6 +5,7 @@
 var Sidebar = function ( editor ) {
 
 	var container = new UI.Panel();
+	container.setId( 'sidebar' );
 
 	container.add( new Sidebar.Renderer( editor ) );
 	container.add( new Sidebar.Scene( editor ) );

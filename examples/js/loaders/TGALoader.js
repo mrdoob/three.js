@@ -3,19 +3,23 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.TGALoader = function () {};
+THREE.TGALoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.TGALoader.prototype = {
 
 	constructor: THREE.TGALoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
-		
+
 		var scope = this;
-		
+
 		var texture = new THREE.DataTexture();
 
-		var loader = new THREE.XHRLoader();
+		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
@@ -32,7 +36,7 @@ THREE.TGALoader.prototype = {
 
 	// reference from vthibault, https://github.com/vthibault/roBrowser/blob/master/src/Loaders/Targa.js
 	parse: function ( buffer ) {
-			   
+
 		// TGA Constants
 		var TGA_TYPE_NO_DATA = 0,
 		TGA_TYPE_INDEXED = 1,
@@ -49,14 +53,14 @@ THREE.TGALoader.prototype = {
 		TGA_ORIGIN_UL = 0x02,
 		TGA_ORIGIN_UR = 0x03;
 
-		
+
 		if ( buffer.length < 19 )
 			console.error( 'THREE.TGALoader.parse: Not enough data to contain header.' );
-		
+
 		var content = new Uint8Array( buffer ),
 			offset = 0,
 			header = {
-				id_length:       content[ offset ++ ], 
+				id_length:       content[ offset ++ ],
 				colormap_type:   content[ offset ++ ],
 				image_type:      content[ offset ++ ],
 				colormap_index:  content[ offset ++ ] | content[ offset ++ ] << 8,
@@ -72,7 +76,7 @@ THREE.TGALoader.prototype = {
 				pixel_size: content[ offset ++ ],
 				flags:      content[ offset ++ ]
 			};
-				
+
 		function tgaCheckHeader( header ) {
 
 			switch( header.image_type ) {
@@ -110,7 +114,7 @@ THREE.TGALoader.prototype = {
 				console.error( 'THREE.TGALoader.parse.tgaCheckHeader: Invalid image size' );
 			}
 
-			// Check image pixel size 
+			// Check image pixel size
 			if (header.pixel_size !== 8  &&
 				header.pixel_size !== 16 &&
 				header.pixel_size !== 24 &&
@@ -131,10 +135,10 @@ THREE.TGALoader.prototype = {
 		offset += header.id_length;
 
 		// Get targa information about RLE compression and palette
-		var use_rle = false, 
-			use_pal = false, 
+		var use_rle = false,
+			use_pal = false,
 			use_grey = false;
-	
+
 		switch ( header.image_type ) {
 
 			case TGA_TYPE_RLE_INDEXED:
@@ -145,7 +149,7 @@ THREE.TGALoader.prototype = {
 			case TGA_TYPE_INDEXED:
 				use_pal = true;
 				break;
-				
+
 			case TGA_TYPE_RLE_RGB:
 				use_rle = true;
 				break;
@@ -163,27 +167,27 @@ THREE.TGALoader.prototype = {
 				break;
 
 		}
-		
+
 		// Parse tga image buffer
 		function tgaParse( use_rle, use_pal, header, offset, data ) {
-			
+
 			var pixel_data,
 				pixel_size,
 				pixel_total,
 				palettes;
-		
+
 				pixel_size = header.pixel_size >> 3;
 				pixel_total = header.width * header.height * pixel_size;
-				
+
 			 // Read palettes
 			 if ( use_pal ) {
 				 palettes = data.subarray( offset, offset += header.colormap_length * ( header.colormap_size >> 3 ) );
 			 }
-			 
+
 			 // Read RLE
 			 if ( use_rle ) {
 				 pixel_data = new Uint8Array(pixel_total);
-				 
+
 				var c, count, i;
 				var shift = 0;
 				var pixels = new Uint8Array(pixel_size);
@@ -221,19 +225,19 @@ THREE.TGALoader.prototype = {
 					 offset, offset += (use_pal ? header.width * header.height : pixel_total)
 				);
 			 }
-			
-			 return { 
-				pixel_data: pixel_data, 
-				palettes: palettes 
+
+			 return {
+				pixel_data: pixel_data,
+				palettes: palettes
 			 };
 		}
-		
+
 		function tgaGetImageData8bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image, palettes) {
 
 			var colormap = palettes;
 			var color, i = 0, x, y;
 					var width = header.width;
-					
+
 			for (y = y_start; y !== y_end; y += y_step) {
 				for (x = x_start; x !== x_end; x += x_step, i++) {
 					color = image[i];
@@ -284,8 +288,8 @@ THREE.TGALoader.prototype = {
 			return imageData;
 
 		};
-		
-		function tgaGetImageData32bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {		
+
+		function tgaGetImageData32bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
 			var i = 0, x, y;
 			var width = header.width;
@@ -322,7 +326,7 @@ THREE.TGALoader.prototype = {
 
 		};
 
-		function tgaGetImageDataGrey16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {		
+		function tgaGetImageDataGrey16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
 			var i = 0, x, y;
 			var width = header.width;
@@ -339,7 +343,7 @@ THREE.TGALoader.prototype = {
 			return imageData;
 
 		};
-	
+
 		function getTgaRGBA( width, height, image, palette ) {
 
 			var x_start,
@@ -347,9 +351,9 @@ THREE.TGALoader.prototype = {
 				x_step,
 				y_step,
 				x_end,
-				y_end,                    
+				y_end,
 				data = new Uint8Array(width * height * 4);
-				
+
 			switch( (header.flags & TGA_ORIGIN_MASK) >> TGA_ORIGIN_SHIFT ) {
 				default:
 				case TGA_ORIGIN_UL:
@@ -360,7 +364,7 @@ THREE.TGALoader.prototype = {
 					y_step = 1;
 					y_end = height;
 					break;
-					
+
 				case TGA_ORIGIN_BL:
 					x_start = 0;
 					x_step = 1;
@@ -369,7 +373,7 @@ THREE.TGALoader.prototype = {
 					y_step = -1;
 					y_end = -1;
 					break;
-					
+
 				case TGA_ORIGIN_UR:
 					x_start = width - 1;
 					x_step = -1;
@@ -378,7 +382,7 @@ THREE.TGALoader.prototype = {
 					y_step = 1;
 					y_end = height;
 					break;
-					
+
 				case TGA_ORIGIN_BR:
 					x_start = width - 1;
 					x_step = -1;
@@ -388,10 +392,10 @@ THREE.TGALoader.prototype = {
 					y_end = -1;
 					break;
 
-			}	
-				
+			}
+
 			if ( use_grey ) {
-				
+
 				switch( header.pixel_size ) {
 					case 8:
 						tgaGetImageDataGrey8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
@@ -403,18 +407,18 @@ THREE.TGALoader.prototype = {
 						console.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
 						break;
 				}
-				
+
 			} else {
-				
+
 				switch( header.pixel_size ) {
 					case 8:
 						tgaGetImageData8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image, palette );
 						break;
-						
+
 					case 16:
 						tgaGetImageData16bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 						break;
-						
+
 					case 24:
 						tgaGetImageData24bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 						break;
@@ -422,10 +426,10 @@ THREE.TGALoader.prototype = {
 					case 32:
 						tgaGetImageData32bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 						break;
-						
+
 					default:
 						console.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
-						break;  
+						break;
 				}
 
 			}
@@ -436,10 +440,10 @@ THREE.TGALoader.prototype = {
 			return data;
 
 		}
-		
+
 		var result = tgaParse( use_rle, use_pal, header, offset, content );
 		var rgbaData = getTgaRGBA( header.width, header.height, result.pixel_data, result.palettes );
-		
+
 		return {
 			width: header.width,
 			height: header.height,

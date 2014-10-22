@@ -66,7 +66,7 @@
 
 				var materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
 
-				var meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
+				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, -1 );
 				scene.add( meshBg );
 
@@ -80,8 +80,8 @@
 				var map3 = THREE.ImageUtils.loadTexture( 'textures/lensflare/lensflare0.png' );
 				var map4 = THREE.ImageUtils.loadTexture( 'textures/lensflare/lensflare0_alpha.png' );
 
-				var geo1 = new THREE.PlaneGeometry( 100, 100 );
-				var geo2 = new THREE.PlaneGeometry( 100, 25 );
+				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
+				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
 
 				addImageRow( map0, 300 );
 				addImageRow( map1, 150 );

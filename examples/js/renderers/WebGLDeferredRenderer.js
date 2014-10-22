@@ -61,7 +61,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	//
 
 	var geometryLightSphere = new THREE.SphereGeometry( 1, 16, 8 );
-	var geometryLightPlane = new THREE.PlaneGeometry( 2, 2 );
+	var geometryLightPlane = new THREE.PlaneBufferGeometry( 2, 2 );
 
 	var black = new THREE.Color( 0x000000 );
 
