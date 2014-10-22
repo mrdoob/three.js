@@ -88,7 +88,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 		// Check boundingBox before continuing
 		if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
 
-		if ( ray.intersectBox( geometry.boundingBox, undefined, vBox1, vBox2 ) === null )  {
+		if ( ray.intersectBoxAndGetHitPoints( geometry.boundingBox, vBox1, vBox2 ) === false )  {
 
 			return;
 

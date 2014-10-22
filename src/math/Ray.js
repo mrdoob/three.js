@@ -325,19 +325,35 @@ THREE.Ray.prototype = {
 
 	isIntersectionBox: function () {
 
-		var v  = new THREE.Vector3(),
-			v2 = new THREE.Vector3(),
-			v3 = new THREE.Vector3();
+		var v  = new THREE.Vector3();
 
 		return function ( box ) {
 
-			return this.intersectBox( box, v, v2, v3 ) !== null;
+			return this.intersectBox( box, v ) !== null;
 
 		};
 
 	}(),
+	
+	intersectBox: function ( box , optionalTarget ) {
+		
+		var hitPointNear = new THREE.Vector3(),
+		    hitPointFar = new THREE.Vector3(),
+		    isHitPointNearVisible = false;		
+		
+		if ( this.intersectBoxAndGetHitPoints( box , hitPointNear, hitPointFar, isHitPointNearVisible ) === false ) {
 
-	intersectBox: function ( box , optionalTargetVisibleNearest, optionalTargetNear, optionalTargetFar ) {
+ 			 return null;
+
+		}
+		
+		optionalTarget = optionalTarget || new THREE.Vector3();
+		optionalTarget.copy( ( isHitPointNearVisible ? hitPointNear : hitPointFar ) );		
+		return optionalTarget;
+		
+	},
+
+	intersectBoxAndGetHitPoints: function ( box , hitPointNear, hitPointFar, isHitPointNearVisible ) {
 
 		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
@@ -371,7 +387,7 @@ THREE.Ray.prototype = {
 			tymax = ( box.min.y - origin.y ) * invdiry;
 		}
 
-		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
+		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return false;
 
 		// These lines also handle the case where tmin or tmax is NaN
 		// (result of 0 * Infinity). x !== x returns true if x is NaN
@@ -391,7 +407,7 @@ THREE.Ray.prototype = {
 			tzmax = ( box.min.z - origin.z ) * invdirz;
 		}
 
-		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
+		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return false;
 
 		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
 
@@ -399,14 +415,13 @@ THREE.Ray.prototype = {
 
 		//return point closest to the ray (positive side)
 
-		if ( tmax < 0 ) return null;
+		if ( tmax < 0 ) return false;
 
-		this.at( tmin, optionalTargetNear );
-		this.at( tmax, optionalTargetFar );
+		this.at( tmin, hitPointNear );
+		this.at( tmax, hitPointFar );
 
-        optionalTargetVisibleNearest = (tmin >= 0 ? optionalTargetNear : optionalTargetFar);
-		return optionalTargetVisibleNearest;
-
+        isHitPointNearVisible = (tmin >= 0);
+		return true;
 	},
 
 	intersectTriangle: function () {
