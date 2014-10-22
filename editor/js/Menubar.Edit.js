@@ -35,10 +35,21 @@ Menubar.Edit = function ( editor ) {
 
 	}
 
+	function onDeleteAllOptionClick () {
+
+		if ( confirm( 'Delete all objects?' ) === false ) return;
+
+		while (editor.scene.children.length) {
+			editor.removeObject(editor.scene.children[0], true);
+		}
+		editor.select( editor.scene );
+
+	}
+
 	function onConvertOptionClick () {
 
 		// convert to BufferGeometry
-		
+
 		var object = editor.selected;
 
 		if ( object.geometry instanceof THREE.Geometry ) {
@@ -72,7 +83,7 @@ Menubar.Edit = function ( editor ) {
 		object.position.set( 0, 0, 0 );
 		object.rotation.set( 0, 0, 0 );
 		object.scale.set( 1, 1, 1 );
-		
+
 		object.geometry.buffersNeedUpdate = true;
 		editor.signals.objectChanged.dispatch( object );
 
@@ -90,6 +101,7 @@ Menubar.Edit = function ( editor ) {
 
 		createOption( 'Clone', onCloneOptionClick ),
 		createOption( 'Delete', onDeleteOptionClick ),
+		createOption( 'Delete All', onDeleteAllOptionClick ),
 		createDivider(),
 
 		createOption( 'Convert', onConvertOptionClick ),
