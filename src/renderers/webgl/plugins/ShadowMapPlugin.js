@@ -58,13 +58,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 	this.render = function ( scene, camera ) {
 
-		if ( _renderer.shadowMapEnabled === false || _renderer.shadowMapAutoUpdate === false ) return;
-
-		this.update( scene, camera );
-
-	};
-
-	this.update = function ( scene, camera ) {
+		if ( _renderer.shadowMapEnabled === false ) return;
 
 		var i, il, j, jl, n,
 

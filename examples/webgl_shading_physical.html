@@ -352,7 +352,6 @@
 
 				//
 
-				renderer.shadowMapAutoUpdate = false;
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapType = THREE.PCFSoftShadowMap;
 
@@ -568,10 +567,6 @@
 				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
 
 				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
-
-				// render shadow map
-
-				renderer.updateShadowMap( scene, camera );
 
 				// render cube map
 

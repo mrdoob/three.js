@@ -67,7 +67,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// shadow map
 
 	this.shadowMapEnabled = false;
-	this.shadowMapAutoUpdate = true;
 	this.shadowMapType = THREE.PCFShadowMap;
 	this.shadowMapCullFace = THREE.CullFaceFront;
 	this.shadowMapDebug = false;
@@ -559,26 +558,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_lightsNeedUpdate = true;
 
 	};
-
-	// Rendering
-
-	this.updateShadowMap = function ( scene, camera ) {
-
-		_currentProgram = null;
-		_oldBlending = - 1;
-		_oldDepthTest = - 1;
-		_oldDepthWrite = - 1;
-		_currentGeometryGroupHash = - 1;
-		_currentMaterialId = - 1;
-		_lightsNeedUpdate = true;
-		_oldDoubleSided = - 1;
-		_oldFlipSided = - 1;
-
-		shadowMapPlugin.update( scene, camera );
-
-	};
-
-	// Internal functions
 
 	// Buffer allocation
 
@@ -3486,12 +3465,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		if ( object instanceof THREE.Light ) {
-
-			lights.push( object );
-
-		}
-
 		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
 
 			// skip
@@ -3500,7 +3473,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			initObject( object, scene );
 
-			if ( object instanceof THREE.Sprite ) {
+			if ( object instanceof THREE.Light ) {
+
+				lights.push( object );
+
+			} else if ( object instanceof THREE.Sprite ) {
 
 				sprites.push( object );
 
@@ -6460,6 +6437,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.addPostPlugin = function () {
 
 		console.warn( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
+
+	};
+
+	this.updateShadowMap = function () {
+
+		console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
 	};
 
