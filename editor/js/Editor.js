@@ -37,7 +37,7 @@ var Editor = function () {
 		windowResize: new SIGNALS.Signal()
 
 	};
-	
+
 	this.config = new Config();
 	this.storage = new Storage();
 	this.loader = new Loader( this );
@@ -114,11 +114,11 @@ Editor.prototype = {
 
 	},
 
-	removeObject: function ( object ) {
+	removeObject: function ( object, suppressWarning ) {
 
 		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
 
-		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+		if ( !suppressWarning && confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var scope = this;
 
