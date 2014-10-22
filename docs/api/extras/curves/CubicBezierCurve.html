@@ -19,25 +19,25 @@
 
 <code>
 var curve = new THREE.CubicBezierCurve(
-	new THREE.Vector3(-10, 0, 0),
-	new THREE.Vector3(-5,  15, 0),
-	new THREE.Vector3( 20, 15, 0),
-	new THREE.Vector3( 10, 0, 0)
+	new THREE.Vector3( -10, 0, 0 ),
+	new THREE.Vector3( -5, 15, 0 ),
+	new THREE.Vector3( 20, 15, 0 ),
+	new THREE.Vector3( 10, 0, 0 )
 );
 
-var path = new THREE.Path( curve.getPoints(50) );
+var path = new THREE.Path( curve.getPoints( 50 ) );
 
 var geometry = path.createPointsGeometry( 50 );
-var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-//Create the final Object3d to add to the scene
+// Create the final Object3d to add to the scene
 var curveObject = new THREE.Line( geometry, material );
 </code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector2 v0], [page:Vector2 v1], [page:Vector2 v2], [page:Vector2 v3])</h3>
+		<h3>[name] ( [page:Vector2 v0], [page:Vector2 v1], [page:Vector2 v2], [page:Vector2 v3] )</h3>
 		<div>
 			[page:Vector2 v0] – The starting point<br/>
 			[page:Vector2 v1] – The first control point<br/>

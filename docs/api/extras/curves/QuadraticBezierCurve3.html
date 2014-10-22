@@ -19,24 +19,24 @@
 
 <code>
 var curve = new THREE.QuadraticBezierCurve3(
-	new THREE.Vector3(-10, 0, 0),
-	new THREE.Vector3( 20, 15, 0),
-	new THREE.Vector3( 10, 0, 0)
+	new THREE.Vector3( -10, 0, 0 ),
+	new THREE.Vector3( 20, 15, 0 ),
+	new THREE.Vector3( 10, 0, 0 )
 );
 
 var geometry = new THREE.Geometry();
-geometry.vertices = curve.getPoints(50);
+geometry.vertices = curve.getPoints( 50 );
 
-var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-//Create the final Object3d to add to the scene
+// Create the final Object3d to add to the scene
 var curveObject = new THREE.Line( geometry, material );
 </code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector3 v0], [page:Vector3 v1], [page:Vector3 v2])</h3>
+		<h3>[name]( [page:Vector3 v0], [page:Vector3 v1], [page:Vector3 v2] )</h3>
 		<div>
 			[page:Vector3 v0] – The starting point<br/>
 			[page:Vector3 v1] – The middle control point<br/>
