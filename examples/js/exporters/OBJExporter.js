@@ -20,7 +20,7 @@ THREE.OBJExporter.prototype = {
 
 		var geometry = object.geometry;
 
-		output += 'g ' + object.id + '\n';
+		output += 'o ' + object.id + '\n';
 
 		if (object.geometry) {
 			for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
