@@ -98,6 +98,7 @@ var list = {
 
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
@@ -124,6 +125,12 @@ var list = {
 		"Renderers / WebGL": [
 			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
 			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ]
+		],
+
+		"Renderers / WebGL / Plugins": [
+			[ "LensFlarePlugin", "api/renderers/webgl/plugins/LensFlarePlugin" ],
+			[ "ShadowMapPlugin", "api/renderers/webgl/plugins/ShadowMapPlugin" ],
+			[ "SpritePlugin", "api/renderers/webgl/plugins/SpritePlugin" ]
 		],
 
 		"Scenes": [
@@ -222,19 +229,7 @@ var list = {
 
 		"Extras / Objects": [
 			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
-			[ "LensFlare", "api/extras/objects/LensFlare" ],
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
-		],
-
-		"Extras / Renderers / Plugins": [
-			[ "DepthPassPlugin", "api/extras/renderers/plugins/DepthPassPlugin" ],
-			[ "LensFlarePlugin", "api/extras/renderers/plugins/LensFlarePlugin" ],
-			[ "ShadowMapPlugin", "api/extras/renderers/plugins/ShadowMapPlugin" ],
-			[ "SpritePlugin", "api/extras/renderers/plugins/SpritePlugin" ]
-		],
-
-		"Extras / Shaders": [
-			[ "ShaderFlares", "api/extras/shaders/ShaderFlares" ]
 		],
 
 		"Examples" : [
