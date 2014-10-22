@@ -129,18 +129,6 @@
 		<div>Default is true. If set, then Cubemaps are scaled, when they are bigger than the maximum size, to make sure that they aren't bigger than the maximum size.</div>
 
 
-		<h3>[property:Boolean renderPluginsPre]</h3>
-
-		<div>An array with render plugins to be applied before rendering.</div>
-		<div>Default is an empty array, or [].</div>
-
-
-		<h3>[property:Boolean renderPluginsPost]</h3>
-
-		<div>An array with render plugins to be applied after rendering.</div>
-		<div>Default is an empty array, or [].</div>
-
-
 		<h3>[property:Object info]</h3>
 
 		<div>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</div>
@@ -220,12 +208,6 @@
 		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
 		<div>Arguments default to true.</div>
 
-		<h3>[method:todo addPostPlugin]( plugin )</h3>
-		<div>Initialises the postprocessing plugin, and adds it to the renderPluginsPost array.</div>
-
-		<h3>[method:todo addPrePlugin]( plugin )</h3>
-		<div>Initialises the preprocessing plugin, and adds it to the renderPluginsPre array.</div>
-
 		<h3>[method:todo updateShadowMap]( [page:Scene scene], [page:Camera camera] )</h3>
 		<div>scene — an instance of [page:Scene]<br />
 		camera — an instance of [page:Camera]</div>
@@ -238,8 +220,8 @@
 		shading — an instance of Material<br />
 		</div>
 		<div>
-        Render an immediate buffer. Gets called by renderImmediateObject.
-        </div>
+		Render an immediate buffer. Gets called by renderImmediateObject.
+		</div>
 
 
 		<h3>[method:todo renderBufferDirect]( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
@@ -253,8 +235,8 @@
 		<h3>[method:todo render]( [page:Scene scene], [page:Camera camera], [page:WebGLRenderTarget renderTarget], [page:Boolean forceClear] )</h3>
 		<div>Render a scene using a camera.</div>
 		<div>The render is done to the renderTarget (if specified) or to the canvas as usual.</div>
-        <div>If forceClear is true, the depth, stencil and color buffers will be cleared before rendering even if the renderer's autoClear property is false.</div>
-        <div>Even with forceClear set to true you can prevent certain buffers being cleared by setting either the .autoClearColor, .autoClearStencil or .autoClearDepth properties to false.</div>
+		<div>If forceClear is true, the depth, stencil and color buffers will be cleared before rendering even if the renderer's autoClear property is false.</div>
+		<div>Even with forceClear set to true you can prevent certain buffers being cleared by setting either the .autoClearColor, .autoClearStencil or .autoClearDepth properties to false.</div>
 
 		<h3>[method:todo renderImmediateObject]( camera, lights, fog, material, object )</h3>
 		<div>Renders an immediate Object using a camera.</div>

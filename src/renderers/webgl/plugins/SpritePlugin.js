@@ -3,11 +3,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpritePlugin = function ( renderer ) {
+THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	var gl = renderer.context;
-
-	var sprites = [];
 
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
@@ -80,21 +78,7 @@ THREE.SpritePlugin = function ( renderer ) {
 
 	};
 
-	this.init = function () {}; // TODO: Remove
-
-	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
-
-		sprites.length = 0;
-
-		scene.traverseVisible( function ( child ) {
-
-			if ( child instanceof THREE.Sprite ) {
-
-				sprites.push( child );
-
-			}
-
-		} );
+	this.render = function ( scene, camera ) {
 
 		if ( sprites.length === 0 ) return;
 
