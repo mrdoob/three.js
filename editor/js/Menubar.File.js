@@ -190,9 +190,23 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	/*
 	//
 
 	options.add( new UI.HorizontalRule() );
+
+	// Publish
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish' );
+	option.onClick( function () {
+
+		alert( 'Not yet...' );
+
+	} );
+	options.add( option );
+	*/
 
 	/*
 	// Test
@@ -209,19 +223,6 @@ Menubar.File = function ( editor ) {
 	options.add( option );
 	*/
 
-	/*
-	// Publish
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Publish' );
-	option.onClick( function () {
-
-		alert( 'Not yet...' );
-
-	} );
-	options.add( option );
-	*/
 
 
 	//
