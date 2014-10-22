@@ -1225,16 +1225,18 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					mesh = new THREE.Mesh( geom, material );
-					// mesh.geom.name = geometry.id;
+					if ( geom.isLineStrip === true ) {
+
+						mesh = new THREE.Line( geom );
+
+					} else {
+
+						mesh = new THREE.Mesh( geom, material );
+
+					}
 
 				}
 
-				// N.B.: TP says this is not a great default behavior. It's a nice
-				// optimization to flatten the hierarchy but this should be done
-				// only if requested by the user via a flag. For now I undid it
-				// and fixed the character animation example that uses it
-				// node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
 				obj.add(mesh);
 
 			}
@@ -2754,13 +2756,11 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Mesh.prototype.parse = function( element ) {
+	Mesh.prototype.parse = function ( element ) {
 
 		this.primitives = [];
 
-		var i, j;
-
-		for ( i = 0; i < element.childNodes.length; i ++ ) {
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[ i ];
 
@@ -2774,6 +2774,11 @@ THREE.ColladaLoader = function () {
 				case 'vertices':
 
 					this.vertices = ( new Vertices() ).parse( child );
+					break;
+
+				case 'linestrips':
+
+					this.primitives.push( ( new LineStrips().parse( child ) ) );
 					break;
 
 				case 'triangles':
@@ -2802,13 +2807,13 @@ THREE.ColladaLoader = function () {
 
 		var vertexData = sources[ this.vertices.input['POSITION'].source ].data;
 
-		for ( i = 0; i < vertexData.length; i += 3 ) {
+		for ( var i = 0; i < vertexData.length; i += 3 ) {
 
 			this.geometry3js.vertices.push( getConvertedVec3( vertexData, i ).clone() );
 
 		}
 
-		for ( i = 0; i < this.primitives.length; i ++ ) {
+		for ( var i = 0; i < this.primitives.length; i ++ ) {
 
 			var primitive = this.primitives[ i ];
 			primitive.setVertices( this.vertices );
@@ -2831,7 +2836,16 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Mesh.prototype.handlePrimitive = function( primitive, geom ) {
+	Mesh.prototype.handlePrimitive = function ( primitive, geom ) {
+
+		if ( primitive instanceof LineStrips ) {
+
+			// TODO: Handle indices. Maybe easier with BufferGeometry?
+
+			geom.isLineStrip = true;
+			return;
+
+		}
 
 		var j, k, pList = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
@@ -3083,6 +3097,7 @@ THREE.ColladaLoader = function () {
 				i += maxOffset * vcount;
 
 			}
+
 		}
 
 	};
@@ -3163,6 +3178,16 @@ THREE.ColladaLoader = function () {
 	};
 
 	Polylist.prototype = Object.create( Polygons.prototype );
+
+	function LineStrips() {
+
+		Polygons.call( this );
+
+		this.vcount = 1;
+
+	};
+
+	LineStrips.prototype = Object.create( Polygons.prototype );
 
 	function Triangles () {
 
