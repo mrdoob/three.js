@@ -1165,7 +1165,7 @@ THREE.ColladaLoader = function () {
 				}
 
 				var mesh;
-				var material = first_material || new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading, side: geometry.doubleSided ? THREE.DoubleSide : THREE.FrontSide } );
+				var material = first_material || new THREE.MeshLambertMaterial( { color: 0xdddddd, side: geometry.doubleSided ? THREE.DoubleSide : THREE.FrontSide } );
 				var geom = geometry.mesh.geometry3js;
 
 				if ( num_materials > 1 ) {
@@ -2821,16 +2821,12 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		this.geometry3js.computeFaceNormals();
-
 		if ( this.geometry3js.calcNormals ) {
 
 			this.geometry3js.computeVertexNormals();
 			delete this.geometry3js.calcNormals;
 
 		}
-
-		// this.geometry3js.computeBoundingBox();
 
 		return this;
 
