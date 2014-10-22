@@ -7918,6 +7918,11 @@ THREE.Object3D.prototype = {
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
 
+			} else if ( object instanceof THREE.Line ) {
+
+				data.geometry = parseGeometry( object.geometry );
+				data.material = parseMaterial( object.material );
+
 			} else if ( object instanceof THREE.Sprite ) {
 
 				data.material = parseMaterial( object.material );
@@ -12662,6 +12667,27 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
+				case 'Line':
+
+					var geometry = geometries[ data.geometry ];
+					var material = materials[ data.material ];
+
+					if ( geometry === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
+
+					}
+
+					if ( material === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
+
+					}
+
+					object = new THREE.Line( geometry, material );
+
+					break;
+
 				case 'Sprite':
 
 					var material = materials[ data.material ];
@@ -14532,7 +14558,7 @@ THREE.ParticleSystem = function ( geometry, material ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Line = function ( geometry, material, type ) {
+THREE.Line = function ( geometry, material, mode ) {
 
 	THREE.Object3D.call( this );
 
@@ -14541,7 +14567,7 @@ THREE.Line = function ( geometry, material, type ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.type = ( type !== undefined ) ? type : THREE.LineStrip;
+	this.mode = ( mode !== undefined ) ? mode : THREE.LineStrip;
 
 };
 
@@ -14587,7 +14613,7 @@ THREE.Line.prototype.raycast = ( function () {
 			var nbVertices = vertices.length;
 			var interSegment = new THREE.Vector3();
 			var interRay = new THREE.Vector3();
-			var step = this.type === THREE.LineStrip ? 1 : 2;
+			var step = this.mode === THREE.LineStrip ? 1 : 2;
 
 			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
@@ -14621,7 +14647,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 THREE.Line.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.Line( this.geometry, this.material, this.type );
+	if ( object === undefined ) object = new THREE.Line( this.geometry, this.material, this.mode );
 
 	THREE.Object3D.prototype.clone.call( this, object );
 
@@ -20411,7 +20437,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			var mode = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
 			setLineWidth( material.linewidth );
 
@@ -20710,7 +20736,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			var mode = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
 			setLineWidth( material.linewidth );
 
