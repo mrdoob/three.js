@@ -1,4 +1,6 @@
-// CodeEditor
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
 UI.CodeEditor = function ( mode ) {
 

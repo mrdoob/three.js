@@ -75,8 +75,6 @@
 
 			var aloader, bloader;
 
-			var total = 0, totaln = 0;
-
 			var composer, effectFocus;
 
 			var clock = new THREE.Clock();
@@ -152,13 +150,10 @@
 				parent = new THREE.Object3D();
 				scene.add( parent );
 
-				var grid = new THREE.PointCloud( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.PointCloudMaterial( { color: 0xff0000, size: 10 } ) );
+				var grid = new THREE.PointCloud( new THREE.PlaneBufferGeometry( 15000, 15000, 64, 64 ), new THREE.PointCloudMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.position.y = -400;
 				grid.rotation.x = - Math.PI / 2;
 				parent.add( grid );
-
-				totaln += 1;
-				total += grid.geometry.vertices.length;
 
 				// postprocessing
 
@@ -258,9 +253,6 @@
 
 					}
 
-					totaln += clones.length;
-					total += clones.length * vl;
-
 				} else {
 
 					mesh = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { size: 3, color: color } ) );
@@ -271,9 +263,6 @@
 					mesh.position.z = z;
 
 					parent.add( mesh );
-
-					totaln += 1;
-					total += vl;
 
 				}
 

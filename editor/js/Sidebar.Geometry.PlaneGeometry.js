@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
@@ -58,7 +62,6 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 			heightSegments.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

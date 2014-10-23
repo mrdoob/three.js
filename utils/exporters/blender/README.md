@@ -15,6 +15,10 @@ Goto Usage.
 
 Should look like this:
 
+    C:\Program Files\Blender Foundation\Blender\2.7X\scripts\addons
+    
+OR
+    
     C:\Users\USERNAME\AppData\Roaming\Blender Foundation\Blender\2.6X\scripts\addons
 
 ### OSX

@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '69dev' };
+var THREE = { REVISION: '69' };
 
 // browserify support
 
@@ -23,7 +23,7 @@ if ( Math.sign === undefined ) {
 		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
 
 	};
-	
+
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
@@ -87,6 +87,8 @@ THREE.CustomBlending = 5;
 THREE.AddEquation = 100;
 THREE.SubtractEquation = 101;
 THREE.ReverseSubtractEquation = 102;
+THREE.MinEquation = 103;
+THREE.MaxEquation = 104;
 
 // custom blending destination factors
 
@@ -168,20 +170,21 @@ THREE.RGBAFormat = 1021;
 THREE.LuminanceFormat = 1022;
 THREE.LuminanceAlphaFormat = 1023;
 
-// Compressed texture formats
+// DDS / ST3C Compressed texture formats
 
 THREE.RGB_S3TC_DXT1_Format = 2001;
 THREE.RGBA_S3TC_DXT1_Format = 2002;
 THREE.RGBA_S3TC_DXT3_Format = 2003;
 THREE.RGBA_S3TC_DXT5_Format = 2004;
 
-/*
-// Potential future PVRTC compressed texture formats
+
+// PVRTC compressed texture formats
+
 THREE.RGB_PVRTC_4BPPV1_Format = 2100;
 THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
-*/
+
 
 // File:src/math/Color.js
 
@@ -1064,12 +1067,14 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this._x = array[ 0 ];
-		this._y = array[ 1 ];
-		this._z = array[ 2 ];
-		this._w = array[ 3 ];
+		if ( offset === undefined ) offset = 0;
+
+		this._x = array[ offset ];
+		this._y = array[ offset + 1 ];
+		this._z = array[ offset + 2 ];
+		this._w = array[ offset + 3 ];
 
 		this.onChangeCallback();
 
@@ -1077,9 +1082,17 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this._x, this._y, this._z, this._w ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this._x;
+		array[ offset + 1 ] = this._y;
+		array[ offset + 2 ] = this._z;
+		array[ offset + 3 ] = this._w;
+
+		return array;
 
 	},
 
@@ -1486,18 +1499,26 @@ THREE.Vector2.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.x = array[ 0 ];
-		this.y = array[ 1 ];
+		if ( offset === undefined ) offset = 0;
+
+		this.x = array[ offset ];
+		this.y = array[ offset + 1 ];
 
 		return this;
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.x, this.y ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+
+		return array;
 
 	},
 
@@ -1817,6 +1838,36 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+
+	project: function () {
+
+		var matrix;
+
+		return function ( camera ) {
+
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+
+			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
+			return this.applyProjection( matrix );
+
+		};
+
+	}(),
+
+	unproject: function () {
+
+		var matrix;
+
+		return function ( camera ) {
+
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+
+			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
+			return this.applyProjection( matrix );
+
+		};
+
+	}(),
 
 	transformDirection: function ( m ) {
 
@@ -2267,19 +2318,28 @@ THREE.Vector3.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.x = array[ 0 ];
-		this.y = array[ 1 ];
-		this.z = array[ 2 ];
+		if ( offset === undefined ) offset = 0;
+
+		this.x = array[ offset ];
+		this.y = array[ offset + 1 ];
+		this.z = array[ offset + 2 ];
 
 		return this;
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.x, this.y, this.z ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+		array[ offset + 2 ] = this.z;
+
+		return array;
 
 	},
 
@@ -2916,20 +2976,30 @@ THREE.Vector4.prototype = {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
 
-		this.x = array[ 0 ];
-		this.y = array[ 1 ];
-		this.z = array[ 2 ];
-		this.w = array[ 3 ];
+		if ( offset === undefined ) offset = 0;
+
+		this.x = array[ offset ];
+		this.y = array[ offset + 1 ];
+		this.z = array[ offset + 2 ];
+		this.w = array[ offset + 3 ];
 
 		return this;
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.x, this.y, this.z, this.w ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+		array[ offset + 2 ] = this.z;
+		array[ offset + 3 ] = this.w;
+
+		return array;
 
 	},
 

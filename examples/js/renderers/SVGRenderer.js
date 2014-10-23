@@ -113,7 +113,7 @@ THREE.SVGRenderer = function () {
 			_svg.removeChild( _svg.childNodes[ 0 ] );
 
 		}
-		
+
 		_svg.style.backgroundColor = 'rgba(' + ( ( _clearColor.r * 255 ) | 0 ) + ',' + ( ( _clearColor.g * 255 ) | 0 ) + ',' + ( ( _clearColor.b * 255 ) | 0 ) + ',' + _clearAlpha + ')';
 
 	};

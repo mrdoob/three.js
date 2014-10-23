@@ -52,8 +52,6 @@
 		var searchInterval = 0;
 		var useOctree = true;
 		
-		var projector;
-		
 		var mouse = new THREE.Vector2();
 		var intersected;
 
@@ -129,10 +127,6 @@
 				modifyOctree( geometry, material, true );
 				
 			} );
-			
-			// projector for click intersection
-			
-			projector = new THREE.Projector();
 			
 			// camera controls
 			
@@ -327,8 +321,7 @@
 			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			
-			var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-			projector.unprojectVector( vector, camera );
+			var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
 
 			var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 			var octreeObjects;

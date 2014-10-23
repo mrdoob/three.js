@@ -1,8 +1,13 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Toolbar = function ( editor ) {
 
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
+	container.setId( 'toolbar' );
 
 	var buttons = new UI.Panel();
 	container.add( buttons );

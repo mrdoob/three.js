@@ -34,7 +34,7 @@ THREE.Audio.prototype.load = function ( file ) {
 
 			scope.source.buffer = buffer;
 			scope.source.connect( scope.panner );
-			scope.source.start();
+			scope.source.start( 0 );
 
 		} );
 
@@ -42,6 +42,12 @@ THREE.Audio.prototype.load = function ( file ) {
 	request.send();
 
 	return this;
+
+};
+
+THREE.Audio.prototype.setLoop = function ( value ) {
+
+	this.source.loop = value;
 
 };
 
@@ -58,7 +64,7 @@ THREE.Audio.prototype.setRolloffFactor = function ( value ) {
 };
 
 THREE.Audio.prototype.updateMatrixWorld = ( function () {
-	
+
 	var position = new THREE.Vector3();
 
 	return function ( force ) {

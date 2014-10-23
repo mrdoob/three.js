@@ -53,7 +53,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 			scene = scope.parse( json );
 			onLoad( scene );
-		} );
+		}, onProgress, onError );
 	},
 
 	setCrossOrigin: function ( value ) {

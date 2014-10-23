@@ -5,7 +5,8 @@
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.GeometryIdCount ++;
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
@@ -82,6 +83,12 @@ THREE.BufferGeometry.prototype = {
 			normal.needsUpdate = true;
 
 		}
+
+	},
+
+	center: function () {
+
+		// TODO
 
 	},
 
@@ -368,7 +375,7 @@ THREE.BufferGeometry.prototype = {
 
 			var normals = attributes.normal.array;
 
-			var vA, vB, vC, x, y, z,
+			var vA, vB, vC,
 
 			pA = new THREE.Vector3(),
 			pB = new THREE.Vector3(),
@@ -393,40 +400,29 @@ THREE.BufferGeometry.prototype = {
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-						vA = index + indices[ i ];
-						vB = index + indices[ i + 1 ];
-						vC = index + indices[ i + 2 ];
+						vA = ( index + indices[ i     ] ) * 3;
+						vB = ( index + indices[ i + 1 ] ) * 3;
+						vC = ( index + indices[ i + 2 ] ) * 3;
 
-						x = positions[ vA * 3 ];
-						y = positions[ vA * 3 + 1 ];
-						z = positions[ vA * 3 + 2 ];
-						pA.set( x, y, z );
-
-						x = positions[ vB * 3 ];
-						y = positions[ vB * 3 + 1 ];
-						z = positions[ vB * 3 + 2 ];
-						pB.set( x, y, z );
-
-						x = positions[ vC * 3 ];
-						y = positions[ vC * 3 + 1 ];
-						z = positions[ vC * 3 + 2 ];
-						pC.set( x, y, z );
+						pA.fromArray( positions, vA );
+						pB.fromArray( positions, vB );
+						pC.fromArray( positions, vC );
 
 						cb.subVectors( pC, pB );
 						ab.subVectors( pA, pB );
 						cb.cross( ab );
 
-						normals[ vA * 3     ] += cb.x;
-						normals[ vA * 3 + 1 ] += cb.y;
-						normals[ vA * 3 + 2 ] += cb.z;
+						normals[ vA     ] += cb.x;
+						normals[ vA + 1 ] += cb.y;
+						normals[ vA + 2 ] += cb.z;
 
-						normals[ vB * 3     ] += cb.x;
-						normals[ vB * 3 + 1 ] += cb.y;
-						normals[ vB * 3 + 2 ] += cb.z;
+						normals[ vB     ] += cb.x;
+						normals[ vB + 1 ] += cb.y;
+						normals[ vB + 2 ] += cb.z;
 
-						normals[ vC * 3     ] += cb.x;
-						normals[ vC * 3 + 1 ] += cb.y;
-						normals[ vC * 3 + 2 ] += cb.z;
+						normals[ vC     ] += cb.x;
+						normals[ vC + 1 ] += cb.y;
+						normals[ vC + 2 ] += cb.z;
 
 					}
 
@@ -438,20 +434,9 @@ THREE.BufferGeometry.prototype = {
 
 				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-					x = positions[ i ];
-					y = positions[ i + 1 ];
-					z = positions[ i + 2 ];
-					pA.set( x, y, z );
-
-					x = positions[ i + 3 ];
-					y = positions[ i + 4 ];
-					z = positions[ i + 5 ];
-					pB.set( x, y, z );
-
-					x = positions[ i + 6 ];
-					y = positions[ i + 7 ];
-					z = positions[ i + 8 ];
-					pC.set( x, y, z );
+					pA.fromArray( positions, i );
+					pB.fromArray( positions, i + 3 );
+					pC.fromArray( positions, i + 6 );
 
 					cb.subVectors( pC, pB );
 					ab.subVectors( pA, pB );
@@ -520,13 +505,13 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		var xA, yA, zA,
-			xB, yB, zB,
-			xC, yC, zC,
+		var vA = new THREE.Vector3(),
+			vB = new THREE.Vector3(),
+			vC = new THREE.Vector3(),
 
-			uA, vA,
-			uB, vB,
-			uC, vC,
+			uvA = new THREE.Vector2(),
+			uvB = new THREE.Vector2(),
+			uvC = new THREE.Vector2(),
 
 			x1, x2, y1, y2, z1, z2,
 			s1, s2, t1, t2, r;
@@ -535,41 +520,28 @@ THREE.BufferGeometry.prototype = {
 
 		function handleTriangle( a, b, c ) {
 
-			xA = positions[ a * 3 ];
-			yA = positions[ a * 3 + 1 ];
-			zA = positions[ a * 3 + 2 ];
+			vA.fromArray( positions, a * 3 );
+			vB.fromArray( positions, b * 3 );
+			vC.fromArray( positions, c * 3 );
 
-			xB = positions[ b * 3 ];
-			yB = positions[ b * 3 + 1 ];
-			zB = positions[ b * 3 + 2 ];
+			uvA.fromArray( uvs, a * 2 );
+			uvB.fromArray( uvs, b * 2 );
+			uvC.fromArray( uvs, c * 2 );
 
-			xC = positions[ c * 3 ];
-			yC = positions[ c * 3 + 1 ];
-			zC = positions[ c * 3 + 2 ];
+			x1 = vB.x - vA.x;
+			x2 = vC.x - vA.x;
 
-			uA = uvs[ a * 2 ];
-			vA = uvs[ a * 2 + 1 ];
+			y1 = vB.y - vA.y;
+			y2 = vC.y - vA.y;
 
-			uB = uvs[ b * 2 ];
-			vB = uvs[ b * 2 + 1 ];
+			z1 = vB.z - vA.z;
+			z2 = vC.z - vA.z;
 
-			uC = uvs[ c * 2 ];
-			vC = uvs[ c * 2 + 1 ];
+			s1 = uvB.x - uvA.x;
+			s2 = uvC.x - uvA.x;
 
-			x1 = xB - xA;
-			x2 = xC - xA;
-
-			y1 = yB - yA;
-			y2 = yC - yA;
-
-			z1 = zB - zA;
-			z2 = zC - zA;
-
-			s1 = uB - uA;
-			s2 = uC - uA;
-
-			t1 = vB - vA;
-			t2 = vC - vA;
+			t1 = uvB.y - uvA.y;
+			t2 = uvC.y - uvA.y;
 
 			r = 1.0 / ( s1 * t2 - s2 * t1 );
 
@@ -631,10 +603,7 @@ THREE.BufferGeometry.prototype = {
 
 		function handleVertex( v ) {
 
-			n.x = normals[ v * 3 ];
-			n.y = normals[ v * 3 + 1 ];
-			n.z = normals[ v * 3 + 2 ];
-
+			n.fromArray( normals, v * 3 );
 			n2.copy( n );
 
 			t = tan1[ v ];

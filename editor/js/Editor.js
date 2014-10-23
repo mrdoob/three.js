@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Editor = function () {
 
 	var SIGNALS = signals;
@@ -17,6 +21,9 @@ var Editor = function () {
 		showDialog: new SIGNALS.Signal(),
 
 		// notifications
+
+		savingStarted: new SIGNALS.Signal(),
+		savingFinished: new SIGNALS.Signal(),
 
 		themeChanged: new SIGNALS.Signal(),
 
@@ -50,23 +57,22 @@ var Editor = function () {
 		showGridChanged: new SIGNALS.Signal()
 
 	};
-	
+
 	this.config = new Config();
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
-	
+
 	this.sceneHelpers = new THREE.Scene();
 
 	this.object = {};
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
-	
-	this.scripts = {};
+	// this.scripts = {};
 
 	this.selected = null;
 	this.helpers = {};
@@ -84,11 +90,11 @@ Editor.prototype = {
 	},
 
 	showDialog: function ( value ) {
-	
+
 		this.signals.showDialog.dispatch( value );
-	
+
 	},
-	
+
 	//
 
 	setScene: function ( scene ) {
