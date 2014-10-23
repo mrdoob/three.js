@@ -4,13 +4,14 @@
  * @author paulirish / http://paulirish.com/
  */
 
-THREE.FirstPersonControls = function ( object, domElement ) {
+THREE.FirstPersonControls = function ( object, domElement, eventPropagation ) {
 
 	this.object = object;
 	this.target = new THREE.Vector3( 0, 0, 0 );
-
+	
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-
+	this.eventPropagation = (eventPropagation !== undefined) ? eventPropagation : false;
+	
 	this.movementSpeed = 1.0;
 	this.lookSpeed = 0.005;
 
@@ -83,7 +84,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		}
 
 		event.preventDefault();
-		event.stopPropagation();
+		if (!this.eventPropagation) {
+			event.stopPropagation();
+		}
 
 		if ( this.activeLook ) {
 
@@ -103,7 +106,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.onMouseUp = function ( event ) {
 
 		event.preventDefault();
-		event.stopPropagation();
+		if (!this.eventPropagation) {
+			event.stopPropagation();
+		}
 
 		if ( this.activeLook ) {
 
@@ -129,8 +134,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		} else {
 
-			this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
-			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
+			var x = event.offsetX === undefined ? event.layerX : event.offsetX;
+			var y = event.offsetY === undefined ? event.layerY : event.offsetY;
+
+			this.mouseX = x - this.viewHalfX;
+			this.mouseY = y - this.viewHalfY;
 
 		}
 
