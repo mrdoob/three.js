@@ -110,10 +110,9 @@
 
 
 				mirrorMesh = new THREE.Mesh(
-					new THREE.PlaneGeometry( parameters.width * 500, parameters.height * 500, 50, 50 ), 
+					new THREE.PlaneBufferGeometry( parameters.width * 500, parameters.height * 500 ),
 					water.material
 				);
-				
 
 				mirrorMesh.add( water );
 				mirrorMesh.rotation.x = - Math.PI * 0.5;

@@ -31,7 +31,7 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Array planes]</h3>
+		<h3>[property:Array planes]</h3>
 		<div>
 		Array of 6 [page:Plane planes].
 		</div>
@@ -39,19 +39,19 @@
 
 		<h2>Methods</h2>
 
-		<h3>.setFromMatrix( [page:Matrix4 matrix] )</h3>
+		<h3>[method:todo setFromMatrix]( [page:Matrix4 matrix] )</h3>
 
-		<h3>.intersectsObject( [page:Object3D object] ) [page:Boolean]</h3>
+		<h3>[method:Boolean intersectsObject]( [page:Object3D object] )</h3>
 		<div>
 		Checks whether the object's bounding sphere is intersecting the Frustum.
 		</div>
 
-		<h3>.clone() [page:Frustum]</h3>
+		<h3>[method:Frustum clone]()</h3>
 		<div>
 		Return a copy of this Frustum
 		</div>
 
-		<h3>.set([page:Plane p0], [page:Plane p1], [page:Plane p2], [page:Plane p3], [page:Plane p4], [page:Plane p5]) [page:Boolean]</h3>
+		<h3>[method:Boolean set]([page:Plane p0], [page:Plane p1], [page:Plane p2], [page:Plane p3], [page:Plane p4], [page:Plane p5])</h3>
 		<div>
 		p0 -- [page:Plane] <br />
 		p1 -- [page:Plane] <br />
@@ -64,7 +64,7 @@
 		Sets the current frustum from the passed planes. No plane order is implicitely implied.
 		</div>
 
-		<h3>.copy([page:Frustum frustum]) [page:Frustum this]</h3>
+		<h3>[method:Frustum copy]([page:Frustum frustum]) [page:Frustum this]</h3>
 		<div>
 		frustum -- The frustum to copy
 		</div>
@@ -72,7 +72,7 @@
 		Copies the values of the passed frustum.
 		</div>
 
-		<h3>.containsPoint([page:Vector3 point]) [page:Boolean]</h3>
+		<h3>[method:Boolean containsPoint]([page:Vector3 point])</h3>
 		<div>
 		point -- [page:Vector3] to test
 		</div>
@@ -80,7 +80,7 @@
 		Checks to see if the frustum contains the point.
 		</div>
 
-		<h3>.intersectsSphere([page:Sphere sphere]) [page:Boolean]</h3>
+		<h3>[method:Boolean intersectsSphere]([page:Sphere sphere])</h3>
 		<div>
 		sphere -- [page:Sphere]
 		</div>

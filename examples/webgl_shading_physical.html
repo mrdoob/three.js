@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
+			body {
 				color: #fff;
 				font-family: Monospace;
 				font-size: 13px;
@@ -15,18 +15,18 @@
 				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
-		    }
+			}
 
-		    #info {
+			#info {
 				position: relative;
 				margin: 0 auto -2.1em;
 				top: 0px;
 				width: 550px;
 				padding: 5px;
 				z-index:100;
-		    }
+			}
 
-		    a { color: skyblue; }
+			a { color: skyblue; }
 
 			#stats #fps { background: transparent !important }
 			#stats #fps #fpsText { color: #444 !important }
@@ -181,9 +181,15 @@
 
 				// GROUND
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { shininess: 80, ambient: 0x444444, color: 0xffffff, specular: 0xffffff, map: textureSquares } );
+				var groundMaterial = new THREE.MeshPhongMaterial( {
+					shininess: 80,
+					ambient: 0x444444,
+					color: 0xffffff,
+					specular: 0xffffff,
+					map: textureSquares
+				} );
 
-				var planeGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
@@ -346,7 +352,6 @@
 
 				//
 
-				renderer.shadowMapAutoUpdate = false;
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapType = THREE.PCFSoftShadowMap;
 
@@ -562,10 +567,6 @@
 				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
 
 				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
-
-				// render shadow map
-
-				renderer.updateShadowMap( scene, camera );
 
 				// render cube map
 

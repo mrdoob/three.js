@@ -113,12 +113,33 @@ THREE.CameraHelper.prototype.dispose = function () {
 
 THREE.CameraHelper.prototype.update = function () {
 
+	var geometry, pointMap;
+	
 	var vector = new THREE.Vector3();
 	var camera = new THREE.Camera();
 
+	var setPoint = function ( point, x, y, z ) {
+
+		vector.set( x, y, z ).unproject( camera );
+
+		var points = pointMap[ point ];
+
+		if ( points !== undefined ) {
+
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				geometry.vertices[ points[ i ] ].copy( vector );
+
+			}
+
+		}
+
+	};
+
 	return function () {
 
-		var scope = this;
+		geometry = this.geometry;
+		pointMap = this.pointMap;
 
 		var w = 1, h = 1;
 
@@ -135,54 +156,36 @@ THREE.CameraHelper.prototype.update = function () {
 		// near
 
 		setPoint( "n1", - w, - h, - 1.00001 );
-		setPoint( "n2",  w, - h, - 1.00001 );
-		setPoint( "n3", - w,  h, - 1.00001 );
-		setPoint( "n4",  w,  h, - 1.00001 );
+		setPoint( "n2",   w, - h, - 1.00001 );
+		setPoint( "n3", - w,   h, - 1.00001 );
+		setPoint( "n4",   w,   h, - 1.00001 );
 
 		// far
 
 		setPoint( "f1", - w, - h, 1 );
-		setPoint( "f2",  w, - h, 1 );
-		setPoint( "f3", - w,  h, 1 );
-		setPoint( "f4",  w,  h, 1 );
+		setPoint( "f2",   w, - h, 1 );
+		setPoint( "f3", - w,   h, 1 );
+		setPoint( "f4",   w,   h, 1 );
 
 		// up
 
-		setPoint( "u1",  w * 0.7, h * 1.1, - 1.00001 );
+		setPoint( "u1",   w * 0.7, h * 1.1, - 1.00001 );
 		setPoint( "u2", - w * 0.7, h * 1.1, - 1.00001 );
-		setPoint( "u3",        0, h * 2,   - 1.00001 );
+		setPoint( "u3",         0, h * 2,   - 1.00001 );
 
 		// cross
 
-		setPoint( "cf1", - w,  0, 1 );
-		setPoint( "cf2",  w,  0, 1 );
-		setPoint( "cf3",  0, - h, 1 );
-		setPoint( "cf4",  0,  h, 1 );
+		setPoint( "cf1", - w,   0, 1 );
+		setPoint( "cf2",   w,   0, 1 );
+		setPoint( "cf3",   0, - h, 1 );
+		setPoint( "cf4",   0,   h, 1 );
 
-		setPoint( "cn1", - w,  0, - 1.00001 );
-		setPoint( "cn2",  w,  0, - 1.00001 );
-		setPoint( "cn3",  0, - h, - 1.00001 );
-		setPoint( "cn4",  0,  h, - 1.00001 );
+		setPoint( "cn1", - w,   0, - 1.00001 );
+		setPoint( "cn2",   w,   0, - 1.00001 );
+		setPoint( "cn3",   0, - h, - 1.00001 );
+		setPoint( "cn4",   0,   h, - 1.00001 );
 
-		function setPoint( point, x, y, z ) {
-
-			vector.set( x, y, z ).unproject( camera );
-
-			var points = scope.pointMap[ point ];
-
-			if ( points !== undefined ) {
-
-				for ( var i = 0, il = points.length; i < il; i ++ ) {
-
-					scope.geometry.vertices[ points[ i ] ].copy( vector );
-
-				}
-
-			}
-
-		}
-
-		this.geometry.verticesNeedUpdate = true;
+		geometry.verticesNeedUpdate = true;
 
 	};
 

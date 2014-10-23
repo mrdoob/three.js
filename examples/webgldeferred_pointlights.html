@@ -291,7 +291,7 @@
 				mapHeight3.anisotropy = 4;
 				mapHeight3.format = THREE.RGBFormat;
 
-				var geoPlane = new THREE.PlaneGeometry( 40, 20 );
+				var geoPlane = new THREE.PlaneBufferGeometry( 40, 20 );
 
 				var matPlane  = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 0.5 } );
 				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x331919, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 1 } );

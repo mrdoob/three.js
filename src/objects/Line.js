@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Line = function ( geometry, material, type ) {
+THREE.Line = function ( geometry, material, mode ) {
 
 	THREE.Object3D.call( this );
 
@@ -11,7 +11,7 @@ THREE.Line = function ( geometry, material, type ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.type = ( type !== undefined ) ? type : THREE.LineStrip;
+	this.mode = ( mode !== undefined ) ? mode : THREE.LineStrip;
 
 };
 
@@ -57,7 +57,7 @@ THREE.Line.prototype.raycast = ( function () {
 			var nbVertices = vertices.length;
 			var interSegment = new THREE.Vector3();
 			var interRay = new THREE.Vector3();
-			var step = this.type === THREE.LineStrip ? 1 : 2;
+			var step = this.mode === THREE.LineStrip ? 1 : 2;
 
 			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
@@ -91,7 +91,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 THREE.Line.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.Line( this.geometry, this.material, this.type );
+	if ( object === undefined ) object = new THREE.Line( this.geometry, this.material, this.mode );
 
 	THREE.Object3D.prototype.clone.call( this, object );
 

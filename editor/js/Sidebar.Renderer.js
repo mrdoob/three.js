@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Renderer = function ( editor ) {
 
 	var signals = editor.signals;
@@ -36,7 +40,12 @@ Sidebar.Renderer = function ( editor ) {
 	}
 
 	var rendererTypeRow = new UI.Panel();
-	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateRenderer );
+	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).onChange( function () {
+
+		editor.config.setKey( 'renderer', this.getValue() );
+		updateRenderer();
+
+	} );
 
 	rendererTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
 	rendererTypeRow.add( rendererType );
@@ -48,13 +57,27 @@ Sidebar.Renderer = function ( editor ) {
 		rendererType.setValue( editor.config.getKey( 'renderer' ) );
 
 	}
+	
+	// antialiasing
+
+	var rendererAntialiasRow = new UI.Panel();
+	var rendererAntialias = new UI.Checkbox( editor.config.getKey( 'renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
+
+		editor.config.setKey( 'renderer/antialias', this.getValue() );
+		// updateRenderer();
+
+	} );
+
+	rendererAntialiasRow.add( new UI.Text( 'Antialias' ).setWidth( '90px' ) );
+	rendererAntialiasRow.add( rendererAntialias );
+
+	container.add( rendererAntialiasRow );
 
 	//
 
 	function updateRenderer() {
 
-		signals.rendererChanged.dispatch( rendererType.getValue() );
-		editor.config.setKey( 'renderer', rendererType.getValue() );
+		signals.rendererChanged.dispatch( rendererType.getValue(), rendererAntialias.getValue() );
 
 	}
 

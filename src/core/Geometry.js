@@ -755,67 +755,6 @@ THREE.Geometry.prototype = {
 
 	},
 
-	// Geometry splitting
-
-	makeGroups: ( function () {
-
-		var geometryGroupCounter = 0;
-
-		return function ( usesFaceMaterial, maxVerticesInGroup ) {
-
-			var f, fl, face, materialIndex,
-				groupHash, hash_map = {},geometryGroup;
-
-			var numMorphTargets = this.morphTargets.length;
-			var numMorphNormals = this.morphNormals.length;
-
-			this.geometryGroups = {};
-			this.geometryGroupsList = [];
-
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-				face = this.faces[ f ];
-				materialIndex = usesFaceMaterial ? face.materialIndex : 0;
-
-				if ( ! ( materialIndex in hash_map ) ) {
-
-					hash_map[ materialIndex ] = { 'hash': materialIndex, 'counter': 0 };
-
-				}
-
-				groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
-
-				if ( ! ( groupHash in this.geometryGroups ) ) {
-
-					geometryGroup = { 'id': geometryGroupCounter++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
-					this.geometryGroups[ groupHash ] = geometryGroup;
-					this.geometryGroupsList.push(geometryGroup);
-				}
-
-				if ( this.geometryGroups[ groupHash ].vertices + 3 > maxVerticesInGroup ) {
-
-					hash_map[ materialIndex ].counter += 1;
-					groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
-
-					if ( ! ( groupHash in this.geometryGroups ) ) {
-
-						geometryGroup = { 'id': geometryGroupCounter++, 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
-						this.geometryGroups[ groupHash ] = geometryGroup;
-						this.geometryGroupsList.push(geometryGroup);
-						
-					}
-
-				}
-
-				this.geometryGroups[ groupHash ].faces3.push( f );
-				this.geometryGroups[ groupHash ].vertices += 3;
-
-			}
-
-		};
-
-	} )(),
-
 	toJSON: function () {
 
 		var output = {

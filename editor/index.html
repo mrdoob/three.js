@@ -41,9 +41,10 @@
 		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
-		<script src="js/Storage.js"></script>
-
+		<script src="js/libs/app.js"></script>
 		<script src="js/Player.js"></script>
+
+		<script src="js/Storage.js"></script>
 
 		<script src="js/Editor.js"></script>
 		<script src="js/Config.js"></script>
@@ -75,6 +76,7 @@
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
+		<script src="js/Sidebar.Script.Editor.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
@@ -92,19 +94,21 @@
 
 			var editor = new Editor();
 
-			var viewport = new Viewport( editor ).setId( 'viewport' );
+			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var player = new Player( editor ).setId( 'player' );
+			/*
+			var player = new Player( editor );
 			document.body.appendChild( player.dom );
+			*/
 
-			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
+			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor ).setId( 'menubar' );
+			var menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
 
-			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
+			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
 			var dialog = new UI.Dialog();

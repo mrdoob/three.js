@@ -5,27 +5,27 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #fff;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 
-			background-color: #000;
-			margin: 0px;
-			overflow: hidden;
-		    }
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-		    #info {
-			color:#fff;
-			position: absolute;
-			top: 0px; width: 100%;
-			padding: 5px;
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
 
-		    }
+			}
 
-		    a { color: red; }
+			a { color: red; }
 
 		</style>
 	</head>
@@ -142,7 +142,7 @@
 
 				} );
 
-				var plane = new THREE.PlaneGeometry( 512, 768 );
+				var plane = new THREE.PlaneBufferGeometry( 512, 768 );
 
 				quad = new THREE.Mesh( plane, materialHDR );
 				quad.position.z = -100;

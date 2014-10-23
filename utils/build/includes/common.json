@@ -28,7 +28,6 @@
 	"src/core/BufferAttribute.js",
 	"src/core/BufferGeometry.js",
 	"src/core/Geometry.js",
-	"src/core/Script.js",
 	"src/cameras/Camera.js",
 	"src/cameras/CubeCamera.js",
 	"src/cameras/OrthographicCamera.js",
@@ -79,6 +78,7 @@
 	"src/objects/MorphAnimMesh.js",
 	"src/objects/LOD.js",
 	"src/objects/Sprite.js",
+	"src/objects/LensFlare.js",
 	"src/scenes/Scene.js",
 	"src/scenes/Fog.js",
 	"src/scenes/FogExp2.js",
@@ -141,6 +141,11 @@
 	"src/renderers/WebGLRenderer.js",
 	"src/renderers/WebGLRenderTarget.js",
 	"src/renderers/WebGLRenderTargetCube.js",
+	"src/renderers/webgl/WebGLExtensions.js",
 	"src/renderers/webgl/WebGLProgram.js",
-	"src/renderers/webgl/WebGLShader.js"
+	"src/renderers/webgl/WebGLShader.js",
+	"src/renderers/webgl/plugins/LensFlarePlugin.js",
+	"src/renderers/webgl/plugins/ShadowMapPlugin.js",
+	"src/renderers/webgl/plugins/SpritePlugin.js"
+
 ]

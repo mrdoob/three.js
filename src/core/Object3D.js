@@ -371,31 +371,10 @@ THREE.Object3D.prototype = {
 
 	},
 
-	raycast: function () {},
+	getChildByName: function ( name, recursive ) {
 
-	traverse: function ( callback ) {
-
-		callback( this );
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].traverse( callback );
-
-		}
-
-	},
-
-	traverseVisible: function ( callback ) {
-
-		if ( this.visible === false ) return;
-
-		callback( this );
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].traverseVisible( callback );
-
-		}
+		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
+		return this.getObjectByName( name, recursive );
 
 	},
 
@@ -441,10 +420,111 @@ THREE.Object3D.prototype = {
 
 	},
 
-	getChildByName: function ( name, recursive ) {
+	getWorldPosition: function ( optionalTarget ) {
 
-		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
-		return this.getObjectByName( name, recursive );
+		var result = optionalTarget || new THREE.Vector3();
+
+		this.updateMatrixWorld( true );
+
+		return result.setFromMatrixPosition( this.matrixWorld );
+
+	},
+
+	getWorldQuaternion: function () {
+
+		var position = new THREE.Vector3();
+		var scale = new THREE.Vector3();
+
+		return function ( optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Quaternion();
+
+			this.updateMatrixWorld( true );
+
+			this.matrixWorld.decompose( position, result, scale );
+
+			return result;
+
+		}
+
+	}(),
+
+	getWorldRotation: function () {
+
+		var quaternion = new THREE.Quaternion();
+
+		return function ( optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Euler();
+
+			this.getWorldQuaternion( quaternion );
+
+			return result.setFromQuaternion( quaternion, this.rotation.order, false );
+
+		}
+
+	}(),
+
+	getWorldScale: function () {
+
+		var position = new THREE.Vector3();
+		var quaternion = new THREE.Quaternion();
+
+		return function ( optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Vector3();
+
+			this.updateMatrixWorld( true );
+
+			this.matrixWorld.decompose( position, quaternion, result );
+
+			return result;
+
+		}
+
+	}(),
+
+	getWorldDirection: function () {
+
+		var quaternion = new THREE.Quaternion();
+
+		return function ( optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Vector3();
+
+			this.getWorldQuaternion( quaternion );
+
+			return result.set( 0, 0, 1 ).applyQuaternion( quaternion );
+
+		}
+
+	}(),
+
+	raycast: function () {},
+
+	traverse: function ( callback ) {
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
+	traverseVisible: function ( callback ) {
+
+		if ( this.visible === false ) return;
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverseVisible( callback );
+
+		}
 
 	},
 
@@ -565,7 +645,6 @@ THREE.Object3D.prototype = {
 
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
-			if ( object.script !== undefined ) data.script = object.script.source;
 			if ( object.visible !== true ) data.visible = object.visible;
 
 			if ( object instanceof THREE.PerspectiveCamera ) {
@@ -613,6 +692,11 @@ THREE.Object3D.prototype = {
 				data.groundColor = object.groundColor.getHex();
 
 			} else if ( object instanceof THREE.Mesh ) {
+
+				data.geometry = parseGeometry( object.geometry );
+				data.material = parseMaterial( object.material );
+
+			} else if ( object instanceof THREE.Line ) {
 
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
@@ -678,8 +762,6 @@ THREE.Object3D.prototype = {
 		object.frustumCulled = this.frustumCulled;
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
-
-		if ( this.script !== undefined ) object.script = this.script.clone();
 
 		if ( recursive === true ) {
 

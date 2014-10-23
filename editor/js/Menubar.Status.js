@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Status = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -6,7 +10,15 @@ Menubar.Status = function ( editor ) {
 	var checkbox = new UI.Checkbox( editor.config.getKey( 'autosave' ) );
 	checkbox.onChange( function () {
 
-		editor.config.setKey( 'autosave', this.getValue() );
+		var value = this.getValue();
+
+		editor.config.setKey( 'autosave', value );
+
+		if ( value === true ) {
+
+			editor.signals.sceneGraphChanged.dispatch();
+
+		}
 
 	} );
 	container.add( checkbox );

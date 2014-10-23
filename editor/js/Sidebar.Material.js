@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Material = function ( editor ) {
 
 	var signals = editor.signals;
@@ -110,7 +114,7 @@ Sidebar.Material = function ( editor ) {
 	// emissive
 
 	var materialEmissiveRow = new UI.Panel();
-	var materialEmissive = new UI.Color().onChange( update );
+	var materialEmissive = new UI.Color().setHexValue( 0x000000 ).onChange( update );
 
 	materialEmissiveRow.add( new UI.Text( 'Emissive' ).setWidth( '90px' ) );
 	materialEmissiveRow.add( materialEmissive );
@@ -120,7 +124,7 @@ Sidebar.Material = function ( editor ) {
 	// specular
 
 	var materialSpecularRow = new UI.Panel();
-	var materialSpecular = new UI.Color().onChange( update );
+	var materialSpecular = new UI.Color().setHexValue( 0x111111 ).onChange( update );
 
 	materialSpecularRow.add( new UI.Text( 'Specular' ).setWidth( '90px' ) );
 	materialSpecularRow.add( materialSpecular );
@@ -334,6 +338,7 @@ Sidebar.Material = function ( editor ) {
 	materialBlendingRow.add( materialBlending );
 
 	container.add( materialBlendingRow );
+
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
@@ -371,8 +376,10 @@ Sidebar.Material = function ( editor ) {
 	function update() {
 
 		var object = editor.selected;
+
 		var geometry = object.geometry;
 		var material = object.material;
+		
 		var textureWarning = false;
 		var objectHasUvs = false;
 
@@ -565,17 +572,9 @@ Sidebar.Material = function ( editor ) {
 
 				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
 
-				if ( objectHasUvs )  {
-
-					material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
-					material.reflectivity = materialReflectivity.getValue();
-					material.needsUpdate = true;
-
-				} else {
-
-					if ( envMapEnabled ) textureWarning = true;
-
-				}
+				material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
+				material.reflectivity = materialReflectivity.getValue();
+				material.needsUpdate = true;
 
 			}
 

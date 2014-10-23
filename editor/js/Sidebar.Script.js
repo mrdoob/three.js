@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Script = function ( editor ) {
 
 	var signals = editor.signals;
@@ -14,54 +18,8 @@ Sidebar.Script = function ( editor ) {
 	container.addStatic( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 
-	var scriptsRow = new UI.Panel();
-	container.add( scriptsRow );
-
-	// source
-
-	var timeout;
-
-	var scriptSourceRow = new UI.Panel();
-	var scriptSource = new UI.TextArea( 'javascript' ).setWidth( '240px' ).setHeight( '180px' ).setFontSize( '12px' );
-	scriptSource.onKeyUp( function () {
-
-		clearTimeout( timeout );
-
-		timeout = setTimeout( function () {
-
-			var object = editor.selected;
-			var source = scriptSource.getValue();
-
-			try {
-
-				var script = new Function( 'scene', 'time', source ).bind( object.clone() );
-				script( new THREE.Scene(), 0 );
-
-				scriptSource.dom.classList.add( 'success' );
-				scriptSource.dom.classList.remove( 'fail' );
-
-			} catch ( error ) {
-
-				scriptSource.dom.classList.remove( 'success' );
-				scriptSource.dom.classList.add( 'fail' );
-
-				return;
-
-			}
-
-			object.script = new THREE.Script( source );
-
-			editor.signals.objectChanged.dispatch( object );
-
-		}, 500 );
-
-	} );	
-
-	scriptSourceRow.add( scriptSource );
-
-	container.add( scriptSourceRow );
-
-	//
+	var source = new Sidebar.Script.Editor( editor );
+	container.add( source );
 
 	signals.objectSelected.add( function ( object ) {
 
@@ -69,15 +27,19 @@ Sidebar.Script = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			if ( object.script !== undefined ) {
+			/*
+			var scripts = editor.scripts[ object.uuid ];
 
-				scriptSource.setValue( object.script.source );
+			if ( scripts !== undefined ) {
+
+				scriptSource.setValue( scripts[ 0 ] );
 
 			} else {
 
 				scriptSource.setValue( '' );
 
 			}
+			*/
 
 		} else {
 
