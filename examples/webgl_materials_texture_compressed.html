@@ -71,7 +71,7 @@
 				*/
 
 				var loader = new THREE.DDSLoader();
-				
+
 				var map1 = loader.load( 'textures/compressed/disturb_dxt1_nomip.dds' );
 				map1.minFilter = map1.magFilter = THREE.LinearFilter;
 				map1.anisotropy = 4;
@@ -121,7 +121,7 @@
 				var material6 = new THREE.MeshBasicMaterial( { envMap: cubemap3 } );
 				var material7 = new THREE.MeshBasicMaterial( { map: map5 } );
 				var material8 = new THREE.MeshBasicMaterial( { map: map6 } );
-				
+
 
 				var mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 50, 32, 16 ), material1 );
 				mesh.position.x = -600;

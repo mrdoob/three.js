@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Loader = function ( editor ) {
 
 	var scope = this;
@@ -9,6 +13,21 @@ var Loader = function ( editor ) {
 		var extension = filename.split( '.' ).pop().toLowerCase();
 
 		switch ( extension ) {
+
+			case 'awd':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new THREE.AWDLoader();
+					var scene = loader.parse( event.target.result );
+
+					editor.setScene( scene );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case 'babylon':
 
@@ -22,6 +41,30 @@ var Loader = function ( editor ) {
 					var scene = loader.parse( json );
 
 					editor.setScene( scene );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'babylonmeshdata':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+					var json = JSON.parse( contents );
+
+					var loader = new THREE.BabylonLoader();
+
+					var geometry = loader.parseGeometry( json );
+					var material = new THREE.MeshPhongMaterial();
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.name = filename;
+
+					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -166,8 +209,6 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					console.log( contents );
-
 					var geometry = new THREE.PLYLoader().parse( contents );
 					geometry.sourceType = "ply";
 					geometry.sourceFile = file.name;
@@ -282,7 +323,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				alert( 'Unsupported file format.' );
+				alert( 'Unsupported file format (' + extension +  ').' );
 
 				break;
 
@@ -310,7 +351,17 @@ var Loader = function ( editor ) {
 
 		}
 
-		if ( data.metadata.type.toLowerCase() === 'geometry' ) {
+		if ( data.metadata.type === 'BufferGeometry' ) {
+
+			var loader = new THREE.BufferGeometryLoader();
+			var result = loader.parse( data );
+
+			var mesh = new THREE.Mesh( result );
+
+			editor.addObject( mesh );
+			editor.select( mesh );
+
+		} else if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
 			var result = loader.parse( data );

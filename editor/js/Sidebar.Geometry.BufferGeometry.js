@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 	var container = new UI.Panel();
@@ -34,15 +38,15 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 
 			container.setDisplay( 'block' );
 
-			vertices.setValue( geometry.attributes.position.array.length / 3 );
+			vertices.setValue( ( geometry.attributes.position.array.length / 3 ).format() );
 
 			if ( geometry.attributes.index !== undefined ) {
 
-				faces.setValue( geometry.attributes.index.array.length / 3 );
+				faces.setValue( ( geometry.attributes.index.array.length / 3 ).format() );
 
 			} else {
 
-				faces.setValue( geometry.attributes.position.array.length / 9 );
+				faces.setValue( ( geometry.attributes.position.array.length / 9 ).format() );
 
 			}
 
@@ -55,7 +59,7 @@ Sidebar.Geometry.BufferGeometry = function ( signals ) {
 	};
 
 	signals.objectSelected.add( update );
-	signals.objectChanged.add( update );
+	signals.geometryChanged.add( update );
 
 	return container;
 

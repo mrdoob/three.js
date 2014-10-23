@@ -12,7 +12,8 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 
 	// Specific HMD parameters
 	var HMD = (options && options.HMD) ? options.HMD: {
-		// Parameters from the Oculus Rift DK1
+		// DK1
+		/*
 		hResolution: 1280,
 		vResolution: 800,
 		hScreenSize: 0.14976,
@@ -22,7 +23,19 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		eyeToScreenDistance: 0.041,
 		distortionK : [1.0, 0.22, 0.24, 0.0],
 		chromaAbParameter: [ 0.996, -0.004, 1.014, 0.0]
+		*/
+		// DK2
+		hResolution: 1920,
+		vResolution: 1080,
+		hScreenSize: 0.12576,
+		vScreenSize: 0.07074,
+		interpupillaryDistance: 0.0635,
+		lensSeparationDistance: 0.0635,
+		eyeToScreenDistance: 0.041,
+		distortionK : [1.0, 0.22, 0.24, 0.0],
+		chromaAbParameter: [ 0.996, -0.004, 1.014, 0.0]
 	};
+	this.HMD = HMD;
 
 	// Perspective camera
 	var pCamera = new THREE.PerspectiveCamera();
@@ -90,7 +103,7 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		].join("\n")
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), RTMaterial );
+	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), RTMaterial );
 
 	// Final scene
 	var finalScene = new THREE.Scene();
@@ -137,7 +150,7 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 
 		// Create render target
 		if ( renderTarget ) renderTarget.dispose();
-		renderTarget = new THREE.WebGLRenderTarget( HMD.hResolution*distScale/2, HMD.vResolution*distScale, RTParams );
+		renderTarget = new THREE.WebGLRenderTarget( ( HMD.hResolution * distScale / 2 ) * renderer.devicePixelRatio, ( HMD.vResolution * distScale ) * renderer.devicePixelRatio, RTParams );
 		RTMaterial.uniforms[ "texid" ].value = renderTarget;
 
 	}	

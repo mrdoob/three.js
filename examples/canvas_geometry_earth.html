@@ -35,6 +35,10 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - earth demo</div>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -59,7 +63,7 @@
 
 				scene = new THREE.Scene();
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				scene.add( group );
 
 				// earth
@@ -99,7 +103,7 @@
 				var texture = new THREE.Texture( canvas );
 				texture.needsUpdate = true;
 
-				var geometry = new THREE.PlaneGeometry( 300, 300, 3, 3 );
+				var geometry = new THREE.PlaneBufferGeometry( 300, 300, 3, 3 );
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var mesh = new THREE.Mesh( geometry, material );

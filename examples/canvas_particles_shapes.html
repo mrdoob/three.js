@@ -18,6 +18,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/tween.min.js"></script>
 		<script src="js/Sparks.js"></script>
@@ -69,7 +72,7 @@
 
 				scene = new THREE.Scene();
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				scene.add( group );
 
 				// Get text from hash
@@ -204,6 +207,12 @@
 
 				sparksEmitter.addCallback("created", onParticleCreated);
 				sparksEmitter.addCallback("dead", onParticleDead);
+				sparksEmitter.addCallback("updated", function( particle ) {
+
+					particle.target.position.copy( particle.position );
+
+				});
+
 				sparksEmitter.start();
 
 				// End Particles

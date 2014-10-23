@@ -4,7 +4,7 @@
 
 THREE.Lut = function ( colormap, numberofcolors ) {
 
-	this.lut = new Array();
+	this.lut = [];
 	this.map = THREE.ColorMapKeywords[ colormap ];
 	this.n = numberofcolors;
 	this.mapname = colormap;
@@ -194,7 +194,7 @@ THREE.Lut.prototype = {
 		this.legend.ctx.putImageData( imageData, 0, 0 );
 		this.legend.texture.needsUpdate = true;
 
-		this.legend.legendGeometry = new THREE.PlaneGeometry( this.legend.dimensions.width , this.legend.dimensions.height );
+		this.legend.legendGeometry = new THREE.PlaneBufferGeometry( this.legend.dimensions.width , this.legend.dimensions.height );
 		this.legend.legendMaterial = new THREE.MeshBasicMaterial( { map : this.legend.texture, side : THREE.DoubleSide } );
 
 		this.legend.mesh = new THREE.Mesh( this.legend.legendGeometry, this.legend.legendMaterial );

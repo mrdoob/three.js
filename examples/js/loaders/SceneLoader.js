@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SceneLoader = function () {
+THREE.SceneLoader = function ( manager ) {
 
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function() {};
@@ -15,6 +15,8 @@ THREE.SceneLoader = function () {
 	this.hierarchyHandlers = {};
 
 	this.addGeometryHandler( "ascii", THREE.JSONLoader );
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -32,7 +34,7 @@ THREE.SceneLoader.prototype = {
 
 			scope.parse( JSON.parse( text ), onLoad, url );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -444,6 +446,10 @@ THREE.SceneLoader.prototype = {
 						} else if ( rot !== undefined ) {
 
 							camera.rotation.fromArray( rot );
+
+						} else if ( objJSON.target ) {
+
+						    camera.lookAt( new THREE.Vector3().fromArray( objJSON.target ) );
 
 						}
 
@@ -985,7 +991,7 @@ THREE.SceneLoader.prototype = {
 
 					texture = new THREE.Texture();
 					loader = new THREE.ImageLoader();
-					
+
 					( function ( texture ) {
 
 						loader.load( fullUrl, function ( image ) {
@@ -996,9 +1002,9 @@ THREE.SceneLoader.prototype = {
 							textureCallback();
 
 						} );
-					
+
 					} )( texture )
-					
+
 
 				}
 
@@ -1058,7 +1064,7 @@ THREE.SceneLoader.prototype = {
 
 			for ( parID in matJSON.parameters ) {
 
-				if ( parID === "envMap" || parID === "map" || parID === "lightMap" || parID === "bumpMap" ) {
+				if ( parID === "envMap" || parID === "map" || parID === "lightMap" || parID === "bumpMap" || parID === "alphaMap" ) {
 
 					matJSON.parameters[ parID ] = result.textures[ matJSON.parameters[ parID ] ];
 

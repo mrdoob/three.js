@@ -1,88 +1,4 @@
-﻿* {
-	vertical-align: middle;
-}
-
-	/* Webkit micro scrollbars */
-
-	::-webkit-scrollbar {
-		width:9px;
-	}
-
-	::-webkit-scrollbar-track {
-		-webkit-border-radius:5px;
-		border-radius:5px;
-		background:rgba(140,140,140,0.1);
-	}
-
-	::-webkit-scrollbar-thumb {
-		-webkit-border-radius:5px;
-		border-radius:5px;
-		background:rgba(140,140,140,0.2);
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background:rgba(140,140,140,0.4);
-	}
-
-	::-webkit-scrollbar-thumb:window-inactive {
-		background:rgba(140,140,140,0.5);
-	}
-
-body {
-	font-family: Arial, sans-serif;
-	font-size: 14px;
-	margin: 0;
-	overflow: hidden;
-}
-
-hr {
-	border: 0px;
-	border-top: 1px solid #ccc;
-}
-
-button {
-	position: relative;
-}
-
-textarea {
-	white-space: pre;
-	word-wrap: normal;
-}
-
-.Panel {
-
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-
-	/* No support for these yet */
-	-o-user-select: none;
-	user-select: none;
-}
-
-.CollapsiblePanel .CollapsiblePanelButton {
-	float: left;
-	margin-right: 6px;
-	width: 0px;
-	height: 0px;
-	border: 6px solid transparent;
-}
-
-.CollapsiblePanel.collapsed .CollapsiblePanelButton {
-	margin-top: 2px;
-	border-left-color: #555;
-}
-
-.CollapsiblePanel:not(.collapsed) .CollapsiblePanelButton {
-	margin-top: 6px;
-	border-top-color: #555;
-}
-
-.CollapsiblePanel.collapsed .CollapsibleContent {
-	display: none;
-}
-
-.FancySelect {
+﻿.FancySelect {
 	background: #222;
 	border: 1px solid #3C3C3C;
 	padding: 0;
@@ -117,31 +33,52 @@ input.Number {
 	bottom: 32px;
 }
 
+	#viewport #info {
+		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
+	}
+
+#player {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+}
+
 #menubar {
 	position: absolute;
 	width: 100%;
 	height: 32px;
-	background-color: #111;
+	background: #111;
 	padding: 0px;
 	margin: 0px;
 }
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
 	}
 
-	#menubar .Panel {
-		color: #888;
+	#menubar .menu.right {
+		float: right;
+		cursor: auto;
+		text-align: right;
 	}
+
+		#menubar .menu .title {
+			display: inline-block;
+			color: #888;
+			margin: 0px;
+			padding: 8px;
+		}
 
 		#menubar .menu .options {
+			position: absolute;
 			display: none;
 			padding: 5px 0px;
-			background-color: #111;
+			background: #111;
 			width: 140px;
-			border-top: solid 1px #1D1D1D;
 		}
 
 		#menubar .menu:hover .options {
@@ -164,6 +101,10 @@ input.Number {
 					background-color: #08f;
 				}
 
+				#menubar .menu .options .option:active {
+					color: #666;
+					background: transparent;
+				}
 
 #sidebar {
 	position: absolute;
@@ -226,5 +167,3 @@ input.Number {
 	#toolbar button {
 		margin-right: 6px;
 	}
-
-

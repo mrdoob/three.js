@@ -75,7 +75,7 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
+	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
 	_scene.add( mesh );
 
 	this.setSize = function ( width, height ) {

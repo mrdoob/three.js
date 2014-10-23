@@ -57,7 +57,7 @@
 				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
 				mapC = THREE.ImageUtils.loadTexture( "textures/sprite2.png" );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 
 				var materialC = new THREE.SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
 				var materialB = new THREE.SpriteMaterial( { map: mapB, color: 0xffffff, fog: true } );
@@ -161,7 +161,7 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				camera.aspect = width / height;				
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
 				cameraOrtho.left = - width / 2;

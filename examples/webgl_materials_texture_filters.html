@@ -126,7 +126,7 @@
 				textureCanvas2.needsUpdate = true;
 				textureCanvas2.repeat.set( 1000, 1000 );
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
 				meshCanvas.rotation.x = - Math.PI / 2;
@@ -149,7 +149,7 @@
 					scene.add( meshCanvas );
 					scene2.add( meshCanvas2 );
 
-					var geometry = new THREE.PlaneGeometry( 100, 100 );
+					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 					var mesh = new THREE.Mesh( geometry, materialPainting );
 					var mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 

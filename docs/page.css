@@ -66,6 +66,22 @@ code {
 	overflow: auto;
 }
 
+
+
+th {
+	padding: 10px;
+	text-decoration: underline;
+}
+td {
+	text-align: center;
+}
+
+table code {
+	padding: 2px;
+	margin: 0px;
+	width: auto;
+}
+
 strong {
 	color: #000;
 	font-weight: normal;
@@ -85,3 +101,8 @@ strong {
 		cursor: pointer;
 		opacity: 1;
 	}
+
+a.permalink {
+	float: right;
+	margin-left: 5px;
+}
