@@ -335,23 +335,27 @@ THREE.Ray.prototype = {
 
 	}(),
 	
-	intersectBox: function ( box , optionalTarget ) {
+	intersectBox: function () {
 		
 		var hitPointNear = new THREE.Vector3(),
 		    hitPointFar = new THREE.Vector3(),
-		    isHitPointNearVisible = false;		
+		    isHitPointNearVisible;		
 		
-		if ( this.intersectBoxAndGetHitPoints( box , hitPointNear, hitPointFar, isHitPointNearVisible ) === false ) {
-
- 			 return null;
-
+		return function ( box , optionalTarget ) {
+		
+			if ( this.intersectBoxAndGetHitPoints( box , hitPointNear, hitPointFar, isHitPointNearVisible ) === false ) {
+	
+	 			 return null;
+	
+			}
+			
+			optionalTarget = optionalTarget || new THREE.Vector3();
+			optionalTarget.copy( ( isHitPointNearVisible ? hitPointNear : hitPointFar ) );		
+			return optionalTarget;
+		
 		}
 		
-		optionalTarget = optionalTarget || new THREE.Vector3();
-		optionalTarget.copy( ( isHitPointNearVisible ? hitPointNear : hitPointFar ) );		
-		return optionalTarget;
-		
-	},
+	}(),
 
 	intersectBoxAndGetHitPoints: function ( box , hitPointNear, hitPointFar, isHitPointNearVisible ) {
 
