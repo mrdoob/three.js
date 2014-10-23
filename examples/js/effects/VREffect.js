@@ -114,6 +114,8 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.render( scene, cameraRight );
 
+		renderer.enableScissorTest( false );
+
 	};
 
 	this.setSize = function( width, height ) {
