@@ -1,9 +1,8 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR
+source "$DIR/setup_test_env.bash"
 
-source setup_test_env.bash
 blender --background $BLEND/anim.blend --python $PYSCRIPT -- \
-    $TMP_JSON --vertices --faces --morphTargets
-testjson $@ --tag $(tagname)
+    $JSON --vertices --faces --morphTargets
+makereview $@ --tag $(tagname)

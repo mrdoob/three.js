@@ -3,7 +3,6 @@
 # you must have blender setup to run from the command line
 if [[ `which blender` == "" ]]; then
     echo "No 'blender' executable found on the command line"
-    exit 1
 fi
 
 export JSON=`python -c "import tempfile;print(tempfile.mktemp(prefix='$TAG.', suffix='.json'))"`
