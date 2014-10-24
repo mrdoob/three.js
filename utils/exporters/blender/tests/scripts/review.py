@@ -12,16 +12,14 @@ review = os.path.join(os.getcwd(), 'review')
 MASK = stat.S_IRWXU|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH
 
 HTML = '''<!doctype html>
-<html>
+<html lang='en'>
   <head>
     <title>%(title)s</title>
     <meta charset='utf-8'>
-    <meta name='review' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>
-    <script src='../scripts/three.js'></script>
-    <script src='../scripts/OrbitControls.js'></script>
-    <script src='../../../js/threeio.js'></script>
-    <script src='../scripts/review.js'></script>
-    <link href='../scripts/style.css' rel='stylesheet' />
+    <script src='../../../../../../build/three.min.js'></script>
+    <script src='../../../../../../examples/js/controls/OrbitControls.js'></script>
+    <script src='../../scripts/js/review.js'></script>
+    <link href='../../scripts/css/style.css' rel='stylesheet' />
   </head>
   <body>
     <script>
