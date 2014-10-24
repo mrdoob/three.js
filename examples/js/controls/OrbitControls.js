@@ -69,9 +69,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.minAzimuthAngle = - Infinity; // radians
 	this.maxAzimuthAngle = Infinity; // radians
 
-	// Angle values
-	this.angle = {};
-
 	// Set to true to disable use of the keys
 	this.noKeys = false;
 
@@ -103,6 +100,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var dollyEnd = new THREE.Vector2();
 	var dollyDelta = new THREE.Vector2();
 
+	var theta;
+	var phi;
 	var phiDelta = 0;
 	var thetaDelta = 0;
 	var scale = 1;
@@ -251,11 +250,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		// angle from z-axis around y-axis
 
-		var theta = Math.atan2( offset.x, offset.z );
+		theta = Math.atan2( offset.x, offset.z );
 
 		// angle from y-axis
 
-		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+		phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
 
 		if ( this.autoRotate ) {
 
@@ -299,9 +298,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scale = 1;
 		pan.set( 0, 0, 0 );
 
-		this.angle.polar = phi;
-		this.angle.azimuth = theta;
-
 		// update condition is:
 		// min(camera displacement, camera rotation in radians)^2 > EPS
 		// using small-angle approximation cos(x/2) = 1 - x^2 / 8
@@ -327,6 +323,18 @@ THREE.OrbitControls = function ( object, domElement ) {
 		this.object.position.copy( this.position0 );
 
 		this.update();
+
+	};
+
+	this.getPolarAngle = function () {
+
+		return phi;
+
+	};
+
+	this.getAzimuthalAngle = function () {
+
+		return theta
 
 	};
 
