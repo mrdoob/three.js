@@ -20982,7 +20982,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera, renderTarget, forceClear ) {
+	this.render = function ( scene, camera, renderTarget, forceClear, options ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
@@ -20992,6 +20992,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var fog = scene.fog;
+		var renderOpaque = (!options || options.renderOpaque !== false);
+		var renderTransparent = (!options || options.renderTransparent !== false);
 
 		// reset caching for this frame
 
@@ -21036,8 +21038,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _this.sortObjects === true ) {
 
-			opaqueObjects.sort( painterSortStable );
-			transparentObjects.sort( reversePainterSortStable );
+			if ( renderOpaque ) {
+				opaqueObjects.sort( painterSortStable );
+			}
+
+			if ( renderTransparent ) {
+				transparentObjects.sort( reversePainterSortStable );
+			}
 
 		}
 
@@ -21086,9 +21093,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setDepthWrite( material.depthWrite );
 			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
+			// if ( !material.transparent && renderOpaque || material.transparent && renderTransparent ) {
 			renderObjects( opaqueObjects, camera, lights, fog, true, material );
 			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, false, material );
+			// }
 
 		} else {
 
@@ -21098,13 +21107,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 
-			renderObjects( opaqueObjects, camera, lights, fog, false, material );
-			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
+			if ( renderOpaque ) {
+				renderObjects( opaqueObjects, camera, lights, fog, false, material );
+				renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
+			}
 
 			// transparent pass (back-to-front order)
-
-			renderObjects( transparentObjects, camera, lights, fog, true, material );
-			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
+			if ( renderTransparent ) {
+				renderObjects( transparentObjects, camera, lights, fog, true, material );
+				renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
+			}
 
 		}
 
