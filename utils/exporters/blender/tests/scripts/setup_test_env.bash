@@ -16,6 +16,10 @@ export BLEND=$(cd "$DIR/../blend"; pwd)
 export PYSCRIPT="$DIR/exporter.py"
 
 function makereview() {
+    if [ ! -f "$JSON" ]; then
+        echo "no json, export error suspected"
+        exit 1
+    fi
     python3 "$DIR/review.py" $JSON $@
 }
 

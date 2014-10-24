@@ -60,11 +60,44 @@ function setupLights() {
 
 }
 
+function loadObject( data ) {
+
+    var loader = new THREE.ObjectLoader();
+    scene = loader.parse( data );
+
+
+    var hasLights = false;
+
+    var lights = ['AmbientLight', 'DirectionalLight', 'AreaLight',
+        'PointLight', 'SpotLight', 'HemisphereLight']
+
+    for ( i = 0; i < data.object.children.length; i ++ ) {
+
+        var index = lights.indexOf( data.object.children[ i ].type );
+
+        if ( index > -1 ) {
+
+            hasLights = true;
+            break;
+
+        }
+
+    }
+
+    if ( ! ( hasLights ) ) setupLights();
+
+    scene.add( new THREE.GridHelper( 10, 2.5 ) );
+
+    render();
+
+}
+
 function loadGeometry( data, url ) {
 
     var loader = new THREE.JSONLoader();
     var texturePath = loader.extractUrlBase( url );
     data = loader.parse( data, texturePath );
+
     if ( data.materials === undefined ) {
     
         console.log('using default material');
@@ -75,8 +108,46 @@ function loadGeometry( data, url ) {
     var material = new THREE.MeshFaceMaterial( data.materials ); 
     var mesh;
 
-    mesh = new THREE.Mesh( data.geometry, material );
+    if ( data.geometry.animation !== undefined ) {
 
+        console.log( 'loading animation' );
+        data.materials[ 0 ].skinning = true;
+        mesh = new THREE.SkinnedMesh( data.geometry, material, false);
+
+        var name = data.geometry.animation.name;
+        animation = new THREE.Animation( mesh, data.geometry.animation );
+
+    } else {
+
+        mesh = new THREE.Mesh( data.geometry, material );
+
+    }
+
+    setupScene();
+    setupLights();
+    scene.add( mesh );
+
+    if ( animation != null ) {
+
+        console.log( 'playing animation' );
+        animation.play();
+        animate();
+
+    } else {
+
+        render();
+
+    }
+}
+
+function loadBufferGeometry( data ) {
+
+    var loader = new THREE.BufferGeometryLoader();
+
+    var bufferGeometry = loader.parse( data );
+
+    var material = new THREE.MeshLambertMaterial( { color: 0xb8b8b8 } );
+    var mesh = new THREE.Mesh( bufferGeometry, material );
     setupScene();
     setupLights();
     scene.add( mesh );
@@ -87,10 +158,22 @@ function loadGeometry( data, url ) {
 
 function loadData( data, url ) {
 
-    if ( data.metadata.type == 'Geometry' ) {
+    if ( data.metadata.type === 'Geometry' ) {
         
         loadGeometry( data, url );
     
+    } else if ( data.metadata.type === 'Object' ) {
+    
+        loadObject( data );
+
+    } else if ( data.metadata.type === 'BufferGeometry' ) {
+
+        loadBufferGeometry( data );
+
+    } else {
+
+        console.warn( 'can not determine type' );
+
     }
 
 }

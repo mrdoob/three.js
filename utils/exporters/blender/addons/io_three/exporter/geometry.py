@@ -261,7 +261,12 @@ class Geometry(base_classes.BaseNode):
                 constants.METADATA: self.metadata
             })
         else:
-            data[constants.ATTRIBUTES] = component_data
+            if self.options[constants.EMBED_GEOMETRY]:
+                data[constants.DATA] = {
+                    constants.ATTRIBUTES: component_data
+                }
+            else:
+                data[constants.ATTRIBUTES] = component_data
             data.update({constants.METADATA: self.metadata}) 
             data[constants.NAME] = self[constants.NAME]
 

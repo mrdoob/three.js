@@ -83,12 +83,16 @@ class Scene(base_classes.BaseScene):
             constants.EXTENSIONS[constants.JSON])
 
         for key, value in self.items():
-            if key == constants.GEOMETRIES and \
-            not self.options[constants.EMBED_GEOMETRY]:
+            embed = self.options[constants.EMBED_GEOMETRY]
+            if key == constants.GEOMETRIES and embed:
                 geometries = []
                 for geometry in value:
                     geom_data = geometry.copy()
-                    geom_data.pop(constants.DATA)
+
+                    geo_type = geom_data[constants.TYPE].lower()
+                    if geo_type == constants.GEOMETRY.lower():
+                        import sys;sys.exit(0)
+                        geom_data.pop(constants.DATA)
 
                     dirname = os.path.dirname(self.filepath)
                     url = 'geometry.%s%s' % (geometry.node, extension)
