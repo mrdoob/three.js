@@ -33,9 +33,9 @@ THREE.HDRDecodeShader = {
 		"void main() {",
 
 			"vec4 sample = texture2D(tDiffuse, vUv );",
-			"#ifdef LOGLUV_HDR",
+			"#ifdef LOGLUV_HDR_INPUT",
 				"gl_FragColor = vec4( LogLuvDecode( sample ), 1.0 );",
-			"#elif defined( RGBM_HDR )",
+			"#elif defined( RGBM_HDR_INPUT )",
 				"gl_FragColor = vec4( RGBMDecode( sample ), 1.0 );",
 			"#else",
 				"gl_FragColor = sample;",

@@ -1,4 +1,4 @@
-#ifdef LOGLUV_HDR
+#ifdef LOGLUV_HDR_INPUT
 
   // Inverse logLuvMatrix matrix, for decoding
   const mat3 InverseLogLuvMatrix = mat3(
@@ -16,10 +16,16 @@
     vec3 vRGB = InverseLogLuvMatrix * Xp_Y_XYZp;
     return clamp(vRGB, 0.0, 1.0);
   }
-#elif defined( RGBM_HDR )
+#elif defined( RGBM_HDR_INPUT )
 
   vec3 RGBMDecode( vec4 rgbm ) {
     return 6.0 * rgbm.rgb * rgbm.a;
+  }
+
+#elif defined( RGBD_HDR_INPUT )
+  vec3 RGBMDecode( vec4 rgbd ) {
+    // return rgbd.rgb * ((MaxRange / 255.0) / rgbd.a);
+    return rgbd.rgb * / rgbd.a;
   }
 
 #endif

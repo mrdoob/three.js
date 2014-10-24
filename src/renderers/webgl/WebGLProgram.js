@@ -228,8 +228,10 @@ THREE.WebGLProgram = ( function () {
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
 
-				_this.hdrEnabled && _this.hdrType === THREE.LogLuvHDR ? "#define LOGLUV_HDR" : "",
-				_this.hdrEnabled && _this.hdrType === THREE.RGBMHDR ? "#define RGBM_HDR" : "",
+				_this.hdrEnabled && _this.hdrType === THREE.LogLuvHDR && parameters.hdrOutput !== false ? "#define LOGLUV_HDR_OUTPUT" : "",
+				_this.hdrEnabled && _this.hdrType === THREE.RGBMHDR && parameters.hdrOutput !== false ? "#define RGBM_HDR_OUTPUT" : "",
+				_this.hdrEnabled && _this.hdrType === THREE.LogLuvHDR ? "#define LOGLUV_HDR_INPUT" : "",
+				_this.hdrEnabled && _this.hdrType === THREE.RGBMHDR ? "#define RGBM_HDR_INPUT" : "",
 
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",

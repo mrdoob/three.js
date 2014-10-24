@@ -1,4 +1,4 @@
-#ifdef LOGLUV_HDR
+#ifdef LOGLUV_HDR_OUTPUT
   // logLuvMatrix matrix, for encoding
   // const mat3 logLuvMatrix = mat3(
   //     0.2209, 0.3390, 0.4184,
@@ -22,7 +22,7 @@
       return vResult;
   }
 
-#elif defined( RGBM_HDR )
+#elif defined( RGBM_HDR_OUTPUT )
 
   vec4 RGBMEncode( vec3 color ) {
     vec4 rgbm;

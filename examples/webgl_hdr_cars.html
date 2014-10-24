@@ -16,18 +16,18 @@
 			}
 			h1 { }
 			a { color:skyblue; text-decoration:none }
-			canvas { pointer-events:none; z-index:10; position:relative; }
+			canvas { pointer-events:none; z-index:0; position:relative; }
 
 			#d { position:absolute; width: 100%; text-align:center; margin:1em 0 -4.5em 0; z-index:1000; }
 
-			.bwrap { margin:0.5em 0 0 0 }
-			button { font-family:georgia; border:0; background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px; }
-			button:hover { background:#333 }
-			#buttons_cars button { color:#fa0 }
+			.bwrap { margin:0.5em 0 0 0; display: none;}
+			button { font-family:georgia; border:0; background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px; display: none; }
+			button:hover { background:#333; display: none; }
+			#buttons_cars button { color:#fa0; display: none; }
 
-			#car_info { text-align:center; }
-			#car_name { font-size:1em }
-			#car_author { font-size:1em }
+			#car_info { text-align:center; display: none; }
+			#car_name { font-size:1em; display: none; }
+			#car_author { font-size:1em; display: none; }
 
 			#oldie { background:rgb(50,0,0) !important; color:#fff !important; margin-top:7em!important }
 		</style>
@@ -61,10 +61,12 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/HDRDecodeShader.js"></script>
+		<script src="js/shaders/ToneMapShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -149,8 +151,12 @@
 
 			var container, stats;
 
+			var bloomPass, toneMapPass;
+			var params;
+
 			var camera, scene, renderer, effectComposer;
 			var cameraCube, sceneCube;
+			var cameraBG, sceneBG;
 
 			var m, mi;
 
@@ -169,6 +175,18 @@
 
 			function init() {
 
+				params = {
+					// projection: 'normal',
+					middleGrey: 0.6,
+					maxLuminance: 16,
+					avgLuminance: 4,
+					bloomAmount: 1.0,
+					sceneLight: 2.0,
+					// clear: function() {
+					// 	removeDecals();
+					// }
+				};
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -180,29 +198,87 @@
 				camera.position.z = 700;
 				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
+				cameraBG = new THREE.OrthographicCamera( -windowHalfX, windowHalfX, windowHalfY, -windowHalfY, -10000, 10000 );
+				cameraBG.position.z = 100;
+
 				// SCENE
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
+				sceneBG = new THREE.Scene();
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x050505 );
+				var ambient = new THREE.AmbientLight( 0x555555 );
 				scene.add( ambient );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff, params.sceneLight );
 				directionalLight.position.set( 2, 1.2, 10 ).normalize();
 				scene.add( directionalLight );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( -2, 1.2, -10 ).normalize();
-				scene.add( directionalLight );
+				// directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				// directionalLight.position.set( -2, 1.2, -10 ).normalize();
+				// scene.add( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xffaa00, 2 );
-				pointLight.position.set( 2000, 1200, 10000 );
-				scene.add( pointLight );
+				// pointLight = new THREE.PointLight( 0xffaa00, 2 );
+				// pointLight.position.set( 2000, 1200, 10000 );
+				// scene.add( pointLight );
+
+				var vBGShader = [
+					// "attribute vec2 uv;",
+					"varying vec2 vUv;",
+			   	"void main() {",
+			   		"vUv = uv;",
+		      	"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		    	"}"
+
+			  ].join("\n");
+
+			  var pBGShader = [
+
+			    "uniform sampler2D map;",
+			    "varying vec2 vUv;",
+			    THREE.ShaderChunk[ 'hdr_decode_pars_fragment'],
+			    
+			    "void main() {",
+			      
+		        "vec2 sampleUV = vUv;",
+		        // "sampleUV.y = clamp( cameraVectorN.y * -0.5 + 0.5, 0.0, 1.0);",
+		        // "sampleUV.x = atan( cameraVectorN.z, cameraVectorN.x ) * 0.15915494309189533576888376337251 + 0.5;",
+		        "vec4 colour = texture2D( map, sampleUV );",
+		        "vec3 environmentColor = RGBMDecode( colour ).xyz;",
+		      
+			      "gl_FragColor = vec4( environmentColor.xyz, 1.0 );",
+
+			    "}"
+
+			  ].join("\n");
 
 				// Skybox
+				var tempBackgroundMat = new THREE.ShaderMaterial( {
+					uniforms: {
+						map: { type: 't', value: null }
+					},
+					vertexShader: vBGShader,
+					fragmentShader: pBGShader,
+					depthTest: false,
+					// color: 0xffffff
+					hdrOutput: false,
+				} );
+
+				var hdrUrl = 'textures/hdr/rgbmTest.png';
+
+				var textureHdr = THREE.ImageUtils.loadTexture( hdrUrl, undefined, function( tex ) {
+					tex.format = THREE.RGBAFormat;
+					tempBackgroundMat.uniforms.map.value = tex;
+					tempBackgroundMat.needsUpdate = true;
+					// console.dir( tex );
+				} );
+				
+				var quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), tempBackgroundMat );
+				quadBG.position.z = -500;
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				sceneBG.add( quadBG );
 
 				var shader = THREE.ShaderLib[ "cube" ];
 				shader.uniforms[ "tCube" ].value = textureCube;
@@ -240,24 +316,33 @@
 				var renderTarget = new THREE.WebGLRenderTarget( width, height, parameters );
 				effectComposer = new THREE.EffectComposer( renderer, renderTarget );
   			effectComposer.setSize( window.innerWidth, window.innerHeight );
+				var bgPass = new THREE.RenderPass( sceneBG, cameraBG );
 				var scenePass = new THREE.RenderPass( scene, camera );
 				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
   			scenePass.clear = false;
   			
   			effectComposer.addPass( skyboxPass );
+  			// effectComposer.addPass( bgPass );
   			effectComposer.addPass( scenePass );
 
-  			var bloomPass = new THREE.BloomPass();
+  			toneMapPass = new THREE.ShaderPass( THREE.ToneMapShader );
+  			effectComposer.addPass( toneMapPass );
+
+  			bloomPass = new THREE.BloomPass();
   			effectComposer.addPass( bloomPass );
   			
-  			var hdrDecodePass = new THREE.ShaderPass( THREE.HDRDecodeShader );
-  			hdrDecodePass.renderToScreen = true;
-
-  			effectComposer.addPass( hdrDecodePass );
+  			// if ( renderer.hdrOutput ) {
+	  		// 	var hdrDecodePass = new THREE.ShaderPass( THREE.HDRDecodeShader );
+	  		// 	hdrDecodePass.renderToScreen = true;
+	  		// 	effectComposer.addPass( hdrDecodePass );
+	  		// }
+	  		// else {
+	  		// 	toneMapPass.renderToScreen = true;
+	  		// }
   			
-  			// var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-  			// copyPass.renderToScreen = true;
-  			// effectComposer.addPass( copyPass );
+  			var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+  			copyPass.renderToScreen = true;
+  			effectComposer.addPass( copyPass );
 
 				if ( STATS_ENABLED ) {
 
@@ -505,11 +590,20 @@
 
 				}
 
-				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
+				loader.load( CARS[ "camaro" ].url, function( geometry ) { createScene( geometry, "camaro" ) } );
 
 				for( var c in CARS ) initCarButton( c );
 
-				//
+				var gui = new dat.GUI();
+
+				// gui.add( params, 'projection', { 'From cam to mesh': 'camera', 'Normal to mesh': 'normal' } );
+				gui.add( params, 'middleGrey', 0, 1 );
+				gui.add( params, 'maxLuminance', 1, 30 );
+				gui.add( params, 'avgLuminance', 0.001, 6.0 );
+				gui.add( params, 'sceneLight', 0.1, 6.0 );
+				gui.add( params, 'bloomAmount' );
+				// gui.add( params, 'clear' );
+				gui.open();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -660,6 +754,13 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+				if ( bloomPass ) {
+					bloomPass.setStrength( params.bloomAmount );
+				}
+				if ( toneMapPass ) {
+					toneMapPass.uniforms.averageLuminance.value = params.avgLuminance;
+				}
+				directionalLight.intensity = params.sceneLight;
 
 				render();
 
@@ -669,9 +770,9 @@
 
 				var timer = -0.0002 * Date.now();
 
-				// camera.position.x = 1000 * Math.cos( timer );
-				// camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				// camera.position.z = 1000 * Math.sin( timer );
+				camera.position.x = 1000 * Math.cos( timer );
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );
 				cameraCube.rotation.copy( camera.rotation );

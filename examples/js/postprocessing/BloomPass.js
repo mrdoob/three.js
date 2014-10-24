@@ -107,6 +107,10 @@ THREE.BloomPass.prototype = {
 
 		renderer.render( this.scene, this.camera, readBuffer, this.clear );
 
+	},
+
+	setStrength: function( strength ) {
+		this.copyUniforms[ "opacity" ].value = strength;
 	}
 
 };
