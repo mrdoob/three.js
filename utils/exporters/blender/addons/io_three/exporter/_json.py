@@ -1,7 +1,7 @@
 import json
 from .. import constants
 
-ROUND = constants.ROUND
+ROUND = constants.DEFAULT_PRECISION
 
 ## THREE override function
 def _json_floatstr(o):

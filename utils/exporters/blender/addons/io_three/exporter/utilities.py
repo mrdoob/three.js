@@ -4,7 +4,7 @@ import hashlib
 from .. import constants
 
 
-ROUND = constants.ROUND
+ROUND = constants.DEFAULT_PRECISION
 
 
 def bit_mask(flags):
@@ -55,9 +55,9 @@ def round_off(value, ndigits=ROUND):
 
 
 def rounding(options):
-    round_off = options.get(constants.ROUND_OFF)
+    round_off = options.get(constants.ENABLE_PRECISION)
     if round_off:
-        round_val = options[constants.ROUND_VALUE]
+        round_val = options[constants.PRECISION]
     else:
         round_val = None
 

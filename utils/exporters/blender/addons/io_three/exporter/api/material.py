@@ -30,9 +30,9 @@ def ambient_color(material):
 def blending(material):
     logger.debug('material.blending(%s)', material)
     try:
-        blend = material.three_blending_type
+        blend = material.THREE_blending_type
     except AttributeError:
-        logger.debug('No three_blending_type attribute found')
+        logger.debug('No THREE_blending_type attribute found')
         blend = constants.NORMAL_BLENDING 
     return blend
 
@@ -55,9 +55,9 @@ def bump_scale(material):
 def depth_test(material):
     logger.debug('material.depth_test(%s)', material)
     try:
-        test = material.three_depth_test
+        test = material.THREE_depth_test
     except AttributeError:
-        logger.debug('No three_depth_test attribute found')
+        logger.debug('No THREE_depth_test attribute found')
         test = True
     return test
 
@@ -66,9 +66,9 @@ def depth_test(material):
 def depth_write(material):
     logger.debug('material.depth_write(%s)', material)
     try:
-        write = material.three_depth_write
+        write = material.THREE_depth_write
     except AttributeError:
-        logger.debug('No three_depth_write attribute found')
+        logger.debug('No THREE_depth_write attribute found')
         write = True
     return write
 
@@ -199,9 +199,9 @@ def used_materials():
 def visible(material):
     logger.debug('material.visible(%s)', material)
     try:
-        vis = material.three_visible
+        vis = material.THREE_visible
     except AttributeError:
-        logger.debug('No three_visible attribute found')
+        logger.debug('No THREE_visible attribute found')
         vis = True
 
     return vis

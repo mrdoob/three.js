@@ -1,3 +1,21 @@
+# ##### BEGIN GPL LICENSE BLOCK #####
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# ##### END GPL LICENSE BLOCK #####
+
 import os
 import json
 
@@ -16,14 +34,15 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 
 
 bl_info = {
-    'name': 'io_three',
+    'name': 'Three.js Format',
     'author': 'Ed Caspersen (repsac)',
     'version': (1, 0, 0),
     'blender': (2, 7, 2),
     'location': 'File > Import-Export',
-    'description': 'Export ThreeJs scenes',
-    'warning': 'Importer not implemented',
-    'wiki_url': 'https://github.com/mrdoob/three.js/wiki',
+    'description': 'Export Three.js formatted JSON files.',
+    'warning': '',
+    'wiki_url': 'https://github.com/mrdoob/three.js/tree/'\
+        'master/utils/exporters/blender',
     'tracker_url':  'https://github.com/mrdoob/three.js/issues',
     'category': 'Import-Export'
 }
@@ -40,7 +59,7 @@ def _geometry_types():
 
     return types
 
-bpy.types.Mesh.three_geometry_type = EnumProperty(
+bpy.types.Mesh.THREE_geometry_type = EnumProperty(
     name='Geometry type',
     description='Geometry type',
     items=_geometry_types(),
@@ -56,7 +75,7 @@ class MESH_PT_hello(bpy.types.Panel):
     def draw(self, context):
         row = self.layout.row()
         if context.mesh:
-            row.prop(context.mesh, 'three_geometry_type', text='Type')
+            row.prop(context.mesh, 'THREE_geometry_type', text='Type')
 
 def _blending_types(index):
     types = (
@@ -68,14 +87,14 @@ def _blending_types(index):
         constants.BLENDING_TYPES.CUSTOM)
     return (types[index], types[index], types[index])
 
-bpy.types.Material.three_blending_type = EnumProperty(
+bpy.types.Material.THREE_blending_type = EnumProperty(
     name='Blending type', 
     description='Blending type', 
     items=[_blending_types(x) for x in range(5)], 
     default=constants.BLENDING_TYPES.NORMAL)
 
-bpy.types.Material.three_depth_write = BoolProperty(default=True)
-bpy.types.Material.three_depth_test = BoolProperty(default=True)
+bpy.types.Material.THREE_depth_write = BoolProperty(default=True)
+bpy.types.Material.THREE_depth_test = BoolProperty(default=True)
 
 class MATERIAL_PT_hello(bpy.types.Panel):
 
@@ -93,15 +112,15 @@ class MATERIAL_PT_hello(bpy.types.Panel):
             row.label(text='Selected material: %s' % mat.name )
 
             row = layout.row()
-            row.prop(mat, 'three_blending_type', 
+            row.prop(mat, 'THREE_blending_type', 
                 text='Blending type' )
 
             row = layout.row()
-            row.prop(mat, 'three_depth_write', 
+            row.prop(mat, 'THREE_depth_write', 
                 text='Enable depth writing' )
 
             row = layout.row()
-            row.prop(mat, 'three_depth_test', 
+            row.prop(mat, 'THREE_depth_test', 
                 text='Enable depth testing' )
 
 def _mag_filters(index):
@@ -109,7 +128,7 @@ def _mag_filters(index):
         constants.NEAREST_FILTERS.NEAREST)
     return (types[index], types[index], types[index])
 
-bpy.types.Texture.three_mag_filter = EnumProperty(
+bpy.types.Texture.THREE_mag_filter = EnumProperty(
     name='Mag Filter',
     items = [_mag_filters(x) for x in range(2)],
     default=constants.LINEAR_FILTERS.LINEAR)
@@ -123,7 +142,7 @@ def _min_filters(index):
         constants.NEAREST_FILTERS.MIP_MAP_LINEAR)
     return (types[index], types[index], types[index])
 
-bpy.types.Texture.three_min_filter = EnumProperty(
+bpy.types.Texture.THREE_min_filter = EnumProperty(
     name='Min Filter',
     items = [_min_filters(x) for x in range(6)],
     default=constants.LINEAR_FILTERS.MIP_MAP_LINEAR)
@@ -136,7 +155,7 @@ def _mapping(index):
         constants.MAPPING_TYPES.SPHERICAL_REFRACTION)
     return (types[index], types[index], types[index])
 
-bpy.types.Texture.three_mapping = EnumProperty(
+bpy.types.Texture.THREE_mapping = EnumProperty(
     name='Mapping',
     items = [_mapping(x) for x in range(5)],
     default=constants.MAPPING_TYPES.UV)
@@ -154,15 +173,15 @@ class TEXTURE_PT_hello(bpy.types.Panel):
 
         if tex is not None:
             row = layout.row()
-            row.prop(tex, 'three_mapping', text='Mapping')
+            row.prop(tex, 'THREE_mapping', text='Mapping')
 
             row = layout.row()
-            row.prop(tex, 'three_mag_filter', text='Mag Filter')
+            row.prop(tex, 'THREE_mag_filter', text='Mag Filter')
 
             row = layout.row()
-            row.prop(tex, 'three_min_filter', text='Min Filter')
+            row.prop(tex, 'THREE_min_filter', text='Min Filter')
 
-bpy.types.Object.three_export = bpy.props.BoolProperty(default=True)
+bpy.types.Object.THREE_export = bpy.props.BoolProperty(default=True)
 
 class OBJECT_PT_hello(bpy.types.Panel):
     bl_label = 'THREE'
@@ -175,7 +194,7 @@ class OBJECT_PT_hello(bpy.types.Panel):
         obj = context.object
 
         row = layout.row()
-        row.prop(obj, 'three_export', text='Export')
+        row.prop(obj, 'THREE_export', text='Export')
 
 def get_settings_fullpath():
     return os.path.join(bpy.app.tempdir, SETTINGS_FILE_EXPORT)
@@ -199,8 +218,8 @@ def save_settings_export(properties):
         constants.MIX_COLORS: properties.option_mix_colors,
 
         constants.SCALE: properties.option_scale,
-        constants.ROUND_OFF: properties.option_round_off,
-        constants.ROUND_VALUE: properties.option_round_value,
+        constants.ENABLE_PRECISION: properties.option_round_off,
+        constants.PRECISION: properties.option_round_value,
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
         constants.COPY_TEXTURES: properties.option_copy_textures,
@@ -269,9 +288,11 @@ def restore_settings_export(properties):
     properties.option_scale = settings.get(
         constants.SCALE, constants.EXPORT_OPTIONS[constants.SCALE])
     properties.option_round_off = settings.get(
-        constants.ROUND_OFF, constants.EXPORT_OPTIONS[constants.ROUND_OFF])
+        constants.ENABLE_PRECISION, 
+        constants.EXPORT_OPTIONS[constants.ENABLE_PRECISION])
     properties.option_round_value = settings.get(
-        constants.ROUND_VALUE, constants.EXPORT_OPTIONS[constants.ROUND_VALUE])
+        constants.PRECISION, 
+        constants.EXPORT_OPTIONS[constants.PRECISION])
     properties.option_logging = settings.get(
         constants.LOGGING, constants.EXPORT_OPTIONS[constants.LOGGING])
     properties.option_compression = settings.get(
@@ -392,16 +413,16 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=constants.EXPORT_OPTIONS[constants.SCALE])
 
     option_round_off = BoolProperty(
-        name='Round Off',
-        description='Round of floating point values',
-        default=constants.EXPORT_OPTIONS[constants.ROUND_OFF])
+        name='Enable Precision',
+        description='Round off floating point values',
+        default=constants.EXPORT_OPTIONS[constants.ENABLE_PRECISION])
 
     option_round_value = IntProperty(
         name='Precision',
         min=0,
         max=16,
         description='Floating point precision',
-        default=constants.EXPORT_OPTIONS[constants.ROUND_VALUE])
+        default=constants.EXPORT_OPTIONS[constants.PRECISION])
 
     logging_types = [
         (constants.DEBUG, constants.DEBUG, constants.DEBUG),

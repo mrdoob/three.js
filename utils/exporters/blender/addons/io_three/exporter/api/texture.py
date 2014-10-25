@@ -49,9 +49,9 @@ def image_node(texture):
 def mag_filter(texture):
     logger.debug('texture.mag_filter(%s)', texture)
     try:
-        val = texture.three_mag_filter
+        val = texture.THREE_mag_filter
     except AttributeError:
-        logger.debug('No three_mag_filter attribute found')
+        logger.debug('No THREE_mag_filter attribute found')
         val = MAG_FILTER
 
     return val
@@ -61,9 +61,9 @@ def mag_filter(texture):
 def mapping(texture):
     logger.debug('texture.mapping(%s)', texture)
     try:
-        val = texture.three_mapping
+        val = texture.THREE_mapping
     except AttributeError:
-        logger.debug('No three_mapping attribute found')
+        logger.debug('No THREE_mapping attribute found')
         val = MAPPING
 
     return val
@@ -71,9 +71,9 @@ def mapping(texture):
 def min_filter(texture):
     logger.debug('texture.min_filter(%s)', texture)
     try:
-        val = texture.three_min_filter
+        val = texture.THREE_min_filter
     except AttributeError:
-        logger.debug('No three_min_filter attribute found')
+        logger.debug('No THREE_min_filter attribute found')
         val = MIN_FILTER 
 
     return val

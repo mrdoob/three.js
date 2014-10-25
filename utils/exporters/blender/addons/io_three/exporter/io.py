@@ -30,9 +30,9 @@ def dump(filepath, data, options=None):
         func = lambda x,y: msgpack.dump(x, y)
         mode = 'wb'
     else:
-        round_off = options.get(constants.ROUND_OFF)
+        round_off = options.get(constants.ENABLE_PRECISION)
         if round_off:
-            _json.ROUND = options[constants.ROUND_VALUE]
+            _json.ROUND = options[constants.PRECISION]
         else:
             _json.ROUND = None
 

@@ -131,7 +131,7 @@ function loadGeometry( data, url ) {
 
         mesh = new THREE.Mesh( data.geometry, material );
 
-        if ( data.geometry.morphTargets !== undefined ) {
+        if ( data.geometry.morphTargets.length > 0 ) {
 
             console.log( 'loading morph targets' );
             data.materials[ 0 ].morphTargets = true;

@@ -60,9 +60,9 @@ LIGHTS = 'lights'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
 COPY_TEXTURES = 'copyTextures'
-ROUND_OFF = 'roundOff'
-ROUND_VALUE = 'roundValue'
-ROUND = 6
+ENABLE_PRECISION = 'enablePrecision'
+PRECISION = 'precision'
+DEFAULT_PRECISION = 6
 EMBED_GEOMETRY = 'embedGeometry'
 EMBED_ANIMATION = 'embedAnimation'
 
@@ -104,8 +104,8 @@ EXPORT_OPTIONS = {
     LIGHTS: False,
     COPY_TEXTURES: True,
     LOGGING: DEBUG,
-    ROUND_OFF: False,
-    ROUND_VALUE: ROUND,
+    ENABLE_PRECISION: False,
+    PRECISION: DEFAULT_PRECISION,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: GEOMETRY
@@ -118,10 +118,6 @@ THREE = 'io_three'
 GENERATOR = 'generator'
 SOURCE_FILE = 'sourceFile'
 VALID_DATA_TYPES = (str, int, float, bool, list, tuple, dict)
-
-ROUND = 6
-ROUND_VALUE = 'roundValue'
-ROUND_OFF = 'roundOff'
 
 JSON = 'json'
 GZIP = 'gzip'

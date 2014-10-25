@@ -161,7 +161,7 @@ def nodes(valid_types, options):
         if not _on_visible_layer(obj, visible_layers): 
             continue
         try:
-            export = obj.three_export
+            export = obj.THREE_export
         except AttributeError:
             export = True
 
@@ -253,14 +253,14 @@ def extract_mesh(obj, options, recalculate=False):
     mesh = obj.to_mesh(context.scene, True, RENDER)
 
     # transfer the geometry type to the extracted mesh
-    mesh.three_geometry_type = obj.data.three_geometry_type
+    mesh.THREE_geometry_type = obj.data.THREE_geometry_type
 
     # now determine whether or not to export using the geometry type
     # set globally from the exporter's options or to use the local
     # override on the mesh node itself
     opt_buffer = options.get(constants.GEOMETRY_TYPE) 
     opt_buffer = opt_buffer == constants.BUFFER_GEOMETRY
-    prop_buffer = mesh.three_geometry_type == constants.BUFFER_GEOMETRY
+    prop_buffer = mesh.THREE_geometry_type == constants.BUFFER_GEOMETRY
 
     # if doing buffer geometry it is imperative to triangulate the mesh
     if opt_buffer or prop_buffer:
@@ -352,7 +352,7 @@ def prep_meshes(options):
             continue
 
         # if someone really insists on a visible node not being exportable
-        if not obj.three_export: 
+        if not obj.THREE_export: 
             logger.info('%s export is disabled', obj.name)
             continue
 
