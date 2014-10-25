@@ -267,7 +267,7 @@ class Geometry(base_classes.BaseNode):
                 }
             else:
                 data[constants.ATTRIBUTES] = component_data
-            data.update({constants.METADATA: self.metadata}) 
+            data[constants.METADATA] = self.metadata 
             data[constants.NAME] = self[constants.NAME]
 
         return data 

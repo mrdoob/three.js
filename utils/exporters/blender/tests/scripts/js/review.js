@@ -1,18 +1,28 @@
 var scene, renderer, camera, container, animation;
-
+var hasMorph = false;
+var prevTime = Date.now();
 var clock = new THREE.Clock();
 
 function render() {
         
     renderer.render( scene, camera );
-      
+ 
+    if ( hasMorph ) {
+
+        var time = Date.now();
+
+        animation.update( time - prevTime );
+
+        prevTime = time;
+
+    }     
 }
 
 function animate() {
 
     requestAnimationFrame( animate );
 
-    if ( animation != null ) {
+    if ( animation !== null ) {
 
         var delta = clock.getDelta();
         THREE.AnimationHandler.update( delta );
@@ -120,6 +130,15 @@ function loadGeometry( data, url ) {
     } else {
 
         mesh = new THREE.Mesh( data.geometry, material );
+
+        if ( data.geometry.morphTargets !== undefined ) {
+
+            console.log( 'loading morph targets' );
+            data.materials[ 0 ].morphTargets = true;
+            animation = new THREE.MorphAnimation( mesh );
+            hasMorph = true;
+
+        }
 
     }
 

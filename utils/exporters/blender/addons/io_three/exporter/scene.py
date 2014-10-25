@@ -77,35 +77,44 @@ class Scene(base_classes.BaseScene):
         data = {}
         
         embed_anim = self.options.get(constants.EMBED_ANIMATION, True)
+        embed = self.options[constants.EMBED_GEOMETRY]
 
         compression = self.options.get(constants.COMPRESSION)
         extension = constants.EXTENSIONS.get(compression, 
             constants.EXTENSIONS[constants.JSON])
 
+        #@TODO: test this new logic
+        export_dir = os.path.dirname(self.filepath)
         for key, value in self.items():
-            embed = self.options[constants.EMBED_GEOMETRY]
-            if key == constants.GEOMETRIES and embed:
+            
+            if key == constants.GEOMETRIES:
                 geometries = []
                 for geometry in value:
+
+                    if not embed_anim:
+                        geometry.write_animation(export_dir)
+
+                    if embed:
+                        for each in value:
+                            geometries.append(each.copy())
+                        continue
+
                     geom_data = geometry.copy()
 
                     geo_type = geom_data[constants.TYPE].lower()
                     if geo_type == constants.GEOMETRY.lower():
-                        import sys;sys.exit(0)
                         geom_data.pop(constants.DATA)
+                    elif geo_type == constants.BUFFER_GEOMETRY.lower():
+                        geom_data.pop(constants.ATTRIBUTES)
+                        geom_data.pop(constants.METADATA)
 
-                    dirname = os.path.dirname(self.filepath)
                     url = 'geometry.%s%s' % (geometry.node, extension)
-                    geometry_file = os.path.join(dirname, url)
+                    geometry_file = os.path.join(export_dir, url)
 
                     geometry.write(filepath=geometry_file)
                     geom_data[constants.URL] = os.path.basename(url)
 
                     geometries.append(geom_data)
-
-                    if not embed_anim:
-                        geom_dir = os.path.dirname(geometry_file)
-                        geometry.write_animation(geom_dir)
 
                 data[key] = geometries
             elif isinstance(value, list):
