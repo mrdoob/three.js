@@ -1,8 +1,8 @@
 # Running tests
-In order to use the test scripts you must have your shell setup to execute Blender from the command line using `$ blender`. This either done by setting up your own wrapper scripts or by symlinking /usr/bin/python directly to $BLENDER_ROOT/blender. 
+In order to use the test scripts you must have your shell setup to execute Blender from the command line using `$ blender`. This either done by setting up your own wrapper scripts or by symlinking /usr/bin/blender directly to $BLENDER_ROOT/blender. 
 
 ## OS X
-Make sure your do not point to blender.app as it will not pass the arguments corrently. It is required to execute on $BLENDER_ROOT/blender.app/Contents/MacOS/blender in order for the tests to execute correctly.
+Make sure your do not point to blender.app as it will not pass the arguments corrently. It is required to execute on $BLENDER_ROOT/blender.app/Contents/MacOS/blender in order for the tests to function correctly.
 
 # Testing
 Each test script focuses on a specific context and feature of the exporter. 

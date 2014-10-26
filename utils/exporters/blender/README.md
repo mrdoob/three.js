@@ -8,10 +8,10 @@ The exporter (r69 and earlier) has been completely replaced. Please ensure you h
 
 ## Installation
 
-Copy the io_mesh folder to the scripts/addons folder. If it doesn't exist, create it. The full path is OS-dependent (see below).
+Copy the io_three folder to the scripts/addons folder. If it doesn't exist, create it. The full path is OS-dependent (see below).
 
 Once that is done, you need to activate the plugin. Open Blender preferences, look for
-Addons, search for `three`, enable the checkbox next to the `Import-Export: three.js format` entry.
+Addons, search for `three`, enable the checkbox next to the `Import-Export: Three.js Format` entry.
 
 Goto Usage.
 
@@ -44,7 +44,7 @@ For Ubuntu users who installed Blender 2.68 via apt-get, this is the location:
 
 ## Usage
 
-Activate the Import-Export addon under "User Preferences" > "Addons" and then use the regular Import and Export menu within Blender, select `Three.js (json)`.
+Activate the Import-Export addon under "User Preferences" > "Addons" and then use the regular Export menu within Blender, select `Three.js (json)`.
 
 
 ## Enabling msgpack
@@ -52,4 +52,4 @@ To enable msgpack compression copy the msgpack to scripts/modules.
 
 
 ## Importer
-Currently there is no import functionality.
+Currently there is no import functionality available.
