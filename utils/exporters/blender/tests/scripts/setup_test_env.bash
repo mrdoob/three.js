@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # you must have blender setup to run from the command line
-if [[ `which blender` == "" ]]; then
-    echo "No 'blender' executable found on the command line"
-fi
+command -v blender >/dev/null 2>&1 || { echo >&2 "Blender is not accessible from the command line. Aborting."; exit 1; }
 
 export JSON=`python -c "import tempfile;print(tempfile.mktemp(prefix='$TAG.', suffix='.json'))"`
 
