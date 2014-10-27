@@ -9784,6 +9784,19 @@ THREE.Geometry.prototype = {
 	},
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
+	
+		if ( geometry instanceof THREE.Mesh ) {
+
+			geometry.matrixAutoUpdate && geometry.updateMatrix();
+
+			var matrix = geometry.matrix;
+			geometry = geometry.geometry;
+			
+			this.merge( geometry, matrix, materialIndexOffset );
+			
+			return;
+
+		}	
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
