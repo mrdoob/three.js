@@ -9789,7 +9789,7 @@ THREE.Geometry.prototype = {
 
 			geometry.matrixAutoUpdate && geometry.updateMatrix();
 
-			var matrix = geometry.matrix;
+			matrix = geometry.matrix;
 			geometry = geometry.geometry;
 			
 			this.merge( geometry, matrix, materialIndexOffset );
