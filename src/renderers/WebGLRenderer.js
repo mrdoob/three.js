@@ -208,6 +208,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		_canvas.addEventListener( 'webglcontextlost', function ( event ) {
+
+			event.preventDefault();
+
+			resetGLState();
+			setDefaultGLState();
+
+			_webglObjects = {};
+
+		}, false);
+
 	} catch ( error ) {
 
 		console.error( error );
@@ -242,7 +253,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	function setDefaultGLState() {
+	var setDefaultGLState = function () {
 
 		_gl.clearColor( 0, 0, 0, 1 );
 		_gl.clearDepth( 1 );
@@ -263,7 +274,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	}
+	};
+
+	var resetGLState = function () {
+
+		_currentProgram = null;
+		_currentCamera = null;
+
+		_oldBlending = - 1;
+		_oldDepthTest = - 1;
+		_oldDepthWrite = - 1;
+		_oldDoubleSided = - 1;
+		_oldFlipSided = - 1;
+		_currentGeometryGroupHash = - 1;
+		_currentMaterialId = - 1;
+
+		_lightsNeedUpdate = true;
+
+	};
 
 	setDefaultGLState();
 
@@ -314,7 +342,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-			
+
 			return array;
 
 		};
@@ -361,6 +389,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.getContext = function () {
 
 		return _gl;
+
+	};
+
+	this.forceContextLoss = function () {
+
+		extensions.get( 'WEBGL_lose_context' ).loseContext();
 
 	};
 
@@ -542,22 +576,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Reset
 
-	this.resetGLState = function () {
-
-		_currentProgram = null;
-		_currentCamera = null;
-
-		_oldBlending = - 1;
-		_oldDepthTest = - 1;
-		_oldDepthWrite = - 1;
-		_oldDoubleSided = - 1;
-		_oldFlipSided = - 1;
-		_currentGeometryGroupHash = - 1;
-		_currentMaterialId = - 1;
-
-		_lightsNeedUpdate = true;
-
-	};
+	this.resetGLState = resetGLState;
 
 	// Buffer allocation
 
@@ -689,7 +708,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Buffer deallocation
 
 	var deleteBuffers = function ( geometry ) {
-	
+
 		var buffers = [
 			'__webglVertexBuffer',
 			'__webglNormalBuffer',
@@ -697,13 +716,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			'__webglColorBuffer',
 			'__webglUVBuffer',
 			'__webglUV2Buffer',
-			
+
 			'__webglSkinIndicesBuffer',
 			'__webglSkinWeightsBuffer',
-			
+
 			'__webglFaceBuffer',
 			'__webglLineBuffer',
-			
+
 			'__webglLineDistanceBuffer'
 		];
 
@@ -746,7 +765,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			for ( var name in geometry.attributes ) {
-			
+
 				var attribute = geometry.attributes[ name ];
 
 				if ( attribute.buffer !== undefined ) {
@@ -3838,7 +3857,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					numMorphTargets: numMorphTargets,
 					numMorphNormals: numMorphNormals
 				};
-				
+
 				groups[ groupHash ] = group;
 				groupsList.push( group );
 
@@ -3859,7 +3878,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						numMorphTargets: numMorphTargets,
 						numMorphNormals: numMorphNormals
 					};
-					
+
 					groups[ groupHash ] = group;
 					groupsList.push( group );
 
@@ -6421,7 +6440,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// DEPRECATED
-	
+
 	this.initMaterial = function () {
 
 		console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
