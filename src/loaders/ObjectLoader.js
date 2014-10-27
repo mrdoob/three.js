@@ -251,10 +251,16 @@ THREE.ObjectLoader.prototype = {
 			var loader = new THREE.ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
+			if ( json.length === 0 ) {
+
+				manager.onLoad();
+
+			}
+
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json[ i ],
-						url  = self.texturePath + data.url;
+				var data = json[ i ];
+				var url  = self.texturePath + data.url;
 
 				self.manager.itemStart( url );
 				loader.load( url, function ( image ) {
@@ -266,6 +272,11 @@ THREE.ObjectLoader.prototype = {
 				} );
 
 			}
+
+		}
+		else {
+
+			manager.onLoad();
 
 		}
 
