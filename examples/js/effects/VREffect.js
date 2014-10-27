@@ -21,10 +21,12 @@
  * https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
  *
  */
-THREE.VREffect = function ( renderer, done ) {
+THREE.VREffect = function ( renderer, done, options ) {
 
 	var cameraLeft = new THREE.PerspectiveCamera();
 	var cameraRight = new THREE.PerspectiveCamera();
+
+	this.options = (options || {});
 
 	this._renderer = renderer;
 
@@ -149,20 +151,26 @@ THREE.VREffect = function ( renderer, done ) {
 		this.startFullscreen();
 	};
 
+	this.onFullScreenChanged = function(){
+	  var windowed = (!document.mozFullScreenElement && !document.webkitFullScreenElement);
+
+	  if ( windowed ) {
+	    this.setFullScreen( false );
+	    this.options.onWindowed && this.options.onWindowed();
+	  } else {
+	    this.options.onFullscreen && this.options.onFullscreen();
+	  }
+
+	};
+
 	this.startFullscreen = function() {
-		var self = this;
-		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
 		var canvas = renderer.domElement;
 		var fullScreenChange =
 			canvas.mozRequestFullScreen? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
-		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
-		function onFullScreenChanged() {
-			if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
-				self.setFullScreen( false );
-			}
-		}
+		document.addEventListener( fullScreenChange, this.onFullScreenChanged.bind(this), false );
+
 		if ( canvas.mozRequestFullScreen ) {
 			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
 		} else {
