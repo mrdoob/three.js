@@ -10,13 +10,11 @@ THREE.DeviceOrientationControls = function ( object ) {
 	var scope = this;
 
 	this.object = object;
-
 	this.object.rotation.reorder( "YXZ" );
 
-	this.freeze = true;
+	this.enabled = true;
 
 	this.deviceOrientation = {};
-
 	this.screenOrientation = 0;
 
 	var onDeviceOrientationChangeEvent = function ( event ) {
@@ -64,22 +62,22 @@ THREE.DeviceOrientationControls = function ( object ) {
 		window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
 		window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
-		scope.freeze = false;
+		scope.enabled = true;
 
 	};
 
 	this.disconnect = function() {
 
-		scope.freeze = true;
-
 		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
 		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+		scope.enabled = false;
 
 	};
 
 	this.update = function () {
 
-		if ( scope.freeze ) return;
+		if ( scope.enabled === false ) return;
 
 		var alpha  = scope.deviceOrientation.alpha ? THREE.Math.degToRad( scope.deviceOrientation.alpha ) : 0; // Z
 		var beta   = scope.deviceOrientation.beta  ? THREE.Math.degToRad( scope.deviceOrientation.beta  ) : 0; // X'
