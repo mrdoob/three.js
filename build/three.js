@@ -9781,15 +9781,15 @@ THREE.Geometry.prototype = {
 
 		this.boundingSphere.setFromPoints( this.vertices );
 
-	},
-	
+	},	
+
 	merge: function ( geometry, matrix, materialIndexOffset ) {
 	
 		console.warn( 'THREE.Geometry.merge() has been renamed to THREE.Geometry.mergeGeometry().' );
 		this.mergeGeometry( geometry, matrix, materialIndexOffset );
 	
-	},
-	
+	},	
+
 	mergeMesh: function ( mesh ) {
 	
 		if ( mesh instanceof THREE.Mesh === false ) {
