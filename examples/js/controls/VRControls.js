@@ -44,11 +44,17 @@ THREE.VRControls = function ( object, callback ) {
 
 		if ( vrInput === undefined ) return;
 
-		var orientation = vrInput.getState().orientation;
+		var state = vrInput.getState();
 
-		if ( orientation !== null ) {
+		if ( state.orientation !== null ) {
 
-			object.quaternion.set( orientation.x, orientation.y, orientation.z, orientation.w );
+			object.quaternion.copy( state.orientation );
+
+		}
+
+		if ( state.position !== null ) {
+
+			object.position.copy( state.position );
 
 		}
 
