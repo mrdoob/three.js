@@ -13,10 +13,23 @@
                   but draws it using the (slower) <a href="http://www.w3.org/html/wg/drafts/2dcontext/html5_canvas/">Canvas 2D Context</a> API.</div>
 		<div class="desc">This renderer can be a nice fallback from [page:WebGLRenderer] for simple scenes:</div>
 		<code>
-		if (window.WebGLRenderingContext)
+		function webglAvailable() {
+			try {
+				var canvas = document.createElement( 'canvas' );
+				return !!( window.WebGLRenderingContext && (
+					canvas.getContext( 'webgl' ) ||
+					canvas.getContext( 'experimental-webgl' ) )
+				);
+			} catch ( e ) {
+				return false;
+			}
+		}
+
+		if ( webglAvailable() ) {
 			renderer = new THREE.WebGLRenderer();
-		else
+		} else {
 			renderer = new THREE.CanvasRenderer();
+		}
 		</code>
 		<div class="desc">
 			Note: both WebGLRenderer and CanvasRenderer are embedded in the web page using an HTML5 &lt;canvas&gt; tag.
