@@ -161,7 +161,7 @@ THREE.Geometry.prototype = {
 			}
 
 		}
-		
+
 		this.computeFaceNormals();
 
 		if ( geometry.boundingBox !== null ) {
@@ -557,32 +557,10 @@ THREE.Geometry.prototype = {
 	},
 
 	merge: function ( geometry, matrix, materialIndexOffset ) {
-	
-		console.warn( 'THREE.Geometry.merge() has been renamed to THREE.Geometry.mergeGeometry().' );
-		this.mergeGeometry( geometry, matrix, materialIndexOffset );
-	
-	},
-
-	mergeMesh: function ( mesh ) {
-	
-		if ( mesh instanceof THREE.Mesh === false ) {
-		
-			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
-			return;
-		
-		}
-
-		mesh.matrixAutoUpdate && mesh.updateMatrix();
-		
-		this.mergeGeometry( mesh.geometry, mesh.matrix );
-	
-	},
-
-	mergeGeometry: function ( geometry, matrix, materialIndexOffset ) {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
-			console.error( 'THREE.Geometry.mergeGeometry(): geometry not an instance of THREE.Geometry.', geometry );
+			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
 
 		}
@@ -685,6 +663,21 @@ THREE.Geometry.prototype = {
 			uvs1.push( uvCopy );
 
 		}
+
+	},
+
+	mergeMesh: function ( mesh ) {
+
+		if ( mesh instanceof THREE.Mesh === false ) {
+
+			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
+			return;
+
+		}
+
+		mesh.matrixAutoUpdate && mesh.updateMatrix();
+
+		this.merge( mesh.geometry, mesh.matrix );
 
 	},
 
