@@ -179,8 +179,8 @@
 					// projection: 'normal',
 					middleGrey: 0.6,
 					maxLuminance: 16,
-					avgLuminance: 4,
-					bloomAmount: 1.0,
+					avgLuminance: 1,
+					bloomAmount: 2.0,
 					sceneLight: 2.0,
 					// clear: function() {
 					// 	removeDecals();
@@ -246,9 +246,9 @@
 		        // "sampleUV.y = clamp( cameraVectorN.y * -0.5 + 0.5, 0.0, 1.0);",
 		        // "sampleUV.x = atan( cameraVectorN.z, cameraVectorN.x ) * 0.15915494309189533576888376337251 + 0.5;",
 		        "vec4 colour = texture2D( map, sampleUV );",
-		        "vec3 environmentColor = RGBMDecode( colour ).xyz;",
+		        // "vec3 environmentColor = LogLuvDecode( colour ).xyz;",
 		      
-			      "gl_FragColor = vec4( environmentColor.xyz, 1.0 );",
+			      "gl_FragColor = colour;",//vec4( environmentColor.xyz, 1.0 );",
 
 			    "}"
 
@@ -264,6 +264,7 @@
 					depthTest: false,
 					// color: 0xffffff
 					hdrOutput: false,
+					blending: THREE.NoBlending
 				} );
 
 				var hdrUrl = 'textures/hdr/rgbmTest.png';
@@ -317,7 +318,9 @@
 				effectComposer = new THREE.EffectComposer( renderer, renderTarget );
   			effectComposer.setSize( window.innerWidth, window.innerHeight );
 				var bgPass = new THREE.RenderPass( sceneBG, cameraBG );
-				var scenePass = new THREE.RenderPass( scene, camera );
+				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, true, false );
+				var sceneTransparentPass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, false, true );
+				sceneTransparentPass.clear = false;
 				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
   			scenePass.clear = false;
   			
@@ -326,9 +329,15 @@
   			effectComposer.addPass( scenePass );
 
   			toneMapPass = new THREE.ShaderPass( THREE.ToneMapShader );
+  			toneMapPass.needsSwap = true;
+  			toneMapPass.clear = false;
   			effectComposer.addPass( toneMapPass );
 
+  			// sceneTransparentPass.needsSwap = true;
+  			effectComposer.addPass( sceneTransparentPass );
+
   			bloomPass = new THREE.BloomPass();
+  			// bloomPass.clear = true;
   			effectComposer.addPass( bloomPass );
   			
   			// if ( renderer.hdrOutput ) {
@@ -590,7 +599,7 @@
 
 				}
 
-				loader.load( CARS[ "camaro" ].url, function( geometry ) { createScene( geometry, "camaro" ) } );
+				loader.load( CARS[ "f50" ].url, function( geometry ) { createScene( geometry, "f50" ) } );
 
 				for( var c in CARS ) initCarButton( c );
 

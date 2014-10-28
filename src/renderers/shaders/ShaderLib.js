@@ -72,6 +72,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -90,6 +91,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 

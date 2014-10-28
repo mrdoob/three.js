@@ -154,6 +154,8 @@
 			var loader = new THREE.BinaryLoader( true );
 			document.body.appendChild( loader.statusDomElement );
 
+			var renderOptions = { renderOpaque: true, renderTransparent: false }
+
 			init();
 			animate();
 
@@ -634,7 +636,12 @@
 				cameraCube.rotation.copy( camera.rotation );
 
 				renderer.render( sceneCube, cameraCube );
-				renderer.render( scene, camera );
+				renderOptions.renderOpaque = true;
+				renderOptions.renderTransparent = false;
+				renderer.render( scene, camera, undefined, undefined, renderOptions );
+				renderOptions.renderOpaque = false;
+				renderOptions.renderTransparent = true;
+				renderer.render( scene, camera, undefined, undefined, renderOptions );
 
 				if ( STATS_ENABLED ) stats.update();
 

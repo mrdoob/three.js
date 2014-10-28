@@ -60,11 +60,11 @@ THREE.ToneMapShader = {
 
 			"vec4 texel = texture2D( tDiffuse, vUv );",
 			"#ifdef LOGLUV_HDR_INPUT",
-				"gl_FragColor.xyz = ToneMap( LogLuvDecode( texel ) );",
+				"gl_FragColor = vec4( ToneMap( LogLuvDecode( texel ) ), 1.0 );",
 			"#elif defined( RGBM_HDR_INPUT )",
-				"gl_FragColor.xyz = ToneMap( RGBMDecode( texel ) );",
+				"gl_FragColor = vec4( ToneMap( RGBMDecode( texel ) ), 1.0 );",
 			"#else",
-				"gl_FragColor.xyz = ToneMap( texel.xyz );",
+				"gl_FragColor = vec4( ToneMap( texel.xyz ), 1.0 );",
 			"#endif",
 			// THREE.ShaderChunk['hdr_encode_fragment'],
 
