@@ -41,10 +41,12 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script>
 
 			var camera, scene, renderer,
-			particle1, particle2, particle2,
 			light1, light2, light3,
 			loader, mesh;
 
@@ -80,14 +82,14 @@
 
 				}
 
-				particle1 = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xff0040, program: program } ) );
-				scene.add( particle1 );
+				var sprite = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xff0040, program: program } ) );
+				light1.add( sprite );
 
-				particle2 = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x0040ff, program: program } ) );
-				scene.add( particle2 );
+				var sprite = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x0040ff, program: program } ) );
+				light2.add( sprite );
 
-				particle3 = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x80ff80, program: program } ) );
-				scene.add( particle3 );
+				var sprite = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x80ff80, program: program } ) );
+				light3.add( sprite );
 
 				loader = new THREE.JSONLoader();
 				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
@@ -131,29 +133,17 @@
 
 				if ( mesh ) mesh.rotation.y -= 0.01;
 
-				particle1.position.x = Math.sin( time * 0.7 ) * 30;
-				particle1.position.y = Math.cos( time * 0.5 ) * 40;
-				particle1.position.z = Math.cos( time * 0.3 ) * 30;
+				light1.position.x = Math.sin( time * 0.7 ) * 30;
+				light1.position.y = Math.cos( time * 0.5 ) * 40;
+				light1.position.z = Math.cos( time * 0.3 ) * 30;
 
-				light1.position.x = particle1.position.x;
-				light1.position.y = particle1.position.y;
-				light1.position.z = particle1.position.z;
+				light2.position.x = Math.cos( time * 0.3 ) * 30;
+				light2.position.y = Math.sin( time * 0.5 ) * 40;
+				light2.position.z = Math.sin( time * 0.7 ) * 30;
 
-				particle2.position.x = Math.cos( time * 0.3 ) * 30;
-				particle2.position.y = Math.sin( time * 0.5 ) * 40;
-				particle2.position.z = Math.sin( time * 0.7 ) * 30;
-
-				light2.position.x = particle2.position.x;
-				light2.position.y = particle2.position.y;
-				light2.position.z = particle2.position.z;
-
-				particle3.position.x = Math.sin( time * 0.7 ) * 30;
-				particle3.position.y = Math.cos( time * 0.3 ) * 40;
-				particle3.position.z = Math.sin( time * 0.5 ) * 30;
-
-				light3.position.x = particle3.position.x;
-				light3.position.y = particle3.position.y;
-				light3.position.z = particle3.position.z;
+				light3.position.x = Math.sin( time * 0.7 ) * 30;
+				light3.position.y = Math.cos( time * 0.3 ) * 40;
+				light3.position.z = Math.sin( time * 0.5 ) * 30;
 
 				renderer.render( scene, camera );
 

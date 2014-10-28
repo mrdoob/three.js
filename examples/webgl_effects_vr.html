@@ -12,13 +12,21 @@
 				overflow: hidden;
 			}
 
-			.button {
+			.menu {
 				position: fixed;
 				bottom: 20px;
 				right: 20px;
+			}
+
+			.button {
+				display: inline-block;
 				padding: 8px;
 				color: #FFF;
 				background-color: #555;
+			}
+
+			.button.enabled {
+				background-color: rgb(18, 36, 70);
 			}
 
 			.button:hover {
@@ -34,9 +42,13 @@
 		</style>
 	</head>
 	<body>
-		<div class="button">Start VR Mode</div>
+		<div class="menu">
+			<div class="button mouse-look">Enable Mouse Look</div>
+			<div class="button full-screen">Start VR Mode</div>
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
+		<script src="js/controls/MouseControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -44,9 +56,11 @@
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, raycaster, renderer;
+			var camera, scene, raycaster, renderer;
 			var vrEffect;
 			var vrControls;
+			var mouseControls;
+			var headControls;
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
@@ -71,12 +85,8 @@
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
-				scene.add( light );
-
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
 				var geometry = new THREE.BoxGeometry( 20, 20, 20 );
@@ -101,18 +111,35 @@
 
 				}
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
-				renderer = new THREE.WebGLRenderer();
-				var fullScreenButton = document.querySelector( '.button' );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+				var fullScreenButton = document.querySelector( '.full-screen' );
+				var mouseLookButton = document.querySelector( '.mouse-look' );
+				var mouseLook = false;
+
 				fullScreenButton.onclick = function() {
 					vrEffect.setFullScreen( true );
 				};
 
-				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
 				vrControls = new THREE.VRControls(camera);
+				mouseControls = new THREE.MouseControls(camera);
+				headControls = vrControls;
 
+				mouseLookButton.onclick = function() {
+					mouseLook = !mouseLook;
+
+					if (mouseLook) {
+						headControls = mouseControls;
+						mouseLookButton.classList.add('enabled');
+					} else {
+						headControls = vrControls;
+						mouseLookButton.classList.remove('enabled');
+					}
+				}
+
+				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
 				function VREffectLoaded(error) {
 					if (error) {
 						fullScreenButton.innerHTML = error;
@@ -143,7 +170,7 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				vrEffect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -178,8 +205,7 @@
 
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
 
 				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 
@@ -205,7 +231,7 @@
 
 				}
 
-				vrControls.update();
+				headControls.update();
 				vrEffect.render( scene, camera );
 
 			}

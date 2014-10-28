@@ -1,8 +1,13 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Toolbar = function ( editor ) {
 
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
+	container.setId( 'toolbar' );
 
 	var buttons = new UI.Panel();
 	container.add( buttons );
@@ -45,10 +50,15 @@ var Toolbar = function ( editor ) {
 	buttons.add( local );
 	buttons.add( new UI.Text( 'local' ) );
 
+	var showGrid = new UI.Checkbox().onChange( update ).setValue( true );
+	buttons.add( showGrid );
+	buttons.add( new UI.Text( 'show' ) );
+
 	function update() {
 
 		signals.snapChanged.dispatch( snap.getValue() === true ? grid.getValue() : null );
 		signals.spaceChanged.dispatch( local.getValue() === true ? "local" : "world" );
+		signals.showGridChanged.dispatch( showGrid.getValue() );
 
 	}
 

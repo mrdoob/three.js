@@ -8,6 +8,8 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
+	this.type = 'SkinnedMesh';
+
 	this.bindMode = "attached";
 	this.bindMatrix = new THREE.Matrix4();
 	this.bindMatrixInverse = new THREE.Matrix4();

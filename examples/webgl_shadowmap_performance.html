@@ -57,8 +57,6 @@
 
 			var NEAR = 5, FAR = 3000;
 
-			var sceneHUD, cameraOrtho, hudMaterial;
-
 			var morph, morphs = [];
 
 			var light;
@@ -89,7 +87,8 @@
 				controls.verticalMin = 1.5;
 				controls.verticalMax = 2.0;
 
-				controls.lon = -110;
+				controls.lon = 250;
+				controls.lat = 30;
 
 				// SCENE
 
@@ -121,7 +120,6 @@
 
 				scene.add( light );
 
-				createHUD();
 				createScene();
 
 				// RENDERER
@@ -166,34 +164,11 @@
 
 			}
 
-			function createHUD() {
-
-				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
-				cameraOrtho.position.z = 10;
-
-				var shader = THREE.UnpackDepthRGBAShader;
-				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
-
-				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
-
-				var hudGeo = new THREE.PlaneGeometry( SHADOW_MAP_WIDTH / 2, SHADOW_MAP_HEIGHT / 2 );
-				var hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
-				hudMesh.position.x = ( SCREEN_WIDTH - SHADOW_MAP_WIDTH / 2 ) * -0.5;
-				hudMesh.position.y = ( SCREEN_HEIGHT - SHADOW_MAP_HEIGHT / 2 ) * -0.5;
-				hudMesh.rotation.x = Math.PI / 2;
-
-				sceneHUD = new THREE.Scene();
-				sceneHUD.add( hudMesh );
-
-				cameraOrtho.lookAt( sceneHUD.position );
-
-			}
-
 			function createScene( ) {
 
 				// GROUND
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 				planeMaterial.ambient = planeMaterial.color;
 
@@ -412,11 +387,6 @@
 
 				renderer.clear();
 				renderer.render( scene, camera );
-
-				// Render debug HUD with shadow map
-
-				//hudMaterial.uniforms.tDiffuse.texture = light.shadowMap;
-				//renderer.render( sceneHUD, cameraOrtho );
 
 			}
 

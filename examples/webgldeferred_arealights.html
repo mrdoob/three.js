@@ -69,10 +69,9 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var SCALE = 1;
-			var MARGIN = 100;
 
 			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight - 2 * MARGIN;
+			var HEIGHT = window.innerHeight;
 
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 40;
@@ -109,10 +108,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true, tonemapping: THREE.FilmicOperator, brightness: 2.5 } );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = MARGIN + "px";
-				renderer.domElement.style.left = "0px";
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -175,9 +170,6 @@
 				geometry.faces[ 0 ].color.setHex( backColor );
 
 				var emitter = new THREE.Mesh( geometry, material );
-
-				emitter.position = light.position;
-				emitter.quaternion.copy( light.quaternion );
 				emitter.scale.set( light.width * 2, 0.2, light.height * 2 );
 
 				return emitter;
@@ -203,11 +195,10 @@
 				areaLight1.rotation.set( -0.74719, 0.0001, 0.0001 );
 				areaLight1.width = 10;
 				areaLight1.height = 1;
-
 				scene.add( areaLight1 );
 
 				var meshEmitter = createAreaEmitter( areaLight1 );
-				scene.add( meshEmitter );
+				areaLight1.add( meshEmitter );
 
 				//
 
@@ -216,11 +207,10 @@
 				areaLight2.rotation.set( -1.5707, 0.0001, 1.5707 );
 				areaLight2.width = 8;
 				areaLight2.height = 1;
-
 				scene.add( areaLight2 );
 
 				var meshEmitter = createAreaEmitter( areaLight2 );
-				scene.add( meshEmitter );
+				areaLight2.add( meshEmitter );
 
 				//
 
@@ -229,11 +219,10 @@
 				areaLight3.rotation.set( 1.5707, 0.0001, -1.5707 );
 				areaLight3.width = 8;
 				areaLight3.height = 1;
-
 				scene.add( areaLight3 );
 
 				var meshEmitter = createAreaEmitter( areaLight3 );
-				scene.add( meshEmitter );
+				areaLight3.add( meshEmitter );
 
 			}
 

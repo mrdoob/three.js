@@ -191,7 +191,7 @@
 	this.materialOcean.blending = 0;
 
 	// Create the simulation plane
-	this.screenQuad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ) );
+	this.screenQuad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ) );
 	this.scene.add(this.screenQuad);
 
 	// Initialise spectrum data
@@ -203,7 +203,7 @@
 
 THREE.Ocean.prototype.generateMesh = function () {
 
-	var geometry = new THREE.PlaneGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
+	var geometry = new THREE.PlaneBufferGeometry( this.geometrySize, this.geometrySize, this.geometryResolution, this.geometryResolution );
 
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 

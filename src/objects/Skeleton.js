@@ -136,8 +136,7 @@ THREE.Skeleton.prototype.pose = function () {
 				bone.matrix.getInverse( bone.parent.matrixWorld );
 				bone.matrix.multiply( bone.matrixWorld );
 
-			}
-			else {
+			} else {
 
 				bone.matrix.copy( bone.matrixWorld );
 
@@ -151,28 +150,32 @@ THREE.Skeleton.prototype.pose = function () {
 
 };
 
-THREE.Skeleton.prototype.update = function () {
+THREE.Skeleton.prototype.update = ( function () {
 
 	var offsetMatrix = new THREE.Matrix4();
+	
+	return function () {
 
-	// flatten bone matrices to array
+		// flatten bone matrices to array
 
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
-		// compute the offset between the current and the original transform
+			// compute the offset between the current and the original transform
 
-		var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
+			var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
 
-		offsetMatrix.multiplyMatrices( matrix, this.boneInverses[ b ] );
-		offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+			offsetMatrix.multiplyMatrices( matrix, this.boneInverses[ b ] );
+			offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
 
-	}
+		}
 
-	if ( this.useVertexTexture ) {
+		if ( this.useVertexTexture ) {
 
-		this.boneTexture.needsUpdate = true;
+			this.boneTexture.needsUpdate = true;
 
-	}
+		}
+		
+	};
 
-};
+} )();
 

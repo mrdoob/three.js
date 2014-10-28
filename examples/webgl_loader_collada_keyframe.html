@@ -55,7 +55,7 @@
 			var kfAnimations = [ ];
 			var kfAnimationsLength = 0;
 			var loader = new THREE.ColladaLoader();
-			var lastTimestamp;
+			var lastTimestamp = 0;
 			var progress = 0;
 
 			loader.load( './models/collada/pump/pump.dae', function ( collada ) {
@@ -91,7 +91,6 @@
 				for ( var i = 0; i < kfAnimationsLength; ++i ) {
 
 					var animation = animations[ i ];
-					THREE.AnimationHandler.add( animation );
 
 					var kfAnimation = new THREE.KeyFrameAnimation( animation );
 					kfAnimation.timeScale = 1;
@@ -189,18 +188,17 @@
 						}
 
 					}
+
 					animation.loop = false;
 					animation.play();
-					lastTimestamp = Date.now();
 
 				}
 
 			}
 
-			function animate() {
+			function animate( timestamp ) {
 
-				var timestamp = Date.now();
-				var frameTime = ( timestamp - lastTimestamp ) * 0.001; // seconds
+				var frameTime = ( timestamp - lastTimestamp ) * 0.001;
 
 				if ( progress >= 0 && progress < 48 ) {
 

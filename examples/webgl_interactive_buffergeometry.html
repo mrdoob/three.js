@@ -47,7 +47,7 @@
 
 			var camera, scene, renderer;
 
-			var projector, raycaster, mouse, points = [];
+			var raycaster, mouse, points = [];
 
 			var mesh, line;
 
@@ -198,7 +198,6 @@
 
 				//
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
 
 				mouse = new THREE.Vector2();
@@ -269,8 +268,7 @@
 				mesh.rotation.x = time * 0.15;
 				mesh.rotation.y = time * 0.25;
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
 
 				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 
@@ -279,19 +277,15 @@
 				if ( intersects.length > 0 ) {
 
 					var intersect = intersects[ 0 ];
+					var face = intersect.face;
 
-					var object = intersect.object;
-					var positions = object.geometry.attributes.position.array;
+					var linePosition = line.geometry.attributes.position;
+					var meshPosition = mesh.geometry.attributes.position;
 
-					for ( var i = 0, j = 0; i < 4; i ++, j += 3 ) {
-
-						var index = intersect.indices[ i % 3 ] * 3;
-
-						line.geometry.attributes.position.array[ j     ] = positions[ index     ];
-						line.geometry.attributes.position.array[ j + 1 ] = positions[ index + 1 ];
-						line.geometry.attributes.position.array[ j + 2 ] = positions[ index + 2 ];
-
-					}
+					linePosition.copyAt( 0, meshPosition, face.a );
+					linePosition.copyAt( 1, meshPosition, face.b );
+					linePosition.copyAt( 2, meshPosition, face.c );
+					linePosition.copyAt( 3, meshPosition, face.a );
 
 					mesh.updateMatrix();
 					

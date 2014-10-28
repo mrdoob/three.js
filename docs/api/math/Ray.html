@@ -26,19 +26,19 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Vector3 origin]</h3>
+		<h3>[property:Vector3 origin]</h3>
 		<div>
 		The origin of the [page:Ray].
 		</div> 
 
-		<h3>.[page:Vector3 direction]</h3>
+		<h3>[property:Vector3 direction]</h3>
 		<div>
 		The direction of the [page:Ray]. This must be normalized (with [page:Vector3].normalize) for the methods to operate properly.
 		</div> 
 
 		<h2>Methods</h2>
 
-		<h3>.applyMatrix4([page:Matrix4 matrix4]) [page:Ray]</h3>
+		<h3>[method:Ray applyMatrix4]([page:Matrix4 matrix4])</h3>
 		<div>
 		matrix4 -- [page:Matrix4] The [page:Matrix4] to transform this [page:Ray] by.
 		</div>
@@ -55,12 +55,12 @@
 		Get a [page:Vector3] that is a given distance along this [page:Ray].
 		</div>
 
-		<h3>.clone() [page:Ray]</h3>
+		<h3>[method:Ray clone]()</h3>
 		<div>
 		Create a clone of this [page:Ray].
 		</div>
 
-		<h3>.closestPointToPoint([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
+		<h3>[method:Vector3 closestPointToPoint]([page:Vector3 point], [page:Vector3 optionalTarget])</h3>
 		<div>
 		point -- [page:Vector3] The point to get the closest approach to. <br />
 		optionalTarget -- [page:Vector3] Receives the return value if passed; otherwise a new [page:Vector3] is created.
@@ -69,7 +69,7 @@
 		Get the point along this [page:Ray] that is closest to the [page:Vector3] provided.
 		</div>
 
-		<h3>.copy([page:Ray ray]) [page:Ray]</h3>
+		<h3>[method:Ray copy]([page:Ray ray])</h3>
 		<div>
 		ray -- [page:Ray] The [page:Ray] to copy values from.
 		</div>
@@ -88,7 +88,7 @@
 		Get the squared distance between this [page:Ray] and a line segment.
 		</div>
 
-		<h3>.distanceToPlane([page:Plane plane]) [page:Float]</h3>
+		<h3>[method:Float distanceToPlane]([page:Plane plane])</h3>
 		<div>
 		plane -- [page:Plane] The [page:Plane] to get the distance to.
 		</div>
@@ -96,7 +96,7 @@
 		Get the distance from the origin to the [page:Plane], or *null* if the [page:Ray] doesn't intersect the [page:Plane].
 		</div>
 
-		<h3>.distanceToPoint([page:Vector3 point]) [page:Float]</h3>
+		<h3>[method:Float distanceToPoint]([page:Vector3 point])</h3>
 		<div>
 		point -- [page:Vector3] The [page:Vector3] to compute a distance to.
 		</div>
@@ -104,7 +104,7 @@
 		Get the distance of the closest approach between the [page:Ray] and the [page:Vector3].
 		</div>
 
-		<h3>.equals([page:Ray ray]) [page:Boolean]</h3>
+		<h3>[method:Boolean equals]([page:Ray ray])</h3>
 		<div>
 		ray -- [page:Ray] The [page:Ray] to compare to.
 		</div>
@@ -141,7 +141,7 @@
 		Intersect this [page:Ray] with a triangle, returning the intersection point or *null* if there is no intersection.
 		</div>
 		
-		<h3>.isIntersectionBox([page:Box3 box]) [page:Boolean]</h3>
+		<h3>[method:Boolean isIntersectionBox]([page:Box3 box])</h3>
 		<div>
 		box -- [page:Box3] The [page:Box3] to intersect with.
 		</div>
@@ -149,7 +149,7 @@
 		Return whether or not this [page:Ray] intersects with the [page:Box3].
 		</div>
 
-		<h3>.isIntersectionPlane([page:Plane plane]) [page:Boolean]</h3>
+		<h3>[method:Boolean isIntersectionPlane]([page:Plane plane])</h3>
 		<div>
 		plane -- [page:Plane] The [page:Plane] to intersect with.
 		</div>
@@ -157,7 +157,7 @@
 		Return whether or not this [page:Ray] intersects with the [page:Plane].
 		</div>
 
-		<h3>.isIntersectionSphere([page:Sphere sphere]) [page:Boolean]</h3>
+		<h3>[method:Boolean isIntersectionSphere]([page:Sphere sphere])</h3>
 		<div>
 		sphere -- [page:Sphere] The [page:Sphere] to intersect with.
 		</div>
@@ -165,7 +165,7 @@
 		Return whether or not this [page:Ray] intersects with the [page:Sphere].
 		</div>
 
-		<h3>.recast([page:Float t])</h3>
+		<h3>[method:Ray recast]([page:Float t])</h3>
 		<div>
 		t -- The distance along the [page:Ray] to interpolate.
 		</div>
@@ -173,7 +173,7 @@
 		Shift the origin of this [page:Ray] along its direction by the distance given.
 		</div>
 
-		<h3>.set([page:Vector3 origin], [page:Vector3 direction]) [page:Ray]</h3>
+		<h3>[method:Ray set]([page:Vector3 origin], [page:Vector3 direction])</h3>
 		<div>
 		origin -- [page:Vector3] The origin of the [page:Ray].<br />
 		direction -- [page:Vector3] The direction of the [page:Ray]. This must be normalized (with [page:Vector3].normalize) for the methods to operate properly.

@@ -104,7 +104,7 @@
 				scene1.add( light1 );
 
 				var light2 = new THREE.DirectionalLight( 0xffffff, 2 );
-				light2.position = light1.position;
+				light2.position.set( 1, 1, 1 );
 				scene2.add( light2 );
 
 				// GROUND
@@ -139,7 +139,7 @@
 
 				//
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.rotation.x = - Math.PI / 2;

@@ -25,7 +25,7 @@ THREE.SVGLoader.prototype = {
 
 			onLoad( doc.firstChild );
 
-		} );
+		}, onProgress, onError );
 
 	}
 };

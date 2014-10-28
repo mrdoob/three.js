@@ -166,8 +166,8 @@
 				light.castShadow = true;
 				//light.shadowCameraVisible = true;
 
-				light.shadowMapWidth = 2048;
-				light.shadowMapHeight = 2048;
+				light.shadowMapWidth = 1024;
+				light.shadowMapHeight = 1024;
 
 				var d = 300;
 
@@ -178,11 +178,6 @@
 
 				light.shadowCameraFar = 1000;
 				light.shadowDarkness = 0.5;
-
-				scene.add( light );
-
-				light = new THREE.DirectionalLight( 0x3dff0c, 0.35 );
-				light.position.set( 0, -1, 0 );
 
 				scene.add( light );
 
@@ -238,7 +233,7 @@
 				
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: groundTexture } );
 
-				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000 ), groundMaterial );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 				mesh.position.y = -250;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;

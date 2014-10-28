@@ -56,7 +56,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
@@ -279,7 +279,7 @@
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( -1200, 800, 1200 );
 
-				controls = new THREE.TrackballControls( camera );
+				controls = new THREE.OrbitControls( camera );
 				controls.target.set( 0, 0, 0 );
 
 				controls.rotateSpeed = 1.0;
@@ -288,9 +288,6 @@
 
 				controls.noZoom = false;
 				controls.noPan = false;
-
-				controls.staticMoving = false;
-				controls.dynamicDampingFactor = 0.15;
 
 				controls.keys = [ 65, 83, 68 ];
 
@@ -320,7 +317,10 @@
 				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
+				heightMap.generateMipmaps = false;
+
 				normalMap = new THREE.WebGLRenderTarget( rx, ry, pars );
+				normalMap.generateMipmaps = false;
 
 				uniformsNoise = {
 
@@ -341,6 +341,7 @@
 				// TEXTURES
 
 				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
+				specularMap.generateMipmaps = false;
 
 				var diffuseTexture1 = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, function () {
 
@@ -409,7 +410,7 @@
 				}
 
 
-				var plane = new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
+				var plane = new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				quadTarget.position.z = -500;
@@ -417,7 +418,7 @@
 
 				// TERRAIN MESH
 
-				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
+				var geometryTerrain = new THREE.PlaneBufferGeometry( 6000, 6000, 256, 256 );
 				geometryTerrain.computeTangents();
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ "terrain" ] );
@@ -457,7 +458,9 @@
 				renderer.autoClear = false;
 
 				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+				renderTarget.generateMipmaps = false;
 
 				effectBloom = new THREE.BloomPass( 0.6 );
 				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );

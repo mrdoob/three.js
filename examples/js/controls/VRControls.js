@@ -1,73 +1,65 @@
 /**
  * @author dmarcos / https://github.com/dmarcos
+ * @author mrdoob / http://mrdoob.com
  */
 
-THREE.VRControls = function ( camera, done ) {
+THREE.VRControls = function ( object, callback ) {
 
-	this._camera = camera;
+	var vrInput;
 
-	this._init = function () {
-		var self = this;
-		if ( !navigator.mozGetVRDevices ) {
-			if ( done ) {
-				done("Your browser is not VR Ready");
+	var onVRDevices = function ( devices ) {
+
+		for ( var i = 0; i < devices.length; i ++ ) {
+
+			var device = devices[ i ];
+
+			if ( device instanceof PositionSensorVRDevice ) {
+
+				vrInput = devices[ i ];
+				return; // We keep the first we encounter
+
 			}
-			return;
+
 		}
-		navigator.mozGetVRDevices( gotVRDevices );
-		function gotVRDevices( devices ) {
-			var vrInput;
-			var error;
-			for ( var i = 0; i < devices.length; ++i ) {
-				if ( devices[i] instanceof PositionSensorVRDevice ) {
-					vrInput = devices[i]
-					self._vrInput = vrInput;
-					break; // We keep the first we encounter
-				}
-			}
-			if ( done ) {
-				if ( !vrInput ) {
-				 error = 'HMD not available';
-				}
-				done( error );
-			}
+
+		if ( callback !== undefined ) {
+
+			callback( 'HMD not available' );
+
 		}
+
 	};
 
-	this._init();
+	if ( navigator.getVRDevices !== undefined ) {
 
-	this.update = function() {
-		var camera = this._camera;
-		var quat;
-		var vrState = this.getVRState();
-		if ( !vrState ) {
-			return;
+		navigator.getVRDevices().then( onVRDevices );
+
+	} else if ( callback !== undefined ) {
+
+		callback( 'Your browser is not VR Ready' );
+
+	}
+
+	this.update = function () {
+
+		if ( vrInput === undefined ) return;
+
+		var orientation = vrInput.getState().orientation;
+
+		if ( orientation !== null ) {
+
+			object.quaternion.set( orientation.x, orientation.y, orientation.z, orientation.w );
+
 		}
-		// Applies head rotation from sensors data.
-		if ( camera ) {
-			camera.quaternion.fromArray( vrState.hmd.rotation );
-		}
+
 	};
 
-	this.getVRState = function() {
-		var vrInput = this._vrInput;
-		var orientation;
-		var vrState;
-		if ( !vrInput ) {
-			return null;
-		}
-		orientation	= vrInput.getState().orientation;
-		vrState = {
-			hmd : {
-				rotation : [
-					orientation.x,
-					orientation.y,
-					orientation.z,
-					orientation.w
-				]
-			}
-		};
-		return vrState;
+	this.zeroSensor = function () {
+
+		if ( vrInput === undefined ) return;
+
+		vrInput.zeroSensor();
+
 	};
 
 };

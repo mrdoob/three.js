@@ -4,8 +4,6 @@
 
 
 THREE.glTFLoader = function (showStatus) {
-	this.useBufferGeometry = (THREE.glTFLoader.useBufferGeometry !== undefined ) ?
-			THREE.glTFLoader.useBufferGeometry : true;
     this.meshesRequested = 0;
     this.meshesLoaded = 0;
     this.pendingMeshes = [];
@@ -86,12 +84,8 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     var ClassicGeometry = function() {
 
-    	if (theLoader.useBufferGeometry) {
-    		this.geometry = new THREE.BufferGeometry;
-    	}
-    	else {
-    		this.geometry = new THREE.Geometry;
-    	}
+        this.geometry = new THREE.BufferGeometry;
+
         this.totalAttributes = 0;
         this.loadedAttributes = 0;
         this.indicesLoaded = false;
@@ -105,56 +99,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     ClassicGeometry.prototype.constructor = ClassicGeometry;
 
-    ClassicGeometry.prototype.buildArrayGeometry = function() {
-
-    	// Build indexed mesh
-        var geometry = this.geometry;
-        var normals = geometry.normals;
-        var indexArray = this.indexArray;
-        var uvs = this.uvs;
-        var a, b, c;
-        var i, l;
-        var faceNormals = null;
-        var faceTexcoords = null;
-        
-        for(i = 0, l = this.indexArray.length; i < l; i += 3) {
-            a = indexArray[i];
-            b = indexArray[i+1];
-            c = indexArray[i+2];
-            if(normals) {
-                faceNormals = [normals[a], normals[b], normals[c]];
-            }
-            geometry.faces.push( new THREE.Face3( a, b, c, faceNormals, null, null ) );
-            if(uvs) {
-                geometry.faceVertexUvs[0].push([ uvs[a], uvs[b], uvs[c] ]);
-            }
-        }
-
-        // Allow Three.js to calculate some values for us
-        geometry.computeBoundingBox();
-        geometry.computeBoundingSphere();
-        geometry.computeFaceNormals();
-        if(!normals) {
-            geometry.computeVertexNormals();
-        }
-
-    }
-
     ClassicGeometry.prototype.buildBufferGeometry = function() {
         // Build indexed mesh
         var geometry = this.geometry;
-        geometry.attributes.index = {
-        		itemSize: 1,
-        		array : this.indexArray
-        };
 
-		var offset = {
-				start: 0,
-				index: 0,
-				count: this.indexArray.length
-			};
-
-		geometry.offsets.push( offset );
+        geometry.addAttribute( 'index', new THREE.BufferAttribute( this.indexArray, 1 ) );
+        geometry.addDrawCall( 0, this.indexArray.length, 0 );
 
         geometry.computeBoundingSphere();
     }
@@ -162,12 +112,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     ClassicGeometry.prototype.checkFinished = function() {
         if(this.indexArray && this.loadedAttributes === this.totalAttributes) {
         	
-        	if (theLoader.useBufferGeometry) {
-        		this.buildBufferGeometry();
-        	}
-        	else {
-        		this.buildArrayGeometry();
-        	}
+        	this.buildBufferGeometry();
         	
             this.finished = true;
 
@@ -272,16 +217,10 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         if(semantic == "POSITION") {
             // TODO: Should be easy to take strides into account here
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
-            geom.geometry.attributes.position = {
-            		itemSize: 3,
-            		array : floatArray
-            };
+            geom.geometry.addAttribute( 'position', new THREE.BufferAttribute( floatArray, 3 ) );
         } else if(semantic == "NORMAL") {
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
-            geom.geometry.attributes.normal = {
-            		itemSize: 3,
-            		array : floatArray
-            };
+            geom.geometry.addAttribute( 'normal', new THREE.BufferAttribute( floatArray, 3 ) );
         } else if ((semantic == "TEXCOORD_0") || (semantic == "TEXCOORD" )) {
         	
         	nComponents = componentsPerElementForGLType(attribute.type);
@@ -290,36 +229,23 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
             for (i = 0; i < floatArray.length / 2; i++) {
             	floatArray[i*2+1] = 1.0 - floatArray[i*2+1];
             }
-            geom.geometry.attributes.uv = {
-            		itemSize: nComponents,
-            		array : floatArray
-            };
+            geom.geometry.addAttribute( 'uv', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
         else if (semantic == "WEIGHT") {
         	nComponents = componentsPerElementForGLType(attribute.type);
             floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
-            geom.geometry.attributes.skinWeight = {
-            		itemSize: nComponents,
-            		array : floatArray
-            };        	
+            geom.geometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
         else if (semantic == "JOINT") {
         	nComponents = componentsPerElementForGLType(attribute.type);
             floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
-            geom.geometry.attributes.skinIndex = {
-            		itemSize: nComponents,
-            		array : floatArray
-            };        	
+            geom.geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
     }
     
     VertexAttributeDelegate.prototype.resourceAvailable = function(glResource, ctx) {
-    	if (theLoader.useBufferGeometry) {
-    		this.bufferResourceAvailable(glResource, ctx);
-    	}
-    	else {
-    		this.arrayResourceAvailable(glResource, ctx);
-    	}
+
+    	this.bufferResourceAvailable(glResource, ctx);
     	
         var geom = ctx.geometry;
         geom.loadedAttributes++;
@@ -1093,12 +1019,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
                 var m = description.matrix;
                 if(m) {
-                    threeNode.applyMatrix(new THREE.Matrix4(
-                        m[0],  m[4],  m[8],  m[12],
-                        m[1],  m[5],  m[9],  m[13],
-                        m[2],  m[6],  m[10], m[14],
-                        m[3],  m[7],  m[11], m[15]
-                    ));
+                    threeNode.applyMatrix(new THREE.Matrix4().fromArray( m ));
                     threeNode.matrixAutoUpdate = false;
                     threeNode.matrixWorldNeedsUpdate = true;
                 }
@@ -1266,7 +1187,8 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                            
                                     	threeMesh.boneInverses = [];
         	                            var jointsIds = skin.jointsIds;
-        	                            var joints = [];
+        	                            var bones = [];
+        	                            var boneInverses = [];
         	                            var i, len = jointsIds.length;
         	                            for (i = 0; i < len; i++) {
         	                            	var jointId = jointsIds[i];
@@ -1275,23 +1197,23 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                if (joint) {
         	                                	
         	                                	joint.skin = threeMesh;
-        	                                    joints.push(joint);
-        	                                    threeMesh.skeleton.bones.push(joint);
+        	                                    bones.push(joint);
         	                                    
         	                                    var m = skin.inverseBindMatrices;
-        	                    	            var mat = new THREE.Matrix4(
+        	                    	            var mat = new THREE.Matrix4().set(
         	                                            m[i * 16 + 0],  m[i * 16 + 4],  m[i * 16 + 8],  m[i * 16 + 12],
         	                                            m[i * 16 + 1],  m[i * 16 + 5],  m[i * 16 + 9],  m[i * 16 + 13],
         	                                            m[i * 16 + 2],  m[i * 16 + 6],  m[i * 16 + 10], m[i * 16 + 14],
         	                                            m[i * 16 + 3],  m[i * 16 + 7],  m[i * 16 + 11], m[i * 16 + 15]
         	                                        );
-        	                                    threeMesh.skeleton.boneInverses.push(mat);
-        	                                    threeMesh.pose();
+        	                                    boneInverses.push(mat);
         	                                    
         	                                } else {
         	                                    console.log("WARNING: jointId:"+jointId+" cannot be found in skeleton:"+skeleton);
         	                                }
         	                            }
+
+                                        threeMesh.bind(new THREE.Skeleton(bones, boneInverses, false));
                                     }
                                     
                                     if (threeMesh) {
@@ -1507,12 +1429,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         		};
         		
                 var m = description.bindShapeMatrix;
-	            skin.bindShapeMatrix = new THREE.Matrix4(
-                        m[0],  m[4],  m[8],  m[12],
-                        m[1],  m[5],  m[9],  m[13],
-                        m[2],  m[6],  m[10], m[14],
-                        m[3],  m[7],  m[11], m[15]
-                    );
+	            skin.bindShapeMatrix = new THREE.Matrix4().fromArray( m );
 	            
 	            skin.jointsIds = description.joints;
 	            var inverseBindMatricesDescription = description.inverseBindMatrices;

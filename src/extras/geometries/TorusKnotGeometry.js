@@ -7,6 +7,8 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 	THREE.Geometry.call( this );
 
+	this.type = 'TorusKnotGeometry';
+
 	this.parameters = {
 		radius: radius,
 		tube: tube,

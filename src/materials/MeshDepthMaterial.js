@@ -18,6 +18,8 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
+	this.type = 'MeshDepthMaterial';
+
 	this.morphTargets = false;
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;

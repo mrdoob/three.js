@@ -5,7 +5,11 @@
  * @author angelxuanchang
  */
 
-THREE.OBJMTLLoader = function () {};
+THREE.OBJMTLLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.OBJMTLLoader.prototype = {
 
@@ -45,9 +49,9 @@ THREE.OBJMTLLoader.prototype = {
 
 				onLoad( object );
 
-			} );
+			}, onProgress, onError );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -110,7 +114,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		}
 
-		var group = new THREE.Object3D();
+		var group = new THREE.Group();
 		var object = group;
 
 		var geometry = new THREE.Geometry();
@@ -147,7 +151,7 @@ THREE.OBJMTLLoader.prototype = {
 			}
 
 		}
-		
+
 		function add_uvs( a, b, c ) {
 
 			geometry.faceVertexUvs[ 0 ].push( [
@@ -157,19 +161,19 @@ THREE.OBJMTLLoader.prototype = {
 			] );
 
 		}
-		
+
 		function handle_face_line(faces, uvs, normals_inds) {
-			
+
 			if ( faces[ 3 ] === undefined ) {
-				
+
 				add_face( faces[ 0 ], faces[ 1 ], faces[ 2 ], normals_inds );
-				
+
 				if (!(uvs === undefined) && uvs.length > 0) {
 					add_uvs( uvs[ 0 ], uvs[ 1 ], uvs[ 2 ] );
 				}
 
 			} else {
-				
+
 				if (!(normals_inds === undefined) && normals_inds.length > 0) {
 
 					add_face( faces[ 0 ], faces[ 1 ], faces[ 3 ], [ normals_inds[ 0 ], normals_inds[ 1 ], normals_inds[ 3 ] ]);
@@ -181,7 +185,7 @@ THREE.OBJMTLLoader.prototype = {
 					add_face( faces[ 1 ], faces[ 2 ], faces[ 3 ]);
 
 				}
-				
+
 				if (!(uvs === undefined) && uvs.length > 0) {
 
 					add_uvs( uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] );
@@ -190,7 +194,7 @@ THREE.OBJMTLLoader.prototype = {
 				}
 
 			}
-			
+
 		}
 
 
@@ -218,7 +222,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		var face_pattern3 = /f( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))?/;
 
-		// f vertex//normal vertex//normal vertex//normal ... 
+		// f vertex//normal vertex//normal vertex//normal ...
 
 		var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/
 
@@ -275,7 +279,7 @@ THREE.OBJMTLLoader.prototype = {
 			} else if ( ( result = face_pattern2.exec( line ) ) !== null ) {
 
 				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-				
+
 				handle_face_line(
 					[ result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] ], //faces
 					[ result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ] ] //uv
@@ -304,7 +308,7 @@ THREE.OBJMTLLoader.prototype = {
 			} else if ( /^o /.test( line ) ) {
 
 				// object
-				
+
 				meshN();
 				face_offset = face_offset + vertices.length;
 				vertices = [];
@@ -350,7 +354,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		//Add last object
 		meshN(undefined, undefined);
-		
+
 		return group;
 
 	}

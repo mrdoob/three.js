@@ -11,8 +11,8 @@ THREE.OculusControls = function ( object ) {
 	this.object = object;
 	this.target = new THREE.Vector3( 0, 0, 0 );
 
+	this.enabled = true;
 	this.headquat = new THREE.Quaternion();
-	this.freeze = false;
 
 	this.loadAjaxJSON = function ( url, callback ) {
 		var xhr = new XMLHttpRequest();
@@ -45,10 +45,7 @@ THREE.OculusControls = function ( object ) {
 	}
 
 	this.update = function( delta ) {
-		if ( this.freeze ) {
-			return;
-		}
-
+		if ( this.enabled === false ) return;
 		this.object.quaternion.multiply(this.headquat);
 	};
 

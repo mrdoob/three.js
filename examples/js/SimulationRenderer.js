@@ -43,7 +43,7 @@ function SimulationRenderer(WIDTH, renderer) {
 		fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), passThruShader );
+	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), passThruShader );
 
 	var positionShader = new THREE.ShaderMaterial( {
 
