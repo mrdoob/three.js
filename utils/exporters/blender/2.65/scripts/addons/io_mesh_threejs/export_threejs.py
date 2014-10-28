@@ -1517,14 +1517,27 @@ def generate_ascii_model(meshes, morphs,
             mesh_materials, nmaterial = generate_materials_string(mesh, scene, mesh_extract_colors, object.draw_type, option_copy_textures, filepath, nmaterial)
             materials.append(mesh_materials)
 
+    #Set morph animation names according to markers
+    frames_count = scene.frame_end - scene.frame_start + 1
+    frame_names = ['animation_']*(frames_count) 
+    
+    timeline_markers = sorted(scene.timeline_markers.items(), key=lambda k: k[1].frame)
 
+    #Rename all frame names to the name a previous marker holds
+    for k, v in timeline_markers:
+        frame = v.frame - scene.frame_start #If the frame doesnt start at 0
+        name = v.name
+        
+        for i in range(frame, frames_count):
+            frame_names[i] = name
+            
     morphTargets_string = ""
     nmorphTarget = 0
 
     if option_animation_morph:
         chunks = []
         for i, morphVertices in enumerate(morphs):
-            morphTarget = '{ "name": "%s_%06d", "vertices": [%s] }' % ("animation", i, morphVertices)
+            morphTarget = '{ "name": "%s%06d", "vertices": [%s] }' % (frame_names[i], i, morphVertices)
             chunks.append(morphTarget)
 
         morphTargets_string = ",\n\t".join(chunks)
