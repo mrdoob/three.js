@@ -62,15 +62,70 @@ function handleColorChange( color ) {
 	
 }
 
-function guiMaterial( gui, material ) {
+function needsUpdate( material, geometry ) {
+	return function() {
+		material.shading = +material.shading; //Ensure number
+		material.needsUpdate = true;
+		geometry.verticesNeedUpdate = true;
+		geometry.normalsNeedUpdate = true;
+	}
+};
+
+function guiScene( gui, scene ) {
+	var folder = gui.addFolder('Scene');
+	
+	var data = {
+		background : "#000000"
+	}
+	
+	var color = new THREE.Color();
+	var colorConvert = handleColorChange( color );
+	
+	folder.addColor( data, "background" ).onChange( function( value ) {
+		
+		colorConvert( value );
+		
+		renderer.setClearColor(color.getHex(), 1);
+		
+	} );
+	
+	guiSceneFog( folder, scene );
+	
+}
+
+function guiSceneFog( folder, scene ) {
+	var fogFolder = folder.addFolder('scene.fog');
+	
+	var fog = new THREE.Fog( 0x3f7b9d, 0, 60 );
+
+	var data = {
+		fog : {
+			"THREE.Fog()" : false,
+			"scene.fog.color" : fog.color.getHex()
+		}
+	};
+	
+	fogFolder.add( data.fog, 'THREE.Fog()' ).onChange( function( useFog ) {
+		
+		if( useFog ) {
+			scene.fog = fog;
+		} else {
+			scene.fog = null;
+		}
+		
+	} );
+	fogFolder.addColor( data.fog, 'scene.fog.color').onChange( handleColorChange( fog.color ) );
+}
+
+function guiMaterial( gui, material, geometry ) {
 	var folder = gui.addFolder('THREE.Material');
 	
 	folder.add( material, 'transparent' );
 	folder.add( material, 'opacity', 0, 1 );
-	folder.add( material, 'blending', constants.blendingMode );
-	folder.add( material, 'blendSrc', constants.destinationFactors );
-	folder.add( material, 'blendDst', constants.destinationFactors );
-	folder.add( material, 'blendEquation', constants.equations );
+	// folder.add( material, 'blending', constants.blendingMode );
+	// folder.add( material, 'blendSrc', constants.destinationFactors );
+	// folder.add( material, 'blendDst', constants.destinationFactors );
+	// folder.add( material, 'blendEquation', constants.equations );
 	folder.add( material, 'depthTest' );
 	folder.add( material, 'depthWrite' );
 	folder.add( material, 'polygonOffset' );
@@ -79,10 +134,10 @@ function guiMaterial( gui, material ) {
 	folder.add( material, 'alphaTest' );
 	folder.add( material, 'overdraw' );
 	folder.add( material, 'visible' );
-	folder.add( material, 'side', constants.side );
+	folder.add( material, 'side', constants.side ).onChange( needsUpdate( material, geometry ) );
 }
 
-function guiMeshBasicMaterial( gui, material ) {
+function guiMeshBasicMaterial( gui, material, geometry ) {
 	
 	var data = {
 		color : material.color.getHex()
@@ -111,7 +166,7 @@ function guiMeshBasicMaterial( gui, material ) {
 	//folder.add( material, 'refractionRatio' );
 }
 
-function guiMeshDepthMaterial( gui, material ) {
+function guiMeshDepthMaterial( gui, material, geometry ) {
 	
 	var folder = gui.addFolder('THREE.MeshDepthMaterial');
 		
@@ -119,17 +174,17 @@ function guiMeshDepthMaterial( gui, material ) {
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 }
 
-function guiMeshNormalMaterial( gui, material ) {
+function guiMeshNormalMaterial( gui, material, geometry ) {
 	
 	var folder = gui.addFolder('THREE.MeshNormalMaterial');
 	
 	folder.add( material, 'morphTargets');
-	folder.add( material, 'shading', constants.shading);
+	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 }
 
-function guiLineBasicMaterial( gui, material ) {
+function guiLineBasicMaterial( gui, material, geometry ) {
 	
 	var data = {
 		color : material.color.getHex()
@@ -146,7 +201,7 @@ function guiLineBasicMaterial( gui, material ) {
 	
 }
 
-function guiMeshLambertMaterial( gui, material ) {
+function guiMeshLambertMaterial( gui, material, geometry ) {
 	
 	var data = {
 		color : material.color.getHex(),
@@ -160,7 +215,7 @@ function guiMeshLambertMaterial( gui, material ) {
 	folder.addColor( data, 'ambient' ).onChange( handleColorChange( material.ambient ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 	
-	folder.add( material, 'shading', constants.shading);
+	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'wireframeLinecap', ["butt", "round", "square"] );
@@ -170,7 +225,7 @@ function guiMeshLambertMaterial( gui, material ) {
 	
 }
 
-function guiMeshPhongMaterial( gui, material ) {
+function guiMeshPhongMaterial( gui, material, geometry ) {
 	
 	var data = {
 		color : material.color.getHex(),
@@ -187,7 +242,7 @@ function guiMeshPhongMaterial( gui, material ) {
 	folder.addColor( data, 'specular' ).onChange( handleColorChange( material.specular ) );
 	folder.add( material, 'shininess', 0, 100);
 	
-	folder.add( material, 'shading', constants.shading);
+	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'wireframeLinecap', ["butt", "round", "square"] );
@@ -197,20 +252,18 @@ function guiMeshPhongMaterial( gui, material ) {
 	
 }
 
-
-function chooseFromHash() {
+function chooseFromHash( gui, geometry ) {
 
 	var selectedMaterial = window.location.hash.substring(1) || "MeshBasicMaterial";
 	var material;
 	
-	var gui = new dat.GUI();
 	switch (selectedMaterial) {
 		
 	case "MeshBasicMaterial":
 
 		material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-		guiMaterial( gui, material );
-		guiMeshBasicMaterial( gui, material );
+		guiMaterial( gui, material, geometry );
+		guiMeshBasicMaterial( gui, material, geometry );
 
 		return material;
 
@@ -219,8 +272,8 @@ function chooseFromHash() {
 	case "MeshLambertMaterial":
 
 		material = new THREE.MeshLambertMaterial({color: 0x00ff00});
-		guiMaterial( gui, material );
-		guiMeshLambertMaterial( gui, material );
+		guiMaterial( gui, material, geometry );
+		guiMeshLambertMaterial( gui, material, geometry );
 
 		return material;
 
@@ -229,8 +282,8 @@ function chooseFromHash() {
 	case "MeshPhongMaterial":
 
 		material = new THREE.MeshPhongMaterial({color: 0x00ff00});
-		guiMaterial( gui, material );
-		guiMeshPhongMaterial( gui, material );
+		guiMaterial( gui, material, geometry );
+		guiMeshPhongMaterial( gui, material, geometry );
 
 		return material;
 
@@ -239,8 +292,8 @@ function chooseFromHash() {
 	case "MeshDepthMaterial":
 		
 		material = new THREE.MeshDepthMaterial({color: 0x00ff00});
-		guiMaterial( gui, material );
-		guiMeshDepthMaterial( gui, material );
+		guiMaterial( gui, material, geometry );
+		guiMeshDepthMaterial( gui, material, geometry );
 
 		return material;
 		
@@ -249,8 +302,8 @@ function chooseFromHash() {
 	case "MeshNormalMaterial":
 		
 		material = new THREE.MeshNormalMaterial();
-		guiMaterial( gui, material );
-		guiMeshNormalMaterial( gui, material );
+		guiMaterial( gui, material, geometry );
+		guiMeshNormalMaterial( gui, material, geometry );
 
 		return material;
 		
@@ -259,8 +312,8 @@ function chooseFromHash() {
 	case "LineBasicMaterial":
 
 		material = new THREE.LineBasicMaterial({color: 0x00ff00});
-		guiMaterial( gui, material );
-		guiLineBasicMaterial( gui, material );
+		guiMaterial( gui, material, geometry );
+		guiLineBasicMaterial( gui, material, geometry );
 
 		return material;
 
