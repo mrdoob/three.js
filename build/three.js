@@ -25747,7 +25747,13 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	var program, attributes, uniforms;
 
 	var texture;
-	
+
+	// decompose matrixWorld
+
+	var spritePosition = new THREE.Vector3();
+	var spriteRotation = new THREE.Quaternion();
+	var spriteScale = new THREE.Vector3();
+
 	var init = function () {
 
 		var vertices = new Float32Array( [
@@ -25915,8 +25921,10 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
-			scale[ 0 ] = sprite.scale.x;
-			scale[ 1 ] = sprite.scale.y;
+			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
+
+			scale[ 0 ] = spriteScale.x;
+			scale[ 1 ] = spriteScale.y;
 
 			var fogType = 0;
 
@@ -25972,7 +25980,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		// restore gl
 
 		gl.enable( gl.CULL_FACE );
-		
+
 		renderer.resetGLState();
 
 	};
@@ -29420,7 +29428,7 @@ THREE.AnimationHandler = {
 
 	init: function ( data ) {
 
-		if ( data.initialized === true ) return;
+		if ( data.initialized === true ) return data;
 
 		// loop through all keys
 
