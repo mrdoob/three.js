@@ -74,6 +74,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -93,6 +94,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -187,6 +189,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -223,6 +226,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 				
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -323,6 +327,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -346,6 +351,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "tonemap_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -1257,6 +1263,7 @@ THREE.ShaderLib = {
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -1264,6 +1271,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "tonemap_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 

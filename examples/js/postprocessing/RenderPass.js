@@ -2,10 +2,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
+THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha, renderOpaque, renderTransparent ) {
 
 	this.scene = scene;
 	this.camera = camera;
+	this.renderOptions = { renderOpaque: renderOpaque, renderTransparent: renderTransparent};
 
 	this.overrideMaterial = overrideMaterial;
 
@@ -36,7 +37,7 @@ THREE.RenderPass.prototype = {
 
 		}
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		renderer.render( this.scene, this.camera, readBuffer, this.clear, this.renderOptions );
 
 		if ( this.clearColor ) {
 

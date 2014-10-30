@@ -36,8 +36,10 @@ THREE.ToneMapShader = {
 		"varying vec2 vUv;",
 
 		"uniform float averageLuminance;",
+
 		"uniform float middleGrey;",
 		"uniform float maxLuminance;",
+
 		"const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);",
 
 		"vec3 ToneMap( vec3 vColor ) {",
@@ -54,8 +56,8 @@ THREE.ToneMapShader = {
 			"return fLumCompressed * vColor;",
 		"}",
 
-		// THREE.ShaderChunk['hdr_decode_pars_fragment'],
-		// THREE.ShaderChunk['hdr_encode_pars_fragment'],
+		THREE.ShaderChunk['hdr_decode_pars_fragment'],
+		THREE.ShaderChunk['hdr_encode_pars_fragment'],
 
 		"void main() {",
 

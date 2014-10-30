@@ -18,6 +18,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderTarget1 = renderTarget;
 	this.renderTarget2 = renderTarget.clone();
+	this.renderTarget2.shareDepthFrom = this.renderTarget1;
 
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
