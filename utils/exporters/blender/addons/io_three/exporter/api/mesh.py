@@ -654,7 +654,7 @@ def _skinning_data(mesh, bone_map, array_index):
                 if bone.name != obj.vertex_groups[bone_array[index][0]].name:
                     continue
                 if array_index is 0:
-                    entry = bone_map.get(bone_index)
+                    entry = bone_map.get(bone_index, -1)
                 else:
                     entry = bone_array[index][1]
 

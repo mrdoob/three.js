@@ -345,7 +345,7 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.SKINNING):
             logger.info('Parsing %s', constants.SKINNING)
-            bone_map = self[constants.BONE_MAP]
+            bone_map = self.get(constants.BONE_MAP) or {}
             self[constants.SKIN_INDICES] = api.mesh.skin_indices(self.node, bone_map)
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(self.node, bone_map)
 
