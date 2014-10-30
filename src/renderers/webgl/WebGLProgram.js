@@ -228,6 +228,8 @@ THREE.WebGLProgram = ( function () {
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
 
+				_this.toneMappingEnabled ? "#define USE_TONEMAPPING" : "",
+				
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
 

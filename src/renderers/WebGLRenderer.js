@@ -64,6 +64,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
+	// tone mapping
+
+	this.toneMappingEnabled = false;
+	this.toneMappingMaxLuminance = 16.0;
+	this.toneMappingMiddleGrey = 0.6;
+
 	// shadow map
 
 	this.shadowMapEnabled = false;
@@ -4519,6 +4525,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			if ( _this.toneMappingEnabled ) {
+				refreshUniformsToneMapping( m_uniforms );
+			}
+
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
@@ -4742,6 +4752,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+	}
+
+	function refreshUniformsToneMapping ( uniforms ) {
+		if ( uniforms.avgLuminance ) {
+			uniforms.avgLuminance.value = _this.toneMapping_AvgLum;
+			uniforms.maxLuminance.value = _this.toneMappingMaxLuminance;
+			uniforms.middleGrey.value = _this.toneMappingMiddleGrey;
+			uniforms.luminanceMap.value = _this.toneMappingLuminanceMap;
+		}
 	}
 
 	function refreshUniformsPhong ( uniforms, material ) {

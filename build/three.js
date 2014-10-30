@@ -16157,6 +16157,14 @@ THREE.ShaderChunk[ 'alphamap_fragment'] = "#ifdef USE_ALPHAMAP\n\n	gl_FragColor.
 
 THREE.ShaderChunk[ 'alphamap_pars_fragment'] = "#ifdef USE_ALPHAMAP\n\n	uniform sampler2D alphaMap;\n\n#endif\n";
 
+// File:src/renderers/shaders/ShaderChunk/tonemap_fragment.glsl
+
+THREE.ShaderChunk[ 'tonemap_fragment'] = "#ifdef USE_TONEMAPPING\n\n	gl_FragColor.xyz = ToneMap( gl_FragColor.xyz );\n\n#endif";
+
+// File:src/renderers/shaders/ShaderChunk/tonemap_pars_fragment.glsl
+
+THREE.ShaderChunk[ 'tonemap_pars_fragment'] = "#ifdef USE_TONEMAPPING\n\n	uniform float middleGrey;\n	uniform float maxLuminance;\n	const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);\n	uniform float avgLuminance; //TEMP!\n	uniform sampler2D luminanceMap;\n\n	vec3 ToneMap( vec3 vColor ) {\n\n		float fCurrentLum = texture2D(luminanceMap, vec2(0.5, 0.5)).r;\n		// Adapt the luminance using Pattanaik's technique\n		// const float fTau = 0.5f;\n		// float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1 - exp(-g_fDT * fTau));\n\n		// Get the calculated average luminance \n		float fLumAvg = fCurrentLum + 0.001;//texture2D(PointSampler1, float2(0.5, 0.5)).r;\n\n		// Calculate the luminance of the current pixel\n		float fLumPixel = dot(vColor, LUM_CONVERT);\n\n		// Apply the modified operator (Eq. 4)\n		float fLumScaled = (fLumPixel * middleGrey) / fLumAvg;\n\n		float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / ( maxLuminance * maxLuminance)))) / (1.0 + fLumScaled);\n		return fLumCompressed * vColor;\n	}\n	\n#endif";
+
 // File:src/renderers/shaders/UniformsUtils.js
 
 /**
@@ -16328,7 +16336,15 @@ THREE.UniformsLib = {
 
 		"shadowMatrix" : { type: "m4v", value: [] }
 
-	}
+	},
+
+	tonemap : {
+
+		"middleGrey" : { type: "f", value: 0.6 },
+		"maxLuminance" : { type: "f", value: 16.0 },
+		"avgLuminance" : { type: "f", value: 2.0 },
+		"luminanceMap" : { type: "t", value: null },
+	},
 
 };
 
@@ -16351,7 +16367,8 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "shadowmap" ],
+			THREE.UniformsLib[ "tonemap" ],
 
 		] ),
 
@@ -16408,6 +16425,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 
 			"void main() {",
 
@@ -16423,6 +16441,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
+				THREE.ShaderChunk[ "tonemap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -16441,6 +16460,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
+			THREE.UniformsLib[ "tonemap" ],
 
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
@@ -16518,6 +16538,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 
 			"void main() {",
 
@@ -16550,8 +16571,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
+				THREE.ShaderChunk[ "tonemap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
+				
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"}"
@@ -16570,6 +16592,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
+			THREE.UniformsLib[ "tonemap" ],
 
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
@@ -16651,6 +16674,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 
 			"void main() {",
 
@@ -16669,7 +16693,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
+				
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
+				THREE.ShaderChunk[ "tonemap_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 
@@ -16937,6 +16963,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
+			THREE.UniformsLib[ "tonemap" ],
 
 			{
 
@@ -17056,6 +17083,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 
 			"void main() {",
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
@@ -17390,6 +17418,7 @@ THREE.ShaderLib = {
 			"	}",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
+				THREE.ShaderChunk[ "tonemap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
 
@@ -17547,8 +17576,10 @@ THREE.ShaderLib = {
 
 	'cube': {
 
-		uniforms: { "tCube": { type: "t", value: null },
+		uniforms: THREE.UniformsUtils.merge( [
+			{ "tCube": { type: "t", value: null },
 					"tFlip": { type: "f", value: - 1 } },
+					THREE.UniformsLib[ "tonemap" ] ]),
 
 		vertexShader: [
 
@@ -17573,6 +17604,7 @@ THREE.ShaderLib = {
 
 			"uniform samplerCube tCube;",
 			"uniform float tFlip;",
+			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 
 			"varying vec3 vWorldPosition;",
 
@@ -17583,6 +17615,7 @@ THREE.ShaderLib = {
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+				THREE.ShaderChunk[ "tonemap_fragment" ],
 
 			"}"
 
@@ -17732,6 +17765,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.gammaInput = false;
 	this.gammaOutput = false;
+
+	// tone mapping
+
+	this.toneMappingEnabled = false;
+	this.toneMappingMaxLuminance = 16.0;
+	this.toneMappingMiddleGrey = 0.6;
 
 	// shadow map
 
@@ -22188,6 +22227,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			if ( _this.toneMappingEnabled ) {
+				refreshUniformsToneMapping( m_uniforms );
+			}
+
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
@@ -22411,6 +22454,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+	}
+
+	function refreshUniformsToneMapping ( uniforms ) {
+		if ( uniforms.avgLuminance ) {
+			uniforms.avgLuminance.value = _this.toneMapping_AvgLum;
+			uniforms.maxLuminance.value = _this.toneMappingMaxLuminance;
+			uniforms.middleGrey.value = _this.toneMappingMiddleGrey;
+			uniforms.luminanceMap.value = _this.toneMappingLuminanceMap;
+		}
 	}
 
 	function refreshUniformsPhong ( uniforms, material ) {
@@ -24522,6 +24574,8 @@ THREE.WebGLProgram = ( function () {
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
 
+				_this.toneMappingEnabled ? "#define USE_TONEMAPPING" : "",
+				
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
 
