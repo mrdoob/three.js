@@ -25,10 +25,11 @@ THREE.Animation = function ( root, data ) {
 THREE.Animation.prototype.keyTypes = [ "pos", "rot", "scl" ];
 
 
-THREE.Animation.prototype.play = function ( startTime, weight ) {
+THREE.Animation.prototype.play = function ( startTime, weight, callback ) {
 
 	this.currentTime = startTime !== undefined ? startTime : 0;
 	this.weight = weight !== undefined ? weight: 1;
+	this.callback = typeof callback === 'function' ? callback : null;
 
 	this.isPlaying = true;
 
@@ -44,6 +45,12 @@ THREE.Animation.prototype.stop = function() {
 	this.isPlaying = false;
 
 	THREE.AnimationHandler.stop( this );
+	
+	if( this.callback ){
+		
+		this.callback();
+		
+	}
 
 };
 
