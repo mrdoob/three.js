@@ -37,9 +37,9 @@
 
     <script src="../build/three.js"></script>
 
-    <script src="js/ui/Cursor.js"></script>
+    <script src="js/Cursor.js"></script>
 
-    <script src="js/controls/TrackballControls.js"></script>
+    <script src="js/controls/MouseControls.js"></script>
 
     <script src="js/libs/stats.min.js"></script>
 
@@ -64,7 +64,7 @@
         camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
         camera.position.z = 1000;
 
-        controls = new THREE.TrackballControls( camera );
+        controls = new THREE.MouseControls( camera );
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 1.2;
         controls.panSpeed = 0.8;
@@ -176,8 +176,8 @@
         stats.domElement.style.top = '0px';
         container.appendChild( stats.domElement );
 
-        cursor = new THREE.Cursor( camera, renderer.domElement );
-        scene.add ( cursor.pivot );
+        scene.add ( camera );
+        cursor = new THREE.Cursor( camera, renderer );
 
         renderer.domElement.addEventListener( 'mousemove', onMouseMove );
 
@@ -243,10 +243,10 @@
       function render() {
 
         controls.update();
-
         pick();
 
         renderer.render( scene, camera );
+        cursor.update();
 
       }
 
