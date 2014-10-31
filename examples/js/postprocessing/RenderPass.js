@@ -2,12 +2,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha, renderOpaque, renderTransparent ) {
+THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
 	this.scene = scene;
 	this.camera = camera;
-	this.renderOptions = { renderOpaque: renderOpaque, renderTransparent: renderTransparent};
-
+	
 	this.overrideMaterial = overrideMaterial;
 
 	this.clearColor = clearColor;

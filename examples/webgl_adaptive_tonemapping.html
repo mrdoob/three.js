@@ -286,9 +286,8 @@
   			effectComposer.setSize( window.innerWidth, window.innerHeight );
 				var debugPass = new THREE.RenderPass( debugScene, cameraBG );
 				debugPass.clear = false;
-				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, true, false );
-				var sceneTransparentPass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, false, true );
-				sceneTransparentPass.clear = false;
+				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined );
+				
 				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
   			scenePass.clear = false;
 
@@ -296,9 +295,6 @@
   			
   			effectComposer.addPass( skyboxPass );
   			effectComposer.addPass( scenePass );
-
-  			// // sceneTransparentPass.needsSwap = true;
-  			effectComposer.addPass( sceneTransparentPass );
 
   			effectComposer.addPass( luminancePass );
   			luminancePass.needsSwap = true;
