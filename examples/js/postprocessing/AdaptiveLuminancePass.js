@@ -11,14 +11,16 @@ THREE.AdaptiveLuminancePass = function ( resolution ) {
 	this.needsInit = true;
 
 	// render targets
-	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 	this.luminanceRT = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 	this.luminanceRT.generateMipmaps = false;
-	//We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
-	this.currentLuminanceRT = new THREE.WebGLRenderTarget( resolution, resolution, { minFilter: THREE.LinearMipMapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat } );
 	this.previousLuminanceRT = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 	this.previousLuminanceRT.generateMipmaps = false;
+
+	//We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
+	pars.minFilter = THREE.LinearMipMapLinearFilter;
+	this.currentLuminanceRT = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 	
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.AdaptiveLuminancePass relies on THREE.CopyShader" );
@@ -48,6 +50,61 @@ THREE.AdaptiveLuminancePass = function ( resolution ) {
 		blending: THREE.NoBlending,
 	} );
 
+
+	// this.materialLuminance = new THREE.ShaderMaterial( {
+
+	// 	uniforms: {
+
+	// 		"tDiffuse": { type: "t", value: null }
+
+	// 	},
+
+	// 	vertexShader: [
+
+	// 		"varying vec2 vUv;",
+
+	// 		"void main() {",
+
+	// 			"vUv = uv;",
+
+	// 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+	// 		"}"
+
+	// 	].join("\n"),
+
+	// 	fragmentShader: [
+
+	// 		"uniform sampler2D tDiffuse;",
+
+	// 		"varying vec2 vUv;",
+
+	// 		THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
+	// 		THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+
+	// 		"void main() {",
+
+	// 			"vec4 texel = texture2D( tDiffuse, vUv );",
+
+	// 			"#ifdef HDR_INPUT",
+	// 				"texel.xyz = HDRDecode( texel );",
+	// 			"#endif",
+
+	// 			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
+
+	// 			"float v = dot( texel.xyz, luma );",
+
+	// 			"#ifdef HDR_OUTPUT",
+	// 				"gl_FragColor = HDREncode( vec3( v ) );",
+	// 			"#else",
+	// 				"gl_FragColor = vec4( vec3( v ), 1.0 );",
+	// 			"#endif",
+
+	// 		"}"
+
+	// 	].join("\n")
+	// } );
+
 	this.adaptLuminanceShader = {
 		defines: {
 			"MIP_LEVEL_1X1" : Math.log2( resolution ).toFixed(1),
@@ -55,7 +112,8 @@ THREE.AdaptiveLuminancePass = function ( resolution ) {
 		uniforms: {
 			"lastLum": { type: "t", value: null },
 			"currentLum": { type: "t", value: null },
-			"delta": { type: 'f', value: 0.016 }
+			"delta": { type: 'f', value: 0.016 },
+			"tau": { type: 'f', value: 1.0 }
 		},
 		vertexShader: [
 			"varying vec2 vUv;",
@@ -73,14 +131,29 @@ THREE.AdaptiveLuminancePass = function ( resolution ) {
 			"uniform sampler2D lastLum;",
 			"uniform sampler2D currentLum;",
 			"uniform float delta;",
+			"uniform float tau;",
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 			
 			"void main() {",
-				"float fLastLum = (texture2D( lastLum, vec2( 0.5 ), MIP_LEVEL_1X1 )).r;",
-				"float fCurrentLum = (texture2D( currentLum, vUv, MIP_LEVEL_1X1 )).r;",
+				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
+				"vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
+				"#ifdef HDR_INPUT",
+					"float fLastLum = HDRDecode( lastLum ).r;",
+					"float fCurrentLum = HDRDecode( currentLum ).r;",
+				"#else",
+					"float fLastLum = lastLum.r;",
+					"float fCurrentLum = currentLum.r;",
+				"#endif",
+				
 				// Adapt the luminance using Pattanaik's technique
-				"const float fTau = 8.0;",
-				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * fTau));",
-				"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
+				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
+				"#ifdef HDR_OUTPUT",
+					"gl_FragColor = HDREncode( vec4( vec3( fAdaptedLum ), 1.0 ) );",
+				"#else",
+					// Adaption (tau) needs to be fast when writing to a non-hdr buffer or value won't change
+					"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
+				"#endif",
 			"}",
 		].join('\n')
 	};
@@ -112,12 +185,23 @@ THREE.AdaptiveLuminancePass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		//Put something in the adaptive luminance texture so that the scene can render initially
-		// if ( this.needsInit ) {
-		// 	this.quad.material = new THREE.MeshBasicMaterial( {color: 0xffffff });
+		if ( this.needsInit ) {
+			//If HDR is enabled and the type is full HDR, change the format of the render targets
+			if ( renderer.hdrEnabled && renderer.hdrType === THREE.FullHDR ) {
+				var extensions = new THREE.WebGLExtensions( renderer.getContext() );
+				if ( extensions.get('OES_texture_half_float_linear') ) {
+					this.luminanceRT.type = THREE.FloatType;
+					this.previousLuminanceRT.type = THREE.FloatType;
+					this.currentLuminanceRT.type = THREE.FloatType;
+				}
+			}
+			//Put something in the adaptive luminance texture so that the scene can render initially
+			this.quad.material = new THREE.MeshBasicMaterial( {color: 0xffffff });
+			renderer.render( this.scene, this.camera, this.luminanceRT );
+			renderer.render( this.scene, this.camera, this.previousLuminanceRT );
 			// renderer.render( this.scene, this.camera, this.luminanceRT );
-		// 	this.needsInit = false;
-		// }
+			this.needsInit = false;
+		}
 
 		//Render the luminance of the current scene into a render target with mipmapping enabled
 		this.quad.material = this.materialLuminance;
@@ -138,6 +222,12 @@ THREE.AdaptiveLuminancePass.prototype = {
 		renderer.render( this.scene, this.camera, this.previousLuminanceRT, this.clear );
 
 		
+	},
+
+	setAdaptionRate: function( rate ) {
+		if ( rate ) {
+			this.materialAdaptiveLum.uniforms.tau.value = Math.abs( rate );
+		}
 	},
 
 	dispose: function() {

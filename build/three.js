@@ -16060,15 +16060,15 @@ THREE.ShaderChunk[ 'linear_to_gamma_fragment'] = "#ifdef GAMMA_OUTPUT\n\n	gl_Fra
 
 // File:src/renderers/shaders/ShaderChunk/hdr_encode_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'hdr_encode_pars_fragment'] = "#ifdef LOGLUV_HDR_OUTPUT\n  // logLuvMatrix matrix, for encoding\n  // const mat3 logLuvMatrix = mat3(\n  //     0.2209, 0.3390, 0.4184,\n  //     0.1138, 0.6780, 0.7319,\n  //     0.0102, 0.1130, 0.2969);\n\n  const mat3 logLuvMatrix = mat3(\n      0.2209, 0.1138, 0.0102,\n      0.3390, 0.6780, 0.1130,\n      0.4184, 0.7319, 0.2969);\n\n  vec4 LogLuvEncode(in vec3 vRGB) \n  {    \n      vec4 vResult; \n      vec3 Xp_Y_XYZp = vRGB * logLuvMatrix;\n      Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));\n      vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;\n      float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;\n      vResult.w = fract(Le);\n      vResult.z = (Le - (floor(vResult.w*255.0))/255.0)/255.0;\n      return vResult;\n  }\n\n#elif defined( RGBM_HDR_OUTPUT )\n\n  vec4 RGBMEncode( vec3 color ) {\n    vec4 rgbm;\n    color *= 1.0 / 6.0;\n    rgbm.a = clamp( max( max( color.r, color.g ), max( color.b, 1e-6 ) ) , 0.0, 1.0 );\n    rgbm.a = ceil( rgbm.a * 255.0 ) / 255.0;\n    rgbm.rgb = color / rgbm.a;\n    return rgbm;\n  }\n\n#endif";
+THREE.ShaderChunk[ 'hdr_encode_pars_fragment'] = "#ifdef HDR_OUTPUT\n\n  #ifdef HDR_TYPE_LOGLUV\n    // logLuvMatrix matrix, for encoding\n    // const mat3 logLuvMatrix = mat3(\n    //     0.2209, 0.3390, 0.4184,\n    //     0.1138, 0.6780, 0.7319,\n    //     0.0102, 0.1130, 0.2969);\n\n    const mat3 logLuvMatrix = mat3(\n        0.2209, 0.1138, 0.0102,\n        0.3390, 0.6780, 0.1130,\n        0.4184, 0.7319, 0.2969);\n\n    vec4 HDREncode(in vec4 vRGB) \n    {    \n        vec4 vResult; \n        vec3 Xp_Y_XYZp = vRGB.xyz * logLuvMatrix;\n        Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));\n        vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;\n        float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;\n        vResult.w = fract(Le);\n        vResult.z = (Le - (floor(vResult.w*255.0))/255.0)/255.0;\n        return vResult;\n    }\n\n  #elif defined( HDR_TYPE_RGBM )\n\n    vec4 HDREncode( in vec4 color ) {\n      vec4 rgbm;\n      color *= 1.0 / 6.0;\n      rgbm.a = clamp( max( max( color.r, color.g ), max( color.b, 1e-6 ) ) , 0.0, 1.0 );\n      rgbm.a = ceil( rgbm.a * 255.0 ) / 255.0;\n      rgbm.rgb = color.rgb / rgbm.a;\n      return rgbm;\n    }\n  #elif defined( HDR_TYPE_FULL )\n\n    vec4 HDREncode( in vec4 color ) {\n      return color;\n    }\n\n  #endif\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/hdr_decode_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'hdr_decode_pars_fragment'] = "#ifdef LOGLUV_HDR_INPUT\n\n  // Inverse logLuvMatrix matrix, for decoding\n  const mat3 InverseLogLuvMatrix = mat3(\n    6.0013, -1.332, .3007,\n    -2.700, 3.1029, -1.088,\n    -1.7995, -5.7720, 5.6268);  \n\n  vec3 LogLuvDecode(in vec4 vLogLuv)\n  { \n    float Le = vLogLuv.z * 255.0 + vLogLuv.w;\n    vec3 Xp_Y_XYZp;\n    Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n    Xp_Y_XYZp.z = Xp_Y_XYZp.y / vLogLuv.y;\n    Xp_Y_XYZp.x = vLogLuv.x * Xp_Y_XYZp.z;\n    vec3 vRGB = InverseLogLuvMatrix * Xp_Y_XYZp;\n    return clamp(vRGB, 0.0, 1.0);\n  }\n#elif defined( RGBM_HDR_INPUT )\n\n  vec3 RGBMDecode( vec4 rgbm ) {\n    return 6.0 * rgbm.rgb * rgbm.a;\n  }\n\n#elif defined( RGBD_HDR_INPUT )\n  vec3 RGBMDecode( vec4 rgbd ) {\n    // return rgbd.rgb * ((MaxRange / 255.0) / rgbd.a);\n    return rgbd.rgb * / rgbd.a;\n  }\n\n#endif";
+THREE.ShaderChunk[ 'hdr_decode_pars_fragment'] = "#ifdef HDR_INPUT\n\n  #ifdef HDR_TYPE_LOGLUV\n\n    // Inverse logLuvMatrix matrix, for decoding\n    const mat3 InverseLogLuvMatrix = mat3(\n      6.0013, -1.332, .3007,\n      -2.700, 3.1029, -1.088,\n      -1.7995, -5.7720, 5.6268);  \n\n    vec3 HDRDecode(in vec4 vLogLuv)\n    { \n      float Le = vLogLuv.z * 255.0 + vLogLuv.w;\n      vec3 Xp_Y_XYZp;\n      Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n      Xp_Y_XYZp.z = Xp_Y_XYZp.y / vLogLuv.y;\n      Xp_Y_XYZp.x = vLogLuv.x * Xp_Y_XYZp.z;\n      vec3 vRGB = InverseLogLuvMatrix * Xp_Y_XYZp;\n      return clamp(vRGB, 0.0, 1.0);\n    }\n  #elif defined( HDR_TYPE_RGBM )\n\n    vec3 HDRDecode( vec4 rgbm ) {\n      return 6.0 * rgbm.rgb * rgbm.a;\n    }\n\n  #elif defined( HDR_TYPE_RGBD )\n    vec3 HDRDecode( vec4 rgbd ) {\n      // return rgbd.rgb * ((MaxRange / 255.0) / rgbd.a);\n      return rgbd.rgb * / rgbd.a;\n    }\n  #elif defined( HDR_TYPE_FULL )\n    vec3 HDRDecode( vec4 rgbd ) {\n      return rgbd.rgb;\n    }\n  #endif\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/hdr_encode_fragment.glsl
 
-THREE.ShaderChunk[ 'hdr_encode_fragment'] = "#ifdef LOGLUV_HDR_OUTPUT\n\n	gl_FragColor = LogLuvEncode( gl_FragColor.xyz );\n\n#elif defined( RGBM_HDR_OUTPUT )\n  \n  gl_FragColor = RGBMEncode( gl_FragColor.xyz );\n\n#endif";
+THREE.ShaderChunk[ 'hdr_encode_fragment'] = "#ifdef HDR_OUTPUT\n\n	gl_FragColor = HDREncode( gl_FragColor );\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl
 
@@ -16180,7 +16180,7 @@ THREE.ShaderChunk[ 'tonemap_fragment'] = "#ifdef USE_TONEMAPPING\n\n	gl_FragColo
 
 // File:src/renderers/shaders/ShaderChunk/tonemap_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'tonemap_pars_fragment'] = "#ifdef USE_TONEMAPPING\n\n	uniform float middleGrey;\n	uniform float maxLuminance;\n	const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);\n	uniform float avgLuminance; //TEMP!\n	uniform sampler2D luminanceMap;\n\n	vec3 ToneMap( vec3 vColor ) {\n\n		float fCurrentLum = texture2D(luminanceMap, vec2(0.5, 0.5)).r;\n		// Adapt the luminance using Pattanaik's technique\n		// const float fTau = 0.5f;\n		// float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1 - exp(-g_fDT * fTau));\n\n		// Get the calculated average luminance \n		float fLumAvg = fCurrentLum + 0.001;//texture2D(PointSampler1, float2(0.5, 0.5)).r;\n\n		// Calculate the luminance of the current pixel\n		float fLumPixel = dot(vColor, LUM_CONVERT);\n\n		// Apply the modified operator (Eq. 4)\n		float fLumScaled = (fLumPixel * middleGrey) / fLumAvg;\n\n		float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / ( maxLuminance * maxLuminance)))) / (1.0 + fLumScaled);\n		return fLumCompressed * vColor;\n	}\n	\n#endif";
+THREE.ShaderChunk[ 'tonemap_pars_fragment'] = "#ifdef USE_TONEMAPPING\n\n	uniform float middleGrey;\n	uniform float maxLuminance;\n	const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);\n	uniform float avgLuminance; //TEMP!\n	uniform sampler2D luminanceMap;\n\n	vec3 ToneMap( vec3 vColor ) {\n\n		float fCurrentLum = 2.0 * texture2D(luminanceMap, vec2(0.5, 0.5)).r;\n\n		// Get the calculated average luminance \n		float fLumAvg = fCurrentLum + 0.001;//texture2D(PointSampler1, float2(0.5, 0.5)).r;\n\n		// Calculate the luminance of the current pixel\n		float fLumPixel = dot(vColor, LUM_CONVERT);\n\n		// Apply the modified operator (Eq. 4)\n		float fLumScaled = (fLumPixel * middleGrey) / fLumAvg;\n\n		float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / ( maxLuminance * maxLuminance)))) / (1.0 + fLumScaled);\n		return fLumCompressed * vColor;\n	}\n	\n#endif";
 
 // File:src/renderers/shaders/UniformsUtils.js
 
@@ -24340,6 +24340,10 @@ THREE.WebGLExtensions = function ( gl ) {
 				extension = gl.getExtension( 'OES_texture_float_linear' );
 				break;
 
+			case 'OES_texture_half_float_linear':
+				extension = gl.getExtension( 'OES_texture_float_linear' );
+				break;
+
 			case 'OES_standard_derivatives':
 				extension = gl.getExtension( 'OES_standard_derivatives' );
 				break;
@@ -24471,6 +24475,24 @@ THREE.WebGLProgram = ( function () {
 			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
 
 		}
+
+		var hdrOutputTypeDefine = null;
+		if ( _this.hdrEnabled ) {
+			if ( parameters.hdrOutput !== false ) {
+				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrType;
+				if ( outputType === THREE.FullHDR ) {
+					hdrOutputTypeDefine = "HDR_TYPE_FULL";
+				}
+				else if ( outputType === THREE.RGBMHDR ) {
+					hdrOutputTypeDefine = "HDR_TYPE_RGBM";
+				}
+				else if ( outputType === THREE.LogLuvHDR ) {
+					hdrOutputTypeDefine = "HDR_TYPE_LOGLUV";
+				}
+
+			}
+		}
+
 
 		// console.log( "building new program " );
 
@@ -24618,10 +24640,12 @@ THREE.WebGLProgram = ( function () {
 
 				_this.toneMappingEnabled ? "#define USE_TONEMAPPING" : "",
 				
-				_this.hdrEnabled && _this.hdrType === THREE.LogLuvHDR && parameters.hdrOutput !== false ? "#define LOGLUV_HDR_OUTPUT" : "",
-				_this.hdrEnabled && _this.hdrType === THREE.RGBMHDR && parameters.hdrOutput !== false ? "#define RGBM_HDR_OUTPUT" : "",
-				_this.hdrEnabled && _this.hdrType === THREE.LogLuvHDR ? "#define LOGLUV_HDR_INPUT" : "",
-				_this.hdrEnabled && _this.hdrType === THREE.RGBMHDR ? "#define RGBM_HDR_INPUT" : "",
+				_this.hdrEnabled && parameters.hdrOutput !== false ? "#define HDR_OUTPUT" : "",
+				_this.hdrEnabled && parameters.hdrInput !== false ? "#define HDR_INPUT" : "",
+				// _this.hdrEnabled && _this.hdrType === THREE.LogLuvHDR ? "#define HDR_TYPE_LOGLUV" : "",
+				// _this.hdrEnabled && _this.hdrType === THREE.RGBMHDR ? "#define HDR_TYPE_RGBM" : "",
+				// _this.hdrEnabled && _this.hdrType === THREE.FullHDR ? "#define HDR_TYPE_FULL" : "",
+				hdrOutputTypeDefine ? "#define " + hdrOutputTypeDefine : "",
 
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",

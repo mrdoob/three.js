@@ -8,10 +8,7 @@
 
 	vec3 ToneMap( vec3 vColor ) {
 
-		float fCurrentLum = texture2D(luminanceMap, vec2(0.5, 0.5)).r;
-		// Adapt the luminance using Pattanaik's technique
-		// const float fTau = 0.5f;
-		// float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1 - exp(-g_fDT * fTau));
+		float fCurrentLum = 2.0 * texture2D(luminanceMap, vec2(0.5, 0.5)).r;
 
 		// Get the calculated average luminance 
 		float fLumAvg = fCurrentLum + 0.001;//texture2D(PointSampler1, float2(0.5, 0.5)).r;

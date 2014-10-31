@@ -22,6 +22,10 @@ THREE.WebGLExtensions = function ( gl ) {
 				extension = gl.getExtension( 'OES_texture_float_linear' );
 				break;
 
+			case 'OES_texture_half_float_linear':
+				extension = gl.getExtension( 'OES_texture_float_linear' );
+				break;
+
 			case 'OES_standard_derivatives':
 				extension = gl.getExtension( 'OES_standard_derivatives' );
 				break;

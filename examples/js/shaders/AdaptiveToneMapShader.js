@@ -4,12 +4,12 @@
  * Full-screen tone-mapping shader based on http://www.graphics.cornell.edu/~jaf/publications/sig02_paper.pdf
  */
 
-THREE.ToneMapShader = {
+THREE.AdaptiveToneMapShader = {
 
 	uniforms: {
 
 		"tDiffuse": { type: "t", value: null },
-		"averageLuminance":  { type: "f", value: 1.0 },
+		"luminanceMap":  { type: "t", value: null },
 		"maxLuminance":  { type: "f", value: 16.0 },
 		"middleGrey":  { type: "f", value: 0.6 }
 	},
@@ -29,21 +29,19 @@ THREE.ToneMapShader = {
 
 	fragmentShader: [
 
-		"#define ADAPTED_LUMINANCE",
-
 		"uniform sampler2D tDiffuse;",
 
 		"varying vec2 vUv;",
 
 		"uniform float middleGrey;",
 		"uniform float maxLuminance;",
-		"uniform float averageLuminance;",
+		"uniform sampler2D luminanceMap;",
 		
 		"const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);",
 
 		"vec3 ToneMap( vec3 vColor ) {",
 			// Get the calculated average luminance 
-			"float fLumAvg = averageLuminance;",
+			"float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;",
 			
 			// Calculate the luminance of the current pixel
 			"float fLumPixel = dot(vColor, LUM_CONVERT);",

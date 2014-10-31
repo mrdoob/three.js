@@ -75,6 +75,7 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/BloomPass.js"></script>
 		<script src="js/postprocessing/AdaptiveLuminancePass.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
 
@@ -166,6 +167,7 @@
 			var directionalLight, pointLight;
 
 			var mouseX = 0, mouseY = 0;
+			var orbitControls;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -204,6 +206,8 @@
 				cameraBG = new THREE.OrthographicCamera( -windowHalfX, windowHalfX, windowHalfY, -windowHalfY, -10000, 10000 );
 				cameraBG.position.z = 100;
 
+				orbitControls = new THREE.OrbitControls(camera);
+
 				// SCENE
 
 				scene = new THREE.Scene();
@@ -237,21 +241,21 @@
 					earthMat.specularMap = tex;
 					earthMat.needsUpdate = true;
 				} );
-				var earthNormal = THREE.ImageUtils.loadTexture( 'textures/planets/earth_normal_2048.jpg', undefined, function( tex ) {
-					earthMat.normalMap = tex;
-					earthMat.needsUpdate = true;
-				} );
+				// var earthNormal = THREE.ImageUtils.loadTexture( 'textures/planets/earth_normal_2048.jpg', undefined, function( tex ) {
+				// 	earthMat.normalMap = tex;
+				// 	earthMat.needsUpdate = true;
+				// } );
 				
-				var sphereMesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 500, 500 ), earthMat );
+				var sphereMesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 16, 16 ), earthMat );
 				scene.add( sphereMesh );
 
-				var earthLightsMat = new THREE.MeshBasicMaterial( { color: 0x444444, blending: THREE.AdditiveBlending, transparent: true, depthTest: false } );
+				var earthLightsMat = new THREE.MeshBasicMaterial( { color: 0xffffff, blending: THREE.AdditiveBlending, transparent: true, depthTest: false } );
 				var earthLights = THREE.ImageUtils.loadTexture( 'textures/planets/earth_lights_2048.jpg', undefined, function( tex ) {
 					earthLightsMat.map = tex;
 					earthLightsMat.needsUpdate = true;
 				} );
 
-				var sphereLightsMesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 500, 500 ), earthLightsMat );
+				var sphereLightsMesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 16, 16 ), earthLightsMat );
 				scene.add( sphereLightsMesh );
 
 				var vBGShader = [
@@ -273,7 +277,7 @@
 			    "void main() {",
 			      
 		        "vec2 sampleUV = vUv;",
-		        "float colour = texture2D( map, sampleUV, 8.0 ).r;",
+		        "float colour = texture2D( map, sampleUV, 0.0 ).r;",
 		        
 			      "gl_FragColor = vec4( vec3( colour ), 1.0 );",
 
@@ -351,8 +355,8 @@
 				renderer.autoClear = false;
 				renderer.toneMappingEnabled = true;
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.gammaInput = false;
+				renderer.gammaOutput = false;
 
 				container.appendChild( renderer.domElement );
 
@@ -407,7 +411,7 @@
 
 				}
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				// document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				var r = "textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
@@ -823,6 +827,8 @@
 				renderer.toneMappingMiddleGrey = params.middleGrey;
 				directionalLight.intensity = params.sunLight;
 
+				orbitControls.update();
+
 				render();
 
 			}
@@ -831,9 +837,9 @@
 
 				var timer = -0.0002 * Date.now();
 
-				camera.position.x = 750 * Math.cos( 0.01 * mouseX );
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.position.z = 750 * Math.sin( 0.01 * mouseX );
+				// camera.position.x = 750 * Math.cos( 0.01 * mouseX );
+				// camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				// camera.position.z = 750 * Math.sin( 0.01 * mouseX );
 
 				camera.lookAt( scene.position );
 				cameraCube.rotation.copy( camera.rotation );
