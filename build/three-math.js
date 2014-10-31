@@ -46,6 +46,12 @@ THREE.BasicShadowMap = 0;
 THREE.PCFShadowMap = 1;
 THREE.PCFSoftShadowMap = 2;
 
+// HDR TYPE CONSTANTS
+
+THREE.LogLuvHDR = 0;
+THREE.RGBMHDR = 1;
+THREE.FullHDR = 1;
+
 // MATERIAL CONSTANTS
 
 // side

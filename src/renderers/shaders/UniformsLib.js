@@ -98,6 +98,14 @@ THREE.UniformsLib = {
 
 		"shadowMatrix" : { type: "m4v", value: [] }
 
-	}
+	},
+
+	tonemap : {
+
+		"middleGrey" : { type: "f", value: 0.6 },
+		"maxLuminance" : { type: "f", value: 16.0 },
+		"avgLuminance" : { type: "f", value: 2.0 },
+		"luminanceMap" : { type: "t", value: null },
+	},
 
 };

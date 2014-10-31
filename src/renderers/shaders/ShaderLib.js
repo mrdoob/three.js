@@ -15,7 +15,7 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "shadowmap" ],
 
 		] ),
 
@@ -72,6 +72,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -90,6 +91,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -105,7 +107,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-
+			
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -182,6 +184,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -215,8 +218,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
+				
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -234,7 +238,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-
+			
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -315,6 +319,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -333,9 +338,11 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
+				
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -601,7 +608,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-
+			
 			{
 
 			"enableAO"          : { type: "i", value: 0 },
@@ -720,7 +727,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
+			
 			"void main() {",
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
@@ -1237,16 +1244,18 @@ THREE.ShaderLib = {
 
 			"uniform samplerCube tCube;",
 			"uniform float tFlip;",
-
+			
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -1272,11 +1281,9 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			//Comment out the logdepth stuff for depth rendering until I can figure out how to get shadow mapping, ssao, etc. working
-			//properly.
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			// THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
+			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
 
 			"void main() {",
 
@@ -1284,7 +1291,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
-				// THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"
 
@@ -1292,7 +1299,7 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
-			// THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
 			"vec4 pack_depth( const in float depth ) {",
 
@@ -1306,17 +1313,17 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				// THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
-			// "	#ifdef USE_LOGDEPTHBUF_EXT",
+			"	#ifdef USE_LOGDEPTHBUF_EXT",
 
-			// "		gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );",
+			"		gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );",
 
-			// "	#else",
+			"	#else",
 
 			"		gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );",
 
-			// "	#endif",
+			"	#endif",
 
 				//"gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z / gl_FragCoord.w );",
 				//"float z = ( ( gl_FragCoord.z / gl_FragCoord.w ) - 3.0 ) / ( 4000.0 - 3.0 );",

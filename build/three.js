@@ -46,6 +46,12 @@ THREE.BasicShadowMap = 0;
 THREE.PCFShadowMap = 1;
 THREE.PCFSoftShadowMap = 2;
 
+// HDR TYPE CONSTANTS
+
+THREE.LogLuvHDR = 0;
+THREE.RGBMHDR = 1;
+THREE.FullHDR = 1;
+
 // MATERIAL CONSTANTS
 
 // side
@@ -12983,6 +12989,9 @@ THREE.Material = function () {
 
 	this.visible = true;
 
+	this.hdrOutput = undefined; //Override for renderer's hdrOutputEnabled
+	this.hdrOutputType = undefined; //Override for renderer's hdrOutputType
+
 	this.needsUpdate = true;
 
 };
@@ -16070,6 +16079,18 @@ THREE.ShaderChunk[ 'envmap_pars_vertex'] = "#if defined( USE_ENVMAP ) && ! defin
 
 THREE.ShaderChunk[ 'linear_to_gamma_fragment'] = "#ifdef GAMMA_OUTPUT\n\n	gl_FragColor.xyz = sqrt( gl_FragColor.xyz );\n\n#endif";
 
+// File:src/renderers/shaders/ShaderChunk/hdr_encode_pars_fragment.glsl
+
+THREE.ShaderChunk[ 'hdr_encode_pars_fragment'] = "// #ifdef HDR_OUTPUT\n\n  #ifdef HDR_OUTPUT_LOGLUV\n    // logLuvMatrix matrix, for encoding\n    // const mat3 logLuvMatrix = mat3(\n    //     0.2209, 0.3390, 0.4184,\n    //     0.1138, 0.6780, 0.7319,\n    //     0.0102, 0.1130, 0.2969);\n\n    const mat3 logLuvMatrix = mat3(\n        0.2209, 0.1138, 0.0102,\n        0.3390, 0.6780, 0.1130,\n        0.4184, 0.7319, 0.2969);\n\n    vec4 HDREncodeLOGLUV(in vec4 vRGB) \n    {    \n        vec4 vResult; \n        vec3 Xp_Y_XYZp = vRGB.xyz * logLuvMatrix;\n        Xp_Y_XYZp = max(Xp_Y_XYZp, vec3(1e-6, 1e-6, 1e-6));\n        vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;\n        float Le = 2.0 * log2(Xp_Y_XYZp.y) + 127.0;\n        vResult.w = fract(Le);\n        vResult.z = (Le - (floor(vResult.w*255.0))/255.0)/255.0;\n        return vResult;\n    }\n\n  #elif defined( HDR_OUTPUT_RGBM )\n\n    vec4 HDREncodeRGBM( in vec4 color ) {\n      vec4 rgbm;\n      color *= 1.0 / 6.0;\n      rgbm.a = clamp( max( max( color.r, color.g ), max( color.b, 1e-6 ) ) , 0.0, 1.0 );\n      rgbm.a = ceil( rgbm.a * 255.0 ) / 255.0;\n      rgbm.rgb = color.rgb / rgbm.a;\n      return rgbm;\n    }\n  \n  #endif\n// #endif";
+
+// File:src/renderers/shaders/ShaderChunk/hdr_decode_pars_fragment.glsl
+
+THREE.ShaderChunk[ 'hdr_decode_pars_fragment'] = "// #ifdef HDR_INPUT\n\n  // #ifdef HDR_TYPE_LOGLUV\n\n    // Inverse logLuvMatrix matrix, for decoding\n    const mat3 InverseLogLuvMatrix = mat3(\n      6.0013, -1.332, .3007,\n      -2.700, 3.1029, -1.088,\n      -1.7995, -5.7720, 5.6268);  \n\n    vec3 HDRDecodeLOGLUV(in vec4 vLogLuv)\n    { \n      float Le = vLogLuv.z * 255.0 + vLogLuv.w;\n      vec3 Xp_Y_XYZp;\n      Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n      Xp_Y_XYZp.z = Xp_Y_XYZp.y / vLogLuv.y;\n      Xp_Y_XYZp.x = vLogLuv.x * Xp_Y_XYZp.z;\n      vec3 vRGB = InverseLogLuvMatrix * Xp_Y_XYZp;\n      return clamp(vRGB, 0.0, 1.0);\n    }\n  // #elif defined( HDR_TYPE_RGBM )\n\n    vec3 HDRDecodeRGBM( vec4 rgbm ) {\n      return 6.0 * rgbm.rgb * rgbm.a;\n    }\n\n  // #elif defined( HDR_OUTPUT_RGBD )\n    vec3 HDRDecodeRGBD( vec4 rgbd ) {\n      // return rgbd.rgb * ((MaxRange / 255.0) / rgbd.a);\n      return rgbd.rgb / rgbd.a;\n    }\n  // #elif defined( HDR_TYPE_FULL )\n  //   vec3 HDRDecode( vec4 rgbd ) {\n  //     return rgbd.rgb;\n  //   }\n//   #endif\n// #endif";
+
+// File:src/renderers/shaders/ShaderChunk/hdr_encode_fragment.glsl
+
+THREE.ShaderChunk[ 'hdr_encode_fragment'] = "#ifdef HDR_OUTPUT_LOGLUV\n\n	gl_FragColor = HDREncodeLOGLUV( gl_FragColor );\n\n#elif defined( HDR_OUTPUT_RGBM )\n\n  gl_FragColor = HDREncodeRGBM( gl_FragColor );\n\n#endif";
+
 // File:src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl
 
 THREE.ShaderChunk[ 'color_pars_vertex'] = "#ifdef USE_COLOR\n\n	varying vec3 vColor;\n\n#endif";
@@ -16345,7 +16366,15 @@ THREE.UniformsLib = {
 
 		"shadowMatrix" : { type: "m4v", value: [] }
 
-	}
+	},
+
+	tonemap : {
+
+		"middleGrey" : { type: "f", value: 0.6 },
+		"maxLuminance" : { type: "f", value: 16.0 },
+		"avgLuminance" : { type: "f", value: 2.0 },
+		"luminanceMap" : { type: "t", value: null },
+	},
 
 };
 
@@ -16368,7 +16397,7 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "shadowmap" ],
 
 		] ),
 
@@ -16425,6 +16454,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -16443,6 +16473,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -16458,7 +16489,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-
+			
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -16535,6 +16566,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -16568,8 +16600,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
+				
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -16587,7 +16620,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-
+			
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -16668,6 +16701,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -16686,9 +16720,11 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
+				
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -16954,7 +16990,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-
+			
 			{
 
 			"enableAO"          : { type: "i", value: 0 },
@@ -17073,7 +17109,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-
+			
 			"void main() {",
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
@@ -17590,16 +17626,18 @@ THREE.ShaderLib = {
 
 			"uniform samplerCube tCube;",
 			"uniform float tFlip;",
-
+			
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
@@ -17625,11 +17663,9 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			//Comment out the logdepth stuff for depth rendering until I can figure out how to get shadow mapping, ssao, etc. working
-			//properly.
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			// THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
+			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
 
 			"void main() {",
 
@@ -17637,7 +17673,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
-				// THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
 			"}"
 
@@ -17645,7 +17681,7 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
-			// THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
 			"vec4 pack_depth( const in float depth ) {",
 
@@ -17659,17 +17695,17 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				// THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
-			// "	#ifdef USE_LOGDEPTHBUF_EXT",
+			"	#ifdef USE_LOGDEPTHBUF_EXT",
 
-			// "		gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );",
+			"		gl_FragData[ 0 ] = pack_depth( gl_FragDepthEXT );",
 
-			// "	#else",
+			"	#else",
 
 			"		gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );",
 
-			// "	#endif",
+			"	#endif",
 
 				//"gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z / gl_FragCoord.w );",
 				//"float z = ( ( gl_FragCoord.z / gl_FragCoord.w ) - 3.0 ) / ( 4000.0 - 3.0 );",
@@ -17683,7 +17719,6 @@ THREE.ShaderLib = {
 	}
 
 };
-
 // File:src/renderers/WebGLRenderer.js
 
 /**
@@ -17751,6 +17786,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.gammaInput = false;
 	this.gammaOutput = false;
+
+	// hdr rendering
+	
+	this.hdrOutputEnabled = false;
+	this.hdrOutputType = THREE.LogLuvHDR;
 
 	// shadow map
 
@@ -21145,7 +21185,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var fog = scene.fog;
-
+		
 		// reset caching for this frame
 
 		_currentGeometryGroupHash = - 1;
@@ -21191,7 +21231,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			opaqueObjects.sort( painterSortStable );
 			transparentObjects.sort( reversePainterSortStable );
-
+			
 		}
 
 		// custom render plugins (pre pass)
@@ -21248,9 +21288,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 			//END_VEROLD_MOD
 
+			// if ( !material.transparent && renderOpaque || material.transparent && renderTransparent ) {
 			renderObjects( opaqueObjects, camera, lights, fog, true, material );
 			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, false, material );
+			// }
 
 		} else {
 
@@ -22433,6 +22475,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			if ( _this.toneMappingEnabled ) {
+				refreshUniformsToneMapping( m_uniforms );
+			}
+
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
@@ -22656,6 +22702,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+	}
+
+	function refreshUniformsToneMapping ( uniforms ) {
+		if ( uniforms.avgLuminance ) {
+			uniforms.avgLuminance.value = _this.toneMapping_AvgLum;
+			uniforms.maxLuminance.value = _this.toneMappingMaxLuminance;
+			uniforms.middleGrey.value = _this.toneMappingMiddleGrey;
+			uniforms.luminanceMap.value = _this.toneMappingLuminanceMap;
+		}
 	}
 
 	function refreshUniformsPhong ( uniforms, material ) {
@@ -24516,6 +24571,10 @@ THREE.WebGLExtensions = function ( gl ) {
 				extension = gl.getExtension( 'OES_texture_float_linear' );
 				break;
 
+			case 'OES_texture_half_float_linear':
+				extension = gl.getExtension( 'OES_texture_half_float_linear' );
+				break;
+
 			case 'OES_standard_derivatives':
 				extension = gl.getExtension( 'OES_standard_derivatives' );
 				break;
@@ -24647,6 +24706,24 @@ THREE.WebGLProgram = ( function () {
 			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
 
 		}
+
+		var hdrOutputTypeDefine = null;
+		if ( _this.hdrOutputEnabled ) {
+			if ( parameters.hdrOutput !== false ) {
+				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrOutputType;
+				if ( outputType === THREE.FullHDR ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_FULL";
+				}
+				else if ( outputType === THREE.RGBMHDR ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
+				}
+				else if ( outputType === THREE.LogLuvHDR ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_LOGLUV";
+				}
+
+			}
+		}
+
 
 		// console.log( "building new program " );
 
@@ -24791,6 +24868,8 @@ THREE.WebGLProgram = ( function () {
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+
+				hdrOutputTypeDefine ? "#define " + hdrOutputTypeDefine : "",
 
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",

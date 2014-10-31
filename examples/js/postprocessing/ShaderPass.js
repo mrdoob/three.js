@@ -12,8 +12,8 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader
-
+		fragmentShader: shader.fragmentShader,
+		depthWrite: false
 	} );
 
 	this.renderToScreen = false;

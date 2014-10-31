@@ -173,7 +173,7 @@
 				group3.rotation.x = 0;
 				scene.add( group3 );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: false, devicePixelRatio: 2.0 } );
 				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

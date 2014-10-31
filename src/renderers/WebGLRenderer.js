@@ -64,6 +64,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
+	// hdr rendering
+	
+	this.hdrOutputEnabled = false;
+	this.hdrOutputType = THREE.LogLuvHDR;
+
 	// shadow map
 
 	this.shadowMapEnabled = false;
@@ -3457,7 +3462,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var fog = scene.fog;
-
+		
 		// reset caching for this frame
 
 		_currentGeometryGroupHash = - 1;
@@ -3503,7 +3508,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			opaqueObjects.sort( painterSortStable );
 			transparentObjects.sort( reversePainterSortStable );
-
+			
 		}
 
 		// custom render plugins (pre pass)
@@ -3560,9 +3565,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 			//END_VEROLD_MOD
 
+			// if ( !material.transparent && renderOpaque || material.transparent && renderTransparent ) {
 			renderObjects( opaqueObjects, camera, lights, fog, true, material );
 			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, false, material );
+			// }
 
 		} else {
 
@@ -4745,6 +4752,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			if ( _this.toneMappingEnabled ) {
+				refreshUniformsToneMapping( m_uniforms );
+			}
+
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
@@ -4968,6 +4979,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+	}
+
+	function refreshUniformsToneMapping ( uniforms ) {
+		if ( uniforms.avgLuminance ) {
+			uniforms.avgLuminance.value = _this.toneMapping_AvgLum;
+			uniforms.maxLuminance.value = _this.toneMappingMaxLuminance;
+			uniforms.middleGrey.value = _this.toneMappingMiddleGrey;
+			uniforms.luminanceMap.value = _this.toneMappingLuminanceMap;
+		}
 	}
 
 	function refreshUniformsPhong ( uniforms, material ) {
