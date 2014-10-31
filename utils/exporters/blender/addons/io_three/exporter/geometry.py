@@ -229,7 +229,7 @@ class Geometry(base_classes.BaseNode):
     def __geometry_metadata(self, metadata): 
         skip = (constants.TYPE, constants.FACES, constants.UUID,
             constants.ANIMATION, constants.SKIN_INDICES,
-            constants.SKIN_WEIGHTS, constants.NAME)
+            constants.BONE_MAP, constants.SKIN_WEIGHTS, constants.NAME)
         vectors = (constants.VERTICES, constants.NORMALS)
 
         for key in self.keys():
@@ -339,12 +339,15 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.BONES):
             logger.info('Parsing %s', constants.BONES)
-            self[constants.BONES] = api.mesh.bones(self.node) 
+            bone_data = api.mesh.bones(self.node)
+            self[constants.BONES] = bone_data[constants.BONES]
+            self[constants.BONE_MAP] = bone_data[constants.BONE_MAP]
 
         if self.options.get(constants.SKINNING):
             logger.info('Parsing %s', constants.SKINNING)
-            self[constants.SKIN_INDICES] = api.mesh.skin_indices(self.node)
-            self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(self.node)
+            bone_map = self.get(constants.BONE_MAP) or {}
+            self[constants.SKIN_INDICES] = api.mesh.skin_indices(self.node, bone_map)
+            self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(self.node, bone_map)
 
         if self.options.get(constants.MORPH_TARGETS):
             logger.info('Parsing %s', constants.MORPH_TARGETS)
