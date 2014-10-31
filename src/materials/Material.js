@@ -36,6 +36,9 @@ THREE.Material = function () {
 
 	this.visible = true;
 
+	this.hdrOutput = undefined; //Override for renderer's hdrOutputEnabled
+	this.hdrOutputType = undefined; //Override for renderer's hdrOutputType
+
 	this.needsUpdate = true;
 
 };

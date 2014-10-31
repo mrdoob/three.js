@@ -16,7 +16,6 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "shadowmap" ],
-			THREE.UniformsLib[ "tonemap" ],
 
 		] ),
 
@@ -73,7 +72,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
@@ -90,7 +88,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-				THREE.ShaderChunk[ "tonemap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -110,8 +107,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-			THREE.UniformsLib[ "tonemap" ],
-
+			
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -188,7 +184,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
@@ -222,7 +217,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-				THREE.ShaderChunk[ "tonemap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 				
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -244,8 +238,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-			THREE.UniformsLib[ "tonemap" ],
-
+			
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -326,7 +319,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
@@ -348,7 +340,6 @@ THREE.ShaderLib = {
 
 				
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-				THREE.ShaderChunk[ "tonemap_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 				THREE.ShaderChunk[ "hdr_encode_fragment" ],
@@ -617,8 +608,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-			THREE.UniformsLib[ "tonemap" ],
-
+			
 			{
 
 			"enableAO"          : { type: "i", value: 0 },
@@ -737,8 +727,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
-
+			
 			"void main() {",
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
@@ -1072,7 +1061,6 @@ THREE.ShaderLib = {
 			"	}",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
-				THREE.ShaderChunk[ "tonemap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
 
@@ -1230,10 +1218,8 @@ THREE.ShaderLib = {
 
 	'cube': {
 
-		uniforms: THREE.UniformsUtils.merge( [
-			{ "tCube": { type: "t", value: null },
+		uniforms: { "tCube": { type: "t", value: null },
 					"tFlip": { type: "f", value: - 1 } },
-					THREE.UniformsLib[ "tonemap" ] ]),
 
 		vertexShader: [
 
@@ -1258,8 +1244,7 @@ THREE.ShaderLib = {
 
 			"uniform samplerCube tCube;",
 			"uniform float tFlip;",
-			THREE.ShaderChunk[ "tonemap_pars_fragment" ],
-
+			
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
@@ -1270,7 +1255,6 @@ THREE.ShaderLib = {
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "tonemap_fragment" ],
 				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"

@@ -1,6 +1,6 @@
-#ifdef HDR_OUTPUT
+// #ifdef HDR_OUTPUT
 
-  #ifdef HDR_TYPE_LOGLUV
+  #ifdef HDR_OUTPUT_LOGLUV
     // logLuvMatrix matrix, for encoding
     // const mat3 logLuvMatrix = mat3(
     //     0.2209, 0.3390, 0.4184,
@@ -12,7 +12,7 @@
         0.3390, 0.6780, 0.1130,
         0.4184, 0.7319, 0.2969);
 
-    vec4 HDREncode(in vec4 vRGB) 
+    vec4 HDREncodeLOGLUV(in vec4 vRGB) 
     {    
         vec4 vResult; 
         vec3 Xp_Y_XYZp = vRGB.xyz * logLuvMatrix;
@@ -24,9 +24,9 @@
         return vResult;
     }
 
-  #elif defined( HDR_TYPE_RGBM )
+  #elif defined( HDR_OUTPUT_RGBM )
 
-    vec4 HDREncode( in vec4 color ) {
+    vec4 HDREncodeRGBM( in vec4 color ) {
       vec4 rgbm;
       color *= 1.0 / 6.0;
       rgbm.a = clamp( max( max( color.r, color.g ), max( color.b, 1e-6 ) ) , 0.0, 1.0 );
@@ -34,11 +34,6 @@
       rgbm.rgb = color.rgb / rgbm.a;
       return rgbm;
     }
-  #elif defined( HDR_TYPE_FULL )
-
-    vec4 HDREncode( in vec4 color ) {
-      return color;
-    }
-
+  
   #endif
-#endif
+// #endif

@@ -40,8 +40,10 @@ THREE.LuminosityShader = {
 
 			"vec4 texel = texture2D( tDiffuse, vUv );",
 
-			"#ifdef HDR_INPUT",
-				"texel.xyz = HDRDecode( texel );",
+			"#ifdef HDR_INPUT_LOGLUV",
+				"texel.xyz = HDRDecodeLOGLUV( texel );",
+			"#elif defined( HDR_INPUT_RGBM )",
+				"texel.xyz = HDRDecodeRGBM( texel );",
 			"#endif",
 
 			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",

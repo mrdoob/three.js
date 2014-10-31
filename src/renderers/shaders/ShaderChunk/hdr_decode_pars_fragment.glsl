@@ -1,6 +1,6 @@
-#ifdef HDR_INPUT
+// #ifdef HDR_INPUT
 
-  #ifdef HDR_TYPE_LOGLUV
+  // #ifdef HDR_TYPE_LOGLUV
 
     // Inverse logLuvMatrix matrix, for decoding
     const mat3 InverseLogLuvMatrix = mat3(
@@ -8,7 +8,7 @@
       -2.700, 3.1029, -1.088,
       -1.7995, -5.7720, 5.6268);  
 
-    vec3 HDRDecode(in vec4 vLogLuv)
+    vec3 HDRDecodeLOGLUV(in vec4 vLogLuv)
     { 
       float Le = vLogLuv.z * 255.0 + vLogLuv.w;
       vec3 Xp_Y_XYZp;
@@ -18,20 +18,20 @@
       vec3 vRGB = InverseLogLuvMatrix * Xp_Y_XYZp;
       return clamp(vRGB, 0.0, 1.0);
     }
-  #elif defined( HDR_TYPE_RGBM )
+  // #elif defined( HDR_TYPE_RGBM )
 
-    vec3 HDRDecode( vec4 rgbm ) {
+    vec3 HDRDecodeRGBM( vec4 rgbm ) {
       return 6.0 * rgbm.rgb * rgbm.a;
     }
 
-  #elif defined( HDR_TYPE_RGBD )
-    vec3 HDRDecode( vec4 rgbd ) {
+  // #elif defined( HDR_OUTPUT_RGBD )
+    vec3 HDRDecodeRGBD( vec4 rgbd ) {
       // return rgbd.rgb * ((MaxRange / 255.0) / rgbd.a);
-      return rgbd.rgb * / rgbd.a;
+      return rgbd.rgb / rgbd.a;
     }
-  #elif defined( HDR_TYPE_FULL )
-    vec3 HDRDecode( vec4 rgbd ) {
-      return rgbd.rgb;
-    }
-  #endif
-#endif
+  // #elif defined( HDR_TYPE_FULL )
+  //   vec3 HDRDecode( vec4 rgbd ) {
+  //     return rgbd.rgb;
+  //   }
+//   #endif
+// #endif

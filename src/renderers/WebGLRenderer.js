@@ -64,16 +64,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
-	// tone mapping
-
-	this.toneMappingEnabled = false;
-	this.toneMappingMaxLuminance = 16.0;
-	this.toneMappingMiddleGrey = 0.6;
-
 	// hdr rendering
 	
-	this.hdrEnabled = false;
-	this.hdrType = THREE.LogLuvHDR;
+	this.hdrOutputEnabled = false;
+	this.hdrOutputType = THREE.LogLuvHDR;
 
 	// shadow map
 

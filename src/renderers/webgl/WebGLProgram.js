@@ -85,17 +85,17 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		var hdrOutputTypeDefine = null;
-		if ( _this.hdrEnabled ) {
+		if ( _this.hdrOutputEnabled ) {
 			if ( parameters.hdrOutput !== false ) {
-				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrType;
+				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrOutputType;
 				if ( outputType === THREE.FullHDR ) {
-					hdrOutputTypeDefine = "HDR_TYPE_FULL";
+					hdrOutputTypeDefine = "HDR_OUTPUT_FULL";
 				}
 				else if ( outputType === THREE.RGBMHDR ) {
-					hdrOutputTypeDefine = "HDR_TYPE_RGBM";
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
 				}
 				else if ( outputType === THREE.LogLuvHDR ) {
-					hdrOutputTypeDefine = "HDR_TYPE_LOGLUV";
+					hdrOutputTypeDefine = "HDR_OUTPUT_LOGLUV";
 				}
 
 			}
@@ -246,13 +246,6 @@ THREE.WebGLProgram = ( function () {
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
 
-				_this.toneMappingEnabled ? "#define USE_TONEMAPPING" : "",
-				
-				_this.hdrEnabled && parameters.hdrOutput !== false ? "#define HDR_OUTPUT" : "",
-				_this.hdrEnabled && parameters.hdrInput !== false ? "#define HDR_INPUT" : "",
-				// _this.hdrEnabled && _this.hdrType === THREE.LogLuvHDR ? "#define HDR_TYPE_LOGLUV" : "",
-				// _this.hdrEnabled && _this.hdrType === THREE.RGBMHDR ? "#define HDR_TYPE_RGBM" : "",
-				// _this.hdrEnabled && _this.hdrType === THREE.FullHDR ? "#define HDR_TYPE_FULL" : "",
 				hdrOutputTypeDefine ? "#define " + hdrOutputTypeDefine : "",
 
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",

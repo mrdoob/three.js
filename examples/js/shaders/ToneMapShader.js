@@ -10,6 +10,7 @@ THREE.ToneMapShader = {
 
 		"tDiffuse": { type: "t", value: null },
 		"averageLuminance":  { type: "f", value: 1.0 },
+		"luminanceMap":  { type: "t", value: null },
 		"maxLuminance":  { type: "f", value: 16.0 },
 		"middleGrey":  { type: "f", value: 0.6 }
 	},
@@ -29,21 +30,27 @@ THREE.ToneMapShader = {
 
 	fragmentShader: [
 
-		"#define ADAPTED_LUMINANCE",
-
 		"uniform sampler2D tDiffuse;",
 
 		"varying vec2 vUv;",
 
 		"uniform float middleGrey;",
 		"uniform float maxLuminance;",
-		"uniform float averageLuminance;",
+		"#ifdef ADAPTED_LUMINANCE",
+			"uniform sampler2D luminanceMap;",
+		"#else",
+			"uniform float averageLuminance;",
+		"#endif",
 		
 		"const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);",
 
 		"vec3 ToneMap( vec3 vColor ) {",
-			// Get the calculated average luminance 
-			"float fLumAvg = averageLuminance;",
+			"#ifdef ADAPTED_LUMINANCE",
+				// Get the calculated average luminance 
+				"float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;",
+			"#else",
+				"float fLumAvg = averageLuminance;",
+			"#endif",
 			
 			// Calculate the luminance of the current pixel
 			"float fLumPixel = dot(vColor, LUM_CONVERT);",
@@ -61,12 +68,16 @@ THREE.ToneMapShader = {
 		"void main() {",
 
 			"vec4 texel = texture2D( tDiffuse, vUv );",
-			"#ifdef HDR_INPUT",
-				"gl_FragColor = vec4( ToneMap( HDRDecode( texel ) ), 1.0 );",
-				// "gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
+			
+			"#ifdef HDR_INPUT_LOGLUV",
+				"gl_FragColor = vec4( ToneMap( HDRDecodeLOGLUV( texel ) ), 1.0 );",
+			"#elif defined( HDR_INPUT_RGBM )",
+				"gl_FragColor = vec4( ToneMap( HDRDecodeRGBM( texel ) ), 1.0 );",
 			"#else",
 				"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
 			"#endif",
+			//Gamma 2.0
+			"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
 
 		"}"
 
