@@ -179,7 +179,8 @@ class Geometry(base_classes.BaseNode):
         components = [constants.VERTICES, constants.FACES, 
             constants.UVS, constants.COLORS, constants.NORMALS,
             constants.BONES, constants.SKIN_WEIGHTS, 
-            constants.SKIN_INDICES, constants.NAME]
+            constants.SKIN_INDICES, constants.NAME,
+            constants.INFLUENCES_PER_VERTEX]
 
         data = {}
         anim_components = [constants.MORPH_TARGETS, constants.ANIMATION]
@@ -229,7 +230,8 @@ class Geometry(base_classes.BaseNode):
     def __geometry_metadata(self, metadata): 
         skip = (constants.TYPE, constants.FACES, constants.UUID,
             constants.ANIMATION, constants.SKIN_INDICES,
-            constants.BONE_MAP, constants.SKIN_WEIGHTS, constants.NAME)
+            constants.BONE_MAP, constants.SKIN_WEIGHTS, 
+            constants.NAME, constants.INFLUENCES_PER_VERTEX)
         vectors = (constants.VERTICES, constants.NORMALS)
 
         for key in self.keys():
@@ -337,6 +339,10 @@ class Geometry(base_classes.BaseNode):
             self[constants.ANIMATION] = api.mesh.animation(
                 self.node, self.options)
 
+        #@TODO: wondering if bone maps should be stored with
+        #       the object itself or only handled via a local
+        #       variable as it doesn't seem this data has 
+        #       other users outside of the immediate logic
         if self.options.get(constants.BONES):
             logger.info('Parsing %s', constants.BONES)
             bone_data = api.mesh.bones(self.node)
@@ -345,9 +351,15 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.SKINNING):
             logger.info('Parsing %s', constants.SKINNING)
+            influences = self.options.get(
+                constants.INFLUENCES_PER_VERTEX, 2)
             bone_map = self.get(constants.BONE_MAP) or {}
-            self[constants.SKIN_INDICES] = api.mesh.skin_indices(self.node, bone_map)
-            self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(self.node, bone_map)
+
+            self[constants.INFLUENCES_PER_VERTEX] = influences
+            self[constants.SKIN_INDICES] = api.mesh.skin_indices(
+                self.node, bone_map, influences)
+            self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
+                self.node, bone_map, influences)
 
         if self.options.get(constants.MORPH_TARGETS):
             logger.info('Parsing %s', constants.MORPH_TARGETS)

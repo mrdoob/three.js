@@ -60,7 +60,8 @@ def bones(mesh):
         z_axis = -bone_world_pos.y
 
         if bone.use_deform:
-            logger.debug('Adding bone %s at: %s, %s', bone.name, bone_index, bone_index_rel)
+            logger.debug('Adding bone %s at: %s, %s', 
+                bone.name, bone_index, bone_index_rel)
             bone_map[bone_count] = bone_index_rel
             bone_index_rel += 1
             bones.append({
@@ -70,7 +71,8 @@ def bones(mesh):
                 constants.ROTQ: (0,0,0,1)
             })
         else:
-            logger.debug('Ignoring bone %s at: %s, %s', bone.name, bone_index, bone_index_rel)
+            logger.debug('Ignoring bone %s at: %s, %s', 
+                bone.name, bone_index, bone_index_rel)
 
         bone_count += 1
 
@@ -377,15 +379,15 @@ def normals(mesh, options):
 
 
 @_mesh
-def skin_weights(mesh, bone_map):
+def skin_weights(mesh, bone_map, influences):
     logger.debug('mesh.skin_weights(%s)', mesh)
-    return _skinning_data(mesh, bone_map, 1)
+    return _skinning_data(mesh, bone_map, influences, 1)
 
 
 @_mesh
-def skin_indices(mesh, bone_map):
+def skin_indices(mesh, bone_map, influences):
     logger.debug('mesh.skin_indices(%s)', mesh)
-    return _skinning_data(mesh, bone_map, 0)
+    return _skinning_data(mesh, bone_map, influences, 0)
 
 
 @_mesh
@@ -630,7 +632,7 @@ def _armature(mesh):
     return armature
 
 
-def _skinning_data(mesh, bone_map, array_index):
+def _skinning_data(mesh, bone_map, influences, array_index):
     armature = _armature(mesh)
     if not armature: return
 
@@ -645,7 +647,7 @@ def _skinning_data(mesh, bone_map, array_index):
 
         bone_array.sort(key=operator.itemgetter(1), reverse=True)
 
-        for index in range(2):
+        for index in range(influences):
             if index >= len(bone_array):
                 manifest.append(0)
                 continue
