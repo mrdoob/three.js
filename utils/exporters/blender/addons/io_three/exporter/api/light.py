@@ -1,5 +1,5 @@
-from bpy import data, types, context
-from .. import constants, utilities, logger
+from bpy import data, types 
+from .. import utilities, logger
 
 
 def _lamp(func):

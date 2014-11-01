@@ -3,7 +3,7 @@ import mathutils
 from bpy import data, types, context
 from . import material, texture
 from . import object as object_
-from .. import constants, utilities, logger
+from .. import constants, utilities, logger, exceptions
 
 
 def _mesh(func):
@@ -76,10 +76,7 @@ def bones(mesh):
 
         bone_count += 1
 
-    return {
-        constants.BONES: bones,
-        constants.BONE_MAP: bone_map
-    }
+    return (bones, bone_map)
 
 
 @_mesh
@@ -172,7 +169,6 @@ def faces(mesh, options):
     vertex_normals = _normals(mesh, options) if opt_normals else None
     vertex_colours = vertex_colors(mesh) if opt_colours else None
 
-    MASK = constants.MASK
     face_data = []
 
     logger.info('Parsing %d faces', len(mesh.tessfaces))

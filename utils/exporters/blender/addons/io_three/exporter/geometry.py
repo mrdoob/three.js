@@ -230,8 +230,8 @@ class Geometry(base_classes.BaseNode):
     def __geometry_metadata(self, metadata): 
         skip = (constants.TYPE, constants.FACES, constants.UUID,
             constants.ANIMATION, constants.SKIN_INDICES,
-            constants.BONE_MAP, constants.SKIN_WEIGHTS, 
-            constants.NAME, constants.INFLUENCES_PER_VERTEX)
+            constants.SKIN_WEIGHTS, constants.NAME, 
+            constants.INFLUENCES_PER_VERTEX)
         vectors = (constants.VERTICES, constants.NORMALS)
 
         for key in self.keys():
@@ -332,28 +332,27 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.UVS):
             logger.info('Parsing %s', constants.UVS)
-            self[constants.UVS] = api.mesh.uvs(self.node, self.options)
+            self[constants.UVS] = api.mesh.uvs(
+                self.node, self.options)
 
         if self.options.get(constants.ANIMATION):
             logger.info('Parsing %s', constants.ANIMATION)
             self[constants.ANIMATION] = api.mesh.animation(
                 self.node, self.options)
 
-        #@TODO: wondering if bone maps should be stored with
-        #       the object itself or only handled via a local
-        #       variable as it doesn't seem this data has 
-        #       other users outside of the immediate logic
+        #@TODO: considering making bones data implied when
+        #       querying skinning data
+
+        bone_map = {}
         if self.options.get(constants.BONES):
             logger.info('Parsing %s', constants.BONES)
-            bone_data = api.mesh.bones(self.node)
-            self[constants.BONES] = bone_data[constants.BONES]
-            self[constants.BONE_MAP] = bone_data[constants.BONE_MAP]
+            bones, bone_map = api.mesh.bones(self.node)
+            self[constants.BONES] = bones
 
         if self.options.get(constants.SKINNING):
             logger.info('Parsing %s', constants.SKINNING)
             influences = self.options.get(
                 constants.INFLUENCES_PER_VERTEX, 2)
-            bone_map = self.get(constants.BONE_MAP) or {}
 
             self[constants.INFLUENCES_PER_VERTEX] = influences
             self[constants.SKIN_INDICES] = api.mesh.skin_indices(
