@@ -51,7 +51,7 @@ def bones(mesh):
             index = 0
             for parent in armature.data.bones:
                 if parent.name == bone.parent.name:
-                    bone_index = index
+                    bone_index = bone_map.get(index)
                 index += 1
 
         bone_world_pos = armature.matrix_world * bone_pos
