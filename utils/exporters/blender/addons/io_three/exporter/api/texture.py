@@ -1,4 +1,3 @@
-import bpy
 from bpy import data, types
 from .. import constants, logger
 from .constants import IMAGE, MAG_FILTER, MIN_FILTER, MAPPING

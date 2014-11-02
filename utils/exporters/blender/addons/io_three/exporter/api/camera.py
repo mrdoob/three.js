@@ -1,6 +1,5 @@
-import math
 from bpy import data, types, context
-from .. import constants, logger
+from .. import logger
 
 
 def _camera(func):

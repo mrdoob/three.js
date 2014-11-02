@@ -43,7 +43,6 @@ VERTICES = 'vertices'
 FACES = 'faces'
 NORMALS = 'normals'
 BONES = 'bones'
-BONE_MAP = 'boneMap'
 UVS = 'uvs'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
@@ -83,6 +82,8 @@ MSGPACK = 'msgpack'
 
 PACK = 'pack'
 
+INFLUENCES_PER_VERTEX = 'influencesPerVertex'
+
 EXPORT_OPTIONS = {
     FACES: True,
     VERTICES: True,
@@ -109,7 +110,8 @@ EXPORT_OPTIONS = {
     PRECISION: DEFAULT_PRECISION,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
-    GEOMETRY_TYPE: GEOMETRY
+    GEOMETRY_TYPE: GEOMETRY,
+    INFLUENCES_PER_VERTEX: 2
 }
 
 

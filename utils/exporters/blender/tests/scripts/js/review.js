@@ -75,20 +75,33 @@ function loadObject( data ) {
     var loader = new THREE.ObjectLoader();
     scene = loader.parse( data );
 
-
     var hasLights = false;
 
     var lights = ['AmbientLight', 'DirectionalLight', 'AreaLight',
         'PointLight', 'SpotLight', 'HemisphereLight']
 
-    for ( i = 0; i < data.object.children.length; i ++ ) {
+    var cameras = ['OrthographicCamera', 'PerspectiveCamera'];
 
-        var index = lights.indexOf( data.object.children[ i ].type );
+    for ( i = 0; i < scene.children.length; i ++ ) {
 
-        if ( index > -1 ) {
+        var lightIndex = lights.indexOf( scene.children[ i ].type );
+
+        if ( lightIndex > -1 ) {
 
             hasLights = true;
-            break;
+            continue;
+
+        }
+
+        var cameraIndex = cameras.indexOf( scene.children[ i ].type );
+
+        if ( cameraIndex > -1 ) {
+
+            camera = scene.children[ i ];
+            var container = document.getElementById( 'viewport' );
+            var aspect = container.offsetWidth / container.offsetHeight;
+            camera.aspect = aspect;
+            camera.updateProjectionMatrix();
 
         }
 

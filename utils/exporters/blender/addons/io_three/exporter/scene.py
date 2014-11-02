@@ -2,11 +2,9 @@ import os
 from .. import constants
 from . import (
     base_classes,
-    image,
     texture,
     material,
     geometry, 
-    exceptions,
     object,
     logger,
     io,
@@ -83,7 +81,6 @@ class Scene(base_classes.BaseScene):
         extension = constants.EXTENSIONS.get(compression, 
             constants.EXTENSIONS[constants.JSON])
 
-        #@TODO: test this new logic
         export_dir = os.path.dirname(self.filepath)
         for key, value in self.items():
             

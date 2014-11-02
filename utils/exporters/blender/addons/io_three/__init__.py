@@ -232,7 +232,8 @@ def save_settings_export(properties):
 
         constants.MORPH_TARGETS: properties.option_animation_morph,
         constants.ANIMATION: properties.option_animation_skeletal,
-        constants.FRAME_STEP: properties.option_frame_step
+        constants.FRAME_STEP: properties.option_frame_step,
+        constants.INFLUENCES_PER_VERTEX: properties.option_influences
     }
 
     fname = get_settings_fullpath()
@@ -253,16 +254,28 @@ def restore_settings_export(properties):
 
     ## Geometry {
     properties.option_vertices = settings.get(
-        constants.VERTICES, constants.EXPORT_OPTIONS[constants.VERTICES])
+        constants.VERTICES, 
+        constants.EXPORT_OPTIONS[constants.VERTICES])
+
     properties.option_faces = settings.get(
-        constants.FACES, constants.EXPORT_OPTIONS[constants.FACES])
+        constants.FACES, 
+        constants.EXPORT_OPTIONS[constants.FACES])
     properties.option_normals = settings.get(
-        constants.NORMALS, constants.EXPORT_OPTIONS[constants.NORMALS])
+        constants.NORMALS, 
+        constants.EXPORT_OPTIONS[constants.NORMALS])
 
     properties.option_skinning = settings.get(
-        constants.SKINNING, constants.EXPORT_OPTIONS[constants.SKINNING])
+        constants.SKINNING, 
+        constants.EXPORT_OPTIONS[constants.SKINNING])
+
     properties.option_bones = settings.get(
-        constants.BONES, constants.EXPORT_OPTIONS[constants.BONES])
+        constants.BONES, 
+        constants.EXPORT_OPTIONS[constants.BONES])
+
+    properties.option_influences = settings.get(
+        constants.INFLUENCES_PER_VERTEX,
+        constants.EXPORT_OPTIONS[constants.INFLUENCES_PER_VERTEX])
+
     properties.option_geometry_type = settings.get(
         constants.GEOMETRY_TYPE,
         constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
@@ -270,36 +283,55 @@ def restore_settings_export(properties):
 
     ## Materials {
     properties.option_materials = settings.get(
-        constants.MATERIALS, constants.EXPORT_OPTIONS[constants.MATERIALS])
+        constants.MATERIALS, 
+        constants.EXPORT_OPTIONS[constants.MATERIALS])
+
     properties.option_uv_coords = settings.get(
-        constants.UVS, constants.EXPORT_OPTIONS[constants.UVS])
+        constants.UVS, 
+        constants.EXPORT_OPTIONS[constants.UVS])
+
     properties.option_face_materials = settings.get(
         constants.FACE_MATERIALS, 
         constants.EXPORT_OPTIONS[constants.FACE_MATERIALS])
+
     properties.option_maps = settings.get(
-        constants.MAPS, constants.EXPORT_OPTIONS[constants.MAPS])
+        constants.MAPS, 
+        constants.EXPORT_OPTIONS[constants.MAPS])
+
     properties.option_colors = settings.get(
-        constants.COLORS, constants.EXPORT_OPTIONS[constants.COLORS])
+        constants.COLORS, 
+        constants.EXPORT_OPTIONS[constants.COLORS])
+
     properties.option_mix_colors = settings.get(
-        constants.MIX_COLORS, constants.EXPORT_OPTIONS[constants.MIX_COLORS])
+        constants.MIX_COLORS, 
+        constants.EXPORT_OPTIONS[constants.MIX_COLORS])
     ## }
 
     ## Settings {
     properties.option_scale = settings.get(
-        constants.SCALE, constants.EXPORT_OPTIONS[constants.SCALE])
+        constants.SCALE, 
+        constants.EXPORT_OPTIONS[constants.SCALE])
+
     properties.option_round_off = settings.get(
         constants.ENABLE_PRECISION, 
         constants.EXPORT_OPTIONS[constants.ENABLE_PRECISION])
+
     properties.option_round_value = settings.get(
         constants.PRECISION, 
         constants.EXPORT_OPTIONS[constants.PRECISION])
+
     properties.option_logging = settings.get(
-        constants.LOGGING, constants.EXPORT_OPTIONS[constants.LOGGING])
+        constants.LOGGING, 
+        constants.EXPORT_OPTIONS[constants.LOGGING])
+
     properties.option_compression = settings.get(
-        constants.COMPRESSION, constants.NONE)
+        constants.COMPRESSION, 
+        constants.NONE)
+
     properties.option_copy_textures = settings.get(
         constants.COPY_TEXTURES, 
         constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
+
     properties.option_embed_animation = settings.get(
         constants.EMBED_ANIMATION, 
         constants.EXPORT_OPTIONS[constants.EMBED_ANIMATION])
@@ -307,26 +339,34 @@ def restore_settings_export(properties):
 
     ## Scene {
     properties.option_export_scene = settings.get(
-        constants.SCENE, constants.EXPORT_OPTIONS[constants.SCENE])
+        constants.SCENE, 
+        constants.EXPORT_OPTIONS[constants.SCENE])
+
     properties.option_embed_geometry = settings.get(
         constants.EMBED_GEOMETRY, 
         constants.EXPORT_OPTIONS[constants.EMBED_GEOMETRY])
+
     properties.option_lights = settings.get(
-        constants.LIGHTS, constants.EXPORT_OPTIONS[constants.LIGHTS])
+        constants.LIGHTS, 
+        constants.EXPORT_OPTIONS[constants.LIGHTS])
+
     properties.option_cameras = settings.get(
-        constants.CAMERAS, constants.EXPORT_OPTIONS[constants.CAMERAS])
+        constants.CAMERAS, 
+        constants.EXPORT_OPTIONS[constants.CAMERAS])
     ## }
 
     ## Animation {
     properties.option_animation_morph = settings.get(
-        constants.MORPH_TARGETS, constants.EXPORT_OPTIONS[constants.MORPH_TARGETS])
+        constants.MORPH_TARGETS, 
+        constants.EXPORT_OPTIONS[constants.MORPH_TARGETS])
+
     properties.option_animation_skeletal = settings.get(
-        constants.ANIMATION, constants.EXPORT_OPTIONS[constants.ANIMATION])
-    #properties.option_frame_index_as_time = settings.get(
-    #    'option_frame_index_as_time', False)
+        constants.ANIMATION, 
+        constants.EXPORT_OPTIONS[constants.ANIMATION])
 
     properties.option_frame_step = settings.get(
-        constants.FRAME_STEP, constants.EXPORT_OPTIONS[constants.FRAME_STEP])
+        constants.FRAME_STEP, 
+        constants.EXPORT_OPTIONS[constants.FRAME_STEP])
     ## }
 
 def compression_types():
@@ -498,6 +538,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         items=compression_types(), 
         default=constants.NONE)
 
+    option_influences = IntProperty(
+        name='Influences',
+        description='Maximum number of bone influences',
+        min=1,
+        max=4,
+        default=2)
+
     def invoke(self, context, event):
         restore_settings_export(self.properties)
         return ExportHelper.invoke(self, context, event)
@@ -544,6 +591,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_influences')
         ## }
 
         layout.separator()

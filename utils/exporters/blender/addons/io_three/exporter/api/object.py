@@ -2,7 +2,7 @@ import math
 import mathutils
 import bpy
 from bpy import data, context, types
-from .. import constants, logger, utilities
+from .. import constants, logger, utilities, exceptions
 from .constants import (
     MESH,
     EMPTY,
@@ -13,8 +13,6 @@ from .constants import (
     POINT,
     HEMI,
     AREA,
-    PERSP,
-    ORTHO,
     CAMERA,
     PERSP,
     ORTHO,
@@ -50,7 +48,6 @@ def _object(func):
 
 def assemblies(valid_types):
     logger.debug('object.assemblies(%s)', valid_types)
-    nodes = []
     for obj in data.objects:
         if not obj.parent and obj.type in valid_types:
             yield obj.name
@@ -390,7 +387,6 @@ def _matrix(obj):
 
 
 def _on_visible_layer(obj, visible_layers):
-    obj_layers = []
     visible = True
     for index, layer in enumerate(obj.layers):
         if layer and index not in visible_layers:
