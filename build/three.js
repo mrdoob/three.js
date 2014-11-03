@@ -17790,7 +17790,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// hdr rendering
 	
 	this.hdrOutputEnabled = false;
-	this.hdrOutputType = THREE.LogLuvHDR;
+	this.hdrOutputType = THREE.FullHDR;
 
 	// shadow map
 
@@ -21302,17 +21302,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 
-			//START_VEROLD_MOD
 			renderObjects( opaqueObjects, camera, lights, fog, false, material );
-			//END_VEROLD_MOD
 			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
-
+			
 			// transparent pass (back-to-front order)
-			//START_VEROLD_MOD
 			renderObjects( transparentObjects, camera, lights, fog, true, material );
-			//END_VEROLD_MOD
 			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
-
+			
 		}
 
 		// custom render plugins (post pass)
