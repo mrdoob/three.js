@@ -5,6 +5,8 @@
 
 THREE.VRControls = function ( object, callback ) {
 
+	var scope = this;
+
 	var vrInput;
 
 	var onVRDevices = function ( devices ) {
@@ -59,7 +61,7 @@ THREE.VRControls = function ( object, callback ) {
 
 		if ( state.position !== null ) {
 
-			object.position.copy( state.position ).multiplyScalar( this.scale );
+			object.position.copy( state.position ).multiplyScalar( scope.scale );
 
 		}
 

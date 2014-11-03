@@ -20,20 +20,46 @@
         text-align: center;
         top: 0px;
         width: 100%;
+        padding: 10px;
       }
 
       .info a {
         color: #00ffff;
       }
+
+      .button {
+        display: inline-block;
+        padding: 8px;
+        color: #FFF;
+        background-color: #555;
+      }
+
+      .button:hover {
+        cursor: pointer;
+        background-color: red;
+      }
+
+      .lock-pointer {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+      }
+
+      .button.enabled {
+        background-color: red;
+      }
+
     </style>
   </head>
   <body>
 
     <div class="info">
-      <a href="http://threejs.org" target="_blank">three.js</a> webgl - gpu picking
+      Click and drag to rotate the camera
     </div>
 
-    <div id="container"></div>
+    <div id="container">
+      <div class="button lock-pointer">Lock Pointer</div>
+    </div>
 
     <script src="../build/three.js"></script>
 
@@ -53,6 +79,45 @@
       var mouse = new THREE.Vector2();
       var offset = new THREE.Vector3( 10, 10, 10 );
       var cursor;
+      var lockPointerButton = document.querySelector('.lock-pointer');
+
+      lockPointerButton.onclick = lockPointer;
+
+      document.exitPointerLock = document.exitPointerLock    ||
+                                 document.mozExitPointerLock ||
+                                 document.webkitExitPointerLock;
+
+      function lockPointer() {
+        var pointerLockElement =
+          document.pointerLockElement ||
+          document.mozPointerLockElement ||
+          document.webkitPointerLockElement;
+        if ( !pointerLockElement ) {
+          lockPointerButton.textContent = '\'Esc\' to release pointer';
+          lockPointerButton.classList.add('enabled');
+          renderer.domElement.requestPointerLock();
+        }
+      }
+
+      function resetPointerLockButton() {
+        lockPointerButton.textContent = 'Lock Pointer';
+        lockPointerButton.classList.remove('enabled');
+      }
+
+      function onPointerLockChanged() {
+        var pointerLocked =
+        document.pointerLockElement ||
+        document.mozPointerLockElement ||
+        document.webkitPointerLockElement;
+
+        if ( !pointerLocked ) {
+          resetPointerLockButton();
+        }
+      }
+
+      document.addEventListener( 'pointerlockchange', onPointerLockChanged, false );
+      document.addEventListener( 'mozpointerlockchange', onPointerLockChanged, false );
+      document.addEventListener( 'webkitpointerlockchange', onPointerLockChanged, false );
 
       init();
       animate();
@@ -176,10 +241,14 @@
         stats.domElement.style.top = '0px';
         container.appendChild( stats.domElement );
 
-        scene.add ( camera );
         cursor = new THREE.Cursor( camera, renderer );
+        scene.add( camera );
 
         renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+
+        renderer.domElement.requestPointerLock = renderer.domElement.requestPointerLock ||
+        renderer.domElement.mozRequestPointerLock ||
+        renderer.domElement.webkitRequestPointerLock;
 
       }
 
@@ -243,7 +312,7 @@
       function render() {
 
         controls.update();
-        pick();
+        //pick();
 
         renderer.render( scene, camera );
         cursor.update();
