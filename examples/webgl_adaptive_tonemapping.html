@@ -145,8 +145,8 @@
 					earthMat.needsUpdate = true;
 				} );
 
-				
-				var sphereMesh = new THREE.Mesh( new THREE.SphereGeometry( 600, 24, 24 ), earthMat );
+				var earthGeo = new THREE.SphereGeometry( 600, 24, 24 );
+				var sphereMesh = new THREE.Mesh( earthGeo, earthMat );
 				scene.add( sphereMesh );
 
 				var earthLightsMat = new THREE.MeshBasicMaterial( { color: 0xffffff, blending: THREE.AdditiveBlending, transparent: true, depthTest: false } );
@@ -155,8 +155,17 @@
 					earthLightsMat.needsUpdate = true;
 				} );
 
-				var sphereLightsMesh = new THREE.Mesh( new THREE.SphereGeometry( 600, 24, 24 ), earthLightsMat );
+				var sphereLightsMesh = new THREE.Mesh( earthGeo, earthLightsMat );
 				scene.add( sphereLightsMesh );
+
+				var earthCloudsMat = new THREE.MeshLambertMaterial( { color: 0x555555, blending: THREE.NormalBlending, transparent: true, depthTest: false } );
+				var earthClouds = THREE.ImageUtils.loadTexture( 'textures/planets/earth_clouds_1024.png', undefined, function( tex ) {
+					earthCloudsMat.map = tex;
+					earthCloudsMat.needsUpdate = true;
+				} );
+
+				var sphereCloudsMesh = new THREE.Mesh( earthGeo, earthCloudsMat );
+				scene.add( sphereCloudsMesh );
 
 				var vBGShader = [
 					// "attribute vec2 uv;",
@@ -286,9 +295,8 @@
   			effectComposer.setSize( window.innerWidth, window.innerHeight );
 				var debugPass = new THREE.RenderPass( debugScene, cameraBG );
 				debugPass.clear = false;
-				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, true, false );
-				var sceneTransparentPass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, false, true );
-				sceneTransparentPass.clear = false;
+				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined );
+				
 				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
   			scenePass.clear = false;
 
@@ -296,9 +304,6 @@
   			
   			effectComposer.addPass( skyboxPass );
   			effectComposer.addPass( scenePass );
-
-  			// // sceneTransparentPass.needsSwap = true;
-  			effectComposer.addPass( sceneTransparentPass );
 
   			effectComposer.addPass( luminancePass );
   			luminancePass.needsSwap = true;

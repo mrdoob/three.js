@@ -21025,7 +21025,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera, renderTarget, forceClear, options ) {
+	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
@@ -21035,9 +21035,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var fog = scene.fog;
-		var renderOpaque = (!options || options.renderOpaque !== false);
-		var renderTransparent = (!options || options.renderTransparent !== false);
-
+		
 		// reset caching for this frame
 
 		_currentGeometryGroupHash = - 1;
@@ -21081,14 +21079,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _this.sortObjects === true ) {
 
-			if ( renderOpaque ) {
-				opaqueObjects.sort( painterSortStable );
-			}
-
-			if ( renderTransparent ) {
-				transparentObjects.sort( reversePainterSortStable );
-			}
-
+			opaqueObjects.sort( painterSortStable );
+			transparentObjects.sort( reversePainterSortStable );
+			
 		}
 
 		// custom render plugins (pre pass)
@@ -21150,17 +21143,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 
-			if ( renderOpaque ) {
-				renderObjects( opaqueObjects, camera, lights, fog, false, material );
-				renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
-			}
-
+			renderObjects( opaqueObjects, camera, lights, fog, false, material );
+			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
+			
 			// transparent pass (back-to-front order)
-			if ( renderTransparent ) {
-				renderObjects( transparentObjects, camera, lights, fog, true, material );
-				renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
-			}
-
+			renderObjects( transparentObjects, camera, lights, fog, true, material );
+			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
+			
 		}
 
 		// custom render plugins (post pass)
