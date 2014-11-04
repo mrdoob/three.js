@@ -192,7 +192,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var positions = attributes.position.array;
 
-				for ( var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9 ) {
+				for ( var i = 0, j = 0, jl = positions.length; j < jl; i += 3, j += 9 ) {
 
 					// Test if the triangle is near the ray.
 					if (positions[ j     ] < minX && positions[ j + 3 ] < minX && positions[ j + 6 ] < minX) continue;
