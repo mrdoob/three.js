@@ -47,13 +47,54 @@ THREE.Cursor = function ( object, renderer ) {
 	this.pivot.add( this.cursor );
 	this.scene.add( this.pivot );
 
+	this.previousCamera = new THREE.Quaternion().copy( object.quaternion );
+
 	this.update = function() {
 		var autoClear;
 		var rotation = this.rotation;
+		var mouseQuaternion;
+		var angleX;
+		var angleY;
+		var differenceQuaternion;
+		var lockEuler;
+		var cameraQuaternion;
+
 		if ( this.pointerLocked ) {
-			rotation.euler.set( rotation.x, rotation.y, 0 );
+
+			var angleX = Math.abs(this.rotation.x * 360);
+			var angleY = Math.abs(this.rotation.y * 360);
+
+			var validAngle =
+				angleX < (scope.object.fov / 2) - 5 &&
+				angleY < (scope.object.fov / 2) * scope.object.aspect - 20
+
+			differenceQuaternion = new THREE.Quaternion().copy( this.previousCamera ).inverse();
+			mouseQuaternion = new THREE.Quaternion().copy( scope.object.quaternion ).multiply( differenceQuaternion );
+			lockEuler = new THREE.Euler().setFromQuaternion( mouseQuaternion );
+			if ( !this.previousCamera.equals( scope.object.quaternion ) && validAngle && !this.lock) {
+
+				this.rotation.x -= lockEuler.x / (2 * Math.PI);
+				this.rotation.y -= lockEuler.y / (2 * Math.PI);
+
+				if ( Math.abs(this.rotation.x * 360) >= (scope.object.fov / 2) - 5) {
+					this.rotation.x = clamp(this.rotation.x * 360, (scope.object.fov / 2) - 5) / 360;
+					this.lock = true;
+				}
+
+				if (Math.abs(this.rotation.y * 360) >= (scope.object.fov / 2) * scope.object.aspect - 20) {
+					this.rotation.y = clamp(this.rotation.y * 360, (scope.object.fov / 2) * scope.object.aspect - 20) / 360;
+					this.lock = true;
+				}
+
+			}
+			this.previousCamera.copy( scope.object.quaternion );
+
+			rotation.euler.set( this.rotation.x * 2 * Math.PI, this.rotation.y * 2 * Math.PI, 0 );
 			rotation.quaternion.setFromEuler( rotation.euler, true );
-			this.pivot.quaternion.copy( rotation.quaternion );
+			mouseQuaternion =	new THREE.Quaternion().multiply( rotation.quaternion );
+			pivotQuaternion = new THREE.Quaternion().multiply( mouseQuaternion );
+			this.pivot.quaternion.copy( pivotQuaternion );
+
 		} else {
 			this.cursor.position.x = this.mouseVector.x;
 			this.cursor.position.y = -this.mouseVector.y;
@@ -62,6 +103,16 @@ THREE.Cursor = function ( object, renderer ) {
 			this.renderer.render( this.scene, this.camera );
 			this.renderer.autoClear = autoClear;
 		}
+	};
+
+	function clamp(value, boundary) {
+		if (value < -boundary) {
+		  return -boundary;
+		}
+		if (value > boundary) {
+		  return boundary;
+		}
+		return angle;
 	};
 
 	function updateScreenPosition( e ) {
@@ -86,17 +137,33 @@ THREE.Cursor = function ( object, renderer ) {
 				e.mozMovementY ||
 				e.webkitMovementY || 0;
 
-		// Rotation in degrees
-		var rotationX = (movementX * pixelsToDegreesFactor) % 360;
-		var rotationY = (movementY * pixelsToDegreesFactor) % 360;
+		var rotationX = scope.rotation.x - movementY * pixelsToDegreesFactor;
+		var rotationY = scope.rotation.y - movementX * pixelsToDegreesFactor;
 
-		// To Radians
-		scope.rotation.x -= rotationY * 2 * Math.PI;
-		scope.rotation.y -= rotationX * 2 * Math.PI;
+		if (Math.abs(rotationX * 360) >= (scope.object.fov / 2) - 5) {
+			movementY = 0;
+			scope.lock = true;
+		} else {
+			scope.lock = false;
+		}
+
+		if (Math.abs(rotationY * 360) >= (scope.object.fov / 2) * scope.object.aspect - 20) {
+			movementX = 0;
+			scope.lock = true;
+		} else {
+			scope.lock = false;
+		}
+
+		scope.rotation.x -= movementY * pixelsToDegreesFactor;
+		scope.rotation.y -= movementX * pixelsToDegreesFactor;
+
 	}
 
 	function onMouseMove( e ) {
 		if ( scope.pointerLocked ) {
+			if ( scope.mouseDown === true ) {
+				return;
+			}
 			updateRadialPosition ( e );
 		} else {
 			updateScreenPosition ( e )
@@ -132,11 +199,11 @@ THREE.Cursor = function ( object, renderer ) {
 	}
 
 	function onMouseUp() {
-		scope.onMouseDown = false;
+		scope.mouseDown = false;
 	}
 
 	function onMouseDown() {
-		scope.onMouseDown = true;
+		scope.mouseDown = true;
 	}
 
 	this.domElement.addEventListener( 'mousemove', onMouseMove );
