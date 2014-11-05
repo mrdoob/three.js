@@ -9369,7 +9369,7 @@ THREE.Geometry.prototype = {
 
 			if ( uvs !== undefined ) {
 
-				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ], tempUVs[ b ], tempUVs[ c ] ] );
+				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
 
 			}
 
@@ -9887,7 +9887,7 @@ THREE.Geometry.prototype = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+				uvCopy.push( uv[ j ].clone() );
 
 			}
 
