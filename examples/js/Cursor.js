@@ -53,25 +53,24 @@ THREE.Cursor = function ( object, renderer ) {
 		var autoClear;
 		var rotation = this.rotation;
 		var mouseQuaternion;
-		var angleX;
-		var angleY;
+		// var angleX;
+		// var angleY;
 		var differenceQuaternion;
 		var lockEuler;
-		var cameraQuaternion;
 
 		if ( this.pointerLocked ) {
 
-			var angleX = Math.abs(this.rotation.x * 360);
-			var angleY = Math.abs(this.rotation.y * 360);
+			// var angleX = Math.abs(this.rotation.x * 360);
+			// var angleY = Math.abs(this.rotation.y * 360);
 
-			var validAngle =
-				angleX < (scope.object.fov / 2) - 5 &&
-				angleY < (scope.object.fov / 2) * scope.object.aspect - 20
+			// var validAngle =
+			// 	angleX < (scope.object.fov / 2) - 5 &&
+			// 	angleY < (scope.object.fov / 2) * scope.object.aspect - 20
 
 			differenceQuaternion = new THREE.Quaternion().copy( this.previousCamera ).inverse();
 			mouseQuaternion = new THREE.Quaternion().copy( scope.object.quaternion ).multiply( differenceQuaternion );
 			lockEuler = new THREE.Euler().setFromQuaternion( mouseQuaternion );
-			if ( !this.previousCamera.equals( scope.object.quaternion ) && validAngle && !this.lock) {
+			if ( !this.previousCamera.equals( scope.object.quaternion ) && !this.lock) {
 
 				this.rotation.x -= lockEuler.x / (2 * Math.PI);
 				this.rotation.y -= lockEuler.y / (2 * Math.PI);
