@@ -241,7 +241,6 @@
         container.appendChild( stats.domElement );
 
         cursor = new THREE.Cursor( camera, renderer );
-        // scene.add( cursor.pivot );
         scene.add( camera );
 
         renderer.domElement.addEventListener( 'mousemove', onMouseMove );
@@ -312,10 +311,10 @@
       function render() {
 
         controls.update();
-        //pick();
-
-        renderer.render( scene, camera );
         cursor.update();
+        //pick();
+        renderer.render( scene, camera );
+        cursor.render();
 
       }
 
