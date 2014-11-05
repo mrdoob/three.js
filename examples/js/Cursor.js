@@ -20,6 +20,11 @@ THREE.Cursor = function ( object, renderer ) {
 	var cursorPosition = new THREE.Vector3();
 	var pixelsToDegreesFactor = 0.00025;
 
+	var verticalFOV = scope.object.fov;
+	var verticalFOVPadding = 5;
+	var horizontalFOV = scope.object.fov * scope.object.aspect;
+	var horizontalFOVPadding = verticalFOVPadding * scope.object.aspect + 10;
+
 	this.rotation = {
 		x: 0,
 		y: 0,
@@ -66,13 +71,13 @@ THREE.Cursor = function ( object, renderer ) {
 				this.rotation.x -= lockEuler.x / (2 * Math.PI);
 				this.rotation.y -= lockEuler.y / (2 * Math.PI);
 
-				if ( Math.abs(this.rotation.x * 360) >= (scope.object.fov / 2) - 5) {
-					this.rotation.x = clamp(this.rotation.x * 360, (scope.object.fov / 2) - 5) / 360;
+				if ( Math.abs(this.rotation.x * 360) >= (verticalFOV / 2) - verticalFOVPadding) {
+					this.rotation.x = clamp(this.rotation.x * 360, (verticalFOV / 2) - verticalFOVPadding) / 360;
 					this.lock = true;
 				}
 
-				if (Math.abs(this.rotation.y * 360) >= (scope.object.fov / 2) * scope.object.aspect - 20) {
-					this.rotation.y = clamp(this.rotation.y * 360, (scope.object.fov / 2) * scope.object.aspect - 20) / 360;
+				if (Math.abs(this.rotation.y * 360) >= (horizontalFOV / 2) - horizontalFOVPadding) {
+					this.rotation.y = clamp(this.rotation.y * 360, (horizontalFOV / 2) - horizontalFOVPadding) / 360;
 					this.lock = true;
 				}
 
@@ -130,14 +135,14 @@ THREE.Cursor = function ( object, renderer ) {
 		var rotationX = scope.rotation.x - movementY * pixelsToDegreesFactor;
 		var rotationY = scope.rotation.y - movementX * pixelsToDegreesFactor;
 
-		if (Math.abs(rotationX * 360) >= (scope.object.fov / 2) - 5) {
+		if (Math.abs(rotationX * 360) >= (verticalFOV / 2) - verticalFOVPadding) {
 			movementY = 0;
 			scope.lock = true;
 		} else {
 			scope.lock = false;
 		}
 
-		if (Math.abs(rotationY * 360) >= (scope.object.fov / 2) * scope.object.aspect - 20) {
+		if (Math.abs(rotationY * 360) >= (horizontalFOV / 2) - horizontalFOVPadding) {
 			movementX = 0;
 			scope.lock = true;
 		} else {
