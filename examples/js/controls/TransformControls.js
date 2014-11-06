@@ -150,6 +150,7 @@
 
 			this.traverse(function ( child ) {
 				if (child instanceof THREE.Mesh) {
+
 					child.updateMatrix();
 
 					var tempGeometry = new THREE.Geometry();
@@ -701,11 +702,17 @@
 			camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );
 
 			this.position.copy( worldPosition );
-			if (camera instanceof THREE.OrthographicCamera){
-				scale = scope.size * (camera.right-camera.left) / 2.0;
-			}else{
+
+			if ( camera instanceof THREE.OrthographicCamera ) {
+
+				scale = scope.size * ( camera.right - camera.left ) / 2.0;
+
+			} else {
+
 				scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
+
 			}
+
 			this.scale.set( scale, scale, scale );
 
 			eye.copy( camPosition ).sub( worldPosition ).normalize();
@@ -761,6 +768,7 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+
 					event.stopPropagation();
 
 					scope.dispatchEvent( mouseDownEvent );
@@ -980,15 +988,19 @@
 			var x = ( pointer.clientX - rect.left ) / rect.width;
 			var y = ( pointer.clientY - rect.top ) / rect.height;
 
-			if (camera instanceof THREE.OrthographicCamera){
+			if (camera instanceof THREE.OrthographicCamera ) {
+
 				pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, -1 );
 				pointerVector.unproject( camera );
 				camPosition.set( 0, 0, -1 ).transformDirection( camera.matrixWorld );
 				ray.set( pointerVector, camPosition );
-			}else{
+
+			} else {
+
 				pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
 				pointerVector.unproject( camera );
 				ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
+
 			}
 
 			var intersections = ray.intersectObjects( objects, true );
