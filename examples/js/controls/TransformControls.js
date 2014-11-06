@@ -701,7 +701,7 @@
 			camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );
 
 			this.position.copy( worldPosition );
-			if (camera.type == "OrthographicCamera"){
+			if (camera instanceof THREE.OrthographicCamera){
 				scale = scope.size * (camera.right-camera.left) / 2.0;
 			}else{
 				scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
@@ -980,7 +980,7 @@
 			var x = ( pointer.clientX - rect.left ) / rect.width;
 			var y = ( pointer.clientY - rect.top ) / rect.height;
 
-			if (camera.type == "OrthographicCamera"){
+			if (camera instanceof THREE.OrthographicCamera){
 				pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, -1 );
 				pointerVector.unproject( camera );
 				camPosition.set( 0, 0, -1 ).transformDirection( camera.matrixWorld );
