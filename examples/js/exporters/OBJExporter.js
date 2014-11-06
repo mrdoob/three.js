@@ -9,6 +9,7 @@ THREE.OBJExporter.prototype = {
 	constructor: THREE.OBJExporter,
 
 	parse: function ( object ) {
+
 		var output = '';
 
 		var indexVertex = 0;
@@ -17,22 +18,25 @@ THREE.OBJExporter.prototype = {
 
 		var parseObject = function ( child ) {
 
-			var nbVertex, nbVertexUvs, nbNormals;
-			nbVertex = nbVertexUvs = nbNormals = 0;
+			var nbVertex = 0;
+			var nbVertexUvs = 0;
+			var nbNormals = 0;
 
-			var geometry = object.geometry;
+			var geometry = child.geometry;
 
-			output += 'o ' + object.id + '\n';
+			if ( geometry instanceof THREE.Geometry ) {
 
-			if (object.geometry) {
+				output += 'o ' + child.name + '\n';
+
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
 					var vertex = geometry.vertices[ i ].clone();
-					vertex.applyMatrix4( object.matrixWorld );
+					vertex.applyMatrix4( child.matrixWorld );
 
 					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
 
-					nbVertex++;
+					nbVertex ++;
+
 				}
 
 				// uvs
@@ -44,11 +48,12 @@ THREE.OBJExporter.prototype = {
 					for ( var j = 0; j < vertexUvs.length; j ++ ) {
 
 						var uv = vertexUvs[ j ];
-						vertex.applyMatrix4( object.matrixWorld );
+						vertex.applyMatrix4( child.matrixWorld );
 
 						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
-						nbVertexUvs++;
+						nbVertexUvs ++;
+
 					}
 
 				}
@@ -64,7 +69,8 @@ THREE.OBJExporter.prototype = {
 						var normal = normals[ j ];
 						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
 
-						nbNormals++;
+						nbNormals ++;
+
 					}
 
 				}
@@ -81,12 +87,14 @@ THREE.OBJExporter.prototype = {
 					output += ( indexVertex + face.c + 1 ) + '/' + ( indexVertexUvs + j + 2 ) + '/' + ( indexNormals + j + 2 ) + '\n';
 
 				}
+
 			}
 
 			// update index
 			indexVertex += nbVertex;
-			indexVertexUvs += nbVertexUvs
-			indexNormals += nbNormals
+			indexVertexUvs += nbVertexUvs;
+			indexNormals += nbNormals;
+
 		};
 
 		object.traverse( parseObject );
@@ -95,4 +103,4 @@ THREE.OBJExporter.prototype = {
 
 	}
 
-}
+};
