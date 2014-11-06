@@ -700,8 +700,12 @@
 			camPosition.setFromMatrixPosition( camera.matrixWorld );
 			camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );
 
-			scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
 			this.position.copy( worldPosition );
+			if (camera.type == "OrthographicCamera"){
+				scale = scope.size * (camera.right-camera.left) / 2.0;
+			}else{
+				scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
+			}
 			this.scale.set( scale, scale, scale );
 
 			eye.copy( camPosition ).sub( worldPosition ).normalize();
@@ -749,7 +753,6 @@
 			if ( scope.object === undefined || _dragging === true ) return;
 
 			event.preventDefault();
-			event.stopPropagation();
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
@@ -758,6 +761,7 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+					event.stopPropagation();
 
 					scope.dispatchEvent( mouseDownEvent );
 
@@ -976,10 +980,16 @@
 			var x = ( pointer.clientX - rect.left ) / rect.width;
 			var y = ( pointer.clientY - rect.top ) / rect.height;
 
-			pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
-			pointerVector.unproject( camera );
-
-			ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
+			if (camera.type == "OrthographicCamera"){
+				pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, -1 );
+				pointerVector.unproject( camera );
+				camPosition.set( 0, 0, -1 ).transformDirection( camera.matrixWorld );
+				ray.set( pointerVector, camPosition );
+			}else{
+				pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
+				pointerVector.unproject( camera );
+				ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
+			}
 
 			var intersections = ray.intersectObjects( objects, true );
 			return intersections[0] ? intersections[0] : false;
