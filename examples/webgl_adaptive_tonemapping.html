@@ -41,8 +41,7 @@
 		<script src="js/shaders/LuminosityShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/ToneMapShader.js"></script>
-		<script src="js/shaders/AdaptiveToneMapShader.js"></script>
-
+		
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
@@ -273,8 +272,8 @@
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
 				// renderer.toneMappingEnabled = false;
-				renderer.hdrEnabled = true;
-				renderer.hdrType = THREE.FullHDR;
+				renderer.hdrOutputEnabled = true;
+				renderer.hdrOutputType = THREE.FullHDR;
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = false;
@@ -286,7 +285,7 @@
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
 				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
-				if ( renderer.hdrEnabled && extensions.get('OES_texture_half_float_linear') ) {
+				if ( renderer.hdrOutputEnabled && extensions.get('OES_texture_half_float_linear') ) {
 					parameters.type = THREE.FloatType;
 				}
 
@@ -300,7 +299,7 @@
 				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
   			scenePass.clear = false;
 
-  			luminancePass = new THREE.AdaptiveToneMappingPass( 256 );
+  			luminancePass = new THREE.AdaptiveToneMappingPass( true, 256 );
   			
   			effectComposer.addPass( skyboxPass );
   			effectComposer.addPass( scenePass );

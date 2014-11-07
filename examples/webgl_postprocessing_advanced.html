@@ -178,7 +178,10 @@
 				effectVignette.uniforms[ "offset" ].value = 0.95;
 				effectVignette.uniforms[ "darkness" ].value = 1.6;
 
-				var effectBloom = new THREE.BloomPass( 0.5 );
+				var effectBloom = new THREE.BloomPass( 8 );
+				THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
+				THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
+				// effectBloom
 				var effectFilm = new THREE.FilmPass( 0.35, 0.025, 648, false );
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
 				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
@@ -218,16 +221,16 @@
 				var renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
 				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
 
-				renderModel.clear = false;
+				// renderModel.clear = false;
 
 				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth * 2, rtHeight * 2, rtParameters ) );
 
-				composerScene.addPass( renderBackground );
+				// composerScene.addPass( renderBackground );
 				composerScene.addPass( renderModel );
-				composerScene.addPass( renderMaskInverse );
-				composerScene.addPass( effectHBlur );
-				composerScene.addPass( effectVBlur );
-				composerScene.addPass( clearMask );
+				// composerScene.addPass( renderMaskInverse );
+				// composerScene.addPass( effectHBlur );
+				// composerScene.addPass( effectVBlur );
+				// composerScene.addPass( clearMask );
 
 				//
 
@@ -275,8 +278,8 @@
 				composer4.addPass( renderScene );
 				//composer4.addPass( renderMask );
 				composer4.addPass( effectBloom );
-				composer4.addPass( effectFilm );
-				composer4.addPass( effectBleach );
+				// composer4.addPass( effectFilm );
+				// composer4.addPass( effectBleach );
 				//composer4.addPass( clearMask );
 				composer4.addPass( effectVignette );
 
@@ -312,7 +315,7 @@
 				composer1.setSize( halfWidth, halfHeight );
 				composer2.setSize( halfWidth, halfHeight );
 				composer3.setSize( halfWidth, halfHeight );
-				composer4.setSize( halfWidth, halfHeight );
+				composer4.setSize( width, height );
 
 				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
 
@@ -357,7 +360,7 @@
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var mat2 = new THREE.ShaderMaterial( parameters );
 
-				mesh = new THREE.Mesh( geometry, mat2 );
+				mesh = new THREE.Mesh( new THREE.SphereGeometry( 0.1, 24, 24 ), new THREE.MeshBasicMaterial({color: 0xffffff}) );
 				mesh.position.set( 0, -50, 0 );
 				mesh.scale.set( scale, scale, scale );
 
@@ -389,16 +392,16 @@
 				renderer.clear();
 				composerScene.render( delta );
 
-				renderer.setViewport( 0, 0, halfWidth, halfHeight );
-				composer1.render( delta );
+				// renderer.setViewport( 0, 0, halfWidth, halfHeight );
+				// composer1.render( delta );
 
-				renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
-				composer2.render( delta );
+				// renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
+				// composer2.render( delta );
 
-				renderer.setViewport( 0, halfHeight, halfWidth, halfHeight );
-				composer3.render( delta );
+				// renderer.setViewport( 0, halfHeight, halfWidth, halfHeight );
+				// composer3.render( delta );
 
-				renderer.setViewport( halfWidth, halfHeight, halfWidth, halfHeight );
+				renderer.setViewport( 0, 0, width, height );
 				composer4.render( delta );
 
 			}

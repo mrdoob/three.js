@@ -5,8 +5,8 @@
 THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	strength = ( strength !== undefined ) ? strength : 1;
-	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
-	sigma = ( sigma !== undefined ) ? sigma : 4.0;
+	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 37;
+	sigma = ( sigma !== undefined ) ? sigma : 6.0;
 	resolution = ( resolution !== undefined ) ? resolution : 256;
 
 	// render targets
