@@ -160,18 +160,9 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		var geometry = object.geometry;
-
-		if ( geometry === undefined ) {
-
-			alert( 'The selected object doesn\'t have geometry.' );
-			return;
-
-		}
-
 		var exporter = new THREE.OBJExporter();
 
-		exportString( exporter.parse( geometry ) );
+		exportString( exporter.parse( object ) );
 
 	} );
 	options.add( option );

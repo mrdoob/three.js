@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '69' };
+var THREE = { REVISION: '70dev' };
 
 // browserify support
 
@@ -185,7 +185,6 @@ THREE.RGB_PVRTC_4BPPV1_Format = 2100;
 THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
-
 
 // File:src/math/Color.js
 
@@ -6509,7 +6508,7 @@ THREE.Math = {
 
 	randInt: function ( low, high ) {
 
-		return low + Math.floor( Math.random() * ( high - low + 1 ) );
+		return Math.floor( this.randFloat( low, high ) );
 
 	},
 
@@ -9373,7 +9372,12 @@ THREE.Geometry.prototype = {
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
 			scope.faces.push( new THREE.Face3( a, b, c, vertexNormals, vertexColors ) );
-			scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ], tempUVs[ b ], tempUVs[ c ] ] );
+
+			if ( uvs !== undefined ) {
+
+				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+
+			}
 
 		};
 
@@ -9394,7 +9398,7 @@ THREE.Geometry.prototype = {
 			}
 
 		}
-		
+
 		this.computeFaceNormals();
 
 		if ( geometry.boundingBox !== null ) {
@@ -9889,13 +9893,28 @@ THREE.Geometry.prototype = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+				uvCopy.push( uv[ j ].clone() );
 
 			}
 
 			uvs1.push( uvCopy );
 
 		}
+
+	},
+
+	mergeMesh: function ( mesh ) {
+
+		if ( mesh instanceof THREE.Mesh === false ) {
+
+			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
+			return;
+
+		}
+
+		mesh.matrixAutoUpdate && mesh.updateMatrix();
+
+		this.merge( mesh.geometry, mesh.matrix );
 
 	},
 
@@ -17920,6 +17939,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		_canvas.addEventListener( 'webglcontextlost', function ( event ) {
+
+			event.preventDefault();
+
+			resetGLState();
+			setDefaultGLState();
+
+			_webglObjects = {};
+
+		}, false);
+
 	} catch ( error ) {
 
 		console.error( error );
@@ -17954,7 +17984,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	function setDefaultGLState() {
+	var setDefaultGLState = function () {
 
 		_gl.clearColor( 0, 0, 0, 1 );
 		_gl.clearDepth( 1 );
@@ -17975,7 +18005,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	}
+	};
+
+	var resetGLState = function () {
+
+		_currentProgram = null;
+		_currentCamera = null;
+
+		_oldBlending = - 1;
+		_oldDepthTest = - 1;
+		_oldDepthWrite = - 1;
+		_oldDoubleSided = - 1;
+		_oldFlipSided = - 1;
+		_currentGeometryGroupHash = - 1;
+		_currentMaterialId = - 1;
+
+		_lightsNeedUpdate = true;
+
+	};
 
 	setDefaultGLState();
 
@@ -18026,7 +18073,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-			
+
 			return array;
 
 		};
@@ -18073,6 +18120,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.getContext = function () {
 
 		return _gl;
+
+	};
+
+	this.forceContextLoss = function () {
+
+		extensions.get( 'WEBGL_lose_context' ).loseContext();
 
 	};
 
@@ -18254,22 +18307,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Reset
 
-	this.resetGLState = function () {
-
-		_currentProgram = null;
-		_currentCamera = null;
-
-		_oldBlending = - 1;
-		_oldDepthTest = - 1;
-		_oldDepthWrite = - 1;
-		_oldDoubleSided = - 1;
-		_oldFlipSided = - 1;
-		_currentGeometryGroupHash = - 1;
-		_currentMaterialId = - 1;
-
-		_lightsNeedUpdate = true;
-
-	};
+	this.resetGLState = resetGLState;
 
 	// Buffer allocation
 
@@ -18401,7 +18439,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Buffer deallocation
 
 	var deleteBuffers = function ( geometry ) {
-	
+
 		var buffers = [
 			'__webglVertexBuffer',
 			'__webglNormalBuffer',
@@ -18409,13 +18447,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			'__webglColorBuffer',
 			'__webglUVBuffer',
 			'__webglUV2Buffer',
-			
+
 			'__webglSkinIndicesBuffer',
 			'__webglSkinWeightsBuffer',
-			
+
 			'__webglFaceBuffer',
 			'__webglLineBuffer',
-			
+
 			'__webglLineDistanceBuffer'
 		];
 
@@ -18458,7 +18496,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			for ( var name in geometry.attributes ) {
-			
+
 				var attribute = geometry.attributes[ name ];
 
 				if ( attribute.buffer !== undefined ) {
@@ -21551,7 +21589,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					numMorphTargets: numMorphTargets,
 					numMorphNormals: numMorphNormals
 				};
-				
+
 				groups[ groupHash ] = group;
 				groupsList.push( group );
 
@@ -21572,7 +21610,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						numMorphTargets: numMorphTargets,
 						numMorphNormals: numMorphNormals
 					};
-					
+
 					groups[ groupHash ] = group;
 					groupsList.push( group );
 
@@ -24147,7 +24185,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// DEPRECATED
-	
+
 	this.initMaterial = function () {
 
 		console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
@@ -24279,6 +24317,10 @@ THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.p
 
 // File:src/renderers/webgl/WebGLExtensions.js
 
+/**
+* @author mrdoob / http://mrdoob.com/
+*/
+
 THREE.WebGLExtensions = function ( gl ) {
 
 	var extensions = {};
@@ -24323,17 +24365,8 @@ THREE.WebGLExtensions = function ( gl ) {
 				extension = gl.getExtension( 'WEBGL_compressed_texture_pvrtc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 				break;
 
-			case 'OES_element_index_uint':
-				extension = gl.getExtension( 'OES_element_index_uint' );
-				break;
-
-			case 'EXT_blend_minmax':
-				extension = gl.getExtension( 'EXT_blend_minmax' );
-				break;
-
-			case 'EXT_frag_depth':
-				extension = gl.getExtension( 'EXT_frag_depth' );
-				break;
+			default:
+				extension = gl.getExtension( name );
 
 		}
 
@@ -25812,7 +25845,13 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 	var program, attributes, uniforms;
 
 	var texture;
-	
+
+	// decompose matrixWorld
+
+	var spritePosition = new THREE.Vector3();
+	var spriteRotation = new THREE.Quaternion();
+	var spriteScale = new THREE.Vector3();
+
 	var init = function () {
 
 		var vertices = new Float32Array( [
@@ -25980,8 +26019,10 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
-			scale[ 0 ] = sprite.scale.x;
-			scale[ 1 ] = sprite.scale.y;
+			sprite.matrixWorld.decompose( spritePosition, spriteRotation, spriteScale );
+
+			scale[ 0 ] = spriteScale.x;
+			scale[ 1 ] = spriteScale.y;
 
 			var fogType = 0;
 
@@ -26037,7 +26078,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		// restore gl
 
 		gl.enable( gl.CULL_FACE );
-		
+
 		renderer.resetGLState();
 
 	};
@@ -29485,7 +29526,7 @@ THREE.AnimationHandler = {
 
 	init: function ( data ) {
 
-		if ( data.initialized === true ) return;
+		if ( data.initialized === true ) return data;
 
 		// loop through all keys
 
@@ -33177,7 +33218,7 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.line.scale.set( 1, length, 1 );
+	this.line.scale.set( 1, length - headLength, 1 );
 	this.line.updateMatrix();
 
 	this.cone.scale.set( headWidth, headLength, headWidth );

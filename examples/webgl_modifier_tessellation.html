@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - tessellation</title>
+		<title>three.js webgl - modifier - tessellation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -34,7 +34,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - geometry tessellation example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - modifier tessellation</div>
 		<div id="container"></div>
 
 		<script src="../build/three.min.js"></script>
@@ -163,7 +163,7 @@
 
 			geometry.center();
 
-			var tessellateModifier = new THREE.TessellateModifier( 4 );
+			var tessellateModifier = new THREE.TessellateModifier( 8 );
 
 			for ( var i = 0; i < 6; i ++ ) {
 
