@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '69' };
+var THREE = { REVISION: '70dev' };
 
 // browserify support
 
@@ -6521,7 +6521,7 @@ THREE.Math = {
 
 	randInt: function ( low, high ) {
 
-		return low + Math.floor( Math.random() * ( high - low + 1 ) );
+		return Math.floor( this.randFloat( low, high ) );
 
 	},
 

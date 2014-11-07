@@ -69,7 +69,6 @@ THREE.VREffect = function ( renderer, done ) {
 	this.render = function ( scene, camera ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
-		renderer.enableScissorTest( false );
 		// VR render mode if HMD is available
 		if ( vrHMD ) {
 			this.renderStereo.apply( this, arguments );
@@ -113,6 +112,8 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.render( scene, cameraRight );
+
+		renderer.enableScissorTest( false );
 
 	};
 

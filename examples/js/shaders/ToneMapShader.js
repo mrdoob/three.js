@@ -45,6 +45,8 @@ THREE.ToneMapShader = {
 		"const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);",
 
 		"vec3 ToneMap( vec3 vColor ) {",
+			//Gamma 2.0 to linear
+			// "vColor = vColor * vColor;",
 			"#ifdef ADAPTED_LUMINANCE",
 				// Get the calculated average luminance 
 				"float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;",

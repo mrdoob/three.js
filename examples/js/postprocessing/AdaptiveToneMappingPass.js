@@ -7,22 +7,15 @@
  * Full-screen tone-mapping shader based on http://www.graphics.cornell.edu/~jaf/publications/sig02_paper.pdf
  */
 
-THREE.AdaptiveToneMappingPass = function ( resolution ) {
+THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
-	resolution = ( resolution !== undefined ) ? resolution : 256;
+	this.resolution = ( resolution !== undefined ) ? resolution : 256;
 	this.needsInit = true;
+	this.adaptive = adaptive !== undefined? !!adaptive : true;
 
-	// render targets
-	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-
-	this.luminanceRT = new THREE.WebGLRenderTarget( resolution, resolution, pars );
-	this.luminanceRT.generateMipmaps = false;
-	this.previousLuminanceRT = new THREE.WebGLRenderTarget( resolution, resolution, pars );
-	this.previousLuminanceRT.generateMipmaps = false;
-
-	//We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
-	pars.minFilter = THREE.LinearMipMapLinearFilter;
-	this.currentLuminanceRT = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+	this.luminanceRT = null;
+	this.previousLuminanceRT = null;
+	this.currentLuminanceRT = null;
 	
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
@@ -54,7 +47,7 @@ THREE.AdaptiveToneMappingPass = function ( resolution ) {
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : Math.log2( resolution ).toFixed(1),
+			"MIP_LEVEL_1X1" : Math.log2( this.resolution ).toFixed(1),
 		},
 		uniforms: {
 			"lastLum": { type: "t", value: null },
@@ -83,6 +76,7 @@ THREE.AdaptiveToneMappingPass = function ( resolution ) {
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 			
 			"void main() {",
+			"float we = 3.0;",
 				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
 				"vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
 				"#ifdef HDR_INPUT_LOGLUV",
@@ -99,9 +93,11 @@ THREE.AdaptiveToneMappingPass = function ( resolution ) {
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
 				"fCurrentLum *= fCurrentLum;",
+				// "fLastLum *= fLastLum;",
 
 				// Adapt the luminance using Pattanaik's technique
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
+				// "fAdaptedLum = sqrt(fAdaptedLum);",
 				"#ifdef HDR_OUTPUT_LOGLUV",
 					"gl_FragColor = HDREncodeLOGLUV( vec3( fAdaptedLum ) );",
 				"#elif defined( HDR_OUTPUT_RGBM )",
@@ -133,18 +129,14 @@ THREE.AdaptiveToneMappingPass = function ( resolution ) {
 		blending: THREE.NoBlending
 	} );
 
-	this.materialToneMap.defines["ADAPTED_LUMINANCE"] = "";
-	this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
-
-	
 	this.enabled = true;
-	this.needsSwap = false;
+	this.needsSwap = true;
 	this.clear = false;
 
 	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
 	this.scene.add( this.quad );
 
 };
@@ -154,45 +146,93 @@ THREE.AdaptiveToneMappingPass.prototype = {
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
 		if ( this.needsInit ) {
-			//If HDR is enabled and the type is full HDR, change the format of the render targets
-			if ( renderer.hdrEnabled && renderer.hdrType === THREE.FullHDR ) {
-				var extensions = new THREE.WebGLExtensions( renderer.getContext() );
-				if ( extensions.get('OES_texture_half_float_linear') ) {
-					this.luminanceRT.type = THREE.FloatType;
-					this.previousLuminanceRT.type = THREE.FloatType;
-					this.currentLuminanceRT.type = THREE.FloatType;
-				}
-			}
-			//Put something in the adaptive luminance texture so that the scene can render initially
-			this.quad.material = new THREE.MeshBasicMaterial( {color: 0xffffff });
-			renderer.render( this.scene, this.camera, this.luminanceRT );
-			renderer.render( this.scene, this.camera, this.previousLuminanceRT );
+			this.reset( renderer );
 			// renderer.render( this.scene, this.camera, this.luminanceRT );
 			this.needsInit = false;
 		}
 
-		//Render the luminance of the current scene into a render target with mipmapping enabled
-		this.quad.material = this.materialLuminance;
-		this.materialLuminance.uniforms.tDiffuse.value = readBuffer;
-		renderer.render( this.scene, this.camera, this.currentLuminanceRT );
+		if ( this.adaptive ) {
+			//Render the luminance of the current scene into a render target with mipmapping enabled
+			this.quad.material = this.materialLuminance;
+			this.materialLuminance.uniforms.tDiffuse.value = readBuffer;
+			renderer.render( this.scene, this.camera, this.currentLuminanceRT );
 
-		//Use the new luminance values, the previous luminance and the frame delta to
-		//adapt the luminance over time.
-		this.quad.material = this.materialAdaptiveLum;
-		this.materialAdaptiveLum.uniforms.delta.value = delta;
-		this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT;
-		this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT;
-		renderer.render( this.scene, this.camera, this.luminanceRT );
+			//Use the new luminance values, the previous luminance and the frame delta to
+			//adapt the luminance over time.
+			this.quad.material = this.materialAdaptiveLum;
+			this.materialAdaptiveLum.uniforms.delta.value = delta;
+			this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT;
+			this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT;
+			renderer.render( this.scene, this.camera, this.luminanceRT );
 
-		//Copy the new adapted luminance value so that it can be used by the next frame.
-		this.quad.material = this.materialCopy;
-		this.copyUniforms.tDiffuse.value = this.luminanceRT;
-		renderer.render( this.scene, this.camera, this.previousLuminanceRT );
+			//Copy the new adapted luminance value so that it can be used by the next frame.
+			this.quad.material = this.materialCopy;
+			this.copyUniforms.tDiffuse.value = this.luminanceRT;
+			renderer.render( this.scene, this.camera, this.previousLuminanceRT );
+		}
 
 		this.quad.material = this.materialToneMap;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer;
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
 		
+	},
+
+	reset: function( renderer ) {
+		// render targets
+		if ( this.luminanceRT ) {
+			this.luminanceRT.dispose();
+		}
+		if ( this.currentLuminanceRT ) {
+			this.currentLuminanceRT.dispose();
+		}
+		if ( this.previousLuminanceRT ) {
+			this.previousLuminanceRT.dispose();
+		}
+		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+
+		this.luminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.luminanceRT.generateMipmaps = false;
+		this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.previousLuminanceRT.generateMipmaps = false;
+
+		//We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
+		pars.minFilter = THREE.LinearMipMapLinearFilter;
+		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
+		//If HDR is enabled and the type is full HDR, change the format of the render targets
+		if ( renderer.hdrOutputEnabled && renderer.hdrOutputType === THREE.FullHDR ) {
+			var extensions = new THREE.WebGLExtensions( renderer.getContext() );
+			if ( extensions.get('OES_texture_half_float_linear') ) {
+				this.luminanceRT.type = THREE.FloatType;
+				this.previousLuminanceRT.type = THREE.FloatType;
+				this.currentLuminanceRT.type = THREE.FloatType;
+			}
+		}
+		if ( this.adaptive ) {
+			this.materialToneMap.defines["ADAPTED_LUMINANCE"] = "";
+			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
+		}
+		//Put something in the adaptive luminance texture so that the scene can render initially
+		this.quad.material = new THREE.MeshBasicMaterial( {color: 0x777777 });
+		this.materialLuminance.needsUpdate = true;
+		this.materialAdaptiveLum.needsUpdate = true;
+		this.materialToneMap.needsUpdate = true;
+		renderer.render( this.scene, this.camera, this.luminanceRT );
+		renderer.render( this.scene, this.camera, this.previousLuminanceRT );
+		renderer.render( this.scene, this.camera, this.currentLuminanceRT );
+	},
+
+	setAdaptive: function( adaptive ) {
+		if ( adaptive ) {
+			this.adaptive = true;
+			this.materialToneMap.defines["ADAPTED_LUMINANCE"] = "";
+			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
+		}
+		else {
+			this.adaptive = false;
+			delete this.materialToneMap.defines["ADAPTED_LUMINANCE"];
+			this.materialToneMap.uniforms.luminanceMap.value = undefined;
+		}
+		this.materialToneMap.needsUpdate = true;
 	},
 
 	setAdaptionRate: function( rate ) {
@@ -237,6 +277,9 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		}
 		if ( this.materialCopy ) {
 			this.materialCopy.dispose();
+		}
+		if ( this.materialToneMap ) {
+			this.materialToneMap.dispose();
 		}
 	}
 

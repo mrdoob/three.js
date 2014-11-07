@@ -63,6 +63,8 @@ var Editor = function () {
 	this.loader = new Loader( this );
 
 	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
+	this.camera.name = 'Camera';
+
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
 
@@ -309,6 +311,13 @@ Editor.prototype = {
 	},
 
 	selectById: function ( id ) {
+
+		if ( id === this.camera.id ) {
+
+			this.select( this.camera );
+			return;
+
+		}
 
 		this.select( this.scene.getObjectById( id, true ) );
 

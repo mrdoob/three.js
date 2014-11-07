@@ -5,6 +5,8 @@
 
 THREE.VRControls = function ( object, callback ) {
 
+	var scope = this;
+
 	var vrInput;
 
 	var onVRDevices = function ( devices ) {
@@ -40,15 +42,26 @@ THREE.VRControls = function ( object, callback ) {
 
 	}
 
+	// the Rift SDK returns the position in meters
+	// this scale factor allows the user to define how meters
+	// are converted to scene units.
+	this.scale = 1;
+
 	this.update = function () {
 
 		if ( vrInput === undefined ) return;
 
-		var orientation = vrInput.getState().orientation;
+		var state = vrInput.getState();
 
-		if ( orientation !== null ) {
+		if ( state.orientation !== null ) {
 
-			object.quaternion.set( orientation.x, orientation.y, orientation.z, orientation.w );
+			object.quaternion.copy( state.orientation );
+
+		}
+
+		if ( state.position !== null ) {
+
+			object.position.copy( state.position ).multiplyScalar( scope.scale );
 
 		}
 
