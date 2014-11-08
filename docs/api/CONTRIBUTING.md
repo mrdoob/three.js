@@ -5,3 +5,4 @@ Contributing to the documentation
 - Use `[example:exampleName title]` (ot just `[example:exampleName]`) to link to the example `threejs.org/examples/#exampleName`.
 - Document a property by writing `<h3>[property:TypeName propertyName]</h3>`.
 - Document a method using `<h3>[method:ReturnType methodName]</h3>`.
+- Mark extras classes (not included in the build) as such
