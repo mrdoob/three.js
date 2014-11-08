@@ -7,9 +7,10 @@
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
 	</head>
 	<body>
+
 		<h1>[name]</h1>
 
-		<div class="desc">Class for loading a [page:Texture texture].</div>
+		<div class="desc">A loader for loading an <em>.obj</em> resource.</div>
 
 
 		<h2>Constructor</h2>
@@ -22,14 +23,7 @@
 		Creates a new [name].
 		</div>
 
-
 		<h2>Properties</h2>
-
-		<h3>[property:String crossOrigin]</h3>
-		<div>
-		default — *null*.<br />
-		If set, assigns the *crossOrigin* attribute of the image to the value of *crossOrigin*, prior to starting the load.
-		</div>
 
 
 		<h2>Methods</h2>
@@ -37,49 +31,45 @@
 		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
 		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded text response.<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Object3D].<br />
 		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
-		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		Begin loading from url and call onLoad with the parsed response content.
 		</div>
 
-
+		<h3>[method:Object3D parse]( [page:String text] )</h3>
+		<div>
+		[page:String text] — The textual <em>obj</em> structure to parse.
+		</div>
+		<div>
+		Parse an <em>obj</em> text structure and return an [page:Object3D].<br />
+		Found objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshLambertMaterial].
+		</div>
 
 		<h2>Example</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.TextureLoader();
+		var loader = new THREE.OBJLoader();
 
 		// load a resource
 		loader.load(
 			// resource URL
-			'textures/land_ocean_ice_cloud_2048.jpg',
+			'models/skinned/UCS_config.json',
 			// Function when resource is loaded
-			function ( texture ) {
-				// do something with the texture
-				var material = new THREE.MeshBasicMaterial( {
-					map: texture
-				 } );
-			},
-			// Function called when download progresses
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-			},
-			// Function called when download errors
-			function ( xhr ) {
-				console.log( 'An error happened' );
+			function ( object ) {
+				scene.add( object );
 			}
 		);
 		</code>
 
-		[example:canvas_geometry_earth]
+		[example:webgl_loader_obj]
 
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/OBJLoader.js examples/js/loaders/OBJLoader.js]
 	</body>
 </html>

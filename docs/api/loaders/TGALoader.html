@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">Class for loading a [page:Texture texture].</div>
+		<div class="desc">Class for loading a <em>.tga</em> [page:DataTexture texture].</div>
 
 
 		<h2>Constructor</h2>
@@ -23,46 +23,33 @@
 		</div>
 
 
-		<h2>Properties</h2>
-
-		<h3>[property:String crossOrigin]</h3>
-		<div>
-		default — *null*.<br />
-		If set, assigns the *crossOrigin* attribute of the image to the value of *crossOrigin*, prior to starting the load.
-		</div>
-
-
 		<h2>Methods</h2>
 
-		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:DataTexture load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
 		[page:String url] — required<br />
-		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded text response.<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:DataTexture].<br />
 		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
-		Begin loading from url and pass the loaded [page:Texture texture] to onLoad.
+		Begin loading from url and pass the loaded [page:DataTexture texture] to onLoad. The [page:DataTexture texture] is also directly returned for immediate use (but may not be fully loaded).
 		</div>
-
 
 
 		<h2>Example</h2>
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.TextureLoader();
+		var loader = new THREE.TGALoader();
 
 		// load a resource
-		loader.load(
+		var texture = loader.load(
 			// resource URL
-			'textures/land_ocean_ice_cloud_2048.jpg',
+			'textures/crate_grey8.tga'
 			// Function when resource is loaded
 			function ( texture ) {
-				// do something with the texture
-				var material = new THREE.MeshBasicMaterial( {
-					map: texture
-				 } );
+				console.log( 'Texture is loaded' );
 			},
 			// Function called when download progresses
 			function ( xhr ) {
@@ -73,13 +60,18 @@
 				console.log( 'An error happened' );
 			}
 		);
+
+		var material = new THREE.MeshPhongMaterial( {
+			color: 0xffffff,
+			map: texture
+		} );
 		</code>
 
-		[example:canvas_geometry_earth]
+		[example:webgl_materials_texture_tga]
 
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/TGALoader.js examples/js/loaders/TGALoader.js]
 	</body>
 </html>
