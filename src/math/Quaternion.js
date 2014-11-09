@@ -3,6 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://exocortex.com
+ * @author dmarcos / http://github.com/dmarcos
  */
 
 THREE.Quaternion = function ( x, y, z, w ) {
@@ -328,6 +329,17 @@ THREE.Quaternion.prototype = {
 	length: function () {
 
 		return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w );
+
+	},
+
+	angle: function () {
+
+		// On not normalized quaternions the w component
+		// might not be in the acos domain interval [-1, 1]
+		// If quaternion is not normalized it uses a normalized copy
+		var q = this.length() === 1? this : this.clone().normalize();
+
+		return 2 * Math.acos(q._w);
 
 	},
 

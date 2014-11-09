@@ -137,6 +137,75 @@ test( "normalize/length/lengthSq", function() {
 	ok( a.length() == 1, "Passed!");
 });
 
+test( "angle/setFromAxisAngle", function() {
+	var axis = new THREE.Vector3( 1, 0, 0 );
+	var angle = Math.PI;
+	var q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	var q2;
+	function equalAngles( a1, a2 ) {
+		// Tolerance for floating point loss of precission
+		var epsilon = 0.0000000001;
+		return Math.abs( a1 - a2 ) <= epsilon;
+	}
+
+	var angleOutput = q.angle();
+
+	ok( angle === angleOutput, "Passed!");
+
+	angle = 0;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	angleOutput = q.angle();
+
+	ok( equalAngles( angle, angleOutput ), "Passed!");
+
+	angle = 2 * Math.PI;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	angleOutput = q.angle();
+
+	ok( equalAngles( angle, angleOutput ), "Passed!");
+
+	angle = Math.PI / 2;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	angleOutput = q.angle();
+
+	ok( equalAngles( angle, angleOutput ), "Passed!");
+
+	angle = - Math.PI / 2;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	angleOutput = - q.angle();
+
+	ok( equalAngles( angle, angleOutput ), "Passed!");
+
+	angle = Math.PI / 4;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	angleOutput = q.angle();
+
+	ok( equalAngles( angle, angleOutput ), "Passed!");
+
+	angle = - Math.PI / 4;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	angleOutput = - q.angle();
+
+	ok( equalAngles( angle, angleOutput ), "Passed!");
+
+	angle = Math.PI / 4;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	q2 = new THREE.Quaternion().setFromAxisAngle( axis, 2 * angle );
+	q.multiply( q2 )
+	angleOutput = q.angle();
+
+	ok( equalAngles( 3 * angle, angleOutput ), "Passed!");
+
+	angle = Math.PI / 4;
+	q = new THREE.Quaternion().setFromAxisAngle( axis, angle );
+	q2 = new THREE.Quaternion().setFromAxisAngle( axis, 2 * angle );
+	q.slerp( q2, 1.0 )
+	angleOutput = q.angle();
+
+	ok( equalAngles( 2 * angle, angleOutput ), "Passed!");
+
+});
+
 test( "inverse/conjugate", function() {
 	var a = new THREE.Quaternion( x, y, z, w );
 
@@ -173,7 +242,7 @@ test( "multiplyQuaternions/multiply", function() {
 });
 
 test( "multiplyVector3", function() {
-	
+
 	var angles = [ new THREE.Euler( 1, 0, 0 ), new THREE.Euler( 0, 1, 0 ), new THREE.Euler( 0, 0, 1 ) ];
 
 	// ensure euler conversion for Quaternion matches that of Matrix4
@@ -185,7 +254,7 @@ test( "multiplyVector3", function() {
 			var v0 = new THREE.Vector3(1, 0, 0);
 			var qv = v0.clone().applyQuaternion( q );
 			var mv = v0.clone().applyMatrix4( m );
-		
+
 			ok( qv.distanceTo( mv ) < 0.001, "Passed!" );
 		}
 	}
@@ -195,7 +264,7 @@ test( "multiplyVector3", function() {
 test( "equals", function() {
 	var a = new THREE.Quaternion( x, y, z, w );
 	var b = new THREE.Quaternion( -x, -y, -z, -w );
-	
+
 	ok( a.x != b.x, "Passed!" );
 	ok( a.y != b.y, "Passed!" );
 
