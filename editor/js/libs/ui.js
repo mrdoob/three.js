@@ -735,7 +735,7 @@ UI.Color.prototype.setValue = function ( value ) {
 
 UI.Color.prototype.setHexValue = function ( hex ) {
 
-	this.dom.value = "#" + ( '000000' + hex.toString( 16 ) ).slice( -6 );
+	this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( -6 );
 
 	return this;
 

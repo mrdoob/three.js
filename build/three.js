@@ -1077,9 +1077,17 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this._x, this._y, this._z, this._w ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this._x;
+		array[ offset + 1 ] = this._y;
+		array[ offset + 2 ] = this._z;
+		array[ offset + 3 ] = this._w;
+
+		return array;
 
 	},
 
@@ -1497,9 +1505,15 @@ THREE.Vector2.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.x, this.y ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+
+		return array;
 
 	},
 
@@ -2311,9 +2325,16 @@ THREE.Vector3.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.x, this.y, this.z ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+		array[ offset + 2 ] = this.z;
+
+		return array;
 
 	},
 
@@ -2963,9 +2984,17 @@ THREE.Vector4.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.x, this.y, this.z, this.w ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		array[ offset ] = this.x;
+		array[ offset + 1 ] = this.y;
+		array[ offset + 2 ] = this.z;
+		array[ offset + 3 ] = this.w;
+
+		return array;
 
 	},
 
@@ -12619,13 +12648,13 @@ THREE.ObjectLoader.prototype = {
 
 					if ( geometry === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined geometry ' + data.geometry );
+						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
 
 					}
 
 					if ( material === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
@@ -12639,7 +12668,7 @@ THREE.ObjectLoader.prototype = {
 
 					if ( material === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
@@ -23985,11 +24014,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// default plugins (order is important)
 
-	this.shadowMapPlugin = new THREE.ShadowMapPlugin();
+	this.shadowMapPlugin = new THREE.ShadowMapPlugin( this );
 	this.addPrePlugin( this.shadowMapPlugin );
 
-	this.addPostPlugin( new THREE.SpritePlugin() );
-	this.addPostPlugin( new THREE.LensFlarePlugin() );
+	this.addPostPlugin( new THREE.SpritePlugin( this ) );
+	this.addPostPlugin( new THREE.LensFlarePlugin( this ) );
 
 };
 
@@ -31909,12 +31938,33 @@ THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
 
 THREE.CameraHelper.prototype.update = function () {
 
+	var geometry, pointMap;
+	
 	var vector = new THREE.Vector3();
 	var camera = new THREE.Camera();
 
+	var setPoint = function ( point, x, y, z ) {
+
+		vector.set( x, y, z ).unproject( camera );
+
+		var points = pointMap[ point ];
+
+		if ( points !== undefined ) {
+
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				geometry.vertices[ points[ i ] ].copy( vector );
+
+			}
+
+		}
+
+	};
+
 	return function () {
 
-		var scope = this;
+		geometry = this.geometry;
+		pointMap = this.pointMap;
 
 		var w = 1, h = 1;
 
@@ -31931,54 +31981,36 @@ THREE.CameraHelper.prototype.update = function () {
 		// near
 
 		setPoint( "n1", - w, - h, - 1 );
-		setPoint( "n2",  w, - h, - 1 );
-		setPoint( "n3", - w,  h, - 1 );
-		setPoint( "n4",  w,  h, - 1 );
+		setPoint( "n2",   w, - h, - 1 );
+		setPoint( "n3", - w,   h, - 1 );
+		setPoint( "n4",   w,   h, - 1 );
 
 		// far
 
 		setPoint( "f1", - w, - h, 1 );
-		setPoint( "f2",  w, - h, 1 );
-		setPoint( "f3", - w,  h, 1 );
-		setPoint( "f4",  w,  h, 1 );
+		setPoint( "f2",   w, - h, 1 );
+		setPoint( "f3", - w,   h, 1 );
+		setPoint( "f4",   w,   h, 1 );
 
 		// up
 
-		setPoint( "u1",  w * 0.7, h * 1.1, - 1 );
+		setPoint( "u1",   w * 0.7, h * 1.1, - 1 );
 		setPoint( "u2", - w * 0.7, h * 1.1, - 1 );
-		setPoint( "u3",        0, h * 2,   - 1 );
+		setPoint( "u3",         0, h * 2,   - 1 );
 
 		// cross
 
-		setPoint( "cf1", - w,  0, 1 );
-		setPoint( "cf2",  w,  0, 1 );
-		setPoint( "cf3",  0, - h, 1 );
-		setPoint( "cf4",  0,  h, 1 );
+		setPoint( "cf1", - w,   0, 1 );
+		setPoint( "cf2",   w,   0, 1 );
+		setPoint( "cf3",   0, - h, 1 );
+		setPoint( "cf4",   0,   h, 1 );
 
-		setPoint( "cn1", - w,  0, - 1 );
-		setPoint( "cn2",  w,  0, - 1 );
-		setPoint( "cn3",  0, - h, - 1 );
-		setPoint( "cn4",  0,  h, - 1 );
+		setPoint( "cn1", - w,   0, - 1 );
+		setPoint( "cn2",   w,   0, - 1 );
+		setPoint( "cn3",   0, - h, - 1 );
+		setPoint( "cn4",   0,   h, - 1 );
 
-		function setPoint( point, x, y, z ) {
-
-			vector.set( x, y, z ).unproject( camera );
-
-			var points = scope.pointMap[ point ];
-
-			if ( points !== undefined ) {
-
-				for ( var i = 0, il = points.length; i < il; i ++ ) {
-
-					scope.geometry.vertices[ points[ i ] ].copy( vector );
-
-				}
-
-			}
-
-		}
-
-		this.geometry.verticesNeedUpdate = true;
+		geometry.verticesNeedUpdate = true;
 
 	};
 
@@ -32846,17 +32878,23 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 			var vertices = object.geometry.attributes.position.array;
 			var indices = object.geometry.attributes.index.array;
-			var offsets = object.geometry.offsets;
+			var drawcalls = object.geometry.drawcalls;
 			var numEdges = 0;
+
+			if ( drawcalls.length === 0 ) {
+
+				drawcalls = [ { count : indices.length, index : 0, start : 0 } ];
+
+			}
 
 			// allocate maximal size
 			var edges = new Uint32Array( 2 * indices.length );
 
-			for ( var o = 0, ol = offsets.length; o < ol; ++ o ) {
+			for ( var o = 0, ol = drawcalls.length; o < ol; ++ o ) {
 
-				var start = offsets[ o ].start;
-				var count = offsets[ o ].count;
-				var index = offsets[ o ].index;
+				var start = drawcalls[ o ].start;
+				var count = drawcalls[ o ].count;
+				var index = drawcalls[ o ].index;
 
 				for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -33359,24 +33397,19 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LensFlarePlugin = function () {
+THREE.LensFlarePlugin = function ( renderer ) {
 
-	var _gl, _renderer, _precision;
-	
+	var gl = renderer.context;
+
 	var flares = [];
-	
+
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
 	var hasVertexTexture;
-	
+
 	var tempTexture, occlusionTexture;
 
-	this.init = function ( renderer ) {
-
-		_gl = renderer.context;
-		_renderer = renderer;
-
-		_precision = renderer.getPrecision();
+	var init = function () {
 
 		var vertices = new Float32Array( [
 			-1, -1,  0, 0,
@@ -33392,64 +33425,65 @@ THREE.LensFlarePlugin = function () {
 
 		// buffers
 
-		vertexBuffer     = _gl.createBuffer();
-		elementBuffer    = _gl.createBuffer();
+		vertexBuffer     = gl.createBuffer();
+		elementBuffer    = gl.createBuffer();
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, vertexBuffer );
-		_gl.bufferData( _gl.ARRAY_BUFFER, vertices, _gl.STATIC_DRAW );
+		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
 
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
-		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, faces, _gl.STATIC_DRAW );
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
+		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, faces, gl.STATIC_DRAW );
 
 		// textures
 
-		tempTexture      = _gl.createTexture();
-		occlusionTexture = _gl.createTexture();
+		tempTexture      = gl.createTexture();
+		occlusionTexture = gl.createTexture();
 
-		_gl.bindTexture( _gl.TEXTURE_2D, tempTexture );
-		_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, 16, 16, 0, _gl.RGB, _gl.UNSIGNED_BYTE, null );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
+		gl.bindTexture( gl.TEXTURE_2D, tempTexture );
+		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 16, 16, 0, gl.RGB, gl.UNSIGNED_BYTE, null );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
-		_gl.bindTexture( _gl.TEXTURE_2D, occlusionTexture );
-		_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, 16, 16, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
-		_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
+		gl.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, 16, 16, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
-		hasVertexTexture = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0;
+		hasVertexTexture = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) > 0;
 
 		if ( hasVertexTexture ) {
 
-			program = createProgram( THREE.ShaderFlares[ "lensFlare" ], _precision );
+			program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ] );
 
 		} else {
 
-			program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ], _precision );
+			program = createProgram( THREE.ShaderFlares[ "lensFlare" ] );
 
 		}
 
 		attributes = {
-			vertex: _gl.getAttribLocation ( program, "position" ),
-			uv:     _gl.getAttribLocation ( program, "uv" )
+			vertex: gl.getAttribLocation ( program, "position" ),
+			uv:     gl.getAttribLocation ( program, "uv" )
 		}
 
 		uniforms = {
-			renderType:     _gl.getUniformLocation( program, "renderType" ),
-			map:            _gl.getUniformLocation( program, "map" ),
-			occlusionMap:   _gl.getUniformLocation( program, "occlusionMap" ),
-			opacity:        _gl.getUniformLocation( program, "opacity" ),
-			color:          _gl.getUniformLocation( program, "color" ),
-			scale:          _gl.getUniformLocation( program, "scale" ),
-			rotation:       _gl.getUniformLocation( program, "rotation" ),
-			screenPosition: _gl.getUniformLocation( program, "screenPosition" )
+			renderType:     gl.getUniformLocation( program, "renderType" ),
+			map:            gl.getUniformLocation( program, "map" ),
+			occlusionMap:   gl.getUniformLocation( program, "occlusionMap" ),
+			opacity:        gl.getUniformLocation( program, "opacity" ),
+			color:          gl.getUniformLocation( program, "color" ),
+			scale:          gl.getUniformLocation( program, "scale" ),
+			rotation:       gl.getUniformLocation( program, "rotation" ),
+			screenPosition: gl.getUniformLocation( program, "screenPosition" )
 		};
 
 	};
 
+	this.init = function () {}; // TODO: Remove
 
 	/*
 	 * Render lens flares
@@ -33485,25 +33519,31 @@ THREE.LensFlarePlugin = function () {
 		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
 			screenPositionPixels = new THREE.Vector2( 1, 1 );
 
-		_gl.useProgram( program );
+		if ( program === undefined ) {
 
-		_gl.enableVertexAttribArray( attributes.vertex );
-		_gl.enableVertexAttribArray( attributes.uv );
+			init();
+
+		}
+
+		gl.useProgram( program );
+
+		gl.enableVertexAttribArray( attributes.vertex );
+		gl.enableVertexAttribArray( attributes.uv );
 
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms
 
-		_gl.uniform1i( uniforms.occlusionMap, 0 );
-		_gl.uniform1i( uniforms.map, 1 );
+		gl.uniform1i( uniforms.occlusionMap, 0 );
+		gl.uniform1i( uniforms.map, 1 );
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, vertexBuffer );
-		_gl.vertexAttribPointer( attributes.vertex, 2, _gl.FLOAT, false, 2 * 8, 0 );
-		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
+		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
+		gl.vertexAttribPointer( attributes.vertex, 2, gl.FLOAT, false, 2 * 8, 0 );
+		gl.vertexAttribPointer( attributes.uv, 2, gl.FLOAT, false, 2 * 8, 8 );
 
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
-		_gl.disable( _gl.CULL_FACE );
-		_gl.depthMask( false );
+		gl.disable( gl.CULL_FACE );
+		gl.depthMask( false );
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
 
@@ -33536,38 +33576,38 @@ THREE.LensFlarePlugin = function () {
 
 				// save current RGB to temp texture
 
-				_gl.activeTexture( _gl.TEXTURE1 );
-				_gl.bindTexture( _gl.TEXTURE_2D, tempTexture );
-				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.activeTexture( gl.TEXTURE1 );
+				gl.bindTexture( gl.TEXTURE_2D, tempTexture );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
 
 
 				// render pink quad
 
-				_gl.uniform1i( uniforms.renderType, 0 );
-				_gl.uniform2f( uniforms.scale, scale.x, scale.y );
-				_gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
+				gl.uniform1i( uniforms.renderType, 0 );
+				gl.uniform2f( uniforms.scale, scale.x, scale.y );
+				gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 
-				_gl.disable( _gl.BLEND );
-				_gl.enable( _gl.DEPTH_TEST );
+				gl.disable( gl.BLEND );
+				gl.enable( gl.DEPTH_TEST );
 
-				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 
 				// copy result to occlusionMap
 
-				_gl.activeTexture( _gl.TEXTURE0 );
-				_gl.bindTexture( _gl.TEXTURE_2D, occlusionTexture );
-				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
+				gl.activeTexture( gl.TEXTURE0 );
+				gl.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
 
 
 				// restore graphics
 
-				_gl.uniform1i( uniforms.renderType, 1 );
-				_gl.disable( _gl.DEPTH_TEST );
+				gl.uniform1i( uniforms.renderType, 1 );
+				gl.disable( gl.DEPTH_TEST );
 
-				_gl.activeTexture( _gl.TEXTURE1 );
-				_gl.bindTexture( _gl.TEXTURE_2D, tempTexture );
-				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+				gl.activeTexture( gl.TEXTURE1 );
+				gl.bindTexture( gl.TEXTURE_2D, tempTexture );
+				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 
 				// update object positions
@@ -33586,8 +33626,8 @@ THREE.LensFlarePlugin = function () {
 
 				// render flares
 
-				_gl.uniform1i( uniforms.renderType, 2 );
-				_gl.enable( _gl.BLEND );
+				gl.uniform1i( uniforms.renderType, 2 );
+				gl.enable( gl.BLEND );
 
 				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
@@ -33604,17 +33644,17 @@ THREE.LensFlarePlugin = function () {
 						scale.x = size * invAspect;
 						scale.y = size;
 
-						_gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
-						_gl.uniform2f( uniforms.scale, scale.x, scale.y );
-						_gl.uniform1f( uniforms.rotation, sprite.rotation );
+						gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
+						gl.uniform2f( uniforms.scale, scale.x, scale.y );
+						gl.uniform1f( uniforms.rotation, sprite.rotation );
 
-						_gl.uniform1f( uniforms.opacity, sprite.opacity );
-						_gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
+						gl.uniform1f( uniforms.opacity, sprite.opacity );
+						gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-						_renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
-						_renderer.setTexture( sprite.texture, 1 );
+						renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
+						renderer.setTexture( sprite.texture, 1 );
 
-						_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+						gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 					}
 
@@ -33626,33 +33666,33 @@ THREE.LensFlarePlugin = function () {
 
 		// restore gl
 
-		_gl.enable( _gl.CULL_FACE );
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthMask( true );
+		gl.enable( gl.CULL_FACE );
+		gl.enable( gl.DEPTH_TEST );
+		gl.depthMask( true );
 
-		_renderer.resetGLState();
+		renderer.resetGLState();
 
 	};
 
-	function createProgram ( shader, precision ) {
+	function createProgram ( shader ) {
 
-		var program = _gl.createProgram();
+		var program = gl.createProgram();
 
-		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
-		var vertexShader = _gl.createShader( _gl.VERTEX_SHADER );
+		var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
+		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
 
-		var prefix = "precision " + precision + " float;\n";
+		var prefix = "precision " + renderer.getPrecision() + " float;\n";
 
-		_gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
-		_gl.shaderSource( vertexShader, prefix + shader.vertexShader );
+		gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
+		gl.shaderSource( vertexShader, prefix + shader.vertexShader );
 
-		_gl.compileShader( fragmentShader );
-		_gl.compileShader( vertexShader );
+		gl.compileShader( fragmentShader );
+		gl.compileShader( vertexShader );
 
-		_gl.attachShader( program, fragmentShader );
-		_gl.attachShader( program, vertexShader );
+		gl.attachShader( program, fragmentShader );
+		gl.attachShader( program, vertexShader );
 
-		_gl.linkProgram( program );
+		gl.linkProgram( program );
 
 		return program;
 
@@ -33695,10 +33735,33 @@ THREE.ShadowMapPlugin = function () {
 		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
-		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
-		_depthMaterialSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, skinning: true } );
-		_depthMaterialMorphSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true, skinning: true } );
+		_depthMaterial = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader
+		 } );
+
+		_depthMaterialMorph = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			morphTargets: true
+		} );
+
+		_depthMaterialSkin = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			skinning: true
+		} );
+
+		_depthMaterialMorphSkin = new THREE.ShaderMaterial( {
+			uniforms: depthUniforms,
+			vertexShader: depthShader.vertexShader,
+			fragmentShader: depthShader.fragmentShader,
+			morphTargets: true,
+			skinning: true
+		} );
 
 		_depthMaterial._shadowPass = true;
 		_depthMaterialMorph._shadowPass = true;
@@ -33854,7 +33917,7 @@ THREE.ShadowMapPlugin = function () {
 			if ( light.shadowCameraVisible && ! light.cameraHelper ) {
 
 				light.cameraHelper = new THREE.CameraHelper( light.shadowCamera );
-				light.shadowCamera.add( light.cameraHelper );
+				scene.add( light.cameraHelper );
 
 			}
 
@@ -33868,6 +33931,8 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
+			//
+
 			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
 			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
@@ -33875,15 +33940,19 @@ THREE.ShadowMapPlugin = function () {
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
+			//
+
 			if ( light.cameraHelper ) light.cameraHelper.visible = light.shadowCameraVisible;
 			if ( light.shadowCameraVisible ) light.cameraHelper.update();
 
 			// compute shadow matrix
 
-			shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
-							  0.0, 0.5, 0.0, 0.5,
-							  0.0, 0.0, 0.5, 0.5,
-							  0.0, 0.0, 0.0, 1.0 );
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 0.5, 0.5,
+				0.0, 0.0, 0.0, 1.0
+			);
 
 			shadowMatrix.multiply( shadowCamera.projectionMatrix );
 			shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
@@ -33901,7 +33970,8 @@ THREE.ShadowMapPlugin = function () {
 			// set object matrices & frustum culling
 
 			_renderList.length = 0;
-			projectObject(scene,scene,shadowCamera);
+
+			projectObject( scene, scene, shadowCamera );
 
 
 			// render regular objects
@@ -33997,32 +34067,34 @@ THREE.ShadowMapPlugin = function () {
 		_renderer.resetGLState();
 
 	};
-	
-	function projectObject(scene, object,shadowCamera){
-		
+
+	function projectObject( scene, object, shadowCamera ){
+
 		if ( object.visible ) {
-	
-			var webglObjects = _webglObjects[object.id];
-	
-			if (webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
-		
-		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
-			
-					var webglObject = webglObjects[i];
-					
+
+			var webglObjects = _webglObjects[ object.id ];
+
+			if ( webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+
+				for (var i = 0, l = webglObjects.length; i < l; i ++ ) {
+
+					var webglObject = webglObjects[ i ];
+
 					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push(webglObject);
-					
+					_renderList.push( webglObject );
+
 				}
+
 			}
-	
-			for(var i = 0, l = object.children.length; i < l; i++) {
-				
-				projectObject(scene, object.children[i],shadowCamera);
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				projectObject( scene, object.children[ i ], shadowCamera );
+
 			}
-		
+
 		}
+
 	}
 
 	function createVirtualLight( light, cascade ) {
@@ -34176,19 +34248,18 @@ THREE.ShadowMapPlugin = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpritePlugin = function () {
+THREE.SpritePlugin = function ( renderer ) {
 
-	var _gl, _renderer, _texture;
+	var gl = renderer.context;
 
 	var sprites = [];
 
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
 
-	this.init = function ( renderer ) {
-
-		_gl = renderer.context;
-		_renderer = renderer;
+	var texture;
+	
+	var init = function () {
 
 		var vertices = new Float32Array( [
 			- 0.5, - 0.5,  0, 0,
@@ -34202,43 +34273,43 @@ THREE.SpritePlugin = function () {
 			0, 2, 3
 		] );
 
-		vertexBuffer  = _gl.createBuffer();
-		elementBuffer = _gl.createBuffer();
+		vertexBuffer  = gl.createBuffer();
+		elementBuffer = gl.createBuffer();
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, vertexBuffer );
-		_gl.bufferData( _gl.ARRAY_BUFFER, vertices, _gl.STATIC_DRAW );
+		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
 
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
-		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, faces, _gl.STATIC_DRAW );
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
+		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, faces, gl.STATIC_DRAW );
 
 		program = createProgram();
 
 		attributes = {
-			position:			_gl.getAttribLocation ( program, 'position' ),
-			uv:					_gl.getAttribLocation ( program, 'uv' )
+			position:			gl.getAttribLocation ( program, 'position' ),
+			uv:					gl.getAttribLocation ( program, 'uv' )
 		};
 
 		uniforms = {
-			uvOffset:			_gl.getUniformLocation( program, 'uvOffset' ),
-			uvScale:			_gl.getUniformLocation( program, 'uvScale' ),
+			uvOffset:			gl.getUniformLocation( program, 'uvOffset' ),
+			uvScale:			gl.getUniformLocation( program, 'uvScale' ),
 
-			rotation:			_gl.getUniformLocation( program, 'rotation' ),
-			scale:				_gl.getUniformLocation( program, 'scale' ),
+			rotation:			gl.getUniformLocation( program, 'rotation' ),
+			scale:				gl.getUniformLocation( program, 'scale' ),
 
-			color:				_gl.getUniformLocation( program, 'color' ),
-			map:				_gl.getUniformLocation( program, 'map' ),
-			opacity:			_gl.getUniformLocation( program, 'opacity' ),
+			color:				gl.getUniformLocation( program, 'color' ),
+			map:				gl.getUniformLocation( program, 'map' ),
+			opacity:			gl.getUniformLocation( program, 'opacity' ),
 
-			modelViewMatrix: 	_gl.getUniformLocation( program, 'modelViewMatrix' ),
-			projectionMatrix:	_gl.getUniformLocation( program, 'projectionMatrix' ),
+			modelViewMatrix: 	gl.getUniformLocation( program, 'modelViewMatrix' ),
+			projectionMatrix:	gl.getUniformLocation( program, 'projectionMatrix' ),
 
-			fogType:			_gl.getUniformLocation( program, 'fogType' ),
-			fogDensity:			_gl.getUniformLocation( program, 'fogDensity' ),
-			fogNear:			_gl.getUniformLocation( program, 'fogNear' ),
-			fogFar:				_gl.getUniformLocation( program, 'fogFar' ),
-			fogColor:			_gl.getUniformLocation( program, 'fogColor' ),
+			fogType:			gl.getUniformLocation( program, 'fogType' ),
+			fogDensity:			gl.getUniformLocation( program, 'fogDensity' ),
+			fogNear:			gl.getUniformLocation( program, 'fogNear' ),
+			fogFar:				gl.getUniformLocation( program, 'fogFar' ),
+			fogColor:			gl.getUniformLocation( program, 'fogColor' ),
 
-			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
+			alphaTest:			gl.getUniformLocation( program, 'alphaTest' )
 		};
 
 		var canvas = document.createElement( 'canvas' );
@@ -34249,10 +34320,12 @@ THREE.SpritePlugin = function () {
 		context.fillStyle = 'white';
 		context.fillRect( 0, 0, 8, 8 );
 
-		_texture = new THREE.Texture( canvas );
-		_texture.needsUpdate = true;
+		texture = new THREE.Texture( canvas );
+		texture.needsUpdate = true;
 
 	};
+
+	this.init = function () {}; // TODO: Remove
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
@@ -34272,24 +34345,30 @@ THREE.SpritePlugin = function () {
 
 		// setup gl
 
-		_gl.useProgram( program );
+		if ( program === undefined ) {
 
-		_gl.enableVertexAttribArray( attributes.position );
-		_gl.enableVertexAttribArray( attributes.uv );
+			init();
 
-		_gl.disable( _gl.CULL_FACE );
-		_gl.enable( _gl.BLEND );
+		}
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, vertexBuffer );
-		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
-		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
+		gl.useProgram( program );
 
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
+		gl.enableVertexAttribArray( attributes.position );
+		gl.enableVertexAttribArray( attributes.uv );
 
-		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
+		gl.disable( gl.CULL_FACE );
+		gl.enable( gl.BLEND );
 
-		_gl.activeTexture( _gl.TEXTURE0 );
-		_gl.uniform1i( uniforms.map, 0 );
+		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
+		gl.vertexAttribPointer( attributes.position, 2, gl.FLOAT, false, 2 * 8, 0 );
+		gl.vertexAttribPointer( attributes.uv, 2, gl.FLOAT, false, 2 * 8, 8 );
+
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
+
+		gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
+
+		gl.activeTexture( gl.TEXTURE0 );
+		gl.uniform1i( uniforms.map, 0 );
 
 		var oldFogType = 0;
 		var sceneFogType = 0;
@@ -34297,22 +34376,22 @@ THREE.SpritePlugin = function () {
 
 		if ( fog ) {
 
-			_gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
+			gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
 
 			if ( fog instanceof THREE.Fog ) {
 
-				_gl.uniform1f( uniforms.fogNear, fog.near );
-				_gl.uniform1f( uniforms.fogFar, fog.far );
+				gl.uniform1f( uniforms.fogNear, fog.near );
+				gl.uniform1f( uniforms.fogFar, fog.far );
 
-				_gl.uniform1i( uniforms.fogType, 1 );
+				gl.uniform1i( uniforms.fogType, 1 );
 				oldFogType = 1;
 				sceneFogType = 1;
 
 			} else if ( fog instanceof THREE.FogExp2 ) {
 
-				_gl.uniform1f( uniforms.fogDensity, fog.density );
+				gl.uniform1f( uniforms.fogDensity, fog.density );
 
-				_gl.uniform1i( uniforms.fogType, 2 );
+				gl.uniform1i( uniforms.fogType, 2 );
 				oldFogType = 2;
 				sceneFogType = 2;
 
@@ -34320,7 +34399,7 @@ THREE.SpritePlugin = function () {
 
 		} else {
 
-			_gl.uniform1i( uniforms.fogType, 0 );
+			gl.uniform1i( uniforms.fogType, 0 );
 			oldFogType = 0;
 			sceneFogType = 0;
 
@@ -34332,10 +34411,18 @@ THREE.SpritePlugin = function () {
 		for ( var i = 0, l = sprites.length; i < l; i ++ ) {
 
 			var sprite = sprites[ i ];
-			var material = sprite.material;
 
 			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
+
+			if ( sprite.renderDepth === null ) {
+
+				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
+
+			} else {
+
+				sprite.z = sprite.renderDepth;
+
+			}
 
 		}
 
@@ -34350,8 +34437,8 @@ THREE.SpritePlugin = function () {
 			var sprite = sprites[ i ];
 			var material = sprite.material;
 
-			_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-			_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
+			gl.uniform1f( uniforms.alphaTest, material.alphaTest );
+			gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
 			scale[ 0 ] = sprite.scale.x;
 			scale[ 1 ] = sprite.scale.y;
@@ -34366,65 +34453,65 @@ THREE.SpritePlugin = function () {
 
 			if ( oldFogType !== fogType ) {
 
-				_gl.uniform1i( uniforms.fogType, fogType );
+				gl.uniform1i( uniforms.fogType, fogType );
 				oldFogType = fogType;
 
 			}
 
 			if ( material.map !== null ) {
 
-				_gl.uniform2f( uniforms.uvOffset, material.map.offset.x, material.map.offset.y );
-				_gl.uniform2f( uniforms.uvScale, material.map.repeat.x, material.map.repeat.y );
+				gl.uniform2f( uniforms.uvOffset, material.map.offset.x, material.map.offset.y );
+				gl.uniform2f( uniforms.uvScale, material.map.repeat.x, material.map.repeat.y );
 
 			} else {
 
-				_gl.uniform2f( uniforms.uvOffset, 0, 0 );
-				_gl.uniform2f( uniforms.uvScale, 1, 1 );
+				gl.uniform2f( uniforms.uvOffset, 0, 0 );
+				gl.uniform2f( uniforms.uvScale, 1, 1 );
 
 			}
 
-			_gl.uniform1f( uniforms.opacity, material.opacity );
-			_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
+			gl.uniform1f( uniforms.opacity, material.opacity );
+			gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
-			_gl.uniform1f( uniforms.rotation, material.rotation );
-			_gl.uniform2fv( uniforms.scale, scale );
+			gl.uniform1f( uniforms.rotation, material.rotation );
+			gl.uniform2fv( uniforms.scale, scale );
 
-			_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			_renderer.setDepthTest( material.depthTest );
-			_renderer.setDepthWrite( material.depthWrite );
+			renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			renderer.setDepthTest( material.depthTest );
+			renderer.setDepthWrite( material.depthWrite );
 
 			if ( material.map && material.map.image && material.map.image.width ) {
 
-				_renderer.setTexture( material.map, 0 );
+				renderer.setTexture( material.map, 0 );
 
 			} else {
 
-				_renderer.setTexture( _texture, 0 );
+				renderer.setTexture( texture, 0 );
 
 			}
 
-			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+			gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 		}
 
 		// restore gl
 
-		_gl.enable( _gl.CULL_FACE );
+		gl.enable( gl.CULL_FACE );
 		
-		_renderer.resetGLState();
+		renderer.resetGLState();
 
 	};
 
 	function createProgram () {
 
-		var program = _gl.createProgram();
+		var program = gl.createProgram();
 
-		var vertexShader = _gl.createShader( _gl.VERTEX_SHADER );
-		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
+		var vertexShader = gl.createShader( gl.VERTEX_SHADER );
+		var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
 
-		_gl.shaderSource( vertexShader, [
+		gl.shaderSource( vertexShader, [
 
-			'precision ' + _renderer.getPrecision() + ' float;',
+			'precision ' + renderer.getPrecision() + ' float;',
 
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
@@ -34460,9 +34547,9 @@ THREE.SpritePlugin = function () {
 
 		].join( '\n' ) );
 
-		_gl.shaderSource( fragmentShader, [
+		gl.shaderSource( fragmentShader, [
 
-			'precision ' + _renderer.getPrecision() + ' float;',
+			'precision ' + renderer.getPrecision() + ' float;',
 
 			'uniform vec3 color;',
 			'uniform sampler2D map;',
@@ -34510,13 +34597,13 @@ THREE.SpritePlugin = function () {
 
 		].join( '\n' ) );
 
-		_gl.compileShader( vertexShader );
-		_gl.compileShader( fragmentShader );
+		gl.compileShader( vertexShader );
+		gl.compileShader( fragmentShader );
 
-		_gl.attachShader( program, vertexShader );
-		_gl.attachShader( program, fragmentShader );
+		gl.attachShader( program, vertexShader );
+		gl.attachShader( program, fragmentShader );
 
-		_gl.linkProgram( program );
+		gl.linkProgram( program );
 
 		return program;
 
