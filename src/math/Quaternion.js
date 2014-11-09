@@ -3,6 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://exocortex.com
+ * @author dmarcos / http://github.com/dmarcos
  */
 
 THREE.Quaternion = function ( x, y, z, w ) {
@@ -328,6 +329,28 @@ THREE.Quaternion.prototype = {
 	length: function () {
 
 		return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w );
+
+	},
+
+	axis: function () {
+
+			// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
+
+			var x = this._x;
+			var y = this._y;
+			var z = this._z;
+
+			// if w > 1 acos and sqrt will produce errors, this cannot happen if quaternion is normalized
+			var q = this._w <= 1? this : new THREE.Quaternion().copy( this ).normalize();
+			var factor = Math.sqrt( 1 - q.w * q.w );
+
+			if ( factor > 0.001) {
+				x /= factor;
+				y /= factor;
+				z /= factor;
+			}
+
+			return new THREE.Vector3( x, y, z );
 
 	},
 

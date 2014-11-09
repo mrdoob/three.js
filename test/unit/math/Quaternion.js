@@ -137,6 +137,59 @@ test( "normalize/length/lengthSq", function() {
 	ok( a.length() == 1, "Passed!");
 });
 
+test( "axis/setFromAxisAngle", function() {
+	var a1 = new THREE.Vector3( 1, 0, 0 );
+	var q = new THREE.Quaternion().setFromAxisAngle( a1, Math.PI );
+	var a2 = q.axis();
+	var a3;
+
+	ok( a1.equals( a2 ), "Passed!");
+
+	a1 = new THREE.Vector3( 0, 1, 0 );
+	q = new THREE.Quaternion().setFromAxisAngle( a1, Math.PI );
+	a2 = q.axis();
+
+	ok( a1.equals( a2 ), "Passed!");
+
+	a1 = new THREE.Vector3( 0, 0, 1 );
+	q = new THREE.Quaternion().setFromAxisAngle( a1, Math.PI );
+	a2 = q.axis();
+
+	ok( a1.equals( a2 ), "Passed!");
+
+	a1 = new THREE.Vector3( 1, 1, 0 );
+	q = new THREE.Quaternion().setFromAxisAngle( a1, Math.PI );
+	a2 = q.axis();
+
+	ok( a1.equals( a2 ), "Passed!");
+
+	a1 = new THREE.Vector3( 0, 1, 1 );
+	q = new THREE.Quaternion().setFromAxisAngle( a1, Math.PI );
+	a2 = q.axis();
+
+	ok( a1.equals( a2 ), "Passed!");
+
+	a1 = new THREE.Vector3( 1, 1, 1 );
+	q = new THREE.Quaternion().setFromAxisAngle( a1, Math.PI );
+	a2 = q.axis();
+
+	ok( a1.equals( a2 ), "Passed!");
+
+	a1 = new THREE.Vector3( 1, 1, 1 );
+	q = new THREE.Quaternion().setFromAxisAngle( a1, Math.PI / 2 );
+	a2 = q.axis();
+
+	ok( a1.equals( a2 ), "Passed!");
+
+	a1 = new THREE.Vector3( 1, 1, 1 );
+	a2 = new THREE.Vector3( 0, 0, 0 );
+	q = new THREE.Quaternion().setFromAxisAngle( a1, 0 );
+	a3 = q.axis();
+
+	ok( a2.equals( a3 ), "Passed!");
+
+});
+
 test( "inverse/conjugate", function() {
 	var a = new THREE.Quaternion( x, y, z, w );
 
@@ -173,7 +226,7 @@ test( "multiplyQuaternions/multiply", function() {
 });
 
 test( "multiplyVector3", function() {
-	
+
 	var angles = [ new THREE.Euler( 1, 0, 0 ), new THREE.Euler( 0, 1, 0 ), new THREE.Euler( 0, 0, 1 ) ];
 
 	// ensure euler conversion for Quaternion matches that of Matrix4
@@ -185,7 +238,7 @@ test( "multiplyVector3", function() {
 			var v0 = new THREE.Vector3(1, 0, 0);
 			var qv = v0.clone().applyQuaternion( q );
 			var mv = v0.clone().applyMatrix4( m );
-		
+
 			ok( qv.distanceTo( mv ) < 0.001, "Passed!" );
 		}
 	}
@@ -195,7 +248,7 @@ test( "multiplyVector3", function() {
 test( "equals", function() {
 	var a = new THREE.Quaternion( x, y, z, w );
 	var b = new THREE.Quaternion( -x, -y, -z, -w );
-	
+
 	ok( a.x != b.x, "Passed!" );
 	ok( a.y != b.y, "Passed!" );
 
