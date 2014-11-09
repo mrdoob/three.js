@@ -15,27 +15,45 @@
 
 		<h2>Example</h2>
 		<code>
-		var projector = new THREE.Projector();
-		var mouse2D = new THREE.Vector3();
+		var raycaster = new THREE.Raycaster();
+		var mouse = new THREE.Vector2();
 
-		function onMouseMove() {
-			mouse2D.x = 2 * ( e.clientX / window.innerWidth ) - 1;
-			mouse2D.y = 1 - 2 * ( e.clientY / window.innerHeight );
+		function onMouseMove(event) {
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1		
+		}
+
+		function pickingRay( raycaster, camera, mouse ) {
+
+			var vector = new THREE.Vector3( mouse.x, mouse.y, -1 ); // z = - 1 important!		
+			var end = new THREE.Vector3( vector.x, vector.y, 1.0 );
+
+			vector.unproject(camera);
+			end.unproject(camera);
+			end.sub( vector ).normalize();
+
+			raycaster.ray.set( vector, end );
+
 		}
 
 		window.addEventListener( 'mousemove', onMouseMove, false );
 
 		function render() {
+			pickingRay( raycaster, camera, mouse );	
 
-			var raycaster = projector.pickingRay( mouse2D.clone(), camera );
 			var intersects = raycaster.intersectObjects( scene.children );
 
 			for ( var intersect in intersects ) {
 				intersect.object.material.color = new THREE.Color( 0xff0000 );
 			}
-
+			renderer.render( scene, camera );
 		}
+		
+		window.requestAnimationFrame(render);
+
 		</code>
+
+		<!-- http://jsfiddle.net/7hfaoeo7/3/ -->
 
 		<h2>Constructor</h2>
 
@@ -98,12 +116,9 @@
 		[page:Boolean recursive] — If set, it also checks all descendants. Otherwise it only checks intersecton with the object.
 		</p>
 
-		<p>
-		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently than [page:Line lines] to ray casting.
-		</p>
 		</div>
 		<div>
-		checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first.
+		Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first.
         <code>
             [ { distance, point, face, faceIndex, indices, object }, ... ]
         </code>
@@ -116,8 +131,11 @@
         [page:Object3D object] – the intersected object
     	</p>
         <p>
-        Note that when intersecting a [page:Mesh] with a [page:BufferGeometry], the *face* and *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. 
+        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. 
         </p>
+		<p>
+		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently than [page:Line lines] to ray casting.
+		</p>
 		</div>
 
 		<h3>[method:Array intersectObjects]( [page:Array objects], [page:Boolean recursive] )</h3>
@@ -126,7 +144,7 @@
 		[page:Boolean recursive] — If set, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects.
 		</div>
 		<div>
-		checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].
+		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].
 		</div>
 
 
