@@ -75,14 +75,6 @@ THREE.ShaderLib['sky'] = {
 		"const float e = 2.71828182845904523536028747135266249775724709369995957;",
 		"const float pi = 3.141592653589793238462643383279502884197169;",
 
-		"const float n = 1.0003; // refractive index of air",
-		"const float N = 2.545E25; // number of molecules per unit volume for air at",
-								"// 288.15K and 1013mb (sea level -45 celsius)",
-		"const float pn = 0.035;	// depolatization factor for standard air",
-
-		"// wavelength of used primaries, according to preetham",
-		"const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);",
-
 		"// mie stuff",
 		"// K coefficient for the primaries",
 		"const vec3 K = vec3(0.686, 0.678, 0.666);",
@@ -101,10 +93,10 @@ THREE.ShaderLib['sky'] = {
 		"const float cutoffAngle = pi/1.95;",
 		"const float steepness = 1.5;",
 
-
-		"vec3 totalRayleigh(vec3 lambda)",
+		"// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE",
+		"vec3 totalRayleigh()",
 		"{",
-			"return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));",
+			"return 0.0005 / vec3(94, 40, 18);",
 		"}",
 
 		"float rayleighPhase(float cosTheta)",
@@ -164,7 +156,7 @@ THREE.ShaderLib['sky'] = {
 
 			"// extinction (absorbtion + out scattering) ",
 			"// rayleigh coefficients",
-			"vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
+			"vec3 betaR = totalRayleigh() * reileighCoefficient;",
 
 			"// mie coefficients",
 			"vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;",
@@ -257,4 +249,3 @@ THREE.Sky = function () {
 
 
 };
-
