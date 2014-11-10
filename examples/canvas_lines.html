@@ -20,6 +20,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script>
 
 			var mouseX = 0, mouseY = 0,
@@ -62,7 +65,7 @@
 					program: function ( context ) {
 
 						context.beginPath();
-						context.arc( 0, 0, 1, 0, PI2, true );
+						context.arc( 0, 0, 0.5, 0, PI2, true );
 						context.fill();
 
 					}
@@ -79,7 +82,7 @@
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
 					particle.position.multiplyScalar( Math.random() * 10 + 450 );
-					particle.scale.x = particle.scale.y = 5;
+					particle.scale.x = particle.scale.y = 10;
 					scene.add( particle );
 
 					geometry.vertices.push( particle.position );

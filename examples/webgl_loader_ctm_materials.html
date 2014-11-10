@@ -46,7 +46,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/loaders/ctm/lzma.js"></script>
 		<script src="js/loaders/ctm/ctm.js"></script>
@@ -93,8 +93,10 @@
 				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.set( 185, 40, 170 );
 
-				controls = new THREE.TrackballControls( camera );
-				controls.dynamicDampingFactor = 0.25;
+				controls = new THREE.OrbitControls( camera );
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.minDistance = 200;
+				controls.maxDistance = 500;
 
 				// SCENE
 
@@ -127,7 +129,7 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
 				sceneCube.add( mesh );
 
 				// LIGHTS
@@ -146,7 +148,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 
@@ -158,7 +160,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				// STATS
 
@@ -189,8 +190,8 @@
 					for ( var i = 0; i < geometries.length; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometries[ i ], materials[ i ] );
-						mesh.position = position;
-						mesh.scale = scale;
+						mesh.position.copy( position );
+						mesh.scale.copy( scale );
 						scene.add( mesh );
 
 					}
@@ -269,7 +270,8 @@
 
 				loader.statusDomElement.style.display = "none";
 
-				THREE.GeometryUtils.center( geometry );
+				geometry.center();
+				
 				hackMaterials( materials );
 
 				var material = new THREE.MeshFaceMaterial( materials );

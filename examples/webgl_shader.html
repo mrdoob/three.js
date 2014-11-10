@@ -94,13 +94,7 @@
 
 			var camera, scene, renderer;
 
-			var uniforms, material, mesh;
-
-			var mouseX = 0, mouseY = 0,
-			lat = 0, lon = 0, phy = 0, theta = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var uniforms;
 
 			init();
 			animate();
@@ -114,12 +108,14 @@
 
 				scene = new THREE.Scene();
 
+				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+
 				uniforms = {
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() }
 				};
 
-				material = new THREE.ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -127,7 +123,7 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), material );
+				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
@@ -148,6 +144,7 @@
 
 				uniforms.resolution.value.x = window.innerWidth;
 				uniforms.resolution.value.y = window.innerHeight;
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}

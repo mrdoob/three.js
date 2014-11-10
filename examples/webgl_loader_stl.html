@@ -76,7 +76,10 @@
 
 				// Ground
 
-				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 40, 40 ), new THREE.MeshPhongMaterial( { ambient: 0x999999, color: 0x999999, specular: 0x101010 } ) );
+				var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 40, 40 ),
+					new THREE.MeshPhongMaterial( { ambient: 0x999999, color: 0x999999, specular: 0x101010 } )
+				);
 				plane.rotation.x = -Math.PI/2;
 				plane.position.y = -0.5;
 				scene.add( plane );
@@ -146,6 +149,31 @@
 				} );
 				loader.load( './models/stl/binary/pr2_head_tilt.stl' );
 
+				// Colored binary STL
+				var loaderColored = new THREE.STLLoader();
+				loaderColored.addEventListener( 'load', function ( event ) {
+
+					var geometry = event.content;
+
+					var meshMaterial = material;
+					if (geometry.hasColors) {
+						meshMaterial = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+					}
+
+					var mesh = new THREE.Mesh( geometry, meshMaterial );
+
+					mesh.position.set( 0.5, 0.2, 0 );
+					mesh.rotation.set( - Math.PI / 2, Math.PI / 2, 0 );
+					mesh.scale.set( 0.3, 0.3, 0.3 );
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					scene.add( mesh );
+
+				} );
+				loaderColored.load( './models/stl/binary/colored.stl' );
+
 
 				// Lights
 
@@ -156,14 +184,13 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapCullFace = THREE.CullFaceBack;

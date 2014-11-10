@@ -27,8 +27,13 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - NURBS curve example</div>
 
 		<script src="../build/three.min.js"></script>
+
 		<script src="js/curves/NURBSCurve.js"></script>
 		<script src="js/curves/NURBSUtils.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
@@ -68,7 +73,7 @@
 
 				scene = new THREE.Scene();
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				group.position.y = 50;
 				scene.add( group );
 
@@ -108,7 +113,6 @@
 
 				var nurbsLine = new THREE.Line( nurbsGeometry, nurbsMaterial );
 				nurbsLine.position.set( 0, -100, 0 );
-				group.add( nurbsLine );
 
 				var nurbsControlPointsGeometry = new THREE.Geometry();
 				nurbsControlPointsGeometry.vertices = nurbsCurve.controlPoints;
@@ -116,11 +120,15 @@
 
 				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
 				nurbsControlPointsLine.position.copy( nurbsLine.position );
-				group.add( nurbsControlPointsLine );
+
+				group.add( nurbsLine, nurbsControlPointsLine );
+				// this also works:
+				// group.add( nurbsLine ).add( nurbsControlPointsLine );
 
 				//
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

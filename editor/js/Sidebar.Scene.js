@@ -1,16 +1,37 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/scene/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
 
-	container.add( new UI.Text( 'SCENE' ) );
-	container.add( new UI.Break(), new UI.Break() );
+		editor.config.setKey( 'ui/sidebar/scene/collapsed', boolean );
+
+	} );
+
+	container.addStatic( new UI.Text( 'SCENE' ) );
+	container.add( new UI.Break() );
+
+	var ignoreObjectSelectedSignal = false;
 
 	var outliner = new UI.FancySelect().setId( 'outliner' );
 	outliner.onChange( function () {
 
+		ignoreObjectSelectedSignal = true;
+
 		editor.selectById( parseInt( outliner.getValue() ) );
+
+		ignoreObjectSelectedSignal = false;
+
+	} );
+	outliner.onDblClick( function () {
+
+		editor.focusById( parseInt( outliner.getValue() ) );
 
 	} );
 	container.add( outliner );
@@ -105,51 +126,35 @@ Sidebar.Scene = function ( editor ) {
 
 	//
 
-	var refreshFogUI = function () {
+	var refreshUI = function () {
 
-		var type = fogType.getValue();
-
-		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
-		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
-
-	};
-
-	// events
-
-	signals.sceneGraphChanged.add( function () {
-
+		var camera = editor.camera;
 		var scene = editor.scene;
-		var sceneType = editor.getObjectType( scene );
 
-		var options = {};
+		var options = [];
 
-		options[ scene.id ] = '<span class="type ' + sceneType + '"></span> ' + scene.name;
+		options.push( { value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
+		options.push( { value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				var object = objects[ i ];
-				var objectType = editor.getObjectType( object );
 
-				var option = pad + '<span class="type ' + objectType + '"></span> ' + object.name;
+				var html = pad + '<span class="type ' + object.type + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
 					var geometry = object.geometry;
 					var material = object.material;
 
-					var geometryType = editor.getGeometryType( geometry );
-					var materialType = editor.getMaterialType( material );
-
-					option += ' <span class="type ' + geometryType + '"></span> ' + geometry.name;
-					option += ' <span class="type ' + materialType + '"></span> ' + material.name;
+					html += ' <span class="type ' + geometry.type + '"></span> ' + geometry.name;
+					html += ' <span class="type ' + material.type + '"></span> ' + material.name;
 
 				}
 
-				options[ object.id ] = option;
+				options.push( { value: object.id, html: html } );
 
 				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
 
@@ -190,9 +195,28 @@ Sidebar.Scene = function ( editor ) {
 
 		refreshFogUI();
 
-	} );
+	};
+
+	var refreshFogUI = function () {
+
+		var type = fogType.getValue();
+
+		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
+		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
+
+	};
+
+	refreshUI();
+
+	// events
+
+	signals.sceneGraphChanged.add( refreshUI );
 
 	signals.objectSelected.add( function ( object ) {
+
+		if ( ignoreObjectSelectedSignal === true ) return;
 
 		outliner.setValue( object !== null ? object.id : null );
 

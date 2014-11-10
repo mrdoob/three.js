@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">A low level class for loading resources with XmlHttpRequest, used internaly by most loaders.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Cache cache]</h3>
+		<div>
+		A [page:Cache cache] instance that hold the response from each request made through this loader, so each file is requested once.
+		</div>
+
+		<h3>[property:String crossOrigin]</h3>
+		<div>
+		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
+
+		<h3>[property:String responseType]</h3>
+		<div>
+		Can be set to change the response type.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded text response.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and return the [page:String text] response that will contain the data.
+		</div>
+
+		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
+		<div>
+		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
+
+		<h3>[method:null setResponseType]( [page:String value] )</h3>
+		<div>
+		[page:String value] — the empty string (default), "arraybuffer", "blob", "document", "json", or "text".
+		</div>
+
+
+		<h2>Example</h2>
+
+		[example:webgl_morphtargets_human]
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

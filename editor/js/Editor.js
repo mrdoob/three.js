@@ -1,14 +1,29 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Editor = function () {
 
 	var SIGNALS = signals;
 
 	this.signals = {
 
+		// player
+
+		startPlayer: new SIGNALS.Signal(),
+		stopPlayer: new SIGNALS.Signal(),
+
 		// actions
 
-		playAnimations: new SIGNALS.Signal(),
+		playAnimation: new SIGNALS.Signal(),
+		stopAnimation: new SIGNALS.Signal(),
+
+		showDialog: new SIGNALS.Signal(),
 
 		// notifications
+
+		savingStarted: new SIGNALS.Signal(),
+		savingFinished: new SIGNALS.Signal(),
 
 		themeChanged: new SIGNALS.Signal(),
 
@@ -21,7 +36,11 @@ var Editor = function () {
 
 		cameraChanged: new SIGNALS.Signal(),
 
+		geometryChanged: new SIGNALS.Signal(),
+
 		objectSelected: new SIGNALS.Signal(),
+		objectFocused: new SIGNALS.Signal(),
+
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
 		objectRemoved: new SIGNALS.Signal(),
@@ -33,21 +52,29 @@ var Editor = function () {
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
-		windowResize: new SIGNALS.Signal()
+		windowResize: new SIGNALS.Signal(),
+
+		showGridChanged: new SIGNALS.Signal()
 
 	};
-	
+
 	this.config = new Config();
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
+	this.camera.name = 'Camera';
+
 	this.scene = new THREE.Scene();
+	this.scene.name = 'Scene';
+
 	this.sceneHelpers = new THREE.Scene();
 
 	this.object = {};
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
+	// this.scripts = {};
 
 	this.selected = null;
 	this.helpers = {};
@@ -63,6 +90,14 @@ Editor.prototype = {
 		this.signals.themeChanged.dispatch( value );
 
 	},
+
+	showDialog: function ( value ) {
+
+		this.signals.showDialog.dispatch( value );
+
+	},
+
+	//
 
 	setScene: function ( scene ) {
 
@@ -175,82 +210,49 @@ Editor.prototype = {
 
 		return function ( object ) {
 
+			var helper;
+
 			if ( object instanceof THREE.Camera ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.CameraHelper( object, 10 );
-				helper.add( picker );
-			
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.CameraHelper( object, 10 );
 
 			} else if ( object instanceof THREE.PointLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.PointLightHelper( object, 10 );
-				helper.add( picker );
-			
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.PointLightHelper( object, 10 );
 
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.DirectionalLightHelper( object, 20 );
-				helper.add( picker );
-
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.DirectionalLightHelper( object, 20 );
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
-
-				var helper = new THREE.SpotLightHelper( object, 10 );
-				helper.add( picker );
-
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
-
-				this.signals.helperAdded.dispatch( helper );
+				helper = new THREE.SpotLightHelper( object, 10 );
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
-				var picker = new THREE.Mesh( geometry, material );
-				picker.name = 'picker';
-				picker.userData.object = object;
-				picker.visible = false;
+				helper = new THREE.HemisphereLightHelper( object, 10 );
 
-				var helper = new THREE.HemisphereLightHelper( object, 10 );
-				helper.add( picker );
+			} else if ( object instanceof THREE.SkinnedMesh ) {
 
-				this.sceneHelpers.add( helper );
-				this.helpers[ object.id ] = helper;
+				helper = new THREE.SkeletonHelper( object );
 
-				this.signals.helperAdded.dispatch( helper );
+			} else {
+
+				// no helper for this object type
+				return;
 
 			}
+
+			var picker = new THREE.Mesh( geometry, material );
+			picker.name = 'picker';
+			picker.userData.object = object;
+			picker.visible = false;
+			helper.add( picker );
+
+			this.sceneHelpers.add( helper );
+			this.helpers[ object.id ] = helper;
+
+			this.signals.helperAdded.dispatch( helper );
 
 		};
 
@@ -291,25 +293,33 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
+		if ( this.selected === object ) return;
+
+		var uuid = null;
+
+		if ( object !== null ) {
+
+			uuid = object.uuid;
+
+		}
+
 		this.selected = object;
-		this.config.setKey( 'selected', object.uuid );
+
+		this.config.setKey( 'selected', uuid );
 		this.signals.objectSelected.dispatch( object );
 
 	},
 
 	selectById: function ( id ) {
 
-		var scope = this;
+		if ( id === this.camera.id ) {
 
-		this.scene.traverse( function ( child ) {
+			this.select( this.camera );
+			return;
 
-			if ( child.id === id ) {
+		}
 
-				scope.select( child );
-
-			}
-
-		} );
+		this.select( this.scene.getObjectById( id, true ) );
 
 	},
 
@@ -335,90 +345,15 @@ Editor.prototype = {
 
 	},
 
-	// utils
+	focus: function ( object ) {
 
-	getObjectType: function ( object ) {
-
-		var types = {
-
-			'Scene': THREE.Scene,
-			'PerspectiveCamera': THREE.PerspectiveCamera,
-			'AmbientLight': THREE.AmbientLight,
-			'DirectionalLight': THREE.DirectionalLight,
-			'HemisphereLight': THREE.HemisphereLight,
-			'PointLight': THREE.PointLight,
-			'SpotLight': THREE.SpotLight,
-			'Mesh': THREE.Mesh,
-			'Object3D': THREE.Object3D
-
-		};
-
-		for ( var type in types ) {
-
-			if ( object instanceof types[ type ] ) return type;
-
-		}
+		this.signals.objectFocused.dispatch( object );
 
 	},
 
-	getGeometryType: function ( geometry ) {
+	focusById: function ( id ) {
 
-		var types = {
-
-			'CircleGeometry': THREE.CircleGeometry,
-			'CubeGeometry': THREE.CubeGeometry,
-			'CylinderGeometry': THREE.CylinderGeometry,
-			'ExtrudeGeometry': THREE.ExtrudeGeometry,
-			'IcosahedronGeometry': THREE.IcosahedronGeometry,
-			'LatheGeometry': THREE.LatheGeometry,
-			'OctahedronGeometry': THREE.OctahedronGeometry,
-			'ParametricGeometry': THREE.ParametricGeometry,
-			'PlaneGeometry': THREE.PlaneGeometry,
-			'PolyhedronGeometry': THREE.PolyhedronGeometry,
-			'ShapeGeometry': THREE.ShapeGeometry,
-			'SphereGeometry': THREE.SphereGeometry,
-			'TetrahedronGeometry': THREE.TetrahedronGeometry,
-			'TextGeometry': THREE.TextGeometry,
-			'TorusGeometry': THREE.TorusGeometry,
-			'TorusKnotGeometry': THREE.TorusKnotGeometry,
-			'TubeGeometry': THREE.TubeGeometry,
-			'Geometry': THREE.Geometry,
-			'BufferGeometry': THREE.BufferGeometry
-
-		};
-
-		for ( var type in types ) {
-
-			if ( geometry instanceof types[ type ] ) return type;
-
-		}
-
-	},
-
-	getMaterialType: function ( material ) {
-
-		var types = {
-
-			'LineBasicMaterial': THREE.LineBasicMaterial,
-			'LineDashedMaterial': THREE.LineDashedMaterial,
-			'MeshBasicMaterial': THREE.MeshBasicMaterial,
-			'MeshDepthMaterial': THREE.MeshDepthMaterial,
-			'MeshFaceMaterial': THREE.MeshFaceMaterial,
-			'MeshLambertMaterial': THREE.MeshLambertMaterial,
-			'MeshNormalMaterial': THREE.MeshNormalMaterial,
-			'MeshPhongMaterial': THREE.MeshPhongMaterial,
-			'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
-			'ShaderMaterial': THREE.ShaderMaterial,
-			'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
-			'Material': THREE.Material
-
-		};
-
-		for ( var type in types ) {
-
-			if ( material instanceof types[ type ] ) return type;
-
-		}
+		this.focus( this.scene.getObjectById( id, true ) );
 
 	}
 

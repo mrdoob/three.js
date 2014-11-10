@@ -14,12 +14,9 @@
 		</style>
 	</head>
 	<body>
-		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
 		<script src="../build/three.min.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
-
 
 		<script>
 
@@ -63,7 +60,7 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				group.position.y = 50;
 				scene.add( group );
 
@@ -111,7 +108,7 @@
 					// vertices from real points
 
 					var pgeo = points.clone();
-					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleSystemMaterial( { color: color, size: 2, opacity: 0.75 } ) );
+					var particles = new THREE.PointCloud( pgeo, new THREE.PointCloudMaterial( { color: color, size: 2, opacity: 0.75 } ) );
 					particles.position.set( x, y, z + 75 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
@@ -128,7 +125,7 @@
 					// equidistance sampled points
 
 					var pgeo = spacedPoints.clone();
-					var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleSystemMaterial( { color: color, size: 2, opacity: 0.5 } ) );
+					var particles2 = new THREE.PointCloud( pgeo, new THREE.PointCloudMaterial( { color: color, size: 2, opacity: 0.5 } ) );
 					particles2.position.set( x, y, z + 125 );
 					particles2.rotation.set( rx, ry, rz );
 					particles2.scale.set( s, s, s );
@@ -314,11 +311,9 @@
 				splinepts.push( new THREE.Vector2 ( -140, 350 ) );
 				splinepts.push( new THREE.Vector2 ( 0, 0 ) );
 
-				var splineShape = new THREE.Shape(  );
+				var splineShape = new THREE.Shape();
 				splineShape.moveTo( 0, 0 );
 				splineShape.splineThru( splinepts );
-
-				// splineShape.debug( document.getElementById("debug") );
 
 				// TODO 3d path?
 
@@ -357,6 +352,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

@@ -9,39 +9,40 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A class containing useful utility functions for scene manipulation.</div>
 
 
 		<h2>Methods</h2>
 
 
-		<h3>.createMultiMaterialObject([page:todo geometry], [page:todo materials]) [page:todo]</h3>
+		<h3>[method:Object3D createMultiMaterialObject]([page:Geometry geometry], [page:Array materials])</h3>
 		<div>
-		geometry -- todo <br />
-		materials -- todo
+		geometry -- The geometry for the Object. <br />
+		materials -- The materials for the object.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.attach([page:todo child], [page:todo scene], [page:todo parent]) [page:todo]</h3>
-		<div>
-		child -- todo <br />
-		scene -- todo <br />
-		parent -- todo
-		</div>
-		<div>
-		todo
+		Creates an new Object3D an new mesh for each material defined in materials. Beware that this is not the same as Meshfacematerial which defines multiple material for 1 mesh.<br />
+		This is mostly useful for object that need a material and a wireframe implementation.
 		</div>
 
-		<h3>.detach([page:todo child], [page:todo parent], [page:todo scene]) [page:todo]</h3>
+		<h3>[method:null attach]([page:Object3D child], [page:Object3D scene], [page:Object3D parent])</h3>
 		<div>
-		child -- todo <br />
-		parent -- todo <br />
-		scene -- todo
+		child -- The object to add to the parent  <br />
+		scene -- The scene to detach the object on. <br />
+		parent -- The parent to attach the object from.
 		</div>
 		<div>
-		todo
+		Attaches the object to the parent without the moving the object in the worldspace.
+		</div>
+
+		<h3>[method:null detach]([page:Object3D child], [page:Object3D parent], [page:Object3D scene])</h3>
+		<div>
+		child -- The object to remove from the parent  <br />
+		scene -- The scene to attach the object on. <br />
+		parent -- The parent to detach the object from.
+		</div>
+		<div>
+		Detaches the object from the parent and adds it back to the scene without moving in worldspace.
 		</div>
 
 		<h2>Source</h2>

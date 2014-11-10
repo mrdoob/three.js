@@ -13,10 +13,23 @@
                   but draws it using the (slower) <a href="http://www.w3.org/html/wg/drafts/2dcontext/html5_canvas/">Canvas 2D Context</a> API.</div>
 		<div class="desc">This renderer can be a nice fallback from [page:WebGLRenderer] for simple scenes:</div>
 		<code>
-		if (window.WebGLRenderingContext)
+		function webglAvailable() {
+			try {
+				var canvas = document.createElement( 'canvas' );
+				return !!( window.WebGLRenderingContext && (
+					canvas.getContext( 'webgl' ) ||
+					canvas.getContext( 'experimental-webgl' ) )
+				);
+			} catch ( e ) {
+				return false;
+			}
+		}
+
+		if ( webglAvailable() ) {
 			renderer = new THREE.WebGLRenderer();
-		else
+		} else {
 			renderer = new THREE.CanvasRenderer();
+		}
 		</code>
 		<div class="desc">
 			Note: both WebGLRenderer and CanvasRenderer are embedded in the web page using an HTML5 &lt;canvas&gt; tag.
@@ -28,106 +41,118 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo parameters])</h3>
+		<h3>[name]([page:object parameters])</h3>
+        <div>parameters is an optional object with properties defining the renderer's behaviour. The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.</div>
+
 		<div>
-		parameters -- todo
-		</div>
-		<div>
-		todo
+		canvas — A [page:Canvas] where the renderer draws its output.<br />
+		devicePixelRatio — The device its pixelRatio.<br />
 		</div>
 
 
 		<h2>Properties</h2>
 
 
-		<h3>.[page:object info]</h3>
+        <h3>[property:Object info]</h3>
+
+		<div>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</div>
 		<div>
-		todo
+		<ul>
+			<li>render:
+				<ul>
+					<li>vertices</li>
+					<li>faces</li>
+				</ul>
+			</li>
+		</ul>
+		</div>
+
+        <h3>[property:DOMElement domElement]</h3>
+
+		<div>A [page:Canvas] where the renderer draws its output.<br />
+		This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.</div>
+
+		<h3>[property:number devicePixelRatio]</h3>
+		<div>
+		The pixel ration of the devices.
 		</div> 
 
-		<h3>.[page:object domElement]</h3>
+		<h3>[property:Boolean autoClear]</h3>
 		<div>
-		todo
-		</div> 
+        Defines whether the renderer should automatically clear its output before rendering.
+        </div>
 
-		<h3>.[page:number devicePixelRatio]</h3>
+		<h3>[property:Boolean sortObjects]</h3>
 		<div>
-		todo
-		</div> 
+        Defines whether the renderer should sort objects. Default is true.
+        </div>
+		<div>
+        Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.
+        </div>
 
-		<h3>.[page:boolean autoClear]</h3>
+		<h3>[property:boolean sortElements]</h3>
 		<div>
-		todo
-		</div> 
-
-		<h3>.[page:boolean sortObjects]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:boolean sortElements]</h3>
-		<div>
-		todo
+		Defines whether the renderer should sort the face of each object. Default is true.
 		</div> 
 
 		<h2>Methods</h2>
 
 
-		<h3>.getMaxAnisotropy() [page:todo]</h3>
+		<h3>[method:number getMaxAnisotropy]()</h3>
 		<div>
-		todo
+		This returns the anisotropy level of the textures.
 		</div>
 
-		<h3>.render([page:todo scene], [page:todo camera]) [page:todo]</h3>
+		<h3>[method:todo render]( [page:Scene scene], [page:Camera camera])</h3>
 		<div>
-		scene -- todo <br />
-		camera -- todo
+		scene -- The scene to render. <br />
+		camera -- the camera to view the scene.
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.clear() [page:todo]</h3>
-		<div>
-		todo
+        Render a scene using a camera.
 		</div>
 
-		<h3>.setClearColor([page:todo color], [page:todo alpha]) [page:todo]</h3>
+		<h3>[method:todo clear]()</h3>
 		<div>
-		color -- todo <br />
-		alpha -- todo
-		</div>
-		<div>
-		todo
+		Tells the renderer to clear its color drawing buffer with the clearcolor.
 		</div>
 
-		<h3>.setFaceCulling() [page:todo]</h3>
+		<h3>[method:todo setClearColor]([page:Color color], [page:number alpha])</h3>
 		<div>
-		todo
+		color -- The color to clear the canvas with. <br />
+		alpha -- The alpha channel to clear the canvas with.
+		</div>
+		<div>
+		This set the clearColor and the clearAlpha.
 		</div>
 
-		<h3>.supportsVertexTextures() [page:todo]</h3>
+		<h3>[method:todo setFaceCulling]()</h3>
 		<div>
-		todo
+		Empty function to keep compability with [page:WebglRenderer].
 		</div>
 
-		<h3>.setSize([page:todo width], [page:todo height], [page:todo updateStyle]) [page:todo]</h3>
+		<h3>[method:todo supportsVertexTextures]()</h3>
 		<div>
-		width -- todo <br />
-		height -- todo <br />
-		updateStyle -- todo
-		</div>
-		<div>
-		todo
+		Empty function to keep compability with [page:WebglRenderer].
 		</div>
 
-		<h3>.setClearColorHex([page:todo hex], [page:todo alpha]) [page:todo]</h3>
+		<h3>[method:todo setSize]([page:Number width], [page:Number height], [page:boolean updateStyle])</h3>
 		<div>
-		hex -- todo <br />
-		alpha -- todo
+		width -- The width of the drawing canvas. <br />
+		height -- The height of the drawing canvas. <br />
+		updateStyle -- If set, update the css of the canvas too.
 		</div>
 		<div>
-		todo
+		This set the size of the drawing canvas and if updateStyle is set, then the css of the canvas is updated too.
+		</div>
+
+		<h3>[method:todo setClearColorHex]([page:number hex], [page:number alpha])</h3>
+		<div>
+		hex -- The the hexadecimal value of the color to clear the canvas with. <br />
+        alpha -- The alpha channel to clear the canvas with.
+		</div>
+		<div>
+		This set the clearColor and the clearAlpha.
 		</div>
 
 		<h2>Source</h2>

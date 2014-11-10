@@ -2,13 +2,15 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.HemisphereLight = function ( skyColorHex, groundColorHex, intensity ) {
+THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
-	THREE.Light.call( this, skyColorHex );
+	THREE.Light.call( this, skyColor );
+
+	this.type = 'HemisphereLight';
 
 	this.position.set( 0, 100, 0 );
 
-	this.groundColor = new THREE.Color( groundColorHex );
+	this.groundColor = new THREE.Color( groundColor );
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 
 };

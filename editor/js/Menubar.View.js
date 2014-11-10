@@ -1,25 +1,22 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.View = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
-	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
-	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
+	title.setClass( 'title' );
 	title.setTextContent( 'View' );
-	title.setMargin( '0px' );
-	title.setPadding( '8px' );
 	container.add( title );
-
-	//
 
 	var options = new UI.Panel();
 	options.setClass( 'options' );
-	options.setDisplay( 'none' );
 	container.add( options );
 
-	// themes
+	// Light theme
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
@@ -32,7 +29,7 @@ Menubar.View = function ( editor ) {
 	} );
 	options.add( option );
 
-	// about
+	// Dark theme
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
@@ -45,8 +42,6 @@ Menubar.View = function ( editor ) {
 	} );
 	options.add( option );
 
-	//
-
 	return container;
 
-}
+};

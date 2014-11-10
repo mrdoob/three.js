@@ -92,7 +92,7 @@
 				hemiLight.position.set( 0, 500, 0 );
 				scene.add( hemiLight );
 
-				var geometry = new THREE.CubeGeometry( 100, 100, 200 );
+				var geometry = new THREE.BoxGeometry( 100, 100, 200 );
 
 				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
 				texture.anisotropy = renderer.getMaxAnisotropy();

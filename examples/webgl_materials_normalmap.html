@@ -63,7 +63,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var mesh, zmesh, geometry;
 			var mesh1, mesh2;
 
 			var spotLight, pointLight, ambientLight;
@@ -134,10 +134,6 @@
 				// light representation
 
 				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				lightMesh.position = pointLight.position;
-				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				//scene.add( lightMesh );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
@@ -173,18 +169,18 @@
 
 				uniforms[ "uNormalScale" ].value.y = -1;
 
-				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniforms[ "uSpecularColor" ].value.setHex( specular );
-				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+				uniforms[ "diffuse" ].value.setHex( diffuse );
+				uniforms[ "specular" ].value.setHex( specular );
+				uniforms[ "ambient" ].value.setHex( ambient );
 
-				uniforms[ "uShininess" ].value = shininess;
+				uniforms[ "shininess" ].value = shininess;
 
 				uniforms[ "tCube" ].value = reflectionCube;
-				uniforms[ "uReflectivity" ].value = 0.1;
+				uniforms[ "reflectivity" ].value = 0.1;
 
-				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
-				uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
-				uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
+				uniforms[ "diffuse" ].value.convertGammaToLinear();
+				uniforms[ "specular" ].value.convertGammaToLinear();
+				uniforms[ "ambient" ].value.convertGammaToLinear();
 
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
@@ -219,7 +215,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				//
 
@@ -323,8 +318,8 @@
 
 				}
 
-				lightMesh.position.x = 2500 * Math.cos( r );
-				lightMesh.position.z = 2500 * Math.sin( r );
+				pointLight.position.x = 2500 * Math.cos( r );
+				pointLight.position.z = 2500 * Math.sin( r );
 
 				r += 0.01;
 

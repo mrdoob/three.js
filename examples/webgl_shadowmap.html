@@ -28,7 +28,8 @@
 
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a></br>
-		move camera with WASD / RF + mouse
+		move camera with WASD / RF + mouse<br/>
+		t: toggle HUD</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -48,24 +49,26 @@
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
-			var MARGIN = 100;
+			var HUD_MARGIN = 0.05;
 
 			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
 			var camera, controls, scene, renderer;
 			var container, stats;
 
-			var NEAR = 5, FAR = 3000;
+			var NEAR = 10, FAR = 3000;
 
-			var sceneHUD, cameraOrtho, hudMaterial;
+			var sceneHUD, cameraOrtho, hudMesh;
 
 			var morph, morphs = [];
 
 			var light;
 
 			var clock = new THREE.Clock();
+
+			var showHUD = false;
 
 			init();
 			animate();
@@ -91,7 +94,8 @@
 				controls.verticalMin = 1.5;
 				controls.verticalMax = 2.0;
 
-				controls.lon = -110;
+				controls.lon = 250;
+				controls.lat = 30;
 
 				// SCENE
 
@@ -103,14 +107,14 @@
 				var ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI, 1 );
+				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2, 1 );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 
 				light.castShadow = true;
 
-				light.shadowCameraNear = 700;
-				light.shadowCameraFar = camera.far;
+				light.shadowCameraNear = 1200;
+				light.shadowCameraFar = 2500;
 				light.shadowCameraFov = 50;
 
 				//light.shadowCameraVisible = true;
@@ -128,10 +132,8 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-				renderer.domElement.style.top = MARGIN + 'px';
 				container.appendChild( renderer.domElement );
 
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -153,38 +155,73 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'keydown', onKeyDown, false );
 
 			}
 
 			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+				SCREEN_HEIGHT = window.innerHeight;
 
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
+				var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				cameraOrtho.left = - aspect;
+				cameraOrtho.right = aspect;
+				cameraOrtho.top = 1;
+				cameraOrtho.bottom = - 1;
+				cameraOrtho.updateProjectionMatrix();
+
+				hudMesh.position.x = cameraOrtho.left + HUD_MARGIN;
+				hudMesh.position.y = cameraOrtho.bottom + HUD_MARGIN;
+
 				controls.handleResize();
+
+			}
+
+			function onKeyDown ( event ) {
+
+				switch( event.keyCode ) {
+
+					case 84: /*t*/ showHUD = !showHUD; break;
+
+				}
 
 			}
 
 			function createHUD() {
 
-				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
-				cameraOrtho.position.z = 10;
+				var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+
+				cameraOrtho = new THREE.OrthographicCamera( - aspect, aspect,  1, - 1, 1, 10 );
+				cameraOrtho.position.z = 5;
 
 				var shader = THREE.UnpackDepthRGBAShader;
 				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 
-				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
+				uniforms.tDiffuse.value = light.shadowMap;
 
-				var hudGeo = new THREE.PlaneGeometry( SHADOW_MAP_WIDTH / 2, SHADOW_MAP_HEIGHT / 2 );
-				var hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
-				hudMesh.position.x = ( SCREEN_WIDTH - SHADOW_MAP_WIDTH / 2 ) * -0.5;
-				hudMesh.position.y = ( SCREEN_HEIGHT - SHADOW_MAP_HEIGHT / 2 ) * -0.5;
-				hudMesh.rotation.x = Math.PI / 2;
+				var hudMaterial = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				} );
+
+				var hudHeight = 2 / 3;
+
+				var hudWidth = hudHeight * SHADOW_MAP_WIDTH / SHADOW_MAP_HEIGHT;
+
+				var hudGeo = new THREE.PlaneBufferGeometry( hudWidth, hudHeight );
+				hudGeo.applyMatrix( new THREE.Matrix4().makeTranslation( hudWidth / 2, hudHeight / 2, 0 ) );
+
+				hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
+
+				hudMesh.position.x = cameraOrtho.left + HUD_MARGIN;
+				hudMesh.position.y = cameraOrtho.bottom + HUD_MARGIN;
 
 				sceneHUD = new THREE.Scene();
 				sceneHUD.add( hudMesh );
@@ -197,7 +234,7 @@
 
 				// GROUND
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 				planeMaterial.ambient = planeMaterial.color;
 
@@ -246,7 +283,7 @@
 
 				// CUBES
 
-				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1500, 220, 150 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1500, 220, 150 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -256,7 +293,7 @@
 
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1600, 170, 250 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxGeometry( 1600, 170, 250 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -329,60 +366,28 @@
 
 				} );
 
-				/*
-				loader.load( "obj/morphs/fox.js", function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 200, 1000, 100 - Math.random() * 500, FLOOR - 5, 600 );
-
-				} );
-
-				loader.load( "obj/morphs/shdw3walk.js", function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 40, 2000, -500, FLOOR + 60, 245 );
-
-				} );
-
-				loader.load( "obj/morphs/flamingo.js", function( geometry ) {
+				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 500, 1000, 500 - Math.random() * 500, FLOOR + 350, 40 );
 
 				} );
 
-				loader.load( "obj/morphs/stork.js", function( geometry ) {
+				loader.load( "models/animated/stork.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 350, 1000, 500 - Math.random() * 500, FLOOR + 350, 340 );
 
 				} );
 
-				loader.load( "obj/morphs/mountainlion.js", function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 400, 1000, 500 - Math.random() * 500, FLOOR - 5, 700 );
-
-				} );
-
-				loader.load( "obj/morphs/bearBrown.js", function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 300, 2500, -500, FLOOR - 5, -750 );
-
-				} );
-
-				loader.load( "obj/morphs/parrot.js", function( geometry ) {
+				loader.load( "models/animated/parrot.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 450, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );
 
 				} );
-				*/
 
 			}
-
-			//
 
 			function animate() {
 
@@ -420,8 +425,12 @@
 
 				// Render debug HUD with shadow map
 
-				//hudMaterial.uniforms.tDiffuse.texture = light.shadowMap;
-				//renderer.render( sceneHUD, cameraOrtho );
+				if ( showHUD ) {
+
+					renderer.clearDepth();
+					renderer.render( sceneHUD, cameraOrtho );
+
+				}
 
 			}
 

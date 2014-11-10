@@ -13,6 +13,13 @@
 
 		<div class="desc">A class for generating a two-dimensional ring geometry.</div>
 
+		<h2>Example</h2>
+		
+		<code>var geometry = new THREE.RingGeometry( 1, 5, 32 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
 
 		<h2>Constructor</h2>
 

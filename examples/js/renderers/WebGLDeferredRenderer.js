@@ -7,13 +7,22 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var _this = this;
 
-	var fullWidth = parameters.width !== undefined ? parameters.width : 800;
-	var fullHeight = parameters.height !== undefined ? parameters.height : 600;
+	var pixelWidth = parameters.width !== undefined ? parameters.width : 800;
+	var pixelHeight = parameters.height !== undefined ? parameters.height : 600;
 	var currentScale = parameters.scale !== undefined ? parameters.scale : 1;
+    
+	var devicePixelRatio = parameters.devicePixelRatio !== undefined
+		? parameters.devicePixelRatio
+			: self.devicePixelRatio !== undefined
+				? self.devicePixelRatio
+				: 1;
 
+	var fullWidth = pixelWidth * devicePixelRatio;
+	var fullHeight = pixelHeight * devicePixelRatio;
+	
 	var scaledWidth = Math.floor( currentScale * fullWidth );
 	var scaledHeight = Math.floor( currentScale * fullHeight );
-
+	
 	var brightness = parameters.brightness !== undefined ? parameters.brightness : 1;
 	var tonemapping = parameters.tonemapping !== undefined ? parameters.tonemapping : THREE.SimpleOperator;
 	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
@@ -22,9 +31,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	if ( this.renderer === undefined ) {
 
-		this.renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
+		this.renderer = new THREE.WebGLRenderer( { antialias: false, devicePixelRatio : devicePixelRatio } );
 		this.renderer.setSize( fullWidth, fullHeight );
-		this.renderer.setClearColorHex( 0x000000, 0 );
+		this.renderer.setClearColor( 0x000000, 0 );
 
 		this.renderer.autoClear = false;
 
@@ -39,6 +48,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	//
 
 	var currentCamera = null;
+	var projectionMatrixInverse = new THREE.Matrix4();
 
 	var positionVS = new THREE.Vector3();
 	var directionVS = new THREE.Vector3();
@@ -51,7 +61,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	//
 
 	var geometryLightSphere = new THREE.SphereGeometry( 1, 16, 8 );
-	var geometryLightPlane = new THREE.PlaneGeometry( 2, 2 );
+	var geometryLightPlane = new THREE.PlaneBufferGeometry( 2, 2 );
 
 	var black = new THREE.Color( 0x000000 );
 
@@ -333,12 +343,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
 			uniforms[ "lightRadius" ].value = distance;
 
-			positionVS.getPositionFromMatrix( light.matrixWorld );
+			positionVS.setFromMatrixPosition( light.matrixWorld );
 			positionVS.applyMatrix4( currentCamera.matrixWorldInverse );
 
 			uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
-			lightProxy.position.getPositionFromMatrix( light.matrixWorld );
+			lightProxy.position.setFromMatrixPosition( light.matrixWorld );
 
 		} else {
 
@@ -425,11 +435,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var viewMatrix = currentCamera.matrixWorldInverse;
 		var modelMatrix = light.matrixWorld;
 
-		positionVS.getPositionFromMatrix( modelMatrix );
+		positionVS.setFromMatrixPosition( modelMatrix );
 		positionVS.applyMatrix4( viewMatrix );
 
-		directionVS.getPositionFromMatrix( modelMatrix );
-		tempVS.getPositionFromMatrix( light.target.matrixWorld );
+		directionVS.setFromMatrixPosition( modelMatrix );
+		tempVS.setFromMatrixPosition( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
 		directionVS.transformDirection( viewMatrix );
@@ -499,8 +509,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		directionVS.getPositionFromMatrix( light.matrixWorld );
-		tempVS.getPositionFromMatrix( light.target.matrixWorld );
+		directionVS.setFromMatrixPosition( light.matrixWorld );
+		tempVS.setFromMatrixPosition( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
 		directionVS.transformDirection( currentCamera.matrixWorldInverse );
@@ -566,7 +576,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		directionVS.getPositionFromMatrix( light.matrixWorld );
+		directionVS.setFromMatrixPosition( light.matrixWorld );
 		directionVS.normalize();
 		directionVS.transformDirection( currentCamera.matrixWorldInverse );
 
@@ -635,7 +645,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var modelMatrix = light.matrixWorld;
 		var viewMatrix = currentCamera.matrixWorldInverse;
 
-		positionVS.getPositionFromMatrix( modelMatrix );
+		positionVS.setFromMatrixPosition( modelMatrix );
 		positionVS.applyMatrix4( viewMatrix );
 
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );
@@ -932,7 +942,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var uniforms = proxy.material.uniforms;
 
-		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = currentCamera.projectionMatrixInverse;
+		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = projectionMatrixInverse;
 		if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = currentCamera.matrixWorldInverse;
 
 		var originalLight = proxy.userData.originalLight;
@@ -989,7 +999,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		passColor.camera = currentCamera;
 		passNormalDepth.camera = currentCamera;
 		passLightProxy.camera = currentCamera;
-		passLightFullscreen.camera = THREE.EffectComposer.camera;
+		passLightFullscreen.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 
 		passColor.scene = scene;
 		passNormalDepth.scene = scene;
@@ -1055,7 +1065,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		gl.depthFunc( gl.GEQUAL );
 
-		currentCamera.projectionMatrixInverse.getInverse( currentCamera.projectionMatrix );
+		projectionMatrixInverse.getInverse( currentCamera.projectionMatrix );
 
 		for ( var i = 0, il = lightSceneProxy.children.length; i < il; i ++ ) {
 

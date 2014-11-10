@@ -5,7 +5,7 @@ three.js
 
 The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt;, CSS3D and WebGL renderers.
 
-[Examples](http://threejs.org/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
+[Examples](http://threejs.org/examples/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
 
 
 ### Usage ###
@@ -17,12 +17,12 @@ Alternatively see [how to build the library yourself](https://github.com/mrdoob/
 <script src="js/three.min.js"></script>
 ```
 
-This code creates a scene, then creates a camera, adds the camera and cube to the scene, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
+This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a &lt;canvas&gt; renderer for the scene and camera, and it adds that viewport to the document.body element. Finally it animates the cube within the scene for the camera.
 
 ```html
 <script>
 
-	var camera, scene, renderer;
+	var scene, camera, renderer;
 	var geometry, material, mesh;
 
 	init();
@@ -30,18 +30,18 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 	function init() {
 
+		scene = new THREE.Scene();
+		
 		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 		camera.position.z = 1000;
 
-		scene = new THREE.Scene();
-
-		geometry = new THREE.CubeGeometry( 200, 200, 200 );
+		geometry = new THREE.BoxGeometry( 200, 200, 200 );
 		material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
 		mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
-		renderer = new THREE.CanvasRenderer();
+		renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 
 		document.body.appendChild( renderer.domElement );
@@ -50,7 +50,6 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 	function animate() {
 
-		// note: three.js includes requestAnimationFrame shim
 		requestAnimationFrame( animate );
 
 		mesh.rotation.x += 0.01;
@@ -62,7 +61,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 </script>
 ```
-If everything went well you should see [this](http://jsfiddle.net/ksRyQ/).
+If everything went well you should see [this](http://jsfiddle.net/f17Lz5ux/).
 
 ### Change log ###
 

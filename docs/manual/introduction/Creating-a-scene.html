@@ -18,16 +18,19 @@
 		<div>Three.js is a library that makes WebGL - 3D in the browser - very easy. While a simple cube in raw WebGL would turn out hundreds of lines of Javascript and shader code, a Three.js equivalent is only a fraction of that.</div>
 
 		<h2>Before we start</h2>
-		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, and open it in your browser.</div>
+		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of <a href="http://threejs.org/build/three.min.js">three.min.js</a> in the js/ directory, and open it in your browser.</div>
 
 		<code>
 		&lt;html&gt;
 			&lt;head&gt;
 				&lt;title&gt;My first Three.js app&lt;/title&gt;
-				&lt;style&gt;canvas { width: 100%; height: 100% }&lt;/style&gt;
+				&lt;style&gt;
+					body { margin: 0; }
+					canvas { width: 100%; height: 100% }
+				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"&gt;&lt;/script&gt;
+				&lt;script src="js/three.min.js"&gt;&lt;/script&gt;
 				&lt;script&gt;
 					// Our Javascript will go here.
 				&lt;/script&gt;
@@ -65,7 +68,7 @@
 		<div><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</div>
 
 		<code>
-		var geometry = new THREE.CubeGeometry(1,1,1);
+		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -73,7 +76,7 @@
 		camera.position.z = 5;
 		</code>
 
-		<div>To create a cube, we need a <strong>CubeGeometry</strong>. This is an object that contains all the points (<strong>vertices</strong>) and fill (<strong>faces</strong>) of the cube. We'll explore this more in the future.</div>
+		<div>To create a cube, we need a <strong>BoxGeometry</strong>. This is an object that contains all the points (<strong>vertices</strong>) and fill (<strong>faces</strong>) of the cube. We'll explore this more in the future.</div>
 
 		<div>In addition to the geometry, we need a material to color it. Three.js comes with several materials, but we'll stick to the <strong>MeshBasicMaterial</strong> for now. All materials take an object of properties which will be applied to them. To keep things very simple, we only supply a color attribute of <strong>0x00ff00</strong>, which is green. This works the same way that colors work in CSS or Photoshop (<strong>hex colors</strong>).</div>
 
@@ -87,8 +90,8 @@
 
 		<code>
 		function render() {
-			requestAnimationFrame(render);
-			renderer.render(scene, camera);
+			requestAnimationFrame( render );
+			renderer.render( scene, camera );
 		}
 		render();
 		</code>
@@ -118,27 +121,30 @@
 		&lt;html&gt;
 			&lt;head&gt;
 				&lt;title&gt;My first Three.js app&lt;/title&gt;
-				&lt;style&gt;canvas { width: 100%; height: 100% }&lt;/style&gt;
+				&lt;style&gt;
+					body { margin: 0; }
+					canvas { width: 100%; height: 100% }
+				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="three.min.js"&gt;&lt;/script&gt;
+				&lt;script src="js/three.min.js"&gt;&lt;/script&gt;
 				&lt;script&gt;
 					var scene = new THREE.Scene();
-					var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+					var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
 					var renderer = new THREE.WebGLRenderer();
-					renderer.setSize(window.innerWidth, window.innerHeight);
-					document.body.appendChild(renderer.domElement);
+					renderer.setSize( window.innerWidth, window.innerHeight );
+					document.body.appendChild( renderer.domElement );
 
-					var geometry = new THREE.CubeGeometry(1,1,1);
-					var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-					var cube = new THREE.Mesh(geometry, material);
-					scene.add(cube);
+					var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+					var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+					var cube = new THREE.Mesh( geometry, material );
+					scene.add( cube );
 
 					camera.position.z = 5;
 
 					var render = function () {
-						requestAnimationFrame(render);
+						requestAnimationFrame( render );
 
 						cube.rotation.x += 0.1;
 						cube.rotation.y += 0.1;

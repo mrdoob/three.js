@@ -20,7 +20,6 @@ var Bird = function () {
 	f3( 4, 7, 6 );
 	f3( 5, 6, 7 );
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	function v( x, y, z ) {

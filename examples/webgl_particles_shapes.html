@@ -185,6 +185,9 @@
 
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
+				group = new THREE.Group();
+				scene.add( group );
+
 				text = new THREE.Mesh( text3d, material );
 
 				// Potentially, we can extract the vertices or faces of the text to generate particles too.
@@ -197,9 +200,7 @@
 				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
 
-				group = new THREE.Object3D();
 				group.add( text );
-				scene.add( group );
 
 				// Create particle objects for Three.js
 
@@ -343,7 +344,7 @@
 
 				});
 
-				particleCloud = new THREE.ParticleSystem( particles, shaderMaterial );
+				particleCloud = new THREE.PointCloud( particles, shaderMaterial );
 
 				particleCloud.dynamic = true;
 				// particleCloud.sortParticles = true;
@@ -472,7 +473,6 @@
 
 
 				sparksEmitter.addInitializer( new SPARKS.Velocity( new SPARKS.PointZone( new THREE.Vector3( 0, -5, 1 ) ) ) );
-				// TOTRY Set velocity to move away from centroid
 
 				sparksEmitter.addAction( new SPARKS.Age() );
 				sparksEmitter.addAction( new SPARKS.Accelerate( 0, 0, -50 ) );
@@ -488,7 +488,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000, 1 );
 
 				container.appendChild( renderer.domElement );
 

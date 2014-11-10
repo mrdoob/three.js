@@ -31,6 +31,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -86,7 +87,9 @@
 							 r + "py.dds", r + "ny.dds",
 							 r + "pz.dds", r + "nz.dds" ];
 
-				var textureCube = THREE.ImageUtils.loadCompressedTextureCube( urls );
+				var loader = new THREE.DDSLoader();
+				
+				var textureCube = loader.load( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } )
 				var geometry = new THREE.SphereGeometry( 100, 96, 64 );
 
@@ -108,7 +111,7 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 6000, 6000, 6000 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 6000, 6000, 6000 ), material );
 				scene.add( mesh );
 
 				//

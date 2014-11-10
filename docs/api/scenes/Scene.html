@@ -18,27 +18,24 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		Create a new scene object.
 		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Fog fog]</h3>
+		<h3>[property:Fog fog]</h3>
 		
 		<div>A [page:Fog fog] instance defining the type of fog that affects everything rendered in the scene. Default is null.</div>
 		
-		<h3>.[page:Material overrideMaterial]</h3>
+		<h3>[property:Material overrideMaterial]</h3>
 		
 		<div>If not null, it will force everything in the scene to be rendered with that material. Default is null.</div>
 		
-		<h3>.[page:Boolean matrixAutoUpdate]</h3>
-		
-		<div>??? - Default is false.</div>
-		
-		<h3>.[page:boolean autoUpdate]</h3>
+		<h3>[property:boolean autoUpdate]</h3>
 		<div>
-		todo
+		Default is true. If set, then the renderer checks every frame if the scene and its objects needs matrix updates. 
+		When it isn't, then you have to maintain all matrices in the scene yourself.  
 		</div> 
 
 		<h2>Methods</h2>

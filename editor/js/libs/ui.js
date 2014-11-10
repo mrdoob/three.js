@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var UI = {};
 
 UI.Element = function () {};
@@ -52,7 +56,7 @@ UI.Element.prototype = {
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
+'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
 
@@ -69,7 +73,7 @@ properties.forEach( function ( property ) {
 
 // events
 
-var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'Change' ];
+var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change' ];
 
 events.forEach( function ( event ) {
 
@@ -77,7 +81,8 @@ events.forEach( function ( event ) {
 
 	UI.Element.prototype[ method ] = function ( callback ) {
 
-		this.dom.addEventListener( event.toLowerCase(), callback, false );
+		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
+
 		return this;
 
 	};
@@ -105,7 +110,17 @@ UI.Panel.prototype.add = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
 
-		this.dom.appendChild( arguments[ i ].dom );
+		var argument = arguments[ i ];
+
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.appendChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
@@ -117,12 +132,154 @@ UI.Panel.prototype.add = function () {
 UI.Panel.prototype.remove = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
+	
+		var argument = arguments[ i ];
 
-		this.dom.removeChild( arguments[ i ].dom );
+		if ( argument instanceof UI.Element ) {
+
+			this.dom.removeChild( argument.dom );
+
+		} else {
+
+			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
+
+		}
 
 	}
 
 	return this;
+
+};
+
+UI.Panel.prototype.clear = function () {
+
+	while ( this.dom.children.length ) {
+
+		this.dom.removeChild( this.dom.lastChild );
+
+	}
+
+};
+
+
+// Collapsible Panel
+
+UI.CollapsiblePanel = function () {
+
+	UI.Panel.call( this );
+
+	this.setClass( 'Panel Collapsible' );
+
+	var scope = this;
+
+	this.static = new UI.Panel();
+	this.static.setClass( 'Static' );
+	this.static.onClick( function () {
+		scope.toggle();
+	} );
+	this.dom.appendChild( this.static.dom );
+
+	this.contents = new UI.Panel();
+	this.contents.setClass( 'Content' );
+	this.dom.appendChild( this.contents.dom );
+
+	var button = new UI.Panel();
+	button.setClass( 'Button' );
+	this.static.add( button );
+
+	this.isCollapsed = false;
+
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
+
+UI.CollapsiblePanel.prototype.addStatic = function () {
+
+	this.static.add.apply( this.static, arguments );
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.removeStatic = function () {
+
+	this.static.remove.apply( this.static, arguments );
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.clearStatic = function () {
+
+	this.static.clear();
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.add = function () {
+
+	this.contents.add.apply( this.contents, arguments );
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.remove = function () {
+
+	this.contents.remove.apply( this.contents, arguments );
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.clear = function () {
+
+	this.contents.clear();
+	return this;
+
+};
+
+UI.CollapsiblePanel.prototype.toggle = function() {
+
+	this.setCollapsed( !this.isCollapsed );
+
+};
+
+UI.CollapsiblePanel.prototype.collapse = function() {
+
+	this.setCollapsed( true );
+
+};
+
+UI.CollapsiblePanel.prototype.expand = function() {
+
+	this.setCollapsed( false );
+
+};
+
+UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
+
+	if ( boolean ) {
+
+		this.dom.classList.add( 'collapsed' );
+
+	} else {
+
+		this.dom.classList.remove( 'collapsed' );
+
+	}
+
+	this.isCollapsed = boolean;
+
+	if ( this.onCollapsedChangeCallback !== undefined ) {
+
+		this.onCollapsedChangeCallback( boolean );
+
+	}
+
+};
+
+UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
+
+	this.onCollapsedChangeCallback = callback;
 
 };
 
@@ -214,10 +371,23 @@ UI.TextArea = function () {
 	dom.className = 'TextArea';
 	dom.style.padding = '2px';
 	dom.style.border = '1px solid #ccc';
+	dom.spellcheck = false;
 
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		event.stopPropagation();
+
+		if ( event.keyCode === 9 ) {
+
+			event.preventDefault();
+
+			var cursor = dom.selectionStart;
+
+			dom.value = dom.value.substring( 0, cursor ) + '\t' + dom.value.substring( cursor );
+			dom.selectionStart = cursor + 1;
+			dom.selectionEnd = dom.selectionStart;
+
+		}
 
 	}, false );
 
@@ -308,7 +478,13 @@ UI.Select.prototype.getValue = function () {
 
 UI.Select.prototype.setValue = function ( value ) {
 
-	this.dom.value = value;
+	value = String( value );
+
+	if ( this.dom.value !== value ) {
+
+		this.dom.value = value;
+
+	}
 
 	return this;
 
@@ -356,13 +532,13 @@ UI.FancySelect = function () {
 					// Highlight selected dom elem and scroll parent if needed
 					scope.setValue( scope.options[ scope.selectedIndex ].value );
 
-					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
 
 				}
 
 				break;
 		}
+
 	}, false);
 
 	this.dom = dom;
@@ -392,17 +568,19 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	scope.options = [];
 
-	for ( var key in options ) {
+	for ( var i = 0; i < options.length; i ++ ) {
 
-		var option = document.createElement('div');
-		option.className = 'option';
-		option.innerHTML = options[ key ];
-		option.value = key;
-		scope.dom.appendChild( option );
+		var option = options[ i ];
 
-		scope.options.push( option );
+		var div = document.createElement( 'div' );
+		div.className = 'option';
+		div.innerHTML = option.html;
+		div.value = option.value;
+		scope.dom.appendChild( div );
 
-		option.addEventListener( 'click', function ( event ) {
+		scope.options.push( div );
+
+		div.addEventListener( 'click', function ( event ) {
 
 			scope.setValue( this.value );
 			scope.dom.dispatchEvent( changeEvent );
@@ -422,8 +600,6 @@ UI.FancySelect.prototype.getValue = function () {
 };
 
 UI.FancySelect.prototype.setValue = function ( value ) {
-
-	if ( typeof value === 'number' ) value = value.toString();
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
@@ -522,7 +698,12 @@ UI.Color = function () {
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
 
-	try { dom.type = 'color'; } catch ( exception ) {}
+	try {
+
+		dom.type = 'color';
+		dom.value = '#ffffff';
+
+	} catch ( exception ) {}
 
 	this.dom = dom;
 
@@ -554,7 +735,7 @@ UI.Color.prototype.setValue = function ( value ) {
 
 UI.Color.prototype.setHexValue = function ( hex ) {
 
-	this.dom.value = "#" + ( '000000' + hex.toString( 16 ) ).slice( -6 );
+	this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( -6 );
 
 	return this;
 
@@ -596,6 +777,9 @@ UI.Number = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -603,6 +787,8 @@ UI.Number = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -613,16 +799,17 @@ UI.Number = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 
@@ -642,9 +829,19 @@ UI.Number = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseFloat( dom.value );
+		var value = 0;
 
-		dom.value = isNaN( number ) === false ? number : 0;
+		try {
+
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
+
+		}
+
+		dom.value = parseFloat( value );
 
 	};
 
@@ -743,6 +940,9 @@ UI.Integer = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -750,6 +950,8 @@ UI.Integer = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -760,16 +962,17 @@ UI.Integer = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ) | 0;
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 
@@ -789,13 +992,19 @@ UI.Integer = function ( number ) {
 
 	var onChange = function ( event ) {
 
-		var number = parseInt( dom.value );
+		var value = 0;
 
-		if ( isNaN( number ) === false ) {
+		try {
 
-			dom.value = number;
+			value = eval( dom.value );
+
+		} catch ( error ) {
+
+			console.error( error.message );
 
 		}
+
+		dom.value = parseInt( value );
 
 	};
 
@@ -913,6 +1122,52 @@ UI.Button.prototype = Object.create( UI.Element.prototype );
 UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
+
+	return this;
+
+};
+
+
+// Dialog
+
+UI.Dialog = function ( value ) {
+
+	var scope = this;
+	
+	var dom = document.createElement( 'dialog' );
+
+	if ( dom.showModal === undefined ) {
+
+		// fallback
+
+		dom = document.createElement( 'div' );
+		dom.style.display = 'none';
+
+		dom.showModal = function () {
+
+			dom.style.position = 'absolute';
+			dom.style.left = '100px';
+			dom.style.top = '100px';
+			dom.style.zIndex = 1;
+			dom.style.display = '';
+
+		};
+
+	}
+
+	dom.className = 'Dialog';
+
+	this.dom = dom;
+
+	return this;
+
+};
+
+UI.Dialog.prototype = Object.create( UI.Panel.prototype );
+
+UI.Dialog.prototype.showModal = function () {
+
+	this.dom.showModal();
 
 	return this;
 

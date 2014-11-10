@@ -92,7 +92,7 @@
 
 				var s = 250;
 
-				var cube = new THREE.CubeGeometry( s, s, s );
+				var cube = new THREE.BoxGeometry( s, s, s );
 				var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 
@@ -161,7 +161,7 @@
 					lensFlare.add( textureFlare3, 70, 1.0, THREE.AdditiveBlending );
 
 					lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-					lensFlare.position = light.position;
+					lensFlare.position.copy( light.position );
 
 					scene.add( lensFlare );
 
@@ -179,7 +179,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				// stats
 

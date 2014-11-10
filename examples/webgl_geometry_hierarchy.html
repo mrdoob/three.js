@@ -48,10 +48,10 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
@@ -73,6 +73,7 @@
 				scene.add( group );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 

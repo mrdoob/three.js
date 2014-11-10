@@ -28,6 +28,13 @@ References:
 
 var CTM = CTM || {};
 
+// browserify support
+if ( typeof module === 'object' ) {
+
+	module.exports = CTM;
+
+}
+
 CTM.CompressionMethod = {
   RAW: 0x00574152,
   MG1: 0x0031474d,
@@ -630,7 +637,7 @@ CTM.Stream.prototype.readString = function(){
 
   this.offset += len;
 
-  return this.data.subarray(this.offset - len, len);
+  return String.fromCharCode.apply(null,this.data.subarray(this.offset - len, this.offset));
 };
 
 CTM.Stream.prototype.readArrayInt32 = function(array){

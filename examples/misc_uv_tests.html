@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		<script src="../build/three.min.js"></script>
-		<script src="js/UVsUtils.js"></script>
+		<script src="js/utils/UVsDebug.js"></script>
 		<script>
 			/* 
 			 * This is to help debug UVs problems in geometry, 
@@ -28,7 +28,7 @@
 
 			test('new THREE.CylinderGeometry( 25, 75, 100, 10, 5 )', new THREE.CylinderGeometry( 25, 75, 100, 10, 5 ));
 
-			test('new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 )', new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ));
+			test('new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 )', new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 ));
 
 			var points = [];
 
@@ -42,57 +42,6 @@
 			test('new THREE.LatheGeometry( points, 8 )', new THREE.LatheGeometry( points, 8 ));
 			test('new THREE.TorusGeometry( 50, 20, 8, 8 )', new THREE.TorusGeometry( 50, 20, 8, 8 ));
 			test('new THREE.TorusKnotGeometry( 50, 10, 12, 6 )', new THREE.TorusKnotGeometry( 50, 10, 12, 6 ));
-
-			/*
-			Not sure how UVs for ExtrudeGeometry are done currently...
-			*/
-
-			var pts = [], starPoints = 5, l;
-			for (i=0; i<starPoints*2;i++) {
-			  if (i%2==1) {
-			    l = 5;
-			  } else {
-			    l = 10;
-			  }
-
-			  var a = i / starPoints * Math.PI;
-			  pts.push(new THREE.Vector2(Math.cos(a) * l,Math.sin(a) * l ));
-			}
-			var starShape = new THREE.Shape(pts);
-			var extrudeSettings = { amount: 200,  bevelEnabled: true, bevelSegments: 2, steps: 10 }; 
-
-			test('new THREE.ExtrudeGeometry(starShape, extrudeSettings);', new THREE.ExtrudeGeometry(starShape, extrudeSettings));
-
-			var uvGenerator = new THREE.UVsUtils.CylinderUVGenerator();
-					testShape = setupShape(8, 3);
-					holeShape = setupShape(8, 2);
-					testShape.holes.push(holeShape);
-
-			function setupShape(n, r) {
-				// Make shape
-				var sh = new THREE.Shape();
-				for (var i = 0; i < n;i++) {
-					var method = i ? 'lineTo' : 'moveTo';
-					var a = (i/n) * Math.PI * 2;
-					var x = Math.cos(a) * r;
-					var y = Math.sin(a) * r;
-					sh[method](x, y);
-				}
-
-				return sh;
-			}
-
-			var exoption = {
-				bevelEnabled: true,
-				bevelSize: 1,
-				amount: 3,
-				extrudeMaterial: 0,
-				material: 1,
-				uvGenerator: uvGenerator
-			};
-
-			var geom = testShape.extrude(exoption);
-			test('new THREE.ExtrudeGeometry with CylinderUVGenerator;', geom);
 		</script>
 	</body>
 </html>

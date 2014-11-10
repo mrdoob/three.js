@@ -46,7 +46,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color;
+			var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color, size;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -92,9 +92,9 @@
 					color = parameters[i][0];
 					size  = parameters[i][1];
 
-					materials[i] = new THREE.ParticleSystemMaterial( { size: size } );
+					materials[i] = new THREE.PointCloudMaterial( { size: size } );
 
-					particles = new THREE.ParticleSystem( geometry, materials[i] );
+					particles = new THREE.PointCloud( geometry, materials[i] );
 
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
@@ -192,7 +192,7 @@
 
 					var object = scene.children[ i ];
 
-					if ( object instanceof THREE.ParticleSystem ) {
+					if ( object instanceof THREE.PointCloud ) {
 
 						object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
 

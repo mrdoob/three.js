@@ -23,7 +23,7 @@
 
 			var container, stats;
 			var camera, scene, projector, renderer;
-			var mesh;
+			var mesh, animation;
 
 			init();
 			animate();
@@ -66,12 +66,15 @@
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 
+					animation = new THREE.MorphAnimation( mesh );
+					animation.play();
+
 				} );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.sortObjects = false;
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild(renderer.domElement);
@@ -112,9 +115,7 @@
 			var radius = 600;
 			var theta = 0;
 
-			var duration = 1000;
-			var keyframes = 15, interpolation = duration / keyframes;
-			var lastKeyframe = 0, currentKeyframe = 0;
+			var prevTime = Date.now();
 
 			function render() {
 
@@ -125,29 +126,13 @@
 
 				camera.lookAt( camera.target );
 
-				if ( mesh ) {
+				if ( animation ) {
 
-					// Alternate morph targets
+					var time = Date.now();
 
-					var time = Date.now() % duration;
+					animation.update( time - prevTime );
 
-					var keyframe = Math.floor( time / interpolation );
-
-					if ( keyframe != currentKeyframe ) {
-
-						mesh.morphTargetInfluences[ lastKeyframe ] = 0;
-						mesh.morphTargetInfluences[ currentKeyframe ] = 1;
-						mesh.morphTargetInfluences[ keyframe ] = 0;
-
-						lastKeyframe = currentKeyframe;
-						currentKeyframe = keyframe;
-
-						// console.log( mesh.morphTargetInfluences );
-
-					}
-
-					mesh.morphTargetInfluences[ keyframe ] = ( time % interpolation ) / interpolation;
-					mesh.morphTargetInfluences[ lastKeyframe ] = 1 - mesh.morphTargetInfluences[ keyframe ];
+					prevTime = time;
 
 				}
 

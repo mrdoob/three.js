@@ -5,7 +5,11 @@
  * @author angelxuanchang
  */
 
-THREE.OBJMTLLoader = function () {};
+THREE.OBJMTLLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.OBJMTLLoader.prototype = {
 
@@ -45,9 +49,9 @@ THREE.OBJMTLLoader.prototype = {
 
 				onLoad( object );
 
-			} );
+			}, onProgress, onError );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -78,12 +82,15 @@ THREE.OBJMTLLoader.prototype = {
 
 		}
 
+		var face_offset = 0;
+
 		function meshN( meshName, materialName ) {
 
-			if ( geometry.vertices.length > 0 ) {
+			if ( vertices.length > 0 ) {
+
+				geometry.vertices = vertices;
 
 				geometry.mergeVertices();
-				geometry.computeCentroids();
 				geometry.computeFaceNormals();
 				geometry.computeBoundingSphere();
 
@@ -92,11 +99,10 @@ THREE.OBJMTLLoader.prototype = {
 				geometry = new THREE.Geometry();
 				mesh = new THREE.Mesh( geometry, material );
 
-				verticesCount = 0;
-
 			}
 
 			if ( meshName !== undefined ) mesh.name = meshName;
+
 			if ( materialName !== undefined ) {
 
 				material = new THREE.MeshLambertMaterial();
@@ -108,7 +114,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		}
 
-		var group = new THREE.Object3D();
+		var group = new THREE.Group();
 		var object = group;
 
 		var geometry = new THREE.Geometry();
@@ -116,9 +122,81 @@ THREE.OBJMTLLoader.prototype = {
 		var mesh = new THREE.Mesh( geometry, material );
 
 		var vertices = [];
-		var verticesCount = 0;
 		var normals = [];
 		var uvs = [];
+
+		function add_face( a, b, c, normals_inds ) {
+
+			if ( normals_inds === undefined ) {
+
+				geometry.faces.push( face3(
+					parseInt( a ) - (face_offset + 1),
+					parseInt( b ) - (face_offset + 1),
+					parseInt( c ) - (face_offset + 1)
+				) );
+
+			} else {
+
+				geometry.faces.push( face3(
+					parseInt( a ) - (face_offset + 1),
+					parseInt( b ) - (face_offset + 1),
+					parseInt( c ) - (face_offset + 1),
+					[
+						normals[ parseInt( normals_inds[ 0 ] ) - 1 ].clone(),
+						normals[ parseInt( normals_inds[ 1 ] ) - 1 ].clone(),
+						normals[ parseInt( normals_inds[ 2 ] ) - 1 ].clone()
+					]
+				) );
+
+			}
+
+		}
+
+		function add_uvs( a, b, c ) {
+
+			geometry.faceVertexUvs[ 0 ].push( [
+				uvs[ parseInt( a ) - 1 ].clone(),
+				uvs[ parseInt( b ) - 1 ].clone(),
+				uvs[ parseInt( c ) - 1 ].clone()
+			] );
+
+		}
+
+		function handle_face_line(faces, uvs, normals_inds) {
+
+			if ( faces[ 3 ] === undefined ) {
+
+				add_face( faces[ 0 ], faces[ 1 ], faces[ 2 ], normals_inds );
+
+				if (!(uvs === undefined) && uvs.length > 0) {
+					add_uvs( uvs[ 0 ], uvs[ 1 ], uvs[ 2 ] );
+				}
+
+			} else {
+
+				if (!(normals_inds === undefined) && normals_inds.length > 0) {
+
+					add_face( faces[ 0 ], faces[ 1 ], faces[ 3 ], [ normals_inds[ 0 ], normals_inds[ 1 ], normals_inds[ 3 ] ]);
+					add_face( faces[ 1 ], faces[ 2 ], faces[ 3 ], [ normals_inds[ 1 ], normals_inds[ 2 ], normals_inds[ 3 ] ]);
+
+				} else {
+
+					add_face( faces[ 0 ], faces[ 1 ], faces[ 3 ]);
+					add_face( faces[ 1 ], faces[ 2 ], faces[ 3 ]);
+
+				}
+
+				if (!(uvs === undefined) && uvs.length > 0) {
+
+					add_uvs( uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] );
+					add_uvs( uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] );
+
+				}
+
+			}
+
+		}
+
 
 		// v float float float
 
@@ -144,7 +222,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		var face_pattern3 = /f( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))?/;
 
-		// f vertex//normal vertex//normal vertex//normal ... 
+		// f vertex//normal vertex//normal vertex//normal ...
 
 		var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/
 
@@ -196,244 +274,44 @@ THREE.OBJMTLLoader.prototype = {
 
 				// ["f 1 2 3", "1", "2", "3", undefined]
 
-				 if ( result[ 4 ] === undefined ) {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 1 ] ) - 1 ],
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 3 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++
-					) );
-
-				} else {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 1 ] ) - 1 ],
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 3 ] ) - 1 ],
-						vertices[ parseInt( result[ 4 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3
-					) );
-
-					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3
-					) );
-
-					verticesCount += 4;
-
-				}
+				handle_face_line([ result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ] ]);
 
 			} else if ( ( result = face_pattern2.exec( line ) ) !== null ) {
 
 				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
 
-				if ( result[ 10 ] === undefined ) {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++
-					) );
-
-					geometry.faceVertexUvs[ 0 ].push( [
-						uvs[ parseInt( result[ 3 ] ) - 1 ],
-						uvs[ parseInt( result[ 6 ] ) - 1 ],
-						uvs[ parseInt( result[ 9 ] ) - 1 ]
-					] );
-
-				} else {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ],
-						vertices[ parseInt( result[ 11 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3
-					) );
-
-					geometry.faceVertexUvs[ 0 ].push( [
-						uvs[ parseInt( result[ 3 ] ) - 1 ],
-						uvs[ parseInt( result[ 6 ] ) - 1 ],
-						uvs[ parseInt( result[ 12 ] ) - 1 ]
-					] );
-
-					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3
-					) );
-
-					geometry.faceVertexUvs[ 0 ].push( [
-						uvs[ parseInt( result[ 6 ] ) - 1 ],
-						uvs[ parseInt( result[ 9 ] ) - 1 ],
-						uvs[ parseInt( result[ 12 ] ) - 1 ]
-					] );
-
-					verticesCount += 4;
-
-				}
+				handle_face_line(
+					[ result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] ], //faces
+					[ result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ] ] //uv
+				);
 
 			} else if ( ( result = face_pattern3.exec( line ) ) !== null ) {
 
 				// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
 
-				if ( result[ 13 ] === undefined ) {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 6 ] ) - 1 ],
-						vertices[ parseInt( result[ 10 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++,
-						[
-							normals[ parseInt( result[ 4 ] ) - 1 ],
-							normals[ parseInt( result[ 8 ] ) - 1 ],
-							normals[ parseInt( result[ 12 ] ) - 1 ]
-						]
-					) );
-
-					geometry.faceVertexUvs[ 0 ].push( [
-						uvs[ parseInt( result[ 3 ] ) - 1 ],
-						uvs[ parseInt( result[ 7 ] ) - 1 ],
-						uvs[ parseInt( result[ 11 ] ) - 1 ]
-					] );
-
-				} else {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 6 ] ) - 1 ],
-						vertices[ parseInt( result[ 10 ] ) - 1 ],
-						vertices[ parseInt( result[ 14 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3,
-						[
-							normals[ parseInt( result[ 4 ] ) - 1 ],
-							normals[ parseInt( result[ 8 ] ) - 1 ],
-							normals[ parseInt( result[ 16 ] ) - 1 ]
-						]
-					) );
-
-					geometry.faceVertexUvs[ 0 ].push( [
-						uvs[ parseInt( result[ 3 ] ) - 1 ],
-						uvs[ parseInt( result[ 7 ] ) - 1 ],
-						uvs[ parseInt( result[ 15 ] ) - 1 ]
-					] );
-
-					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3,
-						[
-							normals[ parseInt( result[ 8 ] ) - 1 ],
-							normals[ parseInt( result[ 12 ] ) - 1 ],
-							normals[ parseInt( result[ 16 ] ) - 1 ]
-						]
-					) );
-
-					geometry.faceVertexUvs[ 0 ].push( [
-						uvs[ parseInt( result[ 7 ] ) - 1 ],
-						uvs[ parseInt( result[ 11 ] ) - 1 ],
-						uvs[ parseInt( result[ 15 ] ) - 1 ]
-					] );
-
-					verticesCount += 4;
-
-				}
+				handle_face_line(
+					[ result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ] ], //faces
+					[ result[ 3 ], result[ 7 ], result[ 11 ], result[ 15 ] ], //uv
+					[ result[ 4 ], result[ 8 ], result[ 12 ], result[ 16 ] ] //normal
+				);
 
 			} else if ( ( result = face_pattern4.exec( line ) ) !== null ) {
 
 				// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
 
-				if ( result[ 10 ] === undefined ) {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++,
-						[
-							normals[ parseInt( result[ 3 ] ) - 1 ],
-							normals[ parseInt( result[ 6 ] ) - 1 ],
-							normals[ parseInt( result[ 9 ] ) - 1 ]
-						]
-					) );
-
-				} else {
-
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ],
-						vertices[ parseInt( result[ 11 ] ) - 1 ]
-					);
-
-					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3,
-						[
-							normals[ parseInt( result[ 3 ] ) - 1 ],
-							normals[ parseInt( result[ 6 ] ) - 1 ],
-							normals[ parseInt( result[ 12 ] ) - 1 ]
-						]
-					) );
-
-					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3,
-						[
-							normals[ parseInt( result[ 6 ] ) - 1 ],
-							normals[ parseInt( result[ 9 ] ) - 1 ],
-							normals[ parseInt( result[ 12 ] ) - 1 ]
-						]
-					) );
-
-					verticesCount += 4;
-
-				}
+				handle_face_line(
+					[ result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] ], //faces
+					[ ], //uv
+					[ result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ] ] //normal
+				);
 
 			} else if ( /^o /.test( line ) ) {
 
 				// object
 
+				meshN();
+				face_offset = face_offset + vertices.length;
+				vertices = [];
 				object = new THREE.Object3D();
 				object.name = line.substring( 2 ).trim();
 				group.add( object );

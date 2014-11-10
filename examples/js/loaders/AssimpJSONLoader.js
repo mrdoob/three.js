@@ -31,9 +31,29 @@ THREE.AssimpJSONLoader.prototype = {
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
-			var scene = scope.parse( JSON.parse( text ) );
+			var json = JSON.parse( text ), scene, metadata;
+
+			// Check __metadata__ meta header if present
+			// This header is used to disambiguate between
+			// different JSON-based file formats.
+			metadata = json.__metadata__;
+			if ( typeof metadata !== 'undefined' )
+			{
+				// Check if assimp2json at all
+				if ( metadata.format !== 'assimp2json' ) {
+					onError('Not an assimp2json scene');
+					return;
+				}
+				// Check major format version
+				else if ( metadata.version < 100 && metadata.version >= 200 ) {
+					onError('Unsupported assimp2json file format version');
+					return;
+				}
+			}
+
+			scene = scope.parse( json );
 			onLoad( scene );
-		} );
+		}, onProgress, onError );
 	},
 
 	setCrossOrigin: function ( value ) {
@@ -85,6 +105,7 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 		// read texture coordinates - three.js attaches them to its faces
+		json.texturecoords = json.texturecoords || [];
 		for(i = 0, e = json.texturecoords.length; i < e; ++i) {
 
 			function convertTextureCoords(in_uv, out_faces, out_vertex_uvs) {
@@ -158,7 +179,6 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 
-		geometry.computeCentroids();
 		//geometry.computeFaceNormals();
 		//geometry.computeVertexNormals();
 		//geometry.computeTangents();
@@ -220,7 +240,9 @@ THREE.AssimpJSONLoader.prototype = {
 						has_textures.push(keyname);
 
 						loader.setCrossOrigin(this.crossOrigin);
-						loader.load(scope.texturePath + '/' + prop.value, function(tex) {
+						var material_url = scope.texturePath + '/' + prop.value
+						material_url = material_url.replace(/\\/g, '/');
+						loader.load(material_url, function(tex) {
 							if(tex) {
 								// TODO: read texture settings from assimp.
 								// Wrapping is the default, though.

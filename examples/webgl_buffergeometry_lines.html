@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - buffergeometry</title>
+		<title>three.js webgl - buffergeometry - lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry - lines</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -67,13 +67,10 @@
 				var segments = 10000;
 
 				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial({ vertexColors: true });
+				var material = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
 
-				geometry.addAttribute( 'position', Float32Array, segments, 3 );
-				geometry.addAttribute( 'color', Float32Array, segments, 3 );
-
-				var positions = geometry.attributes.position.array;
-				var colors = geometry.attributes.color.array;
+				var positions = new Float32Array( segments * 3 );
+				var colors = new Float32Array( segments * 3 );
 
 				var r = 800;
 
@@ -97,6 +94,9 @@
 
 				}
 
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
 				geometry.computeBoundingSphere();
 
 				mesh = new THREE.Line( geometry, material );
@@ -104,12 +104,11 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				container.appendChild( renderer.domElement );
 

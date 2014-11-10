@@ -37,8 +37,6 @@
 		</style>
 	</head>
 	<body>
-
-		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - cameras<br/>
 		<b>O</b> orthographic <b>P</b> perspective
 		</div>
@@ -130,13 +128,13 @@
 
 				}
 
-				var particles = new THREE.ParticleSystem( geometry, new THREE.ParticleSystemMaterial( { color: 0x888888 } ) );
+				var particles = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
 
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );

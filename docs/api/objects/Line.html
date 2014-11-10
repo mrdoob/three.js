@@ -14,6 +14,25 @@
 		<div class="desc">A line or a series of lines.</div>
 
 
+		<h2>Example</h2>
+
+
+		<code>var material = new THREE.LineBasicMaterial({
+			color: 0x0000ff
+		});
+
+		var geometry = new THREE.Geometry();
+		geometry.vertices.push(
+			new THREE.Vector3( -10, 0, 0 ),
+			new THREE.Vector3( 0, 10, 0 ),
+			new THREE.Vector3( 10, 0, 0 )
+		);
+
+		var line = new THREE.Line( geometry, material );
+		scene.add( line );
+		</code>
+
+
 		<h2>Constructor</h2>
 
 
@@ -31,17 +50,17 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Geometry geometry]</h3>
+		<h3>[property:Geometry geometry]</h3>
 		<div>
 		Vertices representing the line segment(s).
 		</div>
 
-		<h3>.[page:Material material]</h3>
+		<h3>[property:Material material]</h3>
 		<div>
 		Material for the line.
 		</div>
 
-		<h3>.[page:Integer type]</h3>
+		<h3>[property:Integer type]</h3>
 		<div>
 		Possible values: THREE.LineStrip or THREE.LinePieces. THREE.LineStrip will draw a series of segments connecting each point (first connected to the second, the second connected to the third, and so on and so forth); and THREE.LinePieces will draw a series of pairs of segments (first connected to the second, the third connected to the fourth, and so on and so forth).</div>
 

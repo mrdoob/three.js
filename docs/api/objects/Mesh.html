@@ -14,18 +14,16 @@
 		<div class="desc">Base class for Mesh objects, such as [page:MorphAnimMesh] and [page:SkinnedMesh].</div>
 
 
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+
 		<h2>Constructor</h2>
-
-
-		<h3>[name]([page:todo geometry], [page:todo material])</h3>
-		<div>
-		geometry -- todo <br />
-		material -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
 
 		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
 
@@ -37,27 +35,29 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Geometry geometry]</h3>
+		<h3>[property:Geometry geometry]</h3>
 
 		<div>An instance of [page:Geometry], defining the object's structure.</div>
 
-		<h3>.[page:Material material]</h3>
+		<h3>[property:Material material]</h3>
 
 		<div>An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour.</div>
 
 
 		<h2>Methods</h2>
 
-		<h3>.getMorphTargetIndexByName( [page:String name] )</h3>
+		<h3>[method:Integer getMorphTargetIndexByName]( [page:String name] )</h3>
 		<div>
 		name — a morph target name<br />
 		</div>
-
-		Returns the index of a morph target defined by name.
-
-		<h3>.updateMorphTargets() [page:todo]</h3>
 		<div>
-		todo
+		Returns the index of a morph target defined by name.
+		</div>
+
+
+		<h3>[method:null updateMorphTargets]()</h3>
+		<div>
+		Updates the morphtargets to have no influence on the object.
 		</div>
 
 		<h2>Source</h2>

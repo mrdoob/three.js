@@ -57,10 +57,6 @@ THREE.Mirror = function ( renderer, camera, options ) {
 
 	this.name = 'mirror_' + this.id;
 
-	function isPowerOfTwo ( value ) {
-		return ( value & ( value - 1 ) ) === 0;
-	};
-
 	options = options || {};
 
 	this.matrixNeedsUpdate = true;
@@ -133,7 +129,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	this.material.uniforms.mirrorColor.value = mirrorColor;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
 
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo( height ) ) {
+	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo( height ) ) {
 
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
@@ -175,13 +171,11 @@ THREE.Mirror.prototype.renderWithMirror = function ( otherMirror ) {
 
 THREE.Mirror.prototype.updateTextureMatrix = function () {
 
-	var sign = THREE.Math.sign;
-
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
 
-	this.mirrorWorldPosition.getPositionFromMatrix( this.matrixWorld );
-	this.cameraWorldPosition.getPositionFromMatrix( this.camera.matrixWorld );
+	this.mirrorWorldPosition.setFromMatrixPosition( this.matrixWorld );
+	this.cameraWorldPosition.setFromMatrixPosition( this.camera.matrixWorld );
 
 	this.rotationMatrix.extractRotation( this.matrixWorld );
 
@@ -189,8 +183,8 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	this.normal.applyMatrix4( this.rotationMatrix );
 
 	var view = this.mirrorWorldPosition.clone().sub( this.cameraWorldPosition );
-	var reflectView = view.reflect( this.normal );
-	reflectView.add( this.mirrorWorldPosition );
+	view.reflect( this.normal ).negate();
+	view.add( this.mirrorWorldPosition );
 
 	this.rotationMatrix.extractRotation( this.camera.matrixWorld );
 
@@ -199,16 +193,16 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	this.lookAtPosition.add( this.cameraWorldPosition );
 
 	var target = this.mirrorWorldPosition.clone().sub( this.lookAtPosition );
-	var reflectTarget = target.reflect( this.normal );
-	reflectTarget.add( this.mirrorWorldPosition );
+	target.reflect( this.normal ).negate();
+	target.add( this.mirrorWorldPosition );
 
 	this.up.set( 0, -1, 0 );
 	this.up.applyMatrix4( this.rotationMatrix );
-	var reflectUp = this.up.reflect( this.normal );
+	this.up.reflect( this.normal ).negate();
 
-	this.mirrorCamera.position.copy(reflectView);
-	this.mirrorCamera.up = reflectUp;
-	this.mirrorCamera.lookAt( reflectTarget );
+	this.mirrorCamera.position.copy( view );
+	this.mirrorCamera.up = this.up;
+	this.mirrorCamera.lookAt( target );
 
 	this.mirrorCamera.updateProjectionMatrix();
 	this.mirrorCamera.updateMatrixWorld();
@@ -232,8 +226,8 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	var q = new THREE.Vector4();
 	var projectionMatrix = this.mirrorCamera.projectionMatrix;
 
-	q.x = ( sign(this.clipPlane.x) + projectionMatrix.elements[8] ) / projectionMatrix.elements[0];
-	q.y = ( sign(this.clipPlane.y) + projectionMatrix.elements[9] ) / projectionMatrix.elements[5];
+	q.x = ( Math.sign(this.clipPlane.x) + projectionMatrix.elements[8] ) / projectionMatrix.elements[0];
+	q.y = ( Math.sign(this.clipPlane.y) + projectionMatrix.elements[9] ) / projectionMatrix.elements[5];
 	q.z = - 1.0;
 	q.w = ( 1.0 + projectionMatrix.elements[10] ) / projectionMatrix.elements[14];
 

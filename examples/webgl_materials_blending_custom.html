@@ -78,9 +78,6 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var SCREEN_WIDTH = window.innerWidth - 215;
-			var SCREEN_HEIGHT = window.innerHeight;
-
 			var camera, scene, renderer;
 
 			var materialBg;
@@ -99,7 +96,7 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 700;
 
 				// SCENE
@@ -175,7 +172,7 @@
 
 				materialBg = new THREE.MeshBasicMaterial( { map: mapBg1 } );
 
-				var meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
+				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, -1 );
 				scene.add( meshBg );
 
@@ -210,8 +207,8 @@
 				var src = [ "ZeroFactor", "OneFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor", "DstColorFactor", "OneMinusDstColorFactor", "SrcAlphaSaturateFactor" ];
 				var dst = [ "ZeroFactor", "OneFactor", "SrcColorFactor", "OneMinusSrcColorFactor", "SrcAlphaFactor", "OneMinusSrcAlphaFactor", "DstAlphaFactor", "OneMinusDstAlphaFactor" ];
 
-				var geo1 = new THREE.PlaneGeometry( 100, 100 );
-				var geo2 = new THREE.PlaneGeometry( 100, 25 );
+				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
+				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
 
 				var blending = "CustomBlending";
 
@@ -281,8 +278,8 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.left = "215px";
@@ -393,12 +390,9 @@
 
 			function onWindowResize( event ) {
 
-				SCREEN_WIDTH = window.innerWidth;
-				SCREEN_HEIGHT = window.innerHeight;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 			}
@@ -418,7 +412,7 @@
 				//xc.shadowColor = "#000";
 				//xc.shadowBlur = 3;
 				xc.fillStyle = "white";
-				xc.font = "10pt arial bold";
+				xc.font = "12pt arial bold";
 				xc.fillText( text, 8, 22 );
 
 				var map = new THREE.Texture( x );
@@ -436,7 +430,6 @@
 				var time = Date.now() * 0.00025;
 				var ox = ( time * -0.01 * materialBg.map.repeat.x ) % 1;
 				var oy = ( time * -0.01 * materialBg.map.repeat.y ) % 1;
-				//var oy = Math.sin( 0.75 * time ) * 0.01 * materialBg.map.repeat.y;
 
 				materialBg.map.offset.set( ox, oy );
 

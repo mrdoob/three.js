@@ -8,64 +8,99 @@ THREE.OBJExporter.prototype = {
 
 	constructor: THREE.OBJExporter,
 
-	parse: function ( geometry ) {
-
-		console.log( geometry );
+	parse: function ( object ) {
 
 		var output = '';
 
-		for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+		var indexVertex = 0;
+		var indexVertexUvs = 0
+		var indexNormals = 0;
 
-			var vertex = geometry.vertices[ i ];
-			output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+		var parseObject = function ( child ) {
 
-		}
+			var nbVertex = 0;
+			var nbVertexUvs = 0;
+			var nbNormals = 0;
 
-		// uvs
+			var geometry = child.geometry;
 
-		for ( var i = 0, l = geometry.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+			if ( geometry instanceof THREE.Geometry ) {
 
-			var vertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
+				output += 'o ' + child.name + '\n';
 
-			for ( var j = 0; j < vertexUvs.length; j ++ ) {
+				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-				var uv = vertexUvs[ j ];
-				output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+					var vertex = geometry.vertices[ i ].clone();
+					vertex.applyMatrix4( child.matrixWorld );
+
+					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
+
+					nbVertex ++;
+
+				}
+
+				// uvs
+
+				for ( var i = 0, l = geometry.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+
+					var vertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
+
+					for ( var j = 0; j < vertexUvs.length; j ++ ) {
+
+						var uv = vertexUvs[ j ];
+						vertex.applyMatrix4( child.matrixWorld );
+
+						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+
+						nbVertexUvs ++;
+
+					}
+
+				}
+
+				// normals
+
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+
+					var normals = geometry.faces[ i ].vertexNormals;
+
+					for ( var j = 0; j < normals.length; j ++ ) {
+
+						var normal = normals[ j ];
+						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+
+						nbNormals ++;
+
+					}
+
+				}
+
+				// faces
+
+				for ( var i = 0, j = 1, l = geometry.faces.length; i < l; i ++, j += 3 ) {
+
+					var face = geometry.faces[ i ];
+
+					output += 'f ';
+					output += ( indexVertex + face.a + 1 ) + '/' + ( indexVertexUvs + j ) + '/' + ( indexNormals + j ) + ' ';
+					output += ( indexVertex + face.b + 1 ) + '/' + ( indexVertexUvs + j + 1 ) + '/' + ( indexNormals + j + 1 ) + ' ';
+					output += ( indexVertex + face.c + 1 ) + '/' + ( indexVertexUvs + j + 2 ) + '/' + ( indexNormals + j + 2 ) + '\n';
+
+				}
 
 			}
 
-		}
+			// update index
+			indexVertex += nbVertex;
+			indexVertexUvs += nbVertexUvs;
+			indexNormals += nbNormals;
 
-		// normals
+		};
 
-		for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-			var normals = geometry.faces[ i ].vertexNormals;
-
-			for ( var j = 0; j < normals.length; j ++ ) {
-
-				var normal = normals[ j ];
-				output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
-
-			}
-
-		}
-
-		// faces
-
-		for ( var i = 0, j = 1, l = geometry.faces.length; i < l; i ++, j += 3 ) {
-
-			var face = geometry.faces[ i ];
-
-			output += 'f ';
-			output += ( face.a + 1 ) + '/' + ( j ) + '/' + ( j ) + ' ';
-			output += ( face.b + 1 ) + '/' + ( j + 1 ) + '/' + ( j + 1 ) + ' ';
-			output += ( face.c + 1 ) + '/' + ( j + 2 ) + '/' + ( j + 2 ) + '\n';
-
-		}
+		object.traverse( parseObject );
 
 		return output;
 
 	}
 
-}
+};

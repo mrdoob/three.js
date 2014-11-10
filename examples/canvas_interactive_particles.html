@@ -17,28 +17,33 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, renderer;
+			var camera, scene, renderer;
+
+			var raycaster;
 
 			var PI2 = Math.PI * 2;
 
 			var programFill = function ( context ) {
 
 				context.beginPath();
-				context.arc( 0, 0, 1, 0, PI2, true );
+				context.arc( 0, 0, 0.5, 0, PI2, true );
 				context.fill();
 
 			}
 
 			var programStroke = function ( context ) {
 
-				context.lineWidth = 0.05;
+				context.lineWidth = 0.025;
 				context.beginPath();
-				context.arc( 0, 0, 1, 0, PI2, true );
+				context.arc( 0, 0, 0.5, 0, PI2, true );
 				context.stroke();
 
 			}
@@ -72,16 +77,18 @@
 					particle.position.x = Math.random() * 800 - 400;
 					particle.position.y = Math.random() * 800 - 400;
 					particle.position.z = Math.random() * 800 - 400;
-					particle.scale.x = particle.scale.y = Math.random() * 10 + 10;
+					particle.scale.x = particle.scale.y = Math.random() * 20 + 20;
 					scene.add( particle );
 
 				}
-
-				projector = new THREE.Projector();
+				
+				//
+				
+				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -144,10 +151,9 @@
 
 				camera.updateMatrixWorld();
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

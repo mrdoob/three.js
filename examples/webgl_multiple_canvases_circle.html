@@ -240,7 +240,7 @@
 					shadowTexture.needsUpdate = true;
 
 					var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
-					var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
+					var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 
 					for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
 
@@ -302,6 +302,7 @@
 					}
 
 					renderer = new THREE.WebGLRenderer( { antialias: true } );
+					renderer.setClearColor( 0xffffff );
 					renderer.setSize( container.clientWidth, container.clientHeight );
 
 					container.appendChild( renderer.domElement );

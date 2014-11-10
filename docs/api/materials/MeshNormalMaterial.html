@@ -11,18 +11,21 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A material that maps the normal vectors to RGB colors.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo parameters])</h3>
+		<h3>[name]([page:Object parameters])</h3>
 		<div>
-		parameters -- todo
+		parameters is an object with one or more properties defining the material's appearance. 
 		</div>
 		<div>
-		todo
+		morphTargets -- Define whether the material uses morphTargets. Default is false.<br/>
+		shading --  How the triangles of a curved surface are rendered. Default is [page:Materials THREE.SmoothShading].<br/>
+		wireframe -- Render geometry as wireframe. Default is false (i.e. render as smooth shaded).<br/>
+		wireframeLinewidth -- Controls wireframe thickness. Default is 1.<br/>
 		</div>
 
 
@@ -30,24 +33,25 @@
 
 
 
-		<h3>.[page:boolean morphTargets]</h3>
-		<div>
-		todo
-		</div> 
+		<h3>[property:boolean morphTargets]</h3>
+		<div>Define whether the material uses morphTargets. Default is false.</div> 
 
-		<h3>.[page:number shading]</h3>
+		<h3>[property:number shading]</h3>
 		<div>
-		todo
-		</div> 
+			How the triangles of a curved surface are rendered: as a smooth surface, as flat separate facets, or no shading at all.<br/><br/>
+			Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading]
+		</div>
+		
 
-		<h3>.[page:number wireframeLinewidth]</h3>
+		<h3>[property:boolean wireframe]</h3>
 		<div>
-		todo
+			Render geometry as wireframe. Default is false (i.e. render as smooth shaded). 
 		</div> 
-
-		<h3>.[page:boolean wireframe]</h3>
+		
+		<h3>[property:number wireframeLinewidth]</h3>
 		<div>
-		todo
+			Controls wireframe thickness. Default is 1.<br/><br/>
+			Due to limitations in the ANGLE layer, on Windows platforms linewidth will always be 1 regardless of the set value.
 		</div> 
 
 		<h2>Methods</h2>

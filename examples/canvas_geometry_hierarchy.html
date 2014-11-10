@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js canvas - geometry hierarchy 2</title>
+		<title>three.js canvas - geometry - hierarchy</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -17,6 +17,9 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -48,10 +51,10 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial( { overdraw: 0.5 } );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -70,8 +73,8 @@
 				scene.add( group );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

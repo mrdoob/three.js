@@ -29,12 +29,12 @@
 
 
 
-		<h3>.[page:Vector2 max]</h3>
+		<h3>[property:Vector2 max]</h3>
 		<div>
 		Upper (x, y) boundary of this box.
 		</div> 
 
-		<h3>.[page:Vector2 min]</h3>
+		<h3>[property:Vector2 min]</h3>
 		<div>
 		Lower (x, y) boundary of this box.
 		</div> 
@@ -43,7 +43,7 @@
 
 
 
-		<h3>.set([page:Vector2 min], [page:Vector2 max]) [page:todo]</h3>
+		<h3>[method:Box2 set]([page:Vector2 min], [page:Vector2 max]) [page:Box2 this]</h3>
 		<div>
 		min -- Lower (x, y) boundary of the box. <br />
 		max -- Upper (x, y) boundary of the box.
@@ -52,7 +52,7 @@
 		Sets the lower and upper (x, y) boundaries of this box.
 		</div>
 
-		<h3>.expandByPoint([page:Vector2 point]) [page:Box2]</h3>
+		<h3>[method:Box2 expandByPoint]([page:Vector2 point]) [page:Box2 this]</h3>
 		<div>
 		point -- Point that should be included in the box.
 		</div>
@@ -60,7 +60,7 @@
 		Expands the boundaries of this box to include *point*.
 		</div>
 
-		<h3>.clampPoint([page:Vector2 point], [page:Vector2 optionalTarget]) [page:Vector2]</h3>
+		<h3>[method:Vector2 clampPoint]([page:Vector2 point], [page:Vector2 optionalTarget])</h3>
 		<div>
 		point -- Position to clamp. <br />
 		optionalTarget -- If specified, the clamped result will be copied here.
@@ -69,7 +69,7 @@
 		Clamps *point* within the bounds of this box.
 		</div>
 
-		<h3>.isIntersectionBox([page:Box2 box]) [page:Boolean]</h3>
+		<h3>[method:Boolean isIntersectionBox]([page:Box2 box])</h3>
 		<div>
 		box -- Box to check for intersection against.
 		</div>
@@ -77,7 +77,7 @@
 		Determines whether or not this box intersects *box*.
 		</div>
 
-		<h3>.setFromPoints([page:Array points]) [page:Box2]</h3>
+		<h3>[method:Box2 setFromPoints]([page:Array points]) [page:Box2 this]</h3>
 		<div>
 		points -- Set of points that the resulting box will envelop.
 		</div>
@@ -85,7 +85,7 @@
 		Sets the upper and lower bounds of this box to include all of the points in *points*.
 		</div>
 
-		<h3>.size([page:Vector2 optionalTarget]) [page:Vector2]</h3>
+		<h3>[method:Vector2 size]([page:Vector2 optionalTarget])</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>
@@ -93,7 +93,7 @@
 		Returns the width and height of this box.
 		</div>
 
-		<h3>.union([page:Box2 box]) [page:Box2]</h3>
+		<h3>[method:Box2 union]([page:Box2 box]) [page:Box2 this]</h3>
 		<div>
 		box -- Box that will be unioned with this box.
 		</div>
@@ -103,15 +103,17 @@
 		lower bounds.
 		</div>
 
-		<h3>.getParameter([page:Vector2 point]) [page:Vector2]</h3>
+		<h3>[method:Vector2 getParameter]([page:Vector2 point], [page:Vector2 optionalTarget])</h3>
 		<div>
-		point -- Point to parametrize.
+		point -- [page:Vector2]<br/>
+		optionalTarget -- [page:Vector2]<br/>
+		
 		</div>
 		<div>
-		Returns point as a proportion of this box's width and height.
+		Returns a point as a proportion of this box's width and height.
 		</div>
 
-		<h3>.expandByScalar([page:float scalar]) [page:Box2]</h3>
+		<h3>[method:Box2 expandByScalar]([page:float scalar]) [page:Box2 this]</h3>
 		<div>
 		scalar -- Distance to expand.
 		</div>
@@ -120,7 +122,7 @@
 		will be contracted.
 		</div>
 
-		<h3>.intersect([page:Box2 box]) [page:Box2]</h3>
+		<h3>[method:Box2 intersect]([page:Box2 box]) [page:Box2 this]</h3>
 		<div>
 		box -- Box to intersect with.
 		</div>
@@ -130,7 +132,7 @@
 		lower bounds.
 		</div>
 
-		<h3>.containsBox([page:Box2 box]) [page:Boolean]</h3>
+		<h3>[method:Boolean containsBox]([page:Box2 box])</h3>
 		<div>
 		box -- Box to test for inclusion.
 		</div>
@@ -139,7 +141,7 @@
 		this function also returns true. 
 		</div>
 
-		<h3>.translate([page:Vector2 offset]) [page:Box2]</h3>
+		<h3>[method:Box2 translate]([page:Vector2 offset]) [page:Box2 this]</h3>
 		<div>
 		offset -- Direction and distance of offset.
 		</div>
@@ -148,19 +150,19 @@
 		*offset* units in 2D space.
 		</div>
 
-		<h3>.empty() [page:Boolean]</h3>
+		<h3>[method:Boolean empty]()</h3>
 		<div>
 		Returns true if this box includes zero points within its bounds.</br>
 		Note that a box with equal lower and upper bounds still includes one point, the
 		one both bounds share.
 		</div>
 
-		<h3>.clone() [page:Box2]</h3>
+		<h3>[method:Box2 clone]()</h3>
 		<div>
 		Returns a copy of this box.
 		</div>
 
-		<h3>.equals([page:Box2 box]) [page:Boolean]</h3>
+		<h3>[method:Boolean equals]([page:Box2 box])</h3>
 		<div>
 		box -- Box to compare.
 		</div>
@@ -168,7 +170,7 @@
 		Returns true if this box and *box* share the same lower and upper bounds.
 		</div>
 
-		<h3>.expandByVector([page:Vector2 vector]) [page:Box2]</h3>
+		<h3>[method:Box2 expandByVector]([page:Vector2 vector]) [page:Box2 this]</h3>
 		<div>
 		vector -- Amount to expand this box in each dimension.
 		</div>
@@ -178,7 +180,7 @@
 		this box will be expanded by the y component of *vector* in both directions.
 		</div>
 
-		<h3>.copy([page:Box2 box]) [page:Box2]</h3>
+		<h3>[method:Box2 copy]([page:Box2 box]) [page:Box2 this]</h3>
 		<div>
 		box -- Box to copy.
 		</div>
@@ -186,12 +188,12 @@
 		Copies the values of *box* to this box.
 		</div>
 
-		<h3>.makeEmpty() [page:Box2]</h3>
+		<h3>[method:Box2 makeEmpty]() [page:Box2 this]</h3>
 		<div>
 		Makes this box empty.
 		</div>
 
-		<h3>.center([page:Vector2 optionalTarget]) [page:Vector2]</h3>
+		<h3>[method:Vector2 center]([page:Vector2 optionalTarget])</h3>
 		<div>
 		optionalTarget -- If specified, the result will be copied here.
 		</div>
@@ -199,7 +201,7 @@
 		Returns the center point of this box.
 		</div>
 
-		<h3>.distanceToPoint([page:Vector2 point]) [page:Float]</h3>
+		<h3>[method:Float distanceToPoint]([page:Vector2 point])</h3>
 		<div>
 		point -- Point to measure distance to.
 		</div>
@@ -208,15 +210,15 @@
 		If the point lies inside of this box, the distance will be 0.
 		</div>
 
-		<h3>.containsPoint([page:Vector2 point]) [page:Boolean]</h3>
+		<h3>[method:Boolean containsPoint]([page:Vector2 point])</h3>
 		<div>
-		point -- Point to check for inclusion.
+		point -- [page:Vector2] to check for inclusion.
 		</div>
 		<div>
 		Returns true if the specified point lies within the boundaries of this box.
 		</div>
 
-		<h3>.setFromCenterAndSize([page:Vector2 center], [page:Vector2 size]) [page:Box2]</h3>
+		<h3>[method:Box2 setFromCenterAndSize]([page:Vector2 center], [page:Vector2 size]) [page:Box2 this]</h3>
 		<div>
 		center -- Desired center position of the box. <br />
 		size -- Desired x and y dimensions of the box. 

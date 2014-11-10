@@ -47,6 +47,7 @@
 
 			var stats;
 			var scene;
+			var pointLight;
 			var camera;
 			var renderer;
 			var model;
@@ -54,7 +55,7 @@
 			var kfAnimations = [ ];
 			var kfAnimationsLength = 0;
 			var loader = new THREE.ColladaLoader();
-			var lastTimestamp;
+			var lastTimestamp = 0;
 			var progress = 0;
 
 			loader.load( './models/collada/pump/pump.dae', function ( collada ) {
@@ -87,14 +88,11 @@
 
 				// KeyFrame Animations
 
-				var animHandler = THREE.AnimationHandler;
-
 				for ( var i = 0; i < kfAnimationsLength; ++i ) {
 
 					var animation = animations[ i ];
-					animHandler.add( animation );
 
-					var kfAnimation = new THREE.KeyFrameAnimation( animation.node, animation.name );
+					var kfAnimation = new THREE.KeyFrameAnimation( animation );
 					kfAnimation.timeScale = 1;
 					kfAnimations.push( kfAnimation );
 
@@ -120,18 +118,14 @@
 
 				// Add the COLLADA
 
-				model.getChildByName( 'camEye_camera', true ).visible = false;
-				model.getChildByName( 'camTarget_camera', true ).visible = false;
+				model.getObjectByName( 'camEye_camera', true ).visible = false;
+				model.getObjectByName( 'camTarget_camera', true ).visible = false;
 
 				scene.add( model );
 
 				// Lights
 
 				pointLight = new THREE.PointLight( 0xffffff, 1.75 );
-				pointLight.position = camera.position;
-				pointLight.rotation = camera.rotation;
-				pointLight.scale = camera.scale;
-
 				scene.add( pointLight );
 
 				// Renderer
@@ -195,17 +189,16 @@
 
 					}
 
-					animation.play( false, 0 );
-					lastTimestamp = Date.now();
+					animation.loop = false;
+					animation.play();
 
 				}
 
 			}
 
-			function animate() {
+			function animate( timestamp ) {
 
-				var timestamp = Date.now();
-				var frameTime = ( timestamp - lastTimestamp ) * 0.001; // seconds
+				var frameTime = ( timestamp - lastTimestamp ) * 0.001;
 
 				if ( progress >= 0 && progress < 48 ) {
 
@@ -227,6 +220,8 @@
 					start();
 
 				}
+
+				pointLight.position.copy( camera.position );
 
 				progress += frameTime;
 				lastTimestamp = timestamp;

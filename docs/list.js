@@ -2,11 +2,21 @@ var list = {
 
 	"Manual": {
 		"Introduction": [
-			[ "Creating a scene", "manual/introduction/Creating-a-scene" ]
+			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+
 		]
 	},
 
 	"Reference": {
+		"Constants": [
+			[ "CustomBlendingEquation", "api/constants/CustomBlendingEquations"],
+			[ "GLState", "api/constants/GLState"],
+			[ "Materials", "api/constants/Materials"],
+			[ "ShadowingTypes", "api/constants/ShadowingTypes"],
+			[ "Textures", "api/constants/Textures"]
+		],
+
 		"Cameras": [
 			[ "Camera", "api/cameras/Camera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
@@ -14,51 +24,65 @@ var list = {
 		],
 
 		"Core": [
+			[ "BufferAttribute", "api/core/BufferAttribute" ],
 			[ "BufferGeometry", "api/core/BufferGeometry" ],
 			[ "Clock", "api/core/Clock" ],
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
-			[ "Projector", "api/core/Projector" ],
 			[ "Raycaster", "api/core/Raycaster" ],
 		],
 
 		"Lights": [
-			[ "Light", "api/lights/Light" ],
 			[ "AmbientLight", "api/lights/AmbientLight" ],
 			[ "AreaLight", "api/lights/AreaLight" ],
 			[ "DirectionalLight", "api/lights/DirectionalLight" ],
 			[ "HemisphereLight", "api/lights/HemisphereLight" ],
+			[ "Light", "api/lights/Light" ],
 			[ "PointLight", "api/lights/PointLight" ],
 			[ "SpotLight", "api/lights/SpotLight" ]
 		],
 
 
 		"Loaders": [
-			[ "Loader", "api/loaders/Loader" ],
-			[ "GeometryLoader", "api/loaders/GeometryLoader" ],
+			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
+			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
+			[ "Cache", "api/loaders/Cache" ],
+			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
+			[ "glTFLoader", "api/loaders/glTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
+			[ "Loader", "api/loaders/Loader" ],
 			[ "LoadingManager", "api/loaders/LoadingManager" ],
+			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
+			[ "MTLLoader", "api/loaders/MTLLoader" ],
+			[ "OBJLoader", "api/loaders/OBJLoader" ],
+			[ "OBJMTLLoader", "api/loaders/OBJMTLLoader" ],
+			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
+			[ "PDBLoader", "api/loaders/PDBLoader" ],
+			[ "SVGLoader", "api/loaders/SVGLoader" ],
 			[ "SceneLoader", "api/loaders/SceneLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
+			[ "TGALoader", "api/loaders/TGALoader" ],
+			[ "XHRLoader", "api/loaders/XHRLoader" ]
 		],
 
 		"Materials": [
-			[ "Material", "api/materials/Material" ],
 			[ "LineBasicMaterial", "api/materials/LineBasicMaterial" ],
 			[ "LineDashedMaterial", "api/materials/LineDashedMaterial" ],
+			[ "Material", "api/materials/Material" ],
 			[ "MeshBasicMaterial", "api/materials/MeshBasicMaterial" ],
 			[ "MeshDepthMaterial", "api/materials/MeshDepthMaterial" ],
 			[ "MeshFaceMaterial", "api/materials/MeshFaceMaterial" ],
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
-			[ "ParticleSystemMaterial", "api/materials/ParticleSystemMaterial" ],
+			[ "PointCloudMaterial", "api/materials/PointCloudMaterial" ],
+			[ "RawShaderMaterial", "api/materials/RawShaderMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
-			[ "SpriteMaterial", "api/materials/SpriteMaterial" ],
-			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ]
+			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ],
+			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
 		],
 
 		"Math": [
@@ -67,6 +91,7 @@ var list = {
 			[ "Color", "api/math/Color" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
+			[ "Line3", "api/math/Line3" ],
 			[ "Math", "api/math/Math" ],
 			[ "Matrix3", "api/math/Matrix3" ],
 			[ "Matrix4", "api/math/Matrix4" ],
@@ -83,30 +108,39 @@ var list = {
 
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
-			[ "ParticleSystem", "api/objects/ParticleSystem" ],
+			[ "PointCloud", "api/objects/PointCloud" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Sprite", "api/objects/Sprite" ]
-
 		],
 
 		"Renderers": [
 			[ "CanvasRenderer", "api/renderers/CanvasRenderer" ],
 			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ],
 			[ "WebGLRenderTarget", "api/renderers/WebGLRenderTarget" ],
-			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ],
-			[ "WebGLShaders", "api/renderers/WebGLShaders" ]
+			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
 		],
 
-		"Renderers / Renderables": [
-			[ "RenderableFace3", "api/renderers/renderables/RenderableFace3" ],
-			[ "RenderableLine", "api/renderers/renderables/RenderableLine" ],
-			[ "RenderableObject", "api/renderers/renderables/RenderableObject" ],
-			[ "RenderableParticle", "api/renderers/renderables/RenderableParticle" ],
-			[ "RenderableVertex", "api/renderers/renderables/RenderableVertex" ]
+		"Renderers / Shaders": [
+			[ "ShaderChunk", "api/renderers/shaders/ShaderChunk" ],
+			[ "ShaderLib", "api/renderers/shaders/ShaderLib" ],
+			[ "UniformsLib", "api/renderers/shaders/UniformsLib" ],
+			[ "UniformsUtils", "api/renderers/shaders/UniformsUtils" ]
+		],
+
+		"Renderers / WebGL": [
+			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
+			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ]
+		],
+
+		"Renderers / WebGL / Plugins": [
+			[ "LensFlarePlugin", "api/renderers/webgl/plugins/LensFlarePlugin" ],
+			[ "ShadowMapPlugin", "api/renderers/webgl/plugins/ShadowMapPlugin" ],
+			[ "SpritePlugin", "api/renderers/webgl/plugins/SpritePlugin" ]
 		],
 
 		"Scenes": [
@@ -131,14 +165,15 @@ var list = {
 		"Extras / Animation": [
 			[ "Animation", "api/extras/animation/Animation" ],
 			[ "AnimationHandler", "api/extras/animation/AnimationHandler" ],
-			[ "AnimationMorphTarget", "api/extras/animation/AnimationMorphTarget" ],
-			[ "KeyFrameAnimation", "api/extras/animation/KeyFrameAnimation" ]
+			[ "KeyFrameAnimation", "api/extras/animation/KeyFrameAnimation" ],
+			[ "AnimationMorphTarget", "api/extras/animation/AnimationMorphTarget" ]
 		],
 
 		"Extras / Cameras": [
 			[ "CombinedCamera", "api/extras/cameras/CombinedCamera" ],
 			[ "CubeCamera", "api/extras/cameras/CubeCamera" ]
 		],
+
 
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
@@ -148,11 +183,26 @@ var list = {
 			[ "Shape", "api/extras/core/Shape" ]
 		],
 
+		"Extras / Curves": [
+			[ "ArcCurve", "api/extras/curves/ArcCurve" ],
+			[ "ClosedSplineCurve3", "api/extras/curves/ClosedSplineCurve3" ],
+			[ "CubicBezierCurve", "api/extras/curves/CubicBezierCurve" ],
+			[ "CubicBezierCurve3", "api/extras/curves/CubicBezierCurve3" ],
+			[ "EllipseCurve", "api/extras/curves/EllipseCurve" ],
+			[ "LineCurve", "api/extras/curves/LineCurve" ],
+			[ "LineCurve3", "api/extras/curves/LineCurve3" ],
+			[ "QuadraticBezierCurve", "api/extras/curves/QuadraticBezierCurve" ],
+			[ "QuadraticBezierCurve3", "api/extras/curves/QuadraticBezierCurve3" ],
+			[ "SplineCurve", "api/extras/curves/SplineCurve" ],
+			[ "SplineCurve3", "api/extras/curves/SplineCurve3" ]
+		],
+
 		"Extras / Geometries": [
+			[ "BoxGeometry", "api/extras/geometries/BoxGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
-			[ "ConvexGeometry", "api/extras/geometries/ConvexGeometry" ],
 			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
+			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],
 			[ "LatheGeometry", "api/extras/geometries/LatheGeometry" ],
@@ -160,6 +210,7 @@ var list = {
 			[ "ParametricGeometry", "api/extras/geometries/ParametricGeometry" ],
 			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
 			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
+			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
 			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],
 			[ "SphereGeometry", "api/extras/geometries/SphereGeometry" ],
 			[ "TetrahedronGeometry", "api/extras/geometries/TetrahedronGeometry" ],
@@ -172,31 +223,30 @@ var list = {
 		"Extras / Helpers": [
 			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
 			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
+			[ "BoundingBoxHelper", "api/extras/helpers/BoundingBoxHelper" ],
 			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
+			[ "EdgesHelper", "api/extras/helpers/EdgesHelper" ],
+			[ "FaceNormalsHelper", "api/extras/helpers/FaceNormalsHelper" ],
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
-			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ]
+			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ],
+			[ "VertexNormalsHelper", "api/extras/helpers/VertexNormalsHelper" ],
+			[ "VertexTangentsHelper", "api/extras/helpers/VertexTangentsHelper" ],
+			[ "WireframeHelper", "api/extras/helpers/WireframeHelper" ]
 		],
 
 		"Extras / Objects": [
 			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
-			[ "LensFlare", "api/extras/objects/LensFlare" ],
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
 		],
 
-		"Extras / Renderers / Plugins": [
-			[ "DepthPassPlugin", "api/extras/renderers/plugins/DepthPassPlugin" ],
-			[ "LensFlarePlugin", "api/extras/renderers/plugins/LensFlarePlugin" ],
-			[ "ShadowMapPlugin", "api/extras/renderers/plugins/ShadowMapPlugin" ],
-			[ "SpritePlugin", "api/extras/renderers/plugins/SpritePlugin" ]
-		],
+		"Examples" : [
+			[ "LookupTable", "api/examples/Lut" ]
 
-		"Extras / Shaders": [
-			[ "ShaderFlares", "api/extras/shaders/ShaderFlares" ],
-			[ "ShaderSprite", "api/extras/shaders/ShaderSprite" ]
 		]
+
 	}
 
 };

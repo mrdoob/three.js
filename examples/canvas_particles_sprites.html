@@ -20,6 +20,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/tween.min.js"></script>
 
@@ -116,10 +119,8 @@
 				var particle = this instanceof THREE.Sprite ? this : particle;
 				var delay = delay !== undefined ? delay : 0;
 
-				particle.position.x = 0;
-				particle.position.y = 0;
-				particle.position.z = 0;
-				particle.scale.x = particle.scale.y = Math.random() * 3 + 1;
+				particle.position.set( 0, 0, 0 )
+				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
 
 				new TWEEN.Tween( particle )
 					.delay( delay )

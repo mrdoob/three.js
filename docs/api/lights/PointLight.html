@@ -26,26 +26,27 @@ scene.add( light );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo hex], [page:todo intensity], [page:todo distance])</h3>
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Number distance])</h3>
 		<div>
-		hex -- todo <br />
-		intensity -- todo <br />
-		distance -- todo
+		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
+		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
+		[page:Number distance] -- The distance of the light where the intensity is 0. When distance is 0, then the distance is endless. 
 		</div>
 		<div>
-		todo
+		Creates a light at a specific position in the scene.  The light shines in all directions (roughly similar to a light bulb.)
+	
 		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Float intensity]</h3>
+		<h3>[property:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
 			Default - *1.0*.
 		</div>
 
-		<h3>.[page:Float distance]</h3>
+		<h3>[property:Float distance]</h3>
 		<div>
 			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
 			Default — *0.0*.

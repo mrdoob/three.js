@@ -75,7 +75,7 @@
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 				group.position.y = 50;
 				scene.add( group );
 
@@ -152,7 +152,7 @@
 				var knots2 = [0, 0, 0, 0, 1, 1, 1, 1];
 				var nurbsSurface = new THREE.NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
 
-				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
@@ -170,6 +170,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

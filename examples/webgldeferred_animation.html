@@ -67,10 +67,9 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var SCALE = 0.75;
-			var MARGIN = 100;
 
 			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight - 2 * MARGIN;
+			var HEIGHT = window.innerHeight;
 
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
@@ -116,10 +115,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, brightness: 2, antialias: true } );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = MARGIN + "px";
-				renderer.domElement.style.left = "0px";
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -200,9 +195,7 @@
 					material.color = light.color;
 
 					var emitter = new THREE.Mesh( geometry, material );
-					emitter.position = light.position;
-
-					scene.add( emitter );
+					light.add( emitter );
 
 				}
 
@@ -255,7 +248,6 @@
 					geometry.computeBoundingBox();
 
 					ensureLoop( geometry.animation );
-					THREE.AnimationHandler.add( geometry.animation );
 
 					for ( var i = 0, il = materials.length; i < il; i ++ ) {
 
@@ -292,11 +284,8 @@
 					skins.push( mesh );
 
 
-					animation = new THREE.Animation( mesh, "ActionFemale" );
-					animation.JITCompile = false;
-					animation.interpolationType = THREE.AnimationHandler.LINEAR;
-
-					animation.play( true );
+					animation = new THREE.Animation( mesh, geometry.animation );
+					animation.play();
 					animation.update( 0 );
 
 				} );
@@ -327,7 +316,8 @@
 				mapHeight3.anisotropy = 4;
 				mapHeight3.format = THREE.RGBFormat;
 
-				var geoPlane = new THREE.PlaneGeometry( 40, 20 );
+				var geoPlane = new THREE.PlaneBufferGeometry( 40, 20 );
+				
 				var matPlaneSide   = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight2, bumpScale: 0.5 } );
 				var matPlaneBottom = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight3, bumpScale: 0.5 } );
 				var matPlaneTop    = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight3, bumpScale: 1 } );

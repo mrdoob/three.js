@@ -17,13 +17,18 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, renderer;
+			var camera, scene, renderer;
 			var particleMaterial;
+
+			var raycaster;
 
 			var objects = [];
 
@@ -48,7 +53,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
@@ -78,16 +83,19 @@
 					program: function ( context ) {
 
 						context.beginPath();
-						context.arc( 0, 0, 1, 0, PI2, true );
+						context.arc( 0, 0, 0.5, 0, PI2, true );
 						context.fill();
 
 					}
 
 				} );
-
-				projector = new THREE.Projector();
+				
+				//
+				
+				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -118,10 +126,11 @@
 
 				event.preventDefault();
 
-				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-				projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3();
+				vector.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+				vector.unproject( camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -130,8 +139,8 @@
 					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
 					var particle = new THREE.Sprite( particleMaterial );
-					particle.position = intersects[ 0 ].point;
-					particle.scale.x = particle.scale.y = 8;
+					particle.position.copy( intersects[ 0 ].point );
+					particle.scale.x = particle.scale.y = 16;
 					scene.add( particle );
 
 				}

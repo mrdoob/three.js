@@ -1,12 +1,23 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UI.CollapsiblePanel();
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/geometry/collapsed' ) );
+	container.onCollapsedChange( function ( boolean ) {
+
+		editor.config.setKey( 'ui/sidebar/geometry/collapsed', boolean );
+
+	} );
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text().setValue( 'GEOMETRY' ) );
-	container.add( new UI.Break(), new UI.Break() );
+	var geometryType = new UI.Text().setTextTransform( 'uppercase' );
+	container.addStatic( geometryType );
+	container.add( new UI.Break() );
 
 	// uuid
 
@@ -40,35 +51,13 @@ Sidebar.Geometry = function ( editor ) {
 
 	container.add( geometryNameRow );
 
-	// class
+	// geometry
 
-	var geometryTypeRow = new UI.Panel();
-	var geometryType = new UI.Text().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+	container.add( new Sidebar.Geometry.Geometry( signals ) );
 
-	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
-	geometryTypeRow.add( geometryType );
+	// buffergeometry
 
-	container.add( geometryTypeRow );
-
-	// vertices
-
-	var geometryVerticesRow = new UI.Panel();
-	var geometryVertices = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
-
-	geometryVerticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
-	geometryVerticesRow.add( geometryVertices );
-
-	container.add( geometryVerticesRow );
-
-	// faces
-
-	var geometryFacesRow = new UI.Panel();
-	var geometryFaces = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
-
-	geometryFacesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
-	geometryFacesRow.add( geometryFaces );
-
-	container.add( geometryFacesRow );
+	container.add( new Sidebar.Geometry.BufferGeometry( signals ) );
 
 	// parameters
 
@@ -87,9 +76,10 @@ Sidebar.Geometry = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			geometryType.setValue( editor.getGeometryType( object.geometry ) );
+			geometryType.setValue( geometry.type );
 
-			updateFields( geometry );
+			geometryUUID.setValue( geometry.uuid );
+			geometryName.setValue( geometry.name );
 
 			//
 
@@ -100,14 +90,14 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-			if ( geometry instanceof THREE.CircleGeometry ) {
+			if ( geometry instanceof THREE.BoxGeometry ) {
 
-				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
+				parameters = new Sidebar.Geometry.BoxGeometry( signals, object );
 				container.add( parameters );
 
-			} else if ( geometry instanceof THREE.CubeGeometry ) {
+			} else if ( geometry instanceof THREE.CircleGeometry ) {
 
-				parameters = new Sidebar.Geometry.CubeGeometry( signals, object );
+				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
 				container.add( parameters );
 
 			} else if ( geometry instanceof THREE.CylinderGeometry ) {
@@ -140,6 +130,11 @@ Sidebar.Geometry = function ( editor ) {
 				parameters = new Sidebar.Geometry.TorusKnotGeometry( signals, object );
 				container.add( parameters );
 
+			} else {
+
+				parameters = new Sidebar.Geometry.Modifiers( signals, object );
+				container.add( parameters );
+
 			}
 
 		} else {
@@ -151,38 +146,6 @@ Sidebar.Geometry = function ( editor ) {
 	}
 
 	signals.objectSelected.add( build );
-	signals.objectChanged.add( build );
-
-	//
-
-	function updateFields( geometry ) {
-
-		geometryUUID.setValue( geometry.uuid );
-		geometryName.setValue( geometry.name );
-
-		if ( geometry instanceof THREE.Geometry ) {
-
-			geometryVertices.setValue( geometry.vertices.length );
-			geometryFaces.setValue( geometry.faces.length );
-
-		} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-			geometryVertices.setValue( geometry.attributes.position.numItems / 3 );
-
-			if ( geometry.attributes.index !== undefined ) {
-
-				geometryFaces.setValue( geometry.attributes.index.numItems / 3 );
-
-			} else {
-
-				geometryFaces.setValue( geometry.attributes.position.numItems / 3 / 3 );
-
-			}
-
-
-		}
-
-	}
 
 	return container;
 

@@ -22,7 +22,7 @@ THREE.BabylonLoader.prototype = {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -34,7 +34,7 @@ THREE.BabylonLoader.prototype = {
 
 	parse: function ( json ) {
 
-		var materials = this.parseMaterials( json.materials );
+		var materials = this.parseMaterials( json );
 		var scene = this.parseObjects( json, materials );
 
 		return scene;
@@ -45,9 +45,9 @@ THREE.BabylonLoader.prototype = {
 
 		var materials = {};
 
-		for ( var i = 0, l = json.length; i < l; i ++ ) {
+		for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
 
-			var data = json[ i ];
+			var data = json.materials[ i ];
 
 			var material = new THREE.MeshPhongMaterial();
 			material.name = data.name;
@@ -62,7 +62,93 @@ THREE.BabylonLoader.prototype = {
 
 		}
 
+		if ( json.multiMaterials ) {
+
+			for ( var i = 0, l = json.multiMaterials.length; i < l; i ++ ) {
+
+				var data = json.multiMaterials[ i ];
+
+				console.warn( 'THREE.BabylonLoader: Multi materials not yet supported.' );
+
+				materials[ data.id ] = new THREE.MeshPhongMaterial();
+
+			}
+
+		}
+
 		return materials;
+
+	},
+
+	parseGeometry: function ( json ) {
+
+		var geometry = new THREE.BufferGeometry();
+
+		// indices
+
+		var indices = new Uint16Array( json.indices );
+
+		geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+
+		// positions
+
+		var positions = new Float32Array( json.positions );
+
+		for ( var j = 2, jl = positions.length; j < jl; j += 3 ) {
+
+			positions[ j ] = - positions[ j ];
+
+		}
+
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+		// normals
+
+		if ( json.normals ) {
+
+			var normals = new Float32Array( json.normals );
+
+			for ( var j = 2, jl = normals.length; j < jl; j += 3 ) {
+
+				normals[ j ] = - normals[ j ];
+
+			}
+
+			geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+
+		}
+
+		// uvs
+
+		if ( json.uvs ) {
+
+			var uvs = new Float32Array( json.uvs );
+
+			geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+		}
+
+		// offsets
+
+		var subMeshes = json.subMeshes;
+
+		if ( subMeshes ) {
+
+			for ( var j = 0, jl = subMeshes.length; j < jl; j ++ ) {
+
+				var subMesh = subMeshes[ j ];
+
+				geometry.addDrawCall( subMesh.indexStart, subMesh.indexCount );
+
+			}
+
+		} else {
+
+			geometry.addDrawCall( 0, json.indices.length );
+
+		}
+
+		return geometry;
 
 	},
 
@@ -70,6 +156,22 @@ THREE.BabylonLoader.prototype = {
 
 		var objects = {};
 		var scene = new THREE.Scene();
+
+		var cameras = json.cameras;
+
+		for ( var i = 0, l = cameras.length; i < l; i ++ ) {
+
+			var data = cameras[ i ];
+
+			var camera = new THREE.PerspectiveCamera( ( data.fov / Math.PI ) * 180, 1.33, data.minZ, data.maxZ );
+
+			camera.name = data.name;
+			camera.position.fromArray( data.position );
+			if ( data.rotation ) camera.rotation.fromArray( data.rotation );
+
+			objects[ data.id ] = camera;
+
+		}
 
 		var lights = json.lights;
 
@@ -117,88 +219,26 @@ THREE.BabylonLoader.prototype = {
 
 			var object;
 
-			if ( data.indices !== null  ) {
+			if ( data.indices ) {
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = this.parseGeometry( data );
 
-				geometry.attributes.index = {
-					itemSize: 1,
-					array: new Uint16Array( data.indices )
-				};
-
-				geometry.attributes.position = {
-					itemSize: 3,
-					array: new Float32Array( data.positions )
-				};
-
-				var positions = geometry.attributes.position.array;
-
-				for ( var j = 2, jl = positions.length; j < jl; j += 3 ) {
-
-					positions[ j ] = - positions[ j ]; 
-
-				}
-
-				geometry.attributes.normal = {
-					itemSize: 3,
-					array: new Float32Array( data.normals )
-				};
-
-				var normals = geometry.attributes.normal.array;
-
-				for ( var j = 2, jl = normals.length; j < jl; j += 3 ) {
-
-					normals[ j ] = - normals[ j ]; 
-
-				}
-
-				geometry.attributes.uv = {
-					itemSize: 2,
-					array: new Float32Array( data.uvs )
-				};
-
-				var subMeshes = data.subMeshes;
-
-				if ( subMeshes !== null ) {
-
-					for ( var j = 0, jl = subMeshes.length; j < jl; j ++ ) {
-
-						var subMesh = subMeshes[ j ];
-
-						geometry.offsets.push( {
-							start: subMesh.indexStart,
-							index: 0,
-							count: subMesh.indexCount
-						} );
-
-					}
-
-				} else {
-
-					geometry.offsets.push( {
-						start: 0,
-						index: 0,
-						count: data.indices.length
-					} );
-
-				}
-
-				var material = materials[ data.materialId ];
-
-				object = new THREE.Mesh( geometry, material );
+				object = new THREE.Mesh( geometry, materials[ data.materialId ] );
 
 			} else {
 
-				object = new THREE.Object3D();
+				object = new THREE.Group();
 
 			}
 
 			object.name = data.name;
 			object.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
 			object.rotation.fromArray( data.rotation );
+			if ( data.rotationQuaternion ) object.quaternion.fromArray( data.rotationQuaternion );
 			object.scale.fromArray( data.scaling );
+			// object.visible = data.isVisible;
 
-			if ( data.parentId !== undefined && data.parentId !== '' ) {
+			if ( data.parentId ) {
 
 				objects[ data.parentId ].add( object );
 

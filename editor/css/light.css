@@ -1,34 +1,4 @@
-﻿* {
-	vertical-align: middle;
-}
-
-body {
-	font-family: Arial, sans-serif;
-	font-size: 14px;
-	margin: 0;
-	overflow: hidden;
-}
-
-hr {
-	border: 0px;
-	border-top: 1px solid #ccc;
-}
-
-button {
-	position: relative;
-}
-
-.Panel {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-
-		/* No support for these yet */
-	-o-user-select: none;
-	user-select: none;
-}
-
-.FancySelect {
+﻿.FancySelect {
 	background: #fff;
 	border: 1px solid #ccc;
 	padding: 0;
@@ -57,11 +27,23 @@ input.Number {
 }
 
 #viewport {
+	position: absolute;
 	top: 32px;
 	left: 0px;
 	right: 300px;
 	bottom: 32px;
-	background-color: #aaaaaa;
+}
+
+	#viewport #info {
+		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
+	}
+
+#player {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
 }
 
 #menubar {
@@ -75,18 +57,33 @@ input.Number {
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
 	}
 
-	#menubar .Panel {
-		color: #888;
+	#menubar .menu.right {
+		float: right;
+		cursor: auto;
+		text-align: right;
 	}
+
+		#menubar .menu .title {
+			display: inline-block;
+			color: #888;
+			margin: 0px;
+			padding: 8px;
+		}
 
 		#menubar .menu .options {
+			position: absolute;
+			display: none;
 			padding: 5px 0px;
 			background: #eee;
 			width: 140px;
+		}
+
+		#menubar .menu:hover .options {
+			display: block;
 		}
 
 			#menubar .menu .options hr {
@@ -105,6 +102,10 @@ input.Number {
 					background-color: #08f;
 				}
 
+				#menubar .menu .options .option:active {
+					color: #666;
+					background: transparent;
+				}
 
 #sidebar {
 	position: absolute;
@@ -124,6 +125,10 @@ input.Number {
 
 	#sidebar .Panel {
 		margin-bottom: 10px;
+	}
+
+	#sidebar .Panel.collapsed {
+		margin-bottom: 0px;
 	}
 
 	#sidebar > .Panel {
@@ -157,5 +162,3 @@ input.Number {
 	#toolbar button {
 		margin-right: 6px;
 	}
-
-

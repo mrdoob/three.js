@@ -34,6 +34,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script>
 
 			var camera, scene, renderer;
@@ -47,6 +50,7 @@
 			target = new THREE.Vector3();
 
 			init();
+			animate();
 
 			function init() {
 
@@ -77,7 +81,7 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 300, 300, 300, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 300, 300, 300, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
 				mesh.scale.x = - 1;
 				scene.add( mesh );
 
@@ -107,22 +111,18 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-
 			}
 
 			function loadTexture( path ) {
 
 				var texture = new THREE.Texture( texture_placeholder );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var image = new Image();
 				image.onload = function () {
 
+					texture.image = this;
 					texture.needsUpdate = true;
-					material.map.image = this;
-
-					render();
 
 				};
 				image.src = path;
@@ -147,11 +147,10 @@
 
 			function onDocumentMouseMove( event ) {
 
-				if ( isUserInteracting ) {
+				if ( isUserInteracting === true ) {
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
 					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
-					render();
 
 				}
 
@@ -160,7 +159,6 @@
 			function onDocumentMouseUp( event ) {
 
 				isUserInteracting = false;
-				render();
 
 			}
 
@@ -168,8 +166,6 @@
 
 				camera.fov -= event.wheelDeltaY * 0.05;
 				camera.updateProjectionMatrix();
-
-				render();
 
 			}
 
@@ -199,13 +195,24 @@
 					lon = ( onPointerDownPointerX - event.touches[0].pageX ) * 0.1 + onPointerDownLon;
 					lat = ( event.touches[0].pageY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 
-					render();
-
 				}
 
 			}
 
-			function render() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+				update();
+
+			}
+
+			function update() {
+
+				if ( isUserInteracting === false ) {
+
+					lon += 0.1;
+
+				}
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.Math.degToRad( 90 - lat );

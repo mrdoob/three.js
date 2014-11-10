@@ -125,7 +125,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				renderer.shadowMapEnabled = true;
 
@@ -159,7 +158,7 @@
 
 				loader.load( "models/ctm/ben.ctm",   function( geometry ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
 					checkTime();
 
@@ -201,11 +200,11 @@
 					uniforms[ "enableDiffuse" ].value = true;
 					uniforms[ "enableSpecular" ].value = true;
 
-					uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-					uniforms[ "uSpecularColor" ].value.setHex( specular );
-					uniforms[ "uAmbientColor" ].value.setHex( ambient );
+					uniforms[ "diffuse" ].value.setHex( diffuse );
+					uniforms[ "specular" ].value.setHex( specular );
+					uniforms[ "ambient" ].value.setHex( ambient );
 
-					uniforms[ "uShininess" ].value = shininess;
+					uniforms[ "shininess" ].value = shininess;
 
 					uniforms[ "wrapRGB" ].value.set( 0.75, 0.5, 0.5 );
 

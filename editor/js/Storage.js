@@ -1,6 +1,15 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Storage = function () {
 
 	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
+	if ( indexedDB === undefined  ) {
+		console.warn( 'Storage: IndexedDB not available.' );
+		return { init: function (){}, get: function (){}, set: function (){}, clear: function (){} };
+	}
 
 	var name = 'threejs-editor';
 	var version = 1;
@@ -35,7 +44,7 @@ var Storage = function () {
 				console.error( 'IndexedDB', event );
 
 			};
-			
+
 
 		},
 
@@ -54,12 +63,14 @@ var Storage = function () {
 
 		set: function ( data, callback ) {
 
+			var start = performance.now();
+
 			var transaction = database.transaction( [ 'states' ], 'readwrite' );
 			var objectStore = transaction.objectStore( 'states' );
 			var request = objectStore.put( data, 0 );
 			request.onsuccess = function ( event ) {
 
-				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to IndexedDB.' );
+				console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to IndexedDB. ' + ( performance.now() - start ).toFixed( 2 ) + 'ms' );
 
 			};
 
@@ -73,7 +84,7 @@ var Storage = function () {
 			request.onsuccess = function ( event ) {
 
 				callback();
-			
+
 			};
 
 		}

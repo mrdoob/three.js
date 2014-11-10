@@ -17,241 +17,287 @@
 
 		<h3>[name]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
 		<div>
-		x -- todo <br />
-		y -- todo <br />
-		z -- todo <br />
-		w -- todo
-		</div>
-		<div>
-		todo
+		x -- [page:Float] <br />
+		y -- [page:Float] <br />
+		z -- [page:Float] <br />
+		w -- [page:Float]
 		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Float x]</h3>
+		<h3>[property:Float x]</h3>
 
-		<h3>.[page:Float y]</h3>
+		<h3>[property:Float y]</h3>
 
-		<h3>.[page:Float z]</h3>
+		<h3>[property:Float z]</h3>
 
-		<h3>.[page:Float w]</h3>
+		<h3>[property:Float w]</h3>
 
 
 		<h2>Methods</h2>
 
-		<h3>.set( [page:Float x], [page:Float y], [page:Float z], [page:Float w] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 set]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] ) [page:Vector4 this]</h3>
 		<div>
 		Sets value of this vector.
 		</div>
 
-		<h3>.copy( [page:Vector4 v] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 copy]( [page:Vector4 v] ) [page:Vector4 this]</h3>
 		<div>
 		Copies value of *v* to this vector.
 		</div>
 
-		<h3>.add( [page:Vector4 v] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 add]( [page:Vector4 v] ) [page:Vector4 this]</h3>
 		<div>
 		Adds *v* to this vector.
 		</div>
 
-		<h3>.addVectors( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 addVectors]( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4 this]</h3>
 		<div>
 		Sets this vector to *a + b*.
 		</div>
 
-		<h3>.sub( [page:Vector4 v] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 sub]( [page:Vector4 v] )</h3>
 		<div>
 		Subtracts *v* from this vector.
 		</div>
 
-		<h3>.subVectors( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 subVectors]( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4 this]</h3>
 		<div>
 		Sets this vector to *a - b*.
 		</div>
 
-		<h3>.multiplyScalar( [page:Float s] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 multiplyScalar]( [page:Float s] ) [page:Vector4 this]</h3>
 		<div>
 		Multiplies this vector by scalar *s*.
 		</div>
 
-		<h3>.divideScalar( [page:Float s] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 divideScalar]( [page:Float s] ) [page:Vector4 this]</h3>
 		<div>
 		Divides this vector by scalar *s*.<br />
 		Set vector to *( 0, 0, 0 )* if *s == 0*.
 		</div>
 
-		<h3>.negate() [page:Vector4]</h3>
+		<h3>[method:Vector4 negate]() [page:Vector4 this]</h3>
 		<div>
 		Inverts this vector.
 		</div>
 
-		<h3>.dot( [page:Vector4 v] ) [page:Float]</h3>
+		<h3>[method:Float dot]( [page:Vector4 v] )</h3>
 		<div>
 		Computes dot product of this vector and *v*.
 		</div>
 
-		<h3>.lengthSq() [page:Float]</h3>
+		<h3>[method:Float lengthSq]()</h3>
 		<div>
 		Computes squared length of this vector.
 		</div>
 
-		<h3>.length() [page:Float]</h3>
+		<h3>[method:Float length]()</h3>
 		<div>
 		Computes length of this vector.
 		</div>
 
-		<h3>.normalize() [page:Vector4]</h3>
+		<h3>[method:Vector4 normalize]() [page:Vector4 this]</h3>
 		<div>
 		Normalizes this vector.
 		</div>
 
-		<h3>.setLength( [page:Float l] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 setLength]( [page:Float l] ) [page:Vector4 this]</h3>
 		<div>
 		Normalizes this vector and multiplies it by *l*.
 		</div>
 
-		<h3>.lerp( [page:Vector4 v], [page:Float alpha] ) [page:Vector4]</h3>
+		<h3>[method:Vector4 lerp]( [page:Vector4 v], [page:Float alpha] ) [page:Vector4 this]</h3>
 		<div>
 		Linearly interpolate between this vector and *v* with *alpha* factor.
 		</div>
 
-		<h3>.clone() [page:Vector4]</h3>
+		<h3>[method:Vector4 clone]()</h3>
 		<div>
 		Clones this vector.
 		</div>
 
 
-		<h3>.clamp([page:todo min], [page:todo max]) [page:todo]</h3>
+		<h3>[method:Vector4 clamp]([page:Vector4 min], [page:Vector4 max]) [page:Vector4 this]</h3>
 		<div>
-		min -- todo <br />
-		max -- todo
+		min -- [page:Vector4] <br />
+		max -- [page:Vector4]
 		</div>
 		<div>
-		todo
+		If this vector's x, y, z, or w value is greater than the max vector's x, y, z, or w value, it is replaced by the corresponding value.<br/><br/>
+
+		If this vector's x, y, z, or w value is less than the min vector's x, y, z, or w value, it is replace by the corresponding value.
 		</div>
 
-		<h3>.toArray() [page:todo]</h3>
+		<h3>[method:Vector4 clampScalar]([page:Float min], [page:Float max]) [page:Vector4 this]</h3>
 		<div>
-		todo
+		min -- [page:Float] the minimum value the components will be clamped to <br />
+		max -- [page:Float] the maximum value the components will be clamped to
+		</div>
+		<div>
+		If this vector's x, y, z or w values are greater than the max value, they are replaced by the max value. <br />
+		If this vector's x, y, z or w values are less than the min value, they are replace by the min value.
 		</div>
 
-		<h3>.applyMatrix4([page:todo m]) [page:todo]</h3>
+		<h3>[method:Vector4 floor]()</h3>
 		<div>
-		m -- todo
-		</div>
-		<div>
-		todo
+		The components of the vector are rounded downwards (towards negative infinity) to an integer value.
 		</div>
 
-		<h3>.min([page:todo v]) [page:todo]</h3>
+		<h3>[method:Vector4 ceil]()</h3>
 		<div>
-		v -- todo
-		</div>
-		<div>
-		todo
+		The components of the vector are rounded upwards (towards positive infinity) to an integer value.
 		</div>
 
-		<h3>.max([page:todo v]) [page:todo]</h3>
+		<h3>[method:Vector4 round]()</h3>
 		<div>
-		v -- todo
-		</div>
-		<div>
-		todo
+		The components of the vector are rounded towards the nearest integer value.
 		</div>
 
-		<h3>.setAxisAngleFromRotationMatrix([page:todo m]) [page:todo]</h3>
+		<h3>[method:Vector4 roundToZero]()</h3>
 		<div>
-		m -- todo
-		</div>
-		<div>
-		todo
+		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</div>
 
-		<h3>.addScalar([page:todo s]) [page:todo]</h3>
+		<h3>[method:Vector4 applyMatrix4]([page:Matrix4 m]) [page:Vector4 this]</h3>
 		<div>
-		s -- todo
+		m -- [page:Matrix4]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.equals([page:todo v]) [page:todo]</h3>
-		<div>
-		v -- todo
-		</div>
-		<div>
-		todo
+		Transforms the vector by the matrix.
 		</div>
 
-		<h3>.setAxisAngleFromQuaternion([page:todo q]) [page:todo]</h3>
+		<h3>[method:Vector4 min]([page:Vector4 v]) [page:Vector4 this]</h3>
 		<div>
-		q -- todo
+		v -- [page:Vector4]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.setW([page:todo w]) [page:todo]</h3>
-		<div>
-		w -- todo
-		</div>
-		<div>
-		todo
+		If this vector's x, y, z, or w value is less than vector v's x, y, z, or w value, that value is replaced by the corresponding vector v value.
 		</div>
 
-		<h3>.getComponent([page:todo index]) [page:todo]</h3>
+		<h3>[method:Vector4 max]([page:Vector4 v]) [page:Vector4 this]</h3>
 		<div>
-		index -- todo
+		v -- [page:Vector4]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.fromArray([page:todo array]) [page:todo]</h3>
-		<div>
-		array -- todo
-		</div>
-		<div>
-		todo
+		If this vector's x, y, z, or w value is greater than vector v's x, y, z, or w value, that value is replaced by the corresponding vector v value. 
 		</div>
 
-		<h3>.lengthManhattan() [page:todo]</h3>
+		<h3>[method:Vector4 addScalar]([page:Float s]) [page:Vector4 this]</h3>
 		<div>
-		todo
+		s -- [page:Float]
+		</div>
+		<div>
+		Adds a scalar value to all of the vector's components.
 		</div>
 
-		<h3>.setComponent([page:todo index], [page:todo value]) [page:todo]</h3>
+		<h3>[method:Boolean equals]([page:Vector4 v])</h3>
 		<div>
-		index -- todo <br />
-		value -- todo
+		v -- [page:Vector4]
 		</div>
 		<div>
-		todo
+		Checks to see if this vector matches vector v.
+		</div>
+		
+		<h3>[method:Vector4 setAxisAngleFromRotationMatrix]([page:Matrix4 m]) [page:Vector4 this]</h3>
+		<div>
+		m -- [page:Matrix4]
+		</div>
+		<div>
+		Sets this Vector4 to the computed <a href='http://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation' target='_blank'>axis-angle representation</a> of the rotation defined by Matrix4 m. Assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled).<br/><br/>
+
+		The axis is stored in components (x, y, z) of the vector, and the rotation in radians is stored in component w
 		</div>
 
-		<h3>.setX([page:todo x]) [page:todo]</h3>
+		<h3>[method:Vector4 setAxisAngleFromQuaternion]([page:Quaternion q]) [page:Vector4 this]</h3>
 		<div>
-		x -- todo
+		q -- [page:Quaternion]
 		</div>
 		<div>
-		todo
+		Sets this Vector4 to the computed <a href='http://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation' target='_blank'>axis-angle representation</a> of the rotation defined by Quaternion q.<br/><br/>
+
+		The axis is stored in components (x, y, z) of the vector, and the rotation in radians is stored in component w
 		</div>
 
-		<h3>.setY([page:todo y]) [page:todo]</h3>
+		<h3>[method:Float getComponent]([page:Integer index])</h3>
 		<div>
-		y -- todo
+		index -- [page:Integer] 0, 1, 2, or 3
 		</div>
 		<div>
-		todo
+		Returns the value of the vector component x, y, or z by an index.<br/><br/>
+
+		Index 0: x<br/>
+		Index 1: y<br/>
+		Index 2: z<br/>
+		Index 3: w<br/>
+ 
 		</div>
 
-		<h3>.setZ([page:todo z]) [page:todo]</h3>
+		<h3>[method:null setComponent]([page:Integer index], [page:Float value])</h3>
 		<div>
-		z -- todo
+		index -- [page:Integer] 0 - 3 <br />
+		value -- [page:Float]
 		</div>
 		<div>
-		todo
+		Sets the value of the vector component	x, y, or z by an index.<br/><br/>
+		
+		Index 0: x<br/>
+		Index 1: y<br/>
+		Index 2: z<br/>
+		Index 3: w<br/>
+		</div>
+		
+		<h3>[method:Vector4 fromArray]([page:Array array]) [page:Vector4 this]</h3>
+		<div>
+		array -- [page:Array] An array formatted [x, y, z, w]
+		</div>
+		<div>
+		Sets the vector's components based on an array formatted like [x, y, z, w]
+		</div>
+
+		<h3>[method:Array toArray]()</h3>
+		<div>
+		Returns an array in the format [x, y, z, w]
+		</div>
+
+		<h3>[method:Float lengthManhattan]()</h3>
+		<div>
+		Computes Manhattan length of this vector.<br />
+		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
+		</div>
+
+
+		<h3>[method:Vector4 setX]([page:Float x]) [page:Vector4 this]</h3>
+		<div>
+		x -- [page:Float]
+		</div>
+		<div>
+		Sets the x component of the vector.
+		</div>
+
+		<h3>[method:Vector4 setY]([page:Float y]) [page:Vector4 this]</h3>
+		<div>
+		y -- [page:Float]
+		</div>
+		<div>
+		Sets the y component of the vector.
+		</div>
+
+		<h3>[method:Vector4 setZ]([page:Float z]) [page:Vector4 this]</h3>
+		<div>
+		z -- [page:Float]
+		</div>
+		<div>
+		Sets the z component of the vector.
+		</div>
+
+		<h3>[method:Vector4 setW]([page:Float w]) [page:Vector4 this]</h3>
+		<div>
+		w -- [page:Float]
+		</div>
+		<div>
+		Sets the w component of the vector.
 		</div>
 
 		<h2>Source</h2>
