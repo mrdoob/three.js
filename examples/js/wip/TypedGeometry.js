@@ -19,6 +19,7 @@ THREE.TypedGeometry = function ( size ) {
 };
 
 THREE.TypedGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.TypedGeometry.prototype.constructor = THREE.TypedGeometry;
 
 THREE.TypedGeometry.prototype.setArrays = function ( vertices, normals, uvs ) {
 

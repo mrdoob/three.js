@@ -73,3 +73,4 @@ THREE.CircleTypedGeometry = function ( radius, segments, thetaStart, thetaLength
 };
 
 THREE.CircleTypedGeometry.prototype = Object.create( THREE.IndexedTypedGeometry.prototype );
+THREE.CircleTypedGeometry.prototype.constructor = THREE.CircleTypedGeometry;

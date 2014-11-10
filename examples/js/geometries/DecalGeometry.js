@@ -261,3 +261,4 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 }
 
 THREE.DecalGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.DecalGeometry.prototype.constructor = THREE.DecalGeometry;
