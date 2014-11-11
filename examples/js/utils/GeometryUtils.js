@@ -72,7 +72,7 @@ THREE.GeometryUtils = {
 	// Get random point in face (triangle)
 	// (uniform distribution)
 
-	randomPointInFace: function ( face, geometry, useCachedAreas ) {
+	randomPointInFace: function ( face, geometry ) {
 
 		var vA, vB, vC;
 
