@@ -98,7 +98,7 @@ THREE.GeometryUtils = {
 			il = faces.length,
 			totalArea = 0,
 			cumulativeAreas = [],
-			vA, vB, vC, vD;
+			vA, vB, vC;
 
 		// precompute face areas
 
