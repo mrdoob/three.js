@@ -34,6 +34,7 @@ THREE.Cursor = function ( object, renderer ) {
 		euler: new THREE.Euler(),
 		quaternion: new THREE.Quaternion()
 	};
+	this.maxFOV = 35;
 	this.deltaEuler = new THREE.Euler();
 	this.mouseDeltaX = 0;
 	this.mouseDeltaY = 0;
@@ -63,57 +64,34 @@ THREE.Cursor = function ( object, renderer ) {
 	this.update = function() {
 		var differenceQuaternion;
 		var cameraInverse;
-
-		var quatAngle;
 		var quatAxis;
-
-		var mouseQuat = scope.mouseQuat;
+		var deltaAngle;
 
 		if ( this.pointerLocked ) {
 
-			cameraInverse = new THREE.Quaternion().copy( this.object.quaternion ).inverse();
-			differenceQuaternion = new THREE.Quaternion().copy( scope.quaternion ).multiply( cameraInverse );
-			quatAxis = quaternionAxis( differenceQuaternion ).normalize();
-
-			quatAngle = quaternionAngle( differenceQuaternion ) / 2;
+			// Angle between camera and cursor
 			deltaAngle = quaternionsAngle( scope.object.quaternion, scope.quaternion ) * ( 180 / Math.PI ) ;
-
 			//console.log("ANGLE " + deltaAngle);
 
-			if ( deltaAngle >= 35 && !scope.locked) {
-				differenceQuaternion.setFromAxisAngle( quatAxis, 35 * Math.PI / 180  );
+			if ( deltaAngle >= scope.maxFOV && !scope.locked) {
+				// Calculates the quaternion to go from camera orientation to the current cursor
+				// http://stackoverflow.com/questions/22157435/difference-between-the-two-quaternions
+				cameraInverse = new THREE.Quaternion().copy( this.object.quaternion ).inverse();
+				differenceQuaternion = new THREE.Quaternion().copy( scope.quaternion ).multiply( cameraInverse );
+				quatAxis = quaternionAxis( differenceQuaternion ).normalize();
+				// It locks the cursor position to maxFOV from the FOV center.
+				// Quick rotations of the head might bring the cursor beyond maxFOV
+				differenceQuaternion.setFromAxisAngle( quatAxis, scope.maxFOV * Math.PI / 180  );
 				scope.locked = scope.locked || differenceQuaternion;
 			}
 
+			// In sync with the camera orientation and locked to the edge of the FOV
 			if (scope.locked) {
 				scope.quaternion.copy( scope.object.quaternion ).multiply( scope.locked );
-				if ( scope.mouseDeltaX !== 0 || scope.mouseDeltaY !==0 ) {
-					scope.deltaEuler.set( scope.mouseDeltaX * 2 * Math.PI, scope.mouseDeltaY * 2 * Math.PI, 0 );
-					scope.deltaQuaternion.setFromEuler( scope.deltaEuler, true );
-					mouseQuat.copy( scope.quaternion ).multiply( scope.deltaQuaternion );
-					scope.mouseDeltaX = 0;
-					scope.mouseDeltaY = 0;
-					deltaAngle = quaternionsAngle( scope.object.quaternion, mouseQuat ) * ( 180 / Math.PI );
-					if ( deltaAngle < 35) {
-						scope.quaternion.multiply( scope.deltaQuaternion );
-						scope.locked = false;
-					}
-				}
-			} else if ( scope.mouseDeltaX !== 0 || scope.mouseDeltaY !== 0 ) {
-				scope.deltaEuler.set( scope.mouseDeltaX * 2 * Math.PI, scope.mouseDeltaY * 2 * Math.PI, 0 );
-				scope.deltaQuaternion.setFromEuler( scope.deltaEuler, true );
-				mouseQuat.copy( scope.quaternion ).multiply( scope.deltaQuaternion );
-				scope.mouseDeltaX = 0;
-				scope.mouseDeltaY = 0;
-				deltaAngle = quaternionsAngle( scope.object.quaternion, mouseQuat ) * ( 180 / Math.PI );
-				if ( deltaAngle < 35) {
-					scope.quaternion.multiply( scope.deltaQuaternion );
-					// differenceQuaternion = new THREE.Quaternion().copy( mouseQuat ).multiply( cameraInverse );
-					// quatAxis = quaternionAxis( differenceQuaternion ).normalize();
-					// scope.deltaQuaternion.setFromAxisAngle( quatAxis, 35 * Math.PI / 180 );
-					// scope.locked = scope.deltaQuaternion;
-				}
 			}
+
+			// Updates the cursor to take into account mouse movement
+			this.updateMousePosition();
 
 			scope.matrixAutoUpdate = false;
 			scope.updateMatrix();
@@ -122,6 +100,23 @@ THREE.Cursor = function ( object, renderer ) {
 			scope.matrixAutoUpdate = true;
 			this.cursor.position.x = this.mouseVector.x;
 			this.cursor.position.y = -this.mouseVector.y;
+		}
+	};
+
+	this.updateMousePosition = function() {
+		var mouseQuat = scope.mouseQuat;
+		var deltaAngle;
+		if ( scope.mouseDeltaX !== 0 || scope.mouseDeltaY !==0 ) {
+			scope.deltaEuler.set( scope.mouseDeltaX * 2 * Math.PI, scope.mouseDeltaY * 2 * Math.PI, 0 );
+			scope.deltaQuaternion.setFromEuler( scope.deltaEuler, true );
+			mouseQuat.copy( scope.quaternion ).multiply( scope.deltaQuaternion );
+			scope.mouseDeltaX = 0;
+			scope.mouseDeltaY = 0;
+			deltaAngle = quaternionsAngle( scope.object.quaternion, mouseQuat ) * ( 180 / Math.PI );
+			if ( deltaAngle < scope.maxFOV) {
+				scope.quaternion.multiply( scope.deltaQuaternion );
+				scope.locked = false;
+			}
 		}
 	};
 
