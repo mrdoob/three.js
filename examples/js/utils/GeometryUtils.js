@@ -166,7 +166,7 @@ THREE.GeometryUtils = {
 
 			index = binarySearchIndices( r );
 
-			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
+			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry );
 
 			if ( ! stats[ index ] ) {
 
