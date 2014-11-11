@@ -8,7 +8,7 @@ var THREE = { REVISION: '70dev' };
 
 if ( typeof module === 'object' ) {
 
-	module.exports = THREE;
+  module.exports = THREE;
 
 }
 
@@ -16,11 +16,11 @@ if ( typeof module === 'object' ) {
 
 if ( Math.sign === undefined ) {
 
-	Math.sign = function ( x ) {
+  Math.sign = function ( x ) {
 
-		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
+    return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
 
-	};
+  };
 
 }
 

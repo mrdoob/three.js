@@ -77,16 +77,9 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
 				"vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
-				"#ifdef HDR_INPUT_LOGLUV",
-					"float fLastLum = HDRDecodeLOGLUV( lastLum ).r;",
-					"float fCurrentLum = HDRDecodeLOGLUV( currentLum ).r;",
-				"#elif defined( HDR_INPUT_RGBM )",
-					"float fLastLum = HDRDecodeRGBM( lastLum ).r;",
-					"float fCurrentLum = HDRDecodeRGBM( currentLum ).r;",
-				"#else",
-					"float fLastLum = lastLum.r;",
-					"float fCurrentLum = currentLum.r;",
-				"#endif",
+				
+				"float fLastLum = lastLum.r;",
+				"float fCurrentLum = currentLum.r;",
 				
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
