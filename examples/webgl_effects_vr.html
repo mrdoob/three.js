@@ -48,6 +48,9 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/Cursor.js"></script>
+
 		<script src="js/controls/MouseControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
@@ -59,6 +62,7 @@
 			var camera, scene, raycaster, renderer;
 			var vrEffect;
 			var vrControls;
+			var cursor;
 			var mouseControls;
 			var headControls;
 
@@ -84,6 +88,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
+				scene.add( camera );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -116,12 +121,33 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 
+				cursor = new THREE.Cursor( camera, renderer);
+
 				var fullScreenButton = document.querySelector( '.full-screen' );
 				var mouseLookButton = document.querySelector( '.mouse-look' );
 				var mouseLook = false;
 
+			  document.exitPointerLock = document.exitPointerLock    ||
+                               document.mozExitPointerLock ||
+                               document.webkitExitPointerLock;
+
+        renderer.domElement.requestPointerLock = renderer.domElement.requestPointerLock ||
+        renderer.domElement.mozRequestPointerLock ||
+        renderer.domElement.webkitRequestPointerLock;
+
+      	function lockPointer() {
+	        var pointerLockElement =
+	          document.pointerLockElement ||
+	          document.mozPointerLockElement ||
+	          document.webkitPointerLockElement;
+	        if ( !pointerLockElement ) {
+	          renderer.domElement.requestPointerLock();
+	        }
+      	}
+
 				fullScreenButton.onclick = function() {
 					vrEffect.setFullScreen( true );
+					lockPointer();
 				};
 
 				vrControls = new THREE.VRControls(camera);
@@ -189,8 +215,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
+				cursor.update();
+				cursor.render();
 				stats.update();
 
 			}

@@ -39,14 +39,19 @@
         background-color: red;
       }
 
-      .lock-pointer {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-      }
-
       .button.enabled {
         background-color: red;
+      }
+
+      .button.error {
+        pointer-events: none;
+        background-color: red;
+      }
+
+      .menu {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
       }
 
     </style>
@@ -58,7 +63,12 @@
     </div>
 
     <div id="container">
-      <div class="button lock-pointer">Lock Pointer</div>
+      <div class="menu">
+        <div class="button lock-pointer" style="display: none">Lock Pointer</div>
+        <div class="button full-screen">Start VR Mode</div>
+      </div>
+    </div>
+
     </div>
 
     <script src="../build/three.js"></script>
@@ -66,7 +76,8 @@
     <script src="js/Cursor.js"></script>
 
     <script src="js/controls/MouseControls.js"></script>
-
+    <script src="js/effects/VREffect.js"></script>
+    <script src="js/controls/VRControls.js"></script>
     <script src="js/libs/stats.min.js"></script>
 
     <script>
@@ -80,6 +91,11 @@
       var offset = new THREE.Vector3( 10, 10, 10 );
       var cursor;
       var lockPointerButton = document.querySelector('.lock-pointer');
+      var fullScreenButton = document.querySelector( '.full-screen' );
+      var vrEffect;
+      var vrControls;
+      var vrMode;
+      var mouseLook = true;
 
       lockPointerButton.onclick = lockPointer;
 
@@ -126,7 +142,7 @@
 
         container = document.getElementById( "container" );
 
-        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
         controls = new THREE.MouseControls( camera );
         controls.rotateSpeed = 1.0;
@@ -170,18 +186,23 @@
 
         }
 
-        var geom = new THREE.BoxGeometry( 1, 1, 1 );
+        var geom = new THREE.BoxGeometry( 20, 20, 20 );
         var color = new THREE.Color();
+
+        var colors = [ 0x00ff00, 0x0000ff ]
 
         var matrix = new THREE.Matrix4();
         var quaternion = new THREE.Quaternion();
 
-        for ( var i = 0; i < 50; i ++ ) {
+
+        for ( var i = 0; i < 500; i ++ ) {
 
           var position = new THREE.Vector3();
-          position.x = Math.random() * 10000 - 5000;
-          position.y = Math.random() * 6000 - 3000;
-          position.z = Math.random() * 8000 - 4000;
+          position.x = Math.random() * 800 - 400;
+          position.y = Math.random() * 800 - 400;
+          position.z = Math.random() * 800 - 400;
+          position.z = position.z < 0 && position.z > -100 ? -100: position.z;
+          position.z = position.z > 0 && position.z < 100 ? 100: position.z;
 
           var rotation = new THREE.Euler();
           rotation.x = Math.random() * 2 * Math.PI;
@@ -189,16 +210,16 @@
           rotation.z = Math.random() * 2 * Math.PI;
 
           var scale = new THREE.Vector3();
-          scale.x = Math.random() * 200 + 100;
-          scale.y = Math.random() * 200 + 100;
-          scale.z = Math.random() * 200 + 100;
+          scale.x = Math.random() + 0.5;
+          scale.y = Math.random() + 0.5;
+          scale.z = Math.random() + 0.5;
 
           quaternion.setFromEuler( rotation, false );
           matrix.compose( position, quaternion, scale );
 
           // give the geom's vertices a random color, to be displayed
 
-          applyVertexColors( geom, color.setHex( Math.random() * 0xffffff ) );
+          applyVertexColors( geom, color.setHex( colors[Math.floor(Math.random() * 2)] ) );
 
           geometry.merge( geom, matrix );
 
@@ -216,9 +237,26 @@
 
           };
 
+          function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            vrEffect.setSize( window.innerWidth, window.innerHeight );
+
+          }
+
+          window.addEventListener( 'resize', onWindowResize, false );
+
         }
 
-        var drawnObject = new THREE.Mesh( geometry, defaultMaterial );
+        var materials = [
+          new THREE.MeshNormalMaterial()
+          //new THREE.MeshBasicMaterial( { color: 0xeeeeee, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+        ];
+
+        drawnObject = THREE.SceneUtils.createMultiMaterialObject( geometry, materials )
+
         scene.add( drawnObject );
 
         pickingScene.add( new THREE.Mesh( pickingGeometry, pickingMaterial ) );
@@ -241,6 +279,35 @@
         container.appendChild( stats.domElement );
 
         cursor = new THREE.Cursor( camera, renderer );
+        vrControls = new THREE.VRControls(camera);
+        vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
+        vrMode = false;
+        function VREffectLoaded(error) {
+          if (error) {
+            fullScreenButton.innerHTML = error;
+            fullScreenButton.classList.add('error');
+          }
+        }
+
+        fullScreenButton.onclick = function() {
+          mouseLook = false;
+          vrEffect.setFullScreen( true );
+          vrMode = true;
+          lockPointer();
+        };
+
+        var fullScreenChange =
+          renderer.domElement.mozRequestFullScreen? 'mozfullscreenchange' : 'webkitfullscreenchange';
+
+        document.addEventListener( fullScreenChange, onFullScreenChanged, false );
+        function onFullScreenChanged() {
+          if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
+            document.exitPointerLock();
+            vrMode = false;
+            mouseLook = true;
+          }
+        }
+
         scene.add( camera );
 
         renderer.domElement.addEventListener( 'mousemove', onMouseMove );
@@ -310,13 +377,27 @@
 
       function render() {
 
-        controls.update();
-        cursor.update();
+        if (mouseLook) {
+          controls.update();
+        } else {
+          vrControls.update();
+        }
         //pick();
-        renderer.render( scene, camera );
+        if (vrMode) {
+          vrEffect.render( scene, camera );
+        } else {
+          renderer.render( scene, camera );
+        }
+        cursor.update();
         cursor.render();
 
       }
+
+      document.addEventListener( 'keydown', function ( event ) {
+        if (event.keyCode === 90) {
+          vrControls.zeroSensor();
+        }
+      });
 
     </script>
 
