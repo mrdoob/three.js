@@ -55,6 +55,154 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 };
 
 
+/**
+ * Test if the ray is intersecting a single trinagle of the mesh. 
+ * @param {number}  faceIndex        Index of the face that should be tested
+ * @param {number}  bufferGeometryIndexOffset    
+ * @param {Ray}     ray               Ray with applied reverse mesh.matrixWorld. Test if this ray is intersecting the Face.    
+ * @param {number}  precision         Min distance of the intersection point to the ray origin.
+ * @param {number}  near              Min distance of the intersection point to the ray origin.
+ * @param {number}  far               Max distance of the intersection point to the ray origin.
+ * @param {Object[]}  intersects      Result array of correct intersection points.
+ */
+THREE.Mesh.prototype.rayIntersectsFace = function() {
+
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
+	var originalOrigin = new THREE.Vector3();
+	var a, b, c, tmpFace;
+			
+	return function(faceIndex, bufferGeometryIndexOffset, ray, precision, near, far,  intersects) {
+
+		var geometry = this.geometry;
+			
+		var material = this.material;
+		if ( material === undefined ) return;
+				
+								
+		if ( geometry instanceof THREE.BufferGeometry ) {	
+			
+			var attributes = geometry.attributes;
+			var positions = attributes.position.array;				
+		
+			// Indexed-BufferGeometry
+			if ( attributes.index !== undefined ) {
+
+				var indices = attributes.index.array;
+				
+				a = ( indices[ faceIndex*3 ] )     + bufferGeometryIndexOffset ;
+				b = ( indices[ faceIndex*3 + 1 ] ) + bufferGeometryIndexOffset ;
+				c = ( indices[ faceIndex*3 + 2 ] ) + bufferGeometryIndexOffset ;
+											
+			} else {
+				
+				a = faceIndex*3 ;
+				b = faceIndex*3 + 1;
+				c = faceIndex*3 + 2;
+				
+			}
+			
+			vA.fromArray( positions, a *3 );
+			vB.fromArray( positions, b *3 );
+			vC.fromArray( positions, c *3 );	
+			
+			tmpFace = new THREE.Face3( a,b,c, THREE.Triangle.normal( vA, vB, vC ) );							
+			
+		} else if ( this.geometry instanceof THREE.Geometry ) {
+			
+			tmpFace = geometry.faces[ faceIndex ];	
+			
+			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
+			var objectMaterials = (isFaceMaterial === true ? this.material.materials : null);
+			material = (isFaceMaterial === true ? objectMaterials[ tmpFace.materialIndex ] : this.material);
+
+			if ( material === undefined ) return;
+			
+			vertices = geometry.vertices;
+			
+				a = vertices[ tmpFace.a ];
+				b = vertices[ tmpFace.b ];
+				c = vertices[ tmpFace.c ];
+
+				vA.set( 0, 0, 0 );
+				vB.set( 0, 0, 0 );
+				vC.set( 0, 0, 0 );
+
+				if ( material.morphTargets === true ) {
+
+					var morphTargets = geometry.morphTargets;
+					var morphInfluences = this.morphTargetInfluences;
+
+					for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+						var influence = morphInfluences[ t ];
+
+						if ( influence === 0 ) return;
+
+						var targets = morphTargets[ t ].vertices;
+
+						vA.x += ( targets[ tmpFace.a ].x - a.x ) * influence;
+						vA.y += ( targets[ tmpFace.a ].y - a.y ) * influence;
+						vA.z += ( targets[ tmpFace.a ].z - a.z ) * influence;
+
+						vB.x += ( targets[ tmpFace.b ].x - b.x ) * influence;
+						vB.y += ( targets[ tmpFace.b ].y - b.y ) * influence;
+						vB.z += ( targets[ tmpFace.b ].z - b.z ) * influence;
+
+						vC.x += ( targets[ tmpFace.c ].x - c.x ) * influence;
+						vC.y += ( targets[ tmpFace.c ].y - c.y ) * influence;
+						vC.z += ( targets[ tmpFace.c ].z - c.z ) * influence;
+
+					}
+
+				}
+				
+				vA.add( a );
+				vB.add( b );
+				vC.add( c );			
+				
+		} else {
+			console.warn('rayIntersectsFace: The type of the geometry is not supported.');
+			return;
+		}
+		
+			
+		if ( material.side === THREE.BackSide ) {
+
+			var intersectionPoint = ray.intersectTriangle( vC, vB, vA, true );
+
+		} else {
+
+			var intersectionPoint = ray.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+
+		}
+
+		if ( intersectionPoint === null ) return;
+
+		intersectionPoint.applyMatrix4( this.matrixWorld );
+		
+		// To calculate the correct distance we need to calculate the distance between the world intersection point 
+		// and the world ray origin.  (If we didn't do that the distance will be off by the object scaling factor.)    
+		originalOrigin.copy(ray.origin).applyMatrix4( this.matrixWorld );
+		var distance = originalOrigin.distanceTo( intersectionPoint );
+
+		if ( distance < precision || distance < near || distance > far ) return;
+		
+
+		intersects.push( {
+
+			distance: distance,
+			point: intersectionPoint,
+			face: tmpFace,
+			faceIndex: faceIndex,
+			object: this
+
+		} );		
+	};
+}();
+
+
 THREE.Mesh.prototype.raycast = ( function () {
 
 	var inverseMatrix = new THREE.Matrix4();
