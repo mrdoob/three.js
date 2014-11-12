@@ -22,7 +22,6 @@
 	"src/core/EventDispatcher.js",
 	"src/core/Raycaster.js",
 	"src/core/Object3D.js",
-	"src/core/Projector.js",
 	"src/core/Face3.js",
 	"src/core/Face4.js",
 	"src/core/BufferAttribute.js",
