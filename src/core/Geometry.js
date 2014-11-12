@@ -140,7 +140,12 @@ THREE.Geometry.prototype = {
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
 			scope.faces.push( new THREE.Face3( a, b, c, vertexNormals, vertexColors ) );
-			scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ], tempUVs[ b ], tempUVs[ c ] ] );
+
+			if ( uvs !== undefined ) {
+
+				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+
+			}
 
 		};
 
@@ -161,7 +166,7 @@ THREE.Geometry.prototype = {
 			}
 
 		}
-		
+
 		this.computeFaceNormals();
 
 		if ( geometry.boundingBox !== null ) {
@@ -656,13 +661,28 @@ THREE.Geometry.prototype = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+				uvCopy.push( uv[ j ].clone() );
 
 			}
 
 			uvs1.push( uvCopy );
 
 		}
+
+	},
+
+	mergeMesh: function ( mesh ) {
+
+		if ( mesh instanceof THREE.Mesh === false ) {
+
+			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
+			return;
+
+		}
+
+		mesh.matrixAutoUpdate && mesh.updateMatrix();
+
+		this.merge( mesh.geometry, mesh.matrix );
 
 	},
 

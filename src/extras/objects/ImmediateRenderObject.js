@@ -11,3 +11,4 @@ THREE.ImmediateRenderObject = function () {
 };
 
 THREE.ImmediateRenderObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.ImmediateRenderObject.prototype.constructor = THREE.ImmediateRenderObject;

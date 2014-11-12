@@ -1,77 +1,78 @@
 /**
  * @author dmarcos / https://github.com/dmarcos
+ * @author mrdoob / http://mrdoob.com
  */
 
-THREE.VRControls = function ( camera, done ) {
+THREE.VRControls = function ( object, callback ) {
 
-	this._camera = camera;
+	var scope = this;
 
-	this._init = function () {
-		var self = this;
-		if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
-			if ( done ) {
-				done("Your browser is not VR Ready");
+	var vrInput;
+
+	var onVRDevices = function ( devices ) {
+
+		for ( var i = 0; i < devices.length; i ++ ) {
+
+			var device = devices[ i ];
+
+			if ( device instanceof PositionSensorVRDevice ) {
+
+				vrInput = devices[ i ];
+				return; // We keep the first we encounter
+
 			}
-			return;
+
 		}
-		if ( navigator.getVRDevices ) {
-			navigator.getVRDevices().then( gotVRDevices );
-		} else {
-			navigator.mozGetVRDevices( gotVRDevices );
+
+		if ( callback !== undefined ) {
+
+			callback( 'HMD not available' );
+
 		}
-		function gotVRDevices( devices ) {
-			var vrInput;
-			var error;
-			for ( var i = 0; i < devices.length; ++i ) {
-				if ( devices[i] instanceof PositionSensorVRDevice ) {
-					vrInput = devices[i]
-					self._vrInput = vrInput;
-					break; // We keep the first we encounter
-				}
-			}
-			if ( done ) {
-				if ( !vrInput ) {
-				 error = 'HMD not available';
-				}
-				done( error );
-			}
-		}
+
 	};
 
-	this._init();
+	if ( navigator.getVRDevices !== undefined ) {
 
-	this.update = function() {
-		var camera = this._camera;
-		var quat;
-		var vrState = this.getVRState();
-		if ( !vrState ) {
-			return;
+		navigator.getVRDevices().then( onVRDevices );
+
+	} else if ( callback !== undefined ) {
+
+		callback( 'Your browser is not VR Ready' );
+
+	}
+
+	// the Rift SDK returns the position in meters
+	// this scale factor allows the user to define how meters
+	// are converted to scene units.
+	this.scale = 1;
+
+	this.update = function () {
+
+		if ( vrInput === undefined ) return;
+
+		var state = vrInput.getState();
+
+		if ( state.orientation !== null ) {
+
+			object.quaternion.copy( state.orientation );
+
 		}
-		// Applies head rotation from sensors data.
-		if ( camera ) {
-			camera.quaternion.fromArray( vrState.hmd.rotation );
+
+		if ( state.position !== null ) {
+
+			object.position.copy( state.position ).multiplyScalar( scope.scale );
+
 		}
+
 	};
 
-	this.getVRState = function() {
-		var vrInput = this._vrInput;
-		var orientation;
-		var vrState;
-		if ( !vrInput ) {
-			return null;
-		}
-		orientation	= vrInput.getState().orientation;
-		vrState = {
-			hmd : {
-				rotation : [
-					orientation.x,
-					orientation.y,
-					orientation.z,
-					orientation.w
-				]
-			}
-		};
-		return vrState;
+	this.zeroSensor = function () {
+
+		if ( vrInput === undefined ) return;
+
+		vrInput.zeroSensor();
+
 	};
 
 };

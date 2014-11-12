@@ -288,6 +288,27 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
+				case 'Line':
+
+					var geometry = geometries[ data.geometry ];
+					var material = materials[ data.material ];
+
+					if ( geometry === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
+
+					}
+
+					if ( material === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
+
+					}
+
+					object = new THREE.Line( geometry, material );
+
+					break;
+
 				case 'Sprite':
 
 					var material = materials[ data.material ];

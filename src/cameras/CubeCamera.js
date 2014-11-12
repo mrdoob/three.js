@@ -77,3 +77,4 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 };
 
 THREE.CubeCamera.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CubeCamera.prototype.constructor = THREE.CubeCamera;

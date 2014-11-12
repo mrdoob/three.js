@@ -695,6 +695,11 @@ THREE.Object3D.prototype = {
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
 
+			} else if ( object instanceof THREE.Line ) {
+
+				data.geometry = parseGeometry( object.geometry );
+				data.material = parseMaterial( object.material );
+
 			} else if ( object instanceof THREE.Sprite ) {
 
 				data.material = parseMaterial( object.material );

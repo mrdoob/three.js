@@ -1064,7 +1064,7 @@ THREE.SceneLoader.prototype = {
 
 			for ( parID in matJSON.parameters ) {
 
-				if ( parID === "envMap" || parID === "map" || parID === "lightMap" || parID === "bumpMap" ) {
+				if ( parID === "envMap" || parID === "map" || parID === "lightMap" || parID === "bumpMap" || parID === "alphaMap" ) {
 
 					matJSON.parameters[ parID ] = result.textures[ matJSON.parameters[ parID ] ];
 

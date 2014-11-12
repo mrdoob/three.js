@@ -22,6 +22,7 @@ THREE.CSS2DObject = function ( element ) {
 };
 
 THREE.CSS2DObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 
 //
 

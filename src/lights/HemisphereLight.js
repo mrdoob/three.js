@@ -16,6 +16,7 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 };
 
 THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
+THREE.HemisphereLight.prototype.constructor = THREE.HemisphereLight;
 
 THREE.HemisphereLight.prototype.clone = function () {
 
