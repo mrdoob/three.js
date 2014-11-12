@@ -169,6 +169,13 @@ THREE.RGBAFormat = 1021;
 THREE.LuminanceFormat = 1022;
 THREE.LuminanceAlphaFormat = 1023;
 
+// HDR formats
+
+THREE.RGBMHDRFormat = 1024;
+THREE.RGBDHDRFormat = 1025;
+THREE.RGBEHDRFormat = 1026;
+THREE.LogLuvHDRFormat = 1027;
+
 // DDS / ST3C Compressed texture formats
 
 THREE.RGB_S3TC_DXT1_Format = 2001;

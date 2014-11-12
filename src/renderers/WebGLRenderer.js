@@ -4710,6 +4710,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.envMap && uniforms.envMap.value && material.envMap.hdrFormat !== uniforms.envMap.value.hdrFormat ) {
+			material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrFormat;
+			material.needsUpdate = true;
+		}
 		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 

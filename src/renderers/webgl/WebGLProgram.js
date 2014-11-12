@@ -128,6 +128,11 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
+				"HDR_TYPE_RGBM " + THREE.HDRRGBM,
+				"HDR_TYPE_RGBD " + THREE.HDRRGBD,
+				"HDR_TYPE_RGBE " + THREE.HDRRGBE,
+				"HDR_TYPE_LOGLUV " + THREE.HDRLogLuv,
+				
 				parameters.supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
