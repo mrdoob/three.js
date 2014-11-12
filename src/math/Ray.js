@@ -325,7 +325,7 @@ THREE.Ray.prototype = {
 
 	isIntersectionBox: function () {
 
-		var v = new THREE.Vector3();
+		var v  = new THREE.Vector3();
 
 		return function ( box ) {
 
@@ -334,8 +334,30 @@ THREE.Ray.prototype = {
 		};
 
 	}(),
+	
+	intersectBox: function () {
+		
+		var hitPointNear = new THREE.Vector3(),
+		    hitPointFar = new THREE.Vector3(),
+		    isHitPointNearVisible;		
+		
+		return function ( box , optionalTarget ) {
+		
+			if ( this.intersectBoxAndGetHitPoints( box , hitPointNear, hitPointFar, isHitPointNearVisible ) === false ) {
+	
+	 			 return null;
+	
+			}
+			
+			optionalTarget = optionalTarget || new THREE.Vector3();
+			optionalTarget.copy( ( isHitPointNearVisible ? hitPointNear : hitPointFar ) );		
+			return optionalTarget;
+		
+		}
+		
+	}(),
 
-	intersectBox: function ( box , optionalTarget ) {
+	intersectBoxAndGetHitPoints: function ( box , hitPointNear, hitPointFar, isHitPointNearVisible ) {
 
 		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
@@ -369,7 +391,7 @@ THREE.Ray.prototype = {
 			tymax = ( box.min.y - origin.y ) * invdiry;
 		}
 
-		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
+		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return false;
 
 		// These lines also handle the case where tmin or tmax is NaN
 		// (result of 0 * Infinity). x !== x returns true if x is NaN
@@ -389,7 +411,7 @@ THREE.Ray.prototype = {
 			tzmax = ( box.min.z - origin.z ) * invdirz;
 		}
 
-		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
+		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return false;
 
 		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
 
@@ -397,10 +419,13 @@ THREE.Ray.prototype = {
 
 		//return point closest to the ray (positive side)
 
-		if ( tmax < 0 ) return null;
+		if ( tmax < 0 ) return false;
 
-		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
+		this.at( tmin, hitPointNear );
+		this.at( tmax, hitPointFar );
 
+        isHitPointNearVisible = (tmin >= 0);
+		return true;
 	},
 
 	intersectTriangle: function () {
