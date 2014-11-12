@@ -10274,6 +10274,7 @@ THREE.Camera = function () {
 };
 
 THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Camera.prototype.constructor = THREE.Camera;
 
 THREE.Camera.prototype.getWorldDirection = function () {
 
@@ -10400,6 +10401,7 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 };
 
 THREE.CubeCamera.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CubeCamera.prototype.constructor = THREE.CubeCamera;
 
 // File:src/cameras/OrthographicCamera.js
 
@@ -10428,6 +10430,7 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 };
 
 THREE.OrthographicCamera.prototype = Object.create( THREE.Camera.prototype );
+THREE.OrthographicCamera.prototype.constructor = THREE.OrthographicCamera;
 
 THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
@@ -10487,6 +10490,7 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 };
 
 THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
+THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
 
 
 /**
@@ -10623,6 +10627,7 @@ THREE.Light = function ( color ) {
 };
 
 THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Light.prototype.constructor = THREE.Light;
 
 THREE.Light.prototype.clone = function ( light ) {
 
@@ -10651,6 +10656,7 @@ THREE.AmbientLight = function ( color ) {
 };
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
+THREE.AmbientLight.prototype.constructor = THREE.AmbientLight;
 
 THREE.AmbientLight.prototype.clone = function () {
 
@@ -10690,6 +10696,7 @@ THREE.AreaLight = function ( color, intensity ) {
 };
 
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
+THREE.AreaLight.prototype.constructor = THREE.AreaLight;
 
 
 // File:src/lights/DirectionalLight.js
@@ -10757,6 +10764,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 };
 
 THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
+THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
 
 THREE.DirectionalLight.prototype.clone = function () {
 
@@ -10827,6 +10835,7 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 };
 
 THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
+THREE.HemisphereLight.prototype.constructor = THREE.HemisphereLight;
 
 THREE.HemisphereLight.prototype.clone = function () {
 
@@ -10859,6 +10868,7 @@ THREE.PointLight = function ( color, intensity, distance ) {
 };
 
 THREE.PointLight.prototype = Object.create( THREE.Light.prototype );
+THREE.PointLight.prototype.constructor = THREE.PointLight;
 
 THREE.PointLight.prototype.clone = function () {
 
@@ -10920,6 +10930,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
 };
 
 THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
+THREE.SpotLight.prototype.constructor = THREE.SpotLight;
 
 THREE.SpotLight.prototype.clone = function () {
 
@@ -11666,6 +11677,7 @@ THREE.JSONLoader = function ( showStatus ) {
 };
 
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
+THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
 
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
@@ -12261,7 +12273,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader();
+		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
@@ -12342,7 +12354,7 @@ THREE.MaterialLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader();
+		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
@@ -12369,7 +12381,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.uniforms !== undefined ) material.uniforms = json.uniforms;
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
-		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;		
+		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 		if ( json.shading !== undefined ) material.shading = json.shading;
 		if ( json.blending !== undefined ) material.blending = json.blending;
@@ -13199,6 +13211,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 };
 
 THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.LineBasicMaterial.prototype.constructor = THREE.LineBasicMaterial;
 
 THREE.LineBasicMaterial.prototype.clone = function () {
 
@@ -13268,6 +13281,7 @@ THREE.LineDashedMaterial = function ( parameters ) {
 };
 
 THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.LineDashedMaterial.prototype.constructor = THREE.LineDashedMaterial;
 
 THREE.LineDashedMaterial.prototype.clone = function () {
 
@@ -13370,6 +13384,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 };
 
 THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
 
 THREE.MeshBasicMaterial.prototype.clone = function () {
 
@@ -13499,6 +13514,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 };
 
 THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshLambertMaterial.prototype.constructor = THREE.MeshLambertMaterial;
 
 THREE.MeshLambertMaterial.prototype.clone = function () {
 
@@ -13652,6 +13668,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 };
 
 THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshPhongMaterial.prototype.constructor = THREE.MeshPhongMaterial;
 
 THREE.MeshPhongMaterial.prototype.clone = function () {
 
@@ -13741,6 +13758,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 };
 
 THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshDepthMaterial.prototype.constructor = THREE.MeshDepthMaterial;
 
 THREE.MeshDepthMaterial.prototype.clone = function () {
 
@@ -13791,6 +13809,7 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 };
 
 THREE.MeshNormalMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshNormalMaterial.prototype.constructor = THREE.MeshNormalMaterial;
 
 THREE.MeshNormalMaterial.prototype.clone = function () {
 
@@ -13911,6 +13930,7 @@ THREE.PointCloudMaterial = function ( parameters ) {
 };
 
 THREE.PointCloudMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.PointCloudMaterial.prototype.constructor = THREE.PointCloudMaterial;
 
 THREE.PointCloudMaterial.prototype.clone = function () {
 
@@ -14027,6 +14047,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 };
 
 THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 
 THREE.ShaderMaterial.prototype.clone = function () {
 
@@ -14077,6 +14098,7 @@ THREE.RawShaderMaterial = function ( parameters ) {
 };
 
 THREE.RawShaderMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
+THREE.RawShaderMaterial.prototype.constructor = THREE.RawShaderMaterial;
 
 THREE.RawShaderMaterial.prototype.clone = function () {
 
@@ -14129,6 +14151,7 @@ THREE.SpriteMaterial = function ( parameters ) {
 };
 
 THREE.SpriteMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.SpriteMaterial.prototype.constructor = THREE.SpriteMaterial;
 
 THREE.SpriteMaterial.prototype.clone = function () {
 
@@ -14278,6 +14301,7 @@ THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilt
 };
 
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
+THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
 THREE.CubeTexture.clone = function ( texture ) {
 
@@ -14317,6 +14341,7 @@ THREE.CompressedTexture = function ( mipmaps, width, height, format, type, mappi
 };
 
 THREE.CompressedTexture.prototype = Object.create( THREE.Texture.prototype );
+THREE.CompressedTexture.prototype.constructor = THREE.CompressedTexture;
 
 THREE.CompressedTexture.prototype.clone = function () {
 
@@ -14343,6 +14368,7 @@ THREE.DataTexture = function ( data, width, height, format, type, mapping, wrapS
 };
 
 THREE.DataTexture.prototype = Object.create( THREE.Texture.prototype );
+THREE.DataTexture.prototype.constructor = THREE.DataTexture;
 
 THREE.DataTexture.prototype.clone = function () {
 
@@ -14385,6 +14411,7 @@ THREE.VideoTexture = function ( video, mapping, wrapS, wrapT, magFilter, minFilt
 };
 
 THREE.VideoTexture.prototype = Object.create( THREE.Texture.prototype );
+THREE.VideoTexture.prototype.constructor = THREE.VideoTexture;
 
 // File:src/objects/Group.js
 
@@ -14401,6 +14428,7 @@ THREE.Group = function () {
 };
 
 THREE.Group.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Group.prototype.constructor = THREE.Group;
 
 // File:src/objects/PointCloud.js
 
@@ -14422,6 +14450,7 @@ THREE.PointCloud = function ( geometry, material ) {
 };
 
 THREE.PointCloud.prototype = Object.create( THREE.Object3D.prototype );
+THREE.PointCloud.prototype.constructor = THREE.PointCloud;
 
 THREE.PointCloud.prototype.raycast = ( function () {
 
@@ -14594,6 +14623,7 @@ THREE.LineStrip = 0;
 THREE.LinePieces = 1;
 
 THREE.Line.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Line.prototype.constructor = THREE.Line;
 
 THREE.Line.prototype.raycast = ( function () {
 
@@ -14697,6 +14727,7 @@ THREE.Mesh = function ( geometry, material ) {
 };
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Mesh.prototype.constructor = THREE.Mesh;
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
@@ -15018,6 +15049,7 @@ THREE.Bone = function ( belongsToSkin ) {
 };
 
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Bone.prototype.constructor = THREE.Bone;
 
 
 // File:src/objects/Skeleton.js
@@ -15287,6 +15319,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 
 THREE.SkinnedMesh.prototype = Object.create( THREE.Mesh.prototype );
+THREE.SkinnedMesh.prototype.constructor = THREE.SkinnedMesh;
 
 THREE.SkinnedMesh.prototype.bind = function( skeleton, bindMatrix ) {
 
@@ -15407,6 +15440,7 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 };
 
 THREE.MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
+THREE.MorphAnimMesh.prototype.constructor = THREE.MorphAnimMesh;
 
 THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 
@@ -15610,6 +15644,7 @@ THREE.LOD = function () {
 
 
 THREE.LOD.prototype = Object.create( THREE.Object3D.prototype );
+THREE.LOD.prototype.constructor = THREE.LOD;
 
 THREE.LOD.prototype.addLevel = function ( object, distance ) {
 
@@ -15755,6 +15790,7 @@ THREE.Sprite = ( function () {
 } )();
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Sprite.prototype.constructor = THREE.Sprite;
 
 THREE.Sprite.prototype.raycast = ( function () {
 
@@ -15824,6 +15860,7 @@ THREE.LensFlare = function ( texture, size, distance, blending, color ) {
 };
 
 THREE.LensFlare.prototype = Object.create( THREE.Object3D.prototype );
+THREE.LensFlare.prototype.constructor = THREE.LensFlare;
 
 
 /*
@@ -15901,6 +15938,7 @@ THREE.Scene = function () {
 };
 
 THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Scene.prototype.constructor = THREE.Scene;
 
 THREE.Scene.prototype.clone = function ( object ) {
 
@@ -24257,6 +24295,7 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 };
 
 THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
+THREE.WebGLRenderTargetCube.prototype.constructor = THREE.WebGLRenderTargetCube;
 
 // File:src/renderers/webgl/WebGLExtensions.js
 
@@ -26913,6 +26952,7 @@ THREE.Audio = function ( listener ) {
 };
 
 THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Audio.prototype.constructor = THREE.Audio;
 
 THREE.Audio.prototype.load = function ( file ) {
 
@@ -26989,6 +27029,7 @@ THREE.AudioListener = function () {
 };
 
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
+THREE.AudioListener.prototype.constructor = THREE.AudioListener;
 
 THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
@@ -27354,6 +27395,7 @@ THREE.Curve.Utils = {
 THREE.Curve.create = function ( constructor, getPointFunc ) {
 
 	constructor.prototype = Object.create( THREE.Curve.prototype );
+	constructor.prototype.constructor = constructor;
 	constructor.prototype.getPoint = getPointFunc;
 
 	return constructor;
@@ -27381,6 +27423,7 @@ THREE.CurvePath = function () {
 };
 
 THREE.CurvePath.prototype = Object.create( THREE.Curve.prototype );
+THREE.CurvePath.prototype.constructor = THREE.CurvePath;
 
 THREE.CurvePath.prototype.add = function ( curve ) {
 
@@ -27701,6 +27744,7 @@ THREE.Gyroscope = function () {
 };
 
 THREE.Gyroscope.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Gyroscope.prototype.constructor = THREE.Gyroscope;
 
 THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 
@@ -27778,6 +27822,7 @@ THREE.Path = function ( points ) {
 };
 
 THREE.Path.prototype = Object.create( THREE.CurvePath.prototype );
+THREE.Path.prototype.constructor = THREE.Path;
 
 THREE.PathActions = {
 
@@ -28454,6 +28499,7 @@ THREE.Shape = function () {
 };
 
 THREE.Shape.prototype = Object.create( THREE.Path.prototype );
+THREE.Shape.prototype.constructor = THREE.Shape;
 
 // Convenience method to return ExtrudeGeometry
 
@@ -29026,6 +29072,7 @@ THREE.LineCurve = function ( v1, v2 ) {
 };
 
 THREE.LineCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.LineCurve.prototype.constructor = THREE.LineCurve;
 
 THREE.LineCurve.prototype.getPoint = function ( t ) {
 
@@ -29068,6 +29115,7 @@ THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
 };
 
 THREE.QuadraticBezierCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.QuadraticBezierCurve.prototype.constructor = THREE.QuadraticBezierCurve;
 
 
 THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
@@ -29111,6 +29159,7 @@ THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
 };
 
 THREE.CubicBezierCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.CubicBezierCurve.prototype.constructor = THREE.CubicBezierCurve;
 
 THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
@@ -29150,6 +29199,7 @@ THREE.SplineCurve = function ( points /* array of Vector2 */ ) {
 };
 
 THREE.SplineCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.SplineCurve.prototype.constructor = THREE.SplineCurve;
 
 THREE.SplineCurve.prototype.getPoint = function ( t ) {
 
@@ -29195,6 +29245,7 @@ THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle
 };
 
 THREE.EllipseCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.EllipseCurve.prototype.constructor = THREE.EllipseCurve;
 
 THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 
@@ -29236,6 +29287,7 @@ THREE.ArcCurve = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise 
 };
 
 THREE.ArcCurve.prototype = Object.create( THREE.EllipseCurve.prototype );
+THREE.ArcCurve.prototype.constructor = THREE.ArcCurve;
 
 // File:src/extras/curves/LineCurve3.js
 
@@ -30481,6 +30533,7 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 };
 
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
 // File:src/extras/geometries/CircleGeometry.js
 
@@ -30542,6 +30595,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 };
 
 THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.CircleGeometry.prototype.constructor = THREE.CircleGeometry;
 
 // File:src/extras/geometries/CubeGeometry.js
 
@@ -30726,6 +30780,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 }
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
 
 // File:src/extras/geometries/ExtrudeGeometry.js
 
@@ -30783,6 +30838,7 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 };
 
 THREE.ExtrudeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
 
 THREE.ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
 	var sl = shapes.length;
@@ -31436,6 +31492,7 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 };
 
 THREE.ShapeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ShapeGeometry.prototype.constructor = THREE.ShapeGeometry;
 
 /**
  * Add an array of shapes to THREE.ShapeGeometry.
@@ -31646,6 +31703,7 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 };
 
 THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.LatheGeometry.prototype.constructor = THREE.LatheGeometry;
 
 // File:src/extras/geometries/PlaneGeometry.js
 
@@ -31674,6 +31732,7 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 };
 
 THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
 
 // File:src/extras/geometries/PlaneBufferGeometry.js
 
@@ -31772,6 +31831,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 };
 
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
 
 // File:src/extras/geometries/RingGeometry.js
 
@@ -31856,6 +31916,7 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 };
 
 THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.RingGeometry.prototype.constructor = THREE.RingGeometry;
 
 
 // File:src/extras/geometries/SphereGeometry.js
@@ -31972,6 +32033,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 };
 
 THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
 
 // File:src/extras/geometries/TextGeometry.js
 
@@ -32036,6 +32098,7 @@ THREE.TextGeometry = function ( text, parameters ) {
 };
 
 THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
+THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
 // File:src/extras/geometries/TorusGeometry.js
 
@@ -32117,6 +32180,7 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 };
 
 THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
 
 // File:src/extras/geometries/TorusKnotGeometry.js
 
@@ -32232,6 +32296,7 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 };
 
 THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
 
 // File:src/extras/geometries/TubeGeometry.js
 
@@ -32370,6 +32435,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 };
 
 THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.TubeGeometry.prototype.constructor = THREE.TubeGeometry;
 
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
@@ -32755,6 +32821,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 };
 
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
 
 // File:src/extras/geometries/DodecahedronGeometry.js
 
@@ -32813,6 +32880,7 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.DodecahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;
 
 // File:src/extras/geometries/IcosahedronGeometry.js
 
@@ -32848,6 +32916,7 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
 
 // File:src/extras/geometries/OctahedronGeometry.js
 
@@ -32881,6 +32950,7 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.OctahedronGeometry.prototype.constructor = THREE.OctahedronGeometry;
 
 // File:src/extras/geometries/TetrahedronGeometry.js
 
@@ -32910,6 +32980,7 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.TetrahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.TetrahedronGeometry.prototype.constructor = THREE.TetrahedronGeometry;
 
 // File:src/extras/geometries/ParametricGeometry.js
 
@@ -32997,6 +33068,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 };
 
 THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ParametricGeometry.prototype.constructor = THREE.ParametricGeometry;
 
 // File:src/extras/helpers/AxisHelper.js
 
@@ -33032,6 +33104,7 @@ THREE.AxisHelper = function ( size ) {
 };
 
 THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.AxisHelper.prototype.constructor = THREE.AxisHelper;
 
 // File:src/extras/helpers/ArrowHelper.js
 
@@ -33088,6 +33161,7 @@ THREE.ArrowHelper = ( function () {
 }() );
 
 THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.ArrowHelper.prototype.constructor = THREE.ArrowHelper;
 
 THREE.ArrowHelper.prototype.setDirection = ( function () {
 
@@ -33163,6 +33237,7 @@ THREE.BoxHelper = function ( object ) {
 };
 
 THREE.BoxHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
 
 THREE.BoxHelper.prototype.update = function ( object ) {
 
@@ -33265,6 +33340,7 @@ THREE.BoundingBoxHelper = function ( object, hex ) {
 };
 
 THREE.BoundingBoxHelper.prototype = Object.create( THREE.Mesh.prototype );
+THREE.BoundingBoxHelper.prototype.constructor = THREE.BoundingBoxHelper;
 
 THREE.BoundingBoxHelper.prototype.update = function () {
 
@@ -33384,6 +33460,7 @@ THREE.CameraHelper = function ( camera ) {
 };
 
 THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
 THREE.CameraHelper.prototype.update = function () {
 
@@ -33517,6 +33594,7 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 };
 
 THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.DirectionalLightHelper.prototype.constructor = THREE.DirectionalLightHelper;
 
 THREE.DirectionalLightHelper.prototype.dispose = function () {
 
@@ -33635,6 +33713,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 };
 
 THREE.EdgesHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.EdgesHelper.prototype.constructor = THREE.EdgesHelper;
 
 // File:src/extras/helpers/FaceNormalsHelper.js
 
@@ -33674,6 +33753,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 };
 
 THREE.FaceNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.FaceNormalsHelper.prototype.constructor = THREE.FaceNormalsHelper;
 
 THREE.FaceNormalsHelper.prototype.update = function () {
 
@@ -33745,6 +33825,7 @@ THREE.GridHelper = function ( size, step ) {
 };
 
 THREE.GridHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.GridHelper.prototype.constructor = THREE.GridHelper;
 
 THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
 
@@ -33793,6 +33874,7 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 };
 
 THREE.HemisphereLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.HemisphereLightHelper.prototype.constructor = THREE.HemisphereLightHelper;
 
 THREE.HemisphereLightHelper.prototype.dispose = function () {
 	this.lightSphere.geometry.dispose();
@@ -33861,6 +33943,7 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 };
 
 THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
+THREE.PointLightHelper.prototype.constructor = THREE.PointLightHelper;
 
 THREE.PointLightHelper.prototype.dispose = function () {
 
@@ -33934,6 +34017,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 
 THREE.SkeletonHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.SkeletonHelper.prototype.constructor = THREE.SkeletonHelper;
 
 THREE.SkeletonHelper.prototype.getBoneList = function( object ) {
 
@@ -34022,6 +34106,7 @@ THREE.SpotLightHelper = function ( light ) {
 };
 
 THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.SpotLightHelper.prototype.constructor = THREE.SpotLightHelper;
 
 THREE.SpotLightHelper.prototype.dispose = function () {
 	this.cone.geometry.dispose();
@@ -34097,6 +34182,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 };
 
 THREE.VertexNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.VertexNormalsHelper.prototype.constructor = THREE.VertexNormalsHelper;
 
 THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
 
@@ -34198,6 +34284,7 @@ THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 };
 
 THREE.VertexTangentsHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.VertexTangentsHelper.prototype.constructor = THREE.VertexTangentsHelper;
 
 THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
 
@@ -34430,6 +34517,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 };
 
 THREE.WireframeHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.WireframeHelper.prototype.constructor = THREE.WireframeHelper;
 
 // File:src/extras/objects/ImmediateRenderObject.js
 
@@ -34446,6 +34534,7 @@ THREE.ImmediateRenderObject = function () {
 };
 
 THREE.ImmediateRenderObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.ImmediateRenderObject.prototype.constructor = THREE.ImmediateRenderObject;
 
 // File:src/extras/objects/MorphBlendMesh.js
 
@@ -34478,6 +34567,7 @@ THREE.MorphBlendMesh = function( geometry, material ) {
 };
 
 THREE.MorphBlendMesh.prototype = Object.create( THREE.Mesh.prototype );
+THREE.MorphBlendMesh.prototype.constructor = THREE.MorphBlendMesh;
 
 THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fps ) {
 
