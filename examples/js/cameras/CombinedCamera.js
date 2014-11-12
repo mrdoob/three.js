@@ -34,6 +34,7 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 };
 
 THREE.CombinedCamera.prototype = Object.create( THREE.Camera.prototype );
+THREE.CombinedCamera.prototype.constructor = THREE.CombinedCamera;
 
 THREE.CombinedCamera.prototype.toPerspective = function () {
 
@@ -66,7 +67,7 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 
 	var hyperfocus = ( near + far ) / 2;
 
-	var halfHeight = Math.tan( fov / 2 ) * hyperfocus;
+	var halfHeight = Math.tan( fov * Math.PI / 180 / 2 ) * hyperfocus;
 	var planeHeight = 2 * halfHeight;
 	var planeWidth = planeHeight * aspect;
 	var halfWidth = planeWidth / 2;

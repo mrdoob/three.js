@@ -90,3 +90,4 @@ THREE.PlaneGeometry99 = function ( width, height, widthSegments, heightSegments 
 };
 
 THREE.PlaneGeometry99.prototype = Object.create( THREE.Geometry99.prototype );
+THREE.PlaneGeometry99.prototype.constructor = THREE.PlaneGeometry99;
