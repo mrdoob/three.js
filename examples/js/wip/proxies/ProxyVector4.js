@@ -11,6 +11,7 @@ THREE.ProxyVector4 = function ( array, offset ) {
 };
 
 THREE.ProxyVector4.prototype = Object.create( THREE.Vector4.prototype );
+THREE.ProxyVector4.prototype.constructor = THREE.ProxyVector4;
 
 Object.defineProperties( THREE.ProxyVector4.prototype, {
 	'x': {

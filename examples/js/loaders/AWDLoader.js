@@ -116,8 +116,7 @@ THREE.AWDLoader = (function (){
   };
 
 
-  AWDLoader.prototype = new THREE.Loader();
-
+  AWDLoader.prototype = Object.create( THREE.Loader.prototype );
   AWDLoader.prototype.constructor = AWDLoader;
 
   AWDLoader.prototype.load = function ( url, callback ) {
