@@ -14,6 +14,7 @@ THREE.PVRLoader = function () {
 };
 
 THREE.PVRLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
+THREE.PVRLoader.prototype.constructor = THREE.PVRLoader;
 
 
 THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {

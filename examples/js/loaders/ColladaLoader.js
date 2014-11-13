@@ -3174,6 +3174,7 @@ THREE.ColladaLoader = function () {
 	};
 
 	Polylist.prototype = Object.create( Polygons.prototype );
+	Polylist.prototype.constructor = Polylist;
 
 	function LineStrips() {
 
@@ -3184,6 +3185,7 @@ THREE.ColladaLoader = function () {
 	};
 
 	LineStrips.prototype = Object.create( Polygons.prototype );
+	LineStrips.prototype.constructor = LineStrips;
 
 	function Triangles () {
 
@@ -3194,6 +3196,7 @@ THREE.ColladaLoader = function () {
 	};
 
 	Triangles.prototype = Object.create( Polygons.prototype );
+	Triangles.prototype.constructor = Triangles;
 
 	function Accessor() {
 
