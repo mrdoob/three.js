@@ -84,6 +84,24 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		var envMapTypeDefine = null;
+		if ( parameters.envMap ) {
+			switch ( material.envMap.mapping ) {
+				case THREE.CubeReflectionMapping:
+				case THREE.CubeRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+					break;
+				case THREE.SphericalReflectionMapping:
+				case THREE.SphericalRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
+					break;
+				case THREE.EquirectangularReflectionMapping:
+				case THREE.EquirectangularRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_EQUIREC";
+					break;
+			}
+		}
+
 		// console.log( "building new program " );
 
 		//
@@ -233,6 +251,7 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
+				envMapTypeDefine ? "#define " + envMapTypeDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
