@@ -906,7 +906,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				deleteBuffers( geometry );
+
 			}
+
 		}
 
 		// TOFIX: Workaround for deleted geometry being currently bound
@@ -1122,25 +1124,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			nlines    = faces3.length * 3,
 
 			material = getBufferMaterial( object, geometryGroup );
-
-		// START_VEROLD_MOD - quad wireframes
-		if ( geometry.faceEdgeMasks !== undefined ) {
-
-			nlines = 0;
-
-			for ( var f = 0, fl = faces3.length; f < fl; f ++ ) {
-
-				var fi = faces3[ f ],
-					edgeMask = geometry.faceEdgeMasks[ fi ];
-
-				nlines += ( edgeMask & 1 ) ? 1 : 0;
-				nlines += ( edgeMask & 2 ) ? 1 : 0;
-				nlines += ( edgeMask & 4 ) ? 1 : 0;
-
-			}
-
-		}
-		// END_VEROLD_MOD - quad wireframes
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
 		geometryGroup.__normalArray = new Float32Array( nvertices * 3 );
@@ -2241,26 +2224,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				faceArray[ offset_face + 2 ] = vertexIndex + 2;
 
 				offset_face += 3;
-
-				// START_VEROLD_MOD - quad wireframes
-				var edgeMask = geometry.faceEdgeMasks !== undefined ? geometry.faceEdgeMasks[ fi ] : ~0;
-
-				if ( edgeMask & 1 ) {
-					lineArray[ offset_line++ ] = vertexIndex;
-					lineArray[ offset_line++ ] = vertexIndex + 1;
-				}
-
-				if ( edgeMask & 2 ) {
-					lineArray[ offset_line++ ] = vertexIndex + 1;
-					lineArray[ offset_line++ ] = vertexIndex + 2;
-				}
-
-				if ( edgeMask & 4 ) {
-					lineArray[ offset_line++ ] = vertexIndex;
-					lineArray[ offset_line++ ] = vertexIndex + 2;
-				}
-				// END_VEROLD_MOD - quad wireframes
-
 				vertexIndex += 3;
 
 			}
@@ -2792,16 +2755,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var index = geometry.attributes.index;
 
-			// START_VEROLD_MOD - wireframe
-
-			if ( wireframeBit && geometry.attributes.index_wireframe ) {
-
-				index = geometry.attributes.index_wireframe;
-				mode = _gl.LINES;
-
-			}
-			// END_VEROLD_MOD - wireframe
-
 			if ( index ) {
 
 				// indexed triangles
@@ -2837,7 +2790,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
 					_this.info.render.faces += index.array.length / 3;
 
-
 				} else {
 
 					// if there is more than 1 chunk
@@ -2848,25 +2800,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( var i = 0, il = offsetIndices.length; i < il; i ++ ) {
 
-						// START_VEROLD_MOD - wireframe
-						var offset = offsets[ offsetIndices[ i ] ];
-						var startIndex = offset.index;
-
-						if ( wireframeBit ) {
-
-							if ( offset.wireframe ) {
-
-								offset = offset.wireframe;
-
-							} else {
-
-								continue;
-
-							}
-
-						}
-						// END_VEROLD_MODE - wireframe
-
 						if ( updateBuffers ) {
 
 							setupVertexAttributes( material, program, geometry, startIndex );
@@ -2875,6 +2808,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						// render indexed triangles
+
 						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
 
 						_this.info.render.calls ++;
@@ -3110,6 +3044,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.vertexAttrib3fv( attributes.color, material.defaultAttributeValues.color );
 
 				}
+
 			}
 
 			// normals
@@ -3165,6 +3100,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.vertexAttrib2fv( attributes.uv2, material.defaultAttributeValues.uv2 );
 
 				}
+
 			}
 
 			if ( material.skinning &&
@@ -3584,11 +3520,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 			//END_VEROLD_MOD
 
-			// if ( !material.transparent && renderOpaque || material.transparent && renderTransparent ) {
 			renderObjects( opaqueObjects, camera, lights, fog, true, material );
 			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, false, material );
-			// }
 
 		} else {
 
@@ -3600,11 +3534,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderObjects( opaqueObjects, camera, lights, fog, false, material );
 			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
-			
+
 			// transparent pass (back-to-front order)
+
 			renderObjects( transparentObjects, camera, lights, fog, true, material );
 			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
-			
+
 		}
 
 		// custom render plugins (post pass)
@@ -3728,9 +3663,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 			else if ( overrideMaterial ) {
 				material = overrideMaterial;
+
 			} else {
 			//END_VEROLD_MOD
 				material = webglObject.material;
+
 				if ( ! material ) continue;
 
 				if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
