@@ -58,7 +58,7 @@
 				vec4 rgbcolor = vec4( 0.0, 0.0, 0.0, 0.0 );
 
 				if ( color.w > 0.0 ) {
-					float f = pow(2.0, color.w-0.5);
+					float f = pow(2.0, 127.0*(color.w-0.5));
 					rgbcolor.xyz = color.xyz * f;
 				}
 				return rgbcolor.xyz;
@@ -137,7 +137,7 @@
 
 				var loader = new THREE.RGBELoader();
 
-				var texture = loader.load( "textures/miranda_uncropped.hdr"/*"textures/beach_cross.hdr"*/, function( texture, textureData ){ 
+				var texture = loader.load( "textures/miranda_uncropped.hdr", function( texture, textureData ){ 
 					console.log( textureData.header ); // header string
 					console.log( [textureData.width, textureData.height] ); // dimensions
 					materialHDR = new THREE.ShaderMaterial( {
@@ -152,7 +152,7 @@
 
 					} );
 					quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( textureData.width, textureData.height ), materialHDR );
-					quad.position.z = -300;
+					quad.position.z = -100;
 					scene.add( quad );
 					animate();
 				} );
