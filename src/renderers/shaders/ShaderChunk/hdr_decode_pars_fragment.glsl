@@ -1,4 +1,4 @@
-#if defined( ENVMAP_HDR_INPUT ) || defined( LIGHTMAP_HDR_INPUT )
+#if defined( ENVMAP_HDR_INPUT )
 
   // #ifdef HDR_TYPE_LOGLUV
 

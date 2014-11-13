@@ -128,11 +128,6 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
-				"HDR_TYPE_RGBM " + THREE.HDRRGBM,
-				"HDR_TYPE_RGBD " + THREE.HDRRGBD,
-				"HDR_TYPE_RGBE " + THREE.HDRRGBE,
-				"HDR_TYPE_LOGLUV " + THREE.HDRLogLuv,
-				
 				parameters.supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
@@ -238,6 +233,11 @@ THREE.WebGLProgram = ( function () {
 				( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
 				customDefines,
+
+				"#define HDR_TYPE_RGBM " + THREE.HDRRGBM,
+				"#define HDR_TYPE_RGBD " + THREE.HDRRGBD,
+				"#define HDR_TYPE_RGBE " + THREE.HDRRGBE,
+				"#define HDR_TYPE_LOGLUV " + THREE.HDRLogLuv,
 
 				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,

@@ -65,7 +65,7 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/HDRDecodeShader.js"></script>
+		<!-- <script src="js/shaders/HDRDecodeShader.js"></script> -->
 		<script src="js/shaders/ToneMapShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
@@ -180,7 +180,7 @@
 					middleGrey: 0.6,
 					maxLuminance: 16,
 					avgLuminance: 1,
-					bloomAmount: 2.0,
+					bloomAmount: 0.0,
 					sceneLight: 2.0,
 					// clear: function() {
 					// 	removeDecals();
@@ -263,18 +263,18 @@
 					fragmentShader: pBGShader,
 					depthTest: false,
 					// color: 0xffffff
-					hdrOutput: false,
+					// hdrOutput: false,
 					blending: THREE.NoBlending
 				} );
 
-				var hdrUrl = 'textures/hdr/rgbmTest.png';
+				// var hdrUrl = 'textures/hdr/rgbmTest.png';
 
-				var textureHdr = THREE.ImageUtils.loadTexture( hdrUrl, undefined, function( tex ) {
-					tex.format = THREE.RGBAFormat;
-					tempBackgroundMat.uniforms.map.value = tex;
-					tempBackgroundMat.needsUpdate = true;
-					// console.dir( tex );
-				} );
+				// var textureHdr = THREE.ImageUtils.loadTexture( hdrUrl, undefined, function( tex ) {
+				// 	tex.format = THREE.RGBAFormat;
+				// 	tempBackgroundMat.uniforms.map.value = tex;
+				// 	tempBackgroundMat.needsUpdate = true;
+				// 	// console.dir( tex );
+				// } );
 				
 				var quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), tempBackgroundMat );
 				quadBG.position.z = -500;
@@ -282,19 +282,18 @@
 				sceneBG.add( quadBG );
 
 				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
+				// shader.uniforms[ "tCube" ].value = textureCube;
 
-				var material = new THREE.ShaderMaterial( {
+				var skyboxMaterial = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
 					depthWrite: false,
-					side: THREE.BackSide
-
+					side: THREE.BackSide,
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), skyboxMaterial );
 				sceneCube.add( mesh );
 
 				//
@@ -303,8 +302,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
-				renderer.hdrEnabled = true;
-				renderer.hdrType = THREE.RGBMHDR;
+				// renderer.hdrEnabled = true;
+				// renderer.hdrType = THREE.RGBMHDR;
 				renderer.gammaInput = false;
 				renderer.gammaOutput = false;
 
@@ -318,9 +317,9 @@
 				effectComposer = new THREE.EffectComposer( renderer, renderTarget );
   			effectComposer.setSize( window.innerWidth, window.innerHeight );
 				var bgPass = new THREE.RenderPass( sceneBG, cameraBG );
-				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, true, false );
-				var sceneTransparentPass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, false, true );
-				sceneTransparentPass.clear = false;
+				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined );
+				// var sceneTransparentPass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined, false, true );
+				// sceneTransparentPass.clear = false;
 				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
   			scenePass.clear = false;
   			
@@ -334,7 +333,7 @@
   			effectComposer.addPass( toneMapPass );
 
   			// sceneTransparentPass.needsSwap = true;
-  			effectComposer.addPass( sceneTransparentPass );
+  			// effectComposer.addPass( sceneTransparentPass );
 
   			bloomPass = new THREE.BloomPass();
   			// bloomPass.clear = true;
@@ -365,13 +364,16 @@
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
-				var r = "textures/cube/Bridge2/";
-				var urls = [ r + "posx.jpg", r + "negx.jpg",
-							 r + "posy.jpg", r + "negy.jpg",
-							 r + "posz.jpg", r + "negz.jpg" ];
+				var r = "textures/hdr/GraceCube/";
+				var urls = [ r + "posX.jpg", r + "negX.png",
+							 r + "posY.jpg", r + "negY.jpg",
+							 r + "posZ.jpg", r + "negZ.jpg" ];
 
 				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
-				textureCube.format = THREE.RGBFormat;
+				textureCube.format = THREE.RGBAFormat;
+				textureCube.hdrFormat = THREE.HDRRGBM;
+
+				skyboxMaterial.defines["ENVMAP_HDR_INPUT"] = textureCube.hdrFormat;
 
 				// common materials
 

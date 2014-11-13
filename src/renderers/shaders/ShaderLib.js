@@ -73,6 +73,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -185,6 +186,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -320,6 +322,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -1248,14 +1251,22 @@ THREE.ShaderLib = {
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "hdr_encode_fragment" ],
+				"#ifdef ENVMAP_HDR_INPUT",
+					"#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM",
+						"gl_FragColor = vec4( HDRDecodeRGBM( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD",
+						"gl_FragColor = vec4( HDRDecodeRGBD( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE",
+						"gl_FragColor = vec4( HDRDecodeRGBE( gl_FragColor ), 1.0 );",
+					"#endif",
+				"#endif",
 
 			"}"
 

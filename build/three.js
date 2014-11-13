@@ -48,9 +48,11 @@ THREE.PCFSoftShadowMap = 2;
 
 // HDR TYPE CONSTANTS
 
-THREE.LogLuvHDR = 0;
-THREE.RGBMHDR = 1;
-THREE.FullHDR = 1;
+THREE.HDRFull = 0;
+THREE.HDRRGBM = 1;
+THREE.HDRRGBD = 2;
+THREE.HDRRGBE = 3;
+THREE.HDRLogLuv = 4;
 
 // MATERIAL CONSTANTS
 
@@ -16141,7 +16143,7 @@ THREE.ShaderChunk[ 'hdr_encode_pars_fragment'] = "// #ifdef HDR_OUTPUT\n\n  #ifd
 
 // File:src/renderers/shaders/ShaderChunk/hdr_decode_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'hdr_decode_pars_fragment'] = "#if defined( ENVMAP_HDR_INPUT ) || defined( LIGHTMAP_HDR_INPUT )\n\n  // #ifdef HDR_TYPE_LOGLUV\n\n    // Inverse logLuvMatrix matrix, for decoding\n    const mat3 InverseLogLuvMatrix = mat3(\n      6.0013, -1.332, .3007,\n      -2.700, 3.1029, -1.088,\n      -1.7995, -5.7720, 5.6268);  \n\n    vec3 HDRDecodeLOGLUV(in vec4 vLogLuv)\n    { \n      float Le = vLogLuv.z * 255.0 + vLogLuv.w;\n      vec3 Xp_Y_XYZp;\n      Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n      Xp_Y_XYZp.z = Xp_Y_XYZp.y / vLogLuv.y;\n      Xp_Y_XYZp.x = vLogLuv.x * Xp_Y_XYZp.z;\n      vec3 vRGB = InverseLogLuvMatrix * Xp_Y_XYZp;\n      return clamp(vRGB, 0.0, 1.0);\n    }\n  // #elif defined( HDR_TYPE_RGBM )\n\n    vec3 HDRDecodeRGBM( vec4 rgbm ) {\n      return 6.0 * rgbm.rgb * rgbm.a;\n    }\n\n  // #elif defined( HDR_OUTPUT_RGBD )\n    vec3 HDRDecodeRGBD( vec4 rgbd ) {\n      // return rgbd.rgb * ((MaxRange / 255.0) / rgbd.a);\n      return rgbd.rgb / rgbd.a;\n    }\n  // #elif defined( HDR_TYPE_FULL )\n  //   vec3 HDRDecode( vec4 rgbd ) {\n  //     return rgbd.rgb;\n  //   }\n//   #endif\n#endif";
+THREE.ShaderChunk[ 'hdr_decode_pars_fragment'] = "#if defined( ENVMAP_HDR_INPUT )\n\n  // #ifdef HDR_TYPE_LOGLUV\n\n    // Inverse logLuvMatrix matrix, for decoding\n    const mat3 InverseLogLuvMatrix = mat3(\n      6.0013, -1.332, .3007,\n      -2.700, 3.1029, -1.088,\n      -1.7995, -5.7720, 5.6268);  \n\n    vec3 HDRDecodeLOGLUV(in vec4 vLogLuv)\n    { \n      float Le = vLogLuv.z * 255.0 + vLogLuv.w;\n      vec3 Xp_Y_XYZp;\n      Xp_Y_XYZp.y = exp2((Le - 127.0) / 2.0);\n      Xp_Y_XYZp.z = Xp_Y_XYZp.y / vLogLuv.y;\n      Xp_Y_XYZp.x = vLogLuv.x * Xp_Y_XYZp.z;\n      vec3 vRGB = InverseLogLuvMatrix * Xp_Y_XYZp;\n      return clamp(vRGB, 0.0, 1.0);\n    }\n  // #elif defined( HDR_TYPE_RGBM )\n\n    vec3 HDRDecodeRGBM( vec4 rgbm ) {\n      return 6.0 * rgbm.rgb * rgbm.a;\n    }\n\n  // #elif defined( HDR_OUTPUT_RGBD )\n    vec3 HDRDecodeRGBD( vec4 rgbd ) {\n      // return rgbd.rgb * ((MaxRange / 255.0) / rgbd.a);\n      return rgbd.rgb / rgbd.a;\n    }\n  // #elif defined( HDR_TYPE_FULL )\n  //   vec3 HDRDecode( vec4 rgbd ) {\n  //     return rgbd.rgb;\n  //   }\n//   #endif\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/hdr_encode_fragment.glsl
 
@@ -16161,7 +16163,7 @@ THREE.ShaderChunk[ 'map_pars_vertex'] = "#if defined( USE_MAP ) || defined( USE_
 
 // File:src/renderers/shaders/ShaderChunk/envmap_fragment.glsl
 
-THREE.ShaderChunk[ 'envmap_fragment'] = "#ifdef USE_ENVMAP\n\n	vec3 reflectVec;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\n		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations\n		// Transforming Normal Vectors with the Inverse Transformation\n\n		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );\n\n		if ( useRefract ) {\n\n			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\n		} else { \n\n			reflectVec = reflect( cameraToVertex, worldNormal );\n\n		}\n\n	#else\n\n		reflectVec = vReflect;\n\n	#endif\n\n	#ifdef ENVMAP_TYPE_CUBE\n		#ifdef DOUBLE_SIDED\n\n			float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n			vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n		#else\n\n			vec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n		#endif\n	#elif ENVMAP_TYPE_EQUIREC\n		vec2 sampleUV;\n    sampleUV.y = clamp( reflectVec.y * -0.5 + 0.5, 0.0, 1.0);\n   	sampleUV.x = atan( reflectVec.z, reflectVec.x ) * 0.15915494309189533576888376337251 + 0.5; // reciprocal( 2 PI ) + 0.5\n   	vec4 envColor = texture2D( envMap, sampleUV );\n	#endif\n\n	#ifdef ENVMAP_HDR_INPUT\n		#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM\n			envColor.xyz = HDRDecodeRGBM( envColor );\n		#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD\n			envColor.xyz = HDRDecodeRGBD( envColor );\n		#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE\n			envColor.xyz = HDRDecodeRGBE( envColor );\n		#endif\n	#endif\n\n	#ifdef GAMMA_INPUT\n\n		envColor.xyz *= envColor.xyz;\n\n	#endif\n\n	if ( combine == 1 ) {\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );\n\n	} else if ( combine == 2 ) {\n\n		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;\n\n	} else {\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * envColor.xyz, specularStrength * reflectivity );\n\n	}\n\n#endif";
+THREE.ShaderChunk[ 'envmap_fragment'] = "#ifdef USE_ENVMAP\n\n	vec3 reflectVec;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\n		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations\n		// Transforming Normal Vectors with the Inverse Transformation\n\n		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );\n\n		if ( useRefract ) {\n\n			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\n		} else { \n\n			reflectVec = reflect( cameraToVertex, worldNormal );\n\n		}\n\n	#else\n\n		reflectVec = vReflect;\n\n	#endif\n\n	#ifdef DOUBLE_SIDED\n\n		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n		vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#else\n\n		vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#endif\n\n	#ifdef ENVMAP_HDR_INPUT\n		#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM\n			cubeColor.xyz = HDRDecodeRGBM( cubeColor );\n		#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD\n			cubeColor.xyz = HDRDecodeRGBD( cubeColor );\n		#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE\n			cubeColor.xyz = HDRDecodeRGBE( cubeColor );\n		#endif\n	#endif\n\n	#ifdef GAMMA_INPUT\n\n		cubeColor.xyz *= cubeColor.xyz;\n\n	#endif\n\n	if ( combine == 1 ) {\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularStrength * reflectivity );\n\n	} else if ( combine == 2 ) {\n\n		gl_FragColor.xyz += cubeColor.xyz * specularStrength * reflectivity;\n\n	} else {\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * cubeColor.xyz, specularStrength * reflectivity );\n\n	}\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/specularmap_pars_fragment.glsl
 
@@ -16511,6 +16513,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -16623,6 +16626,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -16758,6 +16762,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -17686,14 +17691,22 @@ THREE.ShaderLib = {
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				THREE.ShaderChunk[ "hdr_encode_fragment" ],
+				"#ifdef ENVMAP_HDR_INPUT",
+					"#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM",
+						"gl_FragColor = vec4( HDRDecodeRGBM( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD",
+						"gl_FragColor = vec4( HDRDecodeRGBD( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE",
+						"gl_FragColor = vec4( HDRDecodeRGBE( gl_FragColor ), 1.0 );",
+					"#endif",
+				"#endif",
 
 			"}"
 
@@ -17846,8 +17859,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// hdr rendering
 	
-	this.hdrOutputEnabled = false;
-	this.hdrOutputType = THREE.FullHDR;
+	// this.hdrOutputEnabled = false;
+	// this.hdrOutputType = THREE.FullHDR;
 
 	// shadow map
 
@@ -22490,9 +22503,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( material.envMap && uniforms.envMap.value && material.envMap.hdrFormat !== uniforms.envMap.value.hdrFormat ) {
-			material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrFormat;
-			material.needsUpdate = true;
+		if ( material.envMap && material.envMap.hdrFormat ) {
+			if ( !material.defines ) material.defines = {};
+			if ( material.defines['ENVMAP_HDR_INPUT'] !== material.envMap.hdrFormat ) {
+				material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrFormat;
+				material.needsUpdate = true;
+			}
 		}
 		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
@@ -24587,11 +24603,6 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
-				"HDR_TYPE_RGBM " + THREE.HDRRGBM,
-				"HDR_TYPE_RGBD " + THREE.HDRRGBD,
-				"HDR_TYPE_RGBE " + THREE.HDRRGBE,
-				"HDR_TYPE_LOGLUV " + THREE.HDRLogLuv,
-				
 				parameters.supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
@@ -24697,6 +24708,11 @@ THREE.WebGLProgram = ( function () {
 				( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
 				customDefines,
+
+				"#define HDR_TYPE_RGBM " + THREE.HDRRGBM,
+				"#define HDR_TYPE_RGBD " + THREE.HDRRGBD,
+				"#define HDR_TYPE_RGBE " + THREE.HDRRGBE,
+				"#define HDR_TYPE_LOGLUV " + THREE.HDRLogLuv,
 
 				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,

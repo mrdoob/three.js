@@ -66,8 +66,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// hdr rendering
 	
-	this.hdrOutputEnabled = false;
-	this.hdrOutputType = THREE.FullHDR;
+	// this.hdrOutputEnabled = false;
+	// this.hdrOutputType = THREE.FullHDR;
 
 	// shadow map
 
@@ -4710,9 +4710,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( material.envMap && uniforms.envMap.value && material.envMap.hdrFormat !== uniforms.envMap.value.hdrFormat ) {
-			material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrFormat;
-			material.needsUpdate = true;
+		if ( material.envMap && material.envMap.hdrFormat ) {
+			if ( !material.defines ) material.defines = {};
+			if ( material.defines['ENVMAP_HDR_INPUT'] !== material.envMap.hdrFormat ) {
+				material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrFormat;
+				material.needsUpdate = true;
+			}
 		}
 		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
