@@ -12,6 +12,7 @@ THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
 };
 
 THREE.CubicBezierCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.CubicBezierCurve.prototype.constructor = THREE.CubicBezierCurve;
 
 THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 

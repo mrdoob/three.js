@@ -9,6 +9,7 @@ THREE.SplineCurve = function ( points /* array of Vector2 */ ) {
 };
 
 THREE.SplineCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.SplineCurve.prototype.constructor = THREE.SplineCurve;
 
 THREE.SplineCurve.prototype.getPoint = function ( t ) {
 

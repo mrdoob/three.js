@@ -53,3 +53,4 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.DodecahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;

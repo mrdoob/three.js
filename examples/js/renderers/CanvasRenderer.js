@@ -16,6 +16,7 @@ THREE.SpriteCanvasMaterial = function ( parameters ) {
 };
 
 THREE.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.SpriteCanvasMaterial.prototype.constructor = THREE.SpriteCanvasMaterial;
 
 THREE.SpriteCanvasMaterial.prototype.clone = function () {
 

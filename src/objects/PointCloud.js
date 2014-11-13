@@ -16,6 +16,7 @@ THREE.PointCloud = function ( geometry, material ) {
 };
 
 THREE.PointCloud.prototype = Object.create( THREE.Object3D.prototype );
+THREE.PointCloud.prototype.constructor = THREE.PointCloud;
 
 THREE.PointCloud.prototype.raycast = ( function () {
 

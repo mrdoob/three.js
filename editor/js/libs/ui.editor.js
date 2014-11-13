@@ -30,6 +30,7 @@ UI.CodeEditor = function ( mode ) {
 };
 
 UI.CodeEditor.prototype = Object.create( UI.Element.prototype );
+UI.CodeEditor.prototype.constructor = UI.CodeEditor;
 
 UI.CodeEditor.prototype.setWidth = function ( value ) {
 
