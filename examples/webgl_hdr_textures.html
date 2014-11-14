@@ -92,12 +92,16 @@
 					useRGBM: function() {
 						// cubeMesh.material = cubeMaterial;
 						sphereMaterial.envMap = textureCubeRGBM;
-						// sphereMaterial.needsUpdate = true;
+						cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
+						cubeMaterial.uniforms.tCube.value = textureCubeRGBM;
+						cubeMaterial.needsUpdate = true;
 					},
 					useRGBD: function() {
 						// cubeMesh.material = cubeMaterial;
 						sphereMaterial.envMap = textureCubeRGBD;
-						// sphereMaterial.needsUpdate = true;
+						cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBD;
+						cubeMaterial.uniforms.tCube.value = textureCubeRGBD;
+						cubeMaterial.needsUpdate = true;
 					},
 					// useSphere: function() {
 					// 	cubeMesh.material = equirectMaterial;
@@ -152,16 +156,16 @@
 
 				// Skybox
 
-				var equirectShader = THREE.ShaderLib[ "equirect" ];
-				// shader.uniforms[ "tCube" ].value = textureCube;
+				// var equirectShader = THREE.ShaderLib[ "equirect" ];
+				// // shader.uniforms[ "tCube" ].value = textureCube;
 
-				var equirectMaterial = new THREE.ShaderMaterial( {
-					fragmentShader: equirectShader.fragmentShader,
-					vertexShader: equirectShader.vertexShader,
-					uniforms: equirectShader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-				} );
+				// var equirectMaterial = new THREE.ShaderMaterial( {
+				// 	fragmentShader: equirectShader.fragmentShader,
+				// 	vertexShader: equirectShader.vertexShader,
+				// 	uniforms: equirectShader.uniforms,
+				// 	depthWrite: false,
+				// 	side: THREE.BackSide
+				// } );
 
 				var cubeShader = THREE.ShaderLib[ "cube" ];
 				var cubeMaterial = new THREE.ShaderMaterial( {
@@ -172,12 +176,15 @@
 					side: THREE.BackSide
 				} );
 
+				cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
 				cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), cubeMaterial );
 				sceneCube.add( cubeMesh );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
 				renderer.autoClear = false;
 
 				container.appendChild( renderer.domElement );
@@ -200,6 +207,7 @@
 							 r + "ml_posZ_RGBM.png", r + "ml_negZ_RGBM.png" ];
 				textureCubeRGBM = THREE.ImageUtils.loadTextureCube( urls );
 				textureCubeRGBM.format = THREE.RGBAFormat;
+				textureCubeRGBM.hdrFormat = THREE.HDRRGBM;
 
 				var r = "textures/hdr/ml/";
 				var urls = [ r + "ml_posX_RGBD.png", r + "ml_negX_RGBD.png",
@@ -208,6 +216,7 @@
 
 				textureCubeRGBD = THREE.ImageUtils.loadTextureCube( urls );
 				textureCubeRGBD.format = THREE.RGBAFormat;
+				textureCubeRGBD.hdrFormat = THREE.HDRRGBD;
 				
 				cubeMaterial.uniforms[ "tCube" ].value = textureCubeRGBM;
 
@@ -253,7 +262,7 @@
 
 			function createScene(  ) {
 				var geometry = new THREE.SphereGeometry( 400.0, 24, 24 );
-				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
+				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCubeRGBM } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 
 				// sphereMesh.scale.x = mesh.scale.y = mesh.scale.z = s;

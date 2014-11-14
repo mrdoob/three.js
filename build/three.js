@@ -17707,6 +17707,11 @@ THREE.ShaderLib = {
 						"gl_FragColor = vec4( HDRDecodeRGBE( gl_FragColor ), 1.0 );",
 					"#endif",
 				"#endif",
+				"#if defined( GAMMA_INPUT ) && !defined( GAMMA_OUTPUT )",
+					"gl_FragColor.xyz *= gl_FragColor.xyz;",
+				"#elif !defined( GAMMA_INPUT ) && defined( GAMMA_OUTPUT )",
+					"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
+				"#endif",
 
 			"}"
 
