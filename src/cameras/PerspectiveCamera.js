@@ -166,11 +166,28 @@ THREE.PerspectiveCamera.prototype.zoomTo = function( node, factor ){
 	var _factor = factor || 1;
 	
 	var radius = node.geometry.boundingSphere.radius;
-	var distanceFactor = Math.abs( this.aspect * radius / Math.sin( (this.fov * Math.PI / 180) / 2 ) ) * factor;
+	var fovr = this.fov * Math.PI / 180;
+	
+	if( this.aspect < 1 ){
+	
+		fovr = fovr * this.aspect;
+		
+	}
+	
+	var distanceFactor = Math.abs( radius / Math.sin( fovr / 2 ) ) * factor ;
 	
 	var dir = new THREE.Vector3( 0, 0, -1 ).applyQuaternion( this.quaternion );
-	var offset = dir.clone().multiplyScalar( -distanceFactor );
-	offset.multiplyScalar( factor );
+	var offset = dir.multiplyScalar( -distanceFactor );
 	this.position.copy(node.position.clone().add( offset ));
 	
 };
+
+
+
+
+
+
+
+
+
+
