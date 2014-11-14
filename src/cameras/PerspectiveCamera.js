@@ -141,7 +141,6 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 
 };
 
-
 THREE.PerspectiveCamera.prototype.zoomTo = function( node, factor ){
 
 	if ( !node.geometry ) {
@@ -150,116 +149,28 @@ THREE.PerspectiveCamera.prototype.zoomTo = function( node, factor ){
 	
 	}
 	
-	node.updateMatrixWorld();
+	if ( node.geometry.boundingSphere === null ) { 
 	
-	if ( node.geometry.boundingBox === null ) { 
-	
-		node.geometry.computeBoundingBox();
+		node.geometry.computeBoundingSphere();
 	
 	}
 	
-	if ( !node.geometry.boundingBox ) {
+	if ( !node.geometry.boundingSphere ) {
 	
 		return;
-	
+		
 	}
+	
+	node.updateMatrixWorld();
 
 	var _factor = factor || 1;
-
-	// returns even negative distances
-	var distanceToPlane = function ( origin, direction, plane ) {
 	
-		var denominator = plane.normal.dot( direction );
-		if ( denominator == 0 ) {
-
-			// line is coplanar, return origin
-			if( plane.distanceToPoint( origin ) == 0 ) {
-				return 0;
-			}
-
-			// Null is preferable to undefined since undefined means.... it is undefined
-			return null;
-		}
-		var t = - ( origin.dot( plane.normal ) + plane.constant ) / denominator;
-
-		return t;
-		
-	};
+	var radius = node.geometry.boundingSphere.radius;
+	var distanceFactor = Math.abs( this.aspect * radius / Math.sin( (this.fov * Math.PI / 180) / 2 ) ) * factor;
 	
-	var computeTransformedBoundingBox = function (box, transform) {
-
-		var vertices = [
-			new THREE.Vector3( box.min.x, box.min.y, box.min.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.min.x, box.min.y, box.min.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.max.x, box.min.y, box.min.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.min.x, box.max.y, box.min.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.min.x, box.min.y, box.max.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.min.x, box.max.y, box.max.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.max.x, box.max.y, box.min.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.max.x, box.min.y, box.max.z ).applyMatrix4( transform ),
-			new THREE.Vector3( box.max.x, box.max.y, box.max.z ).applyMatrix4( transform )
-		];
-		
-		var boundingBox = new THREE.Box3();
-		boundingBox.setFromPoints( vertices );
-		
-		return boundingBox;
-	}
-
-	
-	this.updateMatrix();
-	this.updateMatrixWorld();
-
-	var box = computeTransformedBoundingBox( node.geometry.boundingBox, node.matrixWorld );
 	var dir = new THREE.Vector3( 0, 0, -1 ).applyQuaternion( this.quaternion );
-	var pos = box.center().sub( dir );
-	this.position.copy( pos );
-	this.updateProjectionMatrix();
-	this.updateMatrix();
-	this.updateMatrixWorld();
-
-	// corners of the bounding box
-	var ps = [
-		new THREE.Vector3( box.min.x, box.min.y, box.min.z ),
-		new THREE.Vector3( box.max.x, box.min.y, box.min.z ),
-		new THREE.Vector3( box.min.x, box.max.y, box.min.z ),
-		new THREE.Vector3( box.min.x, box.min.y, box.max.z ),
-		new THREE.Vector3( box.min.x, box.max.y, box.max.z ),
-		new THREE.Vector3( box.max.x, box.max.y, box.min.z ),
-		new THREE.Vector3( box.max.x, box.min.y, box.max.z ),
-		new THREE.Vector3( box.max.x, box.max.y, box.max.z )
-	];
-
-	// frustum planes
-	var frustum = new THREE.Frustum();
-	var worldInverse = new THREE.Matrix4().getInverse( this.matrixWorld );
-	frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this.projectionMatrix, worldInverse ) );
-
-	var max = Number.MIN_VALUE;
-	
-	// calculate distances of bounding box corners to the camera frustum planes
-	for( var i = 0; i < ps.length; i++ ) {
-		var p  = ps[i];
-
-		var distance = Number.MIN_VALUE;
-		
-		// iterate through left, right, top and bottom planes
-		for ( var j = 0; j < frustum.planes.length-2; j++ ) {
-		
-			var plane = frustum.planes[j];
-			var dI = distanceToPlane(p, dir, plane);
-			distance = Math.max(distance, dI);
-			
-		} 
-		
-		max = Math.max(max, distance);
-		
-	}
-	
-	// move camera to fit the bounding box
-	var offset = dir.clone().multiplyScalar( -max );
+	var offset = dir.clone().multiplyScalar( -distanceFactor );
 	offset.multiplyScalar( factor );
-	pos.add( offset );
-	this.position.copy( pos );
+	this.position.copy(node.position.clone().add( offset ));
 	
 };
