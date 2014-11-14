@@ -174,20 +174,11 @@ THREE.PerspectiveCamera.prototype.zoomTo = function( node, factor ){
 		
 	}
 	
-	var distanceFactor = Math.abs( radius / Math.sin( fovr / 2 ) ) * factor ;
+	var distanceFactor = Math.abs( radius / Math.sin( fovr / 2 ) ) * _factor ;
 	
 	var dir = new THREE.Vector3( 0, 0, -1 ).applyQuaternion( this.quaternion );
 	var offset = dir.multiplyScalar( -distanceFactor );
 	this.position.copy(node.position.clone().add( offset ));
 	
 };
-
-
-
-
-
-
-
-
-
 
