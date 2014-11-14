@@ -71,6 +71,7 @@
 
     </div>
 
+    <script src="js/libs/bignumber.js"></script>
     <script src="../build/three.js"></script>
 
     <script src="js/Cursor.js"></script>
@@ -279,6 +280,7 @@
         container.appendChild( stats.domElement );
 
         cursor = new THREE.Cursor( camera, renderer );
+        scene.add( cursor );
         vrControls = new THREE.VRControls(camera);
         vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
         vrMode = false;
@@ -307,8 +309,6 @@
             mouseLook = true;
           }
         }
-
-        scene.add( camera );
 
         renderer.domElement.addEventListener( 'mousemove', onMouseMove );
 
@@ -383,14 +383,13 @@
           vrControls.update();
         }
         //pick();
+        cursor.update();
         if (vrMode) {
           vrEffect.render( scene, camera );
         } else {
           renderer.render( scene, camera );
         }
-        cursor.update();
         cursor.render();
-
       }
 
       document.addEventListener( 'keydown', function ( event ) {
