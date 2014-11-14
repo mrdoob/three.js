@@ -2779,8 +2779,52 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var position = geometry.attributes.position;
 
 			// render particles
+			
+			if ( geometry.attributes.index !== undefined ) {
+			
+				var indices = geometry.attributes.index;
+			
+				var type;
+				var size;
+				
+				if ( indices.array instanceof Uint16Array ) {
+				
+					type = _gl.UNSIGNED_SHORT;
+					size = 2;
+				
+				} else {
+				
+					console.error( "unsupported index data type" );
+					return;
+				
+				}
 
-			_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indices.buffer );
+			
+				if ( geometry.offsets.length > 0 ) {
+				
+					for ( var i = 0; i < geometry.offsets.length; i++ ) {
+					
+						var offset = geometry.offsets[ i ];
+						
+						_gl.drawElements( _gl.POINTS, offset.count, type, offset.start * size );
+						
+					
+					}
+				
+				} else {
+					
+					_gl.drawElements( _gl.POINTS, indices.length, type, 0);
+					
+				}
+			
+			} else {
+			
+				_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
+			
+			}
+
+			
 
 			_this.info.render.calls ++;
 			_this.info.render.points += position.array.length / 3;
