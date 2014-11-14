@@ -2770,64 +2770,92 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// render particles
 
-			if ( updateBuffers ) {
+			var mode = _gl.POINTS;
 
-				setupVertexAttributes( material, program, geometry, 0 );
+			var index = geometry.attributes.index;
 
-			}
+			if ( index ) {
 
-			var position = geometry.attributes.position;
+				// indexed points
 
-			// render particles
-			
-			if ( geometry.attributes.index !== undefined ) {
-			
-				var indices = geometry.attributes.index;
-			
-				var type;
-				var size;
-				
-				if ( indices.array instanceof Uint16Array ) {
-				
+				var type, size;
+
+				if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+
+					type = _gl.UNSIGNED_INT;
+					size = 4;
+
+				} else {
+
 					type = _gl.UNSIGNED_SHORT;
 					size = 2;
-				
-				} else {
-				
-					console.error( "unsupported index data type" );
-					return;
-				
+
 				}
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indices.buffer );
-			
-				if ( geometry.offsets.length > 0 ) {
-				
-					for ( var i = 0; i < geometry.offsets.length; i++ ) {
-					
-						var offset = geometry.offsets[ i ];
-						
-						_gl.drawElements( _gl.POINTS, offset.count, type, offset.start * size );
-						
-					
+				var offsets = geometry.offsets;
+
+				if ( offsets.length === 0 ) {
+
+					if ( updateBuffers ) {
+
+						setupVertexAttributes( material, program, geometry, 0 );
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
 					}
-				
+
+					_gl.drawElements( mode, index.array.length, type, 0);
+
+					_this.info.render.calls ++;
+					_this.info.render.points += index.array.length;
+
 				} else {
-					
-					_gl.drawElements( _gl.POINTS, indices.length, type, 0);
-					
+
+					// if there is more than 1 chunk
+					// must set attribute pointers to use new offsets for each chunk
+					// even if geometry and materials didn't change
+
+					if ( offsets.length > 1 ) updateBuffers = true;
+
+					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+						var startIndex = offsets[ i ].index;
+
+						if ( updateBuffers ) {
+
+							setupVertexAttributes( material, program, geometry, startIndex );
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+						}
+
+						// render indexed points
+
+						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size ); 
+
+						_this.info.render.calls ++;
+						_this.info.render.points += offsets[ i ].count;
+
+					}
+
 				}
-			
+
 			} else {
-			
-				_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
-			
+
+				// non-indexed points
+
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( material, program, geometry, 0 );
+
+				}
+
+				var position = geometry.attributes.position;
+
+				_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+				_this.info.render.calls ++;
+				_this.info.render.points += position.array.length / 3;
+
 			}
-
-			
-
-			_this.info.render.calls ++;
-			_this.info.render.points += position.array.length / 3;
 
 		} else if ( object instanceof THREE.Line ) {
 
