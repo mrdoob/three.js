@@ -142,10 +142,10 @@
 
 			function onWindowResize( event ) {
 
-				uniforms.resolution.value.x = window.innerWidth;
-				uniforms.resolution.value.y = window.innerHeight;
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				uniforms.resolution.value.x = renderer.domElement.width;
+				uniforms.resolution.value.y = renderer.domElement.height;
 
 			}
 
