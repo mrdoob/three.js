@@ -17,13 +17,17 @@ Should look like this:
 
     C:\Program Files\Blender Foundation\Blender\2.7X\scripts\addons
     
-OR
+OR (for 2.6)
     
     C:\Users\USERNAME\AppData\Roaming\Blender Foundation\Blender\2.6X\scripts\addons
 
 ### OSX
 
 Depends on where blender.app is. Assuming you copied it to your Applications folder:
+
+    /Applications/blender.app/Contents/Resources/2.7X/scripts/addons
+    
+OR (for 2.6)
 
     /Applications/Blender/blender.app/Contents/MacOS/2.6X/scripts/addons
 
