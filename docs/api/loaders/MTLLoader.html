@@ -1,0 +1,56 @@
+<!D]OCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:String baseUrl], [page:Object options], [page:String crossOrigin] )</h3>
+		<div>
+		[page:String baseUrl] — The base url from which to find subsequent resources.<br />
+		[page:Object options] — Options passed to the created material (side, wrap, normalizeRGB, ignoreZeroRGBs, invertTransparency).<br />
+		[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.<br />
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from url and return the loaded material.
+		</div>
+
+		<h3>[method:MTLLoaderMaterialCreator parse]( [page:String text] )</h3>
+		<div>
+		[page:String text] — The textual <em>mtl</em> structure to parse.
+		</div>
+		<div>
+		Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br />
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/[name].js examples/js/loaders/[name].js]
+	</body>
+</html>

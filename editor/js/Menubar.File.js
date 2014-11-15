@@ -181,7 +181,6 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	/*
 	//
 
 	options.add( new UI.HorizontalRule() );
@@ -197,7 +196,6 @@ Menubar.File = function ( editor ) {
 
 	} );
 	options.add( option );
-	*/
 
 	/*
 	// Test

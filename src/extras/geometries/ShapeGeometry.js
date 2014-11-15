@@ -29,6 +29,7 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 };
 
 THREE.ShapeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.ShapeGeometry.prototype.constructor = THREE.ShapeGeometry;
 
 /**
  * Add an array of shapes to THREE.ShapeGeometry.

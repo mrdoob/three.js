@@ -9,15 +9,15 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an [page:Material material].</div>
+		<div class="desc">A loader for loading a [page:Material] in JSON format.</div>
+
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]([page:LoadingManager manager])</h3>
-        <div>
-        manager -- The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
-        </div>
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
 		<div>
 		Creates a new [name].
 		</div>
@@ -25,32 +25,60 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Image load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
 		<div>
-        onLoad -- Will be called when load completes. The argument will be the loaded Imageloader.
-        onProgress -- Will be called while load progresses. The argument will be the progress event.
-        onError -- Will be called when load errors.
-		url — required
+		[page:String url] — required<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded [page:Material].<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the progress event.<br />
+		[page:Function onError] — Will be called when load errors.<br />
 		</div>
 		<div>
-        Begin loading from url and return the [page:Material material] object that will contain the data.
-        </div>
+		Begin loading from url and return the [page:Material] object that will contain the data.
+		</div>
 
-        <h3>[method:todo setCrossOrigin]([page:String value])</h3>
+		<h3>[method:null setCrossOrigin]( [page:String value] )</h3>
 		<div>
-        value -- The crossOrigin string.
+		[page:String value] — The crossOrigin string.
 		</div>
 		<div>
-        The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-        </div>
+		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
 
-        <h3>[method:todo parse]([page:Object json])</h3>
-        <div>
-        json -- The json object containing the parameters of the Material.
+		<h3>[method:Material parse]( [page:Object json] )</h3>
+		<div>
+		[page:Object json] — The json object containing the parameters of the Material.
 		</div>
 		<div>
-        Creates a new [page:Material material] of the type 'json.type' and with parameters defined in the json object.
-        </div>
+		Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object.
+		</div>
+
+
+		<h2>Example</h2>
+
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.MaterialLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'path/to/material.json',
+			// Function when resource is loaded
+			function ( material ) {
+				object.material = material;
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when download errors
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
 
 		<h2>Source</h2>
 
