@@ -4930,7 +4930,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.refractionRatio.value = material.refractionRatio;
 		uniforms.combine.value = material.combine;
-		uniforms.useRefract.value = material.envMap && material.envMap.mapping instanceof THREE.CubeRefractionMapping;
+		uniforms.useRefract.value = material.envMap && (
+			material.envMap.mapping === THREE.CubeRefractionMapping ||
+			material.envMap.mapping === THREE.SphericalRefractionMapping ||
+			material.envMap.mapping === THREE.EquirectangularRefractionMapping );
 
 	}
 

@@ -84,23 +84,23 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		var hdrOutputTypeDefine = null;
-		if ( _this.hdrOutputEnabled ) {
-			if ( parameters.hdrOutput !== false ) {
-				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrOutputType;
-				if ( outputType === THREE.FullHDR ) {
-					hdrOutputTypeDefine = "HDR_OUTPUT_FULL";
-				}
-				else if ( outputType === THREE.RGBMHDR ) {
-					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
-				}
-				else if ( outputType === THREE.LogLuvHDR ) {
-					hdrOutputTypeDefine = "HDR_OUTPUT_LOGLUV";
-				}
-
+		var envMapTypeDefine = null;
+		if ( parameters.envMap ) {
+			switch ( material.envMap.mapping ) {
+				case THREE.CubeReflectionMapping:
+				case THREE.CubeRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+					break;
+				case THREE.SphericalReflectionMapping:
+				case THREE.SphericalRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
+					break;
+				case THREE.EquirectangularReflectionMapping:
+				case THREE.EquirectangularRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_EQUIREC";
+					break;
 			}
 		}
-
 
 		// console.log( "building new program " );
 
@@ -253,6 +253,7 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
+				envMapTypeDefine ? "#define " + envMapTypeDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
