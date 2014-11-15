@@ -6,4 +6,8 @@
 
   gl_FragColor = HDREncodeRGBM( gl_FragColor );
 
+#elif defined( HDR_OUTPUT_RGBD )
+
+  gl_FragColor = HDREncodeRGBD( gl_FragColor );
+
 #endif

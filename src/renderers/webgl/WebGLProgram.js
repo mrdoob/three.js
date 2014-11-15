@@ -88,13 +88,13 @@ THREE.WebGLProgram = ( function () {
 		if ( _this.hdrOutputEnabled ) {
 			if ( parameters.hdrOutput !== false ) {
 				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrOutputType;
-				if ( outputType === THREE.FullHDR ) {
-					hdrOutputTypeDefine = "HDR_OUTPUT_FULL";
-				}
-				else if ( outputType === THREE.RGBMHDR ) {
+				if ( outputType === THREE.HDRRGBM ) {
 					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
 				}
-				else if ( outputType === THREE.LogLuvHDR ) {
+				else if ( outputType === THREE.HDRRGBD ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBD";
+				}
+				else if ( outputType === THREE.HDRLogLuv ) {
 					hdrOutputTypeDefine = "HDR_OUTPUT_LOGLUV";
 				}
 

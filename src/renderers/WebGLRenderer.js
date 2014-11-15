@@ -66,8 +66,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// hdr rendering
 	
-	// this.hdrOutputEnabled = false;
-	// this.hdrOutputType = THREE.FullHDR;
+	this.hdrOutputEnabled = false;
+	this.hdrOutputType = THREE.HDRFull;
 
 	// shadow map
 

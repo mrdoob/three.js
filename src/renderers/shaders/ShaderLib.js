@@ -1272,7 +1272,7 @@ THREE.ShaderLib = {
 				"#elif !defined( GAMMA_INPUT ) && defined( GAMMA_OUTPUT )",
 					"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
 				"#endif",
-
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 			"}"
 
 		].join("\n")
