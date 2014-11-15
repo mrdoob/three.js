@@ -44,6 +44,7 @@ THREE.LineDashedMaterial = function ( parameters ) {
 };
 
 THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.LineDashedMaterial.prototype.constructor = THREE.LineDashedMaterial;
 
 THREE.LineDashedMaterial.prototype.clone = function () {
 

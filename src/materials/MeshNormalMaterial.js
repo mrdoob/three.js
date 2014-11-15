@@ -32,6 +32,7 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 };
 
 THREE.MeshNormalMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshNormalMaterial.prototype.constructor = THREE.MeshNormalMaterial;
 
 THREE.MeshNormalMaterial.prototype.clone = function () {
 

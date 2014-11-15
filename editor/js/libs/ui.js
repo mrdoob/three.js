@@ -105,6 +105,7 @@ UI.Panel = function () {
 };
 
 UI.Panel.prototype = Object.create( UI.Element.prototype );
+UI.Panel.prototype.constructor = UI.Panel;
 
 UI.Panel.prototype.add = function () {
 
@@ -194,6 +195,7 @@ UI.CollapsiblePanel = function () {
 };
 
 UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
+UI.CollapsiblePanel.prototype.constructor = UI.CollapsiblePanel;
 
 UI.CollapsiblePanel.prototype.addStatic = function () {
 
@@ -303,6 +305,7 @@ UI.Text = function ( text ) {
 };
 
 UI.Text.prototype = Object.create( UI.Element.prototype );
+UI.Text.prototype.constructor = UI.Text;
 
 UI.Text.prototype.setValue = function ( value ) {
 
@@ -343,6 +346,7 @@ UI.Input = function () {
 };
 
 UI.Input.prototype = Object.create( UI.Element.prototype );
+UI.Input.prototype.constructor = UI.Input;
 
 UI.Input.prototype.getValue = function () {
 
@@ -398,6 +402,7 @@ UI.TextArea = function () {
 };
 
 UI.TextArea.prototype = Object.create( UI.Element.prototype );
+UI.TextArea.prototype.constructor = UI.TextArea;
 
 UI.TextArea.prototype.getValue = function () {
 
@@ -436,6 +441,7 @@ UI.Select = function () {
 };
 
 UI.Select.prototype = Object.create( UI.Element.prototype );
+UI.Select.prototype.constructor = UI.Select;
 
 UI.Select.prototype.setMultiple = function ( boolean ) {
 
@@ -552,6 +558,7 @@ UI.FancySelect = function () {
 };
 
 UI.FancySelect.prototype = Object.create( UI.Element.prototype );
+UI.FancySelect.prototype.constructor = UI.FancySelect;
 
 UI.FancySelect.prototype.setOptions = function ( options ) {
 
@@ -662,6 +669,7 @@ UI.Checkbox = function ( boolean ) {
 };
 
 UI.Checkbox.prototype = Object.create( UI.Element.prototype );
+UI.Checkbox.prototype.constructor = UI.Checkbox;
 
 UI.Checkbox.prototype.getValue = function () {
 
@@ -712,6 +720,7 @@ UI.Color = function () {
 };
 
 UI.Color.prototype = Object.create( UI.Element.prototype );
+UI.Color.prototype.constructor = UI.Color;
 
 UI.Color.prototype.getValue = function () {
 
@@ -871,6 +880,7 @@ UI.Number = function ( number ) {
 };
 
 UI.Number.prototype = Object.create( UI.Element.prototype );
+UI.Number.prototype.constructor = UI.Number;
 
 UI.Number.prototype.getValue = function () {
 
@@ -1034,6 +1044,7 @@ UI.Integer = function ( number ) {
 };
 
 UI.Integer.prototype = Object.create( UI.Element.prototype );
+UI.Integer.prototype.constructor = UI.Integer;
 
 UI.Integer.prototype.getValue = function () {
 
@@ -1079,6 +1090,7 @@ UI.Break = function () {
 };
 
 UI.Break.prototype = Object.create( UI.Element.prototype );
+UI.Break.prototype.constructor = UI.Break;
 
 
 // HorizontalRule
@@ -1097,6 +1109,7 @@ UI.HorizontalRule = function () {
 };
 
 UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
+UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
 
 
 // Button
@@ -1118,6 +1131,7 @@ UI.Button = function ( value ) {
 };
 
 UI.Button.prototype = Object.create( UI.Element.prototype );
+UI.Button.prototype.constructor = UI.Button;
 
 UI.Button.prototype.setLabel = function ( value ) {
 
@@ -1164,6 +1178,7 @@ UI.Dialog = function ( value ) {
 };
 
 UI.Dialog.prototype = Object.create( UI.Panel.prototype );
+UI.Dialog.prototype.constructor = UI.Dialog;
 
 UI.Dialog.prototype.showModal = function () {
 

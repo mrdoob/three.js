@@ -40,6 +40,7 @@
 	};
 
 	GizmoMaterial.prototype = Object.create( THREE.MeshBasicMaterial.prototype );
+	GizmoMaterial.prototype.constructor = GizmoMaterial;
 
 	var GizmoLineMaterial = function ( parameters ) {
 
@@ -74,6 +75,7 @@
 	};
 
 	GizmoLineMaterial.prototype = Object.create( THREE.LineBasicMaterial.prototype );
+	GizmoLineMaterial.prototype.constructor = GizmoLineMaterial;
 
 	THREE.TransformGizmo = function () {
 
@@ -194,6 +196,7 @@
 	};
 
 	THREE.TransformGizmo.prototype = Object.create( THREE.Object3D.prototype );
+	THREE.TransformGizmo.prototype.constructor = THREE.TransformGizmo;
 
 	THREE.TransformGizmo.prototype.update = function ( rotation, eye ) {
 
@@ -320,6 +323,7 @@
 	};
 
 	THREE.TransformGizmoTranslate.prototype = Object.create( THREE.TransformGizmo.prototype );
+	THREE.TransformGizmoTranslate.prototype.constructor = THREE.TransformGizmoTranslate;
 
 	THREE.TransformGizmoRotate = function () {
 
@@ -446,6 +450,7 @@
 	};
 
 	THREE.TransformGizmoRotate.prototype = Object.create( THREE.TransformGizmo.prototype );
+	THREE.TransformGizmoRotate.prototype.constructor = THREE.TransformGizmoRotate;
 
 	THREE.TransformGizmoScale = function () {
 
@@ -532,6 +537,7 @@
 	};
 
 	THREE.TransformGizmoScale.prototype = Object.create( THREE.TransformGizmo.prototype );
+	THREE.TransformGizmoScale.prototype.constructor = THREE.TransformGizmoScale;
 
 	THREE.TransformControls = function ( camera, domElement ) {
 
@@ -989,5 +995,6 @@
 	};
 
 	THREE.TransformControls.prototype = Object.create( THREE.Object3D.prototype );
+	THREE.TransformControls.prototype.constructor = THREE.TransformControls;
 
 }());

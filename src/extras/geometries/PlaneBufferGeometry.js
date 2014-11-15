@@ -93,3 +93,4 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 };
 
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;

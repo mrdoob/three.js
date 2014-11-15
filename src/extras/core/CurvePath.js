@@ -17,6 +17,7 @@ THREE.CurvePath = function () {
 };
 
 THREE.CurvePath.prototype = Object.create( THREE.Curve.prototype );
+THREE.CurvePath.prototype.constructor = THREE.CurvePath;
 
 THREE.CurvePath.prototype.add = function ( curve ) {
 

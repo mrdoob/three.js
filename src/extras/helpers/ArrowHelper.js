@@ -51,6 +51,7 @@ THREE.ArrowHelper = ( function () {
 }() );
 
 THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.ArrowHelper.prototype.constructor = THREE.ArrowHelper;
 
 THREE.ArrowHelper.prototype.setDirection = ( function () {
 

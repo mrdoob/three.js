@@ -111,3 +111,4 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 };
 
 THREE.BoxGeometry2.prototype = Object.create( THREE.Geometry2.prototype );
+THREE.BoxGeometry2.prototype.constructor = THREE.BoxGeometry2;

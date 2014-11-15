@@ -72,39 +72,23 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 			"uniform sampler2D currentLum;",
 			"uniform float delta;",
 			"uniform float tau;",
-			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
-			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 			
 			"void main() {",
-			"float we = 3.0;",
+
 				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
 				"vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
-				"#ifdef HDR_INPUT_LOGLUV",
-					"float fLastLum = HDRDecodeLOGLUV( lastLum ).r;",
-					"float fCurrentLum = HDRDecodeLOGLUV( currentLum ).r;",
-				"#elif defined( HDR_INPUT_RGBM )",
-					"float fLastLum = HDRDecodeRGBM( lastLum ).r;",
-					"float fCurrentLum = HDRDecodeRGBM( currentLum ).r;",
-				"#else",
-					"float fLastLum = lastLum.r;",
-					"float fCurrentLum = currentLum.r;",
-				"#endif",
+				
+				"float fLastLum = lastLum.r;",
+				"float fCurrentLum = currentLum.r;",
 				
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
 				"fCurrentLum *= fCurrentLum;",
-				// "fLastLum *= fLastLum;",
 
 				// Adapt the luminance using Pattanaik's technique
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
 				// "fAdaptedLum = sqrt(fAdaptedLum);",
-				"#ifdef HDR_OUTPUT_LOGLUV",
-					"gl_FragColor = HDREncodeLOGLUV( vec3( fAdaptedLum ) );",
-				"#elif defined( HDR_OUTPUT_RGBM )",
-					"gl_FragColor = HDREncodeRGBM( vec3( fAdaptedLum ) );",
-				"#else",
-					"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
-				"#endif",
+				"gl_FragColor = vec4( vec3( fAdaptedLum ), 1.0 );",
 			"}",
 		].join('\n')
 	};
@@ -147,7 +131,9 @@ THREE.AdaptiveToneMappingPass.prototype = {
 
 		if ( this.needsInit ) {
 			this.reset( renderer );
-			// renderer.render( this.scene, this.camera, this.luminanceRT );
+			this.luminanceRT.type = readBuffer.type;
+			this.previousLuminanceRT.type = readBuffer.type;
+			this.currentLuminanceRT.type = readBuffer.type;
 			this.needsInit = false;
 		}
 
@@ -198,15 +184,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		//We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 		pars.minFilter = THREE.LinearMipMapLinearFilter;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		//If HDR is enabled and the type is full HDR, change the format of the render targets
-		if ( renderer.hdrOutputEnabled && renderer.hdrOutputType === THREE.FullHDR ) {
-			var extensions = new THREE.WebGLExtensions( renderer.getContext() );
-			if ( extensions.get('OES_texture_half_float_linear') ) {
-				this.luminanceRT.type = THREE.FloatType;
-				this.previousLuminanceRT.type = THREE.FloatType;
-				this.currentLuminanceRT.type = THREE.FloatType;
-			}
-		}
+		
 		if ( this.adaptive ) {
 			this.materialToneMap.defines["ADAPTED_LUMINANCE"] = "";
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
@@ -216,9 +194,9 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		this.materialLuminance.needsUpdate = true;
 		this.materialAdaptiveLum.needsUpdate = true;
 		this.materialToneMap.needsUpdate = true;
-		renderer.render( this.scene, this.camera, this.luminanceRT );
-		renderer.render( this.scene, this.camera, this.previousLuminanceRT );
-		renderer.render( this.scene, this.camera, this.currentLuminanceRT );
+		// renderer.render( this.scene, this.camera, this.luminanceRT );
+		// renderer.render( this.scene, this.camera, this.previousLuminanceRT );
+		// renderer.render( this.scene, this.camera, this.currentLuminanceRT );
 	},
 
 	setAdaptive: function( adaptive ) {
