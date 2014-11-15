@@ -23,35 +23,44 @@
 			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1		
 		}
 
-		function pickingRay( raycaster, camera, mouse ) {
+		function pickingRay( raycaster, coords, camera ) {
 
-			var vector = new THREE.Vector3( mouse.x, mouse.y, -1 ); // z = - 1 important!		
-			var end = new THREE.Vector3( vector.x, vector.y, 1.0 );
+		    // the camera is assumed _not_ to be a child of a transformed object
 
-			vector.unproject(camera);
-			end.unproject(camera);
-			end.sub( vector ).normalize();
+		    raycaster.ray.origin.copy( camera.position );
+		    raycaster.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
 
-			raycaster.ray.set( vector, end );
+		}
+
+		function render() {
+
+			pickingRay( raycaster, mouse, camera );	
+
+			var intersects = raycaster.intersectObjects( scene.children );
+
+			for ( var intersect in intersects ) {
+
+				intersect.object.material.color = new THREE.Color( 0xff0000 );
+			
+			}
+			
+			renderer.render( scene, camera );
 
 		}
 
 		window.addEventListener( 'mousemove', onMouseMove, false );
 
-		function render() {
-			pickingRay( raycaster, camera, mouse );	
-
-			var intersects = raycaster.intersectObjects( scene.children );
-
-			for ( var intersect in intersects ) {
-				intersect.object.material.color = new THREE.Color( 0xff0000 );
-			}
-			renderer.render( scene, camera );
-		}
-		
 		window.requestAnimationFrame(render);
 
 		</code>
+		<div>Examples: [example:webgl_interactive_cubes Raycasting to a Mesh], 
+			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera], 
+			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry], 
+			[example:webgl_interactive_lines Raycasting to a Line], 
+			[example:webgl_interactive_raycasting_pointcloud Raycasting to a PointCloud], 
+			[example:webgl_geometry_terrain_raycast Terrain raycasting], 
+			[example:webgl_octree_raycasting Raycasting using an octree],
+			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]</div>
 
 		<!-- http://jsfiddle.net/7hfaoeo7/3/ -->
 
