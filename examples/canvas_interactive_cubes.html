@@ -106,6 +106,7 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 
 				//
 
@@ -121,6 +122,16 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
+			
+			function onDocumentTouchStart( event ) {
+				
+				event.preventDefault();
+				
+				event.clientX = event.touches[0].clientX;
+				event.clientY = event.touches[0].clientY;
+				onDocumentMouseDown( event );
+
+			}	
 
 			function onDocumentMouseDown( event ) {
 
