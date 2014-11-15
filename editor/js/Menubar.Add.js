@@ -64,7 +64,34 @@ Menubar.Add = function ( editor ) {
 
 	} );
 	options.add( option );
+	
+	//Triangle
+	
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Triangle' );
+	option.onClick( function () {
 
+		var geometry = new THREE.Geometry();
+		var v1 = new THREE.Vector3(-100,0,0);
+		var v2 = new THREE.Vector3(100,0,0);
+		var v3 = new THREE.Vector3(0,100,0);
+
+		geometry.vertices.push(v1);
+		geometry.vertices.push(v2);
+		geometry.vertices.push(v3);
+
+		geometry.faces.push(new THREE.Face3(0,2,1));
+		var material = new THREE.MeshBasicMaterial({color:0xff0000});
+		var mesh = new THREE.Mesh(geometry, material);
+		mesh.name = 'Triangle ' + (++ meshCount);
+		
+		editor.addObject( mesh );
+		editor.select( mesh );
+
+	} );
+	options.add( option );
+	
 	// Box
 
 	var option = new UI.Panel();
