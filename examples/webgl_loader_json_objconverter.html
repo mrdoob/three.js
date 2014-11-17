@@ -101,7 +101,7 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, new THREE.UVMapping(), THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
+				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
 				xm.map.needsUpdate = true;
 				xm.map.repeat.set( 10, 10 );
 

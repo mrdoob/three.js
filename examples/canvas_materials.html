@@ -76,8 +76,8 @@
 					new THREE.MeshDepthMaterial( { overdraw: 0.5 } ),
 					new THREE.MeshNormalMaterial( { overdraw: 0.5 } ),
 					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ), overdraw: 0.5 } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalRefractionMapping() ), overdraw: 0.5 } )
+					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', THREE.SphericalReflectionMapping ), overdraw: 0.5 } ),
+					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', THREE.SphericalRefractionMapping ), overdraw: 0.5 } )
 
 				];
 

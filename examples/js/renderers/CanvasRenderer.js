@@ -700,8 +700,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				    material instanceof THREE.MeshPhongMaterial ) {
 
 			if ( material.map !== null ) {
+			
+				var mapping = material.map.mapping;
 
-				if ( material.map.mapping instanceof THREE.UVMapping ) {
+				if ( mapping === THREE.UVMapping ) {
 
 					_uvs = element.uvs;
 					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uvs[ uv1 ].x, _uvs[ uv1 ].y, _uvs[ uv2 ].x, _uvs[ uv2 ].y, _uvs[ uv3 ].x, _uvs[ uv3 ].y, material.map );
@@ -710,7 +712,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material.envMap !== null ) {
 
-				if ( material.envMap.mapping instanceof THREE.SphericalReflectionMapping ) {
+				if ( mapping === THREE.SphericalReflectionMapping ) {
 
 					_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
 					_uv1x = 0.5 * _normal.x + 0.5;
@@ -726,7 +728,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
-				} else if ( material.envMap.mapping instanceof THREE.SphericalRefractionMapping ) {
+				} else if ( mapping === THREE.SphericalRefractionMapping ) {
 
 					_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
 					_uv1x = - 0.5 * _normal.x + 0.5;

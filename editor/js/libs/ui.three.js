@@ -189,9 +189,7 @@ UI.CubeTexture = function () {
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function( event ) {
 
-					var array = [ this, this, this, this, this, this ];
-
-					var texture = new THREE.Texture( array, new THREE.CubeReflectionMapping() );
+					var texture = new THREE.Texture( this, THREE.SphericalReflectionMapping );
 					texture.sourceFile = file.name;
 					texture.needsUpdate = true;
 
