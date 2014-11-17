@@ -17,7 +17,7 @@
 			}
 			h1 { }
 			a { color:skyblue; text-decoration:none }
-			canvas { pointer-events:none; z-index:10; position:relative; }
+			/*canvas { pointer-events:none; z-index:10; position:relative; }*/
 
 			#d { position:absolute; width: 100%; text-align:center; margin:1em 0 -4.5em 0; z-index:1000; }
 
@@ -41,12 +41,12 @@
 		<script src="../build/three.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
+		
 		<div id="info">
 
 
@@ -64,7 +64,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var controls, camera, scene, renderer;
 			var cameraCube, sceneCube;
 			var textureEquirec, textureCube, textureSphere;
 			var cubeMesh, sphereMesh;
@@ -127,7 +127,13 @@
 				// CAMERAS
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.set( 550, 0, 550 );
 				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+
+				controls = new THREE.OrbitControls( camera );
+				controls.minDistance = 500;
+				controls.maxDistance = 2500;
+
 
 				// SCENE
 
@@ -205,11 +211,13 @@
 				textureCube.mapping = THREE.CubeReflectionMapping;
 				cubeMaterial.uniforms[ "tCube" ].value = textureCube;
 
-				textureEquirec = THREE.ImageUtils.loadTexture( "textures/environment/grace-new.jpg" );
+				textureEquirec = THREE.ImageUtils.loadTexture( "textures/environment/test2.jpg" );
 				textureEquirec.format = THREE.RGBAFormat;
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.magFilter = THREE.LinearFilter;
-				textureEquirec.minFilter = THREE.LinearFilter;
+				textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
+				// textureEquirec.anisotropy = 8.0;
+				textureEquirec.generateMipmaps = true;
 				equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
 
 				textureSphere = THREE.ImageUtils.loadTexture( "textures/environment/grace_probe.jpg" );
@@ -254,8 +262,6 @@
 				// sphereMesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 
 				scene.add( sphereMesh );
-
-				$('.dg.ac').css('z-index', 100);
 				
 			}
 
@@ -273,15 +279,17 @@
 
 				render();
 
+				controls.update();
+
 			}
 
 			function render() {
 
 				var timer = -0.0002 * Date.now();
 
-				camera.position.x = 1000 * Math.cos( timer );
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.position.z = 1000 * Math.sin( timer );
+				// camera.position.x = 1000 * Math.cos( timer );
+				// camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				// camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );
 				cameraCube.rotation.copy( camera.rotation );
