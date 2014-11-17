@@ -102,6 +102,22 @@ THREE.WebGLProgram = ( function () {
 			}
 		}
 
+		var hdrOutputTypeDefine = null;
+		if ( _this.hdrOutputEnabled ) {
+			if ( parameters.hdrOutput !== false ) {
+				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrOutputType;
+				if ( outputType === THREE.HDRRGBM ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
+				}
+				else if ( outputType === THREE.HDRRGBD ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBD";
+				}
+				else if ( outputType === THREE.HDRLogLuv ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_LOGLUV";
+				}
+			}
+		}
+
 		// console.log( "building new program " );
 
 		//
@@ -233,6 +249,11 @@ THREE.WebGLProgram = ( function () {
 				( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
 				customDefines,
+
+				"#define HDR_TYPE_RGBM " + THREE.HDRRGBM,
+				"#define HDR_TYPE_RGBD " + THREE.HDRRGBD,
+				"#define HDR_TYPE_RGBE " + THREE.HDRRGBE,
+				"#define HDR_TYPE_LOGLUV " + THREE.HDRLogLuv,
 
 				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,

@@ -48,9 +48,10 @@ THREE.PCFSoftShadowMap = 2;
 
 // HDR TYPE CONSTANTS
 
-THREE.LogLuvHDR = 0;
-THREE.RGBMHDR = 1;
-THREE.FullHDR = 1;
+THREE.HDRFull = 0;
+THREE.HDRRGBM = 1;
+THREE.HDRRGBD = 2;
+THREE.HDRLogLuv = 3;
 
 // MATERIAL CONSTANTS
 
@@ -123,13 +124,16 @@ THREE.AddOperation = 2;
 
 // Mapping modes
 
-THREE.UVMapping = function () {};
+THREE.UVMapping = 300;
 
-THREE.CubeReflectionMapping = function () {};
-THREE.CubeRefractionMapping = function () {};
+THREE.CubeReflectionMapping = 301;
+THREE.CubeRefractionMapping = 302;
 
-THREE.SphericalReflectionMapping = function () {};
-THREE.SphericalRefractionMapping = function () {};
+THREE.SphericalReflectionMapping = 303;
+THREE.SphericalRefractionMapping = 304;
+
+THREE.EquirectangularReflectionMapping = 305;
+THREE.EquirectangularRefractionMapping = 306;
 
 // Wrapping modes
 
@@ -172,6 +176,13 @@ THREE.LuminanceFormat = 1022;
 THREE.LuminanceAlphaFormat = 1023;
 // THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
 THREE.RGBEFormat = THREE.RGBAFormat; //1024;
+
+// HDR formats
+
+THREE.RGBMHDRFormat = 1024;
+THREE.RGBDHDRFormat = 1025;
+THREE.RGBEHDRFormat = 1026;
+THREE.LogLuvHDRFormat = 1027;
 
 // DDS / ST3C Compressed texture formats
 
