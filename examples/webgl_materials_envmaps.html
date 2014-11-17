@@ -51,35 +51,6 @@
 
 			function init() {
 
-				params = {
-					useCube: function() {
-						cubeMesh.material = cubeMaterial;
-						sphereMaterial.envMap = textureCube;
-						sphereMaterial.needsUpdate = true;
-					},
-					useEquirect: function() {
-						cubeMesh.material = equirectMaterial;
-						sphereMaterial.envMap = textureEquirec;
-						sphereMaterial.needsUpdate = true;
-					},
-					useSphere: function() {
-						cubeMesh.material = equirectMaterial;
-						sphereMaterial.envMap = textureSphere;
-						sphereMaterial.needsUpdate = true;
-					},
-					toggleRefraction: function() {
-						refract = !refract;
-						if ( refract ) {
-							textureEquirec.mapping = THREE.EquirectangularRefractionMapping;
-							textureCube.mapping = THREE.CubeRefractionMapping;
-						} else {
-							textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
-							textureCube.mapping = THREE.CubeReflectionMapping;
-						}
-						sphereMaterial.needsUpdate = true;
-					}
-				};
-
 				// CAMERAS
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
@@ -111,13 +82,13 @@
 				textureCube.format = THREE.RGBFormat;
 				textureCube.mapping = THREE.CubeReflectionMapping;
 
-				textureEquirec = THREE.ImageUtils.loadTexture( "textures/environment/grace-new.jpg" );
+				textureEquirec = THREE.ImageUtils.loadTexture( "textures/2294472375_24a3b8ef46_o.jpg" );
 				textureEquirec.format = THREE.RGBAFormat;
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.magFilter = THREE.LinearFilter;
 				textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
 
-				textureSphere = THREE.ImageUtils.loadTexture( "textures/environment/grace_probe.jpg" );
+				textureSphere = THREE.ImageUtils.loadTexture( "textures/metal.jpg" );
 				textureSphere.mapping = THREE.SphericalReflectionMapping;
 
 				// Materials
@@ -166,11 +137,50 @@
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				document.body.appendChild( renderer.domElement );
 
+				//
+
+				var params = {
+					Cube: function () {
+						cubeMesh.material = cubeMaterial;
+						cubeMesh.visible = true;
+						sphereMaterial.envMap = textureCube;
+						sphereMaterial.needsUpdate = true;
+					},
+					Equirectangular: function () {
+						cubeMesh.material = equirectMaterial;
+						cubeMesh.visible = true;
+						sphereMaterial.envMap = textureEquirec;
+						sphereMaterial.needsUpdate = true;
+					},
+					Spherical: function () {
+							cubeMesh.visible = false;
+						sphereMaterial.envMap = textureSphere;
+						sphereMaterial.needsUpdate = true;
+					},
+					Refraction: false
+				};
+
 				var gui = new dat.GUI();
-				gui.add( params, 'toggleRefraction' );
-				gui.add( params, 'useCube' );
-				gui.add( params, 'useEquirect' );
-				gui.add( params, 'useSphere' );
+				gui.add( params, 'Cube' );
+				gui.add( params, 'Equirectangular' );
+				gui.add( params, 'Spherical' );
+				gui.add( params, 'Refraction' ).onChange( function( value ) {
+
+					if ( value ) {
+
+						textureEquirec.mapping = THREE.EquirectangularRefractionMapping;
+						textureCube.mapping = THREE.CubeRefractionMapping;
+
+					} else {
+
+						textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
+						textureCube.mapping = THREE.CubeReflectionMapping;
+
+					}
+
+					sphereMaterial.needsUpdate = true;
+
+				} );
 				gui.open();
 
 				window.addEventListener( 'resize', onWindowResize, false );
