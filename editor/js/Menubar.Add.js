@@ -98,7 +98,7 @@ Menubar.Add = function ( editor ) {
 	option.onClick( function () {
 
 		var radius = 20;
-		var segments = 32; // 32 segments instead of 8 as it gives the circle a more realistic look.
+		var segments = 32;
 
 		var geometry = new THREE.CircleGeometry( radius, segments );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
@@ -120,7 +120,7 @@ Menubar.Add = function ( editor ) {
 		var radiusTop = 20;
 		var radiusBottom = 20;
 		var height = 100;
-		var radiusSegments = 32; // 32 segments instead of 8 as it gives the cylinder a more realistic look.
+		var radiusSegments = 32;
 		var heightSegments = 1;
 		var openEnded = false;
 
