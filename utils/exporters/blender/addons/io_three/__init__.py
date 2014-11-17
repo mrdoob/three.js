@@ -151,8 +151,7 @@ def _mapping(index):
     types = (constants.MAPPING_TYPES.UV,
         constants.MAPPING_TYPES.CUBE_REFLECTION,
         constants.MAPPING_TYPES.CUBE_REFRACTION,
-        constants.MAPPING_TYPES.SPHERICAL_REFLECTION,
-        constants.MAPPING_TYPES.SPHERICAL_REFRACTION)
+        constants.MAPPING_TYPES.SPHERICAL_REFLECTION)
     return (types[index], types[index], types[index])
 
 bpy.types.Texture.THREE_mapping = EnumProperty(

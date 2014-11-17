@@ -72,11 +72,9 @@
 						if ( refract ) {
 							textureEquirec.mapping = THREE.EquirectangularRefractionMapping;
 							textureCube.mapping = THREE.CubeRefractionMapping;
-							textureSphere.mapping = THREE.SphericalRefractionMapping;
 						} else {
 							textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 							textureCube.mapping = THREE.CubeReflectionMapping;
-							textureSphere.mapping = THREE.SphericalReflectionMapping;
 						}
 						sphereMaterial.needsUpdate = true;
 					}
