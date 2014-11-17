@@ -17869,11 +17869,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.context = null;
-	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
-				 ? parameters.devicePixelRatio
-				 : self.devicePixelRatio !== undefined
-					 ? self.devicePixelRatio
-					 : 1;
+	this.devicePixelRatio = self.devicePixelRatio !== undefined ? self.devicePixelRatio : 1;
 
 	// clearing
 
@@ -20597,20 +20593,92 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// render particles
 
-			if ( updateBuffers ) {
+			var mode = _gl.POINTS;
 
-				setupVertexAttributes( material, program, geometry, 0 );
+			var index = geometry.attributes.index;
+
+			if ( index ) {
+
+				// indexed points
+
+				var type, size;
+
+				if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+
+					type = _gl.UNSIGNED_INT;
+					size = 4;
+
+				} else {
+
+					type = _gl.UNSIGNED_SHORT;
+					size = 2;
+
+				}
+
+				var offsets = geometry.offsets;
+
+				if ( offsets.length === 0 ) {
+
+					if ( updateBuffers ) {
+
+						setupVertexAttributes( material, program, geometry, 0 );
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+					}
+
+					_gl.drawElements( mode, index.array.length, type, 0);
+
+					_this.info.render.calls ++;
+					_this.info.render.points += index.array.length;
+
+				} else {
+
+					// if there is more than 1 chunk
+					// must set attribute pointers to use new offsets for each chunk
+					// even if geometry and materials didn't change
+
+					if ( offsets.length > 1 ) updateBuffers = true;
+
+					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+						var startIndex = offsets[ i ].index;
+
+						if ( updateBuffers ) {
+
+							setupVertexAttributes( material, program, geometry, startIndex );
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+						}
+
+						// render indexed points
+
+						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+
+						_this.info.render.calls ++;
+						_this.info.render.points += offsets[ i ].count;
+
+					}
+
+				}
+
+			} else {
+
+				// non-indexed points
+
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( material, program, geometry, 0 );
+
+				}
+
+				var position = geometry.attributes.position;
+
+				_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+				_this.info.render.calls ++;
+				_this.info.render.points += position.array.length / 3;
 
 			}
-
-			var position = geometry.attributes.position;
-
-			// render particles
-
-			_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
-
-			_this.info.render.calls ++;
-			_this.info.render.points += position.array.length / 3;
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -30448,6 +30516,7 @@ THREE.KeyFrameAnimation.prototype.getPrevKeyWith = function( sid, h, key ) {
 
 /**
  * @author mrdoob / http://mrdoob.com
+ * @author willy-vvu / http://willy-vvu.github.io
  */
 
 THREE.MorphAnimation = function ( mesh ) {
@@ -30457,12 +30526,16 @@ THREE.MorphAnimation = function ( mesh ) {
 	this.currentTime = 0;
 	this.duration = 1000;
 	this.loop = true;
+	this.lastFrame = 0;
+	this.currentFrame = 0;
 
 	this.isPlaying = false;
 
 };
 
 THREE.MorphAnimation.prototype = {
+
+	constructor: THREE.MorphAnimation,
 
 	play: function () {
 
@@ -30476,45 +30549,38 @@ THREE.MorphAnimation.prototype = {
 
 	},
 
-	update: ( function () {
+	update: function ( delta ) {
 
-		var lastFrame = 0;
-		var currentFrame = 0;
+		if ( this.isPlaying === false ) return;
 
-		return function ( delta ) {
+		this.currentTime += delta;
 
-			if ( this.isPlaying === false ) return;
+		if ( this.loop === true && this.currentTime > this.duration ) {
 
-			this.currentTime += delta;
-
-			if ( this.loop === true && this.currentTime > this.duration ) {
-
-				this.currentTime %= this.duration;
-
-			}
-
-			this.currentTime = Math.min( this.currentTime, this.duration );
-
-			var interpolation = this.duration / this.frames;
-			var frame = Math.floor( this.currentTime / interpolation );
-
-			if ( frame != currentFrame ) {
-
-				this.mesh.morphTargetInfluences[ lastFrame ] = 0;
-				this.mesh.morphTargetInfluences[ currentFrame ] = 1;
-				this.mesh.morphTargetInfluences[ frame ] = 0;
-
-				lastFrame = currentFrame;
-				currentFrame = frame;
-
-			}
-
-			this.mesh.morphTargetInfluences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
-			this.mesh.morphTargetInfluences[ lastFrame ] = 1 - this.mesh.morphTargetInfluences[ frame ];
+			this.currentTime %= this.duration;
 
 		}
 
-	} )()
+		this.currentTime = Math.min( this.currentTime, this.duration );
+
+		var interpolation = this.duration / this.frames;
+		var frame = Math.floor( this.currentTime / interpolation );
+
+		if ( frame != this.currentFrame ) {
+
+			this.mesh.morphTargetInfluences[ this.lastFrame ] = 0;
+			this.mesh.morphTargetInfluences[ this.currentFrame ] = 1;
+			this.mesh.morphTargetInfluences[ frame ] = 0;
+
+			this.lastFrame = this.currentFrame;
+			this.currentFrame = frame;
+
+		}
+
+		this.mesh.morphTargetInfluences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
+		this.mesh.morphTargetInfluences[ this.lastFrame ] = 1 - this.mesh.morphTargetInfluences[ frame ];
+
+	}
 
 };
 

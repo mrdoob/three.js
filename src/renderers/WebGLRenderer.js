@@ -2825,7 +2825,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						// render indexed points
 
-						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size ); 
+						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
 
 						_this.info.render.calls ++;
 						_this.info.render.points += offsets[ i ].count;
