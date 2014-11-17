@@ -42,11 +42,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.context = null;
-	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
-				 ? parameters.devicePixelRatio
-				 : self.devicePixelRatio !== undefined
-					 ? self.devicePixelRatio
-					 : 1;
+	this.devicePixelRatio = self.devicePixelRatio !== undefined ? self.devicePixelRatio : 1;
 
 	// clearing
 
