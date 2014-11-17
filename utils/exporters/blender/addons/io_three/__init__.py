@@ -156,7 +156,7 @@ def _mapping(index):
 
 bpy.types.Texture.THREE_mapping = EnumProperty(
     name='Mapping',
-    items = [_mapping(x) for x in range(5)],
+    items = [_mapping(x) for x in range(4)],
     default=constants.MAPPING_TYPES.UV)
 
 class TEXTURE_PT_hello(bpy.types.Panel):
