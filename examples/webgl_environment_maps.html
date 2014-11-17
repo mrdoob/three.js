@@ -211,13 +211,13 @@
 				textureCube.mapping = THREE.CubeReflectionMapping;
 				cubeMaterial.uniforms[ "tCube" ].value = textureCube;
 
-				textureEquirec = THREE.ImageUtils.loadTexture( "textures/environment/test2.jpg" );
+				textureEquirec = THREE.ImageUtils.loadTexture( "textures/environment/grace-new.jpg" );
 				textureEquirec.format = THREE.RGBAFormat;
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.magFilter = THREE.LinearFilter;
 				textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
 				// textureEquirec.anisotropy = 8.0;
-				textureEquirec.generateMipmaps = true;
+				// textureEquirec.generateMipmaps = true;
 				equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
 
 				textureSphere = THREE.ImageUtils.loadTexture( "textures/environment/grace_probe.jpg" );
