@@ -122,11 +122,10 @@ THREE.UVMapping = 300;
 THREE.CubeReflectionMapping = 301;
 THREE.CubeRefractionMapping = 302;
 
-THREE.SphericalReflectionMapping = 303;
-THREE.SphericalRefractionMapping = 304;
+THREE.EquirectangularReflectionMapping = 303;
+THREE.EquirectangularRefractionMapping = 304;
 
-THREE.EquirectangularReflectionMapping = 305;
-THREE.EquirectangularRefractionMapping = 306;
+THREE.SphericalReflectionMapping = 305;
 
 // Wrapping modes
 
@@ -22672,7 +22671,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.combine.value = material.combine;
 		uniforms.useRefract.value = material.envMap && (
 			material.envMap.mapping === THREE.CubeRefractionMapping ||
-			material.envMap.mapping === THREE.SphericalRefractionMapping ||
 			material.envMap.mapping === THREE.EquirectangularRefractionMapping );
 
 	}
@@ -24682,21 +24680,27 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		var envMapTypeDefine = null;
+
 		if ( parameters.envMap ) {
+
 			switch ( material.envMap.mapping ) {
+
 				case THREE.CubeReflectionMapping:
 				case THREE.CubeRefractionMapping:
 					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
 					break;
-				case THREE.SphericalReflectionMapping:
-				case THREE.SphericalRefractionMapping:
-					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
-					break;
+
 				case THREE.EquirectangularReflectionMapping:
 				case THREE.EquirectangularRefractionMapping:
 					envMapTypeDefine = "ENVMAP_TYPE_EQUIREC";
 					break;
+
+				case THREE.SphericalReflectionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
+					break;
+
 			}
+
 		}
 
 		// console.log( "building new program " );
