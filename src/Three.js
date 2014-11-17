@@ -115,13 +115,16 @@ THREE.AddOperation = 2;
 
 // Mapping modes
 
-THREE.UVMapping = function () {};
+THREE.UVMapping = 300;
 
-THREE.CubeReflectionMapping = function () {};
-THREE.CubeRefractionMapping = function () {};
+THREE.CubeReflectionMapping = 301;
+THREE.CubeRefractionMapping = 302;
 
-THREE.SphericalReflectionMapping = function () {};
-THREE.SphericalRefractionMapping = function () {};
+THREE.SphericalReflectionMapping = 303;
+THREE.SphericalRefractionMapping = 304;
+
+THREE.EquirectangularReflectionMapping = 305;
+THREE.EquirectangularRefractionMapping = 306;
 
 // Wrapping modes
 
