@@ -712,7 +712,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material.envMap !== null ) {
 
-				if ( mapping === THREE.SphericalReflectionMapping ) {
+				if ( material.envMap.mapping === THREE.SphericalReflectionMapping ) {
 
 					_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
 					_uv1x = 0.5 * _normal.x + 0.5;
