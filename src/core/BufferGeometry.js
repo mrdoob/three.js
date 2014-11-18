@@ -62,6 +62,38 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	// START_VEROLD_MOD - wireframe
+	addWireframeAttribute: function ( ) {
+
+		var indices = this.attributes.index;
+
+		if ( indices === undefined || indices.array === undefined ) {
+
+			console.warn( 'THREE.BufferGeometry.addWireframeAttribute: Missing index attribute.' );
+			return;
+
+		}
+
+		indices = indices.array;
+
+		var wireframe = new Uint16Array( indices.length * 2 );
+
+		for ( var i = 0; i < indices.length / 3; ++i ) {
+
+			for ( var j = 0; j < 3; ++j ) {
+
+				wireframe[ i * 6 + j * 2 + 0 ] = indices[ i * 3 + j ];
+				wireframe[ i * 6 + j * 2 + 1 ] = indices[ i * 3 + ( j + 1 ) % 3 ];
+
+			}
+
+		}
+
+		this.addAttribute( 'wireframe', new THREE.BufferAttribute( wireframe, 1 ) );
+
+	},
+	// END_VEROLD_MOD - wireframe
+
 	applyMatrix: function ( matrix ) {
 
 		var position = this.attributes.position;

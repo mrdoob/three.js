@@ -2217,13 +2217,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				fi = chunk_faces3[ f ];
-
-				faceArray[ offset_face ] 	 = vertexIndex;
+				faceArray[ offset_face ]   = vertexIndex;
 				faceArray[ offset_face + 1 ] = vertexIndex + 1;
 				faceArray[ offset_face + 2 ] = vertexIndex + 2;
 
 				offset_face += 3;
+
+				lineArray[ offset_line ]     = vertexIndex;
+				lineArray[ offset_line + 1 ] = vertexIndex + 1;
+
+				lineArray[ offset_line + 2 ] = vertexIndex;
+				lineArray[ offset_line + 3 ] = vertexIndex + 2;
+
+				lineArray[ offset_line + 4 ] = vertexIndex + 1;
+				lineArray[ offset_line + 5 ] = vertexIndex + 2;
+
+				offset_line += 6;
+
 				vertexIndex += 3;
 
 			}
@@ -2560,7 +2570,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attribute.needsUpdate === true ) {
 
-				var bufferType = ( key === 'index' || key === 'index_wireframe' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
+				var bufferType = ( key === 'index' || key === 'wireframe' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
 				_gl.bindBuffer( bufferType, attribute.buffer );
 				_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
@@ -2684,8 +2694,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var key = programAttributesKeys[ i ];
 			var programAttribute = programAttributes[ key ];
 
-			if ( key === 'index' || key === 'index_wireframe') continue;
-
 			if ( programAttribute >= 0 ) {
 
 				var geometryAttribute = geometryAttributes[ key ];
@@ -2753,7 +2761,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var mode = material.wireframe === true ? _gl.LINES : _gl.TRIANGLES;
 
-			var index = geometry.attributes.index;
+			// START_VEROLD_MOD - wireframe
+			var index = material.wireframe === true ?
+				geometry.attributes.wireframe : geometry.attributes.index;
+			// END_VEROLD_MOD - wireframe
 
 			if ( index ) {
 
@@ -2798,28 +2809,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					updateBuffers = true;
 
+					// START_VEROLD_MOD - materialIndex in offsets
 					for ( var i = 0, il = offsetIndices.length; i < il; i ++ ) {
+
+						var offset = offsets[ offsetIndices[ i ] ];
+
+						// START_VEROLD_MOD - wireframe
+						if ( material.wireframe ) {
+
+							offset = {
+								index: offset.index,
+								start: 2 * offset.start,
+								count: 2 * offset.count
+							};
+
+						}
+						// END_VEROLD_MOD - wireframe
+						// END_VEROLD_MOD - materialIndex in offsets
 
 						if ( updateBuffers ) {
 
-							setupVertexAttributes( material, program, geometry, startIndex );
+							setupVertexAttributes( material, program, geometry, offset.index );
 							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 						}
 
 						// render indexed triangles
-
-						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+						// START_VEROLD_MOD - wireframe
+						_gl.drawElements( mode, offset.count, type, offset.start * size );
 
 						_this.info.render.calls ++;
-						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-						_this.info.render.faces += offsets[ i ].count / 3;
+						_this.info.render.vertices += offset.count; // not really true, here vertices can be shared
+
+						if ( !material.wireframe ) {
+
+							_this.info.render.faces += offset.count / 3;
+
+						}
+						// END_VEROLD_MOD - wireframe
 
 					}
 
 				}
 
-			} else if ( !wireframeBit ) {
+			} else if ( !material.wireframe ) {
 
 				// non-indexed triangles
 
@@ -2836,8 +2869,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
 				_this.info.render.calls ++;
-				_this.info.render.vertices += position.numItems / 3;
-				_this.info.render.faces += position.numItems / 9;
+				_this.info.render.vertices += position.array.length / 3;
+				_this.info.render.faces += position.array.length / 9;
 
 			}
 
@@ -3032,7 +3065,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.color >= 0 ) {
 
-				if ( object.geometry.colors.length > 0 || object.geometry.faces.length > 0 && geometryGroup.__webglColorBuffer.length > 0) {
+				if ( object.geometry.colors.length > 0 || object.geometry.faces.length > 0 ) {
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
 					enableAttribute( attributes.color );
@@ -3637,9 +3670,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-//START_VEROLD_MOD
 	function renderObjects( renderList, camera, lights, fog, useBlending, overrideMaterial ) {
-//END_VEROLD_MOD
 
 		var material;
 
@@ -3768,7 +3799,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			globject.transparent = null;
 
 		}
-	};
+
+	}
 
 	function unrollBufferMaterial ( globject ) {
 
