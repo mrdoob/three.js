@@ -46,9 +46,10 @@ THREE.PCFSoftShadowMap = 2;
 
 // HDR TYPE CONSTANTS
 
-THREE.LogLuvHDR = 0;
-THREE.RGBMHDR = 1;
-THREE.FullHDR = 1;
+THREE.HDRFull = 0;
+THREE.HDRRGBM = 1;
+THREE.HDRRGBD = 2;
+THREE.HDRLogLuv = 3;
 
 // MATERIAL CONSTANTS
 
@@ -121,13 +122,16 @@ THREE.AddOperation = 2;
 
 // Mapping modes
 
-THREE.UVMapping = function () {};
+THREE.UVMapping = 300;
 
-THREE.CubeReflectionMapping = function () {};
-THREE.CubeRefractionMapping = function () {};
+THREE.CubeReflectionMapping = 301;
+THREE.CubeRefractionMapping = 302;
 
-THREE.SphericalReflectionMapping = function () {};
-THREE.SphericalRefractionMapping = function () {};
+THREE.SphericalReflectionMapping = 303;
+THREE.SphericalRefractionMapping = 304;
+
+THREE.EquirectangularReflectionMapping = 305;
+THREE.EquirectangularRefractionMapping = 306;
 
 // Wrapping modes
 
@@ -168,6 +172,15 @@ THREE.RGBFormat = 1020;
 THREE.RGBAFormat = 1021;
 THREE.LuminanceFormat = 1022;
 THREE.LuminanceAlphaFormat = 1023;
+// THREE.RGBEFormat handled as THREE.RGBAFormat in shaders
+THREE.RGBEFormat = THREE.RGBAFormat; //1024;
+
+// HDR formats
+
+THREE.RGBMHDRFormat = 1024;
+THREE.RGBDHDRFormat = 1025;
+THREE.RGBEHDRFormat = 1026;
+THREE.LogLuvHDRFormat = 1027;
 
 // DDS / ST3C Compressed texture formats
 
@@ -188,3 +201,43 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 THREE.RGB_ATC_Format = 2200;
 THREE.RGBA_ATC_EXPLICIT_ALPHA_Format = 2201;
 THREE.RGBA_ATC_INTERP_ALPHA_Format = 2202;
+
+// DEPRECATED
+
+THREE.Projector = function () {
+
+	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
+
+	this.projectVector = function ( vector, camera ) {
+
+		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
+		vector.project( camera );
+
+	};
+
+	this.unprojectVector = function ( vector, camera ) {
+
+		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
+		vector.unproject( camera );
+
+	};
+
+	this.pickingRay = function ( vector, camera ) {
+
+		console.error( 'THREE.Projector: .pickingRay() has been removed.' );
+
+	};
+
+};
+
+THREE.CanvasRenderer = function () {
+
+	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
+
+	this.domElement = document.createElement( 'canvas' );
+	this.clear = function () {};
+	this.render = function () {};
+	this.setClearColor = function () {};
+	this.setSize = function () {};
+
+};

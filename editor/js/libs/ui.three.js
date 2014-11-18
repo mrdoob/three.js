@@ -83,6 +83,7 @@ UI.Texture = function () {
 };
 
 UI.Texture.prototype = Object.create( UI.Element.prototype );
+UI.Texture.prototype.constructor = UI.Texture;
 
 UI.Texture.prototype.getValue = function () {
 
@@ -217,6 +218,7 @@ UI.CubeTexture = function () {
 };
 
 UI.CubeTexture.prototype = Object.create( UI.Element.prototype );
+UI.CubeTexture.prototype.constructor = UI.CubeTexture;
 
 UI.CubeTexture.prototype.getValue = function () {
 

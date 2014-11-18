@@ -45,8 +45,6 @@ THREE.ToneMapShader = {
 		"const vec3 LUM_CONVERT = vec3(0.299, 0.587, 0.114);",
 
 		"vec3 ToneMap( vec3 vColor ) {",
-			//Gamma 2.0 to linear
-			// "vColor = vColor * vColor;",
 			"#ifdef ADAPTED_LUMINANCE",
 				// Get the calculated average luminance 
 				"float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;",
@@ -64,20 +62,11 @@ THREE.ToneMapShader = {
 			"return fLumCompressed * vColor;",
 		"}",
 
-		THREE.ShaderChunk['hdr_decode_pars_fragment'],
-		THREE.ShaderChunk['hdr_encode_pars_fragment'],
-
 		"void main() {",
 
 			"vec4 texel = texture2D( tDiffuse, vUv );",
 			
-			"#ifdef HDR_INPUT_LOGLUV",
-				"gl_FragColor = vec4( ToneMap( HDRDecodeLOGLUV( texel ) ), 1.0 );",
-			"#elif defined( HDR_INPUT_RGBM )",
-				"gl_FragColor = vec4( ToneMap( HDRDecodeRGBM( texel ) ), 1.0 );",
-			"#else",
-				"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
-			"#endif",
+			"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
 			//Gamma 2.0
 			"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
 

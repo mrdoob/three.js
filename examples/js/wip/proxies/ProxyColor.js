@@ -11,6 +11,7 @@ THREE.ProxyColor = function ( array, offset ) {
 }
 
 THREE.ProxyColor.prototype = Object.create( THREE.Color.prototype );
+THREE.ProxyColor.prototype.constructor = THREE.ProxyColor;
 
 Object.defineProperties( THREE.ProxyColor.prototype, {
 	'r': {

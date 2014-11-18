@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			h1 { }
+			a { color:skyblue; text-decoration:none }
+			canvas { pointer-events:none; z-index:10; position:relative; }
+
+			#d { position:absolute; width: 100%; text-align:center; margin:1em 0 -4.5em 0; z-index:1000; }
+
+			.bwrap { margin:0.5em 0 0 0 }
+			button { font-family:georgia; border:0; background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px; }
+			button:hover { background:#333 }
+			#buttons_cars button { color:#fa0 }
+
+			#car_info { text-align:center; }
+			#car_name { font-size:1em }
+			#car_author { font-size:1em }
+
+			.dg { z-index: 100 }
+
+			#oldie { background:rgb(50,0,0) !important; color:#fff !important; margin-top:7em!important }
+		</style>
+	</head>
+
+	<body>
+		
+		<script src="../build/three.js"></script>
+
+		<script src="js/loaders/BinaryLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+		<div id="info">
+
+
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl hdr texture example<br/>
+			Cube Map by <a href="http://www.pauldebevec.com/Probes/">Paul Debevec</a>
+
+		</div>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var STATS_ENABLED = false;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+			var cameraCube, sceneCube;
+			var textureCubeRGBM, textureCubeRGBD;
+			var cubeMesh, sphereMesh;
+			var sphereMaterial;
+			var refract;
+
+			var m, mi;
+
+			var directionalLight, pointLight;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			// var loader = new THREE.BinaryLoader( true );
+			// document.body.appendChild( loader.statusDomElement );
+
+			init();
+			animate();
+
+			function init() {
+
+				params = {
+					// stuff: 0.4,
+					useRGBM: function() {
+						// cubeMesh.material = cubeMaterial;
+						sphereMaterial.envMap = textureCubeRGBM;
+						cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
+						cubeMaterial.uniforms.tCube.value = textureCubeRGBM;
+						cubeMaterial.needsUpdate = true;
+					},
+					useRGBD: function() {
+						// cubeMesh.material = cubeMaterial;
+						sphereMaterial.envMap = textureCubeRGBD;
+						cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBD;
+						cubeMaterial.uniforms.tCube.value = textureCubeRGBD;
+						cubeMaterial.needsUpdate = true;
+					},
+					// useSphere: function() {
+					// 	cubeMesh.material = equirectMaterial;
+					// 	sphereMaterial.envMap = textureSphere;
+					// 	sphereMaterial.needsUpdate = true;
+					// },
+					// toggleRefraction: function() {
+					// 	refract = !refract;
+					// 	if ( refract ) {
+					// 		textureEquirec.mapping = THREE.EquirectangularRefractionMapping;
+					// 		textureCube.mapping = THREE.CubeRefractionMapping;
+					// 		textureSphere.mapping = THREE.SphericalRefractionMapping;
+					// 	}
+					// 	else {
+					// 		textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
+					// 		textureCube.mapping = THREE.CubeReflectionMapping;
+					// 		textureSphere.mapping = THREE.SphericalReflectionMapping;
+					// 	}
+					// 	sphereMaterial.needsUpdate = true;
+					// }
+				};
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// CAMERAS
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0xffffff );
+				scene.add( ambient );
+
+				// directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				// directionalLight.position.set( 2, 1.2, 10 ).normalize();
+				// scene.add( directionalLight );
+
+				// directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				// directionalLight.position.set( -2, 1.2, -10 ).normalize();
+				// scene.add( directionalLight );
+
+				// pointLight = new THREE.PointLight( 0xffaa00, 2 );
+				// pointLight.position.set( 2000, 1200, 10000 );
+				// scene.add( pointLight );
+
+				// Skybox
+
+				// var equirectShader = THREE.ShaderLib[ "equirect" ];
+				// // shader.uniforms[ "tCube" ].value = textureCube;
+
+				// var equirectMaterial = new THREE.ShaderMaterial( {
+				// 	fragmentShader: equirectShader.fragmentShader,
+				// 	vertexShader: equirectShader.vertexShader,
+				// 	uniforms: equirectShader.uniforms,
+				// 	depthWrite: false,
+				// 	side: THREE.BackSide
+				// } );
+
+				var cubeShader = THREE.ShaderLib[ "cube" ];
+				var cubeMaterial = new THREE.ShaderMaterial( {
+					fragmentShader: cubeShader.fragmentShader,
+					vertexShader: cubeShader.vertexShader,
+					uniforms: cubeShader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide
+				} );
+
+				cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
+				cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), cubeMaterial );
+				sceneCube.add( cubeMesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setFaceCulling( THREE.CullFaceNone );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
+
+				if ( STATS_ENABLED ) {
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+
+				}
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				var r = "textures/hdr/ml/";
+				var urls = [ r + "ml_posX_RGBM.png", r + "ml_negX_RGBM.png",
+							 r + "ml_posY_RGBM.png", r + "ml_negY_RGBM.png",
+							 r + "ml_posZ_RGBM.png", r + "ml_negZ_RGBM.png" ];
+				textureCubeRGBM = THREE.ImageUtils.loadTextureCube( urls );
+				textureCubeRGBM.format = THREE.RGBAFormat;
+				textureCubeRGBM.hdrFormat = THREE.HDRRGBM;
+
+				var r = "textures/hdr/ml/";
+				var urls = [ r + "ml_posX_RGBD.png", r + "ml_negX_RGBD.png",
+							 r + "ml_posY_RGBD.png", r + "ml_negY_RGBD.png",
+							 r + "ml_posZ_RGBD.png", r + "ml_negZ_RGBD.png" ];
+
+				textureCubeRGBD = THREE.ImageUtils.loadTextureCube( urls );
+				textureCubeRGBD.format = THREE.RGBAFormat;
+				textureCubeRGBD.hdrFormat = THREE.HDRRGBD;
+				
+				cubeMaterial.uniforms[ "tCube" ].value = textureCubeRGBM;
+
+				// textureEquirec = THREE.ImageUtils.loadTexture( "textures/environment/grace-new.jpg" );
+				// textureEquirec.format = THREE.RGBAFormat;
+				// textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
+				// textureEquirec.magFilter = THREE.LinearFilter;
+				// textureEquirec.minFilter = THREE.LinearFilter;
+				// equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
+
+				// textureSphere = THREE.ImageUtils.loadTexture( "textures/environment/grace_probe.jpg" );
+				// textureSphere.mapping = THREE.SphericalReflectionMapping;
+
+				var gui = new dat.GUI();
+				
+				gui.add( params, 'useRGBM' );
+				gui.add( params, 'useRGBD' );
+				// gui.add( params, 'useLogLuv' );
+				gui.open();
+
+				createScene();
+				
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				cameraCube.aspect = window.innerWidth / window.innerHeight;
+				cameraCube.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+
+			function createScene(  ) {
+				var geometry = new THREE.SphereGeometry( 400.0, 24, 24 );
+				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCubeRGBM } );
+				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
+
+				// sphereMesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+
+				scene.add( sphereMesh );
+
+				$('.dg.ac').css('z-index', 100);
+				
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseY = ( event.clientY - window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var timer = -0.0002 * Date.now();
+
+				camera.position.x = 1000 * Math.cos( timer );
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.position.z = 1000 * Math.sin( timer );
+
+				camera.lookAt( scene.position );
+				cameraCube.rotation.copy( camera.rotation );
+
+				renderer.render( sceneCube, cameraCube );
+				renderer.render( scene, camera );
+
+				if ( STATS_ENABLED ) stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>

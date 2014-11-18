@@ -15,6 +15,7 @@ THREE.CTMLoader = function ( showStatus ) {
 };
 
 THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
+THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
 
 // Load multiple CTM parts defined in JSON
 
@@ -242,6 +243,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 	}
 
 	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
+	Model.prototype.constructor = Model;
 
 	var geometry = new Model();
 

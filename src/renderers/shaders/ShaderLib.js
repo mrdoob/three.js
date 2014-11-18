@@ -73,6 +73,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -185,6 +186,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -320,6 +322,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
@@ -1248,14 +1251,77 @@ THREE.ShaderLib = {
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 
 			"void main() {",
 
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+				"#ifdef ENVMAP_HDR_INPUT",
+					"#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM",
+						"gl_FragColor = vec4( HDRDecodeRGBM( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD",
+						"gl_FragColor = vec4( HDRDecodeRGBD( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE",
+						"gl_FragColor = vec4( HDRDecodeRGBE( gl_FragColor ), 1.0 );",
+					"#endif",
+				"#endif",
+				"#if defined( GAMMA_INPUT ) && !defined( GAMMA_OUTPUT )",
+					"gl_FragColor.xyz *= gl_FragColor.xyz;",
+				"#elif !defined( GAMMA_INPUT ) && defined( GAMMA_OUTPUT )",
+					"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
+				"#endif",
 				THREE.ShaderChunk[ "hdr_encode_fragment" ],
+			"}"
+
+		].join("\n")
+
+	},
+
+	'equirect': {
+
+		uniforms: { "tEquirect": { type: "t", value: null },
+					"tFlip": { type: "f", value: - 1 } },
+
+		vertexShader: [
+
+			"varying vec3 vWorldPosition;",
+
+			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
+
+			"void main() {",
+
+			"	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+			"	vWorldPosition = worldPosition.xyz;",
+
+			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+
+			"uniform sampler2D tEquirect;",
+			"uniform float tFlip;",
+
+			"varying vec3 vWorldPosition;",
+
+			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+
+			"void main() {",
+
+				// "	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
+				"vec3 direction = normalize( vWorldPosition );",
+				"vec2 sampleUV;",
+				"sampleUV.y = clamp( tFlip * direction.y * -0.5 + 0.5, 0.0, 1.0);",
+				"sampleUV.x = atan( direction.z, direction.x ) * 0.15915494309189533576888376337251 + 0.5;", // reciprocal( 2 PI ) + 0.5
+				"gl_FragColor = texture2D( tEquirect, sampleUV );",
+
+				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
 			"}"
 

@@ -67,7 +67,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// hdr rendering
 	
 	this.hdrOutputEnabled = false;
-	this.hdrOutputType = THREE.FullHDR;
+	this.hdrOutputType = THREE.HDRFull;
 
 	// shadow map
 
@@ -2887,8 +2887,52 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var position = geometry.attributes.position;
 
 			// render particles
+			
+			if ( geometry.attributes.index !== undefined ) {
+			
+				var indices = geometry.attributes.index;
+			
+				var type;
+				var size;
+				
+				if ( indices.array instanceof Uint16Array ) {
+				
+					type = _gl.UNSIGNED_SHORT;
+					size = 2;
+				
+				} else {
+				
+					console.error( "unsupported index data type" );
+					return;
+				
+				}
 
-			_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, indices.buffer );
+			
+				if ( geometry.offsets.length > 0 ) {
+				
+					for ( var i = 0; i < geometry.offsets.length; i++ ) {
+					
+						var offset = geometry.offsets[ i ];
+						
+						_gl.drawElements( _gl.POINTS, offset.count, type, offset.start * size );
+						
+					
+					}
+				
+				} else {
+					
+					_gl.drawElements( _gl.POINTS, indices.length, type, 0);
+					
+				}
+			
+			} else {
+			
+				_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
+			
+			}
+
+			
 
 			_this.info.render.calls ++;
 			_this.info.render.points += position.array.length / 3;
@@ -4902,6 +4946,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.envMap && material.envMap.hdrFormat ) {
+			if ( !material.defines ) material.defines = {};
+			if ( material.defines['ENVMAP_HDR_INPUT'] !== material.envMap.hdrFormat ) {
+				material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrFormat;
+				material.needsUpdate = true;
+			}
+		}
 		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
@@ -4918,7 +4969,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.refractionRatio.value = material.refractionRatio;
 		uniforms.combine.value = material.combine;
-		uniforms.useRefract.value = material.envMap && material.envMap.mapping instanceof THREE.CubeRefractionMapping;
+		uniforms.useRefract.value = material.envMap && (
+			material.envMap.mapping === THREE.CubeRefractionMapping ||
+			material.envMap.mapping === THREE.SphericalRefractionMapping ||
+			material.envMap.mapping === THREE.EquirectangularRefractionMapping );
 
 	}
 
@@ -5979,8 +6033,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 
+			if ( texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping ) {
+
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT is set to THREE.ClampToEdgeWrapping. ( ' + texture.sourceFile + ' )' );
+
+			}
+
 			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
+
+			if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
+
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter is set to THREE.LinearFilter or THREE.NearestFilter. ( ' + texture.sourceFile + ' )' );			
+
+			}
 
 		}
 

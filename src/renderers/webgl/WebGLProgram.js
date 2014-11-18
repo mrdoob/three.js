@@ -84,23 +84,39 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		var envMapTypeDefine = null;
+		if ( parameters.envMap ) {
+			switch ( material.envMap.mapping ) {
+				case THREE.CubeReflectionMapping:
+				case THREE.CubeRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+					break;
+				case THREE.SphericalReflectionMapping:
+				case THREE.SphericalRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
+					break;
+				case THREE.EquirectangularReflectionMapping:
+				case THREE.EquirectangularRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_EQUIREC";
+					break;
+			}
+		}
+
 		var hdrOutputTypeDefine = null;
 		if ( _this.hdrOutputEnabled ) {
 			if ( parameters.hdrOutput !== false ) {
 				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrOutputType;
-				if ( outputType === THREE.FullHDR ) {
-					hdrOutputTypeDefine = "HDR_OUTPUT_FULL";
-				}
-				else if ( outputType === THREE.RGBMHDR ) {
+				if ( outputType === THREE.HDRRGBM ) {
 					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
 				}
-				else if ( outputType === THREE.LogLuvHDR ) {
+				else if ( outputType === THREE.HDRRGBD ) {
+					hdrOutputTypeDefine = "HDR_OUTPUT_RGBD";
+				}
+				else if ( outputType === THREE.HDRLogLuv ) {
 					hdrOutputTypeDefine = "HDR_OUTPUT_LOGLUV";
 				}
-
 			}
 		}
-
 
 		// console.log( "building new program " );
 
@@ -234,6 +250,11 @@ THREE.WebGLProgram = ( function () {
 
 				customDefines,
 
+				"#define HDR_TYPE_RGBM " + THREE.HDRRGBM,
+				"#define HDR_TYPE_RGBD " + THREE.HDRRGBD,
+				"#define HDR_TYPE_RGBE " + THREE.HDRRGBE,
+				"#define HDR_TYPE_LOGLUV " + THREE.HDRLogLuv,
+
 				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 				"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
@@ -253,6 +274,7 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
+				envMapTypeDefine ? "#define " + envMapTypeDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
