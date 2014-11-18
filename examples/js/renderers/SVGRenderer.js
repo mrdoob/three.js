@@ -11,6 +11,7 @@ THREE.SVGObject = function ( node ) {
 };
 
 THREE.SVGObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.SVGObject.prototype.constructor = THREE.SVGObject;
 
 THREE.SVGRenderer = function () {
 

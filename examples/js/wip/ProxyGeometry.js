@@ -21,6 +21,7 @@ THREE.ProxyGeometry = function ( ) {
 };
 
 THREE.ProxyGeometry.prototype = Object.create( THREE.IndexedGeometry2.prototype );
+THREE.ProxyGeometry.prototype.constructor = THREE.ProxyGeometry;
 
 Object.defineProperties(THREE.ProxyGeometry.prototype, {
 	vertices: { 

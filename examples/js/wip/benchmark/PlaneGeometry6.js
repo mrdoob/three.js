@@ -27,3 +27,4 @@ THREE.PlaneGeometry6 = function ( width, height, widthSegments, heightSegments )
 };
 
 THREE.PlaneGeometry6.prototype = Object.create( THREE.PlaneBufferGeometry.prototype );
+THREE.PlaneGeometry6.prototype.constructor = THREE.PlaneGeometry6;

@@ -160,7 +160,7 @@ THREE.VREffect = function ( renderer, done ) {
 
 		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
 		function onFullScreenChanged() {
-			if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
+			if ( !document.mozFullScreenElement && !document.webkitFullscreenElement ) {
 				self.setFullScreen( false );
 			}
 		}
