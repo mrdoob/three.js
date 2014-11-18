@@ -18172,6 +18172,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_lightsNeedUpdate = true;
 
+		for ( var i = 0; i < _enabledAttributes.length; i ++ ) {
+
+			_enabledAttributes[ i ] = 0;
+
+		}
+
 	};
 
 	setDefaultGLState();
