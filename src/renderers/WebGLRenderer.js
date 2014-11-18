@@ -4530,6 +4530,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
+				 material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
