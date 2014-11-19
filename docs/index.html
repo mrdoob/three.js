@@ -102,7 +102,7 @@
 				border: 1px solid #2194CE;
 			}
 			#clearFilterButton {
-				position: absolute; 
+				position: absolute;
 				right: 6px;
 				top: 50%;
 				margin-top: -8px;
@@ -260,20 +260,20 @@
 						var li = document.createElement( 'li' );
 						var a = document.createElement( 'a' );
 						a.setAttribute( 'href', '#' );
-						( function( s, c, p ) { 
+						( function( s, c, p ) {
 							a.addEventListener( 'click', function( e ) {
 								goTo( s, c, p );
 								e.preventDefault();
-							} ) 
-						} )( section, category, page[ 0 ] )
+							} )
+						} )( section, category, cleanPageName( page[0] ) )
 						a.textContent = page[ 0 ];
 						li.appendChild( a );
 						ul.appendChild( li );
 
-						nameCategoryMap[page[0]] = {
+						nameCategoryMap[ cleanPageName( page[0] ) ] = {
 							section: section,
 							category: category,
-							name: page[0],
+							name: cleanPageName( page[0] ),
 							element: a
 						};
 
@@ -286,6 +286,8 @@
 
 
 			}
+
+			ul.appendChild( outBuildNote() );
 
 			panel.appendChild( content )
 
@@ -361,7 +363,7 @@
 					// Resolve links of the form 'Class.member'
 					if(section.indexOf(MEMBER_DELIMITER) !== -1) {
 						parts = section.split(MEMBER_DELIMITER)
-						section = parts[0]; 
+						section = parts[0];
 						member = parts[1];
 					}
 
@@ -370,7 +372,7 @@
 					section = location.section;
 					category = location.category;
 					name = location.name;
-				} 
+				}
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
 				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
@@ -390,6 +392,12 @@
 				var member = hash[2].split(MEMBER_DELIMITER)
 				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(member[0]), decodeUrl(member.length > 1 ? member[1] : '') );
 
+			}
+
+			function outBuildNote() {
+				var note = document.createElement( 'li' );
+				note.innerHTML = '<br><br> * This class is not bundled in the Three.js build. ';
+				return note;
 			}
 
 			window.addEventListener( 'hashchange', goToHash, false );
