@@ -527,7 +527,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	traverseParents: function ( callback ) {
+	traverseUp: function ( callback ) {
 
 		if( this.parent ){
 		
