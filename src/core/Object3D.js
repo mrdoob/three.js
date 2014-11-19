@@ -533,7 +533,7 @@ THREE.Object3D.prototype = {
 		
 			callback( this.parent );
 		
-			this.parent.traverseParents( callback );
+			this.parent.traverseUp( callback );
 		
 		}
 	},
