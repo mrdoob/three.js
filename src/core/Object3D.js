@@ -527,15 +527,16 @@ THREE.Object3D.prototype = {
 
 	},
 
-	traverseUp: function ( callback ) {
+	traverseAncestors: function ( callback ) {
 
-		if( this.parent ){
-		
+		if ( this.parent ) {
+
 			callback( this.parent );
-		
-			this.parent.traverseUp( callback );
-		
+
+			this.parent.traverseAncestors( callback );
+
 		}
+
 	},
 
 	updateMatrix: function () {
