@@ -102,7 +102,7 @@
 				border: 1px solid #2194CE;
 			}
 			#clearFilterButton {
-				position: absolute;
+				position: absolute; 
 				right: 6px;
 				top: 50%;
 				margin-top: -8px;
@@ -215,12 +215,8 @@
 			//filterInput.focus();
 
 			panel.addEventListener( 'click', function( e ) {
-				if ( e.target.parentElement.href && e.target.parentElement.href.indexOf('outbuild') ) {
-					// from a footnote link, default behaviour
-				} else {
-					//filterInput.focus();
-					e.preventDefault();
-				}
+				//filterInput.focus();
+				e.preventDefault();
 			} );
 
 			document.getElementById( 'expandButton' ).addEventListener( 'click', function( e ) {
@@ -264,17 +260,14 @@
 						var li = document.createElement( 'li' );
 						var a = document.createElement( 'a' );
 						a.setAttribute( 'href', '#' );
-						( function( s, c, p ) {
+						( function( s, c, p ) { 
 							a.addEventListener( 'click', function( e ) {
 								goTo( s, c, p );
 								e.preventDefault();
-							} )
+							} ) 
 						} )( section, category, page[ 0 ] )
 						a.textContent = page[ 0 ];
 						li.appendChild( a );
-						if ( page[ 2 ] ) {
-							li.appendChild( outBuildRef() );
-						}
 						ul.appendChild( li );
 
 						nameCategoryMap[page[0]] = {
@@ -293,8 +286,6 @@
 
 
 			}
-
-			ul.appendChild( outBuildNote() );
 
 			panel.appendChild( content )
 
@@ -370,7 +361,7 @@
 					// Resolve links of the form 'Class.member'
 					if(section.indexOf(MEMBER_DELIMITER) !== -1) {
 						parts = section.split(MEMBER_DELIMITER)
-						section = parts[0];
+						section = parts[0]; 
 						member = parts[1];
 					}
 
@@ -379,7 +370,7 @@
 					section = location.section;
 					category = location.category;
 					name = location.name;
-				}
+				} 
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
 				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
@@ -396,49 +387,9 @@
 			function goToHash() {
 
 				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
+				var member = hash[2].split(MEMBER_DELIMITER)
+				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(member[0]), decodeUrl(member.length > 1 ? member[1] : '') );
 
-				if ( hash.length > 2 ) {
-
-					var member = hash[2].split(MEMBER_DELIMITER)
-					goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(member[0]), decodeUrl(member.length > 1 ? member[1] : '') );
-
-				}
-
-			}
-
-			function outBuildRef() {
-				var sup = document.createElement( 'sup' );
-				sup.textContent = '*';
-
-				var a = document.createElement( 'a' );
-				a.href = '#outbuild';
-				a.appendChild( document.createTextNode( ' ' ) );
-				a.appendChild( sup );
-
-				return a;
-			}
-
-			function outBuildNote() {
-				var a = document.createElement( 'a' );
-				a.name = 'outbuild';
-				a.textContent = '*';
-
-				var back = document.createElement( 'a' );
-				back.innerHTML = '&#8617;'
-				back.href = '#back';
-				back.addEventListener( 'click', function (event) {
-					event.preventDefault();
-					window.history.back();
-				} )
-
-				var note = document.createElement( 'li' );
-				note.appendChild( document.createElement( 'br' ) );
-				note.appendChild( document.createElement( 'br' ) );
-				note.appendChild( a );
-				note.appendChild( document.createTextNode( ' This class is not bundled in the Three.js build. ' ) );
-				note.appendChild( back );
-
-				return note;
 			}
 
 			window.addEventListener( 'hashchange', goToHash, false );
