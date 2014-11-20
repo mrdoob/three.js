@@ -224,18 +224,19 @@ THREE.Euler.prototype = {
 
 	},
 
-	setFromQuaternion: function() {
+	setFromQuaternion: function () {
 
-	   var mIntermediate = null;
-	   
-	   return function( q, order, update ) {
-	   
-	   	  mIntermediate = mIntermediate || new THREE.Matrix4();
-	      mIntermediate.makeRotationFromQuaternion( q );
-	      this.setFromRotationMatrix( mIntermediate, order, update );
-	   
-	      return this;
-	   };
+		var matrix;
+
+		return function ( q, order, update ) {
+
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			matrix.makeRotationFromQuaternion( q );
+			this.setFromRotationMatrix( matrix, order, update );
+
+			return this;
+
+		};
 
 	}(),
 
