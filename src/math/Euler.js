@@ -232,7 +232,7 @@ THREE.Euler.prototype = {
 	   
 	   	  mIntermediate = mIntermediate || new THREE.Matrix4();
 	      mIntermediate.makeRotationFromQuaternion( q );
-	      this.setFromRotationMatrix( mIntermediate, order );
+	      this.setFromRotationMatrix( mIntermediate, order, update );
 	   
 	      return this;
 	   };
