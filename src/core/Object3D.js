@@ -527,6 +527,18 @@ THREE.Object3D.prototype = {
 
 	},
 
+	traverseAncestors: function ( callback ) {
+
+		if ( this.parent ) {
+
+			callback( this.parent );
+
+			this.parent.traverseAncestors( callback );
+
+		}
+
+	},
+
 	updateMatrix: function () {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
