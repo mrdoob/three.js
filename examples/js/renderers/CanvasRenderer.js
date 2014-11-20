@@ -237,17 +237,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_clearBox.expandByScalar( 2 );
 
 			_clearBox.min.x = _clearBox.min.x + _canvasWidthHalf;
-			_clearBox.min.y =  - _clearBox.min.y + _canvasHeightHalf;
+			_clearBox.min.y =  - _clearBox.min.y + _canvasHeightHalf;		// higher y value !
 			_clearBox.max.x = _clearBox.max.x + _canvasWidthHalf;
-			_clearBox.max.y =  - _clearBox.max.y + _canvasHeightHalf;
+			_clearBox.max.y =  - _clearBox.max.y + _canvasHeightHalf;		// lower y value !
 
 			if ( _clearAlpha < 1 ) {
 
 				_context.clearRect(
 					_clearBox.min.x | 0,
-					_clearBox.min.y | 0,
+					_clearBox.max.y | 0,
 					( _clearBox.max.x - _clearBox.min.x ) | 0,
-					( _clearBox.max.y - _clearBox.min.y ) | 0
+					( _clearBox.min.y - _clearBox.max.y ) | 0
 				);
 
 			}
@@ -261,9 +261,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.fillRect(
 					_clearBox.min.x | 0,
-					_clearBox.min.y | 0,
+					_clearBox.max.y | 0,
 					( _clearBox.max.x - _clearBox.min.x ) | 0,
-					( _clearBox.max.y - _clearBox.min.y ) | 0
+					( _clearBox.min.y - _clearBox.max.y ) | 0
 				);
 
 			}
