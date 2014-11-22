@@ -3292,7 +3292,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sprites.length = 0;
 		lensFlares.length = 0;
 
-		projectObject( scene, scene );
+		projectObject( scene );
 
 		if ( _this.sortObjects === true ) {
 
@@ -3390,7 +3390,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function projectObject( scene, object ) {
+	function projectObject( object ) {
 
 		if ( object.visible === false ) return;
 
@@ -3400,7 +3400,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			initObject( object, scene );
+			initObject( object );
 
 			if ( object instanceof THREE.Light ) {
 
@@ -3420,7 +3420,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( webglObjects && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-					updateObject( object, scene );
+					updateObject( object );
 
 					for ( var i = 0, l = webglObjects.length; i < l; i ++ ) {
 
@@ -3457,7 +3457,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			projectObject( scene, object.children[ i ] );
+			projectObject( object.children[ i ] );
 
 		}
 
@@ -3630,7 +3630,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function initObject( object, scene ) {
+	function initObject( object ) {
 
 		if ( object.__webglInit === undefined ) {
 
@@ -3659,7 +3659,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Mesh ) {
 
-				initGeometryGroups( scene, object, geometry );
+				initGeometryGroups( object, geometry );
 
 			} else if ( object instanceof THREE.Line ) {
 
@@ -3805,7 +3805,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function initGeometryGroups( scene, object, geometry ) {
+	function initGeometryGroups( object, geometry ) {
 
 		var material = object.material, addBuffers = false;
 
@@ -3894,7 +3894,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Objects updates
 
-	function updateObject( object, scene ) {
+	function updateObject( object ) {
 
 		var geometry = object.geometry, customAttributesDirty, material;
 
@@ -3908,7 +3908,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.groupsNeedUpdate === true ) {
 
-				initGeometryGroups( scene, object, geometry );
+				initGeometryGroups( object, geometry );
 
 			}
 
