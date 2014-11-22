@@ -2489,6 +2489,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
+		updateObject( object );
+
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
@@ -2793,6 +2795,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
 
 		if ( material.visible === false ) return;
+
+		updateObject( object );
 
 		var program = setProgram( camera, lights, fog, material, object );
 
@@ -3420,8 +3424,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( webglObjects && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-					updateObject( object );
-
 					for ( var i = 0, l = webglObjects.length; i < l; i ++ ) {
 
 						var webglObject = webglObjects[i];
@@ -3965,7 +3967,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.lineDistancesNeedUpdate = false;
 
 			material.attributes && clearCustomAttributes( material );
-
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
