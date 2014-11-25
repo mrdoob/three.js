@@ -17,6 +17,22 @@ THREE.WebGLExtensions = function ( gl ) {
 		var extension;
 
 		switch ( name ) {
+		
+			case 'OES_texture_float':
+				extension = gl.getExtension( 'OES_texture_float' );
+				break;
+
+			case 'OES_texture_float_linear':
+				extension = gl.getExtension( 'OES_texture_float_linear' );
+				break;
+
+			case 'OES_texture_half_float_linear':
+				extension = gl.getExtension( 'OES_texture_half_float_linear' );
+				break;
+
+			case 'OES_standard_derivatives':
+				extension = gl.getExtension( 'OES_standard_derivatives' );
+				break;
 
 			case 'EXT_texture_filter_anisotropic':
 				extension = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );

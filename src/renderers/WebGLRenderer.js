@@ -60,6 +60,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
+	// hdr rendering
+	
+	this.hdrOutputEnabled = false;
+	this.hdrOutputType = THREE.HDRFull;
+
 	// shadow map
 
 	this.shadowMapEnabled = false;
@@ -4548,6 +4553,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.map.value = material.map;
+		if ( material.lightMap && material.lightMap.hdrPacking && material.hdrInputEnabled !== false ) {
+			if ( !material.defines ) material.defines = {};
+			if ( material.defines['LIGHTMAP_HDR_INPUT'] !== material.lightMap.hdrPacking ) {
+				material.hdrInputEnabled = true;
+				material.defines['LIGHTMAP_HDR_INPUT'] = material.lightMap.hdrPacking;
+				material.needsUpdate = true;
+			}
+		}
 		uniforms.lightMap.value = material.lightMap;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
@@ -4606,6 +4619,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.envMap && material.envMap.hdrPacking && material.hdrInputEnabled !== false ) {
+			if ( !material.defines ) material.defines = {};
+			if ( material.defines['ENVMAP_HDR_INPUT'] !== material.envMap.hdrPacking ) {
+				material.hdrInputEnabled = true;
+				material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrPacking;
+				material.needsUpdate = true;
+			}
+		}
 		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 

@@ -47,6 +47,18 @@
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 	#endif
 
+	#if defined( HDR_INPUT ) && defined( ENVMAP_HDR_INPUT )
+		#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM
+			envColor.xyz = HDRDecodeRGBM( envColor );
+		#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD
+			envColor.xyz = HDRDecodeRGBD( envColor );
+		#elif ENVMAP_HDR_INPUT == HDR_TYPE_LOGLUV
+			envColor.xyz = HDRDecodeLOGLUV( envColor );
+		#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE
+			envColor.xyz = HDRDecodeRGBE( envColor );
+		#endif
+	#endif
+
 	#ifdef GAMMA_INPUT
 
 		envColor.xyz *= envColor.xyz;
