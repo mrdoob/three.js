@@ -32477,7 +32477,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 		normal = normals[ i ];
 		binormal = binormals[ i ];
 
-		r = radius * taper(u);
+		r = radius * taper( u );
 
 		for ( j = 0; j < radialSegments; j ++ ) {
 
@@ -32533,12 +32533,16 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TubeGeometry.prototype.constructor = THREE.TubeGeometry;
 
-THREE.TubeGeometry.NoTaper = function(u) {
-	return u;
+THREE.TubeGeometry.NoTaper = function ( u ) {
+
+	return 1;
+
 };
 
-THREE.TubeGeometry.SinusoidalTaper = function(u) {
-	return Math.sin(Math.PI * u);
+THREE.TubeGeometry.SinusoidalTaper = function ( u ) {
+
+	return Math.sin( Math.PI * u );
+
 };
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
