@@ -2306,38 +2306,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setDirectBuffers( geometry ) {
-
-		var attributes = geometry.attributes;
-		var attributesKeys = geometry.attributesKeys;
-
-		for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
-
-			var key = attributesKeys[ i ];
-			var attribute = attributes[ key ];
-
-			if ( attribute.buffer === undefined ) {
-
-				attribute.buffer = _gl.createBuffer();
-				attribute.needsUpdate = true;
-
-			}
-
-			if ( attribute.needsUpdate === true ) {
-
-				var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
-
-				_gl.bindBuffer( bufferType, attribute.buffer );
-				_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
-
-				attribute.needsUpdate = false;
-
-			}
-
-		}
-
-	}
-
 	// Buffer rendering
 
 	this.renderBufferImmediate = function ( object, program, material ) {
@@ -3902,7 +3870,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			setDirectBuffers( geometry );
+			var attributes = geometry.attributes;
+			var attributesKeys = geometry.attributesKeys;
+
+			for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
+
+				var key = attributesKeys[ i ];
+				var attribute = attributes[ key ];
+
+				if ( attribute.buffer === undefined ) {
+
+					attribute.buffer = _gl.createBuffer();
+					attribute.needsUpdate = true;
+
+				}
+
+				if ( attribute.needsUpdate === true ) {
+
+					var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
+
+					_gl.bindBuffer( bufferType, attribute.buffer );
+					_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
+
+					attribute.needsUpdate = false;
+
+				}
+
+			}
 
 		} else if ( object instanceof THREE.Mesh ) {
 
