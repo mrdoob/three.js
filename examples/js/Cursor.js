@@ -19,7 +19,7 @@ THREE.Cursor = function ( object, renderer ) {
 	var far = object.far;
 
 	var cursorPosition = new THREE.Vector3();
-	var pixelsToDegreesFactor = 0.00025;
+	var pixelsToDegreesFactor = 0.00030;
 
 	var verticalFOV = object.fov;
 	var verticalFOVPadding = 5;
@@ -55,7 +55,7 @@ THREE.Cursor = function ( object, renderer ) {
 		new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide } )
 	);
 
-	this.cursor.position.z = -50;
+	this.cursor.position.z = -75;
 	this.add( this.cursor );
 	this.scene.add( this );
 
@@ -70,6 +70,7 @@ THREE.Cursor = function ( object, renderer ) {
 		var cameraInverse = this.cameraInverse;
 		var cursorAxis;
 		var cursorAngle;
+		var angleSign;
 		if ( this.pointerLocked ) {
 			if ( !this.previousCameraQuat ) {
 				this.deltaMouse.copy( this.object.quaternion );
@@ -77,7 +78,6 @@ THREE.Cursor = function ( object, renderer ) {
 			}
 			// Angle between camera and cursor
 			deltaAngle = quaternionsAngle( scope.object.quaternion, scope.quaternion ) * ( 180 / Math.PI ) ;
-			console.log("ANGLE OLD " + deltaAngle);
 			// Checks if cursor within the FOVs limits
 			if ( deltaAngle >= this.maxFOV ) {
 				//cursorAxis = quaternionAxis( scope.quaternion );
@@ -94,7 +94,17 @@ THREE.Cursor = function ( object, renderer ) {
 			this.cameraDeltaQuaternion.copy( this.previousCameraQuat ).multiply( cameraInverse );
 			scope.mouseQuat.copy( scope.quaternion ).multiply( this.cameraDeltaQuaternion );
 			deltaAngle = quaternionsAngle( scope.object.quaternion, scope.mouseQuat ) * ( 180 / Math.PI );
-			console.log("ANGLE NEW " + deltaAngle);
+
+			// Dealing with overreach on extremely fast movements
+			if ( deltaAngle >= this.maxFOV + 10 ) {
+				cursorAxis = quaternionAxis( scope.cameraDeltaQuaternion );
+				cursorAngle = quaternionAngle( scope.cameraDeltaQuaternion );
+				angleSign = cursorAngle > 0 ? 1 : -1;
+				//scope.cameraDeltaQuaternion.setFromAxisAngle( cursorAxis, cursorAngle - ( ( deltaAngle - this.maxFOV )  * Math.PI / 180 ) );
+				//scope.quaternion.multiply( scope.cameraDeltaQuaternion );
+				scope.cameraDeltaQuaternion.setFromAxisAngle( cursorAxis, ((angleSign) * (deltaAngle - this.maxFOV)  * Math.PI / 180 ) );
+			}
+
 			/**********/
 			// PING PONG
 			if ( this.lock && deltaAngle >= this.maxFOV ) {
@@ -105,6 +115,7 @@ THREE.Cursor = function ( object, renderer ) {
 			// 	this.deltaQuaternion.multiply( this.cameraDeltaQuaternion );
 			// }
 			/*********/
+
 			this.updateMouseQuaternion();
 			if ( scope.lock ) {
 				scope.quaternion.copy( scope.deltaQuaternion.clone().inverse() );
@@ -145,21 +156,27 @@ THREE.Cursor = function ( object, renderer ) {
 
 	this.updateMouseQuaternion = function() {
 		var mouseQuat = scope.mouseQuat;
-		var newDeltaQuaternion = new THREE.Quaternion();
 		var deltaAngle;
+		var xDeltaQuaternion = scope.xDeltaQuaternion = xDeltaQuaternion || new THREE.Quaternion();
+		var yDeltaQuaternion = scope.yDeltaQuaternion = yDeltaQuaternion || new THREE.Quaternion();
+		var xAxis = new THREE.Vector3(1, 0, 0);
+		var yAxis = new THREE.Vector3(0, 1, 0);
+
 		if ( scope.mouseDeltaX !== 0 || scope.mouseDeltaY !==0 ) {
-			scope.deltaEuler.set( scope.mouseDeltaX * 2 * Math.PI, scope.mouseDeltaY * 2 * Math.PI, 0 );
-			newDeltaQuaternion.setFromEuler( scope.deltaEuler, true ).normalize();
+			// scope.object.localToWorld( xAxis );
+			// scope.object.localToWorld( yAxis );
+			yDeltaQuaternion.setFromAxisAngle( yAxis, scope.mouseDeltaY * 2 * Math.PI );
+			xDeltaQuaternion.setFromAxisAngle( xAxis, scope.mouseDeltaX * 2 * Math.PI );
 			scope.mouseDeltaX = 0;
 			scope.mouseDeltaY = 0;
-			mouseQuat.copy( scope.quaternion ).multiply( newDeltaQuaternion );
+			mouseQuat.copy( scope.quaternion ).multiply( xDeltaQuaternion ).multiply( yDeltaQuaternion );
 			deltaAngle = quaternionsAngle( scope.object.quaternion, mouseQuat ) * ( 180 / Math.PI );
 			if ( deltaAngle < scope.maxFOV ) {
 				if ( scope.lock ) {
 					scope.deltaQuaternion = new THREE.Quaternion();
 					scope.lock = false;
 				}
-				scope.deltaMouse.copy( scope.quaternion ).multiply( newDeltaQuaternion );
+				scope.deltaMouse.copy( xDeltaQuaternion ).multiply( yDeltaQuaternion ).multiply( scope.quaternion );
 			}
 		}
 	};
