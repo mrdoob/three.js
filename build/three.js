@@ -20181,38 +20181,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setDirectBuffers( geometry ) {
-
-		var attributes = geometry.attributes;
-		var attributesKeys = geometry.attributesKeys;
-
-		for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
-
-			var key = attributesKeys[ i ];
-			var attribute = attributes[ key ];
-
-			if ( attribute.buffer === undefined ) {
-
-				attribute.buffer = _gl.createBuffer();
-				attribute.needsUpdate = true;
-
-			}
-
-			if ( attribute.needsUpdate === true ) {
-
-				var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
-
-				_gl.bindBuffer( bufferType, attribute.buffer );
-				_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
-
-				attribute.needsUpdate = false;
-
-			}
-
-		}
-
-	}
-
 	// Buffer rendering
 
 	this.renderBufferImmediate = function ( object, program, material ) {
@@ -21777,7 +21745,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			setDirectBuffers( geometry );
+			var attributes = geometry.attributes;
+			var attributesKeys = geometry.attributesKeys;
+
+			for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
+
+				var key = attributesKeys[ i ];
+				var attribute = attributes[ key ];
+
+				if ( attribute.buffer === undefined ) {
+
+					attribute.buffer = _gl.createBuffer();
+					attribute.needsUpdate = true;
+
+				}
+
+				if ( attribute.needsUpdate === true ) {
+
+					var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
+
+					_gl.bindBuffer( bufferType, attribute.buffer );
+					_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
+
+					attribute.needsUpdate = false;
+
+				}
+
+			}
 
 		} else if ( object instanceof THREE.Mesh ) {
 
@@ -32402,6 +32396,7 @@ THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
  * @author WestLangley / https://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
  * @author miningold / https://github.com/miningold
+ * @author jonobr1 / https://github.com/jonobr1
  *
  * Modified from the TorusKnotGeometry by @oosmoxiecode
  *
@@ -32411,7 +32406,7 @@ THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed ) {
+THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, taper ) {
 
 	THREE.Geometry.call( this );
 
@@ -32429,6 +32424,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 	radius = radius || 1;
 	radialSegments = radialSegments || 8;
 	closed = closed || false;
+	taper = taper || THREE.TubeGeometry.NoTaper;
 
 	var grid = [];
 
@@ -32442,7 +32438,7 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 
 		x, y, z,
 		tx, ty, tz,
-		u, v,
+		u, v, r,
 
 		cx, cy,
 		pos, pos2 = new THREE.Vector3(),
@@ -32481,12 +32477,14 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 		normal = normals[ i ];
 		binormal = binormals[ i ];
 
+		r = radius * taper(u);
+
 		for ( j = 0; j < radialSegments; j ++ ) {
 
 			v = j / radialSegments * 2 * Math.PI;
 
-			cx = - radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-			cy = radius * Math.sin( v );
+			cx = - r * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+			cy = r * Math.sin( v );
 
 			pos2.copy( pos );
 			pos2.x += cx * normal.x + cy * binormal.x;
@@ -32535,6 +32533,13 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed )
 THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TubeGeometry.prototype.constructor = THREE.TubeGeometry;
 
+THREE.TubeGeometry.NoTaper = function(u) {
+	return u;
+};
+
+THREE.TubeGeometry.SinusoidalTaper = function(u) {
+	return Math.sin(Math.PI * u);
+};
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
