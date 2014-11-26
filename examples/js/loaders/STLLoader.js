@@ -8,32 +8,28 @@
  * Supports both binary and ASCII encoded files, with automatic detection of type.
  *
  * Limitations:
- * 	Binary decoding supports "Magics" color format (http://en.wikipedia.org/wiki/STL_(file_format)#Color_in_binary_STL).
- * 	There is perhaps some question as to how valid it is to always assume little-endian-ness.
- * 	ASCII decoding assumes file is UTF-8. Seems to work for the examples...
+ *	Binary decoding supports "Magics" color format (http://en.wikipedia.org/wiki/STL_(file_format)#Color_in_binary_STL).
+ *	There is perhaps some question as to how valid it is to always assume little-endian-ness.
+ *	ASCII decoding assumes file is UTF-8. Seems to work for the examples...
  *
  * Usage:
- * 	var loader = new THREE.STLLoader();
- * 	loader.addEventListener( 'load', function ( event ) {
- *
- * 		var geometry = event.content;
- * 		scene.add( new THREE.Mesh( geometry ) );
- *
- * 	} );
- * 	loader.load( './models/stl/slotted_disk.stl' );
+ *	var loader = new THREE.STLLoader();
+ *	loader.load( './models/stl/slotted_disk.stl', function(geometry){
+ *		scene.add( new THREE.Mesh( geometry ) );
+ *	});
  *
  * For binary STLs geometry might contain colors for vertices. To use it:
- *  ... // use the same code to load STL as above
- *  var geometry = event.content;
- *  if (geometry.hasColors) {
- *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
- *  } else { .... }
- * var mesh = new THREE.Mesh( geometry, material );
+ *	... // use the same code to load STL as above
+ *	if (geometry.hasColors) {
+ *		material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+ *	} else { .... }
+ *	var mesh = new THREE.Mesh( geometry, material );
  */
 
 
-THREE.STLLoader = function (manager) {
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+THREE.STLLoader = function (manager, crossOrigin) {
+  this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+  this.crossOrigin = crossOrigin;
 };
 
 THREE.STLLoader.prototype = {
@@ -42,53 +38,21 @@ THREE.STLLoader.prototype = {
 
 };
 
-THREE.STLLoader.prototype.load = function ( url, callback ) {
+THREE.STLLoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
 
-	var scope = this;
+  var scope = this;
 
-	var xhr = new XMLHttpRequest();
+  var loader = new THREE.XHRLoader( scope.manager );
+  loader.setCrossOrigin( this.crossOrigin );
+  loader.setResponseType('arraybuffer');
+  loader.load( url, function ( text ) {
 
-	function onloaded( event ) {
+	var geometry = scope.parse( text );
 
-		if ( event.target.status === 200 || event.target.status === 0 ) {
+	if ( onLoad )
+		onLoad( geometry );
 
-			var geometry = scope.parse( event.target.response || event.target.responseText );
-
-			scope.dispatchEvent( { type: 'load', content: geometry } );
-
-			if ( callback ) callback( geometry );
-
-		} else {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']', response: event.target.statusText } );
-
-		}
-
-	}
-
-	xhr.addEventListener( 'load', function(event){
-		onloaded(event);
-		scope.manager.itemEnd( url );
-	}, false );
-
-	xhr.addEventListener( 'progress', function ( event ) {
-
-		scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-	}, false );
-
-	xhr.addEventListener( 'error', function () {
-
-		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-	}, false );
-
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( 'text/plain; charset=x-user-defined' );
-	xhr.open( 'GET', url, true );
-	xhr.responseType = 'arraybuffer';
-	xhr.send( null );
-
-	scope.manager.itemStart( url );
+  }, onProgress, onError);
 
 };
 
