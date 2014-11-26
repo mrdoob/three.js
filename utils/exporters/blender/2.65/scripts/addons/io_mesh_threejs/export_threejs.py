@@ -75,7 +75,7 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 
 
 # skinning
-MAX_INFLUENCES = 2
+MAX_INFLUENCES = 4
 
 
 # #####################################################
@@ -86,7 +86,7 @@ TEMPLATE_SCENE_ASCII = """\
 {
 
 	"urlBaseType": %(basetype)s,
-
+	"influencesPerVertex" : 4,
 	"metadata": {
 		"formatVersion" : 3.2,
 		"type"          : "scene",
@@ -259,7 +259,7 @@ TEMPLATE_HEX = "0x%06x"
 
 TEMPLATE_FILE_ASCII = """\
 	{
-
+		"influencesPerVertex" : 4,
 		"metadata": {
 			"formatVersion" : 3.1,
 			"generatedBy"   : "Blender 2.7 Exporter",
