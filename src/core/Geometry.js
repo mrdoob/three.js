@@ -1001,7 +1001,7 @@ THREE.Geometry.prototype = {
 			var uvs = this.faceVertexUvs[ uvLayer ];
 
 			if ( ! geometry.faceVertexUvs[ uvLayer ]) {
-				geometry.faceVertexUvs[ uvLayer ] = [];
+				geometry.faceVertexUvs[ uvLayer ] = [ ];
 			}
 
 			for ( var i = 0, il = uvs.length; i < il; i ++ ) {
