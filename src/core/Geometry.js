@@ -996,19 +996,27 @@ THREE.Geometry.prototype = {
 
 		}
 
-		var uvs = this.faceVertexUvs[ 0 ];
+		for ( var uvLayer = 0, uvl = this.faceVertexUvs.length; uvLayer < uvl; uvLayer ++ ) {
 
-		for ( var i = 0, il = uvs.length; i < il; i ++ ) {
+			var uvs = this.faceVertexUvs[ uvLayer ];
 
-			var uv = uvs[ i ], uvCopy = [];
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
-
+			if ( ! geometry.faceVertexUvs[ uvLayer ]) {
+				geometry.faceVertexUvs[ uvLayer ] = [];
 			}
 
-			geometry.faceVertexUvs[ 0 ].push( uvCopy );
+			for ( var i = 0, il = uvs.length; i < il; i ++ ) {
+
+				var uv = uvs[ i ], uvCopy = [];
+
+				for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+
+					uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+
+				}
+
+				geometry.faceVertexUvs[ uvLayer ].push( uvCopy );
+
+			}
 
 		}
 
