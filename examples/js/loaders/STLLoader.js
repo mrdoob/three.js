@@ -2,7 +2,6 @@
  * @author aleeper / http://adamleeper.com/
  * @author mrdoob / http://mrdoob.com/
  * @author gero3 / https://github.com/gero3
- * @author zinefer / https://github.com/zinefer
  *
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
