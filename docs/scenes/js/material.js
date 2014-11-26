@@ -105,11 +105,11 @@ var envMaps = (function () {
 		path + 'pz' + format, path + 'nz' + format
 	];
 
-	var textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
+	var textureCube = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeRefractionMapping );
 	var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 	reflectionCube.format = THREE.RGBFormat;
 
-	var refractionCube = new THREE.Texture( reflectionCube.image, new THREE.CubeRefractionMapping() );
+	var refractionCube = new THREE.Texture( reflectionCube.image, THREE.CubeRefractionMapping );
 	reflectionCube.format = THREE.RGBFormat;
 	
 	return {
