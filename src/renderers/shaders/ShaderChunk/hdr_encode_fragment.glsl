@@ -1,13 +1,3 @@
-#ifdef HDR_OUTPUT_LOGLUV
-
-	gl_FragColor = HDREncodeLOGLUV( gl_FragColor );
-
-#elif defined( HDR_OUTPUT_RGBM )
-
-  gl_FragColor = HDREncodeRGBM( gl_FragColor );
-
-#elif defined( HDR_OUTPUT_RGBD )
-
-  gl_FragColor = HDREncodeRGBD( gl_FragColor );
-
+#if defined( HDR_OUTPUT_LOGLUV ) || defined( HDR_OUTPUT_RGBM ) || defined( HDR_OUTPUT_RGBD ) || defined( HDR_OUTPUT_RGBE )
+  gl_FragColor = HDREncode( gl_FragColor.xyz );
 #endif

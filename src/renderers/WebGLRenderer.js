@@ -4750,6 +4750,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.map.value = material.map;
+		if ( material.lightMap && material.lightMap.hdrPacking && material.hdrInputEnabled !== false ) {
+			if ( !material.defines ) material.defines = {};
+			if ( material.defines['LIGHTMAP_HDR_INPUT'] !== material.lightMap.hdrPacking ) {
+				material.hdrInputEnabled = true;
+				material.defines['LIGHTMAP_HDR_INPUT'] = material.lightMap.hdrPacking;
+				material.needsUpdate = true;
+			}
+		}
 		uniforms.lightMap.value = material.lightMap;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
@@ -4808,10 +4816,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( material.envMap && material.envMap.hdrFormat ) {
+		if ( material.envMap && material.envMap.hdrPacking && material.hdrInputEnabled !== false ) {
 			if ( !material.defines ) material.defines = {};
-			if ( material.defines['ENVMAP_HDR_INPUT'] !== material.envMap.hdrFormat ) {
-				material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrFormat;
+			if ( material.defines['ENVMAP_HDR_INPUT'] !== material.envMap.hdrPacking ) {
+				material.hdrInputEnabled = true;
+				material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrPacking;
 				material.needsUpdate = true;
 			}
 		}

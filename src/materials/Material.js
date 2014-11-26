@@ -36,8 +36,9 @@ THREE.Material = function () {
 
 	this.visible = true;
 
-	this.hdrOutput = undefined; //Override for renderer's hdrOutputEnabled
+	this.hdrOutputEnabled = undefined; //Override for renderer's hdrOutputEnabled
 	this.hdrOutputType = undefined; //Override for renderer's hdrOutputType
+	this.hdrInputEnabled = undefined;
 
 	this.needsUpdate = true;
 

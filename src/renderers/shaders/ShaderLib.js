@@ -15,7 +15,7 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "shadowmap" ],
+			THREE.UniformsLib[ "shadowmap" ]
 
 		] ),
 
@@ -108,7 +108,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-			
+
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -220,7 +220,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-				
+
 				THREE.ShaderChunk[ "fog_fragment" ],
 				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
@@ -240,7 +240,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-			
+
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
@@ -341,7 +341,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-				
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -611,7 +610,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
-			
+
 			{
 
 			"enableAO"          : { type: "i", value: 0 },
@@ -730,7 +729,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
-			
+
 			"void main() {",
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 
@@ -1247,24 +1246,27 @@ THREE.ShaderLib = {
 
 			"uniform samplerCube tCube;",
 			"uniform float tFlip;",
-			
+
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
 			"	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-				"#ifdef ENVMAP_HDR_INPUT",
+				"#if defined( HDR_INPUT ) && defined( ENVMAP_HDR_INPUT )",
 					"#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM",
 						"gl_FragColor = vec4( HDRDecodeRGBM( gl_FragColor ), 1.0 );",
 					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD",
 						"gl_FragColor = vec4( HDRDecodeRGBD( gl_FragColor ), 1.0 );",
 					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE",
 						"gl_FragColor = vec4( HDRDecodeRGBE( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_LOGLUV",
+						"gl_FragColor = vec4( HDRDecodeLOGLUV( gl_FragColor ), 1.0 );",
 					"#endif",
 				"#endif",
 				"#if defined( GAMMA_INPUT ) && !defined( GAMMA_OUTPUT )",
@@ -1278,6 +1280,10 @@ THREE.ShaderLib = {
 		].join("\n")
 
 	},
+
+	/* -------------------------------------------------------------------------
+	//	Cube map shader
+	 ------------------------------------------------------------------------- */
 
 	'equirect': {
 
@@ -1311,6 +1317,8 @@ THREE.ShaderLib = {
 			"varying vec3 vWorldPosition;",
 
 			THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
+			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
 
 			"void main() {",
 
@@ -1322,6 +1330,24 @@ THREE.ShaderLib = {
 				"gl_FragColor = texture2D( tEquirect, sampleUV );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+
+				"#if defined( HDR_INPUT ) && defined( ENVMAP_HDR_INPUT )",
+					"#if ENVMAP_HDR_INPUT == HDR_TYPE_RGBM",
+						"gl_FragColor = vec4( HDRDecodeRGBM( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBD",
+						"gl_FragColor = vec4( HDRDecodeRGBD( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_RGBE",
+						"gl_FragColor = vec4( HDRDecodeRGBE( gl_FragColor ), 1.0 );",
+					"#elif ENVMAP_HDR_INPUT == HDR_TYPE_LOGLUV",
+						"gl_FragColor = vec4( HDRDecodeLOGLUV( gl_FragColor ), 1.0 );",
+					"#endif",
+				"#endif",
+				"#if defined( GAMMA_INPUT ) && !defined( GAMMA_OUTPUT )",
+					"gl_FragColor.xyz *= gl_FragColor.xyz;",
+				"#elif !defined( GAMMA_INPUT ) && defined( GAMMA_OUTPUT )",
+					"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
+				"#endif",
+				THREE.ShaderChunk[ "hdr_encode_fragment" ],
 
 			"}"
 
