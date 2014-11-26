@@ -946,7 +946,7 @@ THREE.SceneLoader.prototype = {
 
 			if ( textureJSON.mapping !== undefined && THREE[ textureJSON.mapping ] !== undefined ) {
 
-				textureJSON.mapping = new THREE[ textureJSON.mapping ]();
+				textureJSON.mapping = THREE[ textureJSON.mapping ];
 
 			}
 

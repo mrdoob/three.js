@@ -85,21 +85,27 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		var envMapTypeDefine = null;
+
 		if ( parameters.envMap ) {
+
 			switch ( material.envMap.mapping ) {
+
 				case THREE.CubeReflectionMapping:
 				case THREE.CubeRefractionMapping:
 					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
 					break;
-				case THREE.SphericalReflectionMapping:
-				case THREE.SphericalRefractionMapping:
-					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
-					break;
+
 				case THREE.EquirectangularReflectionMapping:
 				case THREE.EquirectangularRefractionMapping:
 					envMapTypeDefine = "ENVMAP_TYPE_EQUIREC";
 					break;
+
+				case THREE.SphericalReflectionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
+					break;
+
 			}
+
 		}
 
 		var hdrOutputTypeDefine = null;

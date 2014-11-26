@@ -73,14 +73,14 @@
     			var onCube1Loaded = function(texture){
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
-					texture.mapping = new THREE.CubeReflectionMapping();
+					texture.mapping = THREE.CubeReflectionMapping;
 					material6.needsUpdate = true;
     			};
     			var onCube2Loaded = function(texture){
 					texture.magFilter = THREE.LinearFilter;
 					// texture.minFilter = THREE.LinearMipMapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
-					texture.mapping = new THREE.CubeReflectionMapping();
+					texture.mapping = THREE.CubeReflectionMapping;
 					material8.needsUpdate = true;
     			};
      

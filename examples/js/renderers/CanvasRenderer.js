@@ -123,11 +123,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 
-	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
-				 ? parameters.devicePixelRatio
-				 : self.devicePixelRatio !== undefined
-					 ? self.devicePixelRatio
-					 : 1;
+	this.devicePixelRatio = self.devicePixelRatio !== undefined ? self.devicePixelRatio : 1;
 
 	this.autoClear = true;
 	this.sortObjects = true;
@@ -241,17 +237,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_clearBox.expandByScalar( 2 );
 
 			_clearBox.min.x = _clearBox.min.x + _canvasWidthHalf;
-			_clearBox.min.y =  - _clearBox.min.y + _canvasHeightHalf;
+			_clearBox.min.y =  - _clearBox.min.y + _canvasHeightHalf;		// higher y value !
 			_clearBox.max.x = _clearBox.max.x + _canvasWidthHalf;
-			_clearBox.max.y =  - _clearBox.max.y + _canvasHeightHalf;
+			_clearBox.max.y =  - _clearBox.max.y + _canvasHeightHalf;		// lower y value !
 
 			if ( _clearAlpha < 1 ) {
 
 				_context.clearRect(
 					_clearBox.min.x | 0,
-					_clearBox.min.y | 0,
+					_clearBox.max.y | 0,
 					( _clearBox.max.x - _clearBox.min.x ) | 0,
-					( _clearBox.max.y - _clearBox.min.y ) | 0
+					( _clearBox.min.y - _clearBox.max.y ) | 0
 				);
 
 			}
@@ -265,9 +261,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.fillRect(
 					_clearBox.min.x | 0,
-					_clearBox.min.y | 0,
+					_clearBox.max.y | 0,
 					( _clearBox.max.x - _clearBox.min.x ) | 0,
-					( _clearBox.max.y - _clearBox.min.y ) | 0
+					( _clearBox.min.y - _clearBox.max.y ) | 0
 				);
 
 			}
@@ -704,8 +700,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				    material instanceof THREE.MeshPhongMaterial ) {
 
 			if ( material.map !== null ) {
+			
+				var mapping = material.map.mapping;
 
-				if ( material.map.mapping instanceof THREE.UVMapping ) {
+				if ( mapping === THREE.UVMapping ) {
 
 					_uvs = element.uvs;
 					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uvs[ uv1 ].x, _uvs[ uv1 ].y, _uvs[ uv2 ].x, _uvs[ uv2 ].y, _uvs[ uv3 ].x, _uvs[ uv3 ].y, material.map );
@@ -714,7 +712,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material.envMap !== null ) {
 
-				if ( material.envMap.mapping instanceof THREE.SphericalReflectionMapping ) {
+				if ( material.envMap.mapping === THREE.SphericalReflectionMapping ) {
 
 					_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
 					_uv1x = 0.5 * _normal.x + 0.5;
@@ -730,24 +728,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
-				} else if ( material.envMap.mapping instanceof THREE.SphericalRefractionMapping ) {
-
-					_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
-					_uv1x = - 0.5 * _normal.x + 0.5;
-					_uv1y = - 0.5 * _normal.y + 0.5;
-
-					_normal.copy( element.vertexNormalsModel[ uv2 ] ).applyMatrix3( _normalViewMatrix );
-					_uv2x = - 0.5 * _normal.x + 0.5;
-					_uv2y = - 0.5 * _normal.y + 0.5;
-
-					_normal.copy( element.vertexNormalsModel[ uv3 ] ).applyMatrix3( _normalViewMatrix );
-					_uv3x = - 0.5 * _normal.x + 0.5;
-					_uv3y = - 0.5 * _normal.y + 0.5;
-
-					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
-
 				}
-
 
 			} else {
 

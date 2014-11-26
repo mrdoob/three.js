@@ -78,7 +78,7 @@ THREE.UCSCharacter = function() {
 	}
 	
 	function loadTextures( baseUrl, textureUrls ) {
-		var mapping = new THREE.UVMapping();
+		var mapping = THREE.UVMapping;
 		var textures = [];
 
 		for ( var i = 0; i < textureUrls.length; i ++ ) {

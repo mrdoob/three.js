@@ -4,7 +4,8 @@
 
 THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-  mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
+	mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
+	
 	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.images = images;

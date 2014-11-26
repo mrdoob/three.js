@@ -29,8 +29,7 @@ MAPPING_TYPES = type('Mapping', (), {
     'UV': 'UVMapping',
     'CUBE_REFLECTION': 'CubeReflectionMapping',
     'CUBE_REFRACTION': 'CubeRefractionMapping',
-    'SPHERICAL_REFLECTION': 'SphericalReflectionMapping',
-    'SPHERICAL_REFRACTION': 'SphericalRefractionMapping'
+    'SPHERICAL_REFLECTION': 'SphericalReflectionMapping'
 })
 
 JSON = 'json'
