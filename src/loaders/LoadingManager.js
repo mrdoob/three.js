@@ -2,26 +2,28 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function ( onLoad, onProgress, onError, onItemStart ) {
+THREE.LoadingManager = function ( onStart, onLoad, onProgress, onError ) {
 
 	var scope = this;
 
-	var loaded = 0, total = 0;
+	var loaded = 0, total = 0, loading = false;
 
+	this.onStart = onStart;
 	this.onLoad = onLoad;
 	this.onProgress = onProgress;
 	this.onError = onError;
-	this.onItemStart = onItemStart;
 
 	this.itemStart = function ( url ) {
 
 		total ++;
 
-		if ( scope.onItemStart !== undefined ) {
+		if ( scope.onStart !== undefined && loading === false ) {
 
-			scope.onItemStart( url, loaded, total );
+			scope.onStart( url, loaded, total );
 
 		}
+
+		loading = true;
 
 	};
 
@@ -38,6 +40,7 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError, onItemStart ) {
 		if ( loaded === total && scope.onLoad !== undefined ) {
 
 			scope.onLoad();
+			loading = false;
 
 		}
 
