@@ -2,12 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( object ) {
+THREE.BoxHelper = function ( object, color ) {
 
+	var boxColor = ( color !== undefined ) ? color : 0xffff00; 
 	var geometry = new THREE.BufferGeometry();
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 72 ), 3 ) );
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: boxColor } ), THREE.LinePieces );
 
 	if ( object !== undefined ) {
 
@@ -18,7 +19,6 @@ THREE.BoxHelper = function ( object ) {
 };
 
 THREE.BoxHelper.prototype = Object.create( THREE.Line.prototype );
-THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
 
 THREE.BoxHelper.prototype.update = function ( object ) {
 
