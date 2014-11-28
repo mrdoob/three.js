@@ -85,12 +85,12 @@
 
       var container, stats;
       var camera, controls, scene, renderer;
-      var pickingData = [], pickingTexture, pickingScene;
       var objects = [];
-      var highlightBox;
       var mouse = new THREE.Vector2();
       var offset = new THREE.Vector3( 10, 10, 10 );
       var cursor;
+      var raycaster;
+      var INTERSECTED;
       var lockPointerButton = document.querySelector('.lock-pointer');
       var fullScreenButton = document.querySelector( '.full-screen' );
       var vrEffect;
@@ -156,19 +156,19 @@
 
         scene = new THREE.Scene();
 
-        pickingScene = new THREE.Scene();
-        pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-        pickingTexture.generateMipmaps = false;
+        // scene.add( new THREE.AmbientLight( 0x555555 ) );
 
-        scene.add( new THREE.AmbientLight( 0x555555 ) );
-
-        var light = new THREE.SpotLight( 0xffffff, 1.5 );
-        light.position.set( 0, 500, 2000 );
-        scene.add( light );
+        var spotLight = new THREE.SpotLight( 0xffffff, 1.5 );
+        spotLight.position.set( 1, 1, 10 ).normalize();
+        spotLight.shadowMapWidth = 1024;
+        spotLight.shadowMapHeight = 1024;
+        spotLight.shadowCameraNear = 50;
+        spotLight.shadowCameraFar = 4000;
+        spotLight.shadowCameraFov = 60;
+        spotLight.target = camera;
+        camera.add( spotLight );
 
         var geometry = new THREE.Geometry(),
-        pickingGeometry = new THREE.Geometry(),
-        pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } ),
         defaultMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
 
         function applyVertexColors( g, c ) {
@@ -187,6 +187,32 @@
 
         }
 
+        function explode( geometry, material ) {
+
+          var group = new THREE.Group();
+
+          for ( var i = 0; i < geometry.faces.length; i ++ ) {
+
+            var face = geometry.faces[ i ];
+
+            var vertexA = geometry.vertices[ face.a ].clone();
+            var vertexB = geometry.vertices[ face.b ].clone();
+            var vertexC = geometry.vertices[ face.c ].clone();
+
+            var geometry2 = new THREE.Geometry();
+            geometry2.vertices.push( vertexA, vertexB, vertexC );
+            geometry2.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+            var mesh = new THREE.Mesh( geometry2, material );
+            mesh.position.sub( geometry2.center() );
+            group.add( mesh );
+
+          }
+
+          return group;
+
+        }
+
         var geom = new THREE.BoxGeometry( 20, 20, 20 );
         var color = new THREE.Color();
 
@@ -195,61 +221,20 @@
         var matrix = new THREE.Matrix4();
         var quaternion = new THREE.Quaternion();
 
+        var objects;
 
-        for ( var i = 0; i < 500; i ++ ) {
+        var geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
-          var position = new THREE.Vector3();
-          position.x = Math.random() * 800 - 400;
-          position.y = Math.random() * 800 - 400;
-          position.z = Math.random() * 800 - 400;
-          position.z = position.z < 0 && position.z > -100 ? -100: position.z;
-          position.z = position.z > 0 && position.z < 100 ? 100: position.z;
+        function onWindowResize() {
 
-          var rotation = new THREE.Euler();
-          rotation.x = Math.random() * 2 * Math.PI;
-          rotation.y = Math.random() * 2 * Math.PI;
-          rotation.z = Math.random() * 2 * Math.PI;
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
 
-          var scale = new THREE.Vector3();
-          scale.x = Math.random() + 0.5;
-          scale.y = Math.random() + 0.5;
-          scale.z = Math.random() + 0.5;
-
-          quaternion.setFromEuler( rotation, false );
-          matrix.compose( position, quaternion, scale );
-
-          // give the geom's vertices a random color, to be displayed
-
-          applyVertexColors( geom, color.setHex( colors[Math.floor(Math.random() * 2)] ) );
-
-          geometry.merge( geom, matrix );
-
-          // give the geom's vertices a color corresponding to the "id"
-
-          applyVertexColors( geom, color.setHex( i ) );
-
-          pickingGeometry.merge( geom, matrix );
-
-          pickingData[ i ] = {
-
-            position: position,
-            rotation: rotation,
-            scale: scale
-
-          };
-
-          function onWindowResize() {
-
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-
-            vrEffect.setSize( window.innerWidth, window.innerHeight );
-
-          }
-
-          window.addEventListener( 'resize', onWindowResize, false );
+          vrEffect.setSize( window.innerWidth, window.innerHeight );
 
         }
+
+        window.addEventListener( 'resize', onWindowResize, false );
 
         var materials = [
           new THREE.MeshNormalMaterial()
@@ -259,14 +244,6 @@
         drawnObject = THREE.SceneUtils.createMultiMaterialObject( geometry, materials )
 
         scene.add( drawnObject );
-
-        pickingScene.add( new THREE.Mesh( pickingGeometry, pickingMaterial ) );
-
-        highlightBox = new THREE.Mesh(
-          new THREE.BoxGeometry( 1, 1, 1 ),
-          new THREE.MeshLambertMaterial( { color: 0xffff00 }
-        ) );
-        scene.add( highlightBox );
 
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setClearColor( 0xffffff, 1 );
@@ -279,8 +256,14 @@
         stats.domElement.style.top = '0px';
         container.appendChild( stats.domElement );
 
+        raycaster = new THREE.Raycaster();
+
         cursor = new THREE.Cursor( camera, renderer );
+        cursor.addEventListener('click', function() {
+          console.log("CURSOR CLICK");
+        });
         scene.add( cursor );
+        scene.add( camera );
         vrControls = new THREE.VRControls(camera);
         vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
         vrMode = false;
@@ -289,6 +272,31 @@
             fullScreenButton.innerHTML = error;
             fullScreenButton.classList.add('error');
           }
+        }
+
+        for ( var i = 0; i < 2000; i ++ ) {
+
+          var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+
+          object.position.x = Math.random() * 800 - 400;
+          object.position.y = Math.random() * 800 - 400;
+          object.position.z = Math.random() * 800 - 400;
+          if (object.position.z < 0) {
+            object.position.z += cursor.cursor.position.z;
+          } else {
+            object.position.z -= cursor.cursor.position.z;
+          }
+
+          object.rotation.x = Math.random() * 2 * Math.PI;
+          object.rotation.y = Math.random() * 2 * Math.PI;
+          object.rotation.z = Math.random() * 2 * Math.PI;
+
+          object.scale.x = Math.random() + 0.5;
+          object.scale.y = Math.random() + 0.5;
+          object.scale.z = Math.random() + 0.5;
+
+          scene.add( object );
+
         }
 
         fullScreenButton.onclick = function() {
@@ -310,8 +318,6 @@
           }
         }
 
-        renderer.domElement.addEventListener( 'mousemove', onMouseMove );
-
         renderer.domElement.requestPointerLock = renderer.domElement.requestPointerLock ||
         renderer.domElement.mozRequestPointerLock ||
         renderer.domElement.webkitRequestPointerLock;
@@ -319,14 +325,6 @@
       }
 
       //
-
-      function onMouseMove( e ) {
-
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-
-      }
-
       function animate() {
 
         requestAnimationFrame( animate );
@@ -336,44 +334,6 @@
 
       }
 
-      function pick() {
-
-        //render the picking scene off-screen
-
-        renderer.render( pickingScene, camera, pickingTexture );
-
-        var gl = self.renderer.getContext();
-
-        //read the pixel under the mouse from the texture
-
-        var pixelBuffer = new Uint8Array( 4 );
-        gl.readPixels( mouse.x, pickingTexture.height - mouse.y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelBuffer );
-
-        //interpret the pixel as an ID
-
-        var id = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-        var data = pickingData[ id ];
-
-        if ( data) {
-
-          //move our highlightBox so that it surrounds the picked object
-
-          if ( data.position && data.rotation && data.scale ){
-
-            highlightBox.position.copy( data.position );
-            highlightBox.rotation.copy( data.rotation );
-            highlightBox.scale.copy( data.scale ).add( offset );
-            highlightBox.visible = true;
-
-          }
-
-        } else {
-
-          highlightBox.visible = false;
-
-        }
-
-      }
 
       function render() {
 
@@ -382,9 +342,9 @@
         } else {
           vrControls.update();
         }
-        //pick();
         cursor.update();
         if (vrMode) {
+          intersect();
           vrEffect.render( scene, camera );
         } else {
           renderer.render( scene, camera );
@@ -397,6 +357,37 @@
           vrControls.zeroSensor();
         }
       });
+
+      // find intersections
+      function intersect() {
+
+        var vector = cursor.localToWorld( cursor.cursor.position.clone() );
+        raycaster.set( camera.position, vector.sub(camera.position).normalize() );
+
+        var intersects = raycaster.intersectObjects( scene.children );
+
+        if ( intersects.length > 0 ) {
+
+          if ( INTERSECTED != intersects[ 0 ].object ) {
+
+            console.log("RAY " + intersects[ 0 ].object.id);
+
+            if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+            INTERSECTED = intersects[ 0 ].object;
+            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+            INTERSECTED.material.emissive.setHex( 0xffff00 );
+
+          }
+
+        } else {
+
+          if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+          INTERSECTED = null;
+
+        }
+      }
 
     </script>
 
