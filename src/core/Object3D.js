@@ -56,8 +56,6 @@ THREE.Object3D = function () {
 		},
 	} );
 
-	this.renderDepth = null;
-
 	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
@@ -754,8 +752,6 @@ THREE.Object3D.prototype = {
 		object.position.copy( this.position );
 		object.quaternion.copy( this.quaternion );
 		object.scale.copy( this.scale );
-
-		object.renderDepth = this.renderDepth;
 
 		object.rotationAutoUpdate = this.rotationAutoUpdate;
 

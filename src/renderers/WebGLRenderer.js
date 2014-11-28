@@ -3402,18 +3402,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( _this.sortObjects === true ) {
 
-							if ( object.renderDepth !== null ) {
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyProjection( _projScreenMatrix );
 
-								webglObject.z = object.renderDepth;
-
-							} else {
-
-								_vector3.setFromMatrixPosition( object.matrixWorld );
-								_vector3.applyProjection( _projScreenMatrix );
-
-								webglObject.z = _vector3.z;
-
-							}
+							webglObject.z = _vector3.z;
 
 						}
 
