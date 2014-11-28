@@ -7273,8 +7273,6 @@ THREE.Object3D = function () {
 		},
 	} );
 
-	this.renderDepth = null;
-
 	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
@@ -7971,8 +7969,6 @@ THREE.Object3D.prototype = {
 		object.position.copy( this.position );
 		object.quaternion.copy( this.quaternion );
 		object.scale.copy( this.scale );
-
-		object.renderDepth = this.renderDepth;
 
 		object.rotationAutoUpdate = this.rotationAutoUpdate;
 
@@ -21065,11 +21061,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( a.material.id !== b.material.id ) {
 
-			return b.material.id - a.material.id;
+			return a.material.id - b.material.id;
 
 		} else if ( a.z !== b.z ) {
 
-			return b.z - a.z;
+			return a.z - b.z;
 
 		} else {
 
@@ -21083,7 +21079,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( a.z !== b.z ) {
 
-			return a.z - b.z;
+			return b.z - a.z;
 
 		} else {
 
@@ -21289,18 +21285,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( _this.sortObjects === true ) {
 
-							if ( object.renderDepth !== null ) {
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyProjection( _projScreenMatrix );
 
-								webglObject.z = object.renderDepth;
-
-							} else {
-
-								_vector3.setFromMatrixPosition( object.matrixWorld );
-								_vector3.applyProjection( _projScreenMatrix );
-
-								webglObject.z = _vector3.z;
-
-							}
+							webglObject.z = _vector3.z;
 
 						}
 
@@ -21324,7 +21312,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var material;
 
-		for ( var i = renderList.length - 1; i !== - 1; i -- ) {
+		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var webglObject = renderList[ i ];
 
@@ -21371,7 +21359,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var material;
 
-		for ( var i = 0, il = renderList.length; i < il; i ++ ) {
+		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var webglObject = renderList[ i ];
 			var object = webglObject.object;
@@ -23559,7 +23547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter is set to THREE.LinearFilter or THREE.NearestFilter. ( ' + texture.sourceFile + ' )' );			
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter is set to THREE.LinearFilter or THREE.NearestFilter. ( ' + texture.sourceFile + ' )' );
 
 			}
 
@@ -26044,16 +26032,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			var sprite = sprites[ i ];
 
 			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-
-			if ( sprite.renderDepth === null ) {
-
-				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
-
-			} else {
-
-				sprite.z = sprite.renderDepth;
-
-			}
+			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
 
 		}
 
