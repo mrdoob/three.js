@@ -2,12 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( object ) {
+THREE.BoxHelper = function ( object, color ) {
+	
+	var tempColor = ( color !== undefined ) ? color : 0xffff00;
+	this.color = new THREE.Color();
+	this.color.set( tempColor );
 
 	var geometry = new THREE.BufferGeometry();
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 72 ), 3 ) );
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: this.color } ), THREE.LinePieces );
 
 	if ( object !== undefined ) {
 
@@ -98,4 +102,11 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
+};
+
+THREE.BoxHelper.prototype.setColor = function ( color ) {
+	
+	this.color.set( color );
+	this.material.color.copy( this.color );
+	
 };
