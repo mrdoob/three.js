@@ -4,11 +4,11 @@
 
 THREE.BoxHelper = function ( object, color ) {
 	
-	var tempColor = ( color !== undefined ) ? color : 0xffff00;
+	if ( color === undefined ) color = 0xffff00;
 	this.colors = {
     		main: new THREE.Color()
 	};
-	this.colors.main.set( tempColor );
+	this.colors.main.set( color );
 
 	var geometry = new THREE.BufferGeometry();
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 72 ), 3 ) );
