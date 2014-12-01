@@ -4426,6 +4426,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.shared ) {
+
+			if ( _supportsBoneTextures ) {
+
+				if ( p_uniforms.sharedMaterialMatricesTexture !== null ) {
+
+					var textureUnit = getTextureUnit();
+
+					_gl.uniform1i( p_uniforms.sharedMaterialMatricesTexture, textureUnit );
+					_this.setTexture( object.matrixTexture, textureUnit );
+
+				}
+
+				if ( p_uniforms.sharedMaterialMatricesTextureWidth !== null ) {
+
+					_gl.uniform1i( p_uniforms.sharedMaterialMatricesTextureWidth, object.matricesTextureWidth );
+
+				}
+
+			}
+
+		}
+
 		if ( refreshMaterial ) {
 
 			// refresh uniforms common to several materials

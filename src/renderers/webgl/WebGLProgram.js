@@ -160,6 +160,8 @@ THREE.WebGLProgram = ( function () {
 				parameters.skinning ? "#define USE_SKINNING" : "",
 				parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
 
+				parameters.shared ? "#define USE_SHARED_MATERIAL" : "",
+
 				parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
 				parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
 				parameters.wrapAround ? "#define WRAP_AROUND" : "",
@@ -341,6 +343,13 @@ THREE.WebGLProgram = ( function () {
 
 			identifiers.push( 'boneGlobalMatrices' );
 
+		}
+		
+		if ( parameters.shared ) {
+			
+			identifiers.push( 'sharedMaterialMatricesTextureWidth' );
+			identifiers.push( 'sharedMaterialMatricesTexture' );
+			
 		}
 
 		if ( parameters.logarithmicDepthBuffer ) {
