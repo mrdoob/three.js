@@ -16,58 +16,60 @@ THREE.CameraHelper = function ( camera ) {
 
 	// colors
 
-	var hexFrustum = 0xffaa00;
-	var hexCone = 0xff0000;
-	var hexUp = 0x00aaff;
-	var hexTarget = 0xffffff;
-	var hexCross = 0x333333;
+	this.colors = {
+		frustum: new THREE.Color( 0xffaa00 ),
+		cone: new THREE.Color( 0xff0000 ),
+		up: new THREE.Color( 0x00aaff ),
+		target: new THREE.Color( 0xffffff ),
+		cross: new THREE.Color( 0x333333 )	
+	};
 
 	// near
 
-	addLine( "n1", "n2", hexFrustum );
-	addLine( "n2", "n4", hexFrustum );
-	addLine( "n4", "n3", hexFrustum );
-	addLine( "n3", "n1", hexFrustum );
+	addLine( "n1", "n2", this.colors.frustum ); //0,1
+	addLine( "n2", "n4", this.colors.frustum ); //2,3
+	addLine( "n4", "n3", this.colors.frustum ); //4,5
+	addLine( "n3", "n1", this.colors.frustum ); //6,7
 
 	// far
 
-	addLine( "f1", "f2", hexFrustum );
-	addLine( "f2", "f4", hexFrustum );
-	addLine( "f4", "f3", hexFrustum );
-	addLine( "f3", "f1", hexFrustum );
+	addLine( "f1", "f2", this.colors.frustum ); //8,9
+	addLine( "f2", "f4", this.colors.frustum ); //10,11
+	addLine( "f4", "f3", this.colors.frustum ); //12,13
+	addLine( "f3", "f1", this.colors.frustum ); //14,15
 
 	// sides
 
-	addLine( "n1", "f1", hexFrustum );
-	addLine( "n2", "f2", hexFrustum );
-	addLine( "n3", "f3", hexFrustum );
-	addLine( "n4", "f4", hexFrustum );
+	addLine( "n1", "f1", this.colors.frustum ); //16,17
+	addLine( "n2", "f2", this.colors.frustum ); //18,19
+	addLine( "n3", "f3", this.colors.frustum ); //20,21
+	addLine( "n4", "f4", this.colors.frustum ); //22,23
 
 	// cone
 
-	addLine( "p", "n1", hexCone );
-	addLine( "p", "n2", hexCone );
-	addLine( "p", "n3", hexCone );
-	addLine( "p", "n4", hexCone );
+	addLine( "p", "n1", this.colors.cone ); //24,25
+	addLine( "p", "n2", this.colors.cone ); //26,27
+	addLine( "p", "n3", this.colors.cone ); //28,29
+	addLine( "p", "n4", this.colors.cone ); //30,31
 
 	// up
 
-	addLine( "u1", "u2", hexUp );
-	addLine( "u2", "u3", hexUp );
-	addLine( "u3", "u1", hexUp );
+	addLine( "u1", "u2", this.colors.up ); //32,33
+	addLine( "u2", "u3", this.colors.up ); //34,35
+	addLine( "u3", "u1", this.colors.up ); //36,37
 
 	// target
 
-	addLine( "c", "t", hexTarget );
-	addLine( "p", "c", hexCross );
+	addLine( "c", "t", this.colors.target ); //38,39
+	addLine( "p", "c", this.colors.cross ); //40,41
 
 	// cross
 
-	addLine( "cn1", "cn2", hexCross );
-	addLine( "cn3", "cn4", hexCross );
+	addLine( "cn1", "cn2", this.colors.cross ); //42,43
+	addLine( "cn3", "cn4", this.colors.cross ); //44,45
 
-	addLine( "cf1", "cf2", hexCross );
-	addLine( "cf3", "cf4", hexCross );
+	addLine( "cf1", "cf2", this.colors.cross ); //46,47
+	addLine( "cf3", "cf4", this.colors.cross ); //48,49
 
 	function addLine( a, b, hex ) {
 
@@ -185,3 +187,38 @@ THREE.CameraHelper.prototype.update = function () {
 	};
 
 }();
+
+THREE.CameraHelper.prototype.setColors = function ( frustum, cone, up, target, cross ) {
+
+	this.colors.frustum.set( frustum );
+	this.colors.cone.set( cone );
+	this.colors.up.set( up );
+	this.colors.target.set( target );
+	this.colors.cross.set( cross );
+	
+	var colorObjectArray = this.geometry.colors;
+	var i = 0;
+	
+	for ( i = 0; i < 24; i ++ ) {
+		colorObjectArray[ i ].set( frustum );	
+	}
+	
+	for ( i = 24; i < 32; i ++ ) {	
+		colorObjectArray[ i ].set( cone );	
+	}
+	
+	for ( i = 32; i < 38; i ++ ) {	
+		colorObjectArray[ i ].set( up );	
+	}
+	
+	for ( i = 38; i < 40; i ++ ) {	
+		colorObjectArray[ i ].set( target );	
+	}
+	
+	for ( i = 40; i < 50; i ++ ) {	
+		colorObjectArray[ i ].set( cross );	
+	}
+	
+	this.geometry.colorsNeedUpdate = true;
+	
+};
