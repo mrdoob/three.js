@@ -73,9 +73,11 @@
 
     <script src="js/libs/bignumber.js"></script>
     <script src="../build/three.js"></script>
+    <script src="js/libs/tween.min.js"></script>
 
     <script src="js/Cursor.js"></script>
 
+    <script src="js/SkyShader.js"></script>
     <script src="js/controls/MouseControls.js"></script>
     <script src="js/effects/VREffect.js"></script>
     <script src="js/controls/VRControls.js"></script>
@@ -89,6 +91,7 @@
       var mouse = new THREE.Vector2();
       var offset = new THREE.Vector3( 10, 10, 10 );
       var cursor;
+      var sky;
       var raycaster;
       var INTERSECTED;
       var lockPointerButton = document.querySelector('.lock-pointer');
@@ -143,7 +146,7 @@
 
         container = document.getElementById( "container" );
 
-        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000000 );
 
         controls = new THREE.MouseControls( camera );
         controls.rotateSpeed = 1.0;
@@ -187,9 +190,65 @@
 
         }
 
+        function explodeBox(box) {
+
+          var duration = 8000;
+
+          // explode geometry into objects
+          var pieces = explode( box.geometry, box.material );
+
+          box.material.visible = false;
+
+          // animate objects
+          for ( var i = 0; i < pieces.children.length; i ++ ) {
+
+            var object = pieces.children[ i ];
+
+            object.geometry.computeFaceNormals();
+            var normal = object.geometry.faces[0].normal.clone();
+            var targetPosition = object.position.clone().add( normal.multiplyScalar( 3000 ) );
+            removeBoxFromList( box );
+            new TWEEN.Tween( object.position )
+              .to( targetPosition, duration )
+              .onComplete( deleteBox )
+              .start();
+
+            object.material.opacity = 0;
+            new TWEEN.Tween( object.material )
+              .to( { opacity: 1 }, duration )
+              .start();
+
+            var rotation = 2 * Math.PI;
+            var targetRotation = { x: rotation, y: rotation, z:rotation };
+            new TWEEN.Tween( object.rotation )
+              .to( targetRotation, duration )
+              .start();
+
+          }
+
+          function deleteBox() {
+            box.remove( pieces )
+            scene.remove( box );
+          }
+
+          box.add( pieces )
+
+        }
+
+        function removeBoxFromList( box ) {
+          for (var i = 0; i < objects.length; i++) {
+            if (objects[i] === box) {
+              objects.splice(i, 1);
+              return;
+            }
+          }
+        }
+
         function explode( geometry, material ) {
 
-          var group = new THREE.Group();
+          var pieces = new THREE.Group();
+          var material = material.clone();
+          material.side = THREE.DoubleSide;
 
           for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -205,11 +264,22 @@
 
             var mesh = new THREE.Mesh( geometry2, material );
             mesh.position.sub( geometry2.center() );
-            group.add( mesh );
+            pieces.add( mesh );
 
           }
 
-          return group;
+          //sort the pieces
+          pieces.children.sort( function ( a, b ) {
+
+            return a.position.z - b.position.z;
+            //return a.position.x - b.position.x;     // sort x
+            //return b.position.y - a.position.y;   // sort y
+
+          } );
+
+          pieces.rotation.set( 0, 0, 0 )
+
+          return pieces;
 
         }
 
@@ -220,8 +290,6 @@
 
         var matrix = new THREE.Matrix4();
         var quaternion = new THREE.Quaternion();
-
-        var objects;
 
         var geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
@@ -249,6 +317,7 @@
         renderer.setClearColor( 0xffffff, 1 );
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.sortObjects = false;
+
         container.appendChild( renderer.domElement );
 
         stats = new Stats();
@@ -260,7 +329,10 @@
 
         cursor = new THREE.Cursor( camera, renderer );
         cursor.addEventListener('click', function() {
-          console.log("CURSOR CLICK");
+          if (INTERSECTED) {
+            explodeBox(INTERSECTED);
+            intersect();
+          }
         });
         scene.add( cursor );
         scene.add( camera );
@@ -273,6 +345,8 @@
             fullScreenButton.classList.add('error');
           }
         }
+
+        initSky();
 
         for ( var i = 0; i < 2000; i ++ ) {
 
@@ -296,6 +370,7 @@
           object.scale.z = Math.random() + 0.5;
 
           scene.add( object );
+          objects.push( object );
 
         }
 
@@ -350,6 +425,7 @@
           renderer.render( scene, camera );
         }
         cursor.render();
+        TWEEN.update();
       }
 
       document.addEventListener( 'keydown', function ( event ) {
@@ -358,19 +434,58 @@
         }
       });
 
+      function initSky() {
+
+        // Add Sky Mesh
+        sky = new THREE.Sky();
+        scene.add( sky.mesh );
+
+        var effectController  = {
+          turbidity: 10,
+          reileigh: 2,
+          mieCoefficient: 0.005,
+          mieDirectionalG: 0.8,
+          luminance: 1,
+          inclination: 0.49, // elevation / inclination
+          azimuth: 0.25, // Facing front,
+          sun: !true
+        }
+
+        var distance = 400000;
+
+        function updateSky() {
+          var uniforms = sky.uniforms;
+          uniforms.turbidity.value = effectController.turbidity;
+          uniforms.reileigh.value = effectController.reileigh;
+          uniforms.luminance.value = effectController.luminance;
+          uniforms.mieCoefficient.value = effectController.mieCoefficient;
+          uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+
+          var theta = Math.PI * (effectController.inclination - 0.5);
+          var phi = 2 * Math.PI * (effectController.azimuth - 0.5);
+
+          var x = distance * Math.cos(phi);
+          var y = distance * Math.sin(phi) * Math.sin(theta);
+          var z = distance * Math.sin(phi) * Math.cos(theta);
+
+          uniforms.sunPosition.value.copy(new THREE.Vector3( x, y, z ));
+        }
+
+        updateSky();
+
+      }
+
       // find intersections
       function intersect() {
 
         var vector = cursor.localToWorld( cursor.cursor.position.clone() );
         raycaster.set( camera.position, vector.sub(camera.position).normalize() );
 
-        var intersects = raycaster.intersectObjects( scene.children );
+        var intersects = raycaster.intersectObjects( objects );
 
         if ( intersects.length > 0 ) {
 
           if ( INTERSECTED != intersects[ 0 ].object ) {
-
-            console.log("RAY " + intersects[ 0 ].object.id);
 
             if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
 
