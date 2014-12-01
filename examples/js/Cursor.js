@@ -37,13 +37,13 @@ THREE.Cursor = function ( object, renderer ) {
 	this.domElement.style.cursor = 'none';
 	this.mouseVector = new THREE.Vector3(0, 0, 0);
 
-	this.cursor = new THREE.Mesh(
+	this.pointer = new THREE.Mesh(
 		new THREE.SphereGeometry( 0.02, 0.02, 0.02 ),
 		new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide } )
 	);
 
-	this.cursor.position.z = -75;
-	this.add( this.cursor );
+	this.pointer.position.z = -75;
+	this.add( this.pointer );
 	this.scene.add( this );
 
 	this.mouseQuat = new THREE.Quaternion();
@@ -100,8 +100,9 @@ THREE.Cursor = function ( object, renderer ) {
 			scope.updateMatrix();
 		} else {
 			scope.matrixAutoUpdate = true;
-			this.cursor.position.x = this.mouseVector.x;
-			this.cursor.position.y = -this.mouseVector.y;
+			this.pointer.position.x = this.mouseVector.x;
+			this.pointer.position.y = -this.mouseVector.y;
+			this.render();
 		}
 
 	};
@@ -163,7 +164,7 @@ THREE.Cursor = function ( object, renderer ) {
 		var mouseY = ( e.clientY / window.innerHeight ) * 2 - 1;
 
 		// cursor position in camera coordinates
-		cursorPosition.copy( scope.cursor.position );
+		cursorPosition.copy( scope.pointer.position );
 		cursorPosition.project( scope.camera );
 
 		scope.mouseVector.set( mouseX, mouseY, cursorPosition.z );
@@ -221,13 +222,13 @@ THREE.Cursor = function ( object, renderer ) {
 			resetPivot( scope.object );
 			scope.scene.remove( scope );
 			scope.parentScene.add( scope );
-			scope.cursor.scale.set( 50, 50, 50 );
+			scope.pointer.scale.set( 50, 50, 50 );
 			scope.previousCameraQuat = false;
 		} else {
 			resetPivot( scope.camera );
 			scope.parentScene.remove( scope );
 			scope.scene.add( scope );
-			scope.cursor.scale.set( 1, 1, 1 );
+			scope.pointer.scale.set( 1, 1, 1 );
 			scope.pointerLocked = false;
 		}
 	}
