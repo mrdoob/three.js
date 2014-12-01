@@ -21,25 +21,12 @@ THREE.Cursor = function ( object, renderer ) {
 	var cursorPosition = new THREE.Vector3();
 	var pixelsToDegreesFactor = 0.00030;
 
-	var verticalFOV = object.fov;
-	var verticalFOVPadding = 5;
-	var horizontalFOV = object.fov * object.aspect;
-	var horizontalFOVPadding = verticalFOVPadding * object.aspect + 20;
-
 	this.object = object;
 	this.lock = false;
-	this.orientation = {
-		x: 0,
-		y: 0,
-		euler: new THREE.Euler(),
-		quaternion: new THREE.Quaternion()
-	};
 	this.maxFOV = 30;
 	this.deltaEuler = new THREE.Euler();
 	this.mouseDeltaX = 0;
 	this.mouseDeltaY = 0;
-	this.deltaQuaternion = new THREE.Quaternion();
-	this.rotationQuaternion = new THREE.Quaternion();
 
 	this.pointerLocked = false;
 	this.camera = new THREE.OrthographicCamera( left, right, top, bottom, near, far );
@@ -86,18 +73,6 @@ THREE.Cursor = function ( object, renderer ) {
 			// http://stackoverflow.com/questions/22157435/difference-between-the-two-quaternions
 			cameraInverse.copy( this.object.quaternion ).inverse();
 			this.cameraDeltaQuaternion.copy( this.previousCameraQuat ).multiply( cameraInverse );
-			// scope.mouseQuat.copy( scope.quaternion ).multiply( this.cameraDeltaQuaternion );
-			// deltaAngle = quaternionsAngle( scope.object.quaternion, scope.mouseQuat ) * ( 180 / Math.PI );
-
-			// // Dealing with overreach on extremely fast movements
-			// if ( deltaAngle >= this.maxFOV + 10 ) {
-			// 	cursorAxis = quaternionAxis( scope.cameraDeltaQuaternion );
-			// 	cursorAngle = quaternionAngle( scope.cameraDeltaQuaternion );
-			// 	angleSign = cursorAngle > 0 ? 1 : -1;
-			// 	//scope.cameraDeltaQuaternion.setFromAxisAngle( cursorAxis, cursorAngle - ( ( deltaAngle - this.maxFOV )  * Math.PI / 180 ) );
-			// 	//scope.quaternion.multiply( scope.cameraDeltaQuaternion );
-			// 	scope.cameraDeltaQuaternion.setFromAxisAngle( cursorAxis, ((angleSign) * (deltaAngle - this.maxFOV)  * Math.PI / 180 ) );
-			// }
 
 			/**********/
 			// PING PONG
@@ -110,13 +85,11 @@ THREE.Cursor = function ( object, renderer ) {
 			// if ( deltaAngle >= this.maxFOV ) {
 			// 	this.lock = true;
 			// }
+			// if ( this.lock ) {
+			//	this.deltaQuaternion.multiply( this.cameraDeltaQuaternion );
+			// }
 			// // STICKY
-
-
-			if ( this.lock ) {
-				this.deltaQuaternion.multiply( this.cameraDeltaQuaternion );
-			}
-			/*********/
+			/**********/
 
 			this.updateMouseQuaternion();
 			scope.quaternion.copy( scope.deltaQuaternion.clone().inverse() );
@@ -133,26 +106,6 @@ THREE.Cursor = function ( object, renderer ) {
 
 	};
 
-	function quaternionAngle(q) {
-		return 2 * Math.acos(q.w);
-	}
-
-	function quaternionAxis(q) {
-		var x = q.x;
-		var y = q.y;
-		var z = q.z;
-		// if w > 1 acos and sqrt will produce errors,
-		// this cannot happen if quaternion is normalised
-		var q = q.w <= 1? q : new THREE.Quaternion().copy( q ).normalize();
-		var factor = Math.sqrt( 1 - q.w * q.w );
-		if ( factor > 0.001) {
-		x /= factor;
-		y /= factor;
-		z /= factor;
-		}
-		return new THREE.Vector3( x, y, z );
-	}
-
 	this.updateMouseQuaternion = function() {
 		var mouseQuat = scope.mouseQuat;
 		var deltaAngle;
@@ -161,46 +114,17 @@ THREE.Cursor = function ( object, renderer ) {
 		var mouseMoveQuat = new THREE.Quaternion();
 		var xAxis = new THREE.Vector3(1, 0, 0);
 		var yAxis = new THREE.Vector3(0, 1, 0);
-		var xDelta = scope.xDelta = scope.xDelta || 0;
-		var yDelta = scope.yDelta = scope.yDelta || 0;
 		var xInc = scope.mouseDeltaX;
 		var yInc = scope.mouseDeltaY;
 		var incSign;
 
 		if ( xInc !== 0 || yInc !==0 ) {
-			// if ( Math.abs(( xDelta + xInc )) * 360 >= this.maxFOV ) {
-			// 	xInc = 0;
-			// }
-
-			// if ( Math.abs(( yDelta + yInc )) * 360 >= this.maxFOV ) {
-			// 	yInc = 0;
-			// }
 
 			scope.object.localToWorld( xAxis );
 			xDeltaQuaternion.setFromAxisAngle( xAxis, xInc * 2 * Math.PI );
-			// mouseQuat.copy( scope.quaternion ).multiply( xDeltaQuaternion );
-			// deltaAngle = quaternionsAngle( scope.object.quaternion, mouseQuat ) * ( 180 / Math.PI );
-			// console.log("ANGLE X " + deltaAngle);
-			// incSign = xInc >= 0? 1 : -1;
-			// if (deltaAngle >= this.maxFOV) {
-			// 	xInc = incSign * (deltaAngle - this.maxFOV) / 360;
-			// 	console.log("INC INC " + xInc);
-			// 	xDeltaQuaternion.setFromAxisAngle( xAxis, xInc * 2 * Math.PI );
-			// }
 
 			scope.object.localToWorld( yAxis );
 			yDeltaQuaternion.setFromAxisAngle( yAxis, yInc * 2 * Math.PI );
-			// mouseQuat.copy( scope.quaternion ).multiply( yDeltaQuaternion );
-			// deltaAngle = quaternionsAngle( scope.object.quaternion, mouseQuat ) * ( 180 / Math.PI );
-			// console.log("ANGLE Y " + deltaAngle);
-			// incSign = yInc >= 0? 1 : -1;
-			// if (deltaAngle >= this.maxFOV) {
-			// 	yInc = incSign * (deltaAngle - this.maxFOV) / 360;
-			// 	yDeltaQuaternion.setFromAxisAngle( yAxis, yInc * 2 * Math.PI );
-			// }
-
-			scope.xDelta += xInc;
-			scope.yDelta += yInc;
 
 			mouseMoveQuat.copy( xDeltaQuaternion ).multiply( yDeltaQuaternion );
 			mouseQuat.copy( mouseMoveQuat ).multiply( scope.quaternion );
@@ -232,10 +156,6 @@ THREE.Cursor = function ( object, renderer ) {
 		this.renderer.render( this.scene, this.camera );
 		this.renderer.autoClear = autoClear;
 	};
-
-	function quaternionAngle(q) {
-		return 2 * Math.acos(q.w);
-	}
 
 	function updateScreenPosition( e ) {
 		// It converts from screen to camera coordinates
@@ -284,8 +204,6 @@ THREE.Cursor = function ( object, renderer ) {
 	}
 
 	function resetPivot( object ) {
-		scope.orientation.x = 0;
-		scope.orientation.y = 0;
 		scope.position.copy( object.position );
 		scope.quaternion.copy( object.quaternion );
 		scope.deltaQuaternion = new THREE.Quaternion();
@@ -324,7 +242,7 @@ THREE.Cursor = function ( object, renderer ) {
 	}
 
 	function storeParentScene() {
-		if (!scope.parentScene && scope.parent !== scope.scene) {
+		if ( !scope.parentScene && scope.parent !== scope.scene ) {
 			scope.parentScene = scope.parent;
 		}
 	}

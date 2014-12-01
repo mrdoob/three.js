@@ -135,6 +135,16 @@
         }
       }
 
+      function onDocumentMouseMove( event ) {
+
+        event.preventDefault();
+
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+      }
+
+      document.addEventListener( 'mousemove', onDocumentMouseMove, false );
       document.addEventListener( 'pointerlockchange', onPointerLockChanged, false );
       document.addEventListener( 'mozpointerlockchange', onPointerLockChanged, false );
       document.addEventListener( 'webkitpointerlockchange', onPointerLockChanged, false );
@@ -422,6 +432,7 @@
           intersect();
           vrEffect.render( scene, camera );
         } else {
+          intersectMouse();
           renderer.render( scene, camera );
         }
         cursor.render();
@@ -479,7 +490,7 @@
       function intersect() {
 
         var vector = cursor.localToWorld( cursor.cursor.position.clone() );
-        raycaster.set( camera.position, vector.sub(camera.position).normalize() );
+        raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 
         var intersects = raycaster.intersectObjects( objects );
 
@@ -502,6 +513,37 @@
           INTERSECTED = null;
 
         }
+      }
+
+
+      function intersectMouse() {
+
+        var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+        vector.unproject( camera );
+
+        raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+        var intersects = raycaster.intersectObjects( objects );
+
+        if ( intersects.length > 0 ) {
+
+          if ( INTERSECTED != intersects[ 0 ].object ) {
+
+            if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+            INTERSECTED = intersects[ 0 ].object;
+            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+            INTERSECTED.material.emissive.setHex( 0xffff00 );
+
+          }
+
+        } else {
+
+          if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
+
+          INTERSECTED = null;
+
+        }
+
       }
 
     </script>
