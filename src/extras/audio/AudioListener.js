@@ -21,6 +21,8 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 	var quaternion = new THREE.Quaternion();
 	var scale = new THREE.Vector3();
 
+	var up = this.up;
+
 	var orientation = new THREE.Vector3();
 	var velocity = new THREE.Vector3();
 
@@ -38,7 +40,7 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 		velocity.subVectors( position, positionPrev );
 
 		listener.setPosition( position.x, position.y, position.z );
-		listener.setOrientation( orientation.x, orientation.y, orientation.z, this.up.x, this.up.y, this.up.z );
+		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
 		listener.setVelocity( velocity.x, velocity.y, velocity.z );
 
 		positionPrev.copy( position );
