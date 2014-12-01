@@ -2,13 +2,19 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, step ) {
+THREE.GridHelper = function ( size, step, colorCenterLine, colorGrid ) {
 
 	var geometry = new THREE.Geometry();
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
-
-	this.color1 = new THREE.Color( 0x444444 );
-	this.color2 = new THREE.Color( 0x888888 );
+	
+	if ( colorCenterLine === undefined ) colorCenterLine = 0x444444;
+	if ( colorGrid === undefined ) colorGrid = 0x888888;
+	this.colors = {
+		centerLine: new THREE.Color(),
+    		grid: new THREE.Color()
+	};
+	this.colors.centerLine.set( colorCenterLine );
+	this.colors.grid.set( colorGrid );
 
 	for ( var i = - size; i <= size; i += step ) {
 
@@ -17,7 +23,7 @@ THREE.GridHelper = function ( size, step ) {
 			new THREE.Vector3( i, 0, - size ), new THREE.Vector3( i, 0, size )
 		);
 
-		var color = i === 0 ? this.color1 : this.color2;
+		var color = i === 0 ? this.colors.centerLine : this.colors.grid;
 
 		geometry.colors.push( color, color, color, color );
 
@@ -32,9 +38,9 @@ THREE.GridHelper.prototype.constructor = THREE.GridHelper;
 
 THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
 
-	this.color1.set( colorCenterLine );
-	this.color2.set( colorGrid );
+	this.colors.centerLine.set( colorCenterLine );
+	this.colors.grid.set( colorGrid );
 
 	this.geometry.colorsNeedUpdate = true;
 
-}
+};
