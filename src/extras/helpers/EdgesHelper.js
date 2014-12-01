@@ -2,12 +2,16 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EdgesHelper = function ( object, hex ) {
+THREE.EdgesHelper = function ( object, color ) {
 
-	var color = ( hex !== undefined ) ? hex : 0xffffff;
+	if ( color === undefined ) color = 0xffffff;
+	this.colors = {
+    		main: new THREE.Color()
+	};
+	this.colors.main.set( color );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+	var sortFunction = function ( a, b ) { return a - b; };
 
 	var keys = [ 'a', 'b', 'c' ];
 	var geometry = new THREE.BufferGeometry();
@@ -74,7 +78,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: this.colors.main } ), THREE.LinePieces );
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
@@ -83,3 +87,10 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 THREE.EdgesHelper.prototype = Object.create( THREE.Line.prototype );
 THREE.EdgesHelper.prototype.constructor = THREE.EdgesHelper;
+
+THREE.EdgesHelper.prototype.setColor = function ( color ) {
+	
+	this.colors.main.set( color );
+	this.material.color.copy( this.colors.main );
+	
+};
