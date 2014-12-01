@@ -377,19 +377,19 @@ THREE.Object3D.prototype = {
 
 	getObjectById: function ( id, recursive ) {
 
-		return this.getObjectByProperty('id', id, recursive);
+		return this.getObjectByProperty( 'id', id, recursive );
 
 	},
 
 	getObjectByName: function ( name, recursive ) {
 
-		return this.getObjectByProperty('name', name, recursive);
+		return this.getObjectByProperty( 'name', name, recursive );
 
 	},
-	
+
 	getObjectByProperty: function ( name, value, recursive ) {
 
-		if ( this[name] === value ) return this;
+		if ( this[ name ] === value ) return this;
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
