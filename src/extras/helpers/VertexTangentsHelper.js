@@ -10,6 +10,7 @@ THREE.VertexTangentsHelper = function ( object, size, color, linewidth ) {
 	this.size = ( size !== undefined ) ? size : 1;
 
 	if ( color === undefined ) color = 0x0000ff;
+	
 	this.colors = {
     		main: new THREE.Color()
 	};
