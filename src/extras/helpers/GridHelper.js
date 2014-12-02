@@ -36,7 +36,7 @@ THREE.GridHelper = function ( size, step, colorCenterLine, colorGrid ) {
 THREE.GridHelper.prototype = Object.create( THREE.Line.prototype );
 THREE.GridHelper.prototype.constructor = THREE.GridHelper;
 
-THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
+THREE.GridHelper.prototype.setColors = function ( colorCenterLine, colorGrid ) {
 
 	this.colors.centerLine.set( colorCenterLine );
 	this.colors.grid.set( colorGrid );
