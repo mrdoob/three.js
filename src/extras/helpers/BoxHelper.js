@@ -5,6 +5,7 @@
 THREE.BoxHelper = function ( object, color ) {
 	
 	if ( color === undefined ) color = 0xffff00;
+	
 	this.colors = {
     		main: new THREE.Color()
 	};
