@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @authod mrdoob / http://mrdoob.com/
  * @authod arodic / http://aleksandarrodic.com/
- * @authod fonserbc / http://twitter.com/fonserbc
+ * @authod fonserbc / http://fonserbc.github.io/
  *
  * Off-axis stereoscopic effect based on http://paulbourke.net/stereographics/stereorender/
  */
@@ -13,6 +13,9 @@ THREE.StereoEffect = function ( renderer ) {
 
 	this.eyeSeparation = 3;
 
+	/*
+	 * Distance to the non-parallax or projection plane
+	 */
 	this.focalLength = 15;
 
 	// internals
@@ -54,6 +57,7 @@ THREE.StereoEffect = function ( renderer ) {
 
 		// Stereo frustum calculation
 
+		// Effective fov of the camera
 		_fov = THREE.Math.radToDeg( 2 * Math.atan( Math.tan( THREE.Math.degToRad( camera.fov ) * 0.5 ) / camera.zoom ) );
 
 		_ndfl = camera.near / this.focalLength;
@@ -61,22 +65,17 @@ THREE.StereoEffect = function ( renderer ) {
 		_halfFocalWidth = _halfFocalHeight * 0.5 * camera.aspect;
 
 		_top = _halfFocalHeight * _ndfl;
-		_bottom = - _top;
+		_bottom = -_top;
 		_innerFactor = ( _halfFocalWidth + this.eyeSeparation / 2.0 ) / ( _halfFocalWidth * 2.0 );
 		_outerFactor = 1.0 - _innerFactor;
 
 		_outer = _halfFocalWidth * 2.0 * _ndfl * _outerFactor;
 		_inner = _halfFocalWidth * 2.0 * _ndfl * _innerFactor;
 
-
 		// left
 
-		_cameraL.fov = _fov;
-		_cameraL.aspect = 0.5 * camera.aspect;
-		_cameraL.near = camera.near;
-		_cameraL.far = camera.far;
 		_cameraL.projectionMatrix.makeFrustum(
-			- _outer,
+			-_outer,
 			_inner,
 			_bottom,
 			_top,
@@ -90,12 +89,8 @@ THREE.StereoEffect = function ( renderer ) {
 
 		// right
 
-		_cameraR.fov = _fov;
-		_cameraR.aspect = 0.5 * camera.aspect;
-		_cameraR.near = camera.near;
-		_cameraR.far = camera.far;
 		_cameraR.projectionMatrix.makeFrustum(
-			- _inner,
+			-_inner,
 			_outer,
 			_bottom,
 			_top,
