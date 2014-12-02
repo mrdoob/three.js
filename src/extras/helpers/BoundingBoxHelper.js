@@ -7,6 +7,7 @@
 THREE.BoundingBoxHelper = function ( object, color ) {
 
 	if ( color === undefined ) color = 0x888888;
+	
 	this.colors = {
     		main: new THREE.Color()
 	};
