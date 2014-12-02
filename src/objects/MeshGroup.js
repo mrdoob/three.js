@@ -2,24 +2,25 @@
  * @author TatumCreative (Greg Tatum) / http://gregtatum.com/
  */
 
-THREE.MeshGroup = function( material ) {
+THREE.MeshGroup = function( objectType, material ) {
 	
 	THREE.Object3D.call( this );
 	
 	console.warn( "Todo: check for valid materials" );
 		
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
-	
 	this.material.shared = true;
+	this.objectType = objectType !== undefined ? objectType : THREE.Mesh;
+
 	
 	this.type = 'MeshGroup';
-	this.bufferGeometry = new THREE.BufferGeometry();
+	this.geometry = new THREE.BufferGeometry();
 	
 	this.matricesTextureWidth = null;
 	this.matricesData = null;
 	this.matrixIndices = null;
 	
-	this.matrixTexture = null;
+	this.matricesTexture = null;
 	this.vertexShader = null;
 	this.fragmentShader = null;
 	
@@ -28,19 +29,22 @@ THREE.MeshGroup = function( material ) {
 THREE.MeshGroup.prototype = Object.create( THREE.Object3D.prototype );
 THREE.MeshGroup.prototype.constructor = THREE.MeshGroup;
 
-MeshGroup.prototype.build = function( scene ) {
+THREE.MeshGroup.prototype.build = function() {
+	
 	
 	this.buildGeometry();
 	this.buildMatrices();
 	this.buildMaterial();
 	
-	this.object = new THREE.PointCloud( this.bufferGeometry, this.material );
+	this.object = new this.objectType( this.geometry, this.material );
+	
+	this.object.matricesTexture = this.matricesTexture;
 
-	if( scene ) scene.add( this.object );
+	return this.object;
 		
 };
 	
-MeshGroup.prototype.calculateSquaredTextureWidth = function( count ) {
+THREE.MeshGroup.prototype.calculateSquaredTextureWidth = function( count ) {
 
 	var width = 1;
 	var i = 0;
@@ -56,7 +60,7 @@ MeshGroup.prototype.calculateSquaredTextureWidth = function( count ) {
 	
 };
 	
-MeshGroup.prototype.buildGeometry = function() {
+THREE.MeshGroup.prototype.buildGeometry = function() {
 	
 	var mergedGeometry = new THREE.Geometry();
 	
@@ -83,16 +87,18 @@ MeshGroup.prototype.buildGeometry = function() {
 		
 	}
 	
-	this.bufferGeometry.fromGeometry( mergedGeometry );
+	this.geometry.fromGeometry( mergedGeometry );
 	
 };
 	
-MeshGroup.prototype.generateTransformMatrixIndices = function( object3Ds ) {
+THREE.MeshGroup.prototype.generateTransformMatrixIndices = function( object3Ds ) {
 	
 	var matrixIndices = [];
 	var totalLength = 0;
 	var positionsInFaces;
 	var childGeometry;
+	
+	var i, il, j, jl;
 	
 	for( i = 0, il = object3Ds.length; i < il; i++ ) {
 		
@@ -117,10 +123,10 @@ MeshGroup.prototype.generateTransformMatrixIndices = function( object3Ds ) {
 	return new Float32Array( matrixIndices );
 };
 
-MeshGroup.prototype.buildMatrices = function() {
+THREE.MeshGroup.prototype.buildMatrices = function() {
 	
 	//Calculates the n^2 width of the texture
-	this.matricesTextureWidth = calculateSquaredTextureWidth( this.children.length * 16 ); //16 floats per matrix
+	this.matricesTextureWidth = this.calculateSquaredTextureWidth( this.children.length * 16 ); //16 floats per matrix
 	
 	//The texture has 4 floats per pixel
 	this.matricesData = new Float32Array( this.matricesTextureWidth * this.matricesTextureWidth * 4 );
@@ -138,22 +144,32 @@ MeshGroup.prototype.buildMatrices = function() {
 	this.matricesTexture.flipY = false;
 	this.matricesTexture.needsUpdate = true;
 	
+	this.material.matricesTexture = this.matricesTexture;
+	this.material.matricesTextureWidth = this.matricesTextureWidth;
+	
+	for( var i = 0, il = this.children.length; i < il ; i++ ) {
+		
+		this.children[i].visible = false;
+		
+	}
+	
 };
 
-MeshGroup.prototype.buildMaterial = function() {
+THREE.MeshGroup.prototype.buildMaterial = function() {
 		
 	this.matrixIndices = this.generateTransformMatrixIndices( this.children );
 	
-	this.bufferGeometry.addAttribute( 'transformMatrixIndex', new THREE.BufferAttribute( this.matrixIndices, 1 ) );
+	this.geometry.addAttribute( 'transformMatrixIndex', new THREE.BufferAttribute( this.matrixIndices, 1 ) );
 			
 };
 
-MeshGroup.prototype.updateMatrixWorld = function( force ) {
+THREE.MeshGroup.prototype.updateMatrixWorld = function( force ) {
 	
 	if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 	
 		for( var i = 0, il = this.children.length; i < il ; i++ ) {
 			
+			this.children[i].updateMatrixWorld( force );
 			this.children[i].matrixWorld.flattenToArrayOffset( this.matricesData, i * 16 );
 			this.matricesTexture.needsUpdate = true;
 			

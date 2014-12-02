@@ -347,8 +347,8 @@ THREE.WebGLProgram = ( function () {
 		
 		if ( parameters.shared ) {
 			
-			identifiers.push( 'sharedMaterialMatricesTextureWidth' );
 			identifiers.push( 'sharedMaterialMatricesTexture' );
+			identifiers.push( 'sharedMaterialMatricesTextureWidth' );
 			
 		}
 

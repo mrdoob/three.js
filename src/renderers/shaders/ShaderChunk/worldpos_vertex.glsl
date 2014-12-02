@@ -1,6 +1,6 @@
 #if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )
 
-	#ifdef USE_SKINNING && ! defined( USE_SHARED_MATERIAL )
+	#if defined( USE_SKINNING ) && ! defined( USE_SHARED_MATERIAL )
 
 		vec4 worldPosition = modelMatrix * skinned;
 

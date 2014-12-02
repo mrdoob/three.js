@@ -1,9 +1,10 @@
-#ifdef USE_SHAREDMATERIAL
+#ifdef USE_SHARED_MATERIAL
 
 	attribute float sharedMaterialMatrixIndex;
 
 	uniform float sharedMaterialMatricesTextureWidth;
 	uniform sampler2D sharedMaterialMatricesTexture;
+	
 
 	mat4 getMatrixFromTexture( const in float i ) {
 

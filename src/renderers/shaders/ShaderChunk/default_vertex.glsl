@@ -1,6 +1,6 @@
 vec4 mvPosition;
 
-#ifdef USE_SKINNING && ! defined( USE_SHARED_MATERIAL )
+#if defined( USE_SKINNING ) && ! defined( USE_SHARED_MATERIAL )
 
 	mvPosition = modelViewMatrix * skinned;
 
