@@ -10,6 +10,7 @@ THREE.VertexNormalsHelper = function ( object, size, color, linewidth ) {
 	this.size = ( size !== undefined ) ? size : 1;
 
 	if ( color === undefined ) color = 0xff0000;
+	
 	this.colors = {
     		main: new THREE.Color()
 	};
