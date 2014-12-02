@@ -5,11 +5,12 @@
  * @author angelxuanchang
  */
 
-THREE.OBJMTLLoader = function ( manager, options, crossOrigin ) {
+THREE.OBJMTLLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	this.options = options;
-	this.crossOrigin = crossOrigin;
+	
+	this.options = {};
+	this.crossOrigin = false;
 
 };
 
