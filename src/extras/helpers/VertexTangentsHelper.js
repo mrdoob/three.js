@@ -3,13 +3,17 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
+THREE.VertexTangentsHelper = function ( object, size, color, linewidth ) {
 
 	this.object = object;
 
 	this.size = ( size !== undefined ) ? size : 1;
 
-	var color = ( hex !== undefined ) ? hex : 0x0000ff;
+	if ( color === undefined ) color = 0x0000ff;
+	this.colors = {
+    		main: new THREE.Color()
+	};
+	this.colors.main.set( color );
 
 	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
@@ -32,7 +36,7 @@ THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: this.colors.main, linewidth: width } ), THREE.LinePieces );
 
 	this.matrixAutoUpdate = false;
 
@@ -92,6 +96,13 @@ THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
 
 		return this;
 
-	}
+	};
 
 }());
+
+THREE.VertexTangentsHelper.prototype.setColor = function ( color ) {
+	
+	this.colors.main.set( color );
+	this.material.color.copy( this.colors.main );
+	
+};
