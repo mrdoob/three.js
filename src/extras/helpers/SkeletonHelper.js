@@ -14,7 +14,6 @@ THREE.SkeletonHelper = function ( object, color1, color2 ) {
 		color1: new THREE.Color(),
     		color2: new THREE.Color()
 	};
-	
 	this.colors.color1.set( color1 );
 	this.colors.color2.set( color2 );
 	
