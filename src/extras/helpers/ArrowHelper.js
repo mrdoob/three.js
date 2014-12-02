@@ -106,6 +106,7 @@ THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth
 THREE.ArrowHelper.prototype.setColor = function ( color ) {
 
 	this.colors.main.set( color );
+	
 	this.line.material.color.copy( this.colors.main );
 	this.cone.material.color.copy( this.colors.main );
 
