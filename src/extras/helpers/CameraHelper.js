@@ -200,23 +200,23 @@ THREE.CameraHelper.prototype.setColors = function ( frustum, cone, up, target, c
 	var i = 0;
 	
 	for ( i = 0; i < 24; i ++ ) {
-		colorObjectArray[ i ].set( frustum );	
+		colorObjectArray[ i ].copy( this.colors.frustum );	
 	}
 	
 	for ( i = 24; i < 32; i ++ ) {	
-		colorObjectArray[ i ].set( cone );	
+		colorObjectArray[ i ].copy( this.colors.cone );	
 	}
 	
 	for ( i = 32; i < 38; i ++ ) {	
-		colorObjectArray[ i ].set( up );	
+		colorObjectArray[ i ].copy( this.colors.up );	
 	}
 	
 	for ( i = 38; i < 40; i ++ ) {	
-		colorObjectArray[ i ].set( target );	
+		colorObjectArray[ i ].copy( this.colors.target );	
 	}
 	
 	for ( i = 40; i < 50; i ++ ) {	
-		colorObjectArray[ i ].set( cross );	
+		colorObjectArray[ i ].copy( this.colors.cross );	
 	}
 	
 	this.geometry.colorsNeedUpdate = true;
