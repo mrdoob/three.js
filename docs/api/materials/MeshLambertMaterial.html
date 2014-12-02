@@ -103,21 +103,26 @@
 		<h3>[property:Boolean morphTargets]</h3>
 		<div>Define whether the material uses morphTargets. Default is *false*.</div>	
 
+		<h3>[property:boolean wrapAround]</h3>
+		<div>
+			Define whether the diffuse lighting wraps around the model or not. This option adds a little more (tintable) light
+			onto the side of the object in relation to a light.
+		</div>
 
 		<h3>[property:Vector3 wrapRGB]</h3>
 		<div>
-		todo
+			Decide how much of the wrap around values get used if the wrapAround option is set. The x, y, z values correspond
+			to the r, g, b values respectively. The typical range is of each is from 0 to 1. For example setting all of the
+			vector values to 0.5 will add a moderate amount of light to the side of the model. Changing *b* to 1 will
+			tint the light on the side to be more blue. Defaults to *(1,1,1)*.
 		</div> 
 
 		<h3>[property:boolean morphNormals]</h3>
 		<div>
-		todo
-		</div> 
+			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
+			to the shader. Default is *false*.
+		</div>
 
-		<h3>[property:boolean wrapAround]</h3>
-		<div>
-		todo
-		</div> 
 
 		<h2>Methods</h2>
 
