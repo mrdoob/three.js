@@ -2,9 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJLoader = function ( manager ) {
+THREE.OBJLoader = function ( manager, crossOrigin ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.crossOrigin = crossOrigin;
 
 };
 

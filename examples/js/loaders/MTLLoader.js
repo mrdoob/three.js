@@ -86,7 +86,7 @@ THREE.MTLLoader.prototype = {
 
 		}
 
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options );
+		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options, this.crossOrigin );
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -111,10 +111,11 @@ THREE.MTLLoader.prototype = {
  * @constructor
  */
 
-THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
+THREE.MTLLoader.MaterialCreator = function( baseUrl, options, crossOrigin ) {
 
 	this.baseUrl = baseUrl;
 	this.options = options;
+	this.crossOrigin = crossOrigin;
 	this.materialsInfo = {};
 	this.materials = {};
 	this.materialsArray = [];
