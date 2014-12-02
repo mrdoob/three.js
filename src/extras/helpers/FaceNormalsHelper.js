@@ -9,7 +9,8 @@ THREE.FaceNormalsHelper = function ( object, size, color, linewidth ) {
 
 	this.size = ( size !== undefined ) ? size : 1;
 
-	if ( color === undefined ) color = 0xffffff;
+	if ( color === undefined ) color = 0xffff00;
+	
 	this.colors = {
     		main: new THREE.Color()
 	};
