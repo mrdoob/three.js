@@ -3,13 +3,17 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
+THREE.VertexNormalsHelper = function ( object, size, color, linewidth ) {
 
 	this.object = object;
 
 	this.size = ( size !== undefined ) ? size : 1;
 
-	var color = ( hex !== undefined ) ? hex : 0xff0000;
+	if ( color === undefined ) color = 0xff0000;
+	this.colors = {
+    		main: new THREE.Color()
+	};
+	this.colors.main.set( color );
 
 	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
@@ -31,7 +35,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: this.colors.main, linewidth: width } ), THREE.LinePieces );
 
 	this.matrixAutoUpdate = false;
 
@@ -95,6 +99,13 @@ THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
 
 		return this;
 
-	}
+	};
 
 }());
+
+THREE.VertexNormalsHelper.prototype.setColor = function ( color ) {
+	
+	this.colors.main.set( color );
+	this.material.color.copy( this.colors.main );
+	
+};
