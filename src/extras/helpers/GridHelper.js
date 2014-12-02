@@ -9,6 +9,7 @@ THREE.GridHelper = function ( size, step, colorCenterLine, colorGrid ) {
 	
 	if ( colorCenterLine === undefined ) colorCenterLine = 0x444444;
 	if ( colorGrid === undefined ) colorGrid = 0x888888;
+	
 	this.colors = {
 		centerLine: new THREE.Color(),
     		grid: new THREE.Color()
