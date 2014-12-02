@@ -5,6 +5,7 @@
 THREE.WireframeHelper = function ( object, color ) {
 
 	if ( color === undefined ) color = 0xffffff;
+	
 	this.colors = {
     		main: new THREE.Color()
 	};
