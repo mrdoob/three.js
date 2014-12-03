@@ -2,13 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function ( onStart, onLoad, onProgress, onError ) {
+THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	var scope = this;
 
 	var loaded = 0, total = 0, loading = false;
 
-	this.onStart = onStart;
+	this.onStart = undefined;
 	this.onLoad = onLoad;
 	this.onProgress = onProgress;
 	this.onError = onError;
