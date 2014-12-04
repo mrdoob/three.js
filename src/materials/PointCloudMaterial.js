@@ -41,6 +41,7 @@ THREE.PointCloudMaterial = function ( parameters ) {
 };
 
 THREE.PointCloudMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.PointCloudMaterial.prototype.constructor = THREE.PointCloudMaterial;
 
 THREE.PointCloudMaterial.prototype.clone = function () {
 

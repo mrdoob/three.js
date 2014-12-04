@@ -89,3 +89,4 @@ THREE.PlaneTypedGeometry = function ( width, height, widthSegments, heightSegmen
 };
 
 THREE.PlaneTypedGeometry.prototype = Object.create( THREE.IndexedTypedGeometry.prototype );
+THREE.PlaneTypedGeometry.prototype.constructor = THREE.PlaneTypedGeometry;

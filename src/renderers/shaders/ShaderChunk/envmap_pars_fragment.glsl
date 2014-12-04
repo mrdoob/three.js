@@ -1,7 +1,11 @@
 #ifdef USE_ENVMAP
 
 	uniform float reflectivity;
-	uniform samplerCube envMap;
+	#ifdef ENVMAP_TYPE_CUBE
+		uniform samplerCube envMap;
+	#else
+		uniform sampler2D envMap;
+	#endif
 	uniform float flipEnvMap;
 	uniform int combine;
 

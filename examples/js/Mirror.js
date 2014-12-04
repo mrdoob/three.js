@@ -142,6 +142,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 };
 
 THREE.Mirror.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Mirror.prototype.constructor = THREE.Mirror;
 
 THREE.Mirror.prototype.renderWithMirror = function ( otherMirror ) {
 

@@ -13,13 +13,14 @@
 
 		<div class="desc">A material for shiny surfaces, evaluated per pixel.</div>
 
+		<iframe src='../../scenes/material-browser.html#MeshPhongMaterial'></iframe>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo parameters])</h3>
+		<h3>[name]([page:Object parameters])</h3>
 		<div>
-		parameters -- A JSON object with settable parameters.
+		parameters -- an object with one or more of the material's properties defining the its appearance.
 		</div>
 		<div>
 		Example:<br>
@@ -116,45 +117,55 @@
 		<div>Define whether the material uses morphTargets. Default is *false*.</div>	
 
 
-		<h3>[property:Vector2 normalScale]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>[property:boolean morphNormals]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>[property:boolean metal]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>[property:number bumpScale]</h3>
-		<div>
-		todo
-		</div> 
-
 		<h3>[property:boolean wrapAround]</h3>
 		<div>
-		todo
+			Define whether the diffuse lighting wraps around the model or not. This option adds a little more (tintable) light
+			onto the side of the object in relation to a light.
 		</div>
-
-		<h3>[property:object normalMap]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>[property:object bumpMap]</h3>
-		<div>
-		todo
-		</div> 
 
 		<h3>[property:Vector3 wrapRGB]</h3>
 		<div>
-		todo
+			Decide how much of the wrap around values get used if the wrapAround option is set. The x, y, z values correspond
+			to the r, g, b values respectively. The typical range is of each is from 0 to 1. For example setting all of the
+			vector values to 0.5 will add a moderate amount of light to the side of the model. Changing *b* to 1 will
+			tint the light on the side to be more blue. Defaults to (1,1,1).
+		</div>
+
+		<h3>[property:boolean morphNormals]</h3>
+		<div>
+			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
+			to the shader. Default is *false*.
+		</div>
+
+		<h3>[property:boolean metal]</h3>
+		<div>
+			If set to true the shader multiplies the specular highlight by the underlying color of the object, making
+			it appear to be more metal-like and darker. If set to false the specular highlight is added ontop of the
+			underlying colors.
 		</div> 
+
+		<h3>[property:Texture normalMap]</h3>
+		<div>
+			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
+			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+		</div>
+		
+		<h3>[property:Vector2 normalScale]</h3>
+		<div>
+			How much the normal map affects the material. Typical ranges are 0-1. Default is (1,1).
+		</div> 
+
+		<h3>[property:Texture bumpMap]</h3>
+		<div>
+			The texture to create a bump map. The black and white values map to the perceived depth in relation to the lights.
+			Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will
+			be ignored.
+		</div>
+		
+		<h3>[property:Float bumpScale]</h3>
+		<div>
+			How much the bump map affects the material. Typical ranges are 0-1. Default is 1.
+		</div>
 
 		<h2>Methods</h2>
 

@@ -107,6 +107,14 @@ THREE.ShaderLib['sky'] = {
 			"return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));",
 		"}",
 
+		// see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
+		"// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE",
+		"vec3 simplifiedRayleigh()",
+		"{",
+			"return 0.0005 / vec3(94, 40, 18);",
+			// return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
+		"}",
+
 		"float rayleighPhase(float cosTheta)",
 		"{	 ",
 			"return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));",
@@ -164,7 +172,9 @@ THREE.ShaderLib['sky'] = {
 
 			"// extinction (absorbtion + out scattering) ",
 			"// rayleigh coefficients",
-			"vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
+
+			// "vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
+			"vec3 betaR = simplifiedRayleigh() * reileighCoefficient;",
 
 			"// mie coefficients",
 			"vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;",
@@ -257,4 +267,3 @@ THREE.Sky = function () {
 
 
 };
-
