@@ -12,6 +12,7 @@ THREE.Camera = function () {
 
 	this.matrixWorldInverse = new THREE.Matrix4();
 	this.projectionMatrix = new THREE.Matrix4();
+	this.frustum = new THREE.Frustum();
 
 };
 
@@ -49,6 +50,38 @@ THREE.Camera.prototype.lookAt = function () {
 	};
 
 }();
+
+THREE.Camera.prototype.getListObjectsInFrustum = function( scene ){
+
+	var objects = [];
+
+	if ( scene === undefined ) return objects;
+
+	this.updateMatrix();
+	this.updateMatrixWorld();
+	this.matrixWorldInverse.getInverse( this.matrixWorld );
+
+	this.frustum.setFromMatrix( new THREE.Matrix4().multiplyMatrices( this.projectionMatrix, this.matrixWorldInverse ) );
+
+	var frustum = this.frustum;
+
+	scene.traverse( function( object ) {
+
+		if( object instanceof THREE.Mesh ) {
+
+			if( frustum.intersectsObject( object ) ) {
+
+				objects.push( object );
+
+			}
+
+		}
+
+	});
+
+	return objects;
+
+};
 
 THREE.Camera.prototype.clone = function ( camera ) {
 
