@@ -11,17 +11,17 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Camera with cube projection</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo near], [page:todo far], [page:todo cubeResolution])</h3>
+		<h3>[name]([page:Float near], [page:Float far], [page:Float cubeResolution])</h3>
 		<div>
-		near -- todo <br />
-		far -- todo <br />
-		cubeResolution -- todo
+		near -- Camera frustum near plane. <br />
+		far -- Camera frustum far plane. <br />
+		cubeResolution -- The size of the render target image.
 		</div>
 		<div>
 		todo
@@ -34,17 +34,17 @@
 
 		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
 		<div>
-		todo
+		The camera renders to this target.
 		</div> 
 
 		<h2>Methods</h2>
 
 
 
-		<h3>[method:todo updateCubeMap]([page:todo renderer], [page:todo scene])</h3>
+		<h3>[method:todo updateCubeMap]([page:WebGLRenderer], [page:Scene])</h3>
 		<div>
-		renderer -- todo <br />
-		scene -- todo
+		renderer -- The renderer to use for this camera. <br />
+		scene -- The scene to render.
 		</div>
 		<div>
 		todo
