@@ -11,20 +11,46 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Creates 6 cameras that render to a [page:WebGLRenderTargetCube].</div>
 
+		<h2>Examples</h2>
+		
+		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
+		<div>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</div>
+		<div>[example:webgl_materials_cubemap_dynamic2 shading / physical ]</div>
+		
+		<code>//Create cube camera
+		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );		
+		scene.add( cubeCamera );
+		
+		//Create car
+		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeCamera.renderTarget  } );
+		var car = new Mesh( carGeometry, chromeMaterial );
+		scene.add( car );
+		
+		//Update the render target cube
+		car.setVisible( false );
+		cubeCamera.position.copy( car.position );
+		cubeCamera.updateCubeMap( renderer, scene );
+
+		//Render the scene
+		car.setVisible( true );
+		renderer.render( scene, camera );
+		</code>
+		
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo near], [page:todo far], [page:todo cubeResolution])</h3>
+		<h3>[name]([page:number near], [page:number far], [page:number cubeResolution])</h3>
 		<div>
-		near -- todo <br />
-		far -- todo <br />
-		cubeResolution -- todo
+		near -- The near clipping distance. <br />
+		far -- The far clipping distance <br />
+		cubeResolution -- Sets the width of the cube.
 		</div>
 		<div>
-		todo
+		Constructs a CubeCamera that contains 6 [page:PerspectiveCamera PerspectiveCameras] that then
+		render to a [page:WebGLRenderTargetCube]
 		</div>
 
 
@@ -34,7 +60,7 @@
 
 		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
 		<div>
-		todo
+		The cube texture that gets generated.
 		</div> 
 
 		<h2>Methods</h2>
@@ -43,11 +69,11 @@
 
 		<h3>[method:todo updateCubeMap]([page:todo renderer], [page:todo scene])</h3>
 		<div>
-		renderer -- todo <br />
-		scene -- todo
+		renderer -- The current WebGL renderer <br />
+		scene -- The current scene
 		</div>
 		<div>
-		todo
+		Call this to update the renderTarget.
 		</div>
 
 		<h2>Source</h2>
