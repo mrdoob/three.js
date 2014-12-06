@@ -170,8 +170,8 @@ var list = {
 		],
 
 		"Extras / Cameras": [
-			[ "CombinedCamera", "api/extras/cameras/CombinedCamera" ],
-			[ "CubeCamera", "api/extras/cameras/CubeCamera" ]
+			[ "CombinedCamera", "api/cameras/CombinedCamera" ],
+			[ "CubeCamera", "api/cameras/CubeCamera" ]
 		],
 
 
