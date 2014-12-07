@@ -98,12 +98,7 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:number getMaxAnisotropy]()</h3>
-		<div>
-		This returns the anisotropy level of the textures.
-		</div>
-
-		<h3>[method:todo render]( [page:Scene scene], [page:Camera camera])</h3>
+		<h3>[method:null render]( [page:Scene scene], [page:Camera camera])</h3>
 		<div>
 		scene -- The scene to render. <br />
 		camera -- the camera to view the scene.
@@ -112,12 +107,12 @@
         Render a scene using a camera.
 		</div>
 
-		<h3>[method:todo clear]()</h3>
+		<h3>[method:null clear]()</h3>
 		<div>
 		Tells the renderer to clear its color drawing buffer with the clearcolor.
 		</div>
 
-		<h3>[method:todo setClearColor]([page:Color color], [page:number alpha])</h3>
+		<h3>[method:null setClearColor]([page:Color color], [page:number alpha])</h3>
 		<div>
 		color -- The color to clear the canvas with. <br />
 		alpha -- The alpha channel to clear the canvas with.
@@ -126,17 +121,8 @@
 		This set the clearColor and the clearAlpha.
 		</div>
 
-		<h3>[method:todo setFaceCulling]()</h3>
-		<div>
-		Empty function to keep compability with [page:WebglRenderer].
-		</div>
 
-		<h3>[method:todo supportsVertexTextures]()</h3>
-		<div>
-		Empty function to keep compability with [page:WebglRenderer].
-		</div>
-
-		<h3>[method:todo setSize]([page:Number width], [page:Number height], [page:boolean updateStyle])</h3>
+		<h3>[method:null setSize]([page:Number width], [page:Number height], [page:boolean updateStyle])</h3>
 		<div>
 		width -- The width of the drawing canvas. <br />
 		height -- The height of the drawing canvas. <br />
@@ -146,13 +132,33 @@
 		This set the size of the drawing canvas and if updateStyle is set, then the css of the canvas is updated too.
 		</div>
 
-		<h3>[method:todo setClearColorHex]([page:number hex], [page:number alpha])</h3>
+		<h3>[method:null setClearColorHex]([page:number hex], [page:number alpha])</h3>
 		<div>
 		hex -- The the hexadecimal value of the color to clear the canvas with. <br />
         alpha -- The alpha channel to clear the canvas with.
 		</div>
 		<div>
 		This set the clearColor and the clearAlpha.
+		</div>
+		
+		<h3>[method:number getClearColorHex]()</h3>
+		<div>
+		Returns the [page:number hex] color.
+		</div>
+		
+		<h3>[method:number getClearAlpha]()</h3>
+		<div>
+		Returns the alpha value.
+		</div>
+		
+		<h2>Empty Methods to Maintain Compatibility with [page:WebglRenderer]</h2>
+		<div>
+			[method:null clearColor]()<br/>
+			[method:null clearDepth]()<br/>
+			[method:null clearStencil]()<br/>
+			[method:null setFaceCulling]()<br/>
+			[method:null supportsVertexTextures]()<br/>
+			[method:number getMaxAnisotropy]() - returns 1 <br/>
 		</div>
 
 		<h2>Source</h2>
