@@ -2,9 +2,9 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
@@ -20,11 +20,11 @@
 		<div>[example:webgl_materials_cubemap_dynamic2 shading / physical ]</div>
 		
 		<code>//Create cube camera
-		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );		
+		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
 		scene.add( cubeCamera );
 		
 		//Create car
-		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeCamera.renderTarget  } );
+		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeCamera.renderTarget } );
 		var car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 		
