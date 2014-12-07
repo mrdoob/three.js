@@ -19,6 +19,7 @@ var list = {
 
 		"Cameras": [
 			[ "Camera", "api/cameras/Camera" ],
+			[ "CubeCamera", "api/cameras/CubeCamera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
 			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ]
 		],
@@ -169,12 +170,6 @@ var list = {
 			[ "AnimationMorphTarget", "api/extras/animation/AnimationMorphTarget" ]
 		],
 
-		"Extras / Cameras": [
-			[ "CombinedCamera", "api/cameras/CombinedCamera" ],
-			[ "CubeCamera", "api/cameras/CubeCamera" ]
-		],
-
-
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
 			[ "CurvePath", "api/extras/core/CurvePath" ],
@@ -243,6 +238,7 @@ var list = {
 		],
 
 		"Examples" : [
+			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "api/examples/Lut" ]
 
 		]
