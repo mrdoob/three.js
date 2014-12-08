@@ -8,6 +8,7 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  size: <float>,
+ *  sizeAttenuation: <bool>,
  *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
