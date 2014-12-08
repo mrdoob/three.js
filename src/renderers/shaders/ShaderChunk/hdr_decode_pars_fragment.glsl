@@ -20,7 +20,7 @@
 
   vec3 HDRDecodeRGBM( vec4 rgbm ) {
     //Based on http://vemberaudio.se/graphics/RGBdiv8.pdf
-    return 6.0 * rgbm.rgb * rgbm.a;
+    return 9.0 * rgbm.rgb * rgbm.a;
   }
 
   vec3 HDRDecodeRGBD( vec4 rgbd ) {

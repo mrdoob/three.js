@@ -45,7 +45,8 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
 		blending: THREE.NoBlending,
-		name: "Luminance"
+		name: "Luminance",
+		defines: {"MAX_LUMINANCE": ""}
 	} );
 
 	this.adaptLuminanceShader = {
@@ -107,7 +108,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
-				"fCurrentLum = pow( fCurrentLum, 2.0 );",
+				// "fCurrentLum = pow( fCurrentLum, 2.0 );",
 
 				// Adapt the luminance using Pattanaik's technique
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
@@ -412,6 +413,11 @@ THREE.AdaptiveToneMappingPass.prototype = {
 	setMaxLuminance: function( maxLum ) {
 		if ( maxLum ) {
 			this.materialToneMap.uniforms.maxLuminance.value = maxLum;
+			this.materialLuminance.uniforms.maxLuminance.value = maxLum;
+			if ( !this.materialLuminance.defines || !this.materialLuminance.defines["MAX_LUMINANCE"] ) {
+				this.materialLuminance.defines["MAX_LUMINANCE"] = "";
+				this.materialLuminance.needsUpdate = true;
+			}
 		}
 	},
 

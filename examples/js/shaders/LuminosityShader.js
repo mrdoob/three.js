@@ -9,8 +9,8 @@ THREE.LuminosityShader = {
 
 	uniforms: {
 
-		"tDiffuse": { type: "t", value: null }
-
+		"tDiffuse": { type: "t", value: null },
+		"maxLuminance": { type: "f", value: 100.0 }
 	},
 
 	vertexShader: [
@@ -30,6 +30,9 @@ THREE.LuminosityShader = {
 	fragmentShader: [
 
 		"uniform sampler2D tDiffuse;",
+		"#ifdef MAX_LUMINANCE",
+			"uniform float maxLuminance;",
+		"#endif",
 
 		"varying vec2 vUv;",
 
@@ -55,7 +58,9 @@ THREE.LuminosityShader = {
 			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
 
 			"float v = dot( texel.xyz, luma );",
-
+			"#ifdef MAX_LUMINANCE",
+				"v = clamp( v, 0.0, maxLuminance );",
+			"#endif",
 			"gl_FragColor = vec4( v, v, v, texel.w );",
 
 			THREE.ShaderChunk[ "hdr_encode_fragment" ],
