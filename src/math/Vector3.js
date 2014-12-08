@@ -809,6 +809,20 @@ THREE.Vector3.prototype = {
 
 	},
 
+	fromAttribute: function ( attribute, index, offset ) {
+
+	    if ( offset === undefined ) offset = 0;
+
+	    index = index * attribute.itemSize + offset;
+
+	    this.x = attribute.array[ index ];
+	    this.y = attribute.array[ index + 1 ];
+	    this.z = attribute.array[ index + 2 ];
+
+	    return this;
+
+	},
+
 	clone: function () {
 
 		return new THREE.Vector3( this.x, this.y, this.z );
