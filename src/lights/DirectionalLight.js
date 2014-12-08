@@ -12,7 +12,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.position.set( 0, 1, 0 );
 	this.target = new THREE.Object3D();
 
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
+	this.intensity = intensity || 1;
 
 	this.castShadow = false;
 	this.onlyShadow = false;

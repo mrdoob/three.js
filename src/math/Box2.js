@@ -4,8 +4,8 @@
 
 THREE.Box2 = function ( min, max ) {
 
-	this.min = ( min !== undefined ) ? min : new THREE.Vector2( Infinity, Infinity );
-	this.max = ( max !== undefined ) ? max : new THREE.Vector2( - Infinity, - Infinity );
+	this.min = min || new THREE.Vector2( Infinity, Infinity );
+	this.max = max || new THREE.Vector2( - Infinity, - Infinity );
 
 };
 

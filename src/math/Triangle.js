@@ -5,9 +5,9 @@
 
 THREE.Triangle = function ( a, b, c ) {
 
-	this.a = ( a !== undefined ) ? a : new THREE.Vector3();
-	this.b = ( b !== undefined ) ? b : new THREE.Vector3();
-	this.c = ( c !== undefined ) ? c : new THREE.Vector3();
+	this.a = a || new THREE.Vector3();
+	this.b = b || new THREE.Vector3();
+	this.c = c || new THREE.Vector3();
 
 };
 

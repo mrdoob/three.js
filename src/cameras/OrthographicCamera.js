@@ -15,8 +15,8 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 	this.top = top;
 	this.bottom = bottom;
 
-	this.near = ( near !== undefined ) ? near : 0.1;
-	this.far = ( far !== undefined ) ? far : 2000;
+	this.near = near || 0.1;
+	this.far = far || 2000;
 
 	this.updateProjectionMatrix();
 

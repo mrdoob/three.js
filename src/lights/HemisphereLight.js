@@ -11,7 +11,7 @@ THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 	this.position.set( 0, 100, 0 );
 
 	this.groundColor = new THREE.Color( groundColor );
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
+	this.intensity = intensity || 1;
 
 };
 

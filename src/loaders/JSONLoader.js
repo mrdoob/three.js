@@ -107,7 +107,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	var scope = this,
 	geometry = new THREE.Geometry(),
-	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
+        scale = 1.0 / json.scale || 1.0
 
 	parseModel( scale );
 
@@ -418,7 +418,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 	};
 
 	function parseSkin() {
-		var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
+		var influencesPerVertex = json.influencesPerVertex || 2;
 
 		if ( json.skinWeights ) {
 

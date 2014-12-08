@@ -8,8 +8,8 @@ THREE.PointLight = function ( color, intensity, distance ) {
 
 	this.type = 'PointLight';
 
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
-	this.distance = ( distance !== undefined ) ? distance : 0;
+	this.intensity = intensity || 1;
+	this.distance = distance || 0;
 
 };
 
