@@ -11,10 +11,10 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
 	this.position.set( 0, 1, 0 );
 	this.target = new THREE.Object3D();
 
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
-	this.distance = ( distance !== undefined ) ? distance : 0;
-	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
-	this.exponent = ( exponent !== undefined ) ? exponent : 10;
+	this.intensity = intensity || 1;
+	this.distance = distance || 0;
+	this.angle = angle || Math.PI / 3;
+	this.exponent = exponent || 10;
 
 	this.castShadow = false;
 	this.onlyShadow = false;

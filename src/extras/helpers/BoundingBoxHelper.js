@@ -6,7 +6,7 @@
 
 THREE.BoundingBoxHelper = function ( object, hex ) {
 
-	var color = ( hex !== undefined ) ? hex : 0x888888;
+	var color = hex || 0x888888;
 
 	this.object = object;
 

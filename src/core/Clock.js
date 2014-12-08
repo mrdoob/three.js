@@ -4,7 +4,7 @@
 
 THREE.Clock = function ( autoStart ) {
 
-	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+	this.autoStart = autoStart || true;
 
 	this.startTime = 0;
 	this.oldTime = 0;

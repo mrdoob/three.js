@@ -11,7 +11,7 @@ THREE.Vector4 = function ( x, y, z, w ) {
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0;
-	this.w = ( w !== undefined ) ? w : 1;
+	this.w = w || 1;
 
 };
 
@@ -95,7 +95,7 @@ THREE.Vector4.prototype = {
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
-		this.w = ( v.w !== undefined ) ? v.w : 1;
+		this.w = v.w || 1;
 
 		return this;
 

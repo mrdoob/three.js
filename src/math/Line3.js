@@ -4,8 +4,8 @@
 
 THREE.Line3 = function ( start, end ) {
 
-	this.start = ( start !== undefined ) ? start : new THREE.Vector3();
-	this.end = ( end !== undefined ) ? end : new THREE.Vector3();
+	this.start = start || new THREE.Vector3();
+	this.end = end || new THREE.Vector3();
 
 };
 

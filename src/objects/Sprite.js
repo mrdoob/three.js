@@ -21,7 +21,7 @@ THREE.Sprite = ( function () {
 		this.type = 'Sprite';
 
 		this.geometry = geometry;
-		this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
+		this.material = material || new THREE.SpriteMaterial();
 
 	};
 

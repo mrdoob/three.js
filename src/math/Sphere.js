@@ -5,8 +5,8 @@
 
 THREE.Sphere = function ( center, radius ) {
 
-	this.center = ( center !== undefined ) ? center : new THREE.Vector3();
-	this.radius = ( radius !== undefined ) ? radius : 0;
+	this.center = center || new THREE.Vector3();
+	this.radius = radius || 0;
 
 };
 

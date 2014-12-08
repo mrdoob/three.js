@@ -12,7 +12,7 @@ THREE.AreaLight = function ( color, intensity ) {
 	this.normal = new THREE.Vector3( 0, - 1, 0 );
 	this.right = new THREE.Vector3( 1, 0, 0 );
 
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
+	this.intensity = intensity || 1;
 
 	this.width = 1.0;
 	this.height = 1.0;

@@ -4,7 +4,7 @@
 
 THREE.SplineCurve = function ( points /* array of Vector2 */ ) {
 
-	this.points = ( points == undefined ) ? [] : points;
+	this.points = points || [];
 
 };
 

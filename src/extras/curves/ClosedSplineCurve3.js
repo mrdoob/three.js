@@ -7,7 +7,7 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
 
 	function ( points /* array of Vector3 */) {
 
-		this.points = ( points == undefined ) ? [] : points;
+		this.points = points || [];
 
 	},
 

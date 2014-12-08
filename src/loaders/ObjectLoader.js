@@ -4,7 +4,7 @@
 
 THREE.ObjectLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = manager || THREE.DefaultLoadingManager;
 
 };
 

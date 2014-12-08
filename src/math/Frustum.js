@@ -8,12 +8,12 @@ THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
 
 	this.planes = [
 
-		( p0 !== undefined ) ? p0 : new THREE.Plane(),
-		( p1 !== undefined ) ? p1 : new THREE.Plane(),
-		( p2 !== undefined ) ? p2 : new THREE.Plane(),
-		( p3 !== undefined ) ? p3 : new THREE.Plane(),
-		( p4 !== undefined ) ? p4 : new THREE.Plane(),
-		( p5 !== undefined ) ? p5 : new THREE.Plane()
+		p0 || new THREE.Plane(),
+		p1 || new THREE.Plane(),
+		p2 || new THREE.Plane(),
+		p3 || new THREE.Plane(),
+		p4 || new THREE.Plane(),
+		p5 || new THREE.Plane()
 
 	];
 

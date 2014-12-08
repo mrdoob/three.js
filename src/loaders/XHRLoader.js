@@ -5,7 +5,7 @@
 THREE.XHRLoader = function ( manager ) {
 
 	this.cache = new THREE.Cache();
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = manager || THREE.DefaultLoadingManager;
 
 };
 
