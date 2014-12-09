@@ -4114,6 +4114,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			map: !! material.map,
 			envMap: !! material.envMap,
 			lightMap: !! material.lightMap,
+			enhancedLightMap: !! material.enhancedLightMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			specularMap: !! material.specularMap,
@@ -4372,6 +4373,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		if(material.enhancedLightMap) {
+			_gl.uniform1f(p_uniforms.lm_Intensity, material.enhancedLightMap.intensity * 0.5);
+			_gl.uniform1f(p_uniforms.lm_Center, material.enhancedLightMap.center);
+			_gl.uniform1f(p_uniforms.lm_Falloff, material.enhancedLightMap.falloff * material.enhancedLightMap.falloff);
+		}
+
 
 		// skinning uniforms must be set even if material didn't change
 		// auto-setting of texture unit for bone texture must go before other textures

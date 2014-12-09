@@ -151,6 +151,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+				parameters.enhancedLightMap ? "#define USE_ENHANCED_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
 				parameters.specularMap ? "#define USE_SPECULARMAP" : "",
@@ -259,6 +260,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.envMap ? "#define USE_ENVMAP" : "",
 				envMapTypeDefine ? "#define " + envMapTypeDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+				parameters.enhancedLightMap ? "#define USE_ENHANCED_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
 				parameters.specularMap ? "#define USE_SPECULARMAP" : "",
@@ -348,6 +350,13 @@ THREE.WebGLProgram = ( function () {
 			identifiers.push('logDepthBufFC');
 
 		}
+
+		if( parameters.enhancedLightMap ) {
+
+			identifiers = identifiers.concat( [ "lm_Intensity", "lm_Center", "lm_Falloff" ] );
+
+		}
+
 
 
 		for ( var u in uniforms ) {
