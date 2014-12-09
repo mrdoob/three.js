@@ -27,6 +27,7 @@ THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints 
 
 
 THREE.NURBSCurve.prototype = Object.create( THREE.Curve.prototype );
+THREE.NURBSCurve.prototype.constructor = THREE.NURBSCurve;
 
 
 THREE.NURBSCurve.prototype.getPoint = function ( t ) {

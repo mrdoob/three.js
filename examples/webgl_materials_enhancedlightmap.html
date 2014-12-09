@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>three.js webgl - materials - enhancedlightmap</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			h1 { }
+			a { color:skyblue }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #abc !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script>
+
+			var camera, scene, renderer, stats;
+			var geometry, material, material2, mesh, mesh2;
+
+			function setup() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var W = window.innerWidth, H = window.innerHeight;
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( W, H );
+				container.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 50, W/H, 1, 10000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+
+				// Setting up geometry, materials and meshes
+
+				geometry = new THREE.CubeGeometry(200,200,200);
+				material = new THREE.MeshPhongMaterial({color: 0xffffff});
+
+				material.map = THREE.ImageUtils.loadTexture("textures/brick_diffuse.jpg");
+				material.lightMap = THREE.ImageUtils.loadTexture("textures/enhanced_lightmap.jpg");
+
+				material2 = material.clone();
+				material2.enhancedLightMap = {
+					intensity: 1,
+					center: 0.5,
+					falloff: 0
+				};
+
+				geometry.faceVertexUvs[1] = geometry.faceVertexUvs[0];
+
+				mesh  = new THREE.Mesh(geometry, material);
+				mesh2 = new THREE.Mesh(geometry, material2);
+
+				mesh.position.x  = -110;
+				mesh2.position.x =  110;
+
+				scene.add(mesh);
+				scene.add(mesh2);
+
+				// Some lights
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.475 );
+				directionalLight.position.set( 100, 100, -100 );
+				scene.add( directionalLight );
+
+
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.25 );
+				hemiLight.color.setHSL( 0.6, 1, 0.75 );
+				hemiLight.groundColor.setHSL( 0.1, 0.8, 0.7 );
+				hemiLight.position.y = 500;
+				scene.add( hemiLight );
+
+				// Stats
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+			}
+
+			function draw() {
+
+				requestAnimationFrame( draw );
+
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+			setup();
+			draw();
+
+		</script>
+
+	</body>
+</html>

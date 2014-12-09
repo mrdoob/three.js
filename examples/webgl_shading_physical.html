@@ -146,7 +146,7 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var texturePattern = new THREE.Texture( x, new THREE.UVMapping(), THREE.RepeatWrapping, THREE.RepeatWrapping );
+				var texturePattern = new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				texturePattern.needsUpdate = true;
 				texturePattern.repeat.set( 1000, 1000 );
 				texturePattern.format = THREE.RGBFormat;

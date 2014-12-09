@@ -9,6 +9,7 @@ THREE.IndexedTypedGeometry = function () {
 };
 
 THREE.IndexedTypedGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.IndexedTypedGeometry.prototype.constructor = THREE.IndexedTypedGeometry;
 
 THREE.IndexedTypedGeometry.prototype.setArrays = function ( indices, vertices, normals, uvs ) {
 

@@ -72,7 +72,7 @@ THREE.GeometryUtils = {
 	// Get random point in face (triangle)
 	// (uniform distribution)
 
-	randomPointInFace: function ( face, geometry, useCachedAreas ) {
+	randomPointInFace: function ( face, geometry ) {
 
 		var vA, vB, vC;
 
@@ -98,7 +98,7 @@ THREE.GeometryUtils = {
 			il = faces.length,
 			totalArea = 0,
 			cumulativeAreas = [],
-			vA, vB, vC, vD;
+			vA, vB, vC;
 
 		// precompute face areas
 
@@ -166,7 +166,7 @@ THREE.GeometryUtils = {
 
 			index = binarySearchIndices( r );
 
-			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
+			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry );
 
 			if ( ! stats[ index ] ) {
 

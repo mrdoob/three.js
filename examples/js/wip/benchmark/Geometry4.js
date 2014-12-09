@@ -16,6 +16,7 @@ THREE.Geometry4 = function ( size ) {
 
 };
 THREE.Geometry4.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.Geometry4.prototype.constructor = THREE.Geometry4;
 
 THREE.VectorArrayProxy = function(attribute) {
 
@@ -66,6 +67,7 @@ THREE.Vector2Proxy = function(subarray) {
 
 }
 THREE.Vector2Proxy.prototype = Object.create( THREE.Vector2.prototype );
+THREE.Vector2Proxy.prototype.constructor = THREE.Vector2Proxy;
 Object.defineProperty(THREE.Vector2Proxy.prototype, 'x', { get: function() { return this.subarray[0]; }, set: function(v) { this.subarray[0] = v; } });
 Object.defineProperty(THREE.Vector2Proxy.prototype, 'y', { get: function() { return this.subarray[1]; }, set: function(v) { this.subarray[1] = v; } });
 
@@ -76,6 +78,7 @@ THREE.Vector3Proxy = function(subarray) {
 
 }
 THREE.Vector3Proxy.prototype = Object.create( THREE.Vector3.prototype );
+THREE.Vector3Proxy.prototype.constructor = THREE.Vector3Proxy;
 
 Object.defineProperty(THREE.Vector3Proxy.prototype, 'x', { get: function() { return this.subarray[0]; }, set: function(v) { this.subarray[0] = v; } });
 Object.defineProperty(THREE.Vector3Proxy.prototype, 'y', { get: function() { return this.subarray[1]; }, set: function(v) { this.subarray[1] = v; } });
