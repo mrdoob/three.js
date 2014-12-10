@@ -82,8 +82,8 @@ THREE.VREffect = function ( renderer, done ) {
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.width / renderer.devicePixelRatio;
-		var rendererHeight = renderer.domElement.height / renderer.devicePixelRatio;
+		var rendererWidth = renderer.domElement.clientWidth;
+		var rendererHeight = renderer.domElement.clientHeight;
 		var eyeDivisionLine = rendererWidth / 2;
 
 		renderer.enableScissorTest( true );
