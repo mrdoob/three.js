@@ -297,7 +297,15 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 				}
 
-				_renderer.setMaterialFaces( objectMaterial );
+				if ( material.side === THREE.DoubleSide ) {
+
+					_gl.disable( _gl.CULL_FACE );
+
+				} else if ( material.side === THREE.BackSide ) {
+
+					_gl.frontFace( _gl.CW );
+
+				}
 
 				if ( buffer instanceof THREE.BufferGeometry ) {
 
