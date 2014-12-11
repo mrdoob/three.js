@@ -21,6 +21,9 @@ THREE.BufferGeometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
+	this.morphTargets = [];
+	this.morphNormals = [];
+
 };
 
 THREE.BufferGeometry.prototype = {
@@ -461,6 +464,50 @@ THREE.BufferGeometry.prototype = {
 			this.normalizeNormals();
 
 			attributes.normal.needsUpdate = true;
+
+		}
+
+	},
+
+	computeMorphNormals: function () {
+
+		if ( this.morphTargets.length === 0 ) {
+
+			return;
+
+		}
+
+		var geometry = new THREE.BufferGeometry();
+
+		geometry.drawcalls = this.drawcalls;
+
+		if ( this.attributes.index ) {
+
+			geometry.addAttribute( 'index', new THREE.BufferAttribute( this.attributes.index.array, this.attributes.index.itemSize ) );
+
+		}
+
+		this.morphNormals.length = this.morphTargets.length;
+
+		var morphTarget;
+
+		for ( var i = 0, l = this.morphTargets.length; i < l; i ++ ) {
+
+			morphTarget = this.morphTargets[ i ];
+
+			geometry.addAttribute( 'position', new THREE.BufferAttribute( morphTarget.vertices, this.attributes.position.itemSize ) );
+
+			geometry.computeVertexNormals();
+
+			this.morphNormals[ i ] = {
+
+				name: morphTarget.name,
+
+				normals: new Float32Array( geometry.attributes.normal.array )
+
+			};
+
+			geometry.dispose();
 
 		}
 

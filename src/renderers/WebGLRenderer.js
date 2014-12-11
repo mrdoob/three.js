@@ -659,6 +659,43 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function createMorphBuffers ( geometry ) {
+
+		var i, l;
+
+		geometry.numMorphTargets = geometry.morphTargets.length;
+		geometry.numMorphNormals = geometry.morphNormals.length;
+
+		if ( geometry.numMorphTargets ) {
+
+			geometry.__webglMorphTargetsBuffers = [];
+
+			for ( i = 0, l = geometry.numMorphTargets; i < l; i ++ ) {
+
+				geometry.__webglMorphTargetsBuffers.push( _gl.createBuffer() );
+
+			}
+
+			geometry.morphTargetsNeedUpdate = true;
+
+		}
+
+		if ( geometry.numMorphNormals ) {
+
+			geometry.__webglMorphNormalsBuffers = [];
+
+			for ( i = 0, l = geometry.numMorphNormals; i < l; i ++ ) {
+
+				geometry.__webglMorphNormalsBuffers.push( _gl.createBuffer() );
+
+			}
+
+			geometry.morphTargetsNeedUpdate = true;
+
+		}
+
+	}
+
 	// Events
 
 	var onObjectRemoved = function ( event ) {
@@ -790,6 +827,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 					delete attribute.buffer;
 
 				}
+
+			}
+
+			if ( geometry.numMorphTargets !== undefined ) {
+
+				for ( var m = 0, ml = geometry.numMorphTargets; m < ml; m ++ ) {
+
+					_gl.deleteBuffer( geometry.__webglMorphTargetsBuffers[ m ] );
+
+				}
+
+				delete geometry.__webglMorphTargetsBuffers;
+
+			}
+
+			if ( geometry.numMorphNormals !== undefined ) {
+
+				for ( var m = 0, ml = geometry.numMorphNormals; m < ml; m ++ ) {
+
+					_gl.deleteBuffer( geometry.__webglMorphNormalsBuffers[ m ] );
+
+				}
+
+				delete geometry.__webglMorphNormalsBuffers;
 
 			}
 
@@ -2319,6 +2380,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function setMorphBuffers ( geometry, material ) {
+
+		for ( var vk = 0, vkl = geometry.morphTargets.length; vk < vkl; vk ++ ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglMorphTargetsBuffers[ vk ] );
+			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.morphTargets[ vk ].vertices, _gl.STATIC_DRAW );
+
+			if ( material.morphNormals ) {
+
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglMorphNormalsBuffers[ vk ] );
+				_gl.bufferData( _gl.ARRAY_BUFFER, geometry.morphNormals[ vk ].normals, _gl.STATIC_DRAW );
+
+			}
+
+		}
+
+	}
+
 	// Buffer rendering
 
 	this.renderBufferImmediate = function ( object, program, material ) {
@@ -2444,7 +2523,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
 
-				} else if ( material.defaultAttributeValues !== undefined ) {
+				} else if ( material.defaultAttributeValues !== undefined && material.defaultAttributeValues[ key ] ) {
 
 					if ( material.defaultAttributeValues[ key ].length === 2 ) {
 
@@ -2488,6 +2567,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( updateBuffers ) {
 
 			initAttributes();
+
+		}
+
+		if ( object.morphTargetBase ) {
+
+			setupMorphTargets( material, geometry, object );
 
 		}
 
@@ -3052,7 +3137,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			enableAttribute( attributes.position );
 			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
-		} else if ( attributes.position >= 0 ) {
+		} else if ( ! ( geometryGroup instanceof THREE.BufferGeometry ) && attributes.position >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer );
 			enableAttribute( attributes.position );
@@ -3630,6 +3715,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
+				createMorphBuffers( geometry );
+
 				_this.info.memory.geometries ++;
 
 			} else if ( object instanceof THREE.Mesh ) {
@@ -3900,6 +3987,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 					attribute.needsUpdate = false;
 
 				}
+
+			}
+
+			if ( geometry.morphTargetsNeedUpdate ) {
+
+				setMorphBuffers( geometry, object.material );
+
+				geometry.morphTargetsNeedUpdate = false;
 
 			}
 
