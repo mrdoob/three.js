@@ -59,6 +59,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_viewportWidth = _canvasWidth,
 	_viewportHeight = _canvasHeight,
 
+	pixelRatio = 1,
+
 	_context = _canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
 	} ),
@@ -123,8 +125,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 
-	this.devicePixelRatio = self.devicePixelRatio !== undefined ? self.devicePixelRatio : 1;
-
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
@@ -145,10 +145,24 @@ THREE.CanvasRenderer = function ( parameters ) {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
+	//
+
+	this.getPixelRatio = function () {
+
+		return pixelRatio;
+
+	};
+
+	this.setPixelRatio = function ( value ) {
+
+		pixelRatio = value;
+
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_canvasWidth = width * this.devicePixelRatio;
-		_canvasHeight = height * this.devicePixelRatio;
+		_canvasWidth = width * pixelRatio;
+		_canvasHeight = height * pixelRatio;
 
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
@@ -183,11 +197,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x * this.devicePixelRatio;
-		_viewportY = y * this.devicePixelRatio;
+		_viewportX = x * pixelRatio;
+		_viewportY = y * pixelRatio;
 
-		_viewportWidth = width * this.devicePixelRatio;
-		_viewportHeight = height * this.devicePixelRatio;
+		_viewportWidth = width * pixelRatio;
+		_viewportHeight = height * pixelRatio;
 
 	};
 
@@ -700,7 +714,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				    material instanceof THREE.MeshPhongMaterial ) {
 
 			if ( material.map !== null ) {
-			
+
 				var mapping = material.map.mapping;
 
 				if ( mapping === THREE.UVMapping ) {

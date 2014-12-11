@@ -192,7 +192,102 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Publish' );
 	option.onClick( function () {
 
-		alert( 'Not yet...' );
+		var camera = editor.camera;
+
+		var zip = new JSZip();
+
+		zip.file( 'index.html', [
+
+			'<!DOCTYPE html>',
+			'<html lang="en">',
+			'	<head>',
+			'		<title>three.js</title>',
+			'		<meta charset="utf-8">',
+			'		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">',
+			'		<style>',
+			'		body {',
+			'			margin: 0px;',
+			'			overflow: hidden;',
+			'		}',
+			'		</style>',
+			'	</head>',
+			'	<body ontouchstart="">',
+			'		<script src="js/three.min.js"></script>',
+			'		<script src="js/OrbitControls.js"></script>',
+			'		<script>',
+
+			'			var camera, controls, scene, renderer;',
+
+			'			var loader = new THREE.ObjectLoader();',
+			'			loader.load( \'scene.json\', function ( object ) {',
+
+			'				scene = object;',
+
+			'				camera = new THREE.PerspectiveCamera( ' + camera.fov + ', 1, ' + camera.near + ', ' + camera.far + ' );',
+			'				camera.position.set( ' + camera.position.x + ', ' + camera.position.y + ', ' + camera.position.z + ' );',
+			'				camera.rotation.set( ' + camera.rotation.x + ', ' + camera.rotation.y + ', ' + camera.rotation.z + ' );',
+
+			'				controls = new THREE.OrbitControls( camera );',
+			'				controls.addEventListener( \'change\', render );',
+
+			'				renderer = new THREE.WebGLRenderer();',
+			'				renderer.setSize( window.innerWidth, window.innerHeight );',
+			'				document.body.appendChild( renderer.domElement );',
+
+			'				camera.aspect = window.innerWidth / window.innerHeight;',
+			'				camera.updateProjectionMatrix();',
+
+			'				animate();',
+			'				render();',
+			
+			'			} );',
+
+			'			var render = function () {',
+
+			'				renderer.render( scene, camera );',
+
+			'			};',
+
+			'			var animate = function () {',
+
+			'				requestAnimationFrame( animate );',
+			'				controls.update();',
+
+			'			};',
+
+			'		</script>',
+			'	</body>',
+			'</html>'
+
+		].join( '\n' ) );
+
+		//
+
+		var output = editor.scene.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		zip.file( 'scene.json', output );
+
+		//
+
+		var manager = new THREE.LoadingManager( function () {
+
+			location.href = 'data:application/zip;base64,' + zip.generate();
+
+		} );
+
+		var loader = new THREE.XHRLoader( manager );
+		loader.load( '../build/three.min.js', function ( content ) {
+
+			zip.file( 'js/three.min.js', content );
+
+		} );
+		loader.load( '../examples/js/controls/OrbitControls.js', function ( content ) {
+
+			zip.file( 'js/OrbitControls.js', content );
+
+		} );
 
 	} );
 	options.add( option );

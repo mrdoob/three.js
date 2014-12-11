@@ -14,6 +14,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
+	pixelRatio = 1,
+
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
@@ -42,7 +44,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.context = null;
-	this.devicePixelRatio = self.devicePixelRatio !== undefined ? self.devicePixelRatio : 1;
 
 	// clearing
 
@@ -534,11 +535,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_programs = null;
 		_this = null;
 	};
+	
+	this.getPixelRatio = function () {
+
+		return pixelRatio;
+
+	};
+
+	this.setPixelRatio = function ( value ) {
+
+		pixelRatio = value;
+
+	};
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_canvas.width = width * this.devicePixelRatio;
-		_canvas.height = height * this.devicePixelRatio;
+		_canvas.width = width * pixelRatio;
+		_canvas.height = height * pixelRatio;
 
 		if ( updateStyle !== false ) {
 
@@ -553,11 +566,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x * this.devicePixelRatio;
-		_viewportY = y * this.devicePixelRatio;
+		_viewportX = x * pixelRatio;
+		_viewportY = y * pixelRatio;
 
-		_viewportWidth = width * this.devicePixelRatio;
-		_viewportHeight = height * this.devicePixelRatio;
+		_viewportWidth = width * pixelRatio;
+		_viewportHeight = height * pixelRatio;
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
@@ -578,10 +591,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setScissor = function ( x, y, width, height ) {
 
 		_gl.scissor(
-			x * this.devicePixelRatio,
-			y * this.devicePixelRatio,
-			width * this.devicePixelRatio,
-			height * this.devicePixelRatio
+			x * pixelRatio,
+			y * pixelRatio,
+			width * pixelRatio,
+			height * pixelRatio
 		);
 
 	};
@@ -3286,11 +3299,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( a.material.id !== b.material.id ) {
 
-			return b.material.id - a.material.id;
+			return a.material.id - b.material.id;
 
 		} else if ( a.z !== b.z ) {
 
-			return b.z - a.z;
+			return a.z - b.z;
 
 		} else {
 
@@ -3304,7 +3317,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( a.z !== b.z ) {
 
-			return a.z - b.z;
+			return b.z - a.z;
 
 		} else {
 
@@ -3519,18 +3532,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( _this.sortObjects === true ) {
 
-							if ( object.renderDepth !== null ) {
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyProjection( _projScreenMatrix );
 
-								webglObject.z = object.renderDepth;
-
-							} else {
-
-								_vector3.setFromMatrixPosition( object.matrixWorld );
-								_vector3.applyProjection( _projScreenMatrix );
-
-								webglObject.z = _vector3.z;
-
-							}
+							webglObject.z = _vector3.z;
 
 						}
 
@@ -3554,7 +3559,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var material;
 
-		for ( var i = renderList.length - 1; i !== - 1; i -- ) {
+		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var webglObject = renderList[ i ];
 
@@ -3610,7 +3615,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var material;
 
-		for ( var i = 0, il = renderList.length; i < il; i ++ ) {
+		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var webglObject = renderList[ i ];
 			var object = webglObject.object;
@@ -3785,7 +3790,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				//
+				_this.info.memory.geometries ++;
 
 			} else if ( object instanceof THREE.Mesh ) {
 
@@ -5772,6 +5777,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setLineWidth ( width ) {
 
+		width *= pixelRatio;
+
 		if ( width !== _oldLineWidth ) {
 
 			_gl.lineWidth( width );
@@ -5914,7 +5921,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter is set to THREE.LinearFilter or THREE.NearestFilter. ( ' + texture.sourceFile + ' )' );			
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter is set to THREE.LinearFilter or THREE.NearestFilter. ( ' + texture.sourceFile + ' )' );
 
 			}
 

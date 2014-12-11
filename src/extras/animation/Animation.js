@@ -53,8 +53,6 @@ THREE.Animation.prototype.reset = function () {
 
 		var object = this.hierarchy[ h ];
 
-		object.matrixAutoUpdate = true;
-
 		if ( object.animationCache === undefined ) {
 
 			object.animationCache = {
@@ -203,7 +201,6 @@ THREE.Animation.prototype.update = (function(){
 			} else {
 
 				this.stop();
-				return;
 
 			}
 
@@ -249,9 +246,6 @@ THREE.Animation.prototype.update = (function(){
 					animationCache.nextKey[ type ] = nextKey;
 
 				}
-
-				object.matrixAutoUpdate = true;
-				object.matrixWorldNeedsUpdate = true;
 
 				var scale = ( this.currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
 

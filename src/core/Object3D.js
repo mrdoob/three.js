@@ -56,8 +56,6 @@ THREE.Object3D = function () {
 		},
 	} );
 
-	this.renderDepth = null;
-
 	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
@@ -380,33 +378,24 @@ THREE.Object3D.prototype = {
 
 	getObjectById: function ( id, recursive ) {
 
-		if ( this.id === id ) return this;
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			var child = this.children[ i ];
-			var object = child.getObjectById( id, recursive );
-
-			if ( object !== undefined ) {
-
-				return object;
-
-			}
-
-		}
-
-		return undefined;
+		return this.getObjectByProperty( 'id', id, recursive );
 
 	},
 
 	getObjectByName: function ( name, recursive ) {
 
-		if ( this.name === name ) return this;
+		return this.getObjectByProperty( 'name', name, recursive );
+
+	},
+
+	getObjectByProperty: function ( name, value, recursive ) {
+
+		if ( this[ name ] === value ) return this;
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			var child = this.children[ i ];
-			var object = child.getObjectByName( name, recursive );
+			var object = child.getObjectByProperty( name, value, recursive );
 
 			if ( object !== undefined ) {
 
@@ -755,8 +744,6 @@ THREE.Object3D.prototype = {
 		object.position.copy( this.position );
 		object.quaternion.copy( this.quaternion );
 		object.scale.copy( this.scale );
-
-		object.renderDepth = this.renderDepth;
 
 		object.rotationAutoUpdate = this.rotationAutoUpdate;
 
