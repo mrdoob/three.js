@@ -108,6 +108,24 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		var lightMapModeDefine = null;
+
+		if( parameters.lightMap ) {
+
+			switch ( material.lightMapMode ) {
+
+				case THREE.MultiplyOperation:
+					lightMapModeDefine = "LIGHTMAP_MULTIPLY";
+					break;
+
+				case THREE.Modulate2XOperation:
+					lightMapModeDefine = 'LIGHTMAP_MODULATE2X';
+					break;
+
+			}
+
+		}
+
 		// console.log( "building new program " );
 
 		//
@@ -259,6 +277,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.envMap ? "#define USE_ENVMAP" : "",
 				envMapTypeDefine ? "#define " + envMapTypeDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+				parameters.lightMap ? "#define " + lightMapModeDefine : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
 				parameters.specularMap ? "#define USE_SPECULARMAP" : "",

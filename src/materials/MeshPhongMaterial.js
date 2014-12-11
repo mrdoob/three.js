@@ -67,6 +67,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.map = null;
 
 	this.lightMap = null;
+	this.lightMapMode = THREE.MultiplyOperation;
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -125,6 +126,7 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.lightMap = this.lightMap;
+	material.lightMapMode = this.lightMapMode;
 
 	material.bumpMap = this.bumpMap;
 	material.bumpScale = this.bumpScale;

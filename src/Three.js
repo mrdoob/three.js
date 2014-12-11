@@ -112,6 +112,7 @@ THREE.SrcAlphaSaturateFactor = 210;
 THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;
 THREE.AddOperation = 2;
+THREE.Modulate2XOperation = 3;
 
 // Mapping modes
 

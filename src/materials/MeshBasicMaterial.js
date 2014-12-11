@@ -46,6 +46,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.map = null;
 
 	this.lightMap = null;
+	this.lightMapMode = THREE.MultiplyOperation;
 
 	this.specularMap = null;
 
@@ -88,6 +89,7 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.lightMap = this.lightMap;
+	material.lightMapMode = this.lightMapMode;
 
 	material.specularMap = this.specularMap;
 

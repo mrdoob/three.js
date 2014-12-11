@@ -4134,6 +4134,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			vertexColors: material.vertexColors,
 
+			lightMapMode: material.lightMapMode,
+
 			fog: fog,
 			useFog: material.fog,
 			fogExp: fog instanceof THREE.FogExp2,
