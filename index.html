@@ -57,7 +57,7 @@
 				text-decoration: underline;
 			}
 
-			#panel	{
+			#panel {
 				position: fixed;
 
 				left: 0px;
@@ -68,6 +68,14 @@
 
 				padding: 20px 20px 0 20px;
 			}
+
+				#panel #book {
+					margin-top: 15px;
+				}
+
+				#panel #book img {
+					border: 1px solid #ccc;
+				}
 
 			#content {
 				position: absolute;
@@ -131,9 +139,21 @@
 			<hr />
 
 			<center>
-			<a href="http://www.udacity.com/overview/Course/cs291/" target="_blank"><img src="files/udacity.png" width="121" height="152" style="border:1px solid #ccc" /></a><br /><br />
+			<a href="http://www.udacity.com/overview/Course/cs291/" target="_blank"><img src="files/udacity.png" width="121" height="152" style="border:1px solid #ccc" /></a>
 
-			<a href="http://shop.oreilly.com/product/0636920024729.do" target="_blank"><img src="files/webglbook.png" width="100" height="132" style="border:1px solid #ccc" /></a>
+			<div id="book">
+			<script>
+				var books = [
+					'<a href="http://shop.oreilly.com/product/0636920024729.do" target="_blank"><img src="files/books/webgl.png" width="100" height="132" /></a>',
+					'<a href="https://www.packtpub.com/web-development/learning-threejs-javascript-3d-library-webgl" target="_blank"><img src="files/books/learning-threejs-javascript-3d-library-webgl.png" width="100" height="123" /></a>',
+					'<a href="https://www.packtpub.com/game-development/game-development-threejs" target="_blank"><img src="files/books/game-development-threejs.png" width="100" height="123" /></a>',
+					'<a href="https://www.packtpub.com/web-development/threejs-essentials" target="_blank"><img src="files/books/threejs-essentials.png" width="100" height="124" /></a>',
+					'<a href="https://www.packtpub.com/web-development/threejs-cookbook" target="_blank"><img src="files/books/threejs-cookbook.png" width="100" height="123" /></a>',
+				];
+				document.write( books[ Math.floor( Math.random() * books.length ) ] );
+			</script>
+			</div>
+
 			</center>
 
 		</div>
