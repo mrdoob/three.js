@@ -45,7 +45,8 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
 		blending: THREE.NoBlending,
-		name: "Luminance"
+		name: "Luminance",
+		defines: {"MAX_LUMINANCE": ""}
 	} );
 
 	this.adaptLuminanceShader = {
@@ -107,7 +108,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 				
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
-				"fCurrentLum = pow( fCurrentLum, 2.0 );",
+				// "fCurrentLum = pow( fCurrentLum, 2.0 );",
 
 				// Adapt the luminance using Pattanaik's technique
 				"float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
@@ -241,7 +242,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 
 			//If we need to generate a 1x1 texture for sampling luminosity (because filtering isn't supported)
 			if ( this.needsManualDownSample ) {
-				this.downSampleLuminance();
+				this.downSampleLuminance( renderer );
 				this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRTDownSampled[ this.currentLuminanceRTDownSampled.length - 1 ];
 			}
 			else {
@@ -268,7 +269,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		
 	},
 
-	downSampleLuminance: function() {
+	downSampleLuminance: function( renderer ) {
 		this.quad.material = this.materialDownSample;
 		this.materialDownSample.uniforms.tDiffuse.value = this.currentLuminanceRT;
 		for ( var i = 0; i < this.currentLuminanceRTDownSampled.length; i++ ) {
@@ -377,11 +378,11 @@ THREE.AdaptiveToneMappingPass.prototype = {
 			this.materialAdaptiveLum.defines['MIP_LEVEL_1X1'] = Math.log2( this.resolution ).toFixed(1);
 		}
 
-		this.seedTargets();
+		this.seedTargets( renderer );
 		
 	},
 
-	seedTargets: function() {
+	seedTargets: function( renderer ) {
 		//Put something in the adaptive luminance texture so that the scene can render initially
 		this.quad.material = new THREE.MeshBasicMaterial( {color: 0x777777, opacity: 0.5 });
 		renderer.render( this.scene, this.camera, this.luminanceRT );
@@ -412,6 +413,11 @@ THREE.AdaptiveToneMappingPass.prototype = {
 	setMaxLuminance: function( maxLum ) {
 		if ( maxLum ) {
 			this.materialToneMap.uniforms.maxLuminance.value = maxLum;
+			this.materialLuminance.uniforms.maxLuminance.value = maxLum;
+			if ( !this.materialLuminance.defines || !this.materialLuminance.defines["MAX_LUMINANCE"] ) {
+				this.materialLuminance.defines["MAX_LUMINANCE"] = "";
+				this.materialLuminance.needsUpdate = true;
+			}
 		}
 	},
 

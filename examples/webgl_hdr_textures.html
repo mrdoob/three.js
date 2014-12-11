@@ -62,7 +62,7 @@
 			var cameraCube, sceneCube, cubeMesh;
 			var cubeMaterial, equirectMaterial;
 			var adaptiveLuminanceMat, currentLuminanceRT, previousLuminanceMat;
-			var textureCubeRGBM, textureCubeRGBD, textureRGBE;
+			var textureRGBM, textureRGBD, textureRGBE;
 
 			var hemiLight;
 
@@ -89,11 +89,11 @@
 					renderer.hdrOutputType = hdrOutputType;
 					dynamicHdrEffectComposer.reset( hdrRenderTarget );
 					adaptToneMappingPass.needsUpdate = true;
-					toneMapPass.material.defines['HDR_INPUT_TYPE'] = hdrOutputType;
-					toneMapPass.material.needsUpdate = true;
+					// toneMapPass.material.defines['HDR_INPUT_TYPE'] = hdrOutputType;
+					// toneMapPass.material.needsUpdate = true;
 					ninjaMat.needsUpdate = true;
 					cubeMaterial.needsUpdate = true;
-					// equirectMaterial.needsUpdate = true;
+					equirectMaterial.needsUpdate = true;
 					debugMat.uniforms.map.value = adaptToneMappingPass.currentLuminanceRT;
 				}
 				params = {
@@ -103,30 +103,40 @@
 					// adaptionRate: 2.0,
 					// sunLight: 1.0,
 					RGBM_EnvMap: function() {
-						cubeMesh.material = cubeMaterial;
-						ninjaMat.envMap = textureCubeRGBM;
-						cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
-						cubeMaterial.uniforms.tCube.value = textureCubeRGBM;
-						cubeMaterial.needsUpdate = true;
+						// cubeMesh.material = cubeMaterial;
+						ninjaMat.envMap = textureRGBM;
+						ninjaMat.needsUpdate = true;
+						// cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
+						// cubeMaterial.uniforms.tCube.value = textureRGBM;
+						// cubeMaterial.needsUpdate = true;
+						cubeMesh.material = equirectMaterial;
+						equirectMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
+						equirectMaterial.uniforms.tEquirect.value = textureRGBM;
 						adaptToneMappingPass.needsUpdate = true;
+						equirectMaterial.needsUpdate = true;
 					},
 					RGBD_EnvMap: function() {
-						cubeMesh.material = cubeMaterial;
-						ninjaMat.envMap = textureCubeRGBD;
-
-						cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBD;
-						cubeMaterial.uniforms.tCube.value = textureCubeRGBD;
-						cubeMaterial.needsUpdate = true;
+						// cubeMesh.material = cubeMaterial;
+						ninjaMat.envMap = textureRGBD;
+						ninjaMat.needsUpdate = true;
+						// cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBD;
+						// cubeMaterial.uniforms.tCube.value = textureRGBD;
+						// cubeMaterial.needsUpdate = true;
+						cubeMesh.material = equirectMaterial;
+						equirectMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBD;
+						equirectMaterial.uniforms.tEquirect.value = textureRGBD;
+						adaptToneMappingPass.needsUpdate = true;
+						equirectMaterial.needsUpdate = true;
+					},
+					RGBE_EnvMap: function() {
+						cubeMesh.material = equirectMaterial;
+						ninjaMat.envMap = textureRGBE;
+						ninjaMat.needsUpdate = true;
+						equirectMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBE;
+						equirectMaterial.uniforms.tEquirect.value = textureRGBE;
+						equirectMaterial.needsUpdate = true;
 						adaptToneMappingPass.needsUpdate = true;
 					},
-					// RGBE_EnvMap: function() {
-					// 	cubeMesh.material = equirectMaterial;
-					// 	ninjaMat.envMap = textureRGBE;
-					// 	equirectMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBE;
-					// 	equirectMaterial.uniforms.tEquirect.value = textureRGBE;
-					// 	// equirectMaterial.needsUpdate = true;
-					// 	adaptToneMappingPass.needsUpdate = true;
-					// },
 					LOGLUV_Render: function() {
 						setRenderFormat( THREE.HDRLOGLUV );
 					},
@@ -173,8 +183,8 @@
 				var ambient = new THREE.AmbientLight( 0x050505 );
 				scene.add( ambient );
 
-				hemiLight = new THREE.HemisphereLight( 0x556663, 0x553311, 1.0 );
-				scene.add( hemiLight );
+				// hemiLight = new THREE.HemisphereLight( 0x556663, 0x553311, 0.0 );
+				// scene.add( hemiLight );
 
 				var debugVShader = [
 					// "attribute vec2 uv;",
@@ -261,59 +271,64 @@
 
 				cubeMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
 
-				// var equirectShader = THREE.ShaderLib[ "equirect" ];
-				// equirectMaterial = new THREE.ShaderMaterial( {
-				// 	fragmentShader: equirectShader.fragmentShader,
-				// 	vertexShader: equirectShader.vertexShader,
-				// 	uniforms: equirectShader.uniforms,
-				// 	depthWrite: false,
-				// 	side: THREE.BackSide,
-				// 	blending: THREE.NoBlending
-				// } );
+				var equirectShader = THREE.ShaderLib[ "equirect" ];
+				equirectMaterial = new THREE.ShaderMaterial( {
+					fragmentShader: equirectShader.fragmentShader,
+					vertexShader: equirectShader.vertexShader,
+					uniforms: equirectShader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide,
+					blending: THREE.NoBlending
+				} );
 
-				// equirectMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
+				equirectMaterial.defines['ENVMAP_HDR_INPUT'] = THREE.HDRRGBM;
 
 				var r = "textures/hdr/ml/";
-				var urls = [ r + "ml_posX_RGBM.png", r + "ml_negX_RGBM.png",
-							 r + "ml_posY_RGBM.png", r + "ml_negY_RGBM.png",
-							 r + "ml_posZ_RGBM.png", r + "ml_negZ_RGBM.png" ];
+				// var urls = [ r + "ml_posX_RGBM.png", r + "ml_negX_RGBM.png",
+				// 			 r + "ml_posY_RGBM.png", r + "ml_negY_RGBM.png",
+				// 			 r + "ml_posZ_RGBM.png", r + "ml_negZ_RGBM.png" ];
 				
-				textureCubeRGBM = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeReflectionMapping, function( tex ) {
-					ninjaMat.envMap = tex;
-					cubeMaterial.uniforms[ "tCube" ].value = textureCubeRGBM;
-					cubeMaterial.needsUpdate = true;
-					cubeMesh.material = cubeMaterial;
-				} );
-				textureCubeRGBM.format = THREE.RGBAFormat;
-				textureCubeRGBM.hdrPacking = THREE.HDRRGBM;
-
-				urls = [ r + "ml_posX_RGBD.png", r + "ml_negX_RGBD.png",
-							 r + "ml_posY_RGBD.png", r + "ml_negY_RGBD.png",
-							 r + "ml_posZ_RGBD.png", r + "ml_negZ_RGBD.png" ];
-
-				textureCubeRGBD = THREE.ImageUtils.loadTextureCube( urls );
-				textureCubeRGBD.format = THREE.RGBAFormat;
-				textureCubeRGBD.hdrPacking = THREE.HDRRGBD;
-				
-				// textureRGBE = THREE.ImageUtils.loadTexture( "textures/hdr/reflectionRGBE.png" );
-				// textureRGBE.format = THREE.RGBAFormat;
-				// textureRGBE.mapping = THREE.EquirectangularReflectionMapping;
-				// textureRGBE.magFilter = THREE.LinearFilter;
-				// textureRGBE.minFilter = THREE.NearestMipMapLinearFilter;
-				// textureRGBE.hdrPacking = THREE.HDRRGBE;
-				// textureRGBE.generateMipmaps = true;
-
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
-				textureCube.format = THREE.RGBFormat;
-
+				// textureRGBM = THREE.ImageUtils.loadTextureCube( urls, THREE.CubeReflectionMapping, function( tex ) {
+				// 	ninjaMat.envMap = tex;
+				// 	cubeMaterial.uniforms[ "tCube" ].value = textureRGBM;
+				// 	cubeMaterial.needsUpdate = true;
+				// 	cubeMesh.material = cubeMaterial;
+				// } );
 				cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ) );
 				sceneCube.add( cubeMesh );
+
+				textureRGBM = THREE.ImageUtils.loadTexture( "textures/hdr/ennis-RGBM.png", undefined, function( tex ) {
+					ninjaMat.envMap = tex;
+					equirectMaterial.uniforms[ "tEquirect" ].value = textureRGBM;
+					equirectMaterial.needsUpdate = true;
+					cubeMesh.material = equirectMaterial;
+				});
+				textureRGBM.format = THREE.RGBAFormat;
+				textureRGBM.mapping = THREE.EquirectangularReflectionMapping;
+				textureRGBM.magFilter = THREE.LinearFilter;
+				textureRGBM.minFilter = THREE.NearestMipMapLinearFilter;
+				textureRGBM.generateMipmaps = false;
+				textureRGBM.format = THREE.RGBAFormat;
+				textureRGBM.hdrPacking = THREE.HDRRGBM;
+
+				textureRGBD = THREE.ImageUtils.loadTexture( "textures/hdr/ennis-RGBD.png" );
+				textureRGBD.format = THREE.RGBAFormat;
+				textureRGBD.hdrPacking = THREE.HDRRGBD;
+				textureRGBD.mapping = THREE.EquirectangularReflectionMapping;
+				
+				textureRGBE = THREE.ImageUtils.loadTexture( "textures/hdr/ennis-RGBE.png" );
+				textureRGBE.format = THREE.RGBAFormat;
+				textureRGBE.mapping = THREE.EquirectangularReflectionMapping;
+				// textureRGBE.magFilter = THREE.NearestFilter;
+				// textureRGBE.minFilter = THREE.NearestMipMapNearestFilter;
+				textureRGBE.hdrPacking = THREE.HDRRGBE;
+				// textureRGBE.generateMipmaps = false;
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
-				renderer.gammaInput = true;
+				renderer.gammaInput = false;
 				renderer.gammaOutput = false;
 				renderer.hdrOutputEnabled = true;
 				renderer.hdrInputEnabled = true;
@@ -345,15 +360,15 @@
   			adaptToneMappingPass = new THREE.AdaptiveToneMappingPass( true, 256 );
   			adaptToneMappingPass.needsSwap = true;
   			
-  			bloomPass = new THREE.BloomPass( 0.3 );
+  			bloomPass = new THREE.BloomPass( 0.0 );
   			var copyPass = new THREE.ShaderPass( THREE.CopyShader );
   			copyPass.renderToScreen = true;
 
-  			var toneMapPass = new THREE.ShaderPass( THREE.ToneMapShader );
-  			toneMapPass.hdrOutputEnabled = false;
-  			toneMapPass.hdrInputEnabled = true;
-  			toneMapPass.material.defines['HDR_INPUT_TYPE'] = renderer.hdrOutputType;
-  			toneMapPass.renderToScreen = true;
+  			// var toneMapPass = new THREE.ShaderPass( THREE.ToneMapShader );
+  			// toneMapPass.hdrOutputEnabled = false;
+  			// toneMapPass.hdrInputEnabled = true;
+  			// toneMapPass.material.defines['HDR_INPUT_TYPE'] = renderer.hdrOutputType;
+  			// toneMapPass.renderToScreen = true;
   			
   			dynamicHdrEffectComposer.addPass( skyboxPass );
   			dynamicHdrEffectComposer.addPass( scenePass );
@@ -364,23 +379,22 @@
   			dynamicHdrEffectComposer.addPass( copyPass );
   			
 
-				var dynamicHdrGui = new dat.GUI();
+  			var envMapGui = new dat.GUI();
 
-				// dynamicHdrGui.add( params, 'middleGrey', 0, 12 );
-				// dynamicHdrGui.add( params, 'maxLuminance', 1, 30 );
-				// dynamicHdrGui.add( params, 'adaptionRate', 0.0, 10.0 );
-				// dynamicHdrGui.add( params, 'bloomAmount', 0.0, 10.0 );
-				// dynamicHdrGui.add( params, 'sunLight', 0.1, 12.0 );
-				dynamicHdrGui.add( params, 'RGBM_EnvMap' );
-				dynamicHdrGui.add( params, 'RGBD_EnvMap' );
-				// dynamicHdrGui.add( params, 'RGBE_EnvMap' );
-				// dynamicHdrGui.add( params, 'RGBLOGLUV_EnvironmentMap' );
-				dynamicHdrGui.add( params, 'LOGLUV_Render' );
-				dynamicHdrGui.add( params, 'RGBM_Render' );
-				dynamicHdrGui.add( params, 'RGBD_Render' );
-				dynamicHdrGui.add( params, 'RGBE_Render' );
-				dynamicHdrGui.add( params, 'FullHDR_Render' );
-				dynamicHdrGui.open();
+  			envMapGui.add( params, 'RGBM_EnvMap' );
+				envMapGui.add( params, 'RGBD_EnvMap' );
+				envMapGui.add( params, 'RGBE_EnvMap' );
+				// envMapGui.add( params, 'RGBLOGLUV_EnvironmentMap' );
+				envMapGui.open();
+
+				var backBufferGui = new dat.GUI();
+				
+				backBufferGui.add( params, 'LOGLUV_Render' );
+				backBufferGui.add( params, 'RGBM_Render' );
+				backBufferGui.add( params, 'RGBD_Render' );
+				backBufferGui.add( params, 'RGBE_Render' );
+				backBufferGui.add( params, 'FullHDR_Render' );
+				backBufferGui.open();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
