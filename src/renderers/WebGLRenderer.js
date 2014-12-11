@@ -5535,6 +5535,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setLineWidth ( width ) {
 
+		width *= pixelRatio;
+
 		if ( width !== _oldLineWidth ) {
 
 			_gl.lineWidth( width );
