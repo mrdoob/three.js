@@ -21635,7 +21635,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				//
+				_this.info.memory.geometries ++;
 
 			} else if ( object instanceof THREE.Mesh ) {
 
@@ -23539,6 +23539,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function setLineWidth ( width ) {
+
+		width *= pixelRatio;
 
 		if ( width !== _oldLineWidth ) {
 
