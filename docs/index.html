@@ -32,6 +32,32 @@
 				overflow: hidden;
 			}
 
+				h1 {
+					margin-top: 30px;
+					margin-bottom: 40px;
+					margin-left: 20px;
+					font-size: 25px;
+					font-weight: normal;
+				}
+
+				h2 {
+					color: #454545;
+					font-size: 18px;
+					font-weight: normal;
+
+					margin-top: 20px;
+					margin-left: 20px;
+				}
+
+				h3 {
+					color: #666;
+					font-size: 16px;
+					font-weight: normal;
+
+					margin-top: 20px;
+					margin-left: 20px;
+				}
+
 			a {
 				color: #2194CE;
 				text-decoration: none;
@@ -45,32 +71,6 @@
 				overflow: auto;
 				background: #fafafa;
 			}
-
-				#panel h1 {
-					margin-top: 30px;
-					margin-bottom: 40px;
-					margin-left: 20px;
-					font-size: 25px;
-					font-weight: normal;
-				}
-
-				#panel h2 {
-					color: #454545;
-					font-size: 18px;
-					font-weight: normal;
-
-					margin-top: 20px;
-					margin-left: 20px;
-				}
-
-				#panel h3 {
-					color: #666;
-					font-size: 16px;
-					font-weight: normal;
-
-					margin-top: 20px;
-					margin-left: 20px;
-				}
 
 				#panel ul {
 					list-style-type: none;
@@ -164,6 +164,10 @@
 				}
 
 			@media all and ( max-width: 640px ) {
+				h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
 				#panel{
 					position: absolute;
 					left: 0;
@@ -174,10 +178,6 @@
 					z-index: 100;
 					overflow: hidden;
 					border-bottom: 1px solid #dedede;
-				}
-				#panel h1{
-					margin-top: 20px;
-					margin-bottom: 20px;
 				}
 				#content{
 					position: absolute;
@@ -222,7 +222,7 @@
 
 		<div id="panel" class="collapsed">
 			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
-			<a id="expandButton" href="#" >
+			<a id="expandButton" href="#">
 				<span></span>
 				<span></span>
 				<span></span>

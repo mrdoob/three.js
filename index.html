@@ -3,7 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<title>three.js - Javascript 3D library</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+
 			@font-face {
 				font-family: 'inconsolata';
 				src: url('files/inconsolata.woff') format('woff');
@@ -11,24 +13,25 @@
 				font-style: normal;
 			}
 
+			*{
+				box-sizing: border-box;
+			}
+
 			body {
-
 				background-color: #ffffff;
-
 				margin: 0px;
-
 				font-family: 'inconsolata';
 				font-size: 15px;
-
+				line-height: 18px;
+				color: #555;
 			}
 
 			h1 {
-				color: #444;
+				margin-top: 30px;
+				margin-bottom: 30px;
+				margin-left: 20px;
 				font-size: 25px;
 				font-weight: normal;
-
-				margin-top: 5px;
-				margin-bottom: 20px;
 			}
 
 			h2 {
@@ -37,7 +40,7 @@
 				font-weight: normal;
 
 				margin-top: 5px;
-				margin-bottom: 20px;
+				margin-bottom: 30px;
 			}
 
 			hr {
@@ -47,9 +50,16 @@
 				margin: 30px 0px;
 			}
 
+			sup {
+				position: relative;
+				margin-left: 5px;
+				font-size: 15px;
+				top: -0.5em;
+				vertical-align: top;
+			}
+
 			a {
 				color: #2194CE;
-				font-size: 15px;
 				text-decoration: none;
 			}
 
@@ -59,15 +69,16 @@
 
 			#panel {
 				position: fixed;
-
 				left: 0px;
 				top: 0px;
 				bottom: 0px;
-
-				width: 140px;
-
-				padding: 20px 20px 0 20px;
+				width: 180px;
+				background: #ffffff;
 			}
+
+				#panel #content {
+					padding: 0px 20px;
+				}
 
 				#panel img {
 					border: 1px solid #ccc;
@@ -82,14 +93,14 @@
 					margin-top: 15px;
 				}
 
-			#content {
+			#viewer {
 				position: absolute;
 				left: 180px;
 				top: 0px;
-				padding: 28px 0 0 0;
+				padding: 28px 20px;
 			}
 
-				#content img {
+				#viewer img {
 					width: 200px;
 					height: 150px;
 					display: block;
@@ -97,14 +108,89 @@
 					transition: opacity 0.2s;
 				}
 
-				#content img:hover {
+				#viewer img:hover {
 					opacity: 0.75;
 				}
+
+			/* mobile */
+
+			#expandButton {
+				display: none;
+				position: absolute;
+				right: 20px;
+				top: 12px;
+				width: 32px;
+				height: 32px;
+			}
+
+				#expandButton span {
+					height: 2px;
+					background-color: #2194CE;
+					width: 16px;
+					position: absolute;
+					left: 8px;
+					top: 10px;
+				}
+
+				#expandButton span:nth-child(1) {
+					top: 16px;
+				}
+
+				#expandButton span:nth-child(2) {
+					top: 22px;
+				}
+
+			@media all and ( max-width: 640px ) {
+				h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
+				h2{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
+				#panel{
+					position: fixed;
+					left: 0;
+					top: 0;
+					height: 480px;
+					width: 100%;
+					right: 0;
+					z-index: 100;
+					overflow: hidden;
+					border-bottom: 1px solid #dedede;
+				}
+				#content{
+					position: absolute;
+					left: 0;
+					top: 60px;
+					right: 0;
+					bottom: 0;
+					font-size: 17px;
+					line-height: 22px;
+					overflow: auto;
+				}
+				#viewer{
+					position: absolute;
+					left: 0;
+					top: 56px;
+					width: 100%;
+				}
+				#viewer img {
+					width: 100px;
+					height: 75px;
+				}
+				#expandButton{
+					display: block;
+				}
+				#panel.collapsed{
+					height: 56px;
+				}
+			}
 
 		</style>
 	</head>
 	<body>
-
 		<script type="text/javascript">
 
 		  var _gaq = _gaq || [];
@@ -119,56 +205,70 @@
 
 		</script>
 
-		<div id="panel">
-			<h1>three.js<span style="font-size: 50%; vertical-align: super;"> <a href="http://github.com/mrdoob/three.js/releases">r69</a></span></h1>
+		<div id="panel" class="collapsed">
+			<h1>three.js<sup><a href="http://github.com/mrdoob/three.js/releases">r69</a></sup></h1>
+			<a id="expandButton" href="#">
+				<span></span>
+				<span></span>
+				<span></span>
+			</a>
+			<div id="content">
+				<a href="examples/">examples</a>,
+				<a href="http://stemkoski.github.io/Three.js/">more</a><br /><br />
 
-			<a href="examples/">examples</a>,
-			<a href="http://stemkoski.github.io/Three.js/">more</a><br /><br />
+				<a href="http://github.com/mrdoob/three.js/zipball/master">download</a>,
+				<a href="http://cdnjs.com/libraries/three.js/">cdn</a><br /><br />
 
-			<a href="http://github.com/mrdoob/three.js/zipball/master">download</a>,
-			<a href="http://cdnjs.com/libraries/three.js/">cdn</a><br /><br />
+				<a href="docs/index.html#Manual/Introduction/Creating_a_scene">getting started</a><br />
+				<a href="docs/">documentation</a><br />
+				<a href="https://plus.google.com/104300307601542851567" rel="publisher">google+</a><br />
+				<a href="http://webchat.freenode.net/?channels=three.js">chat</a><br />
+				<a href="http://stackoverflow.com/questions/tagged/three.js">help</a><br /><br />
 
-			<a href="docs/index.html#Manual/Introduction/Creating_a_scene">getting started</a><br />
-			<a href="docs/">documentation</a><br />
-			<a href="https://plus.google.com/104300307601542851567" rel="publisher">google+</a><br />
-			<a href="http://webchat.freenode.net/?channels=three.js">chat</a><br />
-			<a href="http://stackoverflow.com/questions/tagged/three.js">help</a><br /><br />
+				<a href="http://github.com/mrdoob/three.js/">github</a><br />
+				<a href="http://github.com/mrdoob/three.js/contributors">contributors</a><br />
+				<a href="http://github.com/mrdoob/three.js/wiki">wiki</a><br />
+				<a href="http://github.com/mrdoob/three.js/issues">issues</a><br /><br />
 
-			<a href="http://github.com/mrdoob/three.js/">github</a><br />
-			<a href="http://github.com/mrdoob/three.js/contributors">contributors</a><br />
-			<a href="http://github.com/mrdoob/three.js/wiki">wiki</a><br />
-			<a href="http://github.com/mrdoob/three.js/issues">issues</a><br /><br />
+				<a href="editor/">editor</a> (beta)
 
-			<a href="editor/">editor</a> (beta)
+				<hr />
 
-			<hr />
+				<div id="resource">
+				<script>
+					var resources = [
+						'<a href="http://www.udacity.com/overview/Course/cs291/" target="_blank"><img src="files/udacity.png" width="121" height="152" /></a>',
+						'<a href="http://davidscottlyons.com/threejs/presentations/frontporch14/" target="_blank"><img src="files/intro.png" width="121" height="106" /></a>'
+					];
+					document.write( resources[ Math.floor( Math.random() * resources.length ) ] );
+				</script>
+				</div>
 
-			<div id="resource">
-			<script>
-				var resources = [
-					'<a href="http://www.udacity.com/overview/Course/cs291/" target="_blank"><img src="files/udacity.png" width="121" height="152" /></a>',
-					'<a href="http://davidscottlyons.com/threejs/presentations/frontporch14/" target="_blank"><img src="files/intro.png" width="121" height="106" /></a>'
-				];
-				document.write( resources[ Math.floor( Math.random() * resources.length ) ] );
-			</script>
+				<div id="book">
+				<script>
+					var books = [
+						'<a href="http://shop.oreilly.com/product/0636920024729.do" target="_blank"><img src="files/books/webgl.png" width="100" height="132" /></a>',
+						'<a href="https://www.packtpub.com/web-development/learning-threejs-javascript-3d-library-webgl" target="_blank"><img src="files/books/learning-threejs-javascript-3d-library-webgl.png" width="100" height="123" /></a>',
+						'<a href="https://www.packtpub.com/game-development/game-development-threejs" target="_blank"><img src="files/books/game-development-threejs.png" width="100" height="123" /></a>',
+						'<a href="https://www.packtpub.com/web-development/threejs-essentials" target="_blank"><img src="files/books/threejs-essentials.png" width="100" height="124" /></a>',
+						'<a href="https://www.packtpub.com/web-development/threejs-cookbook" target="_blank"><img src="files/books/threejs-cookbook.png" width="100" height="123" /></a>'
+					];
+					document.write( books[ Math.floor( Math.random() * books.length ) ] );
+				</script>
+				</div>
 			</div>
-
-			<div id="book">
-			<script>
-				var books = [
-					'<a href="http://shop.oreilly.com/product/0636920024729.do" target="_blank"><img src="files/books/webgl.png" width="100" height="132" /></a>',
-					'<a href="https://www.packtpub.com/web-development/learning-threejs-javascript-3d-library-webgl" target="_blank"><img src="files/books/learning-threejs-javascript-3d-library-webgl.png" width="100" height="123" /></a>',
-					'<a href="https://www.packtpub.com/game-development/game-development-threejs" target="_blank"><img src="files/books/game-development-threejs.png" width="100" height="123" /></a>',
-					'<a href="https://www.packtpub.com/web-development/threejs-essentials" target="_blank"><img src="files/books/threejs-essentials.png" width="100" height="124" /></a>',
-					'<a href="https://www.packtpub.com/web-development/threejs-cookbook" target="_blank"><img src="files/books/threejs-cookbook.png" width="100" height="123" /></a>'
-				];
-				document.write( books[ Math.floor( Math.random() * books.length ) ] );
-			</script>
-			</div>
-
 		</div>
 
-		<div id="content">
+		<script>
+		var panel = document.getElementById( 'panel' );
+		var expandButton = document.getElementById( 'expandButton' );
+		expandButton.addEventListener( 'click', function ( event ) {
+			panel.classList.toggle( 'collapsed' );
+			event.preventDefault();
+		} );
+		</script>
+
+		<div id="viewer">
 
 			<h2>featured projects</h2>
 

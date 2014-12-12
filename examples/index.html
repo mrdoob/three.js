@@ -32,6 +32,19 @@
 				overflow: hidden;
 			}
 
+			h1 {
+				margin-top: 30px;
+				margin-bottom: 40px;
+				margin-left: 20px;
+				font-size: 25px;
+				font-weight: normal;
+			}
+
+			h2 {
+				font-size: 20px;
+				font-weight: normal;
+			}
+
 			a {
 				color: #2194CE;
 				text-decoration: none;
@@ -45,19 +58,6 @@
 				overflow: auto;
 				background: #fafafa;
 			}
-
-				#panel h1 {
-					margin-top: 30px;
-					margin-bottom: 40px;
-					margin-left: 20px;
-					font-size: 25px;
-					font-weight: normal;
-				}
-
-				#panel h2 {
-					font-size: 20px;
-					font-weight: normal;
-				}
 
 				#panel #content {
 					padding: 0px 20px;
@@ -130,6 +130,10 @@
 				}
 
 			@media all and ( max-width: 640px ) {
+				h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
 				#panel{
 					position: absolute;
 					left: 0;
@@ -140,10 +144,6 @@
 					z-index: 100;
 					overflow: hidden;
 					border-bottom: 1px solid #dedede;
-				}
-				#panel h1{
-					margin-top: 20px;
-					margin-bottom: 20px;
 				}
 				#content{
 					position: absolute;
@@ -189,7 +189,7 @@
 
 		<div id="panel" class="collapsed">
 			<h1><a href="http://threejs.org">three.js</a> / examples</h1>
-			<a id="expandButton" href="#" >
+			<a id="expandButton" href="#">
 				<span></span>
 				<span></span>
 				<span></span>
@@ -460,6 +460,7 @@
 
 		//
 
+		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
 		var viewer = document.getElementById( 'viewer' );
 
