@@ -2,18 +2,15 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>three.js - documentation</title>
+		<title>three.js / documentation</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+
 			@font-face {
 				font-family: 'inconsolata';
 				src: url('files/inconsolata.woff') format('woff');
 				font-weight: normal;
 				font-style: normal;
-			}
-
-			*{
-				box-sizing: border-box;
 			}
 
 			html {
@@ -22,8 +19,7 @@
 
 			body {
 				background-color: #ffffff;
-				margin: 0;
-				padding: 0 0 0 260px;
+				margin: 0px;
 				height: 100%;
 				color: #555;
 				font-family: 'inconsolata';
@@ -37,7 +33,7 @@
 				text-decoration: none;
 			}
 
-			#panel	{
+			#panel {
 				position: fixed;
 				left: 0px;
 				width: 260px;
@@ -79,8 +75,10 @@
 				}
 
 			#viewer {
+				position: absolute;
 				border: 0px;
-				width: 100%;
+				left: 260px;
+				width: calc(100% - 260px);
 				height: 100%;
 				overflow: auto;
 			}
@@ -133,6 +131,8 @@
 				font-weight: bold;
 			}
 
+			/* mobile */
+
 			#expandButton {
 				display: none;
 				position: absolute;
@@ -142,22 +142,22 @@
 				height: 32px;
 			}
 
-			#expandButton span {
-				height: 1px;
-				background-color: #2194CE;
-				width: 16px;
-				position: absolute;
-				left: 8px;
-				top: 10px;
-			}
+				#expandButton span {
+					height: 2px;
+					background-color: #2194CE;
+					width: 16px;
+					position: absolute;
+					left: 8px;
+					top: 10px;
+				}
 
-			#expandButton span:nth-child(1) {
-				top: 16px;
-			}
+				#expandButton span:nth-child(1) {
+					top: 16px;
+				}
 
-			#expandButton span:nth-child(2) {
-				top: 22px;
-			}
+				#expandButton span:nth-child(2) {
+					top: 22px;
+				}
 
 			@media all and ( max-width: 640px ) {
 				#panel{
@@ -171,31 +171,30 @@
 					overflow: hidden;
 					border-bottom: 1px solid #dedede;
 				}
+				#panel h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
 				#content{
 					overflow: auto;
 					position: absolute;
 					left: 0;
-					top: 120px;
+					top: 90px;
 					right: 0;
 					bottom: 0;
 				}
 				#viewer{
 					position: absolute;
 					left: 0;
-					top: 48px;
+					top: 56px;
+					width: 100%;
+					height: calc(100% - 56px);
 				}
 				#expandButton{
 					display: block;
 				}
 				#panel.collapsed{
 					height: 56px;
-				}
-				#panel h1{
-					margin-top: 20px;
-					margin-bottom: 20px;
-				}
-				#content{
-					top: 90px;
 				}
 			}
 		</style>
@@ -213,8 +212,7 @@
 				<input type="text" id="filterInput" placeholder="Type to filter"/>
 				<a href="#" id="clearFilterButton" >x</a>
 			</div>
-			<div id="content" >
-			</div>
+			<div id="content"></div>
 		</div>
 		<iframe id="viewer"></iframe>
 
@@ -224,9 +222,9 @@
 			var viewer = document.getElementById( 'viewer' );
 
 			var expandButton = document.getElementById( 'expandButton' );
-			expandButton.addEventListener( 'click', function( e ) {
+			expandButton.addEventListener( 'click', function ( event ) {
 				panel.classList.toggle( 'collapsed' );
-				e.preventDefault();
+				event.preventDefault();
 			} );
 
 			var filterInput = document.getElementById( 'filterInput' );
