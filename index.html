@@ -69,12 +69,17 @@
 				padding: 20px 20px 0 20px;
 			}
 
-				#panel #book {
-					margin-top: 15px;
+				#panel img {
+					border: 1px solid #ccc;
 				}
 
-				#panel #book img {
-					border: 1px solid #ccc;
+				#panel #resource {
+					text-align: center;
+				}
+
+				#panel #book {
+					text-align: center;
+					margin-top: 15px;
 				}
 
 			#content {
@@ -138,8 +143,15 @@
 
 			<hr />
 
-			<center>
-			<a href="http://www.udacity.com/overview/Course/cs291/" target="_blank"><img src="files/udacity.png" width="121" height="152" style="border:1px solid #ccc" /></a>
+			<div id="resource">
+			<script>
+				var resources = [
+					'<a href="http://www.udacity.com/overview/Course/cs291/" target="_blank"><img src="files/udacity.png" width="121" height="152" /></a>',
+					'<a href="http://davidscottlyons.com/threejs/presentations/frontporch14/" target="_blank"><img src="files/intro.png" width="121" height="106" /></a>'
+				];
+				document.write( resources[ Math.floor( Math.random() * resources.length ) ] );
+			</script>
+			</div>
 
 			<div id="book">
 			<script>
@@ -153,8 +165,6 @@
 				document.write( books[ Math.floor( Math.random() * books.length ) ] );
 			</script>
 			</div>
-
-			</center>
 
 		</div>
 
