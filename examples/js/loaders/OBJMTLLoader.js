@@ -8,6 +8,9 @@
 THREE.OBJMTLLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	
+	this.options = {};
+	this.crossOrigin = false;
 
 };
 
@@ -19,14 +22,14 @@ THREE.OBJMTLLoader.prototype = {
 
 		var scope = this;
 
-		var mtlLoader = new THREE.MTLLoader( url.substr( 0, url.lastIndexOf( "/" ) + 1 ) );
+		var mtlLoader = new THREE.MTLLoader( url.substr( 0, url.lastIndexOf( "/" ) + 1 ), this.options, this.crossOrigin );
 		mtlLoader.load( mtlurl, function ( materials ) {
 
 			var materialsCreator = materials;
 			materialsCreator.preload();
 
 			var loader = new THREE.XHRLoader( scope.manager );
-			loader.setCrossOrigin( this.crossOrigin );
+			loader.setCrossOrigin( scope.crossOrigin );
 			loader.load( url, function ( text ) {
 
 				var object = scope.parse( text );

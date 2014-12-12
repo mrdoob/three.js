@@ -6,6 +6,8 @@ THREE.OBJLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
+	this.crossOrigin = false;
+
 };
 
 THREE.OBJLoader.prototype = {
