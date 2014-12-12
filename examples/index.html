@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - examples</title>
 		<meta charset="utf-8">
+		<title>three.js / examples</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 
 			@font-face {
@@ -12,11 +13,22 @@
 				font-style: normal;
 			}
 
+			*{
+				box-sizing: border-box;
+			}
+
+			html {
+				height: 100%;
+			}
+
 			body {
 				background-color: #ffffff;
 				margin: 0px;
+				height: 100%;
+				color: #555;
 				font-family: 'inconsolata';
 				font-size: 15px;
+				line-height: 18px;
 				overflow: hidden;
 			}
 
@@ -25,51 +37,54 @@
 				text-decoration: none;
 			}
 
-			h1 {
-				margin-top: 30px;
-				margin-bottom: 40px;
-				font-size: 25px;
-				font-weight: normal;
-			}
-
-			h2 {
-				font-size: 20px;
-				font-weight: normal;
-			}
-
 			#panel {
-				position: absolute;
+				position: fixed;
+				left: 0px;
 				width: 310px;
 				height: 100%;
-				overflow: scroll;
+				overflow: auto;
 				background: #fafafa;
 			}
 
-				#panel #list {
+				#panel h1 {
+					margin-top: 30px;
+					margin-bottom: 40px;
+					margin-left: 20px;
+					font-size: 25px;
+					font-weight: normal;
+				}
+
+				#panel h2 {
+					font-size: 20px;
+					font-weight: normal;
+				}
+
+				#panel #content {
 					padding: 0px 20px;
 					line-height: 18px;
 				}
 
-				#panel #list .link {
+				#panel #content .link {
 					color: #2194CE;
 					text-decoration: none;
 					cursor: pointer;
 				}
 
-				#panel #list .selected {
+				#panel #content .selected {
 					color: #ff0000;
 				}
 
-					#panel #list .link:hover {
+					#panel #content .link:hover {
 						text-decoration: underline;
 					}
 
 			#viewer {
 				position: absolute;
+				border: 0px;
 				left: 310px;
 				width: calc(100% - 310px);
 				height: 100%;
-				border: 0px;
+				overflow: auto;
 			}
 
 			#button {
@@ -86,6 +101,73 @@
 					cursor: pointer;
 					opacity: 1;
 				}
+
+			/* mobile */
+
+			#expandButton {
+				display: none;
+				position: absolute;
+				right: 20px;
+				top: 12px;
+				width: 32px;
+				height: 32px;
+			}
+
+				#expandButton span {
+					height: 2px;
+					background-color: #2194CE;
+					width: 16px;
+					position: absolute;
+					left: 8px;
+					top: 10px;
+				}
+
+				#expandButton span:nth-child(1) {
+					top: 16px;
+				}
+
+				#expandButton span:nth-child(2) {
+					top: 22px;
+				}
+
+			@media all and ( max-width: 640px ) {
+				#panel{
+					position: absolute;
+					left: 0;
+					top: 0;
+					height: 480px;
+					width: 100%;
+					right: 0;
+					z-index: 100;
+					overflow: hidden;
+					border-bottom: 1px solid #dedede;
+				}
+				#panel h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
+				#content{
+					overflow: auto;
+					position: absolute;
+					left: 0;
+					top: 60px;
+					right: 0;
+					bottom: 0;
+				}
+				#viewer{
+					position: absolute;
+					left: 0;
+					top: 56px;
+					width: 100%;
+					height: calc(100% - 56px);
+				}
+				#expandButton{
+					display: block;
+				}
+				#panel.collapsed{
+					height: 56px;
+				}
+			}
 
 		</style>
 	</head>
@@ -104,10 +186,14 @@
 
 		</script>
 
-		<div id="panel">
-			<div id="list">
-				<h1><a href="http://threejs.org">three.js</a> / examples</h1>
-			</div>
+		<div id="panel" class="collapsed">
+			<h1><a href="http://threejs.org">three.js</a> / examples</h1>
+			<a id="expandButton" href="#" >
+				<span></span>
+				<span></span>
+				<span></span>
+			</a>
+			<div id="content"></div>
 		</div>
 		<iframe id="viewer" allowfullscreen></iframe>
 
@@ -373,8 +459,16 @@
 
 		//
 
-		var list = document.getElementById( 'list' );
+		var content = document.getElementById( 'content' );
 		var viewer = document.getElementById( 'viewer' );
+
+		var expandButton = document.getElementById( 'expandButton' );
+		expandButton.addEventListener( 'click', function ( event ) {
+			panel.classList.toggle( 'collapsed' );
+			event.preventDefault();
+		} );
+
+		// iOS8 workaround
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
@@ -388,7 +482,7 @@
 		}
 
 		var container = document.createElement( 'div' );
-		list.appendChild( container );
+		content.appendChild( container );
 
 		var button = document.createElement( 'div' );
 		button.id = 'button';
@@ -428,6 +522,7 @@
 					div.textContent = name;
 					div.addEventListener( 'click', function () {
 
+						panel.classList.toggle( 'collapsed' );
 						load( file );
 
 					} );
