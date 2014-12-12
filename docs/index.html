@@ -12,7 +12,9 @@
 				font-style: normal;
 			}
 
-			*{ box-sizing: border-box;}
+			*{
+				box-sizing: border-box;
+			}
 
 			html {
 				height: 100%;
@@ -90,6 +92,7 @@
 			.filterBlock p {
 				margin: 0;
 			}
+
 			#filterInput {
 				width: 100%;
 				padding: 5px;
@@ -98,11 +101,13 @@
 				outline: none;
 				border: 1px solid #dedede;
 			}
+
 			#filterInput:focus{
 				border: 1px solid #2194CE;
 			}
+
 			#clearFilterButton {
-				position: absolute; 
+				position: absolute;
 				right: 6px;
 				top: 50%;
 				margin-top: -8px;
@@ -115,39 +120,45 @@
 				padding-top: 7px;
 				opacity: .5;
 			}
-			#clearFilterButton:hover{
+
+			#clearFilterButton:hover {
 				opacity: 1;
 			}
-			.filtered{
+
+			.filtered {
 				display: none;
 			}
-			#panel li b{
+
+			#panel li b {
 				font-weight: bold;
 			}
-			#expandButton{
+
+			#expandButton {
 				display: none;
 				position: absolute;
 				right: 20px;
 				top: 12px;
 				width: 32px;
 				height: 32px;
-				background-color: #2194CE;
 			}
-			#expandButton span{
-				height: 3px;
-				background-color: white;
+
+			#expandButton span {
+				height: 1px;
+				background-color: #2194CE;
 				width: 16px;
 				position: absolute;
 				left: 8px;
-				top: 8px;
+				top: 10px;
 			}
+
 			#expandButton span:nth-child(1) {
-				top: 14px;
+				top: 16px;
 			}
+
 			#expandButton span:nth-child(2) {
-				top: 20px;
-				width: 12px;
+				top: 22px;
 			}
+
 			@media all and ( max-width: 640px ) {
 				#panel{
 					position: absolute;
@@ -192,10 +203,12 @@
 	<body>
 
 		<div id="panel" class="collapsed">
-			<a id="expandButton" href="#" >
-				<span></span><span></span><span></span>
-			</a>
 			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
+			<a id="expandButton" href="#" >
+				<span></span>
+				<span></span>
+				<span></span>
+			</a>
 			<div class="filterBlock" >
 				<input type="text" id="filterInput" placeholder="Type to filter"/>
 				<a href="#" id="clearFilterButton" >x</a>
@@ -210,17 +223,14 @@
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
-			var clearFilterButton = document.getElementById( 'clearFilterButton' );
-			var filterInput = document.getElementById( 'filterInput' );
-			//filterInput.focus();
-
-			document.getElementById( 'expandButton' ).addEventListener( 'click', function( e ) {
+			var expandButton = document.getElementById( 'expandButton' );
+			expandButton.addEventListener( 'click', function( e ) {
 				panel.classList.toggle( 'collapsed' );
-				if( !panel.classList.contains( 'collapsed' ) ) {
-					//filterInput.focus();
-				}
 				e.preventDefault();
 			} );
+
+			var filterInput = document.getElementById( 'filterInput' );
+			var clearFilterButton = document.getElementById( 'clearFilterButton' );
 
 			var DELIMITER = '/';
 			var MEMBER_DELIMITER = '.';
