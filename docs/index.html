@@ -214,11 +214,6 @@
 			var filterInput = document.getElementById( 'filterInput' );
 			//filterInput.focus();
 
-			panel.addEventListener( 'click', function( e ) {
-				//filterInput.focus();
-				e.preventDefault();
-			} );
-
 			document.getElementById( 'expandButton' ).addEventListener( 'click', function( e ) {
 				panel.classList.toggle( 'collapsed' );
 				if( !panel.classList.contains( 'collapsed' ) ) {
