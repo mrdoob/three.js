@@ -41,9 +41,9 @@ THREE.STLLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
-		loader.setResponseType('arraybuffer');
+		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -51,7 +51,13 @@ THREE.STLLoader.prototype = {
 		}, onProgress, onError );
 
 	},
-	
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
 	parse: function ( data ) {
 
 		var isBinary = function () {
@@ -235,7 +241,7 @@ THREE.STLLoader.prototype = {
 		} else {
 			return buf;
 		}
-		
+
 	}
 
 };

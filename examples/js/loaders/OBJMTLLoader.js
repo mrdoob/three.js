@@ -19,14 +19,16 @@ THREE.OBJMTLLoader.prototype = {
 
 		var scope = this;
 
-		var mtlLoader = new THREE.MTLLoader( url.substr( 0, url.lastIndexOf( "/" ) + 1 ) );
+		var mtlLoader = new THREE.MTLLoader( this.manager );
+		mtlLoader.setBaseUrl( url.substr( 0, url.lastIndexOf( "/" ) + 1 ) );
+		mtlLoader.setCrossOrigin( this.crossOrigin );
 		mtlLoader.load( mtlurl, function ( materials ) {
 
 			var materialsCreator = materials;
 			materialsCreator.preload();
 
 			var loader = new THREE.XHRLoader( scope.manager );
-			loader.setCrossOrigin( this.crossOrigin );
+			loader.setCrossOrigin( scope.crossOrigin );
 			loader.load( url, function ( text ) {
 
 				var object = scope.parse( text );
@@ -52,6 +54,12 @@ THREE.OBJMTLLoader.prototype = {
 			}, onProgress, onError );
 
 		}, onProgress, onError );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
 
 	},
 

@@ -19,7 +19,7 @@ THREE.SVGLoader.prototype = {
 
 		var parser = new DOMParser();
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( svgString ) {
 
@@ -29,5 +29,11 @@ THREE.SVGLoader.prototype = {
 
 		}, onProgress, onError );
 
-	}
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
 };

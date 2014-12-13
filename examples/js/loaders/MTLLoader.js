@@ -4,11 +4,9 @@
  * @author angelxuanchang
  */
 
-THREE.MTLLoader = function( baseUrl, options, crossOrigin ) {
+THREE.MTLLoader = function( manager ) {
 
-	this.baseUrl = baseUrl;
-	this.options = options;
-	this.crossOrigin = crossOrigin;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -20,13 +18,31 @@ THREE.MTLLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader();
+		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setBaseUrl: function( value ) {
+
+		this.baseUrl = value;
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
+	setMaterialOptions: function ( value ) {
+
+		this.materialOptions = value;
 
 	},
 
@@ -86,7 +102,9 @@ THREE.MTLLoader.prototype = {
 
 		}
 
-		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options );
+		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.materialOptions );
+		materialCreator.setCrossOrigin( this.crossOrigin );
+		materialCreator.setManager( this.manager );
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -128,6 +146,18 @@ THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 THREE.MTLLoader.MaterialCreator.prototype = {
 
 	constructor: THREE.MTLLoader.MaterialCreator,
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
+	setManager: function ( value ) {
+
+		this.manager = value;
+
+	},
 
 	setMaterials: function( materialsInfo ) {
 
@@ -361,10 +391,11 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 	},
 
 
-	loadTexture: function ( url, mapping, onLoad, onError ) {
+	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 
 		var texture;
 		var loader = THREE.Loader.Handlers.get( url );
+		var manager = ( this.manager !== undefined ) ? this.manager : THREE.DefaultLoadingManager;
 
 		if ( loader !== null ) {
 
@@ -374,8 +405,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 			texture = new THREE.Texture();
 
-			loader = new THREE.ImageLoader();
-			loader.crossOrigin = this.crossOrigin;
+			loader = new THREE.ImageLoader( manager );
+			loader.setCrossOrigin( this.crossOrigin );
 			loader.load( url, function ( image ) {
 
 				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
@@ -383,7 +414,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 				if ( onLoad ) onLoad( texture );
 
-			} );
+			}, onProgress, onError );
 
 		}
 

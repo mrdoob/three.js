@@ -1,4 +1,4 @@
-/*    
+/*
  *	 PVRLoader
  *   Author: pierre lepers
  *   Date: 17/09/2014 11:09
@@ -8,8 +8,10 @@
  *   TODO : implement loadMipmaps option
  */
 
+THREE.PVRLoader = function ( manager ) {
 
-THREE.PVRLoader = function () {
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
 	this._parser = THREE.PVRLoader.parse;
 };
 
@@ -30,7 +32,7 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 	// PVR v3
 	if( header[0] === 0x03525650 ) {
 		return THREE.PVRLoader._parseV3( pvrDatas );
-	} 
+	}
 	// PVR v2
 	else if( header[11] === 0x21525650) {
 		return THREE.PVRLoader._parseV2( pvrDatas );
@@ -42,10 +44,10 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 };
 
 THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
-	
+
 	var header = pvrDatas.header;
 	var bpp, format;
-	
+
 
 	var metaLen 	  = header[12],
 		pixelFormat   =  header[2],
@@ -77,16 +79,16 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 	}
 
 	pvrDatas.dataPtr 	 = 52 + metaLen;
-  	pvrDatas.bpp 		 = bpp;
-  	pvrDatas.format 	 = format;
-  	pvrDatas.width 		 = width;
-  	pvrDatas.height 	 = height;
-  	pvrDatas.numSurfaces = numFaces;
-  	pvrDatas.numMipmaps  = numMipmaps;
+	pvrDatas.bpp 		 = bpp;
+	pvrDatas.format 	 = format;
+	pvrDatas.width 		 = width;
+	pvrDatas.height 	 = height;
+	pvrDatas.numSurfaces = numFaces;
+	pvrDatas.numMipmaps  = numMipmaps;
 
-  	pvrDatas.isCubemap 	= (numFaces === 6);
+	pvrDatas.isCubemap 	= (numFaces === 6);
 
-  	return THREE.PVRLoader._extract( pvrDatas );
+	return THREE.PVRLoader._extract( pvrDatas );
 };
 
 THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
@@ -129,35 +131,35 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 	}
 	else
 		throw new Error( "pvrtc - unknown format "+formatFlags);
-	
+
 
 
 	pvrDatas.dataPtr 	 = headerLength;
-  	pvrDatas.bpp 		 = bpp;
-  	pvrDatas.format 	 = format;
-  	pvrDatas.width 		 = width;
-  	pvrDatas.height 	 = height;
-  	pvrDatas.numSurfaces = numSurfs;
-  	pvrDatas.numMipmaps  = numMipmaps + 1;
+	pvrDatas.bpp 		 = bpp;
+	pvrDatas.format 	 = format;
+	pvrDatas.width 		 = width;
+	pvrDatas.height 	 = height;
+	pvrDatas.numSurfaces = numSurfs;
+	pvrDatas.numMipmaps  = numMipmaps + 1;
 
-  	// guess cubemap type seems tricky in v2
-  	// it juste a pvr containing 6 surface (no explicit cubemap type)
-  	pvrDatas.isCubemap 	= (numSurfs === 6);
+	// guess cubemap type seems tricky in v2
+	// it juste a pvr containing 6 surface (no explicit cubemap type)
+	pvrDatas.isCubemap 	= (numSurfs === 6);
 
-  	return THREE.PVRLoader._extract( pvrDatas );
+	return THREE.PVRLoader._extract( pvrDatas );
 
 };
 
 
 THREE.PVRLoader._extract = function ( pvrDatas ) {
-	
+
 	var pvr = {
-		mipmaps: [], 
-		width: pvrDatas.width, 
-		height: pvrDatas.height, 
-		format: pvrDatas.format, 
-		mipmapCount: pvrDatas.numMipmaps, 
-		isCubemap : pvrDatas.isCubemap 
+		mipmaps: [],
+		width: pvrDatas.width,
+		height: pvrDatas.height,
+		format: pvrDatas.format,
+		mipmapCount: pvrDatas.numMipmaps,
+		isCubemap : pvrDatas.isCubemap
 	};
 
 	var buffer = pvrDatas.buffer;
@@ -230,10 +232,10 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 			var byteArray = new Uint8Array( buffer, dataOffset, dataSize );
 
-			var mipmap = { 
-				data: byteArray, 
-				width: sWidth, 
-				height: sHeight 
+			var mipmap = {
+				data: byteArray,
+				width: sWidth,
+				height: sHeight
 			};
 
 			pvr.mipmaps[ surfIndex * pvrDatas.numMipmaps + mipLevel] = mipmap;

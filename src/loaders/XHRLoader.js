@@ -61,6 +61,7 @@ THREE.XHRLoader.prototype = {
 
 		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
 		if ( this.responseType !== undefined ) request.responseType = this.responseType;
+		if ( this.withCredentials !== undefined ) request.withCredentials = this.withCredentials;
 
 		request.send( null );
 
@@ -78,6 +79,12 @@ THREE.XHRLoader.prototype = {
 
 		this.crossOrigin = value;
 
-	}
+	},
+
+	setWithCredentials: function ( value ) {
+
+		this.withCredentials = value;
+
+	},
 
 };

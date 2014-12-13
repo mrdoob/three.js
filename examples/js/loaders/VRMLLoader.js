@@ -2,7 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VRMLLoader = function () {};
+THREE.VRMLLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.VRMLLoader.prototype = {
 
@@ -22,35 +26,23 @@ THREE.VRMLLoader.prototype = {
 
 	recordingFieldname: null,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			var object = scope.parse( event.target.responseText );
+			onLoad( scope.parse( text ) );
 
-			scope.dispatchEvent( { type: 'load', content: object } );
+		}, onProgress, onError );
 
-			if ( callback ) callback( object );
+	},
 
-		}, false );
+	setCrossOrigin: function ( value ) {
 
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		this.crossOrigin = value;
 
 	},
 
@@ -834,6 +826,3 @@ THREE.VRMLLoader.prototype = {
 	}
 
 };
-
-THREE.EventDispatcher.prototype.apply( THREE.VRMLLoader.prototype );
-

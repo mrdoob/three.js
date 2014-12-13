@@ -28,7 +28,7 @@ THREE.SceneLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
@@ -449,7 +449,7 @@ THREE.SceneLoader.prototype = {
 
 						} else if ( objJSON.target ) {
 
-						    camera.lookAt( new THREE.Vector3().fromArray( objJSON.target ) );
+							camera.lookAt( new THREE.Vector3().fromArray( objJSON.target ) );
 
 						}
 
