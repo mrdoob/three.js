@@ -1147,7 +1147,7 @@
 		this.id = "";
 		this.name = "";
 		this.nodes = [];
-		this.scene = new THREE.Scene();
+		this.scene = new THREE.Group();
 
 	};
 

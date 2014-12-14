@@ -187,25 +187,6 @@ THREE.SceneLoader.prototype = {
 
 						if ( objJSON.loading === undefined ) {
 
-							var reservedTypes = {
-								"type": 1, "url": 1, "material": 1,
-								"position": 1, "rotation": 1, "scale" : 1,
-								"visible": 1, "children": 1, "userData": 1,
-								"skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1
-							};
-
-							var loaderParameters = {};
-
-							for ( var parType in objJSON ) {
-
-								if ( ! ( parType in reservedTypes ) ) {
-
-									loaderParameters[ parType ] = objJSON[ parType ];
-
-								}
-
-							}
-
 							material = result.materials[ objJSON.material ];
 
 							objJSON.loading = true;
@@ -223,7 +204,7 @@ THREE.SceneLoader.prototype = {
 
 							} else {
 
-								loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ), loaderParameters );
+								loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ) );
 
 							}
 
@@ -872,20 +853,8 @@ THREE.SceneLoader.prototype = {
 
 			} else if ( geoJSON.type in this.geometryHandlers ) {
 
-				var loaderParameters = {};
-
-				for ( var parType in geoJSON ) {
-
-					if ( parType !== "type" && parType !== "url" ) {
-
-						loaderParameters[ parType ] = geoJSON[ parType ];
-
-					}
-
-				}
-
 				var loader = this.geometryHandlers[ geoJSON.type ][ "loaderObject" ];
-				loader.load( get_url( geoJSON.url, data.urlBaseType ), create_callback_geometry( geoID ), loaderParameters );
+				loader.load( get_url( geoJSON.url, data.urlBaseType ), create_callback_geometry( geoID ) );
 
 			} else if ( geoJSON.type === "embedded" ) {
 
