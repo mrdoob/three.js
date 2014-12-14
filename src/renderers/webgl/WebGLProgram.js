@@ -104,6 +104,11 @@ THREE.WebGLProgram = ( function () {
 					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
 					break;
 
+				case THREE.UVMapping:
+					console.warn( 'THREE.WebGLProgram: envMap.mapping shouldn\'t be THREE.UVMapping. Using THREE.CubeReflectionMapping instead.')
+					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+					break;
+
 			}
 
 		}
