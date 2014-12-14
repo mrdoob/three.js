@@ -19,7 +19,7 @@ THREE.JSONLoader.prototype = {
 
 		var scope = this;
 
-		this.texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : this.extractUrlBase( url );
+		var texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : THREE.Loader.prototype.extractUrlBase( url );
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
@@ -32,7 +32,7 @@ THREE.JSONLoader.prototype = {
 				return;
 			}
 
-			var object = scope.parse(json, texturePath);
+			var object = scope.parse( json, texturePath );
 			onLoad( object.geometry, object.materials );
 
 		} );
@@ -51,7 +51,7 @@ THREE.JSONLoader.prototype = {
 
 	},
 
-	parse = function ( json, texturePath ) {
+	parse: function ( json, texturePath ) {
 
 		var scope = this,
 		geometry = new THREE.Geometry(),
@@ -478,9 +478,9 @@ THREE.JSONLoader.prototype = {
 
 		} else {
 
-			var materials = this.initMaterials( json.materials, texturePath );
+			var materials = THREE.Loader.prototype.initMaterials( json.materials, texturePath, this.crossOrigin );
 
-			if ( this.needsTangents( materials ) ) {
+			if ( THREE.Loader.prototype.needsTangents( materials ) ) {
 
 				geometry.computeTangents();
 

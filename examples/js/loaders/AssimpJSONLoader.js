@@ -60,7 +60,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 	setTexturePath: function ( value ) {
 		this.texturePath = value;
-	}
+	},
 
 	extractUrlBase: function ( url ) { // from three/src/loaders/Loader.js
 		var parts = url.split( '/' );

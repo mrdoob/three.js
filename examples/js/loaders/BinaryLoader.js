@@ -684,7 +684,7 @@ THREE.BinaryLoader.prototype = {
 		Model.prototype.constructor = Model;
 
 		var geometry = new Model( texturePath );
-		var materials = THREE.Loader.prototype.initMaterials( jsonMaterials, texturePath );
+		var materials = THREE.Loader.prototype.initMaterials( jsonMaterials, texturePath, this.crossOrigin );
 
 		if ( THREE.Loader.prototype.needsTangents( materials ) ) geometry.computeTangents();
 
