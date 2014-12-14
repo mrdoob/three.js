@@ -25,6 +25,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'LineBasicMaterial';
+	this.shaderID = 'basic';
 
 	this.color = new THREE.Color( 0xffffff );
 

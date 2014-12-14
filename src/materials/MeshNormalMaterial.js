@@ -19,6 +19,7 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 	THREE.Material.call( this, parameters );
 
 	this.type = 'MeshNormalMaterial';
+	this.shaderID = 'normal';
 
 	this.shading = THREE.FlatShading;
 
