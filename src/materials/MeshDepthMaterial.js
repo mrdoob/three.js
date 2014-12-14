@@ -19,6 +19,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'MeshDepthMaterial';
+	this.shaderID = 'depth';
 
 	this.morphTargets = false;
 	this.wireframe = false;
@@ -29,6 +30,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 };
 
 THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshDepthMaterial.prototype.constructor = THREE.MeshDepthMaterial;
 
 THREE.MeshDepthMaterial.prototype.clone = function () {
 

@@ -40,6 +40,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'MeshBasicMaterial';
+	this.shaderID = 'basic';
 
 	this.color = new THREE.Color( 0xffffff ); // emissive
 
@@ -75,6 +76,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 };
 
 THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
 
 THREE.MeshBasicMaterial.prototype.clone = function () {
 

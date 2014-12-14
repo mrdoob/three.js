@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js editor</title>
+		<title>three.js / editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
@@ -36,6 +36,7 @@
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
+		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.editor.js"></script>
@@ -97,10 +98,8 @@
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			/*
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
-			*/
 
 			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
@@ -146,7 +145,7 @@
 				var timeout;
 
 				var saveState = function ( scene ) {
-				
+
 					if ( editor.config.getKey( 'autosave' ) === false ) {
 
 						return;

@@ -44,6 +44,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'MeshLambertMaterial';
+	this.shaderID = 'lambert';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.ambient = new THREE.Color( 0xffffff );
@@ -85,6 +86,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 };
 
 THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.MeshLambertMaterial.prototype.constructor = THREE.MeshLambertMaterial;
 
 THREE.MeshLambertMaterial.prototype.clone = function () {
 

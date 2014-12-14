@@ -150,41 +150,36 @@
 		<h3>[property:ShadowMapPlugin shadowMapPlugin]</h3>
 		<div>
 		This contains the reference to the shadowMapPlugin.
-		</div> 
+		</div>
 
-
-		<h3>[property:number devicePixelRatio]</h3>
-		<div>
-		The pixel ration of the devices. 
-		</div> 
 
 		<h2>Methods</h2>
 
-		<h3>[method:todo getContext]()</h3>
+		<h3>[method:WebGLRenderingContext getContext]()</h3>
 		<div>
 		Return the WebGL context.
 		</div>
 
-		<h3>[method:todo supportsVertexTextures]()</h3>
+		<h3>[method:Boolean supportsVertexTextures]()</h3>
 		<div>
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
 
 
-		<h3>[method:todo setSize]( [page:Integer width], [page:Integer height] )</h3>
+		<h3>[method:null setSize]( [page:Integer width], [page:Integer height] )</h3>
 		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).</div>
 
-		<h3>[method:todo setViewport]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
+		<h3>[method:null setViewport]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the viewport to render from (x, y) to (x + width, y + height).</div>
 
 
-		<h3>[method:todo setScissor]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
+		<h3>[method:null setScissor]( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
 		<div>Sets the scissor area from (x, y) to (x + width, y + height).</div>
 
-		<h3>[method:todo enableScissorTest]( [page:Boolean enable] )</h3>
+		<h3>[method:null enableScissorTest]( [page:Boolean enable] )</h3>
 		<div>Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
 
-		<h3>[method:todo setClearColor]( [page:Color color], [page:Float alpha] )</h3>
+		<h3>[method:null setClearColor]( [page:Color color], [page:Float alpha] )</h3>
 		<div>Sets the clear color and opacity.</div>
 
 		<code>// Creates a renderer with red background
@@ -199,11 +194,11 @@
 		<h3>[method:Float getClearAlpha]()</h3>
 		<div>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</div>
 
-		<h3>[method:todo clear]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
+		<h3>[method:null clear]( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
 		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
 		<div>Arguments default to true.</div>
 
-		<h3>[method:todo renderBufferImmediate]( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
+		<h3>[method:null renderBufferImmediate]( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
 		<div>object — an instance of [page:Object3D]]<br />
 		program — an instance of shaderProgram<br />
 		shading — an instance of Material<br />
@@ -213,45 +208,25 @@
 		</div>
 
 
-		<h3>[method:todo renderBufferDirect]( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
+		<h3>[method:null renderBufferDirect]( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
 		<div>Render a buffer geometry group using the camera and with the correct material.</div>
 
 
-		<h3>[method:todo renderBuffer]( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
+		<h3>[method:null renderBuffer]( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
 		<div>Render a geometry group using the camera and with the correct material.</div>
 
 
-		<h3>[method:todo render]( [page:Scene scene], [page:Camera camera], [page:WebGLRenderTarget renderTarget], [page:Boolean forceClear] )</h3>
+		<h3>[method:null render]( [page:Scene scene], [page:Camera camera], [page:WebGLRenderTarget renderTarget], [page:Boolean forceClear] )</h3>
 		<div>Render a scene using a camera.</div>
 		<div>The render is done to the renderTarget (if specified) or to the canvas as usual.</div>
 		<div>If forceClear is true, the depth, stencil and color buffers will be cleared before rendering even if the renderer's autoClear property is false.</div>
 		<div>Even with forceClear set to true you can prevent certain buffers being cleared by setting either the .autoClearColor, .autoClearStencil or .autoClearDepth properties to false.</div>
 
-		<h3>[method:todo renderImmediateObject]( camera, lights, fog, material, object )</h3>
+		<h3>[method:null renderImmediateObject]( camera, lights, fog, material, object )</h3>
 		<div>Renders an immediate Object using a camera.</div>
 
 
-		<h3>[method:todo initWebGLObjects]( [page:Scene scene] )</h3>
-		<div>
-		[page:Scene scene] -- The scene to initialize.
-		</div>
-		<div>
-		This method initializes the scene. This means adding and removing all objects from the scene and updating them to make sure we have the correct webgl buffers. 
-		</div>
-
-
-		<h3>[method:todo initMaterial]( [page:Material material], [page:Array lights], [page:Fog fog], [page:Object3D object])</h3>
-		<div>
-		[page:Material material] -- The material to initialize.<br />
-		[page:Array lights] -- An array of lights that influence the material.<br />
-		[page:Fog fog] -- The fog of the scene.<br />
-		[page:Object3D object] -- The object of the material that needs init.
-		</div>
-		<div>
-		This method initializes the material as a webgl program to be used.
-		</div>
-
-		<h3>[method:todo setFaceCulling]( cullFace, frontFace )</h3>
+		<h3>[method:null setFaceCulling]( cullFace, frontFace )</h3>
 		<div>
 		[page:String cullFace] —- "back", "front", "front_and_back", or false.<br />
 		[page:String frontFace] —- "ccw" or "cw<br />
@@ -260,7 +235,7 @@
 		<div>If cullFace is false, culling will be disabled.</div>
 
 
-		<h3>[method:todo setDepthTest]( [page:boolean depthTest] )</h3>
+		<h3>[method:null setDepthTest]( [page:boolean depthTest] )</h3>
 		<div>
 		depthTest -- The boolean to decide if depth of a fragment needs to be tested against the depth buffer . <br />
 		</div>
@@ -268,7 +243,7 @@
 		This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer.
 		</div>
 
-		<h3>[method:todo setDepthWrite]( [page:boolean depthWrite] )</h3>
+		<h3>[method:null setDepthWrite]( [page:boolean depthWrite] )</h3>
 		<div>
 		depthWrite -- The boolean to decide if depth of a fragment needs to be kept. <br />
 		</div>
@@ -277,7 +252,7 @@
 		</div>
 
 
-		<h3>[method:todo setBlending]( [page:number blending], [page:number blendEquation], [page:number blendSrc], [page:number blendDst] )</h3>
+		<h3>[method:null setBlending]( [page:number blending], [page:number blendEquation], [page:number blendSrc], [page:number blendDst] )</h3>
 		<div>
 		blending -- A number indicating the blending mode. Possible value are THREE.NoBlending, THREE.NormalBlending, THREE.AdditiveBlending, THREE.SubtractiveBlending, THREE.MultiplyBlending or THREE.CustomBlending <br />
 		blendEquation -- When blending is THREE.CustomBlending, then you can set the blendEquation. Possible values are THREE.AddEquation, THREE.SubtractEquation or THREE.ReverseSubtractEquation.<br />
@@ -287,8 +262,8 @@
 		<div>
 		This method sets the correct blending.
 		</div>
-		
-		<h3>[method:todo setTexture]( [page:Texture texture], [page:number slot] )</h3>
+
+		<h3>[method:null setTexture]( [page:Texture texture], [page:number slot] )</h3>
 		<div>
 		texture -- The [page:Texture texture] that needs to be set.<br />
 		slot -- The number indicating which slot should be used by the texture.
@@ -296,8 +271,8 @@
 		<div>
 		This method sets the correct texture to the correct slot for the wegl shader. The slot number can be found as a value of the uniform of the sampler.
 		</div>
-		
-		<h3>[method:todo setRenderTarget]( [page:WebGLRenderTarget renderTarget] )</h3>
+
+		<h3>[method:null setRenderTarget]( [page:WebGLRenderTarget renderTarget] )</h3>
 		<div>
 		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated.<br />
 		</div>
@@ -320,9 +295,9 @@
 		This gets the precision used by the shaders. It returns "highp","mediump" or "lowp".
 		</div>
 
-		<h3>[method:todo setMaterialFaces]([page:Material material])</h3>
+		<h3>[method:null setMaterialFaces]([page:Material material])</h3>
 		<div>
-		material -- The [page:Material material] with side that shouldn't be culled.  
+		material -- The [page:Material material] with side that shouldn't be culled.
 		</div>
 		<div>
 		This sets which side needs to be culled in the webgl renderer.
@@ -338,7 +313,7 @@
 		This method returns true if the webgl implementation supports float textures.
 		</div>
 
-		<h3>[method:todo clearTarget]([page:WebGLRenderTarget renderTarget], [page:boolean color], [page:boolean depth], [page:boolean stencil])</h3>
+		<h3>[method:null clearTarget]([page:WebGLRenderTarget renderTarget], [page:boolean color], [page:boolean depth], [page:boolean stencil])</h3>
 		<div>
 		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be cleared.<br />
 		color -- If set, then the color gets cleared. <br />

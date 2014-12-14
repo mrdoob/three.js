@@ -23,6 +23,7 @@ THREE.CSS3DObject = function ( element ) {
 };
 
 THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject;
 
 THREE.CSS3DSprite = function ( element ) {
 
@@ -31,6 +32,7 @@ THREE.CSS3DSprite = function ( element ) {
 };
 
 THREE.CSS3DSprite.prototype = Object.create( THREE.CSS3DObject.prototype );
+THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 
 //
 

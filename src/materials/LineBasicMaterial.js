@@ -25,6 +25,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'LineBasicMaterial';
+	this.shaderID = 'basic';
 
 	this.color = new THREE.Color( 0xffffff );
 
@@ -41,6 +42,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 };
 
 THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.LineBasicMaterial.prototype.constructor = THREE.LineBasicMaterial;
 
 THREE.LineBasicMaterial.prototype.clone = function () {
 
