@@ -44,6 +44,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'MeshLambertMaterial';
+	this.shaderID = 'lambert';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.ambient = new THREE.Color( 0xffffff );

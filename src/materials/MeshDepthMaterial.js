@@ -19,6 +19,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'MeshDepthMaterial';
+	this.shaderID = 'depth';
 
 	this.morphTargets = false;
 	this.wireframe = false;

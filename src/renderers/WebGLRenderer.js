@@ -4127,41 +4127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.addEventListener( 'dispose', onMaterialDispose );
 
-		var shaderID;
-
-		if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			shaderID = 'depth';
-
-		} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-			shaderID = 'normal';
-
-		} else if ( material instanceof THREE.MeshBasicMaterial ) {
-
-			shaderID = 'basic';
-
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-			shaderID = 'lambert';
-
-		} else if ( material instanceof THREE.MeshPhongMaterial ) {
-
-			shaderID = 'phong';
-
-		} else if ( material instanceof THREE.LineBasicMaterial ) {
-
-			shaderID = 'basic';
-
-		} else if ( material instanceof THREE.LineDashedMaterial ) {
-
-			shaderID = 'dashed';
-
-		} else if ( material instanceof THREE.PointCloudMaterial ) {
-
-			shaderID = 'particle_basic';
-
-		}
+		var shaderID = material.shaderID;
 
 		if ( shaderID ) {
 

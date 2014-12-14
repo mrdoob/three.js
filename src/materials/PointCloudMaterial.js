@@ -24,6 +24,7 @@ THREE.PointCloudMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'PointCloudMaterial';
+	this.shaderID = 'particle_basic';
 
 	this.color = new THREE.Color( 0xffffff );
 
