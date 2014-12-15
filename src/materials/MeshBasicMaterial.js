@@ -40,6 +40,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	THREE.Material.call( this );
 
 	this.type = 'MeshBasicMaterial';
+	this.shaderID = 'basic';
 
 	this.color = new THREE.Color( 0xffffff ); // emissive
 
