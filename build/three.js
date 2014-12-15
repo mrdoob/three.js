@@ -24664,6 +24664,10 @@ THREE.WebGLProgram = ( function () {
 					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
 					break;
 
+				default:
+					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+					break;
+
 			}
 
 		}
