@@ -937,7 +937,9 @@ THREE.SceneLoader.prototype = {
 				if ( loader !== null ) {
 
 					texture = loader.load( url_array, generateTextureCallback( count ) );
-					texture.mapping = textureJSON.mapping;
+
+					if ( textureJSON.mapping !== undefined )
+						texture.mapping = textureJSON.mapping;
 
 				} else {
 
@@ -977,7 +979,8 @@ THREE.SceneLoader.prototype = {
 
 				}
 
-				texture.mapping = textureJSON.mapping;
+				if ( textureJSON.mapping !== undefined )
+					texture.mapping = textureJSON.mapping;
 
 				if ( THREE[ textureJSON.minFilter ] !== undefined )
 					texture.minFilter = THREE[ textureJSON.minFilter ];
