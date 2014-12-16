@@ -122,6 +122,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.StereoEffect( renderer );

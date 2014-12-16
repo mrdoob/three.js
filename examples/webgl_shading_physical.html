@@ -342,6 +342,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.domElement.style.position = "absolute";

@@ -170,9 +170,9 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color, 1 );
-
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//

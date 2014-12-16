@@ -115,10 +115,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				renderer.setClearColor( scene.fog.color, 1 );
-
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 

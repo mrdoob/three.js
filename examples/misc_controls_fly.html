@@ -233,6 +233,7 @@
 				}
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.sortObjects = false;
 

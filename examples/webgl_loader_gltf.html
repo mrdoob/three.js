@@ -184,6 +184,7 @@
                 // RENDERER
 
                 renderer = new THREE.WebGLRenderer({antialias:true});
+				renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( container.offsetWidth, container.offsetHeight );
 
                 if (sceneInfo.shadows) {

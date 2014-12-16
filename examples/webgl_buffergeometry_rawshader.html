@@ -152,14 +152,14 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x101010 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				onWindowResize();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

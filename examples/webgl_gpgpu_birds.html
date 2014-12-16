@@ -505,8 +505,9 @@
 				scene.fog = new THREE.Fog( 0xffffff, 100, 1000 );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				simulator = new SimulationRenderer(WIDTH, renderer);

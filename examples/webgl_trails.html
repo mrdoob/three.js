@@ -70,6 +70,7 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				renderer.autoClearColor = false;

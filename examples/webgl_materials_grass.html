@@ -67,6 +67,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.sortObjects = false;
 				renderer.setClearColor( 0x003300 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
