@@ -21108,7 +21108,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				influence = influences[ i ];
 
-				if ( influence > 0 ) {
+				if ( influence !== 0 ) {
 
 					activeInfluenceIndices.push( [ influence, i ] );
 
