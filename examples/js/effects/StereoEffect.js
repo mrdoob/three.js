@@ -11,12 +11,31 @@ THREE.StereoEffect = function ( renderer ) {
 
 	// API
 
-	this.eyeSeparation = 3;
+	var scope = this;
 
-	/*
-	 * Distance to the non-parallax or projection plane
-	 */
-	this.focalLength = 15;
+	this.eyeSeparation = 3;
+	this.focalLength = 15; 	// Distance to the non-parallax or projection plane
+
+	Object.defineProperties( this, {
+		separation: {
+			get: function () {
+				return scope.eyeSeparation;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE.StereoEffect: .separation is now .eyeSeparation.' );
+				scope.eyeSeparation = value;
+			}
+		},
+		targetDistance: {
+			get: function () {
+				return scope.focalLength;
+			},
+			set: function ( value ) {
+				console.warn( 'THREE.StereoEffect: .targetDistance is now .focalLength.' );
+				scope.focalLength = value;
+			}
+		}
+	} );
 
 	// internals
 
@@ -55,9 +74,8 @@ THREE.StereoEffect = function ( renderer ) {
 	
 		camera.matrixWorld.decompose( _position, _quaternion, _scale );
 
-		// Stereo frustum calculation
-
 		// Effective fov of the camera
+
 		_fov = THREE.Math.radToDeg( 2 * Math.atan( Math.tan( THREE.Math.degToRad( camera.fov ) * 0.5 ) / camera.zoom ) );
 
 		_ndfl = camera.near / this.focalLength;
