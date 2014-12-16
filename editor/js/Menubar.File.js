@@ -215,46 +215,46 @@ Menubar.File = function ( editor ) {
 			'		<script src="js/three.min.js"></script>',
 			'		<script src="js/OrbitControls.js"></script>',
 			'		<script>',
-
+			'',
 			'			var camera, controls, scene, renderer;',
-
+			'',
 			'			var loader = new THREE.ObjectLoader();',
 			'			loader.load( \'scene.json\', function ( object ) {',
-
+			'',
 			'				scene = object;',
-
+			'',
 			'				camera = new THREE.PerspectiveCamera( ' + camera.fov + ', 1, ' + camera.near + ', ' + camera.far + ' );',
 			'				camera.position.set( ' + camera.position.x + ', ' + camera.position.y + ', ' + camera.position.z + ' );',
 			'				camera.rotation.set( ' + camera.rotation.x + ', ' + camera.rotation.y + ', ' + camera.rotation.z + ' );',
-
+			'',
 			'				controls = new THREE.OrbitControls( camera );',
 			'				controls.addEventListener( \'change\', render );',
-
+			'',
 			'				renderer = new THREE.WebGLRenderer();',
 			'				renderer.setSize( window.innerWidth, window.innerHeight );',
 			'				document.body.appendChild( renderer.domElement );',
-
+			'',
 			'				camera.aspect = window.innerWidth / window.innerHeight;',
 			'				camera.updateProjectionMatrix();',
-
+			'',
 			'				animate();',
 			'				render();',
-			
+			'',
 			'			} );',
-
+			'',
 			'			var render = function () {',
-
+			'',
 			'				renderer.render( scene, camera );',
-
+			'',
 			'			};',
-
+			'',
 			'			var animate = function () {',
-
+			'',
 			'				requestAnimationFrame( animate );',
 			'				controls.update();',
-
+			'',
 			'			};',
-
+			'',
 			'		</script>',
 			'	</body>',
 			'</html>'
