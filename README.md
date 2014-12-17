@@ -45,6 +45,8 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 		renderer.setSize( window.innerWidth, window.innerHeight );
 
 		document.body.appendChild( renderer.domElement );
+		
+		animate();
 
 	}
 
