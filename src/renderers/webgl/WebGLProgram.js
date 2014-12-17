@@ -84,7 +84,8 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		var envMapTypeDefine = null;
+		var envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+		var envMapBlendingDefine = "ENVMAP_BLENDING_MULTIPLY";
 
 		if ( parameters.envMap ) {
 
@@ -104,8 +105,20 @@ THREE.WebGLProgram = ( function () {
 					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
 					break;
 
-				default:
-					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+			}
+
+			switch ( material.combine ) {
+
+				case THREE.MultiplyOperation:
+					envMapBlendingDefine = "ENVMAP_BLENDING_MULTIPLY";
+					break;
+
+				case THREE.MixOperation:
+					envMapBlendingDefine = "ENVMAP_BLENDING_MIX";
+					break;
+
+				case THREE.AddOperation:
+					envMapBlendingDefine = "ENVMAP_BLENDING_ADD";
 					break;
 
 			}
@@ -261,7 +274,8 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
-				envMapTypeDefine ? "#define " + envMapTypeDefine : "",
+				parameters.envMap ? "#define " + envMapTypeDefine : "",
+				parameters.envMap ? "#define " + envMapBlendingDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",

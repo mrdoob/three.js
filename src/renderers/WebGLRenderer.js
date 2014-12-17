@@ -4109,6 +4109,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 
+			combine: material.combine,
+
 			vertexColors: material.vertexColors,
 
 			fog: fog,
@@ -4603,7 +4605,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.refractionRatio.value = material.refractionRatio;
-		uniforms.combine.value = material.combine;
 		uniforms.useRefract.value = material.envMap && (
 			material.envMap.mapping === THREE.CubeRefractionMapping ||
 			material.envMap.mapping === THREE.EquirectangularRefractionMapping );

@@ -53,18 +53,18 @@
 
 	#endif
 
-	if ( combine == 1 ) {
-
-		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );
-
-	} else if ( combine == 2 ) {
-
-		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;
-
-	} else {
+	#ifdef ENVMAP_BLENDING_MULTIPLY
 
 		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * envColor.xyz, specularStrength * reflectivity );
 
-	}
+	#elif defined( ENVMAP_BLENDING_MIX )
+
+		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );
+
+	#elif defined( ENVMAP_BLENDING_ADD )
+
+		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;
+
+	#endif
 
 #endif
