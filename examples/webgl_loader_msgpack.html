@@ -121,7 +121,7 @@ https://github.com/creationix/msgpack-js-browser
 				camera.aspect = container.offsetWidth / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				render();
 
 			}
@@ -136,7 +136,7 @@ https://github.com/creationix/msgpack-js-browser
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true	} );
 				renderer.setClearColor( 0x000000, 0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				var aspect = container.offsetWidth / container.offsetHeight;

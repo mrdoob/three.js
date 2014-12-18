@@ -132,14 +132,14 @@
 					try {
 
 						webglRenderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-						renderer.setPixelRatio( window.devicePixelRatio );
+						webglRenderer.setPixelRatio( window.devicePixelRatio );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;
 
-					}
-					catch (e) {
+					} catch (e) {
+
 					}
 				}
 

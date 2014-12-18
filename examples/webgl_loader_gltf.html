@@ -185,7 +185,7 @@
 
                 renderer = new THREE.WebGLRenderer({antialias:true});
 				renderer.setPixelRatio( window.devicePixelRatio );
-                renderer.setSize( container.offsetWidth, container.offsetHeight );
+                renderer.setSize( window.innerWidth, window.innerHeight );
 
                 if (sceneInfo.shadows) {
 	                renderer.shadowMapEnabled = true;
@@ -320,7 +320,7 @@
 					cameras[i].updateProjectionMatrix();
 				}
 				
-				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
