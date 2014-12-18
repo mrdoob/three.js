@@ -4103,6 +4103,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			map: !! material.map,
 			envMap: !! material.envMap,
+			envMapMode: material.envMap && material.envMap.mapping,
 			lightMap: !! material.lightMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
@@ -4605,9 +4606,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.refractionRatio.value = material.refractionRatio;
-		uniforms.useRefract.value = material.envMap && (
-			material.envMap.mapping === THREE.CubeRefractionMapping ||
-			material.envMap.mapping === THREE.EquirectangularRefractionMapping );
 
 	}
 

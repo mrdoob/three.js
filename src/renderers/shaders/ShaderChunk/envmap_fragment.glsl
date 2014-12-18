@@ -11,15 +11,15 @@
 
 		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );
 
-		if ( useRefract ) {
-
-			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );
-
-		} else { 
+		#ifdef ENVMAP_MODE_REFLECTION
 
 			reflectVec = reflect( cameraToVertex, worldNormal );
 
-		}
+		#elif defined( ENVMAP_MODE_REFRACTION )
+
+			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );
+
+		#endif
 
 	#else
 

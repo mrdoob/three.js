@@ -5,14 +5,14 @@
 
 	vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );
 
-	if ( useRefract ) {
-
-		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );
-
-	} else {
+	#ifdef ENVMAP_MODE_REFLECTION
 
 		vReflect = reflect( cameraToVertex, worldNormal );
 
-	}
+	#elif defined( ENVMAP_MODE_REFRACTION )
+
+		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );
+
+	#endif
 
 #endif

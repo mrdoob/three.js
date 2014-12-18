@@ -628,7 +628,6 @@ THREE.ShaderLib = {
 			"shininess": { type: "f", value: 30 },
 			"opacity": { type: "f", value: 1 },
 
-			"useRefract": { type: "i", value: 0 },
 			"refractionRatio": { type: "f", value: 0.98 },
 			"reflectivity": { type: "f", value: 0.5 },
 
@@ -663,7 +662,6 @@ THREE.ShaderLib = {
 
 			"uniform vec2 uNormalScale;",
 
-			"uniform bool useRefract;",
 			"uniform float refractionRatio;",
 			"uniform float reflectivity;",
 
@@ -1031,15 +1029,15 @@ THREE.ShaderLib = {
 			"		vec3 vReflect;",
 			"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
-			"		if ( useRefract ) {",
-
-			"			vReflect = refract( cameraToVertex, normal, refractionRatio );",
-
-			"		} else {",
+			"		#ifdef ENVMAP_MODE_REFLECTION",
 
 			"			vReflect = reflect( cameraToVertex, normal );",
 
-			"		}",
+			"		#elif defined( ENVMAP_MODE_REFRACTION )",
+
+			"			vReflect = refract( cameraToVertex, normal, refractionRatio );",
+
+			"		#endif",
 
 			"		vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
 
