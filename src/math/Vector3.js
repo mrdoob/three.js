@@ -527,9 +527,9 @@ THREE.Vector3.prototype = {
 
 	roundToZero: function () {
 
-		this.x = this.x | 0;
-		this.y = this.y | 0;
-		this.z = this.z | 0;
+		this.x |= 0;
+		this.y |= 0;
+		this.z |= 0;
 
 		return this;
 
