@@ -113,7 +113,7 @@ THREE.Ray.prototype = {
 		var det = Math.abs( 1 - a01 * a01 );
 		var s0, s1, sqrDist, extDet;
 
-		if ( det >= 0 ) {
+		if ( det > 0 ) {
 
 			// The ray and segment are not parallel.
 
