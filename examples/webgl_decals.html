@@ -44,7 +44,6 @@
 			normal: new THREE.Vector3()
 		};
 		var controls;
-		var mouseVector = new THREE.Vector3();
 		var mouse = new THREE.Vector2();
 
 		var decalDiffuse = THREE.ImageUtils.loadTexture( 'textures/decal/decal-diffuse.png' );
@@ -103,9 +102,10 @@
 			camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.position.z = 100;
 			camera.target = new THREE.Vector3();
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-			scene.add( camera );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 50;
+			controls.maxDistance = 200;
 
 			var light = new THREE.HemisphereLight( 0xffddcc, 0x111122 );
 			light.position.set( 1, 0.75, 0.5 );
@@ -121,8 +121,8 @@
 			raycaster = new THREE.Raycaster();
 
 			mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
-			scene.add( mouseHelper );
 			mouseHelper.visible = false;
+			scene.add( mouseHelper );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
@@ -171,9 +171,7 @@
 
 				if( !mesh ) return;
 
-				mouseVector.set( mouse.x, mouse.y, 1 ).unproject( camera );
-
-				raycaster.set( camera.position, mouseVector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( [ mesh ] );
 

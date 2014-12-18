@@ -79,16 +79,15 @@ var Viewport = function ( editor ) {
 	// object picking
 
 	var raycaster = new THREE.Raycaster();
+	var mouse = new THREE.Vector2();
 
 	// events
 
 	var getIntersects = function ( point, object ) {
 
-		var vector = new THREE.Vector3();
-		vector.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1, 0.5 );
-		vector.unproject( camera );
+		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
 
-		raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+		raycaster.setFromCamera( mouse, camera );
 
 		if ( object instanceof Array ) {
 

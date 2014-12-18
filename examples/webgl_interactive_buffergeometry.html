@@ -268,9 +268,7 @@
 				mesh.rotation.x = time * 0.15;
 				mesh.rotation.y = time * 0.25;
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
-
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObject( mesh );
 
