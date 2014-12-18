@@ -76,7 +76,7 @@ THREE.Vector2.prototype = {
 
 	add: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
@@ -110,7 +110,7 @@ THREE.Vector2.prototype = {
 
 	sub: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
@@ -164,10 +164,8 @@ THREE.Vector2.prototype = {
 
 		if ( scalar !== 0 ) {
 
-			var invScalar = 1 / scalar;
-
-			this.x *= invScalar;
-			this.y *= invScalar;
+			this.x /= scalar;
+			this.y /= scalar;
 
 		} else {
 
@@ -249,7 +247,7 @@ THREE.Vector2.prototype = {
 
 		return function ( minVal, maxVal ) {
 
-			if ( min === undefined ) {
+			if ( min === void(0) ) {
 
 				min = new THREE.Vector2();
 				max = new THREE.Vector2();
@@ -294,8 +292,8 @@ THREE.Vector2.prototype = {
 
 	roundToZero: function () {
 
-		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+		this.x = this.x | 0; // n < 0 : ceil(n) : floor(n)
+		this.y = this.y | 0; // n < 0 : ceil(n) : floor(n)
 
 		return this;
 
@@ -377,7 +375,7 @@ THREE.Vector2.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === void(0) ) offset = 0;
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -388,8 +386,8 @@ THREE.Vector2.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === void(0)) array = [];
+		if ( offset === void(0)) offset = 0;
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -400,15 +398,12 @@ THREE.Vector2.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
-
-	    index = index * attribute.itemSize + offset;
+	    index = index * attribute.itemSize + (offset || 0);
 
 	    this.x = attribute.array[ index ];
 	    this.y = attribute.array[ index + 1 ];
 
 	    return this;
-
 	},
 
 	clone: function () {
