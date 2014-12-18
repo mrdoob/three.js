@@ -1,7 +1,5 @@
 #ifdef USE_ENVMAP
 
-	vec3 reflectVec;
-
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )
 
 		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );
@@ -13,17 +11,17 @@
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
-			reflectVec = reflect( cameraToVertex, worldNormal );
+			vec3 reflectVec = reflect( cameraToVertex, worldNormal );
 
-		#elif defined( ENVMAP_MODE_REFRACTION )
+		#else
 
-			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );
+			vec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );
 
 		#endif
 
 	#else
 
-		reflectVec = vReflect;
+		vec3 reflectVec = vReflect;
 
 	#endif
 

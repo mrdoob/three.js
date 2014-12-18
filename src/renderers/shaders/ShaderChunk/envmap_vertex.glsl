@@ -9,7 +9,7 @@
 
 		vReflect = reflect( cameraToVertex, worldNormal );
 
-	#elif defined( ENVMAP_MODE_REFRACTION )
+	#else
 
 		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );
 

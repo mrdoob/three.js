@@ -345,6 +345,8 @@ THREE.WebGLProgram = ( function () {
 		if ( _gl.getProgramInfoLog( program ) !== '' ) {
 
 			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
+			// console.warn( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+			// console.warn( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
 		}
 

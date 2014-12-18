@@ -1026,16 +1026,15 @@ THREE.ShaderLib = {
 
 			"	if ( enableReflection ) {",
 
-			"		vec3 vReflect;",
 			"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
 			"		#ifdef ENVMAP_MODE_REFLECTION",
 
-			"			vReflect = reflect( cameraToVertex, normal );",
+			"			vec3 vReflect = reflect( cameraToVertex, normal );",
 
-			"		#elif defined( ENVMAP_MODE_REFRACTION )",
+			"		#else",
 
-			"			vReflect = refract( cameraToVertex, normal, refractionRatio );",
+			"			vec3 vReflect = refract( cameraToVertex, normal, refractionRatio );",
 
 			"		#endif",
 

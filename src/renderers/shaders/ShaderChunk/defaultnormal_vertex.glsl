@@ -1,20 +1,14 @@
-vec3 objectNormal;
-
 #ifdef USE_SKINNING
 
-	objectNormal = skinnedNormal.xyz;
+	vec3 objectNormal = skinnedNormal.xyz;
 
-#endif
+#elif defined( USE_MORPHNORMALS )
 
-#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )
+	vec3 objectNormal = morphedNormal;
 
-	objectNormal = morphedNormal;
+#else
 
-#endif
-
-#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )
-
-	objectNormal = normal;
+	vec3 objectNormal = normal;
 
 #endif
 
