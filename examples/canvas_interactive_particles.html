@@ -28,6 +28,7 @@
 			var camera, scene, renderer;
 
 			var raycaster;
+			var mouse;
 
 			var PI2 = Math.PI * 2;
 
@@ -48,7 +49,7 @@
 
 			}
 
-			var mouse = { x: 0, y: 0 }, INTERSECTED;
+			var INTERSECTED;
 
 			init();
 			animate();
@@ -85,6 +86,7 @@
 				//
 				
 				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
@@ -148,13 +150,11 @@
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
-				// find intersections
-
 				camera.updateMatrixWorld();
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
+				// find intersections
 
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

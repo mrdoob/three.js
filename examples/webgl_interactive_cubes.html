@@ -133,11 +133,11 @@
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
+				camera.updateMatrixWorld();
+
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
-
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

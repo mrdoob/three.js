@@ -42,7 +42,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> canvas - interactive lines';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive lines';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -52,21 +52,21 @@
 				var geometry = new THREE.SphereGeometry( 5 );
 				var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
-				sphereInter = new THREE.Mesh( geometry, material );
-				sphereInter.visible = false;
-				scene.add( sphereInter );
+				//sphereInter = new THREE.Mesh( geometry, material );
+				//sphereInter.visible = false;
+				//scene.add( sphereInter );
 
 				var geometry = new THREE.Geometry();
 
 				var point = new THREE.Vector3();
 				var direction = new THREE.Vector3();
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( var i = 0; i < 50; i ++ ) {
 
 					direction.x += Math.random() - 0.5;
 					direction.y += Math.random() - 0.5;
 					direction.z += Math.random() - 0.5;
-					direction.normalize().multiplyScalar( 5 );
+					direction.normalize().multiplyScalar( 10 );
 
 					point.add( direction );
 
@@ -111,7 +111,7 @@
 				scene.add( parentTransform );
 
 				raycaster = new THREE.Raycaster();
-				raycaster.linePrecision = 3;
+				raycaster.linePrecision = 1;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
@@ -170,11 +170,11 @@
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
+				camera.updateMatrixWorld();
+
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
-
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( parentTransform.children, true);
 
@@ -189,8 +189,8 @@
 					currentIntersected = intersects[ 0 ].object;
 					currentIntersected.material.linewidth = 5;
 
-					sphereInter.visible = true;
-					sphereInter.position.copy( intersects[ 0 ].point );
+					//sphereInter.visible = true;
+					//sphereInter.position.copy( intersects[ 0 ].point );
 
 				} else {
 
@@ -202,7 +202,7 @@
 
 					currentIntersected = undefined;
 
-					sphereInter.visible = false;
+					//sphereInter.visible = false;
 
 				}
 

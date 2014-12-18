@@ -36,7 +36,10 @@
 				searchMesh,
 				baseR = 255, baseG = 0, baseB = 255,
 				foundR = 0, foundG = 255, foundB = 0,
-				adding = true;
+				adding = true,
+				rayCaster = new THREE.Raycaster(),
+				origin = new THREE.Vector3(),
+				direction = new THREE.Vector3();
 
 			init();
 			animate();
@@ -225,7 +228,9 @@
 				// optional third parameter: boolean, if should sort results by object when using faces in octree
 				// optional fourth parameter: vector3, direction of search when using ray (assumes radius is distance/far of ray)
 			
-				var rayCaster = new THREE.Raycaster( new THREE.Vector3().copy( searchMesh.position ), new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 ).normalize() );
+				origin.copy( searchMesh.position );
+				direction.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 ).normalize();
+				rayCaster.set( origin, direction );
 				meshesSearch = octree.search( rayCaster.ray.origin, radiusSearch, true, rayCaster.ray.direction );
 				var intersections = rayCaster.intersectOctreeObjects( meshesSearch );
 			
