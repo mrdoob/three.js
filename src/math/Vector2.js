@@ -294,8 +294,8 @@ THREE.Vector2.prototype = {
 
 	roundToZero: function () {
 
-		this.x = this.x | 0; // n < 0 : ceil(n) : floor(n)
-		this.y = this.y | 0; // n < 0 : ceil(n) : floor(n)
+		this.x |= 0; // n < 0 : ceil(n) : floor(n)
+		this.y |= 0; // n < 0 : ceil(n) : floor(n)
 
 		return this;
 
