@@ -11,7 +11,7 @@ THREE.Vector4 = function ( x, y, z, w ) {
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0;
-	this.w = ( w !== undefined ) ? w : 1;
+	this.w = ( w !== void(0) ) ? w : 1;
 
 };
 
@@ -95,7 +95,7 @@ THREE.Vector4.prototype = {
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
-		this.w = ( v.w !== undefined ) ? v.w : 1;
+		this.w = ( v.w !== void(0) ) ? v.w : 1;
 
 		return this;
 
@@ -103,7 +103,7 @@ THREE.Vector4.prototype = {
 
 	add: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
@@ -143,7 +143,7 @@ THREE.Vector4.prototype = {
 
 	sub: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
@@ -183,17 +183,17 @@ THREE.Vector4.prototype = {
 
 	applyMatrix4: function ( m ) {
 
+		m = m.elements;
+
 		var x = this.x;
 		var y = this.y;
 		var z = this.z;
 		var w = this.w;
 
-		var e = m.elements;
-
-		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] * w;
-		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] * w;
-		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] * w;
-		this.w = e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] * w;
+		this.x = m[ 0 ] * x + m[ 4 ] * y + m[ 8 ] * z + m[ 12 ] * w;
+		this.y = m[ 1 ] * x + m[ 5 ] * y + m[ 9 ] * z + m[ 13 ] * w;
+		this.z = m[ 2 ] * x + m[ 6 ] * y + m[ 10 ] * z + m[ 14 ] * w;
+		this.w = m[ 3 ] * x + m[ 7 ] * y + m[ 11 ] * z + m[ 15 ] * w;
 
 		return this;
 
@@ -203,12 +203,12 @@ THREE.Vector4.prototype = {
 
 		if ( scalar !== 0 ) {
 
-			var invScalar = 1 / scalar;
+			scalar = 1 / scalar;
 
-			this.x *= invScalar;
-			this.y *= invScalar;
-			this.z *= invScalar;
-			this.w *= invScalar;
+			this.x *= scalar;
+			this.y *= scalar;
+			this.z *= scalar;
+			this.w *= scalar;
 
 		} else {
 
@@ -257,7 +257,7 @@ THREE.Vector4.prototype = {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
-		var angle, x, y, z,		// variables for result
+		var x, y, z,		// variables for result
 			epsilon = 0.01,		// margin to allow for rounding errors
 			epsilon2 = 0.1,		// margin to distinguish between 0 and 180 degrees
 
@@ -282,22 +282,18 @@ THREE.Vector4.prototype = {
 
 				// this singularity is identity matrix so angle = 0
 
-				this.set( 1, 0, 0, 0 );
-
-				return this; // zero angle, arbitrary axis
+				return this.set( 1, 0, 0, 0 ); // zero angle, arbitrary axis
 
 			}
 
 			// otherwise this singularity is angle = 180
 
-			angle = Math.PI;
-
-			var xx = ( m11 + 1 ) / 2;
-			var yy = ( m22 + 1 ) / 2;
-			var zz = ( m33 + 1 ) / 2;
-			var xy = ( m12 + m21 ) / 4;
-			var xz = ( m13 + m31 ) / 4;
-			var yz = ( m23 + m32 ) / 4;
+			var xx = ( m11 + 1 ) * 0.5; // divided by 2
+			var yy = ( m22 + 1 ) * 0.5; // divided by 2
+			var zz = ( m33 + 1 ) * 0.5; // divided by 2
+			var xy = ( m12 + m21 ) * 0.25; // divided by 4
+			var xz = ( m13 + m31 ) * 0.25; // divided by 4
+			var yz = ( m23 + m32 ) * 0.25; // divided by 4
 
 			if ( ( xx > yy ) && ( xx > zz ) ) { // m11 is the largest diagonal term
 
@@ -349,9 +345,8 @@ THREE.Vector4.prototype = {
 
 			}
 
-			this.set( x, y, z, angle );
-
-			return this; // return 180 deg rotation
+			// this singularity is angle = 180
+			return this.set( x, y, z, /*angle*/Math.PI );; // return 180 deg rotation
 
 		}
 
@@ -369,7 +364,7 @@ THREE.Vector4.prototype = {
 		this.x = ( m32 - m23 ) / s;
 		this.y = ( m13 - m31 ) / s;
 		this.z = ( m21 - m12 ) / s;
-		this.w = Math.acos( ( m11 + m22 + m33 - 1 ) / 2 );
+		this.w = Math.acos( ( m11 + m22 + m33 - 1 ) * 0.5 );
 
 		return this;
 
@@ -489,7 +484,7 @@ THREE.Vector4.prototype = {
 
 		return function ( minVal, maxVal ) {
 
-			if ( min === undefined ) {
+			if ( min === void(0) ) {
 
 				min = new THREE.Vector4();
 				max = new THREE.Vector4();
@@ -540,10 +535,10 @@ THREE.Vector4.prototype = {
 
     roundToZero: function () {
 
-        this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-        this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-        this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
-        this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
+        this.x |= 0; // n < 0 ? ceil(n) : floor(n)
+        this.y |= 0; // n < 0 ? ceil(n) : floor(n)
+        this.z |= 0; // n < 0 ? ceil(n) : floor(n)
+        this.w |= 0; // n < 0 ? ceil(n) : floor(n)
 
         return this;
 
@@ -551,10 +546,10 @@ THREE.Vector4.prototype = {
 
 	negate: function () {
 
-		this.x = - this.x;
-		this.y = - this.y;
-		this.z = - this.z;
-		this.w = - this.w;
+		this.x *= - 1;
+		this.y *= - 1;
+		this.z *= - 1;
+		this.w *= - 1;
 
 		return this;
 
@@ -623,7 +618,7 @@ THREE.Vector4.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === void(0) ) offset = 0;
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -636,8 +631,8 @@ THREE.Vector4.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === void(0) ) array = [];
+		if ( offset === void(0) ) offset = 0;
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -650,9 +645,7 @@ THREE.Vector4.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
-
-	    index = index * attribute.itemSize + offset;
+	    index = index * attribute.itemSize + (offset || 0);
 
 	    this.x = attribute.array[ index ];
 	    this.y = attribute.array[ index + 1 ];
