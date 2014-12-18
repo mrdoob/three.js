@@ -164,8 +164,10 @@ THREE.Vector2.prototype = {
 
 		if ( scalar !== 0 ) {
 
-			this.x /= scalar;
-			this.y /= scalar;
+			scalar = 1 / scalar;
+
+			this.x *= scalar;
+			this.y *= scalar;
 
 		} else {
 
