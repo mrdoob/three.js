@@ -16300,7 +16300,7 @@ THREE.ShaderChunk[ 'morphnormal_vertex'] = "#ifdef USE_MORPHNORMALS\n\n	vec3 mor
 
 // File:src/renderers/shaders/ShaderChunk/envmap_pars_fragment.glsl
 
-THREE.ShaderChunk[ 'envmap_pars_fragment'] = "#ifdef USE_ENVMAP\n\n	uniform float reflectivity;\n	#ifdef ENVMAP_TYPE_CUBE\n		uniform samplerCube envMap;\n	#else\n		uniform sampler2D envMap;\n	#endif\n	uniform float flipEnvMap;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		uniform bool useRefract;\n		uniform float refractionRatio;\n\n	#else\n\n		varying vec3 vReflect;\n\n	#endif\n\n#endif\n";
+THREE.ShaderChunk[ 'envmap_pars_fragment'] = "#ifdef USE_ENVMAP\n\n	uniform float reflectivity;\n	#ifdef ENVMAP_TYPE_CUBE\n		uniform samplerCube envMap;\n	#else\n		uniform sampler2D envMap;\n	#endif\n	uniform float flipEnvMap;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		uniform float refractionRatio;\n\n	#else\n\n		varying vec3 vReflect;\n\n	#endif\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/logdepthbuf_fragment.glsl
 
@@ -16352,7 +16352,7 @@ THREE.ShaderChunk[ 'skinning_vertex'] = "#ifdef USE_SKINNING\n\n	#ifdef USE_MORP
 
 // File:src/renderers/shaders/ShaderChunk/envmap_pars_vertex.glsl
 
-THREE.ShaderChunk[ 'envmap_pars_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG )\n\n	varying vec3 vReflect;\n\n	uniform float refractionRatio;\n	uniform bool useRefract;\n\n#endif\n";
+THREE.ShaderChunk[ 'envmap_pars_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG )\n\n	varying vec3 vReflect;\n\n	uniform float refractionRatio;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl
 
@@ -16372,7 +16372,7 @@ THREE.ShaderChunk[ 'map_pars_vertex'] = "#if defined( USE_MAP ) || defined( USE_
 
 // File:src/renderers/shaders/ShaderChunk/envmap_fragment.glsl
 
-THREE.ShaderChunk[ 'envmap_fragment'] = "#ifdef USE_ENVMAP\n\n	vec3 reflectVec;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\n		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations\n		// Transforming Normal Vectors with the Inverse Transformation\n\n		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );\n\n		if ( useRefract ) {\n\n			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\n		} else { \n\n			reflectVec = reflect( cameraToVertex, worldNormal );\n\n		}\n\n	#else\n\n		reflectVec = vReflect;\n\n	#endif\n\n	#ifdef DOUBLE_SIDED\n		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n	#else\n		float flipNormal = 1.0;\n	#endif\n\n	#ifdef ENVMAP_TYPE_CUBE\n		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#elif defined( ENVMAP_TYPE_EQUIREC )\n		vec2 sampleUV;\n		sampleUV.y = clamp( flipNormal * reflectVec.y * 0.5 + 0.5, 0.0, 1.0);\n		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * 0.15915494309189533576888376337251 + 0.5; // reciprocal( 2 PI ) + 0.5\n		vec4 envColor = texture2D( envMap, sampleUV );\n		\n	#elif defined( ENVMAP_TYPE_SPHERE )\n		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n	#endif\n\n	#ifdef GAMMA_INPUT\n\n		envColor.xyz *= envColor.xyz;\n\n	#endif\n\n	#ifdef ENVMAP_BLENDING_MULTIPLY\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_MIX )\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_ADD )\n\n		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;\n\n	#endif\n\n#endif\n";
+THREE.ShaderChunk[ 'envmap_fragment'] = "#ifdef USE_ENVMAP\n\n	vec3 reflectVec;\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\n		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations\n		// Transforming Normal Vectors with the Inverse Transformation\n\n		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );\n\n		#ifdef ENVMAP_MODE_REFLECTION\n\n			reflectVec = reflect( cameraToVertex, worldNormal );\n\n		#elif defined( ENVMAP_MODE_REFRACTION )\n\n			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\n		#endif\n\n	#else\n\n		reflectVec = vReflect;\n\n	#endif\n\n	#ifdef DOUBLE_SIDED\n		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n	#else\n		float flipNormal = 1.0;\n	#endif\n\n	#ifdef ENVMAP_TYPE_CUBE\n		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#elif defined( ENVMAP_TYPE_EQUIREC )\n		vec2 sampleUV;\n		sampleUV.y = clamp( flipNormal * reflectVec.y * 0.5 + 0.5, 0.0, 1.0);\n		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * 0.15915494309189533576888376337251 + 0.5; // reciprocal( 2 PI ) + 0.5\n		vec4 envColor = texture2D( envMap, sampleUV );\n		\n	#elif defined( ENVMAP_TYPE_SPHERE )\n		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n	#endif\n\n	#ifdef GAMMA_INPUT\n\n		envColor.xyz *= envColor.xyz;\n\n	#endif\n\n	#ifdef ENVMAP_BLENDING_MULTIPLY\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_MIX )\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_ADD )\n\n		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;\n\n	#endif\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/specularmap_pars_fragment.glsl
 
@@ -16432,7 +16432,7 @@ THREE.ShaderChunk[ 'morphtarget_vertex'] = "#ifdef USE_MORPHTARGETS\n\n	vec3 mor
 
 // File:src/renderers/shaders/ShaderChunk/envmap_vertex.glsl
 
-THREE.ShaderChunk[ 'envmap_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG )\n\n	vec3 worldNormal = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;\n	worldNormal = normalize( worldNormal );\n\n	vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n\n	if ( useRefract ) {\n\n		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n\n	} else {\n\n		vReflect = reflect( cameraToVertex, worldNormal );\n\n	}\n\n#endif";
+THREE.ShaderChunk[ 'envmap_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP ) && ! defined( PHONG )\n\n	vec3 worldNormal = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;\n	worldNormal = normalize( worldNormal );\n\n	vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );\n\n	#ifdef ENVMAP_MODE_REFLECTION\n\n		vReflect = reflect( cameraToVertex, worldNormal );\n\n	#elif defined( ENVMAP_MODE_REFRACTION )\n\n		vReflect = refract( cameraToVertex, worldNormal, refractionRatio );\n\n	#endif\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/shadowmap_fragment.glsl
 
@@ -16553,7 +16553,6 @@ THREE.UniformsLib = {
 
 		"envMap" : { type: "t", value: null },
 		"flipEnvMap" : { type: "f", value: - 1 },
-		"useRefract" : { type: "i", value: 0 },
 		"reflectivity" : { type: "f", value: 1.0 },
 		"refractionRatio" : { type: "f", value: 0.98 },
 
@@ -17268,7 +17267,6 @@ THREE.ShaderLib = {
 			"shininess": { type: "f", value: 30 },
 			"opacity": { type: "f", value: 1 },
 
-			"useRefract": { type: "i", value: 0 },
 			"refractionRatio": { type: "f", value: 0.98 },
 			"reflectivity": { type: "f", value: 0.5 },
 
@@ -17303,7 +17301,6 @@ THREE.ShaderLib = {
 
 			"uniform vec2 uNormalScale;",
 
-			"uniform bool useRefract;",
 			"uniform float refractionRatio;",
 			"uniform float reflectivity;",
 
@@ -17671,15 +17668,15 @@ THREE.ShaderLib = {
 			"		vec3 vReflect;",
 			"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
-			"		if ( useRefract ) {",
-
-			"			vReflect = refract( cameraToVertex, normal, refractionRatio );",
-
-			"		} else {",
+			"		#ifdef ENVMAP_MODE_REFLECTION",
 
 			"			vReflect = reflect( cameraToVertex, normal );",
 
-			"		}",
+			"		#elif defined( ENVMAP_MODE_REFRACTION )",
+
+			"			vReflect = refract( cameraToVertex, normal, refractionRatio );",
+
+			"		#endif",
 
 			"		vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
 
@@ -22130,6 +22127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			map: !! material.map,
 			envMap: !! material.envMap,
+			envMapMode: material.envMap && material.envMap.mapping,
 			lightMap: !! material.lightMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
@@ -22632,9 +22630,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.refractionRatio.value = material.refractionRatio;
-		uniforms.useRefract.value = material.envMap && (
-			material.envMap.mapping === THREE.CubeRefractionMapping ||
-			material.envMap.mapping === THREE.EquirectangularRefractionMapping );
 
 	}
 
@@ -24645,6 +24640,7 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		var envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+		var envMapModeDefine = "ENVMAP_MODE_REFLECTION";
 		var envMapBlendingDefine = "ENVMAP_BLENDING_MULTIPLY";
 
 		if ( parameters.envMap ) {
@@ -24663,6 +24659,15 @@ THREE.WebGLProgram = ( function () {
 
 				case THREE.SphericalReflectionMapping:
 					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
+					break;
+
+			}
+
+			switch ( material.envMap.mapping ) {
+
+				case THREE.CubeRefractionMapping:
+				case THREE.EquirectangularRefractionMapping:
+					envMapModeDefine = "ENVMAP_MODE_REFRACTION";
 					break;
 
 			}
@@ -24727,6 +24732,7 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
+				parameters.envMap ? "#define " + envMapModeDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
@@ -24835,6 +24841,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
 				parameters.envMap ? "#define " + envMapTypeDefine : "",
+				parameters.envMap ? "#define " + envMapModeDefine : "",
 				parameters.envMap ? "#define " + envMapBlendingDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
