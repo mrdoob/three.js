@@ -346,7 +346,7 @@ THREE.Vector4.prototype = {
 			}
 
 			// this singularity is angle = 180
-			return this.set( x, y, z, /*angle*/Math.PI );; // return 180 deg rotation
+			return this.set( x, y, z, /*angle*/Math.PI ); // return 180 deg rotation
 
 		}
 
@@ -364,7 +364,7 @@ THREE.Vector4.prototype = {
 		this.x = ( m32 - m23 ) / s;
 		this.y = ( m13 - m31 ) / s;
 		this.z = ( m21 - m12 ) / s;
-		this.w = Math.acos( ( m11 + m22 + m33 - 1 ) * 0.5 );
+		this.w = Math.acos( ( m11 + m22 + m33 - 1 ) * 0.5 ); // divide by 2
 
 		return this;
 
