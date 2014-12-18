@@ -368,10 +368,12 @@ THREE.Vector3.prototype = {
 	divideScalar: function ( scalar ) {
 
 		if ( scalar !== 0 ) {
+			
+			scalar = 1 / scalar;
 
-			this.x /= scalar;
-			this.y /= scalar;
-			this.z /= scalar;
+			this.x *= scalar;
+			this.y *= scalar;
+			this.z *= scalar;
 
 		} else {
 
