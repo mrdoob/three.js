@@ -67,7 +67,7 @@ THREE.UniformsLib = {
 		"spotLightDirection" : { type: "fv", value: [] },
 		"spotLightDistance" : { type: "fv1", value: [] },
 		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] }
+		"spotLightExponent" : { type: "fv1", value: [] },
 
 		"areaLightColor" : { type: "fv", value: [] },
 		"areaLightPosition" : { type: "fv", value: [] },

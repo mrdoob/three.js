@@ -157,6 +157,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_projScreenMatrixPS = new THREE.Matrix4(),
 
 	_vector3 = new THREE.Vector3(),
+	_width = new THREE.Vector3(),	// for area light
+	_height = new THREE.Vector3(),	// for area light
 
 	// light arrays cache
 
@@ -5442,8 +5444,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				areaLength += 1;
 
 			}
-
-		}
 
 		}
 
