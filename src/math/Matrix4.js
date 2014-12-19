@@ -146,6 +146,35 @@ THREE.Matrix4.prototype = {
 
 	}(),
 
+	makeShear: function ( vector3Shear, reverseStyle ) {
+
+		var xy = vector3Shear.x;
+    	var xz = vector3Shear.y;
+    	var yz = vector3Shear.z;
+
+		if ( reverseStyle ) {
+
+		  this.set(
+		    1,  0,  0,  0,
+		    xy, 1,  0,  0,
+		    xz, yz, 1,  0,
+		    0,   0,  0,  1
+		  );
+
+		} else {
+		  // Maya style
+		  this.set(
+		    1,  xy, xz, 0,
+		    0,  1,  yz, 0,
+		    0,  0,  1,  0,
+		    0,  0,  0,  1
+		  );
+		}
+
+	    return this;
+
+	},
+
 	makeRotationFromEuler: function ( euler ) {
 
 		if ( euler instanceof THREE.Euler === false ) {
