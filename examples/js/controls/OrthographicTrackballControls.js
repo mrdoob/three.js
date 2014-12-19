@@ -17,6 +17,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	this.screen = { left: 0, top: 0, width: 0, height: 0 };
 
+	this.radius = 0;
+
 	this.rotateSpeed = 1.0;
 	this.zoomSpeed = 1.2;
 	this.panSpeed = 0.3;
@@ -98,6 +100,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		}
 
+		this.radius = 0.5 * Math.min( this.screen.width, this.screen.height );
+
 	};
 
 	this.handleEvent = function ( event ) {
@@ -136,8 +140,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		return function ( pageX, pageY ) {
 
 			mouseOnBall.set(
-				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / (_this.screen.width*.5),
-				( _this.screen.height * 0.5 + _this.screen.top - pageY ) / (_this.screen.height*.5),
+				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / _this.radius,
+				( _this.screen.height * 0.5 + _this.screen.top - pageY ) / _this.radius,
 				0.0
 			);
 
