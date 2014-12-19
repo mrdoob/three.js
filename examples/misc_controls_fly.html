@@ -107,46 +107,17 @@
 				dirLight.position.set( -1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				ambientLight = new THREE.AmbientLight( 0x000000 );
-				scene.add( ambientLight );
-
-				var planetTexture   = THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" );
-				var cloudsTexture   = THREE.ImageUtils.loadTexture( "textures/planets/earth_clouds_1024.png" );
-				var normalTexture   = THREE.ImageUtils.loadTexture( "textures/planets/earth_normal_2048.jpg" );
-				var specularTexture = THREE.ImageUtils.loadTexture( "textures/planets/earth_specular_2048.jpg" );
-
-				var moonTexture = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
-
-				var shader = THREE.ShaderLib[ "normalmap" ];
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-				uniforms[ "tNormal" ].value = normalTexture;
-				uniforms[ "uNormalScale" ].value.set( 0.85, 0.85 );
-
-				uniforms[ "tDiffuse" ].value = planetTexture;
-				uniforms[ "tSpecular" ].value = specularTexture;
-
-				uniforms[ "enableAO" ].value = false;
-				uniforms[ "enableDiffuse" ].value = true;
-				uniforms[ "enableSpecular" ].value = true;
-
-				uniforms[ "diffuse" ].value.setHex( 0xffffff );
-				uniforms[ "specular" ].value.setHex( 0x333333 );
-				uniforms[ "ambient" ].value.setHex( 0x000000 );
-
-				uniforms[ "shininess" ].value = 15;
-
-				var parameters = {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: uniforms,
-					lights: true,
-					fog: true
-
-				};
-
-				var materialNormalMap = new THREE.ShaderMaterial( parameters );
+				var materialNormalMap = new THREE.MeshPhongMaterial( {
+				
+					ambient: 0x000000,
+					specular: 0x333333,
+					shininess: 15,
+					map: THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" ),
+					specularMap: THREE.ImageUtils.loadTexture( "textures/planets/earth_specular_2048.jpg" ),
+					normalMap: THREE.ImageUtils.loadTexture( "textures/planets/earth_normal_2048.jpg" ),
+					normalScale: new THREE.Vector2( 0.85, 0.85 )
+				
+				} );
 
 				// planet
 
@@ -160,7 +131,12 @@
 
 				// clouds
 
-				var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudsTexture, transparent: true } );
+				var materialClouds = new THREE.MeshLambertMaterial( {
+				
+					map: THREE.ImageUtils.loadTexture( "textures/planets/earth_clouds_1024.png" ),
+					transparent: true
+				
+				} );
 
 				meshClouds = new THREE.Mesh( geometry, materialClouds );
 				meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
@@ -169,7 +145,11 @@
 
 				// moon
 
-				var materialMoon = new THREE.MeshPhongMaterial( { color: 0xffffff, map: moonTexture } );
+				var materialMoon = new THREE.MeshPhongMaterial( {
+				
+					map: THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" )
+				
+				} );
 
 				meshMoon = new THREE.Mesh( geometry, materialMoon );
 				meshMoon.position.set( radius * 5, 0, 0 );

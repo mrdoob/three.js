@@ -118,35 +118,18 @@
 				directionalLight.position.set( 1, -0.5, -1 );
 				scene.add( directionalLight );
 
-				// material parameters
-
-				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x060606, shininess = 35;
-
-				var shader = THREE.ShaderLib[ "normalmap" ];
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value.set( 0.8, 0.8 );
-
-				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-				uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
-
-				uniforms[ "enableAO" ].value = false;
-				uniforms[ "enableDiffuse" ].value = true;
-				uniforms[ "enableSpecular" ].value = true;
-
-				uniforms[ "diffuse" ].value.setHex( diffuse );
-				uniforms[ "specular" ].value.setHex( specular );
-				uniforms[ "ambient" ].value.setHex( ambient );
-
-				uniforms[ "shininess" ].value = shininess;
-
-				uniforms[ "wrapRGB" ].value.set( 0.575, 0.5, 0.5 );
-
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var material = new THREE.ShaderMaterial( parameters );
-
-				material.wrapAround = true;
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xdddddd,
+					ambient: 0x111111,
+					specular: 0x222222,
+					shininess: 35,
+					map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
+					specularMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" ),
+					normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalScale: new THREE.Vector2( 0.8, 0.8 ),
+					wrapRGB: new THREE.Vector3( 0.575, 0.5, 0.5 ),
+					wrapAround: true
+				} );
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );

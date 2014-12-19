@@ -49,6 +49,7 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/shaders/NormalDisplacementShader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -151,7 +152,7 @@
 
 				// normal map shader
 
-				var shader = THREE.ShaderLib[ "normalmap" ];
+				var shader = THREE.NormalDisplacementShader;
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "enableAO" ].value = true;
