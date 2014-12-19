@@ -27,7 +27,7 @@ if ( Math.sign === undefined ) {
 
 THREE.ExceptionErrorHandler = function( message, optionalData ) {
 	console.error( message );
-	console.error( optionalData );
+	if( optionalData ) console.error( optionalData );
 	var error = new Error( message );
 	error.optionalData = optionalData;
 	throw error;
@@ -35,12 +35,12 @@ THREE.ExceptionErrorHandler = function( message, optionalData ) {
 
 THREE.ConsoleErrorHandler = function( message, optionalData ) {
 	console.error( message );
-	console.error( optionalData );
+	if( optionalData ) console.error( optionalData );
 };
 
 THREE.ConsoleWarningHandler = function( message, optionalData ) {
 	console.warn( message );
-	console.warn( optionalData );
+	if( optionalData ) console.warn( optionalData );
 };
 
 THREE.NullHandler = function( message, optionalData ) {
