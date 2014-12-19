@@ -90,6 +90,31 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	extractBasis: function ( xAxis, yAxis, zAxis ) {
+ 
+ 		var te = this.elements;
+ 
+		xAxis.set( te[0], te[1], te[2] );
+		yAxis.set( te[4], te[5], te[6] );
+		zAxis.set( te[8], te[9], te[10] );
+ 
+ 		return this;
+ 		
+ 	},
+ 
+	makeBasis: function ( xAxis, yAxis, zAxis ) {
+
+		this.identity();
+
+		var te = this.elements;
+	    te.elements[0] = xAxis.x; te.elements[1] = xAxis.y; te.elements[2] = xAxis.z;
+	    te.elements[4] = yAxis.x; te.elements[5] = yAxis.y; te.elements[6] = yAxis.z;
+	    te.elements[8] = zAxis.x; te.elements[9] = zAxis.y; te.elements[10] = zAxis.z;
+
+	    return this;
+
+	},
+
 	extractRotation: function () {
 
 		var v1 = new THREE.Vector3();
