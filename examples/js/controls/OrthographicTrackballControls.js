@@ -38,7 +38,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	var EPS = 0.000001;
 
-	var lastPosition = new THREE.Vector3();
+	var _changed = true;
 
 	var _state = STATE.NONE,
 	_prevState = STATE.NONE,
@@ -212,6 +212,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 				}
 
+				_changed = true;
+
 			}
 		}
 
@@ -225,6 +227,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 			_touchZoomDistanceStart = _touchZoomDistanceEnd;
 
 			_this.object.zoom *= factor;
+
+			_changed = true;
 
 		} else {
 
@@ -243,6 +247,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 					_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
 
 				}
+
+				_changed = true;
 
 			}
 
@@ -284,6 +290,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 				}
 
+				_changed = true;
+
 			}
 		}
 
@@ -302,7 +310,12 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		if ( !_this.noZoom ) {
 
 			_this.zoomCamera();
-			_this.object.updateProjectionMatrix();
+
+			if ( _changed ) {
+
+				_this.object.updateProjectionMatrix();
+
+			}
 
 		}
 
@@ -316,11 +329,11 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		_this.object.lookAt( _this.target );
 
-		if ( lastPosition.distanceToSquared( _this.object.position ) > EPS ) {
+		if ( _changed ) {
 
 			_this.dispatchEvent( changeEvent );
 
-			lastPosition.copy( _this.object.position );
+			_changed = false;
 
 		}
 
@@ -346,7 +359,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		_this.dispatchEvent( changeEvent );
 
-		lastPosition.copy( _this.object.position );
+		_changed = false;
 
 	};
 
