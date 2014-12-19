@@ -270,6 +270,7 @@ var Viewport = function ( editor ) {
 
 		renderer = createRenderer( type, antialias );
 		renderer.setClearColor( clearColor );
+		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
