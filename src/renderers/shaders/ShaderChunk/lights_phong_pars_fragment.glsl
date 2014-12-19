@@ -36,6 +36,17 @@ uniform vec3 ambientLightColor;
 
 #endif
 
+#if MAX_AREA_LIGHTS > 0
+
+	uniform vec3 areaLightColor[ MAX_AREA_LIGHTS ];
+	uniform vec3 areaLightPosition[ MAX_AREA_LIGHTS ];
+	uniform vec3 areaLightWidth[ MAX_AREA_LIGHTS ];
+	uniform vec3 areaLightHeight[ MAX_AREA_LIGHTS ];
+	uniform float areaLightDistance[ MAX_AREA_LIGHTS ];
+	uniform float areaLightDecayExponent[ MAX_AREA_LIGHTS ];
+
+#endif
+
 #if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP ) || defined( USE_ENVMAP )
 
 	varying vec3 vWorldPosition;
