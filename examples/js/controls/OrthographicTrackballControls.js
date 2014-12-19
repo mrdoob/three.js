@@ -233,7 +233,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
 
-			if ( factor !== 1.0 && factor > 0.0 ) {
+			if ( Math.abs( factor - 1.0 ) > EPS && factor > 0.0 ) {
 				_zoomFactor *= factor;
 
 				_this.object.left = _zoomFactor * _this.left0 + ( 1 - _zoomFactor ) *  _this.center0.x;
