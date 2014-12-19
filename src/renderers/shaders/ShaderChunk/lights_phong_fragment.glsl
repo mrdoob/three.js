@@ -79,7 +79,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		float lDistance = 1.0;
 		if ( spotLightDistance[ i ] > 0.0 )
-			lDistance = saturate( 1.0 - ( length( lVector ) / spotLightDistance[ i ] );
+			lDistance = saturate( 1.0 - ( length( lVector ) / spotLightDistance[ i ] ) );
 
 		lVector = normalize( lVector );
 
