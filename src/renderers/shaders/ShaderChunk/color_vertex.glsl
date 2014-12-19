@@ -2,7 +2,7 @@
 
 	#ifdef GAMMA_INPUT
 
-		vColor = color * color;
+		vColor = square( color );
 
 	#else
 

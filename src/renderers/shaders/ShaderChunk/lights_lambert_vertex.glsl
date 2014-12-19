@@ -12,8 +12,7 @@ transformedNormal = normalize( transformedNormal );
 
 for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-	vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );
-	vec3 dirVector = normalize( lDirection.xyz );
+	vec3 dirVector = transformNormal( directionalLightDirection[ i ], viewMatrix );
 
 	float dotProduct = dot( transformedNormal, dirVector );
 	vec3 directionalLightWeighting = vec3( max( dotProduct, 0.0 ) );
@@ -173,8 +172,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );
-		vec3 lVector = normalize( lDirection.xyz );
+		vec3 lVector = transformNormal( hemisphereLightDirection[ i ], viewMatrix );
 
 		float dotProduct = dot( transformedNormal, lVector );
 
