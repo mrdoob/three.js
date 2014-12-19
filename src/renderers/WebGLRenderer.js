@@ -903,13 +903,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var deallocateMaterial = function ( material ) {
+	var deallocateMaterial = function ( material, optionalDisconnectedProgram ) {
 
-		var program = material.program.program;
+		var program = optionalDisconnectedProgram || material.program;
 
 		if ( program === undefined ) return;
 
-		material.program = undefined;
+		if( ! optionalDisconnectedProgram ) {
+			material.program = undefined;
+		}
 
 		// only deallocate GL program if this was the last use of shared program
 		// assumed there is only single copy of any program in the _programs list
@@ -4276,10 +4278,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			if ( material.program ) deallocateMaterial( material );
+			var oldProgram = material.program;
 
 			initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
+
+			if ( oldProgram ) deallocateMaterial( material, oldProgram );
 
 		}
 
