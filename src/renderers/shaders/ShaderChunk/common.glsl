@@ -23,6 +23,10 @@ vec4  whiteCompliment( in vec4 a )  { return saturate( vec4(1.0) - a ); }
 vec3 transformNormal( in vec3 normal, in mat4 matrix ) {
 	return normalize( ( viewMatrix * vec4( normal, 0.0 ) ).xyz );
 }
+// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
+vec3 inverseTransformNormal( in vec3 normal, in mat4 matrix ) {
+	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );
+}
 vec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal) {
 	float distance = dot( planeNormal, point-pointOnPlane );
 	return point - distance * planeNormal;

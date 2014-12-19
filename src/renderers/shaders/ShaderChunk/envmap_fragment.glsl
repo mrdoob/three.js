@@ -4,10 +4,8 @@
 
 		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );
 
-		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
 		// Transforming Normal Vectors with the Inverse Transformation
-
-		vec3 worldNormal = transformNormal( normal, viewMatrix );
+		vec3 worldNormal = inverseTransformNormal( normal, viewMatrix );
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
