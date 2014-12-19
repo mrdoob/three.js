@@ -91,7 +91,7 @@ THREE.Vector3.prototype = {
 
 	add: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
@@ -128,7 +128,7 @@ THREE.Vector3.prototype = {
 
 	sub: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
@@ -155,7 +155,7 @@ THREE.Vector3.prototype = {
 
 	multiply: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
 			return this.multiplyVectors( v, w );
@@ -202,7 +202,7 @@ THREE.Vector3.prototype = {
 
 			}
 
-			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
+			if ( quaternion === void(0) ) quaternion = new THREE.Quaternion();
 
 			this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
@@ -218,7 +218,7 @@ THREE.Vector3.prototype = {
 
 		return function ( axis, angle ) {
 
-			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
+			if ( quaternion === void(0) ) quaternion = new THREE.Quaternion();
 
 			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
@@ -230,15 +230,15 @@ THREE.Vector3.prototype = {
 
 	applyMatrix3: function ( m ) {
 
+		m = m.elements; // caching
+
 		var x = this.x;
 		var y = this.y;
 		var z = this.z;
 
-		var e = m.elements;
-
-		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
-		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
-		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
+		this.x = m[ 0 ] * x + m[ 3 ] * y + m[ 6 ] * z;
+		this.y = m[ 1 ] * x + m[ 4 ] * y + m[ 7 ] * z;
+		this.z = m[ 2 ] * x + m[ 5 ] * y + m[ 8 ] * z;
 
 		return this;
 
@@ -246,15 +246,15 @@ THREE.Vector3.prototype = {
 
 	applyMatrix4: function ( m ) {
 
+		m = m.elements; // caching
+
 		// input: THREE.Matrix4 affine matrix
 
 		var x = this.x, y = this.y, z = this.z;
 
-		var e = m.elements;
-
-		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ];
-		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ];
-		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ];
+		this.x = m[ 0 ] * x + m[ 4 ] * y + m[ 8 ]  * z + m[ 12 ];
+		this.y = m[ 1 ] * x + m[ 5 ] * y + m[ 9 ]  * z + m[ 13 ];
+		this.z = m[ 2 ] * x + m[ 6 ] * y + m[ 10 ] * z + m[ 14 ];
 
 		return this;
 
@@ -262,16 +262,17 @@ THREE.Vector3.prototype = {
 
 	applyProjection: function ( m ) {
 
+		m = m.elements;
+
 		// input: THREE.Matrix4 projection matrix
 
 		var x = this.x, y = this.y, z = this.z;
 
-		var e = m.elements;
-		var d = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] ); // perspective divide
+		var d = 1 / ( m[ 3 ] * x + m[ 7 ] * y + m[ 11 ] * z + m[ 15 ] ); // perspective divide
 
-		this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z + e[ 12 ] ) * d;
-		this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z + e[ 13 ] ) * d;
-		this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * d;
+		this.x = ( m[ 0 ] * x + m[ 4 ] * y + m[ 8 ]  * z + m[ 12 ] ) * d;
+		this.y = ( m[ 1 ] * x + m[ 5 ] * y + m[ 9 ]  * z + m[ 13 ] ) * d;
+		this.z = ( m[ 2 ] * x + m[ 6 ] * y + m[ 10 ] * z + m[ 14 ] ) * d;
 
 		return this;
 
@@ -311,7 +312,7 @@ THREE.Vector3.prototype = {
 
 		return function ( camera ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === void(0) ) matrix = new THREE.Matrix4();
 
 			matrix.multiplyMatrices( camera.projectionMatrix, matrix.getInverse( camera.matrixWorld ) );
 			return this.applyProjection( matrix );
@@ -326,7 +327,7 @@ THREE.Vector3.prototype = {
 
 		return function ( camera ) {
 
-			if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( matrix === void(0) ) matrix = new THREE.Matrix4();
 
 			matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
 			return this.applyProjection( matrix );
@@ -337,16 +338,16 @@ THREE.Vector3.prototype = {
 
 	transformDirection: function ( m ) {
 
+		m = m.elements; // caching
+
 		// input: THREE.Matrix4 affine matrix
 		// vector interpreted as a direction
 
 		var x = this.x, y = this.y, z = this.z;
 
-		var e = m.elements;
-
-		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ]  * z;
-		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ]  * z;
-		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
+		this.x = m[ 0 ] * x + m[ 4 ] * y + m[ 8 ]  * z;
+		this.y = m[ 1 ] * x + m[ 5 ] * y + m[ 9 ]  * z;
+		this.z = m[ 2 ] * x + m[ 6 ] * y + m[ 10 ] * z;
 
 		this.normalize();
 
@@ -367,12 +368,12 @@ THREE.Vector3.prototype = {
 	divideScalar: function ( scalar ) {
 
 		if ( scalar !== 0 ) {
+			
+			scalar = 1 / scalar;
 
-			var invScalar = 1 / scalar;
-
-			this.x *= invScalar;
-			this.y *= invScalar;
-			this.z *= invScalar;
+			this.x *= scalar;
+			this.y *= scalar;
+			this.z *= scalar;
 
 		} else {
 
@@ -478,7 +479,7 @@ THREE.Vector3.prototype = {
 
 		return function ( minVal, maxVal ) {
 
-			if ( min === undefined ) {
+			if ( min === void(0) ) {
 
 				min = new THREE.Vector3();
 				max = new THREE.Vector3();
@@ -526,9 +527,9 @@ THREE.Vector3.prototype = {
 
 	roundToZero: function () {
 
-		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-		this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+		this.x |= 0;
+		this.y |= 0;
+		this.z |= 0;
 
 		return this;
 
@@ -536,9 +537,9 @@ THREE.Vector3.prototype = {
 
 	negate: function () {
 
-		this.x = - this.x;
-		this.y = - this.y;
-		this.z = - this.z;
+		this.x *= -1;
+		this.y *= -1;
+		this.z *= -1;
 
 		return this;
 
@@ -599,7 +600,7 @@ THREE.Vector3.prototype = {
 
 	cross: function ( v, w ) {
 
-		if ( w !== undefined ) {
+		if ( w !== void(0) ) {
 
 			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
 			return this.crossVectors( v, w );
@@ -618,12 +619,9 @@ THREE.Vector3.prototype = {
 
 	crossVectors: function ( a, b ) {
 
-		var ax = a.x, ay = a.y, az = a.z;
-		var bx = b.x, by = b.y, bz = b.z;
-
-		this.x = ay * bz - az * by;
-		this.y = az * bx - ax * bz;
-		this.z = ax * by - ay * bx;
+		this.x = a.y * b.z - a.z * b.y;
+		this.y = a.z * b.x - a.x * b.z;
+		this.z = a.x * b.y - a.y * b.x;
 
 		return this;
 
@@ -635,7 +633,7 @@ THREE.Vector3.prototype = {
 
 		return function ( vector ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === void(0) ) v1 = new THREE.Vector3();
 
 			v1.copy( vector ).normalize();
 
@@ -653,7 +651,7 @@ THREE.Vector3.prototype = {
 
 		return function ( planeNormal ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === void(0) ) v1 = new THREE.Vector3();
 
 			v1.copy( this ).projectOnVector( planeNormal );
 
@@ -672,7 +670,7 @@ THREE.Vector3.prototype = {
 
 		return function ( normal ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === void(0) ) v1 = new THREE.Vector3();
 
 			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
@@ -682,11 +680,9 @@ THREE.Vector3.prototype = {
 
 	angleTo: function ( v ) {
 
-		var theta = this.dot( v ) / ( this.length() * v.length() );
-
 		// clamp, to handle numerical problems
 
-		return Math.acos( THREE.Math.clamp( theta, - 1, 1 ) );
+		return Math.acos( THREE.Math.clamp( this.dot( v ) / ( this.length() * v.length() ), - 1, 1 ) );
 
 	},
 
@@ -743,9 +739,11 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixPosition: function ( m ) {
 
-		this.x = m.elements[ 12 ];
-		this.y = m.elements[ 13 ];
-		this.z = m.elements[ 14 ];
+		m = m.elements; // caching
+
+		this.x = m[ 12 ];
+		this.y = m[ 13 ];
+		this.z = m[ 14 ];
 
 		return this;
 
@@ -753,9 +751,11 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixScale: function ( m ) {
 
-		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[  2 ] ).length();
-		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[  6 ] ).length();
-		var sz = this.set( m.elements[ 8 ], m.elements[ 9 ], m.elements[ 10 ] ).length();
+		m = m.elements; // caching
+
+		var sx = this.set( m[ 0 ], m[ 1 ], m[  2 ] ).length();
+		var sy = this.set( m[ 4 ], m[ 5 ], m[  6 ] ).length();
+		var sz = this.set( m[ 8 ], m[ 9 ], m[ 10 ] ).length();
 
 		this.x = sx;
 		this.y = sy;
@@ -766,13 +766,13 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixColumn: function ( index, matrix ) {
 
-		var offset = index * 4;
+		index *= 4; // offset
 
-		var me = matrix.elements;
+		matrix = matrix.elements; // caching
 
-		this.x = me[ offset ];
-		this.y = me[ offset + 1 ];
-		this.z = me[ offset + 2 ];
+		this.x = matrix[ index ];
+		this.y = matrix[ index + 1 ];
+		this.z = matrix[ index + 2 ];
 
 		return this;
 
@@ -786,7 +786,7 @@ THREE.Vector3.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === void(0) ) offset = 0;
 
 		this.x = array[ offset ];
 		this.y = array[ offset + 1 ];
@@ -798,8 +798,8 @@ THREE.Vector3.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === void(0) ) array = [];
+		if ( offset === void(0) ) offset = 0;
 
 		array[ offset ] = this.x;
 		array[ offset + 1 ] = this.y;
@@ -811,9 +811,7 @@ THREE.Vector3.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
-
-	    index = index * attribute.itemSize + offset;
+	    index = index * attribute.itemSize + (offset || 0);
 
 	    this.x = attribute.array[ index ];
 	    this.y = attribute.array[ index + 1 ];

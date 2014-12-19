@@ -10,7 +10,7 @@ THREE.Quaternion = function ( x, y, z, w ) {
 	this._x = x || 0;
 	this._y = y || 0;
 	this._z = z || 0;
-	this._w = ( w !== undefined ) ? w : 1;
+	this._w = ( w !== void(0) ) ? w : 1;
 
 };
 
@@ -109,12 +109,12 @@ THREE.Quaternion.prototype = {
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( euler._x / 2 );
-		var c2 = Math.cos( euler._y / 2 );
-		var c3 = Math.cos( euler._z / 2 );
-		var s1 = Math.sin( euler._x / 2 );
-		var s2 = Math.sin( euler._y / 2 );
-		var s3 = Math.sin( euler._z / 2 );
+		var c1 = Math.cos( euler._x * 0.5 );
+		var c2 = Math.cos( euler._y * 0.5 );
+		var c3 = Math.cos( euler._z * 0.5 );
+		var s1 = Math.sin( euler._x * 0.5 );
+		var s2 = Math.sin( euler._y * 0.5 );
+		var s3 = Math.sin( euler._z * 0.5 );
 
 		if ( euler.order === 'XYZ' ) {
 
@@ -172,7 +172,7 @@ THREE.Quaternion.prototype = {
 
 		// assumes axis is normalized
 
-		var halfAngle = angle / 2, s = Math.sin( halfAngle );
+		var halfAngle = angle * 0.5, s = Math.sin( halfAngle );
 
 		this._x = axis.x * s;
 		this._y = axis.y * s;
@@ -256,7 +256,7 @@ THREE.Quaternion.prototype = {
 
 		return function ( vFrom, vTo ) {
 
-			if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === void(0) ) v1 = new THREE.Vector3();
 
 			r = vFrom.dot( vTo ) + 1;
 
@@ -346,10 +346,10 @@ THREE.Quaternion.prototype = {
 
 			l = 1 / l;
 
-			this._x = this._x * l;
-			this._y = this._y * l;
-			this._z = this._z * l;
-			this._w = this._w * l;
+			this._x *= l;
+			this._y *= l;
+			this._z *= l;
+			this._w *= l;
 
 		}
 
@@ -361,7 +361,7 @@ THREE.Quaternion.prototype = {
 
 	multiply: function ( q, p ) {
 
-		if ( p !== undefined ) {
+		if ( p !== void(0) ) {
 
 			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
 			return this.multiplyQuaternions( q, p );
@@ -470,7 +470,7 @@ THREE.Quaternion.prototype = {
 
 	fromArray: function ( array, offset ) {
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === void(0) ) offset = 0;
 
 		this._x = array[ offset ];
 		this._y = array[ offset + 1 ];
@@ -485,8 +485,8 @@ THREE.Quaternion.prototype = {
 
 	toArray: function ( array, offset ) {
 
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
+		if ( array === void(0) ) array = [];
+		if ( offset === void(0) ) offset = 0;
 
 		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
