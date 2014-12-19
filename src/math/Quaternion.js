@@ -190,6 +190,7 @@ THREE.Quaternion.prototype = {
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		if ( ! ( m instanceof THREE.Matrix4 ) ) throw new Error( 'expecting a Matrix4' );
 
 		var te = m.elements,
 
