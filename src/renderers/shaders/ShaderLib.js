@@ -709,6 +709,7 @@ THREE.ShaderLib = {
 			"	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 			"	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+			"	uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
@@ -720,6 +721,7 @@ THREE.ShaderLib = {
 			"	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 			"	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+			"	uniform float spotLightDecayExponent[ MAX_SPOT_LIGHTS ];",
 
 			"#endif",
 
@@ -810,9 +812,7 @@ THREE.ShaderLib = {
 			"			vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 			"			vec3 pointVector = lPosition.xyz + vViewPosition.xyz;",
 
-			"			float pointDistance = 1.0;",
-			"			if ( pointLightDistance[ i ] > 0.0 )",
-			"				pointDistance = 1.0 - min( ( length( pointVector ) / pointLightDistance[ i ] ), 1.0 );",
+			"			float pointDistance = calcLightAttenuation( length( pointVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );",
 
 			"			pointVector = normalize( pointVector );",
 
@@ -860,9 +860,7 @@ THREE.ShaderLib = {
 			"			vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
 			"			vec3 spotVector = lPosition.xyz + vViewPosition.xyz;",
 
-			"			float spotDistance = 1.0;",
-			"			if ( spotLightDistance[ i ] > 0.0 )",
-			"				spotDistance = 1.0 - min( ( length( spotVector ) / spotLightDistance[ i ] ), 1.0 );",
+			"			float spotDistance = calcLightAttenuation( length( spotVector ), spotLightDistance[ i ], spotLightDecayExponent[i] );",
 
 			"			spotVector = normalize( spotVector );",
 

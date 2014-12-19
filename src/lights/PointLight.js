@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointLight = function ( color, intensity, distance ) {
+THREE.PointLight = function ( color, intensity, distance, decayExponent ) {
 
 	THREE.Light.call( this, color );
 
@@ -10,6 +10,7 @@ THREE.PointLight = function ( color, intensity, distance ) {
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
+	this.decayExponent = ( decayExponent !== undefined ) ? decayExponent : 0;;	// for physically correct lights, should be 2.
 
 };
 
@@ -24,7 +25,8 @@ THREE.PointLight.prototype.clone = function () {
 
 	light.intensity = this.intensity;
 	light.distance = this.distance;
-
+	light.decayExponent = this.decayExponent;
+	
 	return light;
 
 };

@@ -61,9 +61,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );
 		vec3 lVector = lPosition.xyz - mvPosition.xyz;
 
-		float lDistance = 1.0;
-		if ( pointLightDistance[ i ] > 0.0 )
-			lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );
+		float lDistance = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );
 
 		lVector = normalize( lVector );
 		float dotProduct = dot( transformedNormal, lVector );
@@ -120,9 +118,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );
 
-			float lDistance = 1.0;
-			if ( spotLightDistance[ i ] > 0.0 )
-				lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );
+			float lDistance = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecayExponent[i] );
 
 			lVector = normalize( lVector );
 

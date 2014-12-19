@@ -33,3 +33,11 @@ float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
 vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
 	return pointOnLine + lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) );
 }
+// standard exponential distance attenuation multiplied by a linear distance cutoff, if cutoffDistance > 0.
+float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
+	float distanceAttenuation = 1.0 / pow( lightDistance, decayExponent );
+	if ( cutoffDistance > 0.0 ) {
+		distanceAttenuation *= 1.0 - min( lightDistance / cutoffDistance, 1.0 );
+	}
+	return distanceAttenuation;
+}
