@@ -319,6 +319,39 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	add: function ( q ) {
+
+		this._x += q._x;
+		this._y += q._y;
+		this._z += q._z;
+		this._w += q._w;
+
+		return this;
+
+	},
+
+	sub: function ( q ) {
+
+		this._x -= q._x;
+		this._y -= q._y;
+		this._z -= q._z;
+		this._w -= q._w;
+
+		return this;
+
+	},
+
+	multiplyScalar: function ( s ) {
+
+		this._x *= s;
+		this._y *= s;
+		this._z *= s;
+		this._w *= s;
+
+		return this;
+
+	},
+
 	lengthSq: function () {
 
 		return this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w;
