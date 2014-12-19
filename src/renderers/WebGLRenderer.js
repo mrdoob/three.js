@@ -170,7 +170,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		directional: { length: 0, colors:[], positions: [] },
 		point: { length: 0, colors: [], positions: [], distances: [] },
 		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [] },
-		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
+		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] },
+		area: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), decayExponents: new Array(), widths: new Array(), heights: new Array() }
 
 	};
 
@@ -4134,6 +4135,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxPointLights: maxLightCount.point,
 			maxSpotLights: maxLightCount.spot,
 			maxHemiLights: maxLightCount.hemi,
+			maxAreaLights: maxLightCount.area,
 
 			maxShadows: maxShadows,
 			shadowMapEnabled: _this.shadowMapEnabled && object.receiveShadow && maxShadows > 0,
@@ -4722,6 +4724,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
 		uniforms.hemisphereLightDirection.value = lights.hemi.positions;
 
+		uniforms.areaLightColor.value = lights.area.colors;
+		uniforms.areaLightPosition.value = lights.area.positions;
+		uniforms.areaLightDistance.value = lights.area.distances;
+		uniforms.areaLightDecayExponent.value = lights.area.decayExponents;
+		uniforms.areaLightWidth.value = lights.area.widths;
+		uniforms.areaLightHeight.value = lights.area.heights;
 	}
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
@@ -4747,6 +4755,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.hemisphereLightSkyColor.needsUpdate = boolean;
 		uniforms.hemisphereLightGroundColor.needsUpdate = boolean;
 		uniforms.hemisphereLightDirection.needsUpdate = boolean;
+
+		uniforms.areaLightColor.needsUpdate = boolean;
+		uniforms.areaLightPosition.needsUpdate = boolean;
+		uniforms.areaLightDistance.needsUpdate = boolean;
+		uniforms.areaLightDecayExponent.needsUpdate = boolean;
+		uniforms.areaLightWidth.needsUpdate = boolean;
+		uniforms.areaLightHeight.needsUpdate = boolean;
 
 	}
 
@@ -5202,20 +5217,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 		hemiGroundColors = zlights.hemi.groundColors,
 		hemiPositions = zlights.hemi.positions,
 
+		areaColors = zlights.area.colors,
+		areaPositions = zlights.area.positions,
+		areaDistances = zlights.area.distances,
+		areaDecayExponents = zlights.area.decayExponents,
+		areaWidths = zlights.area.widths,
+		areaHeights = zlights.area.heights,
+
 		dirLength = 0,
 		pointLength = 0,
 		spotLength = 0,
 		hemiLength = 0,
+		areaLength = 0,
 
 		dirCount = 0,
 		pointCount = 0,
 		spotCount = 0,
 		hemiCount = 0,
+		areaCount = 0,
 
 		dirOffset = 0,
 		pointOffset = 0,
 		spotOffset = 0,
-		hemiOffset = 0;
+		hemiOffset = 0,
+		areaOffset = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -5375,7 +5400,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				hemiLength += 1;
 
+			} else if ( light instanceof THREE.AreaLight ) {
+
+				areaCount += 1;
+
+				if ( ! light.visible ) continue;
+
+				areaOffset = areaLength * 3;
+
+				if ( _this.gammaInput ) {
+
+					setColorGamma( areaColors, areaOffset, color, intensity * intensity );
+
+				} else {
+
+					setColorLinear( areaColors, areaOffset, color, intensity );
+
+				}
+
+				_vector3.setFromMatrixPosition( light.matrixWorld );
+
+				areaPositions[ areaOffset ]     = _vector3.x;
+				areaPositions[ areaOffset + 1 ] = _vector3.y;
+				areaPositions[ areaOffset + 2 ] = _vector3.z;
+
+				areaDistances[ areaLength ] = distance;
+				areaDecayExponents[ areaLength ] = light.decayExponent;
+
+				light.matrixWorld.extractBasis( _width, _height, _vector3 );
+				_width.multiplyScalar( light.width );
+				_height.multiplyScalar( light.height );
+
+				areaWidths[ areaOffset ]     = _width.x;
+				areaWidths[ areaOffset + 1 ] = _width.y;
+				areaWidths[ areaOffset + 2 ] = _width.z;
+
+				areaHeights[ areaOffset ]     = _height.x;
+				areaHeights[ areaOffset + 1 ] = _height.y;
+				areaHeights[ areaOffset + 2 ] = _height.z;
+
+				areaLength += 1;
+
 			}
+
+		}
 
 		}
 
@@ -5387,11 +5455,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( l = spotLength * 3, ll = Math.max( spotColors.length, spotCount * 3 ); l < ll; l ++ ) spotColors[ l ] = 0.0;
 		for ( l = hemiLength * 3, ll = Math.max( hemiSkyColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiSkyColors[ l ] = 0.0;
 		for ( l = hemiLength * 3, ll = Math.max( hemiGroundColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiGroundColors[ l ] = 0.0;
+		for ( l = areaLength * 3, ll = Math.max( areaColors.length, areaCount * 3 ); l < ll; l ++ ) areaColors[ l ] = 0.0;
 
 		zlights.directional.length = dirLength;
 		zlights.point.length = pointLength;
 		zlights.spot.length = spotLength;
 		zlights.hemi.length = hemiLength;
+		zlights.area.length = areaLength;
 
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
@@ -6305,6 +6375,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var pointLights = 0;
 		var spotLights = 0;
 		var hemiLights = 0;
+		var areaLights = 0;
 
 		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -6316,10 +6387,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( light instanceof THREE.PointLight ) pointLights ++;
 			if ( light instanceof THREE.SpotLight ) spotLights ++;
 			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
+			if ( light instanceof THREE.AreaLight ) areaLights ++;
 
 		}
 
-		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
+		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights, 'area': areaLights };
 
 	}
 
