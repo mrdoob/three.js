@@ -21,7 +21,7 @@ vec2  whiteCompliment( in vec2 a )  { return saturate( vec2(1.0) - a ); }
 vec3  whiteCompliment( in vec3 a )  { return saturate( vec3(1.0) - a ); }
 vec4  whiteCompliment( in vec4 a )  { return saturate( vec4(1.0) - a ); }
 vec3 transformNormal( in vec3 normal, in mat4 matrix ) {
-	return normalize( ( viewMatrix * vec4( normal, 0.0 ) ).xyz );
+	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );
 }
 // http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
 vec3 inverseTransformNormal( in vec3 normal, in mat4 matrix ) {
