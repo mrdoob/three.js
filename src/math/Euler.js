@@ -279,6 +279,17 @@ THREE.Euler.prototype = {
 		return [ this._x, this._y, this._z, this._order ];
 
 	},
+	
+	toVector3: function ( optionalResult ) {
+
+		if( optionalResult ) {
+			return optionalResult.set( this._x, this._y, this._z );
+		}
+		else {
+			return new THREE.Vector3( this._x, this._y, this._z );
+		}
+
+	},
 
 	onChange: function ( callback ) {
 
