@@ -24,6 +24,33 @@ if ( Math.sign === undefined ) {
 
 }
 
+
+THREE.ExceptionErrorHandler = function( message, optionalData ) {
+	console.error( message );
+	console.error( optionalData );
+	var error = new Error( message );
+	error.optionalData = optionalData;
+	throw error;
+};
+
+THREE.ConsoleErrorHandler = function( message, optionalData ) {
+	console.error( message );
+	console.error( optionalData );
+};
+
+THREE.ConsoleWarningHandler = function( message, optionalData ) {
+	console.warn( message );
+	console.warn( optionalData );
+};
+
+THREE.NullHandler = function( message, optionalData ) {
+};
+
+// set the default error handlers
+THREE.error = THREE.ConsoleErrorHandler;
+THREE.warning = THREE.ConsoleWarningHandler;
+
+
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
 THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
@@ -187,25 +214,25 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
 THREE.Projector = function () {
 
-	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
+	THREE.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
 
 	this.projectVector = function ( vector, camera ) {
 
-		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
+		THREE.warning( 'THREE.Projector: .projectVector() is now vector.project().' );
 		vector.project( camera );
 
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
+		THREE.warning( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
 		vector.unproject( camera );
 
 	};
 
 	this.pickingRay = function ( vector, camera ) {
 
-		console.error( 'THREE.Projector: .pickingRay() has been removed.' );
+		THREE.error( 'THREE.Projector: .pickingRay() has been removed.' );
 
 	};
 
@@ -213,7 +240,7 @@ THREE.Projector = function () {
 
 THREE.CanvasRenderer = function () {
 
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
+	THREE.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
 
 	this.domElement = document.createElement( 'canvas' );
 	this.clear = function () {};

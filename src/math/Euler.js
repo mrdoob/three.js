@@ -212,7 +212,7 @@ THREE.Euler.prototype = {
 
 		} else {
 
-			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
+			THREE.warning( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order )
 
 		}
 

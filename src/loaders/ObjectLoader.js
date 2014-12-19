@@ -274,13 +274,13 @@ THREE.ObjectLoader.prototype = {
 
 					if ( geometry === undefined ) {
 
-						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
+						THREE.warning( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
 
 					}
 
 					if ( material === undefined ) {
 
-						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
+						THREE.warning( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
@@ -295,13 +295,13 @@ THREE.ObjectLoader.prototype = {
 
 					if ( geometry === undefined ) {
 
-						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
+						THREE.warning( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
 
 					}
 
 					if ( material === undefined ) {
 
-						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
+						THREE.warning( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
@@ -315,7 +315,7 @@ THREE.ObjectLoader.prototype = {
 
 					if ( material === undefined ) {
 
-						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
+						THREE.warning( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
