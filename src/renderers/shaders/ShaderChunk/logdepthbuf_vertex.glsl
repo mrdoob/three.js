@@ -1,6 +1,6 @@
 #ifdef USE_LOGDEPTHBUF
 
-	gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC;
+	gl_Position.z = log2(max( EPSILON, gl_Position.w + 1.0 )) * logDepthBufFC;
 
 	#ifdef USE_LOGDEPTHBUF_EXT
 

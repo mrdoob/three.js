@@ -29,7 +29,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		float lDistance = 1.0;
 		if ( pointLightDistance[ i ] > 0.0 )
-			lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );
+			lDistance = saturate( 1.0 - ( length( lVector ) / pointLightDistance[ i ] ) );
 
 		lVector = normalize( lVector );
 
@@ -79,7 +79,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		float lDistance = 1.0;
 		if ( spotLightDistance[ i ] > 0.0 )
-			lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );
+			lDistance = saturate( 1.0 - ( length( lVector ) / spotLightDistance[ i ] ) );
 
 		lVector = normalize( lVector );
 
@@ -132,8 +132,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );
-		vec3 dirVector = normalize( lDirection.xyz );
+		vec3 dirVector = transformNormal( directionalLightDirection[ i ], viewMatrix );
 
 				// diffuse
 
@@ -198,8 +197,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );
-		vec3 lVector = normalize( lDirection.xyz );
+		vec3 lVector = transformNormal( hemisphereLightDirection[ i ], viewMatrix );
 
 		// diffuse
 
@@ -236,6 +234,83 @@ vec3 viewPosition = normalize( vViewPosition );
 
 #endif
 
+#if MAX_AREA_LIGHTS > 0
+
+	vec3 areaDiffuse  = vec3( 0.0 );
+	vec3 areaSpecular = vec3( 0.0 );
+
+	for( int i = 0; i < MAX_AREA_LIGHTS; i ++ ) {
+
+		vec3 lPosition = ( viewMatrix * vec4( areaLightPosition[ i ], 1.0 ) ).xyz;
+		
+		vec3 width = areaLightWidth[ i ];
+		vec3 height = areaLightHeight[ i ];
+		vec3 up = transformNormal( height, viewMatrix );
+		vec3 right = transformNormal( width, viewMatrix );
+		vec3 pnormal = normalize( cross( right, up ) );
+
+		float widthScalar = length( width );
+		float heightScalar = length( height );
+
+		//project onto plane and calculate direction from center to the projection.
+		vec3 projection = projectOnPlane( -vViewPosition.xyz, lPosition, pnormal );  // projection in plane
+		vec3 dir = projection - lPosition;
+
+		//calculate distance from area:
+		vec2 diagonal = vec2( dot( dir, right ), dot( dir, up ) );
+		vec2 nearest2D = vec2( clamp( diagonal.x, -widthScalar, widthScalar ), clamp( diagonal.y, -heightScalar, heightScalar ) );
+		vec3 nearestPointInside = lPosition + ( right *nearest2D.x + up * nearest2D.y );
+
+		vec3 lVector = ( nearestPointInside + vViewPosition.xyz );
+		float distanceAttenuation = calcLightAttenuation( length( lVector ), areaLightDistance[ i ], areaLightDecayExponent[i] );
+		lVector = normalize( lVector );
+			
+		float nDotLDiffuse = saturate( dot( normal, lVector ) );
+		   
+		vec3 viewReflection = reflect( viewPosition.xyz, normal );
+		vec3 reflectionLightPlaneIntersection = linePlaneIntersect( -vViewPosition.xyz, viewReflection, lPosition, pnormal );
+
+		float specAngle = dot( viewReflection, pnormal );
+
+		if ( specAngle < 0.0 ) {
+
+			vec3 dirSpec = reflectionLightPlaneIntersection - lPosition;
+			vec2 dirSpec2D = vec2( dot( dirSpec, right ), dot( dirSpec, up ) );
+			vec2 nearestSpec2D = vec2( clamp( dirSpec2D.x, -widthScalar, widthScalar ), clamp( dirSpec2D.y, -heightScalar, heightScalar ) );
+			lVector = normalize( lPosition + ( right *nearestSpec2D.x + up * nearestSpec2D.y ) + vViewPosition.xyz );
+
+		} else { 
+
+			lVector = vec3( 0 );
+
+		}
+
+				// diffuse
+
+		float dotProduct = nDotLDiffuse;
+
+		float areaDiffuseWeight = max( dotProduct, 0.0 );
+
+		areaDiffuse  += areaLightColor[ i ] * areaDiffuseWeight * distanceAttenuation * widthScalar * heightScalar * 0.01;  // the 0.01 is the area light intensity scaling.
+
+		// specular
+
+		vec3 areaHalfVector = normalize( lVector + viewPosition );
+		float areaDotNormalHalf = max( dot( normal, areaHalfVector ), 0.0 );
+		float areaSpecularWeight = specularStrength * max( pow( areaDotNormalHalf, shininess ), 0.0 );
+
+		// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+		float specularNormalization = ( shininess + 2.0001 ) / 8.0;
+
+		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, areaHalfVector ), 0.0 ), 5.0 );
+		areaSpecular += schlick * areaLightColor[ i ] * areaSpecularWeight * areaDiffuseWeight * distanceAttenuation * specularNormalization * 0.01;  // the 0.01 is the area light intensity scaling.
+
+	}
+
+#endif
+
+
 vec3 totalDiffuse = vec3( 0.0 );
 vec3 totalSpecular = vec3( 0.0 );
 
@@ -264,6 +339,13 @@ vec3 totalSpecular = vec3( 0.0 );
 
 	totalDiffuse += spotDiffuse;
 	totalSpecular += spotSpecular;
+
+#endif
+
+#if MAX_AREA_LIGHTS > 0
+
+	totalDiffuse += areaDiffuse;
+	totalSpecular += areaSpecular;
 
 #endif
 

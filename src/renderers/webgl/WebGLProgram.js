@@ -170,6 +170,7 @@ THREE.WebGLProgram = ( function () {
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 				"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
 				"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
+				"#define MAX_AREA_LIGHTS " + parameters.maxAreaLights,
 
 				"#define MAX_SHADOWS " + parameters.maxShadows,
 
@@ -272,6 +273,7 @@ THREE.WebGLProgram = ( function () {
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 				"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
 				"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
+				"#define MAX_AREA_LIGHTS " + parameters.maxAreaLights,
 
 				"#define MAX_SHADOWS " + parameters.maxShadows,
 
