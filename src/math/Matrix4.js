@@ -441,6 +441,19 @@ THREE.Matrix4.prototype = {
 
 	},
 
+
+	multiplyList: function ( listOfMatrices ) {
+
+		for (var i = 0, il = listOfMatrices.length; i < il ; i++) {
+
+		  this.multiplyMatrices( this, listOfMatrices[ i ] );
+
+		}
+
+		return this;
+
+	},
+
 	multiplyToArray: function ( a, b, r ) {
 
 		var te = this.elements;
