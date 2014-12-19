@@ -1236,7 +1236,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec4 worldPosition = transformNormal( position, modelMatrix );",
+			"	vWorldPosition = transformNormal( position, modelMatrix );",
 
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -1286,7 +1286,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec4 worldPosition = transformNormal( position, modelMatrix );",
+			"	vWorldPosition = transformNormal( position, modelMatrix );",
 
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
