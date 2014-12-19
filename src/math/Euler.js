@@ -242,6 +242,12 @@ THREE.Euler.prototype = {
 
 	}(),
 
+	setFromVector: function ( v, order ) {
+
+		return this.set( v.x, v.y, v.z, order || this._order );
+
+	},
+
 	reorder: function () {
 
 		// WARNING: this discards revolution information -bhouston
