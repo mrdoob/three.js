@@ -214,8 +214,8 @@
 				for (float y=0.0;y<height;y++) {
 					for (float x=0.0;x<width;x++) {
 
-						birdPosition = texture2D( texturePosition,
-							vec2( x / resolution.x,  y / resolution.y ) ).xyz;
+						vec2 ref = vec2( x + 0.5, y + 0.5 ) / resolution.xy;
+						birdPosition = texture2D( texturePosition, ref ).xyz;
 
 						dir = birdPosition - selfPosition;
 						dist = length(dir);
@@ -240,7 +240,7 @@
 							float threshDelta = alignmentThresh - separationThresh;
 							float adjustedPercent = ( percent - separationThresh ) / threshDelta;
 
-							birdVelocity = texture2D( textureVelocity, vec2(x/resolution.x, y/resolution.y) ).xyz;
+							birdVelocity = texture2D( textureVelocity, ref ).xyz;
 
 							f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * delta;
 							velocity += normalize(birdVelocity) * f;
