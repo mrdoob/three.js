@@ -2761,11 +2761,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var position = geometry.attributes.position;
+				var offsets = geometry.offsets;
 
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
+				if ( offsets.length === 0 ) {
 
-				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length / 3;
+					_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+					_this.info.render.calls ++;
+					_this.info.render.points += position.array.length / 3;
+
+				} else {
+
+					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+						var startIndex = offsets[ i ].index;
+
+						_gl.drawArrays( mode, 0, offsets[ i ].count );
+
+						_this.info.render.calls ++;
+						_this.info.render.points += offsets[ i ].count;
+
+					}
+
+				}
 
 			}
 
