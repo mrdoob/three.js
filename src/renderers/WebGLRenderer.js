@@ -2768,7 +2768,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.drawArrays( mode, 0, position.array.length / 3 );
 
 					_this.info.render.calls ++;
-					_this.info.render.points += position.array.length / 3;
+					_this.info.render.vertices += position.array.length / 3;
 
 				} else {
 
@@ -2779,7 +2779,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						_gl.drawArrays( mode, 0, offsets[ i ].count );
 
 						_this.info.render.calls ++;
-						_this.info.render.points += offsets[ i ].count;
+						_this.info.render.vertices += offsets[ i ].count;
 
 					}
 
