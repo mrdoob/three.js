@@ -1,4 +1,4 @@
-var launchIntoFullscreen = function ( element ) {
+var viewFullscreen = function ( element ) {
 
 	if (element.requestFullscreen) {
 		element.requestFullscreen();

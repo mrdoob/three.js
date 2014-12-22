@@ -52,7 +52,7 @@ Menubar.View = function ( editor ) {
 	option.setTextContent( 'Fullscreen' );
 	option.onClick( function () {
 
-		launchIntoFullscreen(document.body);
+		viewFullscreen(document.body);
 
 	} );
 	options.add( option );
