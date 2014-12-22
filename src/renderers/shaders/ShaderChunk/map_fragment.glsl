@@ -9,5 +9,11 @@
 	#endif
 
 	gl_FragColor = gl_FragColor * texelColor;
+	
+	#if defined( PHONG )
+
+		diffuseColor *= texelColor.xyz;
+
+	#endif
 
 #endif

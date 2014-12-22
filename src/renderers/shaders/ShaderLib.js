@@ -186,7 +186,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 			"	gl_FragColor = vec4( vec3( 1.0 ), opacity );",
-
+	
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphamap_fragment" ],
@@ -319,6 +319,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 			"	gl_FragColor = vec4( vec3( 1.0 ), opacity );",
+			"   vec3 diffuseColor = diffuse;",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],

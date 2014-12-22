@@ -33,7 +33,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		lVector = normalize( lVector );
 
-				// diffuse
+		// diffuse
 
 		float dotProduct = dot( normal, lVector );
 
@@ -50,7 +50,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		#endif
 
-		pointDiffuse += diffuse * pointLightColor[ i ] * pointDiffuseWeight * lDistance;
+		pointDiffuse += pointLightColor[ i ] * pointDiffuseWeight * lDistance;
 
 				// specular
 
@@ -89,7 +89,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );
 
-					// diffuse
+			// diffuse
 
 			float dotProduct = dot( normal, lVector );
 
@@ -106,9 +106,9 @@ vec3 viewPosition = normalize( vViewPosition );
 
 			#endif
 
-			spotDiffuse += diffuse * spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;
+			spotDiffuse += spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;
 
-					// specular
+			// specular
 
 			vec3 spotHalfVector = normalize( lVector + viewPosition );
 			float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );
@@ -135,7 +135,7 @@ vec3 viewPosition = normalize( vViewPosition );
 		vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );
 		vec3 dirVector = normalize( lDirection.xyz );
 
-				// diffuse
+		// diffuse
 
 		float dotProduct = dot( normal, dirVector );
 
@@ -152,7 +152,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		#endif
 
-		dirDiffuse += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;
+		dirDiffuse += directionalLightColor[ i ] * dirDiffuseWeight;
 
 		// specular
 
@@ -208,7 +208,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );
 
-		hemiDiffuse += diffuse * hemiColor;
+		hemiDiffuse += hemiColor;
 
 		// specular (sky light)
 
@@ -269,10 +269,10 @@ vec3 totalSpecular = vec3( 0.0 );
 
 #ifdef METAL
 
-	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient + totalSpecular );
+	gl_FragColor.xyz = diffuseColor * ( emissive + totalDiffuse + ambientLightColor * ambient + totalSpecular );
 
 #else
 
-	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient ) + totalSpecular;
+	gl_FragColor.xyz = diffuseColor * ( emissive + totalDiffuse + ambientLightColor * ambient ) + totalSpecular;
 
 #endif
