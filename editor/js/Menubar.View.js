@@ -42,20 +42,20 @@ Menubar.View = function ( editor ) {
 	} );
 	options.add( option );
 
-    //
+	//
 
-    options.add( new UI.HorizontalRule() );
+	options.add( new UI.HorizontalRule() );
 
-    // fullscreen
-    var option = new UI.Panel();
-    option.setClass( 'option' );
-    option.setTextContent( 'Fullscreen' );
-    option.onClick( function () {
+	// fullscreen
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Fullscreen' );
+	option.onClick( function () {
 
-        launchIntoFullscreen(document.body);
+	launchIntoFullscreen(document.body);
 
-    } );
-    options.add( option );
+	} );
+	options.add( option );
 
 	return container;
 
