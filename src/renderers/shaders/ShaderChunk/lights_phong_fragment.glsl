@@ -262,7 +262,11 @@ vec3 viewPosition = normalize( vViewPosition );
 		vec3 nearestPointInside = lPosition + ( right *nearest2D.x + up * nearest2D.y );
 
 		vec3 lVector = ( nearestPointInside + vViewPosition.xyz );
-		float distanceAttenuation = calcLightAttenuation( length( lVector ), areaLightDistance[ i ], areaLightDecayExponent[i] );
+
+		float distanceAttenuation = 1.0;
+		if ( areaLightDistance[ i ] > 0.0 )
+			distanceAttenuation = saturate( 1.0 - ( length( lVector ) / areaLightDistance[ i ] ) );
+		//float distanceAttenuation = calcLightAttenuation( length( lVector ), areaLightDistance[ i ], areaLightDecayExponent[i] );
 		lVector = normalize( lVector );
 			
 		float nDotLDiffuse = saturate( dot( normal, lVector ) );

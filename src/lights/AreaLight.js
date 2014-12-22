@@ -9,7 +9,7 @@ THREE.AreaLight = function ( color, intensity, distance, decayExponent ) {
 	THREE.Light.call( this, color );
 
 	this.position.set( 0, 1, 0 );
-	this.target = new THREE.Object3D();
+	this.target = new THREE.Object3D(); 
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
@@ -22,6 +22,7 @@ THREE.AreaLight = function ( color, intensity, distance, decayExponent ) {
 };
 
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
+THREE.AreaLight.prototype.constructor = THREE.AreaLight;
 
 THREE.AreaLight.prototype.clone = function () {
 

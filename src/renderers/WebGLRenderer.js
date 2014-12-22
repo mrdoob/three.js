@@ -173,7 +173,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		point: { length: 0, colors: [], positions: [], distances: [] },
 		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [] },
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] },
-		area: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), decayExponents: new Array(), widths: new Array(), heights: new Array() }
+		area: { length: 0, colors: [], positions: [], distances: [], decayExponents: [], widths: [], heights: [] }
 
 	};
 
