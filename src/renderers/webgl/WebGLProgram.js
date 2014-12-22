@@ -338,16 +338,13 @@ THREE.WebGLProgram = ( function () {
 
 		if ( _gl.getProgramParameter( program, _gl.LINK_STATUS ) === false ) {
 
-			THREE.error( 'THREE.WebGLProgram: shader error: ' + _gl.getError(), {
-				'gl.VALIDATE_STATUS': _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ),
-				'gl.getPRogramInfoLog': programLogInfo
-			});
+			THREE.error( 'THREE.WebGLProgram: shader error: ' + _gl.getError(), 'gl.VALIDATE_STATUS', _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ), 'gl.getPRogramInfoLog', programLogInfo );
 
 		}
 		
 		if ( programLogInfo !== '' ) {
 
-			THREE.warning( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
+			THREE.warning( 'THREE.WebGLProgram: gl.getProgramInfoLog()' + programLogInfo );
 			// THREE.warning( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
 			// THREE.warning( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 

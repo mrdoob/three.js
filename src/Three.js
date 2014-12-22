@@ -25,25 +25,22 @@ if ( Math.sign === undefined ) {
 }
 
 
-THREE.ExceptionErrorHandler = function( message, optionalData ) {
-	console.error( message );
-	if( optionalData ) console.error( optionalData );
+THREE.ExceptionErrorHandler = function( message ) {
+	console.error( arguments );
 	var error = new Error( message );
-	error.optionalData = optionalData;
+	error.optionalData = arguments;
 	throw error;
 };
 
-THREE.ConsoleErrorHandler = function( message, optionalData ) {
-	console.error( message );
-	if( optionalData ) console.error( optionalData );
+THREE.ConsoleErrorHandler = function() {
+	console.error( arguments );
 };
 
-THREE.ConsoleWarningHandler = function( message, optionalData ) {
-	console.warn( message );
-	if( optionalData ) console.warn( optionalData );
+THREE.ConsoleWarningHandler = function() {
+	console.warn( arguments );
 };
 
-THREE.NullHandler = function( message, optionalData ) {
+THREE.NullHandler = function() {
 };
 
 // set the default error handlers

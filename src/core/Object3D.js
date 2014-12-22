@@ -314,7 +314,7 @@ THREE.Object3D.prototype = {
 
 		if ( object === this ) {
 
-			THREE.error( "THREE.Object3D.add:", object, "can't be added as a child of itself." );
+			THREE.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
 			return this;
 
 		}
@@ -334,7 +334,7 @@ THREE.Object3D.prototype = {
 
 		} else {
 
-			THREE.error( "THREE.Object3D.add:", object, "is not an instance of THREE.Object3D." );
+			THREE.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
 
 		}
 
