@@ -146,26 +146,6 @@ THREE.Matrix4.prototype = {
 
 	}(),
 
-	makeShear: function ( s, reverseStyle ) {
-
-		// Maya style
-		this.set(
-			1,  s.x, s.y, 0,
-			0,  1,   s.z, 0,
-			0,  0,   1,   0,
-			0,  0,   0,   1
-		);
-
-		if ( reverseStyle ) {
-
-		 	this.transpose();
-
-		}
-
-	    return this;
-
-	},
-
 	makeRotationFromEuler: function ( euler ) {
 
 		if ( euler instanceof THREE.Euler === false ) {

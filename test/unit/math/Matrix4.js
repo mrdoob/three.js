@@ -211,20 +211,6 @@ test( "getInverse", function() {
 	}
 });
 
-test( "makeShear", function() {
-	var a = new THREE.Matrix4();
-	var b = new THREE.Matrix4();
-	var shear = new THREE.Vector3( 1, 2, 3 );
-	a.makeShear( shear )
-	// ensure it isn't identity
-	ok( ! matrixEquals4( a, b ), "Passed!" ); 
-	b.makeShear( shear, true );
-	var c = a.clone().transpose();
-	// ensure that one is transpose of the other
-	ok( matrixEquals4( b, c ), "Passed!" );
-	// TODO: Think of better tests for shear
-});
-
 test( "makeBasis/extractBasis", function() {
 	var identityBasis = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
 	var a = new THREE.Matrix4().makeBasis( identityBasis[0], identityBasis[1], identityBasis[2] );
