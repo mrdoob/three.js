@@ -288,12 +288,11 @@ THREE.Euler.prototype = {
 
 	toVector3: function ( optionalResult ) {
 
-		if( optionalResult ) {
+		if ( optionalResult ) {
 
 			return optionalResult.set( this._x, this._y, this._z );
 
-		}
-		else {
+		} else {
 
 			return new THREE.Vector3( this._x, this._y, this._z );
 

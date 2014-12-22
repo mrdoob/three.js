@@ -207,7 +207,7 @@ THREE.Projector = function () {
 
 	this.pickingRay = function ( vector, camera ) {
 
-		console.error( 'THREE.Projector: .pickingRay() has been removed.' );
+		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
 
 	};
 
@@ -3336,6 +3336,12 @@ THREE.Euler.prototype = {
 
 	}(),
 
+	setFromVector3: function ( v, order ) {
+
+		return this.set( v.x, v.y, v.z, order || this._order );
+
+	},
+
 	reorder: function () {
 
 		// WARNING: this discards revolution information -bhouston
@@ -3373,6 +3379,20 @@ THREE.Euler.prototype = {
 	toArray: function () {
 
 		return [ this._x, this._y, this._z, this._order ];
+
+	},
+
+	toVector3: function ( optionalResult ) {
+
+		if ( optionalResult ) {
+
+			return optionalResult.set( this._x, this._y, this._z );
+
+		} else {
+
+			return new THREE.Vector3( this._x, this._y, this._z );
+
+		}
 
 	},
 
@@ -4482,6 +4502,31 @@ THREE.Matrix4.prototype = {
 		te[ 14 ] = me[ 14 ];
 
 		return this;
+
+	},
+
+	extractBasis: function ( xAxis, yAxis, zAxis ) {
+ 
+ 		var te = this.elements;
+ 
+		xAxis.set( te[ 0 ], te[ 1 ], te[ 2 ] );
+		yAxis.set( te[ 4 ], te[ 5 ], te[ 6 ] );
+		zAxis.set( te[ 8 ], te[ 9 ], te[ 10 ] );
+ 
+ 		return this;
+ 		
+ 	},
+ 
+	makeBasis: function ( xAxis, yAxis, zAxis ) {
+
+		this.set(
+			xAxis.x, yAxis.x, zAxis.x, 0,
+			xAxis.y, yAxis.y, zAxis.y, 0,
+			xAxis.z, yAxis.z, zAxis.z, 0,
+			0,       0,       0,       1
+		);
+
+	    return this;
 
 	},
 
