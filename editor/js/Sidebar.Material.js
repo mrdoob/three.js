@@ -278,7 +278,7 @@ Sidebar.Material = function ( editor ) {
 
 	var materialEnvMapRow = new UI.Panel();
 	var materialEnvMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialEnvMap = new UI.CubeTexture().setColor( '#444' ).onChange( update );
+	var materialEnvMap = new UI.Texture( THREE.SphericalReflectionMapping ).setColor( '#444' ).onChange( update );
 	var materialReflectivity = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
 
 	materialEnvMapRow.add( new UI.Text( 'Env Map' ).setWidth( '90px' ) );

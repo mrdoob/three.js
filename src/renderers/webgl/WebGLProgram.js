@@ -84,6 +84,57 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		var envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+		var envMapModeDefine = "ENVMAP_MODE_REFLECTION";
+		var envMapBlendingDefine = "ENVMAP_BLENDING_MULTIPLY";
+
+		if ( parameters.envMap ) {
+
+			switch ( material.envMap.mapping ) {
+
+				case THREE.CubeReflectionMapping:
+				case THREE.CubeRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_CUBE";
+					break;
+
+				case THREE.EquirectangularReflectionMapping:
+				case THREE.EquirectangularRefractionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_EQUIREC";
+					break;
+
+				case THREE.SphericalReflectionMapping:
+					envMapTypeDefine = "ENVMAP_TYPE_SPHERE";
+					break;
+
+			}
+
+			switch ( material.envMap.mapping ) {
+
+				case THREE.CubeRefractionMapping:
+				case THREE.EquirectangularRefractionMapping:
+					envMapModeDefine = "ENVMAP_MODE_REFRACTION";
+					break;
+
+			}
+
+			switch ( material.combine ) {
+
+				case THREE.MultiplyOperation:
+					envMapBlendingDefine = "ENVMAP_BLENDING_MULTIPLY";
+					break;
+
+				case THREE.MixOperation:
+					envMapBlendingDefine = "ENVMAP_BLENDING_MIX";
+					break;
+
+				case THREE.AddOperation:
+					envMapBlendingDefine = "ENVMAP_BLENDING_ADD";
+					break;
+
+			}
+
+		}
+
 		// console.log( "building new program " );
 
 		//
@@ -126,6 +177,7 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
+				parameters.envMap ? "#define " + envMapModeDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
@@ -233,6 +285,9 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.map ? "#define USE_MAP" : "",
 				parameters.envMap ? "#define USE_ENVMAP" : "",
+				parameters.envMap ? "#define " + envMapTypeDefine : "",
+				parameters.envMap ? "#define " + envMapModeDefine : "",
+				parameters.envMap ? "#define " + envMapBlendingDefine : "",
 				parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 				parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 				parameters.normalMap ? "#define USE_NORMALMAP" : "",
@@ -290,6 +345,8 @@ THREE.WebGLProgram = ( function () {
 		if ( _gl.getProgramInfoLog( program ) !== '' ) {
 
 			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', _gl.getProgramInfoLog( program ) );
+			// console.warn( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+			// console.warn( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
 		}
 

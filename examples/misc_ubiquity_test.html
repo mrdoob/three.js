@@ -182,6 +182,7 @@
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xf0f0f0 );
+				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( width, height );
 				document.body.appendChild( canvasRenderer.domElement );
 
@@ -198,6 +199,7 @@
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setClearColor( 0xf0f0f0 );
+				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
 				document.body.appendChild( webglRenderer.domElement );
 

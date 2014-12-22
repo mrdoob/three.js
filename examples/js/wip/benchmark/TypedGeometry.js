@@ -7,7 +7,7 @@ THREE.TypedVector2 = function ( array, offset ) {
 
 THREE.TypedVector2.prototype = {
 
-	constructor: THREE.TypedVector3,
+	constructor: THREE.TypedVector2,
 
 	get x () {
 

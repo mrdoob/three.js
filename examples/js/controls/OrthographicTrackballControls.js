@@ -533,3 +533,4 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 };
 
 THREE.OrthographicTrackballControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.OrthographicTrackballControls.prototype.constructor = THREE.OrthographicTrackballControls;

@@ -362,9 +362,22 @@ THREE.PLYLoader.prototype = {
 
 		} else if ( elementName === "face" ) {
 
-			geometry.faces.push(
-				new THREE.Face3( element.vertex_indices[0], element.vertex_indices[1], element.vertex_indices[2] )
-			);
+			var vertex_indices = element.vertex_indices;
+
+			if ( vertex_indices.length === 3 ) {
+
+				geometry.faces.push(
+					new THREE.Face3( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 2 ] )
+				);
+
+			} else if ( vertex_indices.length === 4 ) {
+
+				geometry.faces.push(
+					new THREE.Face3( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 3 ] ),
+					new THREE.Face3( vertex_indices[ 1 ], vertex_indices[ 2 ], vertex_indices[ 3 ] )
+				);
+
+			}
 
 		}
 

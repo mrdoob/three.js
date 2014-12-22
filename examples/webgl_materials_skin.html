@@ -157,8 +157,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x050505, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 
 				container.appendChild( renderer.domElement );

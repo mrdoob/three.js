@@ -18,6 +18,7 @@ THREE.ProxyFace3 = function ( array, offset, vertexNormals, vertexColors, vertex
 }
 
 THREE.ProxyFace3.prototype = Object.create( THREE.Face3.prototype );
+THREE.ProxyFace3.prototype.constructor = THREE.ProxyFace3;
 
 Object.defineProperties( THREE.ProxyFace3.prototype, {
 	'a': {
