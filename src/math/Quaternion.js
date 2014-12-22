@@ -190,7 +190,6 @@ THREE.Quaternion.prototype = {
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-		if ( ! ( m instanceof THREE.Matrix4 ) ) throw new Error( 'expecting a Matrix4' );
 
 		var te = m.elements,
 
@@ -317,39 +316,6 @@ THREE.Quaternion.prototype = {
 	dot: function ( v ) {
 
 		return this._x * v._x + this._y * v._y + this._z * v._z + this._w * v._w;
-
-	},
-
-	add: function ( q ) {
-
-		this._x += q._x;
-		this._y += q._y;
-		this._z += q._z;
-		this._w += q._w;
-
-		return this;
-
-	},
-
-	sub: function ( q ) {
-
-		this._x -= q._x;
-		this._y -= q._y;
-		this._z -= q._z;
-		this._w -= q._w;
-
-		return this;
-
-	},
-
-	multiplyScalar: function ( s ) {
-
-		this._x *= s;
-		this._y *= s;
-		this._z *= s;
-		this._w *= s;
-
-		return this;
 
 	},
 

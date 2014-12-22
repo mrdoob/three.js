@@ -137,8 +137,6 @@ THREE.Matrix3.prototype = {
 
 	getInverse: function ( matrix, throwOnInvertible ) {
 
-		if ( ! ( matrix instanceof THREE.Matrix4 ) ) throw new Error( 'expecting a Matrix4' );
-
 		// input: THREE.Matrix4
 		// ( based on http://code.google.com/p/webgl-mjs/ )
 

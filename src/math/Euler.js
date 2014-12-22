@@ -103,8 +103,6 @@ THREE.Euler.prototype = {
 
 	setFromRotationMatrix: function ( m, order, update ) {
 
-		if ( ! ( m instanceof THREE.Matrix4 ) ) throw new Error( 'expecting a Matrix4' );
-
 		var clamp = THREE.Math.clamp;
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
@@ -242,7 +240,7 @@ THREE.Euler.prototype = {
 
 	}(),
 
-	setFromVector: function ( v, order ) {
+	setFromVector3: function ( v, order ) {
 
 		return this.set( v.x, v.y, v.z, order || this._order );
 
@@ -291,10 +289,14 @@ THREE.Euler.prototype = {
 	toVector3: function ( optionalResult ) {
 
 		if( optionalResult ) {
+
 			return optionalResult.set( this._x, this._y, this._z );
+
 		}
 		else {
+
 			return new THREE.Vector3( this._x, this._y, this._z );
+
 		}
 
 	},

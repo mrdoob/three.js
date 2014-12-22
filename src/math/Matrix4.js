@@ -94,9 +94,9 @@ THREE.Matrix4.prototype = {
  
  		var te = this.elements;
  
-		xAxis.set( te[0], te[1], te[2] );
-		yAxis.set( te[4], te[5], te[6] );
-		zAxis.set( te[8], te[9], te[10] );
+		xAxis.set( te[ 0 ], te[ 1 ], te[ 2 ] );
+		yAxis.set( te[ 4 ], te[ 5 ], te[ 6 ] );
+		zAxis.set( te[ 8 ], te[ 9 ], te[ 10 ] );
  
  		return this;
  		
@@ -104,12 +104,12 @@ THREE.Matrix4.prototype = {
  
 	makeBasis: function ( xAxis, yAxis, zAxis ) {
 
-		this.identity();
-
-		var te = this.elements;
-	    te.elements[0] = xAxis.x; te.elements[1] = xAxis.y; te.elements[2] = xAxis.z;
-	    te.elements[4] = yAxis.x; te.elements[5] = yAxis.y; te.elements[6] = yAxis.z;
-	    te.elements[8] = zAxis.x; te.elements[9] = zAxis.y; te.elements[10] = zAxis.z;
+		this.set(
+			xAxis.x, yAxis.x, zAxis.x, 0,
+			xAxis.y, yAxis.y, zAxis.y, 0,
+			xAxis.z, yAxis.z, zAxis.z, 0,
+			0,       0,       0,       1
+		);
 
 	    return this;
 
@@ -146,29 +146,20 @@ THREE.Matrix4.prototype = {
 
 	}(),
 
-	makeShear: function ( vector3Shear, reverseStyle ) {
+	makeShear: function ( s, reverseStyle ) {
 
-		var xy = vector3Shear.x;
-    	var xz = vector3Shear.y;
-    	var yz = vector3Shear.z;
+		// Maya style
+		this.set(
+			1,  s.x, s.y, 0,
+			0,  1,   s.z, 0,
+			0,  0,   1,   0,
+			0,  0,   0,   1
+		);
 
 		if ( reverseStyle ) {
 
-		  this.set(
-		    1,  0,  0,  0,
-		    xy, 1,  0,  0,
-		    xz, yz, 1,  0,
-		    0,   0,  0,  1
-		  );
+		 	this.transpose();
 
-		} else {
-		  // Maya style
-		  this.set(
-		    1,  xy, xz, 0,
-		    0,  1,  yz, 0,
-		    0,  0,  1,  0,
-		    0,  0,  0,  1
-		  );
 		}
 
 	    return this;
@@ -436,19 +427,6 @@ THREE.Matrix4.prototype = {
 		te[ 7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
 		te[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
 		te[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
-
-		return this;
-
-	},
-
-
-	multiplyList: function ( listOfMatrices ) {
-
-		for (var i = 0, il = listOfMatrices.length; i < il ; i++) {
-
-		  this.multiplyMatrices( this, listOfMatrices[ i ] );
-
-		}
 
 		return this;
 

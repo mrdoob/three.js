@@ -124,6 +124,7 @@ test( "multiplyScalar", function() {
 	ok( b.elements[8] == 8*2 );
 });
 
+
 test( "determinant", function() {
 	var a = new THREE.Matrix3();
 	ok( a.determinant() == 1, "Passed!" );
