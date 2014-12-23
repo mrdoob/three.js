@@ -13317,7 +13317,216 @@ THREE.Material.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
+	},
+	refreshUniformsCommon: function ( uniforms, gammaInput ) {
+
+		uniforms.opacity.value = this.opacity;
+
+		if ( gammaInput ) {
+
+			uniforms.diffuse.value.copyGammaToLinear( this.color );
+
+		} else {
+
+			uniforms.diffuse.value = this.color;
+
+		}
+
+		uniforms.map.value = this.map;
+		uniforms.lightMap.value = this.lightMap;
+		uniforms.specularMap.value = this.specularMap;
+		uniforms.alphaMap.value = this.alphaMap;
+
+		if ( this.bumpMap ) {
+
+			uniforms.bumpMap.value = this.bumpMap;
+			uniforms.bumpScale.value = this.bumpScale;
+
+		}
+
+		if ( this.normalMap ) {
+
+			uniforms.normalMap.value = this.normalMap;
+			uniforms.normalScale.value.copy( this.normalScale );
+
+		}
+
+		// uv repeat and offset setting priorities
+		//  1. color map
+		//  2. specular map
+		//  3. normal map
+		//  4. bump map
+		//  5. alpha map
+
+		var uvScaleMap;
+
+		if ( this.map ) {
+
+			uvScaleMap = this.map;
+
+		} else if ( this.specularMap ) {
+
+			uvScaleMap = this.specularMap;
+
+		} else if ( this.normalMap ) {
+
+			uvScaleMap = this.normalMap;
+
+		} else if ( this.bumpMap ) {
+
+			uvScaleMap = this.bumpMap;
+
+		} else if ( this.alphaMap ) {
+
+			uvScaleMap = this.alphaMap;
+
+		}
+
+		if ( uvScaleMap !== undefined ) {
+
+			var offset = uvScaleMap.offset;
+			var repeat = uvScaleMap.repeat;
+
+			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+		}
+
+		uniforms.envMap.value = this.envMap;
+		uniforms.flipEnvMap.value = ( this.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
+
+		if ( gammaInput ) {
+
+			//uniforms.reflectivity.value = this.reflectivity * this.reflectivity;
+			uniforms.reflectivity.value = this.reflectivity;
+
+		} else {
+
+			uniforms.reflectivity.value = this.reflectivity;
+
+		}
+
+		uniforms.refractionRatio.value = this.refractionRatio;
+
+	},
+	refreshUniformsLine: function ( uniforms ) {
+
+		uniforms.diffuse.value = this.color;
+		uniforms.opacity.value = this.opacity;
+
+	},
+
+	refreshUniformsDash: function ( uniforms ) {
+
+		uniforms.dashSize.value = this.dashSize;
+		uniforms.totalSize.value = this.dashSize + this.gapSize;
+		uniforms.scale.value = this.scale;
+
+	},
+
+	refreshUniformsParticle: function ( uniforms, scale ) {
+
+		uniforms.psColor.value = this.color;
+		uniforms.opacity.value = this.opacity;
+		uniforms.size.value = this.size;
+		uniforms.scale.value = scale;
+
+		uniforms.map.value = this.map;
+
+	},
+
+	refreshUniformsPhong: function ( uniforms, gammaInput ) {
+
+		uniforms.shininess.value = this.shininess;
+
+		if ( gammaInput ) {
+
+			uniforms.ambient.value.copyGammaToLinear( this.ambient );
+			uniforms.emissive.value.copyGammaToLinear( this.emissive );
+			uniforms.specular.value.copyGammaToLinear( this.specular );
+
+		} else {
+
+			uniforms.ambient.value = this.ambient;
+			uniforms.emissive.value = this.emissive;
+			uniforms.specular.value = this.specular;
+
+		}
+
+		if ( this.wrapAround ) {
+
+			uniforms.wrapRGB.value.copy( this.wrapRGB );
+
+		}
+
+	},
+
+	refreshUniformsLambert: function ( uniforms, gammaInput ) {
+
+		if ( gammaInput ) {
+
+			uniforms.ambient.value.copyGammaToLinear( this.ambient );
+			uniforms.emissive.value.copyGammaToLinear( this.emissive );
+
+		} else {
+
+			uniforms.ambient.value = this.ambient;
+			uniforms.emissive.value = this.emissive;
+
+		}
+
+		if ( this.wrapAround ) {
+
+			uniforms.wrapRGB.value.copy( this.wrapRGB );
+
+		}
+
+	},
+
+	refreshUniforms: function ( uniforms, renderer, camera ) {
+		console.warn( "THREE.Material: refreshUniforms() is not implemented." );
+	},
+
+	useEnvMap: function () {
+		return false; //false as default
+	},
+
+	useSkinning: function () {
+		return false; //false as default
+	},
+
+	useLights: function () {
+		return false; //false as default
+	},
+
+	getShaderID: function () {
+		return null;
+	},
+
+	getWebglShader: function () {
+		var shaderID = this.getShaderID();
+		var webglShader;
+		if ( shaderID ) {
+
+			var shader = THREE.ShaderLib[ shaderID ];
+
+			webglShader = {
+				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+			};
+
+		} else {
+
+			webglShader = {
+				uniforms: this.uniforms,
+				vertexShader: this.vertexShader,
+				fragmentShader: this.fragmentShader
+			};
+
+		}
+		return webglShader;
 	}
+
 
 };
 
@@ -13392,6 +13601,14 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 
 };
 
+THREE.LineBasicMaterial.prototype.refreshUniforms = function (uniforms) {
+	this.refreshUniformsLine(uniforms);
+};
+
+THREE.LineBasicMaterial.prototype.getShaderID = function () {
+	return 'basic';
+};
+
 // File:src/materials/LineDashedMaterial.js
 
 /**
@@ -13463,6 +13680,16 @@ THREE.LineDashedMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.LineDashedMaterial.prototype.refreshUniforms = function (uniforms) {
+	this.refreshUniformsLine(uniforms);
+	this.refreshUniformsDash(uniforms);
+};
+
+THREE.LineDashedMaterial.prototype.getShaderID = function () {
+	return 'dashed';
+};
+
 
 // File:src/materials/MeshBasicMaterial.js
 
@@ -13582,6 +13809,18 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 
 	return material;
 
+};
+
+THREE.MeshBasicMaterial.prototype.refreshUniforms = function (uniforms, renderer) {
+	this.refreshUniformsCommon(uniforms, renderer.gammaInput);
+};
+
+THREE.MeshBasicMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshBasicMaterial.prototype.getShaderID = function () {
+	return 'basic';
 };
 
 // File:src/materials/MeshLambertMaterial.js
@@ -13718,6 +13957,23 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 
 	return material;
 
+};
+
+THREE.MeshLambertMaterial.prototype.refreshUniforms = function (uniforms, renderer) {
+	this.refreshUniformsCommon(uniforms, renderer.gammaInput);
+	this.refreshUniformsLambert(uniforms, renderer.gammaInput);
+};
+
+THREE.MeshLambertMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshLambertMaterial.prototype.useLights = function () {
+	return true;
+};
+
+THREE.MeshLambertMaterial.prototype.getShaderID = function () {
+	return 'lambert';
 };
 
 // File:src/materials/MeshPhongMaterial.js
@@ -13884,6 +14140,27 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 
 };
 
+THREE.MeshPhongMaterial.prototype.refreshUniforms = function (uniforms, renderer) {
+	this.refreshUniformsCommon(uniforms, renderer.gammaInput);
+	this.refreshUniformsPhong(uniforms, renderer.gammaInput);
+};
+
+THREE.MeshPhongMaterial.prototype.useEnvMap = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.useLights = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.getShaderID = function () {
+	return 'phong';
+};
+
 // File:src/materials/MeshDepthMaterial.js
 
 /**
@@ -13930,6 +14207,16 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
 
 	return material;
 
+};
+
+THREE.MeshDepthMaterial.prototype.refreshUniforms = function (uniforms, renderer, camera) {
+	uniforms.mNear.value = camera.near;
+	uniforms.mFar.value = camera.far;
+	uniforms.opacity.value = this.opacity;
+};
+
+THREE.MeshDepthMaterial.prototype.getShaderID = function () {
+	return 'depth';
 };
 
 // File:src/materials/MeshNormalMaterial.js
@@ -13983,6 +14270,14 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 
 	return material;
 
+};
+
+THREE.MeshNormalMaterial.prototype.refreshUniforms = function (uniforms) {
+	uniforms.opacity.value = this.opacity;
+};
+
+THREE.MeshNormalMaterial.prototype.getShaderID = function () {
+	return 'normal';
 };
 
 // File:src/materials/MeshFaceMaterial.js
@@ -14129,6 +14424,14 @@ THREE.ParticleSystemMaterial = function ( parameters ) {
 
 };
 
+THREE.PointCloudMaterial.prototype.refreshUniforms = function (uniforms, renderer) {
+	this.refreshUniformsParticle(uniforms, renderer.domElement.height / 2.0);
+};
+
+THREE.PointCloudMaterial.prototype.getShaderID = function () {
+	return 'particle_basic';
+};
+
 // File:src/materials/ShaderMaterial.js
 
 /**
@@ -14241,6 +14544,18 @@ THREE.ShaderMaterial.prototype.clone = function () {
 
 	return material;
 
+};
+
+THREE.ShaderMaterial.prototype.useEnvMap = function () {
+	return true;
+};
+
+THREE.ShaderMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.ShaderMaterial.prototype.refreshUniforms = function () {
+	return true;
 };
 
 // File:src/materials/RawShaderMaterial.js
@@ -21494,42 +21809,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Materials
 
-	var shaderIDs = {
-		MeshDepthMaterial: 'depth',
-		MeshNormalMaterial: 'normal',
-		MeshBasicMaterial: 'basic',
-		MeshLambertMaterial: 'lambert',
-		MeshPhongMaterial: 'phong',
-		LineBasicMaterial: 'basic',
-		LineDashedMaterial: 'dashed',
-		PointCloudMaterial: 'particle_basic'
-	};
-
 	function initMaterial( material, lights, fog, object ) {
 
 		material.addEventListener( 'dispose', onMaterialDispose );
-
-		var shaderID = shaderIDs[ material.type ];
-
-		if ( shaderID ) {
-
-			var shader = THREE.ShaderLib[ shaderID ];
-
-			material.__webglShader = {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			}
-
-		} else {
-
-			material.__webglShader = {
-				uniforms: material.uniforms,
-				vertexShader: material.vertexShader,
-				fragmentShader: material.fragmentShader
-			}
-
-		}
+		material.__webglShader = material.getWebglShader();
 
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
@@ -21594,7 +21877,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// Generate code
 
 		var chunks = [];
-
+		var shaderID = material.getShaderID();
 		if ( shaderID ) {
 
 			chunks.push( shaderID );
@@ -21779,9 +22062,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// load material specific uniforms
 			// (shader material also gets them for the sake of genericity)
 
-			if ( material instanceof THREE.ShaderMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ||
-				 material.envMap ) {
+			if ( material.useEnvMap() || material.envMap ) {
 
 				if ( p_uniforms.cameraPosition !== null ) {
 
@@ -21792,11 +22073,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshBasicMaterial ||
-				 material instanceof THREE.ShaderMaterial ||
-				 material.skinning ) {
+			if ( material.useSkinning() || material.skinning ) {
 
 				if ( p_uniforms.viewMatrix !== null ) {
 
@@ -21863,17 +22140,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial ) {
 
-			// refresh uniforms common to several materials
-
 			if ( fog && material.fog ) {
 
 				refreshUniformsFog( m_uniforms, fog );
 
 			}
 
-			if ( material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material.lights ) {
+			if ( material.useLights() || material.lights ) {
 
 				if ( _lightsNeedUpdate ) {
 
@@ -21891,48 +22164,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( material instanceof THREE.MeshBasicMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
-			}
-
-			// refresh single material specific uniforms
-
-			if ( material instanceof THREE.LineBasicMaterial ) {
-
-				refreshUniformsLine( m_uniforms, material );
-
-			} else if ( material instanceof THREE.LineDashedMaterial ) {
-
-				refreshUniformsLine( m_uniforms, material );
-				refreshUniformsDash( m_uniforms, material );
-
-			} else if ( material instanceof THREE.PointCloudMaterial ) {
-
-				refreshUniformsParticle( m_uniforms, material );
-
-			} else if ( material instanceof THREE.MeshPhongMaterial ) {
-
-				refreshUniformsPhong( m_uniforms, material );
-
-			} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-				refreshUniformsLambert( m_uniforms, material );
-
-			} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-				m_uniforms.mNear.value = camera.near;
-				m_uniforms.mFar.value = camera.far;
-				m_uniforms.opacity.value = material.opacity;
-
-			} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-				m_uniforms.opacity.value = material.opacity;
-
-			}
+			material.refreshUniforms(m_uniforms, _this, camera);
 
 			if ( object.receiveShadow && ! material._shadowPass ) {
 
@@ -21943,7 +22175,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// load common uniforms
 
 			loadUniformsGeneric( material.uniformsList );
-
 		}
 
 		loadUniformsMatrices( p_uniforms, object );
@@ -21960,123 +22191,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Uniforms (refresh uniforms objects)
 
-	function refreshUniformsCommon ( uniforms, material ) {
-
-		uniforms.opacity.value = material.opacity;
-
-		if ( _this.gammaInput ) {
-
-			uniforms.diffuse.value.copyGammaToLinear( material.color );
-
-		} else {
-
-			uniforms.diffuse.value = material.color;
-
-		}
-
-		uniforms.map.value = material.map;
-		uniforms.lightMap.value = material.lightMap;
-		uniforms.specularMap.value = material.specularMap;
-		uniforms.alphaMap.value = material.alphaMap;
-
-		if ( material.bumpMap ) {
-
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-
-		}
-
-		// uv repeat and offset setting priorities
-		//  1. color map
-		//  2. specular map
-		//  3. normal map
-		//  4. bump map
-		//  5. alpha map
-
-		var uvScaleMap;
-
-		if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.specularMap ) {
-
-			uvScaleMap = material.specularMap;
-
-		} else if ( material.normalMap ) {
-
-			uvScaleMap = material.normalMap;
-
-		} else if ( material.bumpMap ) {
-
-			uvScaleMap = material.bumpMap;
-
-		} else if ( material.alphaMap ) {
-
-			uvScaleMap = material.alphaMap;
-
-		}
-
-		if ( uvScaleMap !== undefined ) {
-
-			var offset = uvScaleMap.offset;
-			var repeat = uvScaleMap.repeat;
-
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-		uniforms.envMap.value = material.envMap;
-		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
-
-		if ( _this.gammaInput ) {
-
-			//uniforms.reflectivity.value = material.reflectivity * material.reflectivity;
-			uniforms.reflectivity.value = material.reflectivity;
-
-		} else {
-
-			uniforms.reflectivity.value = material.reflectivity;
-
-		}
-
-		uniforms.refractionRatio.value = material.refractionRatio;
-
-	}
-
-	function refreshUniformsLine ( uniforms, material ) {
-
-		uniforms.diffuse.value = material.color;
-		uniforms.opacity.value = material.opacity;
-
-	}
-
-	function refreshUniformsDash ( uniforms, material ) {
-
-		uniforms.dashSize.value = material.dashSize;
-		uniforms.totalSize.value = material.dashSize + material.gapSize;
-		uniforms.scale.value = material.scale;
-
-	}
-
-	function refreshUniformsParticle ( uniforms, material ) {
-
-		uniforms.psColor.value = material.color;
-		uniforms.opacity.value = material.opacity;
-		uniforms.size.value = material.size;
-		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
-
-		uniforms.map.value = material.map;
-
-	}
-
 	function refreshUniformsFog ( uniforms, fog ) {
 
 		uniforms.fogColor.value = fog.color;
@@ -22089,54 +22203,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( fog instanceof THREE.FogExp2 ) {
 
 			uniforms.fogDensity.value = fog.density;
-
-		}
-
-	}
-
-	function refreshUniformsPhong ( uniforms, material ) {
-
-		uniforms.shininess.value = material.shininess;
-
-		if ( _this.gammaInput ) {
-
-			uniforms.ambient.value.copyGammaToLinear( material.ambient );
-			uniforms.emissive.value.copyGammaToLinear( material.emissive );
-			uniforms.specular.value.copyGammaToLinear( material.specular );
-
-		} else {
-
-			uniforms.ambient.value = material.ambient;
-			uniforms.emissive.value = material.emissive;
-			uniforms.specular.value = material.specular;
-
-		}
-
-		if ( material.wrapAround ) {
-
-			uniforms.wrapRGB.value.copy( material.wrapRGB );
-
-		}
-
-	}
-
-	function refreshUniformsLambert ( uniforms, material ) {
-
-		if ( _this.gammaInput ) {
-
-			uniforms.ambient.value.copyGammaToLinear( material.ambient );
-			uniforms.emissive.value.copyGammaToLinear( material.emissive );
-
-		} else {
-
-			uniforms.ambient.value = material.ambient;
-			uniforms.emissive.value = material.emissive;
-
-		}
-
-		if ( material.wrapAround ) {
-
-			uniforms.wrapRGB.value.copy( material.wrapRGB );
 
 		}
 
