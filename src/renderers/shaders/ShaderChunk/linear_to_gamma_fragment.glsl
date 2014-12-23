@@ -1,5 +1,5 @@
 #ifdef GAMMA_OUTPUT
 
-	gl_FragColor.xyz = sqrt( gl_FragColor.xyz );
+	outgoingLight.xyz = sqrt( outgoingLight.xyz );
 
 #endif

@@ -159,12 +159,13 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"gl_FragColor = vec4( vec3( 1.0 ), opacity );",
+			"   vec3 outgoingLight = vec3( 0.0, 0.0, 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				"vec4 colDiffuse = texture2D( tDiffuse, vUv );",
 				"colDiffuse.rgb *= colDiffuse.rgb;",
 
-				"gl_FragColor = gl_FragColor * colDiffuse;",
+				"diffuseColor = diffuseColor * colDiffuse;",
 
 				"vec3 normal = normalize( vNormal );",
 				"vec3 viewPosition = normalize( vViewPosition );",
@@ -190,11 +191,10 @@ THREE.ShaderSkin = {
 
 				// point lights
 
-				"vec3 specularTotal = vec3( 0.0 );",
+				"vec3 totalSpecularLight = vec3( 0.0 );",
+				"vec3 totalDiffuseLight = vec3( 0.0 );",
 
 				"#if MAX_POINT_LIGHTS > 0",
-
-					"vec3 pointTotal = vec3( 0.0 );",
 
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -215,8 +215,8 @@ THREE.ShaderSkin = {
 
 						"float pointSpecularWeight = KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"pointTotal    += lDistance * diffuse * pointLightColor[ i ] * pointDiffuseWeight;",
-						"specularTotal += lDistance * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
+						"totalDiffuseLight    += lDistance * pointLightColor[ i ] * pointDiffuseWeight;",
+						"totalSpecularLight += lDistance * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -225,8 +225,6 @@ THREE.ShaderSkin = {
 				// directional lights
 
 				"#if MAX_DIR_LIGHTS > 0",
-
-					"vec3 dirTotal = vec3( 0.0 );",
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
@@ -240,8 +238,8 @@ THREE.ShaderSkin = {
 
 						"float dirSpecularWeight =  KS_Skin_Specular( normal, dirVector, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"dirTotal 	   += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
-						"specularTotal += specular * directionalLightColor[ i ] * dirSpecularWeight * specularStrength;",
+						"totalDiffuseLight 	   += directionalLightColor[ i ] * dirDiffuseWeight;",
+						"totalSpecularLight += specular * directionalLightColor[ i ] * dirSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -251,8 +249,6 @@ THREE.ShaderSkin = {
 
 				"#if MAX_HEMI_LIGHTS > 0",
 
-					"vec3 hemiTotal = vec3( 0.0 );",
-
 					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
 						"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
@@ -261,7 +257,7 @@ THREE.ShaderSkin = {
 						"float dotProduct = dot( normal, lVector );",
 						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
 
-						"hemiTotal += diffuse * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+						"totalDiffuseLight += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
 
 						// specular (sky light)
 
@@ -273,33 +269,20 @@ THREE.ShaderSkin = {
 						"vec3 lVectorGround = -lVector;",
 						"hemiSpecularWeight += KS_Skin_Specular( normal, lVectorGround, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"specularTotal += specular * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",
+						"totalSpecularLight += specular * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",
 
 					"}",
 
 				"#endif",
 
-				// all lights contribution summation
-
-				"vec3 totalLight = vec3( 0.0 );",
-
-				"#if MAX_DIR_LIGHTS > 0",
-					"totalLight += dirTotal;",
-				"#endif",
-
-				"#if MAX_POINT_LIGHTS > 0",
-					"totalLight += pointTotal;",
-				"#endif",
-
-				"#if MAX_HEMI_LIGHTS > 0",
-					"totalLight += hemiTotal;",
-				"#endif",
-
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * ambient ) + specularTotal;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuseLight + ambientLightColor * ambient ) + totalSpecularLight;",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+
 
 			"}"
 

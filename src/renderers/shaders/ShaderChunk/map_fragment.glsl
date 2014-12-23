@@ -4,16 +4,10 @@
 
 	#ifdef GAMMA_INPUT
 
-		texelColor.xyz *= texelColor.xyz;
+		texelColor.rgb *= texelColor.rgb;
 
 	#endif
 
-	gl_FragColor = gl_FragColor * texelColor;
-	
-	#if defined( PHONG )
-
-		diffuseColor *= texelColor.xyz;
-
-	#endif
+	diffuseColor.rgb *= texelColor.rgb;
 
 #endif

@@ -17,10 +17,10 @@ vec3 viewPosition = normalize( vViewPosition );
 
 #endif
 
-#if MAX_POINT_LIGHTS > 0
+vec3 totalDiffuseLight = vec3( 0.0 );
+vec3 totalSpecularLight = vec3( 0.0 );
 
-	vec3 pointDiffuse = vec3( 0.0 );
-	vec3 pointSpecular = vec3( 0.0 );
+#if MAX_POINT_LIGHTS > 0
 
 	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
 
@@ -50,7 +50,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		#endif
 
-		pointDiffuse += pointLightColor[ i ] * pointDiffuseWeight * lDistance;
+		totalDiffuseLight += pointLightColor[ i ] * pointDiffuseWeight * lDistance;
 
 				// specular
 
@@ -61,16 +61,13 @@ vec3 viewPosition = normalize( vViewPosition );
 		float specularNormalization = ( shininess + 2.0 ) / 8.0;
 
 		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );
-		pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;
+		totalSpecularLight += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;
 
 	}
 
 #endif
 
 #if MAX_SPOT_LIGHTS > 0
-
-	vec3 spotDiffuse = vec3( 0.0 );
-	vec3 spotSpecular = vec3( 0.0 );
 
 	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
 
@@ -106,7 +103,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 			#endif
 
-			spotDiffuse += spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;
+			totalDiffuseLight += spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;
 
 			// specular
 
@@ -117,7 +114,7 @@ vec3 viewPosition = normalize( vViewPosition );
 			float specularNormalization = ( shininess + 2.0 ) / 8.0;
 
 			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );
-			spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;
+			totalSpecularLight += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;
 
 		}
 
@@ -126,9 +123,6 @@ vec3 viewPosition = normalize( vViewPosition );
 #endif
 
 #if MAX_DIR_LIGHTS > 0
-
-	vec3 dirDiffuse = vec3( 0.0 );
-	vec3 dirSpecular = vec3( 0.0 );
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
@@ -152,7 +146,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		#endif
 
-		dirDiffuse += directionalLightColor[ i ] * dirDiffuseWeight;
+		totalDiffuseLight += directionalLightColor[ i ] * dirDiffuseWeight;
 
 		// specular
 
@@ -184,7 +178,7 @@ vec3 viewPosition = normalize( vViewPosition );
 		// 		dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;
 
 		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );
-		dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;
+		totalSpecularLight += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;
 
 
 	}
@@ -192,9 +186,6 @@ vec3 viewPosition = normalize( vViewPosition );
 #endif
 
 #if MAX_HEMI_LIGHTS > 0
-
-	vec3 hemiDiffuse = vec3( 0.0 );
-	vec3 hemiSpecular = vec3( 0.0 );
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
@@ -208,7 +199,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );
 
-		hemiDiffuse += hemiColor;
+		totalDiffuseLight += hemiColor;
 
 		// specular (sky light)
 
@@ -230,49 +221,18 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );
 		vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );
-		hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );
+		totalSpecularLight += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );
 
 	}
 
 #endif
 
-vec3 totalDiffuse = vec3( 0.0 );
-vec3 totalSpecular = vec3( 0.0 );
-
-#if MAX_DIR_LIGHTS > 0
-
-	totalDiffuse += dirDiffuse;
-	totalSpecular += dirSpecular;
-
-#endif
-
-#if MAX_HEMI_LIGHTS > 0
-
-	totalDiffuse += hemiDiffuse;
-	totalSpecular += hemiSpecular;
-
-#endif
-
-#if MAX_POINT_LIGHTS > 0
-
-	totalDiffuse += pointDiffuse;
-	totalSpecular += pointSpecular;
-
-#endif
-
-#if MAX_SPOT_LIGHTS > 0
-
-	totalDiffuse += spotDiffuse;
-	totalSpecular += spotSpecular;
-
-#endif
-
 #ifdef METAL
 
-	gl_FragColor.xyz = diffuseColor * ( emissive + totalDiffuse + ambientLightColor * ambient + totalSpecular );
+	outgoingLight += diffuseColor.rgb * ( emissive + totalDiffuseLight + ambientLightColor * ambient + totalSpecularLight );
 
 #else
 
-	gl_FragColor.xyz = diffuseColor * ( emissive + totalDiffuse + ambientLightColor * ambient ) + totalSpecular;
+	outgoingLight += diffuseColor.rgb * ( emissive + totalDiffuseLight + ambientLightColor * ambient ) + totalSpecularLight;
 
 #endif
