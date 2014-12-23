@@ -8,6 +8,6 @@
 
 	#endif
 
-	diffuseColor.rgb *= texelColor.rgb;
+	diffuseColor *= texelColor;
 
 #endif
