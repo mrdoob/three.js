@@ -115,3 +115,15 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.MeshBasicMaterial.prototype.refreshUniforms = function (uniforms, renderer) {
+	this.refreshUniformsCommon(uniforms, renderer.gammaInput);
+};
+
+THREE.MeshBasicMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshBasicMaterial.prototype.getShaderID = function () {
+	return 'basic';
+};

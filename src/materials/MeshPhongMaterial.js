@@ -159,3 +159,24 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.MeshPhongMaterial.prototype.refreshUniforms = function (uniforms, renderer) {
+	this.refreshUniformsCommon(uniforms, renderer.gammaInput);
+	this.refreshUniformsPhong(uniforms, renderer.gammaInput);
+};
+
+THREE.MeshPhongMaterial.prototype.useEnvMap = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.useLights = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.getShaderID = function () {
+	return 'phong';
+};

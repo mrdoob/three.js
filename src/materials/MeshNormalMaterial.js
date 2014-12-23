@@ -48,3 +48,11 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.MeshNormalMaterial.prototype.refreshUniforms = function (uniforms) {
+	uniforms.opacity.value = this.opacity;
+};
+
+THREE.MeshNormalMaterial.prototype.getShaderID = function () {
+	return 'normal';
+};
