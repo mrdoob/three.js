@@ -413,8 +413,11 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_particle_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
+
+			"	outgoingLight.rgb = diffuseColor.rgb;", // simple shader
+
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
 
