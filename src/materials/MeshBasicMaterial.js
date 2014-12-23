@@ -128,3 +128,15 @@ THREE.MeshBasicMaterial.prototype.toJSON = function () {
 	return data;
 
 };
+
+THREE.MeshBasicMaterial.prototype.refreshUniforms = function (uniforms) {
+	this.refreshUniformsCommon(uniforms);
+};
+
+THREE.MeshBasicMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshBasicMaterial.prototype.getShaderID = function () {
+	return 'basic';
+};

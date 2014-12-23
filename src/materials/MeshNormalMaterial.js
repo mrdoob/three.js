@@ -55,3 +55,11 @@ THREE.MeshNormalMaterial.prototype.toJSON = function () {
 	return data;
 
 };
+
+THREE.MeshNormalMaterial.prototype.refreshUniforms = function (uniforms) {
+	uniforms.opacity.value = this.opacity;
+};
+
+THREE.MeshNormalMaterial.prototype.getShaderID = function () {
+	return 'normal';
+};

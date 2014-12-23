@@ -95,3 +95,11 @@ THREE.ParticleSystemMaterial = function ( parameters ) {
 	return new THREE.PointCloudMaterial( parameters );
 
 };
+
+THREE.PointCloudMaterial.prototype.refreshUniforms = function (uniforms, renderer) {
+	this.refreshUniformsParticle(uniforms, renderer.domElement.height / 2.0);
+};
+
+THREE.PointCloudMaterial.prototype.getShaderID = function () {
+	return 'particle_basic';
+};

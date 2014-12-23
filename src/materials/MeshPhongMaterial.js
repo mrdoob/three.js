@@ -186,3 +186,24 @@ THREE.MeshPhongMaterial.prototype.toJSON = function () {
 	return data;
 
 };
+
+THREE.MeshPhongMaterial.prototype.refreshUniforms = function (uniforms) {
+	this.refreshUniformsCommon(uniforms);
+	this.refreshUniformsPhong(uniforms);
+};
+
+THREE.MeshPhongMaterial.prototype.useEnvMap = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.useLights = function () {
+	return true;
+};
+
+THREE.MeshPhongMaterial.prototype.getShaderID = function () {
+	return 'phong';
+};
