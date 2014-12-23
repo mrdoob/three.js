@@ -38,7 +38,6 @@ THREE.ShaderSkin = {
 
 			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"ambient":  { type: "c", value: new THREE.Color( 0x050505 ) },
 			"opacity": 	  { type: "f", value: 1 },
 
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
@@ -65,7 +64,6 @@ THREE.ShaderSkin = {
 			"uniform bool enableBump;",
 			"uniform bool enableSpecular;",
 
-			"uniform vec3 ambient;",
 			"uniform vec3 diffuse;",
 			"uniform vec3 specular;",
 			"uniform float opacity;",
@@ -295,7 +293,7 @@ THREE.ShaderSkin = {
 					"totalLight += hemiTotal;",
 				"#endif",
 
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * ambient ) + specularTotal;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor ) + specularTotal;",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -377,7 +375,6 @@ THREE.ShaderSkin = {
 
 			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"ambient":  { type: "c", value: new THREE.Color( 0x050505 ) },
 			"opacity": 	  { type: "f", value: 1 },
 
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
@@ -389,7 +386,6 @@ THREE.ShaderSkin = {
 
 		fragmentShader: [
 
-			"uniform vec3 ambient;",
 			"uniform vec3 diffuse;",
 			"uniform vec3 specular;",
 			"uniform float opacity;",
@@ -595,7 +591,7 @@ THREE.ShaderSkin = {
 
 					"gl_FragColor.xyz *= pow( colDiffuse.xyz, vec3( 0.5 ) );",
 
-					"gl_FragColor.xyz += ambientLightColor * ambient * colDiffuse.xyz + specularTotal;",
+					"gl_FragColor.xyz += ambientLightColor * colDiffuse.xyz + specularTotal;",
 
 					"#ifndef VERSION1",
 

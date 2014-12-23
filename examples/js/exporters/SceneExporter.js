@@ -472,7 +472,6 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "MeshLambertMaterial",',
 				'	"parameters"  : {',
 				'		"color"  : ' 	+ m.color.getHex() + ',',
-				'		"ambient"  : ' 	+ m.ambient.getHex() + ',',
 				'		"emissive"  : ' + m.emissive.getHex() + ',',
 
 				m.map ? 		'		"map" : ' + LabelString( getTextureName( m.map ) ) + ',' : '',
@@ -498,7 +497,6 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "MeshPhongMaterial",',
 				'	"parameters"  : {',
 				'		"color"  : ' 	+ m.color.getHex() + ',',
-				'		"ambient"  : ' 	+ m.ambient.getHex() + ',',
 				'		"emissive"  : ' + m.emissive.getHex() + ',',
 				'		"specular"  : ' + m.specular.getHex() + ',',
 				'		"shininess" : ' + m.shininess + ',',

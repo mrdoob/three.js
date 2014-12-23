@@ -42,7 +42,6 @@ THREE.ShaderTerrain = {
 
 			"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"ambient": { type: "c", value: new THREE.Color( 0x050505 ) },
 			"shininess": { type: "f", value: 30 },
 			"opacity": { type: "f", value: 1 },
 
@@ -57,7 +56,6 @@ THREE.ShaderTerrain = {
 
 		fragmentShader: [
 
-			"uniform vec3 ambient;",
 			"uniform vec3 diffuse;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
@@ -288,8 +286,8 @@ THREE.ShaderTerrain = {
 
 				"#endif",
 
-				//"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient) + totalSpecular;",
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient + totalSpecular );",
+				//"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor) + totalSpecular;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor + totalSpecular );",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],

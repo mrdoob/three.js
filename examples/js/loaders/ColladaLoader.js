@@ -3576,7 +3576,6 @@ THREE.ColladaLoader = function () {
 
 			switch ( child.nodeName ) {
 
-				case 'ambient':
 				case 'emission':
 				case 'diffuse':
 				case 'specular':

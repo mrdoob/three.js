@@ -785,11 +785,6 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 	params.shininess = shininess;
                 }
                 
-                if (!(values.ambient === undefined) && !(typeof(values.ambient) == 'string'))
-                {
-                	params.ambient = RgbArraytoHex(values.ambient);
-                }
-
                 if (!(values.emission === undefined))
                 {
                 	params.emissive = RgbArraytoHex(values.emission);
