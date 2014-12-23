@@ -301,9 +301,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_lightsNeedUpdate = true;
 
-		for ( var i = 0; i < _enabledAttributes.length; i ++ ) {
+		for ( var i = 0; i < _newAttributes.length; i ++ ) {
 
-			_enabledAttributes[ i ] = 0;
+			_newAttributes[ i ] = 0;
 
 		}
 
@@ -579,10 +579,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	//START_VEROLD_MOD
 	this.getViewport = function () {
 		var viewport = {
-			x: _viewportX / this.devicePixelRatio,
-			y: _viewportY / this.devicePixelRatio,
-			width: _viewportWidth / this.devicePixelRatio,
-			height: _viewportHeight / this.devicePixelRatio,
+			x: _viewportX / pixelRatio,
+			y: _viewportY / pixelRatio,
+			width: _viewportWidth / pixelRatio,
+			height: _viewportHeight / pixelRatio,
 		}
 		return viewport;
 	};
