@@ -2,88 +2,86 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var APP = {};
+var APP = {
 
-APP.Player = function () {
+	Player: function () {
 
-	var loader = new THREE.ObjectLoader();
-	var camera, scene, renderer;
-	var scripts;
+		var loader = new THREE.ObjectLoader();
+		var camera, scene, renderer;
+
+		var scripts = {
+			update: []
+		};
 	
-	this.dom = undefined;
+		this.dom = undefined;
 
-	this.load = function ( json ) {
+		this.load = function ( json ) {
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
 
-		scene = loader.parse( json );
+			camera = loader.parse( json.camera );
 
-		/*
-		scripts = [];
+			scene = loader.parse( json.scene );
 
-		scene.traverse( function ( child ) {
+			scripts.update = [];
 
-			if ( child.script !== undefined ) {
+			for ( var uuid in json.scripts ) {
 
-				var script = new Function( 'scene', 'time', child.script.source ).bind( child );
-				scripts.push( script );
+				var source = json.scripts[ uuid ];
+				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+
+				var script = ( new Function( 'scene', 'time', source ).bind( object ) )();
+
+				if ( script.update !== undefined ) {
+
+					scripts.update.push( script.update );
+
+				}
 
 			}
 
-		} );
-		*/
+			this.dom = renderer.domElement;
 
-		this.dom = renderer.domElement;
+		};
 
-	};
+		this.setSize = function ( width, height ) {
 
-	this.setCamera = function ( master ) {
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
 
-		camera = master.clone();
+			renderer.setSize( width, height );
 
-	};
+		};
 
-	this.setSize = function ( width, height ) {
+		var request;
 
-		renderer.setSize( width, height );
+		var animate = function ( time ) {
 
-	};
+			request = requestAnimationFrame( animate );
 
-	var request;
+			for ( var i = 0, l = scripts.update.length; i < l; i ++ ) {
 
-	var animate = function ( time ) {
+				scripts.update[ i ]( scene, time );
 
-		request = requestAnimationFrame( animate );
+			}
 
-		/*
-		for ( var i = 0; i < scripts.length; i ++ ) {
+			renderer.render( scene, camera );
 
-			scripts[ i ]( scene, time );
+		};
 
-		}
-		*/
+		this.play = function () {
 
-		renderer.render( scene, camera );
+			request = requestAnimationFrame( animate );
 
-	};
+		};
 
-	this.play = function () {
+		this.stop = function () {
 
-		request = requestAnimationFrame( animate );
+			cancelAnimationFrame( request );
 
-	};
+		};
 
-	this.stop = function () {
-
-		cancelAnimationFrame( request );
-
-	};
-
-};
-
-APP.Script = function ( source ) {
-
-	this.uuid = THREE.Math.generateUUID();
-	this.source = source;
+	}
 
 };

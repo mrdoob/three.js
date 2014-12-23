@@ -4,6 +4,8 @@
 
 Sidebar.Script.Editor = function ( editor ) {
 
+	var signals = editor.signals;
+
 	var timeout;
 
 	var scriptSource = new UI.TextArea( 'javascript' ).setWidth( '240px' ).setHeight( '180px' ).setFontSize( '12px' );
@@ -33,11 +35,31 @@ Sidebar.Script.Editor = function ( editor ) {
 
 			}
 
-			editor.scripts[ object.uuid ] = [ source ];
+			editor.scripts[ object.uuid ] = source;
 
 			editor.signals.objectChanged.dispatch( object );
 
 		}, 500 );
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
+		if ( object !== null ) {
+
+			var script = editor.scripts[ object.uuid ];
+
+			if ( script !== undefined ) {
+
+				scriptSource.setValue( script );
+
+			} else {
+
+				scriptSource.setValue( '' );
+
+			}
+
+		}
 
 	} );
 

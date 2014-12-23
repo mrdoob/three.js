@@ -15,12 +15,11 @@ var Player = function ( editor ) {
 
 	var player = new APP.Player();
 
-	signals.startPlayer.add( function ( json ) {
+	signals.startPlayer.add( function () {
 
 		container.setDisplay( '' );
 
-		player.load( json );
-		player.setCamera( editor.camera );
+		player.load( editor.toJSON() );
 		player.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 		player.play();
 
