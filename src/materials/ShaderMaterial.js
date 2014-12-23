@@ -109,3 +109,15 @@ THREE.ShaderMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.ShaderMaterial.prototype.useEnvMap = function () {
+	return true;
+};
+
+THREE.ShaderMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.ShaderMaterial.prototype.refreshUniforms = function () {
+	return true;
+};

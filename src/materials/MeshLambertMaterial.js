@@ -128,3 +128,20 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.MeshLambertMaterial.prototype.refreshUniforms = function (uniforms) {
+	this.refreshUniformsCommon(uniforms);
+	this.refreshUniformsLambert(uniforms);
+};
+
+THREE.MeshLambertMaterial.prototype.useSkinning = function () {
+	return true;
+};
+
+THREE.MeshLambertMaterial.prototype.useLights = function () {
+	return true;
+};
+
+THREE.MeshLambertMaterial.prototype.getShaderID = function () {
+	return 'lambert';
+};
