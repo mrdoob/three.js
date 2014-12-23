@@ -27,20 +27,6 @@ Sidebar.Script = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			/*
-			var scripts = editor.scripts[ object.uuid ];
-
-			if ( scripts !== undefined ) {
-
-				scriptSource.setValue( scripts[ 0 ] );
-
-			} else {
-
-				scriptSource.setValue( '' );
-
-			}
-			*/
-
 		} else {
 
 			container.setDisplay( 'none' );

@@ -20,7 +20,7 @@ Menubar.Play = function ( editor ) {
 
 			isPlaying = true;
 			title.setTextContent( 'Stop' );
-			signals.startPlayer.dispatch( editor.scene.toJSON() );
+			signals.startPlayer.dispatch();
 
 		} else {
 
