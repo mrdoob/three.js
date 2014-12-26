@@ -20,7 +20,8 @@ vec4 mvPosition;
 
 #if defined( USE_SHARED_MATERIAL )
 
-	mvPosition = sharedMaterialTransformMatrix * vec4( position, 1.0 );
+	mvPosition = modelViewMatrix * sharedMaterialTransformMatrix * vec4( position, 1.0 );
+	
 
 #endif
 

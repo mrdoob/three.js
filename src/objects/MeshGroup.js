@@ -41,7 +41,7 @@ THREE.MeshGroup.prototype.build = function() {
 	this.object.matricesTexture = this.matricesTexture;
 
 	return this.object;
-		
+	
 };
 	
 THREE.MeshGroup.prototype.calculateSquaredTextureWidth = function( count ) {
@@ -113,7 +113,9 @@ THREE.MeshGroup.prototype.generateTransformMatrixIndices = function( object3Ds )
 			jl = totalLength;
 			
 			for( ; j < jl; j++ ) {
+
 				matrixIndices[j] = i;
+				
 			}
 			
 		}
@@ -159,14 +161,19 @@ THREE.MeshGroup.prototype.buildMaterial = function() {
 		
 	this.matrixIndices = this.generateTransformMatrixIndices( this.children );
 	
-	this.geometry.addAttribute( 'transformMatrixIndex', new THREE.BufferAttribute( this.matrixIndices, 1 ) );
-			
+	this.material.attributes = {
+		sharedMaterialMatrixIndex:	{ type: 'f', value: null }
+	}
+	
+	this.geometry.addAttribute( 'sharedMaterialMatrixIndex', new THREE.BufferAttribute( this.matrixIndices, 1 ) );
+	
 };
 
+
 THREE.MeshGroup.prototype.updateMatrixWorld = function( force ) {
-	
+
 	if ( this.matrixWorldNeedsUpdate === true || force === true ) {
-	
+
 		for( var i = 0, il = this.children.length; i < il ; i++ ) {
 			
 			this.children[i].updateMatrixWorld( force );

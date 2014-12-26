@@ -1,18 +1,24 @@
 vec3 objectNormal;
 
-#ifdef USE_SKINNING
+#if defined( USE_SKINNING ) && !defined( USE_SHARED_MATERIAL )
 
 	objectNormal = skinnedNormal.xyz;
 
 #endif
 
-#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )
+#if !defined( USE_SKINNING ) && defined( USE_SHARED_MATERIAL )
+
+	objectNormal = sharedMaterialNormal.xyz;
+
+#endif
+
+#if !defined( USE_SKINNING ) && !defined( USE_SHARED_MATERIAL ) && defined( USE_MORPHNORMALS )
 
 	objectNormal = morphedNormal;
 
 #endif
 
-#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )
+#if !defined( USE_SKINNING ) && !defined( USE_SHARED_MATERIAL ) && ! defined( USE_MORPHNORMALS )
 
 	objectNormal = normal;
 
@@ -23,5 +29,6 @@ vec3 objectNormal;
 	objectNormal = -objectNormal;
 
 #endif
+
 
 vec3 transformedNormal = normalMatrix * objectNormal;

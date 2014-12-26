@@ -228,6 +228,12 @@ THREE.WebGLProgram = ( function () {
 				"	attribute vec4 skinWeight;",
 
 				"#endif",
+				
+				"#ifdef USE_SHARED_MATERIAL",
+
+				"	attribute float sharedMaterialMatrixIndex;",
+
+				"#endif",
 
 				""
 

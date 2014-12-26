@@ -138,6 +138,7 @@
 	"src/renderers/shaders/ShaderChunk/alphamap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/sharedmat_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/sharedmat_vertex.glsl",
+	"src/renderers/shaders/ShaderChunk/sharedmatnormal_vertex.glsl",
 	"src/renderers/shaders/UniformsUtils.js",
 	"src/renderers/shaders/UniformsLib.js",
 	"src/renderers/shaders/ShaderLib.js",

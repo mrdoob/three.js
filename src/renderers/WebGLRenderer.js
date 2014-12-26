@@ -4443,7 +4443,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.sharedMaterialMatricesTextureWidth !== null ) {
 
-					_gl.uniform1i( p_uniforms.sharedMaterialMatricesTextureWidth, material.matricesTextureWidth );
+					_gl.uniform1f( p_uniforms.sharedMaterialMatricesTextureWidth, material.matricesTextureWidth );
 					
 
 				}

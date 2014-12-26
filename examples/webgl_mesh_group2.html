@@ -76,10 +76,10 @@
 
 				// world
 
-				var geometry = new THREE.CylinderGeometry( 1, 10, 30, 10, 1 );
-				var material =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.SmoothShading } );
+				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 5, 1 );
+				var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
 				
-				meshGroup = new THREE.MeshGroup( THREE.Mesh, material );
+				meshGroup = new THREE.Mesh();
 
 				function randomRange(min, max) {
 					return Math.random() * (max - min) + min;
@@ -87,14 +87,9 @@
 				
 				var twoPi = Math.PI * 2;
 				var speed = 10;
-				var count = +window.location.hash.substring(1);
-				if( count === NaN ) {
-					count = 5000;
-				}
+				for ( var i = 0; i < 50000; i ++ ) {
 
-				for ( var i = 0; i < count; i ++ ) {
-
-					var mesh = new THREE.Mesh( geometry );
+					var mesh = new THREE.Mesh( geometry, material );
 					
 					mesh.position.x = ( Math.random() - 0.5 ) * 500;
 					mesh.position.y = ( Math.random() - 0.5 ) * 500;
@@ -128,9 +123,7 @@
 
 				}
 				
-				meshGroup.build();
-				meshGroup.updateMatrixWorld( true );
-				scene.add( meshGroup.object );
+				scene.add( meshGroup );
 				
 				var cube = new THREE.Mesh(
 					new THREE.BoxGeometry( 50, 50, 50 ),
@@ -139,26 +132,16 @@
 				// scene.add( cube );
 
 				// lights
-				
-				var intensity = 0.8;
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
-				light.intensity = intensity;
 				scene.add( light );
 
-				light = new THREE.DirectionalLight( 0xff8800 );
-				light.intensity = intensity;
-				light.position.set( -1, -1, 1 );
-				scene.add( light );
-
-				light = new THREE.DirectionalLight( 0x0033ff );
-				light.intensity = intensity;
+				light = new THREE.DirectionalLight( 0x002288 );
 				light.position.set( -1, -1, -1 );
 				scene.add( light );
 
 				light = new THREE.AmbientLight( 0x222222 );
-				light.intensity = intensity;
 				scene.add( light );
 
 
