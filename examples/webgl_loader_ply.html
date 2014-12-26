@@ -118,9 +118,9 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;

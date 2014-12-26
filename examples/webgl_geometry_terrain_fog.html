@@ -102,6 +102,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xefd1b5 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";

@@ -127,6 +127,7 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

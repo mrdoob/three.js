@@ -1,7 +1,5 @@
 #ifdef USE_ENVMAP
 
-	vec3 reflectVec;
-
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )
 
 		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );
@@ -11,19 +9,19 @@
 
 		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );
 
-		if ( useRefract ) {
+		#ifdef ENVMAP_MODE_REFLECTION
 
-			reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );
+			vec3 reflectVec = reflect( cameraToVertex, worldNormal );
 
-		} else { 
+		#else
 
-			reflectVec = reflect( cameraToVertex, worldNormal );
+			vec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );
 
-		}
+		#endif
 
 	#else
 
-		reflectVec = vReflect;
+		vec3 reflectVec = vReflect;
 
 	#endif
 
@@ -53,18 +51,18 @@
 
 	#endif
 
-	if ( combine == 1 ) {
-
-		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );
-
-	} else if ( combine == 2 ) {
-
-		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;
-
-	} else {
+	#ifdef ENVMAP_BLENDING_MULTIPLY
 
 		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * envColor.xyz, specularStrength * reflectivity );
 
-	}
+	#elif defined( ENVMAP_BLENDING_MIX )
+
+		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );
+
+	#elif defined( ENVMAP_BLENDING_ADD )
+
+		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;
+
+	#endif
 
 #endif

@@ -7,11 +7,9 @@
 		uniform sampler2D envMap;
 	#endif
 	uniform float flipEnvMap;
-	uniform int combine;
 
 	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )
 
-		uniform bool useRefract;
 		uniform float refractionRatio;
 
 	#else

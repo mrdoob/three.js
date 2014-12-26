@@ -210,7 +210,15 @@
 		<div>
 		parameters -- An object containing various parameters setting up shaders and their uniforms.
 		</div>
-
+		<div>
+		shading — Define shading type. Default is THREE.SmoothShading.<br />
+		fog — Define whether the material color is affected by global fog settings. Default is true.<br />
+		wireframe — render geometry as wireframe. Default is false.<br />
+		wireframeLinewidth — Line thickness. Default is 1.<br />
+		vertexColors — Define how the vertices gets colored. Default is THREE.NoColors.<br />
+		skinning — Define whether the material uses skinning. Default is false.<br />
+		morphTargets — Define whether the material uses morphTargets. Default is false.
+		</div>
 
 		<h2>Properties</h2>
 
@@ -254,35 +262,40 @@
 		in the GLSL code.
 		</div>
 
-		<h3>[property:String fragmentShader]</h3>
-		<div>
-		Fragment shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed as a string directly or loaded via AJAX instead.
-		</div>
-
 		<h3>[property:String vertexShader]</h3>
 		<div>
 		Vertex shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed as a string directly or loaded via AJAX instead.
 		</div>
 
-
-		<h3>[property:Boolean lights]</h3>
+		<h3>[property:String fragmentShader]</h3>
 		<div>
-		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader
+		Fragment shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed as a string directly or loaded via AJAX instead.
 		</div>
 
-		<h3>[property:Boolean morphTargets]</h3>
+		<h3>[property:Number shading]</h3>
 		<div>
-		Defines whether the material uses morphTargets; true morphTarget attributes to this shader
+		Define shading type, which determines whether normals are smoothed between vertices; possible values are [page:Materials THREE.SmoothShading] or [page:Materials THREE.FlatShading]. Default is THREE.SmoothShading.
 		</div>
 
-		<h3>[property:Boolean morphNormals]</h3>
-		<div>
-		Defines whether the material uses morphNormals; true to pass morphNormal attributes to this shader
-		</div>
+		<h3>[property:Number linewidth]</h3>
+		<div>Controls line thickness; only effective if the material is attached to a [page:Line]. Default is 1.</div>
+		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<div>
 		Render geometry as wireframe (using GL_LINES instead of GL_TRIANGLES). Default is false (i.e. render as flat polygons).
+		</div>
+
+		<h3>[property:Number wireframeLinewidth]</h3>
+		<div>Controls wireframe thickness; only effective if the material is attached to a [page:Mesh] and *wireframe* is true. Default is 1.</div>
+		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+
+		<h3>[property:Boolean fog]</h3>
+		<div>Define whether the material color is affected by global fog settings; true to pass fog uniforms to the shader. Default is false.</div>
+
+		<h3>[property:Boolean lights]</h3>
+		<div>
+		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader
 		</div>
 
 		<h3>[property:Number vertexColors]</h3>
@@ -295,22 +308,16 @@
 		Define whether the material uses skinning; true to pass skinning attributes to the shader. Default is false.
 		</div>
 
-		<h3>[property:Boolean fog]</h3>
-		<div>Define whether the material color is affected by global fog settings; true to pass fog uniforms to the shader. Default is false.</div>
-
-
-		<h3>[property:Number shading]</h3>
+		<h3>[property:Boolean morphTargets]</h3>
 		<div>
-		Define shading type, which determines whether normals are smoothed between vertices; possible values are [page:Materials THREE.SmoothShading] or [page:Materials THREE.FlatShading]. Default is THREE.SmoothShading.
+		Defines whether the material uses morphTargets; true morphTarget attributes to this shader
 		</div>
 
-		<h3>[property:Number linewidth]</h3>
-		<div>Controls line thickness; only effective if the material is attached to a [page:Line]. Default is 1.</div>
-		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
-
-		<h3>[property:Number wireframeLinewidth]</h3>
-		<div>Controls wireframe thickness; only effective if the material is attached to a [page:Mesh] and *wireframe* is true. Default is 1.</div>
-		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+		<h3>[property:boolean morphNormals]</h3>
+		<div>
+			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
+			to the shader. Default is *false*.
+		</div>
 
 		<h3>[property:WebGLProgram program]</h3>
 		<div>

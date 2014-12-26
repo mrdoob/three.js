@@ -14,6 +14,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
+	pixelRatio = 1,
+
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
@@ -42,7 +44,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.context = null;
-	this.devicePixelRatio = self.devicePixelRatio !== undefined ? self.devicePixelRatio : 1;
 
 	// clearing
 
@@ -464,10 +465,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getPixelRatio = function () {
+
+		return pixelRatio;
+
+	};
+
+	this.setPixelRatio = function ( value ) {
+
+		pixelRatio = value;
+
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_canvas.width = width * this.devicePixelRatio;
-		_canvas.height = height * this.devicePixelRatio;
+		_canvas.width = width * pixelRatio;
+		_canvas.height = height * pixelRatio;
 
 		if ( updateStyle !== false ) {
 
@@ -482,11 +495,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x * this.devicePixelRatio;
-		_viewportY = y * this.devicePixelRatio;
+		_viewportX = x * pixelRatio;
+		_viewportY = y * pixelRatio;
 
-		_viewportWidth = width * this.devicePixelRatio;
-		_viewportHeight = height * this.devicePixelRatio;
+		_viewportWidth = width * pixelRatio;
+		_viewportHeight = height * pixelRatio;
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
@@ -495,10 +508,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setScissor = function ( x, y, width, height ) {
 
 		_gl.scissor(
-			x * this.devicePixelRatio,
-			y * this.devicePixelRatio,
-			width * this.devicePixelRatio,
-			height * this.devicePixelRatio
+			x * pixelRatio,
+			y * pixelRatio,
+			width * pixelRatio,
+			height * pixelRatio
 		);
 
 	};
@@ -2657,11 +2670,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var position = geometry.attributes.position;
+				var offsets = geometry.offsets;
 
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
+				if ( offsets.length === 0 ) {
 
-				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length / 3;
+					_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+					_this.info.render.calls ++;
+					_this.info.render.points += position.array.length / 3;
+
+				} else {
+
+					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+						var startIndex = offsets[ i ].index;
+
+						_gl.drawArrays( mode, 0, offsets[ i ].count );
+
+						_this.info.render.calls ++;
+						_this.info.render.points += offsets[ i ].count;
+
+					}
+
+				}
 
 			}
 
@@ -2748,11 +2779,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var position = geometry.attributes.position;
+				var offsets = geometry.offsets;
 
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
+				if ( offsets.length === 0 ) {
 
-				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length / 3;
+					_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+					_this.info.render.calls ++;
+					_this.info.render.vertices += position.array.length / 3;
+
+				} else {
+
+					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+						var startIndex = offsets[ i ].index;
+
+						_gl.drawArrays( mode, 0, offsets[ i ].count );
+
+						_this.info.render.calls ++;
+						_this.info.render.vertices += offsets[ i ].count;
+
+					}
+
+				}
 
 			}
 
@@ -3090,7 +3139,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				influence = influences[ i ];
 
-				if ( influence > 0 ) {
+				if ( influence !== 0 ) {
 
 					activeInfluenceIndices.push( [ influence, i ] );
 
@@ -3617,7 +3666,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				//
+				_this.info.memory.geometries ++;
 
 			} else if ( object instanceof THREE.Mesh ) {
 
@@ -4039,45 +4088,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Materials
 
+	var shaderIDs = {
+		MeshDepthMaterial: 'depth',
+		MeshNormalMaterial: 'normal',
+		MeshBasicMaterial: 'basic',
+		MeshLambertMaterial: 'lambert',
+		MeshPhongMaterial: 'phong',
+		LineBasicMaterial: 'basic',
+		LineDashedMaterial: 'dashed',
+		PointCloudMaterial: 'particle_basic'
+	};
+
 	function initMaterial( material, lights, fog, object ) {
 
 		material.addEventListener( 'dispose', onMaterialDispose );
 
-		var shaderID;
-
-		if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			shaderID = 'depth';
-
-		} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-			shaderID = 'normal';
-
-		} else if ( material instanceof THREE.MeshBasicMaterial ) {
-
-			shaderID = 'basic';
-
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-			shaderID = 'lambert';
-
-		} else if ( material instanceof THREE.MeshPhongMaterial ) {
-
-			shaderID = 'phong';
-
-		} else if ( material instanceof THREE.LineBasicMaterial ) {
-
-			shaderID = 'basic';
-
-		} else if ( material instanceof THREE.LineDashedMaterial ) {
-
-			shaderID = 'dashed';
-
-		} else if ( material instanceof THREE.PointCloudMaterial ) {
-
-			shaderID = 'particle_basic';
-
-		}
+		var shaderID = shaderIDs[ material.type ];
 
 		if ( shaderID ) {
 
@@ -4113,11 +4139,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			map: !! material.map,
 			envMap: !! material.envMap,
+			envMapMode: material.envMap && material.envMap.mapping,
 			lightMap: !! material.lightMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
+
+			combine: material.combine,
 
 			vertexColors: material.vertexColors,
 
@@ -4639,10 +4668,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.refractionRatio.value = material.refractionRatio;
-		uniforms.combine.value = material.combine;
-		uniforms.useRefract.value = material.envMap && (
-			material.envMap.mapping === THREE.CubeRefractionMapping ||
-			material.envMap.mapping === THREE.EquirectangularRefractionMapping );
 
 	}
 
@@ -5547,6 +5572,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function setLineWidth ( width ) {
+
+		width *= pixelRatio;
 
 		if ( width !== _oldLineWidth ) {
 

@@ -150,13 +150,13 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 
 		// Create render target
 		if ( renderTarget ) renderTarget.dispose();
-		renderTarget = new THREE.WebGLRenderTarget( ( HMD.hResolution * distScale / 2 ) * renderer.devicePixelRatio, ( HMD.vResolution * distScale ) * renderer.devicePixelRatio, RTParams );
+		renderTarget = new THREE.WebGLRenderTarget( HMD.hResolution * distScale / 2, HMD.vResolution * distScale, RTParams );
 		RTMaterial.uniforms[ "texid" ].value = renderTarget;
 
-	}	
+	}
 	this.getHMD = function() {return HMD};
 
-	this.setHMD(HMD);	
+	this.setHMD(HMD);
 
 	this.setSize = function ( width, height ) {
 		left.viewport = [width/2 - HMD.hResolution/2, height/2 - HMD.vResolution/2, HMD.hResolution/2, HMD.vResolution];

@@ -225,6 +225,7 @@
 				}
 
 				var renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: logDepthBuf });
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
 				renderer.domElement.style.position = "relative";
 				renderer.domElement.id = 'renderer_' + name;

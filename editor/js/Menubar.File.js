@@ -213,48 +213,21 @@ Menubar.File = function ( editor ) {
 			'	</head>',
 			'	<body ontouchstart="">',
 			'		<script src="js/three.min.js"></script>',
-			'		<script src="js/OrbitControls.js"></script>',
+			'		<script src="js/app.js"></script>',
 			'		<script>',
-
-			'			var camera, controls, scene, renderer;',
-
-			'			var loader = new THREE.ObjectLoader();',
-			'			loader.load( \'scene.json\', function ( object ) {',
-
-			'				scene = object;',
-
-			'				camera = new THREE.PerspectiveCamera( ' + camera.fov + ', 1, ' + camera.near + ', ' + camera.far + ' );',
-			'				camera.position.set( ' + camera.position.x + ', ' + camera.position.y + ', ' + camera.position.z + ' );',
-			'				camera.rotation.set( ' + camera.rotation.x + ', ' + camera.rotation.y + ', ' + camera.rotation.z + ' );',
-
-			'				controls = new THREE.OrbitControls( camera );',
-			'				controls.addEventListener( \'change\', render );',
-
-			'				renderer = new THREE.WebGLRenderer();',
-			'				renderer.setSize( window.innerWidth, window.innerHeight );',
-			'				document.body.appendChild( renderer.domElement );',
-
-			'				camera.aspect = window.innerWidth / window.innerHeight;',
-			'				camera.updateProjectionMatrix();',
-
-			'				animate();',
-			'				render();',
-			
+			'',
+			'			var loader = new THREE.XHRLoader();',
+			'			loader.load( \'app.json\', function ( text ) {',
+			'',
+			'				var player = new APP.Player();',
+			'				player.load( JSON.parse( text ) );',
+			'				player.setSize( window.innerWidth, window.innerHeight );',
+			'				player.play();',
+			'',
+			'				document.body.appendChild( player.dom );',
+			'',
 			'			} );',
-
-			'			var render = function () {',
-
-			'				renderer.render( scene, camera );',
-
-			'			};',
-
-			'			var animate = function () {',
-
-			'				requestAnimationFrame( animate );',
-			'				controls.update();',
-
-			'			};',
-
+			'',
 			'		</script>',
 			'	</body>',
 			'</html>'
@@ -263,11 +236,11 @@ Menubar.File = function ( editor ) {
 
 		//
 
-		var output = editor.scene.toJSON();
+		var output = editor.toJSON();
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		zip.file( 'scene.json', output );
+		zip.file( 'app.json', output );
 
 		//
 
@@ -278,14 +251,14 @@ Menubar.File = function ( editor ) {
 		} );
 
 		var loader = new THREE.XHRLoader( manager );
+		loader.load( 'js/libs/app.js', function ( content ) {
+
+			zip.file( 'js/app.js', content );
+
+		} );
 		loader.load( '../build/three.min.js', function ( content ) {
 
 			zip.file( 'js/three.min.js', content );
-
-		} );
-		loader.load( '../examples/js/controls/OrbitControls.js', function ( content ) {
-
-			zip.file( 'js/OrbitControls.js', content );
 
 		} );
 

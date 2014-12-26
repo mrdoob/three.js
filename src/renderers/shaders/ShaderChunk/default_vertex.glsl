@@ -1,27 +1,18 @@
-vec4 mvPosition;
+#ifdef USE_SHARED_MATERIAL
 
-#if defined( USE_SKINNING ) && ! defined( USE_SHARED_MATERIAL )
+	vec4 mvPosition = modelViewMatrix * sharedMaterialTransformMatrix * vec4( position, 1.0 );
 
-	mvPosition = modelViewMatrix * skinned;
+#elif defined( USE_SKINNING )
 
-#endif
+	vec4 mvPosition = modelViewMatrix * skinned;
 
-#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS ) && ! defined( USE_SHARED_MATERIAL )
+#elif defined( USE_MORPHTARGETS )
 
-	mvPosition = modelViewMatrix * vec4( morphed, 1.0 );
+	vec4 mvPosition = modelViewMatrix * vec4( morphed, 1.0 );
 
-#endif
+#else
 
-#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS ) && ! defined( USE_SHARED_MATERIAL )
-
-	mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-#endif
-
-#if defined( USE_SHARED_MATERIAL )
-
-	mvPosition = modelViewMatrix * sharedMaterialTransformMatrix * vec4( position, 1.0 );
-	
+	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
 #endif
 

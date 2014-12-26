@@ -66,8 +66,6 @@ Use WEBGL Depth buffer support?
 			var camera, scene, renderer,
 				material_depth;
 
-			var mouseX = 0, mouseY = 0;
-
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
@@ -81,7 +79,8 @@ Use WEBGL Depth buffer support?
 			};
 
 			var singleMaterial = false;
-			var vector = new THREE.Vector3();
+			var mouse = new THREE.Vector2();
+			var raycaster = new THREE.Raycaster();
 			var distance = 100;
 			var target = new THREE.Vector3( 0, 20, -50 );
 			var effectController;
@@ -104,6 +103,7 @@ Use WEBGL Depth buffer support?
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, height );
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
@@ -370,8 +370,8 @@ Use WEBGL Depth buffer support?
 
 			function onDocumentMouseMove( event ) {
 
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
+				mouse.x = ( event.clientX - windowHalfX ) / windowHalfX;
+				mouse.y = - ( event.clientY - windowHalfY ) / windowHalfY;
 
 				postprocessing.bokeh_uniforms[ 'focusCoords' ].value.set(event.clientX / window.innerWidth, 1-event.clientY / window.innerHeight);
 
@@ -383,8 +383,8 @@ Use WEBGL Depth buffer support?
 
 					event.preventDefault();
 
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+					mouse.x = ( event.touches[ 0 ].pageX - windowHalfX ) / windowHalfX;
+					mouse.y = - ( event.touches[ 0 ].pageY - windowHalfY ) / windowHalfY;
 
 				}
 			}
@@ -395,8 +395,8 @@ Use WEBGL Depth buffer support?
 
 					event.preventDefault();
 
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+					mouse.x = ( event.touches[ 0 ].pageX - windowHalfX ) / windowHalfX;
+					mouse.y = - ( event.touches[ 0 ].pageY - windowHalfY ) / windowHalfY;
 
 				}
 
@@ -489,12 +489,11 @@ Use WEBGL Depth buffer support?
 
 				camera.lookAt( target );
 
+				camera.updateMatrixWorld();
+
 				if ( effectController.jsDepthCalculation ) {
 
-					vector.set( mouseX / windowHalfX, -mouseY / windowHalfY, 1 );
-					vector.unproject( camera );
-
-					var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+					raycaster.setFromCamera( mouse, camera );
 
 					var intersects = raycaster.intersectObjects( scene.children, true );
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js editor</title>
+		<title>three.js / editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
@@ -123,10 +123,7 @@
 
 					if ( state !== undefined ) {
 
-						var loader = new THREE.ObjectLoader();
-						var scene = loader.parse( state );
-
-						editor.setScene( scene );
+						editor.fromJSON( state );
 
 					}
 
@@ -160,7 +157,7 @@
 
 						timeout = setTimeout( function () {
 
-							editor.storage.set( editor.scene.toJSON() );
+							editor.storage.set( editor.toJSON() );
 
 							editor.signals.savingFinished.dispatch();
 

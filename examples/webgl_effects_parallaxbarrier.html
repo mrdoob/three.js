@@ -204,6 +204,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setFaceCulling( THREE.CullFaceNone );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				var width = window.innerWidth || 2;
