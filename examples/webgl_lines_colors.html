@@ -204,8 +204,6 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
-
 				composer.reset();
             	effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
             	composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
