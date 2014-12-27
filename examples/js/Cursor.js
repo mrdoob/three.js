@@ -95,6 +95,7 @@ THREE.Cursor = function ( object, renderer ) {
 			scope.quaternion.copy( scope.deltaQuaternion.clone().inverse() );
 			scope.quaternion.multiply( scope.deltaMouse );
 
+			// We copy current quaternion in previous for the next frame
 			this.previousCameraQuat.copy( this.object.quaternion );
 			scope.matrixAutoUpdate = false;
 			scope.updateMatrix();
@@ -128,8 +129,10 @@ THREE.Cursor = function ( object, renderer ) {
 			yDeltaQuaternion.setFromAxisAngle( yAxis, yInc * 2 * Math.PI );
 
 			mouseMoveQuat.copy( xDeltaQuaternion ).multiply( yDeltaQuaternion );
+			// Test if the mouse delta moves the cursor out of FOV
 			mouseQuat.copy( mouseMoveQuat ).multiply( scope.quaternion );
 			deltaAngle = quaternionsAngle( scope.object.quaternion, mouseQuat ) * ( 180 / Math.PI );
+			// If the cursor stays in FOV we apply the delta
 			if (deltaAngle < this.maxFOV) {
 				scope.deltaMouse.copy( mouseMoveQuat ).multiply( scope.quaternion );
 				scope.deltaQuaternion = new THREE.Quaternion();
