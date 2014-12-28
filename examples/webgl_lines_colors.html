@@ -74,7 +74,7 @@
 
 			camera, scene, renderer, material, composer,
 
-			dpr = 1;
+			pixelRatio;
 
 			init();
 			animate();
@@ -163,11 +163,7 @@
 
 				//
 
-            	if ( window.devicePixelRatio !== undefined ) {
-                	
-                	dpr = window.devicePixelRatio;
-
-            	}
+            	pixelRatio = renderer.getPixelRatio();
 
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.3 );
@@ -175,13 +171,13 @@
 
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				effectFXAA.uniforms[ 'resolution' ].value.set (1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
+				effectFXAA.uniforms[ 'resolution' ].value.set (1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
 
 				effectCopy.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
-				composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
+				composer.setSize(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
 				
 				composer.addPass( renderModel );
 				composer.addPass( effectFXAA );
@@ -205,8 +201,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				composer.reset();
-            	effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * dpr), 1 / (window.innerHeight * dpr));
-            	composer.setSize(window.innerWidth * dpr, window.innerHeight * dpr);
+            	effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
+            	composer.setSize(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
 
 			}
 
