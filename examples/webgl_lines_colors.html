@@ -163,7 +163,7 @@
 
 				//
 
-            	pixelRatio = renderer.getPixelRatio();
+				pixelRatio = renderer.getPixelRatio();
 
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.3 );
@@ -201,8 +201,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				composer.reset();
-            	effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
-            	composer.setSize(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
+				effectFXAA.uniforms['resolution'].value.set(1 / (window.innerWidth * pixelRatio), 1 / (window.innerHeight * pixelRatio));
+				composer.setSize(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio);
 
 			}
 
