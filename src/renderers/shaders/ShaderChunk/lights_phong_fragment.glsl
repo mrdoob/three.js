@@ -132,7 +132,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-		vec3 dirVector = transformNormal( directionalLightDirection[ i ], viewMatrix );
+		vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );
 
 				// diffuse
 
@@ -197,7 +197,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec3 lVector = transformNormal( hemisphereLightDirection[ i ], viewMatrix );
+		vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );
 
 		// diffuse
 
