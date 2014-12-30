@@ -165,6 +165,7 @@ THREE.WebGLProgram = ( function () {
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+				"#define GAMMA_FACTOR " + this.renderer.gammaFactor,
 
 				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -279,6 +280,7 @@ THREE.WebGLProgram = ( function () {
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+				"#define GAMMA_FACTOR " + this.renderer.gammaFactor,
 
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
