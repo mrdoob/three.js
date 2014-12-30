@@ -7,9 +7,12 @@
 
 THREE.WebGLRenderer = function ( parameters ) {
 
-	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
-
 	parameters = parameters || {};
+
+	var _logging = parameters.logging !== undefined ? parameters.logging : true;
+	if(_logging) {
+		console.log( 'THREE.WebGLRenderer', THREE.REVISION );
+	}
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
