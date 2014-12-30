@@ -134,12 +134,8 @@ THREE.ShaderTerrain = {
 					"vec4 colDiffuse1 = texture2D( tDiffuse1, uvOverlay );",
 					"vec4 colDiffuse2 = texture2D( tDiffuse2, uvOverlay );",
 
-					"#ifdef GAMMA_INPUT",
-
-						"colDiffuse1.xyz *= colDiffuse1.xyz;",
-						"colDiffuse2.xyz *= colDiffuse2.xyz;",
-
-					"#endif",
+					"colDiffuse1.xyz = inputToLinear( colDiffuse1.xyz );",
+					"colDiffuse2.xyz = inputToLinear( colDiffuse2.xyz );",
 
 					"gl_FragColor = gl_FragColor * mix ( colDiffuse1, colDiffuse2, 1.0 - texture2D( tDisplacement, uvBase ) );",
 

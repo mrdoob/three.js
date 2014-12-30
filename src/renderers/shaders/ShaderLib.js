@@ -749,35 +749,15 @@ THREE.ShaderLib = {
 
 			"	if( enableDiffuse ) {",
 
-			"		#ifdef GAMMA_INPUT",
-
-			"			vec4 texelColor = texture2D( tDiffuse, vUv );",
-			"			texelColor.xyz *= texelColor.xyz;",
-
-			"			gl_FragColor = gl_FragColor * texelColor;",
-
-			"		#else",
-
-			"			gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
-
-			"		#endif",
+			"		vec4 texelColor = texture2D( tDiffuse, vUv );",
+			"		texelColor.xyz = inputToLinear( texelColor.xyz );",
+			"		gl_FragColor = gl_FragColor * texelColor;",
 
 			"	}",
 
 			"	if( enableAO ) {",
 
-			"		#ifdef GAMMA_INPUT",
-
-			"			vec4 aoColor = texture2D( tAO, vUv );",
-			"			aoColor.xyz *= aoColor.xyz;",
-
-			"			gl_FragColor.xyz = gl_FragColor.xyz * aoColor.xyz;",
-
-			"		#else",
-
-			"			gl_FragColor.xyz = gl_FragColor.xyz * texture2D( tAO, vUv ).xyz;",
-
-			"		#endif",
+			"		gl_FragColor.xyz = gl_FragColor.xyz * inputToLinear( texture2D( tAO, vUv ).xyz );",
 
 			"	}",
 			
@@ -1054,12 +1034,7 @@ THREE.ShaderLib = {
 			"		#endif",
 
 			"		vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-
-			"		#ifdef GAMMA_INPUT",
-
-			"			cubeColor.xyz *= cubeColor.xyz;",
-
-			"		#endif",
+			"		cubeColor.xyz = inputToLinear( cubeColor.xyz );",
 
 			"		gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * reflectivity );",
 

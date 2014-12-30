@@ -225,11 +225,7 @@ THREE.ShaderDeferred = {
 
 					"#endif",
 
-					"#ifdef GAMMA_INPUT",
-
-						"cubeColor.xyz *= cubeColor.xyz;",
-
-					"#endif",
+					"cubeColor.xyz = inputToLinear( cubeColor.xyz );",
 
 					"if ( combine == 1 ) {",
 

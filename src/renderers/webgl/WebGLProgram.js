@@ -135,6 +135,8 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
+		var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
+
 		// console.log( "building new program " );
 
 		//
@@ -165,7 +167,7 @@ THREE.WebGLProgram = ( function () {
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-				"#define GAMMA_FACTOR " + this.renderer.gammaFactor,
+				"#define GAMMA_FACTOR " + gammaFactorDefine,
 
 				"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 				"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -280,7 +282,7 @@ THREE.WebGLProgram = ( function () {
 
 				_this.gammaInput ? "#define GAMMA_INPUT" : "",
 				_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-				"#define GAMMA_FACTOR " + this.renderer.gammaFactor,
+				"#define GAMMA_FACTOR " + gammaFactorDefine,
 
 				( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 				( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",

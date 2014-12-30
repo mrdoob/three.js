@@ -1,13 +1,5 @@
 #ifdef USE_COLOR
 
-	#ifdef GAMMA_INPUT
-
-		vColor = square( color );
-
-	#else
-
-		vColor = color;
-
-	#endif
+	vColor.xyz = inputToLinear( color.xyz );
 
 #endif

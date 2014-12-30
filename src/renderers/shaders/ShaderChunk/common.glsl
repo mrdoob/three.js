@@ -37,3 +37,19 @@ float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
 vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
 	return pointOnLine + lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) );
 }
+
+vec3 inputToLinear( in vec3 a ) {
+#ifdef GAMMA_INPUT
+	return pow( a.rgb, vec3( float( GAMMA_FACTOR ) ) );
+#else
+	return a;
+#endif
+}
+
+vec3 linearToOutput( in vec3 a ) {
+#ifdef GAMMA_OUTPUT
+	return pow( a.rgb, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
+#else
+	return a;
+#endif
+}
