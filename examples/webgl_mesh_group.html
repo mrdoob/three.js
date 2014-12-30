@@ -28,6 +28,13 @@
 			a {
 				color: red;
 			}
+			#selects {
+				position:absolute;
+				bottom:1em;
+				right:1em;
+				text-align:right;
+				display:none;
+			}
 		</style>
 	</head>
 
@@ -35,6 +42,48 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - mesh group example
+		</div>
+		<div id="selects">
+			<div>
+				MeshGroup:
+				<select id="useGroup">
+					<option>true</option>
+					<option>false</option>
+				</select>
+			</div>
+			<div>
+				Count:
+				<select id="count">
+					<option>1000</option>
+					<option>2500</option>
+					<option>5000</option>
+					<option>10000</option>
+					<option>15000</option>
+					<option>20000</option>
+					<option>25000</option>
+					<option>30000</option>
+					<option>40000</option>
+					<option>50000</option>
+				</select>
+			</div>
+			<div>
+				Material:
+				<select id="material">
+					<option value='basic'>MeshBasicMaterial</option>
+					<option value='lambert'>MeshLambertMaterial</option>
+					<option value='phong'>MeshPhongMaterial</option>
+				</select>
+			</div>
+			<div>
+				Faces Per Object
+				<select id="face">
+					<option>16</option>
+					<option>24</option>
+					<option>48</option>
+					<option>128</option>
+					<option>256</option>
+				</select>
+			</div>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -47,10 +96,16 @@
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			
+			window.onhashchange = function() {
+				location.reload();
+			}
 
 			var container, stats;
 
-			var camera, controls, scene, renderer, meshGroup;
+			var camera, controls, scene, renderer, group;
+			
+			var useMeshGroup = true;
 
 			init();
 			render();
@@ -62,47 +117,172 @@
 				render();
 
 			}
+			
+			function initSelectsAndProcessHash() {
+				
+				var hashPieces = window.location.hash
+					.substring(1)
+					.split("|");
+					
+				var countVal		= "5000";
+				var materialVal		= "phong";
+				var faceVal			= "16";
+				var useGroupVal		= "true";
+				
+				var countEl = document.getElementById("count");
+				var materialEl = document.getElementById("material");
+				var faceEl = document.getElementById("face");
+				var useGroupEl = document.getElementById("useGroup");
+				
+				function selectVal( select, value ) {
+					
+					for(var i, j = 0; i = select.options[j]; j++) {
+					    if(i.value == value) {
+					        select.selectedIndex = j;
+					        break;
+					    }
+					}
+					
+				}
+				
+				if( hashPieces.length === 4 ) {
+				
+					countVal	= hashPieces[0];
+					materialVal	= hashPieces[1];
+					faceVal		= hashPieces[2];
+					useGroupVal	= hashPieces[3];
+					
+					selectVal( countEl, countVal );
+					selectVal( materialEl, materialVal );
+					selectVal( faceEl, faceVal );
+					selectVal( useGroupEl, useGroupVal );
+				
+				}
+				
+				function handleSelectChange() {
+					window.location.hash = [
+						countEl.value,
+						materialEl.value,
+						faceEl.value,
+						useGroupEl.value
+					].join("|");
+				}
+				
+				countEl.onchange = handleSelectChange;
+				materialEl.onchange = handleSelectChange;
+				faceEl.onchange = handleSelectChange;
+				useGroupEl.onchange = handleSelectChange;
+				
+				return {
+					count		: countEl.value,
+					material	: materialEl.value,
+					face		: faceEl.value,
+					useGroup	: useGroupEl.value
+				}
+				
+			}
+			
+			function randomRange(min, max) {
+				return Math.random() * (max - min) + min;
+			}
 
 			function init() {
-
+				
+				var settings = initSelectsAndProcessHash();
+				
 				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
 				camera.position.z = 500;
-
-				controls = new THREE.OrbitControls( camera );
-				controls.damping = 0.2;
 
 				scene = new THREE.Scene();
 				// scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				// world
-
-				var geometry = new THREE.CylinderGeometry( 1, 10, 30, 10, 1 );
-				var material =  new THREE.MeshPhongMaterial( { color:0xffffff, shading: THREE.SmoothShading } );
+				var geometry = (function generateCylinderGeometry() {
+					
+					var sidesCount = 4;
 				
-				meshGroup = new THREE.MeshGroup( THREE.Mesh, material );
-
-				function randomRange(min, max) {
-					return Math.random() * (max - min) + min;
+					switch ( settings.face ) {
+					
+						case "16":
+							sidesCount = 4;
+							break;
+						
+						case "24":
+							sidesCount = 6;
+							break;
+						
+						case "48":
+							sidesCount = 12;
+							break;
+						
+						case "128":
+							sidesCount = 32;
+							break;
+						
+						case "256":
+							sidesCount = 64;
+							break;		
+						
+					}
+					
+					return new THREE.CylinderGeometry( 1, 10, 30, sidesCount, 1 );
+					
+				})();
+				
+				var material = (function generateMaterial() {
+					
+					var MaterialClass;
+					var color = 0xffffff;
+				
+					switch ( settings.material ) {
+						case "basic":
+							MaterialClass = THREE.MeshBasicMaterial;
+							color = 0x884400;
+							break;
+						case "lambert":
+							MaterialClass = THREE.MeshLambertMaterial;
+							break;
+						default:
+							MaterialClass = THREE.MeshPhongMaterial;
+					}
+					return new MaterialClass( { color:color, shading: THREE.SmoothShading } );
+					
+				})();
+				
+				useMeshGroup = settings.useGroup === "true";
+				
+				if( useMeshGroup ) {
+					group = new THREE.MeshGroup( THREE.Mesh, material );
+				} else {
+					group = new THREE.Object3D( THREE.Mesh, material );
 				}
 				
 				var twoPi = Math.PI * 2;
 				var speed = 10;
-				var count = +window.location.hash.substring(1);
-				if( count === 0 || count === NaN ) {
-					count = 5000;
-				}
+				var count = ( isNaN( +settings.count ) || +settings.count === 0 ) ? 5000 : +settings.count
 
+				var mesh;
+				
+				// generate meshes
+				
 				for ( var i = 0; i < count; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry );
+					if( useMeshGroup ) {
+						mesh = new THREE.Mesh( geometry );
+					} else {
+						mesh = new THREE.Mesh( geometry, material );
+					}
 					
-					mesh.position.x = ( Math.random() - 0.5 ) * 500;
-					mesh.position.y = ( Math.random() - 0.5 ) * 500;
-					mesh.position.z = ( Math.random() - 0.5 ) * 500;
+					mesh.position.set(
+						randomRange( -250, 250 ),
+						randomRange( -250, 250 ),
+						randomRange( -250, 250 )
+					);
 					
-					mesh.rotation.x = ( Math.random() - 0.5 ) * Math.PI * 2;
-					mesh.rotation.y = ( Math.random() - 0.5 ) * Math.PI * 2;
-					mesh.rotation.z = ( Math.random() - 0.5 ) * Math.PI * 2;
+					mesh.rotation.set(
+						randomRange( 0, twoPi ),
+						randomRange( 0, twoPi ),
+						randomRange( 0, twoPi )
+					);
 					
 					mesh.velocity = new THREE.Vector3(
 				
@@ -118,26 +298,30 @@
 						randomRange( -twoPi, twoPi ),
 						randomRange( -twoPi, twoPi )
 				
-					).multiplyScalar(0.01);
+					).multiplyScalar(0.005);
+					
+					//minimize the effect of updating the rotation quaternion
+					mesh.flipFlop = Math.random() > 0.5;
 			
 					mesh.scale.multiplyScalar( randomRange( 1, 2) );
 					
-					
 					mesh.updateMatrix();
-					meshGroup.add( mesh );
+					group.add( mesh );
 
 				}
 				
-				meshGroup.build();
-				meshGroup.updateMatrixWorld( true );
-				scene.add( meshGroup.object );
-				
-				var cube = new THREE.Mesh(
-					new THREE.BoxGeometry( 50, 50, 50 ),
-					new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
-				);
-				// scene.add( cube );
+				if( useMeshGroup ) {
+					
+					group.build();
+					group.updateMatrixWorld( true );
+					scene.add( group.object );
+					
+				} else {
 
+					scene.add( group );
+										
+				}
+				
 				// lights
 				
 				var intensity = 0.8;
@@ -168,6 +352,9 @@
 				// renderer.setClearColor( scene.fog.color, 1 );
 				renderer.setClearColor( 0xcccccc, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.damping = 0.2;
 
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -181,7 +368,10 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
+				
+				//Show hidden elements
+				document.getElementById("selects").style.display = "block"
+				
 				animate();
 
 			}
@@ -208,19 +398,26 @@
 			
 			function updateMeshPositions() {
 				
-				meshGroup.updateMatrixWorld( true );
+				if( useMeshGroup ) {
+					group.updateMatrixWorld( true );
+				}
 				
 				var mesh;
 	
-				for( var i = 0; i < meshGroup.children.length; i++ ) {
+				for( var i = 0; i < group.children.length; i++ ) {
 		
-					mesh = meshGroup.children[i];
+					mesh = group.children[i];
 		
 					mesh.position.add( mesh.velocity );
-		
-					mesh.rotation.x += mesh.spin.x;
-					mesh.rotation.y += mesh.spin.y;
-					mesh.rotation.z += mesh.spin.z;
+					
+					//minimize the effect of updating the rotation quaternion
+					if( mesh.flipFlop = !mesh.flipFlop ) {
+						mesh.rotation.set(
+							mesh.rotation.x + mesh.spin.x,
+							mesh.rotation.y + mesh.spin.y,
+							mesh.rotation.z + mesh.spin.z
+						)
+					}
 		
 					mesh.updateMatrix();
 		
