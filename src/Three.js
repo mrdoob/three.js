@@ -25,13 +25,6 @@ if ( Math.sign === undefined ) {
 }
 
 
-THREE.ExceptionErrorHandler = function( message ) {
-	console.error( arguments );
-	var error = new Error( message );
-	error.optionalData = arguments;
-	throw error;
-};
-
 THREE.ConsoleErrorHandler = function() {
 	console.error( arguments );
 };
