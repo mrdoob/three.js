@@ -4525,7 +4525,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _this.gammaInput ) {
 
-			uniforms.diffuse.value.copyGammaToLinear( material.color, this.gammaFactor );
+			uniforms.diffuse.value.copyGammaToLinear( material.color, _this.gammaFactor );
 
 		} else {
 
@@ -4659,9 +4659,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _this.gammaInput ) {
 
-			uniforms.ambient.value.copyGammaToLinear( material.ambient, this.gammaFactor );
-			uniforms.emissive.value.copyGammaToLinear( material.emissive, this.gammaFactor );
-			uniforms.specular.value.copyGammaToLinear( material.specular, this.gammaFactor );
+			uniforms.ambient.value.copyGammaToLinear( material.ambient, _this.gammaFactor );
+			uniforms.emissive.value.copyGammaToLinear( material.emissive, _this.gammaFactor );
+			uniforms.specular.value.copyGammaToLinear( material.specular, _this.gammaFactor );
+
 
 		} else {
 
@@ -4683,8 +4684,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _this.gammaInput ) {
 
-			uniforms.ambient.value.copyGammaToLinear( material.ambient, this.gammaFactor );
-			uniforms.emissive.value.copyGammaToLinear( material.emissive, this.gammaFactor );
+			uniforms.ambient.value.copyGammaToLinear( material.ambient, _this.gammaFactor );
+			uniforms.emissive.value.copyGammaToLinear( material.emissive, _this.gammaFactor );
 
 		} else {
 
@@ -5158,11 +5159,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	function setColorGamma( array, offset, color, intensity ) {
+	function setColorGamma( array, offset, color, intensity, gammaFactor ) {
 
-		array[ offset ]     = Math.pow( color.r * intensity, this.gammaFactor );
-		array[ offset + 1 ] = Math.pow( color.g * intensity, this.gammaFactor );
-		array[ offset + 2 ] = Math.pow( color.b * intensity, this.gammaFactor );
+		array[ offset ]     = Math.pow( color.r * intensity, gammaFactor );
+		array[ offset + 1 ] = Math.pow( color.g * intensity, gammaFactor );
+		array[ offset + 2 ] = Math.pow( color.b * intensity, gammaFactor );
 
 	}
 
@@ -5234,9 +5235,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( _this.gammaInput ) {
 
-					r += Math.pow( color.r, this.gammaFactor );
-					g += Math.pow( color.g, this.gammaFactor );
-					b += Math.pow( color.b, this.gammaFactor );
+					r += Math.pow( color.r, _this.gammaFactor );
+					g += Math.pow( color.g, _this.gammaFactor );
+					b += Math.pow( color.b, _this.gammaFactor );
 
 				} else {
 
@@ -5265,7 +5266,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( _this.gammaInput ) {
 
-					setColorGamma( dirColors, dirOffset, color, intensity );
+					setColorGamma( dirColors, dirOffset, color, intensity, _this.gammaFactor );
 
 				} else {
 
@@ -5285,7 +5286,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( _this.gammaInput ) {
 
-					setColorGamma( pointColors, pointOffset, color, intensity );
+					setColorGamma( pointColors, pointOffset, color, intensity, _this.gammaFactor );
 
 				} else {
 
@@ -5313,7 +5314,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( _this.gammaInput ) {
 
-					setColorGamma( spotColors, spotOffset, color, intensity );
+					setColorGamma( spotColors, spotOffset, color, intensity, _this.gammaFactor );
 
 				} else {
 
@@ -5362,8 +5363,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( _this.gammaInput ) {
 
-					setColorGamma( hemiSkyColors, hemiOffset, skyColor, intensity );
-					setColorGamma( hemiGroundColors, hemiOffset, groundColor, intensity );
+					setColorGamma( hemiSkyColors, hemiOffset, skyColor, intensity, _this.gammaFactor );
+					setColorGamma( hemiGroundColors, hemiOffset, groundColor, intensity, _this.gammaFactor );
 
 				} else {
 
