@@ -286,8 +286,8 @@ THREE.ShaderTerrain = {
 
 				"#endif",
 
-				//"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor) + totalSpecular;",
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor + totalSpecular );",
+				//"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse ) + totalSpecular;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse + totalSpecular );",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],

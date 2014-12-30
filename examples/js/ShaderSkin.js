@@ -293,7 +293,7 @@ THREE.ShaderSkin = {
 					"totalLight += hemiTotal;",
 				"#endif",
 
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor ) + specularTotal;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * diffuse ) + specularTotal;",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -591,7 +591,7 @@ THREE.ShaderSkin = {
 
 					"gl_FragColor.xyz *= pow( colDiffuse.xyz, vec3( 0.5 ) );",
 
-					"gl_FragColor.xyz += ambientLightColor * colDiffuse.xyz + specularTotal;",
+					"gl_FragColor.xyz += ambientLightColor * diffuse * colDiffuse.xyz + specularTotal;",
 
 					"#ifndef VERSION1",
 

@@ -428,11 +428,11 @@ THREE.NormalDisplacementShader = {
 
 		"	#ifdef METAL",
 
-		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor + totalSpecular );",
+		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse + totalSpecular );",
 
 		"	#else",
 
-		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor ) + totalSpecular;",
+		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse ) + totalSpecular;",
 
 		"	#endif",
 
