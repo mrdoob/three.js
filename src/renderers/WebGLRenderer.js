@@ -218,7 +218,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	} catch ( error ) {
 
-		THREE.error( error );
+		THREE.error( 'THREE.WebGLRenderer: ' + error );
 
 	}
 
@@ -5744,7 +5744,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else {
 
-						THREE.warning( "Attempt to load unsupported compressed texture format" );
+						THREE.warning( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
 
 					}
 
@@ -5908,7 +5908,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								} else {
 
-									THREE.warning( "Attempt to load unsupported compressed texture format" );
+									THREE.warning( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
 
 								}
 

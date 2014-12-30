@@ -43,7 +43,7 @@ THREE.Curve = function () {
 
 THREE.Curve.prototype.getPoint = function ( t ) {
 
-	THREE.warning( "Warning, THREE.Curve.getPoint() not implemented!" );
+	THREE.warning( "THREE.Curve: Warning, getPoint() not implemented!" );
 	return null;
 
 };

@@ -476,7 +476,7 @@ THREE.BufferGeometry.prototype = {
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
 
-			THREE.warning( 'Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
+			THREE.warning( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
 			return;
 
 		}

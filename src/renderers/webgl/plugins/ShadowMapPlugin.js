@@ -183,7 +183,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 				} else {
 
-					THREE.error( "Unsupported light type for shadow" );
+					THREE.error( "THREE.ShadowMapPlugin: Unsupported light type for shadow", light );
 					continue;
 
 				}

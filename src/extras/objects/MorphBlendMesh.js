@@ -221,7 +221,7 @@ THREE.MorphBlendMesh.prototype.playAnimation = function ( name ) {
 
 	} else {
 
-		THREE.warning( "animation[" + name + "] undefined" );
+		THREE.warning( "THREE.MorphBlendMesh: animation[" + name + "] undefined in .playAnimation()" );
 
 	}
 

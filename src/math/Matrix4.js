@@ -634,7 +634,7 @@ THREE.Matrix4.prototype = {
 
 		if ( det == 0 ) {
 
-			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
+			var msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
 			if ( throwOnInvertible || false ) {
 

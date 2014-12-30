@@ -109,7 +109,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		THREE.warning( 'animation[' + label + '] undefined' );
+		THREE.warning( 'THREE.MorphAnimMesh: animation[' + label + '] undefined in .playAnimation()' );
 
 	}
 

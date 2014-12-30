@@ -462,7 +462,7 @@ THREE.Shape.Utils = {
 
 			if ( allPointsMap[ key ] !== undefined ) {
 
-				console.log( "Duplicate point", key );
+				THREE.warning( "THREE.Shape: Duplicate point", key );
 
 			}
 
