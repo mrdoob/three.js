@@ -140,6 +140,7 @@ def buffer_uv(mesh, options):
         uv = (uv.uv[0], uv.uv[1])
         if round_off:
             uv = utilities.round_off(uv, round_val)
+        uvs_.extend(uv)
     
     return uvs_
 
