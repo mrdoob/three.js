@@ -166,7 +166,6 @@
 
 				var groundMaterial = new THREE.MeshPhongMaterial( {
 					shininess: 80,
-					ambient: 0x444444,
 					color: 0xffffff,
 					specular: 0xffffff,
 					map: textureSquares
@@ -265,7 +264,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
 					morphMaterial.shading = THREE.FlatShading;
 
 					geometry.computeMorphNormals();

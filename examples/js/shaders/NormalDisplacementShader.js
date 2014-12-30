@@ -54,7 +54,6 @@ THREE.NormalDisplacementShader = {
 
 	fragmentShader: [
 
-		"uniform vec3 ambient;",
 		"uniform vec3 diffuse;",
 		"uniform vec3 specular;",
 		"uniform float shininess;",
