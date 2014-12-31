@@ -25,22 +25,10 @@ if ( Math.sign === undefined ) {
 }
 
 
-THREE.ConsoleErrorHandler = function() {
-	console.error( arguments );
-};
-
-THREE.ConsoleWarningHandler = function() {
-	console.warn( arguments );
-};
-
-THREE.ConsoleLogHandler = function() {
-	console.log( arguments );
-};
-
-// set the default error handlers
-THREE.error = THREE.ConsoleErrorHandler;
-THREE.warning = THREE.ConsoleWarningHandler;
-THREE.log = THREE.ConsoleLogHandler;
+// set the default log handlers
+THREE.error = function() { console.error.apply( console, arguments ); }
+THREE.warning = function() { console.warn.apply( console, arguments ); }
+THREE.log = function() { console.log.apply( console, arguments ); }
 
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
