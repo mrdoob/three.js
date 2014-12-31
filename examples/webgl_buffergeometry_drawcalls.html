@@ -70,21 +70,21 @@
 			animate();
 
 			function initGUI() {
-				
+
 				var gui = new dat.GUI();
-				
+
 				gui.add( effectController, "showDots" ).onChange( function( value ) { pointCloud.visible = value; } );
 				gui.add( effectController, "showLines" ).onChange( function( value ) { linesMesh.visible = value; } );
 				gui.add( effectController, "minDistance", 10, 300 );
 				gui.add( effectController, "limitConnections" );
 				gui.add( effectController, "maxConnections", 0, 30, 1 );
-				gui.add( effectController, "particleCount", 0, maxParticleCount, 1 ).onChange( function( value ) { 
-					
+				gui.add( effectController, "particleCount", 0, maxParticleCount, 1 ).onChange( function( value ) {
+
 					particleCount = parseInt( value );
 					particles.drawcalls[ 0 ].count = particleCount;
 
 				});
-					
+
 			}
 
 			function init() {
@@ -98,9 +98,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.z = 1750;
 
-				controls = new THREE.OrbitControls( camera );
-				controls.damping = 0.2;
-				controls.addEventListener( 'change', render );
+				controls = new THREE.OrbitControls( camera, container );
 
 				scene = new THREE.Scene();
 
@@ -128,7 +126,7 @@
 					var x = Math.random() * r - r / 2;
 					var y = Math.random() * r - r / 2;
 					var z = Math.random() * r - r / 2;
-	
+
 					particlePositions[ i * 3     ] = x;
 					particlePositions[ i * 3 + 1 ] = y;
 					particlePositions[ i * 3 + 2 ] = z;
@@ -172,9 +170,9 @@
 				group.add( linesMesh );
 
 				scene.add( group );
-				
+
 				//
-				
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio )
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -185,7 +183,7 @@
 				container.appendChild( renderer.domElement );
 
 				//
-				
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
@@ -240,14 +238,14 @@
 						var particleDataB = particlesData[ j ];
 						if ( effectController.limitConnections && particleDataB.numConnections >= effectController.maxConnections )
 							continue;
-						
+
 						var dx = particlePositions[ i * 3     ] - particlePositions[ j * 3     ];
 						var dy = particlePositions[ i * 3 + 1 ] - particlePositions[ j * 3 + 1 ];
 						var dz = particlePositions[ i * 3 + 2 ] - particlePositions[ j * 3 + 2 ];
 						var dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
 
 						if ( dist < effectController.minDistance ) {
-							
+
 							particleData.numConnections++;
 							particleDataB.numConnections++;
 
