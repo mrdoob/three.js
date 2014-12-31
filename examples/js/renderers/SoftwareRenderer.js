@@ -7,7 +7,7 @@
 
 THREE.SoftwareRenderer = function ( parameters ) {
 
-	THREE.log( 'THREE.SoftwareRenderer', THREE.REVISION );
+	console.log( 'THREE.SoftwareRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 

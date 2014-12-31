@@ -46,7 +46,7 @@ THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 
 THREE.CSS3DStereoRenderer = function () {
 
-	THREE.log( 'THREE.CSS3DRenderer', THREE.REVISION );
+	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;

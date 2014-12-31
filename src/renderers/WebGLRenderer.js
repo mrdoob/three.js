@@ -7,7 +7,7 @@
 
 THREE.WebGLRenderer = function ( parameters ) {
 
-	THREE.log( 'THREE.WebGLRenderer', THREE.REVISION );
+	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 
