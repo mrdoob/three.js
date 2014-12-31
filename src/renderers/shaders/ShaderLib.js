@@ -1312,7 +1312,7 @@ THREE.ShaderLib = {
 				"vec3 direction = normalize( vWorldPosition );",
 				"vec2 sampleUV;",
 				"sampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );",
-				"sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_2PI + 0.5;", 
+				"sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;", 
 				"gl_FragColor = texture2D( tEquirect, sampleUV );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
