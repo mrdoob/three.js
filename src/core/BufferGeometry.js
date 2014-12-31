@@ -31,7 +31,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( attribute instanceof THREE.BufferAttribute === false ) {
 
-			THREE.warning( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
 			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
 
@@ -476,7 +476,7 @@ THREE.BufferGeometry.prototype = {
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
 
-			THREE.warning( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
+			THREE.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
 			return;
 
 		}

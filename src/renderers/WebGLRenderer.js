@@ -362,12 +362,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( mediumpAvailable ) {
 
 			_precision = 'mediump';
-			THREE.warning( 'THREE.WebGLRenderer: highp not supported, using mediump.' );
+			THREE.warn( 'THREE.WebGLRenderer: highp not supported, using mediump.' );
 
 		} else {
 
 			_precision = 'lowp';
-			THREE.warning( 'THREE.WebGLRenderer: highp and mediump not supported, using lowp.' );
+			THREE.warn( 'THREE.WebGLRenderer: highp and mediump not supported, using lowp.' );
 
 		}
 
@@ -376,7 +376,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	if ( _precision === 'mediump' && ! mediumpAvailable ) {
 
 		_precision = 'lowp';
-		THREE.warning( 'THREE.WebGLRenderer: mediump not supported, using lowp.' );
+		THREE.warn( 'THREE.WebGLRenderer: mediump not supported, using lowp.' );
 
 	}
 
@@ -535,7 +535,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		THREE.warning( 'THREE.WebGLRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
+		THREE.warn( 'THREE.WebGLRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
 		this.setClearColor( hex, alpha );
 
 	};
@@ -4802,7 +4802,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( textureUnit >= _maxTextures ) {
 
-			THREE.warning( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + _maxTextures );
+			THREE.warn( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + _maxTextures );
 
 		}
 
@@ -5140,7 +5140,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				default:
 
-					THREE.warning( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
+					THREE.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
 
 			}
 
@@ -5646,7 +5646,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping ) {
 
-				THREE.warning( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT is set to THREE.ClampToEdgeWrapping. ( ' + texture.sourceFile + ' )' );
+				THREE.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT is set to THREE.ClampToEdgeWrapping. ( ' + texture.sourceFile + ' )' );
 
 			}
 
@@ -5655,7 +5655,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				THREE.warning( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter is set to THREE.LinearFilter or THREE.NearestFilter. ( ' + texture.sourceFile + ' )' );
+				THREE.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter is set to THREE.LinearFilter or THREE.NearestFilter. ( ' + texture.sourceFile + ' )' );
 
 			}
 
@@ -5744,7 +5744,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else {
 
-						THREE.warning( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
+						THREE.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
 
 					}
 
@@ -5821,7 +5821,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var context = canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
 
-			THREE.warning( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+			THREE.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
 
 			return canvas;
 
@@ -5908,7 +5908,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								} else {
 
-									THREE.warning( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
+									THREE.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
 
 								}
 
@@ -6287,7 +6287,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( maxBones < object.skeleton.bones.length ) {
 
-					THREE.warning( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
+					THREE.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
 
 				}
 
@@ -6347,24 +6347,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.initMaterial = function () {
 
 
-		THREE.warning( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
+		THREE.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
 	};
 
 	this.addPrePlugin = function () {
 
-		THREE.warning( 'THREE.WebGLRenderer: .addPrePlugin() has been removed.' );
+		THREE.warn( 'THREE.WebGLRenderer: .addPrePlugin() has been removed.' );
 
 	};
 
 	this.addPostPlugin = function () {
 
-		THREE.warning( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
+		THREE.warn( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
 
 	};
 
 	this.updateShadowMap = function () {
 
-		THREE.warning( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
+		THREE.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
 	};
 

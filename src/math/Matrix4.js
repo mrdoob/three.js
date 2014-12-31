@@ -72,7 +72,7 @@ THREE.Matrix4.prototype = {
 
 	extractPosition: function ( m ) {
 
-		THREE.warning( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
+		THREE.warn( 'THREE.Matrix4: .extractPosition() has been renamed to .copyPosition().' );
 		return this.copyPosition( m );
 
 	},
@@ -251,7 +251,7 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromQuaternion: function ( q ) {
 
-		THREE.warning( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
+		THREE.warn( 'THREE.Matrix4: .setRotationFromQuaternion() has been renamed to .makeRotationFromQuaternion().' );
 
 		return this.makeRotationFromQuaternion( q );
 
@@ -338,7 +338,7 @@ THREE.Matrix4.prototype = {
 
 		if ( n !== undefined ) {
 
-			THREE.warning( 'THREE.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
+			THREE.warn( 'THREE.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
 			return this.multiplyMatrices( m, n );
 
 		}
@@ -417,21 +417,21 @@ THREE.Matrix4.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		THREE.warning( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
+		THREE.warn( 'THREE.Matrix4: .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
 		return vector.applyProjection( this );
 
 	},
 
 	multiplyVector4: function ( vector ) {
 
-		THREE.warning( 'THREE.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		THREE.warn( 'THREE.Matrix4: .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
 		return vector.applyMatrix4( this );
 
 	},
 
 	multiplyVector3Array: function ( a ) {
 
-		THREE.warning( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
+		THREE.warn( 'THREE.Matrix4: .multiplyVector3Array() has been renamed. Use matrix.applyToVector3Array( array ) instead.' );
 		return this.applyToVector3Array( a );
 
 	},
@@ -467,7 +467,7 @@ THREE.Matrix4.prototype = {
 
 	rotateAxis: function ( v ) {
 
-		THREE.warning( 'THREE.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
+		THREE.warn( 'THREE.Matrix4: .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
 
 		v.transformDirection( this );
 
@@ -475,7 +475,7 @@ THREE.Matrix4.prototype = {
 
 	crossVector: function ( vector ) {
 
-		THREE.warning( 'THREE.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		THREE.warn( 'THREE.Matrix4: .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
 		return vector.applyMatrix4( this );
 
 	},
@@ -581,7 +581,7 @@ THREE.Matrix4.prototype = {
 
 		return function () {
 
-			THREE.warning( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
+			THREE.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
 			var te = this.elements;
 			return v1.set( te[ 12 ], te[ 13 ], te[ 14 ] );
@@ -642,7 +642,7 @@ THREE.Matrix4.prototype = {
 
 			} else {
 
-				THREE.warning( msg );
+				THREE.warn( msg );
 
 			}
 

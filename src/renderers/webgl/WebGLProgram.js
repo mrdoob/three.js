@@ -344,9 +344,9 @@ THREE.WebGLProgram = ( function () {
 		
 		if ( programLogInfo !== '' ) {
 
-			THREE.warning( 'THREE.WebGLProgram: gl.getProgramInfoLog()' + programLogInfo );
-			// THREE.warning( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
-			// THREE.warning( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
+			THREE.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()' + programLogInfo );
+			// THREE.warn( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+			// THREE.warn( _gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
 		}
 

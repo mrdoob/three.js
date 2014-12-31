@@ -69,14 +69,14 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 THREE.ParticleBasicMaterial = function ( parameters ) {
 
-	THREE.warning( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointCloudMaterial.' );
+	THREE.warn( 'THREE.ParticleBasicMaterial has been renamed to THREE.PointCloudMaterial.' );
 	return new THREE.PointCloudMaterial( parameters );
 
 };
 
 THREE.ParticleSystemMaterial = function ( parameters ) {
 
-	THREE.warning( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
+	THREE.warn( 'THREE.ParticleSystemMaterial has been renamed to THREE.PointCloudMaterial.' );
 	return new THREE.PointCloudMaterial( parameters );
 
 };

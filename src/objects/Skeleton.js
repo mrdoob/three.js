@@ -69,7 +69,7 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 		} else {
 
-			THREE.warning( 'THREE.Skeleton bonInverses is the wrong length.' );
+			THREE.warn( 'THREE.Skeleton bonInverses is the wrong length.' );
 
 			this.boneInverses = [];
 

@@ -105,7 +105,7 @@
 
 			if ( objects instanceof Array === false ) {
 
-				THREE.warning( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
+				THREE.warn( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
 				return intersects;
 
 			}

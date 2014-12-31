@@ -29,7 +29,7 @@ THREE.WebGLShader = ( function () {
 
 		if ( gl.getShaderInfoLog( shader ) !== '' ) {
 
-			THREE.warning( 'THREE.WebGLShader: gl.getShaderInfoLog()', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
+			THREE.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
 
 		}
 

@@ -93,7 +93,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			THREE.warning( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -130,7 +130,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			THREE.warning( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -157,7 +157,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			THREE.warning( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
 			return this.multiplyVectors( v, w );
 
 		}
@@ -601,7 +601,7 @@ THREE.Vector3.prototype = {
 
 		if ( w !== undefined ) {
 
-			THREE.warning( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
 			return this.crossVectors( v, w );
 
 		}
@@ -720,7 +720,7 @@ THREE.Vector3.prototype = {
 
 	getPositionFromMatrix: function ( m ) {
 
-		THREE.warning( 'THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition().' );
+		THREE.warn( 'THREE.Vector3: .getPositionFromMatrix() has been renamed to .setFromMatrixPosition().' );
 
 		return this.setFromMatrixPosition( m );
 
@@ -728,14 +728,14 @@ THREE.Vector3.prototype = {
 
 	getScaleFromMatrix: function ( m ) {
 
-		THREE.warning( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
+		THREE.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
 
 		return this.setFromMatrixScale( m );
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
 
-		THREE.warning( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
+		THREE.warn( 'THREE.Vector3: .getColumnFromMatrix() has been renamed to .setFromMatrixColumn().' );
 
 		return this.setFromMatrixColumn( index, matrix );
 
