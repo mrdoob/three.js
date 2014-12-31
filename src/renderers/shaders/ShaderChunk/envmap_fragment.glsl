@@ -35,11 +35,11 @@
 	#elif defined( ENVMAP_TYPE_EQUIREC )
 		vec2 sampleUV;
 		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );
-		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_2PI + 0.5;
+		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
 		vec4 envColor = texture2D( envMap, sampleUV );
 		
 	#elif defined( ENVMAP_TYPE_SPHERE )
-		vec3 reflectView = flipNormal * ( transformDirection( reflectVec, viewMatrix ) + vec3(0.0,0.0,1.0) );
+		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 	#endif
 
