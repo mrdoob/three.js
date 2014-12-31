@@ -33,12 +33,14 @@ THREE.ConsoleWarningHandler = function() {
 	console.warn( arguments );
 };
 
-THREE.NullHandler = function() {
+THREE.ConsoleLogHandler = function() {
+	console.log( arguments );
 };
 
 // set the default error handlers
 THREE.error = THREE.ConsoleErrorHandler;
 THREE.warning = THREE.ConsoleWarningHandler;
+THREE.log = THREE.ConsoleLogHandler;
 
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button

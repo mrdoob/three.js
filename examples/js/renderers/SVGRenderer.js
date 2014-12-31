@@ -15,7 +15,7 @@ THREE.SVGObject.prototype.constructor = THREE.SVGObject;
 
 THREE.SVGRenderer = function () {
 
-	console.log( 'THREE.SVGRenderer', THREE.REVISION );
+	THREE.log( 'THREE.SVGRenderer', THREE.REVISION );
 
 	var _this = this,
 	_renderData, _elements, _lights,

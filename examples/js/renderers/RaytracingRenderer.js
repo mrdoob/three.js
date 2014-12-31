@@ -5,7 +5,7 @@
 
 THREE.RaytracingRenderer = function ( parameters ) {
 
-	console.log( 'THREE.RaytracingRenderer', THREE.REVISION );
+	THREE.log( 'THREE.RaytracingRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 

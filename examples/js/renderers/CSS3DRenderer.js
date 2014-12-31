@@ -38,7 +38,7 @@ THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 
 THREE.CSS3DRenderer = function () {
 
-	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
+	THREE.log( 'THREE.CSS3DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
