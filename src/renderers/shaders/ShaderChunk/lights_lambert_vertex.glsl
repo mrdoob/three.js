@@ -12,7 +12,7 @@ transformedNormal = normalize( transformedNormal );
 
 for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
-	vec3 dirVector = transformNormal( directionalLightDirection[ i ], viewMatrix );
+	vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );
 
 	float dotProduct = dot( transformedNormal, dirVector );
 	vec3 directionalLightWeighting = vec3( max( dotProduct, 0.0 ) );
@@ -61,7 +61,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );
 		vec3 lVector = lPosition.xyz - mvPosition.xyz;
 
-		float lDistance = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );
+		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );
 
 		lVector = normalize( lVector );
 		float dotProduct = dot( transformedNormal, lVector );
@@ -93,11 +93,11 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 		#endif
 
-		vLightFront += pointLightColor[ i ] * pointLightWeighting * lDistance;
+		vLightFront += pointLightColor[ i ] * pointLightWeighting * attenuation;
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += pointLightColor[ i ] * pointLightWeightingBack * lDistance;
+			vLightBack += pointLightColor[ i ] * pointLightWeightingBack * attenuation;
 
 		#endif
 
@@ -118,7 +118,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );
 
-			float lDistance = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecayExponent[i] );
+			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecayExponent[i] );
 
 			lVector = normalize( lVector );
 
@@ -150,11 +150,11 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 			#endif
 
-			vLightFront += spotLightColor[ i ] * spotLightWeighting * lDistance * spotEffect;
+			vLightFront += spotLightColor[ i ] * spotLightWeighting * attenuation * spotEffect;
 
 			#ifdef DOUBLE_SIDED
 
-				vLightBack += spotLightColor[ i ] * spotLightWeightingBack * lDistance * spotEffect;
+				vLightBack += spotLightColor[ i ] * spotLightWeightingBack * attenuation * spotEffect;
 
 			#endif
 
@@ -168,7 +168,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {
 
-		vec3 lVector = transformNormal( hemisphereLightDirection[ i ], viewMatrix );
+		vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );
 
 		float dotProduct = dot( transformedNormal, lVector );
 

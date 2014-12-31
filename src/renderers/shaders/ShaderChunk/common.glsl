@@ -14,14 +14,18 @@ vec3  saturate( in vec3 a )  { return clamp( a, 0.0, 1.0 ); }
 vec4  saturate( in vec4 a )  { return clamp( a, 0.0, 1.0 ); }
 float average( in float a ) { return a; }
 float average( in vec2 a )  { return ( a.x + a.y) * 0.5; }
-float average( in vec3 a )  { return ( a.x + a.y + a.z) * 0.3333333333; }
+float average( in vec3 a )  { return ( a.x + a.y + a.z) / 3.0; }
 float average( in vec4 a )  { return ( a.x + a.y + a.z + a.w) * 0.25; }
 float whiteCompliment( in float a ) { return saturate( 1.0 - a ); }
 vec2  whiteCompliment( in vec2 a )  { return saturate( vec2(1.0) - a ); }
 vec3  whiteCompliment( in vec3 a )  { return saturate( vec3(1.0) - a ); }
 vec4  whiteCompliment( in vec4 a )  { return saturate( vec4(1.0) - a ); }
-vec3 transformNormal( in vec3 normal, in mat4 matrix ) {
-	return normalize( ( viewMatrix * vec4( normal, 0.0 ) ).xyz );
+vec3 transformDirection( in vec3 normal, in mat4 matrix ) {
+	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );
+}
+// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
+vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {
+	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );
 }
 vec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal) {
 	float distance = dot( planeNormal, point-pointOnPlane );
@@ -33,11 +37,10 @@ float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
 vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
 	return pointOnLine + lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) );
 }
-// standard exponential distance attenuation multiplied by a linear distance cutoff, if cutoffDistance > 0.
 float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
-	float distanceAttenuation = 1.0 / pow( lightDistance, decayExponent );
-	if ( cutoffDistance > 0.0 ) {
-		distanceAttenuation *= 1.0 - min( lightDistance / cutoffDistance, 1.0 );
+	if ( decayExponent > 0.0 ) {
+	  return pow( saturate( 1.0 - lightDistance / cutoffDistance ), decayExponent );
 	}
-	return distanceAttenuation;
+	return 1.0;
 }
+

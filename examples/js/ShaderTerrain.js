@@ -108,6 +108,7 @@ THREE.ShaderTerrain = {
 				"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
@@ -174,22 +175,19 @@ THREE.ShaderTerrain = {
 						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
-						"float lDistance = 1.0;",
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );"
 
 						"lVector = normalize( lVector );",
 
 						"vec3 pointHalfVector = normalize( lVector + viewPosition );",
-						"float pointDistance = lDistance;",
 
 						"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 						"float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );",
 
 						"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-						"pointDiffuse += pointDistance * pointLightColor[ i ] * diffuse * pointDiffuseWeight;",
-						"pointSpecular += pointDistance * pointLightColor[ i ] * specular * pointSpecularWeight * pointDiffuseWeight;",
+						"pointDiffuse += attenuation * pointLightColor[ i ] * diffuse * pointDiffuseWeight;",
+						"pointSpecular += attenuation * pointLightColor[ i ] * specular * pointSpecularWeight * pointDiffuseWeight;",
 
 					"}",
 

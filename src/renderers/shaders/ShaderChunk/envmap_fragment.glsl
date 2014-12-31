@@ -4,10 +4,8 @@
 
 		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );
 
-		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
 		// Transforming Normal Vectors with the Inverse Transformation
-
-		vec3 worldNormal = transformNormal( normal, viewMatrix );
+		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
@@ -41,7 +39,7 @@
 		vec4 envColor = texture2D( envMap, sampleUV );
 		
 	#elif defined( ENVMAP_TYPE_SPHERE )
-		vec3 reflectView = flipNormal * ( transformNormal( reflectVec, viewMatrix ) + vec3(0.0,0.0,1.0) );
+		vec3 reflectView = flipNormal * ( transformDirection( reflectVec, viewMatrix ) + vec3(0.0,0.0,1.0) );
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 	#endif
 

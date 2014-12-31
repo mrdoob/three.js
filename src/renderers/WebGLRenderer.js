@@ -5304,8 +5304,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				pointPositions[ pointOffset + 1 ] = _vector3.y;
 				pointPositions[ pointOffset + 2 ] = _vector3.z;
 
+				// distance is 0 if decayExponent is 0, because there is no attenuation at all.
 				pointDistances[ pointLength ] = distance;
-				pointDecayExponents[ pointLength ] = light.decayExponent;
+				pointDecayExponents[ pointLength ] = ( light.distance === 0 ) ? 0.0 : light.decayExponent;
 
 				pointLength += 1;
 
@@ -5345,7 +5346,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
 				spotExponents[ spotLength ] = light.exponent;
-				spotDecayExponents[ pointLength ] = light.decayExponent;
+				spotDecayExponents[ spotLength ] = ( light.distance === 0 ) ? 0.0 : light.decayExponent;
 
 				spotLength += 1;
 

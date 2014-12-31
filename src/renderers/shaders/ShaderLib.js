@@ -913,7 +913,7 @@ THREE.ShaderLib = {
 
 			"		for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-			"			vec3 dirVector = transformNormal( directionalLightDirection[ i ], viewMatrix );",
+			"			vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
 
 						// diffuse
 
@@ -956,7 +956,7 @@ THREE.ShaderLib = {
 
 			"		for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-			"			vec3 lVector = transformNormal( hemisphereLightDirection[ i ], viewMatrix );",
+			"			vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );",
 
 						// diffuse
 
@@ -1234,7 +1234,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vWorldPosition = transformNormal( position, modelMatrix );",
+			"	vWorldPosition = transformDirection( position, modelMatrix );",
 
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -1284,7 +1284,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vWorldPosition = transformNormal( position, modelMatrix );",
+			"	vWorldPosition = transformDirection( position, modelMatrix );",
 
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
