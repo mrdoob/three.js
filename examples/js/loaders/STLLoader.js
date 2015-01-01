@@ -61,7 +61,26 @@ THREE.STLLoader.prototype = {
 			face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
 			n_faces = reader.getUint32(80,true);
 			expect = 80 + (32 / 8) + (n_faces * face_size);
-			return expect === reader.byteLength;
+			
+			if ( expect === reader.byteLength ) {
+				
+				return true;
+				
+			}
+
+			var fileLength = reader.byteLength;
+
+			for ( var index = 0; index < fileLength; index ++ ) {
+
+				if ( reader.getUint8(index, false) > 127 ) {
+					
+					return true;
+					
+				}
+
+			}
+
+			return false;
 
 		};
 
