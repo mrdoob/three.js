@@ -232,6 +232,25 @@
 
 			onWindowResize();
 
+                        //
+
+                        var sceneURL = editor.getUrlParamByName('scene');
+
+                        if ( sceneURL !== null ) {
+
+                                var loader = new THREE.XHRLoader();
+
+                                loader.setResponseType('blob');
+
+                                loader.load( sceneURL, function ( text ) {
+
+                                        var file = new File( [text], sceneURL, {type: "", lastModified: ""})
+                                        editor.loader.loadFile( file );
+
+                                } );
+
+                        }
+
 		</script>
 	</body>
 </html>
