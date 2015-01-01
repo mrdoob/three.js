@@ -11,7 +11,23 @@ var Storage = function () {
 		return { init: function (){}, get: function (){}, set: function (){}, clear: function (){} };
 	}
 
-	var name = 'threejs-editor';
+        var hashcode = function(s){
+                var s = unescape(encodeURI(s));
+                return s.split("").reduce(
+                        function(a,b){
+                                var a = ( ( a << 5 ) - a ) + b.charCodeAt( 0 );
+                                return a & a
+                        },
+                        0
+                );
+        }
+
+        var url = document.URL;
+        url = url.replace(/^https?:\/\//,'');
+
+        var urlhash = hashcode(url);
+
+        var name = 'threejs-editor-' + urlhash;
 	var version = 1;
 
 	var database;
