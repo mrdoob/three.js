@@ -68,8 +68,9 @@ THREE.STLLoader.prototype = {
 				
 			}
 
+			// some binary files will have different size from expected,
+			// checking characters higher than ASCII to confirm is binary
 			var fileLength = reader.byteLength;
-
 			for ( var index = 0; index < fileLength; index ++ ) {
 
 				if ( reader.getUint8(index, false) > 127 ) {
