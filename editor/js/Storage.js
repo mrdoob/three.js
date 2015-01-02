@@ -22,10 +22,7 @@ var Storage = function () {
                 );
         }
 
-        var url = document.URL;
-        url = url.replace(/^https?:\/\//,'');
-
-        var urlhash = createHash(url);
+        var urlhash = createHash( document.URL.replace(/^https?:\/\//,'') );
 
         var name = 'threejs-editor-' + urlhash;
 	var version = 1;
