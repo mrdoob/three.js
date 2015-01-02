@@ -1,6 +1,6 @@
 import shutil
-from .. import constants
-from . import _json, logger
+from .. import constants, logger
+from . import _json
 
 
 def copy_registered_textures(dest, registration):
