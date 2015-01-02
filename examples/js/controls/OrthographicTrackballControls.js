@@ -84,6 +84,12 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		this.radius = ( this.screen.width + this.screen.height ) / 4;
 
+		this.left0 = this.object.left;
+		this.right0 = this.object.right;
+		this.top0 = this.object.top;
+		this.bottom0 = this.object.bottom;
+		this.center0 = new THREE.Vector2((this.left0 + this.right0) / 2.0, (this.top0 + this.bottom0) / 2.0);
+
 	};
 
 	this.handleEvent = function ( event ) {
