@@ -1,6 +1,6 @@
 import os
-from .. import constants
-from . import base_classes, io, logger, api
+from .. import constants, logger
+from . import base_classes, io, api
 
 
 FORMAT_VERSION = 3
@@ -23,7 +23,8 @@ class Geometry(base_classes.BaseNode):
         logger.info('Setting %s to "%s"', node, geo_type)
 
         self._defaults[constants.TYPE] = geo_type
-        base_classes.BaseNode.__init__(self, node, parent=parent,
+        base_classes.BaseNode.__init__(self, node, 
+            parent=parent,
             type=geo_type)
 
     @property
@@ -59,27 +60,25 @@ class Geometry(base_classes.BaseNode):
         bitset = lambda x,y: x & ( 1 << y )
         face_count = 0
 
+        masks = (constants.MASK[constants.UVS],
+            constants.MASK[constants.NORMALS],
+            constants.MASK[constants.COLORS])
+
         while offset < length:
             bit = faces[offset]
             offset += 1
             face_count += 1
-            is_quad = bitset(bit, constants.MASK[constants.QUAD])
-            has_material = bitset(bit, constants.MASK[constants.MATERIALS])
-            has_uv = bitset(bit, constants.MASK[constants.UVS])
-            has_normal = bitset(bit, constants.MASK[constants.NORMALS])
-            has_color = bitset(bit, constants.MASK[constants.COLORS])
 
+            is_quad = bitset(bit, constants.MASK[constants.QUAD])
             vector = 4 if is_quad else 3
             offset += vector
 
-            if has_material:
+            if bitset(bit, constants.MASK[constants.MATERIALS]):
                 offset += 1
-            if has_uv:
-                offset += vector
-            if has_normal:
-                offset += vector
-            if has_color:
-                offset += vector
+
+            for mask in masks:
+                if bitset(bit, mask):
+                    offset += vector
 
         return face_count
 
@@ -109,7 +108,6 @@ class Geometry(base_classes.BaseNode):
             data[constants.MATERIALS] = self[constants.MATERIALS].copy()
         except KeyError:
             logger.debug('No materials to copy')
-            pass
 
         return data
 
@@ -323,7 +321,8 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.COLORS):
             logger.info('Parsing %s', constants.COLORS)
-            self[constants.COLORS] = api.mesh.vertex_colors(self.node)
+            self[constants.COLORS] = api.mesh.vertex_colors(
+                self.node)
         
         if self.options.get(constants.FACE_MATERIALS):
             logger.info('Parsing %s', constants.FACE_MATERIALS)
