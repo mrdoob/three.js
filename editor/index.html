@@ -127,6 +127,25 @@
 
 					}
 
+					// ---
+					var sceneURL = editor.getUrlParamByName('scene');
+
+					if ( sceneURL !== null ) {
+
+						var loader = new THREE.XHRLoader();
+
+						loader.setResponseType('blob');
+
+						loader.load( sceneURL, function ( text ) {
+
+							var file = new File( [text], sceneURL, {type: "application/json", lastModified: ""})
+							editor.loader.loadFile( file );
+
+						} );
+
+					}
+					// ---
+
 					var selected = editor.config.getKey( 'selected' );
 
 					if ( selected !== undefined ) {
@@ -231,25 +250,6 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
-
-                        //
-
-                        var sceneURL = editor.getUrlParamByName('scene');
-
-                        if ( sceneURL !== null ) {
-
-                                var loader = new THREE.XHRLoader();
-
-                                loader.setResponseType('blob');
-
-                                loader.load( sceneURL, function ( text ) {
-
-                                        var file = new File( [text], sceneURL, {type: "", lastModified: ""})
-                                        editor.loader.loadFile( file );
-
-                                } );
-
-                        }
 
 		</script>
 	</body>
