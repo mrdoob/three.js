@@ -3907,7 +3907,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function updateObject( object ) {
 
-		var geometry = object.geometry, customAttributesDirty, material;
+		var geometry = object.geometry;
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -3954,8 +3954,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			for ( var i = 0, il = geometryGroupsList.length; i < il; i ++ ) {
 
 				var geometryGroup = geometryGroupsList[ i ];
-
-				material = getBufferMaterial( object, geometryGroup );
+				var material = getBufferMaterial( object, geometryGroup );
 
 				if ( geometry.groupsNeedUpdate === true ) {
 
@@ -3963,7 +3962,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+				var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 				if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
 					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
@@ -3987,9 +3986,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			material = getBufferMaterial( object, geometry );
-
-			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+			var material = getBufferMaterial( object, geometry );
+			var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
 
@@ -4005,9 +4003,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
-			material = getBufferMaterial( object, geometry );
-
-			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+			var material = getBufferMaterial( object, geometry );
+			var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || customAttributesDirty ) {
 
