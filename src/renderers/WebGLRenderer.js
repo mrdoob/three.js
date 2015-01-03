@@ -309,6 +309,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _supportsVertexTextures = _maxVertexTextures > 0;
 	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
+	var _glExtensionVAO = extensions.get('OES_vertex_array_object');
 
 	//
 
@@ -778,6 +779,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		delete geometry.__webglInit;
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			if (geometry.vaos) {
+				for (var i=0; i<geometry.vaos.length; i++) {
+					_glExtensionVAO.deleteVertexArrayOES(geometry.vaos[i].vao);
+				}
+			}
 
 			for ( var name in geometry.attributes ) {
 
@@ -2418,6 +2425,104 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+
+	function setupVAO(geomhash, material, program, geometry) {
+
+		var vao;
+
+		if (geometry.offsets && geometry.offsets.length > 1) {
+			geometry.vaos = null;
+			return false;
+		}
+
+		if (!_glExtensionVAO) {
+			geometry.vaos = null;
+			return false;
+		}
+
+		if (geometry.vaos === undefined)
+			geometry.vaos = [];
+
+		//Set up a VAO for this object
+		vao = _glExtensionVAO.createVertexArrayOES();
+		geometry.vaos.push( { geomhash : geomhash, vao : vao } );
+		_glExtensionVAO.bindVertexArrayOES(vao);
+
+		var geometryAttributes = geometry.attributes;
+
+		//bind the index buffer
+		var index = geometryAttributes.index;
+		if (index)
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+		var programAttributes = program.attributes;
+		var programAttributesKeys = program.attributesKeys;
+
+
+		var startIndex = (geometry.offsets && geometry.offsets.length) ? geometry.offsets[0].index : 0;
+
+		//Set up vertex attributes
+		for ( var i = 0, l = programAttributesKeys.length; i < l; i ++ ) {
+
+			var key = programAttributesKeys[ i ];
+			var programAttribute = programAttributes[ key ];
+
+			if ( programAttribute >= 0 ) {
+
+				var geometryAttribute = geometryAttributes[ key ];            	
+
+				if (geometryAttribute !== undefined) {
+
+					_gl.enableVertexAttribArray(programAttribute);
+
+					var size = geometryAttribute.itemSize;
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
+
+					_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+
+				} else {
+
+					//Default material attributes cannot be set in VAO, so we have to abort the VAO setup
+					//and fall back to the regular setupVertexAttributes in draw loop way.
+					//This is hopefully very rare.
+					_glExtensionVAO.bindVertexArrayOES(null);
+
+					for (var i=0; i<geometry.vaos.length; i++)
+						_glExtensionVAO.deleteVertexArrayOES(geometry.vaos[i].vao);
+
+					geometry.vaos = null; //Flag it so we don't pass through here again.
+
+					return false;
+				}
+
+			}
+		}
+
+		return true;
+	}
+
+	function activateVAO( geomhash, material, program, geometry) {
+		var vaos = geometry.vaos;
+
+		if (vaos) {
+			//The assumption is that this array is rarely bigger than one or two items,
+			//so it's faster to do a search than use object hashmap based on geomhash.
+			for (var i=0; i<vaos.length; i++) {
+				if (vaos[i].geomhash === geomhash) {
+					_glExtensionVAO.bindVertexArrayOES(vaos[i].vao);
+					return true;
+				}
+			}
+		}
+
+		if (vaos === null)
+			return false;
+
+		return setupVAO(geomhash, material, program, geometry);
+	}
+
+
 	function setupVertexAttributes( material, program, geometry, startIndex ) {
 
 		var geometryAttributes = geometry.attributes;
@@ -2484,6 +2589,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			updateBuffers = true;
 
 		}
+
+		var vao = activateVAO(geometryHash, material, program, geometry);
+		updateBuffers = updateBuffers && !vao;
 
 		if ( updateBuffers ) {
 
@@ -2805,6 +2913,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+		}
+
+		if (vao) {
+		
+			_glExtensionVAO.bindVertexArrayOES(null);
+	
 		}
 
 	};
