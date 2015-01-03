@@ -88,7 +88,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		this.right0 = this.object.right;
 		this.top0 = this.object.top;
 		this.bottom0 = this.object.bottom;
-		this.center0 = new THREE.Vector2((this.left0 + this.right0) / 2.0, (this.top0 + this.bottom0) / 2.0);
+		this.center0.set((this.left0 + this.right0) / 2.0, (this.top0 + this.bottom0) / 2.0);
 
 	};
 
@@ -102,44 +102,72 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.getMouseOnScreen = function ( clientX, clientY ) {
+	var getMouseOnScreen = ( function () {
 
-		return new THREE.Vector2(
-			( clientX - _this.screen.offsetLeft ) / _this.radius * 0.5,
-			( clientY - _this.screen.offsetTop ) / _this.radius * 0.5
-		);
+		var vector = new THREE.Vector2();
 
-	};
+		return function ( pageX, pageY ) {
 
-	this.getMouseProjectionOnBall = function ( clientX, clientY ) {
+			vector.set(
+				( pageX - _this.screen.offsetLeft ) / _this.radius * 0.5,
+				( pageY - _this.screen.offsetTop ) / _this.radius * 0.5
+			);
 
-		var mouseOnBall = new THREE.Vector3(
-			( clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft ) / _this.radius,
-			( _this.screen.height * 0.5 + _this.screen.offsetTop - clientY ) / _this.radius,
-			0.0
-		);
+			return vector;
 
-		var length = mouseOnBall.length();
+		};
 
-		if ( length > 1.0 ) {
+	}() );
 
-			mouseOnBall.normalize();
+	var getMouseProjectionOnBall = ( function () {
 
-		} else {
+		var vector = new THREE.Vector3();
+		var objectUp = new THREE.Vector3();
+		var mouseOnBall = new THREE.Vector3();
 
-			mouseOnBall.z = Math.sqrt( 1.0 - length * length );
+		return function ( pageX, pageY ) {
 
-		}
+			mouseOnBall.set(
+				( pageX - _this.screen.width * 0.5 - _this.screen.offsetLeft ) / _this.radius,
+				( _this.screen.height * 0.5 + _this.screen.offsetTop - pageY ) / _this.radius,
+				0.0
+			);
 
-		_eye.copy( _this.object.position ).sub( _this.target );
+			var length = mouseOnBall.length();
 
-		var projection = _this.object.up.clone().setLength( mouseOnBall.y );
-		projection.add( _this.object.up.clone().cross( _eye ).setLength( mouseOnBall.x ) );
-		projection.add( _eye.setLength( mouseOnBall.z ) );
+			if ( _this.noRoll ) {
 
-		return projection;
+				if ( length < Math.SQRT1_2 ) {
 
-	};
+					mouseOnBall.z = Math.sqrt( 1.0 - length*length );
+
+				} else {
+
+					mouseOnBall.z = .5 / length;
+
+				}
+
+			} else if ( length > 1.0 ) {
+
+				mouseOnBall.normalize();
+
+			} else {
+
+				mouseOnBall.z = Math.sqrt( 1.0 - length * length );
+
+			}
+
+			_eye.copy( _this.object.position ).sub( _this.target );
+
+			vector.copy( _this.object.up ).setLength( mouseOnBall.y )
+			vector.add( objectUp.copy( _this.object.up ).cross( _eye ).setLength( mouseOnBall.x ) );
+			vector.add( _eye.setLength( mouseOnBall.z ) );
+
+			return vector;
+
+		};
+
+	}() );
 
 	this.rotateCamera = function () {
 
