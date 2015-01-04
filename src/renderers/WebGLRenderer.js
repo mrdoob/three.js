@@ -112,7 +112,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentProgram = null,
 	_currentFramebuffer = null,
 	_currentMaterialId = - 1,
-	_currentGeometryGroupHash = - 1,
+	_currentGeometryProgram = '',
 	_currentCamera = null,
 
 	_usedTextureUnits = 0,
@@ -283,7 +283,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldDepthWrite = - 1;
 		_oldDoubleSided = - 1;
 		_oldFlipSided = - 1;
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 
 		_lightsNeedUpdate = true;
@@ -845,7 +845,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// TOFIX: Workaround for deleted geometry being currently bound
 
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 
 	};
 
@@ -2476,11 +2476,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryHash = ( geometry.id * 0x1000000 ) + ( program.id * 4 ) + 2 + wireframeBit;
+			geometryProgram = 'direct_' + geometry.id + '_' + program.id + '_' + wireframeBit;
 
-		if ( geometryHash !== _currentGeometryGroupHash ) {
+		if ( geometryProgram !== _currentGeometryProgram ) {
 
-			_currentGeometryGroupHash = geometryHash;
+			_currentGeometryProgram = geometryProgram;
 			updateBuffers = true;
 
 		}
@@ -2821,11 +2821,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryGroupHash = ( geometryGroup.id * 0x1000000 ) + ( program.id * 4 ) + wireframeBit;
+			geometryProgram = geometryGroup.id + '_' + program.id + '_' + wireframeBit;
 
-		if ( geometryGroupHash !== _currentGeometryGroupHash ) {
+		if ( geometryProgram !== _currentGeometryProgram ) {
 
-			_currentGeometryGroupHash = geometryGroupHash;
+			_currentGeometryProgram = geometryProgram;
 			updateBuffers = true;
 
 		}
@@ -3276,7 +3276,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// reset caching for this frame
 
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 		_lightsNeedUpdate = true;
@@ -3562,7 +3562,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = setProgram( camera, lights, fog, material, object );
 
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 
 		_this.setMaterialFaces( material );
 
