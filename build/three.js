@@ -17518,7 +17518,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentProgram = null,
 	_currentFramebuffer = null,
 	_currentMaterialId = - 1,
-	_currentGeometryGroupHash = - 1,
+	_currentGeometryProgram = '',
 	_currentCamera = null,
 
 	_usedTextureUnits = 0,
@@ -17689,7 +17689,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldDepthWrite = - 1;
 		_oldDoubleSided = - 1;
 		_oldFlipSided = - 1;
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 
 		_lightsNeedUpdate = true;
@@ -18251,7 +18251,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// TOFIX: Workaround for deleted geometry being currently bound
 
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 
 	};
 
@@ -19882,11 +19882,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryHash = ( geometry.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
+			geometryProgram = 'direct_' + geometry.id + '_' + program.id + '_' + wireframeBit;
 
-		if ( geometryHash !== _currentGeometryGroupHash ) {
+		if ( geometryProgram !== _currentGeometryProgram ) {
 
-			_currentGeometryGroupHash = geometryHash;
+			_currentGeometryProgram = geometryProgram;
 			updateBuffers = true;
 
 		}
@@ -20227,11 +20227,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryGroupHash = ( geometryGroup.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
+			geometryProgram = geometryGroup.id + '_' + program.id + '_' + wireframeBit;
 
-		if ( geometryGroupHash !== _currentGeometryGroupHash ) {
+		if ( geometryProgram !== _currentGeometryProgram ) {
 
-			_currentGeometryGroupHash = geometryGroupHash;
+			_currentGeometryProgram = geometryProgram;
 			updateBuffers = true;
 
 		}
@@ -20682,7 +20682,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// reset caching for this frame
 
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 		_lightsNeedUpdate = true;
@@ -20968,7 +20968,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = setProgram( camera, lights, fog, material, object );
 
-		_currentGeometryGroupHash = - 1;
+		_currentGeometryProgram = '';
 
 		_this.setMaterialFaces( material );
 
@@ -21313,7 +21313,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function updateObject( object ) {
 
-		var geometry = object.geometry, customAttributesDirty, material;
+		var geometry = object.geometry;
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -21360,8 +21360,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			for ( var i = 0, il = geometryGroupsList.length; i < il; i ++ ) {
 
 				var geometryGroup = geometryGroupsList[ i ];
-
-				material = getBufferMaterial( object, geometryGroup );
+				var material = getBufferMaterial( object, geometryGroup );
 
 				if ( geometry.groupsNeedUpdate === true ) {
 
@@ -21369,7 +21368,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+				var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 				if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
 					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
@@ -21393,9 +21392,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			material = getBufferMaterial( object, geometry );
-
-			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+			var material = getBufferMaterial( object, geometry );
+			var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
 
@@ -21411,9 +21409,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.PointCloud ) {
 
-			material = getBufferMaterial( object, geometry );
-
-			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+			var material = getBufferMaterial( object, geometry );
+			var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || customAttributesDirty ) {
 
@@ -30277,7 +30274,7 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded ) {
+THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
 	THREE.Geometry.call( this );
 
@@ -30289,7 +30286,9 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 		height: height,
 		radialSegments: radialSegments,
 		heightSegments: heightSegments,
-		openEnded: openEnded
+		openEnded: openEnded,
+		thetaStart: thetaStart,
+		thetaLength: thetaLength
 	};
 
 	radiusTop = radiusTop !== undefined ? radiusTop : 20;
@@ -30300,6 +30299,8 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 	heightSegments = heightSegments || 1;
 
 	openEnded = openEnded !== undefined ? openEnded : false;
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : 2 * Math.PI;
 
 	var heightHalf = height / 2;
 
@@ -30318,9 +30319,9 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 			var u = x / radialSegments;
 
 			var vertex = new THREE.Vector3();
-			vertex.x = radius * Math.sin( u * Math.PI * 2 );
+			vertex.x = radius * Math.sin( u * thetaLength + thetaStart );
 			vertex.y = - v * height + heightHalf;
-			vertex.z = radius * Math.cos( u * Math.PI * 2 );
+			vertex.z = radius * Math.cos( u * thetaLength + thetaStart );
 
 			this.vertices.push( vertex );
 
@@ -30416,16 +30417,16 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 		for ( x = 0; x < radialSegments; x ++ ) {
 
-			var v1 = vertices[ y ][ x + 1 ];
-			var v2 = vertices[ y ][ x ];
+			var v1 = vertices[ heightSegments ][ x + 1 ];
+			var v2 = vertices[ heightSegments ][ x ];
 			var v3 = this.vertices.length - 1;
 
 			var n1 = new THREE.Vector3( 0, - 1, 0 );
 			var n2 = new THREE.Vector3( 0, - 1, 0 );
 			var n3 = new THREE.Vector3( 0, - 1, 0 );
 
-			var uv1 = uvs[ y ][ x + 1 ].clone();
-			var uv2 = uvs[ y ][ x ].clone();
+			var uv1 = uvs[ heightSegments ][ x + 1 ].clone();
+			var uv2 = uvs[ heightSegments ][ x ].clone();
 			var uv3 = new THREE.Vector2( uv2.x, 1 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
@@ -30437,7 +30438,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 	this.computeFaceNormals();
 
-}
+};
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
