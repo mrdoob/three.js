@@ -404,7 +404,7 @@ Editor.prototype = {
 
         getUrlParamByName: function ( name ) {
 
-                name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+                name = name.replace( /[\[]/ , "\\\[" ).replace( /[\]]/ , "\\\]" );
                 var regexS = "[\\?&]"+name+"=([^&#]*)";
                 var regex = new RegExp( regexS );
                 var results = regex.exec( document.URL );
@@ -415,7 +415,7 @@ Editor.prototype = {
 
                 } else {
 
-                        return results[1];
+                        return results[ 1 ];
 
                 }
 
