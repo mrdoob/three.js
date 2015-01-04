@@ -125,6 +125,25 @@
 
 						editor.fromJSON( state );
 
+					} else {
+
+						var sceneURL = editor.getUrlParamByName('scene');
+
+						if ( sceneURL !== null ) {
+
+							var loader = new THREE.XHRLoader();
+
+							loader.load( sceneURL, function ( data ) {
+
+								var file = new Blob( [data], { type : "", lastModified : "" } )
+
+								file.name = sceneURL;
+
+								editor.loader.loadFile( file );
+
+							} );
+
+						}
 					}
 
 					var selected = editor.config.getKey( 'selected' );
