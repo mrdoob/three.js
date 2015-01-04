@@ -133,19 +133,17 @@
 
 							var loader = new THREE.XHRLoader();
 
-							//loader.setResponseType('blob');
+							loader.load( sceneURL, function ( data ) {
 
-							loader.load( sceneURL, function ( text ) {
+								var file = new Blob( [data], { type : "", lastModified : "" } )
 
-							var file = new Blob( [text], {type: "", lastModified: ""})
+								file.name = sceneURL;
 
-							file.name = sceneURL;
-							
-							editor.loader.loadFile( file );
+								editor.loader.loadFile( file );
 
-						    } );
+							} );
 
-					    }
+						}
 					}
 
 					var selected = editor.config.getKey( 'selected' );

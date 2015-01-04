@@ -410,10 +410,13 @@ Editor.prototype = {
                 var results = regex.exec( document.URL );
 
                 if ( results == null ) {
+
                         return null;
-                }
-                else {
+
+                } else {
+
                         return results[1];
+
                 }
 
         }
