@@ -11,15 +11,23 @@ var Storage = function () {
 		return { init: function (){}, get: function (){}, set: function (){}, clear: function (){} };
 	}
 
-        var createHash = function(s){
-                var s = unescape(encodeURI(s));
-                return s.split("").reduce(
-                        function(a,b){
+        var createHash = function ( s ){
+
+                var s = unescape( encodeURI( s ) );
+
+                return s.split( "" ).reduce(
+
+                        function ( a, b ) {
+
                                 var a = ( ( a << 5 ) - a ) + b.charCodeAt( 0 );
+
                                 return a & a
+
                         },
                         0
+
                 );
+
         }
 
         var urlhash = createHash( document.URL.replace(/^https?:\/\//,'') );
