@@ -803,7 +803,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometryGroupsList !== undefined ) {
 
-				for ( var i = 0,l = geometryGroupsList.length; i < l; i ++ ) {
+				for ( var i = 0, l = geometryGroupsList.length; i < l; i ++ ) {
 
 					var geometryGroup = geometryGroupsList[ i ];
 
@@ -3162,27 +3162,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			};
 
-			var m = 0;
-
-			while ( m < material.numSupportedMorphTargets ) {
+			for ( var m = 0, ml = material.numSupportedMorphTargets; m < ml; m ++ ) {
 
 				if ( activeInfluenceIndices[ m ] ) {
 
 					var influenceIndex = activeInfluenceIndices[ m ][ 1 ];
 
-					if ( attributes[ 'morphTarget' + m ] >= 0 ) {
+					var attribute = attributes[ 'morphTarget' + m ];
+
+					if ( attribute >= 0 ) {
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ influenceIndex ] );
-						enableAttribute( attributes[ 'morphTarget' + m ] );
-						_gl.vertexAttribPointer( attributes[ 'morphTarget' + m ], 3, _gl.FLOAT, false, 0, 0 );
+						enableAttribute( attribute );
+						_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
 
 					}
 
-					if ( material.morphNormals && attributes[ 'morphNormal' + m ] >= 0 ) {
+					var attribute = attributes[ 'morphNormal' + m ];
+
+					if ( material.morphNormals && attribute >= 0 ) {
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ influenceIndex ] );
-						enableAttribute( attributes[ 'morphNormal' + m ] );
-						_gl.vertexAttribPointer( attributes[ 'morphNormal' + m ], 3, _gl.FLOAT, false, 0, 0 );
+						enableAttribute( attribute );
+						_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
 
 
 					}
@@ -3204,8 +3206,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					object.__webglMorphTargetInfluences[ m ] = 0;
 
 				}
-
-				m ++;
 
 			}
 
