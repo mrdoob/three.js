@@ -20514,21 +20514,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var order = object.morphTargetForcedOrder;
 			var influences = object.morphTargetInfluences;
 
+			var attribute;
+
 			while ( m < material.numSupportedMorphTargets && m < order.length ) {
 
-				if ( attributes[ 'morphTarget' + m ] >= 0 ) {
+				attribute = attributes[ 'morphTarget' + m ];
+
+				if ( attribute >= 0 ) {
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ order[ m ] ] );
-					enableAttribute( attributes[ 'morphTarget' + m ] );
-					_gl.vertexAttribPointer( attributes[ 'morphTarget' + m ], 3, _gl.FLOAT, false, 0, 0 );
+					enableAttribute( attribute );
+					_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
 
 				}
 
-				if ( attributes[ 'morphNormal' + m ] >= 0 && material.morphNormals ) {
+				attribute = attributes[ 'morphNormal' + m ];
+
+				if ( attribute >= 0 && material.morphNormals ) {
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ order[ m ] ] );
-					enableAttribute( attributes[ 'morphNormal' + m ] );
-					_gl.vertexAttribPointer( attributes[ 'morphNormal' + m ], 3, _gl.FLOAT, false, 0, 0 );
+					enableAttribute( attribute );
+					_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
 
 				}
 
@@ -20566,7 +20572,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				activeInfluenceIndices.push( [ 0, 0 ] );
 
-			};
+			}
+
+			var attribute;
 
 			for ( var m = 0, ml = material.numSupportedMorphTargets; m < ml; m ++ ) {
 
@@ -20574,7 +20582,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					var influenceIndex = activeInfluenceIndices[ m ][ 1 ];
 
-					var attribute = attributes[ 'morphTarget' + m ];
+					attribute = attributes[ 'morphTarget' + m ];
 
 					if ( attribute >= 0 ) {
 
@@ -20584,9 +20592,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					var attribute = attributes[ 'morphNormal' + m ];
+					attribute = attributes[ 'morphNormal' + m ];
 
-					if ( material.morphNormals && attribute >= 0 ) {
+					if ( attribute >= 0 && material.morphNormals ) {
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ influenceIndex ] );
 						enableAttribute( attribute );
