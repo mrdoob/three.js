@@ -11,11 +11,9 @@ var Storage = function () {
 		return { init: function (){}, get: function (){}, set: function (){}, clear: function (){} };
 	}
 
-        var createHash = function ( s ){
+        var createHash = function ( string ){
 
-                var s = unescape( encodeURI( s ) );
-
-                return s.split( "" ).reduce(
+                return string.split( "" ).reduce(
 
                         function ( a, b ) {
 
@@ -30,7 +28,7 @@ var Storage = function () {
 
         }
 
-        var urlhash = createHash( document.URL.replace( /^https?:\/\// , '' ) );
+        var urlhash = createHash( unescape( encodeURI( document.URL.replace( /^https?:\/\// , '' ) ) ) );
 
         var name = 'threejs-editor-' + urlhash;
 	var version = 1;
