@@ -3129,19 +3129,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object.__webglMorphTargetInfluences[ m ] = influences[ order[ m ] ];
 
 				m ++;
+
 			}
 
 		} else {
 
 			// find the most influencing
 
-			var influence, activeInfluenceIndices = [];
+			var activeInfluenceIndices = [];
 			var influences = object.morphTargetInfluences;
-			var i, il = influences.length;
 
-			for ( i = 0; i < il; i ++ ) {
+			for ( var i = 0, il = influences.length; i < il; i ++ ) {
 
-				influence = influences[ i ];
+				var influence = influences[ i ];
 
 				activeInfluenceIndices.push( [ influence, i ] );
 
@@ -3162,13 +3162,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			};
 
-			var influenceIndex, m = 0;
+			var m = 0;
 
 			while ( m < material.numSupportedMorphTargets ) {
 
 				if ( activeInfluenceIndices[ m ] ) {
 
-					influenceIndex = activeInfluenceIndices[ m ][ 1 ];
+					var influenceIndex = activeInfluenceIndices[ m ][ 1 ];
 
 					if ( attributes[ 'morphTarget' + m ] >= 0 ) {
 
@@ -3178,7 +3178,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					if ( attributes[ 'morphNormal' + m ] >= 0 && material.morphNormals ) {
+					if ( material.morphNormals && attributes[ 'morphNormal' + m ] >= 0 ) {
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ influenceIndex ] );
 						enableAttribute( attributes[ 'morphNormal' + m ] );
