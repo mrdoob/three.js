@@ -67,3 +67,13 @@ THREE.LineDashedMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+THREE.LineDashedMaterial.prototype.refreshUniforms = function (uniforms) {
+	this.refreshUniformsLine(uniforms);
+	this.refreshUniformsDash(uniforms);
+};
+
+THREE.LineDashedMaterial.prototype.getShaderID = function () {
+	return 'dashed';
+};
+

@@ -198,7 +198,216 @@ THREE.Material.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
+	},
+	refreshUniformsCommon: function ( uniforms, gammaInput ) {
+
+		uniforms.opacity.value = this.opacity;
+
+		if ( gammaInput ) {
+
+			uniforms.diffuse.value.copyGammaToLinear( this.color );
+
+		} else {
+
+			uniforms.diffuse.value = this.color;
+
+		}
+
+		uniforms.map.value = this.map;
+		uniforms.lightMap.value = this.lightMap;
+		uniforms.specularMap.value = this.specularMap;
+		uniforms.alphaMap.value = this.alphaMap;
+
+		if ( this.bumpMap ) {
+
+			uniforms.bumpMap.value = this.bumpMap;
+			uniforms.bumpScale.value = this.bumpScale;
+
+		}
+
+		if ( this.normalMap ) {
+
+			uniforms.normalMap.value = this.normalMap;
+			uniforms.normalScale.value.copy( this.normalScale );
+
+		}
+
+		// uv repeat and offset setting priorities
+		//  1. color map
+		//  2. specular map
+		//  3. normal map
+		//  4. bump map
+		//  5. alpha map
+
+		var uvScaleMap;
+
+		if ( this.map ) {
+
+			uvScaleMap = this.map;
+
+		} else if ( this.specularMap ) {
+
+			uvScaleMap = this.specularMap;
+
+		} else if ( this.normalMap ) {
+
+			uvScaleMap = this.normalMap;
+
+		} else if ( this.bumpMap ) {
+
+			uvScaleMap = this.bumpMap;
+
+		} else if ( this.alphaMap ) {
+
+			uvScaleMap = this.alphaMap;
+
+		}
+
+		if ( uvScaleMap !== undefined ) {
+
+			var offset = uvScaleMap.offset;
+			var repeat = uvScaleMap.repeat;
+
+			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+		}
+
+		uniforms.envMap.value = this.envMap;
+		uniforms.flipEnvMap.value = ( this.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
+
+		if ( gammaInput ) {
+
+			//uniforms.reflectivity.value = this.reflectivity * this.reflectivity;
+			uniforms.reflectivity.value = this.reflectivity;
+
+		} else {
+
+			uniforms.reflectivity.value = this.reflectivity;
+
+		}
+
+		uniforms.refractionRatio.value = this.refractionRatio;
+
+	},
+	refreshUniformsLine: function ( uniforms ) {
+
+		uniforms.diffuse.value = this.color;
+		uniforms.opacity.value = this.opacity;
+
+	},
+
+	refreshUniformsDash: function ( uniforms ) {
+
+		uniforms.dashSize.value = this.dashSize;
+		uniforms.totalSize.value = this.dashSize + this.gapSize;
+		uniforms.scale.value = this.scale;
+
+	},
+
+	refreshUniformsParticle: function ( uniforms, scale ) {
+
+		uniforms.psColor.value = this.color;
+		uniforms.opacity.value = this.opacity;
+		uniforms.size.value = this.size;
+		uniforms.scale.value = scale;
+
+		uniforms.map.value = this.map;
+
+	},
+
+	refreshUniformsPhong: function ( uniforms, gammaInput ) {
+
+		uniforms.shininess.value = this.shininess;
+
+		if ( gammaInput ) {
+
+			uniforms.ambient.value.copyGammaToLinear( this.ambient );
+			uniforms.emissive.value.copyGammaToLinear( this.emissive );
+			uniforms.specular.value.copyGammaToLinear( this.specular );
+
+		} else {
+
+			uniforms.ambient.value = this.ambient;
+			uniforms.emissive.value = this.emissive;
+			uniforms.specular.value = this.specular;
+
+		}
+
+		if ( this.wrapAround ) {
+
+			uniforms.wrapRGB.value.copy( this.wrapRGB );
+
+		}
+
+	},
+
+	refreshUniformsLambert: function ( uniforms, gammaInput ) {
+
+		if ( gammaInput ) {
+
+			uniforms.ambient.value.copyGammaToLinear( this.ambient );
+			uniforms.emissive.value.copyGammaToLinear( this.emissive );
+
+		} else {
+
+			uniforms.ambient.value = this.ambient;
+			uniforms.emissive.value = this.emissive;
+
+		}
+
+		if ( this.wrapAround ) {
+
+			uniforms.wrapRGB.value.copy( this.wrapRGB );
+
+		}
+
+	},
+
+	refreshUniforms: function ( uniforms, renderer, camera ) {
+		console.warn( "THREE.Material: refreshUniforms() is not implemented." );
+	},
+
+	useEnvMap: function () {
+		return false; //false as default
+	},
+
+	useSkinning: function () {
+		return false; //false as default
+	},
+
+	useLights: function () {
+		return false; //false as default
+	},
+
+	getShaderID: function () {
+		return null;
+	},
+
+	getWebglShader: function () {
+		var shaderID = this.getShaderID();
+		var webglShader;
+		if ( shaderID ) {
+
+			var shader = THREE.ShaderLib[ shaderID ];
+
+			webglShader = {
+				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+			};
+
+		} else {
+
+			webglShader = {
+				uniforms: this.uniforms,
+				vertexShader: this.vertexShader,
+				fragmentShader: this.fragmentShader
+			};
+
+		}
+		return webglShader;
 	}
+
 
 };
 
