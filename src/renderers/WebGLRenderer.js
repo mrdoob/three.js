@@ -2476,7 +2476,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryHash = ( geometry.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
+			geometryHash = ( geometry.id * 0x1000000 ) + ( program.id * 4 ) + 2 + wireframeBit;
 
 		if ( geometryHash !== _currentGeometryGroupHash ) {
 
@@ -2821,7 +2821,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryGroupHash = ( geometryGroup.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
+			geometryGroupHash = ( geometryGroup.id * 0x1000000 ) + ( program.id * 4 ) + wireframeBit;
 
 		if ( geometryGroupHash !== _currentGeometryGroupHash ) {
 
