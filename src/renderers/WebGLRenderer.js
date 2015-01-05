@@ -533,6 +533,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.setClearAlpha = function ( alpha ) {
+
+		_clearAlpha = alpha;
+
+		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+
+	};
+
 	this.setClearColorHex = function ( hex, alpha ) {
 
 		console.warn( 'THREE.WebGLRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
