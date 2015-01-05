@@ -4154,6 +4154,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: _logarithmicDepthBuffer,
 
+			shared: material.shared,
 			skinning: material.skinning,
 			maxBones: maxBones,
 			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
@@ -4445,6 +4446,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( p_uniforms.boneGlobalMatrices !== null ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );
+
+				}
+
+			}
+
+		}
+
+		if ( material.shared ) {
+
+			if ( _supportsBoneTextures && material.matricesTexture !== null ) {
+				
+				if ( p_uniforms.sharedMaterialMatricesTexture !== null ) {
+
+					var textureUnit = getTextureUnit();
+
+					_gl.uniform1i( p_uniforms.sharedMaterialMatricesTexture, textureUnit );
+					_this.setTexture( material.matricesTexture, textureUnit );
+
+
+				}
+
+				if ( p_uniforms.sharedMaterialMatricesTextureWidth !== null ) {
+
+					_gl.uniform1f( p_uniforms.sharedMaterialMatricesTextureWidth, material.matricesTextureWidth );
+					
 
 				}
 

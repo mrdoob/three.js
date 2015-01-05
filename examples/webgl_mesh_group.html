@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - mesh group</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#000;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: red;
+			}
+			#selects {
+				position:absolute;
+				bottom:1em;
+				right:1em;
+				text-align:right;
+				display:none;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - mesh group example
+		</div>
+		<div id="selects">
+			<div>
+				MeshGroup:
+				<select id="useGroup">
+					<option>true</option>
+					<option>false</option>
+				</select>
+			</div>
+			<div>
+				Count:
+				<select id="count">
+					<option>1000</option>
+					<option>2500</option>
+					<option>5000</option>
+					<option>10000</option>
+					<option>15000</option>
+					<option>20000</option>
+					<option>25000</option>
+					<option>30000</option>
+					<option>40000</option>
+					<option>50000</option>
+				</select>
+			</div>
+			<div>
+				Material:
+				<select id="material">
+					<option value='basic'>MeshBasicMaterial</option>
+					<option value='lambert'>MeshLambertMaterial</option>
+					<option value='phong'>MeshPhongMaterial</option>
+				</select>
+			</div>
+			<div>
+				Faces Per Object
+				<select id="face">
+					<option>16</option>
+					<option>24</option>
+					<option>48</option>
+					<option>128</option>
+					<option>256</option>
+				</select>
+			</div>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			
+			window.onhashchange = function() {
+				location.reload();
+			}
+
+			var container, stats;
+
+			var camera, controls, scene, renderer, group;
+			
+			var useMeshGroup = true;
+
+			init();
+			render();
+
+			function animate() {
+
+				requestAnimationFrame(animate);
+				controls.update();
+				render();
+
+			}
+			
+			function initSelectsAndProcessHash() {
+				
+				var hashPieces = window.location.hash
+					.substring(1)
+					.split("|");
+					
+				var countVal		= "5000";
+				var materialVal		= "phong";
+				var faceVal			= "16";
+				var useGroupVal		= "true";
+				
+				var countEl = document.getElementById("count");
+				var materialEl = document.getElementById("material");
+				var faceEl = document.getElementById("face");
+				var useGroupEl = document.getElementById("useGroup");
+				
+				function selectVal( select, value ) {
+					
+					for(var i, j = 0; i = select.options[j]; j++) {
+					    if(i.value == value) {
+					        select.selectedIndex = j;
+					        break;
+					    }
+					}
+					
+				}
+				
+				if( hashPieces.length === 4 ) {
+				
+					countVal	= hashPieces[0];
+					materialVal	= hashPieces[1];
+					faceVal		= hashPieces[2];
+					useGroupVal	= hashPieces[3];
+					
+					selectVal( countEl, countVal );
+					selectVal( materialEl, materialVal );
+					selectVal( faceEl, faceVal );
+					selectVal( useGroupEl, useGroupVal );
+				
+				}
+				
+				function handleSelectChange() {
+					window.location.hash = [
+						countEl.value,
+						materialEl.value,
+						faceEl.value,
+						useGroupEl.value
+					].join("|");
+				}
+				
+				countEl.onchange = handleSelectChange;
+				materialEl.onchange = handleSelectChange;
+				faceEl.onchange = handleSelectChange;
+				useGroupEl.onchange = handleSelectChange;
+				
+				return {
+					count		: countEl.value,
+					material	: materialEl.value,
+					face		: faceEl.value,
+					useGroup	: useGroupEl.value
+				}
+				
+			}
+			
+			function randomRange(min, max) {
+				return Math.random() * (max - min) + min;
+			}
+
+			function init() {
+				
+				var settings = initSelectsAndProcessHash();
+				
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+				// scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+
+				var geometry = (function generateCylinderGeometry() {
+					
+					var sidesCount = 4;
+				
+					switch ( settings.face ) {
+					
+						case "16":
+							sidesCount = 4;
+							break;
+						
+						case "24":
+							sidesCount = 6;
+							break;
+						
+						case "48":
+							sidesCount = 12;
+							break;
+						
+						case "128":
+							sidesCount = 32;
+							break;
+						
+						case "256":
+							sidesCount = 64;
+							break;		
+						
+					}
+					
+					return new THREE.CylinderGeometry( 1, 10, 30, sidesCount, 1 );
+					
+				})();
+				
+				var material = (function generateMaterial() {
+					
+					var MaterialClass;
+					var color = 0xffffff;
+				
+					switch ( settings.material ) {
+						case "basic":
+							MaterialClass = THREE.MeshBasicMaterial;
+							color = 0x884400;
+							break;
+						case "lambert":
+							MaterialClass = THREE.MeshLambertMaterial;
+							break;
+						default:
+							MaterialClass = THREE.MeshPhongMaterial;
+					}
+					return new MaterialClass( { color:color, shading: THREE.SmoothShading } );
+					
+				})();
+				
+				useMeshGroup = settings.useGroup === "true";
+				
+				if( useMeshGroup ) {
+					group = new THREE.MeshGroup( THREE.Mesh, material );
+				} else {
+					group = new THREE.Object3D( THREE.Mesh, material );
+				}
+				
+				var twoPi = Math.PI * 2;
+				var speed = 10;
+				var count = ( isNaN( +settings.count ) || +settings.count === 0 ) ? 5000 : +settings.count
+
+				var mesh;
+				
+				// generate meshes
+				
+				for ( var i = 0; i < count; i ++ ) {
+
+					if( useMeshGroup ) {
+						mesh = new THREE.Mesh( geometry );
+					} else {
+						mesh = new THREE.Mesh( geometry, material );
+					}
+					
+					mesh.position.set(
+						randomRange( -250, 250 ),
+						randomRange( -250, 250 ),
+						randomRange( -250, 250 )
+					);
+					
+					mesh.rotation.set(
+						randomRange( 0, twoPi ),
+						randomRange( 0, twoPi ),
+						randomRange( 0, twoPi )
+					);
+					
+					mesh.velocity = new THREE.Vector3(
+				
+						randomRange( -speed, speed ),
+						randomRange( -speed, speed ),
+						randomRange( -speed, speed )
+				
+					).multiplyScalar(0.1);
+			
+					mesh.spin = new THREE.Vector3(
+				
+						randomRange( -twoPi, twoPi ),
+						randomRange( -twoPi, twoPi ),
+						randomRange( -twoPi, twoPi )
+				
+					).multiplyScalar(0.005);
+					
+					//minimize the effect of updating the rotation quaternion
+					mesh.flipFlop = Math.random() > 0.5;
+			
+					mesh.scale.multiplyScalar( randomRange( 1, 2) );
+					
+					mesh.updateMatrix();
+					group.add( mesh );
+
+				}
+				
+				if( useMeshGroup ) {
+					
+					group.build();
+					group.updateMatrixWorld( true );
+					scene.add( group.object );
+					
+				} else {
+
+					scene.add( group );
+										
+				}
+				
+				// lights
+				
+				var intensity = 0.8;
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				light.intensity = intensity;
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xff8800 );
+				light.intensity = intensity;
+				light.position.set( -1, -1, 1 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0x0033ff );
+				light.intensity = intensity;
+				light.position.set( -1, -1, -1 );
+				scene.add( light );
+
+				light = new THREE.AmbientLight( 0x222222 );
+				light.intensity = intensity;
+				scene.add( light );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				// renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( 0xcccccc, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.damping = 0.2;
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				
+				//Show hidden elements
+				document.getElementById("selects").style.display = "block"
+				
+				animate();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				updateMeshPositions();
+				
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+			
+			function updateMeshPositions() {
+				
+				if( useMeshGroup ) {
+					group.updateMatrixWorld( true );
+				}
+				
+				var mesh;
+	
+				for( var i = 0; i < group.children.length; i++ ) {
+		
+					mesh = group.children[i];
+		
+					mesh.position.add( mesh.velocity );
+					
+					//minimize the effect of updating the rotation quaternion
+					if( mesh.flipFlop = !mesh.flipFlop ) {
+						mesh.rotation.set(
+							mesh.rotation.x + mesh.spin.x,
+							mesh.rotation.y + mesh.spin.y,
+							mesh.rotation.z + mesh.spin.z
+						)
+					}
+		
+					mesh.updateMatrix();
+		
+				}
+				
+			}
+
+
+		</script>
+
+	</body>
+</html>

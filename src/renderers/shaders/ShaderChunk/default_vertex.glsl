@@ -1,4 +1,8 @@
-#ifdef USE_SKINNING
+#ifdef USE_SHARED_MATERIAL
+
+	vec4 mvPosition = modelViewMatrix * sharedMaterialTransformMatrix * vec4( position, 1.0 );
+
+#elif defined( USE_SKINNING )
 
 	vec4 mvPosition = modelViewMatrix * skinned;
 

@@ -1,6 +1,10 @@
-#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )
+#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP ) || defined( USE_SHARED_MATERIAL )
 
-	#ifdef USE_SKINNING
+	#ifdef USE_SHARED_MATERIAL
+
+		vec4 worldPosition = sharedMaterialTransformMatrix * vec4( position, 1.0 );
+
+	#elif defined( USE_SKINNING )
 
 		vec4 worldPosition = modelMatrix * skinned;
 

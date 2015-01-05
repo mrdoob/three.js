@@ -1,4 +1,8 @@
-#ifdef USE_SKINNING
+#ifdef USE_SHARED_MATERIAL
+
+	vec3 objectNormal = sharedMaterialNormal.xyz;
+
+#elif defined( USE_SKINNING )
 
 	vec3 objectNormal = skinnedNormal.xyz;
 
