@@ -306,7 +306,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		if ( !_this.noZoom ) {
 
 			_this.zoomCamera();
-                        _this.object.updateProjectionMatrix();
+			_this.object.updateProjectionMatrix();
 
 		}
 
