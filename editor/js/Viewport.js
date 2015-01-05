@@ -341,7 +341,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.geometryChanged.add( render );
+	signals.geometryChanged.add( function ( geometry ) {
+
+		selectionBox.update( editor.selected );
+
+		render();
+
+	} );
 
 	signals.objectAdded.add( function ( object ) {
 
