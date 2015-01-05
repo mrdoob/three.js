@@ -187,7 +187,7 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -887,7 +887,7 @@
 				v = THREE.Math.clamp( v + 0.5 * delta * vdir, 0.1, 0.9 );
 				scene.fog.color.setHSL( 0.51, 0.5, v * 0.75 );
 
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
 
 				var vnorm = ( v - 0.05 ) / ( 0.9 - 0.05 );
 
