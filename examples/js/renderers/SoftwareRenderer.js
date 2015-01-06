@@ -35,7 +35,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	var subpixelBits = 4;
 	var subpixelBias = (1 << subpixelBits) - 1;
-	var blockShift = 3;
+	var blockShift = 0;
 	var blockSize = 1 << blockShift;
 	var maxZVal = (1 << 24); // Note: You want to size this so you don't get overflows.
 
@@ -541,7 +541,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					'depthBuf[ offset ] = depth;'
 				].join('\n');
 
-				shader = new Function( 'buffer, depthBuf, offset, depth, u, v', string );
+				shader = new Function( 'buffer, depthBuf, offset, depth, u, v, n, face, material', string );
 
 			}
 
@@ -750,7 +750,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// Loop through blocks
 		var linestep = canvasWidth - q;
-		var scale = 1.0 / (c1 + c2 + c3);
 
 		var cb1 = c1;
 		var cb2 = c2;
@@ -1046,6 +1045,10 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	}
     
+    // To do: draw line clean color using clean blocks is not enough.
+    // To confirm why must mouse move can see the line.
+    // var blockShift = 0; var blockSize = 1 << blockShift; In order to clean pixel
+    // LineWidth support
     function drawLine( v1, v2, color1, color2, shader, material ) {
         
         // TODO: Implement per-pixel z-clipping
@@ -1068,6 +1071,24 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
 		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
 		
+//        // Line width
+//        
+//        var halfLineWidth = material.linewidth * 0.5;
+//        
+//        // Line width direction
+//        var dummyUpAxis = new THREE.Vector3( 0, 1, 0 );
+//        var dummyRightAxis = new THREE.Vector3( 1, 0, 0 );
+//        var crossVector = new THREE.Vector3();
+//        var lineDir = v1.clone();
+//        lineDir.sub( v2 ) ;
+//        
+//        if ( Math.abs(dummyUpAxis.dot( lineDir )) === 1 ) {  // This is parallel            
+//             crossVector.crossVectors( lineDir, dummyRightAxis );
+//        } else {
+//             crossVector.crossVectors( lineDir, dummyUpAxis );
+//        }
+        
+        
 		// Deltas
 
 		var dx12 = x1 - x2, dy12 = y2 - y1;
@@ -1102,7 +1123,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// Correct for fill convention
 
-		if ( dy12 > 0 || ( dy12 == 0 && dx12 > 0 ) ) c1 ++;
+		if ( dy12 > 0 || ( dy12 === 0 && dx12 > 0 ) ) c1 ++;
 
 		// Note this doesn't kill subpixel precision, but only because we test for >=0 (not >0).
 		// It's a bit subtle. :)
@@ -1128,8 +1149,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		// Set up min/max corners
 		var qm1 = q - 1; // for convenience
 		var nmin1 = 0, nmax1 = 0;
-		var nmin2 = 0, nmax2 = 0;
-		var nmin3 = 0, nmax3 = 0;
 		var nminz = 0, nmaxz = 0;
 		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
 		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
@@ -1138,7 +1157,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		// Loop through blocks
 		var linestep = canvasWidth - q;
-		var scale = 1.0 / c1;
 
 		var cb1 = c1;
 		var cbz = cz;
@@ -1205,7 +1223,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					for ( var iy = 0; iy < q; iy ++ ) {
 
 						var cx1 = cy1;
-						var cx2 = cy2;
 						var cxz = cyz;										 
 
 						for ( var ix = 0; ix < q; ix ++ ) {
@@ -1242,7 +1259,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 						
 						for ( var ix = 0; ix < q; ix ++ ) {
 
-							if ( ( cx1 | cx2 ) >= 0 ) {
+							if ( cx1 >= 0 ) {
 
 								var z = cxz;								
 
