@@ -2690,7 +2690,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						var startIndex = offsets[ i ].index;
 
-						_gl.drawArrays( mode, 0, offsets[ i ].count );
+						_gl.drawArrays( mode, startIndex, offsets[ i ].count );
 
 						_this.info.render.calls ++;
 						_this.info.render.points += offsets[ i ].count;
