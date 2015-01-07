@@ -12,7 +12,7 @@ var APP = {
 		var scripts = {
 			update: []
 		};
-	
+
 		this.dom = undefined;
 
 		this.load = function ( json ) {
@@ -28,14 +28,15 @@ var APP = {
 
 			for ( var uuid in json.scripts ) {
 
-				var source = json.scripts[ uuid ];
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+				var sources = json.scripts[ uuid ];
 
-				var script = ( new Function( 'scene', 'time', source ).bind( object ) )();
+				for ( var i = 0; i < sources.length; i ++ ) {
 
-				if ( script.update !== undefined ) {
+					var source = sources[ i ];
 
-					scripts.update.push( script.update );
+					var script = ( new Function( 'scene', 'time', source ).bind( object ) );
+					scripts.update.push( script );
 
 				}
 
