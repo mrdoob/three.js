@@ -9,9 +9,7 @@ var APP = {
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
 
-		var scripts = {
-			update: []
-		};
+		var scripts = {};
 
 		this.dom = undefined;
 
@@ -21,26 +19,37 @@ var APP = {
 			renderer.setPixelRatio( window.devicePixelRatio );
 
 			camera = loader.parse( json.camera );
-
 			scene = loader.parse( json.scene );
 
-			scripts.update = [];
+			scripts = {
+				init: [],
+				keydown: [],
+				keyup: [],
+				mousedown: [],
+				mouseup: [],
+				mousemove: [],
+				update: []
+			};
 
 			for ( var uuid in json.scripts ) {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+
 				var sources = json.scripts[ uuid ];
 
 				for ( var i = 0; i < sources.length; i ++ ) {
 
-					var source = sources[ i ];
+					var script = sources[ i ];
 
-					var script = ( new Function( 'scene', 'time', source ).bind( object ) );
-					scripts.update.push( script );
+					script.compiled = new Function( 'event', script.source ).bind( object );
+
+					scripts[ script.event ].push( script.compiled );
 
 				}
 
 			}
+
+			dispatch( scripts.init, {} );
 
 			this.dom = renderer.domElement;
 
@@ -55,17 +64,23 @@ var APP = {
 
 		};
 
+		var dispatch = function ( array, event ) {
+
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
+
+				array[ i ]( event );
+
+			}
+
+		};
+
 		var request;
 
 		var animate = function ( time ) {
 
 			request = requestAnimationFrame( animate );
 
-			for ( var i = 0, l = scripts.update.length; i < l; i ++ ) {
-
-				scripts.update[ i ]( scene, time );
-
-			}
+			dispatch( scripts.update, { time: time } );
 
 			renderer.render( scene, camera );
 
@@ -73,13 +88,57 @@ var APP = {
 
 		this.play = function () {
 
+			document.addEventListener( 'keydown', onDocumentKeyDown );
+			document.addEventListener( 'keyup', onDocumentKeyUp );
+			document.addEventListener( 'mousedown', onDocumentMouseDown );
+			document.addEventListener( 'mouseup', onDocumentMouseUp );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
+
 			request = requestAnimationFrame( animate );
 
 		};
 
 		this.stop = function () {
 
+			document.removeEventListener( 'keydown', onDocumentKeyDown );
+			document.removeEventListener( 'keyup', onDocumentKeyUp );
+			document.removeEventListener( 'mousedown', onDocumentMouseDown );
+			document.removeEventListener( 'mouseup', onDocumentMouseUp );
+			document.removeEventListener( 'mousemove', onDocumentMouseMove );
+			
 			cancelAnimationFrame( request );
+
+		};
+
+		//
+
+		var onDocumentKeyDown = function ( event ) {
+
+			dispatch( scripts.keydown, event );
+
+		};
+
+		var onDocumentKeyUp = function ( event ) {
+
+			dispatch( scripts.keyup, event );
+
+		};
+
+		var onDocumentMouseDown = function ( event ) {
+
+			dispatch( scripts.mousedown, event );
+
+		};
+
+		var onDocumentMouseUp = function ( event ) {
+
+			dispatch( scripts.mouseup, event );
+
+		};
+
+		var onDocumentMouseMove = function ( event ) {
+
+			dispatch( scripts.mousemove, event );
 
 		};
 

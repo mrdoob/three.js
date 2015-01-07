@@ -10,8 +10,13 @@ UI.ScriptEditor = function () {
 
 	var timeout;
 
+	var event = new UI.Text( '' );
+	this.add( event );
+
+	this.add( new UI.Break() );
+
 	var textarea = new UI.TextArea();
-	textarea.setWidth( '240px' );
+	textarea.setWidth( '100%' );
 	textarea.setHeight( '100px' );
 	textarea.onKeyUp( function () {
 
@@ -20,17 +25,18 @@ UI.ScriptEditor = function () {
 		timeout = setTimeout( function () {
 
 			var object = editor.selected;
-			var source = scope.getValue();
+			var source = textarea.getValue();
 
 			try {
 
-				var script = new Function( 'scene', 'time', source ).bind( object.clone() );
-				script( new THREE.Scene(), 0 );
+				( new Function( 'event', source ).bind( object.clone() ) )( {} );
 
 				textarea.dom.classList.add( 'success' );
 				textarea.dom.classList.remove( 'fail' );
 
 			} catch ( error ) {
+
+				console.error( error );
 
 				textarea.dom.classList.remove( 'success' );
 				textarea.dom.classList.add( 'fail' );
@@ -50,6 +56,7 @@ UI.ScriptEditor = function () {
 	} );
 	this.add( textarea );
 
+	this.event = event;
 	this.textarea = textarea;
 
 };
@@ -59,13 +66,14 @@ UI.ScriptEditor.prototype.constructor = UI.ScriptEditor;
 
 UI.ScriptEditor.prototype.getValue = function () {
 
-	return this.textarea.getValue();
+	return { event: this.event.getValue(), source: this.textarea.getValue() };
 
 };
 
 UI.ScriptEditor.prototype.setValue = function ( value ) {
 
-	this.textarea.setValue( value );
+	this.event.setValue( value.event );
+	this.textarea.setValue( value.source );
 
 	return this;
 

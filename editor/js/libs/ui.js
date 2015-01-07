@@ -100,6 +100,7 @@ UI.Panel = function () {
 	dom.className = 'Panel';
 
 	this.dom = dom;
+	this.children = [];
 
 	return this;
 };
@@ -116,6 +117,7 @@ UI.Panel.prototype.add = function () {
 		if ( argument instanceof UI.Element ) {
 
 			this.dom.appendChild( argument.dom );
+			this.children.push( argument );
 
 		} else {
 
@@ -140,6 +142,14 @@ UI.Panel.prototype.remove = function () {
 
 			this.dom.removeChild( argument.dom );
 
+			var index = this.children.indexOf( argument );
+
+			if ( index !== - 1 ) {
+
+				this.children.splice( index, 1 );
+
+			}
+
 		} else {
 
 			console.error( 'UI.Panel:', argument, 'is not an instance of UI.Element.' )
@@ -159,6 +169,8 @@ UI.Panel.prototype.clear = function () {
 		this.dom.removeChild( this.dom.lastChild );
 
 	}
+
+	this.children = [];
 
 };
 
@@ -306,6 +318,12 @@ UI.Text = function ( text ) {
 
 UI.Text.prototype = Object.create( UI.Element.prototype );
 UI.Text.prototype.constructor = UI.Text;
+
+UI.Text.prototype.getValue = function () {
+
+	return this.dom.textContent;
+
+};
 
 UI.Text.prototype.setValue = function ( value ) {
 
