@@ -20094,9 +20094,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-						var startIndex = offsets[ i ].index;
-
-						_gl.drawArrays( mode, 0, offsets[ i ].count );
+						_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
 						_this.info.render.calls ++;
 						_this.info.render.points += offsets[ i ].count;
@@ -20203,9 +20201,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-						var startIndex = offsets[ i ].index;
-
-						_gl.drawArrays( mode, 0, offsets[ i ].count );
+						_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
 						_this.info.render.calls ++;
 						_this.info.render.vertices += offsets[ i ].count;
