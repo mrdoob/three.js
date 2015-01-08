@@ -41,7 +41,7 @@ var APP = {
 
 					var script = sources[ i ];
 
-					script.compiled = new Function( 'event', script.source ).bind( object );
+					script.compiled = new Function( 'scene', 'event', script.source ).bind( object );
 
 					scripts[ script.event ].push( script.compiled );
 
@@ -68,7 +68,7 @@ var APP = {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				array[ i ]( event );
+				array[ i ]( scene, event );
 
 			}
 

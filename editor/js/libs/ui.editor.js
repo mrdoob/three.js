@@ -29,7 +29,7 @@ UI.ScriptEditor = function () {
 
 			try {
 
-				( new Function( 'event', source ).bind( object.clone() ) )( {} );
+				( new Function( 'scene', 'event', source ).bind( object.clone() ) )( new THREE.Scene(), {} );
 
 				textarea.dom.classList.add( 'success' );
 				textarea.dom.classList.remove( 'fail' );
