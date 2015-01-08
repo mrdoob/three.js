@@ -330,10 +330,11 @@
 
 				
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
-				
+
 				renderer.gammaInput = true;
 				renderer.gammaOutput = false;
 

@@ -175,8 +175,8 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false, devicePixelRatio: 2.0 } );
 				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

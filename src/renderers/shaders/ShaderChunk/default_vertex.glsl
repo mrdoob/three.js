@@ -1,20 +1,14 @@
-vec4 mvPosition;
-
 #ifdef USE_SKINNING
 
-	mvPosition = modelViewMatrix * skinned;
+	vec4 mvPosition = modelViewMatrix * skinned;
 
-#endif
+#elif defined( USE_MORPHTARGETS )
 
-#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )
+	vec4 mvPosition = modelViewMatrix * vec4( morphed, 1.0 );
 
-	mvPosition = modelViewMatrix * vec4( morphed, 1.0 );
+#else
 
-#endif
-
-#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )
-
-	mvPosition = modelViewMatrix * vec4( position, 1.0 );
+	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
 #endif
 

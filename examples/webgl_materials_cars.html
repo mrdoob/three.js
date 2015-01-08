@@ -154,8 +154,6 @@
 			var loader = new THREE.BinaryLoader( true );
 			document.body.appendChild( loader.statusDomElement );
 
-			var renderOptions = { renderOpaque: true, renderTransparent: false }
-
 			init();
 			animate();
 
@@ -212,6 +210,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
@@ -636,12 +635,7 @@
 				cameraCube.rotation.copy( camera.rotation );
 
 				renderer.render( sceneCube, cameraCube );
-				renderOptions.renderOpaque = true;
-				renderOptions.renderTransparent = false;
-				renderer.render( scene, camera, undefined, undefined, renderOptions );
-				renderOptions.renderOpaque = false;
-				renderOptions.renderTransparent = true;
-				renderer.render( scene, camera, undefined, undefined, renderOptions );
+				renderer.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
 

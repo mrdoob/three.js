@@ -49,7 +49,7 @@
 		</div>
 
 
-		<!-- <div id="ctrl">
+		<div id="ctrl">
 			Use controls to change morph target influences:<br/>
 			<input type="range" value="0" min="0" max="100" onchange="mesh.morphTargetInfluences[ 0 ] = this.value/100;" />
 			<input type="range" value="0" min="0" max="100" onchange="mesh.morphTargetInfluences[ 1 ] = this.value/100;" />
@@ -59,7 +59,7 @@
 			<input type="range" value="0" min="0" max="100" onchange="mesh.morphTargetInfluences[ 5 ] = this.value/100;" />
 			<input type="range" value="0" min="0" max="100" onchange="mesh.morphTargetInfluences[ 6 ] = this.value/100;" />
 			<input type="range" value="0" min="0" max="100" onchange="mesh.morphTargetInfluences[ 7 ] = this.value/100;" />
-		</div> -->
+		</div>
 
 
 		<script src="../build/three.min.js"></script>
@@ -112,27 +112,27 @@
 
 				// construct 8 blend shapes
 
-				// for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+				for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
-				// 	var vertices = [];
+					var vertices = [];
 
-				// 	for ( var v = 0; v < geometry.vertices.length; v ++ ) {
+					for ( var v = 0; v < geometry.vertices.length; v ++ ) {
 
-				// 		vertices.push( geometry.vertices[ v ].clone() );
+						vertices.push( geometry.vertices[ v ].clone() );
 
-				// 		if ( v === i ) {
+						if ( v === i ) {
 
-				// 			vertices[ vertices.length - 1 ].x *= 2;
-				// 			vertices[ vertices.length - 1 ].y *= 2;
-				// 			vertices[ vertices.length - 1 ].z *= 2;
+							vertices[ vertices.length - 1 ].x *= 2;
+							vertices[ vertices.length - 1 ].y *= 2;
+							vertices[ vertices.length - 1 ].z *= 2;
 
-				// 		}
+						}
 
-				// 	}
+					}
 
-				// 	geometry.morphTargets.push( { name: "target" + i, vertices: vertices } );
+					geometry.morphTargets.push( { name: "target" + i, vertices: vertices } );
 
-				// }
+				}
 
 				mesh = new THREE.Mesh( geometry, material );
 
@@ -141,10 +141,10 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x222222, 1 );
+				renderer.setClearColor( 0x222222 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
-				renderer.shadowMapCullFace = 1;
 				container.appendChild( renderer.domElement );
 
 				//

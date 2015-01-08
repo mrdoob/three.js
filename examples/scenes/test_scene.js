@@ -592,7 +592,7 @@
 
 		"phong_normal": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 0, "specular": 16777215, "shininess": 25, "envMap": "cube_reflection", "reflectivity": 0.1, "lightMap": "texture_ao", "normalMap": "texture_normal", "normalScale": [ 1, -1 ], "displacementMap": "texture_displacement", "displacementScale": 2.436143, "displacementBias": -0.428408 }
+			"parameters": { "color": 0, "specular": 16777215, "shininess": 25, "envMap": "cube_reflection", "reflectivity": 0.1, "lightMap": "texture_ao", "normalMap": "texture_normal", "normalScale": [ 1, -1 ] }
 		},
 
 		"phong_morph": {

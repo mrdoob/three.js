@@ -303,8 +303,8 @@
 
 					renderer = new THREE.WebGLRenderer( { antialias: true } );
 					renderer.setClearColor( 0xffffff );
+					renderer.setPixelRatio( window.devicePixelRatio );
 					renderer.setSize( container.clientWidth, container.clientHeight );
-
 					container.appendChild( renderer.domElement );
 
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );

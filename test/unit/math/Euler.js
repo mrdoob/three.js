@@ -55,13 +55,23 @@ test( "clone/copy/equals", function() {
 
 });
 
-test( "set", function() {
+test( "set/setFromVector3/toVector3", function() {
 	var a = new THREE.Euler();
 
 	a.set( 0, 1, 0, "ZYX" );
 	ok( a.equals( eulerAzyx ), "Passed!" );
 	ok( ! a.equals( eulerAxyz ), "Passed!" );
 	ok( ! a.equals( eulerZero ), "Passed!" );
+
+	var vec = new THREE.Vector3( 0, 1, 0 );
+
+	var b = new THREE.Euler().setFromVector3( vec, "ZYX" );
+	console.log( a, b );
+	ok( a.equals( b ), "Passed!" );
+
+	var c = b.toVector3();
+	console.log( c, vec );
+	ok( c.equals( vec ), "Passed!" );	
 });
 
 test( "Quaternion.setFromEuler/Euler.fromQuaternion", function() {

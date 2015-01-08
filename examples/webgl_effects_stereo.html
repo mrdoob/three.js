@@ -122,10 +122,11 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.StereoEffect( renderer );
-				effect.separation = 10;
+				effect.eyeSeparation = 10;
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//

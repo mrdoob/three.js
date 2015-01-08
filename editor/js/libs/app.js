@@ -2,88 +2,146 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var APP = {};
+var APP = {
 
-APP.Player = function () {
+	Player: function () {
 
-	var loader = new THREE.ObjectLoader();
-	var camera, scene, renderer;
-	var scripts;
-	
-	this.dom = undefined;
+		var loader = new THREE.ObjectLoader();
+		var camera, scene, renderer;
 
-	this.load = function ( json ) {
+		var scripts = {};
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		this.dom = undefined;
 
-		scene = loader.parse( json );
+		this.load = function ( json ) {
 
-		/*
-		scripts = [];
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
 
-		scene.traverse( function ( child ) {
+			camera = loader.parse( json.camera );
+			scene = loader.parse( json.scene );
 
-			if ( child.script !== undefined ) {
+			scripts = {
+				init: [],
+				keydown: [],
+				keyup: [],
+				mousedown: [],
+				mouseup: [],
+				mousemove: [],
+				update: []
+			};
 
-				var script = new Function( 'scene', 'time', child.script.source ).bind( child );
-				scripts.push( script );
+			for ( var uuid in json.scripts ) {
+
+				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+
+				var sources = json.scripts[ uuid ];
+
+				for ( var i = 0; i < sources.length; i ++ ) {
+
+					var script = sources[ i ];
+
+					script.compiled = new Function( 'scene', 'event', script.source ).bind( object );
+
+					scripts[ script.event ].push( script.compiled );
+
+				}
 
 			}
 
-		} );
-		*/
+			dispatch( scripts.init, {} );
 
-		this.dom = renderer.domElement;
+			this.dom = renderer.domElement;
 
-	};
+		};
 
-	this.setCamera = function ( master ) {
+		this.setSize = function ( width, height ) {
 
-		camera = master.clone();
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
 
-	};
+			renderer.setSize( width, height );
 
-	this.setSize = function ( width, height ) {
+		};
 
-		renderer.setSize( width, height );
+		var dispatch = function ( array, event ) {
 
-	};
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-	var request;
+				array[ i ]( scene, event );
 
-	var animate = function ( time ) {
+			}
 
-		request = requestAnimationFrame( animate );
+		};
 
-		/*
-		for ( var i = 0; i < scripts.length; i ++ ) {
+		var request;
 
-			scripts[ i ]( scene, time );
+		var animate = function ( time ) {
 
-		}
-		*/
+			request = requestAnimationFrame( animate );
 
-		renderer.render( scene, camera );
+			dispatch( scripts.update, { time: time } );
 
-	};
+			renderer.render( scene, camera );
 
-	this.play = function () {
+		};
 
-		request = requestAnimationFrame( animate );
+		this.play = function () {
 
-	};
+			document.addEventListener( 'keydown', onDocumentKeyDown );
+			document.addEventListener( 'keyup', onDocumentKeyUp );
+			document.addEventListener( 'mousedown', onDocumentMouseDown );
+			document.addEventListener( 'mouseup', onDocumentMouseUp );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
-	this.stop = function () {
+			request = requestAnimationFrame( animate );
 
-		cancelAnimationFrame( request );
+		};
 
-	};
+		this.stop = function () {
 
-};
+			document.removeEventListener( 'keydown', onDocumentKeyDown );
+			document.removeEventListener( 'keyup', onDocumentKeyUp );
+			document.removeEventListener( 'mousedown', onDocumentMouseDown );
+			document.removeEventListener( 'mouseup', onDocumentMouseUp );
+			document.removeEventListener( 'mousemove', onDocumentMouseMove );
+			
+			cancelAnimationFrame( request );
 
-APP.Script = function ( source ) {
+		};
 
-	this.uuid = THREE.Math.generateUUID();
-	this.source = source;
+		//
+
+		var onDocumentKeyDown = function ( event ) {
+
+			dispatch( scripts.keydown, event );
+
+		};
+
+		var onDocumentKeyUp = function ( event ) {
+
+			dispatch( scripts.keyup, event );
+
+		};
+
+		var onDocumentMouseDown = function ( event ) {
+
+			dispatch( scripts.mousedown, event );
+
+		};
+
+		var onDocumentMouseUp = function ( event ) {
+
+			dispatch( scripts.mouseup, event );
+
+		};
+
+		var onDocumentMouseMove = function ( event ) {
+
+			dispatch( scripts.mousemove, event );
+
+		};
+
+	}
 
 };
