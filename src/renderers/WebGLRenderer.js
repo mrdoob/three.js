@@ -785,6 +785,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var renderTarget = event.target;
 
+		if ( window.VAPI ) {
+			window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:unregisterTexture", renderTarget );
+		}
+
 		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 
 		deallocateRenderTarget( renderTarget );

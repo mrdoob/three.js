@@ -5,6 +5,9 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	this.uuid = THREE.Math.generateUUID();
+	this.name = '';
+
 	this.width = width;
 	this.height = height;
 
@@ -48,6 +51,7 @@ THREE.WebGLRenderTarget.prototype = {
 
 		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
 
+		tmp.name = this.name;
 		tmp.wrapS = this.wrapS;
 		tmp.wrapT = this.wrapT;
 
