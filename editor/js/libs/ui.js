@@ -100,6 +100,8 @@ UI.Panel = function () {
 	dom.className = 'Panel';
 
 	this.dom = dom;
+
+	this.parent = null;
 	this.children = [];
 
 	return this;
@@ -118,6 +120,8 @@ UI.Panel.prototype.add = function () {
 
 			this.dom.appendChild( argument.dom );
 			this.children.push( argument );
+
+			argument.parent = this;
 
 		} else {
 
@@ -149,6 +153,8 @@ UI.Panel.prototype.remove = function () {
 				this.children.splice( index, 1 );
 
 			}
+
+			argument.parent = null;
 
 		} else {
 

@@ -13,11 +13,33 @@ UI.ScriptEditor = function () {
 	var event = new UI.Text( '' );
 	this.add( event );
 
+	var remove = new UI.Text( 'x' );
+	remove.setPosition( 'absolute' );
+	remove.setRight( '8px' );
+	remove.setCursor( 'pointer' );
+	remove.onClick( function () {
+
+		if ( confirm( 'Are you sure?' ) ) {
+
+			scope.parent.remove( scope );
+
+			if ( scope.onChangeCallback !== undefined ) {
+
+				scope.onChangeCallback();
+
+			}
+
+		}
+
+	} );
+	this.add( remove );
+
 	this.add( new UI.Break() );
 
 	var textarea = new UI.TextArea();
 	textarea.setWidth( '100%' );
 	textarea.setHeight( '100px' );
+	textarea.setMarginTop( '8px' );
 	textarea.onKeyUp( function () {
 
 		clearTimeout( timeout );
