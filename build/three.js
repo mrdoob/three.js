@@ -18925,6 +18925,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var renderTarget = event.target;
 
+		if ( window.VAPI ) {
+			window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:unregisterTexture", renderTarget );
+		}
+
 		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 
 		deallocateRenderTarget( renderTarget );
@@ -24795,6 +24799,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	this.uuid = THREE.Math.generateUUID();
+	this.name = '';
+
 	this.width = width;
 	this.height = height;
 
@@ -24821,6 +24828,10 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.shareDepthFrom = null;
 
+	if ( window.VAPI ) {
+		window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:registerTexture", this );
+	}
+
 };
 
 THREE.WebGLRenderTarget.prototype = {
@@ -24838,6 +24849,7 @@ THREE.WebGLRenderTarget.prototype = {
 
 		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
 
+		tmp.name = this.name;
 		tmp.wrapS = this.wrapS;
 		tmp.wrapT = this.wrapT;
 
@@ -26095,6 +26107,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
 				light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
+				light.shadowMap.name = (light.name !== '' ? light.name : "Light, " + light.id + "," ) + " shadow map";
 				light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
 
 				light.shadowMatrix = new THREE.Matrix4();
