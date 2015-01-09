@@ -49,6 +49,9 @@ var Editor = function () {
 		helperRemoved: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
+
+		scriptChanged: new SIGNALS.Signal(),
+
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
@@ -384,7 +387,7 @@ Editor.prototype = {
 		this.camera.aspect = camera.aspect;
 		this.camera.near = camera.near;
 		this.camera.far = camera.far;
-		
+
 		this.setScene( loader.parse( json.scene ) );
 		this.scripts = json.scripts;
 
