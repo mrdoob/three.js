@@ -40,7 +40,7 @@ var APP = {
 
 					var script = sources[ i ];
 
-					var events = ( new Function( 'scene', script.source ).bind( object ) )();
+					var events = ( new Function( 'scene', script.source ).bind( object ) )( scene );
 
 					for ( var name in events ) {
 
