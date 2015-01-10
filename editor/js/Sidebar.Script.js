@@ -27,7 +27,7 @@ Sidebar.Script = function ( editor ) {
 	newScript.setMarginLeft( '5px' );
 	newScript.onClick( function () {
 
-		var script = new UI.ScriptEditor();
+		var script = new UI.ScriptEditor( editor );
 		script.setValue( { name: '', source: 'return {\n\tupdate: function ( event ) {}\n};' } );
 		script.onChange( function () {
 
@@ -59,7 +59,7 @@ Sidebar.Script = function ( editor ) {
 
 				for ( var i = 0; i < sources.length; i ++ ) {
 
-					var script = new UI.ScriptEditor();
+					var script = new UI.ScriptEditor( editor );
 					script.setValue( sources[ i ] );
 					script.onChange( function () {
 

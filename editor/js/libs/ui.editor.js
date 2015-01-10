@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-UI.ScriptEditor = function () {
+UI.ScriptEditor = function ( editor ) {
 
 	UI.Panel.call( this );
 
@@ -42,6 +42,9 @@ UI.ScriptEditor = function () {
 
 	this.add( new UI.Break() );
 
+	var object = editor.selected.clone();
+	var scene = editor.scene.clone();
+
 	var timeout;
 
 	var textarea = new UI.TextArea();
@@ -52,14 +55,16 @@ UI.ScriptEditor = function () {
 
 		clearTimeout( timeout );
 
+		textarea.dom.classList.remove( 'success' );
+		textarea.dom.classList.remove( 'fail' );
+
 		timeout = setTimeout( function () {
 
-			var object = editor.selected;
 			var source = textarea.getValue();
 
 			try {
 
-				( new Function( 'scene', source ).bind( object.clone() ) )( new THREE.Scene() );
+				( new Function( 'scene', source ).bind( object ) )( scene );
 
 				textarea.dom.classList.add( 'success' );
 				textarea.dom.classList.remove( 'fail' );

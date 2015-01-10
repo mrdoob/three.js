@@ -23,18 +23,9 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'New' );
 	option.onClick( function () {
 
-		if ( confirm( 'Are you sure?' ) ) {
+		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-			editor.config.setKey(
-				'camera/position', [ 500, 250, 500 ],
-				'camera/target', [ 0, 0, 0 ]
-			);
-
-			editor.storage.clear( function () {
-
-				location.href = location.pathname;
-
-			} );
+			editor.clear();
 
 		}
 

@@ -94,16 +94,19 @@ Editor.prototype = {
 
 	},
 
+	/*
 	showDialog: function ( value ) {
 
 		this.signals.showDialog.dispatch( value );
 
 	},
+	*/
 
 	//
 
 	setScene: function ( scene ) {
 
+		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -154,8 +157,6 @@ Editor.prototype = {
 	removeObject: function ( object ) {
 
 		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
-
-		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var scope = this;
 
@@ -357,6 +358,28 @@ Editor.prototype = {
 	focusById: function ( id ) {
 
 		this.focus( this.scene.getObjectById( id, true ) );
+
+	},
+
+	clear: function () {
+
+		this.camera.position.set( 500, 250, 500 );
+		this.camera.lookAt( new THREE.Vector3() );
+
+		var objects = this.scene.children;
+
+		while ( objects.length > 0 ) {
+
+			this.removeObject( objects[ 0 ] );
+
+		}
+
+		this.geometries = {};
+		this.materials = {};
+		this.textures = {};
+		this.scripts = {};
+
+		this.deselect();
 
 	},
 
