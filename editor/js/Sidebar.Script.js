@@ -23,26 +23,12 @@ Sidebar.Script = function ( editor ) {
 	var scriptsContainer = new UI.Panel();
 	container.add( scriptsContainer );
 
-	var eventType = new UI.Select();
-	eventType.setOptions( {
-
-		'init': 'init',
-		'keydown': 'keydown',
-		'keyup': 'keyup',
-		'mousedown': 'mousedown',
-		'mouseup': 'mouseup',
-		'mousemove': 'mousemove',
-		'update': 'update'
-
-	} );
-	container.add( eventType );
-
-	var button = new UI.Button( 'Add' );
-	button.setMarginLeft( '5px' );
-	button.onClick( function () {
+	var newScript = new UI.Button( 'New' );
+	newScript.setMarginLeft( '5px' );
+	newScript.onClick( function () {
 
 		var script = new UI.ScriptEditor();
-		script.setValue( { event: eventType.getValue(), source: '' } );
+		script.setValue( { name: '', source: 'return {\n\tupdate: function ( event ) {}\n};' } );
 		script.onChange( function () {
 
 			signals.scriptChanged.dispatch();
@@ -51,7 +37,11 @@ Sidebar.Script = function ( editor ) {
 		scriptsContainer.add( script );
 
 	} );
-	container.add( button );
+	container.add( newScript );
+
+	var loadScript = new UI.Button( 'Load' );
+	loadScript.setMarginLeft( '4px' );
+	container.add( loadScript );
 
 	// signals
 

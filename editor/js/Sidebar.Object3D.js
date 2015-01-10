@@ -40,7 +40,7 @@ Sidebar.Object3D = function ( editor ) {
 	// name
 
 	var objectNameRow = new UI.Panel();
-	var objectName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
+	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 			editor.setObjectName( editor.selected, objectName.getValue() );
 
@@ -54,7 +54,7 @@ Sidebar.Object3D = function ( editor ) {
 	// parent
 
 	var objectParentRow = new UI.Panel();
-	var objectParent = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectParent = new UI.Select().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
 	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ) );
 	objectParentRow.add( objectParent );
@@ -200,7 +200,7 @@ Sidebar.Object3D = function ( editor ) {
 	container.add( objectVisibleRow );
 
 	// user data
-	
+
 	var timeout;
 
 	var objectUserDataRow = new UI.Panel();

@@ -8,10 +8,16 @@ UI.ScriptEditor = function () {
 
 	var scope = this;
 
-	var timeout;
+	var name = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-	var event = new UI.Text( '' );
-	this.add( event );
+		if ( scope.onChangeCallback !== undefined ) {
+
+			scope.onChangeCallback();
+
+		}
+
+	} );
+	this.add( name );
 
 	var remove = new UI.Text( 'x' );
 	remove.setPosition( 'absolute' );
@@ -36,9 +42,11 @@ UI.ScriptEditor = function () {
 
 	this.add( new UI.Break() );
 
+	var timeout;
+
 	var textarea = new UI.TextArea();
 	textarea.setWidth( '100%' );
-	textarea.setHeight( '100px' );
+	textarea.setHeight( '150px' );
 	textarea.setMarginTop( '8px' );
 	textarea.onKeyUp( function () {
 
@@ -51,7 +59,7 @@ UI.ScriptEditor = function () {
 
 			try {
 
-				( new Function( 'scene', 'event', source ).bind( object.clone() ) )( new THREE.Scene(), {} );
+				( new Function( 'scene', source ).bind( object.clone() ) )( new THREE.Scene() );
 
 				textarea.dom.classList.add( 'success' );
 				textarea.dom.classList.remove( 'fail' );
@@ -78,7 +86,7 @@ UI.ScriptEditor = function () {
 	} );
 	this.add( textarea );
 
-	this.event = event;
+	this.name = name;
 	this.textarea = textarea;
 
 };
@@ -88,13 +96,16 @@ UI.ScriptEditor.prototype.constructor = UI.ScriptEditor;
 
 UI.ScriptEditor.prototype.getValue = function () {
 
-	return { event: this.event.getValue(), source: this.textarea.getValue() };
+	return {
+		name: this.name.getValue(),
+		source: this.textarea.getValue()
+	};
 
 };
 
 UI.ScriptEditor.prototype.setValue = function ( value ) {
 
-	this.event.setValue( value.event );
+	this.name.setValue( value.name );
 	this.textarea.setValue( value.source );
 
 	return this;

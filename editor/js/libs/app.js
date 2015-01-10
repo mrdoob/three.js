@@ -22,7 +22,6 @@ var APP = {
 			scene = loader.parse( json.scene );
 
 			scripts = {
-				init: [],
 				keydown: [],
 				keyup: [],
 				mousedown: [],
@@ -41,15 +40,24 @@ var APP = {
 
 					var script = sources[ i ];
 
-					script.compiled = new Function( 'scene', 'event', script.source ).bind( object );
+					var events = ( new Function( 'scene', script.source ).bind( object ) )();
 
-					scripts[ script.event ].push( script.compiled );
+					for ( var name in events ) {
+
+						if ( scripts[ name ] === undefined ) {
+
+							console.warn( 'APP.Player: event type not supported (', name, ')' );
+							continue;
+
+						}
+
+						scripts[ name ].push( events[ name ] );
+
+					}
 
 				}
 
 			}
-
-			dispatch( scripts.init, {} );
 
 			this.dom = renderer.domElement;
 
@@ -68,7 +76,7 @@ var APP = {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				array[ i ]( scene, event );
+				array[ i ]( event );
 
 			}
 
@@ -105,7 +113,7 @@ var APP = {
 			document.removeEventListener( 'mousedown', onDocumentMouseDown );
 			document.removeEventListener( 'mouseup', onDocumentMouseUp );
 			document.removeEventListener( 'mousemove', onDocumentMouseMove );
-			
+
 			cancelAnimationFrame( request );
 
 		};
