@@ -48,11 +48,18 @@ function main() {
 
 			var file = '../../' + files[ j ];
 			
-			sources.push( file );
 			buffer.push('// File:' + files[ j ]);
 			buffer.push('\n\n');
-			buffer.push( fs.readFileSync( file, 'utf8' ) );
-			buffer.push('\n');
+			if( file.indexOf( '.glsl') >= 0 ) {
+				buffer.push('THREE.ShaderChunk[\'' + path.basename(file, '.glsl') + '\'] = "');
+				buffer.push(fs.readFileSync( file, 'utf8' ));
+				buffer.push('";\n\n');
+			}
+			else {
+				sources.push( file );
+				buffer.push( fs.readFileSync( file, 'utf8' ) );
+				buffer.push('\n');
+			}
 
 		}
 
