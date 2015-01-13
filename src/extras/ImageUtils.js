@@ -65,7 +65,7 @@ THREE.ImageUtils = {
 
 				}
 
-			} );
+			}, undefined, onError );
 
 		}
 
