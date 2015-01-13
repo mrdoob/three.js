@@ -1248,8 +1248,11 @@ THREE.ColladaLoader = function () {
 			var instance_camera = node.cameras[i];
 			var cparams = cameras[instance_camera.url];
 
-			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio),
-					parseFloat(cparams.znear), parseFloat(cparams.zfar));
+			var cam = new THREE.PerspectiveCamera(
+				parseFloat(cparams.xfov || cparams.yfov),
+				parseFloat(cparams.aspect_ratio),
+				parseFloat(cparams.znear),
+				parseFloat(cparams.zfar));
 
 			obj.add(cam);
 		}
