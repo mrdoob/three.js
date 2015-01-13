@@ -35,7 +35,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	var subpixelBits = 4;
 	var subpixelBias = (1 << subpixelBits) - 1;
-	var blockShift = 0;
+	var blockShift = 0; // Normally, it should be 3. At line mode, it has to be 0
 	var blockSize = 1 << blockShift;
 	var maxZVal = (1 << 24); // Note: You want to size this so you don't get overflows.
 
@@ -1050,48 +1050,48 @@ THREE.SoftwareRenderer = function ( parameters ) {
     // var blockShift = 0; var blockSize = 1 << blockShift; In order to clean pixel
     // LineWidth support
     function drawLine( v1, v2, color1, color2, shader, material ) {
-        
         // TODO: Implement per-pixel z-clipping
 
 		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
 
-		// https://gist.github.com/2486101
-		// explanation: http://pouet.net/topic.php?which=8760&page=1
-
-		// 28.4 fixed-point coordinates
-
-		var x1 = (v1.x * viewportXScale + viewportXOffs) | 0;
-		var x2 = (v2.x * viewportXScale + viewportXOffs) | 0;
-
-		var y1 = (v1.y * viewportYScale + viewportYOffs) | 0;
-		var y2 = (v2.y * viewportYScale + viewportYOffs) | 0;
-
-		// Z values (.28 fixed-point)
-
-		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
-		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
-		
-//        // Line width
-//        
-//        var halfLineWidth = material.linewidth * 0.5;
-//        
-//        // Line width direction
+        // According line width to get bounding points
+        
+        var halfLineWidth = Math.floor( (material.linewidth-1) * 0.5 );
+        var lookVector = new THREE.Vector3( 0, 0, 1 );
+        var crossVector = new THREE.Vector3();
 //        var dummyUpAxis = new THREE.Vector3( 0, 1, 0 );
 //        var dummyRightAxis = new THREE.Vector3( 1, 0, 0 );
 //        var crossVector = new THREE.Vector3();
 //        var lineDir = v1.clone();
 //        lineDir.sub( v2 ) ;
 //        
-//        if ( Math.abs(dummyUpAxis.dot( lineDir )) === 1 ) {  // This is parallel            
+//        if ( Math.abs(dummyUpAxis.dot( lineDir )) === 1 ) {  // This is parallel vector           
 //             crossVector.crossVectors( lineDir, dummyRightAxis );
 //        } else {
 //             crossVector.crossVectors( lineDir, dummyUpAxis );
 //        }
         
+//        crossVector.multiplyScalar( halfLineWidth );
         
+        // https://gist.github.com/2486101
+		// explanation: http://pouet.net/topic.php?which=8760&page=1
+
+		// 28.4 fixed-point coordinates
+
+		var x1 = (v1.x * viewportXScale + viewportXOffs) | 0;
+        var x2 = (v2.x * viewportXScale + viewportXOffs) | 0;
+
+		var y1 = (v1.y * viewportYScale + viewportYOffs) | 0;
+        var y2 = (v2.y * viewportYScale + viewportYOffs) | 0;
+
+		// Z values (.28 fixed-point)
+
+		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
+		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
+       
 		// Deltas
 
-		var dx12 = x1 - x2, dy12 = y2 - y1;
+		var dx12 = x1 - x2, dy12 = y1 - y2;
 
 		// Bounding rectangle
 
@@ -1099,6 +1099,191 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var maxx = Math.min( ( Math.max( x1, x2 ) + subpixelBias ) >> subpixelBits, canvasWidth );
 		var miny = Math.max( ( Math.min( y1, y2 ) + subpixelBias ) >> subpixelBits, 0 );
 		var maxy = Math.min( ( Math.max( y1, y2 ) + subpixelBias ) >> subpixelBits, canvasHeight );
+        var minz = Math.max( ( Math.min( z1, z2 ) + subpixelBias ) >> subpixelBits, 0 );
+		//var maxz = Math.min( ( Math.max( z1, z2 ) + subpixelBias ) >> subpixelBits, canvasHeight );
+
+		rectx1 = Math.min( minx, rectx1 );
+		rectx2 = Math.max( maxx, rectx2 );
+		recty1 = Math.min( miny, recty1 );
+		recty2 = Math.max( maxy, recty2 );
+
+		// Block size, standard 8x8 (must be power of two)
+
+		var q = blockSize; // line mode should be 0.
+
+		// Start in corner of 8x8 block
+
+		minx &= ~(q - 1);
+		miny &= ~(q - 1);
+
+		// Constant part of half-edge functions
+
+		//var minXfixscale = (minx << subpixelBits);
+		//var minYfixscale = (miny << subpixelBits);
+
+		//var c1 = dy12 * ((minXfixscale) - x1) + dx12 * ((minYfixscale) - y1);
+
+		// Correct for fill convention
+
+		//if ( dy12 > 0 || ( dy12 === 0 && dx12 > 0 ) ) c1++;
+
+		// Note this doesn't kill subpixel precision, but only because we test for >=0 (not >0).
+		// It's a bit subtle. :)
+		//c1 = (c1 - 1) >> subpixelBits;
+
+		// Z interpolation setup
+
+		var dz12 = z1 - z2;
+
+		// Z at top/left corner of rast area
+
+		//var cz = ( z1 + ((minXfixscale) - x1) * dzdx + ((minYfixscale) - y1) * dzdy ) | 0;
+
+		// Z pixel steps
+
+//		var fixscale = (1 << subpixelBits);
+//		dzdx = (dzdx * fixscale) | 0;
+//		dzdy = (dzdy * fixscale) | 0;
+		
+		// Set up min/max corners
+//		var qm1 = q - 1; // for convenience
+//		var nmin1 = 0, nmax1 = 0;
+//		var nminz = 0, nmaxz = 0;
+//		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
+//		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
+//        if (dz12 >= 0) nmaxz += qm1*dz12; else nminz += qm1*dz12;
+//		if (dzdx >= 0) nmaxz += qm1*dzdx; else nminz += qm1*dzdx;
+//		if (dzdy >= 0) nmaxz += qm1*dzdy; else nminz += qm1*dzdy;
+
+		// Loop through blocks
+		//var linestep = canvasWidth - q;
+
+		//var cb1 = c1;
+		//var cbz = cz;
+		//var qstep = -q;
+		//var e1x = qstep * dy12;
+		//var ezx = qstep * dz12;
+			
+		var x0 = (x2);
+        //var slope = dy12 / dx12;
+        var length = Math.sqrt((dy12 * dy12) + (dx12 *dx12));
+        var unitX = (dx12 / length);
+        var unitY = (dy12 / length);
+        var unitZ = (dz12 / length);
+        var y0 = (y2);
+        var z0 = (z2);
+        var pixelX, pixelY, pixelZ;
+        crossVector.set( unitX, unitY, unitZ );
+        crossVector.cross( lookVector );
+        crossVector.normalize();
+            
+            while (length > 0) {
+
+                // Get this pixel.
+                pixelX = (x0 + length * unitX);
+                pixelY = (y0 + length * unitY);
+                pixelZ = (z0 + length * unitZ);
+
+                // if pixel is at rect ...Draw.
+                
+                // Draw line with width
+                pixelX = pixelX >> subpixelBits;
+                pixelY = pixelY >> subpixelBits;
+                var pZ = pixelZ >> subpixelBits;
+                    
+                for ( var i = -halfLineWidth; i <= halfLineWidth; ++i ) {
+
+                    var pX = (pixelX + crossVector.x * i);
+                    var pY = (pixelY + crossVector.y * i);
+                   // pZ = (pZ + crossVector.z * i);
+                   
+                    // Find this pixel at which block
+                    var blockX = pX >> blockShift;
+                    var blockY = pY >> blockShift;
+                    var blockId = blockX + blockY * canvasWBlocks;
+
+                    if ( blockMaxZ[ blockId ] < minz ) continue;
+
+                    // Compare the pixel with block's z 
+                    var bflags = blockFlags[ blockId ];
+                    if ( bflags & BLOCK_NEEDCLEAR) clearBlock( blockX, blockY );
+                    blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
+
+                    // Line can't use block          
+
+                    // draw pixel
+                    var offset = Math.round(pX) + Math.round(pY) * canvasWidth;
+
+                    if ( pZ < zbuffer[ offset ] ) {		 
+                        shader( data, zbuffer, offset, pZ, 1, 1, null, null, material );								
+                    }
+                }
+
+                --length;
+            }            
+
+    }
+    
+    // To do: draw line clean color using clean blocks is not enough.
+    // To confirm why must mouse move can see the line.
+    // var blockShift = 0; var blockSize = 1 << blockShift; In order to clean pixel
+    // LineWidth support
+    function drawLine1( v1, v2, color1, color2, upVector, rightVector, shader, material ) {
+        
+        // TODO: Implement per-pixel z-clipping
+
+		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
+
+        // According line width to get bounding points
+        
+        var halfLineWidth = material.linewidth * 0.5;
+        var dummyUpAxis = new THREE.Vector3( 0, 1, 0 );
+        var dummyRightAxis = new THREE.Vector3( 1, 0, 0 );
+        var crossVector = new THREE.Vector3();
+        var lineDir = v1.clone();
+        lineDir.sub( v2 ) ;
+        
+        if ( Math.abs(dummyUpAxis.dot( lineDir )) === 1 ) {  // This is parallel vector           
+             crossVector.crossVectors( lineDir, dummyRightAxis );
+        } else {
+             crossVector.crossVectors( lineDir, dummyUpAxis );
+        }
+        
+        crossVector.multiplyScalar( halfLineWidth );
+        
+        // https://gist.github.com/2486101
+		// explanation: http://pouet.net/topic.php?which=8760&page=1
+
+		// 28.4 fixed-point coordinates
+
+		var x1 = ((v1.x-crossVector.x) * viewportXScale + viewportXOffs) | 0;
+        var x2 = ((v1.x+crossVector.x) * viewportXScale + viewportXOffs) | 0;
+		var x3 = ((v2.x-crossVector.x) * viewportXScale + viewportXOffs) | 0;
+        var x4 = ((v2.x+crossVector.x) * viewportXScale + viewportXOffs) | 0;
+
+		var y1 = ((v1.y-crossVector.y) * viewportYScale + viewportYOffs) | 0;
+        var y2 = ((v1.y+crossVector.y) * viewportYScale + viewportYOffs) | 0;
+		var y3 = ((v2.y-crossVector.y) * viewportYScale + viewportYOffs) | 0;
+        var y4 = ((v2.y+crossVector.y) * viewportYScale + viewportYOffs) | 0;
+
+		// Z values (.28 fixed-point)
+
+		var z1 = ((v1.z-crossVector.z) * viewportZScale + viewportZOffs) | 0;
+		var z2 = ((v1.z+crossVector.z) * viewportZScale + viewportZOffs) | 0;
+        var z3 = ((v2.z-crossVector.z) * viewportZScale + viewportZOffs) | 0;
+        var z4 = ((v2.z+crossVector.z) * viewportZScale + viewportZOffs) | 0;
+		
+        
+		// Deltas
+
+		var dx12 = x1 - x2, dy12 = y2 - y1;
+
+		// Bounding rectangle
+
+		var minx = Math.max( ( Math.min( x1, x2, x3, x4 ) + subpixelBias ) >> subpixelBits, 0 );
+		var maxx = Math.min( ( Math.max( x1, x2, x3, x4 ) + subpixelBias ) >> subpixelBits, canvasWidth );
+		var miny = Math.max( ( Math.min( y1, y2, y3, y4 ) + subpixelBias ) >> subpixelBits, 0 );
+		var maxy = Math.min( ( Math.max( y1, y2, y3, y4 ) + subpixelBias ) >> subpixelBits, canvasHeight );
 
 		rectx1 = Math.min( minx, rectx1 );
 		rectx2 = Math.max( maxx, rectx2 );
