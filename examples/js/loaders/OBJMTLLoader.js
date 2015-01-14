@@ -20,6 +20,7 @@ THREE.OBJMTLLoader.prototype = {
 		var scope = this;
 
 		var mtlLoader = new THREE.MTLLoader( url.substr( 0, url.lastIndexOf( "/" ) + 1 ) );
+		mtlLoader.crossOrigin	= scope.crossOrigin;
 		mtlLoader.load( mtlurl, function ( materials ) {
 
 			var materialsCreator = materials;
