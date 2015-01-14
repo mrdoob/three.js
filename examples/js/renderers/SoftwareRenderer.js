@@ -96,6 +96,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	};
 
+    // TODO: Check why autoClear can't be false.
 	this.render = function ( scene, camera ) {
 
 		if ( this.autoClear === true ) this.clear();
@@ -1124,54 +1125,54 @@ THREE.SoftwareRenderer = function ( parameters ) {
         crossVector.cross( lookVector );
         crossVector.normalize();
             
-            while (length > 0) {
+        while (length > 0) {
 
-                // Get this pixel.
-                pixelX = (x2 + length * unitX);
-                pixelY = (y2 + length * unitY);
-                pixelZ = (z2 + length * unitZ);               
-                                
-                pixelX = (pixelX + subpixelBias) >> subpixelBits;
-                pixelY = (pixelY + subpixelBias) >> subpixelBits;
-                pZ = (pixelZ + subpixelBias) >> subpixelBits;
+            // Get this pixel.
+            pixelX = (x2 + length * unitX);
+            pixelY = (y2 + length * unitY);
+            pixelZ = (z2 + length * unitZ);               
+
+            pixelX = (pixelX + subpixelBias) >> subpixelBits;
+            pixelY = (pixelY + subpixelBias) >> subpixelBits;
+            pZ = (pixelZ + subpixelBias) >> subpixelBits;
+
+            // Draw line with line width
+            for ( var i = -halfLineWidth; i <= halfLineWidth; ++i ) {
+
+                // Compute the line pixels.
+                // Get the pixels on the vector that crosses to the line vector
+                pX = Math.floor((pixelX + crossVector.x * i));
+                pY = Math.floor((pixelY + crossVector.y * i));                    
+
+               // if pixel is over the rect. Continue
+               if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY 
+                       || recty2 <= pY )
+                   continue;
+
+                // Find this pixel at which block
+                var blockX = pX >> blockShift;
+                var blockY = pY >> blockShift;
+                var blockId = blockX + blockY * canvasWBlocks;
+
+                // Compare the pixel depth width z block.
+                if ( blockMaxZ[ blockId ] < minz ) continue;
+
+                blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );                    
+
+                var bflags = blockFlags[ blockId ];
+                if ( bflags & BLOCK_NEEDCLEAR ) clearBlock( blockX, blockY );
+                blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );                   
                 
-                // Draw line with line width
-                for ( var i = -halfLineWidth; i <= halfLineWidth; ++i ) {
+                // draw pixel
+                var offset = pX + pY * canvasWidth;
 
-                    // Compute the line pixels.
-                    // Get the pixels on the vector that crosses to the line vector
-                    pX = Math.floor((pixelX + crossVector.x * i));
-                    pY = Math.floor((pixelY + crossVector.y * i));                    
-                   
-                   // if pixel is over the rect. Continue
-                   if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY 
-                           || recty2 <= pY )
-                       continue;
-                   
-                    // Find this pixel at which block
-                    var blockX = pX;
-                    var blockY = pY;
-                    var blockId = blockX + blockY * canvasWBlocks;
-
-                    // Compare the pixel depth width z block.
-                    if ( blockMaxZ[ blockId ] < minz ) continue;
-
-                    blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );                    
-                    
-                    var bflags = blockFlags[ blockId ];
-                    if ( bflags & BLOCK_NEEDCLEAR ) clearBlock( blockX, blockY );
-                    blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );                    
-
-                    // draw pixel
-                    var offset = pX + pY * canvasWidth;
-
-                    if ( pZ < zbuffer[ offset ] ) {		 
-                        shader( data, zbuffer, offset, pZ, color1, color2, material );								
-                    }
+                if ( pZ < zbuffer[ offset ] ) {		 
+                    shader( data, zbuffer, offset, pZ, color1, color2, material );								
                 }
+            }
 
-                --length;
-            }            
+            --length;
+        }           
 
     }
     
