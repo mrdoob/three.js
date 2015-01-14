@@ -66,7 +66,11 @@ code {
 	overflow: auto;
 }
 
-
+iframe {
+	width: 100%;
+	height: 420px;
+	border:0;
+}
 
 th {
 	padding: 10px;

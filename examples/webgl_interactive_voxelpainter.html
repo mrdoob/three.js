@@ -28,7 +28,7 @@
 			var container;
 			var camera, scene, renderer;
 			var plane, cube;
-			var vector, raycaster, isShiftDown = false;
+			var mouse, raycaster, isShiftDown = false;
 
 			var rollOverMesh, rollOverMaterial;
 			var cubeGeo, cubeMaterial;
@@ -93,8 +93,8 @@
 
 				//
 
-				vector = new THREE.Vector3();
 				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
 
 				var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
@@ -116,8 +116,8 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -144,10 +144,9 @@
 
 				event.preventDefault();
 
-				vector.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-				vector.unproject( camera );
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -168,10 +167,9 @@
 
 				event.preventDefault();
 
-				vector.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-				vector.unproject( camera );
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( objects );
 

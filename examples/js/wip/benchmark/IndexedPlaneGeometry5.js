@@ -80,3 +80,4 @@ THREE.IndexedPlaneGeometry5 = function ( width, height, widthSegments, heightSeg
 };
 
 THREE.IndexedPlaneGeometry5.prototype = Object.create( THREE.IndexedGeometry5.prototype );
+THREE.IndexedPlaneGeometry5.prototype.constructor = THREE.IndexedPlaneGeometry5;

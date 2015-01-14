@@ -99,7 +99,8 @@
 				scene.add( object );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0x111111, 1 );
+				renderer.setClearColor( 0x111111 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
 				var container = document.getElementById( 'container' );

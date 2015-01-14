@@ -21,6 +21,13 @@ Menubar.Add = function ( editor ) {
 	var meshCount = 0;
 	var lightCount = 0;
 
+	editor.signals.editorCleared.add( function () {
+
+		meshCount = 0;
+		lightCount = 0;
+
+	} );
+
 	// Group
 
 	var option = new UI.Panel();
@@ -98,7 +105,7 @@ Menubar.Add = function ( editor ) {
 	option.onClick( function () {
 
 		var radius = 20;
-		var segments = 8;
+		var segments = 32;
 
 		var geometry = new THREE.CircleGeometry( radius, segments );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
@@ -120,7 +127,7 @@ Menubar.Add = function ( editor ) {
 		var radiusTop = 20;
 		var radiusBottom = 20;
 		var height = 100;
-		var radiusSegments = 8;
+		var radiusSegments = 32;
 		var heightSegments = 1;
 		var openEnded = false;
 

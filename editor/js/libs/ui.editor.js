@@ -2,72 +2,124 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-UI.CodeEditor = function ( mode ) {
+UI.ScriptEditor = function ( editor ) {
 
-	UI.Element.call( this );
+	UI.Panel.call( this );
 
 	var scope = this;
 
-	var dom = document.createElement( 'div' );
-	dom.className = 'CodeEditor';
+	var name = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-	var editor = CodeMirror( dom, { mode: mode, indentWithTabs: true, lineWrapping: true, matchBrackets: true } );
-	editor.onKeyUp( 'keyup', function () {
+		if ( scope.onChangeCallback !== undefined ) {
 
-		if ( scope.onKeyUpCallback !== undefined ) {
-
-			scope.onKeyUpCallback();
+			scope.onChangeCallback();
 
 		}
 
-	});
+	} );
+	this.add( name );
 
-	this.dom = dom;
-	this.editor = editor;
+	var remove = new UI.Text( 'x' );
+	remove.setPosition( 'absolute' );
+	remove.setRight( '8px' );
+	remove.setCursor( 'pointer' );
+	remove.onClick( function () {
+
+		if ( confirm( 'Are you sure?' ) ) {
+
+			scope.parent.remove( scope );
+
+			if ( scope.onChangeCallback !== undefined ) {
+
+				scope.onChangeCallback();
+
+			}
+
+		}
+
+	} );
+	this.add( remove );
+
+	this.add( new UI.Break() );
+
+	var object = editor.selected.clone();
+	var scene = editor.scene.clone();
+
+	var timeout;
+
+	var textarea = new UI.TextArea();
+	textarea.setWidth( '100%' );
+	textarea.setHeight( '150px' );
+	textarea.setMarginTop( '8px' );
+	textarea.onKeyUp( function () {
+
+		clearTimeout( timeout );
+
+		textarea.dom.classList.remove( 'success' );
+		textarea.dom.classList.remove( 'fail' );
+
+		timeout = setTimeout( function () {
+
+			var source = textarea.getValue();
+
+			try {
+
+				( new Function( 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'update', source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, update: update };' ).bind( object ) )( scene );
+
+				textarea.dom.classList.add( 'success' );
+				textarea.dom.classList.remove( 'fail' );
+
+			} catch ( error ) {
+
+				console.error( error );
+
+				textarea.dom.classList.remove( 'success' );
+				textarea.dom.classList.add( 'fail' );
+
+				return;
+
+			}
+
+			if ( scope.onChangeCallback !== undefined ) {
+
+				scope.onChangeCallback();
+
+			}
+
+		}, 500 );
+
+	} );
+	this.add( textarea );
+
+	this.name = name;
+	this.textarea = textarea;
+
+};
+
+UI.ScriptEditor.prototype = Object.create( UI.Panel.prototype );
+UI.ScriptEditor.prototype.constructor = UI.ScriptEditor;
+
+UI.ScriptEditor.prototype.getValue = function () {
+
+	return {
+		name: this.name.getValue(),
+		source: this.textarea.getValue()
+	};
+
+};
+
+UI.ScriptEditor.prototype.setValue = function ( value ) {
+
+	this.name.setValue( value.name );
+	this.textarea.setValue( value.source );
 
 	return this;
 
 };
 
-UI.CodeEditor.prototype = Object.create( UI.Element.prototype );
+UI.ScriptEditor.prototype.onChange = function ( callback ) {
 
-UI.CodeEditor.prototype.setWidth = function ( value ) {
-
-	UI.Element.prototype.setWidth.call( this, value );
-
-	this.editor.setSize( this.dom.style.width, this.dom.style.height );
-
-	return this;
-
-};
-
-UI.CodeEditor.prototype.setHeight = function ( value ) {
-
-	UI.Element.prototype.setHeight.call( this, value );
-
-	this.editor.setSize( this.dom.style.width, this.dom.style.height );
-
-	return this;
-
-};
-
-UI.CodeEditor.prototype.getValue = function () {
-
-	return this.editor.getValue();
-
-};
-
-UI.CodeEditor.prototype.setValue = function ( value ) {
-
-	this.editor.setValue( value );
-
-	return this;
-
-};
-
-UI.CodeEditor.prototype.onKeyUp = function ( callback ) {
-
-	this.onKeyUpCallback = callback;
+	this.onChangeCallback = callback;
 
 	return this;
 

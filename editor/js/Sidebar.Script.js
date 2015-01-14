@@ -18,28 +18,59 @@ Sidebar.Script = function ( editor ) {
 	container.addStatic( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 
-	var source = new Sidebar.Script.Editor( editor );
-	container.add( source );
+	//
+
+	var scriptsContainer = new UI.Panel();
+	container.add( scriptsContainer );
+
+	var newScript = new UI.Button( 'New' );
+	newScript.setMarginLeft( '5px' );
+	newScript.onClick( function () {
+
+		var script = new UI.ScriptEditor( editor );
+		script.setValue( { name: '', source: 'return {\n\tupdate: function ( event ) {}\n};' } );
+		script.onChange( function () {
+
+			signals.scriptChanged.dispatch();
+
+		} );
+		scriptsContainer.add( script );
+
+	} );
+	container.add( newScript );
+
+	var loadScript = new UI.Button( 'Load' );
+	loadScript.setMarginLeft( '4px' );
+	container.add( loadScript );
+
+	// signals
 
 	signals.objectSelected.add( function ( object ) {
+
+		scriptsContainer.clear();
 
 		if ( object !== null ) {
 
 			container.setDisplay( 'block' );
 
-			/*
-			var scripts = editor.scripts[ object.uuid ];
+			var sources = editor.scripts[ object.uuid ];
 
-			if ( scripts !== undefined ) {
+			if ( sources !== undefined ) {
 
-				scriptSource.setValue( scripts[ 0 ] );
+				for ( var i = 0; i < sources.length; i ++ ) {
 
-			} else {
+					var script = new UI.ScriptEditor( editor );
+					script.setValue( sources[ i ] );
+					script.onChange( function () {
 
-				scriptSource.setValue( '' );
+						signals.scriptChanged.dispatch();
+
+					} );
+					scriptsContainer.add( script );
+
+				}
 
 			}
-			*/
 
 		} else {
 
@@ -49,6 +80,23 @@ Sidebar.Script = function ( editor ) {
 
 	} );
 
+	signals.scriptChanged.add( function () {
+
+		var array = [];
+		var object = editor.selected;
+
+		for ( var i = 0; i < scriptsContainer.children.length; i ++ ) {
+
+			var script = scriptsContainer.children[ i ];
+
+			array.push( script.getValue() );
+
+		}
+
+		editor.scripts[ object.uuid ] = array;
+
+	} );
+
 	return container;
 
-}
+};

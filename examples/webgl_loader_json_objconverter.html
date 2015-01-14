@@ -101,7 +101,7 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, new THREE.UVMapping(), THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
+				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
 				xm.map.needsUpdate = true;
 				xm.map.repeat.set( 10, 10 );
 
@@ -150,6 +150,7 @@
 
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setClearColor( 0xffffff );
+						webglRenderer.setPixelRatio( window.devicePixelRatio );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 
@@ -167,6 +168,7 @@
 
 					canvasRenderer = new THREE.CanvasRenderer();
 					canvasRenderer.setClearColor( 0xffffff );
+					canvasRenderer.setPixelRatio( window.devicePixelRatio );
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
 

@@ -169,8 +169,8 @@
 				initSky();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				document.body.appendChild( renderer.domElement );
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );

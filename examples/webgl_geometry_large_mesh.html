@@ -132,19 +132,21 @@
 					try {
 
 						webglRenderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+						webglRenderer.setPixelRatio( window.devicePixelRatio );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;
 
-					}
-					catch (e) {
+					} catch (e) {
+
 					}
 				}
 
 				if( render_canvas ) {
 
 					canvasRenderer = new THREE.CanvasRenderer();
+					canvasRenderer.setPixelRatio( window.devicePixelRatio );
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
 

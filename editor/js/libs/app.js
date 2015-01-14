@@ -2,88 +2,156 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var APP = {};
+var APP = {
 
-APP.Player = function () {
+	Player: function () {
 
-	var loader = new THREE.ObjectLoader();
-	var camera, scene, renderer;
-	var scripts;
-	
-	this.dom = undefined;
+		var loader = new THREE.ObjectLoader();
+		var camera, scene, renderer;
 
-	this.load = function ( json ) {
+		var scripts = {};
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		this.dom = undefined;
 
-		scene = loader.parse( json );
+		this.load = function ( json ) {
 
-		/*
-		scripts = [];
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
 
-		scene.traverse( function ( child ) {
+			camera = loader.parse( json.camera );
+			scene = loader.parse( json.scene );
 
-			if ( child.script !== undefined ) {
+			scripts = {
+				keydown: [],
+				keyup: [],
+				mousedown: [],
+				mouseup: [],
+				mousemove: [],
+				update: []
+			};
 
-				var script = new Function( 'scene', 'time', child.script.source ).bind( child );
-				scripts.push( script );
+			for ( var uuid in json.scripts ) {
+
+				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+
+				var sources = json.scripts[ uuid ];
+
+				for ( var i = 0; i < sources.length; i ++ ) {
+
+					var script = sources[ i ];
+
+					var events = ( new Function( 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, update: update };' ).bind( object ) )( scene );
+
+					for ( var name in events ) {
+
+						if ( events[ name ] === undefined ) continue;
+
+						if ( scripts[ name ] === undefined ) {
+
+							console.warn( 'APP.Player: event type not supported (', name, ')' );
+							continue;
+
+						}
+
+						scripts[ name ].push( events[ name ] );
+
+					}
+
+				}
 
 			}
 
-		} );
-		*/
+			this.dom = renderer.domElement;
 
-		this.dom = renderer.domElement;
+		};
 
-	};
+		this.setSize = function ( width, height ) {
 
-	this.setCamera = function ( master ) {
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
 
-		camera = master.clone();
+			renderer.setSize( width, height );
 
-	};
+		};
 
-	this.setSize = function ( width, height ) {
+		var dispatch = function ( array, event ) {
 
-		renderer.setSize( width, height );
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-	};
+				array[ i ]( event );
 
-	var request;
+			}
 
-	var animate = function ( time ) {
+		};
 
-		request = requestAnimationFrame( animate );
+		var request;
 
-		/*
-		for ( var i = 0; i < scripts.length; i ++ ) {
+		var animate = function ( time ) {
 
-			scripts[ i ]( scene, time );
+			request = requestAnimationFrame( animate );
 
-		}
-		*/
+			dispatch( scripts.update, { time: time } );
 
-		renderer.render( scene, camera );
+			renderer.render( scene, camera );
 
-	};
+		};
 
-	this.play = function () {
+		this.play = function () {
 
-		request = requestAnimationFrame( animate );
+			document.addEventListener( 'keydown', onDocumentKeyDown );
+			document.addEventListener( 'keyup', onDocumentKeyUp );
+			document.addEventListener( 'mousedown', onDocumentMouseDown );
+			document.addEventListener( 'mouseup', onDocumentMouseUp );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
-	};
+			request = requestAnimationFrame( animate );
 
-	this.stop = function () {
+		};
 
-		cancelAnimationFrame( request );
+		this.stop = function () {
 
-	};
+			document.removeEventListener( 'keydown', onDocumentKeyDown );
+			document.removeEventListener( 'keyup', onDocumentKeyUp );
+			document.removeEventListener( 'mousedown', onDocumentMouseDown );
+			document.removeEventListener( 'mouseup', onDocumentMouseUp );
+			document.removeEventListener( 'mousemove', onDocumentMouseMove );
 
-};
+			cancelAnimationFrame( request );
 
-APP.Script = function ( source ) {
+		};
 
-	this.uuid = THREE.Math.generateUUID();
-	this.source = source;
+		//
+
+		var onDocumentKeyDown = function ( event ) {
+
+			dispatch( scripts.keydown, event );
+
+		};
+
+		var onDocumentKeyUp = function ( event ) {
+
+			dispatch( scripts.keyup, event );
+
+		};
+
+		var onDocumentMouseDown = function ( event ) {
+
+			dispatch( scripts.mousedown, event );
+
+		};
+
+		var onDocumentMouseUp = function ( event ) {
+
+			dispatch( scripts.mouseup, event );
+
+		};
+
+		var onDocumentMouseMove = function ( event ) {
+
+			dispatch( scripts.mousemove, event );
+
+		};
+
+	}
 
 };

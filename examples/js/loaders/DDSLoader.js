@@ -7,6 +7,7 @@ THREE.DDSLoader = function () {
 };
 
 THREE.DDSLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
+THREE.DDSLoader.prototype.constructor = THREE.DDSLoader;
 
 THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 

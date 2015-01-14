@@ -24,4 +24,5 @@ THREE.AreaLight = function ( color, intensity ) {
 };
 
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
+THREE.AreaLight.prototype.constructor = THREE.AreaLight;
 

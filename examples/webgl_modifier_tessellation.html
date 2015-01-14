@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - modifier - tessellation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+			a { color: red }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #777 !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - modifier tessellation</div>
+		<div id="container"></div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/modifiers/ExplodeModifier.js"></script>
+		<script src="js/modifiers/TessellateModifier.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="fonts/helvetiker_bold.typeface.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			uniform float amplitude;
+
+			attribute vec3 customColor;
+			attribute vec3 displacement;
+
+			varying vec3 vNormal;
+			varying vec3 vColor;
+
+			void main() {
+
+				vNormal = normal;
+				vColor = customColor;
+
+				vec3 newPosition = position + amplitude * displacement;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			varying vec3 vNormal;
+			varying vec3 vColor;
+
+			void main() {
+
+				const float ambient = 0.005;
+
+				vec3 light = vec3( 1.0 );
+				light = normalize( light );
+
+				float directional = max( dot( vNormal, light ), 0.0 );
+
+				gl_FragColor = vec4( ( directional + ambient ) * vColor, 1.0 );
+				gl_FragColor.xyz = sqrt( gl_FragColor.xyz );
+
+			}
+
+		</script>
+
+
+		<script>
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var renderer, scene, camera, stats;
+
+		var mesh, uniforms, attributes;
+
+		var WIDTH = window.innerWidth,
+			HEIGHT = window.innerHeight;
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera( 25, WIDTH / HEIGHT, 1, 10000 );
+			camera.position.z = 350;
+
+			controls = new THREE.TrackballControls( camera );
+
+			scene = new THREE.Scene();
+
+			//
+
+			attributes = {
+
+				displacement: {	type: 'v3', value: [] },
+				customColor:  {	type: 'c', value: [] }
+
+			};
+
+			uniforms = {
+
+				amplitude: { type: "f", value: 0.0 }
+
+			};
+
+			var shaderMaterial = new THREE.ShaderMaterial( {
+
+				uniforms: 		uniforms,
+				attributes:     attributes,
+				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+				shading: 		THREE.FlatShading,
+				side: 			THREE.DoubleSide
+
+			});
+
+
+			var geometry = new THREE.TextGeometry( "THREE.JS", {
+
+				size: 40,
+				height: 5,
+				curveSegments: 3,
+
+				font: "helvetiker",
+				weight: "bold",
+				style: "normal",
+
+				bevelThickness: 2,
+				bevelSize: 1,
+				bevelEnabled: true
+
+			});
+
+			geometry.dynamic = true;
+
+			geometry.center();
+
+			var tessellateModifier = new THREE.TessellateModifier( 8 );
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				tessellateModifier.modify( geometry );
+
+			}
+
+			var explodeModifier = new THREE.ExplodeModifier();
+			explodeModifier.modify( geometry );
+
+			var vertices = geometry.vertices;
+
+			var colors = attributes.customColor.value;
+			var displacement = attributes.displacement.value;
+
+			var nv, v = 0;
+
+			for ( var f = 0; f < geometry.faces.length; f ++ ) {
+
+				var face = geometry.faces[ f ];
+
+				if ( face instanceof THREE.Face3 ) {
+
+					nv = 3;
+
+				} else {
+
+					nv = 4;
+
+				}
+
+				var h = 0.15 * Math.random();
+				var s = 0.5 + 0.5 * Math.random();
+				var l = 0.5 + 0.5 * Math.random();
+
+				var d = 10 * ( 0.5 - Math.random() );
+
+				var x = 2 * ( 0.5 - Math.random() );
+				var y = 2 * ( 0.5 - Math.random() );
+				var z = 2 * ( 0.5 - Math.random() );
+
+				for ( var i = 0; i < nv; i ++ ) {
+
+					colors[ v ] = new THREE.Color();
+					displacement[ v ] = new THREE.Vector3();
+
+					colors[ v ].setHSL( h, s, l );
+					colors[ v ].convertGammaToLinear();
+
+					displacement[ v ].set( x, y, z );
+
+					v += 1;
+
+				}
+
+			}
+
+			console.log( "faces", geometry.faces.length );
+
+			mesh = new THREE.Mesh( geometry, shaderMaterial );
+			mesh.rotation.set( 0.5, 0.5, 0 );
+
+			scene.add( mesh );
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0x050505 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( WIDTH, HEIGHT );
+
+			var container = document.getElementById( 'container' );
+			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			stats.update();
+
+		}
+
+		function render() {
+
+			var time = Date.now() * 0.001;
+
+			uniforms.amplitude.value = Math.sin( time * 0.5 );
+
+			controls.update();
+			renderer.render( scene, camera );
+
+		}
+
+
+	</script>
+
+</body>
+
+</html>

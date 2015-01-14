@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Camera] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A general purpose camera, for setting FOV, Lens Focal Length,
+ 		and switching between perspective and orthographic views easily.
+ 		Use this only if you do not wish to manage
+ 		both an Orthographic and Perspective Camera</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Number width], [page:Number height], [page:Number fov], [page:Number near], [page:Number far], [page:Number orthoNear], [page:Number orthoFar])</h3>
+		<div>
+		width -- Camera frustum width.<br />
+		height -- Camera frustum height.<br />
+		fov — Camera frustum vertical field of view in perspective view.<br />
+		near — Camera frustum near plane in perspective view.<br />
+		far — Camera frustum far plane in perspective view.<br />
+		orthoNear — Camera frustum near plane in orthographic view.<br />
+		orthoFar — Camera frustum far plane in orthographic view.
+		</div>
+		<div>
+		Creates a [name]. This initializes 2 cameras, an OrthographicCamera and a PerspectiveCamera. The default is the perspective Camera. 
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+
+		<h3>[property:Number fov]</h3>
+		<div>
+		Gets or sets the camera frustum vertical field of view in perspective view.
+		</div> 
+
+		<h3>[property:number left]</h3>
+		<div>
+		Gets or sets the camera frustum left plane in orthographic view.
+		</div> 
+
+		<h3>[property:Number right]</h3>
+		<div>
+		Gets or sets the camera frustum right plane in orthographic view. 
+		</div> 
+
+		<h3>[property:number top]</h3>
+		<div>
+		Gets or sets the camera frustum top plane in orthographic view.
+		</div> 
+
+		<h3>[property:Number bottom]</h3>
+		<div>
+		Gets or sets the camera frustum bottom plane in orthographic view.
+		</div> 
+
+		<h3>[property:number zoom]</h3>
+		<div>
+		Gets or sets the zoom factor of the camera.
+		</div> 
+
+		<h3>[property:number near]</h3>
+		<div>
+		Gets camera frustum near plane.
+		</div> 
+
+		<h3>[property:number far]</h3>
+		<div>
+		Gets camera frustum far plane.
+		</div> 
+
+		<h3>[property:OrthographicCamera cameraO]</h3>
+		<div>
+		Gets or sets the internal OrthographicCamera used as camera.
+		</div> 
+
+		<h3>[property:PerspectiveCamera cameraP]</h3>
+		<div>
+		Gets or sets the internal PerspectiveCamera used as camera.
+		</div> 
+
+		<h3>[property:boolean inOrthographicMode]</h3>
+		<div>
+		Gets whether the combinedCamera is in Orthographic Mode.
+		</div> 
+
+		<h3>[property:boolean inPerspectiveMode]</h3>
+		<div>
+		Gets whether the combinedCamera is in Perspective Mode.
+		</div> 
+
+		<h2>Methods</h2>
+
+		<h3>[method:null setFov]([page:Number fov])</h3>
+		<div>
+		fov --  Camera frustum vertical field of view in perspective view.
+		</div>
+		<div>
+		sets the camera frustum vertical field of view in perspective view.
+		</div>
+
+		<h3>[method:null setZoom]([page:Number zoom])</h3>
+		<div>
+		zoom -- The zoom factor.
+		</div>
+		<div>
+		Sets the zoomfactor.
+		</div>
+
+		<h3>[method:null setLens]([page:number focalLength], [page:Number frameHeight])</h3>
+		<div>
+		focalLength -- The focal length of a lens is defined as the distance from the optical center of a lens (or, the secondary principal point for a complex lens like a camera lens) to the focal point (sensor) when the lens is focused on an object at infinity. <br />
+		frameHeight -- the size of the frame in mm. (default is *35*)
+		</div>
+		<div>
+		Sets the fov based on lens data.
+		</div>
+
+		<h3>[method:null toFrontView]()</h3>
+		<div>
+		Sets the camera to view the front of the target.
+		</div>
+
+		<h3>[method:null toBackView]()</h3>
+		<div>
+		Sets the camera to view the back of the target.
+		</div>
+
+		<h3>[method:null toLeftView]()</h3>
+		<div>
+		Sets the camera to view the left of the target.
+		</div>
+
+		<h3>[method:null toRightView]()</h3>
+		<div>
+		Sets the camera to view the right of the target.
+		</div>
+
+		<h3>[method:null toTopView]()</h3>
+		<div>
+		Sets the camera to view the top.
+		</div>
+
+		<h3>[method:null toBottomView]()</h3>
+		<div>
+		Sets the camera to view the bottom.
+		</div>
+
+		<h3>[method:null setSize]([page:Number width], [page:Number height])</h3>
+		<div>
+		width -- The width of the orthographic view.<br />
+		height -- The height of the orthographic view.
+		</div>
+		<div>
+		Sets the size of the orthographic view.
+		</div>
+
+		<h3>[method:null toOrthographic]()</h3>
+		<div>
+		Change the camera to orthographic view.
+		</div>
+
+		<h3>[method:null toPerspective]()</h3>
+		<div>
+		Change the camera to Perspective view.
+		</div>
+
+		<h3>[method:null updateProjectionMatrix]()</h3>
+		<div>
+		Updates the ProjectionMatrix.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
