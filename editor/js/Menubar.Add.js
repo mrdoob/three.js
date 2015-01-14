@@ -21,6 +21,13 @@ Menubar.Add = function ( editor ) {
 	var meshCount = 0;
 	var lightCount = 0;
 
+	editor.signals.editorCleared.add( function () {
+
+		meshCount = 0;
+		lightCount = 0;
+
+	} );
+
 	// Group
 
 	var option = new UI.Panel();

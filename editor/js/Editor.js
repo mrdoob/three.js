@@ -22,6 +22,8 @@ var Editor = function () {
 
 		// notifications
 
+		editorCleared: new SIGNALS.Signal(),
+
 		savingStarted: new SIGNALS.Signal(),
 		savingFinished: new SIGNALS.Signal(),
 
@@ -380,6 +382,8 @@ Editor.prototype = {
 		this.scripts = {};
 
 		this.deselect();
+
+		this.signals.editorCleared.dispatch();
 
 	},
 

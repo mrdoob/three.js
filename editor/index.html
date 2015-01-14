@@ -169,6 +169,7 @@
 
 				var signals = editor.signals;
 
+				signals.editorCleared.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
