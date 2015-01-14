@@ -28,6 +28,7 @@ THREE.Sprite = ( function () {
 } )();
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Sprite.prototype.constructor = THREE.Sprite;
 
 THREE.Sprite.prototype.raycast = ( function () {
 

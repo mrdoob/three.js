@@ -15,7 +15,6 @@
 
 
 		<h2>Constructor</h2>
-		
 
 		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
 
@@ -24,34 +23,29 @@
 		material — An instance of [page:Material] (optional).
 		</div>
 
+
 		<h2>Properties</h2>
 
-		<h3>.[page:Geometry geometry]</h3>
+		<h3>[property:Geometry geometry]</h3>
 
 		<div>An instance of [page:Geometry], where each vertex designates the position of a particle in the system.</div>
 
-		<h3>.[page:Material material]</h3>
+		<h3>[property:Material material]</h3>
 
 		<div>An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour.</div>
 
-		<h3>.[page:Boolean frustrumCulled]</h3>
-		
-		<div>Specifies whether the particle system will be culled if it's outside the camera's frustum. By default this is set to false.</div>
-
-		<h3>.[page:boolean sortParticles]</h3>
-		<div>
-		When set, then the particles should be depth sorted (from far to near), based on camera, in the renderer every frame. 
-		</div> 
 
 		<h2>Methods</h2>
-		
-		<h3>.clone()</h3>
+
+		<h3>[method:PointCloud clone]()</h3>
 		<div>
 		This creates a clone of the particle system.
-		</div> 
-		
+		</div>
+
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+
 	</body>
 </html>

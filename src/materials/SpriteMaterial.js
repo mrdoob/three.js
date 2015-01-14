@@ -37,6 +37,7 @@ THREE.SpriteMaterial = function ( parameters ) {
 };
 
 THREE.SpriteMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.SpriteMaterial.prototype.constructor = THREE.SpriteMaterial;
 
 THREE.SpriteMaterial.prototype.clone = function () {
 

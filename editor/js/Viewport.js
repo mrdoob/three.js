@@ -1,8 +1,13 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
+	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
 	container.add( new Viewport.Info( editor ) );
@@ -34,22 +39,33 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-		controls.enabled = true;
+		var object = transformControls.object;
 
-		if ( transformControls.axis !== null ) {
+		if ( object !== undefined ) {
 
-			controls.enabled = false;
+			if ( editor.helpers[ object.id ] !== undefined ) {
+
+				editor.helpers[ object.id ].update();
+
+			}
 
 		}
 
 		render();
 
 	} );
-	transformControls.addEventListener( 'objectChange', function () {
+	transformControls.addEventListener( 'mouseDown', function () {
 
-		signals.objectChanged.dispatch( transformControls.object );
+		controls.enabled = false;
 
 	} );
+	transformControls.addEventListener( 'mouseUp', function () {
+
+		signals.objectChanged.dispatch( transformControls.object );
+		controls.enabled = true;
+
+	} );
+
 	sceneHelpers.add( transformControls );
 
 	// fog
@@ -62,58 +78,43 @@ var Viewport = function ( editor ) {
 
 	// object picking
 
-	var ray = new THREE.Raycaster();
-	var projector = new THREE.Projector();
+	var raycaster = new THREE.Raycaster();
+	var mouse = new THREE.Vector2();
 
 	// events
 
-	var getIntersects = function ( event, object ) {
+	var getIntersects = function ( point, object ) {
 
-		var rect = container.dom.getBoundingClientRect();
-		x = ( event.clientX - rect.left ) / rect.width;
-		y = ( event.clientY - rect.top ) / rect.height;
-		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
+		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
 
-		projector.unprojectVector( vector, camera );
-
-		ray.set( camera.position, vector.sub( camera.position ).normalize() );
+		raycaster.setFromCamera( mouse, camera );
 
 		if ( object instanceof Array ) {
 
-			return ray.intersectObjects( object );
+			return raycaster.intersectObjects( object );
 
 		}
 
-		return ray.intersectObject( object );
+		return raycaster.intersectObject( object );
 
 	};
 
-	var onMouseDownPosition = new THREE.Vector2();
-	var onMouseUpPosition = new THREE.Vector2();
+	var onDownPosition = new THREE.Vector2();
+	var onUpPosition = new THREE.Vector2();
+	var onDoubleClickPosition = new THREE.Vector2();
 
-	var onMouseDown = function ( event ) {
+	var getMousePosition = function ( dom, x, y ) {
 
-		event.preventDefault();
-
-		var rect = container.dom.getBoundingClientRect();
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
-		onMouseDownPosition.set( x, y );
-
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		var rect = dom.getBoundingClientRect();
+		return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
 
 	};
 
-	var onMouseUp = function ( event ) {
+	var handleClick = function () {
 
-		var rect = container.dom.getBoundingClientRect();
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
-		onMouseUpPosition.set( x, y );
+		if ( onDownPosition.distanceTo( onUpPosition ) == 0 ) {
 
-		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
-
-			var intersects = getIntersects( event, objects );
+			var intersects = getIntersects( onUpPosition, objects );
 
 			if ( intersects.length > 0 ) {
 
@@ -141,30 +142,80 @@ var Viewport = function ( editor ) {
 
 		}
 
-		document.removeEventListener( 'mouseup', onMouseUp );
+	};
+
+	var onMouseDown = function ( event ) {
+
+		event.preventDefault();
+
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onDownPosition.fromArray( array );
+
+		document.addEventListener( 'mouseup', onMouseUp, false );
+
+	};
+
+	var onMouseUp = function ( event ) {
+
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onUpPosition.fromArray( array );
+
+		handleClick();
+
+		document.removeEventListener( 'mouseup', onMouseUp, false );
+
+	};
+
+	var onTouchStart = function ( event ) {
+
+		var touch = event.changedTouches[ 0 ];
+
+		var array = getMousePosition( container.dom, touch.clientX, touch.clientY );
+		onDownPosition.fromArray( array );
+
+		document.addEventListener( 'touchend', onTouchEnd, false );
+
+	};
+
+	var onTouchEnd = function ( event ) {
+
+		var touch = event.changedTouches[ 0 ];
+
+		var array = getMousePosition( container.dom, touch.clientX, touch.clientY );
+		onUpPosition.fromArray( array );
+
+		handleClick();
+
+		document.removeEventListener( 'touchend', onTouchEnd, false );
 
 	};
 
 	var onDoubleClick = function ( event ) {
 
-		var intersects = getIntersects( event, objects );
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onDoubleClickPosition.fromArray( array );
 
-		if ( intersects.length > 0 && intersects[ 0 ].object === editor.selected ) {
+		var intersects = getIntersects( onDoubleClickPosition, objects );
 
-			controls.focus( editor.selected );
+		if ( intersects.length > 0 ) {
+
+			var intersect = intersects[ 0 ];
+
+			signals.objectFocused.dispatch( intersect.object );
 
 		}
 
 	};
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'touchstart', onTouchStart, false );
 	container.dom.addEventListener( 'dblclick', onDoubleClick, false );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
-	controls.center.fromArray( editor.config.getKey( 'camera/target' ) )
+	controls.center.fromArray( editor.config.getKey( 'camera/target' ) );
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
@@ -188,7 +239,7 @@ var Viewport = function ( editor ) {
 				break;
 
 		}
-		
+
 		renderer.setClearColor( clearColor );
 
 		render();
@@ -213,14 +264,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( type ) {
+	signals.rendererChanged.add( function ( type, antialias ) {
 
 		container.dom.removeChild( renderer.domElement );
 
-		renderer = new THREE[ type ]( { antialias: true } );
-		renderer.autoClear = false;
-		renderer.autoUpdateScene = false;
+		renderer = createRenderer( type, antialias );
 		renderer.setClearColor( clearColor );
+		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
@@ -247,8 +297,10 @@ var Viewport = function ( editor ) {
 
 		saveTimeout = setTimeout( function () {
 
-			editor.config.setKey( 'camera/position', camera.position.toArray() );
-			editor.config.setKey( 'camera/target', controls.center.toArray() );
+			editor.config.setKey(
+				'camera/position', camera.position.toArray(),
+				'camera/target', controls.center.toArray()
+			);
 
 		}, 1000 );
 
@@ -283,7 +335,19 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.geometryChanged.add( render );
+	signals.objectFocused.add( function ( object ) {
+
+		controls.focus( object );
+
+	} );
+
+	signals.geometryChanged.add( function ( geometry ) {
+
+		selectionBox.update( editor.selected );
+
+		render();
+
+	} );
 
 	signals.objectAdded.add( function ( object ) {
 
@@ -449,28 +513,24 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var clearColor, renderer;
+	var createRenderer = function ( type, antialias ) {
 
-	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
+		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
 
-		renderer = new THREE[ editor.config.getKey( 'renderer' ) ]( { antialias: true } );
-
-	} else {
-
-		if ( System.support.webgl === true ) {
-
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-
-		} else {
-
-			renderer = new THREE.CanvasRenderer();
+			type = 'CanvasRenderer';
 
 		}
 
-	}
+		var renderer = new THREE[ type ]( { antialias: antialias } );
+		renderer.autoClear = false;
+		renderer.autoUpdateScene = false;
 
-	renderer.autoClear = false;
-	renderer.autoUpdateScene = false;
+		return renderer;
+
+	};
+
+	var clearColor;
+	var renderer = createRenderer( editor.config.getKey( 'renderer' ), editor.config.getKey( 'renderer/antialias' ) );
 	container.dom.appendChild( renderer.domElement );
 
 	animate();

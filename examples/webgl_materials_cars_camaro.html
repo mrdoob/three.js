@@ -91,6 +91,7 @@
 				pointLight.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.setFaceCulling( THREE.CullFaceNone );
 

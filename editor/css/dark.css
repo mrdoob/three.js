@@ -33,6 +33,10 @@ input.Number {
 	bottom: 32px;
 }
 
+	#viewport #info {
+		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
+	}
+
 #player {
 	position: absolute;
 	top: 32px;
@@ -45,29 +49,38 @@ input.Number {
 	position: absolute;
 	width: 100%;
 	height: 32px;
-	background-color: #111;
+	background: #111;
 	padding: 0px;
 	margin: 0px;
+	right: 0px;
+	top: 0px;
 }
 
 	#menubar .menu {
 		float: left;
-		width: 50px;
 		cursor: pointer;
+		padding-right: 8px;
+	}
+
+	#menubar .menu.right {
+		float: right;
+		cursor: auto;
+		text-align: right;
 	}
 
 		#menubar .menu .title {
+			display: inline-block;
 			color: #888;
 			margin: 0px;
 			padding: 8px;
 		}
 
 		#menubar .menu .options {
+			position: absolute;
 			display: none;
 			padding: 5px 0px;
-			background-color: #111;
+			background: #111;
 			width: 140px;
-			border-top: solid 1px #1D1D1D;
 		}
 
 		#menubar .menu:hover .options {
@@ -156,5 +169,3 @@ input.Number {
 	#toolbar button {
 		margin-right: 6px;
 	}
-
-

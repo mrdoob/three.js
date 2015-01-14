@@ -30,17 +30,17 @@
 
 
 
-		<h3>.[page:Vector3 a]</h3>
+		<h3>[property:Vector3 a]</h3>
 		<div>
 		The first [page:Vector3] of the triangle.
 		</div>
 		
-		<h3>.[page:Vector3 c]</h3>
+		<h3>[property:Vector3 b]</h3>
 		<div>
 		The second [page:Vector3] of the triangle.
 		</div>
 
-		<h3>.[page:Vector3 b]</h3>
+		<h3>[property:Vector3 c]</h3>
 		<div>
 		The third [page:Vector3] of the triangle.
 		</div>
@@ -49,7 +49,7 @@
 
 
 
-		<h3>.setFromPointsAndIndices([page:Array points], [page:Integer i0], [page:Integer i1], [page:Integer i2]) [page:Triangle this]</h3>
+		<h3>[method:Triangle setFromPointsAndIndices]([page:Array points], [page:Integer i0], [page:Integer i1], [page:Integer i2]) [page:Triangle this]</h3>
 		<div>
 		points -- [page:Array] of [page:Vector3]s <br />
 		i0 -- [page:Integer] index <br />
@@ -60,7 +60,7 @@
 		Sets the triangle's vectors to the vectors in the array.
 		</div>
 
-		<h3>.set([page:Vector3 a], [page:Vector3 b], [page:Vector3 c]) [page:Triangle this]</h3>
+		<h3>[method:Triangle set]([page:Vector3 a], [page:Vector3 b], [page:Vector3 c]) [page:Triangle this]</h3>
 		<div>
 		a -- [page:Vector3] <br />
 		b -- [page:Vector3] <br />
@@ -70,7 +70,7 @@
 		Sets the triangle's vectors to the passed vectors.
 		</div>
 
-		<h3>.normal([page:Vector3 optionalTarget]) [page:Vector3]</h3>
+		<h3>[method:Vector3 normal]([page:Vector3 optionalTarget])</h3>
 		<div>
 		optionalTarget -- Optional [page:Vector3] target to set the result.
 		</div>
@@ -78,7 +78,7 @@
 		Return the calculated normal of the triangle.
 		</div>
 
-		<h3>.barycoordFromPoint([page:Vector3 point], [page:Vector3 optionalTarget]) [page:Vector3]</h3>
+		<h3>[method:Vector3 barycoordFromPoint]([page:Vector3 point], [page:Vector3 optionalTarget])</h3>
 		<div>
 		point -- [page:Vector3] <br />
 		optionalTarget -- Optional [page:Vector3] target to set the result.
@@ -88,17 +88,17 @@
 		[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)
 		</div>
 
-		<h3>.clone() [page:Triangle]</h3>
+		<h3>[method:Triangle clone]()</h3>
 		<div>
 		Return a new copy of this triangle.
 		</div>
 
-		<h3>.area() [page:Float]</h3>
+		<h3>[method:Float area]()</h3>
 		<div>
 		Return the area of the triangle.
 		</div>
 
-		<h3>.midpoint([page:Vector3 optionalTarget]) [page:Vector3]</h3>
+		<h3>[method:Vector3 midpoint]([page:Vector3 optionalTarget])</h3>
 		<div>
 		optionalTarget -- Optional [page:Vector3] target to set the result.
 		</div>
@@ -106,7 +106,7 @@
 		Return the midpoint of the triangle. Optionally sets a target vector.
 		</div>
 
-		<h3>.equals([page:Triangle triangle]) [page:Boolean]</h3>
+		<h3>[method:Boolean equals]([page:Triangle triangle])</h3>
 		<div>
 		triangle -- [page:Triangle]
 		</div>
@@ -114,7 +114,7 @@
 		Checks to see if two triangles are equal (share the same vectors).
 		</div>
 
-		<h3>.plane([page:Plane optionalTarget]) [page:Plane]</h3>
+		<h3>[method:Plane plane]([page:Plane optionalTarget])</h3>
 		<div>
 		optionalTarget -- Optional [page:Plane] target to set the result.
 		</div>
@@ -122,7 +122,7 @@
 		Return a [page:Plane plane] based on the triangle. Optionally sets a target plane. 
 		</div>
 
-		<h3>.containsPoint([page:Vector3 point]) [page:Boolean]</h3>
+		<h3>[method:Boolean containsPoint]([page:Vector3 point])</h3>
 		<div>
 		point -- [page:Vector3]
 		</div>
@@ -130,7 +130,7 @@
 		Checks to see if the passed vector is within the triangle.
 		</div>
 
-		<h3>.copy([page:Triangle triangle]) [page:Triangle]</h3>
+		<h3>[method:Triangle copy]([page:Triangle triangle])</h3>
 		<div>
 		triangle -- [page:Triangle]
 		</div>

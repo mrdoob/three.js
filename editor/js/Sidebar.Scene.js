@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
@@ -23,6 +27,11 @@ Sidebar.Scene = function ( editor ) {
 		editor.selectById( parseInt( outliner.getValue() ) );
 
 		ignoreObjectSelectedSignal = false;
+
+	} );
+	outliner.onDblClick( function () {
+
+		editor.focusById( parseInt( outliner.getValue() ) );
 
 	} );
 	container.add( outliner );
@@ -119,10 +128,12 @@ Sidebar.Scene = function ( editor ) {
 
 	var refreshUI = function () {
 
+		var camera = editor.camera;
 		var scene = editor.scene;
 
 		var options = [];
 
+		// options.push( { value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
 		options.push( { value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {

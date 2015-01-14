@@ -11,18 +11,19 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Create a material that can draw custom sprites using a 2d canvas.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo parameters])</h3>
+		<h3>[name]( [page:Object parameters] )</h3>
 		<div>
-		parameters -- todo
+		parameters is an object that can be used to set up the default properties
 		</div>
 		<div>
-		todo
+		color - the color of the sprite<br/>
+		program - the program used to draw the sprite
 		</div>
 
 
@@ -30,22 +31,22 @@
 
 
 
-		<h3>.[page:Color color]</h3>
+		<h3>[property:Color color]</h3>
 		<div>
-		todo
-		</div> 
+		The color of the sprite. The material will set up the color for the context before calling the material's program.
+		</div>
 
 		<h2>Methods</h2>
 
 
 
-		<h3>.program([page:todo context], [page:todo color]) [page:todo]</h3>
+		<h3>[method:null program]([page:CanvasRenderingContext2D context], [page:Color color])</h3>
 		<div>
-		context -- todo <br />
-		color -- todo
+		context -- The canvas context <br />
+		color -- The color of the sprite
 		</div>
 		<div>
-		todo
+			Define a program that will use the context to draw the sprite.
 		</div>
 
 		<h2>Source</h2>

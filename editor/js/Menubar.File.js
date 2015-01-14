@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.File = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -19,14 +23,9 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'New' );
 	option.onClick( function () {
 
-		if ( confirm( 'Are you sure?' ) ) {
+		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-			editor.config.clear();
-			editor.storage.clear( function () {
-
-				location.href = location.pathname;
-
-			} );
+			editor.clear();
 
 		}
 
@@ -67,7 +66,7 @@ Menubar.File = function ( editor ) {
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Geometry' );
 	option.onClick( function () {
-		
+
 		var object = editor.selected;
 
 		if ( object === null ) {
@@ -152,18 +151,9 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		var geometry = object.geometry;
+		var exporter = new THREE.OBJExporter();
 
-		if ( geometry === undefined ) {
-
-			alert( 'The selected object doesn\'t have geometry.' );
-			return;
-
-		}
-
-		var exporter = new OBJExporter();
-
-		exportString( exporter.parse( geometry ) );
+		exportString( exporter.parse( object ) );
 
 	} );
 	options.add( option );
@@ -175,7 +165,7 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export STL' );
 	option.onClick( function () {
 
-		var exporter = new STLExporter();
+		var exporter = new THREE.STLExporter();
 
 		exportString( exporter.parse( editor.scene ) );
 
@@ -186,8 +176,87 @@ Menubar.File = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
-	/*
+	// Publish
 
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish' );
+	option.onClick( function () {
+
+		var camera = editor.camera;
+
+		var zip = new JSZip();
+
+		zip.file( 'index.html', [
+
+			'<!DOCTYPE html>',
+			'<html lang="en">',
+			'	<head>',
+			'		<title>three.js</title>',
+			'		<meta charset="utf-8">',
+			'		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">',
+			'		<style>',
+			'		body {',
+			'			margin: 0px;',
+			'			overflow: hidden;',
+			'		}',
+			'		</style>',
+			'	</head>',
+			'	<body ontouchstart="">',
+			'		<script src="js/three.min.js"></script>',
+			'		<script src="js/app.js"></script>',
+			'		<script>',
+			'',
+			'			var loader = new THREE.XHRLoader();',
+			'			loader.load( \'app.json\', function ( text ) {',
+			'',
+			'				var player = new APP.Player();',
+			'				player.load( JSON.parse( text ) );',
+			'				player.setSize( window.innerWidth, window.innerHeight );',
+			'				player.play();',
+			'',
+			'				document.body.appendChild( player.dom );',
+			'',
+			'			} );',
+			'',
+			'		</script>',
+			'	</body>',
+			'</html>'
+
+		].join( '\n' ) );
+
+		//
+
+		var output = editor.toJSON();
+		output = JSON.stringify( output, null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		zip.file( 'app.json', output );
+
+		//
+
+		var manager = new THREE.LoadingManager( function () {
+
+			location.href = 'data:application/zip;base64,' + zip.generate();
+
+		} );
+
+		var loader = new THREE.XHRLoader( manager );
+		loader.load( 'js/libs/app.js', function ( content ) {
+
+			zip.file( 'js/app.js', content );
+
+		} );
+		loader.load( '../build/three.min.js', function ( content ) {
+
+			zip.file( 'js/three.min.js', content );
+
+		} );
+
+	} );
+	options.add( option );
+
+	/*
 	// Test
 
 	var option = new UI.Panel();
@@ -202,17 +271,6 @@ Menubar.File = function ( editor ) {
 	options.add( option );
 	*/
 
-	// Publish
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Publish' );
-	option.onClick( function () {
-
-		alert( 'Not yet...' );
-
-	} );
-	options.add( option );
 
 
 	//

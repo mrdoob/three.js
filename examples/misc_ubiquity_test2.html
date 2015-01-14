@@ -15,6 +15,10 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<div id='container1' style='float: left '></div>
@@ -127,7 +131,7 @@
 
 					var material = new THREE.SpriteMaterial( { map: texture3 } );
 					material.rotation = 2 * Math.PI * ( Math.random() - 0.5 );
-					
+
 					var sprite = new THREE.Sprite( material );
 
 					sprite.position.x = Math.random() * 1000 - 500;
@@ -144,12 +148,14 @@
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xf0f0f0 );
+				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( width, height );
 				var container1 = document.getElementById( 'container1' );
 				container1.appendChild( canvasRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setClearColor( 0xf0f0f0 );
+				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
 				var container2 = document.getElementById( 'container2' );
 				container2.appendChild( webglRenderer.domElement );

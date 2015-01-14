@@ -1,13 +1,17 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
 
-	var geometry = object.geometry;
+	var parameters = object.geometry.parameters;
 
 	// radius
 
 	var radiusRow = new UI.Panel();
-	var radius = new UI.Number( geometry.parameters.radius ).onChange( update );
+	var radius = new UI.Number( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
 	radiusRow.add( radius );
@@ -17,7 +21,7 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 	// segments
 
 	var segmentsRow = new UI.Panel();
-	var segments = new UI.Integer( geometry.parameters.segments ).setRange( 3, Infinity ).onChange( update );
+	var segments = new UI.Integer( parameters.segments ).setRange( 3, Infinity ).onChange( update );
 
 	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
@@ -34,7 +38,7 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 			radius.getValue(),
 			segments.getValue()
 		);
-		object.geometry.buffersNeedUpdate = true;
+
 		object.geometry.computeBoundingSphere();
 
 		signals.geometryChanged.dispatch( object );

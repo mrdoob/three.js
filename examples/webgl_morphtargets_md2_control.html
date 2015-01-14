@@ -5,29 +5,29 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #000;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 
-			background-color: #fff;
-			margin: 0px;
-			overflow: hidden;
-		    }
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-		    #info {
-			color:#000;
-			position: relative;
-			margin: 0 auto -2.1em;
-			top: 0px;
+			#info {
+				color:#000;
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0px;
 
-			padding: 5px;
-			z-index:100;
-		    }
+				padding: 5px;
+				z-index:100;
+			}
 
-		    a { color: skyblue; }
+			a { color: skyblue; }
 
 			#stats { position: absolute; top:0; left: 0 }
 			#stats #fps { background: transparent !important }
@@ -124,7 +124,7 @@
 				//  GROUND
 
 				var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
-				var gg = new THREE.PlaneGeometry( 16000, 16000 );
+				var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
 				var ground = new THREE.Mesh( gg, gm );
@@ -138,9 +138,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				container.appendChild( renderer.domElement );
 
 				//

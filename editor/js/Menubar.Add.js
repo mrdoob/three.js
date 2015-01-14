@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Add = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -94,7 +98,7 @@ Menubar.Add = function ( editor ) {
 	option.onClick( function () {
 
 		var radius = 20;
-		var segments = 8;
+		var segments = 32;
 
 		var geometry = new THREE.CircleGeometry( radius, segments );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
@@ -116,7 +120,7 @@ Menubar.Add = function ( editor ) {
 		var radiusTop = 20;
 		var radiusBottom = 20;
 		var height = 100;
-		var radiusSegments = 8;
+		var radiusSegments = 32;
 		var heightSegments = 1;
 		var openEnded = false;
 
@@ -140,8 +144,12 @@ Menubar.Add = function ( editor ) {
 		var radius = 75;
 		var widthSegments = 32;
 		var heightSegments = 16;
+		var phiStart = 0;
+		var phiLength = Math.PI * 2;
+		var thetaStart = 0;
+		var thetaLength = Math.PI;
 
-		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
@@ -280,7 +288,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'SpotLight ' + ( ++ lightCount );
 		light.target.name = 'SpotLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
@@ -302,7 +310,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'DirectionalLight ' + ( ++ lightCount );
 		light.target.name = 'DirectionalLight ' + ( lightCount ) + ' Target';
 
-		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );
@@ -324,7 +332,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
 		light.name = 'HemisphereLight ' + ( ++ lightCount );
 
-		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+		light.position.set( 0.5, 1, 0.75 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
 		editor.select( light );

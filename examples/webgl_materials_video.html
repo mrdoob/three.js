@@ -24,8 +24,7 @@
 			#info {
 				color:#fff;
 				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+				top: 5px; width: 100%;
 				z-index:100;
 			}
 
@@ -99,17 +98,16 @@
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
 
-				texture = new THREE.Texture( video );
+				texture = new THREE.VideoTexture( video );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.format = THREE.RGBFormat;
-				texture.generateMipmaps = false;
 
 				//
 
@@ -251,12 +249,6 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
-
-				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
-					if ( texture ) texture.needsUpdate = true;
-
-				}
 
 				for ( i = 0; i < cube_count; i ++ ) {
 

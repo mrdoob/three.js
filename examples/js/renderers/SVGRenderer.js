@@ -11,6 +11,7 @@ THREE.SVGObject = function ( node ) {
 };
 
 THREE.SVGObject.prototype = Object.create( THREE.Object3D.prototype );
+THREE.SVGObject.prototype.constructor = THREE.SVGObject;
 
 THREE.SVGRenderer = function () {
 
@@ -113,7 +114,7 @@ THREE.SVGRenderer = function () {
 			_svg.removeChild( _svg.childNodes[ 0 ] );
 
 		}
-		
+
 		_svg.style.backgroundColor = 'rgba(' + ( ( _clearColor.r * 255 ) | 0 ) + ',' + ( ( _clearColor.g * 255 ) | 0 ) + ',' + ( ( _clearColor.b * 255 ) | 0 ) + ',' + _clearAlpha + ')';
 
 	};

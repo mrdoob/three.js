@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Script = function ( editor ) {
 
 	var signals = editor.signals;
@@ -14,68 +18,57 @@ Sidebar.Script = function ( editor ) {
 	container.addStatic( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 
-	var scriptsRow = new UI.Panel();
-	container.add( scriptsRow );
-
-	// source
-
-	var timeout;
-
-	var scriptSourceRow = new UI.Panel();
-	var scriptSource = new UI.TextArea( 'javascript' ).setWidth( '240px' ).setHeight( '180px' ).setFontSize( '12px' );
-	scriptSource.onKeyUp( function () {
-
-		clearTimeout( timeout );
-
-		timeout = setTimeout( function () {
-
-			var object = editor.selected;
-			var source = scriptSource.getValue();
-
-			try {
-
-				var script = new Function( 'scene', 'time', source ).bind( object.clone() );
-				script( new THREE.Scene(), 0 );
-
-				scriptSource.dom.classList.add( 'success' );
-				scriptSource.dom.classList.remove( 'fail' );
-
-			} catch ( error ) {
-
-				scriptSource.dom.classList.remove( 'success' );
-				scriptSource.dom.classList.add( 'fail' );
-
-				return;
-
-			}
-
-			object.script = new THREE.Script( source );
-
-			editor.signals.objectChanged.dispatch( object );
-
-		}, 500 );
-
-	} );	
-
-	scriptSourceRow.add( scriptSource );
-
-	container.add( scriptSourceRow );
-
 	//
 
+	var scriptsContainer = new UI.Panel();
+	container.add( scriptsContainer );
+
+	var newScript = new UI.Button( 'New' );
+	newScript.setMarginLeft( '5px' );
+	newScript.onClick( function () {
+
+		var script = new UI.ScriptEditor( editor );
+		script.setValue( { name: '', source: 'return {\n\tupdate: function ( event ) {}\n};' } );
+		script.onChange( function () {
+
+			signals.scriptChanged.dispatch();
+
+		} );
+		scriptsContainer.add( script );
+
+	} );
+	container.add( newScript );
+
+	var loadScript = new UI.Button( 'Load' );
+	loadScript.setMarginLeft( '4px' );
+	container.add( loadScript );
+
+	// signals
+
 	signals.objectSelected.add( function ( object ) {
+
+		scriptsContainer.clear();
 
 		if ( object !== null ) {
 
 			container.setDisplay( 'block' );
 
-			if ( object.script !== undefined ) {
+			var sources = editor.scripts[ object.uuid ];
 
-				scriptSource.setValue( object.script.source );
+			if ( sources !== undefined ) {
 
-			} else {
+				for ( var i = 0; i < sources.length; i ++ ) {
 
-				scriptSource.setValue( '' );
+					var script = new UI.ScriptEditor( editor );
+					script.setValue( sources[ i ] );
+					script.onChange( function () {
+
+						signals.scriptChanged.dispatch();
+
+					} );
+					scriptsContainer.add( script );
+
+				}
 
 			}
 
@@ -87,6 +80,23 @@ Sidebar.Script = function ( editor ) {
 
 	} );
 
+	signals.scriptChanged.add( function () {
+
+		var array = [];
+		var object = editor.selected;
+
+		for ( var i = 0; i < scriptsContainer.children.length; i ++ ) {
+
+			var script = scriptsContainer.children[ i ];
+
+			array.push( script.getValue() );
+
+		}
+
+		editor.scripts[ object.uuid ] = array;
+
+	} );
+
 	return container;
 
-}
+};

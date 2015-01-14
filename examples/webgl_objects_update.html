@@ -108,8 +108,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -187,7 +187,6 @@
 						
 					
 						objectNewGeometry.geometry = createGeometry(1);
-						objectNewGeometry.geometry.buffersNeedUpdate = true;
 						randomizeFaces(objectRandomizeFaces);
 					
 						scene.add(objectToggleAddRemove);
@@ -199,7 +198,6 @@
 					if (scene.children.indexOf(objectToggleAddRemove) !== -1) {
 											
 						objectNewGeometry.geometry = createGeometry(1);
-						objectNewGeometry.geometry.buffersNeedUpdate = true;
 						randomizeFaces(objectRandomizeFaces);
 					
 						scene.remove(objectToggleAddRemove);

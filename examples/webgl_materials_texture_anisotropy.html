@@ -139,7 +139,7 @@
 
 				//
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.rotation.x = - Math.PI / 2;
@@ -154,8 +154,9 @@
 
 				// RENDERER
 
+				renderer.setClearColor( scene1.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setClearColor( scene1.fog.color, 1 );
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = "relative";

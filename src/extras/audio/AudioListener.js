@@ -8,11 +8,12 @@ THREE.AudioListener = function () {
 
 	this.type = 'AudioListener';
 
-	this.context = new AudioContext();
+	this.context = new ( window.AudioContext || window.webkitAudioContext )();
 
 };
 
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
+THREE.AudioListener.prototype.constructor = THREE.AudioListener;
 
 THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
@@ -26,10 +27,11 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 	var positionPrev = new THREE.Vector3();
 
 	return function ( force ) {
-	
+
 		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
 		var listener = this.context.listener;
+		var up = this.up;
 
 		this.matrixWorld.decompose( position, quaternion, scale );
 
@@ -37,7 +39,7 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 		velocity.subVectors( position, positionPrev );
 
 		listener.setPosition( position.x, position.y, position.z );
-		listener.setOrientation( orientation.x, orientation.y, orientation.z, this.up.x, this.up.y, this.up.z );
+		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );
 		listener.setVelocity( velocity.x, velocity.y, velocity.z );
 
 		positionPrev.copy( position );

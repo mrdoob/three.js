@@ -33,6 +33,9 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
 		<script src="js/geometries/hilbert3D.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -96,7 +99,8 @@
 				scene.add( object );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0x111111, 1 );
+				renderer.setClearColor( 0x111111 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
 				var container = document.getElementById( 'container' );

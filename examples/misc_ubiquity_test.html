@@ -16,8 +16,11 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 		<script src="js/renderers/SVGRenderer.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="obj/Qrcode.js"></script>
@@ -74,7 +77,7 @@
 
 				// PLANE
 
-				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
+				mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 				mesh.position.y = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
@@ -179,6 +182,7 @@
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xf0f0f0 );
+				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( width, height );
 				document.body.appendChild( canvasRenderer.domElement );
 
@@ -195,6 +199,7 @@
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setClearColor( 0xf0f0f0 );
+				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( width, height );
 				document.body.appendChild( webglRenderer.domElement );
 

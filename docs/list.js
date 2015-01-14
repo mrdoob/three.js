@@ -2,7 +2,9 @@ var list = {
 
 	"Manual": {
 		"Introduction": [
-			[ "Creating a scene", "manual/introduction/Creating-a-scene" ]
+			[ "Creating a scene", "manual/introduction/Creating-a-scene" ],
+			[ "Matrix transformations", "manual/introduction/Matrix-transformations" ]
+
 		]
 	},
 
@@ -17,6 +19,7 @@ var list = {
 
 		"Cameras": [
 			[ "Camera", "api/cameras/Camera" ],
+			[ "CubeCamera", "api/cameras/CubeCamera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
 			[ "PerspectiveCamera", "api/cameras/PerspectiveCamera" ]
 		],
@@ -29,7 +32,6 @@ var list = {
 			[ "Face3", "api/core/Face3" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
-			[ "Projector", "api/core/Projector" ],
 			[ "Raycaster", "api/core/Raycaster" ],
 		],
 
@@ -45,15 +47,25 @@ var list = {
 
 
 		"Loaders": [
+			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
+			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
+			[ "glTFLoader", "api/loaders/glTFLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
 			[ "Loader", "api/loaders/Loader" ],
 			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "MaterialLoader", "api/loaders/MaterialLoader" ],
+			[ "MTLLoader", "api/loaders/MTLLoader" ],
+			[ "OBJLoader", "api/loaders/OBJLoader" ],
+			[ "OBJMTLLoader", "api/loaders/OBJMTLLoader" ],
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
+			[ "PDBLoader", "api/loaders/PDBLoader" ],
+			[ "SVGLoader", "api/loaders/SVGLoader" ],
+			[ "SceneLoader", "api/loaders/SceneLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
+			[ "TGALoader", "api/loaders/TGALoader" ],
 			[ "XHRLoader", "api/loaders/XHRLoader" ]
 		],
 
@@ -97,6 +109,7 @@ var list = {
 
 		"Objects": [
 			[ "Bone", "api/objects/Bone" ],
+			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
@@ -113,14 +126,6 @@ var list = {
 			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
 		],
 
-		"Renderers / Renderables": [
-			[ "RenderableFace", "api/renderers/renderables/RenderableFace" ],
-			[ "RenderableLine", "api/renderers/renderables/RenderableLine" ],
-			[ "RenderableObject", "api/renderers/renderables/RenderableObject" ],
-			[ "RenderableSprite", "api/renderers/renderables/RenderableSprite" ],
-			[ "RenderableVertex", "api/renderers/renderables/RenderableVertex" ]
-		],
-
 		"Renderers / Shaders": [
 			[ "ShaderChunk", "api/renderers/shaders/ShaderChunk" ],
 			[ "ShaderLib", "api/renderers/shaders/ShaderLib" ],
@@ -131,6 +136,12 @@ var list = {
 		"Renderers / WebGL": [
 			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
 			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ]
+		],
+
+		"Renderers / WebGL / Plugins": [
+			[ "LensFlarePlugin", "api/renderers/webgl/plugins/LensFlarePlugin" ],
+			[ "ShadowMapPlugin", "api/renderers/webgl/plugins/ShadowMapPlugin" ],
+			[ "SpritePlugin", "api/renderers/webgl/plugins/SpritePlugin" ]
 		],
 
 		"Scenes": [
@@ -159,12 +170,6 @@ var list = {
 			[ "AnimationMorphTarget", "api/extras/animation/AnimationMorphTarget" ]
 		],
 
-		"Extras / Cameras": [
-			[ "CombinedCamera", "api/extras/cameras/CombinedCamera" ],
-			[ "CubeCamera", "api/extras/cameras/CubeCamera" ]
-		],
-
-		
 		"Extras / Core": [
 			[ "Curve", "api/extras/core/Curve" ],
 			[ "CurvePath", "api/extras/core/CurvePath" ],
@@ -192,6 +197,7 @@ var list = {
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],
 			[ "CylinderGeometry", "api/extras/geometries/CylinderGeometry" ],
+			[ "DodecahedronGeometry", "api/extras/geometries/DodecahedronGeometry" ],
 			[ "ExtrudeGeometry", "api/extras/geometries/ExtrudeGeometry" ],
 			[ "IcosahedronGeometry", "api/extras/geometries/IcosahedronGeometry" ],
 			[ "LatheGeometry", "api/extras/geometries/LatheGeometry" ],
@@ -228,22 +234,11 @@ var list = {
 
 		"Extras / Objects": [
 			[ "ImmediateRenderObject", "api/extras/objects/ImmediateRenderObject" ],
-			[ "LensFlare", "api/extras/objects/LensFlare" ],
 			[ "MorphBlendMesh", "api/extras/objects/MorphBlendMesh" ]
 		],
 
-		"Extras / Renderers / Plugins": [
-			[ "DepthPassPlugin", "api/extras/renderers/plugins/DepthPassPlugin" ],
-			[ "LensFlarePlugin", "api/extras/renderers/plugins/LensFlarePlugin" ],
-			[ "ShadowMapPlugin", "api/extras/renderers/plugins/ShadowMapPlugin" ],
-			[ "SpritePlugin", "api/extras/renderers/plugins/SpritePlugin" ]
-		],
-
-		"Extras / Shaders": [
-			[ "ShaderFlares", "api/extras/shaders/ShaderFlares" ]
-		],
-
 		"Examples" : [
+			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "api/examples/Lut" ]
 
 		]

@@ -13,15 +13,18 @@
  *
  * Firefox:
  *
- * OSX: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.mac.dmg
- * WIN: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.win64-x86_64.zip
+ * http://mozvr.com/downloads.html
  *
  * Chrome builds:
  *
- * https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
+ * https://drive.google.com/a/google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
  *
  */
 THREE.VREffect = function ( renderer, done ) {
+
+	var cameraLeft = new THREE.PerspectiveCamera();
+	var cameraRight = new THREE.PerspectiveCamera();
+
 	this._renderer = renderer;
 
 	this._init = function() {
@@ -65,43 +68,39 @@ THREE.VREffect = function ( renderer, done ) {
 	this.render = function ( scene, camera ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
-		renderer.enableScissorTest( false );
 		// VR render mode if HMD is available
 		if ( vrHMD ) {
 			this.renderStereo.apply( this, arguments );
 			return;
 		}
 		// Regular render mode if not HMD
-		renderer.render.apply( this._renderer , arguments );
+		renderer.render.apply( this._renderer, arguments );
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
-		var cameraLeft;
-		var cameraRight;
+
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.width / renderer.devicePixelRatio;
-		var rendererHeight = renderer.domElement.height / renderer.devicePixelRatio;
+		var rendererWidth = renderer.domElement.clientWidth;
+		var rendererHeight = renderer.domElement.clientHeight;
 		var eyeDivisionLine = rendererWidth / 2;
+
 		renderer.enableScissorTest( true );
 		renderer.clear();
 
-		// Grab camera matrix from user.
-		// This is interpreted as the head base.
-		if ( camera.matrixAutoUpdate ) {
-			camera.updateMatrix();
+		if ( camera.parent === undefined ) {
+			camera.updateMatrixWorld();
 		}
-		var eyeWorldMatrix = camera.matrixWorld.clone();
 
-		cameraLeft = camera.clone();
-		cameraRight = camera.clone();
-		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV );
-		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV );
-		cameraLeft.position.add(new THREE.Vector3(
-			leftEyeTranslation.x, leftEyeTranslation.y, leftEyeTranslation.z) );
-		cameraRight.position.add(new THREE.Vector3(
-			rightEyeTranslation.x, rightEyeTranslation.y, rightEyeTranslation.z) );
+		cameraLeft.projectionMatrix = this.FovToProjection( this.leftEyeFOV, true, camera.near, camera.far );
+		cameraRight.projectionMatrix = this.FovToProjection( this.rightEyeFOV, true, camera.near, camera.far );
+
+		camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
+		camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
+
+		cameraLeft.translateX( leftEyeTranslation.x );
+		cameraRight.translateX( rightEyeTranslation.x );
 
 		// render left eye
 		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
@@ -113,6 +112,12 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.render( scene, cameraRight );
 
+		renderer.enableScissorTest( false );
+
+	};
+
+	this.setSize = function( width, height ) {
+		renderer.setSize( width, height );
 	};
 
 	this.setFullScreen = function( enable ) {
@@ -154,7 +159,7 @@ THREE.VREffect = function ( renderer, done ) {
 
 		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
 		function onFullScreenChanged() {
-			if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
+			if ( !document.mozFullScreenElement && !document.webkitFullscreenElement ) {
 				self.setFullScreen( false );
 			}
 		}

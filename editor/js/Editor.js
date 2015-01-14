@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Editor = function () {
 
 	var SIGNALS = signals;
@@ -18,6 +22,9 @@ var Editor = function () {
 
 		// notifications
 
+		savingStarted: new SIGNALS.Signal(),
+		savingFinished: new SIGNALS.Signal(),
+
 		themeChanged: new SIGNALS.Signal(),
 
 		transformModeChanged: new SIGNALS.Signal(),
@@ -32,6 +39,8 @@ var Editor = function () {
 		geometryChanged: new SIGNALS.Signal(),
 
 		objectSelected: new SIGNALS.Signal(),
+		objectFocused: new SIGNALS.Signal(),
+
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
 		objectRemoved: new SIGNALS.Signal(),
@@ -40,6 +49,9 @@ var Editor = function () {
 		helperRemoved: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
+
+		scriptChanged: new SIGNALS.Signal(),
+
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
@@ -48,22 +60,23 @@ var Editor = function () {
 		showGridChanged: new SIGNALS.Signal()
 
 	};
-	
+
 	this.config = new Config();
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
+	this.camera.name = 'Camera';
+
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
-	
+
 	this.sceneHelpers = new THREE.Scene();
 
 	this.object = {};
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
-	
 	this.scripts = {};
 
 	this.selected = null;
@@ -81,16 +94,19 @@ Editor.prototype = {
 
 	},
 
+	/*
 	showDialog: function ( value ) {
-	
+
 		this.signals.showDialog.dispatch( value );
-	
+
 	},
-	
+	*/
+
 	//
 
 	setScene: function ( scene ) {
 
+		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -141,8 +157,6 @@ Editor.prototype = {
 	removeObject: function ( object ) {
 
 		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
-
-		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var scope = this;
 
@@ -283,35 +297,33 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		this.selected = object;
+		if ( this.selected === object ) return;
+
+		var uuid = null;
 
 		if ( object !== null ) {
 
-			this.config.setKey( 'selected', object.uuid );
-
-		} else {
-
-			this.config.setKey( 'selected', null );
+			uuid = object.uuid;
 
 		}
 
+		this.selected = object;
+
+		this.config.setKey( 'selected', uuid );
 		this.signals.objectSelected.dispatch( object );
 
 	},
 
 	selectById: function ( id ) {
 
-		var scope = this;
+		if ( id === this.camera.id ) {
 
-		this.scene.traverse( function ( child ) {
+			this.select( this.camera );
+			return;
 
-			if ( child.id === id ) {
+		}
 
-				scope.select( child );
-
-			}
-
-		} );
+		this.select( this.scene.getObjectById( id, true ) );
 
 	},
 
@@ -334,6 +346,85 @@ Editor.prototype = {
 	deselect: function () {
 
 		this.select( null );
+
+	},
+
+	focus: function ( object ) {
+
+		this.signals.objectFocused.dispatch( object );
+
+	},
+
+	focusById: function ( id ) {
+
+		this.focus( this.scene.getObjectById( id, true ) );
+
+	},
+
+	clear: function () {
+
+		this.camera.position.set( 500, 250, 500 );
+		this.camera.lookAt( new THREE.Vector3() );
+
+		var objects = this.scene.children;
+
+		while ( objects.length > 0 ) {
+
+			this.removeObject( objects[ 0 ] );
+
+		}
+
+		this.geometries = {};
+		this.materials = {};
+		this.textures = {};
+		this.scripts = {};
+
+		this.deselect();
+
+	},
+
+	//
+
+	fromJSON: function ( json ) {
+
+		var loader = new THREE.ObjectLoader();
+
+		// backwards
+
+		if ( json.scene === undefined ) {
+
+			var scene = loader.parse( json );
+
+			this.setScene( scene );
+
+			return;
+
+		}
+
+		// TODO: Clean this up somehow
+
+		var camera = loader.parse( json.camera );
+
+		this.camera.position.copy( camera.position );
+		this.camera.rotation.copy( camera.rotation );
+		this.camera.aspect = camera.aspect;
+		this.camera.near = camera.near;
+		this.camera.far = camera.far;
+
+		this.setScene( loader.parse( json.scene ) );
+		this.scripts = json.scripts;
+
+	},
+
+	toJSON: function () {
+
+		return {
+
+			camera: this.camera.toJSON(),
+			scene: this.scene.toJSON(),
+			scripts: this.scripts
+
+		};
 
 	}
 

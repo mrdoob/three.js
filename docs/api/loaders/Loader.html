@@ -15,9 +15,9 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Boolean showStatus])</h3>
+		<h3>[name]( [page:Boolean showStatus] )</h3>
 		<div>
-		showStatus -- Show the status of loading div.
+		[page:Boolean showStatus] — Show the status of loading div.
 		</div>
 		<div>
 		Creates a new [name]. This should be called as base class.
@@ -26,76 +26,76 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Boolean showStatus]</h3>
+		<h3>[property:Boolean showStatus]</h3>
 		<div>If true, show loading status in the statusDomElement.</div>
-		
-		<h3>.[page:DOMElement statusDomElement]</h3>
+
+		<h3>[property:DOMElement statusDomElement]</h3>
 		<div>This is the recipient of status messages.</div>
-		
-		<h3>.[page:Function onLoadStart]</h3>
+
+		<h3>[property:Function onLoadStart]</h3>
 		<div>Will be called when load starts.</div>
 		<div>The default is a function with empty body.</div>
 
-		<h3>.[page:Function onLoadProgress]</h3>
+		<h3>[property:Function onLoadProgress]</h3>
 		<div>Will be called while load progresses.</div>
 		<div>The default is a function with empty body.</div>
-		
-		<h3>.[page:Function onLoadComplete]</h3>
+
+		<h3>[property:Function onLoadComplete]</h3>
 		<div>Will be called when load completes.</div>
 		<div>The default is a function with empty body.</div>
-		
-		<h3>.[page:string crossOrigin]</h3>
+
+		<h3>[property:string crossOrigin]</h3>
 		<div>
 		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
-		<h3>.needsTangents([page:Array materials]) [page:Boolean]</h3>
+		<h3>[method:Boolean needsTangents]( [page:Array materials] )</h3>
 		<div>
-		materials -- an array of [page:Material]
+		[page:Array materials] — an array of [page:Material]
 		</div>
 		<div>
 		Checks if the loaded object needs tangents based on its materials.
 		</div>
 
-		<h3>.updateProgress([page:object progress])</h3>
+		<h3>[method:null updateProgress]( [page:object progress] )</h3>
 		<div>
-		progress -- an object containing loaded(contains the amount of bytes loaded) and optionally total (containing the total amount of bytes).
+		[page:Object progress] — an object containing loaded(contains the amount of bytes loaded) and optionally total (containing the total amount of bytes).
 		</div>
 		<div>
 		Updates the DOM object with the progress made.
 		</div>
 
-		<h3>.createMaterial([page:object m], [page:string texturePath]) [page:Material]</h3>
+		<h3>[method:Material createMaterial]( [page:object m], [page:string texturePath] )</h3>
 		<div>
-		m -- The parameters to create the material. <br />
-		texturePath -- The base path of the textures.
+		[page:Object m] — The parameters to create the material. <br />
+		[page:String texturePath] — The base path of the textures.
 		</div>
 		<div>
 		Creates the Material based on the parameters m.
 		</div>
 
-		<h3>.initMaterials([page:Array materials], [page:string texturePath]) [page:Array]</h3>
+		<h3>[method:Array initMaterials]( [page:Array materials], [page:string texturePath] )</h3>
 		<div>
-		materials -- an array of parameters to create materials. <br />
-		texturePath --  The base path of the textures.
+		[page:Array materials] — an array of parameters to create materials. <br />
+		[page:String texturePath] —  The base path of the textures.
 		</div>
 		<div>
 		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
 		</div>
 
-		<h3>.extractUrlBase([page:string url])</h3>
+		<h3>[method:String extractUrlBase]( [page:string url] )</h3>
 		<div>
-		url --  The url to extract the base url from.
+		[page:String url] —  The url to extract the base url from.
 		</div>
 		<div>
-		Extract the base from the URL. 
+		Extract the base from the URL.
 		</div>
 
-		<h3>.addStatusElement() [page:DOMElement]</h3>
+		<h3>[method:DOMElement addStatusElement]()</h3>
 		<div>
-		Add a DOM element to indicate the progress and returns the DOMElement
+		Add a DOM element to indicate the progress and return the DOMElement
 		</div>
 
 

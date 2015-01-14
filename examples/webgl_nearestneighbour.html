@@ -112,8 +112,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer(); // Detector.webgl? new THREE.WebGLRenderer(): new THREE.CanvasRenderer()
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				document.body.appendChild( renderer.domElement );
 
 				// create the custom shader

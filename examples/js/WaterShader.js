@@ -185,6 +185,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 };
 
 THREE.Water.prototype = Object.create( THREE.Mirror.prototype );
+THREE.Water.prototype.constructor = THREE.Water;
 
 
 THREE.Water.prototype.updateTextureMatrix = function () {

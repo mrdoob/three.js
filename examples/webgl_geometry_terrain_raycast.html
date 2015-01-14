@@ -62,8 +62,10 @@
 
 			var clock = new THREE.Clock();
 
-			var shouldSphereFollowMouse = true;
 			var helper;
+
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2();
 
 			init();
 			animate();
@@ -77,7 +79,7 @@
 				scene = new THREE.Scene();
 
 				controls = new THREE.OrbitControls(camera);
-				controls.center.set(0.0, 100.0, 0.0);
+				controls.center.set( 0.0, 100.0, 0.0 );
 				controls.userPanSpeed = 100;
 
 				data = generateHeight( worldWidth, worldDepth );
@@ -99,7 +101,7 @@
 
 				geometry.computeFaceNormals();
 
-				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
+				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
 				texture.needsUpdate = true;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
@@ -113,6 +115,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xbfd1e5 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
@@ -137,8 +140,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				controls.handleResize();
 
 			}
 
@@ -250,33 +251,24 @@
 
 			function onMouseMove( event ) {
 
-				if ( shouldSphereFollowMouse ) {
+				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+				mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 
-					var mouseX = ( event.clientX / window.innerWidth ) * 2 - 1;
-					var mouseY = -( event.clientY / window.innerHeight ) * 2 + 1;
+				raycaster.setFromCamera( mouse, camera );
 
-					var vector = new THREE.Vector3( mouseX, mouseY, camera.near );
+				// See if the ray from the camera into the world hits one of our meshes
+				var intersects = raycaster.intersectObject( mesh );
 
-					// Convert the [-1, 1] screen coordinate into a world coordinate on the near plane
-					var projector = new THREE.Projector();
-					projector.unprojectVector( vector, camera );
+				// Toggle rotation bool for meshes that we clicked
+				if ( intersects.length > 0 ) {
 
-					var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+					helper.position.set( 0, 0, 0 );
+					helper.lookAt( intersects[ 0 ].face.normal );
 
-					// See if the ray from the camera into the world hits one of our meshes
-					var intersects = raycaster.intersectObject( mesh );
-					lastIntersects = intersects;
+					helper.position.copy( intersects[ 0 ].point );
 
-					// Toggle rotation bool for meshes that we clicked
-					if ( intersects.length > 0 ) {
-
-						helper.position.set( 0, 0, 0 );
-						helper.lookAt( intersects[ 0 ].face.normal );
-
-						helper.position.copy( intersects[ 0 ].point );
-
-					}
 				}
+
 			}
 
 		</script>

@@ -41,6 +41,7 @@
 				clock = new THREE.Clock;
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize(window.innerWidth, window.innerHeight);
 				container.appendChild( renderer.domElement );
 
@@ -52,7 +53,7 @@
 				container.appendChild(stats.domElement);
 
 				groundMaterial = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
-				planeGeometry = new THREE.PlaneGeometry( 16000, 16000 );
+				planeGeometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
 				ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, -5, 0 );
 				ground.rotation.x = -Math.PI/2;

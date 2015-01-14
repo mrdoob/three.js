@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #000;
+				color: #fff;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
@@ -68,7 +68,8 @@
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
-				renderer.setClearColor( '#777777', 1 );
+				renderer.setClearColor( 0x777777 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = true;
 
@@ -262,4 +263,3 @@
 
 	</body>
 </html>
-

@@ -102,7 +102,7 @@ THREE.Math = {
 
 	randInt: function ( low, high ) {
 
-		return low + Math.floor( Math.random() * ( high - low + 1 ) );
+		return Math.floor( this.randFloat( low, high ) );
 
 	},
 
