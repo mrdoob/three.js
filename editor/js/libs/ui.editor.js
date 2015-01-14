@@ -64,7 +64,7 @@ UI.ScriptEditor = function ( editor ) {
 
 			try {
 
-				( new Function( 'scene', source ).bind( object ) )( scene );
+				( new Function( 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'update', source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, update: update };' ).bind( object ) )( scene );
 
 				textarea.dom.classList.add( 'success' );
 				textarea.dom.classList.remove( 'fail' );

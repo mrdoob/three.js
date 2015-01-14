@@ -131,7 +131,7 @@
 		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
 			{
 				"name": "Game logic",
-				"source": "/**\n * @author mrdoob / http://mrdoob.com/\n */\n\nvar ball = scene.getObjectByName( 'Ball' );\n\nvar position = ball.position;\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = Math.random() - 0.5;\ndirection.normalize();\ndirection.multiplyScalar( 8 );\n\n//\n\nvar pad1 = scene.getObjectByName( 'Pad 1' );\nvar pad2 = scene.getObjectByName( 'Pad 2' );\n\nreturn {\n\tmousemove: function ( event ) {\n\t\tpad1.position.z = ( event.clientX / window.innerWidth ) * 300 - 150;\n\t\tpad2.position.z = - pad1.position.z;\n\t},\n\tupdate: function ( event ) {\n\n\t\tif ( position.x < -300 || position.x > 300 )\n\t\t\tdirection.x = - direction.x;\n\n\t\tif ( position.z < -200 || position.z > 200 )\n\t\t\tdirection.z = - direction.z;\n\n\t\tposition.add( direction );\n\n\t}\n};"
+				"source": "/**\n * @author mrdoob / http://mrdoob.com/\n */\n\nvar ball = scene.getObjectByName( 'Ball' );\n\nvar position = ball.position;\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = Math.random() - 0.5;\ndirection.normalize();\ndirection.multiplyScalar( 8 );\n\nvar pad1 = scene.getObjectByName( 'Pad 1' );\nvar pad2 = scene.getObjectByName( 'Pad 2' );\n\n//\n\nfunction mousemove( event ) {\n\n\tpad1.position.z = ( event.clientX / window.innerWidth ) * 300 - 150;\n\tpad2.position.z = - pad1.position.z;\n\n}\n\nfunction update( event ) {\n\n\tif ( position.x < -300 || position.x > 300 )\n\t\tdirection.x = - direction.x;\n\n\tif ( position.z < -200 || position.z > 200 )\n\t\tdirection.z = - direction.z;\n\n\tposition.add( direction );\n\n}"
 			}]
 	}
 }

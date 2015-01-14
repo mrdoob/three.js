@@ -40,9 +40,11 @@ var APP = {
 
 					var script = sources[ i ];
 
-					var events = ( new Function( 'scene', script.source ).bind( object ) )( scene );
+					var events = ( new Function( 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, update: update };' ).bind( object ) )( scene );
 
 					for ( var name in events ) {
+
+						if ( events[ name ] === undefined ) continue;
 
 						if ( scripts[ name ] === undefined ) {
 
