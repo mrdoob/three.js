@@ -35,9 +35,12 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	var subpixelBits = 4;
 	var subpixelBias = (1 << subpixelBits) - 1;
-	var blockShift = 0; // Normally, it should be 3. At line mode, it has to be 0
+	var blockShift = 3; // Normally, it should be 3. At line mode, it has to be 0
 	var blockSize = 1 << blockShift;
 	var maxZVal = (1 << 24); // Note: You want to size this so you don't get overflows.
+    var lineMode = false;
+    var lookVector = new THREE.Vector3( 0, 0, 1 );
+    var crossVector = new THREE.Vector3();        
 
 	var rectx1 = Infinity, recty1 = Infinity;
 	var rectx2 = 0, recty2 = 0;
@@ -72,50 +75,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		canvasWBlocks = Math.floor( width / blockSize );
-		canvasHBlocks = Math.floor( height / blockSize );
-		canvasWidth   = canvasWBlocks * blockSize;
-		canvasHeight  = canvasHBlocks * blockSize;
-
-		var fixScale = 1 << subpixelBits;
-
-		viewportXScale =  fixScale * canvasWidth  / 2;
-		viewportYScale = -fixScale * canvasHeight / 2;
-		viewportZScale =             maxZVal      / 2;
-              
-		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
-		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
-		viewportZOffs  =             maxZVal      / 2 + 0.5;
-        
-		canvas.width = canvasWidth;
-		canvas.height = canvasHeight;
-
-		context.fillStyle = clearColor.getStyle();
-		context.fillRect( 0, 0, canvasWidth, canvasHeight );
-
-		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
-		data = imagedata.data;
-
-		zbuffer = new Int32Array( data.length / 4 );
-
-		numBlocks = canvasWBlocks * canvasHBlocks;
-		blockMaxZ = new Int32Array( numBlocks );
-		blockFlags = new Uint8Array( numBlocks );
-
-		for ( var i = 0, l = zbuffer.length; i < l; i ++ ) {
-
-			zbuffer[ i ] = maxZVal;
-
-		}
-
-		for ( var i = 0; i < numBlocks; i ++ ) {
-
-			blockFlags[ i ] = BLOCK_ISCLEAR;
-
-		}
-
-		cleanColorBuffer();
-
+        setSize( width, height );
 	};
 
 	this.setSize( canvas.width, canvas.height );
@@ -293,6 +253,53 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	};
 
+    function setSize( width, height ) {
+        
+        canvasWBlocks = Math.floor( width / blockSize );
+		canvasHBlocks = Math.floor( height / blockSize );
+		canvasWidth   = canvasWBlocks * blockSize;
+		canvasHeight  = canvasHBlocks * blockSize;
+
+		var fixScale = 1 << subpixelBits;
+
+		viewportXScale =  fixScale * canvasWidth  / 2;
+		viewportYScale = -fixScale * canvasHeight / 2;
+		viewportZScale =             maxZVal      / 2;
+              
+		viewportXOffs  =  fixScale * canvasWidth  / 2 + 0.5;
+		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
+		viewportZOffs  =             maxZVal      / 2 + 0.5;
+        
+		canvas.width = canvasWidth;
+		canvas.height = canvasHeight;
+
+		context.fillStyle = clearColor.getStyle();
+		context.fillRect( 0, 0, canvasWidth, canvasHeight );
+
+		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
+		data = imagedata.data;
+
+		zbuffer = new Int32Array( data.length / 4 );
+
+		numBlocks = canvasWBlocks * canvasHBlocks;
+		blockMaxZ = new Int32Array( numBlocks );
+		blockFlags = new Uint8Array( numBlocks );
+
+		for ( var i = 0, l = zbuffer.length; i < l; i ++ ) {
+
+			zbuffer[ i ] = maxZVal;
+
+		}
+
+		for ( var i = 0; i < numBlocks; i ++ ) {
+
+			blockFlags[ i ] = BLOCK_ISCLEAR;
+
+		}
+
+		cleanColorBuffer();
+    }
+    
 	function cleanColorBuffer() {
 
 		var size = canvasWidth * canvasHeight * 4;
@@ -530,7 +537,20 @@ THREE.SoftwareRenderer = function ( parameters ) {
 					shader = new Function( 'buffer, depthBuf, offset, depth, u, v, n, face, material', string );
 				}			
 
-			} else {
+			} else if ( material instanceof THREE.LineBasicMaterial ) {
+                
+                var string = [
+					'var colorOffset = offset * 4;',
+					'buffer[ colorOffset ] = (color1.r+color2.r) * 0.5 * 255;',
+					'buffer[ colorOffset + 1 ] = (color1.g+color2.g) * 0.5 * 255;',
+					'buffer[ colorOffset + 2 ] = (color1.b+color2.b) * 0.5 * 255;',
+					'buffer[ colorOffset + 3 ] = 255;',
+					'depthBuf[ offset ] = depth;'
+				].join('\n');
+
+				shader = new Function( 'buffer, depthBuf, offset, depth, color1, color2, material', string );
+
+            } else {
 
 				var string = [
 					'var colorOffset = offset * 4;',
@@ -1045,134 +1065,61 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 	}
     
-    // To do: draw line clean color using clean blocks is not enough.
-    // To confirm why must mouse move can see the line.
-    // var blockShift = 0; var blockSize = 1 << blockShift; In order to clean pixel
-    // LineWidth support
+    // When drawing line, the blockShiftShift has to be zero. In order to clean pixel
+    // Using color1 and color2 to interpolation pixel color
+    // LineWidth is according to material.linewidth
     function drawLine( v1, v2, color1, color2, shader, material ) {
+        
+        // While the line mode is enable, blockSize has to be changed to 0.
+        if ( !lineMode ) {
+            lineMode = true;            
+            blockShift = 0;
+            blockSize = 1 << blockShift;
+            
+            setSize( canvas.width, canvas.height );
+        }
+
         // TODO: Implement per-pixel z-clipping
-
 		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
-
-        // According line width to get bounding points
         
         var halfLineWidth = Math.floor( (material.linewidth-1) * 0.5 );
-        var lookVector = new THREE.Vector3( 0, 0, 1 );
-        var crossVector = new THREE.Vector3();
-//        var dummyUpAxis = new THREE.Vector3( 0, 1, 0 );
-//        var dummyRightAxis = new THREE.Vector3( 1, 0, 0 );
-//        var crossVector = new THREE.Vector3();
-//        var lineDir = v1.clone();
-//        lineDir.sub( v2 ) ;
-//        
-//        if ( Math.abs(dummyUpAxis.dot( lineDir )) === 1 ) {  // This is parallel vector           
-//             crossVector.crossVectors( lineDir, dummyRightAxis );
-//        } else {
-//             crossVector.crossVectors( lineDir, dummyUpAxis );
-//        }
-        
-//        crossVector.multiplyScalar( halfLineWidth );
-        
+      
         // https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
 
 		// 28.4 fixed-point coordinates
-
 		var x1 = (v1.x * viewportXScale + viewportXOffs) | 0;
         var x2 = (v2.x * viewportXScale + viewportXOffs) | 0;
 
 		var y1 = (v1.y * viewportYScale + viewportYOffs) | 0;
         var y2 = (v2.y * viewportYScale + viewportYOffs) | 0;
 
-		// Z values (.28 fixed-point)
-
 		var z1 = (v1.z * viewportZScale + viewportZOffs) | 0;
 		var z2 = (v2.z * viewportZScale + viewportZOffs) | 0;
        
 		// Deltas
-
-		var dx12 = x1 - x2, dy12 = y1 - y2;
+		var dx12 = x1 - x2, dy12 = y1 - y2, dz12 = z1 - z2;
 
 		// Bounding rectangle
-
 		var minx = Math.max( ( Math.min( x1, x2 ) + subpixelBias ) >> subpixelBits, 0 );
 		var maxx = Math.min( ( Math.max( x1, x2 ) + subpixelBias ) >> subpixelBits, canvasWidth );
 		var miny = Math.max( ( Math.min( y1, y2 ) + subpixelBias ) >> subpixelBits, 0 );
 		var maxy = Math.min( ( Math.max( y1, y2 ) + subpixelBias ) >> subpixelBits, canvasHeight );
         var minz = Math.max( ( Math.min( z1, z2 ) + subpixelBias ) >> subpixelBits, 0 );
-		//var maxz = Math.min( ( Math.max( z1, z2 ) + subpixelBias ) >> subpixelBits, canvasHeight );
-
+        var maxz = Math.min( ( Math.max( z1, z2 ) + subpixelBias ) >> subpixelBits, 0 );
+		
 		rectx1 = Math.min( minx, rectx1 );
 		rectx2 = Math.max( maxx, rectx2 );
 		recty1 = Math.min( miny, recty1 );
 		recty2 = Math.max( maxy, recty2 );
-
-		// Block size, standard 8x8 (must be power of two)
-
-		var q = blockSize; // line mode should be 0.
-
-		// Start in corner of 8x8 block
-
-		minx &= ~(q - 1);
-		miny &= ~(q - 1);
-
-		// Constant part of half-edge functions
-
-		//var minXfixscale = (minx << subpixelBits);
-		//var minYfixscale = (miny << subpixelBits);
-
-		//var c1 = dy12 * ((minXfixscale) - x1) + dx12 * ((minYfixscale) - y1);
-
-		// Correct for fill convention
-
-		//if ( dy12 > 0 || ( dy12 === 0 && dx12 > 0 ) ) c1++;
-
-		// Note this doesn't kill subpixel precision, but only because we test for >=0 (not >0).
-		// It's a bit subtle. :)
-		//c1 = (c1 - 1) >> subpixelBits;
-
-		// Z interpolation setup
-
-		var dz12 = z1 - z2;
-
-		// Z at top/left corner of rast area
-
-		//var cz = ( z1 + ((minXfixscale) - x1) * dzdx + ((minYfixscale) - y1) * dzdy ) | 0;
-
-		// Z pixel steps
-
-//		var fixscale = (1 << subpixelBits);
-//		dzdx = (dzdx * fixscale) | 0;
-//		dzdy = (dzdy * fixscale) | 0;
 		
-		// Set up min/max corners
-//		var qm1 = q - 1; // for convenience
-//		var nmin1 = 0, nmax1 = 0;
-//		var nminz = 0, nmaxz = 0;
-//		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
-//		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
-//        if (dz12 >= 0) nmaxz += qm1*dz12; else nminz += qm1*dz12;
-//		if (dzdx >= 0) nmaxz += qm1*dzdx; else nminz += qm1*dzdx;
-//		if (dzdy >= 0) nmaxz += qm1*dzdy; else nminz += qm1*dzdy;
-
-		// Loop through blocks
-		//var linestep = canvasWidth - q;
-
-		//var cb1 = c1;
-		//var cbz = cz;
-		//var qstep = -q;
-		//var e1x = qstep * dy12;
-		//var ezx = qstep * dz12;
-			
-		var x0 = (x2);
-        //var slope = dy12 / dx12;
-        var length = Math.sqrt((dy12 * dy12) + (dx12 *dx12));
+        // Get the line's unit vector and cross vector
+        var length = Math.sqrt((dy12 * dy12) + (dx12 * dx12));
         var unitX = (dx12 / length);
         var unitY = (dy12 / length);
-        var unitZ = (dz12 / length);
-        var y0 = (y2);
-        var z0 = (z2);
+        var unitZ = (dz12 / length);        
         var pixelX, pixelY, pixelZ;
+        var pX, pY, pZ;
         crossVector.set( unitX, unitY, unitZ );
         crossVector.cross( lookVector );
         crossVector.normalize();
@@ -1180,42 +1127,46 @@ THREE.SoftwareRenderer = function ( parameters ) {
             while (length > 0) {
 
                 // Get this pixel.
-                pixelX = (x0 + length * unitX);
-                pixelY = (y0 + length * unitY);
-                pixelZ = (z0 + length * unitZ);
-
-                // if pixel is at rect ...Draw.
+                pixelX = (x2 + length * unitX);
+                pixelY = (y2 + length * unitY);
+                pixelZ = (z2 + length * unitZ);               
+                                
+                pixelX = (pixelX + subpixelBias) >> subpixelBits;
+                pixelY = (pixelY + subpixelBias) >> subpixelBits;
+                pZ = (pixelZ + subpixelBias) >> subpixelBits;
                 
-                // Draw line with width
-                pixelX = pixelX >> subpixelBits;
-                pixelY = pixelY >> subpixelBits;
-                var pZ = pixelZ >> subpixelBits;
-                    
+                // Draw line with line width
                 for ( var i = -halfLineWidth; i <= halfLineWidth; ++i ) {
 
-                    var pX = (pixelX + crossVector.x * i);
-                    var pY = (pixelY + crossVector.y * i);
-                   // pZ = (pZ + crossVector.z * i);
+                    // Compute the line pixels.
+                    // Get the pixels on the vector that crosses to the line vector
+                    pX = Math.floor((pixelX + crossVector.x * i));
+                    pY = Math.floor((pixelY + crossVector.y * i));                    
+                   
+                   // if pixel is over the rect. Continue
+                   if ( rectx1 >= pX || rectx2 <= pX || recty1 >= pY 
+                           || recty2 <= pY )
+                       continue;
                    
                     // Find this pixel at which block
-                    var blockX = pX >> blockShift;
-                    var blockY = pY >> blockShift;
+                    var blockX = pX;
+                    var blockY = pY;
                     var blockId = blockX + blockY * canvasWBlocks;
 
+                    // Compare the pixel depth width z block.
                     if ( blockMaxZ[ blockId ] < minz ) continue;
 
-                    // Compare the pixel with block's z 
+                    blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );                    
+                    
                     var bflags = blockFlags[ blockId ];
-                    if ( bflags & BLOCK_NEEDCLEAR) clearBlock( blockX, blockY );
-                    blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
-
-                    // Line can't use block          
+                    if ( bflags & BLOCK_NEEDCLEAR ) clearBlock( blockX, blockY );
+                    blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );                    
 
                     // draw pixel
-                    var offset = Math.round(pX) + Math.round(pY) * canvasWidth;
+                    var offset = pX + pY * canvasWidth;
 
                     if ( pZ < zbuffer[ offset ] ) {		 
-                        shader( data, zbuffer, offset, pZ, 1, 1, null, null, material );								
+                        shader( data, zbuffer, offset, pZ, color1, color2, material );								
                     }
                 }
 
@@ -1224,265 +1175,6 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
     }
     
-    // To do: draw line clean color using clean blocks is not enough.
-    // To confirm why must mouse move can see the line.
-    // var blockShift = 0; var blockSize = 1 << blockShift; In order to clean pixel
-    // LineWidth support
-    function drawLine1( v1, v2, color1, color2, upVector, rightVector, shader, material ) {
-        
-        // TODO: Implement per-pixel z-clipping
-
-		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 ) return;
-
-        // According line width to get bounding points
-        
-        var halfLineWidth = material.linewidth * 0.5;
-        var dummyUpAxis = new THREE.Vector3( 0, 1, 0 );
-        var dummyRightAxis = new THREE.Vector3( 1, 0, 0 );
-        var crossVector = new THREE.Vector3();
-        var lineDir = v1.clone();
-        lineDir.sub( v2 ) ;
-        
-        if ( Math.abs(dummyUpAxis.dot( lineDir )) === 1 ) {  // This is parallel vector           
-             crossVector.crossVectors( lineDir, dummyRightAxis );
-        } else {
-             crossVector.crossVectors( lineDir, dummyUpAxis );
-        }
-        
-        crossVector.multiplyScalar( halfLineWidth );
-        
-        // https://gist.github.com/2486101
-		// explanation: http://pouet.net/topic.php?which=8760&page=1
-
-		// 28.4 fixed-point coordinates
-
-		var x1 = ((v1.x-crossVector.x) * viewportXScale + viewportXOffs) | 0;
-        var x2 = ((v1.x+crossVector.x) * viewportXScale + viewportXOffs) | 0;
-		var x3 = ((v2.x-crossVector.x) * viewportXScale + viewportXOffs) | 0;
-        var x4 = ((v2.x+crossVector.x) * viewportXScale + viewportXOffs) | 0;
-
-		var y1 = ((v1.y-crossVector.y) * viewportYScale + viewportYOffs) | 0;
-        var y2 = ((v1.y+crossVector.y) * viewportYScale + viewportYOffs) | 0;
-		var y3 = ((v2.y-crossVector.y) * viewportYScale + viewportYOffs) | 0;
-        var y4 = ((v2.y+crossVector.y) * viewportYScale + viewportYOffs) | 0;
-
-		// Z values (.28 fixed-point)
-
-		var z1 = ((v1.z-crossVector.z) * viewportZScale + viewportZOffs) | 0;
-		var z2 = ((v1.z+crossVector.z) * viewportZScale + viewportZOffs) | 0;
-        var z3 = ((v2.z-crossVector.z) * viewportZScale + viewportZOffs) | 0;
-        var z4 = ((v2.z+crossVector.z) * viewportZScale + viewportZOffs) | 0;
-		
-        
-		// Deltas
-
-		var dx12 = x1 - x2, dy12 = y2 - y1;
-
-		// Bounding rectangle
-
-		var minx = Math.max( ( Math.min( x1, x2, x3, x4 ) + subpixelBias ) >> subpixelBits, 0 );
-		var maxx = Math.min( ( Math.max( x1, x2, x3, x4 ) + subpixelBias ) >> subpixelBits, canvasWidth );
-		var miny = Math.max( ( Math.min( y1, y2, y3, y4 ) + subpixelBias ) >> subpixelBits, 0 );
-		var maxy = Math.min( ( Math.max( y1, y2, y3, y4 ) + subpixelBias ) >> subpixelBits, canvasHeight );
-
-		rectx1 = Math.min( minx, rectx1 );
-		rectx2 = Math.max( maxx, rectx2 );
-		recty1 = Math.min( miny, recty1 );
-		recty2 = Math.max( maxy, recty2 );
-
-		// Block size, standard 8x8 (must be power of two)
-
-		var q = blockSize;
-
-		// Start in corner of 8x8 block
-
-		minx &= ~(q - 1);
-		miny &= ~(q - 1);
-
-		// Constant part of half-edge functions
-
-		var minXfixscale = (minx << subpixelBits);
-		var minYfixscale = (miny << subpixelBits);
-
-		var c1 = dy12 * ((minXfixscale) - x1) + dx12 * ((minYfixscale) - y1);
-
-		// Correct for fill convention
-
-		if ( dy12 > 0 || ( dy12 === 0 && dx12 > 0 ) ) c1 ++;
-
-		// Note this doesn't kill subpixel precision, but only because we test for >=0 (not >0).
-		// It's a bit subtle. :)
-		c1 = (c1 - 1) >> subpixelBits;
-
-		// Z interpolation setup
-
-		var dz12 = z1 - z2;
-		var invDet = 1.0 / dx12;
-		var dzdx = invDet * dz12; // dz per one subpixel step in x
-		var dzdy = invDet * dz12; // dz per one subpixel step in y
-
-		// Z at top/left corner of rast area
-
-		var cz = ( z1 + ((minXfixscale) - x1) * dzdx + ((minYfixscale) - y1) * dzdy ) | 0;
-
-		// Z pixel steps
-
-		var fixscale = (1 << subpixelBits);
-		dzdx = (dzdx * fixscale) | 0;
-		dzdy = (dzdy * fixscale) | 0;
-		
-		// Set up min/max corners
-		var qm1 = q - 1; // for convenience
-		var nmin1 = 0, nmax1 = 0;
-		var nminz = 0, nmaxz = 0;
-		if (dx12 >= 0) nmax1 -= qm1*dx12; else nmin1 -= qm1*dx12;
-		if (dy12 >= 0) nmax1 -= qm1*dy12; else nmin1 -= qm1*dy12;
-		if (dzdx >= 0) nmaxz += qm1*dzdx; else nminz += qm1*dzdx;
-		if (dzdy >= 0) nmaxz += qm1*dzdy; else nminz += qm1*dzdy;
-
-		// Loop through blocks
-		var linestep = canvasWidth - q;
-
-		var cb1 = c1;
-		var cbz = cz;
-		var qstep = -q;
-		var e1x = qstep * dy12;
-		var ezx = qstep * dzdx;
-			
-		var x0 = minx;
-
-		for ( var y0 = miny; y0 < maxy; y0 += q ) {
-
-			// New block line - keep hunting for tri outer edge in old block line dir
-			while ( x0 >= minx && x0 < maxx && cb1 >= nmax1 ) {
-
-				x0 += qstep;
-				cb1 += e1x;
-				cbz += ezx;	
-			}
-
-			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
-			qstep = -qstep;
-			e1x = -e1x;
-			ezx = -ezx;
-			
-			while ( 1 ) {
-
-				// Step everything
-				x0 += qstep;
-				cb1 += e1x;
-				cbz += ezx;
-				
-				// We're done with this block line when at least one edge completely out
-				// If an edge function is too small and decreasing in the current traversal
-				// dir, we're done with this line.
-				if (x0 < minx || x0 >= maxx) break;
-				if (cb1 < nmax1) if (e1x < 0) break; else continue;
-				
-				// We can skip this block if it's already fully covered
-				var blockX = x0 >> blockShift;
-				var blockY = y0 >> blockShift;
-				var blockId = blockX + blockY * canvasWBlocks;
-				var minz = cbz + nminz;
-
-				// farthest point in block closer than closest point in our tri?
-				if ( blockMaxZ[ blockId ] < minz ) continue;
-
-				// Need to do a deferred clear?
-				var bflags = blockFlags[ blockId ];
-				if ( bflags & BLOCK_NEEDCLEAR) clearBlock( blockX, blockY );
-				blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
-
-				// Offset at top-left corner
-				var offset = x0 + y0 * canvasWidth;
-				
-				// Accept whole block when fully covered
-				if ( cb1 >= nmin1 ) {
-
-					var maxz = cbz + nmaxz;
-					blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );
-
-					var cy1 = cb1;
-					var cyz = cbz;
-
-					for ( var iy = 0; iy < q; iy ++ ) {
-
-						var cx1 = cy1;
-						var cxz = cyz;										 
-
-						for ( var ix = 0; ix < q; ix ++ ) {
-
-							var z = cxz;
-							 
-							if ( z < zbuffer[ offset ] ) {		 
-								shader( data, zbuffer, offset, z, 1, 1, null, null, material );								
-							}
-
-							cx1 += dy12;
-							cxz += dzdx;
-							
-							offset++;
-
-						}
-
-						cy1 += dx12;
-						cyz += dzdy;										
-						
-						offset += linestep;
-
-					}
-
-				} else { // Partially covered block
-
-					var cy1 = cb1;
-					var cyz = cbz;
-					
-					for ( var iy = 0; iy < q; iy ++ ) {
-
-						var cx1 = cy1;
-						var cxz = cyz;
-						
-						for ( var ix = 0; ix < q; ix ++ ) {
-
-							if ( cx1 >= 0 ) {
-
-								var z = cxz;								
-
-								if ( z < zbuffer[ offset ] ) {						 
-									shader( data, zbuffer, offset, z, 1, 1, null, null, material );
-								}
-
-							}
-
-							cx1 += dy12;
-							cxz += dzdx;
-														
-							offset++;
-
-						}
-
-						cy1 += dx12;
-						cyz += dzdy;
-						
-						offset += linestep;
-
-					}
-
-				}
-
-			}
-
-			// Advance to next row of blocks
-			cb1 += q*dx12;
-			cbz += q*dzdy;
-			
-		}
-        
-        // interpolation pixel postion from vertices
-        
-        // interpolation pixel color from vertices
-    }
-
 	function clearBlock( blockX, blockY ) {
 
 		var zoffset = blockX * blockSize + blockY * blockSize * canvasWidth;
