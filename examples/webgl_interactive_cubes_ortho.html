@@ -77,6 +77,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				container.appendChild(renderer.domElement);
@@ -136,12 +137,11 @@
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
+				camera.updateMatrixWorld();
+
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, - 1 ).unproject( camera );
-				var direction = new THREE.Vector3( 0, 0, -1 ).transformDirection( camera.matrixWorld );
-
-				raycaster.set( vector, direction );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

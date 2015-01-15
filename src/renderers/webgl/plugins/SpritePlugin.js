@@ -158,16 +158,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			var sprite = sprites[ i ];
 
 			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-
-			if ( sprite.renderDepth === null ) {
-
-				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
-
-			} else {
-
-				sprite.z = sprite.renderDepth;
-
-			}
+			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
 
 		}
 

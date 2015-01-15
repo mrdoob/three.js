@@ -65,7 +65,7 @@
 				f=400.0*(p.y*0.5+0.5);
 				i=200.0+sin(e*g+a/150.0)*20.0;
 				d=200.0+cos(f*g/2.0)*18.0+cos(e*g)*7.0;
-				r=sqrt(pow(i-e,2.0)+pow(d-f,2.0));
+				r=sqrt(pow(abs(i-e),2.0)+pow(abs(d-f),2.0));
 				q=f/r;
 				e=(r*cos(q))-a/2.0;f=(r*sin(q))-a/2.0;
 				d=sin(e*g)*176.0+sin(e*g)*164.0+r;
@@ -127,6 +127,7 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -142,10 +143,10 @@
 
 			function onWindowResize( event ) {
 
-				uniforms.resolution.value.x = window.innerWidth;
-				uniforms.resolution.value.y = window.innerHeight;
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				uniforms.resolution.value.x = renderer.domElement.width;
+				uniforms.resolution.value.y = renderer.domElement.height;
 
 			}
 

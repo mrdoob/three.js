@@ -1,5 +1,5 @@
-from .. import constants
-from . import base_classes, image, api, logger
+from .. import constants, logger
+from . import base_classes, image, api
 
 
 class Texture(base_classes.BaseNode):

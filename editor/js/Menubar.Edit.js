@@ -41,9 +41,13 @@ Menubar.Edit = function ( editor ) {
 	option.setClass( 'option' );
 	option.setTextContent( 'Delete' );
 	option.onClick( function () {
+	
+		var object = editor.selected;
 
-		var parent = editor.selected.parent;
-		editor.removeObject( editor.selected );
+		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+		var parent = object.parent;
+		editor.removeObject( object );
 		editor.select( parent );
 
 	} );

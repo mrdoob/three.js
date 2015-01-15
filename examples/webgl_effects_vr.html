@@ -114,6 +114,7 @@
 				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 
 				var fullScreenButton = document.querySelector( '.full-screen' );
 				var mouseLookButton = document.querySelector( '.mouse-look' );
@@ -203,11 +204,11 @@
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
+				camera.updateMatrixWorld();
+
 				// find intersections
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 ).unproject( camera );
-
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

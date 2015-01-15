@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js editor</title>
+		<title>three.js / editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
@@ -36,13 +36,19 @@
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
+		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
+		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
+		<script src="js/libs/codemirror/codemirror.js"></script>
+		<script src="js/libs/codemirror/mode/javascript.js"></script>
+
+		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
-		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/libs/app.js"></script>
 		<script src="js/Player.js"></script>
+		<script src="js/Script.js"></script>
 
 		<script src="js/Storage.js"></script>
 
@@ -55,6 +61,7 @@
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
+		<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -76,7 +83,6 @@
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
-		<script src="js/Sidebar.Script.Editor.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
@@ -96,6 +102,9 @@
 
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
+
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
 
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
@@ -122,10 +131,7 @@
 
 					if ( state !== undefined ) {
 
-						var loader = new THREE.ObjectLoader();
-						var scene = loader.parse( state );
-
-						editor.setScene( scene );
+						editor.fromJSON( state );
 
 					}
 
@@ -159,7 +165,7 @@
 
 						timeout = setTimeout( function () {
 
-							editor.storage.set( editor.scene.toJSON() );
+							editor.storage.set( editor.toJSON() );
 
 							editor.signals.savingFinished.dispatch();
 
@@ -171,12 +177,14 @@
 
 				var signals = editor.signals;
 
+				signals.editorCleared.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
+				signals.scriptChanged.add( saveState );
 
 				var showDialog = function ( content ) {
 
@@ -213,11 +221,6 @@
 
 					case 8: // prevent browser back
 						event.preventDefault();
-						break;
-					case 46: // delete
-						var parent = editor.selected.parent;
-						editor.removeObject( editor.selected );
-						editor.select( parent );
 						break;
 
 				}

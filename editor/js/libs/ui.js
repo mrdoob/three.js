@@ -4,7 +4,11 @@
 
 var UI = {};
 
-UI.Element = function () {};
+UI.Element = function ( dom ) {
+
+	this.dom = dom;
+
+};
 
 UI.Element.prototype = {
 
@@ -56,7 +60,7 @@ UI.Element.prototype = {
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor' ];
+'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
@@ -307,6 +311,12 @@ UI.Text = function ( text ) {
 UI.Text.prototype = Object.create( UI.Element.prototype );
 UI.Text.prototype.constructor = UI.Text;
 
+UI.Text.prototype.getValue = function () {
+
+	return this.dom.textContent;
+
+};
+
 UI.Text.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
@@ -322,7 +332,7 @@ UI.Text.prototype.setValue = function ( value ) {
 
 // Input
 
-UI.Input = function () {
+UI.Input = function ( text ) {
 
 	UI.Element.call( this );
 
@@ -340,6 +350,7 @@ UI.Input = function () {
 	}, false );
 
 	this.dom = dom;
+	this.setValue( text );
 
 	return this;
 

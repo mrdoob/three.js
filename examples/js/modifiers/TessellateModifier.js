@@ -17,7 +17,7 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 	var faces = [];
 	var faceVertexUvs = [];
-	var maxEdgeLength = this.maxEdgeLength;
+	var maxEdgeLengthSquared = this.maxEdgeLength * this.maxEdgeLength;
 
 	for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
@@ -39,11 +39,11 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 			var vb = geometry.vertices[ b ];
 			var vc = geometry.vertices[ c ];
 
-			var dab = va.distanceTo( vb );
-			var dbc = vb.distanceTo( vc );
-			var dac = va.distanceTo( vc );
+			var dab = va.distanceToSquared( vb );
+			var dbc = vb.distanceToSquared( vc );
+			var dac = va.distanceToSquared( vc );
 
-			if ( dab > maxEdgeLength || dbc > maxEdgeLength || dac > maxEdgeLength ) {
+			if ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) {
 
 				var m = geometry.vertices.length;
 

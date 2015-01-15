@@ -2,7 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VTKLoader = function () {};
+THREE.VTKLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.VTKLoader.prototype = {
 
@@ -18,7 +22,7 @@ THREE.VTKLoader.prototype = {
 
 			onLoad( scope.parse( text ) );
 
-		} );
+		}, onProgress, onError );
 
 	},
 

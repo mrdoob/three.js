@@ -3,6 +3,5 @@
 	varying vec3 vReflect;
 
 	uniform float refractionRatio;
-	uniform bool useRefract;
 
 #endif
