@@ -6176,31 +6176,52 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	//Read pixels from RGBA rendertarget.
-	this.readRenderTargetPixels = function(renderTarget, x, y, width, height, buffer) {
+	this.readRenderTargetPixels = function( renderTarget, x, y, width, height, buffer ) {
 
-		if(!(renderTarget && renderTarget instanceof THREE.WebGLRenderTarget))
-			throw new Error( 'renderTarget is not THREE.WebGLRenderTarget!' );
+	    if ( ! ( renderTarget instanceof THREE.WebGLRenderTarget ) ) {
 
-		if(renderTarget.__webglFramebuffer) {
+	        console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+	        return;
 
-			if(renderTarget.format !== THREE.RGBAFormat)
-				throw new Error( 'Rendertarget is not in RGBA format. readPixels can read only RGBA format!' );
+	    }
 
-			var restore = false;
-			if ( renderTarget.__webglFramebuffer !== _currentFramebuffer ) {
-				_gl.bindFramebuffer(_gl.FRAMEBUFFER, renderTarget.__webglFramebuffer);
-				restore = true;
-			}
+	    if ( renderTarget.__webglFramebuffer ) {
 
-			if (_gl.checkFramebufferStatus(_gl.FRAMEBUFFER) === _gl.FRAMEBUFFER_COMPLETE)
-				_gl.readPixels(x, y, width, height, paramThreeToGL(renderTarget.format), _gl.UNSIGNED_BYTE, buffer);
-			else
-				throw new Error( 'readPixels from rendertarget failed. Framebuffer not complete!' );
+	        if ( renderTarget.format !== THREE.RGBAFormat ) {
 
-			if(restore)
-				_gl.bindFramebuffer(_gl.FRAMEBUFFER, _currentFramebuffer);
-		}
+	            console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA format. readPixels can read only RGBA format.' );
+	            return;
+
+	        }
+
+	        var restore = false;
+
+	        if ( renderTarget.__webglFramebuffer !== _currentFramebuffer ) {
+
+	            _gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTarget.__webglFramebuffer );
+
+	            restore = true;
+
+	        }
+
+	        if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
+
+	            _gl.readPixels( x, y, width, height, _gl.RGBA, _gl.UNSIGNED_BYTE, buffer );
+
+	        } else {
+
+	            console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
+
+	        }
+
+	        if ( restore ) {
+
+	            _gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+
+	        }
+
+	    }
+
 	};
 
 	function updateRenderTargetMipmap ( renderTarget ) {
