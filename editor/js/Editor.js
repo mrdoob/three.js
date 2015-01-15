@@ -8,6 +8,10 @@ var Editor = function () {
 
 	this.signals = {
 
+		// script
+
+		editScript: new SIGNALS.Signal(),
+
 		// player
 
 		startPlayer: new SIGNALS.Signal(),
@@ -21,6 +25,8 @@ var Editor = function () {
 		showDialog: new SIGNALS.Signal(),
 
 		// notifications
+
+		editorCleared: new SIGNALS.Signal(),
 
 		savingStarted: new SIGNALS.Signal(),
 		savingFinished: new SIGNALS.Signal(),
@@ -49,6 +55,11 @@ var Editor = function () {
 		helperRemoved: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
+
+		scriptAdded: new SIGNALS.Signal(),
+		scriptChanged: new SIGNALS.Signal(),
+		scriptRemoved: new SIGNALS.Signal(),
+
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
@@ -62,7 +73,9 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
+	this.camera.name = 'Camera';
+
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
 
@@ -72,7 +85,7 @@ var Editor = function () {
 	this.geometries = {};
 	this.materials = {};
 	this.textures = {};
-	// this.scripts = {};
+	this.scripts = {};
 
 	this.selected = null;
 	this.helpers = {};
@@ -89,16 +102,19 @@ Editor.prototype = {
 
 	},
 
+	/*
 	showDialog: function ( value ) {
 
 		this.signals.showDialog.dispatch( value );
 
 	},
+	*/
 
 	//
 
 	setScene: function ( scene ) {
 
+		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -149,8 +165,6 @@ Editor.prototype = {
 	removeObject: function ( object ) {
 
 		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
-
-		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var scope = this;
 
@@ -273,6 +287,38 @@ Editor.prototype = {
 
 	//
 
+	addScript: function ( object, script ) {
+
+		if ( this.scripts[ object.uuid ] === undefined ) {
+
+			this.scripts[ object.uuid ] = [];
+
+		}
+
+		this.scripts[ object.uuid ].push( script );
+
+		this.signals.scriptAdded.dispatch( script );
+
+	},
+
+	removeScript: function ( object, script ) {
+
+		if ( this.scripts[ object.uuid ] === undefined ) return;
+
+		var index = this.scripts[ object.uuid ].indexOf( script );
+
+		if ( index !== - 1 ) {
+
+			this.scripts[ object.uuid ].splice( index, 1 );
+
+		}
+
+		this.signals.scriptRemoved.dispatch( script );
+
+	},
+
+	//
+
 	parent: function ( object, parent ) {
 
 		if ( parent === undefined ) {
@@ -310,6 +356,13 @@ Editor.prototype = {
 
 	selectById: function ( id ) {
 
+		if ( id === this.camera.id ) {
+
+			this.select( this.camera );
+			return;
+
+		}
+
 		this.select( this.scene.getObjectById( id, true ) );
 
 	},
@@ -345,6 +398,75 @@ Editor.prototype = {
 	focusById: function ( id ) {
 
 		this.focus( this.scene.getObjectById( id, true ) );
+
+	},
+
+	clear: function () {
+
+		this.camera.position.set( 500, 250, 500 );
+		this.camera.lookAt( new THREE.Vector3() );
+
+		var objects = this.scene.children;
+
+		while ( objects.length > 0 ) {
+
+			this.removeObject( objects[ 0 ] );
+
+		}
+
+		this.geometries = {};
+		this.materials = {};
+		this.textures = {};
+		this.scripts = {};
+
+		this.deselect();
+
+		this.signals.editorCleared.dispatch();
+
+	},
+
+	//
+
+	fromJSON: function ( json ) {
+
+		var loader = new THREE.ObjectLoader();
+
+		// backwards
+
+		if ( json.scene === undefined ) {
+
+			var scene = loader.parse( json );
+
+			this.setScene( scene );
+
+			return;
+
+		}
+
+		// TODO: Clean this up somehow
+
+		var camera = loader.parse( json.camera );
+
+		this.camera.position.copy( camera.position );
+		this.camera.rotation.copy( camera.rotation );
+		this.camera.aspect = camera.aspect;
+		this.camera.near = camera.near;
+		this.camera.far = camera.far;
+
+		this.setScene( loader.parse( json.scene ) );
+		this.scripts = json.scripts;
+
+	},
+
+	toJSON: function () {
+
+		return {
+
+			camera: this.camera.toJSON(),
+			scene: this.scene.toJSON(),
+			scripts: this.scripts
+
+		};
 
 	}
 

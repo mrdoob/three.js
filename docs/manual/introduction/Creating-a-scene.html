@@ -9,13 +9,13 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div>The goal of this section is to give a brief introduction to Three.js. We will start by setting up a scene, with a spinning cube. A working example is provided at the bottom of the page, if you get stuck, and need help.</div>
+		<div>The goal of this section is to give a brief introduction to Three.js. We will start by setting up a scene, with a spinning cube. A working example is provided at the bottom of the page in case you get stuck and need help.</div>
 
 		<h2>What is Three.js?</h2>
 
-		<div>If you're reading this, you probably have some understanding of what Three.js is, and what it helps you with, but let's try to describe it briefly anyway.</div>
+		<div>Let's try to describe it briefly:</div>
 
-		<div>Three.js is a library that makes WebGL - 3D in the browser - very easy. While a simple cube in raw WebGL would turn out hundreds of lines of Javascript and shader code, a Three.js equivalent is only a fraction of that.</div>
+		<div>Three.js is a library that makes WebGL - 3D in the browser - easy to use. While a simple cube in raw WebGL would turn out hundreds of lines of Javascript and shader code, a Three.js equivalent is only a fraction of that.</div>
 
 		<h2>Before we start</h2>
 		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of <a href="http://threejs.org/build/three.min.js">three.min.js</a> in the js/ directory, and open it in your browser.</div>
@@ -53,7 +53,7 @@
 		document.body.appendChild( renderer.domElement );
 		</code>
 
-		<div>Let's take a moment to explain what's going on here. We have now set up the scene, our camera and the renderer. There are a few different cameras in Three.js, but we'll go more into that later. For now, let's use a PerspectiveCamera. The first attribute is the <strong>field of view</strong>.</div>
+		<div>Let's take a moment to explain what's going on here. We have now set up the scene, our camera and the renderer. There are a few different cameras in Three.js. For now, let's use a PerspectiveCamera. The first attribute is the <strong>field of view</strong>.</div>
 
 		<div>The second one is the <strong>aspect ratio</strong>. You almost always want to use the width of the element divided by the height, or you'll get the same result as when you play old movies on a widescreen TV - the image looks squished.</div>
 

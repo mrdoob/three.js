@@ -90,9 +90,8 @@
 				// ASCII file
 
 				var loader = new THREE.STLLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( './models/stl/ascii/slotted_disk.stl', function ( geometry ) {
 
-					var geometry = event.content;
 					var material = new THREE.MeshPhongMaterial( { ambient: 0xff5533, color: 0xff5533, specular: 0x111111, shininess: 200 } );
 					var mesh = new THREE.Mesh( geometry, material );
 
@@ -106,17 +105,14 @@
 					scene.add( mesh );
 
 				} );
-				loader.load( './models/stl/ascii/slotted_disk.stl' );
 
 
 				// Binary files
 
 				var material = new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
 
-				var loader = new THREE.STLLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( './models/stl/binary/pr2_head_pan.stl', function ( geometry ) {
 
-					var geometry = event.content;
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0, - 0.37, - 0.6 );
@@ -129,12 +125,9 @@
 					scene.add( mesh );
 
 				} );
-				loader.load( './models/stl/binary/pr2_head_pan.stl' );
 
-				var loader = new THREE.STLLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( './models/stl/binary/pr2_head_tilt.stl', function ( geometry ) {
 
-					var geometry = event.content;
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.136, - 0.37, - 0.6 );
@@ -147,13 +140,9 @@
 					scene.add( mesh );
 
 				} );
-				loader.load( './models/stl/binary/pr2_head_tilt.stl' );
 
 				// Colored binary STL
-				var loaderColored = new THREE.STLLoader();
-				loaderColored.addEventListener( 'load', function ( event ) {
-
-					var geometry = event.content;
+				loader.load( './models/stl/binary/colored.stl', function ( geometry ) {
 
 					var meshMaterial = material;
 					if (geometry.hasColors) {
@@ -172,7 +161,6 @@
 					scene.add( mesh );
 
 				} );
-				loaderColored.load( './models/stl/binary/colored.stl' );
 
 
 				// Lights
@@ -185,9 +173,9 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;

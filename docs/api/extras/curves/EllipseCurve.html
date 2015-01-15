@@ -23,18 +23,18 @@ var curve = new THREE.EllipseCurve(
 	false             // aClockwise
 );
 
-var path = new THREE.Path( curve.getPoints(50) );
+var path = new THREE.Path( curve.getPoints( 50 ) );
 var geometry = path.createPointsGeometry( 50 );
-var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-//Create the final Object3d to add to the scene
+// Create the final Object3d to add to the scene
 var ellipse = new THREE.Line( geometry, material );
 </code>
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Float aX], [page:Float aY], [page:Float xRadius], [page:Float yRadius], [page:Radians aStartAngle], [page:Radians aEndAngle], [page:Boolean aClockwise])</h3>
+		<h3>[name]( [page:Float aX], [page:Float aY], [page:Float xRadius], [page:Float yRadius], [page:Radians aStartAngle], [page:Radians aEndAngle], [page:Boolean aClockwise] )</h3>
 		<div>
 			aX – The X center of the ellipse<br/>
 			aY – The Y center of the ellipse<br/>

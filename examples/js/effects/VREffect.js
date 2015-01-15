@@ -13,12 +13,11 @@
  *
  * Firefox:
  *
- * OSX: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.mac.dmg
- * WIN: http://people.mozilla.com/~vladimir/vr/firefox-33.0a1.en-US.win64-x86_64.zip
+ * http://mozvr.com/downloads.html
  *
  * Chrome builds:
  *
- * https://drive.google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
+ * https://drive.google.com/a/google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
  *
  */
 THREE.VREffect = function ( renderer, done ) {
@@ -69,7 +68,6 @@ THREE.VREffect = function ( renderer, done ) {
 	this.render = function ( scene, camera ) {
 		var renderer = this._renderer;
 		var vrHMD = this._vrHMD;
-		renderer.enableScissorTest( false );
 		// VR render mode if HMD is available
 		if ( vrHMD ) {
 			this.renderStereo.apply( this, arguments );
@@ -84,8 +82,8 @@ THREE.VREffect = function ( renderer, done ) {
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.width / renderer.devicePixelRatio;
-		var rendererHeight = renderer.domElement.height / renderer.devicePixelRatio;
+		var rendererWidth = renderer.domElement.clientWidth;
+		var rendererHeight = renderer.domElement.clientHeight;
 		var eyeDivisionLine = rendererWidth / 2;
 
 		renderer.enableScissorTest( true );
@@ -113,6 +111,8 @@ THREE.VREffect = function ( renderer, done ) {
 		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.render( scene, cameraRight );
+
+		renderer.enableScissorTest( false );
 
 	};
 
@@ -159,7 +159,7 @@ THREE.VREffect = function ( renderer, done ) {
 
 		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
 		function onFullScreenChanged() {
-			if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
+			if ( !document.mozFullScreenElement && !document.webkitFullscreenElement ) {
 				self.setFullScreen( false );
 			}
 		}

@@ -91,6 +91,7 @@
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xbfd1e5 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";

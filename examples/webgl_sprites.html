@@ -6,7 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background:#fff;
 				padding:0;
 				margin:0;
 				font-weight: bold;
@@ -96,9 +95,10 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
-				
+
 				document.body.appendChild( renderer.domElement );
 
 				//

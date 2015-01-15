@@ -225,10 +225,10 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
