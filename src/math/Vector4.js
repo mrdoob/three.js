@@ -648,6 +648,21 @@ THREE.Vector4.prototype = {
 
 	},
 
+	fromAttribute: function ( attribute, index, offset ) {
+
+	    if ( offset === undefined ) offset = 0;
+
+	    index = index * attribute.itemSize + offset;
+
+	    this.x = attribute.array[ index ];
+	    this.y = attribute.array[ index + 1 ];
+	    this.z = attribute.array[ index + 2 ];
+	    this.w = attribute.array[ index + 3 ];
+
+	    return this;
+
+	},
+
 	clone: function () {
 
 		return new THREE.Vector4( this.x, this.y, this.z, this.w );

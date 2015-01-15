@@ -67,8 +67,11 @@
 
 			void main() {
 
-				gl_FragColor = vec4( color * vColor, 1.0 );
-				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+				vec4 color = vec4( color * vColor, 1.0 ) * texture2D( texture, gl_PointCoord );
+
+				if ( color.w < 0.5 ) discard;
+
+				gl_FragColor = color;
 
 			}
 
@@ -136,9 +139,6 @@
 
 			sphere = new THREE.PointCloud( geometry, shaderMaterial );
 
-			sphere.dynamic = true;
-			sphere.sortParticles = true;
-
 			var vertices = sphere.geometry.vertices;
 			var values_size = attributes.size.value;
 			var values_color = attributes.ca.value;
@@ -164,6 +164,7 @@
 			scene.add( sphere );
 
 			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );

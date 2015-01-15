@@ -180,13 +180,10 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x060708, 1 );
+				renderer.setClearColor( 0x444a54 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				var color = new THREE.Color();
-				color.setHSL( 0.6, 0.1, 0.3 );
-				renderer.setClearColor( color, 1 );
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapCullFace = THREE.CullFaceBack;

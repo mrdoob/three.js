@@ -59,8 +59,31 @@
 
 		set: function ( origin, direction ) {
 
-			this.ray.set( origin, direction );
 			// direction is assumed to be normalized (for accurate distance calculations)
+
+			this.ray.set( origin, direction );
+
+		},
+
+		setFromCamera: function ( coords, camera ) {
+
+			// camera is assumed _not_ to be a child of a transformed object
+
+			if ( camera instanceof THREE.PerspectiveCamera ) {
+
+				this.ray.origin.copy( camera.position );
+				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
+
+			} else if ( camera instanceof THREE.OrthographicCamera ) {
+
+				this.ray.origin.set( coords.x, coords.y, - 1 ).unproject( camera );
+				this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
+
+			} else {
+
+				console.error( 'THREE.Raycaster: Unsupported camera type.' );
+
+			}
 
 		},
 

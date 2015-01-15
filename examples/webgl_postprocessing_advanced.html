@@ -139,8 +139,9 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
-				renderer.setClearColor( 0x000000, 1 );
 				renderer.autoClear = false;
 
 				//
@@ -331,31 +332,17 @@
 
 				geometry.computeTangents();
 
-				var ambient = 0x444444, diffuse = 0x999999, specular = 0x080808, shininess = 20;
+				var mat2 = new THREE.MeshLambertMaterial( {
 
-				var shader = THREE.ShaderLib[ "normalmap" ];
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+					color: 0x999999,
+					ambient: 0x444444,
+					specular: 0x080808,
+					shininess: 20,
+					map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
+					normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
-				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value.set( 0.75, 0.75 );
-
-				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-
-				uniforms[ "enableAO" ].value = false;
-				uniforms[ "enableDiffuse" ].value = true;
-
-				uniforms[ "diffuse" ].value.setHex( diffuse );
-				uniforms[ "specular" ].value.setHex( specular );
-				uniforms[ "ambient" ].value.setHex( ambient );
-
-				uniforms[ "shininess" ].value = shininess;
-
-				uniforms[ "diffuse" ].value.convertGammaToLinear();
-				uniforms[ "specular" ].value.convertGammaToLinear();
-				uniforms[ "ambient" ].value.convertGammaToLinear();
-
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var mat2 = new THREE.ShaderMaterial( parameters );
+				} );
 
 				mesh = new THREE.Mesh( geometry, mat2 );
 				mesh.position.set( 0, -50, 0 );

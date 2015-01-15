@@ -1,40 +1,44 @@
-HEADER    NONAME 22-Apr-10                                              NONE   1
-TITLE                                                                   NONE   2
-AUTHOR    Chemical Structure Services at http://cactus.nci.nih.gov      NONE   3
-REVDAT   1  22-Apr-10     0                                             NONE   4
-ATOM      1  C           0       2.154   1.017  -0.012  0.00  0.00           C+0
-ATOM      2  C           0      -0.545   1.675   0.087  0.00  0.00           C+0
-ATOM      3  C           0       1.761   2.338   0.015  0.00  0.00           C+0
-ATOM      4  C           0       0.416   2.666   0.064  0.00  0.00           C+0
-ATOM      5  C           0      -3.466  -1.377   0.133  0.00  0.00           C+0
-ATOM      6  C           0       1.192   0.004   0.010  0.00  0.00           C+0
-ATOM      7  C           0      -0.168   0.341   0.060  0.00  0.00           C+0
-ATOM      8  O           0       0.765  -2.290  -0.001  0.00  0.00           O+0
-ATOM      9  O           0      -2.733   0.825  -0.277  0.00  0.00           O+0
-ATOM     10  O           0       2.912  -1.731  -0.067  0.00  0.00           O+0
-ATOM     11  C           0       1.604  -1.411  -0.019  0.00  0.00           C+0
-ATOM     12  C           0      -2.411  -0.315  -0.036  0.00  0.00           C+0
-ATOM     13  O           0      -1.112  -0.634   0.081  0.00  0.00           O+0
-ATOM     14  H           0       3.183  -2.659  -0.086  0.00  0.00           H+0
-ATOM     15  H           0       3.203   0.765  -0.054  0.00  0.00           H+0
-ATOM     16  H           0      -1.591   1.939   0.125  0.00  0.00           H+0
-ATOM     17  H           0       2.506   3.120  -0.002  0.00  0.00           H+0
-ATOM     18  H           0       0.118   3.704   0.085  0.00  0.00           H+0
-ATOM     19  H           0      -3.762  -1.431   1.181  0.00  0.00           H+0
-ATOM     20  H           0      -4.334  -1.127  -0.477  0.00  0.00           H+0
-ATOM     21  H           0      -3.066  -2.340  -0.182  0.00  0.00           H+0
-CONECT    1    6    3   15    0                                         NONE  26
-CONECT    2    7    4   16    0                                         NONE  27
-CONECT    3    1    4   17    0                                         NONE  28
-CONECT    4    2    3   18    0                                         NONE  29
-CONECT    5   12   19   20   21                                         NONE  30
-CONECT    6    7    1   11    0                                         NONE  31
-CONECT    7    6    2   13    0                                         NONE  32
-CONECT    8   11    0    0    0                                         NONE  33
-CONECT    9   12    0    0    0                                         NONE  34
-CONECT   10   11   14    0    0                                         NONE  35
-CONECT   11    6   10    8    0                                         NONE  36
-CONECT   12   13    5    9    0                                         NONE  37
-CONECT   13    7   12    0    0                                         NONE  38
-END                                                                     NONE  39
-
+HEADER
+HETATM    1  C   UNK  0001      -0.778  -3.342  -0.910
+HETATM    2  O   UNK  0001      -1.251  -3.633  -1.994
+HETATM    3  O   UNK  0001      -0.469  -4.239   0.048
+HETATM    4  C   UNK  0001      -0.569  -1.952  -0.480
+HETATM    5  C   UNK  0001      -1.706  -1.156  -0.297
+HETATM    6  C   UNK  0001      -1.565   0.180   0.087
+HETATM    7  C   UNK  0001      -0.294   0.725   0.273
+HETATM    8  C   UNK  0001       0.843  -0.060   0.075
+HETATM    9  C   UNK  0001       0.703  -1.401  -0.291
+HETATM   10  O   UNK  0001       1.883  -2.113  -0.531
+HETATM   11  C   UNK  0001       2.213  -2.986   0.497
+HETATM   12  C   UNK  0001       3.539  -3.621   0.208
+HETATM   13  O   UNK  0001       1.510  -3.239   1.470
+HETATM   14  H   UNK  0001      -0.081  -3.852   0.870
+HETATM   15  H   UNK  0001      -2.698  -1.572  -0.462
+HETATM   16  H   UNK  0001      -2.449   0.799   0.229
+HETATM   17  H   UNK  0001      -0.189   1.769   0.561
+HETATM   18  H   UNK  0001       1.830   0.376   0.201
+HETATM   19  H   UNK  0001       4.294  -2.847   0.047
+HETATM   20  H   UNK  0001       3.844  -4.225   1.067
+HETATM   21  H   UNK  0001       3.456  -4.267  -0.669
+CONECT    1    2    3    4
+CONECT    2    1
+CONECT    3    1   14
+CONECT    4    1    5    9
+CONECT    5    4    6   15
+CONECT    6    5    7   16
+CONECT    7    6    8   17
+CONECT    8    7    9   18
+CONECT    9    4    8   10
+CONECT   10    9   11
+CONECT   11   10   12   13
+CONECT   12   11   19   20   21
+CONECT   13   11
+CONECT   14    3
+CONECT   15    5
+CONECT   16    6
+CONECT   17    7
+CONECT   18    8
+CONECT   19   12
+CONECT   20   12
+CONECT   21   12
+END

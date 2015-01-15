@@ -4,15 +4,11 @@
 
 		vec4 worldPosition = modelMatrix * skinned;
 
-	#endif
-
-	#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )
+	#elif defined( USE_MORPHTARGETS )
 
 		vec4 worldPosition = modelMatrix * vec4( morphed, 1.0 );
 
-	#endif
-
-	#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )
+	#else
 
 		vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
 

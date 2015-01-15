@@ -19,7 +19,7 @@
 				padding: 0px;
 				overflow: hidden;
 			}
-				
+
 			#stats { position: absolute; top:0; left: 0 }
 			#stats #fps { background: transparent !important }
 			#stats #fps #fpsText { color: #777 !important }
@@ -35,9 +35,9 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		
+
 		<script>
-			
+
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var SCREEN_WIDTH = window.innerWidth;
@@ -51,52 +51,54 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-				 
+
 			init();
 			animate();
-			
+
 			function init() {
-				
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-				
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				
+
 				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 25000 );
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
-				
+
 				var light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
-				
+
 				var loader = new THREE.TGALoader();
 
 				// add box 1 - grey8 texture
 				var texture1 = loader.load( 'textures/crate_grey8.tga' );
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
-				
+
 				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
 				var mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.rotation.x = -Math.PI / 2;
 				mesh1.position.x = - 50;
-				
+
 				scene.add( mesh1 );
-				
+
 				// add box 2 - tga texture
 				var texture2 = loader.load( 'textures/crate_color8.tga' );
 				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
-					   
+
 				var mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.rotation.x = -Math.PI / 2;
 				mesh2.position.x = 50;
-				
+
 				scene.add( mesh2 );
-				
+
 				// RENDERER
+
+				renderer.setClearColor( 0xf2f7ff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setClearColor( 0xf2f7ff, 1 );
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = "relative";
@@ -109,7 +111,7 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			}
-			
+
 			function onDocumentMouseMove(event) {
 
 				mouseX = ( event.clientX - windowHalfX );
@@ -140,9 +142,9 @@
 
 				renderer.setScissor( 0, 0, SCREEN_WIDTH - 2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
-					
+
 			}
-			
+
 		</script>
 	</body>
 </html>
