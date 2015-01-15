@@ -13,6 +13,9 @@ var APP = {
 
 		this.dom = undefined;
 
+		this.width = 500;
+		this.height = 500;
+
 		this.load = function ( json ) {
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -65,22 +68,20 @@ var APP = {
 
 		};
 
-		this.setCamera = function ( newCamera ) {
+		this.setCamera = function ( value ) {
 
-			if ( camera !== undefined ) {
-
-				newCamera.aspect = camera.aspect;
-				newCamera.updateProjectionMatrix();
-
-			}
-
-			camera = newCamera;
+			camera = value;
+			camera.aspect = this.width / this.height;
+			camera.updateProjectionMatrix();
 
 		};
 
 		this.setSize = function ( width, height ) {
 
-			camera.aspect = width / height;
+			this.width = width;
+			this.height = height;
+
+			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
 			renderer.setSize( width, height );

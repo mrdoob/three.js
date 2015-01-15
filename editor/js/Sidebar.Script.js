@@ -53,7 +53,7 @@ Sidebar.Script = function ( editor ) {
 
 				( function ( object, script ) {
 
-					var name = new UI.Input( script.name ).setWidth( '160px' ).setFontSize( '12px' );
+					var name = new UI.Input( script.name ).setWidth( '150px' ).setFontSize( '12px' );
 					name.onChange( function () {
 
 						script.name = this.getValue();

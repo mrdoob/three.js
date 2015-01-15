@@ -17,6 +17,8 @@ var Player = function ( editor ) {
 
 	window.addEventListener( 'resize', function () {
 
+		if ( player.dom === undefined ) return;
+
 		player.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 	} );
