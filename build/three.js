@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '70dev' };
+var THREE = { REVISION: '70' };
 
 // browserify support
 
@@ -25941,7 +25941,7 @@ THREE.ImageUtils = {
 
 				}
 
-			} );
+			}, undefined, onError );
 
 		}
 
