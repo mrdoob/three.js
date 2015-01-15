@@ -47,14 +47,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// clearing
 
-	this.autoClear = true;
-	this.autoClearColor = true;
-	this.autoClearDepth = true;
-	this.autoClearStencil = true;
+	this.autoClear = parameters.autoClear !== undefined ? parameters.autoClear : true;
+	this.autoClearColor = parameters.autoClearColor !== undefined ? parameters.autoClearColor : true;
+	this.autoClearDepth = parameters.autoClearDepth !== undefined ? parameters.autoClearDepth : true;
+	this.autoClearStencil = parameters.autoClearStencil !== undefined ? parameters.autoClearStencil : true;
 
 	// scene graph
 
-	this.sortObjects = true;
+	this.sortObjects = parameters.sortObjects !== undefined ? parameters.sortObjects : true;
+	this.hideOpaque = parameters.hideOpaque !== undefined ? parameters.hideOpaque : false;
+	this.hideTransparent = parameters.hideTransparent !== undefined ? parameters.hideTransparent : false;
 
 	// physically based shading
 
@@ -2471,9 +2473,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	this.isMaterialHidden = function ( material ) {
+
+		return ( material.visible === false ) || ( material.transparent ? _this.hideTransparent : _this.hideOpaque );
+
+	}
+
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
 
-		if ( material.visible === false ) return;
+		if ( _this.isMaterialHidden( material ) ) return;
 
 		updateObject( object );
 
@@ -2812,7 +2820,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
 
-		if ( material.visible === false ) return;
+		if ( _this.isMaterialHidden( material ) ) return;
 
 		updateObject( object );
 
