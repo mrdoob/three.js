@@ -6,11 +6,11 @@
 			"generator": "ObjectExporter"
 		},
 		"object": {
-			"uuid": "3A99B129-6210-4568-910C-CA621D987060",
+			"uuid": "E5C76691-3D55-4E26-862E-24BADC21F4D7",
 			"type": "PerspectiveCamera",
 			"name": "Camera",
 			"fov": 50,
-			"aspect": 1.2237762237762237,
+			"aspect": 1.3291139240506329,
 			"near": 0.1,
 			"far": 100000,
 			"matrix": [0.9522120356559753,4.209433246415983e-9,-0.3054378032684326,0,-0.17742955684661865,0.8139731884002686,-0.553142249584198,0,0.24861818552017212,0.5809023976325989,0.7750750780105591,0,186.46363830566406,435.67681884765625,581.3063354492188,1]
@@ -91,7 +91,7 @@
 					"name": "Ground",
 					"geometry": "77B20ED1-2871-4B14-A652-8F823B2A817E",
 					"material": "7EDF7C08-6325-418A-BBAB-89341C694730",
-					"matrix": [1,0,0,0,0,0.0007962126983329654,-0.9999997019767761,0,0,0.9999997019767761,0.0007962126983329654,0,0,-10,0,1]
+					"matrix": [1,0,0,0,0,0.0007961748051457107,-0.9999997019767761,0,0,0.9999997019767761,0.0007961748051457107,0,0,-10,0,1]
 				},
 				{
 					"uuid": "CE13E58A-4E8B-4F72-9E2E-7DE57C58F989",
@@ -122,7 +122,7 @@
 					"type": "DirectionalLight",
 					"name": "DirectionalLight 3",
 					"color": 16777215,
-					"intensity": 1.5,
+					"intensity": 1,
 					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,100,200,150,1]
 				}]
 		}
@@ -131,7 +131,7 @@
 		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
 			{
 				"name": "Game logic",
-				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar position = ball.position;\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = Math.random() - 0.5;\ndirection.normalize();\ndirection.multiplyScalar( 8 );\n\nvar pad1 = this.getObjectByName( 'Pad 1' );\nvar pad2 = this.getObjectByName( 'Pad 2' );\n\n//\n\nfunction mousemove( event ) {\n\n\tpad1.position.z = ( event.clientX / window.innerWidth ) * 300 - 150;\n\tpad2.position.z = - pad1.position.z;\n\n}\n\nfunction update( event ) {\n\n\tif ( position.x < -300 || position.x > 300 )\n\t\tdirection.x = - direction.x;\n\n\tif ( position.z < -200 || position.z > 200 )\n\t\tdirection.z = - direction.z;\n\n\tposition.add( direction );\n\n}"
+				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar position = ball.position;\n\nvar velocity = new THREE.Vector3();\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = Math.random() - 0.5;\ndirection.normalize();\n\nvar pad1 = this.getObjectByName( 'Pad 1' );\nvar pad2 = this.getObjectByName( 'Pad 2' );\n\nvar raycaster = new THREE.Raycaster();\nvar objects = [ pad1, pad2 ];\n\n//\n\nfunction mousemove( event ) {\n\n\tpad1.position.z = ( event.clientX / player.width ) * 300 - 150;\n\tpad2.position.z = - pad1.position.z;\n\n}\n\nfunction update( event ) {\n\n\tif ( position.x < -300 || position.x > 300 ) {\n\t\t\n\t\tdirection.x = - direction.x;\n\t\t\n\t}\n\n\tif ( position.z < -200 || position.z > 200 ) {\n\t\t\n\t\tdirection.z = - direction.z;\n\t\t\n\t}\n\t\n\traycaster.set( position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( objects );\n\t\n\tif ( intersections.length > 0 ) {\n\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 10 ) {\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n\tposition.add( velocity.copy( direction ).multiplyScalar( 8 ) );\n\n}"
 			}]
 	}
 }
