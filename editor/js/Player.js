@@ -15,6 +15,12 @@ var Player = function ( editor ) {
 
 	var player = new APP.Player();
 
+	window.addEventListener( 'resize', function () {
+
+		player.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+
+	} );
+
 	signals.startPlayer.add( function () {
 
 		container.setDisplay( '' );

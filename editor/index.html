@@ -36,14 +36,19 @@
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
+		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
+		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
+		<script src="js/libs/codemirror/codemirror.js"></script>
+		<script src="js/libs/codemirror/mode/javascript.js"></script>
+
 		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
-		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/libs/app.js"></script>
 		<script src="js/Player.js"></script>
+		<script src="js/Script.js"></script>
 
 		<script src="js/Storage.js"></script>
 
@@ -97,6 +102,9 @@
 
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
+
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
 
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );

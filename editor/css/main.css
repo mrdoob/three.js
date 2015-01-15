@@ -71,6 +71,14 @@ textarea, input { outline: none; } /* osx */
 		display: none;
 	}
 
+.CodeMirror {
+
+	position: absolute !important;
+	top: 37px;
+	width: 100% !important;
+	height: calc(100% - 37px) !important;
+
+}
 /* scene types */
 
 .type {

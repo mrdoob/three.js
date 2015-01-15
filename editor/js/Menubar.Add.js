@@ -20,11 +20,13 @@ Menubar.Add = function ( editor ) {
 
 	var meshCount = 0;
 	var lightCount = 0;
+	var cameraCount = 0;
 
 	editor.signals.editorCleared.add( function () {
 
 		meshCount = 0;
 		lightCount = 0;
+		cameraCount = 0;
 
 	} );
 
@@ -234,10 +236,6 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
-	//
-
-	options.add( new UI.HorizontalRule() );
-
 	// Sprite
 
 	var option = new UI.Panel();
@@ -361,6 +359,26 @@ Menubar.Add = function ( editor ) {
 
 		editor.addObject( light );
 		editor.select( light );
+
+	} );
+	options.add( option );
+
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// PerspectiveCamera
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'PerspectiveCamera' );
+	option.onClick( function() {
+
+		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10000 );
+		camera.name = 'PerspectiveCamera ' + ( ++ cameraCount );
+
+		editor.addObject( camera );
+		editor.select( camera );
 
 	} );
 	options.add( option );

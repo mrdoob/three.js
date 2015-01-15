@@ -40,7 +40,7 @@ var APP = {
 
 					var script = sources[ i ];
 
-					var events = ( new Function( 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, update: update };' ).bind( object ) )( scene );
+					var events = ( new Function( 'player', 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, update: update };' ).bind( object ) )( this, scene );
 
 					for ( var name in events ) {
 
@@ -53,7 +53,7 @@ var APP = {
 
 						}
 
-						scripts[ name ].push( events[ name ] );
+						scripts[ name ].push( events[ name ].bind( object ) );
 
 					}
 
@@ -62,6 +62,19 @@ var APP = {
 			}
 
 			this.dom = renderer.domElement;
+
+		};
+
+		this.setCamera = function ( newCamera ) {
+
+			if ( camera !== undefined ) {
+
+				newCamera.aspect = camera.aspect;
+				newCamera.updateProjectionMatrix();
+
+			}
+
+			camera = newCamera;
 
 		};
 

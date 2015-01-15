@@ -8,6 +8,10 @@ var Editor = function () {
 
 	this.signals = {
 
+		// script
+
+		editScript: new SIGNALS.Signal(),
+
 		// player
 
 		startPlayer: new SIGNALS.Signal(),
@@ -52,7 +56,9 @@ var Editor = function () {
 
 		materialChanged: new SIGNALS.Signal(),
 
+		scriptAdded: new SIGNALS.Signal(),
 		scriptChanged: new SIGNALS.Signal(),
+		scriptRemoved: new SIGNALS.Signal(),
 
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
@@ -67,7 +73,7 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
 	this.camera.name = 'Camera';
 
 	this.scene = new THREE.Scene();
@@ -276,6 +282,38 @@ Editor.prototype = {
 			this.signals.helperRemoved.dispatch( helper );
 
 		}
+
+	},
+
+	//
+
+	addScript: function ( object, script ) {
+
+		if ( this.scripts[ object.uuid ] === undefined ) {
+
+			this.scripts[ object.uuid ] = [];
+
+		}
+
+		this.scripts[ object.uuid ].push( script );
+
+		this.signals.scriptAdded.dispatch( script );
+
+	},
+
+	removeScript: function ( object, script ) {
+
+		if ( this.scripts[ object.uuid ] === undefined ) return;
+
+		var index = this.scripts[ object.uuid ].indexOf( script );
+
+		if ( index !== - 1 ) {
+
+			this.scripts[ object.uuid ].splice( index, 1 );
+
+		}
+
+		this.signals.scriptRemoved.dispatch( script );
 
 	},
 

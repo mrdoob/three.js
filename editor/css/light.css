@@ -38,6 +38,15 @@ input.Number {
 		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
 	}
 
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+	opacity: 0.9;
+}
+
 #player {
 	position: absolute;
 	top: 32px;
@@ -81,7 +90,7 @@ input.Number {
 			display: none;
 			padding: 5px 0px;
 			background: #eee;
-			width: 140px;
+			width: 150px;
 		}
 
 		#menubar .menu:hover .options {

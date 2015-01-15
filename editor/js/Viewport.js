@@ -225,6 +225,12 @@ var Viewport = function ( editor ) {
 
 	// signals
 
+	signals.editorCleared.add( function () {
+
+		render();
+
+	} );
+
 	signals.themeChanged.add( function ( value ) {
 
 		switch ( value ) {
@@ -323,11 +329,7 @@ var Viewport = function ( editor ) {
 
 			}
 
-			if ( object instanceof THREE.PerspectiveCamera === false ) {
-
-				transformControls.attach( object );
-
-			}
+			transformControls.attach( object );
 
 		}
 
@@ -369,19 +371,21 @@ var Viewport = function ( editor ) {
 
 		transformControls.update();
 
-		if ( object !== camera ) {
+		if ( object.geometry !== undefined ) {
 
-			if ( object.geometry !== undefined ) {
+			selectionBox.update( object );
 
-				selectionBox.update( object );
+		}
 
-			}
+		if ( object instanceof THREE.PerspectiveCamera ) {
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			object.updateProjectionMatrix();
 
-				editor.helpers[ object.id ].update();
+		}
 
-			}
+		if ( editor.helpers[ object.id ] !== undefined ) {
+
+			editor.helpers[ object.id ].update();
 
 		}
 
