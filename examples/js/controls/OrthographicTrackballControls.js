@@ -1,5 +1,6 @@
 /**
  * @author Eberhard Graether / http://egraether.com/
+ * @author Mark Lundin 	/ http://mark-lundin.com
  * @author Patrick Fuller / http://patrick-fuller.com
  */
 
@@ -74,6 +75,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	var startEvent = { type: 'start'};
 	var endEvent = { type: 'end'};
 
+
 	// methods
 
 	this.handleResize = function () {
@@ -98,6 +100,11 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		}
 
 		this.radius = 0.5 * Math.min( this.screen.width, this.screen.height );
+
+		this.left0 = this.object.left;
+		this.right0 = this.object.right;
+		this.top0 = this.object.top;
+		this.bottom0 = this.object.bottom;
 
 	};
 
@@ -174,8 +181,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			return vector;
 
- 		};
- 
+		};
+
 	}() );
 
 	this.rotateCamera = (function(){

@@ -1,6 +1,5 @@
 import uuid
-from .. import constants 
-from .exceptions import ThreeValueError
+from .. import constants, exceptions 
 
 
 class BaseClass(constants.BASE_DICT):
@@ -18,7 +17,7 @@ class BaseClass(constants.BASE_DICT):
     def __setitem__(self, key, value):
         if not isinstance(value, constants.VALID_DATA_TYPES):
             msg = 'Value is an invalid data type: %s' % type(value)
-            raise ThreeValueError(msg) 
+            raise exceptions.ThreeValueError(msg) 
         constants.BASE_DICT.__setitem__(self, key, value)
 
     @property

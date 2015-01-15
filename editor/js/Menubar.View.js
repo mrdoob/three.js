@@ -42,6 +42,40 @@ Menubar.View = function ( editor ) {
 	} );
 	options.add( option );
 
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// fullscreen
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Fullscreen' );
+	option.onClick( function () {
+
+		var element = document.body;
+
+		if ( element.requestFullscreen ) {
+
+			element.requestFullscreen();
+
+		} else if ( element.mozRequestFullScreen ) {
+
+			element.mozRequestFullScreen();
+
+		} else if ( element.webkitRequestFullscreen ) {
+
+			element.webkitRequestFullscreen();
+
+		} else if ( element.msRequestFullscreen ) {
+
+			element.msRequestFullscreen();
+
+		}
+
+	} );
+	options.add( option );
+
 	return container;
 
 };

@@ -65,15 +65,16 @@
 				video.width = 640;
 				video.height = 360;
 				video.autoplay = true;
-				video.loop = true; 
+				video.loop = true;
 				video.src = "textures/pano.webm";
 
 				var texture = new THREE.VideoTexture( video );
+				texture.minFilter = THREE.LinearFilter;
 
 				var material   = new THREE.MeshBasicMaterial( { map : texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
-				
+
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();

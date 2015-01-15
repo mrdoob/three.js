@@ -79,16 +79,15 @@ var Viewport = function ( editor ) {
 	// object picking
 
 	var raycaster = new THREE.Raycaster();
+	var mouse = new THREE.Vector2();
 
 	// events
 
 	var getIntersects = function ( point, object ) {
 
-		var vector = new THREE.Vector3();
-		vector.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1, 0.5 );
-		vector.unproject( camera );
+		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
 
-		raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+		raycaster.setFromCamera( mouse, camera );
 
 		if ( object instanceof Array ) {
 
@@ -226,6 +225,12 @@ var Viewport = function ( editor ) {
 
 	// signals
 
+	signals.editorCleared.add( function () {
+
+		render();
+
+	} );
+
 	signals.themeChanged.add( function ( value ) {
 
 		switch ( value ) {
@@ -271,6 +276,7 @@ var Viewport = function ( editor ) {
 
 		renderer = createRenderer( type, antialias );
 		renderer.setClearColor( clearColor );
+		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
@@ -323,11 +329,7 @@ var Viewport = function ( editor ) {
 
 			}
 
-			if ( object instanceof THREE.PerspectiveCamera === false ) {
-
-				transformControls.attach( object );
-
-			}
+			transformControls.attach( object );
 
 		}
 
@@ -341,7 +343,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.geometryChanged.add( render );
+	signals.geometryChanged.add( function ( geometry ) {
+
+		selectionBox.update( editor.selected );
+
+		render();
+
+	} );
 
 	signals.objectAdded.add( function ( object ) {
 
@@ -363,19 +371,21 @@ var Viewport = function ( editor ) {
 
 		transformControls.update();
 
-		if ( object !== camera ) {
+		if ( object.geometry !== undefined ) {
 
-			if ( object.geometry !== undefined ) {
+			selectionBox.update( object );
 
-				selectionBox.update( object );
+		}
 
-			}
+		if ( object instanceof THREE.PerspectiveCamera ) {
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			object.updateProjectionMatrix();
 
-				editor.helpers[ object.id ].update();
+		}
 
-			}
+		if ( editor.helpers[ object.id ] !== undefined ) {
+
+			editor.helpers[ object.id ].update();
 
 		}
 

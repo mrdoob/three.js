@@ -22,7 +22,6 @@
 
 		<script src="js/CurveExtras.js"></script>
 		<script src="js/ParametricGeometries.js"></script>
-		<script src="js/utils/UVsUtils.js"></script>
 
 		<script>
 
@@ -110,7 +109,6 @@
 				scene.add( object );
 
 				var geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.plane( 200, 200 ), 10, 20 );
-				// document.body.appendChild( THREE.UVsDebug( geo ));
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
@@ -131,7 +129,6 @@
 				//  scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( sphere2, materials );
-				// document.body.appendChild( THREE.UVsDebug( sphere2 ));
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 

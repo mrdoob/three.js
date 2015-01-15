@@ -25,7 +25,7 @@
 
 		<h3>[property:Integer id]</h3>
 		<div>
-		Unique number for this object instance.
+		readonly – Unique number for this object instance.
 		</div>
 
 		<h3>[property:String uuid]</h3>
@@ -59,11 +59,6 @@
 		Object's local rotation (<a href="https://en.wikipedia.org/wiki/Euler_angles" target="_blank">Euler angles</a>), in radians.
 		</div>
 
-		<h3>[property:String eulerOrder]</h3>
-		<div>
-		Order of axis for Euler angles.
-		</div>
-
 		<h3>[property:Vector3 scale]</h3>
 		<div>
 		Object's local scale.
@@ -81,47 +76,63 @@
 
 		<h3>[property:Quaternion quaternion]</h3>
 		<div>
-		Object's local rotation as [page:Quaternion Quaternion]. Only used when useQuaternion is set to true.
-		</div>
-
-		<h3>[property:Boolean useQuaternion]</h3>
-		<div>
-		Use quaternion instead of Euler angles for specifying local rotation.
+		Object's local rotation as [page:Quaternion Quaternion].
 		</div>
 
 		<h3>[property:Boolean visible]</h3>
 		<div>
 		Object gets rendered if *true*.
 		</div>
+		<div>
+		default – true
+		</div>
 
 		<h3>[property:Boolean castShadow]</h3>
 		<div>
 		Gets rendered into shadow map.
+		</div>
+		<div>
+		default – false
 		</div>
 
 		<h3>[property:Boolean receiveShadow]</h3>
 		<div>
 		Material gets baked in shadow receiving.
 		</div>
+		<div>
+		default – false
+		</div>
 
 		<h3>[property:Boolean frustumCulled]</h3>
 		<div>
 		When this is set, it checks every frame if the object is in the frustum of the camera. Otherwise the object gets drawn every frame even if it isn't visible.
+		</div>
+		<div>
+		default – true
 		</div>
 
 		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<div>
 		When this is set, it calculates the matrix of position, (rotation or quaternion) and scale every frame and also recalculates the matrixWorld property.
 		</div>
+		<div>
+		default – true
+		</div>
 
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
 		<div>
 		When this is set, it calculates the matrixWorld in that frame and resets this property to false.
 		</div>
+		<div>
+		default – false
+		</div>
 
 		<h3>[property:Boolean rotationAutoUpdate]</h3>
 		<div>
 		When this is set, then the rotationMatrix gets calculated every frame.
+		</div>
+		<div>
+		default – true
 		</div>
 
 		<h3>[property:object userData]</h3>
@@ -195,28 +206,45 @@
 		Rotates object to face point in space.
 		</div>
 
-		<h3>[method:null add]( [page:Object3D object] )</h3>
+		<h3>[method:null add]( [page:Object3D object], ... )</h3>
 		<div>
 		object - An object.<br />
 		</div>
 		<div>
-		Adds *object* as child of this object.
+		Adds *object* as child of this object. An arbitrary number of objects may be added.
 		</div>
 
-		<h3>[method:null remove]( [page:Object3D object] )</h3>
+		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
 		<div>
 		object - An object.<br />
 		</div>
 		<div>
-		Removes *object* as child of this object.
+		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</div>
 
 		<h3>[method:null traverse]( [page:Function callback] )</h3>
 		<div>
-		callback - An Function with as first argument an object3D object.<br />
+		callback - A function with as first argument an object3D object.<br />
 		</div>
 		<div>
 		Executes the callback on this object and all descendants.
+		</div>
+		
+		<h3>[method:null traverseVisible]( [page:Function callback] )</h3>
+		<div>
+		callback - A function with as first argument an object3D object.<br />
+		</div>
+		<div>
+		Like traverse, but the callback will only be executed for visible objects.
+		Descendants of invisible objects are not traversed.
+		</div>
+		
+		<h3>[method:null traverseAncestors]( [page:Function callback] )</h3>
+		<div>
+		callback - A function with as first argument an object3D object.<br />
+		</div>
+		<div>
+		Executes the callback on this object and all ancestors.
 		</div>
 
 		<h3>[method:null updateMatrix]()</h3>
@@ -269,6 +297,11 @@
 		</div>
 		<div>
 		Rotate an object along an axis in object space. The axis is assumed to be normalized.
+		</div>
+
+		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
+		<div>
+		Abstract method to get intersections between a casted ray and this object. Subclasses such as [page:Mesh], [page:Line], and [page:PointCloud] implement this method in order to participate in raycasting.
 		</div>
 
 		<h2>Source</h2>

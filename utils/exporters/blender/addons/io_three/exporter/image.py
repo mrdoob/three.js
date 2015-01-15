@@ -1,6 +1,6 @@
 import os
-from .. import constants
-from . import base_classes, io, api, logger
+from .. import constants, logger
+from . import base_classes, io, api
 
 
 class Image(base_classes.BaseNode):

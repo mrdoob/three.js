@@ -1036,7 +1036,7 @@ THREE.SceneLoader.prototype = {
 
 			for ( parID in matJSON.parameters ) {
 
-				if ( parID === "envMap" || parID === "map" || parID === "lightMap" || parID === "bumpMap" || parID === "alphaMap" ) {
+				if ( parID === "envMap" || parID === "map" || parID === "lightMap" || parID === "bumpMap" || parID === "normalMap" || parID === "alphaMap" ) {
 
 					matJSON.parameters[ parID ] = result.textures[ matJSON.parameters[ parID ] ];
 
@@ -1087,6 +1087,11 @@ THREE.SceneLoader.prototype = {
 					var v3 = matJSON.parameters[ parID ];
 					matJSON.parameters[ parID ] = new THREE.Vector3( v3[ 0 ], v3[ 1 ], v3[ 2 ] );
 
+				} else if ( parID === "normalScale" ) {
+
+					var v2 = matJSON.parameters[ parID ];
+					matJSON.parameters[ parID ] = new THREE.Vector2( v2[ 0 ], v2[ 1 ] );
+
 				}
 
 			}
@@ -1097,85 +1102,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-			if ( matJSON.parameters.normalMap ) {
-
-				var shader = THREE.ShaderLib[ "normalmap" ];
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-				var diffuse = matJSON.parameters.color;
-				var specular = matJSON.parameters.specular;
-				var ambient = matJSON.parameters.ambient;
-				var shininess = matJSON.parameters.shininess;
-
-				uniforms[ "tNormal" ].value = result.textures[ matJSON.parameters.normalMap ];
-
-				if ( matJSON.parameters.normalScale ) {
-
-					uniforms[ "uNormalScale" ].value.set( matJSON.parameters.normalScale[ 0 ], matJSON.parameters.normalScale[ 1 ] );
-
-				}
-
-				if ( matJSON.parameters.map ) {
-
-					uniforms[ "tDiffuse" ].value = matJSON.parameters.map;
-					uniforms[ "enableDiffuse" ].value = true;
-
-				}
-
-				if ( matJSON.parameters.envMap ) {
-
-					uniforms[ "tCube" ].value = matJSON.parameters.envMap;
-					uniforms[ "enableReflection" ].value = true;
-					uniforms[ "reflectivity" ].value = matJSON.parameters.reflectivity;
-
-				}
-
-				if ( matJSON.parameters.lightMap ) {
-
-					uniforms[ "tAO" ].value = matJSON.parameters.lightMap;
-					uniforms[ "enableAO" ].value = true;
-
-				}
-
-				if ( matJSON.parameters.specularMap ) {
-
-					uniforms[ "tSpecular" ].value = result.textures[ matJSON.parameters.specularMap ];
-					uniforms[ "enableSpecular" ].value = true;
-
-				}
-
-				if ( matJSON.parameters.displacementMap ) {
-
-					uniforms[ "tDisplacement" ].value = result.textures[ matJSON.parameters.displacementMap ];
-					uniforms[ "enableDisplacement" ].value = true;
-
-					uniforms[ "uDisplacementBias" ].value = matJSON.parameters.displacementBias;
-					uniforms[ "uDisplacementScale" ].value = matJSON.parameters.displacementScale;
-
-				}
-
-				uniforms[ "diffuse" ].value.setHex( diffuse );
-				uniforms[ "specular" ].value.setHex( specular );
-				uniforms[ "ambient" ].value.setHex( ambient );
-
-				uniforms[ "shininess" ].value = shininess;
-
-				if ( matJSON.parameters.opacity ) {
-
-					uniforms[ "opacity" ].value = matJSON.parameters.opacity;
-
-				}
-
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
-
-				material = new THREE.ShaderMaterial( parameters );
-
-			} else {
-
-				material = new THREE[ matJSON.type ]( matJSON.parameters );
-
-			}
-
+			material = new THREE[ matJSON.type ]( matJSON.parameters );
 			material.name = matID;
 
 			result.materials[ matID ] = material;

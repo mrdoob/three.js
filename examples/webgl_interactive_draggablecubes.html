@@ -27,6 +27,7 @@
 			var camera, controls, scene, renderer;
 			var objects = [], plane;
 
+			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2(),
 			offset = new THREE.Vector3(),
 			INTERSECTED, SELECTED;
@@ -159,9 +160,7 @@
 
 				//
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
-
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				if ( SELECTED ) {
 

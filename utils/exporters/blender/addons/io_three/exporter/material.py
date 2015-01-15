@@ -1,5 +1,5 @@
-from .. import constants
-from . import base_classes, utilities, logger, api
+from .. import constants, logger
+from . import base_classes, utilities, api
 
 
 class Material(base_classes.BaseNode):

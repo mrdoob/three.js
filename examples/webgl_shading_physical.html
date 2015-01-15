@@ -324,7 +324,7 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -496,7 +496,7 @@
 				if ( morph ) morph.updateAnimation( delta );
 
 				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
 
 				sunLight.intensity = parameters.control * 0.7 + 0.3;
 				pointLight.intensity = - parameters.control * 0.5 + 1;
@@ -526,4 +526,3 @@
 
 	</body>
 </html>
-
