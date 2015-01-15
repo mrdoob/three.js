@@ -230,7 +230,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.TOUCH_ZOOM_PAN ) {
 
-			var factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
+			var factor = _touchZoomDistanceEnd / _touchZoomDistanceStart;
 			_touchZoomDistanceStart = _touchZoomDistanceEnd;
 
 			_this.object.zoom *= factor;
