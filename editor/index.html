@@ -264,6 +264,8 @@
 					loader.load( hash.substr( 5 ), function ( text ) {
 
 						var json = JSON.parse( text );
+
+						editor.clear();
 						editor.fromJSON( json );
 
 					} );
