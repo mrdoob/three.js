@@ -89,7 +89,7 @@
 			void main( void ) {
 
 				vec4 color = texture2D( texture, gl_PointCoord );
-				// TODO: mul with far, or something like that...
+				// Depth was encoded as 1/1000, so we need to scale it back.
 				float bgDepth = 1000.0 * unpackDepth( texture2D( colorDepthTex, gl_FragCoord.xy * invResolution ) );
 				float soften = min( softenCoeff * (bgDepth - depth), 1.0 );
 				gl_FragColor = vec4( color.rgb, fade*soften * color.a );
@@ -122,7 +122,8 @@
 			void main( void ) {
 
 				float depth = gl_FragCoord.z / gl_FragCoord.w;
-				// TODO: div with far, or something like that...
+				// The packing requires depth in [0, 1] so we scale the clip-space z by 1000.
+				// Ideally the scaler should match far plane distance.
 				gl_FragColor = vec4( packDepth( depth / 1000.0 ) );
 
 			}
@@ -132,11 +133,13 @@
 		<script>
 
 			// This is inversely proportional to world-space distance: 1 / <world-space size>.
-			// Experimentation will give good values.
+			// Experiment to get good value for your scene.
 			var SOFTEN_COEFF = 1.0 / 1.2;
 
-			// Factor to reduce depth texture size in proportion to window size.
+			// Divisor to window size for depth texture size. Larger values produce more error where depth changes sharply.
 			var DEPTH_TEXTURE_SCALE = 1;
+
+			var PARTICLE_SIZE = 10;
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -147,10 +150,8 @@
 
 			var effectEnabled = true;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-			var scaledWidth = 800;
-			var scaledHeight = 600;
+			var windowHalfX, windowHalfY;
+			var scaledWidth, scaledHeight;
 
 			var particleUnif, particleCloud;
 			var boxMesh;
@@ -162,20 +163,16 @@
 
 			}
 
-
 			init();
 			animate();
 
 			function init() {
 
-				updateScaledSize();
+				updateSizes();
 
-				renderer = new THREE.WebGLRenderer( {
-					autoClear: false,
-					autoClearColor: false,
-					autoClearDepth: false,
-					autoClearStencil: false
-				} );
+				renderer = new THREE.WebGLRenderer();
+				renderer.autoClear = false;
+				renderer.autoClearColor = renderer.autoClearDepth = renderer.autoClearStencil = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -205,7 +202,7 @@
 				}
 
 				particleUnif = {
-					particleSize: { type: 'f', value: 10 },
+					particleSize: { type: 'f', value: PARTICLE_SIZE },
 					particleScale: { type: 'f', value: window.innerHeight },
 					near: { type: 'f', value: camera.near },
 					far: { type: 'f', value: camera.far },
@@ -220,12 +217,8 @@
 					vertexShader: document.getElementById( 'particleVS' ).textContent,
 					fragmentShader: document.getElementById( 'particleFS' ).textContent,
 					transparent: true,
-					depthTest: true,
 					depthWrite: false,
-					blending: THREE.CustomBlending,
-					blendEquation: THREE.AddEquation,
-					blendSrd: THREE.OneFactor,
-					blendDst: THREE.OneFactor
+					blending: THREE.AdditiveBlending
 				} );
 
 				particleCloud = new THREE.PointCloud( particleGeom, particleMat );
@@ -235,15 +228,14 @@
 				boxTex.anisotropy = 4;
 				var boxMat = new THREE.MeshBasicMaterial( { map: boxTex } );
 				boxMesh = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ), boxMat );
+				boxMesh.position.z = 1;
 				scene.add( boxMesh );
 
 				depthMat = new THREE.ShaderMaterial( {
 					vertexShader: document.getElementById( 'depthVS' ).textContent,
 					fragmentShader: document.getElementById( 'depthFS' ).textContent,
-					writeDepth: true,
 					blending: THREE.NoBlending
 				} );
-
 
 				onWindowResize();
 
@@ -264,7 +256,10 @@
 
 			}
 
-			function updateScaledSize() {
+			function updateSizes() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				scaledWidth = Math.floor( window.innerWidth / DEPTH_TEXTURE_SCALE );
 				scaledHeight = Math.floor( window.innerHeight / DEPTH_TEXTURE_SCALE );
@@ -273,10 +268,7 @@
 
 			function onWindowResize() {
 
-				updateScaledSize();
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
+				updateSizes();
 
 				rtDepth.width = scaledWidth;
 				rtDepth.height = scaledHeight;
@@ -328,13 +320,12 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				frameCounter++;
+				frameCounter ++;
 
 				render();
 				stats.update();
 
 			}
-
 			
 			function toggleEffect() {
 
@@ -356,20 +347,22 @@
 				camera.lookAt( scene.position );
 
 				boxMesh.position.x = 1.7 * Math.cos( t );
-				boxMesh.position.z = 1;
 				boxMesh.rotation.y = t * 0.5;
 				particleCloud.rotation.y = t * 0.25;
 
 				if ( effectEnabled ) {
 
-					renderer.customCullCallback = cullTransparent;
+					// 1) Render opaque objects using a depth material to depth texture.
 					scene.overrideMaterial = depthMat;
+					renderer.customCullCallback = cullTransparent;
 					renderer.setClearColor( 0xffffff, 1 );
 					renderer.clearTarget( rtDepth, true, true, false )
 					renderer.render( scene, camera, rtDepth );
 
-					renderer.customCullCallback = null;
+					// 2) Render scene normally. Particles use a shader which reduces
+					// alpha the nearer the fragment is to the opaque surface behind it.
 					scene.overrideMaterial = null;
+					renderer.customCullCallback = null;
 					renderer.setRenderTarget( null );
 					renderer.setClearColor( 0x000000, 0 );
 					renderer.render( scene, camera );
