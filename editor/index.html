@@ -251,6 +251,27 @@
 
 			onWindowResize();
 
+			//
+
+			var hash = window.location.hash;
+
+			if ( hash.substr( 1, 4 ) === 'app=' ) {
+
+				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+
+					var loader = new THREE.XHRLoader();
+					loader.crossOrigin = '';
+					loader.load( hash.substr( 5 ), function ( text ) {
+
+						var json = JSON.parse( text );
+						editor.fromJSON( json );
+
+					} );
+
+				}
+
+			}
+
 		</script>
 	</body>
 </html>
