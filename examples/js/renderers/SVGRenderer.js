@@ -89,6 +89,8 @@ THREE.SVGRenderer = function () {
 
 	};
 
+	this.setPixelRatio = function () {};
+
 	this.setSize = function( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;

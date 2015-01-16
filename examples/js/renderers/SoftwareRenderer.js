@@ -70,6 +70,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		cleanColorBuffer();
 	};
 
+	this.setPixelRatio = function () {};
+
 	this.setSize = function ( width, height ) {
 
 		canvasWBlocks = Math.floor( width / blockSize );
