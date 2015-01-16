@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - particles - soft</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl soft particles - references: <a href="http://developer.download.nvidia.com/whitepapers/2007/SDK10/SoftParticles_hi.pdf" target="_blank">[1]</a> <a href="http://http.developer.nvidia.com/GPUGems3/gpugems3_ch23.html" target="_blank">[2]</a><br/>
+			<input type="checkbox" checked onclick="toggleEffect();">enabled</>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script id="particleVS" type="x-shader/x-vertex">
+
+			uniform float particleScale;
+			uniform float particleSize;
+			uniform float far;
+			uniform float near;
+
+			varying float fade;
+			varying float depth;
+
+			void main()
+			{
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+				depth = gl_Position.z * (far-near) / far + near;
+
+				float attenuation = 1.0 / (gl_Position.z * gl_Position.z);
+				gl_PointSize = particleSize * particleScale * attenuation;
+
+				// Fade particles a little based on distance to give a better look.
+				fade = min( 4.3 * attenuation, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="particleFS" type="x-shader/x-fragment">
+
+			uniform sampler2D texture;
+			uniform sampler2D colorDepthTex;
+			uniform vec2 invResolution;
+			uniform float softenCoeff;
+
+			varying float fade;
+			varying float depth;
+
+			float unpackDepth( const in vec4 rgba_depth ) {
+
+				const vec4 bit_shift = vec4( 1.0 / ( 256.0*256.0*256.0 ), 1.0 / ( 256.0*256.0 ), 1.0 / 256.0, 1.0 );
+				float depth = dot( rgba_depth, bit_shift );
+				return depth;
+
+			}
+
+			void main( void ) {
+
+				vec4 color = texture2D( texture, gl_PointCoord );
+				// TODO: mul with far, or something like that...
+				float bgDepth = 1000.0 * unpackDepth( texture2D( colorDepthTex, gl_FragCoord.xy * invResolution ) );
+				float soften = min( softenCoeff * (bgDepth - depth), 1.0 );
+				gl_FragColor = vec4( color.rgb, fade*soften * color.a );
+
+			}
+
+		</script>
+
+		<script id="depthVS" type="x-shader/x-vertex">
+
+			void main()
+			{
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			}
+
+		</script>
+
+		<script id="depthFS" type="x-shader/x-fragment">
+
+			vec4 packDepth( const in float depth ) {
+
+				const vec4 bit_shift = vec4( 256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0 );
+				const vec4 bit_mask = vec4( 0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0 );
+				vec4 res = mod( depth * bit_shift * vec4( 255.0 ), vec4( 256.0 ) ) / vec4( 255.0 );
+				res -= res.xxyz * bit_mask;
+				return res;
+
+			}
+
+			void main( void ) {
+
+				float depth = gl_FragCoord.z / gl_FragCoord.w;
+				// TODO: div with far, or something like that...
+				gl_FragColor = vec4( packDepth( depth / 1000.0 ) );
+
+			}
+
+		</script>
+
+		<script>
+
+			// This is inversely proportional to world-space distance: 1 / <world-space size>.
+			// Experimentation will give good values.
+			var SOFTEN_COEFF = 1.0 / 1.2;
+
+			// Factor to reduce depth texture size in proportion to window size.
+			var DEPTH_TEXTURE_SCALE = 1;
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var camera, scene, renderer, frameCounter = 0;
+			var mouseX = 0, mouseY = 0;
+			var angleX = 0, angleY = 0;
+
+			var effectEnabled = true;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+			var scaledWidth = 800;
+			var scaledHeight = 600;
+
+			var particleUnif, particleCloud;
+			var boxMesh;
+			var depthMat, rtDepth;
+
+			var cullTransparent = function ( object ) {
+
+				return object.material && ( object.material.transparent === true );
+
+			}
+
+
+			init();
+			animate();
+
+			function init() {
+
+				updateScaledSize();
+
+				renderer = new THREE.WebGLRenderer( {
+					autoClear: false,
+					autoClearColor: false,
+					autoClearDepth: false,
+					autoClearStencil: false
+				} );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera = new THREE.PerspectiveCamera( 64, window.innerWidth / window.innerHeight, 0.1, 200 );
+				scene = new THREE.Scene();
+
+				rtDepth = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, {
+					minFilter: THREE.NearestFilter,
+					magFilter: THREE.NearestFilter,
+					format: THREE.RGBAFormat,
+					stencilBuffer: false
+				} );
+
+				var particleGeom = new THREE.Geometry();
+				var particleTex = THREE.ImageUtils.loadTexture( "textures/sprites/circle.png" );
+				particleTex.minFilter = particleTex.magFilter = THREE.LinearFilter;
+
+				for ( var i = 0; i < 30; i ++ ) {
+
+					var a = 8*Math.PI * i/29;
+					var vertex = new THREE.Vector3();
+					vertex.x = 2 * Math.cos( a );
+					vertex.z = 2 * Math.sin( a );
+					vertex.y = 4 * i/29 - 2;
+					particleGeom.vertices.push( vertex );
+
+				}
+
+				particleUnif = {
+					particleSize: { type: 'f', value: 10 },
+					particleScale: { type: 'f', value: window.innerHeight },
+					near: { type: 'f', value: camera.near },
+					far: { type: 'f', value: camera.far },
+					invResolution: { type: 'v2', value: THREE.Vector2( 1/window.innerWidth, 1/window.innerHeight ) },
+					softenCoeff: { type: 'f', value: SOFTEN_COEFF }, 
+					texture: { type: 't', value: particleTex },
+					colorDepthTex: { type: 't', value: rtDepth }
+				};
+
+				var particleMat = new THREE.ShaderMaterial( {
+					uniforms: particleUnif,
+					vertexShader: document.getElementById( 'particleVS' ).textContent,
+					fragmentShader: document.getElementById( 'particleFS' ).textContent,
+					transparent: true,
+					depthTest: true,
+					depthWrite: false,
+					blending: THREE.CustomBlending,
+					blendEquation: THREE.AddEquation,
+					blendSrd: THREE.OneFactor,
+					blendDst: THREE.OneFactor
+				} );
+
+				particleCloud = new THREE.PointCloud( particleGeom, particleMat );
+				scene.add( particleCloud );
+
+				var boxTex = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
+				boxTex.anisotropy = 4;
+				var boxMat = new THREE.MeshBasicMaterial( { map: boxTex } );
+				boxMesh = new THREE.Mesh( new THREE.BoxGeometry( 4, 4, 4 ), boxMat );
+				scene.add( boxMesh );
+
+				depthMat = new THREE.ShaderMaterial( {
+					vertexShader: document.getElementById( 'depthVS' ).textContent,
+					fragmentShader: document.getElementById( 'depthFS' ).textContent,
+					writeDepth: true,
+					blending: THREE.NoBlending
+				} );
+
+
+				onWindowResize();
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function updateScaledSize() {
+
+				scaledWidth = Math.floor( window.innerWidth / DEPTH_TEXTURE_SCALE );
+				scaledHeight = Math.floor( window.innerHeight / DEPTH_TEXTURE_SCALE );
+
+			}
+
+			function onWindowResize() {
+
+				updateScaledSize();
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				rtDepth.width = scaledWidth;
+				rtDepth.height = scaledHeight;
+				rtDepth = rtDepth.clone();
+
+				particleUnif[ 'colorDepthTex' ].value = rtDepth;
+				particleUnif[ 'invResolution' ].value = new THREE.Vector2( 1/window.innerWidth, 1/window.innerHeight );
+				particleUnif[ 'particleScale' ].value = window.innerHeight;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
+				}
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				frameCounter++;
+
+				render();
+				stats.update();
+
+			}
+
+			
+			function toggleEffect() {
+
+				effectEnabled = ! effectEnabled;
+
+			}
+
+			function render() {
+
+				var t = frameCounter / 60;
+
+				angleX += (  0.5*Math.PI * mouseX / window.innerWidth - angleX ) * 0.1;
+				angleY += (  0.5*Math.PI * mouseY / window.innerHeight - angleY ) * 0.1;
+
+				camera.position.x = 6 * Math.sin(angleX) * Math.cos(angleY);
+				camera.position.y = 6 * Math.sin(angleY);
+				camera.position.z = -6 * Math.cos(angleX) * Math.cos(angleY);
+
+				camera.lookAt( scene.position );
+
+				boxMesh.position.x = 1.7 * Math.cos( t );
+				boxMesh.position.z = 1;
+				boxMesh.rotation.y = t * 0.5;
+				particleCloud.rotation.y = t * 0.25;
+
+				if ( effectEnabled ) {
+
+					renderer.customCullCallback = cullTransparent;
+					scene.overrideMaterial = depthMat;
+					renderer.setClearColor( 0xffffff, 1 );
+					renderer.clearTarget( rtDepth, true, true, false )
+					renderer.render( scene, camera, rtDepth );
+
+					renderer.customCullCallback = null;
+					scene.overrideMaterial = null;
+					renderer.setRenderTarget( null );
+					renderer.setClearColor( 0x000000, 0 );
+					renderer.render( scene, camera );
+
+				} else {
+
+					renderer.customCullCallback = null;
+					scene.overrideMaterial = null;
+					renderer.setClearColor( 0xffffff, 1 );
+					renderer.clearTarget( rtDepth, true, false, false )
+					renderer.setClearColor( 0x000000, 0 );
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>
