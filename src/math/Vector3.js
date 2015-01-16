@@ -597,6 +597,14 @@ THREE.Vector3.prototype = {
 
 	},
 
+	lerpVectors: function ( v1, v2, alpha ) {
+
+	    this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+
+	    return this;
+
+	},
+
 	cross: function ( v, w ) {
 
 		if ( w !== undefined ) {
