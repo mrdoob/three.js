@@ -55,6 +55,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
+	this.customCullCallback = null;
 
 	// physically based shading
 
@@ -3419,6 +3420,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function projectObject( object ) {
 
 		if ( object.visible === false ) return;
+
+		if ( _this.customCullCallback && _this.customCullCallback( object ) === true ) return;
 
 		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
 
