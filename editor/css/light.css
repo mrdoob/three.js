@@ -128,6 +128,10 @@ input.Number {
 	overflow: auto;
 }
 
+	#sidebar * {
+		vertical-align: middle;
+	}
+
 	#sidebar input,
 	#sidebar textarea,
 	#sidebar select {

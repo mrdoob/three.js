@@ -1,7 +1,3 @@
-﻿* {
-	vertical-align: middle;
-}
-
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -79,6 +75,7 @@ textarea, input { outline: none; } /* osx */
 	height: calc(100% - 37px) !important;
 
 }
+
 /* scene types */
 
 .type {
@@ -119,7 +116,7 @@ textarea, input { outline: none; } /* osx */
 	color: #bbeebb;
 }
 .TorusGeometry {
-	color: #aaeeaa;	
+	color: #aaeeaa;
 }
 
 /* */
