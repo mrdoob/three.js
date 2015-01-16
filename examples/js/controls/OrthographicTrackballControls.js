@@ -366,7 +366,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		_this.dispatchEvent( changeEvent );
 
-		_changed = true;
+		_changed = false;
 
 	};
 
