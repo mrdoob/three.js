@@ -272,7 +272,6 @@ Menubar.File = function ( editor ) {
 	*/
 
 
-
 	//
 
 	var exportString = function ( output ) {
