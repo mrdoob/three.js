@@ -227,6 +227,7 @@ var Viewport = function ( editor ) {
 
 	signals.editorCleared.add( function () {
 
+		controls.center.set( 0, 0, 0 );
 		render();
 
 	} );
