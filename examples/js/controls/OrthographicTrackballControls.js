@@ -2,6 +2,7 @@
  * @author Eberhard Graether / http://egraether.com/
  * @author Mark Lundin 	/ http://mark-lundin.com
  * @author Patrick Fuller / http://patrick-fuller.com
+ * @author Max Smolens / https://github.com/msmolens
  */
 
 THREE.OrthographicTrackballControls = function ( object, domElement ) {
