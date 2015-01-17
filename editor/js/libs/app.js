@@ -30,6 +30,9 @@ var APP = {
 				mousedown: [],
 				mouseup: [],
 				mousemove: [],
+				touchstart: [],
+				touchend: [],
+				touchmove: [],
 				update: []
 			};
 
@@ -43,7 +46,7 @@ var APP = {
 
 					var script = sources[ i ];
 
-					var events = ( new Function( 'player', 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, update: update };' ).bind( object ) )( this, scene );
+					var events = ( new Function( 'player', 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'touchstart', 'touchend', 'touchmove', 'update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, touchstart: touchstart, touchend: touchend, touchmove: touchmove, update: update };' ).bind( object ) )( this, scene );
 
 					for ( var name in events ) {
 
@@ -117,6 +120,9 @@ var APP = {
 			document.addEventListener( 'mousedown', onDocumentMouseDown );
 			document.addEventListener( 'mouseup', onDocumentMouseUp );
 			document.addEventListener( 'mousemove', onDocumentMouseMove );
+			document.addEventListener( 'touchstart', onDocumentTouchStart );
+			document.addEventListener( 'touchend', onDocumentTouchEnd );
+			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
 			request = requestAnimationFrame( animate );
 
@@ -129,6 +135,9 @@ var APP = {
 			document.removeEventListener( 'mousedown', onDocumentMouseDown );
 			document.removeEventListener( 'mouseup', onDocumentMouseUp );
 			document.removeEventListener( 'mousemove', onDocumentMouseMove );
+			document.removeEventListener( 'touchstart', onDocumentTouchStart );
+			document.removeEventListener( 'touchend', onDocumentTouchEnd );
+			document.removeEventListener( 'touchmove', onDocumentTouchMove );
 
 			cancelAnimationFrame( request );
 
@@ -163,6 +172,24 @@ var APP = {
 		var onDocumentMouseMove = function ( event ) {
 
 			dispatch( scripts.mousemove, event );
+
+		};
+
+		var onDocumentTouchStart = function ( event ) {
+
+			dispatch( scripts.touchstart, event );
+
+		};
+
+		var onDocumentTouchEnd = function ( event ) {
+
+			dispatch( scripts.touchend, event );
+
+		};
+
+		var onDocumentTouchMove = function ( event ) {
+
+			dispatch( scripts.touchmove, event );
 
 		};
 
