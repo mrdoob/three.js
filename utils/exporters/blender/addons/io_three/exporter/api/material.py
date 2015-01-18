@@ -128,7 +128,7 @@ def normal_map(material):
 @_material
 def opacity(material):
     logger.debug('material.opacity(%s)', material)
-    return round(material.alpha - 1.0, 2);
+    return round(1.0 - material.alpha, 2);
 
 
 @_material
