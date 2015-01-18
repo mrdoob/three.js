@@ -6,6 +6,14 @@ Sidebar.Script = function ( editor ) {
 
 	var signals = editor.signals;
 
+    var container = new UI.Panel().setClass( 'Panel tab' );
+
+    container.add( new UI.Radio('tabs', 'tab-script', false) );
+    container.add( new UI.Label('Script', 'tab-script') );
+
+    var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-script' );
+
+    /*
 	var container = new UI.CollapsiblePanel();
 	container.setCollapsed( editor.config.getKey( 'ui/sidebar/script/collapsed' ) );
 	container.onCollapsedChange( function ( boolean ) {
@@ -16,12 +24,13 @@ Sidebar.Script = function ( editor ) {
 	container.setDisplay( 'none' );
 
 	container.addStatic( new UI.Text( 'Script' ).setTextTransform( 'uppercase' ) );
-	container.add( new UI.Break() );
+	containercontent.add( new UI.Break() );
+    */
 
 	//
 
 	var scriptsContainer = new UI.Panel();
-	container.add( scriptsContainer );
+	containercontent.add( scriptsContainer );
 
 	var newScript = new UI.Button( 'New' );
 	newScript.onClick( function () {
@@ -30,7 +39,7 @@ Sidebar.Script = function ( editor ) {
 		editor.addScript( editor.selected, script );
 
 	} );
-	container.add( newScript );
+	containercontent.add( newScript );
 
 	/*
 	var loadScript = new UI.Button( 'Load' );
@@ -91,6 +100,7 @@ Sidebar.Script = function ( editor ) {
 
 			}
 
+            // containercontent.add( scriptsContainer );
 		}
 
 	}
@@ -101,13 +111,13 @@ Sidebar.Script = function ( editor ) {
 
 		if ( object !== null ) {
 
-			container.setDisplay( 'block' );
+			//containercontent.setDisplay( 'block' );
 
 			update();
 
 		} else {
 
-			container.setDisplay( 'none' );
+			containercontent.setDisplay( 'none' );
 
 		}
 
@@ -115,6 +125,8 @@ Sidebar.Script = function ( editor ) {
 
 	signals.scriptAdded.add( update );
 	signals.scriptRemoved.add( update );
+
+    container.add( containercontent );
 
 	return container;
 

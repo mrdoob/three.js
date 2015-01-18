@@ -148,8 +148,8 @@ input.Number {
 
 	#sidebar > .Panel {
 		color: #888;
-		padding: 10px;
-		border-top: 1px solid #ccc;
+		padding: 1px;
+		/* border-top: 1px solid #ccc; */
 	}
 
 	#sidebar #outliner {
