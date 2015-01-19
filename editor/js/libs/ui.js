@@ -670,7 +670,6 @@ UI.Label = function ( text ) {
 
 	this.dom = dom;
 	this.setValue( text );
-	//this.setFor( id );
 
 	return this;
 
@@ -709,8 +708,6 @@ UI.Label.prototype.setFor = function ( value ) {
 
 };
 
-
-
 // Radio
 
 UI.Radio = function ( name  ) {
@@ -722,11 +719,9 @@ UI.Radio = function ( name  ) {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Radio';
 	dom.type = 'radio';
-	dom.name = name;
-	//dom.id = id;
 
 	this.dom = dom;
-	//this.setValue( boolean );
+	this.setValue( name );
 
 	return this;
 
@@ -745,7 +740,7 @@ UI.Radio.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
-		this.dom.checked = value;
+		this.dom.name = value;
 
 	}
 
@@ -758,15 +753,11 @@ UI.Radio.prototype.setCheck = function ( value ) {
 	if ( value !== undefined ) {
 
 		this.dom.checked = '';
-		//dom.setAttribute('checked', '');
 	}
 
 	return this;
 
 };
-
-
-
 
 // Checkbox
 
@@ -807,7 +798,6 @@ UI.Checkbox.prototype.setValue = function ( value ) {
 	return this;
 
 };
-
 
 // Color
 
