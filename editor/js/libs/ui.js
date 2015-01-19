@@ -661,7 +661,7 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 // Label
 
-UI.Label = function ( text, forid ) {
+UI.Label = function ( text ) {
 
 	UI.Element.call( this );
 
@@ -670,7 +670,7 @@ UI.Label = function ( text, forid ) {
 
 	this.dom = dom;
 	this.setValue( text );
-	this.setFor( forid );
+	//this.setFor( id );
 
 	return this;
 
@@ -713,7 +713,7 @@ UI.Label.prototype.setFor = function ( value ) {
 
 // Radio
 
-UI.Radio = function ( name, id, boolean ) {
+UI.Radio = function ( name  ) {
 
 	UI.Element.call( this );
 
@@ -723,14 +723,10 @@ UI.Radio = function ( name, id, boolean ) {
 	dom.className = 'Radio';
 	dom.type = 'radio';
 	dom.name = name;
-	dom.id = id;
+	//dom.id = id;
 
 	this.dom = dom;
 	//this.setValue( boolean );
-
-    if ( boolean ) {
-        dom.setAttribute('checked', '');
-    }
 
 	return this;
 
@@ -756,6 +752,20 @@ UI.Radio.prototype.setValue = function ( value ) {
 	return this;
 
 };
+
+UI.Radio.prototype.setCheck = function ( value ) {
+
+	if ( value !== undefined ) {
+
+		this.dom.checked = '';
+		//dom.setAttribute('checked', '');
+	}
+
+	return this;
+
+};
+
+
 
 
 // Checkbox

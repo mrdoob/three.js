@@ -6,12 +6,12 @@ Sidebar.Object3D = function ( editor ) {
 
 	var signals = editor.signals;
 
-    var container = new UI.Panel().setClass( 'Panel tab' );
+	var container = new UI.Panel().setClass( 'Panel tab' );
 
-    container.add( new UI.Radio('tabs', 'tab-object3d', false) );
-    container.add( new UI.Label('Obj3D', 'tab-object3d') );
+	container.add( new UI.Radio( 'tabs' ).setId( 'tab-object3d' ) );
+	container.add( new UI.Label( 'Obj3D' ).setFor( 'tab-object3d' ) );
 
-    var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-object3d' );
+	var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-object3d' );
 
 	// uuid
 
@@ -559,7 +559,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	}
 
-    container.add( containercontent );
+	container.add( containercontent );
 
 	return container;
 

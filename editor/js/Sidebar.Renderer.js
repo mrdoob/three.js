@@ -18,8 +18,8 @@ Sidebar.Renderer = function ( editor ) {
 
 	var container = new UI.Panel().setClass( 'Panel tab' );
 
-	container.add( new UI.Radio('tabs', 'tab-renderer', true) );
-    container.add( new UI.Label('Renderer', 'tab-renderer') );
+	container.add( new UI.Radio( 'tabs' ).setId( 'tab-renderer' ).setCheck() );
+	container.add( new UI.Label( 'Renderer' ).setFor( 'tab-renderer' ) );
 
 	var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-renderer' );
 

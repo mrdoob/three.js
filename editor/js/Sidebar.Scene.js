@@ -6,12 +6,12 @@ Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
 
-    var container = new UI.Panel().setClass( 'Panel tab' );
+	var container = new UI.Panel().setClass( 'Panel tab' );
 
-    container.add( new UI.Radio('tabs', 'tab-scene', false) );
-    container.add( new UI.Label('Scene', 'tab-scene') );
+	container.add( new UI.Radio( 'tabs' ).setId( 'tab-scene' ) );
+	container.add( new UI.Label( 'Scene' ).setFor( 'tab-scene' ) );
 
-    var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-scene' );
+	var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-scene' );
 
 	var ignoreObjectSelectedSignal = false;
 
@@ -218,7 +218,7 @@ Sidebar.Scene = function ( editor ) {
 
 	} );
 
-    container.add( containercontent );
+	container.add( containercontent );
 
 	return container;
 
