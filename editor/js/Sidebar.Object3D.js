@@ -17,6 +17,45 @@ Sidebar.Object3D = function ( editor ) {
 
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );
 	container.addStatic( objectType );
+
+	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '12px' );
+	objectActions.setOptions( {
+
+		'Actions': 'Actions',
+		'Reset Position': 'Reset Position',
+		'Reset Rotation': 'Reset Rotation',
+		'Reset Scale': 'Reset Scale'
+
+	} );
+	objectActions.onClick( function ( event ) {
+
+		event.stopPropagation();
+
+		var object = editor.selected;
+
+		switch ( this.getValue() ) {
+
+			case 'Reset Position':
+				object.position.set( 0, 0, 0 );
+				break;
+
+			case 'Reset Rotation':
+				object.rotation.set( 0, 0, 0 );
+				break;
+
+			case 'Reset Scale':
+				object.scale.set( 1, 1, 1 );
+				break;
+
+		}
+		
+		this.setValue( 'Actions' );
+
+		signals.objectChanged.dispatch( object );
+
+	} );
+	container.addStatic( objectActions );
+	
 	container.add( new UI.Break() );
 
 	// uuid
