@@ -341,7 +341,7 @@ UI.Input = function ( text ) {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Input';
 	dom.style.padding = '2px';
-	dom.style.border = '1px solid #ccc';
+	dom.style.border = '1px solid transparent';
 
 	dom.addEventListener( 'keydown', function ( event ) {
 
@@ -385,7 +385,6 @@ UI.TextArea = function () {
 	var dom = document.createElement( 'textarea' );
 	dom.className = 'TextArea';
 	dom.style.padding = '2px';
-	dom.style.border = '1px solid #ccc';
 	dom.spellcheck = false;
 
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -440,10 +439,7 @@ UI.Select = function () {
 
 	var dom = document.createElement( 'select' );
 	dom.className = 'Select';
-	dom.style.width = '64px';
-	dom.style.height = '16px';
-	dom.style.border = '0px';
-	dom.style.padding = '0px';
+	dom.style.padding = '2px';
 
 	this.dom = dom;
 

@@ -18,7 +18,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );
 	container.addStatic( objectType );
 
-	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '12px' );
+	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '11px' );
 	objectActions.setOptions( {
 
 		'Actions': 'Actions',
@@ -61,7 +61,7 @@ Sidebar.Object3D = function ( editor ) {
 	// uuid
 
 	var objectUUIDRow = new UI.Panel();
-	var objectUUID = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
+	var objectUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
 	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
@@ -243,7 +243,7 @@ Sidebar.Object3D = function ( editor ) {
 	var timeout;
 
 	var objectUserDataRow = new UI.Panel();
-	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setFontSize( '12px' ).onChange( update );
 	objectUserData.onKeyUp( function () {
 
 		try {
@@ -597,7 +597,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		}
 
-		objectUserData.setBorderColor( '#ccc' );
+		objectUserData.setBorderColor( 'transparent' );
 		objectUserData.setBackgroundColor( '' );
 
 		updateTransformRows( object );
