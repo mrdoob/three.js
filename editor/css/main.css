@@ -128,3 +128,54 @@ textarea, input { outline: none; } /* osx */
 .MeshPhongMaterial {
 	color: #ffaa88;
 }
+
+/* tabs */
+
+.tabs input[type=radio] {
+	display:none;
+}
+
+.tabs {
+	float: none;
+	list-style: none;
+	position: relative;
+	padding: 0;
+}
+
+.tabs div.Panel.tab {
+	float: left;
+}
+
+.tabs label {
+	display: block;
+	padding: 5px 5px;
+	font-weight: normal;
+	background: #2c3e50;
+	cursor: pointer;
+	position: relative;
+}
+
+.tabs label:hover {
+	background: #3498db;
+}
+
+.tab-content {
+	z-index: 2;
+	display: none;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	padding: 5px;
+	position: absolute;
+	box-sizing: border-box;
+}
+
+[id^=tab]:checked + label {
+	background: #08C;
+	color: white;
+	top: 0;
+}
+
+[id^=tab]:checked ~ [id^=tab-content] {
+	display: block;
+}

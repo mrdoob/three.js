@@ -6,18 +6,12 @@ Sidebar.Object3D = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/object3d/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
+	var container = new UI.Panel().setClass( 'Panel tab' );
 
-		editor.config.setKey( 'ui/sidebar/object3d/collapsed', boolean );
+	container.add( new UI.Radio( 'tabs' ).setId( 'tab-object3d' ) );
+	container.add( new UI.Label( 'Obj3D' ).setFor( 'tab-object3d' ) );
 
-	} );
-	container.setDisplay( 'none' );
-
-	var objectType = new UI.Text().setTextTransform( 'uppercase' );
-	container.addStatic( objectType );
-	container.add( new UI.Break() );
+	var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-object3d' );
 
 	// uuid
 
@@ -35,7 +29,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectUUIDRow.add( objectUUID );
 	objectUUIDRow.add( objectUUIDRenew );
 
-	container.add( objectUUIDRow );
+	containercontent.add( objectUUIDRow );
 
 	// name
 
@@ -49,7 +43,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ) );
 	objectNameRow.add( objectName );
 
-	container.add( objectNameRow );
+	containercontent.add( objectNameRow );
 
 	// parent
 
@@ -59,7 +53,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ) );
 	objectParentRow.add( objectParent );
 
-	container.add( objectParentRow );
+	containercontent.add( objectParentRow );
 
 	// position
 
@@ -71,7 +65,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectPositionRow.add( new UI.Text( 'Position' ).setWidth( '90px' ) );
 	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
 
-	container.add( objectPositionRow );
+	containercontent.add( objectPositionRow );
 
 	// rotation
 
@@ -83,7 +77,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
 
-	container.add( objectRotationRow );
+	containercontent.add( objectRotationRow );
 
 	// scale
 
@@ -97,7 +91,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectScaleRow.add( objectScaleLock );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
 
-	container.add( objectScaleRow );
+	containercontent.add( objectScaleRow );
 
 	// fov
 
@@ -107,7 +101,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectFovRow.add( new UI.Text( 'Fov' ).setWidth( '90px' ) );
 	objectFovRow.add( objectFov );
 
-	container.add( objectFovRow );
+	containercontent.add( objectFovRow );
 
 	// near
 
@@ -117,7 +111,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectNearRow.add( new UI.Text( 'Near' ).setWidth( '90px' ) );
 	objectNearRow.add( objectNear );
 
-	container.add( objectNearRow );
+	containercontent.add( objectNearRow );
 
 	// far
 
@@ -127,7 +121,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectFarRow.add( new UI.Text( 'Far' ).setWidth( '90px' ) );
 	objectFarRow.add( objectFar );
 
-	container.add( objectFarRow );
+	containercontent.add( objectFarRow );
 
 	// intensity
 
@@ -137,7 +131,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectIntensityRow.add( new UI.Text( 'Intensity' ).setWidth( '90px' ) );
 	objectIntensityRow.add( objectIntensity );
 
-	container.add( objectIntensityRow );
+	containercontent.add( objectIntensityRow );
 
 	// color
 
@@ -147,7 +141,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectColorRow.add( new UI.Text( 'Color' ).setWidth( '90px' ) );
 	objectColorRow.add( objectColor );
 
-	container.add( objectColorRow );
+	containercontent.add( objectColorRow );
 
 	// ground color
 
@@ -157,7 +151,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectGroundColorRow.add( new UI.Text( 'Ground color' ).setWidth( '90px' ) );
 	objectGroundColorRow.add( objectGroundColor );
 
-	container.add( objectGroundColorRow );
+	containercontent.add( objectGroundColorRow );
 
 	// distance
 
@@ -167,7 +161,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectDistanceRow.add( new UI.Text( 'Distance' ).setWidth( '90px' ) );
 	objectDistanceRow.add( objectDistance );
 
-	container.add( objectDistanceRow );
+	containercontent.add( objectDistanceRow );
 
 	// angle
 
@@ -177,7 +171,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectAngleRow.add( new UI.Text( 'Angle' ).setWidth( '90px' ) );
 	objectAngleRow.add( objectAngle );
 
-	container.add( objectAngleRow );
+	containercontent.add( objectAngleRow );
 
 	// exponent
 
@@ -187,7 +181,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectExponentRow.add( new UI.Text( 'Exponent' ).setWidth( '90px' ) );
 	objectExponentRow.add( objectExponent );
 
-	container.add( objectExponentRow );
+	containercontent.add( objectExponentRow );
 
 	// visible
 
@@ -197,7 +191,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectVisibleRow.add( new UI.Text( 'Visible' ).setWidth( '90px' ) );
 	objectVisibleRow.add( objectVisible );
 
-	container.add( objectVisibleRow );
+	containercontent.add( objectVisibleRow );
 
 	// user data
 
@@ -226,7 +220,7 @@ Sidebar.Object3D = function ( editor ) {
 	objectUserDataRow.add( new UI.Text( 'User data' ).setWidth( '90px' ) );
 	objectUserDataRow.add( objectUserData );
 
-	container.add( objectUserDataRow );
+	containercontent.add( objectUserDataRow );
 
 
 	//
@@ -431,14 +425,14 @@ Sidebar.Object3D = function ( editor ) {
 
 		if ( object !== null ) {
 
-			container.setDisplay( 'block' );
+			//containercontent.setDisplay( 'block' );
 
 			updateRows( object );
 			updateUI( object );
 
 		} else {
 
-			container.setDisplay( 'none' );
+			containercontent.setDisplay( 'none' );
 
 		}
 
@@ -564,6 +558,8 @@ Sidebar.Object3D = function ( editor ) {
 		updateTransformRows( object );
 
 	}
+
+	container.add( containercontent );
 
 	return container;
 

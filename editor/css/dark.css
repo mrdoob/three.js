@@ -147,13 +147,12 @@ input.Number {
 
 	#sidebar > .Panel {
 		color: #888;
-		padding: 10px;
-		border-top: 1px solid #333;
+		padding: 1px;
+		/* border-top: 1px solid #333; */
 	}
 
 	#sidebar #outliner {
 		width: 100%;
-		height: 140px;
 		color: #868686;
 		font-size: 12px;
 	}

@@ -16,16 +16,12 @@ Sidebar.Renderer = function ( editor ) {
 
 	};
 
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/renderer/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
+	var container = new UI.Panel().setClass( 'Panel tab' );
 
-		editor.config.setKey( 'ui/sidebar/renderer/collapsed', boolean );
+	container.add( new UI.Radio( 'tabs' ).setId( 'tab-renderer' ).setCheck() );
+	container.add( new UI.Label( 'Renderer' ).setFor( 'tab-renderer' ) );
 
-	} );
-
-	container.addStatic( new UI.Text( 'RENDERER' ) );
-	container.add( new UI.Break() );
+	var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-renderer' );
 
 	// class
 
@@ -50,7 +46,7 @@ Sidebar.Renderer = function ( editor ) {
 	rendererTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
 	rendererTypeRow.add( rendererType );
 
-	container.add( rendererTypeRow );
+	containercontent.add( rendererTypeRow );
 
 	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
 
@@ -71,7 +67,7 @@ Sidebar.Renderer = function ( editor ) {
 	rendererAntialiasRow.add( new UI.Text( 'Antialias' ).setWidth( '90px' ) );
 	rendererAntialiasRow.add( rendererAntialias );
 
-	container.add( rendererAntialiasRow );
+	containercontent.add( rendererAntialiasRow );
 
 	//
 
@@ -80,6 +76,8 @@ Sidebar.Renderer = function ( editor ) {
 		signals.rendererChanged.dispatch( rendererType.getValue(), rendererAntialias.getValue() );
 
 	}
+
+	container.add( containercontent );
 
 	return container;
 
