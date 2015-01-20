@@ -3370,13 +3370,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			// Reset blending in case material.transparent = false. _setMaterial() doesn't set blending in such case.
+			// Reset blending in case material.transparent = false. setMaterial() doesn't set blending in such case.
 			this.setBlending( THREE.NoBlending );
-			this._setMaterial( overrideMaterial );
+			setMaterial( overrideMaterial );
 
-			_renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
-			_renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
-			_renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, overrideMaterial );
+			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
+			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
+			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, overrideMaterial );
 
 		} else {
 
@@ -3384,13 +3384,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 
-			_renderObjects( opaqueObjects, camera, lights, fog, null );
-			_renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, null );
+			renderObjects( opaqueObjects, camera, lights, fog, null );
+			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, null );
 
 			// transparent pass (back-to-front order)
 
-			_renderObjects( transparentObjects, camera, lights, fog, null );
-			_renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, null );
+			renderObjects( transparentObjects, camera, lights, fog, null );
+			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, null );
 
 		}
 
@@ -3479,21 +3479,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	this._setMaterial = function ( material ) {
-
-		if ( material.transparent === true ) {
-
-			_this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
-
-		}
-
-		_this.setDepthTest( material.depthTest );
-		_this.setDepthWrite( material.depthWrite );
-		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
-
-	}
-
-	function _renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
+	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
 		var material;
 
@@ -3516,7 +3502,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! material ) continue;
 
-				_this._setMaterial( material );
+				setMaterial( material );
 
 			}
 
@@ -3536,7 +3522,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function _renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
+	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
 
 		var material;
 
@@ -3557,7 +3543,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					_this._setMaterial( material );
+					setMaterial( material );
 
 				}
 
@@ -4311,6 +4297,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+	}
+
+	function setMaterial( material ) {
+
+		if ( material.transparent === true ) {
+
+			_this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
+
+		}
+
+		_this.setDepthTest( material.depthTest );
+		_this.setDepthWrite( material.depthWrite );
+		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
 
