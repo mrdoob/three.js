@@ -23,13 +23,16 @@
  *
  *	5) Optionally: Update the shadow map viewer on window resize:
  *		shadowMapViewer.updateForWindowResize();
+ *
+ *	6) If you set the position or size members directly, you need to call shadowMapViewer.update();
  */
 
 THREE.ShadowMapViewer = function ( light ) {
 
 	//- Internals
 	var scope = this;
-	var name = ( light.name !== undefined && light.name !== '' ) ? light.name : ' ';
+	var doRenderLabel = ( light.name !== undefined && light.name !== '' );
+	var userAutoClearSetting;
 
 	//Holds the initial position and dimension of the HUD
 	var frame = { 
@@ -39,7 +42,8 @@ THREE.ShadowMapViewer = function ( light ) {
 		height: 256,
 	};
 
-	var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -1, 1 );
+	var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
+	camera.position.set(0, 0, 1);
 	var scene = new THREE.Scene();
 
 	//HUD for shadow map
@@ -58,31 +62,37 @@ THREE.ShadowMapViewer = function ( light ) {
 
 
 	//Label for light's name
-	var labelCanvas = document.createElement( 'canvas' );
+	var labelCanvas, labelMesh;
 
-	var context = labelCanvas.getContext( '2d' );
-	context.font = 'Bold 20px Arial';
-	
-	var labelWidth = context.measureText( name ).width;
-	labelCanvas.width = labelWidth;
-	labelCanvas.height = 25;	//25 to account for g, p, etc.
+	if ( doRenderLabel ){
 
-	context.font = 'Bold 20px Arial';
-	context.fillStyle = 'rgba( 255, 0, 0, 1 )';
-	context.fillText( name, 0, 20 );
+		labelCanvas = document.createElement( 'canvas' );
 
-	var labelTexture = new THREE.Texture( labelCanvas );
-	labelTexture.magFilter = THREE.LinearFilter;
-	labelTexture.minFilter = THREE.LinearFilter;
-	labelTexture.needsUpdate = true;
+		var context = labelCanvas.getContext( '2d' );
+		context.font = 'Bold 20px Arial';
+		
+		var labelWidth = context.measureText( light.name ).width;
+		labelCanvas.width = labelWidth;
+		labelCanvas.height = 25;	//25 to account for g, p, etc.
 
-	var labelMaterial = new THREE.MeshBasicMaterial( { map: labelTexture, side: THREE.DoubleSide } );
-	labelMaterial.transparent = true;
+		context.font = 'Bold 20px Arial';
+		context.fillStyle = 'rgba( 255, 0, 0, 1 )';
+		context.fillText( light.name, 0, 20 );
 
-	var labelPlane = new THREE.PlaneBufferGeometry( labelCanvas.width, labelCanvas.height );
-	var labelMesh = new THREE.Mesh( labelPlane, labelMaterial );
+		var labelTexture = new THREE.Texture( labelCanvas );
+		labelTexture.magFilter = THREE.LinearFilter;
+		labelTexture.minFilter = THREE.LinearFilter;
+		labelTexture.needsUpdate = true;
 
-    scene.add( labelMesh );
+		var labelMaterial = new THREE.MeshBasicMaterial( { map: labelTexture, side: THREE.DoubleSide } );
+		labelMaterial.transparent = true;
+
+		var labelPlane = new THREE.PlaneBufferGeometry( labelCanvas.width, labelCanvas.height );
+		labelMesh = new THREE.Mesh( labelPlane, labelMaterial );
+
+	    scene.add( labelMesh );
+
+	}
 
 
 	function resetPosition () {
@@ -97,15 +107,14 @@ THREE.ShadowMapViewer = function ( light ) {
 
 	// Set the size of the displayed shadow map on the HUD
 	this.size = {
-		x: frame.width,
-		y: frame.height,
-		set: function ( x, y ) {
+		width: frame.width,
+		height: frame.height,
+		set: function ( width, height ) {
 
-			this.x = x;
-			this.y = y;
-			this.z = 1;
+			this.width = width;
+			this.height = height;
 
-			mesh.scale.set( this.x / frame.width, this.y / frame.height, 1 );
+			mesh.scale.set( this.width / frame.width, this.height / frame.height, 1 );
 
 			//Reset the position as it is off when we scale stuff
 			resetPosition();
@@ -121,13 +130,13 @@ THREE.ShadowMapViewer = function ( light ) {
 
 			this.x = x;
 			this.y = y;
-			this.z = 0;
 
-			var width = scope.size.x;
-			var height = scope.size.y;
+			var width = scope.size.width;
+			var height = scope.size.height;
 
 			mesh.position.set( -window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
-			labelMesh.position.set(mesh.position.x, mesh.position.y - scope.size.y / 2 + labelCanvas.height / 2, 0 );
+
+			if ( doRenderLabel ) labelMesh.position.set(mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
 
 		}
 	};
@@ -143,9 +152,11 @@ THREE.ShadowMapViewer = function ( light ) {
 			//See: https://github.com/mrdoob/three.js/issues/5932
 			uniforms.tDiffuse.value = light.shadowMap;
 
+			userAutoClearSetting = renderer.autoClear;
 			renderer.autoClear = false; // To allow render overlay
 			renderer.clearDepth()
 			renderer.render( scene, camera );
+			renderer.autoClear = userAutoClearSetting;	//Restore user's setting
 
 		}
 
@@ -164,7 +175,15 @@ THREE.ShadowMapViewer = function ( light ) {
 
 	};
 
-	this.position.set( this.position.x, this.position.y );
+	this.update = function () {
+
+		this.position.set( this.position.x, this.position.y );
+		this.size.set( this.size.width, this.size.height );
+
+	};
+
+	//Force an update to set position/size
+	this.update();
 
 }
 

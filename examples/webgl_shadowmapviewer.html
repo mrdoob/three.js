@@ -101,7 +101,7 @@
         dirLight.shadowCameraVisible = true;
         dirLight.shadowMapWidth = 1024;
         dirLight.shadowMapHeight = 1024;
-        dirLight.name = 'Dir Light';
+        dirLight.name = 'Dir. Light';
         scene.add( dirLight );
 
 
@@ -149,12 +149,16 @@
       function initShadowMapViewers() {
 
         dirLightShadowMapViewer = new THREE.ShadowMapViewer( dirLight );
-        dirLightShadowMapViewer.size.set( 256, 256 );
-        dirLightShadowMapViewer.position.set( 10, 10 );
+        dirLightShadowMapViewer.position.x = 10;
+        dirLightShadowMapViewer.position.y = 10;
+        dirLightShadowMapViewer.size.width = 256;
+        dirLightShadowMapViewer.size.height = 256;
+        dirLightShadowMapViewer.update(); //Required when setting position or size directly
 
         spotLightShadowMapViewer = new THREE.ShadowMapViewer( spotLight );
         spotLightShadowMapViewer.size.set( 256, 256 );
         spotLightShadowMapViewer.position.set( 276, 10 );
+        // spotLightShadowMapViewer.update();  //NOT required because .set updates automatically
 
       }
 
