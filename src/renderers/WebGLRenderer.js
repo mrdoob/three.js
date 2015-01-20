@@ -3479,7 +3479,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function _setMaterial( material ) {
+	this._setMaterial = function ( material ) {
 
 		if ( material.transparent === true ) {
 
