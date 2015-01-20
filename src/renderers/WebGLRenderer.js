@@ -3384,13 +3384,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 
-			renderObjects( opaqueObjects, camera, lights, fog );
-			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog );
+			renderObjects( opaqueObjects, camera, lights, fog, null );
+			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, null );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( transparentObjects, camera, lights, fog );
-			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog );
+			renderObjects( transparentObjects, camera, lights, fog, null );
+			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, null );
 
 		}
 
@@ -3495,8 +3495,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
-		overrideMaterial = overrideMaterial || null;
-
 		var material;
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
@@ -3539,8 +3537,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
-
-		overrideMaterial = overrideMaterial || null;
 
 		var material;
 
