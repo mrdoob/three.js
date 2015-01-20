@@ -67,7 +67,6 @@
 				"uuid": "2F69AF3A-DDF5-4BBA-87B5-80159F90DDBF",
 				"type": "MeshPhongMaterial",
 				"color": 86015,
-				"ambient": 16777215,
 				"emissive": 0,
 				"specular": 1118481,
 				"shininess": 30
@@ -76,7 +75,6 @@
 				"uuid": "CFBEAD4C-6695-4A99-887B-8161E2947225",
 				"type": "MeshPhongMaterial",
 				"color": 16777215,
-				"ambient": 16777215,
 				"emissive": 0,
 				"specular": 1118481,
 				"shininess": 30
@@ -85,7 +83,6 @@
 				"uuid": "043B208C-1F83-42C6-802C-E0E35621C27C",
 				"type": "MeshPhongMaterial",
 				"color": 16777215,
-				"ambient": 16777215,
 				"emissive": 0,
 				"specular": 1118481,
 				"shininess": 30
@@ -94,7 +91,6 @@
 				"uuid": "40EC9BDA-91C0-4671-937A-2BCB6DA7EEBB",
 				"type": "MeshPhongMaterial",
 				"color": 13486790,
-				"ambient": 16777215,
 				"emissive": 0,
 				"specular": 1118481,
 				"shininess": 30

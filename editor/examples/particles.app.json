@@ -46,7 +46,6 @@
 				"uuid": "6EDB0369-7E11-4B0F-BF98-4BD761846D65",
 				"type": "MeshPhongMaterial",
 				"color": 16777215,
-				"ambient": 16777215,
 				"emissive": 0,
 				"specular": 1118481,
 				"shininess": 30

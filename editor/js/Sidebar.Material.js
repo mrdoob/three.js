@@ -101,16 +101,6 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialColorRow );
 
-	// ambient
-
-	var materialAmbientRow = new UI.Panel();
-	var materialAmbient = new UI.Color().onChange( update );
-
-	materialAmbientRow.add( new UI.Text( 'Ambient' ).setWidth( '90px' ) );
-	materialAmbientRow.add( materialAmbient );
-
-	container.add( materialAmbientRow );
-
 	// emissive
 
 	var materialEmissiveRow = new UI.Panel();
