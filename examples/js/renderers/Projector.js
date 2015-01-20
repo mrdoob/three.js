@@ -102,10 +102,6 @@ THREE.Projector = function () {
 
 	_renderData = { objects: [], lights: [], elements: [] },
 
-	_vA = new THREE.Vector3(),
-	_vB = new THREE.Vector3(),
-	_vC = new THREE.Vector3(),
-
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 
