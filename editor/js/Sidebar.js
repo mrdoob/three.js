@@ -4,13 +4,6 @@
 
 var Sidebar = function ( editor ) {
 
-	/*
-    var container = new UI.Panel().setClass( 'Panel tab' );
-    container.add( new UI.Radio( 'tabs' ).setId( 'tab-renderer' ).setCheck() );
-    container.add( new UI.Label( 'Renderer' ).setFor( 'tab-renderer' ) );
-    var containercontent = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-renderer' );
-	*/
-
 	var container = new UI.Panel().setClass( 'Panel tabs' ).setId( 'sidebar' );
 
 	var tabs = [
