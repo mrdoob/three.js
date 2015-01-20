@@ -31,11 +31,11 @@ var Sidebar = function ( editor ) {
 
 		tab.add( new UI.Label( name ).setFor( 'tab-' + name ) );
 
-		var r = new UI.Panel().setClass( 'Panel' ).setClass( 'Content tab-content' ).setId( 'tab-content-' + name );
+		var content = new UI.Panel().setClass( 'Content tab-content' ).setId( 'tab-content-' + name );
 
-		r.add( new Sidebar[name]( editor ) );
+		content.add( new Sidebar[name]( editor ) );
 
-		tab.add( r );
+		tab.add( content );
 
 		container.add( tab );
 
