@@ -40,7 +40,7 @@ Sidebar.Renderer = function ( editor ) {
 	}
 
 	var rendererTypeRow = new UI.Panel();
-	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).onChange( function () {
+	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
 
 		editor.config.setKey( 'renderer', this.getValue() );
 		updateRenderer();

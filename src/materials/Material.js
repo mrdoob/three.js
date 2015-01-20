@@ -22,6 +22,9 @@ THREE.Material = function () {
 	this.blendSrc = THREE.SrcAlphaFactor;
 	this.blendDst = THREE.OneMinusSrcAlphaFactor;
 	this.blendEquation = THREE.AddEquation;
+	this.blendSrcAlpha = null;
+	this.blendDstAlpha = null;
+	this.blendEquationAlpha = null;
 
 	this.depthTest = true;
 	this.depthWrite = true;
@@ -176,6 +179,9 @@ THREE.Material.prototype = {
 		material.blendSrc = this.blendSrc;
 		material.blendDst = this.blendDst;
 		material.blendEquation = this.blendEquation;
+		material.blendSrcAlpha = this.blendSrcAlpha;
+		material.blendDstAlpha = this.blendDstAlpha;
+		material.blendEquationAlpha = this.blendEquationAlpha;
 
 		material.depthTest = this.depthTest;
 		material.depthWrite = this.depthWrite;

@@ -127,6 +127,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_oldBlendEquation = - 1,
 	_oldBlendSrc = - 1,
 	_oldBlendDst = - 1,
+	_oldBlendEquationAlpha = - 1,
+	_oldBlendSrcAlpha = - 1,
+	_oldBlendDstAlpha = - 1,
 
 	_oldDepthTest = - 1,
 	_oldDepthWrite = - 1,
@@ -3367,7 +3370,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var material = scene.overrideMaterial;
 
-			this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
 			this.setDepthTest( material.depthTest );
 			this.setDepthWrite( material.depthWrite );
 			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
@@ -3502,7 +3505,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! material ) continue;
 
-				if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+				if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
 
 				_this.setDepthTest( material.depthTest );
 				_this.setDepthWrite( material.depthWrite );
@@ -3547,7 +3550,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+					if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
 
 					_this.setDepthTest( material.depthTest );
 					_this.setDepthWrite( material.depthWrite );
@@ -5590,7 +5593,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst ) {
+	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
 
 		if ( blending !== _oldBlending ) {
 
@@ -5636,20 +5639,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( blending === THREE.CustomBlending ) {
 
-			if ( blendEquation !== _oldBlendEquation ) {
+			blendEquationAlpha = blendEquationAlpha || blendEquation;
+			blendSrcAlpha = blendSrcAlpha || blendSrc;
+			blendDstAlpha = blendDstAlpha || blendDst;
 
-				_gl.blendEquation( paramThreeToGL( blendEquation ) );
+			if ( blendEquation !== _oldBlendEquation || blendEquationAlpha !== _oldBlendEquationAlpha ) {
+
+				_gl.blendEquationSeparate( paramThreeToGL( blendEquation ), paramThreeToGL( blendEquationAlpha ) );
 
 				_oldBlendEquation = blendEquation;
+				_oldBlendEquationAlpha = blendEquationAlpha;
 
 			}
 
-			if ( blendSrc !== _oldBlendSrc || blendDst !== _oldBlendDst ) {
+			if ( blendSrc !== _oldBlendSrc || blendDst !== _oldBlendDst || blendSrcAlpha !== _oldBlendSrcAlpha || blendDstAlpha !== _oldBlendDstAlpha ) {
 
-				_gl.blendFunc( paramThreeToGL( blendSrc ), paramThreeToGL( blendDst ) );
+				_gl.blendFuncSeparate( paramThreeToGL( blendSrc ), paramThreeToGL( blendDst ), paramThreeToGL( blendSrcAlpha ), paramThreeToGL( blendDstAlpha ) );
 
 				_oldBlendSrc = blendSrc;
 				_oldBlendDst = blendDst;
+				_oldBlendSrcAlpha = blendSrcAlpha;
+				_oldBlendDstAlpha = blendDstAlpha;
 
 			}
 
@@ -5658,6 +5668,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_oldBlendEquation = null;
 			_oldBlendSrc = null;
 			_oldBlendDst = null;
+			_oldBlendEquationAlpha = null;
+			_oldBlendSrcAlpha = null;
+			_oldBlendDstAlpha = null;
 
 		}
 

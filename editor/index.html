@@ -186,6 +186,7 @@
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
 
+				/*
 				var showDialog = function ( content ) {
 
 					dialog.clear();
@@ -196,6 +197,7 @@
 				};
 
 				signals.showDialog.add( showDialog );
+				*/
 
 			} );
 
@@ -239,15 +241,19 @@
 
 			//
 
+			var file = null;
 			var hash = window.location.hash;
 
-			if ( hash.substr( 1, 4 ) === 'app=' ) {
+			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
+			if ( hash.substr( 1, 6 ) === 'scene=' ) file = hash.substr( 7 );
+
+			if ( file !== null ) {
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
 					var loader = new THREE.XHRLoader();
 					loader.crossOrigin = '';
-					loader.load( hash.substr( 5 ), function ( text ) {
+					loader.load( file, function ( text ) {
 
 						var json = JSON.parse( text );
 

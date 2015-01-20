@@ -56,7 +56,7 @@ Sidebar.Scene = function ( editor ) {
 		'Fog': 'Linear',
 		'FogExp2': 'Exponential'
 
-	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' )
+	} ).setWidth( '150px' );
 	fogType.onChange( function () {
 
 		var type = fogType.getValue();

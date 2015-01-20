@@ -11,26 +11,26 @@
 		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Visualize a [page:DirectionalLight]'s effect on the scene</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo light], [page:todo sphereSize])</h3>
+		<h3>[name]([DirectionalLight:todo light], [page:Number size])</h3>
 		<div>
-		light -- todo <br />
-		sphereSize -- todo
+		light -- [page:DirectionalLight] -- Light to visualize <br />
+		size -- dimensions of the plane
 		</div>
 		<div>
-		todo
+		Creates a line and plane to visualize the light's position and direction
 		</div>
 
 
 		<h2>Properties</h2>
 		
 
-		<h3>[property:Mesh lightSphere]</h3>
+		<h3>[property:Line lightPlane]</h3>
 		<div>
 		todo
 		</div> 
@@ -48,9 +48,9 @@
 		<h2>Methods</h2>
 
 
-		<h3>.update() [page:todo]</h3>
+		<h3>.[method:null update]()</h3>
 		<div>
-		todo
+		Updates the helper to match the position and direction of the [page:.light].
 		</div>
 
 		<h2>Source</h2>

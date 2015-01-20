@@ -1,6 +1,5 @@
 ﻿.FancySelect {
 	background: #fff;
-	border: 1px solid #ccc;
 	padding: 0;
 	cursor: default;
 	overflow: auto;
@@ -18,7 +17,7 @@
 	}
 
 input.Number {
-	color: #0080f0;
+	color: #0080f0!important;
 	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
 	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
 	border: 1px solid transparent;
@@ -135,7 +134,8 @@ input.Number {
 	#sidebar input,
 	#sidebar textarea,
 	#sidebar select {
-		/* background: #ccc; */
+		border: 1px solid transparent;
+		color: #444;
 	}
 
 	#sidebar .Panel {
@@ -148,7 +148,8 @@ input.Number {
 
 	#sidebar > .Panel {
 		color: #888;
-		padding: 10px;
+		padding: 2px;
+		max-width: 35px;
 		border-top: 1px solid #ccc;
 	}
 
@@ -168,6 +169,10 @@ input.Number {
 	background: #eee;
 	color: #333;
 }
+
+	#toolbar * {
+		vertical-align: middle;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;

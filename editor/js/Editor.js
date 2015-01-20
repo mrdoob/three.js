@@ -22,7 +22,7 @@ var Editor = function () {
 		playAnimation: new SIGNALS.Signal(),
 		stopAnimation: new SIGNALS.Signal(),
 
-		showDialog: new SIGNALS.Signal(),
+		// showDialog: new SIGNALS.Signal(),
 
 		// notifications
 
