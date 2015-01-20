@@ -4699,13 +4699,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _this.gammaInput ) {
 
-			uniforms.ambient.value.copyGammaToLinear( material.ambient );
 			uniforms.emissive.value.copyGammaToLinear( material.emissive );
 			uniforms.specular.value.copyGammaToLinear( material.specular );
 
 		} else {
 
-			uniforms.ambient.value = material.ambient;
 			uniforms.emissive.value = material.emissive;
 			uniforms.specular.value = material.specular;
 
@@ -4723,12 +4721,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _this.gammaInput ) {
 
-			uniforms.ambient.value.copyGammaToLinear( material.ambient );
 			uniforms.emissive.value.copyGammaToLinear( material.emissive );
 
 		} else {
 
-			uniforms.ambient.value = material.ambient;
 			uniforms.emissive.value = material.emissive;
 
 		}

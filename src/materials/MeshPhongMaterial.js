@@ -4,7 +4,6 @@
  *
  * parameters = {
  *  color: <hex>,
- *  ambient: <hex>,
  *  emissive: <hex>,
  *  specular: <hex>,
  *  shininess: <float>,
@@ -54,7 +53,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.type = 'MeshPhongMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.ambient = new THREE.Color( 0xffffff );
 	this.emissive = new THREE.Color( 0x000000 );
 	this.specular = new THREE.Color( 0x111111 );
 	this.shininess = 30;
@@ -112,7 +110,6 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	THREE.Material.prototype.clone.call( this, material );
 
 	material.color.copy( this.color );
-	material.ambient.copy( this.ambient );
 	material.emissive.copy( this.emissive );
 	material.specular.copy( this.specular );
 	material.shininess = this.shininess;

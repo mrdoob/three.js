@@ -113,7 +113,7 @@
 
 				// MATERIALS
 
-				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x070707, shininess = 50;
+				var diffuse = 0xbbbbbb, specular = 0x070707, shininess = 50;
 
 				specular = 0x555555;
 
@@ -130,7 +130,6 @@
 
 				uniformsUV[ "diffuse" ].value.setHex( diffuse );
 				uniformsUV[ "specular" ].value.setHex( specular );
-				uniformsUV[ "ambient" ].value.setHex( ambient );
 
 				uniformsUV[ "uRoughness" ].value = 0.185;
 				uniformsUV[ "uSpecularBrightness" ].value = 0.8;

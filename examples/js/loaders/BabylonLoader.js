@@ -51,7 +51,6 @@ THREE.BabylonLoader.prototype = {
 
 			var material = new THREE.MeshPhongMaterial();
 			material.name = data.name;
-			material.ambient.fromArray( data.ambient );
 			material.color.fromArray( data.diffuse );
 			material.emissive.fromArray( data.emissive );
 			material.specular.fromArray( data.specular );

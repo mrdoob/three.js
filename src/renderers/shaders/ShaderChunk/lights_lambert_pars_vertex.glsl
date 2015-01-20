@@ -1,4 +1,3 @@
-uniform vec3 ambient;
 uniform vec3 diffuse;
 uniform vec3 emissive;
 

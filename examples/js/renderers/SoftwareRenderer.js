@@ -300,9 +300,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	}
 
 	function getPalette( material, bSimulateSpecular ) {
-		var diffuseR = material.ambient.r + material.color.r * 255;
-		var diffuseG = material.ambient.g + material.color.g * 255;
-		var diffuseB = material.ambient.b + material.color.b * 255;
+		var diffuseR = material.color.r * 255;
+		var diffuseG = material.color.g * 255;
+		var diffuseB = material.color.b * 255;
 		var palette = new Uint8Array(256*3);
 
 		if ( bSimulateSpecular ) {

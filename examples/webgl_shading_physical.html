@@ -166,7 +166,6 @@
 
 				var groundMaterial = new THREE.MeshPhongMaterial( {
 					shininess: 80,
-					ambient: 0x444444,
 					color: 0xffffff,
 					specular: 0xffffff,
 					map: textureSquares
@@ -197,9 +196,9 @@
 
 				} );
 
-				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, map: textureNoiseColor } );
-				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
+				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
+				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
 
 				// OBJECTS
 
@@ -213,7 +212,7 @@
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444 } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
 
 					return addObject( geometry, material, x, y, z, ry );
 
@@ -265,7 +264,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
 					morphMaterial.shading = THREE.FlatShading;
 
 					geometry.computeMorphNormals();

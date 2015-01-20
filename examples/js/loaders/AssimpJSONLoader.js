@@ -264,9 +264,6 @@ THREE.AssimpJSONLoader.prototype = {
 			else if(prop.key === '$clr.specular') {
 				init_props.specular = toColor(prop.value);
 			}
-			else if(prop.key === '$clr.ambient') {
-				init_props.ambient = toColor(prop.value);
-			}
 			else if(prop.key === '$clr.emissive') {
 				init_props.emissive = toColor(prop.value);
 			}
@@ -279,10 +276,6 @@ THREE.AssimpJSONLoader.prototype = {
 			else if (prop.key === '$mat.shininess') {
 				init_props.shininess = prop.value;
 			}
-		}
-
-		if(!init_props.ambient) {
-			init_props.ambient = init_props.color;
 		}
 
 		// note: three.js does not like it when a texture is added after the geometry

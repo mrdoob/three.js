@@ -37,7 +37,6 @@ THREE.NormalDisplacementShader = {
 
 		"diffuse": { type: "c", value: new THREE.Color( 0xffffff ) },
 		"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-		"ambient": { type: "c", value: new THREE.Color( 0xffffff ) },
 		"shininess": { type: "f", value: 30 },
 		"opacity": { type: "f", value: 1 },
 
@@ -55,7 +54,6 @@ THREE.NormalDisplacementShader = {
 
 	fragmentShader: [
 
-		"uniform vec3 ambient;",
 		"uniform vec3 diffuse;",
 		"uniform vec3 specular;",
 		"uniform float shininess;",
@@ -429,11 +427,11 @@ THREE.NormalDisplacementShader = {
 
 		"	#ifdef METAL",
 
-		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient + totalSpecular );",
+		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse + totalSpecular );",
 
 		"	#else",
 
-		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;",
+		"		gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse ) + totalSpecular;",
 
 		"	#endif",
 
