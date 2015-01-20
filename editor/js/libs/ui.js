@@ -754,12 +754,7 @@ UI.Radio.prototype.setValue = function ( value ) {
 
 UI.Radio.prototype.setCheck = function ( ) {
 
-	//if ( value !== undefined ) {
-
-        this.dom.setAttribute('checked', '');
-		//this.dom.checked = '';
-
-	//}
+	this.dom.setAttribute( 'checked', '' );
 
 	return this;
 
