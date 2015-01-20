@@ -3370,13 +3370,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			// Reset blending in case material.transparent = false. setMaterial() doesn't set blending in such case.
+			// Reset blending in case material.transparent = false. _setMaterial() doesn't set blending in such case.
 			this.setBlending( THREE.NoBlending );
-			this.setMaterial( overrideMaterial );
+			this._setMaterial( overrideMaterial );
 
-			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
-			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
-			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, overrideMaterial );
+			_renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
+			_renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
+			_renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, overrideMaterial );
 
 		} else {
 
@@ -3384,13 +3384,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 
-			renderObjects( opaqueObjects, camera, lights, fog, null );
-			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, null );
+			_renderObjects( opaqueObjects, camera, lights, fog, null );
+			_renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, null );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( transparentObjects, camera, lights, fog, null );
-			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, null );
+			_renderObjects( transparentObjects, camera, lights, fog, null );
+			_renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, null );
 
 		}
 
@@ -3479,7 +3479,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setMaterial( material ) {
+	function _setMaterial( material ) {
 
 		if ( material.transparent === true ) {
 
@@ -3493,7 +3493,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
+	function _renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
 		var material;
 
@@ -3516,7 +3516,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! material ) continue;
 
-				_this.setMaterial( material );
+				_this._setMaterial( material );
 
 			}
 
@@ -3536,7 +3536,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
+	function _renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
 
 		var material;
 
@@ -3557,7 +3557,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					_this.setMaterial( material );
+					_this._setMaterial( material );
 
 				}
 
