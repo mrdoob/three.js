@@ -43,7 +43,7 @@ THREE.ShadowMapViewer = function ( light ) {
 	};
 
 	var camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
-	camera.position.set(0, 0, 1);
+	camera.position.set( 0, 0, 2 );
 	var scene = new THREE.Scene();
 
 	//HUD for shadow map
@@ -51,9 +51,9 @@ THREE.ShadowMapViewer = function ( light ) {
 
 	var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 	var material = new THREE.ShaderMaterial( {
-					uniforms: uniforms,
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
+		uniforms: uniforms,
+		vertexShader: shader.vertexShader,
+		fragmentShader: shader.fragmentShader
 	} );
 	var plane = new THREE.PlaneBufferGeometry( frame.width, frame.height );
 	var mesh = new THREE.Mesh( plane, material );
@@ -64,13 +64,13 @@ THREE.ShadowMapViewer = function ( light ) {
 	//Label for light's name
 	var labelCanvas, labelMesh;
 
-	if ( doRenderLabel ){
+	if ( doRenderLabel ) {
 
 		labelCanvas = document.createElement( 'canvas' );
 
 		var context = labelCanvas.getContext( '2d' );
 		context.font = 'Bold 20px Arial';
-		
+
 		var labelWidth = context.measureText( light.name ).width;
 		labelCanvas.width = labelWidth;
 		labelCanvas.height = 25;	//25 to account for g, p, etc.
@@ -90,14 +90,14 @@ THREE.ShadowMapViewer = function ( light ) {
 		var labelPlane = new THREE.PlaneBufferGeometry( labelCanvas.width, labelCanvas.height );
 		labelMesh = new THREE.Mesh( labelPlane, labelMaterial );
 
-	    scene.add( labelMesh );
+		scene.add( labelMesh );
 
 	}
 
 
 	function resetPosition () {
 
-		scope.position.set(scope.position.x, scope.position.y);
+		scope.position.set( scope.position.x, scope.position.y );
 
 	}
 
@@ -136,7 +136,7 @@ THREE.ShadowMapViewer = function ( light ) {
 
 			mesh.position.set( -window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
 
-			if ( doRenderLabel ) labelMesh.position.set(mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
+			if ( doRenderLabel ) labelMesh.position.set( mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
 
 		}
 	};

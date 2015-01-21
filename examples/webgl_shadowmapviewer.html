@@ -42,7 +42,7 @@
     <script src="js/libs/stats.min.js"></script>
 
     <script>
-
+    
       if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
       var camera, scene, renderer, clock, stats;
@@ -55,7 +55,7 @@
 
 
       function init() {
-        
+
         initScene();
         initShadowMapViewers();
         initMisc();
@@ -163,7 +163,7 @@
       }
 
       function initMisc() {
-        
+
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.setClearColor( 0x000000, 1 );
