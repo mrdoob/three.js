@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Renderer = function ( editor ) {
+Sidebar.Project = function ( editor ) {
 
 	var signals = editor.signals;
 
@@ -24,7 +24,7 @@ Sidebar.Renderer = function ( editor ) {
 
 	} );
 
-	container.addStatic( new UI.Text( 'RENDERER' ) );
+	container.addStatic( new UI.Text( 'PROJECT' ) );
 	container.add( new UI.Break() );
 
 	// class
@@ -47,7 +47,7 @@ Sidebar.Renderer = function ( editor ) {
 
 	} );
 
-	rendererTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	rendererTypeRow.add( new UI.Text( 'Renderer' ).setWidth( '90px' ) );
 	rendererTypeRow.add( rendererType );
 
 	container.add( rendererTypeRow );
@@ -57,7 +57,7 @@ Sidebar.Renderer = function ( editor ) {
 		rendererType.setValue( editor.config.getKey( 'renderer' ) );
 
 	}
-	
+
 	// antialiasing
 
 	var rendererAntialiasRow = new UI.Panel();
