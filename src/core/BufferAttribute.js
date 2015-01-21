@@ -1,11 +1,15 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.BufferAttribute = function ( array, itemSize ) {
+THREE.BufferAttribute = function ( array, itemSize, dynamic ) {
 
 	this.array = array;
 	this.itemSize = itemSize;
+
+	this.dynamic = dynamic || false;
+	this.updateRange = { offset: 0, count: -1 };
 
 	this.needsUpdate = false;
 
@@ -32,11 +36,15 @@ THREE.BufferAttribute.prototype = {
 
 		}
 
+		this.markForUpdate( index1, this.itemSize );
+
 	},
 
 	set: function ( value ) {
 
 		this.array.set( value );
+
+		this.markForUpdate( 0, value.length );
 
 		return this;
 
@@ -44,7 +52,11 @@ THREE.BufferAttribute.prototype = {
 
 	setX: function ( index, x ) {
 
-		this.array[ index * this.itemSize ] = x;
+	    index *= this.itemSize;
+
+		this.array[ index ] = x;
+
+		this.markForUpdate( index, 1 );
 
 		return this;
 
@@ -52,7 +64,11 @@ THREE.BufferAttribute.prototype = {
 
 	setY: function ( index, y ) {
 
+	    index = index * this.itemSize + 1;
+
 		this.array[ index * this.itemSize + 1 ] = y;
+
+		this.markForUpdate( index, 1 );
 
 		return this;
 
@@ -60,7 +76,11 @@ THREE.BufferAttribute.prototype = {
 
 	setZ: function ( index, z ) {
 
+	    index = index * this.itemSize + 2;
+
 		this.array[ index * this.itemSize + 2 ] = z;
+
+		this.markForUpdate( index, 1 );
 
 		return this;
 
@@ -73,6 +93,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index     ] = x;
 		this.array[ index + 1 ] = y;
 
+		this.markForUpdate( index, 2 );
+
 		return this;
 
 	},
@@ -84,6 +106,8 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index     ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
+
+		this.markForUpdate( index, 3 );
 
 		return this;
 
@@ -98,8 +122,41 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index + 2 ] = z;
 		this.array[ index + 3 ] = w;
 
+		this.markForUpdate( index, 4 );
+
 		return this;
 
+	},
+
+	setRange: function ( index, array ) {
+
+	    index *= this.itemSize;
+
+	    this.array.set( array, index );
+
+	    this.markForUpdate( index, array.length );
+
+	    return this;
+
+	},
+
+	markForUpdate: function ( offset, count ) {
+
+	    if ( this.updateRange.count <= 0 ) {
+
+	        this.updateRange.offset = offset;
+	        this.updateRange.count = count;
+
+	    } else {
+
+	        var end0 = offset + count;
+	        var end1 = this.updateRange.offset + this.updateRange.count;
+
+	        this.updateRange.offset = ( offset <= this.updateRange.offset ) ? offset : this.updateRange.offset;
+	        this.updateRange.count = ( ( end0 >= end1 ) ? end0 : end1 ) - this.updateRange.offset;
+	    }
+
+	    return this;
 	},
 
 	clone: function () {
