@@ -9,10 +9,11 @@ var Config = function () {
 	var storage = {
 		'autosave': true,
 		'theme': 'css/light.css',
-		
-		'renderer': 'WebGLRenderer',
-		'renderer/antialias': true,
-	
+
+		'project/renderer': 'WebGLRenderer',
+		'project/renderer/antialias': true,
+		'project/vr': false,
+
 		'camera/position': [ 500, 250, 500 ],
 		'camera/target': [ 0, 0, 0 ],
 
@@ -20,7 +21,7 @@ var Config = function () {
 		'ui/sidebar/geometry/collapsed': true,
 		'ui/sidebar/material/collapsed': true,
 		'ui/sidebar/object3d/collapsed': false,
-		'ui/sidebar/renderer/collapsed': true,
+		'ui/sidebar/project/collapsed': true,
 		'ui/sidebar/scene/collapsed': false,
 		'ui/sidebar/script/collapsed': true
 	};
