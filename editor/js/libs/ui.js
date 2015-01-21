@@ -52,6 +52,14 @@ UI.Element.prototype = {
 
 		return this;
 
+	},
+
+	setTitle: function ( name ) {
+
+		this.dom.title = name;
+		
+		return this;
+
 	}
 
 }
@@ -655,6 +663,102 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 };
 
+// Label
+
+UI.Label = function ( text ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'label' );
+	dom.className = 'Label';
+
+	this.dom = dom;
+	this.setValue( text );
+
+	return this;
+
+};
+
+UI.Label.prototype = Object.create( UI.Element.prototype );
+UI.Label.prototype.constructor = UI.Label;
+
+UI.Label.prototype.getValue = function () {
+
+	return this.dom.textContent;
+
+};
+
+UI.Label.prototype.setValue = function ( value ) {
+
+	if ( value !== undefined ) {
+
+		this.dom.textContent = value;
+
+	}
+
+	return this;
+
+};
+
+UI.Label.prototype.setFor = function ( value ) {
+
+	if ( value !== undefined ) {
+
+        this.dom.setAttribute('for', value);
+
+	}
+
+	return this;
+
+};
+
+// Radio
+
+UI.Radio = function ( name  ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'input' );
+	dom.className = 'Radio';
+	dom.type = 'radio';
+
+	this.dom = dom;
+	this.setValue( name );
+
+	return this;
+
+};
+
+UI.Radio.prototype = Object.create( UI.Element.prototype );
+UI.Radio.prototype.constructor = UI.Radio;
+
+UI.Radio.prototype.getValue = function () {
+
+	return this.dom.checked;
+
+};
+
+UI.Radio.prototype.setValue = function ( value ) {
+
+	if ( value !== undefined ) {
+
+		this.dom.name = value;
+
+	}
+
+	return this;
+
+};
+
+UI.Radio.prototype.setCheck = function ( ) {
+
+	this.dom.setAttribute( 'checked', '' );
+
+	return this;
+
+};
 
 // Checkbox
 

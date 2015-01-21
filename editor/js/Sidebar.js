@@ -4,16 +4,42 @@
 
 var Sidebar = function ( editor ) {
 
-	var container = new UI.Panel();
-	container.setId( 'sidebar' );
+	var container = new UI.Panel().setClass( 'Panel tabs' ).setId( 'sidebar' );
 
-	container.add( new Sidebar.Renderer( editor ) );
-	container.add( new Sidebar.Scene( editor ) );
-	container.add( new Sidebar.Object3D( editor ) );
-	container.add( new Sidebar.Geometry( editor ) );
-	container.add( new Sidebar.Material( editor ) );
-	container.add( new Sidebar.Animation( editor ) );
-	container.add( new Sidebar.Script( editor ) );
+	var tabs = [
+		'Renderer',
+		'Scene',
+		'Object3D',
+		'Geometry',
+		'Material',
+		'Animation',
+		'Script'
+	];
+
+	for ( var i = 0; i < tabs.length; i ++ ) {
+
+		var name = tabs[ i ];
+
+		var tab = new UI.Panel().setTitle( name ).setClass( 'Panel tab' );
+
+		if ( i === 0 ) {
+			tab.add( new UI.Radio( 'tabs' ).setId( 'tab-' + name ).setCheck() );
+		}
+		else {
+			tab.add( new UI.Radio( 'tabs' ).setId( 'tab-' + name ) );
+		}
+
+		tab.add( new UI.Label( name ).setFor( 'tab-' + name ) );
+
+		var content = new UI.Panel().setClass( 'Content tab-content' ).setId( 'tab-content-' + name );
+
+		content.add( new Sidebar[name]( editor ) );
+
+		tab.add( content );
+
+		container.add( tab );
+
+	}
 
 	return container;
 
