@@ -390,13 +390,12 @@ THREE.Object3D.prototype = {
 	getObjectByProperty: function ( name, value, recursive ) {
 
 		if ( this[ name ] === value ) return this;
-		if ( recursive === undefined ) recursive = false;
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			var child = this.children[ i ];
 
-			if ( recursive ) {
+			if ( recursive === true ) {
 
 				var object = child.getObjectByProperty( name, value, recursive );
 
