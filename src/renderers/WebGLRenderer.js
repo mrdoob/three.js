@@ -253,6 +253,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
+	var setClearColor = function ( r, g, b, a ) {
+
+		if ( _premultipliedAlpha === true ) {
+
+			_gl.clearColor( r * a, g * a, b * a, a );
+
+		} else {
+
+			_gl.clearColor( r, g, b, a );
+
+		}
+
+	};
+
 	var setDefaultGLState = function () {
 
 		_gl.clearColor( 0, 0, 0, 1 );
@@ -272,7 +286,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
-		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		setClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};
 
@@ -536,9 +550,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setClearColor = function ( color, alpha ) {
 
 		_clearColor.set( color );
+
 		_clearAlpha = alpha !== undefined ? alpha : 1;
 
-		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		setClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};
 
@@ -552,7 +567,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_clearAlpha = alpha;
 
-		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+		setClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};
 
