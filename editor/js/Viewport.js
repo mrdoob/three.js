@@ -535,7 +535,7 @@ var Viewport = function ( editor ) {
 	};
 
 	var clearColor;
-	var renderer = createRenderer( editor.config.getKey( 'renderer' ), editor.config.getKey( 'renderer/antialias' ) );
+	var renderer = createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
 	container.dom.appendChild( renderer.domElement );
 
 	animate();

@@ -17,7 +17,7 @@
 //
 // This is a drop-in replacement for (most) TrackballControls used in examples.
 // That is, include this js file and wherever you see:
-//    	controls = new THREE.TrackballControls( camera );
+//      controls = new THREE.OrbitControls( camera );
 //      controls.target.z = 150;
 // Simple substitute "OrbitControls" and the control should work as-is.
 
