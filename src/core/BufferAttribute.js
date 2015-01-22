@@ -102,6 +102,16 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	setRange: function ( index, typedArray ) {
+
+		index *= this.itemSize;
+
+		this.array.set( typedArray, index );
+
+		return this;
+
+	},
+
 	clone: function () {
 
 		return new THREE.BufferAttribute( new this.array.constructor( this.array ), this.itemSize );
