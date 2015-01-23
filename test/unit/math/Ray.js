@@ -241,6 +241,11 @@ test( "applyMatrix4", function() {
 });
 
 
+QUnit.assert.equalEnough = function(value, expect, epsilon, message) {
+	var result = Math.abs(value - expect) < epsilon;
+	QUnit.push(value - expect < epsilon, value, expect, message);
+}
+
 test( "distanceSqToSegment", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	var ptOnLine = new THREE.Vector3();
@@ -274,8 +279,38 @@ test( "distanceSqToSegment", function() {
 	ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
 	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
 	ok( distSqr < 0.0001, "Passed!" );
-});
+	// test cases from
+	// http://www.geometrictools.com/Documentation/DistanceLine3Line3.pdf
 
+	// Example 1 An example where the minimum point is interior but some
+	// numerical rounding errors lead to an inaccurate result.
+
+	var P0 = new THREE.Vector3(-1.0264718499965966,	  9.6163341007195407e-007, 0.0);
+	var P1 = new THREE.Vector3( 0.91950808032415809, -1.0094441192690283e-006, 0.0);
+	var Q0 = new THREE.Vector3(-1.0629447383806110,	  9.2709540082141753e-007, 0.0);
+	var Q1 = new THREE.Vector3( 1.0811583868227901,	 -1.0670017179567367e-006, 0.0);
+
+	rayP = new THREE.Ray( P0, P1);
+	distSqr = a.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
+	QUnit.assert.equalEnough(distSqr, 0, 0.0001,
+				 "|distSqr|<0.0001? (near parallel segment and ray, example 1)");
+
+	// Example 2 An example where the minimum point is classified as
+	// interior but the theoretically correct point is on the domain
+	// boundary.
+
+	var P0 = new THREE.Vector3(-1.0896217473782599,	  9.7236145595088601e-007, 0.0);
+	var P1 = new THREE.Vector3( 0.91220578597858548, -9.4369829432107506e-007, 0.0);
+	var Q0 = new THREE.Vector3(-0.90010447502136237,  9.0671446351334441e-007, 0.0);
+	var Q1 = new THREE.Vector3( 1.0730877178721130,	 -9.8185787633992740e-007, 0.0);
+
+	rayP = new THREE.Ray( P0, P1);
+	distSqr = a.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
+
+	QUnit.assert.equalEnough(distSqr, 0, 0.0001,
+				 "|distSqr|<0.0001? (near parallel segment and ray, example 2)");
+
+});
 test( "intersectBox", function() {
 
 	var TOL = 0.0001;
