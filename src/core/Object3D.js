@@ -368,33 +368,33 @@ THREE.Object3D.prototype = {
 
 	},
 
-	getChildByName: function ( name, recursive ) {
+	getChildByName: function ( name ) {
 
 		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
-		return this.getObjectByName( name, recursive );
+		return this.getObjectByName( name );
 
 	},
 
-	getObjectById: function ( id, recursive ) {
+	getObjectById: function ( id ) {
 
-		return this.getObjectByProperty( 'id', id, recursive );
-
-	},
-
-	getObjectByName: function ( name, recursive ) {
-
-		return this.getObjectByProperty( 'name', name, recursive );
+		return this.getObjectByProperty( 'id', id );
 
 	},
 
-	getObjectByProperty: function ( name, value, recursive ) {
+	getObjectByName: function ( name ) {
+
+		return this.getObjectByProperty( 'name', name );
+
+	},
+
+	getObjectByProperty: function ( name, value ) {
 
 		if ( this[ name ] === value ) return this;
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			var child = this.children[ i ];
-			var object = child.getObjectByProperty( name, value, recursive );
+			var object = child.getObjectByProperty( name, value );
 
 			if ( object !== undefined ) {
 

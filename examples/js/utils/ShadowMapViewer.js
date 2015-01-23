@@ -14,7 +14,7 @@
  *		light.name = 'Sun';
  *
  *	3) Create a shadow map viewer for that light and set its size and position optionally:
- *		var shadowMapViewer = THREE.ShadowMapViewer( light );
+ *		var shadowMapViewer = new THREE.ShadowMapViewer( light );
  *		shadowMapViewer.size.set( 128, 128 );	//width, height  default: 256, 256
  *		shadowMapViewer.position.set( 10, 10 );	//x, y in pixel	 default: 0, 0 (top left corner)
  *
