@@ -25,7 +25,7 @@ THREE.ColladaLoader = function () {
 	var animData;
 	var kinematics;
 	var visualScenes;
-	var kinematicsModel;
+	var kinematicsModels;
 	var baseUrl;
 	var morphs;
 	var skins;
