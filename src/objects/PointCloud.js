@@ -11,11 +11,10 @@ THREE.PointCloud = function ( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.PointCloudMaterial( { color: Math.random() * 0xffffff } );
 
-	this.sortParticles = false;
-
 };
 
 THREE.PointCloud.prototype = Object.create( THREE.Object3D.prototype );
+THREE.PointCloud.prototype.constructor = THREE.PointCloud;
 
 THREE.PointCloud.prototype.raycast = ( function () {
 
@@ -102,11 +101,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 						var a = index + indices[ i ];
 
-						position.set(
-							positions[ a * 3 ],
-							positions[ a * 3 + 1 ],
-							positions[ a * 3 + 2 ]
-						);
+						position.fromArray( positions, a * 3 );
 
 						testPoint( position, a );
 
@@ -151,8 +146,6 @@ THREE.PointCloud.prototype.raycast = ( function () {
 THREE.PointCloud.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) object = new THREE.PointCloud( this.geometry, this.material );
-
-	object.sortParticles = this.sortParticles;
 
 	THREE.Object3D.prototype.clone.call( this, object );
 

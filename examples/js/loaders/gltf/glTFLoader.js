@@ -16,7 +16,7 @@ THREE.glTFLoader = function (showStatus) {
     THREE.Loader.call( this, showStatus );
 }
 
-THREE.glTFLoader.prototype = new THREE.Loader();
+THREE.glTFLoader.prototype = Object.create( THREE.Loader.prototype );
 THREE.glTFLoader.prototype.constructor = THREE.glTFLoader;
 
 THREE.glTFLoader.prototype.load = function( url, callback ) {

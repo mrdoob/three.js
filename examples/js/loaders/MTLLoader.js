@@ -26,7 +26,7 @@ THREE.MTLLoader.prototype = {
 
 			onLoad( scope.parse( text ) );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -387,7 +387,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		}
 
-		texture.mapping = mapping;
+		if ( mapping !== undefined ) texture.mapping = mapping;
 
 		return texture;
 

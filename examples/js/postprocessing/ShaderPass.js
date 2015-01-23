@@ -10,6 +10,7 @@ THREE.ShaderPass = function ( shader, textureID ) {
 
 	this.material = new THREE.ShaderMaterial( {
 
+        	defines: shader.defines || {},
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader

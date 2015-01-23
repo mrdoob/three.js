@@ -63,11 +63,5 @@
 	"src/extras/helpers/VertexTangentsHelper.js",
 	"src/extras/helpers/WireframeHelper.js",
 	"src/extras/objects/ImmediateRenderObject.js",
-	"src/extras/objects/LensFlare.js",
-	"src/extras/objects/MorphBlendMesh.js",
-	"src/extras/renderers/plugins/LensFlarePlugin.js",
-	"src/extras/renderers/plugins/ShadowMapPlugin.js",
-	"src/extras/renderers/plugins/SpritePlugin.js",
-	"src/extras/renderers/plugins/DepthPassPlugin.js",
-	"src/extras/shaders/ShaderFlares.js"
+	"src/extras/objects/MorphBlendMesh.js"
 ]

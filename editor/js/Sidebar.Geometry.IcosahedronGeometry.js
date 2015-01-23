@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
@@ -36,7 +40,6 @@ Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
 			detail.getValue()
 		);
 
-		object.geometry.buffersNeedUpdate = true;
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );

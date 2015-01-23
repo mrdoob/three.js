@@ -5,30 +5,30 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #000;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 
-			background-color: #000;
-			margin: 0px;
-			overflow: hidden;
-		    }
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-		    #info {
-			color:#fff;
-			background-color: rgba( 0, 0, 0, 0.5 );
-			position: relative;
-			margin: 0 auto -2.1em;
-			top: 0px;
-			width: 550px;
-			padding: 5px;
-			z-index:100;
-		    }
+			#info {
+				color:#fff;
+				background-color: rgba( 0, 0, 0, 0.5 );
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0px;
+				width: 550px;
+				padding: 5px;
+				z-index:100;
+			}
 
-		    a { color: red; }
+			a { color: red; }
 		</style>
 	</head>
 	<body>
@@ -117,9 +117,12 @@
 
 				//
 
-				var materialColor = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( "textures/cube/SwedishRoyalCastle/pz.jpg" ), depthTest: false } );
+				var materialColor = new THREE.MeshBasicMaterial( {
+					map: THREE.ImageUtils.loadTexture( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
+					depthTest: false
+				} );
 
-				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), materialColor );
+				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), materialColor );
 				quadBG.position.z = -500;
 				quadBG.scale.set( width, height, 1 );
 				sceneBG.add( quadBG );
@@ -128,7 +131,7 @@
 
 				var sceneMask = new THREE.Scene();
 
-				quadMask = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
+				quadMask = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
 				quadMask.position.z = -300;
 				quadMask.scale.set( width / 2, height / 2, 1 );
 				sceneMask.add( quadMask );
@@ -136,8 +139,9 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
-				renderer.setClearColor( 0x000000, 1 );
 				renderer.autoClear = false;
 
 				//
@@ -328,31 +332,17 @@
 
 				geometry.computeTangents();
 
-				var ambient = 0x444444, diffuse = 0x999999, specular = 0x080808, shininess = 20;
+				var mat2 = new THREE.MeshLambertMaterial( {
 
-				var shader = THREE.ShaderLib[ "normalmap" ];
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+					color: 0x999999,
+					ambient: 0x444444,
+					specular: 0x080808,
+					shininess: 20,
+					map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
+					normalMap: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
-				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value.set( 0.75, 0.75 );
-
-				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-
-				uniforms[ "enableAO" ].value = false;
-				uniforms[ "enableDiffuse" ].value = true;
-
-				uniforms[ "diffuse" ].value.setHex( diffuse );
-				uniforms[ "specular" ].value.setHex( specular );
-				uniforms[ "ambient" ].value.setHex( ambient );
-
-				uniforms[ "shininess" ].value = shininess;
-
-				uniforms[ "diffuse" ].value.convertGammaToLinear();
-				uniforms[ "specular" ].value.convertGammaToLinear();
-				uniforms[ "ambient" ].value.convertGammaToLinear();
-
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var mat2 = new THREE.ShaderMaterial( parameters );
+				} );
 
 				mesh = new THREE.Mesh( geometry, mat2 );
 				mesh.position.set( 0, -50, 0 );

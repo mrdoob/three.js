@@ -249,6 +249,7 @@ THREE.BlendCharacter = function () {
 
 
 THREE.BlendCharacter.prototype = Object.create( THREE.SkinnedMesh.prototype );
+THREE.BlendCharacter.prototype.constructor = THREE.BlendCharacter;
 
 THREE.BlendCharacter.prototype.getForward = function() {
 

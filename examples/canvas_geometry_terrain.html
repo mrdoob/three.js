@@ -36,7 +36,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/renderers/Renderer.js"></script>
+		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -91,6 +91,7 @@
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xbfd1e5 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";

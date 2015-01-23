@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
+			body {
 				color: #fff;
 				font-family: Monospace;
 				font-size: 13px;
@@ -15,18 +15,18 @@
 				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
-		    }
+			}
 
-		    #info {
+			#info {
 				position: relative;
 				margin: 0 auto -2.1em;
 				top: 0px;
 				width: 550px;
 				padding: 5px;
 				z-index:100;
-		    }
+			}
 
-		    a { color: skyblue; }
+			a { color: skyblue; }
 
 			#stats #fps { background: transparent !important }
 			#stats #fps #fpsText { color: #444 !important }
@@ -41,28 +41,13 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
-		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/SavePass.js"></script>
-
 		<script src="js/controls/TrackballControls.js"></script>
-
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/tween.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
-
 
 		<script>
 
@@ -89,8 +74,6 @@
 			var sunLight, pointLight, ambientLight;
 
 			var morph;
-
-			var composer, effectFXAA, hblur, vblur;
 
 			var parameters, tweenDirection, tweenDay, tweenNight;
 
@@ -146,7 +129,7 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var texturePattern = new THREE.Texture( x, new THREE.UVMapping(), THREE.RepeatWrapping, THREE.RepeatWrapping );
+				var texturePattern = new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				texturePattern.needsUpdate = true;
 				texturePattern.repeat.set( 1000, 1000 );
 				texturePattern.format = THREE.RGBFormat;
@@ -181,9 +164,15 @@
 
 				// GROUND
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { shininess: 80, ambient: 0x444444, color: 0xffffff, specular: 0xffffff, map: textureSquares } );
+				var groundMaterial = new THREE.MeshPhongMaterial( {
+					shininess: 80,
+					ambient: 0x444444,
+					color: 0xffffff,
+					specular: 0xffffff,
+					map: textureSquares
+				} );
 
-				var planeGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
@@ -334,8 +323,9 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.domElement.style.position = "absolute";
@@ -346,7 +336,6 @@
 
 				//
 
-				renderer.shadowMapAutoUpdate = false;
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapType = THREE.PCFSoftShadowMap;
 
@@ -382,47 +371,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'keydown', onKeyDown, false );
-
-				// COMPOSER
-
-				renderer.autoClear = false;
-
-				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-
-				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-				var effectVignette = new THREE.ShaderPass( THREE.VignetteShader );
-
-				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
-				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
-
-				var bluriness = 4;
-
-				hblur.uniforms[ 'h' ].value = bluriness / SCREEN_WIDTH;
-				vblur.uniforms[ 'v' ].value = bluriness / SCREEN_HEIGHT;
-
-				hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
-
-				composer = new THREE.EffectComposer( renderer, renderTarget );
-
-				var renderModel = new THREE.RenderPass( scene, camera );
-
-				effectVignette.renderToScreen = true;
-				vblur.renderToScreen = true;
-				effectFXAA.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer, renderTarget );
-
-				composer.addPass( renderModel );
-
-				composer.addPass( effectFXAA );
-
-				//composer.addPass( hblur );
-				//composer.addPass( vblur );
-
-				//composer.addPass( effectVignette );
 
 				// TWEEN
 
@@ -490,12 +438,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				hblur.uniforms[ 'h' ].value = 4 / SCREEN_WIDTH;
-				vblur.uniforms[ 'v' ].value = 4 / SCREEN_HEIGHT;
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
 
 				controls.handleResize();
 
@@ -554,7 +496,7 @@
 				if ( morph ) morph.updateAnimation( delta );
 
 				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
 
 				sunLight.intensity = parameters.control * 0.7 + 0.3;
 				pointLight.intensity = - parameters.control * 0.5 + 1;
@@ -562,10 +504,6 @@
 				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
 
 				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
-
-				// render shadow map
-
-				renderer.updateShadowMap( scene, camera );
 
 				// render cube map
 
@@ -580,9 +518,7 @@
 
 				// render scene
 
-				//renderer.render( scene, camera );
-				//renderer.clearTarget( null, 1, 1, 1 );
-				composer.render( 0.1 );
+				renderer.render( scene, camera );
 
 			}
 
@@ -590,4 +526,3 @@
 
 	</body>
 </html>
-

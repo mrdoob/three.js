@@ -12,6 +12,8 @@
 		<h1>[name]</h1>
 
 		<div class="desc">A material that maps the normal vectors to RGB colors.</div>
+		
+		<iframe src='../../scenes/material-browser.html#MeshNormalMaterial'></iframe>
 
 
 		<h2>Constructor</h2>
@@ -22,37 +24,35 @@
 		parameters is an object with one or more properties defining the material's appearance. 
 		</div>
 		<div>
-		morphTargets -- Define whether the material uses morphTargets. Default is false.<br/>
-		shading --  How the triangles of a curved surface are rendered. Default is [page:Materials THREE.SmoothShading].<br/>
+		shading --  How the triangles of a curved surface are rendered. Default is [page:Materials THREE.FlatShading].<br/>
 		wireframe -- Render geometry as wireframe. Default is false (i.e. render as smooth shaded).<br/>
 		wireframeLinewidth -- Controls wireframe thickness. Default is 1.<br/>
+		morphTargets -- Define whether the material uses morphTargets. Default is false.<br/>
 		</div>
 
 
 		<h2>Properties</h2>
 
 
-
-		<h3>.[page:boolean morphTargets]</h3>
-		<div>Define whether the material uses morphTargets. Default is false.</div> 
-
-		<h3>.[page:number shading]</h3>
+		<h3>[property:number shading]</h3>
 		<div>
 			How the triangles of a curved surface are rendered: as a smooth surface, as flat separate facets, or no shading at all.<br/><br/>
-			Options are [page:Materials THREE.SmoothShading] (default), [page:Materials THREE.FlatShading]
+			Options are [page:Materials THREE.SmoothShading], [page:Materials THREE.FlatShading](default)
 		</div>
-		
 
-		<h3>.[page:boolean wireframe]</h3>
+		<h3>[property:boolean wireframe]</h3>
 		<div>
 			Render geometry as wireframe. Default is false (i.e. render as smooth shaded). 
 		</div> 
 		
-		<h3>.[page:number wireframeLinewidth]</h3>
+		<h3>[property:number wireframeLinewidth]</h3>
 		<div>
 			Controls wireframe thickness. Default is 1.<br/><br/>
 			Due to limitations in the ANGLE layer, on Windows platforms linewidth will always be 1 regardless of the set value.
 		</div> 
+
+		<h3>[property:boolean morphTargets]</h3>
+		<div>Define whether the material uses morphTargets. Default is false.</div> 
 
 		<h2>Methods</h2>
 

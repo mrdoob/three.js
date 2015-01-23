@@ -68,7 +68,7 @@
 						geometry.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
 						var material = new THREE.MeshBasicMaterial( {
-								map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
+							map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' )
 						} );
 
 						var mesh = new THREE.Mesh( geometry, material );
@@ -80,6 +80,7 @@
 						scene.add( mesh );
 
 						renderer = new THREE.WebGLRenderer();
+						renderer.setPixelRatio( window.devicePixelRatio );
 						renderer.setSize(window.innerWidth, window.innerHeight);
 						renderer.domElement.style.position = 'absolute';
 						renderer.domElement.style.top = 0;
@@ -92,8 +93,6 @@
 							renderer.setSize( window.innerWidth, window.innerHeight );
 
 						}, false);
-
-						controls.connect();
 
 						animate();
 

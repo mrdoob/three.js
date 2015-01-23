@@ -105,9 +105,9 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor(0xffffff, 1);
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize(  window.innerWidth,  window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );

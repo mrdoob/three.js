@@ -109,7 +109,8 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container = document.getElementById( 'container' );

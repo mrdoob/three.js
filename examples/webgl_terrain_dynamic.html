@@ -410,7 +410,7 @@
 				}
 
 
-				var plane = new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
+				var plane = new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				quadTarget.position.z = -500;
@@ -430,8 +430,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setClearColor( scene.fog.color, 1 );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -658,7 +659,7 @@
 
 					scene.fog.color.setHSL( 0.1, 0.5, lightVal );
 
-					renderer.setClearColor( scene.fog.color, 1 );
+					renderer.setClearColor( scene.fog.color );
 
 					directionalLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );

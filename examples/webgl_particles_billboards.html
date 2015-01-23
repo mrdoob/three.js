@@ -81,16 +81,16 @@
 
 				}
 
-				material = new THREE.PointCloudMaterial( { size: 35, sizeAttenuation: false, map: sprite, transparent: true } );
+				material = new THREE.PointCloudMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7 );
 
 				particles = new THREE.PointCloud( geometry, material );
-				particles.sortParticles = true;
 				scene.add( particles );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

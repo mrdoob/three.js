@@ -15,9 +15,11 @@ THREE.SVGLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var scope = this;
+
 		var parser = new DOMParser();
 
-		var loader = new THREE.XHRLoader();
+		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( svgString ) {
 
@@ -25,7 +27,7 @@ THREE.SVGLoader.prototype = {
 
 			onLoad( doc.firstChild );
 
-		} );
+		}, onProgress, onError );
 
 	}
 };

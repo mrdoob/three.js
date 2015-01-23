@@ -61,6 +61,7 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
 				// scene
@@ -83,9 +84,9 @@
 
 			function fillScene() {
 
-				var planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
+				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 				
-			   //MIRORR planes
+				// MIRORR planes
 				groundMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
 				
 				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
@@ -95,7 +96,7 @@
 
 				verticalMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color:0x889999 } );
 				
-				var verticalMirrorMesh = new THREE.Mesh( new THREE.PlaneGeometry( 60, 60 ), verticalMirror.material );
+				var verticalMirrorMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 60, 60 ), verticalMirror.material );
 				verticalMirrorMesh.add( verticalMirror );
 				verticalMirrorMesh.position.y = 35;
 				verticalMirrorMesh.position.z = -45;

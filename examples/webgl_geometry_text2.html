@@ -84,7 +84,7 @@
 				};
 			} )();
 		</script>
-		
+
 
 		<script>
 
@@ -238,7 +238,7 @@
 
 				}
 
-				material = new THREE.MeshFaceMaterial( [ 
+				material = new THREE.MeshFaceMaterial( [
 					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
 					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
 				] );
@@ -250,7 +250,10 @@
 
 				createText();
 
-				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
+				var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 10000, 10000 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
+				);
 				plane.position.y = 100;
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
@@ -258,10 +261,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.setClearColor( scene.fog.color, 1 );
-
 				container.appendChild( renderer.domElement );
 
 				// STATS

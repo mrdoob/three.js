@@ -32,7 +32,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	this.root = object;
 
-	this.matrixWorld = object.matrixWorld;
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
 
 	this.update();
@@ -41,6 +41,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 
 THREE.SkeletonHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.SkeletonHelper.prototype.constructor = THREE.SkeletonHelper;
 
 THREE.SkeletonHelper.prototype.getBoneList = function( object ) {
 

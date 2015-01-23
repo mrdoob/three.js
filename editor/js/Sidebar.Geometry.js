@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Sidebar.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
@@ -57,7 +61,8 @@ Sidebar.Geometry = function ( editor ) {
 
 	// parameters
 
-	var parameters;
+	var parameters = new UI.Panel();
+	container.add( parameters );
 
 
 	//
@@ -79,59 +84,43 @@ Sidebar.Geometry = function ( editor ) {
 
 			//
 
-			if ( parameters !== undefined ) {
-
-				container.remove( parameters );
-				parameters = undefined;
-
-			}
+			parameters.clear();
 
 			if ( geometry instanceof THREE.BoxGeometry ) {
 
-				parameters = new Sidebar.Geometry.BoxGeometry( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.BoxGeometry( signals, object ) );
 
 			} else if ( geometry instanceof THREE.CircleGeometry ) {
 
-				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.CircleGeometry( signals, object ) );
 
 			} else if ( geometry instanceof THREE.CylinderGeometry ) {
 
-				parameters = new Sidebar.Geometry.CylinderGeometry( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.CylinderGeometry( signals, object ) );
 
 			} else if ( geometry instanceof THREE.SphereGeometry ) {
 
-				parameters = new Sidebar.Geometry.SphereGeometry( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.SphereGeometry( signals, object ) );
 
 			} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
 
-				parameters = new Sidebar.Geometry.IcosahedronGeometry( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.IcosahedronGeometry( signals, object ) );
 
 			} else if ( geometry instanceof THREE.PlaneGeometry ) {
 
-				parameters = new Sidebar.Geometry.PlaneGeometry( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.PlaneGeometry( signals, object ) );
 
 			} else if ( geometry instanceof THREE.TorusGeometry ) {
 
-				parameters = new Sidebar.Geometry.TorusGeometry( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.TorusGeometry( signals, object ) );
 
 			} else if ( geometry instanceof THREE.TorusKnotGeometry ) {
 
-				parameters = new Sidebar.Geometry.TorusKnotGeometry( signals, object );
-				container.add( parameters );
-
-			} else {
-
-				parameters = new Sidebar.Geometry.Modifiers( signals, object );
-				container.add( parameters );
+				parameters.add( new Sidebar.Geometry.TorusKnotGeometry( signals, object ) );
 
 			}
+
+			parameters.add( new Sidebar.Geometry.Modifiers( signals, object ) );
 
 		} else {
 
@@ -142,6 +131,7 @@ Sidebar.Geometry = function ( editor ) {
 	}
 
 	signals.objectSelected.add( build );
+	signals.geometryChanged.add( build );
 
 	return container;
 

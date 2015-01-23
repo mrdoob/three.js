@@ -17,7 +17,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/renderers/Renderer.js"></script>
+		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -81,8 +81,6 @@
 				imageContext.fillRect( 0, 0, 480, 204 );
 
 				texture = new THREE.Texture( image );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
 
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
@@ -99,8 +97,6 @@
 				imageReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
 
 				textureReflection = new THREE.Texture( imageReflection );
-				textureReflection.minFilter = THREE.LinearFilter;
-				textureReflection.magFilter = THREE.LinearFilter;
 
 				var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection, side: THREE.BackSide, overdraw: 0.5 } );
 
@@ -155,6 +151,7 @@
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

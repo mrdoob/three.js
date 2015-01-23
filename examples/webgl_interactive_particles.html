@@ -87,9 +87,8 @@
 
 			var PARTICLE_SIZE = 20;
 
-			var projector, raycaster, intersects;
-			var mouse = { x: 1, y: 1 }, INTERSECTED;
-			var vector = new THREE.Vector3();
+			var raycaster, intersects;
+			var mouse, INTERSECTED;
 
 			init();
 			animate();
@@ -152,14 +151,14 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				//
 
-				projector = new THREE.Projector();
 				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2()
 
 				//
 
@@ -202,16 +201,12 @@
 
 			}
 
-			function render() { ref: http://dl.dropboxusercontent.com/u/4253186/three/examples/webgl_interactive_particles.html
+			function render() {
 
 				particles.rotation.x += 0.0005;
 				particles.rotation.y += 0.001;
 
-				vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-
-				projector.unprojectVector( vector, camera );
-
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				intersects = raycaster.intersectObject( particles );
 

@@ -140,7 +140,7 @@
 				textureCanvas2.needsUpdate = true;
 				materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var meshCanvas1 = new THREE.Mesh( geometry, materialCanvas1 );
 				meshCanvas1.rotation.x = -Math.PI / 2;
@@ -163,7 +163,7 @@
 					scene1.add( meshCanvas1 );
 					scene2.add( meshCanvas2 );
 
-					var geometry = new THREE.PlaneGeometry( 100, 100 );
+					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 					var mesh1 = new THREE.Mesh( geometry, materialPainting1 );
 					var mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 
@@ -209,8 +209,9 @@
 
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene1.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setClearColor( scene1.fog.color, 1 );
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = "relative";

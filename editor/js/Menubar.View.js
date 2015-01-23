@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.View = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -34,6 +38,40 @@ Menubar.View = function ( editor ) {
 
 		editor.setTheme( 'css/dark.css' );
 		editor.config.setKey( 'theme', 'css/dark.css' );
+
+	} );
+	options.add( option );
+
+	//
+
+	options.add( new UI.HorizontalRule() );
+
+	// fullscreen
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Fullscreen' );
+	option.onClick( function () {
+
+		var element = document.body;
+
+		if ( element.requestFullscreen ) {
+
+			element.requestFullscreen();
+
+		} else if ( element.mozRequestFullScreen ) {
+
+			element.mozRequestFullScreen();
+
+		} else if ( element.webkitRequestFullscreen ) {
+
+			element.webkitRequestFullscreen();
+
+		} else if ( element.msRequestFullscreen ) {
+
+			element.msRequestFullscreen();
+
+		}
 
 	} );
 	options.add( option );

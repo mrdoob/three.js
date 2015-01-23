@@ -89,10 +89,10 @@
 
 				// GROUND
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
-				var planeGeometry = new THREE.PlaneGeometry( 16000, 16000 );
+				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
+				var material = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
 
-				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
+				var ground = new THREE.Mesh( geometry, material );
 				ground.position.set( 0, FLOOR, 0 );
 				ground.rotation.x = -Math.PI/2;
 				scene.add( ground );
@@ -112,13 +112,13 @@
 
 				light.castShadow = true;
 
-				light.shadowMapWidth = 2048;
+				light.shadowMapWidth = 1024;
 				light.shadowMapHeight = 2048;
 
 				var d = 390;
 
-				light.shadowCameraLeft = -d * 2;
-				light.shadowCameraRight = d * 2;
+				light.shadowCameraLeft = -d;
+				light.shadowCameraRight = d;
 				light.shadowCameraTop = d * 1.5;
 				light.shadowCameraBottom = -d;
 
@@ -134,10 +134,10 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				container.appendChild( renderer.domElement );
 

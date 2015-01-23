@@ -2,7 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VTKLoader = function () {};
+THREE.VTKLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.VTKLoader.prototype = {
 
@@ -18,7 +22,7 @@ THREE.VTKLoader.prototype = {
 
 			onLoad( scope.parse( text ) );
 
-		} );
+		}, onProgress, onError );
 
 	},
 
@@ -69,7 +73,6 @@ THREE.VTKLoader.prototype = {
 		var geometry = new THREE.BufferGeometry();
 		geometry.addAttribute( 'index', new THREE.BufferAttribute( new ( indices.length > 65535 ? Uint32Array : Uint16Array )( indices ), 1 ) );
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
-		geometry.computeVertexNormals();
 
 		return geometry;
 

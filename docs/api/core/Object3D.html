@@ -23,118 +23,124 @@
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Integer id]</h3>
+		<h3>[property:Integer id]</h3>
 		<div>
-		Identifier of this object instance.
+		readonly – Unique number for this object instance.
 		</div>
 
-		<h3>.[page:String uuid]</h3>
+		<h3>[property:String uuid]</h3>
 		<div>
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.
 		This gets automatically assigned, so this shouldn't be edited.
 		</div>
 
-		<h3>.[page:String name]</h3>
+		<h3>[property:String name]</h3>
 		<div>
 		Optional name of the object (doesn't need to be unique).
 		</div>
 
-		<h3>.[page:Object3D parent]</h3>
+		<h3>[property:Object3D parent]</h3>
 		<div>
 		Object's parent in the scene graph.
 		</div>
 
-		<h3>.[page:Object3D children]</h3>
+		<h3>[property:Object3D children]</h3>
 		<div>
 		Array with object's children.
 		</div>
 
-		<h3>.[page:Vector3 position]</h3>
+		<h3>[property:Vector3 position]</h3>
 		<div>
 		Object's local position.
 		</div>
 
-		<h3>.[page:Euler rotation]</h3>
+		<h3>[property:Euler rotation]</h3>
 		<div>
 		Object's local rotation (<a href="https://en.wikipedia.org/wiki/Euler_angles" target="_blank">Euler angles</a>), in radians.
 		</div>
 
-		<h3>.[page:String eulerOrder]</h3>
-		<div>
-		Order of axis for Euler angles.
-		</div>
-
-		<h3>.[page:Vector3 scale]</h3>
+		<h3>[property:Vector3 scale]</h3>
 		<div>
 		Object's local scale.
 		</div>
 
-		<h3>.[page:Vector3 up]</h3>
+		<h3>[property:Vector3 up]</h3>
 		<div>
 		Up direction.
 		</div>
 
-		<h3>.[page:Matrix4 matrix]</h3>
+		<h3>[property:Matrix4 matrix]</h3>
 		<div>
 		Local transform.
 		</div>
 
-		<h3>.[page:Quaternion quaternion]</h3>
+		<h3>[property:Quaternion quaternion]</h3>
 		<div>
-		Object's local rotation as [page:Quaternion Quaternion]. Only used when useQuaternion is set to true.
+		Object's local rotation as [page:Quaternion Quaternion].
 		</div>
 
-		<h3>.[page:Boolean useQuaternion]</h3>
-		<div>
-		Use quaternion instead of Euler angles for specifying local rotation.
-		</div>
-
-		<h3>.[page:Float renderDepth]</h3>
-		<div>
-		Override depth-sorting order if non *null*.
-		</div>
-
-		<h3>.[page:Boolean visible]</h3>
+		<h3>[property:Boolean visible]</h3>
 		<div>
 		Object gets rendered if *true*.
 		</div>
+		<div>
+		default – true
+		</div>
 
-		<h3>.[page:Boolean castShadow]</h3>
+		<h3>[property:Boolean castShadow]</h3>
 		<div>
 		Gets rendered into shadow map.
 		</div>
+		<div>
+		default – false
+		</div>
 
-		<h3>.[page:Boolean receiveShadow]</h3>
+		<h3>[property:Boolean receiveShadow]</h3>
 		<div>
 		Material gets baked in shadow receiving.
 		</div>
+		<div>
+		default – false
+		</div>
 
-		<h3>.[page:Boolean frustumCulled]</h3>
+		<h3>[property:Boolean frustumCulled]</h3>
 		<div>
 		When this is set, it checks every frame if the object is in the frustum of the camera. Otherwise the object gets drawn every frame even if it isn't visible.
 		</div>
+		<div>
+		default – true
+		</div>
 
-		<h3>.[page:Boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<div>
 		When this is set, it calculates the matrix of position, (rotation or quaternion) and scale every frame and also recalculates the matrixWorld property.
 		</div>
+		<div>
+		default – true
+		</div>
 
-		<h3>.[page:Boolean matrixWorldNeedsUpdate]</h3>
+		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
 		<div>
 		When this is set, it calculates the matrixWorld in that frame and resets this property to false.
 		</div>
+		<div>
+		default – false
+		</div>
 
-		<h3>.[page:Boolean rotationAutoUpdate]</h3>
+		<h3>[property:Boolean rotationAutoUpdate]</h3>
 		<div>
 		When this is set, then the rotationMatrix gets calculated every frame.
 		</div>
+		<div>
+		default – true
+		</div>
 
-		<h3>.[page:object userData]</h3>
+		<h3>[property:object userData]</h3>
 		<div>
 		An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
 		</div>
 
-		<h3>.[page:Matrix4 matrixWorld]</h3>
+		<h3>[property:Matrix4 matrixWorld]</h3>
 		<div>
 		The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
 		</div>
@@ -144,7 +150,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>.applyMatrix( [page:Matrix4 matrix])</h3>
+		<h3>[method:null applyMatrix]( [page:Matrix4 matrix])</h3>
 		<div>
 		matrix - matrix
 		</div>
@@ -152,7 +158,7 @@
 		This updates the position, rotation and scale with the matrix.
 		</div>
 
-		<h3>.translateX( [page:Float distance] )</h3>
+		<h3>[method:null translateX]( [page:Float distance] )</h3>
 		<div>
 		distance - Distance.<br />
 		</div>
@@ -160,7 +166,7 @@
 		Translates object along x axis by distance.
 		</div>
 
-		<h3>.translateY( [page:Float distance] )</h3>
+		<h3>[method:null translateY]( [page:Float distance] )</h3>
 		<div>
 		distance - Distance.<br />
 		</div>
@@ -168,7 +174,7 @@
 		Translates object along y axis by distance.
 		</div>
 
-		<h3>.translateZ( [page:Float distance] )</h3>
+		<h3>[method:null translateZ]( [page:Float distance] )</h3>
 		<div>
 		distance - Distance.<br />
 		</div>
@@ -176,7 +182,7 @@
 		Translates object along z axis by distance.
 		</div>
 
-		<h3>.localToWorld( [page:Vector3 vector] )</h3>
+		<h3>[method:Vector3 localToWorld]( [page:Vector3 vector] )</h3>
 		<div>
 		vector - A local vector.<br />
 		</div>
@@ -184,7 +190,7 @@
 		Updates the vector from local space to world space.
 		</div>
 
-		<h3>.worldToLocal( [page:Vector3 vector] )</h3>
+		<h3>[method:Vector3 worldToLocal]( [page:Vector3 vector] )</h3>
 		<div>
 		vector - A world vector.<br />
 		</div>
@@ -192,7 +198,7 @@
 		Updates the vector from world space to local space.
 		</div>
 
-		<h3>.lookAt( [page:Vector3 vector] )</h3>
+		<h3>[method:null lookAt]( [page:Vector3 vector] )</h3>
 		<div>
 		vector - A world vector to look at.<br />
 		</div>
@@ -200,47 +206,64 @@
 		Rotates object to face point in space.
 		</div>
 
-		<h3>.add( [page:Object3D object] )</h3>
+		<h3>[method:null add]( [page:Object3D object], ... )</h3>
 		<div>
 		object - An object.<br />
 		</div>
 		<div>
-		Adds *object* as child of this object.
+		Adds *object* as child of this object. An arbitrary number of objects may be added.
 		</div>
 
-		<h3>.remove( [page:Object3D object] )</h3>
+		<h3>[method:null remove]( [page:Object3D object], ... )</h3>
 		<div>
 		object - An object.<br />
 		</div>
 		<div>
-		Removes *object* as child of this object.
+		Removes *object* as child of this object. An arbitrary number of objects may be removed.
 		</div>
 
-		<h3>.traverse( [page:Function callback] )</h3>
+		<h3>[method:null traverse]( [page:Function callback] )</h3>
 		<div>
-		callback - An Function with as first argument an object3D object.<br />
+		callback - A function with as first argument an object3D object.<br />
 		</div>
 		<div>
 		Executes the callback on this object and all descendants.
 		</div>
+		
+		<h3>[method:null traverseVisible]( [page:Function callback] )</h3>
+		<div>
+		callback - A function with as first argument an object3D object.<br />
+		</div>
+		<div>
+		Like traverse, but the callback will only be executed for visible objects.
+		Descendants of invisible objects are not traversed.
+		</div>
+		
+		<h3>[method:null traverseAncestors]( [page:Function callback] )</h3>
+		<div>
+		callback - A function with as first argument an object3D object.<br />
+		</div>
+		<div>
+		Executes the callback on this object and all ancestors.
+		</div>
 
-		<h3>.updateMatrix()</h3>
+		<h3>[method:null updateMatrix]()</h3>
 		<div>
 		Updates local transform.
 		</div>
 
-		<h3>.updateMatrixWorld( [page:Boolean force] )</h3>
+		<h3>[method:null updateMatrixWorld]( [page:Boolean force] )</h3>
 		<div>
 		Updates global transform of the object and its children.
 		</div>
 
-		<h3>.clone()</h3>
+		<h3>[method:Object3D clone]()</h3>
 		<div>
 		Creates a new clone of this object and all descendants.
 		</div>
 
 
-		<h3>.getObjectByName([page:String name], [page:Boolean recursive]) [page:Object3d Object3d]</h3>
+		<h3>[method:Object3D getObjectByName]([page:String name], [page:Boolean recursive])</h3>
 		<div>
 		name -- String to match to the children's Object3d.name property. <br />
 		recursive -- Boolean whether to search through the children's children. Default is false.
@@ -249,7 +272,7 @@
 		Searches through the object's children and returns the first with a matching name, optionally recursive.
 		</div>
 
-		<h3>.getObjectById([page:Integer id], [page:Boolean recursive]) [page:Object3D]</h3>
+		<h3>[method:Object3D getObjectById]([page:Integer id], [page:Boolean recursive])</h3>
 		<div>
 		id -- Unique number of the object instance<br />
 		recursive -- Boolean whether to search through the children's children. Default is false.
@@ -258,7 +281,7 @@
 		Searches through the object's children and returns the first with a matching id, optionally recursive.
 		</div>
 
-		<h3>.translateOnAxis([page:Vector3 axis], [page:Float distance]) [page:Object3D]</h3>
+		<h3>[method:Object3D translateOnAxis]([page:Vector3 axis], [page:Float distance])</h3>
 		<div>
 		axis -- A normalized vector in object space.<br />
 		distance -- The distance to translate.
@@ -267,7 +290,7 @@
 		Translate an object by distance along an axis in object space. The axis is assumed to be normalized.
 		</div>
 
-		<h3>.rotateOnAxis([page:Vector3 axis], [page:Float angle]) [page:Object3D]</h3>
+		<h3>[method:Object3D rotateOnAxis]([page:Vector3 axis], [page:Float angle])</h3>
 		<div>
 		axis -- A normalized vector in object space. <br />
 		angle -- The angle in radians.

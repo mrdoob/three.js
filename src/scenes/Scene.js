@@ -12,11 +12,11 @@ THREE.Scene = function () {
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
-	this.matrixAutoUpdate = false;
 
 };
 
 THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Scene.prototype.constructor = THREE.Scene;
 
 THREE.Scene.prototype.clone = function ( object ) {
 

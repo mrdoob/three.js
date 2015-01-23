@@ -48,9 +48,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	}
 
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( numEdges * 2 * 3 ), 3 ) );
-
-	var coords = geometry.attributes.position.array;
+	var coords = new Float32Array( numEdges * 2 * 3 );
 
 	var index = 0;
 
@@ -74,11 +72,14 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	}
 
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
+
 	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
 
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
-	this.matrixWorld = object.matrixWorld;
 
 };
 
 THREE.EdgesHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.EdgesHelper.prototype.constructor = THREE.EdgesHelper;

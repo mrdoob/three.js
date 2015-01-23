@@ -52,8 +52,7 @@
 		var searchInterval = 0;
 		var useOctree = true;
 		
-		var projector;
-		
+		var raycaster = new THREE.Raycaster();
 		var mouse = new THREE.Vector2();
 		var intersected;
 
@@ -71,8 +70,8 @@
 			scene.add( camera );
 
 			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
 			document.body.appendChild( renderer.domElement );
 			
 			// create octree
@@ -129,10 +128,6 @@
 				modifyOctree( geometry, material, true );
 				
 			} );
-			
-			// projector for click intersection
-			
-			projector = new THREE.Projector();
 			
 			// camera controls
 			
@@ -327,10 +322,8 @@
 			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			
-			var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-			projector.unprojectVector( vector, camera );
+			raycaster.setFromCamera( mouse, camera );
 
-			var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 			var octreeObjects;
 			var numObjects;
 			var numFaces = 0;

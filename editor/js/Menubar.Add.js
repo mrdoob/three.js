@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 Menubar.Add = function ( editor ) {
 
 	var container = new UI.Panel();
@@ -94,7 +98,7 @@ Menubar.Add = function ( editor ) {
 	option.onClick( function () {
 
 		var radius = 20;
-		var segments = 8;
+		var segments = 32;
 
 		var geometry = new THREE.CircleGeometry( radius, segments );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
@@ -116,7 +120,7 @@ Menubar.Add = function ( editor ) {
 		var radiusTop = 20;
 		var radiusBottom = 20;
 		var height = 100;
-		var radiusSegments = 8;
+		var radiusSegments = 32;
 		var heightSegments = 1;
 		var openEnded = false;
 

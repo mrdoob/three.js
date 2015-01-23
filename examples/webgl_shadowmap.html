@@ -133,10 +133,11 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
-				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.autoClear = false;
 
 				//
@@ -191,7 +192,7 @@
 
 				}
 
-			};
+			}
 
 			function createHUD() {
 
@@ -205,13 +206,17 @@
 
 				uniforms.tDiffuse.value = light.shadowMap;
 
-				var hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
+				var hudMaterial = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				} );
 
 				var hudHeight = 2 / 3;
 
 				var hudWidth = hudHeight * SHADOW_MAP_WIDTH / SHADOW_MAP_HEIGHT;
 
-				var hudGeo = new THREE.PlaneGeometry( hudWidth, hudHeight );
+				var hudGeo = new THREE.PlaneBufferGeometry( hudWidth, hudHeight );
 				hudGeo.applyMatrix( new THREE.Matrix4().makeTranslation( hudWidth / 2, hudHeight / 2, 0 ) );
 
 				hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
@@ -230,7 +235,7 @@
 
 				// GROUND
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 				planeMaterial.ambient = planeMaterial.color;
 

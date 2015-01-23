@@ -1,3 +1,7 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var Loader = function ( editor ) {
 
 	var scope = this;
@@ -37,6 +41,30 @@ var Loader = function ( editor ) {
 					var scene = loader.parse( json );
 
 					editor.setScene( scene );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'babylonmeshdata':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+					var json = JSON.parse( contents );
+
+					var loader = new THREE.BabylonLoader();
+
+					var geometry = loader.parseGeometry( json );
+					var material = new THREE.MeshPhongMaterial();
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.name = filename;
+
+					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -181,8 +209,6 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					console.log( contents );
-
 					var geometry = new THREE.PLYLoader().parse( contents );
 					geometry.sourceType = "ply";
 					geometry.sourceFile = file.name;
@@ -297,7 +323,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				alert( 'Unsupported file format.' );
+				alert( 'Unsupported file format (' + extension +  ').' );
 
 				break;
 

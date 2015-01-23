@@ -18,6 +18,7 @@ THREE.BoxHelper = function ( object ) {
 };
 
 THREE.BoxHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
 
 THREE.BoxHelper.prototype.update = function ( object ) {
 
@@ -94,7 +95,7 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 
 	this.geometry.computeBoundingSphere();
 
+	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
-	this.matrixWorld = object.matrixWorld;
 
 };

@@ -191,7 +191,7 @@
 	this.materialOcean.blending = 0;
 
 	// Create the simulation plane
-	this.screenQuad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ) );
+	this.screenQuad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ) );
 	this.scene.add(this.screenQuad);
 
 	// Initialise spectrum data

@@ -274,17 +274,38 @@ THREE.ObjectLoader.prototype = {
 
 					if ( geometry === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined geometry ' + data.geometry );
+						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
 
 					}
 
 					if ( material === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
 					object = new THREE.Mesh( geometry, material );
+
+					break;
+
+				case 'Line':
+
+					var geometry = geometries[ data.geometry ];
+					var material = materials[ data.material ];
+
+					if ( geometry === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
+
+					}
+
+					if ( material === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
+
+					}
+
+					object = new THREE.Line( geometry, material );
 
 					break;
 
@@ -294,7 +315,7 @@ THREE.ObjectLoader.prototype = {
 
 					if ( material === undefined ) {
 
-						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
 
 					}
 
@@ -332,7 +353,6 @@ THREE.ObjectLoader.prototype = {
 
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
-			if ( data.script !== undefined ) object.script = new THREE.Script( data.script );
 
 			if ( data.children !== undefined ) {
 

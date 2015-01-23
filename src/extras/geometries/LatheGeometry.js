@@ -103,3 +103,4 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 };
 
 THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.LatheGeometry.prototype.constructor = THREE.LatheGeometry;

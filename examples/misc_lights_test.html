@@ -27,7 +27,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/renderers/Renderer.js"></script>
+		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
@@ -111,11 +111,13 @@
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xffffff );
+				canvasRenderer.setPixelRatio( window.devicePixelRatio );
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( canvasRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setClearColor( 0xffffff );
+				webglRenderer.setPixelRatio( window.devicePixelRatio );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				webglRenderer.domElement.style.position = "relative";
 				container.appendChild( webglRenderer.domElement );
