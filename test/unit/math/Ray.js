@@ -287,10 +287,13 @@ test( "distanceSqToSegment", function() {
 
 	var P0 = new THREE.Vector3(-1.0264718499965966,	  9.6163341007195407e-007, 0.0);
 	var P1 = new THREE.Vector3( 0.91950808032415809, -1.0094441192690283e-006, 0.0);
+	var dirP = new THREE.Vector3().subVectors(P1, P0);
+
 	var Q0 = new THREE.Vector3(-1.0629447383806110,	  9.2709540082141753e-007, 0.0);
 	var Q1 = new THREE.Vector3( 1.0811583868227901,	 -1.0670017179567367e-006, 0.0);
 
-	rayP = new THREE.Ray( P0, P1);
+	rayP = new THREE.Ray( P0, dirP);
+
 	distSqr = a.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
 	QUnit.assert.equalEnough(distSqr, 0, 0.0001,
 				 "|distSqr|<0.0001? (near parallel segment and ray, example 1)");
@@ -301,12 +304,14 @@ test( "distanceSqToSegment", function() {
 
 	var P0 = new THREE.Vector3(-1.0896217473782599,	  9.7236145595088601e-007, 0.0);
 	var P1 = new THREE.Vector3( 0.91220578597858548, -9.4369829432107506e-007, 0.0);
+	var dirP = new THREE.Vector3().subVectors(P1, P0);
+
 	var Q0 = new THREE.Vector3(-0.90010447502136237,  9.0671446351334441e-007, 0.0);
 	var Q1 = new THREE.Vector3( 1.0730877178721130,	 -9.8185787633992740e-007, 0.0);
 
-	rayP = new THREE.Ray( P0, P1);
-	distSqr = a.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
+	rayP = new THREE.Ray( P0, dirP);
 
+	distSqr = a.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
 	QUnit.assert.equalEnough(distSqr, 0, 0.0001,
 				 "|distSqr|<0.0001? (near parallel segment and ray, example 2)");
 
