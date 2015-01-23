@@ -256,29 +256,29 @@ test( "distanceSqToSegment", function() {
 	var v1 = new THREE.Vector3( 50, 50, 50 ); // just a far away point
 	var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
-	ok( ptOnSegment.distanceTo( v0 ) < 0.0001, "Passed!" );
-	ok( ptOnLine.distanceTo( new THREE.Vector3(1, 1, 50) ) < 0.0001, "Passed!" );
+	ok( ptOnSegment.distanceTo( v0 ) < 0.000001, "Passed!" );
+	ok( ptOnLine.distanceTo( new THREE.Vector3(1, 1, 50) ) < 0.000001, "Passed!" );
 	// ((3-1) * (3-1) + (5-1) * (5-1) = 4 + 16 = 20
-	ok( Math.abs( distSqr - 20 ) < 0.0001, "Passed!" );
+	ok( Math.abs( distSqr - 20 ) < 0.000001, "Passed!" );
 
 	//segment behind the ray
 	v0 = new THREE.Vector3( -50, -50, -50 ); // just a far away point
 	v1 = new THREE.Vector3( -3, -5, -4 );
 	distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
-	ok( ptOnSegment.distanceTo( v1 ) < 0.0001, "Passed!" );
-	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
+	ok( ptOnSegment.distanceTo( v1 ) < 0.000001, "Passed!" );
+	ok( ptOnLine.distanceTo( one3 ) < 0.000001, "Passed!" );
 	// ((-3-1) * (-3-1) + (-5-1) * (-5-1) + (-4-1) + (-4-1) = 16 + 36 + 25 = 77
-	ok( Math.abs( distSqr - 77 ) < 0.0001, "Passed!" );
+	ok( Math.abs( distSqr - 77 ) < 0.000001, "Passed!" );
 
 	//exact intersection between the ray and the segment
 	v0 = new THREE.Vector3( -50, -50, -50 );
 	v1 = new THREE.Vector3( 50, 50, 50 );
 	distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
-	ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
-	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
-	ok( distSqr < 0.0001, "Passed!" );
+	ok( ptOnSegment.distanceTo( one3 ) < 0.000001, "Passed!" );
+	ok( ptOnLine.distanceTo( one3 ) < 0.000001, "Passed!" );
+	ok( distSqr < 0.000001, "Passed!" );
 	// test cases from
 	// http://www.geometrictools.com/Documentation/DistanceLine3Line3.pdf
 
@@ -287,16 +287,16 @@ test( "distanceSqToSegment", function() {
 
 	var P0 = new THREE.Vector3(-1.0264718499965966,	  9.6163341007195407e-007, 0.0);
 	var P1 = new THREE.Vector3( 0.91950808032415809, -1.0094441192690283e-006, 0.0);
-	var dirP = new THREE.Vector3().subVectors(P1, P0);
+	var dirP = new THREE.Vector3().subVectors(P1, P0).normalize();
 
 	var Q0 = new THREE.Vector3(-1.0629447383806110,	  9.2709540082141753e-007, 0.0);
 	var Q1 = new THREE.Vector3( 1.0811583868227901,	 -1.0670017179567367e-006, 0.0);
 
 	rayP = new THREE.Ray( P0, dirP);
 
-	distSqr = a.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
-	QUnit.assert.equalEnough(distSqr, 0, 0.0001,
-				 "|distSqr|<0.0001? (near parallel segment and ray, example 1)");
+	distSqr = rayP.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
+	QUnit.assert.equalEnough(distSqr, 0, 0.000001,
+				 "|distSqr|<0.000001? (near parallel segment and ray, example 1)");
 
 	// Example 2 An example where the minimum point is classified as
 	// interior but the theoretically correct point is on the domain
@@ -304,16 +304,16 @@ test( "distanceSqToSegment", function() {
 
 	var P0 = new THREE.Vector3(-1.0896217473782599,	  9.7236145595088601e-007, 0.0);
 	var P1 = new THREE.Vector3( 0.91220578597858548, -9.4369829432107506e-007, 0.0);
-	var dirP = new THREE.Vector3().subVectors(P1, P0);
+	var dirP = new THREE.Vector3().subVectors(P1, P0).normalize();
 
 	var Q0 = new THREE.Vector3(-0.90010447502136237,  9.0671446351334441e-007, 0.0);
 	var Q1 = new THREE.Vector3( 1.0730877178721130,	 -9.8185787633992740e-007, 0.0);
 
 	rayP = new THREE.Ray( P0, dirP);
 
-	distSqr = a.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
-	QUnit.assert.equalEnough(distSqr, 0, 0.0001,
-				 "|distSqr|<0.0001? (near parallel segment and ray, example 2)");
+	distSqr = rayP.distanceSqToSegment( Q0, Q1, ptOnLine, ptOnSegment );
+	QUnit.assert.equalEnough(distSqr, 0, 0.000001,
+				 "|distSqr|<0.000001? (near parallel segment and ray, example 2)");
 
 });
 test( "intersectBox", function() {
