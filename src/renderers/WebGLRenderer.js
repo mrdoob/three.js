@@ -257,13 +257,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _premultipliedAlpha === true ) {
 
-			_gl.clearColor( r * a, g * a, b * a, a );
-
-		} else {
-
-			_gl.clearColor( r, g, b, a );
+			r *= a; g *= a; b *= a;
 
 		}
+
+		_gl.clearColor( r, g, b, a );
 
 	};
 
