@@ -151,9 +151,26 @@ THREE.Geometry.prototype = {
 
 		if ( indices !== undefined ) {
 
-			for ( var i = 0; i < indices.length; i += 3 ) {
+			for ( var i = 0, requiredOffset = 0; i < indices.length; i += 3) {
 
-				addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+				if ( geometry.drawcalls && geometry.drawcalls.length > 1 ) {
+
+					var offset = geometry.drawcalls[ requiredOffset ];
+
+					if ( i >= offset.start + offset.count ) {
+
+						requiredOffset ++ ;
+						offset = geometry.drawcalls[ requiredOffset ];
+
+					}
+
+					addFace( indices[ i ] + offset.index, indices[ i + 1 ] + offset.index, indices[ i + 2 ] + offset.index );
+
+				} else {
+
+					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+
+				}
 
 			}
 
