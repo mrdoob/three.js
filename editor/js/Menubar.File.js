@@ -89,7 +89,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output, "geometry.json" );
+		exportString( output, 'geometry.json' );
 
 	} );
 	options.add( option );
@@ -114,7 +114,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output, "model.json" );
+		exportString( output, 'model.json' );
 
 	} );
 	options.add( option );
@@ -130,7 +130,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output, "scene.json" );
+		exportString( output, 'scene.json' );
 
 	} );
 	options.add( option );
@@ -153,7 +153,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.OBJExporter();
 
-		exportString( exporter.parse( object ), "model.obj" );
+		exportString( exporter.parse( object ), 'model.obj' );
 
 	} );
 	options.add( option );
@@ -167,7 +167,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.STLExporter();
 
-		exportString( exporter.parse( editor.scene ), "model.stl" );
+		exportString( exporter.parse( editor.scene ), 'model.stl' );
 
 	} );
 	options.add( option );
@@ -279,10 +279,10 @@ Menubar.File = function ( editor ) {
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
 
-		var link = document.createElement('a');
+		var link = document.createElement( 'a' );
 		link.href = objectURL;
-		link.download = filename || "data.json";
-		link.target = "_blank";
+		link.download = filename || 'data.json';
+		link.target = '_blank';
 		link.click();
 
 	};
