@@ -310,7 +310,7 @@ THREE.Loader.prototype = {
 
 		if ( m.transparency ) {
 
-			console.warn( 'transparency has been renamed to opacity' );
+			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
 			mpars.opacity = m.transparency;
 
 		}
