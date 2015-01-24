@@ -36,7 +36,8 @@ THREE.BufferAttribute.prototype = {
 
 	set: function ( value, offset ) {
 
-		offset !== undefined ? offset : offset = 0;
+		if ( offset === undefined ) offset = 0;
+
 		this.array.set( value, offset );
 
 		return this;
@@ -102,7 +103,7 @@ THREE.BufferAttribute.prototype = {
 		return this;
 
 	},
-	
+
 	clone: function () {
 
 		return new THREE.BufferAttribute( new this.array.constructor( this.array ), this.itemSize );

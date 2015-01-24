@@ -37,7 +37,7 @@ THREE.DynamicBufferAttribute.prototype = {
 
 	set: function ( value, offset ) {
 
-		offset !== undefined ? offset : offset = 0;
+		if ( offset === undefined ) offset = 0;
 
 		this.array.set( value, offset );
 

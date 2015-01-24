@@ -25,6 +25,7 @@
 	"src/core/Face3.js",
 	"src/core/Face4.js",
 	"src/core/BufferAttribute.js",
+	"src/core/DynamicBufferAttribute.js",
 	"src/core/BufferGeometry.js",
 	"src/core/Geometry.js",
 	"src/cameras/Camera.js",
