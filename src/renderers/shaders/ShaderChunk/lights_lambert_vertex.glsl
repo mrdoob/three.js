@@ -61,7 +61,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );
 		vec3 lVector = lPosition.xyz - mvPosition.xyz;
 
-		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );
+		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );
 
 		lVector = normalize( lVector );
 		float dotProduct = dot( transformedNormal, lVector );
@@ -118,7 +118,7 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );
 
-			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecayExponent[i] );
+			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );
 
 			lVector = normalize( lVector );
 
@@ -192,5 +192,5 @@ vLightFront = vLightFront * diffuse + diffuse * ambientLightColor + emissive;
 #ifdef DOUBLE_SIDED
 
 	vLightBack = vLightBack * diffuse + diffuse * ambientLightColor + emissive;
-	
+
 #endif

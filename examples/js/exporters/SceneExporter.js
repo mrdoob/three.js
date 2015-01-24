@@ -242,7 +242,7 @@ THREE.SceneExporter.prototype = {
 				'	"color"          : ' + o.color.getHex() + ',',
 				'	"intensity"      : ' + o.intensity + ',',
 				'	"position"       : ' + Vector3String( o.position ) + ',',
-				'	"decayExponent"  : ' + o.decayExponent + ',',
+				'	"decay"          : ' + o.decay + ',',
 				'	"distance"       : ' + o.distance + ( o.children.length ? ',' : '' )
 
 				];
@@ -259,7 +259,7 @@ THREE.SceneExporter.prototype = {
 				'	"distance"       : ' + o.distance + ',',
 				'	"angle"          : ' + o.angle + ',',
 				'	"exponent"       : ' + o.exponent + ',',
-				'	"decayExponent"  : ' + o.decayExponent + ',',
+				'	"decay"          : ' + o.decay + ',',
 				'	"target"         : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
 				];

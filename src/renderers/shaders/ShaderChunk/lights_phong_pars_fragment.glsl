@@ -21,7 +21,7 @@ uniform vec3 ambientLightColor;
 
 	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];
 	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];
-	uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];
+	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];
 
 #endif
 
@@ -33,7 +33,7 @@ uniform vec3 ambientLightColor;
 	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];
 	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];
 	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];
-	uniform float spotLightDecayExponent[ MAX_SPOT_LIGHTS ];
+	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];
 
 #endif
 

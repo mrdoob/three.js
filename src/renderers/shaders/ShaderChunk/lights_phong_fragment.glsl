@@ -27,7 +27,7 @@ vec3 viewPosition = normalize( vViewPosition );
 		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );
 		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
 
-		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );
+		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );
 
 		lVector = normalize( lVector );
 
@@ -75,7 +75,7 @@ vec3 viewPosition = normalize( vViewPosition );
 		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );
 		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
 
-		float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecayExponent[i] );
+		float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );
 
 		lVector = normalize( lVector );
 

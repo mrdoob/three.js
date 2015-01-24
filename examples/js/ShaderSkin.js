@@ -103,7 +103,7 @@ THREE.ShaderSkin = {
 				"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-				"uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecay[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
@@ -201,8 +201,8 @@ THREE.ShaderSkin = {
 						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 
 						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
-	
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );",
+
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 
@@ -624,7 +624,7 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-				"uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecay[ MAX_POINT_LIGHTS ];",
 
 				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
@@ -663,7 +663,7 @@ THREE.ShaderSkin = {
 
 						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 
@@ -713,7 +713,7 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-				"uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecay[ MAX_POINT_LIGHTS ];",
 
 				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
@@ -752,7 +752,7 @@ THREE.ShaderSkin = {
 
 						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 
