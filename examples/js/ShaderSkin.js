@@ -103,6 +103,7 @@ THREE.ShaderSkin = {
 				"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
@@ -200,11 +201,8 @@ THREE.ShaderSkin = {
 						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 
 						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
-
-						"float lDistance = 1.0;",
-
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+	
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );",
 
 						"lVector = normalize( lVector );",
 
@@ -214,8 +212,8 @@ THREE.ShaderSkin = {
 
 						"float pointSpecularWeight = KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"pointTotal    += lDistance * diffuse * pointLightColor[ i ] * pointDiffuseWeight;",
-						"specularTotal += lDistance * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
+						"pointTotal    += attenuation * diffuse * pointLightColor[ i ] * pointDiffuseWeight;",
+						"specularTotal += attenuation * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -310,6 +308,7 @@ THREE.ShaderSkin = {
 
 			"varying vec3 vViewPosition;",
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -625,12 +624,15 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
 
 				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
 			"varying vec3 vViewPosition;",
+
+			THREE.ShaderChunk[ "common" ],
 
 			"void main() {",
 
@@ -661,14 +663,11 @@ THREE.ShaderSkin = {
 
 						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-						"float lDistance = 1.0;",
-
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );",
 
 						"lVector = normalize( lVector );",
 
-						"vPointLight[ i ] = vec4( lVector, lDistance );",
+						"vPointLight[ i ] = vec4( lVector, attenuation );",
 
 					"}",
 
@@ -714,12 +713,15 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecayExponent[ MAX_POINT_LIGHTS ];",
 
 				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
 			"varying vec3 vViewPosition;",
+
+			THREE.ShaderChunk[ "common" ],
 
 			"void main() {",
 
@@ -750,14 +752,11 @@ THREE.ShaderSkin = {
 
 						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-						"float lDistance = 1.0;",
-
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );",
 
 						"lVector = normalize( lVector );",
 
-						"vPointLight[ i ] = vec4( lVector, lDistance );",
+						"vPointLight[ i ] = vec4( lVector, attenuation );",
 
 					"}",
 

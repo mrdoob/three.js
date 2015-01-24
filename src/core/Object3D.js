@@ -677,6 +677,7 @@ THREE.Object3D.prototype = {
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
 				data.distance = object.distance;
+				data.decayExponent = object.decayExponent || 0;
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
@@ -685,6 +686,7 @@ THREE.Object3D.prototype = {
 				data.distance = object.distance;
 				data.angle = object.angle;
 				data.exponent = object.exponent;
+				data.decayExponent = object.decayExponent || 0;
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 

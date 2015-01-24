@@ -27,9 +27,7 @@ vec3 viewPosition = normalize( vViewPosition );
 		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );
 		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
 
-		float lDistance = 1.0;
-		if ( pointLightDistance[ i ] > 0.0 )
-			lDistance = saturate( 1.0 - ( length( lVector ) / pointLightDistance[ i ] ) );
+		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecayExponent[i] );
 
 		lVector = normalize( lVector );
 
@@ -50,7 +48,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 		#endif
 
-		pointDiffuse += diffuse * pointLightColor[ i ] * pointDiffuseWeight * lDistance;
+		pointDiffuse += diffuse * pointLightColor[ i ] * pointDiffuseWeight * attenuation;
 
 				// specular
 
@@ -61,7 +59,7 @@ vec3 viewPosition = normalize( vViewPosition );
 		float specularNormalization = ( shininess + 2.0 ) / 8.0;
 
 		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );
-		pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;
+		pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * attenuation * specularNormalization;
 
 	}
 
@@ -77,9 +75,7 @@ vec3 viewPosition = normalize( vViewPosition );
 		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );
 		vec3 lVector = lPosition.xyz + vViewPosition.xyz;
 
-		float lDistance = 1.0;
-		if ( spotLightDistance[ i ] > 0.0 )
-			lDistance = saturate( 1.0 - ( length( lVector ) / spotLightDistance[ i ] ) );
+		float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecayExponent[i] );
 
 		lVector = normalize( lVector );
 
@@ -106,7 +102,7 @@ vec3 viewPosition = normalize( vViewPosition );
 
 			#endif
 
-			spotDiffuse += diffuse * spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;
+			spotDiffuse += diffuse * spotLightColor[ i ] * spotDiffuseWeight * attenuation * spotEffect;
 
 					// specular
 
@@ -117,7 +113,7 @@ vec3 viewPosition = normalize( vViewPosition );
 			float specularNormalization = ( shininess + 2.0 ) / 8.0;
 
 			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );
-			spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;
+			spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * attenuation * specularNormalization * spotEffect;
 
 		}
 
