@@ -2,11 +2,7 @@
 
 	vec4 texelColor = texture2D( map, vUv );
 
-	#ifdef GAMMA_INPUT
-
-		texelColor.xyz *= texelColor.xyz;
-
-	#endif
+	texelColor.xyz = inputToLinear( texelColor.xyz );
 
 	gl_FragColor = gl_FragColor * texelColor;
 

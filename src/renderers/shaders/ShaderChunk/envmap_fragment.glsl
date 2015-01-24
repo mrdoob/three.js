@@ -43,11 +43,7 @@
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 	#endif
 
-	#ifdef GAMMA_INPUT
-
-		envColor.xyz *= envColor.xyz;
-
-	#endif
+	envColor.xyz = inputToLinear( envColor.xyz );
 
 	#ifdef ENVMAP_BLENDING_MULTIPLY
 

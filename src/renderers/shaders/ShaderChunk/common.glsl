@@ -44,3 +44,17 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 	return 1.0;
 }
 
+vec3 inputToLinear( in vec3 a ) {
+#ifdef GAMMA_INPUT
+	return pow( a, vec3( float( GAMMA_FACTOR ) ) );
+#else
+	return a;
+#endif
+}
+vec3 linearToOutput( in vec3 a ) {
+#ifdef GAMMA_OUTPUT
+	return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
+#else
+	return a;
+#endif
+}
