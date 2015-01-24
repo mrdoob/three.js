@@ -48,14 +48,14 @@ Sidebar.Object3D = function ( editor ) {
 				break;
 
 		}
-		
+
 		this.setValue( 'Actions' );
 
 		signals.objectChanged.dispatch( object );
 
 	} );
 	container.addStatic( objectActions );
-	
+
 	container.add( new UI.Break() );
 
 	// uuid
@@ -227,6 +227,16 @@ Sidebar.Object3D = function ( editor ) {
 	objectExponentRow.add( objectExponent );
 
 	container.add( objectExponentRow );
+
+	// decay
+
+	var objectDecayRow = new UI.Panel();
+	var objectDecay = new UI.Number().setRange( 0, Infinity ).onChange( update );
+
+	objectDecayRow.add( new UI.Text( 'Decay' ).setWidth( '90px' ) );
+	objectDecayRow.add( objectDecay );
+
+	container.add( objectDecayRow );
 
 	// visible
 
@@ -406,6 +416,12 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
+			if ( object.decay !== undefined ) {
+
+				object.decay = objectDecay.getValue();
+
+			}
+
 			object.visible = objectVisible.getValue();
 
 			try {
@@ -436,7 +452,8 @@ Sidebar.Object3D = function ( editor ) {
 			'groundColor': objectGroundColorRow,
 			'distance' : objectDistanceRow,
 			'angle' : objectAngleRow,
-			'exponent' : objectExponentRow
+			'exponent' : objectExponentRow,
+			'decay' : objectDecayRow
 		};
 
 		for ( var property in properties ) {
@@ -582,6 +599,12 @@ Sidebar.Object3D = function ( editor ) {
 		if ( object.exponent !== undefined ) {
 
 			objectExponent.setValue( object.exponent );
+
+		}
+
+		if ( object.decay !== undefined ) {
+
+			objectDecay.setValue( object.decay );
 
 		}
 
