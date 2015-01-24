@@ -32,6 +32,8 @@ THREE.BufferAttribute.prototype = {
 
 		}
 
+		return this;
+
 	},
 
 	set: function ( value, offset ) {
