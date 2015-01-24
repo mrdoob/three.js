@@ -8254,11 +8254,15 @@ THREE.BufferAttribute.prototype = {
 
 		}
 
+		return this;
+
 	},
 
-	set: function ( value ) {
+	set: function ( value, offset ) {
 
-		this.array.set( value );
+		if ( offset === undefined ) offset = 0;
+
+		this.array.set( value, offset );
 
 		return this;
 
@@ -8395,6 +8399,30 @@ THREE.Float64Attribute = function ( data, itemSize ) {
 
 	console.warn( 'THREE.Float64Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
 	return new THREE.BufferAttribute( data, itemSize );
+
+};
+
+// File:src/core/DynamicBufferAttribute.js
+
+/**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.DynamicBufferAttribute = function ( array, itemSize ) {
+
+	THREE.BufferAttribute.call( this, array, itemSize );
+
+	this.updateRange = { offset: 0, count: -1 };
+
+};
+
+THREE.DynamicBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
+THREE.DynamicBufferAttribute.prototype.constructor = THREE.DynamicBufferAttribute;
+
+THREE.DynamicBufferAttribute.prototype.clone = function () {
+
+	return new THREE.DynamicBufferAttribute( new this.array.constructor( this.array ), this.itemSize );
 
 };
 
@@ -21397,20 +21425,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var key = attributesKeys[ i ];
 				var attribute = attributes[ key ];
+				var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
 				if ( attribute.buffer === undefined ) {
 
 					attribute.buffer = _gl.createBuffer();
-					attribute.needsUpdate = true;
+					_gl.bindBuffer( bufferType, attribute.buffer );
+					_gl.bufferData( bufferType, attribute.array, ( attribute instanceof THREE.DynamicBufferAttribute ) ? _gl.DYNAMIC_DRAW : _gl.STATIC_DRAW );
 
-				}
+					attribute.needsUpdate = false;
 
-				if ( attribute.needsUpdate === true ) {
-
-					var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
+				} else if ( attribute.needsUpdate === true ) {
 
 					_gl.bindBuffer( bufferType, attribute.buffer );
-					_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
+
+					if ( attribute.updateRange === undefined || attribute.updateRange.count === -1 ) { // Not using update ranges
+
+						_gl.bufferSubData( bufferType, 0, attribute.array );
+
+					} else if ( attribute.updateRange.count === 0 ) {
+
+						console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+
+					} else {
+
+						_gl.bufferSubData( bufferType, attribute.updateRange.offset * attribute.array.BYTES_PER_ELEMENT,
+										   attribute.array.subarray( attribute.updateRange.offset, attribute.updateRange.offset + attribute.updateRange.count ) );
+
+						attribute.updateRange.count = 0; // reset range
+
+					}
 
 					attribute.needsUpdate = false;
 
