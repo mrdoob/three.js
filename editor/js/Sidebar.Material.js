@@ -369,7 +369,7 @@ Sidebar.Material = function ( editor ) {
 
 		var geometry = object.geometry;
 		var material = object.material;
-		
+
 		var textureWarning = false;
 		var objectHasUvs = false;
 
@@ -436,8 +436,20 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.vertexColors !== undefined ) {
 
-				material.vertexColors = parseInt( materialVertexColors.getValue() );
-				material.needsUpdate = true;
+				var vertexColors = parseInt( materialVertexColors.getValue() );
+
+				if ( material.vertexColors !== vertexColors ) {
+
+					if ( geometry instanceof THREE.Geometry ) {
+
+						geometry.groupsNeedUpdate = true;
+
+					}
+
+					material.vertexColors = vertexColors;
+					material.needsUpdate = true;
+
+				}
 
 			}
 
