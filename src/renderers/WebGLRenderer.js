@@ -2601,11 +2601,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
 
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
+				_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
 
 				_this.info.render.calls ++;
-				_this.info.render.vertices += position.array.length / 3;
-				_this.info.render.faces += position.array.length / 9;
+				_this.info.render.vertices += position.array.length / position.itemSize;
+				_this.info.render.faces += position.array.length / ( 3 * position.itemsize );
 
 			}
 
