@@ -194,6 +194,7 @@ THREE.Projector = function () {
 
 			_vertex = getNextVertexInPool();
 			_vertex.position.set( x, y, z );
+			_vertex.object = object;
 
 			projectVertex( _vertex );
 
@@ -245,6 +246,7 @@ THREE.Projector = function () {
 			_line.z = ( v1.positionScreen.z + v2.positionScreen.z ) / 2;
 
 			_line.material = object.material;
+			_line.object = object;
 
 			_renderData.elements.push( _line );
 
@@ -286,6 +288,7 @@ THREE.Projector = function () {
 				_face.vertexNormalsLength = 3;
 
 				_face.material = object.material;
+				_face.object = object;
 
 				_renderData.elements.push( _face );
 
