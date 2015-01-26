@@ -89,7 +89,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output, "geometry.json" );
+		exportString( output, 'geometry.json' );
 
 	} );
 	options.add( option );
@@ -114,7 +114,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output, "model.json" );
+		exportString( output, 'model.json' );
 
 	} );
 	options.add( option );
@@ -130,7 +130,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output, "scene.json" );
+		exportString( output, 'scene.json' );
 
 	} );
 	options.add( option );
@@ -153,7 +153,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.OBJExporter();
 
-		exportString( exporter.parse( object ), "model.obj" );
+		exportString( exporter.parse( object ), 'model.obj' );
 
 	} );
 	options.add( option );
@@ -167,7 +167,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.STLExporter();
 
-		exportString( exporter.parse( editor.scene ), "model.stl" );
+		exportString( exporter.parse( editor.scene ), 'model.stl' );
 
 	} );
 	options.add( option );
@@ -237,7 +237,7 @@ Menubar.File = function ( editor ) {
 
 		var manager = new THREE.LoadingManager( function () {
 
-			location.href = 'data:application/zip;base64,' + zip.generate();
+			exportBlob( zip.generate( {type:'blob'} ), 'scene.zip' );
 
 		} );
 
@@ -271,21 +271,35 @@ Menubar.File = function ( editor ) {
 	options.add( option );
 	*/
 
-
 	//
+	
+	var clickByNode = function ( node ) {
+		var event = document.createEvent( 'MouseEvents' );
+		event.initMouseEvent(
+			'click', true, false, window, 0, 0, 0, 0, 0
+			, false, false, false, false, 0, null
+		);
+		node.dispatchEvent(event);
+	};
+
+	var exportBlob = function ( output, filename ) {
+		if(window.navigator.msSaveOrOpenBlob) {
+			window.navigator.msSaveOrOpenBlob( output, filename );
+		} else {
+			var url = URL.createObjectURL( output );
+			var link = document.createElement( 'a' );
+			link.href = url;
+			link.download = filename;
+			link.target = '_blank';
+			clickByNode( link );
+			//URL.revokeObjectURL( url ); //need call after download complete, but how?
+		}
+	};
 
 	var exportString = function ( output, filename ) {
-
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		var link = document.createElement('a');
-		link.href = objectURL;
-		link.download = filename || "data.json";
-		link.target = "_blank";
-		link.click();
-
-	};
+		exportBlob( blob, filename || 'data.json' );
+	};	
 
 	return container;
 
