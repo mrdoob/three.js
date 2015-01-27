@@ -2591,11 +2591,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var mode = material.wireframe === true ? _gl.LINES : _gl.TRIANGLES;
 
-			// START_VEROLD_MOD - wireframe
-			var index = material.wireframe === true ?
-				geometry.attributes.wireframe : geometry.attributes.index;
-			// END_VEROLD_MOD - wireframe
-
+			var index = geometry.attributes.index;
+			
 			if ( index ) {
 
 				// indexed triangles
@@ -2644,17 +2641,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						var offset = offsets[ offsetIndices[ i ] ];
 
-						// START_VEROLD_MOD - wireframe
-						if ( material.wireframe ) {
-
-							offset = {
-								index: offset.index,
-								start: 2 * offset.start,
-								count: 2 * offset.count
-							};
-
-						}
-						// END_VEROLD_MOD - wireframe
 						// END_VEROLD_MOD - materialIndex in offsets
 
 						if ( updateBuffers ) {
@@ -2665,18 +2651,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						// render indexed triangles
-						// START_VEROLD_MOD - wireframe
 						_gl.drawElements( mode, offset.count, type, offset.start * size );
 
 						_this.info.render.calls ++;
 						_this.info.render.vertices += offset.count; // not really true, here vertices can be shared
 
-						if ( !material.wireframe ) {
-
-							_this.info.render.faces += offset.count / 3;
-
-						}
-						// END_VEROLD_MOD - wireframe
+						_this.info.render.faces += offset.count / 3;
 
 					}
 
