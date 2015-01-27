@@ -128,8 +128,8 @@
 
 				// MATERIALS
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444, map: texture } );
-				var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, ambient: 0x111111, specular: 0xffffff, metal: true, map: texture2 } );
+				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
+				var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xffffff, metal: true, map: texture2 } );
 
 				// GROUND
 
@@ -203,9 +203,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;

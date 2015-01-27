@@ -54,7 +54,7 @@
 				map.anisotropy = 16;
 
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map } ),
+					new THREE.MeshLambertMaterial( { map: map } ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
 				];
 
@@ -112,8 +112,8 @@
 				scene.add( object );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

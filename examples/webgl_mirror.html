@@ -50,7 +50,7 @@
 			var NEAR = 1;
 			var FAR = 500;
 
-			var camera, scane, renderer;
+			var camera, scene, renderer;
 
 			var cameraControls;
 
@@ -61,6 +61,7 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
 				// scene

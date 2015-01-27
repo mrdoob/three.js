@@ -56,8 +56,6 @@ THREE.Object3D = function () {
 		},
 	} );
 
-	this.renderDepth = null;
-
 	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
@@ -370,42 +368,33 @@ THREE.Object3D.prototype = {
 
 	},
 
-	getChildByName: function ( name, recursive ) {
+	getChildByName: function ( name ) {
 
 		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
-		return this.getObjectByName( name, recursive );
+		return this.getObjectByName( name );
 
 	},
 
-	getObjectById: function ( id, recursive ) {
+	getObjectById: function ( id ) {
 
-		if ( this.id === id ) return this;
+		return this.getObjectByProperty( 'id', id );
+
+	},
+
+	getObjectByName: function ( name ) {
+
+		return this.getObjectByProperty( 'name', name );
+
+	},
+
+	getObjectByProperty: function ( name, value ) {
+
+		if ( this[ name ] === value ) return this;
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			var child = this.children[ i ];
-			var object = child.getObjectById( id, recursive );
-
-			if ( object !== undefined ) {
-
-				return object;
-
-			}
-
-		}
-
-		return undefined;
-
-	},
-
-	getObjectByName: function ( name, recursive ) {
-
-		if ( this.name === name ) return this;
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			var child = this.children[ i ];
-			var object = child.getObjectByName( name, recursive );
+			var object = child.getObjectByProperty( name, value );
 
 			if ( object !== undefined ) {
 
@@ -522,6 +511,18 @@ THREE.Object3D.prototype = {
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			this.children[ i ].traverseVisible( callback );
+
+		}
+
+	},
+
+	traverseAncestors: function ( callback ) {
+
+		if ( this.parent ) {
+
+			callback( this.parent );
+
+			this.parent.traverseAncestors( callback );
 
 		}
 
@@ -676,6 +677,7 @@ THREE.Object3D.prototype = {
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
 				data.distance = object.distance;
+				data.decay = object.decay;
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
@@ -684,6 +686,7 @@ THREE.Object3D.prototype = {
 				data.distance = object.distance;
 				data.angle = object.angle;
 				data.exponent = object.exponent;
+				data.decay = object.decay;
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
@@ -742,8 +745,6 @@ THREE.Object3D.prototype = {
 		object.position.copy( this.position );
 		object.quaternion.copy( this.quaternion );
 		object.scale.copy( this.scale );
-
-		object.renderDepth = this.renderDepth;
 
 		object.rotationAutoUpdate = this.rotationAutoUpdate;
 

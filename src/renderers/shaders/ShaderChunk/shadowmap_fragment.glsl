@@ -209,11 +209,8 @@
 
 	}
 
-	#ifdef GAMMA_OUTPUT
-
-		shadowColor *= shadowColor;
-
-	#endif
+	// NOTE: I am unsure if this is correct in linear space.  -bhouston, Dec 29, 2014
+	shadowColor = inputToLinear( shadowColor );
 
 	gl_FragColor.xyz = gl_FragColor.xyz * shadowColor;
 

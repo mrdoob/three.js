@@ -32,11 +32,15 @@ THREE.BufferAttribute.prototype = {
 
 		}
 
+		return this;
+
 	},
 
-	set: function ( value ) {
+	set: function ( value, offset ) {
 
-		this.array.set( value );
+		if ( offset === undefined ) offset = 0;
+
+		this.array.set( value, offset );
 
 		return this;
 

@@ -22,7 +22,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -35,7 +35,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -48,7 +48,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.6
+	"opacity" : 0.6
 	},
 
 	{
@@ -61,7 +61,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -74,7 +74,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -87,7 +87,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -100,7 +100,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -113,7 +113,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -126,7 +126,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -139,7 +139,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -152,7 +152,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -165,7 +165,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -178,7 +178,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -191,7 +191,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -204,7 +204,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -217,7 +217,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -230,7 +230,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.4
+	"opacity" : 0.4
 	},
 
 	{
@@ -243,7 +243,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -256,7 +256,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.3
+	"opacity" : 0.3
 	},
 
 	{
@@ -269,7 +269,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.3
+	"opacity" : 0.3
 	},
 
 	{
@@ -282,7 +282,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -295,7 +295,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -308,7 +308,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -321,7 +321,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -334,7 +334,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	}],
 
     "buffers": "F50NoUv_bin.bin"

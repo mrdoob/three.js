@@ -19,7 +19,7 @@ THREE.UTF8Loader = function () {};
 
 THREE.UTF8Loader.prototype.load = function ( jsonUrl, callback, options ) {
 
-    this.downloadModelJson( jsonUrl, options, callback );
+	this.downloadModelJson( jsonUrl, callback, options );
 
 };
 
@@ -690,7 +690,7 @@ THREE.UTF8Loader.prototype.downloadModel = function ( geometryBase, materialBase
 
 };
 
-THREE.UTF8Loader.prototype.downloadModelJson = function ( jsonUrl, options, callback ) {
+THREE.UTF8Loader.prototype.downloadModelJson = function ( jsonUrl, callback, options ) {
 
     getJsonRequest( jsonUrl, function( loaded ) {
 

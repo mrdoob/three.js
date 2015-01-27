@@ -369,6 +369,14 @@ THREE.Vector2.prototype = {
 
 	},
 
+	lerpVectors: function ( v1, v2, alpha ) {
+
+	    this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+
+	    return this;
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
@@ -395,6 +403,19 @@ THREE.Vector2.prototype = {
 		array[ offset + 1 ] = this.y;
 
 		return array;
+
+	},
+
+	fromAttribute: function ( attribute, index, offset ) {
+
+	    if ( offset === undefined ) offset = 0;
+
+	    index = index * attribute.itemSize + offset;
+
+	    this.x = attribute.array[ index ];
+	    this.y = attribute.array[ index + 1 ];
+
+	    return this;
 
 	},
 

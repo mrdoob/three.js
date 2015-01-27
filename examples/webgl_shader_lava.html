@@ -181,6 +181,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 				renderer.autoClear = false;
 

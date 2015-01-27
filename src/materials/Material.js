@@ -22,6 +22,9 @@ THREE.Material = function () {
 	this.blendSrc = THREE.SrcAlphaFactor;
 	this.blendDst = THREE.OneMinusSrcAlphaFactor;
 	this.blendEquation = THREE.AddEquation;
+	this.blendSrcAlpha = null;
+	this.blendDstAlpha = null;
+	this.blendEquationAlpha = null;
 
 	this.depthTest = true;
 	this.depthWrite = true;
@@ -112,7 +115,6 @@ THREE.Material.prototype = {
 		} else if ( this instanceof THREE.MeshLambertMaterial ) {
 
 			output.color = this.color.getHex();
-			output.ambient = this.ambient.getHex();
 			output.emissive = this.emissive.getHex();
 			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
 			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
@@ -121,7 +123,6 @@ THREE.Material.prototype = {
 		} else if ( this instanceof THREE.MeshPhongMaterial ) {
 
 			output.color = this.color.getHex();
-			output.ambient = this.ambient.getHex();
 			output.emissive = this.emissive.getHex();
 			output.specular = this.specular.getHex();
 			output.shininess = this.shininess;
@@ -176,6 +177,9 @@ THREE.Material.prototype = {
 		material.blendSrc = this.blendSrc;
 		material.blendDst = this.blendDst;
 		material.blendEquation = this.blendEquation;
+		material.blendSrcAlpha = this.blendSrcAlpha;
+		material.blendDstAlpha = this.blendDstAlpha;
+		material.blendEquationAlpha = this.blendEquationAlpha;
 
 		material.depthTest = this.depthTest;
 		material.depthWrite = this.depthWrite;

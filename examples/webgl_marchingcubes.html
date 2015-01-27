@@ -158,7 +158,8 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0x050505, 1 );
+			renderer.setClearColor( 0x050505 );
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			renderer.domElement.style.position = "absolute";
@@ -263,7 +264,7 @@
 			var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 			reflectionCube.format = THREE.RGBFormat;
 
-			var refractionCube = new THREE.Texture( reflectionCube.image, new THREE.CubeRefractionMapping() );
+			var refractionCube = new THREE.Texture( reflectionCube.image, THREE.CubeRefractionMapping );
 			reflectionCube.format = THREE.RGBFormat;
 
 			// toons
@@ -333,7 +334,7 @@
 
 			"plastic" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250 } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, shininess: 250 } ),
 				h: 0.6, s: 0.8, l: 0.1
 			},
 

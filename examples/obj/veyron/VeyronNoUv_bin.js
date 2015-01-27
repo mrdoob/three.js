@@ -22,7 +22,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -35,7 +35,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 37.254902,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -48,7 +48,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 56.862745,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -61,7 +61,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 66.666667,
-	"transparency" : 0.5
+	"opacity" : 0.5
 	},
 
 	{
@@ -74,7 +74,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 56.862745,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -87,7 +87,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -100,7 +100,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 66.666667,
-	"transparency" : 0.5
+	"opacity" : 0.5
 	},
 
 	{
@@ -113,7 +113,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 66.666667,
-	"transparency" : 0.5
+	"opacity" : 0.5
 	}],
 
     "buffers": "VeyronNoUv_bin.bin"

@@ -60,8 +60,7 @@
 
 				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
 
-				var line = new THREE.Line( geometry, material );
-				line.type = THREE.LinePieces;
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
 				scene.add( line );
 
 				// Spheres
@@ -77,8 +76,7 @@
 					new THREE.MeshDepthMaterial( { overdraw: 0.5 } ),
 					new THREE.MeshNormalMaterial( { overdraw: 0.5 } ),
 					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ), overdraw: 0.5 } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalRefractionMapping() ), overdraw: 0.5 } )
+					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', THREE.SphericalReflectionMapping ), overdraw: 0.5 } )
 
 				];
 
@@ -138,6 +136,7 @@
 				pointLight.add( sprite );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

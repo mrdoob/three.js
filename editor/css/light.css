@@ -1,6 +1,5 @@
 ﻿.FancySelect {
 	background: #fff;
-	border: 1px solid #ccc;
 	padding: 0;
 	cursor: default;
 	overflow: auto;
@@ -18,7 +17,7 @@
 	}
 
 input.Number {
-	color: #0080f0;
+	color: #0080f0!important;
 	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
 	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
 	border: 1px solid transparent;
@@ -38,6 +37,15 @@ input.Number {
 		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
 	}
 
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+	opacity: 0.9;
+}
+
 #player {
 	position: absolute;
 	top: 32px;
@@ -53,6 +61,8 @@ input.Number {
 	background: #eee;
 	padding: 0px;
 	margin: 0px;
+	right: 0px;
+	top: 0px;
 }
 
 	#menubar .menu {
@@ -79,7 +89,7 @@ input.Number {
 			display: none;
 			padding: 5px 0px;
 			background: #eee;
-			width: 140px;
+			width: 150px;
 		}
 
 		#menubar .menu:hover .options {
@@ -117,10 +127,15 @@ input.Number {
 	overflow: auto;
 }
 
+	#sidebar * {
+		vertical-align: middle;
+	}
+
 	#sidebar input,
 	#sidebar textarea,
 	#sidebar select {
-		/* background: #ccc; */
+		border: 1px solid transparent;
+		color: #444;
 	}
 
 	#sidebar .Panel {
@@ -153,6 +168,10 @@ input.Number {
 	background: #eee;
 	color: #333;
 }
+
+	#toolbar * {
+		vertical-align: middle;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;

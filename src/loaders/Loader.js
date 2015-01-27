@@ -300,12 +300,6 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.colorAmbient ) {
-
-			mpars.ambient = rgb2hex( m.colorAmbient );
-
-		}
-
 		if ( m.colorEmissive ) {
 
 			mpars.emissive = rgb2hex( m.colorEmissive );
@@ -316,7 +310,14 @@ THREE.Loader.prototype = {
 
 		if ( m.transparency ) {
 
+			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
 			mpars.opacity = m.transparency;
+
+		}
+
+		if ( m.opacity ) {
+
+			mpars.opacity = m.opacity;
 
 		}
 
@@ -372,70 +373,13 @@ THREE.Loader.prototype = {
 
 		}
 
-		// special case for normal mapped material
+		if ( m.mapNormalFactor ) {
 
-		if ( m.mapNormal ) {
-
-			var shader = THREE.ShaderLib[ 'normalmap' ];
-			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-			uniforms[ 'tNormal' ].value = mpars.normalMap;
-
-			if ( m.mapNormalFactor ) {
-
-				uniforms[ 'uNormalScale' ].value.set( m.mapNormalFactor, m.mapNormalFactor );
-
-			}
-
-			if ( mpars.map ) {
-
-				uniforms[ 'tDiffuse' ].value = mpars.map;
-				uniforms[ 'enableDiffuse' ].value = true;
-
-			}
-
-			if ( mpars.specularMap ) {
-
-				uniforms[ 'tSpecular' ].value = mpars.specularMap;
-				uniforms[ 'enableSpecular' ].value = true;
-
-			}
-
-			if ( mpars.lightMap ) {
-
-				uniforms[ 'tAO' ].value = mpars.lightMap;
-				uniforms[ 'enableAO' ].value = true;
-
-			}
-
-			// for the moment don't handle displacement texture
-
-			uniforms[ 'diffuse' ].value.setHex( mpars.color );
-			uniforms[ 'specular' ].value.setHex( mpars.specular );
-			uniforms[ 'ambient' ].value.setHex( mpars.ambient );
-
-			uniforms[ 'shininess' ].value = mpars.shininess;
-
-			if ( mpars.opacity !== undefined ) {
-
-				uniforms[ 'opacity' ].value = mpars.opacity;
-
-			}
-
-			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
-			var material = new THREE.ShaderMaterial( parameters );
-
-			if ( mpars.transparent ) {
-
-				material.transparent = true;
-
-			}
-
-		} else {
-
-			var material = new THREE[ mtype ]( mpars );
+			mpars.normalScale = new THREE.Vector2( m.mapNormalFactor, m.mapNormalFactor );
 
 		}
+
+		var material = new THREE[ mtype ]( mpars );
 
 		if ( m.DbgName !== undefined ) material.name = m.DbgName;
 

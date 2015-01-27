@@ -43,8 +43,7 @@
 			var renderer, scene, camera, stats;
 			var pointclouds;
 			var raycaster, intersects;
-			var mouse = { x: 1, y: 1 };
-			var vector = new THREE.Vector3();
+			var mouse = new THREE.Vector2();
 			var intersection = null;
 			var spheres = [];
 			var spheresIndex = 0;
@@ -268,8 +267,8 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				//
@@ -323,11 +322,9 @@
 			function render() {
 
 				camera.applyMatrix( rotateY );
-				camera.updateMatrixWorld( true );
+				camera.updateMatrixWorld();
 
-				vector.set( mouse.x, mouse.y, 0.1 ).unproject( camera );
-
-				raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersections = raycaster.intersectObjects( pointclouds );
 				intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;

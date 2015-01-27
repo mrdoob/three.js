@@ -52,6 +52,7 @@
 		var searchInterval = 0;
 		var useOctree = true;
 		
+		var raycaster = new THREE.Raycaster();
 		var mouse = new THREE.Vector2();
 		var intersected;
 
@@ -69,8 +70,8 @@
 			scene.add( camera );
 
 			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
 			document.body.appendChild( renderer.domElement );
 			
 			// create octree
@@ -122,7 +123,7 @@
 				geometry.computeVertexNormals();
 				totalFaces += geometry.faces.length;
 				
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x030303, shininess: 30 } );
+				var material = new THREE.MeshPhongMaterial( { color: 0x030303, specular: 0x030303, shininess: 30 } );
 				
 				modifyOctree( geometry, material, true );
 				
@@ -321,9 +322,8 @@
 			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 			
-			var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
+			raycaster.setFromCamera( mouse, camera );
 
-			var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 			var octreeObjects;
 			var numObjects;
 			var numFaces = 0;

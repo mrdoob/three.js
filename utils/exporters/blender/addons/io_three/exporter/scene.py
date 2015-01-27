@@ -1,12 +1,11 @@
 import os
-from .. import constants
+from .. import constants, logger
 from . import (
     base_classes,
     texture,
     material,
     geometry, 
     object,
-    logger,
     io,
     api
 )

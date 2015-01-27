@@ -27,6 +27,7 @@
 			var camera, controls, scene, renderer;
 			var objects = [], plane;
 
+			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2(),
 			offset = new THREE.Vector3(),
 			INTERSECTED, SELECTED;
@@ -77,8 +78,6 @@
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-					object.material.ambient = object.material.color;
-
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
 					object.position.z = Math.random() * 800 - 400;
@@ -109,6 +108,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 
@@ -158,9 +158,7 @@
 
 				//
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
-
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				if ( SELECTED ) {
 

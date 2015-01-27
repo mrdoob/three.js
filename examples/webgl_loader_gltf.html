@@ -184,7 +184,8 @@
                 // RENDERER
 
                 renderer = new THREE.WebGLRenderer({antialias:true});
-                renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
 
                 if (sceneInfo.shadows) {
 	                renderer.shadowMapEnabled = true;
@@ -198,7 +199,6 @@
 				if (sceneInfo.addGround) {
 	                var groundMaterial = new THREE.MeshPhongMaterial({
 	                        color: 0xFFFFFF,
-	                        ambient: 0x888888,
 	                        shading: THREE.SmoothShading,
 	                    });
 	                ground = new THREE.Mesh( new THREE.PlaneBufferGeometry(1024, 1024), groundMaterial);
@@ -319,7 +319,7 @@
 					cameras[i].updateProjectionMatrix();
 				}
 				
-				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

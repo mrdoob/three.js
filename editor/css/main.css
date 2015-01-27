@@ -1,7 +1,3 @@
-﻿* {
-	vertical-align: middle;
-}
-
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -19,6 +15,7 @@ button {
 }
 
 textarea {
+	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
 }
@@ -70,6 +67,15 @@ textarea, input { outline: none; } /* osx */
 		display: none;
 	}
 
+.CodeMirror {
+
+	position: absolute !important;
+	top: 37px;
+	width: 100% !important;
+	height: calc(100% - 37px) !important;
+
+}
+
 /* scene types */
 
 .type {
@@ -110,7 +116,7 @@ textarea, input { outline: none; } /* osx */
 	color: #bbeebb;
 }
 .TorusGeometry {
-	color: #aaeeaa;	
+	color: #aaeeaa;
 }
 
 /* */

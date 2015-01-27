@@ -85,8 +85,7 @@
 
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
 
-				var line = new THREE.Line( geometry, material );
-				line.type = THREE.LinePieces;
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
 				scene.add( line );
 
 				// Spheres
@@ -95,7 +94,7 @@
 
 				geometry = new THREE.IcosahedronGeometry( 100, 1 );
 
-				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: 0.5 } );
+				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', THREE.SphericalReflectionMapping ), overdraw: 0.5 } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
@@ -134,6 +133,7 @@
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

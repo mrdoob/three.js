@@ -2,88 +2,198 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var APP = {};
+var APP = {
 
-APP.Player = function () {
+	Player: function () {
 
-	var loader = new THREE.ObjectLoader();
-	var camera, scene, renderer;
-	var scripts;
-	
-	this.dom = undefined;
+		var loader = new THREE.ObjectLoader();
+		var camera, scene, renderer;
 
-	this.load = function ( json ) {
+		var events = {};
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		this.dom = undefined;
 
-		scene = loader.parse( json );
+		this.width = 500;
+		this.height = 500;
 
-		/*
-		scripts = [];
+		this.load = function ( json ) {
 
-		scene.traverse( function ( child ) {
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0x000000 );
+			renderer.setPixelRatio( window.devicePixelRatio );
 
-			if ( child.script !== undefined ) {
+			camera = loader.parse( json.camera );
+			scene = loader.parse( json.scene );
 
-				var script = new Function( 'scene', 'time', child.script.source ).bind( child );
-				scripts.push( script );
+			events = {
+				keydown: [],
+				keyup: [],
+				mousedown: [],
+				mouseup: [],
+				mousemove: [],
+				touchstart: [],
+				touchend: [],
+				touchmove: [],
+				update: []
+			};
+
+			for ( var uuid in json.scripts ) {
+
+				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+
+				var scripts = json.scripts[ uuid ];
+
+				for ( var i = 0; i < scripts.length; i ++ ) {
+
+					var script = scripts[ i ];
+
+					var functions = ( new Function( 'player, scene, keydown, keyup, mousedown, mouseup, mousemove, touchstart, touchend, touchmove, update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, touchstart: touchstart, touchend: touchend, touchmove: touchmove, update: update };' ).bind( object ) )( this, scene );
+
+					for ( var name in functions ) {
+
+						if ( functions[ name ] === undefined ) continue;
+
+						if ( events[ name ] === undefined ) {
+
+							console.warn( 'APP.Player: event type not supported (', name, ')' );
+							continue;
+
+						}
+
+						events[ name ].push( functions[ name ].bind( object ) );
+
+					}
+
+				}
 
 			}
 
-		} );
-		*/
+			this.dom = renderer.domElement;
 
-		this.dom = renderer.domElement;
+		};
 
-	};
+		this.setCamera = function ( value ) {
 
-	this.setCamera = function ( master ) {
+			camera = value;
+			camera.aspect = this.width / this.height;
+			camera.updateProjectionMatrix();
 
-		camera = master.clone();
+		};
 
-	};
+		this.setSize = function ( width, height ) {
 
-	this.setSize = function ( width, height ) {
+			this.width = width;
+			this.height = height;
 
-		renderer.setSize( width, height );
+			camera.aspect = this.width / this.height;
+			camera.updateProjectionMatrix();
 
-	};
+			renderer.setSize( width, height );
 
-	var request;
+		};
 
-	var animate = function ( time ) {
+		var dispatch = function ( array, event ) {
 
-		request = requestAnimationFrame( animate );
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-		/*
-		for ( var i = 0; i < scripts.length; i ++ ) {
+				array[ i ]( event );
 
-			scripts[ i ]( scene, time );
+			}
 
-		}
-		*/
+		};
 
-		renderer.render( scene, camera );
+		var request;
 
-	};
+		var animate = function ( time ) {
 
-	this.play = function () {
+			request = requestAnimationFrame( animate );
 
-		request = requestAnimationFrame( animate );
+			dispatch( events.update, { time: time } );
 
-	};
+			renderer.render( scene, camera );
 
-	this.stop = function () {
+		};
 
-		cancelAnimationFrame( request );
+		this.play = function () {
 
-	};
+			document.addEventListener( 'keydown', onDocumentKeyDown );
+			document.addEventListener( 'keyup', onDocumentKeyUp );
+			document.addEventListener( 'mousedown', onDocumentMouseDown );
+			document.addEventListener( 'mouseup', onDocumentMouseUp );
+			document.addEventListener( 'mousemove', onDocumentMouseMove );
+			document.addEventListener( 'touchstart', onDocumentTouchStart );
+			document.addEventListener( 'touchend', onDocumentTouchEnd );
+			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
-};
+			request = requestAnimationFrame( animate );
 
-APP.Script = function ( source ) {
+		};
 
-	this.uuid = THREE.Math.generateUUID();
-	this.source = source;
+		this.stop = function () {
+
+			document.removeEventListener( 'keydown', onDocumentKeyDown );
+			document.removeEventListener( 'keyup', onDocumentKeyUp );
+			document.removeEventListener( 'mousedown', onDocumentMouseDown );
+			document.removeEventListener( 'mouseup', onDocumentMouseUp );
+			document.removeEventListener( 'mousemove', onDocumentMouseMove );
+			document.removeEventListener( 'touchstart', onDocumentTouchStart );
+			document.removeEventListener( 'touchend', onDocumentTouchEnd );
+			document.removeEventListener( 'touchmove', onDocumentTouchMove );
+
+			cancelAnimationFrame( request );
+
+		};
+
+		//
+
+		var onDocumentKeyDown = function ( event ) {
+
+			dispatch( events.keydown, event );
+
+		};
+
+		var onDocumentKeyUp = function ( event ) {
+
+			dispatch( events.keyup, event );
+
+		};
+
+		var onDocumentMouseDown = function ( event ) {
+
+			dispatch( events.mousedown, event );
+
+		};
+
+		var onDocumentMouseUp = function ( event ) {
+
+			dispatch( events.mouseup, event );
+
+		};
+
+		var onDocumentMouseMove = function ( event ) {
+
+			dispatch( events.mousemove, event );
+
+		};
+
+		var onDocumentTouchStart = function ( event ) {
+
+			dispatch( events.touchstart, event );
+
+		};
+
+		var onDocumentTouchEnd = function ( event ) {
+
+			dispatch( events.touchend, event );
+
+		};
+
+		var onDocumentTouchMove = function ( event ) {
+
+			dispatch( events.touchmove, event );
+
+		};
+
+	}
 
 };

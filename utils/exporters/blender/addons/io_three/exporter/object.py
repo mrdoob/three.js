@@ -1,5 +1,5 @@
-from .. import constants
-from . import base_classes, logger, api
+from .. import constants, logger
+from . import base_classes, api
 
 
 class Object(base_classes.BaseNode):

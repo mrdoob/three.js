@@ -134,10 +134,10 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				container.appendChild( renderer.domElement );
 
@@ -232,7 +232,6 @@
 					m.specular.setHSL( 0, 0, 0.1 );
 
 					m.color.setHSL( 0.6, 0, 0.6 );
-					m.ambient.copy( m.color );
 
 					//m.map = map;
 					//m.envMap = envMap;

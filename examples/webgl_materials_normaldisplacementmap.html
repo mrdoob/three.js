@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - normal map</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			a {	color: #ffffff;	}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			#oldie {
+				background:rgb(200,100,0) !important;
+				color:#fff;
+			}
+
+			#vt { display:none }
+			#vt, #vt a { color:orange; }
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement + environment + shadow</span>) map demo.
+			ninja head from <a href="http://developer.amd.com/archive/gpu/MeshMapper/pages/default.aspx" target="_blank">AMD GPU MeshMapper</a>
+
+			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)</div>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/shaders/NormalDisplacementShader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var statsEnabled = true;
+
+			var container, stats, loader;
+
+			var camera, scene, renderer;
+
+			var mesh, zmesh, geometry;
+			var mesh1, mesh2;
+
+			var spotLight, pointLight, ambientLight;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var r = 0.0;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				camera.position.z = 1500;
+
+				scene = new THREE.Scene();
+
+				// LIGHTS
+
+				ambientLight = new THREE.AmbientLight( 0x111111 );
+				scene.add( ambientLight );
+
+				pointLight = new THREE.PointLight( 0xff0000 );
+				pointLight.position.z = 10000;
+				pointLight.distance = 4000;
+				scene.add( pointLight );
+
+				pointLight2 = new THREE.PointLight( 0xff5500 );
+				pointLight2.position.z = 1000;
+				pointLight2.distance = 2000;
+				scene.add( pointLight2 );
+
+				pointLight3 = new THREE.PointLight( 0x0000ff );
+				pointLight3.position.x = -1000;
+				pointLight3.position.z = 1000;
+				pointLight3.distance = 2000;
+				scene.add( pointLight3 );
+
+				spotLight = new THREE.SpotLight( 0xaaaaaa );
+				spotLight.position.set( 1000, 500, 1000 );
+				spotLight.castShadow = true;
+				spotLight.shadowCameraNear = 500;
+				spotLight.shadowCameraFov = 70;
+				spotLight.shadowBias = 0.001;
+				spotLight.shadowMapWidth = 1024;
+				spotLight.shadowMapHeight = 1024;
+				scene.add( spotLight );
+
+				directionalLight2 = new THREE.DirectionalLight( 0xaaff33, 0 );
+				directionalLight2.position.set( -1, 1, 0.5 ).normalize();
+				//scene.add( directionalLight2 );
+
+				directionalLight3 = new THREE.DirectionalLight( 0xaaff33 );
+				directionalLight3.position.set( -1, 1, 0.5 ).normalize();
+				//scene.add( directionalLight3 );
+
+
+				// light representation
+
+				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
+
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
+
+				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+
+				// common material parameters
+
+				var diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
+
+				// normal map shader
+
+				var shader = THREE.NormalDisplacementShader;
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+				uniforms[ "enableAO" ].value = true;
+				uniforms[ "enableDiffuse" ].value = false;
+				uniforms[ "enableSpecular" ].value = false;
+				uniforms[ "enableReflection" ].value = true;
+				uniforms[ "enableDisplacement" ].value = true;
+
+				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
+				uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
+
+				uniforms[ "tDisplacement" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
+				uniforms[ "uDisplacementBias" ].value = - 0.428408;
+				uniforms[ "uDisplacementScale" ].value = 2.436143;
+
+				uniforms[ "uNormalScale" ].value.y = -1;
+
+				uniforms[ "diffuse" ].value.setHex( diffuse );
+				uniforms[ "specular" ].value.setHex( specular );
+
+				uniforms[ "shininess" ].value = shininess;
+
+				uniforms[ "tCube" ].value = reflectionCube;
+				uniforms[ "reflectivity" ].value = 0.1;
+
+				uniforms[ "diffuse" ].value.convertGammaToLinear();
+				uniforms[ "specular" ].value.convertGammaToLinear();
+
+
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
+				var material1 = new THREE.ShaderMaterial( parameters );
+
+				var material2 = new THREE.MeshPhongMaterial( {
+					color: diffuse,
+					specular: specular,
+					shininess: shininess,
+					normalMap: uniforms[ "tNormal" ].value,
+					normalScale: uniforms[ "uNormalScale" ].value,
+					envMap: reflectionCube,
+					combine: THREE.MixOperation,
+					reflectivity: 0.1
+				} );
+
+				//
+
+				loader = new THREE.BinaryLoader( true );
+				document.body.appendChild( loader.statusDomElement );
+
+				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) } );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				//
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapType = THREE.PCFShadowMap;
+
+
+				//
+
+				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement + environment + shadow" : " + <strike>displacement</strike>" );
+				document.getElementById( "description" ).innerHTML = description;
+				document.getElementById( "vt" ).style.display = renderer.supportsVertexTextures() ? "none" : "block";
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+
+				}
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.left = window.innerWidth / - 2;
+				camera.right = window.innerWidth / 2;
+				camera.top = window.innerHeight / 2;
+				camera.bottom = window.innerHeight / - 2;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function createScene( geometry, scale, material1, material2 ) {
+
+				geometry.computeTangents();
+
+				mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - scale * 12;
+				mesh1.scale.set( scale, scale, scale );
+				mesh1.castShadow = true;
+				mesh1.receiveShadow = true;
+				scene.add( mesh1 );
+
+				mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = scale * 12;
+				mesh2.scale.set( scale, scale, scale );
+				mesh2.castShadow = true;
+				mesh2.receiveShadow = true;
+				scene.add( mesh2 );
+
+				loader.statusDomElement.style.display = "none";
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
+
+				var ry = mouseX * 0.0003, rx = mouseY * 0.0003;
+
+				if( mesh1 ) {
+
+					mesh1.rotation.y = ry;
+					mesh1.rotation.x = rx;
+
+				}
+
+				if( mesh2 ) {
+
+					mesh2.rotation.y = ry;
+					mesh2.rotation.x = rx;
+
+				}
+
+				pointLight.position.x = 2500 * Math.cos( r );
+				pointLight.position.z = 2500 * Math.sin( r );
+
+				r += 0.01;
+
+				renderer.render( scene, camera );
+
+			}
+
+
+		</script>
+
+	</body>
+</html>

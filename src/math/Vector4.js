@@ -615,6 +615,14 @@ THREE.Vector4.prototype = {
 
 	},
 
+	lerpVectors: function ( v1, v2, alpha ) {
+
+	    this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+
+	    return this;
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
@@ -645,6 +653,21 @@ THREE.Vector4.prototype = {
 		array[ offset + 3 ] = this.w;
 
 		return array;
+
+	},
+
+	fromAttribute: function ( attribute, index, offset ) {
+
+	    if ( offset === undefined ) offset = 0;
+
+	    index = index * attribute.itemSize + offset;
+
+	    this.x = attribute.array[ index ];
+	    this.y = attribute.array[ index + 1 ];
+	    this.z = attribute.array[ index + 2 ];
+	    this.w = attribute.array[ index + 3 ];
+
+	    return this;
 
 	},
 

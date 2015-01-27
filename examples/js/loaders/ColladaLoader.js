@@ -25,7 +25,7 @@ THREE.ColladaLoader = function () {
 	var animData;
 	var kinematics;
 	var visualScenes;
-	var kinematicsModel;
+	var kinematicsModels;
 	var baseUrl;
 	var morphs;
 	var skins;
@@ -150,7 +150,7 @@ THREE.ColladaLoader = function () {
 		skins = [];
 
 		visualScene = parseScene();
-		scene = new THREE.Scene();
+		scene = new THREE.Group();
 
 		for ( var i = 0; i < visualScene.nodes.length; i ++ ) {
 
@@ -2060,7 +2060,7 @@ THREE.ColladaLoader = function () {
 		this.id = "";
 		this.name = "";
 		this.nodes = [];
-		this.scene = new THREE.Scene();
+		this.scene = new THREE.Group();
 
 	};
 
@@ -2804,6 +2804,14 @@ THREE.ColladaLoader = function () {
 		}
 
 		this.geometry3js = new THREE.Geometry();
+
+		if ( this.vertices === null ) {
+
+			// TODO (mrdoob): Study case when this is null (carrier.dae)
+
+			return this;
+
+		}
 
 		var vertexData = sources[ this.vertices.input['POSITION'].source ].data;
 
@@ -3576,7 +3584,6 @@ THREE.ColladaLoader = function () {
 
 			switch ( child.nodeName ) {
 
-				case 'ambient':
 				case 'emission':
 				case 'diffuse':
 				case 'specular':

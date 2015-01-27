@@ -1,6 +1,5 @@
 ﻿.FancySelect {
 	background: #222;
-	border: 1px solid #3C3C3C;
 	padding: 0;
 	cursor: default;
 	overflow: auto;
@@ -16,8 +15,16 @@
 		background-color: #153C5E;
 	}
 
+.Panel.Collapsible.collapsed .Static .Button {
+	border-left-color: #444;
+}
+
+.Panel.Collapsible:not(.collapsed) .Static .Button {
+	border-top-color: #444;
+}
+
 input.Number {
-	color: #2A75B7;
+	color: #2A75B7!important;
 	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
 	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
 	border: 1px solid transparent;
@@ -37,6 +44,15 @@ input.Number {
 		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
 	}
 
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+	opacity: 0.9;
+}
+
 #player {
 	position: absolute;
 	top: 32px;
@@ -52,6 +68,8 @@ input.Number {
 	background: #111;
 	padding: 0px;
 	margin: 0px;
+	right: 0px;
+	top: 0px;
 }
 
 	#menubar .menu {
@@ -78,7 +96,7 @@ input.Number {
 			display: none;
 			padding: 5px 0px;
 			background: #111;
-			width: 140px;
+			width: 150px;
 		}
 
 		#menubar .menu:hover .options {
@@ -86,11 +104,11 @@ input.Number {
 		}
 
 			#menubar .menu .options hr {
-				border-color: #444;
+				border-color: #333;
 			}
 
 			#menubar .menu .options .option {
-				color: #666;
+				color: #888;
 				background-color: transparent;
 				padding: 5px 10px;
 				margin: 0px !important;
@@ -102,7 +120,6 @@ input.Number {
 				}
 
 				#menubar .menu .options .option:active {
-					color: #666;
 					background: transparent;
 				}
 
@@ -116,10 +133,16 @@ input.Number {
 	overflow: auto;
 }
 
+	#sidebar * {
+		vertical-align: middle;
+	}
+
 	#sidebar input,
 	#sidebar textarea,
 	#sidebar select {
-		background: #ccc;
+		background: #222;
+		border: 1px solid transparent;
+		color: #888;
 	}
 
 	#sidebar .Panel {
@@ -158,6 +181,10 @@ input.Number {
 	background-color: #111;
 	color: #333;
 }
+
+	#toolbar * {
+		vertical-align: middle;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;

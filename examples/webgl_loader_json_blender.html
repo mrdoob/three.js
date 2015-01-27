@@ -107,7 +107,6 @@
 					var material = materials[ 0 ];
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
-					material.ambient.setHex( 0x222222 );
 
 					var faceMaterial = new THREE.MeshFaceMaterial( materials );
 
@@ -165,8 +164,8 @@
 				// Renderer
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				// Stats
