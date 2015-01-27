@@ -24,57 +24,61 @@ def _mesh(func):
 def animation(mesh, options):
     logger.debug('mesh.animation(%s, %s)', mesh, options)
     armature = _armature(mesh)
-    if armature and armature.animation_data:
-        return _skeletal_animations(armature, options)
+    animations = []
+    if armature:
+        for action in data.actions:
+            logger.info('Processing action %s', action.name)
+            animations.append(
+                _skeletal_animations(action, armature, options))
+    else:
+        logger.warning('No armature found')
+        
+    return animations
 
 
 @_mesh
 def bones(mesh):
     logger.debug('mesh.bones(%s)', mesh)
     armature = _armature(mesh)
-    if not armature: return
-
     bones = []
     bone_map = {}
+
+    if not armature: 
+        return bones, bone_map
+
     bone_count = 0
-    bone_index_rel = 0
 
-    for bone in armature.data.bones:
-        logger.info('Parsing bone %s', bone.name)
+    armature_matrix = armature.matrix_world
+    for bone_count, pose_bone in enumerate(armature.pose.bones):
+        armature_bone = pose_bone.bone
+        bone_index = None
 
-        if bone.parent is None or bone.parent.use_deform is False:
-            bone_pos = bone.head_local
+        if armature_bone.parent is None:
+            bone_matrix = armature_matrix * armature_bone.matrix_local
             bone_index = -1
         else:
-            bone_pos = bone.head_local - bone.parent.head_local
-            bone_index = 0
-            index = 0
-            for parent in armature.data.bones:
-                if parent.name == bone.parent.name:
-                    bone_index = bone_map.get(index)
+            parent_bone = armature_bone.parent
+            parent_matrix = armature_matrix * parent_bone.matrix_local
+            bone_matrix = armature_matrix * armature_bone.matrix_local
+            bone_matrix = parent_matrix.inverted() * bone_matrix
+            bone_index = index = 0
+
+            for pose_parent in armature.pose.bones:
+                armature_parent = pose_parent.bone.name
+                if armature_parent == parent_bone.name:
+                    bone_index = index
                 index += 1
 
-        bone_world_pos = armature.matrix_world * bone_pos
-        x_axis = bone_world_pos.x
-        y_axis = bone_world_pos.z
-        z_axis = -bone_world_pos.y
+        bone_map[bone_count] = bone_count
 
-        if bone.use_deform:
-            logger.debug('Adding bone %s at: %s, %s', 
-                bone.name, bone_index, bone_index_rel)
-            bone_map[bone_count] = bone_index_rel
-            bone_index_rel += 1
-            bones.append({
-                constants.PARENT: bone_index,
-                constants.NAME: bone.name,
-                constants.POS: (x_axis, y_axis, z_axis),
-                constants.ROTQ: (0,0,0,1)
-            })
-        else:
-            logger.debug('Ignoring bone %s at: %s, %s', 
-                bone.name, bone_index, bone_index_rel)
-
-        bone_count += 1
+        pos, rot, scl = bone_matrix.decompose()
+        bones.append({
+            constants.PARENT: bone_index,
+            constants.NAME: armature_bone.name,
+            constants.POS: (pos.x, pos.z, -pos.y),
+            constants.ROTQ: (rot.x, rot.z, -rot.y, rot.w),
+            'scl': (scl.x, scl.z, scl.y)
+        })
 
     return (bones, bone_map)
 
@@ -99,8 +103,6 @@ def buffer_normal(mesh, options):
             normals_.extend(vector)
 
     return normals_
-
-
 
 
 @_mesh
@@ -367,12 +369,12 @@ def materials(mesh, options):
 @_mesh
 def normals(mesh, options):
     logger.debug('mesh.normals(%s, %s)', mesh, options)
-    flattened = []
+    normal_vectors = []
 
     for vector in _normals(mesh, options):
-        flattened.extend(vector)
+        normal_vectors.extend(vector)
 
-    return flattened
+    return normal_vectors
 
 
 @_mesh
@@ -631,12 +633,13 @@ def _armature(mesh):
 
 def _skinning_data(mesh, bone_map, influences, array_index):
     armature = _armature(mesh)
-    if not armature: return
+    manifest = []
+    if not armature: 
+        return manifest
 
     obj = object_.objects_using_mesh(mesh)[0]
     logger.debug('Skinned object found %s', obj.name)
 
-    manifest = []
     for vertex in mesh.vertices:
         bone_array = []
         for group in vertex.groups:
@@ -648,9 +651,9 @@ def _skinning_data(mesh, bone_map, influences, array_index):
             if index >= len(bone_array):
                 manifest.append(0)
                 continue
-
-            for bone_index, bone in enumerate(armature.data.bones):
-                if bone.name != obj.vertex_groups[bone_array[index][0]].name:
+            name = obj.vertex_groups[bone_array[index][0]].name
+            for bone_index, bone in enumerate(armature.pose.bones):
+                if bone.name != name:
                     continue
                 if array_index is 0:
                     entry = bone_map.get(bone_index, -1)
@@ -665,101 +668,177 @@ def _skinning_data(mesh, bone_map, influences, array_index):
     return manifest
 
 
-def _skeletal_animations(armature, options):
-    action = armature.animation_data.action
+def _find_channels(action, bone, channel_type):
+    result = []
+
+    if len(action.groups):
+        
+        group_index = -1
+        for index, group in enumerate(action.groups):
+            if group.name == bone.name:
+                group_index = index
+                #@TODO: break?
+
+        if group_index > -1:
+            for channel in action.groups[group_index].channels:
+                if channel_type in channel.data_path:
+                    result.append(channel)
+
+    else:
+        bone_label = '"%s"' % bone.name
+        for channel in action.fcurves:
+            data_path = [bone_label in channel.data_path,
+                channel_type in channel.data_path]
+            if all(data_path):
+                result.append(channel)
+
+    return result
+
+
+def _skeletal_animations(action, armature, options):
+    try:
+        current_context = context.area.type
+    except AttributeError:
+        logger.warning('No context, possibly running in batch mode')
+    else:
+        context.area.type = 'DOPESHEET_EDITOR'
+        context.space_data.mode = 'ACTION'
+        context.area.spaces.active.action = action
+    
+    armature_matrix = armature.matrix_world
+    fps = context.scene.render.fps
+
     end_frame = action.frame_range[1]
     start_frame = action.frame_range[0]
     frame_length = end_frame - start_frame
-    l,r,s = armature.matrix_world.decompose()
-    rotation_matrix = r.to_matrix()
-    hierarchy = []
-    parent_index = -1
+
     frame_step = options.get(constants.FRAME_STEP, 1)
-    fps = context.scene.render.fps
+    used_frames = int(frame_length / frame_step) + 1
 
-    start = int(start_frame)
-    end = int(end_frame / frame_step) + 1
+    keys = []
+    channels_location = []
+    channels_rotation = []
+    channels_scale = []
 
-    #@TODO need key constants
-    for bone in armature.data.bones:
-        if bone.use_deform is False:
-            logger.info('Skipping animation data for bone %s', bone.name)
-            continue
+    for pose_bone in armature.pose.bones:
+        logger.info('Processing channels for %s', 
+                    pose_bone.bone.name)
+        keys.append([])
+        channels_location.append(
+            _find_channels(action, 
+                           pose_bone.bone,
+                           'location'))
+        channels_rotation.append(
+            _find_channels(action, 
+                           pose_bone.bone,
+                           'rotation_quaternion'))
+        channels_rotation.append(
+            _find_channels(action, 
+                           pose_bone.bone,
+                           'rotation_euler'))
+        channels_scale.append(
+            _find_channels(action, 
+                           pose_bone.bone,
+                           'scale'))
 
-        logger.info('Parsing animation data for bone %s', bone.name)
+    frame_step = options[constants.FRAME_STEP]
+    frame_index_as_time = options[constants.FRAME_INDEX_AS_TIME]
+    for frame_index in range(0, used_frames):
+        if frame_index == used_frames - 1:
+            frame = end_frame
+        else:
+            frame = start_frame + frame_index * frame_step
 
-        keys = []
-        for frame in range(start, end):
-            computed_frame = frame * frame_step
-            pos, pchange = _position(bone, computed_frame, 
-                action, armature.matrix_world)
-            rot, rchange = _rotation(bone, computed_frame, 
-                action, rotation_matrix)
+        logger.info('Processing frame %d', frame)
 
-            # flip y and z
+        time = frame - start_frame
+        if frame_index_as_time is False:
+            time = time / fps
+
+        context.scene.frame_set(frame)
+
+        bone_index = 0
+
+        def has_keyframe_at(channels, frame):
+            def find_keyframe_at(channel, frame):
+                for keyframe in channel.keyframe_points:
+                    if keyframe.co[0] == frame:
+                        return keyframe
+                return None
+
+            for channel in channels:
+                if not find_keyframe_at(channel, frame) is None:
+                    return True
+            return False
+
+        for pose_bone in armature.pose.bones:
+            logger.info('Processing bone %s', pose_bone.bone.name)
+            if pose_bone.parent is None:
+                bone_matrix = armature_matrix * pose_bone.matrix
+            else:
+                parent_matrix = armature_matrix * pose_bone.parent.matrix
+                bone_matrix = armature_matrix * pose_bone.matrix
+                bone_matrix = parent_matrix.inverted() * bone_matrix
+
+            pos, rot, scl = bone_matrix.decompose()
+            
+            pchange = True or has_keyframe_at(
+                channels_location[bone_index], frame)
+            rchange = True or has_keyframe_at(
+                channels_rotation[bone_index], frame)
+            schange = True or has_keyframe_at(
+                channels_scale[bone_index], frame)
+
             px, py, pz = pos.x, pos.z, -pos.y
             rx, ry, rz, rw = rot.x, rot.z, -rot.y, rot.w
+            sx, sy, sz = scl.x, scl.z, scl.y
 
-            if frame == start_frame:
+            keyframe = {constants.TIME: time}
+            if frame == start_frame or frame == end_frame:
+                keyframe.update({
+                    constants.POS: [px, py, pz],
+                    constants.ROT: [rx, ry, rz, rw],
+                    constants.SCL: [sx, sy, sz]
+                })
+            elif any([pchange, rchange, schange]):
+                if pchange is True:
+                    keyframe[constants.POS] = [px, py, pz]
+                if rchange is True:
+                    keyframe[constants.ROT] = [rx, ry, rz, rw]
+                if schange is True:
+                    keyframe[constants.SCL] = [sx, sy, sz]
 
-                time = (frame * frame_step - start_frame) / fps
-                keyframe = {
-                    'time': time,
-                    'pos': [px, py, pz],
-                    'rot': [rx, ry, rz, rw],
-                    'scl': [1, 1, 1]
-                }
-                keys.append(keyframe)
+            if len(keyframe.keys()) > 1:
+                logger.info('Recording keyframe data for %s %s',
+                            pose_bone.bone.name, str(keyframe))
+                keys[bone_index].append(keyframe)
+            else:
+                logger.info('No anim data to record for %s',
+                            pose_bone.bone.name)
 
-            # END-FRAME: needs pos, rot and scl attributes 
-            # with animation length (required frame)
+            bone_index += 1
+    
+    hierarchy = []
+    bone_index = 0
+    for pose_bone in armature.pose.bones:
+        hierarchy.append({
+            constants.PARENT: bone_index - 1,
+            constants.KEYS: keys[bone_index]
+        })
+        bone_index += 1
 
-            elif frame == end_frame / frame_step:
+    if frame_index_as_time is False:
+        frame_length = frame_length / fps
 
-                time = frame_length / fps
-                keyframe = {
-                    'time': time,
-                    'pos': [px, py, pz],
-                    'rot': [rx, ry, rz, rw],
-                    'scl': [1, 1, 1]
-                }
-                keys.append(keyframe)
-
-            # MIDDLE-FRAME: needs only one of the attributes, 
-            # can be an empty frame (optional frame)
-
-            elif pchange == True or rchange == True:
-
-                time = (frame * frame_step - start_frame) / fps
-
-                if pchange == True and rchange == True:
-                    keyframe = {
-                        'time': time, 
-                        'pos': [px, py, pz],
-                        'rot': [rx, ry, rz, rw]
-                    }
-                elif pchange == True:
-                    keyframe = {
-                        'time': time, 
-                        'pos': [px, py, pz]
-                    }
-                elif rchange == True:
-                    keyframe = {
-                        'time': time, 
-                        'rot': [rx, ry, rz, rw]
-                    }
-
-                keys.append(keyframe)
-
-        hierarchy.append({'keys': keys, 'parent': parent_index})
-        parent_index += 1
-
-    #@TODO key constants
+    context.scene.frame_set(start_frame)
+    if context.area:
+        context.area.type = current_context
+    
     animation = {
-        'hierarchy': hierarchy, 
-        'length':frame_length / fps,
-        'fps': fps,
-        'name': action.name
+        constants.HIERARCHY: hierarchy, 
+        constants.LENGTH:frame_length,
+        constants.FPS: fps,
+        constants.NAME: action.name
     }
 
     return animation

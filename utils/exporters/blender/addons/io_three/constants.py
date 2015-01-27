@@ -49,7 +49,8 @@ SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
 FRAME_STEP = 'frameStep'
-ANIMATION = 'animation'
+FRAME_INDEX_AS_TIME = 'frameIndexAsTime'
+ANIMATION = 'animations'
 MORPH_TARGETS = 'morphTargets'
 SKIN_INDICES = 'skinIndices'
 SKIN_WEIGHTS = 'skinWeights'
@@ -93,6 +94,7 @@ EXPORT_OPTIONS = {
     FACE_MATERIALS: False,
     SCALE: 1,
     FRAME_STEP: 1,
+    FRAME_INDEX_AS_TIME: False,
     SCENE: True,
     MIX_COLORS: False,
     COMPRESSION: None,
@@ -210,10 +212,15 @@ IMAGE = 'image'
 
 NAME = 'name'
 PARENT = 'parent'
-
-#@TODO move to api.constants?
+LENGTH = 'length'
+FPS = 'fps'
+HIERARCHY = 'hierarchy'
 POS = 'pos'
 ROTQ = 'rotq'
+ROT = 'rot'
+SCL = 'scl'
+TIME = 'time'
+KEYS = 'keys'
 
 AMBIENT = 'ambient'
 COLOR = 'color'

@@ -131,14 +131,14 @@ function loadGeometry( data, url ) {
     var material = new THREE.MeshFaceMaterial( data.materials ); 
     var mesh;
 
-    if ( data.geometry.animation !== undefined ) {
+    if ( data.geometry.animations !== undefined && data.geometry.animations.length > 0 ) {
 
         console.log( 'loading animation' );
         data.materials[ 0 ].skinning = true;
-        mesh = new THREE.SkinnedMesh( data.geometry, material, false);
+        mesh = new THREE.SkinnedMesh( data.geometry, material, false );
 
-        var name = data.geometry.animation.name;
-        animation = new THREE.Animation( mesh, data.geometry.animation );
+        var name = data.geometry.animations[0].name;
+        animation = new THREE.Animation( mesh, data.geometry.animations[0] );
 
     } else {
 

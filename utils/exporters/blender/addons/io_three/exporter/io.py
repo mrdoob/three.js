@@ -1,4 +1,7 @@
+import os
+import sys
 import shutil
+import traceback
 from .. import constants, logger
 from . import _json
 
@@ -11,6 +14,22 @@ def copy_registered_textures(dest, registration):
 
 def copy(src, dst):
     logger.debug('io.copy(%s, %s)' % (src, dst))
+    if os.path.exists(dst) and os.path.isfile(src):
+        file_name = os.path.basename(src)
+        dst = os.path.join(dst, file_name)
+
+        logger.info('Destination file exists, attempting to remove %s', dst)
+        try:
+            os.remove(dst)
+        except:
+            logger.error('Failed to remove destination file')
+            info = sys.exc_info()
+            trace = traceback.format_exception(
+                info[0], info[1], info[2].tb_next)
+            trace = ''.join(trace)
+            logger.error(trace)
+            raise
+
     shutil.copy(src, dst)
 
 

@@ -35,9 +35,9 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 
 bl_info = {
     'name': 'Three.js Format',
-    'author': 'Ed Caspersen (repsac)',
-    'version': (1, 0, 0),
-    'blender': (2, 7, 2),
+    'author': 'repsac, mrdoob, yomotsu, mpk, jpweeks',
+    'version': (1, 1, 0),
+    'blender': (2, 7, 3),
     'location': 'File > Import-Export',
     'description': 'Export Three.js formatted JSON files.',
     'warning': '',
@@ -232,6 +232,7 @@ def save_settings_export(properties):
         constants.MORPH_TARGETS: properties.option_animation_morph,
         constants.ANIMATION: properties.option_animation_skeletal,
         constants.FRAME_STEP: properties.option_frame_step,
+        constants.FRAME_INDEX_AS_TIME: properties.option_frame_index_as_time,
         constants.INFLUENCES_PER_VERTEX: properties.option_influences
     }
 
@@ -366,6 +367,10 @@ def restore_settings_export(properties):
     properties.option_frame_step = settings.get(
         constants.FRAME_STEP, 
         constants.EXPORT_OPTIONS[constants.FRAME_STEP])
+
+    properties.option_frame_index_as_time = settings.get(
+        constants.FRAME_INDEX_AS_TIME,
+        constants.EXPORT_OPTIONS[constants.FRAME_INDEX_AS_TIME])
     ## }
 
 def compression_types():
@@ -522,6 +527,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description='Export animation (skeletal)', 
         default=constants.EXPORT_OPTIONS[constants.ANIMATION])
 
+    option_frame_index_as_time = BoolProperty(
+        name='Frame index as time',
+        description='Use (original) frame index as frame time',
+        default=constants.EXPORT_OPTIONS[constants.FRAME_INDEX_AS_TIME])
+
     option_frame_step = IntProperty(
         name='Frame step', 
         description='Animation frame step', 
@@ -669,11 +679,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_animation_skeletal')
         row = layout.row()
         row.prop(self.properties, 'option_frame_step')
+        row = layout.row()
+        row.prop(self.properties, 'option_frame_index_as_time')
         ## }
 
 def menu_func_export(self, context):
     default_path = bpy.data.filepath.replace('.blend', constants.EXTENSION)
-    text = 'Three (%s)' % constants.EXTENSION
+    text = 'Three.js (%s)' % constants.EXTENSION
     operator = self.layout.operator(ExportThree.bl_idname, text=text)
     operator.filepath = default_path
 
