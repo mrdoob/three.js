@@ -340,6 +340,17 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'map_bump':
+				case 'bump':
+
+					// Bump texture map
+
+					params[ 'bumpMap' ] = this.loadTexture( this.baseUrl + value );
+					params[ 'bumpMap' ].wrapS = this.wrap;
+					params[ 'bumpMap' ].wrapT = this.wrap;
+
+					break;
+
 				default:
 					break;
 
