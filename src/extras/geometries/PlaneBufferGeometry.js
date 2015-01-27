@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegments, uvMult, uvOffset ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -35,9 +35,14 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 	var offset = 0;
 	var offset2 = 0;
 
+	
+	var uvy = uvOffset ? Math.floor(gridY1 * -uvOffset ) : gridY;
+	uvMult = uvMult ? uvMult : 1.0;
+
 	for ( var iy = 0; iy < gridY1; iy ++ ) {
 
 		var y = iy * segment_height - height_half;
+		var uvx = uvOffset ? Math.floor(gridX1 * uvOffset ) : 0;
 
 		for ( var ix = 0; ix < gridX1; ix ++ ) {
 
@@ -48,14 +53,14 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 			normals[ offset + 2 ] = 1;
 
-			uvs[ offset2     ] = ix / gridX;
-			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
+			uvs[ offset2     ] = (uvx * uvMult / gridX );
+			uvs[ offset2 + 1 ] = (uvy * uvMult / gridY );
 
 			offset += 3;
 			offset2 += 2;
-
+			uvx++;
 		}
-
+		uvy--;
 	}
 
 	offset = 0;
