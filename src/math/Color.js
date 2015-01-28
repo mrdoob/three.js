@@ -372,7 +372,7 @@ THREE.Color.prototype = {
 
 	},
 
-	toArray: function( array, offset ) {
+	toArray: function ( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
