@@ -377,7 +377,7 @@ THREE.Color.prototype = {
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
 
-		array[ offset + 0 ] = this.r;
+		array[ offset ] = this.r;
 		array[ offset + 1 ] = this.g;
 		array[ offset + 2 ] = this.b;
 

@@ -280,16 +280,16 @@ THREE.Euler.prototype = {
 
 	},
 
-	toArray: function( array, offset, withoutOrder ) {
+	toArray: function ( array, offset, withoutOrder ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
 
-		array[ offset + 0 ] = this._x;
+		array[ offset ] = this._x;
 		array[ offset + 1 ] = this._y;
 		array[ offset + 2 ] = this._z;
 
-		if( !withoutOrder ) {
+		if( withoutOrder === true ) {
 			array[ offset + 3 ] = this._order;
 		}
 
