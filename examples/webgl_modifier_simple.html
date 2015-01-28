@@ -57,9 +57,9 @@
 
 			var camera, controls, scene, renderer;
 
-			var objects = [ ];
+			var raycaster = new THREE.Raycaster(), objects = [ ];
 			var mouse = new THREE.Vector2();
-			var projector = new THREE.Projector();
+
 			var DentModifier = new THREE.DentModifier();
 
 
@@ -106,10 +106,25 @@
 
 				// world
 
+				var map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 16;
+
+				materials = [
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
+				];
+
 
 				var material1 = new THREE.MeshPhongMaterial( { color: 0x00ffff } );
 				var geometry1 = new THREE.SphereGeometry( 200, 50, 50 );
-				var Sphere1 = new THREE.Mesh( geometry1, material1 );
+				//var Sphere1 = new THREE.Mesh( geometry1, material1 );
+				
+				var Sphere1 = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
+				//object.position.set( 0, 0, 0 );
+				//scene.add( object );
+				
+				
 				Sphere1.position.set( -800, 0, -300 );
 				scene.add ( Sphere1 ); objects.push( Sphere1 );
 
@@ -190,14 +205,15 @@
 
 			function onDocumentMouseDown( event ) {
 
-				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-				projector.unprojectVector( vector, camera );
+				mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+				mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
+				console.log( ' point' );
 
 					var face = intersects[ 0 ].face; 
 					var direction = new THREE.Vector3(); direction.copy( face.normal );
