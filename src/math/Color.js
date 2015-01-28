@@ -372,10 +372,16 @@ THREE.Color.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function( array, offset ) {
 
-		return [ this.r, this.g, this.b ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
+		array[ offset + 0 ] = this.r;
+		array[ offset + 1 ] = this.g;
+		array[ offset + 2 ] = this.b;
+
+		return array;
 	},
 
 	clone: function () {
