@@ -182,12 +182,10 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 		if ( comparison < 0 ) {
 
 			low = i + 1;
-			continue;
 
 		} else if ( comparison > 0 ) {
 
 			high = i - 1;
-			continue;
 
 		} else {
 
