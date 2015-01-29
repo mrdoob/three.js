@@ -15,7 +15,7 @@ UI.Element.prototype = {
 	setId: function ( id ) {
 
 		this.dom.id = id;
-		
+
 		return this;
 
 	},
@@ -137,7 +137,7 @@ UI.Panel.prototype.add = function () {
 UI.Panel.prototype.remove = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
-	
+
 		var argument = arguments[ i ];
 
 		if ( argument instanceof UI.Element ) {
@@ -514,6 +514,12 @@ UI.FancySelect = function () {
 	var dom = document.createElement( 'div' );
 	dom.className = 'FancySelect';
 	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
+
+	Sortable.create( dom, {
+		onUpdate: function ( event ) {
+			console.log( event );
+		}
+	} );
 
 	// Broadcast for object selection after arrow navigation
 	var changeEvent = document.createEvent('HTMLEvents');
@@ -1154,7 +1160,7 @@ UI.Button.prototype.setLabel = function ( value ) {
 UI.Dialog = function ( value ) {
 
 	var scope = this;
-	
+
 	var dom = document.createElement( 'dialog' );
 
 	if ( dom.showModal === undefined ) {
