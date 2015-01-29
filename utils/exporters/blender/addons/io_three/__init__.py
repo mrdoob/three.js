@@ -36,7 +36,7 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 bl_info = {
     'name': 'Three.js Format',
     'author': 'repsac, mrdoob, yomotsu, mpk, jpweeks',
-    'version': (1, 1, 0),
+    'version': (1, 1, 1),
     'blender': (2, 7, 3),
     'location': 'File > Import-Export',
     'description': 'Export Three.js formatted JSON files.',
@@ -634,9 +634,12 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_scale')
         
         row = layout.row()
+        row = layout.row()
         row.prop(self.properties, 'option_round_off')
+        row = layout.row()
         row.prop(self.properties, 'option_round_value')
 
+        row = layout.row()
         row = layout.row()
         row.prop(self.properties, 'option_logging')
 
