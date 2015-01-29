@@ -114,6 +114,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentMaterialId = - 1,
 	_currentGeometryProgram = '',
 	_currentCamera = null,
+	_currentLightMask = 0,
 
 	_usedTextureUnits = 0,
 
@@ -280,6 +281,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentProgram = null;
 		_currentCamera = null;
+		_currentLightMask = 0;
 
 		_oldBlending = - 1;
 		_oldDepthTest = - 1;
@@ -2476,7 +2478,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
 
-		if ( material.visible === false ) return;
+		if ( material.visible === false || ! camera.isOnSameLayer( object ) ) return;
 
 		updateObject( object );
 
@@ -2815,7 +2817,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
 
-		if ( material.visible === false ) return;
+		if ( material.visible === false || ! camera.isOnSameLayer( object ) ) return;
 
 		updateObject( object );
 
@@ -3287,6 +3289,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 		_currentCamera = null;
+		_currentLightMask = 0;
 		_lightsNeedUpdate = true;
 
 		// update scene graph
@@ -4353,6 +4356,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var lightMask = camera.layerMask & object.layerMask;
+
+		if ( lightMask !== _currentLightMask ) {
+
+			refreshLights = true;
+			_lightsNeedUpdate = true;
+			_currentLightMask = lightMask;
+
+		}
+
 		if ( material.id !== _currentMaterialId ) {
 
 			if ( _currentMaterialId === -1 ) refreshLights = true;
@@ -4371,7 +4384,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.uniform1f( p_uniforms.logDepthBufFC, 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
 
 			}
-
 
 			if ( camera !== _currentCamera ) _currentCamera = camera;
 
@@ -4460,15 +4472,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( refreshMaterial ) {
+		if ( refreshMaterial || refreshLights ) {
 
-			// refresh uniforms common to several materials
-
-			if ( fog && material.fog ) {
-
-				refreshUniformsFog( m_uniforms, fog );
-
-			}
+			// Refresh light uniforms (if material uses shading).
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
@@ -4487,6 +4493,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 				} else {
 					markUniformsLightsNeedsUpdate( m_uniforms, false );
 				}
+
+			}
+
+			// Refresh shadow uniforms for the lights.
+
+			if ( object.receiveShadow && ! material._shadowPass ) {
+
+				refreshUniformsShadow( m_uniforms, lights );
+
+			}
+
+		}
+
+		if ( refreshMaterial ) {
+
+			// refresh uniforms common to several materials
+
+			if ( fog && material.fog ) {
+
+				refreshUniformsFog( m_uniforms, fog );
 
 			}
 
@@ -4530,12 +4556,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 				m_uniforms.opacity.value = material.opacity;
-
-			}
-
-			if ( object.receiveShadow && ! material._shadowPass ) {
-
-				refreshUniformsShadow( m_uniforms, lights );
 
 			}
 
@@ -4805,13 +4825,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) ) {
 
-					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
+					if ( ( light.layerMask & _currentLightMask ) !== 0 ) {
 
-					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
+						uniforms.shadowMap.value[ j ] = light.shadowMap;
+						uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
 
-					uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
-					uniforms.shadowBias.value[ j ] = light.shadowBias;
+						uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
+
+						uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
+						uniforms.shadowBias.value[ j ] = light.shadowBias;
+
+					} else {
+
+						// Hide shadow map by setting darkness to 0.
+						uniforms.shadowDarkness.value[ j ] = 0;
+
+					}
 
 					j ++;
 
@@ -5258,6 +5287,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotOffset = 0,
 		hemiOffset = 0;
 
+		function isLightDisabled ( light ) {
+
+			return ( light.visible === false ) || ( ( light.layerMask & _currentLightMask ) === 0 );
+
+		}
+
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
@@ -5270,7 +5305,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				if ( ! light.visible ) continue;
+				if ( isLightDisabled( light ) ) continue;
+
 
 				if ( _this.gammaInput ) {
 
@@ -5290,7 +5326,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dirCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( isLightDisabled( light ) ) continue;
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
@@ -5319,7 +5355,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				pointCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( isLightDisabled( light ) ) continue;
 
 				pointOffset = pointLength * 3;
 
@@ -5347,7 +5383,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( isLightDisabled( light ) ) continue;
 
 				spotOffset = spotLength * 3;
 
@@ -5386,7 +5422,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				hemiCount += 1;
 
-				if ( ! light.visible ) continue;
+				if ( isLightDisabled( light ) ) continue;
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 				_direction.normalize();

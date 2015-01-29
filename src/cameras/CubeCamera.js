@@ -43,34 +43,32 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new THREE.Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
 
+	this.cameras = [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ];
+
 	this.renderTarget = new THREE.WebGLRenderTargetCube( cubeResolution, cubeResolution, { format: THREE.RGBFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } );
 
 	this.updateCubeMap = function ( renderer, scene ) {
 
 		var renderTarget = this.renderTarget;
+		var cameras = this.cameras;
 		var generateMipmaps = renderTarget.generateMipmaps;
 
 		renderTarget.generateMipmaps = false;
 
-		renderTarget.activeCubeFace = 0;
-		renderer.render( scene, cameraPX, renderTarget );
+		for ( var i = 0; i < 6; i ++ ) {
 
-		renderTarget.activeCubeFace = 1;
-		renderer.render( scene, cameraNX, renderTarget );
+			if ( i == 5 ) {
 
-		renderTarget.activeCubeFace = 2;
-		renderer.render( scene, cameraPY, renderTarget );
+				renderTarget.generateMipmaps = generateMipmaps;
 
-		renderTarget.activeCubeFace = 3;
-		renderer.render( scene, cameraNY, renderTarget );
+			}
 
-		renderTarget.activeCubeFace = 4;
-		renderer.render( scene, cameraPZ, renderTarget );
+			cameras[ i ].layerMask = this.layerMask;
 
-		renderTarget.generateMipmaps = generateMipmaps;
-
-		renderTarget.activeCubeFace = 5;
-		renderer.render( scene, cameraNZ, renderTarget );
+			renderTarget.activeCubeFace = i;
+			renderer.render( scene, cameras[ i ], renderTarget );
+		
+		}
 
 	};
 

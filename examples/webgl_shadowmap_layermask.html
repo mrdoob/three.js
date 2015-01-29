@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shadow map - layermask</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #fff !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> - shadowmap - layermask - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a></br>
+		t: toggle HUD</br>
+		Light 1 layerMask (0-3):
+		<input type=checkbox checked onclick="toggleLightLayer(0,0)"></input>
+		<input type=checkbox checked onclick="toggleLightLayer(0,1)"></input>
+		<input type=checkbox checked onclick="toggleLightLayer(0,2)"></input>
+		<input type=checkbox checked onclick="toggleLightLayer(0,3)"></input><br/>
+		Light 2 layerMask (0-3):
+		<input type=checkbox checked onclick="toggleLightLayer(1,0)"></input>
+		<input type=checkbox checked onclick="toggleLightLayer(1,1)"></input>
+		<input type=checkbox checked onclick="toggleLightLayer(1,2)"></input>
+		<input type=checkbox checked onclick="toggleLightLayer(1,3)"></input><br/>
+		Camera layerMask (0-3):
+		<input type=checkbox checked onclick="toggleCameraLayer(0)"></input>
+		<input type=checkbox checked onclick="toggleCameraLayer(1)"></input>
+		<input type=checkbox checked onclick="toggleCameraLayer(2)"></input>
+		<input type=checkbox checked onclick="toggleCameraLayer(3)"></input><br/>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="fonts/helvetiker_bold.typeface.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
+
+			var HUD_MARGIN = 0.05;
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+			var FLOOR = -250;
+
+			var camera, scene, renderer;
+			var container, stats;
+
+			var NEAR = 10, FAR = 2000;
+
+			var sceneHUD, cameraOrtho, hudMesh;
+
+			var morph, morphs = [];
+
+			var lights = [];
+
+			var clock = new THREE.Clock();
+
+			var showHUD = false;
+
+			init();
+			animate();
+
+			function addLight ( z, color ) {
+
+				var light = new THREE.SpotLight( color, 1, 0, Math.PI / 2, 1 );
+				light.position.set( 0, 600, z );
+				light.target.position.set( 0, 0, 0 );
+
+				light.castShadow = true;
+				light.layerMask = (1<<0) | (1<<1) | (1<<2) | (1<<3); // Place light on layers 0-3.
+
+				light.shadowCameraNear = 500;
+				light.shadowCameraFar = 2000;
+				light.shadowCameraFov = 45;
+
+				light.shadowBias = 0.000001;
+				light.shadowDarkness = 0.6;
+
+				light.shadowMapWidth = SHADOW_MAP_WIDTH;
+				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
+				scene.add( light );
+
+				lights.push( light );
+
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// SCENE CAMERA
+
+				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				camera.position.set( 0, FLOOR + 170, 1200 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0x444444 );
+				scene.add( ambient );
+
+				addLight( 500, 0xa0a0a0 );
+				addLight( 200, 0xa0a0a0 );
+
+				createHUD();
+				createScene();
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( renderer.domElement );
+
+				renderer.autoClear = false;
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapType = THREE.PCFShadowMap;
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'keydown', onKeyDown, false );
+
+			}
+
+			function onWindowResize() {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				cameraOrtho.left = - aspect;
+				cameraOrtho.right = aspect;
+				cameraOrtho.top = 1;
+				cameraOrtho.bottom = - 1;
+				cameraOrtho.updateProjectionMatrix();
+
+				hudMesh.position.x = cameraOrtho.left + HUD_MARGIN;
+				hudMesh.position.y = cameraOrtho.bottom + HUD_MARGIN;
+
+			}
+
+			function onKeyDown ( event ) {
+
+				switch( event.keyCode ) {
+
+					case 84: /*t*/ showHUD = !showHUD; break;
+
+				}
+
+			}
+
+			function toggleLightLayer( index, bitIndex ) {
+
+				lights[ index ].layerMask ^= ( 1 << bitIndex ); // Flip the bit using XOR.
+
+			}
+
+			function toggleCameraLayer( bitIndex ) {
+
+				camera.layerMask ^= ( 1 << bitIndex ); // Flip the bit using XOR.
+
+			}
+
+			function createHUD() {
+
+				var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+
+				cameraOrtho = new THREE.OrthographicCamera( - aspect, aspect,  1, - 1, 1, 10 );
+				cameraOrtho.position.z = 5;
+
+				var shader = THREE.UnpackDepthRGBAShader;
+				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
+
+				uniforms.tDiffuse.value = lights[ 0 ].shadowMap;
+
+				var hudMaterial = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				} );
+
+				var hudHeight = 2 / 3;
+
+				var hudWidth = hudHeight * SHADOW_MAP_WIDTH / SHADOW_MAP_HEIGHT;
+
+				var hudGeo = new THREE.PlaneBufferGeometry( hudWidth, hudHeight );
+				hudGeo.applyMatrix( new THREE.Matrix4().makeTranslation( hudWidth / 2, hudHeight / 2, 0 ) );
+
+				hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
+
+				hudMesh.position.x = cameraOrtho.left + HUD_MARGIN;
+				hudMesh.position.y = cameraOrtho.bottom + HUD_MARGIN;
+
+				sceneHUD = new THREE.Scene();
+				sceneHUD.add( hudMesh );
+
+				cameraOrtho.lookAt( sceneHUD.position );
+
+			}
+
+			function createScene() {
+
+				// GROUND
+
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
+				planeMaterial.ambient = planeMaterial.color;
+
+				var ground = new THREE.Mesh( geometry, planeMaterial );
+
+				ground.position.set( 0, FLOOR, 0 );
+				ground.rotation.x = - Math.PI / 2;
+				ground.scale.set( 50, 50, 50 );
+
+				ground.castShadow = false;
+				ground.receiveShadow = true;
+
+				scene.add( ground );
+
+				// MORPHS
+
+				function addMorph( geometry, speed, duration, x, y, z, layerIndex ) {
+
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
+
+					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+
+					meshAnim.speed = speed;
+					meshAnim.duration = duration;
+					meshAnim.time = 600 * Math.random();
+
+					meshAnim.position.set( x, y, z );
+					meshAnim.rotation.y = Math.PI/2;
+
+					meshAnim.castShadow = true;
+					meshAnim.receiveShadow = true;
+					meshAnim.layerMask = ( 1 << layerIndex ); // Place the object on given layer (and only on that layer).
+
+					scene.add( meshAnim );
+
+					morphs.push( meshAnim );
+
+				}
+
+				function morphColorsToFaceColors( geometry ) {
+
+					if ( geometry.morphColors && geometry.morphColors.length ) {
+
+						var colorMap = geometry.morphColors[ 0 ];
+
+						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
+
+							geometry.faces[ i ].color = colorMap.colors[ i ];
+
+						}
+
+					}
+
+				}
+
+				var loader = new THREE.JSONLoader();
+
+				loader.load( "models/animated/horse.js", function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 500, 1000, -200, FLOOR, 100, 0 );
+
+				} );
+
+				loader.load( "models/animated/flamingo.js", function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 500, 1000, -50, FLOOR + 300, -100, 1 );
+
+				} );
+
+				loader.load( "models/animated/stork.js", function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 500, 1000, 100, FLOOR + 200, 100, 2 );
+
+				} );
+
+				loader.load( "models/animated/parrot.js", function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 500, 1000, 250, FLOOR + 300, -100, 3 );
+
+				} );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				for ( var i = 0; i < morphs.length; i ++ ) {
+
+					morph = morphs[ i ];
+					morph.updateAnimation( 1000 * delta );
+
+				}
+
+				renderer.clear();
+				renderer.render( scene, camera );
+
+				// Render debug HUD with shadow map
+
+				if ( showHUD ) {
+
+					renderer.clearDepth();
+					renderer.render( sceneHUD, cameraOrtho );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>
