@@ -289,10 +289,6 @@ THREE.Euler.prototype = {
 		array[ offset + 1 ] = this._y;
 		array[ offset + 2 ] = this._z;
 
-		if( !withoutOrder ) {
-			array[ offset + 3 ] = this._order;
-		}
-
 		return array;
 	},
 
