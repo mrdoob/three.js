@@ -20671,6 +20671,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var activeInfluenceIndices = [];
 			var influences = object.morphTargetInfluences;
+			var morphTargets = object.geometry.morphTargets;
+
+			if ( influences.length > morphTargets.length ) {
+
+				console.warn( 'THREE.WebGLRenderer: Influences array is bigger than morphTargets array.' );
+				influences.length = morphTargets.length;
+
+			}
 
 			for ( var i = 0, il = influences.length; i < il; i ++ ) {
 
