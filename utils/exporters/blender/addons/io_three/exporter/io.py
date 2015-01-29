@@ -14,7 +14,7 @@ def copy_registered_textures(dest, registration):
 
 def copy(src, dst):
     logger.debug('io.copy(%s, %s)' % (src, dst))
-    if os.path.isfile(src):
+    if os.path.isdir(dst):
         file_name = os.path.basename(src)
         dst = os.path.join(dst, file_name)
 
