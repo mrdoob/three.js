@@ -20,6 +20,7 @@
 	"src/extras/curves/QuadraticBezierCurve3.js",
 	"src/extras/curves/CubicBezierCurve3.js",
 	"src/extras/curves/SplineCurve3.js",
+	"src/extras/curves/CatmullRomCurve3.js",
 	"src/extras/curves/ClosedSplineCurve3.js",
 	"src/extras/animation/AnimationHandler.js",
 	"src/extras/animation/Animation.js",
