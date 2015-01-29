@@ -601,10 +601,16 @@ THREE.Color.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.r, this.g, this.b ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
+		array[ offset ] = this.r;
+		array[ offset + 1 ] = this.g;
+		array[ offset + 2 ] = this.b;
+
+		return array;
 	},
 
 	clone: function () {
@@ -3406,10 +3412,17 @@ THREE.Euler.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this._x, this._y, this._z, this._order ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
+		array[ offset ] = this._x;
+		array[ offset + 1 ] = this._y;
+		array[ offset + 2 ] = this._z;
+		array[ offset + 3 ] = this._order;
+
+		return array;
 	},
 
 	toVector3: function ( optionalResult ) {
@@ -11516,7 +11529,7 @@ THREE.Loader.prototype = {
 
 		if ( m.transparency ) {
 
-			console.warn( 'transparency has been renamed to opacity' );
+			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
 			mpars.opacity = m.transparency;
 
 		}
@@ -20101,11 +20114,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
 
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
+				_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
 
 				_this.info.render.calls ++;
-				_this.info.render.vertices += position.array.length / 3;
-				_this.info.render.faces += position.array.length / 9;
+				_this.info.render.vertices += position.array.length / position.itemSize;
+				_this.info.render.faces += position.array.length / ( 3 * position.itemsize );
 
 			}
 
