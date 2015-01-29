@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author arodic / http://akirodic.com/
  */
 
 THREE.EditorControls = function ( object, domElement ) {
@@ -18,35 +19,209 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var scope = this;
 	var vector = new THREE.Vector3();
+	var matrix = new THREE.Matrix3();
 
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
 
 	var center = this.center;
-	var normalMatrix = new THREE.Matrix3();
-	var pointer = new THREE.Vector2();
-	var pointerOld = new THREE.Vector2();
+
+	// pointer data
+
+	var touches = [];
+
+	// pointers are expressed in -1 to 1 coordinate space relative to domElement.
+
+	var pointers = [ new THREE.Vector2(), new THREE.Vector2() ];
+	var pointersOld = [ new THREE.Vector2(), new THREE.Vector2() ];
+	var pointersDelta = [ new THREE.Vector2(), new THREE.Vector2() ];
 
 	// events
 
 	var changeEvent = { type: 'change' };
 
-	this.focus = function ( target, frame ) {
+	// hepler functions
 
-		var scale = new THREE.Vector3();
-		target.matrixWorld.decompose( center, new THREE.Quaternion(), scale );
+	var getClosestPoint = function( point, pointArray ) {
 
-		if ( frame && target.geometry ) {
+		if ( pointArray[ 0 ].distanceTo( point) < pointArray[ 1 ].distanceTo( point) ) {
 
-			scale = ( scale.x + scale.y + scale.z ) / 3;
-			center.add(target.geometry.boundingSphere.center.clone().multiplyScalar( scale ));
-			var radius = target.geometry.boundingSphere.radius * ( scale );
-			var pos = object.position.clone().sub( center ).normalize().multiplyScalar( radius * 2 );
-			object.position.copy( center ).add( pos );
+			return pointArray[ 0 ];
+		
+		}
+
+		return pointArray[ 1 ];
+
+	};
+
+	var setPointers = function( event ) {
+
+		// Set pointes from mouse/touch events and convert to -1 to 1 coordinate space.
+
+		var parentRect = event.path[ 0 ].getBoundingClientRect();
+
+		// Filter touches that originate from the same element as the event.   
+
+		touches.length = 0;
+
+		if ( event.touches ) {
+
+			for ( var i = 0; i < event.touches.length; i++ ) {
+
+				if ( event.touches[ i ].target === event.path[ 0 ] ) {
+
+					touches.push( event.touches[ i ] );
+
+				}
+
+			}
+
+		}
+		
+		// Set pointer[0] from mouse event.clientX/Y
+
+		if ( touches.length == 0 ) {
+
+			pointers[ 0 ].set(
+				( event.clientX - parentRect.left ) / parentRect.width * 2 - 1,
+				( event.clientY - parentRect.top ) / parentRect.height * 2 - 1
+			);
+
+		// Set both pointer[0] and pointer[1] from a single touch.
+
+		} else if ( touches.length == 1 ) {
+
+			pointers[ 0 ].set(
+				( touches[ 0 ].pageX - parentRect.left ) / parentRect.width * 2 - 1,
+				( touches[ 0 ].pageY - parentRect.top ) / parentRect.height * 2 - 1
+			);
+			pointers[ 1 ].copy( pointers[ 0 ] );
+		
+		// Set pointer[0] and pointer[1] from two touches.
+
+		} else if ( touches.length == 2 ) {
+
+			pointers[ 0 ].set(
+				( touches[ 0 ].pageX - parentRect.left ) / parentRect.width * 2 - 1,
+				( touches[ 0 ].pageY - parentRect.top ) / parentRect.height * 2 - 1
+			);
+			pointers[ 1 ].set(
+				( touches[ 1 ].pageX - parentRect.left ) / parentRect.width * 2 - 1,
+				( touches[ 1 ].pageY - parentRect.top) / parentRect.height * 2 - 1
+			);
 
 		}
 
-		object.lookAt( center );
+	};
+
+	this.focus = function ( target, frame ) {
+
+		// Collection of all centers and radii in the hierarchy of the target.
+
+		var targets = [];
+		
+		// Bounding box (minCenter/maxCenter) encompassing all centers in hierarchy.
+
+		var minCenter;
+		var maxCenter;
+
+		target.traverse( function( child ) {
+
+			child.updateMatrixWorld();
+
+			var center = new THREE.Vector3();
+			var scale = new THREE.Vector3();
+			var radius = 0;
+
+			child.matrixWorld.decompose( center, new THREE.Quaternion(), scale );
+			scale = ( scale.x + scale.y + scale.z ) / 3;
+
+			if ( child.geometry ) {
+
+				child.geometry.computeBoundingSphere();
+				center.add( child.geometry.boundingSphere.center.clone().multiplyScalar( scale ) );
+				radius = child.geometry.boundingSphere.radius * scale;
+
+			}
+
+			targets.push( { center: center, radius: radius } );
+
+			if ( !minCenter ) minCenter = center.clone();
+			if ( !maxCenter ) maxCenter = center.clone();
+
+			minCenter.min( center );
+			maxCenter.max( center );
+
+		} );
+
+		// Center of the bounding box.
+
+		var cumulativeCenter = minCenter.clone().add( maxCenter ).multiplyScalar( 0.5 );
+		
+		// Furthest ( center distance + radius ) from CumulativeCenter.
+		
+		var cumulativeRadius = 0;
+
+		targets.forEach( function( target ) {
+			
+			var radius = cumulativeCenter.distanceTo( target.center ) + target.radius;
+			cumulativeRadius = Math.max( cumulativeRadius, radius );
+		
+		} );
+
+		if ( object instanceof THREE.PerspectiveCamera ) {
+
+			// Look towards cumulativeCenter
+
+			center.copy( cumulativeCenter );
+			object.lookAt( center );
+
+			if ( frame && cumulativeRadius ) {
+
+				// Adjust distance to frame cumulativeRadius
+
+				var fovFactor = Math.tan( ( object.fov / 2) * Math.PI / 180.0 );
+				var pos = object.position.clone().sub( center ).normalize().multiplyScalar( cumulativeRadius  / fovFactor );
+
+				object.position.copy( center ).add( pos );
+
+			}
+
+		} else if ( object instanceof THREE.OrthographicCamera ) {
+
+			// Align camera center with cumulativeCenter
+
+			var initialCenterOffset = object.position.clone().sub( center );
+			center.copy( cumulativeCenter );
+			object.position.copy( center ).add( initialCenterOffset );
+
+			if ( frame && cumulativeRadius ) {
+
+				// Adjust camera boundaries to frame cumulativeRadius
+
+				var cw = object.right - object.left;
+				var ch = object.top - object.bottom;
+				var aspect = cw / ch;
+
+				if ( aspect < 1 ) {
+
+					object.top = cumulativeRadius / aspect;
+					object.right = cumulativeRadius;
+					object.bottom = -cumulativeRadius / aspect;
+					object.left = -cumulativeRadius;
+
+				} else {
+
+					object.top = cumulativeRadius;
+					object.right = cumulativeRadius * aspect;
+					object.bottom = -cumulativeRadius;
+					object.left = -cumulativeRadius * aspect;
+
+				}
+
+			}
+
+		}
 
 		scope.dispatchEvent( changeEvent );
 
@@ -56,11 +231,24 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var distance = object.position.distanceTo( center );
 
-		delta.multiplyScalar( distance * 0.001 );
-		delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
+		vector.set( -delta.x, delta.y, 0 );
 
-		object.position.add( delta );
-		center.add( delta );
+		if ( object instanceof THREE.PerspectiveCamera ) {
+
+			var fovFactor = distance * Math.tan( ( object.fov / 2 ) * Math.PI / 180.0 );
+			vector.multiplyScalar( fovFactor );
+			vector.x *= object.aspect;
+
+		} else if ( object instanceof THREE.OrthographicCamera ) {
+
+			vector.x *= ( object.right - object.left ) / 2;
+			vector.y *= ( object.top - object.bottom ) / 2;
+
+		}
+
+		vector.applyMatrix3( matrix.getNormalMatrix( object.matrix ) );
+		object.position.add( vector );
+		center.add( vector );
 
 		scope.dispatchEvent( changeEvent );
 
@@ -68,15 +256,28 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.zoom = function ( delta ) {
 
-		var distance = object.position.distanceTo( center );
+		if ( object instanceof THREE.PerspectiveCamera ) {
 
-		delta.multiplyScalar( distance * 0.001 );
+			var distance = object.position.distanceTo( center );
 
-		if ( delta.length() > distance ) return;
+			vector.set( 0, 0, delta.y );
 
-		delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
+			vector.multiplyScalar( distance );
 
-		object.position.add( delta );
+			if ( vector.length() > distance ) return;
+
+			vector.applyMatrix3(matrix.getNormalMatrix( object.matrix ) );
+
+			object.position.add( vector );
+
+		} else if ( object instanceof THREE.OrthographicCamera ) {
+
+			object.top *= 1 + delta.y;
+			object.right *= 1 + delta.y;
+			object.bottom *= 1 + delta.y;
+			object.left *= 1 + delta.y;
+
+		}
 
 		scope.dispatchEvent( changeEvent );
 
@@ -89,8 +290,8 @@ THREE.EditorControls = function ( object, domElement ) {
 		var theta = Math.atan2( vector.x, vector.z );
 		var phi = Math.atan2( Math.sqrt( vector.x * vector.x + vector.z * vector.z ), vector.y );
 
-		theta += delta.x;
-		phi += delta.y;
+		theta -= delta.x;
+		phi -= delta.y;
 
 		var EPS = 0.000001;
 
@@ -120,6 +321,12 @@ THREE.EditorControls = function ( object, domElement ) {
 
 			state = STATE.ROTATE;
 
+			if ( object instanceof THREE.OrthographicCamera ) {
+				
+				state = STATE.PAN;
+			
+			};
+
 		} else if ( event.button === 1 ) {
 
 			state = STATE.ZOOM;
@@ -130,7 +337,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
-		pointerOld.set( event.clientX, event.clientY );
+		setPointers( event );
+
+		pointersOld[ 0 ].copy( pointers[ 0 ] );
 
 		domElement.addEventListener( 'mousemove', onMouseMove, false );
 		domElement.addEventListener( 'mouseup', onMouseUp, false );
@@ -143,26 +352,24 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		pointer.set( event.clientX, event.clientY );
+		setPointers( event );
 
-		var movementX = pointer.x - pointerOld.x;
-		var movementY = pointer.y - pointerOld.y;
+		pointersDelta[ 0 ].subVectors( pointers[ 0 ], pointersOld[ 0 ] );
+		pointersOld[ 0 ].copy( pointers[ 0 ] );
 
 		if ( state === STATE.ROTATE ) {
 
-			scope.rotate( new THREE.Vector3( - movementX * 0.005, - movementY * 0.005, 0 ) );
+			scope.rotate( pointersDelta[ 0 ] );
 
 		} else if ( state === STATE.ZOOM ) {
 
-			scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
+			scope.zoom( pointersDelta[ 0 ] );
 
 		} else if ( state === STATE.PAN ) {
 
-			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
+			scope.pan( pointersDelta[ 0 ] );
 
 		}
-
-		pointerOld.set( event.clientX, event.clientY );
 
 	}
 
@@ -179,9 +386,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	function onMouseWheel( event ) {
 
-		event.preventDefault();
+		if ( scope.enabled === false ) return;
 
-		// if ( scope.enabled === false ) return;
+		event.preventDefault();
 
 		var delta = 0;
 
@@ -195,7 +402,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
-		scope.zoom( new THREE.Vector3( 0, 0, delta ) );
+		scope.zoom( new THREE.Vector2( 0, delta / 1000 ) );
 
 	}
 
@@ -204,36 +411,14 @@ THREE.EditorControls = function ( object, domElement ) {
 	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
 
-	// touch
-
-	var touch = new THREE.Vector3();
-
-	var touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-	var prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-	var prevDistance = null;
-
 	function touchStart( event ) {
 
 		if ( scope.enabled === false ) return;
 
-		switch ( event.touches.length ) {
+		setPointers( event );
 
-			case 1:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				break;
-
-			case 2:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 );
-				prevDistance = touches[ 0 ].distanceTo( touches[ 1 ] );
-				break;
-
-		}
-
-		prevTouches[ 0 ].copy( touches[ 0 ] );
-		prevTouches[ 1 ].copy( touches[ 1 ] );
+		pointersOld[ 0 ].copy( pointers[ 0 ] );
+		pointersOld[ 1 ].copy( pointers[ 1 ] );
 
 	}
 
@@ -242,50 +427,46 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		event.preventDefault();
-		event.stopPropagation();
+		setPointers( event );
 
-		var getClosest = function( touch, touches ) {
-
-			var closest = touches[ 0 ];
-
-			for ( var i in touches ) {
-				if ( closest.distanceTo(touch) > touches[ i ].distanceTo(touch) ) closest = touches[ i ];
-			}
-
-			return closest;
-
-		};
-
-		switch ( event.touches.length ) {
+		switch ( touches.length ) {
 
 			case 1:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - 0.005 ) );
+
+				pointersDelta[ 0 ].subVectors( pointers[ 0 ], getClosestPoint( pointers[ 0 ], pointersOld ) );
+				pointersDelta[ 1 ].subVectors( pointers[ 1 ], getClosestPoint( pointers[ 1 ], pointersOld ) );
+				
+				if ( object instanceof THREE.PerspectiveCamera ) {
+				
+					scope.rotate( pointersDelta[ 0 ] );
+				
+				} else if ( object instanceof THREE.OrthographicCamera ) {
+				
+					scope.pan( pointersDelta[ 0 ] );
+				
+				}
 				break;
 
 			case 2:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 );
-				distance = touches[ 0 ].distanceTo( touches[ 1 ] );
-				scope.zoom( new THREE.Vector3( 0, 0, prevDistance - distance ) );
-				prevDistance = distance;
 
-
-				var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ], prevTouches ) );
-				var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ], prevTouches ) );
-				offset0.x = -offset0.x;
-				offset1.x = -offset1.x;
-
-				scope.pan( offset0.add( offset1 ).multiplyScalar( 0.5 ) );
+				pointersDelta[ 0 ].subVectors( pointers[ 0 ], getClosestPoint( pointers[ 0 ], pointersOld ) );
+				pointersDelta[ 1 ].subVectors( pointers[ 1 ], getClosestPoint( pointers[ 1 ], pointersOld ) );
+				
+				var prevDistance = pointersOld[ 0 ].distanceTo( pointersOld[ 1 ] );
+				var distance = pointers[ 0 ].distanceTo( pointers[ 1 ] );
+				
+				if ( prevDistance ) {
+				
+					scope.zoom( new THREE.Vector2(0, prevDistance - distance ) );
+					scope.pan( pointersDelta[ 0 ].clone().add( pointersDelta[ 1 ] ).multiplyScalar(0.5) );
+				
+				}
 
 				break;
-
 		}
 
-		prevTouches[ 0 ].copy( touches[ 0 ] );
-		prevTouches[ 1 ].copy( touches[ 1 ] );
+		pointersOld[ 0 ].copy( pointers[ 0 ] );
+		pointersOld[ 1 ].copy( pointers[ 1 ] );
 
 	}
 
