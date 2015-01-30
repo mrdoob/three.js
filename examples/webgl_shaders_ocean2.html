@@ -47,7 +47,7 @@
 			var hash = document.location.hash.substr( 1 );
 			if (!(hash in types)) hash = 'float';
 
-			document.getElementById('type-status').innerText = hash;
+			document.getElementById('type-status').innerHTML = hash;
 			document.getElementById('change-type').innerHTML =
 				'<a href="#" onclick="return change(\'' + types[hash] + '\')">' + types[hash] + '</a>';
 
