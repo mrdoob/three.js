@@ -495,7 +495,6 @@ THREE.NormalDisplacementShader = {
 		"varying vec3 vWorldPosition;",
 		"varying vec3 vViewPosition;",
 
-		THREE.ShaderChunk[ "common" ],
 		THREE.ShaderChunk[ "skinning_pars_vertex" ],
 		THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
