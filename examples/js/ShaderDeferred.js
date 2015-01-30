@@ -147,6 +147,7 @@ THREE.ShaderDeferred = {
 			"uniform float wrapAround;",
 			"uniform float additiveSpecular;",
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
@@ -169,7 +170,6 @@ THREE.ShaderDeferred = {
 
 			"#endif",
 
-			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
@@ -305,6 +305,7 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "map_pars_vertex" ],
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
