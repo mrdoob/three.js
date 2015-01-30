@@ -62,8 +62,6 @@ var Toolbar = function ( editor ) {
 
 	}
 
-	update();
-
 	return container;
 
 }
