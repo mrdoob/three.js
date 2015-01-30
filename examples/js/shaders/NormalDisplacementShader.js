@@ -1,4 +1,4 @@
-/* 
+/*
  * @author alteredq / http://alteredqualia.com/
  *
  * Normal map shader
@@ -126,6 +126,7 @@ THREE.NormalDisplacementShader = {
 		"varying vec3 vWorldPosition;",
 		"varying vec3 vViewPosition;",
 
+		THREE.ShaderChunk[ "common" ],
 		THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 		THREE.ShaderChunk[ "fog_pars_fragment" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
@@ -174,7 +175,7 @@ THREE.NormalDisplacementShader = {
 		"		#endif",
 
 		"	}",
-		
+
 		THREE.ShaderChunk[ "alphatest_fragment" ],
 
 		"	if( enableSpecular )",
@@ -494,6 +495,7 @@ THREE.NormalDisplacementShader = {
 		"varying vec3 vWorldPosition;",
 		"varying vec3 vViewPosition;",
 
+		THREE.ShaderChunk[ "common" ],
 		THREE.ShaderChunk[ "skinning_pars_vertex" ],
 		THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
