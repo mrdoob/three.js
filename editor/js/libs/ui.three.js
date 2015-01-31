@@ -136,7 +136,7 @@ UI.Texture.prototype.onChange = function ( callback ) {
 
 // Outliner
 
-UI.Outliner = function () {
+UI.Outliner = function ( editor ) {
 
 	UI.Element.call( this );
 
@@ -146,9 +146,14 @@ UI.Outliner = function () {
 	dom.className = 'Outliner';
 	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
 
-	Sortable.create( dom, {
+	var scene = editor.scene;
+
+	var sortable = Sortable.create( dom, {
+		draggable: '.draggable',
 		onUpdate: function ( event ) {
-			console.log( event );
+			var object = scene.getObjectById( scope.options[ event.oldIndex ].value );
+			var preObject = scene.getObjectById( scope.options[ event.newIndex ].value );
+			editor.parent( object, preObject.parent );
 		}
 	} );
 
@@ -224,7 +229,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 		var option = options[ i ];
 
 		var div = document.createElement( 'div' );
-		div.className = 'option';
+		div.className = 'option ' + ( option.static === true ? '': 'draggable' );
 		div.innerHTML = option.html;
 		div.value = option.value;
 		scope.dom.appendChild( div );
