@@ -1,0 +1,15 @@
+{
+  "name": "three.js",
+  "description": "JavaScript 3D library",
+  "version": "0.0.70",
+  "scripts": {
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "eslint": "^0.11.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-eslint": "^3.0.0"
+  }
+}

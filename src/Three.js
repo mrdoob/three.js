@@ -2,9 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+/*eslint no-undef:0*/
+
 var THREE = { REVISION: '71dev' };
 
 // browserify support
+
+/*global module*/
 
 if ( typeof module === 'object' ) {
 
