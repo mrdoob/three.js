@@ -3,35 +3,36 @@
     "browser": true,
   },
   "rules": {
-    // Rules that should be turned on but are off until the code is updated (change the 0 to a 2)
+    // Rules that should be turned on but are off until the code is updated
+    // (change the 0 to a 2 and move them down to the next section)
 
-    "camelcase": 0,                        // Disallow names_with_underscore
-    "comma-spacing": 0,                    // Require space after comma
-    "eqeqeq": 0,                           // Require === and !==
-    "key-spacing": 0,                      // Require a space after key as in "key: value"
-    "new-cap": 0,                          // Disallow captialized function to be used without new.
-    "new-parens": 0,                       // Require new to always have parens. "a = new b();" = ok, "a = new b;" = bad
-    "no-comma-dangle": 0,                  // Disallow dangling commas as in [ 1, 2, 3, ]
-    "no-extra-semi": 0,                    // Disallow extra semicolons. Example function foo() { };
-    "no-mixed-spaces-and-tabs": 0,         // Disallow both spaces and tabs in the same line for indenting
-    "no-spaced-func": 0,                   // Require no space at function call. "fn()" = ok, "fn ()" = bad
-    "no-space-before-semi": 0,             // Require no space before semicolon
-    "no-trailing-spaces": 0,               // Disallow trailing spaces
-    "no-unused-vars": 0,                   // Disallow unused variables.
-    "semi": 0,                             // Disallow missing semicolons
+    "brace-style": [ 0, "1tbs", { "allowSingleLine": true } ],  // Require k&r style braces
+    "camelcase": 0,                          // Disallow names_with_underscore
+    "comma-spacing": 0,                      // Require space after comma
+    "eqeqeq": 0,                             // Require === and !==
+    "key-spacing": 0,                        // Require a space after key as in "key: value"
+    "new-cap": 0,                            // Disallow captialized function to be used without new.
+    "new-parens": 0,                         // Require new to always have parens. "a = new b();" = ok, "a = new b;" = bad
+    "no-comma-dangle": 0,                    // Disallow dangling commas as in [ 1, 2, 3, ]
+    "no-extra-semi": 0,                      // Disallow extra semicolons. Example function foo() { };
+    "no-mixed-spaces-and-tabs": 0,           // Disallow both spaces and tabs in the same line for indenting
+    "no-spaced-func": 0,                     // Require no space at function call. "fn()" = ok, "fn ()" = bad
+    "no-space-before-semi": 0,               // Require no space before semicolon
+    "no-trailing-spaces": 0,                 // Disallow trailing spaces
+    "no-unused-vars": 0,                     // Disallow unused variables.
+    "semi": 0,                               // Disallow missing semicolons
     "space-after-keywords": [ 0, "always" ], // Require space after keywords
     "space-in-brackets": [ 0, "always" ],    // Require space in parens
     "space-in-parens": [ 0, "always" ],      // Require space in parens
-    "space-infix-ops": 0,                  // Require space around operators "a + b" = ok, "a+b" = bad
-    "strict": 0,                           // Require "use strict"
+    "space-infix-ops": 0,                    // Require space around operators "a + b" = ok, "a+b" = bad
+    "strict": 0,                             // Require "use strict"
+    "three-no-new-array": 0,                 // Disallow "new Array"
     "three-space-unary-ops": [ 0, { "words": true, "nonwords": true } ],  // Require space before unary operators except "."
 
     // Rules we intensionally want on
 
     "comma-style": [ 2, "last" ],  // Require commas on the same line
     "no-new-object": 2,            // Disallow "new Object()";
-    "three-no-new-array": 2,       // Disallow "new Array"
-    "brace-style": [ 2, "1tbs", { "allowSingleLine": false } ],  // Require k&r style braces
 
     // Rules we intensionally want off
 

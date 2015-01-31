@@ -5,7 +5,7 @@ module.exports = function( grunt ) {
   grunt.initConfig( {
     eslint: {
         target: [
-          'src/Three.js',
+          'src',
           //'examples',   // should turn this on but not yet. Too many errors
           //'test',       // should turn this on. Will need different options, can put in test/.eslistrc
         ],
