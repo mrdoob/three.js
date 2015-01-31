@@ -19,7 +19,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var ignoreObjectSelectedSignal = false;
 
-	var outliner = new UI.FancySelect().setId( 'outliner' );
+	var outliner = new UI.Outliner().setId( 'outliner' );
 	outliner.onChange( function () {
 
 		ignoreObjectSelectedSignal = true;
