@@ -1,4 +1,4 @@
-﻿.FancySelect {
+﻿.Outliner {
 	background: #222;
 	padding: 0;
 	cursor: default;
@@ -6,12 +6,12 @@
 	outline: none;
 }
 
-	.FancySelect .option {
+	.Outliner .option {
 		padding: 4px;
 		white-space: nowrap;
 	}
 
-	.FancySelect .option.active {
+	.Outliner .option.active {
 		background-color: #153C5E;
 	}
 
