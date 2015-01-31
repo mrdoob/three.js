@@ -151,9 +151,14 @@ UI.Outliner = function ( editor ) {
 	var sortable = Sortable.create( dom, {
 		draggable: '.draggable',
 		onUpdate: function ( event ) {
-			var object = scene.getObjectById( scope.options[ event.oldIndex ].value );
-			var preObject = scene.getObjectById( scope.options[ event.newIndex ].value );
-			editor.parent( object, preObject.parent );
+
+			var item = event.item;
+
+			var object = scene.getObjectById( item.value );
+			var prevObject = scene.getObjectById( item.previousSibling.value );
+
+			editor.parent( object, prevObject.parent, prevObject );
+
 		}
 	} );
 
