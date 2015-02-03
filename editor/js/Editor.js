@@ -319,7 +319,7 @@ Editor.prototype = {
 
 	//
 
-	parent: function ( object, parent, after ) {
+	parent: function ( object, parent, before ) {
 
 		if ( parent === undefined ) {
 
@@ -329,10 +329,12 @@ Editor.prototype = {
 
 		parent.add( object );
 
-		if ( after !== undefined ) {
+		// sort children array
 
-			var index = parent.children.indexOf( after );
-			parent.children.splice( index + 1, 0, object );
+		if ( before !== undefined ) {
+
+			var index = parent.children.indexOf( before );
+			parent.children.splice( index, 0, object );
 			parent.children.pop();
 
 		}

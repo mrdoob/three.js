@@ -155,9 +155,17 @@ UI.Outliner = function ( editor ) {
 			var item = event.item;
 
 			var object = scene.getObjectById( item.value );
-			var prevObject = scene.getObjectById( item.previousSibling.value );
 
-			editor.parent( object, prevObject.parent, prevObject );
+			if ( item.nextSibling === null ) {
+
+				editor.parent( object, editor.scene );
+
+			} else {
+
+				var nextObject = scene.getObjectById( item.nextSibling.value );
+				editor.parent( object, nextObject.parent, nextObject );
+
+			}
 
 		}
 	} );
