@@ -14,6 +14,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	var canvas = parameters.canvas !== undefined
 			 ? parameters.canvas
 			 : document.createElement( 'canvas' );
+
 	var context = canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
 	} );
@@ -371,8 +372,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		var colorOffset = offset * 4;
 
-		if ( material.needsUpdate && !material.texture.data ) {
+		if ( material.map.needsUpdate === true ) {
 			material.texture.CreateFromImage( material.map.image );
+			material.map.needsUpdate = false;
 		}
 
 		if ( !material.texture.data )
@@ -410,8 +412,9 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		var colorOffset = offset * 4;
 
-		if ( material.map.needsUpdate && !material.texture.data ) {
+		if ( material.map.needsUpdate === true ) {
 			material.texture.CreateFromImage( material.map.image );
+			material.map.needsUpdate = false;
 		}
 
 		if ( !material.texture.data )
@@ -454,7 +457,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 		var id = material.id;
 		var shader = shaders[ id ];
 
-		if ( shaders[ id ] === undefined ) {
+		if ( shaders[ id ] === undefined || material.needsUpdate === true ) {
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
@@ -536,6 +539,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			}
 
 			shaders[ id ] = shader;
+
+			material.needsUpdate = false;
 
 		}
 
@@ -1093,7 +1098,7 @@ THREE.SoftwareRenderer.Texture = function() {
 
 	this.CreateFromImage = function( image ) {
 
-		if( !image || image.width <=0 || image.height <=0 )
+		if( !image || image.width <= 0 || image.height <= 0 )
 			return;
 
 		var isCanvasClean = false;
@@ -1142,21 +1147,7 @@ THREE.SoftwareRenderer.Texture = function() {
 		catch(e) {
 			return;
 		}
-
-		var size = data.length;
-		this.data = new Uint8Array(size);
-		var alpha;
-		for(var i=0, j=0; i<size; ) {
-			this.data[i++] = data[j++];
-			this.data[i++] = data[j++];
-			this.data[i++] = data[j++];
-			alpha = data[j++];
-			this.data[i++] = alpha;
-
-			if(alpha < 255)
-				this.hasTransparency = true;
-		}
-
+		this.data = data;
 		this.width = dim;
 		this.height = dim;
 		this.srcUrl = image.src;
