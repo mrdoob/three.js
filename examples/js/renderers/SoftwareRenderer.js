@@ -1117,18 +1117,7 @@ THREE.SoftwareRenderer.Texture = function() {
 		}
 
 		var dim = image.width > image.height ? image.width : image.height;
-		if(dim <= 32)
-			dim = 32;
-		else if(dim <= 64)
-			dim = 64;
-		else if(dim <= 128)
-			dim = 128;
-		else if(dim <= 256)
-			dim = 256;
-		else if(dim <= 512)
-			dim = 512;
-		else
-			dim = 1024;
+		dim = THREE.Math.nextPowerOfTwo( dim );
 
 		if(canvas.width != dim || canvas.height != dim) {
 			canvas.width = canvas.height = dim;
