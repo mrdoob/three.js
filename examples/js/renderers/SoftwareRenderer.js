@@ -301,6 +301,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 	}
 
 	function getPalette( material, bSimulateSpecular ) {
+		var i = 0, j = 0;
 		var diffuseR = material.color.r * 255;
 		var diffuseG = material.color.g * 255;
 		var diffuseB = material.color.b * 255;
@@ -308,58 +309,26 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 		if ( bSimulateSpecular ) {
 
-			var i = 0, j = 0;
 			while(i < 204) {
-				var r = i * diffuseR / 204;
-				var g = i * diffuseG / 204;
-				var b = i * diffuseB / 204;
-				if(r > 255)
-					r = 255;
-				if(g > 255)
-					g = 255;
-				if(b > 255)
-					b = 255;
-
-				palette[j++] = r;
-				palette[j++] = g;
-				palette[j++] = b;
+				palette[j++] = Math.min( i * diffuseR / 204, 255 );
+				palette[j++] = Math.min( i * diffuseG / 204, 255 );
+				palette[j++] = Math.min( i * diffuseB / 204, 255 );
 				++i;
 			}
 
 			while(i < 256) { // plus specular highlight
-				var r = diffuseR + (i - 204) * (255 - diffuseR) / 82;
-				var g = diffuseG + (i - 204) * (255 - diffuseG) / 82;
-				var b = diffuseB + (i - 204) * (255 - diffuseB) / 82;
-				if(r > 255)
-					r = 255;
-				if(g > 255)
-					g = 255;
-				if(b > 255)
-					b = 255;
-
-				palette[j++] = r;
-				palette[j++] = g;
-				palette[j++] = b;
+				palette[j++] = Math.min( diffuseR + (i - 204) * (255 - diffuseR) / 82, 255 );
+				palette[j++] = Math.min( diffuseG + (i - 204) * (255 - diffuseG) / 82, 255 );
+				palette[j++] = Math.min( diffuseB + (i - 204) * (255 - diffuseB) / 82, 255 );
 				++i;
 			}
 
 		} else {
 
-			var i = 0, j = 0;
 			while(i < 256) {
-				var r = i * diffuseR / 255;
-				var g = i * diffuseG / 255;
-				var b = i * diffuseB / 255;
-				if(r > 255)
-					r = 255;
-				if(g > 255)
-					g = 255;
-				if(b > 255)
-					b = 255;
-
-				palette[j++] = r;
-				palette[j++] = g;
-				palette[j++] = b;
+				palette[j++] = Math.min( i * diffuseR / 255, 255 );
+				palette[j++] = Math.min( i * diffuseG / 255, 255 );
+				palette[j++] = Math.min( i * diffuseB / 255, 255 );
 				++i;
 			}
 
