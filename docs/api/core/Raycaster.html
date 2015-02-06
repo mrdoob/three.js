@@ -36,9 +36,9 @@
 			// calculate objects intersecting the picking ray
 			var intersects = raycaster.intersectObjects( scene.children );
 
-			for ( var intersect in intersects ) {
+			for ( var i = 0; i < intersects.length; i++ ) {
 
-				intersect.object.material.color = new THREE.Color( 0xff0000 );
+				intersects[i].object.material.color = new THREE.Color( 0xff0000 );
 			
 			}
 			
