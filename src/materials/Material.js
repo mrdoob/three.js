@@ -39,13 +39,27 @@ THREE.Material = function () {
 
 	this.visible = true;
 
-	this.needsUpdate = true;
+	this._needsUpdate = true;
 
 };
 
 THREE.Material.prototype = {
 
 	constructor: THREE.Material,
+
+	get needsUpdate () {
+
+		return this._needsUpdate;
+
+	},
+
+	set needsUpdate ( value ) {
+
+		if ( value === true ) this.update();
+
+		this._needsUpdate = value;
+
+	},
 
 	setValues: function ( values ) {
 
@@ -195,6 +209,12 @@ THREE.Material.prototype = {
 		material.visible = this.visible;
 
 		return material;
+
+	},
+
+	update: function () {
+
+		this.dispatchEvent( { type: 'update' } );
 
 	},
 

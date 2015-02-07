@@ -6686,6 +6686,20 @@ THREE.Math = {
 
 		return ( value & ( value - 1 ) ) === 0 && value !== 0;
 
+	},
+
+	nextPowerOfTwo: function ( value ) {
+
+		value --;
+		value |= value >> 1;
+		value |= value >> 2;
+		value |= value >> 4;
+		value |= value >> 8;
+		value |= value >> 16;
+		value ++;
+
+		return value;
+
 	}
 
 };
@@ -13243,13 +13257,27 @@ THREE.Material = function () {
 
 	this.visible = true;
 
-	this.needsUpdate = true;
+	this._needsUpdate = true;
 
 };
 
 THREE.Material.prototype = {
 
 	constructor: THREE.Material,
+
+	get needsUpdate () {
+
+		return this._needsUpdate;
+
+	},
+
+	set needsUpdate ( value ) {
+
+		if ( value === true ) this.update();
+
+		this._needsUpdate = value;
+
+	},
 
 	setValues: function ( values ) {
 
@@ -13399,6 +13427,12 @@ THREE.Material.prototype = {
 		material.visible = this.visible;
 
 		return material;
+
+	},
+
+	update: function () {
+
+		this.dispatchEvent( { type: 'update' } );
 
 	},
 
