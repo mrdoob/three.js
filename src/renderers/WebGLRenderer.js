@@ -14,7 +14,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
-	pixelRatio = 1,
+	pixelRatio = parameters.pixelRatio !== undefined ? parameters.pixelRatio : 1,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
