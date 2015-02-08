@@ -175,7 +175,7 @@ THREE.Projector = function () {
 			var positionWorld = vertex.positionWorld;
 			var positionScreen = vertex.positionScreen;
 
-			positionWorld.copy( position ).applyMatrix4( _modelMatrix );
+			positionWorld.copy( position ).applyProjection( _modelMatrix );
 			positionScreen.copy( positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
 			var invW = 1 / positionScreen.w;
