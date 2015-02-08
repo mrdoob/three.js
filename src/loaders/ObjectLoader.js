@@ -50,12 +50,15 @@ THREE.ObjectLoader.prototype = {
 		var geometries, materials, images, textures;
 		var self = this;
 
+		self.manager.itemStart(json.object.uuid);
 		var manager = new THREE.LoadingManager( function() {
 
 			textures  = self.parseTextures( json.textures, images );
 			materials = self.parseMaterials( json.materials, textures );
 
 			onLoad( self.parseObject( json.object, geometries, materials ) );
+			// report back to parent manager
+			self.manager.itemEnd(json.object.uuid);
 
 		} );
 
@@ -263,13 +266,13 @@ THREE.ObjectLoader.prototype = {
 				var url  = self.texturePath + data.url;
 
 				self.manager.itemStart( url );
-				loader.load( url, function ( image ) {
+				loader.load( url, function ( uuid, url, image ) {
 
 					self.manager.itemEnd( url );
 
-					images[ data.uuid ] = image;
+					images[ uuid ] = image;
 
-				} );
+				}.bind( null, data.uuid, url ) );
 
 			}
 
