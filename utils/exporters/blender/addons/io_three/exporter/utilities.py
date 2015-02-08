@@ -28,6 +28,9 @@ def hash(value):
 def id():
     return str(uuid.uuid4()).upper()
 
+def id_from_name(name):
+    return str(uuid.uuid3(uuid.NAMESPACE_DNS, name)).upper()
+
 
 def rgb2int(rgb):
     is_tuple = isinstance(rgb, tuple)

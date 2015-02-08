@@ -18,6 +18,7 @@
 
 import os
 import json
+import logging
 
 import bpy
 from bpy_extras.io_utils import ExportHelper
@@ -29,6 +30,10 @@ from bpy.props import (
 )
 
 from . import constants
+
+logging.basicConfig(
+    format='%(levelname)s:THREE:%(message)s',
+    level=logging.DEBUG)
 
 SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 
@@ -221,10 +226,11 @@ def save_settings_export(properties):
         constants.PRECISION: properties.option_round_value,
         constants.LOGGING: properties.option_logging,
         constants.COMPRESSION: properties.option_compression,
+        constants.INDENT: properties.option_indent,
         constants.COPY_TEXTURES: properties.option_copy_textures,
 
         constants.SCENE: properties.option_export_scene,
-        constants.EMBED_GEOMETRY: properties.option_embed_geometry,
+        #constants.EMBED_GEOMETRY: properties.option_embed_geometry,
         constants.EMBED_ANIMATION: properties.option_embed_animation,
         constants.LIGHTS: properties.option_lights,
         constants.CAMERAS: properties.option_cameras,
@@ -237,6 +243,7 @@ def save_settings_export(properties):
     }
 
     fname = get_settings_fullpath()
+    logging.debug('Saving settings to %s', fname)
     with open(fname, 'w') as stream:
         json.dump(settings, stream)
 
@@ -249,8 +256,11 @@ def restore_settings_export(properties):
 
     fname = get_settings_fullpath()
     if os.path.exists(fname) and os.access(fname, os.R_OK):
-        f = open(fname, 'r')
-        settings = json.load(f)
+        logging.debug('Settings cache found %s', fname)
+        with open(fname, 'r') as fs:
+            settings = json.load(fs)
+    else:
+        logging.debug('No settings file found, using defaults.')
 
     ## Geometry {
     properties.option_vertices = settings.get(
@@ -328,6 +338,10 @@ def restore_settings_export(properties):
         constants.COMPRESSION, 
         constants.NONE)
 
+    properties.option_indent = settings.get(
+        constants.INDENT,
+        constants.EXPORT_OPTIONS[constants.INDENT])
+
     properties.option_copy_textures = settings.get(
         constants.COPY_TEXTURES, 
         constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
@@ -342,9 +356,9 @@ def restore_settings_export(properties):
         constants.SCENE, 
         constants.EXPORT_OPTIONS[constants.SCENE])
 
-    properties.option_embed_geometry = settings.get(
-        constants.EMBED_GEOMETRY, 
-        constants.EXPORT_OPTIONS[constants.EMBED_GEOMETRY])
+    #properties.option_embed_geometry = settings.get(
+    #    constants.EMBED_GEOMETRY, 
+    #    constants.EXPORT_OPTIONS[constants.EMBED_GEOMETRY])
 
     properties.option_lights = settings.get(
         constants.LIGHTS, 
@@ -385,6 +399,15 @@ def compression_types():
 
     return types
 
+def animation_options():
+    anim = [
+        (constants.OFF, constants.OFF.title(), constants.OFF),
+        (constants.POSE, constants.POSE.title(), constants.POSE),
+        (constants.REST, constants.REST.title(), constants.REST)
+    ]
+
+    return anim
+
 class ExportThree(bpy.types.Operator, ExportHelper):
 
     bl_idname='export.three'
@@ -408,7 +431,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=constants.EXPORT_OPTIONS[constants.NORMALS])
 
     option_colors = BoolProperty(
-        name='Colors', 
+        name='Vertex Colors', 
         description='Export vertex colors', 
         default=constants.EXPORT_OPTIONS[constants.COLORS])
 
@@ -476,7 +499,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         (constants.CRITICAL, constants.CRITICAL, constants.CRITICAL)]
 
     option_logging = EnumProperty(
-        name='Logging', 
+        name='', 
         description = 'Logging verbosity level', 
         items=logging_types, 
         default=constants.DEBUG)
@@ -491,11 +514,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name='Scene', 
         description='Export scene', 
         default=constants.EXPORT_OPTIONS[constants.SCENE])
-
-    option_embed_geometry = BoolProperty(
-        name='Embed geometry', 
-        description='Embed geometry', 
-        default=constants.EXPORT_OPTIONS[constants.EMBED_GEOMETRY])
+    
+    #@TODO: removing this option since the ObjectLoader doesn't have
+    #       support for handling external geometry data
+    #option_embed_geometry = BoolProperty(
+    #    name='Embed geometry', 
+    #    description='Embed geometry', 
+    #    default=constants.EXPORT_OPTIONS[constants.EMBED_GEOMETRY])
 
     option_embed_animation = BoolProperty(
         name='Embed animation', 
@@ -522,10 +547,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description='Export animation (morphs)', 
         default=constants.EXPORT_OPTIONS[constants.MORPH_TARGETS])
 
-    option_animation_skeletal = BoolProperty(
-        name='Skeletal animation', 
+    option_animation_skeletal = EnumProperty(
+        name='', 
         description='Export animation (skeletal)', 
-        default=constants.EXPORT_OPTIONS[constants.ANIMATION])
+        items=animation_options(),
+        default=constants.OFF)
 
     option_frame_index_as_time = BoolProperty(
         name='Frame index as time',
@@ -541,8 +567,13 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         soft_max=1000, 
         default=1)
  
+    option_indent = BoolProperty(
+        name='Indent JSON',
+        description='Disable this to reduce the file size',
+        default=constants.EXPORT_OPTIONS[constants.INDENT])
+
     option_compression = EnumProperty(
-        name='Compression', 
+        name='', 
         description = 'Compression options', 
         items=compression_types(), 
         default=constants.NONE)
@@ -585,7 +616,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         ## Geometry {
         row = layout.row()
-        row.label(text='Geometry:')
+        row.label(text='GEOMETRY:')
 
         row = layout.row()
         row.prop(self.properties, 'option_vertices')
@@ -593,6 +624,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_normals')
+        row.prop(self.properties, 'option_uv_coords')
 
         row = layout.row()
         row.prop(self.properties, 'option_bones')
@@ -601,69 +633,66 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
 
-        row = layout.row()
-        row.prop(self.properties, 'option_influences')
         ## }
 
         layout.separator()
 
         ## Materials {
         row = layout.row()
-        row.label(text='Materials:')
-
-        row = layout.row()
-        row.prop(self.properties, 'option_materials')
-        row.prop(self.properties, 'option_uv_coords')
+        row.label(text='- Shading:')
 
         row = layout.row()
         row.prop(self.properties, 'option_face_materials')
-        row.prop(self.properties, 'option_maps')
 
         row = layout.row()
         row.prop(self.properties, 'option_colors')
+
+        row = layout.row()
         row.prop(self.properties, 'option_mix_colors')
         ## }
     
         layout.separator()
 
-        ## Settings {
+        ## Animation {
         row = layout.row()
-        row.label(text='Settings:')
+        row.label(text='- Animation:')
 
         row = layout.row()
-        row.prop(self.properties, 'option_scale')
-        
-        row = layout.row()
-        row = layout.row()
-        row.prop(self.properties, 'option_round_off')
-        row = layout.row()
-        row.prop(self.properties, 'option_round_value')
+        row.prop(self.properties, 'option_animation_morph')
 
         row = layout.row()
-        row = layout.row()
-        row.prop(self.properties, 'option_logging')
+        row.label(text='Skeletal animations:')
 
         row = layout.row()
-        row.prop(self.properties, 'option_compression')
+        row.prop(self.properties, 'option_animation_skeletal')
+
+        layout.row()
+        row = layout.row()
+        row.prop(self.properties, 'option_influences')
 
         row = layout.row()
-        row.prop(self.properties, 'option_copy_textures')
+        row.prop(self.properties, 'option_frame_step')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_frame_index_as_time')
 
         row = layout.row()
         row.prop(self.properties, 'option_embed_animation')
+
         ## }
 
         layout.separator()
 
         ## Scene {
         row = layout.row()
-        row.label(text='Scene:')
+        row.label(text='SCENE:')
 
         row = layout.row()
         row.prop(self.properties, 'option_export_scene')
+        row.prop(self.properties, 'option_materials')
 
-        row = layout.row()
-        row.prop(self.properties, 'option_embed_geometry')
+        #row = layout.row()
+        #row.prop(self.properties, 'option_embed_geometry')
 
         row = layout.row()
         row.prop(self.properties, 'option_lights')
@@ -672,19 +701,43 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         layout.separator()
 
-        ## Animation {
+        ## Settings {
         row = layout.row()
-        row.label(text='Animation:')
+        row.label(text='SETTINGS:')
 
         row = layout.row()
-        row.prop(self.properties, 'option_animation_morph')
+        row.prop(self.properties, 'option_maps')
+
         row = layout.row()
-        row.prop(self.properties, 'option_animation_skeletal')
+        row.prop(self.properties, 'option_copy_textures')
+
         row = layout.row()
-        row.prop(self.properties, 'option_frame_step')
+        row.prop(self.properties, 'option_scale')
+        
+        layout.row()
         row = layout.row()
-        row.prop(self.properties, 'option_frame_index_as_time')
+        row.prop(self.properties, 'option_round_off')
+        row = layout.row()
+        row.prop(self.properties, 'option_round_value')
+
+        layout.row()
+        row = layout.row()
+        row.label(text='Logging verbosity:')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_logging')
+
+        row = layout.row()
+        row.label(text='File compression format:')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_compression')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_indent')
         ## }
+
+
 
 def menu_func_export(self, context):
     default_path = bpy.data.filepath.replace('.blend', constants.EXTENSION)

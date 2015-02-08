@@ -1,4 +1,4 @@
-import uuid
+from . import utilities
 from .. import constants, exceptions 
 
 
@@ -55,8 +55,11 @@ class BaseNode(BaseClass):
     def __init__(self, node, parent, type):
         BaseClass.__init__(self, parent=parent, type=type)
         self.__node = node
-        if node is not None:
+        if node is None:
+            self[constants.UUID] = utilities.id()
+        else:
             self[constants.NAME] = node
+            self[constants.UUID] = utilities.id_from_name(node)
 
         if isinstance(parent, BaseScene):
             scene = parent
@@ -66,9 +69,7 @@ class BaseNode(BaseClass):
             scene = None
 
         self.__scene = scene
-
-        self[constants.UUID] = str(uuid.uuid4()).upper()
-    
+ 
     @property
     def node(self):
         return self.__node

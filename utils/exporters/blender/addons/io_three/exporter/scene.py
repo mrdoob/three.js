@@ -6,6 +6,7 @@ from . import (
     material,
     geometry, 
     object,
+    utilities,
     io,
     api
 )
@@ -74,7 +75,7 @@ class Scene(base_classes.BaseScene):
         data = {}
         
         embed_anim = self.options.get(constants.EMBED_ANIMATION, True)
-        embed = self.options[constants.EMBED_GEOMETRY]
+        embed = self.options.get(constants.EMBED_GEOMETRY, True)
 
         compression = self.options.get(constants.COMPRESSION)
         extension = constants.EXTENSIONS.get(compression, 
@@ -167,8 +168,13 @@ class Scene(base_classes.BaseScene):
 
     def __parse_objects(self): 
         logger.debug('Scene().__parse_objects()')
+        try:
+            scene_name = self[constants.METADATA][constants.SOURCE_FILE]
+        except KeyError:
+            scene_name = constants.SCENE
         self[constants.OBJECT] = object.Object(None, parent=self)
         self[constants.OBJECT][constants.TYPE] = constants.SCENE.title()
+        self[constants.UUID] = utilities.id_from_name(scene_name)
 
         objects = [] 
         for node in api.object.nodes(self.valid_types, self.options):

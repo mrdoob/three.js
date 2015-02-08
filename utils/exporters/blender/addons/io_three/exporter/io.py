@@ -1,7 +1,5 @@
 import os
-import sys
 import shutil
-import traceback
 from .. import constants, logger
 from . import _json
 
@@ -18,21 +16,8 @@ def copy(src, dst):
         file_name = os.path.basename(src)
         dst = os.path.join(dst, file_name)
 
-    if os.path.exists(dst):
-
-        logger.info('Destination file exists, attempting to remove %s', dst)
-        try:
-            os.remove(dst)
-        except:
-            logger.error('Failed to remove destination file')
-            info = sys.exc_info()
-            trace = traceback.format_exception(
-                info[0], info[1], info[2].tb_next)
-            trace = ''.join(trace)
-            logger.error(trace)
-            raise
-
-    shutil.copy(src, dst)
+    if src != dst:
+        shutil.copy(src, dst)
 
 
 def dump(filepath, data, options=None):
@@ -57,8 +42,10 @@ def dump(filepath, data, options=None):
         else:
             _json.ROUND = None
 
+        indent = options.get(constants.INDENT, True)
+        indent = 4 if indent else None
         logger.info('Dumping to JSON')
-        func = lambda x,y: _json.json.dump(x, y, indent=4)
+        func = lambda x,y: _json.json.dump(x, y, indent=indent)
         mode = 'w'
 
     logger.info('Writing to %s', filepath)

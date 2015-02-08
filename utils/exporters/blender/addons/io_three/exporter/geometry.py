@@ -292,7 +292,7 @@ class Geometry(base_classes.BaseNode):
             if not option:
                 continue
 
-            array = func(self.node, self.options)
+            array = func(self.node, self.options) or []
             if not array: 
                 logger.warning('No array could be made for %s', key)
                 continue
@@ -307,37 +307,38 @@ class Geometry(base_classes.BaseNode):
         if self.options.get(constants.VERTICES):
             logger.info('Parsing %s', constants.VERTICES)
             self[constants.VERTICES] = api.mesh.vertices(
-                self.node, self.options)
-
-        if self.options.get(constants.FACES):
-            logger.info('Parsing %s', constants.FACES)
-            self[constants.FACES] = api.mesh.faces(
-                self.node, self.options)
+                self.node, self.options) or []
 
         if self.options.get(constants.NORMALS):
             logger.info('Parsing %s', constants.NORMALS)
             self[constants.NORMALS] = api.mesh.normals(
-                self.node, self.options)
+                self.node, self.options) or []
 
         if self.options.get(constants.COLORS):
             logger.info('Parsing %s', constants.COLORS)
             self[constants.COLORS] = api.mesh.vertex_colors(
-                self.node)
+                self.node) or []
         
         if self.options.get(constants.FACE_MATERIALS):
             logger.info('Parsing %s', constants.FACE_MATERIALS)
             self[constants.MATERIALS] = api.mesh.materials(
-                self.node, self.options)
+                self.node, self.options) or []
 
         if self.options.get(constants.UVS):
             logger.info('Parsing %s', constants.UVS)
             self[constants.UVS] = api.mesh.uvs(
-                self.node, self.options)
+                self.node, self.options) or []
 
-        if self.options.get(constants.ANIMATION):
+        if self.options.get(constants.FACES):
+            logger.info('Parsing %s', constants.FACES)
+            self[constants.FACES] = api.mesh.faces(
+                self.node, self.options) or []
+
+        no_anim = (None, False, constants.OFF)
+        if self.options.get(constants.ANIMATION) not in no_anim:
             logger.info('Parsing %s', constants.ANIMATION)
-            self[constants.ANIMATION] = api.mesh.animation(
-                self.node, self.options)
+            self[constants.ANIMATION] = api.mesh.skeletal_animation(
+                self.node, self.options) or []
 
         #@TODO: considering making bones data implied when
         #       querying skinning data
@@ -345,7 +346,7 @@ class Geometry(base_classes.BaseNode):
         bone_map = {}
         if self.options.get(constants.BONES):
             logger.info('Parsing %s', constants.BONES)
-            bones, bone_map = api.mesh.bones(self.node)
+            bones, bone_map = api.mesh.bones(self.node, self.options)
             self[constants.BONES] = bones
 
         if self.options.get(constants.SKINNING):

@@ -34,6 +34,7 @@ MAPPING_TYPES = type('Mapping', (), {
 
 JSON = 'json'
 EXTENSION = '.%s' % JSON
+INDENT = 'indent'
 
 
 MATERIALS = 'materials'
@@ -52,6 +53,8 @@ FRAME_STEP = 'frameStep'
 FRAME_INDEX_AS_TIME = 'frameIndexAsTime'
 ANIMATION = 'animations'
 MORPH_TARGETS = 'morphTargets'
+POSE = 'pose'
+REST = 'rest'
 SKIN_INDICES = 'skinIndices'
 SKIN_WEIGHTS = 'skinWeights'
 LOGGING = 'logging'
@@ -65,6 +68,7 @@ PRECISION = 'precision'
 DEFAULT_PRECISION = 6
 EMBED_GEOMETRY = 'embedGeometry'
 EMBED_ANIMATION = 'embedAnimation'
+OFF = 'off'
 
 GLOBAL = 'global'
 BUFFER_GEOMETRY = 'BufferGeometry'
@@ -95,11 +99,11 @@ EXPORT_OPTIONS = {
     SCALE: 1,
     FRAME_STEP: 1,
     FRAME_INDEX_AS_TIME: False,
-    SCENE: True,
+    SCENE: False,
     MIX_COLORS: False,
     COMPRESSION: None,
     MAPS: False,
-    ANIMATION: False,
+    ANIMATION: OFF,
     BONES: False,
     SKINNING: False,
     MORPH_TARGETS: False,
@@ -112,7 +116,8 @@ EXPORT_OPTIONS = {
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: GEOMETRY,
-    INFLUENCES_PER_VERTEX: 2
+    INFLUENCES_PER_VERTEX: 2,
+    INDENT: True
 }
 
 
