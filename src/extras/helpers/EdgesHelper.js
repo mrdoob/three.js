@@ -12,7 +12,17 @@ THREE.EdgesHelper = function ( object, hex ) {
 	var keys = [ 'a', 'b', 'c' ];
 	var geometry = new THREE.BufferGeometry();
 
-	var geometry2 = object.geometry.clone();
+	var geometry2;
+	if ( object.geometry instanceof THREE.BufferGeometry ) {
+
+		geometry2 = new THREE.Geometry();
+		geometry2.fromBufferGeometry( object.geometry );
+
+	} else {
+
+		geometry2 = object.geometry.clone();
+
+	}
 
 	geometry2.mergeVertices();
 	geometry2.computeFaceNormals();
