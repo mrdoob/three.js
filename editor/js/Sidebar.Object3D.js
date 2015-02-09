@@ -29,7 +29,10 @@ Sidebar.Object3D = function ( editor ) {
 	} );
 	objectActions.onClick( function ( event ) {
 
-		event.stopPropagation();
+		event.stopPropagation(); // Avoid panel collapsing
+
+	} );
+	objectActions.onChange( function ( event ) {
 
 		var object = editor.selected;
 
