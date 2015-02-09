@@ -155,7 +155,7 @@ Editor.prototype = {
 
 	},
 
-	setObjectName: function ( object, name ) {
+	nameObject: function ( object, name ) {
 
 		object.name = name;
 		this.signals.sceneGraphChanged.dispatch();

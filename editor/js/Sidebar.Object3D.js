@@ -81,7 +81,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectNameRow = new UI.Panel();
 	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-			editor.setObjectName( editor.selected, objectName.getValue() );
+			editor.nameObject( editor.selected, objectName.getValue() );
 
 	} );
 
