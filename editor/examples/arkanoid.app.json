@@ -6,7 +6,7 @@
 			"generator": "ObjectExporter"
 		},
 		"object": {
-			"uuid": "A32F9E56-4DDC-442E-8A0D-F23B9E93EEA9",
+			"uuid": "8EFB9C06-6312-4975-B04A-C9E4549BE348",
 			"type": "PerspectiveCamera",
 			"name": "Camera",
 			"fov": 50,
@@ -107,7 +107,7 @@
 					"name": "Ground",
 					"geometry": "8F05A1F2-3877-478B-8DFC-F572AC61AB3A",
 					"material": "2F69AF3A-DDF5-4BBA-87B5-80159F90DDBF",
-					"matrix": [1,0,0,0,0,0.0007962886593304574,-0.9999997019767761,0,0,0.9999997019767761,0.0007962886593304574,0,0,0,0,1]
+					"matrix": [1,0,0,0,0,0.000796250649727881,-0.9999997019767761,0,0,0.9999997019767761,0.000796250649727881,0,0,0,0,1]
 				},
 				{
 					"uuid": "6EE2E764-43E0-48E0-85F2-E0C8823C20DC",
@@ -148,6 +148,7 @@
 					"color": 16777215,
 					"intensity": 1,
 					"distance": 0,
+					"decay": 1,
 					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,-116.54356384277344,69.48957061767578,-206.8248291015625,1]
 				}]
 		}
@@ -161,7 +162,7 @@
 		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
 			{
 				"name": "Game Logic",
-				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = - 0.5;\ndirection.normalize();\n\nvar speed = new THREE.Vector3();\n\n//\n\nvar group = new THREE.Group();\nthis.add( group );\n\nvar paddle = this.getObjectByName( 'Paddle' );\ngroup.add( paddle );\n\nvar brick = this.getObjectByName( 'Brick' );\n\nfor ( var j = 0; j < 8; j ++ ) {\n\n\tvar material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );\n\n\tfor ( var i = 0; i < 12; i ++ ) {\n\t\t\n\t\tvar object = brick.clone();\n\t\tobject.material = material;\n\t\tobject.position.x = i * 22 - 120;\n\t\tobject.position.z = j * 14 - 120;\n\t\tgroup.add( object );\n\t\t\n\t}\n\t\n}\n\nbrick.visible = false;\n\n//\n\nvar raycaster = new THREE.Raycaster();\n\nfunction update( event ) {\n\t\n\tif ( ball.position.x < - 150 || ball.position.x > 150 ) direction.x = - direction.x;\n\tif ( ball.position.z < - 200 || ball.position.z > 200 ) direction.z = - direction.z;\n\n\tball.position.add( speed.copy( direction ).multiplyScalar( 4 ) );\n\t\n\traycaster.set( ball.position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( group.children );\n\t\n\tif ( intersections.length > 0 ) {\n\t\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 5 ) {\n\t\t\t\n\t\t\tif ( intersection.object !== paddle ) {\n\n\t\t\t\tgroup.remove( intersection.object );\n\t\t\t\t\n\t\t\t}\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n}"
+				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = - 0.5;\ndirection.normalize();\n\nvar speed = new THREE.Vector3();\n\n//\n\nvar group = new THREE.Group();\nthis.add( group );\n\nvar paddle = this.getObjectByName( 'Paddle' );\ngroup.add( paddle );\n\nvar brick = this.getObjectByName( 'Brick' );\n\nfor ( var j = 0; j < 8; j ++ ) {\n\n\tvar material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );\n\n\tfor ( var i = 0; i < 12; i ++ ) {\n\t\t\n\t\tvar object = brick.clone();\n\t\tobject.material = material;\n\t\tobject.position.x = i * 22 - 120;\n\t\tobject.position.z = j * 14 - 120;\n\t\tgroup.add( object );\n\t\t\n\t}\n\t\n}\n\nbrick.visible = false;\n\n//\n\nvar raycaster = new THREE.Raycaster();\n\nfunction update( event ) {\n\t\n\tif ( ball.position.x < - 150 || ball.position.x > 150 ) direction.x = - direction.x;\n\tif ( ball.position.z < - 200 || ball.position.z > 200 ) direction.z = - direction.z;\n\n\tball.position.add( speed.copy( direction ).multiplyScalar( event.delta / 4 ) );\n\t\n\traycaster.set( ball.position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( group.children );\n\t\n\tif ( intersections.length > 0 ) {\n\t\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 5 ) {\n\t\t\t\n\t\t\tif ( intersection.object !== paddle ) {\n\n\t\t\t\tgroup.remove( intersection.object );\n\t\t\t\t\n\t\t\t}\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n}"
 			}]
 	}
 }

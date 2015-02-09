@@ -102,15 +102,17 @@ var APP = {
 
 		};
 
-		var request;
+		var prevTime, request;
 
 		var animate = function ( time ) {
 
 			request = requestAnimationFrame( animate );
 
-			dispatch( events.update, { time: time } );
+			dispatch( events.update, { time: time, delta: time - prevTime } );
 
 			renderer.render( scene, camera );
+
+			prevTime = time;
 
 		};
 
@@ -126,6 +128,7 @@ var APP = {
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
 			request = requestAnimationFrame( animate );
+			prevTime = performance.now();
 
 		};
 
