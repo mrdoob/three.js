@@ -15,7 +15,14 @@ LEVELS = {
     constants.CRITICAL: logging.CRITICAL
 }
 
+
 def init(filename, level=constants.DEBUG):
+    """Initialize the logger.
+
+    :param filename: base name of the log file
+    :param level: logging level (Default = DEBUG)
+
+    """
     global LOG_FILE
     LOG_FILE = os.path.join(tempfile.gettempdir(), filename)
     with open(LOG_FILE, 'w'):
