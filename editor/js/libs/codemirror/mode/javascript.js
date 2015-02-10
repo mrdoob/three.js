@@ -19,7 +19,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   var jsonldMode = parserConfig.jsonld;
   var jsonMode = parserConfig.json || jsonldMode;
   var isTS = parserConfig.typescript;
-  var wordRE = parserConfig.wordCharacters || /[\w$]/;
+  var wordRE = parserConfig.wordCharacters || /[\w$\xa1-\uffff]/;
 
   // Tokenizer
 
@@ -205,6 +205,8 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
         ++depth;
       } else if (wordRE.test(ch)) {
         sawSomething = true;
+      } else if (/["'\/]/.test(ch)) {
+        return;
       } else if (sawSomething && !depth) {
         ++pos;
         break;
@@ -391,7 +393,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   function maybeoperatorNoComma(type, value, noComma) {
     var me = noComma == false ? maybeoperatorComma : maybeoperatorNoComma;
     var expr = noComma == false ? expression : expressionNoComma;
-    if (value == "=>") return cont(pushcontext, noComma ? arrowBodyNoComma : arrowBody, popcontext);
+    if (type == "=>") return cont(pushcontext, noComma ? arrowBodyNoComma : arrowBody, popcontext);
     if (type == "operator") {
       if (/\+\+|--/.test(value)) return cont(me);
       if (value == "?") return cont(expression, expect(":"), expr);
@@ -417,13 +419,11 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   }
   function arrowBody(type) {
     findFatArrow(cx.stream, cx.state);
-    if (type == "{") return pass(statement);
-    return pass(expression);
+    return pass(type == "{" ? statement : expression);
   }
   function arrowBodyNoComma(type) {
     findFatArrow(cx.stream, cx.state);
-    if (type == "{") return pass(statement);
-    return pass(expressionNoComma);
+    return pass(type == "{" ? statement : expressionNoComma);
   }
   function maybelabel(type) {
     if (type == ":") return cont(poplex, statement);
@@ -592,7 +592,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   }
   function maybeArrayComprehension(type) {
     if (type == "for") return pass(comprehension, expect("]"));
-    if (type == ",") return cont(commasep(expressionNoComma, "]"));
+    if (type == ",") return cont(commasep(maybeexpressionNoComma, "]"));
     return pass(commasep(expressionNoComma, "]"));
   }
   function comprehension(type) {
@@ -658,7 +658,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
       else return lexical.indented + (closing ? 0 : indentUnit);
     },
 
-    electricChars: ":{}",
+    electricInput: /^\s*(?:case .*?:|default:|\{|\})$/,
     blockCommentStart: jsonMode ? null : "/*",
     blockCommentEnd: jsonMode ? null : "*/",
     lineComment: jsonMode ? null : "//",

@@ -147,6 +147,7 @@ THREE.ShaderDeferred = {
 			"uniform float wrapAround;",
 			"uniform float additiveSpecular;",
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
@@ -225,11 +226,7 @@ THREE.ShaderDeferred = {
 
 					"#endif",
 
-					"#ifdef GAMMA_INPUT",
-
-						"cubeColor.xyz *= cubeColor.xyz;",
-
-					"#endif",
+					"cubeColor.xyz = inputToLinear( cubeColor.xyz );",
 
 					"if ( combine == 1 ) {",
 
@@ -308,6 +305,7 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "map_pars_vertex" ],
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],

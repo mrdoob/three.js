@@ -49,6 +49,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	};
 
+	this.setPixelRatio = function () {};
+
 	this.setSize = function ( width, height ) {
 
 		canvas.width = width;

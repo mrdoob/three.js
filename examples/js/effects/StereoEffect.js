@@ -122,14 +122,18 @@ THREE.StereoEffect = function ( renderer ) {
 
 		//
 
-		renderer.setViewport( 0, 0, _width * 2, _height );
 		renderer.clear();
+		renderer.enableScissorTest( true );
 
+		renderer.setScissor( 0, 0, _width, _height );
 		renderer.setViewport( 0, 0, _width, _height );
 		renderer.render( scene, _cameraL );
 
+		renderer.setScissor( _width, 0, _width, _height );
 		renderer.setViewport( _width, 0, _width, _height );
 		renderer.render( scene, _cameraR );
+
+		renderer.enableScissorTest( false );
 
 	};
 

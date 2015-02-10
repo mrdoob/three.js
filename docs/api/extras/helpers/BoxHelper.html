@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Line] &rarr;
+		
+		<h1>[name]</h1>
+
+		<div class="desc">Helper object to show a wireframe box (with no face diagonals) around an object</div>
+
+
+		<h2>Example</h2>
+
+		<code>var sphere = new THREE.SphereGeometry();
+		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial(0xff0000) );
+		var box = new THREE.BoxHelper( object );
+		scene.add( box );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Object3D object] )</h3>
+		<div>Creates a new wireframe box matching the size of the passed box.</div>
+
+		<h2>Properties</h2>
+
+		<div>(none)</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null update]( [page:Object3D object] )</h3>
+		<div>
+		Updates the helper's geometry to match the dimensions of the [page:Geometry.boundingBox bounding box] of the passed object's geometry.
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

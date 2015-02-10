@@ -121,7 +121,7 @@ scene.add( spotLight );</code>
 		
 		<h3>[property:Float shadowBias]</h3>
 		<div>
-			Shadow map bias.<br />
+			Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br />
 			Default — *0*.
 		</div>
 
@@ -143,49 +143,24 @@ scene.add( spotLight );</code>
 			Default — *512*.
 		</div>
 		
-		<h3>[property:Float shadowBias]</h3>
+		<h3>[property:Vector2 shadowMapSize]</h3>
 		<div>
-			Shadow map bias.<br />
-			Default — *0*.
-		</div>
-
-		<h3>[property:Float shadowDarkness]</h3>
-		<div>
-			Darkness of shadow casted by this light (from *0* to *1*).<br />
-			Default — *0.5*.
-		</div>
-
-		<h3>[property:Integer shadowMapWidth]</h3>
-		<div>
-			Shadow map texture width in pixels.<br />
-			Default — *512*.
-		</div>
-
-		<h3>[property:Integer shadowMapHeight]</h3>
-		<div>
-			Shadow map texture height in pixels.<br />
-			Default — *512*.
-		</div>
-
-
-		<h3>[property:object shadowMatrix]</h3>
-		<div>
-		todo
+			The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering.
 		</div> 
 
-		<h3>[property:object shadowMapSize]</h3>
+		<h3>[property:PerspectiveCamera shadowCamera]</h3>
 		<div>
-		todo
+			The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings.
 		</div> 
 
-		<h3>[property:object shadowCamera]</h3>
+		<h3>[property:Matrix4 shadowMatrix]</h3>
 		<div>
-		todo
+			Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering.
 		</div> 
 
-		<h3>[property:object shadowMap]</h3>
+		<h3>[property:WebGLRenderTarget shadowMap]</h3>
 		<div>
-		todo
+		    The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
 		</div> 
 
 		<h2>Methods</h2>		

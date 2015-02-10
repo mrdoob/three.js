@@ -1,24 +1,27 @@
-﻿.FancySelect {
+﻿.Outliner {
+	color: #444;
 	background: #fff;
-	border: 1px solid #ccc;
 	padding: 0;
+	width: 100%;
+	height: 140px;
+	font-size: 12px;
 	cursor: default;
 	overflow: auto;
 	outline: none;
 }
 
-	.FancySelect .option {
+	.Outliner .option {
 		padding: 4px;
 		color: #666;
 		white-space: nowrap;
 	}
 
-	.FancySelect .option.active {
+	.Outliner .option.active {
 		background-color: #f8f8f8;
 	}
 
 input.Number {
-	color: #0080f0;
+	color: #0080f0!important;
 	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
 	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
 	border: 1px solid transparent;
@@ -37,6 +40,15 @@ input.Number {
 	#viewport #info {
 		text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
 	}
+
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+	opacity: 0.9;
+}
 
 #player {
 	position: absolute;
@@ -81,7 +93,7 @@ input.Number {
 			display: none;
 			padding: 5px 0px;
 			background: #eee;
-			width: 140px;
+			width: 150px;
 		}
 
 		#menubar .menu:hover .options {
@@ -119,10 +131,15 @@ input.Number {
 	overflow: auto;
 }
 
+	#sidebar * {
+		vertical-align: middle;
+	}
+
 	#sidebar input,
 	#sidebar textarea,
 	#sidebar select {
-		/* background: #ccc; */
+		border: 1px solid transparent;
+		color: #444;
 	}
 
 	#sidebar .Panel {
@@ -139,13 +156,6 @@ input.Number {
 		border-top: 1px solid #ccc;
 	}
 
-	#sidebar #outliner {
-		width: 100%;
-		height: 140px;
-		color: #444;
-		font-size: 12px;
-	}
-
 #toolbar {
 	position: absolute;
 	left: 0px;
@@ -155,6 +165,10 @@ input.Number {
 	background: #eee;
 	color: #333;
 }
+
+	#toolbar * {
+		vertical-align: middle;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;

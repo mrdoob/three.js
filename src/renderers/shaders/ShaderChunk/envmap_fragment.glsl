@@ -4,10 +4,8 @@
 
 		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );
 
-		// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
 		// Transforming Normal Vectors with the Inverse Transformation
-
-		vec3 worldNormal = normalize( vec3( vec4( normal, 0.0 ) * viewMatrix ) );
+		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
@@ -36,8 +34,8 @@
 
 	#elif defined( ENVMAP_TYPE_EQUIREC )
 		vec2 sampleUV;
-		sampleUV.y = clamp( flipNormal * reflectVec.y * 0.5 + 0.5, 0.0, 1.0);
-		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * 0.15915494309189533576888376337251 + 0.5; // reciprocal( 2 PI ) + 0.5
+		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );
+		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
 		vec4 envColor = texture2D( envMap, sampleUV );
 		
 	#elif defined( ENVMAP_TYPE_SPHERE )
@@ -45,11 +43,7 @@
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
 	#endif
 
-	#ifdef GAMMA_INPUT
-
-		envColor.xyz *= envColor.xyz;
-
-	#endif
+	envColor.xyz = inputToLinear( envColor.xyz );
 
 	#ifdef ENVMAP_BLENDING_MULTIPLY
 

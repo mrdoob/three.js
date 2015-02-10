@@ -28,7 +28,7 @@
 	"depthWrite" : true,
 	"shading" : "Phong",
 	"specularCoef" : 50,
-	"transparency" : 1.0,
+	"opacity" : 1.0,
 	"transparent" : false,
 	"vertexColors" : false
 	},

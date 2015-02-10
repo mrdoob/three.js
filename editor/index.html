@@ -36,14 +36,20 @@
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
+		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
+		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
+		<script src="js/libs/codemirror/codemirror.js"></script>
+		<script src="js/libs/codemirror/mode/javascript.js"></script>
+
 		<script src="js/libs/jszip.min.js"></script>
+		<script src="js/libs/sortable.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
-		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/libs/app.js"></script>
 		<script src="js/Player.js"></script>
+		<script src="js/Script.js"></script>
 
 		<script src="js/Storage.js"></script>
 
@@ -56,10 +62,11 @@
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
+		<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
-		<script src="js/Sidebar.Renderer.js"></script>
+		<script src="js/Sidebar.Project.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
 		<script src="js/Sidebar.Object3D.js"></script>
 		<script src="js/Sidebar.Animation.js"></script>
@@ -77,7 +84,6 @@
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
-		<script src="js/Sidebar.Script.Editor.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
@@ -97,6 +103,9 @@
 
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
+
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
 
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
@@ -169,13 +178,16 @@
 
 				var signals = editor.signals;
 
+				signals.editorCleared.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
+				signals.scriptChanged.add( saveState );
 
+				/*
 				var showDialog = function ( content ) {
 
 					dialog.clear();
@@ -186,6 +198,7 @@
 				};
 
 				signals.showDialog.add( showDialog );
+				*/
 
 			} );
 
@@ -201,7 +214,12 @@
 			document.addEventListener( 'drop', function ( event ) {
 
 				event.preventDefault();
-				editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				if ( event.dataTransfer.files.length > 0 ) {
+
+					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				}
 
 			}, false );
 
@@ -211,11 +229,6 @@
 
 					case 8: // prevent browser back
 						event.preventDefault();
-						break;
-					case 46: // delete
-						var parent = editor.selected.parent;
-						editor.removeObject( editor.selected );
-						editor.select( parent );
 						break;
 
 				}
@@ -231,6 +244,33 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
+
+			//
+
+			var file = null;
+			var hash = window.location.hash;
+
+			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
+			if ( hash.substr( 1, 6 ) === 'scene=' ) file = hash.substr( 7 );
+
+			if ( file !== null ) {
+
+				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+
+					var loader = new THREE.XHRLoader();
+					loader.crossOrigin = '';
+					loader.load( file, function ( text ) {
+
+						var json = JSON.parse( text );
+
+						editor.clear();
+						editor.fromJSON( json );
+
+					} );
+
+				}
+
+			}
 
 		</script>
 	</body>

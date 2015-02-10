@@ -22,7 +22,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 52.941176,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -35,7 +35,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 52.941176,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -48,7 +48,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 15.686275,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -61,7 +61,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 35.294118,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -74,7 +74,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 64.705882,
-	"transparency" : 0.5
+	"opacity" : 0.5
 	},
 
 	{
@@ -87,7 +87,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 64.705882,
-	"transparency" : 0.5
+	"opacity" : 0.5
 	},
 
 	{
@@ -100,7 +100,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 15.686275,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -113,7 +113,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 64.705882,
-	"transparency" : 0.5
+	"opacity" : 0.5
 	}],
 
     "buffers": "veyron_body_bin.bin"

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '70dev' };
+var THREE = { REVISION: '71dev' };
 
 // browserify support
 
@@ -149,6 +149,7 @@ THREE.UnsignedShortType = 1012;
 THREE.IntType = 1013;
 THREE.UnsignedIntType = 1014;
 THREE.FloatType = 1015;
+THREE.HalfFloatType = 1025;
 
 // Pixel types
 

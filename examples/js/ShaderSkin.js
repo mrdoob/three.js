@@ -38,7 +38,6 @@ THREE.ShaderSkin = {
 
 			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"ambient":  { type: "c", value: new THREE.Color( 0x050505 ) },
 			"opacity": 	  { type: "f", value: 1 },
 
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
@@ -65,7 +64,6 @@ THREE.ShaderSkin = {
 			"uniform bool enableBump;",
 			"uniform bool enableSpecular;",
 
-			"uniform vec3 ambient;",
 			"uniform vec3 diffuse;",
 			"uniform vec3 specular;",
 			"uniform float opacity;",
@@ -105,11 +103,13 @@ THREE.ShaderSkin = {
 				"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecay[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
 			"varying vec3 vViewPosition;",
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
@@ -202,10 +202,7 @@ THREE.ShaderSkin = {
 
 						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
-						"float lDistance = 1.0;",
-
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 
@@ -215,8 +212,8 @@ THREE.ShaderSkin = {
 
 						"float pointSpecularWeight = KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"pointTotal    += lDistance * diffuse * pointLightColor[ i ] * pointDiffuseWeight;",
-						"specularTotal += lDistance * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
+						"pointTotal    += attenuation * diffuse * pointLightColor[ i ] * pointDiffuseWeight;",
+						"specularTotal += attenuation * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -230,9 +227,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-
-						"vec3 dirVector = normalize( lDirection.xyz );",
+						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
 
 						"float dirDiffuseWeightFull = max( dot( normal, dirVector ), 0.0 );",
 						"float dirDiffuseWeightHalf = max( 0.5 * dot( normal, dirVector ) + 0.5, 0.0 );",
@@ -255,8 +250,7 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
-						"vec3 lVector = normalize( lDirection.xyz );",
+						"vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );",
 
 						"float dotProduct = dot( normal, lVector );",
 						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
@@ -295,7 +289,7 @@ THREE.ShaderSkin = {
 					"totalLight += hemiTotal;",
 				"#endif",
 
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * ambient ) + specularTotal;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * diffuse ) + specularTotal;",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -314,6 +308,7 @@ THREE.ShaderSkin = {
 
 			"varying vec3 vViewPosition;",
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -377,7 +372,6 @@ THREE.ShaderSkin = {
 
 			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"ambient":  { type: "c", value: new THREE.Color( 0x050505 ) },
 			"opacity": 	  { type: "f", value: 1 },
 
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
@@ -389,7 +383,6 @@ THREE.ShaderSkin = {
 
 		fragmentShader: [
 
-			"uniform vec3 ambient;",
 			"uniform vec3 diffuse;",
 			"uniform vec3 specular;",
 			"uniform float opacity;",
@@ -430,6 +423,7 @@ THREE.ShaderSkin = {
 
 			"varying vec3 vViewPosition;",
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 			"float fresnelReflectance( vec3 H, vec3 V, float F0 ) {",
@@ -526,9 +520,7 @@ THREE.ShaderSkin = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-
-						"vec3 dirVector = normalize( lDirection.xyz );",
+						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
 
 						"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
@@ -595,7 +587,7 @@ THREE.ShaderSkin = {
 
 					"gl_FragColor.xyz *= pow( colDiffuse.xyz, vec3( 0.5 ) );",
 
-					"gl_FragColor.xyz += ambientLightColor * ambient * colDiffuse.xyz + specularTotal;",
+					"gl_FragColor.xyz += ambientLightColor * diffuse * colDiffuse.xyz + specularTotal;",
 
 					"#ifndef VERSION1",
 
@@ -632,12 +624,15 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecay[ MAX_POINT_LIGHTS ];",
 
 				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
 			"varying vec3 vViewPosition;",
+
+			THREE.ShaderChunk[ "common" ],
 
 			"void main() {",
 
@@ -668,14 +663,11 @@ THREE.ShaderSkin = {
 
 						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-						"float lDistance = 1.0;",
-
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 
-						"vPointLight[ i ] = vec4( lVector, lDistance );",
+						"vPointLight[ i ] = vec4( lVector, attenuation );",
 
 					"}",
 
@@ -721,12 +713,15 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecay[ MAX_POINT_LIGHTS ];",
 
 				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
 			"varying vec3 vViewPosition;",
+
+			THREE.ShaderChunk[ "common" ],
 
 			"void main() {",
 
@@ -757,14 +752,11 @@ THREE.ShaderSkin = {
 
 						"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-						"float lDistance = 1.0;",
-
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 
-						"vPointLight[ i ] = vec4( lVector, lDistance );",
+						"vPointLight[ i ] = vec4( lVector, attenuation );",
 
 					"}",
 

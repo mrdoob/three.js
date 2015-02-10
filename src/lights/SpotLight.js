@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
+THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay ) {
 
 	THREE.Light.call( this, color );
 
@@ -15,6 +15,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
+	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
 	this.castShadow = false;
 	this.onlyShadow = false;
@@ -57,6 +58,7 @@ THREE.SpotLight.prototype.clone = function () {
 	light.distance = this.distance;
 	light.angle = this.angle;
 	light.exponent = this.exponent;
+	light.decay = this.decay;
 
 	light.castShadow = this.castShadow;
 	light.onlyShadow = this.onlyShadow;

@@ -148,7 +148,7 @@
 
 				// common material parameters
 
-				var ambient = 0x050505, diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
+				var diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
 
 				// normal map shader
 
@@ -172,7 +172,6 @@
 
 				uniforms[ "diffuse" ].value.setHex( diffuse );
 				uniforms[ "specular" ].value.setHex( specular );
-				uniforms[ "ambient" ].value.setHex( ambient );
 
 				uniforms[ "shininess" ].value = shininess;
 
@@ -181,7 +180,6 @@
 
 				uniforms[ "diffuse" ].value.convertGammaToLinear();
 				uniforms[ "specular" ].value.convertGammaToLinear();
-				uniforms[ "ambient" ].value.convertGammaToLinear();
 
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
@@ -190,7 +188,6 @@
 				var material2 = new THREE.MeshPhongMaterial( {
 					color: diffuse,
 					specular: specular,
-					ambient: ambient,
 					shininess: shininess,
 					normalMap: uniforms[ "tNormal" ].value,
 					normalScale: uniforms[ "uNormalScale" ].value,

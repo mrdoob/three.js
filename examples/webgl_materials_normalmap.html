@@ -120,7 +120,6 @@
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xdddddd,
-					ambient: 0x111111,
 					specular: 0x222222,
 					shininess: 35,
 					map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ),
@@ -137,7 +136,7 @@
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x111111, 1 );
+				renderer.setClearColor( 0x111111 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

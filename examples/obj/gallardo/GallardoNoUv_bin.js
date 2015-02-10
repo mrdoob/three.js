@@ -22,7 +22,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -35,7 +35,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -48,7 +48,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 7.843137,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -61,7 +61,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 25.490196,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -74,7 +74,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -87,7 +87,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -100,7 +100,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	}],
 
     "buffers": "GallardoNoUv_bin.bin"

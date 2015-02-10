@@ -102,10 +102,6 @@ THREE.Projector = function () {
 
 	_renderData = { objects: [], lights: [], elements: [] },
 
-	_vA = new THREE.Vector3(),
-	_vB = new THREE.Vector3(),
-	_vC = new THREE.Vector3(),
-
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 
@@ -471,13 +467,40 @@ THREE.Projector = function () {
 
 					_normalMatrix.getNormalMatrix( _modelMatrix );
 
-					var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+					var material = object.material;
+					
+					var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
 					var objectMaterials = isFaceMaterial === true ? object.material : null;
 
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 						var vertex = vertices[ v ];
-						renderList.pushVertex( vertex.x, vertex.y, vertex.z );
+
+						_vector3.copy( vertex );
+
+						if ( material.morphTargets === true ) {
+
+							var morphTargets = geometry.morphTargets;
+							var morphInfluences = object.morphTargetInfluences;
+
+							for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+								var influence = morphInfluences[ t ];
+
+								if ( influence === 0 ) continue;
+
+								var target = morphTargets[ t ];
+								var targetVertex = target.vertices[ v ];
+
+								_vector3.x += ( targetVertex.x - vertex.x ) * influence;
+								_vector3.y += ( targetVertex.y - vertex.y ) * influence;
+								_vector3.z += ( targetVertex.z - vertex.z ) * influence;
+
+							}
+
+						}
+
+						renderList.pushVertex( _vector3.x, _vector3.y, _vector3.z );
 
 					}
 
@@ -496,51 +519,6 @@ THREE.Projector = function () {
 						var v1 = _vertexPool[ face.a ];
 						var v2 = _vertexPool[ face.b ];
 						var v3 = _vertexPool[ face.c ];
-
-						if ( material.morphTargets === true ) {
-
-							var morphTargets = geometry.morphTargets;
-							var morphInfluences = object.morphTargetInfluences;
-
-							var v1p = v1.position;
-							var v2p = v2.position;
-							var v3p = v3.position;
-
-							_vA.set( 0, 0, 0 );
-							_vB.set( 0, 0, 0 );
-							_vC.set( 0, 0, 0 );
-
-							for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
-
-								var influence = morphInfluences[ t ];
-
-								if ( influence === 0 ) continue;
-
-								var targets = morphTargets[ t ].vertices;
-
-								_vA.x += ( targets[ face.a ].x - v1p.x ) * influence;
-								_vA.y += ( targets[ face.a ].y - v1p.y ) * influence;
-								_vA.z += ( targets[ face.a ].z - v1p.z ) * influence;
-
-								_vB.x += ( targets[ face.b ].x - v2p.x ) * influence;
-								_vB.y += ( targets[ face.b ].y - v2p.y ) * influence;
-								_vB.z += ( targets[ face.b ].z - v2p.z ) * influence;
-
-								_vC.x += ( targets[ face.c ].x - v3p.x ) * influence;
-								_vC.y += ( targets[ face.c ].y - v3p.y ) * influence;
-								_vC.z += ( targets[ face.c ].z - v3p.z ) * influence;
-
-							}
-
-							v1.position.add( _vA );
-							v2.position.add( _vB );
-							v3.position.add( _vC );
-
-							renderList.projectVertex( v1 );
-							renderList.projectVertex( v2 );
-							renderList.projectVertex( v3 );
-
-						}
 
 						if ( renderList.checkTriangleVisibility( v1, v2, v3 ) === false ) continue;
 

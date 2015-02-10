@@ -23,18 +23,9 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'New' );
 	option.onClick( function () {
 
-		if ( confirm( 'Are you sure?' ) ) {
+		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-			editor.config.setKey(
-				'camera/position', [ 500, 250, 500 ],
-				'camera/target', [ 0, 0, 0 ]
-			);
-
-			editor.storage.clear( function () {
-
-				location.href = location.pathname;
-
-			} );
+			editor.clear();
 
 		}
 
@@ -98,7 +89,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output );
+		exportString( output, 'geometry.json' );
 
 	} );
 	options.add( option );
@@ -123,7 +114,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output );
+		exportString( output, 'model.json' );
 
 	} );
 	options.add( option );
@@ -139,7 +130,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output );
+		exportString( output, 'scene.json' );
 
 	} );
 	options.add( option );
@@ -162,7 +153,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.OBJExporter();
 
-		exportString( exporter.parse( object ) );
+		exportString( exporter.parse( object ), 'model.obj' );
 
 	} );
 	options.add( option );
@@ -176,7 +167,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.STLExporter();
 
-		exportString( exporter.parse( editor.scene ) );
+		exportString( exporter.parse( editor.scene ), 'model.stl' );
 
 	} );
 	options.add( option );
@@ -281,16 +272,18 @@ Menubar.File = function ( editor ) {
 	*/
 
 
-
 	//
 
-	var exportString = function ( output ) {
+	var exportString = function ( output, filename ) {
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
 
-		window.open( objectURL, '_blank' );
-		window.focus();
+		var link = document.createElement( 'a' );
+		link.href = objectURL;
+		link.download = filename || 'data.json';
+		link.target = '_blank';
+		link.click();
 
 	};
 

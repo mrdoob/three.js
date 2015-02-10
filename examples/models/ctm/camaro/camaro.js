@@ -16,7 +16,7 @@
 	"mapDiffuse" : "car-ao.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 778.431373,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -30,7 +30,7 @@
 	"mapDiffuse" : "car-ao.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 15.686275,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -44,7 +44,7 @@
 	"mapDiffuse" : "car-ao.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 0.0,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -58,7 +58,7 @@
 	"mapDiffuse" : "car-ao.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 15.686275,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -72,7 +72,7 @@
 	"mapDiffuse" : "car-ao.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 778.431373,
-	"transparency" : 0.34
+	"opacity" : 0.34
 	},
 
 	{
@@ -86,7 +86,7 @@
 	"mapDiffuse" : "car-ao.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 3.921569,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -100,7 +100,7 @@
 	"mapDiffuse" : "car-ao.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 778.431373,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 
@@ -115,7 +115,7 @@
 	"mapDiffuse" : "plane-ao-256.png",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 96.078431,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	}
 	]
 }

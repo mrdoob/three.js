@@ -300,12 +300,6 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.colorAmbient ) {
-
-			mpars.ambient = rgb2hex( m.colorAmbient );
-
-		}
-
 		if ( m.colorEmissive ) {
 
 			mpars.emissive = rgb2hex( m.colorEmissive );
@@ -316,7 +310,14 @@ THREE.Loader.prototype = {
 
 		if ( m.transparency ) {
 
+			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
 			mpars.opacity = m.transparency;
+
+		}
+
+		if ( m.opacity ) {
+
+			mpars.opacity = m.opacity;
 
 		}
 

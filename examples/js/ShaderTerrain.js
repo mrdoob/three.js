@@ -42,7 +42,6 @@ THREE.ShaderTerrain = {
 
 			"diffuse": { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"ambient": { type: "c", value: new THREE.Color( 0x050505 ) },
 			"shininess": { type: "f", value: 30 },
 			"opacity": { type: "f", value: 1 },
 
@@ -57,7 +56,6 @@ THREE.ShaderTerrain = {
 
 		fragmentShader: [
 
-			"uniform vec3 ambient;",
 			"uniform vec3 diffuse;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
@@ -108,11 +106,13 @@ THREE.ShaderTerrain = {
 				"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDecay[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
 
 			"varying vec3 vViewPosition;",
 
+			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
@@ -134,12 +134,8 @@ THREE.ShaderTerrain = {
 					"vec4 colDiffuse1 = texture2D( tDiffuse1, uvOverlay );",
 					"vec4 colDiffuse2 = texture2D( tDiffuse2, uvOverlay );",
 
-					"#ifdef GAMMA_INPUT",
-
-						"colDiffuse1.xyz *= colDiffuse1.xyz;",
-						"colDiffuse2.xyz *= colDiffuse2.xyz;",
-
-					"#endif",
+					"colDiffuse1.xyz = inputToLinear( colDiffuse1.xyz );",
+					"colDiffuse2.xyz = inputToLinear( colDiffuse2.xyz );",
 
 					"gl_FragColor = gl_FragColor * mix ( colDiffuse1, colDiffuse2, 1.0 - texture2D( tDisplacement, uvBase ) );",
 
@@ -174,22 +170,19 @@ THREE.ShaderTerrain = {
 						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
-						"float lDistance = 1.0;",
-						"if ( pointLightDistance[ i ] > 0.0 )",
-							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 
 						"vec3 pointHalfVector = normalize( lVector + viewPosition );",
-						"float pointDistance = lDistance;",
 
 						"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 						"float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );",
 
 						"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-						"pointDiffuse += pointDistance * pointLightColor[ i ] * diffuse * pointDiffuseWeight;",
-						"pointSpecular += pointDistance * pointLightColor[ i ] * specular * pointSpecularWeight * pointDiffuseWeight;",
+						"pointDiffuse += attenuation * pointLightColor[ i ] * diffuse * pointDiffuseWeight;",
+						"pointSpecular += attenuation * pointLightColor[ i ] * specular * pointSpecularWeight * pointDiffuseWeight;",
 
 					"}",
 
@@ -204,9 +197,7 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-						"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-
-						"vec3 dirVector = normalize( lDirection.xyz );",
+						"vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );",
 						"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 
 						"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
@@ -230,8 +221,7 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
-						"vec3 lVector = normalize( lDirection.xyz );",
+						"vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );",
 
 						// diffuse
 
@@ -288,8 +278,8 @@ THREE.ShaderTerrain = {
 
 				"#endif",
 
-				//"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient) + totalSpecular;",
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient + totalSpecular );",
+				//"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse ) + totalSpecular;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * diffuse + totalSpecular );",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
