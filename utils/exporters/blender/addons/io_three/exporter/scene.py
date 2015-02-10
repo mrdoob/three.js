@@ -91,12 +91,10 @@ class Scene(base_classes.BaseScene):
                     if not embed_anim:
                         geometry.write_animation(export_dir)
 
-                    if embed:
-                        for each in value:
-                            geometries.append(each.copy())
-                        continue
-
                     geom_data = geometry.copy()
+                    if embed:
+                        geometries.append(geom_data)
+                        continue
 
                     geo_type = geom_data[constants.TYPE].lower()
                     if geo_type == constants.GEOMETRY.lower():
@@ -177,7 +175,7 @@ class Scene(base_classes.BaseScene):
         self[constants.UUID] = utilities.id_from_name(scene_name)
 
         objects = [] 
-        for node in api.object.nodes(self.valid_types, self.options):
+        for node in api.object.assemblies(self.valid_types, self.options):
             logger.info('Parsing object %s', node)
             obj = object.Object(node, parent=self[constants.OBJECT])
             objects.append(obj)

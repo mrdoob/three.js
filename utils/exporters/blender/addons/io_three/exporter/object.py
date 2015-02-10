@@ -105,11 +105,11 @@ class Object(base_classes.BaseNode):
         elif self[constants.TYPE] in lights:
             self.__init_light()
 
-        #for child in api.object.children(self.node, self.scene.valid_types):
-        #    if not self.get(constants.CHILDREN):
-        #        self[constants.CHILDREN] = [Object(child, parent=self)]
-        #    else:
-        #        self[constants.CHILDREN].append(Object(child, parent=self))
+        for child in api.object.children(self.node, self.scene.valid_types):
+            if not self.get(constants.CHILDREN):
+                self[constants.CHILDREN] = [Object(child, parent=self)]
+            else:
+                self[constants.CHILDREN].append(Object(child, parent=self))
 
     def __root_setup(self):
         logger.debug('Object().__root_setup()')
