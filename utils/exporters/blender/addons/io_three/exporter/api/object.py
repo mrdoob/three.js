@@ -17,7 +17,6 @@ from .constants import (
     PERSP,
     ORTHO,
     RENDER,
-    ZYX,
     NO_SHADOW
 )
 

@@ -26,14 +26,15 @@ class Material(base_classes.BaseNode):
         shader_type = api.material.type(self.node)
         self[constants.TYPE] = dispatch[shader_type]
 
-        ambient = api.material.ambient_color(self.node)
-        self[constants.AMBIENT] = utilities.rgb2int(ambient)
-
         diffuse = api.material.diffuse_color(self.node)
         self[constants.COLOR] = utilities.rgb2int(diffuse)
     
-        emissive = api.material.emissive_color(self.node)
-        self[constants.EMISSIVE] = utilities.rgb2int(emissive)
+        if self[constants.TYPE] != constants.THREE_BASIC:
+            ambient = api.material.ambient_color(self.node)
+            self[constants.AMBIENT] = utilities.rgb2int(ambient)
+
+            emissive = api.material.emissive_color(self.node)
+            self[constants.EMISSIVE] = utilities.rgb2int(emissive)
 
         vertex_color = api.material.use_vertex_colors(self.node)
         self[constants.VERTEX_COLORS] = vertex_color

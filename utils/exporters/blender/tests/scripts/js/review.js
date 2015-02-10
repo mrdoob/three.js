@@ -99,6 +99,10 @@ function loadObject( data ) {
 
             camera = scene.children[ i ];
             var container = document.getElementById( 'viewport' );
+
+            orbit = new THREE.OrbitControls( camera, container );
+            orbit.addEventListener( 'change', render );
+
             var aspect = container.offsetWidth / container.offsetHeight;
             camera.aspect = aspect;
             camera.updateProjectionMatrix();
