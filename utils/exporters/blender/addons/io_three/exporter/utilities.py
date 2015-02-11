@@ -74,7 +74,7 @@ def round_off(value, ndigits=ROUND):
     """Round off values to specified limit
 
     :param value: value(s) to round off
-    :param ndigits: limit (Default = ROUND)
+    :param ndigits: limit (Default value = ROUND)
     :type value: float|list|tuple
     :return: the same data type that was passed
     :rtype: float|list|tuple

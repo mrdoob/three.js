@@ -20,7 +20,7 @@ def init(filename, level=constants.DEBUG):
     """Initialize the logger.
 
     :param filename: base name of the log file
-    :param level: logging level (Default = DEBUG)
+    :param level: logging level (Default value = DEBUG)
 
     """
     global LOG_FILE

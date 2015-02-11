@@ -39,7 +39,7 @@ def dump(filepath, data, options=None):
 
     :param filepath: output file path
     :param data: serializable data to write to disk
-    :param options: (Default = None)
+    :param options: (Default value = None)
     :type options: dict
 
     """

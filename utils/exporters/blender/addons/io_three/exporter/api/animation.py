@@ -4,34 +4,66 @@ from .. import constants, logger, utilities
 
 
 def pose_animation(armature, options):
-    logger.debug('animation.pose_animation %s', armature)
+    """Query armature animation using pose bones
+
+    :param armature:
+    :param options:
+    :returns: list dictionaries containing animationdata
+    :rtype: [{}, {}, ...]
+
+    """
+    logger.debug("animation.pose_animation(%s)", armature)
     func = _parse_pose_action
     return _parse_action(func, armature, options)
 
 
 def rest_animation(armature, options):
-    logger.debug('animation.rest_animation %s', armature)
+    """Query armature animation (REST position)
+
+    :param armature:
+    :param options:
+    :returns: list dictionaries containing animationdata
+    :rtype: [{}, {}, ...]
+
+    """
+    logger.debug("animation.rest_animation(%s)", armature)
     func = _parse_rest_action
     return _parse_action(func, armature, options)
 
 
 def _parse_action(func, armature, options):
+    """
+
+    :param func:
+    :param armature:
+    :param options:
+
+    """
     animations = []
-    logger.info('Parsing %d actions', len(data.actions))
+    logger.info("Parsing %d actions", len(data.actions))
     round_off, round_val = utilities.rounding(options)
     for action in data.actions:
-        logger.info('Parsing action %s', action.name)
+        logger.info("Parsing action %s", action.name)
         animation = func(action, armature, options, round_off, round_val)
         animations.append(animation)
     return animations
 
 
 def _parse_rest_action(action, armature, options, round_off, round_val):
+    """
+
+    :param action:
+    :param armature:
+    :param options:
+    :param round_off:
+    :param round_val:
+
+    """
     end_frame = action.frame_range[1]
     start_frame = action.frame_range[0]
     frame_length = end_frame - start_frame
-    l,r,s = armature.matrix_world.decompose()
-    rotation_matrix = r.to_matrix()
+    rot = armature.matrix_world.decompose()[1]
+    rotation_matrix = rot.to_matrix()
     hierarchy = []
     parent_index = -1
     frame_step = options.get(constants.FRAME_STEP, 1)
@@ -44,22 +76,27 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
         # I believe this was meant to skip control bones, may
         # not be useful. needs more testing
         if bone.use_deform is False:
-            logger.info('Skipping animation data for bone %s', bone.name)
+            logger.info("Skipping animation data for bone %s", bone.name)
             continue
 
-        logger.info('Parsing animation data for bone %s', bone.name)
+        logger.info("Parsing animation data for bone %s", bone.name)
 
         keys = []
         for frame in range(start, end):
             computed_frame = frame * frame_step
-            pos, pchange = _position(bone, computed_frame, 
-                action, armature.matrix_world)
-            rot, rchange = _rotation(bone, computed_frame, 
-                action, rotation_matrix)
+            pos, pchange = _position(bone, computed_frame,
+                                     action, armature.matrix_world)
+            rot, rchange = _rotation(bone, computed_frame,
+                                     action, rotation_matrix)
 
-            # flip y and z
-            px, py, pz = pos.x, pos.z, -pos.y
-            rx, ry, rz, rw = rot.x, rot.z, -rot.y, rot.w
+            if round_off:
+                pos_x, pos_y, pos_z = utilities.round_off(
+                    [pos.x, pos.z, -pos.y], round_val)
+                rot_x, rot_y, rot_z, rot_w = utilities.round_off(
+                    [rot.x, rot.z, -rot.y, rot.w], round_val)
+            else:
+                pos_x, pos_y, pos_z = pos.x, pos.z, -pos.y
+                rot_x, rot_y, rot_z, rot_w = rot.x, rot.z, -rot.y, rot.w
 
             if frame == start_frame:
 
@@ -67,13 +104,13 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
                 #@TODO: missing scale values
                 keyframe = {
                     constants.TIME: time,
-                    constants.POS: [px, py, pz],
-                    constants.ROT: [rx, ry, rz, rw],
+                    constants.POS: [pos_x, pos_y, pos_z],
+                    constants.ROT: [rot_x, rot_y, rot_z, rot_w],
                     constants.SCL: [1, 1, 1]
                 }
                 keys.append(keyframe)
 
-            # END-FRAME: needs pos, rot and scl attributes 
+            # END-FRAME: needs pos, rot and scl attributes
             # with animation length (required frame)
 
             elif frame == end_frame / frame_step:
@@ -81,13 +118,13 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
                 time = frame_length / fps
                 keyframe = {
                     constants.TIME: time,
-                    constants.POS: [px, py, pz],
-                    constants.ROT: [rx, ry, rz, rw],
+                    constants.POS: [pos_x, pos_y, pos_z],
+                    constants.ROT: [rot_x, rot_y, rot_z, rot_w],
                     constants.SCL: [1, 1, 1]
                 }
                 keys.append(keyframe)
 
-            # MIDDLE-FRAME: needs only one of the attributes, 
+            # MIDDLE-FRAME: needs only one of the attributes,
             # can be an empty frame (optional frame)
 
             elif pchange == True or rchange == True:
@@ -96,31 +133,31 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
 
                 if pchange == True and rchange == True:
                     keyframe = {
-                        constants.TIME: time, 
-                        constants.POS: [px, py, pz],
-                        constants.ROT: [rx, ry, rz, rw]
+                        constants.TIME: time,
+                        constants.POS: [pos_x, pos_y, pos_z],
+                        constants.ROT: [rot_x, rot_y, rot_z, rot_w]
                     }
                 elif pchange == True:
                     keyframe = {
-                        constants.TIME: time, 
-                        constants.POS: [px, py, pz]
+                        constants.TIME: time,
+                        constants.POS: [pos_x, pos_y, pos_z]
                     }
                 elif rchange == True:
                     keyframe = {
-                        constants.TIME: time, 
-                        constants.ROT: [rx, ry, rz, rw]
+                        constants.TIME: time,
+                        constants.ROT: [rot_x, rot_y, rot_z, rot_w]
                     }
 
                 keys.append(keyframe)
 
         hierarchy.append({
-            constants.KEYS: keys, 
+            constants.KEYS: keys,
             constants.PARENT: parent_index
         })
         parent_index += 1
 
     animation = {
-        constants.HIERARCHY: hierarchy, 
+        constants.HIERARCHY: hierarchy,
         constants.LENGTH:frame_length / fps,
         constants.FPS: fps,
         constants.NAME: action.name
@@ -130,6 +167,15 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
 
 
 def _parse_pose_action(action, armature, options, round_off, round_val):
+    """
+
+    :param action:
+    :param armature:
+    :param options:
+    :param round_off:
+    :param round_val:
+
+    """
     #@TODO: this seems to fail in batch mode meaning the
     #       user has to have th GUI open. need to improve
     #       this logic to allow batch processing, if Blender
@@ -138,7 +184,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
     context.area.type = 'DOPESHEET_EDITOR'
     context.space_data.mode = 'ACTION'
     context.area.spaces.active.action = action
-    
+
     armature_matrix = armature.matrix_world
     fps = context.scene.render.fps
 
@@ -155,23 +201,23 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
     channels_scale = []
 
     for pose_bone in armature.pose.bones:
-        logger.info('Processing channels for %s', 
+        logger.info("Processing channels for %s",
                     pose_bone.bone.name)
         keys.append([])
         channels_location.append(
-            _find_channels(action, 
+            _find_channels(action,
                            pose_bone.bone,
                            'location'))
         channels_rotation.append(
-            _find_channels(action, 
+            _find_channels(action,
                            pose_bone.bone,
                            'rotation_quaternion'))
         channels_rotation.append(
-            _find_channels(action, 
+            _find_channels(action,
                            pose_bone.bone,
                            'rotation_euler'))
         channels_scale.append(
-            _find_channels(action, 
+            _find_channels(action,
                            pose_bone.bone,
                            'scale'))
 
@@ -183,7 +229,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
         else:
             frame = start_frame + frame_index * frame_step
 
-        logger.info('Processing frame %d', frame)
+        logger.info("Processing frame %d", frame)
 
         time = frame - start_frame
         if frame_index_as_time is False:
@@ -194,7 +240,19 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
         bone_index = 0
 
         def has_keyframe_at(channels, frame):
+            """
+
+            :param channels:
+            :param frame:
+
+            """
             def find_keyframe_at(channel, frame):
+                """
+
+                :param channel:
+                :param frame:
+
+                """
                 for keyframe in channel.keyframe_points:
                     if keyframe.co[0] == frame:
                         return keyframe
@@ -207,7 +265,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
 
         for pose_bone in armature.pose.bones:
 
-            logger.info('Processing bone %s', pose_bone.bone.name)
+            logger.info("Processing bone %s", pose_bone.bone.name)
             if pose_bone.parent is None:
                 bone_matrix = armature_matrix * pose_bone.matrix
             else:
@@ -216,7 +274,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
                 bone_matrix = parent_matrix.inverted() * bone_matrix
 
             pos, rot, scl = bone_matrix.decompose()
-            
+
             pchange = True or has_keyframe_at(
                 channels_location[bone_index], frame)
             rchange = True or has_keyframe_at(
@@ -232,7 +290,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
                 )
                 rot = (
                     utilities.round_off(rot.x, round_val),
-                    utilities.round_off(rot.z, round_val), 
+                    utilities.round_off(rot.z, round_val),
                     -utilities.round_off(rot.y, round_val),
                     utilities.round_off(rot.w, round_val)
                 )
@@ -262,15 +320,15 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
                     keyframe[constants.SCL] = scl
 
             if len(keyframe.keys()) > 1:
-                logger.info('Recording keyframe data for %s %s',
+                logger.info("Recording keyframe data for %s %s",
                             pose_bone.bone.name, str(keyframe))
                 keys[bone_index].append(keyframe)
             else:
-                logger.info('No anim data to record for %s',
+                logger.info("No anim data to record for %s",
                             pose_bone.bone.name)
 
             bone_index += 1
-    
+
     hierarchy = []
     bone_index = 0
     for pose_bone in armature.pose.bones:
@@ -285,9 +343,9 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
 
     context.scene.frame_set(start_frame)
     context.area.type = current_context
-    
+
     animation = {
-        constants.HIERARCHY: hierarchy, 
+        constants.HIERARCHY: hierarchy,
         constants.LENGTH:frame_length,
         constants.FPS: fps,
         constants.NAME: action.name
@@ -297,10 +355,17 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
 
 
 def _find_channels(action, bone, channel_type):
+    """
+
+    :param action:
+    :param bone:
+    :param channel_type:
+
+    """
     result = []
 
     if len(action.groups):
-        
+
         group_index = -1
         for index, group in enumerate(action.groups):
             if group.name == bone.name:
@@ -316,7 +381,7 @@ def _find_channels(action, bone, channel_type):
         bone_label = '"%s"' % bone.name
         for channel in action.fcurves:
             data_path = [bone_label in channel.data_path,
-                channel_type in channel.data_path]
+                         channel_type in channel.data_path]
             if all(data_path):
                 result.append(channel)
 
@@ -324,8 +389,16 @@ def _find_channels(action, bone, channel_type):
 
 
 def _position(bone, frame, action, armature_matrix):
+    """
 
-    position = mathutils.Vector((0,0,0))
+    :param bone:
+    :param frame:
+    :param action:
+    :param armature_matrix:
+
+    """
+
+    position = mathutils.Vector((0, 0, 0))
     change = False
 
     ngroups = len(action.groups)
@@ -379,10 +452,18 @@ def _position(bone, frame, action, armature_matrix):
 
 
 def _rotation(bone, frame, action, armature_matrix):
+    """
+
+    :param bone:
+    :param frame:
+    :param action:
+    :param armature_matrix:
+
+    """
 
     # TODO: calculate rotation also from rotation_euler channels
 
-    rotation = mathutils.Vector((0,0,0,1))
+    rotation = mathutils.Vector((0, 0, 0, 1))
 
     change = False
 
@@ -427,6 +508,13 @@ def _rotation(bone, frame, action, armature_matrix):
 
 
 def _handle_rotation_channel(channel, frame, rotation):
+    """
+
+    :param channel:
+    :param frame:
+    :param rotation:
+
+    """
 
     change = False
 
@@ -454,6 +542,13 @@ def _handle_rotation_channel(channel, frame, rotation):
 
 
 def _handle_position_channel(channel, frame, position):
+    """
+
+    :param channel:
+    :param frame:
+    :param position:
+
+    """
 
     change = False
 

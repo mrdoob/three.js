@@ -115,7 +115,8 @@ class Geometry(base_classes.BaseNode):
     def copy(self, scene=True):
         """Copy the geometry definitions to a standard dictionary.
 
-        :param scene: toggle for scene formatting (Default = True)
+        :param scene: toggle for scene formatting 
+                      (Default value = True)
         :type scene: bool
         :rtype: dict
 
@@ -168,7 +169,8 @@ class Geometry(base_classes.BaseNode):
         """Write the geometry definitions to disk. Uses the
         desitnation path of the scene.
 
-        :param filepath: optional output file path (Default=None)
+        :param filepath: optional output file path 
+                        (Default value = None)
         :type filepath: str
 
         """
