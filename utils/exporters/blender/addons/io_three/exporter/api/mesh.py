@@ -1,7 +1,6 @@
 import operator
-import mathutils
 from bpy import data, types, context
-from . import material, texture
+from . import material, texture, animation
 from . import object as object_
 from .. import constants, utilities, logger, exceptions
 
@@ -21,60 +20,57 @@ def _mesh(func):
 
 
 @_mesh
-def animation(mesh, options):
+def skeletal_animation(mesh, options):
     logger.debug('mesh.animation(%s, %s)', mesh, options)
     armature = _armature(mesh)
-    if armature and armature.animation_data:
-        return _skeletal_animations(armature, options)
+
+    if not armature:
+        logger.warning('No armature found (%s)', mesh)
+        return []
+
+    anim_type = options.get(constants.ANIMATION)
+    #pose_position = armature.data.pose_position
+    dispatch = {
+        constants.POSE: animation.pose_animation,
+        constants.REST: animation.rest_animation
+    }
+    
+    func = dispatch[anim_type]
+    #armature.data.pose_position = anim_type.upper()
+    animations = func(armature, options)
+    #armature.data.pose_position = pose_position
+        
+    return animations
 
 
 @_mesh
-def bones(mesh):
+def bones(mesh, options):
     logger.debug('mesh.bones(%s)', mesh)
     armature = _armature(mesh)
-    if not armature: return
 
-    bones = []
-    bone_map = {}
-    bone_count = 0
-    bone_index_rel = 0
+    if not armature: 
+        return [], {}
 
-    for bone in armature.data.bones:
-        logger.info('Parsing bone %s', bone.name)
+    round_off, round_val = utilities.rounding(options)
+    anim_type = options.get(constants.ANIMATION)
+    #pose_position = armature.data.pose_position
 
-        if bone.parent is None or bone.parent.use_deform is False:
-            bone_pos = bone.head_local
-            bone_index = -1
-        else:
-            bone_pos = bone.head_local - bone.parent.head_local
-            bone_index = 0
-            index = 0
-            for parent in armature.data.bones:
-                if parent.name == bone.parent.name:
-                    bone_index = bone_map.get(index)
-                index += 1
+    if anim_type == constants.OFF:
+        logger.info('Animation type not set, defaulting '\
+            'to using REST position for the armature.')
+        func = _rest_bones
+        #armature.data.pose_position = 'REST'
+    else:
+        dispatch = {
+            constants.REST: _rest_bones,
+            constants.POSE: _pose_bones
+        }
+        logger.info('Using %s for the armature', anim_type)
+        func = dispatch[anim_type]
+        #armature.data.pose_position = anim_type.upper()
 
-        bone_world_pos = armature.matrix_world * bone_pos
-        x_axis = bone_world_pos.x
-        y_axis = bone_world_pos.z
-        z_axis = -bone_world_pos.y
-
-        if bone.use_deform:
-            logger.debug('Adding bone %s at: %s, %s', 
-                bone.name, bone_index, bone_index_rel)
-            bone_map[bone_count] = bone_index_rel
-            bone_index_rel += 1
-            bones.append({
-                constants.PARENT: bone_index,
-                constants.NAME: bone.name,
-                constants.POS: (x_axis, y_axis, z_axis),
-                constants.ROTQ: (0,0,0,1)
-            })
-        else:
-            logger.debug('Ignoring bone %s at: %s, %s', 
-                bone.name, bone_index, bone_index_rel)
-
-        bone_count += 1
+    bones, bone_map = func(armature, round_off, round_val)
+    #armature.data.pose_position = pose_position
 
     return (bones, bone_map)
 
@@ -99,8 +95,6 @@ def buffer_normal(mesh, options):
             normals_.extend(vector)
 
     return normals_
-
-
 
 
 @_mesh
@@ -144,6 +138,7 @@ def buffer_uv(mesh, options):
     
     return uvs_
 
+
 @_mesh
 def faces(mesh, options):
     logger.debug('mesh.faces(%s, %s)', mesh, options)
@@ -151,7 +146,6 @@ def faces(mesh, options):
     has_colors = len(mesh.vertex_colors) > 0
     logger.info('Has UVs = %s', vertex_uv)
     logger.info('Has vertex colours = %s', has_colors)
-
 
     round_off, round_val = utilities.rounding(options)
     if round_off:
@@ -170,7 +164,19 @@ def faces(mesh, options):
     vertex_normals = _normals(mesh, options) if opt_normals else None
     vertex_colours = vertex_colors(mesh) if opt_colours else None
 
-    face_data = []
+    faces_data = []
+
+    colour_indices = {}
+    if vertex_colours:
+        logger.debug('Indexing colours')
+        for index, colour in enumerate(vertex_colours):
+            colour_indices[str(colour)] = index
+
+    normal_indices = {}
+    if vertex_normals:
+        logger.debug('Indexing normals')
+        for index, normal in enumerate(vertex_normals):
+            normal_indices[str(normal)] = index
 
     logger.info('Parsing %d faces', len(mesh.tessfaces))
     for face in mesh.tessfaces:
@@ -185,20 +191,21 @@ def faces(mesh, options):
         mask = {
             constants.QUAD: vert_count is 4,
             constants.MATERIALS: materials,
-            constants.UVS: opt_uvs,
-            constants.NORMALS: opt_normals,
-            constants.COLORS: opt_colours
+            constants.UVS: False,
+            constants.NORMALS: False,
+            constants.COLORS: False
         }
 
-        face_data.append(utilities.bit_mask(mask))
+        face_data = []
         
         face_data.extend([v for v in face.vertices])
         
         if mask[constants.MATERIALS]:
             face_data.append(face.material_index)
         
-        if mask[constants.UVS] and uv_layers:
-
+        #@TODO: this needs the same optimization as what
+        #       was done for colours and normals
+        if uv_layers:
             for index, uv_layer in enumerate(uv_layers):
                 layer = mesh.tessface_uv_textures[index]
 
@@ -207,34 +214,38 @@ def faces(mesh, options):
                     if round_off:
                         uv = utilities.round_off(uv, round_val)
                     face_data.append(uv_layer.index(uv))
+                    mask[constants.UVS] = True
 
-        if mask[constants.NORMALS] and vertex_normals:
+        if vertex_normals:
             for vertex in face.vertices:
                 normal = mesh.vertices[vertex].normal
                 normal = (normal.x, normal.y, normal.z)
                 if round_off:
                     normal = utilities.round_off(normal, round_val)
-                face_data.append(vertex_normals.index(normal))
+                face_data.append(normal_indices[str(normal)])
+                mask[constants.NORMALS] = True
         
-        if mask[constants.COLORS]:
+        if vertex_colours:
             colours = mesh.tessface_vertex_colors.active.data[face.index]
 
             for each in (colours.color1, colours.color2, colours.color3):
                 each = utilities.rgb2int(each)
-                face_data.append(vertex_colours.index(each))
+                face_data.append(colour_indices[str(each)])
+                mask[constants.COLORS] = True
 
             if mask[constants.QUAD]:
                 colour = utilities.rgb2int(colours.color4)
-                face_data.append(vertex_colours.index(colour))
+                face_data.append(colour_indices[str(colour)])
 
-    return face_data
+        face_data.insert(0, utilities.bit_mask(mask))
+        faces_data.extend(face_data)
+
+    return faces_data
  
 
 @_mesh
 def morph_targets(mesh, options):
     logger.debug('mesh.morph_targets(%s, %s)', mesh, options)
-    #@TODO: consider an attribute for the meshes for determining
-    #       morphs, which would save on so much overhead
     obj = object_.objects_using_mesh(mesh)[0]
     original_frame = context.scene.frame_current
     frame_step = options.get(constants.FRAME_STEP, 1)
@@ -242,6 +253,8 @@ def morph_targets(mesh, options):
         context.scene.frame_end+1, frame_step)
 
     morphs = []
+    round_off, round_val = utilities.rounding(options)
+
     for frame in scene_frames:
         logger.info('Processing data at frame %d', frame)
         context.scene.frame_set(frame, 0.0)
@@ -249,8 +262,14 @@ def morph_targets(mesh, options):
         vertices = object_.extract_mesh(obj, options).vertices[:]
 
         for vertex in vertices:
-            vectors = [round(vertex.co.x, 6), round(vertex.co.y, 6), 
-                round(vertex.co.z, 6)]
+            if round_off:
+                vectors = [
+                    utilities.round_off(vertex.co.x, round_val), 
+                    utilities.round_off(vertex.co.y, round_val), 
+                    utilities.round_off(vertex.co.z, round_val)
+                ]
+            else:
+                vectors = [vertex.co.x, vertex.co.y, vertex.co.z]
             morphs[-1].extend(vectors)
     
     context.scene.frame_set(original_frame, 0.0)
@@ -367,12 +386,12 @@ def materials(mesh, options):
 @_mesh
 def normals(mesh, options):
     logger.debug('mesh.normals(%s, %s)', mesh, options)
-    flattened = []
+    normal_vectors = []
 
     for vector in _normals(mesh, options):
-        flattened.extend(vector)
+        normal_vectors.extend(vector)
 
-    return flattened
+    return normal_vectors
 
 
 @_mesh
@@ -587,6 +606,7 @@ def _normals(mesh, options):
     vectors = []
     round_off, round_val = utilities.rounding(options)
 
+    vectors_ = {}
     for face in mesh.tessfaces:
 
         for vertex_index in face.vertices:
@@ -595,8 +615,12 @@ def _normals(mesh, options):
             if round_off:
                 vector = utilities.round_off(vector, round_val)
 
-            if vector not in vectors:
+            str_vec = str(vector)
+            try:
+                vectors_[str_vec]
+            except KeyError:
                 vectors.append(vector)
+                vectors_[str_vec] = True
 
     return vectors
 
@@ -631,12 +655,13 @@ def _armature(mesh):
 
 def _skinning_data(mesh, bone_map, influences, array_index):
     armature = _armature(mesh)
-    if not armature: return
+    manifest = []
+    if not armature: 
+        return manifest
 
     obj = object_.objects_using_mesh(mesh)[0]
     logger.debug('Skinned object found %s', obj.name)
 
-    manifest = []
     for vertex in mesh.vertices:
         bone_array = []
         for group in vertex.groups:
@@ -648,9 +673,9 @@ def _skinning_data(mesh, bone_map, influences, array_index):
             if index >= len(bone_array):
                 manifest.append(0)
                 continue
-
-            for bone_index, bone in enumerate(armature.data.bones):
-                if bone.name != obj.vertex_groups[bone_array[index][0]].name:
+            name = obj.vertex_groups[bone_array[index][0]].name
+            for bone_index, bone in enumerate(armature.pose.bones):
+                if bone.name != name:
                     continue
                 if array_index is 0:
                     entry = bone_map.get(bone_index, -1)
@@ -665,254 +690,118 @@ def _skinning_data(mesh, bone_map, influences, array_index):
     return manifest
 
 
-def _skeletal_animations(armature, options):
-    action = armature.animation_data.action
-    end_frame = action.frame_range[1]
-    start_frame = action.frame_range[0]
-    frame_length = end_frame - start_frame
-    l,r,s = armature.matrix_world.decompose()
-    rotation_matrix = r.to_matrix()
-    hierarchy = []
-    parent_index = -1
-    frame_step = options.get(constants.FRAME_STEP, 1)
-    fps = context.scene.render.fps
+def _pose_bones(armature, round_off, round_val):
+    bones = []
+    bone_map = {}
+    bone_count = 0
 
-    start = int(start_frame)
-    end = int(end_frame / frame_step) + 1
+    armature_matrix = armature.matrix_world
+    for bone_count, pose_bone in enumerate(armature.pose.bones):
+        armature_bone = pose_bone.bone
+        bone_index = None
 
-    #@TODO need key constants
+        if armature_bone.parent is None:
+            bone_matrix = armature_matrix * armature_bone.matrix_local
+            bone_index = -1
+        else:
+            parent_bone = armature_bone.parent
+            parent_matrix = armature_matrix * parent_bone.matrix_local
+            bone_matrix = armature_matrix * armature_bone.matrix_local
+            bone_matrix = parent_matrix.inverted() * bone_matrix
+            bone_index = index = 0
+
+            for pose_parent in armature.pose.bones:
+                armature_parent = pose_parent.bone.name
+                if armature_parent == parent_bone.name:
+                    bone_index = index
+                index += 1
+
+        bone_map[bone_count] = bone_count
+
+        pos, rot, scl = bone_matrix.decompose()
+        if round_off:
+            pos = (
+                utilities.round_off(pos.x, round_val),
+                utilities.round_off(pos.z, round_val),
+                -utilities.round_off(pos.y, round_val)
+            )
+            rot = (
+                utilities.round_off(rot.x, round_val),
+                utilities.round_off(rot.z, round_val), 
+                -utilities.round_off(rot.y, round_val),
+                utilities.round_off(rot.w, round_val)
+            )
+            scl = (
+                utilities.round_off(scl.x, round_val),
+                utilities.round_off(scl.z, round_val),
+                utilities.round_off(scl.y, round_val)
+            )
+        else:
+            pos = (pos.x, pos.z, -pos.y)
+            rot = (rot.x, rot.z, -rot.y, rot.w)
+            scl = (scl.x, scl.z, scl.y)
+        bones.append({
+            constants.PARENT: bone_index,
+            constants.NAME: armature_bone.name,
+            constants.POS: pos,
+            constants.ROTQ: rot,
+            constants.SCL: scl 
+        })
+
+    return bones, bone_map
+
+
+def _rest_bones(armature, round_off, round_val):
+    bones = []
+    bone_map = {}
+    bone_count = 0
+    bone_index_rel = 0
+
     for bone in armature.data.bones:
-        if bone.use_deform is False:
-            logger.info('Skipping animation data for bone %s', bone.name)
+        logger.info('Parsing bone %s', bone.name)
+
+        if not bone.use_deform:
+            logger.debug('Ignoring bone %s at: %d', 
+                bone.name, bone_index_rel)
             continue
 
-        logger.info('Parsing animation data for bone %s', bone.name)
+        if bone.parent is None:
+            bone_pos = bone.head_local
+            bone_index = -1
+        else:
+            bone_pos = bone.head_local - bone.parent.head_local
+            bone_index = 0
+            index = 0
+            for parent in armature.data.bones:
+                if parent.name == bone.parent.name:
+                    bone_index = bone_map.get(index)
+                index += 1
+
+        bone_world_pos = armature.matrix_world * bone_pos
+        if round_off:
+            x_axis = utilities.round_off(bone_world_pos.x, round_val)
+            y_axis = utilities.round_off(bone_world_pos.z, round_val)
+            z_axis = -utilities.round_off(bone_world_pos.y, round_val)
+        else:
+            x_axis = bone_world_pos.x
+            y_axis = bone_world_pos.z
+            z_axis = -bone_world_pos.y
+
+        logger.debug('Adding bone %s at: %s, %s', 
+            bone.name, bone_index, bone_index_rel)
+        bone_map[bone_count] = bone_index_rel
+        bone_index_rel += 1
+        #@TODO: the rotq probably should not have these
+        #       hard coded values
+        bones.append({
+            constants.PARENT: bone_index,
+            constants.NAME: bone.name,
+            constants.POS: (x_axis, y_axis, z_axis),
+            constants.ROTQ: (0,0,0,1)
+        })
+
+        bone_count += 1
+
+    return (bones, bone_map)
 
-        keys = []
-        for frame in range(start, end):
-            computed_frame = frame * frame_step
-            pos, pchange = _position(bone, computed_frame, 
-                action, armature.matrix_world)
-            rot, rchange = _rotation(bone, computed_frame, 
-                action, rotation_matrix)
 
-            # flip y and z
-            px, py, pz = pos.x, pos.z, -pos.y
-            rx, ry, rz, rw = rot.x, rot.z, -rot.y, rot.w
-
-            if frame == start_frame:
-
-                time = (frame * frame_step - start_frame) / fps
-                keyframe = {
-                    'time': time,
-                    'pos': [px, py, pz],
-                    'rot': [rx, ry, rz, rw],
-                    'scl': [1, 1, 1]
-                }
-                keys.append(keyframe)
-
-            # END-FRAME: needs pos, rot and scl attributes 
-            # with animation length (required frame)
-
-            elif frame == end_frame / frame_step:
-
-                time = frame_length / fps
-                keyframe = {
-                    'time': time,
-                    'pos': [px, py, pz],
-                    'rot': [rx, ry, rz, rw],
-                    'scl': [1, 1, 1]
-                }
-                keys.append(keyframe)
-
-            # MIDDLE-FRAME: needs only one of the attributes, 
-            # can be an empty frame (optional frame)
-
-            elif pchange == True or rchange == True:
-
-                time = (frame * frame_step - start_frame) / fps
-
-                if pchange == True and rchange == True:
-                    keyframe = {
-                        'time': time, 
-                        'pos': [px, py, pz],
-                        'rot': [rx, ry, rz, rw]
-                    }
-                elif pchange == True:
-                    keyframe = {
-                        'time': time, 
-                        'pos': [px, py, pz]
-                    }
-                elif rchange == True:
-                    keyframe = {
-                        'time': time, 
-                        'rot': [rx, ry, rz, rw]
-                    }
-
-                keys.append(keyframe)
-
-        hierarchy.append({'keys': keys, 'parent': parent_index})
-        parent_index += 1
-
-    #@TODO key constants
-    animation = {
-        'hierarchy': hierarchy, 
-        'length':frame_length / fps,
-        'fps': fps,
-        'name': action.name
-    }
-
-    return animation
-
-
-def _position(bone, frame, action, armature_matrix):
-
-    position = mathutils.Vector((0,0,0))
-    change = False
-
-    ngroups = len(action.groups)
-
-    if ngroups > 0:
-
-        index = 0
-
-        for i in range(ngroups):
-            if action.groups[i].name == bone.name:
-                index = i
-
-        for channel in action.groups[index].channels:
-            if "location" in channel.data_path:
-                has_changed = _handle_position_channel(
-                    channel, frame, position)
-                change = change or has_changed
-
-    else:
-
-        bone_label = '"%s"' % bone.name
-
-        for channel in action.fcurves:
-            data_path = channel.data_path
-            if bone_label in data_path and \
-            "location" in data_path:
-                has_changed = _handle_position_channel(
-                    channel, frame, position)
-                change = change or has_changed
-
-    position = position * bone.matrix_local.inverted()
-
-    if bone.parent is None:
-
-        position.x += bone.head.x
-        position.y += bone.head.y
-        position.z += bone.head.z
-
-    else:
-
-        parent = bone.parent
-
-        parent_matrix = parent.matrix_local.inverted()
-        diff = parent.tail_local - parent.head_local
-
-        position.x += (bone.head * parent_matrix).x + diff.x
-        position.y += (bone.head * parent_matrix).y + diff.y
-        position.z += (bone.head * parent_matrix).z + diff.z
-
-    return armature_matrix*position, change
-
-
-def _rotation(bone, frame, action, armature_matrix):
-
-    # TODO: calculate rotation also from rotation_euler channels
-
-    rotation = mathutils.Vector((0,0,0,1))
-
-    change = False
-
-    ngroups = len(action.groups)
-
-    # animation grouped by bones
-
-    if ngroups > 0:
-
-        index = -1
-
-        for i in range(ngroups):
-            if action.groups[i].name == bone.name:
-                index = i
-
-        if index > -1:
-            for channel in action.groups[index].channels:
-                if "quaternion" in channel.data_path:
-                    has_changed = _handle_rotation_channel(
-                        channel, frame, rotation)
-                    change = change or has_changed
-
-    # animation in raw fcurves
-
-    else:
-
-        bone_label = '"%s"' % bone.name
-
-        for channel in action.fcurves:
-            data_path = channel.data_path
-            if bone_label in data_path and \
-            "quaternion" in data_path:
-                has_changed = _handle_rotation_channel(
-                    channel, frame, rotation)
-                change = change or has_changed
-
-    rot3 = rotation.to_3d()
-    rotation.xyz = rot3 * bone.matrix_local.inverted()
-    rotation.xyz = armature_matrix * rotation.xyz
-
-    return rotation, change
-
-
-def _handle_rotation_channel(channel, frame, rotation):
-
-    change = False
-
-    if channel.array_index in [0, 1, 2, 3]:
-
-        for keyframe in channel.keyframe_points:
-            if keyframe.co[0] == frame:
-                change = True
-
-        value = channel.evaluate(frame)
-
-        if channel.array_index == 1:
-            rotation.x = value
-
-        elif channel.array_index == 2:
-            rotation.y = value
-
-        elif channel.array_index == 3:
-            rotation.z = value
-
-        elif channel.array_index == 0:
-            rotation.w = value
-
-    return change
-
-
-def _handle_position_channel(channel, frame, position):
-
-    change = False
-
-    if channel.array_index in [0, 1, 2]:
-        for keyframe in channel.keyframe_points:
-            if keyframe.co[0] == frame:
-                change = True
-
-        value = channel.evaluate(frame)
-
-        if channel.array_index == 0:
-            position.x = value
-
-        if channel.array_index == 1:
-            position.y = value
-
-        if channel.array_index == 2:
-            position.z = value
-
-    return change

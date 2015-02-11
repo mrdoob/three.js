@@ -17,7 +17,6 @@ from .constants import (
     PERSP,
     ORTHO,
     RENDER,
-    ZYX,
     NO_SHADOW
 )
 
@@ -46,14 +45,16 @@ def _object(func):
     return inner
 
 
-def assemblies(valid_types):
+def assemblies(valid_types, options):
     logger.debug('object.assemblies(%s)', valid_types)
     for obj in data.objects:
-        if not obj.parent and obj.type in valid_types:
-            yield obj.name
-        elif obj.parent and not obj.parent.parent \
-        and obj.parent.type == ARMATURE:
+
+        # rigged assets are parented under armature nodes
+        if obj.parent and obj.parent.type != ARMATURE:
+            continue
+        if obj.parent and obj.parent.type == ARMATURE:
             logger.info('Has armature parent %s', obj.name)
+        if _valid_node(obj, valid_types, options):
             yield obj.name
 
 
@@ -152,38 +153,15 @@ def node_type(obj):
  
 
 def nodes(valid_types, options):
-    visible_layers = _visible_scene_layers()
     for obj in data.objects:
-        # skip objects that are not on visible layers
-        if not _on_visible_layer(obj, visible_layers): 
-            continue
-        try:
-            export = obj.THREE_export
-        except AttributeError:
-            export = True
-
-        mesh_node = mesh(obj, options)
-        is_mesh = obj.type == MESH
-
-        # skip objects that a mesh could not be resolved
-        if is_mesh and not mesh_node:
-            continue
-
-        # secondary test; if a mesh node was resolved but no
-        # faces are detected then bow out
-        if is_mesh:
-            mesh_node = data.meshes[mesh_node]
-            if len(mesh_node.tessfaces) is 0:
-                continue
-
-        if obj.type in valid_types and export:
+        if _valid_node(obj, valid_types, options):
             yield obj.name
-
 
 @_object
 def position(obj, options):
     logger.debug('object.position(%s)', obj)
-    vector = _matrix(obj)[0]
+    parent = obj.parent is None
+    vector = _decompose_matrix(obj, local=not parent)[0]
     vector = (vector.x, vector.y, vector.z)
 
     round_off, round_val = utilities.rounding(options)
@@ -206,8 +184,8 @@ def receive_shadow(obj):
 @_object
 def rotation(obj, options):
     logger.debug('object.rotation(%s)', obj)
-    vector = _matrix(obj)[1].to_euler(ZYX)
-    vector = (vector.x, vector.y, vector.z)
+    vector = _decompose_matrix(obj)[1]
+    vector = (vector.x, vector.y, vector.z, vector.w)
 
     round_off, round_val = utilities.rounding(options)
     if round_off:
@@ -219,7 +197,7 @@ def rotation(obj, options):
 @_object
 def scale(obj, options):
     logger.debug('object.scale(%s)', obj)
-    vector = _matrix(obj)[2]
+    vector = _decompose_matrix(obj)[2]
     vector = (vector.x, vector.y, vector.z)
 
     round_off, round_val = utilities.rounding(options)
@@ -381,8 +359,11 @@ def extracted_meshes():
     return [key for key in _MESH_MAP.keys()]
 
 
-def _matrix(obj):
-    matrix = ROTATE_X_PI2 * obj.matrix_world
+def _decompose_matrix(obj, local=False):
+    if local:
+        matrix = ROTATE_X_PI2 * obj.matrix_local
+    else:
+        matrix = ROTATE_X_PI2 * obj.matrix_world
     return matrix.decompose()
 
 
@@ -401,3 +382,40 @@ def _visible_scene_layers():
     for index, layer in enumerate(context.scene.layers):
         if layer: visible_layers.append(index)
     return visible_layers
+
+
+def _valid_node(obj, valid_types, options):
+    if obj.type not in valid_types:
+        return False
+
+    # skip objects that are not on visible layers
+    visible_layers = _visible_scene_layers()
+    if not _on_visible_layer(obj, visible_layers): 
+        return False
+
+    try:
+        export = obj.THREE_export
+    except AttributeError:
+        export = True
+    if not export:
+        return False
+
+    mesh_node = mesh(obj, options)
+    is_mesh = obj.type == MESH
+
+    # skip objects that a mesh could not be resolved
+    if is_mesh and not mesh_node:
+        return False
+
+    # secondary test; if a mesh node was resolved but no
+    # faces are detected then bow out
+    if is_mesh:
+        mesh_node = data.meshes[mesh_node]
+        if len(mesh_node.tessfaces) is 0:
+            return False
+
+    # if we get this far assume that the mesh is valid
+    return True
+
+
+
