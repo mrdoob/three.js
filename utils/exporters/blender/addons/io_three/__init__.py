@@ -41,9 +41,9 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 bl_info = {
     'name': "Three.js Format",
     'author': "repsac, mrdoob, yomotsu, mpk, jpweeks",
-    'version': (1, 2, 1),
+    'version': (1, 2, 2),
     'blender': (2, 7, 3),
-    'location': "File > Import-Export",
+    'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
     'warning': "Importer not included.",
     'wiki_url': "https://github.com/mrdoob/three.js/tree/"\

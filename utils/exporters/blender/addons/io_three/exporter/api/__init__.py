@@ -1,20 +1,33 @@
 import os
 import bpy
-from . import object, mesh, material, camera, light
+from . import object as object_, mesh, material, camera, light
 from .. import logger
 
 
 def active_object():
+    """
+
+    :return: The actively selected object
+
+    """
     return bpy.context.scene.objects.active
 
 
 def init():
-    logger.debug('Initializing API')
-    object._MESH_MAP.clear()
+    """Initializing the api module. Required first step before
+    initializing the actual export process.
+    """
+    logger.debug("Initializing API")
+    object_.clear_mesh_map()
 
 
 def selected_objects(valid_types=None):
-    logger.debug('api.selected_objects(%s)', valid_types)
+    """Selected objects.
+
+    :param valid_types: Filter for valid types (Default value = None)
+
+    """
+    logger.debug("api.selected_objects(%s)", valid_types)
     for node in bpy.context.selected_objects:
         if valid_types is None:
             yield node.name
@@ -23,9 +36,20 @@ def selected_objects(valid_types=None):
 
 
 def set_active_object(obj):
+    """Set the object as active in the scene
+
+    :param obj:
+
+    """
+    logger.debug("api.set_active_object(%s)", obj)
     bpy.context.scene.objects.active = obj
 
 
 def scene_name():
+    """
+
+    :return: name of the current scene
+
+    """
     return os.path.basename(bpy.data.filepath)
 

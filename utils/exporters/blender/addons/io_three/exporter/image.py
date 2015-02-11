@@ -36,7 +36,7 @@ class Image(base_classes.BaseNode):
         """Copy the texture.
         self.filepath > self.destination
 
-        :param func: Optional function override (Default = io.copy)
+        :param func: Optional function override (Default value = io.copy)
                      arguments are (<source>, <destination>)
         :return: path the texture was copied to
 
