@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - MouseControls</title>
+		<meta charset="utf-8">
+		<meta name="author" content="Vildanov Almaz alvild@gmail.com" />
+		<style>
+			body {
+				margin: 0px;
+				color: #fff;
+				font-family:Monospace;
+				text-align: center;
+				font-size: 15px;
+				line-height: 30px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 15px;
+				z-index:100;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Tower of Hanoi
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/controls/EventsControls.js"></script>
+
+		<script>
+
+			var camera, scene, renderer;
+			var countDisk = 7, heigthRod = 110, heigthDisk = 14, numberDisk, beganRod = 0, nextRod;
+			var stacksDisk = [];
+			
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				document.body.appendChild( stats.domElement );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 2000 );				
+				camera.position.set( 0, 0, 400 );
+				camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+				scene = new THREE.Scene();
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 500, 500, 1000 );
+				scene.add( light );
+
+				var light = new THREE.AmbientLight( 0x222222 );
+				scene.add( light );
+
+				// world
+
+				var material = new THREE.MeshBasicMaterial( { color: 0xFFF000, transparent: true, opacity: 0.3 } );
+				var heigthPlane = 160;
+				var geometry = new THREE.PlaneGeometry( 80, heigthPlane, 1, 1 );
+
+				var plane = new THREE.Mesh( geometry, material );
+				plane.visible = false;
+				scene.add( plane );
+
+				var geometry1 = new THREE.CylinderGeometry( 6, 6, heigthRod, 36 );
+				var geometry2 = new THREE.CylinderGeometry( 40, 40, heigthDisk, 36 );
+				var material = new THREE.MeshPhongMaterial( { color: new THREE.Color( Math.random() * 0xffffff ) } );
+
+				for ( var i = 0; i < 3; i++ ) {
+
+					var rod = new THREE.Mesh( geometry1, material );
+					rod.position.set( -100 * ( i - 1 ), 0, 0 );
+					scene.add( rod );
+
+					var base = new THREE.Mesh( geometry2, material );
+					base.position.set( -100 * ( i - 1 ), -heigthRod / 2 - heigthDisk / 2, 0 );
+					scene.add( base );
+
+					stacksDisk[ i ] = []; stacksDisk[ i ].push( countDisk );
+
+				}
+
+				for ( var i = 0; i < countDisk; i++ ) {
+
+					var geometry = new THREE.TorusGeometry( 36 - 4 * i, ( heigthDisk + 2 ) / 2, 36, 36 );
+					var material = new THREE.MeshPhongMaterial( { color: new THREE.Color( Math.random() * 0xffffff ) } );
+					var disk = new THREE.Mesh( geometry, material );
+					disk.rotation.x = Math.PI / 2;
+					disk.name = 'disk' + String( countDisk - 1 - i );
+					disk.position.set( -100, -heigthRod / 2 + heigthDisk / 2 + i * heigthDisk, 0 );
+					scene.add( disk );
+					stacksDisk[ 0 ].push( countDisk - 1 - i );
+
+				}
+
+
+				EventsControls = new EventsControls( camera, renderer.domElement );
+				EventsControls.map = plane;
+				EventsControls.fixed.z = true;
+				EventsControls.attach( scene.getObjectByName( 'disk0' ) );
+
+				EventsControls.dragAndDrop = function() {
+				
+					this.container.style.cursor = 'move';
+
+					if ( this.focused.position.y > ( heigthRod + heigthDisk ) / 2 ) {
+						plane.position.x = this.focused.position.x; return;
+					}
+					else {
+
+						if ( this.focused.position.x > 50 ) { nextRod = 2; }
+							else if ( this.focused.position.x < -50 ) { nextRod = 0; }
+								else { nextRod = 1; }
+
+						plane.position.x = 100 * ( nextRod - 1 );
+						plane.position.y = ( stacksDisk[ nextRod ].length - 1 / 2 ) * heigthDisk - heigthRod / 2 + heigthPlane / 2;
+						this.focused.position.x = plane.position.x; 
+					}
+
+				}
+
+				EventsControls.mouseUp = function () {
+
+					this.container.style.cursor = 'auto';
+					if ( ( this.focused.position.y <= ( heigthRod + heigthDisk ) / 2 ) && ( nextRod != beganRod ) ) {
+
+						if ( stacksDisk[ nextRod ][ stacksDisk[ nextRod ].length - 1 ] < numberDisk ) {
+							this.returnPrevious(); stacksDisk[ beganRod ].push( numberDisk ); return;
+						}
+
+						this.focused.position.y = stacksDisk[ nextRod ].length * heigthDisk - heigthRod / 2 - heigthDisk / 2;
+						plane.position.y = this.focused.position.y + heigthPlane / 2;
+						stacksDisk[ nextRod ].push( numberDisk );
+
+						var item = stacksDisk[ beganRod ][stacksDisk[ beganRod ].length - 1 ];
+						if ( item < countDisk ) {
+							EventsControls.attach( scene.getObjectByName( 'disk' + String( item ) ) );
+						}
+
+						var item = stacksDisk[ nextRod ][stacksDisk[ nextRod ].length - 2 ];
+						if ( item < countDisk ) {
+							EventsControls.detach( scene.getObjectByName( 'disk' + String( item ) ) );
+						}
+
+						if ( ( stacksDisk[ nextRod ].length == countDisk + 1 ) && nextRod != 0 ) { 
+							EventsControls.enabled = false; setTimeout('alert("Game over, you win!")', 300);
+						}
+					}
+					else { this.returnPrevious(); stacksDisk[ beganRod ].push( numberDisk ); }
+				}
+
+				EventsControls.onclick = function () {
+
+						if ( this.focused.position.x > 50 ) { beganRod = 2; }
+							else if ( this.focused.position.x < -50 ) { beganRod = 0; }
+								else { beganRod = 1; }
+
+						numberDisk = stacksDisk[ beganRod ].pop();
+				}
+
+			}
+
+
+			function animate() {
+
+					requestAnimationFrame(animate);
+					render();
+
+			}
+
+
+			function render() {
+
+					stats.update();
+					EventsControls.update();
+					renderer.render(scene, camera);
+
+			}
+
+		</script>
+
+	</body>
+</html>
