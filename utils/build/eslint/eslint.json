@@ -32,6 +32,7 @@
     // Rules we intensionally want on
 
     "comma-style": [ 2, "last" ],  // Require commas on the same line
+    "no-bang-boolean-cast": 2,     // Disallow !value. Effectively require checking value === null, undefined, false, 0, etc..
     "no-new-object": 2,            // Disallow "new Object()";
 
     // Rules we intensionally want off
