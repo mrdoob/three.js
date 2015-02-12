@@ -55,12 +55,14 @@ THREE.WebGLProgram = ( function () {
 		var _this = renderer;
 		var _gl = _this.context;
 
+		var renderObjectMaterial =  THREE.RenderVault.getRenderObject(material);
+		
 		var defines = material.defines;
-		var uniforms = material.__webglShader.uniforms;
 		var attributes = material.attributes;
 
-		var vertexShader = material.__webglShader.vertexShader;
-		var fragmentShader = material.__webglShader.fragmentShader;
+		var uniforms = renderObjectMaterial.webglShader.uniforms;
+		var vertexShader = renderObjectMaterial.webglShader.vertexShader;
+		var fragmentShader = renderObjectMaterial.webglShader.fragmentShader;
 
 		var index0AttributeName = material.index0AttributeName;
 

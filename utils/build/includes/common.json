@@ -140,6 +140,7 @@
 	"src/renderers/shaders/UniformsUtils.js",
 	"src/renderers/shaders/UniformsLib.js",
 	"src/renderers/shaders/ShaderLib.js",
+	"src/renderers/RendererVault.js",
 	"src/renderers/WebGLRenderer.js",
 	"src/renderers/WebGLRenderTarget.js",
 	"src/renderers/WebGLRenderTargetCube.js",
