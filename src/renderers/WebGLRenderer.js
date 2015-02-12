@@ -935,11 +935,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateMaterial = function ( material ) {
 
-		var program = material.program.program;
+		var program = THREE.RenderVault.getRenderObject(material).program.program;
 
 		if ( program === undefined ) return;
 
-		material.program = undefined;
+		THREE.RenderVault.getRenderObject(material).program = undefined;
 
 		// only deallocate GL program if this was the last use of shared program
 		// assumed there is only single copy of any program in the _programs list
@@ -1552,102 +1552,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setMeshBuffers( geometryGroup, object, hint, dispose, material ) {
+	function setMeshBuffersVertices( geometryGroup, object, hint ) {
+		
+		var geometry = object.geometry,
+			vertices = geometry.vertices,
+			chunk_faces3 = geometryGroup.faces3,
+			obj_faces = geometry.faces,
+			offset = 0;
+		
+		
+		if ( THREE.RenderVault.checkRenderFlagStatus(geometry, "verticesNeedUpdate" ) ) {
+			
+			var vertexArray = THREE.RenderVault.getRenderObject(geometryGroup).vertexArray;
+			
+			for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-		if ( ! THREE.RenderVault.getRenderObject(geometryGroup).inittedArrays ) {
+				var face = obj_faces[ chunk_faces3[ f ] ];
 
-			return;
-
-		}
-
-		var needsSmoothNormals = materialNeedsSmoothNormals( material );
-
-		var f, fl, fi, face,
-		vertexNormals, faceNormal, normal,
-		vertexColors, faceColor,
-		vertexTangents,
-		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
-		c1, c2, c3,
-		sw1, sw2, sw3, sw4,
-		si1, si2, si3, si4,
-		sa1, sa2, sa3, sa4,
-		sb1, sb2, sb3, sb4,
-		m, ml, i, il,
-		vn, uvi, uv2i,
-		vk, vkl, vka,
-		nka, chf, faceVertexNormals,
-		a,
-
-		vertexIndex = 0,
-
-		offset = 0,
-		offset_uv = 0,
-		offset_uv2 = 0,
-		offset_face = 0,
-		offset_normal = 0,
-		offset_tangent = 0,
-		offset_line = 0,
-		offset_color = 0,
-		offset_skin = 0,
-		offset_morphTarget = 0,
-		offset_custom = 0,
-		offset_customSrc = 0,
-
-		value,
-
-		vertexArray = THREE.RenderVault.getRenderObject(geometryGroup).vertexArray,
-		uvArray = THREE.RenderVault.getRenderObject(geometryGroup).uvArray,
-		uv2Array = THREE.RenderVault.getRenderObject(geometryGroup).uv2Array,
-		normalArray = THREE.RenderVault.getRenderObject(geometryGroup).normalArray,
-		tangentArray = THREE.RenderVault.getRenderObject(geometryGroup).tangentArray,
-		colorArray = THREE.RenderVault.getRenderObject(geometryGroup).colorArray,
-
-		skinIndexArray = THREE.RenderVault.getRenderObject(geometryGroup).skinIndexArray,
-		skinWeightArray = THREE.RenderVault.getRenderObject(geometryGroup).skinWeightArray,
-
-		morphTargetsArrays = THREE.RenderVault.getRenderObject(geometryGroup).morphTargetsArrays,
-		morphNormalsArrays = THREE.RenderVault.getRenderObject(geometryGroup).morphNormalsArrays,
-
-		customAttributes = THREE.RenderVault.getRenderObject(geometryGroup).webglCustomAttributesList,
-		customAttribute,
-
-		faceArray = THREE.RenderVault.getRenderObject(geometryGroup).faceArray,
-		lineArray = THREE.RenderVault.getRenderObject(geometryGroup).lineArray,
-
-		geometry = object.geometry, // this is shared for all chunks
-
-		dirtyVertices = geometry.verticesNeedUpdate,
-		dirtyElements = geometry.elementsNeedUpdate,
-		dirtyUvs = geometry.uvsNeedUpdate,
-		dirtyNormals = geometry.normalsNeedUpdate,
-		dirtyTangents = geometry.tangentsNeedUpdate,
-		dirtyColors = geometry.colorsNeedUpdate,
-		dirtyMorphTargets = geometry.morphTargetsNeedUpdate,
-
-		vertices = geometry.vertices,
-		chunk_faces3 = geometryGroup.faces3,
-		obj_faces = geometry.faces,
-
-		obj_uvs  = geometry.faceVertexUvs[ 0 ],
-		obj_uvs2 = geometry.faceVertexUvs[ 1 ],
-
-		obj_colors = geometry.colors,
-
-		obj_skinIndices = geometry.skinIndices,
-		obj_skinWeights = geometry.skinWeights,
-
-		morphTargets = geometry.morphTargets,
-		morphNormals = geometry.morphNormals;
-
-		if ( dirtyVertices ) {
-
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces3[ f ] ];
-
-				v1 = vertices[ face.a ];
-				v2 = vertices[ face.b ];
-				v3 = vertices[ face.c ];
+				var v1 = vertices[ face.a ];
+				var v2 = vertices[ face.b ];
+				var v3 = vertices[ face.c ];
 
 				vertexArray[ offset ]     = v1.x;
 				vertexArray[ offset + 1 ] = v1.y;
@@ -1669,25 +1593,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
 
 		}
+	}
+	
+	function setMeshBuffersMorphTargets( geometryGroup, object, hint, material ) {
+		
+		var geometry = object.geometry,
+			chunk_faces3 = geometryGroup.faces3,
+			obj_faces = geometry.faces;
+			
+		if ( THREE.RenderVault.checkRenderFlagStatus(geometry, "morphTargetsNeedUpdate" ) ) {
+			var	morphTargets = geometry.morphTargets,
+				morphNormals = geometry.morphNormals,
+				morphTargetsArrays = THREE.RenderVault.getRenderObject(geometryGroup).morphTargetsArrays,
+				morphNormalsArrays = THREE.RenderVault.getRenderObject(geometryGroup).morphNormalsArrays;
+		
+			for ( var vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
 
-		if ( dirtyMorphTargets ) {
+				var offset_morphTarget = 0;
 
-			for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
+				for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				offset_morphTarget = 0;
-
-				for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-					chf = chunk_faces3[ f ];
-					face = obj_faces[ chf ];
+					var chf = chunk_faces3[ f ];
+					var face = obj_faces[ chf ];
 
 					// morph positions
 
-					v1 = morphTargets[ vk ].vertices[ face.a ];
-					v2 = morphTargets[ vk ].vertices[ face.b ];
-					v3 = morphTargets[ vk ].vertices[ face.c ];
+					var v1 = morphTargets[ vk ].vertices[ face.a ];
+					var v2 = morphTargets[ vk ].vertices[ face.b ];
+					var v3 = morphTargets[ vk ].vertices[ face.c ];
 
-					vka = morphTargetsArrays[ vk ];
+					var vka = morphTargetsArrays[ vk ];
 
 					vka[ offset_morphTarget ]     = v1.x;
 					vka[ offset_morphTarget + 1 ] = v1.y;
@@ -1705,9 +1640,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( material.morphNormals ) {
 
-						if ( needsSmoothNormals ) {
+						var n1,n2,n3;
+						if ( materialNeedsSmoothNormals( material ) ) {
 
-							faceVertexNormals = morphNormals[ vk ].vertexNormals[ chf ];
+							var faceVertexNormals = morphNormals[ vk ].vertexNormals[ chf ];
 
 							n1 = faceVertexNormals.a;
 							n2 = faceVertexNormals.b;
@@ -1721,7 +1657,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						nka = morphNormalsArrays[ vk ];
+						var nka = morphNormalsArrays[ vk ];
 
 						nka[ offset_morphTarget ]     = n1.x;
 						nka[ offset_morphTarget + 1 ] = n1.y;
@@ -1756,18 +1692,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-
+	};
+	
+	function setMeshBufferSkinWeights( geometryGroup, object, hint ) {
+		
+		var geometry = object.geometry,
+			chunk_faces3 = geometryGroup.faces3,
+			obj_faces = geometry.faces,
+			obj_skinIndices = geometry.skinIndices,
+			obj_skinWeights = geometry.skinWeights,
+			offset_skin = 0;
+		
 		if ( obj_skinWeights.length ) {
+			
+			var skinIndexArray = THREE.RenderVault.getRenderObject(geometryGroup).skinIndexArray,
+				skinWeightArray = THREE.RenderVault.getRenderObject(geometryGroup).skinWeightArray;
+			
+			for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces3[ f ] ];
+				var face = obj_faces[ chunk_faces3[ f ] ];
 
 				// weights
 
-				sw1 = obj_skinWeights[ face.a ];
-				sw2 = obj_skinWeights[ face.b ];
-				sw3 = obj_skinWeights[ face.c ];
+				var sw1 = obj_skinWeights[ face.a ];
+				var sw2 = obj_skinWeights[ face.b ];
+				var sw3 = obj_skinWeights[ face.c ];
 
 				skinWeightArray[ offset_skin ]     = sw1.x;
 				skinWeightArray[ offset_skin + 1 ] = sw1.y;
@@ -1786,9 +1735,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// indices
 
-				si1 = obj_skinIndices[ face.a ];
-				si2 = obj_skinIndices[ face.b ];
-				si3 = obj_skinIndices[ face.c ];
+				var si1 = obj_skinIndices[ face.a ];
+				var si2 = obj_skinIndices[ face.b ];
+				var si3 = obj_skinIndices[ face.c ];
 
 				skinIndexArray[ offset_skin ]     = si1.x;
 				skinIndexArray[ offset_skin + 1 ] = si1.y;
@@ -1820,16 +1769,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+	}
+	
+	function setMeshBufferColor( geometryGroup, object, hint, material ){
+		
+		var geometry = object.geometry,
+			chunk_faces3 = geometryGroup.faces3,
+			obj_faces = geometry.faces,
+			offset_color = 0;
+		
+		if ( THREE.RenderVault.checkRenderFlagStatus(geometry, "colorsNeedUpdate") ) {
 
-		if ( dirtyColors ) {
+			var colorArray = THREE.RenderVault.getRenderObject(geometryGroup).colorArray;
+			
+			for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+				var face = obj_faces[ chunk_faces3[ f ] ];
 
-				face = obj_faces[ chunk_faces3[ f ] ];
+				var vertexColors = face.vertexColors;
+				var faceColor = face.color;
 
-				vertexColors = face.vertexColors;
-				faceColor = face.color;
-
+				var c1,c2,c3;
+				
 				if ( vertexColors.length === 3 && material.vertexColors === THREE.VertexColors ) {
 
 					c1 = vertexColors[ 0 ];
@@ -1868,18 +1829,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+	}
+	
+	function setMeshBuffersTangents(geometryGroup, object, hint, material ){
+		
+		var geometry = object.geometry,
+			chunk_faces3 = geometryGroup.faces3,
+			obj_faces = geometry.faces,
+			offset_tangent = 0;
+		
+		if ( geometry.hasTangents && THREE.RenderVault.checkRenderFlagStatus(geometry, "tangentsNeedUpdate") ) {
+			
+			var tangentArray = THREE.RenderVault.getRenderObject(geometryGroup).tangentArray;
+			
+			for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-		if ( dirtyTangents && geometry.hasTangents ) {
+				var face = obj_faces[ chunk_faces3[ f ] ];
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+				var vertexTangents = face.vertexTangents;
 
-				face = obj_faces[ chunk_faces3[ f ] ];
-
-				vertexTangents = face.vertexTangents;
-
-				t1 = vertexTangents[ 0 ];
-				t2 = vertexTangents[ 1 ];
-				t3 = vertexTangents[ 2 ];
+				var t1 = vertexTangents[ 0 ];
+				var t2 = vertexTangents[ 1 ];
+				var t3 = vertexTangents[ 2 ];
 
 				tangentArray[ offset_tangent ]     = t1.x;
 				tangentArray[ offset_tangent + 1 ] = t1.y;
@@ -1904,21 +1875,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bufferData( _gl.ARRAY_BUFFER, tangentArray, hint );
 
 		}
+	}
+	
+	function setMeshBuffersNormals( geometryGroup, object, hint, material ) {
+		
+		var geometry = object.geometry,
+			chunk_faces3 = geometryGroup.faces3,
+			obj_faces = geometry.faces,
+			offset_normal = 0, i;
+		
+		if ( THREE.RenderVault.checkRenderFlagStatus(geometry, "normalsNeedUpdate" ) ) {
 
-		if ( dirtyNormals ) {
+			var normalArray = THREE.RenderVault.getRenderObject(geometryGroup).normalArray;
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ] ];
+				var face = obj_faces[ chunk_faces3[ f ] ];
 
-				vertexNormals = face.vertexNormals;
-				faceNormal = face.normal;
+				var vertexNormals = face.vertexNormals;
+				var faceNormal = face.normal;
 
-				if ( vertexNormals.length === 3 && needsSmoothNormals ) {
+				if ( vertexNormals.length === 3 && materialNeedsSmoothNormals( material ) ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
-						vn = vertexNormals[ i ];
+						var vn = vertexNormals[ i ];
 
 						normalArray[ offset_normal ]     = vn.x;
 						normalArray[ offset_normal + 1 ] = vn.y;
@@ -1948,20 +1929,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bufferData( _gl.ARRAY_BUFFER, normalArray, hint );
 
 		}
+		
+	}
+	
+	function setMeshBuffersUVs( geometryGroup, object, hint, material ) {
+		var geometry = object.geometry,
+			chunk_faces3 = geometryGroup.faces3,
+			obj_faces = geometry.faces,
+			obj_uvs  = geometry.faceVertexUvs[ 0 ],
+			obj_uvs2 = geometry.faceVertexUvs[ 1 ],
+			offset_uv = 0, 
+			offset_uv2 = 0,
+			i, fi;
+			
+		if ( obj_uvs && THREE.RenderVault.checkRenderFlagStatus(geometry, "uvsNeedUpdate" )  ) {
 
-		if ( dirtyUvs && obj_uvs ) {
-
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			var uvArray = THREE.RenderVault.getRenderObject(geometryGroup).uvArray;
+			
+			for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
 				fi = chunk_faces3[ f ];
 
-				uv = obj_uvs[ fi ];
+				var uv = obj_uvs[ fi ];
 
 				if ( uv === undefined ) continue;
 
 				for ( i = 0; i < 3; i ++ ) {
 
-					uvi = uv[ i ];
+					var uvi = uv[ i ];
 
 					uvArray[ offset_uv ]     = uvi.x;
 					uvArray[ offset_uv + 1 ] = uvi.y;
@@ -1981,19 +1976,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( dirtyUvs && obj_uvs2 ) {
+		if ( obj_uvs2 && THREE.RenderVault.checkRenderFlagStatus(geometry, "uvsNeedUpdate" )  ) {
 
+			var uv2Array = THREE.RenderVault.getRenderObject(geometryGroup).uv2Array;
+			
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
 				fi = chunk_faces3[ f ];
 
-				uv2 = obj_uvs2[ fi ];
+				var uv2 = obj_uvs2[ fi ];
 
 				if ( uv2 === undefined ) continue;
 
 				for ( i = 0; i < 3; i ++ ) {
 
-					uv2i = uv2[ i ];
+					var uv2i = uv2[ i ];
 
 					uv2Array[ offset_uv2 ]     = uv2i.x;
 					uv2Array[ offset_uv2 + 1 ] = uv2i.y;
@@ -2012,10 +2009,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-
-		if ( dirtyElements ) {
-
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+		
+	}
+	
+	function setMeshBuffersElements( geometryGroup, object, hint, material ) {
+		var geometry = object.geometry,
+			chunk_faces3 = geometryGroup.faces3,
+			vertexIndex = 0,
+			offset_face = 0,
+			offset_line = 0;
+			
+		if ( THREE.RenderVault.checkRenderFlagStatus(geometry, "elementsNeedUpdate") ) {
+			
+			var faceArray = THREE.RenderVault.getRenderObject(geometryGroup).faceArray,
+				lineArray = THREE.RenderVault.getRenderObject(geometryGroup).lineArray;
+				
+			for ( var f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
 				faceArray[ offset_face ]   = vertexIndex;
 				faceArray[ offset_face + 1 ] = vertexIndex + 1;
@@ -2045,6 +2054,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
 
 		}
+		
+	}
+	
+	
+	function setMeshBuffersCustomAttributes( geometryGroup, object, hint, dispose, material ) {
+
+		var f, fl, face,
+		v1, v2, v3,
+		i, il,
+		offset_custom = 0,
+
+		value,
+
+
+		customAttributes = THREE.RenderVault.getRenderObject(geometryGroup).webglCustomAttributesList,
+		customAttribute,
+
+		geometry = object.geometry, // this is shared for all chunks
+
+		chunk_faces3 = geometryGroup.faces3,
+		obj_faces = geometry.faces;
+
+		
 
 		if ( customAttributes ) {
 
@@ -2055,7 +2087,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( ! THREE.RenderVault.getRenderObject(customAttribute).original.needsUpdate ) continue;
 
 				offset_custom = 0;
-				offset_customSrc = 0;
 
 				if ( customAttribute.size === 1 ) {
 
@@ -3108,7 +3139,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// set base
 
-		var attributes = material.program.attributes;
+		var attributes = THREE.RenderVault.getRenderObject(material).program.attributes;
 
 		if ( object.morphTargetBase !== - 1 && attributes.position >= 0 ) {
 
@@ -3253,9 +3284,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// load updated influences uniform
 
-		if ( material.program.uniforms.morphTargetInfluences !== null ) {
+		if ( THREE.RenderVault.getRenderObject(material).program.uniforms.morphTargetInfluences !== null ) {
 
-			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, THREE.RenderVault.getRenderObject(object).webglMorphTargetInfluences );
+			_gl.uniform1fv( THREE.RenderVault.getRenderObject(material).program.uniforms.morphTargetInfluences, THREE.RenderVault.getRenderObject(object).webglMorphTargetInfluences );
 
 		}
 
@@ -4017,25 +4048,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var geometryGroup = geometryGroupsList[ i ];
 				var material = getBufferMaterial( object, geometryGroup );
 
-				var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+				if ( ! THREE.RenderVault.getRenderObject(geometryGroup).inittedArrays ) {
 
-				if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
-					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-					 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate || customAttributesDirty ) {
+					return;
 
-					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, ! geometry.dynamic, material );
+				}
+
+				setMeshBuffersVertices(geometryGroup, object, _gl.DYNAMIC_DRAW );
+				setMeshBuffersMorphTargets(geometryGroup, object, _gl.DYNAMIC_DRAW, material);
+				setMeshBufferSkinWeights(geometryGroup, object, _gl.DYNAMIC_DRAW, material);
+				setMeshBufferColor(geometryGroup, object, _gl.DYNAMIC_DRAW, material);
+				setMeshBuffersTangents(geometryGroup, object, _gl.DYNAMIC_DRAW, material);
+				setMeshBuffersNormals(geometryGroup, object, _gl.DYNAMIC_DRAW, material);
+				setMeshBuffersUVs(geometryGroup, object, _gl.DYNAMIC_DRAW, material);
+				setMeshBuffersElements(geometryGroup, object, _gl.DYNAMIC_DRAW, material);
+				
+				if ( material.attributes && areCustomAttributesDirty( material ) ) {
+
+					setMeshBuffersCustomAttributes( geometryGroup, object, _gl.DYNAMIC_DRAW, material );
 
 				}
 
 			}
-
-			geometry.verticesNeedUpdate = false;
-			geometry.morphTargetsNeedUpdate = false;
-			geometry.elementsNeedUpdate = false;
-			geometry.uvsNeedUpdate = false;
-			geometry.normalsNeedUpdate = false;
-			geometry.colorsNeedUpdate = false;
-			geometry.tangentsNeedUpdate = false;
 
 			material.attributes && clearCustomAttributes( material );
 
@@ -4300,7 +4334,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		material.program = program;
+		THREE.RenderVault.getRenderObject(material).program = program;
 
 		var attributes = program.attributes;
 
@@ -4348,7 +4382,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var u in THREE.RenderVault.getRenderObject(material).webglShader.uniforms ) {
 
-			var location = material.program.uniforms[ u ];
+			var location = THREE.RenderVault.getRenderObject(material).program.uniforms[ u ];
 
 			if ( location ) {
 				material.uniformsList.push( [ THREE.RenderVault.getRenderObject(material).webglShader.uniforms[ u ], location ] );
@@ -4362,12 +4396,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_usedTextureUnits = 0;
 
-		if ( material.needsUpdate ) {
+		if ( THREE.RenderVault.checkRenderFlagStatus( material,"needsUpdate")  ) {
 
-			if ( material.program ) deallocateMaterial( material );
+			if ( THREE.RenderVault.getRenderObject(material).program ) deallocateMaterial( material );
 
 			initMaterial( material, lights, fog, object );
-			material.needsUpdate = false;
 
 		}
 
@@ -4385,7 +4418,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var refreshMaterial = false;
 		var refreshLights = false;
 
-		var program = material.program,
+		var program = THREE.RenderVault.getRenderObject(material).program,
 			p_uniforms = program.uniforms,
 			m_uniforms = THREE.RenderVault.getRenderObject(material).webglShader.uniforms;
 

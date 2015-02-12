@@ -64,15 +64,15 @@ THREE.RenderVault = (function(){
         if (object._renderVaultObjectId === undefined) {
             
             object._renderVaultObjectId = renderVaultObjectIdCounter++;
-            selectedFlagVault[object._renderVaultObjectId] = {};
+            objectstorage[object._renderVaultObjectId] = {};
             
-        } else if (selectedFlagVault[object._renderVaultObjectId] === undefined){
+        } else if (objectstorage[object._renderVaultObjectId] === undefined){
             
-            selectedFlagVault[object._renderVaultObjectId]= {};
+            objectstorage[object._renderVaultObjectId]= {};
             
         }
         
-        return selectedFlagVault[object._renderVaultObjectId];
+        return objectstorage[object._renderVaultObjectId];
         
     }
     
@@ -99,8 +99,18 @@ THREE.RenderVault = (function(){
         
         if (object[flagName] === true){
             
-            objectflags[flagName] += 1;
+            if (objectflags[flagName] === undefined){
+                
+                objectflags[flagName] = 0;
+                
+            } else {
+                
+                objectflags[flagName] += 1;
+                
+            }
+            
             renderobjectflags[flagName] = objectflags[flagName];
+            object[flagName] = false;
             return true;
         }
         
