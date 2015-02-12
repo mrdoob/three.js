@@ -121,8 +121,10 @@
 				
 					this.container.style.cursor = 'move';
 
+					var vector = new THREE.Vector3( this._mouse.x, this._mouse.y, 1 ).unproject( camera ).multiplyScalar( camera.position.z / camera.far );
+					
 					if ( this.focused.position.y > ( heigthRod + heigthDisk ) / 2 ) {
-						plane.position.x = this.focused.position.x; return;
+						plane.position.x = vector.x; return;
 					}
 					else {
 
