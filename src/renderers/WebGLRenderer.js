@@ -4378,14 +4378,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		material.uniformsList = [];
+		THREE.RenderVault.getRenderObject(material).uniformsList = [];
 
 		for ( var u in THREE.RenderVault.getRenderObject(material).webglShader.uniforms ) {
 
 			var location = THREE.RenderVault.getRenderObject(material).program.uniforms[ u ];
 
 			if ( location ) {
-				material.uniformsList.push( [ THREE.RenderVault.getRenderObject(material).webglShader.uniforms[ u ], location ] );
+				THREE.RenderVault.getRenderObject(material).uniformsList.push( [ THREE.RenderVault.getRenderObject(material).webglShader.uniforms[ u ], location ] );
 			}
 
 		}
@@ -4621,7 +4621,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// load common uniforms
 
-			loadUniformsGeneric( material.uniformsList );
+			loadUniformsGeneric( THREE.RenderVault.getRenderObject(material).uniformsList );
 
 		}
 
