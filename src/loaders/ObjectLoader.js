@@ -437,6 +437,27 @@ THREE.ObjectLoader.prototype = {
 					object = new THREE.Line( geometry, material );
 
 					break;
+					
+				case 'PointCloud':
+
+					var geometry = geometries[ data.geometry ];
+					var material = materials[ data.material ];
+
+					if ( geometry === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
+
+					}
+
+					if ( material === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
+
+					}
+
+					object = new THREE.PointCloud( geometry, material );
+
+					break;
 
 				case 'Sprite':
 
