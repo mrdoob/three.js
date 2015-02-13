@@ -6,7 +6,7 @@
 
 // a shadow Mesh that follows its parent Mesh in the scene, but is confined to a single plane.
 
-THREE.ShadowMesh = function ( parentMesh ) {
+THREE.ShadowMesh = function ( mesh ) {
 	
 	var shadowMaterial = new THREE.MeshBasicMaterial( {
 		
@@ -17,9 +17,9 @@ THREE.ShadowMesh = function ( parentMesh ) {
 		
 	} );
 	
-	THREE.Mesh.call( this, parentMesh.geometry, shadowMaterial );
+	THREE.Mesh.call( this, mesh.geometry, shadowMaterial );
 	
-	this.parentMeshMatrix = parentMesh.matrix;
+	this.parentMeshMatrix = mesh.matrix;
 	
 	this.frustumCulled = false;
 
@@ -62,9 +62,7 @@ THREE.ShadowMesh.prototype.update = function () {
 		sme[ 11 ] = - lightPosition4D.w * plane.normal.z;
 		sme[ 15 ] = dot - lightPosition4D.w * -plane.constant;
 	
-		this.matrix.identity();
-		this.matrix.multiply( shadowMatrix );
-		this.matrix.multiply( this.parentMeshMatrix );
+		this.matrix.multiplyMatrices( shadowMatrix, this.parentMeshMatrix );
 		
 		this.matrixAutoUpdate = false;
 
