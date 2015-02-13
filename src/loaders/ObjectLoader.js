@@ -51,10 +51,10 @@ THREE.ObjectLoader.prototype = {
 
 		this.manager.itemStart( json.object.uuid );
 
-		var manager = new THREE.LoadingManager( function () {
+		geometries = this.parseGeometries( json.geometries );
+		images = this.parseImages( json.images, function () {
 
 			textures  = scope.parseTextures( json.textures, images );
-
 			materials = scope.parseMaterials( json.materials, textures );
 
 			onLoad( scope.parseObject( json.object, geometries, materials ) );
@@ -63,8 +63,6 @@ THREE.ObjectLoader.prototype = {
 			scope.manager.itemEnd( json.object.uuid );
 
 		} );
-
-		images = this.parseImages( json.images, manager );
 
 	},
 
@@ -247,41 +245,43 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
-	parseImages: function ( json, manager ) {
+	parseImages: function ( json, onLoad ) {
 
 		var scope = this;
 		var images = {};
 
-		if ( json !== undefined ) {
+		if ( json !== undefined && json.length > 0 ) {
+
+			var manager = new THREE.LoadingManager( onLoad );
 
 			var loader = new THREE.ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			if ( json.length === 0 ) {
+			var loadImage = function ( data ) {
 
-				manager.onLoad();
-
-			}
-
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
-
-				var data = json[ i ];
-				var url  = scope.texturePath + data.url;
+				var url = scope.texturePath + data.url;
 
 				scope.manager.itemStart( url );
-				loader.load( url, function ( uuid, url, image ) {
+
+				loader.load( url, function ( image ) {
 
 					scope.manager.itemEnd( url );
 
-					images[ uuid ] = image;
+					images[ data.uuid ] = image;
 
-				}.bind( null, data.uuid, url ) );
+				} );
+
+			};
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				loadImage( json[ i ] );
 
 			}
 
 		} else {
 
-			manager.onLoad();
+			onLoad();
 
 		}
 
