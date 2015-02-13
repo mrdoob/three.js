@@ -6,6 +6,8 @@ THREE.ObjectLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
+	this.texturePath = '';
+
 };
 
 THREE.ObjectLoader.prototype = {
@@ -20,9 +22,20 @@ THREE.ObjectLoader.prototype = {
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( JSON.parse( text ) ) );
+			scope.parse( JSON.parse( text ), onLoad );
 
 		}, onProgress, onError );
+
+	},
+
+	setTexturePath: function ( texturePath ) {
+
+		if ( typeof texturePath === 'string' ) {
+			this.texturePath = texturePath;
+		}
+		else {
+			console.warn( 'THREE.ObjectLoader: texturePath should be a string', texturePath );
+		}
 
 	},
 
@@ -32,13 +45,25 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
-	parse: function ( json ) {
+	parse: function ( json, onLoad ) {
 
-		var geometries = this.parseGeometries( json.geometries );
-		var materials = this.parseMaterials( json.materials );
-		var object = this.parseObject( json.object, geometries, materials );
+		var geometries, materials, images, textures;
+		var self = this;
 
-		return object;
+		self.manager.itemStart(json.object.uuid);
+		var manager = new THREE.LoadingManager( function() {
+
+			textures  = self.parseTextures( json.textures, images );
+			materials = self.parseMaterials( json.materials, textures );
+
+			onLoad( self.parseObject( json.object, geometries, materials ) );
+			// report back to parent manager
+			self.manager.itemEnd(json.object.uuid);
+
+		} );
+
+		geometries = this.parseGeometries( json.geometries );
+		images = this.parseImages( json.images, manager );
 
 	},
 
@@ -182,7 +207,7 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
-	parseMaterials: function ( json ) {
+	parseMaterials: function ( json, textures ) {
 
 		var materials = {};
 
@@ -199,6 +224,16 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.name !== undefined ) material.name = data.name;
 
+				if ( data.map ) {
+
+					if ( !textures[data.map] ) {
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.map );
+					}
+
+					material.map = textures[data.map];
+
+				}
+
 				materials[ data.uuid ] = material;
 
 			}
@@ -206,6 +241,94 @@ THREE.ObjectLoader.prototype = {
 		}
 
 		return materials;
+
+	},
+
+	parseImages: function ( json, manager ) {
+
+		var images = {};
+		var self   = this;
+
+		if ( json !== undefined ) {
+
+			var loader = new THREE.ImageLoader( manager );
+			loader.setCrossOrigin( this.crossOrigin );
+
+			if ( json.length === 0 ) {
+
+				manager.onLoad();
+
+			}
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				var data = json[ i ];
+				var url  = self.texturePath + data.url;
+
+				self.manager.itemStart( url );
+				loader.load( url, function ( uuid, url, image ) {
+
+					self.manager.itemEnd( url );
+
+					images[ uuid ] = image;
+
+				}.bind( null, data.uuid, url ) );
+
+			}
+
+		}
+		else {
+
+			manager.onLoad();
+
+		}
+
+		return images;
+
+	},
+
+	parseTextures: function ( json, images ) {
+
+		var textures = {};
+
+		if ( json !== undefined ) {
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				var data = json[ i ];
+
+				if ( !data.image ) {
+					console.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
+				}
+
+				if ( !images[data.image] ) {
+					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
+				}
+
+				var texture = new THREE.Texture( images[data.image] );
+				texture.needsUpdate = true;
+
+				texture.uuid = data.uuid;
+
+				if ( data.name !== undefined ) texture.name = data.name;
+				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2(data.repeat[0], data.repeat[1]);
+				if ( data.minFilter !== undefined ) texture.minFilter = THREE[data.minFilter];
+				if ( data.magFilter !== undefined ) texture.magFilter = THREE[data.magFilter];
+				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
+				if ( data.wrap instanceof Array ) {
+
+					texture.wrapS = THREE[data.wrap[0]];
+					texture.wrapT = THREE[data.wrap[1]];
+
+				}
+
+				textures[ data.uuid ] = texture;
+
+			}
+
+		}
+
+		return textures;
 
 	},
 
