@@ -5,12 +5,18 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body {
+			html, body {
+				width: 100%;
+				height: 100%;
 				font-family: Monospace;
 				background-color: #000;
 				color: #fff;
 				margin: 0px;
 				overflow: hidden;
+			}
+			canvas {
+				width: 100%;
+				height: 100%;
 			}
 			#info {
 				position: absolute;
@@ -134,8 +140,8 @@
 			var mouseX = 0;
 			var mouseXOnMouseDown = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var windowHalfX;
+			var windowHalfY;
 
 			var postprocessing = { enabled : false };
 			var glow = 0.9;
@@ -159,14 +165,13 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.body;
 
 				permalink = document.getElementById( "permalink" );
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+				camera = new THREE.PerspectiveCamera( 30, 1, 1, 1500 );
 				camera.position.set( 0, 400, 700 );
 
 				cameraTarget = new THREE.Vector3( 0, 150, 0 );
@@ -201,7 +206,7 @@
 					var weighthash = hash.substring( 7, 8 );
 					var pphash 	   = hash.substring( 8, 9 );
 					var bevelhash  = hash.substring( 9, 10 );
-					var texthash   = hash.substring( 10 );
+					var texthash   = hash.substring( 11 );
 
 					hex = colorhash;
 					pointLight.color.setHex( parseInt( colorhash, 16 ) );
@@ -245,10 +250,9 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, autoResize: true } );
 				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				// STATS
@@ -345,11 +349,6 @@
 
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				var width = window.innerWidth || 2;
-				var height = window.innerHeight || 2;
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-
 				effectFilm.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
@@ -359,25 +358,20 @@
 				composer.addPass( effectBloom );
 				composer.addPass( effectFilm );
 
-				//
+				renderer.addEventListener( 'resize', onRendererResize );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				onRendererResize();
 
 			}
 
-			function onWindowResize() {
+			function onRendererResize() {
 
 				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				composer.reset();
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / composer.writeBuffer.width, 1 / composer.writeBuffer.height );
 
 			}
 

@@ -25,6 +25,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 	_logarithmicDepthBuffer = parameters.logarithmicDepthBuffer !== undefined ? parameters.logarithmicDepthBuffer : false,
+	_autoResize = parameters.autoResize !== undefined ? parameters.autoResize : false,
+
+	_sizeNeedsUpdate = _autoResize,
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -501,10 +504,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function adjustByPixelRatio ( value ) {
+
+		return Math.floor( value * pixelRatio );
+
+	}
+
 	this.setSize = function ( width, height, updateStyle ) {
 
-		_canvas.width = width * pixelRatio;
-		_canvas.height = height * pixelRatio;
+		_canvas.width  = adjustByPixelRatio( width );
+		_canvas.height = adjustByPixelRatio( height );
 
 		if ( updateStyle !== false ) {
 
@@ -3299,6 +3308,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	this.resizeCanvasToMatchSizeItsDisplayed = function() {
+
+		var displayWidth  = _canvas.clientWidth;
+		var displayHeight = _canvas.clientHeight;
+
+		var widthSetSizeIsGoingToChoose  = adjustByPixelRatio( displayWidth );
+		var heightSetSizeIsGoingToChoose = adjustByPixelRatio( displayHeight );
+
+		if ( widthSetSizeIsGoingToChoose != _canvas.width || heightSetSizeIsGoingToChoose != _canvas.height ) {
+
+			this.setSize( displayWidth, displayHeight, false );
+
+			return true;
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
@@ -3307,6 +3338,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			THREE.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
+
+		}
+
+		if ( _sizeNeedsUpdate || _autoResize && ( renderTarget === undefined || renderTarget === null ) ) {
+
+			_sizeNeedsUpdate = false;
+
+			if ( this.resizeCanvasToMatchSizeItsDisplayed() ) {
+
+				camera.aspect = _canvas.clientWidth / _canvas.clientHeight;
+				camera.updateProjectionMatrix();
+
+				this.dispatchEvent( { type: 'resize' } );
+
+			}
 
 		}
 
@@ -6431,3 +6477,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.WebGLRenderer.prototype );
+
+
+

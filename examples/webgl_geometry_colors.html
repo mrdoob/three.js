@@ -5,16 +5,22 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body {
+			html, body {
 				color: #808080;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
-
+                width: 100%;
+                height: 100%;
 				background-color: #fff;
 				margin: 0px;
 				overflow: hidden;
 			}
+
+            canvas {
+                width: 100%;
+                height: 100%;
+            }
 
 			#info {
 				position: absolute;
@@ -31,7 +37,6 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - vertex colors</div>
 
 		<script src="../build/three.min.js"></script>
@@ -51,17 +56,14 @@
 
 			var mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				container = document.body;
 
-				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 20, 1, 1, 10000 );
 				camera.position.z = 1800;
 
 				scene = new THREE.Scene();
@@ -173,10 +175,9 @@
 				group3.rotation.x = 0;
 				scene.add( group3 );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, autoResize: true } );
 				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -186,28 +187,12 @@
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 			}
 
 			function onDocumentMouseMove( event ) {
 
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
+				mouseX = ( event.clientX - window.innerWidth / 2 );
+				mouseY = ( event.clientY - window.innerHeight / 2 );
 
 			}
 
