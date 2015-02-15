@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - MouseControls</title>
+		<title>three.js webgl - EventControls</title>
 		<meta charset="utf-8">
 		<meta name="author" content="Vildanov Almaz alvild@gmail.com" />
 		<style>
@@ -114,15 +114,29 @@
 
 				EventsControls = new EventsControls( camera, renderer.domElement );
 				EventsControls.map = plane;
-				EventsControls.fixed.z = true;
 				EventsControls.attach( scene.getObjectByName( 'disk0' ) );
 
-				EventsControls.dragAndDrop = function() {
-				
+
+				EventsControls.attachEvent( 'mouseOver', function () {
+
+					this.container.style.cursor = 'pointer';
+
+				});
+
+
+				EventsControls.attachEvent( 'mouseOut', function () {
+
+					this.container.style.cursor = 'auto';
+
+				});
+
+
+				EventsControls.attachEvent( 'dragAndDrop', function () {
+
 					this.container.style.cursor = 'move';
 
 					var vector = new THREE.Vector3( this._mouse.x, this._mouse.y, 1 ).unproject( camera ).multiplyScalar( camera.position.z / camera.far );
-					
+
 					if ( this.focused.position.y > ( heigthRod + heigthDisk ) / 2 ) {
 						plane.position.x = vector.x; return;
 					}
@@ -137,9 +151,10 @@
 						this.focused.position.x = plane.position.x; 
 					}
 
-				}
+				});
 
-				EventsControls.mouseUp = function () {
+
+				EventsControls.attachEvent( 'mouseUp', function () {
 
 					this.container.style.cursor = 'auto';
 					if ( ( this.focused.position.y <= ( heigthRod + heigthDisk ) / 2 ) && ( nextRod != beganRod ) ) {
@@ -163,20 +178,23 @@
 						}
 
 						if ( ( stacksDisk[ nextRod ].length == countDisk + 1 ) && nextRod != 0 ) { 
-							EventsControls.enabled = false; setTimeout('alert("Game over, you win!")', 300);
+							EventsControls.enabled = false; setTimeout( 'alert("Game over, you win!")', 300 );
 						}
 					}
 					else { this.returnPrevious(); stacksDisk[ beganRod ].push( numberDisk ); }
-				}
 
-				EventsControls.onclick = function () {
+				});
+
+
+				EventsControls.attachEvent( 'onclick', function () {
 
 						if ( this.focused.position.x > 50 ) { beganRod = 2; }
 							else if ( this.focused.position.x < -50 ) { beganRod = 0; }
 								else { beganRod = 1; }
 
 						numberDisk = stacksDisk[ beganRod ].pop();
-				}
+
+				});
 
 			}
 
@@ -193,7 +211,7 @@
 
 					stats.update();
 					EventsControls.update();
-					renderer.render(scene, camera);
+					renderer.render( scene, camera );
 
 			}
 
