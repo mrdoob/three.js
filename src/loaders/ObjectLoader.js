@@ -14,15 +14,27 @@ THREE.ObjectLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		if ( this.texturePath === undefined ) {
+
+			this.texturePath = url.substring( 0, url.lastIndexOf( '/' ) + 1 );
+
+		}
+
 		var scope = this;
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( JSON.parse( text ) ) );
+			scope.parse( JSON.parse( text ), onLoad );
 
 		}, onProgress, onError );
+
+	},
+
+	setTexturePath: function ( value ) {
+
+		this.texturePath = value;
 
 	},
 
@@ -32,13 +44,25 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
-	parse: function ( json ) {
+	parse: function ( json, onLoad ) {
 
-		var geometries = this.parseGeometries( json.geometries );
-		var materials = this.parseMaterials( json.materials );
-		var object = this.parseObject( json.object, geometries, materials );
+		var scope = this;
+		var geometries, materials, images, textures;
 
-		return object;
+		this.manager.itemStart( json.object.uuid );
+
+		geometries = this.parseGeometries( json.geometries );
+		images = this.parseImages( json.images, function () {
+
+			textures  = scope.parseTextures( json.textures, images );
+			materials = scope.parseMaterials( json.materials, textures );
+
+			onLoad( scope.parseObject( json.object, geometries, materials ) );
+
+			// report back to parent manager
+			scope.manager.itemEnd( json.object.uuid );
+
+		} );
 
 	},
 
@@ -182,7 +206,7 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
-	parseMaterials: function ( json ) {
+	parseMaterials: function ( json, textures ) {
 
 		var materials = {};
 
@@ -199,6 +223,18 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.name !== undefined ) material.name = data.name;
 
+				if ( data.map ) {
+
+					if ( textures[ data.map ] === undefined ) {
+
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.map );
+
+				}
+
+					material.map = textures[ data.map ];
+
+				}
+
 				materials[ data.uuid ] = material;
 
 			}
@@ -206,6 +242,99 @@ THREE.ObjectLoader.prototype = {
 		}
 
 		return materials;
+
+	},
+
+	parseImages: function ( json, onLoad ) {
+
+		var scope = this;
+		var images = {};
+
+		if ( json !== undefined && json.length > 0 ) {
+
+			var manager = new THREE.LoadingManager( onLoad );
+
+			var loader = new THREE.ImageLoader( manager );
+			loader.setCrossOrigin( this.crossOrigin );
+
+			var loadImage = function ( data ) {
+
+				var url = scope.texturePath + data.url;
+
+				scope.manager.itemStart( url );
+
+				loader.load( url, function ( image ) {
+
+					scope.manager.itemEnd( url );
+
+					images[ data.uuid ] = image;
+
+				} );
+
+			};
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				loadImage( json[ i ] );
+
+			}
+
+		} else {
+
+			onLoad();
+
+		}
+
+		return images;
+
+	},
+
+	parseTextures: function ( json, images ) {
+
+		var textures = {};
+
+		if ( json !== undefined ) {
+
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
+
+				var data = json[ i ];
+
+				if ( data.image === undefined ) {
+
+					console.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
+
+				}
+
+				if ( images[ data.image ] === undefined ) {
+
+					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
+
+				}
+
+				var texture = new THREE.Texture( images[ data.image ] );
+				texture.needsUpdate = true;
+
+				texture.uuid = data.uuid;
+
+				if ( data.name !== undefined ) texture.name = data.name;
+				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
+				if ( data.minFilter !== undefined ) texture.minFilter = THREE[ data.minFilter ];
+				if ( data.magFilter !== undefined ) texture.magFilter = THREE[ data.magFilter ];
+				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
+				if ( data.wrap instanceof Array ) {
+
+					texture.wrapS = THREE[ data.wrap[ 0 ] ];
+					texture.wrapT = THREE[ data.wrap[ 1 ] ];
+
+				}
+
+				textures[ data.uuid ] = texture;
+
+			}
+
+		}
+
+		return textures;
 
 	},
 
