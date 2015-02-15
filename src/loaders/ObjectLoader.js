@@ -229,10 +229,82 @@ THREE.ObjectLoader.prototype = {
 
 						console.warn( 'THREE.ObjectLoader: Undefined texture', data.map );
 
-				}
+					}
 
 					material.map = textures[ data.map ];
 
+				}
+				
+				if ( data.bumpMap ) {	
+			
+					if ( !textures[data.bumpMap] ) {
+						
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.bumpMap );
+					
+					}
+					
+					material.bumpMap = textures[data.bumpMap];
+					
+				}
+				
+				if ( data.alphaMap ) {
+					
+					if ( !textures[data.alphaMap] ) {
+						
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.alphaMap );
+						
+					}
+					
+					material.alphaMap = textures[data.alphaMap];
+					
+				}
+				
+				if ( data.envMap ) {
+				
+					if ( !textures[data.envMap] ) {
+						
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.envMap );
+						
+					}
+					
+					material.envMap = textures[data.envMap];
+					
+				}
+				
+				if ( data.normalMap ) {
+				
+					if ( !textures[data.normalMap] ) {
+						
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.normalMap );
+						
+					}
+					
+					material.normalMap = textures[data.normalMap];
+					
+				}
+				
+				if ( data.lightMap ) {
+				
+					if ( !textures[data.lightMap] ) {
+						
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.lightMap );
+						
+					}
+					
+					material.lightMap = textures[data.lightMap];
+					
+				}
+				
+				if ( data.specularMap ) {
+				
+					if ( !textures[data.specularMap] ) {
+						
+						console.warn( 'THREE.ObjectLoader: Undefined texture', data.specularMap );
+						
+					}
+					
+					material.specularMap = textures[data.specularMap];
+					
 				}
 
 				materials[ data.uuid ] = material;
