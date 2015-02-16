@@ -19,7 +19,7 @@ THREE.ShadowMesh = function ( mesh ) {
 	
 	THREE.Mesh.call( this, mesh.geometry, shadowMaterial );
 	
-	this.parentMeshMatrix = mesh.matrix;
+	this.parentMeshMatrix = mesh.matrixWorld;
 	
 	this.frustumCulled = false;
 
