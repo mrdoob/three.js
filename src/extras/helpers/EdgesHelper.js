@@ -13,6 +13,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 	var geometry = new THREE.BufferGeometry();
 
 	var geometry2;
+
 	if ( object.geometry instanceof THREE.BufferGeometry ) {
 
 		geometry2 = new THREE.Geometry();

@@ -254,8 +254,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	var textures = new THREE.WebGLTextures( _gl );
-
 	//
 
 	var glClearColor = function ( r, g, b, a ) {
@@ -888,6 +886,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.deleteTexture( texture.image.__webglTextureCube );
 
 			delete texture.image.__webglTextureCube;
+
+		} else {
+
+			// 2D texture
+
+			if ( texture.__webglInit === undefined ) return;
+
+			_gl.deleteTexture( texture.__webglTexture );
+
+			delete texture.__webglTexture;
+			delete texture.__webglInit;
 
 		}
 
@@ -5675,9 +5684,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.uploadTexture = function ( texture ) {
 
-		var webglTexture = textures.get( texture );
+		if ( texture.__webglInit === undefined ) {
 
-		_gl.bindTexture( _gl.TEXTURE_2D, webglTexture );
+			texture.__webglInit = true;
+
+			texture.addEventListener( 'dispose', onTextureDispose );
+
+			texture.__webglTexture = _gl.createTexture();
+
+			_this.info.memory.textures ++;
+
+		}
+
+		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -5786,7 +5805,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			_gl.bindTexture( _gl.TEXTURE_2D, textures.get( texture ) );
+			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
 		}
 
