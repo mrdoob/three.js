@@ -155,6 +155,15 @@ THREE.Material.prototype = {
 			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
 			if ( this.side !== THREE.FrontSide ) output.side = this.side;
 
+		} else if ( this instanceof THREE.PointCloudMaterial ) {
+
+			output.size  = this.size;
+			output.sizeAttenuation = this.sizeAttenuation;
+			output.color = this.color.getHex();
+			
+			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
+			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
+			
 		} else if ( this instanceof THREE.ShaderMaterial ) {
 
 			output.uniforms = this.uniforms;

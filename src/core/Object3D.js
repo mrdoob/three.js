@@ -693,7 +693,7 @@ THREE.Object3D.prototype = {
 				data.color = object.color.getHex();
 				data.groundColor = object.groundColor.getHex();
 
-			} else if ( object instanceof THREE.Mesh ) {
+			} else if ( object instanceof THREE.Mesh || object instanceof THREE.PointCloud ) {
 
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
