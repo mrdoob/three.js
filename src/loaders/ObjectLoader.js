@@ -46,23 +46,13 @@ THREE.ObjectLoader.prototype = {
 
 	parse: function ( json, onLoad ) {
 
-		var scope = this;
-		var geometries, materials, images, textures;
+		var geometries = this.parseGeometries( json.geometries );
 
-		this.manager.itemStart( json.object.uuid );
+		var images = this.parseImages( json.images, onLoad );
+		var textures  = this.parseTextures( json.textures, images );
+		var materials = this.parseMaterials( json.materials, textures );
 
-		geometries = this.parseGeometries( json.geometries );
-		images = this.parseImages( json.images, function () {
-
-			textures  = scope.parseTextures( json.textures, images );
-			materials = scope.parseMaterials( json.materials, textures );
-
-			onLoad( scope.parseObject( json.object, geometries, materials ) );
-
-			// report back to parent manager
-			scope.manager.itemEnd( json.object.uuid );
-
-		} );
+		return this.parseObject( json.object, geometries, materials );
 
 	},
 
@@ -281,7 +271,7 @@ THREE.ObjectLoader.prototype = {
 
 		} else {
 
-			onLoad();
+			if ( onLoad !== undefined ) onLoad();
 
 		}
 
