@@ -442,27 +442,31 @@ Editor.prototype = {
 		// backwards
 
 		if ( json.scene === undefined ) {
+		
+			var ethis = this;
+			loader.parse( json,function(scene) {
+				ethis.setScene( scene );
+			} );
 
-			var scene = loader.parse( json );
-
-			this.setScene( scene );
 
 			return;
 
 		}
 
 		// TODO: Clean this up somehow
+		var ethis = this;
+		loader.parse( json.camera,function(camera) {
+			ethis.camera.position.copy( camera.position );
+			ethis.camera.rotation.copy( camera.rotation );
+			ethis.camera.aspect = camera.aspect;
+			ethis.camera.near = camera.near;
+			ethis.camera.far = camera.far;
 
-		var camera = loader.parse( json.camera );
-
-		this.camera.position.copy( camera.position );
-		this.camera.rotation.copy( camera.rotation );
-		this.camera.aspect = camera.aspect;
-		this.camera.near = camera.near;
-		this.camera.far = camera.far;
-
-		this.setScene( loader.parse( json.scene ) );
-		this.scripts = json.scripts;
+			loader.parse( json.scene, function(sceneObj) {
+				ethis.setScene( sceneObj );
+				ethis.scripts = json.scripts;
+			});
+		});
 
 	},
 
