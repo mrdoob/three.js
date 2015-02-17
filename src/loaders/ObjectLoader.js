@@ -202,6 +202,18 @@ THREE.ObjectLoader.prototype = {
 
 		if ( json !== undefined ) {
 
+			var getTexture = function ( name ) {
+
+				if ( textures[ name ] === undefined ) {
+
+					THREE.warn( 'THREE.ObjectLoader: Undefined texture', name );
+
+				}
+
+				return textures[ name ];
+
+			};
+
 			var loader = new THREE.MaterialLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -213,88 +225,46 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.name !== undefined ) material.name = data.name;
 
-				if ( data.map ) {
+				if ( data.map !== undefined ) {
 
-					if ( textures[ data.map ] === undefined ) {
-
-						console.warn( 'THREE.ObjectLoader: Undefined texture', data.map );
-
-					}
-
-					material.map = textures[ data.map ];
+					material.map = getTexture( data.map );
 
 				}
-				
-				if ( data.bumpMap ) {	
-			
-					if ( !textures[data.bumpMap] ) {
-						
-						console.warn( 'THREE.ObjectLoader: Undefined texture', data.bumpMap );
-					
-					}
-					
-					material.bumpMap = textures[data.bumpMap];
-					
+
+				if ( data.bumpMap !== undefined ) {
+
+					material.bumpMap = getTexture( data.bumpMap );
+
 				}
-				
-				if ( data.alphaMap ) {
-					
-					if ( !textures[data.alphaMap] ) {
-						
-						console.warn( 'THREE.ObjectLoader: Undefined texture', data.alphaMap );
-						
-					}
-					
-					material.alphaMap = textures[data.alphaMap];
-					
+
+				if ( data.alphaMap !== undefined ) {
+
+					material.alphaMap = getTexture( data.alphaMap );
+
 				}
-				
-				if ( data.envMap ) {
-				
-					if ( !textures[data.envMap] ) {
-						
-						console.warn( 'THREE.ObjectLoader: Undefined texture', data.envMap );
-						
-					}
-					
-					material.envMap = textures[data.envMap];
-					
+
+				if ( data.envMap !== undefined ) {
+
+					material.envMap = getTexture( data.envMap );
+
 				}
-				
-				if ( data.normalMap ) {
-				
-					if ( !textures[data.normalMap] ) {
-						
-						console.warn( 'THREE.ObjectLoader: Undefined texture', data.normalMap );
-						
-					}
-					
-					material.normalMap = textures[data.normalMap];
-					
+
+				if ( data.normalMap !== undefined ) {
+
+					material.normalMap = getTexture( data.normalMap );
+
 				}
-				
-				if ( data.lightMap ) {
-				
-					if ( !textures[data.lightMap] ) {
-						
-						console.warn( 'THREE.ObjectLoader: Undefined texture', data.lightMap );
-						
-					}
-					
-					material.lightMap = textures[data.lightMap];
-					
+
+				if ( data.lightMap !== undefined ) {
+
+					material.lightMap = getTexture( data.lightMap );
+
 				}
-				
-				if ( data.specularMap ) {
-				
-					if ( !textures[data.specularMap] ) {
-						
-						console.warn( 'THREE.ObjectLoader: Undefined texture', data.specularMap );
-						
-					}
-					
-					material.specularMap = textures[data.specularMap];
-					
+
+				if ( data.specularMap !== undefined ) {
+
+					material.specularMap = getTexture( data.specularMap );
+
 				}
 
 				materials[ data.uuid ] = material;
@@ -363,13 +333,13 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.image === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
+					THREE.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
 
 				}
 
 				if ( images[ data.image ] === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
+					THREE.warn( 'THREE.ObjectLoader: Undefined image', data.image );
 
 				}
 
@@ -407,6 +377,30 @@ THREE.ObjectLoader.prototype = {
 		return function ( data, geometries, materials ) {
 
 			var object;
+
+			var getGeometry = function ( name ) {
+
+				if ( geometries[ name ] === undefined ) {
+
+					THREE.warn( 'THREE.ObjectLoader: Undefined geometry', name );
+
+				}
+
+				return geometries[ name ];
+
+			};
+
+			var getMaterial = function ( name ) {
+
+				if ( materials[ name ] === undefined ) {
+
+					THREE.warn( 'THREE.ObjectLoader: Undefined material', name );
+
+				}
+
+				return materials[ name ];
+
+			};
 
 			switch ( data.type ) {
 
@@ -460,78 +454,25 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Mesh':
 
-					var geometry = geometries[ data.geometry ];
-					var material = materials[ data.material ];
-
-					if ( geometry === undefined ) {
-
-						THREE.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
-
-					}
-
-					if ( material === undefined ) {
-
-						THREE.warn( 'THREE.ObjectLoader: Undefined material', data.material );
-
-					}
-
-					object = new THREE.Mesh( geometry, material );
+					object = new THREE.Mesh( getGeometry( data.geometry ), getMaterial( data.material ) );
 
 					break;
 
 				case 'Line':
 
-					var geometry = geometries[ data.geometry ];
-					var material = materials[ data.material ];
-
-					if ( geometry === undefined ) {
-
-						THREE.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
-
-					}
-
-					if ( material === undefined ) {
-
-						THREE.warn( 'THREE.ObjectLoader: Undefined material', data.material );
-
-					}
-
-					object = new THREE.Line( geometry, material );
+					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ) );
 
 					break;
-					
+
 				case 'PointCloud':
 
-					var geometry = geometries[ data.geometry ];
-					var material = materials[ data.material ];
-
-					if ( geometry === undefined ) {
-
-						console.warn( 'THREE.ObjectLoader: Undefined geometry', data.geometry );
-
-					}
-
-					if ( material === undefined ) {
-
-						console.warn( 'THREE.ObjectLoader: Undefined material', data.material );
-
-					}
-
-					object = new THREE.PointCloud( geometry, material );
+					object = new THREE.PointCloud( getGeometry( data.geometry ), getMaterial( data.material ) );
 
 					break;
 
 				case 'Sprite':
 
-					var material = materials[ data.material ];
-
-					if ( material === undefined ) {
-
-						THREE.warn( 'THREE.ObjectLoader: Undefined material', data.material );
-
-					}
-
-					object = new THREE.Sprite( material );
+					object = new THREE.Sprite( getMaterial( data.material ) );
 
 					break;
 
