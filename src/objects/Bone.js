@@ -10,6 +10,7 @@ THREE.Bone = function ( belongsToSkin ) {
 
 	this.skin = belongsToSkin;
 
+	this.type = 'Bone';
 };
 
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
