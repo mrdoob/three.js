@@ -19,7 +19,7 @@ THREE.ShadowMesh = function ( mesh ) {
 	
 	THREE.Mesh.call( this, mesh.geometry, shadowMaterial );
 	
-	this.parentMeshMatrix = mesh.matrixWorld;
+	this.meshMatrix = mesh.matrixWorld;
 	
 	this.frustumCulled = false;
 	
@@ -64,7 +64,7 @@ THREE.ShadowMesh.prototype.update = function () {
 		sme[ 11 ] = - lightPosition4D.w * plane.normal.z;
 		sme[ 15 ] = dot - lightPosition4D.w * -plane.constant;
 		
-		this.matrix.multiplyMatrices( shadowMatrix, this.parentMeshMatrix );
+		this.matrix.multiplyMatrices( shadowMatrix, this.meshMatrix );
 
 	};
 
