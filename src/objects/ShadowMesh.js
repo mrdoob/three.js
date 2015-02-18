@@ -4,7 +4,7 @@
  * @author erichlof /  http://github.com/erichlof
  */
 
-// a shadow Mesh that follows its parent Mesh in the scene, but is confined to a single plane.
+// a shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.
 
 THREE.ShadowMesh = function ( mesh ) {
 	
