@@ -12873,17 +12873,13 @@ THREE.ObjectLoader.prototype = {
 			var loader = new THREE.ImageLoader( manager );
 			loader.setCrossOrigin( this.crossOrigin );
 
-			var loadImage = function ( data ) {
-
-				var url = scope.texturePath + data.url;
+			var loadImage = function ( url ) {
 
 				scope.manager.itemStart( url );
 
-				loader.load( url, function ( image ) {
+				return loader.load( url, function () {
 
 					scope.manager.itemEnd( url );
-
-					images[ data.uuid ] = image;
 
 				} );
 
@@ -12891,7 +12887,9 @@ THREE.ObjectLoader.prototype = {
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				loadImage( json[ i ] );
+				var image = json[ i ];
+
+				images[ image.uuid ] = loadImage( scope.texturePath + image.url );
 
 			}
 
