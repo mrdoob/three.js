@@ -1,3 +1,4 @@
+import math
 import mathutils
 from bpy import data, context
 from .. import constants, logger, utilities
@@ -274,6 +275,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
                 bone_matrix = parent_matrix.inverted() * bone_matrix
 
             pos, rot, scl = bone_matrix.decompose()
+            rot = _normalize_quaternion(rot)
 
             pchange = True or has_keyframe_at(
                 channels_location[bone_index], frame)
@@ -569,3 +571,34 @@ def _handle_position_channel(channel, frame, position):
             position.z = value
 
     return change
+
+
+def _quaternion_length(quat):
+    """Calculate the length of a quaternion
+
+    :param quat: Blender quaternion object
+    :rtype: float
+
+    """
+    return math.sqrt(quat.x * quat.x + quat.y * quat.y +
+                     quat.z * quat.z + quat.w * quat.w)
+
+
+def _normalize_quaternion(quat):
+    """Normalize a quaternion
+
+    :param quat: Blender quaternion object
+    :returns: generic quaternion enum object with normalized values
+    :rtype: object
+
+    """
+    enum = type('Enum', (), {'x': 0, 'y': 0, 'z': 0, 'w': 1})
+    length = _quaternion_length(quat)
+    if length is not 0:
+        length = 1 / length
+        enum.x = quat.x * length
+        enum.y = quat.y * length
+        enum.z = quat.z * length
+        enum.w = quat.w * length
+    return enum
+
