@@ -15573,17 +15573,18 @@ THREE.Mesh.prototype.clone = function ( object, recursive ) {
  * @author ikerr / http://verold.com
  */
 
-THREE.Bone = function ( belongsToSkin ) {
+THREE.Bone = function ( skin ) {
 
 	THREE.Object3D.call( this );
 
-	this.skin = belongsToSkin;
+	this.type = 'Bone';
+
+	this.skin = skin;
 
 };
 
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Bone.prototype.constructor = THREE.Bone;
-
 
 // File:src/objects/Skeleton.js
 
