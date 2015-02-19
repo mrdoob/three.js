@@ -12621,11 +12621,16 @@ THREE.ObjectLoader.prototype = {
 
 		var geometries = this.parseGeometries( json.geometries );
 
-		var images = this.parseImages( json.images, onLoad );
+		var images = this.parseImages( json.images, function () {
+
+			if ( onLoad !== undefined ) onLoad( object );
+
+		} );
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
+		var object = this.parseObject( json.object, geometries, materials );
 
-		return this.parseObject( json.object, geometries, materials );
+		return object;
 
 	},
 
