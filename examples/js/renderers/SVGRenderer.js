@@ -215,7 +215,7 @@ THREE.SVGRenderer = function () {
 				var x =   _vector3.x * _svgWidthHalf;
 				var y = - _vector3.y * _svgHeightHalf;
 
-			 	var node = object.node;
+				var node = object.node;
 				node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
 
 				_svg.appendChild( node );

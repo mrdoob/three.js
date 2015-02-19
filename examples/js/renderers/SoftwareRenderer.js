@@ -404,8 +404,8 @@ THREE.SoftwareRenderer = function ( parameters ) {
 							+ (material.palette[cIndex + 2] * tdata[tIndex + 2]);
 
 			if (opaci < 250) {
-			var backColor = buffer[ colorOffset ] << 24 + buffer[ colorOffset + 1 ] << 16 + buffer[ colorOffset + 2 ] << 8;
-			foreColor = foreColor * opaci + backColor * (1 - opaci);
+				var backColor = buffer[ colorOffset ] << 24 + buffer[ colorOffset + 1 ] << 16 + buffer[ colorOffset + 2 ] << 8;
+				foreColor = foreColor * opaci + backColor * (1 - opaci);
 			}
 
 			buffer[ colorOffset ] = (foreColor & 0xff0000) >> 16;

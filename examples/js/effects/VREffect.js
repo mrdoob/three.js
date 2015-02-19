@@ -56,7 +56,7 @@ THREE.VREffect = function ( renderer, done ) {
 			}
 			if ( done ) {
 				if ( !vrHMD ) {
-				 error = 'HMD not available';
+					error = 'HMD not available';
 				}
 				done( error );
 			}

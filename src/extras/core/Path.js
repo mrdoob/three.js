@@ -375,7 +375,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			//console.log(points);
 
-		  break;
+			break;
 		  
 		case THREE.PathActions.ELLIPSE:
 
@@ -413,7 +413,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			//console.log(points);
 
-		  break;
+			break;
 
 		} // end switch
 

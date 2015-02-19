@@ -154,8 +154,8 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			pixel_total,
 			palettes;
 
-			pixel_size = header.pixel_size >> 3;
-			pixel_total = header.width * header.height * pixel_size;
+		pixel_size = header.pixel_size >> 3;
+		pixel_total = header.width * header.height * pixel_size;
 
 		 // Read palettes
 		 if ( use_pal ) {
@@ -178,12 +178,12 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 				if (c & 0x80) {
 					// Bind pixel tmp array
 					for (i = 0; i < pixel_size; ++ i) {
-							pixels[i] = data[offset ++];
+						pixels[i] = data[offset ++];
 					}
 
 					// Copy pixel array
 					for (i = 0; i < count; ++ i) {
-							pixel_data.set(pixels, shift + i * pixel_size);
+						pixel_data.set(pixels, shift + i * pixel_size);
 					}
 
 					shift += pixel_size * count;
@@ -192,7 +192,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 					// Raw pixels.
 					count *= pixel_size;
 					for (i = 0; i < count; ++ i) {
-							pixel_data[shift + i] = data[offset ++];
+						pixel_data[shift + i] = data[offset ++];
 					}
 					shift += count;
 				}
@@ -214,7 +214,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		var colormap = palettes;
 		var color, i = 0, x, y;
-				var width = header.width;
+		var width = header.width;
 
 		for (y = y_start; y !== y_end; y += y_step) {
 			for (x = x_start; x !== x_end; x += x_step, i ++) {

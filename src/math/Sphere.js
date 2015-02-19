@@ -52,7 +52,7 @@ THREE.Sphere.prototype = {
 
 			return this;
 
- 		};
+		};
 
 	}(),
 

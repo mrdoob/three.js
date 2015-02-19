@@ -110,15 +110,15 @@ THREE.STLLoader.prototype = {
 				(reader.getUint8(index + 4) == 0x52 /*'R'*/) &&
 				(reader.getUint8(index + 5) == 0x3D /*'='*/)) {
 
-					hasColors = true;
-					colors = new Float32Array( faces * 3 * 3);
+				hasColors = true;
+				colors = new Float32Array( faces * 3 * 3);
 
-					defaultR = reader.getUint8(index + 6) / 255;
-					defaultG = reader.getUint8(index + 7) / 255;
-					defaultB = reader.getUint8(index + 8) / 255;
-					alpha = reader.getUint8(index + 9) / 255;
-				}
+				defaultR = reader.getUint8(index + 6) / 255;
+				defaultG = reader.getUint8(index + 7) / 255;
+				defaultB = reader.getUint8(index + 8) / 255;
+				alpha = reader.getUint8(index + 9) / 255;
 			}
+		}
 
 		var dataOffset = 84;
 		var faceLength = 12 * 4 + 2;

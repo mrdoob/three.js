@@ -176,14 +176,14 @@ THREE.ConvexGeometry = function( vertices ) {
 
 		 for ( var j = 0; j < 3; j ++ ) {
 
-				if ( newId[ face[ j ] ] === undefined ) {
+			if ( newId[ face[ j ] ] === undefined ) {
 
-						newId[ face[ j ] ] = id ++;
-						this.vertices.push( vertices[ face[ j ] ] );
+				newId[ face[ j ] ] = id ++;
+				this.vertices.push( vertices[ face[ j ] ] );
 
-				}
+			}
 
-				face[ j ] = newId[ face[ j ] ];
+			face[ j ] = newId[ face[ j ] ];
 
 		 }
 

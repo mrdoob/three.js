@@ -430,7 +430,7 @@ THREE.SceneLoader.prototype = {
 
 						} else if ( objJSON.target ) {
 
-						    camera.lookAt( new THREE.Vector3().fromArray( objJSON.target ) );
+							camera.lookAt( new THREE.Vector3().fromArray( objJSON.target ) );
 
 						}
 

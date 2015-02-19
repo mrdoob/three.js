@@ -212,17 +212,17 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 	// we could get finer grain at lengths, or use simple interpolatation between two points
 
 	var lengthBefore = arcLengths[ i ];
-    var lengthAfter = arcLengths[ i + 1 ];
+	var lengthAfter = arcLengths[ i + 1 ];
 
-    var segmentLength = lengthAfter - lengthBefore;
+	var segmentLength = lengthAfter - lengthBefore;
 
     // determine where we are between the 'before' and 'after' points
 
-    var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
+	var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
 
     // add that fractional amount to t
 
-    var t = ( i + segmentFraction ) / ( il - 1 );
+	var t = ( i + segmentFraction ) / ( il - 1 );
 
 	return t;
 

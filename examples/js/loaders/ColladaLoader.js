@@ -735,7 +735,7 @@ THREE.ColladaLoader = function () {
 
 		// move vertices to bind shape
 		for ( i = 0; i < geometry.vertices.length; i ++ ) {
-					geometry.vertices[i].applyMatrix4( skinController.skin.bindShapeMatrix );
+			geometry.vertices[i].applyMatrix4( skinController.skin.bindShapeMatrix );
 		}
 
 		var skinIndices = [];
@@ -1343,17 +1343,17 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-        var nodes = COLLADA.querySelectorAll('library_nodes node');
+		var nodes = COLLADA.querySelectorAll('library_nodes node');
 
-        for ( var i = 0; i < nodes.length; i ++ ) {
+		for ( var i = 0; i < nodes.length; i ++ ) {
 
-            var attObj = nodes[i].attributes.getNamedItem('id');
-            if ( attObj && attObj.value === id ) {
-                return nodes[i];
-        }
-        }
+			var attObj = nodes[i].attributes.getNamedItem('id');
+			if ( attObj && attObj.value === id ) {
+				return nodes[i];
+			}
+		}
 
-        return undefined;
+		return undefined;
 
 	};
 
@@ -3365,35 +3365,35 @@ THREE.ColladaLoader = function () {
 
 		//for (var i = 0; i < this.accessor.params.length; i++) {
 
-			var param = this.accessor.params[ 0 ];
+		var param = this.accessor.params[ 0 ];
 
 			//console.log(param.name + " " + param.type);
 
-			switch ( param.type ) {
+		switch ( param.type ) {
 
-				case 'IDREF':
-				case 'Name': case 'name':
-				case 'float':
+			case 'IDREF':
+			case 'Name': case 'name':
+			case 'float':
 
-					return this.data;
+				return this.data;
 
-				case 'float4x4':
+			case 'float4x4':
 
-					for ( var j = 0; j < this.data.length; j += 16 ) {
+				for ( var j = 0; j < this.data.length; j += 16 ) {
 
-						var s = this.data.slice( j, j + 16 );
-						var m = getConvertedMat4( s );
-						result.push( m );
-					}
+					var s = this.data.slice( j, j + 16 );
+					var m = getConvertedMat4( s );
+					result.push( m );
+				}
 
-					break;
+				break;
 
-				default:
+			default:
 
-					console.log( 'ColladaLoader: Source: Read dont know how to read ' + param.type + '.' );
-					break;
+				console.log( 'ColladaLoader: Source: Read dont know how to read ' + param.type + '.' );
+				break;
 
-			}
+		}
 
 		//}
 

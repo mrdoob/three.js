@@ -605,7 +605,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		var uvs = uvgen.generateTopUV( scope, a, b, c );
 
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+		scope.faceVertexUvs[ 0 ].push( uvs );
 
 	}
 
@@ -616,13 +616,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
- 		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
+		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
- 		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
+		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
 
- 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
- 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
+		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
 
 	}
 

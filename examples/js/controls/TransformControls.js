@@ -30,8 +30,8 @@
 
 			} else {
 
-					this.color.copy( this.oldColor );
-					this.opacity = this.oldOpacity;
+				this.color.copy( this.oldColor );
+				this.opacity = this.oldOpacity;
 
 			}
 
@@ -65,8 +65,8 @@
 
 			} else {
 
-					this.color.copy( this.oldColor );
-					this.opacity = this.oldOpacity;
+				this.color.copy( this.oldColor );
+				this.opacity = this.oldOpacity;
 
 			}
 
@@ -331,15 +331,15 @@
 
 		var CircleGeometry = function ( radius, facing, arc ) {
 
-				var geometry = new THREE.Geometry();
-				arc = arc ? arc : 1;
-				for ( var i = 0; i <= 64 * arc; ++ i ) {
-					if ( facing == 'x' ) geometry.vertices.push( new THREE.Vector3( 0, Math.cos( i / 32 * Math.PI ), Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
-					if ( facing == 'y' ) geometry.vertices.push( new THREE.Vector3( Math.cos( i / 32 * Math.PI ), 0, Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
-					if ( facing == 'z' ) geometry.vertices.push( new THREE.Vector3( Math.sin( i / 32 * Math.PI ), Math.cos( i / 32 * Math.PI ), 0 ).multiplyScalar(radius) );
-				}
+			var geometry = new THREE.Geometry();
+			arc = arc ? arc : 1;
+			for ( var i = 0; i <= 64 * arc; ++ i ) {
+				if ( facing == 'x' ) geometry.vertices.push( new THREE.Vector3( 0, Math.cos( i / 32 * Math.PI ), Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
+				if ( facing == 'y' ) geometry.vertices.push( new THREE.Vector3( Math.cos( i / 32 * Math.PI ), 0, Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
+				if ( facing == 'z' ) geometry.vertices.push( new THREE.Vector3( Math.sin( i / 32 * Math.PI ), Math.cos( i / 32 * Math.PI ), 0 ).multiplyScalar(radius) );
+			}
 
-				return geometry;
+			return geometry;
 		};
 
 		this.handleGizmos = {

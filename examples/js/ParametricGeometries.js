@@ -108,9 +108,9 @@ THREE.ParametricGeometries.TubeGeometry = function(path, segments, radius, segme
 		binormals = frames.binormals;
 
 		// proxy internals
-		this.tangents = tangents;
-		this.normals = normals;
-		this.binormals = binormals;
+	this.tangents = tangents;
+	this.normals = normals;
+	this.binormals = binormals;
 
 
 

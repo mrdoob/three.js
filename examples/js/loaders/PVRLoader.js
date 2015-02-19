@@ -77,16 +77,16 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 	}
 
 	pvrDatas.dataPtr 	 = 52 + metaLen;
-  	pvrDatas.bpp 		 = bpp;
-  	pvrDatas.format 	 = format;
-  	pvrDatas.width 		 = width;
-  	pvrDatas.height 	 = height;
-  	pvrDatas.numSurfaces = numFaces;
-  	pvrDatas.numMipmaps  = numMipmaps;
+	pvrDatas.bpp 		 = bpp;
+	pvrDatas.format 	 = format;
+	pvrDatas.width 		 = width;
+	pvrDatas.height 	 = height;
+	pvrDatas.numSurfaces = numFaces;
+	pvrDatas.numMipmaps  = numMipmaps;
 
-  	pvrDatas.isCubemap 	= (numFaces === 6);
+	pvrDatas.isCubemap 	= (numFaces === 6);
 
-  	return THREE.PVRLoader._extract( pvrDatas );
+	return THREE.PVRLoader._extract( pvrDatas );
 };
 
 THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
@@ -133,18 +133,18 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 
 
 	pvrDatas.dataPtr 	 = headerLength;
-  	pvrDatas.bpp 		 = bpp;
-  	pvrDatas.format 	 = format;
-  	pvrDatas.width 		 = width;
-  	pvrDatas.height 	 = height;
-  	pvrDatas.numSurfaces = numSurfs;
-  	pvrDatas.numMipmaps  = numMipmaps + 1;
+	pvrDatas.bpp 		 = bpp;
+	pvrDatas.format 	 = format;
+	pvrDatas.width 		 = width;
+	pvrDatas.height 	 = height;
+	pvrDatas.numSurfaces = numSurfs;
+	pvrDatas.numMipmaps  = numMipmaps + 1;
 
   	// guess cubemap type seems tricky in v2
   	// it juste a pvr containing 6 surface (no explicit cubemap type)
-  	pvrDatas.isCubemap 	= (numSurfs === 6);
+	pvrDatas.isCubemap 	= (numSurfs === 6);
 
-  	return THREE.PVRLoader._extract( pvrDatas );
+	return THREE.PVRLoader._extract( pvrDatas );
 
 };
 

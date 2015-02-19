@@ -260,7 +260,7 @@ THREE.VRMLLoader.prototype = {
 							// end of current face
 							if (parts[ind] === "-1") {
 								if (index.length > 0) {
-								   this.indexes.push(index);
+									this.indexes.push(index);
 								}
 
 								// start new one
