@@ -514,7 +514,7 @@ THREE.ShaderSkin = {
 				"#endif",
 
 
-				"outgoingLight += diffuseColor.rgb * totalDiffuseLight;",
+				"outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalSpecularLight );",
 
 				"if ( passID == 0 ) {",
 
@@ -547,13 +547,15 @@ THREE.ShaderSkin = {
 					//"gl_FragColor = vec4( vec3( 0.25, 0.6, 0.8 ) * nonblurColor + vec3( 0.15, 0.25, 0.2 ) * blur1Color + vec3( 0.15, 0.15, 0.0 ) * blur2Color + vec3( 0.45, 0.0, 0.0 ) * blur3Color, gl_FragColor.w );",
 
 
-					"outgoingLight += vec3( vec3( 0.22,  0.437, 0.635 ) * nonblurColor + ",
+					"outgoingLight = vec3( vec3( 0.22,  0.437, 0.635 ) * nonblurColor + ",
 										 "vec3( 0.101, 0.355, 0.365 ) * blur1Color + ",
 										 "vec3( 0.119, 0.208, 0.0 )   * blur2Color + ",
 										 "vec3( 0.114, 0.0,   0.0 )   * blur3Color + ",
 										 "vec3( 0.444, 0.0,   0.0 )   * blur4Color );",
 
-					"outgoingLight += ambientLightColor * diffuse + totalSpecularLight;",
+					"outgoingLight *= sqrt( colDiffuse.xyz );",
+
+					"outgoingLight += ambientLightColor * diffuse * colDiffuse.xyz + totalSpecularLight;",
 
 					"#ifndef VERSION1",
 
