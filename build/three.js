@@ -1554,9 +1554,9 @@ THREE.Vector2.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-	    this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
-	    return this;
+		return this;
 
 	},
 
@@ -1591,14 +1591,14 @@ THREE.Vector2.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) offset = 0;
 
-	    index = index * attribute.itemSize + offset;
+		index = index * attribute.itemSize + offset;
 
-	    this.x = attribute.array[ index ];
-	    this.y = attribute.array[ index + 1 ];
+		this.x = attribute.array[ index ];
+		this.y = attribute.array[ index + 1 ];
 
-	    return this;
+		return this;
 
 	},
 
@@ -2213,9 +2213,9 @@ THREE.Vector3.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-	    this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
-	    return this;
+		return this;
 
 	},
 
@@ -2433,15 +2433,15 @@ THREE.Vector3.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) offset = 0;
 
-	    index = index * attribute.itemSize + offset;
+		index = index * attribute.itemSize + offset;
 
-	    this.x = attribute.array[ index ];
-	    this.y = attribute.array[ index + 1 ];
-	    this.z = attribute.array[ index + 2 ];
+		this.x = attribute.array[ index ];
+		this.y = attribute.array[ index + 1 ];
+		this.z = attribute.array[ index + 2 ];
 
-	    return this;
+		return this;
 
 	},
 
@@ -2962,49 +2962,49 @@ THREE.Vector4.prototype = {
 
 	} )(),
 
-    floor: function () {
+  floor: function () {
 
-        this.x = Math.floor( this.x );
-        this.y = Math.floor( this.y );
-        this.z = Math.floor( this.z );
-        this.w = Math.floor( this.w );
+		this.x = Math.floor( this.x );
+		this.y = Math.floor( this.y );
+		this.z = Math.floor( this.z );
+		this.w = Math.floor( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
-    ceil: function () {
+  ceil: function () {
 
-        this.x = Math.ceil( this.x );
-        this.y = Math.ceil( this.y );
-        this.z = Math.ceil( this.z );
-        this.w = Math.ceil( this.w );
+		this.x = Math.ceil( this.x );
+		this.y = Math.ceil( this.y );
+		this.z = Math.ceil( this.z );
+		this.w = Math.ceil( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
-    round: function () {
+  round: function () {
 
-        this.x = Math.round( this.x );
-        this.y = Math.round( this.y );
-        this.z = Math.round( this.z );
-        this.w = Math.round( this.w );
+		this.x = Math.round( this.x );
+		this.y = Math.round( this.y );
+		this.z = Math.round( this.z );
+		this.w = Math.round( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
-    roundToZero: function () {
+  roundToZero: function () {
 
-        this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-        this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-        this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
-        this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
+		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
+		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+		this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+		this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
 	negate: function () {
 
@@ -3074,9 +3074,9 @@ THREE.Vector4.prototype = {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-	    this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
 
-	    return this;
+		return this;
 
 	},
 
@@ -3115,16 +3115,16 @@ THREE.Vector4.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) offset = 0;
 
-	    index = index * attribute.itemSize + offset;
+		index = index * attribute.itemSize + offset;
 
-	    this.x = attribute.array[ index ];
-	    this.y = attribute.array[ index + 1 ];
-	    this.z = attribute.array[ index + 2 ];
-	    this.w = attribute.array[ index + 3 ];
+		this.x = attribute.array[ index ];
+		this.y = attribute.array[ index + 1 ];
+		this.z = attribute.array[ index + 2 ];
+		this.w = attribute.array[ index + 3 ];
 
-	    return this;
+		return this;
 
 	},
 
@@ -4558,15 +4558,15 @@ THREE.Matrix4.prototype = {
 
 	extractBasis: function ( xAxis, yAxis, zAxis ) {
  
- 		var te = this.elements;
+		var te = this.elements;
  
 		xAxis.set( te[ 0 ], te[ 1 ], te[ 2 ] );
 		yAxis.set( te[ 4 ], te[ 5 ], te[ 6 ] );
 		zAxis.set( te[ 8 ], te[ 9 ], te[ 10 ] );
  
- 		return this;
+		return this;
  		
- 	},
+	},
  
 	makeBasis: function ( xAxis, yAxis, zAxis ) {
 
@@ -4577,7 +4577,7 @@ THREE.Matrix4.prototype = {
 			0,       0,       0,       1
 		);
 
-	    return this;
+		return this;
 
 	},
 
@@ -5802,7 +5802,7 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	intersectBox: function ( box , optionalTarget ) {
+	intersectBox: function ( box, optionalTarget ) {
 
 		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 
@@ -6007,7 +6007,7 @@ THREE.Sphere.prototype = {
 
 		var box = new THREE.Box3();
 
-		return function ( points, optionalCenter )  {
+		return function ( points, optionalCenter ) {
 
 			var center = this.center;
 
@@ -6033,7 +6033,7 @@ THREE.Sphere.prototype = {
 
 			return this;
 
- 		};
+		};
 
 	}(),
 
@@ -7704,7 +7704,7 @@ THREE.Object3D.prototype = {
 
 		if ( arguments.length > 1 ) {
 
-			for ( var i = 0; i < arguments.length; i++ ) {
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
 				this.add( arguments[ i ] );
 
@@ -7748,7 +7748,7 @@ THREE.Object3D.prototype = {
 
 		if ( arguments.length > 1 ) {
 
-			for ( var i = 0; i < arguments.length; i++ ) {
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
 				this.remove( arguments[ i ] );
 
@@ -10966,7 +10966,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.shadowCascadeHeight = [ 512, 512, 512 ];
 
 	this.shadowCascadeNearZ = [ - 1.000, 0.990, 0.998 ];
-	this.shadowCascadeFarZ  = [  0.990, 0.998, 1.000 ];
+	this.shadowCascadeFarZ  = [ 0.990, 0.998, 1.000 ];
 
 	this.shadowCascadeArray = [];
 
@@ -12279,7 +12279,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
 
-				THREE.warn( 'THREE.JSONLoader: When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+			THREE.warn( 'THREE.JSONLoader: When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
 					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
 
 		}
@@ -13184,7 +13184,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 				texture.image = texData.image;
 
-			} else if ( undefined !== texData.data ){
+			} else if ( undefined !== texData.data ) {
 
 				texture.image.width = texData.width;
 				texture.image.height = texData.height;
@@ -13289,7 +13289,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 					if ( loaded === 6 ) {
 
- 						if (texDatas.mipmapCount == 1)
+						if (texDatas.mipmapCount == 1)
  							texture.minFilter = THREE.LinearFilter;
 
 						texture.format = texDatas.format;
@@ -14964,7 +14964,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
+				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -15111,7 +15111,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0; oi < offsets.length; oi++){
+				for ( var oi = 0; oi < offsets.length; oi ++) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -15325,7 +15325,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( ray.isIntersectionBox( geometry.boundingBox ) === false )  {
+			if ( ray.isIntersectionBox( geometry.boundingBox ) === false ) {
 
 				return;
 
@@ -15356,7 +15356,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
+				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -15793,7 +15793,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 		var bone, gbone, p, q, s;
 
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
 
 			gbone = this.geometry.bones[ b ];
 
@@ -15820,7 +15820,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 		}
 
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
 
 			gbone = this.geometry.bones[ b ];
 
@@ -16379,7 +16379,7 @@ THREE.LensFlare = function ( texture, size, distance, blending, color ) {
 	this.positionScreen = new THREE.Vector3();
 	this.customUpdateCallback = undefined;
 
-	if( texture !== undefined ) {
+	if ( texture !== undefined ) {
 
 		this.add( texture, size, distance, blending, color );
 
@@ -16431,7 +16431,7 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 	var vecX = - this.positionScreen.x * 2;
 	var vecY = - this.positionScreen.y * 2;
 
-	for( f = 0; f < fl; f ++ ) {
+	for ( f = 0; f < fl; f ++ ) {
 
 		flare = this.lensFlares[ f ];
 
@@ -18066,7 +18066,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var formats = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
 
-				for ( var i = 0; i < formats.length; i ++ ){
+				for ( var i = 0; i < formats.length; i ++ ) {
 
 					array.push( formats[ i ] );
 
@@ -23865,49 +23865,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.readRenderTargetPixels = function( renderTarget, x, y, width, height, buffer ) {
 
-	    if ( ! ( renderTarget instanceof THREE.WebGLRenderTarget ) ) {
+		if ( ! ( renderTarget instanceof THREE.WebGLRenderTarget ) ) {
 
-	        console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
-	        return;
+			console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+			return;
 
-	    }
+		}
 
-	    if ( renderTarget.__webglFramebuffer ) {
+		if ( renderTarget.__webglFramebuffer ) {
 
-	        if ( renderTarget.format !== THREE.RGBAFormat ) {
+			if ( renderTarget.format !== THREE.RGBAFormat ) {
 
-	            console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA format. readPixels can read only RGBA format.' );
-	            return;
+				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA format. readPixels can read only RGBA format.' );
+				return;
 
-	        }
+			}
 
-	        var restore = false;
+			var restore = false;
 
-	        if ( renderTarget.__webglFramebuffer !== _currentFramebuffer ) {
+			if ( renderTarget.__webglFramebuffer !== _currentFramebuffer ) {
 
-	            _gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTarget.__webglFramebuffer );
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTarget.__webglFramebuffer );
 
-	            restore = true;
+				restore = true;
 
-	        }
+			}
 
-	        if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
+			if ( _gl.checkFramebufferStatus( _gl.FRAMEBUFFER ) === _gl.FRAMEBUFFER_COMPLETE ) {
 
-	            _gl.readPixels( x, y, width, height, _gl.RGBA, _gl.UNSIGNED_BYTE, buffer );
+				_gl.readPixels( x, y, width, height, _gl.RGBA, _gl.UNSIGNED_BYTE, buffer );
 
-	        } else {
+			} else {
 
-	            console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
+				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
 
-	        }
+			}
 
-	        if ( restore ) {
+			if ( restore ) {
 
-	            _gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
 
-	        }
+			}
 
-	    }
+		}
 
 	};
 
@@ -24590,7 +24590,7 @@ THREE.WebGLProgram = ( function () {
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
 
-				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest: '',
+				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
 				_this.gammaInput ? '#define GAMMA_INPUT' : '',
 				_this.gammaOutput ? '#define GAMMA_OUTPUT' : '',
@@ -25636,7 +25636,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 	};
 
-	function projectObject( scene, object, shadowCamera ){
+	function projectObject( scene, object, shadowCamera ) {
 
 		if ( object.visible ) {
 
@@ -26360,7 +26360,7 @@ THREE.ImageUtils = {
 				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [  1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
+				points.push( [ 1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 0, data[ ( y * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 1, data[ ( uy * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );
@@ -26639,7 +26639,7 @@ THREE.FontUtils = {
 
 					x = outline[ i ++ ] * scaleX + offset;
 					y = outline[ i ++ ] * scaleY;
-					path.lineTo( x,y );
+					path.lineTo( x, y );
 					break;
 
 				case 'q':
@@ -26665,11 +26665,11 @@ THREE.FontUtils = {
 							var t = i2 / divisions;
 							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
 							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
-					  }
+						}
 
-				  }
+					}
 
-				  break;
+					break;
 
 				case 'b':
 
@@ -26850,7 +26850,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 				/* remove v from the remaining polygon */
 
-				for ( s = v, t = v + 1; t < nv; s++, t++ ) {
+				for ( s = v, t = v + 1; t < nv; s ++, t ++ ) {
 
 					verts[ s ] = verts[ t ];
 
@@ -27199,7 +27199,7 @@ THREE.Curve.prototype.getLength = function () {
 
 THREE.Curve.prototype.getLengths = function ( divisions ) {
 
-	if ( ! divisions ) divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions): 200;
+	if ( ! divisions ) divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions) : 200;
 
 	if ( this.cacheArcLengths
 		&& ( this.cacheArcLengths.length == divisions + 1 )
@@ -27304,17 +27304,17 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 	// we could get finer grain at lengths, or use simple interpolatation between two points
 
 	var lengthBefore = arcLengths[ i ];
-    var lengthAfter = arcLengths[ i + 1 ];
+	var lengthAfter = arcLengths[ i + 1 ];
 
-    var segmentLength = lengthAfter - lengthBefore;
+	var segmentLength = lengthAfter - lengthBefore;
 
     // determine where we are between the 'before' and 'after' points
 
-    var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
+	var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
 
     // add that fractional amount to t
 
-    var t = ( i + segmentFraction ) / ( il -1 );
+	var t = ( i + segmentFraction ) / ( il - 1 );
 
 	return t;
 
@@ -27373,8 +27373,8 @@ THREE.Curve.Utils = {
 	tangentCubicBezier: function (t, p0, p1, p2, p3 ) {
 
 		return - 3 * p0 * (1 - t) * (1 - t)  +
-			3 * p1 * (1 - t) * (1-t) - 6 *t *p1 * (1-t) +
-			6 * t *  p2 * (1-t) - 3 * t * t * p2 +
+			3 * p1 * (1 - t) * (1 - t) - 6 * t * p1 * (1 - t) +
+			6 * t *  p2 * (1 - t) - 3 * t * t * p2 +
 			3 * t * t * p3;
 
 	},
@@ -27465,7 +27465,7 @@ THREE.CurvePath.prototype.closePath = function() {
 	// and verify for vector3 (needs to implement equals)
 	// Add a line curve if start and end of lines are not connected
 	var startPoint = this.curves[0].getPoint(0);
-	var endPoint = this.curves[this.curves.length-1].getPoint(1);
+	var endPoint = this.curves[this.curves.length - 1].getPoint(1);
 	
 	if (! startPoint.equals(endPoint)) {
 		this.curves.push( new THREE.LineCurve(endPoint, startPoint) );
@@ -28053,7 +28053,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 		action = item.action;
 		args = item.args;
 
-		switch( action ) {
+		switch ( action ) {
 
 		case THREE.PathActions.MOVE_TO:
 
@@ -28200,7 +28200,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			//console.log(points);
 
-		  break;
+			break;
 		  
 		case THREE.PathActions.ELLIPSE:
 
@@ -28238,7 +28238,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			//console.log(points);
 
-		  break;
+			break;
 
 		} // end switch
 
@@ -28345,7 +28345,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		//  with the horizontal line through inPt, left of inPt
 		//  not counting lowerY endpoints of edges and whole edges on that line
 		var inside = false;
-		for( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
+		for ( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
 			var edgeLowPt  = inPolygon[ p ];
 			var edgeHighPt = inPolygon[ q ];
 
@@ -28677,16 +28677,16 @@ THREE.Shape.Utils = {
 				if ( perpSeg2 == 0 ) {
 					if ( ( inExcludeAdjacentSegs ) &&
 						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
-					return  [ inSeg1Pt1 ];
+					return [ inSeg1Pt1 ];
 				}
 				if ( perpSeg2 == limit ) {
 					if ( ( inExcludeAdjacentSegs ) &&
 						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
-					return  [ inSeg1Pt2 ];
+					return [ inSeg1Pt2 ];
 				}
 				// intersection at endpoint of segment#2?
-				if ( perpSeg1 == 0 )		return  [ inSeg2Pt1 ];
-				if ( perpSeg1 == limit )	return  [ inSeg2Pt2 ];
+				if ( perpSeg1 == 0 )		return [ inSeg2Pt1 ];
+				if ( perpSeg1 == limit )	return [ inSeg2Pt2 ];
 
 				// return real intersection point
 				var factorSeg1 = perpSeg2 / limit;
@@ -28704,17 +28704,17 @@ THREE.Shape.Utils = {
 				if ( seg1Pt && seg2Pt ) {
 					if ( (inSeg1Pt1.x != inSeg2Pt1.x) ||
 						 (inSeg1Pt1.y != inSeg2Pt1.y) )		return [];   	// they are distinct  points
-					return  [ inSeg1Pt1 ];                 					// they are the same point
+					return [ inSeg1Pt1 ];                 					// they are the same point
 				}
 				// segment#1  is a single point
 				if ( seg1Pt ) {
 					if (! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
-					return  [ inSeg1Pt1 ];
+					return [ inSeg1Pt1 ];
 				}
 				// segment#2  is a single point
 				if ( seg2Pt ) {
 					if (! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
-					return  [ inSeg2Pt1 ];
+					return [ inSeg2Pt1 ];
 				}
 
 				// they are collinear segments, which might overlap
@@ -28845,7 +28845,7 @@ THREE.Shape.Utils = {
 				// checks for intersections with shape edges
 				var sIdx, nextIdx, intersection;
 				for ( sIdx = 0; sIdx < shape.length; sIdx ++ ) {
-					nextIdx = sIdx+1; nextIdx %= shape.length;
+					nextIdx = sIdx + 1; nextIdx %= shape.length;
 					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[sIdx], shape[nextIdx], true );
 					if ( intersection.length > 0 )		return	true;
 				}
@@ -28862,7 +28862,7 @@ THREE.Shape.Utils = {
 				for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
 					chkHole = holes[indepHoles[ihIdx]];
 					for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
-						nextIdx = hIdx+1; nextIdx %= chkHole.length;
+						nextIdx = hIdx + 1; nextIdx %= chkHole.length;
 						intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[hIdx], chkHole[nextIdx], true );
 						if ( intersection.length > 0 )		return	true;
 					}
@@ -28914,12 +28914,12 @@ THREE.Shape.Utils = {
 							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
 
 							holeIndex = h2;
-							indepHoles.splice(h,1);
+							indepHoles.splice(h, 1);
 
-							tmpShape1 = shape.slice( 0, shapeIndex+1 );
+							tmpShape1 = shape.slice( 0, shapeIndex + 1 );
 							tmpShape2 = shape.slice( shapeIndex );
 							tmpHole1 = hole.slice( holeIndex );
-							tmpHole2 = hole.slice( 0, holeIndex+1 );
+							tmpHole2 = hole.slice( 0, holeIndex + 1 );
 
 							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
 
@@ -29233,8 +29233,8 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
 
 	var point0 = points[ intPoint == 0 ? intPoint : intPoint - 1 ]
 	var point1 = points[ intPoint ]
-	var point2 = points[ intPoint > points.length - 2 ? points.length -1 : intPoint + 1 ]
-	var point3 = points[ intPoint > points.length - 3 ? points.length -1 : intPoint + 2 ]
+	var point2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ]
+	var point3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ]
 
 	var vector = new THREE.Vector2();
 
@@ -29726,7 +29726,7 @@ THREE.Animation.prototype.keyTypes = [ "pos", "rot", "scl" ];
 THREE.Animation.prototype.play = function ( startTime, weight ) {
 
 	this.currentTime = startTime !== undefined ? startTime : 0;
-	this.weight = weight !== undefined ? weight: 1;
+	this.weight = weight !== undefined ? weight : 1;
 
 	this.isPlaying = true;
 
@@ -29817,7 +29817,7 @@ THREE.Animation.prototype.resetBlendWeights = function () {
 
 };
 
-THREE.Animation.prototype.update = (function(){
+THREE.Animation.prototype.update = (function() {
 
 	var points = [];
 	var target = new THREE.Vector3();
@@ -30967,7 +30967,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var contour = vertices; // vertices has all points but contour has only points of circumference
 
-	for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
+	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 		ahole = holes[ h ];
 
@@ -31100,7 +31100,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		var pt_j = contour[ j ];
 		var pt_k = contour[ k ];
 
-		contourMovements[ i ]= getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
+		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
 	}
 
@@ -31118,7 +31118,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			if ( k === il ) k = 0;
 
 			//  (j)---(i)---(k)
-			oneHoleMovements[ i ]= getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
+			oneHoleMovements[ i ] = getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
 
 		}
 
@@ -31137,7 +31137,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		z = bevelThickness * ( 1 - t );
 
 		//z = bevelThickness * t;
-		bs = bevelSize * ( Math.sin ( t * Math.PI/2 ) ) ; // curved
+		bs = bevelSize * ( Math.sin ( t * Math.PI / 2 ) ) ; // curved
 		//bs = bevelSize * t ; // linear
 
 		// contract shape
@@ -31237,7 +31237,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		t = b / bevelSegments;
 		z = bevelThickness * ( 1 - t );
 		//bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
-		bs = bevelSize * Math.sin ( t * Math.PI/2 ) ;
+		bs = bevelSize * Math.sin ( t * Math.PI / 2 ) ;
 
 		// contract shape
 
@@ -31300,7 +31300,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			for ( i = 0; i < flen; i ++ ) {
 
 				face = faces[ i ];
-				f3( face[ 2 ]+ offset, face[ 1 ]+ offset, face[ 0 ] + offset );
+				f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
 
 			}
 
@@ -31347,7 +31347,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
 
-		for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
+		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 			ahole = holes[ h ];
 			sidewalls( ahole, layeroffset );
@@ -31364,7 +31364,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		var j, k;
 		i = contour.length;
 
-		while ( --i >= 0 ) {
+		while ( -- i >= 0 ) {
 
 			j = i;
 			k = i - 1;
@@ -31409,7 +31409,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		var uvs = uvgen.generateTopUV( scope, a, b, c );
 
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+		scope.faceVertexUvs[ 0 ].push( uvs );
 
 	}
 
@@ -31420,13 +31420,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
- 		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
+		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
- 		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
+		var uvs = uvgen.generateSideWallUV( scope, a, b, c, d );
 
- 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
- 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
+		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
 
 	}
 
@@ -32572,17 +32572,17 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	for ( i = 1; i < numpoints; i ++ ) {
 
-		normals[ i ] = normals[ i-1 ].clone();
+		normals[ i ] = normals[ i - 1 ].clone();
 
-		binormals[ i ] = binormals[ i-1 ].clone();
+		binormals[ i ] = binormals[ i - 1 ].clone();
 
-		vec.crossVectors( tangents[ i-1 ], tangents[ i ] );
+		vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
 
 		if ( vec.length() > epsilon ) {
 
 			vec.normalize();
 
-			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+			theta = Math.acos( THREE.Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -32597,10 +32597,10 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	if ( closed ) {
 
-		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), - 1, 1 ) );
+		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
 
-		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
+		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
 
 			theta = - theta;
 

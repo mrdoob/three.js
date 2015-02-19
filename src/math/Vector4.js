@@ -505,49 +505,49 @@ THREE.Vector4.prototype = {
 
 	} )(),
 
-    floor: function () {
+  floor: function () {
 
-	this.x = Math.floor( this.x );
-	this.y = Math.floor( this.y );
-	this.z = Math.floor( this.z );
-	this.w = Math.floor( this.w );
+		this.x = Math.floor( this.x );
+		this.y = Math.floor( this.y );
+		this.z = Math.floor( this.z );
+		this.w = Math.floor( this.w );
 
-	return this;
+		return this;
 
-    },
+  },
 
-    ceil: function () {
+  ceil: function () {
 
-	this.x = Math.ceil( this.x );
-	this.y = Math.ceil( this.y );
-	this.z = Math.ceil( this.z );
-	this.w = Math.ceil( this.w );
+		this.x = Math.ceil( this.x );
+		this.y = Math.ceil( this.y );
+		this.z = Math.ceil( this.z );
+		this.w = Math.ceil( this.w );
 
-	return this;
+		return this;
 
-    },
+  },
 
-    round: function () {
+  round: function () {
 
-	this.x = Math.round( this.x );
-	this.y = Math.round( this.y );
-	this.z = Math.round( this.z );
-	this.w = Math.round( this.w );
+		this.x = Math.round( this.x );
+		this.y = Math.round( this.y );
+		this.z = Math.round( this.z );
+		this.w = Math.round( this.w );
 
-	return this;
+		return this;
 
-    },
+  },
 
-    roundToZero: function () {
+  roundToZero: function () {
 
-	this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-	this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-	this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
-	this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
+		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
+		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+		this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+		this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
 
-	return this;
+		return this;
 
-    },
+  },
 
 	negate: function () {
 
