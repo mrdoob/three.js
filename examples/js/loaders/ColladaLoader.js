@@ -56,7 +56,7 @@ THREE.ColladaLoader = function () {
 	var colladaUp = 'Y';
 	var upConversion = null;
 
-	function load ( url, readyCallback, progressCallback ) {
+	function load ( url, readyCallback, progressCallback, failCallback ) {
 
 		var length = 0;
 
@@ -85,7 +85,10 @@ THREE.ColladaLoader = function () {
 
 						} else {
 
-							console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
+							if (faillCallback)
+								failCallback(); 
+							else 
+								console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
 
 						}
 
