@@ -66,7 +66,7 @@ var global = window;
 }(this, function (root) {
     "use strict";
 
-    var categoriesDepsOrder = ["buffers", "bufferViews", "images",  "videos", "samplers", "textures", "shaders", "programs", "techniques", "materials", "accessors", "meshes", "cameras", "lights", "skins", "nodes", "scenes", "animations"];
+    var categoriesDepsOrder = [ "buffers", "bufferViews", "images",  "videos", "samplers", "textures", "shaders", "programs", "techniques", "materials", "accessors", "meshes", "cameras", "lights", "skins", "nodes", "scenes", "animations" ];
 
     var glTFParser = Object.create(Object.prototype, {
 
@@ -86,7 +86,7 @@ var global = window;
         //detect absolute path following the same protocol than window.location
         _isAbsolutePath: {
             value: function(path) {
-                var isAbsolutePathRegExp = new RegExp("^"+window.location.protocol, "i");
+                var isAbsolutePathRegExp = new RegExp("^" + window.location.protocol, "i");
 
                 return path.match(isAbsolutePathRegExp) ? true : false;
             }
@@ -130,7 +130,7 @@ var global = window;
             set: function(value) {
                 if (this._json !== value) {
                     this._json = value;
-                    this._resolvePathsForCategories(["buffers", "shaders", "images", "videos"]);
+                    this._resolvePathsForCategories([ "buffers", "shaders", "images", "videos" ]);
                 }
             }
         },
@@ -147,7 +147,7 @@ var global = window;
                 var category = entryType;
                 entries = this.rootDescription[category];
                 if (!entries) {
-                    console.log("ERROR:CANNOT find expected category named:"+category);
+                    console.log("ERROR:CANNOT find expected category named:" + category);
                     return null;
                 }
 
@@ -177,7 +177,7 @@ var global = window;
                     return false;
                 }
 
-                categoryState.index++;
+                categoryState.index ++;
                 categoryState.keys = null;
                 if (categoryState.index >= keys.length) {
                     return this._stepToNextCategory();
@@ -237,7 +237,7 @@ var global = window;
                     var description = this.getEntryDescription(entryID, type);
                     if (!description) {
                         if (this.handleError) {
-                            this.handleError("INCONSISTENCY ERROR: no description found for entry "+entryID);
+                            this.handleError("INCONSISTENCY ERROR: no description found for entry " + entryID);
                             success = false;
                             break;
                         }
@@ -266,7 +266,7 @@ var global = window;
             value: function(callback) {
                 var self = this;
                 //FIXME: handle error
-                if (!this._json)  {
+                if (!this._json) {
                     var jsonPath = this._path;
                     var i = jsonPath.lastIndexOf("/");
                     this.baseURL = (i !== 0) ? jsonPath.substring(0, i + 1) : '';
@@ -306,7 +306,7 @@ var global = window;
         _getEntryType: {
             value: function(entryID) {
                 var rootKeys = categoriesDepsOrder;
-                for (var i = 0 ;  i < rootKeys.length ; i++) {
+                for (var i = 0 ; i < rootKeys.length ; i ++) {
                     var rootValues = this.rootDescription[rootKeys[i]];
                     if (rootValues) {
                         return rootKeys[i];
@@ -318,7 +318,7 @@ var global = window;
 
         getNextCategoryIndex: {
             value: function(currentIndex) {
-                for (var i = currentIndex ; i < categoriesDepsOrder.length ; i++) {
+                for (var i = currentIndex ; i < categoriesDepsOrder.length ; i ++) {
                     if (this.hasCategory(categoriesDepsOrder[i])) {
                         return i;
                     }
@@ -333,7 +333,7 @@ var global = window;
             value: function(userInfo, options) {
                 var self = this;
                 this._buildLoader(function loaderReady(reader) {
-                    var startCategory = self.getNextCategoryIndex.call(self,0);
+                    var startCategory = self.getNextCategoryIndex.call(self, 0);
                     if (startCategory !== -1) {
                         self._state = { "userInfo" : userInfo,
                                         "options" : options,
@@ -379,7 +379,7 @@ var global = window;
 
     });
 
-    if(root) {
+    if (root) {
         root.glTFParser = glTFParser;
     }
 

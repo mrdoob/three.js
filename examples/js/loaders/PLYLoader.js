@@ -80,7 +80,7 @@ THREE.PLYLoader.prototype = {
 
 		var array_buffer = new Uint8Array(buf);
 		var str = '';
-		for(var i = 0; i < buf.byteLength; i++) {
+		for (var i = 0; i < buf.byteLength; i ++) {
 			str += String.fromCharCode(array_buffer[i]); // implicitly assumes little-endian
 		}
 
@@ -88,7 +88,7 @@ THREE.PLYLoader.prototype = {
 
 	},
 
-	isASCII: function( data ){
+	isASCII: function( data ) {
 
 		var header = this.parseHeader( this.bin2str( data ) );
 
@@ -167,7 +167,7 @@ THREE.PLYLoader.prototype = {
 			lineType = lineValues.shift()
 			line = lineValues.join(" ")
 
-			switch( lineType ) {
+			switch ( lineType ) {
 
 			case "format":
 
@@ -224,7 +224,7 @@ THREE.PLYLoader.prototype = {
 
 	parseASCIINumber: function ( n, type ) {
 
-		switch( type ) {
+		switch ( type ) {
 
 		case 'char': case 'uchar': case 'short': case 'ushort': case 'int': case 'uint':
 		case 'int8': case 'uint8': case 'int16': case 'uint16': case 'int32': case 'uint32':
@@ -301,7 +301,7 @@ THREE.PLYLoader.prototype = {
 
 			if ( currentElementCount >= header.elements[currentElement].count ) {
 
-				currentElement++;
+				currentElement ++;
 				currentElementCount = 0;
 
 			}
@@ -310,7 +310,7 @@ THREE.PLYLoader.prototype = {
 
 			this.handleElement( geometry, header.elements[currentElement].name, element );
 
-			currentElementCount++;
+			currentElementCount ++;
 
 		}
 
@@ -385,7 +385,7 @@ THREE.PLYLoader.prototype = {
 
 	binaryRead: function ( dataview, at, type, little_endian ) {
 
-		switch( type ) {
+		switch ( type ) {
 
 			// corespondences for non-specific length types here match rply:
 		case 'int8':		case 'char':	 return [ dataview.getInt8( at ), 1 ];
@@ -419,13 +419,13 @@ THREE.PLYLoader.prototype = {
 
 				var list = [];
 
-				result = this.binaryRead( dataview, at+read, properties[i].countType, little_endian );
+				result = this.binaryRead( dataview, at + read, properties[i].countType, little_endian );
 				var n = result[0];
 				read += result[1];
 
 				for ( j = 0; j < n; j ++ ) {
 
-					result = this.binaryRead( dataview, at+read, properties[i].itemType, little_endian );
+					result = this.binaryRead( dataview, at + read, properties[i].itemType, little_endian );
 					list.push( result[0] );
 					read += result[1];
 
@@ -435,7 +435,7 @@ THREE.PLYLoader.prototype = {
 
 			} else {
 
-				result = this.binaryRead( dataview, at+read, properties[i].type, little_endian );
+				result = this.binaryRead( dataview, at + read, properties[i].type, little_endian );
 				element[ properties[i].name ] = result[0];
 				read += result[1];
 

@@ -48,7 +48,7 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
             }
 
             if (this._containsResource[resourceID]) {
-                console.log("WARNING: resource:"+resourceID+" is already stored, overriding");
+                console.log("WARNING: resource:" + resourceID + " is already stored, overriding");
             }
 
            this._resources[resourceID] = resource;
@@ -100,7 +100,7 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
             var resourceStatus = this._resourcesStatus[request.id];
             if (resourceStatus)
             {
-            	this._resourcesStatus[request.id]++;
+            	this._resourcesStatus[request.id] ++;
             }
             else
             {
@@ -114,7 +114,7 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
                 return;
             }
             
-            this._streamsStatus[request.path] = { status : "loading", requests : [request] };
+            this._streamsStatus[request.path] = { status : "loading", requests : [ request ] };
     		
             var self = this;
             var processResourceDelegate = {};
@@ -127,7 +127,7 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
                     var convertedResource = req_.delegate.convert(subArray, req_.ctx);
                     self._storeResource(req_.id, convertedResource);
                     req_.delegate.resourceAvailable(convertedResource, req_.ctx);
-                    --self._resourcesStatus[req_.id];
+                    -- self._resourcesStatus[req_.id];
 
                 }, this);
             	
@@ -174,9 +174,9 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
             var bufferView = wrappedBufferView.bufferView;
             var buffer = bufferView.buffer;
             var byteOffset = wrappedBufferView.byteOffset + bufferView.description.byteOffset;
-            var range = [byteOffset , (this._elementSizeForGLType(wrappedBufferView.type) * wrappedBufferView.count) + byteOffset];
+            var range = [ byteOffset, (this._elementSizeForGLType(wrappedBufferView.type) * wrappedBufferView.count) + byteOffset ];
 
-            this._handleRequest({   "id" : wrappedBufferView.id,
+            this._handleRequest({ "id" : wrappedBufferView.id,
                                     "range" : range,
                                     "type" : buffer.description.type,
                                     "path" : buffer.description.path,
@@ -207,9 +207,9 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
     		request.delegate = delegate;
     		request.ctx = ctx;
 
-            this._handleRequest({   "id" : request.id,
+            this._handleRequest({ "id" : request.id,
                 "path" : request.path,
-                "range" : [0],
+                "range" : [ 0 ],
                 "type" : "text",
                 "delegate" : delegate,
                 "ctx" : ctx }, null);

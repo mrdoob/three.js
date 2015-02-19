@@ -12,7 +12,7 @@ THREE.LensFlare = function ( texture, size, distance, blending, color ) {
 	this.positionScreen = new THREE.Vector3();
 	this.customUpdateCallback = undefined;
 
-	if( texture !== undefined ) {
+	if ( texture !== undefined ) {
 
 		this.add( texture, size, distance, blending, color );
 
@@ -64,7 +64,7 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 	var vecX = - this.positionScreen.x * 2;
 	var vecY = - this.positionScreen.y * 2;
 
-	for( f = 0; f < fl; f ++ ) {
+	for ( f = 0; f < fl; f ++ ) {
 
 		flare = this.lensFlares[ f ];
 

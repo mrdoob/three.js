@@ -302,7 +302,7 @@ THREE.Object3D.prototype = {
 
 		if ( arguments.length > 1 ) {
 
-			for ( var i = 0; i < arguments.length; i++ ) {
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
 				this.add( arguments[ i ] );
 
@@ -346,7 +346,7 @@ THREE.Object3D.prototype = {
 
 		if ( arguments.length > 1 ) {
 
-			for ( var i = 0; i < arguments.length; i++ ) {
+			for ( var i = 0; i < arguments.length; i ++ ) {
 
 				this.remove( arguments[ i ] );
 

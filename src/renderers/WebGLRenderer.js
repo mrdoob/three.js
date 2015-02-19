@@ -356,7 +356,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var formats = _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS );
 
-				for ( var i = 0; i < formats.length; i ++ ){
+				for ( var i = 0; i < formats.length; i ++ ) {
 
 					array.push( formats[ i ] );
 

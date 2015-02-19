@@ -278,7 +278,7 @@ THREE.WebGLProgram = ( function () {
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
 
-				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest: '',
+				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
 				_this.gammaInput ? '#define GAMMA_INPUT' : '',
 				_this.gammaOutput ? '#define GAMMA_OUTPUT' : '',

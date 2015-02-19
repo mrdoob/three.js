@@ -15,7 +15,7 @@
 THREE.Curves = {};
 
 
- THREE.Curves.GrannyKnot = THREE.Curve.create( function(){},
+ THREE.Curves.GrannyKnot = THREE.Curve.create( function() {},
 
 	 function(t) {
 	    t = 2 * Math.PI * t;

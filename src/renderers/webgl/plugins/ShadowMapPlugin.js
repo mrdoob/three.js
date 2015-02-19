@@ -348,7 +348,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 	};
 
-	function projectObject( scene, object, shadowCamera ){
+	function projectObject( scene, object, shadowCamera ) {
 
 		if ( object.visible ) {
 

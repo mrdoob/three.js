@@ -77,14 +77,14 @@ SPARKS.Emitter.prototype = {
 				elapsed = maxBlock;
 			}
 
-			while(elapsed >= emitter._TIMESTEP) {
+			while (elapsed >= emitter._TIMESTEP) {
 				emitter.update(emitter._TIMESTEP / 1000);
 				elapsed -= emitter._TIMESTEP;
 			}
 			emitter._lastTime = time - elapsed;
 
 		} else {
-			emitter.update(elapsed/1000);
+			emitter.update(elapsed / 1000);
 			emitter._lastTime = time;
 		}
 
@@ -103,13 +103,13 @@ SPARKS.Emitter.prototype = {
         var len = this._counter.updateEmitter( this, time );
 
         // Create particles
-        for( i = 0; i < len; i++ ) {
+        for ( i = 0; i < len; i ++ ) {
             this.createParticle();
         }
 
         // Update activities
         len = this._activities.length;
-        for ( i = 0; i < len; i++ )
+        for ( i = 0; i < len; i ++ )
         {
             this._activities[i].update( this, time );
         }
@@ -121,10 +121,10 @@ SPARKS.Emitter.prototype = {
 		var action;
         var len2 = this._particles.length;
 
-        for( j = 0; j < len; j++ )
+        for ( j = 0; j < len; j ++ )
         {
             action = this._actions[j];
-            for ( i = 0; i < len2; ++i )
+            for ( i = 0; i < len2; ++ i )
             {
                 particle = this._particles[i];
                 action.update( this, particle, time );
@@ -133,7 +133,7 @@ SPARKS.Emitter.prototype = {
 
 
         // remove dead particles
-        for ( i = len2; i--; )
+        for ( i = len2; i --; )
         {
             particle = this._particles[i];
             if ( particle.isDead )
@@ -158,7 +158,7 @@ SPARKS.Emitter.prototype = {
         // In future, use a Particle Factory
         var len = this._initializers.length, i;
 
-        for ( i = 0; i < len; i++ ) {
+        for ( i = 0; i < len; i ++ ) {
             this._initializers[i].initialize( this, particle );
         }
 
@@ -300,9 +300,9 @@ SPARKS.Particle = function() {
      * For 3D
      */
 
-     this.position = SPARKS.VectorPool.get().set(0,0,0); //new THREE.Vector3( 0, 0, 0 );
-     this.velocity = SPARKS.VectorPool.get().set(0,0,0); //new THREE.Vector3( 0, 0, 0 );
-	this._oldvelocity = SPARKS.VectorPool.get().set(0,0,0);
+     this.position = SPARKS.VectorPool.get().set(0, 0, 0); //new THREE.Vector3( 0, 0, 0 );
+     this.velocity = SPARKS.VectorPool.get().set(0, 0, 0); //new THREE.Vector3( 0, 0, 0 );
+	this._oldvelocity = SPARKS.VectorPool.get().set(0, 0, 0);
      // rotation vec3
      // angVelocity vec3
      // faceAxis vec3
@@ -327,7 +327,7 @@ SPARKS.Age = function(easing) {
 
 SPARKS.Age.prototype.update = function (emitter, particle, time) {
     particle.age += time;
-    if( particle.age >= particle.lifetime )
+    if ( particle.age >= particle.lifetime )
     {
         particle.energy = 0;
         particle.isDead = true;
@@ -451,7 +451,7 @@ SPARKS.AccelerateFactor.prototype.update = function(emitter, particle, time) {
     var v = particle.velocity;
 	var len = v.length();
 	var adjFactor;
-    if (len>0) {
+    if (len > 0) {
 
 		adjFactor = factor * time / len;
 		adjFactor += 1;
@@ -595,17 +595,17 @@ SPARKS.CubeZone.prototype.contains = function(position) {
 	var y = this.y; // depth
 	var z = this.z; // height
 
-	if (x<0) {
+	if (x < 0) {
 		startX += x;
 		x = Math.abs(x);
 	}
 
-	if (y<0) {
+	if (y < 0) {
 		startY += y;
 		y = Math.abs(y);
 	}
 
-	if (z<0) {
+	if (z < 0) {
 		startZ += z;
 		z = Math.abs(z);
 	}
@@ -683,7 +683,7 @@ SPARKS.SphereCapZone = function(x, y, z, minr, maxr, angle) {
 };
 
 SPARKS.SphereCapZone.prototype.getLocation = function() {
-    var theta = Math.PI *2  * SPARKS.Utils.random();
+    var theta = Math.PI * 2  * SPARKS.Utils.random();
     var r = SPARKS.Utils.random();
 
     //new THREE.Vector3
@@ -691,7 +691,7 @@ SPARKS.SphereCapZone.prototype.getLocation = function() {
 
     //v.length = StardustMath.interpolate(0, _minRadius, 1, _maxRadius, Math.random());
 
-    var i = this.minr - ((this.minr-this.maxr) *  Math.random() );
+    var i = this.minr - ((this.minr - this.maxr) *  Math.random() );
     v.multiplyScalar(i);
 
 	v.__markedForReleased = true;
@@ -769,7 +769,7 @@ SPARKS.VectorPool = {
 
 	// Get a new Vector
 	get: function() {
-		if (this.__pools.length>0) {
+		if (this.__pools.length > 0) {
 			return this.__pools.pop();
 		}
 
@@ -786,7 +786,7 @@ SPARKS.VectorPool = {
 	_addToPool: function() {
 		//console.log("creating some pools");
 
-		for (var i=0, size = 100; i < size; i++) {
+		for (var i = 0, size = 100; i < size; i ++) {
 			this.__pools.push(new THREE.Vector3());
 		}
 
@@ -821,7 +821,7 @@ SPARKS.Utils = {
 
 	getPerpendicular: function( v )
 	{
-		if( v.x == 0 )
+		if ( v.x == 0 )
 		{
 			return new THREE.Vector3D( 1, 0, 0 );
 		}

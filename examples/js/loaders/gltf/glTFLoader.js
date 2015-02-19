@@ -25,7 +25,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	// Utilities
 
     function RgbArraytoHex(colorArray) {
-        if(!colorArray) return 0xFFFFFFFF;
+        if (!colorArray) return 0xFFFFFFFF;
         var r = Math.floor(colorArray[0] * 255),
             g = Math.floor(colorArray[1] * 255),
             b = Math.floor(colorArray[2] * 255),
@@ -43,7 +43,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     	var euler = new THREE.Vector3;
     	
     	var i;
-    	for (i = 0; i < count; i++) {
+    	for (i = 0; i < count; i ++) {
     		axis.set(rotations[i * 4], rotations[i * 4 + 1],
     				rotations[i * 4 + 2]).normalize();
     		var angle = rotations[i * 4 + 3];
@@ -76,7 +76,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 
     function LoadTexture(src) {
-        if(!src) { return null; }
+        if (!src) { return null; }
         return THREE.ImageUtils.loadTexture(src);
     }
 
@@ -110,13 +110,13 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     }
     
     ClassicGeometry.prototype.checkFinished = function() {
-        if(this.indexArray && this.loadedAttributes === this.totalAttributes) {
+        if (this.indexArray && this.loadedAttributes === this.totalAttributes) {
         	
         	this.buildBufferGeometry();
         	
             this.finished = true;
 
-            if(this.onload) {
+            if (this.onload) {
                 this.onload();
             }
         }
@@ -127,7 +127,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     IndicesDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-        console.log("ERROR(IndicesDelegate):"+errorCode+":"+info);
+        console.log("ERROR(IndicesDelegate):" + errorCode + ":" + info);
     };
 
     IndicesDelegate.prototype.convert = function(resource, ctx) {
@@ -153,7 +153,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     VertexAttributeDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-        console.log("ERROR(VertexAttributeDelegate):"+errorCode+":"+info);
+        console.log("ERROR(VertexAttributeDelegate):" + errorCode + ":" + info);
     };
 
     VertexAttributeDelegate.prototype.convert = function(resource, ctx) {
@@ -170,37 +170,37 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         var i, l;
         //FIXME: Float32 is assumed here, but should be checked.
 
-        if(semantic == "POSITION") {
+        if (semantic == "POSITION") {
             // TODO: Should be easy to take strides into account here
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
-            for(i = 0, l = floatArray.length; i < l; i += 3) {
-                geom.geometry.vertices.push( new THREE.Vector3( floatArray[i], floatArray[i+1], floatArray[i+2] ) );
+            for (i = 0, l = floatArray.length; i < l; i += 3) {
+                geom.geometry.vertices.push( new THREE.Vector3( floatArray[i], floatArray[i + 1], floatArray[i + 2] ) );
             }
-        } else if(semantic == "NORMAL") {
+        } else if (semantic == "NORMAL") {
             geom.geometry.normals = [];
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
-            for(i = 0, l = floatArray.length; i < l; i += 3) {
-                geom.geometry.normals.push( new THREE.Vector3( floatArray[i], floatArray[i+1], floatArray[i+2] ) );
+            for (i = 0, l = floatArray.length; i < l; i += 3) {
+                geom.geometry.normals.push( new THREE.Vector3( floatArray[i], floatArray[i + 1], floatArray[i + 2] ) );
             }
         } else if ((semantic == "TEXCOORD_0") || (semantic == "TEXCOORD" )) {
         	geom.uvs = [];
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
-            for(i = 0, l = floatArray.length; i < l; i += 2) {
-                geom.uvs.push( new THREE.Vector2( floatArray[i], 1.0 - floatArray[i+1] ) );
+            for (i = 0, l = floatArray.length; i < l; i += 2) {
+                geom.uvs.push( new THREE.Vector2( floatArray[i], 1.0 - floatArray[i + 1] ) );
             }
         }
         else if (semantic == "WEIGHT") {
         	nComponents = componentsPerElementForGLType(attribute.type);
             floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
-            for(i = 0, l = floatArray.length; i < l; i += 4) {
-            	geom.geometry.skinWeights.push( new THREE.Vector4( floatArray[i], floatArray[i+1], floatArray[i+2], floatArray[i+3] ) );
+            for (i = 0, l = floatArray.length; i < l; i += 4) {
+            	geom.geometry.skinWeights.push( new THREE.Vector4( floatArray[i], floatArray[i + 1], floatArray[i + 2], floatArray[i + 3] ) );
             }
         }
         else if (semantic == "JOINT") {
         	nComponents = componentsPerElementForGLType(attribute.type);
             floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
-            for(i = 0, l = floatArray.length; i < l; i += 4) {
-            	geom.geometry.skinIndices.push( new THREE.Vector4( floatArray[i], floatArray[i+1], floatArray[i+2], floatArray[i+3] ) );
+            for (i = 0, l = floatArray.length; i < l; i += 4) {
+            	geom.geometry.skinIndices.push( new THREE.Vector4( floatArray[i], floatArray[i + 1], floatArray[i + 2], floatArray[i + 3] ) );
             }
         }
     }
@@ -214,11 +214,11 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         var nComponents;
         //FIXME: Float32 is assumed here, but should be checked.
 
-        if(semantic == "POSITION") {
+        if (semantic == "POSITION") {
             // TODO: Should be easy to take strides into account here
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
             geom.geometry.addAttribute( 'position', new THREE.BufferAttribute( floatArray, 3 ) );
-        } else if(semantic == "NORMAL") {
+        } else if (semantic == "NORMAL") {
             floatArray = new Float32Array(glResource, 0, attribute.count * componentsPerElementForGLType(attribute.type));
             geom.geometry.addAttribute( 'normal', new THREE.BufferAttribute( floatArray, 3 ) );
         } else if ((semantic == "TEXCOORD_0") || (semantic == "TEXCOORD" )) {
@@ -226,8 +226,8 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	nComponents = componentsPerElementForGLType(attribute.type);
             floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
             // N.B.: flip Y value... should we just set texture.flipY everywhere?
-            for (i = 0; i < floatArray.length / 2; i++) {
-            	floatArray[i*2+1] = 1.0 - floatArray[i*2+1];
+            for (i = 0; i < floatArray.length / 2; i ++) {
+            	floatArray[i * 2 + 1] = 1.0 - floatArray[i * 2 + 1];
             }
             geom.geometry.addAttribute( 'uv', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
@@ -248,7 +248,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     	this.bufferResourceAvailable(glResource, ctx);
     	
         var geom = ctx.geometry;
-        geom.loadedAttributes++;
+        geom.loadedAttributes ++;
         geom.checkFinished();
         return true;
     };
@@ -272,7 +272,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         
     	var self = this;
         geometry.onload = function() {
-            self.loadedGeometry++;
+            self.loadedGeometry ++;
             self.checkComplete();
         };
         
@@ -290,7 +290,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     Mesh.prototype.checkComplete = function() {
         var self = this;
-        if(this.onCompleteCallbacks.length && this.primitives.length == this.loadedGeometry) {
+        if (this.onCompleteCallbacks.length && this.primitives.length == this.loadedGeometry) {
             this.onCompleteCallbacks.forEach(function(callback) {
                 callback(self);
             });
@@ -325,7 +325,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     AnimationParameterDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-        console.log("ERROR(AnimationParameterDelegate):"+errorCode+":"+info);
+        console.log("ERROR(AnimationParameterDelegate):" + errorCode + ":" + info);
     };
 
     AnimationParameterDelegate.prototype.convert = function(resource, ctx) {
@@ -377,12 +377,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     Animation.prototype.handleParameterLoaded = function(parameter) {
     	this.parameters[parameter.name] = parameter;
-    	this.loadedParameters++;
+    	this.loadedParameters ++;
     	this.checkFinished();
     };
     
     Animation.prototype.checkFinished = function() {
-        if(this.loadedParameters === this.totalParameters) {
+        if (this.loadedParameters === this.totalParameters) {
             // Build animation
             this.finishedLoading = true;
 
@@ -397,7 +397,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     InverseBindMatricesDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-        console.log("ERROR(InverseBindMatricesDelegate):"+errorCode+":"+info);
+        console.log("ERROR(InverseBindMatricesDelegate):" + errorCode + ":" + info);
     };
 
     InverseBindMatricesDelegate.prototype.convert = function(resource, ctx) {
@@ -433,7 +433,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
     ShaderDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-        console.log("ERROR(ShaderDelegate):"+errorCode+":"+info);
+        console.log("ERROR(ShaderDelegate):" + errorCode + ":" + info);
     };
 
     ShaderDelegate.prototype.convert = function(resource, ctx) {
@@ -441,7 +441,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
     }
     
     ShaderDelegate.prototype.resourceAvailable = function(data, ctx) {
-        theLoader.shadersLoaded++;
+        theLoader.shadersLoaded ++;
         theLoader.shaders[ctx.id] = data;
         return true;
     };
@@ -472,7 +472,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         }
 
         if (this._entries[entryID]) {
-            console.warn("entry["+entryID+"] is being overwritten");
+            console.warn("entry[" + entryID + "] is being overwritten");
         }
     
         this._entries[entryID] = new ResourceEntry(entryID, object, description );
@@ -562,7 +562,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
                 var shaderContext = new ShaderContext(entryID, description.path);
 
-                theLoader.shadersRequested++;
+                theLoader.shadersRequested ++;
         		THREE.GLTFLoaderUtils.getFile(shaderRequest, shaderDelegate, shaderContext);
         		
                 return true;
@@ -825,11 +825,11 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 var primitivesDescription = description.primitives;
                 if (!primitivesDescription) {
                     //FIXME: not implemented in delegate
-                    console.log("MISSING_PRIMITIVES for mesh:"+ entryID);
+                    console.log("MISSING_PRIMITIVES for mesh:" + entryID);
                     return false;
                 }
 
-                for (var i = 0 ; i < primitivesDescription.length ; i++) {
+                for (var i = 0 ; i < primitivesDescription.length ; i ++) {
                     var primitiveDescription = primitivesDescription[i];
                     
                     if (primitiveDescription.primitive === WebGLRenderingContext.TRIANGLES) {
@@ -858,7 +858,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                         // Load Vertex Attributes
                         var allAttributes = Object.keys(primitiveDescription.attributes);
                         allAttributes.forEach( function(semantic) {
-                            geometry.totalAttributes++;
+                            geometry.totalAttributes ++;
 
                             var attribute;
                             var attributeID = primitiveDescription.attributes[semantic];
@@ -1013,7 +1013,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 this.resources.setEntry(entryID, threeNode, description);
 
                 var m = description.matrix;
-                if(m) {
+                if (m) {
                     threeNode.applyMatrix(new THREE.Matrix4().fromArray( m ));
                     threeNode.matrixAutoUpdate = false;
                     threeNode.matrixWorldNeedsUpdate = true;
@@ -1047,10 +1047,10 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 var meshEntry;
                 if (description.mesh) {
                     meshEntry = this.resources.getEntry(description.mesh);
-                    theLoader.meshesRequested++;
+                    theLoader.meshesRequested ++;
                     meshEntry.object.onComplete(function(mesh) {
                     	self.addPendingMesh(mesh, threeNode);
-                        theLoader.meshesLoaded++;
+                        theLoader.meshesLoaded ++;
                         theLoader.checkComplete();
                     });
                 }
@@ -1058,10 +1058,10 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 if (description.meshes) {
                     description.meshes.forEach( function(meshID) {
                         meshEntry = this.resources.getEntry(meshID);
-                        theLoader.meshesRequested++;
+                        theLoader.meshesRequested ++;
                         meshEntry.object.onComplete(function(mesh) {
                         	self.addPendingMesh(mesh, threeNode);
-                            theLoader.meshesLoaded++;
+                            theLoader.meshesLoaded ++;
                             theLoader.checkComplete();
                         });
                     }, this);
@@ -1081,11 +1081,11 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 		skin.meshes = [];
                         sources.forEach( function(meshID) {
                             meshEntry = this.resources.getEntry(meshID);
-                            theLoader.meshesRequested++;
+                            theLoader.meshesRequested ++;
                             meshEntry.object.onComplete(function(mesh) {
                             	
                             	skin.meshes.push(mesh);
-                                theLoader.meshesLoaded++;
+                                theLoader.meshesLoaded ++;
                                 theLoader.checkComplete();
                             });
                         }, this);
@@ -1144,7 +1144,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                             var dobones = true;
 
                             var i, len = skin.meshes.length;
-                            for (i = 0; i < len; i++) {
+                            for (i = 0; i < len; i ++) {
                             	var mesh = skin.meshes[i];
                             	var threeMesh = null;
                                 mesh.primitives.forEach(function(primitive) {
@@ -1167,7 +1167,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                                     else if (geometry.attributes.position) {
                                     	var a = geometry.attributes.position.array;
                                     	var v = new THREE.Vector3;
-	                            		for ( j = 0; j < a.length / 3; j++ ) {
+	                            		for ( j = 0; j < a.length / 3; j ++ ) {
 	                            			v.set(a[j * 3], a[j * 3 + 1], a[j * 3 + 2]);
 	                            			v.applyMatrix4( skin.bindShapeMatrix );
 	                            			a[j * 3] = v.x;
@@ -1185,7 +1185,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                            var bones = [];
         	                            var boneInverses = [];
         	                            var i, len = jointsIds.length;
-        	                            for (i = 0; i < len; i++) {
+        	                            for (i = 0; i < len; i ++) {
         	                            	var jointId = jointsIds[i];
         	                                var nodeForJoint = this.joints[jointId];
         	                                var joint = this.resources.getEntry(nodeForJoint).object;
@@ -1204,7 +1204,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	                                    boneInverses.push(mat);
         	                                    
         	                                } else {
-        	                                    console.log("WARNING: jointId:"+jointId+" cannot be found in skeleton:"+skeleton);
+        	                                    console.log("WARNING: jointId:" + jointId + " cannot be found in skeleton:" + skeleton);
         	                                }
         	                            }
 
@@ -1310,7 +1310,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         	
         		var interps = [];
 	            var i, len = animation.channels.length;
-	            for (i = 0; i < len; i++) {
+	            for (i = 0; i < len; i ++) {
 	            	
 	            	var channel = animation.channels[i];
 	            	var sampler = animation.samplers[channel.sampler];
@@ -1356,12 +1356,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
             value: function(entryID, description, userInfo) {
         	
         		var self = this;
-	            theLoader.animationsRequested++;
+	            theLoader.animationsRequested ++;
 	            var animation = new Animation();
                 animation.name = entryID;
 	            animation.onload = function() {
 	            	// self.buildAnimation(animation);
-	            	theLoader.animationsLoaded++;
+	            	theLoader.animationsLoaded ++;
 	            	theLoader.animations.push(animation);
                     theLoader.checkComplete();
 	            };	            
@@ -1372,7 +1372,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	            var parameters = description.parameters;
 	            if (!parameters) {
 	                //FIXME: not implemented in delegate
-	                console.log("MISSING_PARAMETERS for animation:"+ entryID);
+	                console.log("MISSING_PARAMETERS for animation:" + entryID);
 	                return false;
 	            }
 	
@@ -1380,7 +1380,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
                 var params = Object.keys(parameters);
                 params.forEach( function(param) {
 
-                	animation.totalParameters++;
+                	animation.totalParameters ++;
                     var parameter = parameters[param];
                     var accessor = this.resources.getEntry(parameter);
                     if (!accessor)
@@ -1535,12 +1535,12 @@ THREE.glTFLoader.prototype.checkComplete = function() {
 			&& this.animationsLoaded == this.animationsRequested)
 	{
 		
-		for (var i = 0; i < this.pendingMeshes.length; i++) {
+		for (var i = 0; i < this.pendingMeshes.length; i ++) {
 			var pending = this.pendingMeshes[i];
 			pending.mesh.attachToNode(pending.node);
 		}
 		
-		for (var i = 0; i < this.animationsLoaded; i++) {
+		for (var i = 0; i < this.animationsLoaded; i ++) {
 			var animation = this.animations[i];
 			this.loader.buildAnimation(animation);
 		}

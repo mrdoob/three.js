@@ -24,7 +24,7 @@ THREE.VectorArrayProxy = function(attribute) {
 
         this.attribute = attribute;
 
-        for (var i = 0, l = this.attribute.array.length / this.attribute.itemSize; i < l; i++)  {
+        for (var i = 0, l = this.attribute.array.length / this.attribute.itemSize; i < l; i ++) {
 
                 Object.defineProperty(this, i, {
                         get: (function(i) { return function() { return this.getValue(i); }})(i),

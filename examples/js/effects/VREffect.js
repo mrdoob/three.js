@@ -43,7 +43,7 @@ THREE.VREffect = function ( renderer, done ) {
 		function gotVRDevices( devices ) {
 			var vrHMD;
 			var error;
-			for ( var i = 0; i < devices.length; ++i ) {
+			for ( var i = 0; i < devices.length; ++ i ) {
 				if ( devices[i] instanceof HMDVRDevice ) {
 					vrHMD = devices[i];
 					self._vrHMD = vrHMD;
@@ -155,7 +155,7 @@ THREE.VREffect = function ( renderer, done ) {
 		var vrHMD = this._vrHMD;
 		var canvas = renderer.domElement;
 		var fullScreenChange =
-			canvas.mozRequestFullScreen? 'mozfullscreenchange' : 'webkitfullscreenchange';
+			canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
 		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
 		function onFullScreenChanged() {
@@ -175,7 +175,7 @@ THREE.VREffect = function ( renderer, done ) {
 		var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
 		var pyscale = 2.0 / (fov.upTan + fov.downTan);
 		var pyoffset = (fov.upTan - fov.downTan) * pyscale * 0.5;
-		return { scale: [pxscale, pyscale], offset: [pxoffset, pyoffset] };
+		return { scale: [ pxscale, pyscale ], offset: [ pxoffset, pyoffset ] };
 	};
 
 	this.FovPortToProjection = function( fov, rightHanded /* = true */, zNear /* = 0.01 */, zFar /* = 10000.0 */ )
@@ -194,30 +194,30 @@ THREE.VREffect = function ( renderer, done ) {
 		var scaleAndOffset = this.FovToNDCScaleOffset(fov);
 
 		// X result, map clip edges to [-w,+w]
-		m[0*4+0] = scaleAndOffset.scale[0];
-		m[0*4+1] = 0.0;
-		m[0*4+2] = scaleAndOffset.offset[0] * handednessScale;
-		m[0*4+3] = 0.0;
+		m[0 * 4 + 0] = scaleAndOffset.scale[0];
+		m[0 * 4 + 1] = 0.0;
+		m[0 * 4 + 2] = scaleAndOffset.offset[0] * handednessScale;
+		m[0 * 4 + 3] = 0.0;
 
 		// Y result, map clip edges to [-w,+w]
 		// Y offset is negated because this proj matrix transforms from world coords with Y=up,
 		// but the NDC scaling has Y=down (thanks D3D?)
-		m[1*4+0] = 0.0;
-		m[1*4+1] = scaleAndOffset.scale[1];
-		m[1*4+2] = -scaleAndOffset.offset[1] * handednessScale;
-		m[1*4+3] = 0.0;
+		m[1 * 4 + 0] = 0.0;
+		m[1 * 4 + 1] = scaleAndOffset.scale[1];
+		m[1 * 4 + 2] = -scaleAndOffset.offset[1] * handednessScale;
+		m[1 * 4 + 3] = 0.0;
 
 		// Z result (up to the app)
-		m[2*4+0] = 0.0;
-		m[2*4+1] = 0.0;
-		m[2*4+2] = zFar / (zNear - zFar) * -handednessScale;
-		m[2*4+3] = (zFar * zNear) / (zNear - zFar);
+		m[2 * 4 + 0] = 0.0;
+		m[2 * 4 + 1] = 0.0;
+		m[2 * 4 + 2] = zFar / (zNear - zFar) * -handednessScale;
+		m[2 * 4 + 3] = (zFar * zNear) / (zNear - zFar);
 
 		// W result (= Z in)
-		m[3*4+0] = 0.0;
-		m[3*4+1] = 0.0;
-		m[3*4+2] = handednessScale;
-		m[3*4+3] = 0.0;
+		m[3 * 4 + 0] = 0.0;
+		m[3 * 4 + 1] = 0.0;
+		m[3 * 4 + 2] = handednessScale;
+		m[3 * 4 + 3] = 0.0;
 
 		mobj.transpose();
 

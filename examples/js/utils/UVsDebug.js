@@ -44,7 +44,7 @@ THREE.UVsDebug = function( geometry, size ) {
     ctx.fillStyle = 'rgba( 255, 255, 255, 1.0 )';
     ctx.fillRect( 0, 0, width, height );
 
-    for ( i = 0, il = uvs.length; i < il; i++ ) {
+    for ( i = 0, il = uvs.length; i < il; i ++ ) {
 
         uv = uvs[ i ];
 
@@ -54,7 +54,7 @@ THREE.UVsDebug = function( geometry, size ) {
 
         a.set( 0, 0 );
 
-        for ( j = 0, jl = uv.length; j < jl; j++ ) {
+        for ( j = 0, jl = uv.length; j < jl; j ++ ) {
 
             u = uv[ j ];
 
@@ -95,7 +95,7 @@ THREE.UVsDebug = function( geometry, size ) {
 
         // label uv edge orders
 
-        for ( j = 0, jl = uv.length; j < jl; j++ ) {
+        for ( j = 0, jl = uv.length; j < jl; j ++ ) {
 
             u = uv[ j ];
             b.addVectors( a, u ).divideScalar( 2 );

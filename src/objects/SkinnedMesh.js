@@ -25,7 +25,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 		var bone, gbone, p, q, s;
 
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
 
 			gbone = this.geometry.bones[ b ];
 
@@ -52,7 +52,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 		}
 
-		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++b ) {
+		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
 
 			gbone = this.geometry.bones[ b ];
 

@@ -68,8 +68,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 	// events
 
 	var changeEvent = { type: 'change' };
-	var startEvent = { type: 'start'};
-	var endEvent = { type: 'end'};
+	var startEvent = { type: 'start' };
+	var endEvent = { type: 'end' };
 
 
 	// methods
@@ -133,8 +133,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		return function ( pageX, pageY ) {
 
 			mouseOnBall.set(
-				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / (_this.screen.width*.5),
-				( _this.screen.height * 0.5 + _this.screen.top - pageY ) / (_this.screen.height*.5),
+				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / (_this.screen.width * .5),
+				( _this.screen.height * 0.5 + _this.screen.top - pageY ) / (_this.screen.height * .5),
 				0.0
 			);
 
@@ -144,7 +144,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 				if ( length < Math.SQRT1_2 ) {
 
-					mouseOnBall.z = Math.sqrt( 1.0 - length*length );
+					mouseOnBall.z = Math.sqrt( 1.0 - length * length );
 
 				} else {
 
@@ -174,7 +174,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	}() );
 
-	this.rotateCamera = (function(){
+	this.rotateCamera = (function() {
 
 		var axis = new THREE.Vector3(),
 			quaternion = new THREE.Quaternion();
@@ -245,7 +245,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.panCamera = (function(){
+	this.panCamera = (function() {
 
 		var mouseChange = new THREE.Vector2(),
 			objectUp = new THREE.Vector3(),
