@@ -238,11 +238,12 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type"      : "PointLight",',
-				'	"color"     : ' + o.color.getHex() + ',',
-				'	"intensity" : ' + o.intensity + ',',
-				'	"position"  : ' + Vector3String( o.position ) + ',',
-				'	"distance"  : ' + o.distance + ( o.children.length ? ',' : '' )
+				'	"type"           : "PointLight",',
+				'	"color"          : ' + o.color.getHex() + ',',
+				'	"intensity"      : ' + o.intensity + ',',
+				'	"position"       : ' + Vector3String( o.position ) + ',',
+				'	"decay"          : ' + o.decay + ',',
+				'	"distance"       : ' + o.distance + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -251,14 +252,15 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type"      : "SpotLight",',
-				'	"color"     : ' + o.color.getHex() + ',',
-				'	"intensity" : ' + o.intensity + ',',
-				'	"position"  : ' + Vector3String( o.position ) + ',',
-				'	"distance"  : ' + o.distance + ',',
-				'	"angle"     : ' + o.angle + ',',
-				'	"exponent"  : ' + o.exponent + ',',
-				'	"target"    : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
+				'	"type"           : "SpotLight",',
+				'	"color"          : ' + o.color.getHex() + ',',
+				'	"intensity"      : ' + o.intensity + ',',
+				'	"position"       : ' + Vector3String( o.position ) + ',',
+				'	"distance"       : ' + o.distance + ',',
+				'	"angle"          : ' + o.angle + ',',
+				'	"exponent"       : ' + o.exponent + ',',
+				'	"decay"          : ' + o.decay + ',',
+				'	"target"         : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -472,7 +474,6 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "MeshLambertMaterial",',
 				'	"parameters"  : {',
 				'		"color"  : ' 	+ m.color.getHex() + ',',
-				'		"ambient"  : ' 	+ m.ambient.getHex() + ',',
 				'		"emissive"  : ' + m.emissive.getHex() + ',',
 
 				m.map ? 		'		"map" : ' + LabelString( getTextureName( m.map ) ) + ',' : '',
@@ -498,7 +499,6 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "MeshPhongMaterial",',
 				'	"parameters"  : {',
 				'		"color"  : ' 	+ m.color.getHex() + ',',
-				'		"ambient"  : ' 	+ m.ambient.getHex() + ',',
 				'		"emissive"  : ' + m.emissive.getHex() + ',',
 				'		"specular"  : ' + m.specular.getHex() + ',',
 				'		"shininess" : ' + m.shininess + ',',

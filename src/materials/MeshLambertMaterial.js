@@ -4,7 +4,6 @@
  *
  * parameters = {
  *  color: <hex>,
- *  ambient: <hex>,
  *  emissive: <hex>,
  *  opacity: <float>,
  *
@@ -46,7 +45,6 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.type = 'MeshLambertMaterial';
 
 	this.color = new THREE.Color( 0xffffff ); // diffuse
-	this.ambient = new THREE.Color( 0xffffff );
 	this.emissive = new THREE.Color( 0x000000 );
 
 	this.wrapAround = false;
@@ -94,7 +92,6 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 	THREE.Material.prototype.clone.call( this, material );
 
 	material.color.copy( this.color );
-	material.ambient.copy( this.ambient );
 	material.emissive.copy( this.emissive );
 
 	material.wrapAround = this.wrapAround;

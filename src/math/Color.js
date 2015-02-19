@@ -173,21 +173,27 @@ THREE.Color.prototype = {
 
 	},
 
-	copyGammaToLinear: function ( color ) {
+	copyGammaToLinear: function ( color, gammaFactor ) {
 
-		this.r = color.r * color.r;
-		this.g = color.g * color.g;
-		this.b = color.b * color.b;
+		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+
+		this.r = Math.pow( color.r, gammaFactor );
+		this.g = Math.pow( color.g, gammaFactor );
+		this.b = Math.pow( color.b, gammaFactor );
 
 		return this;
 
 	},
 
-	copyLinearToGamma: function ( color ) {
+	copyLinearToGamma: function ( color, gammaFactor ) {
 
-		this.r = Math.sqrt( color.r );
-		this.g = Math.sqrt( color.g );
-		this.b = Math.sqrt( color.b );
+		if ( gammaFactor === undefined ) gammaFactor = 2.0;
+
+		var safeInverse = ( gammaFactor > 0 ) ? ( 1.0 / gammaFactor ) : 1.0;
+
+		this.r = Math.pow( color.r, safeInverse );
+		this.g = Math.pow( color.g, safeInverse );
+		this.b = Math.pow( color.b, safeInverse );
 
 		return this;
 
@@ -366,10 +372,16 @@ THREE.Color.prototype = {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		return [ this.r, this.g, this.b ];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
 
+		array[ offset ] = this.r;
+		array[ offset + 1 ] = this.g;
+		array[ offset + 2 ] = this.b;
+
+		return array;
 	},
 
 	clone: function () {

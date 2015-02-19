@@ -116,8 +116,6 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		event.preventDefault();
-
 		if ( event.button === 0 ) {
 
 			state = STATE.ROTATE;
@@ -144,8 +142,6 @@ THREE.EditorControls = function ( object, domElement ) {
 	function onMouseMove( event ) {
 
 		if ( scope.enabled === false ) return;
-
-		event.preventDefault();
 
 		pointer.set( event.clientX, event.clientY );
 

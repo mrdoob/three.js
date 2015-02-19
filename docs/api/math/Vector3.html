@@ -342,6 +342,16 @@
 		Linear Interpolation between this vector and vector v, where alpha is the percent along the line.
 		</div>
 
+		<h3>[method:Vector3 lerpVectors]([page:Vector3 v1], [page:Vector3 v2], [page:Float alpha]) [page:Vector3 this]</h3>
+		<div>
+		v1 -- [page:Vector3] <br />
+		v2 -- [page:Vector3] <br />
+		alpha -- [page:Float] between 0 and 1.
+		</div>
+		<div>
+		Sets this vector to be the vector linearly interpolated between *v1* and *v2* with *alpha* factor.
+		</div>
+
 		<h3>[method:Float angleTo]([page:Vector3 v])</h3>
 		<div>
 		v -- [page:Vector3]
@@ -391,7 +401,10 @@
 		Multiplies this vector and m, and divides by perspective.
 		</div>
 
-		<h3>[method:Array toArray]()</h3>
+		<h3>[method:Array toArray]( [page:Array array] )</h3>
+		<div>
+		array -- Optional array to store the vector.
+		</div>
 		<div>
 		Assigns this vector's x value to array[0]. <br />
 		Assigns this vector's y value to array[1]. <br />

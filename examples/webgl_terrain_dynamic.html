@@ -380,7 +380,6 @@
 
 				uniformsTerrain[ "diffuse" ].value.setHex( 0xffffff );
 				uniformsTerrain[ "specular" ].value.setHex( 0xffffff );
-				uniformsTerrain[ "ambient" ].value.setHex( 0x111111 );
 
 				uniformsTerrain[ "shininess" ].value = 30;
 
@@ -430,7 +429,7 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -659,7 +658,7 @@
 
 					scene.fog.color.setHSL( 0.1, 0.5, lightVal );
 
-					renderer.setClearColor( scene.fog.color, 1 );
+					renderer.setClearColor( scene.fog.color );
 
 					directionalLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );

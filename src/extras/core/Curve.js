@@ -43,7 +43,7 @@ THREE.Curve = function () {
 
 THREE.Curve.prototype.getPoint = function ( t ) {
 
-	console.log( "Warning, getPoint() not implemented!" );
+	THREE.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
 	return null;
 
 };
@@ -182,12 +182,10 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 		if ( comparison < 0 ) {
 
 			low = i + 1;
-			continue;
 
 		} else if ( comparison > 0 ) {
 
 			high = i - 1;
-			continue;
 
 		} else {
 

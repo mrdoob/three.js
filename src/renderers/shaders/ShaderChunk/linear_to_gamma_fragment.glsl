@@ -1,5 +1,1 @@
-#ifdef GAMMA_OUTPUT
-
-	outgoingLight.xyz = sqrt( outgoingLight.xyz );
-
-#endif
+	gl_FragColor.xyz = linearToOutput( gl_FragColor.xyz );

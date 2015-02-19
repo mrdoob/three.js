@@ -122,7 +122,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 						light.shadowCascadeArray[ n ] = virtualLight;
 
-						console.log( "Created virtualLight", virtualLight );
+						//console.log( "Created virtualLight", virtualLight );
 
 					} else {
 
@@ -183,7 +183,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 				} else {
 
-					console.error( "Unsupported light type for shadow" );
+					THREE.error( "THREE.ShadowMapPlugin: Unsupported light type for shadow", light );
 					continue;
 
 				}

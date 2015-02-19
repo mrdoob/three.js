@@ -5,5 +5,5 @@ source "$DIR/setup_test_env.bash"
 
 blender --background $BLEND/scene_instancing.blend --python $PYSCRIPT -- \
     $JSON --vertices --faces --scene --materials --enablePrecision \
-    --precision 4 --embedGeometry
+    --precision 4 --embedGeometry --indent
 makereview $@ --tag $(tagname)

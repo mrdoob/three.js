@@ -25,7 +25,7 @@ THREE.ColladaLoader = function () {
 	var animData;
 	var kinematics;
 	var visualScenes;
-	var kinematicsModel;
+	var kinematicsModels;
 	var baseUrl;
 	var morphs;
 	var skins;
@@ -2805,6 +2805,14 @@ THREE.ColladaLoader = function () {
 
 		this.geometry3js = new THREE.Geometry();
 
+		if ( this.vertices === null ) {
+
+			// TODO (mrdoob): Study case when this is null (carrier.dae)
+
+			return this;
+
+		}
+
 		var vertexData = sources[ this.vertices.input['POSITION'].source ].data;
 
 		for ( var i = 0; i < vertexData.length; i += 3 ) {
@@ -3576,7 +3584,6 @@ THREE.ColladaLoader = function () {
 
 			switch ( child.nodeName ) {
 
-				case 'ambient':
 				case 'emission':
 				case 'diffuse':
 				case 'specular':

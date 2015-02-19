@@ -12,9 +12,8 @@
 
 	#ifdef FOG_EXP2
 
-		const float LOG2 = 1.442695;
-		float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );
-		fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
+		float fogFactor = exp2( - square( fogDensity ) * square( depth ) * LOG2 );
+		fogFactor = whiteCompliment( fogFactor );
 
 	#else
 

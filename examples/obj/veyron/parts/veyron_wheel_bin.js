@@ -22,7 +22,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 35.294118,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	},
 
 	{
@@ -35,7 +35,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 15.686275,
-	"transparency" : 0.0
+	"opacity" : 0.0
 	}],
 
     "buffers": "veyron_wheel_bin.bin"

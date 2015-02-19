@@ -78,7 +78,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -112,7 +112,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -366,6 +366,14 @@ THREE.Vector2.prototype = {
 		this.y += ( v.y - this.y ) * alpha;
 
 		return this;
+
+	},
+
+	lerpVectors: function ( v1, v2, alpha ) {
+
+	    this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+
+	    return this;
 
 	},
 

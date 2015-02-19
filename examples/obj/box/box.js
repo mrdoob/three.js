@@ -21,7 +21,7 @@
 	"colorSpecular" : [0.8, 0.8, 0.8],
 	"illumination" : 2,
 	"specularCoef" : 0.0,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	}],
 
     "buffers": "box.bin"

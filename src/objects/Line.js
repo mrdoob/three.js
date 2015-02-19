@@ -100,6 +100,8 @@ THREE.Line.prototype.raycast = ( function () {
 							// What do we want? intersection point on the ray or on the segment??
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+							index: i,
+							offsetIndex: oi,
 							face: null,
 							faceIndex: null,
 							object: this
@@ -133,6 +135,7 @@ THREE.Line.prototype.raycast = ( function () {
 						// What do we want? intersection point on the ray or on the segment??
 						// point: raycaster.ray.at( distance ),
 						point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+						index: i,
 						face: null,
 						faceIndex: null,
 						object: this
@@ -164,6 +167,7 @@ THREE.Line.prototype.raycast = ( function () {
 					// What do we want? intersection point on the ray or on the segment??
 					// point: raycaster.ray.at( distance ),
 					point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+					index: i,
 					face: null,
 					faceIndex: null,
 					object: this

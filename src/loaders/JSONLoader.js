@@ -43,9 +43,16 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 					var json = JSON.parse( xhr.responseText );
 
+					if ( json.metadata !== undefined && json.metadata.version >= 4 ) {
+
+						console.error( 'THREE.JSONLoader: "' + url + '" should be loaded with THREE.ObjectLoader instead.' );
+						return;
+
+					}
+
 					if ( json.metadata !== undefined && json.metadata.type === 'scene' ) {
 
-						console.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
+						THREE.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
 						return;
 
 					}
@@ -55,7 +62,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 				} else {
 
-					console.error( 'THREE.JSONLoader: "' + url + '" seems to be unreachable or the file is empty.' );
+					THREE.error( 'THREE.JSONLoader: "' + url + '" seems to be unreachable or the file is empty.' );
 
 				}
 
@@ -67,7 +74,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			} else {
 
-				console.error( 'THREE.JSONLoader: Couldn\'t load "' + url + '" (' + xhr.status + ')' );
+				THREE.error( 'THREE.JSONLoader: Couldn\'t load "' + url + '" (' + xhr.status + ')' );
 
 			}
 
@@ -454,7 +461,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
 
-				console.warn( 'When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+				THREE.warn( 'THREE.JSONLoader: When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
 					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
 
 		}

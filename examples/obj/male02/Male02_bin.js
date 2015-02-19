@@ -23,7 +23,7 @@
 	"mapDiffuse" : "male-02-1noCulling.JPG",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 154.901961,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -37,7 +37,7 @@
 	"mapDiffuse" : "orig_02_-_Defaul1noCulling.JPG",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 154.901961,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -51,7 +51,7 @@
 	"mapDiffuse" : "orig_02_-_Defaul1noCulling.JPG",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 154.901961,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -65,7 +65,7 @@
 	"mapDiffuse" : "01_-_Default1noCulling.JPG",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 154.901961,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -79,7 +79,7 @@
 	"mapDiffuse" : "male-02-1noCulling.JPG",
 	"opticalDensity" : 1.0,
 	"specularCoef" : 154.901961,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	}],
 
     "buffers": "Male02_bin.bin"

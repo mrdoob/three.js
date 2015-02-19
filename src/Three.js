@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '70dev' };
+var THREE = { REVISION: '71dev' };
 
 // browserify support
 
@@ -23,6 +23,13 @@ if ( Math.sign === undefined ) {
 	};
 
 }
+
+
+// set the default log handlers
+THREE.log = function() { console.log.apply( console, arguments ); }
+THREE.warn = function() { console.warn.apply( console, arguments ); }
+THREE.error = function() { console.error.apply( console, arguments ); }
+
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
@@ -149,6 +156,7 @@ THREE.UnsignedShortType = 1012;
 THREE.IntType = 1013;
 THREE.UnsignedIntType = 1014;
 THREE.FloatType = 1015;
+THREE.HalfFloatType = 1025;
 
 // Pixel types
 
@@ -187,25 +195,25 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
 THREE.Projector = function () {
 
-	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
+	THREE.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
 
 	this.projectVector = function ( vector, camera ) {
 
-		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
+		THREE.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
 		vector.project( camera );
 
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
+		THREE.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
 		vector.unproject( camera );
 
 	};
 
 	this.pickingRay = function ( vector, camera ) {
 
-		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
+		THREE.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
 
 	};
 
@@ -213,7 +221,7 @@ THREE.Projector = function () {
 
 THREE.CanvasRenderer = function () {
 
-	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
+	THREE.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
 
 	this.domElement = document.createElement( 'canvas' );
 	this.clear = function () {};

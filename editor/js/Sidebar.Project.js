@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Renderer = function ( editor ) {
+Sidebar.Project = function ( editor ) {
 
 	var signals = editor.signals;
 
@@ -17,14 +17,14 @@ Sidebar.Renderer = function ( editor ) {
 	};
 
 	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/renderer/collapsed' ) );
+	container.setCollapsed( editor.config.getKey( 'ui/sidebar/project/collapsed' ) );
 	container.onCollapsedChange( function ( boolean ) {
 
-		editor.config.setKey( 'ui/sidebar/renderer/collapsed', boolean );
+		editor.config.setKey( 'ui/sidebar/project/collapsed', boolean );
 
 	} );
 
-	container.addStatic( new UI.Text( 'RENDERER' ) );
+	container.addStatic( new UI.Text( 'PROJECT' ) );
 	container.add( new UI.Break() );
 
 	// class
@@ -40,30 +40,30 @@ Sidebar.Renderer = function ( editor ) {
 	}
 
 	var rendererTypeRow = new UI.Panel();
-	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).onChange( function () {
+	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
 
-		editor.config.setKey( 'renderer', this.getValue() );
+		editor.config.setKey( 'project/renderer', this.getValue() );
 		updateRenderer();
 
 	} );
 
-	rendererTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	rendererTypeRow.add( new UI.Text( 'Renderer' ).setWidth( '90px' ) );
 	rendererTypeRow.add( rendererType );
 
 	container.add( rendererTypeRow );
 
-	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
+	if ( editor.config.getKey( 'project/renderer' ) !== undefined ) {
 
-		rendererType.setValue( editor.config.getKey( 'renderer' ) );
+		rendererType.setValue( editor.config.getKey( 'project/renderer' ) );
 
 	}
-	
+
 	// antialiasing
 
 	var rendererAntialiasRow = new UI.Panel();
-	var rendererAntialias = new UI.Checkbox( editor.config.getKey( 'renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
+	var rendererAntialias = new UI.Checkbox( editor.config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
 
-		editor.config.setKey( 'renderer/antialias', this.getValue() );
+		editor.config.setKey( 'project/renderer/antialias', this.getValue() );
 		// updateRenderer();
 
 	} );
@@ -72,6 +72,21 @@ Sidebar.Renderer = function ( editor ) {
 	rendererAntialiasRow.add( rendererAntialias );
 
 	container.add( rendererAntialiasRow );
+
+	// VR
+
+	var vrRow = new UI.Panel();
+	var vr = new UI.Checkbox( editor.config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
+
+		editor.config.setKey( 'project/vr', this.getValue() );
+		// updateRenderer();
+
+	} );
+
+	vrRow.add( new UI.Text( 'VR' ).setWidth( '90px' ) );
+	vrRow.add( vr );
+
+	container.add( vrRow );
 
 	//
 

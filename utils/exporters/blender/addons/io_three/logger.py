@@ -2,11 +2,10 @@ import os
 import logging
 import tempfile
 
-from .. import constants
+from . import constants
 
 LOG_FILE = None
 LOGGER = None
-FILE_NAME = 'io_three.export.log'
 
 LEVELS = {
     constants.DEBUG: logging.DEBUG,
@@ -16,9 +15,16 @@ LEVELS = {
     constants.CRITICAL: logging.CRITICAL
 }
 
-def init(level=constants.DEBUG):
+
+def init(filename, level=constants.DEBUG):
+    """Initialize the logger.
+
+    :param filename: base name of the log file
+    :param level: logging level (Default value = DEBUG)
+
+    """
     global LOG_FILE
-    LOG_FILE = os.path.join(tempfile.gettempdir(), FILE_NAME)
+    LOG_FILE = os.path.join(tempfile.gettempdir(), filename)
     with open(LOG_FILE, 'w'):
         pass
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * @author alteredq / http://alteredqualia.com/
  *
  * Normal map shader
@@ -37,7 +37,6 @@ THREE.NormalDisplacementShader = {
 
 		"diffuse": { type: "c", value: new THREE.Color( 0xffffff ) },
 		"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-		"ambient": { type: "c", value: new THREE.Color( 0xffffff ) },
 		"shininess": { type: "f", value: 30 },
 		"opacity": { type: "f", value: 1 },
 
@@ -55,7 +54,6 @@ THREE.NormalDisplacementShader = {
 
 	fragmentShader: [
 
-		"uniform vec3 ambient;",
 		"uniform vec3 diffuse;",
 		"uniform vec3 specular;",
 		"uniform float shininess;",
@@ -128,6 +126,7 @@ THREE.NormalDisplacementShader = {
 		"varying vec3 vWorldPosition;",
 		"varying vec3 vViewPosition;",
 
+		THREE.ShaderChunk[ "common" ],
 		THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 		THREE.ShaderChunk[ "fog_pars_fragment" ],
 		THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
@@ -177,7 +176,7 @@ THREE.NormalDisplacementShader = {
 		"		#endif",
 
 		"	}",
-		
+
 		THREE.ShaderChunk[ "alphatest_fragment" ],
 
 		"	if( enableSpecular )",
@@ -388,11 +387,11 @@ THREE.NormalDisplacementShader = {
 
 		"	#ifdef METAL",
 
-		"		outgoingLight.xyz += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * ambient + totalSpecularLight );",
+		"		outgoingLight.xyz += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse + totalSpecularLight );",
 
 		"	#else",
 
-		"		outgoingLight.xyz += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * ambient ) + totalSpecularLight;",
+		"		outgoingLight.xyz += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
 
 		"	#endif",
 

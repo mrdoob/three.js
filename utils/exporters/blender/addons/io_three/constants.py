@@ -34,6 +34,7 @@ MAPPING_TYPES = type('Mapping', (), {
 
 JSON = 'json'
 EXTENSION = '.%s' % JSON
+INDENT = 'indent'
 
 
 MATERIALS = 'materials'
@@ -49,8 +50,11 @@ SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
 FRAME_STEP = 'frameStep'
-ANIMATION = 'animation'
+FRAME_INDEX_AS_TIME = 'frameIndexAsTime'
+ANIMATION = 'animations'
 MORPH_TARGETS = 'morphTargets'
+POSE = 'pose'
+REST = 'rest'
 SKIN_INDICES = 'skinIndices'
 SKIN_WEIGHTS = 'skinWeights'
 LOGGING = 'logging'
@@ -64,6 +68,7 @@ PRECISION = 'precision'
 DEFAULT_PRECISION = 6
 EMBED_GEOMETRY = 'embedGeometry'
 EMBED_ANIMATION = 'embedAnimation'
+OFF = 'off'
 
 GLOBAL = 'global'
 BUFFER_GEOMETRY = 'BufferGeometry'
@@ -93,11 +98,12 @@ EXPORT_OPTIONS = {
     FACE_MATERIALS: False,
     SCALE: 1,
     FRAME_STEP: 1,
-    SCENE: True,
+    FRAME_INDEX_AS_TIME: False,
+    SCENE: False,
     MIX_COLORS: False,
     COMPRESSION: None,
     MAPS: False,
-    ANIMATION: False,
+    ANIMATION: OFF,
     BONES: False,
     SKINNING: False,
     MORPH_TARGETS: False,
@@ -105,12 +111,13 @@ EXPORT_OPTIONS = {
     LIGHTS: False,
     COPY_TEXTURES: True,
     LOGGING: DEBUG,
-    ENABLE_PRECISION: False,
+    ENABLE_PRECISION: True,
     PRECISION: DEFAULT_PRECISION,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: GEOMETRY,
-    INFLUENCES_PER_VERTEX: 2
+    INFLUENCES_PER_VERTEX: 2,
+    INDENT: True
 }
 
 
@@ -210,10 +217,15 @@ IMAGE = 'image'
 
 NAME = 'name'
 PARENT = 'parent'
-
-#@TODO move to api.constants?
+LENGTH = 'length'
+FPS = 'fps'
+HIERARCHY = 'hierarchy'
 POS = 'pos'
 ROTQ = 'rotq'
+ROT = 'rot'
+SCL = 'scl'
+TIME = 'time'
+KEYS = 'keys'
 
 AMBIENT = 'ambient'
 COLOR = 'color'

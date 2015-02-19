@@ -2,11 +2,7 @@
 
 	vec4 texelColor = texture2D( map, vUv );
 
-	#ifdef GAMMA_INPUT
-
-		texelColor.rgb *= texelColor.rgb;
-
-	#endif
+	texelColor.xyz = inputToLinear( texelColor.xyz );
 
 	diffuseColor *= texelColor;
 
