@@ -4696,6 +4696,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.map.value = material.map;
 
+		if ( material.map !== null ) {
+
+			var offset = material.map.offset;
+			var repeat = material.map.repeat;
+
+			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+		}
+
 	}
 
 	function refreshUniformsFog ( uniforms, fog ) {
