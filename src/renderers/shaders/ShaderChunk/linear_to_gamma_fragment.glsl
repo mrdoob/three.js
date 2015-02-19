@@ -1,1 +1,1 @@
-	gl_FragColor.xyz = linearToOutput( gl_FragColor.xyz );
+	outgoingLight.xyz = linearToOutput( outgoingLight.xyz );
