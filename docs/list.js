@@ -47,7 +47,7 @@ var list = {
 
 
 		"Loaders": [
-			[ "BabylonLoader", "api/loaders/BabylonLoader" ],
+			[ "BabylonLoader *", "api/loaders/BabylonLoader" ],
 			[ "BufferGeometryLoader", "api/loaders/BufferGeometryLoader" ],
 			[ "Cache", "api/loaders/Cache" ],
 			[ "ColladaLoader", "api/loaders/ColladaLoader" ],
@@ -260,10 +260,16 @@ for ( var section in list ) {
 		for ( var i = 0; i < list[ section ][ category ].length; i ++ ) {
 
 			var page = list[ section ][ category ][ i ];
-			pages[ section ][ category ][ page[ 0 ] ] = page[ 1 ];
+			pages[ section ][ category ][ cleanPageName( page[ 0 ] ) ] = page[ 1 ];
 
 		}
 
 	}
+
+}
+
+function cleanPageName( name ) {
+
+	return name.replace(/\ \*/g, '');
 
 }
