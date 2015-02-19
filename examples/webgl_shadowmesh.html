@@ -1,39 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-
 	<head>
 		<title> three.js webgl - ShadowMesh </title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 		<meta charset="utf-8">
-	
 		<style>
-
 			body {
 				background-color: rgb(0, 0, 0);
 				margin: 0;
 				padding: 0;
 				overflow: hidden;
 			}
-		
+
+			#lightButton {
+				position: absolute;
+				right: 20px;
+				top: 20px;
+			}
 		</style>
 	</head>
-
 	<body>
 
 		<div id="container"></div>
-
-		<input id="lightButton" style="position:fixed; right:2%; top:4%; font-size:12px;" type="button" value="Switch to PointLight" onclick="lightButtonHandler()">
-
-		<div id="info" style="position:fixed; left:2%; bottom:7%; font-family:arial; font-type:bold; color:rgb(255,255,255);">
-			three.js webgl - ShadowMesh
-		</div>
-
+		<input id="lightButton" type="button" value="Switch to PointLight" onclick="lightButtonHandler()">
 
 		<script src="../build/three.min.js"></script>
-		
+		<script src="js/objects/ShadowMesh.js"></script>
 		<script>
-
-			//global variables and objects
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -67,14 +60,11 @@
 			var frameTime = 0;
 			var TWO_PI = Math.PI * 2;
 
-
 			init();
-
 			animate();
 
-
 			function init() {
-				
+
 				renderer.setClearColor( 'rgb(0,150,255)' );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
@@ -87,7 +77,7 @@
 				sunLight.position.set( 5, 7, - 1 );
 				sunLight.lookAt( scene.position );
 				scene.add( sunLight );
-				
+
 				lightPosition4D.x = sunLight.position.x;
 				lightPosition4D.y = sunLight.position.y;
 				lightPosition4D.z = sunLight.position.z;
@@ -109,7 +99,7 @@
 				arrowPosition3.copy( sunLight.position ).add( new THREE.Vector3( 0, - 0.2, 0 ) );
 				arrowHelper3 = new THREE.ArrowHelper( arrowDirection, arrowPosition3, 0.9, 0xffff00, 0.25, 0.08 );
 				scene.add( arrowHelper3 );
-				
+
 				// LIGHTBULB
 				var lightSphereGeometry = new THREE.SphereGeometry( 0.09 );
 				var lightSphereMaterial = new THREE.MeshBasicMaterial( { color: 'rgb(255,255,255)' } );
@@ -122,7 +112,7 @@
 				lightHolder = new THREE.Mesh( lightHolderGeometry, lightHolderMaterial );
 				scene.add( lightHolder );
 				lightHolder.visible = false;
-				
+
 				// GROUND
 				var groundGeometry = new THREE.BoxGeometry( 30, 0.01, 40 );
 				var groundMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(0,130,0)' } );
@@ -159,7 +149,7 @@
 
 				torusShadow = new THREE.ShadowMesh( torus );
 				scene.add( torusShadow );
-				
+
 				// WHITE SPHERE and SPHERE'S SHADOW
 				var sphereGeometry = new THREE.SphereGeometry( 0.5, 20, 10 );
 				var sphereMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,255)', emissive: 0x222222 } );
@@ -169,7 +159,7 @@
 
 				sphereShadow = new THREE.ShadowMesh( sphere );
 				scene.add( sphereShadow );
-				
+
 				// YELLOW PYRAMID and PYRAMID'S SHADOW
 				var pyramidGeometry = new THREE.CylinderGeometry( 0, 0.5, 2, 4 );
 				var pyramidMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, shading: THREE.FlatShading } );
@@ -180,13 +170,12 @@
 				pyramidShadow = new THREE.ShadowMesh( pyramid );
 				scene.add( pyramidShadow );
 
-			} //end function init()
-
+			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-				
+
 				frameTime = clock.getDelta();
 
 				cube.rotation.x += 1.0 * frameTime;
@@ -197,7 +186,7 @@
 
 				torus.rotation.x -= 1.0 * frameTime;
 				torus.rotation.y -= 1.0 * frameTime;
-				
+
 				pyramid.rotation.y += 0.5 * frameTime;
 
 				horizontalAngle += 0.5 * frameTime;
@@ -220,13 +209,12 @@
 				torusShadow.update( groundPlane, lightPosition4D );
 				sphereShadow.update( groundPlane, lightPosition4D );
 				pyramidShadow.update( groundPlane, lightPosition4D );
-				
-				
+
+
 				renderer.render( scene, camera );
-				
 
-			} //end function animate()
 
+			}
 
 			function onWindowResize() {
 
@@ -238,18 +226,14 @@
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				document.getElementById( 'lightButton' ).style.fontSize = SCREEN_WIDTH * 0.02 + "px";
-				document.getElementById( 'info' ).style.fontSize = SCREEN_WIDTH * 0.02 + "px";
-				
 			}
-
 
 			function lightButtonHandler() {
 
 				useDirectionalLight = !useDirectionalLight;
 
 				if ( useDirectionalLight ) {
-					
+
 					renderer.setClearColor( 'rgb(0,150,255)' );
 					groundMesh.material.color.set( 'rgb(0,130,0)' );
 					sunLight.position.set( 5, 7, - 1 );
@@ -269,12 +253,11 @@
 
 					document.getElementById( 'lightButton' ).value = "Switch to PointLight" ;
 
-				}
-				else {
+				} else {
 
 					renderer.setClearColor( 'rgb(0,0,0)' );
 					groundMesh.material.color.set( 'rgb(150,150,150)' );
-					
+
 					sunLight.position.set( 0, 6, - 2 );
 					sunLight.lookAt( scene.position );
 					lightSphere.position.copy( sunLight.position );
@@ -297,11 +280,8 @@
 
 				}
 
-			} // end function lightButtonHandler()
-
+			}
 
 		</script>
-
 	</body>
-
 </html>
