@@ -518,7 +518,7 @@ THREE.ShaderSkin = {
 
 				"if ( passID == 0 ) {",
 
-					"gl_FragColor = vec4( sqrt( outgoingLight ), diffuseColor.w );",
+					"outgoingLight = sqrt( outgoingLight );",
 
 				"} else if ( passID == 1 ) {",
 
