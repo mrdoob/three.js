@@ -11192,15 +11192,9 @@ THREE.SpotLight.prototype.clone = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Cache = function () {
+THREE.Cache = {
 
-	this.files = {};
-
-};
-
-THREE.Cache.prototype = {
-
-	constructor: THREE.Cache,
+	files: {},
 
 	add: function ( key, file ) {
 
@@ -11664,7 +11658,6 @@ THREE.Loader.Handlers = {
 
 THREE.XHRLoader = function ( manager ) {
 
-	this.cache = new THREE.Cache();
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -11677,7 +11670,7 @@ THREE.XHRLoader.prototype = {
 
 		var scope = this;
 
-		var cached = scope.cache.get( url );
+		var cached = THREE.Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -11691,7 +11684,7 @@ THREE.XHRLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-			scope.cache.add( url, this.response );
+			THREE.Cache.add( url, this.response );
 
 			if ( onLoad ) onLoad( this.response );
 
@@ -11750,7 +11743,6 @@ THREE.XHRLoader.prototype = {
 
 THREE.ImageLoader = function ( manager ) {
 
-	this.cache = new THREE.Cache();
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -11763,7 +11755,7 @@ THREE.ImageLoader.prototype = {
 
 		var scope = this;
 
-		var cached = scope.cache.get( url );
+		var cached = THREE.Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -11774,18 +11766,15 @@ THREE.ImageLoader.prototype = {
 
 		var image = document.createElement( 'img' );
 
-		if ( onLoad !== undefined ) {
+		image.addEventListener( 'load', function ( event ) {
 
-			image.addEventListener( 'load', function ( event ) {
+			THREE.Cache.add( url, this );
 
-				scope.cache.add( url, this );
+			if ( onLoad ) onLoad( this );
+			
+			scope.manager.itemEnd( url );
 
-				onLoad( this );
-				scope.manager.itemEnd( url );
-
-			}, false );
-
-		}
+		}, false );
 
 		if ( onProgress !== undefined ) {
 
