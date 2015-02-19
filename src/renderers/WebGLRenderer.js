@@ -2502,7 +2502,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		updateObject( object );
 
-		var program = setProgram( camera, lights, fog, material, object );
+		var program = _this.setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -2841,7 +2841,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		updateObject( object );
 
-		var program = setProgram( camera, lights, fog, material, object );
+		var program = _this.setProgram( camera, lights, fog, material, object );
 
 		var attributes = program.attributes;
 
@@ -3598,7 +3598,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderImmediateObject = function ( camera, lights, fog, material, object ) {
 
-		var program = setProgram( camera, lights, fog, material, object );
+		var program = _this.setProgram( camera, lights, fog, material, object );
 
 		_currentGeometryProgram = '';
 
@@ -4351,7 +4351,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setProgram( camera, lights, fog, material, object ) {
+	this.setProgram = function ( camera, lights, fog, material, object ) {
 
 		_usedTextureUnits = 0;
 
@@ -4581,7 +4581,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// load common uniforms
 
-			loadUniformsGeneric( material.uniformsList );
+			_this.loadUniformsGeneric( material.uniformsList );
 
 		}
 
@@ -4595,7 +4595,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return program;
 
-	}
+	};
 
 	// Uniforms (refresh uniforms objects)
 
@@ -4867,7 +4867,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function loadUniformsGeneric ( uniforms ) {
+	this.loadUniformsGeneric = function ( uniforms ) {
 
 		var texture, textureUnit, offset;
 
@@ -5201,7 +5201,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	}
+	};
 
 	function setupMatrices ( object, camera ) {
 
