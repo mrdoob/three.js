@@ -402,7 +402,7 @@ THREE.MD2CharacterComplex = function () {
 
 		if ( controls.moveForward ) {
 
-			if ( this.meshBody )   {
+			if ( this.meshBody ) {
 
 				this.meshBody.setAnimationDirectionForward( this.activeAnimation );
 				this.meshBody.setAnimationDirectionForward( this.oldAnimation );
@@ -445,7 +445,7 @@ THREE.MD2CharacterComplex = function () {
 		// speed based on controls
 
 		if ( controls.crouch ) 	this.maxSpeed = this.crouchSpeed;
-		else  					this.maxSpeed = this.walkSpeed;
+		else this.maxSpeed = this.walkSpeed;
 
 		this.maxReverseSpeed = -this.maxSpeed;
 
@@ -533,7 +533,7 @@ THREE.MD2CharacterComplex = function () {
 		//
 
 		var mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
-		mesh.rotation.y = -Math.PI/2;
+		mesh.rotation.y = -Math.PI / 2;
 
 		//
 

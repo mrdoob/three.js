@@ -34,7 +34,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 				texture.image = texData.image;
 
-			} else if ( undefined !== texData.data ){
+			} else if ( undefined !== texData.data ) {
 
 				texture.image.width = texData.width;
 				texture.image.height = texData.height;

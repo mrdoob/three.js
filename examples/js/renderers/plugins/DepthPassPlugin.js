@@ -107,7 +107,7 @@ THREE.DepthPassPlugin = function () {
 		// set object matrices & frustum culling
 		
 		_renderList.length = 0;
-		projectObject(scene,scene,camera);
+		projectObject(scene, scene, camera);
 
 		// render regular objects
 
@@ -189,7 +189,7 @@ THREE.DepthPassPlugin = function () {
 
 	};
 	
-	function projectObject(scene, object,camera){
+	function projectObject(scene, object,camera) {
 		
 		if ( object.visible ) {
 	
@@ -198,7 +198,7 @@ THREE.DepthPassPlugin = function () {
 			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 		
 		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
+				for (var i = 0, l = webglObjects.length; i < l; i ++) {
 			
 					var webglObject = webglObjects[i];
 					
@@ -208,7 +208,7 @@ THREE.DepthPassPlugin = function () {
 				}
 			}
 	
-			for(var i = 0, l = object.children.length; i < l; i++) {
+			for (var i = 0, l = object.children.length; i < l; i ++) {
 				
 				projectObject(scene, object.children[i], camera);
 			}

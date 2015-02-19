@@ -182,7 +182,7 @@ THREE.SceneExporter.prototype = {
 
 		function NumConstantString( c ) {
 
-			var constants = [ "NearestFilter", "NearestMipMapNearestFilter" , "NearestMipMapLinearFilter",
+			var constants = [ "NearestFilter", "NearestMipMapNearestFilter", "NearestMipMapLinearFilter",
 							  "LinearFilter", "LinearMipMapNearestFilter", "LinearMipMapLinearFilter" ];
 
 			for ( var i = 0; i < constants.length; i ++ ) {

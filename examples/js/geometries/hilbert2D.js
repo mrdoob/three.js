@@ -42,7 +42,7 @@ function hilbert2D (center, size, iterations, v0, v1, v2, v3) {
 	];
 
 	// Recurse iterations
-	if (0 <= --iterations) {
+	if (0 <= -- iterations) {
 		var tmp = [];
 
 		Array.prototype.push.apply( tmp, hilbert2D ( vec[ 0 ], half, iterations, v0, v3, v2, v1 ) );

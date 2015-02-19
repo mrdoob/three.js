@@ -11,7 +11,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.resolution = ( resolution !== undefined ) ? resolution : 256;
 	this.needsInit = true;
-	this.adaptive = adaptive !== undefined? !!adaptive : true;
+	this.adaptive = adaptive !== undefined ? !!adaptive : true;
 
 	this.luminanceRT = null;
 	this.previousLuminanceRT = null;
@@ -190,7 +190,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
 		}
 		//Put something in the adaptive luminance texture so that the scene can render initially
-		this.quad.material = new THREE.MeshBasicMaterial( {color: 0x777777 });
+		this.quad.material = new THREE.MeshBasicMaterial( { color: 0x777777 });
 		this.materialLuminance.needsUpdate = true;
 		this.materialAdaptiveLum.needsUpdate = true;
 		this.materialToneMap.needsUpdate = true;
