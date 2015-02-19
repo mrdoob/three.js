@@ -85,10 +85,15 @@ THREE.ColladaLoader = function () {
 
 						} else {
 
-							if (faillCallback)
-								failCallback(); 
-							else 
+							if ( faillCallback ) {
+
+								failCallback();
+
+							} else {
+
 								console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
+
+							}
 
 						}
 
@@ -694,8 +699,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		var animationBounds = calcAnimationBounds();
-		var skeleton = visualScene.getChildById( instanceCtrl.skeleton[0], true ) ||
-					   visualScene.getChildBySid( instanceCtrl.skeleton[0], true );
+		var skeleton = visualScene.getChildById( instanceCtrl.skeleton[0], true ) || visualScene.getChildBySid( instanceCtrl.skeleton[0], true );
 
 		//flatten the skeleton into a list of bones
 		var bonelist = flattenSkeleton(skeleton);
@@ -745,8 +749,8 @@ THREE.ColladaLoader = function () {
 		var skinWeights = [];
 		var weights = skinController.skin.weights;
 
-		//hook up the skin weights
-		// TODO -  this might be a good place to choose greatest 4 weights
+		// hook up the skin weights
+		// TODO - this might be a good place to choose greatest 4 weights
 		for(var i =0; i < weights.length; i++) {
 
 			var indicies = new THREE.Vector4(weights[i][0]?weights[i][0].joint:0,weights[i][1]?weights[i][1].joint:0,weights[i][2]?weights[i][2].joint:0,weights[i][3]?weights[i][3].joint:0);
@@ -1346,17 +1350,21 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-        var nodes = COLLADA.querySelectorAll('library_nodes node');
+		var nodes = COLLADA.querySelectorAll('library_nodes node');
 
-        for ( var i = 0; i < nodes.length; i++ ) {
+		for ( var i = 0; i < nodes.length; i++ ) {
 
-            var attObj = nodes[i].attributes.getNamedItem('id');
-            if ( attObj && attObj.value === id ) {
-                return nodes[i];
-        }
-        }
+			var attObj = nodes[i].attributes.getNamedItem('id');
 
-        return undefined;
+			if ( attObj && attObj.value === id ) {
+
+				return nodes[i];
+
+			}
+
+		}
+
+		return undefined;
 
 	};
 
@@ -3042,7 +3050,7 @@ THREE.ColladaLoader = function () {
 
 						// FIXME: normals don't seem to be quite right
 
-						faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
+						faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ], clr ) );
 
 					}
 
@@ -3607,8 +3615,7 @@ THREE.ColladaLoader = function () {
 						} else if ( bumpType.toLowerCase() === "normalmap" ) {
 							this[ 'normal' ] = ( new ColorOrTexture() ).parse( child );
 						} else {
-							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType +
-								           ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
+							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType + ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
 							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
 						}
 					} else {
