@@ -84,7 +84,7 @@
 				scene.add( camera );
 				onWindowResize();
 
-				sunLight.position.set( 5, 7, -1 );
+				sunLight.position.set( 5, 7, - 1 );
 				sunLight.lookAt( scene.position );
 				scene.add( sunLight );
 				
@@ -106,7 +106,7 @@
 				arrowHelper2 = new THREE.ArrowHelper( arrowDirection, arrowPosition2, 0.9, 0xffff00, 0.25, 0.08 );
 				scene.add( arrowHelper2 );
 
-				arrowPosition3.copy( sunLight.position ).add( new THREE.Vector3( 0, -0.2, 0 ) );
+				arrowPosition3.copy( sunLight.position ).add( new THREE.Vector3( 0, - 0.2, 0 ) );
 				arrowHelper3 = new THREE.ArrowHelper( arrowDirection, arrowPosition3, 0.9, 0xffff00, 0.25, 0.08 );
 				scene.add( arrowHelper3 );
 				
@@ -134,7 +134,7 @@
 				var cubeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 				var cubeMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,0,0)', emissive: 0x200000 } );
 				cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
-				cube.position.z = -1;
+				cube.position.z = - 1;
 				scene.add( cube );
 
 				cubeShadow = new THREE.ShadowMesh( cube );
@@ -144,7 +144,7 @@
 				var cylinderGeometry = new THREE.CylinderGeometry( 0.3, 0.3, 2 );
 				var cylinderMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(0,0,255)', emissive: 0x000020 } );
 				cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
-				cylinder.position.z = -2.5;
+				cylinder.position.z = - 2.5;
 				scene.add( cylinder );
 
 				cylinderShadow = new THREE.ShadowMesh( cylinder );
@@ -154,7 +154,7 @@
 				var torusGeometry = new THREE.TorusGeometry( 1, 0.2, 10, 16, TWO_PI );
 				var torusMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,0,255)', emissive: 0x200020 } );
 				torus = new THREE.Mesh( torusGeometry, torusMaterial );
-				torus.position.z = -6;
+				torus.position.z = - 6;
 				scene.add( torus );
 
 				torusShadow = new THREE.ShadowMesh( torus );
@@ -174,7 +174,7 @@
 				var pyramidGeometry = new THREE.CylinderGeometry( 0, 0.5, 2, 4 );
 				var pyramidMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, shading: THREE.FlatShading } );
 				pyramid = new THREE.Mesh( pyramidGeometry, pyramidMaterial );
-				pyramid.position.set( -4, 1, 2 );
+				pyramid.position.set( - 4, 1, 2 );
 				scene.add( pyramid );
 
 				pyramidShadow = new THREE.ShadowMesh( pyramid );
@@ -204,7 +204,7 @@
 				if ( horizontalAngle > TWO_PI )
 					horizontalAngle -= TWO_PI;
 				cube.position.x = Math.sin( horizontalAngle ) * 4;
-				cylinder.position.x = Math.sin( horizontalAngle ) * -4;
+				cylinder.position.x = Math.sin( horizontalAngle ) * - 4;
 				torus.position.x = Math.cos( horizontalAngle ) * 4;
 
 				verticalAngle += 1.5 * frameTime;
@@ -252,7 +252,7 @@
 					
 					renderer.setClearColor( 'rgb(0,150,255)' );
 					groundMesh.material.color.set( 'rgb(0,130,0)' );
-					sunLight.position.set( 5, 7, -1 );
+					sunLight.position.set( 5, 7, - 1 );
 					sunLight.lookAt( scene.position );
 
 					lightPosition4D.x = sunLight.position.x;
@@ -275,7 +275,7 @@
 					renderer.setClearColor( 'rgb(0,0,0)' );
 					groundMesh.material.color.set( 'rgb(150,150,150)' );
 					
-					sunLight.position.set( 0, 6, -2 );
+					sunLight.position.set( 0, 6, - 2 );
 					sunLight.lookAt( scene.position );
 					lightSphere.position.copy( sunLight.position );
 					lightHolder.position.copy( lightSphere.position );
