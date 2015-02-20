@@ -120,26 +120,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// GL state cache
 
-	_oldDoubleSided = - 1,
-	_oldFlipSided = - 1,
+	_currentDoubleSided = - 1,
+	_currentFlipSided = - 1,
 
-	_oldBlending = - 1,
+	_currentBlending = - 1,
 
-	_oldBlendEquation = - 1,
-	_oldBlendSrc = - 1,
-	_oldBlendDst = - 1,
-	_oldBlendEquationAlpha = - 1,
-	_oldBlendSrcAlpha = - 1,
-	_oldBlendDstAlpha = - 1,
+	_currentBlendEquation = - 1,
+	_currentBlendSrc = - 1,
+	_currentBlendDst = - 1,
+	_currentBlendEquationAlpha = - 1,
+	_currentBlendSrcAlpha = - 1,
+	_currentBlendDstAlpha = - 1,
 
-	_oldDepthTest = - 1,
-	_oldDepthWrite = - 1,
+	_currentDepthTest = - 1,
+	_currentDepthWrite = - 1,
 
-	_oldPolygonOffset = null,
-	_oldPolygonOffsetFactor = null,
-	_oldPolygonOffsetUnits = null,
+	_currentPolygonOffset = null,
+	_currentPolygonOffsetFactor = null,
+	_currentPolygonOffsetUnits = null,
 
-	_oldLineWidth = null,
+	_currentLineWidth = null,
 
 	_viewportX = 0,
 	_viewportY = 0,
@@ -296,11 +296,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentProgram = null;
 		_currentCamera = null;
 
-		_oldBlending = - 1;
-		_oldDepthTest = - 1;
-		_oldDepthWrite = - 1;
-		_oldDoubleSided = - 1;
-		_oldFlipSided = - 1;
+		_currentBlending = - 1;
+		_currentDepthTest = - 1;
+		_currentDepthWrite = - 1;
+		_currentDoubleSided = - 1;
+		_currentFlipSided = - 1;
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 
@@ -5460,7 +5460,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var doubleSided = material.side === THREE.DoubleSide;
 		var flipSided = material.side === THREE.BackSide;
 
-		if ( _oldDoubleSided !== doubleSided ) {
+		if ( _currentDoubleSided !== doubleSided ) {
 
 			if ( doubleSided ) {
 
@@ -5472,11 +5472,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldDoubleSided = doubleSided;
+			_currentDoubleSided = doubleSided;
 
 		}
 
-		if ( _oldFlipSided !== flipSided ) {
+		if ( _currentFlipSided !== flipSided ) {
 
 			if ( flipSided ) {
 
@@ -5488,7 +5488,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldFlipSided = flipSided;
+			_currentFlipSided = flipSided;
 
 		}
 
@@ -5496,7 +5496,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setDepthTest = function ( depthTest ) {
 
-		if ( _oldDepthTest !== depthTest ) {
+		if ( _currentDepthTest !== depthTest ) {
 
 			if ( depthTest ) {
 
@@ -5508,7 +5508,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldDepthTest = depthTest;
+			_currentDepthTest = depthTest;
 
 		}
 
@@ -5516,10 +5516,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setDepthWrite = function ( depthWrite ) {
 
-		if ( _oldDepthWrite !== depthWrite ) {
+		if ( _currentDepthWrite !== depthWrite ) {
 
 			_gl.depthMask( depthWrite );
-			_oldDepthWrite = depthWrite;
+			_currentDepthWrite = depthWrite;
 
 		}
 
@@ -5529,11 +5529,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		width *= pixelRatio;
 
-		if ( width !== _oldLineWidth ) {
+		if ( width !== _currentLineWidth ) {
 
 			_gl.lineWidth( width );
 
-			_oldLineWidth = width;
+			_currentLineWidth = width;
 
 		}
 
@@ -5541,7 +5541,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setPolygonOffset ( polygonoffset, factor, units ) {
 
-		if ( _oldPolygonOffset !== polygonoffset ) {
+		if ( _currentPolygonOffset !== polygonoffset ) {
 
 			if ( polygonoffset ) {
 
@@ -5553,16 +5553,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldPolygonOffset = polygonoffset;
+			_currentPolygonOffset = polygonoffset;
 
 		}
 
-		if ( polygonoffset && ( _oldPolygonOffsetFactor !== factor || _oldPolygonOffsetUnits !== units ) ) {
+		if ( polygonoffset && ( _currentPolygonOffsetFactor !== factor || _currentPolygonOffsetUnits !== units ) ) {
 
 			_gl.polygonOffset( factor, units );
 
-			_oldPolygonOffsetFactor = factor;
-			_oldPolygonOffsetUnits = units;
+			_currentPolygonOffsetFactor = factor;
+			_currentPolygonOffsetUnits = units;
 
 		}
 
@@ -5570,7 +5570,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
 
-		if ( blending !== _oldBlending ) {
+		if ( blending !== _currentBlending ) {
 
 			if ( blending === THREE.NoBlending ) {
 
@@ -5608,7 +5608,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldBlending = blending;
+			_currentBlending = blending;
 
 		}
 
@@ -5618,34 +5618,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 			blendSrcAlpha = blendSrcAlpha || blendSrc;
 			blendDstAlpha = blendDstAlpha || blendDst;
 
-			if ( blendEquation !== _oldBlendEquation || blendEquationAlpha !== _oldBlendEquationAlpha ) {
+			if ( blendEquation !== _currentBlendEquation || blendEquationAlpha !== _currentBlendEquationAlpha ) {
 
 				_gl.blendEquationSeparate( paramThreeToGL( blendEquation ), paramThreeToGL( blendEquationAlpha ) );
 
-				_oldBlendEquation = blendEquation;
-				_oldBlendEquationAlpha = blendEquationAlpha;
+				_currentBlendEquation = blendEquation;
+				_currentBlendEquationAlpha = blendEquationAlpha;
 
 			}
 
-			if ( blendSrc !== _oldBlendSrc || blendDst !== _oldBlendDst || blendSrcAlpha !== _oldBlendSrcAlpha || blendDstAlpha !== _oldBlendDstAlpha ) {
+			if ( blendSrc !== _currentBlendSrc || blendDst !== _currentBlendDst || blendSrcAlpha !== _currentBlendSrcAlpha || blendDstAlpha !== _currentBlendDstAlpha ) {
 
 				_gl.blendFuncSeparate( paramThreeToGL( blendSrc ), paramThreeToGL( blendDst ), paramThreeToGL( blendSrcAlpha ), paramThreeToGL( blendDstAlpha ) );
 
-				_oldBlendSrc = blendSrc;
-				_oldBlendDst = blendDst;
-				_oldBlendSrcAlpha = blendSrcAlpha;
-				_oldBlendDstAlpha = blendDstAlpha;
+				_currentBlendSrc = blendSrc;
+				_currentBlendDst = blendDst;
+				_currentBlendSrcAlpha = blendSrcAlpha;
+				_currentBlendDstAlpha = blendDstAlpha;
 
 			}
 
 		} else {
 
-			_oldBlendEquation = null;
-			_oldBlendSrc = null;
-			_oldBlendDst = null;
-			_oldBlendEquationAlpha = null;
-			_oldBlendSrcAlpha = null;
-			_oldBlendDstAlpha = null;
+			_currentBlendEquation = null;
+			_currentBlendSrc = null;
+			_currentBlendDst = null;
+			_currentBlendEquationAlpha = null;
+			_currentBlendSrcAlpha = null;
+			_currentBlendDstAlpha = null;
 
 		}
 
@@ -5691,10 +5691,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( extension && texture.type !== THREE.FloatType && texture.type !== THREE.HalfFloatType ) {
 
-			if ( texture.anisotropy > 1 || texture.__oldAnisotropy ) {
+			if ( texture.anisotropy > 1 || texture.__currentAnisotropy ) {
 
 				_gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, _this.getMaxAnisotropy() ) );
-				texture.__oldAnisotropy = texture.anisotropy;
+				texture.__currentAnisotropy = texture.anisotropy;
 
 			}
 
