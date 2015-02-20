@@ -3386,8 +3386,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			// Reset blending in case material.transparent = false. setMaterial() doesn't set blending in such case.
-			state.setBlending( THREE.NoBlending );
 			setMaterial( overrideMaterial );
 
 			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
@@ -4331,6 +4329,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.transparent === true ) {
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
+
+		} else {
+
+			state.setBlending( THREE.NoBlending );
 
 		}
 
