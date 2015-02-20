@@ -1352,7 +1352,6 @@ THREE.ColladaLoader = function () {
 
 		var nodes = COLLADA.querySelectorAll('library_nodes node');
 
-<<<<<<< HEAD
 		for ( var i = 0; i < nodes.length; i++ ) {
 
 			var attObj = nodes[i].attributes.getNamedItem('id');
@@ -1363,14 +1362,6 @@ THREE.ColladaLoader = function () {
 
 			}
 
-=======
-		for ( var i = 0; i < nodes.length; i ++ ) {
-
-			var attObj = nodes[i].attributes.getNamedItem('id');
-			if ( attObj && attObj.value === id ) {
-				return nodes[i];
-			}
->>>>>>> 4501d5a51d49e2e709930188a02af8d3dec5da61
 		}
 
 		return undefined;
@@ -3059,11 +3050,7 @@ THREE.ColladaLoader = function () {
 
 						// FIXME: normals don't seem to be quite right
 
-<<<<<<< HEAD
-						faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ], clr ) );
-=======
-						faces.push( new THREE.Face3( vs[0], vs[k], vs[k + 1], [ ns[0], ns[k ++], ns[k] ],  clr ) );
->>>>>>> 4501d5a51d49e2e709930188a02af8d3dec5da61
+						faces.push( new THREE.Face3( vs[0], vs[k], vs[k + 1], [ ns[0], ns[k ++], ns[k] ], clr ) );
 
 					}
 
