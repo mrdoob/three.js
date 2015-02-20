@@ -7,19 +7,19 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
-	var currentBlending = - 1;
-	var currentBlendEquation = - 1;
-	var currentBlendSrc = - 1;
-	var currentBlendDst = - 1;
-	var currentBlendEquationAlpha = - 1;
-	var currentBlendSrcAlpha = - 1;
-	var currentBlendDstAlpha = - 1;
+	var currentBlending = null;
+	var currentBlendEquation = null;
+	var currentBlendSrc = null;
+	var currentBlendDst = null;
+	var currentBlendEquationAlpha = null;
+	var currentBlendSrcAlpha = null;
+	var currentBlendDstAlpha = null;
 
-	var currentDepthTest = - 1;
-	var currentDepthWrite = - 1;
+	var currentDepthTest = null;
+	var currentDepthWrite = null;
 
-	var currentDoubleSided = - 1;
-	var currentFlipSided = - 1;
+	var currentDoubleSided = null;
+	var currentFlipSided = null;
 
 	var currentLineWidth = null;
 
@@ -268,11 +268,11 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
-		currentBlending = - 1;
-		currentDepthTest = - 1;
-		currentDepthWrite = - 1;
-		currentDoubleSided = - 1;
-		currentFlipSided = - 1;
+		currentBlending = null;
+		currentDepthTest = null;
+		currentDepthWrite = null;
+		currentDoubleSided = null;
+		currentFlipSided = null;
 
 	};
 
