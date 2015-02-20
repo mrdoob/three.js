@@ -3406,32 +3406,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( scene.overrideMaterial ) {
 
-			var material = scene.overrideMaterial;
+			var overrideMaterial = scene.overrideMaterial;
 
-			this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
-			this.setDepthTest( material.depthTest );
-			this.setDepthWrite( material.depthWrite );
-			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+			// Reset blending in case material.transparent = false. setMaterial() doesn't set blending in such case.
+			this.setBlending( THREE.NoBlending );
+			setMaterial( overrideMaterial );
 
-			renderObjects( opaqueObjects, camera, lights, fog, true, material );
-			renderObjects( transparentObjects, camera, lights, fog, true, material );
-			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, false, material );
+			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
+			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
+			renderObjectsImmediate( _webglObjectsImmediate, '', camera, lights, fog, overrideMaterial );
 
 		} else {
-
-			var material = null;
 
 			// opaque pass (front-to-back order)
 
 			this.setBlending( THREE.NoBlending );
 
-			renderObjects( opaqueObjects, camera, lights, fog, false, material );
-			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, false, material );
+			renderObjects( opaqueObjects, camera, lights, fog, null );
+			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, null );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( transparentObjects, camera, lights, fog, true, material );
-			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, true, material );
+			renderObjects( transparentObjects, camera, lights, fog, null );
+			renderObjectsImmediate( _webglObjectsImmediate, 'transparent', camera, lights, fog, null );
 
 		}
 
@@ -3520,7 +3517,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjects( renderList, camera, lights, fog, useBlending, overrideMaterial ) {
+	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
 		var material;
 
@@ -3543,11 +3540,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! material ) continue;
 
-				if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
-
-				_this.setDepthTest( material.depthTest );
-				_this.setDepthWrite( material.depthWrite );
-				setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+				setMaterial( material );
 
 			}
 
@@ -3567,7 +3560,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
+	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
 
 		var material;
 
@@ -3588,11 +3581,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
-
-					_this.setDepthTest( material.depthTest );
-					_this.setDepthWrite( material.depthWrite );
-					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+					setMaterial( material );
 
 				}
 
@@ -4356,6 +4345,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+	}
+
+	function setMaterial( material ) {
+
+		if ( material.transparent === true ) {
+
+			_this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
+
+		}
+
+		_this.setDepthTest( material.depthTest );
+		_this.setDepthWrite( material.depthWrite );
+		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
 
