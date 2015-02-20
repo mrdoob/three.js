@@ -118,11 +118,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_usedTextureUnits = 0,
 
-	// GL state cache
-
-	_currentDoubleSided = - 1,
-	_currentFlipSided = - 1,
-
 	_viewportX = 0,
 	_viewportY = 0,
 	_viewportWidth = _canvas.width,
@@ -280,8 +275,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentProgram = null;
 		_currentCamera = null;
 
-		_currentDoubleSided = - 1;
-		_currentFlipSided = - 1;
 		_currentGeometryProgram = '';
 		_currentMaterialId = - 1;
 
@@ -5442,40 +5435,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setMaterialFaces = function ( material ) {
 
-		var doubleSided = material.side === THREE.DoubleSide;
-		var flipSided = material.side === THREE.BackSide;
-
-		if ( _currentDoubleSided !== doubleSided ) {
-
-			if ( doubleSided ) {
-
-				_gl.disable( _gl.CULL_FACE );
-
-			} else {
-
-				_gl.enable( _gl.CULL_FACE );
-
-			}
-
-			_currentDoubleSided = doubleSided;
-
-		}
-
-		if ( _currentFlipSided !== flipSided ) {
-
-			if ( flipSided ) {
-
-				_gl.frontFace( _gl.CW );
-
-			} else {
-
-				_gl.frontFace( _gl.CCW );
-
-			}
-
-			_currentFlipSided = flipSided;
-
-		}
+		state.setDoubleSided( material.side === THREE.DoubleSide );
+		state.setFlipSided( material.side === THREE.BackSide );
 
 	};
 

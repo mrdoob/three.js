@@ -12,6 +12,18 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentBlendSrcAlpha = - 1;
 	var currentBlendDstAlpha = - 1;
 
+	var currentDepthTest = - 1;
+	var currentDepthWrite = - 1;
+
+	var currentDoubleSided = - 1;
+	var currentFlipSided = - 1;
+
+	var currentLineWidth = null;
+
+	var currentPolygonOffset = null;
+	var currentPolygonOffsetFactor = null;
+	var currentPolygonOffsetUnits = null;
+
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
 
 		if ( blending !== currentBlending ) {
@@ -95,8 +107,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	var currentDepthTest = - 1;
-
 	this.setDepthTest = function ( depthTest ) {
 
 		if ( currentDepthTest !== depthTest ) {
@@ -117,8 +127,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	var currentDepthWrite = - 1;
-
 	this.setDepthWrite = function ( depthWrite ) {
 
 		if ( currentDepthWrite !== depthWrite ) {
@@ -130,7 +138,45 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	var currentLineWidth = null;
+	this.setDoubleSided = function ( doubleSided ) {
+
+		if ( currentDoubleSided !== doubleSided ) {
+
+			if ( doubleSided ) {
+
+				gl.disable( gl.CULL_FACE );
+
+			} else {
+
+				gl.enable( gl.CULL_FACE );
+
+			}
+
+			currentDoubleSided = doubleSided;
+
+		}
+
+	};
+
+	this.setFlipSided = function ( flipSided ) {
+
+		if ( currentFlipSided !== flipSided ) {
+
+			if ( flipSided ) {
+
+				gl.frontFace( gl.CW );
+
+			} else {
+
+				gl.frontFace( gl.CCW );
+
+			}
+
+			currentFlipSided = flipSided;
+
+		}
+
+	};
 
 	this.setLineWidth = function ( width ) {
 
@@ -143,10 +189,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		}
 
 	};
-
-	var currentPolygonOffset = null;
-	var currentPolygonOffsetFactor = null;
-	var currentPolygonOffsetUnits = null;
 
 	this.setPolygonOffset = function ( polygonoffset, factor, units ) {
 
@@ -182,6 +224,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		currentBlending = - 1;
 		currentDepthTest = - 1;
 		currentDepthWrite = - 1;
+		currentDoubleSided = - 1;
+		currentFlipSided = - 1;
 
 	};
 
