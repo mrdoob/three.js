@@ -2704,7 +2704,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-			state.setLineWidth( material.linewidth );
+			state.setLineWidth( material.linewidth * pixelRatio );
 
 			var index = geometry.attributes.index;
 
@@ -3018,7 +3018,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.wireframe ) {
 
-				state.setLineWidth( material.wireframeLinewidth );
+				state.setLineWidth( material.wireframeLinewidth * pixelRatio );
 
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
 				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, type, 0 );
@@ -3042,7 +3042,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-			state.setLineWidth( material.linewidth );
+			state.setLineWidth( material.linewidth * pixelRatio );
 
 			_gl.drawArrays( mode, 0, geometryGroup.__webglLineCount );
 
