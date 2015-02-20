@@ -70,6 +70,7 @@ THREE.Object3D = function () {
 	this.receiveShadow = false;
 
 	this.frustumCulled = true;
+	this.renderOrder = 0;
 
 	this.userData = {};
 
