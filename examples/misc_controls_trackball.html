@@ -35,7 +35,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
-			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan</br>
+			R: switch from cylindrical (default) to spherical rotation
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -133,10 +134,21 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'keypress', onKeyPress, true);
 
 				//
 
 				render();
+
+			}
+
+			function onKeyPress ( e ) {
+
+				if ( e.keyCode === 114 ) {
+
+					controls.cylindricalRotation = !controls.cylindricalRotation;
+
+				}
 
 			}
 
