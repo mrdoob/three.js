@@ -4,6 +4,9 @@
 
 THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
+	var newAttributes = new Uint8Array( 16 );
+	var enabledAttributes = new Uint8Array( 16 );
+
 	var currentBlending = - 1;
 	var currentBlendEquation = - 1;
 	var currentBlendSrc = - 1;
@@ -23,6 +26,44 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentPolygonOffset = null;
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
+
+	this.initAttributes = function () {
+
+		for ( var i = 0, l = newAttributes.length; i < l; i ++ ) {
+
+			newAttributes[ i ] = 0;
+
+		}
+
+	};
+
+	this.enableAttribute = function ( attribute ) {
+
+		newAttributes[ attribute ] = 1;
+
+		if ( enabledAttributes[ attribute ] === 0 ) {
+
+			gl.enableVertexAttribArray( attribute );
+			enabledAttributes[ attribute ] = 1;
+
+		}
+
+	};
+
+	this.disableUnusedAttributes = function () {
+
+		for ( var i = 0, l = enabledAttributes.length; i < l; i ++ ) {
+
+			if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
+
+				gl.disableVertexAttribArray( i );
+				enabledAttributes[ i ] = 0;
+
+			}
+
+		}
+
+	};
 
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
 
@@ -220,6 +261,12 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	};
 
 	this.reset = function () {
+
+		for ( var i = 0; i < enabledAttributes.length; i ++ ) {
+
+			enabledAttributes[ i ] = 0;
+
+		}
 
 		currentBlending = - 1;
 		currentDepthTest = - 1;
