@@ -214,9 +214,9 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			gl.uniform1f( uniforms.rotation, material.rotation );
 			gl.uniform2fv( uniforms.scale, scale );
 
-			renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			renderer.setDepthTest( material.depthTest );
-			renderer.setDepthWrite( material.depthWrite );
+			renderer.state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			renderer.state.setDepthTest( material.depthTest );
+			renderer.state.setDepthWrite( material.depthWrite );
 
 			if ( material.map && material.map.image && material.map.image.width ) {
 

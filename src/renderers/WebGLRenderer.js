@@ -123,24 +123,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentDoubleSided = - 1,
 	_currentFlipSided = - 1,
 
-	_currentBlending = - 1,
-
-	_currentBlendEquation = - 1,
-	_currentBlendSrc = - 1,
-	_currentBlendDst = - 1,
-	_currentBlendEquationAlpha = - 1,
-	_currentBlendSrcAlpha = - 1,
-	_currentBlendDstAlpha = - 1,
-
-	_currentDepthTest = - 1,
-	_currentDepthWrite = - 1,
-
-	_currentPolygonOffset = null,
-	_currentPolygonOffsetFactor = null,
-	_currentPolygonOffsetUnits = null,
-
-	_currentLineWidth = null,
-
 	_viewportX = 0,
 	_viewportY = 0,
 	_viewportWidth = _canvas.width,
@@ -226,6 +208,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	var state = new THREE.WebGLState( _gl, paramThreeToGL );
+
 	if ( _gl.getShaderPrecisionFormat === undefined ) {
 
 		_gl.getShaderPrecisionFormat = function () {
@@ -296,9 +280,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentProgram = null;
 		_currentCamera = null;
 
-		_currentBlending = - 1;
-		_currentDepthTest = - 1;
-		_currentDepthWrite = - 1;
 		_currentDoubleSided = - 1;
 		_currentFlipSided = - 1;
 		_currentGeometryProgram = '';
@@ -312,11 +293,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		state.reset();
+
 	};
 
 	setDefaultGLState();
 
 	this.context = _gl;
+	this.state = state;
 
 	// GPU capabilities
 
@@ -2728,7 +2712,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-			setLineWidth( material.linewidth );
+			state.setLineWidth( material.linewidth );
 
 			var index = geometry.attributes.index;
 
@@ -3022,7 +3006,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.wireframe ) {
 
-				setLineWidth( material.wireframeLinewidth );
+				state.setLineWidth( material.wireframeLinewidth );
+
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
 				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, type, 0 );
 
@@ -3045,7 +3030,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-			setLineWidth( material.linewidth );
+			state.setLineWidth( material.linewidth );
 
 			_gl.drawArrays( mode, 0, geometryGroup.__webglLineCount );
 
@@ -3409,7 +3394,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var overrideMaterial = scene.overrideMaterial;
 
 			// Reset blending in case material.transparent = false. setMaterial() doesn't set blending in such case.
-			this.setBlending( THREE.NoBlending );
+			state.setBlending( THREE.NoBlending );
 			setMaterial( overrideMaterial );
 
 			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
@@ -3420,7 +3405,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// opaque pass (front-to-back order)
 
-			this.setBlending( THREE.NoBlending );
+			state.setBlending( THREE.NoBlending );
 
 			renderObjects( opaqueObjects, camera, lights, fog, null );
 			renderObjectsImmediate( _webglObjectsImmediate, 'opaque', camera, lights, fog, null );
@@ -3447,8 +3432,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
 
-		this.setDepthTest( true );
-		this.setDepthWrite( true );
+		state.setDepthTest( true );
+		state.setDepthWrite( true );
 
 		// _gl.finish();
 
@@ -4352,13 +4337,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.transparent === true ) {
 
-			_this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
+			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
 
 		}
 
-		_this.setDepthTest( material.depthTest );
-		_this.setDepthWrite( material.depthWrite );
-		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+		state.setDepthTest( material.depthTest );
+		state.setDepthWrite( material.depthWrite );
+		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
 
@@ -5489,163 +5474,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_currentFlipSided = flipSided;
-
-		}
-
-	};
-
-	this.setDepthTest = function ( depthTest ) {
-
-		if ( _currentDepthTest !== depthTest ) {
-
-			if ( depthTest ) {
-
-				_gl.enable( _gl.DEPTH_TEST );
-
-			} else {
-
-				_gl.disable( _gl.DEPTH_TEST );
-
-			}
-
-			_currentDepthTest = depthTest;
-
-		}
-
-	};
-
-	this.setDepthWrite = function ( depthWrite ) {
-
-		if ( _currentDepthWrite !== depthWrite ) {
-
-			_gl.depthMask( depthWrite );
-			_currentDepthWrite = depthWrite;
-
-		}
-
-	};
-
-	function setLineWidth ( width ) {
-
-		width *= pixelRatio;
-
-		if ( width !== _currentLineWidth ) {
-
-			_gl.lineWidth( width );
-
-			_currentLineWidth = width;
-
-		}
-
-	}
-
-	function setPolygonOffset ( polygonoffset, factor, units ) {
-
-		if ( _currentPolygonOffset !== polygonoffset ) {
-
-			if ( polygonoffset ) {
-
-				_gl.enable( _gl.POLYGON_OFFSET_FILL );
-
-			} else {
-
-				_gl.disable( _gl.POLYGON_OFFSET_FILL );
-
-			}
-
-			_currentPolygonOffset = polygonoffset;
-
-		}
-
-		if ( polygonoffset && ( _currentPolygonOffsetFactor !== factor || _currentPolygonOffsetUnits !== units ) ) {
-
-			_gl.polygonOffset( factor, units );
-
-			_currentPolygonOffsetFactor = factor;
-			_currentPolygonOffsetUnits = units;
-
-		}
-
-	}
-
-	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
-
-		if ( blending !== _currentBlending ) {
-
-			if ( blending === THREE.NoBlending ) {
-
-				_gl.disable( _gl.BLEND );
-
-			} else if ( blending === THREE.AdditiveBlending ) {
-
-				_gl.enable( _gl.BLEND );
-				_gl.blendEquation( _gl.FUNC_ADD );
-				_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
-
-			} else if ( blending === THREE.SubtractiveBlending ) {
-
-				// TODO: Find blendFuncSeparate() combination
-				_gl.enable( _gl.BLEND );
-				_gl.blendEquation( _gl.FUNC_ADD );
-				_gl.blendFunc( _gl.ZERO, _gl.ONE_MINUS_SRC_COLOR );
-
-			} else if ( blending === THREE.MultiplyBlending ) {
-
-				// TODO: Find blendFuncSeparate() combination
-				_gl.enable( _gl.BLEND );
-				_gl.blendEquation( _gl.FUNC_ADD );
-				_gl.blendFunc( _gl.ZERO, _gl.SRC_COLOR );
-
-			} else if ( blending === THREE.CustomBlending ) {
-
-				_gl.enable( _gl.BLEND );
-
-			} else {
-
-				_gl.enable( _gl.BLEND );
-				_gl.blendEquationSeparate( _gl.FUNC_ADD, _gl.FUNC_ADD );
-				_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
-
-			}
-
-			_currentBlending = blending;
-
-		}
-
-		if ( blending === THREE.CustomBlending ) {
-
-			blendEquationAlpha = blendEquationAlpha || blendEquation;
-			blendSrcAlpha = blendSrcAlpha || blendSrc;
-			blendDstAlpha = blendDstAlpha || blendDst;
-
-			if ( blendEquation !== _currentBlendEquation || blendEquationAlpha !== _currentBlendEquationAlpha ) {
-
-				_gl.blendEquationSeparate( paramThreeToGL( blendEquation ), paramThreeToGL( blendEquationAlpha ) );
-
-				_currentBlendEquation = blendEquation;
-				_currentBlendEquationAlpha = blendEquationAlpha;
-
-			}
-
-			if ( blendSrc !== _currentBlendSrc || blendDst !== _currentBlendDst || blendSrcAlpha !== _currentBlendSrcAlpha || blendDstAlpha !== _currentBlendDstAlpha ) {
-
-				_gl.blendFuncSeparate( paramThreeToGL( blendSrc ), paramThreeToGL( blendDst ), paramThreeToGL( blendSrcAlpha ), paramThreeToGL( blendDstAlpha ) );
-
-				_currentBlendSrc = blendSrc;
-				_currentBlendDst = blendDst;
-				_currentBlendSrcAlpha = blendSrcAlpha;
-				_currentBlendDstAlpha = blendDstAlpha;
-
-			}
-
-		} else {
-
-			_currentBlendEquation = null;
-			_currentBlendSrc = null;
-			_currentBlendDst = null;
-			_currentBlendEquationAlpha = null;
-			_currentBlendSrcAlpha = null;
-			_currentBlendDstAlpha = null;
 
 		}
 

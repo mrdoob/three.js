@@ -15,7 +15,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 	_max = new THREE.Vector3(),
 
 	_matrixPosition = new THREE.Vector3(),
-	
+
 	_renderList = [];
 
 	// init
@@ -89,7 +89,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 		}
 
-		_renderer.setDepthTest( true );
+		_renderer.state.setDepthTest( true );
 
 		// preprocess lights
 		// 	- skip lights that are not casting shadows
