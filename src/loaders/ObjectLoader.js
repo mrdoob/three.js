@@ -48,14 +48,16 @@ THREE.ObjectLoader.prototype = {
 
 		var geometries = this.parseGeometries( json.geometries );
 
-		var images = this.parseImages( json.images, function () {
-
-			if ( onLoad !== undefined ) onLoad( object );
-
-		} );
+		var images = this.parseImages( json.images, onLoad );
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 		var object = this.parseObject( json.object, geometries, materials );
+
+		if ( json.images === undefined || json.images.length === 0 ) {
+
+			if ( onLoad !== undefined ) onLoad( object );
+
+		}
 
 		return object;
 
@@ -313,10 +315,6 @@ THREE.ObjectLoader.prototype = {
 				images[ image.uuid ] = loadImage( scope.texturePath + image.url );
 
 			}
-
-		} else {
-
-			if ( onLoad !== undefined ) onLoad();
 
 		}
 
