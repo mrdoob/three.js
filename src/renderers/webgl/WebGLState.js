@@ -18,6 +18,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentDepthTest = null;
 	var currentDepthWrite = null;
 
+	var currentColorWrite = null;
+
 	var currentDoubleSided = null;
 	var currentFlipSided = null;
 
@@ -179,6 +181,17 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
+	this.setColorWrite = function ( colorWrite ) {
+
+		if ( currentColorWrite !== colorWrite ) {
+
+			gl.colorMask( colorWrite, colorWrite, colorWrite, colorWrite );
+			currentColorWrite = colorWrite;
+
+		}
+
+	};
+
 	this.setDoubleSided = function ( doubleSided ) {
 
 		if ( currentDoubleSided !== doubleSided ) {
@@ -271,6 +284,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		currentBlending = null;
 		currentDepthTest = null;
 		currentDepthWrite = null;
+		currentColorWrite = null;
 		currentDoubleSided = null;
 		currentFlipSided = null;
 
