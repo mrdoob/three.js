@@ -2,9 +2,14 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EdgesHelper = function ( object, hex ) {
+THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
+	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 170;
+
+	thresholdAngle = thresholdAngle * 0.0175; //deg -> radian
+	var thresholdDot = Math.cos( thresholdAngle );
+
 
 	var edge = [ 0, 0 ], hash = {};
 	var sortFunction = function ( a, b ) { return a - b };
@@ -67,7 +72,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 		var h = hash[ key ];
 
-		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) < 0.9999 ) { // hardwired const OK
+		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) < thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
 			coords[ index ++ ] = vertex.x;
