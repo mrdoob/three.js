@@ -42,7 +42,7 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 bl_info = {
     'name': "Three.js Format",
     'author': "repsac, mrdoob, yomotsu, mpk, jpweeks",
-    'version': (1, 2, 2),
+    'version': (1, 2, 3),
     'blender': (2, 7, 3),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
@@ -702,6 +702,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
             raise Exception("filename not set")
 
         settings = save_settings_export(self.properties)
+        settings['addon_version'] = bl_info['version']
 
         filepath = self.filepath
         if settings[constants.COMPRESSION] == constants.MSGPACK:
