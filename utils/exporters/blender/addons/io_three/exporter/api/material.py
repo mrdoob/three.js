@@ -380,7 +380,7 @@ def _valid_textures(material):
     for texture in material.texture_slots:
         if not texture:
             continue
-        if texture.texture.type != IMAGE:
+        if texture.texture.type != IMAGE or not texture.use:
             continue
         logger.debug("Valid texture found %s", texture)
         yield texture

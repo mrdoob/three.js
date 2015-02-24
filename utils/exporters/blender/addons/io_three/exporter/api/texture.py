@@ -170,6 +170,9 @@ def textures():
 
     """
     logger.debug("texture.textures()")
-    for texture in data.textures:
-        if texture.type == IMAGE:
-            yield texture.name
+    for mat in data.materials:
+        if mat.users == 0:
+            continue
+        for slot in mat.texture_slots:
+            if slot and slot.use and slot.texture.type == IMAGE:
+                yield slot.texture.name

@@ -26,7 +26,8 @@ from bpy.props import (
     EnumProperty,
     BoolProperty,
     FloatProperty,
-    IntProperty
+    IntProperty,
+    StringProperty
 )
 
 from . import constants
@@ -41,7 +42,7 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 bl_info = {
     'name': "Three.js Format",
     'author': "repsac, mrdoob, yomotsu, mpk, jpweeks",
-    'version': (1, 2, 3),
+    'version': (1, 2, 2),
     'blender': (2, 7, 3),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
@@ -295,6 +296,7 @@ def save_settings_export(properties):
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
         constants.COPY_TEXTURES: properties.option_copy_textures,
+        constants.TEXTURE_FOLDER: properties.option_texture_folder,
 
         constants.SCENE: properties.option_export_scene,
         #constants.EMBED_GEOMETRY: properties.option_embed_geometry,
@@ -419,6 +421,10 @@ def restore_settings_export(properties):
     properties.option_copy_textures = settings.get(
         constants.COPY_TEXTURES,
         constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
+
+    properties.option_texture_folder = settings.get(
+        constants.TEXTURE_FOLDER,
+        constants.EXPORT_OPTIONS[constants.TEXTURE_FOLDER])
 
     properties.option_embed_animation = settings.get(
         constants.EMBED_ANIMATION,
@@ -617,6 +623,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Copy textures",
         default=constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
 
+    option_texture_folder = StringProperty(name="Texture folder",
+        description="add this folder to textures path", default="")
+
     option_lights = BoolProperty(
         name="Lights",
         description="Export default scene lights",
@@ -693,7 +702,6 @@ class ExportThree(bpy.types.Operator, ExportHelper):
             raise Exception("filename not set")
 
         settings = save_settings_export(self.properties)
-        settings['addon_version'] = bl_info['version']
 
         filepath = self.filepath
         if settings[constants.COMPRESSION] == constants.MSGPACK:
@@ -811,6 +819,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_copy_textures')
+
+        row = layout.row()
+        row.prop(self.properties, "option_texture_folder")
 
         row = layout.row()
         row.prop(self.properties, 'option_scale')
