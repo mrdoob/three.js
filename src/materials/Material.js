@@ -29,6 +29,8 @@ THREE.Material = function () {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.colorWrite = true;
+
 	this.polygonOffset = false;
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
