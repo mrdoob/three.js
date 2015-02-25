@@ -71,12 +71,12 @@ def export_geometry(filepath, options, node=None):
             logger.error(msg)
             exception = exceptions.GeometryError
     
-    if exception is not None:
-        if api.batch_mode():
-            raise exception(msg)
-        else:
-            dialogs.error(msg)
-            return
+        if exception is not None:
+            if api.batch_mode():
+                raise exception(msg)
+            else:
+                dialogs.error(msg)
+                return
 
     mesh = api.object.mesh(node, options)
     parent = base_classes.BaseScene(filepath, options)

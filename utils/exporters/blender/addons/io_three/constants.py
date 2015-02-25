@@ -63,6 +63,7 @@ LIGHTS = 'lights'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
 COPY_TEXTURES = 'copyTextures'
+TEXTURE_FOLDER = "textureFolder"
 ENABLE_PRECISION = 'enablePrecision'
 PRECISION = 'precision'
 DEFAULT_PRECISION = 6
@@ -91,8 +92,8 @@ INFLUENCES_PER_VERTEX = 'influencesPerVertex'
 EXPORT_OPTIONS = {
     FACES: True,
     VERTICES: True,
-    NORMALS: False,
-    UVS: False,
+    NORMALS: True,
+    UVS: True,
     COLORS: False,
     MATERIALS: False,
     FACE_MATERIALS: False,
@@ -110,6 +111,7 @@ EXPORT_OPTIONS = {
     CAMERAS: False,
     LIGHTS: False,
     COPY_TEXTURES: True,
+    TEXTURE_FOLDER: "",
     LOGGING: DEBUG,
     ENABLE_PRECISION: True,
     PRECISION: DEFAULT_PRECISION,

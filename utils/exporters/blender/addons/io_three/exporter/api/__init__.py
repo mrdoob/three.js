@@ -18,10 +18,10 @@ def batch_mode():
 
     :return: Whether or not the session is interactive
     :rtype: bool
-
+       
     """
     return bpy.context.area is None
-
+      
 
 def init():
     """Initializing the api module. Required first step before

@@ -135,7 +135,7 @@ class Geometry(base_classes.BaseNode):
 
         return data
 
-    def copy_textures(self):
+    def copy_textures(self, texture_folder=""):
         """Copy the textures to the destination directory."""
         logger.debug("Geometry().copy_textures()")
         if self.options.get(constants.COPY_TEXTURES):
@@ -143,7 +143,7 @@ class Geometry(base_classes.BaseNode):
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
                 io.copy_registered_textures(
-                    os.path.dirname(self.scene.filepath),
+                    os.path.join(os.path.dirname(self.scene.filepath), texture_folder),
                     texture_registration)
 
     def parse(self):
