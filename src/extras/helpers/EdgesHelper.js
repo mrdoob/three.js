@@ -5,7 +5,7 @@
 THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
-	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 170;
+	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 10;
 
 	thresholdAngle = thresholdAngle * 0.0175; //deg -> radian
 	var thresholdDot = Math.cos( thresholdAngle );
@@ -72,7 +72,7 @@ THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
 
 		var h = hash[ key ];
 
-		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) < thresholdDot ) {
+		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
 			coords[ index ++ ] = vertex.x;
