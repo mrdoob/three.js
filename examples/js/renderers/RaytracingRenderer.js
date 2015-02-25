@@ -39,6 +39,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	var animationFrameId = null;
 
+	var dispatch = this.dispatchEvent.bind(this);
+
 	this.domElement = canvas;
 
 	this.autoClear = true;
@@ -456,7 +458,13 @@ THREE.RaytracingRenderer = function ( parameters ) {
 				blockX = 0;
 				blockY += blockSize;
 
-				if ( blockY >= canvasHeight ) return;
+				if ( blockY >= canvasHeight ) {
+
+					dispatch( { type: "renderfinish" } );
+
+					return;
+
+				}
 
 			}
 
@@ -533,3 +541,5 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	};
 
 };
+
+THREE.EventDispatcher.prototype.apply(THREE.RaytracingRenderer.prototype);
