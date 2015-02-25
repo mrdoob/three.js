@@ -1,5 +1,10 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
+ * @param object THREE.Mesh whose geometry will be used
+ * @param hex line color
+ * @param thresholdAngle the minimum difference in degree between two
+ * faces needed to create an edge. A value of 10 means that an edge is only
+ * created if two face normals are at least at a 10° angle to one another
  */
 
 THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
