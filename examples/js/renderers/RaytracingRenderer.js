@@ -460,7 +460,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 				if ( blockY >= canvasHeight ) {
 
-					dispatch( { type: "renderfinish" } );
+					dispatch( { type: "complete" } );
 
 					return;
 
