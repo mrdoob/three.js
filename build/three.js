@@ -18,9 +18,11 @@ if ( typeof module === 'object' ) {
 
 if ( Math.sign === undefined ) {
 
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign 
+
 	Math.sign = function ( x ) {
 
-		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
+		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : +x;
 
 	};
 
@@ -12631,6 +12633,12 @@ THREE.ObjectLoader.prototype = {
 		var materials = this.parseMaterials( json.materials, textures );
 		var object = this.parseObject( json.object, geometries, materials );
 
+		if ( json.images === undefined || json.images.length === 0 ) {
+
+			if ( onLoad !== undefined ) onLoad( object );
+
+		}
+
 		return object;
 
 	},
@@ -12887,10 +12895,6 @@ THREE.ObjectLoader.prototype = {
 				images[ image.uuid ] = loadImage( scope.texturePath + image.url );
 
 			}
-
-		} else {
-
-			if ( onLoad !== undefined ) onLoad();
 
 		}
 
@@ -13398,6 +13402,8 @@ THREE.Material = function () {
 
 	this.depthTest = true;
 	this.depthWrite = true;
+
+	this.colorWrite = true;
 
 	this.polygonOffset = false;
 	this.polygonOffsetFactor = 0;
@@ -21128,6 +21134,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.setDepthTest( true );
 		state.setDepthWrite( true );
+		state.setColorWrite( true );
 
 		// _gl.finish();
 
@@ -22041,6 +22048,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.setDepthTest( material.depthTest );
 		state.setDepthWrite( material.depthWrite );
+		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}
@@ -24629,6 +24637,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentDepthTest = null;
 	var currentDepthWrite = null;
 
+	var currentColorWrite = null;
+
 	var currentDoubleSided = null;
 	var currentFlipSided = null;
 
@@ -24790,6 +24800,17 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
+	this.setColorWrite = function ( colorWrite ) {
+
+		if ( currentColorWrite !== colorWrite ) {
+
+			gl.colorMask( colorWrite, colorWrite, colorWrite, colorWrite );
+			currentColorWrite = colorWrite;
+
+		}
+
+	};
+
 	this.setDoubleSided = function ( doubleSided ) {
 
 		if ( currentDoubleSided !== doubleSided ) {
@@ -24882,6 +24903,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		currentBlending = null;
 		currentDepthTest = null;
 		currentDepthWrite = null;
+		currentColorWrite = null;
 		currentDoubleSided = null;
 		currentFlipSided = null;
 
