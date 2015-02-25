@@ -8,6 +8,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	console.log( 'THREE.RaytracingRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
+	
+	var scope = this;
 
 	var canvas = document.createElement( 'canvas' );
 	var context = canvas.getContext( '2d', {
@@ -38,8 +40,6 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	var cache = {};
 
 	var animationFrameId = null;
-
-	var dispatch = this.dispatchEvent.bind(this);
 
 	this.domElement = canvas;
 
@@ -460,7 +460,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 				if ( blockY >= canvasHeight ) {
 
-					dispatch( { type: "complete" } );
+					scope.dispatchEvent( { type: "complete" } );
 
 					return;
 
