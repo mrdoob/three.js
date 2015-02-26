@@ -79,6 +79,16 @@ var APP = {
 				controls = new THREE.VRControls( camera );
 				renderer = new THREE.VREffect( renderer );
 
+				document.addEventListener( 'keyup', function ( event ) {
+
+					switch ( event.keyCode ) {
+						case 90:
+							controls.zeroSensor();
+							break;
+					}
+
+				} );
+
 				this.dom.addEventListener( 'dblclick', function () {
 
 					renderer.setFullScreen( true );
@@ -104,10 +114,7 @@ var APP = {
 
 		this.setSize = function ( width, height ) {
 
-			if ( vr ) {
-				width = 1280;
-				height = 800;
-			}
+			if ( renderer._fullScreen ) return;
 
 			this.width = width;
 			this.height = height;
