@@ -12581,6 +12581,7 @@ THREE.MaterialLoader.prototype = {
 THREE.ObjectLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.texturePath = '';
 
 };
 
@@ -12590,7 +12591,7 @@ THREE.ObjectLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.texturePath === undefined ) {
+		if ( this.texturePath === '' ) {
 
 			this.texturePath = url.substring( 0, url.lastIndexOf( '/' ) + 1 );
 
@@ -12821,6 +12822,9 @@ THREE.ObjectLoader.prototype = {
 				if ( data.bumpMap !== undefined ) {
 
 					material.bumpMap = getTexture( data.bumpMap );
+					if ( data.bumpScale ) {
+						material.bumpScale = new THREE.Vector2( data.bumpScale, data.bumpScale );
+					}
 
 				}
 
@@ -12839,6 +12843,9 @@ THREE.ObjectLoader.prototype = {
 				if ( data.normalMap !== undefined ) {
 
 					material.normalMap = getTexture( data.normalMap );
+					if ( data.normalScale ) {
+						material.normalScale = new THREE.Vector2( data.normalScale, data.normalScale );
+					}
 
 				}
 
@@ -33986,7 +33993,7 @@ THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSize ) {
+THREE.HemisphereLightHelper = function ( light, sphereSize ) {
 
 	THREE.Object3D.call( this );
 
