@@ -3233,9 +3233,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function painterSortStable ( a, b ) {
 
-		if ( a.renderOrder !== b.renderOrder ) {
+		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-			return a.renderOrder - b.renderOrder;
+			return a.object.renderOrder - b.object.renderOrder;
 
 		} else if ( a.material.id !== b.material.id ) {
 
@@ -3255,9 +3255,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function reversePainterSortStable ( a, b ) {
 
-		if ( a.renderOrder !== b.renderOrder ) {
+		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-			return a.renderOrder - b.renderOrder;
+			return a.object.renderOrder - b.object.renderOrder;
 
 		} if ( a.z !== b.z ) {
 
@@ -3467,7 +3467,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							_vector3.applyProjection( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
-							webglObject.renderOrder = object.renderOrder;
 
 						}
 
@@ -3888,8 +3887,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				buffer: buffer,
 				object: object,
 				material: null,
-				z: 0,
-				renderOrder: 0
+				z: 0
 			}
 		);
 
@@ -3903,8 +3901,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object: object,
 				opaque: null,
 				transparent: null,
-				z: 0,
-				renderOrder: 0
+				z: 0
 			}
 		);
 
