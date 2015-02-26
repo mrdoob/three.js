@@ -3467,6 +3467,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							_vector3.applyProjection( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
+							webglObject.renderOrder = object.renderOrder;
 
 						}
 
@@ -3887,7 +3888,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				buffer: buffer,
 				object: object,
 				material: null,
-				z: 0
+				z: 0,
+				renderOrder: 0
 			}
 		);
 
@@ -3901,7 +3903,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object: object,
 				opaque: null,
 				transparent: null,
-				z: 0
+				z: 0,
+				renderOrder: 0
 			}
 		);
 
