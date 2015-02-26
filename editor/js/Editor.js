@@ -155,7 +155,31 @@ Editor.prototype = {
 
 	},
 
-	setObjectName: function ( object, name ) {
+	moveObject: function ( object, parent, before ) {
+
+		if ( parent === undefined ) {
+
+			parent = this.scene;
+
+		}
+
+		parent.add( object );
+
+		// sort children array
+
+		if ( before !== undefined ) {
+
+			var index = parent.children.indexOf( before );
+			parent.children.splice( index, 0, object );
+			parent.children.pop();
+
+		}
+
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	nameObject: function ( object, name ) {
 
 		object.name = name;
 		this.signals.sceneGraphChanged.dispatch();
@@ -314,32 +338,6 @@ Editor.prototype = {
 		}
 
 		this.signals.scriptRemoved.dispatch( script );
-
-	},
-
-	//
-
-	parent: function ( object, parent, before ) {
-
-		if ( parent === undefined ) {
-
-			parent = this.scene;
-
-		}
-
-		parent.add( object );
-
-		// sort children array
-
-		if ( before !== undefined ) {
-
-			var index = parent.children.indexOf( before );
-			parent.children.splice( index, 0, object );
-			parent.children.pop();
-
-		}
-
-		this.signals.sceneGraphChanged.dispatch();
 
 	},
 

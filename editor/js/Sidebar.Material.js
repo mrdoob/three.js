@@ -463,7 +463,7 @@ Sidebar.Material = function ( editor ) {
 
 				var mapEnabled = materialMapEnabled.getValue() === true;
 
-				if ( objectHasUvs )  {
+				if ( objectHasUvs ) {
 
 					material.map = mapEnabled ? materialMap.getValue() : null;
 					material.needsUpdate = true;
@@ -480,7 +480,7 @@ Sidebar.Material = function ( editor ) {
 
 				var mapEnabled = materialAlphaMapEnabled.getValue() === true;
 
-				if ( objectHasUvs )  {
+				if ( objectHasUvs ) {
 
 					material.alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
 					material.needsUpdate = true;
@@ -516,7 +516,7 @@ Sidebar.Material = function ( editor ) {
 
 				var bumpMapEnabled = materialBumpMapEnabled.getValue() === true;
 
-				if ( objectHasUvs )  {
+				if ( objectHasUvs ) {
 
 					material.bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
 					material.bumpScale = materialBumpScale.getValue();
@@ -534,7 +534,7 @@ Sidebar.Material = function ( editor ) {
 
 				var normalMapEnabled = materialNormalMapEnabled.getValue() === true;
 
-				if ( objectHasUvs )  {
+				if ( objectHasUvs ) {
 
 					material.normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
 					material.needsUpdate = true;
@@ -551,7 +551,7 @@ Sidebar.Material = function ( editor ) {
 
 				var specularMapEnabled = materialSpecularMapEnabled.getValue() === true;
 
-				if ( objectHasUvs )  {
+				if ( objectHasUvs ) {
 
 					material.specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
 					material.needsUpdate = true;

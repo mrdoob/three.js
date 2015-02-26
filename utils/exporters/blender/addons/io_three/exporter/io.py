@@ -14,6 +14,7 @@ def copy_registered_textures(dest, registration):
 
     """
     logger.debug("io.copy_registered_textures(%s, %s)", dest, registration)
+    os.makedirs(dest, exist_ok=True)
     for value in registration.values():
         copy(value['file_path'], dest)
 

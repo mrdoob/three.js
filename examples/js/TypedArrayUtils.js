@@ -33,8 +33,8 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 		for ( y = 0; y < eleSize; y ++ ) {
 
 			tmp = arr[ a + y ];
-			arr[ a + y ]=arr[ b + y ];
-			arr[ b + y ]=tmp;
+			arr[ a + y ] = arr[ b + y ];
+			arr[ b + y ] = tmp;
 
 		}
 
@@ -46,7 +46,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 		if ( right - left <= 25 ) {
 
-			for ( j= left + 1; j <= right; j ++ ) {
+			for ( j = left + 1; j <= right; j ++ ) {
 
 				for ( x = 0; x < eleSize; x ++ ) {
 			
@@ -214,7 +214,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 		
 		median = Math.floor( plength / 2 );
 		
-		node = new self.Node( getPointSet( points, median ) , depth, parent, median + pos );
+		node = new self.Node( getPointSet( points, median ), depth, parent, median + pos );
 		node.left = buildTree( points.subarray( 0, median * eleSize), depth + 1, node, pos );
 		node.right = buildTree( points.subarray( ( median + 1 ) * eleSize, points.length ), depth + 1, node, pos + median + 1 );
 
@@ -226,7 +226,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 		
 	this.getMaxDepth = function () { return maxDepth; };
 	
-	this.nearest = function ( point, maxNodes , maxDistance ) {
+	this.nearest = function ( point, maxNodes, maxDistance ) {
 	
 		 /* point: array of size eleSize 
 			maxNodes: max amount of nodes to return 

@@ -430,7 +430,7 @@ THREE.SceneLoader.prototype = {
 
 						} else if ( objJSON.target ) {
 
-						    camera.lookAt( new THREE.Vector3().fromArray( objJSON.target ) );
+							camera.lookAt( new THREE.Vector3().fromArray( objJSON.target ) );
 
 						}
 
@@ -891,7 +891,7 @@ THREE.SceneLoader.prototype = {
 
 				counter_textures += textureJSON.url.length;
 
-				for( var n = 0; n < textureJSON.url.length; n ++ ) {
+				for ( var n = 0; n < textureJSON.url.length; n ++ ) {
 
 					scope.onLoadStart();
 

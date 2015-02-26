@@ -6,8 +6,12 @@ var APP = {
 
 	Player: function () {
 
+		var scope = this;
+
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
+
+		var vr, controls;
 
 		var events = {};
 
@@ -70,6 +74,18 @@ var APP = {
 
 			this.dom = renderer.domElement;
 
+			if ( vr === true ) {
+
+				controls = new THREE.VRControls( camera );
+				renderer = new THREE.VREffect( renderer );
+
+				this.dom.addEventListener( 'dblclick', function () {
+
+					renderer.setFullScreen( true );
+
+				} );
+			}
+
 		};
 
 		this.setCamera = function ( value ) {
@@ -80,7 +96,18 @@ var APP = {
 
 		};
 
+		this.setVR = function ( value ) {
+
+			vr = value;
+
+		};
+
 		this.setSize = function ( width, height ) {
+
+			if ( vr ) {
+				width = 1280;
+				height = 800;
+			}
 
 			this.width = width;
 			this.height = height;
@@ -102,15 +129,19 @@ var APP = {
 
 		};
 
-		var request;
+		var prevTime, request;
 
 		var animate = function ( time ) {
 
 			request = requestAnimationFrame( animate );
 
-			dispatch( events.update, { time: time } );
+			dispatch( events.update, { time: time, delta: time - prevTime } );
+
+			if ( vr ) controls.update();
 
 			renderer.render( scene, camera );
+
+			prevTime = time;
 
 		};
 
@@ -126,6 +157,7 @@ var APP = {
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
 			request = requestAnimationFrame( animate );
+			prevTime = performance.now();
 
 		};
 

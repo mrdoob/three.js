@@ -28,7 +28,7 @@ THREE.Animation.prototype.keyTypes = [ "pos", "rot", "scl" ];
 THREE.Animation.prototype.play = function ( startTime, weight ) {
 
 	this.currentTime = startTime !== undefined ? startTime : 0;
-	this.weight = weight !== undefined ? weight: 1;
+	this.weight = weight !== undefined ? weight : 1;
 
 	this.isPlaying = true;
 
@@ -119,7 +119,7 @@ THREE.Animation.prototype.resetBlendWeights = function () {
 
 };
 
-THREE.Animation.prototype.update = (function(){
+THREE.Animation.prototype.update = (function() {
 
 	var points = [];
 	var target = new THREE.Vector3();

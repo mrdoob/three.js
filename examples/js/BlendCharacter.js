@@ -22,7 +22,7 @@ THREE.BlendCharacter = function () {
 
 			// Create the animations
 
-			for ( var i = 0; i < geometry.animations.length; ++i ) {
+			for ( var i = 0; i < geometry.animations.length; ++ i ) {
 
 				var animName = geometry.animations[ i ].name;
 				scope.animations[ animName ] = new THREE.Animation( scope, geometry.animations[ i ] );
@@ -46,7 +46,7 @@ THREE.BlendCharacter = function () {
 
 	this.update = function( dt ) {
 
-		for ( var i = this.weightSchedule.length - 1; i >= 0; --i ) {
+		for ( var i = this.weightSchedule.length - 1; i >= 0; -- i ) {
 
 			var data = this.weightSchedule[ i ];
 			data.timeElapsed += dt;
@@ -87,7 +87,7 @@ THREE.BlendCharacter = function () {
 		// lengths match. This is useful for smoothing out transitions that get out of
 		// phase such as between a walk and run cycle
 
-		for ( var i = this.warpSchedule.length - 1; i >= 0; --i ) {
+		for ( var i = this.warpSchedule.length - 1; i >= 0; -- i ) {
 
 			var data = this.warpSchedule[ i ];
 			data.timeElapsed += dt;
@@ -203,17 +203,17 @@ THREE.BlendCharacter = function () {
 
 	this.unPauseAll = function() {
 
-	for ( var a in this.animations ) {
+		for ( var a in this.animations ) {
 
-	  if ( this.animations[ a ].isPlaying && this.animations[ a ].isPaused ) {
+			if ( this.animations[ a ].isPlaying && this.animations[ a ].isPaused ) {
 
-		this.animations[ a ].pause();
+				this.animations[ a ].pause();
 
-	  }
+			}
 
-	}
+		}
 
-  };
+	};
 
 
 	this.stopAll = function() {

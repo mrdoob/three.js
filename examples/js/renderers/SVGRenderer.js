@@ -68,7 +68,7 @@ THREE.SVGRenderer = function () {
 
 	this.setQuality = function( quality ) {
 
-		switch(quality) {
+		switch (quality) {
 
 			case "high": _quality = 1; break;
 			case "low": _quality = 0; break;
@@ -215,7 +215,7 @@ THREE.SVGRenderer = function () {
 				var x =   _vector3.x * _svgWidthHalf;
 				var y = - _vector3.y * _svgHeightHalf;
 
-			 	var node = object.node;
+				var node = object.node;
 				node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
 
 				_svg.appendChild( node );
@@ -232,7 +232,7 @@ THREE.SVGRenderer = function () {
 		_directionalLights.setRGB( 0, 0, 0 );
 		_pointLights.setRGB( 0, 0, 0 );
 
-		for ( var l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			var light = lights[ l ];
 			var lightColor = light.color;

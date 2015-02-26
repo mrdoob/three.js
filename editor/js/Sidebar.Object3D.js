@@ -29,7 +29,10 @@ Sidebar.Object3D = function ( editor ) {
 	} );
 	objectActions.onClick( function ( event ) {
 
-		event.stopPropagation();
+		event.stopPropagation(); // Avoid panel collapsing
+
+	} );
+	objectActions.onChange( function ( event ) {
 
 		var object = editor.selected;
 
@@ -81,7 +84,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectNameRow = new UI.Panel();
 	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-			editor.setObjectName( editor.selected, objectName.getValue() );
+		editor.nameObject( editor.selected, objectName.getValue() );
 
 	} );
 
@@ -343,7 +346,7 @@ Sidebar.Object3D = function ( editor ) {
 
 				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
-					editor.parent( object, editor.scene.getObjectById( newParentId ) );
+					editor.moveObject( object, editor.scene.getObjectById( newParentId ) );
 
 				}
 

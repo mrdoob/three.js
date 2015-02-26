@@ -350,7 +350,7 @@ THREE.NormalDisplacementShader = {
 		"	#if MAX_HEMI_LIGHTS > 0",
 
 		"		vec3 hemiDiffuse = vec3( 0.0 );",
-		"		vec3 hemiSpecular = vec3( 0.0 );" ,
+		"		vec3 hemiSpecular = vec3( 0.0 );",
 
 		"		for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
