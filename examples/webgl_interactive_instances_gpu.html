@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - interactive instances (gpu)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			.info {
+				position: absolute;
+				background-color: black;
+				opacity: 0.8;
+				color: white;
+				text-align: center;
+				top: 0px;
+				width: 100%;
+			}
+
+			.info a {
+				color: #00ffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="info">
+
+			<a href="http://threejs.org" target="_blank">three.js</a> webgl - gpu picking of geometry instances using a single material
+
+			<br/><br/>
+
+			<div>
+
+				<span>number of instances </span>
+				<select id="instanceCount">
+					<option>500</option>
+					<option>1000</option>
+					<option selected>2000</option>
+					<option>3000</option>
+					<option>5000</option>
+					<option>10000</option>
+				</select>
+
+				&nbsp;&nbsp;&nbsp;
+
+				<span>use single material </span>
+				<input id="useSingleMaterial" type="checkbox" checked />
+
+			</div>
+
+		</div>
+
+		<div id="container"></div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="../src/renderers/WebGLRenderer.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script id="pickingVert" type="x-shader/x-vertex">
+
+			// precision mediump float;
+			// precision mediump int;
+
+			// uniform mat4 modelViewMatrix;
+			// uniform mat4 projectionMatrix;
+
+			// attribute vec3 position;
+
+			void main()	{
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="pickingFrag" type="x-shader/x-fragment">
+
+			// precision mediump float;
+			// precision mediump int;
+
+			uniform vec3 pickingColor;
+
+			void main()	{
+
+				gl_FragColor.xyz = pickingColor;
+
+			}
+
+		</script>
+
+		<script>
+
+			var container, stats;
+			var camera, controls, scene, renderer;
+			var pickingData, pickingTexture, pickingScene;
+			var highlightBox;
+			var material, pickingMaterial
+			var materialList = [];
+			var geometry;
+
+			var mouse = new THREE.Vector2();
+			var scale = 1.03;
+
+			//create buffer for reading single pixel
+			var pixelBuffer = new Uint8Array( 4 );
+
+			//
+
+			var instanceCountElm = document.getElementById( 'instanceCount' );
+
+			var instanceCount = instanceCountElm.value;
+
+			instanceCountElm.addEventListener( "change", function(){
+
+				instanceCount = instanceCountElm.value;
+				console.log( "instanceCount", instanceCount );
+				initInstances();
+
+			} );
+
+			//
+
+			var useSingleMaterialElm = document.getElementById( 'useSingleMaterial' );
+
+			var useSingleMaterial = useSingleMaterialElm.checked;
+
+			useSingleMaterialElm.addEventListener( "change", function(){
+
+				useSingleMaterial = useSingleMaterialElm.checked;
+				console.log( "useSingleMaterial", useSingleMaterial );
+				initInstances();
+
+			} );
+
+			//
+
+			init();
+			initInstances();
+			animate();
+
+			function initInstances(){
+
+				// clean up
+
+				materialList.forEach( function( m ){
+					m.dispose();
+				} );
+
+				if( geometry ) geometry.dispose();
+
+				scene = new THREE.Scene();
+				pickingScene = new THREE.Scene();
+				pickingData = {};
+				materialList = [];
+
+				// make instances
+
+				var loader = new THREE.JSONLoader();
+				loader.load( 'obj/Suzanne.js', function ( geo ) {
+
+					geometry = geo;
+
+					geometry.computeVertexNormals();
+
+					geometry.computeBoundingBox();
+					var size = geometry.boundingBox.size();
+
+					highlightBox.children[0].geometry = new THREE.BoxGeometry(
+						size.x, size.y, size.z
+					);
+					highlightBox.children[1].geometry = new THREE.BoxGeometry(
+						size.x, size.y, size.z
+					);
+
+					console.time( "init mesh" );
+
+					for ( var i = 0; i < instanceCount; i ++ ) {
+
+						var object = new THREE.Mesh( geometry, material );
+						var color = Math.random() * 0xffffff;
+
+						object.position.x = Math.random() * 800 - 400;
+						object.position.y = Math.random() * 800 - 400;
+						object.position.z = Math.random() * 800 - 400;
+
+						object.rotation.x = Math.random() * 2 * Math.PI;
+						object.rotation.y = Math.random() * 2 * Math.PI;
+						object.rotation.z = Math.random() * 2 * Math.PI;
+
+						object.scale.x = object.scale.y = object.scale.z = Math.random() * 30;
+
+						scene.add( object );
+
+						//
+
+						pickingData[ i + 1 ] = object;
+
+						var pickingObject = object.clone();
+
+						pickingScene.add( pickingObject );
+
+						//
+
+						if( useSingleMaterial ){
+
+							object.uniformValues = [
+								[ "diffuse", new THREE.Color( color ) ]
+							]
+
+							pickingObject.material = pickingMaterial;
+							pickingObject.uniformValues = [
+								[ "pickingColor", new THREE.Color( i + 1 ) ]
+							]
+
+						}else{
+
+							object.material = material.clone();
+							object.material.color.setHex( color );
+							materialList.push( object.material );
+
+							pickingObject.material = pickingMaterial.clone();
+							pickingObject.material.uniforms.pickingColor.value.setHex( i + 1 );
+							materialList.push( pickingObject.material )
+
+						}
+
+					}
+
+					//
+
+					scene.add( camera );
+
+					scene.add( highlightBox );
+
+					render();
+
+					console.timeEnd( "init mesh" );
+
+					console.log( "material count", materialList.length );
+
+					console.log( renderer.info.memory )
+					console.log( renderer.info.render )
+
+					console.log( material )
+
+				} );
+
+			}
+
+			function init() {
+
+				container = document.getElementById( "container" );
+
+				camera = new THREE.PerspectiveCamera(
+					70, window.innerWidth / window.innerHeight, 1, 10000
+				);
+				camera.position.z = 500;
+				camera.add( new THREE.PointLight( 0xffffff, 1 ) );
+
+				//
+
+				pickingTexture = new THREE.WebGLRenderTarget(
+					window.innerWidth, window.innerHeight
+				);
+				pickingTexture.generateMipmaps = false;
+				pickingTexture.minFilter = THREE.NearestFilter;
+
+				//
+
+				material = new THREE.MeshPhongMaterial( {
+					shading: THREE.SmoothShading
+				} );
+
+				pickingMaterial = new THREE.ShaderMaterial( {
+
+					uniforms: {
+						pickingColor: {
+							type: "c", value: new THREE.Color()
+						}
+					},
+					vertexShader: document.getElementById( 'pickingVert' ).textContent,
+					fragmentShader: document.getElementById( 'pickingFrag' ).textContent
+
+				} );
+
+				//
+
+				var boxGeo = new THREE.BoxGeometry( 1, 1, 1 );
+
+				highlightBox = new THREE.Group();
+
+				highlightBox.add(
+					new THREE.Mesh(
+						boxGeo,
+						new THREE.MeshLambertMaterial( {
+							color: 0xffff00,
+							transparent: true,
+							opacity: 0.5,
+							side: THREE.BackSide
+						} )
+					)
+				);
+
+				highlightBox.add(
+					new THREE.Mesh(
+						boxGeo,
+						new THREE.MeshLambertMaterial( {
+							color: 0xffff00,
+							transparent: true,
+							opacity: 0.5,
+							side: THREE.FrontSide
+						} )
+					)
+				);
+
+				//
+
+				renderer = new THREE.WebGLRenderer( {
+					antialias: true,
+					alpha: true
+				} );
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.TrackballControls(
+					camera, renderer.domElement
+				);
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = false;
+				controls.noPan = false;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+
+			}
+
+			//
+
+			function onMouseMove( e ) {
+
+				mouse.x = e.clientX;
+				mouse.y = e.clientY;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+				controls.update();
+				stats.update();
+
+			}
+
+			function pick() {
+
+				// render the picking scene off-screen
+
+				renderer.render( pickingScene, camera, pickingTexture );
+
+				// read the pixel under the mouse from the texture
+
+				renderer.readRenderTargetPixels(
+					pickingTexture,
+					mouse.x,
+					pickingTexture.height - mouse.y,
+					1,
+					1,
+					pixelBuffer
+				);
+
+				// interpret the pixel as an ID
+
+				var id =
+					( pixelBuffer[0] << 16 ) |
+					( pixelBuffer[1] << 8 ) |
+					( pixelBuffer[2] );
+
+				var object = pickingData[ id ];
+
+				if ( object ) {
+
+					//move the highlightBox so that it surrounds the picked object
+
+					if ( object.position && object.rotation && object.scale ){
+
+						highlightBox.position.copy( object.position );
+						highlightBox.rotation.copy( object.rotation );
+
+						highlightBox.children[0].scale.copy( object.scale ).multiplyScalar( scale );
+						highlightBox.children[1].scale.copy( object.scale ).multiplyScalar( scale );
+
+						highlightBox.visible = true;
+
+					}
+
+				} else {
+
+					highlightBox.visible = false;
+
+				}
+
+			}
+
+			function render() {
+
+				pick();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

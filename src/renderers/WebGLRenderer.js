@@ -4310,7 +4310,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var location = material.program.uniforms[ u ];
 
 			if ( location ) {
-				material.uniformsList.push( [ material.__webglShader.uniforms[ u ], location ] );
+
+				material.uniformsList.push( [
+
+					material.__webglShader.uniforms[ u ],
+					location,
+					u
+
+				] );
+
 			}
 
 		}
@@ -4563,6 +4571,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 				refreshUniformsShadow( m_uniforms, lights );
 
 			}
+
+		}
+
+		// overwrite uniforms with values from object
+
+		var o_values = object.uniformValues;
+
+		if ( o_values ) {
+
+			for ( var j = 0, jl = o_values.length; j < jl; j ++ ) {
+
+				u = o_values[ j ];
+				m_uniforms[ u[ 0 ] ].value = u[ 1 ];
+
+			}
+
+		}
+
+		if ( refreshMaterial || o_values ) {
 
 			// load common uniforms
 
