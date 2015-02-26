@@ -451,7 +451,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				scope.dollyIn();
 
-			} else {
+			} else if ( dollyDelta.y < 0 ) {
 
 				scope.dollyOut();
 
@@ -510,7 +510,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			scope.dollyOut();
 
-		} else {
+		} else if ( delta < 0 ) {
 
 			scope.dollyIn();
 
@@ -643,7 +643,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 					scope.dollyOut();
 
-				} else {
+				} else if ( dollyDelta.y < 0 ) {
 
 					scope.dollyIn();
 
