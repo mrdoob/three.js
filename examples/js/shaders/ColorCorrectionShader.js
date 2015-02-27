@@ -35,7 +35,7 @@ THREE.ColorCorrectionShader = {
 		"uniform sampler2D tDiffuse;",
 		"uniform vec3 powRGB;",
 		"uniform vec3 mulRGB;",
-        "uniform vec3 addRGB;",
+        	"uniform vec3 addRGB;",
 
 		"varying vec2 vUv;",
 
