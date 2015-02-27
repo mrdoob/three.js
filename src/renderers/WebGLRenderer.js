@@ -4310,9 +4310,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var location = material.program.uniforms[ u ];
 
 			if ( location ) {
-
 				material.uniformsList.push( [ material.__webglShader.uniforms[ u ], location ] );
-
 			}
 
 		}
@@ -4568,16 +4566,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if( object.uniformValues ){
+		if( object.uniformValues && object.uniformValues.length > 0 ){
 
 			// temporarily overwrite uniforms with values from object
 
 			overwriteUniformsObject( material, object );
+			material.needsRefresh = true;
 
 		}else if( refreshMaterial || material.needsRefresh ){
 
-			loadUniformsGeneric( material.uniformsList );
+			// load common uniforms
 
+			loadUniformsGeneric( material.uniformsList );
 			material.needsRefresh = false;
 
 		}
@@ -4842,36 +4842,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var m_values = [];
 		var o_values = object.uniformValues;
 
-		if ( o_values ) {
+		for ( var u, j = 0, jl = o_values.length; j < jl; j ++ ) {
 
-			for ( var u, j = 0, jl = o_values.length; j < jl; j ++ ) {
+			u = o_values[ j ];
 
-				u = o_values[ j ];
+			// save material value
+			m_values[ j ] = [ u[ 0 ], m_uniforms[ u[ 0 ] ].value ];
 
-				// save material value
-				m_values[ j ] = [ u[ 0 ], m_uniforms[ u[ 0 ] ].value ];
-
-				// overwrite with object value
-				m_uniforms[ u[ 0 ] ].value = u[ 1 ];
-
-			}
+			// overwrite with object value
+			m_uniforms[ u[ 0 ] ].value = u[ 1 ];
 
 		}
 
 		loadUniformsGeneric( material.uniformsList );
 
-		if ( m_values.length > 0 ) {
+		for ( var u, j = 0, jl = m_values.length; j < jl; j ++ ) {
 
-			for ( var u, j = 0, jl = m_values.length; j < jl; j ++ ) {
+			u = m_values[ j ];
 
-				u = m_values[ j ];
-
-				// recover saved material value
-				m_uniforms[ u[ 0 ] ].value = u[ 1 ];
-
-			}
-
-			material.needsRefresh = true;
+			// recover saved material value
+			m_uniforms[ u[ 0 ] ].value = u[ 1 ];
 
 		}
 
