@@ -35,7 +35,7 @@ THREE.SpriteCanvasMaterial.prototype.clone = function () {
 
 THREE.CanvasRenderer = function ( parameters ) {
 
-	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
+	if(window.console && console.log) { console.log( 'THREE.CanvasRenderer', THREE.REVISION ); }
 
 	var smoothstep = THREE.Math.smoothstep;
 
