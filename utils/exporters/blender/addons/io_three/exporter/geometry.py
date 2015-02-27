@@ -115,7 +115,7 @@ class Geometry(base_classes.BaseNode):
     def copy(self, scene=True):
         """Copy the geometry definitions to a standard dictionary.
 
-        :param scene: toggle for scene formatting 
+        :param scene: toggle for scene formatting
                       (Default value = True)
         :type scene: bool
         :rtype: dict
@@ -135,16 +135,17 @@ class Geometry(base_classes.BaseNode):
 
         return data
 
-    def copy_textures(self, texture_folder=""):
+    def copy_textures(self, texture_folder=''):
         """Copy the textures to the destination directory."""
         logger.debug("Geometry().copy_textures()")
         if self.options.get(constants.COPY_TEXTURES):
             texture_registration = self.register_textures()
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
+                dirname = os.path.dirname(self.scene.filepath)
+                full_path = os.path.join(dirname, texture_folder)
                 io.copy_registered_textures(
-                    os.path.join(os.path.dirname(self.scene.filepath), texture_folder),
-                    texture_registration)
+                    full_path, texture_registration)
 
     def parse(self):
         """Parse the current node"""
@@ -169,7 +170,7 @@ class Geometry(base_classes.BaseNode):
         """Write the geometry definitions to disk. Uses the
         desitnation path of the scene.
 
-        :param filepath: optional output file path 
+        :param filepath: optional output file path
                         (Default value = None)
         :type filepath: str
 
@@ -307,7 +308,8 @@ class Geometry(base_classes.BaseNode):
                     pass
                 continue
 
-            if key in skip: continue
+            if key in skip:
+                continue
 
             metadata[key] = len(self[key])
 

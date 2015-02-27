@@ -89,6 +89,7 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
                                      action, armature.matrix_world)
             rot, rchange = _rotation(bone, computed_frame,
                                      action, rotation_matrix)
+            rot = _normalize_quaternion(rot)
 
             if round_off:
                 pos_x, pos_y, pos_z = utilities.round_off(
