@@ -340,7 +340,7 @@ def morph_targets(mesh, options):
             break
     else:
         logger.info("No valid morph data detected")
-        return
+        return []
 
     manifest = []
     for index, morph in enumerate(morphs):

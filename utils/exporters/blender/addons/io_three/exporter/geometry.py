@@ -432,12 +432,12 @@ class Geometry(base_classes.BaseNode):
 
             self[constants.INFLUENCES_PER_VERTEX] = influences
             self[constants.SKIN_INDICES] = api.mesh.skin_indices(
-                self.node, bone_map, influences)
+                self.node, bone_map, influences) or []
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
-                self.node, bone_map, influences)
+                self.node, bone_map, influences) or []
 
         if self.options.get(constants.MORPH_TARGETS):
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
-                self.node, self.options)
+                self.node, self.options) or []
 
