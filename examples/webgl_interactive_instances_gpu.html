@@ -59,22 +59,11 @@
 		<div id="container"></div>
 
 		<script src="../build/three.min.js"></script>
-
 		<script src="../src/renderers/WebGLRenderer.js"></script>
-
 		<script src="js/controls/TrackballControls.js"></script>
-
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="pickingVert" type="x-shader/x-vertex">
-
-			// precision mediump float;
-			// precision mediump int;
-
-			// uniform mat4 modelViewMatrix;
-			// uniform mat4 projectionMatrix;
-
-			// attribute vec3 position;
 
 			void main()	{
 
@@ -85,9 +74,6 @@
 		</script>
 
 		<script id="pickingFrag" type="x-shader/x-fragment">
-
-			// precision mediump float;
-			// precision mediump int;
 
 			uniform vec3 pickingColor;
 
@@ -107,12 +93,14 @@
 			var highlightBox;
 			var material, pickingMaterial
 			var materialList = [];
-			var geometry;
+			var geometry, geometrySize;
 
 			var mouse = new THREE.Vector2();
 			var scale = 1.03;
 
-			//create buffer for reading single pixel
+			var loader = new THREE.JSONLoader();
+
+			//create buffer for reading a single pixel
 			var pixelBuffer = new Uint8Array( 4 );
 
 			//
@@ -158,30 +146,78 @@
 				} );
 
 				if( geometry ) geometry.dispose();
+				if( material ) material.dispose();
+				if( pickingMaterial ) pickingMaterial.dispose();
 
 				scene = new THREE.Scene();
+				scene.add( camera );
+				scene.add( highlightBox );
+
 				pickingScene = new THREE.Scene();
 				pickingData = {};
 				materialList = [];
 
-				// make instances
+				material = new THREE.MeshPhongMaterial( {
+					shading: THREE.SmoothShading,
+					color: new THREE.Color( 0xffff00 )
+				} );
 
-				var loader = new THREE.JSONLoader();
+				pickingMaterial = new THREE.ShaderMaterial( {
+
+					uniforms: {
+						pickingColor: {
+							type: "c", value: new THREE.Color()
+						}
+					},
+					vertexShader: document.getElementById( 'pickingVert' ).textContent,
+					fragmentShader: document.getElementById( 'pickingFrag' ).textContent
+
+				} );
+
+				// make instances
 				loader.load( 'obj/Suzanne.js', function ( geo ) {
 
 					geometry = geo;
-
 					geometry.computeVertexNormals();
-
 					geometry.computeBoundingBox();
-					var size = geometry.boundingBox.size();
 
-					highlightBox.children[0].geometry = new THREE.BoxGeometry(
-						size.x, size.y, size.z
-					);
-					highlightBox.children[1].geometry = new THREE.BoxGeometry(
-						size.x, size.y, size.z
-					);
+					geometrySize = geometry.boundingBox.size();
+
+					// create some objects with .uniformValues and one
+					// without that use the same material to show that
+					// it is possible
+
+					var objectRed = new THREE.Mesh( geometry, material );
+					objectRed.position.x = 800;
+					objectRed.scale.set( 50, 50, 50 );
+					objectRed.uniformValues = [
+						[ "diffuse", new THREE.Color( 0xff0000 ) ]
+					];
+					scene.add( objectRed );
+
+					var objectGreen = new THREE.Mesh( geometry, material );
+					objectGreen.position.x = 700;
+					objectGreen.scale.set( 40, 40, 40 );
+					objectGreen.uniformValues = [
+						[ "diffuse", new THREE.Color( 0x00ff00 ) ]
+					];
+					scene.add( objectGreen );
+
+					var objectBlue = new THREE.Mesh( geometry, material );
+					objectBlue.position.x = 620;
+					objectBlue.scale.set( 30, 30, 30 );
+					objectBlue.uniformValues = [
+						[ "diffuse", new THREE.Color( 0x0000ff ) ]
+					];
+					scene.add( objectBlue );
+
+					var objectDefault = new THREE.Mesh( geometry, material );
+					objectDefault.position.x = 560;
+					objectDefault.scale.set( 20, 20, 20 );
+					scene.add( objectDefault );
+
+					// create a lot of geometry instances to compare the time
+					// needed to initialize a single vs. separate materials
 
 					console.time( "init mesh" );
 
@@ -208,20 +244,16 @@
 
 						var pickingObject = object.clone();
 
-						pickingScene.add( pickingObject );
-
-						//
-
 						if( useSingleMaterial ){
 
 							object.uniformValues = [
 								[ "diffuse", new THREE.Color( color ) ]
-							]
+							];
 
 							pickingObject.material = pickingMaterial;
 							pickingObject.uniformValues = [
 								[ "pickingColor", new THREE.Color( i + 1 ) ]
-							]
+							];
 
 						}else{
 
@@ -231,28 +263,23 @@
 
 							pickingObject.material = pickingMaterial.clone();
 							pickingObject.material.uniforms.pickingColor.value.setHex( i + 1 );
-							materialList.push( pickingObject.material )
+							materialList.push( pickingObject.material );
 
 						}
+
+						pickingScene.add( pickingObject );
 
 					}
 
 					//
 
-					scene.add( camera );
-
-					scene.add( highlightBox );
-
 					render();
 
 					console.timeEnd( "init mesh" );
 
-					console.log( "material count", materialList.length );
-
+					console.log( "material count", materialList.length + 2 );
 					console.log( renderer.info.memory )
 					console.log( renderer.info.render )
-
-					console.log( material )
 
 				} );
 
@@ -265,7 +292,7 @@
 				camera = new THREE.PerspectiveCamera(
 					70, window.innerWidth / window.innerHeight, 1, 10000
 				);
-				camera.position.z = 500;
+				camera.position.z = 1500;
 				camera.add( new THREE.PointLight( 0xffffff, 1 ) );
 
 				//
@@ -275,24 +302,6 @@
 				);
 				pickingTexture.generateMipmaps = false;
 				pickingTexture.minFilter = THREE.NearestFilter;
-
-				//
-
-				material = new THREE.MeshPhongMaterial( {
-					shading: THREE.SmoothShading
-				} );
-
-				pickingMaterial = new THREE.ShaderMaterial( {
-
-					uniforms: {
-						pickingColor: {
-							type: "c", value: new THREE.Color()
-						}
-					},
-					vertexShader: document.getElementById( 'pickingVert' ).textContent,
-					fragmentShader: document.getElementById( 'pickingFrag' ).textContent
-
-				} );
 
 				//
 
@@ -408,15 +417,19 @@
 
 				if ( object ) {
 
-					//move the highlightBox so that it surrounds the picked object
+					// move the highlightBox so that it surrounds the picked object
 
 					if ( object.position && object.rotation && object.scale ){
 
 						highlightBox.position.copy( object.position );
 						highlightBox.rotation.copy( object.rotation );
 
-						highlightBox.children[0].scale.copy( object.scale ).multiplyScalar( scale );
-						highlightBox.children[1].scale.copy( object.scale ).multiplyScalar( scale );
+						highlightBox.children[0].scale.copy( object.scale )
+							.multiply( geometrySize )
+							.multiplyScalar( scale );
+						highlightBox.children[1].scale.copy(
+							highlightBox.children[0].scale
+						);
 
 						highlightBox.visible = true;
 
