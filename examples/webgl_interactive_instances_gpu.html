@@ -146,8 +146,6 @@
 				} );
 
 				if( geometry ) geometry.dispose();
-				if( material ) material.dispose();
-				if( pickingMaterial ) pickingMaterial.dispose();
 
 				scene = new THREE.Scene();
 				scene.add( camera );
@@ -161,6 +159,7 @@
 					shading: THREE.SmoothShading,
 					color: new THREE.Color( 0xffff00 )
 				} );
+				materialList.push( material );
 
 				pickingMaterial = new THREE.ShaderMaterial( {
 
@@ -173,12 +172,14 @@
 					fragmentShader: document.getElementById( 'pickingFrag' ).textContent
 
 				} );
+				materialList.push( pickingMaterial );
 
 				// make instances
 				loader.load( 'obj/Suzanne.js', function ( geo ) {
 
-					geometry = geo;
-					geometry.computeVertexNormals();
+					// geometry = geo;
+					geometry = new THREE.BoxGeometry( 1, 1, 1 );
+					// geometry.computeVertexNormals();
 					geometry.computeBoundingBox();
 
 					geometrySize = geometry.boundingBox.size();
@@ -190,31 +191,52 @@
 					var objectRed = new THREE.Mesh( geometry, material );
 					objectRed.position.x = 800;
 					objectRed.scale.set( 50, 50, 50 );
-					objectRed.uniformValues = [
-						[ "diffuse", new THREE.Color( 0xff0000 ) ]
-					];
 					scene.add( objectRed );
 
 					var objectGreen = new THREE.Mesh( geometry, material );
 					objectGreen.position.x = 700;
 					objectGreen.scale.set( 40, 40, 40 );
-					objectGreen.uniformValues = [
-						[ "diffuse", new THREE.Color( 0x00ff00 ) ]
-					];
 					scene.add( objectGreen );
 
 					var objectBlue = new THREE.Mesh( geometry, material );
 					objectBlue.position.x = 620;
 					objectBlue.scale.set( 30, 30, 30 );
-					objectBlue.uniformValues = [
-						[ "diffuse", new THREE.Color( 0x0000ff ) ]
-					];
 					scene.add( objectBlue );
 
 					var objectDefault = new THREE.Mesh( geometry, material );
 					objectDefault.position.x = 560;
 					objectDefault.scale.set( 20, 20, 20 );
 					scene.add( objectDefault );
+
+					if( useSingleMaterial ){
+
+						objectRed.uniformValues = [
+							[ "diffuse", new THREE.Color( 0xff0000 ) ]
+						];
+
+						objectGreen.uniformValues = [
+							[ "diffuse", new THREE.Color( 0x00ff00 ) ]
+						];
+
+						objectBlue.uniformValues = [
+							[ "diffuse", new THREE.Color( 0x0000ff ) ]
+						];
+
+					}else{
+
+						objectRed.material = material.clone();
+						objectRed.material.color.setHex( 0xff0000 );
+						materialList.push( objectRed.material );
+
+						objectGreen.material = material.clone();
+						objectGreen.material.color.setHex( 0x00ff00 );
+						materialList.push( objectGreen.material );
+
+						objectBlue.material = material.clone();
+						objectBlue.material.color.setHex( 0x0000ff );
+						materialList.push( objectBlue.material );
+
+					}
 
 					// create a lot of geometry instances to compare the time
 					// needed to initialize a single vs. separate materials
@@ -277,7 +299,7 @@
 
 					console.timeEnd( "init mesh" );
 
-					console.log( "material count", materialList.length + 2 );
+					console.log( "material count", materialList.length );
 					console.log( renderer.info.memory )
 					console.log( renderer.info.render )
 
@@ -367,6 +389,8 @@
 
 				renderer.domElement.addEventListener( 'mousemove', onMouseMove );
 
+				// controls.addEventListener( 'change', render );
+
 			}
 
 			//
@@ -444,6 +468,8 @@
 			}
 
 			function render() {
+
+				// console.log( "render" )
 
 				pick();
 				renderer.render( scene, camera );
