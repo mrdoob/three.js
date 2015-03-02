@@ -40,20 +40,24 @@ THREE.Object3D = function () {
 	Object.defineProperties( this, {
 		position: {
 			enumerable: true,
+			configurable: true,
 			value: position
 		},
 		rotation: {
 			enumerable: true,
+			configurable: true,
 			value: rotation
 		},
 		quaternion: {
 			enumerable: true,
+			configurable: true,
 			value: quaternion
 		},
 		scale: {
 			enumerable: true,
+			configurable: true,
 			value: scale
-		},
+		}
 	} );
 
 	this.rotationAutoUpdate = true;
@@ -772,7 +776,63 @@ THREE.Object3D.prototype = {
 
 		return object;
 
-	}
+	},
+
+  bindPosition: function( position ) {
+
+    delete this.position;
+    Object.defineProperty( this, "position", {
+      enumerable: true,
+      value: position
+    });
+
+  },
+
+  bindQuaternion: function( quaternion ) {
+
+    delete this.quaternion;
+    Object.defineProperty( this, "quaternion", {
+      enumerable: true,
+      value: quaternion
+    });
+
+    var rotation = this.rotation;
+
+    quaternion.onChange( function () {
+
+      rotation.setFromQuaternion( quaternion, undefined, false );
+
+    } );
+
+  },
+
+  bindRotation: function( rotation ) {
+
+    delete this.rotation;
+    Object.defineProperty( this, "rotation", {
+      enumerable: true,
+      value: rotation
+    });
+
+    var quaternion = this.quaternion;
+
+    rotation.onChange( function () {
+
+      quaternion.setFromEuler( rotation, false );
+
+    } );
+
+  },
+
+  bindScale: function( scale ) {
+
+    delete this.scale;
+    Object.defineProperty( this, "scale", {
+      enumerable: true,
+      value: scale
+    });
+
+  }
 
 };
 
