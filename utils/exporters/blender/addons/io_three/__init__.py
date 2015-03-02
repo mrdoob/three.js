@@ -42,7 +42,7 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 bl_info = {
     'name': "Three.js Format",
     'author': "repsac, mrdoob, yomotsu, mpk, jpweeks",
-    'version': (1, 2, 3),
+    'version': (1, 3, 0),
     'blender': (2, 7, 3),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
@@ -623,8 +623,10 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Copy textures",
         default=constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
 
-    option_texture_folder = StringProperty(name="Texture folder",
-        description="add this folder to textures path", default="")
+    option_texture_folder = StringProperty(
+        name="Texture folder",
+        description="add this folder to textures path",
+        default=constants.EXPORT_OPTIONS[constants.TEXTURE_FOLDER])
 
     option_lights = BoolProperty(
         name="Lights",
@@ -822,7 +824,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_copy_textures')
 
         row = layout.row()
-        row.prop(self.properties, "option_texture_folder")
+        row.prop(self.properties, 'option_texture_folder')
 
         row = layout.row()
         row.prop(self.properties, 'option_scale')

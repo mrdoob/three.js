@@ -63,7 +63,7 @@ LIGHTS = 'lights'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
 COPY_TEXTURES = 'copyTextures'
-TEXTURE_FOLDER = "textureFolder"
+TEXTURE_FOLDER = 'textureFolder'
 ENABLE_PRECISION = 'enablePrecision'
 PRECISION = 'precision'
 DEFAULT_PRECISION = 6
@@ -111,7 +111,7 @@ EXPORT_OPTIONS = {
     CAMERAS: False,
     LIGHTS: False,
     COPY_TEXTURES: True,
-    TEXTURE_FOLDER: "",
+    TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
     ENABLE_PRECISION: True,
     PRECISION: DEFAULT_PRECISION,
@@ -173,7 +173,7 @@ UUID = 'uuid'
 MATRIX = 'matrix'
 POSITION = 'position'
 QUATERNION = 'quaternion'
-ROTATION ='rotation'
+ROTATION = 'rotation'
 SCALE = 'scale'
 
 UV = 'uv'
@@ -321,7 +321,8 @@ BASIC = 'basic'
 
 NORMAL_BLENDING = 'NormalBlending'
 
-DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee)
+DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee,
+              0xeeee00, 0x00eeee, 0xee00ee)
 
 DOUBLE_SIDED = 'doubleSided'
 
