@@ -1179,13 +1179,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 ? object.material.materials[ geometryGroup.materialIndex ]
 			 : object.material;
 
-	};
+	}
 
-	function materialNeedsSmoothNormals ( material ) {
+	function materialNeedsFaceNormals ( material ) {
 
-		return material && material.shading !== undefined && material.shading === THREE.SmoothShading;
+		return material instanceof THREE.MeshPhongMaterial === false && material.shading === THREE.FlatShading;
 
-	};
+	}
 
 	// Buffer setting
 
@@ -1526,7 +1526,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var needsSmoothNormals = materialNeedsSmoothNormals( material );
+		var needsFaceNormals = materialNeedsFaceNormals( material );
 
 		var f, fl, fi, face,
 		vertexNormals, faceNormal, normal,
@@ -1671,19 +1671,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( material.morphNormals ) {
 
-						if ( needsSmoothNormals ) {
+						if ( needsFaceNormals ) {
+
+							n1 = morphNormals[ vk ].faceNormals[ chf ];
+							n2 = n1;
+							n3 = n1;
+
+						} else {
 
 							faceVertexNormals = morphNormals[ vk ].vertexNormals[ chf ];
 
 							n1 = faceVertexNormals.a;
 							n2 = faceVertexNormals.b;
 							n3 = faceVertexNormals.c;
-
-						} else {
-
-							n1 = morphNormals[ vk ].faceNormals[ chf ];
-							n2 = n1;
-							n3 = n1;
 
 						}
 
@@ -1880,7 +1880,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertexNormals = face.vertexNormals;
 				faceNormal = face.normal;
 
-				if ( vertexNormals.length === 3 && needsSmoothNormals ) {
+				if ( vertexNormals.length === 3 && needsFaceNormals === false ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
@@ -2343,7 +2343,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglNormalBuffer );
 
-			if ( material.shading === THREE.FlatShading ) {
+			if ( material instanceof THREE.MeshPhongMaterial === false &&
+				   material.shading === THREE.FlatShading ) {
 
 				var nx, ny, nz,
 					nax, nbx, ncx, nay, nby, ncy, naz, nbz, ncz,

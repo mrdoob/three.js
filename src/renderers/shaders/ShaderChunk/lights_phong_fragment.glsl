@@ -1,12 +1,12 @@
-#ifdef FLAT_SHADED
+#ifndef FLAT_SHADED
+
+	vec3 normal = normalize( vNormal );
+
+#else
 
 	vec3 fdx = dFdx( vViewPosition );
 	vec3 fdy = dFdy( vViewPosition );
 	vec3 normal = normalize( cross( fdx, fdy ) );
-
-#else
-
-	vec3 normal = normalize( vNormal );
 
 #endif
 

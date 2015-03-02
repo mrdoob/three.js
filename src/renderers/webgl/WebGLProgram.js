@@ -188,6 +188,8 @@ THREE.WebGLProgram = ( function () {
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
+				parameters.flatShading ? '#define FLAT_SHADED': '',
+
 				parameters.skinning ? '#define USE_SKINNING' : '',
 				parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
 
@@ -278,7 +280,6 @@ THREE.WebGLProgram = ( function () {
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
 
-				parameters.flatShading ? '#define FLAT_SHADED': '',
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
 				_this.gammaInput ? '#define GAMMA_INPUT' : '',
@@ -299,6 +300,8 @@ THREE.WebGLProgram = ( function () {
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
+
+				parameters.flatShading ? '#define FLAT_SHADED': '',
 
 				parameters.metal ? '#define METAL' : '',
 				parameters.wrapAround ? '#define WRAP_AROUND' : '',
