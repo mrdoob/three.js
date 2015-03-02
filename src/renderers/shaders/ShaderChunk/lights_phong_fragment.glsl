@@ -1,4 +1,15 @@
-vec3 normal = normalize( vNormal );
+#ifdef FLAT_SHADED
+
+	vec3 fdx = dFdx( vViewPosition );
+	vec3 fdy = dFdy( vViewPosition );
+	vec3 normal = normalize( cross( fdx, fdy ) );
+
+#else
+
+	vec3 normal = normalize( vNormal );
+
+#endif
+
 vec3 viewPosition = normalize( vViewPosition );
 
 #ifdef DOUBLE_SIDED

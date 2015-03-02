@@ -267,7 +267,7 @@ THREE.WebGLProgram = ( function () {
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
 
-				( parameters.bumpMap || parameters.normalMap ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+				( parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 
 				customDefines,
 
@@ -278,6 +278,7 @@ THREE.WebGLProgram = ( function () {
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
 
+				parameters.flatShading ? '#define FLAT_SHADED': '',
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
 				_this.gammaInput ? '#define GAMMA_INPUT' : '',
@@ -345,7 +346,7 @@ THREE.WebGLProgram = ( function () {
 			THREE.error( 'THREE.WebGLProgram: shader error: ' + _gl.getError(), 'gl.VALIDATE_STATUS', _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ), 'gl.getPRogramInfoLog', programLogInfo );
 
 		}
-		
+
 		if ( programLogInfo !== '' ) {
 
 			THREE.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()' + programLogInfo );
