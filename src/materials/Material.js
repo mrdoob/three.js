@@ -45,6 +45,10 @@ THREE.Material = function () {
 
 };
 
+THREE.Material.updateEvent = { type: 'update' };
+
+THREE.Material.disposeEvent = { type: 'dispose' };
+
 THREE.Material.prototype = {
 
 	constructor: THREE.Material,
@@ -226,13 +230,13 @@ THREE.Material.prototype = {
 
 	update: function () {
 
-		this.dispatchEvent( { type: 'update' } );
+		this.dispatchEvent( THREE.Material.updateEvent );
 
 	},
 
 	dispose: function () {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		this.dispatchEvent( THREE.Material.disposeEvent );
 
 	}
 
