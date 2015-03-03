@@ -165,7 +165,7 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 		if ( canvas.mozRequestFullScreen ) {
 			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
-		} else {
+		} else if ( canvas.webkitRequestFullscreen ) {
 			canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
 		}
 	};
