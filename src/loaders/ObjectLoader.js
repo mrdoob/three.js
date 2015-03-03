@@ -322,8 +322,9 @@ THREE.ObjectLoader.prototype = {
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
 				var image = json[ i ];
+				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
 
-				images[ image.uuid ] = loadImage( scope.texturePath + image.url );
+				images[ image.uuid ] = loadImage( path );
 
 			}
 
