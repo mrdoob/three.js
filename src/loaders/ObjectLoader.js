@@ -473,7 +473,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Line':
 
-					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ) );
+					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
 
 					break;
 
