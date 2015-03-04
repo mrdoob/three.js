@@ -502,12 +502,15 @@ def _on_visible_layer(obj, visible_layers):
     :param visible_layers:
 
     """
-    is_visible = True
+    is_visible = False
     for index, layer in enumerate(obj.layers):
-        if layer and index not in visible_layers:
-            logger.info('%s is on a hidden layer', obj.name)
-            is_visible = False
+        if layer and index in visible_layers:
+            is_visible = True
             break
+
+    if not is_visible:
+        logger.info('%s is on a hidden layer', obj.name)
+
     return is_visible
 
 
