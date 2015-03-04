@@ -700,6 +700,7 @@ THREE.Object3D.prototype = {
 
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
+				data.mode = object.mode;
 
 			} else if ( object instanceof THREE.Sprite ) {
 

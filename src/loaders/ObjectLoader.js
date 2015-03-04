@@ -305,7 +305,7 @@ THREE.ObjectLoader.prototype = {
 
 					}
 
-					object = new THREE.Line( geometry, material );
+					object = new THREE.Line( geometry, material, data.mode );
 
 					break;
 
