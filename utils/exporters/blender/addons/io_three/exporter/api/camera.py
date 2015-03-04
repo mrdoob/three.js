@@ -21,7 +21,8 @@ def _camera(func):
         if isinstance(name, types.Camera):
             camera = name
         else:
-            camera = data.cameras[name]
+            obj = data.objects[name]
+            camera = data.cameras[obj.data.name]
 
         return func(camera, *args, **kwargs)
 

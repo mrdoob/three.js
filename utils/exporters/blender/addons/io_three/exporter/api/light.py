@@ -21,7 +21,8 @@ def _lamp(func):
         if isinstance(name, types.Lamp):
             lamp = name
         else:
-            lamp = data.lamps[name]
+            obj = data.objects[name]
+            lamp = data.lamps[obj.data.name]
 
         return func(lamp, *args, **kwargs)
 
