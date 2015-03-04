@@ -783,6 +783,7 @@ THREE.Object3D.prototype = {
     delete this.position;
     Object.defineProperty( this, "position", {
       enumerable: true,
+      configurable: true,
       value: position
     });
 
@@ -793,6 +794,7 @@ THREE.Object3D.prototype = {
     delete this.quaternion;
     Object.defineProperty( this, "quaternion", {
       enumerable: true,
+      configurable: true,
       value: quaternion
     });
 
@@ -811,6 +813,7 @@ THREE.Object3D.prototype = {
     delete this.rotation;
     Object.defineProperty( this, "rotation", {
       enumerable: true,
+      configurable: true,
       value: rotation
     });
 
@@ -829,6 +832,7 @@ THREE.Object3D.prototype = {
     delete this.scale;
     Object.defineProperty( this, "scale", {
       enumerable: true,
+      configurable: true,
       value: scale
     });
 
