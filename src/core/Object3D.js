@@ -806,6 +806,13 @@ THREE.Object3D.prototype = {
 
     } );
 
+    rotation.onChange( function () {
+
+      quaternion.setFromEuler( rotation, false );
+
+    } );
+
+
   },
 
   bindRotation: function( rotation ) {
@@ -822,6 +829,12 @@ THREE.Object3D.prototype = {
     rotation.onChange( function () {
 
       quaternion.setFromEuler( rotation, false );
+
+    } );
+
+    quaternion.onChange( function () {
+
+      rotation.setFromQuaternion( quaternion, undefined, false );
 
     } );
 
