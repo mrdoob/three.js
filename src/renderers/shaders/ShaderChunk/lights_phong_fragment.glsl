@@ -2,6 +2,12 @@
 
 	vec3 normal = normalize( vNormal );
 
+	#ifdef DOUBLE_SIDED
+
+		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
+
+	#endif
+
 #else
 
 	vec3 fdx = dFdx( vViewPosition );
@@ -11,12 +17,6 @@
 #endif
 
 vec3 viewPosition = normalize( vViewPosition );
-
-#ifdef DOUBLE_SIDED
-
-	normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
-
-#endif
 
 #ifdef USE_NORMALMAP
 
