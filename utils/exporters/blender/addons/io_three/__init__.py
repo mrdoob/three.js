@@ -503,6 +503,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     bl_idname = 'export.three'
     bl_label = 'Export THREE'
+    bl_options = {'PRESET'}
 
     filename_ext = constants.EXTENSION
 
