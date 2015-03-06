@@ -39,11 +39,11 @@ class Scene(base_classes.BaseScene):
         """
         valid_types = [api.constants.MESH]
 
-        if self.options.get(constants.CAMERAS):
+        if self.options.option_cameras:
             logger.info("Adding cameras to valid object types")
             valid_types.append(api.constants.CAMERA)
 
-        if self.options.get(constants.LIGHTS):
+        if self.options.option_lights:
             logger.info("Adding lights to valid object types")
             valid_types.append(api.constants.LAMP)
 
@@ -85,10 +85,10 @@ class Scene(base_classes.BaseScene):
     def parse(self):
         """Execute the parsing of the scene"""
         logger.debug("Scene().parse()")
-        if self.options.get(constants.MAPS):
+        if self.options.option_maps:
             self._parse_textures()
 
-        if self.options.get(constants.MATERIALS):
+        if self.options.option_materials:
             self._parse_materials()
 
         self._parse_geometries()
@@ -110,10 +110,10 @@ class Scene(base_classes.BaseScene):
         logger.debug("Scene().write()")
         data = {}
 
-        embed_anim = self.options.get(constants.EMBED_ANIMATION, True)
-        embed = self.options.get(constants.EMBED_GEOMETRY, True)
+        embed_anim = self.options.option_embed_animation
+        embed = self.options.option_embed_geometry
 
-        compression = self.options.get(constants.COMPRESSION)
+        compression = self.options.option_compression
         extension = constants.EXTENSIONS.get(
             compression,
             constants.EXTENSIONS[constants.JSON])
@@ -158,8 +158,8 @@ class Scene(base_classes.BaseScene):
 
         io.dump(self.filepath, data, options=self.options)
 
-        if self.options.get(constants.COPY_TEXTURES):
-            texture_folder = self.options.get(constants.TEXTURE_FOLDER)
+        if self.options.option_copy_textures:
+            texture_folder = self.options.option_texture_folder
             for geo in self[constants.GEOMETRIES]:
                 logger.info("Copying textures from %s", geo.node)
                 geo.copy_textures(texture_folder)

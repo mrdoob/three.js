@@ -104,9 +104,9 @@ def rounding(options):
     :rtype: bool, int
 
     """
-    round_off_ = options.get(constants.ENABLE_PRECISION)
+    round_off_ = options.option_round_off
     if round_off_:
-        round_val = options[constants.PRECISION]
+        round_val = options.option_round_value
     else:
         round_val = None
 

@@ -13,7 +13,7 @@ class Material(base_classes.BaseNode):
         if self[constants.TYPE] == constants.THREE_PHONG:
             self._phong_attributes()
 
-        textures = self.parent.options.get(constants.MAPS)
+        textures = self.parent.options.option_maps
         if textures:
             self._update_maps()
 
@@ -83,7 +83,7 @@ class Material(base_classes.BaseNode):
 
             for func, map_key, scale_key, scale_func in mapping:
                 map_node = func(self.node)
-                if not map_node: 
+                if not map_node:
                     continue
                 logger.info("Found map node %s for %s", map_node, map_key)
                 tex_inst = self.scene.texture(map_node.name)

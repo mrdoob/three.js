@@ -336,7 +336,7 @@ def extract_mesh(obj, options, recalculate=False):
     # now determine whether or not to export using the geometry type
     # set globally from the exporter's options or to use the local
     # override on the mesh node itself
-    opt_buffer = options.get(constants.GEOMETRY_TYPE)
+    opt_buffer = options.option_geometry_type
     opt_buffer = opt_buffer == constants.BUFFER_GEOMETRY
     prop_buffer = mesh_node.THREE_geometry_type == constants.BUFFER_GEOMETRY
 
@@ -373,7 +373,7 @@ def extract_mesh(obj, options, recalculate=False):
 
         obj.data = original_mesh
 
-    if not options.get(constants.SCENE):
+    if not options.option_export_scene:
         xrot = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
         mesh_node.transform(xrot * obj.matrix_world)
 
@@ -394,7 +394,7 @@ def extract_mesh(obj, options, recalculate=False):
     mesh_node.update(calc_tessface=True)
     mesh_node.calc_normals()
     mesh_node.calc_tessface()
-    scale_ = options.get(constants.SCALE, 1)
+    scale_ = options.option_scale
     mesh_node.transform(mathutils.Matrix.Scale(scale_, 4))
 
     return mesh_node

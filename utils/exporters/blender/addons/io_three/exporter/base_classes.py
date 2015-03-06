@@ -136,7 +136,7 @@ class BaseScene(BaseClass):
 
         self._filepath = filepath
 
-        self._options = options.copy()
+        self._options = options
 
     @property
     def filepath(self):
