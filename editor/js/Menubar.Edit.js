@@ -68,6 +68,13 @@ Menubar.Edit = function ( editor ) {
 
 		if ( object.parent === undefined ) return; // avoid flattening the camera or scene
 
+		if ( object.geometry === undefined ) {
+
+			alert( object.name + ' doesn\'t have geometry' );
+			return;
+
+		}
+
 		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
 
 		var geometry = object.geometry;
