@@ -67,7 +67,7 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
     rotation_matrix = rot.to_matrix()
     hierarchy = []
     parent_index = -1
-    frame_step = options.get(constants.FRAME_STEP, 1)
+    frame_step = optionsoption_frame_step
     fps = context.scene.render.fps
 
     start = int(start_frame)
@@ -194,7 +194,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
     start_frame = action.frame_range[0]
     frame_length = end_frame - start_frame
 
-    frame_step = options.get(constants.FRAME_STEP, 1)
+    frame_step = options.option_frame_step
     used_frames = int(frame_length / frame_step) + 1
 
     keys = []
@@ -223,8 +223,8 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
                            pose_bone.bone,
                            'scale'))
 
-    frame_step = options[constants.FRAME_STEP]
-    frame_index_as_time = options[constants.FRAME_INDEX_AS_TIME]
+    frame_step = options.option_frame_step
+    frame_index_as_time = options.option_frame_index_as_time
     for frame_index in range(0, used_frames):
         if frame_index == used_frames - 1:
             frame = end_frame

@@ -81,7 +81,7 @@ class Object(base_classes.BaseNode):
 
         self[constants.TYPE] = api.object.node_type(self.node)
 
-        if self.options.get(constants.MATERIALS):
+        if self.options.option_materials:
             logger.info("Parsing materials for %s", self.node)
             material_name = api.object.material(self.node)
             if material_name:

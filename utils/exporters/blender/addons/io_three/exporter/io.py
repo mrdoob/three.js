@@ -47,7 +47,7 @@ def dump(filepath, data, options=None):
     options = options or {}
     logger.debug("io.dump(%s, data, options=%s)", filepath, options)
 
-    compress = options.get(constants.COMPRESSION, constants.NONE)
+    compress = options.option_compression
     if compress == constants.MSGPACK:
         try:
             import msgpack
@@ -59,13 +59,13 @@ def dump(filepath, data, options=None):
         func = lambda x, y: msgpack.dump(x, y)
         mode = 'wb'
     else:
-        round_off = options.get(constants.ENABLE_PRECISION)
+        round_off = options.option_round_off
         if round_off:
-            _json.ROUND = options[constants.PRECISION]
+            _json.ROUND = options.option_round_value
         else:
             _json.ROUND = None
 
-        indent = options.get(constants.INDENT, True)
+        indent = options.option_indent
         indent = 4 if indent else None
         logger.info("Dumping to JSON")
         func = lambda x, y: _json.json.dump(x, y, indent=indent)
@@ -85,7 +85,7 @@ def load(filepath, options):
 
     """
     logger.debug("io.load(%s, %s)", filepath, options)
-    compress = options.get(constants.COMPRESSION, constants.NONE)
+    compress = options.option_compression
     if compress == constants.MSGPACK:
         try:
             import msgpack

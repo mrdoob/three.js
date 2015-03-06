@@ -14,8 +14,8 @@ class Geometry(base_classes.BaseNode):
         #@TODO: maybe better to have `three` constants for
         #       strings that are specific to `three` properties
         geo_type = constants.GEOMETRY.title()
-        if parent.options.get(constants.GEOMETRY_TYPE):
-            opt_type = parent.options[constants.GEOMETRY_TYPE]
+        if parent.options.option_geometry_type:
+            opt_type = parent.options.option_geometry_type
             if opt_type == constants.BUFFER_GEOMETRY:
                 geo_type = constants.BUFFER_GEOMETRY
             elif opt_type != constants.GEOMETRY:
@@ -34,7 +34,7 @@ class Geometry(base_classes.BaseNode):
 
         :return: base name for the file
         """
-        compression = self.options.get(constants.COMPRESSION)
+        compression = self.options.option_compression
         if compression in (None, constants.NONE):
             ext = constants.JSON
         elif compression == constants.MSGPACK:
@@ -138,7 +138,7 @@ class Geometry(base_classes.BaseNode):
     def copy_textures(self, texture_folder=''):
         """Copy the textures to the destination directory."""
         logger.debug("Geometry().copy_textures()")
-        if self.options.get(constants.COPY_TEXTURES):
+        if self.options.option_copy_textures:
             texture_registration = self.register_textures()
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
@@ -182,7 +182,7 @@ class Geometry(base_classes.BaseNode):
         io.dump(filepath, self.copy(scene=False),
                 options=self.scene.options)
 
-        if self.options.get(constants.MAPS):
+        if self.options.option_maps:
             logger.info("Copying textures for %s", self.node)
             self.copy_textures()
 
@@ -235,7 +235,7 @@ class Geometry(base_classes.BaseNode):
 
         data = {}
         anim_components = [constants.MORPH_TARGETS, constants.ANIMATION]
-        if self.options.get(constants.EMBED_ANIMATION):
+        if self.options.option_embed_animation:
             components.extend(anim_components)
         else:
             for component in anim_components:
@@ -335,7 +335,7 @@ class Geometry(base_classes.BaseNode):
                 constants.METADATA: self.metadata
             })
         else:
-            if self.options.get(constants.EMBED_GEOMETRY):
+            if self.options.option_embed_geometry:
                 data[constants.DATA] = {
                     constants.ATTRIBUTES: component_data
                 }
@@ -350,9 +350,9 @@ class Geometry(base_classes.BaseNode):
         """Parse the geometry to Three.BufferGeometry specs"""
         self[constants.ATTRIBUTES] = {}
 
-        options_vertices = self.options.get(constants.VERTICES)
-        option_normals = self.options.get(constants.NORMALS)
-        option_uvs = self.options.get(constants.UVS)
+        options_vertices = self.options.option_vertices
+        option_normals = self.options.option_normals
+        option_uvs = self.options.option_uv_coords
 
         pos_tuple = (constants.POSITION, options_vertices,
                      api.mesh.buffer_position, 3)
@@ -380,38 +380,38 @@ class Geometry(base_classes.BaseNode):
 
     def _parse_geometry(self):
         """Parse the geometry to Three.Geometry specs"""
-        if self.options.get(constants.VERTICES):
+        if self.options.option_vertices:
             logger.info("Parsing %s", constants.VERTICES)
             self[constants.VERTICES] = api.mesh.vertices(
                 self.node, self.options) or []
 
-        if self.options.get(constants.NORMALS):
+        if self.options.option_normals:
             logger.info("Parsing %s", constants.NORMALS)
             self[constants.NORMALS] = api.mesh.normals(
                 self.node, self.options) or []
 
-        if self.options.get(constants.COLORS):
+        if self.options.option_colors:
             logger.info("Parsing %s", constants.COLORS)
             self[constants.COLORS] = api.mesh.vertex_colors(
                 self.node) or []
 
-        if self.options.get(constants.FACE_MATERIALS):
+        if self.options.option_face_materials:
             logger.info("Parsing %s", constants.FACE_MATERIALS)
             self[constants.MATERIALS] = api.mesh.materials(
                 self.node, self.options) or []
 
-        if self.options.get(constants.UVS):
+        if self.options.option_uv_coords:
             logger.info("Parsing %s", constants.UVS)
             self[constants.UVS] = api.mesh.uvs(
                 self.node, self.options) or []
 
-        if self.options.get(constants.FACES):
+        if self.options.option_faces:
             logger.info("Parsing %s", constants.FACES)
             self[constants.FACES] = api.mesh.faces(
                 self.node, self.options) or []
 
         no_anim = (None, False, constants.OFF)
-        if self.options.get(constants.ANIMATION) not in no_anim:
+        if self.options.option_animation_skeletal not in no_anim:
             logger.info("Parsing %s", constants.ANIMATION)
             self[constants.ANIMATION] = api.mesh.skeletal_animation(
                 self.node, self.options) or []
@@ -420,15 +420,14 @@ class Geometry(base_classes.BaseNode):
         #       querying skinning data
 
         bone_map = {}
-        if self.options.get(constants.BONES):
+        if self.options.option_bones:
             logger.info("Parsing %s", constants.BONES)
             bones, bone_map = api.mesh.bones(self.node, self.options)
             self[constants.BONES] = bones
 
-        if self.options.get(constants.SKINNING):
+        if self.options.option_skinning:
             logger.info("Parsing %s", constants.SKINNING)
-            influences = self.options.get(
-                constants.INFLUENCES_PER_VERTEX, 2)
+            influences = self.options.option_influences
 
             self[constants.INFLUENCES_PER_VERTEX] = influences
             self[constants.SKIN_INDICES] = api.mesh.skin_indices(
@@ -436,7 +435,7 @@ class Geometry(base_classes.BaseNode):
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
                 self.node, bone_map, influences) or []
 
-        if self.options.get(constants.MORPH_TARGETS):
+        if self.options.option_animation_morph:
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
                 self.node, self.options) or []

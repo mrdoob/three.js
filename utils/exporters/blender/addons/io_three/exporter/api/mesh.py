@@ -46,7 +46,7 @@ def skeletal_animation(mesh, options):
         logger.warning("No armature found (%s)", mesh)
         return []
 
-    anim_type = options.get(constants.ANIMATION)
+    anim_type = options.option_animation_skeletal
     #pose_position = armature.data.pose_position
     dispatch = {
         constants.POSE: animation.pose_animation,
@@ -76,7 +76,7 @@ def bones(mesh, options):
         return [], {}
 
     round_off, round_val = utilities.rounding(options)
-    anim_type = options.get(constants.ANIMATION)
+    anim_type = options.option_animation_skeletal
     #pose_position = armature.data.pose_position
 
     if anim_type == constants.OFF:
@@ -199,10 +199,10 @@ def faces(mesh, options):
     if round_off:
         logger.debug("Rounding off of vectors set to %s", round_off)
 
-    opt_colours = options[constants.COLORS] and has_colors
-    opt_uvs = options[constants.UVS] and vertex_uv
-    opt_materials = options.get(constants.FACE_MATERIALS)
-    opt_normals = options[constants.NORMALS]
+    opt_colours = options.option_colors and has_colors
+    opt_uvs = options.option_uv_coords and vertex_uv
+    opt_materials = options.option_face_materials
+    opt_normals = options.option_normals
     logger.debug("Vertex colours enabled = %s", opt_colours)
     logger.debug("UVS enabled = %s", opt_uvs)
     logger.debug("Materials enabled = %s", opt_materials)
@@ -304,7 +304,7 @@ def morph_targets(mesh, options):
     logger.debug("mesh.morph_targets(%s, %s)", mesh, options)
     obj = object_.objects_using_mesh(mesh)[0]
     original_frame = context.scene.frame_current
-    frame_step = options.get(constants.FRAME_STEP, 1)
+    frame_step = options.option_frame_step
     scene_frames = range(context.scene.frame_start,
                          context.scene.frame_end+1,
                          frame_step)
@@ -365,10 +365,10 @@ def materials(mesh, options):
     material_sets = [(mesh.materials[index], index) for index in indices]
     materials_ = []
 
-    maps = options.get(constants.MAPS)
+    maps = options.option_maps
 
-    mix = options.get(constants.MIX_COLORS)
-    use_colors = options.get(constants.COLORS)
+    mix = options.option_mix_colors
+    use_colors = options.option_colors
     logger.info("Colour mix is set to %s", mix)
     logger.info("Vertex colours set to %s", use_colors)
 
