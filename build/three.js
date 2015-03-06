@@ -8103,6 +8103,8 @@ THREE.Object3D.prototype = {
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
 
+				if ( object instanceof THREE.Line ) data.mode = object.mode;
+
 			} else if ( object instanceof THREE.Sprite ) {
 
 				data.material = parseMaterial( object.material );
@@ -8552,6 +8554,18 @@ THREE.BufferGeometry.prototype = {
 
 			normalMatrix.applyToVector3Array( normal.array );
 			normal.needsUpdate = true;
+
+		}
+
+		if ( this.boundingBox instanceof THREE.Box3 ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere instanceof THREE.Sphere ) {
+
+			this.computeBoundingSphere();
 
 		}
 
@@ -13049,7 +13063,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Line':
 
-					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ) );
+					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
 
 					break;
 
@@ -15062,7 +15076,7 @@ THREE.Line = function ( geometry, material, mode ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.mode = ( mode !== undefined ) ? mode : THREE.LineStrip;
+	this.mode = mode !== undefined ? mode : THREE.LineStrip;
 
 };
 
