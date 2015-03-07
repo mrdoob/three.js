@@ -343,7 +343,7 @@ Sidebar.Object3D = function ( editor ) {
 
 				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
-					editor.parent( object, editor.scene.getObjectById( newParentId, true ) );
+					editor.parent( object, editor.scene.getObjectById( newParentId ) );
 
 				}
 

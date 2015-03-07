@@ -319,7 +319,7 @@ Editor.prototype = {
 
 	//
 
-	parent: function ( object, parent ) {
+	parent: function ( object, parent, before ) {
 
 		if ( parent === undefined ) {
 
@@ -328,6 +328,16 @@ Editor.prototype = {
 		}
 
 		parent.add( object );
+
+		// sort children array
+
+		if ( before !== undefined ) {
+
+			var index = parent.children.indexOf( before );
+			parent.children.splice( index, 0, object );
+			parent.children.pop();
+
+		}
 
 		this.signals.sceneGraphChanged.dispatch();
 

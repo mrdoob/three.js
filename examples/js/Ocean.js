@@ -41,6 +41,7 @@
 	this.matrixNeedsUpdate = false;
 	
 	// Setup framebuffer pipeline
+	var renderTargetType = optionalParameter(options.USE_HALF_FLOAT, false) ? THREE.HalfFloatType : THREE.FloatType;
 	var LinearClampParams = {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
@@ -50,7 +51,7 @@
 		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
-		type: THREE.FloatType
+		type: renderTargetType
 	};
 	var NearestClampParams = {
 		minFilter: THREE.NearestFilter,
@@ -61,7 +62,7 @@
 		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha:false,
-		type: THREE.FloatType
+		type: renderTargetType
 	};
 	var NearestRepeatParams = {
 		minFilter: THREE.NearestFilter,
@@ -72,7 +73,7 @@
 		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
-		type: THREE.FloatType
+		type: renderTargetType
 	};
 	this.initialSpectrumFramebuffer = new THREE.WebGLRenderTarget(this.resolution, this.resolution, NearestRepeatParams);
 	this.spectrumFramebuffer = new THREE.WebGLRenderTarget(this.resolution, this.resolution, NearestClampParams);

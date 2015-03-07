@@ -170,7 +170,7 @@ THREE.ShaderTerrain = {
 						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
-						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );"
+						"float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[i] );",
 
 						"lVector = normalize( lVector );",
 

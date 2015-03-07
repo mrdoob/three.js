@@ -42,6 +42,7 @@
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
 
 		<script src="js/libs/jszip.min.js"></script>
+		<script src="js/libs/sortable.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
@@ -213,7 +214,12 @@
 			document.addEventListener( 'drop', function ( event ) {
 
 				event.preventDefault();
-				editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				if ( event.dataTransfer.files.length > 0 ) {
+
+					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				}
 
 			}, false );
 
