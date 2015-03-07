@@ -5,8 +5,18 @@
  * @author ikerr / http://verold.com
  */
 
-THREE.SkeletonHelper = function ( object ) {
+THREE.SkeletonHelper = function ( object, color1, color2 ) {
 
+	if ( color1 === undefined ) color1 = 0x0000ff;
+	if ( color2 === undefined ) color2 = 0x00ff00;
+	
+	this.colors = {
+		color1: new THREE.Color(),
+    		color2: new THREE.Color()
+	};
+	this.colors.color1.set( color1 );
+	this.colors.color2.set( color2 );
+	
 	this.bones = this.getBoneList( object );
 
 	var geometry = new THREE.Geometry();
@@ -19,8 +29,8 @@ THREE.SkeletonHelper = function ( object ) {
 
 			geometry.vertices.push( new THREE.Vector3() );
 			geometry.vertices.push( new THREE.Vector3() );
-			geometry.colors.push( new THREE.Color( 0, 0, 1 ) );
-			geometry.colors.push( new THREE.Color( 0, 1, 0 ) );
+			geometry.colors.push( this.colors.color1 );
+			geometry.colors.push( this.colors.color2 );
 
 		}
 
@@ -94,5 +104,14 @@ THREE.SkeletonHelper.prototype.update = function () {
 	geometry.verticesNeedUpdate = true;
 
 	geometry.computeBoundingSphere();
+
+};
+
+THREE.SkeletonHelper.prototype.setColors = function ( color1, color2 ) {
+
+	this.colors.color1.set( color1 );
+	this.colors.color2.set( color2 );
+	
+	this.geometry.colorsNeedUpdate = true;
 
 };

@@ -2,12 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WireframeHelper = function ( object, hex ) {
+THREE.WireframeHelper = function ( object, color ) {
 
-	var color = ( hex !== undefined ) ? hex : 0xffffff;
+	if ( color === undefined ) color = 0xffffff;
+	
+	this.colors = {
+    		main: new THREE.Color()
+	};
+	this.colors.main.set( color );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+	var sortFunction = function ( a, b ) { return a - b; };
 
 	var keys = [ 'a', 'b', 'c' ];
 	var geometry = new THREE.BufferGeometry();
@@ -166,7 +171,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: this.colors.main } ), THREE.LinePieces );
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
@@ -175,3 +180,10 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 THREE.WireframeHelper.prototype = Object.create( THREE.Line.prototype );
 THREE.WireframeHelper.prototype.constructor = THREE.WireframeHelper;
+
+THREE.WireframeHelper.prototype.setColor = function ( color ) {
+	
+	this.colors.main.set( color );
+	this.material.color.copy( this.colors.main );
+	
+};

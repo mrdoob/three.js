@@ -3,13 +3,18 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
+THREE.FaceNormalsHelper = function ( object, size, color, linewidth ) {
 
 	this.object = object;
 
 	this.size = ( size !== undefined ) ? size : 1;
 
-	var color = ( hex !== undefined ) ? hex : 0xffff00;
+	if ( color === undefined ) color = 0xffff00;
+	
+	this.colors = {
+    		main: new THREE.Color()
+	};
+	this.colors.main.set( color );
 
 	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
@@ -23,7 +28,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: this.colors.main, linewidth: width } ), THREE.LinePieces );
 
 	this.matrixAutoUpdate = false;
 
@@ -73,3 +78,9 @@ THREE.FaceNormalsHelper.prototype.update = function () {
 
 };
 
+THREE.FaceNormalsHelper.prototype.setColor = function ( color ) {
+	
+	this.colors.main.set( color );
+	this.material.color.copy( this.colors.main );
+	
+};
