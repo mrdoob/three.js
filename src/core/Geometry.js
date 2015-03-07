@@ -692,14 +692,14 @@ THREE.Geometry.prototype = {
 	 * and faces' vertices are updated.
 	 */
 
-	mergeVertices: function () {
+	mergeVertices: function ( epsilon ) {
 
 		var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
 
 		var v, key;
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
-		var precision = Math.pow( 10, precisionPoints );
+		var precision = ( epsilon !== undefined ) ? 1 / epsilon : Math.pow( 10, precisionPoints );
 		var i,il, face;
 		var indices, k, j, jl, u;
 
