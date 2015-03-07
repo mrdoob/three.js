@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - buffergeometry</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #cccccc;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #050505;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/DynamicBufferGeometry.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 350 );
+				camera.position.z = 275;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
+				//
+
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
+
+				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light1.position.set( 1, 1, 1 );
+				scene.add( light1 );
+
+				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				light2.position.set( 0, -1, 0 );
+				scene.add( light2 );
+
+				// merging of indexed buffer geometries preserving face normals
+
+				var box1 = new THREE.Mesh (new THREE.BoxGeometry (30, 30, 30), null);
+				var box2 = new THREE.Mesh (new THREE.BoxGeometry (30, 30, 30), null);
+				var box3 = new THREE.Mesh (new THREE.BoxGeometry (30, 30, 30), null);
+
+				box1.position.x = -30; box1.updateMatrix ();
+				box3.position.x = +30; box3.updateMatrix ();
+
+				box1.geometry.applyMatrix( box1.matrix );
+				box3.geometry.applyMatrix( box3.matrix );
+
+				// remove "inner" faces from geometries
+
+				box1.geometry.faces.splice(0, 2);
+				box2.geometry.faces.splice(2, 2);
+				box2.geometry.faces.splice(0, 2);
+				box3.geometry.faces.splice(2, 2);
+
+				// remove vertex normals
+
+				box1.geometry.faces.forEach (function (face) { face.vertexNormals.length = 0; });
+				box2.geometry.faces.forEach (function (face) { face.vertexNormals.length = 0; });
+				box3.geometry.faces.forEach (function (face) { face.vertexNormals.length = 0; });
+
+				// "invert" box2.geometry so that side vertices match to those of its neighbors 
+
+				box2.scale.x = -1; box2.updateMatrix ();
+				box2.geometry.applyMatrix( box2.matrix );
+				for (var f = 0; f < box2.geometry.faces.length; f++) {
+					var face = box2.geometry.faces[f];
+					var temp = face.a; face.a = face.b; face.b = temp;
+					var uvs = box2.geometry.faceVertexUvs[ 0 ][ f ];
+					temp = uvs[0]; uvs[0] = uvs[1]; uvs[1] = temp;
+				}
+
+				// ok, ready to go...
+
+				var geometry = new DynamicBufferGeometry();
+				geometry.fromGeometry( box1.geometry );
+
+				// merging another indexed geometry in...
+
+				temp = new DynamicBufferGeometry();
+				temp.fromGeometry( box2.geometry );
+
+				geometry.merge( temp );
+
+				// merging unindexed geometry in? no problemo
+
+				temp = new THREE.BufferGeometry();
+				temp.fromGeometry( box3.geometry );
+
+				geometry.merge( temp );
+
+				// at this point we must have 2 * 2 + 8 * 3 = 28 faces and 4 * 2 + 8 * 4 = 40 vertices
+
+				console.log ('28 = ' + geometry.attributes.index.array.length / 3);
+				console.log ('40 = ' + geometry.attributes.position.array.length / 3);
+
+//				console.log (JSON.stringify (geometry.toJSON ()));
+
+
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+//					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+				} );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			var time = 234;
+
+			function render() {
+
+//				var time = Date.now() * 0.001;
+time += 0.01;
+
+				mesh.rotation.x = time * 0.25;
+				mesh.rotation.y = time * 0.5;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
