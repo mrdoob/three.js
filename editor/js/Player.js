@@ -27,7 +27,6 @@ var Player = function ( editor ) {
 
 		container.setDisplay( '' );
 
-		player.setVR( editor.config.getKey( 'project/vr' ) );
 		player.load( editor.toJSON() );
 		player.setSize( container.dom.clientWidth, container.dom.clientHeight );
 		player.play();

@@ -22,12 +22,15 @@ var APP = {
 
 		this.load = function ( json ) {
 
+			vr = json.project.vr;
+
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			this.dom = renderer.domElement;
 
-			camera = loader.parse( json.camera );
-			scene = loader.parse( json.scene );
+			this.setScene( loader.parse( json.scene ) );
+			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
 				keydown: [],
@@ -72,9 +75,29 @@ var APP = {
 
 			}
 
-			this.dom = renderer.domElement;
+		};
+
+		this.setCamera = function ( value ) {
+
+			camera = value;
+			camera.aspect = this.width / this.height;
+			camera.updateProjectionMatrix();
+
 
 			if ( vr === true ) {
+
+				if ( camera.parent === undefined ) {
+
+					// camera needs to be in the scene so camera2 matrix updates
+					
+					scene.add( camera );
+
+				}
+
+				var camera2 = camera.clone();
+				camera.add( camera2 );
+
+				camera = camera2;
 
 				controls = new THREE.VRControls( camera );
 				renderer = new THREE.VREffect( renderer );
@@ -94,23 +117,16 @@ var APP = {
 					renderer.setFullScreen( true );
 
 				} );
+
 			}
 
 		};
 
-		this.setCamera = function ( value ) {
+		this.setScene = function ( value ) {
 
-			camera = value;
-			camera.aspect = this.width / this.height;
-			camera.updateProjectionMatrix();
+			scene = value;
 
-		};
-
-		this.setVR = function ( value ) {
-
-			vr = value;
-
-		};
+		},
 
 		this.setSize = function ( width, height ) {
 

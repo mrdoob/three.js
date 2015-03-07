@@ -84,6 +84,18 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( this.boundingBox instanceof THREE.Box3 ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere instanceof THREE.Sphere ) {
+
+			this.computeBoundingSphere();
+
+		}
+
 	},
 
 	center: function () {

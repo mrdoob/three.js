@@ -17,6 +17,56 @@ Sidebar.Geometry = function ( editor ) {
 
 	var geometryType = new UI.Text().setTextTransform( 'uppercase' );
 	container.addStatic( geometryType );
+	
+	// Actions
+	
+	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '11px' );
+	objectActions.setOptions( {
+
+		'Actions': 'Actions',
+		'Flatten': 'Flatten'
+
+	} );
+	objectActions.onClick( function ( event ) {
+
+		event.stopPropagation(); // Avoid panel collapsing
+
+	} );
+	objectActions.onChange( function ( event ) {
+
+		var object = editor.selected;
+
+		switch ( this.getValue() ) {
+
+			case 'Flatten':
+
+				var object = editor.selected;
+
+				if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
+
+				var geometry = object.geometry;
+
+				geometry.applyMatrix( object.matrix );
+				geometry.verticesNeedUpdate = true;
+				geometry.normalsNeedUpdate = true;
+
+				object.position.set( 0, 0, 0 );
+				object.rotation.set( 0, 0, 0 );
+				object.scale.set( 1, 1, 1 );
+
+				editor.signals.objectChanged.dispatch( object );
+
+				break;
+
+		}
+
+		this.setValue( 'Actions' );
+
+		signals.objectChanged.dispatch( object );
+
+	} );
+	container.addStatic( objectActions );
+
 	container.add( new UI.Break() );
 
 	// uuid
