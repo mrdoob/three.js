@@ -56,16 +56,6 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 };
 
 
-/**
- * Test if the ray is intersecting a single trinagle of the mesh. 
- * @param {number}  faceIndex        Index of the face that should be tested
- * @param {number}  bufferGeometryIndexOffset    
- * @param {Ray}     ray               Ray with applied reverse mesh.matrixWorld. Test if this ray is intersecting the Face.    
- * @param {number}  precision         Min distance of the intersection point to the ray origin.
- * @param {number}  near              Min distance of the intersection point to the ray origin.
- * @param {number}  far               Max distance of the intersection point to the ray origin.
- * @param {Object[]}  intersects      Result array of correct intersection points.
- */
 THREE.Mesh.prototype.rayIntersectsFace = function() {
 
 	var vA = new THREE.Vector3();
@@ -74,13 +64,12 @@ THREE.Mesh.prototype.rayIntersectsFace = function() {
 	var originalOrigin = new THREE.Vector3();
 	var a, b, c, tmpFace;
 			
-	return function(faceIndex, bufferGeometryIndexOffset, ray, precision, near, far,  intersects) {
+	return function(faceIndex, drawcallIndexOffset, ray, precision, near, far,  intersects) {
 
 		var geometry = this.geometry;
 			
 		var material = this.material;
-		if ( material === undefined ) return;
-				
+		if ( material === undefined ) return;				
 								
 		if ( geometry instanceof THREE.BufferGeometry ) {	
 			
@@ -92,9 +81,9 @@ THREE.Mesh.prototype.rayIntersectsFace = function() {
 
 				var indices = attributes.index.array;
 				
-				a = ( indices[ faceIndex*3 ] )     + bufferGeometryIndexOffset ;
-				b = ( indices[ faceIndex*3 + 1 ] ) + bufferGeometryIndexOffset ;
-				c = ( indices[ faceIndex*3 + 2 ] ) + bufferGeometryIndexOffset ;
+				a = ( indices[ faceIndex*3 ] )     + drawcallIndexOffset ;
+				b = ( indices[ faceIndex*3 + 1 ] ) + drawcallIndexOffset ;
+				c = ( indices[ faceIndex*3 + 2 ] ) + drawcallIndexOffset ;
 											
 			} else {
 				
@@ -247,23 +236,23 @@ THREE.Mesh.prototype.raycast = ( function () {
 			if ( attributes.index !== undefined ) {
 
 				var indices = attributes.index.array;
-				var offsets = geometry.offsets;
+				var drawcalls = geometry.drawcalls;
 
-				if ( offsets.length === 0 ) {
+				if ( drawcalls.length === 0 ) {
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+					drawcalls = [ { start: 0, count: indices.length, index: 0 } ];
 
 				}
 
 				for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
 
-					var start = offsets[ oi ].start;
-					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var start = drawcalls[ oi ].start;
+					var count = drawcalls[ oi ].count;
+					var indexOffset = drawcalls[ oi ].index;
 
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
+					for ( var i = start / 3, il = (start + count) / 3; i < il; i += 1 ) {
 
-  						this.rayIntersectsFace(i/3, index,  ray, raycaster.precision, raycaster.near, raycaster.far, intersects);		
+  						this.rayIntersectsFace(i, indexOffset,  ray, raycaster.precision, raycaster.near, raycaster.far, intersects);		
 
 					}
 
