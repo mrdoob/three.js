@@ -11472,10 +11472,14 @@ THREE.Loader.prototype = {
 			mpars.blending = THREE[ m.blending ];
 
 		}
-
-		if ( m.transparent !== undefined || m.opacity < 1.0 ) {
+		
+		if ( m.transparent !== undefined ) {
 
 			mpars.transparent = m.transparent;
+
+		} else if ( m.opacity < 1.0 ) {
+
+			mpars.transparent = true;
 
 		}
 
@@ -11555,14 +11559,14 @@ THREE.Loader.prototype = {
 
 		// modifiers
 
-		if ( m.transparency ) {
+		if ( m.transparency !== undefined ) {
 
 			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
-			mpars.opacity = m.transparency;
+			m.opacity = m.transparency;
 
 		}
 
-		if ( m.opacity ) {
+		if ( m.opacity !== undefined ) {
 
 			mpars.opacity = m.opacity;
 
