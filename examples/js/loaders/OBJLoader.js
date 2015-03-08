@@ -87,11 +87,12 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		function addFace( a, b, c, d,  ua, ub, uc, ud,  na, nb, nc, nd ) {
+		function addFace( a, b, c, d,  ua, ub, uc, ud, na, nb, nc, nd ) {
 
 			var ia = parseVertexIndex( a );
 			var ib = parseVertexIndex( b );
 			var ic = parseVertexIndex( c );
+			var id;
 
 			if ( d === undefined ) {
 
@@ -99,7 +100,7 @@ THREE.OBJLoader.prototype = {
 
 			} else {
 
-				var id = parseVertexIndex( d );
+				id = parseVertexIndex( d );
 
 				addVertex( ia, ib, id );
 				addVertex( ib, ic, id );
@@ -108,9 +109,9 @@ THREE.OBJLoader.prototype = {
 
 			if ( ua !== undefined ) {
 
-				var ia = parseUVIndex( ua );
-				var ib = parseUVIndex( ub );
-				var ic = parseUVIndex( uc );
+				ia = parseUVIndex( ua );
+				ib = parseUVIndex( ub );
+				ic = parseUVIndex( uc );
 
 				if ( d === undefined ) {
 
@@ -118,7 +119,7 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					var id = parseUVIndex( ud );
+					id = parseUVIndex( ud );
 
 					addUV( ia, ib, id );
 					addUV( ib, ic, id );
@@ -129,9 +130,9 @@ THREE.OBJLoader.prototype = {
 
 			if ( na !== undefined ) {
 
-				var ia = parseNormalIndex( na );
-				var ib = parseNormalIndex( nb );
-				var ic = parseNormalIndex( nc );
+				ia = parseNormalIndex( na );
+				ib = parseNormalIndex( nb );
+				ic = parseNormalIndex( nc );
 
 				if ( d === undefined ) {
 
@@ -139,7 +140,7 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					var id = parseNormalIndex( nd );
+					id = parseNormalIndex( nd );
 
 					addNormal( ia, ib, id );
 					addNormal( ib, ic, id );
@@ -202,7 +203,7 @@ THREE.OBJLoader.prototype = {
 
 		var face_pattern3 = /f( +(-?\d+)\/(-?\d+)\/(-?\d+))( +(-?\d+)\/(-?\d+)\/(-?\d+))( +(-?\d+)\/(-?\d+)\/(-?\d+))( +(-?\d+)\/(-?\d+)\/(-?\d+))?/;
 
-		// f vertex//normal vertex//normal vertex//normal ... 
+		// f vertex//normal vertex//normal vertex//normal ...
 
 		var face_pattern4 = /f( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))( +(-?\d+)\/\/(-?\d+))?/
 
@@ -261,7 +262,7 @@ THREE.OBJLoader.prototype = {
 			} else if ( ( result = face_pattern2.exec( line ) ) !== null ) {
 
 				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-				
+
 				addFace(
 					result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ],
 					result[ 3 ], result[ 6 ], result[ 9 ], result[ 12 ]
@@ -337,8 +338,8 @@ THREE.OBJLoader.prototype = {
 
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-			var object = objects[ i ];
-			var geometry = object.geometry;
+			object = objects[ i ];
+			geometry = object.geometry;
 
 			var buffergeometry = new THREE.BufferGeometry();
 
@@ -352,7 +353,7 @@ THREE.OBJLoader.prototype = {
 				buffergeometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( geometry.uvs ), 2 ) );
 			}
 
-			var material = new THREE.MeshLambertMaterial();
+			material = new THREE.MeshLambertMaterial();
 			material.name = object.material.name;
 
 			var mesh = new THREE.Mesh( buffergeometry, material );
