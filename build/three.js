@@ -11472,12 +11472,14 @@ THREE.Loader.prototype = {
 			mpars.blending = THREE[ m.blending ];
 
 		}
-		
+
 		if ( m.transparent !== undefined ) {
 
 			mpars.transparent = m.transparent;
 
-		} else if ( m.opacity < 1.0 ) {
+		}
+
+		if ( m.opacity !== undefined && m.opacity < 1.0 ) {
 
 			mpars.transparent = true;
 
