@@ -116,14 +116,17 @@ THREE.PLYLoader.prototype = {
 
 		var patternHeader = /ply([\s\S]*)end_header\s/;
 		var headerText = "";
-		if ( ( result = patternHeader.exec( data ) ) !== null ) {
+		var headerLength = 0;
+		var result = patternHeader.exec( data );
+		if ( result !== null ) {
 			headerText = result [ 1 ];
+			headerLength = result[ 0 ].length;
 		}
 
 		var header = {
 			comments: [],
 			elements: [],
-			headerLength: result[ 0 ].length
+			headerLength: headerLength
 		};
 
 		var lines = headerText.split( '\n' );
@@ -241,7 +244,7 @@ THREE.PLYLoader.prototype = {
 
 	parseASCIIElement: function ( properties, line ) {
 
-		values = line.split( /\s+/ );
+		var values = line.split( /\s+/ );
 
 		var element = Object();
 
@@ -252,7 +255,7 @@ THREE.PLYLoader.prototype = {
 				var list = [];
 				var n = this.parseASCIINumber( values.shift(), properties[i].countType );
 
-				for ( j = 0; j < n; j ++ ) {
+				for ( var j = 0; j < n; j ++ ) {
 
 					list.push( this.parseASCIINumber( values.shift(), properties[i].itemType ) );
 
@@ -354,7 +357,7 @@ THREE.PLYLoader.prototype = {
 
 				geometry.useColor = true;
 
-				color = new THREE.Color();
+				var color = new THREE.Color();
 				color.setRGB( element.red / 255.0, element.green / 255.0, element.blue / 255.0 );
 				geometry.colors.push( color );
 
@@ -423,7 +426,7 @@ THREE.PLYLoader.prototype = {
 				var n = result[0];
 				read += result[1];
 
-				for ( j = 0; j < n; j ++ ) {
+				for ( var j = 0; j < n; j ++ ) {
 
 					result = this.binaryRead( dataview, at + read, properties[i].itemType, little_endian );
 					list.push( result[0] );
