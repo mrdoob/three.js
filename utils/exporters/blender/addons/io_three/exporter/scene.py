@@ -39,6 +39,9 @@ class Scene(base_classes.BaseScene):
         """
         valid_types = [api.constants.MESH]
 
+        if self.options.get(constants.HIERARCHY, False):
+            valid_types.append(api.constants.EMPTY)
+
         if self.options.get(constants.CAMERAS):
             logger.info("Adding cameras to valid object types")
             valid_types.append(api.constants.CAMERA)
@@ -207,7 +210,12 @@ class Scene(base_classes.BaseScene):
         self[constants.UUID] = utilities.id_from_name(scene_name)
 
         objects = []
-        for node in api.object.nodes(self.valid_types, self.options):
+        if self.options.get(constants.HIERARCHY, False):
+            nodes = api.object.assemblies(self.valid_types, self.options)
+        else:
+            nodes = api.object.nodes(self.valid_types, self.options)
+
+        for node in nodes:
             logger.info("Parsing object %s", node)
             obj = object_.Object(node, parent=self[constants.OBJECT])
             objects.append(obj)

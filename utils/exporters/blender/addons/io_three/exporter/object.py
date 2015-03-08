@@ -68,14 +68,13 @@ class Object(base_classes.BaseNode):
         logger.debug("Object()._node_setup()")
         self[constants.NAME] = api.object.name(self.node)
 
-        self[constants.POSITION] = api.object.position(
-            self.node, self.options)
+        transform = api.object.matrix(self.node, self.options)
+        matrix = []
+        for col in range(0, 4):
+            for row in range(0, 4):
+                matrix.append(transform[row][col])
 
-        self[constants.ROTATION] = api.object.rotation(
-            self.node, self.options)
-
-        self[constants.SCALE] = api.object.scale(
-            self.node, self.options)
+        self[constants.MATRIX] = matrix
 
         self[constants.VISIBLE] = api.object.visible(self.node)
 
@@ -120,11 +119,12 @@ class Object(base_classes.BaseNode):
         elif self[constants.TYPE] in lights:
             self._init_light()
 
-        #for child in api.object.children(self.node, self.scene.valid_types):
-        #    if not self.get(constants.CHILDREN):
-        #        self[constants.CHILDREN] = [Object(child, parent=self)]
-        #    else:
-        #        self[constants.CHILDREN].append(Object(child, parent=self))
+        if self.options.get(constants.HIERARCHY, False):
+            for child in api.object.children(self.node, self.scene.valid_types):
+                if not self.get(constants.CHILDREN):
+                    self[constants.CHILDREN] = [Object(child, parent=self)]
+                else:
+                    self[constants.CHILDREN].append(Object(child, parent=self))
 
     def _root_setup(self):
         """Applies to a root/scene object"""

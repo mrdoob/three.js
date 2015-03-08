@@ -303,6 +303,7 @@ def save_settings_export(properties):
         constants.EMBED_ANIMATION: properties.option_embed_animation,
         constants.LIGHTS: properties.option_lights,
         constants.CAMERAS: properties.option_cameras,
+        constants.HIERARCHY: properties.option_hierarchy,
 
         constants.MORPH_TARGETS: properties.option_animation_morph,
         constants.ANIMATION: properties.option_animation_skeletal,
@@ -447,6 +448,10 @@ def restore_settings_export(properties):
     properties.option_cameras = settings.get(
         constants.CAMERAS,
         constants.EXPORT_OPTIONS[constants.CAMERAS])
+
+    properties.option_hierarchy = settings.get(
+        constants.HIERARCHY,
+        constants.EXPORT_OPTIONS[constants.HIERARCHY])
     ## }
 
     ## Animation {
@@ -638,6 +643,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Export default scene cameras",
         default=False)
 
+    option_hierarchy = BoolProperty(
+        name="Hierarchy",
+        description="Export object hierarchy",
+        default=False)
+
     option_animation_morph = BoolProperty(
         name="Morph animation",
         description="Export animation (morphs)",
@@ -810,6 +820,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_lights')
         row.prop(self.properties, 'option_cameras')
         ## }
+
+        row = layout.row()
+        row.prop(self.properties, 'option_hierarchy')
 
         layout.separator()
 
