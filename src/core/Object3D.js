@@ -826,9 +826,13 @@ THREE.Object3D.prototype = {
 
     var quaternion = this.quaternion;
 
+    // Remember the last callback, since Object3D needs this to keep this.quaternion in sync
+    var lastcallback = rotation.onChangeCallback;
+
     rotation.onChange( function () {
 
       quaternion.setFromEuler( rotation, false );
+      lastcallback();
 
     } );
 
