@@ -21,8 +21,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -34,8 +33,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 17.647059,
-	"opacity" : 0.0
+	"specularCoef" : 17.647059
 	},
 
 	{
@@ -60,8 +58,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -73,8 +70,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -86,8 +82,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -99,8 +94,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -112,8 +106,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -125,8 +118,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -138,8 +130,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -151,8 +142,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -164,8 +154,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 17.647059,
-	"opacity" : 0.0
+	"specularCoef" : 17.647059
 	},
 
 	{
@@ -177,8 +166,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 17.647059,
-	"opacity" : 0.0
+	"specularCoef" : 17.647059
 	},
 
 	{
@@ -190,8 +178,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 17.647059,
-	"opacity" : 0.0
+	"specularCoef" : 17.647059
 	},
 
 	{
@@ -203,8 +190,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -216,8 +202,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 17.647059,
-	"opacity" : 0.0
+	"specularCoef" : 17.647059
 	},
 
 	{
@@ -242,8 +227,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 17.647059,
-	"opacity" : 0.0
+	"specularCoef" : 17.647059
 	},
 
 	{
@@ -281,8 +265,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -294,8 +277,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -307,8 +289,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -320,8 +301,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	},
 
 	{
@@ -333,8 +313,7 @@
 	"colorSpecular" : [0.025, 0.025, 0.025],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 98.039216,
-	"opacity" : 0.0
+	"specularCoef" : 98.039216
 	}],
 
     "buffers": "F50NoUv_bin.bin"

@@ -1179,13 +1179,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 ? object.material.materials[ geometryGroup.materialIndex ]
 			 : object.material;
 
-	};
+	}
 
-	function materialNeedsSmoothNormals ( material ) {
+	function materialNeedsFaceNormals ( material ) {
 
-		return material && material.shading !== undefined && material.shading === THREE.SmoothShading;
+		return material instanceof THREE.MeshPhongMaterial === false && material.shading === THREE.FlatShading;
 
-	};
+	}
 
 	// Buffer setting
 
@@ -1526,7 +1526,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var needsSmoothNormals = materialNeedsSmoothNormals( material );
+		var needsFaceNormals = materialNeedsFaceNormals( material );
 
 		var f, fl, fi, face,
 		vertexNormals, faceNormal, normal,
@@ -1671,19 +1671,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( material.morphNormals ) {
 
-						if ( needsSmoothNormals ) {
+						if ( needsFaceNormals ) {
+
+							n1 = morphNormals[ vk ].faceNormals[ chf ];
+							n2 = n1;
+							n3 = n1;
+
+						} else {
 
 							faceVertexNormals = morphNormals[ vk ].vertexNormals[ chf ];
 
 							n1 = faceVertexNormals.a;
 							n2 = faceVertexNormals.b;
 							n3 = faceVertexNormals.c;
-
-						} else {
-
-							n1 = morphNormals[ vk ].faceNormals[ chf ];
-							n2 = n1;
-							n3 = n1;
 
 						}
 
@@ -1880,7 +1880,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertexNormals = face.vertexNormals;
 				faceNormal = face.normal;
 
-				if ( vertexNormals.length === 3 && needsSmoothNormals ) {
+				if ( vertexNormals.length === 3 && needsFaceNormals === false ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
@@ -2343,7 +2343,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglNormalBuffer );
 
-			if ( material.shading === THREE.FlatShading ) {
+			if ( material instanceof THREE.MeshPhongMaterial === false &&
+				   material.shading === THREE.FlatShading ) {
 
 				var nx, ny, nz,
 					nax, nbx, ncx, nay, nby, ncy, naz, nbz, ncz,
@@ -3233,9 +3234,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function painterSortStable ( a, b ) {
 
-		if ( a.renderOrder !== b.renderOrder ) {
+		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-			return a.renderOrder - b.renderOrder;
+			return a.object.renderOrder - b.object.renderOrder;
 
 		} else if ( a.material.id !== b.material.id ) {
 
@@ -3255,9 +3256,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function reversePainterSortStable ( a, b ) {
 
-		if ( a.renderOrder !== b.renderOrder ) {
+		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
-			return a.renderOrder - b.renderOrder;
+			return a.object.renderOrder - b.object.renderOrder;
 
 		} if ( a.z !== b.z ) {
 
@@ -3417,6 +3418,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.setDepthTest( true );
 		state.setDepthWrite( true );
+		state.setColorWrite( true );
 
 		// _gl.finish();
 
@@ -4164,6 +4166,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			useFog: material.fog,
 			fogExp: fog instanceof THREE.FogExp2,
 
+			flatShading: material.shading === THREE.FlatShading,
+
 			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: _logarithmicDepthBuffer,
 
@@ -4330,6 +4334,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.setDepthTest( material.depthTest );
 		state.setDepthWrite( material.depthWrite );
+		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 	}

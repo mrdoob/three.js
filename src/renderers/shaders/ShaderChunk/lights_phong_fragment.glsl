@@ -1,11 +1,22 @@
-vec3 normal = normalize( vNormal );
-vec3 viewPosition = normalize( vViewPosition );
+#ifndef FLAT_SHADED
 
-#ifdef DOUBLE_SIDED
+	vec3 normal = normalize( vNormal );
 
-	normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
+	#ifdef DOUBLE_SIDED
+
+		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
+
+	#endif
+
+#else
+
+	vec3 fdx = dFdx( vViewPosition );
+	vec3 fdy = dFdy( vViewPosition );
+	vec3 normal = normalize( cross( fdx, fdy ) );
 
 #endif
+
+vec3 viewPosition = normalize( vViewPosition );
 
 #ifdef USE_NORMALMAP
 

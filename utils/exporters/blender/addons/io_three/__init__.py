@@ -26,7 +26,8 @@ from bpy.props import (
     EnumProperty,
     BoolProperty,
     FloatProperty,
-    IntProperty
+    IntProperty,
+    StringProperty
 )
 
 from . import constants
@@ -41,7 +42,7 @@ SETTINGS_FILE_EXPORT = 'three_settings_export.js'
 bl_info = {
     'name': "Three.js Format",
     'author': "repsac, mrdoob, yomotsu, mpk, jpweeks",
-    'version': (1, 2, 3),
+    'version': (1, 3, 1),
     'blender': (2, 7, 3),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
@@ -295,12 +296,14 @@ def save_settings_export(properties):
         constants.COMPRESSION: properties.option_compression,
         constants.INDENT: properties.option_indent,
         constants.COPY_TEXTURES: properties.option_copy_textures,
+        constants.TEXTURE_FOLDER: properties.option_texture_folder,
 
         constants.SCENE: properties.option_export_scene,
         #constants.EMBED_GEOMETRY: properties.option_embed_geometry,
         constants.EMBED_ANIMATION: properties.option_embed_animation,
         constants.LIGHTS: properties.option_lights,
         constants.CAMERAS: properties.option_cameras,
+        constants.HIERARCHY: properties.option_hierarchy,
 
         constants.MORPH_TARGETS: properties.option_animation_morph,
         constants.ANIMATION: properties.option_animation_skeletal,
@@ -420,6 +423,10 @@ def restore_settings_export(properties):
         constants.COPY_TEXTURES,
         constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
 
+    properties.option_texture_folder = settings.get(
+        constants.TEXTURE_FOLDER,
+        constants.EXPORT_OPTIONS[constants.TEXTURE_FOLDER])
+
     properties.option_embed_animation = settings.get(
         constants.EMBED_ANIMATION,
         constants.EXPORT_OPTIONS[constants.EMBED_ANIMATION])
@@ -441,6 +448,10 @@ def restore_settings_export(properties):
     properties.option_cameras = settings.get(
         constants.CAMERAS,
         constants.EXPORT_OPTIONS[constants.CAMERAS])
+
+    properties.option_hierarchy = settings.get(
+        constants.HIERARCHY,
+        constants.EXPORT_OPTIONS[constants.HIERARCHY])
     ## }
 
     ## Animation {
@@ -617,6 +628,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Copy textures",
         default=constants.EXPORT_OPTIONS[constants.COPY_TEXTURES])
 
+    option_texture_folder = StringProperty(
+        name="Texture folder",
+        description="add this folder to textures path",
+        default=constants.EXPORT_OPTIONS[constants.TEXTURE_FOLDER])
+
     option_lights = BoolProperty(
         name="Lights",
         description="Export default scene lights",
@@ -625,6 +641,11 @@ class ExportThree(bpy.types.Operator, ExportHelper):
     option_cameras = BoolProperty(
         name="Cameras",
         description="Export default scene cameras",
+        default=False)
+
+    option_hierarchy = BoolProperty(
+        name="Hierarchy",
+        description="Export object hierarchy",
         default=False)
 
     option_animation_morph = BoolProperty(
@@ -800,6 +821,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_cameras')
         ## }
 
+        row = layout.row()
+        row.prop(self.properties, 'option_hierarchy')
+
         layout.separator()
 
         ## Settings {
@@ -811,6 +835,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_copy_textures')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_texture_folder')
 
         row = layout.row()
         row.prop(self.properties, 'option_scale')

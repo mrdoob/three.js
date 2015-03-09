@@ -29,6 +29,8 @@ THREE.Material = function () {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.colorWrite = true;
+
 	this.polygonOffset = false;
 	this.polygonOffsetFactor = 0;
 	this.polygonOffsetUnits = 0;
@@ -131,6 +133,7 @@ THREE.Material.prototype = {
 			output.color = this.color.getHex();
 			output.emissive = this.emissive.getHex();
 			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
+			if ( this.shading !== THREE.SmoothShading ) output.shading = this.shading;
 			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
 			if ( this.side !== THREE.FrontSide ) output.side = this.side;
 
@@ -141,12 +144,12 @@ THREE.Material.prototype = {
 			output.specular = this.specular.getHex();
 			output.shininess = this.shininess;
 			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
+			if ( this.shading !== THREE.SmoothShading ) output.shading = this.shading;
 			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
 			if ( this.side !== THREE.FrontSide ) output.side = this.side;
 
 		} else if ( this instanceof THREE.MeshNormalMaterial ) {
 
-			if ( this.shading !== THREE.FlatShading ) output.shading = this.shading;
 			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
 			if ( this.side !== THREE.FrontSide ) output.side = this.side;
 
@@ -160,10 +163,10 @@ THREE.Material.prototype = {
 			output.size  = this.size;
 			output.sizeAttenuation = this.sizeAttenuation;
 			output.color = this.color.getHex();
-			
+
 			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
 			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
-			
+
 		} else if ( this instanceof THREE.ShaderMaterial ) {
 
 			output.uniforms = this.uniforms;
