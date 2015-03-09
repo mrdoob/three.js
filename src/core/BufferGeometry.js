@@ -896,13 +896,7 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = attributes[ key ];
 
-			var array = [], typeArray = attribute.array;
-
-			for ( var i = 0, l = typeArray.length; i < l; i ++ ) {
-
-				array[ i ] = typeArray[ i ];
-
-			}
+			var array = Array.prototype.slice.call( attribute.array );
 
 			output.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
