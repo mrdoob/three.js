@@ -227,6 +227,6 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 #else
 
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight + emissive;
+	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor ) + totalSpecularLight + emissive;
 
 #endif
