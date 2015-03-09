@@ -269,7 +269,7 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
-				"outgoingLight.xyz += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
+				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -526,11 +526,11 @@ THREE.ShaderSkin = {
 
 					"#ifdef VERSION1",
 
-						"vec3 nonblurColor = sqrt(outgoingLight.xyz );",
+						"vec3 nonblurColor = sqrt(outgoingLight );",
 
 					"#else",
 
-						"vec3 nonblurColor = outgoingLight.xyz;",
+						"vec3 nonblurColor = outgoingLight;",
 
 					"#endif",
 
