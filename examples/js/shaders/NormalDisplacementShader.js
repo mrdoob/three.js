@@ -391,7 +391,7 @@ THREE.NormalDisplacementShader = {
 
 		"	#else",
 
-		"		outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse ) + totalSpecularLight;",
+		"		outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor ) + totalSpecularLight;",
 
 		"	#endif",
 
