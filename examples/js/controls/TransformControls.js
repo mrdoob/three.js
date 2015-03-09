@@ -726,8 +726,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
@@ -737,6 +735,8 @@
 			if ( intersect ) {
 
 				axis = intersect.object.name;
+
+				event.preventDefault();
 
 			}
 
@@ -754,9 +754,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-			event.stopPropagation();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
@@ -764,6 +761,9 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+
+					event.preventDefault();
+					event.stopPropagation();
 
 					scope.dispatchEvent( mouseDownEvent );
 
