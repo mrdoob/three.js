@@ -87,7 +87,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 
-			"	outgoingLight.rgb = diffuseColor.rgb;", // simple shader
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],		// TODO: Light map on an otherwise unlit surface doesn't make sense.
 				THREE.ShaderChunk[ "envmap_fragment" ],
@@ -196,7 +196,7 @@ THREE.ShaderLib = {
 
 			"   vec3 outgoingLight = vec3( 0.0, 0.0, 0.0 );",	// outgoing light does not have an alpha, the surface does
 			"	vec4 diffuseColor = vec4( 1.0, 1.0, 1.0, opacity );",
-	
+
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
@@ -421,7 +421,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 
-			"	outgoingLight.rgb = diffuseColor.rgb;", // simple shader
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
@@ -713,7 +713,7 @@ THREE.ShaderLib = {
 				"vec3 direction = normalize( vWorldPosition );",
 				"vec2 sampleUV;",
 				"sampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );",
-				"sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;", 
+				"sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
 				"gl_FragColor = texture2D( tEquirect, sampleUV );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
