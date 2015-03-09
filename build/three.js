@@ -12680,8 +12680,9 @@ THREE.ObjectLoader.prototype = {
 				switch ( data.type ) {
 
 					case 'PlaneGeometry':
+					case 'PlaneBufferGeometry':
 
-						geometry = new THREE.PlaneGeometry(
+						geometry = new THREE[ data.type ](
 							data.width,
 							data.height,
 							data.widthSegments,
