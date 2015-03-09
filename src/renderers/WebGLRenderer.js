@@ -2590,7 +2590,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_this.info.render.calls ++;
 				_this.info.render.vertices += position.array.length / position.itemSize;
-				_this.info.render.faces += position.array.length / ( 3 * position.itemsize );
+				_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
 
 			}
 
