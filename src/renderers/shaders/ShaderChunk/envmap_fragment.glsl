@@ -47,7 +47,7 @@
 
 	#ifdef ENVMAP_BLENDING_MULTIPLY
 
-		outgoingLight = mix( outgoingLight, outgoingLight. * envColor.xyz, specularStrength * reflectivity );
+		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
 
 	#elif defined( ENVMAP_BLENDING_MIX )
 
