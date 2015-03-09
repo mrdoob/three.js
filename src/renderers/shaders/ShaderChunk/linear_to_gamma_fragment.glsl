@@ -1,1 +1,2 @@
-	outgoingLight.xyz = linearToOutput( outgoingLight.xyz );
+
+	outgoingLight = linearToOutput( outgoingLight );
