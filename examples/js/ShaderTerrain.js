@@ -253,7 +253,7 @@ THREE.ShaderTerrain = {
 
 				"#endif",
 
-				"outgoingLight.rgb += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse + totalSpecularLight );",
+				"outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse + totalSpecularLight );",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
