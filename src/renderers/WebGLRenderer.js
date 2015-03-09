@@ -3939,7 +3939,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( attribute.updateRange === undefined || attribute.updateRange.count === -1 ) { // Not using update ranges
 
-						_gl.bufferSubData( bufferType, 0, attribute.array );
+						if ( attribute instanceof THREE.DynamicBufferAttribute ) {
+
+							_gl.bufferSubData( bufferType, 0, attribute.array );
+
+						} else {
+
+							_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
+
+						}
 
 					} else if ( attribute.updateRange.count === 0 ) {
 
