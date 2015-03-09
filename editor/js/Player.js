@@ -19,7 +19,7 @@ var Player = function ( editor ) {
 
 		if ( player.dom === undefined ) return;
 
-		player.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		player.setSize( container.dom.clientWidth, container.dom.clientHeight );
 
 	} );
 
@@ -27,9 +27,8 @@ var Player = function ( editor ) {
 
 		container.setDisplay( '' );
 
-		player.setVR( editor.config.getKey( 'project/vr' ) );
 		player.load( editor.toJSON() );
-		player.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		player.setSize( container.dom.clientWidth, container.dom.clientHeight );
 		player.play();
 
 		container.dom.appendChild( player.dom );

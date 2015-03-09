@@ -5,6 +5,7 @@
 THREE.ObjectLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.texturePath = '';
 
 };
 
@@ -14,7 +15,7 @@ THREE.ObjectLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if ( this.texturePath === undefined ) {
+		if ( this.texturePath === '' ) {
 
 			this.texturePath = url.substring( 0, url.lastIndexOf( '/' ) + 1 );
 
@@ -48,7 +49,11 @@ THREE.ObjectLoader.prototype = {
 
 		var geometries = this.parseGeometries( json.geometries );
 
-		var images = this.parseImages( json.images, onLoad );
+		var images = this.parseImages( json.images, function () {
+
+			if ( onLoad !== undefined ) onLoad( object );
+
+		} );
 		var textures  = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 		var object = this.parseObject( json.object, geometries, materials );
@@ -241,6 +246,9 @@ THREE.ObjectLoader.prototype = {
 				if ( data.bumpMap !== undefined ) {
 
 					material.bumpMap = getTexture( data.bumpMap );
+					if ( data.bumpScale ) {
+						material.bumpScale = new THREE.Vector2( data.bumpScale, data.bumpScale );
+					}
 
 				}
 
@@ -259,6 +267,9 @@ THREE.ObjectLoader.prototype = {
 				if ( data.normalMap !== undefined ) {
 
 					material.normalMap = getTexture( data.normalMap );
+					if ( data.normalScale ) {
+						material.normalScale = new THREE.Vector2( data.normalScale, data.normalScale );
+					}
 
 				}
 
@@ -311,8 +322,9 @@ THREE.ObjectLoader.prototype = {
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
 				var image = json[ i ];
+				var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.texturePath + image.url;
 
-				images[ image.uuid ] = loadImage( scope.texturePath + image.url );
+				images[ image.uuid ] = loadImage( path );
 
 			}
 
@@ -461,7 +473,7 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Line':
 
-					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ) );
+					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
 
 					break;
 

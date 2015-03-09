@@ -82,8 +82,8 @@ THREE.VREffect = function ( renderer, done ) {
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.clientWidth;
-		var rendererHeight = renderer.domElement.clientHeight;
+		var rendererWidth = renderer.context.drawingBufferWidth;
+		var rendererHeight = renderer.context.drawingBufferHeight;
 		var eyeDivisionLine = rendererWidth / 2;
 
 		renderer.enableScissorTest( true );
@@ -165,7 +165,7 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 		if ( canvas.mozRequestFullScreen ) {
 			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
-		} else {
+		} else if ( canvas.webkitRequestFullscreen ) {
 			canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
 		}
 	};

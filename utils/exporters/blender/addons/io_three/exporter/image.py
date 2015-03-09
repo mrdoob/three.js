@@ -11,7 +11,8 @@ class Image(base_classes.BaseNode):
         logger.debug("Image().__init__(%s)", node)
         base_classes.BaseNode.__init__(self, node, parent, constants.IMAGE)
 
-        self[constants.URL] = api.image.file_name(self.node)
+        texture_folder = self.scene.options.get(constants.TEXTURE_FOLDER, "")
+        self[constants.URL] = os.path.join(texture_folder, api.image.file_name(self.node))
 
     @property
     def destination(self):

@@ -23,6 +23,18 @@ def batch_mode():
     return bpy.context.area is None
 
 
+def data(node):
+    """
+
+    :param node: name of an object node
+    :returns: the data block of the node
+
+    """
+    try:
+        return bpy.data.objects[node].data
+    except KeyError:
+        pass
+
 def init():
     """Initializing the api module. Required first step before
     initializing the actual export process.

@@ -3035,9 +3035,9 @@ THREE.ColladaLoader = function () {
 
 				} else if ( vcount === 4 ) {
 
-					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], [ ns[0], ns[1], ns[3]], cs.length ? [ cs[0], cs[1], cs[3]] : new THREE.Color() ) );
+					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], [ ns[0].clone(), ns[1].clone(), ns[3].clone() ], cs.length ? [ cs[0], cs[1], cs[3] ] : new THREE.Color() ) );
 
-					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], [ ns[1], ns[2], ns[3]], cs.length ? [ cs[1], cs[2], cs[3]] : new THREE.Color() ) );
+					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], [ ns[1].clone(), ns[2].clone(), ns[3].clone() ], cs.length ? [ cs[1], cs[2], cs[3] ] : new THREE.Color() ) );
 
 				} else if ( vcount > 4 && options.subdivideFaces ) {
 
@@ -3048,9 +3048,7 @@ THREE.ColladaLoader = function () {
 
 					for ( k = 1; k < vcount - 1; ) {
 
-						// FIXME: normals don't seem to be quite right
-
-						faces.push( new THREE.Face3( vs[0], vs[k], vs[k + 1], [ ns[0], ns[k ++], ns[k] ], clr ) );
+						faces.push( new THREE.Face3( vs[0], vs[k], vs[k + 1], [ ns[0].clone(), ns[k ++].clone(), ns[k].clone() ], clr ) );
 
 					}
 
