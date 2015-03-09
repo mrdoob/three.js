@@ -8557,13 +8557,13 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( this.boundingBox instanceof THREE.Box3 ) {
+		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
 
 		}
 
-		if ( this.boundingSphere instanceof THREE.Sphere ) {
+		if ( this.boundingSphere !== null ) {
 
 			this.computeBoundingSphere();
 
@@ -8573,7 +8573,13 @@ THREE.BufferGeometry.prototype = {
 
 	center: function () {
 
-		// TODO
+		this.computeBoundingBox();
+
+		var offset = this.boundingBox.center().negate();
+
+		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
+
+		return offset;
 
 	},
 
@@ -9369,13 +9375,7 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = attributes[ key ];
 
-			var array = [], typeArray = attribute.array;
-
-			for ( var i = 0, l = typeArray.length; i < l; i ++ ) {
-
-				array[ i ] = typeArray[ i ];
-
-			}
+			var array = Array.prototype.slice.call( attribute.array );
 
 			output.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
@@ -9528,17 +9528,20 @@ THREE.Geometry.prototype = {
 
 		}
 
-		if ( this.boundingBox instanceof THREE.Box3 ) {
+		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
 
 		}
 
-		if ( this.boundingSphere instanceof THREE.Sphere ) {
+		if ( this.boundingSphere !== null ) {
 
 			this.computeBoundingSphere();
 
 		}
+
+		this.verticesNeedUpdate = true;
+		this.normalsNeedUpdate = true;
 
 	},
 
@@ -9636,13 +9639,9 @@ THREE.Geometry.prototype = {
 
 		this.computeBoundingBox();
 
-		var offset = new THREE.Vector3();
+		var offset = this.boundingBox.center().negate();
 
-		offset.addVectors( this.boundingBox.min, this.boundingBox.max );
-		offset.multiplyScalar( - 0.5 );
-
-		this.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
-		this.computeBoundingBox();
+		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
 
 		return offset;
 
