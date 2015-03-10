@@ -5,10 +5,10 @@ ROUND = constants.DEFAULT_PRECISION
 
 ## THREE override function
 def _json_floatstr(o):
-    s = str(o)
-
     if ROUND is None:
-        return s
+        return str(o)
+        
+    s = str(round(o, ROUND))
 
     if '.' in s and len(s[s.index('.'):]) > ROUND - 1:
         s = '%.{0}f'.format(ROUND) % o

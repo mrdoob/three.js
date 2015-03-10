@@ -27,6 +27,8 @@ def parse_args():
 
 def main():
     args = parse_args()
+    args[constants.ENABLE_PRECISION] = True
+    args[constants.INDENT] = True
     if args[constants.SCENE]:
         io_three.exporter.export_scene(args['filepath'], args)
     else:
