@@ -2,19 +2,18 @@
  * @author WestLangley / http://github.com/WestLangley
  * @param object THREE.Mesh whose geometry will be used
  * @param hex line color
- * @param thresholdAngle the minimum difference in degree between two
- * faces needed to create an edge. A value of 10 means that an edge is only
- * created if two face normals are at least at a 10° angle to one another
+ * @param thresholdAngle  the minimim angle (in degrees),
+ * between the face normals of adjacent faces,
+ * that is required to render an edge. A value of 10 means
+ * an edge is only rendered if the angle is at least 10 degrees.
  */
 
 THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
-	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 10;
+	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 0.1;
 
-	thresholdAngle = thresholdAngle * 0.0175; //deg -> radian
-	var thresholdDot = Math.cos( thresholdAngle );
-
+	var thresholdDot = Math.cos( THREE.Math.degToRad( thresholdAngle ) );
 
 	var edge = [ 0, 0 ], hash = {};
 	var sortFunction = function ( a, b ) { return a - b };
