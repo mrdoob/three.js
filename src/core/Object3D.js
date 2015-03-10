@@ -844,6 +844,47 @@ THREE.Object3D.prototype = {
 
   },
 
+  bindObjectRotation: function( object ) {
+
+    delete this.rotation;
+    delete this.quaternion;
+
+    Object.defineProperty( this, "rotation", {
+      enumerable: true,
+      configurable: true,
+      value: object.rotation
+    });
+    Object.defineProperty( this, "quaternion", {
+      enumerable: true,
+      configurable: true,
+      value: object.quaternion
+    });
+
+    var quaternion = object.quaternion;
+        rotation = object.rotation;
+
+    // Remember the last callback, since Object3D needs this to keep this.quaternion in sync
+    var lastrotcallback = object.rotation.onChangeCallback;
+        lastquatcallback = object.quaternion.onChangeCallback;
+
+    var onRotationChange = function () {
+
+      this.quaternion.setFromEuler( rotation, false );
+      object.quaternion.setFromEuler( rotation, false );
+      lastrotcallback();
+
+    }.bind(this);
+
+    var onQuaternionChange = function () {
+
+      this.rotation.setFromQuaternion( quaternion, undefined, false );
+      object.rotation.setFromQuaternion( quaternion, undefined, false );
+      lastquatcallback();
+
+    }.bind(this);
+
+  },
+
   bindScale: function( scale ) {
 
     delete this.scale;
