@@ -4,6 +4,6 @@
 
 	texelColor.xyz = inputToLinear( texelColor.xyz );
 
-	gl_FragColor = gl_FragColor * texelColor;
+	diffuseColor *= texelColor;
 
 #endif
