@@ -632,6 +632,23 @@
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
 
+		this.dispose = function () {
+			domElement.removeEventListener( "mousedown", onPointerDown );
+			domElement.removeEventListener( "touchstart", onPointerDown );
+
+			domElement.removeEventListener( "mousemove", onPointerHover );
+			domElement.removeEventListener( "touchmove", onPointerHover );
+
+			domElement.removeEventListener( "mousemove", onPointerMove );
+			domElement.removeEventListener( "touchmove", onPointerMove );
+
+			domElement.removeEventListener( "mouseup", onPointerUp );
+			domElement.removeEventListener( "mouseout", onPointerUp );
+			domElement.removeEventListener( "touchend", onPointerUp );
+			domElement.removeEventListener( "touchcancel", onPointerUp );
+			domElement.removeEventListener( "touchleave", onPointerUp );
+		};
+
 		this.attach = function ( object ) {
 
 			scope.object = object;
