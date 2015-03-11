@@ -53,7 +53,7 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: scale
-		},
+		}
 	} );
 
 	this.rotationAutoUpdate = true;

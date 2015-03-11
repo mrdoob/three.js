@@ -4755,29 +4755,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
-	function markUniformsLightsNeedsUpdate ( uniforms, boolean ) {
+	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
 
-		uniforms.ambientLightColor.needsUpdate = boolean;
+		uniforms.ambientLightColor.needsUpdate = value;
 
-		uniforms.directionalLightColor.needsUpdate = boolean;
-		uniforms.directionalLightDirection.needsUpdate = boolean;
+		uniforms.directionalLightColor.needsUpdate = value;
+		uniforms.directionalLightDirection.needsUpdate = value;
 
-		uniforms.pointLightColor.needsUpdate = boolean;
-		uniforms.pointLightPosition.needsUpdate = boolean;
-		uniforms.pointLightDistance.needsUpdate = boolean;
-		uniforms.pointLightDecay.needsUpdate = boolean;
+		uniforms.pointLightColor.needsUpdate = value;
+		uniforms.pointLightPosition.needsUpdate = value;
+		uniforms.pointLightDistance.needsUpdate = value;
+		uniforms.pointLightDecay.needsUpdate = value;
 
-		uniforms.spotLightColor.needsUpdate = boolean;
-		uniforms.spotLightPosition.needsUpdate = boolean;
-		uniforms.spotLightDistance.needsUpdate = boolean;
-		uniforms.spotLightDirection.needsUpdate = boolean;
-		uniforms.spotLightAngleCos.needsUpdate = boolean;
-		uniforms.spotLightExponent.needsUpdate = boolean;
-		uniforms.spotLightDecay.needsUpdate = boolean;
+		uniforms.spotLightColor.needsUpdate = value;
+		uniforms.spotLightPosition.needsUpdate = value;
+		uniforms.spotLightDistance.needsUpdate = value;
+		uniforms.spotLightDirection.needsUpdate = value;
+		uniforms.spotLightAngleCos.needsUpdate = value;
+		uniforms.spotLightExponent.needsUpdate = value;
+		uniforms.spotLightDecay.needsUpdate = value;
 
-		uniforms.hemisphereLightSkyColor.needsUpdate = boolean;
-		uniforms.hemisphereLightGroundColor.needsUpdate = boolean;
-		uniforms.hemisphereLightDirection.needsUpdate = boolean;
+		uniforms.hemisphereLightSkyColor.needsUpdate = value;
+		uniforms.hemisphereLightGroundColor.needsUpdate = value;
+		uniforms.hemisphereLightDirection.needsUpdate = value;
 
 	}
 
