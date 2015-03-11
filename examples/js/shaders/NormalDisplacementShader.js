@@ -387,7 +387,7 @@ THREE.NormalDisplacementShader = {
 
 		"	#ifdef METAL",
 
-		"		outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse + totalSpecularLight );",
+		"		outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor + totalSpecularLight );",
 
 		"	#else",
 
@@ -417,7 +417,7 @@ THREE.NormalDisplacementShader = {
 
 		"		#endif",
 
-		"		outgoingLight = mix( outgoingLight.xyz, cubeColor.xyz, specularTex.r * reflectivity );",
+		"		outgoingLight = mix( outgoingLight, cubeColor.xyz, specularTex.r * reflectivity );",
 
 		"	}",
 
