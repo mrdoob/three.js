@@ -17904,7 +17904,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	 // camera matrices cache
 
 	_projScreenMatrix = new THREE.Matrix4(),
-	_projScreenMatrixPS = new THREE.Matrix4(),
 
 	_vector3 = new THREE.Vector3(),
 
@@ -18072,11 +18071,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
 	var _vertexShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_FLOAT );
-	var _vertexShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_FLOAT );
 
 	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
 	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
-	var _fragmentShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_FLOAT );
 
 	var getCompressedTextureFormats = ( function () {
 
@@ -18792,8 +18789,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
 		geometry.__colorArray = new Float32Array( nvertices * 3 );
 
-		geometry.__sortArray = [];
-
 		geometry.__webglParticleCount = nvertices;
 
 		initCustomAttributes( object );
@@ -18974,10 +18969,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertexArray = geometry.__vertexArray,
 		colorArray = geometry.__colorArray,
 
-		sortArray = geometry.__sortArray,
-
 		dirtyVertices = geometry.verticesNeedUpdate,
-		dirtyElements = geometry.elementsNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
 
 		customAttributes = geometry.__webglCustomAttributesList,
@@ -19329,7 +19321,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_skin = 0,
 		offset_morphTarget = 0,
 		offset_custom = 0,
-		offset_customSrc = 0,
 
 		value,
 
@@ -19368,8 +19359,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
 		obj_uvs2 = geometry.faceVertexUvs[ 1 ],
-
-		obj_colors = geometry.colors,
 
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
@@ -19793,7 +19782,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( ! customAttribute.__original.needsUpdate ) continue;
 
 				offset_custom = 0;
-				offset_customSrc = 0;
 
 				if ( customAttribute.size === 1 ) {
 
