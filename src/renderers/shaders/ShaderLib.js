@@ -173,7 +173,6 @@ THREE.ShaderLib = {
 
 			"uniform vec3 diffuse;",
 			"uniform vec3 emissive;",
-
 			"uniform float opacity;",
 
 			"varying vec3 vLightFront;",
@@ -320,11 +319,10 @@ THREE.ShaderLib = {
 			"#define PHONG",
 
 			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
 			"uniform vec3 emissive;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
+			"uniform float opacity;",
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
