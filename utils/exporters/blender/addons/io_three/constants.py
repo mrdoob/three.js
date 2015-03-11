@@ -329,3 +329,4 @@ DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee,
 
 DOUBLE_SIDED = 'doubleSided'
 
+EXPORT_SETTINGS_KEY = 'threeExportSettings'
