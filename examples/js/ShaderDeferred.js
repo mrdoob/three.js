@@ -241,7 +241,7 @@ THREE.ShaderDeferred = {
 
 					"} else {",
 
-						"outgoingLight = mix( outgoingLight.xyz, diffuseColor.xyz * cubeColor.xyz, specularStrength * reflectivity );",
+						"outgoingLight = mix( outgoingLight, diffuseColor.xyz * cubeColor.xyz, specularStrength * reflectivity );",
 
 					"}",
 
@@ -270,7 +270,7 @@ THREE.ShaderDeferred = {
 
 				// diffuse color
 
-				"gl_FragColor.x = vec3_to_float( compressionScale * outgoingLight.xyz );",
+				"gl_FragColor.x = vec3_to_float( compressionScale * outgoingLight );",
 
 				// specular color
 
