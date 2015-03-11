@@ -172,9 +172,9 @@ THREE.ShaderLib = {
 		fragmentShader: [
 
 			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
 			"uniform vec3 emissive;",
+
+			"uniform float opacity;",
 
 			"varying vec3 vLightFront;",
 
