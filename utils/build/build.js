@@ -1,7 +1,7 @@
 var fs = require("fs");
 var path = require("path");
 var argparse =  require( "argparse" );
-var uglify = require("uglify-js2");
+var uglify = require("uglify-js");
 var spawn = require('child_process').spawn;
 
 function main() {
@@ -34,7 +34,8 @@ function main() {
 
 	var buffer = [];
 	var sources = [];
-			
+	// TODO - sources are not being used. should remove and make sourcemaps work with uglify
+
 	if ( args.amd ){
 		buffer.push('function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
 	};
@@ -79,11 +80,11 @@ function main() {
 	
 	if ( !args.minify ){
 
-		fs.writeFileSync( output,temp, 'utf8' );
+		fs.writeFileSync( output, temp, 'utf8' );
 
 	} else {
 
-		var result = uglify.minify( sources, { outSourceMap: sourcemap } );
+		var result = uglify.minify( temp, { outSourceMap: sourcemap, fromString: true } );
 		
 		fs.writeFileSync( output, '// threejs.org/license\n' + result.code + sourcemapping, 'utf8' );
 
