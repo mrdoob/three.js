@@ -179,7 +179,7 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 
  };
 
-THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
+THREE.Path.prototype.getSpacedPoints = function ( divisions ) {
 
 	if ( ! divisions ) divisions = 40;
 
@@ -633,7 +633,6 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			betterShapeHoles[sIdx] = [];
 		}
 		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-			var sh = newShapes[sIdx];
 			var sho = newShapeHoles[sIdx];
 			for (var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 				var ho = sho[hIdx];

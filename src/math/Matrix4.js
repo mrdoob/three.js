@@ -470,7 +470,7 @@ THREE.Matrix4.prototype = {
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
-			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
 
 				v1.x = array[ j ];
 				v1.y = array[ j + 1 ];
@@ -682,31 +682,31 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	translate: function ( v ) {
+	translate: function () {
 
 		THREE.error( 'THREE.Matrix4: .translate() has been removed.' );
 
 	},
 
-	rotateX: function ( angle ) {
+	rotateX: function () {
 
 		THREE.error( 'THREE.Matrix4: .rotateX() has been removed.' );
 
 	},
 
-	rotateY: function ( angle ) {
+	rotateY: function () {
 
 		THREE.error( 'THREE.Matrix4: .rotateY() has been removed.' );
 
 	},
 
-	rotateZ: function ( angle ) {
+	rotateZ: function () {
 
 		THREE.error( 'THREE.Matrix4: .rotateZ() has been removed.' );
 
 	},
 
-	rotateByAxis: function ( axis, angle ) {
+	rotateByAxis: function () {
 
 		THREE.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 

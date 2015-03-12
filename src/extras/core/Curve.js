@@ -287,7 +287,7 @@ THREE.Curve.Utils = {
 
 	},
 
-	tangentSpline: function ( t, p0, p1, p2, p3 ) {
+	tangentSpline: function ( t ) {
 
 		// To check if my formulas are correct
 

@@ -134,7 +134,7 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function() {
 
 	THREE.Mesh.prototype.updateMatrixWorld.call( this, true );
 

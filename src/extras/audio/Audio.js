@@ -29,7 +29,7 @@ THREE.Audio.prototype.load = function ( file ) {
 	var request = new XMLHttpRequest();
 	request.open( 'GET', file, true );
 	request.responseType = 'arraybuffer';
-	request.onload = function ( e ) {
+	request.onload = function () {
 
 		scope.context.decodeAudioData( this.response, function ( buffer ) {
 

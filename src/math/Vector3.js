@@ -714,13 +714,13 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setEulerFromRotationMatrix: function ( m, order ) {
+	setEulerFromRotationMatrix: function () {
 
 		THREE.error( 'THREE.Vector3: .setEulerFromRotationMatrix() has been removed. Use Euler.setFromRotationMatrix() instead.' );
 
 	},
 
-	setEulerFromQuaternion: function ( q, order ) {
+	setEulerFromQuaternion: function () {
 
 		THREE.error( 'THREE.Vector3: .setEulerFromQuaternion() has been removed. Use Euler.setFromQuaternion() instead.' );
 

@@ -43,11 +43,11 @@ THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 THREE.VertexTangentsHelper.prototype = Object.create( THREE.Line.prototype );
 THREE.VertexTangentsHelper.prototype.constructor = THREE.VertexTangentsHelper;
 
-THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
+THREE.VertexTangentsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 
-	return function( object ) {
+	return function() {
 
 		var keys = [ 'a', 'b', 'c', 'd' ];
 

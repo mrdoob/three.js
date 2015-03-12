@@ -12,7 +12,7 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 	this.onProgress = onProgress;
 	this.onError = onError;
 
-	this.itemStart = function ( url ) {
+	this.itemStart = function () {
 
 		total ++;
 

@@ -199,21 +199,21 @@ THREE.Projector = function () {
 
 	THREE.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
 
-	this.projectVector = function ( vector, camera ) {
+	this.projectVector = function () {
 
 		THREE.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
 		vector.project( camera );
 
 	};
 
-	this.unprojectVector = function ( vector, camera ) {
+	this.unprojectVector = function () {
 
 		THREE.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
 		vector.unproject( camera );
 
 	};
 
-	this.pickingRay = function ( vector, camera ) {
+	this.pickingRay = function () {
 
 		THREE.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
 

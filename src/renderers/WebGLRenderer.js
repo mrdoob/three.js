@@ -1184,9 +1184,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer setting
 
-	function setParticleBuffers ( geometry, hint, object ) {
+	function setParticleBuffers ( geometry, hint ) {
 
-		var v, c, vertex, offset, index, color,
+		var v, c, vertex, offset, color,
 
 		vertices = geometry.vertices,
 		vl = vertices.length,
@@ -1202,7 +1202,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		customAttributes = geometry.__webglCustomAttributesList,
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -1361,7 +1361,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		customAttributes = geometry.__webglCustomAttributesList,
 
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -1521,20 +1521,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var needsFaceNormals = materialNeedsFaceNormals( material );
 
 		var f, fl, fi, face,
-		vertexNormals, faceNormal, normal,
+		vertexNormals, faceNormal,
 		vertexColors, faceColor,
 		vertexTangents,
-		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
+		uv, uv2, v1, v2, v3, t1, t2, t3, n1, n2, n3,
 		c1, c2, c3,
-		sw1, sw2, sw3, sw4,
-		si1, si2, si3, si4,
-		sa1, sa2, sa3, sa4,
-		sb1, sb2, sb3, sb4,
-		m, ml, i, il,
+		sw1, sw2, sw3,
+		si1, si2, si3,
+		i, il,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
 		nka, chf, faceVertexNormals,
-		a,
 
 		vertexIndex = 0,
 
@@ -4011,7 +4008,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || customAttributesDirty ) {
 
-				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
+				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW );
 
 			}
 
@@ -5196,11 +5193,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupLights ( lights ) {
 
-		var l, ll, light, n,
+		var l, ll, light,
 		r = 0, g = 0, b = 0,
 		color, skyColor, groundColor,
-		intensity,  intensitySq,
-		position,
+		intensity,
 		distance,
 
 		zlights = _lights,

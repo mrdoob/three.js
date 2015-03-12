@@ -15,8 +15,6 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	var geometry = new THREE.Geometry();
 
-	var vertices = object.geometry.vertices;
-
 	var faces = object.geometry.faces;
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
@@ -44,11 +42,11 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 THREE.VertexNormalsHelper.prototype = Object.create( THREE.Line.prototype );
 THREE.VertexNormalsHelper.prototype.constructor = THREE.VertexNormalsHelper;
 
-THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
+THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 	var v1 = new THREE.Vector3();
 
-	return function( object ) {
+	return function() {
 
 		var keys = [ 'a', 'b', 'c', 'd' ];
 
