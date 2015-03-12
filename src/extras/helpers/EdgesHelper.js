@@ -11,7 +11,7 @@
 THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
-	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 0.1;
+	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
 	var thresholdDot = Math.cos( THREE.Math.degToRad( thresholdAngle ) );
 
