@@ -220,7 +220,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
 			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
 
-			var a, b, c, d;
+			var a, b, c;
 			var precision = raycaster.precision;
 
 			var vertices = geometry.vertices;

@@ -26,7 +26,6 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	var i, j, p;
 	var u, v;
 
-	var stackCount = stacks + 1;
 	var sliceCount = slices + 1;
 
 	for ( i = 0; i <= stacks; i ++ ) {
