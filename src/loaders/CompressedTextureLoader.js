@@ -16,7 +16,7 @@ THREE.CompressedTextureLoader.prototype = {
 
 	constructor: THREE.CompressedTextureLoader,
 
-	load: function ( url, onLoad, onError ) {
+	load: function ( url, onLoad ) {
 
 		var scope = this;
 

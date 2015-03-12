@@ -123,7 +123,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var ahole, h, hl; // looping of holes
 	var scope = this;
-	var bevelPoints = [];
 
 	var shapesOffset = this.vertices.length;
 
@@ -183,12 +182,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var b, bs, t, z,
 		vert, vlen = vertices.length,
 		face, flen = faces.length,
-		cont, clen = contour.length;
 
 
 	// Find directions for point movement
-
-	var RAD_TO_DEGREES = 180 / Math.PI;
 
 
 	function getBevelVec( inPt, inPrev, inNext ) {
@@ -291,10 +287,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		//  (j)---(i)---(k)
 		// console.log('i,j,k', i, j , k)
-
-		var pt_i = contour[ i ];
-		var pt_j = contour[ j ];
-		var pt_k = contour[ k ];
 
 		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
@@ -609,7 +601,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+	function f4( a, b, c, d ) {
 
 		a += shapesOffset;
 		b += shapesOffset;
