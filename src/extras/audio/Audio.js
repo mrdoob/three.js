@@ -108,6 +108,12 @@ THREE.Audio.prototype.setRolloffFactor = function ( value ) {
 
 };
 
+THREE.Audio.prototype.setVolume = function ( value ) {
+
+	this.gain.gain.value = value;
+
+};
+
 THREE.Audio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();

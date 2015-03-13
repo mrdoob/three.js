@@ -4284,7 +4284,7 @@ THREE.Matrix3.prototype = {
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
-			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
 
 				v1.x = array[ j ];
 				v1.y = array[ j + 1 ];
@@ -4938,7 +4938,7 @@ THREE.Matrix4.prototype = {
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
-			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
 
 				v1.x = array[ j ];
 				v1.y = array[ j + 1 ];
@@ -6842,7 +6842,7 @@ THREE.Spline = function ( points ) {
 
 		var i, j,
 			index, indexCurrent, indexNext,
-			linearDistance, realDistance,
+			realDistance,
 			sampling, position,
 			newpoints = [],
 			tmpVec = new THREE.Vector3(),
@@ -7422,8 +7422,6 @@ THREE.Object3D = function () {
 	this.children = [];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
-
-	var scope = this;
 
 	var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
@@ -9152,12 +9150,12 @@ THREE.BufferGeometry.prototype = {
 		if ( indexBufferSize === undefined )
 			size = 65535; //WebGL limits type of index buffer values to 16-bit.
 
-		var s = Date.now();
+		//var s = Date.now();
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
-		var verticesCount = ( vertices.length / 3 );
+		//var verticesCount = ( vertices.length / 3 );
 		var facesCount = ( indices.length / 3 );
 
 		/*
@@ -9688,9 +9686,8 @@ THREE.Geometry.prototype = {
 			// vertex normals weighted by triangle areas
 			// http://www.iquilezles.org/www/articles/normals/normals.htm
 
-			var vA, vB, vC, vD;
-			var cb = new THREE.Vector3(), ab = new THREE.Vector3(),
-				db = new THREE.Vector3(), dc = new THREE.Vector3(), bc = new THREE.Vector3();
+			var vA, vB, vC;
+			var cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -9864,7 +9861,7 @@ THREE.Geometry.prototype = {
 		// based on http://www.terathon.com/code/tangent.html
 		// tangents go to vertices
 
-		var f, fl, v, vl, i, il, vertexIndex,
+		var f, fl, v, vl, i, vertexIndex,
 			face, uv, vA, vB, vC, uvA, uvB, uvC,
 			x1, x2, y1, y2, z1, z2,
 			s1, s2, t1, t2, r, t, test,
@@ -10146,8 +10143,8 @@ THREE.Geometry.prototype = {
 		var v, key;
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
-		var i,il, face;
-		var indices, k, j, jl, u;
+		var i, il, face;
+		var indices, j, jl;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -11856,8 +11853,6 @@ THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
 
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
-	var scope = this;
-
 	// todo: unify load API to for easier SceneLoader use
 
 	texturePath = texturePath && ( typeof texturePath === 'string' ) ? texturePath : this.extractUrlBase( url );
@@ -11952,8 +11947,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
-	var scope = this,
-	geometry = new THREE.Geometry(),
+	var geometry = new THREE.Geometry(),
 	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
 	parseModel( scale );
@@ -11985,7 +11979,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
 
-		vertex, face, faceA, faceB, color, hex, normal,
+		vertex, face, faceA, faceB, hex, normal,
 
 		uvLayer, uv, u, v,
 
@@ -15487,7 +15481,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
 			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
 
-			var a, b, c, d;
+			var a, b, c;
 			var precision = raycaster.precision;
 
 			var vertices = geometry.vertices;
@@ -16043,7 +16037,6 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 		if ( parts && parts.length > 1 ) {
 
 			var label = parts[ 1 ];
-			var num = parts[ 2 ];
 
 			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: - Infinity };
 
@@ -18962,7 +18955,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setParticleBuffers ( geometry, hint, object ) {
 
-		var v, c, vertex, offset, index, color,
+		var v, c, vertex, offset, color,
 
 		vertices = geometry.vertices,
 		vl = vertices.length,
@@ -18978,7 +18971,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		customAttributes = geometry.__webglCustomAttributesList,
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -19137,7 +19130,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		customAttributes = geometry.__webglCustomAttributesList,
 
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -19297,20 +19290,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var needsFaceNormals = materialNeedsFaceNormals( material );
 
 		var f, fl, fi, face,
-		vertexNormals, faceNormal, normal,
+		vertexNormals, faceNormal,
 		vertexColors, faceColor,
 		vertexTangents,
-		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
+		uv, uv2, v1, v2, v3, t1, t2, t3, n1, n2, n3,
 		c1, c2, c3,
-		sw1, sw2, sw3, sw4,
-		si1, si2, si3, si4,
-		sa1, sa2, sa3, sa4,
-		sb1, sb2, sb3, sb4,
-		m, ml, i, il,
+		sw1, sw2, sw3,
+		si1, si2, si3,
+		i, il,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
 		nka, chf, faceVertexNormals,
-		a,
 
 		vertexIndex = 0,
 
@@ -22972,11 +22962,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupLights ( lights ) {
 
-		var l, ll, light, n,
+		var l, ll, light,
 		r = 0, g = 0, b = 0,
 		color, skyColor, groundColor,
-		intensity,  intensitySq,
-		position,
+		intensity,
 		distance,
 
 		zlights = _lights,
@@ -25504,7 +25493,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		var i, il, j, jl, n,
 
 		shadowMap, shadowMatrix, shadowCamera,
-		program, buffer, material,
+		buffer, material,
 		webglObject, object, light,
 
 		lights = [],
@@ -26692,7 +26681,7 @@ THREE.FontUtils = {
 		ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
 		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
-		var face = ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
+		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
 		return data;
 
@@ -26700,11 +26689,9 @@ THREE.FontUtils = {
 
 	drawText: function ( text ) {
 
-		var characterPts = [], allPts = [];
-
 		// RenderText
 
-		var i, p,
+		var i,
 			face = this.getFace(),
 			scale = this.size / face.resolution,
 			offset = 0,
@@ -26816,8 +26803,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
-							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+							THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 						}
 
 					}
@@ -26847,8 +26834,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
-							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+							THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 
 						}
 
@@ -27170,6 +27157,12 @@ THREE.Audio.prototype.setRefDistance = function ( value ) {
 THREE.Audio.prototype.setRolloffFactor = function ( value ) {
 
 	this.panner.rolloffFactor = value;
+
+};
+
+THREE.Audio.prototype.setVolume = function ( value ) {
+
+	this.gain.gain.value = value;
 
 };
 
@@ -28611,7 +28604,6 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			betterShapeHoles[sIdx] = [];
 		}
 		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-			var sh = newShapes[sIdx];
 			var sho = newShapeHoles[sIdx];
 			for (var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 				var ho = sho[hIdx];
@@ -31080,7 +31072,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var ahole, h, hl; // looping of holes
 	var scope = this;
-	var bevelPoints = [];
 
 	var shapesOffset = this.vertices.length;
 
@@ -31139,13 +31130,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var b, bs, t, z,
 		vert, vlen = vertices.length,
-		face, flen = faces.length,
-		cont, clen = contour.length;
+		face, flen = faces.length;
 
 
 	// Find directions for point movement
-
-	var RAD_TO_DEGREES = 180 / Math.PI;
 
 
 	function getBevelVec( inPt, inPrev, inNext ) {
@@ -31248,10 +31236,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		//  (j)---(i)---(k)
 		// console.log('i,j,k', i, j , k)
-
-		var pt_i = contour[ i ];
-		var pt_j = contour[ j ];
-		var pt_k = contour[ k ];
 
 		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
@@ -31693,7 +31677,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	//
 
-	var i, l, hole, s;
+	var i, l, hole;
 
 	var shapesOffset = this.vertices.length;
 	var shapePoints = shape.extractPoints( curveSegments );
@@ -31742,7 +31726,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var vert, vlen = vertices.length;
 	var face, flen = faces.length;
-	var cont, clen = contour.length;
 
 	for ( i = 0; i < vlen; i ++ ) {
 
@@ -32515,8 +32498,6 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 		numpoints = segments + 1,
 
-		x, y, z,
-		tx, ty, tz,
 		u, v, r,
 
 		cx, cy,
@@ -32627,9 +32608,7 @@ THREE.TubeGeometry.SinusoidalTaper = function ( u ) {
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
-	var	tangent = new THREE.Vector3(),
-		normal = new THREE.Vector3(),
-		binormal = new THREE.Vector3(),
+	var	normal = new THREE.Vector3(),
 
 		tangents = [],
 		normals = [],
@@ -32644,7 +32623,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		smallest,
 
 		tx, ty, tz,
-		i, u, v;
+		i, u;
 
 
 	// expose internals
@@ -32802,7 +32781,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	}
 
-	var midpoints = [], p = this.vertices;
+	var p = this.vertices;
 
 	var faces = [];
 
@@ -32910,7 +32889,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 	function subdivide( face, detail ) {
 
 		var cols = Math.pow(2, detail);
-		var cells = Math.pow(4, detail);
 		var a = prepare( that.vertices[ face.a ] );
 		var b = prepare( that.vertices[ face.b ] );
 		var c = prepare( that.vertices[ face.c ] );
@@ -33198,7 +33176,6 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	var i, j, p;
 	var u, v;
 
-	var stackCount = stacks + 1;
 	var sliceCount = slices + 1;
 
 	for ( i = 0; i <= stacks; i ++ ) {
@@ -34361,8 +34338,6 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	var geometry = new THREE.Geometry();
 
-	var vertices = object.geometry.vertices;
-
 	var faces = object.geometry.faces;
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
@@ -34463,8 +34438,6 @@ THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
 	var geometry = new THREE.Geometry();
-
-	var vertices = object.geometry.vertices;
 
 	var faces = object.geometry.faces;
 
@@ -34822,7 +34795,6 @@ THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 		if ( chunks && chunks.length > 1 ) {
 
 			var name = chunks[ 1 ];
-			var num = chunks[ 2 ];
 
 			if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: - Infinity };
 
