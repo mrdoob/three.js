@@ -6,14 +6,14 @@
  * @author arodic / http://akirodic.com/
  */
 
-THREE.EditorControls = function ( object, domElement ) {
+THREE.EditorControls = function ( object, domElement, center ) {
 
 	domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
 
 	this.enabled = true;
-	this.center = new THREE.Vector3();
+	this.center = center = center || new THREE.Vector3();
 
 	// internals
 
@@ -23,8 +23,6 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
-
-	var center = this.center;
 
 	// pointer data
 
@@ -47,7 +45,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		if ( pointArray[ 0 ].distanceTo( point) < pointArray[ 1 ].distanceTo( point) ) {
 
 			return pointArray[ 0 ];
-		
+
 		}
 
 		return pointArray[ 1 ];
@@ -77,7 +75,7 @@ THREE.EditorControls = function ( object, domElement ) {
 			}
 
 		}
-		
+
 		// Set pointer[0] from mouse event.clientX/Y
 
 		if ( touches.length == 0 ) {
@@ -96,7 +94,7 @@ THREE.EditorControls = function ( object, domElement ) {
 				( touches[ 0 ].pageY - parentRect.top ) / parentRect.height * 2 - 1
 			);
 			pointers[ 1 ].copy( pointers[ 0 ] );
-		
+
 		// Set pointer[0] and pointer[1] from two touches.
 
 		} else if ( touches.length == 2 ) {
@@ -119,7 +117,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		// Collection of all centers and radii in the hierarchy of the target.
 
 		var targets = [];
-		
+
 		// Bounding box (minCenter/maxCenter) encompassing all centers in hierarchy.
 
 		var minCenter;
@@ -127,46 +125,59 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		target.traverse( function( child ) {
 
-			child.updateMatrixWorld();
+			if (child.visible) {
 
-			var center = new THREE.Vector3();
-			var scale = new THREE.Vector3();
-			var radius = 0;
+				child.updateMatrixWorld( true );
 
-			child.matrixWorld.decompose( center, new THREE.Quaternion(), scale );
-			scale = ( scale.x + scale.y + scale.z ) / 3;
+				var center = new THREE.Vector3();
+				var scale = new THREE.Vector3();
+				var radius = 0;
 
-			if ( child.geometry ) {
+				child.matrixWorld.decompose( center, new THREE.Quaternion(), scale );
+				scale = ( scale.x + scale.y + scale.z ) / 3;
 
-				child.geometry.computeBoundingSphere();
-				center.add( child.geometry.boundingSphere.center.clone().multiplyScalar( scale ) );
-				radius = child.geometry.boundingSphere.radius * scale;
+				//TODO: make work with non-uniform scale
+
+				if ( child.geometry ) {
+
+					child.geometry.computeBoundingSphere();
+					center.add( child.geometry.boundingSphere.center.clone().multiplyScalar( scale )
+						.applyMatrix4(child.matrixWorld) );
+					radius = child.geometry.boundingSphere.radius * scale;
+
+				}
+
+				if ( !frame || child.geometry ) {
+
+					targets.push( { center: center, radius: radius } );
+
+					if ( !minCenter ) minCenter = center.clone();
+					if ( !maxCenter ) maxCenter = center.clone();
+
+					minCenter.min( center );
+					maxCenter.max( center );
+
+				}
+
 
 			}
 
-			targets.push( { center: center, radius: radius } );
-
-			if ( !minCenter ) minCenter = center.clone();
-			if ( !maxCenter ) maxCenter = center.clone();
-
-			minCenter.min( center );
-			maxCenter.max( center );
 
 		} );
 
 		// Center of the bounding box.
 
 		var cumulativeCenter = minCenter.clone().add( maxCenter ).multiplyScalar( 0.5 );
-		
+
 		// Furthest ( center distance + radius ) from CumulativeCenter.
-		
+
 		var cumulativeRadius = 0;
 
-		targets.forEach( function( target ) {
-			
-			var radius = cumulativeCenter.distanceTo( target.center ) + target.radius;
+		targets.forEach( function( child ) {
+
+			var radius = cumulativeCenter.distanceTo( child.center ) + child.radius;
 			cumulativeRadius = Math.max( cumulativeRadius, radius );
-		
+
 		} );
 
 		if ( object instanceof THREE.PerspectiveCamera ) {
@@ -180,7 +191,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 				// Adjust distance to frame cumulativeRadius
 
-				var fovFactor = Math.tan( ( object.fov / 2) * Math.PI / 180.0 );
+				var fovFactor = Math.tan( ( object.fov / 2 ) * Math.PI / 180.0 );
 				var pos = object.position.clone().sub( center ).normalize().multiplyScalar( cumulativeRadius  / fovFactor );
 
 				object.position.copy( center ).add( pos );
@@ -322,9 +333,9 @@ THREE.EditorControls = function ( object, domElement ) {
 			state = STATE.ROTATE;
 
 			if ( object instanceof THREE.OrthographicCamera ) {
-				
+
 				state = STATE.PAN;
-			
+
 			};
 
 		} else if ( event.button === 1 ) {
@@ -432,36 +443,33 @@ THREE.EditorControls = function ( object, domElement ) {
 		switch ( touches.length ) {
 
 			case 1:
-
 				pointersDelta[ 0 ].subVectors( pointers[ 0 ], getClosestPoint( pointers[ 0 ], pointersOld ) );
 				pointersDelta[ 1 ].subVectors( pointers[ 1 ], getClosestPoint( pointers[ 1 ], pointersOld ) );
-				
+
 				if ( object instanceof THREE.PerspectiveCamera ) {
 				
 					scope.rotate( pointersDelta[ 0 ] );
-				
+
 				} else if ( object instanceof THREE.OrthographicCamera ) {
-				
+
 					scope.pan( pointersDelta[ 0 ] );
-				
+
 				}
 				break;
 
 			case 2:
-
 				pointersDelta[ 0 ].subVectors( pointers[ 0 ], getClosestPoint( pointers[ 0 ], pointersOld ) );
 				pointersDelta[ 1 ].subVectors( pointers[ 1 ], getClosestPoint( pointers[ 1 ], pointersOld ) );
-				
+
 				var prevDistance = pointersOld[ 0 ].distanceTo( pointersOld[ 1 ] );
 				var distance = pointers[ 0 ].distanceTo( pointers[ 1 ] );
-				
+
 				if ( prevDistance ) {
-				
+
 					scope.zoom( new THREE.Vector2(0, prevDistance - distance ) );
 					scope.pan( pointersDelta[ 0 ].clone().add( pointersDelta[ 1 ] ).multiplyScalar(0.5) );
-				
-				}
 
+				}
 				break;
 		}
 
