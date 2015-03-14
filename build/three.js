@@ -9138,24 +9138,18 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	/*
-		computeOffsets
-		Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
-		This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
-		WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-		indexBufferSize - Defaults to 65535, but allows for larger or smaller chunks.
+	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
+	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
+	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
+	size - Defaults to 65535, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function ( indexBufferSize ) {
+	computeOffsets: function ( size ) {
 
-		var size = indexBufferSize;
-		if ( indexBufferSize === undefined )
-			size = 65535; //WebGL limits type of index buffer values to 16-bit.
-
-		//var s = Date.now();
+		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
-		//var verticesCount = ( vertices.length / 3 );
 		var facesCount = ( indices.length / 3 );
 
 		/*
@@ -9235,7 +9229,8 @@ THREE.BufferGeometry.prototype = {
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
-		this.offsets = offsets;
+		this.offsets = offsets; // TODO: Deprecate
+		this.drawcalls = offsets;
 
 		/*
 		var orderTime = Date.now();
@@ -9599,9 +9594,33 @@ THREE.Geometry.prototype = {
 
 		if ( indices !== undefined ) {
 
-			for ( var i = 0; i < indices.length; i += 3 ) {
+			var drawcalls = geometry.drawcalls;
 
-				addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+			if ( drawcalls.length > 0 ) {
+
+				for ( var i = 0; i < drawcalls.length; i ++ ) {
+
+					var drawcall = drawcalls[ i ];
+
+					var start = drawcall.start;
+					var count = drawcall.count;
+					var index = drawcall.index;
+
+					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
+
+						addFace( index + indices[ j ], index + indices[ j + 1 ], index + indices[ j + 2 ] );
+
+					}
+
+				}
+
+			} else {
+
+				for ( var i = 0; i < indices.length; i += 3 ) {
+
+					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+
+				}
 
 			}
 
