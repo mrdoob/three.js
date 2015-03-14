@@ -1275,19 +1275,19 @@ THREE.Vector2.prototype = {
 
 	},
 
-	addVectors: function ( a, b ) {
+	addScalar: function ( s ) {
 
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
+		this.x += s;
+		this.y += s;
 
 		return this;
 
 	},
 
-	addScalar: function ( s ) {
+	addVectors: function ( a, b ) {
 
-		this.x += s;
-		this.y += s;
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
 
 		return this;
 
@@ -1304,6 +1304,15 @@ THREE.Vector2.prototype = {
 
 		this.x -= v.x;
 		this.y -= v.y;
+
+		return this;
+
+	},
+
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
 
 		return this;
 
@@ -1754,6 +1763,16 @@ THREE.Vector3.prototype = {
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
+
+		return this;
+
+	},
+	
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
+		this.z -= s;
 
 		return this;
 
@@ -2613,6 +2632,17 @@ THREE.Vector4.prototype = {
 		this.y -= v.y;
 		this.z -= v.z;
 		this.w -= v.w;
+
+		return this;
+
+	},
+
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
+		this.z -= s;
+		this.w -= s;
 
 		return this;
 
