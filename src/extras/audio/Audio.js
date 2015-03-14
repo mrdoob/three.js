@@ -2,20 +2,26 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Audio = function ( listener ) {
+THREE.Audio = function ( listener, autoplay ) {
 
 	THREE.Object3D.call( this );
 
 	this.type = 'Audio';
 
+	this.autoplay = autoplay || false;
+
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
+	this.source.onended = this.onEnded.bind(this);
 
 	this.gain = this.context.createGain();
 	this.gain.connect( this.context.destination );
 
 	this.panner = this.context.createPanner();
 	this.panner.connect( this.gain );
+
+	this.startTime = 0;
+	this.isPlaying = false;
 
 };
 
@@ -34,8 +40,8 @@ THREE.Audio.prototype.load = function ( file ) {
 		scope.context.decodeAudioData( this.response, function ( buffer ) {
 
 			scope.source.buffer = buffer;
-			scope.source.connect( scope.panner );
-			scope.source.start( 0 );
+
+			if( scope.autoplay ) scope.play();
 
 		} );
 
@@ -43,6 +49,52 @@ THREE.Audio.prototype.load = function ( file ) {
 	request.send();
 
 	return this;
+
+};
+
+THREE.Audio.prototype.play = function () {
+
+	if ( ! this.isPlaying ) {
+
+		var source = this.context.createBufferSource();
+
+		source.buffer = this.source.buffer;
+		source.loop = this.source.loop;
+		source.onended = this.source.onended;
+		source.connect( this.panner );
+		source.start( 0, this.startTime );
+
+		this.isPlaying = true;
+
+		this.source = source;
+
+	}
+
+	else {
+
+		console.warn("Audio is already playing.")
+
+	}
+
+};
+
+THREE.Audio.prototype.pause = function () {
+
+	this.source.stop();
+	this.startTime = this.context.currentTime;
+
+};
+
+THREE.Audio.prototype.stop = function () {
+
+	this.source.stop();
+	this.startTime = 0;
+
+};
+
+THREE.Audio.prototype.onEnded = function() {
+
+	this.isPlaying = false;
 
 };
 
