@@ -54,27 +54,24 @@ THREE.Audio.prototype.load = function ( file ) {
 
 THREE.Audio.prototype.play = function () {
 
-	if ( ! this.isPlaying ) {
+	if ( this.isPlaying === true ) {
 
-		var source = this.context.createBufferSource();
-
-		source.buffer = this.source.buffer;
-		source.loop = this.source.loop;
-		source.onended = this.source.onended;
-		source.connect( this.panner );
-		source.start( 0, this.startTime );
-
-		this.isPlaying = true;
-
-		this.source = source;
+		THREE.warn( 'THREE.Audio: Audio is already playing.' );
+		return;
 
 	}
 
-	else {
+	var source = this.context.createBufferSource();
 
-		console.warn("Audio is already playing.")
+	source.buffer = this.source.buffer;
+	source.loop = this.source.loop;
+	source.onended = this.source.onended;
+	source.connect( this.panner );
+	source.start( 0, this.startTime );
 
-	}
+	this.isPlaying = true;
+
+	this.source = source;
 
 };
 
