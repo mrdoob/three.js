@@ -2,11 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Audio = function ( listener ) {
+THREE.Audio = function ( listener, autoplay ) {
 
 	THREE.Object3D.call( this );
 
 	this.type = 'Audio';
+
+	this.autoplay = autoplay || false;
 
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
@@ -25,7 +27,7 @@ THREE.Audio = function ( listener ) {
 THREE.Audio.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Audio.prototype.constructor = THREE.Audio;
 
-THREE.Audio.prototype.load = function ( file, playImmediately ) {
+THREE.Audio.prototype.load = function ( file ) {
 
 	var scope = this;
 
@@ -38,7 +40,7 @@ THREE.Audio.prototype.load = function ( file, playImmediately ) {
 
 			scope.source.buffer = buffer;
 
-			if( playImmediately !== false ) scope.play();
+			if( scope.autoplay ) scope.play();
 
 		} );
 
