@@ -142,6 +142,16 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+	
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
+		this.z -= s;
+
+		return this;
+
+	},
 
 	subVectors: function ( a, b ) {
 
