@@ -2,13 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Audio = function ( listener, autoplay ) {
+THREE.Audio = function ( listener ) {
 
 	THREE.Object3D.call( this );
 
 	this.type = 'Audio';
-
-	this.autoplay = autoplay || false;
 
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
@@ -19,6 +17,8 @@ THREE.Audio = function ( listener, autoplay ) {
 
 	this.panner = this.context.createPanner();
 	this.panner.connect( this.gain );
+
+	this.autoplay = false;
 
 	this.startTime = 0;
 	this.isPlaying = false;
