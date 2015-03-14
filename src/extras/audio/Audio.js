@@ -12,6 +12,7 @@ THREE.Audio = function ( listener, autoplay ) {
 
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
+	this.source.onended = this.onEnded.bind(this);
 
 	this.gain = this.context.createGain();
 	this.gain.connect( this.context.destination );
@@ -59,6 +60,7 @@ THREE.Audio.prototype.play = function () {
 
 		source.buffer = this.source.buffer;
 		source.loop = this.source.loop;
+		source.onended = this.source.onended;
 		source.connect( this.panner );
 		source.start( 0, this.startTime );
 
@@ -80,7 +82,6 @@ THREE.Audio.prototype.pause = function () {
 
 	this.source.stop();
 	this.startTime = this.context.currentTime;
-	this.isPlaying = false;
 
 };
 
@@ -88,6 +89,11 @@ THREE.Audio.prototype.stop = function () {
 
 	this.source.stop();
 	this.startTime = 0;
+
+};
+
+THREE.Audio.prototype.onEnded = function() {
+
 	this.isPlaying = false;
 
 };
