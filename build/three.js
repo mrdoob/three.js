@@ -11926,18 +11926,23 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 				if ( xhr.responseText ) {
 
 					var json = JSON.parse( xhr.responseText );
+					var metadata = json.metadata;
 
-					if ( json.metadata !== undefined && json.metadata.version >= 4 ) {
+					if ( metadata !== undefined ) {
 
-						console.error( 'THREE.JSONLoader: "' + url + '" should be loaded with THREE.ObjectLoader instead.' );
-						return;
+						if ( metadata.type === 'object' ) {
 
-					}
+							THREE.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
+							return;
 
-					if ( json.metadata !== undefined && json.metadata.type === 'scene' ) {
+						}
 
-						THREE.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
-						return;
+						if ( metadata.type === 'scene' ) {
+
+							THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be a Scene. Use THREE.SceneLoader instead.' );
+							return;
+
+						}
 
 					}
 
@@ -11946,7 +11951,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 				} else {
 
-					THREE.error( 'THREE.JSONLoader: "' + url + '" seems to be unreachable or the file is empty.' );
+					THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be unreachable or the file is empty.' );
 
 				}
 
@@ -11958,7 +11963,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			} else {
 
-				THREE.error( 'THREE.JSONLoader: Couldn\'t load "' + url + '" (' + xhr.status + ')' );
+				THREE.error( 'THREE.JSONLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
 
 			}
 
@@ -14697,6 +14702,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.sourceFile = '';
 
 	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
