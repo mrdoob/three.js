@@ -53,6 +53,8 @@ THREE.Geometry = function () {
 
 };
 
+THREE.Geometry.disposeEvent = { type: 'dispose' };
+
 THREE.Geometry.prototype = {
 
 	constructor: THREE.Geometry,
@@ -1052,7 +1054,7 @@ THREE.Geometry.prototype = {
 
 	dispose: function () {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		this.dispatchEvent( THREE.Geometry.disposeEvent );
 
 	}
 

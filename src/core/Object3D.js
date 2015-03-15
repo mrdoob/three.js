@@ -76,6 +76,10 @@ THREE.Object3D = function () {
 
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
 
+THREE.Object3D.addedEvent = { type: 'added' };
+
+THREE.Object3D.removedEvent = { type: 'removed' };
+
 THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
@@ -327,7 +331,7 @@ THREE.Object3D.prototype = {
 			}
 
 			object.parent = this;
-			object.dispatchEvent( { type: 'added' } );
+			object.dispatchEvent( THREE.Object3D.addedEvent );
 
 			this.children.push( object );
 
@@ -359,7 +363,7 @@ THREE.Object3D.prototype = {
 
 			object.parent = undefined;
 
-			object.dispatchEvent( { type: 'removed' } );
+			object.dispatchEvent( THREE.Object3D.removedEvent );
 
 			this.children.splice( index, 1 );
 
