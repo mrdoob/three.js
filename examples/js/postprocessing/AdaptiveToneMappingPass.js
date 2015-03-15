@@ -16,7 +16,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.luminanceRT = null;
 	this.previousLuminanceRT = null;
 	this.currentLuminanceRT = null;
-	
+
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
 
@@ -72,15 +72,15 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 			"uniform sampler2D currentLum;",
 			"uniform float delta;",
 			"uniform float tau;",
-			
+
 			"void main() {",
 
 				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
 				"vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
-				
+
 				"float fLastLum = lastLum.r;",
 				"float fCurrentLum = currentLum.r;",
-				
+
 				//The adaption seems to work better in extreme lighting differences
 				//if the input luminance is squared.
 				"fCurrentLum *= fCurrentLum;",
@@ -120,7 +120,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.scene.add( this.quad );
 
 };
@@ -160,7 +160,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		this.quad.material = this.materialToneMap;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer;
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-		
+
 	},
 
 	reset: function( renderer ) {
@@ -184,7 +184,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		//We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 		pars.minFilter = THREE.LinearMipMapLinearFilter;
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		
+
 		if ( this.adaptive ) {
 			this.materialToneMap.defines["ADAPTED_LUMINANCE"] = "";
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;

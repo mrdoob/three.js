@@ -163,7 +163,7 @@
 								var actualHeight = hits[0].distance - birdsEye;
 
 								// collision: stick to the surface if landing on it
-								
+
 								if( ( motion.velocity.y <= 0 ) && ( Math.abs( actualHeight ) < kneeDeep ) ) {
 									motion.position.y -= actualHeight;
 									motion.velocity.y = 0;
@@ -185,9 +185,9 @@
 							// limit the tilt at ±0.4 radians
 
 							motion.rotation.x = Math.max( -0.4, Math.min ( +0.4, motion.rotation.x ) );
-							
+
 							// wrap horizontal rotation to 0...2π
-							
+
 							motion.rotation.y += tau; motion.rotation.y %= tau;
 
 							timeLeft -= dt;
@@ -233,6 +233,7 @@
 				var placeholder = new THREE.Object3D();
 
 				var texture = THREE.ImageUtils.loadTexture( textureUrl );
+				texture.minFilter = THREE.LinearFilter;
 				texture.anisotropy = textureQuality;
 
 				var loader = new THREE.JSONLoader();
@@ -256,7 +257,7 @@
 			var camera = new THREE.PerspectiveCamera( 60, 1, 0.1, 9000 );
 
 			var scene = new THREE.Scene();
-			
+
 			scene.add( camera );
 
 			scene.add( makeSkybox( [
@@ -294,7 +295,7 @@
 
 					// call our game loop with the time elapsed since last rendering, in ms
 					gameLoop( timeElapsed );
-					
+
 					renderer.render( scene, camera );
 					requestAnimationFrame( render );
 				};
