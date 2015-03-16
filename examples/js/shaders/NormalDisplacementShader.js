@@ -399,13 +399,15 @@ THREE.NormalDisplacementShader = {
 
 		"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
+		"		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );",
+
 		"		#ifdef ENVMAP_MODE_REFLECTION",
 
-		"			vec3 vReflect = reflect( cameraToVertex, normal );",
+		"			vec3 vReflect = reflect( cameraToVertex, worldNormal );",
 
 		"		#else",
 
-		"			vec3 vReflect = refract( cameraToVertex, normal, refractionRatio );",
+		"			vec3 vReflect = refract( cameraToVertex, worldNormal, refractionRatio );",
 
 		"		#endif",
 
