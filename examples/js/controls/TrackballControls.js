@@ -1,6 +1,8 @@
 /**
  * @author Eberhard Graether / http://egraether.com/
  * @author Mark Lundin 	/ http://mark-lundin.com
+ * @author Simone Manini / http://daron1337.github.io
+ * @author Luca Antiga 	/ http://lantiga.github.io
  */
 
 THREE.TrackballControls = function ( object, domElement ) {
@@ -24,7 +26,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
-	this.noRoll = false;
 
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
@@ -47,8 +48,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	_eye = new THREE.Vector3(),
 
-	_rotateStart = new THREE.Vector3(),
-	_rotateEnd = new THREE.Vector3(),
+	_movePrev = new THREE.Vector2(),
+	_moveCurr = new THREE.Vector2(),
+
+	_lastAxis = new THREE.Vector3(),
+	_lastAngle = 0,
 
 	_zoomStart = new THREE.Vector2(),
 	_zoomEnd = new THREE.Vector2(),
@@ -68,8 +72,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 	// events
 
 	var changeEvent = { type: 'change' };
-	var startEvent = { type: 'start'};
-	var endEvent = { type: 'end'};
+	var startEvent = { type: 'start' };
+	var endEvent = { type: 'end' };
 
 
 	// methods
@@ -124,106 +128,93 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	}() );
 
-	var getMouseProjectionOnBall = ( function () {
+	var getMouseOnCircle = ( function () {
 
-		var vector = new THREE.Vector3();
-		var objectUp = new THREE.Vector3();
-		var mouseOnBall = new THREE.Vector3();
+		var vector = new THREE.Vector2();
 
 		return function ( pageX, pageY ) {
 
-			mouseOnBall.set(
-				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / (_this.screen.width*.5),
-				( _this.screen.height * 0.5 + _this.screen.top - pageY ) / (_this.screen.height*.5),
-				0.0
+			vector.set(
+				( ( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ) ),
+				( ( _this.screen.height + 2 * ( _this.screen.top - pageY ) ) / _this.screen.width ) // screen.width intentional
 			);
 
-			var length = mouseOnBall.length();
-
-			if ( _this.noRoll ) {
-
-				if ( length < Math.SQRT1_2 ) {
-
-					mouseOnBall.z = Math.sqrt( 1.0 - length*length );
-
-				} else {
-
-					mouseOnBall.z = .5 / length;
-					
-				}
-
-			} else if ( length > 1.0 ) {
-
-				mouseOnBall.normalize();
-
-			} else {
-
-				mouseOnBall.z = Math.sqrt( 1.0 - length * length );
-
-			}
-
-			_eye.copy( _this.object.position ).sub( _this.target );
-
-			vector.copy( _this.object.up ).setLength( mouseOnBall.y )
-			vector.add( objectUp.copy( _this.object.up ).cross( _eye ).setLength( mouseOnBall.x ) );
-			vector.add( _eye.setLength( mouseOnBall.z ) );
-
 			return vector;
-
 		};
 
 	}() );
 
-	this.rotateCamera = (function(){
+	this.rotateCamera = (function() {
 
 		var axis = new THREE.Vector3(),
-			quaternion = new THREE.Quaternion();
-
+			quaternion = new THREE.Quaternion(),
+			eyeDirection = new THREE.Vector3(),
+			objectUpDirection = new THREE.Vector3(),
+			objectSidewaysDirection = new THREE.Vector3(),
+			moveDirection = new THREE.Vector3(),
+			angle;
 
 		return function () {
 
-			var angle = Math.acos( _rotateStart.dot( _rotateEnd ) / _rotateStart.length() / _rotateEnd.length() );
+			moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
+			angle = moveDirection.length();
 
 			if ( angle ) {
 
-				axis.crossVectors( _rotateStart, _rotateEnd ).normalize();
+				_eye.copy( _this.object.position ).sub( _this.target );
+
+				eyeDirection.copy( _eye ).normalize();
+				objectUpDirection.copy( _this.object.up ).normalize();
+				objectSidewaysDirection.crossVectors( objectUpDirection, eyeDirection ).normalize();
+
+				objectUpDirection.setLength( _moveCurr.y - _movePrev.y );
+				objectSidewaysDirection.setLength( _moveCurr.x - _movePrev.x );
+
+				moveDirection.copy( objectUpDirection.add( objectSidewaysDirection ) );
+
+				axis.crossVectors( moveDirection, _eye ).normalize();
 
 				angle *= _this.rotateSpeed;
-
-				quaternion.setFromAxisAngle( axis, -angle );
+				quaternion.setFromAxisAngle( axis, angle );
 
 				_eye.applyQuaternion( quaternion );
 				_this.object.up.applyQuaternion( quaternion );
 
-				_rotateEnd.applyQuaternion( quaternion );
-
-				if ( _this.staticMoving ) {
-
-					_rotateStart.copy( _rotateEnd );
-
-				} else {
-
-					quaternion.setFromAxisAngle( axis, angle * ( _this.dynamicDampingFactor - 1.0 ) );
-					_rotateStart.applyQuaternion( quaternion );
-
-				}
+				_lastAxis.copy( axis );
+				_lastAngle = angle;
 
 			}
-		}
+
+			else if ( !_this.staticMoving && _lastAngle ) {
+
+				_lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
+				_eye.copy( _this.object.position ).sub( _this.target );
+				quaternion.setFromAxisAngle( _lastAxis, _lastAngle );
+				_eye.applyQuaternion( quaternion );
+				_this.object.up.applyQuaternion( quaternion );
+
+			}
+
+			_movePrev.copy( _moveCurr );
+
+		};
 
 	}());
 
+
 	this.zoomCamera = function () {
+
+		var factor;
 
 		if ( _state === STATE.TOUCH_ZOOM_PAN ) {
 
-			var factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
+			factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
 			_touchZoomDistanceStart = _touchZoomDistanceEnd;
 			_eye.multiplyScalar( factor );
 
 		} else {
 
-			var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
+			factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
 
 			if ( factor !== 1.0 && factor > 0.0 ) {
 
@@ -245,7 +236,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.panCamera = (function(){
+	this.panCamera = (function() {
 
 		var mouseChange = new THREE.Vector2(),
 			objectUp = new THREE.Vector3(),
@@ -276,7 +267,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 				}
 
 			}
-		}
+		};
 
 	}());
 
@@ -412,8 +403,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_rotateStart.copy( getMouseProjectionOnBall( event.pageX, event.pageY ) );
-			_rotateEnd.copy( _rotateStart );
+			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
+			_movePrev.copy(_moveCurr);
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
@@ -423,7 +414,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		} else if ( _state === STATE.PAN && !_this.noPan ) {
 
 			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_panEnd.copy(_panStart)
+			_panEnd.copy(_panStart);
 
 		}
 
@@ -443,7 +434,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_rotateEnd.copy( getMouseProjectionOnBall( event.pageX, event.pageY ) );
+			_movePrev.copy(_moveCurr);
+			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
@@ -505,8 +497,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			case 1:
 				_state = STATE.TOUCH_ROTATE;
-				_rotateStart.copy( getMouseProjectionOnBall( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-				_rotateEnd.copy( _rotateStart );
+				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
+				_movePrev.copy(_moveCurr);
 				break;
 
 			case 2:
@@ -540,7 +532,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		switch ( event.touches.length ) {
 
 			case 1:
-				_rotateEnd.copy( getMouseProjectionOnBall( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
+				_movePrev.copy(_moveCurr);
+				_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
 				break;
 
 			case 2:
@@ -567,8 +560,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		switch ( event.touches.length ) {
 
 			case 1:
-				_rotateEnd.copy( getMouseProjectionOnBall( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-				_rotateStart.copy( _rotateEnd );
+				_movePrev.copy(_moveCurr);
+				_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
 				break;
 
 			case 2:

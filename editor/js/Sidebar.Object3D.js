@@ -17,12 +17,56 @@ Sidebar.Object3D = function ( editor ) {
 
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );
 	container.addStatic( objectType );
+
+	// Actions
+
+	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '11px' );
+	objectActions.setOptions( {
+
+		'Actions': 'Actions',
+		'Reset Position': 'Reset Position',
+		'Reset Rotation': 'Reset Rotation',
+		'Reset Scale': 'Reset Scale'
+
+	} );
+	objectActions.onClick( function ( event ) {
+
+		event.stopPropagation(); // Avoid panel collapsing
+
+	} );
+	objectActions.onChange( function ( event ) {
+
+		var object = editor.selected;
+
+		switch ( this.getValue() ) {
+
+			case 'Reset Position':
+				object.position.set( 0, 0, 0 );
+				break;
+
+			case 'Reset Rotation':
+				object.rotation.set( 0, 0, 0 );
+				break;
+
+			case 'Reset Scale':
+				object.scale.set( 1, 1, 1 );
+				break;
+
+		}
+
+		this.setValue( 'Actions' );
+
+		signals.objectChanged.dispatch( object );
+
+	} );
+	container.addStatic( objectActions );
+
 	container.add( new UI.Break() );
 
 	// uuid
 
 	var objectUUIDRow = new UI.Panel();
-	var objectUUID = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
+	var objectUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
 	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
@@ -42,7 +86,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectNameRow = new UI.Panel();
 	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-			editor.setObjectName( editor.selected, objectName.getValue() );
+		editor.nameObject( editor.selected, objectName.getValue() );
 
 	} );
 
@@ -189,6 +233,16 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectExponentRow );
 
+	// decay
+
+	var objectDecayRow = new UI.Panel();
+	var objectDecay = new UI.Number().setRange( 0, Infinity ).onChange( update );
+
+	objectDecayRow.add( new UI.Text( 'Decay' ).setWidth( '90px' ) );
+	objectDecayRow.add( objectDecay );
+
+	container.add( objectDecayRow );
+
 	// visible
 
 	var objectVisibleRow = new UI.Panel();
@@ -204,7 +258,7 @@ Sidebar.Object3D = function ( editor ) {
 	var timeout;
 
 	var objectUserDataRow = new UI.Panel();
-	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setFontSize( '12px' ).onChange( update );
 	objectUserData.onKeyUp( function () {
 
 		try {
@@ -294,7 +348,7 @@ Sidebar.Object3D = function ( editor ) {
 
 				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
-					editor.parent( object, editor.scene.getObjectById( newParentId, true ) );
+					editor.moveObject( object, editor.scene.getObjectById( newParentId ) );
 
 				}
 
@@ -367,6 +421,12 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
+			if ( object.decay !== undefined ) {
+
+				object.decay = objectDecay.getValue();
+
+			}
+
 			object.visible = objectVisible.getValue();
 
 			try {
@@ -397,7 +457,8 @@ Sidebar.Object3D = function ( editor ) {
 			'groundColor': objectGroundColorRow,
 			'distance' : objectDistanceRow,
 			'angle' : objectAngleRow,
-			'exponent' : objectExponentRow
+			'exponent' : objectExponentRow,
+			'decay' : objectDecayRow
 		};
 
 		for ( var property in properties ) {
@@ -546,6 +607,12 @@ Sidebar.Object3D = function ( editor ) {
 
 		}
 
+		if ( object.decay !== undefined ) {
+
+			objectDecay.setValue( object.decay );
+
+		}
+
 		objectVisible.setValue( object.visible );
 
 		try {
@@ -558,7 +625,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		}
 
-		objectUserData.setBorderColor( '#ccc' );
+		objectUserData.setBorderColor( 'transparent' );
 		objectUserData.setBackgroundColor( '' );
 
 		updateTransformRows( object );

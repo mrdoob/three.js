@@ -75,6 +75,7 @@
 
 				pickingScene = new THREE.Scene();
 				pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				pickingTexture.minFilter = THREE.LinearFilter;
 				pickingTexture.generateMipmaps = false;
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
@@ -203,12 +204,11 @@
 
 				renderer.render( pickingScene, camera, pickingTexture );
 
-				var gl = self.renderer.getContext();
+				//create buffer for reading single pixel
+				var pixelBuffer = new Uint8Array( 4 );
 
 				//read the pixel under the mouse from the texture
-
-				var pixelBuffer = new Uint8Array( 4 );
-				gl.readPixels( mouse.x, pickingTexture.height - mouse.y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelBuffer );
+				renderer.readRenderTargetPixels(pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer);
 
 				//interpret the pixel as an ID
 

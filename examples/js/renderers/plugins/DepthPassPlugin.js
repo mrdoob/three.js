@@ -33,21 +33,21 @@ THREE.DepthPassPlugin = function () {
 			vertexShader: depthShader.vertexShader,
 			uniforms: depthUniforms
 		} );
-		
+
 		_depthMaterialMorph = new THREE.ShaderMaterial( {
 			fragmentShader: depthShader.fragmentShader,
 			vertexShader: depthShader.vertexShader,
 			uniforms: depthUniforms,
 			morphTargets: true
 		} );
-		
+
 		_depthMaterialSkin = new THREE.ShaderMaterial( {
 			fragmentShader: depthShader.fragmentShader,
 			vertexShader: depthShader.vertexShader,
 			uniforms: depthUniforms,
 			skinning: true
 		} );
-		
+
 		_depthMaterialMorphSkin = new THREE.ShaderMaterial( {
 			fragmentShader: depthShader.fragmentShader,
 			vertexShader: depthShader.vertexShader,
@@ -86,7 +86,7 @@ THREE.DepthPassPlugin = function () {
 		_gl.clearColor( 1, 1, 1, 1 );
 		_gl.disable( _gl.BLEND );
 
-		_renderer.setDepthTest( true );
+		_renderer.state.setDepthTest( true );
 
 		// update scene
 
@@ -105,9 +105,9 @@ THREE.DepthPassPlugin = function () {
 		_renderer.clear();
 
 		// set object matrices & frustum culling
-		
+
 		_renderList.length = 0;
-		projectObject(scene,scene,camera);
+		projectObject(scene, scene, camera);
 
 		// render regular objects
 
@@ -188,31 +188,31 @@ THREE.DepthPassPlugin = function () {
 		_gl.enable( _gl.BLEND );
 
 	};
-	
-	function projectObject(scene, object,camera){
-		
+
+	function projectObject(scene, object,camera) {
+
 		if ( object.visible ) {
-	
+
 			var webglObjects = _webglObjects[object.id];
-	
+
 			if (webglObjects && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
-		
-		
-				for (var i = 0, l = webglObjects.length; i < l; i++){
-			
+
+
+				for (var i = 0, l = webglObjects.length; i < l; i ++) {
+
 					var webglObject = webglObjects[i];
-					
+
 					object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 					_renderList.push(webglObject);
-					
+
 				}
 			}
-	
-			for(var i = 0, l = object.children.length; i < l; i++) {
-				
+
+			for (var i = 0, l = object.children.length; i < l; i ++) {
+
 				projectObject(scene, object.children[i], camera);
 			}
-		
+
 		}
 	}
 
@@ -228,4 +228,3 @@ THREE.DepthPassPlugin = function () {
 	};
 
 };
-

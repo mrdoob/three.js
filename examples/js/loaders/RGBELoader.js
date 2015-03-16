@@ -30,11 +30,11 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 		rgbe_error = function(rgbe_error_code, msg) {
 			switch (rgbe_error_code) {
 				case rgbe_read_error: console.error("THREE.RGBELoader Read Error: " + (msg||''));
-				break;
+					break;
 				case rgbe_write_error: console.error("THREE.RGBELoader Write Error: " + (msg||''));
-				break;
+					break;
 				case rgbe_format_error:  console.error("THREE.RGBELoader Bad File Format: " + (msg||''));
-				break;
+					break;
 				default:
 				case rgbe_memory_error:  console.error("THREE.RGBELoader: Error: " + (msg||''));
 			}
@@ -60,13 +60,13 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 			lineLimit = !lineLimit ? 1024 : lineLimit;
 			var p = buffer.pos,
 				i = -1, len = 0, s = '', chunkSize = 128,
-				chunk = String.fromCharCode.apply(null, new Uint16Array( buffer.subarray( p, p+chunkSize ) ) )
+				chunk = String.fromCharCode.apply(null, new Uint16Array( buffer.subarray( p, p + chunkSize ) ) )
 			;
-			while ( (0 > (i=chunk.indexOf( NEWLINE ))) && (len < lineLimit) && (p < buffer.byteLength) ) {
+			while ( (0 > (i = chunk.indexOf( NEWLINE ))) && (len < lineLimit) && (p < buffer.byteLength) ) {
 
 				s += chunk; len += chunk.length;
 				p += chunkSize;
-				chunk += String.fromCharCode.apply(null, new Uint16Array( buffer.subarray( p, p+chunkSize ) ) );
+				chunk += String.fromCharCode.apply(null, new Uint16Array( buffer.subarray( p, p + chunkSize ) ) );
 
 			}
 
@@ -78,7 +78,7 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 					else if (byteCode > 0x7ff && byteCode <= 0xffff) byteLen += 2;
 					if (byteCode >= 0xDC00 && byteCode <= 0xDFFF) i--; //trail surrogate
 				}*/
-				if ( false !== consume ) buffer.pos += len+i+1;
+				if ( false !== consume ) buffer.pos += len + i + 1;
 				return s + chunk.slice(0, i);
 
 			}
@@ -122,11 +122,11 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 				}
 			;
 
-			if ( buffer.pos >= buffer.byteLength || !( line=fgets( buffer ) ) ) {
+			if ( buffer.pos >= buffer.byteLength || !( line = fgets( buffer ) ) ) {
 				return rgbe_error( rgbe_read_error, "no header found" );
 			}
 			/* if you want to require the magic token then uncomment the next line */
-			if ( !(match=line.match(magic_token_re)) ) {
+			if ( !(match = line.match(magic_token_re)) ) {
 				return rgbe_error( rgbe_format_error, "bad initial token" );
 			}
 			header.valid |= RGBE_VALID_PROGRAMTYPE;
@@ -144,17 +144,17 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 					continue; // comment line
 				}
 
-				if ( match=line.match(gamma_re) ) {
+				if ( match = line.match(gamma_re) ) {
 					header.gamma = parseFloat(match[1], 10);
 				}
-				if ( match=line.match(exposure_re) ) {
+				if ( match = line.match(exposure_re) ) {
 					header.exposure = parseFloat(match[1], 10);
 				}
-				if ( match=line.match(format_re) ) {
+				if ( match = line.match(format_re) ) {
 					header.valid |= RGBE_VALID_FORMAT;
 					header.format = match[1];//'32-bit_rle_rgbe';
 				}
-				if ( match=line.match(dimensions_re) ) {
+				if ( match = line.match(dimensions_re) ) {
 					header.valid |= RGBE_VALID_DIMENSIONS;
 					header.height = parseInt(match[1], 10);
 					header.width = parseInt(match[2], 10);
@@ -193,29 +193,29 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 				return rgbe_error(rgbe_format_error, "wrong scanline width");
 			}
 
-			data_rgba = new Uint8Array( 4*w*h );
+			data_rgba = new Uint8Array( 4 * w * h );
 
 			if ( !data_rgba || !data_rgba.length ) {
 				return rgbe_error(rgbe_memory_error, "unable to allocate buffer space");
 			}
 
-			offset = 0; pos = 0; ptr_end = 4*scanline_width;
+			offset = 0; pos = 0; ptr_end = 4 * scanline_width;
 			rgbeStart = new Uint8Array( 4 );
 			scanline_buffer = new Uint8Array( ptr_end );
 
 			// read in each successive scanline
-			while( (num_scanlines > 0) && (pos < buffer.byteLength) ) {
+			while ( (num_scanlines > 0) && (pos < buffer.byteLength) ) {
 
-				if ( pos+4 > buffer.byteLength ) {
+				if ( pos + 4 > buffer.byteLength ) {
 
 					return rgbe_error( rgbe_read_error );
 
 				}
 
-				rgbeStart[0] = buffer[pos++];
-				rgbeStart[1] = buffer[pos++];
-				rgbeStart[2] = buffer[pos++];
-				rgbeStart[3] = buffer[pos++];
+				rgbeStart[0] = buffer[pos ++];
+				rgbeStart[1] = buffer[pos ++];
+				rgbeStart[2] = buffer[pos ++];
+				rgbeStart[3] = buffer[pos ++];
 
 				if ( (2 != rgbeStart[0]) || (2 != rgbeStart[1]) || (((rgbeStart[2]<<8) | rgbeStart[3]) != scanline_width) ) {
 
@@ -228,11 +228,11 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 				ptr = 0;
 				while ( (ptr < ptr_end) && (pos < buffer.byteLength) ) {
 
-					count = buffer[ pos++ ];
+					count = buffer[ pos ++ ];
 					isEncodedRun = count > 128;
 					if ( isEncodedRun ) count -= 128;
 
-					if ( (0 === count) || (ptr+count > ptr_end) ) {
+					if ( (0 === count) || (ptr + count > ptr_end) ) {
 
 						return rgbe_error(rgbe_format_error, "bad scanline data");
 
@@ -240,15 +240,15 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 					if ( isEncodedRun ) {
 						// a (encoded) run of the same value
-						byteValue = buffer[ pos++ ];
-						for (i=0; i<count; i++) {
-							scanline_buffer[ ptr++ ] = byteValue;
+						byteValue = buffer[ pos ++ ];
+						for (i = 0; i < count; i ++) {
+							scanline_buffer[ ptr ++ ] = byteValue;
 						}
 						//ptr += count;
 
 					} else {
 						// a literal-run
-						scanline_buffer.set( buffer.subarray(pos, pos+count), ptr );
+						scanline_buffer.set( buffer.subarray(pos, pos + count), ptr );
 						ptr += count; pos += count;
 					}
 				}
@@ -257,19 +257,19 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 				// now convert data from buffer into rgba
 				// first red, then green, then blue, then exponent (alpha)
 				l = scanline_width; //scanline_buffer.byteLength;
-				for (i=0; i<l; i++) {
+				for (i = 0; i < l; i ++) {
 					off = 0;
-					data_rgba[offset] = scanline_buffer[i+off];
+					data_rgba[offset] = scanline_buffer[i + off];
 					off += scanline_width; //1;
-					data_rgba[offset+1] = scanline_buffer[i+off];
+					data_rgba[offset + 1] = scanline_buffer[i + off];
 					off += scanline_width; //1;
-					data_rgba[offset+2] = scanline_buffer[i+off];
+					data_rgba[offset + 2] = scanline_buffer[i + off];
 					off += scanline_width; //1;
-					data_rgba[offset+3] = scanline_buffer[i+off];
+					data_rgba[offset + 3] = scanline_buffer[i + off];
 					offset += 4;
 				}
 
-				num_scanlines--;
+				num_scanlines --;
 			}
 
 			return data_rgba;

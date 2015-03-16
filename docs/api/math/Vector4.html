@@ -113,6 +113,11 @@
 		Linearly interpolate between this vector and *v* with *alpha* factor.
 		</div>
 
+		<h3>[method:Vector4 lerpVectors]( [page:Vector4 v1], [page:Vector4 v2], [page:Float alpha] ) [page:Vector4 this]</h3>
+		<div>
+		Sets this vector to be the vector linearly interpolated between *v1* and *v2* with *alpha* factor.
+		</div>
+
 		<h3>[method:Vector4 clone]()</h3>
 		<div>
 		Clones this vector.
@@ -181,7 +186,7 @@
 		v -- [page:Vector4]
 		</div>
 		<div>
-		If this vector's x, y, z, or w value is greater than vector v's x, y, z, or w value, that value is replaced by the corresponding vector v value. 
+		If this vector's x, y, z, or w value is greater than vector v's x, y, z, or w value, that value is replaced by the corresponding vector v value.
 		</div>
 
 		<h3>[method:Vector4 addScalar]([page:Float s]) [page:Vector4 this]</h3>
@@ -199,7 +204,7 @@
 		<div>
 		Checks to see if this vector matches vector v.
 		</div>
-		
+
 		<h3>[method:Vector4 setAxisAngleFromRotationMatrix]([page:Matrix4 m]) [page:Vector4 this]</h3>
 		<div>
 		m -- [page:Matrix4]
@@ -231,7 +236,7 @@
 		Index 1: y<br/>
 		Index 2: z<br/>
 		Index 3: w<br/>
- 
+
 		</div>
 
 		<h3>[method:null setComponent]([page:Integer index], [page:Float value])</h3>
@@ -241,13 +246,13 @@
 		</div>
 		<div>
 		Sets the value of the vector component	x, y, or z by an index.<br/><br/>
-		
+
 		Index 0: x<br/>
 		Index 1: y<br/>
 		Index 2: z<br/>
 		Index 3: w<br/>
 		</div>
-		
+
 		<h3>[method:Vector4 fromArray]([page:Array array]) [page:Vector4 this]</h3>
 		<div>
 		array -- [page:Array] An array formatted [x, y, z, w]
@@ -256,7 +261,10 @@
 		Sets the vector's components based on an array formatted like [x, y, z, w]
 		</div>
 
-		<h3>[method:Array toArray]()</h3>
+		<h3>[method:Array toArray]( [page:Array array] )</h3>
+		<div>
+		array -- Optional array to store the vector.
+		</div>
 		<div>
 		Returns an array in the format [x, y, z, w]
 		</div>

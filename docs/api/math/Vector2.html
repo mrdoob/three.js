@@ -181,6 +181,16 @@
 		Linear interpolation between this vector and v, where alpha is the percent along the line.
 		</div>
 
+		<h3>[method:Vector2 lerpVectors]([page:Vector2 v1], [page:Vector2 v2], [page:Float alpha]) [page:Vector2 this]</h3>
+		<div>
+		v1 -- [page:Vector2] <br />
+		v2 -- [page:Vector2] <br />
+		alpha -- [page:Float] between 0 and 1.
+		</div>
+		<div>
+		Sets this vector to be the vector linearly interpolated between *v1* and *v2* with *alpha* factor.
+		</div>
+
 		<h3>[method:undefined setComponent]([page:Integer index], [page:Float value])</h3>
 		<div>
 		index -- 0 or 1 <br />
@@ -216,7 +226,10 @@
 		Sets this vector's x value to be array[0] and y value to be array[1].
 		</div>
 
-		<h3>[method:Array toArray]()</h3>
+		<h3>[method:Array toArray]( [page:Array array] )</h3>
+		<div>
+		array -- Optional array to store the vector.
+		</div>
 		<div>
 		Returns an array [x, y].
 		</div>

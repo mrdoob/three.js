@@ -73,7 +73,7 @@
 
 					var geometry = new THREE.ShapeGeometry( shape );
 
-					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color, ambient: color, side: THREE.DoubleSide } ) );
+					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide } ) );
 					mesh.position.set( x, y, z - 125 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
@@ -83,7 +83,7 @@
 
 					var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
-					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color, ambient: color } ) );
+					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
 					mesh.position.set( x, y, z - 75 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );

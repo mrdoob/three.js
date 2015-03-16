@@ -57,22 +57,22 @@
 
 				var materials = [];
 
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0xffffff, ambient: 0x777777, specular: specular, shininess: shininess, shading: shading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x00ff00, ambient: 0x777777, specular: specular, shininess: shininess, shading: shading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x00ff00, ambient: 0x007700, specular: specular, shininess: shininess, shading: shading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x000000, ambient: 0x00ff00, specular: specular, shininess: shininess, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0xffffff, specular: specular, shininess: shininess, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x00ff00, specular: specular, shininess: shininess, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x00ff00, specular: specular, shininess: shininess, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture, bumpMap: imgTexture, bumpScale: bumpScale, color: 0x000000, specular: specular, shininess: shininess, shading: shading } ) );
 
-				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0xffffff, ambient: 0x777777, shading: shading } ) );
-				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0xff0000, ambient: 0x777777, shading: shading } ) );
-				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0xff0000, ambient: 0x770000, shading: shading } ) );
-				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0x000000, ambient: 0xff0000, shading: shading } ) );
+				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0xffffff, shading: shading } ) );
+				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0xff0000, shading: shading } ) );
+				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0xff0000, shading: shading } ) );
+				materials.push( new THREE.MeshLambertMaterial( { map: imgTexture, color: 0x000000, shading: shading } ) );
 
 				shininess = 15;
 
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, ambient: 0x000000, specular: 0xffaa00, shininess: shininess, metal: true, shading: shading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, ambient: 0x000000, specular: 0xaaff00, shininess: shininess, metal: true, shading: shading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, ambient: 0x000000, specular: 0x00ffaa, shininess: shininess, metal: true, shading: shading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, ambient: 0x000000, specular: 0x00aaff, shininess: shininess, metal: true, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, specular: 0xffaa00, shininess: shininess, metal: true, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, specular: 0xaaff00, shininess: shininess, metal: true, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, specular: 0x00ffaa, shininess: shininess, metal: true, shading: shading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { map: imgTexture2, bumpMap: imgTexture2, bumpScale: bumpScale, color: 0x000000, specular: 0x00aaff, shininess: shininess, metal: true, shading: shading } ) );
 
 				// Spheres geometry
 

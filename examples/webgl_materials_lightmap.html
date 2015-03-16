@@ -100,14 +100,13 @@
 
 				// LIGHTS
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.475 );
+				var directionalLight = new THREE.DirectionalLight( 0x333333, 2 );
 				directionalLight.position.set( 100, 100, -100 );
 				scene.add( directionalLight );
 
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.25 );
-				hemiLight.color.setHSL( 0.6, 1, 0.75 );
-				hemiLight.groundColor.setHSL( 0.1, 0.8, 0.7 );
+				var hemiLight = new THREE.HemisphereLight( 0xaabbff, 0x040404, 1 );
+
 				hemiLight.position.y = 500;
 				scene.add( hemiLight );
 

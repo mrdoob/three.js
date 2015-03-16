@@ -46,14 +46,13 @@
 				"uuid": "6EDB0369-7E11-4B0F-BF98-4BD761846D65",
 				"type": "MeshPhongMaterial",
 				"color": 16777215,
-				"ambient": 16777215,
 				"emissive": 0,
 				"specular": 1118481,
 				"shininess": 30
 			},
 			{
-				"uuid": "D586E672-03FC-4C82-9D6E-CCCF899DDDB1",
-				"type": "MeshBasicMaterial",
+				"uuid": "F5361474-F5F1-412F-8D99-3699B868092D",
+				"type": "SpriteMaterial",
 				"color": 16777215
 			}],
 		"object": {
@@ -71,12 +70,11 @@
 					"matrix": [1,0,0,0,0,0.0007962886593304574,-0.9999997019767761,0,0,0.9999997019767761,0.0007962886593304574,0,0,-2,0,1]
 				},
 				{
-					"uuid": "9DFA44C6-C85A-4F2F-9252-E9564C2785C5",
-					"type": "Mesh",
+					"uuid": "0A3CB873-07E6-4EEB-830B-68192504111B",
+					"type": "Sprite",
 					"name": "Particle",
-					"geometry": "8693E7B2-0009-4C4C-94C5-8E031557AEC2",
-					"material": "D586E672-03FC-4C82-9D6E-CCCF899DDDB1",
-					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+					"material": "F5361474-F5F1-412F-8D99-3699B868092D",
+					"matrix": [3,0,0,0,0,3,0,0,0,0,1,0,0,0,0,1]
 				},
 				{
 					"uuid": "40E5CDA4-0E39-4265-9293-3E9EC3207F61",

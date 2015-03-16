@@ -17,12 +17,72 @@ Sidebar.Geometry = function ( editor ) {
 
 	var geometryType = new UI.Text().setTextTransform( 'uppercase' );
 	container.addStatic( geometryType );
+
+	// Actions
+
+	var objectActions = new UI.Select().setPosition('absolute').setRight( '8px' ).setFontSize( '11px' );
+	objectActions.setOptions( {
+
+		'Actions': 'Actions',
+		'Center': 'Center',
+		'Flatten': 'Flatten'
+
+	} );
+	objectActions.onClick( function ( event ) {
+
+		event.stopPropagation(); // Avoid panel collapsing
+
+	} );
+	objectActions.onChange( function ( event ) {
+
+		var action = this.getValue();
+
+		var object = editor.selected;
+		var geometry = object.geometry;
+
+		if ( confirm( action + ' ' + object.name + '?' ) === false ) return;
+
+		switch ( action ) {
+
+			case 'Center':
+
+				var offset = geometry.center();
+
+				object.position.sub( offset );
+
+				editor.signals.geometryChanged.dispatch( geometry );
+				editor.signals.objectChanged.dispatch( object );
+
+				break;
+
+			case 'Flatten':
+
+				geometry.applyMatrix( object.matrix );
+
+				object.position.set( 0, 0, 0 );
+				object.rotation.set( 0, 0, 0 );
+				object.scale.set( 1, 1, 1 );
+
+				editor.signals.geometryChanged.dispatch( geometry );
+				editor.signals.objectChanged.dispatch( object );
+
+				break;
+
+		}
+
+		this.setValue( 'Actions' );
+
+		signals.objectChanged.dispatch( object );
+
+	} );
+	container.addStatic( objectActions );
+
 	container.add( new UI.Break() );
 
 	// uuid
 
 	var geometryUUIDRow = new UI.Panel();
-	var geometryUUID = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
+	var geometryUUID = new UI.Input().setWidth( '115px' ).setFontSize( '12px' ).setDisabled( true );
 	var geometryUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
@@ -40,7 +100,7 @@ Sidebar.Geometry = function ( editor ) {
 	// name
 
 	var geometryNameRow = new UI.Panel();
-	var geometryName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
+	var geometryName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 		editor.setGeometryName( editor.selected.geometry, geometryName.getValue() );
 

@@ -237,7 +237,6 @@
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
-				planeMaterial.ambient = planeMaterial.color;
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -271,7 +270,7 @@
 				textGeo.computeBoundingBox();
 				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff, ambient: 0xaa0000 } );
+				var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
 
 				var mesh = new THREE.Mesh( textGeo, textMaterial );
 				mesh.position.x = centerOffset;
@@ -313,7 +312,6 @@
 					if ( fudgeColor ) {
 
 						material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.5 - 0.25 );
-						material.ambient = material.color;
 
 					}
 

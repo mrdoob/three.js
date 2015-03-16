@@ -1,0 +1,1 @@
+ffmpeg -i MaryOculus.mp4 -vf scale=2048:1024 -b:v 20M -threads 4 -an MaryOculus7.webm

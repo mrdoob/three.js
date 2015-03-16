@@ -26,7 +26,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	var repeats = this.subdivisions;
 
-	while ( repeats-- > 0 ) {
+	while ( repeats -- > 0 ) {
 		this.smooth( geometry );
 	}
 
@@ -101,11 +101,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		var i, il, face, edge;
 
-		for ( i = 0, il = vertices.length; i < il; i++ ) {
+		for ( i = 0, il = vertices.length; i < il; i ++ ) {
 			metaVertices[ i ] = { edges: [] };
 		}
 		
-		for ( i = 0, il = faces.length; i < il; i++ ) {
+		for ( i = 0, il = faces.length; i < il; i ++ ) {
 			face = faces[ i ];
 
 			processEdge( face.a, face.b, vertices, edges, face, metaVertices );
@@ -194,11 +194,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			tmp.set( 0, 0, 0 );
 
-			for ( j = 0; j < connectedFaces; j++ ) {
+			for ( j = 0; j < connectedFaces; j ++ ) {
 
 				face = currentEdge.faces[ j ];
 				
-				for ( k = 0; k < 3; k++ ) {
+				for ( k = 0; k < 3; k ++ ) {
 
 					other = oldVertices[ face[ ABC[k] ] ];
 					if (other !== currentEdge.a && other !== currentEdge.b ) break;
@@ -229,7 +229,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var connectingEdge, connectingEdges, oldVertex, newSourceVertex;
 		newSourceVertices = [];
 
-		for ( i = 0, il = oldVertices.length; i < il; i++ ) {
+		for ( i = 0, il = oldVertices.length; i < il; i ++ ) {
 
 			oldVertex = oldVertices[ i ];
 
@@ -284,7 +284,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			tmp.set( 0, 0, 0 );
 
-			for ( j=0; j < n; j++ ) {
+			for ( j = 0; j < n; j ++ ) {
 
 				connectingEdge = connectingEdges[ j ];
 				other = connectingEdge.a !== oldVertex ? connectingEdge.a : connectingEdge.b;
@@ -312,7 +312,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var sl = newSourceVertices.length, edge1, edge2, edge3;
 		newFaces = [];
 
-		for ( i = 0, il = oldFaces.length; i < il; i++ ) {
+		for ( i = 0, il = oldFaces.length; i < il; i ++ ) {
 
 			face = oldFaces[ i ];
 

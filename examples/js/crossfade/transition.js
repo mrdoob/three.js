@@ -5,8 +5,8 @@ function Transition ( sceneA, sceneB ) {
 	this.cameraOrtho = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10, 10);
 
 	this.textures = [];
-	for (var i=0;i<6;i++)
-		this.textures[i]=new THREE.ImageUtils.loadTexture('textures/transition/transition'+(i+1)+'.png');
+	for (var i = 0; i < 6; i ++)
+		this.textures[i] = new THREE.ImageUtils.loadTexture('textures/transition/transition' + (i + 1) + '.png');
 				
 	this.quadmaterial = new THREE.ShaderMaterial({
 
@@ -101,13 +101,13 @@ function Transition ( sceneA, sceneB ) {
 	
 	this.setTextureThreshold = function ( value ) {
 	
-		this.quadmaterial.uniforms.threshold.value=value;
+		this.quadmaterial.uniforms.threshold.value = value;
 
 	}
 	
 	this.useTexture = function ( value ) {
 	
-		this.quadmaterial.uniforms.useTexture.value = value?1:0;
+		this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
 
 	}
 	
@@ -122,32 +122,32 @@ function Transition ( sceneA, sceneB ) {
 		// Transition animation
 		if (transitionParams.animateTransition)
 		{
-			var t=(1+Math.sin(transitionParams.transitionSpeed*clock.getElapsedTime()/Math.PI))/2;
-			transitionParams.transition=THREE.Math.smoothstep(t,0.3,0.7);
+			var t = (1 + Math.sin(transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI)) / 2;
+			transitionParams.transition = THREE.Math.smoothstep(t, 0.3, 0.7);
 			
 			// Change the current alpha texture after each transition
-			if (transitionParams.loopTexture && (transitionParams.transition==0 || transitionParams.transition==1))
+			if (transitionParams.loopTexture && (transitionParams.transition == 0 || transitionParams.transition == 1))
 			{
 				if (this.needChange)
 				{
-					transitionParams.texture=(transitionParams.texture+1)%this.textures.length;
+					transitionParams.texture = (transitionParams.texture + 1)%this.textures.length;
 					this.quadmaterial.uniforms.tMixTexture.value = this.textures[transitionParams.texture];
-					this.needChange=false;
+					this.needChange = false;
 				}
 			}	
 			else
-				this.needChange=true;
+				this.needChange = true;
 				
 		}
 		
 		this.quadmaterial.uniforms.mixRatio.value = transitionParams.transition;
 
 		// Prevent render both scenes when it's not necessary
-		if (transitionParams.transition==0) {
+		if (transitionParams.transition == 0) {
 			
 			this.sceneB.render( delta, false );
 		
-		} else if (transitionParams.transition==1) {
+		} else if (transitionParams.transition == 1) {
 		
 			this.sceneA.render( delta, false );
 			

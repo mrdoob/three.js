@@ -133,3 +133,179 @@ UI.Texture.prototype.onChange = function ( callback ) {
 	return this;
 
 };
+
+// Outliner
+
+UI.Outliner = function ( editor ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'Outliner';
+	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
+
+	var scene = editor.scene;
+
+	var sortable = Sortable.create( dom, {
+		draggable: '.draggable',
+		onUpdate: function ( event ) {
+
+			var item = event.item;
+
+			var object = scene.getObjectById( item.value );
+
+			if ( item.nextSibling === null ) {
+
+				editor.moveObject( object, editor.scene );
+
+			} else {
+
+				var nextObject = scene.getObjectById( item.nextSibling.value );
+				editor.moveObject( object, nextObject.parent, nextObject );
+
+			}
+
+		}
+	} );
+
+	// Broadcast for object selection after arrow navigation
+	var changeEvent = document.createEvent('HTMLEvents');
+	changeEvent.initEvent( 'change', true, true );
+
+	// Prevent native scroll behavior
+	dom.addEventListener( 'keydown', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+			event.preventDefault();
+			event.stopPropagation();
+			break;
+		}
+
+	}, false);
+
+	// Keybindings to support arrow navigation
+	dom.addEventListener( 'keyup', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+			scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
+
+			if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
+
+				// Highlight selected dom elem and scroll parent if needed
+				scope.setValue( scope.options[ scope.selectedIndex ].value );
+
+				scope.dom.dispatchEvent( changeEvent );
+
+			}
+
+			break;
+		}
+
+	}, false);
+
+	this.dom = dom;
+
+	this.options = [];
+	this.selectedIndex = -1;
+	this.selectedValue = null;
+
+	return this;
+
+};
+
+UI.Outliner.prototype = Object.create( UI.Element.prototype );
+UI.Outliner.prototype.constructor = UI.Outliner;
+
+UI.Outliner.prototype.setOptions = function ( options ) {
+
+	var scope = this;
+
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
+
+	while ( scope.dom.children.length > 0 ) {
+
+		scope.dom.removeChild( scope.dom.firstChild );
+
+	}
+
+	scope.options = [];
+
+	for ( var i = 0; i < options.length; i ++ ) {
+
+		var option = options[ i ];
+
+		var div = document.createElement( 'div' );
+		div.className = 'option ' + ( option.static === true ? '': 'draggable' );
+		div.innerHTML = option.html;
+		div.value = option.value;
+		scope.dom.appendChild( div );
+
+		scope.options.push( div );
+
+		div.addEventListener( 'click', function ( event ) {
+
+			scope.setValue( this.value );
+			scope.dom.dispatchEvent( changeEvent );
+
+		}, false );
+
+	}
+
+	return scope;
+
+};
+
+UI.Outliner.prototype.getValue = function () {
+
+	return this.selectedValue;
+
+};
+
+UI.Outliner.prototype.setValue = function ( value ) {
+
+	for ( var i = 0; i < this.options.length; i ++ ) {
+
+		var element = this.options[ i ];
+
+		if ( element.value === value ) {
+
+			element.classList.add( 'active' );
+
+			// scroll into view
+
+			var y = element.offsetTop - this.dom.offsetTop;
+			var bottomY = y + element.offsetHeight;
+			var minScroll = bottomY - this.dom.offsetHeight;
+
+			if ( this.dom.scrollTop > y ) {
+
+				this.dom.scrollTop = y
+
+			} else if ( this.dom.scrollTop < minScroll ) {
+
+				this.dom.scrollTop = minScroll;
+
+			}
+
+			this.selectedIndex = i;
+
+		} else {
+
+			element.classList.remove( 'active' );
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	return this;
+
+};

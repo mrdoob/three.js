@@ -41,7 +41,7 @@
 		</div>
 		<div>
 		Example:<br>
-		materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
+		materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
 	
 		</div>
 
@@ -52,11 +52,6 @@
 		<h3>[property:Color color]</h3>
 		<div>
 		Diffuse color of the material. Default is white.<br />
-		</div>
-
-		<h3>[property:Color ambient]</h3>
-		<div>
-		Ambient color of the material, multiplied by the color of the [page:AmbientLight]. Default is white.<br />
 		</div>
 
 		<h3>[property:Color emissive]</h3>
@@ -70,7 +65,7 @@
 		</div>
 
 		<h3>[property:Float shininess]</h3>
-		<div>How shiny the specular highlight is; a higher value gives a sharper highlight. Default is *30*.</div>
+		<div>How shiny the specular highlight is; a higher value gives a sharper highlight. Default is *30*. It should not be set to 0.</div>
 
 		<h3>[property:boolean metal]</h3>
 		<div>
