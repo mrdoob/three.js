@@ -50,8 +50,7 @@
 				video.play();
 
 				texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
+				texture.minFilter = THREE.LinearFilter;
 				texture.format = THREE.RGBFormat;
 				texture.generateMipmaps = false;
 
