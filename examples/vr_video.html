@@ -11,10 +11,24 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				color: #fff;
+				text-align: center;
+			}
+			a {
+				color: #ff0
+			}
 		</style>
 	</head>
 	<body>
 		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> webgl - vr video<br />
+			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank">mery project</a>.
+		</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/effects/VREffect.js"></script>
