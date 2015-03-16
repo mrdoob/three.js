@@ -37,3 +37,24 @@ float sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {
 vec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {
 	return pointOnLine + lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) );
 }
+float calcLightAttenuation( float lightDistance, float cutoffDistance, float decayExponent ) {
+	if ( decayExponent > 0.0 ) {
+	  return pow( saturate( 1.0 - lightDistance / cutoffDistance ), decayExponent );
+	}
+	return 1.0;
+}
+
+vec3 inputToLinear( in vec3 a ) {
+#ifdef GAMMA_INPUT
+	return pow( a, vec3( float( GAMMA_FACTOR ) ) );
+#else
+	return a;
+#endif
+}
+vec3 linearToOutput( in vec3 a ) {
+#ifdef GAMMA_OUTPUT
+	return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );
+#else
+	return a;
+#endif
+}

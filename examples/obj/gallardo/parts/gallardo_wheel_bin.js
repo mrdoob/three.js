@@ -21,8 +21,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 27.45098,
-	"transparency" : 0.0
+	"specularCoef" : 27.45098
 	},
 
 	{
@@ -34,8 +33,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 27.45098,
-	"transparency" : 0.0
+	"specularCoef" : 27.45098
 	}],
 
     "buffers": "gallardo_wheel_bin.bin"

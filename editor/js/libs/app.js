@@ -6,8 +6,12 @@ var APP = {
 
 	Player: function () {
 
+		var scope = this;
+
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
+
+		var vr, controls;
 
 		var events = {};
 
@@ -18,12 +22,15 @@ var APP = {
 
 		this.load = function ( json ) {
 
+			vr = json.project.vr;
+
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			this.dom = renderer.domElement;
 
-			camera = loader.parse( json.camera );
-			scene = loader.parse( json.scene );
+			this.setScene( loader.parse( json.scene ) );
+			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
 				keydown: [],
@@ -47,7 +54,7 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( 'player', 'scene', 'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove', 'touchstart', 'touchend', 'touchmove', 'update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, touchstart: touchstart, touchend: touchend, touchmove: touchmove, update: update };' ).bind( object ) )( this, scene );
+					var functions = ( new Function( 'player, scene, keydown, keyup, mousedown, mouseup, mousemove, touchstart, touchend, touchmove, update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, touchstart: touchstart, touchend: touchend, touchmove: touchmove, update: update };' ).bind( object ) )( this, scene );
 
 					for ( var name in functions ) {
 
@@ -68,8 +75,6 @@ var APP = {
 
 			}
 
-			this.dom = renderer.domElement;
-
 		};
 
 		this.setCamera = function ( value ) {
@@ -78,9 +83,54 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
+
+			if ( vr === true ) {
+
+				if ( camera.parent === undefined ) {
+
+					// camera needs to be in the scene so camera2 matrix updates
+					
+					scene.add( camera );
+
+				}
+
+				var camera2 = camera.clone();
+				camera.add( camera2 );
+
+				camera = camera2;
+
+				controls = new THREE.VRControls( camera );
+				renderer = new THREE.VREffect( renderer );
+
+				document.addEventListener( 'keyup', function ( event ) {
+
+					switch ( event.keyCode ) {
+						case 90:
+							controls.zeroSensor();
+							break;
+					}
+
+				} );
+
+				this.dom.addEventListener( 'dblclick', function () {
+
+					renderer.setFullScreen( true );
+
+				} );
+
+			}
+
 		};
 
+		this.setScene = function ( value ) {
+
+			scene = value;
+
+		},
+
 		this.setSize = function ( width, height ) {
+
+			if ( renderer._fullScreen ) return;
 
 			this.width = width;
 			this.height = height;
@@ -102,15 +152,19 @@ var APP = {
 
 		};
 
-		var request;
+		var prevTime, request;
 
 		var animate = function ( time ) {
 
 			request = requestAnimationFrame( animate );
 
-			dispatch( events.update, { time: time } );
+			dispatch( events.update, { time: time, delta: time - prevTime } );
+
+			if ( vr ) controls.update();
 
 			renderer.render( scene, camera );
+
+			prevTime = time;
 
 		};
 
@@ -126,6 +180,7 @@ var APP = {
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
 			request = requestAnimationFrame( animate );
+			prevTime = performance.now();
 
 		};
 

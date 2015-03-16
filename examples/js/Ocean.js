@@ -20,8 +20,8 @@
 		return value !== undefined ? value : defaultValue;
 	};
 	options = options || {};
-	this.clearColor = optionalParameter(options.CLEAR_COLOR, [1.0, 1.0, 1.0, 0.0]);
-	this.geometryOrigin = optionalParameter(options.GEOMETRY_ORIGIN, [-1000.0, -1000.0]);
+	this.clearColor = optionalParameter(options.CLEAR_COLOR, [ 1.0, 1.0, 1.0, 0.0 ]);
+	this.geometryOrigin = optionalParameter(options.GEOMETRY_ORIGIN, [ -1000.0, -1000.0 ]);
 	this.sunDirectionX = optionalParameter(options.SUN_DIRECTION[0], -1.0);
 	this.sunDirectionY = optionalParameter(options.SUN_DIRECTION[1], 1.0);
 	this.sunDirectionZ = optionalParameter(options.SUN_DIRECTION[2], 1.0);
@@ -41,6 +41,7 @@
 	this.matrixNeedsUpdate = false;
 	
 	// Setup framebuffer pipeline
+	var renderTargetType = optionalParameter(options.USE_HALF_FLOAT, false) ? THREE.HalfFloatType : THREE.FloatType;
 	var LinearClampParams = {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
@@ -50,7 +51,7 @@
 		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
-		type: THREE.FloatType
+		type: renderTargetType
 	};
 	var NearestClampParams = {
 		minFilter: THREE.NearestFilter,
@@ -61,7 +62,7 @@
 		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha:false,
-		type: THREE.FloatType
+		type: renderTargetType
 	};
 	var NearestRepeatParams = {
 		minFilter: THREE.NearestFilter,
@@ -72,7 +73,7 @@
 		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
-		type: THREE.FloatType
+		type: renderTargetType
 	};
 	this.initialSpectrumFramebuffer = new THREE.WebGLRenderTarget(this.resolution, this.resolution, NearestRepeatParams);
 	this.spectrumFramebuffer = new THREE.WebGLRenderTarget(this.resolution, this.resolution, NearestClampParams);
@@ -227,8 +228,8 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function() {
 	// Setup the seed texture
 	this.pingPhase = true;
 	var phaseArray = new window.Float32Array(this.resolution * this.resolution * 4);
-	for (var i = 0; i < this.resolution; i++) {
-		for (var j = 0; j < this.resolution; j++) {
+	for (var i = 0; i < this.resolution; i ++) {
+		for (var j = 0; j < this.resolution; j ++) {
 			phaseArray[i * this.resolution * 4 + j * 4] =  Math.random() * 2.0 * Math.PI;
 			phaseArray[i * this.resolution * 4 + j * 4 + 1] = 0.0;
 			phaseArray[i * this.resolution * 4 + j * 4 + 2] = 0.0;
@@ -282,7 +283,7 @@ THREE.Ocean.prototype.renderSpectrumFFT = function() {
 	
 	this.scene.overrideMaterial = this.materialOceanHorizontal;
 
-	for (var i = 0; i < iterations; i++) {
+	for (var i = 0; i < iterations; i ++) {
 		if (i === 0) {
 			this.materialOceanHorizontal.uniforms.u_input.value = this.spectrumFramebuffer;
 			this.materialOceanHorizontal.uniforms.u_subtransformSize.value = Math.pow(2, (i % (iterations)) + 1);
@@ -300,7 +301,7 @@ THREE.Ocean.prototype.renderSpectrumFFT = function() {
 		}
 	}
 	this.scene.overrideMaterial = this.materialOceanVertical;
-	for (var i = iterations; i < iterations*2; i++) {
+	for (var i = iterations; i < iterations * 2; i ++) {
 		if (i === iterations * 2 - 1) {
 			this.materialOceanVertical.uniforms.u_input.value = (iterations % 2 === 0) ? this.pingTransformFramebuffer : this.pongTransformFramebuffer;
 			this.materialOceanVertical.uniforms.u_subtransformSize.value = Math.pow(2, (i % (iterations)) + 1);

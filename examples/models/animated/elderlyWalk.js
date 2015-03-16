@@ -24,7 +24,7 @@
 	"colorSpecular" : [0.10135135054588318, 0.10135135054588318, 0.10135135054588318],
 	"shading" : "Lambert",
 	"specularCoef" : 50,
-	"transparency" : 1.0,
+	"opacity" : 1.0,
 	"vertexColors" : false
 	},
 
@@ -37,7 +37,7 @@
 	"colorSpecular" : [0.10135135054588318, 0.10135135054588318, 0.10135135054588318],
 	"shading" : "Lambert",
 	"specularCoef" : 50,
-	"transparency" : 1.0,
+	"opacity" : 1.0,
 	"vertexColors" : false
 	}],
 

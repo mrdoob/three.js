@@ -28,11 +28,11 @@ THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
 	};
 
 	// PVR v3
-	if( header[0] === 0x03525650 ) {
+	if ( header[0] === 0x03525650 ) {
 		return THREE.PVRLoader._parseV3( pvrDatas );
 	} 
 	// PVR v2
-	else if( header[11] === 0x21525650) {
+	else if ( header[11] === 0x21525650) {
 		return THREE.PVRLoader._parseV2( pvrDatas );
 
 	} else {
@@ -55,7 +55,7 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 		numFaces      =  header[10],
 		numMipmaps    =  header[11];
 
-	switch( pixelFormat ) {
+	switch ( pixelFormat ) {
 		case 0 : // PVRTC 2bpp RGB
 			bpp = 2;
 			format = THREE.RGB_PVRTC_2BPPV1_Format;
@@ -73,20 +73,20 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 			format = THREE.RGBA_PVRTC_4BPPV1_Format;
 			break;
 		default :
-			throw new Error( "pvrtc - unsupported PVR format "+pixelFormat);
+			throw new Error( "pvrtc - unsupported PVR format " + pixelFormat);
 	}
 
 	pvrDatas.dataPtr 	 = 52 + metaLen;
-  	pvrDatas.bpp 		 = bpp;
-  	pvrDatas.format 	 = format;
-  	pvrDatas.width 		 = width;
-  	pvrDatas.height 	 = height;
-  	pvrDatas.numSurfaces = numFaces;
-  	pvrDatas.numMipmaps  = numMipmaps;
+	pvrDatas.bpp 		 = bpp;
+	pvrDatas.format 	 = format;
+	pvrDatas.width 		 = width;
+	pvrDatas.height 	 = height;
+	pvrDatas.numSurfaces = numFaces;
+	pvrDatas.numMipmaps  = numMipmaps;
 
-  	pvrDatas.isCubemap 	= (numFaces === 6);
+	pvrDatas.isCubemap 	= (numFaces === 6);
 
-  	return THREE.PVRLoader._extract( pvrDatas );
+	return THREE.PVRLoader._extract( pvrDatas );
 };
 
 THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
@@ -123,28 +123,28 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 		format = _hasAlpha ? THREE.RGBA_PVRTC_4BPPV1_Format : THREE.RGB_PVRTC_4BPPV1_Format;
 		bpp = 4;
 	}
-	else if( formatFlags === PVRTC_2) {
+	else if ( formatFlags === PVRTC_2) {
 		format = _hasAlpha ? THREE.RGBA_PVRTC_2BPPV1_Format : THREE.RGB_PVRTC_2BPPV1_Format;
 		bpp = 2;
 	}
 	else
-		throw new Error( "pvrtc - unknown format "+formatFlags);
+		throw new Error( "pvrtc - unknown format " + formatFlags);
 	
 
 
 	pvrDatas.dataPtr 	 = headerLength;
-  	pvrDatas.bpp 		 = bpp;
-  	pvrDatas.format 	 = format;
-  	pvrDatas.width 		 = width;
-  	pvrDatas.height 	 = height;
-  	pvrDatas.numSurfaces = numSurfs;
-  	pvrDatas.numMipmaps  = numMipmaps + 1;
+	pvrDatas.bpp 		 = bpp;
+	pvrDatas.format 	 = format;
+	pvrDatas.width 		 = width;
+	pvrDatas.height 	 = height;
+	pvrDatas.numSurfaces = numSurfs;
+	pvrDatas.numMipmaps  = numMipmaps + 1;
 
   	// guess cubemap type seems tricky in v2
   	// it juste a pvr containing 6 surface (no explicit cubemap type)
-  	pvrDatas.isCubemap 	= (numSurfs === 6);
+	pvrDatas.isCubemap 	= (numSurfs === 6);
 
-  	return THREE.PVRLoader._extract( pvrDatas );
+	return THREE.PVRLoader._extract( pvrDatas );
 
 };
 
@@ -195,7 +195,7 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 
 
-	if( bpp === 2 ){
+	if ( bpp === 2 ) {
 		blockWidth = 8;
 		blockHeight = 4;
 	} else {
@@ -243,7 +243,7 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 		}
 
-		mipLevel++;
+		mipLevel ++;
 
 	}
 

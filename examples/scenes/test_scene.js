@@ -518,7 +518,7 @@
 				"colorDiffuse" : [0.8, 0.8, 0.8],
 				"colorSpecular" : [0.5, 0.5, 0.5],
 				"specularCoef" : 50,
-				"transparency" : 1.0,
+				"opacity" : 1.0,
 				"vertexColors" : true
 			}],
 

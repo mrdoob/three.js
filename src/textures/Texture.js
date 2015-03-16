@@ -11,6 +11,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.sourceFile = '';
 
 	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];

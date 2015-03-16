@@ -56,17 +56,17 @@ Object.defineProperties(THREE.ProxyGeometry.prototype, {
 
 	verticesNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'position' ]) return this.attributes[ 'position' ].needsUpdate; } ,
+		get: function() { if (this.attributes[ 'position' ]) return this.attributes[ 'position' ].needsUpdate; },
 		set: function(v) { if (this.attributes[ 'position' ]) this.attributes[ 'position' ].needsUpdate = v; } 
 	},
 	colorsNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'color' ]) return this.attributes[ 'color' ].needsUpdate; } ,
+		get: function() { if (this.attributes[ 'color' ]) return this.attributes[ 'color' ].needsUpdate; },
 		set: function(v) { if (this.attributes[ 'color' ]) this.attributes[ 'color' ].needsUpdate = v; } 
 	},
 	normalsNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'normal' ]) return this.attributes[ 'normal' ].needsUpdate; } ,
+		get: function() { if (this.attributes[ 'normal' ]) return this.attributes[ 'normal' ].needsUpdate; },
 		set: function(v) { if (this.attributes[ 'normal' ]) this.attributes[ 'normal' ].needsUpdate = v; } 
 	},
 });
@@ -95,7 +95,7 @@ THREE.ProxyGeometry.prototype.createVertexProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.vertices[i].copy(values[i]);
 
@@ -166,7 +166,7 @@ THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 		for ( var i = 0, l = positionarray.length / 3; i < l; i += 3 ) {
 
 			var o = i * 3;
-			var v1 = i, v2 = i+1, v3 = i+2;
+			var v1 = i, v2 = i + 1, v3 = i + 2;
 
 			var face = new THREE.ProxyFace3( v1, v2, v3 );
 			faces.push(face);
@@ -179,7 +179,7 @@ THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = faces[i],
 			    v = values[i];
@@ -222,7 +222,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 		var normalarray = this.attributes[ 'normal' ].array;
 
-		for (var i = 0, l = this.faces.length; i < l; i++) {
+		for (var i = 0, l = this.faces.length; i < l; i ++) {
 
 			var f = this.faces[i];
 
@@ -240,14 +240,14 @@ THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = this.faces[i],
 			    v = values[i];
 
 			if (v.vertexNormals.length > 0) {
 
-				for (var j = 0, l2 = f.vertexNormals.length; j < l2; j++) {
+				for (var j = 0, l2 = f.vertexNormals.length; j < l2; j ++) {
 
 					f.vertexNormals[j].copy(v.vertexNormals[j]);
 
@@ -271,7 +271,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
 		var colorarray = this.attributes[ 'color' ].array;
 
-		for (var i = 0, l = this.faces.length; i < l; i++) {
+		for (var i = 0, l = this.faces.length; i < l; i ++) {
 			var f = this.faces[i];
 
 			if ( this.attributes[ 'index' ] ) {
@@ -298,12 +298,12 @@ THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = this.faces[i],
 			    v = values[i];
 
-			for (var j = 0, l2 = f.vertexColors.length; j < l2; j++) {
+			for (var j = 0, l2 = f.vertexColors.length; j < l2; j ++) {
 
 				if (v.vertexColors.length > 0) {
 
@@ -329,7 +329,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) 
 
 		var tangentarray = this.attributes[ 'tangent' ].array;
 
-		for (var i = 0, l = this.faces.length; i < l; i++) {
+		for (var i = 0, l = this.faces.length; i < l; i ++) {
 
 			var f = this.faces[i];
 
@@ -346,14 +346,14 @@ THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) 
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = this.faces[i],
 			    v = values[i];
 
 			if (v.vertexTangents.length > 0) {
 
-				for (var j = 0, l2 = f.vertexTangents.length; j < l2; j++) {
+				for (var j = 0, l2 = f.vertexTangents.length; j < l2; j ++) {
 
 					f.vertexTangents[j].copy(v.vertexTangents[j]);
 
@@ -384,7 +384,7 @@ THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 		var faces = this.faces;
 		var uvarray = this.attributes[ 'uv' ].array;
 
-		for (var i = 0, l = faces.length; i < l; i++) {
+		for (var i = 0, l = faces.length; i < l; i ++) {
 			var f = faces[i];
 
 			this.faceVertexUvs[0][i] = [];
@@ -408,9 +408,9 @@ THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
-			for (var j = 0, l2 = values[i].length; j < l2; j++) {
+			for (var j = 0, l2 = values[i].length; j < l2; j ++) {
 
 				var uv = values[i][j];
 				this.faceVertexUvs[0][i][j].copy(uv);
@@ -445,7 +445,7 @@ THREE.ProxyGeometry.prototype.createSkinIndexProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.skinIndices[i].copy(values[i]);
 
@@ -477,7 +477,7 @@ THREE.ProxyGeometry.prototype.createSkinWeightProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.skinWeights[i].copy(values[i]);
 
@@ -509,7 +509,7 @@ THREE.ProxyGeometry.prototype.createColorProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.colors[i].copy(values[i]);
 
@@ -585,7 +585,7 @@ THREE.ProxyGeometry.prototype.mergeVertices = function () {
 	// have to remove them from the geometry.
 	var faceIndicesToRemove = [];
 
-	for( i = 0, il = this.faces.length; i < il; i ++ ) {
+	for ( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 		face = this.faces[ i ];
 

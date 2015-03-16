@@ -197,11 +197,11 @@
 
 			#ifdef SHADOWMAP_CASCADE
 
-				if ( inFrustum && inFrustumCount == 1 ) gl_FragColor.xyz *= frustumColors[ i ];
+				if ( inFrustum && inFrustumCount == 1 ) outgoingLight *= frustumColors[ i ];
 
 			#else
 
-				if ( inFrustum ) gl_FragColor.xyz *= frustumColors[ i ];
+				if ( inFrustum ) outgoingLight *= frustumColors[ i ];
 
 			#endif
 
@@ -209,12 +209,9 @@
 
 	}
 
-	#ifdef GAMMA_OUTPUT
+	// NOTE: I am unsure if this is correct in linear space.  -bhouston, Dec 29, 2014
+	shadowColor = inputToLinear( shadowColor );
 
-		shadowColor *= shadowColor;
-
-	#endif
-
-	gl_FragColor.xyz = gl_FragColor.xyz * shadowColor;
+	outgoingLight = outgoingLight * shadowColor;
 
 #endif

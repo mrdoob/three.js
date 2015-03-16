@@ -182,7 +182,7 @@ THREE.SceneExporter.prototype = {
 
 		function NumConstantString( c ) {
 
-			var constants = [ "NearestFilter", "NearestMipMapNearestFilter" , "NearestMipMapLinearFilter",
+			var constants = [ "NearestFilter", "NearestMipMapNearestFilter", "NearestMipMapLinearFilter",
 							  "LinearFilter", "LinearMipMapNearestFilter", "LinearMipMapLinearFilter" ];
 
 			for ( var i = 0; i < constants.length; i ++ ) {
@@ -238,11 +238,12 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type"      : "PointLight",',
-				'	"color"     : ' + o.color.getHex() + ',',
-				'	"intensity" : ' + o.intensity + ',',
-				'	"position"  : ' + Vector3String( o.position ) + ',',
-				'	"distance"  : ' + o.distance + ( o.children.length ? ',' : '' )
+				'	"type"           : "PointLight",',
+				'	"color"          : ' + o.color.getHex() + ',',
+				'	"intensity"      : ' + o.intensity + ',',
+				'	"position"       : ' + Vector3String( o.position ) + ',',
+				'	"decay"          : ' + o.decay + ',',
+				'	"distance"       : ' + o.distance + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -251,14 +252,15 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type"      : "SpotLight",',
-				'	"color"     : ' + o.color.getHex() + ',',
-				'	"intensity" : ' + o.intensity + ',',
-				'	"position"  : ' + Vector3String( o.position ) + ',',
-				'	"distance"  : ' + o.distance + ',',
-				'	"angle"     : ' + o.angle + ',',
-				'	"exponent"  : ' + o.exponent + ',',
-				'	"target"    : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
+				'	"type"           : "SpotLight",',
+				'	"color"          : ' + o.color.getHex() + ',',
+				'	"intensity"      : ' + o.intensity + ',',
+				'	"position"       : ' + Vector3String( o.position ) + ',',
+				'	"distance"       : ' + o.distance + ',',
+				'	"angle"          : ' + o.angle + ',',
+				'	"exponent"       : ' + o.exponent + ',',
+				'	"decay"          : ' + o.decay + ',',
+				'	"target"         : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
 				];
 

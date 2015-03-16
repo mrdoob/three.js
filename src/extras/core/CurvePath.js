@@ -36,7 +36,7 @@ THREE.CurvePath.prototype.closePath = function() {
 	// and verify for vector3 (needs to implement equals)
 	// Add a line curve if start and end of lines are not connected
 	var startPoint = this.curves[0].getPoint(0);
-	var endPoint = this.curves[this.curves.length-1].getPoint(1);
+	var endPoint = this.curves[this.curves.length - 1].getPoint(1);
 	
 	if (! startPoint.equals(endPoint)) {
 		this.curves.push( new THREE.LineCurve(endPoint, startPoint) );
@@ -72,7 +72,6 @@ THREE.CurvePath.prototype.getPoint = function( t ) {
 
 			return curve.getPointAt( u );
 
-			break;
 		}
 
 		i ++;

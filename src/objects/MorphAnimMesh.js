@@ -70,7 +70,6 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 		if ( parts && parts.length > 1 ) {
 
 			var label = parts[ 1 ];
-			var num = parts[ 2 ];
 
 			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: - Infinity };
 
@@ -109,7 +108,7 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	} else {
 
-		console.warn( 'animation[' + label + '] undefined' );
+		THREE.warn( 'THREE.MorphAnimMesh: animation[' + label + '] undefined in .playAnimation()' );
 
 	}
 

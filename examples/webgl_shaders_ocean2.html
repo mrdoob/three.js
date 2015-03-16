@@ -7,19 +7,49 @@
 			body {
 				margin: 0px;
 				overflow: hidden;
+				font-family: Monospace;
+				text-align: center;
 			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+			}
+			a {
+				color: #09f;
+			}
+			#type-status {
+				font-weight: bold;
+			}
+			#stats { position: absolute; top:0; left: 0 }
 		</style>        
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl ocean simulation<br/>
+			current simulation framebuffers type is <span id="type-status"></span><br/>
+			change type to <span id="change-type"></span>
+		</div>
 
 		<script src="../build/three.min.js"></script>		
+		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/shaders/OceanShaders.js"></script>
 		<script src="js/Ocean.js"></script>		
 
 		<script>
+			var stats;
 			var lastTime = (new Date()).getTime();
+
+			var types = { 'float': 'half-float', 'half-float': 'float' };
+			var hash = document.location.hash.substr( 1 );
+			if (!(hash in types)) hash = 'float';
+
+			document.getElementById('type-status').innerHTML = hash;
+			document.getElementById('change-type').innerHTML =
+				'<a href="#" onclick="return change(\'' + types[hash] + '\')">' + types[hash] + '</a>';
 
 			var WINDOW = {
 				ms_Width: 0,
@@ -30,6 +60,9 @@
 
 				Initialize: function () {
 					this.UpdateSize();
+
+					stats = new Stats();
+					document.body.appendChild( stats.domElement );
 
 					// Create callbacks from keyboard
 					document.onkeydown = function (inEvent) { WINDOW.CallAction(inEvent.keyCode); };
@@ -71,6 +104,12 @@
 
 			var lastTime = (new Date()).getTime();
 
+			function change(n) {
+				location.hash = n;
+				location.reload();
+				return false;
+			}
+
 			var DEMO =
 			{
 				ms_Renderer: null,
@@ -110,6 +149,7 @@
 					var origz = -gsize / 2;
 					this.ms_Ocean = new THREE.Ocean(this.ms_Renderer, this.ms_Camera, this.ms_Scene,
 					{
+						USE_HALF_FLOAT : hash === 'half-float',
 						INITIAL_SIZE : 256.0,
 						INITIAL_WIND : [10.0, 10.0],
 						INITIAL_CHOPPINESS : 1.5,
@@ -170,7 +210,7 @@
 						this.object.changed = true;
 					});
 				},
-				
+
 				Display: function () {
 					this.ms_Renderer.render(this.ms_Scene, this.ms_Camera);
 				},
@@ -207,7 +247,7 @@
 			};
 
 			WINDOW.Initialize();
-			
+
 			DEMO.Initialize();
 
 			WINDOW.ResizeCallback = function (inWidth, inHeight) { DEMO.Resize(inWidth, inHeight); };
@@ -217,6 +257,7 @@
 
 				requestAnimationFrame( render );
 				DEMO.Update();
+				stats.update();
 
 			};
 

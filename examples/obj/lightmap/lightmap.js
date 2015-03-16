@@ -39,7 +39,7 @@
 	"mapLightAnisotropy": 4,
 	"shading" : "Phong",
 	"specularCoef" : 100,
-	"transparency" : 1.0,
+	"opacity" : 1.0,
 	"transparent" : false,
 	"vertexColors" : false
 	},
@@ -67,7 +67,7 @@
 	"mapLightAnisotropy": 4,
 	"shading" : "Phong",
 	"specularCoef" : 100,
-	"transparency" : 1.0,
+	"opacity" : 1.0,
 	"transparent" : false,
 	"vertexColors" : false
 	},
@@ -95,7 +95,7 @@
 	"mapLightAnisotropy": 4,
 	"shading" : "Phong",
 	"specularCoef" : 100,
-	"transparency" : 1.0,
+	"opacity" : 1.0,
 	"transparent" : false,
 	"vertexColors" : false
 	}],

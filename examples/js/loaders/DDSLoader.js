@@ -70,21 +70,21 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 	}
 
 	function loadARGBMip( buffer, dataOffset, width, height ) {
-		var dataLength = width*height*4;
+		var dataLength = width * height * 4;
 		var srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
 		var byteArray = new Uint8Array( dataLength );
 		var dst = 0;
 		var src = 0;
-		for ( var y = 0; y < height; y++ ) {
-			for ( var x = 0; x < width; x++ ) {
-				var b = srcBuffer[src]; src++;
-				var g = srcBuffer[src]; src++;
-				var r = srcBuffer[src]; src++;
-				var a = srcBuffer[src]; src++;
-				byteArray[dst] = r; dst++;	//r
-				byteArray[dst] = g; dst++;	//g
-				byteArray[dst] = b; dst++;	//b
-				byteArray[dst] = a; dst++;	//a
+		for ( var y = 0; y < height; y ++ ) {
+			for ( var x = 0; x < width; x ++ ) {
+				var b = srcBuffer[src]; src ++;
+				var g = srcBuffer[src]; src ++;
+				var r = srcBuffer[src]; src ++;
+				var a = srcBuffer[src]; src ++;
+				byteArray[dst] = r; dst ++;	//r
+				byteArray[dst] = g; dst ++;	//g
+				byteArray[dst] = b; dst ++;	//b
+				byteArray[dst] = a; dst ++;	//a
 			}
 		}
 		return byteArray;
@@ -166,7 +166,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 		default:
 
-			if( header[off_RGBBitCount] ==32 
+			if ( header[off_RGBBitCount] == 32 
 				&& header[off_RBitMask]&0xff0000
 				&& header[off_GBitMask]&0xff00 
 				&& header[off_BBitMask]&0xff
@@ -208,7 +208,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 		for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
-			if( isRGBAUncompressed ) {
+			if ( isRGBAUncompressed ) {
 				var byteArray = loadARGBMip( buffer, dataOffset, width, height );
 				var dataLength = byteArray.length;
 			} else {

@@ -40,7 +40,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 
 			THREE.AudioObject.prototype.context = new webkitAudioContext();
 
-		} catch( error ) {
+		} catch ( error ) {
 
 			console.warn( "THREE.AudioObject: webkitAudioContext not found" );
 			return this;
