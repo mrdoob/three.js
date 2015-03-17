@@ -222,6 +222,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	extensions.get( 'OES_texture_half_float' );
 	extensions.get( 'OES_texture_half_float_linear' );
 	extensions.get( 'OES_standard_derivatives' );
+	extensions.get( 'ANGLE_instanced_arrays' );
 
 	if ( _logarithmicDepthBuffer ) {
 
@@ -294,6 +295,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _supportsVertexTextures = _maxVertexTextures > 0;
 	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
+	var _supportsInstancedArrays = extensions.get( 'ANGLE_instanced_arrays' );
 
 	//
 
@@ -387,6 +389,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.supportsVertexTextures = function () {
 
 		return _supportsVertexTextures;
+
+	};
+
+	this.supportsInstancedArrays = function () {
+
+	    return _supportsInstancedArrays;
 
 	};
 
@@ -2412,6 +2420,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupVertexAttributes( material, program, geometry, startIndex ) {
 
+	    var extension;
+
+	    if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+
+	        extension = extensions.get( 'ANGLE_instanced_arrays' );
+	        
+	        if ( extension === null ) {
+
+	            THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+	            return;
+
+	        }
+
+	    }
+
 		var geometryAttributes = geometry.attributes;
 
 		var programAttributes = program.attributes;
@@ -2435,6 +2458,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 					state.enableAttribute( programAttribute );
 
 					_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+
+					if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
+
+					    if ( extension === null ) {
+
+					        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+					        return;
+
+					    }
+
+					    extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
+
+					    if ( geometry.maxInstancedCount === -1 ) {
+
+					        geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+
+					    }
+
+					}
 
 				} else if ( material.defaultAttributeValues !== undefined ) {
 
@@ -2520,8 +2562,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_gl.drawElements( mode, index.array.length, type, 0 );
+					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
+					    var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+					    if ( extension === null ) {
+
+					        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+					        return;
+
+					    }
+
+					    extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+					} else {
+
+					    _gl.drawElements( mode, index.array.length, type, 0 );
+
+					}
 					_this.info.render.calls ++;
 					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
 					_this.info.render.faces += index.array.length / 3;
@@ -2546,8 +2604,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						// render indexed triangles
+                        
+						if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
-						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+						    var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+						    if ( extension === null ) {
+
+						        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						        return;
+
+						    }
+
+						    extension.drawElementsInstancedANGLE( mode, offsets[i].count, type, offsets[i].start * size, offsets[i].count, type, offsets[i].instances ); // Draw the instanced meshes
+
+						} else {
+
+						    _gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+						}
 
 						_this.info.render.calls ++;
 						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -2570,8 +2644,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var position = geometry.attributes[ 'position' ];
 
 				// render non-indexed triangles
+                
+				if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
-				_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+				    var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+				    if ( extension === null ) {
+
+				        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				        return;
+
+				    }
+
+				    extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+				} else {
+
+				    _gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+
+				}
 
 				_this.info.render.calls ++;
 				_this.info.render.vertices += position.array.length / position.itemSize;
@@ -3914,7 +4005,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					attribute.buffer = _gl.createBuffer();
 					_gl.bindBuffer( bufferType, attribute.buffer );
-					_gl.bufferData( bufferType, attribute.array, ( attribute instanceof THREE.DynamicBufferAttribute ) ? _gl.DYNAMIC_DRAW : _gl.STATIC_DRAW );
+					_gl.bufferData( bufferType, attribute.array, ( attribute instanceof THREE.DynamicBufferAttribute && !( attribute instanceof THREE.InstancedBufferAttribute && attribute.dynamic === false ) ) ? _gl.DYNAMIC_DRAW : _gl.STATIC_DRAW );
 
 					attribute.needsUpdate = false;
 
