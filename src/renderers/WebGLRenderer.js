@@ -78,6 +78,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// flags
 
 	this.autoScaleCubemaps = true;
+	this.updateBuffersOnly = false;
 
 	// info
 
@@ -1249,7 +1250,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				customAttribute = customAttributes[ i ];
 
-				if ( customAttribute.needsUpdate && ( customAttribute.boundTo === undefined ||  customAttribute.boundTo === 'vertices' ) ) {
+				if ( customAttribute.needsUpdate === true && ( customAttribute.boundTo === undefined || customAttribute.boundTo === 'vertices' ) ) {
 
 					cal = customAttribute.value.length;
 
@@ -1421,7 +1422,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				customAttribute = customAttributes[ i ];
 
-				if ( customAttribute.needsUpdate && ( customAttribute.boundTo === undefined || customAttribute.boundTo === 'vertices' ) ) {
+				if ( customAttribute.needsUpdate === true && ( customAttribute.boundTo === undefined || customAttribute.boundTo === 'vertices' ) ) {
 
 					offset = 0;
 
@@ -2004,7 +2005,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				customAttribute = customAttributes[ i ];
 
-				if ( ! customAttribute.__original.needsUpdate ) continue;
+				if ( ! ( customAttribute.__original.needsUpdate === true ) ) continue;
 
 				offset_custom = 0;
 
@@ -2464,6 +2465,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		updateObject( object );
 
+		if ( this.updateBuffersOnly === true ) return;
+
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
@@ -2802,6 +2805,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.visible === false ) return;
 
 		updateObject( object );
+
+		if ( this.updateBuffersOnly === true ) return;
 
 		var program = setProgram( camera, lights, fog, material, object );
 
@@ -4027,7 +4032,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var name in material.attributes ) {
 
-			if ( material.attributes[ name ].needsUpdate ) return true;
+			if ( material.attributes[ name ].needsUpdate === true ) return true;
 
 		}
 
@@ -4328,7 +4333,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_usedTextureUnits = 0;
 
-		if ( material.needsUpdate ) {
+		if ( material.needsUpdate === true ) {
 
 			if ( material.program ) deallocateMaterial( material );
 
@@ -5591,7 +5596,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 
-		if ( texture.needsUpdate ) {
+		if ( texture.needsUpdate === true ) {
 
 			_this.uploadTexture( texture );
 
@@ -5633,7 +5638,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( texture.image.length === 6 ) {
 
-			if ( texture.needsUpdate ) {
+			if ( texture.needsUpdate === true ) {
 
 				if ( ! texture.image.__webglTextureCube ) {
 
