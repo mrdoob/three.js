@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js webgl - instancing test</title>
+    <title>three.js webgl - instancing test (single triangle)</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -43,29 +43,28 @@
 
     <div id="container"></div>
     <div id="info">
-        <a href="http://threejs.org" target="_blank">three.js</a> - instancing demo
+        <a href="http://threejs.org" target="_blank">three.js</a> - instancing demo (single triangle)
         <div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
     </div>
 
-    <script src="../build/three.js"></script>
-
+    <script src="js/libs/dat.gui.min.js"></script>
+    <script src="../build/three.min.js"></script>
     <script src="js/Detector.js"></script>
     <script src="js/libs/stats.min.js"></script>
 
     <script id="vertexShader" type="x-shader/x-vertex">
-
         precision highp float;
 
         uniform float sineTime;
 
-        uniform mat4 modelViewMatrix; // optional
-        uniform mat4 projectionMatrix; // optional
+        uniform mat4 modelViewMatrix; 
+        uniform mat4 projectionMatrix; 
 
         attribute vec3 position;
         attribute vec3 offset;
         attribute vec4 color;
-        attribute vec4 rotationStart;
-        attribute vec4 rotationEnd;
+        attribute vec4 orientationStart;
+        attribute vec4 orientationEnd;
 
         varying vec3 vPosition;
         varying vec4 vColor;
@@ -73,9 +72,9 @@
         void main()	{
 
         vPosition = offset * max(abs(sineTime * 2.0 + 1.0), 0.5) + position;
-        vec4 rotation = normalize(mix(rotationStart, rotationEnd, sineTime));
-        vec3 vcV = cross(rotation.xyz, vPosition);
-        vPosition = vcV * (2.0 * rotation.w) + (cross(rotation.xyz, vcV) * 2.0 + vPosition);
+        vec4 orientation = normalize(mix(orientationStart, orientationEnd, sineTime));
+        vec3 vcV = cross(orientation.xyz, vPosition);
+        vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
 
         vColor = color;
 
@@ -132,6 +131,10 @@
 
             var geometry = new THREE.InstancedBufferGeometry();
 
+            geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
+            var gui = new dat.GUI();
+            gui.add( geometry, "maxInstancedCount", 0, 65000 );
+
             var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
 
             vertices.setXYZ( 0, 0.025, -0.025, 0 );
@@ -162,31 +165,31 @@
 
             var vector = new THREE.Vector4();
 
-            var rotationsStart = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, false );
+            var orientationsStart = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, false );
 
-            for ( var i = 0, ul = rotationsStart.length / 4; i < ul; i++ ) {
-
-                vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-                vector.normalize();
-
-                rotationsStart.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
-
-            }
-
-            geometry.addAttribute( 'rotationStart', rotationsStart );
-
-            var rotationsEnd = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, false );
-
-            for ( var i = 0, ul = rotationsEnd.length / 4; i < ul; i++ ) {
+            for ( var i = 0, ul = orientationsStart.length / 4; i < ul; i++ ) {
 
                 vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
                 vector.normalize();
 
-                rotationsEnd.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
+                orientationsStart.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
 
             }
 
-            geometry.addAttribute( 'rotationEnd', rotationsEnd );
+            geometry.addAttribute( 'orientationStart', orientationsStart );
+
+            var orientationsEnd = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, false );
+
+            for ( var i = 0, ul = orientationsEnd.length / 4; i < ul; i++ ) {
+
+                vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+                vector.normalize();
+
+                orientationsEnd.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
+
+            }
+
+            geometry.addAttribute( 'orientationEnd', orientationsEnd );
 
             // material
 
@@ -200,7 +203,7 @@
                 fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
                 side: THREE.DoubleSide,
                 transparent: true,
-                attributes: { 'position': 0, 'offset': 1, 'color': 2, 'rotationStart': 3, 'rotationEnd': 4 }
+                attributes: { 'position': 0, 'offset': 1, 'color': 2, 'orientationStart': 3, 'orientationEnd': 4 }
 
             } );
 

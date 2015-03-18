@@ -2451,28 +2451,58 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
-					var size = geometryAttribute.itemSize;
-
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
-
+				    var size = geometryAttribute.itemSize;
 					state.enableAttribute( programAttribute );
 
-					_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+					if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
+                        
+					    var data = geometryAttribute.data;
+					    var stride = data.stride;
+					    var offset = geometryAttribute.offset;
 
-					if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
+					    _gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.data.buffer );
+					    _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT ); 
 
-					    if ( extension === null ) {
+					    if ( data instanceof THREE.InstancedInterleavedBuffer ) {
 
-					        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
-					        return;
+					        if ( extension === null ) {
+
+					            THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+					            return;
+
+					        }
+
+					        extension.vertexAttribDivisorANGLE( programAttribute, data.meshPerAttribute );
+
+					        if ( geometry.maxInstancedCount === undefined ) {
+
+					            geometry.maxInstancedCount = data.meshPerAttribute * ( data.array.length / data.stride );
+
+					        }
 
 					    }
 
-					    extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
+					} else {
 
-					    if ( geometry.maxInstancedCount === -1 ) {
+					    _gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
+					    _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
 
-					        geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+					    if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
+
+					        if ( extension === null ) {
+
+					            THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+					            return;
+
+					        }
+
+					        extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
+
+					        if ( geometry.maxInstancedCount === undefined ) {
+
+					            geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+
+					        }
 
 					    }
 
@@ -2562,7 +2592,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+					if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
 					    var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -2605,7 +2635,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						// render indexed triangles
                         
-						if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+						if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[i].instances > 0 ) {
 
 						    var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -2645,7 +2675,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
                 
-				if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
 				    var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -2656,12 +2686,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				    }
 
-				    extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+				    if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+				        extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+				    } else {
+
+				        extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+				    }
 
 				} else {
 
-				    _gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+				    
+				    if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
+				        _gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+
+				    } else {
+
+				        _gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+				    }
 				}
 
 				_this.info.render.calls ++;
@@ -4001,36 +4046,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var attribute = attributes[ key ];
 				var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-				if ( attribute.buffer === undefined ) {
+                var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
-					attribute.buffer = _gl.createBuffer();
-					_gl.bindBuffer( bufferType, attribute.buffer );
-					_gl.bufferData( bufferType, attribute.array, ( attribute instanceof THREE.DynamicBufferAttribute && !( attribute instanceof THREE.InstancedBufferAttribute && attribute.dynamic === false ) ) ? _gl.DYNAMIC_DRAW : _gl.STATIC_DRAW );
+                if ( data.buffer === undefined ) {
 
-					attribute.needsUpdate = false;
+                    data.buffer = _gl.createBuffer();
+                    _gl.bindBuffer( bufferType, data.buffer );
 
-				} else if ( attribute.needsUpdate === true ) {
+					var usage = _gl.STATIC_DRAW;
+					if ( data instanceof THREE.DynamicBufferAttribute
+                         || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
+                         || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true )
+                    ) {
 
-					_gl.bindBuffer( bufferType, attribute.buffer );
+					    usage = _gl.DYNAMIC_DRAW;
 
-					if ( attribute.updateRange === undefined || attribute.updateRange.count === -1 ) { // Not using update ranges
+                    }
 
-						_gl.bufferSubData( bufferType, 0, attribute.array );
+					_gl.bufferData( bufferType, data.array, usage );
 
-					} else if ( attribute.updateRange.count === 0 ) {
+					data.needsUpdate = false;
+
+                } else if ( data.needsUpdate === true ) {
+
+                    _gl.bindBuffer( bufferType, data.buffer );
+
+                    if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+
+					    _gl.bufferSubData( bufferType, 0, data.array );
+
+                    } else if ( data.updateRange.count === 0 ) {
 
 						console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
 
 					} else {
 
-						_gl.bufferSubData( bufferType, attribute.updateRange.offset * attribute.array.BYTES_PER_ELEMENT,
-										   attribute.array.subarray( attribute.updateRange.offset, attribute.updateRange.offset + attribute.updateRange.count ) );
+					    _gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+										   data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
 
-						attribute.updateRange.count = 0; // reset range
+					    data.updateRange.count = 0; // reset range
 
 					}
 
-					attribute.needsUpdate = false;
+                    data.needsUpdate = false;
 
 				}
 

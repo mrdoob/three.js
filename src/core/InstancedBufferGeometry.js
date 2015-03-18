@@ -7,7 +7,7 @@ THREE.InstancedBufferGeometry = function () {
     THREE.BufferGeometry.call( this );
 
     this.type = 'InstancedBufferGeometry';
-    this.maxInstancedCount = -1;
+    this.maxInstancedCount = undefined;
 
 };
 

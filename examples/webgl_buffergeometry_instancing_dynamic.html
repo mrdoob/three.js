@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js webgl - indexed instancing, dynamic updates</title>
+    <title>three.js webgl - indexed instancing (single box), dynamic updates</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -43,11 +43,11 @@
 
     <div id="container"></div>
     <div id="info">
-        <a href="http://threejs.org" target="_blank">three.js</a> - indexed instancing, dynamic updates
+        <a href="http://threejs.org" target="_blank">three.js</a> - indexed instancing (single box), dynamic updates
         <div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
     </div>
 
-    <script src="../build/three.js"></script>
+    <script src="../build/three.min.js"></script>
 
     <script src="js/Detector.js"></script>
     <script src="js/libs/stats.min.js"></script>
@@ -55,21 +55,21 @@
     <script id="vertexShader" type="x-shader/x-vertex">
         precision highp float;
         
-        uniform mat4 modelViewMatrix; // optional
-        uniform mat4 projectionMatrix; // optional
+        uniform mat4 modelViewMatrix; 
+        uniform mat4 projectionMatrix; 
 
         attribute vec3 position;
         attribute vec3 offset;
         attribute vec2 uv;
-        attribute vec4 rotation;
+        attribute vec4 orientation;
 
         varying vec2 vUv;
 
         void main()	{
 
         vec3 vPosition = position;
-        vec3 vcV = cross(rotation.xyz, vPosition);
-        vPosition = vcV * (2.0 * rotation.w) + (cross(rotation.xyz, vcV) * 2.0 + vPosition);
+        vec3 vcV = cross(orientation.xyz, vPosition);
+        vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
 
         vUv = uv;
 
@@ -101,7 +101,7 @@
         var container, stats;
 
         var camera, scene, renderer;
-        var rotations;
+        var orientations;
 
 
         function init() {
@@ -226,18 +226,18 @@
             geometry.addAttribute( 'offset', offsets ); // per mesh translation
 
 
-            rotations = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, true );
+            orientations = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, true );
 
-            for ( var i = 0, ul = rotations.length / 4; i < ul; i++ ) {
+            for ( var i = 0, ul = orientations.length / 4; i < ul; i++ ) {
 
                 vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
                 vector.normalize();
 
-                rotations.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
+                orientations.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
 
             }
 
-            geometry.addAttribute( 'rotation', rotations ); // per mesh rotation
+            geometry.addAttribute( 'orientation', orientations ); // per mesh orientation
 
             // material
             var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
@@ -252,7 +252,7 @@
                 fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
                 side: THREE.DoubleSide,
                 transparent: false,
-                attributes: { 'position': 0, 'offset': 1, 'rotation': 2, 'uv': 3 }
+                attributes: { 'position': 0, 'offset': 1, 'orientation': 2, 'uv': 3 }
 
             } );
 
@@ -318,15 +318,15 @@
             var delta = ( time - lastTime ) / 5000;
             tmpQ.set( moveQ.x * delta, moveQ.y * delta, moveQ.z * delta, 1 ).normalize();
 
-            for ( var i = 0, ul = rotations.length / 4; i < ul; i++ ) {
+            for ( var i = 0, ul = orientations.length / 4; i < ul; i++ ) {
                 var index = i * 4;
-                currentQ.set( rotations.array[index], rotations.array[index + 1], rotations.array[index + 2], rotations.array[index + 3] );
+                currentQ.set( orientations.array[index], orientations.array[index + 1], orientations.array[index + 2], orientations.array[index + 3] );
                 currentQ.multiply( tmpQ );
                 
-                rotations.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
+                orientations.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
 
             }
-            rotations.needsUpdate = true;
+            orientations.needsUpdate = true;
             lastTime = time;
         }
 
