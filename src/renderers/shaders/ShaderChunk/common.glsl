@@ -41,9 +41,16 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 	if ( decayExponent > 0.0 ) {
 	  return pow( saturate( 1.0 - lightDistance / cutoffDistance ), decayExponent );
 	}
+	else if( decayExponent < 0.0 ) {
+		// this is based upon UE4 light fall as described on page 11 of:
+		//  https://de45xmedrsdbp.cloudfront.net/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+		return square(
+			saturate( 1.0 - square( square( lightDistance / cutoffDistance ) ) ) /
+			( square( lightDistance ) + 1.0 )
+		);
+	}
 	return 1.0;
 }
-
 vec3 inputToLinear( in vec3 a ) {
 #ifdef GAMMA_INPUT
 	return pow( a, vec3( float( GAMMA_FACTOR ) ) );

@@ -243,6 +243,16 @@ Sidebar.Object3D = function ( editor ) {
 
 	container.add( objectDecayRow );
 
+	// physical quadratic falloff
+
+	var objectPhysicalQuadraticFalloffRow = new UI.Panel();
+	var objectPhysicalQuadraticFalloff = new UI.Checkbox().onChange( update );
+
+	objectPhysicalQuadraticFalloffRow.add( new UI.Text( 'Quadratic Physical Falloff' ).setWidth( '90px' ) );
+	objectPhysicalQuadraticFalloffRow.add( objectPhysicalQuadraticFalloff );
+
+	container.add( objectPhysicalQuadraticFalloffRow );
+
 	// visible
 
 	var objectVisibleRow = new UI.Panel();
@@ -424,6 +434,12 @@ Sidebar.Object3D = function ( editor ) {
 			if ( object.decay !== undefined ) {
 
 				object.decay = objectDecay.getValue();
+
+			}
+
+			if ( object.physicalQuadraticFalloff !== undefined ) {
+
+				object.physicalQuadraticFalloff = objectPhysicalQuadraticFalloff.getValue();
 
 			}
 
