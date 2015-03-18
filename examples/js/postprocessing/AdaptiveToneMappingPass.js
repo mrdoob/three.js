@@ -39,7 +39,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.LuminosityShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
 		blending: THREE.NoBlending,
@@ -95,7 +95,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialAdaptiveLum = new THREE.ShaderMaterial( {
 
-		uniforms: this.adaptLuminanceShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
 		vertexShader: this.adaptLuminanceShader.vertexShader,
 		fragmentShader: this.adaptLuminanceShader.fragmentShader,
 		defines: this.adaptLuminanceShader.defines,
@@ -107,7 +107,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.ToneMapShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( THREE.ToneMapShader.uniforms ),
 		vertexShader: THREE.ToneMapShader.vertexShader,
 		fragmentShader: THREE.ToneMapShader.fragmentShader,
 		blending: THREE.NoBlending
