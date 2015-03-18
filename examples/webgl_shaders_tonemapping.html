@@ -46,6 +46,7 @@
 		<script src="js/shaders/LuminosityShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/ToneMapShader.js"></script>
+		<script src="js/shaders/GammaCorrectionShader.js"></script>
 		
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -368,27 +369,27 @@
 				ldrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
 				hdrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
 				bloomPass = new THREE.BloomPass();
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
+				var gammaCorrectionPass = new THREE.ShaderPass( THREE.GammaCorrectionShader );
+				gammaCorrectionPass.renderToScreen = true;
 				
 				dynamicHdrEffectComposer.addPass( skyboxPass );
 				dynamicHdrEffectComposer.addPass( scenePass );
 				dynamicHdrEffectComposer.addPass( adaptToneMappingPass );
 				// dynamicHdrEffectComposer.addPass( debugPass );
 				dynamicHdrEffectComposer.addPass( bloomPass );
-				dynamicHdrEffectComposer.addPass( copyPass );
+				dynamicHdrEffectComposer.addPass( gammaCorrectionPass );
 
 				hdrEffectComposer.addPass( skyboxPass );
 				hdrEffectComposer.addPass( scenePass );
 				hdrEffectComposer.addPass( hdrToneMappingPass );
 				hdrEffectComposer.addPass( bloomPass );
-				hdrEffectComposer.addPass( copyPass );
+				hdrEffectComposer.addPass( gammaCorrectionPass );
 
 				ldrEffectComposer.addPass( skyboxPass );
 				ldrEffectComposer.addPass( scenePass );
 				ldrEffectComposer.addPass( ldrToneMappingPass );
 				ldrEffectComposer.addPass( bloomPass );
-				ldrEffectComposer.addPass( copyPass );
+				ldrEffectComposer.addPass( gammaCorrectionPass );
 
 				// var gammaPass = new THREE.ShaderPass( GammaShader );
 				// gammaPass.renderToScreen = true;
