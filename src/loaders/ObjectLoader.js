@@ -280,6 +280,12 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
+				if ( data.ambientOcclusionMap !== undefined ) {
+
+					material.ambientOcclusionMap = getTexture( data.ambientOcclusionMap );
+
+				}
+
 				if ( data.specularMap !== undefined ) {
 
 					material.specularMap = getTexture( data.specularMap );

@@ -347,6 +347,12 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.mapAmbientOcclusion && texturePath ) {
+
+			create_texture( mpars, 'ambientOcclusionMap', m.mapAmbientOcclusion, m.mapAmbientOcclusionRepeat, m.mapAmbientOcclusionOffset, m.mapAmbientOcclusionWrap, m.mapAmbientOcclusionAnisotropy );
+
+		}
+
 		if ( m.mapBump && texturePath ) {
 
 			create_texture( mpars, 'bumpMap', m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
