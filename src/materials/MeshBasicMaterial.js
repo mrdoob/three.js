@@ -8,6 +8,7 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  lightMap: new THREE.Texture( <Image> ),
+ *  ambientOcclusionMap: new THREE.Texture( <Image> ),
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -46,6 +47,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.map = null;
 
 	this.lightMap = null;
+	this.ambientOcclusionMap = null;
 
 	this.specularMap = null;
 
@@ -88,6 +90,7 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.lightMap = this.lightMap;
+	material.ambientOcclusionMap = this.ambientOcclusionMap;
 
 	material.specularMap = this.specularMap;
 
