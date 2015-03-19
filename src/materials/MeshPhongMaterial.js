@@ -67,6 +67,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.lightMap = null;
 	this.ambientOcclusionMap = null;
+	this.ambientOcclusionScale = 1.0;
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
@@ -125,6 +126,7 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 
 	material.lightMap = this.lightMap;
 	material.ambientOcclusionMap = this.ambientOcclusionMap;
+	material.ambientOcclusionScale = this.ambientOcclusionScale;
 
 	material.bumpMap = this.bumpMap;
 	material.bumpScale = this.bumpScale;

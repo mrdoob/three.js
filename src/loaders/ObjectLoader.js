@@ -283,7 +283,9 @@ THREE.ObjectLoader.prototype = {
 				if ( data.ambientOcclusionMap !== undefined ) {
 
 					material.ambientOcclusionMap = getTexture( data.ambientOcclusionMap );
-
+					if ( data.ambientOcclusionScale ) {
+						material.ambientOcclusionScale = data.ambientOcclusionScale;
+					}
 				}
 
 				if ( data.specularMap !== undefined ) {

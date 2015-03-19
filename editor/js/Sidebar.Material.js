@@ -278,6 +278,32 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialEnvMapRow );
 
+	// light map
+
+	var materialLightMapRow = new UI.Panel();
+	var materialLightMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialLightMap = new UI.Texture().onChange( update );
+
+	materialLightMapRow.add( new UI.Text( 'Light Map' ).setWidth( '90px' ) );
+	materialLightMapRow.add( materialLightMapEnabled );
+	materialLightMapRow.add( materialLightMap );
+
+	container.add( materialLightMapRow );
+
+	// ambient occlusion map
+
+	var materialAmbientOcclusionMapRow = new UI.Panel();
+	var materialAmbientOcclusionMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialAmbientOcclusionMap = new UI.Texture().onChange( update );
+	var materialAmbientOcclusionScale = new UI.Number( 1 ).setRange( 0, 1 ).setWidth( '30px' ).onChange( update );
+
+	materialAmbientOcclusionMapRow.add( new UI.Text( 'Ambient Occlusion Map' ).setWidth( '90px' ) );
+	materialAmbientOcclusionMapRow.add( materialAmbientOcclusionMapEnabled );
+	materialAmbientOcclusionMapRow.add( materialAmbientOcclusionMap );
+	materialAmbientOcclusionMapRow.add( materialAmbientOcclusionScale );
+
+	container.add( materialAmbientOcclusionMapRow );
+
 	// side
 
 	var materialSideRow = new UI.Panel();
@@ -574,6 +600,41 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+
+			if ( material.lightMap !== undefined ) {
+
+				var lightMapEnabled = materialLightMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					material.lightMap = specularMapEnabled ? materialLightMap.getValue() : null;
+					material.needsUpdate = true;
+
+				} else {
+
+					if ( lightMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
+			if ( material.ambientOcclusionMap !== undefined ) {
+
+				var ambientOcclusionMapEnabled = materialAmbientOcclusionMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					material.ambientOcclusionMap = ambientOcclusionMapEnabled ? materialAmbientOcclusionMap.getValue() : null;
+					material.ambientOcclusionScale = materialAmbientOcclusionScale.getValue();
+					material.needsUpdate = true;
+
+				} else {
+
+					if ( ambientOcclusionMapEnabled ) textureWarning = true;
+
+				}
+
+			}
 			if ( material.side !== undefined ) {
 
 				material.side = parseInt( materialSide.getValue() );
@@ -650,6 +711,8 @@ Sidebar.Material = function ( editor ) {
 			'normalMap': materialNormalMapRow,
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
+			'lightMap': materialLightMapRow,
+			'ambientOcclusionMap': materialAmbientOcclusionMapRow,
 			'side': materialSideRow,
 			'shading': materialShadingRow,
 			'blending': materialBlendingRow,
@@ -796,6 +859,21 @@ Sidebar.Material = function ( editor ) {
 				materialEnvMapEnabled.setValue( material.envMap !== null );
 				materialEnvMap.setValue( material.envMap );
 				materialReflectivity.setValue( material.reflectivity );
+
+			}
+
+			if ( material.ambientOcclusionMap !== undefined ) {
+
+				materialAmbientOcclusionMapEnabled.setValue( material.ambientOcclusionMap !== null );
+				materialAmbientOcclusionMap.setValue( material.ambientOcclusionMap );
+				materialAmbientOcclusionScale.setValue( material.ambientOcclusionScale );
+
+			}
+
+			if ( material.lightMap !== undefined ) {
+
+				materialLightMapEnabled.setValue( material.lightMap !== null );
+				materialLightMap.setValue( material.lightMap );
 
 			}
 

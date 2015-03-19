@@ -13,7 +13,10 @@ THREE.UniformsLib = {
 		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
 		"lightMap" : { type: "t", value: null },
+
 		"ambientOcclusionMap" : { type: "t", value: null },
+		"ambientOcclusionScale" : { type: "f", value: 1 },
+
 		"specularMap" : { type: "t", value: null },
 		"alphaMap" : { type: "t", value: null },
 

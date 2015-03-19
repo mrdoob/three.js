@@ -55,6 +55,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.lightMap = null;
 	this.ambientOcclusionMap = null;
+	this.ambientOcclusionScale = 1.0;
 
 	this.specularMap = null;
 
@@ -103,6 +104,8 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 
 	material.lightMap = this.lightMap;
 	material.ambientOcclusionMap = this.ambientOcclusionMap;
+	material.ambientOcclusionScale = this.ambientOcclusionScale;
+	material.ambientOcclusionScale = this.ambientOcclusionScale;
 
 	material.specularMap = this.specularMap;
 

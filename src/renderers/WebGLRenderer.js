@@ -4597,6 +4597,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.map.value = material.map;
 		uniforms.lightMap.value = material.lightMap;
 		uniforms.ambientOcclusionMap.value = material.ambientOcclusionMap;
+		uniforms.ambientOcclusionScale.value = material.ambientOcclusionScale;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
 
