@@ -63,7 +63,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		var i, il, j, jl, n,
 
 		shadowMap, shadowMatrix, shadowCamera,
-		program, buffer, material,
+		buffer, material,
 		webglObject, object, light,
 
 		lights = [],

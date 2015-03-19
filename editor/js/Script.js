@@ -89,13 +89,11 @@ var Script = function ( editor ) {
 
 			}
 
-			for ( var i = 0; i < widgets.length; i ++ ) {
+			while ( widgets.length > 0 ) {
 
-				codemirror.removeLineWidget( widgets[ i ] );
+				codemirror.removeLineWidget( widgets.shift() );
 
 			}
-
-			widgets.length = 0;
 
 			//
 

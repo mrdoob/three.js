@@ -84,13 +84,13 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( this.boundingBox instanceof THREE.Box3 ) {
+		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
 
 		}
 
-		if ( this.boundingSphere instanceof THREE.Sphere ) {
+		if ( this.boundingSphere !== null ) {
 
 			this.computeBoundingSphere();
 
@@ -100,7 +100,13 @@ THREE.BufferGeometry.prototype = {
 
 	center: function () {
 
-		// TODO
+		this.computeBoundingBox();
+
+		var offset = this.boundingBox.center().negate();
+
+		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
+
+		return offset;
 
 	},
 
@@ -661,24 +667,18 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	/*
-		computeOffsets
-		Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
-		This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
-		WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-		indexBufferSize - Defaults to 65535, but allows for larger or smaller chunks.
+	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
+	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
+	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
+	size - Defaults to 65535, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function ( indexBufferSize ) {
+	computeOffsets: function ( size ) {
 
-		var size = indexBufferSize;
-		if ( indexBufferSize === undefined )
-			size = 65535; //WebGL limits type of index buffer values to 16-bit.
-
-		var s = Date.now();
+		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
-		var verticesCount = ( vertices.length / 3 );
 		var facesCount = ( indices.length / 3 );
 
 		/*
@@ -758,7 +758,8 @@ THREE.BufferGeometry.prototype = {
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
-		this.offsets = offsets;
+		this.offsets = offsets; // TODO: Deprecate
+		this.drawcalls = offsets;
 
 		/*
 		var orderTime = Date.now();

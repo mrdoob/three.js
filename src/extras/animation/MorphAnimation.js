@@ -50,19 +50,21 @@ THREE.MorphAnimation.prototype = {
 		var interpolation = this.duration / this.frames;
 		var frame = Math.floor( this.currentTime / interpolation );
 
+		var influences = this.mesh.morphTargetInfluences;
+
 		if ( frame != this.currentFrame ) {
 
-			this.mesh.morphTargetInfluences[ this.lastFrame ] = 0;
-			this.mesh.morphTargetInfluences[ this.currentFrame ] = 1;
-			this.mesh.morphTargetInfluences[ frame ] = 0;
+			influences[ this.lastFrame ] = 0;
+			influences[ this.currentFrame ] = 1;
+			influences[ frame ] = 0;
 
 			this.lastFrame = this.currentFrame;
 			this.currentFrame = frame;
 
 		}
 
-		this.mesh.morphTargetInfluences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
-		this.mesh.morphTargetInfluences[ this.lastFrame ] = 1 - this.mesh.morphTargetInfluences[ frame ];
+		influences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
+		influences[ this.lastFrame ] = 1 - influences[ frame ];
 
 	}
 

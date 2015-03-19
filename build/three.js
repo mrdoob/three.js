@@ -4,7 +4,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = { REVISION: '71dev' };
+var THREE = { REVISION: '71' };
 
 // browserify support
 
@@ -18,7 +18,7 @@ if ( typeof module === 'object' ) {
 
 if ( Math.sign === undefined ) {
 
-	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign 
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
 
 	Math.sign = function ( x ) {
 
@@ -1275,19 +1275,19 @@ THREE.Vector2.prototype = {
 
 	},
 
-	addVectors: function ( a, b ) {
+	addScalar: function ( s ) {
 
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
+		this.x += s;
+		this.y += s;
 
 		return this;
 
 	},
 
-	addScalar: function ( s ) {
+	addVectors: function ( a, b ) {
 
-		this.x += s;
-		this.y += s;
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
 
 		return this;
 
@@ -1304,6 +1304,15 @@ THREE.Vector2.prototype = {
 
 		this.x -= v.x;
 		this.y -= v.y;
+
+		return this;
+
+	},
+
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
 
 		return this;
 
@@ -1754,6 +1763,16 @@ THREE.Vector3.prototype = {
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
+
+		return this;
+
+	},
+	
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
+		this.z -= s;
 
 		return this;
 
@@ -2613,6 +2632,17 @@ THREE.Vector4.prototype = {
 		this.y -= v.y;
 		this.z -= v.z;
 		this.w -= v.w;
+
+		return this;
+
+	},
+
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
+		this.z -= s;
+		this.w -= s;
 
 		return this;
 
@@ -4284,7 +4314,7 @@ THREE.Matrix3.prototype = {
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
-			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
 
 				v1.x = array[ j ];
 				v1.y = array[ j + 1 ];
@@ -4938,7 +4968,7 @@ THREE.Matrix4.prototype = {
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
-			for ( var i = 0, j = offset, il; i < length; i += 3, j += 3 ) {
+			for ( var i = 0, j = offset; i < length; i += 3, j += 3 ) {
 
 				v1.x = array[ j ];
 				v1.y = array[ j + 1 ];
@@ -6842,7 +6872,7 @@ THREE.Spline = function ( points ) {
 
 		var i, j,
 			index, indexCurrent, indexNext,
-			linearDistance, realDistance,
+			realDistance,
 			sampling, position,
 			newpoints = [],
 			tmpVec = new THREE.Vector3(),
@@ -7423,8 +7453,6 @@ THREE.Object3D = function () {
 
 	this.up = THREE.Object3D.DefaultUp.clone();
 
-	var scope = this;
-
 	var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
 	var quaternion = new THREE.Quaternion();
@@ -7457,7 +7485,7 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: scale
-		},
+		}
 	} );
 
 	this.rotationAutoUpdate = true;
@@ -8557,13 +8585,13 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( this.boundingBox instanceof THREE.Box3 ) {
+		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
 
 		}
 
-		if ( this.boundingSphere instanceof THREE.Sphere ) {
+		if ( this.boundingSphere !== null ) {
 
 			this.computeBoundingSphere();
 
@@ -8573,7 +8601,13 @@ THREE.BufferGeometry.prototype = {
 
 	center: function () {
 
-		// TODO
+		this.computeBoundingBox();
+
+		var offset = this.boundingBox.center().negate();
+
+		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
+
+		return offset;
 
 	},
 
@@ -9134,24 +9168,18 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	/*
-		computeOffsets
-		Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
-		This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
-		WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-		indexBufferSize - Defaults to 65535, but allows for larger or smaller chunks.
+	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
+	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
+	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
+	size - Defaults to 65535, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function ( indexBufferSize ) {
+	computeOffsets: function ( size ) {
 
-		var size = indexBufferSize;
-		if ( indexBufferSize === undefined )
-			size = 65535; //WebGL limits type of index buffer values to 16-bit.
-
-		var s = Date.now();
+		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
-		var verticesCount = ( vertices.length / 3 );
 		var facesCount = ( indices.length / 3 );
 
 		/*
@@ -9231,7 +9259,8 @@ THREE.BufferGeometry.prototype = {
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
-		this.offsets = offsets;
+		this.offsets = offsets; // TODO: Deprecate
+		this.drawcalls = offsets;
 
 		/*
 		var orderTime = Date.now();
@@ -9369,13 +9398,7 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = attributes[ key ];
 
-			var array = [], typeArray = attribute.array;
-
-			for ( var i = 0, l = typeArray.length; i < l; i ++ ) {
-
-				array[ i ] = typeArray[ i ];
-
-			}
+			var array = Array.prototype.slice.call( attribute.array );
 
 			output.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
@@ -9528,17 +9551,20 @@ THREE.Geometry.prototype = {
 
 		}
 
-		if ( this.boundingBox instanceof THREE.Box3 ) {
+		if ( this.boundingBox !== null ) {
 
 			this.computeBoundingBox();
 
 		}
 
-		if ( this.boundingSphere instanceof THREE.Sphere ) {
+		if ( this.boundingSphere !== null ) {
 
 			this.computeBoundingSphere();
 
 		}
+
+		this.verticesNeedUpdate = true;
+		this.normalsNeedUpdate = true;
 
 	},
 
@@ -9598,9 +9624,33 @@ THREE.Geometry.prototype = {
 
 		if ( indices !== undefined ) {
 
-			for ( var i = 0; i < indices.length; i += 3 ) {
+			var drawcalls = geometry.drawcalls;
 
-				addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+			if ( drawcalls.length > 0 ) {
+
+				for ( var i = 0; i < drawcalls.length; i ++ ) {
+
+					var drawcall = drawcalls[ i ];
+
+					var start = drawcall.start;
+					var count = drawcall.count;
+					var index = drawcall.index;
+
+					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
+
+						addFace( index + indices[ j ], index + indices[ j + 1 ], index + indices[ j + 2 ] );
+
+					}
+
+				}
+
+			} else {
+
+				for ( var i = 0; i < indices.length; i += 3 ) {
+
+					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+
+				}
 
 			}
 
@@ -9636,13 +9686,9 @@ THREE.Geometry.prototype = {
 
 		this.computeBoundingBox();
 
-		var offset = new THREE.Vector3();
+		var offset = this.boundingBox.center().negate();
 
-		offset.addVectors( this.boundingBox.min, this.boundingBox.max );
-		offset.multiplyScalar( - 0.5 );
-
-		this.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
-		this.computeBoundingBox();
+		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
 
 		return offset;
 
@@ -9689,9 +9735,8 @@ THREE.Geometry.prototype = {
 			// vertex normals weighted by triangle areas
 			// http://www.iquilezles.org/www/articles/normals/normals.htm
 
-			var vA, vB, vC, vD;
-			var cb = new THREE.Vector3(), ab = new THREE.Vector3(),
-				db = new THREE.Vector3(), dc = new THREE.Vector3(), bc = new THREE.Vector3();
+			var vA, vB, vC;
+			var cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -9865,7 +9910,7 @@ THREE.Geometry.prototype = {
 		// based on http://www.terathon.com/code/tangent.html
 		// tangents go to vertices
 
-		var f, fl, v, vl, i, il, vertexIndex,
+		var f, fl, v, vl, i, vertexIndex,
 			face, uv, vA, vB, vC, uvA, uvB, uvC,
 			x1, x2, y1, y2, z1, z2,
 			s1, s2, t1, t2, r, t, test,
@@ -10147,8 +10192,8 @@ THREE.Geometry.prototype = {
 		var v, key;
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
-		var i,il, face;
-		var indices, k, j, jl, u;
+		var i, il, face;
+		var indices, j, jl;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -11857,8 +11902,6 @@ THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
 
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
-	var scope = this;
-
 	// todo: unify load API to for easier SceneLoader use
 
 	texturePath = texturePath && ( typeof texturePath === 'string' ) ? texturePath : this.extractUrlBase( url );
@@ -11883,18 +11926,23 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 				if ( xhr.responseText ) {
 
 					var json = JSON.parse( xhr.responseText );
+					var metadata = json.metadata;
 
-					if ( json.metadata !== undefined && json.metadata.version >= 4 ) {
+					if ( metadata !== undefined ) {
 
-						console.error( 'THREE.JSONLoader: "' + url + '" should be loaded with THREE.ObjectLoader instead.' );
-						return;
+						if ( metadata.type === 'object' ) {
 
-					}
+							THREE.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
+							return;
 
-					if ( json.metadata !== undefined && json.metadata.type === 'scene' ) {
+						}
 
-						THREE.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
-						return;
+						if ( metadata.type === 'scene' ) {
+
+							THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be a Scene. Use THREE.SceneLoader instead.' );
+							return;
+
+						}
 
 					}
 
@@ -11903,7 +11951,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 				} else {
 
-					THREE.error( 'THREE.JSONLoader: "' + url + '" seems to be unreachable or the file is empty.' );
+					THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be unreachable or the file is empty.' );
 
 				}
 
@@ -11915,7 +11963,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			} else {
 
-				THREE.error( 'THREE.JSONLoader: Couldn\'t load "' + url + '" (' + xhr.status + ')' );
+				THREE.error( 'THREE.JSONLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
 
 			}
 
@@ -11953,8 +12001,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
-	var scope = this,
-	geometry = new THREE.Geometry(),
+	var geometry = new THREE.Geometry(),
 	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
 	parseModel( scale );
@@ -11986,7 +12033,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
 
-		vertex, face, faceA, faceB, color, hex, normal,
+		vertex, face, faceA, faceB, hex, normal,
 
 		uvLayer, uv, u, v,
 
@@ -12476,7 +12523,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
-		var attributes = json.attributes;
+		var attributes = json.data.attributes;
 
 		for ( var key in attributes ) {
 
@@ -12487,7 +12534,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
-		var offsets = json.offsets;
+		var offsets = json.data.offsets;
 
 		if ( offsets !== undefined ) {
 
@@ -12495,7 +12542,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
-		var boundingSphere = json.boundingSphere;
+		var boundingSphere = json.data.boundingSphere;
 
 		if ( boundingSphere !== undefined ) {
 
@@ -12681,8 +12728,9 @@ THREE.ObjectLoader.prototype = {
 				switch ( data.type ) {
 
 					case 'PlaneGeometry':
+					case 'PlaneBufferGeometry':
 
-						geometry = new THREE.PlaneGeometry(
+						geometry = new THREE[ data.type ](
 							data.width,
 							data.height,
 							data.widthSegments,
@@ -12778,7 +12826,7 @@ THREE.ObjectLoader.prototype = {
 
 					case 'BufferGeometry':
 
-						geometry = bufferGeometryLoader.parse( data.data );
+						geometry = bufferGeometryLoader.parse( data );
 
 						break;
 
@@ -14654,6 +14702,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
+	this.sourceFile = '';
 
 	this.image = image !== undefined ? image : THREE.Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
@@ -15487,7 +15536,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
 			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
 
-			var a, b, c, d;
+			var a, b, c;
 			var precision = raycaster.precision;
 
 			var vertices = geometry.vertices;
@@ -16043,7 +16092,6 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 		if ( parts && parts.length > 1 ) {
 
 			var label = parts[ 1 ];
-			var num = parts[ 2 ];
 
 			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: - Infinity };
 
@@ -16572,11 +16620,11 @@ THREE.ShaderChunk[ 'common'] = "#define PI 3.14159\n#define PI2 6.28318\n#define
 
 // File:src/renderers/shaders/ShaderChunk/alphatest_fragment.glsl
 
-THREE.ShaderChunk[ 'alphatest_fragment'] = "#ifdef ALPHATEST\n\n	if ( gl_FragColor.a < ALPHATEST ) discard;\n\n#endif\n";
+THREE.ShaderChunk[ 'alphatest_fragment'] = "#ifdef ALPHATEST\n\n	if ( diffuseColor.a < ALPHATEST ) discard;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/lights_lambert_vertex.glsl
 
-THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vLightFront = vec3( 0.0 );\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack = vec3( 0.0 );\n\n#endif\n\ntransformedNormal = normalize( transformedNormal );\n\n#if MAX_DIR_LIGHTS > 0\n\nfor( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n	vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );\n\n	float dotProduct = dot( transformedNormal, dirVector );\n	vec3 directionalLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n	#ifdef DOUBLE_SIDED\n\n		vec3 directionalLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n		#ifdef WRAP_AROUND\n\n			vec3 directionalLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n		#endif\n\n	#endif\n\n	#ifdef WRAP_AROUND\n\n		vec3 directionalLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n		directionalLightWeighting = mix( directionalLightWeighting, directionalLightWeightingHalf, wrapRGB );\n\n		#ifdef DOUBLE_SIDED\n\n			directionalLightWeightingBack = mix( directionalLightWeightingBack, directionalLightWeightingHalfBack, wrapRGB );\n\n		#endif\n\n	#endif\n\n	vLightFront += directionalLightColor[ i ] * directionalLightWeighting;\n\n	#ifdef DOUBLE_SIDED\n\n		vLightBack += directionalLightColor[ i ] * directionalLightWeightingBack;\n\n	#endif\n\n}\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		lVector = normalize( lVector );\n		float dotProduct = dot( transformedNormal, lVector );\n\n		vec3 pointLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n		#ifdef DOUBLE_SIDED\n\n			vec3 pointLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n			#ifdef WRAP_AROUND\n\n				vec3 pointLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n			#endif\n\n		#endif\n\n		#ifdef WRAP_AROUND\n\n			vec3 pointLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n			pointLightWeighting = mix( pointLightWeighting, pointLightWeightingHalf, wrapRGB );\n\n			#ifdef DOUBLE_SIDED\n\n				pointLightWeightingBack = mix( pointLightWeightingBack, pointLightWeightingHalfBack, wrapRGB );\n\n			#endif\n\n		#endif\n\n		vLightFront += pointLightColor[ i ] * pointLightWeighting * attenuation;\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += pointLightColor[ i ] * pointLightWeightingBack * attenuation;\n\n		#endif\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - worldPosition.xyz ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );\n\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n			lVector = normalize( lVector );\n\n			float dotProduct = dot( transformedNormal, lVector );\n			vec3 spotLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n			#ifdef DOUBLE_SIDED\n\n				vec3 spotLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n				#ifdef WRAP_AROUND\n\n					vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n				#endif\n\n			#endif\n\n			#ifdef WRAP_AROUND\n\n				vec3 spotLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n				spotLightWeighting = mix( spotLightWeighting, spotLightWeightingHalf, wrapRGB );\n\n				#ifdef DOUBLE_SIDED\n\n					spotLightWeightingBack = mix( spotLightWeightingBack, spotLightWeightingHalfBack, wrapRGB );\n\n				#endif\n\n			#endif\n\n			vLightFront += spotLightColor[ i ] * spotLightWeighting * attenuation * spotEffect;\n\n			#ifdef DOUBLE_SIDED\n\n				vLightBack += spotLightColor[ i ] * spotLightWeightingBack * attenuation * spotEffect;\n\n			#endif\n\n		}\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );\n\n		float dotProduct = dot( transformedNormal, lVector );\n\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n		float hemiDiffuseWeightBack = -0.5 * dotProduct + 0.5;\n\n		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );\n\n		#endif\n\n	}\n\n#endif\n\nvLightFront = vLightFront * diffuse + diffuse * ambientLightColor + emissive;\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack = vLightBack * diffuse + diffuse * ambientLightColor + emissive;\n\n#endif\n";
+THREE.ShaderChunk[ 'lights_lambert_vertex'] = "vLightFront = vec3( 0.0 );\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack = vec3( 0.0 );\n\n#endif\n\ntransformedNormal = normalize( transformedNormal );\n\n#if MAX_DIR_LIGHTS > 0\n\nfor( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n	vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );\n\n	float dotProduct = dot( transformedNormal, dirVector );\n	vec3 directionalLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n	#ifdef DOUBLE_SIDED\n\n		vec3 directionalLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n		#ifdef WRAP_AROUND\n\n			vec3 directionalLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n		#endif\n\n	#endif\n\n	#ifdef WRAP_AROUND\n\n		vec3 directionalLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n		directionalLightWeighting = mix( directionalLightWeighting, directionalLightWeightingHalf, wrapRGB );\n\n		#ifdef DOUBLE_SIDED\n\n			directionalLightWeightingBack = mix( directionalLightWeightingBack, directionalLightWeightingHalfBack, wrapRGB );\n\n		#endif\n\n	#endif\n\n	vLightFront += directionalLightColor[ i ] * directionalLightWeighting;\n\n	#ifdef DOUBLE_SIDED\n\n		vLightBack += directionalLightColor[ i ] * directionalLightWeightingBack;\n\n	#endif\n\n}\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		lVector = normalize( lVector );\n		float dotProduct = dot( transformedNormal, lVector );\n\n		vec3 pointLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n		#ifdef DOUBLE_SIDED\n\n			vec3 pointLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n			#ifdef WRAP_AROUND\n\n				vec3 pointLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n			#endif\n\n		#endif\n\n		#ifdef WRAP_AROUND\n\n			vec3 pointLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n			pointLightWeighting = mix( pointLightWeighting, pointLightWeightingHalf, wrapRGB );\n\n			#ifdef DOUBLE_SIDED\n\n				pointLightWeightingBack = mix( pointLightWeightingBack, pointLightWeightingHalfBack, wrapRGB );\n\n			#endif\n\n		#endif\n\n		vLightFront += pointLightColor[ i ] * pointLightWeighting * attenuation;\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += pointLightColor[ i ] * pointLightWeightingBack * attenuation;\n\n		#endif\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz - mvPosition.xyz;\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - worldPosition.xyz ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );\n\n			float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n			lVector = normalize( lVector );\n\n			float dotProduct = dot( transformedNormal, lVector );\n			vec3 spotLightWeighting = vec3( max( dotProduct, 0.0 ) );\n\n			#ifdef DOUBLE_SIDED\n\n				vec3 spotLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );\n\n				#ifdef WRAP_AROUND\n\n					vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );\n\n				#endif\n\n			#endif\n\n			#ifdef WRAP_AROUND\n\n				vec3 spotLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );\n				spotLightWeighting = mix( spotLightWeighting, spotLightWeightingHalf, wrapRGB );\n\n				#ifdef DOUBLE_SIDED\n\n					spotLightWeightingBack = mix( spotLightWeightingBack, spotLightWeightingHalfBack, wrapRGB );\n\n				#endif\n\n			#endif\n\n			vLightFront += spotLightColor[ i ] * spotLightWeighting * attenuation * spotEffect;\n\n			#ifdef DOUBLE_SIDED\n\n				vLightBack += spotLightColor[ i ] * spotLightWeightingBack * attenuation * spotEffect;\n\n			#endif\n\n		}\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );\n\n		float dotProduct = dot( transformedNormal, lVector );\n\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n		float hemiDiffuseWeightBack = -0.5 * dotProduct + 0.5;\n\n		vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		#ifdef DOUBLE_SIDED\n\n			vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );\n\n		#endif\n\n	}\n\n#endif\n\nvLightFront += ambientLightColor;\n\n#ifdef DOUBLE_SIDED\n\n	vLightBack += ambientLightColor;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/map_particle_pars_fragment.glsl
 
@@ -16604,7 +16652,7 @@ THREE.ShaderChunk[ 'lightmap_pars_vertex'] = "#ifdef USE_LIGHTMAP\n\n	varying ve
 
 // File:src/renderers/shaders/ShaderChunk/lights_phong_fragment.glsl
 
-THREE.ShaderChunk[ 'lights_phong_fragment'] = "#ifndef FLAT_SHADED\n\n	vec3 normal = normalize( vNormal );\n\n	#ifdef DOUBLE_SIDED\n\n		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n\n	#endif\n\n#else\n\n	vec3 fdx = dFdx( vViewPosition );\n	vec3 fdy = dFdy( vViewPosition );\n	vec3 normal = normalize( cross( fdx, fdy ) );\n\n#endif\n\nvec3 viewPosition = normalize( vViewPosition );\n\n#ifdef USE_NORMALMAP\n\n	normal = perturbNormal2Arb( -vViewPosition, normal );\n\n#elif defined( USE_BUMPMAP )\n\n	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	vec3 pointDiffuse = vec3( 0.0 );\n	vec3 pointSpecular = vec3( 0.0 );\n\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		lVector = normalize( lVector );\n\n				// diffuse\n\n		float dotProduct = dot( normal, lVector );\n\n		#ifdef WRAP_AROUND\n\n			float pointDiffuseWeightFull = max( dotProduct, 0.0 );\n			float pointDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n			vec3 pointDiffuseWeight = mix( vec3( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );\n\n		#else\n\n			float pointDiffuseWeight = max( dotProduct, 0.0 );\n\n		#endif\n\n		pointDiffuse += diffuse * pointLightColor[ i ] * pointDiffuseWeight * attenuation;\n\n				// specular\n\n		vec3 pointHalfVector = normalize( lVector + viewPosition );\n		float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );\n		float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );\n		pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * attenuation * specularNormalization;\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	vec3 spotDiffuse = vec3( 0.0 );\n	vec3 spotSpecular = vec3( 0.0 );\n\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n\n		float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n		lVector = normalize( lVector );\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );\n\n					// diffuse\n\n			float dotProduct = dot( normal, lVector );\n\n			#ifdef WRAP_AROUND\n\n				float spotDiffuseWeightFull = max( dotProduct, 0.0 );\n				float spotDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n				vec3 spotDiffuseWeight = mix( vec3( spotDiffuseWeightFull ), vec3( spotDiffuseWeightHalf ), wrapRGB );\n\n			#else\n\n				float spotDiffuseWeight = max( dotProduct, 0.0 );\n\n			#endif\n\n			spotDiffuse += diffuse * spotLightColor[ i ] * spotDiffuseWeight * attenuation * spotEffect;\n\n					// specular\n\n			vec3 spotHalfVector = normalize( lVector + viewPosition );\n			float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );\n			float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );\n\n			float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );\n			spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * attenuation * specularNormalization * spotEffect;\n\n		}\n\n	}\n\n#endif\n\n#if MAX_DIR_LIGHTS > 0\n\n	vec3 dirDiffuse = vec3( 0.0 );\n	vec3 dirSpecular = vec3( 0.0 );\n\n	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n		vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );\n\n				// diffuse\n\n		float dotProduct = dot( normal, dirVector );\n\n		#ifdef WRAP_AROUND\n\n			float dirDiffuseWeightFull = max( dotProduct, 0.0 );\n			float dirDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n			vec3 dirDiffuseWeight = mix( vec3( dirDiffuseWeightFull ), vec3( dirDiffuseWeightHalf ), wrapRGB );\n\n		#else\n\n			float dirDiffuseWeight = max( dotProduct, 0.0 );\n\n		#endif\n\n		dirDiffuse += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;\n\n		// specular\n\n		vec3 dirHalfVector = normalize( dirVector + viewPosition );\n		float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );\n		float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );\n\n		/*\n		// fresnel term from skin shader\n		const float F0 = 0.128;\n\n		float base = 1.0 - dot( viewPosition, dirHalfVector );\n		float exponential = pow( base, 5.0 );\n\n		float fresnel = exponential + F0 * ( 1.0 - exponential );\n		*/\n\n		/*\n		// fresnel term from fresnel shader\n		const float mFresnelBias = 0.08;\n		const float mFresnelScale = 0.3;\n		const float mFresnelPower = 5.0;\n\n		float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );\n		*/\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		// 		dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;\n\n		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );\n		dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;\n\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	vec3 hemiDiffuse = vec3( 0.0 );\n	vec3 hemiSpecular = vec3( 0.0 );\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lVector );\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n\n		vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		hemiDiffuse += diffuse * hemiColor;\n\n		// specular (sky light)\n\n		vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );\n		float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;\n		float hemiSpecularWeightSky = specularStrength * max( pow( max( hemiDotNormalHalfSky, 0.0 ), shininess ), 0.0 );\n\n		// specular (ground light)\n\n		vec3 lVectorGround = -lVector;\n\n		vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );\n		float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;\n		float hemiSpecularWeightGround = specularStrength * max( pow( max( hemiDotNormalHalfGround, 0.0 ), shininess ), 0.0 );\n\n		float dotProductGround = dot( normal, lVectorGround );\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );\n		vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );\n		hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );\n\n	}\n\n#endif\n\nvec3 totalDiffuse = vec3( 0.0 );\nvec3 totalSpecular = vec3( 0.0 );\n\n#if MAX_DIR_LIGHTS > 0\n\n	totalDiffuse += dirDiffuse;\n	totalSpecular += dirSpecular;\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	totalDiffuse += hemiDiffuse;\n	totalSpecular += hemiSpecular;\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	totalDiffuse += pointDiffuse;\n	totalSpecular += pointSpecular;\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	totalDiffuse += spotDiffuse;\n	totalSpecular += spotSpecular;\n\n#endif\n\n#ifdef METAL\n\n	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * diffuse + totalSpecular );\n\n#else\n\n	gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * diffuse ) + totalSpecular;\n\n#endif\n";
+THREE.ShaderChunk[ 'lights_phong_fragment'] = "#ifndef FLAT_SHADED\n\n	vec3 normal = normalize( vNormal );\n\n	#ifdef DOUBLE_SIDED\n\n		normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n\n	#endif\n\n#else\n\n	vec3 fdx = dFdx( vViewPosition );\n	vec3 fdy = dFdy( vViewPosition );\n	vec3 normal = normalize( cross( fdx, fdy ) );\n\n#endif\n\nvec3 viewPosition = normalize( vViewPosition );\n\n#ifdef USE_NORMALMAP\n\n	normal = perturbNormal2Arb( -vViewPosition, normal );\n\n#elif defined( USE_BUMPMAP )\n\n	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n\n#endif\n\nvec3 totalDiffuseLight = vec3( 0.0 );\nvec3 totalSpecularLight = vec3( 0.0 );\n\n#if MAX_POINT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n\n		float attenuation = calcLightAttenuation( length( lVector ), pointLightDistance[ i ], pointLightDecay[ i ] );\n\n		lVector = normalize( lVector );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lVector );\n\n		#ifdef WRAP_AROUND\n\n			float pointDiffuseWeightFull = max( dotProduct, 0.0 );\n			float pointDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n			vec3 pointDiffuseWeight = mix( vec3( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );\n\n		#else\n\n			float pointDiffuseWeight = max( dotProduct, 0.0 );\n\n		#endif\n\n		totalDiffuseLight += pointLightColor[ i ] * pointDiffuseWeight * attenuation;\n\n				// specular\n\n		vec3 pointHalfVector = normalize( lVector + viewPosition );\n		float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );\n		float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );\n		totalSpecularLight += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * attenuation * specularNormalization;\n\n	}\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {\n\n		vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );\n		vec3 lVector = lPosition.xyz + vViewPosition.xyz;\n\n		float attenuation = calcLightAttenuation( length( lVector ), spotLightDistance[ i ], spotLightDecay[ i ] );\n\n		lVector = normalize( lVector );\n\n		float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );\n\n		if ( spotEffect > spotLightAngleCos[ i ] ) {\n\n			spotEffect = max( pow( max( spotEffect, 0.0 ), spotLightExponent[ i ] ), 0.0 );\n\n			// diffuse\n\n			float dotProduct = dot( normal, lVector );\n\n			#ifdef WRAP_AROUND\n\n				float spotDiffuseWeightFull = max( dotProduct, 0.0 );\n				float spotDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n				vec3 spotDiffuseWeight = mix( vec3( spotDiffuseWeightFull ), vec3( spotDiffuseWeightHalf ), wrapRGB );\n\n			#else\n\n				float spotDiffuseWeight = max( dotProduct, 0.0 );\n\n			#endif\n\n			totalDiffuseLight += spotLightColor[ i ] * spotDiffuseWeight * attenuation * spotEffect;\n\n			// specular\n\n			vec3 spotHalfVector = normalize( lVector + viewPosition );\n			float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );\n			float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );\n\n			float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n			vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );\n			totalSpecularLight += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * attenuation * specularNormalization * spotEffect;\n\n		}\n\n	}\n\n#endif\n\n#if MAX_DIR_LIGHTS > 0\n\n	for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {\n\n		vec3 dirVector = transformDirection( directionalLightDirection[ i ], viewMatrix );\n\n		// diffuse\n\n		float dotProduct = dot( normal, dirVector );\n\n		#ifdef WRAP_AROUND\n\n			float dirDiffuseWeightFull = max( dotProduct, 0.0 );\n			float dirDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );\n\n			vec3 dirDiffuseWeight = mix( vec3( dirDiffuseWeightFull ), vec3( dirDiffuseWeightHalf ), wrapRGB );\n\n		#else\n\n			float dirDiffuseWeight = max( dotProduct, 0.0 );\n\n		#endif\n\n		totalDiffuseLight += directionalLightColor[ i ] * dirDiffuseWeight;\n\n		// specular\n\n		vec3 dirHalfVector = normalize( dirVector + viewPosition );\n		float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );\n		float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );\n\n		/*\n		// fresnel term from skin shader\n		const float F0 = 0.128;\n\n		float base = 1.0 - dot( viewPosition, dirHalfVector );\n		float exponential = pow( base, 5.0 );\n\n		float fresnel = exponential + F0 * ( 1.0 - exponential );\n		*/\n\n		/*\n		// fresnel term from fresnel shader\n		const float mFresnelBias = 0.08;\n		const float mFresnelScale = 0.3;\n		const float mFresnelPower = 5.0;\n\n		float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );\n		*/\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		// 		dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;\n\n		vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );\n		totalSpecularLight += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;\n\n\n	}\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {\n\n		vec3 lVector = transformDirection( hemisphereLightDirection[ i ], viewMatrix );\n\n		// diffuse\n\n		float dotProduct = dot( normal, lVector );\n		float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;\n\n		vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );\n\n		totalDiffuseLight += hemiColor;\n\n		// specular (sky light)\n\n		vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );\n		float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;\n		float hemiSpecularWeightSky = specularStrength * max( pow( max( hemiDotNormalHalfSky, 0.0 ), shininess ), 0.0 );\n\n		// specular (ground light)\n\n		vec3 lVectorGround = -lVector;\n\n		vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );\n		float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;\n		float hemiSpecularWeightGround = specularStrength * max( pow( max( hemiDotNormalHalfGround, 0.0 ), shininess ), 0.0 );\n\n		float dotProductGround = dot( normal, lVectorGround );\n\n		float specularNormalization = ( shininess + 2.0 ) / 8.0;\n\n		vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );\n		vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );\n		totalSpecularLight += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );\n\n	}\n\n#endif\n\n#ifdef METAL\n\n	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor ) * specular + totalSpecularLight + emissive;\n\n#else\n\n	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor ) + totalSpecularLight + emissive;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/fog_pars_fragment.glsl
 
@@ -16644,7 +16692,7 @@ THREE.ShaderChunk[ 'lights_phong_vertex'] = "#if MAX_SPOT_LIGHTS > 0 || defined(
 
 // File:src/renderers/shaders/ShaderChunk/map_fragment.glsl
 
-THREE.ShaderChunk[ 'map_fragment'] = "#ifdef USE_MAP\n\n	vec4 texelColor = texture2D( map, vUv );\n\n	texelColor.xyz = inputToLinear( texelColor.xyz );\n\n	gl_FragColor = gl_FragColor * texelColor;\n\n#endif";
+THREE.ShaderChunk[ 'map_fragment'] = "#ifdef USE_MAP\n\n	vec4 texelColor = texture2D( map, vUv );\n\n	texelColor.xyz = inputToLinear( texelColor.xyz );\n\n	diffuseColor *= texelColor;\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/lightmap_vertex.glsl
 
@@ -16652,7 +16700,7 @@ THREE.ShaderChunk[ 'lightmap_vertex'] = "#ifdef USE_LIGHTMAP\n\n	vUv2 = uv2;\n\n
 
 // File:src/renderers/shaders/ShaderChunk/map_particle_fragment.glsl
 
-THREE.ShaderChunk[ 'map_particle_fragment'] = "#ifdef USE_MAP\n\n	gl_FragColor = gl_FragColor * texture2D( map, vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y ) * offsetRepeat.zw + offsetRepeat.xy );\n\n#endif\n";
+THREE.ShaderChunk[ 'map_particle_fragment'] = "#ifdef USE_MAP\n\n	diffuseColor *= texture2D( map, vec2( gl_PointCoord.x, 1.0 - gl_PointCoord.y ) * offsetRepeat.zw + offsetRepeat.xy );\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/color_pars_fragment.glsl
 
@@ -16672,7 +16720,7 @@ THREE.ShaderChunk[ 'envmap_pars_vertex'] = "#if defined( USE_ENVMAP ) && ! defin
 
 // File:src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl
 
-THREE.ShaderChunk[ 'linear_to_gamma_fragment'] = "\n	gl_FragColor.xyz = linearToOutput( gl_FragColor.xyz );\n";
+THREE.ShaderChunk[ 'linear_to_gamma_fragment'] = "\n	outgoingLight = linearToOutput( outgoingLight );\n";
 
 // File:src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl
 
@@ -16680,7 +16728,7 @@ THREE.ShaderChunk[ 'color_pars_vertex'] = "#ifdef USE_COLOR\n\n	varying vec3 vCo
 
 // File:src/renderers/shaders/ShaderChunk/lights_lambert_pars_vertex.glsl
 
-THREE.ShaderChunk[ 'lights_lambert_pars_vertex'] = "uniform vec3 diffuse;\nuniform vec3 emissive;\n\nuniform vec3 ambientLightColor;\n\n#if MAX_DIR_LIGHTS > 0\n\n	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];\n	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];\n	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];\n\n#endif\n\n#ifdef WRAP_AROUND\n\n	uniform vec3 wrapRGB;\n\n#endif\n";
+THREE.ShaderChunk[ 'lights_lambert_pars_vertex'] = "uniform vec3 ambientLightColor;\n\n#if MAX_DIR_LIGHTS > 0\n\n	uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];\n	uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];\n\n#endif\n\n#if MAX_HEMI_LIGHTS > 0\n\n	uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];\n	uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];\n\n#endif\n\n#if MAX_POINT_LIGHTS > 0\n\n	uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];\n	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];\n	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];\n\n#endif\n\n#if MAX_SPOT_LIGHTS > 0\n\n	uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];\n	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];\n	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];\n\n#endif\n\n#ifdef WRAP_AROUND\n\n	uniform vec3 wrapRGB;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/map_pars_vertex.glsl
 
@@ -16688,7 +16736,7 @@ THREE.ShaderChunk[ 'map_pars_vertex'] = "#if defined( USE_MAP ) || defined( USE_
 
 // File:src/renderers/shaders/ShaderChunk/envmap_fragment.glsl
 
-THREE.ShaderChunk[ 'envmap_fragment'] = "#ifdef USE_ENVMAP\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\n		// Transforming Normal Vectors with the Inverse Transformation\n		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\n		#ifdef ENVMAP_MODE_REFLECTION\n\n			vec3 reflectVec = reflect( cameraToVertex, worldNormal );\n\n		#else\n\n			vec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\n		#endif\n\n	#else\n\n		vec3 reflectVec = vReflect;\n\n	#endif\n\n	#ifdef DOUBLE_SIDED\n		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n	#else\n		float flipNormal = 1.0;\n	#endif\n\n	#ifdef ENVMAP_TYPE_CUBE\n		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#elif defined( ENVMAP_TYPE_EQUIREC )\n		vec2 sampleUV;\n		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n		vec4 envColor = texture2D( envMap, sampleUV );\n		\n	#elif defined( ENVMAP_TYPE_SPHERE )\n		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n	#endif\n\n	envColor.xyz = inputToLinear( envColor.xyz );\n\n	#ifdef ENVMAP_BLENDING_MULTIPLY\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_MIX )\n\n		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_ADD )\n\n		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;\n\n	#endif\n\n#endif\n";
+THREE.ShaderChunk[ 'envmap_fragment'] = "#ifdef USE_ENVMAP\n\n	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG )\n\n		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );\n\n		// Transforming Normal Vectors with the Inverse Transformation\n		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\n		#ifdef ENVMAP_MODE_REFLECTION\n\n			vec3 reflectVec = reflect( cameraToVertex, worldNormal );\n\n		#else\n\n			vec3 reflectVec = refract( cameraToVertex, worldNormal, refractionRatio );\n\n		#endif\n\n	#else\n\n		vec3 reflectVec = vReflect;\n\n	#endif\n\n	#ifdef DOUBLE_SIDED\n		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );\n	#else\n		float flipNormal = 1.0;\n	#endif\n\n	#ifdef ENVMAP_TYPE_CUBE\n		vec4 envColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\n	#elif defined( ENVMAP_TYPE_EQUIREC )\n		vec2 sampleUV;\n		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );\n		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;\n		vec4 envColor = texture2D( envMap, sampleUV );\n\n	#elif defined( ENVMAP_TYPE_SPHERE )\n		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));\n		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );\n	#endif\n\n	envColor.xyz = inputToLinear( envColor.xyz );\n\n	#ifdef ENVMAP_BLENDING_MULTIPLY\n\n		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_MIX )\n\n		outgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\n	#elif defined( ENVMAP_BLENDING_ADD )\n\n		outgoingLight += envColor.xyz * specularStrength * reflectivity;\n\n	#endif\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/specularmap_pars_fragment.glsl
 
@@ -16708,7 +16756,7 @@ THREE.ShaderChunk[ 'specularmap_fragment'] = "float specularStrength;\n\n#ifdef 
 
 // File:src/renderers/shaders/ShaderChunk/fog_fragment.glsl
 
-THREE.ShaderChunk[ 'fog_fragment'] = "#ifdef USE_FOG\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		float depth = gl_FragDepthEXT / gl_FragCoord.w;\n\n	#else\n\n		float depth = gl_FragCoord.z / gl_FragCoord.w;\n\n	#endif\n\n	#ifdef FOG_EXP2\n\n		float fogFactor = exp2( - square( fogDensity ) * square( depth ) * LOG2 );\n		fogFactor = whiteCompliment( fogFactor );\n\n	#else\n\n		float fogFactor = smoothstep( fogNear, fogFar, depth );\n\n	#endif\n	\n	gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );\n\n#endif";
+THREE.ShaderChunk[ 'fog_fragment'] = "#ifdef USE_FOG\n\n	#ifdef USE_LOGDEPTHBUF_EXT\n\n		float depth = gl_FragDepthEXT / gl_FragCoord.w;\n\n	#else\n\n		float depth = gl_FragCoord.z / gl_FragCoord.w;\n\n	#endif\n\n	#ifdef FOG_EXP2\n\n		float fogFactor = exp2( - square( fogDensity ) * square( depth ) * LOG2 );\n		fogFactor = whiteCompliment( fogFactor );\n\n	#else\n\n		float fogFactor = smoothstep( fogNear, fogFar, depth );\n\n	#endif\n	\n	outgoingLight = mix( outgoingLight, fogColor, fogFactor );\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/bumpmap_pars_fragment.glsl
 
@@ -16732,7 +16780,7 @@ THREE.ShaderChunk[ 'map_vertex'] = "#if defined( USE_MAP ) || defined( USE_BUMPM
 
 // File:src/renderers/shaders/ShaderChunk/lightmap_fragment.glsl
 
-THREE.ShaderChunk[ 'lightmap_fragment'] = "#ifdef USE_LIGHTMAP\n\n	gl_FragColor = gl_FragColor * texture2D( lightMap, vUv2 );\n\n#endif";
+THREE.ShaderChunk[ 'lightmap_fragment'] = "#ifdef USE_LIGHTMAP\n\n	outgoingLight *= diffuseColor.xyz * texture2D( lightMap, vUv2 ).xyz;\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/shadowmap_pars_vertex.glsl
 
@@ -16740,7 +16788,7 @@ THREE.ShaderChunk[ 'shadowmap_pars_vertex'] = "#ifdef USE_SHADOWMAP\n\n	varying 
 
 // File:src/renderers/shaders/ShaderChunk/color_fragment.glsl
 
-THREE.ShaderChunk[ 'color_fragment'] = "#ifdef USE_COLOR\n\n	gl_FragColor = gl_FragColor * vec4( vColor, 1.0 );\n\n#endif";
+THREE.ShaderChunk[ 'color_fragment'] = "#ifdef USE_COLOR\n\n	diffuseColor.rgb *= vColor;\n\n#endif";
 
 // File:src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl
 
@@ -16752,7 +16800,7 @@ THREE.ShaderChunk[ 'envmap_vertex'] = "#if defined( USE_ENVMAP ) && ! defined( U
 
 // File:src/renderers/shaders/ShaderChunk/shadowmap_fragment.glsl
 
-THREE.ShaderChunk[ 'shadowmap_fragment'] = "#ifdef USE_SHADOWMAP\n\n	#ifdef SHADOWMAP_DEBUG\n\n		vec3 frustumColors[3];\n		frustumColors[0] = vec3( 1.0, 0.5, 0.0 );\n		frustumColors[1] = vec3( 0.0, 1.0, 0.8 );\n		frustumColors[2] = vec3( 0.0, 0.5, 1.0 );\n\n	#endif\n\n	#ifdef SHADOWMAP_CASCADE\n\n		int inFrustumCount = 0;\n\n	#endif\n\n	float fDepth;\n	vec3 shadowColor = vec3( 1.0 );\n\n	for( int i = 0; i < MAX_SHADOWS; i ++ ) {\n\n		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;\n\n				// if ( something && something ) breaks ATI OpenGL shader compiler\n				// if ( all( something, something ) ) using this instead\n\n		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n		bool inFrustum = all( inFrustumVec );\n\n				// don't shadow pixels outside of light frustum\n				// use just first frustum (for cascades)\n				// don't shadow pixels behind far plane of light frustum\n\n		#ifdef SHADOWMAP_CASCADE\n\n			inFrustumCount += int( inFrustum );\n			bvec3 frustumTestVec = bvec3( inFrustum, inFrustumCount == 1, shadowCoord.z <= 1.0 );\n\n		#else\n\n			bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n\n		#endif\n\n		bool frustumTest = all( frustumTestVec );\n\n		if ( frustumTest ) {\n\n			shadowCoord.z += shadowBias[ i ];\n\n			#if defined( SHADOWMAP_TYPE_PCF )\n\n						// Percentage-close filtering\n						// (9 pixel kernel)\n						// http://fabiensanglard.net/shadowmappingPCF/\n\n				float shadow = 0.0;\n\n		/*\n						// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL\n						// must enroll loop manually\n\n				for ( float y = -1.25; y <= 1.25; y += 1.25 )\n					for ( float x = -1.25; x <= 1.25; x += 1.25 ) {\n\n						vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );\n\n								// doesn't seem to produce any noticeable visual difference compared to simple texture2D lookup\n								//vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );\n\n						float fDepth = unpackDepth( rgbaDepth );\n\n						if ( fDepth < shadowCoord.z )\n							shadow += 1.0;\n\n				}\n\n				shadow /= 9.0;\n\n		*/\n\n				const float shadowDelta = 1.0 / 9.0;\n\n				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;\n				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;\n\n				float dx0 = -1.25 * xPixelOffset;\n				float dy0 = -1.25 * yPixelOffset;\n				float dx1 = 1.25 * xPixelOffset;\n				float dy1 = 1.25 * yPixelOffset;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );\n\n			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n\n						// Percentage-close filtering\n						// (9 pixel kernel)\n						// http://fabiensanglard.net/shadowmappingPCF/\n\n				float shadow = 0.0;\n\n				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;\n				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;\n\n				float dx0 = -1.0 * xPixelOffset;\n				float dy0 = -1.0 * yPixelOffset;\n				float dx1 = 1.0 * xPixelOffset;\n				float dy1 = 1.0 * yPixelOffset;\n\n				mat3 shadowKernel;\n				mat3 depthKernel;\n\n				depthKernel[0][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				depthKernel[0][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				depthKernel[0][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				depthKernel[1][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				depthKernel[1][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				depthKernel[1][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				depthKernel[2][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				depthKernel[2][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				depthKernel[2][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n\n				vec3 shadowZ = vec3( shadowCoord.z );\n				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));\n				shadowKernel[0] *= vec3(0.25);\n\n				shadowKernel[1] = vec3(lessThan(depthKernel[1], shadowZ ));\n				shadowKernel[1] *= vec3(0.25);\n\n				shadowKernel[2] = vec3(lessThan(depthKernel[2], shadowZ ));\n				shadowKernel[2] *= vec3(0.25);\n\n				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[i].xy );\n\n				shadowKernel[0] = mix( shadowKernel[1], shadowKernel[0], fractionalCoord.x );\n				shadowKernel[1] = mix( shadowKernel[2], shadowKernel[1], fractionalCoord.x );\n\n				vec4 shadowValues;\n				shadowValues.x = mix( shadowKernel[0][1], shadowKernel[0][0], fractionalCoord.y );\n				shadowValues.y = mix( shadowKernel[0][2], shadowKernel[0][1], fractionalCoord.y );\n				shadowValues.z = mix( shadowKernel[1][1], shadowKernel[1][0], fractionalCoord.y );\n				shadowValues.w = mix( shadowKernel[1][2], shadowKernel[1][1], fractionalCoord.y );\n\n				shadow = dot( shadowValues, vec4( 1.0 ) );\n\n				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );\n\n			#else\n\n				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );\n				float fDepth = unpackDepth( rgbaDepth );\n\n				if ( fDepth < shadowCoord.z )\n\n		// spot with multiple shadows is darker\n\n					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );\n\n		// spot with multiple shadows has the same color as single shadow spot\n\n		// 					shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );\n\n			#endif\n\n		}\n\n\n		#ifdef SHADOWMAP_DEBUG\n\n			#ifdef SHADOWMAP_CASCADE\n\n				if ( inFrustum && inFrustumCount == 1 ) gl_FragColor.xyz *= frustumColors[ i ];\n\n			#else\n\n				if ( inFrustum ) gl_FragColor.xyz *= frustumColors[ i ];\n\n			#endif\n\n		#endif\n\n	}\n\n	// NOTE: I am unsure if this is correct in linear space.  -bhouston, Dec 29, 2014\n	shadowColor = inputToLinear( shadowColor );\n\n	gl_FragColor.xyz = gl_FragColor.xyz * shadowColor;\n\n#endif\n";
+THREE.ShaderChunk[ 'shadowmap_fragment'] = "#ifdef USE_SHADOWMAP\n\n	#ifdef SHADOWMAP_DEBUG\n\n		vec3 frustumColors[3];\n		frustumColors[0] = vec3( 1.0, 0.5, 0.0 );\n		frustumColors[1] = vec3( 0.0, 1.0, 0.8 );\n		frustumColors[2] = vec3( 0.0, 0.5, 1.0 );\n\n	#endif\n\n	#ifdef SHADOWMAP_CASCADE\n\n		int inFrustumCount = 0;\n\n	#endif\n\n	float fDepth;\n	vec3 shadowColor = vec3( 1.0 );\n\n	for( int i = 0; i < MAX_SHADOWS; i ++ ) {\n\n		vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;\n\n				// if ( something && something ) breaks ATI OpenGL shader compiler\n				// if ( all( something, something ) ) using this instead\n\n		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n		bool inFrustum = all( inFrustumVec );\n\n				// don't shadow pixels outside of light frustum\n				// use just first frustum (for cascades)\n				// don't shadow pixels behind far plane of light frustum\n\n		#ifdef SHADOWMAP_CASCADE\n\n			inFrustumCount += int( inFrustum );\n			bvec3 frustumTestVec = bvec3( inFrustum, inFrustumCount == 1, shadowCoord.z <= 1.0 );\n\n		#else\n\n			bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n\n		#endif\n\n		bool frustumTest = all( frustumTestVec );\n\n		if ( frustumTest ) {\n\n			shadowCoord.z += shadowBias[ i ];\n\n			#if defined( SHADOWMAP_TYPE_PCF )\n\n						// Percentage-close filtering\n						// (9 pixel kernel)\n						// http://fabiensanglard.net/shadowmappingPCF/\n\n				float shadow = 0.0;\n\n		/*\n						// nested loops breaks shader compiler / validator on some ATI cards when using OpenGL\n						// must enroll loop manually\n\n				for ( float y = -1.25; y <= 1.25; y += 1.25 )\n					for ( float x = -1.25; x <= 1.25; x += 1.25 ) {\n\n						vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );\n\n								// doesn't seem to produce any noticeable visual difference compared to simple texture2D lookup\n								//vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );\n\n						float fDepth = unpackDepth( rgbaDepth );\n\n						if ( fDepth < shadowCoord.z )\n							shadow += 1.0;\n\n				}\n\n				shadow /= 9.0;\n\n		*/\n\n				const float shadowDelta = 1.0 / 9.0;\n\n				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;\n				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;\n\n				float dx0 = -1.25 * xPixelOffset;\n				float dy0 = -1.25 * yPixelOffset;\n				float dx1 = 1.25 * xPixelOffset;\n				float dy1 = 1.25 * yPixelOffset;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n				if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\n				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );\n\n			#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n\n						// Percentage-close filtering\n						// (9 pixel kernel)\n						// http://fabiensanglard.net/shadowmappingPCF/\n\n				float shadow = 0.0;\n\n				float xPixelOffset = 1.0 / shadowMapSize[ i ].x;\n				float yPixelOffset = 1.0 / shadowMapSize[ i ].y;\n\n				float dx0 = -1.0 * xPixelOffset;\n				float dy0 = -1.0 * yPixelOffset;\n				float dx1 = 1.0 * xPixelOffset;\n				float dy1 = 1.0 * yPixelOffset;\n\n				mat3 shadowKernel;\n				mat3 depthKernel;\n\n				depthKernel[0][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n				depthKernel[0][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n				depthKernel[0][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n				depthKernel[1][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n				depthKernel[1][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );\n				depthKernel[1][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n				depthKernel[2][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n				depthKernel[2][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n				depthKernel[2][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n\n				vec3 shadowZ = vec3( shadowCoord.z );\n				shadowKernel[0] = vec3(lessThan(depthKernel[0], shadowZ ));\n				shadowKernel[0] *= vec3(0.25);\n\n				shadowKernel[1] = vec3(lessThan(depthKernel[1], shadowZ ));\n				shadowKernel[1] *= vec3(0.25);\n\n				shadowKernel[2] = vec3(lessThan(depthKernel[2], shadowZ ));\n				shadowKernel[2] *= vec3(0.25);\n\n				vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[i].xy );\n\n				shadowKernel[0] = mix( shadowKernel[1], shadowKernel[0], fractionalCoord.x );\n				shadowKernel[1] = mix( shadowKernel[2], shadowKernel[1], fractionalCoord.x );\n\n				vec4 shadowValues;\n				shadowValues.x = mix( shadowKernel[0][1], shadowKernel[0][0], fractionalCoord.y );\n				shadowValues.y = mix( shadowKernel[0][2], shadowKernel[0][1], fractionalCoord.y );\n				shadowValues.z = mix( shadowKernel[1][1], shadowKernel[1][0], fractionalCoord.y );\n				shadowValues.w = mix( shadowKernel[1][2], shadowKernel[1][1], fractionalCoord.y );\n\n				shadow = dot( shadowValues, vec4( 1.0 ) );\n\n				shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );\n\n			#else\n\n				vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );\n				float fDepth = unpackDepth( rgbaDepth );\n\n				if ( fDepth < shadowCoord.z )\n\n		// spot with multiple shadows is darker\n\n					shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );\n\n		// spot with multiple shadows has the same color as single shadow spot\n\n		// 					shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );\n\n			#endif\n\n		}\n\n\n		#ifdef SHADOWMAP_DEBUG\n\n			#ifdef SHADOWMAP_CASCADE\n\n				if ( inFrustum && inFrustumCount == 1 ) outgoingLight *= frustumColors[ i ];\n\n			#else\n\n				if ( inFrustum ) outgoingLight *= frustumColors[ i ];\n\n			#endif\n\n		#endif\n\n	}\n\n	// NOTE: I am unsure if this is correct in linear space.  -bhouston, Dec 29, 2014\n	shadowColor = inputToLinear( shadowColor );\n\n	outgoingLight = outgoingLight * shadowColor;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/worldpos_vertex.glsl
 
@@ -16772,7 +16820,7 @@ THREE.ShaderChunk[ 'logdepthbuf_pars_fragment'] = "#ifdef USE_LOGDEPTHBUF\n\n	un
 
 // File:src/renderers/shaders/ShaderChunk/alphamap_fragment.glsl
 
-THREE.ShaderChunk[ 'alphamap_fragment'] = "#ifdef USE_ALPHAMAP\n\n	gl_FragColor.a *= texture2D( alphaMap, vUv ).g;\n\n#endif\n";
+THREE.ShaderChunk[ 'alphamap_fragment'] = "#ifdef USE_ALPHAMAP\n\n	diffuseColor.a *= texture2D( alphaMap, vUv ).g;\n\n#endif\n";
 
 // File:src/renderers/shaders/ShaderChunk/alphamap_pars_fragment.glsl
 
@@ -17035,21 +17083,27 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( diffuse, opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
-				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
+
+				THREE.ShaderChunk[ "lightmap_fragment" ],		// TODO: Light map on an otherwise unlit surface doesn't make sense.
 				THREE.ShaderChunk[ "envmap_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
+				THREE.ShaderChunk[ "shadowmap_fragment" ],		// TODO: Shadows on an otherwise unlit surface doesn't make sense.
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -17123,6 +17177,8 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
+			"uniform vec3 diffuse;",
+			"uniform vec3 emissive;",
 			"uniform float opacity;",
 
 			"varying vec3 vLightFront;",
@@ -17146,10 +17202,12 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( vec3( 1.0 ), opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
@@ -17160,24 +17218,25 @@ THREE.ShaderLib = {
 					//"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
 
 			"		if ( gl_FrontFacing )",
-			"			gl_FragColor.xyz *= vLightFront;",
+			"			outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 			"		else",
-			"			gl_FragColor.xyz *= vLightBack;",
+			"			outgoingLight += diffuseColor.rgb * vLightBack + emissive;",
 
 			"	#else",
 
-			"		gl_FragColor.xyz *= vLightFront;",
+			"		outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 
 			"	#endif",
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -17239,7 +17298,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-			"#ifndef FLAT_SHADED",
+			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
 			"	vNormal = normalize( transformedNormal );",
 
@@ -17266,11 +17325,10 @@ THREE.ShaderLib = {
 			"#define PHONG",
 
 			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
 			"uniform vec3 emissive;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
+			"uniform float opacity;",
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
@@ -17288,10 +17346,12 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( vec3( 1.0 ), opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
@@ -17299,13 +17359,14 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -17368,14 +17429,20 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( psColor, opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( psColor, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_particle_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
+
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -17447,11 +17514,17 @@ THREE.ShaderLib = {
 
 			"	}",
 
-			"	gl_FragColor = vec4( diffuse, opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
+
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -17509,7 +17582,7 @@ THREE.ShaderLib = {
 			"	#endif",
 
 			"	float color = 1.0 - smoothstep( mNear, mFar, depth );",
-			"	gl_FragColor = vec4( vec3( color ), opacity );",
+			"	gl_FragColor = vec4( vec3( color ), opacity );",   // TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -17883,7 +17956,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	 // camera matrices cache
 
 	_projScreenMatrix = new THREE.Matrix4(),
-	_projScreenMatrixPS = new THREE.Matrix4(),
 
 	_vector3 = new THREE.Vector3(),
 
@@ -18051,11 +18123,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
 	var _vertexShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_FLOAT );
-	var _vertexShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_FLOAT );
 
 	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
 	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
-	var _fragmentShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_FLOAT );
 
 	var getCompressedTextureFormats = ( function () {
 
@@ -18771,8 +18841,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
 		geometry.__colorArray = new Float32Array( nvertices * 3 );
 
-		geometry.__sortArray = [];
-
 		geometry.__webglParticleCount = nvertices;
 
 		initCustomAttributes( object );
@@ -18942,7 +19010,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setParticleBuffers ( geometry, hint, object ) {
 
-		var v, c, vertex, offset, index, color,
+		var v, c, vertex, offset, color,
 
 		vertices = geometry.vertices,
 		vl = vertices.length,
@@ -18953,15 +19021,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertexArray = geometry.__vertexArray,
 		colorArray = geometry.__colorArray,
 
-		sortArray = geometry.__sortArray,
-
 		dirtyVertices = geometry.verticesNeedUpdate,
-		dirtyElements = geometry.elementsNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
 
 		customAttributes = geometry.__webglCustomAttributesList,
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -19120,7 +19185,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		customAttributes = geometry.__webglCustomAttributesList,
 
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -19280,20 +19345,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var needsFaceNormals = materialNeedsFaceNormals( material );
 
 		var f, fl, fi, face,
-		vertexNormals, faceNormal, normal,
+		vertexNormals, faceNormal,
 		vertexColors, faceColor,
 		vertexTangents,
-		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
+		uv, uv2, v1, v2, v3, t1, t2, t3, n1, n2, n3,
 		c1, c2, c3,
-		sw1, sw2, sw3, sw4,
-		si1, si2, si3, si4,
-		sa1, sa2, sa3, sa4,
-		sb1, sb2, sb3, sb4,
-		m, ml, i, il,
+		sw1, sw2, sw3,
+		si1, si2, si3,
+		i, il,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
 		nka, chf, faceVertexNormals,
-		a,
 
 		vertexIndex = 0,
 
@@ -19308,7 +19370,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_skin = 0,
 		offset_morphTarget = 0,
 		offset_custom = 0,
-		offset_customSrc = 0,
 
 		value,
 
@@ -19347,8 +19408,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
 		obj_uvs2 = geometry.faceVertexUvs[ 1 ],
-
-		obj_colors = geometry.colors,
 
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
@@ -19772,7 +19831,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( ! customAttribute.__original.needsUpdate ) continue;
 
 				offset_custom = 0;
-				offset_customSrc = 0;
 
 				if ( customAttribute.size === 1 ) {
 
@@ -20341,7 +20399,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_this.info.render.calls ++;
 				_this.info.render.vertices += position.array.length / position.itemSize;
-				_this.info.render.faces += position.array.length / ( 3 * position.itemsize );
+				_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
 
 			}
 
@@ -22518,29 +22576,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// If uniforms are marked as clean, they don't need to be loaded to the GPU.
 
-	function markUniformsLightsNeedsUpdate ( uniforms, boolean ) {
+	function markUniformsLightsNeedsUpdate ( uniforms, value ) {
 
-		uniforms.ambientLightColor.needsUpdate = boolean;
+		uniforms.ambientLightColor.needsUpdate = value;
 
-		uniforms.directionalLightColor.needsUpdate = boolean;
-		uniforms.directionalLightDirection.needsUpdate = boolean;
+		uniforms.directionalLightColor.needsUpdate = value;
+		uniforms.directionalLightDirection.needsUpdate = value;
 
-		uniforms.pointLightColor.needsUpdate = boolean;
-		uniforms.pointLightPosition.needsUpdate = boolean;
-		uniforms.pointLightDistance.needsUpdate = boolean;
-		uniforms.pointLightDecay.needsUpdate = boolean;
+		uniforms.pointLightColor.needsUpdate = value;
+		uniforms.pointLightPosition.needsUpdate = value;
+		uniforms.pointLightDistance.needsUpdate = value;
+		uniforms.pointLightDecay.needsUpdate = value;
 
-		uniforms.spotLightColor.needsUpdate = boolean;
-		uniforms.spotLightPosition.needsUpdate = boolean;
-		uniforms.spotLightDistance.needsUpdate = boolean;
-		uniforms.spotLightDirection.needsUpdate = boolean;
-		uniforms.spotLightAngleCos.needsUpdate = boolean;
-		uniforms.spotLightExponent.needsUpdate = boolean;
-		uniforms.spotLightDecay.needsUpdate = boolean;
+		uniforms.spotLightColor.needsUpdate = value;
+		uniforms.spotLightPosition.needsUpdate = value;
+		uniforms.spotLightDistance.needsUpdate = value;
+		uniforms.spotLightDirection.needsUpdate = value;
+		uniforms.spotLightAngleCos.needsUpdate = value;
+		uniforms.spotLightExponent.needsUpdate = value;
+		uniforms.spotLightDecay.needsUpdate = value;
 
-		uniforms.hemisphereLightSkyColor.needsUpdate = boolean;
-		uniforms.hemisphereLightGroundColor.needsUpdate = boolean;
-		uniforms.hemisphereLightDirection.needsUpdate = boolean;
+		uniforms.hemisphereLightSkyColor.needsUpdate = value;
+		uniforms.hemisphereLightGroundColor.needsUpdate = value;
+		uniforms.hemisphereLightDirection.needsUpdate = value;
 
 	}
 
@@ -22959,11 +23017,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupLights ( lights ) {
 
-		var l, ll, light, n,
+		var l, ll, light,
 		r = 0, g = 0, b = 0,
 		color, skyColor, groundColor,
-		intensity,  intensitySq,
-		position,
+		intensity,
 		distance,
 
 		zlights = _lights,
@@ -25491,7 +25548,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		var i, il, j, jl, n,
 
 		shadowMap, shadowMatrix, shadowCamera,
-		program, buffer, material,
+		buffer, material,
 		webglObject, object, light,
 
 		lights = [],
@@ -26679,7 +26736,7 @@ THREE.FontUtils = {
 		ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
 		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
-		var face = ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
+		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
 		return data;
 
@@ -26687,11 +26744,9 @@ THREE.FontUtils = {
 
 	drawText: function ( text ) {
 
-		var characterPts = [], allPts = [];
-
 		// RenderText
 
-		var i, p,
+		var i,
 			face = this.getFace(),
 			scale = this.size / face.resolution,
 			offset = 0,
@@ -26803,8 +26858,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
-							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+							THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 						}
 
 					}
@@ -26834,8 +26889,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
-							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+							THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 
 						}
 
@@ -27106,12 +27161,18 @@ THREE.Audio = function ( listener ) {
 
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
+	this.source.onended = this.onEnded.bind(this);
 
 	this.gain = this.context.createGain();
 	this.gain.connect( this.context.destination );
 
 	this.panner = this.context.createPanner();
 	this.panner.connect( this.gain );
+
+	this.autoplay = false;
+
+	this.startTime = 0;
+	this.isPlaying = false;
 
 };
 
@@ -27130,8 +27191,8 @@ THREE.Audio.prototype.load = function ( file ) {
 		scope.context.decodeAudioData( this.response, function ( buffer ) {
 
 			scope.source.buffer = buffer;
-			scope.source.connect( scope.panner );
-			scope.source.start( 0 );
+
+			if( scope.autoplay ) scope.play();
 
 		} );
 
@@ -27139,6 +27200,49 @@ THREE.Audio.prototype.load = function ( file ) {
 	request.send();
 
 	return this;
+
+};
+
+THREE.Audio.prototype.play = function () {
+
+	if ( this.isPlaying === true ) {
+
+		THREE.warn( 'THREE.Audio: Audio is already playing.' );
+		return;
+
+	}
+
+	var source = this.context.createBufferSource();
+
+	source.buffer = this.source.buffer;
+	source.loop = this.source.loop;
+	source.onended = this.source.onended;
+	source.connect( this.panner );
+	source.start( 0, this.startTime );
+
+	this.isPlaying = true;
+
+	this.source = source;
+
+};
+
+THREE.Audio.prototype.pause = function () {
+
+	this.source.stop();
+	this.startTime = this.context.currentTime;
+
+};
+
+THREE.Audio.prototype.stop = function () {
+
+	this.source.stop();
+	this.startTime = 0;
+
+};
+
+THREE.Audio.prototype.onEnded = function() {
+
+	this.isPlaying = false;
 
 };
 
@@ -27157,6 +27261,12 @@ THREE.Audio.prototype.setRefDistance = function ( value ) {
 THREE.Audio.prototype.setRolloffFactor = function ( value ) {
 
 	this.panner.rolloffFactor = value;
+
+};
+
+THREE.Audio.prototype.setVolume = function ( value ) {
+
+	this.gain.gain.value = value;
 
 };
 
@@ -28598,7 +28708,6 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			betterShapeHoles[sIdx] = [];
 		}
 		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-			var sh = newShapes[sIdx];
 			var sho = newShapeHoles[sIdx];
 			for (var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 				var ho = sho[hIdx];
@@ -29859,384 +29968,387 @@ THREE.Animation = function ( root, data ) {
 
 };
 
+THREE.Animation.prototype = {
 
-THREE.Animation.prototype.keyTypes = [ "pos", "rot", "scl" ];
+	constructor: THREE.Animation,
 
+	keyTypes:  [ "pos", "rot", "scl" ],
 
-THREE.Animation.prototype.play = function ( startTime, weight ) {
+	play: function ( startTime, weight ) {
 
-	this.currentTime = startTime !== undefined ? startTime : 0;
-	this.weight = weight !== undefined ? weight : 1;
+		this.currentTime = startTime !== undefined ? startTime : 0;
+		this.weight = weight !== undefined ? weight : 1;
 
-	this.isPlaying = true;
+		this.isPlaying = true;
 
-	this.reset();
+		this.reset();
 
-	THREE.AnimationHandler.play( this );
+		THREE.AnimationHandler.play( this );
 
-};
+	},
 
+	stop: function() {
 
-THREE.Animation.prototype.stop = function() {
+		this.isPlaying = false;
 
-	this.isPlaying = false;
+		THREE.AnimationHandler.stop( this );
 
-	THREE.AnimationHandler.stop( this );
+	},
 
-};
-
-THREE.Animation.prototype.reset = function () {
-
-	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
-
-		var object = this.hierarchy[ h ];
-
-		if ( object.animationCache === undefined ) {
-
-			object.animationCache = {
-				animations: {},
-				blending: {
-					positionWeight: 0.0,
-					quaternionWeight: 0.0,
-					scaleWeight: 0.0
-				}
-			};
-		}
-
-		if ( object.animationCache.animations[this.data.name] === undefined ) {
-
-			object.animationCache.animations[this.data.name] = {};
-			object.animationCache.animations[this.data.name].prevKey = { pos: 0, rot: 0, scl: 0 };
-			object.animationCache.animations[this.data.name].nextKey = { pos: 0, rot: 0, scl: 0 };
-			object.animationCache.animations[this.data.name].originalMatrix = object.matrix;
-
-		}
-
-		var animationCache = object.animationCache.animations[this.data.name];
-
-		// Get keys to match our current time
-
-		for ( var t = 0; t < 3; t ++ ) {
-
-			var type = this.keyTypes[ t ];
-
-			var prevKey = this.data.hierarchy[ h ].keys[ 0 ];
-			var nextKey = this.getNextKeyWith( type, h, 1 );
-
-			while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
-
-				prevKey = nextKey;
-				nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
-
-			}
-
-			animationCache.prevKey[ type ] = prevKey;
-			animationCache.nextKey[ type ] = nextKey;
-
-		}
-
-	}
-
-};
-
-THREE.Animation.prototype.resetBlendWeights = function () {
-
-	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
-
-		var object = this.hierarchy[ h ];
-
-		if ( object.animationCache !== undefined ) {
-
-			object.animationCache.blending.positionWeight = 0.0;
-			object.animationCache.blending.quaternionWeight = 0.0;
-			object.animationCache.blending.scaleWeight = 0.0;
-
-		}
-
-	}
-
-};
-
-THREE.Animation.prototype.update = (function() {
-
-	var points = [];
-	var target = new THREE.Vector3();
-	var newVector = new THREE.Vector3();
-	var newQuat = new THREE.Quaternion();
-
-	// Catmull-Rom spline
-
-	var interpolateCatmullRom = function ( points, scale ) {
-
-		var c = [], v3 = [],
-		point, intPoint, weight, w2, w3,
-		pa, pb, pc, pd;
-
-		point = ( points.length - 1 ) * scale;
-		intPoint = Math.floor( point );
-		weight = point - intPoint;
-
-		c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
-		c[ 1 ] = intPoint;
-		c[ 2 ] = intPoint > points.length - 2 ? intPoint : intPoint + 1;
-		c[ 3 ] = intPoint > points.length - 3 ? intPoint : intPoint + 2;
-
-		pa = points[ c[ 0 ] ];
-		pb = points[ c[ 1 ] ];
-		pc = points[ c[ 2 ] ];
-		pd = points[ c[ 3 ] ];
-
-		w2 = weight * weight;
-		w3 = weight * w2;
-
-		v3[ 0 ] = interpolate( pa[ 0 ], pb[ 0 ], pc[ 0 ], pd[ 0 ], weight, w2, w3 );
-		v3[ 1 ] = interpolate( pa[ 1 ], pb[ 1 ], pc[ 1 ], pd[ 1 ], weight, w2, w3 );
-		v3[ 2 ] = interpolate( pa[ 2 ], pb[ 2 ], pc[ 2 ], pd[ 2 ], weight, w2, w3 );
-
-		return v3;
-
-	};
-
-	var interpolate = function ( p0, p1, p2, p3, t, t2, t3 ) {
-
-		var v0 = ( p2 - p0 ) * 0.5,
-			v1 = ( p3 - p1 ) * 0.5;
-
-		return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-	};
-
-	return function ( delta ) {
-
-		if ( this.isPlaying === false ) return;
-
-		this.currentTime += delta * this.timeScale;
-
-		if ( this.weight === 0 )
-			return;
-
-		//
-
-		var duration = this.data.length;
-
-		if ( this.currentTime > duration || this.currentTime < 0 ) {
-
-			if ( this.loop ) {
-
-				this.currentTime %= duration;
-
-				if ( this.currentTime < 0 )
-					this.currentTime += duration;
-
-				this.reset();
-
-			} else {
-
-				this.stop();
-
-			}
-
-		}
+	reset: function () {
 
 		for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
 			var object = this.hierarchy[ h ];
-			var animationCache = object.animationCache.animations[this.data.name];
-			var blending = object.animationCache.blending;
 
-			// loop through pos/rot/scl
+			if ( object.animationCache === undefined ) {
+
+				object.animationCache = {
+					animations: {},
+					blending: {
+						positionWeight: 0.0,
+						quaternionWeight: 0.0,
+						scaleWeight: 0.0
+					}
+				};
+			}
+
+			var name = this.data.name;
+			var animations = object.animationCache.animations;
+			var animationCache = animations[ name ];
+
+			if ( animationCache === undefined ) {
+
+				animationCache = {
+					prevKey: { pos: 0, rot: 0, scl: 0 },
+					nextKey: { pos: 0, rot: 0, scl: 0 },
+					originalMatrix: object.matrix
+				};
+
+				animations[ name ] = animationCache;
+
+			}
+
+			// Get keys to match our current time
 
 			for ( var t = 0; t < 3; t ++ ) {
 
-				// get keys
+				var type = this.keyTypes[ t ];
 
-				var type    = this.keyTypes[ t ];
-				var prevKey = animationCache.prevKey[ type ];
-				var nextKey = animationCache.nextKey[ type ];
+				var prevKey = this.data.hierarchy[ h ].keys[ 0 ];
+				var nextKey = this.getNextKeyWith( type, h, 1 );
 
-				if ( ( this.timeScale > 0 && nextKey.time <= this.currentTime ) ||
-					( this.timeScale < 0 && prevKey.time >= this.currentTime ) ) {
+				while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
 
-					prevKey = this.data.hierarchy[ h ].keys[ 0 ];
-					nextKey = this.getNextKeyWith( type, h, 1 );
-
-					while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
-
-						prevKey = nextKey;
-						nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
-
-					}
-
-					animationCache.prevKey[ type ] = prevKey;
-					animationCache.nextKey[ type ] = nextKey;
+					prevKey = nextKey;
+					nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
 
 				}
 
-				var scale = ( this.currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
+				animationCache.prevKey[ type ] = prevKey;
+				animationCache.nextKey[ type ] = nextKey;
 
-				var prevXYZ = prevKey[ type ];
-				var nextXYZ = nextKey[ type ];
+			}
 
-				if ( scale < 0 ) scale = 0;
-				if ( scale > 1 ) scale = 1;
+		}
 
-				// interpolate
+	},
 
-				if ( type === "pos" ) {
+	resetBlendWeights: function () {
 
-					if ( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
+		for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
+
+			var object = this.hierarchy[ h ];
+			var animationCache = object.animationCache;
+
+			if ( animationCache !== undefined ) {
+
+				var blending = animationCache.blending;
+
+				blending.positionWeight = 0.0;
+				blending.quaternionWeight = 0.0;
+				blending.scaleWeight = 0.0;
+
+			}
+
+		}
+
+	},
+
+	update: ( function() {
+
+		var points = [];
+		var target = new THREE.Vector3();
+		var newVector = new THREE.Vector3();
+		var newQuat = new THREE.Quaternion();
+
+		// Catmull-Rom spline
+
+		var interpolateCatmullRom = function ( points, scale ) {
+
+			var c = [], v3 = [],
+			point, intPoint, weight, w2, w3,
+			pa, pb, pc, pd;
+
+			point = ( points.length - 1 ) * scale;
+			intPoint = Math.floor( point );
+			weight = point - intPoint;
+
+			c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
+			c[ 1 ] = intPoint;
+			c[ 2 ] = intPoint > points.length - 2 ? intPoint : intPoint + 1;
+			c[ 3 ] = intPoint > points.length - 3 ? intPoint : intPoint + 2;
+
+			pa = points[ c[ 0 ] ];
+			pb = points[ c[ 1 ] ];
+			pc = points[ c[ 2 ] ];
+			pd = points[ c[ 3 ] ];
+
+			w2 = weight * weight;
+			w3 = weight * w2;
+
+			v3[ 0 ] = interpolate( pa[ 0 ], pb[ 0 ], pc[ 0 ], pd[ 0 ], weight, w2, w3 );
+			v3[ 1 ] = interpolate( pa[ 1 ], pb[ 1 ], pc[ 1 ], pd[ 1 ], weight, w2, w3 );
+			v3[ 2 ] = interpolate( pa[ 2 ], pb[ 2 ], pc[ 2 ], pd[ 2 ], weight, w2, w3 );
+
+			return v3;
+
+		};
+
+		var interpolate = function ( p0, p1, p2, p3, t, t2, t3 ) {
+
+			var v0 = ( p2 - p0 ) * 0.5,
+				v1 = ( p3 - p1 ) * 0.5;
+
+			return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
+
+		};
+
+		return function ( delta ) {
+
+			if ( this.isPlaying === false ) return;
+
+			this.currentTime += delta * this.timeScale;
+
+			if ( this.weight === 0 )
+				return;
+
+			//
+
+			var duration = this.data.length;
+
+			if ( this.currentTime > duration || this.currentTime < 0 ) {
+
+				if ( this.loop ) {
+
+					this.currentTime %= duration;
+
+					if ( this.currentTime < 0 )
+						this.currentTime += duration;
+
+					this.reset();
+
+				} else {
+
+					this.stop();
+
+				}
+
+			}
+
+			for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
+
+				var object = this.hierarchy[ h ];
+				var animationCache = object.animationCache.animations[this.data.name];
+				var blending = object.animationCache.blending;
+
+				// loop through pos/rot/scl
+
+				for ( var t = 0; t < 3; t ++ ) {
+
+					// get keys
+
+					var type    = this.keyTypes[ t ];
+					var prevKey = animationCache.prevKey[ type ];
+					var nextKey = animationCache.nextKey[ type ];
+
+					if ( ( this.timeScale > 0 && nextKey.time <= this.currentTime ) ||
+						( this.timeScale < 0 && prevKey.time >= this.currentTime ) ) {
+
+						prevKey = this.data.hierarchy[ h ].keys[ 0 ];
+						nextKey = this.getNextKeyWith( type, h, 1 );
+
+						while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
+
+							prevKey = nextKey;
+							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
+
+						}
+
+						animationCache.prevKey[ type ] = prevKey;
+						animationCache.nextKey[ type ] = nextKey;
+
+					}
+
+					var scale = ( this.currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
+
+					var prevXYZ = prevKey[ type ];
+					var nextXYZ = nextKey[ type ];
+
+					if ( scale < 0 ) scale = 0;
+					if ( scale > 1 ) scale = 1;
+
+					// interpolate
+
+					if ( type === "pos" ) {
+
+						if ( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
+
+							newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
+							newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
+							newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
+
+							// blend
+							var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
+							object.position.lerp( newVector, proportionalWeight );
+							blending.positionWeight += this.weight;
+
+						} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+									this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+
+							points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
+							points[ 1 ] = prevXYZ;
+							points[ 2 ] = nextXYZ;
+							points[ 3 ] = this.getNextKeyWith( "pos", h, nextKey.index + 1 )[ "pos" ];
+
+							scale = scale * 0.33 + 0.33;
+
+							var currentPoint = interpolateCatmullRom( points, scale );
+							var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
+							blending.positionWeight += this.weight;
+
+							// blend
+
+							var vector = object.position;
+
+							vector.x = vector.x + ( currentPoint[ 0 ] - vector.x ) * proportionalWeight;
+							vector.y = vector.y + ( currentPoint[ 1 ] - vector.y ) * proportionalWeight;
+							vector.z = vector.z + ( currentPoint[ 2 ] - vector.z ) * proportionalWeight;
+
+							if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+
+								var forwardPoint = interpolateCatmullRom( points, scale * 1.01 );
+
+								target.set( forwardPoint[ 0 ], forwardPoint[ 1 ], forwardPoint[ 2 ] );
+								target.sub( vector );
+								target.y = 0;
+								target.normalize();
+
+								var angle = Math.atan2( target.x, target.z );
+								object.rotation.set( 0, angle, 0 );
+
+							}
+
+						}
+
+					} else if ( type === "rot" ) {
+
+						THREE.Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
+
+						// Avoid paying the cost of an additional slerp if we don't have to
+						if ( blending.quaternionWeight === 0 ) {
+
+							object.quaternion.copy(newQuat);
+							blending.quaternionWeight = this.weight;
+
+						} else {
+
+							var proportionalWeight = this.weight / ( this.weight + blending.quaternionWeight );
+							THREE.Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
+							blending.quaternionWeight += this.weight;
+
+						}
+
+					} else if ( type === "scl" ) {
 
 						newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 						newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 						newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
-						// blend
-						var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
-						object.position.lerp( newVector, proportionalWeight );
-						blending.positionWeight += this.weight;
-
-					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-								this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-						points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
-						points[ 1 ] = prevXYZ;
-						points[ 2 ] = nextXYZ;
-						points[ 3 ] = this.getNextKeyWith( "pos", h, nextKey.index + 1 )[ "pos" ];
-
-						scale = scale * 0.33 + 0.33;
-
-						var currentPoint = interpolateCatmullRom( points, scale );
-						var proportionalWeight = this.weight / ( this.weight + blending.positionWeight );
-						blending.positionWeight += this.weight;
-
-						// blend
-
-						var vector = object.position;
-						
-						vector.x = vector.x + ( currentPoint[ 0 ] - vector.x ) * proportionalWeight;
-						vector.y = vector.y + ( currentPoint[ 1 ] - vector.y ) * proportionalWeight;
-						vector.z = vector.z + ( currentPoint[ 2 ] - vector.z ) * proportionalWeight;
-
-						if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-							var forwardPoint = interpolateCatmullRom( points, scale * 1.01 );
-
-							target.set( forwardPoint[ 0 ], forwardPoint[ 1 ], forwardPoint[ 2 ] );
-							target.sub( vector );
-							target.y = 0;
-							target.normalize();
-
-							var angle = Math.atan2( target.x, target.z );
-							object.rotation.set( 0, angle, 0 );
-
-						}
+						var proportionalWeight = this.weight / ( this.weight + blending.scaleWeight );
+						object.scale.lerp( newVector, proportionalWeight );
+						blending.scaleWeight += this.weight;
 
 					}
-
-				} else if ( type === "rot" ) {
-
-					THREE.Quaternion.slerp( prevXYZ, nextXYZ, newQuat, scale );
-
-					// Avoid paying the cost of an additional slerp if we don't have to
-					if ( blending.quaternionWeight === 0 ) {
-
-						object.quaternion.copy(newQuat);
-						blending.quaternionWeight = this.weight;
-
-					} else {
-
-						var proportionalWeight = this.weight / ( this.weight + blending.quaternionWeight );
-						THREE.Quaternion.slerp( object.quaternion, newQuat, object.quaternion, proportionalWeight );
-						blending.quaternionWeight += this.weight;
-
-					}
-
-				} else if ( type === "scl" ) {
-
-					newVector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
-					newVector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
-					newVector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
-
-					var proportionalWeight = this.weight / ( this.weight + blending.scaleWeight );
-					object.scale.lerp( newVector, proportionalWeight );
-					blending.scaleWeight += this.weight;
 
 				}
 
 			}
 
-		}
+			return true;
 
-		return true;
+		};
 
-	};
+	} )(),
 
-})();
+	getNextKeyWith: function ( type, h, key ) {
 
+		var keys = this.data.hierarchy[ h ].keys;
 
+		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+			 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
+			key = key < keys.length - 1 ? key : keys.length - 1;
 
+		} else {
 
-// Get next key with
-
-THREE.Animation.prototype.getNextKeyWith = function ( type, h, key ) {
-
-	var keys = this.data.hierarchy[ h ].keys;
-
-	if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-		 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-		key = key < keys.length - 1 ? key : keys.length - 1;
-
-	} else {
-
-		key = key % keys.length;
-
-	}
-
-	for ( ; key < keys.length; key ++ ) {
-
-		if ( keys[ key ][ type ] !== undefined ) {
-
-			return keys[ key ];
+			key = key % keys.length;
 
 		}
 
-	}
+		for ( ; key < keys.length; key ++ ) {
 
-	return this.data.hierarchy[ h ].keys[ 0 ];
+			if ( keys[ key ][ type ] !== undefined ) {
 
-};
+				return keys[ key ];
 
-// Get previous key with
-
-THREE.Animation.prototype.getPrevKeyWith = function ( type, h, key ) {
-
-	var keys = this.data.hierarchy[ h ].keys;
-
-	if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-		this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-		key = key > 0 ? key : 0;
-
-	} else {
-
-		key = key >= 0 ? key : key + keys.length;
-
-	}
-
-
-	for ( ; key >= 0; key -- ) {
-
-		if ( keys[ key ][ type ] !== undefined ) {
-
-			return keys[ key ];
+			}
 
 		}
 
-	}
+		return this.data.hierarchy[ h ].keys[ 0 ];
 
-	return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
+	},
+
+	getPrevKeyWith: function ( type, h, key ) {
+
+		var keys = this.data.hierarchy[ h ].keys;
+
+		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+			this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+
+			key = key > 0 ? key : 0;
+
+		} else {
+
+			key = key >= 0 ? key : key + keys.length;
+
+		}
+
+
+		for ( ; key >= 0; key -- ) {
+
+			if ( keys[ key ][ type ] !== undefined ) {
+
+				return keys[ key ];
+
+			}
+
+		}
+
+		return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
+
+	}
 
 };
 
@@ -30294,196 +30406,193 @@ THREE.KeyFrameAnimation = function ( data ) {
 
 };
 
+THREE.KeyFrameAnimation.prototype = {
 
-THREE.KeyFrameAnimation.prototype.play = function ( startTime ) {
+	constructor: THREE.KeyFrameAnimation,
 
-	this.currentTime = startTime !== undefined ? startTime : 0;
+	play: function ( startTime ) {
 
-	if ( this.isPlaying === false ) {
+		this.currentTime = startTime !== undefined ? startTime : 0;
 
-		this.isPlaying = true;
+		if ( this.isPlaying === false ) {
 
-		// reset key cache
+			this.isPlaying = true;
 
-		var h, hl = this.hierarchy.length,
-			object,
-			node;
+			// reset key cache
 
-		for ( h = 0; h < hl; h ++ ) {
+			var h, hl = this.hierarchy.length,
+				object,
+				node;
 
-			object = this.hierarchy[ h ];
-			node = this.data.hierarchy[ h ];
+			for ( h = 0; h < hl; h ++ ) {
 
-			if ( node.animationCache === undefined ) {
+				object = this.hierarchy[ h ];
+				node = this.data.hierarchy[ h ];
 
-				node.animationCache = {};
-				node.animationCache.prevKey = null;
-				node.animationCache.nextKey = null;
-				node.animationCache.originalMatrix = object.matrix;
+				if ( node.animationCache === undefined ) {
 
-			}
-
-			var keys = this.data.hierarchy[h].keys;
-
-			if (keys.length) {
-
-				node.animationCache.prevKey = keys[ 0 ];
-				node.animationCache.nextKey = keys[ 1 ];
-
-				this.startTime = Math.min( keys[0].time, this.startTime );
-				this.endTime = Math.max( keys[keys.length - 1].time, this.endTime );
-
-			}
-
-		}
-
-		this.update( 0 );
-
-	}
-
-	this.isPaused = false;
-
-	THREE.AnimationHandler.play( this );
-
-};
-
-
-THREE.KeyFrameAnimation.prototype.stop = function() {
-
-	this.isPlaying = false;
-	this.isPaused  = false;
-
-	THREE.AnimationHandler.stop( this );
-
-	// reset JIT matrix and remove cache
-
-	for ( var h = 0; h < this.data.hierarchy.length; h ++ ) {
-		
-		var obj = this.hierarchy[ h ];
-		var node = this.data.hierarchy[ h ];
-
-		if ( node.animationCache !== undefined ) {
-
-			var original = node.animationCache.originalMatrix;
-
-			original.copy( obj.matrix );
-			obj.matrix = original;
-
-			delete node.animationCache;
-
-		}
-
-	}
-
-};
-
-
-// Update
-
-THREE.KeyFrameAnimation.prototype.update = function ( delta ) {
-
-	if ( this.isPlaying === false ) return;
-
-	this.currentTime += delta * this.timeScale;
-
-	//
-
-	var duration = this.data.length;
-
-	if ( this.loop === true && this.currentTime > duration ) {
-
-		this.currentTime %= duration;
-
-	}
-
-	this.currentTime = Math.min( this.currentTime, duration );
-
-	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
-
-		var object = this.hierarchy[ h ];
-		var node = this.data.hierarchy[ h ];
-
-		var keys = node.keys,
-			animationCache = node.animationCache;
-
-
-		if ( keys.length ) {
-
-			var prevKey = animationCache.prevKey;
-			var nextKey = animationCache.nextKey;
-
-			if ( nextKey.time <= this.currentTime ) {
-
-				while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
-
-					prevKey = nextKey;
-					nextKey = keys[ prevKey.index + 1 ];
+					node.animationCache = {};
+					node.animationCache.prevKey = null;
+					node.animationCache.nextKey = null;
+					node.animationCache.originalMatrix = object.matrix;
 
 				}
 
-				animationCache.prevKey = prevKey;
-				animationCache.nextKey = nextKey;
+				var keys = this.data.hierarchy[h].keys;
+
+				if (keys.length) {
+
+					node.animationCache.prevKey = keys[ 0 ];
+					node.animationCache.nextKey = keys[ 1 ];
+
+					this.startTime = Math.min( keys[0].time, this.startTime );
+					this.endTime = Math.max( keys[keys.length - 1].time, this.endTime );
+
+				}
 
 			}
 
-			if ( nextKey.time >= this.currentTime ) {
+			this.update( 0 );
 
-				prevKey.interpolate( nextKey, this.currentTime );
+		}
 
-			} else {
+		this.isPaused = false;
 
-				prevKey.interpolate( nextKey, nextKey.time );
+		THREE.AnimationHandler.play( this );
+
+	},
+
+	stop: function () {
+
+		this.isPlaying = false;
+		this.isPaused  = false;
+
+		THREE.AnimationHandler.stop( this );
+
+		// reset JIT matrix and remove cache
+
+		for ( var h = 0; h < this.data.hierarchy.length; h ++ ) {
+
+			var obj = this.hierarchy[ h ];
+			var node = this.data.hierarchy[ h ];
+
+			if ( node.animationCache !== undefined ) {
+
+				var original = node.animationCache.originalMatrix;
+
+				original.copy( obj.matrix );
+				obj.matrix = original;
+
+				delete node.animationCache;
 
 			}
 
-			this.data.hierarchy[ h ].node.updateMatrix();
-			object.matrixWorldNeedsUpdate = true;
+		}
+
+	},
+
+	update: function ( delta ) {
+
+		if ( this.isPlaying === false ) return;
+
+		this.currentTime += delta * this.timeScale;
+
+		//
+
+		var duration = this.data.length;
+
+		if ( this.loop === true && this.currentTime > duration ) {
+
+			this.currentTime %= duration;
 
 		}
 
-	}
+		this.currentTime = Math.min( this.currentTime, duration );
 
-};
+		for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
-// Get next key with
+			var object = this.hierarchy[ h ];
+			var node = this.data.hierarchy[ h ];
 
-THREE.KeyFrameAnimation.prototype.getNextKeyWith = function( sid, h, key ) {
+			var keys = node.keys,
+				animationCache = node.animationCache;
 
-	var keys = this.data.hierarchy[ h ].keys;
-	key = key % keys.length;
 
-	for ( ; key < keys.length; key ++ ) {
+			if ( keys.length ) {
 
-		if ( keys[ key ].hasTarget( sid ) ) {
+				var prevKey = animationCache.prevKey;
+				var nextKey = animationCache.nextKey;
 
-			return keys[ key ];
+				if ( nextKey.time <= this.currentTime ) {
+
+					while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
+
+						prevKey = nextKey;
+						nextKey = keys[ prevKey.index + 1 ];
+
+					}
+
+					animationCache.prevKey = prevKey;
+					animationCache.nextKey = nextKey;
+
+				}
+
+				if ( nextKey.time >= this.currentTime ) {
+
+					prevKey.interpolate( nextKey, this.currentTime );
+
+				} else {
+
+					prevKey.interpolate( nextKey, nextKey.time );
+
+				}
+
+				this.data.hierarchy[ h ].node.updateMatrix();
+				object.matrixWorldNeedsUpdate = true;
+
+			}
 
 		}
 
-	}
+	},
 
-	return keys[ 0 ];
+	getNextKeyWith: function ( sid, h, key ) {
 
-};
+		var keys = this.data.hierarchy[ h ].keys;
+		key = key % keys.length;
 
-// Get previous key with
+		for ( ; key < keys.length; key ++ ) {
 
-THREE.KeyFrameAnimation.prototype.getPrevKeyWith = function( sid, h, key ) {
+			if ( keys[ key ].hasTarget( sid ) ) {
 
-	var keys = this.data.hierarchy[ h ].keys;
-	key = key >= 0 ? key : key + keys.length;
+				return keys[ key ];
 
-	for ( ; key >= 0; key -- ) {
-
-		if ( keys[ key ].hasTarget( sid ) ) {
-
-			return keys[ key ];
+			}
 
 		}
 
-	}
+		return keys[ 0 ];
 
-	return keys[ keys.length - 1 ];
+	},
+
+	getPrevKeyWith: function ( sid, h, key ) {
+
+		var keys = this.data.hierarchy[ h ].keys;
+		key = key >= 0 ? key : key + keys.length;
+
+		for ( ; key >= 0; key -- ) {
+
+			if ( keys[ key ].hasTarget( sid ) ) {
+
+				return keys[ key ];
+
+			}
+
+		}
+
+		return keys[ keys.length - 1 ];
+
+	}
 
 };
 
@@ -30541,19 +30650,21 @@ THREE.MorphAnimation.prototype = {
 		var interpolation = this.duration / this.frames;
 		var frame = Math.floor( this.currentTime / interpolation );
 
+		var influences = this.mesh.morphTargetInfluences;
+
 		if ( frame != this.currentFrame ) {
 
-			this.mesh.morphTargetInfluences[ this.lastFrame ] = 0;
-			this.mesh.morphTargetInfluences[ this.currentFrame ] = 1;
-			this.mesh.morphTargetInfluences[ frame ] = 0;
+			influences[ this.lastFrame ] = 0;
+			influences[ this.currentFrame ] = 1;
+			influences[ frame ] = 0;
 
 			this.lastFrame = this.currentFrame;
 			this.currentFrame = frame;
 
 		}
 
-		this.mesh.morphTargetInfluences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
-		this.mesh.morphTargetInfluences[ this.lastFrame ] = 1 - this.mesh.morphTargetInfluences[ frame ];
+		influences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
+		influences[ this.lastFrame ] = 1 - influences[ frame ];
 
 	}
 
@@ -31067,7 +31178,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var ahole, h, hl; // looping of holes
 	var scope = this;
-	var bevelPoints = [];
 
 	var shapesOffset = this.vertices.length;
 
@@ -31126,13 +31236,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var b, bs, t, z,
 		vert, vlen = vertices.length,
-		face, flen = faces.length,
-		cont, clen = contour.length;
+		face, flen = faces.length;
 
 
 	// Find directions for point movement
-
-	var RAD_TO_DEGREES = 180 / Math.PI;
 
 
 	function getBevelVec( inPt, inPrev, inNext ) {
@@ -31235,10 +31342,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		//  (j)---(i)---(k)
 		// console.log('i,j,k', i, j , k)
-
-		var pt_i = contour[ i ];
-		var pt_j = contour[ j ];
-		var pt_k = contour[ k ];
 
 		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
@@ -31680,7 +31783,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	//
 
-	var i, l, hole, s;
+	var i, l, hole;
 
 	var shapesOffset = this.vertices.length;
 	var shapePoints = shape.extractPoints( curveSegments );
@@ -31729,7 +31832,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var vert, vlen = vertices.length;
 	var face, flen = faces.length;
-	var cont, clen = contour.length;
 
 	for ( i = 0; i < vlen; i ++ ) {
 
@@ -32502,8 +32604,6 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 		numpoints = segments + 1,
 
-		x, y, z,
-		tx, ty, tz,
 		u, v, r,
 
 		cx, cy,
@@ -32614,9 +32714,7 @@ THREE.TubeGeometry.SinusoidalTaper = function ( u ) {
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
-	var	tangent = new THREE.Vector3(),
-		normal = new THREE.Vector3(),
-		binormal = new THREE.Vector3(),
+	var	normal = new THREE.Vector3(),
 
 		tangents = [],
 		normals = [],
@@ -32631,7 +32729,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		smallest,
 
 		tx, ty, tz,
-		i, u, v;
+		i, u;
 
 
 	// expose internals
@@ -32789,7 +32887,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	}
 
-	var midpoints = [], p = this.vertices;
+	var p = this.vertices;
 
 	var faces = [];
 
@@ -32897,7 +32995,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 	function subdivide( face, detail ) {
 
 		var cols = Math.pow(2, detail);
-		var cells = Math.pow(4, detail);
 		var a = prepare( that.vertices[ face.a ] );
 		var b = prepare( that.vertices[ face.b ] );
 		var c = prepare( that.vertices[ face.c ] );
@@ -33185,7 +33282,6 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	var i, j, p;
 	var u, v;
 
-	var stackCount = stacks + 1;
 	var sliceCount = slices + 1;
 
 	for ( i = 0; i <= stacks; i ++ ) {
@@ -33804,11 +33900,20 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 
 /**
  * @author WestLangley / http://github.com/WestLangley
+ * @param object THREE.Mesh whose geometry will be used
+ * @param hex line color
+ * @param thresholdAngle the minimim angle (in degrees),
+ * between the face normals of adjacent faces,
+ * that is required to render an edge. A value of 10 means
+ * an edge is only rendered if the angle is at least 10 degrees.
  */
 
-THREE.EdgesHelper = function ( object, hex ) {
+THREE.EdgesHelper = function ( object, hex, thresholdAngle ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
+	thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
+
+	var thresholdDot = Math.cos( THREE.Math.degToRad( thresholdAngle ) );
 
 	var edge = [ 0, 0 ], hash = {};
 	var sortFunction = function ( a, b ) { return a - b };
@@ -33871,7 +33976,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 		var h = hash[ key ];
 
-		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) < 0.9999 ) { // hardwired const OK
+		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
 			coords[ index ++ ] = vertex.x;
@@ -34339,8 +34444,6 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	var geometry = new THREE.Geometry();
 
-	var vertices = object.geometry.vertices;
-
 	var faces = object.geometry.faces;
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
@@ -34441,8 +34544,6 @@ THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
 	var geometry = new THREE.Geometry();
-
-	var vertices = object.geometry.vertices;
 
 	var faces = object.geometry.faces;
 
@@ -34800,7 +34901,6 @@ THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
 		if ( chunks && chunks.length > 1 ) {
 
 			var name = chunks[ 1 ];
-			var num = chunks[ 2 ];
 
 			if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: - Infinity };
 

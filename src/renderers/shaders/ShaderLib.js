@@ -77,21 +77,27 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( diffuse, opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
-				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
+
+				THREE.ShaderChunk[ "lightmap_fragment" ],		// TODO: Light map on an otherwise unlit surface doesn't make sense.
 				THREE.ShaderChunk[ "envmap_fragment" ],
-				THREE.ShaderChunk[ "shadowmap_fragment" ],
+				THREE.ShaderChunk[ "shadowmap_fragment" ],		// TODO: Shadows on an otherwise unlit surface doesn't make sense.
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -165,6 +171,8 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
+			"uniform vec3 diffuse;",
+			"uniform vec3 emissive;",
 			"uniform float opacity;",
 
 			"varying vec3 vLightFront;",
@@ -188,10 +196,12 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( vec3( 1.0 ), opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
@@ -202,24 +212,25 @@ THREE.ShaderLib = {
 					//"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
 
 			"		if ( gl_FrontFacing )",
-			"			gl_FragColor.xyz *= vLightFront;",
+			"			outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 			"		else",
-			"			gl_FragColor.xyz *= vLightBack;",
+			"			outgoingLight += diffuseColor.rgb * vLightBack + emissive;",
 
 			"	#else",
 
-			"		gl_FragColor.xyz *= vLightFront;",
+			"		outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 
 			"	#endif",
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -281,7 +292,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-			"#ifndef FLAT_SHADED",
+			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
 			"	vNormal = normalize( transformedNormal );",
 
@@ -308,11 +319,10 @@ THREE.ShaderLib = {
 			"#define PHONG",
 
 			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
 			"uniform vec3 emissive;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
+			"uniform float opacity;",
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
@@ -330,10 +340,12 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( vec3( 1.0 ), opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
@@ -341,13 +353,14 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],
-				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -410,14 +423,20 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	gl_FragColor = vec4( psColor, opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( psColor, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_particle_fragment" ],
-				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
+
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -489,11 +508,17 @@ THREE.ShaderLib = {
 
 			"	}",
 
-			"	gl_FragColor = vec4( diffuse, opacity );",
+			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
+
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 
@@ -551,7 +576,7 @@ THREE.ShaderLib = {
 			"	#endif",
 
 			"	float color = 1.0 - smoothstep( mNear, mFar, depth );",
-			"	gl_FragColor = vec4( vec3( color ), opacity );",
+			"	gl_FragColor = vec4( vec3( color ), opacity );",   // TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
 			"}"
 

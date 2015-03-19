@@ -1,3 +1,7 @@
+"""
+Module for creating Three.js geometry JSON nodes.
+"""
+
 import os
 from .. import constants, logger
 from . import base_classes, io, api
@@ -42,11 +46,8 @@ class Geometry(base_classes.BaseNode):
 
         key = ''
         for key in (constants.MORPH_TARGETS, constants.ANIMATION):
-            try:
-                self[key]
+            if key in self.keys():
                 break
-            except KeyError:
-                pass
         else:
             logger.info("%s has no animation data", self.node)
             return
@@ -367,7 +368,7 @@ class Geometry(base_classes.BaseNode):
             if not option:
                 continue
 
-            array = func(self.node, self.options) or []
+            array = func(self.node) or []
             if not array:
                 logger.warning("No array could be made for %s", key)
                 continue
@@ -382,13 +383,11 @@ class Geometry(base_classes.BaseNode):
         """Parse the geometry to Three.Geometry specs"""
         if self.options.get(constants.VERTICES):
             logger.info("Parsing %s", constants.VERTICES)
-            self[constants.VERTICES] = api.mesh.vertices(
-                self.node, self.options) or []
+            self[constants.VERTICES] = api.mesh.vertices(self.node) or []
 
         if self.options.get(constants.NORMALS):
             logger.info("Parsing %s", constants.NORMALS)
-            self[constants.NORMALS] = api.mesh.normals(
-                self.node, self.options) or []
+            self[constants.NORMALS] = api.mesh.normals(self.node) or []
 
         if self.options.get(constants.COLORS):
             logger.info("Parsing %s", constants.COLORS)
@@ -402,8 +401,7 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.UVS):
             logger.info("Parsing %s", constants.UVS)
-            self[constants.UVS] = api.mesh.uvs(
-                self.node, self.options) or []
+            self[constants.UVS] = api.mesh.uvs(self.node) or []
 
         if self.options.get(constants.FACES):
             logger.info("Parsing %s", constants.FACES)

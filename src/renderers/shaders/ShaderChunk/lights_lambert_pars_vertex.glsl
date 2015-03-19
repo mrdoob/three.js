@@ -1,6 +1,3 @@
-uniform vec3 diffuse;
-uniform vec3 emissive;
-
 uniform vec3 ambientLightColor;
 
 #if MAX_DIR_LIGHTS > 0
