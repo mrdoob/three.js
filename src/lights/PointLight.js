@@ -10,7 +10,7 @@ THREE.PointLight = function ( color, intensity, distance, decay, physicalQuadrat
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
-	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be -1.
+	this.decay = ( decay !== undefined ) ? decay : 1;
 	this.physicalQuadraticFalloff =  ( physicalQuadraticFalloff !== undefined ) ? physicalQuadraticFalloff : false;
 
 };

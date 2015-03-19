@@ -15,7 +15,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay,
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
-	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
+	this.decay = ( decay !== undefined ) ? decay : 1;
 	this.physicalQuadraticFalloff =  ( physicalQuadraticFalloff !== undefined ) ? physicalQuadraticFalloff : false;
 
 	this.castShadow = false;
