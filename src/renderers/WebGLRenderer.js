@@ -5312,10 +5312,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if( light.physicalQuadraticFalloff ) {
 					// magic value of -1 switches the equation to UE4 physical quadratic falloff.
-					spotDecays[ spotLength ] = -1.0;
+					pointDecays[ pointLength ] = -1.0;
 				}
 				else {
-					spotDecays[ spotLength ] = ( distance === 0 ) ? 0.0 : light.decay;
+					pointDecays[ pointLength ] = ( distance === 0 ) ? 0.0 : light.decay;
 				}
 
 				pointLength += 1;
