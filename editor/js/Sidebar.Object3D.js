@@ -629,6 +629,12 @@ Sidebar.Object3D = function ( editor ) {
 
 		}
 
+		if ( object.physicalQuadraticFalloff !== undefined ) {
+
+			objectPhysicalQuadraticFalloff.setValue( object.physicalQuadraticFalloff );
+
+		}
+
 		objectVisible.setValue( object.visible );
 
 		try {
