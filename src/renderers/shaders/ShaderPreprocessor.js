@@ -9,9 +9,7 @@ THREE.ShaderPreprocessor._shaderCache = {};
 
 THREE.ShaderPreprocessor.preprocess( shaderCode, shaderName ) {
 
-	if( shaderName.indexOf( '.glsl') < 0 ) {
-		shaderName = shaderName + '.glsl';
-	}
+	shaderName = shaderName.replace( '.glsl', '' ); // standardize on no extensions as that is how it is in ShaderChunk.
 
 	if( ! shaderCode ) {
 		if( ! THREE.ShaderChunks[shaderName] ) {
