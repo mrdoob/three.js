@@ -49,7 +49,7 @@ THREE.ShaderPreprocessor.preprocess( shaderCode, shaderName ) {
 
 	}
 
-	var outputCode = outputLines.join();
+	var outputCode = outputLines.join( '\n' );
 	THREE.ShaderPreprocessor._shaderCache[ shaderName ] = outputCode;
 
 	return outputCode;
