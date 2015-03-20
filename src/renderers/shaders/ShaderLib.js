@@ -70,7 +70,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-			THREE.ShaderChunk[ "ambientocclusionmap_pars_fragment" ],
+			THREE.ShaderChunk[ "aomap_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -92,7 +92,7 @@ THREE.ShaderLib = {
 
 			"	outgoingLight = diffuseColor.rgb;", // simple shader
 
-				THREE.ShaderChunk[ "ambientocclusionmap_fragment" ],
+				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],		// TODO: Shadows on an otherwise unlit surface doesn't make sense.
@@ -191,7 +191,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-			THREE.ShaderChunk[ "ambientocclusionmap_pars_fragment" ],
+			THREE.ShaderChunk[ "aomap_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -227,7 +227,7 @@ THREE.ShaderLib = {
 
 			"	#endif",
 
-				THREE.ShaderChunk[ "ambientocclusionmap_fragment" ],
+				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
@@ -337,7 +337,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-			THREE.ShaderChunk[ "ambientocclusionmap_pars_fragment" ],
+			THREE.ShaderChunk[ "aomap_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -362,7 +362,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
 
-				THREE.ShaderChunk[ "ambientocclusionmap_fragment" ],
+				THREE.ShaderChunk[ "aomap_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
