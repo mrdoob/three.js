@@ -14,8 +14,8 @@ THREE.UniformsLib = {
 
 		"lightMap" : { type: "t", value: null },
 
-		"ambientOcclusionMap" : { type: "t", value: null },
-		"ambientOcclusionScale" : { type: "f", value: 1 },
+		"aoMap" : { type: "t", value: null },
+		"aoScale" : { type: "f", value: 1 },
 
 		"specularMap" : { type: "t", value: null },
 		"alphaMap" : { type: "t", value: null },

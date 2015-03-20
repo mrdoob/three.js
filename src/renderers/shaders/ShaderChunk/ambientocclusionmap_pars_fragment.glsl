@@ -1,6 +1,6 @@
-#ifdef USE_AMBIENTOCCLUSIONMAP
+#ifdef USE_AOMAP
 
-	uniform sampler2D ambientOcclusionMap;
-	uniform float ambientOcclusionScale;
+	uniform sampler2D aoMap;
+	uniform float aoScale;
 
 #endif

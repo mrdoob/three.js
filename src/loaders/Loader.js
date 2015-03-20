@@ -347,9 +347,9 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.mapAmbientOcclusion && texturePath ) {
+		if ( m.mapAO && texturePath ) {
 
-			create_texture( mpars, 'ambientOcclusionMap', m.mapAmbientOcclusion, m.mapAmbientOcclusionRepeat, m.mapAmbientOcclusionOffset, m.mapAmbientOcclusionWrap, m.mapAmbientOcclusionAnisotropy );
+			create_texture( mpars, 'aoMap', m.mapAO, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
 
 		}
 

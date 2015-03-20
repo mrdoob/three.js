@@ -1,5 +1,5 @@
-#ifdef USE_AMBIENTOCCLUSIONMAP
+#ifdef USE_AOMAP
 
-	outgoingLight *= ( texture2D( ambientOcclusionMap, vUv2 ).r - 1.0 ) * ambientOcclusionScale + 1.0;
+	outgoingLight *= ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoScale + 1.0;
 
 #endif

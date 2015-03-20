@@ -4153,7 +4153,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			envMap: !! material.envMap,
 			envMapMode: material.envMap && material.envMap.mapping,
 			lightMap: !! material.lightMap,
-			ambientOcclusionMap: !! material.ambientOcclusionMap,
+			aoMap: !! material.aoMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			specularMap: !! material.specularMap,
@@ -4596,8 +4596,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.map.value = material.map;
 		uniforms.lightMap.value = material.lightMap;
-		uniforms.ambientOcclusionMap.value = material.ambientOcclusionMap;
-		uniforms.ambientOcclusionScale.value = material.ambientOcclusionScale;
+		uniforms.aoMap.value = material.aoMap;
+		uniforms.aoScale.value = material.aoScale;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
 

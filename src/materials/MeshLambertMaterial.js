@@ -10,7 +10,7 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  lightMap: new THREE.Texture( <Image> ),
- *  ambientOcclusionMap: new THREE.Texture( <Image> ),
+ *  aoMap: new THREE.Texture( <Image> ),
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -54,8 +54,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.map = null;
 
 	this.lightMap = null;
-	this.ambientOcclusionMap = null;
-	this.ambientOcclusionScale = 1.0;
+	this.aoMap = null;
+	this.aoScale = 1.0;
 
 	this.specularMap = null;
 
@@ -103,9 +103,9 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.lightMap = this.lightMap;
-	material.ambientOcclusionMap = this.ambientOcclusionMap;
-	material.ambientOcclusionScale = this.ambientOcclusionScale;
-	material.ambientOcclusionScale = this.ambientOcclusionScale;
+	material.aoMap = this.aoMap;
+	material.aoScale = this.aoScale;
+	material.aoScale = this.aoScale;
 
 	material.specularMap = this.specularMap;
 

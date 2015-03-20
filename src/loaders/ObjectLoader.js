@@ -280,11 +280,11 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
-				if ( data.ambientOcclusionMap !== undefined ) {
+				if ( data.aoMap !== undefined ) {
 
-					material.ambientOcclusionMap = getTexture( data.ambientOcclusionMap );
-					if ( data.ambientOcclusionScale ) {
-						material.ambientOcclusionScale = data.ambientOcclusionScale;
+					material.aoMap = getTexture( data.aoMap );
+					if ( data.aoScale ) {
+						material.aoScale = data.aoScale;
 					}
 				}
 

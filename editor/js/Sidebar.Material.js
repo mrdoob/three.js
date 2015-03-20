@@ -292,17 +292,17 @@ Sidebar.Material = function ( editor ) {
 
 	// ambient occlusion map
 
-	var materialAmbientOcclusionMapRow = new UI.Panel();
-	var materialAmbientOcclusionMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialAmbientOcclusionMap = new UI.Texture().onChange( update );
-	var materialAmbientOcclusionScale = new UI.Number( 1 ).setRange( 0, 1 ).setWidth( '30px' ).onChange( update );
+	var materialAOMapRow = new UI.Panel();
+	var materialAOMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialAOMap = new UI.Texture().onChange( update );
+	var materialAOScale = new UI.Number( 1 ).setRange( 0, 1 ).setWidth( '30px' ).onChange( update );
 
-	materialAmbientOcclusionMapRow.add( new UI.Text( 'Ambient Occlusion Map' ).setWidth( '90px' ) );
-	materialAmbientOcclusionMapRow.add( materialAmbientOcclusionMapEnabled );
-	materialAmbientOcclusionMapRow.add( materialAmbientOcclusionMap );
-	materialAmbientOcclusionMapRow.add( materialAmbientOcclusionScale );
+	materialAOMapRow.add( new UI.Text( 'AO Map' ).setWidth( '90px' ) );
+	materialAOMapRow.add( materialAOMapEnabled );
+	materialAOMapRow.add( materialAOMap );
+	materialAOMapRow.add( materialAOScale );
 
-	container.add( materialAmbientOcclusionMapRow );
+	container.add( materialAOMapRow );
 
 	// side
 
@@ -618,19 +618,19 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.ambientOcclusionMap !== undefined ) {
+			if ( material.aoMap !== undefined ) {
 
-				var ambientOcclusionMapEnabled = materialAmbientOcclusionMapEnabled.getValue() === true;
+				var aoMapEnabled = materialAOMapEnabled.getValue() === true;
 
 				if ( objectHasUvs ) {
 
-					material.ambientOcclusionMap = ambientOcclusionMapEnabled ? materialAmbientOcclusionMap.getValue() : null;
-					material.ambientOcclusionScale = materialAmbientOcclusionScale.getValue();
+					material.aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
+					material.aoScale = materialAOScale.getValue();
 					material.needsUpdate = true;
 
 				} else {
 
-					if ( ambientOcclusionMapEnabled ) textureWarning = true;
+					if ( aoMapEnabled ) textureWarning = true;
 
 				}
 
@@ -712,7 +712,7 @@ Sidebar.Material = function ( editor ) {
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
 			'lightMap': materialLightMapRow,
-			'ambientOcclusionMap': materialAmbientOcclusionMapRow,
+			'aoMap': materialAOMapRow,
 			'side': materialSideRow,
 			'shading': materialShadingRow,
 			'blending': materialBlendingRow,
@@ -862,11 +862,11 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.ambientOcclusionMap !== undefined ) {
+			if ( material.aoMap !== undefined ) {
 
-				materialAmbientOcclusionMapEnabled.setValue( material.ambientOcclusionMap !== null );
-				materialAmbientOcclusionMap.setValue( material.ambientOcclusionMap );
-				materialAmbientOcclusionScale.setValue( material.ambientOcclusionScale );
+				materialAOMapEnabled.setValue( material.aoMap !== null );
+				materialAOMap.setValue( material.aoMap );
+				materialAOScale.setValue( material.aoScale );
 
 			}
 
