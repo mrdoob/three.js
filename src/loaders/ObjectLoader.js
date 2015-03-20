@@ -189,6 +189,15 @@ THREE.ObjectLoader.prototype = {
 						geometry = geometryLoader.parse( data.data ).geometry;
 
 						break;
+						
+					case 'TextGeometry':
+					
+						geometry = new THREE.TextGeometry(
+							data.text,
+							data.data
+						); 
+						
+						break;
 
 				}
 
