@@ -10,7 +10,7 @@ THREE.Mesh = function ( geometry, material ) {
 	THREE.Object3D.call( this );
 
 	this.type = 'Mesh';
-	
+
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
@@ -321,5 +321,26 @@ THREE.Mesh.prototype.clone = function ( object, recursive ) {
 	THREE.Object3D.prototype.clone.call( this, object, recursive );
 
 	return object;
+
+};
+
+THREE.Mesh.prototype.toJSON = function ( meta ) {
+
+  var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	// only serialize if not in meta geometries cache
+	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
+	}
+
+	// only serialize if not in meta materials cache
+	if ( meta.materials[ this.material.uuid ] === undefined ) {
+		meta.materials[ this.material.uuid ] = this.material.toJSON();
+	}
+
+	data.object.geometry = this.geometry.uuid;
+	data.object.material = this.material.uuid;
+
+  return data;
 
 };

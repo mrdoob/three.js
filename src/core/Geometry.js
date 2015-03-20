@@ -797,31 +797,35 @@ THREE.Geometry.prototype = {
 
 	},
 
-	toJSON: function () {
+	toJSON: function() {
 
-		var output = {
-			metadata: {
-				version: 4.0,
-				type: 'BufferGeometry',
-				generator: 'BufferGeometryExporter'
-			},
-			uuid: this.uuid,
-			type: this.type
+	  // we will store all serialization data on 'data'
+	  var data = {};
+
+    // add metadata
+    data.metadata = {
+			version: 4.4,
+			type: 'Geometry',
+			generator: 'Geometry.toJSON'
 		};
 
-		if ( this.name !== "" ) output.name = this.name;
+	  // standard Geometry serialization
 
-		if ( this.parameters !== undefined ) {
+	  data.type = this.type;
+	  data.uuid = this.uuid;
+	  if ( this.name !== '' ) data.name = this.name;
+
+	  if ( this.parameters !== undefined ) {
 
 			var parameters = this.parameters;
 
 			for ( var key in parameters ) {
 
-				if ( parameters[ key ] !== undefined ) output[ key ] = parameters[ key ];
+				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
 
 			}
 
-			return output;
+			return data;
 
 		}
 
@@ -984,17 +988,15 @@ THREE.Geometry.prototype = {
 
 		}
 
-		output.data = {};
+		data.data = {};
 
-		output.data.vertices = vertices;
-		output.data.normals = normals;
-		if ( colors.length > 0 ) output.data.colors = colors;
-		if ( uvs.length > 0 ) output.data.uvs = [ uvs ]; // temporal backward compatibility
-		output.data.faces = faces;
+		data.data.vertices = vertices;
+		data.data.normals = normals;
+		if ( colors.length > 0 ) data.data.colors = colors;
+		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+		data.data.faces = faces;
 
-		//
-
-		return output;
+	  return data;
 
 	},
 

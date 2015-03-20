@@ -140,3 +140,16 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 	return camera;
 
 };
+
+THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.fov = this.fov;
+	data.object.aspect = this.aspect;
+	data.object.near = this.near;
+	data.object.far = this.far;
+
+	return data;
+
+};
