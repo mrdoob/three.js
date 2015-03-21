@@ -22,7 +22,9 @@ var APP = {
 
 		this.load = function ( json ) {
 
-			vr = json.project.vr;
+			// vr = json.project.vr;
+			// jme- change
+			vr = false
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );

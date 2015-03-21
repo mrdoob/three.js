@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<head>
+	<title>three.js player - standalone - able to play example from three.js editor</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			background:#777;
+			padding:0;
+			margin:0;
+			font-weight: bold;
+			overflow:hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px; width: 100%;
+			color: #ffffff;
+			padding: 5px;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			z-index:1000;
+		}
+
+		a {
+			color: #ffffff;
+		}
+	</style>
+	<script src="../build/three.min.js"></script>
+	<script src="../editor/js/libs/app.js"></script>
+</head>
+<body>	
+	<div id="info">three.js standalone player 
+		- able to play examples app from <a href='http://threejs.org/editor'>three.js editor</a>
+		<br/>
+		examples : 
+		<a href='javascript:void(0)' onClick='load("../editor/examples/arkanoid.app.json")'>arkanoid</a> -
+		<a href='javascript:void(0)' onClick='load("../editor/examples/camera.app.json")'>camera</a> -
+		<a href='javascript:void(0)' onClick='load("../editor/examples/particles.app.json")'>particles</a> -
+		<a href='javascript:void(0)' onClick='load("../editor/examples/pong.app.json")'>pong</a>
+	</div>
+	<script>
+		var appPlayer = new APP.Player();
+		var isRunning = false
+
+		var appUrl = location.hash.substr(1) || '../editor/examples/arkanoid.app.json'
+		load(appUrl)
+
+		function load(appUrl){		
+			console.log('load', appUrl)
+			var loader = new THREE.XHRLoader();
+			loader.load( appUrl, function( text ){
+				
+				if( isRunning ){
+					appPlayer.stop();	 
+					document.body.removeChild(appPlayer.dom)	
+					isRunning = false
+				}
+				
+				var json = JSON.parse( text );
+				appPlayer.load(json)
+
+				appPlayer.setSize(window.innerWidth, window.innerHeight)
+				document.body.appendChild(appPlayer.dom)
+				appPlayer.play();
+
+				isRunning = true
+			});
+			
+			location.hash = appUrl
+		}
+	</script>
+</body>
