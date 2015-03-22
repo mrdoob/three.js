@@ -365,7 +365,6 @@ function guiMeshNormalMaterial ( gui, mesh, material, geometry ) {
 
 	var folder = gui.addFolder('THREE.MeshNormalMaterial');
 
-	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
