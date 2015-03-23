@@ -23,7 +23,7 @@
 
 			var container, stats, controls;
 			var camera, scene, renderer, loader, clock, light;
-			var skinnedMesh, animation, groundMaterial, planeGeometry;
+			var skinnedMesh, animation, groundMaterial, planeGeometry, wireframeHelper;
 
 			init();
 			animate();
@@ -76,6 +76,10 @@
 					scene.add( skinnedMesh );
 					animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[ 0 ] );
 					animation.play();
+
+					wireframeHelper = new THREE.WireframeHelper( skinnedMesh, 0xffffff );
+					wireframeHelper.visible = true;
+					scene.add( wireframeHelper );
 
 				});
 
