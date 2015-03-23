@@ -403,6 +403,7 @@
 				// dynamicHdrGui.add( params, 'projection', { 'From cam to mesh': 'camera', 'Normal to mesh': 'normal' } );
 				var sceneGui = gui.addFolder( 'Scenes' );
 				var toneMappingGui = gui.addFolder( 'ToneMapping' );
+				var staticToneMappingGui = gui.addFolder( 'StaticOnly' );
 				var adaptiveToneMappingGui = gui.addFolder( 'AdaptiveOnly' );
 
 				sceneGui.add( params, 'bloomAmount', 0.0, 10.0 );
@@ -410,9 +411,9 @@
 
 				toneMappingGui.add( params, 'enabled' );
 				toneMappingGui.add( params, 'middleGrey', 0, 12 );
-				toneMappingGui.add( params, 'avgLuminance', 0.001, 2.0 );
 				toneMappingGui.add( params, 'maxLuminance', 1, 30 );
 
+				staticToneMappingGui.add( params, 'avgLuminance', 0.001, 2.0 );
 				adaptiveToneMappingGui.add( params, 'adaptionRate', 0.0, 10.0 );
 
 				gui.open();
@@ -449,9 +450,7 @@
 					adaptToneMappingPass.setAdaptionRate( params.adaptionRate );
 					adaptiveLuminanceMat.uniforms.map.value = adaptToneMappingPass.luminanceRT;
 					currentLuminanceMat.uniforms.map.value = adaptToneMappingPass.currentLuminanceRT;
-					if ( adaptToneMappingPass.setAverageLuminance ) {
-						adaptToneMappingPass.setAverageLuminance( params.avgLuminance );
-					}
+					
 					adaptToneMappingPass.enabled = params.enabled;
 					adaptToneMappingPass.setMaxLuminance( params.maxLuminance );
 					adaptToneMappingPass.setMiddleGrey( params.middleGrey );
@@ -459,10 +458,16 @@
 					hdrToneMappingPass.enabled = params.enabled;
 					hdrToneMappingPass.setMaxLuminance( params.maxLuminance );
 					hdrToneMappingPass.setMiddleGrey( params.middleGrey );
+					if ( hdrToneMappingPass.setAverageLuminance ) {
+						hdrToneMappingPass.setAverageLuminance( params.avgLuminance );
+					}
 				
 					ldrToneMappingPass.enabled = params.enabled;
 					ldrToneMappingPass.setMaxLuminance( params.maxLuminance );
 					ldrToneMappingPass.setMiddleGrey( params.middleGrey );
+					if ( ldrToneMappingPass.setAverageLuminance ) {
+						ldrToneMappingPass.setAverageLuminance( params.avgLuminance );
+					}
 				}
 
 				directionalLight.intensity = params.sunLight;
