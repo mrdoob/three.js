@@ -530,7 +530,8 @@ THREE.ObjectLoader.prototype = {
 				}
 
 			}
-
+			if (data.castShadow !== undefined) object.castShadow = data.castShadow;
+			if (data.receiveShadow !== undefined) object.receiveShadow = data.receiveShadow;
 			return object;
 
 		}
