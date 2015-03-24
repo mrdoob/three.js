@@ -518,6 +518,9 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
+			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
+			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
+
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
 
@@ -530,8 +533,7 @@ THREE.ObjectLoader.prototype = {
 				}
 
 			}
-			if (data.castShadow !== undefined) object.castShadow = data.castShadow;
-			if (data.receiveShadow !== undefined) object.receiveShadow = data.receiveShadow;
+
 			return object;
 
 		}
