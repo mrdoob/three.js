@@ -328,7 +328,7 @@ THREE.OBJLoader.prototype = {
 
 			} else {
 
-				// console.log( "THREE.OBJLoader: Unhandled line " + line );
+				// THREE.log( "THREE.OBJLoader: Unhandled line " + line );
 
 			}
 

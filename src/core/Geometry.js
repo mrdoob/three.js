@@ -738,7 +738,7 @@ THREE.Geometry.prototype = {
 
 			} else {
 
-				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+				//THREE.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 				changes[ i ] = changes[ verticesMap[ key ] ];
 
 			}

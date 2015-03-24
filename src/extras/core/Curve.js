@@ -113,7 +113,7 @@ THREE.Curve.prototype.getLengths = function ( divisions ) {
 		&& ( this.cacheArcLengths.length == divisions + 1 )
 		&& ! this.needsUpdate) {
 
-		//console.log( "cached", this.cacheArcLengths );
+		//THREE.log( "cached", this.cacheArcLengths );
 		return this.cacheArcLengths;
 
 	}
@@ -200,7 +200,7 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 	i = high;
 
-	//console.log('b' , i, low, high, Date.now()- time);
+	//THREE.log('b' , i, low, high, Date.now()- time);
 
 	if ( arcLengths[ i ] == targetArcLength ) {
 

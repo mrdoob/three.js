@@ -126,14 +126,14 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 	if ( header[ off_magic ] !== DDS_MAGIC ) {
 
-		console.error( 'THREE.DDSLoader.parse: Invalid magic number in DDS header.' );
+		THREE.error( 'THREE.DDSLoader.parse: Invalid magic number in DDS header.' );
 		return dds;
 
 	}
 
 	if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
 
-		console.error( 'THREE.DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
+		THREE.error( 'THREE.DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
 		return dds;
 
 	}
@@ -175,7 +175,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 				blockBytes = 64;
 				dds.format = THREE.RGBAFormat;
 			} else {
-				console.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
+				THREE.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
 				return dds;
 			}
 	}

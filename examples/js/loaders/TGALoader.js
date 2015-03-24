@@ -33,7 +33,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 
 	if ( buffer.length < 19 )
-		console.error( 'THREE.TGALoader.parse: Not enough data to contain header.' );
+		THREE.error( 'THREE.TGALoader.parse: Not enough data to contain header.' );
 
 	var content = new Uint8Array( buffer ),
 		offset = 0,
@@ -63,7 +63,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			case TGA_TYPE_INDEXED:
 			case TGA_TYPE_RLE_INDEXED:
 				if ( header.colormap_length > 256 || header.colormap_size !== 24 || header.colormap_type !== 1) {
-					console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for indexed type');
+					THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for indexed type');
 				}
 				break;
 
@@ -73,23 +73,23 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			case TGA_TYPE_RLE_RGB:
 			case TGA_TYPE_RLE_GREY:
 				if (header.colormap_type) {
-					console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for colormap type');
+					THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for colormap type');
 				}
 				break;
 
 			// What the need of a file without data ?
 			case TGA_TYPE_NO_DATA:
-				console.error('THREE.TGALoader.parse.tgaCheckHeader: No data');
+				THREE.error('THREE.TGALoader.parse.tgaCheckHeader: No data');
 
 			// Invalid type ?
 			default:
-				console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type " ' + header.image_type + '"');
+				THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type " ' + header.image_type + '"');
 
 		}
 
 		// Check image width and height
 		if ( header.width <= 0 || header.height <= 0 ) {
-			console.error( 'THREE.TGALoader.parse.tgaCheckHeader: Invalid image size' );
+			THREE.error( 'THREE.TGALoader.parse.tgaCheckHeader: Invalid image size' );
 		}
 
 		// Check image pixel size
@@ -97,7 +97,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			header.pixel_size !== 16 &&
 			header.pixel_size !== 24 &&
 			header.pixel_size !== 32) {
-			console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid pixel size "' + header.pixel_size + '"');
+			THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid pixel size "' + header.pixel_size + '"');
 		}
 
 	}
@@ -106,7 +106,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 	tgaCheckHeader( header );
 
 	if ( header.id_length + offset > buffer.length ) {
-		console.error('THREE.TGALoader.parse: No data');
+		THREE.error('THREE.TGALoader.parse: No data');
 	}
 
 	// Skip the needn't data
@@ -382,7 +382,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 					tgaGetImageDataGrey16bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 					break;
 				default:
-					console.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
+					THREE.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
 					break;
 			}
 
@@ -406,7 +406,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 					break;
 
 				default:
-					console.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
+					THREE.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
 					break;
 			}
 
