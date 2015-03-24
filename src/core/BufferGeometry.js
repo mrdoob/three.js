@@ -682,9 +682,9 @@ THREE.BufferGeometry.prototype = {
 		var facesCount = ( indices.length / 3 );
 
 		/*
-		console.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
-		console.log("Faces to process: "+(indices.length/3));
-		console.log("Reordering "+verticesCount+" vertices.");
+		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
+		THREE.log("Faces to process: "+(indices.length/3));
+		THREE.log("Reordering "+verticesCount+" vertices.");
 		*/
 
 		var sortedIndices = new Uint16Array( indices.length ); //16-bit buffers
@@ -763,10 +763,10 @@ THREE.BufferGeometry.prototype = {
 
 		/*
 		var orderTime = Date.now();
-		console.log("Reorder time: "+(orderTime-s)+"ms");
-		console.log("Duplicated "+duplicatedVertices+" vertices.");
-		console.log("Compute Buffers time: "+(Date.now()-s)+"ms");
-		console.log("Draw offsets: "+offsets.length);
+		THREE.log("Reorder time: "+(orderTime-s)+"ms");
+		THREE.log("Duplicated "+duplicatedVertices+" vertices.");
+		THREE.log("Compute Buffers time: "+(Date.now()-s)+"ms");
+		THREE.log("Draw offsets: "+offsets.length);
 		*/
 
 		return offsets;

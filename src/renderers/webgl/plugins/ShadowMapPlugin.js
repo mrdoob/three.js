@@ -122,7 +122,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 						light.shadowCascadeArray[ n ] = virtualLight;
 
-						//console.log( "Created virtualLight", virtualLight );
+						//THREE.log( "Created virtualLight", virtualLight );
 
 					} else {
 

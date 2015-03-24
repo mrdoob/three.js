@@ -15,7 +15,7 @@ THREE.SVGObject.prototype.constructor = THREE.SVGObject;
 
 THREE.SVGRenderer = function () {
 
-	console.log( 'THREE.SVGRenderer', THREE.REVISION );
+	THREE.log( 'THREE.SVGRenderer', THREE.REVISION );
 
 	var _this = this,
 	_renderData, _elements, _lights,
@@ -125,7 +125,7 @@ THREE.SVGRenderer = function () {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
-			console.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
+			THREE.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}

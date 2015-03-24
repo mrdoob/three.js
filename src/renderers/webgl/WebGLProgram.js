@@ -137,7 +137,7 @@ THREE.WebGLProgram = ( function () {
 
 		var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
 
-		// console.log( 'building new program ' );
+		// THREE.log( 'building new program ' );
 
 		//
 

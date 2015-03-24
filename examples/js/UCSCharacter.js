@@ -36,7 +36,7 @@ THREE.UCSCharacter = function() {
 		
 		// CHARACTER
 		var loader = new THREE.JSONLoader();
-		console.log( config.baseUrl + config.character );
+		THREE.log( config.baseUrl + config.character );
 		loader.load( config.baseUrl + config.character, function( geometry ) {
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();

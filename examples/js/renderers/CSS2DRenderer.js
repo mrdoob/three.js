@@ -28,7 +28,7 @@ THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 
 THREE.CSS2DRenderer = function () {
 
-	console.log( 'THREE.CSS2DRenderer', THREE.REVISION );
+	THREE.log( 'THREE.CSS2DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
