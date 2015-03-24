@@ -248,7 +248,7 @@ THREE.ObjectLoader.prototype = {
 
 					material.bumpMap = getTexture( data.bumpMap );
 					if ( data.bumpScale ) {
-						material.bumpScale = new THREE.Vector2( data.bumpScale, data.bumpScale );
+						material.bumpScale = data.bumpScale;
 					}
 
 				}
