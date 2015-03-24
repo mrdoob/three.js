@@ -46,6 +46,9 @@ THREE.VRControls = function ( object, callback ) {
 	// this scale factor allows the user to define how meters
 	// are converted to scene units.
 	this.scale = 1;
+	this.positionalTrackingMatrix = new THREE.Matrix4();
+
+	object.matrixAutoUpdate = false;
 
 	this.update = function () {
 
@@ -61,7 +64,14 @@ THREE.VRControls = function ( object, callback ) {
 
 		if ( state.position !== null ) {
 
-			object.position.copy( state.position ).multiplyScalar( scope.scale );
+			// It honors the camera position and it applies offset within the tracking volume
+			scope.positionalTrackingMatrix.makeTranslation(
+				state.position.x * scope.scale,
+				state.position.y * scope.scale,
+				state.position.z * scope.scale );
+
+			object.updateMatrixWorld();
+			object.matrix.multiply( scope.positionalTrackingMatrix );
 
 		}
 
