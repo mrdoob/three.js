@@ -12,7 +12,10 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  lightMap: new THREE.Texture( <Image> ),
+ *  lightScale: <float>
+ *
  *  aoMap: new THREE.Texture( <Image> ),
+ *  aoScale: <float>
  *
  *  bumpMap: new THREE.Texture( <Image> ),
  *  bumpScale: <float>,
@@ -66,6 +69,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.map = null;
 
 	this.lightMap = null;
+	this.lightScale = null;
+
 	this.aoMap = null;
 	this.aoScale = 1.0;
 
@@ -125,6 +130,8 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.lightMap = this.lightMap;
+	material.lightScale = this.lightScale;
+
 	material.aoMap = this.aoMap;
 	material.aoScale = this.aoScale;
 
