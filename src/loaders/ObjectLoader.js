@@ -248,7 +248,7 @@ THREE.ObjectLoader.prototype = {
 
 					material.bumpMap = getTexture( data.bumpMap );
 					if ( data.bumpScale ) {
-						material.bumpScale = new THREE.Vector2( data.bumpScale, data.bumpScale );
+						material.bumpScale = data.bumpScale;
 					}
 
 				}
@@ -517,6 +517,9 @@ THREE.ObjectLoader.prototype = {
 				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
 
 			}
+
+			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
+			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;

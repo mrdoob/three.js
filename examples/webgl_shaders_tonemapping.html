@@ -85,12 +85,15 @@
 			function init() {
 
 				params = {
-					"Average Luminosity": 0.7,
+					bloomAmount: 1.0,
+					sunLight: 4.0,
+
+					enabled: true,
+					avgLuminance: 0.7,
 					middleGrey: 0.04,
 					maxLuminance: 16,
-					bloomAmount: 1.0,
+
 					adaptionRate: 2.0,
-					sunLight: 4.0,
 				};
 
 				container = document.createElement( 'div' );
@@ -395,22 +398,25 @@
 				// ldrEffectComposer.addPass( gammaPass );
 
 
-				var dynamicHdrGui = new dat.GUI();
+				var gui = new dat.GUI();
 
 				// dynamicHdrGui.add( params, 'projection', { 'From cam to mesh': 'camera', 'Normal to mesh': 'normal' } );
-				dynamicHdrGui.add( params, 'middleGrey', 0, 12 );
-				dynamicHdrGui.add( params, 'maxLuminance', 1, 30 );
-				dynamicHdrGui.add( params, 'adaptionRate', 0.0, 10.0 );
-				dynamicHdrGui.add( params, 'bloomAmount', 0.0, 10.0 );
-				dynamicHdrGui.add( params, 'sunLight', 0.1, 12.0 );
-				// dynamicHdrGui.add( params, 'clear' );
-				dynamicHdrGui.open();
+				var sceneGui = gui.addFolder( 'Scenes' );
+				var toneMappingGui = gui.addFolder( 'ToneMapping' );
+				var staticToneMappingGui = gui.addFolder( 'StaticOnly' );
+				var adaptiveToneMappingGui = gui.addFolder( 'AdaptiveOnly' );
 
-				var ldrGui = new dat.GUI();
-				ldrGui.domElement.style.position = 'absolute';
-				ldrGui.add( params, 'Average Luminosity', 0.001, 2.0 );
-				ldrGui.open();
+				sceneGui.add( params, 'bloomAmount', 0.0, 10.0 );
+				sceneGui.add( params, 'sunLight', 0.1, 12.0 );
 
+				toneMappingGui.add( params, 'enabled' );
+				toneMappingGui.add( params, 'middleGrey', 0, 12 );
+				toneMappingGui.add( params, 'maxLuminance', 1, 30 );
+
+				staticToneMappingGui.add( params, 'avgLuminance', 0.001, 2.0 );
+				adaptiveToneMappingGui.add( params, 'adaptionRate', 0.0, 10.0 );
+
+				gui.open();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -444,11 +450,24 @@
 					adaptToneMappingPass.setAdaptionRate( params.adaptionRate );
 					adaptiveLuminanceMat.uniforms.map.value = adaptToneMappingPass.luminanceRT;
 					currentLuminanceMat.uniforms.map.value = adaptToneMappingPass.currentLuminanceRT;
-					if ( adaptToneMappingPass.setAverageLuminance ) {
-						adaptToneMappingPass.setAverageLuminance( params["Average Luminosity"] );
-					}
+					
+					adaptToneMappingPass.enabled = params.enabled;
 					adaptToneMappingPass.setMaxLuminance( params.maxLuminance );
 					adaptToneMappingPass.setMiddleGrey( params.middleGrey );
+
+					hdrToneMappingPass.enabled = params.enabled;
+					hdrToneMappingPass.setMaxLuminance( params.maxLuminance );
+					hdrToneMappingPass.setMiddleGrey( params.middleGrey );
+					if ( hdrToneMappingPass.setAverageLuminance ) {
+						hdrToneMappingPass.setAverageLuminance( params.avgLuminance );
+					}
+				
+					ldrToneMappingPass.enabled = params.enabled;
+					ldrToneMappingPass.setMaxLuminance( params.maxLuminance );
+					ldrToneMappingPass.setMiddleGrey( params.middleGrey );
+					if ( ldrToneMappingPass.setAverageLuminance ) {
+						ldrToneMappingPass.setAverageLuminance( params.avgLuminance );
+					}
 				}
 
 				directionalLight.intensity = params.sunLight;

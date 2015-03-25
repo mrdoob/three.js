@@ -207,7 +207,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 			hasFaceColor	     = isBitSet( type, 6 );
 			hasFaceVertexColor  = isBitSet( type, 7 );
 
-			// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
+			// THREE.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
 			if ( isQuad ) {
 

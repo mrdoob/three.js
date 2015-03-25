@@ -134,7 +134,7 @@ THREE.FontUtils = {
 
 				action = outline[ i ++ ];
 
-				//console.log( action );
+				//THREE.log( action );
 
 				switch ( action ) {
 

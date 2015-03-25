@@ -5,7 +5,7 @@
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
-	console.info( 'THREE.PlaneGeometry: Consider using THREE.PlaneBufferGeometry for lower memory footprint.' );
+	THREE.info( 'THREE.PlaneGeometry: Consider using THREE.PlaneBufferGeometry for lower memory footprint.' );
 
 	THREE.Geometry.call( this );
 
