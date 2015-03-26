@@ -278,8 +278,8 @@ THREE.ObjectLoader.prototype = {
 
 					material.lightMap = getTexture( data.lightMap );
 
-					if ( data.lightMapScale !== undefined ) {
-						material.lightMapScale = data.lightMapScale;
+					if ( data.lightMapIntensity !== undefined ) {
+						material.lightMapIntensity = data.lightMapIntensity;
 					}
 
 				}
