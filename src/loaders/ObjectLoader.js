@@ -247,7 +247,7 @@ THREE.ObjectLoader.prototype = {
 				if ( data.bumpMap !== undefined ) {
 
 					material.bumpMap = getTexture( data.bumpMap );
-					if ( data.bumpScale ) {
+					if ( data.bumpScale !== undefined ) {
 						material.bumpScale = data.bumpScale;
 					}
 
@@ -268,7 +268,7 @@ THREE.ObjectLoader.prototype = {
 				if ( data.normalMap !== undefined ) {
 
 					material.normalMap = getTexture( data.normalMap );
-					if ( data.normalScale ) {
+					if ( data.normalScale !== undefined ) {
 						material.normalScale = new THREE.Vector2( data.normalScale, data.normalScale );
 					}
 
@@ -278,6 +278,18 @@ THREE.ObjectLoader.prototype = {
 
 					material.lightMap = getTexture( data.lightMap );
 
+					if ( data.lightMapIntensity !== undefined ) {
+						material.lightMapIntensity = data.lightMapIntensity;
+					}
+
+				}
+
+				if ( data.aoMap !== undefined ) {
+
+					material.aoMap = getTexture( data.aoMap );
+					if ( data.aoMapIntensity !== undefined ) {
+						material.aoMapIntensity = data.aoMapIntensity;
+					}
 				}
 
 				if ( data.specularMap !== undefined ) {
