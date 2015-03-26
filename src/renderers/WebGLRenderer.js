@@ -283,6 +283,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	setDefaultGLState();
 
 	this.context = _gl;
+	this.extensions = extensions;
 	this.state = state;
 
 	// GPU capabilities
