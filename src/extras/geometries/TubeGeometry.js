@@ -42,8 +42,6 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 		numpoints = segments + 1,
 
-		x, y, z,
-		tx, ty, tz,
 		u, v, r,
 
 		cx, cy,
@@ -154,9 +152,7 @@ THREE.TubeGeometry.SinusoidalTaper = function ( u ) {
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
-	var	tangent = new THREE.Vector3(),
-		normal = new THREE.Vector3(),
-		binormal = new THREE.Vector3(),
+	var	normal = new THREE.Vector3(),
 
 		tangents = [],
 		normals = [],
@@ -171,7 +167,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		smallest,
 
 		tx, ty, tz,
-		i, u, v;
+		i, u;
 
 
 	// expose internals

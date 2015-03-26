@@ -234,7 +234,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 #ifdef METAL
 
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor * diffuse ) * specular + totalSpecularLight + emissive;
+	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor ) * specular + totalSpecularLight + emissive;
 
 #else
 

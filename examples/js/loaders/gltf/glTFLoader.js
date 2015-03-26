@@ -127,7 +127,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	IndicesDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-		console.log("ERROR(IndicesDelegate):" + errorCode + ":" + info);
+		THREE.log("ERROR(IndicesDelegate):" + errorCode + ":" + info);
 	};
 
 	IndicesDelegate.prototype.convert = function(resource, ctx) {
@@ -153,7 +153,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	VertexAttributeDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-		console.log("ERROR(VertexAttributeDelegate):" + errorCode + ":" + info);
+		THREE.log("ERROR(VertexAttributeDelegate):" + errorCode + ":" + info);
 	};
 
 	VertexAttributeDelegate.prototype.convert = function(resource, ctx) {
@@ -325,7 +325,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	AnimationParameterDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-		console.log("ERROR(AnimationParameterDelegate):" + errorCode + ":" + info);
+		THREE.log("ERROR(AnimationParameterDelegate):" + errorCode + ":" + info);
 	};
 
 	AnimationParameterDelegate.prototype.convert = function(resource, ctx) {
@@ -397,7 +397,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	InverseBindMatricesDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-		console.log("ERROR(InverseBindMatricesDelegate):" + errorCode + ":" + info);
+		THREE.log("ERROR(InverseBindMatricesDelegate):" + errorCode + ":" + info);
 	};
 
 	InverseBindMatricesDelegate.prototype.convert = function(resource, ctx) {
@@ -433,7 +433,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	ShaderDelegate.prototype.handleError = function(errorCode, info) {
         // FIXME: report error
-		console.log("ERROR(ShaderDelegate):" + errorCode + ":" + info);
+		THREE.log("ERROR(ShaderDelegate):" + errorCode + ":" + info);
 	};
 
 	ShaderDelegate.prototype.convert = function(resource, ctx) {
@@ -467,12 +467,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	Resources.prototype.setEntry = function(entryID, object, description) {
 		if (!entryID) {
-			console.error("No EntryID provided, cannot store", description);
+			THREE.error("No EntryID provided, cannot store", description);
 			return;
 		}
 
 		if (this._entries[entryID]) {
-			console.warn("entry[" + entryID + "] is being overwritten");
+			THREE.warn("entry[" + entryID + "] is being overwritten");
 		}
     
 		this._entries[entryID] = new ResourceEntry(entryID, object, description );
@@ -588,13 +588,13 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
         		
 	var fragmentShader = theLoader.shaders[material.params.fragmentShader];
 	if (!fragmentShader) {
-		console.log("ERROR: Missing fragment shader definition:", material.params.fragmentShader);
+		THREE.log("ERROR: Missing fragment shader definition:", material.params.fragmentShader);
 		return new THREE.MeshPhongMaterial;
 	}
         		
 	var vertexShader = theLoader.shaders[material.params.vertexShader];
 	if (!fragmentShader) {
-		console.log("ERROR: Missing vertex shader definition:", material.params.vertexShader);
+		THREE.log("ERROR: Missing vertex shader definition:", material.params.vertexShader);
 		return new THREE.MeshPhongMaterial;
 	}
         		
@@ -825,7 +825,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	var primitivesDescription = description.primitives;
 	if (!primitivesDescription) {
                     //FIXME: not implemented in delegate
-		console.log("MISSING_PRIMITIVES for mesh:" + entryID);
+		THREE.log("MISSING_PRIMITIVES for mesh:" + entryID);
 		return false;
 	}
 
@@ -1204,7 +1204,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 									boneInverses.push(mat);
         	                                    
 								} else {
-									console.log("WARNING: jointId:" + jointId + " cannot be found in skeleton:" + skeleton);
+									THREE.log("WARNING: jointId:" + jointId + " cannot be found in skeleton:" + skeleton);
 								}
 							}
 
@@ -1253,7 +1253,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
             value: function(entryID, description, userInfo) {
 
 	if (!description.nodes) {
-		console.log("ERROR: invalid file required nodes property is missing from scene");
+		THREE.log("ERROR: invalid file required nodes property is missing from scene");
 		return false;
 	}
 
@@ -1294,9 +1294,9 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	for (var name in this.nodeAnimationChannels) {
 		var nodeAnimationChannels = this.nodeAnimationChannels[name];
 		var i, len = nodeAnimationChannels.length;
-        			//console.log(" animation channels for node " + name);
+        			//THREE.log(" animation channels for node " + name);
         			//for (i = 0; i < len; i++) {
-        			//	console.log(nodeAnimationChannels[i]);
+        			//	THREE.log(nodeAnimationChannels[i]);
         			//}
 		var anim = new THREE.glTFAnimation(nodeAnimationChannels);
 		anim.name = "animation_" + name;
@@ -1372,7 +1372,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	            var parameters = description.parameters;
 	            if (!parameters) {
 	                //FIXME: not implemented in delegate
-		console.log("MISSING_PARAMETERS for animation:" + entryID);
+		THREE.log("MISSING_PARAMETERS for animation:" + entryID);
 		return false;
 	            }
 	

@@ -175,6 +175,8 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
+			"uniform vec3 diffuse;",
+			"uniform vec3 emissive;",
 			"uniform float opacity;",
 
 			"varying vec3 vLightFront;",
@@ -202,7 +204,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
-			"	vec4 diffuseColor = vec4( 1.0, 1.0, 1.0, opacity );",
+			"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -217,13 +219,13 @@ THREE.ShaderLib = {
 					//"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
 
 			"		if ( gl_FrontFacing )",
-			"			outgoingLight += diffuseColor.rgb * vLightFront;",
+			"			outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 			"		else",
-			"			outgoingLight += diffuseColor.rgb * vLightBack;",
+			"			outgoingLight += diffuseColor.rgb * vLightBack + emissive;",
 
 			"	#else",
 
-			"		outgoingLight += diffuseColor.rgb * vLightFront;",
+			"		outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 
 			"	#endif",
 
@@ -298,7 +300,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-			"#ifndef FLAT_SHADED",
+			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
 
 			"	vNormal = normalize( transformedNormal );",
 
@@ -325,11 +327,10 @@ THREE.ShaderLib = {
 			"#define PHONG",
 
 			"uniform vec3 diffuse;",
-			"uniform float opacity;",
-
 			"uniform vec3 emissive;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
+			"uniform float opacity;",
 
 			THREE.ShaderChunk[ "common" ],
 			THREE.ShaderChunk[ "color_pars_fragment" ],
@@ -524,6 +525,9 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
+
+			"	outgoingLight = diffuseColor.rgb;", // simple shader
+
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 			"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects

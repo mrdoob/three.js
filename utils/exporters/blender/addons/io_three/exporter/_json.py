@@ -5,18 +5,10 @@ ROUND = constants.DEFAULT_PRECISION
 
 ## THREE override function
 def _json_floatstr(o):
-    if ROUND is None:
-        return str(o)
+    if ROUND is not None:
+        o = round(o, ROUND)
         
-    s = str(round(o, ROUND))
-
-    if '.' in s and len(s[s.index('.'):]) > ROUND - 1:
-        s = '%.{0}f'.format(ROUND) % o
-        while '.' in s and s[-1] == '0':
-            s = s[:-1] # this actually removes the last '0' from the string
-        if s[-1] == '.': # added this test to avoid leaving '0.' instead of '0.0',
-            s += '0'    # which would throw an error while loading the file
-    return s
+    return '%g' % o
 
 
 def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,

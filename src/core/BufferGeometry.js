@@ -667,30 +667,24 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	/*
-		computeOffsets
-		Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
-		This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
-		WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-		indexBufferSize - Defaults to 65535, but allows for larger or smaller chunks.
+	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
+	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
+	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
+	size - Defaults to 65535, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function ( indexBufferSize ) {
+	computeOffsets: function ( size ) {
 
-		var size = indexBufferSize;
-		if ( indexBufferSize === undefined )
-			size = 65535; //WebGL limits type of index buffer values to 16-bit.
-
-		var s = Date.now();
+		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
-		var verticesCount = ( vertices.length / 3 );
 		var facesCount = ( indices.length / 3 );
 
 		/*
-		console.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
-		console.log("Faces to process: "+(indices.length/3));
-		console.log("Reordering "+verticesCount+" vertices.");
+		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
+		THREE.log("Faces to process: "+(indices.length/3));
+		THREE.log("Reordering "+verticesCount+" vertices.");
 		*/
 
 		var sortedIndices = new Uint16Array( indices.length ); //16-bit buffers
@@ -764,14 +758,15 @@ THREE.BufferGeometry.prototype = {
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
-		this.offsets = offsets;
+		this.offsets = offsets; // TODO: Deprecate
+		this.drawcalls = offsets;
 
 		/*
 		var orderTime = Date.now();
-		console.log("Reorder time: "+(orderTime-s)+"ms");
-		console.log("Duplicated "+duplicatedVertices+" vertices.");
-		console.log("Compute Buffers time: "+(Date.now()-s)+"ms");
-		console.log("Draw offsets: "+offsets.length);
+		THREE.log("Reorder time: "+(orderTime-s)+"ms");
+		THREE.log("Duplicated "+duplicatedVertices+" vertices.");
+		THREE.log("Compute Buffers time: "+(Date.now()-s)+"ms");
+		THREE.log("Draw offsets: "+offsets.length);
 		*/
 
 		return offsets;

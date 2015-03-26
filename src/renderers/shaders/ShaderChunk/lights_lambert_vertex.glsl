@@ -187,10 +187,10 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 #endif
 
-vLightFront = vLightFront * diffuse + diffuse * ambientLightColor + emissive;
+vLightFront += ambientLightColor;
 
 #ifdef DOUBLE_SIDED
 
-	vLightBack = vLightBack * diffuse + diffuse * ambientLightColor + emissive;
+	vLightBack += ambientLightColor;
 
 #endif
