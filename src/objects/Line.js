@@ -194,7 +194,7 @@ THREE.Line.prototype.clone = function ( object ) {
 
 THREE.Line.prototype.toJSON = function ( meta ) {
 
-  var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
 	data.object.mode = this.mode;
 
@@ -211,6 +211,6 @@ THREE.Line.prototype.toJSON = function ( meta ) {
 	data.object.geometry = this.geometry.uuid;
 	data.object.material = this.material.uuid;
 
-  return data;
+	return data;
 
 };

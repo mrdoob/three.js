@@ -571,85 +571,85 @@ THREE.Object3D.prototype = {
 
 		var isRootObject = ( meta === undefined );
 
-	  // we will store all serialization data on 'data'
-	  var data = {};
-	  var metadata;
+		// we will store all serialization data on 'data'
+		var data = {};
+		var metadata;
 
-	  // meta is a hash used to collect geometries, materials.
-	  // not providing it implies that this is the root object
-	  // being serialized.
-	  if ( isRootObject ) {
+		// meta is a hash used to collect geometries, materials.
+		// not providing it implies that this is the root object
+		// being serialized.
+		if ( isRootObject ) {
 
-	    // initialize meta obj
-	    meta = {
-	      geometries: {},
-	      materials: {}
-	    }
+			// initialize meta obj
+			meta = {
+				geometries: {},
+				materials: {}
+			}
 
-	    // add metadata
-	    metadata = {
+			// add metadata
+			metadata = {
 				version: 4.4,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			}
 
-	  }
+		}
 
-	  // standard Object3D serialization
+		// standard Object3D serialization
 
-	  data.type = this.type;
-	  data.uuid = this.uuid;
-	  if ( this.name !== '' ) data.name = this.name;
-	  if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
-	  if ( this.visible !== true ) data.visible = this.visible;
+		data.type = this.type;
+		data.uuid = this.uuid;
+		if ( this.name !== '' ) data.name = this.name;
+		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
+		if ( this.visible !== true ) data.visible = this.visible;
 
-	  data.matrix = this.matrix.toArray();
+		data.matrix = this.matrix.toArray();
 
-	  if ( this.children.length > 0 ) {
+		if ( this.children.length > 0 ) {
 
-	    data.children = [];
+			data.children = [];
 
-	    for ( var i = 0; i < this.children.length; i ++ ) {
+			for ( var i = 0; i < this.children.length; i ++ ) {
 
-	      data.children.push( this.children[ i ].toJSON( meta ).object );
+				data.children.push( this.children[ i ].toJSON( meta ).object );
 
-	    }
+			}
 
-	  }
+		}
 
-	  // wrap serialized object with additional data
+		// wrap serialized object with additional data
 
-	  var output;
+		var output;
 
-	  if ( isRootObject ) {
+		if ( isRootObject ) {
 
-	  	output = {
-	  		metadata: metadata,
-	  		geometries: extractFromCache(meta.geometries),
-	  		materials: extractFromCache(meta.materials),
-	  		object: data
-	  	};
+			output = {
+				metadata: metadata,
+				geometries: extractFromCache(meta.geometries),
+				materials: extractFromCache(meta.materials),
+				object: data
+			};
 
-	  } else {
+		} else {
 
-	  	output = { object: data };
+			output = { object: data };
 
-	  }
+		}
 
-	  return output;
+		return output;
 
-	  // extract data from the cache hash
-	  // remove metadata on each item
-	  // and return as array
-	  function extractFromCache ( cache ) {
-	  	var values = [];
-	  	for ( var key in cache ) {
-	  		var data = cache[ key ];
-	  		delete data.metadata;
-	  		values.push( data );
-	  	}
-	  	return values;
-	  }
+		// extract data from the cache hash
+		// remove metadata on each item
+		// and return as array
+		function extractFromCache ( cache ) {
+			var values = [];
+			for ( var key in cache ) {
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+			}
+			return values;
+		}
 
 	},
 

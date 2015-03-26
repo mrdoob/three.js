@@ -326,7 +326,7 @@ THREE.Mesh.prototype.clone = function ( object, recursive ) {
 
 THREE.Mesh.prototype.toJSON = function ( meta ) {
 
-  var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
 	// only serialize if not in meta geometries cache
 	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
@@ -341,6 +341,6 @@ THREE.Mesh.prototype.toJSON = function ( meta ) {
 	data.object.geometry = this.geometry.uuid;
 	data.object.material = this.material.uuid;
 
-  return data;
+	return data;
 
 };

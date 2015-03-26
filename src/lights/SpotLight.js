@@ -83,7 +83,7 @@ THREE.SpotLight.prototype.clone = function () {
 
 THREE.SpotLight.prototype.toJSON = function ( meta ) {
 
-  var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
 	data.object.color = this.color.getHex();
 	data.object.intensity = this.intensity;
@@ -92,6 +92,6 @@ THREE.SpotLight.prototype.toJSON = function ( meta ) {
 	data.object.exponent = this.exponent;
 	data.object.decay = this.decay;
 
-  return data;
+	return data;
 
 };

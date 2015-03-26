@@ -876,25 +876,25 @@ THREE.BufferGeometry.prototype = {
 
 	toJSON: function() {
 
-	  // we will store all serialization data on 'data'
-	  var data = {};
+		// we will store all serialization data on 'data'
+		var data = {};
 
-    // add metadata
-    data.metadata = {
+		// add metadata
+		data.metadata = {
 			version: 4.4,
 			type: 'BufferGeometry',
 			generator: 'BufferGeometry.toJSON'
 		}
 
-	  // standard BufferGeometry serialization
+		// standard BufferGeometry serialization
 
-	  data.type = this.type;
-	  data.uuid = this.uuid;
-	  if ( this.name !== '' ) data.name = this.name;
-	  data.data = {};
-	  data.data.attributes = {};
+		data.type = this.type;
+		data.uuid = this.uuid;
+		if ( this.name !== '' ) data.name = this.name;
+		data.data = {};
+		data.data.attributes = {};
 
-	  var attributes = this.attributes;
+		var attributes = this.attributes;
 		var offsets = this.offsets;
 		var boundingSphere = this.boundingSphere;
 
@@ -927,7 +927,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-	  return data;
+		return data;
 
 	},
 

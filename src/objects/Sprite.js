@@ -71,7 +71,7 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 THREE.Sprite.prototype.toJSON = function ( meta ) {
 
-  var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
 	// only serialize if not in meta materials cache
 	if ( meta.materials[ this.material.uuid ] === undefined ) {
@@ -80,7 +80,7 @@ THREE.Sprite.prototype.toJSON = function ( meta ) {
 
 	data.object.material = this.material.uuid;
 
-  return data;
+	return data;
 
 };
 

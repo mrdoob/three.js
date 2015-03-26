@@ -799,23 +799,23 @@ THREE.Geometry.prototype = {
 
 	toJSON: function() {
 
-	  // we will store all serialization data on 'data'
-	  var data = {};
+		// we will store all serialization data on 'data'
+		var data = {};
 
-    // add metadata
-    data.metadata = {
+		// add metadata
+		data.metadata = {
 			version: 4.4,
 			type: 'Geometry',
 			generator: 'Geometry.toJSON'
 		};
 
-	  // standard Geometry serialization
+		// standard Geometry serialization
 
-	  data.type = this.type;
-	  data.uuid = this.uuid;
-	  if ( this.name !== '' ) data.name = this.name;
+		data.type = this.type;
+		data.uuid = this.uuid;
+		if ( this.name !== '' ) data.name = this.name;
 
-	  if ( this.parameters !== undefined ) {
+		if ( this.parameters !== undefined ) {
 
 			var parameters = this.parameters;
 
@@ -996,7 +996,7 @@ THREE.Geometry.prototype = {
 		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
 		data.data.faces = faces;
 
-	  return data;
+		return data;
 
 	},
 

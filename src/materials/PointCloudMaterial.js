@@ -69,12 +69,12 @@ THREE.MeshDepthMaterial.prototype.toJSON = function () {
 
 	var data = THREE.Material.prototype.toJSON.call( this );
 
-  data.size  = this.size;
-  data.sizeAttenuation = this.sizeAttenuation;
-  data.color = this.color.getHex();
+	data.size	= this.size;
+	data.sizeAttenuation = this.sizeAttenuation;
+	data.color = this.color.getHex();
 
-  if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
-  if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+	if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
+	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
 
 	return data;
 

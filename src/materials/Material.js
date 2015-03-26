@@ -109,26 +109,26 @@ THREE.Material.prototype = {
 
 	toJSON: function() {
 
-	  // we will store all serialization data on 'data'
-	  var data = {};
+		// we will store all serialization data on 'data'
+		var data = {};
 
-    // add metadata
-    data.metadata = {
+		// add metadata
+		data.metadata = {
 			version: 4.4,
 			type: 'Material',
 			generator: 'Material.toJSON'
 		}
 
-	  // standard Material serialization
-	  data.type = this.type;
-	  data.uuid = this.uuid;
-	  if ( this.name !== '' ) data.name = this.name;
+		// standard Material serialization
+		data.type = this.type;
+		data.uuid = this.uuid;
+		if ( this.name !== '' ) data.name = this.name;
 
-	  if ( this.opacity < 1 ) data.opacity = this.opacity;
+		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent !== false ) data.transparent = this.transparent;
 		if ( this.wireframe !== false ) data.wireframe = this.wireframe;
 
-	  return data;
+		return data;
 
 	},
 
