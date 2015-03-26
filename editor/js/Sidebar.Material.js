@@ -625,7 +625,7 @@ Sidebar.Material = function ( editor ) {
 				if ( objectHasUvs ) {
 
 					material.aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
-					material.aoScale = materialAOScale.getValue();
+					material.oaMapScale = materialAOScale.getValue();
 					material.needsUpdate = true;
 
 				} else {
@@ -866,7 +866,7 @@ Sidebar.Material = function ( editor ) {
 
 				materialAOMapEnabled.setValue( material.aoMap !== null );
 				materialAOMap.setValue( material.aoMap );
-				materialAOScale.setValue( material.aoScale );
+				materialAOScale.setValue( material.oaMapScale );
 
 			}
 
