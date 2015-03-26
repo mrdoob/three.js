@@ -19,45 +19,7 @@ THREE.ShaderLib = {
 
 		] ),
 
-		vertexShader: [
-
-			THREE.ShaderChunk[ "common" ],
-			THREE.ShaderChunk[ "map_pars_vertex" ],
-			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
-			THREE.ShaderChunk[ "envmap_pars_vertex" ],
-			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
-			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-			THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "map_vertex" ],
-				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "color_vertex" ],
-				THREE.ShaderChunk[ "skinbase_vertex" ],
-
-			"	#ifdef USE_ENVMAP",
-
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-
-			"	#endif",
-
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
-				THREE.ShaderChunk[ "logdepthbuf_vertex" ],
-
-				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
-				THREE.ShaderChunk[ "shadowmap_vertex" ],
-
-			"}"
-
-		].join("\n"),
+		vertexShader: THREE.ShaderPreprocessor.preprocess( null, "material_basic_vertex" ),
 
 		fragmentShader: [
 
