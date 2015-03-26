@@ -287,8 +287,8 @@ THREE.ObjectLoader.prototype = {
 				if ( data.aoMap !== undefined ) {
 
 					material.aoMap = getTexture( data.aoMap );
-					if ( data.aoMapScale !== undefined ) {
-						material.aoMapScale = data.aoMapScale;
+					if ( data.aoMapIntensity !== undefined ) {
+						material.aoMapIntensity = data.aoMapIntensity;
 					}
 				}
 

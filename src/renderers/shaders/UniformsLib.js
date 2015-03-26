@@ -16,7 +16,7 @@ THREE.UniformsLib = {
 		"lightMapIntensity" : { type: "f", value: 1 },
 
 		"aoMap" : { type: "t", value: null },
-		"oaMapScale" : { type: "f", value: 1 },
+		"aoMapIntensity" : { type: "f", value: 1 },
 
 		"specularMap" : { type: "t", value: null },
 		"alphaMap" : { type: "t", value: null },
