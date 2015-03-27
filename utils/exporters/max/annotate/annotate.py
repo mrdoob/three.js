@@ -29,6 +29,7 @@ def parse_range(value):
 epilog = 'example:\n  %(prog)s -i model.js -o model.new.js idle=1..10 walk=11..20'
 if not CAN_GUI:
     epilog += '\npro tip:\n  Install PyQt4 and argparseui packages to use GUI ("-u" option).'
+epilog += '\nCreated by {}'.format(__author__)
 
 parser = argparse.ArgumentParser(
     description='Split THREE.js model animation into seperate parts.',
