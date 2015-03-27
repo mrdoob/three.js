@@ -5510,6 +5510,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var mipmap, mipmaps = texture.mipmaps;
 
+		var imageNotComplete = false;
+
 		if ( texture instanceof THREE.DataTexture ) {
 
 			// use manually created mipmaps if available
@@ -5578,11 +5580,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+				if (texture.image.complete) {
+
+					_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+
+				} else {
+
+					imageNotComplete = true;
+
+				}
 
 			}
 
 		}
+
+		if (imageNotComplete) return;
 
 		if ( texture.generateMipmaps && isImagePowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
