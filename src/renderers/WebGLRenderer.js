@@ -5596,15 +5596,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 
-		if ( texture.needsUpdate ) {
+		if ( texture.needsUpdate === true ) {
+
+			var image = texture.image;
+
+			if ( image.complete === false ) {
+
+				THREE.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
+				return;
+
+			}
 
 			_this.uploadTexture( texture );
-
-		} else {
-
-			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+			return;
 
 		}
+
+		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
 	};
 
