@@ -47,7 +47,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : Math.log2( this.resolution ).toFixed(1),
+			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed(1),
 		},
 		uniforms: {
 			"lastLum": { type: "t", value: null },
