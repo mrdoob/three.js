@@ -67,14 +67,15 @@
 
 		setFromCamera: function ( coords, camera ) {
 
-			// camera is assumed _not_ to be a child of a transformed object
-
 			if ( camera instanceof THREE.PerspectiveCamera ) {
 
-				this.ray.origin.copy( camera.position );
-				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
+				this.ray.origin.set( 0, 0, 0 );
+				camera.localToWorld( this.ray.origin );
+				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
 			} else if ( camera instanceof THREE.OrthographicCamera ) {
+
+				// camera is assumed _not_ to be a child of a transformed object
 
 				this.ray.origin.set( coords.x, coords.y, - 1 ).unproject( camera );
 				this.ray.direction.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld );
