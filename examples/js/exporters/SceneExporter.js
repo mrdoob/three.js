@@ -8,7 +8,9 @@ THREE.SceneExporter.prototype = {
 
 	constructor: THREE.SceneExporter,
 
-	parse: function ( scene ) {
+	parse: function ( scene , options ) {
+
+		options = options || {};
 
 		var position = Vector3String( scene.position );
 		var rotation = Vector3String( scene.rotation );
@@ -168,6 +170,26 @@ THREE.SceneExporter.prototype = {
 
 		}
 
+		function Vector3ArrayString( a ) {
+
+			var vector3Array = [];
+
+			var arrayLength = a.length;
+
+			for ( var i = 0; i < arrayLength; i++) {
+
+				var vector3 = a[i];
+
+				vector3Array.push( vector3.x );
+				vector3Array.push( vector3.y );
+				vector3Array.push( vector3.z );
+
+			}
+
+			return vector3Array.join(",");
+
+		}
+
 		function ColorString( c ) {
 
 			return "[" + c.r.toFixed( 3 ) + "," + c.g.toFixed( 3 ) + "," + c.b.toFixed( 3 ) + "]";
@@ -182,7 +204,7 @@ THREE.SceneExporter.prototype = {
 
 		function NumConstantString( c ) {
 
-			var constants = [ "NearestFilter", "NearestMipMapNearestFilter", "NearestMipMapLinearFilter",
+			var constants = [ "NearestFilter", "NearestMipMapNearestFilter" , "NearestMipMapLinearFilter",
 							  "LinearFilter", "LinearMipMapNearestFilter", "LinearMipMapLinearFilter" ];
 
 			for ( var i = 0; i < constants.length; i ++ ) {
@@ -204,7 +226,6 @@ THREE.SceneExporter.prototype = {
 			return output;
 
 		}
-
 
 		//
 
@@ -238,12 +259,11 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type"           : "PointLight",',
-				'	"color"          : ' + o.color.getHex() + ',',
-				'	"intensity"      : ' + o.intensity + ',',
-				'	"position"       : ' + Vector3String( o.position ) + ',',
-				'	"decay"          : ' + o.decay + ',',
-				'	"distance"       : ' + o.distance + ( o.children.length ? ',' : '' )
+				'	"type"      : "PointLight",',
+				'	"color"     : ' + o.color.getHex() + ',',
+				'	"intensity" : ' + o.intensity + ',',
+				'	"position"  : ' + Vector3String( o.position ) + ',',
+				'	"distance"  : ' + o.distance + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -252,15 +272,14 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type"           : "SpotLight",',
-				'	"color"          : ' + o.color.getHex() + ',',
-				'	"intensity"      : ' + o.intensity + ',',
-				'	"position"       : ' + Vector3String( o.position ) + ',',
-				'	"distance"       : ' + o.distance + ',',
-				'	"angle"          : ' + o.angle + ',',
-				'	"exponent"       : ' + o.exponent + ',',
-				'	"decay"          : ' + o.decay + ',',
-				'	"target"         : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
+				'	"type"      : "SpotLight",',
+				'	"color"     : ' + o.color.getHex() + ',',
+				'	"intensity" : ' + o.intensity + ',',
+				'	"position"  : ' + Vector3String( o.position ) + ',',
+				'	"distance"  : ' + o.distance + ',',
+				'	"angle"     : ' + o.angle + ',',
+				'	"exponent"  : ' + o.exponent + ',',
+				'	"target"    : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -410,9 +429,40 @@ THREE.SceneExporter.prototype = {
 
 				];
 
+			} else if ( g instanceof THREE.CylinderGeometry ) {
+
+				var params = {
+
+					topRad: (g.parameters.radiusTop || 20),
+					botRad: (g.parameters.radiusBottom || 20),
+					height: (g.parameters.height || 100),
+					radSegs: (g.parameters.radialSegments || 8),
+					heightSegs: (g.parameters.heightSegments || 1),
+					openEnded: ((g.parameters.openEnded) ? "true" : "false"),
+					thetaStart: (g.parameters.thetaStart || 0),
+					thetaLength: (g.parameters.thetaLength || (2 * Math.PI) )
+
+				};
+
+				var output = [
+
+				'\t' + LabelString( getGeometryName( g ) ) + ': {',
+				'	"type" 	      : "cylinder",',
+				'	"topRad"	  : ' + params.topRad + ',',
+				'	"botRad"	  : ' + params.botRad + ',',
+				' 	"height" 	  : ' + params.height + ',',
+				'	"radSegs"     : ' + params.radSegs + ',',
+				'	"heightSegs"  : ' + params.heightSegs + ',',
+				'	"openEnded"   : ' + params.openEnded + ',',
+				'	"thetaStart"  : ' + params.thetaStart + ',',
+				' 	"thetaLength" : ' + params.thetaLength,
+				'}'
+
+				];
+
 			} else if ( g instanceof THREE.Geometry ) {
 
-				if ( g.sourceType === "ascii" || g.sourceType === "ctm" || g.sourceType === "stl" || g.sourceType === "vtk" ) {
+				if ( g.sourceType === "ascii" || g.sourceType === "ctm" || g.sourceType === "stl" || g.sourceType === "vtk") {
 
 					var output = [
 
@@ -425,7 +475,25 @@ THREE.SceneExporter.prototype = {
 
 				} else {
 
-					var output = [];
+					var type = "Geometry";
+
+					if( g instanceof THREE.BufferGeometry ) {
+						g = new THREE.Geometry().fromBufferGeometry( g );
+						type = "BufferGeometry";
+					}
+
+					var faceObj = getGeometryFacesObject( g );
+
+					var output = [
+
+					'\t' + LabelString( getGeometryName( g ) ) + ': {',
+					'	"type"	   : "' + type + '",',
+					'	"vertices" : [' + Vector3ArrayString( g.vertices ) + '],',
+					'	"faces"    : [' + faceObj.faces + '],',
+					'	"normals"  : [' + faceObj.normals + '],',
+					'	"uvs"      : []',
+					'}'
+					];
 
 				}
 
@@ -474,6 +542,7 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "MeshLambertMaterial",',
 				'	"parameters"  : {',
 				'		"color"  : ' 	+ m.color.getHex() + ',',
+				'		"ambient"  : ' 	+ m.ambient.getHex() + ',',
 				'		"emissive"  : ' + m.emissive.getHex() + ',',
 
 				m.map ? 		'		"map" : ' + LabelString( getTextureName( m.map ) ) + ',' : '',
@@ -499,6 +568,7 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "MeshPhongMaterial",',
 				'	"parameters"  : {',
 				'		"color"  : ' 	+ m.color.getHex() + ',',
+				'		"ambient"  : ' 	+ m.ambient.getHex() + ',',
 				'		"emissive"  : ' + m.emissive.getHex() + ',',
 				'		"specular"  : ' + m.specular.getHex() + ',',
 				'		"shininess" : ' + m.shininess + ',',
@@ -667,6 +737,35 @@ THREE.SceneExporter.prototype = {
 
 		}
 
+		function getGeometryFacesObject( g ) {
+
+			var faces = [], normals = [];
+
+			var geometryFaces = g.faces;
+			var geometryFacesLength = geometryFaces.length;
+
+			for ( var i = 0; i < geometryFacesLength; i++ ) {
+
+				var face = geometryFaces[i];
+
+				faces.push( face.a );
+				faces.push( face.b );
+				faces.push( face.c );
+
+				normals.push( face.normal );
+
+			}
+
+			//console.log(faces);
+			console.log(normals.join(","));
+
+			return {
+				faces: faces.join(","),
+				normals: Vector3ArrayString(normals)
+			};
+
+		}
+
 		function getMaterialName( m ) {
 
 			return m.name ? m.name : "Material_" + m.id;
@@ -747,7 +846,7 @@ THREE.SceneExporter.prototype = {
 			'}'
 		].join( '\n' );
 
-		return JSON.parse( output );
+		return output;
 
 	}
 
