@@ -97,9 +97,8 @@ THREE.VREffect = function ( renderer, done ) {
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.context.drawingBufferWidth / renderer.getPixelRatio();
-		var rendererHeight = renderer.context.drawingBufferHeight / renderer.getPixelRatio();
-		var eyeDivisionLine = rendererWidth / 2;
+		var rendererSize = renderer.getSize();
+		rendererSize.width /= 2;
 
 		renderer.enableScissorTest( true );
 		renderer.clear();
@@ -118,13 +117,13 @@ THREE.VREffect = function ( renderer, done ) {
 		cameraRight.translateX( rightEyeTranslation.x );
 
 		// render left eye
-		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
-		renderer.setScissor( 0, 0, eyeDivisionLine, rendererHeight );
+		renderer.setViewport( 0, 0, rendererSize.width, rendererSize.height );
+		renderer.setScissor( 0, 0, rendererSize.width, rendererSize.height );
 		renderer.render( sceneLeft, cameraLeft );
 
 		// render right eye
-		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
-		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
+		renderer.setViewport( rendererSize.width, 0, rendererSize.width, rendererSize.height );
+		renderer.setScissor( rendererSize.width, 0, rendererSize.width, rendererSize.height );
 		renderer.render( sceneRight, cameraRight );
 
 		renderer.enableScissorTest( false );
@@ -155,10 +154,7 @@ THREE.VREffect = function ( renderer, done ) {
 			return;
 		}
 		// VR Mode enabled
-		this._canvasOriginalSize = {
-			width: renderer.domElement.width / renderer.getPixelRatio(),
-			height: renderer.domElement.height / renderer.getPixelRatio()
-		};
+		this._canvasOriginalSize = renderer.getSize();
 		this.startFullscreen();
 	};
 
