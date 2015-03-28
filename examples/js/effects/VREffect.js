@@ -74,16 +74,31 @@ THREE.VREffect = function ( renderer, done ) {
 			return;
 		}
 		// Regular render mode if not HMD
+		if ( scene instanceof Array ) scene = scene[ 0 ];
 		renderer.render.apply( this._renderer, arguments );
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
 
+		var sceneLeft, sceneRight;
+
+		if ( scene instanceof Array ) {
+
+			sceneLeft = scene[ 0 ];
+			sceneRight = scene[ 1 ];
+
+		} else {
+
+			sceneLeft = scene;
+			sceneRight = scene;
+
+		}
+
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.clientWidth;
-		var rendererHeight = renderer.domElement.clientHeight;
+		var rendererWidth = renderer.context.drawingBufferWidth / renderer.getPixelRatio();
+		var rendererHeight = renderer.context.drawingBufferHeight / renderer.getPixelRatio();
 		var eyeDivisionLine = rendererWidth / 2;
 
 		renderer.enableScissorTest( true );
@@ -105,12 +120,12 @@ THREE.VREffect = function ( renderer, done ) {
 		// render left eye
 		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
 		renderer.setScissor( 0, 0, eyeDivisionLine, rendererHeight );
-		renderer.render( scene, cameraLeft );
+		renderer.render( sceneLeft, cameraLeft );
 
 		// render right eye
 		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
-		renderer.render( scene, cameraRight );
+		renderer.render( sceneRight, cameraRight );
 
 		renderer.enableScissorTest( false );
 
@@ -165,7 +180,7 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 		if ( canvas.mozRequestFullScreen ) {
 			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
-		} else {
+		} else if ( canvas.webkitRequestFullscreen ) {
 			canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
 		}
 	};

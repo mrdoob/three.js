@@ -1,3 +1,9 @@
+"""
+Blender API for querying mesh data. Animation data is also
+handled here since Three.js associates the animation (skeletal,
+morph targets) with the geometry nodes.
+"""
+
 import operator
 from bpy import data, types, context
 from . import material, texture, animation
@@ -37,6 +43,7 @@ def skeletal_animation(mesh, options):
 
     :param mesh:
     :param options:
+    :rtype: []
 
     """
     logger.debug("mesh.animation(%s, %s)", mesh, options)
@@ -47,16 +54,16 @@ def skeletal_animation(mesh, options):
         return []
 
     anim_type = options.get(constants.ANIMATION)
-    #pose_position = armature.data.pose_position
+#    pose_position = armature.data.pose_position
     dispatch = {
         constants.POSE: animation.pose_animation,
         constants.REST: animation.rest_animation
     }
 
     func = dispatch[anim_type]
-    #armature.data.pose_position = anim_type.upper()
+#    armature.data.pose_position = anim_type.upper()
     animations = func(armature, options)
-    #armature.data.pose_position = pose_position
+#    armature.data.pose_position = pose_position
 
     return animations
 
@@ -67,6 +74,7 @@ def bones(mesh, options):
 
     :param mesh:
     :param options:
+    :rtype: [], {}
 
     """
     logger.debug("mesh.bones(%s)", mesh)
@@ -75,15 +83,14 @@ def bones(mesh, options):
     if not armature:
         return [], {}
 
-    round_off, round_val = utilities.rounding(options)
     anim_type = options.get(constants.ANIMATION)
-    #pose_position = armature.data.pose_position
+#    pose_position = armature.data.pose_position
 
     if anim_type == constants.OFF:
-        logger.info("Animation type not set, defaulting "\
-            "to using REST position for the armature.")
+        logger.info("Animation type not set, defaulting "
+                    "to using REST position for the armature.")
         func = _rest_bones
-        #armature.data.pose_position = "REST"
+#        armature.data.pose_position = "REST"
     else:
         dispatch = {
             constants.REST: _rest_bones,
@@ -91,24 +98,23 @@ def bones(mesh, options):
         }
         logger.info("Using %s for the armature", anim_type)
         func = dispatch[anim_type]
-        #armature.data.pose_position = anim_type.upper()
+#        armature.data.pose_position = anim_type.upper()
 
-    bones_, bone_map = func(armature, round_off, round_val)
-    #armature.data.pose_position = pose_position
+    bones_, bone_map = func(armature)
+#    armature.data.pose_position = pose_position
 
     return (bones_, bone_map)
 
 
 @_mesh
-def buffer_normal(mesh, options):
+def buffer_normal(mesh):
     """
 
     :param mesh:
-    :param options:
+    :rtype: []
 
     """
     normals_ = []
-    round_off, round_val = utilities.rounding(options)
 
     for face in mesh.tessfaces:
         vert_count = len(face.vertices)
@@ -119,24 +125,20 @@ def buffer_normal(mesh, options):
         for vertex_index in face.vertices:
             normal = mesh.vertices[vertex_index].normal
             vector = (normal.x, normal.y, normal.z)
-            if round_off:
-                vector = utilities.round_off(vector, round_val)
-
             normals_.extend(vector)
 
     return normals_
 
 
 @_mesh
-def buffer_position(mesh, options):
+def buffer_position(mesh):
     """
 
     :param mesh:
-    :param options:
+    :rtype: []
 
     """
     position = []
-    round_off, round_val = utilities.rounding(options)
 
     for face in mesh.tessfaces:
         vert_count = len(face.vertices)
@@ -147,35 +149,29 @@ def buffer_position(mesh, options):
         for vertex_index in face.vertices:
             vertex = mesh.vertices[vertex_index]
             vector = (vertex.co.x, vertex.co.y, vertex.co.z)
-            if round_off:
-                vector = utilities.round_off(vector, round_val)
-
             position.extend(vector)
 
     return position
 
 
 @_mesh
-def buffer_uv(mesh, options):
+def buffer_uv(mesh):
     """
 
     :param mesh:
-    :param options:
+    :rtype: []
 
     """
+    uvs_ = []
     if len(mesh.uv_layers) is 0:
-        return
+        return uvs_
     elif len(mesh.uv_layers) > 1:
         # if memory serves me correctly buffer geometry
         # only uses one UV layer
         logger.warning("%s has more than 1 UV layer", mesh.name)
 
-    round_off, round_val = utilities.rounding(options)
-    uvs_ = []
     for uv_data in mesh.uv_layers[0].data:
         uv_tuple = (uv_data.uv[0], uv_data.uv[1])
-        if round_off:
-            uv_tuple = utilities.round_off(uv_tuple, round_val)
         uvs_.extend(uv_tuple)
 
     return uvs_
@@ -195,10 +191,6 @@ def faces(mesh, options):
     logger.info("Has UVs = %s", vertex_uv)
     logger.info("Has vertex colours = %s", has_colors)
 
-    round_off, round_val = utilities.rounding(options)
-    if round_off:
-        logger.debug("Rounding off of vectors set to %s", round_off)
-
     opt_colours = options[constants.COLORS] and has_colors
     opt_uvs = options[constants.UVS] and vertex_uv
     opt_materials = options.get(constants.FACE_MATERIALS)
@@ -208,8 +200,8 @@ def faces(mesh, options):
     logger.debug("Materials enabled = %s", opt_materials)
     logger.debug("Normals enabled = %s", opt_normals)
 
-    uv_layers = _uvs(mesh, options) if opt_uvs else None
-    vertex_normals = _normals(mesh, options) if opt_normals else None
+    uv_layers = _uvs(mesh) if opt_uvs else None
+    vertex_normals = _normals(mesh) if opt_normals else None
     vertex_colours = vertex_colors(mesh) if opt_colours else None
 
     faces_data = []
@@ -252,17 +244,14 @@ def faces(mesh, options):
         if mask[constants.MATERIALS]:
             face_data.append(face.material_index)
 
-        #@TODO: this needs the same optimization as what
-        #       was done for colours and normals
+        # @TODO: this needs the same optimization as what
+        #        was done for colours and normals
         if uv_layers:
             for index, uv_layer in enumerate(uv_layers):
                 layer = mesh.tessface_uv_textures[index]
 
                 for uv_data in layer.data[face.index].uv:
                     uv_tuple = (uv_data[0], uv_data[1])
-                    if round_off:
-                        uv_tuple = utilities.round_off(
-                            uv_tuple, round_val)
                     face_data.append(uv_layer.index(uv_tuple))
                     mask[constants.UVS] = True
 
@@ -270,8 +259,6 @@ def faces(mesh, options):
             for vertex in face.vertices:
                 normal = mesh.vertices[vertex].normal
                 normal = (normal.x, normal.y, normal.z)
-                if round_off:
-                    normal = utilities.round_off(normal, round_val)
                 face_data.append(normal_indices[str(normal)])
                 mask[constants.NORMALS] = True
 
@@ -310,7 +297,6 @@ def morph_targets(mesh, options):
                          frame_step)
 
     morphs = []
-    round_off, round_val = utilities.rounding(options)
 
     for frame in scene_frames:
         logger.info("Processing data at frame %d", frame)
@@ -319,15 +305,7 @@ def morph_targets(mesh, options):
         vertices_ = object_.extract_mesh(obj, options).vertices[:]
 
         for vertex in vertices_:
-            if round_off:
-                vectors = [
-                    utilities.round_off(vertex.co.x, round_val),
-                    utilities.round_off(vertex.co.y, round_val),
-                    utilities.round_off(vertex.co.z, round_val)
-                ]
-            else:
-                vectors = [vertex.co.x, vertex.co.y, vertex.co.z]
-            morphs[-1].extend(vectors)
+            morphs[-1].extend([vertex.co.x, vertex.co.y, vertex.co.z])
 
     context.scene.frame_set(original_frame, 0.0)
     morphs_detected = False
@@ -340,7 +318,7 @@ def morph_targets(mesh, options):
             break
     else:
         logger.info("No valid morph data detected")
-        return
+        return []
 
     manifest = []
     for index, morph in enumerate(morphs):
@@ -449,17 +427,17 @@ def materials(mesh, options):
 
 
 @_mesh
-def normals(mesh, options):
+def normals(mesh):
     """
 
     :param mesh:
-    :param options:
+    :rtype: []
 
     """
-    logger.debug("mesh.normals(%s, %s)", mesh, options)
+    logger.debug("mesh.normals(%s)", mesh)
     normal_vectors = []
 
-    for vector in _normals(mesh, options):
+    for vector in _normals(mesh):
         normal_vectors.extend(vector)
 
     return normal_vectors
@@ -544,16 +522,16 @@ def texture_registration(mesh):
 
 
 @_mesh
-def uvs(mesh, options):
+def uvs(mesh):
     """
 
     :param mesh:
-    :param options:
+    :rtype: []
 
     """
-    logger.debug("mesh.uvs(%s, %s)", mesh, options)
+    logger.debug("mesh.uvs(%s)", mesh)
     uvs_ = []
-    for layer in _uvs(mesh, options):
+    for layer in _uvs(mesh):
         uvs_.append([])
         logger.info("Parsing UV layer %d", len(uvs_))
         for pair in layer:
@@ -594,24 +572,18 @@ def vertex_colors(mesh):
 
 
 @_mesh
-def vertices(mesh, options):
+def vertices(mesh):
     """
 
     :param mesh:
-    :param options:
+    :rtype: []
 
     """
-    logger.debug("mesh.vertices(%s, %s)", mesh, options)
+    logger.debug("mesh.vertices(%s)", mesh)
     vertices_ = []
 
-    round_off, round_val = utilities.rounding(options)
-
     for vertex in mesh.vertices:
-        vector = (vertex.co.x, vertex.co.y, vertex.co.z)
-        if round_off:
-            vector = utilities.round_off(vector, round_val)
-
-        vertices_.extend(vector)
+        vertices_.extend((vertex.co.x, vertex.co.y, vertex.co.z))
 
     return vertices_
 
@@ -740,15 +712,14 @@ def _diffuse_map(mat):
     return diffuse
 
 
-def _normals(mesh, options):
+def _normals(mesh):
     """
 
     :param mesh:
-    :param options:
+    :rtype: []
 
     """
     vectors = []
-    round_off, round_val = utilities.rounding(options)
 
     vectors_ = {}
     for face in mesh.tessfaces:
@@ -756,8 +727,6 @@ def _normals(mesh, options):
         for vertex_index in face.vertices:
             normal = mesh.vertices[vertex_index].normal
             vector = (normal.x, normal.y, normal.z)
-            if round_off:
-                vector = utilities.round_off(vector, round_val)
 
             str_vec = str(vector)
             try:
@@ -769,23 +738,19 @@ def _normals(mesh, options):
     return vectors
 
 
-def _uvs(mesh, options):
+def _uvs(mesh):
     """
 
     :param mesh:
-    :param options:
 
     """
     uv_layers = []
-    round_off, round_val = utilities.rounding(options)
 
     for layer in mesh.uv_layers:
         uv_layers.append([])
 
         for uv_data in layer.data:
             uv_tuple = (uv_data.uv[0], uv_data.uv[1])
-            if round_off:
-                uv_tuple = utilities.round_off(uv_tuple, round_val)
 
             if uv_tuple not in uv_layers[-1]:
                 uv_layers[-1].append(uv_tuple)
@@ -853,12 +818,11 @@ def _skinning_data(mesh, bone_map, influences, array_index):
     return manifest
 
 
-def _pose_bones(armature, round_off, round_val):
+def _pose_bones(armature):
     """
 
     :param armature:
-    :param round_off:
-    :param round_val:
+    :rtype: [], {}
 
     """
     bones_ = []
@@ -889,44 +853,22 @@ def _pose_bones(armature, round_off, round_val):
         bone_map[bone_count] = bone_count
 
         pos, rot, scl = bone_matrix.decompose()
-        if round_off:
-            pos = (
-                utilities.round_off(pos.x, round_val),
-                utilities.round_off(pos.z, round_val),
-                -utilities.round_off(pos.y, round_val)
-            )
-            rot = (
-                utilities.round_off(rot.x, round_val),
-                utilities.round_off(rot.z, round_val),
-                -utilities.round_off(rot.y, round_val),
-                utilities.round_off(rot.w, round_val)
-            )
-            scl = (
-                utilities.round_off(scl.x, round_val),
-                utilities.round_off(scl.z, round_val),
-                utilities.round_off(scl.y, round_val)
-            )
-        else:
-            pos = (pos.x, pos.z, -pos.y)
-            rot = (rot.x, rot.z, -rot.y, rot.w)
-            scl = (scl.x, scl.z, scl.y)
         bones_.append({
             constants.PARENT: bone_index,
             constants.NAME: armature_bone.name,
-            constants.POS: pos,
-            constants.ROTQ: rot,
-            constants.SCL: scl
+            constants.POS: (pos.x, pos.z, -pos.y),
+            constants.ROTQ: (rot.x, rot.z, -rot.y, rot.w),
+            constants.SCL: (scl.x, scl.z, scl.y)
         })
 
     return bones_, bone_map
 
 
-def _rest_bones(armature, round_off, round_val):
+def _rest_bones(armature):
     """
 
     :param armature:
-    :param round_off:
-    :param round_val:
+    :rtype: [], {}
 
     """
     bones_ = []
@@ -955,21 +897,16 @@ def _rest_bones(armature, round_off, round_val):
                 index += 1
 
         bone_world_pos = armature.matrix_world * bone_pos
-        if round_off:
-            x_axis = utilities.round_off(bone_world_pos.x, round_val)
-            y_axis = utilities.round_off(bone_world_pos.z, round_val)
-            z_axis = -utilities.round_off(bone_world_pos.y, round_val)
-        else:
-            x_axis = bone_world_pos.x
-            y_axis = bone_world_pos.z
-            z_axis = -bone_world_pos.y
+        x_axis = bone_world_pos.x
+        y_axis = bone_world_pos.z
+        z_axis = -bone_world_pos.y
 
         logger.debug("Adding bone %s at: %s, %s",
                      bone.name, bone_index, bone_index_rel)
         bone_map[bone_count] = bone_index_rel
         bone_index_rel += 1
-        #@TODO: the rotq probably should not have these
-        #       hard coded values
+        # @TODO: the rotq probably should not have these
+        #        hard coded values
         bones_.append({
             constants.PARENT: bone_index,
             constants.NAME: bone.name,
@@ -980,5 +917,3 @@ def _rest_bones(armature, round_off, round_val):
         bone_count += 1
 
     return (bones_, bone_map)
-
-

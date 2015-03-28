@@ -208,7 +208,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		} else {
 
 			// camera neither orthographic or perspective
-			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - pan disabled.' );
+			THREE.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - pan disabled.' );
 
 		}
 
@@ -234,7 +234,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		} else {
 
-			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
+			THREE.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
 
 		}
 
@@ -260,7 +260,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		} else {
 
-			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
+			THREE.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
 
 		}
 
@@ -451,7 +451,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				scope.dollyIn();
 
-			} else {
+			} else if ( dollyDelta.y < 0 ) {
 
 				scope.dollyOut();
 
@@ -510,7 +510,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			scope.dollyOut();
 
-		} else {
+		} else if ( delta < 0 ) {
 
 			scope.dollyIn();
 
@@ -643,7 +643,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 					scope.dollyOut();
 
-				} else {
+				} else if ( dollyDelta.y < 0 ) {
 
 					scope.dollyIn();
 

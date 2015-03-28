@@ -39,6 +39,9 @@ class Scene(base_classes.BaseScene):
         """
         valid_types = [api.constants.MESH]
 
+        if self.options.get(constants.HIERARCHY, False):
+            valid_types.append(api.constants.EMPTY)
+
         if self.options.get(constants.CAMERAS):
             logger.info("Adding cameras to valid object types")
             valid_types.append(api.constants.CAMERA)
@@ -159,9 +162,10 @@ class Scene(base_classes.BaseScene):
         io.dump(self.filepath, data, options=self.options)
 
         if self.options.get(constants.COPY_TEXTURES):
+            texture_folder = self.options.get(constants.TEXTURE_FOLDER)
             for geo in self[constants.GEOMETRIES]:
                 logger.info("Copying textures from %s", geo.node)
-                geo.copy_textures()
+                geo.copy_textures(texture_folder)
 
     def _parse_geometries(self):
         """Locate all geometry nodes and parse them"""
@@ -206,7 +210,12 @@ class Scene(base_classes.BaseScene):
         self[constants.UUID] = utilities.id_from_name(scene_name)
 
         objects = []
-        for node in api.object.nodes(self.valid_types, self.options):
+        if self.options.get(constants.HIERARCHY, False):
+            nodes = api.object.assemblies(self.valid_types, self.options)
+        else:
+            nodes = api.object.nodes(self.valid_types, self.options)
+
+        for node in nodes:
             logger.info("Parsing object %s", node)
             obj = object_.Object(node, parent=self[constants.OBJECT])
             objects.append(obj)

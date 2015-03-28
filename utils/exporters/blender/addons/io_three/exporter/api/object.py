@@ -2,6 +2,7 @@ import math
 import mathutils
 import bpy
 from bpy import data, context, types
+from bpy_extras.io_utils import axis_conversion
 from .. import constants, logger, utilities, exceptions
 from .constants import (
     MESH,
@@ -225,14 +226,8 @@ def position(obj, options):
 
     """
     logger.debug('object.position(%s)', obj)
-    vector = _decompose_matrix(obj)[0]
-    vector = (vector.x, vector.y, vector.z)
-
-    round_off, round_val = utilities.rounding(options)
-    if round_off:
-        vector = utilities.round_off(vector, round_val)
-
-    return vector
+    vector = matrix(obj, options).to_translation()
+    return (vector.x, vector.y, vector.z)
 
 
 @_object
@@ -250,6 +245,24 @@ def receive_shadow(obj):
             return False
 
 
+AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4()
+
+@_object
+def matrix(obj, options):
+    """
+
+    :param obj:
+    :param options:
+
+    """
+    logger.debug('object.matrix(%s)', obj)
+    if options.get(constants.HIERARCHY, False) and obj.parent:
+        parent_inverted = obj.parent.matrix_world.inverted(mathutils.Matrix())
+        return parent_inverted * obj.matrix_world
+    else:
+        return AXIS_CONVERSION * obj.matrix_world
+
+
 @_object
 def rotation(obj, options):
     """
@@ -259,14 +272,8 @@ def rotation(obj, options):
 
     """
     logger.debug('object.rotation(%s)', obj)
-    vector = _decompose_matrix(obj)[1].to_euler(ZYX)
-    vector = (vector.x, vector.y, vector.z)
-
-    round_off, round_val = utilities.rounding(options)
-    if round_off:
-        vector = utilities.round_off(vector, round_val)
-
-    return vector
+    vector = matrix(obj, options).to_euler(ZYX)
+    return (vector.x, vector.y, vector.z)
 
 
 @_object
@@ -278,14 +285,8 @@ def scale(obj, options):
 
     """
     logger.debug('object.scale(%s)', obj)
-    vector = _decompose_matrix(obj)[2]
-    vector = (vector.x, vector.y, vector.z)
-
-    round_off, round_val = utilities.rounding(options)
-    if round_off:
-        vector = utilities.round_off(vector, round_val)
-
-    return vector
+    vector = matrix(obj, options).to_scale()
+    return (vector.x, vector.y, vector.z)
 
 
 @_object
@@ -477,24 +478,6 @@ def extracted_meshes():
     return [key for key in _MESH_MAP.keys()]
 
 
-def _decompose_matrix(obj, local=False):
-    """
-
-    :param obj:
-    :param local:  (Default value = False)
-
-    """
-    rotate_x_pi2 = mathutils.Quaternion((1.0, 0.0, 0.0),
-                                        math.radians(-90.0))
-    rotate_x_pi2 = rotate_x_pi2.to_matrix().to_4x4()
-
-    if local:
-        matrix = rotate_x_pi2 * obj.matrix_local
-    else:
-        matrix = rotate_x_pi2 * obj.matrix_world
-    return matrix.decompose()
-
-
 def _on_visible_layer(obj, visible_layers):
     """
 
@@ -502,12 +485,15 @@ def _on_visible_layer(obj, visible_layers):
     :param visible_layers:
 
     """
-    is_visible = True
+    is_visible = False
     for index, layer in enumerate(obj.layers):
-        if layer and index not in visible_layers:
-            logger.info('%s is on a hidden layer', obj.name)
-            is_visible = False
+        if layer and index in visible_layers:
+            is_visible = True
             break
+
+    if not is_visible:
+        logger.info('%s is on a hidden layer', obj.name)
+
     return is_visible
 
 

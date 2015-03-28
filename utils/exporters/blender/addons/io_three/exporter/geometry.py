@@ -1,3 +1,7 @@
+"""
+Module for creating Three.js geometry JSON nodes.
+"""
+
 import os
 from .. import constants, logger
 from . import base_classes, io, api
@@ -42,11 +46,8 @@ class Geometry(base_classes.BaseNode):
 
         key = ''
         for key in (constants.MORPH_TARGETS, constants.ANIMATION):
-            try:
-                self[key]
+            if key in self.keys():
                 break
-            except KeyError:
-                pass
         else:
             logger.info("%s has no animation data", self.node)
             return
@@ -115,7 +116,7 @@ class Geometry(base_classes.BaseNode):
     def copy(self, scene=True):
         """Copy the geometry definitions to a standard dictionary.
 
-        :param scene: toggle for scene formatting 
+        :param scene: toggle for scene formatting
                       (Default value = True)
         :type scene: bool
         :rtype: dict
@@ -135,16 +136,17 @@ class Geometry(base_classes.BaseNode):
 
         return data
 
-    def copy_textures(self):
+    def copy_textures(self, texture_folder=''):
         """Copy the textures to the destination directory."""
         logger.debug("Geometry().copy_textures()")
         if self.options.get(constants.COPY_TEXTURES):
             texture_registration = self.register_textures()
             if texture_registration:
                 logger.info("%s has registered textures", self.node)
+                dirname = os.path.dirname(self.scene.filepath)
+                full_path = os.path.join(dirname, texture_folder)
                 io.copy_registered_textures(
-                    os.path.dirname(self.scene.filepath),
-                    texture_registration)
+                    full_path, texture_registration)
 
     def parse(self):
         """Parse the current node"""
@@ -169,7 +171,7 @@ class Geometry(base_classes.BaseNode):
         """Write the geometry definitions to disk. Uses the
         desitnation path of the scene.
 
-        :param filepath: optional output file path 
+        :param filepath: optional output file path
                         (Default value = None)
         :type filepath: str
 
@@ -307,7 +309,8 @@ class Geometry(base_classes.BaseNode):
                     pass
                 continue
 
-            if key in skip: continue
+            if key in skip:
+                continue
 
             metadata[key] = len(self[key])
 
@@ -333,7 +336,7 @@ class Geometry(base_classes.BaseNode):
                 constants.METADATA: self.metadata
             })
         else:
-            if self.options[constants.EMBED_GEOMETRY]:
+            if self.options.get(constants.EMBED_GEOMETRY, True):
                 data[constants.DATA] = {
                     constants.ATTRIBUTES: component_data
                 }
@@ -365,7 +368,7 @@ class Geometry(base_classes.BaseNode):
             if not option:
                 continue
 
-            array = func(self.node, self.options) or []
+            array = func(self.node) or []
             if not array:
                 logger.warning("No array could be made for %s", key)
                 continue
@@ -380,13 +383,11 @@ class Geometry(base_classes.BaseNode):
         """Parse the geometry to Three.Geometry specs"""
         if self.options.get(constants.VERTICES):
             logger.info("Parsing %s", constants.VERTICES)
-            self[constants.VERTICES] = api.mesh.vertices(
-                self.node, self.options) or []
+            self[constants.VERTICES] = api.mesh.vertices(self.node) or []
 
         if self.options.get(constants.NORMALS):
             logger.info("Parsing %s", constants.NORMALS)
-            self[constants.NORMALS] = api.mesh.normals(
-                self.node, self.options) or []
+            self[constants.NORMALS] = api.mesh.normals(self.node) or []
 
         if self.options.get(constants.COLORS):
             logger.info("Parsing %s", constants.COLORS)
@@ -400,8 +401,7 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.UVS):
             logger.info("Parsing %s", constants.UVS)
-            self[constants.UVS] = api.mesh.uvs(
-                self.node, self.options) or []
+            self[constants.UVS] = api.mesh.uvs(self.node) or []
 
         if self.options.get(constants.FACES):
             logger.info("Parsing %s", constants.FACES)
@@ -430,12 +430,12 @@ class Geometry(base_classes.BaseNode):
 
             self[constants.INFLUENCES_PER_VERTEX] = influences
             self[constants.SKIN_INDICES] = api.mesh.skin_indices(
-                self.node, bone_map, influences)
+                self.node, bone_map, influences) or []
             self[constants.SKIN_WEIGHTS] = api.mesh.skin_weights(
-                self.node, bone_map, influences)
+                self.node, bone_map, influences) or []
 
         if self.options.get(constants.MORPH_TARGETS):
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
-                self.node, self.options)
+                self.node, self.options) or []
 

@@ -26,11 +26,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
-	this.noRoll = false;
 
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
-	this.cylindricalRotation = true;
 
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
@@ -49,9 +47,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	_prevState = STATE.NONE,
 
 	_eye = new THREE.Vector3(),
-
-	_rotateStart = new THREE.Vector3(),
-	_rotateEnd = new THREE.Vector3(),
 
 	_movePrev = new THREE.Vector2(),
 	_moveCurr = new THREE.Vector2(),
@@ -141,60 +136,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			vector.set(
 				( ( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ) ),
-				( ( _this.screen.height * 0.5 + _this.screen.top - pageY ) / ( _this.screen.height * 0.5 ) / _this.screen.width * _this.screen.height )
+				( ( _this.screen.height + 2 * ( _this.screen.top - pageY ) ) / _this.screen.width ) // screen.width intentional
 			);
 
 			return vector;
-		};
-
-	}() );
-
-	var getMouseProjectionOnBall = ( function () {
-
-		var vector = new THREE.Vector3();
-		var objectUp = new THREE.Vector3();
-		var mouseOnBall = new THREE.Vector3();
-
-		return function ( pageX, pageY ) {
-
-			mouseOnBall.set(
-				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ),
-				( _this.screen.height * 0.5 + _this.screen.top - pageY ) / ( _this.screen.height * 0.5 ),
-				0.0
-			);
-
-			var length = mouseOnBall.length();
-
-			if ( _this.noRoll ) {
-
-				if ( length < Math.SQRT1_2 ) {
-
-					mouseOnBall.z = Math.sqrt( 1.0 - length * length );
-
-				} else {
-
-					mouseOnBall.z = 0.5 / length;
-
-				}
-
-			} else if ( length > 1.0 ) {
-
-				mouseOnBall.normalize();
-
-			} else {
-
-				mouseOnBall.z = Math.sqrt( 1.0 - length * length );
-
-			}
-
-			_eye.copy( _this.object.position ).sub( _this.target );
-
-			vector.copy( _this.object.up ).setLength( mouseOnBall.y );
-			vector.add( objectUp.copy( _this.object.up ).cross( _eye ).setLength( mouseOnBall.x ) );
-			vector.add( _eye.setLength( mouseOnBall.z ) );
-
-			return vector;
-
 		};
 
 	}() );
@@ -211,79 +156,46 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		return function () {
 
-			if ( _this.cylindricalRotation ) {
+			moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
+			angle = moveDirection.length();
 
-				moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
-				angle = moveDirection.length();
+			if ( angle ) {
 
-				if ( angle ) {
+				_eye.copy( _this.object.position ).sub( _this.target );
 
-					_eye.copy( _this.object.position ).sub( _this.target );
+				eyeDirection.copy( _eye ).normalize();
+				objectUpDirection.copy( _this.object.up ).normalize();
+				objectSidewaysDirection.crossVectors( objectUpDirection, eyeDirection ).normalize();
 
-					eyeDirection.copy( _eye ).normalize();
-					objectUpDirection.copy( _this.object.up ).normalize();
-					objectSidewaysDirection.crossVectors( objectUpDirection, eyeDirection ).normalize();
+				objectUpDirection.setLength( _moveCurr.y - _movePrev.y );
+				objectSidewaysDirection.setLength( _moveCurr.x - _movePrev.x );
 
-					objectUpDirection.setLength( _moveCurr.y - _movePrev.y );
-					objectSidewaysDirection.setLength( _moveCurr.x - _movePrev.x );
+				moveDirection.copy( objectUpDirection.add( objectSidewaysDirection ) );
 
-					moveDirection.copy( objectUpDirection.add( objectSidewaysDirection ) );
+				axis.crossVectors( moveDirection, _eye ).normalize();
 
-					axis.crossVectors( moveDirection, _eye ).normalize();
+				angle *= _this.rotateSpeed;
+				quaternion.setFromAxisAngle( axis, angle );
 
-					angle *= _this.rotateSpeed;
-					quaternion.setFromAxisAngle( axis, angle );
+				_eye.applyQuaternion( quaternion );
+				_this.object.up.applyQuaternion( quaternion );
 
-					_eye.applyQuaternion( quaternion );
-					_this.object.up.applyQuaternion( quaternion );
-
-					_lastAxis.copy( axis );
-					_lastAngle = angle;
-
-				}
-				else if ( !_this.staticMoving && _lastAngle ) {
-
-					_lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
-					_eye.copy( _this.object.position ).sub( _this.target );
-					quaternion.setFromAxisAngle( _lastAxis, _lastAngle );
-					_eye.applyQuaternion( quaternion );
-					_this.object.up.applyQuaternion( quaternion );
-
-				}
-
-				_movePrev.copy( _moveCurr );
-
-			} else {
-
-				angle = Math.acos( _rotateStart.dot( _rotateEnd ) / _rotateStart.length() / _rotateEnd.length() );
-
-				if ( angle ) {
-
-					axis.crossVectors( _rotateStart, _rotateEnd ).normalize();
-
-					angle *= _this.rotateSpeed;
-
-					quaternion.setFromAxisAngle( axis, -angle );
-
-					_eye.applyQuaternion( quaternion );
-					_this.object.up.applyQuaternion( quaternion );
-
-					_rotateEnd.applyQuaternion( quaternion );
-
-					if ( _this.staticMoving ) {
-
-						_rotateStart.copy( _rotateEnd );
-
-					} else {
-
-						quaternion.setFromAxisAngle( axis, angle * ( _this.dynamicDampingFactor - 1.0 ) );
-						_rotateStart.applyQuaternion( quaternion );
-
-					}
-
-				}
+				_lastAxis.copy( axis );
+				_lastAngle = angle;
 
 			}
+
+			else if ( !_this.staticMoving && _lastAngle ) {
+
+				_lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
+				_eye.copy( _this.object.position ).sub( _this.target );
+				quaternion.setFromAxisAngle( _lastAxis, _lastAngle );
+				_eye.applyQuaternion( quaternion );
+				_this.object.up.applyQuaternion( quaternion );
+
+			}
+
+			_movePrev.copy( _moveCurr );
 
 		};
 
@@ -491,17 +403,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			if ( _this.cylindricalRotation ) {
-
-				_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
-				_movePrev.copy(_moveCurr);
-
-			} else {
-
-				_rotateStart.copy( getMouseProjectionOnBall( event.pageX, event.pageY ) );
-				_rotateEnd.copy( _rotateStart );
-
-			}
+			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
+			_movePrev.copy(_moveCurr);
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
@@ -531,16 +434,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			if ( _this.cylindricalRotation ) {
-
-				_movePrev.copy(_moveCurr);
-				_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
-
-			} else {
-
-				_rotateEnd.copy( getMouseProjectionOnBall( event.pageX, event.pageY ) );
-
-			}
+			_movePrev.copy(_moveCurr);
+			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
@@ -602,18 +497,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			case 1:
 				_state = STATE.TOUCH_ROTATE;
-
-				if ( _this.cylindricalRotation ) {
-
-					_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-					_movePrev.copy(_moveCurr);
-
-				} else {
-
-					_rotateStart.copy( getMouseProjectionOnBall( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-					_rotateEnd.copy( _rotateStart );
-
-				}
+				_moveCurr.copy( getMouseOnCircle( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
+				_movePrev.copy(_moveCurr);
 				break;
 
 			case 2:
@@ -647,16 +532,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		switch ( event.touches.length ) {
 
 			case 1:
-				if ( _this.cylindricalRotation ) {
-
-					_movePrev.copy(_moveCurr);
-					_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-
-				} else {
-
-					_rotateEnd.copy( getMouseProjectionOnBall( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-
-				}
+				_movePrev.copy(_moveCurr);
+				_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
 				break;
 
 			case 2:
@@ -683,16 +560,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		switch ( event.touches.length ) {
 
 			case 1:
-				if ( _this.cylindricalRotation ) {
-
-					_movePrev.copy(_moveCurr);
-					_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-
-				} else {
-
-					_rotateEnd.copy( getMouseProjectionOnBall( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
-					_rotateStart.copy( _rotateEnd );
-				}
+				_movePrev.copy(_moveCurr);
+				_moveCurr.copy( getMouseOnCircle(  event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ) );
 				break;
 
 			case 2:

@@ -470,6 +470,9 @@ Editor.prototype = {
 
 		return {
 
+			project: {
+				vr: this.config.getKey( 'project/vr' )
+			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts

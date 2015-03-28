@@ -5,7 +5,7 @@
 THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
 	if ( THREE.FilmShader === undefined )
-		console.error( "THREE.FilmPass relies on THREE.FilmShader" );
+		THREE.error( "THREE.FilmPass relies on THREE.FilmShader" );
 
 	var shader = THREE.FilmShader;
 

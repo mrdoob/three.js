@@ -370,12 +370,6 @@ var Viewport = function ( editor ) {
 
 		transformControls.update();
 
-		if ( object.geometry !== undefined ) {
-
-			selectionBox.update( object );
-
-		}
-
 		if ( object instanceof THREE.PerspectiveCamera ) {
 
 			object.updateProjectionMatrix();

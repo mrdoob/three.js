@@ -179,7 +179,7 @@ def light_map(material):
 
     """
     logger.debug("material.light_map(%s)", material)
-    for texture in _valid_textures(material):
+    for texture in _valid_textures(material, strict_use=False):
         if texture.use_map_color_diffuse and \
         texture.blend_type == MULTIPLY:
             return texture.texture
@@ -370,7 +370,7 @@ def wireframe(material):
     return material.type == WIRE
 
 
-def _valid_textures(material):
+def _valid_textures(material, strict_use=True):
     """
 
     :param material:
@@ -380,7 +380,11 @@ def _valid_textures(material):
     for texture in material.texture_slots:
         if not texture:
             continue
-        if texture.texture.type != IMAGE:
+        if strict_use:
+            in_use = texture.use
+        else:
+            in_use = True
+        if texture.texture.type != IMAGE or not in_use:
             continue
         logger.debug("Valid texture found %s", texture)
         yield texture

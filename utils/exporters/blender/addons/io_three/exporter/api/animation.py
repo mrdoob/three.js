@@ -1,6 +1,11 @@
+"""
+Module for handling the parsing of skeletal animation data.
+"""
+
+import math
 import mathutils
 from bpy import data, context
-from .. import constants, logger, utilities
+from .. import constants, logger
 
 
 def pose_animation(armature, options):
@@ -41,22 +46,19 @@ def _parse_action(func, armature, options):
     """
     animations = []
     logger.info("Parsing %d actions", len(data.actions))
-    round_off, round_val = utilities.rounding(options)
     for action in data.actions:
         logger.info("Parsing action %s", action.name)
-        animation = func(action, armature, options, round_off, round_val)
+        animation = func(action, armature, options)
         animations.append(animation)
     return animations
 
 
-def _parse_rest_action(action, armature, options, round_off, round_val):
+def _parse_rest_action(action, armature, options):
     """
 
     :param action:
     :param armature:
     :param options:
-    :param round_off:
-    :param round_val:
 
     """
     end_frame = action.frame_range[1]
@@ -88,20 +90,15 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
                                      action, armature.matrix_world)
             rot, rchange = _rotation(bone, computed_frame,
                                      action, rotation_matrix)
+            rot = _normalize_quaternion(rot)
 
-            if round_off:
-                pos_x, pos_y, pos_z = utilities.round_off(
-                    [pos.x, pos.z, -pos.y], round_val)
-                rot_x, rot_y, rot_z, rot_w = utilities.round_off(
-                    [rot.x, rot.z, -rot.y, rot.w], round_val)
-            else:
-                pos_x, pos_y, pos_z = pos.x, pos.z, -pos.y
-                rot_x, rot_y, rot_z, rot_w = rot.x, rot.z, -rot.y, rot.w
+            pos_x, pos_y, pos_z = pos.x, pos.z, -pos.y
+            rot_x, rot_y, rot_z, rot_w = rot.x, rot.z, -rot.y, rot.w
 
             if frame == start_frame:
 
                 time = (frame * frame_step - start_frame) / fps
-                #@TODO: missing scale values
+                # @TODO: missing scale values
                 keyframe = {
                     constants.TIME: time,
                     constants.POS: [pos_x, pos_y, pos_z],
@@ -127,22 +124,22 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
             # MIDDLE-FRAME: needs only one of the attributes,
             # can be an empty frame (optional frame)
 
-            elif pchange == True or rchange == True:
+            elif pchange is True or rchange is True:
 
                 time = (frame * frame_step - start_frame) / fps
 
-                if pchange == True and rchange == True:
+                if pchange is True and rchange is True:
                     keyframe = {
                         constants.TIME: time,
                         constants.POS: [pos_x, pos_y, pos_z],
                         constants.ROT: [rot_x, rot_y, rot_z, rot_w]
                     }
-                elif pchange == True:
+                elif pchange is True:
                     keyframe = {
                         constants.TIME: time,
                         constants.POS: [pos_x, pos_y, pos_z]
                     }
-                elif rchange == True:
+                elif rchange is True:
                     keyframe = {
                         constants.TIME: time,
                         constants.ROT: [rot_x, rot_y, rot_z, rot_w]
@@ -158,7 +155,7 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
 
     animation = {
         constants.HIERARCHY: hierarchy,
-        constants.LENGTH:frame_length / fps,
+        constants.LENGTH: frame_length / fps,
         constants.FPS: fps,
         constants.NAME: action.name
     }
@@ -166,20 +163,18 @@ def _parse_rest_action(action, armature, options, round_off, round_val):
     return animation
 
 
-def _parse_pose_action(action, armature, options, round_off, round_val):
+def _parse_pose_action(action, armature, options):
     """
 
     :param action:
     :param armature:
     :param options:
-    :param round_off:
-    :param round_val:
 
     """
-    #@TODO: this seems to fail in batch mode meaning the
-    #       user has to have th GUI open. need to improve
-    #       this logic to allow batch processing, if Blender
-    #       chooses to behave....
+    # @TODO: this seems to fail in batch mode meaning the
+    #        user has to have th GUI open. need to improve
+    #        this logic to allow batch processing, if Blender
+    #        chooses to behave....
     current_context = context.area.type
     context.area.type = 'DOPESHEET_EDITOR'
     context.space_data.mode = 'ACTION'
@@ -274,6 +269,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
                 bone_matrix = parent_matrix.inverted() * bone_matrix
 
             pos, rot, scl = bone_matrix.decompose()
+            rot = _normalize_quaternion(rot)
 
             pchange = True or has_keyframe_at(
                 channels_location[bone_index], frame)
@@ -282,27 +278,9 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
             schange = True or has_keyframe_at(
                 channels_scale[bone_index], frame)
 
-            if round_off:
-                pos = (
-                    utilities.round_off(pos.x, round_val),
-                    utilities.round_off(pos.z, round_val),
-                    -utilities.round_off(pos.y, round_val)
-                )
-                rot = (
-                    utilities.round_off(rot.x, round_val),
-                    utilities.round_off(rot.z, round_val),
-                    -utilities.round_off(rot.y, round_val),
-                    utilities.round_off(rot.w, round_val)
-                )
-                scl = (
-                    utilities.round_off(scl.x, round_val),
-                    utilities.round_off(scl.z, round_val),
-                    utilities.round_off(scl.y, round_val)
-                )
-            else:
-                pos = (pos.x, pos.z, -pos.y)
-                rot = (rot.x, rot.z, -rot.y, rot.w)
-                scl = (scl.x, scl.z, scl.y)
+            pos = (pos.x, pos.z, -pos.y)
+            rot = (rot.x, rot.z, -rot.y, rot.w)
+            scl = (scl.x, scl.z, scl.y)
 
             keyframe = {constants.TIME: time}
             if frame == start_frame or frame == end_frame:
@@ -346,7 +324,7 @@ def _parse_pose_action(action, armature, options, round_off, round_val):
 
     animation = {
         constants.HIERARCHY: hierarchy,
-        constants.LENGTH:frame_length,
+        constants.LENGTH: frame_length,
         constants.FPS: fps,
         constants.NAME: action.name
     }
@@ -370,7 +348,7 @@ def _find_channels(action, bone, channel_type):
         for index, group in enumerate(action.groups):
             if group.name == bone.name:
                 group_index = index
-                #@TODO: break?
+                # @TODO: break?
 
         if group_index > -1:
             for channel in action.groups[group_index].channels:
@@ -423,8 +401,7 @@ def _position(bone, frame, action, armature_matrix):
 
         for channel in action.fcurves:
             data_path = channel.data_path
-            if bone_label in data_path and \
-            "location" in data_path:
+            if bone_label in data_path and "location" in data_path:
                 has_changed = _handle_position_channel(
                     channel, frame, position)
                 change = change or has_changed
@@ -494,8 +471,7 @@ def _rotation(bone, frame, action, armature_matrix):
 
         for channel in action.fcurves:
             data_path = channel.data_path
-            if bone_label in data_path and \
-            "quaternion" in data_path:
+            if bone_label in data_path and "quaternion" in data_path:
                 has_changed = _handle_rotation_channel(
                     channel, frame, rotation)
                 change = change or has_changed
@@ -569,3 +545,33 @@ def _handle_position_channel(channel, frame, position):
             position.z = value
 
     return change
+
+
+def _quaternion_length(quat):
+    """Calculate the length of a quaternion
+
+    :param quat: Blender quaternion object
+    :rtype: float
+
+    """
+    return math.sqrt(quat.x * quat.x + quat.y * quat.y +
+                     quat.z * quat.z + quat.w * quat.w)
+
+
+def _normalize_quaternion(quat):
+    """Normalize a quaternion
+
+    :param quat: Blender quaternion object
+    :returns: generic quaternion enum object with normalized values
+    :rtype: object
+
+    """
+    enum = type('Enum', (), {'x': 0, 'y': 0, 'z': 0, 'w': 1})
+    length = _quaternion_length(quat)
+    if length is not 0:
+        length = 1 / length
+        enum.x = quat.x * length
+        enum.y = quat.y * length
+        enum.z = quat.z * length
+        enum.w = quat.w * length
+    return enum
