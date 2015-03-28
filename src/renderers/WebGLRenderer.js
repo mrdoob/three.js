@@ -14,8 +14,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
-	_width = canvas.width,
-	_height = canvas.height,
+	_width = _canvas.width,
+	_height = _canvas.height,
 
 	pixelRatio = 1,
 
