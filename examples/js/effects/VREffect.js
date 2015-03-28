@@ -156,11 +156,9 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 		// VR Mode enabled
 		this._canvasOriginalSize = {
-			width: renderer.domElement.width,
-			height: renderer.domElement.height
+			width: renderer.domElement.width / renderer.getPixelRatio(),
+			height: renderer.domElement.height / renderer.getPixelRatio()
 		};
-		// Hardcoded Rift display size
-		renderer.setSize( 1280, 800, false );
 		this.startFullscreen();
 	};
 
