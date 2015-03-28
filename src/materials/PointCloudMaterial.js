@@ -65,7 +65,7 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshDepthMaterial.prototype.toJSON = function () {
+THREE.PointCloudMaterial.prototype.toJSON = function () {
 
 	var data = THREE.Material.prototype.toJSON.call( this );
 

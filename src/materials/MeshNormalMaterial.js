@@ -45,7 +45,7 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshPhongMaterial.prototype.toJSON = function () {
+THREE.MeshNormalMaterial.prototype.toJSON = function () {
 
 	var data = THREE.Material.prototype.toJSON.call( this );
 
