@@ -846,7 +846,7 @@ THREE.SceneExporter.prototype = {
 			'}'
 		].join( '\n' );
 
-		return (options.toObject === false) ? output : JSON.stringify(output);
+		return (options.toObject === false) ? output : JSON.parse(output);
 
 	}
 
