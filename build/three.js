@@ -7371,12 +7371,10 @@ THREE.EventDispatcher.prototype = {
 
 		setFromCamera: function ( coords, camera ) {
 
-			// camera is assumed _not_ to be a child of a transformed object
-
 			if ( camera instanceof THREE.PerspectiveCamera ) {
 
-				this.ray.origin.copy( camera.position );
-				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
+				this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
+				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
 			} else if ( camera instanceof THREE.OrthographicCamera ) {
 
@@ -12643,6 +12641,7 @@ THREE.MaterialLoader.prototype = {
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
+		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 
 		// for PointCloudMaterial
 		if ( json.size !== undefined ) material.size = json.size;
@@ -18046,6 +18045,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
+	_width = _canvas.width,
+	_height = _canvas.height,
+
 	pixelRatio = 1,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
@@ -18499,7 +18501,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getSize = function () {
+
+		return {
+			width: _width,
+			height: _height
+		};
+
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
+
+		_width = width;
+		_height = height;
 
 		_canvas.width = width * pixelRatio;
 		_canvas.height = height * pixelRatio;
@@ -23621,7 +23635,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		texture.needsUpdate = false;
 
-		if ( texture.onUpdate ) texture.onUpdate();
+		if ( texture.onUpdate ) texture.onUpdate( texture );
 
 	};
 
@@ -23775,7 +23789,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				texture.needsUpdate = false;
 
-				if ( texture.onUpdate ) texture.onUpdate();
+				if ( texture.onUpdate ) texture.onUpdate( texture );
 
 			} else {
 
