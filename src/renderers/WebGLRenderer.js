@@ -14,6 +14,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	_context = parameters.context !== undefined ? parameters.context : null,
 
+	_width = canvas.width,
+	_height = canvas.height,
+
 	pixelRatio = 1,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
@@ -467,7 +470,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getSize = function () {
+
+		return {
+			width: _width,
+			height: _height
+		};
+
+	};
+
 	this.setSize = function ( width, height, updateStyle ) {
+
+		_width = width;
+		_height = height;
 
 		_canvas.width = width * pixelRatio;
 		_canvas.height = height * pixelRatio;
