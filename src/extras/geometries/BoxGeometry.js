@@ -125,3 +125,5 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
+
+THREE.CubeGeometry = THREE.BoxGeometry; // backwards compatibility

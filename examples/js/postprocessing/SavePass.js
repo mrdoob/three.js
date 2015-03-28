@@ -5,7 +5,7 @@
 THREE.SavePass = function ( renderTarget ) {
 
 	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.SavePass relies on THREE.CopyShader" );
+		THREE.error( "THREE.SavePass relies on THREE.CopyShader" );
 
 	var shader = THREE.CopyShader;
 

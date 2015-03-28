@@ -60,6 +60,7 @@ SKIN_WEIGHTS = 'skinWeights'
 LOGGING = 'logging'
 CAMERAS = 'cameras'
 LIGHTS = 'lights'
+HIERARCHY = 'hierarchy'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
 COPY_TEXTURES = 'copyTextures'
@@ -110,6 +111,7 @@ EXPORT_OPTIONS = {
     MORPH_TARGETS: False,
     CAMERAS: False,
     LIGHTS: False,
+    HIERARCHY: False,
     COPY_TEXTURES: True,
     TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
@@ -160,6 +162,7 @@ POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
 MESH = 'Mesh'
+EMPTY = 'Empty'
 SPRITE = 'Sprite'
 
 DEFAULT_METADATA = {
@@ -326,3 +329,4 @@ DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee,
 
 DOUBLE_SIDED = 'doubleSided'
 
+EXPORT_SETTINGS_KEY = 'threeExportSettings'
