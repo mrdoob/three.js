@@ -31,7 +31,7 @@ THREE.VREffect = function ( renderer, done ) {
 		var self = this;
 		if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
 			if ( done ) {
-				done("Your browser is not VR Ready");
+				done( 'Your browser is not VR Ready' );
 			}
 			return;
 		}
@@ -42,8 +42,7 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 		function gotVRDevices( devices ) {
 			var vrHMD;
-			var error;
-			for ( var i = 0; i < devices.length; ++ i ) {
+			for ( var i = 0; i < devices.length; i ++ ) {
 				if ( devices[i] instanceof HMDVRDevice ) {
 					vrHMD = devices[i];
 					self._vrHMD = vrHMD;
@@ -56,9 +55,8 @@ THREE.VREffect = function ( renderer, done ) {
 			}
 			if ( done ) {
 				if ( !vrHMD ) {
-					error = 'HMD not available';
+					done( 'HMD not available' );
 				}
-				done( error );
 			}
 		}
 	};
