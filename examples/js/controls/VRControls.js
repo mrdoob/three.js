@@ -71,7 +71,11 @@ THREE.VRControls = function ( object, callback ) {
 
 		if ( vrInput === undefined ) return;
 
-		vrInput.zeroSensor();
+		if ( 'resetSensor' in vrInput) {
+			vrInput.resetSensor();
+		} else if ( 'zeroSensor' in vrInput) {
+			vrInput.zeroSensor();
+		}
 
 	};
 

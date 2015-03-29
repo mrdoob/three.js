@@ -47,10 +47,23 @@ THREE.VREffect = function ( renderer, done ) {
 				if ( devices[i] instanceof HMDVRDevice ) {
 					vrHMD = devices[i];
 					self._vrHMD = vrHMD;
-					self.leftEyeTranslation = vrHMD.getEyeTranslation( "left" );
-					self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
-					self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
-					self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
+
+					if ( 'getEyeParameters' in vrHMD ) {
+						var leftEyeParams = vrHMD.getEyeParameters( "left" );
+						var rightEyeParams = vrHMD.getEyeParameters( "right" );
+						self.leftEyeTranslation = leftEyeParams.eyeTranslation;
+						self.rightEyeTranslation = rightEyeParams.eyeTranslation;
+						self.leftEyeFOV = leftEyeParams.recommendedFieldOfView;
+						self.rightEyeFOV = rightEyeParams.recommendedFieldOfView;
+					} else {
+						// TODO: This is an older code path and not spec compliant.
+						// It should be removed at some point in the near future.
+						self.leftEyeTranslation = vrHMD.getEyeTranslation( "left" );
+						self.rightEyeTranslation = vrHMD.getEyeTranslation( "right" );
+						self.leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "left" );
+						self.rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( "right" );
+					}
+					
 					break; // We keep the first we encounter
 				}
 			}
