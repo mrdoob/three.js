@@ -258,6 +258,183 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+
+	fromGeometryIndexed: function ( geometry, settings ) {
+
+	    settings = settings || { 'vertexColors': THREE.NoColors };
+
+	    var vertices = geometry.vertices;
+	    var faces = geometry.faces;
+	    var faceVertexUvs = geometry.faceVertexUvs;
+	    var vertexColors = settings.vertexColors;
+	    var hasFaceVertexUv = faceVertexUvs[0].length > 0;
+	    var hasFaceVertexNormals = faces[0].vertexNormals.length == 3;
+
+	    var maxVertex = 0;
+
+	    for ( var i = 0, i2 = 0, i3 = 0; i < faces.length; i++, i2 += 6, i3 += 9 ) {
+
+	        var face = faces[i];
+	        maxVertex = maxVertex < face.a ? face.a : maxVertex;
+	        maxVertex = maxVertex < face.b ? face.b : maxVertex;
+	        maxVertex = maxVertex < face.c ? face.c : maxVertex;
+
+	    }
+	    maxVertex += 1;
+
+	    var indices = new Uint16Array( faces.length * 3 );
+	    this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+
+	    var positions = new Float32Array( maxVertex * 3 );
+	    this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+	    var normals = new Float32Array( maxVertex * 3 );
+	    this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+
+	    if ( vertexColors !== THREE.NoColors ) {
+
+	        var colors = new Float32Array( maxVertex * 3 );
+	        this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
+	    }
+
+	    if ( hasFaceVertexUv === true ) {
+
+	        var uvs = new Float32Array( maxVertex * 2 );
+	        this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+	    }
+
+	    for ( var i = 0, i2 = 0, i3 = 0; i < faces.length; i++, i2 += 6, i3 += 9 ) {
+
+	        var face = faces[i];
+            var index = i * 3;
+
+            indices[index] = face.a;
+            indices[index + 1] = face.b;
+            indices[index + 2] = face.c;
+
+	        var a = vertices[face.a];
+	        var b = vertices[face.b];
+	        var c = vertices[face.c];
+            
+	        var vA = face.a * 3;
+	        var vB = face.b * 3;
+	        var vC = face.c * 3;
+
+	        positions[vA] = a.x;
+	        positions[vA + 1] = a.y;
+	        positions[vA + 2] = a.z;
+
+	        positions[vB] = b.x;
+	        positions[vB + 1] = b.y;
+	        positions[vB + 2] = b.z;
+
+	        positions[vC] = c.x;
+	        positions[vC + 1] = c.y;
+	        positions[vC + 2] = c.z;
+
+	        if ( hasFaceVertexNormals === true ) {
+
+	            var na = face.vertexNormals[0];
+	            var nb = face.vertexNormals[1];
+	            var nc = face.vertexNormals[2];
+
+	            normals[vA] = na.x;
+	            normals[vA + 1] = na.y;
+	            normals[vA + 2] = na.z;
+
+	            normals[vB] = nb.x;
+	            normals[vB + 1] = nb.y;
+	            normals[vB + 2] = nb.z;
+
+	            normals[vC] = nc.x;
+	            normals[vC + 1] = nc.y;
+	            normals[vC + 2] = nc.z;
+
+	        } else {
+
+	            var n = face.normal;
+
+	            normals[vA] = n.x;
+	            normals[vA + 1] = n.y;
+	            normals[vA + 2] = n.z;
+
+	            normals[vB] = n.x;
+	            normals[vB + 1] = n.y;
+	            normals[vB + 2] = n.z;
+
+	            normals[vC] = n.x;
+	            normals[vC + 1] = n.y;
+	            normals[vC + 2] = n.z;
+
+	        }
+
+	        if ( vertexColors === THREE.FaceColors ) {
+
+	            var fc = face.color;
+
+	            colors[vA] = fc.r;
+	            colors[vA + 1] = fc.g;
+	            colors[vA + 2] = fc.b;
+
+	            colors[vB] = fc.r;
+	            colors[vB + 1] = fc.g;
+	            colors[vB + 2] = fc.b;
+
+	            colors[vC] = fc.r;
+	            colors[vC + 1] = fc.g;
+	            colors[vC + 2] = fc.b;
+
+	        } else if ( vertexColors === THREE.VertexColors ) {
+
+	            var vca = face.vertexColors[0];
+	            var vcb = face.vertexColors[1];
+	            var vcc = face.vertexColors[2];
+
+	            colors[vA] = vca.r;
+	            colors[vA + 1] = vca.g;
+	            colors[vA + 2] = vca.b;
+
+	            colors[vB] = vcb.r;
+	            colors[vB + 1] = vcb.g;
+	            colors[vB + 2] = vcb.b;
+
+	            colors[vC] = vcc.r;
+	            colors[vC + 1] = vcc.g;
+	            colors[vC + 2] = vcc.b;
+
+	        }
+
+	        if ( hasFaceVertexUv === true ) {
+
+	            var vA = face.a * 2;
+	            var vB = face.b * 2;
+	            var vC = face.c * 2;
+
+	            var uva = faceVertexUvs[0][i][0];
+	            var uvb = faceVertexUvs[0][i][1];
+	            var uvc = faceVertexUvs[0][i][2];
+
+	            uvs[vA] = uva.x;
+	            uvs[vA + 1] = uva.y;
+
+	            uvs[vB] = uvb.x;
+	            uvs[vB + 1] = uvb.y;
+
+	            uvs[vC] = uvc.x;
+	            uvs[vC + 1] = uvc.y;
+
+	        }
+
+	    }
+
+	    this.computeBoundingSphere()
+
+	    return this;
+
+	},
+
 	computeBoundingBox: function () {
 
 		var vector = new THREE.Vector3();
