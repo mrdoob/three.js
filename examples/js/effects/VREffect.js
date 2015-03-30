@@ -21,11 +21,11 @@
  * https://drive.google.com/a/google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
  *
  */
-THREE.VREffect = function ( renderer, done ) {
+THREE.VREffect = function ( renderer, callback ) {
 
 	if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
 
-		if ( done ) done( 'Your browser is not VR Ready' );
+		if ( callback ) callback( 'Your browser is not VR Ready' );
 
 	}
 
@@ -72,7 +72,7 @@ THREE.VREffect = function ( renderer, done ) {
 
 		if ( vrHMD === undefined ) {
 
-			if ( done ) done( 'HMD not available' );
+			if ( callback ) callback( 'HMD not available' );
 
 		}
 
@@ -82,13 +82,11 @@ THREE.VREffect = function ( renderer, done ) {
 
 		navigator.getVRDevices().then( gotVRDevices );
 
-	} else if ( navigator.mozGetVRDevices ) {
-
-		navigator.mozGetVRDevices( gotVRDevices );
-
 	}
 
 	//
+
+	this.scale = 1;
 
 	this.setSize = function( width, height ) {
 
@@ -165,8 +163,8 @@ THREE.VREffect = function ( renderer, done ) {
 			camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
 			camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
 
-			cameraLeft.translateX( leftEyeTranslation.x );
-			cameraRight.translateX( rightEyeTranslation.x );
+			cameraLeft.translateX( leftEyeTranslation.x * this.scale );
+			cameraRight.translateX( rightEyeTranslation.x * this.scale );
 
 			// render left eye
 			renderer.setViewport( 0, 0, size.width, size.height );
