@@ -69,7 +69,14 @@ THREE.CSS3DRenderer = function () {
 
 	domElement.appendChild( cameraElement );
 
-	this.setClearColor = function () {
+	this.setClearColor = function () {};
+
+	this.getSize = function() {
+
+		return {
+			width: _width,
+			height: _height
+		};
 
 	};
 
@@ -87,15 +94,6 @@ THREE.CSS3DRenderer = function () {
 		cameraElement.style.width = width + 'px';
 		cameraElement.style.height = height + 'px';
 
-	};
-	
-	/**
-	 * Returns the renderers pixel size as descriptive object
-	 * 
-	 * @returns {Object} The size object with keys 'width' and 'height'
-	 */
-	this.getSize = function() {
-		return {width: _width, height: _height};
 	};
 
 	var epsilon = function ( value ) {
