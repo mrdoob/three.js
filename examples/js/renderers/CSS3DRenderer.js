@@ -88,6 +88,15 @@ THREE.CSS3DRenderer = function () {
 		cameraElement.style.height = height + 'px';
 
 	};
+	
+	/**
+	 * Returns the renderers pixel size as descriptive object
+	 * 
+	 * @returns {Object} The size object with keys 'width' and 'height'
+	 */
+	this.getSize = function() {
+		return {width: _width, height: _height};
+	};
 
 	var epsilon = function ( value ) {
 
