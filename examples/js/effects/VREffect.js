@@ -126,24 +126,24 @@ THREE.VREffect = function ( renderer, callback ) {
 
 	// render
 
-	var cameraLeft = new THREE.PerspectiveCamera();
-	var cameraRight = new THREE.PerspectiveCamera();
+	var cameraL = new THREE.PerspectiveCamera();
+	var cameraR = new THREE.PerspectiveCamera();
 
 	this.render = function ( scene, camera ) {
 
 		if ( vrHMD ) {
 
-			var sceneLeft, sceneRight;
+			var sceneL, sceneR;
 
 			if ( scene instanceof Array ) {
 
-				sceneLeft = scene[ 0 ];
-				sceneRight = scene[ 1 ];
+				sceneL = scene[ 0 ];
+				sceneR = scene[ 1 ];
 
 			} else {
 
-				sceneLeft = scene;
-				sceneRight = scene;
+				sceneL = scene;
+				sceneR = scene;
 
 			}
 
@@ -157,24 +157,24 @@ THREE.VREffect = function ( renderer, callback ) {
 				camera.updateMatrixWorld();
 			}
 
-			cameraLeft.projectionMatrix = fovToProjection( leftEyeFOV, true, camera.near, camera.far );
-			cameraRight.projectionMatrix = fovToProjection( rightEyeFOV, true, camera.near, camera.far );
+			cameraL.projectionMatrix = fovToProjection( leftEyeFOV, true, camera.near, camera.far );
+			cameraR.projectionMatrix = fovToProjection( rightEyeFOV, true, camera.near, camera.far );
 
-			camera.matrixWorld.decompose( cameraLeft.position, cameraLeft.quaternion, cameraLeft.scale );
-			camera.matrixWorld.decompose( cameraRight.position, cameraRight.quaternion, cameraRight.scale );
+			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
+			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
 
-			cameraLeft.translateX( leftEyeTranslation.x * this.scale );
-			cameraRight.translateX( rightEyeTranslation.x * this.scale );
+			cameraL.translateX( leftEyeTranslation.x * this.scale );
+			cameraR.translateX( rightEyeTranslation.x * this.scale );
 
 			// render left eye
 			renderer.setViewport( 0, 0, size.width, size.height );
 			renderer.setScissor( 0, 0, size.width, size.height );
-			renderer.render( sceneLeft, cameraLeft );
+			renderer.render( sceneL, cameraL );
 
 			// render right eye
 			renderer.setViewport( size.width, 0, size.width, size.height );
 			renderer.setScissor( size.width, 0, size.width, size.height );
-			renderer.render( sceneRight, cameraRight );
+			renderer.render( sceneR, cameraR );
 
 			renderer.enableScissorTest( false );
 
