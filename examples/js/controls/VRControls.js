@@ -77,13 +77,15 @@ THREE.VRControls = function ( object, callback ) {
 
 			var vrInput = vrInputs[ i ];
 
-		if ( vrInput.resetSensor !== undefined ) {
+			if ( vrInput.resetSensor !== undefined ) {
 
-			vrInput.resetSensor();
+				vrInput.resetSensor();
 
-		} else if ( vrInput.zeroSensor !== undefined ) {
+			} else if ( vrInput.zeroSensor !== undefined ) {
 
-			vrInput.zeroSensor();
+				vrInput.zeroSensor();
+
+			}
 
 		}
 
