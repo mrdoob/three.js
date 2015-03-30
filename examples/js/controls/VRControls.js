@@ -71,15 +71,28 @@ THREE.VRControls = function ( object, callback ) {
 
 	};
 
-	this.zeroSensor = function () {
+	this.resetSensor = function () {
 
 		for ( var i = 0; i < vrInputs.length; i++ ) {
 
 			var vrInput = vrInputs[ i ];
 
+		if ( vrInput.resetSensor !== undefined ) {
+
+			vrInput.resetSensor();
+
+		} else if ( vrInput.zeroSensor !== undefined ) {
+
 			vrInput.zeroSensor();
 
 		}
+
+	};
+
+	this.zeroSensor = function () {
+
+		THREE.warn( 'THREE.VRControls: .zeroSensor() is now .resetSensor().' );
+		this.resetSensor();
 
 	};
 
