@@ -45,6 +45,7 @@
 	"src/extras/geometries/OctahedronGeometry.js",
 	"src/extras/geometries/TetrahedronGeometry.js",
 	"src/extras/geometries/ParametricGeometry.js",
+	"src/extras/geometries/WireframeGeometry.js",
 	"src/extras/helpers/AxisHelper.js",
 	"src/extras/helpers/ArrowHelper.js",
 	"src/extras/helpers/BoxHelper.js",
