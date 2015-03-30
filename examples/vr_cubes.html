@@ -43,12 +43,10 @@
 	</head>
 	<body>
 		<div class="menu">
-			<div class="button mouse-look">Enable Mouse Look</div>
 			<div class="button full-screen">Start VR Mode</div>
 		</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/controls/MouseControls.js"></script>
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -59,8 +57,6 @@
 			var camera, scene, raycaster, renderer;
 			var vrEffect;
 			var vrControls;
-			var mouseControls;
-			var headControls;
 
 			var mouse = new THREE.Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
@@ -117,30 +113,14 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				var fullScreenButton = document.querySelector( '.full-screen' );
-				var mouseLookButton = document.querySelector( '.mouse-look' );
-				var mouseLook = false;
 
 				fullScreenButton.onclick = function() {
 					vrEffect.setFullScreen( true );
 				};
 
 				vrControls = new THREE.VRControls(camera);
-				mouseControls = new THREE.MouseControls(camera);
-				headControls = vrControls;
-
-				mouseLookButton.onclick = function() {
-					mouseLook = !mouseLook;
-
-					if (mouseLook) {
-						headControls = mouseControls;
-						mouseLookButton.classList.add('enabled');
-					} else {
-						headControls = vrControls;
-						mouseLookButton.classList.remove('enabled');
-					}
-				}
-
 				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
+
 				function VREffectLoaded(error) {
 					if (error) {
 						fullScreenButton.innerHTML = error;
@@ -232,7 +212,7 @@
 
 				}
 
-				headControls.update();
+				vrControls.update();
 				vrEffect.render( scene, camera );
 
 			}
