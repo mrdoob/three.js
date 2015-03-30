@@ -21,15 +21,7 @@
  * https://drive.google.com/a/google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&usp=sharing#list
  *
  */
-THREE.VREffect = function ( renderer, callback ) {
-
-	if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
-
-		if ( callback ) callback( 'Your browser is not VR Ready' );
-
-	}
-
-	// init
+THREE.VREffect = function ( renderer, onError ) {
 
 	var vrHMD;
 	var leftEyeTranslation, leftEyeFOV;
@@ -72,7 +64,7 @@ THREE.VREffect = function ( renderer, callback ) {
 
 		if ( vrHMD === undefined ) {
 
-			if ( callback ) callback( 'HMD not available' );
+			if ( onError ) onError( 'HMD not available' );
 
 		}
 

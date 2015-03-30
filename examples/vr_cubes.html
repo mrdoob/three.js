@@ -114,19 +114,24 @@
 
 				var fullScreenButton = document.querySelector( '.full-screen' );
 
+				if ( navigator.getVRDevices === undefined ) {
+
+					fullScreenButton.innerHTML = 'Your browser doesn\'t support WebVR';
+					fullScreenButton.classList.add('error');
+
+				}
+
+				vrControls = new THREE.VRControls( camera );
+				vrEffect = new THREE.VREffect( renderer, function ( error ) {
+
+					fullScreenButton.innerHTML = error;
+					fullScreenButton.classList.add('error');
+
+				} );
+
 				fullScreenButton.onclick = function() {
 					vrEffect.setFullScreen( true );
 				};
-
-				vrControls = new THREE.VRControls(camera);
-				vrEffect = new THREE.VREffect(renderer, VREffectLoaded);
-
-				function VREffectLoaded(error) {
-					if (error) {
-						fullScreenButton.innerHTML = error;
-						fullScreenButton.classList.add('error');
-					}
-				}
 
 				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
