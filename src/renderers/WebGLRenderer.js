@@ -481,6 +481,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		this.setViewport( 0, 0, width, height );
 
 	};
+	
+	
+	/**
+	 * Returns the renderers pixel size as descriptive object
+	 * 
+	 * @returns {Object} The size object with keys 'width' and 'height'
+	 */
+	this.getSize = function() {
+		var pixelRatio = this.getPixelRatio || 0;
+		var width = (pixelRatio !== 0) ? _canvas.width / pixelRatio : undefined;
+		var height = (pixelRatio !== 0) ? _canvas.height / pixelRatio : undefined;
+		return {width: width, height: height};
+	};
 
 	this.setViewport = function ( x, y, width, height ) {
 
