@@ -1,8 +1,9 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObjectsImmediate ) {
+THREE.WebGLShadowMap = function ( _renderer, _lights, _webglObjects, _webglObjectsImmediate ) {
 
 	var _gl = _renderer.context;
 

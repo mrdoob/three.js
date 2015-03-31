@@ -65,14 +65,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
-	// shadow map
-
-	this.shadowMapEnabled = false;
-	this.shadowMapType = THREE.PCFShadowMap;
-	this.shadowMapCullFace = THREE.CullFaceFront;
-	this.shadowMapDebug = false;
-	this.shadowMapCascade = false;
-
 	// morphs
 
 	this.maxMorphTargets = 8;
@@ -290,6 +282,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.extensions = extensions;
 	this.state = state;
 
+	// shadow map
+
+	this.shadowMap = new THREE.WebGLShadowMap( this, lights, _webglObjects, _webglObjectsImmediate );
+	this.shadowMapEnabled = false;
+	this.shadowMapType = THREE.PCFShadowMap;
+	this.shadowMapCullFace = THREE.CullFaceFront;
+	this.shadowMapDebug = false;
+	this.shadowMapCascade = false;
+
 	// GPU capabilities
 
 	var _maxTextures = _gl.getParameter( _gl.MAX_TEXTURE_IMAGE_UNITS );
@@ -369,8 +370,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Plugins
-
-	var shadowMapPlugin = new THREE.ShadowMapPlugin( this, lights, _webglObjects, _webglObjectsImmediate );
 
 	var spritePlugin = new THREE.SpritePlugin( this, sprites );
 	var lensFlarePlugin = new THREE.LensFlarePlugin( this, lensFlares );
@@ -1889,9 +1888,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// custom render plugins (pre pass)
+		//
 
-		shadowMapPlugin.render( scene, camera );
+		this.shadowMap.render( scene, camera );
 
 		//
 
