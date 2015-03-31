@@ -285,7 +285,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// shadow map
 
 	var shadowMap = new THREE.WebGLShadowMap( this, lights, _webglObjects, _webglObjectsImmediate );
-
+	
 	this.shadowMap = shadowMap;
 
 	// GPU capabilities
@@ -4780,47 +4780,47 @@ THREE.WebGLRenderer = function ( parameters ) {
 	Object.defineProperties( this, {
 		shadowMapEnabled: {
 			get: function () {
-				return this.shadowMap.enabled;
+				return shadowMap.enabled;
 			},
 			set: function ( value ) {
 				THREE.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
-				this.shadowMap.enabled = value;
+				shadowMap.enabled = value;
 			}
 		},
 		shadowMapType: {
 			get: function () {
-				return this.shadowMap.type;
+				return shadowMap.type;
 			},
 			set: function ( value ) {
 				THREE.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
-				this.shadowMap.type = value;
+				shadowMap.type = value;
 			}
 		},
 		shadowMapCullFace: {
 			get: function () {
-				return this.shadowMap.cullFace;
+				return shadowMap.cullFace;
 			},
 			set: function ( value ) {
 				THREE.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
-				this.shadowMap.cullFace = value;
+				shadowMap.cullFace = value;
 			}
 		},
 		shadowMapDebug: {
 			get: function () {
-				return this.shadowMap.debug;
+				return shadowMap.debug;
 			},
 			set: function ( value ) {
 				THREE.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
-				this.shadowMap.debug = value;
+				shadowMap.debug = value;
 			}
 		},
 		shadowMapCascade: {
 			get: function () {
-				return this.shadowMap.cascade;
+				return shadowMap.cascade;
 			},
 			set: function ( value ) {
 				THREE.warn( 'THREE.WebGLRenderer: .shadowMapCascade is now .shadowMap.cascade.' );
-				this.shadowMap.cascade = value;
+				shadowMap.cascade = value;
 			}
 		}
 	} );
