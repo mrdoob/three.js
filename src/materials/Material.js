@@ -269,12 +269,12 @@ THREE.Material.prototype = {
 
 	},
 
-	refreshUniformsParticle: function ( uniforms ) {
+	refreshUniformsParticle: function ( uniforms, option ) {
 
         uniforms.psColor.value = this.color;
         uniforms.opacity.value = this.opacity;
         uniforms.size.value = this.size;
-        uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
+        uniforms.scale.value = option.canvas.height / 2.0; // TODO: Cache this.
 
         uniforms.map.value = this.map;
 

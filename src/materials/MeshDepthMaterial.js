@@ -55,9 +55,9 @@ THREE.MeshDepthMaterial.prototype.toJSON = function () {
 
 };
 
-THREE.MeshDepthMaterial.prototype.refreshUniforms = function (uniforms, camera) {
-	uniforms.mNear.value = camera.near;
-	uniforms.mFar.value = camera.far;
+THREE.MeshDepthMaterial.prototype.refreshUniforms = function (uniforms, option) {
+	uniforms.mNear.value = option.camera.near;
+	uniforms.mFar.value = option.camera.far;
 	uniforms.opacity.value = this.opacity;
 };
 
