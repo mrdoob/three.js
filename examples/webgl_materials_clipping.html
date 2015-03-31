@@ -26,7 +26,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer, objects, material;
 			var particleLight;
 			var lambertshader = {
 
@@ -43,90 +43,90 @@
 						"enableClipping": {type: "i", value:0}
 					},
 
-                    {
-                        "emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-                        "wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
-                    }
+					{
+						"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
+						"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
+					}
 
 
 				] ),
 
 				vertexShader: [
 
-                    "#define LAMBERT",
+					"#define LAMBERT",
 
-                    "varying vec3 vLightFront;",
+					"varying vec3 vLightFront;",
 
-                    "#ifdef DOUBLE_SIDED",
+					"#ifdef DOUBLE_SIDED",
 
-                    "	varying vec3 vLightBack;",
+					"	varying vec3 vLightBack;",
 
-                    "#endif",
+					"#endif",
 
-                    THREE.ShaderChunk[ "common" ],
-                    THREE.ShaderChunk[ "uv_pars_vertex" ],
-                    THREE.ShaderChunk[ "uv2_pars_vertex" ],
-                    THREE.ShaderChunk[ "envmap_pars_vertex" ],
-                    THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
-                    THREE.ShaderChunk[ "color_pars_vertex" ],
-                    THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-                    THREE.ShaderChunk[ "skinning_pars_vertex" ],
-                    THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
-                    THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
-                    "varying vec4 model_position;",
-                    "void main() {",
-                    " model_position = modelMatrix*vec4( position, 1.0 );",
+					THREE.ShaderChunk[ "common" ],
+					THREE.ShaderChunk[ "uv_pars_vertex" ],
+					THREE.ShaderChunk[ "uv2_pars_vertex" ],
+					THREE.ShaderChunk[ "envmap_pars_vertex" ],
+					THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
+					THREE.ShaderChunk[ "color_pars_vertex" ],
+					THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+					THREE.ShaderChunk[ "skinning_pars_vertex" ],
+					THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
+					THREE.ShaderChunk[ "logdepthbuf_pars_vertex" ],
+					"varying vec4 model_position;",
+					"void main() {",
+					" model_position = modelMatrix*vec4( position, 1.0 );",
 
-                        THREE.ShaderChunk[ "uv_vertex" ],
-                        THREE.ShaderChunk[ "uv2_vertex" ],
-                        THREE.ShaderChunk[ "color_vertex" ],
+						THREE.ShaderChunk[ "uv_vertex" ],
+						THREE.ShaderChunk[ "uv2_vertex" ],
+						THREE.ShaderChunk[ "color_vertex" ],
 
-                        THREE.ShaderChunk[ "morphnormal_vertex" ],
-                        THREE.ShaderChunk[ "skinbase_vertex" ],
-                        THREE.ShaderChunk[ "skinnormal_vertex" ],
-                        THREE.ShaderChunk[ "defaultnormal_vertex" ],
+						THREE.ShaderChunk[ "morphnormal_vertex" ],
+						THREE.ShaderChunk[ "skinbase_vertex" ],
+						THREE.ShaderChunk[ "skinnormal_vertex" ],
+						THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-                        THREE.ShaderChunk[ "morphtarget_vertex" ],
-                        THREE.ShaderChunk[ "skinning_vertex" ],
-                        THREE.ShaderChunk[ "default_vertex" ],
-                        THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+						THREE.ShaderChunk[ "morphtarget_vertex" ],
+						THREE.ShaderChunk[ "skinning_vertex" ],
+						THREE.ShaderChunk[ "default_vertex" ],
+						THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
-                        THREE.ShaderChunk[ "worldpos_vertex" ],
-                        THREE.ShaderChunk[ "envmap_vertex" ],
-                        THREE.ShaderChunk[ "lights_lambert_vertex" ],
-                        THREE.ShaderChunk[ "shadowmap_vertex" ],
+						THREE.ShaderChunk[ "worldpos_vertex" ],
+						THREE.ShaderChunk[ "envmap_vertex" ],
+						THREE.ShaderChunk[ "lights_lambert_vertex" ],
+						THREE.ShaderChunk[ "shadowmap_vertex" ],
 
-                    "}"
+					"}"
 
-                ].join("\n"),
+					].join("\n"),
 
 				fragmentShader: [
 
-                    "uniform vec3 diffuse;",
-                    "uniform vec3 emissive;",
-                    "uniform float opacity;",
+					"uniform vec3 diffuse;",
+					"uniform vec3 emissive;",
+					"uniform float opacity;",
 
-                    "varying vec3 vLightFront;",
+					"varying vec3 vLightFront;",
 
-                    "#ifdef DOUBLE_SIDED",
+					"#ifdef DOUBLE_SIDED",
 
-                    "	varying vec3 vLightBack;",
+					"	varying vec3 vLightBack;",
 
-                    "#endif",
+					"#endif",
 
-                    THREE.ShaderChunk[ "common" ],
-                    THREE.ShaderChunk[ "color_pars_fragment" ],
-                    THREE.ShaderChunk[ "uv_pars_fragment" ],
-                    THREE.ShaderChunk[ "uv2_pars_fragment" ],
-                    THREE.ShaderChunk[ "map_pars_fragment" ],
-                    THREE.ShaderChunk[ "alphamap_pars_fragment" ],
-                    THREE.ShaderChunk[ "aomap_pars_fragment" ],
-                    THREE.ShaderChunk[ "lightmap_pars_fragment" ],
-                    THREE.ShaderChunk[ "envmap_pars_fragment" ],
-                    THREE.ShaderChunk[ "fog_pars_fragment" ],
-                    THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
-                    THREE.ShaderChunk[ "specularmap_pars_fragment" ],
-                    THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+					THREE.ShaderChunk[ "common" ],
+					THREE.ShaderChunk[ "color_pars_fragment" ],
+					THREE.ShaderChunk[ "uv_pars_fragment" ],
+					THREE.ShaderChunk[ "uv2_pars_fragment" ],
+					THREE.ShaderChunk[ "map_pars_fragment" ],
+					THREE.ShaderChunk[ "alphamap_pars_fragment" ],
+					THREE.ShaderChunk[ "aomap_pars_fragment" ],
+					THREE.ShaderChunk[ "lightmap_pars_fragment" ],
+					THREE.ShaderChunk[ "envmap_pars_fragment" ],
+					THREE.ShaderChunk[ "fog_pars_fragment" ],
+					THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+					THREE.ShaderChunk[ "specularmap_pars_fragment" ],
+					THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
 
 					"varying vec4 model_position;",
 					"uniform vec4 clipplane;",
@@ -134,44 +134,44 @@
 					"void main() {",
 					"if( enableClipping==1&&dot(model_position,clipplane) > 0.0 )", //add clipplane test here
 					" discard;",
-                    "	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
-                    "	vec4 diffuseColor = vec4( diffuse, opacity );",
+					"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+					"	vec4 diffuseColor = vec4( diffuse, opacity );",
 
-                    THREE.ShaderChunk[ "logdepthbuf_fragment" ],
-                    THREE.ShaderChunk[ "map_fragment" ],
-                    THREE.ShaderChunk[ "color_fragment" ],
-                    THREE.ShaderChunk[ "alphamap_fragment" ],
-                    THREE.ShaderChunk[ "alphatest_fragment" ],
-                    THREE.ShaderChunk[ "specularmap_fragment" ],
+					THREE.ShaderChunk[ "logdepthbuf_fragment" ],
+					THREE.ShaderChunk[ "map_fragment" ],
+					THREE.ShaderChunk[ "color_fragment" ],
+					THREE.ShaderChunk[ "alphamap_fragment" ],
+					THREE.ShaderChunk[ "alphatest_fragment" ],
+					THREE.ShaderChunk[ "specularmap_fragment" ],
 
-                    "	#ifdef DOUBLE_SIDED",
+					"	#ifdef DOUBLE_SIDED",
 
-                    //"float isFront = float( gl_FrontFacing );",
-                    //"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
+					//"float isFront = float( gl_FrontFacing );",
+					//"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
 
-                    "		if ( gl_FrontFacing )",
-                    "			outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
-                    "		else",
-                    "			outgoingLight += diffuseColor.rgb * vLightBack + emissive;",
+					"		if ( gl_FrontFacing )",
+					"			outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
+					"		else",
+					"			outgoingLight += diffuseColor.rgb * vLightBack + emissive;",
 
-                    "	#else",
+					"	#else",
 
-                    "		outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
+					"		outgoingLight += diffuseColor.rgb * vLightFront + emissive;",
 
-                    "	#endif",
+					"	#endif",
 
-                    THREE.ShaderChunk[ "aomap_fragment" ],
-                    THREE.ShaderChunk[ "lightmap_fragment" ],
-                    THREE.ShaderChunk[ "envmap_fragment" ],
-                    THREE.ShaderChunk[ "shadowmap_fragment" ],
+					THREE.ShaderChunk[ "aomap_fragment" ],
+					THREE.ShaderChunk[ "lightmap_fragment" ],
+					THREE.ShaderChunk[ "envmap_fragment" ],
+					THREE.ShaderChunk[ "shadowmap_fragment" ],
 
-                    THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
+					THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
-                    THREE.ShaderChunk[ "fog_fragment" ],
+					THREE.ShaderChunk[ "fog_fragment" ],
 
-                    "	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
+					"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
-                    "}"
+					"}"
 
 				].join("\n")
 
@@ -219,9 +219,6 @@
 				return null;
 			};
 
-
-			var materials = [];
-
 			init();
 			animate();
 
@@ -254,72 +251,32 @@
 				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
 				scene.add( line );
 
-				// Materials
+				// Material
 
 				var texture = new THREE.Texture( generateTexture() );
 				texture.needsUpdate = true;
-
-				materials.push( new THREE.MeshLambertMaterialClipping( { map: texture, transparent: true } ) );
-				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
-				materials.push( new THREE.MeshNormalMaterial( ) );
-				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, transparent: true, blending: THREE.AdditiveBlending } ) );
-				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
-
-				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading, map: texture, transparent: true } ) );
-				materials.push( new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
-				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
-
-				materials.push( new THREE.MeshDepthMaterial() );
-
-				materials.push( new THREE.MeshLambertMaterial( { color: 0x666666, emissive: 0xff0000, ambient: 0x000000, shading: THREE.SmoothShading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x666666, emissive: 0xff0000, ambient: 0x000000, shininess: 10, shading: THREE.SmoothShading, opacity: 0.9, transparent: true } ) );
-
-				materials.push( new THREE.MeshBasicMaterial( { map: texture, transparent: true } ) );
+				{  }
+				material = new THREE.MeshLambertMaterialClipping( { transparent: false, side:2, shading: THREE.SmoothShading } );
 
 				// Spheres geometry
 
-				var geometry_smooth = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_flat = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_pieces = new THREE.SphereGeometry( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
+				var sphere, geometry;
 
-				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
+				geometry = new THREE.SphereGeometry( 70, 32, 16 );
 
-					var face = geometry_pieces.faces[ i ];
-					face.materialIndex = Math.floor( Math.random() * materials.length );
+				sphere = new THREE.Mesh( geometry, material );
 
-				}
+				sphere.position.x = 0;
+				sphere.position.z = 0;
 
-				geometry_pieces.materials = materials;
-
-				materials.push( new THREE.MeshFaceMaterial( materials ) );
+				sphere.rotation.x = Math.random() * 200 - 100;
+				sphere.rotation.y = Math.random() * 200 - 100;
+				sphere.rotation.z = Math.random() * 200 - 100;
 
 				objects = [];
+				objects.push( sphere );
 
-				var sphere, geometry, material;
-
-				for ( var i = 0, l = 1; i < l; i ++ ) {
-
-					material = materials[ i ];
-
-					geometry = material instanceof THREE.MeshFaceMaterial ? geometry_pieces :
-							   ( material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth );
-
-					sphere = new THREE.Mesh( geometry, material );
-
-					sphere.position.x = ( i % 4 ) * 200 - 400;
-					sphere.position.z = Math.floor( i / 4 ) * 200 - 200;
-
-					sphere.rotation.x = Math.random() * 200 - 100;
-					sphere.rotation.y = Math.random() * 200 - 100;
-					sphere.rotation.z = Math.random() * 200 - 100;
-
-					objects.push( sphere );
-
-					scene.add( sphere );
-
-				}
+				scene.add( sphere );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -428,10 +385,8 @@
 					object.rotation.y += 0.005;
 
 				}
-				materials[0].enableClipping = true;
-				materials[0].clipplane[3] = -40* Math.sin( 35 * timer );
-				materials[ materials.length - 3 ].emissive.setHSL( 0.54, 1, 0.35 * ( 0.5 + 0.5 * Math.sin( 35 * timer ) ) );
-				materials[ materials.length - 4 ].emissive.setHSL( 0.04, 1, 0.35 * ( 0.5 + 0.5 * Math.cos( 35 * timer ) ) );
+				material.enableClipping = true;
+				material.clipplane[3] = -60* Math.sin( 20 * timer );
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;

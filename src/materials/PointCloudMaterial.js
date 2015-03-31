@@ -96,8 +96,8 @@ THREE.ParticleSystemMaterial = function ( parameters ) {
 
 };
 
-THREE.PointCloudMaterial.prototype.refreshUniforms = function (uniforms, option) {
-	this.refreshUniformsParticle(uniforms, option);
+THREE.PointCloudMaterial.prototype.refreshUniforms = function ( uniforms, option ) {
+	this.refreshUniformsParticle( uniforms, option );
 };
 
 THREE.PointCloudMaterial.prototype.getShaderID = function () {

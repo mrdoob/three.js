@@ -3004,7 +3004,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			material.refreshUniforms(m_uniforms, {camera:camera , canvas:_canvas} );
+			material.refreshUniforms(m_uniforms, { camera: camera, canvas: _canvas } );
 
 			if ( object.receiveShadow && ! material._shadowPass ) {
 

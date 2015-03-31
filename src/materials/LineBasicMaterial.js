@@ -63,8 +63,8 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 
 };
 
-THREE.LineBasicMaterial.prototype.refreshUniforms = function (uniforms) {
-	this.refreshUniformsLine(uniforms);
+THREE.LineBasicMaterial.prototype.refreshUniforms = function ( uniforms ) {
+	this.refreshUniformsLine( uniforms );
 };
 
 THREE.LineBasicMaterial.prototype.getShaderID = function () {

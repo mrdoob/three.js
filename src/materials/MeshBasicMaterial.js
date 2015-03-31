@@ -129,8 +129,8 @@ THREE.MeshBasicMaterial.prototype.toJSON = function () {
 
 };
 
-THREE.MeshBasicMaterial.prototype.refreshUniforms = function (uniforms) {
-	this.refreshUniformsCommon(uniforms);
+THREE.MeshBasicMaterial.prototype.refreshUniforms = function ( uniforms ) {
+	this.refreshUniformsCommon( uniforms );
 };
 
 THREE.MeshBasicMaterial.prototype.useSkinning = function () {

@@ -144,9 +144,9 @@ THREE.MeshLambertMaterial.prototype.toJSON = function () {
 
 };
 
-THREE.MeshLambertMaterial.prototype.refreshUniforms = function (uniforms) {
-	this.refreshUniformsCommon(uniforms);
-	this.refreshUniformsLambert(uniforms);
+THREE.MeshLambertMaterial.prototype.refreshUniforms = function ( uniforms ) {
+	this.refreshUniformsCommon( uniforms );
+	this.refreshUniformsLambert( uniforms );
 };
 
 THREE.MeshLambertMaterial.prototype.useSkinning = function () {

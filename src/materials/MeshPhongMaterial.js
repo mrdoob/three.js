@@ -187,9 +187,9 @@ THREE.MeshPhongMaterial.prototype.toJSON = function () {
 
 };
 
-THREE.MeshPhongMaterial.prototype.refreshUniforms = function (uniforms) {
-	this.refreshUniformsCommon(uniforms);
-	this.refreshUniformsPhong(uniforms);
+THREE.MeshPhongMaterial.prototype.refreshUniforms = function ( uniforms ) {
+	this.refreshUniformsCommon( uniforms );
+	this.refreshUniformsPhong( uniforms );
 };
 
 THREE.MeshPhongMaterial.prototype.useEnvMap = function () {

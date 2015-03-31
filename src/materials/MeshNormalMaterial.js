@@ -56,7 +56,7 @@ THREE.MeshNormalMaterial.prototype.toJSON = function () {
 
 };
 
-THREE.MeshNormalMaterial.prototype.refreshUniforms = function (uniforms) {
+THREE.MeshNormalMaterial.prototype.refreshUniforms = function ( uniforms ) {
 	uniforms.opacity.value = this.opacity;
 };
 
