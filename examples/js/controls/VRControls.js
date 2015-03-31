@@ -3,14 +3,13 @@
  * @author mrdoob / http://mrdoob.com
  */
 
-THREE.VRControls = function ( object, callback ) {
+THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	// Allow for multiple VR input devices.
 	var vrInputs = [];
 
-	var onVRDevices = function ( devices ) {
+	function gotVRDevices( devices ) {
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
@@ -24,27 +23,20 @@ THREE.VRControls = function ( object, callback ) {
 
 		}
 
-		if ( callback !== undefined ) {
-
-			callback( 'HMD not available' );
-
-		}
+		if ( onError ) onError( 'HMD not available' );
 
 	};
 
-	if ( navigator.getVRDevices !== undefined ) {
+	if ( navigator.getVRDevices ) {
 
-		navigator.getVRDevices().then( onVRDevices );
-
-	} else if ( callback !== undefined ) {
-
-		callback( 'Your browser is not VR Ready' );
+		navigator.getVRDevices().then( gotVRDevices );
 
 	}
 
 	// the Rift SDK returns the position in meters
 	// this scale factor allows the user to define how meters
 	// are converted to scene units.
+
 	this.scale = 1;
 
 	this.update = function () {
