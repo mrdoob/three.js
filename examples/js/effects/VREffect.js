@@ -24,8 +24,8 @@
 THREE.VREffect = function ( renderer, onError ) {
 
 	var vrHMD;
-	var leftEyeTranslation, leftEyeFOV;
-	var rightEyeTranslation, rightEyeFOV;
+	var eyeTranslationL, eyeFOVL;
+	var eyeTranslationR, eyeFOVR;
 
 	function gotVRDevices( devices ) {
 
@@ -37,22 +37,22 @@ THREE.VREffect = function ( renderer, onError ) {
 
 				if ( vrHMD.getEyeParameters !== undefined ) {
 
-					var leftEyeParams = vrHMD.getEyeParameters( 'left' );
-					var rightEyeParams = vrHMD.getEyeParameters( 'right' );
+					var eyeParamsL = vrHMD.getEyeParameters( 'left' );
+					var eyeParamsR = vrHMD.getEyeParameters( 'right' );
 
-					leftEyeTranslation = leftEyeParams.eyeTranslation;
-					rightEyeTranslation = rightEyeParams.eyeTranslation;
-					leftEyeFOV = leftEyeParams.recommendedFieldOfView;
-					rightEyeFOV = rightEyeParams.recommendedFieldOfView;
+					eyeTranslationL = eyeParamsL.eyeTranslation;
+					eyeTranslationR = eyeParamsR.eyeTranslation;
+					eyeFOVL = eyeParamsL.recommendedFieldOfView;
+					eyeFOVR = eyeParamsR.recommendedFieldOfView;
 
 				} else {
 
 					// TODO: This is an older code path and not spec compliant.
 					// It should be removed at some point in the near future.
-					leftEyeTranslation = vrHMD.getEyeTranslation( 'left' );
-					rightEyeTranslation = vrHMD.getEyeTranslation( 'right' );
-					leftEyeFOV = vrHMD.getRecommendedEyeFieldOfView( 'left' );
-					rightEyeFOV = vrHMD.getRecommendedEyeFieldOfView( 'right' );
+					eyeTranslationL = vrHMD.getEyeTranslation( 'left' );
+					eyeTranslationR = vrHMD.getEyeTranslation( 'right' );
+					eyeFOVL = vrHMD.getRecommendedEyeFieldOfView( 'left' );
+					eyeFOVR = vrHMD.getRecommendedEyeFieldOfView( 'right' );
 
 				}
 
@@ -145,18 +145,16 @@ THREE.VREffect = function ( renderer, onError ) {
 			renderer.enableScissorTest( true );
 			renderer.clear();
 
-			if ( camera.parent === undefined ) {
-				camera.updateMatrixWorld();
-			}
+			if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
-			cameraL.projectionMatrix = fovToProjection( leftEyeFOV, true, camera.near, camera.far );
-			cameraR.projectionMatrix = fovToProjection( rightEyeFOV, true, camera.near, camera.far );
+			cameraL.projectionMatrix = fovToProjection( eyeFOVL, true, camera.near, camera.far );
+			cameraR.projectionMatrix = fovToProjection( eyeFOVR, true, camera.near, camera.far );
 
 			camera.matrixWorld.decompose( cameraL.position, cameraL.quaternion, cameraL.scale );
 			camera.matrixWorld.decompose( cameraR.position, cameraR.quaternion, cameraR.scale );
 
-			cameraL.translateX( leftEyeTranslation.x * this.scale );
-			cameraR.translateX( rightEyeTranslation.x * this.scale );
+			cameraL.translateX( eyeTranslationL.x * this.scale );
+			cameraR.translateX( eyeTranslationR.x * this.scale );
 
 			// render left eye
 			renderer.setViewport( 0, 0, size.width, size.height );
