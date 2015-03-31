@@ -71,6 +71,24 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
+		var morphTargets = json.morphTargets;
+
+		if ( morphTargets !== undefined ) {
+
+			for ( var key in morphTargets ) {
+
+				var morphTarget = morphTargets[ key ];
+
+				console.assert( morphTarget.vertices.length === attributes.position.array.length, 'morphTarget vertices.length must match attributes.position.length!' );
+
+				var typedArray = new self[ attributes.position.type ]( morphTarget.vertices );
+
+				geometry.morphTargets.push( { name: morphTarget.name, vertices: typedArray } );
+
+			}
+
+		}
+
 		return geometry;
 
 	}

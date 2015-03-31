@@ -50,6 +50,7 @@
 	"src/extras/helpers/ArrowHelper.js",
 	"src/extras/helpers/BoxHelper.js",
 	"src/extras/helpers/BoundingBoxHelper.js",
+	"src/extras/helpers/BoundingSphereHelper.js",
 	"src/extras/helpers/CameraHelper.js",
 	"src/extras/helpers/DirectionalLightHelper.js",
 	"src/extras/helpers/EdgesHelper.js",

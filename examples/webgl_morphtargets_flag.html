@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - morph targets - horse</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+			}
+
+			a {
+				color: #0A0;
+			}
+
+			#title {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center
+			}
+
+			#controls {
+				position: absolute;
+				top: 1.5em;
+				width: 100%;
+				padding: 0;
+				text-align: center
+			}
+
+			#controls li {
+				display: inline;
+				margin-right: 1em;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container">
+
+			<div id="title">
+				<a href="http://threejs.org" target="_blank">three.js</a>
+				webgl - morph targets -
+				<a href="https://github.com/satori99/three.js/blob/bg-morphtargets/examples/models/animated/flag/flag.json" target="_blank">flag.json</a>
+			</div>
+
+			<ul id="controls">
+				<li><a id="toggle-animation" href="javascript:void(0);" onclick="onClick(this)">A</a> &ndash; Toggle Animation</li>
+				<li><a id="toggle-helpers" href="javascript:void(0);" onclick="onClick(this)">H</a> &ndash; Toggle Helpers</li>
+				<li><a id="toggle-shadows" href="javascript:void(0);" onclick="onClick(this)">S</a> &ndash; Toggle Shadows</li>
+				<li><a id="toggle-textures" href="javascript:void(0);" onclick="onClick(this)">T</a> &ndash; Toggle Textures</li>
+			</ul>
+
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script id="depthAlphaTestRGBA">
+
+		// Custom depth shader material with support for morphTargets
+		// and alpha map testing.
+
+		THREE.depthAlphaTestRGBA = {
+
+			uniforms: {
+				"tAlphaMap": { type: "t", value: null },
+				"alphaTest": { type: 'f', value: 0.5 },
+				"useAlphaTest": { type: 'i', value: 0 }
+			},
+
+			vertexShader: [
+
+				THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+
+				"varying vec2 vUV;",
+
+				"void main() {",
+
+				"	vUV = uv;",
+
+					THREE.ShaderChunk[ "morphtarget_vertex" ],
+					THREE.ShaderChunk[ "default_vertex" ],
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+
+				"uniform sampler2D tAlphaMap;",
+				"uniform float alphaTest;",
+				"uniform int useAlphaTest;",
+
+				"varying vec2 vUV;",
+
+				"vec4 pack_depth( const in float depth ) {",
+				"	const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
+				"	const vec4 bit_mask = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+				"	vec4 res = mod( depth * bit_shift * vec4( 255 ), vec4( 256 ) ) / vec4( 255 );",
+				"	res -= res.xxyz * bit_mask;",
+				"	return res;",
+				"}",
+
+				"void main() {",
+
+				"	vec4 pixel = texture2D( tAlphaMap, vUV );",
+
+				"	if ( useAlphaTest != 0 && pixel.g < alphaTest ) discard;",
+
+				"	gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );",
+
+				"}"
+
+			].join("\n")
+
+		}
+
+		</script>
+
+		<script>
+
+			var container, stats;
+
+			var scene, camera, flag;
+
+			var renderer, clock;
+
+			var delta = 0, theta = 0;
+
+			var animations = [], materials = [], materialIndex = 0;
+
+			//
+
+			init();
+
+			//
+
+			function init () {
+
+				container = document.getElementById( 'container' );
+
+				// create scene
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xf5edcb, 0.0008 );
+
+				// create custom depth material
+
+				var shaderDepthMaterial = new THREE.ShaderMaterial( {
+					uniforms: THREE.UniformsUtils.clone( THREE.depthAlphaTestRGBA.uniforms ),
+					vertexShader: THREE.depthAlphaTestRGBA.vertexShader,
+					fragmentShader: THREE.depthAlphaTestRGBA.fragmentShader,
+					morphTargets: true,
+					side: THREE.DoubleSide
+				} );
+
+				// all scene objects are loaded from JSON file ...
+
+				var loader = new THREE.ObjectLoader();
+
+				loader.load( 'models/animated/flag/flag.json', function( root ) {
+
+					// process loaded graph objects
+
+					root.traverse( function( object ) {
+
+						// object properties not parsed by THREE.ObjectLoader,
+						// are stored in object userData.
+
+						for ( var prop in object.userData ) {
+							if ( prop in object ) {
+								object[ prop ] = object.userData[ prop ];;
+								delete object.userData[ prop ];
+							}
+						}
+
+						// initialize animated meshes
+
+						if ( object.type === 'Mesh' && object.morphTargetBase ) {
+
+							object.customDepthMaterial = shaderDepthMaterial;
+
+							object.geometry.computeMorphNormals();
+
+							object.material.morphTargets = true;
+							object.material.morphNormals = true;
+							object.material.alphaTest = 0.5;
+
+							var animation = new THREE.MorphAnimation( object );
+							animation.duration = 4000;
+							animation.play();
+							animations.push( animation );
+
+							// initialize flag materials
+
+							if ( object.name === 'Flag:Fly' ) {
+								flag = object;
+								initMaterials();
+							}
+
+						}
+
+						// initialize camera
+
+						else if ( object.type === 'PerspectiveCamera' && camera == undefined ) {
+
+							camera = object;
+
+							camera.aspect = window.innerWidth / window.innerHeight;
+							camera.target = new THREE.Vector3().fromArray( camera.userData.target );
+							camera.radius = camera.position.length();
+							camera.updateProjectionMatrix();
+
+						}
+
+					} );
+
+					// add scene helpers to animated meshes
+
+					root.updateMatrixWorld();
+
+					animations.forEach( function( animation ) {
+
+						var mesh = animation.mesh;
+
+						mesh.helper = new THREE.BoundingSphereHelper( mesh );
+						mesh.helper.visible = false;
+						scene.add( mesh.helper );
+
+					} );
+
+					// add direct children of root object to scene
+
+					root.children.slice().forEach( function ( object ) { scene.add( object ); } );
+
+					// start render loop
+
+					animate();
+
+				} );
+
+				// create WebGL renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0xf5edcb, 1 );
+				renderer.clear();
+				renderer.autoClear = false;
+				renderer.shadowMapEnabled = true;
+
+				renderer.domElement.style.display = 'block';
+				container.appendChild( renderer.domElement );
+
+				// clock
+
+				clock = new THREE.Clock();
+
+				// stats
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				// add event handlers
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'keydown', onWindowKeyDown, false );
+
+			}
+
+			function initMaterials() {
+
+				function onLoad ( tex ) {
+					tex.format = THREE.RGBFormat;
+					tex.wrapS = tex.wrapS = THREE.ClampToEdgeWrapping;
+					tex.anisotropy = renderer.getMaxAnisotropy();
+				}
+
+				// add default (from json) material first
+				materials.push( flag.material );
+
+				// add uv grid material
+				var uvGrid = flag.material.clone();
+				uvGrid.map = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg', THREE.UVMapping, onLoad );
+				materials.push( uvGrid );
+
+				// add skull and crossbones
+				var pirate = flag.material.clone();
+				pirate.map = THREE.ImageUtils.loadTexture( 'models/animated/flag/pirate.png', THREE.UVMapping, onLoad );
+				materials.push( pirate );
+
+				// add skull and crossbones + alphamap
+				var pirateAlpha = flag.material.clone();
+				pirateAlpha.map = pirate.map;
+				pirateAlpha.alphaMap = THREE.ImageUtils.loadTexture( 'models/animated/flag/alpha.png', THREE.UVMapping, onLoad );
+				materials.push( pirateAlpha );
+
+				// add australian flag
+				var australia = flag.material.clone();
+				australia.map = THREE.ImageUtils.loadTexture( 'models/animated/flag/australia.png', THREE.UVMapping, onLoad );
+				materials.push( australia );
+
+			}
+
+			// controls
+
+			function toggleAnimation () {
+
+				animations.forEach( function( animation ) {
+
+					animation.isPlaying = ! animation.isPlaying;
+
+				} );
+
+			}
+
+			function toggleHelpers () {
+
+				scene.traverse( function( object ) {
+
+					if ( object.helper ) {
+
+						object.helper.visible = ! object.helper.visible;
+
+					} else if ( object.shadowCamera ) {
+
+						object.shadowCameraVisible = ! object.shadowCameraVisible;
+
+					}
+
+				} );
+
+			}
+
+			function toggleShadows () {
+
+				animations.forEach( function ( animation ) {
+
+					var mesh = animation.mesh;
+
+					if ( mesh.castShadow && mesh.receiveShadow ) {
+
+						mesh.castShadow = mesh.receiveShadow = false;
+
+					} else {
+
+						if ( mesh.castShadow ) {
+
+							mesh.receiveShadow = true;
+
+						} else {
+
+							mesh.castShadow = true;
+
+						}
+
+						mesh.material.needsUpdate = true;
+
+					}
+
+				} );
+
+			}
+
+			function toggleTextures () {
+
+				flag.material = materials[ ++ materialIndex % materials.length ];
+				flag.customDepthMaterial.uniforms.tAlphaMap.value = flag.material.alphaMap;
+				flag.customDepthMaterial.uniforms.useAlphaTest.value = !! flag.material.alphaMap;
+				flag.customDepthMaterial.needsUpdate = true;
+
+			}
+
+			// events handlers
+
+			function onWindowResize () {
+
+				if ( camera ) {
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+				}
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onClick ( e ) {
+
+				switch ( e.id ) {
+					case 'toggle-animation': toggleAnimation(); break;
+					case 'toggle-helpers'  : toggleHelpers();   break;
+					case 'toggle-shadows'  : toggleShadows();   break;
+					case 'toggle-textures' : toggleTextures();  break;
+				}
+
+			}
+
+			function onWindowKeyDown ( e ) {
+
+				switch ( e.keyCode ) {
+					case 65: /* A */ toggleAnimation(); break;
+					case 72: /* H */ toggleHelpers();   break;
+					case 83: /* S */ toggleShadows();   break;
+					case 84: /* T */ toggleTextures();  break;
+				}
+
+			}
+
+			// render loop
+
+			function animate () {
+
+				stats.begin();
+
+				requestAnimationFrame( animate );
+
+				delta = clock.getDelta();
+
+				render();
+
+				theta += delta * 16;
+
+				camera.position.x = camera.radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = camera.radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.lookAt( camera.target );
+
+				animations.forEach( function( animation ) { animation.update( delta  * 1000 ); } );
+
+				stats.end();
+
+			}
+
+			function render () {
+
+				renderer.clear();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>
