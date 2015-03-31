@@ -284,12 +284,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// shadow map
 
-	this.shadowMap = new THREE.WebGLShadowMap( this, lights, _webglObjects, _webglObjectsImmediate );
-	this.shadowMapEnabled = false;
-	this.shadowMapType = THREE.PCFShadowMap;
-	this.shadowMapCullFace = THREE.CullFaceFront;
-	this.shadowMapDebug = false;
-	this.shadowMapCascade = false;
+	var shadowMap = new THREE.WebGLShadowMap( this, lights, _webglObjects, _webglObjectsImmediate );
+
+	this.shadowMap = shadowMap;
 
 	// GPU capabilities
 
@@ -1890,7 +1887,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		this.shadowMap.render( scene, camera );
+		shadowMap.render( scene, camera );
 
 		//
 
@@ -2718,10 +2715,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxHemiLights: maxLightCount.hemi,
 
 			maxShadows: maxShadows,
-			shadowMapEnabled: _this.shadowMapEnabled && object.receiveShadow && maxShadows > 0,
-			shadowMapType: _this.shadowMapType,
-			shadowMapDebug: _this.shadowMapDebug,
-			shadowMapCascade: _this.shadowMapCascade,
+			shadowMapEnabled: shadowMap.enabled && object.receiveShadow && maxShadows > 0,
+			shadowMapType: shadowMap.type,
+			shadowMapDebug: shadowMap.debug,
+			shadowMapCascade: shadowMap.cascade,
 
 			alphaTest: material.alphaTest,
 			metal: material.metal,
@@ -4779,5 +4776,53 @@ THREE.WebGLRenderer = function ( parameters ) {
 		THREE.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
 	};
+
+	Object.defineProperties( this, {
+		shadowMapEnabled: {
+			get: function () {
+				return this.shadowMap.enabled;
+			},
+			set: function ( value ) {
+				THREE.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
+				this.shadowMap.enabled = value;
+			}
+		},
+		shadowMapType: {
+			get: function () {
+				return this.shadowMap.type;
+			},
+			set: function ( value ) {
+				THREE.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
+				this.shadowMap.type = value;
+			}
+		},
+		shadowMapCullFace: {
+			get: function () {
+				return this.shadowMap.cullFace;
+			},
+			set: function ( value ) {
+				THREE.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
+				this.shadowMap.cullFace = value;
+			}
+		},
+		shadowMapDebug: {
+			get: function () {
+				return this.shadowMap.debug;
+			},
+			set: function ( value ) {
+				THREE.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
+				this.shadowMap.debug = value;
+			}
+		},
+		shadowMapCascade: {
+			get: function () {
+				return this.shadowMap.cascade;
+			},
+			set: function ( value ) {
+				THREE.warn( 'THREE.WebGLRenderer: .shadowMapCascade is now .shadowMap.cascade.' );
+				this.shadowMap.cascade = value;
+			}
+		}
+	} );
 
 };
