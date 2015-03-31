@@ -30,6 +30,8 @@
 			var particleLight;
 			var lambertshader = {
 
+
+
 				uniforms: THREE.UniformsUtils.merge( [
 
 					THREE.UniformsLib[ "common" ],
@@ -62,8 +64,8 @@
                     "#endif",
 
                     THREE.ShaderChunk[ "common" ],
-                    THREE.ShaderChunk[ "map_pars_vertex" ],
-                    THREE.ShaderChunk[ "lightmap_pars_vertex" ],
+                    THREE.ShaderChunk[ "uv_pars_vertex" ],
+                    THREE.ShaderChunk[ "uv2_pars_vertex" ],
                     THREE.ShaderChunk[ "envmap_pars_vertex" ],
                     THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
                     THREE.ShaderChunk[ "color_pars_vertex" ],
@@ -75,24 +77,24 @@
                     "void main() {",
                     " model_position = modelMatrix*vec4( position, 1.0 );",
 
-                    THREE.ShaderChunk[ "map_vertex" ],
-                    THREE.ShaderChunk[ "lightmap_vertex" ],
-                    THREE.ShaderChunk[ "color_vertex" ],
+                        THREE.ShaderChunk[ "uv_vertex" ],
+                        THREE.ShaderChunk[ "uv2_vertex" ],
+                        THREE.ShaderChunk[ "color_vertex" ],
 
-                    THREE.ShaderChunk[ "morphnormal_vertex" ],
-                    THREE.ShaderChunk[ "skinbase_vertex" ],
-                    THREE.ShaderChunk[ "skinnormal_vertex" ],
-                    THREE.ShaderChunk[ "defaultnormal_vertex" ],
+                        THREE.ShaderChunk[ "morphnormal_vertex" ],
+                        THREE.ShaderChunk[ "skinbase_vertex" ],
+                        THREE.ShaderChunk[ "skinnormal_vertex" ],
+                        THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-                    THREE.ShaderChunk[ "morphtarget_vertex" ],
-                    THREE.ShaderChunk[ "skinning_vertex" ],
-                    THREE.ShaderChunk[ "default_vertex" ],
-                    THREE.ShaderChunk[ "logdepthbuf_vertex" ],
+                        THREE.ShaderChunk[ "morphtarget_vertex" ],
+                        THREE.ShaderChunk[ "skinning_vertex" ],
+                        THREE.ShaderChunk[ "default_vertex" ],
+                        THREE.ShaderChunk[ "logdepthbuf_vertex" ],
 
-                    THREE.ShaderChunk[ "worldpos_vertex" ],
-                    THREE.ShaderChunk[ "envmap_vertex" ],
-                    THREE.ShaderChunk[ "lights_lambert_vertex" ],
-                    THREE.ShaderChunk[ "shadowmap_vertex" ],
+                        THREE.ShaderChunk[ "worldpos_vertex" ],
+                        THREE.ShaderChunk[ "envmap_vertex" ],
+                        THREE.ShaderChunk[ "lights_lambert_vertex" ],
+                        THREE.ShaderChunk[ "shadowmap_vertex" ],
 
                     "}"
 
@@ -114,14 +116,18 @@
 
                     THREE.ShaderChunk[ "common" ],
                     THREE.ShaderChunk[ "color_pars_fragment" ],
+                    THREE.ShaderChunk[ "uv_pars_fragment" ],
+                    THREE.ShaderChunk[ "uv2_pars_fragment" ],
                     THREE.ShaderChunk[ "map_pars_fragment" ],
                     THREE.ShaderChunk[ "alphamap_pars_fragment" ],
+                    THREE.ShaderChunk[ "aomap_pars_fragment" ],
                     THREE.ShaderChunk[ "lightmap_pars_fragment" ],
                     THREE.ShaderChunk[ "envmap_pars_fragment" ],
                     THREE.ShaderChunk[ "fog_pars_fragment" ],
                     THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
                     THREE.ShaderChunk[ "specularmap_pars_fragment" ],
                     THREE.ShaderChunk[ "logdepthbuf_pars_fragment" ],
+
 					"varying vec4 model_position;",
 					"uniform vec4 clipplane;",
 					"uniform int enableClipping;",
@@ -154,6 +160,7 @@
 
                     "	#endif",
 
+                    THREE.ShaderChunk[ "aomap_fragment" ],
                     THREE.ShaderChunk[ "lightmap_fragment" ],
                     THREE.ShaderChunk[ "envmap_fragment" ],
                     THREE.ShaderChunk[ "shadowmap_fragment" ],
