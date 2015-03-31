@@ -63,6 +63,7 @@ THREE.Object3D = function () {
 	this.matrixWorldNeedsUpdate = false;
 
 	this.visible = true;
+	this.layerMask = THREE.Object3D.DefaultLayerMask;
 
 	this.castShadow = false;
 	this.receiveShadow = false;
@@ -75,6 +76,7 @@ THREE.Object3D = function () {
 };
 
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
+THREE.Object3D.DefaultLayerMask = 0xffffffff;
 
 THREE.Object3D.prototype = {
 
@@ -487,6 +489,12 @@ THREE.Object3D.prototype = {
 
 	}(),
 
+	isOnSameLayer: function ( object ) {
+
+		return ( this.layerMask & object.layerMask ) !== 0;
+
+	},
+
 	raycast: function () {},
 
 	traverse: function ( callback ) {
@@ -675,6 +683,7 @@ THREE.Object3D.prototype = {
 		object.matrixWorldNeedsUpdate = this.matrixWorldNeedsUpdate;
 
 		object.visible = this.visible;
+		object.layerMask = this.layerMask;
 
 		object.castShadow = this.castShadow;
 		object.receiveShadow = this.receiveShadow;

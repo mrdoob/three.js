@@ -68,6 +68,7 @@
 
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 256 );
 				cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.layerMask = ~ ( 1 << 0 ); // Hide sphere object on layer 0 from the cube camera.
 				scene.add( cubeCamera );
 
 				document.body.appendChild( renderer.domElement );
@@ -77,6 +78,7 @@
 				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget } );
 
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 30, 15 ), material );
+				sphere.layerMask = ( 1 << 0 ); // Set sphere object to layer 0.
 				scene.add( sphere );
 
 				cube = new THREE.Mesh( new THREE.BoxGeometry( 20, 20, 20 ), material );
@@ -201,11 +203,7 @@
 
 				camera.lookAt( scene.position );
 
-				sphere.visible = false; // *cough*
-
 				cubeCamera.updateCubeMap( renderer, scene );
-
-				sphere.visible = true; // *cough*
 
 				renderer.render( scene, camera );
 
