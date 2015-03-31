@@ -2229,26 +2229,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				if ( geometry.__webglVertexBuffer === undefined ) {
-
-					buffers.initLineBuffers( geometry, object );
-
-					geometry.verticesNeedUpdate = true;
-					geometry.colorsNeedUpdate = true;
-					geometry.lineDistancesNeedUpdate = true;
-
-				}
+				buffers.initLineBuffers( geometry, object );
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				if ( geometry.__webglVertexBuffer === undefined ) {
-
-					buffers.initParticleBuffers( geometry, object );
-
-					geometry.verticesNeedUpdate = true;
-					geometry.colorsNeedUpdate = true;
-
-				}
+				buffers.initPointCloudBuffers( geometry, object );
 
 			}
 
@@ -2570,7 +2555,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || customAttributesDirty ) {
 
-				buffers.setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
+				buffers.setPointCloudBuffers( geometry, _gl.DYNAMIC_DRAW, object );
 
 			}
 

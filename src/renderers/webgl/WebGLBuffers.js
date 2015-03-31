@@ -53,7 +53,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 	};
 
-	this.initParticleBuffers = function ( geometry, object ) {
+	this.initPointCloudBuffers = function ( geometry, object ) {
+
+		if ( geometry.__webglVertexBuffer !== undefined ) return;
 
 		geometry.__webglVertexBuffer = gl.createBuffer();
 		geometry.__webglColorBuffer = gl.createBuffer();
@@ -71,9 +73,14 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		initCustomAttributes( object );
 
+		geometry.verticesNeedUpdate = true;
+		geometry.colorsNeedUpdate = true;
+
 	};
 
 	this.initLineBuffers = function ( geometry, object ) {
+
+		if ( geometry.__webglVertexBuffer !== undefined ) return;
 
 		geometry.__webglVertexBuffer = gl.createBuffer();
 		geometry.__webglColorBuffer = gl.createBuffer();
@@ -92,6 +99,10 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 		geometry.__webglLineCount = nvertices;
 
 		initCustomAttributes( object );
+
+		geometry.verticesNeedUpdate = true;
+		geometry.colorsNeedUpdate = true;
+		geometry.lineDistancesNeedUpdate = true;
 
 	};
 
@@ -269,7 +280,7 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 	// Buffer setting
 
-	this.setParticleBuffers = function ( geometry, hint, object ) {
+	this.setPointCloudBuffers = function ( geometry, hint, object ) {
 
 		var v, c, vertex, offset, color,
 
