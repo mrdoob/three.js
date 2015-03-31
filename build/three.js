@@ -20272,26 +20272,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				if ( geometry.__webglVertexBuffer === undefined ) {
-
-					buffers.initLineBuffers( geometry, object );
-
-					geometry.verticesNeedUpdate = true;
-					geometry.colorsNeedUpdate = true;
-					geometry.lineDistancesNeedUpdate = true;
-
-				}
+				buffers.initLineBuffers( geometry, object );
 
 			} else if ( object instanceof THREE.PointCloud ) {
 
-				if ( geometry.__webglVertexBuffer === undefined ) {
-
-					buffers.initParticleBuffers( geometry, object );
-
-					geometry.verticesNeedUpdate = true;
-					geometry.colorsNeedUpdate = true;
-
-				}
+				buffers.initPointCloudBuffers( geometry, object );
 
 			}
 
@@ -20613,7 +20598,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || customAttributesDirty ) {
 
-				buffers.setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
+				buffers.setPointCloudBuffers( geometry, _gl.DYNAMIC_DRAW, object );
 
 			}
 
@@ -23002,7 +22987,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 	};
 
-	this.initParticleBuffers = function ( geometry, object ) {
+	this.initPointCloudBuffers = function ( geometry, object ) {
+
+		if ( geometry.__webglVertexBuffer !== undefined ) return;
 
 		geometry.__webglVertexBuffer = gl.createBuffer();
 		geometry.__webglColorBuffer = gl.createBuffer();
@@ -23020,9 +23007,14 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		initCustomAttributes( object );
 
+		geometry.verticesNeedUpdate = true;
+		geometry.colorsNeedUpdate = true;
+
 	};
 
 	this.initLineBuffers = function ( geometry, object ) {
+
+		if ( geometry.__webglVertexBuffer !== undefined ) return;
 
 		geometry.__webglVertexBuffer = gl.createBuffer();
 		geometry.__webglColorBuffer = gl.createBuffer();
@@ -23041,6 +23033,10 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 		geometry.__webglLineCount = nvertices;
 
 		initCustomAttributes( object );
+
+		geometry.verticesNeedUpdate = true;
+		geometry.colorsNeedUpdate = true;
+		geometry.lineDistancesNeedUpdate = true;
 
 	};
 
@@ -23218,7 +23214,7 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 	// Buffer setting
 
-	this.setParticleBuffers = function ( geometry, hint, object ) {
+	this.setPointCloudBuffers = function ( geometry, hint, object ) {
 
 		var v, c, vertex, offset, color,
 
