@@ -177,7 +177,9 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo(height) )
 	{
 		this.texture.generateMipmaps = false;
+		this.texture.minFilter = THREE.LinearFilter;
 		this.tempTexture.generateMipmaps = false;
+		this.tempTexture.minFilter = THREE.LinearFilter;
 	}
 
 	this.updateTextureMatrix();
