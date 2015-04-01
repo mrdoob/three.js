@@ -1,5 +1,5 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
