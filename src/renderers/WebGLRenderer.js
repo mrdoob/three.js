@@ -286,7 +286,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// shadow map
 
 	var shadowMap = new THREE.WebGLShadowMap( this, lights, _webglObjects, _webglObjectsImmediate );
-	
+
 	this.shadowMap = shadowMap;
 
 	// GPU capabilities
@@ -395,7 +395,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.supportsInstancedArrays = function () {
 
-	    return _supportsInstancedArrays;
+		return _supportsInstancedArrays;
 
 	};
 
@@ -897,8 +897,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglNormalBuffer );
 
-			if ( material instanceof THREE.MeshPhongMaterial === false &&
-				   material.shading === THREE.FlatShading ) {
+			if ( material instanceof THREE.MeshPhongMaterial === false && material.shading === THREE.FlatShading ) {
 
 				var nx, ny, nz,
 					nax, nbx, ncx, nay, nby, ncy, naz, nbz, ncz,
@@ -909,23 +908,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					normalArray = object.normalArray;
 
-					nax  = normalArray[ i ];
-					nay  = normalArray[ i + 1 ];
-					naz  = normalArray[ i + 2 ];
+					nax = normalArray[ i ];
+					nay = normalArray[ i + 1 ];
+					naz = normalArray[ i + 2 ];
 
-					nbx  = normalArray[ i + 3 ];
-					nby  = normalArray[ i + 4 ];
-					nbz  = normalArray[ i + 5 ];
+					nbx = normalArray[ i + 3 ];
+					nby = normalArray[ i + 4 ];
+					nbz = normalArray[ i + 5 ];
 
-					ncx  = normalArray[ i + 6 ];
-					ncy  = normalArray[ i + 7 ];
-					ncz  = normalArray[ i + 8 ];
+					ncx = normalArray[ i + 6 ];
+					ncy = normalArray[ i + 7 ];
+					ncz = normalArray[ i + 8 ];
 
 					nx = ( nax + nbx + ncx ) / 3;
 					ny = ( nay + nby + ncy ) / 3;
 					nz = ( naz + nbz + ncz ) / 3;
 
-					normalArray[ i ]   = nx;
+					normalArray[ i     ] = nx;
 					normalArray[ i + 1 ] = ny;
 					normalArray[ i + 2 ] = nz;
 
@@ -981,20 +980,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupVertexAttributes( material, program, geometry, startIndex ) {
 
-	    var extension;
+		var extension;
 
-	    if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+		if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
-	        extension = extensions.get( 'ANGLE_instanced_arrays' );
-	        
-	        if ( extension === null ) {
+			extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-	            THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-	            return;
+			if ( extension === null ) {
 
-	        }
+				THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				return;
 
-	    }
+			}
+
+		}
 
 		var geometryAttributes = geometry.attributes;
 
@@ -1012,60 +1011,60 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
-				    var size = geometryAttribute.itemSize;
+					var size = geometryAttribute.itemSize;
 					state.enableAttribute( programAttribute );
 
 					if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
-                        
-					    var data = geometryAttribute.data;
-					    var stride = data.stride;
-					    var offset = geometryAttribute.offset;
 
-					    _gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.data.buffer );
-					    _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT ); 
+						var data = geometryAttribute.data;
+						var stride = data.stride;
+						var offset = geometryAttribute.offset;
 
-					    if ( data instanceof THREE.InstancedInterleavedBuffer ) {
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.data.buffer );
+						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
 
-					        if ( extension === null ) {
+						if ( data instanceof THREE.InstancedInterleavedBuffer ) {
 
-					            THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
-					            return;
+							if ( extension === null ) {
 
-					        }
+								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+								return;
 
-					        extension.vertexAttribDivisorANGLE( programAttribute, data.meshPerAttribute );
+							}
 
-					        if ( geometry.maxInstancedCount === undefined ) {
+							extension.vertexAttribDivisorANGLE( programAttribute, data.meshPerAttribute );
 
-					            geometry.maxInstancedCount = data.meshPerAttribute * ( data.array.length / data.stride );
+							if ( geometry.maxInstancedCount === undefined ) {
 
-					        }
+								geometry.maxInstancedCount = data.meshPerAttribute * ( data.array.length / data.stride );
 
-					    }
+							}
+
+						}
 
 					} else {
 
-					    _gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
-					    _gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
+						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
 
-					    if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
+						if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
 
-					        if ( extension === null ) {
+							if ( extension === null ) {
 
-					            THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
-					            return;
+								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+								return;
 
-					        }
+							}
 
-					        extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
+							extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
 
-					        if ( geometry.maxInstancedCount === undefined ) {
+							if ( geometry.maxInstancedCount === undefined ) {
 
-					            geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
 
-					        }
+							}
 
-					    }
+						}
 
 					}
 
@@ -1155,20 +1154,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
-					    var extension = extensions.get( 'ANGLE_instanced_arrays' );
+						var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-					    if ( extension === null ) {
+						if ( extension === null ) {
 
-					        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-					        return;
+							THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+							return;
 
-					    }
+						}
 
-					    extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 					} else {
 
-					    _gl.drawElements( mode, index.array.length, type, 0 );
+						_gl.drawElements( mode, index.array.length, type, 0 );
 
 					}
 					_this.info.render.calls ++;
@@ -1195,23 +1194,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 						// render indexed triangles
-                        
+
 						if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[i].instances > 0 ) {
 
-						    var extension = extensions.get( 'ANGLE_instanced_arrays' );
+							var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-						    if ( extension === null ) {
+							if ( extension === null ) {
 
-						        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-						        return;
+								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+								return;
 
-						    }
+							}
 
-						    extension.drawElementsInstancedANGLE( mode, offsets[i].count, type, offsets[i].start * size, offsets[i].count, type, offsets[i].instances ); // Draw the instanced meshes
+							extension.drawElementsInstancedANGLE( mode, offsets[i].count, type, offsets[i].start * size, offsets[i].count, type, offsets[i].instances ); // Draw the instanced meshes
 
 						} else {
 
-						    _gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+							_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+
 						}
 
 						_this.info.render.calls ++;
@@ -1235,39 +1235,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var position = geometry.attributes[ 'position' ];
 
 				// render non-indexed triangles
-                
+
 				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
-				    var extension = extensions.get( 'ANGLE_instanced_arrays' );
+					var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-				    if ( extension === null ) {
+					if ( extension === null ) {
 
-				        THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-				        return;
+						THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						return;
 
-				    }
+					}
 
-				    if ( position instanceof THREE.InterleavedBufferAttribute ) {
+					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-				        extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
 
-				    } else {
+					} else {
 
-				        extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
 
-				    }
+					}
 
 				} else {
 
-				    
-				    if ( position instanceof THREE.InterleavedBufferAttribute ) {
+					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-				        _gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+						_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
 
-				    } else {
+					} else {
 
-				        _gl.drawArrays( mode, 0, position.array.length / position.itemSize );
-				    }
+						_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+
+					}
+
 				}
 
 				_this.info.render.calls ++;
@@ -2589,49 +2590,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var attribute = attributes[ key ];
 				var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-                var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
+				var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
-                if ( data.buffer === undefined ) {
+				if ( data.buffer === undefined ) {
 
-                    data.buffer = _gl.createBuffer();
-                    _gl.bindBuffer( bufferType, data.buffer );
+					data.buffer = _gl.createBuffer();
+					_gl.bindBuffer( bufferType, data.buffer );
 
 					var usage = _gl.STATIC_DRAW;
+
 					if ( data instanceof THREE.DynamicBufferAttribute
-                         || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
-                         || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true )
-                    ) {
+							 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
+							 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
 
-					    usage = _gl.DYNAMIC_DRAW;
+						usage = _gl.DYNAMIC_DRAW;
 
-                    }
+					}
 
 					_gl.bufferData( bufferType, data.array, usage );
 
 					data.needsUpdate = false;
 
-                } else if ( data.needsUpdate === true ) {
+				} else if ( data.needsUpdate === true ) {
 
-                    _gl.bindBuffer( bufferType, data.buffer );
+					_gl.bindBuffer( bufferType, data.buffer );
 
-                    if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+					if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
 
-					    _gl.bufferSubData( bufferType, 0, data.array );
+						_gl.bufferSubData( bufferType, 0, data.array );
 
-                    } else if ( data.updateRange.count === 0 ) {
+					} else if ( data.updateRange.count === 0 ) {
 
 						THREE.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
 
 					} else {
 
-					    _gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-										   data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
+						_gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+										 data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
 
-					    data.updateRange.count = 0; // reset range
+						data.updateRange.count = 0; // reset range
 
 					}
 
-                    data.needsUpdate = false;
+					data.needsUpdate = false;
 
 				}
 
@@ -2741,7 +2742,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function removeObject( object ) {
 
-		if ( object instanceof THREE.Mesh  ||
+		if ( object instanceof THREE.Mesh ||
 			 object instanceof THREE.PointCloud ||
 			 object instanceof THREE.Line ) {
 
@@ -3294,11 +3295,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// uv repeat and offset setting priorities
-		//  1. color map
-		//  2. specular map
-		//  3. normal map
-		//  4. bump map
-		//  5. alpha map
+		// 1. color map
+		// 2. specular map
+		// 3. normal map
+		// 4. bump map
+		// 5. alpha map
 
 		var uvScaleMap;
 
@@ -3691,7 +3692,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						offset = i * 2;
 
-						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 0 ] = value[ i ].x;
 						uniform._array[ offset + 1 ] = value[ i ].y;
 
 					}
@@ -3714,7 +3715,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						offset = i * 3;
 
-						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 0 ] = value[ i ].x;
 						uniform._array[ offset + 1 ] = value[ i ].y;
 						uniform._array[ offset + 2 ] = value[ i ].z;
 
@@ -3738,7 +3739,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						offset = i * 4;
 
-						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 0 ] = value[ i ].x;
 						uniform._array[ offset + 1 ] = value[ i ].y;
 						uniform._array[ offset + 2 ] = value[ i ].z;
 						uniform._array[ offset + 3 ] = value[ i ].w;
@@ -3815,7 +3816,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( ! texture ) continue;
 
 					if ( texture instanceof THREE.CubeTexture ||
-					   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
+						 ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
 
 						setCubeTexture( texture, textureUnit );
 
@@ -3881,7 +3882,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setColorLinear( array, offset, color, intensity ) {
 
-		array[ offset ]     = color.r * intensity;
+		array[ offset + 0 ] = color.r * intensity;
 		array[ offset + 1 ] = color.g * intensity;
 		array[ offset + 2 ] = color.b * intensity;
 
@@ -3963,7 +3964,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dirOffset = dirLength * 3;
 
-				dirPositions[ dirOffset ]     = _direction.x;
+				dirPositions[ dirOffset + 0 ] = _direction.x;
 				dirPositions[ dirOffset + 1 ] = _direction.y;
 				dirPositions[ dirOffset + 2 ] = _direction.z;
 
@@ -3983,7 +3984,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_vector3.setFromMatrixPosition( light.matrixWorld );
 
-				pointPositions[ pointOffset ]     = _vector3.x;
+				pointPositions[ pointOffset + 0 ] = _vector3.x;
 				pointPositions[ pointOffset + 1 ] = _vector3.y;
 				pointPositions[ pointOffset + 2 ] = _vector3.z;
 
@@ -4005,7 +4006,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 
-				spotPositions[ spotOffset ]     = _direction.x;
+				spotPositions[ spotOffset + 0 ] = _direction.x;
 				spotPositions[ spotOffset + 1 ] = _direction.y;
 				spotPositions[ spotOffset + 2 ] = _direction.z;
 
@@ -4015,7 +4016,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_direction.sub( _vector3 );
 				_direction.normalize();
 
-				spotDirections[ spotOffset ]     = _direction.x;
+				spotDirections[ spotOffset + 0 ] = _direction.x;
 				spotDirections[ spotOffset + 1 ] = _direction.y;
 				spotDirections[ spotOffset + 2 ] = _direction.z;
 
@@ -4036,7 +4037,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				hemiOffset = hemiLength * 3;
 
-				hemiPositions[ hemiOffset ]     = _direction.x;
+				hemiPositions[ hemiOffset + 0 ] = _direction.x;
 				hemiPositions[ hemiOffset + 1 ] = _direction.y;
 				hemiPositions[ hemiOffset + 2 ] = _direction.z;
 
@@ -4463,7 +4464,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setupRenderBuffer ( renderbuffer, renderTarget  ) {
+	function setupRenderBuffer ( renderbuffer, renderTarget ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -4827,8 +4828,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			// default for when object is not specified
-			// ( for example when prebuilding shader
-			//   to be used with multiple objects )
+			// ( for example when prebuilding shader to be used with multiple objects )
 			//
 			//  - leave some extra space for other uniforms
 			//  - limit here is ANGLE's 254 max uniform vectors

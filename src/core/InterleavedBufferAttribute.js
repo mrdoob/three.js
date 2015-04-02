@@ -4,81 +4,81 @@
 
 THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset ) {
 
-    this.data = interleavedBuffer;
-    this.itemSize = itemSize;
-    this.offset = offset;
+	this.data = interleavedBuffer;
+	this.itemSize = itemSize;
+	this.offset = offset;
 
 };
 
 
 THREE.InterleavedBufferAttribute.prototype = {
 
-    constructor: THREE.InterleavedBufferAttribute,
+	constructor: THREE.InterleavedBufferAttribute,
 
-    get length() {
+	get length() {
 
-        return this.itemSize * this.data.array.length / this.data.stride;
+		return this.itemSize * this.data.array.length / this.data.stride;
 
-    },
-    
-    setX: function ( index, x ) {
+	},
 
-        this.data.array[ index * this.data.stride + this.offset ] = x;
+	setX: function ( index, x ) {
 
-        return this;
+		this.data.array[ index * this.data.stride + this.offset ] = x;
 
-    },
+		return this;
 
-    setY: function ( index, y ) {
+	},
 
-        this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
+	setY: function ( index, y ) {
 
-        return this;
+		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
 
-    },
+		return this;
 
-    setZ: function ( index, z ) {
+	},
 
-        this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+	setZ: function ( index, z ) {
 
-        return this;
+		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
 
-    },
+		return this;
 
-    setXY: function ( index, x, y ) {
+	},
 
-        index = index * this.data.stride + this.offset;
+	setXY: function ( index, x, y ) {
 
-        this.data.array[ index ] = x;
-        this.data.array[ index + 1 ] = y;
+		index = index * this.data.stride + this.offset;
 
-        return this;
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
 
-    },
+		return this;
 
-    setXYZ: function ( index, x, y, z ) {
+	},
 
-        index = index * this.data.stride + this.offset;
+	setXYZ: function ( index, x, y, z ) {
 
-        this.data.array[ index ] = x;
-        this.data.array[ index + 1 ] = y;
-        this.data.array[ index + 2 ] = z;
+		index = index * this.data.stride + this.offset;
 
-        return this;
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
 
-    },
+		return this;
 
-    setXYZW: function ( index, x, y, z, w ) {
+	},
 
-        index = index * this.data.stride + this.offset;
+	setXYZW: function ( index, x, y, z, w ) {
 
-        this.data.array[ index ] = x;
-        this.data.array[ index + 1 ] = y;
-        this.data.array[ index + 2 ] = z;
-        this.data.array[ index + 3 ] = w;
+		index = index * this.data.stride + this.offset;
 
-        return this;
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
+		this.data.array[ index + 3 ] = w;
 
-    }
+		return this;
+
+	}
 
 };

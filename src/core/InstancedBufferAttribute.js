@@ -4,7 +4,7 @@
 
 THREE.InstancedBufferAttribute = function (array, itemSize, meshPerAttribute, dynamic) {
 
-    THREE.DynamicBufferAttribute.call( this, array, itemSize );
+	THREE.DynamicBufferAttribute.call( this, array, itemSize );
 
 	this.dynamic = dynamic || false;
 	this.meshPerAttribute = meshPerAttribute || 1;
@@ -16,6 +16,6 @@ THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttr
 
 THREE.InstancedBufferAttribute.prototype.clone = function () {
 
-    return new THREE.InstancedBufferAttribute(new this.array.constructor(this.array), this.itemSize, meshPerAttribute, dynamic);
+	return new THREE.InstancedBufferAttribute(new this.array.constructor(this.array), this.itemSize, meshPerAttribute, dynamic);
 
 };

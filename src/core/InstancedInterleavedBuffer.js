@@ -4,9 +4,9 @@
 
 THREE.InstancedInterleavedBuffer = function ( array, stride, dynamic, meshPerAttribute ) {
 
-    THREE.InterleavedBuffer.call( this, array, stride, dynamic );
+	THREE.InterleavedBuffer.call( this, array, stride, dynamic );
 
-    this.meshPerAttribute = meshPerAttribute || 1;
+	this.meshPerAttribute = meshPerAttribute || 1;
 
 };
 
@@ -15,6 +15,6 @@ THREE.InstancedInterleavedBuffer.prototype.constructor = THREE.InstancedInterlea
 
 THREE.InstancedInterleavedBuffer.prototype.clone = function () {
 
-    return new THREE.InstancedInterleavedBuffer( new this.array.constructor( this.array ), this.stride, this.dynamic, this.meshPerAttribute );
-    
+	return new THREE.InstancedInterleavedBuffer( new this.array.constructor( this.array ), this.stride, this.dynamic, this.meshPerAttribute );
+
 };

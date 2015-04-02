@@ -74,7 +74,7 @@ THREE.BufferAttribute.prototype = {
 
 		index *= this.itemSize;
 
-		this.array[ index     ] = x;
+		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
 
 		return this;
@@ -85,7 +85,7 @@ THREE.BufferAttribute.prototype = {
 
 		index *= this.itemSize;
 
-		this.array[ index     ] = x;
+		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 
@@ -97,7 +97,7 @@ THREE.BufferAttribute.prototype = {
 
 		index *= this.itemSize;
 
-		this.array[ index     ] = x;
+		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 		this.array[ index + 3 ] = w;

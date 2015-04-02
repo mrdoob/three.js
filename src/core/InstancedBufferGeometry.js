@@ -4,10 +4,10 @@
 
 THREE.InstancedBufferGeometry = function () {
 
-    THREE.BufferGeometry.call( this );
+	THREE.BufferGeometry.call( this );
 
-    this.type = 'InstancedBufferGeometry';
-    this.maxInstancedCount = undefined;
+	this.type = 'InstancedBufferGeometry';
+	this.maxInstancedCount = undefined;
 
 };
 
@@ -16,45 +16,45 @@ THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeome
 
 THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, indexOffset, instances ) {
 
-    this.drawcalls.push( {
+	this.drawcalls.push( {
 
-        start: start,
-        count: count,
-        index: indexOffset !== undefined ? indexOffset : 0,
-        instances: instances
-    } );
+		start: start,
+		count: count,
+		index: indexOffset !== undefined ? indexOffset : 0,
+		instances: instances
+
+	} );
 
 },
 
 THREE.InstancedBufferGeometry.prototype.clone = function () {
 
-    var geometry = new THREE.InstancedBufferGeometry();
+	var geometry = new THREE.InstancedBufferGeometry();
 
-    for ( var attr in this.attributes ) {
+	for ( var attr in this.attributes ) {
 
-        var sourceAttr = this.attributes[attr];
-        geometry.addAttribute( attr, sourceAttr.clone() );
+		var sourceAttr = this.attributes[attr];
+		geometry.addAttribute( attr, sourceAttr.clone() );
 
-    }
+	}
 
-    for ( var i = 0, il = this.offsets.length; i < il; i++ ) {
+	for ( var i = 0, il = this.offsets.length; i < il; i++ ) {
 
-        var offset = this.offsets[i];
+		var offset = this.offsets[i];
 
-        geometry.offsets.push( {
+		geometry.offsets.push( {
 
-            start: offset.start,
-            index: offset.index,
-            count: offset.count,
-            instances: offset.instances
+			start: offset.start,
+			index: offset.index,
+			count: offset.count,
+			instances: offset.instances
 
-        } );
+		} );
 
-    }
+	}
 
-    return geometry;
+	return geometry;
 
 };
-
 
 THREE.EventDispatcher.prototype.apply( THREE.InstancedBufferGeometry.prototype );

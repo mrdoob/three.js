@@ -29,7 +29,7 @@ THREE.BufferGeometry.prototype = {
 
 	addAttribute: function ( name, attribute ) {
 
-	    if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
+		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
 			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -334,7 +334,7 @@ THREE.BufferGeometry.prototype = {
 				box.center( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox:  sqrt(3) smaller in the best case
+				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
 
 				var maxRadiusSq = 0;
 
