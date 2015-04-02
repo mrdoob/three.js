@@ -334,10 +334,6 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 		}
 
-		// TOFIX: Workaround for deleted geometry being currently bound
-
-		_currentGeometryProgram = '';
-
 	};
 
 	//
