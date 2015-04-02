@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WebGLShadowMap = function ( _renderer, _lights, _webglObjects, _webglObjectsImmediate ) {
+THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	var _gl = _renderer.context,
 	_frustum = new THREE.Frustum(),
@@ -11,6 +11,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _webglObjects, _webglObjec
 
 	_min = new THREE.Vector3(),
 	_max = new THREE.Vector3(),
+
+	_webglObjects = _objects.objects,
+	_webglObjectsImmediate = _objects.objectsImmediate,
 
 	_matrixPosition = new THREE.Vector3(),
 
