@@ -9,6 +9,8 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 	var objects = {};
 	var objectsImmediate = [];
 
+	var geometries = {};
+
 	var geometryGroups = {};
 	var geometryGroupCounter = 0;
 
@@ -264,7 +266,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 	function deallocateGeometry ( geometry ) {
 
-		delete geometry.__webglInit;
+		delete geometries[ geometry.id ];
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -361,9 +363,9 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 			// ImmediateRenderObject
 
-		} else if ( geometry.__webglInit === undefined ) {
+		} else if ( geometries[ geometry.id ] === undefined ) {
 
-			geometry.__webglInit = true;
+			geometries[ geometry.id ] = geometry;
 			geometry.addEventListener( 'dispose', onGeometryDispose );
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
