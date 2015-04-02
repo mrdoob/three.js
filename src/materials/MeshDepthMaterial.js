@@ -54,3 +54,13 @@ THREE.MeshDepthMaterial.prototype.toJSON = function () {
 	return data;
 
 };
+
+THREE.MeshDepthMaterial.prototype.refreshUniforms = function ( uniforms, option ) {
+	uniforms.mNear.value = option.camera.near;
+	uniforms.mFar.value = option.camera.far;
+	uniforms.opacity.value = this.opacity;
+};
+
+THREE.MeshDepthMaterial.prototype.getShaderID = function () {
+	return 'depth';
+};
