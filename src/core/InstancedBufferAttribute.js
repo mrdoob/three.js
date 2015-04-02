@@ -16,6 +16,6 @@ THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttr
 
 THREE.InstancedBufferAttribute.prototype.clone = function () {
 
-	return new THREE.InstancedBufferAttribute(new this.array.constructor(this.array), this.itemSize, meshPerAttribute, dynamic);
+	return new THREE.InstancedBufferAttribute( new this.array.constructor( this.array ), this.itemSize, this.meshPerAttribute, this.dynamic );
 
 };
