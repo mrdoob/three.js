@@ -8289,7 +8289,7 @@ THREE.BufferAttribute.prototype = {
 
 		index *= this.itemSize;
 
-		this.array[ index     ] = x;
+		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
 
 		return this;
@@ -8300,7 +8300,7 @@ THREE.BufferAttribute.prototype = {
 
 		index *= this.itemSize;
 
-		this.array[ index     ] = x;
+		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 
@@ -8312,7 +8312,7 @@ THREE.BufferAttribute.prototype = {
 
 		index *= this.itemSize;
 
-		this.array[ index     ] = x;
+		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
 		this.array[ index + 3 ] = w;
@@ -8419,979 +8419,200 @@ THREE.DynamicBufferAttribute.prototype.clone = function () {
 
 };
 
-// File:src/core/BufferGeometry.js
+// File:src/core/InstancedBufferAttribute.js
 
 /**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
+ * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.BufferGeometry = function () {
+THREE.InstancedBufferAttribute = function (array, itemSize, meshPerAttribute, dynamic) {
 
-	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+	THREE.DynamicBufferAttribute.call( this, array, itemSize );
 
-	this.uuid = THREE.Math.generateUUID();
-
-	this.name = '';
-	this.type = 'BufferGeometry';
-
-	this.attributes = {};
-	this.attributesKeys = [];
-
-	this.drawcalls = [];
-	this.offsets = this.drawcalls; // backwards compatibility
-
-	this.boundingBox = null;
-	this.boundingSphere = null;
+	this.dynamic = dynamic || false;
+	this.meshPerAttribute = meshPerAttribute || 1;
 
 };
 
-THREE.BufferGeometry.prototype = {
+THREE.InstancedBufferAttribute.prototype = Object.create( THREE.DynamicBufferAttribute.prototype );
+THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttribute;
 
-	constructor: THREE.BufferGeometry,
+THREE.InstancedBufferAttribute.prototype.clone = function () {
 
-	addAttribute: function ( name, attribute ) {
+	return new THREE.InstancedBufferAttribute( new this.array.constructor( this.array ), this.itemSize, this.meshPerAttribute, this.dynamic );
 
-		if ( attribute instanceof THREE.BufferAttribute === false ) {
+};
 
-			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+// File:src/core/InterleavedBuffer.js
 
-			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+/**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ */
 
-			return;
+THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
 
-		}
+	this.array = array;
+	this.stride = stride;
 
-		this.attributes[ name ] = attribute;
-		this.attributesKeys = Object.keys( this.attributes );
+	this.needsUpdate = false;
 
-	},
+	this.dynamic = dynamic || false;
+	this.updateRange = { offset: 0, count: -1 };
 
-	getAttribute: function ( name ) {
+};
 
-		return this.attributes[ name ];
+THREE.InterleavedBuffer.prototype = {
 
-	},
+	constructor: THREE.InterleavedBuffer,
 
-	addDrawCall: function ( start, count, indexOffset ) {
+	get length () {
 
-		this.drawcalls.push( {
-
-			start: start,
-			count: count,
-			index: indexOffset !== undefined ? indexOffset : 0
-
-		} );
+		return this.array.length;
 
 	},
 
-	applyMatrix: function ( matrix ) {
+	copyAt: function ( index1, attribute, index2 ) {
 
-		var position = this.attributes.position;
+		index1 *= this.stride;
+		index2 *= attribute.stride;
 
-		if ( position !== undefined ) {
+		for ( var i = 0, l = this.stride; i < l; i++ ) {
 
-			matrix.applyToVector3Array( position.array );
-			position.needsUpdate = true;
-
-		}
-
-		var normal = this.attributes.normal;
-
-		if ( normal !== undefined ) {
-
-			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
-
-			normalMatrix.applyToVector3Array( normal.array );
-			normal.needsUpdate = true;
+			this.array[ index1 + i ] = attribute.array[ index2 + i ];
 
 		}
-
-		if ( this.boundingBox !== null ) {
-
-			this.computeBoundingBox();
-
-		}
-
-		if ( this.boundingSphere !== null ) {
-
-			this.computeBoundingSphere();
-
-		}
-
-	},
-
-	center: function () {
-
-		this.computeBoundingBox();
-
-		var offset = this.boundingBox.center().negate();
-
-		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
-
-		return offset;
-
-	},
-
-	fromGeometry: function ( geometry, settings ) {
-
-		settings = settings || { 'vertexColors': THREE.NoColors };
-
-		var vertices = geometry.vertices;
-		var faces = geometry.faces;
-		var faceVertexUvs = geometry.faceVertexUvs;
-		var vertexColors = settings.vertexColors;
-		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
-		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
-
-		var positions = new Float32Array( faces.length * 3 * 3 );
-		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-
-		var normals = new Float32Array( faces.length * 3 * 3 );
-		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-
-		if ( vertexColors !== THREE.NoColors ) {
-
-			var colors = new Float32Array( faces.length * 3 * 3 );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-
-		}
-
-		if ( hasFaceVertexUv === true ) {
-
-			var uvs = new Float32Array( faces.length * 3 * 2 );
-			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
-
-		}
-
-		for ( var i = 0, i2 = 0, i3 = 0; i < faces.length; i ++, i2 += 6, i3 += 9 ) {
-
-			var face = faces[ i ];
-
-			var a = vertices[ face.a ];
-			var b = vertices[ face.b ];
-			var c = vertices[ face.c ];
-
-			positions[ i3     ] = a.x;
-			positions[ i3 + 1 ] = a.y;
-			positions[ i3 + 2 ] = a.z;
-
-			positions[ i3 + 3 ] = b.x;
-			positions[ i3 + 4 ] = b.y;
-			positions[ i3 + 5 ] = b.z;
-
-			positions[ i3 + 6 ] = c.x;
-			positions[ i3 + 7 ] = c.y;
-			positions[ i3 + 8 ] = c.z;
-
-			if ( hasFaceVertexNormals === true ) {
-
-				var na = face.vertexNormals[ 0 ];
-				var nb = face.vertexNormals[ 1 ];
-				var nc = face.vertexNormals[ 2 ];
-
-				normals[ i3     ] = na.x;
-				normals[ i3 + 1 ] = na.y;
-				normals[ i3 + 2 ] = na.z;
-
-				normals[ i3 + 3 ] = nb.x;
-				normals[ i3 + 4 ] = nb.y;
-				normals[ i3 + 5 ] = nb.z;
-
-				normals[ i3 + 6 ] = nc.x;
-				normals[ i3 + 7 ] = nc.y;
-				normals[ i3 + 8 ] = nc.z;
-
-			} else {
-
-				var n = face.normal;
-
-				normals[ i3     ] = n.x;
-				normals[ i3 + 1 ] = n.y;
-				normals[ i3 + 2 ] = n.z;
-
-				normals[ i3 + 3 ] = n.x;
-				normals[ i3 + 4 ] = n.y;
-				normals[ i3 + 5 ] = n.z;
-
-				normals[ i3 + 6 ] = n.x;
-				normals[ i3 + 7 ] = n.y;
-				normals[ i3 + 8 ] = n.z;
-
-			}
-
-			if ( vertexColors === THREE.FaceColors ) {
-
-				var fc = face.color;
-
-				colors[ i3     ] = fc.r;
-				colors[ i3 + 1 ] = fc.g;
-				colors[ i3 + 2 ] = fc.b;
-
-				colors[ i3 + 3 ] = fc.r;
-				colors[ i3 + 4 ] = fc.g;
-				colors[ i3 + 5 ] = fc.b;
-
-				colors[ i3 + 6 ] = fc.r;
-				colors[ i3 + 7 ] = fc.g;
-				colors[ i3 + 8 ] = fc.b;
-
-			} else if ( vertexColors === THREE.VertexColors ) {
-
-				var vca = face.vertexColors[ 0 ];
-				var vcb = face.vertexColors[ 1 ];
-				var vcc = face.vertexColors[ 2 ];
-
-				colors[ i3     ] = vca.r;
-				colors[ i3 + 1 ] = vca.g;
-				colors[ i3 + 2 ] = vca.b;
-
-				colors[ i3 + 3 ] = vcb.r;
-				colors[ i3 + 4 ] = vcb.g;
-				colors[ i3 + 5 ] = vcb.b;
-
-				colors[ i3 + 6 ] = vcc.r;
-				colors[ i3 + 7 ] = vcc.g;
-				colors[ i3 + 8 ] = vcc.b;
-
-			}
-
-			if ( hasFaceVertexUv === true ) {
-
-				var uva = faceVertexUvs[ 0 ][ i ][ 0 ];
-				var uvb = faceVertexUvs[ 0 ][ i ][ 1 ];
-				var uvc = faceVertexUvs[ 0 ][ i ][ 2 ];
-
-				uvs[ i2     ] = uva.x;
-				uvs[ i2 + 1 ] = uva.y;
-
-				uvs[ i2 + 2 ] = uvb.x;
-				uvs[ i2 + 3 ] = uvb.y;
-
-				uvs[ i2 + 4 ] = uvc.x;
-				uvs[ i2 + 5 ] = uvc.y;
-
-			}
-
-		}
-
-		this.computeBoundingSphere()
 
 		return this;
 
 	},
 
-	computeBoundingBox: function () {
-
-		var vector = new THREE.Vector3();
-
-		return function () {
-
-			if ( this.boundingBox === null ) {
-
-				this.boundingBox = new THREE.Box3();
-
-			}
-
-			var positions = this.attributes.position.array;
-
-			if ( positions ) {
-
-				var bb = this.boundingBox;
-				bb.makeEmpty();
-
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-					bb.expandByPoint( vector );
-
-				}
-
-			}
-
-			if ( positions === undefined || positions.length === 0 ) {
-
-				this.boundingBox.min.set( 0, 0, 0 );
-				this.boundingBox.max.set( 0, 0, 0 );
-
-			}
-
-			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
-
-				THREE.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
-
-			}
-
-		}
-
-	}(),
-
-	computeBoundingSphere: function () {
-
-		var box = new THREE.Box3();
-		var vector = new THREE.Vector3();
-
-		return function () {
-
-			if ( this.boundingSphere === null ) {
-
-				this.boundingSphere = new THREE.Sphere();
-
-			}
-
-			var positions = this.attributes.position.array;
-
-			if ( positions ) {
-
-				box.makeEmpty();
-
-				var center = this.boundingSphere.center;
-
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-					box.expandByPoint( vector );
-
-				}
-
-				box.center( center );
-
-				// hoping to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox:  sqrt(3) smaller in the best case
-
-				var maxRadiusSq = 0;
-
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
-
-				}
-
-				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-				if ( isNaN( this.boundingSphere.radius ) ) {
-
-					THREE.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
-
-				}
-
-			}
-
-		}
-
-	}(),
-
-	computeFaceNormals: function () {
-
-		// backwards compatibility
-
-	},
-
-	computeVertexNormals: function () {
-
-		var attributes = this.attributes;
-
-		if ( attributes.position ) {
-
-			var positions = attributes.position.array;
-
-			if ( attributes.normal === undefined ) {
-
-				this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( positions.length ), 3 ) );
-
-			} else {
-
-				// reset existing normals to zero
-
-				var normals = attributes.normal.array;
-
-				for ( var i = 0, il = normals.length; i < il; i ++ ) {
-
-					normals[ i ] = 0;
-
-				}
-
-			}
-
-			var normals = attributes.normal.array;
-
-			var vA, vB, vC,
-
-			pA = new THREE.Vector3(),
-			pB = new THREE.Vector3(),
-			pC = new THREE.Vector3(),
-
-			cb = new THREE.Vector3(),
-			ab = new THREE.Vector3();
-
-			// indexed elements
-
-			if ( attributes.index ) {
-
-				var indices = attributes.index.array;
-
-				var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
-
-				for ( var j = 0, jl = offsets.length; j < jl; ++ j ) {
-
-					var start = offsets[ j ].start;
-					var count = offsets[ j ].count;
-					var index = offsets[ j ].index;
-
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-						vA = ( index + indices[ i     ] ) * 3;
-						vB = ( index + indices[ i + 1 ] ) * 3;
-						vC = ( index + indices[ i + 2 ] ) * 3;
-
-						pA.fromArray( positions, vA );
-						pB.fromArray( positions, vB );
-						pC.fromArray( positions, vC );
-
-						cb.subVectors( pC, pB );
-						ab.subVectors( pA, pB );
-						cb.cross( ab );
-
-						normals[ vA     ] += cb.x;
-						normals[ vA + 1 ] += cb.y;
-						normals[ vA + 2 ] += cb.z;
-
-						normals[ vB     ] += cb.x;
-						normals[ vB + 1 ] += cb.y;
-						normals[ vB + 2 ] += cb.z;
-
-						normals[ vC     ] += cb.x;
-						normals[ vC + 1 ] += cb.y;
-						normals[ vC + 2 ] += cb.z;
-
-					}
-
-				}
-
-			} else {
-
-				// non-indexed elements (unconnected triangle soup)
-
-				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
-
-					pA.fromArray( positions, i );
-					pB.fromArray( positions, i + 3 );
-					pC.fromArray( positions, i + 6 );
-
-					cb.subVectors( pC, pB );
-					ab.subVectors( pA, pB );
-					cb.cross( ab );
-
-					normals[ i     ] = cb.x;
-					normals[ i + 1 ] = cb.y;
-					normals[ i + 2 ] = cb.z;
-
-					normals[ i + 3 ] = cb.x;
-					normals[ i + 4 ] = cb.y;
-					normals[ i + 5 ] = cb.z;
-
-					normals[ i + 6 ] = cb.x;
-					normals[ i + 7 ] = cb.y;
-					normals[ i + 8 ] = cb.z;
-
-				}
-
-			}
-
-			this.normalizeNormals();
-
-			attributes.normal.needsUpdate = true;
-
-		}
-
-	},
-
-	computeTangents: function () {
-
-		// based on http://www.terathon.com/code/tangent.html
-		// (per vertex tangents)
-
-		if ( this.attributes.index === undefined ||
-			 this.attributes.position === undefined ||
-			 this.attributes.normal === undefined ||
-			 this.attributes.uv === undefined ) {
-
-			THREE.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
-			return;
-
-		}
-
-		var indices = this.attributes.index.array;
-		var positions = this.attributes.position.array;
-		var normals = this.attributes.normal.array;
-		var uvs = this.attributes.uv.array;
-
-		var nVertices = positions.length / 3;
-
-		if ( this.attributes.tangent === undefined ) {
-
-			this.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
-
-		}
-
-		var tangents = this.attributes.tangent.array;
-
-		var tan1 = [], tan2 = [];
-
-		for ( var k = 0; k < nVertices; k ++ ) {
-
-			tan1[ k ] = new THREE.Vector3();
-			tan2[ k ] = new THREE.Vector3();
-
-		}
-
-		var vA = new THREE.Vector3(),
-			vB = new THREE.Vector3(),
-			vC = new THREE.Vector3(),
-
-			uvA = new THREE.Vector2(),
-			uvB = new THREE.Vector2(),
-			uvC = new THREE.Vector2(),
-
-			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r;
-
-		var sdir = new THREE.Vector3(), tdir = new THREE.Vector3();
-
-		function handleTriangle( a, b, c ) {
-
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
-
-			uvA.fromArray( uvs, a * 2 );
-			uvB.fromArray( uvs, b * 2 );
-			uvC.fromArray( uvs, c * 2 );
-
-			x1 = vB.x - vA.x;
-			x2 = vC.x - vA.x;
-
-			y1 = vB.y - vA.y;
-			y2 = vC.y - vA.y;
-
-			z1 = vB.z - vA.z;
-			z2 = vC.z - vA.z;
-
-			s1 = uvB.x - uvA.x;
-			s2 = uvC.x - uvA.x;
-
-			t1 = uvB.y - uvA.y;
-			t2 = uvC.y - uvA.y;
-
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
-
-			sdir.set(
-				( t2 * x1 - t1 * x2 ) * r,
-				( t2 * y1 - t1 * y2 ) * r,
-				( t2 * z1 - t1 * z2 ) * r
-			);
-
-			tdir.set(
-				( s1 * x2 - s2 * x1 ) * r,
-				( s1 * y2 - s2 * y1 ) * r,
-				( s1 * z2 - s2 * z1 ) * r
-			);
-
-			tan1[ a ].add( sdir );
-			tan1[ b ].add( sdir );
-			tan1[ c ].add( sdir );
-
-			tan2[ a ].add( tdir );
-			tan2[ b ].add( tdir );
-			tan2[ c ].add( tdir );
-
-		}
-
-		var i, il;
-		var j, jl;
-		var iA, iB, iC;
-
-		if ( this.drawcalls.length === 0 ) {
-
-			this.addDrawCall( 0, indices.length, 0 );
-
-		}
-
-		var drawcalls = this.drawcalls;
-
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
-
-			var start = drawcalls[ j ].start;
-			var count = drawcalls[ j ].count;
-			var index = drawcalls[ j ].index;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = index + indices[ i ];
-				iB = index + indices[ i + 1 ];
-				iC = index + indices[ i + 2 ];
-
-				handleTriangle( iA, iB, iC );
-
-			}
-
-		}
-
-		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
-		var w, t, test;
-
-		function handleVertex( v ) {
-
-			n.fromArray( normals, v * 3 );
-			n2.copy( n );
-
-			t = tan1[ v ];
-
-			// Gram-Schmidt orthogonalize
-
-			tmp.copy( t );
-			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-			// Calculate handedness
-
-			tmp2.crossVectors( n2, t );
-			test = tmp2.dot( tan2[ v ] );
-			w = ( test < 0.0 ) ? - 1.0 : 1.0;
-
-			tangents[ v * 4     ] = tmp.x;
-			tangents[ v * 4 + 1 ] = tmp.y;
-			tangents[ v * 4 + 2 ] = tmp.z;
-			tangents[ v * 4 + 3 ] = w;
-
-		}
-
-		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
-
-			var start = drawcalls[ j ].start;
-			var count = drawcalls[ j ].count;
-			var index = drawcalls[ j ].index;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = index + indices[ i ];
-				iB = index + indices[ i + 1 ];
-				iC = index + indices[ i + 2 ];
-
-				handleVertex( iA );
-				handleVertex( iB );
-				handleVertex( iC );
-
-			}
-
-		}
-
-	},
-
-	/*
-	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
-	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
-	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-	size - Defaults to 65535, but allows for larger or smaller chunks.
-	*/
-	computeOffsets: function ( size ) {
-
-		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
-
-		var indices = this.attributes.index.array;
-		var vertices = this.attributes.position.array;
-
-		var facesCount = ( indices.length / 3 );
-
-		/*
-		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
-		THREE.log("Faces to process: "+(indices.length/3));
-		THREE.log("Reordering "+verticesCount+" vertices.");
-		*/
-
-		var sortedIndices = new Uint16Array( indices.length ); //16-bit buffers
-		var indexPtr = 0;
-		var vertexPtr = 0;
-
-		var offsets = [ { start:0, count:0, index:0 } ];
-		var offset = offsets[ 0 ];
-
-		var duplicatedVertices = 0;
-		var newVerticeMaps = 0;
-		var faceVertices = new Int32Array( 6 );
-		var vertexMap = new Int32Array( vertices.length );
-		var revVertexMap = new Int32Array( vertices.length );
-		for ( var j = 0; j < vertices.length; j ++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
-
-		/*
-			Traverse every face and reorder vertices in the proper offsets of 65k.
-			We can have more than 65k entries in the index buffer per offset, but only reference 65k values.
-		*/
-		for ( var findex = 0; findex < facesCount; findex ++ ) {
-			newVerticeMaps = 0;
-
-			for ( var vo = 0; vo < 3; vo ++ ) {
-				var vid = indices[ findex * 3 + vo ];
-				if ( vertexMap[ vid ] == - 1 ) {
-					//Unmapped vertice
-					faceVertices[ vo * 2 ] = vid;
-					faceVertices[ vo * 2 + 1 ] = - 1;
-					newVerticeMaps ++;
-				} else if ( vertexMap[ vid ] < offset.index ) {
-					//Reused vertices from previous block (duplicate)
-					faceVertices[ vo * 2 ] = vid;
-					faceVertices[ vo * 2 + 1 ] = - 1;
-					duplicatedVertices ++;
-				} else {
-					//Reused vertice in the current block
-					faceVertices[ vo * 2 ] = vid;
-					faceVertices[ vo * 2 + 1 ] = vertexMap[ vid ];
-				}
-			}
-
-			var faceMax = vertexPtr + newVerticeMaps;
-			if ( faceMax > ( offset.index + size ) ) {
-				var new_offset = { start:indexPtr, count:0, index:vertexPtr };
-				offsets.push( new_offset );
-				offset = new_offset;
-
-				//Re-evaluate reused vertices in light of new offset.
-				for ( var v = 0; v < 6; v += 2 ) {
-					var new_vid = faceVertices[ v + 1 ];
-					if ( new_vid > - 1 && new_vid < offset.index )
-						faceVertices[ v + 1 ] = - 1;
-				}
-			}
-
-			//Reindex the face.
-			for ( var v = 0; v < 6; v += 2 ) {
-				var vid = faceVertices[ v ];
-				var new_vid = faceVertices[ v + 1 ];
-
-				if ( new_vid === - 1 )
-					new_vid = vertexPtr ++;
-
-				vertexMap[ vid ] = new_vid;
-				revVertexMap[ new_vid ] = vid;
-				sortedIndices[ indexPtr ++ ] = new_vid - offset.index; //XXX overflows at 16bit
-				offset.count ++;
-			}
-		}
-
-		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
-		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
-		this.offsets = offsets; // TODO: Deprecate
-		this.drawcalls = offsets;
-
-		/*
-		var orderTime = Date.now();
-		THREE.log("Reorder time: "+(orderTime-s)+"ms");
-		THREE.log("Duplicated "+duplicatedVertices+" vertices.");
-		THREE.log("Compute Buffers time: "+(Date.now()-s)+"ms");
-		THREE.log("Draw offsets: "+offsets.length);
-		*/
-
-		return offsets;
-
-	},
-
-	merge: function ( geometry, offset ) {
-
-		if ( geometry instanceof THREE.BufferGeometry === false ) {
-
-			THREE.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
-			return;
-
-		}
+	set: function ( value, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
-		var attributes = this.attributes;
-
-		for ( var key in attributes ) {
-
-			if ( geometry.attributes[ key ] === undefined ) continue;
-
-			var attribute1 = attributes[ key ];
-			var attributeArray1 = attribute1.array;
-
-			var attribute2 = geometry.attributes[ key ];
-			var attributeArray2 = attribute2.array;
-
-			var attributeSize = attribute2.itemSize;
-
-			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
-
-				attributeArray1[ j ] = attributeArray2[ i ];
-
-			}
-
-		}
+		this.array.set( value, offset );
 
 		return this;
-
-	},
-
-	normalizeNormals: function () {
-
-		var normals = this.attributes.normal.array;
-
-		var x, y, z, n;
-
-		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
-
-			x = normals[ i ];
-			y = normals[ i + 1 ];
-			z = normals[ i + 2 ];
-
-			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-			normals[ i     ] *= n;
-			normals[ i + 1 ] *= n;
-			normals[ i + 2 ] *= n;
-
-		}
-
-	},
-
-	/*
-		reoderBuffers:
-		Reorder attributes based on a new indexBuffer and indexMap.
-		indexBuffer - Uint16Array of the new ordered indices.
-		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
-		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertice stack).
-	*/
-	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
-
-		/* Create a copy of all attributes for reordering. */
-		var sortedAttributes = {};
-		for ( var attr in this.attributes ) {
-			if ( attr == 'index' )
-				continue;
-			var sourceArray = this.attributes[ attr ].array;
-			sortedAttributes[ attr ] = new sourceArray.constructor( this.attributes[ attr ].itemSize * vertexCount );
-		}
-
-		/* Move attribute positions based on the new index map */
-		for ( var new_vid = 0; new_vid < vertexCount; new_vid ++ ) {
-			var vid = indexMap[ new_vid ];
-			for ( var attr in this.attributes ) {
-				if ( attr == 'index' )
-					continue;
-				var attrArray = this.attributes[ attr ].array;
-				var attrSize = this.attributes[ attr ].itemSize;
-				var sortedAttr = sortedAttributes[ attr ];
-				for ( var k = 0; k < attrSize; k ++ )
-					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
-			}
-		}
-
-		/* Carry the new sorted buffers locally */
-		this.attributes[ 'index' ].array = indexBuffer;
-		for ( var attr in this.attributes ) {
-			if ( attr == 'index' )
-				continue;
-			this.attributes[ attr ].array = sortedAttributes[ attr ];
-			this.attributes[ attr ].numItems = this.attributes[ attr ].itemSize * vertexCount;
-		}
-	},
-
-	toJSON: function() {
-
-		// we will store all serialization data on 'data'
-		var data = {};
-
-		// add metadata
-		data.metadata = {
-			version: 4.4,
-			type: 'BufferGeometry',
-			generator: 'BufferGeometry.toJSON'
-		}
-
-		// standard BufferGeometry serialization
-
-		data.type = this.type;
-		data.uuid = this.uuid;
-		if ( this.name !== '' ) data.name = this.name;
-		data.data = {};
-		data.data.attributes = {};
-
-		var attributes = this.attributes;
-		var offsets = this.offsets;
-		var boundingSphere = this.boundingSphere;
-
-		for ( var key in attributes ) {
-
-			var attribute = attributes[ key ];
-
-			var array = Array.prototype.slice.call( attribute.array );
-
-			data.data.attributes[ key ] = {
-				itemSize: attribute.itemSize,
-				type: attribute.array.constructor.name,
-				array: array
-			}
-
-		}
-
-		if ( offsets.length > 0 ) {
-
-			data.data.offsets = JSON.parse( JSON.stringify( offsets ) );
-
-		}
-
-		if ( boundingSphere !== null ) {
-
-			data.data.boundingSphere = {
-				center: boundingSphere.center.toArray(),
-				radius: boundingSphere.radius
-			}
-
-		}
-
-		return data;
 
 	},
 
 	clone: function () {
 
-		var geometry = new THREE.BufferGeometry();
-
-		for ( var attr in this.attributes ) {
-
-			var sourceAttr = this.attributes[ attr ];
-			geometry.addAttribute( attr, sourceAttr.clone() );
-
-		}
-
-		for ( var i = 0, il = this.offsets.length; i < il; i ++ ) {
-
-			var offset = this.offsets[ i ];
-
-			geometry.offsets.push( {
-
-				start: offset.start,
-				index: offset.index,
-				count: offset.count
-
-			} );
-
-		}
-
-		return geometry;
-
-	},
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
+		return new THREE.InterleavedBuffer( new this.array.constructor( this.array ), this.stride, this.dynamic );
 
 	}
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
+// File:src/core/InstancedInterleavedBuffer.js
+
+/**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ */
+
+THREE.InstancedInterleavedBuffer = function ( array, stride, dynamic, meshPerAttribute ) {
+
+	THREE.InterleavedBuffer.call( this, array, stride, dynamic );
+
+	this.meshPerAttribute = meshPerAttribute || 1;
+
+};
+
+THREE.InstancedInterleavedBuffer.prototype = Object.create( THREE.InterleavedBuffer.prototype );
+THREE.InstancedInterleavedBuffer.prototype.constructor = THREE.InstancedInterleavedBuffer;
+
+THREE.InstancedInterleavedBuffer.prototype.clone = function () {
+
+	return new THREE.InstancedInterleavedBuffer( new this.array.constructor( this.array ), this.stride, this.dynamic, this.meshPerAttribute );
+
+};
+
+// File:src/core/InterleavedBufferAttribute.js
+
+/**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ */
+
+THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset ) {
+
+	this.data = interleavedBuffer;
+	this.itemSize = itemSize;
+	this.offset = offset;
+
+};
+
+
+THREE.InterleavedBufferAttribute.prototype = {
+
+	constructor: THREE.InterleavedBufferAttribute,
+
+	get length() {
+
+		return this.itemSize * this.data.array.length / this.data.stride;
+
+	},
+
+	setX: function ( index, x ) {
+
+		this.data.array[ index * this.data.stride + this.offset ] = x;
+
+		return this;
+
+	},
+
+	setY: function ( index, y ) {
+
+		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
+
+		return this;
+
+	},
+
+	setZ: function ( index, z ) {
+
+		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+
+		return this;
+
+	},
+
+	setXY: function ( index, x, y ) {
+
+		index = index * this.data.stride + this.offset;
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+
+		return this;
+
+	},
+
+	setXYZ: function ( index, x, y, z ) {
+
+		index = index * this.data.stride + this.offset;
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
+
+		return this;
+
+	},
+
+	setXYZW: function ( index, x, y, z, w ) {
+
+		index = index * this.data.stride + this.offset;
+
+		this.data.array[ index + 0 ] = x;
+		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 2 ] = z;
+		this.data.array[ index + 3 ] = w;
+
+		return this;
+
+	}
+
+};
 
 // File:src/core/Geometry.js
 
@@ -10460,6 +9681,1043 @@ THREE.Geometry.prototype = {
 THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
 
 THREE.GeometryIdCount = 0;
+
+// File:src/core/BufferGeometry.js
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.BufferGeometry = function () {
+
+	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
+
+	this.uuid = THREE.Math.generateUUID();
+
+	this.name = '';
+	this.type = 'BufferGeometry';
+
+	this.attributes = {};
+	this.attributesKeys = [];
+
+	this.drawcalls = [];
+	this.offsets = this.drawcalls; // backwards compatibility
+
+	this.boundingBox = null;
+	this.boundingSphere = null;
+
+};
+
+THREE.BufferGeometry.prototype = {
+
+	constructor: THREE.BufferGeometry,
+
+	addAttribute: function ( name, attribute ) {
+
+		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
+
+			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+
+			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
+
+			return;
+
+		}
+
+		this.attributes[ name ] = attribute;
+		this.attributesKeys = Object.keys( this.attributes );
+
+	},
+
+	getAttribute: function ( name ) {
+
+		return this.attributes[ name ];
+
+	},
+
+	addDrawCall: function ( start, count, indexOffset ) {
+
+		this.drawcalls.push( {
+
+			start: start,
+			count: count,
+			index: indexOffset !== undefined ? indexOffset : 0
+
+		} );
+
+	},
+
+	applyMatrix: function ( matrix ) {
+
+		var position = this.attributes.position;
+
+		if ( position !== undefined ) {
+
+			matrix.applyToVector3Array( position.array );
+			position.needsUpdate = true;
+
+		}
+
+		var normal = this.attributes.normal;
+
+		if ( normal !== undefined ) {
+
+			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+
+			normalMatrix.applyToVector3Array( normal.array );
+			normal.needsUpdate = true;
+
+		}
+
+		if ( this.boundingBox !== null ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere !== null ) {
+
+			this.computeBoundingSphere();
+
+		}
+
+	},
+
+	center: function () {
+
+		this.computeBoundingBox();
+
+		var offset = this.boundingBox.center().negate();
+
+		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
+
+		return offset;
+
+	},
+
+	fromGeometry: function ( geometry, settings ) {
+
+		settings = settings || { 'vertexColors': THREE.NoColors };
+
+		var vertices = geometry.vertices;
+		var faces = geometry.faces;
+		var faceVertexUvs = geometry.faceVertexUvs;
+		var vertexColors = settings.vertexColors;
+		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
+
+		var positions = new Float32Array( faces.length * 3 * 3 );
+		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+		var normals = new Float32Array( faces.length * 3 * 3 );
+		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+
+		if ( vertexColors !== THREE.NoColors ) {
+
+			var colors = new Float32Array( faces.length * 3 * 3 );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+
+		}
+
+		if ( hasFaceVertexUv === true ) {
+
+			var uvs = new Float32Array( faces.length * 3 * 2 );
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+		}
+
+		for ( var i = 0, i2 = 0, i3 = 0; i < faces.length; i ++, i2 += 6, i3 += 9 ) {
+
+			var face = faces[ i ];
+
+			var a = vertices[ face.a ];
+			var b = vertices[ face.b ];
+			var c = vertices[ face.c ];
+
+			positions[ i3     ] = a.x;
+			positions[ i3 + 1 ] = a.y;
+			positions[ i3 + 2 ] = a.z;
+
+			positions[ i3 + 3 ] = b.x;
+			positions[ i3 + 4 ] = b.y;
+			positions[ i3 + 5 ] = b.z;
+
+			positions[ i3 + 6 ] = c.x;
+			positions[ i3 + 7 ] = c.y;
+			positions[ i3 + 8 ] = c.z;
+
+			if ( hasFaceVertexNormals === true ) {
+
+				var na = face.vertexNormals[ 0 ];
+				var nb = face.vertexNormals[ 1 ];
+				var nc = face.vertexNormals[ 2 ];
+
+				normals[ i3     ] = na.x;
+				normals[ i3 + 1 ] = na.y;
+				normals[ i3 + 2 ] = na.z;
+
+				normals[ i3 + 3 ] = nb.x;
+				normals[ i3 + 4 ] = nb.y;
+				normals[ i3 + 5 ] = nb.z;
+
+				normals[ i3 + 6 ] = nc.x;
+				normals[ i3 + 7 ] = nc.y;
+				normals[ i3 + 8 ] = nc.z;
+
+			} else {
+
+				var n = face.normal;
+
+				normals[ i3     ] = n.x;
+				normals[ i3 + 1 ] = n.y;
+				normals[ i3 + 2 ] = n.z;
+
+				normals[ i3 + 3 ] = n.x;
+				normals[ i3 + 4 ] = n.y;
+				normals[ i3 + 5 ] = n.z;
+
+				normals[ i3 + 6 ] = n.x;
+				normals[ i3 + 7 ] = n.y;
+				normals[ i3 + 8 ] = n.z;
+
+			}
+
+			if ( vertexColors === THREE.FaceColors ) {
+
+				var fc = face.color;
+
+				colors[ i3     ] = fc.r;
+				colors[ i3 + 1 ] = fc.g;
+				colors[ i3 + 2 ] = fc.b;
+
+				colors[ i3 + 3 ] = fc.r;
+				colors[ i3 + 4 ] = fc.g;
+				colors[ i3 + 5 ] = fc.b;
+
+				colors[ i3 + 6 ] = fc.r;
+				colors[ i3 + 7 ] = fc.g;
+				colors[ i3 + 8 ] = fc.b;
+
+			} else if ( vertexColors === THREE.VertexColors ) {
+
+				var vca = face.vertexColors[ 0 ];
+				var vcb = face.vertexColors[ 1 ];
+				var vcc = face.vertexColors[ 2 ];
+
+				colors[ i3     ] = vca.r;
+				colors[ i3 + 1 ] = vca.g;
+				colors[ i3 + 2 ] = vca.b;
+
+				colors[ i3 + 3 ] = vcb.r;
+				colors[ i3 + 4 ] = vcb.g;
+				colors[ i3 + 5 ] = vcb.b;
+
+				colors[ i3 + 6 ] = vcc.r;
+				colors[ i3 + 7 ] = vcc.g;
+				colors[ i3 + 8 ] = vcc.b;
+
+			}
+
+			if ( hasFaceVertexUv === true ) {
+
+				var uva = faceVertexUvs[ 0 ][ i ][ 0 ];
+				var uvb = faceVertexUvs[ 0 ][ i ][ 1 ];
+				var uvc = faceVertexUvs[ 0 ][ i ][ 2 ];
+
+				uvs[ i2     ] = uva.x;
+				uvs[ i2 + 1 ] = uva.y;
+
+				uvs[ i2 + 2 ] = uvb.x;
+				uvs[ i2 + 3 ] = uvb.y;
+
+				uvs[ i2 + 4 ] = uvc.x;
+				uvs[ i2 + 5 ] = uvc.y;
+
+			}
+
+		}
+
+		this.computeBoundingSphere()
+
+		return this;
+
+	},
+
+	computeBoundingBox: function () {
+
+		var vector = new THREE.Vector3();
+
+		return function () {
+
+			if ( this.boundingBox === null ) {
+
+				this.boundingBox = new THREE.Box3();
+
+			}
+
+			var positions = this.attributes.position.array;
+
+			if ( positions ) {
+
+				var bb = this.boundingBox;
+				bb.makeEmpty();
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					bb.expandByPoint( vector );
+
+				}
+
+			}
+
+			if ( positions === undefined || positions.length === 0 ) {
+
+				this.boundingBox.min.set( 0, 0, 0 );
+				this.boundingBox.max.set( 0, 0, 0 );
+
+			}
+
+			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+
+				THREE.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
+
+			}
+
+		}
+
+	}(),
+
+	computeBoundingSphere: function () {
+
+		var box = new THREE.Box3();
+		var vector = new THREE.Vector3();
+
+		return function () {
+
+			if ( this.boundingSphere === null ) {
+
+				this.boundingSphere = new THREE.Sphere();
+
+			}
+
+			var positions = this.attributes.position.array;
+
+			if ( positions ) {
+
+				box.makeEmpty();
+
+				var center = this.boundingSphere.center;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					box.expandByPoint( vector );
+
+				}
+
+				box.center( center );
+
+				// hoping to find a boundingSphere with a radius smaller than the
+				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
+
+				var maxRadiusSq = 0;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+				}
+
+				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+				if ( isNaN( this.boundingSphere.radius ) ) {
+
+					THREE.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
+
+				}
+
+			}
+
+		}
+
+	}(),
+
+	computeFaceNormals: function () {
+
+		// backwards compatibility
+
+	},
+
+	computeVertexNormals: function () {
+
+		var attributes = this.attributes;
+
+		if ( attributes.position ) {
+
+			var positions = attributes.position.array;
+
+			if ( attributes.normal === undefined ) {
+
+				this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( positions.length ), 3 ) );
+
+			} else {
+
+				// reset existing normals to zero
+
+				var normals = attributes.normal.array;
+
+				for ( var i = 0, il = normals.length; i < il; i ++ ) {
+
+					normals[ i ] = 0;
+
+				}
+
+			}
+
+			var normals = attributes.normal.array;
+
+			var vA, vB, vC,
+
+			pA = new THREE.Vector3(),
+			pB = new THREE.Vector3(),
+			pC = new THREE.Vector3(),
+
+			cb = new THREE.Vector3(),
+			ab = new THREE.Vector3();
+
+			// indexed elements
+
+			if ( attributes.index ) {
+
+				var indices = attributes.index.array;
+
+				var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
+
+				for ( var j = 0, jl = offsets.length; j < jl; ++ j ) {
+
+					var start = offsets[ j ].start;
+					var count = offsets[ j ].count;
+					var index = offsets[ j ].index;
+
+					for ( var i = start, il = start + count; i < il; i += 3 ) {
+
+						vA = ( index + indices[ i     ] ) * 3;
+						vB = ( index + indices[ i + 1 ] ) * 3;
+						vC = ( index + indices[ i + 2 ] ) * 3;
+
+						pA.fromArray( positions, vA );
+						pB.fromArray( positions, vB );
+						pC.fromArray( positions, vC );
+
+						cb.subVectors( pC, pB );
+						ab.subVectors( pA, pB );
+						cb.cross( ab );
+
+						normals[ vA     ] += cb.x;
+						normals[ vA + 1 ] += cb.y;
+						normals[ vA + 2 ] += cb.z;
+
+						normals[ vB     ] += cb.x;
+						normals[ vB + 1 ] += cb.y;
+						normals[ vB + 2 ] += cb.z;
+
+						normals[ vC     ] += cb.x;
+						normals[ vC + 1 ] += cb.y;
+						normals[ vC + 2 ] += cb.z;
+
+					}
+
+				}
+
+			} else {
+
+				// non-indexed elements (unconnected triangle soup)
+
+				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
+
+					pA.fromArray( positions, i );
+					pB.fromArray( positions, i + 3 );
+					pC.fromArray( positions, i + 6 );
+
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
+
+					normals[ i     ] = cb.x;
+					normals[ i + 1 ] = cb.y;
+					normals[ i + 2 ] = cb.z;
+
+					normals[ i + 3 ] = cb.x;
+					normals[ i + 4 ] = cb.y;
+					normals[ i + 5 ] = cb.z;
+
+					normals[ i + 6 ] = cb.x;
+					normals[ i + 7 ] = cb.y;
+					normals[ i + 8 ] = cb.z;
+
+				}
+
+			}
+
+			this.normalizeNormals();
+
+			attributes.normal.needsUpdate = true;
+
+		}
+
+	},
+
+	computeTangents: function () {
+
+		// based on http://www.terathon.com/code/tangent.html
+		// (per vertex tangents)
+
+		if ( this.attributes.index === undefined ||
+			 this.attributes.position === undefined ||
+			 this.attributes.normal === undefined ||
+			 this.attributes.uv === undefined ) {
+
+			THREE.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
+			return;
+
+		}
+
+		var indices = this.attributes.index.array;
+		var positions = this.attributes.position.array;
+		var normals = this.attributes.normal.array;
+		var uvs = this.attributes.uv.array;
+
+		var nVertices = positions.length / 3;
+
+		if ( this.attributes.tangent === undefined ) {
+
+			this.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
+
+		}
+
+		var tangents = this.attributes.tangent.array;
+
+		var tan1 = [], tan2 = [];
+
+		for ( var k = 0; k < nVertices; k ++ ) {
+
+			tan1[ k ] = new THREE.Vector3();
+			tan2[ k ] = new THREE.Vector3();
+
+		}
+
+		var vA = new THREE.Vector3(),
+			vB = new THREE.Vector3(),
+			vC = new THREE.Vector3(),
+
+			uvA = new THREE.Vector2(),
+			uvB = new THREE.Vector2(),
+			uvC = new THREE.Vector2(),
+
+			x1, x2, y1, y2, z1, z2,
+			s1, s2, t1, t2, r;
+
+		var sdir = new THREE.Vector3(), tdir = new THREE.Vector3();
+
+		function handleTriangle( a, b, c ) {
+
+			vA.fromArray( positions, a * 3 );
+			vB.fromArray( positions, b * 3 );
+			vC.fromArray( positions, c * 3 );
+
+			uvA.fromArray( uvs, a * 2 );
+			uvB.fromArray( uvs, b * 2 );
+			uvC.fromArray( uvs, c * 2 );
+
+			x1 = vB.x - vA.x;
+			x2 = vC.x - vA.x;
+
+			y1 = vB.y - vA.y;
+			y2 = vC.y - vA.y;
+
+			z1 = vB.z - vA.z;
+			z2 = vC.z - vA.z;
+
+			s1 = uvB.x - uvA.x;
+			s2 = uvC.x - uvA.x;
+
+			t1 = uvB.y - uvA.y;
+			t2 = uvC.y - uvA.y;
+
+			r = 1.0 / ( s1 * t2 - s2 * t1 );
+
+			sdir.set(
+				( t2 * x1 - t1 * x2 ) * r,
+				( t2 * y1 - t1 * y2 ) * r,
+				( t2 * z1 - t1 * z2 ) * r
+			);
+
+			tdir.set(
+				( s1 * x2 - s2 * x1 ) * r,
+				( s1 * y2 - s2 * y1 ) * r,
+				( s1 * z2 - s2 * z1 ) * r
+			);
+
+			tan1[ a ].add( sdir );
+			tan1[ b ].add( sdir );
+			tan1[ c ].add( sdir );
+
+			tan2[ a ].add( tdir );
+			tan2[ b ].add( tdir );
+			tan2[ c ].add( tdir );
+
+		}
+
+		var i, il;
+		var j, jl;
+		var iA, iB, iC;
+
+		if ( this.drawcalls.length === 0 ) {
+
+			this.addDrawCall( 0, indices.length, 0 );
+
+		}
+
+		var drawcalls = this.drawcalls;
+
+		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+
+			var start = drawcalls[ j ].start;
+			var count = drawcalls[ j ].count;
+			var index = drawcalls[ j ].index;
+
+			for ( i = start, il = start + count; i < il; i += 3 ) {
+
+				iA = index + indices[ i ];
+				iB = index + indices[ i + 1 ];
+				iC = index + indices[ i + 2 ];
+
+				handleTriangle( iA, iB, iC );
+
+			}
+
+		}
+
+		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
+		var w, t, test;
+
+		function handleVertex( v ) {
+
+			n.fromArray( normals, v * 3 );
+			n2.copy( n );
+
+			t = tan1[ v ];
+
+			// Gram-Schmidt orthogonalize
+
+			tmp.copy( t );
+			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
+
+			// Calculate handedness
+
+			tmp2.crossVectors( n2, t );
+			test = tmp2.dot( tan2[ v ] );
+			w = ( test < 0.0 ) ? - 1.0 : 1.0;
+
+			tangents[ v * 4     ] = tmp.x;
+			tangents[ v * 4 + 1 ] = tmp.y;
+			tangents[ v * 4 + 2 ] = tmp.z;
+			tangents[ v * 4 + 3 ] = w;
+
+		}
+
+		for ( j = 0, jl = drawcalls.length; j < jl; ++ j ) {
+
+			var start = drawcalls[ j ].start;
+			var count = drawcalls[ j ].count;
+			var index = drawcalls[ j ].index;
+
+			for ( i = start, il = start + count; i < il; i += 3 ) {
+
+				iA = index + indices[ i ];
+				iB = index + indices[ i + 1 ];
+				iC = index + indices[ i + 2 ];
+
+				handleVertex( iA );
+				handleVertex( iB );
+				handleVertex( iC );
+
+			}
+
+		}
+
+	},
+
+	/*
+	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
+	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
+	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
+	size - Defaults to 65535, but allows for larger or smaller chunks.
+	*/
+	computeOffsets: function ( size ) {
+
+		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
+
+		var indices = this.attributes.index.array;
+		var vertices = this.attributes.position.array;
+
+		var facesCount = ( indices.length / 3 );
+
+		/*
+		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
+		THREE.log("Faces to process: "+(indices.length/3));
+		THREE.log("Reordering "+verticesCount+" vertices.");
+		*/
+
+		var sortedIndices = new Uint16Array( indices.length ); //16-bit buffers
+		var indexPtr = 0;
+		var vertexPtr = 0;
+
+		var offsets = [ { start:0, count:0, index:0 } ];
+		var offset = offsets[ 0 ];
+
+		var duplicatedVertices = 0;
+		var newVerticeMaps = 0;
+		var faceVertices = new Int32Array( 6 );
+		var vertexMap = new Int32Array( vertices.length );
+		var revVertexMap = new Int32Array( vertices.length );
+		for ( var j = 0; j < vertices.length; j ++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
+
+		/*
+			Traverse every face and reorder vertices in the proper offsets of 65k.
+			We can have more than 65k entries in the index buffer per offset, but only reference 65k values.
+		*/
+		for ( var findex = 0; findex < facesCount; findex ++ ) {
+			newVerticeMaps = 0;
+
+			for ( var vo = 0; vo < 3; vo ++ ) {
+				var vid = indices[ findex * 3 + vo ];
+				if ( vertexMap[ vid ] == - 1 ) {
+					//Unmapped vertice
+					faceVertices[ vo * 2 ] = vid;
+					faceVertices[ vo * 2 + 1 ] = - 1;
+					newVerticeMaps ++;
+				} else if ( vertexMap[ vid ] < offset.index ) {
+					//Reused vertices from previous block (duplicate)
+					faceVertices[ vo * 2 ] = vid;
+					faceVertices[ vo * 2 + 1 ] = - 1;
+					duplicatedVertices ++;
+				} else {
+					//Reused vertice in the current block
+					faceVertices[ vo * 2 ] = vid;
+					faceVertices[ vo * 2 + 1 ] = vertexMap[ vid ];
+				}
+			}
+
+			var faceMax = vertexPtr + newVerticeMaps;
+			if ( faceMax > ( offset.index + size ) ) {
+				var new_offset = { start:indexPtr, count:0, index:vertexPtr };
+				offsets.push( new_offset );
+				offset = new_offset;
+
+				//Re-evaluate reused vertices in light of new offset.
+				for ( var v = 0; v < 6; v += 2 ) {
+					var new_vid = faceVertices[ v + 1 ];
+					if ( new_vid > - 1 && new_vid < offset.index )
+						faceVertices[ v + 1 ] = - 1;
+				}
+			}
+
+			//Reindex the face.
+			for ( var v = 0; v < 6; v += 2 ) {
+				var vid = faceVertices[ v ];
+				var new_vid = faceVertices[ v + 1 ];
+
+				if ( new_vid === - 1 )
+					new_vid = vertexPtr ++;
+
+				vertexMap[ vid ] = new_vid;
+				revVertexMap[ new_vid ] = vid;
+				sortedIndices[ indexPtr ++ ] = new_vid - offset.index; //XXX overflows at 16bit
+				offset.count ++;
+			}
+		}
+
+		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
+		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
+		this.offsets = offsets; // TODO: Deprecate
+		this.drawcalls = offsets;
+
+		/*
+		var orderTime = Date.now();
+		THREE.log("Reorder time: "+(orderTime-s)+"ms");
+		THREE.log("Duplicated "+duplicatedVertices+" vertices.");
+		THREE.log("Compute Buffers time: "+(Date.now()-s)+"ms");
+		THREE.log("Draw offsets: "+offsets.length);
+		*/
+
+		return offsets;
+
+	},
+
+	merge: function ( geometry, offset ) {
+
+		if ( geometry instanceof THREE.BufferGeometry === false ) {
+
+			THREE.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
+			return;
+
+		}
+
+		if ( offset === undefined ) offset = 0;
+
+		var attributes = this.attributes;
+
+		for ( var key in attributes ) {
+
+			if ( geometry.attributes[ key ] === undefined ) continue;
+
+			var attribute1 = attributes[ key ];
+			var attributeArray1 = attribute1.array;
+
+			var attribute2 = geometry.attributes[ key ];
+			var attributeArray2 = attribute2.array;
+
+			var attributeSize = attribute2.itemSize;
+
+			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
+
+				attributeArray1[ j ] = attributeArray2[ i ];
+
+			}
+
+		}
+
+		return this;
+
+	},
+
+	normalizeNormals: function () {
+
+		var normals = this.attributes.normal.array;
+
+		var x, y, z, n;
+
+		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
+
+			x = normals[ i ];
+			y = normals[ i + 1 ];
+			z = normals[ i + 2 ];
+
+			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+
+			normals[ i     ] *= n;
+			normals[ i + 1 ] *= n;
+			normals[ i + 2 ] *= n;
+
+		}
+
+	},
+
+	/*
+		reoderBuffers:
+		Reorder attributes based on a new indexBuffer and indexMap.
+		indexBuffer - Uint16Array of the new ordered indices.
+		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
+		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertice stack).
+	*/
+	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
+
+		/* Create a copy of all attributes for reordering. */
+		var sortedAttributes = {};
+		for ( var attr in this.attributes ) {
+			if ( attr == 'index' )
+				continue;
+			var sourceArray = this.attributes[ attr ].array;
+			sortedAttributes[ attr ] = new sourceArray.constructor( this.attributes[ attr ].itemSize * vertexCount );
+		}
+
+		/* Move attribute positions based on the new index map */
+		for ( var new_vid = 0; new_vid < vertexCount; new_vid ++ ) {
+			var vid = indexMap[ new_vid ];
+			for ( var attr in this.attributes ) {
+				if ( attr == 'index' )
+					continue;
+				var attrArray = this.attributes[ attr ].array;
+				var attrSize = this.attributes[ attr ].itemSize;
+				var sortedAttr = sortedAttributes[ attr ];
+				for ( var k = 0; k < attrSize; k ++ )
+					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
+			}
+		}
+
+		/* Carry the new sorted buffers locally */
+		this.attributes[ 'index' ].array = indexBuffer;
+		for ( var attr in this.attributes ) {
+			if ( attr == 'index' )
+				continue;
+			this.attributes[ attr ].array = sortedAttributes[ attr ];
+			this.attributes[ attr ].numItems = this.attributes[ attr ].itemSize * vertexCount;
+		}
+	},
+
+	toJSON: function() {
+
+		// we will store all serialization data on 'data'
+		var data = {};
+
+		// add metadata
+		data.metadata = {
+			version: 4.4,
+			type: 'BufferGeometry',
+			generator: 'BufferGeometry.toJSON'
+		}
+
+		// standard BufferGeometry serialization
+
+		data.type = this.type;
+		data.uuid = this.uuid;
+		if ( this.name !== '' ) data.name = this.name;
+		data.data = {};
+		data.data.attributes = {};
+
+		var attributes = this.attributes;
+		var offsets = this.offsets;
+		var boundingSphere = this.boundingSphere;
+
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
+
+			var array = Array.prototype.slice.call( attribute.array );
+
+			data.data.attributes[ key ] = {
+				itemSize: attribute.itemSize,
+				type: attribute.array.constructor.name,
+				array: array
+			}
+
+		}
+
+		if ( offsets.length > 0 ) {
+
+			data.data.offsets = JSON.parse( JSON.stringify( offsets ) );
+
+		}
+
+		if ( boundingSphere !== null ) {
+
+			data.data.boundingSphere = {
+				center: boundingSphere.center.toArray(),
+				radius: boundingSphere.radius
+			}
+
+		}
+
+		return data;
+
+	},
+
+	clone: function () {
+
+		var geometry = new THREE.BufferGeometry();
+
+		for ( var attr in this.attributes ) {
+
+			var sourceAttr = this.attributes[ attr ];
+			geometry.addAttribute( attr, sourceAttr.clone() );
+
+		}
+
+		for ( var i = 0, il = this.offsets.length; i < il; i ++ ) {
+
+			var offset = this.offsets[ i ];
+
+			geometry.offsets.push( {
+
+				start: offset.start,
+				index: offset.index,
+				count: offset.count
+
+			} );
+
+		}
+
+		return geometry;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+};
+
+THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
+
+// File:src/core/InstancedBufferGeometry.js
+
+/**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ */
+
+THREE.InstancedBufferGeometry = function () {
+
+	THREE.BufferGeometry.call( this );
+
+	this.type = 'InstancedBufferGeometry';
+	this.maxInstancedCount = undefined;
+
+};
+
+THREE.InstancedBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.InstancedBufferGeometry.prototype.constructor = THREE.InstancedBufferGeometry;
+
+THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, indexOffset, instances ) {
+
+	this.drawcalls.push( {
+
+		start: start,
+		count: count,
+		index: indexOffset !== undefined ? indexOffset : 0,
+		instances: instances
+
+	} );
+
+},
+
+THREE.InstancedBufferGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.InstancedBufferGeometry();
+
+	for ( var attr in this.attributes ) {
+
+		var sourceAttr = this.attributes[attr];
+		geometry.addAttribute( attr, sourceAttr.clone() );
+
+	}
+
+	for ( var i = 0, il = this.offsets.length; i < il; i++ ) {
+
+		var offset = this.offsets[i];
+
+		geometry.offsets.push( {
+
+			start: offset.start,
+			index: offset.index,
+			count: offset.count,
+			instances: offset.instances
+
+		} );
+
+	}
+
+	return geometry;
+
+};
+
+THREE.EventDispatcher.prototype.apply( THREE.InstancedBufferGeometry.prototype );
 
 // File:src/cameras/Camera.js
 
@@ -18261,6 +18519,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	extensions.get( 'OES_texture_half_float' );
 	extensions.get( 'OES_texture_half_float_linear' );
 	extensions.get( 'OES_standard_derivatives' );
+	extensions.get( 'ANGLE_instanced_arrays' );
 
 	if ( _logarithmicDepthBuffer ) {
 
@@ -18328,7 +18587,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// shadow map
 
 	var shadowMap = new THREE.WebGLShadowMap( this, lights, _webglObjects, _webglObjectsImmediate );
-	
+
 	this.shadowMap = shadowMap;
 
 	// GPU capabilities
@@ -18340,6 +18599,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _supportsVertexTextures = _maxVertexTextures > 0;
 	var _supportsBoneTextures = _supportsVertexTextures && extensions.get( 'OES_texture_float' );
+	var _supportsInstancedArrays = extensions.get( 'ANGLE_instanced_arrays' );
 
 	//
 
@@ -18431,6 +18691,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.supportsVertexTextures = function () {
 
 		return _supportsVertexTextures;
+
+	};
+
+	this.supportsInstancedArrays = function () {
+
+		return _supportsInstancedArrays;
 
 	};
 
@@ -18932,8 +19198,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglNormalBuffer );
 
-			if ( material instanceof THREE.MeshPhongMaterial === false &&
-				   material.shading === THREE.FlatShading ) {
+			if ( material instanceof THREE.MeshPhongMaterial === false && material.shading === THREE.FlatShading ) {
 
 				var nx, ny, nz,
 					nax, nbx, ncx, nay, nby, ncy, naz, nbz, ncz,
@@ -18944,23 +19209,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					normalArray = object.normalArray;
 
-					nax  = normalArray[ i ];
-					nay  = normalArray[ i + 1 ];
-					naz  = normalArray[ i + 2 ];
+					nax = normalArray[ i ];
+					nay = normalArray[ i + 1 ];
+					naz = normalArray[ i + 2 ];
 
-					nbx  = normalArray[ i + 3 ];
-					nby  = normalArray[ i + 4 ];
-					nbz  = normalArray[ i + 5 ];
+					nbx = normalArray[ i + 3 ];
+					nby = normalArray[ i + 4 ];
+					nbz = normalArray[ i + 5 ];
 
-					ncx  = normalArray[ i + 6 ];
-					ncy  = normalArray[ i + 7 ];
-					ncz  = normalArray[ i + 8 ];
+					ncx = normalArray[ i + 6 ];
+					ncy = normalArray[ i + 7 ];
+					ncz = normalArray[ i + 8 ];
 
 					nx = ( nax + nbx + ncx ) / 3;
 					ny = ( nay + nby + ncy ) / 3;
 					nz = ( naz + nbz + ncz ) / 3;
 
-					normalArray[ i ]   = nx;
+					normalArray[ i     ] = nx;
 					normalArray[ i + 1 ] = ny;
 					normalArray[ i + 2 ] = nz;
 
@@ -19016,6 +19281,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupVertexAttributes( material, program, geometry, startIndex ) {
 
+		var extension;
+
+		if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+
+			extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+			if ( extension === null ) {
+
+				THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				return;
+
+			}
+
+		}
+
 		var geometryAttributes = geometry.attributes;
 
 		var programAttributes = program.attributes;
@@ -19033,12 +19313,61 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( geometryAttribute !== undefined ) {
 
 					var size = geometryAttribute.itemSize;
-
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
-
 					state.enableAttribute( programAttribute );
 
-					_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+					if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
+
+						var data = geometryAttribute.data;
+						var stride = data.stride;
+						var offset = geometryAttribute.offset;
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.data.buffer );
+						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, stride * data.array.BYTES_PER_ELEMENT, ( startIndex * stride + offset ) * data.array.BYTES_PER_ELEMENT );
+
+						if ( data instanceof THREE.InstancedInterleavedBuffer ) {
+
+							if ( extension === null ) {
+
+								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+								return;
+
+							}
+
+							extension.vertexAttribDivisorANGLE( programAttribute, data.meshPerAttribute );
+
+							if ( geometry.maxInstancedCount === undefined ) {
+
+								geometry.maxInstancedCount = data.meshPerAttribute * ( data.array.length / data.stride );
+
+							}
+
+						}
+
+					} else {
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryAttribute.buffer );
+						_gl.vertexAttribPointer( programAttribute, size, _gl.FLOAT, false, 0, startIndex * size * 4 ); // 4 bytes per Float32
+
+						if ( geometryAttribute instanceof THREE.InstancedBufferAttribute ) {
+
+							if ( extension === null ) {
+
+								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+								return;
+
+							}
+
+							extension.vertexAttribDivisorANGLE( programAttribute, geometryAttribute.meshPerAttribute );
+
+							if ( geometry.maxInstancedCount === undefined ) {
+
+								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+
+							}
+
+						}
+
+					}
 
 				} else if ( material.defaultAttributeValues !== undefined ) {
 
@@ -19124,8 +19453,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_gl.drawElements( mode, index.array.length, type, 0 );
+					if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
+						var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+						if ( extension === null ) {
+
+							THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+							return;
+
+						}
+
+						extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+					} else {
+
+						_gl.drawElements( mode, index.array.length, type, 0 );
+
+					}
 					_this.info.render.calls ++;
 					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
 					_this.info.render.faces += index.array.length / 3;
@@ -19151,7 +19496,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						// render indexed triangles
 
-						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+						if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[i].instances > 0 ) {
+
+							var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+							if ( extension === null ) {
+
+								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+								return;
+
+							}
+
+							extension.drawElementsInstancedANGLE( mode, offsets[i].count, type, offsets[i].start * size, offsets[i].count, type, offsets[i].instances ); // Draw the instanced meshes
+
+						} else {
+
+							_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+
+						}
 
 						_this.info.render.calls ++;
 						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -19175,7 +19537,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
 
-				_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+
+					var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+					if ( extension === null ) {
+
+						THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						return;
+
+					}
+
+					if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+						extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+					} else {
+
+						extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+					}
+
+				} else {
+
+					if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+						_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+
+					} else {
+
+						_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+
+					}
+
+				}
 
 				_this.info.render.calls ++;
 				_this.info.render.vertices += position.array.length / position.itemSize;
@@ -20496,36 +20891,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var attribute = attributes[ key ];
 				var bufferType = ( key === 'index' ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-				if ( attribute.buffer === undefined ) {
+				var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
-					attribute.buffer = _gl.createBuffer();
-					_gl.bindBuffer( bufferType, attribute.buffer );
-					_gl.bufferData( bufferType, attribute.array, ( attribute instanceof THREE.DynamicBufferAttribute ) ? _gl.DYNAMIC_DRAW : _gl.STATIC_DRAW );
+				if ( data.buffer === undefined ) {
 
-					attribute.needsUpdate = false;
+					data.buffer = _gl.createBuffer();
+					_gl.bindBuffer( bufferType, data.buffer );
 
-				} else if ( attribute.needsUpdate === true ) {
+					var usage = _gl.STATIC_DRAW;
 
-					_gl.bindBuffer( bufferType, attribute.buffer );
+					if ( data instanceof THREE.DynamicBufferAttribute
+							 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
+							 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
 
-					if ( attribute.updateRange === undefined || attribute.updateRange.count === -1 ) { // Not using update ranges
+						usage = _gl.DYNAMIC_DRAW;
 
-						_gl.bufferSubData( bufferType, 0, attribute.array );
+					}
 
-					} else if ( attribute.updateRange.count === 0 ) {
+					_gl.bufferData( bufferType, data.array, usage );
+
+					data.needsUpdate = false;
+
+				} else if ( data.needsUpdate === true ) {
+
+					_gl.bindBuffer( bufferType, data.buffer );
+
+					if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+
+						_gl.bufferSubData( bufferType, 0, data.array );
+
+					} else if ( data.updateRange.count === 0 ) {
 
 						THREE.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
 
 					} else {
 
-						_gl.bufferSubData( bufferType, attribute.updateRange.offset * attribute.array.BYTES_PER_ELEMENT,
-										   attribute.array.subarray( attribute.updateRange.offset, attribute.updateRange.offset + attribute.updateRange.count ) );
+						_gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+										 data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
 
-						attribute.updateRange.count = 0; // reset range
+						data.updateRange.count = 0; // reset range
 
 					}
 
-					attribute.needsUpdate = false;
+					data.needsUpdate = false;
 
 				}
 
@@ -20635,7 +21043,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function removeObject( object ) {
 
-		if ( object instanceof THREE.Mesh  ||
+		if ( object instanceof THREE.Mesh ||
 			 object instanceof THREE.PointCloud ||
 			 object instanceof THREE.Line ) {
 
@@ -21188,11 +21596,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// uv repeat and offset setting priorities
-		//  1. color map
-		//  2. specular map
-		//  3. normal map
-		//  4. bump map
-		//  5. alpha map
+		// 1. color map
+		// 2. specular map
+		// 3. normal map
+		// 4. bump map
+		// 5. alpha map
 
 		var uvScaleMap;
 
@@ -21585,7 +21993,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						offset = i * 2;
 
-						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 0 ] = value[ i ].x;
 						uniform._array[ offset + 1 ] = value[ i ].y;
 
 					}
@@ -21608,7 +22016,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						offset = i * 3;
 
-						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 0 ] = value[ i ].x;
 						uniform._array[ offset + 1 ] = value[ i ].y;
 						uniform._array[ offset + 2 ] = value[ i ].z;
 
@@ -21632,7 +22040,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						offset = i * 4;
 
-						uniform._array[ offset ]   = value[ i ].x;
+						uniform._array[ offset + 0 ] = value[ i ].x;
 						uniform._array[ offset + 1 ] = value[ i ].y;
 						uniform._array[ offset + 2 ] = value[ i ].z;
 						uniform._array[ offset + 3 ] = value[ i ].w;
@@ -21709,7 +22117,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( ! texture ) continue;
 
 					if ( texture instanceof THREE.CubeTexture ||
-					   ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
+						 ( texture.image instanceof Array && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
 
 						setCubeTexture( texture, textureUnit );
 
@@ -21775,7 +22183,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setColorLinear( array, offset, color, intensity ) {
 
-		array[ offset ]     = color.r * intensity;
+		array[ offset + 0 ] = color.r * intensity;
 		array[ offset + 1 ] = color.g * intensity;
 		array[ offset + 2 ] = color.b * intensity;
 
@@ -21857,7 +22265,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dirOffset = dirLength * 3;
 
-				dirPositions[ dirOffset ]     = _direction.x;
+				dirPositions[ dirOffset + 0 ] = _direction.x;
 				dirPositions[ dirOffset + 1 ] = _direction.y;
 				dirPositions[ dirOffset + 2 ] = _direction.z;
 
@@ -21877,7 +22285,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_vector3.setFromMatrixPosition( light.matrixWorld );
 
-				pointPositions[ pointOffset ]     = _vector3.x;
+				pointPositions[ pointOffset + 0 ] = _vector3.x;
 				pointPositions[ pointOffset + 1 ] = _vector3.y;
 				pointPositions[ pointOffset + 2 ] = _vector3.z;
 
@@ -21899,7 +22307,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_direction.setFromMatrixPosition( light.matrixWorld );
 
-				spotPositions[ spotOffset ]     = _direction.x;
+				spotPositions[ spotOffset + 0 ] = _direction.x;
 				spotPositions[ spotOffset + 1 ] = _direction.y;
 				spotPositions[ spotOffset + 2 ] = _direction.z;
 
@@ -21909,7 +22317,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_direction.sub( _vector3 );
 				_direction.normalize();
 
-				spotDirections[ spotOffset ]     = _direction.x;
+				spotDirections[ spotOffset + 0 ] = _direction.x;
 				spotDirections[ spotOffset + 1 ] = _direction.y;
 				spotDirections[ spotOffset + 2 ] = _direction.z;
 
@@ -21930,7 +22338,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				hemiOffset = hemiLength * 3;
 
-				hemiPositions[ hemiOffset ]     = _direction.x;
+				hemiPositions[ hemiOffset + 0 ] = _direction.x;
 				hemiPositions[ hemiOffset + 1 ] = _direction.y;
 				hemiPositions[ hemiOffset + 2 ] = _direction.z;
 
@@ -22357,7 +22765,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setupRenderBuffer ( renderbuffer, renderTarget  ) {
+	function setupRenderBuffer ( renderbuffer, renderTarget ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
@@ -22721,8 +23129,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			// default for when object is not specified
-			// ( for example when prebuilding shader
-			//   to be used with multiple objects )
+			// ( for example when prebuilding shader to be used with multiple objects )
 			//
 			//  - leave some extra space for other uniforms
 			//  - limit here is ANGLE's 254 max uniform vectors
