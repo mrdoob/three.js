@@ -121,7 +121,7 @@ THREE.Matrix4.prototype = {
 
 		return function ( m ) {
 
-			if ( v1 === undefined) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
 
 			var te = this.elements;
 			var me = m.elements;
@@ -471,7 +471,7 @@ THREE.Matrix4.prototype = {
 
 		return function ( array, offset, length ) {
 
-			if ( v1 === undefined) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
 
@@ -680,6 +680,7 @@ THREE.Matrix4.prototype = {
 			this.identity();
 
 			return this;
+			
 		}
 
 		this.multiplyScalar( 1 / det );
@@ -876,7 +877,9 @@ THREE.Matrix4.prototype = {
 			// if determine is negative, we need to invert one scale
 			var det = this.determinant();
 			if ( det < 0 ) {
+				
 				sx = - sx;
+				
 			}
 
 			position.x = te[ 12 ];
