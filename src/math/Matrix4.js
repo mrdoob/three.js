@@ -120,7 +120,7 @@ THREE.Matrix4.prototype = {
 		var v1;
 
 		return function ( m ) {
-                        if ( v1 === undefined) v1 = new THREE.Vector3();
+			if ( v1 === undefined) v1 = new THREE.Vector3();
 
 			var te = this.elements;
 			var me = m.elements;
@@ -325,9 +325,9 @@ THREE.Matrix4.prototype = {
 		var x, y, z;
 
 		return function ( eye, target, up ) {
-                        if ( x === undefined ) x = new THREE.Vector3();
-                        if ( y === undefined ) y = new THREE.Vector3();
-                        if ( z === undefined ) z = new THREE.Vector3();
+			if ( x === undefined ) x = new THREE.Vector3();
+			if ( y === undefined ) y = new THREE.Vector3();
+			if ( z === undefined ) z = new THREE.Vector3();
 
 			var te = this.elements;
 
@@ -468,7 +468,7 @@ THREE.Matrix4.prototype = {
 		var v1;
 
 		return function ( array, offset, length ) {
-                        if ( v1 === undefined) v1 = new THREE.Vector3();
+			if ( v1 === undefined) v1 = new THREE.Vector3();
 
 			if ( offset === undefined ) offset = 0;
 			if ( length === undefined ) length = array.length;
@@ -608,7 +608,7 @@ THREE.Matrix4.prototype = {
 		var v1;
 
 		return function () {
-                        if ( v1 === undefined ) v1 = new THREE.Vector3();
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			THREE.warn( 'THREE.Matrix4: .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
 			var te = this.elements;
@@ -861,8 +861,8 @@ THREE.Matrix4.prototype = {
 
 		return function ( position, quaternion, scale ) {
 
-                        if ( vector === undefined ) vector = new THREE.Vector3();
-                        if ( matrix === undefined ) matrix = new THREE.Matrix4();
+			if ( vector === undefined ) vector = new THREE.Vector3();
+			if ( matrix === undefined ) matrix = new THREE.Matrix4();
 
 			var te = this.elements;
 
