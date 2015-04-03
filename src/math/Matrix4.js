@@ -680,7 +680,7 @@ THREE.Matrix4.prototype = {
 			this.identity();
 
 			return this;
-			
+
 		}
 
 		this.multiplyScalar( 1 / det );
@@ -877,9 +877,9 @@ THREE.Matrix4.prototype = {
 			// if determine is negative, we need to invert one scale
 			var det = this.determinant();
 			if ( det < 0 ) {
-				
+
 				sx = - sx;
-				
+
 			}
 
 			position.x = te[ 12 ];
