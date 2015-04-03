@@ -2,7 +2,7 @@ THREE.WebGLProgram = ( function () {
 
 	var programIdCount = 0;
 
-	var generateDefines = function ( defines ) {
+	function generateDefines( defines ) {
 
 		var value, chunk, chunks = [];
 
@@ -18,9 +18,9 @@ THREE.WebGLProgram = ( function () {
 
 		return chunks.join( '\n' );
 
-	};
+	}
 
-	var cacheUniformLocations = function ( gl, program, identifiers ) {
+	function cacheUniformLocations( gl, program, identifiers ) {
 
 		var uniforms = {};
 
@@ -33,9 +33,9 @@ THREE.WebGLProgram = ( function () {
 
 		return uniforms;
 
-	};
+	}
 
-	var cacheAttributeLocations = function ( gl, program, identifiers ) {
+	function cacheAttributeLocations( gl, program, identifiers ) {
 
 		var attributes = {};
 
@@ -48,12 +48,11 @@ THREE.WebGLProgram = ( function () {
 
 		return attributes;
 
-	};
+	}
 
 	return function ( renderer, code, material, parameters ) {
 
-		var _this = renderer;
-		var _gl = _this.context;
+		var gl = renderer.context;
 
 		var defines = material.defines;
 		var uniforms = material.__webglShader.uniforms;
@@ -145,7 +144,7 @@ THREE.WebGLProgram = ( function () {
 
 		//
 
-		var program = _gl.createProgram();
+		var program = gl.createProgram();
 
 		var prefix_vertex, prefix_fragment;
 
@@ -165,8 +164,8 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
-				_this.gammaInput ? '#define GAMMA_INPUT' : '',
-				_this.gammaOutput ? '#define GAMMA_OUTPUT' : '',
+				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
+				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				'#define MAX_DIR_LIGHTS ' + parameters.maxDirLights,
@@ -208,7 +207,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				//_this._glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				//renderer.glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 
 				'uniform mat4 modelMatrix;',
@@ -282,8 +281,8 @@ THREE.WebGLProgram = ( function () {
 
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
-				_this.gammaInput ? '#define GAMMA_INPUT' : '',
-				_this.gammaOutput ? '#define GAMMA_OUTPUT' : '',
+				renderer.gammaInput ? '#define GAMMA_INPUT' : '',
+				renderer.gammaOutput ? '#define GAMMA_OUTPUT' : '',
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
@@ -315,7 +314,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.shadowMapCascade ? '#define SHADOWMAP_CASCADE' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				//_this._glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				//renderer.glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
@@ -325,11 +324,11 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		var glVertexShader = new THREE.WebGLShader( _gl, _gl.VERTEX_SHADER, prefix_vertex + vertexShader );
-		var glFragmentShader = new THREE.WebGLShader( _gl, _gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
+		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, prefix_vertex + vertexShader );
+		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
 
-		_gl.attachShader( program, glVertexShader );
-		_gl.attachShader( program, glFragmentShader );
+		gl.attachShader( program, glVertexShader );
+		gl.attachShader( program, glFragmentShader );
 
 		if ( index0AttributeName !== undefined ) {
 
@@ -337,19 +336,19 @@ THREE.WebGLProgram = ( function () {
 			// because potentially expensive emulation is done by browser if attribute 0 is disabled.
 			// And, color, for example is often automatically bound to index 0 so disabling it
 
-			_gl.bindAttribLocation( program, 0, index0AttributeName );
+			gl.bindAttribLocation( program, 0, index0AttributeName );
 
 		}
 
-		_gl.linkProgram( program );
+		gl.linkProgram( program );
 
-		var programLogInfo = _gl.getProgramInfoLog( program );
-		var vertexErrorLogInfo = _gl.getShaderInfoLog( glVertexShader );
-		var fragmentErrorLogInfo = _gl.getShaderInfoLog( glFragmentShader );
+		var programLogInfo = gl.getProgramInfoLog( program );
+		var vertexErrorLogInfo = gl.getShaderInfoLog( glVertexShader );
+		var fragmentErrorLogInfo = gl.getShaderInfoLog( glFragmentShader );
 
-		if ( _gl.getProgramParameter( program, _gl.LINK_STATUS ) === false ) {
+		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-			THREE.error( 'THREE.WebGLProgram: shader error: ', _gl.getError(), 'gl.VALIDATE_STATUS', _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
+			THREE.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
 
 		}
 
@@ -361,8 +360,8 @@ THREE.WebGLProgram = ( function () {
 
 		// clean up
 
-		_gl.deleteShader( glVertexShader );
-		_gl.deleteShader( glFragmentShader );
+		gl.deleteShader( glVertexShader );
+		gl.deleteShader( glFragmentShader );
 
 		// cache uniform locations
 
@@ -405,7 +404,7 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		this.uniforms = cacheUniformLocations( _gl, program, identifiers );
+		this.uniforms = cacheUniformLocations( gl, program, identifiers );
 
 		// cache attributes locations
 
@@ -441,7 +440,7 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		this.attributes = cacheAttributeLocations( _gl, program, identifiers );
+		this.attributes = cacheAttributeLocations( gl, program, identifiers );
 		this.attributesKeys = Object.keys( this.attributes );
 
 		//
