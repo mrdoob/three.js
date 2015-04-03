@@ -381,9 +381,7 @@ THREE.WebGLProgram = ( function () {
 
 		if ( parameters.useVertexTexture ) {
 
-			identifiers.push( 'boneTexture' );
-			identifiers.push( 'boneTextureWidth' );
-			identifiers.push( 'boneTextureHeight' );
+			identifiers.push( 'boneTexture', 'boneTextureWidth', 'boneTextureHeight' );
 
 		} else {
 
@@ -393,10 +391,9 @@ THREE.WebGLProgram = ( function () {
 
 		if ( parameters.logarithmicDepthBuffer ) {
 
-			identifiers.push('logDepthBufFC');
+			identifiers.push( 'logDepthBufFC' );
 
 		}
-
 
 		for ( var u in uniforms ) {
 

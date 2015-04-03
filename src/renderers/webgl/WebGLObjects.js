@@ -44,7 +44,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 				group = {
 					id: geometryGroupCounter ++,
-					faces3: [],
+					faces: [],
 					materialIndex: materialIndex,
 					vertices: 0,
 					numMorphTargets: numMorphTargets,
@@ -65,7 +65,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 					group = {
 						id: geometryGroupCounter ++,
-						faces3: [],
+						faces: [],
 						materialIndex: materialIndex,
 						vertices: 0,
 						numMorphTargets: numMorphTargets,
@@ -79,7 +79,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 			}
 
-			groups[ groupHash ].faces3.push( f );
+			groups[ groupHash ].faces.push( f );
 			groups[ groupHash ].vertices += 3;
 
 		}
@@ -202,14 +202,13 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 	//
 
-	function onObjectRemoved ( event ) {
+	function onObjectRemoved( event ) {
 
 		var object = event.target;
 
 		object.traverse( function ( child ) {
 
 			child.removeEventListener( 'remove', onObjectRemoved );
-
 			removeObject( child );
 
 		} );
@@ -254,7 +253,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 	//
 
-	function onGeometryDispose ( event ) {
+	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
 
@@ -264,7 +263,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 	};
 
-	function deallocateGeometry ( geometry ) {
+	function deallocateGeometry( geometry ) {
 
 		delete geometries[ geometry.id ];
 

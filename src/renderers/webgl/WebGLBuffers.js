@@ -4,7 +4,7 @@
 
 THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
-	function initCustomAttributes ( object ) {
+	function initCustomAttributes( object ) {
 
 		var geometry = object.geometry;
 		var material = object.material;
@@ -154,11 +154,11 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 		//
 
 		var geometry = object.geometry,
-			faces3 = geometryGroup.faces3,
+			faces = geometryGroup.faces,
 
-			nvertices = faces3.length * 3,
-			ntris     = faces3.length * 1,
-			nlines    = faces3.length * 3,
+			nvertices = faces.length * 3,
+			ntris     = faces.length * 1,
+			nlines    = faces.length * 3,
 
 			material = getBufferMaterial( object, geometryGroup );
 
@@ -681,7 +681,7 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 		dirtyMorphTargets = geometry.morphTargetsNeedUpdate,
 
 		vertices = geometry.vertices,
-		chunk_faces3 = geometryGroup.faces3,
+		chunk_faces = geometryGroup.faces,
 		obj_faces = geometry.faces,
 
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
@@ -695,9 +695,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( dirtyVertices ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ] ];
+				face = obj_faces[ chunk_faces[ f ] ];
 
 				v1 = vertices[ face.a ];
 				v2 = vertices[ face.b ];
@@ -730,9 +730,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 				offset_morphTarget = 0;
 
-				for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+				for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-					chf = chunk_faces3[ f ];
+					chf = chunk_faces[ f ];
 					face = obj_faces[ chf ];
 
 					// morph positions
@@ -813,9 +813,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( obj_skinWeights.length ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ] ];
+				face = obj_faces[ chunk_faces[ f ] ];
 
 				// weights
 
@@ -877,9 +877,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( dirtyColors ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ] ];
+				face = obj_faces[ chunk_faces[ f ] ];
 
 				vertexColors = face.vertexColors;
 				faceColor = face.color;
@@ -925,9 +925,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( dirtyTangents && geometry.hasTangents ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ] ];
+				face = obj_faces[ chunk_faces[ f ] ];
 
 				vertexTangents = face.vertexTangents;
 
@@ -961,9 +961,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( dirtyNormals ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ] ];
+				face = obj_faces[ chunk_faces[ f ] ];
 
 				vertexNormals = face.vertexNormals;
 				faceNormal = face.normal;
@@ -1005,9 +1005,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( dirtyUvs && obj_uvs ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-				fi = chunk_faces3[ f ];
+				fi = chunk_faces[ f ];
 
 				uv = obj_uvs[ fi ];
 
@@ -1037,9 +1037,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( dirtyUvs && obj_uvs2 ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-				fi = chunk_faces3[ f ];
+				fi = chunk_faces[ f ];
 
 				uv2 = obj_uvs2[ fi ];
 
@@ -1069,7 +1069,7 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		if ( dirtyElements ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
 				faceArray[ offset_face ]   = vertexIndex;
 				faceArray[ offset_face + 1 ] = vertexIndex + 1;
@@ -1114,9 +1114,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === 'vertices' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ] ];
+							face = obj_faces[ chunk_faces[ f ] ];
 
 							customAttribute.array[ offset_custom ]     = customAttribute.value[ face.a ];
 							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
@@ -1128,9 +1128,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					} else if ( customAttribute.boundTo === 'faces' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ chunk_faces3[ f ] ];
+							value = customAttribute.value[ chunk_faces[ f ] ];
 
 							customAttribute.array[ offset_custom ]     = value;
 							customAttribute.array[ offset_custom + 1 ] = value;
@@ -1146,9 +1146,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === 'vertices' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ] ];
+							face = obj_faces[ chunk_faces[ f ] ];
 
 							v1 = customAttribute.value[ face.a ];
 							v2 = customAttribute.value[ face.b ];
@@ -1169,9 +1169,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					} else if ( customAttribute.boundTo === 'faces' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ chunk_faces3[ f ] ];
+							value = customAttribute.value[ chunk_faces[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -1208,9 +1208,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === 'vertices' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ] ];
+							face = obj_faces[ chunk_faces[ f ] ];
 
 							v1 = customAttribute.value[ face.a ];
 							v2 = customAttribute.value[ face.b ];
@@ -1234,9 +1234,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					} else if ( customAttribute.boundTo === 'faces' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ chunk_faces3[ f ] ];
+							value = customAttribute.value[ chunk_faces[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -1260,9 +1260,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					} else if ( customAttribute.boundTo === 'faceVertices' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ chunk_faces3[ f ] ];
+							value = customAttribute.value[ chunk_faces[ f ] ];
 
 							v1 = value[ 0 ];
 							v2 = value[ 1 ];
@@ -1290,9 +1290,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === 'vertices' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							face = obj_faces[ chunk_faces3[ f ] ];
+							face = obj_faces[ chunk_faces[ f ] ];
 
 							v1 = customAttribute.value[ face.a ];
 							v2 = customAttribute.value[ face.b ];
@@ -1319,9 +1319,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					} else if ( customAttribute.boundTo === 'faces' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ chunk_faces3[ f ] ];
+							value = customAttribute.value[ chunk_faces[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -1348,9 +1348,9 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 					} else if ( customAttribute.boundTo === 'faceVertices' ) {
 
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+						for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ chunk_faces3[ f ] ];
+							value = customAttribute.value[ chunk_faces[ f ] ];
 
 							v1 = value[ 0 ];
 							v2 = value[ 1 ];
