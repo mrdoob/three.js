@@ -91,15 +91,15 @@ THREE.Matrix4.prototype = {
 	},
 
 	extractBasis: function ( xAxis, yAxis, zAxis ) {
- 
+
 		var te = this.elements;
- 
+
 		xAxis.set( te[ 0 ], te[ 1 ], te[ 2 ] );
 		yAxis.set( te[ 4 ], te[ 5 ], te[ 6 ] );
 		zAxis.set( te[ 8 ], te[ 9 ], te[ 10 ] );
- 
+
 		return this;
- 		
+
 	},
  
 	makeBasis: function ( xAxis, yAxis, zAxis ) {
