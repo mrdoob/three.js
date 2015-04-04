@@ -662,7 +662,7 @@
 
 		};
 
-		this.detach = function ( object ) {
+		this.detach = function () {
 
 			scope.object = undefined;
 			this.axis = null;
