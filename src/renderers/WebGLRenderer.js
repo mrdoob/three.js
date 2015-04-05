@@ -1285,7 +1285,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-			state.setLineWidth( material.linewidth * pixelRatio );
+			// In case user is not using Line*Material by mistake
+			var lineWidth = material.linewidth !== undefined ? material.linewidth : 1;
+
+			state.setLineWidth( lineWidth * pixelRatio );
 
 			var index = geometry.attributes.index;
 
