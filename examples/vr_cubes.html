@@ -58,8 +58,9 @@
 			var vrEffect;
 			var vrControls;
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
+			var INTERSECTED;
 			var radius = 100, theta = 0;
+			var crosshair;
 
 			init();
 			animate();
@@ -80,6 +81,16 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
+
+				crosshair = new THREE.Mesh(
+					new THREE.RingGeometry( 0.5, 1, 32 ),
+					new THREE.LineBasicMaterial( {
+						color: 0x00bb00,
+						transparent: true,
+						opacity: 0.5
+					} )
+				);
+				scene.add( crosshair );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -130,7 +141,9 @@
 				} );
 
 				fullScreenButton.onclick = function() {
+
 					vrEffect.setFullScreen( true );
+
 				};
 
 				renderer.setClearColor( 0xf0f0f0 );
@@ -142,8 +155,6 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				//
 
@@ -160,15 +171,6 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-			}
-
 			//
 
 			function animate() {
@@ -182,18 +184,9 @@
 
 			function render() {
 
-				theta += 0.1;
-
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
-				camera.lookAt( scene.position );
-
-				camera.updateMatrixWorld();
-
 				// find intersections
 
-				raycaster.setFromCamera( mouse, camera );
+				raycaster.setFromCamera( { x: 0, y: 0 }, camera );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 
@@ -218,6 +211,21 @@
 				}
 
 				vrControls.update();
+				crosshair.quaternion.copy( camera.quaternion );
+				crosshair.position.set( 0, 0, 0 );
+				if ( INTERSECTED ) {
+
+					crosshair.translateZ(
+						-scene.position.distanceTo( INTERSECTED.position ) +
+						INTERSECTED.geometry.boundingSphere.radius + 5
+					);
+
+				}
+				else {
+
+					crosshair.translateZ(-40);
+
+				}
 				vrEffect.render( scene, camera );
 
 			}
