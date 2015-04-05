@@ -211,8 +211,10 @@
 				}
 
 				vrControls.update();
+
 				crosshair.quaternion.copy( camera.quaternion );
 				crosshair.position.set( 0, 0, 0 );
+
 				if ( INTERSECTED ) {
 
 					crosshair.translateZ(
@@ -226,6 +228,7 @@
 					crosshair.translateZ(-40);
 
 				}
+
 				vrEffect.render( scene, camera );
 
 			}
