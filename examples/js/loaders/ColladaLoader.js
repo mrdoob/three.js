@@ -1179,13 +1179,6 @@ THREE.ColladaLoader = function () {
 
 					material = new THREE.MeshFaceMaterial( used_materials_array );
 
-					for ( j = 0; j < geom.faces.length; j ++ ) {
-
-						var face = geom.faces[ j ];
-						face.materialIndex = used_materials[ face.daeMaterial ]
-
-					}
-
 				}
 
 				if ( skinController !== undefined ) {

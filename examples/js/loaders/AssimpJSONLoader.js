@@ -94,13 +94,8 @@ THREE.AssimpJSONLoader.prototype = {
 		// read faces
 		var cnt = 0;
 		for (in_data = json.faces, i = 0, e = in_data.length; i < e; ++ i) {
-			face = new THREE.Face3();
 			src = in_data[i];
-			face.a = src[0];
-			face.b = src[1];
-			face.c = src[2];
-
-			face.materialIndex = 0; //json.materialindex;
+			face = new THREE.Face3(src[0],src[1],src[2]);
 			geometry.faces.push(face);
 		}
 
@@ -189,7 +184,7 @@ THREE.AssimpJSONLoader.prototype = {
 	},
 
 	parseMaterial : function(json) {
-		var mat = null, 
+		var mat = null,
 		scope = this, i, prop, has_textures = [],
 
 		init_props = {
@@ -286,7 +281,7 @@ THREE.AssimpJSONLoader.prototype = {
 				init_props[has_textures[i]] = defaultTexture();
 			}
 		}
-		
+
 		mat = new THREE.MeshPhongMaterial( init_props );
 		return mat;
 	},
@@ -313,5 +308,3 @@ THREE.AssimpJSONLoader.prototype = {
 		return obj;
 	},
 };
-
-

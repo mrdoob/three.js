@@ -488,7 +488,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				scope.faces.push( new THREE.Face3( a, b, c, null, null, m ) );
+				scope.faces.push( new THREE.Face3( a, b, c ) );
 
 			}
 
@@ -510,8 +510,8 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				scope.faces.push( new THREE.Face3( a, b, d, null, null, m ) );
-				scope.faces.push( new THREE.Face3( b, c, d, null, null, m ) );
+				scope.faces.push( new THREE.Face3( a, b, d ) );
+				scope.faces.push( new THREE.Face3( b, c, d ) );
 
 			}
 
@@ -554,7 +554,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 					new THREE.Vector3( nax, nay, naz ),
 					new THREE.Vector3( nbx, nby, nbz ),
 					new THREE.Vector3( ncx, ncy, ncz )
-				], null, m ) );
+				] ) );
 
 			}
 
@@ -603,13 +603,13 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 					new THREE.Vector3( nax, nay, naz ),
 					new THREE.Vector3( nbx, nby, nbz ),
 					new THREE.Vector3( ndx, ndy, ndz )
-				], null, m ) );
+				] ) );
 
 				scope.faces.push( new THREE.Face3( b, c, d, [
 					new THREE.Vector3( nbx, nby, nbz ),
 					new THREE.Vector3( ncx, ncy, ncz ),
 					new THREE.Vector3( ndx, ndy, ndz )
-				], null, m ) );
+				] ) );
 
 			}
 

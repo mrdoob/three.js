@@ -138,7 +138,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		offset, zLength,
 
-		colorIndex, normalIndex, uvIndex, materialIndex,
+		colorIndex, normalIndex, uvIndex,
 
 		type,
 		isQuad,
@@ -225,9 +225,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasMaterial ) {
 
-					materialIndex = faces[ offset ++ ];
-					faceA.materialIndex = materialIndex;
-					faceB.materialIndex = materialIndex;
+					offset ++;
 
 				}
 
@@ -334,8 +332,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasMaterial ) {
 
-					materialIndex = faces[ offset ++ ];
-					face.materialIndex = materialIndex;
+					offset ++;
 
 				}
 

@@ -91,18 +91,6 @@
 
 				var geometry_smooth = new THREE.SphereGeometry( 70, 32, 16 );
 				var geometry_flat = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_pieces = new THREE.SphereGeometry( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
-
-				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
-
-					var face = geometry_pieces.faces[ i ];
-					face.materialIndex = Math.floor( Math.random() * materials.length );
-
-				}
-
-				geometry_pieces.materials = materials;
-
-				materials.push( new THREE.MeshFaceMaterial( materials ) );
 
 				objects = [];
 
@@ -112,8 +100,7 @@
 
 					material = materials[ i ];
 
-					geometry = material instanceof THREE.MeshFaceMaterial ? geometry_pieces :
-							   ( material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth );
+					geometry = material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth;
 
 					sphere = new THREE.Mesh( geometry, material );
 
@@ -238,8 +225,8 @@
 
 				}
 
-				materials[ materials.length - 3 ].emissive.setHSL( 0.54, 1, 0.35 * ( 0.5 + 0.5 * Math.sin( 35 * timer ) ) );
-				materials[ materials.length - 4 ].emissive.setHSL( 0.04, 1, 0.35 * ( 0.5 + 0.5 * Math.cos( 35 * timer ) ) );
+				materials[ materials.length - 2 ].emissive.setHSL( 0.54, 1, 0.35 * ( 0.5 + 0.5 * Math.sin( 35 * timer ) ) );
+				materials[ materials.length - 3 ].emissive.setHSL( 0.04, 1, 0.35 * ( 0.5 + 0.5 * Math.cos( 35 * timer ) ) );
 
 				particleLight.position.x = Math.sin( timer * 7 ) * 300;
 				particleLight.position.y = Math.cos( timer * 5 ) * 400;
