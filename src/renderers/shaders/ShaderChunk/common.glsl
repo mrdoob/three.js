@@ -4,10 +4,6 @@
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
-float average( in float a ) { return a; }
-float average( in vec2 a )  { return ( a.x + a.y) * 0.5; }
-float average( in vec3 a )  { return ( a.x + a.y + a.z) / 3.0; }
-float average( in vec4 a )  { return ( a.x + a.y + a.z + a.w) * 0.25; }
 vec3 transformDirection( in vec3 normal, in mat4 matrix ) {
 	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );
 }
