@@ -19,13 +19,15 @@ THREE.VRControls = function ( object, onError ) {
 
 				vrInputs.push( devices[ i ] );
 
+				break; // We keep the first we encounter
+
 			}
 
 		}
 
 		if ( onError ) onError( 'HMD not available' );
 
-	};
+	}
 
 	if ( navigator.getVRDevices ) {
 
@@ -41,7 +43,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.update = function () {
 
-		for ( var i = 0; i < vrInputs.length; i++ ) {
+		for ( var i = 0; i < vrInputs.length; i ++ ) {
 
 			var vrInput = vrInputs[ i ];
 
@@ -65,7 +67,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.resetSensor = function () {
 
-		for ( var i = 0; i < vrInputs.length; i++ ) {
+		for ( var i = 0; i < vrInputs.length; i ++ ) {
 
 			var vrInput = vrInputs[ i ];
 
