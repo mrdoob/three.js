@@ -108,6 +108,7 @@
 	"src/renderers/shaders/ShaderChunk/envmap_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/fog_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/fog_pars_fragment.glsl",
+	"src/renderers/shaders/ShaderChunk/helper_funcs.glsl",
 	"src/renderers/shaders/ShaderChunk/lightmap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/lightmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/lights_lambert_pars_vertex.glsl",

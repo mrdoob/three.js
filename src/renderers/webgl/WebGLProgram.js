@@ -49,6 +49,17 @@ THREE.WebGLProgram = ( function () {
 		return attributes;
 
 	}
+	
+	function programArrayToString ( previousValue, currentValue, index, array ) {
+	
+		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
+		
+			return previousValue + currentValue + '\n';
+			
+		}
+		
+		return previousValue;
+	}
 
 	return function ( renderer, code, material, parameters ) {
 
@@ -261,7 +272,7 @@ THREE.WebGLProgram = ( function () {
 
 				''
 
-			].join( '\n' );
+			].reduce( programArrayToString, '' );
 
 			prefix_fragment = [
 
@@ -320,7 +331,7 @@ THREE.WebGLProgram = ( function () {
 				'uniform vec3 cameraPosition;',
 				''
 
-			].join( '\n' );
+			].reduce( programArrayToString, '' );
 
 		}
 
