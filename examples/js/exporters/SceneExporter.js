@@ -189,7 +189,7 @@ THREE.SceneExporter.prototype = {
 
 				if ( THREE[ constants[ i ] ] === c ) return LabelString( constants[ i ] );
 
-			};
+			}
 
 			return "";
 

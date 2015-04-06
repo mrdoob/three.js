@@ -195,7 +195,7 @@ THREE.MD2Character = function () {
 
 		return textures;
 
-	};
+	}
 
 	function createPart( geometry, skinMap ) {
 
@@ -229,7 +229,7 @@ THREE.MD2Character = function () {
 
 		return mesh;
 
-	};
+	}
 
 	function checkLoadingComplete() {
 
@@ -237,6 +237,6 @@ THREE.MD2Character = function () {
 
 		if ( scope.loadCounter === 0 ) scope.onLoadComplete();
 
-	};
+	}
 
 };

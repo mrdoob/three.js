@@ -518,7 +518,7 @@ THREE.MD2CharacterComplex = function () {
 
 		return textures;
 
-	};
+	}
 
 	function createPart( geometry, skinMap ) {
 
@@ -546,14 +546,14 @@ THREE.MD2CharacterComplex = function () {
 
 		return mesh;
 
-	};
+	}
 
 	function checkLoadingComplete() {
 
 		scope.loadCounter -= 1;
 		if ( scope.loadCounter === 0 ) 	scope.onLoadComplete();
 
-	};
+	}
 
 	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
 

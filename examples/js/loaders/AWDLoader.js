@@ -113,7 +113,7 @@ THREE.AWDLoader = (function () {
 		this._accuracyProps   = false;
 
 
-	};
+	}
 
 
 	AWDLoader.prototype = Object.create( THREE.Loader.prototype );

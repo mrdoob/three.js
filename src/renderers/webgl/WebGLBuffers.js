@@ -51,7 +51,7 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		}
 
-	};
+	}
 
 	this.initPointCloudBuffers = function ( geometry, object ) {
 

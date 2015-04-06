@@ -41,7 +41,7 @@ THREE.FontUtils = {
 
 			throw "The font " + this.face + " with " + this.weight + " weight and " + this.style + " style is missing."
 
-		};
+		}
 
 	},
 

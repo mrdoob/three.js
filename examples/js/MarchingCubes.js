@@ -196,7 +196,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1 );
 			this.VIntX( q * 3, this.vlist, this.nlist, 0, isol, fx, fy, fz, field0, field1 );
 
-		};
+		}
 
 		if ( bits & 2 ) {
 
@@ -204,7 +204,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1y );
 			this.VIntY( q1 * 3, this.vlist, this.nlist, 3, isol, fx2, fy, fz, field1, field3 );
 
-		};
+		}
 
 		if ( bits & 4 ) {
 
@@ -212,7 +212,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1y );
 			this.VIntX( qy * 3, this.vlist, this.nlist, 6, isol, fx, fy2, fz, field2, field3 );
 
-		};
+		}
 
 		if ( bits & 8 ) {
 
@@ -220,7 +220,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( qy );
 			this.VIntY( q * 3, this.vlist, this.nlist, 9, isol, fx, fy, fz, field0, field2 );
 
-		};
+		}
 
 		// bottom of the cube
 
@@ -230,7 +230,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1z );
 			this.VIntX( qz * 3, this.vlist, this.nlist, 12, isol, fx, fy, fz2, field4, field5 );
 
-		};
+		}
 
 		if ( bits & 32 ) {
 
@@ -238,7 +238,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1yz );
 			this.VIntY( q1z * 3,  this.vlist, this.nlist, 15, isol, fx2, fy, fz2, field5, field7 );
 
-		};
+		}
 
 		if ( bits & 64 ) {
 
@@ -246,7 +246,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1yz );
 			this.VIntX( qyz * 3, this.vlist, this.nlist, 18, isol, fx, fy2, fz2, field6, field7 );
 
-		};
+		}
 
 		if ( bits & 128 ) {
 
@@ -254,7 +254,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( qyz );
 			this.VIntY( qz * 3,  this.vlist, this.nlist, 21, isol, fx, fy, fz2, field4, field6 );
 
-		};
+		}
 
 		// vertical lines of the cube
 
@@ -264,7 +264,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( qz );
 			this.VIntZ( q * 3, this.vlist, this.nlist, 24, isol, fx, fy, fz, field0, field4 );
 
-		};
+		}
 
 		if ( bits & 512 ) {
 
@@ -272,7 +272,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1z );
 			this.VIntZ( q1 * 3,  this.vlist, this.nlist, 27, isol, fx2, fy,  fz, field1, field5 );
 
-		};
+		}
 
 		if ( bits & 1024 ) {
 
@@ -280,7 +280,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( q1yz );
 			this.VIntZ( q1y * 3, this.vlist, this.nlist, 30, isol, fx2, fy2, fz, field3, field7 );
 
-		};
+		}
 
 		if ( bits & 2048 ) {
 
@@ -288,7 +288,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 			this.compNorm( qyz );
 			this.VIntZ( qy * 3, this.vlist, this.nlist, 33, isol, fx,  fy2, fz, field2, field6 );
 
-		};
+		}
 
 		cubeindex <<= 4;  // re-purpose cubeindex into an offset into triTable
 

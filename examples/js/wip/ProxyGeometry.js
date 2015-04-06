@@ -578,7 +578,7 @@ THREE.ProxyGeometry.prototype.mergeVertices = function () {
 
 		}
 
-	};
+	}
 
 
 	// if faces are completely degenerate after merging vertices, we

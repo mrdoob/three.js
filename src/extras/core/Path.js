@@ -45,7 +45,7 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 		this.lineTo( vectors[ v ].x, vectors[ v ].y );
 
-	};
+	}
 
 };
 
@@ -508,7 +508,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		//THREE.log("shape", shapes);
 
 		return shapes;
-	};
+	}
 
 	function isPointInsidePolygon( inPt, inPolygon ) {
 		var EPSILON = 0.0000000001;

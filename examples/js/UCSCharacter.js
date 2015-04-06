@@ -89,7 +89,7 @@ THREE.UCSCharacter = function() {
 		}
 
 		return textures;
-	};
+	}
 
 	function createMaterials( skins ) {
 		var materials = [];

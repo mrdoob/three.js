@@ -155,7 +155,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		// toplevel loader function, delegates to handle_children
 
@@ -515,7 +515,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function handle_mesh( geo, mat, id ) {
 
@@ -523,7 +523,7 @@ THREE.SceneLoader.prototype = {
 			result.face_materials[ id ] = mat;
 			handle_objects();
 
-		};
+		}
 
 		function handle_hierarchy( node, id, parent, material, obj ) {
 
@@ -577,7 +577,7 @@ THREE.SceneLoader.prototype = {
 			result.objects[ id ] = node;
 			handle_objects();
 
-		};
+		}
 
 		function create_callback_geometry( id ) {
 
@@ -595,7 +595,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function create_callback_hierachy( id, parent, material, obj ) {
 
@@ -634,7 +634,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function create_callback_embed( id ) {
 
@@ -647,7 +647,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function async_callback_gate() {
 
@@ -671,7 +671,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		function finalize() {
 
@@ -702,7 +702,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		var callbackTexture = function ( count ) {
 
@@ -740,7 +740,7 @@ THREE.SceneLoader.prototype = {
 
 			}
 
-		};
+		}
 
 		// first go synchronous elements
 
