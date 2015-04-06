@@ -528,6 +528,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 			? object.material.materials[ 0 ]
 			: object.material;
 
-	};
+	}
 
 };

@@ -73,4 +73,4 @@ THREE.ImageLoader.prototype = {
 
 	}
 
-}
+};

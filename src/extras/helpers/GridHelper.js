@@ -37,4 +37,4 @@ THREE.GridHelper.prototype.setColors = function( colorCenterLine, colorGrid ) {
 
 	this.geometry.colorsNeedUpdate = true;
 
-}
+};

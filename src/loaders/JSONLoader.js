@@ -240,7 +240,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 						uvLayer = json.uvs[ i ];
 
 						geometry.faceVertexUvs[ i ][ fi ] = [];
-						geometry.faceVertexUvs[ i ][ fi + 1 ] = []
+						geometry.faceVertexUvs[ i ][ fi + 1 ] = [];
 
 						for ( j = 0; j < 4; j ++ ) {
 
@@ -421,7 +421,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		}
 
-	};
+	}
 
 	function parseSkin() {
 		var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
@@ -471,7 +471,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
 
-	};
+	}
 
 	function parseMorphing( scale ) {
 
@@ -528,7 +528,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		}
 
-	};
+	}
 
 	if ( json.materials === undefined || json.materials.length === 0 ) {
 
