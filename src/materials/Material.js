@@ -26,6 +26,7 @@ THREE.Material = function () {
 	this.blendDstAlpha = null;
 	this.blendEquationAlpha = null;
 
+	this.depthFunc = THREE.LessEqualDepth;
 	this.depthTest = true;
 	this.depthWrite = true;
 
@@ -152,6 +153,7 @@ THREE.Material.prototype = {
 		material.blendDstAlpha = this.blendDstAlpha;
 		material.blendEquationAlpha = this.blendEquationAlpha;
 
+		material.depthFunc = this.depthFunc;
 		material.depthTest = this.depthTest;
 		material.depthWrite = this.depthWrite;
 

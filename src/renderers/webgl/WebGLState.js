@@ -15,6 +15,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentBlendSrcAlpha = null;
 	var currentBlendDstAlpha = null;
 
+	var currentDepthFunc = null;
 	var currentDepthTest = null;
 	var currentDepthWrite = null;
 
@@ -147,6 +148,71 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 			currentBlendDstAlpha = null;
 
 		}
+
+	};
+
+	this.setDepthFunc = function ( depthFunc ) {
+
+	    if ( currentDepthFunc !== depthFunc ) {
+
+	        if ( depthFunc ) {
+
+	            switch ( depthFunc ) {
+
+	                case THREE.NeverDepth:
+
+	                    gl.depthFunc( gl.NEVER );
+	                    break;
+
+	                case THREE.AlwaysDepth:
+
+	                    gl.depthFunc( gl.ALWAYS );
+	                    break;
+
+	                case THREE.LessDepth:
+
+	                    gl.depthFunc( gl.LESS );
+	                    break;
+
+	                case THREE.LessEqualDepth:
+
+	                    gl.depthFunc( gl.LEQUAL );
+	                    break;
+
+	                case THREE.EqualDepth:
+
+	                    gl.depthFunc( gl.EQUAL );
+	                    break;
+
+	                case THREE.GreaterEqualDepth:
+
+	                    gl.depthFunc( gl.GEQUAL );
+	                    break;
+
+	                case THREE.GreaterDepth:
+
+	                    gl.depthFunc( gl.GREATER );
+	                    break;
+
+	                case THREE.NotEqualDepth:
+
+	                    gl.depthFunc( gl.NOTEQUAL );
+	                    break;
+
+	                default:
+
+                        gl.depthFunc( gl.LEQUAL );
+	            }
+
+	        } else {
+
+	            gl.depthFunc( gl.LEQUAL );
+
+	        }
+
+	        currentDepthFunc = depthFunc;
+
+	    }
 
 	};
 

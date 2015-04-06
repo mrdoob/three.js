@@ -115,6 +115,17 @@ THREE.DstColorFactor = 208;
 THREE.OneMinusDstColorFactor = 209;
 THREE.SrcAlphaSaturateFactor = 210;
 
+// depth modes
+
+THREE.NeverDepth = 0;
+THREE.AlwaysDepth = 1;
+THREE.LessDepth = 2;
+THREE.LessEqualDepth = 3;
+THREE.EqualDepth = 4;
+THREE.GreaterEqualDepth = 5;
+THREE.GreaterDepth = 6;
+THREE.NotEqualDepth = 7;
+
 
 // TEXTURE CONSTANTS
 
