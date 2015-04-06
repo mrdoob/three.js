@@ -345,7 +345,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		return program;
 
-	};
+	}
 
 	function painterSortStable ( a, b ) {
 
@@ -359,6 +359,6 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		}
 
-	};
+	}
 
 };

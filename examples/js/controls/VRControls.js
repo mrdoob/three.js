@@ -25,7 +25,7 @@ THREE.VRControls = function ( object, onError ) {
 
 		if ( onError ) onError( 'HMD not available' );
 
-	};
+	}
 
 	if ( navigator.getVRDevices ) {
 

@@ -148,7 +148,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			var result = binarySearch( 0, cumulativeAreas.length - 1 )
+			var result = binarySearch( 0, cumulativeAreas.length - 1 );
 			return result;
 
 		}
@@ -242,7 +242,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			var result = binarySearch( 0, cumulativeAreas.length - 1 )
+			var result = binarySearch( 0, cumulativeAreas.length - 1 );
 			return result;
 
 		}

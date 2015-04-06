@@ -64,7 +64,7 @@ THREE.SVGRenderer = function () {
 
 		}
 
-	}
+	};
 
 	this.setQuality = function( quality ) {
 

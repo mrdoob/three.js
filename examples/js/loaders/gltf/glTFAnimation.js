@@ -45,7 +45,7 @@ THREE.glTFAnimation = function(interps)
 	{
 		this.createInterpolators(interps);
 	}
-}
+};
 
 THREE.glTFAnimation.prototype.createInterpolators = function(interps)
 {
@@ -56,7 +56,7 @@ THREE.glTFAnimation.prototype.createInterpolators = function(interps)
 		this.interps.push(interp);
 		this.duration = Math.max(this.duration, interp.duration);
 	}
-}
+};
 
 // Start/stop
 THREE.glTFAnimation.prototype.play = function()
@@ -67,13 +67,13 @@ THREE.glTFAnimation.prototype.play = function()
 	this.startTime = Date.now();
 	this.running = true;
 	THREE.glTFAnimator.add(this);
-}
+};
 
 THREE.glTFAnimation.prototype.stop = function()
 {
 	this.running = false;
 	THREE.glTFAnimator.remove(this);
-}
+};
 
 // Update - drive key frame evaluation
 THREE.glTFAnimation.prototype.update = function()
@@ -105,7 +105,7 @@ THREE.glTFAnimation.prototype.update = function()
 			this.interps[i].interp(t);
 		}
 	}
-}
+};
 
 //Interpolator class
 //Construction/initialization
@@ -147,7 +147,7 @@ THREE.glTFInterpolator = function(param)
 	this.quat1 = new THREE.Quaternion;
 	this.quat2 = new THREE.Quaternion;
 	this.quat3 = new THREE.Quaternion;
-}
+};
 
 //Interpolation and tweening methods
 THREE.glTFInterpolator.prototype.interp = function(t)
@@ -238,7 +238,7 @@ THREE.glTFInterpolator.prototype.interp = function(t)
 	{
 		this.copyValue(this.target);
 	}
-}
+};
 
 THREE.glTFInterpolator.prototype.copyValue = function(target) {
 	
@@ -248,4 +248,4 @@ THREE.glTFInterpolator.prototype.copyValue = function(target) {
 	else {
 		target.copy(this.vec3);
 	}		
-}
+};

@@ -228,7 +228,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageData16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -247,7 +247,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageData24bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -265,7 +265,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageData32bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -283,7 +283,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageDataGrey8bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
 
@@ -302,7 +302,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageDataGrey16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -320,7 +320,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function getTgaRGBA( width, height, image, palette ) {
 

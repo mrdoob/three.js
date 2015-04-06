@@ -15,7 +15,7 @@ THREE.ProxyFace3 = function ( array, offset, vertexNormals, vertexColors, vertex
 
 	//THREE.Face3.call( this, array[offset], array[offset+1], array[offset+2] /*, normal, color, materialIndex */);
 
-}
+};
 
 THREE.ProxyFace3.prototype = Object.create( THREE.Face3.prototype );
 THREE.ProxyFace3.prototype.constructor = THREE.ProxyFace3;

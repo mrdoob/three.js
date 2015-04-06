@@ -75,7 +75,7 @@ THREE.UCSCharacter = function() {
 				mesh.morphTargetInfluences[ i ] = influences[ scope.morphs[ i ] ] / 100;
 			}
 		}
-	}
+	};
 	
 	function loadTextures( baseUrl, textureUrls ) {
 		var mapping = THREE.UVMapping;
@@ -89,7 +89,7 @@ THREE.UCSCharacter = function() {
 		}
 
 		return textures;
-	};
+	}
 
 	function createMaterials( skins ) {
 		var materials = [];
@@ -122,4 +122,4 @@ THREE.UCSCharacter = function() {
 
 	}
 
-}
+};

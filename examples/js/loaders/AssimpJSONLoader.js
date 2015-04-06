@@ -235,7 +235,7 @@ THREE.AssimpJSONLoader.prototype = {
 						has_textures.push(keyname);
 
 						loader.setCrossOrigin(this.crossOrigin);
-						var material_url = scope.texturePath + '/' + prop.value
+						var material_url = scope.texturePath + '/' + prop.value;
 						material_url = material_url.replace(/\\/g, '/');
 						loader.load(material_url, function(tex) {
 							if (tex) {

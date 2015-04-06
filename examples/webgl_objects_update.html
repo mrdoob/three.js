@@ -64,17 +64,17 @@
 				object = createObject( createMeshFaceMaterial(), 4 );
 				object.position.set( -400, 0, 200 );
 				scene.add( object );
-				objectNewGeometry = object
+				objectNewGeometry = object;
 
 				object = createObject( createMeshFaceMaterial(), 4 );
 				object.position.set( -200, 0, 200 );
 				scene.add( object );
-				objectToggleAddRemove = object 
+				objectToggleAddRemove = object;
 
 				object = createObject( createMeshFaceMaterial(), 4 );
 				object.position.set( 0, 0, 200 );
 				scene.add( object );
-				objectRandomizeFaces = object
+				objectRandomizeFaces = object;
 /*
 				These are not yet used but they are ready to be shown
 				object = createObject( createMeshFaceMaterial(), 4 );
@@ -130,20 +130,20 @@
 			}
 			function createGeometry(segments){
 				var matrix = new THREE.Matrix4();
-				var euler = new THREE.Euler()
+				var euler = new THREE.Euler();
 				var geometry = new THREE.BoxGeometry( 100, 100, 100, segments, segments, segments );
-				geometry.applyMatrix(matrix.makeRotationFromEuler(euler.set(parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI)))
+				geometry.applyMatrix(matrix.makeRotationFromEuler(euler.set(parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI,parseInt(Math.random()*2,10)*Math.PI)));
 				return geometry;
 			}
 			
 			function createMeshFaceMaterial(){
 				var materials = [];
-				materials.push(new THREE.MeshBasicMaterial({color: 0xff0000}))
-				materials.push(new THREE.MeshBasicMaterial({color: 0xffff00}))
-				materials.push(new THREE.MeshBasicMaterial({color: 0x00ff00}))
-				materials.push(new THREE.MeshBasicMaterial({color: 0x00ffff}))
-				materials.push(new THREE.MeshBasicMaterial({color: 0x0000ff}))
-				materials.push(new THREE.MeshBasicMaterial({color: 0xff00ff}))
+				materials.push(new THREE.MeshBasicMaterial({color: 0xff0000}));
+				materials.push(new THREE.MeshBasicMaterial({color: 0xffff00}));
+				materials.push(new THREE.MeshBasicMaterial({color: 0x00ff00}));
+				materials.push(new THREE.MeshBasicMaterial({color: 0x00ffff}));
+				materials.push(new THREE.MeshBasicMaterial({color: 0x0000ff}));
+				materials.push(new THREE.MeshBasicMaterial({color: 0xff00ff}));
 				var material = new THREE.MeshFaceMaterial(materials);
 				return material;
 			}
@@ -175,7 +175,7 @@
 					
 				}
 				object.geometry.groupsNeedUpdate = true;
-			};
+			}
 
 			function render() {
 
@@ -191,7 +191,7 @@
 					
 						scene.add(objectToggleAddRemove);
 						
-					};
+					}
 					
 				} else {
 					
@@ -202,9 +202,9 @@
 					
 						scene.remove(objectToggleAddRemove);
 						
-					};
+					}
 					
-				};
+				}
 
 				camera.lookAt( scene.position );
 

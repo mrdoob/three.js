@@ -138,7 +138,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-	}
+	};
 
 	// WebGLRenderer compatibility
 
