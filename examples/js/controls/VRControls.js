@@ -9,17 +9,45 @@ THREE.VRControls = function ( object, onError ) {
 
 	var vrInputs = [];
 
+	function filterInvalidDevices( devices ) {
+
+		var
+			OculusDeviceId = 'HMDInfo-dev-0x421e7eb800',
+			CardboardDeviceId = 'HMDInfo-dev-0x421e7ecc00';
+
+
+		// Exclude Cardboard position sensor if Oculus exists.
+		var oculusDevices = devices.filter( function ( device ) {
+
+			return device.deviceId === OculusDeviceId;
+
+		} );
+
+		if ( oculusDevices.length >= 1 ) {
+
+			return devices.filter( function ( device ) {
+
+				return device.deviceId !== CardboardDeviceId;
+
+			} );
+
+		} else {
+
+			return devices;
+
+		}
+
+	}
+
 	function gotVRDevices( devices ) {
+
+		devices = filterInvalidDevices( devices );
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			var device = devices[ i ];
-
-			if ( device instanceof PositionSensorVRDevice ) {
+			if ( devices[ i ] instanceof PositionSensorVRDevice ) {
 
 				vrInputs.push( devices[ i ] );
-
-				break; // We keep the first we encounter
 
 			}
 
