@@ -158,7 +158,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 			}
 		);
 
-	};
+	}
 
 	function addBufferImmediate( objlist, object ) {
 
@@ -172,7 +172,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 			}
 		);
 
-	};
+	}
 
 	//
 
@@ -213,7 +213,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 		} );
 
-	};
+	}
 
 	function removeObject( object ) {
 
@@ -261,7 +261,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 		deallocateGeometry( geometry );
 
-	};
+	}
 
 	function deallocateGeometry( geometry ) {
 
@@ -333,7 +333,7 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 		}
 
-	};
+	}
 
 	//
 
