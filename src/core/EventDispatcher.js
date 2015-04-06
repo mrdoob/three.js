@@ -2,46 +2,29 @@
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-THREE.EventDispatcher = function () {}
+THREE.EventDispatcher = function () {
 
-THREE.EventDispatcher.prototype = {
+	var listeners = {};
 
-	constructor: THREE.EventDispatcher,
+	this.addEventListener = function ( type, listener ) {
 
-	apply: function ( object ) {
+		var listenersForType = listeners[ type ];
+		if ( listenersForType === undefined ) {
 
-		object.addEventListener = THREE.EventDispatcher.prototype.addEventListener;
-		object.hasEventListener = THREE.EventDispatcher.prototype.hasEventListener;
-		object.removeEventListener = THREE.EventDispatcher.prototype.removeEventListener;
-		object.dispatchEvent = THREE.EventDispatcher.prototype.dispatchEvent;
-
-	},
-
-	addEventListener: function ( type, listener ) {
-
-		if ( this._listeners === undefined ) this._listeners = {};
-
-		var listeners = this._listeners;
-
-		if ( listeners[ type ] === undefined ) {
-
-			listeners[ type ] = [];
+			listenersForType = [];
+			listeners[ type ] = listenersForType;
 
 		}
 
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
+		if ( listenersForType.indexOf( listener ) === - 1 ) {
 
-			listeners[ type ].push( listener );
+			listenersForType.push( listener );
 
 		}
 
-	},
+	};
 
-	hasEventListener: function ( type, listener ) {
-
-		if ( this._listeners === undefined ) return false;
-
-		var listeners = this._listeners;
+	this.hasEventListener = function ( type, listener ) {
 
 		if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
 
@@ -51,46 +34,38 @@ THREE.EventDispatcher.prototype = {
 
 		return false;
 
-	},
+	};
 
-	removeEventListener: function ( type, listener ) {
+	this.removeEventListener = function ( type, listener ) {
 
-		if ( this._listeners === undefined ) return;
+		var listenersForType = listeners[ type ];
 
-		var listeners = this._listeners;
-		var listenerArray = listeners[ type ];
+		if ( listenersForType !== undefined ) {
 
-		if ( listenerArray !== undefined ) {
-
-			var index = listenerArray.indexOf( listener );
+			var index = listenersForType.indexOf( listener );
 
 			if ( index !== - 1 ) {
 
-				listenerArray.splice( index, 1 );
+				listenersForType.splice( index, 1 );
 
 			}
 
 		}
 
-	},
+	};
 
-	dispatchEvent: function ( event ) {
+	this.dispatchEvent = function ( event ) {
 
-		if ( this._listeners === undefined ) return;
+		var listenersForType = listeners[ event.type ];
 
-		var listeners = this._listeners;
-		var listenerArray = listeners[ event.type ];
-
-		if ( listenerArray !== undefined ) {
-
-			event.target = this;
+		if ( listenersForType !== undefined ) {
 
 			var array = [];
-			var length = listenerArray.length;
+			var length = listenersForType.length;
 
 			for ( var i = 0; i < length; i ++ ) {
 
-				array[ i ] = listenerArray[ i ];
+				array[ i ] = listenersForType[ i ];
 
 			}
 
@@ -102,6 +77,16 @@ THREE.EventDispatcher.prototype = {
 
 		}
 
-	}
+	};
+
+
+	this.exposePublicAPIOnObject = function ( object ) {
+
+		object.addEventListener = this.addEventListener;
+		object.hasEventListener = this.hasEventListener;
+		object.removeEventListener = this.removeEventListener;
+
+	};
+}
 
 };

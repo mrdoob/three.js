@@ -154,6 +154,8 @@ THREE.TypedGeometry = function ( size ) {
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
+	this.eventDispatcher = new THREE.EventDispatcher();
+	this.eventDispatcher.exposePublicAPIOnObject( this );
 
 };
 
@@ -169,10 +171,10 @@ THREE.TypedGeometry.prototype = {
 
 	dispose: function () {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		this.eventDispatcher.dispatchEvent( { type: 'dispose', target: this } );
 
 	}
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.TypedGeometry.prototype );
+
