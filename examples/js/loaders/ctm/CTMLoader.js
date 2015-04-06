@@ -72,7 +72,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
@@ -179,7 +179,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.responseType = "arraybuffer";
@@ -240,7 +240,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-	}
+	};
 
 	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
 	Model.prototype.constructor = Model;

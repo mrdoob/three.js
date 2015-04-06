@@ -751,4 +751,4 @@ THREE.SceneExporter.prototype = {
 
 	}
 
-}
+};

@@ -252,7 +252,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.computeBoundingSphere()
+		this.computeBoundingSphere();
 
 		return this;
 
@@ -884,7 +884,7 @@ THREE.BufferGeometry.prototype = {
 			version: 4.4,
 			type: 'BufferGeometry',
 			generator: 'BufferGeometry.toJSON'
-		}
+		};
 
 		// standard BufferGeometry serialization
 

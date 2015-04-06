@@ -1012,7 +1012,7 @@ THREE.SceneLoader.prototype = {
 					var wrapMap = {
 						"repeat": THREE.RepeatWrapping,
 						"mirror": THREE.MirroredRepeatWrapping
-					}
+					};
 
 					if ( wrapMap[ textureJSON.wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ textureJSON.wrap[ 0 ] ];
 					if ( wrapMap[ textureJSON.wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ textureJSON.wrap[ 1 ] ];
@@ -1161,4 +1161,4 @@ THREE.SceneLoader.prototype = {
 
 	}
 
-}
+};

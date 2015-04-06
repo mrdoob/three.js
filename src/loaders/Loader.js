@@ -181,7 +181,7 @@ THREE.Loader.prototype = {
 				var wrapMap = {
 					'repeat': THREE.RepeatWrapping,
 					'mirror': THREE.MirroredRepeatWrapping
-				}
+				};
 
 				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ wrap[ 0 ] ];
 				if ( wrapMap[ wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ wrap[ 1 ] ];

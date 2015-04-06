@@ -453,7 +453,7 @@
 
 				this.applyMatrix( new THREE.Matrix4().makeScale( 0.2, 0.2, 0.2 ) );
 
-			}
+			};
 
 			THREE.BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
@@ -662,7 +662,7 @@
 
 			function render() {
 
-				var now = performance.now()
+				var now = performance.now();
 				var delta = (now - last) / 1000;
 
 				if (delta > 1) delta = 1; // safety cap on large deltas
