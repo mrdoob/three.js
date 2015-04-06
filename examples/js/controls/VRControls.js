@@ -9,13 +9,43 @@ THREE.VRControls = function ( object, onError ) {
 
 	var vrInputs = [];
 
+	function filterInvalidDevices( devices ) {
+
+		var
+			OculusDeviceName = 'VR Position Device (oculus)',
+			CardboardDeviceName = 'VR Position Device (cardboard)';
+
+
+		// Exclude Cardboard position sensor if Oculus exists.
+		var oculusDevices = devices.filter( function ( device ) {
+
+			return device.deviceName === OculusDeviceName;
+
+		} );
+
+		if ( oculusDevices.length >= 1 ) {
+
+			return devices.filter( function ( device ) {
+
+				return device.deviceName !== CardboardDeviceName;
+
+			} );
+
+		} else {
+
+			return devices;
+
+		}
+
+	}
+
 	function gotVRDevices( devices ) {
+
+		devices = filterInvalidDevices( devices );
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			var device = devices[ i ];
-
-			if ( device instanceof PositionSensorVRDevice ) {
+			if ( devices[ i ] instanceof PositionSensorVRDevice ) {
 
 				vrInputs.push( devices[ i ] );
 
@@ -41,7 +71,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.update = function () {
 
-		for ( var i = 0; i < vrInputs.length; i++ ) {
+		for ( var i = 0; i < vrInputs.length; i ++ ) {
 
 			var vrInput = vrInputs[ i ];
 
@@ -65,7 +95,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.resetSensor = function () {
 
-		for ( var i = 0; i < vrInputs.length; i++ ) {
+		for ( var i = 0; i < vrInputs.length; i ++ ) {
 
 			var vrInput = vrInputs[ i ];
 
