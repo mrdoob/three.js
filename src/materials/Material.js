@@ -117,7 +117,7 @@ THREE.Material.prototype = {
 			version: 4.4,
 			type: 'Material',
 			generator: 'Material.toJSON'
-		}
+		};
 
 		// standard Material serialization
 		data.type = this.type;

@@ -432,7 +432,7 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		}
 
-	}
+	};
 
 	this.setLineBuffers = function ( geometry, hint ) {
 
@@ -604,7 +604,7 @@ THREE.WebGLBuffers = function ( gl, info, extensions, getBufferMaterial ) {
 
 		}
 
-	}
+	};
 
 	function materialNeedsFaceNormals ( material ) {
 

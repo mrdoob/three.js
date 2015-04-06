@@ -584,7 +584,7 @@ THREE.Object3D.prototype = {
 			meta = {
 				geometries: {},
 				materials: {}
-			}
+			};
 
 			// add metadata
 			metadata = {
