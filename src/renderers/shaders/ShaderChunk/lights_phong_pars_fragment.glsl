@@ -61,7 +61,7 @@ vec3 calcCosineTerm( in vec3 normal, in vec3 lightDir ) {
 
 	float dotProduct = dot( normal, lightDir );
 
-	vec3 cosineTerm = vec3( saturate( dotProduct ) );
+	vec3 cosineTerm = vec3( clamp( dotProduct, 0.0, 1.0 ) );
 
 	#ifdef WRAP_AROUND
 

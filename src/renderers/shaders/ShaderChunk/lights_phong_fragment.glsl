@@ -78,7 +78,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		if ( spotEffect > spotLightAngleCos[ i ] ) {
 
-			spotEffect = saturate( pow( saturate( spotEffect ), spotLightExponent[ i ] ) );
+			spotEffect = clamp( pow( clamp( spotEffect, 0.0, 1.0 ), spotLightExponent[ i ] ), 0.0, 1.0 );
 
 			// attenuation
 

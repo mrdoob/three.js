@@ -75,10 +75,10 @@ vec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in vec3 normal,
 
 	vec3 halfDir = normalize( lightDir + viewDir );
 
-	//float dotNL = saturate( dot( normal, lightDir ) );
-	//float dotNV = saturate( dot( normal, viewDir ) );
-	float dotNH = saturate( dot( normal, halfDir ) );
-	float dotLH = saturate( dot( lightDir, halfDir ) );
+	//float dotNL = clamp( dot( normal, lightDir ), 0.0, 1.0 );
+	//float dotNV = clamp( dot( normal, viewDir ), 0.0, 1.0 );
+	float dotNH = clamp( dot( normal, halfDir ), 0.0, 1.0 );
+	float dotLH = clamp( dot( lightDir, halfDir ), 0.0, 1.0 );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 
