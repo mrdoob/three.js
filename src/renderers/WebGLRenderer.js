@@ -2244,29 +2244,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMaterial( material, lights, fog, object ) {
 
-		material.addEventListener( 'dispose', onMaterialDispose );
-
 		var shaderID = shaderIDs[ material.type ];
-
-		if ( shaderID ) {
-
-			var shader = THREE.ShaderLib[ shaderID ];
-
-			material.__webglShader = {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			}
-
-		} else {
-
-			material.__webglShader = {
-				uniforms: material.uniforms,
-				vertexShader: material.vertexShader,
-				fragmentShader: material.fragmentShader
-			}
-
-		}
 
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
@@ -2365,6 +2343,43 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var code = chunks.join();
+
+		if ( !material.program ) {
+
+		    // new material
+		    material.addEventListener( 'dispose', onMaterialDispose );
+
+		} else if ( material.program.code !== code ) {
+
+		    // changed glsl or parameters
+		    deallocateMaterial( material );
+
+		} else {
+
+            // same glsl and parameters
+		    return;
+
+		}
+
+		if ( shaderID ) {
+
+			var shader = THREE.ShaderLib[ shaderID ];
+
+			material.__webglShader = {
+				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+			}
+
+		} else {
+
+			material.__webglShader = {
+				uniforms: material.uniforms,
+				vertexShader: material.vertexShader,
+				fragmentShader: material.fragmentShader
+			}
+
+		}
 
 		var program;
 
@@ -2476,8 +2491,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_usedTextureUnits = 0;
 
 		if ( material.needsUpdate ) {
-
-			if ( material.program ) deallocateMaterial( material );
 
 			initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
