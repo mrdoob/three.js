@@ -106,7 +106,7 @@ THREE.ProxyGeometry.prototype.createVertexProxies = function(values) {
 
 	return this.vertices;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 
@@ -214,7 +214,7 @@ THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 
 	return this.faces;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
@@ -263,7 +263,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 	}
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
@@ -321,7 +321,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
 	}
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) {
 
@@ -365,7 +365,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) 
 
 	}
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 
@@ -425,7 +425,7 @@ THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 
 	return this.faceVertexUvs;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createSkinIndexProxies = function(values) {
 
@@ -457,7 +457,7 @@ THREE.ProxyGeometry.prototype.createSkinIndexProxies = function(values) {
 
 	return this.skinIndices;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createSkinWeightProxies = function(values) {
 
@@ -489,7 +489,7 @@ THREE.ProxyGeometry.prototype.createSkinWeightProxies = function(values) {
 
 	return this.skinWeights;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createColorProxies = function(values) {
 
@@ -521,7 +521,7 @@ THREE.ProxyGeometry.prototype.createColorProxies = function(values) {
 
 	return this.colors;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.populateProxyFromBuffer = function(attr, buffername, proxytype, itemsize, offset, count) {
 
@@ -541,7 +541,7 @@ THREE.ProxyGeometry.prototype.populateProxyFromBuffer = function(attr, buffernam
 
 	}
 
-}
+};
 
 /*
  * Checks for duplicate vertices with hashmap.
@@ -578,7 +578,7 @@ THREE.ProxyGeometry.prototype.mergeVertices = function () {
 
 		}
 
-	};
+	}
 
 
 	// if faces are completely degenerate after merging vertices, we
@@ -630,7 +630,7 @@ THREE.ProxyGeometry.prototype.mergeVertices = function () {
 	this.vertices = unique;
 	return diff;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.onGeometryAllocate = function (ev) {
 
@@ -693,7 +693,7 @@ THREE.ProxyGeometry.prototype.onGeometryAllocate = function (ev) {
 		this.createSkinWeightProxies(this.skinWeights);
 
 	}
-}
+};
 
 THREE.ProxyGeometry.prototype.computeFaceNormals = function() {
 
@@ -701,7 +701,7 @@ THREE.ProxyGeometry.prototype.computeFaceNormals = function() {
 
 	return THREE.BufferGeometry.prototype.computeFaceNormals.call(this);
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeVertexNormals = function() {
 
@@ -709,7 +709,7 @@ THREE.ProxyGeometry.prototype.computeVertexNormals = function() {
 
 	return THREE.BufferGeometry.prototype.computeVertexNormals.call(this);
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeTangents = function() {
 
@@ -722,7 +722,7 @@ THREE.ProxyGeometry.prototype.computeTangents = function() {
 
 	return ret;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeBoundingSphere = function() {
 
@@ -730,7 +730,7 @@ THREE.ProxyGeometry.prototype.computeBoundingSphere = function() {
 
 	return THREE.BufferGeometry.prototype.computeBoundingSphere.call(this);
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeBoundingBox = function () {
 
@@ -738,7 +738,7 @@ THREE.ProxyGeometry.prototype.computeBoundingBox = function () {
 
 	return THREE.BufferGeometry.prototype.computeBoundingBox.call(this);
 
-}
+};
 THREE.ProxyGeometry.prototype.clone = function () {
 
 	var buff = THREE.BufferGeometry.prototype.clone.call(this);
@@ -748,7 +748,7 @@ THREE.ProxyGeometry.prototype.clone = function () {
 
 	return geo;
 
-}
+};
 
 THREE.EventDispatcher.prototype.apply( THREE.ProxyGeometry.prototype );
 

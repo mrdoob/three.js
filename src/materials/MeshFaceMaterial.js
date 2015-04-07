@@ -4,46 +4,11 @@
 
 THREE.MeshFaceMaterial = function ( materials ) {
 
-	this.uuid = THREE.Math.generateUUID();
+	THREE.error( 'THREE.MeshFaceMaterial has been removed.' );
 
-	this.type = 'MeshFaceMaterial';
+	var material = materials !== undefined ? materials[ 0 ] : new THREE.MeshBasicMaterial();
+	material.materials = []; // temporal workaround
 
-	this.materials = materials instanceof Array ? materials : [];
-
-};
-
-THREE.MeshFaceMaterial.prototype = {
-
-	constructor: THREE.MeshFaceMaterial,
-
-	toJSON: function () {
-
-		var data = THREE.Material.prototype.toJSON.call( this );
-
-		data.materials = [];
-
-		for ( var i = 0, l = this.materials.length; i < l; i ++ ) {
-
-			data.materials.push( this.materials[ i ].toJSON() );
-
-		}
-
-		return data;
-
-	},
-
-	clone: function () {
-
-		var material = new THREE.MeshFaceMaterial();
-
-		for ( var i = 0; i < this.materials.length; i ++ ) {
-
-			material.materials.push( this.materials[ i ].clone() );
-
-		}
-
-		return material;
-
-	}
+	return material;
 
 };

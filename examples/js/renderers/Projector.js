@@ -786,7 +786,7 @@ THREE.Projector = function () {
 			var line = new THREE.RenderableLine();
 			_linePool.push( line );
 			_linePoolLength ++;
-			_lineCount ++
+			_lineCount ++;
 			return line;
 
 		}
@@ -802,7 +802,7 @@ THREE.Projector = function () {
 			var sprite = new THREE.RenderableSprite();
 			_spritePool.push( sprite );
 			_spritePoolLength ++;
-			_spriteCount ++
+			_spriteCount ++;
 			return sprite;
 
 		}

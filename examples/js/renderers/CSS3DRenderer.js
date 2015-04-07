@@ -69,7 +69,14 @@ THREE.CSS3DRenderer = function () {
 
 	domElement.appendChild( cameraElement );
 
-	this.setClearColor = function () {
+	this.setClearColor = function () {};
+
+	this.getSize = function() {
+
+		return {
+			width: _width,
+			height: _height
+		};
 
 	};
 

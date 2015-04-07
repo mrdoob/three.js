@@ -24,7 +24,7 @@
 	#endif
 
 	#ifdef DOUBLE_SIDED
-		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );
+		float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 	#else
 		float flipNormal = 1.0;
 	#endif
@@ -34,7 +34,7 @@
 
 	#elif defined( ENVMAP_TYPE_EQUIREC )
 		vec2 sampleUV;
-		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );
+		sampleUV.y = clamp( flipNormal * reflectVec.y * 0.5 + 0.5, 0.0, 1.0 );
 		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
 		vec4 envColor = texture2D( envMap, sampleUV );
 

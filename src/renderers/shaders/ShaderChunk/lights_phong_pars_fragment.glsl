@@ -56,3 +56,21 @@ varying vec3 vViewPosition;
 	varying vec3 vNormal;
 
 #endif
+
+vec3 calcCosineTerm( in vec3 normal, in vec3 lightDir ) {
+
+	float dotProduct = dot( normal, lightDir );
+
+	vec3 cosineTerm = vec3( clamp( dotProduct, 0.0, 1.0 ) );
+
+	#ifdef WRAP_AROUND
+
+		vec3 cosineTermHalf = vec3( clamp( 0.5 * dotProduct + 0.5, 0.0, 1.0 ) );
+
+		cosineTerm = mix( cosineTerm, cosineTermHalf, wrapRGB );
+
+	#endif
+
+	return cosineTerm;
+
+}

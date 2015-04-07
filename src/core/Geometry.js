@@ -583,7 +583,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	merge: function ( geometry, matrix, materialIndexOffset ) {
+	merge: function ( geometry, matrix ) {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
@@ -600,8 +600,6 @@ THREE.Geometry.prototype = {
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
 		uvs2 = geometry.faceVertexUvs[ 0 ];
-
-		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
@@ -662,8 +660,6 @@ THREE.Geometry.prototype = {
 				faceCopy.vertexColors.push( color.clone() );
 
 			}
-
-			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
 
 			faces1.push( faceCopy );
 
@@ -743,7 +739,7 @@ THREE.Geometry.prototype = {
 
 			}
 
-		};
+		}
 
 
 		// if faces are completely degenerate after merging vertices, we
@@ -871,15 +867,6 @@ THREE.Geometry.prototype = {
 
 			faces.push( faceType );
 			faces.push( face.a, face.b, face.c );
-
-
-			/*
-			if ( hasMaterial ) {
-
-				faces.push( face.materialIndex );
-
-			}
-			*/
 
 			if ( hasFaceVertexUv ) {
 

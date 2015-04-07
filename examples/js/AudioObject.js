@@ -154,7 +154,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 			_this.source.buffer = _this.context.createBuffer( request.response, true );
 			_this.source.noteOn( 0 );
 
-		}
+		};
 
 		request.send();
 

@@ -33,7 +33,7 @@ THREE.VectorArrayProxy = function(attribute) {
 
 	}
 
-}
+};
 
 THREE.VectorArrayProxy.prototype.getValue = function(i) {
 
@@ -51,13 +51,13 @@ THREE.VectorArrayProxy.prototype.getValue = function(i) {
 
 	}
 
-}
+};
 THREE.VectorArrayProxy.prototype.setValue = function(i, v) {
 
 	var vec = this[i];
 	vec.copy(v);
 
-}
+};
 
 // Vector Proxy Objects
 
@@ -65,7 +65,7 @@ THREE.Vector2Proxy = function(subarray) {
 
 	this.subarray = subarray;
 
-}
+};
 THREE.Vector2Proxy.prototype = Object.create( THREE.Vector2.prototype );
 THREE.Vector2Proxy.prototype.constructor = THREE.Vector2Proxy;
 Object.defineProperty(THREE.Vector2Proxy.prototype, 'x', { get: function() { return this.subarray[0]; }, set: function(v) { this.subarray[0] = v; } });
@@ -76,7 +76,7 @@ THREE.Vector3Proxy = function(subarray) {
 
 	this.subarray = subarray;
 
-}
+};
 THREE.Vector3Proxy.prototype = Object.create( THREE.Vector3.prototype );
 THREE.Vector3Proxy.prototype.constructor = THREE.Vector3Proxy;
 

@@ -29,7 +29,7 @@ THREE.BufferGeometry.prototype = {
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( attribute instanceof THREE.BufferAttribute === false ) {
+		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
 			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -107,6 +107,76 @@ THREE.BufferGeometry.prototype = {
 		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
 
 		return offset;
+
+	},
+
+	setFromObject: function ( object ) {
+
+		var geometry = object.geometry;
+		var material = object.material;
+
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+
+			var positions = new Float32Array( geometry.vertices.length * 3 );
+			var colors = new Float32Array( geometry.colors.length * 3 );
+
+			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.computeBoundingSphere();
+
+		} else if ( object instanceof THREE.Mesh ) {
+
+			this.fromGeometry( geometry, material );
+
+		}
+
+		if ( material.attributes !== undefined ) {
+
+			console.warn( 'THREE.BufferGeometry.fromObject(). TODO: material.attributes', material );
+
+		}
+
+		return this;
+
+	},
+
+	updateFromObject: function ( object ) {
+
+		var geometry = object.geometry;
+
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+
+			if ( geometry.verticesNeedUpdate === true ) {
+
+				var attribute = this.attributes.position;
+
+				if ( attribute !== undefined ) {
+
+					attribute.copyVector3sArray( geometry.vertices );
+					attribute.needsUpdate = true;
+
+				}
+
+				geometry.verticesNeedUpdate = false;
+
+			}
+
+			if ( geometry.colorsNeedUpdate === true ) {
+
+				var attribute = this.attributes.color;
+
+				if ( attribute !== undefined ) {
+
+					attribute.copyColorsArray( geometry.colors );
+					attribute.needsUpdate = true;
+
+				}
+
+				geometry.colorsNeedUpdate = false;
+
+			}
+
+		}
 
 	},
 
@@ -252,7 +322,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.computeBoundingSphere()
+		this.computeBoundingSphere();
 
 		return this;
 
@@ -511,7 +581,7 @@ THREE.BufferGeometry.prototype = {
 				box.center( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox:  sqrt(3) smaller in the best case
+				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
 
 				var maxRadiusSq = 0;
 
@@ -1061,7 +1131,7 @@ THREE.BufferGeometry.prototype = {
 			version: 4.4,
 			type: 'BufferGeometry',
 			generator: 'BufferGeometry.toJSON'
-		}
+		};
 
 		// standard BufferGeometry serialization
 

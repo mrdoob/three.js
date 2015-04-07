@@ -3,20 +3,49 @@
  * @author mrdoob / http://mrdoob.com
  */
 
-THREE.VRControls = function ( object, callback ) {
+THREE.VRControls = function ( object, onError ) {
 
 	var scope = this;
 
-	// Allow for multiple VR input devices.
 	var vrInputs = [];
 
-	var onVRDevices = function ( devices ) {
+	function filterInvalidDevices( devices ) {
+
+		var
+			OculusDeviceName = 'VR Position Device (oculus)',
+			CardboardDeviceName = 'VR Position Device (cardboard)';
+
+
+		// Exclude Cardboard position sensor if Oculus exists.
+		var oculusDevices = devices.filter( function ( device ) {
+
+			return device.deviceName === OculusDeviceName;
+
+		} );
+
+		if ( oculusDevices.length >= 1 ) {
+
+			return devices.filter( function ( device ) {
+
+				return device.deviceName !== CardboardDeviceName;
+
+			} );
+
+		} else {
+
+			return devices;
+
+		}
+
+	}
+
+	function gotVRDevices( devices ) {
+
+		devices = filterInvalidDevices( devices );
 
 		for ( var i = 0; i < devices.length; i ++ ) {
 
-			var device = devices[ i ];
-
-			if ( device instanceof PositionSensorVRDevice ) {
+			if ( devices[ i ] instanceof PositionSensorVRDevice ) {
 
 				vrInputs.push( devices[ i ] );
 
@@ -24,32 +53,25 @@ THREE.VRControls = function ( object, callback ) {
 
 		}
 
-		if ( callback !== undefined ) {
+		if ( onError ) onError( 'HMD not available' );
 
-			callback( 'HMD not available' );
+	}
 
-		}
+	if ( navigator.getVRDevices ) {
 
-	};
-
-	if ( navigator.getVRDevices !== undefined ) {
-
-		navigator.getVRDevices().then( onVRDevices );
-
-	} else if ( callback !== undefined ) {
-
-		callback( 'Your browser is not VR Ready' );
+		navigator.getVRDevices().then( gotVRDevices );
 
 	}
 
 	// the Rift SDK returns the position in meters
 	// this scale factor allows the user to define how meters
 	// are converted to scene units.
+
 	this.scale = 1;
 
 	this.update = function () {
 
-		for ( var i = 0; i < vrInputs.length; i++ ) {
+		for ( var i = 0; i < vrInputs.length; i ++ ) {
 
 			var vrInput = vrInputs[ i ];
 
@@ -71,15 +93,30 @@ THREE.VRControls = function ( object, callback ) {
 
 	};
 
-	this.zeroSensor = function () {
+	this.resetSensor = function () {
 
-		for ( var i = 0; i < vrInputs.length; i++ ) {
+		for ( var i = 0; i < vrInputs.length; i ++ ) {
 
 			var vrInput = vrInputs[ i ];
 
-			vrInput.zeroSensor();
+			if ( vrInput.resetSensor !== undefined ) {
+
+				vrInput.resetSensor();
+
+			} else if ( vrInput.zeroSensor !== undefined ) {
+
+				vrInput.zeroSensor();
+
+			}
 
 		}
+
+	};
+
+	this.zeroSensor = function () {
+
+		THREE.warn( 'THREE.VRControls: .zeroSensor() is now .resetSensor().' );
+		this.resetSensor();
 
 	};
 

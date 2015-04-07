@@ -201,7 +201,7 @@
 			function addShadowedLight( x, y, z, color, intensity ) {
 
 				var directionalLight = new THREE.DirectionalLight( color, intensity );
-				directionalLight.position.set( x, y, z )
+				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
