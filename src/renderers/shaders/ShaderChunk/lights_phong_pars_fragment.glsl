@@ -65,7 +65,7 @@ vec3 calcCosineTerm( in vec3 normal, in vec3 lightDir ) {
 
 	#ifdef WRAP_AROUND
 
-		vec3 cosineTermHalf = vec3( saturate( 0.5 * dotProduct + 0.5 ) );
+		vec3 cosineTermHalf = vec3( clamp( 0.5 * dotProduct + 0.5, 0.0, 1.0 ) );
 
 		cosineTerm = mix( cosineTerm, cosineTermHalf, wrapRGB );
 
