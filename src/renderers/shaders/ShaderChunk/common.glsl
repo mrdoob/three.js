@@ -4,9 +4,8 @@
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
-#define square(a) a * a
 #define saturate(a) clamp( a, 0.0, 1.0 )
-#define whiteCompliment(a) 1.0 - saturate( a )
+#define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
 vec3 transformDirection( in vec3 normal, in mat4 matrix ) {
 
