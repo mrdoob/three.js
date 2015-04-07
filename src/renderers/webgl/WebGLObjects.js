@@ -2,9 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
-
-	var buffers = new THREE.WebGLBuffers( gl, info, extensions, getBufferMaterial );
+THREE.WebGLObjects = function ( gl, info, extensions ) {
 
 	var objects = {};
 	var objectsImmediate = [];
@@ -13,192 +11,6 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 	var geometryGroups = {};
 	var geometryGroupCounter = 0;
-
-	function makeGroups( geometry, usesFaceMaterial ) {
-
-		var maxVerticesInGroup = extensions.get( 'OES_element_index_uint' ) ? 4294967296 : 65535;
-
-		var groupHash, hash_map = {};
-
-		var numMorphTargets = geometry.morphTargets.length;
-		var numMorphNormals = geometry.morphNormals.length;
-
-		var group;
-		var groups = {};
-		var groupsList = [];
-
-		for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
-
-			var face = geometry.faces[ f ];
-			var materialIndex = usesFaceMaterial ? face.materialIndex : 0;
-
-			if ( ! ( materialIndex in hash_map ) ) {
-
-				hash_map[ materialIndex ] = { hash: materialIndex, counter: 0 };
-
-			}
-
-			groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
-
-			if ( ! ( groupHash in groups ) ) {
-
-				group = {
-					id: geometryGroupCounter ++,
-					faces: [],
-					materialIndex: materialIndex,
-					vertices: 0,
-					numMorphTargets: numMorphTargets,
-					numMorphNormals: numMorphNormals
-				};
-
-				groups[ groupHash ] = group;
-				groupsList.push( group );
-
-			}
-
-			if ( groups[ groupHash ].vertices + 3 > maxVerticesInGroup ) {
-
-				hash_map[ materialIndex ].counter += 1;
-				groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
-
-				if ( ! ( groupHash in groups ) ) {
-
-					group = {
-						id: geometryGroupCounter ++,
-						faces: [],
-						materialIndex: materialIndex,
-						vertices: 0,
-						numMorphTargets: numMorphTargets,
-						numMorphNormals: numMorphNormals
-					};
-
-					groups[ groupHash ] = group;
-					groupsList.push( group );
-
-				}
-
-			}
-
-			groups[ groupHash ].faces.push( f );
-			groups[ groupHash ].vertices += 3;
-
-		}
-
-		return groupsList;
-
-	}
-
-	function initGeometryGroups( object, geometry ) {
-
-		var material = object.material, addBuffers = false;
-
-		if ( geometryGroups[ geometry.id ] === undefined || geometry.groupsNeedUpdate === true ) {
-
-			delete objects[ object.id ];
-
-			geometryGroups[ geometry.id ] = makeGroups( geometry, material instanceof THREE.MeshFaceMaterial );
-
-			geometry.groupsNeedUpdate = false;
-
-		}
-
-		var geometryGroupsList = geometryGroups[ geometry.id ];
-
-		// create separate VBOs per geometry chunk
-
-		for ( var i = 0, il = geometryGroupsList.length; i < il; i ++ ) {
-
-			var geometryGroup = geometryGroupsList[ i ];
-
-			// initialise VBO on the first access
-
-			if ( geometryGroup.__webglVertexBuffer === undefined ) {
-
-				buffers.initMeshBuffers( geometryGroup, object );
-
-				geometry.verticesNeedUpdate = true;
-				geometry.morphTargetsNeedUpdate = true;
-				geometry.elementsNeedUpdate = true;
-				geometry.uvsNeedUpdate = true;
-				geometry.normalsNeedUpdate = true;
-				geometry.tangentsNeedUpdate = true;
-				geometry.colorsNeedUpdate = true;
-
-				addBuffers = true;
-
-			} else {
-
-				addBuffers = false;
-
-			}
-
-			if ( addBuffers || object.__webglActive === undefined ) {
-
-				addBuffer( objects, geometryGroup, object );
-
-			}
-
-		}
-
-		object.__webglActive = true;
-
-	}
-
-	function addBuffer( objlist, buffer, object ) {
-
-		var id = object.id;
-		objlist[id] = objlist[id] || [];
-		objlist[id].push(
-			{
-				id: id,
-				buffer: buffer,
-				object: object,
-				material: null,
-				z: 0
-			}
-		);
-
-	}
-
-	function addBufferImmediate( objlist, object ) {
-
-		objlist.push(
-			{
-				id: null,
-				object: object,
-				opaque: null,
-				transparent: null,
-				z: 0
-			}
-		);
-
-	}
-
-	//
-
-	// Objects updates - custom attributes check
-
-	function areCustomAttributesDirty( material ) {
-
-		for ( var name in material.attributes ) {
-
-			if ( material.attributes[ name ].needsUpdate ) return true;
-
-		}
-
-		return false;
-
-	}
-
-	function clearCustomAttributes( material ) {
-
-		for ( var name in material.attributes ) {
-
-			material.attributes[ name ].needsUpdate = false;
-
-		}
-
-	}
 
 	//
 
@@ -259,79 +71,27 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
-		deallocateGeometry( geometry );
+		deallocateGeometry( geometries[ geometry.id ] );
 
 	}
 
 	function deallocateGeometry( geometry ) {
 
-		delete geometries[ geometry.id ];
+		for ( var name in geometry.attributes ) {
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+			var attribute = geometry.attributes[ name ];
 
-			for ( var name in geometry.attributes ) {
+			if ( attribute.buffer !== undefined ) {
 
-				var attribute = geometry.attributes[ name ];
+				gl.deleteBuffer( attribute.buffer );
 
-				if ( attribute.buffer !== undefined ) {
-
-					gl.deleteBuffer( attribute.buffer );
-
-					delete attribute.buffer;
-
-				}
-
-			}
-
-			info.memory.geometries --;
-
-		} else {
-
-			var geometryGroupsList = geometryGroups[ geometry.id ];
-
-			if ( geometryGroupsList !== undefined ) {
-
-				for ( var i = 0, l = geometryGroupsList.length; i < l; i ++ ) {
-
-					var geometryGroup = geometryGroupsList[ i ];
-
-					if ( geometryGroup.numMorphTargets !== undefined ) {
-
-						for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
-
-							gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
-
-						}
-
-						delete geometryGroup.__webglMorphTargetsBuffers;
-
-					}
-
-					if ( geometryGroup.numMorphNormals !== undefined ) {
-
-						for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
-
-							gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
-
-						}
-
-						delete geometryGroup.__webglMorphNormalsBuffers;
-
-					}
-
-					buffers.delete( geometryGroup );
-
-				}
-
-				delete geometryGroups[ geometry.id ];
-
-			} else {
-
-				buffers.delete( geometry );
+				delete attribute.buffer;
 
 			}
 
 		}
+
+		info.memory.geometries --;
 
 	}
 
@@ -360,24 +120,21 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 		} else if ( geometries[ geometry.id ] === undefined ) {
 
-			geometries[ geometry.id ] = geometry;
 			geometry.addEventListener( 'dispose', onGeometryDispose );
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
+				geometries[ geometry.id ] = geometry;
 				info.memory.geometries ++;
 
-			} else if ( object instanceof THREE.Mesh ) {
+			} else {
 
-				initGeometryGroups( object, geometry );
+				var bufferGeometry = new THREE.BufferGeometry().fromObject( object );
+				geometries[ geometry.id ] = bufferGeometry;
 
-			} else if ( object instanceof THREE.Line ) {
+				console.log( 'THREE.WebGLObjects: Converting...', object, bufferGeometry );
 
-				buffers.initLineBuffers( geometry, object );
-
-			} else if ( object instanceof THREE.PointCloud ) {
-
-				buffers.initPointCloudBuffers( geometry, object );
+				info.memory.geometries ++;
 
 			}
 
@@ -387,31 +144,25 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 
 			object.__webglActive = true;
 
-			if ( object instanceof THREE.Mesh ) {
+			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
-				if ( geometry instanceof THREE.BufferGeometry ) {
-
-					addBuffer( objects, geometry, object );
-
-				} else if ( geometry instanceof THREE.Geometry ) {
-
-					var geometryGroupsList = geometryGroups[ geometry.id ];
-
-					for ( var i = 0,l = geometryGroupsList.length; i < l; i ++ ) {
-
-						addBuffer( objects, geometryGroupsList[ i ], object );
-
-					}
-
-				}
-
-			} else if ( object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				addBuffer( objects, geometry, object );
+				objects[ object.id ] = {
+					id: object.id,
+					buffer: geometries[ geometry.id ],
+					object: object,
+					material: null,
+					z: 0
+				};
 
 			} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
 
-				addBufferImmediate( objectsImmediate, object );
+				objectsImmediate.push( {
+					id: null,
+					object: object,
+					opaque: null,
+					transparent: null,
+					z: 0
+				} );
 
 			}
 
@@ -422,6 +173,38 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 	this.update = function ( object ) {
 
 		var geometry = object.geometry;
+
+		if ( geometry instanceof THREE.Geometry ) {
+
+			var bufferGeometry = geometries[ geometry.id ];
+
+			if ( geometry.verticesNeedUpdate === true ) {
+
+				var attribute = bufferGeometry.attributes.position;
+
+				attribute.copyVector3sArray( geometry.vertices );
+				attribute.needsUpdate = true;
+
+				geometry.verticesNeedUpdate = false;
+
+			}
+
+			if ( geometry.colorsNeedUpdate === true ) {
+
+				var attribute = bufferGeometry.attributes.color;
+
+				attribute.copyColorsArray( geometry.colors );
+				attribute.needsUpdate = true;
+
+				geometry.colorsNeedUpdate = false;
+
+			}
+
+			geometry = bufferGeometry;
+
+		}
+
+		//
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -481,78 +264,6 @@ THREE.WebGLObjects = function ( gl, info, extensions, getBufferMaterial ) {
 				}
 
 			}
-
-		} else if ( object instanceof THREE.Mesh ) {
-
-			// check all geometry groups
-
-			if ( geometry.groupsNeedUpdate === true ) {
-
-				initGeometryGroups( object, geometry );
-
-			}
-
-			var geometryGroupsList = geometryGroups[ geometry.id ];
-
-			for ( var i = 0, il = geometryGroupsList.length; i < il; i ++ ) {
-
-				var geometryGroup = geometryGroupsList[ i ];
-				var material = getBufferMaterial( object, geometryGroup );
-
-				var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-				if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
-					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-					 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate || customAttributesDirty ) {
-
-					buffers.setMeshBuffers( geometryGroup, object, gl.DYNAMIC_DRAW, ! geometry.dynamic, material );
-
-				}
-
-			}
-
-			geometry.verticesNeedUpdate = false;
-			geometry.morphTargetsNeedUpdate = false;
-			geometry.elementsNeedUpdate = false;
-			geometry.uvsNeedUpdate = false;
-			geometry.normalsNeedUpdate = false;
-			geometry.colorsNeedUpdate = false;
-			geometry.tangentsNeedUpdate = false;
-
-			material.attributes && clearCustomAttributes( material );
-
-		} else if ( object instanceof THREE.Line ) {
-
-			var material = getBufferMaterial( object, geometry );
-			var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
-
-				buffers.setLineBuffers( geometry, gl.DYNAMIC_DRAW );
-
-			}
-
-			geometry.verticesNeedUpdate = false;
-			geometry.colorsNeedUpdate = false;
-			geometry.lineDistancesNeedUpdate = false;
-
-			material.attributes && clearCustomAttributes( material );
-
-		} else if ( object instanceof THREE.PointCloud ) {
-
-			var material = getBufferMaterial( object, geometry );
-			var customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || customAttributesDirty ) {
-
-				buffers.setPointCloudBuffers( geometry, gl.DYNAMIC_DRAW, object );
-
-			}
-
-			geometry.verticesNeedUpdate = false;
-			geometry.colorsNeedUpdate = false;
-
-			material.attributes && clearCustomAttributes( material );
 
 		}
 

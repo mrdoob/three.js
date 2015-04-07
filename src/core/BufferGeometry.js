@@ -110,6 +110,36 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	fromObject: function ( object ) {
+
+		var geometry = object.geometry;
+		var material = object.material;
+
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+
+			var positions = new Float32Array( geometry.vertices.length * 3 );
+			var colors = new Float32Array( geometry.colors.length * 3 );
+
+			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.computeBoundingSphere();
+
+		} else if ( object instanceof THREE.Mesh ) {
+
+			this.fromGeometry( geometry, material );
+
+		}
+
+		if ( material.attributes !== undefined ) {
+
+			console.warn( 'THREE.BufferGeometry.fromObject(). TODO: material.attributes', material );
+
+		}
+
+		return this;
+
+	},
+
 	fromGeometry: function ( geometry, settings ) {
 
 		settings = settings || { 'vertexColors': THREE.NoColors };

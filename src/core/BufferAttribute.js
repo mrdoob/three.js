@@ -36,6 +36,42 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	copyColorsArray: function ( colors ) {
+
+		var array = this.array, offset = 0;
+
+		for ( var i = 0, l = colors.length; i < l; i ++ ) {
+
+			var color = colors[ i ];
+
+			array[ offset ++ ] = color.r;
+			array[ offset ++ ] = color.g;
+			array[ offset ++ ] = color.b;
+
+		}
+
+		return this;
+
+	},
+
+	copyVector3sArray: function ( vectors ) {
+
+		var array = this.array, offset = 0;
+
+		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+
+			var vector = vectors[ i ];
+
+			array[ offset ++ ] = vector.x;
+			array[ offset ++ ] = vector.y;
+			array[ offset ++ ] = vector.z;
+
+		}
+
+		return this;
+
+	},
+
 	set: function ( value, offset ) {
 
 		if ( offset === undefined ) offset = 0;
