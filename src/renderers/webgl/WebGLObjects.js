@@ -14,6 +14,26 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	//
 
+	function initGeometry( object ) {
+
+		var geometry = object.geometry;
+
+		geometry.addEventListener( 'dispose', onGeometryDispose );
+
+		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			geometries[ geometry.id ] = geometry;
+
+		} else {
+
+			geometries[ geometry.id ] = new THREE.BufferGeometry().setFromObject( object );
+
+		}
+
+		info.memory.geometries ++;
+
+	}
+
 	function onObjectRemoved( event ) {
 
 		var object = event.target;
@@ -71,11 +91,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
-		deallocateGeometry( geometries[ geometry.id ] );
-
-	}
-
-	function deallocateGeometry( geometry ) {
+		geometry = geometries[ geometry.id ];
 
 		for ( var name in geometry.attributes ) {
 
@@ -116,25 +132,9 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		var geometry = object.geometry;
 
-		if ( geometry === undefined ) {
+		if ( geometry !== undefined ) {
 
-			// ImmediateRenderObject
-
-		} else if ( geometries[ geometry.id ] === undefined ) {
-
-			geometry.addEventListener( 'dispose', onGeometryDispose );
-
-			if ( geometry instanceof THREE.BufferGeometry ) {
-
-				geometries[ geometry.id ] = geometry;
-				info.memory.geometries ++;
-
-			} else {
-
-				geometries[ geometry.id ] = new THREE.BufferGeometry().setFromObject( object );
-				info.memory.geometries ++;
-
-			}
+			initGeometry( object );
 
 		}
 
@@ -171,14 +171,15 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		var geometry = object.geometry;
 
-		if ( object.geometry instanceof THREE.Geometry ) {
+		if ( geometry instanceof THREE.Geometry ) {
 
 			geometry = geometries[ geometry.id ];
 
 			if ( geometry === undefined ) {
 
-				geometry = new THREE.BufferGeometry().setFromObject( object );
-				geometries[ geometry.id ] = geometry;
+				initGeometry( object );
+
+				geometry = geometries[ geometry.id ];
 
 			} else {
 
