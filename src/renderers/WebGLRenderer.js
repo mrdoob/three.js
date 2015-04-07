@@ -1813,7 +1813,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var webglObject = renderList[ i ];
 
 			var object = webglObject.object;
-			var buffer = webglObject.buffer;
+			var buffer = objects.geometries[ object.geometry.id ];
 
 			setupMatrices( object, camera );
 
@@ -1913,9 +1913,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function unrollBufferMaterial ( globject ) {
 
 		var object = globject.object;
-		var buffer = globject.buffer;
-
-		var geometry = object.geometry;
 		var material = object.material;
 
 		if ( material ) {

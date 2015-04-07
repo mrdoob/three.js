@@ -100,6 +100,8 @@ THREE.WebGLObjects = function ( gl, info ) {
 	this.objects = objects;
 	this.objectsImmediate = objectsImmediate;
 
+	this.geometries = geometries;
+
 	this.init = function ( object ) {
 
 		if ( object.__webglInit === undefined ) {
@@ -129,11 +131,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			} else {
 
-				var bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
-				geometries[ geometry.id ] = bufferGeometry;
-
-				console.log( 'THREE.WebGLObjects: Converting...', object, bufferGeometry );
-
+				geometries[ geometry.id ] = new THREE.BufferGeometry().setFromObject( object );
 				info.memory.geometries ++;
 
 			}
@@ -148,7 +146,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 				objects[ object.id ] = {
 					id: object.id,
-					buffer: geometries[ geometry.id ],
 					object: object,
 					material: null,
 					z: 0
@@ -177,7 +174,17 @@ THREE.WebGLObjects = function ( gl, info ) {
 		if ( object.geometry instanceof THREE.Geometry ) {
 
 			geometry = geometries[ geometry.id ];
-			geometry.updateFromObject( object );
+
+			if ( geometry === undefined ) {
+
+				geometry = new THREE.BufferGeometry().setFromObject( object );
+				geometries[ geometry.id ] = geometry;
+
+			} else {
+
+				geometry.updateFromObject( object );
+
+			}
 
 		}
 

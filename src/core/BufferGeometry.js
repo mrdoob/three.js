@@ -112,6 +112,8 @@ THREE.BufferGeometry.prototype = {
 
 	setFromObject: function ( object ) {
 
+		console.log( 'THREE.BufferGeometry.setFromObject(). Converting ', object, this );
+
 		var geometry = object.geometry;
 		var material = object.material;
 
@@ -132,7 +134,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( material.attributes !== undefined ) {
 
-			console.warn( 'THREE.BufferGeometry.fromObject(). TODO: material.attributes', material );
+			console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: material.attributes', material );
 
 		}
 
