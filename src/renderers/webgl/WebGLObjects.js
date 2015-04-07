@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLObjects = function ( gl, info, extensions ) {
+THREE.WebGLObjects = function ( gl, info ) {
 
 	var objects = {};
 	var objectsImmediate = [];
