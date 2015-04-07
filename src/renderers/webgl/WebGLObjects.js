@@ -129,7 +129,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			} else {
 
-				var bufferGeometry = new THREE.BufferGeometry().fromObject( object );
+				var bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
 				geometries[ geometry.id ] = bufferGeometry;
 
 				console.log( 'THREE.WebGLObjects: Converting...', object, bufferGeometry );
@@ -174,45 +174,10 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		var geometry = object.geometry;
 
-		if ( geometry instanceof THREE.Geometry ) {
+		if ( object.geometry instanceof THREE.Geometry ) {
 
-			var bufferGeometry = geometries[ geometry.id ];
-
-			if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
-
-				if ( geometry.verticesNeedUpdate === true ) {
-
-					var attribute = bufferGeometry.attributes.position;
-
-					if ( attribute !== undefined ) {
-
-						attribute.copyVector3sArray( geometry.vertices );
-						attribute.needsUpdate = true;
-
-					}
-
-					geometry.verticesNeedUpdate = false;
-
-				}
-
-				if ( geometry.colorsNeedUpdate === true ) {
-
-					var attribute = bufferGeometry.attributes.color;
-
-					if ( attribute !== undefined ) {
-
-						attribute.copyColorsArray( geometry.colors );
-						attribute.needsUpdate = true;
-
-					}
-
-					geometry.colorsNeedUpdate = false;
-
-				}
-
-			}
-
-			geometry = bufferGeometry;
+			geometry = geometries[ geometry.id ];
+			geometry.updateFromObject( object );
 
 		}
 

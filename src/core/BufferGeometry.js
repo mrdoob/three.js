@@ -110,7 +110,7 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromObject: function ( object ) {
+	setFromObject: function ( object ) {
 
 		var geometry = object.geometry;
 		var material = object.material;
@@ -137,6 +137,46 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		return this;
+
+	},
+
+	updateFromObject: function ( object ) {
+
+		var geometry = object.geometry;
+
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+
+			if ( geometry.verticesNeedUpdate === true ) {
+
+				var attribute = this.attributes.position;
+
+				if ( attribute !== undefined ) {
+
+					attribute.copyVector3sArray( geometry.vertices );
+					attribute.needsUpdate = true;
+
+				}
+
+				geometry.verticesNeedUpdate = false;
+
+			}
+
+			if ( geometry.colorsNeedUpdate === true ) {
+
+				var attribute = this.attributes.color;
+
+				if ( attribute !== undefined ) {
+
+					attribute.copyColorsArray( geometry.colors );
+					attribute.needsUpdate = true;
+
+				}
+
+				geometry.colorsNeedUpdate = false;
+
+			}
+
+		}
 
 	},
 
