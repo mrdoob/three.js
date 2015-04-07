@@ -178,25 +178,37 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			var bufferGeometry = geometries[ geometry.id ];
 
-			if ( geometry.verticesNeedUpdate === true ) {
+			if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
 
-				var attribute = bufferGeometry.attributes.position;
+				if ( geometry.verticesNeedUpdate === true ) {
 
-				attribute.copyVector3sArray( geometry.vertices );
-				attribute.needsUpdate = true;
+					var attribute = bufferGeometry.attributes.position;
 
-				geometry.verticesNeedUpdate = false;
+					if ( attribute !== undefined ) {
 
-			}
+						attribute.copyVector3sArray( geometry.vertices );
+						attribute.needsUpdate = true;
 
-			if ( geometry.colorsNeedUpdate === true ) {
+					}
 
-				var attribute = bufferGeometry.attributes.color;
+					geometry.verticesNeedUpdate = false;
 
-				attribute.copyColorsArray( geometry.colors );
-				attribute.needsUpdate = true;
+				}
 
-				geometry.colorsNeedUpdate = false;
+				if ( geometry.colorsNeedUpdate === true ) {
+
+					var attribute = bufferGeometry.attributes.color;
+
+					if ( attribute !== undefined ) {
+
+						attribute.copyColorsArray( geometry.colors );
+						attribute.needsUpdate = true;
+
+					}
+
+					geometry.colorsNeedUpdate = false;
+
+				}
 
 			}
 
