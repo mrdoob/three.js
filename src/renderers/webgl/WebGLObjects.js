@@ -134,7 +134,11 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		if ( geometry !== undefined ) {
 
-			initGeometry( object );
+			if ( geometries[ geometry.id ] === undefined ) {
+
+				initGeometry( object );
+
+			}
 
 		}
 
@@ -169,23 +173,17 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	this.update = function ( object ) {
 
-		var geometry = object.geometry;
+		if ( geometries[ object.geometry.id ] === undefined ) {
 
-		if ( geometry instanceof THREE.Geometry ) {
+			initGeometry( object );
 
-			geometry = geometries[ geometry.id ];
+		}
 
-			if ( geometry === undefined ) {
+		var geometry = geometries[ object.geometry.id ];
 
-				initGeometry( object );
+		if ( object.geometry instanceof THREE.Geometry ) {
 
-				geometry = geometries[ geometry.id ];
-
-			} else {
-
-				geometry.updateFromObject( object );
-
-			}
+			geometry.updateFromObject( object );
 
 		}
 
