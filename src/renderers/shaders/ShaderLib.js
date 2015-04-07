@@ -737,7 +737,7 @@ THREE.ShaderLib = {
 				// "	gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 				"vec3 direction = normalize( vWorldPosition );",
 				"vec2 sampleUV;",
-				"sampleUV.y = clamp( tFlip * direction.y * -0.5 + 0.5, 0.0, 1.0 );",
+				"sampleUV.y = saturate( tFlip * direction.y * -0.5 + 0.5 );",
 				"sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
 				"gl_FragColor = texture2D( tEquirect, sampleUV );",
 

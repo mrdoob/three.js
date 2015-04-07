@@ -4,6 +4,10 @@
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
+#define square(a) a * a
+#define saturate(a) clamp( a, 0.0, 1.0 )
+#define whiteCompliment(a) 1.0 - saturate( a )
+
 vec3 transformDirection( in vec3 normal, in mat4 matrix ) {
 
 	return normalize( ( matrix * vec4( normal, 0.0 ) ).xyz );
@@ -41,7 +45,7 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 
 	if ( decayExponent > 0.0 ) {
 
-	  return pow( clamp( -lightDistance / cutoffDistance + 1.0, 0.0, 1.0 ), decayExponent );
+	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
 
 	}
 
@@ -75,10 +79,10 @@ vec3 BRDF_BlinnPhong( in vec3 specularColor, in float shininess, in vec3 normal,
 
 	vec3 halfDir = normalize( lightDir + viewDir );
 
-	//float dotNL = clamp( dot( normal, lightDir ), 0.0, 1.0 );
-	//float dotNV = clamp( dot( normal, viewDir ), 0.0, 1.0 );
-	float dotNH = clamp( dot( normal, halfDir ), 0.0, 1.0 );
-	float dotLH = clamp( dot( lightDir, halfDir ), 0.0, 1.0 );
+	//float dotNL = saturate( dot( normal, lightDir ) );
+	//float dotNV = saturate( dot( normal, viewDir ) );
+	float dotNH = saturate( dot( normal, halfDir ) );
+	float dotLH = saturate( dot( lightDir, halfDir ) );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 
