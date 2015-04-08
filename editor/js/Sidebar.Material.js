@@ -6,24 +6,6 @@ Sidebar.Material = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var materialClasses = {
-
-		'LineBasicMaterial': THREE.LineBasicMaterial,
-		'LineDashedMaterial': THREE.LineDashedMaterial,
-		'MeshBasicMaterial': THREE.MeshBasicMaterial,
-		'MeshDepthMaterial': THREE.MeshDepthMaterial,
-		'MeshFaceMaterial': THREE.MeshFaceMaterial,
-		'MeshLambertMaterial': THREE.MeshLambertMaterial,
-		'MeshNormalMaterial': THREE.MeshNormalMaterial,
-		'MeshPhongMaterial': THREE.MeshPhongMaterial,
-		'PointCloudMaterial': THREE.PointCloudMaterial,
-		'ShaderMaterial': THREE.ShaderMaterial,
-		'SpriteMaterial': THREE.SpriteMaterial,
-		'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
-		'Material': THREE.Material
-
-	};
-
 	var container = new UI.CollapsiblePanel();
 	container.setCollapsed( editor.config.getKey( 'ui/sidebar/material/collapsed' ) );
 	container.onCollapsedChange( function ( boolean ) {
@@ -77,7 +59,6 @@ Sidebar.Material = function ( editor ) {
 		'LineDashedMaterial': 'LineDashedMaterial',
 		'MeshBasicMaterial': 'MeshBasicMaterial',
 		'MeshDepthMaterial': 'MeshDepthMaterial',
-		'MeshFaceMaterial': 'MeshFaceMaterial',
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial',
@@ -213,18 +194,6 @@ Sidebar.Material = function ( editor ) {
 	materialAlphaMapRow.add( materialAlphaMap );
 
 	container.add( materialAlphaMapRow );
-
-	// light map
-
-	var materialLightMapRow = new UI.Panel();
-	var materialLightMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialLightMap = new UI.Texture().onChange( update );
-
-	materialLightMapRow.add( new UI.Text( 'Light Map' ).setWidth( '90px' ) );
-	materialLightMapRow.add( materialLightMapEnabled );
-	materialLightMapRow.add( materialLightMap );
-
-	container.add( materialLightMapRow );
 
 	// bump map
 
@@ -411,9 +380,9 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material instanceof materialClasses[ materialClass.getValue() ] === false ) {
+			if ( material instanceof THREE[ materialClass.getValue() ] === false ) {
 
-				material = new materialClasses[ materialClass.getValue() ]();
+				material = new THREE[ materialClass.getValue() ]();
 				object.material = material;
 
 			}
@@ -518,25 +487,6 @@ Sidebar.Material = function ( editor ) {
 				}
 
 			}
-
-			/*
-			if ( material.lightMap !== undefined ) {
-
-				var lightMapEnabled = materialLightMapEnabled.getValue() === true;
-
-				if ( objectHasUvs )  {
-
-					material.lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
-					material.needsUpdate = true;
-
-				} else {
-
-					if ( lightMapEnabled ) textureWarning = true;
-
-				}
-
-			}
-			*/
 
 			if ( material.bumpMap !== undefined ) {
 
@@ -706,7 +656,6 @@ Sidebar.Material = function ( editor ) {
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
 			'alphaMap': materialAlphaMapRow,
-			'lightMap': materialLightMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
 			'specularMap': materialSpecularMapRow,
@@ -823,15 +772,6 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			/*
-			if ( material.lightMap !== undefined ) {
-
-				materialLightMapEnabled.setValue( material.lightMap !== null );
-				materialLightMap.setValue( material.lightMap );
-
-			}
-			*/
-
 			if ( material.bumpMap !== undefined ) {
 
 				materialBumpMapEnabled.setValue( material.bumpMap !== null );
@@ -862,18 +802,18 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.lightMap !== undefined ) {
+
+				materialLightMapEnabled.setValue( material.lightMap !== null );
+				materialLightMap.setValue( material.lightMap );
+
+			}
+
 			if ( material.aoMap !== undefined ) {
 
 				materialAOMapEnabled.setValue( material.aoMap !== null );
 				materialAOMap.setValue( material.aoMap );
 				materialAOScale.setValue( material.aoMapIntensity );
-
-			}
-
-			if ( material.lightMap !== undefined ) {
-
-				materialLightMapEnabled.setValue( material.lightMap !== null );
-				materialLightMap.setValue( material.lightMap );
 
 			}
 
