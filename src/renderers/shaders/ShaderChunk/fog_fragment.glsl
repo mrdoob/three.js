@@ -12,7 +12,7 @@
 
 	#ifdef FOG_EXP2
 
-		float fogFactor = 1.0 - clamp( exp2( - fogDensity * fogDensity * depth * depth * LOG2 ), 0.0, 1.0 );
+		float fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * depth * depth * LOG2 ) );
 
 	#else
 
