@@ -138,7 +138,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-	}
+	};
 
 	// WebGLRenderer compatibility
 
@@ -177,7 +177,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf ),
+		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf );
 		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
@@ -220,7 +220,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		console.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
+		THREE.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
 		this.setClearColor( hex, alpha );
 
 	};
@@ -298,7 +298,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
-			console.error( 'THREE.CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
+			THREE.error( 'THREE.CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}

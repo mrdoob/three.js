@@ -142,7 +142,7 @@ THREE.MD2CharacterComplex = function () {
 
 		this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
 
-		var weaponsTextures = []
+		var weaponsTextures = [];
 		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 
 		// SKINS
@@ -193,7 +193,7 @@ THREE.MD2CharacterComplex = function () {
 
 			}
 
-		}
+		};
 
 		for ( var i = 0; i < config.weapons.length; i ++ ) {
 
@@ -518,7 +518,7 @@ THREE.MD2CharacterComplex = function () {
 
 		return textures;
 
-	};
+	}
 
 	function createPart( geometry, skinMap ) {
 
@@ -546,14 +546,14 @@ THREE.MD2CharacterComplex = function () {
 
 		return mesh;
 
-	};
+	}
 
 	function checkLoadingComplete() {
 
 		scope.loadCounter -= 1;
 		if ( scope.loadCounter === 0 ) 	scope.onLoadComplete();
 
-	};
+	}
 
 	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
 

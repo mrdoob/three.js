@@ -583,7 +583,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	merge: function ( geometry, matrix, materialIndexOffset ) {
+	merge: function ( geometry, matrix ) {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
@@ -600,8 +600,6 @@ THREE.Geometry.prototype = {
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
 		uvs2 = geometry.faceVertexUvs[ 0 ];
-
-		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
@@ -662,8 +660,6 @@ THREE.Geometry.prototype = {
 				faceCopy.vertexColors.push( color.clone() );
 
 			}
-
-			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
 
 			faces1.push( faceCopy );
 
@@ -738,12 +734,12 @@ THREE.Geometry.prototype = {
 
 			} else {
 
-				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+				//THREE.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 				changes[ i ] = changes[ verticesMap[ key ] ];
 
 			}
 
-		};
+		}
 
 
 		// if faces are completely degenerate after merging vertices, we
@@ -797,19 +793,23 @@ THREE.Geometry.prototype = {
 
 	},
 
-	toJSON: function () {
+	toJSON: function() {
 
-		var output = {
-			metadata: {
-				version: 4.0,
-				type: 'BufferGeometry',
-				generator: 'BufferGeometryExporter'
-			},
-			uuid: this.uuid,
-			type: this.type
+		// we will store all serialization data on 'data'
+		var data = {};
+
+		// add metadata
+		data.metadata = {
+			version: 4.4,
+			type: 'Geometry',
+			generator: 'Geometry.toJSON'
 		};
 
-		if ( this.name !== "" ) output.name = this.name;
+		// standard Geometry serialization
+
+		data.type = this.type;
+		data.uuid = this.uuid;
+		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.parameters !== undefined ) {
 
@@ -817,11 +817,11 @@ THREE.Geometry.prototype = {
 
 			for ( var key in parameters ) {
 
-				if ( parameters[ key ] !== undefined ) output[ key ] = parameters[ key ];
+				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
 
 			}
 
-			return output;
+			return data;
 
 		}
 
@@ -867,15 +867,6 @@ THREE.Geometry.prototype = {
 
 			faces.push( faceType );
 			faces.push( face.a, face.b, face.c );
-
-
-			/*
-			if ( hasMaterial ) {
-
-				faces.push( face.materialIndex );
-
-			}
-			*/
 
 			if ( hasFaceVertexUv ) {
 
@@ -984,17 +975,15 @@ THREE.Geometry.prototype = {
 
 		}
 
-		output.data = {};
+		data.data = {};
 
-		output.data.vertices = vertices;
-		output.data.normals = normals;
-		if ( colors.length > 0 ) output.data.colors = colors;
-		if ( uvs.length > 0 ) output.data.uvs = [ uvs ]; // temporal backward compatibility
-		output.data.faces = faces;
+		data.data.vertices = vertices;
+		data.data.normals = normals;
+		if ( colors.length > 0 ) data.data.colors = colors;
+		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+		data.data.faces = faces;
 
-		//
-
-		return output;
+		return data;
 
 	},
 

@@ -138,7 +138,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		offset, zLength,
 
-		colorIndex, normalIndex, uvIndex, materialIndex,
+		colorIndex, normalIndex, uvIndex,
 
 		type,
 		isQuad,
@@ -207,7 +207,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 			hasFaceColor	     = isBitSet( type, 6 );
 			hasFaceVertexColor  = isBitSet( type, 7 );
 
-			// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
+			// THREE.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
 			if ( isQuad ) {
 
@@ -225,9 +225,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasMaterial ) {
 
-					materialIndex = faces[ offset ++ ];
-					faceA.materialIndex = materialIndex;
-					faceB.materialIndex = materialIndex;
+					offset ++;
 
 				}
 
@@ -242,7 +240,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 						uvLayer = json.uvs[ i ];
 
 						geometry.faceVertexUvs[ i ][ fi ] = [];
-						geometry.faceVertexUvs[ i ][ fi + 1 ] = []
+						geometry.faceVertexUvs[ i ][ fi + 1 ] = [];
 
 						for ( j = 0; j < 4; j ++ ) {
 
@@ -334,8 +332,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasMaterial ) {
 
-					materialIndex = faces[ offset ++ ];
-					face.materialIndex = materialIndex;
+					offset ++;
 
 				}
 
@@ -424,7 +421,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		}
 
-	};
+	}
 
 	function parseSkin() {
 		var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
@@ -474,7 +471,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
 
-	};
+	}
 
 	function parseMorphing( scale ) {
 
@@ -531,7 +528,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		}
 
-	};
+	}
 
 	if ( json.materials === undefined || json.materials.length === 0 ) {
 

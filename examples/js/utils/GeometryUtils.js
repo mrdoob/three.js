@@ -9,7 +9,7 @@ THREE.GeometryUtils = {
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
-		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
+		THREE.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
 
 		var matrix;
 
@@ -148,7 +148,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			var result = binarySearch( 0, cumulativeAreas.length - 1 )
+			var result = binarySearch( 0, cumulativeAreas.length - 1 );
 			return result;
 
 		}
@@ -242,7 +242,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			var result = binarySearch( 0, cumulativeAreas.length - 1 )
+			var result = binarySearch( 0, cumulativeAreas.length - 1 );
 			return result;
 
 		}
@@ -292,7 +292,7 @@ THREE.GeometryUtils = {
 
 	center: function ( geometry ) {
 
-		console.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
+		THREE.warn( 'THREE.GeometryUtils: .center() has been moved to Geometry. Use geometry.center() instead.' );
 		return geometry.center();
 
 	}

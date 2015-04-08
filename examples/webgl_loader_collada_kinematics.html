@@ -151,7 +151,7 @@
 
 				var duration = getRandomInt(1000, 5000);
 
-				var target = {}
+				var target = {};
 
 				for ( var i = 0; i < kinematics.joints.length; i++ ) {
 
@@ -159,9 +159,9 @@
 
 						var old = tweenParameters[ i ];
 
-						var position = old ? old : joint.zeroPosition
+						var position = old ? old : joint.zeroPosition;
 
-						tweenParameters[ i ] = position
+						tweenParameters[ i ] = position;
 
 						target[ i ] = getRandomInt(joint.limits.min, joint.limits.max)
 
@@ -177,7 +177,7 @@
 
 					}
 
-				} )
+				} );
 
 				kinematicsTween.start();
 

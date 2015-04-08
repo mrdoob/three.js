@@ -45,7 +45,7 @@ THREE.MouseControls = function ( object ) {
 
 		mouseQuat.x.setFromAxisAngle( xVector, this.orientation.x );
 		mouseQuat.y.setFromAxisAngle( yVector, this.orientation.y );
-		object.quaternion.copy(mouseQuat.y).multiply(mouseQuat.x)
+		object.quaternion.copy(mouseQuat.y).multiply(mouseQuat.x);
 		return;
 
 	};

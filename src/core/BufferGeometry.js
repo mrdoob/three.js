@@ -29,7 +29,7 @@ THREE.BufferGeometry.prototype = {
 
 	addAttribute: function ( name, attribute ) {
 
-		if ( attribute instanceof THREE.BufferAttribute === false ) {
+		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
 			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
@@ -107,6 +107,78 @@ THREE.BufferGeometry.prototype = {
 		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
 
 		return offset;
+
+	},
+
+	setFromObject: function ( object ) {
+
+		console.log( 'THREE.BufferGeometry.setFromObject(). Converting ', object, this );
+
+		var geometry = object.geometry;
+		var material = object.material;
+
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+
+			var positions = new Float32Array( geometry.vertices.length * 3 );
+			var colors = new Float32Array( geometry.colors.length * 3 );
+
+			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.computeBoundingSphere();
+
+		} else if ( object instanceof THREE.Mesh ) {
+
+			this.fromGeometry( geometry, material );
+
+		}
+
+		if ( material.attributes !== undefined ) {
+
+			console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: material.attributes', material );
+
+		}
+
+		return this;
+
+	},
+
+	updateFromObject: function ( object ) {
+
+		var geometry = object.geometry;
+
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+
+			if ( geometry.verticesNeedUpdate === true ) {
+
+				var attribute = this.attributes.position;
+
+				if ( attribute !== undefined ) {
+
+					attribute.copyVector3sArray( geometry.vertices );
+					attribute.needsUpdate = true;
+
+				}
+
+				geometry.verticesNeedUpdate = false;
+
+			}
+
+			if ( geometry.colorsNeedUpdate === true ) {
+
+				var attribute = this.attributes.color;
+
+				if ( attribute !== undefined ) {
+
+					attribute.copyColorsArray( geometry.colors );
+					attribute.needsUpdate = true;
+
+				}
+
+				geometry.colorsNeedUpdate = false;
+
+			}
+
+		}
 
 	},
 
@@ -252,7 +324,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.computeBoundingSphere()
+		this.computeBoundingSphere();
 
 		return this;
 
@@ -334,7 +406,7 @@ THREE.BufferGeometry.prototype = {
 				box.center( center );
 
 				// hoping to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox:  sqrt(3) smaller in the best case
+				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
 
 				var maxRadiusSq = 0;
 
@@ -682,9 +754,9 @@ THREE.BufferGeometry.prototype = {
 		var facesCount = ( indices.length / 3 );
 
 		/*
-		console.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
-		console.log("Faces to process: "+(indices.length/3));
-		console.log("Reordering "+verticesCount+" vertices.");
+		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
+		THREE.log("Faces to process: "+(indices.length/3));
+		THREE.log("Reordering "+verticesCount+" vertices.");
 		*/
 
 		var sortedIndices = new Uint16Array( indices.length ); //16-bit buffers
@@ -763,10 +835,10 @@ THREE.BufferGeometry.prototype = {
 
 		/*
 		var orderTime = Date.now();
-		console.log("Reorder time: "+(orderTime-s)+"ms");
-		console.log("Duplicated "+duplicatedVertices+" vertices.");
-		console.log("Compute Buffers time: "+(Date.now()-s)+"ms");
-		console.log("Draw offsets: "+offsets.length);
+		THREE.log("Reorder time: "+(orderTime-s)+"ms");
+		THREE.log("Duplicated "+duplicatedVertices+" vertices.");
+		THREE.log("Compute Buffers time: "+(Date.now()-s)+"ms");
+		THREE.log("Draw offsets: "+offsets.length);
 		*/
 
 		return offsets;
@@ -874,20 +946,25 @@ THREE.BufferGeometry.prototype = {
 		}
 	},
 
-	toJSON: function () {
+	toJSON: function() {
 
-		var output = {
-			metadata: {
-				version: 4.0,
-				type: 'BufferGeometry',
-				generator: 'BufferGeometryExporter'
-			},
-			uuid: this.uuid,
-			type: this.type,
-			data: {
-				attributes: {}
-			}
+		// we will store all serialization data on 'data'
+		var data = {};
+
+		// add metadata
+		data.metadata = {
+			version: 4.4,
+			type: 'BufferGeometry',
+			generator: 'BufferGeometry.toJSON'
 		};
+
+		// standard BufferGeometry serialization
+
+		data.type = this.type;
+		data.uuid = this.uuid;
+		if ( this.name !== '' ) data.name = this.name;
+		data.data = {};
+		data.data.attributes = {};
 
 		var attributes = this.attributes;
 		var offsets = this.offsets;
@@ -899,7 +976,7 @@ THREE.BufferGeometry.prototype = {
 
 			var array = Array.prototype.slice.call( attribute.array );
 
-			output.data.attributes[ key ] = {
+			data.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
 				array: array
@@ -909,20 +986,20 @@ THREE.BufferGeometry.prototype = {
 
 		if ( offsets.length > 0 ) {
 
-			output.data.offsets = JSON.parse( JSON.stringify( offsets ) );
+			data.data.offsets = JSON.parse( JSON.stringify( offsets ) );
 
 		}
 
 		if ( boundingSphere !== null ) {
 
-			output.data.boundingSphere = {
+			data.data.boundingSphere = {
 				center: boundingSphere.center.toArray(),
 				radius: boundingSphere.radius
 			}
 
 		}
 
-		return output;
+		return data;
 
 	},
 

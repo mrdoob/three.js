@@ -5,7 +5,7 @@ THREE.MultiColor = function(links) {
 
 	this.links = links;
 
-}
+};
 
 THREE.MultiColor.prototype = Object.create( THREE.Color.prototype );
 THREE.MultiColor.prototype.constructor = THREE.MultiColor;
@@ -18,7 +18,7 @@ THREE.MultiColor.prototype.setAll = function(axis, value) {
 
 	}
 
-}
+};
 
 // Getters return value from the first linked color
 // Setters set the same value for all linked colors

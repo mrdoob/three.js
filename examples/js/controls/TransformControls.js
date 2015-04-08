@@ -632,6 +632,23 @@
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
 
+		this.dispose = function () {
+			domElement.removeEventListener( "mousedown", onPointerDown );
+			domElement.removeEventListener( "touchstart", onPointerDown );
+
+			domElement.removeEventListener( "mousemove", onPointerHover );
+			domElement.removeEventListener( "touchmove", onPointerHover );
+
+			domElement.removeEventListener( "mousemove", onPointerMove );
+			domElement.removeEventListener( "touchmove", onPointerMove );
+
+			domElement.removeEventListener( "mouseup", onPointerUp );
+			domElement.removeEventListener( "mouseout", onPointerUp );
+			domElement.removeEventListener( "touchend", onPointerUp );
+			domElement.removeEventListener( "touchcancel", onPointerUp );
+			domElement.removeEventListener( "touchleave", onPointerUp );
+		};
+
 		this.attach = function ( object ) {
 
 			scope.object = object;
@@ -645,7 +662,7 @@
 
 		};
 
-		this.detach = function ( object ) {
+		this.detach = function () {
 
 			scope.object = undefined;
 			this.axis = null;
@@ -726,8 +743,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
@@ -737,6 +752,8 @@
 			if ( intersect ) {
 
 				axis = intersect.object.name;
+
+				event.preventDefault();
 
 			}
 
@@ -754,9 +771,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-			event.stopPropagation();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
@@ -764,6 +778,9 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+
+					event.preventDefault();
+					event.stopPropagation();
 
 					scope.dispatchEvent( mouseDownEvent );
 

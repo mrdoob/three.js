@@ -124,7 +124,7 @@ THREE.BlendCharacter = function () {
 
 		}
 
-	}
+	};
 
 	this.play = function(animName, weight) {
 
@@ -231,13 +231,13 @@ THREE.BlendCharacter = function () {
 		this.weightSchedule.length = 0;
 		this.warpSchedule.length = 0;
 
-	}
+	};
 
 	this.showSkeleton = function( boolean ) {
 
 		this.skeletonHelper.visible = boolean;
 
-	}
+	};
 
 	this.showModel = function( boolean ) {
 
@@ -266,5 +266,5 @@ THREE.BlendCharacter.prototype.getForward = function() {
 
 		return forward;
 	}
-}
+};
 

@@ -29,7 +29,7 @@ THREE.MD2Character = function () {
 
 		this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
 
-		var weaponsTextures = []
+		var weaponsTextures = [];
 		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 
 		// SKINS
@@ -79,7 +79,7 @@ THREE.MD2Character = function () {
 
 			}
 
-		}
+		};
 
 		for ( var i = 0; i < config.weapons.length; i ++ ) {
 
@@ -195,7 +195,7 @@ THREE.MD2Character = function () {
 
 		return textures;
 
-	};
+	}
 
 	function createPart( geometry, skinMap ) {
 
@@ -229,7 +229,7 @@ THREE.MD2Character = function () {
 
 		return mesh;
 
-	};
+	}
 
 	function checkLoadingComplete() {
 
@@ -237,6 +237,6 @@ THREE.MD2Character = function () {
 
 		if ( scope.loadCounter === 0 ) scope.onLoadComplete();
 
-	};
+	}
 
 };

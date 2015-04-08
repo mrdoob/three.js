@@ -255,7 +255,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 			return closest;
 
-		}
+		};
 
 		switch ( event.touches.length ) {
 

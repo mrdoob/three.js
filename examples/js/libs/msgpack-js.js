@@ -147,7 +147,7 @@ exports.encode = function (value) {
   var view = new DataView(buffer);
   encode(value, view, 0);
   return buffer;
-}
+};
 
 exports.decode = decode;
 

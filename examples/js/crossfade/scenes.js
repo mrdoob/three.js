@@ -47,7 +47,7 @@ function generateGeometry(objectType, numObjects) {
 		}
 		else if ( objectType == "sphere" )
 		{
-			geom = new THREE.IcosahedronGeometry( 1, 1 )
+			geom = new THREE.IcosahedronGeometry( 1, 1 );
 			scale.y = scale.z = scale.x;
 			color.setRGB( Math.random() + 0.1, 0, 0 );
 		}

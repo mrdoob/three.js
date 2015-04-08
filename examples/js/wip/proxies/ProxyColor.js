@@ -8,7 +8,7 @@ THREE.ProxyColor = function ( array, offset ) {
 	this.array = array;
 	this.offset = offset;
 
-}
+};
 
 THREE.ProxyColor.prototype = Object.create( THREE.Color.prototype );
 THREE.ProxyColor.prototype.constructor = THREE.ProxyColor;
