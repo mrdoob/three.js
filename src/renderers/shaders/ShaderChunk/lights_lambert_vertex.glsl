@@ -21,25 +21,6 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 
 		vec3 directionalLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );
 
-		#ifdef WRAP_AROUND
-
-			vec3 directionalLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );
-
-		#endif
-
-	#endif
-
-	#ifdef WRAP_AROUND
-
-		vec3 directionalLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );
-		directionalLightWeighting = mix( directionalLightWeighting, directionalLightWeightingHalf, wrapRGB );
-
-		#ifdef DOUBLE_SIDED
-
-			directionalLightWeightingBack = mix( directionalLightWeightingBack, directionalLightWeightingHalfBack, wrapRGB );
-
-		#endif
-
 	#endif
 
 	vLightFront += directionalLightColor[ i ] * directionalLightWeighting;
@@ -71,25 +52,6 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 		#ifdef DOUBLE_SIDED
 
 			vec3 pointLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );
-
-			#ifdef WRAP_AROUND
-
-				vec3 pointLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );
-
-			#endif
-
-		#endif
-
-		#ifdef WRAP_AROUND
-
-			vec3 pointLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );
-			pointLightWeighting = mix( pointLightWeighting, pointLightWeightingHalf, wrapRGB );
-
-			#ifdef DOUBLE_SIDED
-
-				pointLightWeightingBack = mix( pointLightWeightingBack, pointLightWeightingHalfBack, wrapRGB );
-
-			#endif
 
 		#endif
 
@@ -128,25 +90,6 @@ for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {
 			#ifdef DOUBLE_SIDED
 
 				vec3 spotLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );
-
-				#ifdef WRAP_AROUND
-
-					vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );
-
-				#endif
-
-			#endif
-
-			#ifdef WRAP_AROUND
-
-				vec3 spotLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );
-				spotLightWeighting = mix( spotLightWeighting, spotLightWeightingHalf, wrapRGB );
-
-				#ifdef DOUBLE_SIDED
-
-					spotLightWeightingBack = mix( spotLightWeightingBack, spotLightWeightingHalfBack, wrapRGB );
-
-				#endif
 
 			#endif
 

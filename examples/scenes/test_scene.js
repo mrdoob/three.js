@@ -567,12 +567,12 @@
 
 		"phong_man": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 16737894, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+			"parameters": { "color": 16737894, "specular": 2236962, "shininess": 40 }
 		},
 
 		"phong_hand": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 14531481, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+			"parameters": { "color": 14531481, "specular": 2236962, "shininess": 40 }
 		},
 
 		"phong_bunny": {
