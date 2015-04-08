@@ -85,7 +85,7 @@ THREE.ColladaLoader = function () {
 
 						} else {
 
-							if ( faillCallback ) {
+							if ( failCallback ) {
 
 								failCallback();
 
