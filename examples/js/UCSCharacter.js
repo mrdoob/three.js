@@ -101,8 +101,7 @@ THREE.UCSCharacter = function() {
 				specular: 10.0,
 				map: skins[ i ],
 				skinning: true,
-				morphTargets: true,
-				wrapAround: true
+				morphTargets: true
 			} );
 
 		}

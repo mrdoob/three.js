@@ -2007,7 +2007,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			alphaTest: material.alphaTest,
 			metal: material.metal,
-			wrapAround: material.wrapAround,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
 
@@ -2572,23 +2571,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.emissive.value = material.emissive;
 		uniforms.specular.value = material.specular;
 
-		if ( material.wrapAround ) {
-
-			uniforms.wrapRGB.value.copy( material.wrapRGB );
-
-		}
-
 	}
 
 	function refreshUniformsLambert ( uniforms, material ) {
 
 		uniforms.emissive.value = material.emissive;
-
-		if ( material.wrapAround ) {
-
-			uniforms.wrapRGB.value.copy( material.wrapRGB );
-
-		}
 
 	}
 

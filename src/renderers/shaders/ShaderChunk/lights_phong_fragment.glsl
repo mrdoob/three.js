@@ -48,7 +48,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		// diffuse
 
-		vec3 cosineTerm = calcCosineTerm( normal, lightDir );
+		float cosineTerm = saturate( dot( normal, lightDir ) );
 
 		totalDiffuseLight += lightColor * attenuation * cosineTerm;
 
@@ -88,7 +88,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 			// diffuse
 
-			vec3 cosineTerm = calcCosineTerm( normal, lightDir );
+			float cosineTerm = saturate( dot( normal, lightDir ) );
 
 			totalDiffuseLight += lightColor * attenuation * cosineTerm;
 
@@ -114,7 +114,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		// diffuse
 
-		vec3 cosineTerm = calcCosineTerm( normal, lightDir );
+		float cosineTerm = saturate( dot( normal, lightDir ) );
 
 		totalDiffuseLight += lightColor * cosineTerm;
 
