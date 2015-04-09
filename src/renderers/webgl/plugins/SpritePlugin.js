@@ -98,8 +98,9 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.useProgram( program );
 
-		gl.enableVertexAttribArray( attributes.position );
-		gl.enableVertexAttribArray( attributes.uv );
+		renderer.state.disableUnusedAttributes();
+		renderer.state.enableAttribute( attributes.position );
+		renderer.state.enableAttribute( attributes.uv );
 
 		gl.disable( gl.CULL_FACE );
 		gl.enable( gl.BLEND );
