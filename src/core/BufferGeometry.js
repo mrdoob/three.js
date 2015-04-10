@@ -769,16 +769,18 @@ THREE.BufferGeometry.prototype = {
 	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
 	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
 	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-	size - Defaults to 65535, but allows for larger or smaller chunks.
+	size - Defaults to 65535 or 4294967296 if extension OES_element_index_uint supported, but allows for larger or smaller chunks.
 	*/
 	computeOffsets: function ( size ) {
 
-		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
+		if ( size === undefined ) size = THREE.BufferGeometry.MaxReferenceableIndex; 
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
 		var facesCount = ( indices.length / 3 );
+
+		var UintArray = ( ( vertices.length / 3 ) > 65535 && THREE.BufferGeometry.MaxReferenceableIndex > 65535 ) ? Uint32Array : Uint16Array;
 
 		/*
 		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
@@ -786,7 +788,8 @@ THREE.BufferGeometry.prototype = {
 		THREE.log("Reordering "+verticesCount+" vertices.");
 		*/
 
-		var sortedIndices = new Uint16Array( indices.length ); //16-bit buffers
+		var sortedIndices = new UintArray( indices.length );
+
 		var indexPtr = 0;
 		var vertexPtr = 0;
 
@@ -802,7 +805,7 @@ THREE.BufferGeometry.prototype = {
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
-			We can have more than 65k entries in the index buffer per offset, but only reference 65k values.
+			We can have more than 'size' entries in the index buffer per offset, but only reference 'size' values.
 		*/
 		for ( var findex = 0; findex < facesCount; findex ++ ) {
 			newVerticeMaps = 0;
@@ -1068,3 +1071,5 @@ THREE.BufferGeometry.prototype = {
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
+
+THREE.BufferGeometry.MaxReferenceableIndex = 65535;

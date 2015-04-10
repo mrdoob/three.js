@@ -217,6 +217,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	extensions.get( 'OES_standard_derivatives' );
 	extensions.get( 'ANGLE_instanced_arrays' );
 
+	if ( extensions.get( 'OES_element_index_uint' ) ) {
+
+		THREE.BufferGeometry.MaxReferenceableIndex = 4294967296;
+
+	}
+
 	if ( _logarithmicDepthBuffer ) {
 
 		extensions.get( 'EXT_frag_depth' );
