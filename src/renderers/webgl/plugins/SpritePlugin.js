@@ -98,9 +98,10 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.useProgram( program );
 
-		renderer.state.disableUnusedAttributes();
+		renderer.state.initAttributes();
 		renderer.state.enableAttribute( attributes.position );
 		renderer.state.enableAttribute( attributes.uv );
+		renderer.state.disableUnusedAttributes();
 
 		gl.disable( gl.CULL_FACE );
 		gl.enable( gl.BLEND );

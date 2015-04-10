@@ -1726,7 +1726,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom render plugins (post pass)
 
-		this.resetGLState();
 		spritePlugin.render( scene, camera );
 		lensFlarePlugin.render( scene, camera, _currentWidth, _currentHeight );
 

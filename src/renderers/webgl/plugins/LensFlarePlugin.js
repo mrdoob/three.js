@@ -295,9 +295,10 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		gl.useProgram( program );
 
-		renderer.state.disableUnusedAttributes();
+		renderer.state.initAttributes();
 		renderer.state.enableAttribute( attributes.vertex );
 		renderer.state.enableAttribute( attributes.uv );
+		renderer.state.disableUnusedAttributes();
 
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms
