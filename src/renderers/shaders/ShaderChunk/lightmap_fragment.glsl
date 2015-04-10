@@ -1,5 +1,5 @@
 #ifdef USE_LIGHTMAP
 
-	outgoingLight += diffuseColor.xyz * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+	totalAmbientLight += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
 
 #endif
