@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
+ * @author benaadams / https://twitter.com/ben_a_adams
  */
 
 THREE.WebGLRenderer = function ( parameters ) {
@@ -99,6 +100,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _this = this,
 
 	_programs = [],
+	_shaderCache = { vertex: [], fragment: [] },
 
 	// internal state cache
 
@@ -697,62 +699,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateMaterial = function ( material ) {
 
-		var program = material.program.program;
+		var program = material.program;
 
 		if ( program === undefined ) return;
 
 		material.program = undefined;
 
-		// only deallocate GL program if this was the last use of shared program
-		// assumed there is only single copy of any program in the _programs list
-		// (that's how it's constructed)
+		program.dispose();
 
-		var i, il, programInfo;
-		var deleteProgram = false;
+		// update caches
+		// avoid using array.splice, this is costlier than creating new array from scratch
 
-		for ( i = 0, il = _programs.length; i < il; i ++ ) {
+		if ( program.usedTimes === 0 ) {
 
-			programInfo = _programs[ i ];
+			var id = program.id;
+			var cache = _programs;
+			var programs = [];
 
-			if ( programInfo.program === program ) {
+			for ( var i = 0, ul = cache.length; i < ul; i++ ) {
 
-				programInfo.usedTimes --;
+				if ( cache[i].id !== id ) {
 
-				if ( programInfo.usedTimes === 0 ) {
+					programs.push( cache[i] );
 
-					deleteProgram = true;
+				} else {
 
-				}
-
-				break;
-
-			}
-
-		}
-
-		if ( deleteProgram === true ) {
-
-			// avoid using array.splice, this is costlier than creating new array from scratch
-
-			var newPrograms = [];
-
-			for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-				programInfo = _programs[ i ];
-
-				if ( programInfo.program !== program ) {
-
-					newPrograms.push( programInfo );
+					_this.info.memory.programs--;
 
 				}
 
 			}
 
-			_programs = newPrograms;
-
-			_gl.deleteProgram( program );
-
-			_this.info.memory.programs --;
+			_programs.vertex = programs;
 
 		}
 
@@ -984,6 +962,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		objects.update( object );
 
 		var program = setProgram( camera, lights, fog, material, object );
+
+		if ( !program ) {
+
+			return;
+
+		}
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -1875,6 +1859,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = setProgram( camera, lights, fog, material, object );
 
+		if ( !program ) {
+
+			return;
+
+		}
+
 		_currentGeometryProgram = '';
 
 		_this.setMaterialFaces( material );
@@ -2055,64 +2045,74 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material.program.code !== code ) {
 
 		    // changed glsl or parameters
-		    deallocateMaterial( material );
-
-		} else {
-
-            // same glsl and parameters
-		    return;
-
-		}
-
-		if ( shaderID ) {
-
-			var shader = THREE.ShaderLib[ shaderID ];
-
-			material.__webglShader = {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			}
-
-		} else {
-
-			material.__webglShader = {
-				uniforms: material.uniforms,
-				vertexShader: material.vertexShader,
-				fragmentShader: material.fragmentShader
-			}
+			deallocateMaterial( material );
+			material.program = undefined;
 
 		}
 
 		var program;
 
-		// Check if code has been already compiled
+		if ( !material.program ) {
 
-		for ( var p = 0, pl = _programs.length; p < pl; p ++ ) {
+			if ( shaderID ) {
 
-			var programInfo = _programs[ p ];
+				var shader = THREE.ShaderLib[shaderID];
 
-			if ( programInfo.code === code ) {
+				material.__webglShader = {
+					uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				}
 
-				program = programInfo;
-				program.usedTimes ++;
+			} else {
 
-				break;
+				material.__webglShader = {
+					uniforms: material.uniforms,
+					vertexShader: material.vertexShader,
+					fragmentShader: material.fragmentShader
+				}
 
 			}
 
+			// Check if code has been already compiled
+
+			for ( var p = 0, pl = _programs.length; p < pl; p++ ) {
+
+				var programInfo = _programs[p];
+
+				if ( programInfo.code === code ) {
+
+					program = programInfo;
+					program.usedTimes++;
+
+					break;
+
+				}
+
+			}
+
+			material.program = program;
+
+			if ( program === undefined ) {
+
+				program = new THREE.WebGLProgram( _this, code, material, parameters, _shaderCache );
+				_programs.push( program );
+
+				_this.info.memory.programs = _programs.length;
+
+				material.program = program;
+
+				return false;
+			}
 		}
 
-		if ( program === undefined ) {
+		program = material.program;
 
-			program = new THREE.WebGLProgram( _this, code, material, parameters );
-			_programs.push( program );
+		if ( program.state !== THREE.WebGLProgram.LinkedState ) {
 
-			_this.info.memory.programs = _programs.length;
+			return false;
 
 		}
-
-		material.program = program;
 
 		var attributes = program.attributes;
 
@@ -2168,6 +2168,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		return true;
 	}
 
 	function setMaterial( material ) {
@@ -2196,7 +2197,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			initMaterial( material, lights, fog, object );
+			if ( !initMaterial( material, lights, fog, object ) ) {
+
+				return undefined;
+
+			}
+
 			material.needsUpdate = false;
 
 		}
@@ -2215,8 +2221,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var refreshMaterial = false;
 		var refreshLights = false;
 
-		var program = material.program,
-			p_uniforms = program.uniforms,
+		var program = material.program;
+
+		if ( program.state !== THREE.WebGLProgram.LinkedState ) {
+
+			return undefined;
+
+		}
+
+		var p_uniforms = program.uniforms,
 			m_uniforms = material.__webglShader.uniforms;
 
 		if ( program.id !== _currentProgram ) {
