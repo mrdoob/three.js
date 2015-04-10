@@ -1963,9 +1963,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
 
+		if ( material.precision ) {
+			if ( material.precision === 'highp' && ! highpAvailable ) {
+				if ( mediumpAvailable ) {
+					material.precision = 'mediump';
+				} else {
+					material.precision = 'lowp';
+				}
+			}
+
+			if ( material.precision === 'mediump' && ! mediumpAvailable ) {
+				material.precision = 'lowp';
+			}
+		}
+
 		var parameters = {
 
-			precision: _precision,
+			precision: material.precision ? material.precision : _precision,
 			supportsVertexTextures: _supportsVertexTextures,
 
 			map: !! material.map,
