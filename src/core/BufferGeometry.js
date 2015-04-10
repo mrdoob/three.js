@@ -190,7 +190,10 @@ THREE.BufferGeometry.prototype = {
 		var faces = geometry.faces;
 		var faceVertexUvs = geometry.faceVertexUvs;
 		var vertexColors = settings.vertexColors;
+
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+
 		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
 
 		var positions = new Float32Array( faces.length * 3 * 3 );
@@ -210,6 +213,13 @@ THREE.BufferGeometry.prototype = {
 
 			var uvs = new Float32Array( faces.length * 3 * 2 );
 			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+		}
+
+		if ( hasFaceVertexUv2 === true ) {
+
+			var uvs2 = new Float32Array( faces.length * 3 * 2 );
+			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs, 2 ) );
 
 		}
 
@@ -319,6 +329,23 @@ THREE.BufferGeometry.prototype = {
 
 				uvs[ i2 + 4 ] = uvc.x;
 				uvs[ i2 + 5 ] = uvc.y;
+
+			}
+
+			if ( hasFaceVertexUv2 === true ) {
+
+				var uva = faceVertexUvs[ 1 ][ i ][ 0 ];
+				var uvb = faceVertexUvs[ 1 ][ i ][ 1 ];
+				var uvc = faceVertexUvs[ 1 ][ i ][ 2 ];
+
+				uvs2[ i2     ] = uva.x;
+				uvs2[ i2 + 1 ] = uva.y;
+
+				uvs2[ i2 + 2 ] = uvb.x;
+				uvs2[ i2 + 3 ] = uvb.y;
+
+				uvs2[ i2 + 4 ] = uvc.x;
+				uvs2[ i2 + 5 ] = uvc.y;
 
 			}
 
