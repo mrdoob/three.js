@@ -219,7 +219,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	if ( extensions.get( 'OES_element_index_uint' ) ) {
 
-		THREE.BufferGeometry.MaxReferenceableIndex = 4294967296;
+		THREE.BufferGeometry.MaxIndex = 4294967296;
 
 	}
 

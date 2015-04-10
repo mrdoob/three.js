@@ -773,14 +773,14 @@ THREE.BufferGeometry.prototype = {
 	*/
 	computeOffsets: function ( size ) {
 
-		if ( size === undefined ) size = THREE.BufferGeometry.MaxReferenceableIndex; 
+		if ( size === undefined ) size = THREE.BufferGeometry.MaxIndex;
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
 		var facesCount = ( indices.length / 3 );
 
-		var UintArray = ( ( vertices.length / 3 ) > 65535 && THREE.BufferGeometry.MaxReferenceableIndex > 65535 ) ? Uint32Array : Uint16Array;
+		var UintArray = ( ( vertices.length / 3 ) > 65535 && THREE.BufferGeometry.MaxIndex > 65535 ) ? Uint32Array : Uint16Array;
 
 		/*
 		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
@@ -1072,4 +1072,4 @@ THREE.BufferGeometry.prototype = {
 
 THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
 
-THREE.BufferGeometry.MaxReferenceableIndex = 65535;
+THREE.BufferGeometry.MaxIndex = 65535;
