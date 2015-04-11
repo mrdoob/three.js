@@ -121,14 +121,16 @@ THREE.BufferGeometry.prototype = {
 
 			var positions = new Float32Array( geometry.vertices.length * 3 );
 			var colors = new Float32Array( geometry.colors.length * 3 );
+			
+			var BufferType = geometry.dynamic ? THREE.DynamicBufferAttribute : THREE.BufferAttribute;
 
-			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'position', new BufferType( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+			this.addAttribute( 'color', new BufferType( colors, 3 ).copyColorsArray( geometry.colors ) );
 			this.computeBoundingSphere();
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			this.fromGeometry( geometry, material );
+			this.fromGeometry( geometry, material, object );
 
 		}
 
@@ -172,11 +174,86 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
+		} else if ( object instanceof THREE.Mesh ) {
+			
+			if ( geometry.dynamic ) {
+
+				var material = object.material;
+
+				if ( geometry.verticesNeedUpdate === true ) {
+
+					this.updateWithMapping( geometry.vertices, this.attributes.position, this.vertexMap );
+
+					geometry.verticesNeedUpdate = false;
+
+				}
+
+				if ( geometry.colorsNeedUpdate === true ) {
+
+					this.updateWithMapping( geometry.colors, this.attributes.color, this.vertexMap );
+
+					geometry.colorsNeedUpdate = false;
+
+				}
+
+				for ( var name in material.attributes ) {
+
+					var attribute = material.attributes[name];
+
+					if ( attribute.needsUpdate ) {
+
+						this.updateWithMapping( attribute.value, this.attributes[name], object.vertexMap );
+
+						attribute.needsUpdate = false;
+
+					}
+
+				}
+
+			}
 		}
 
 	},
 
-	fromGeometry: function ( geometry, material ) {
+	updateWithMapping: function ( values, attribute, vertexMap ) {
+
+		if ( attribute !== undefined ) {
+
+			for ( var i = 0, ul = values.length; i < ul; i += attribute.itemSize ) {
+
+				var mapping = vertexMap[i];
+
+				if ( mapping === undefined ) continue;
+
+				for ( var ii = 0; ii < attribute.itemSize; ii++ ) {
+
+					var value = values[i + ii];
+
+					if ( mapping instanceof Array ) {
+
+						for ( var m = 0, ml = mapping.length; m < ml; m++ ) {
+
+							attribute.array[mapping[m]] = value;
+
+						}
+
+					} else {
+
+						attribute.array[mapping] = value;
+
+					}
+
+				}
+
+			}
+
+			attribute.needsUpdate = true;
+
+		}
+
+	},
+
+	fromGeometry: function ( geometry, material, object ) {
 
 		material = material || { 'vertexColors': THREE.NoColors, attributes: [] };
 
@@ -346,7 +423,7 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var i = 0; i < 3; i++ ) {
 
-				var hashGroup = [];
+				var hashGroup = [index[i]];
 
 				// don't put in one loop and intermingle attribute values, or weird index connections may happen
 
@@ -461,24 +538,26 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( positions ), 3 ) );
-		this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
+		var BufferType = geometry.dynamic ? THREE.DynamicBufferAttribute : THREE.BufferAttribute;
+
+		this.addAttribute( 'position', new BufferType( new Float32Array( positions ), 3 ) );
+		this.addAttribute( 'normal', new BufferType( new Float32Array( normals ), 3 ) );
 
 		if ( vertexColors !== THREE.NoColors ) {
 
-			this.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
+			this.addAttribute( 'color', new BufferType( new Float32Array( colors ), 3 ) );
 
 		}
 
 		if ( hasFaceVertexUv === true ) {
 
-			this.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( uvs ), 2 ) );
+			this.addAttribute( 'uv', new BufferType( new Float32Array( uvs ), 2 ) );
 
 		}
 
 		if ( hasFaceVertexUv2 === true ) {
 
-			this.addAttribute( 'uv2', new THREE.BufferAttribute( new Float32Array( uvs2 ), 2 ) );
+			this.addAttribute( 'uv2', new BufferType( new Float32Array( uvs2 ), 2 ) );
 
 		}
 
@@ -509,9 +588,10 @@ THREE.BufferGeometry.prototype = {
 
 				for ( var ii = 0; ii < size; ii++ ) {
 
+					var value = values[i + ii];
+
 					if ( mapping instanceof Array ) {
 
-						var value = values[i + ii];
 						for ( var m = 0, ml = mapping.length; m < ml; m++ ) {
 
 							array[mapping[m]] = value;
@@ -520,7 +600,7 @@ THREE.BufferGeometry.prototype = {
 
 					} else {
 
-						array[mapping] = values[i + ii];
+						array[mapping] = value;
 
 					}
 
@@ -528,7 +608,13 @@ THREE.BufferGeometry.prototype = {
 
 			}
 			
-			this.addAttribute( name, new THREE.BufferAttribute( array, size ) );
+			this.addAttribute( name, new BufferType( array, size ) );
+
+		}
+
+		if ( geometry.dynamic ) {
+
+			object.vertexMap = vertexMap;
 
 		}
 
