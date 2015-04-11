@@ -11,15 +11,11 @@ THREE.VRControls = function ( object, onError ) {
 
 	function filterInvalidDevices( devices ) {
 
-		var
-			OculusDeviceName = 'VR Position Device (oculus)',
-			CardboardDeviceName = 'VR Position Device (cardboard)';
-
-
 		// Exclude Cardboard position sensor if Oculus exists.
+
 		var oculusDevices = devices.filter( function ( device ) {
 
-			return device.deviceName === OculusDeviceName;
+			return device.deviceName.toLowerCase().indexOf('oculus') !== -1;
 
 		} );
 
@@ -27,7 +23,7 @@ THREE.VRControls = function ( object, onError ) {
 
 			return devices.filter( function ( device ) {
 
-				return device.deviceName !== CardboardDeviceName;
+				return device.deviceName.toLowerCase().indexOf('cardboard') === -1;
 
 			} );
 
