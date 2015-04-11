@@ -44,9 +44,58 @@ THREE.BufferAttribute.prototype = {
 
 			var color = colors[ i ];
 
+			if ( vector === undefined ) {
+
+				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
+				vector = new THREE.Color();
+
+			}
+
 			array[ offset ++ ] = color.r;
 			array[ offset ++ ] = color.g;
 			array[ offset ++ ] = color.b;
+
+		}
+
+		return this;
+
+	},
+
+	copyFacesArray: function ( faces ) {
+
+		var array = this.array, offset = 0;
+
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+			var face = faces[ i ];
+
+			array[ offset ++ ] = face.a;
+			array[ offset ++ ] = face.b;
+			array[ offset ++ ] = face.c;
+
+		}
+
+		return this;
+
+	},
+
+	copyVector2sArray: function ( vectors ) {
+
+		var array = this.array, offset = 0;
+
+		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+
+			var vector = vectors[ i ];
+
+			if ( vector === undefined ) {
+
+				console.warn( 'THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i );
+				vector = new THREE.Vector2();
+
+			}
+
+			array[ offset ++ ] = vector.x;
+			array[ offset ++ ] = vector.y;
 
 		}
 
@@ -61,6 +110,13 @@ THREE.BufferAttribute.prototype = {
 		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
 			var vector = vectors[ i ];
+
+			if ( vector === undefined ) {
+
+				console.warn( 'THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i );
+				vector = new THREE.Vector3();
+
+			}
 
 			array[ offset ++ ] = vector.x;
 			array[ offset ++ ] = vector.y;

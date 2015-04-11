@@ -128,7 +128,13 @@ THREE.BufferGeometry.prototype = {
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			this.fromGeometry( geometry, material );
+			if ( geometry.isFlattened === false ) {
+
+				geometry.flatten();
+
+			}
+
+			this.fromFlattenedGeometry( geometry );
 
 		}
 
@@ -146,7 +152,7 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = object.geometry;
 
-		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line || object instanceof THREE.Mesh ) {
 
 			if ( geometry.verticesNeedUpdate === true ) {
 
@@ -350,6 +356,33 @@ THREE.BufferGeometry.prototype = {
 			}
 
 		}
+
+		this.computeBoundingSphere();
+
+		return this;
+
+	},
+
+	fromFlattenedGeometry: function ( geometry ) {
+
+		var indices = new Uint16Array( geometry.faces.length * 3 );
+		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyFacesArray( geometry.faces ) );
+
+		var positions = new Float32Array( geometry.vertices.length * 3 );
+		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+
+		if ( geometry.normals.length > 0 ) {
+
+			var normals = new Float32Array( geometry.normals.length * 3 );
+			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+
+		}
+
+		var colors = new Float32Array( geometry.colors.length * 3 );
+		this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+
+		var uvs = new Float32Array( geometry.uvs.length * 2 );
+		this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
 
 		this.computeBoundingSphere();
 

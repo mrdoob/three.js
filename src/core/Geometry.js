@@ -16,10 +16,18 @@ THREE.Geometry = function () {
 	this.name = '';
 	this.type = 'Geometry';
 
-	this.vertices = [];
-	this.colors = [];  // one-to-one vertex colors, used in Points and Line
+	// FlattenedGeometry
 
+	this.isFlattened = false;
+
+	this.vertices = [];
+	this.colors = [];
+	this.normals = [];
+	this.colors = [];
+	this.uvs = [];
 	this.faces = [];
+
+	//
 
 	this.faceVertexUvs = [ [] ];
 
@@ -37,7 +45,7 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = true; // the intermediate typed arrays will be deleted when set to false
+	this.dynamic = true;
 
 	// update flags
 
@@ -95,6 +103,44 @@ THREE.Geometry.prototype = {
 
 		this.verticesNeedUpdate = true;
 		this.normalsNeedUpdate = true;
+
+	},
+
+	flatten: function () {
+
+		var faces = this.faces;
+		var faceVertexUvs = this.faceVertexUvs[ 0 ];
+
+		for ( var i = 0, il = faces.length; i < il; i ++ ) {
+
+			var face = faces[ i ];
+			var indices = [ face.a, face.b, face.c ];
+
+			var vertexNormals = face.vertexNormals;
+			var vertexColors = face.vertexColors;
+			var vertexUvs = faceVertexUvs[ i ];
+
+			for ( var j = 0, jl = vertexNormals.length; j < jl; j ++ ) {
+
+				this.normals[ indices[ j ] ] = vertexNormals[ j ];
+
+			}
+
+			for ( var j = 0, jl = vertexColors.length; j < jl; j ++ ) {
+
+				this.colors[ indices[ j ] ] = vertexColors[ j ];
+
+			}
+
+			for ( var j = 0, jl = vertexUvs.length; j < jl; j ++ ) {
+
+				this.uvs[ indices[ j ] ] = vertexUvs[ j ];
+
+			}
+
+		}
+
+		this.isFlattened = true;
 
 	},
 
