@@ -612,14 +612,14 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		this.computeOffsets( undefined, vertexMap );
+
 		if ( geometry.dynamic ) {
 
 			object.vertexMap = vertexMap;
 
 		}
 
-		// TODO: Vertexes are again reordered, issue for dynamic updates
-		this.computeOffsets();
 		this.computeBoundingSphere();
 
 		return this;
@@ -1040,9 +1040,10 @@ THREE.BufferGeometry.prototype = {
 	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
 	size - Defaults to 65535 or 4294967296 if extension OES_element_index_uint supported, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function ( size ) {
+	computeOffsets: function ( size, vertexMap ) {
 
-		if ( size === undefined ) size = THREE.BufferGeometry.MaxIndex; 
+		if ( size === undefined ) size = THREE.BufferGeometry.MaxIndex;
+
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
@@ -1128,7 +1129,7 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
-		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
+		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr, vertexMap );
 		this.offsets = offsets; // TODO: Deprecate
 		this.drawcalls = offsets;
 
@@ -1210,7 +1211,7 @@ THREE.BufferGeometry.prototype = {
 		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
 		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertice stack).
 	*/
-	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
+	reorderBuffers: function ( indexBuffer, indexMap, vertexCount, vertexMap ) {
 
 		/* Create a copy of all attributes for reordering. */
 		var sortedAttributes = {};
@@ -1233,6 +1234,68 @@ THREE.BufferGeometry.prototype = {
 				for ( var k = 0; k < attrSize; k ++ )
 					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
 			}
+		}
+
+		/* Adjust vertex map for converted objects for dynamic updates */
+		if ( vertexMap !== undefined ) {
+				
+			// reverse lookup
+			var invVertexMap = [];
+			for ( var i = 0, ul = vertexMap.length; i < ul; i++ ) {
+
+				var value = vertexMap[i];
+				if ( value === undefined ) continue;
+
+				if ( value instanceof Array ) {
+
+					for ( var m = 0, ml = value.length; m < ml; m++ ) {
+
+						invVertexMap[value[m]] = i;
+
+					}
+
+				} else {
+
+					invVertexMap[value] = i;
+
+				}
+
+			}
+
+			var newVertexMap = [];
+			for ( var new_vid = 0; new_vid < vertexCount; new_vid++ ) {
+
+				var vid = indexMap[new_vid];
+				var oid = invVertexMap[vid];
+
+
+				var newMapping = newVertexMap[oid];
+				if ( newMapping === undefined ) {
+
+					newVertexMap[oid] = new_vid;
+
+				} else if ( newMapping instanceof Array ) {
+
+					newMapping.push( new_vid );
+
+				} else {
+
+					newVertexMap[oid] = [];
+					newVertexMap[oid].push( newMapping, new_vid );
+
+				}
+				
+			}
+
+			// reassign new vaules
+			for ( var i = 0, ul = vertexMap.length; i < ul; i++ ) {
+
+				if ( vertexMap[i] === undefined ) continue;
+
+				vertexMap[i] = newVertexMap[i];
+
+			}
+
 		}
 
 		/* Carry the new sorted buffers locally */
