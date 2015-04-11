@@ -132,12 +132,6 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( material.attributes !== undefined ) {
-
-			console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: material.attributes', material );
-
-		}
-
 		return this;
 
 	},
@@ -182,14 +176,14 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromGeometry: function ( geometry, settings ) {
+	fromGeometry: function ( geometry, material ) {
 
-		settings = settings || { 'vertexColors': THREE.NoColors };
+		material = material || { 'vertexColors': THREE.NoColors, attributes: [] };
 
 		var vertices = geometry.vertices;
 		var faces = geometry.faces;
 		var faceVertexUvs = geometry.faceVertexUvs;
-		var vertexColors = settings.vertexColors;
+		var vertexColors = material.vertexColors;
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
@@ -203,7 +197,7 @@ THREE.BufferGeometry.prototype = {
 		var uvs = [];
 		var uvs2 = [];
 
-		var vertexMap = {};
+		var vertexHash = {}, vertexMap = [];
 
 		var index = [], position = [], normal = [], color = [], uv = [], uv2 = [];
 
@@ -400,7 +394,7 @@ THREE.BufferGeometry.prototype = {
 
 				var hash = hashGroup.join( '|' );
 
-				var vertexIndex = vertexMap[hash];
+				var vertexIndex = vertexHash[hash];
 
 				if ( vertexIndex === undefined ) {
 
@@ -436,8 +430,24 @@ THREE.BufferGeometry.prototype = {
 
 					}
 
+					var currentMapping = vertexMap[index[i]];
+					if ( currentMapping === undefined ) {
+
+						vertexMap[index[i]] = indexCount;
+
+					} else if ( currentMapping instanceof Array ) {
+
+						currentMapping.push( indexCount );
+
+					} else {
+
+						vertexMap[index[i]] = [];
+						vertexMap[index[i]].push( currentMapping, indexCount );
+
+					}
+
 					indices.push( indexCount );
-					vertexMap[hash] = indexCount;
+					vertexHash[hash] = indexCount;
 
 					indexCount++;
 
@@ -475,6 +485,54 @@ THREE.BufferGeometry.prototype = {
 		var UintArray = ( ( positions.length / 3 ) > 65535 ) ? Uint32Array : Uint16Array;
 		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 		
+		// custom attributes
+
+		var vertexCount = positions.length / 3;
+
+		for ( var name in material.attributes ) {
+
+			var attribute = material.attributes[name];
+
+			var size = 1;   // "f" and "i"
+
+			if ( attribute.type === 'v2' ) size = 2;
+			else if ( attribute.type === 'v3' ) size = 3;
+			else if ( attribute.type === 'v4' ) size = 4;
+			else if ( attribute.type === 'c' ) size = 3;
+
+			var array = new Float32Array( vertexCount * size );
+			var values = attribute.value;
+
+			for ( var i = 0, ul = values.length; i < ul; i += size ) {
+
+				var mapping = vertexMap[i];
+
+				for ( var ii = 0; ii < size; ii++ ) {
+
+					if ( mapping instanceof Array ) {
+
+						var value = values[i + ii];
+						for ( var m = 0, ml = mapping.length; m < ml; m++ ) {
+
+							array[mapping[m]] = value;
+
+						}
+
+					} else {
+
+						array[mapping] = values[i + ii];
+
+					}
+
+				}				
+
+			}
+			
+			this.addAttribute( name, new THREE.BufferAttribute( array, size ) );
+
+		}
+
+		// TODO: Vertexes are again reordered, issue for dynamic updates
 		this.computeOffsets();
 		this.computeBoundingSphere();
 
@@ -924,9 +982,9 @@ THREE.BufferGeometry.prototype = {
 		var duplicatedVertices = 0;
 		var newVerticeMaps = 0;
 		var faceVertices = new Int32Array( 6 );
-		var vertexMap = new Int32Array( vertices.length );
+		var vertexHash = new Int32Array( vertices.length );
 		var revVertexMap = new Int32Array( vertices.length );
-		for ( var j = 0; j < vertices.length; j ++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
+		for ( var j = 0; j < vertices.length; j ++ ) { vertexHash[ j ] = - 1; revVertexMap[ j ] = - 1; }
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
@@ -937,12 +995,12 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var vo = 0; vo < 3; vo ++ ) {
 				var vid = indices[ findex * 3 + vo ];
-				if ( vertexMap[ vid ] == - 1 ) {
+				if ( vertexHash[ vid ] == - 1 ) {
 					//Unmapped vertice
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
 					newVerticeMaps ++;
-				} else if ( vertexMap[ vid ] < offset.index ) {
+				} else if ( vertexHash[ vid ] < offset.index ) {
 					//Reused vertices from previous block (duplicate)
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
@@ -950,7 +1008,7 @@ THREE.BufferGeometry.prototype = {
 				} else {
 					//Reused vertice in the current block
 					faceVertices[ vo * 2 ] = vid;
-					faceVertices[ vo * 2 + 1 ] = vertexMap[ vid ];
+					faceVertices[ vo * 2 + 1 ] = vertexHash[ vid ];
 				}
 			}
 
@@ -976,7 +1034,7 @@ THREE.BufferGeometry.prototype = {
 				if ( new_vid === - 1 )
 					new_vid = vertexPtr ++;
 
-				vertexMap[ vid ] = new_vid;
+				vertexHash[ vid ] = new_vid;
 				revVertexMap[ new_vid ] = vid;
 				sortedIndices[ indexPtr ++ ] = new_vid - offset.index; //XXX overflows at 16bit
 				offset.count ++;
