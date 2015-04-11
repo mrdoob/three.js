@@ -121,20 +121,16 @@ THREE.BufferGeometry.prototype = {
 
 			var positions = new Float32Array( geometry.vertices.length * 3 );
 			var colors = new Float32Array( geometry.colors.length * 3 );
+			
+			var BufferType = geometry.dynamic ? THREE.DynamicBufferAttribute : THREE.BufferAttribute;
 
-			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'position', new BufferType( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+			this.addAttribute( 'color', new BufferType( colors, 3 ).copyColorsArray( geometry.colors ) );
 			this.computeBoundingSphere();
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			this.fromGeometry( geometry, material );
-
-		}
-
-		if ( material.attributes !== undefined ) {
-
-			console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: material.attributes', material );
+			this.fromGeometry( geometry, material, object );
 
 		}
 
@@ -178,104 +174,180 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
+		} else if ( object instanceof THREE.Mesh ) {
+			
+			if ( geometry.dynamic ) {
+
+				var material = object.material;
+
+				if ( geometry.verticesNeedUpdate === true ) {
+
+					this.updateWithMapping( geometry.vertices, this.attributes.position, this.vertexMap );
+
+					geometry.verticesNeedUpdate = false;
+
+				}
+
+				if ( geometry.colorsNeedUpdate === true ) {
+
+					this.updateWithMapping( geometry.colors, this.attributes.color, this.vertexMap );
+
+					geometry.colorsNeedUpdate = false;
+
+				}
+
+				for ( var name in material.attributes ) {
+
+					var attribute = material.attributes[name];
+
+					if ( attribute.needsUpdate ) {
+
+						this.updateWithMapping( attribute.value, this.attributes[name], object.vertexMap );
+
+						attribute.needsUpdate = false;
+
+					}
+
+				}
+
+			}
 		}
 
 	},
 
-	fromGeometry: function ( geometry, settings ) {
+	updateWithMapping: function ( values, attribute, vertexMap ) {
 
-		settings = settings || { 'vertexColors': THREE.NoColors };
+		if ( attribute !== undefined ) {
+
+			for ( var i = 0, ul = values.length; i < ul; i += attribute.itemSize ) {
+
+				var mapping = vertexMap[i];
+
+				if ( mapping === undefined ) continue;
+
+				for ( var ii = 0; ii < attribute.itemSize; ii++ ) {
+
+					var value = values[i + ii];
+
+					if ( mapping instanceof Array ) {
+
+						for ( var m = 0, ml = mapping.length; m < ml; m++ ) {
+
+							attribute.array[mapping[m]] = value;
+
+						}
+
+					} else {
+
+						attribute.array[mapping] = value;
+
+					}
+
+				}
+
+			}
+
+			attribute.needsUpdate = true;
+
+		}
+
+	},
+
+	fromGeometry: function ( geometry, material, object ) {
+
+		material = material || { 'vertexColors': THREE.NoColors, attributes: [] };
 
 		var vertices = geometry.vertices;
 		var faces = geometry.faces;
 		var faceVertexUvs = geometry.faceVertexUvs;
-		var vertexColors = settings.vertexColors;
+		var vertexColors = material.vertexColors;
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
 
-		var positions = new Float32Array( faces.length * 3 * 3 );
-		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+		var indices = [];
+		var positions = [];
+		var normals = [];
+		var colors = [];
+		var uvs = [];
+		var uvs2 = [];
 
-		var normals = new Float32Array( faces.length * 3 * 3 );
-		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+		var vertexHash = {}, vertexMap = [];
 
-		if ( vertexColors !== THREE.NoColors ) {
+		var index = [], position = [], normal = [], color = [], uv = [], uv2 = [];
 
-			var colors = new Float32Array( faces.length * 3 * 3 );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+		var indexCount = 0;
 
-		}
+		for ( var i = 0; i < 3; i++ ) {
 
-		if ( hasFaceVertexUv === true ) {
-
-			var uvs = new Float32Array( faces.length * 3 * 2 );
-			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
-
-		}
-
-		if ( hasFaceVertexUv2 === true ) {
-
-			var uvs2 = new Float32Array( faces.length * 3 * 2 );
-			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs2, 2 ) );
+			index[i] = 0;
+			position[i] = [];
+			normal[i] = [];
+			color[i] = [];
+			uv[i] = [];
+			uv2[i] = [];
 
 		}
 
-		for ( var i = 0, i2 = 0, i3 = 0; i < faces.length; i ++, i2 += 6, i3 += 9 ) {
+		for ( var f = 0, fl = faces.length; f < fl; f++ ) {
 
-			var face = faces[ i ];
+			var face = faces[f];
 
-			var a = vertices[ face.a ];
-			var b = vertices[ face.b ];
-			var c = vertices[ face.c ];
+			index[0] = face.a;
+			index[1] = face.b;
+			index[2] = face.c;
 
-			positions[ i3     ] = a.x;
-			positions[ i3 + 1 ] = a.y;
-			positions[ i3 + 2 ] = a.z;
+			var a = vertices[face.a];
+			var b = vertices[face.b];
+			var c = vertices[face.c];
 
-			positions[ i3 + 3 ] = b.x;
-			positions[ i3 + 4 ] = b.y;
-			positions[ i3 + 5 ] = b.z;
+			position[0][0] = a.x;
+			position[0][1] = a.y;
+			position[0][2] = a.z;
 
-			positions[ i3 + 6 ] = c.x;
-			positions[ i3 + 7 ] = c.y;
-			positions[ i3 + 8 ] = c.z;
+			position[1][0] = b.x;
+			position[1][1] = b.y;
+			position[1][2] = b.z;
+
+			position[2][0] = c.x;
+			position[2][1] = c.y;
+			position[2][2] = c.z;
 
 			if ( hasFaceVertexNormals === true ) {
 
-				var na = face.vertexNormals[ 0 ];
-				var nb = face.vertexNormals[ 1 ];
-				var nc = face.vertexNormals[ 2 ];
+				var na = face.vertexNormals[0];
+				var nb = face.vertexNormals[1];
+				var nc = face.vertexNormals[2];
 
-				normals[ i3     ] = na.x;
-				normals[ i3 + 1 ] = na.y;
-				normals[ i3 + 2 ] = na.z;
+				normal[0][0] = na.x;
+				normal[0][1] = na.y;
+				normal[0][2] = na.z;
 
-				normals[ i3 + 3 ] = nb.x;
-				normals[ i3 + 4 ] = nb.y;
-				normals[ i3 + 5 ] = nb.z;
+				normal[1][0] = nb.x;
+				normal[1][1] = nb.y;
+				normal[1][2] = nb.z;
 
-				normals[ i3 + 6 ] = nc.x;
-				normals[ i3 + 7 ] = nc.y;
-				normals[ i3 + 8 ] = nc.z;
+				normal[2][0] = nc.x;
+				normal[2][1] = nc.y;
+				normal[2][2] = nc.z;
 
 			} else {
 
 				var n = face.normal;
 
-				normals[ i3     ] = n.x;
-				normals[ i3 + 1 ] = n.y;
-				normals[ i3 + 2 ] = n.z;
+				normal[0][0] = n.x;
+				normal[0][1] = n.y;
+				normal[0][2] = n.z;
 
-				normals[ i3 + 3 ] = n.x;
-				normals[ i3 + 4 ] = n.y;
-				normals[ i3 + 5 ] = n.z;
+				normal[1][0] = n.x;
+				normal[1][1] = n.y;
+				normal[1][2] = n.z;
 
-				normals[ i3 + 6 ] = n.x;
-				normals[ i3 + 7 ] = n.y;
-				normals[ i3 + 8 ] = n.z;
+				normal[2][0] = n.x;
+				normal[2][1] = n.y;
+				normal[2][2] = n.z;
 
 			}
 
@@ -283,71 +355,268 @@ THREE.BufferGeometry.prototype = {
 
 				var fc = face.color;
 
-				colors[ i3     ] = fc.r;
-				colors[ i3 + 1 ] = fc.g;
-				colors[ i3 + 2 ] = fc.b;
+				color[0][0] = fc.r;
+				color[0][1] = fc.g;
+				color[0][2] = fc.b;
 
-				colors[ i3 + 3 ] = fc.r;
-				colors[ i3 + 4 ] = fc.g;
-				colors[ i3 + 5 ] = fc.b;
+				color[1][0] = fc.r;
+				color[1][1] = fc.g;
+				color[1][2] = fc.b;
 
-				colors[ i3 + 6 ] = fc.r;
-				colors[ i3 + 7 ] = fc.g;
-				colors[ i3 + 8 ] = fc.b;
+				color[2][0] = fc.r;
+				color[2][1] = fc.g;
+				color[2][2] = fc.b;
 
 			} else if ( vertexColors === THREE.VertexColors ) {
 
-				var vca = face.vertexColors[ 0 ];
-				var vcb = face.vertexColors[ 1 ];
-				var vcc = face.vertexColors[ 2 ];
+				var vca = face.vertexColors[0];
+				var vcb = face.vertexColors[1];
+				var vcc = face.vertexColors[2];
 
-				colors[ i3     ] = vca.r;
-				colors[ i3 + 1 ] = vca.g;
-				colors[ i3 + 2 ] = vca.b;
+				color[0][0] = vca.r;
+				color[0][1] = vca.g;
+				color[0][2] = vca.b;
 
-				colors[ i3 + 3 ] = vcb.r;
-				colors[ i3 + 4 ] = vcb.g;
-				colors[ i3 + 5 ] = vcb.b;
+				color[1][0] = vcb.r;
+				color[1][1] = vcb.g;
+				color[1][2] = vcb.b;
 
-				colors[ i3 + 6 ] = vcc.r;
-				colors[ i3 + 7 ] = vcc.g;
-				colors[ i3 + 8 ] = vcc.b;
+				color[2][0] = vcc.r;
+				color[2][1] = vcc.g;
+				color[2][2] = vcc.b;
 
 			}
 
 			if ( hasFaceVertexUv === true ) {
 
-				var uva = faceVertexUvs[ 0 ][ i ][ 0 ];
-				var uvb = faceVertexUvs[ 0 ][ i ][ 1 ];
-				var uvc = faceVertexUvs[ 0 ][ i ][ 2 ];
+				var uva = faceVertexUvs[0][f][0];
+				var uvb = faceVertexUvs[0][f][1];
+				var uvc = faceVertexUvs[0][f][2];
 
-				uvs[ i2     ] = uva.x;
-				uvs[ i2 + 1 ] = uva.y;
+				uv[0][0] = uva.x;
+				uv[0][1] = uva.y;
 
-				uvs[ i2 + 2 ] = uvb.x;
-				uvs[ i2 + 3 ] = uvb.y;
+				uv[1][0] = uvb.x;
+				uv[1][1] = uvb.y;
 
-				uvs[ i2 + 4 ] = uvc.x;
-				uvs[ i2 + 5 ] = uvc.y;
+				uv[2][0] = uvc.x;
+				uv[2][1] = uvc.y;
 
 			}
 
 			if ( hasFaceVertexUv2 === true ) {
 
-				var uva = faceVertexUvs[ 1 ][ i ][ 0 ];
-				var uvb = faceVertexUvs[ 1 ][ i ][ 1 ];
-				var uvc = faceVertexUvs[ 1 ][ i ][ 2 ];
+				var uva = faceVertexUvs[1][f][0];
+				var uvb = faceVertexUvs[1][f][1];
+				var uvc = faceVertexUvs[1][f][2];
 
-				uvs2[ i2     ] = uva.x;
-				uvs2[ i2 + 1 ] = uva.y;
+				uv2[0][0] = uva.x;
+				uv2[0][1] = uva.y;
 
-				uvs2[ i2 + 2 ] = uvb.x;
-				uvs2[ i2 + 3 ] = uvb.y;
+				uv2[1][0] = uvb.x;
+				uv2[1][1] = uvb.y;
 
-				uvs2[ i2 + 4 ] = uvc.x;
-				uvs2[ i2 + 5 ] = uvc.y;
+				uv2[2][0] = uvc.x;
+				uv2[2][1] = uvc.y;
 
 			}
+
+			for ( var i = 0; i < 3; i++ ) {
+
+				var hashGroup = [index[i]];
+
+				// don't put in one loop and intermingle attribute values, or weird index connections may happen
+
+				for ( var ii = 0; ii < 3; ii++ ) {
+
+					hashGroup.push( position[i][ii] );
+
+				}
+
+				for ( var ii = 0; ii < 3; ii++ ) {
+
+					hashGroup.push( normal[i][ii] );
+
+				}
+
+				if ( vertexColors !== THREE.NoColors ) {
+
+					for ( var ii = 0; ii < 3; ii++ ) {
+
+						hashGroup.push( color[i][ii] );
+
+					}
+
+				}
+
+				if ( hasFaceVertexUv === true ) {
+
+					for ( var ii = 0; ii < 2; ii++ ) {
+
+						hashGroup.push( uv[i][ii] );
+
+					}
+
+				}
+				
+				if ( hasFaceVertexUv2 === true ) {
+
+					for ( var ii = 0; ii < 2; ii++ ) {
+
+						hashGroup.push( uv2[i][ii] );
+
+					}
+
+				}
+
+				var hash = hashGroup.join( '|' );
+
+				var vertexIndex = vertexHash[hash];
+
+				if ( vertexIndex === undefined ) {
+
+					for ( var ii = 0; ii < 3; ii++ ) {
+
+						positions.push( position[i][ii] );
+						normals.push( normal[i][ii] );
+
+						if ( vertexColors !== THREE.NoColors ) {
+
+							colors.push( color[i][ii] );
+
+						}
+
+					}
+
+					if ( hasFaceVertexUv === true || hasFaceVertexUv2 === true ) {
+
+						for ( var ii = 0; ii < 2; ii++ ) {
+
+							if ( hasFaceVertexUv === true ) {
+
+								uvs.push( uv[i][ii] );
+							}
+
+							if ( hasFaceVertexUv2 === true ) {
+
+								uvs2.push( uv2[i][ii] ); 
+
+							}
+
+						}
+
+					}
+
+					var currentMapping = vertexMap[index[i]];
+					if ( currentMapping === undefined ) {
+
+						vertexMap[index[i]] = indexCount;
+
+					} else if ( currentMapping instanceof Array ) {
+
+						currentMapping.push( indexCount );
+
+					} else {
+
+						vertexMap[index[i]] = [];
+						vertexMap[index[i]].push( currentMapping, indexCount );
+
+					}
+
+					indices.push( indexCount );
+					vertexHash[hash] = indexCount;
+
+					indexCount++;
+
+				} else {
+
+					indices.push( vertexIndex );
+
+				}
+
+			}
+
+		}
+
+		var BufferType = geometry.dynamic ? THREE.DynamicBufferAttribute : THREE.BufferAttribute;
+
+		this.addAttribute( 'position', new BufferType( new Float32Array( positions ), 3 ) );
+		this.addAttribute( 'normal', new BufferType( new Float32Array( normals ), 3 ) );
+
+		if ( vertexColors !== THREE.NoColors ) {
+
+			this.addAttribute( 'color', new BufferType( new Float32Array( colors ), 3 ) );
+
+		}
+
+		if ( hasFaceVertexUv === true ) {
+
+			this.addAttribute( 'uv', new BufferType( new Float32Array( uvs ), 2 ) );
+
+		}
+
+		if ( hasFaceVertexUv2 === true ) {
+
+			this.addAttribute( 'uv2', new BufferType( new Float32Array( uvs2 ), 2 ) );
+
+		}
+
+		var UintArray = ( ( positions.length / 3 ) > 65535 ) ? Uint32Array : Uint16Array;
+		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+		
+		// custom attributes
+
+		var vertexCount = positions.length / 3;
+
+		for ( var name in material.attributes ) {
+
+			var attribute = material.attributes[name];
+
+			var size = 1;   // "f" and "i"
+
+			if ( attribute.type === 'v2' ) size = 2;
+			else if ( attribute.type === 'v3' ) size = 3;
+			else if ( attribute.type === 'v4' ) size = 4;
+			else if ( attribute.type === 'c' ) size = 3;
+
+			var array = new Float32Array( vertexCount * size );
+			var values = attribute.value;
+
+			for ( var i = 0, ul = values.length; i < ul; i += size ) {
+
+				var mapping = vertexMap[i];
+
+				for ( var ii = 0; ii < size; ii++ ) {
+
+					var value = values[i + ii];
+
+					if ( mapping instanceof Array ) {
+
+						for ( var m = 0, ml = mapping.length; m < ml; m++ ) {
+
+							array[mapping[m]] = value;
+
+						}
+
+					} else {
+
+						array[mapping] = value;
+
+					}
+
+				}				
+
+			}
+			
+			this.addAttribute( name, new BufferType( array, size ) );
+
+		}
+
+		this.computeOffsets( undefined, vertexMap );
+
+		if ( geometry.dynamic ) {
+
+			object.vertexMap = vertexMap;
 
 		}
 
@@ -771,9 +1040,10 @@ THREE.BufferGeometry.prototype = {
 	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
 	size - Defaults to 65535 or 4294967296 if extension OES_element_index_uint supported, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function ( size ) {
+	computeOffsets: function ( size, vertexMap ) {
 
 		if ( size === undefined ) size = THREE.BufferGeometry.MaxIndex;
+
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
@@ -799,9 +1069,9 @@ THREE.BufferGeometry.prototype = {
 		var duplicatedVertices = 0;
 		var newVerticeMaps = 0;
 		var faceVertices = new Int32Array( 6 );
-		var vertexMap = new Int32Array( vertices.length );
+		var vertexHash = new Int32Array( vertices.length );
 		var revVertexMap = new Int32Array( vertices.length );
-		for ( var j = 0; j < vertices.length; j ++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
+		for ( var j = 0; j < vertices.length; j ++ ) { vertexHash[ j ] = - 1; revVertexMap[ j ] = - 1; }
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
@@ -812,12 +1082,12 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var vo = 0; vo < 3; vo ++ ) {
 				var vid = indices[ findex * 3 + vo ];
-				if ( vertexMap[ vid ] == - 1 ) {
+				if ( vertexHash[ vid ] == - 1 ) {
 					//Unmapped vertice
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
 					newVerticeMaps ++;
-				} else if ( vertexMap[ vid ] < offset.index ) {
+				} else if ( vertexHash[ vid ] < offset.index ) {
 					//Reused vertices from previous block (duplicate)
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
@@ -825,7 +1095,7 @@ THREE.BufferGeometry.prototype = {
 				} else {
 					//Reused vertice in the current block
 					faceVertices[ vo * 2 ] = vid;
-					faceVertices[ vo * 2 + 1 ] = vertexMap[ vid ];
+					faceVertices[ vo * 2 + 1 ] = vertexHash[ vid ];
 				}
 			}
 
@@ -851,7 +1121,7 @@ THREE.BufferGeometry.prototype = {
 				if ( new_vid === - 1 )
 					new_vid = vertexPtr ++;
 
-				vertexMap[ vid ] = new_vid;
+				vertexHash[ vid ] = new_vid;
 				revVertexMap[ new_vid ] = vid;
 				sortedIndices[ indexPtr ++ ] = new_vid - offset.index; //XXX overflows at 16bit
 				offset.count ++;
@@ -859,7 +1129,7 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
-		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
+		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr, vertexMap );
 		this.offsets = offsets; // TODO: Deprecate
 		this.drawcalls = offsets;
 
@@ -941,7 +1211,7 @@ THREE.BufferGeometry.prototype = {
 		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
 		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertice stack).
 	*/
-	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
+	reorderBuffers: function ( indexBuffer, indexMap, vertexCount, vertexMap ) {
 
 		/* Create a copy of all attributes for reordering. */
 		var sortedAttributes = {};
@@ -964,6 +1234,68 @@ THREE.BufferGeometry.prototype = {
 				for ( var k = 0; k < attrSize; k ++ )
 					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
 			}
+		}
+
+		/* Adjust vertex map for converted objects for dynamic updates */
+		if ( vertexMap !== undefined ) {
+				
+			// reverse lookup
+			var invVertexMap = [];
+			for ( var i = 0, ul = vertexMap.length; i < ul; i++ ) {
+
+				var value = vertexMap[i];
+				if ( value === undefined ) continue;
+
+				if ( value instanceof Array ) {
+
+					for ( var m = 0, ml = value.length; m < ml; m++ ) {
+
+						invVertexMap[value[m]] = i;
+
+					}
+
+				} else {
+
+					invVertexMap[value] = i;
+
+				}
+
+			}
+
+			var newVertexMap = [];
+			for ( var new_vid = 0; new_vid < vertexCount; new_vid++ ) {
+
+				var vid = indexMap[new_vid];
+				var oid = invVertexMap[vid];
+
+
+				var newMapping = newVertexMap[oid];
+				if ( newMapping === undefined ) {
+
+					newVertexMap[oid] = new_vid;
+
+				} else if ( newMapping instanceof Array ) {
+
+					newMapping.push( new_vid );
+
+				} else {
+
+					newVertexMap[oid] = [];
+					newVertexMap[oid].push( newMapping, new_vid );
+
+				}
+				
+			}
+
+			// reassign new vaules
+			for ( var i = 0, ul = vertexMap.length; i < ul; i++ ) {
+
+				if ( vertexMap[i] === undefined ) continue;
+
+				vertexMap[i] = newVertexMap[i];
+
+			}
+
 		}
 
 		/* Carry the new sorted buffers locally */
