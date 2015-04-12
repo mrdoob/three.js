@@ -134,7 +134,7 @@ THREE.BufferGeometry.prototype = {
 
 			} else if ( geometry instanceof THREE.Geometry ) {
 
-				this.fromGeometry( geometry );
+				this.fromGeometry( geometry, material );
 
 			}
 
@@ -186,14 +186,14 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromGeometry: function ( geometry, settings ) {
+	fromGeometry: function ( geometry, material ) {
 
-		settings = settings || { 'vertexColors': THREE.NoColors };
+		material = material || { 'vertexColors': THREE.NoColors };
 
 		var vertices = geometry.vertices;
 		var faces = geometry.faces;
 		var faceVertexUvs = geometry.faceVertexUvs;
-		var vertexColors = settings.vertexColors;
+		var vertexColors = material.vertexColors;
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
