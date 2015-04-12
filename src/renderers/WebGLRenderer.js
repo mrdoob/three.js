@@ -1819,7 +1819,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var webglObject = renderList[ i ];
 
 			var object = webglObject.object;
-			var buffer = objects.geometries[ object.geometry.id ];
+			var buffer = objects.geometries.get( object );
 
 			setupMatrices( object, camera );
 
