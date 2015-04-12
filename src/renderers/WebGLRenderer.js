@@ -3,7 +3,6 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
- * @author benaadams / https://twitter.com/ben_a_adams
  */
 
 THREE.WebGLRenderer = function ( parameters ) {
@@ -79,6 +78,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		memory: {
 
 			programs: 0,
+			vertexShaders: 0,
+			fragmentShaders: 0,
 			geometries: 0,
 			textures: 0
 
@@ -99,8 +100,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _this = this,
 
-	_programs = [],
-	_shaderCache = { vertex: [], fragment: [] },
 
 	// internal state cache
 
@@ -192,6 +191,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		THREE.error( 'THREE.WebGLRenderer: ' + error );
 
 	}
+
+	var programs = new THREE.WebGLPrograms( _gl, this );
 
 	var state = new THREE.WebGLState( _gl, paramThreeToGL );
 
@@ -705,34 +706,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.program = undefined;
 
-		program.dispose();
-
-		// update caches
-		// avoid using array.splice, this is costlier than creating new array from scratch
-
-		if ( program.usedTimes === 0 ) {
-
-			var id = program.id;
-			var cache = _programs;
-			var programs = [];
-
-			for ( var i = 0, ul = cache.length; i < ul; i++ ) {
-
-				if ( cache[i].id !== id ) {
-
-					programs.push( cache[i] );
-
-				} else {
-
-					_this.info.memory.programs--;
-
-				}
-
-			}
-
-			_programs.vertex = programs;
-
-		}
+		programs.release( program );
 
 	};
 
@@ -963,11 +937,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = setProgram( camera, lights, fog, material, object );
 
-		if ( !program ) {
-
-			return;
-
-		}
+		if ( program === undefined ) return;
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -1529,9 +1499,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// load updated influences uniform
 
-		if ( material.program.uniforms.morphTargetInfluences !== null ) {
+		if ( material.program.webglUniforms.morphTargetInfluences !== null ) {
 
-			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
+			_gl.uniform1fv( material.program.webglUniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
 
 		}
 
@@ -1544,6 +1514,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
+
+		} else if ( a.material.program !== b.material.program ) {
+
+			return ( a.material.program ? a.material.program.id : 0 ) - ( b.material.program ? b.material.program.id : 0 );
 
 		} else if ( a.material.id !== b.material.id ) {
 
@@ -1859,11 +1833,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = setProgram( camera, lights, fog, material, object );
 
-		if ( !program ) {
-
-			return;
-
-		}
+		if ( program === undefined ) return;
 
 		_currentGeometryProgram = '';
 
@@ -1925,20 +1895,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Materials
 
-	var shaderIDs = {
-		MeshDepthMaterial: 'depth',
-		MeshNormalMaterial: 'normal',
-		MeshBasicMaterial: 'basic',
-		MeshLambertMaterial: 'lambert',
-		MeshPhongMaterial: 'phong',
-		LineBasicMaterial: 'basic',
-		LineDashedMaterial: 'dashed',
-		PointCloudMaterial: 'particle_basic'
-	};
 
 	function initMaterial( material, lights, fog, object ) {
-
-		var shaderID = shaderIDs[ material.type ];
 
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
@@ -1947,40 +1905,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
 
-		var parameters = {
+		if ( !material.program ) {
+
+		    // new material
+		    material.addEventListener( 'dispose', onMaterialDispose );
+
+		}
+
+
+		//else if ( material.program.code !== code ) {
+
+		//    // changed glsl or parameters
+		//	deallocateMaterial( material );
+		//	material.program = undefined;
+
+		//}
+
+		var params = {
 
 			precision: _precision,
 			supportsVertexTextures: _supportsVertexTextures,
 
-			map: !! material.map,
-			envMap: !! material.envMap,
-			envMapMode: material.envMap && material.envMap.mapping,
-			lightMap: !! material.lightMap,
-			aoMap: !! material.aoMap,
-			bumpMap: !! material.bumpMap,
-			normalMap: !! material.normalMap,
-			specularMap: !! material.specularMap,
-			alphaMap: !! material.alphaMap,
-
-			combine: material.combine,
-
-			vertexColors: material.vertexColors,
-
 			fog: fog,
-			useFog: material.fog,
 			fogExp: fog instanceof THREE.FogExp2,
 
-			flatShading: material.shading === THREE.FlatShading,
-
-			sizeAttenuation: material.sizeAttenuation,
 			logarithmicDepthBuffer: _logarithmicDepthBuffer,
 
-			skinning: material.skinning,
 			maxBones: maxBones,
 			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
 
-			morphTargets: material.morphTargets,
-			morphNormals: material.morphNormals,
 			maxMorphTargets: _this.maxMorphTargets,
 			maxMorphNormals: _this.maxMorphNormals,
 
@@ -1993,120 +1946,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			shadowMapEnabled: shadowMap.enabled && object.receiveShadow && maxShadows > 0,
 			shadowMapType: shadowMap.type,
 			shadowMapDebug: shadowMap.debug,
-			shadowMapCascade: shadowMap.cascade,
-
-			alphaTest: material.alphaTest,
-			metal: material.metal,
-			doubleSided: material.side === THREE.DoubleSide,
-			flipSided: material.side === THREE.BackSide
+			shadowMapCascade: shadowMap.cascade
 
 		};
 
-		// Generate code
+		programs.initProgram( material, params );
 
-		var chunks = [];
-
-		if ( shaderID ) {
-
-			chunks.push( shaderID );
-
-		} else {
-
-			chunks.push( material.fragmentShader );
-			chunks.push( material.vertexShader );
-
-		}
-
-		if ( material.defines !== undefined ) {
-
-			for ( var name in material.defines ) {
-
-				chunks.push( name );
-				chunks.push( material.defines[ name ] );
-
-			}
-
-		}
-
-		for ( var name in parameters ) {
-
-			chunks.push( name );
-			chunks.push( parameters[ name ] );
-
-		}
-
-		var code = chunks.join();
-
-		if ( !material.program ) {
-
-		    // new material
-		    material.addEventListener( 'dispose', onMaterialDispose );
-
-		} else if ( material.program.code !== code ) {
-
-		    // changed glsl or parameters
-			deallocateMaterial( material );
-			material.program = undefined;
-
-		}
-
-		var program;
-
-		if ( !material.program ) {
-
-			if ( shaderID ) {
-
-				var shader = THREE.ShaderLib[shaderID];
-
-				material.__webglShader = {
-					uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
-				}
-
-			} else {
-
-				material.__webglShader = {
-					uniforms: material.uniforms,
-					vertexShader: material.vertexShader,
-					fragmentShader: material.fragmentShader
-				}
-
-			}
-
-			// Check if code has been already compiled
-
-			for ( var p = 0, pl = _programs.length; p < pl; p++ ) {
-
-				var programInfo = _programs[p];
-
-				if ( programInfo.code === code ) {
-
-					program = programInfo;
-					program.usedTimes++;
-
-					break;
-
-				}
-
-			}
-
-			material.program = program;
-
-			if ( program === undefined ) {
-
-				program = new THREE.WebGLProgram( _this, code, material, parameters, _shaderCache );
-				_programs.push( program );
-
-				_this.info.memory.programs = _programs.length;
-
-				material.program = program;
-
-				return false;
-			}
-		}
-
-		program = material.program;
+		var program = material.program;
 
 		if ( program.state !== THREE.WebGLProgram.LinkedState ) {
 
@@ -2158,12 +2004,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniformsList = [];
 
-		for ( var u in material.__webglShader.uniforms ) {
+		for ( var u in program.sourceUniforms ) {
 
-			var location = material.program.uniforms[ u ];
+			var location = program.webglUniforms[ u ];
 
 			if ( location ) {
-				material.uniformsList.push( [ material.__webglShader.uniforms[ u ], location ] );
+				material.uniformsList.push( [program.sourceUniforms[u], location] );
 			}
 
 		}
@@ -2223,18 +2069,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = material.program;
 
-		if ( program.state !== THREE.WebGLProgram.LinkedState ) {
+		if ( program.state !== THREE.WebGLProgram.LinkedState ) return undefined;
 
-			return undefined;
-
-		}
-
-		var p_uniforms = program.uniforms,
-			m_uniforms = material.__webglShader.uniforms;
+		var p_uniforms = program.webglUniforms,
+			m_uniforms = program.sourceUniforms;
 
 		if ( program.id !== _currentProgram ) {
 
-			_gl.useProgram( program.program );
+			_gl.useProgram( program.webglProgram );
 			_currentProgram = program.id;
 
 			refreshProgram = true;

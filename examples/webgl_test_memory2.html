@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js - webgl</title>
@@ -117,27 +117,66 @@
 
 			}
 
+			var frameCount = 0;
+
+			function stepName(){
+			
+			    switch ( frameCount % 4 ) {
+
+			        case 0:
+			            return '1: compile submit';
+                    case 1:
+                        return '2: wait compile complete + link submit';
+                    case 2:
+                        return '3: wait link complete + draw';
+                    case 3:
+                        return '4: just draw';
+			    }
+			}
+
+            // 3 phase render for async shaders, as shaders are deleted each frame
+
 			function render() {
 
-				for ( var i = 0; i < N; i ++ ) {
+			    frameCount++;
+                
+			    if ( frameCount % 4 == 0 ) {
+			        console.log( "------" );
+			        for ( var i = 0; i < N; i++ ) {
 
-					var mesh = meshes[ i ];
-					mesh.material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
+			            var mesh = meshes[i];
+			            mesh.material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
+
+			        }
+
+			    }
+
+			    var memory = renderer.info.memory;
+
+			    var start = performance.now();
+
+				renderer.render( scene, camera ); 
+                
+				var end = performance.now();
+
+				console.log( stepName(), " - meshes:", N ,"vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs, " time:", (end - start).toFixed(1), "ms" );
+
+				start = performance.now();
+
+				if ( frameCount % 4 == 3 ) {
+
+				    for ( var i = 0; i < N; i++ ) {
+
+				        var mesh = meshes[i];
+				        mesh.material.dispose();
+
+				    }
+
+				    end = performance.now();
+
+				    console.log( "5: programs disposed - meshes:", N, "vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs, " time:", ( end - start ).toFixed( 1 ), "ms" );
 
 				}
-
-				renderer.render( scene, camera );
-
-				console.log( "before", renderer.info.memory.programs );
-
-				for ( var i = 0; i < N; i ++ ) {
-
-					var mesh = meshes[ i ];
-					mesh.material.dispose();
-
-				}
-
-				console.log( "after", renderer.info.memory.programs );
 
 			}
 
