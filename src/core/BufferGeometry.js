@@ -128,13 +128,15 @@ THREE.BufferGeometry.prototype = {
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			if ( geometry.isFlattened === false ) {
+			if ( geometry instanceof THREE.DynamicGeometry ) {
 
-				geometry.flatten();
+				this.fromDynamicGeometry( geometry );
+
+			} else if ( geometry instanceof THREE.Geometry ) {
+
+				this.fromGeometry( geometry );
 
 			}
-
-			this.fromFlattenedGeometry( geometry );
 
 		}
 
@@ -152,37 +154,35 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = object.geometry;
 
-		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line || object instanceof THREE.Mesh ) {
+		if ( object instanceof THREE.Mesh && geometry instanceof THREE.Geometry ) return;
 
-			if ( geometry.verticesNeedUpdate === true ) {
+		if ( geometry.verticesNeedUpdate === true ) {
 
-				var attribute = this.attributes.position;
+			var attribute = this.attributes.position;
 
-				if ( attribute !== undefined ) {
+			if ( attribute !== undefined ) {
 
-					attribute.copyVector3sArray( geometry.vertices );
-					attribute.needsUpdate = true;
-
-				}
-
-				geometry.verticesNeedUpdate = false;
+				attribute.copyVector3sArray( geometry.vertices );
+				attribute.needsUpdate = true;
 
 			}
 
-			if ( geometry.colorsNeedUpdate === true ) {
+			geometry.verticesNeedUpdate = false;
 
-				var attribute = this.attributes.color;
+		}
 
-				if ( attribute !== undefined ) {
+		if ( geometry.colorsNeedUpdate === true ) {
 
-					attribute.copyColorsArray( geometry.colors );
-					attribute.needsUpdate = true;
+			var attribute = this.attributes.color;
 
-				}
+			if ( attribute !== undefined ) {
 
-				geometry.colorsNeedUpdate = false;
+				attribute.copyColorsArray( geometry.colors );
+				attribute.needsUpdate = true;
 
 			}
+
+			geometry.colorsNeedUpdate = false;
 
 		}
 
@@ -363,7 +363,7 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromFlattenedGeometry: function ( geometry ) {
+	fromDynamicGeometry: function ( geometry ) {
 
 		var indices = new Uint16Array( geometry.faces.length * 3 );
 		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyFacesArray( geometry.faces ) );
@@ -371,12 +371,8 @@ THREE.BufferGeometry.prototype = {
 		var positions = new Float32Array( geometry.vertices.length * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
 
-		if ( geometry.normals.length > 0 ) {
-
-			var normals = new Float32Array( geometry.normals.length * 3 );
-			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
-
-		}
+		var normals = new Float32Array( geometry.normals.length * 3 );
+		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
 
 		var colors = new Float32Array( geometry.colors.length * 3 );
 		this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );

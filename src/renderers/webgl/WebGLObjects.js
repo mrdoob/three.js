@@ -180,12 +180,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 		}
 
 		var geometry = geometries[ object.geometry.id ];
-
-		if ( object.geometry instanceof THREE.Geometry ) {
-
-			geometry.updateFromObject( object );
-
-		}
+		geometry.updateFromObject( object );
 
 		//
 

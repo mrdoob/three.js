@@ -16,19 +16,9 @@ THREE.Geometry = function () {
 	this.name = '';
 	this.type = 'Geometry';
 
-	// FlattenedGeometry
-
-	this.isFlattened = false;
-
 	this.vertices = [];
 	this.colors = [];
-	this.normals = [];
-	this.colors = [];
-	this.uvs = [];
 	this.faces = [];
-
-	//
-
 	this.faceVertexUvs = [ [] ];
 
 	this.morphTargets = [];
@@ -103,44 +93,6 @@ THREE.Geometry.prototype = {
 
 		this.verticesNeedUpdate = true;
 		this.normalsNeedUpdate = true;
-
-	},
-
-	flatten: function () {
-
-		var faces = this.faces;
-		var faceVertexUvs = this.faceVertexUvs[ 0 ];
-
-		for ( var i = 0, il = faces.length; i < il; i ++ ) {
-
-			var face = faces[ i ];
-			var indices = [ face.a, face.b, face.c ];
-
-			var vertexNormals = face.vertexNormals;
-			var vertexColors = face.vertexColors;
-			var vertexUvs = faceVertexUvs[ i ];
-
-			for ( var j = 0, jl = vertexNormals.length; j < jl; j ++ ) {
-
-				this.normals[ indices[ j ] ] = vertexNormals[ j ];
-
-			}
-
-			for ( var j = 0, jl = vertexColors.length; j < jl; j ++ ) {
-
-				this.colors[ indices[ j ] ] = vertexColors[ j ];
-
-			}
-
-			for ( var j = 0, jl = vertexUvs.length; j < jl; j ++ ) {
-
-				this.uvs[ indices[ j ] ] = vertexUvs[ j ];
-
-			}
-
-		}
-
-		this.isFlattened = true;
 
 	},
 
