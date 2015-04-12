@@ -142,7 +142,39 @@ THREE.BufferGeometry.prototype = {
 
 		if ( material.attributes !== undefined ) {
 
-			console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: material.attributes', material );
+			var attributes = material.attributes;
+
+			for ( var name in attributes ) {
+
+				var attribute = attributes[ name ];
+
+				var type = attribute.type;
+				var array = attribute.value;
+
+				switch ( type ) {
+
+					case "f":
+						var floats = new Float32Array( array.length );
+						this.addAttribute( name, new THREE.BufferAttribute( floats, 1 ).copyArray( array ) );
+						break;
+
+					case "c":
+						var colors = new Float32Array( array.length * 3 );
+						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyColorsArray( array ) );
+						break;
+
+					case "v3":
+						var colors = new Float32Array( array.length * 3 );
+						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( array ) );
+						break;
+
+					default:
+						console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: attribute unsupported', type );
+						break;
+
+				}
+
+			}
 
 		}
 
@@ -181,6 +213,44 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.colorsNeedUpdate = false;
+
+		}
+
+	},
+
+	updateFromMaterial: function ( material ) {
+
+		if ( material.attributes !== undefined ) {
+
+			var attributes = material.attributes;
+
+			for ( var name in attributes ) {
+
+				var attribute = attributes[ name ];
+
+				var type = attribute.type;
+				var array = attribute.value;
+
+				switch ( type ) {
+
+					case "f":
+						this.attributes[ name ].copyArray( array );
+						this.attributes[ name ].needsUpdate = true;
+						break;
+
+					case "c":
+						this.attributes[ name ].copyColorsArray( array );
+						this.attributes[ name ].needsUpdate = true;
+						break;
+
+					case "v3":
+						this.attributes[ name ].copyVector3sArray( array );
+						this.attributes[ name ].needsUpdate = true;
+						break;
+
+				}
+
+			}
 
 		}
 

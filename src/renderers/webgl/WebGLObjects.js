@@ -121,6 +121,8 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		}
 
+		geometry.updateFromMaterial( object.material );
+
 		//
 
 		if ( geometry instanceof THREE.BufferGeometry ) {

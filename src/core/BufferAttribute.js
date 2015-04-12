@@ -36,6 +36,14 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	copyArray: function ( array ) {
+
+		this.array.set( array );
+
+		return this;
+
+	},
+
 	copyColorsArray: function ( colors ) {
 
 		var array = this.array, offset = 0;
