@@ -154,8 +154,6 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = object.geometry;
 
-		if ( object instanceof THREE.Mesh && geometry instanceof THREE.Geometry ) return;
-
 		if ( geometry.verticesNeedUpdate === true ) {
 
 			var attribute = this.attributes.position;

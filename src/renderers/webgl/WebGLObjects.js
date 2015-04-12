@@ -173,14 +173,13 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	this.update = function ( object ) {
 
-		if ( geometries[ object.geometry.id ] === undefined ) {
+		var geometry = geometries.get( object );
 
-			initGeometry( object );
+		if ( geometry instanceof THREE.DynamicGeometry ) {
+
+			geometry.updateFromObject( object );
 
 		}
-
-		var geometry = geometries[ object.geometry.id ];
-		geometry.updateFromObject( object );
 
 		//
 

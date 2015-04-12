@@ -35,8 +35,6 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = true;
-
 	// update flags
 
 	this.verticesNeedUpdate = false;

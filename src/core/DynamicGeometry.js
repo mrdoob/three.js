@@ -45,9 +45,29 @@ THREE.DynamicGeometry = function () {
 
 THREE.DynamicGeometry.prototype = {
 
-	constructor: THREE.Geometry,
+	constructor: THREE.DynamicGeometry,
+
+	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
+	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
+
+	computeFaceNormals: function () {
+
+		THREE.warn( 'THREE.DynamicGeometry: computeFaceNormals() is not a method of this type of geometry.' );
+		return this;
+
+	},
+
+	computeVertexNormals: function () {
+
+		THREE.warn( 'THREE.DynamicGeometry: computeVertexNormals	() is not a method of this type of geometry.' );
+		return this;
+
+	},
 
 	fromGeometry: function ( geometry ) {
+
+		this.vertices = geometry.vertices;
+		this.faces = geometry.faces;
 
 		var faces = geometry.faces;
 		var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
@@ -80,6 +100,8 @@ THREE.DynamicGeometry.prototype = {
 			}
 
 		}
+
+		return this;
 
 	},
 
