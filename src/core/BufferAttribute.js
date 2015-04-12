@@ -44,10 +44,10 @@ THREE.BufferAttribute.prototype = {
 
 			var color = colors[ i ];
 
-			if ( vector === undefined ) {
+			if ( color === undefined ) {
 
 				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
-				vector = new THREE.Color();
+				color = new THREE.Color();
 
 			}
 
