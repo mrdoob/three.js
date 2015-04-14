@@ -476,6 +476,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		pixelRatio = value;
 
+		this.setSize( _width, _height, true );
+
 	};
 
 	this.getSize = function () {
