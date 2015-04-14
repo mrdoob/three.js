@@ -23,8 +23,8 @@
 			// calculate mouse position in normalized device coordinates
 			// (-1 to +1) for both components
 
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1		
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;		
 		
 		}
 
@@ -36,9 +36,9 @@
 			// calculate objects intersecting the picking ray
 			var intersects = raycaster.intersectObjects( scene.children );
 
-			for ( var intersect in intersects ) {
+			for ( var i = 0; i < intersects.length; i++ ) {
 
-				intersect.object.material.color = new THREE.Color( 0xff0000 );
+				intersects[ i ].object.material.color.set( 0xff0000 );
 			
 			}
 			

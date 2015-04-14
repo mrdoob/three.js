@@ -40,9 +40,9 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 
 			THREE.AudioObject.prototype.context = new webkitAudioContext();
 
-		} catch( error ) {
+		} catch ( error ) {
 
-			console.warn( "THREE.AudioObject: webkitAudioContext not found" );
+			THREE.warn( "THREE.AudioObject: webkitAudioContext not found" );
 			return this;
 
 		}
@@ -154,7 +154,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 			_this.source.buffer = _this.context.createBuffer( request.response, true );
 			_this.source.noteOn( 0 );
 
-		}
+		};
 
 		request.send();
 

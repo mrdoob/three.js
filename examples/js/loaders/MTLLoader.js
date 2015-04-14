@@ -87,7 +87,7 @@ THREE.MTLLoader.prototype = {
 		}
 
 		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options );
-		materialCreator.crossOrigin = this.crossOrigin
+		materialCreator.crossOrigin = this.crossOrigin;
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -121,8 +121,8 @@ THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 	this.materialsArray = [];
 	this.nameLookup = {};
 
-	this.side = ( this.options && this.options.side )? this.options.side: THREE.FrontSide;
-	this.wrap = ( this.options && this.options.wrap )? this.options.wrap: THREE.RepeatWrapping;
+	this.side = ( this.options && this.options.side ) ? this.options.side : THREE.FrontSide;
+	this.wrap = ( this.options && this.options.wrap ) ? this.options.wrap : THREE.RepeatWrapping;
 
 };
 
@@ -426,7 +426,7 @@ THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 
 THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
 
-	--x;
+	-- x;
 
 	for ( var i = 1; i < 32; i <<= 1 ) {
 

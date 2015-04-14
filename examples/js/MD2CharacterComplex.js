@@ -142,7 +142,7 @@ THREE.MD2CharacterComplex = function () {
 
 		this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
 
-		var weaponsTextures = []
+		var weaponsTextures = [];
 		for ( var i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 
 		// SKINS
@@ -193,7 +193,7 @@ THREE.MD2CharacterComplex = function () {
 
 			}
 
-		}
+		};
 
 		for ( var i = 0; i < config.weapons.length; i ++ ) {
 
@@ -402,7 +402,7 @@ THREE.MD2CharacterComplex = function () {
 
 		if ( controls.moveForward ) {
 
-			if ( this.meshBody )   {
+			if ( this.meshBody ) {
 
 				this.meshBody.setAnimationDirectionForward( this.activeAnimation );
 				this.meshBody.setAnimationDirectionForward( this.oldAnimation );
@@ -445,7 +445,7 @@ THREE.MD2CharacterComplex = function () {
 		// speed based on controls
 
 		if ( controls.crouch ) 	this.maxSpeed = this.crouchSpeed;
-		else  					this.maxSpeed = this.walkSpeed;
+		else this.maxSpeed = this.walkSpeed;
 
 		this.maxReverseSpeed = -this.maxSpeed;
 
@@ -518,7 +518,7 @@ THREE.MD2CharacterComplex = function () {
 
 		return textures;
 
-	};
+	}
 
 	function createPart( geometry, skinMap ) {
 
@@ -528,12 +528,11 @@ THREE.MD2CharacterComplex = function () {
 		var materialWireframe = new THREE.MeshPhongMaterial( { color: 0xffaa00, specular: 0x111111, shininess: 50, wireframe: true, shading: THREE.SmoothShading, map: whiteMap, morphTargets: true, morphNormals: true, metal: true } );
 
 		var materialTexture = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 50, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true, metal: true } );
-		materialTexture.wrapAround = true;
 
 		//
 
 		var mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
-		mesh.rotation.y = -Math.PI/2;
+		mesh.rotation.y = -Math.PI / 2;
 
 		//
 
@@ -546,14 +545,14 @@ THREE.MD2CharacterComplex = function () {
 
 		return mesh;
 
-	};
+	}
 
 	function checkLoadingComplete() {
 
 		scope.loadCounter -= 1;
 		if ( scope.loadCounter === 0 ) 	scope.onLoadComplete();
 
-	};
+	}
 
 	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
 

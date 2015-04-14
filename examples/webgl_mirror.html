@@ -85,17 +85,17 @@
 			function fillScene() {
 
 				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
-				
-				// MIRORR planes
+
+				// MIRROR planes
 				groundMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color: 0x777777 } );
-				
+
 				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
 				mirrorMesh.add( groundMirror );
 				mirrorMesh.rotateX( - Math.PI / 2 );
 				scene.add( mirrorMesh );
 
 				verticalMirror = new THREE.Mirror( renderer, camera, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT, color:0x889999 } );
-				
+
 				var verticalMirrorMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 60, 60 ), verticalMirror.material );
 				verticalMirrorMesh.add( verticalMirror );
 				verticalMirrorMesh.position.y = 35;
@@ -110,50 +110,50 @@
 				var sphereCap = new THREE.Mesh( geometry, material );
 				sphereCap.position.y = -15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
 				sphereCap.rotateX(-Math.PI);
-				
+
 				var geometry = new THREE.SphereGeometry( 15, 24, 24, Math.PI / 2, Math.PI * 2, 0, Math.PI / 180 * 120 );
 				var halfSphere = new THREE.Mesh( geometry, material );
 				halfSphere.add( sphereCap );
-				halfSphere.rotateX( - Math.PI / 180 * 135 ); 
-				halfSphere.rotateZ( - Math.PI / 180 * 20 ); 
+				halfSphere.rotateX( - Math.PI / 180 * 135 );
+				halfSphere.rotateZ( - Math.PI / 180 * 20 );
 				halfSphere.position.y = 7.5 + 15 * Math.sin( Math.PI / 180 * 30 );
-				
+
 				sphereGroup.add( halfSphere );
-				
+
 				var geometry = new THREE.IcosahedronGeometry( 5, 0 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, emissive: 0x333333, shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, shading: THREE.FlatShading } );
 				smallSphere = new THREE.Mesh( geometry, material );
-				scene.add(smallSphere);	
-				
+				scene.add(smallSphere);
+
 				// walls
 				var planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
 				planeTop.position.y = 100;
 				planeTop.rotateX( Math.PI / 2 );
 				scene.add( planeTop );
-				
+
 				var planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
 				planeBack.position.z = -50;
 				planeBack.position.y = 50;
 				scene.add( planeBack );
-				
+
 				var planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
 				planeFront.position.z = 50;
 				planeFront.position.y = 50;
 				planeFront.rotateY( Math.PI );
 				scene.add( planeFront );
-				
+
 				var planeRight = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
 				planeRight.position.x = 50;
 				planeRight.position.y = 50;
 				planeRight.rotateY( - Math.PI / 2 );
 				scene.add( planeRight );
-				
+
 				var planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
 				planeLeft.position.x = -50;
 				planeLeft.position.y = 50;
 				planeLeft.rotateY( Math.PI / 2 );
 				scene.add( planeLeft );
-				
+
 				// lights
 				var mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
 				mainLight.position.y = 60;
@@ -178,13 +178,13 @@
 				// render (update) the mirrors
 				groundMirror.renderWithMirror( verticalMirror );
 				verticalMirror.renderWithMirror( groundMirror );
-				
+
 				renderer.render(scene, camera);
 
 			}
 
 			function update() {
-				
+
 				requestAnimationFrame( update );
 
 				var timer = Date.now() * 0.01;
@@ -200,7 +200,7 @@
 				smallSphere.rotation.z = timer * 0.8;
 
 				cameraControls.update();
-				
+
 				render();
 			}
 

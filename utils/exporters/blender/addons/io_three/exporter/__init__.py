@@ -1,7 +1,7 @@
 import os
 import sys
 import traceback
-from .. import constants, logger, exceptions
+from .. import constants, logger, exceptions, dialogs
 from . import scene, geometry, api, base_classes
 
 
@@ -9,7 +9,10 @@ def _error_handler(func):
     
     def inner(filepath, options, *args, **kwargs):
         level = options.get(constants.LOGGING, constants.DEBUG)
+        version = options.get('addon_version')
         logger.init('io_three.export.log', level=level)
+        if version is not None:
+            logger.debug("Addon Version %s", version)
         api.init()
         
         try:
@@ -55,16 +58,26 @@ def export_scene(filepath, options):
 
 @_error_handler
 def export_geometry(filepath, options, node=None):
+    msg = ""
+    exception = None
     if node is None:
         node = api.active_object()
         if node is None:
-            msg = 'Nothing selected'
+            msg = "Nothing selected"
             logger.error(msg)
-            raise exceptions.SelectionError(msg)
+            exception = exceptions.SelectionError
         if node.type != 'MESH':
-            msg = 'Not a valid mesh object'
-            raise exceptions.GeometryError(msg)
+            msg = "%s is not a valid mesh object" % node.name
+            logger.error(msg)
+            exception = exceptions.GeometryError
     
+        if exception is not None:
+            if api.batch_mode():
+                raise exception(msg)
+            else:
+                dialogs.error(msg)
+                return
+
     mesh = api.object.mesh(node, options)
     parent = base_classes.BaseScene(filepath, options)
     geo = geometry.Geometry(mesh, parent)

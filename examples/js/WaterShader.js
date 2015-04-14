@@ -109,7 +109,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	function optionalParameter ( value, defaultValue ) {
 		return value !== undefined ? value : defaultValue;
-	};
+	}
 
 	options = options || {};
 	
@@ -142,7 +142,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	else 
 	{
 		this.camera = new THREE.PerspectiveCamera();
-		console.log(this.name + ': camera is not a Perspective Camera!')
+		THREE.log(this.name + ': camera is not a Perspective Camera!')
 	}
 
 	this.textureMatrix = new THREE.Matrix4();
@@ -177,7 +177,9 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo(height) )
 	{
 		this.texture.generateMipmaps = false;
+		this.texture.minFilter = THREE.LinearFilter;
 		this.tempTexture.generateMipmaps = false;
+		this.tempTexture.minFilter = THREE.LinearFilter;
 	}
 
 	this.updateTextureMatrix();

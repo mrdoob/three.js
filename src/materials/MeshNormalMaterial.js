@@ -20,8 +20,6 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 
 	this.type = 'MeshNormalMaterial';
 
-	this.shading = THREE.FlatShading;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
@@ -40,11 +38,20 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 
 	THREE.Material.prototype.clone.call( this, material );
 
-	material.shading = this.shading;
-
 	material.wireframe = this.wireframe;
 	material.wireframeLinewidth = this.wireframeLinewidth;
 
 	return material;
+
+};
+
+THREE.MeshNormalMaterial.prototype.toJSON = function () {
+
+	var data = THREE.Material.prototype.toJSON.call( this );
+
+	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+	if ( this.side !== THREE.FrontSide ) data.side = this.side;
+
+	return data;
 
 };

@@ -76,9 +76,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 
-THREE.ShaderMaterial.prototype.clone = function () {
+THREE.ShaderMaterial.prototype.clone = function ( material ) {
 
-	var material = new THREE.ShaderMaterial();
+	if ( material === undefined ) material = new THREE.ShaderMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -107,5 +107,17 @@ THREE.ShaderMaterial.prototype.clone = function () {
 	material.morphNormals = this.morphNormals;
 
 	return material;
+
+};
+
+THREE.ShaderMaterial.prototype.toJSON = function () {
+
+	var data = THREE.Material.prototype.toJSON.call( this );
+
+	data.uniforms = this.uniforms;
+	data.vertexShader = this.vertexShader;
+	data.fragmentShader = this.fragmentShader;
+
+	return data;
 
 };

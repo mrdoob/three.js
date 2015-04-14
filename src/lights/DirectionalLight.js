@@ -47,7 +47,7 @@ THREE.DirectionalLight = function ( color, intensity ) {
 	this.shadowCascadeHeight = [ 512, 512, 512 ];
 
 	this.shadowCascadeNearZ = [ - 1.000, 0.990, 0.998 ];
-	this.shadowCascadeFarZ  = [  0.990, 0.998, 1.000 ];
+	this.shadowCascadeFarZ = [ 0.990, 0.998, 1.000 ];
 
 	this.shadowCascadeArray = [];
 
@@ -106,8 +106,19 @@ THREE.DirectionalLight.prototype.clone = function () {
 	light.shadowCascadeHeight = this.shadowCascadeHeight.slice( 0 );
 
 	light.shadowCascadeNearZ = this.shadowCascadeNearZ.slice( 0 );
-	light.shadowCascadeFarZ  = this.shadowCascadeFarZ.slice( 0 );
+	light.shadowCascadeFarZ = this.shadowCascadeFarZ.slice( 0 );
 
 	return light;
+
+};
+
+THREE.DirectionalLight.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.color = this.color.getHex();
+	data.object.intensity = this.intensity;
+
+	return data;
 
 };

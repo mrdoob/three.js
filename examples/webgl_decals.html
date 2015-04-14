@@ -53,7 +53,7 @@
 			specular: 0x444444,
 			map: decalDiffuse,
 			normalMap: decalNormal,
-			normalScale: new THREE.Vector2( .15, .15 ),
+			normalScale: new THREE.Vector2( 1, 1 ),
 			shininess: 30,
 			transparent: true,
 			depthTest: true,
@@ -111,9 +111,8 @@
 			light.position.set( 1, 0.75, 0.5 );
 			scene.add( light );
 
-			line = new THREE.Line( new THREE.Geometry( ), new THREE.LineBasicMaterial( { linewidth: 4 }) );
-			line.geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
-			line.geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
+			line = new THREE.Line( new THREE.DynamicGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
+			line.geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
 			scene.add( line );
 
 			loadLeePerrySmith();
@@ -296,7 +295,7 @@
 			} );
 			decals = [];
 
-		};
+		}
 
 		function mergeDecals() {
 

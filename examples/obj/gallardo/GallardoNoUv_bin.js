@@ -21,8 +21,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 29.411765,
-	"opacity" : 0.0
+	"specularCoef" : 29.411765
 	},
 
 	{
@@ -34,8 +33,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 29.411765,
-	"opacity" : 0.0
+	"specularCoef" : 29.411765
 	},
 
 	{
@@ -47,8 +45,7 @@
 	"colorSpecular" : [0.0, 0.0, 0.0],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 7.843137,
-	"opacity" : 0.0
+	"specularCoef" : 7.843137
 	},
 
 	{
@@ -60,8 +57,7 @@
 	"colorSpecular" : [0.6525, 0.6525, 0.6525],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 25.490196,
-	"opacity" : 0.0
+	"specularCoef" : 25.490196
 	},
 
 	{
@@ -73,8 +69,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 29.411765,
-	"opacity" : 0.0
+	"specularCoef" : 29.411765
 	},
 
 	{
@@ -86,8 +81,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 29.411765,
-	"opacity" : 0.0
+	"specularCoef" : 29.411765
 	},
 
 	{
@@ -99,8 +93,7 @@
 	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 29.411765,
-	"opacity" : 0.0
+	"specularCoef" : 29.411765
 	}],
 
     "buffers": "GallardoNoUv_bin.bin"

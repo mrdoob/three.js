@@ -41,7 +41,7 @@
 		</div>
 		<div>
 		Example:<br>
-		materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
+		materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
 	
 		</div>
 
@@ -52,11 +52,6 @@
 		<h3>[property:Color color]</h3>
 		<div>
 		Diffuse color of the material. Default is white.<br />
-		</div>
-
-		<h3>[property:Color ambient]</h3>
-		<div>
-		Ambient color of the material, multiplied by the color of the [page:AmbientLight]. Default is white.<br />
 		</div>
 
 		<h3>[property:Color emissive]</h3>
@@ -70,7 +65,7 @@
 		</div>
 
 		<h3>[property:Float shininess]</h3>
-		<div>How shiny the specular highlight is; a higher value gives a sharper highlight. Default is *30*.</div>
+		<div>How shiny the specular highlight is; a higher value gives a sharper highlight. Default is *30*. It should not be set to 0.</div>
 
 		<h3>[property:boolean metal]</h3>
 		<div>
@@ -78,20 +73,6 @@
 			it appear to be more metal-like and darker. If set to false the specular highlight is added ontop of the
 			underlying colors.
 		</div> 
-
-		<h3>[property:boolean wrapAround]</h3>
-		<div>
-			Define whether the diffuse lighting wraps around the model or not. This option adds a little more (tintable) light
-			onto the side of the object in relation to a light.
-		</div>
-
-		<h3>[property:Vector3 wrapRGB]</h3>
-		<div>
-			Decide how much of the wrap around values get used if the wrapAround option is set. The x, y, z values correspond
-			to the r, g, b values respectively. The typical range is of each is from 0 to 1. For example setting all of the
-			vector values to 0.5 will add a moderate amount of light to the side of the model. Changing *b* to 1 will
-			tint the light on the side to be more blue. Defaults to (1,1,1).
-		</div>
 
 		<h3>[property:Texture map]</h3>
 		<div>Set color texture map. Default is null.</div>

@@ -181,7 +181,7 @@ THREE.Loader.prototype = {
 				var wrapMap = {
 					'repeat': THREE.RepeatWrapping,
 					'mirror': THREE.MirroredRepeatWrapping
-				}
+				};
 
 				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ wrap[ 0 ] ];
 				if ( wrapMap[ wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ wrap[ 1 ] ];
@@ -226,9 +226,15 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.transparent !== undefined || m.opacity < 1.0 ) {
+		if ( m.transparent !== undefined ) {
 
 			mpars.transparent = m.transparent;
+
+		}
+
+		if ( m.opacity !== undefined && m.opacity < 1.0 ) {
+
+			mpars.transparent = true;
 
 		}
 
@@ -308,14 +314,14 @@ THREE.Loader.prototype = {
 
 		// modifiers
 
-		if ( m.transparency ) {
+		if ( m.transparency !== undefined ) {
 
-			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
-			mpars.opacity = m.transparency;
+			THREE.warn( 'THREE.Loader: transparency has been renamed to opacity' );
+			m.opacity = m.transparency;
 
 		}
 
-		if ( m.opacity ) {
+		if ( m.opacity !== undefined ) {
 
 			mpars.opacity = m.opacity;
 
@@ -338,6 +344,12 @@ THREE.Loader.prototype = {
 		if ( m.mapLight && texturePath ) {
 
 			create_texture( mpars, 'lightMap', m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
+
+		}
+
+		if ( m.mapAO && texturePath ) {
+
+			create_texture( mpars, 'aoMap', m.mapAO, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy );
 
 		}
 

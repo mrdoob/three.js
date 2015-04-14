@@ -72,6 +72,8 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 		renderTarget.activeCubeFace = 5;
 		renderer.render( scene, cameraNZ, renderTarget );
 
+		renderer.setRenderTarget( null );
+
 	};
 
 };

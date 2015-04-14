@@ -27,7 +27,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.passes = [];
 
 	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
+		THREE.error( "THREE.EffectComposer relies on THREE.CopyShader" );
 
 	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 
@@ -110,7 +110,7 @@ THREE.EffectComposer.prototype = {
 
 			renderTarget = this.renderTarget1.clone();
 
-			var pixelRatio = renderer.getPixelRatio();
+			var pixelRatio = this.renderer.getPixelRatio();
 
 			renderTarget.width  = Math.floor( this.renderer.context.canvas.width  / pixelRatio );
 			renderTarget.height = Math.floor( this.renderer.context.canvas.height / pixelRatio );

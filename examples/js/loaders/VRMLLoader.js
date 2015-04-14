@@ -58,7 +58,7 @@ THREE.VRMLLoader.prototype = {
 
 		var parseV1 = function ( lines, scene ) {
 
-			console.warn( 'VRML V1.0 not supported yet' );
+			THREE.warn( 'VRML V1.0 not supported yet' );
 
 		};
 
@@ -123,7 +123,7 @@ THREE.VRMLLoader.prototype = {
 
 				var coord = [ ], aColor, bColor, t = 1, A = {}, B = {}, applyColor = false, colorIndex;
 
-				for ( var k = 0; k < angles.length; k++ ) {
+				for ( var k = 0; k < angles.length; k ++ ) {
 
 					var vec = { };
 
@@ -137,19 +137,19 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				// painting the colors on the faces
-				for ( var i = 0; i < geometry.faces.length ; i++ ) {
+				for ( var i = 0; i < geometry.faces.length ; i ++ ) {
 
 					f  = geometry.faces[ i ];
 
 					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
 
-					for ( var j = 0; j < n; j++ ) {
+					for ( var j = 0; j < n; j ++ ) {
 
 						vertexIndex = f[ faceIndices[ j ] ];
 
 						p = geometry.vertices[ vertexIndex ];
 
-						for ( var index = 0; index < colors.length; index++ ) {
+						for ( var index = 0; index < colors.length; index ++ ) {
 
 							// linear interpolation between aColor and bColor, calculate proportion
 							// A is previous point (angle)
@@ -160,8 +160,8 @@ THREE.VRMLLoader.prototype = {
 
 							} else {
 
-								A.x = coord[ index-1 ].x;
-								A.y = coord[ index-1 ].y;
+								A.x = coord[ index - 1 ].x;
+								A.y = coord[ index - 1 ].y;
 
 							}
 
@@ -188,7 +188,7 @@ THREE.VRMLLoader.prototype = {
 								}
 
 							} else if ( undefined === f.vertexColors[ j ] ) {
-								colorIndex = directionIsDown ? colors.length -1 : 0;
+								colorIndex = directionIsDown ? colors.length - 1 : 0;
 								f.vertexColors[ j ] = colors[ colorIndex ];
 
 							}
@@ -250,7 +250,7 @@ THREE.VRMLLoader.prototype = {
 					if (parts.length > 0) {
 						index = [];
 
-						for (var ind = 0;ind < parts.length; ind++) {
+						for (var ind = 0; ind < parts.length; ind ++) {
 
 							// the part should either be positive integer or -1
 							if (!/(-?\d+)/.test( parts[ind]) ) {
@@ -260,7 +260,7 @@ THREE.VRMLLoader.prototype = {
 							// end of current face
 							if (parts[ind] === "-1") {
 								if (index.length > 0) {
-								   this.indexes.push(index);
+									this.indexes.push(index);
 								}
 
 								// start new one
@@ -301,7 +301,7 @@ THREE.VRMLLoader.prototype = {
 					// the parts hold the angles as strings
 					if ( parts.length > 0 ) {
 
-						for ( var ind = 0;ind < parts.length; ind++ ) {
+						for ( var ind = 0; ind < parts.length; ind ++ ) {
 
 							// the part should be a float
 							if ( ! float_pattern.test( parts[ind] ) ) {
@@ -321,7 +321,7 @@ THREE.VRMLLoader.prototype = {
 
 				} else if (this.isRecordingColors) {
 
-					while( null !== ( parts = float3_pattern.exec(line) ) ) {
+					while ( null !== ( parts = float3_pattern.exec(line) ) ) {
 
 						color = {
 							r: parseFloat(parts[1]),
@@ -339,7 +339,7 @@ THREE.VRMLLoader.prototype = {
 						node[this.recordingFieldname] = this.colors;
 					}
 
-				} else if ( parts[parts.length -1] !== 'NULL' && fieldName !== 'children') {
+				} else if ( parts[parts.length - 1] !== 'NULL' && fieldName !== 'children') {
 
 					switch (fieldName) {
 
@@ -349,7 +349,7 @@ THREE.VRMLLoader.prototype = {
 						case 'color':
 
 							if (parts.length != 4) {
-								console.warn('Invalid color format detected for ' + fieldName );
+								THREE.warn('Invalid color format detected for ' + fieldName );
 								break;
 							}
 
@@ -357,7 +357,7 @@ THREE.VRMLLoader.prototype = {
 								r: parseFloat(parts[1]),
 								g: parseFloat(parts[2]),
 								b: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -365,7 +365,7 @@ THREE.VRMLLoader.prototype = {
 						case 'scale':
 						case 'size':
 							if (parts.length != 4) {
-								console.warn('Invalid vector format detected for ' + fieldName);
+								THREE.warn('Invalid vector format detected for ' + fieldName);
 								break;
 							}
 
@@ -373,7 +373,7 @@ THREE.VRMLLoader.prototype = {
 								x: parseFloat(parts[1]),
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -385,7 +385,7 @@ THREE.VRMLLoader.prototype = {
 						case 'shininess':
 						case 'ambientIntensity':
 							if (parts.length != 2) {
-								console.warn('Invalid single float value specification detected for ' + fieldName);
+								THREE.warn('Invalid single float value specification detected for ' + fieldName);
 								break;
 							}
 
@@ -395,7 +395,7 @@ THREE.VRMLLoader.prototype = {
 
 						case 'rotation':
 							if (parts.length != 5) {
-								console.warn('Invalid quaternion format detected for ' + fieldName);
+								THREE.warn('Invalid quaternion format detected for ' + fieldName);
 								break;
 							}
 
@@ -404,7 +404,7 @@ THREE.VRMLLoader.prototype = {
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3]),
 								w: parseFloat(parts[4])
-							}
+							};
 
 							break;
 
@@ -413,7 +413,7 @@ THREE.VRMLLoader.prototype = {
 						case 'colorPerVertex':
 						case 'convex':
 							if (parts.length != 2) {
-								console.warn('Invalid format detected for ' + fieldName);
+								THREE.warn('Invalid format detected for ' + fieldName);
 								break;
 							}
 
@@ -466,7 +466,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( matches = /([^\s]*){1}\s?{/.exec( line ) ) { // first subpattern should match the Node name
 
-						var block = { 'nodeType' : matches[1], 'string': line, 'parent': current, 'children': [],'comment' : comment};
+						var block = { 'nodeType' : matches[1], 'string': line, 'parent': current, 'children': [],'comment' : comment };
 						current.children.push( block );
 						current = block;
 
@@ -498,11 +498,11 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				return tree;
-			}
+			};
 
 			var parseNode = function ( data, parent ) {
 
-				// console.log( data );
+				// THREE.log( data );
 
 				if ( typeof data === 'string' ) {
 
@@ -511,7 +511,7 @@ THREE.VRMLLoader.prototype = {
 						var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
 
 						if (undefined == defines[defineKey]) {
-							console.warn(defineKey + ' is not defined.');
+							THREE.warn(defineKey + ' is not defined.');
 						} else {
 
 							if ( /appearance/.exec( data ) && defineKey ) {
@@ -528,7 +528,7 @@ THREE.VRMLLoader.prototype = {
 									parent.material.side = THREE.DoubleSide;
 								}
 
-							} else if (defineKey){
+							} else if (defineKey) {
 
 								var object = defines[ defineKey ].clone();
 								parent.add( object );
@@ -660,7 +660,7 @@ THREE.VRMLLoader.prototype = {
 
 						var indexes;
 
-						for ( var i = 0, j = data.children.length; i < j; i++ ) {
+						for ( var i = 0, j = data.children.length; i < j; i ++ ) {
 
 							var child = data.children[ i ];
 
@@ -668,7 +668,7 @@ THREE.VRMLLoader.prototype = {
 
 							if ( 'Coordinate' === child.nodeType ) {
 
-								for ( var k = 0, l = child.points.length; k < l; k++ ) {
+								for ( var k = 0, l = child.points.length; k < l; k ++ ) {
 
 									var point = child.points[ k ];
 
@@ -684,7 +684,7 @@ THREE.VRMLLoader.prototype = {
 						var skip = 0;
 
 						// read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
-						for ( var i = 0, j = data.coordIndex.length; i < j; i++ ) {
+						for ( var i = 0, j = data.coordIndex.length; i < j; i ++ ) {
 
 							indexes = data.coordIndex[i];
 
@@ -694,7 +694,7 @@ THREE.VRMLLoader.prototype = {
 							// todo: this is the time to check if the faces are ordered ccw or not (cw)
 
 							// Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
-							while ( indexes.length >= 3 && skip < ( indexes.length -2 ) ) {
+							while ( indexes.length >= 3 && skip < ( indexes.length - 2 ) ) {
 
 								var face = new THREE.Face3(
 									indexes[0],
@@ -704,7 +704,7 @@ THREE.VRMLLoader.prototype = {
 									// todo: pass in the color, if a color index is present
 								);
 
-								skip++;
+								skip ++;
 
 								geometry.faces.push( face );
 
@@ -807,7 +807,7 @@ THREE.VRMLLoader.prototype = {
 
 				}
 
-			}
+			};
 
 			parseNode( getTree( lines ), scene );
 

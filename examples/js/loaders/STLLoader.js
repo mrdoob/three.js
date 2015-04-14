@@ -59,7 +59,7 @@ THREE.STLLoader.prototype = {
 			var expect, face_size, n_faces, reader;
 			reader = new DataView( binData );
 			face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
-			n_faces = reader.getUint32(80,true);
+			n_faces = reader.getUint32(80, true);
 			expect = 80 + (32 / 8) + (n_faces * face_size);
 			
 			if ( expect === reader.byteLength ) {
@@ -110,15 +110,15 @@ THREE.STLLoader.prototype = {
 				(reader.getUint8(index + 4) == 0x52 /*'R'*/) &&
 				(reader.getUint8(index + 5) == 0x3D /*'='*/)) {
 
-					hasColors = true;
-					colors = new Float32Array( faces * 3 * 3);
+				hasColors = true;
+				colors = new Float32Array( faces * 3 * 3);
 
-					defaultR = reader.getUint8(index + 6) / 255;
-					defaultG = reader.getUint8(index + 7) / 255;
-					defaultB = reader.getUint8(index + 8) / 255;
-					alpha = reader.getUint8(index + 9) / 255;
-				}
+				defaultR = reader.getUint8(index + 6) / 255;
+				defaultG = reader.getUint8(index + 7) / 255;
+				defaultB = reader.getUint8(index + 8) / 255;
+				alpha = reader.getUint8(index + 9) / 255;
 			}
+		}
 
 		var dataOffset = 84;
 		var faceLength = 12 * 4 + 2;
@@ -231,10 +231,10 @@ THREE.STLLoader.prototype = {
 
 	ensureString: function ( buf ) {
 
-		if (typeof buf !== "string"){
+		if (typeof buf !== "string") {
 			var array_buffer = new Uint8Array(buf);
 			var str = '';
-			for(var i = 0; i < buf.byteLength; i++) {
+			for (var i = 0; i < buf.byteLength; i ++) {
 				str += String.fromCharCode(array_buffer[i]); // implicitly assumes little-endian
 			}
 			return str;
@@ -246,9 +246,9 @@ THREE.STLLoader.prototype = {
 
 	ensureBinary: function ( buf ) {
 
-		if (typeof buf === "string"){
+		if (typeof buf === "string") {
 			var array_buffer = new Uint8Array(buf.length);
-			for(var i = 0; i < buf.length; i++) {
+			for (var i = 0; i < buf.length; i ++) {
 				array_buffer[i] = buf.charCodeAt(i) & 0xff; // implicitly assumes little-endian
 			}
 			return array_buffer.buffer || array_buffer;
@@ -260,25 +260,25 @@ THREE.STLLoader.prototype = {
 
 };
 
-if ( typeof DataView === 'undefined'){
+if ( typeof DataView === 'undefined') {
 
-	DataView = function(buffer, byteOffset, byteLength){
+	DataView = function(buffer, byteOffset, byteLength) {
 
 		this.buffer = buffer;
 		this.byteOffset = byteOffset || 0;
 		this.byteLength = byteLength || buffer.byteLength || buffer.length;
 		this._isString = typeof buffer === "string";
 
-	}
+	};
 
 	DataView.prototype = {
 
-		_getCharCodes:function(buffer,start,length){
+		_getCharCodes:function(buffer,start,length) {
 			start = start || 0;
 			length = length || buffer.length;
 			var end = start + length;
 			var codes = [];
-			for (var i = start; i < end; i++) {
+			for (var i = start; i < end; i ++) {
 				codes.push(buffer.charCodeAt(i) & 0xff);
 			}
 			return codes;
@@ -325,7 +325,7 @@ if ( typeof DataView === 'undefined'){
 
 			}
 
-			if (this.isString){
+			if (this.isString) {
 
 				result = this._getCharCodes(this.buffer, byteOffset, byteOffset + length);
 

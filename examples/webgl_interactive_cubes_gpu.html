@@ -75,6 +75,7 @@
 
 				pickingScene = new THREE.Scene();
 				pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				pickingTexture.minFilter = THREE.LinearFilter;
 				pickingTexture.generateMipmaps = false;
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );

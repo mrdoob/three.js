@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">	
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>        
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
 		<style type="text/css">
 			body {
 				margin: 0px;
@@ -23,7 +23,7 @@
 				font-weight: bold;
 			}
 			#stats { position: absolute; top:0; left: 0 }
-		</style>        
+		</style>
 	</head>
 	<body>
 		<div id="info">
@@ -32,12 +32,12 @@
 			change type to <span id="change-type"></span>
 		</div>
 
-		<script src="../build/three.min.js"></script>		
+		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/shaders/OceanShaders.js"></script>
-		<script src="js/Ocean.js"></script>		
+		<script src="js/Ocean.js"></script>
 
 		<script>
 			var stats;
@@ -45,7 +45,7 @@
 
 			var types = { 'float': 'half-float', 'half-float': 'float' };
 			var hash = document.location.hash.substr( 1 );
-			if (!(hash in types)) hash = 'float';
+			if (!(hash in types)) hash = 'half-float';
 
 			document.getElementById('type-status').innerHTML = hash;
 			document.getElementById('change-type').innerHTML =
@@ -133,7 +133,7 @@
 					this.ms_Camera.position.set(450, 350, 450);
 					this.ms_Camera.lookAt(new THREE.Vector3());
 
-					// Initialize Orbit control		
+					// Initialize Orbit control
 					this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
 					this.ms_Controls.userPan = false;
 					this.ms_Controls.userPanSpeed = 0.0;
@@ -141,9 +141,9 @@
 					this.ms_Controls.maxDistance = 2000.0;
 					this.ms_Controls.minPolarAngle = 0;
 					this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
-					
-					var gsize = 512; 
-					var res = 1024; 
+
+					var gsize = 512;
+					var res = 1024;
 					var gres = res / 2;
 					var origx = -gsize / 2;
 					var origz = -gsize / 2;

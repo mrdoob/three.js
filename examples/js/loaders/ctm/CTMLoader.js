@@ -72,7 +72,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
@@ -121,12 +121,12 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 							var ctmFile = files[ i ];
 
 							var e1 = Date.now();
-							// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
+							// THREE.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
 
 							scope.createModel( ctmFile, callback );
 
 							var e = Date.now();
-							console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
+							THREE.log( "model load time [worker]: " + (e - e1) + " ms, total: " + (e - s));
 
 						}
 
@@ -149,13 +149,13 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 					}
 
 					//var e = Date.now();
-					//console.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
+					//THREE.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
 
 				}
 
 			} else {
 
-				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				THREE.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -179,7 +179,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.responseType = "arraybuffer";
@@ -240,7 +240,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-	}
+	};
 
 	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
 	Model.prototype.constructor = Model;

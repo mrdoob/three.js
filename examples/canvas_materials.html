@@ -80,15 +80,6 @@
 
 				];
 
-				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-					var face = geometry.faces[ i ];
-					if ( Math.random() > 0.5 ) face.materialIndex = Math.floor( Math.random() * materials.length );
-
-				}
-
-				materials.push( new THREE.MeshFaceMaterial( materials ) );
-
 				objects = [];
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
@@ -115,7 +106,7 @@
 					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
-				}
+				};
 
 				// Lights
 
@@ -176,7 +167,7 @@
 			function loadImage( path ) {
 
 				var image = document.createElement( 'img' );
-				var texture = new THREE.Texture( image, THREE.UVMapping )
+				var texture = new THREE.Texture( image, THREE.UVMapping );
 
 				image.onload = function () { texture.needsUpdate = true; };
 				image.src = path;

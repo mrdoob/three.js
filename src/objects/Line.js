@@ -11,7 +11,7 @@ THREE.Line = function ( geometry, material, mode ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.mode = ( mode !== undefined ) ? mode : THREE.LineStrip;
+	this.mode = mode !== undefined ? mode : THREE.LineStrip;
 
 };
 
@@ -72,7 +72,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0; oi < offsets.length; oi++){
+				for ( var oi = 0; oi < offsets.length; oi ++) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -189,5 +189,28 @@ THREE.Line.prototype.clone = function ( object ) {
 	THREE.Object3D.prototype.clone.call( this, object );
 
 	return object;
+
+};
+
+THREE.Line.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.mode = this.mode;
+
+	// only serialize if not in meta geometries cache
+	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
+	}
+
+	// only serialize if not in meta materials cache
+	if ( meta.materials[ this.material.uuid ] === undefined ) {
+		meta.materials[ this.material.uuid ] = this.material.toJSON();
+	}
+
+	data.object.geometry = this.geometry.uuid;
+	data.object.material = this.material.uuid;
+
+	return data;
 
 };

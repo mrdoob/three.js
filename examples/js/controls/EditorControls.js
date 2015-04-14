@@ -255,14 +255,14 @@ THREE.EditorControls = function ( object, domElement ) {
 
 			return closest;
 
-		}
+		};
 
 		switch ( event.touches.length ) {
 
 			case 1:
 				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
 				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ] ,prevTouches ) ).multiplyScalar( - 0.005 ) );
+				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - 0.005 ) );
 				break;
 
 			case 2:
@@ -273,8 +273,8 @@ THREE.EditorControls = function ( object, domElement ) {
 				prevDistance = distance;
 
 
-				var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ] ,prevTouches ) );
-				var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ] ,prevTouches ) );
+				var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ], prevTouches ) );
+				var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ], prevTouches ) );
 				offset0.x = -offset0.x;
 				offset1.x = -offset1.x;
 

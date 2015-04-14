@@ -26,7 +26,7 @@ THREE.Sphere.prototype = {
 
 		var box = new THREE.Box3();
 
-		return function ( points, optionalCenter )  {
+		return function ( points, optionalCenter ) {
 
 			var center = this.center;
 
@@ -52,7 +52,7 @@ THREE.Sphere.prototype = {
 
 			return this;
 
- 		};
+		};
 
 	}(),
 

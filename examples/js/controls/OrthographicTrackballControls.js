@@ -73,8 +73,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	// events
 
 	var changeEvent = { type: 'change' };
-	var startEvent = { type: 'start'};
-	var endEvent = { type: 'end'};
+	var startEvent = { type: 'start' };
+	var endEvent = { type: 'end' };
 
 
 	// methods
@@ -156,7 +156,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 				if ( length < Math.SQRT1_2 ) {
 
-					mouseOnBall.z = Math.sqrt( 1.0 - length*length );
+					mouseOnBall.z = Math.sqrt( 1.0 - length * length );
 
 				} else {
 
@@ -176,7 +176,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			_eye.copy( _this.object.position ).sub( _this.target );
 
-			vector.copy( _this.object.up ).setLength( mouseOnBall.y )
+			vector.copy( _this.object.up ).setLength( mouseOnBall.y );
 			vector.add( objectUp.copy( _this.object.up ).cross( _eye ).setLength( mouseOnBall.x ) );
 			vector.add( _eye.setLength( mouseOnBall.z ) );
 
@@ -186,7 +186,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	}() );
 
-	this.rotateCamera = (function(){
+	this.rotateCamera = (function() {
 
 		var axis = new THREE.Vector3(),
 			quaternion = new THREE.Quaternion();
@@ -264,7 +264,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.panCamera = (function(){
+	this.panCamera = (function() {
 
 		var mouseChange = new THREE.Vector2(),
 			objectUp = new THREE.Vector3(),

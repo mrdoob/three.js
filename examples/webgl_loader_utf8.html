@@ -159,13 +159,6 @@
 						node.castShadow = true;
 						node.receiveShadow = true;
 
-						if ( node.material && node.material.name === "skin" ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
-
 					} );
 
 				}, { normalizeRGB: true } );
@@ -185,13 +178,6 @@
 
 						node.castShadow = true;
 						node.receiveShadow = true;
-
-						if ( node.material && ( node.material.name === "head" || node.material.name === "skinbody" ) ) {
-
-							node.material.wrapAround = true;
-							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
-
-						}
 
 					} );
 

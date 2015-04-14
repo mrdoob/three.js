@@ -36,7 +36,7 @@ THREE.UCSCharacter = function() {
 		
 		// CHARACTER
 		var loader = new THREE.JSONLoader();
-		console.log( config.baseUrl + config.character );
+		THREE.log( config.baseUrl + config.character );
 		loader.load( config.baseUrl + config.character, function( geometry ) {
 			geometry.computeBoundingBox();
 			geometry.computeVertexNormals();
@@ -75,7 +75,7 @@ THREE.UCSCharacter = function() {
 				mesh.morphTargetInfluences[ i ] = influences[ scope.morphs[ i ] ] / 100;
 			}
 		}
-	}
+	};
 	
 	function loadTextures( baseUrl, textureUrls ) {
 		var mapping = THREE.UVMapping;
@@ -89,7 +89,7 @@ THREE.UCSCharacter = function() {
 		}
 
 		return textures;
-	};
+	}
 
 	function createMaterials( skins ) {
 		var materials = [];
@@ -101,8 +101,7 @@ THREE.UCSCharacter = function() {
 				specular: 10.0,
 				map: skins[ i ],
 				skinning: true,
-				morphTargets: true,
-				wrapAround: true
+				morphTargets: true
 			} );
 
 		}
@@ -122,4 +121,4 @@ THREE.UCSCharacter = function() {
 
 	}
 
-}
+};

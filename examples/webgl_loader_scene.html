@@ -39,15 +39,6 @@
 				display:none;
 			}
 
-			#start {
-				color:#fff;
-				text-shadow: #000 0px 0px 2px;
-				padding:0.1em 0.3em;
-				width:3em;
-				text-align: center;
-				display:none;
-			}
-
 			.shadow {
 				-moz-box-shadow: 0px 0px 5px #000;
 				-webkit-box-shadow: 0px 0px 5px #000;
@@ -97,7 +88,6 @@
 
 			<center>
 				<div id="progressbar" class="shadow"><div id="bar" class="shadow"></div></div>
-				<div id="start" class="disabled">Start</div>
 			</center>
 		</div>
 
@@ -109,7 +99,7 @@
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
-		<script src="js/loaders/SceneLoader.js"></script>
+		<script src="js/loaders/deprecated/SceneLoader.js"></script>
 		<script src="js/loaders/BinaryLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
@@ -186,8 +176,6 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
-				$( "start" ).addEventListener( 'click', onStartClick, false );
-
 				var callbackProgress = function( progress, result ) {
 
 					var bar = 250,
@@ -199,7 +187,7 @@
 
 					$( "bar" ).style.width = bar + "px";
 
-				}
+				};
 
 				var callbackFinished = function ( result ) {
 
@@ -207,8 +195,6 @@
 
 					$( "message" ).style.display = "none";
 					$( "progressbar" ).style.display = "none";
-					$( "start" ).style.display = "block";
-					$( "start" ).className = "enabled";
 
 					result.scene.traverse( function ( object ) {
 
@@ -237,7 +223,17 @@
 
 					} );
 
-				}
+					//
+
+					$( "progress" ).style.display = "none";
+
+					camera = loaded.currentCamera;
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					scene = loaded.scene;
+
+				};
 
 				$( "progress" ).style.display = "block";
 
@@ -273,24 +269,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function setButtonActive( id ) {
-
-				$( "start" ).style.backgroundColor = "green";
-
-			}
-
-			function onStartClick() {
-
-				$( "progress" ).style.display = "none";
-
-				camera = loaded.currentCamera;
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				scene = loaded.scene;
 
 			}
 

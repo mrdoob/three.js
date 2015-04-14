@@ -67,12 +67,10 @@
 
 		setFromCamera: function ( coords, camera ) {
 
-			// camera is assumed _not_ to be a child of a transformed object
-
 			if ( camera instanceof THREE.PerspectiveCamera ) {
 
-				this.ray.origin.copy( camera.position );
-				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( camera.position ).normalize();
+				this.ray.origin.setFromMatrixPosition( camera.matrixWorld );
+				this.ray.direction.set( coords.x, coords.y, 0.5 ).unproject( camera ).sub( this.ray.origin ).normalize();
 
 			} else if ( camera instanceof THREE.OrthographicCamera ) {
 
@@ -81,7 +79,7 @@
 
 			} else {
 
-				console.error( 'THREE.Raycaster: Unsupported camera type.' );
+				THREE.error( 'THREE.Raycaster: Unsupported camera type.' );
 
 			}
 
@@ -105,7 +103,7 @@
 
 			if ( objects instanceof Array === false ) {
 
-				console.log( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
+				THREE.warn( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
 				return intersects;
 
 			}

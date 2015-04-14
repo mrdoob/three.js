@@ -74,7 +74,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 	parseList : function(json, handler) {
 		var meshes = new Array(json.length);
-		for(var i = 0; i < json.length; ++i) {
+		for (var i = 0; i < json.length; ++ i) {
 			meshes[i] = handler.call(this, json[i]);
 		}
 		return meshes;
@@ -87,31 +87,26 @@ THREE.AssimpJSONLoader.prototype = {
 		geometry = new THREE.Geometry();
 
 		// read vertex positions
-		for(in_data = json.vertices, i = 0, e = in_data.length; i < e; ) {
-			geometry.vertices.push( new THREE.Vector3( in_data[ i++ ], in_data[ i++ ], in_data[ i++ ] ) );
+		for (in_data = json.vertices, i = 0, e = in_data.length; i < e; ) {
+			geometry.vertices.push( new THREE.Vector3( in_data[ i ++ ], in_data[ i ++ ], in_data[ i ++ ] ) );
 		}
 
 		// read faces
 		var cnt = 0;
-		for(in_data = json.faces, i = 0, e = in_data.length; i < e; ++i) {
-			face = new THREE.Face3();
+		for (in_data = json.faces, i = 0, e = in_data.length; i < e; ++ i) {
 			src = in_data[i];
-			face.a = src[0];
-			face.b = src[1];
-			face.c = src[2];
-
-			face.materialIndex = 0; //json.materialindex;
+			face = new THREE.Face3(src[0],src[1],src[2]);
 			geometry.faces.push(face);
 		}
 
 		// read texture coordinates - three.js attaches them to its faces
 		json.texturecoords = json.texturecoords || [];
-		for(i = 0, e = json.texturecoords.length; i < e; ++i) {
+		for (i = 0, e = json.texturecoords.length; i < e; ++ i) {
 
 			function convertTextureCoords(in_uv, out_faces, out_vertex_uvs) {
 				var i, e, face, a, b, c;
 
-				for(i = 0, e = out_faces.length; i < e; ++i) {
+				for (i = 0, e = out_faces.length; i < e; ++ i) {
 					face = out_faces[i];
 					a = face.a * 2;
 					b = face.b * 2;
@@ -128,12 +123,12 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 		// read normals - three.js also attaches them to its faces
-		if(json.normals) {
+		if (json.normals) {
 
 			function convertNormals(in_nor, out_faces) {
 				var i, e, face, a, b, c;
 
-				for(i = 0, e = out_faces.length; i < e; ++i) {
+				for (i = 0, e = out_faces.length; i < e; ++ i) {
 					face = out_faces[i];
 					a = face.a * 3;
 					b = face.b * 3;
@@ -150,7 +145,7 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 		// read vertex colors - three.js also attaches them to its faces
-		if(json.colors && json.colors[0]) {
+		if (json.colors && json.colors[0]) {
 
 			function convertColors(in_color, out_faces) {
 				var i, e, face, a, b, c;
@@ -162,7 +157,7 @@ THREE.AssimpJSONLoader.prototype = {
 					return col;
 				}
 
-				for(i = 0, e = out_faces.length; i < e; ++i) {
+				for (i = 0, e = out_faces.length; i < e; ++ i) {
 					face = out_faces[i];
 					a = face.a * 4;
 					b = face.b * 4;
@@ -189,7 +184,7 @@ THREE.AssimpJSONLoader.prototype = {
 	},
 
 	parseMaterial : function(json) {
-		var mat = null, 
+		var mat = null,
 		scope = this, i, prop, has_textures = [],
 
 		init_props = {
@@ -198,7 +193,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 		function toColor(value_arr) {
 			var col = new THREE.Color();
-			col.setRGB(value_arr[0],value_arr[1],value_arr[2]);
+			col.setRGB(value_arr[0], value_arr[1], value_arr[2]);
 			return col;
 		}
 
@@ -212,38 +207,38 @@ THREE.AssimpJSONLoader.prototype = {
 		for (var i in json.properties) {
 			prop = json.properties[i];
 
-			if(prop.key === '$tex.file') {
+			if (prop.key === '$tex.file') {
 				// prop.semantic gives the type of the texture
 				// 1: diffuse
 				// 2: specular mao
 				// 5: height map (bumps)
 				// 6: normal map
 				// more values (i.e. emissive, environment) are known by assimp and may be relevant
-				if(prop.semantic === 1 || prop.semantic === 5 || prop.semantic === 6 || prop.semantic === 2) {
+				if (prop.semantic === 1 || prop.semantic === 5 || prop.semantic === 6 || prop.semantic === 2) {
 					(function(semantic) {
 						var loader = new THREE.TextureLoader(scope.manager),
 						keyname;
 
-						if(semantic === 1) {
+						if (semantic === 1) {
 							keyname = 'map';
 						}
-						else if(semantic === 5) {
+						else if (semantic === 5) {
 							keyname = 'bumpMap';
 						}
-						else if(semantic === 6) {
+						else if (semantic === 6) {
 							keyname = 'normalMap';
 						}
-						else if(semantic === 2) {
+						else if (semantic === 2) {
 							keyname = 'specularMap';
 						}
 
 						has_textures.push(keyname);
 
 						loader.setCrossOrigin(this.crossOrigin);
-						var material_url = scope.texturePath + '/' + prop.value
+						var material_url = scope.texturePath + '/' + prop.value;
 						material_url = material_url.replace(/\\/g, '/');
 						loader.load(material_url, function(tex) {
-							if(tex) {
+							if (tex) {
 								// TODO: read texture settings from assimp.
 								// Wrapping is the default, though.
 								tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -255,19 +250,19 @@ THREE.AssimpJSONLoader.prototype = {
 					})(prop.semantic);
 				}
 			}
-			else if(prop.key === '?mat.name') {
+			else if (prop.key === '?mat.name') {
 				init_props.name = prop.value;
 			}
-			else if(prop.key === '$clr.diffuse') {
+			else if (prop.key === '$clr.diffuse') {
 				init_props.color = toColor(prop.value);
 			}
-			else if(prop.key === '$clr.specular') {
+			else if (prop.key === '$clr.specular') {
 				init_props.specular = toColor(prop.value);
 			}
-			else if(prop.key === '$clr.emissive') {
+			else if (prop.key === '$clr.emissive') {
 				init_props.emissive = toColor(prop.value);
 			}
-			else if(prop.key === '$mat.shadingm') {
+			else if (prop.key === '$mat.shadingm') {
 				// aiShadingMode_Flat
 				if (prop.value === 1) {
 					init_props.shading = THREE.FlatShading;
@@ -281,12 +276,12 @@ THREE.AssimpJSONLoader.prototype = {
 		// note: three.js does not like it when a texture is added after the geometry
 		// has been rendered once, see http://stackoverflow.com/questions/16531759/.
 		// for this reason we fill all slots upfront with default textures
-		if(has_textures.length) {
-			for(i = has_textures.length-1; i >= 0; --i) {
+		if (has_textures.length) {
+			for (i = has_textures.length - 1; i >= 0; -- i) {
 				init_props[has_textures[i]] = defaultTexture();
 			}
 		}
-		
+
 		mat = new THREE.MeshPhongMaterial( init_props );
 		return mat;
 	},
@@ -301,17 +296,15 @@ THREE.AssimpJSONLoader.prototype = {
 		obj.matrix = new THREE.Matrix4().fromArray(node.transformation).transpose();
 		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 
-		for(i = 0; node.meshes && i < node.meshes.length; ++i) {
+		for (i = 0; node.meshes && i < node.meshes.length; ++ i) {
 			idx = node.meshes[i];
 			obj.add(new THREE.Mesh( meshes[idx], materials[json.meshes[idx].materialindex] ));
 		}
 
-		for(i = 0; node.children && i < node.children.length; ++i) {
+		for (i = 0; node.children && i < node.children.length; ++ i) {
 			obj.add(this.parseObject(json, node.children[i], meshes, materials));
 		}
 
 		return obj;
 	},
 };
-
-

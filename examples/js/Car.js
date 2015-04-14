@@ -195,7 +195,7 @@ THREE.Car = function () {
 
 		var forwardDelta = this.speed * delta;
 
-		this.carOrientation += ( forwardDelta * this.STEERING_RADIUS_RATIO )* this.wheelOrientation;
+		this.carOrientation += ( forwardDelta * this.STEERING_RADIUS_RATIO ) * this.wheelOrientation;
 
 		// displacement
 
@@ -246,7 +246,7 @@ THREE.Car = function () {
 
 		createCar();
 
-	};
+	}
 
 	function createWheels ( geometry, materials ) {
 
@@ -255,7 +255,7 @@ THREE.Car = function () {
 
 		createCar();
 
-	};
+	}
 
 	function createCar () {
 
@@ -360,11 +360,11 @@ THREE.Car = function () {
 
 		}
 
-	};
+	}
 
 	function quadraticEaseOut( k ) { return - k * ( k - 2 ); }
-	function cubicEaseOut( k ) { return --k * k * k + 1; }
-	function circularEaseOut( k ) { return Math.sqrt( 1 - --k * k ); }
+	function cubicEaseOut( k ) { return -- k * k * k + 1; }
+	function circularEaseOut( k ) { return Math.sqrt( 1 - -- k * k ); }
 	function sinusoidalEaseOut( k ) { return Math.sin( k * Math.PI / 2 ); }
 	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
 

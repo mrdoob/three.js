@@ -24,7 +24,7 @@
 	#endif
 
 	#ifdef DOUBLE_SIDED
-		float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );
+		float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 	#else
 		float flipNormal = 1.0;
 	#endif
@@ -37,7 +37,7 @@
 		sampleUV.y = saturate( flipNormal * reflectVec.y * 0.5 + 0.5 );
 		sampleUV.x = atan( flipNormal * reflectVec.z, flipNormal * reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
 		vec4 envColor = texture2D( envMap, sampleUV );
-		
+
 	#elif defined( ENVMAP_TYPE_SPHERE )
 		vec3 reflectView = flipNormal * normalize((viewMatrix * vec4( reflectVec, 0.0 )).xyz + vec3(0.0,0.0,1.0));
 		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
@@ -47,15 +47,15 @@
 
 	#ifdef ENVMAP_BLENDING_MULTIPLY
 
-		gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * envColor.xyz, specularStrength * reflectivity );
+		outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
 
 	#elif defined( ENVMAP_BLENDING_MIX )
 
-		gl_FragColor.xyz = mix( gl_FragColor.xyz, envColor.xyz, specularStrength * reflectivity );
+		outgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );
 
 	#elif defined( ENVMAP_BLENDING_ADD )
 
-		gl_FragColor.xyz += envColor.xyz * specularStrength * reflectivity;
+		outgoingLight += envColor.xyz * specularStrength * reflectivity;
 
 	#endif
 

@@ -37,7 +37,7 @@ THREE.WebGLExtensions = function ( gl ) {
 
 		if ( extension === null ) {
 
-			console.log( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
+			THREE.warn( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
 
 		}
 

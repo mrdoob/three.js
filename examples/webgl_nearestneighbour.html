@@ -76,7 +76,7 @@
 			var objects = [];
 
 			var amountOfParticles = 500000, maxDistance = Math.pow(120, 2);
-			var positions, alphas, particles, _particleGeom
+			var positions, alphas, particles, _particleGeom;
 
 			var clock = new THREE.Clock();
 
@@ -188,7 +188,7 @@
 				//
 				displayNearest(camera.position);
 
-				controls.update( clock.getDelta() )
+				controls.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
 

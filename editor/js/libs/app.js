@@ -6,8 +6,12 @@ var APP = {
 
 	Player: function () {
 
+		var scope = this;
+
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
+
+		var vr, controls, effect;
 
 		var events = {};
 
@@ -18,12 +22,15 @@ var APP = {
 
 		this.load = function ( json ) {
 
+			vr = json.project.vr;
+
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			this.dom = renderer.domElement;
 
-			camera = loader.parse( json.camera );
-			scene = loader.parse( json.scene );
+			this.setScene( loader.parse( json.scene ) );
+			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
 				keydown: [],
@@ -68,8 +75,6 @@ var APP = {
 
 			}
 
-			this.dom = renderer.domElement;
-
 		};
 
 		this.setCamera = function ( value ) {
@@ -78,9 +83,54 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
+
+			if ( vr === true ) {
+
+				if ( camera.parent === undefined ) {
+
+					// camera needs to be in the scene so camera2 matrix updates
+
+					scene.add( camera );
+
+				}
+
+				var camera2 = camera.clone();
+				camera.add( camera2 );
+
+				camera = camera2;
+
+				controls = new THREE.VRControls( camera );
+				effect = new THREE.VREffect( renderer );
+
+				document.addEventListener( 'keyup', function ( event ) {
+
+					switch ( event.keyCode ) {
+						case 90:
+							controls.zeroSensor();
+							break;
+					}
+
+				} );
+
+				this.dom.addEventListener( 'dblclick', function () {
+
+					effect.setFullScreen( true );
+
+				} );
+
+			}
+
 		};
 
+		this.setScene = function ( value ) {
+
+			scene = value;
+
+		},
+
 		this.setSize = function ( width, height ) {
+
+			if ( renderer._fullScreen ) return;
 
 			this.width = width;
 			this.height = height;
@@ -102,15 +152,26 @@ var APP = {
 
 		};
 
-		var request;
+		var prevTime, request;
 
 		var animate = function ( time ) {
 
 			request = requestAnimationFrame( animate );
 
-			dispatch( events.update, { time: time } );
+			dispatch( events.update, { time: time, delta: time - prevTime } );
 
-			renderer.render( scene, camera );
+			if ( vr === true ) {
+
+				controls.update();
+				effect.render( scene, camera );
+
+			} else {
+
+				renderer.render( scene, camera );
+
+			}
+
+			prevTime = time;
 
 		};
 
@@ -126,6 +187,7 @@ var APP = {
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
 			request = requestAnimationFrame( animate );
+			prevTime = performance.now();
 
 		};
 

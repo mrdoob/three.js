@@ -30,8 +30,8 @@
 
 			} else {
 
-					this.color.copy( this.oldColor );
-					this.opacity = this.oldOpacity;
+				this.color.copy( this.oldColor );
+				this.opacity = this.oldOpacity;
 
 			}
 
@@ -65,8 +65,8 @@
 
 			} else {
 
-					this.color.copy( this.oldColor );
-					this.opacity = this.oldOpacity;
+				this.color.copy( this.oldColor );
+				this.opacity = this.oldOpacity;
 
 			}
 
@@ -110,8 +110,8 @@
 
 			this.activePlane = planes["XYZE"];
 
-			planes["YZ"].rotation.set( 0, Math.PI/2, 0 );
-			planes["XZ"].rotation.set( -Math.PI/2, 0, 0 );
+			planes["YZ"].rotation.set( 0, Math.PI / 2, 0 );
+			planes["XZ"].rotation.set( -Math.PI / 2, 0, 0 );
 
 			for (var i in planes) {
 				planes[i].name = i;
@@ -126,7 +126,7 @@
 
 				for ( var name in gizmoMap ) {
 
-					for ( i = gizmoMap[name].length; i--;) {
+					for ( i = gizmoMap[name].length; i --;) {
 
 						var object = gizmoMap[name][i][0];
 						var position = gizmoMap[name][i][1];
@@ -183,7 +183,7 @@
 
 		this.highlight = function ( axis ) {
 			this.traverse(function( child ) {
-				if ( child.material && child.material.highlight ){
+				if ( child.material && child.material.highlight ) {
 					if ( child.name == axis ) {
 						child.material.highlight( true );
 					} else {
@@ -236,7 +236,7 @@
 
 		this.handleGizmos = {
 			X: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, -Math.PI/2 ] ],
+				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ],
 				[ new THREE.Line( lineXGeometry, new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 			Y: [
@@ -244,7 +244,7 @@
 				[	new THREE.Line( lineYGeometry, new GizmoLineMaterial( { color: 0x00ff00 } ) ) ]
 			],
 			Z: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI/2, 0, 0 ] ],
+				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ] ],
 				[ new THREE.Line( lineZGeometry, new GizmoLineMaterial( { color: 0x0000ff } ) ) ]
 			],
 			XYZ: [
@@ -254,22 +254,22 @@
 				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ), [ 0.15, 0.15, 0 ] ]
 			],
 			YZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ), [ 0, 0.15, 0.15 ], [ 0, Math.PI/2, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ] ]
 			],
 			XZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.15, 0, 0.15 ], [ -Math.PI/2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.29, 0.29 ), new GizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.15, 0, 0.15 ], [ -Math.PI / 2, 0, 0 ] ]
 			]
 		};
 
 		this.pickerGizmos = {
 			X: [
-				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ), [ 0.6, 0, 0 ], [ 0, 0, -Math.PI/2 ] ]
+				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ), [ 0.6, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ]
 			],
 			Y: [
 				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ), [ 0, 0.6, 0 ] ]
 			],
 			Z: [
-				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ), [ 0, 0, 0.6 ], [ Math.PI/2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ] ]
 			],
 			XYZ: [
 				[ new THREE.Mesh( new THREE.OctahedronGeometry( 0.2, 0 ), new GizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) ) ]
@@ -278,10 +278,10 @@
 				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), new GizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ), [ 0.2, 0.2, 0 ] ]
 			],
 			YZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), new GizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ), [ 0, 0.2, 0.2 ], [ 0, Math.PI/2, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), new GizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ), [ 0, 0.2, 0.2 ], [ 0, Math.PI / 2, 0 ] ]
 			],
 			XZ: [
-				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), new GizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.2, 0, 0.2 ], [ -Math.PI/2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), new GizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ), [ 0.2, 0, 0.2 ], [ -Math.PI / 2, 0, 0 ] ]
 			]
 		};
 
@@ -295,12 +295,12 @@
 				if ( Math.abs(eye.y) > Math.abs(eye.z) ) this.activePlane = this.planes[ "XZ" ];
 			}
 
-			if ( axis == "Y" ){
+			if ( axis == "Y" ) {
 				this.activePlane = this.planes[ "XY" ];
 				if ( Math.abs(eye.x) > Math.abs(eye.z) ) this.activePlane = this.planes[ "YZ" ];
 			}
 
-			if ( axis == "Z" ){
+			if ( axis == "Z" ) {
 				this.activePlane = this.planes[ "XZ" ];
 				if ( Math.abs(eye.x) > Math.abs(eye.y) ) this.activePlane = this.planes[ "YZ" ];
 			}
@@ -331,15 +331,15 @@
 
 		var CircleGeometry = function ( radius, facing, arc ) {
 
-				var geometry = new THREE.Geometry();
-				arc = arc ? arc : 1;
-				for ( var i = 0; i <= 64 * arc; ++i ) {
-					if ( facing == 'x' ) geometry.vertices.push( new THREE.Vector3( 0, Math.cos( i / 32 * Math.PI ), Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
-					if ( facing == 'y' ) geometry.vertices.push( new THREE.Vector3( Math.cos( i / 32 * Math.PI ), 0, Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
-					if ( facing == 'z' ) geometry.vertices.push( new THREE.Vector3( Math.sin( i / 32 * Math.PI ), Math.cos( i / 32 * Math.PI ), 0 ).multiplyScalar(radius) );
-				}
+			var geometry = new THREE.Geometry();
+			arc = arc ? arc : 1;
+			for ( var i = 0; i <= 64 * arc; ++ i ) {
+				if ( facing == 'x' ) geometry.vertices.push( new THREE.Vector3( 0, Math.cos( i / 32 * Math.PI ), Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
+				if ( facing == 'y' ) geometry.vertices.push( new THREE.Vector3( Math.cos( i / 32 * Math.PI ), 0, Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
+				if ( facing == 'z' ) geometry.vertices.push( new THREE.Vector3( Math.sin( i / 32 * Math.PI ), Math.cos( i / 32 * Math.PI ), 0 ).multiplyScalar(radius) );
+			}
 
-				return geometry;
+			return geometry;
 		};
 
 		this.handleGizmos = {
@@ -362,13 +362,13 @@
 
 		this.pickerGizmos = {
 			X: [
-				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new GizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ 0, -Math.PI/2, -Math.PI/2 ] ]
+				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new GizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ 0, -Math.PI / 2, -Math.PI / 2 ] ]
 			],
 			Y: [
-				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new GizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ Math.PI/2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new GizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ] ]
 			],
 			Z: [
-				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new GizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ 0, 0, -Math.PI/2 ] ]
+				[ new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new GizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ), [ 0, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ]
 			],
 			E: [
 				[ new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.12, 2, 24 ), new GizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ) ]
@@ -474,7 +474,7 @@
 
 		this.handleGizmos = {
 			X: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, -Math.PI/2 ] ],
+				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0xff0000 } ) ), [ 0.5, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ],
 				[ new THREE.Line( lineXGeometry, new GizmoLineMaterial( { color: 0xff0000 } ) ) ]
 			],
 			Y: [
@@ -482,7 +482,7 @@
 				[ new THREE.Line( lineYGeometry, new GizmoLineMaterial( { color: 0x00ff00 } ) ) ]
 			],
 			Z: [
-				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI/2, 0, 0 ] ],
+				[ new THREE.Mesh( arrowGeometry, new GizmoMaterial( { color: 0x0000ff } ) ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ] ],
 				[ new THREE.Line( lineZGeometry, new GizmoLineMaterial( { color: 0x0000ff } ) ) ]
 			],
 			XYZ: [
@@ -492,13 +492,13 @@
 
 		this.pickerGizmos = {
 			X: [
-				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ), [ 0.6, 0, 0 ], [ 0, 0, -Math.PI/2 ] ]
+				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ), [ 0.6, 0, 0 ], [ 0, 0, -Math.PI / 2 ] ]
 			],
 			Y: [
 				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ), [ 0, 0.6, 0 ] ]
 			],
 			Z: [
-				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ), [ 0, 0, 0.6 ], [ Math.PI/2, 0, 0 ] ]
+				[ new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new GizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ] ]
 			],
 			XYZ: [
 				[ new THREE.Mesh( new THREE.BoxGeometry( 0.4, 0.4, 0.4 ), new GizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) ) ]
@@ -515,12 +515,12 @@
 				if ( Math.abs(eye.y) > Math.abs(eye.z) ) this.activePlane = this.planes[ "XZ" ];
 			}
 
-			if ( axis == "Y" ){
+			if ( axis == "Y" ) {
 				this.activePlane = this.planes[ "XY" ];
 				if ( Math.abs(eye.x) > Math.abs(eye.z) ) this.activePlane = this.planes[ "YZ" ];
 			}
 
-			if ( axis == "Z" ){
+			if ( axis == "Z" ) {
 				this.activePlane = this.planes[ "XZ" ];
 				if ( Math.abs(eye.x) > Math.abs(eye.y) ) this.activePlane = this.planes[ "YZ" ];
 			}
@@ -632,6 +632,23 @@
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
 
+		this.dispose = function () {
+			domElement.removeEventListener( "mousedown", onPointerDown );
+			domElement.removeEventListener( "touchstart", onPointerDown );
+
+			domElement.removeEventListener( "mousemove", onPointerHover );
+			domElement.removeEventListener( "touchmove", onPointerHover );
+
+			domElement.removeEventListener( "mousemove", onPointerMove );
+			domElement.removeEventListener( "touchmove", onPointerMove );
+
+			domElement.removeEventListener( "mouseup", onPointerUp );
+			domElement.removeEventListener( "mouseout", onPointerUp );
+			domElement.removeEventListener( "touchend", onPointerUp );
+			domElement.removeEventListener( "touchcancel", onPointerUp );
+			domElement.removeEventListener( "touchleave", onPointerUp );
+		};
+
 		this.attach = function ( object ) {
 
 			scope.object = object;
@@ -645,7 +662,7 @@
 
 		};
 
-		this.detach = function ( object ) {
+		this.detach = function () {
 
 			scope.object = undefined;
 			this.axis = null;
@@ -726,8 +743,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
@@ -737,6 +752,8 @@
 			if ( intersect ) {
 
 				axis = intersect.object.name;
+
+				event.preventDefault();
 
 			}
 
@@ -754,9 +771,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-			event.stopPropagation();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
@@ -764,6 +778,9 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+
+					event.preventDefault();
+					event.stopPropagation();
 
 					scope.dispatchEvent( mouseDownEvent );
 
@@ -775,7 +792,7 @@
 
 					scope.gizmo[_mode].setActivePlane( scope.axis, eye );
 
-					var planeIntersect = intersectObjects( pointer, [scope.gizmo[_mode].activePlane] );
+					var planeIntersect = intersectObjects( pointer, [ scope.gizmo[_mode].activePlane ] );
 
 					oldPosition.copy( scope.object.position );
 					oldScale.copy( scope.object.scale );
@@ -803,9 +820,9 @@
 			event.preventDefault();
 			event.stopPropagation();
 
-			var pointer = event.changedTouches? event.changedTouches[0] : event;
+			var pointer = event.changedTouches ? event.changedTouches[0] : event;
 
-			var planeIntersect = intersectObjects( pointer, [scope.gizmo[_mode].activePlane] );
+			var planeIntersect = intersectObjects( pointer, [ scope.gizmo[_mode].activePlane ] );
 
 			point.copy( planeIntersect.point );
 

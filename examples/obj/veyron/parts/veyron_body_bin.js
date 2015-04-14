@@ -21,8 +21,7 @@
 	"colorSpecular" : [0.75, 0.75, 0.75],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 52.941176,
-	"opacity" : 0.0
+	"specularCoef" : 52.941176
 	},
 
 	{
@@ -34,8 +33,7 @@
 	"colorSpecular" : [0.75, 0.75, 0.75],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 52.941176,
-	"opacity" : 0.0
+	"specularCoef" : 52.941176
 	},
 
 	{
@@ -47,8 +45,7 @@
 	"colorSpecular" : [0.4, 0.4, 0.4],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 15.686275,
-	"opacity" : 0.0
+	"specularCoef" : 15.686275
 	},
 
 	{
@@ -60,8 +57,7 @@
 	"colorSpecular" : [0.6, 0.6, 0.6],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 35.294118,
-	"opacity" : 0.0
+	"specularCoef" : 35.294118
 	},
 
 	{
@@ -99,8 +95,7 @@
 	"colorSpecular" : [0.14825, 0.14825, 0.14825],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
-	"specularCoef" : 15.686275,
-	"opacity" : 0.0
+	"specularCoef" : 15.686275
 	},
 
 	{

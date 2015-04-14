@@ -56,17 +56,17 @@ Object.defineProperties(THREE.ProxyGeometry.prototype, {
 
 	verticesNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'position' ]) return this.attributes[ 'position' ].needsUpdate; } ,
+		get: function() { if (this.attributes[ 'position' ]) return this.attributes[ 'position' ].needsUpdate; },
 		set: function(v) { if (this.attributes[ 'position' ]) this.attributes[ 'position' ].needsUpdate = v; } 
 	},
 	colorsNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'color' ]) return this.attributes[ 'color' ].needsUpdate; } ,
+		get: function() { if (this.attributes[ 'color' ]) return this.attributes[ 'color' ].needsUpdate; },
 		set: function(v) { if (this.attributes[ 'color' ]) this.attributes[ 'color' ].needsUpdate = v; } 
 	},
 	normalsNeedUpdate: {
 		enumerable: true,	
-		get: function() { if (this.attributes[ 'normal' ]) return this.attributes[ 'normal' ].needsUpdate; } ,
+		get: function() { if (this.attributes[ 'normal' ]) return this.attributes[ 'normal' ].needsUpdate; },
 		set: function(v) { if (this.attributes[ 'normal' ]) this.attributes[ 'normal' ].needsUpdate = v; } 
 	},
 });
@@ -95,7 +95,7 @@ THREE.ProxyGeometry.prototype.createVertexProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.vertices[i].copy(values[i]);
 
@@ -106,7 +106,7 @@ THREE.ProxyGeometry.prototype.createVertexProxies = function(values) {
 
 	return this.vertices;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 
@@ -166,7 +166,7 @@ THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 		for ( var i = 0, l = positionarray.length / 3; i < l; i += 3 ) {
 
 			var o = i * 3;
-			var v1 = i, v2 = i+1, v3 = i+2;
+			var v1 = i, v2 = i + 1, v3 = i + 2;
 
 			var face = new THREE.ProxyFace3( v1, v2, v3 );
 			faces.push(face);
@@ -179,7 +179,7 @@ THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = faces[i],
 			    v = values[i];
@@ -214,7 +214,7 @@ THREE.ProxyGeometry.prototype.createFaceProxies = function(values) {
 
 	return this.faces;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
@@ -222,7 +222,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 		var normalarray = this.attributes[ 'normal' ].array;
 
-		for (var i = 0, l = this.faces.length; i < l; i++) {
+		for (var i = 0, l = this.faces.length; i < l; i ++) {
 
 			var f = this.faces[i];
 
@@ -240,14 +240,14 @@ THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = this.faces[i],
 			    v = values[i];
 
 			if (v.vertexNormals.length > 0) {
 
-				for (var j = 0, l2 = f.vertexNormals.length; j < l2; j++) {
+				for (var j = 0, l2 = f.vertexNormals.length; j < l2; j ++) {
 
 					f.vertexNormals[j].copy(v.vertexNormals[j]);
 
@@ -263,7 +263,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexNormalProxies = function(values) {
 
 	}
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
@@ -271,7 +271,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
 		var colorarray = this.attributes[ 'color' ].array;
 
-		for (var i = 0, l = this.faces.length; i < l; i++) {
+		for (var i = 0, l = this.faces.length; i < l; i ++) {
 			var f = this.faces[i];
 
 			if ( this.attributes[ 'index' ] ) {
@@ -298,12 +298,12 @@ THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = this.faces[i],
 			    v = values[i];
 
-			for (var j = 0, l2 = f.vertexColors.length; j < l2; j++) {
+			for (var j = 0, l2 = f.vertexColors.length; j < l2; j ++) {
 
 				if (v.vertexColors.length > 0) {
 
@@ -321,7 +321,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexColorProxies = function(values) {
 
 	}
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) {
 
@@ -329,7 +329,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) 
 
 		var tangentarray = this.attributes[ 'tangent' ].array;
 
-		for (var i = 0, l = this.faces.length; i < l; i++) {
+		for (var i = 0, l = this.faces.length; i < l; i ++) {
 
 			var f = this.faces[i];
 
@@ -346,14 +346,14 @@ THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) 
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
 			var f = this.faces[i],
 			    v = values[i];
 
 			if (v.vertexTangents.length > 0) {
 
-				for (var j = 0, l2 = f.vertexTangents.length; j < l2; j++) {
+				for (var j = 0, l2 = f.vertexTangents.length; j < l2; j ++) {
 
 					f.vertexTangents[j].copy(v.vertexTangents[j]);
 
@@ -365,7 +365,7 @@ THREE.ProxyGeometry.prototype.createFaceVertexTangentProxies = function(values) 
 
 	}
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 
@@ -384,7 +384,7 @@ THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 		var faces = this.faces;
 		var uvarray = this.attributes[ 'uv' ].array;
 
-		for (var i = 0, l = faces.length; i < l; i++) {
+		for (var i = 0, l = faces.length; i < l; i ++) {
 			var f = faces[i];
 
 			this.faceVertexUvs[0][i] = [];
@@ -408,9 +408,9 @@ THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0, l = values.length; i < l; i++) {
+		for (var i = 0, l = values.length; i < l; i ++) {
 
-			for (var j = 0, l2 = values[i].length; j < l2; j++) {
+			for (var j = 0, l2 = values[i].length; j < l2; j ++) {
 
 				var uv = values[i][j];
 				this.faceVertexUvs[0][i][j].copy(uv);
@@ -425,7 +425,7 @@ THREE.ProxyGeometry.prototype.createUvProxies = function(values) {
 
 	return this.faceVertexUvs;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createSkinIndexProxies = function(values) {
 
@@ -445,7 +445,7 @@ THREE.ProxyGeometry.prototype.createSkinIndexProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.skinIndices[i].copy(values[i]);
 
@@ -457,7 +457,7 @@ THREE.ProxyGeometry.prototype.createSkinIndexProxies = function(values) {
 
 	return this.skinIndices;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createSkinWeightProxies = function(values) {
 
@@ -477,7 +477,7 @@ THREE.ProxyGeometry.prototype.createSkinWeightProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.skinWeights[i].copy(values[i]);
 
@@ -489,7 +489,7 @@ THREE.ProxyGeometry.prototype.createSkinWeightProxies = function(values) {
 
 	return this.skinWeights;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.createColorProxies = function(values) {
 
@@ -509,7 +509,7 @@ THREE.ProxyGeometry.prototype.createColorProxies = function(values) {
 
 	if (values) {
 
-		for (var i = 0; i < values.length; i++) {
+		for (var i = 0; i < values.length; i ++) {
 
 			this.colors[i].copy(values[i]);
 
@@ -521,7 +521,7 @@ THREE.ProxyGeometry.prototype.createColorProxies = function(values) {
 
 	return this.colors;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.populateProxyFromBuffer = function(attr, buffername, proxytype, itemsize, offset, count) {
 
@@ -541,7 +541,7 @@ THREE.ProxyGeometry.prototype.populateProxyFromBuffer = function(attr, buffernam
 
 	}
 
-}
+};
 
 /*
  * Checks for duplicate vertices with hashmap.
@@ -573,19 +573,19 @@ THREE.ProxyGeometry.prototype.mergeVertices = function () {
 
 		} else {
 
-			//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+			//THREE.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 			changes[ i ] = changes[ verticesMap[ key ] ];
 
 		}
 
-	};
+	}
 
 
 	// if faces are completely degenerate after merging vertices, we
 	// have to remove them from the geometry.
 	var faceIndicesToRemove = [];
 
-	for( i = 0, il = this.faces.length; i < il; i ++ ) {
+	for ( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 		face = this.faces[ i ];
 
@@ -630,7 +630,7 @@ THREE.ProxyGeometry.prototype.mergeVertices = function () {
 	this.vertices = unique;
 	return diff;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.onGeometryAllocate = function (ev) {
 
@@ -693,7 +693,7 @@ THREE.ProxyGeometry.prototype.onGeometryAllocate = function (ev) {
 		this.createSkinWeightProxies(this.skinWeights);
 
 	}
-}
+};
 
 THREE.ProxyGeometry.prototype.computeFaceNormals = function() {
 
@@ -701,7 +701,7 @@ THREE.ProxyGeometry.prototype.computeFaceNormals = function() {
 
 	return THREE.BufferGeometry.prototype.computeFaceNormals.call(this);
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeVertexNormals = function() {
 
@@ -709,7 +709,7 @@ THREE.ProxyGeometry.prototype.computeVertexNormals = function() {
 
 	return THREE.BufferGeometry.prototype.computeVertexNormals.call(this);
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeTangents = function() {
 
@@ -722,7 +722,7 @@ THREE.ProxyGeometry.prototype.computeTangents = function() {
 
 	return ret;
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeBoundingSphere = function() {
 
@@ -730,7 +730,7 @@ THREE.ProxyGeometry.prototype.computeBoundingSphere = function() {
 
 	return THREE.BufferGeometry.prototype.computeBoundingSphere.call(this);
 
-}
+};
 
 THREE.ProxyGeometry.prototype.computeBoundingBox = function () {
 
@@ -738,7 +738,7 @@ THREE.ProxyGeometry.prototype.computeBoundingBox = function () {
 
 	return THREE.BufferGeometry.prototype.computeBoundingBox.call(this);
 
-}
+};
 THREE.ProxyGeometry.prototype.clone = function () {
 
 	var buff = THREE.BufferGeometry.prototype.clone.call(this);
@@ -748,7 +748,7 @@ THREE.ProxyGeometry.prototype.clone = function () {
 
 	return geo;
 
-}
+};
 
 THREE.EventDispatcher.prototype.apply( THREE.ProxyGeometry.prototype );
 

@@ -33,7 +33,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 
 	if ( buffer.length < 19 )
-		console.error( 'THREE.TGALoader.parse: Not enough data to contain header.' );
+		THREE.error( 'THREE.TGALoader.parse: Not enough data to contain header.' );
 
 	var content = new Uint8Array( buffer ),
 		offset = 0,
@@ -57,13 +57,13 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 	function tgaCheckHeader( header ) {
 
-		switch( header.image_type ) {
+		switch ( header.image_type ) {
 
 			// Check indexed type
 			case TGA_TYPE_INDEXED:
 			case TGA_TYPE_RLE_INDEXED:
 				if ( header.colormap_length > 256 || header.colormap_size !== 24 || header.colormap_type !== 1) {
-					console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for indexed type');
+					THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for indexed type');
 				}
 				break;
 
@@ -73,23 +73,23 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			case TGA_TYPE_RLE_RGB:
 			case TGA_TYPE_RLE_GREY:
 				if (header.colormap_type) {
-					console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for colormap type');
+					THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type colormap data for colormap type');
 				}
 				break;
 
 			// What the need of a file without data ?
 			case TGA_TYPE_NO_DATA:
-				console.error('THREE.TGALoader.parse.tgaCheckHeader: No data');
+				THREE.error('THREE.TGALoader.parse.tgaCheckHeader: No data');
 
 			// Invalid type ?
 			default:
-				console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type " '+ header.image_type + '"');
+				THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid type " ' + header.image_type + '"');
 
 		}
 
 		// Check image width and height
-		if ( header.width <= 0 || header.height <=0 ) {
-			console.error( 'THREE.TGALoader.parse.tgaCheckHeader: Invalid image size' );
+		if ( header.width <= 0 || header.height <= 0 ) {
+			THREE.error( 'THREE.TGALoader.parse.tgaCheckHeader: Invalid image size' );
 		}
 
 		// Check image pixel size
@@ -97,7 +97,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			header.pixel_size !== 16 &&
 			header.pixel_size !== 24 &&
 			header.pixel_size !== 32) {
-			console.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid pixel size "' + header.pixel_size + '"');
+			THREE.error('THREE.TGALoader.parse.tgaCheckHeader: Invalid pixel size "' + header.pixel_size + '"');
 		}
 
 	}
@@ -106,7 +106,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 	tgaCheckHeader( header );
 
 	if ( header.id_length + offset > buffer.length ) {
-		console.error('THREE.TGALoader.parse: No data');
+		THREE.error('THREE.TGALoader.parse: No data');
 	}
 
 	// Skip the needn't data
@@ -154,8 +154,8 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			pixel_total,
 			palettes;
 
-			pixel_size = header.pixel_size >> 3;
-			pixel_total = header.width * header.height * pixel_size;
+		pixel_size = header.pixel_size >> 3;
+		pixel_total = header.width * header.height * pixel_size;
 
 		 // Read palettes
 		 if ( use_pal ) {
@@ -171,19 +171,19 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			var pixels = new Uint8Array(pixel_size);
 
 			while (shift < pixel_total) {
-				c     = data[offset++];
+				c     = data[offset ++];
 				count = (c & 0x7f) + 1;
 
 				// RLE pixels.
 				if (c & 0x80) {
 					// Bind pixel tmp array
-					for (i = 0; i < pixel_size; ++i) {
-							pixels[i] = data[offset++];
+					for (i = 0; i < pixel_size; ++ i) {
+						pixels[i] = data[offset ++];
 					}
 
 					// Copy pixel array
-					for (i = 0; i < count; ++i) {
-							pixel_data.set(pixels, shift + i * pixel_size);
+					for (i = 0; i < count; ++ i) {
+						pixel_data.set(pixels, shift + i * pixel_size);
 					}
 
 					shift += pixel_size * count;
@@ -191,8 +191,8 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 				} else {
 					// Raw pixels.
 					count *= pixel_size;
-					for (i = 0; i < count; ++i) {
-							pixel_data[shift + i] = data[offset++];
+					for (i = 0; i < count; ++ i) {
+						pixel_data[shift + i] = data[offset ++];
 					}
 					shift += count;
 				}
@@ -214,10 +214,10 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		var colormap = palettes;
 		var color, i = 0, x, y;
-				var width = header.width;
+		var width = header.width;
 
 		for (y = y_start; y !== y_end; y += y_step) {
-			for (x = x_start; x !== x_end; x += x_step, i++) {
+			for (x = x_start; x !== x_end; x += x_step, i ++) {
 				color = image[i];
 				imageData[(x + width * y) * 4 + 3] = 255;
 				imageData[(x + width * y) * 4 + 2] = colormap[(color * 3) + 0];
@@ -228,7 +228,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageData16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -247,7 +247,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageData24bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -265,7 +265,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageData32bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -283,7 +283,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageDataGrey8bits( imageData, y_start, y_step, y_end, x_start, x_step, x_end, image ) {
 
@@ -291,7 +291,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 		var width = header.width;
 
 		for (y = y_start; y !== y_end; y += y_step) {
-			for (x = x_start; x !== x_end; x += x_step, i++) {
+			for (x = x_start; x !== x_end; x += x_step, i ++) {
 				color = image[i];
 				imageData[(x + width * y) * 4 + 0] = color;
 				imageData[(x + width * y) * 4 + 1] = color;
@@ -302,7 +302,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function tgaGetImageDataGrey16bits(imageData, y_start, y_step, y_end, x_start, x_step, x_end, image) {
 
@@ -320,7 +320,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		return imageData;
 
-	};
+	}
 
 	function getTgaRGBA( width, height, image, palette ) {
 
@@ -332,7 +332,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 			y_end,
 			data = new Uint8Array(width * height * 4);
 
-		switch( (header.flags & TGA_ORIGIN_MASK) >> TGA_ORIGIN_SHIFT ) {
+		switch ( (header.flags & TGA_ORIGIN_MASK) >> TGA_ORIGIN_SHIFT ) {
 			default:
 			case TGA_ORIGIN_UL:
 				x_start = 0;
@@ -374,7 +374,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 
 		if ( use_grey ) {
 
-			switch( header.pixel_size ) {
+			switch ( header.pixel_size ) {
 				case 8:
 					tgaGetImageDataGrey8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 					break;
@@ -382,13 +382,13 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 					tgaGetImageDataGrey16bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image );
 					break;
 				default:
-					console.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
+					THREE.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
 					break;
 			}
 
 		} else {
 
-			switch( header.pixel_size ) {
+			switch ( header.pixel_size ) {
 				case 8:
 					tgaGetImageData8bits( data, y_start, y_step, y_end, x_start, x_step, x_end, image, palette );
 					break;
@@ -406,7 +406,7 @@ THREE.TGALoader.prototype._parser = function ( buffer ) {
 					break;
 
 				default:
-					console.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
+					THREE.error( 'THREE.TGALoader.parse.getTgaRGBA: not support this format' );
 					break;
 			}
 

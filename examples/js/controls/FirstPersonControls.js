@@ -163,7 +163,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onKeyUp = function ( event ) {
 
-		switch( event.keyCode ) {
+		switch ( event.keyCode ) {
 
 			case 38: /*up*/
 			case 87: /*W*/ this.moveForward = false; break;
@@ -229,7 +229,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		}
 
 		this.lon += this.mouseX * actualLookSpeed;
-		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
+		if ( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 		this.phi = THREE.Math.degToRad( 90 - this.lat );
@@ -271,7 +271,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		};
 
-	};
+	}
 
 	this.handleResize();
 
