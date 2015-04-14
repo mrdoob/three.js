@@ -68,7 +68,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 		if ( geometry.attributes.index !== undefined ) { // Indexed BufferGeometry
 
-			var vertices = geometry.attributes.position.array;
+			var vertices = geometry.attributes.position;
 			var indices = geometry.attributes.index.array;
 			var drawcalls = geometry.drawcalls;
 			var numEdges = 0;
@@ -120,10 +120,11 @@ THREE.WireframeGeometry = function ( geometry ) {
 				for ( var j = 0; j < 2; j ++ ) {
 
 					var index = 6 * i + 3 * j;
-					var index2 = 3 * edges[ 2 * i + j];
-					coords[ index + 0 ] = vertices[ index2 ];
-					coords[ index + 1 ] = vertices[ index2 + 1 ];
-					coords[ index + 2 ] = vertices[ index2 + 2 ];
+					var index2 = edges[2 * i + j];
+
+					coords[ index + 0 ] = vertices.getX( index2 );
+					coords[ index + 1 ] = vertices.getY( index2 );
+					coords[ index + 2 ] = vertices.getZ( index2 );
 
 				}
 

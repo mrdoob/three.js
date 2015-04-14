@@ -36,6 +36,7 @@
 	"src/extras/geometries/PlaneBufferGeometry.js",
 	"src/extras/geometries/RingGeometry.js",
 	"src/extras/geometries/SphereGeometry.js",
+	"src/extras/geometries/SphereBufferGeometry.js",
 	"src/extras/geometries/TextGeometry.js",
 	"src/extras/geometries/TorusGeometry.js",
 	"src/extras/geometries/TorusKnotGeometry.js",
