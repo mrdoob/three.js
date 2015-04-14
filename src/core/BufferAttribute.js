@@ -36,6 +36,14 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	copyArray: function ( array ) {
+
+		this.array.set( array );
+
+		return this;
+
+	},
+
 	copyColorsArray: function ( colors ) {
 
 		var array = this.array, offset = 0;
@@ -44,9 +52,58 @@ THREE.BufferAttribute.prototype = {
 
 			var color = colors[ i ];
 
+			if ( color === undefined ) {
+
+				console.warn( 'THREE.BufferAttribute.copyColorsArray(): color is undefined', i );
+				color = new THREE.Color();
+
+			}
+
 			array[ offset ++ ] = color.r;
 			array[ offset ++ ] = color.g;
 			array[ offset ++ ] = color.b;
+
+		}
+
+		return this;
+
+	},
+
+	copyFacesArray: function ( faces ) {
+
+		var array = this.array, offset = 0;
+
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+			var face = faces[ i ];
+
+			array[ offset ++ ] = face.a;
+			array[ offset ++ ] = face.b;
+			array[ offset ++ ] = face.c;
+
+		}
+
+		return this;
+
+	},
+
+	copyVector2sArray: function ( vectors ) {
+
+		var array = this.array, offset = 0;
+
+		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+
+			var vector = vectors[ i ];
+
+			if ( vector === undefined ) {
+
+				console.warn( 'THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i );
+				vector = new THREE.Vector2();
+
+			}
+
+			array[ offset ++ ] = vector.x;
+			array[ offset ++ ] = vector.y;
 
 		}
 
@@ -61,6 +118,13 @@ THREE.BufferAttribute.prototype = {
 		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
 			var vector = vectors[ i ];
+
+			if ( vector === undefined ) {
+
+				console.warn( 'THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i );
+				vector = new THREE.Vector3();
+
+			}
 
 			array[ offset ++ ] = vector.x;
 			array[ offset ++ ] = vector.y;
@@ -103,6 +167,38 @@ THREE.BufferAttribute.prototype = {
 		this.array[ index * this.itemSize + 2 ] = z;
 
 		return this;
+
+	},
+
+	setW: function ( index, w ) {
+
+		this.array[ index * this.itemSize + 3 ] = w;
+
+		return this;
+
+	},
+
+	getX: function ( index ) {
+
+		return this.array[ index * this.itemSize ];
+
+	},
+
+	getY: function ( index ) {
+
+		return this.array[ index * this.itemSize + 1 ];
+
+	},
+
+	getZ: function ( index ) {
+
+		return this.array[ index * this.itemSize + 2 ];
+
+	},
+
+	getW: function ( index ) {
+
+		return this.array[ index * this.itemSize + 3 ];
 
 	},
 

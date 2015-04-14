@@ -96,11 +96,7 @@
 
 				}
 
-
-				//console.log( "triangles: " + geometry.faces.length * 2 + " faces: " + geometry.faces.length + " vertices: " + geometry.vertices.length );
-
-				geometry.computeFaceNormals();
-				geometry.computeVertexNormals();
+				geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -164,11 +160,7 @@
 
 				}
 
-				//geometry.computeFaceNormals();
-				//geometry.computeVertexNormals();
-
 				mesh.geometry.verticesNeedUpdate = true;
-				//mesh.geometry.normalsNeedUpdate = true;
 
 				controls.update( delta );
 				renderer.render( scene, camera );

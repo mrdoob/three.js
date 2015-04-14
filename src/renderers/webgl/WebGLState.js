@@ -4,6 +4,8 @@
 
 THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
+	var _this = this;
+
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
@@ -29,6 +31,11 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentPolygonOffset = null;
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
+
+	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
+
+	var currentTextureSlot = undefined;
+	var currentBoundTextures = {};
 
 	this.initAttributes = function () {
 
@@ -338,6 +345,47 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		}
 
 	};
+
+	this.activeTexture = function ( webglSlot ) {
+
+		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+		if ( currentTextureSlot !== webglSlot ) {
+
+			gl.activeTexture( webglSlot );
+			currentTextureSlot = webglSlot;
+
+		}
+
+	}
+
+	this.bindTexture = function ( webglType, webglTexture ) {
+
+		if ( currentTextureSlot === undefined ) {
+
+			_this.activeTexture();
+
+		}
+
+		var boundTexture = currentBoundTextures[currentTextureSlot];
+
+		if ( boundTexture === undefined ) {
+
+			boundTexture = { type: undefined, texture: undefined };
+			currentBoundTextures[currentTextureSlot] = boundTexture;
+
+		}
+
+		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+
+			gl.bindTexture( webglType, webglTexture );
+
+			boundTexture.type = webglType;
+			boundTexture.texture = webglTexture;
+
+		}
+
+	}
 
 	this.reset = function () {
 

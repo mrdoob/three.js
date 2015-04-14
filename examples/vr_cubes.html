@@ -58,6 +58,7 @@
 			var vrEffect;
 			var vrControls;
 
+			var cubes = [];
 			var INTERSECTED;
 			var radius = 100, theta = 0;
 			var crosshair;
@@ -115,6 +116,7 @@
 					object.scale.z = Math.random() + 0.5;
 
 					scene.add( object );
+					cubes.push( object );
 
 				}
 
@@ -188,7 +190,7 @@
 
 				raycaster.setFromCamera( { x: 0, y: 0 }, camera );
 
-				var intersects = raycaster.intersectObjects( scene.children );
+				var intersects = raycaster.intersectObjects( cubes );
 
 				if ( intersects.length > 0 ) {
 

@@ -68,7 +68,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( position !== undefined ) {
 
-			matrix.applyToVector3Array( position.array );
+			matrix.applyToBuffer( position );
 			position.needsUpdate = true;
 
 		}
@@ -79,7 +79,7 @@ THREE.BufferGeometry.prototype = {
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.applyToVector3Array( normal.array );
+			normalMatrix.applyToBuffer( normal );
 			normal.needsUpdate = true;
 
 		}
@@ -128,13 +128,53 @@ THREE.BufferGeometry.prototype = {
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			this.fromGeometry( geometry, material );
+			if ( geometry instanceof THREE.DynamicGeometry ) {
+
+				this.fromDynamicGeometry( geometry );
+
+			} else if ( geometry instanceof THREE.Geometry ) {
+
+				this.fromGeometry( geometry, material );
+
+			}
 
 		}
 
 		if ( material.attributes !== undefined ) {
 
-			console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: material.attributes', material );
+			var attributes = material.attributes;
+
+			for ( var name in attributes ) {
+
+				var attribute = attributes[ name ];
+
+				var type = attribute.type;
+				var array = attribute.value;
+
+				switch ( type ) {
+
+					case "f":
+						var floats = new Float32Array( array.length );
+						this.addAttribute( name, new THREE.BufferAttribute( floats, 1 ).copyArray( array ) );
+						break;
+
+					case "c":
+						var colors = new Float32Array( array.length * 3 );
+						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyColorsArray( array ) );
+						break;
+
+					case "v3":
+						var colors = new Float32Array( array.length * 3 );
+						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( array ) );
+						break;
+
+					default:
+						console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: attribute unsupported', type );
+						break;
+
+				}
+
+			}
 
 		}
 
@@ -146,35 +186,69 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = object.geometry;
 
-		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+		if ( geometry.verticesNeedUpdate === true ) {
 
-			if ( geometry.verticesNeedUpdate === true ) {
+			var attribute = this.attributes.position;
 
-				var attribute = this.attributes.position;
+			if ( attribute !== undefined ) {
 
-				if ( attribute !== undefined ) {
-
-					attribute.copyVector3sArray( geometry.vertices );
-					attribute.needsUpdate = true;
-
-				}
-
-				geometry.verticesNeedUpdate = false;
+				attribute.copyVector3sArray( geometry.vertices );
+				attribute.needsUpdate = true;
 
 			}
 
-			if ( geometry.colorsNeedUpdate === true ) {
+			geometry.verticesNeedUpdate = false;
 
-				var attribute = this.attributes.color;
+		}
 
-				if ( attribute !== undefined ) {
+		if ( geometry.colorsNeedUpdate === true ) {
 
-					attribute.copyColorsArray( geometry.colors );
-					attribute.needsUpdate = true;
+			var attribute = this.attributes.color;
+
+			if ( attribute !== undefined ) {
+
+				attribute.copyColorsArray( geometry.colors );
+				attribute.needsUpdate = true;
+
+			}
+
+			geometry.colorsNeedUpdate = false;
+
+		}
+
+	},
+
+	updateFromMaterial: function ( material ) {
+
+		if ( material.attributes !== undefined ) {
+
+			var attributes = material.attributes;
+
+			for ( var name in attributes ) {
+
+				var attribute = attributes[ name ];
+
+				var type = attribute.type;
+				var array = attribute.value;
+
+				switch ( type ) {
+
+					case "f":
+						this.attributes[ name ].copyArray( array );
+						this.attributes[ name ].needsUpdate = true;
+						break;
+
+					case "c":
+						this.attributes[ name ].copyColorsArray( array );
+						this.attributes[ name ].needsUpdate = true;
+						break;
+
+					case "v3":
+						this.attributes[ name ].copyVector3sArray( array );
+						this.attributes[ name ].needsUpdate = true;
+						break;
 
 				}
-
-				geometry.colorsNeedUpdate = false;
 
 			}
 
@@ -182,15 +256,18 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromGeometry: function ( geometry, settings ) {
+	fromGeometry: function ( geometry, material ) {
 
-		settings = settings || { 'vertexColors': THREE.NoColors };
+		material = material || { 'vertexColors': THREE.NoColors };
 
 		var vertices = geometry.vertices;
 		var faces = geometry.faces;
 		var faceVertexUvs = geometry.faceVertexUvs;
-		var vertexColors = settings.vertexColors;
+		var vertexColors = material.vertexColors;
+
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+
 		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
 
 		var positions = new Float32Array( faces.length * 3 * 3 );
@@ -210,6 +287,13 @@ THREE.BufferGeometry.prototype = {
 
 			var uvs = new Float32Array( faces.length * 3 * 2 );
 			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+
+		}
+
+		if ( hasFaceVertexUv2 === true ) {
+
+			var uvs2 = new Float32Array( faces.length * 3 * 2 );
+			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs2, 2 ) );
 
 		}
 
@@ -322,7 +406,47 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
+			if ( hasFaceVertexUv2 === true ) {
+
+				var uva = faceVertexUvs[ 1 ][ i ][ 0 ];
+				var uvb = faceVertexUvs[ 1 ][ i ][ 1 ];
+				var uvc = faceVertexUvs[ 1 ][ i ][ 2 ];
+
+				uvs2[ i2     ] = uva.x;
+				uvs2[ i2 + 1 ] = uva.y;
+
+				uvs2[ i2 + 2 ] = uvb.x;
+				uvs2[ i2 + 3 ] = uvb.y;
+
+				uvs2[ i2 + 4 ] = uvc.x;
+				uvs2[ i2 + 5 ] = uvc.y;
+
+			}
+
 		}
+
+		this.computeBoundingSphere();
+
+		return this;
+
+	},
+
+	fromDynamicGeometry: function ( geometry ) {
+
+		var indices = new Uint16Array( geometry.faces.length * 3 );
+		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyFacesArray( geometry.faces ) );
+
+		var positions = new Float32Array( geometry.vertices.length * 3 );
+		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+
+		var normals = new Float32Array( geometry.normals.length * 3 );
+		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+
+		var colors = new Float32Array( geometry.colors.length * 3 );
+		this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+
+		var uvs = new Float32Array( geometry.uvs.length * 2 );
+		this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
 
 		this.computeBoundingSphere();
 
@@ -342,16 +466,16 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position.array;
+			var positions = this.attributes.position;
 
 			if ( positions ) {
 
 				var bb = this.boundingBox;
 				bb.makeEmpty();
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
 
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
 					bb.expandByPoint( vector );
 
 				}
@@ -388,7 +512,7 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position.array;
+			var positions = this.attributes.position;
 
 			if ( positions ) {
 
@@ -396,9 +520,9 @@ THREE.BufferGeometry.prototype = {
 
 				var center = this.boundingSphere.center;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
 
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
 					box.expandByPoint( vector );
 
 				}
@@ -410,9 +534,9 @@ THREE.BufferGeometry.prototype = {
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
 
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}
@@ -742,16 +866,18 @@ THREE.BufferGeometry.prototype = {
 	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
 	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
 	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-	size - Defaults to 65535, but allows for larger or smaller chunks.
+	size - Defaults to 65535 or 4294967296 if extension OES_element_index_uint supported, but allows for larger or smaller chunks.
 	*/
 	computeOffsets: function ( size ) {
 
-		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
+		if ( size === undefined ) size = THREE.BufferGeometry.MaxIndex;
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
 		var facesCount = ( indices.length / 3 );
+
+		var UintArray = ( ( vertices.length / 3 ) > 65535 && THREE.BufferGeometry.MaxIndex > 65535 ) ? Uint32Array : Uint16Array;
 
 		/*
 		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
@@ -759,7 +885,8 @@ THREE.BufferGeometry.prototype = {
 		THREE.log("Reordering "+verticesCount+" vertices.");
 		*/
 
-		var sortedIndices = new Uint16Array( indices.length ); //16-bit buffers
+		var sortedIndices = new UintArray( indices.length );
+
 		var indexPtr = 0;
 		var vertexPtr = 0;
 
@@ -775,7 +902,7 @@ THREE.BufferGeometry.prototype = {
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
-			We can have more than 65k entries in the index buffer per offset, but only reference 65k values.
+			We can have more than 'size' entries in the index buffer per offset, but only reference 'size' values.
 		*/
 		for ( var findex = 0; findex < facesCount; findex ++ ) {
 			newVerticeMaps = 0;
@@ -1041,3 +1168,5 @@ THREE.BufferGeometry.prototype = {
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );
+
+THREE.BufferGeometry.MaxIndex = 65535;

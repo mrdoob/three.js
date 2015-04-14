@@ -7,32 +7,12 @@ THREE.WebGLObjects = function ( gl, info ) {
 	var objects = {};
 	var objectsImmediate = [];
 
-	var geometries = {};
+	var geometries = new THREE.WebGLGeometries( gl, info );
 
 	var geometryGroups = {};
 	var geometryGroupCounter = 0;
 
 	//
-
-	function initGeometry( object ) {
-
-		var geometry = object.geometry;
-
-		geometry.addEventListener( 'dispose', onGeometryDispose );
-
-		if ( geometry instanceof THREE.BufferGeometry ) {
-
-			geometries[ geometry.id ] = geometry;
-
-		} else {
-
-			geometries[ geometry.id ] = new THREE.BufferGeometry().setFromObject( object );
-
-		}
-
-		info.memory.geometries ++;
-
-	}
 
 	function onObjectRemoved( event ) {
 
@@ -85,34 +65,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	//
 
-	function onGeometryDispose( event ) {
-
-		var geometry = event.target;
-
-		geometry.removeEventListener( 'dispose', onGeometryDispose );
-
-		geometry = geometries[ geometry.id ];
-
-		for ( var name in geometry.attributes ) {
-
-			var attribute = geometry.attributes[ name ];
-
-			if ( attribute.buffer !== undefined ) {
-
-				gl.deleteBuffer( attribute.buffer );
-
-				delete attribute.buffer;
-
-			}
-
-		}
-
-		info.memory.geometries --;
-
-	}
-
-	//
-
 	this.objects = objects;
 	this.objectsImmediate = objectsImmediate;
 
@@ -127,18 +79,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 			object._normalMatrix = new THREE.Matrix3();
 
 			object.addEventListener( 'removed', onObjectRemoved );
-
-		}
-
-		var geometry = object.geometry;
-
-		if ( geometry !== undefined ) {
-
-			if ( geometries[ geometry.id ] === undefined ) {
-
-				initGeometry( object );
-
-			}
 
 		}
 
@@ -173,19 +113,15 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	this.update = function ( object ) {
 
-		if ( geometries[ object.geometry.id ] === undefined ) {
+		var geometry = geometries.get( object );
 
-			initGeometry( object );
-
-		}
-
-		var geometry = geometries[ object.geometry.id ];
-
-		if ( object.geometry instanceof THREE.Geometry ) {
+		if ( object.geometry instanceof THREE.DynamicGeometry ) {
 
 			geometry.updateFromObject( object );
 
 		}
+
+		geometry.updateFromMaterial( object.material );
 
 		//
 
