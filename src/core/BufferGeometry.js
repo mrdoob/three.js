@@ -68,7 +68,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( position !== undefined ) {
 
-			matrix.applyToVector3Array( position.array );
+			matrix.applyToBuffer( position );
 			position.needsUpdate = true;
 
 		}
@@ -79,7 +79,7 @@ THREE.BufferGeometry.prototype = {
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.applyToVector3Array( normal.array );
+			normalMatrix.applyToBuffer( normal );
 			normal.needsUpdate = true;
 
 		}
@@ -466,16 +466,16 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position.array;
+			var positions = this.attributes.position;
 
 			if ( positions ) {
 
 				var bb = this.boundingBox;
 				bb.makeEmpty();
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
 
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
 					bb.expandByPoint( vector );
 
 				}
@@ -512,7 +512,7 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position.array;
+			var positions = this.attributes.position;
 
 			if ( positions ) {
 
@@ -520,9 +520,9 @@ THREE.BufferGeometry.prototype = {
 
 				var center = this.boundingSphere.center;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
 
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
 					box.expandByPoint( vector );
 
 				}
@@ -534,9 +534,9 @@ THREE.BufferGeometry.prototype = {
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
 
-					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}

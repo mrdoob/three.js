@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - shaders - sky sun shader</title>
@@ -75,7 +75,7 @@
 
 
 				// Add Sun Helper
-				sunSphere = new THREE.Mesh( new THREE.SphereGeometry( 20000, 30, 30 ),
+				sunSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 20000, 30, 30 ),
 					new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: false }));
 				sunSphere.position.y = -700000;
 				sunSphere.visible = true;
