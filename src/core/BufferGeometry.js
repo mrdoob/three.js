@@ -268,7 +268,7 @@ THREE.BufferGeometry.prototype = {
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
-		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
+		var hasFaceVertexNormals = faces[ 0 ] && faces[ 0 ].vertexNormals.length == 3;
 
 		var positions = new Float32Array( faces.length * 3 * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
