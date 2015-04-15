@@ -265,7 +265,7 @@ THREE.BufferGeometry.prototype = {
 		var faceVertexUvs = geometry.faceVertexUvs;
 		var vertexColors = material.vertexColors;
 
-		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		var hasFaceVertexNormals = faces[ 0 ] && faces[ 0 ].vertexNormals.length == 3;
@@ -391,35 +391,55 @@ THREE.BufferGeometry.prototype = {
 
 			if ( hasFaceVertexUv === true ) {
 
-				var uva = faceVertexUvs[ 0 ][ i ][ 0 ];
-				var uvb = faceVertexUvs[ 0 ][ i ][ 1 ];
-				var uvc = faceVertexUvs[ 0 ][ i ][ 2 ];
+				var vertexUvs = faceVertexUvs[ 0 ][ i ];
 
-				uvs[ i2     ] = uva.x;
-				uvs[ i2 + 1 ] = uva.y;
+				if ( vertexUvs !== undefined ) {
 
-				uvs[ i2 + 2 ] = uvb.x;
-				uvs[ i2 + 3 ] = uvb.y;
+					var uva = vertexUvs[ 0 ];
+					var uvb = vertexUvs[ 1 ];
+					var uvc = vertexUvs[ 2 ];
 
-				uvs[ i2 + 4 ] = uvc.x;
-				uvs[ i2 + 5 ] = uvc.y;
+					uvs[ i2     ] = uva.x;
+					uvs[ i2 + 1 ] = uva.y;
+
+					uvs[ i2 + 2 ] = uvb.x;
+					uvs[ i2 + 3 ] = uvb.y;
+
+					uvs[ i2 + 4 ] = uvc.x;
+					uvs[ i2 + 5 ] = uvc.y;
+
+				} else {
+
+					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i )
+
+				}
 
 			}
 
 			if ( hasFaceVertexUv2 === true ) {
 
-				var uva = faceVertexUvs[ 1 ][ i ][ 0 ];
-				var uvb = faceVertexUvs[ 1 ][ i ][ 1 ];
-				var uvc = faceVertexUvs[ 1 ][ i ][ 2 ];
+				var vertexUvs = faceVertexUvs[ 1 ][ i ];
 
-				uvs2[ i2     ] = uva.x;
-				uvs2[ i2 + 1 ] = uva.y;
+				if ( vertexUvs !== undefined ) {
 
-				uvs2[ i2 + 2 ] = uvb.x;
-				uvs2[ i2 + 3 ] = uvb.y;
+					var uva = vertexUvs[ 0 ];
+					var uvb = vertexUvs[ 1 ];
+					var uvc = vertexUvs[ 2 ];
 
-				uvs2[ i2 + 4 ] = uvc.x;
-				uvs2[ i2 + 5 ] = uvc.y;
+					uvs2[ i2     ] = uva.x;
+					uvs2[ i2 + 1 ] = uva.y;
+
+					uvs2[ i2 + 2 ] = uvb.x;
+					uvs2[ i2 + 3 ] = uvb.y;
+
+					uvs2[ i2 + 4 ] = uvc.x;
+					uvs2[ i2 + 5 ] = uvc.y;
+
+				} else {
+
+					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i )
+
+				}
 
 			}
 

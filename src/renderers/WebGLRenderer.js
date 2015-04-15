@@ -963,13 +963,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( material.defaultAttributeValues !== undefined ) {
 
-					if ( material.defaultAttributeValues[ key ].length === 2 ) {
+					if ( material.defaultAttributeValues[ key ] !== undefined ) {
 
-						_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ key ] );
+						if ( material.defaultAttributeValues[ key ].length === 2 ) {
 
-					} else if ( material.defaultAttributeValues[ key ].length === 3 ) {
+							_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ key ] );
 
-						_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ key ] );
+						} else if ( material.defaultAttributeValues[ key ].length === 3 ) {
+
+							_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ key ] );
+
+						}
 
 					}
 
