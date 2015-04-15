@@ -1532,6 +1532,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
 
+		} else if ( a.material.program !== b.material.program ) {
+
+			return a.material.program.id - b.material.program.id;
+
 		} else if ( a.material.id !== b.material.id ) {
 
 			return a.material.id - b.material.id;
