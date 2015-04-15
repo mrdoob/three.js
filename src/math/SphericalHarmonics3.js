@@ -1,7 +1,10 @@
 /**
  * @author bhouston / http://clara.io
  *
- * Good references:
+ * Primary theory reference:
+ *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
+ *
+ * Good secondary references:
  *   http://www1.cs.columbia.edu/~cs4162/slides/spherical-harmonic-lighting.pdf
  *   http://www.ppsloan.org/publications/StupidSH36.pdf
  *   http://www.sunandblackcat.com/tipFullView.php?l=eng&topicid=32
