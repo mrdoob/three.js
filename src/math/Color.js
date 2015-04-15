@@ -306,6 +306,16 @@ THREE.Color.prototype = {
 
 	},
 
+	addScale: function ( color, s ) {
+
+		this.r += color.r * s;
+		this.g += color.g * s;
+		this.b += color.b * s;
+
+		return this;
+
+	},
+
 	addColors: function ( color1, color2 ) {
 
 		this.r = color1.r + color2.r;
