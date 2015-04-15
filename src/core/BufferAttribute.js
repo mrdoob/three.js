@@ -146,11 +146,23 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	getX: function ( index ) {
+
+		return this.array[ index * this.itemSize ];
+
+	},
+
 	setX: function ( index, x ) {
 
 		this.array[ index * this.itemSize ] = x;
 
 		return this;
+
+	},
+
+	getY: function ( index ) {
+
+		return this.array[ index * this.itemSize + 1 ];
 
 	},
 
@@ -162,6 +174,12 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	getZ: function ( index ) {
+
+		return this.array[ index * this.itemSize + 2 ];
+
+	},
+
 	setZ: function ( index, z ) {
 
 		this.array[ index * this.itemSize + 2 ] = z;
@@ -170,35 +188,17 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
+	getW: function ( index ) {
+
+		return this.array[ index * this.itemSize + 3 ];
+
+	},
+
 	setW: function ( index, w ) {
 
 		this.array[ index * this.itemSize + 3 ] = w;
 
 		return this;
-
-	},
-
-	getX: function ( index ) {
-
-		return this.array[ index * this.itemSize ];
-
-	},
-
-	getY: function ( index ) {
-
-		return this.array[ index * this.itemSize + 1 ];
-
-	},
-
-	getZ: function ( index ) {
-
-		return this.array[ index * this.itemSize + 2 ];
-
-	},
-
-	getW: function ( index ) {
-
-		return this.array[ index * this.itemSize + 3 ];
 
 	},
 
