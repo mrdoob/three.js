@@ -1966,14 +1966,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.precision ) {
 			if ( material.precision === 'highp' && ! highpAvailable ) {
 				if ( mediumpAvailable ) {
-					material.precision = 'mediump';
+					console.warn("Material requires highp but only mediump is available.");
 				} else {
-					material.precision = 'lowp';
+					console.warn("Material requires highp but only lowp is available.");
 				}
 			}
 
 			if ( material.precision === 'mediump' && ! mediumpAvailable ) {
-				material.precision = 'lowp';
+				console.warn("Material requires mediump but only lowp is available.");
 			}
 		}
 
