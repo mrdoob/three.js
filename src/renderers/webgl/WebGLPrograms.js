@@ -3,7 +3,6 @@
 */
 
 THREE.WebGLPrograms = function ( gl, renderer ) {
-
 	var _this = this;
 
 	var programCache = {};
@@ -12,7 +11,193 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 
 	var programCount = 0;
 
-	this.initProgram = function ( material, params ) {
+	
+	function getMaxBones ( object, supportsBoneTextures ) {
+
+		if ( supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
+
+			return 1024;
+
+		} else {
+
+			// default for when object is not specified
+			// ( for example when prebuilding shader to be used with multiple objects )
+			//
+			//  - leave some extra space for other uniforms
+			//  - limit here is ANGLE's 254 max uniform vectors
+			//    (up to 54 should be safe)
+
+			var vertexUniforms = gl.getParameter( gl.MAX_VERTEX_UNIFORM_VECTORS );
+			var maxBones = Math.floor( ( vertexUniforms - 20 ) / 4 );
+
+			if ( object && object instanceof THREE.SkinnedMesh ) {
+
+				maxBones = Math.min( object.skeleton.bones.length, maxBones );
+
+				if ( maxBones < object.skeleton.bones.length ) {
+
+					THREE.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
+
+				}
+
+			}
+
+			return maxBones;
+
+		}
+
+	}
+
+	function updateObjectParams( params, object ) {
+
+		var maxBones = getMaxBones( object, params.supportsBoneTextures );
+
+		params.maxBones = maxBones;
+		params.useVertexTexture = params.supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture;
+		params.shadowMapEnabled = params.shadowMapGoballyEnabled && object && object.receiveShadow && params.maxShadows > 0;
+
+	}
+
+	function onMaterialDispose( event ) {
+
+		var material = event.target;
+
+		material.removeEventListener( 'dispose', onMaterialDispose );
+
+		var program = material.program;
+
+		if ( program === undefined ) return;
+
+		material.program = undefined;
+
+		_this.release( program );
+
+	}
+
+	this.resolvePrograms = function ( renderList, params, overrideMaterial ) {
+
+		if ( !!overrideMaterial ) {
+
+			if ( overrideMaterial.visible && overrideMaterial.needsUpdate ) {
+
+				updateObjectParams( params, undefined );
+
+				var prevProgram = material.program;
+
+				if ( !overrideMaterial.program ) {
+
+					overrideMaterial.addEventListener( 'dispose', onMaterialDispose );
+
+				}
+
+				var releaseProgram = initProgram( overrideMaterial, params );
+
+				if ( releaseProgram ) {
+
+					_this.release( prevProgram );
+
+				}
+
+				return [overrideMaterial.program];
+
+			}
+
+			return undefined;
+
+		} 
+
+		var programsToRelease, programsUpdated;
+
+		for ( var i = 0, ul = renderList.length; i < ul; i++ ) {
+
+			var object = renderList[i];
+			var material = object.material;
+
+			if ( material && material.visible && material.needsUpdate ) {
+
+				updateObjectParams( params, object );
+
+				var prevProgram = material.program;
+
+				if ( !material.program ) {
+
+					material.addEventListener( 'dispose', onMaterialDispose );
+
+				}
+
+				var releaseProgram = initProgram( material, params );
+
+				if ( releaseProgram ) {
+
+					programsToRelease = programsToRelease || [];
+					programsToRelease.push( prevProgram );
+
+				}
+
+				programsUpdated = programsUpdated || [];
+				programsUpdated.push( material.program );
+
+			}
+
+		}
+
+		if ( programsToRelease !== undefined ) {
+
+			for ( var i = 0, ul = programsToRelease.length; i < ul; i++ ) {
+
+				_this.release( programsToRelease[i] );
+
+			}
+
+		}
+
+		return programsUpdated;
+
+	}
+
+	this.link = function ( programs ) {
+
+		if ( programs !== undefined ) {
+
+			for ( var i = 0, ul = programs.length; i < ul; i++ ) {
+
+				var program = programs[i];
+
+				if ( program.state === THREE.WebGLProgram.CompilingState ) {
+
+					updateProgramCompileState( program );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	this.linkComplete = function ( programs ) {
+
+		if ( programs !== undefined ) {
+
+			for ( var i = 0, ul = programs.length; i < ul; i++ ) {
+
+				var program = programs[i];
+
+				if ( program.state === THREE.WebGLProgram.LinkingState ) {
+
+					updateLinkState( program );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	function initProgram ( material, params ) {
+
+		var releasedProgram = false;
 
 		var codeParams = generateCodeAndParams( material, params );
 
@@ -22,7 +207,7 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 
 			if ( program === undefined || material.program.id !== program.id ) {
 
-				_this.release( material.program );
+				releasedProgram = true;
 
 				material.program = undefined;
 
@@ -43,7 +228,7 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 
 				}
 
-				return;
+				return releasedProgram;
 
 			}
 
@@ -54,7 +239,7 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 			program.usedTimes++;
 			material.program = program;
 
-			return;
+			return releasedProgram;
 
 		}
 
@@ -81,7 +266,7 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 
 		material.program = program;
 
-		return;
+		return releasedProgram;
 
 	};
 
@@ -121,7 +306,7 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 
 			deleteProgram( program );
 
-			programCache[program.code] = undefined;
+			delete programCache[program.code];
 
 		}
 
@@ -135,11 +320,11 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 
 			if ( shader.type === gl.VERTEX_SHADER ) {
 
-				vertexShaderCache[shader.source] = undefined;
+				delete vertexShaderCache[shader.source];
 
 			} else {
 
-				fragmentShaderCache[shader.source] = undefined;
+				delete fragmentShaderCache[shader.source];
 
 			}
 

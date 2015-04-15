@@ -638,16 +638,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onMaterialDispose = function ( event ) {
-
-		var material = event.target;
-
-		material.removeEventListener( 'dispose', onMaterialDispose );
-
-		deallocateMaterial( material );
-
-	};
-
 	// Buffer deallocation
 
 	var deallocateTexture = function ( texture ) {
@@ -701,18 +691,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		delete renderTarget.__webglFramebuffer;
 		delete renderTarget.__webglRenderbuffer;
-
-	};
-
-	var deallocateMaterial = function ( material ) {
-
-		var program = material.program;
-
-		if ( program === undefined ) return;
-
-		material.program = undefined;
-
-		programs.release( program );
 
 	};
 
@@ -936,10 +914,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
-
-		if ( material.visible === false ) return;
-
-		objects.update( object );
 
 		var program = setProgram( camera, lights, fog, material, object );
 
@@ -1523,7 +1497,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( a.material.program !== b.material.program ) {
 
-			return ( a.material.program ? a.material.program.id : 0 ) - ( b.material.program ? b.material.program.id : 0 );
+			return a.material.program.id - b.material.program.id;
 
 		} else if ( a.material.id !== b.material.id ) {
 
@@ -1567,6 +1541,241 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Rendering
 
+	var renderParams;
+
+	function setupRenderParams( lights, fog ) {
+
+		// heuristics to create shader parameters according to lights in the scene
+		// (not to blow over maxLights budget)
+		var dirLights = 0;
+		var pointLights = 0;
+		var spotLights = 0;
+		var hemiLights = 0;
+
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
+
+			var light = lights[ l ];
+
+			if ( light.onlyShadow || light.visible === false ) continue;
+
+			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
+			if ( light instanceof THREE.PointLight ) pointLights ++;
+			if ( light instanceof THREE.SpotLight ) spotLights ++;
+			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
+
+		}
+
+		var maxShadows = 0;
+
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
+
+			var light = lights[ l ];
+
+			if ( ! light.castShadow ) continue;
+
+			if ( light instanceof THREE.SpotLight ) maxShadows ++;
+			if ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) maxShadows ++;
+
+		}
+
+		if ( renderParams === undefined ) {
+
+			renderParams = {
+				precision: _precision,
+				supportsVertexTextures: _supportsVertexTextures,
+
+				fog: fog,
+				fogExp: fog instanceof THREE.FogExp2,
+
+				logarithmicDepthBuffer: _logarithmicDepthBuffer,
+
+				maxBones: 0, // overriden per object
+				supportsBoneTextures: _supportsBoneTextures,
+				useVertexTexture: _supportsBoneTextures, // overriden per object
+
+				maxMorphTargets: _this.maxMorphTargets,
+				maxMorphNormals: _this.maxMorphNormals,
+
+				maxDirLights: dirLights,
+				maxPointLights: pointLights,
+				maxSpotLights: spotLights,
+				maxHemiLights: hemiLights,
+
+				maxShadows: maxShadows,
+				shadowMapGoballyEnabled: shadowMap.enabled,
+				shadowMapEnabled: shadowMap.enabled, // overriden per object
+				shadowMapType: shadowMap.type,
+				shadowMapDebug: shadowMap.debug,
+				shadowMapCascade: shadowMap.cascade
+
+			};
+
+		} else {
+
+			renderParams.precision = _precision,
+			renderParams.supportsVertexTextures = _supportsVertexTextures,
+
+			renderParams.fog = fog,
+			renderParams.fogExp = fog instanceof THREE.FogExp2,
+
+			renderParams.logarithmicDepthBuffer = _logarithmicDepthBuffer,
+
+			renderParams.maxBones = 0, // overriden per object
+			renderParams.supportsBoneTextures = _supportsBoneTextures,
+			renderParams.useVertexTexture = _supportsBoneTextures, // overriden per object
+
+			renderParams.maxMorphTargets = _this.maxMorphTargets,
+			renderParams.maxMorphNormals = _this.maxMorphNormals,
+
+			renderParams.maxDirLights = dirLights,
+			renderParams.maxPointLights = pointLights,
+			renderParams.maxSpotLights = spotLights,
+			renderParams.maxHemiLights = hemiLights,
+
+			renderParams.maxShadows = maxShadows,
+			renderParams.shadowMapGoballyEnabled = shadowMap.enabled,
+			renderParams.shadowMapEnabled = shadowMap.enabled, // overriden per object
+			renderParams.shadowMapType = shadowMap.type,
+			renderParams.shadowMapDebug = shadowMap.debug,
+			renderParams.shadowMapCascade = shadowMap.cascade
+
+		}
+	}
+
+	function resolvePrograms() {
+
+		var resolvedPrograms, programsUpdated;
+		// shadow map resolve
+
+		resolvedPrograms = programs.resolvePrograms( opaqueObjects, renderParams, scene.overrideMaterial );
+		if ( resolvedPrograms !== undefined ) {
+
+			programsUpdated = programsUpdated || [];
+			Array.prototype.push.apply( programsUpdated, resolvedPrograms );
+
+		}
+
+		resolvedPrograms = programs.resolvePrograms( transparentObjects, renderParams, scene.overrideMaterial );
+		if ( resolvedPrograms !== undefined ) {
+
+			programsUpdated = programsUpdated || [];
+			Array.prototype.push.apply( programsUpdated, resolvedPrograms );
+
+		}
+		// immediate resolve
+		// sprite resolve
+		// lens flare resolve
+
+		return programsUpdated;
+	}
+
+	function uploadTextures( renderList, overrideMaterial ) {
+		
+		if ( overrideMaterial ) {
+
+			if ( overrideMaterial.visible ) {
+
+			}
+
+			return;
+		}
+
+		for ( var i = 0, il = renderList.length; i < il; i++ ) {
+
+			var material = renderList[i].material;
+
+			if ( material.uniformsList !== undefined ) {
+
+				var uniforms = material.uniformsList;
+				for ( var u = 0, ul = uniforms.length; u < ul; u++ ) {
+
+					var uniform = uniforms[u];
+
+					if ( uniform[0].type === 't' ) {
+
+						var texture = uniform[0].value;
+
+						if ( texture.needsUpdate === true ) {
+
+							if ( texture.image.complete === false ) {
+
+								THREE.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
+								continue;
+
+							}
+
+							_this.uploadTexture( uniform[0].value, 0 );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	this.dataUpdate = function (scene) {
+
+		lights.length = 0;
+		opaqueObjects.length = 0;
+		transparentObjects.length = 0;
+
+		sprites.length = 0;
+		lensFlares.length = 0;
+
+		_this.info.render.calls = 0;
+		_this.info.render.vertices = 0;
+		_this.info.render.faces = 0;
+		_this.info.render.points = 0;
+
+		projectObject( scene );
+
+		var fog = scene.fog;
+
+
+		// *************************** TODO
+
+		// Setup scene wide parameters
+		setupRenderParams( lights, fog );
+		// Send new programs for compliation
+		var programsUpdated = resolvePrograms();
+
+		// *******************************
+
+		if ( _this.sortObjects === true ) {
+
+			opaqueObjects.sort( painterSortStable );
+			transparentObjects.sort( reversePainterSortStable );
+
+		}
+
+		// ******************************* TODO
+
+		// Update vertex/attribute buffers
+		objects.update( opaqueObjects );
+		objects.update( transparentObjects );
+		// other ones..?
+
+
+
+		// link complied 
+		programs.link( programsUpdated );
+
+		// upload textures
+		uploadTextures( opaqueObjects, scene.overrideMaterial );
+		uploadTextures( transparentObjects, scene.overrideMaterial );
+
+		// Force program link completion
+		programs.linkComplete( programsUpdated );
+		// *******************************
+		//
+
+	}
+
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
@@ -1593,49 +1802,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
-		// update Skeleton objects
-
-		scene.traverse( function ( object ) {
-
-			if ( object instanceof THREE.SkinnedMesh ) {
-
-				object.skeleton.update();
-
-			}
-
-		} );
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
-		lights.length = 0;
-		opaqueObjects.length = 0;
-		transparentObjects.length = 0;
-
-		sprites.length = 0;
-		lensFlares.length = 0;
-
-		projectObject( scene );
-
-		if ( _this.sortObjects === true ) {
-
-			opaqueObjects.sort( painterSortStable );
-			transparentObjects.sort( reversePainterSortStable );
-
-		}
-
-		//
+		_this.dataUpdate( scene );
 
 		shadowMap.render( scene, camera );
-
-		//
-
-		_this.info.render.calls = 0;
-		_this.info.render.vertices = 0;
-		_this.info.render.faces = 0;
-		_this.info.render.points = 0;
 
 		this.setRenderTarget( renderTarget );
 
@@ -1720,6 +1894,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// skip
 
 		} else {
+
+			// update Skeleton objects
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				object.skeleton.update();
+
+			}
 
 			objects.init( object );
 
@@ -1903,60 +2084,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 
 	function initMaterial( material, lights, fog, object ) {
-
-		// heuristics to create shader parameters according to lights in the scene
-		// (not to blow over maxLights budget)
-
-		var maxLightCount = allocateLights( lights );
-		var maxShadows = allocateShadows( lights );
-		var maxBones = allocateBones( object );
-
-		if ( !material.program ) {
-
-		    // new material
-		    material.addEventListener( 'dispose', onMaterialDispose );
-
-		}
-
-
-		//else if ( material.program.code !== code ) {
-
-		//    // changed glsl or parameters
-		//	deallocateMaterial( material );
-		//	material.program = undefined;
-
-		//}
-
-		var params = {
-
-			precision: _precision,
-			supportsVertexTextures: _supportsVertexTextures,
-
-			fog: fog,
-			fogExp: fog instanceof THREE.FogExp2,
-
-			logarithmicDepthBuffer: _logarithmicDepthBuffer,
-
-			maxBones: maxBones,
-			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
-
-			maxMorphTargets: _this.maxMorphTargets,
-			maxMorphNormals: _this.maxMorphNormals,
-
-			maxDirLights: maxLightCount.directional,
-			maxPointLights: maxLightCount.point,
-			maxSpotLights: maxLightCount.spot,
-			maxHemiLights: maxLightCount.hemi,
-
-			maxShadows: maxShadows,
-			shadowMapEnabled: shadowMap.enabled && object.receiveShadow && maxShadows > 0,
-			shadowMapType: shadowMap.type,
-			shadowMapDebug: shadowMap.debug,
-			shadowMapCascade: shadowMap.cascade
-
-		};
-
-		programs.initProgram( material, params );
 
 		var program = material.program;
 
@@ -3836,89 +3963,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		return 0;
-
-	}
-
-	// Allocations
-
-	function allocateBones ( object ) {
-
-		if ( _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
-
-			return 1024;
-
-		} else {
-
-			// default for when object is not specified
-			// ( for example when prebuilding shader to be used with multiple objects )
-			//
-			//  - leave some extra space for other uniforms
-			//  - limit here is ANGLE's 254 max uniform vectors
-			//    (up to 54 should be safe)
-
-			var nVertexUniforms = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );
-			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
-
-			var maxBones = nVertexMatrices;
-
-			if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
-
-				maxBones = Math.min( object.skeleton.bones.length, maxBones );
-
-				if ( maxBones < object.skeleton.bones.length ) {
-
-					THREE.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
-
-				}
-
-			}
-
-			return maxBones;
-
-		}
-
-	}
-
-	function allocateLights( lights ) {
-
-		var dirLights = 0;
-		var pointLights = 0;
-		var spotLights = 0;
-		var hemiLights = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( light.onlyShadow || light.visible === false ) continue;
-
-			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
-			if ( light instanceof THREE.PointLight ) pointLights ++;
-			if ( light instanceof THREE.SpotLight ) spotLights ++;
-			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
-
-		}
-
-		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
-
-	}
-
-	function allocateShadows( lights ) {
-
-		var maxShadows = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( ! light.castShadow ) continue;
-
-			if ( light instanceof THREE.SpotLight ) maxShadows ++;
-			if ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) maxShadows ++;
-
-		}
-
-		return maxShadows;
 
 	}
 
