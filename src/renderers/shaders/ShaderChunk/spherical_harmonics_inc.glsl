@@ -1,7 +1,5 @@
-uniform vec3 shCoefficients[9];
-
 // normal is assumed to be unit length!
-vec3 shGetRadianceAt( vec3 normal )
+vec3 shGetRadianceAt( vec3 shCoefficients[9], vec3 normal )
 {
 
     float x = normal.x, y = normal.y, z = normal.z;
@@ -36,7 +34,7 @@ vec3 shGetRadianceAt( vec3 normal )
 #define C5 0.247708
 
 // normal is assumed to be unit length!
-vec3 shGetIrradianceAt( vec3 normal )
+vec3 shGetIrradianceAt( vec3 shCoefficients[9], vec3 normal )
 {
 
     float x = normal.x, y = normal.y, z = normal.z;
