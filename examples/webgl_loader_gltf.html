@@ -188,11 +188,10 @@
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
                 if (sceneInfo.shadows) {
-	                renderer.shadowMapEnabled = true;
-	                renderer.shadowMapSoft = true;
-	        		renderer.shadowMapType = THREE.PCFSoftShadowMap;
+	                renderer.shadowMap.enabled = true;
+	                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 }
-                				
+
                 container.appendChild( renderer.domElement );
 
                 var ground = null;

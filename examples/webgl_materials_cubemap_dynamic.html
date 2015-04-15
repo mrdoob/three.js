@@ -194,8 +194,8 @@
 
 				// SHADOW
 
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
 
 				// STATS
 
@@ -982,7 +982,7 @@
 				// render scene
 
 				renderer.autoClear = false;
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.enabled = true;
 
 				camera.lookAt( cameraTarget );
 
@@ -991,7 +991,7 @@
 				renderer.clear();
 				composer.render( 0.1 );
 
-				renderer.shadowMapEnabled = false;
+				renderer.shadowMap.enabled = false;
 
 			}
 
