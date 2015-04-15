@@ -68,7 +68,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( position !== undefined ) {
 
-			matrix.applyToBuffer( position );
+			matrix.applyToVector3Array( position.array );
 			position.needsUpdate = true;
 
 		}
@@ -79,7 +79,7 @@ THREE.BufferGeometry.prototype = {
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.applyToBuffer( normal );
+			normalMatrix.applyToVector3Array( normal.array );
 			normal.needsUpdate = true;
 
 		}
