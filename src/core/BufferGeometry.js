@@ -466,16 +466,16 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position;
+			var positions = this.attributes.position.array;
 
 			if ( positions ) {
 
 				var bb = this.boundingBox;
 				bb.makeEmpty();
 
-				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
+				for ( var i = 0, il = positions.length; i < il; i ++ ) {
 
-					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
+					vector.fromArray( positions, i );
 					bb.expandByPoint( vector );
 
 				}
@@ -512,7 +512,7 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position;
+			var positions = this.attributes.position.array;
 
 			if ( positions ) {
 
@@ -520,9 +520,9 @@ THREE.BufferGeometry.prototype = {
 
 				var center = this.boundingSphere.center;
 
-				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
+				for ( var i = 0, il = positions.length; i < il; i ++ ) {
 
-					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
+					vector.fromArray( positions, i );
 					box.expandByPoint( vector );
 
 				}
@@ -534,9 +534,9 @@ THREE.BufferGeometry.prototype = {
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
+				for ( var i = 0, il = positions.length; i < il; i ++ ) {
 
-					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
+					vector.fromArray( positions, i );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}
