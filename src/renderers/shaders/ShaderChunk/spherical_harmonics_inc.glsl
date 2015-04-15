@@ -1,12 +1,7 @@
 uniform vec3 shCoefficients[9];
 
-#define C1 0.429043
-#define C2 0.511664
-#define C3 0.743125
-#define C4 0.886227
-#define C5 0.247708
-
-vec3 shGetAt( vec3 normal )
+// normal is assumed to be unit length!
+vec3 shGetRadianceAt( vec3 normal )
 {
 
     float x = normal.x, y = normal.y, z = normal.z;
@@ -32,8 +27,16 @@ vec3 shGetAt( vec3 normal )
 
 }
 
+// constants to convert from radiance to hemispheric irradiance
+// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf
+#define C1 0.429043
+#define C2 0.511664
+#define C3 0.743125
+#define C4 0.886227
+#define C5 0.247708
+
 // normal is assumed to be unit length!
-vec3 shGetHemiIrradianceAt( vec3 normal )
+vec3 shGetIrradianceAt( vec3 normal )
 {
 
     float x = normal.x, y = normal.y, z = normal.z;

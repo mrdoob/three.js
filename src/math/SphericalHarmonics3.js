@@ -22,7 +22,8 @@ THREE.SphericalHarmonics3 = function () {
 
 };
 
-// constants from http://www.yaldex.com/open-gl/ch12lev1sec3.html and
+// constants to convert from radiance to hemispheric irradiance
+// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf
 THREE.SphericalHarmonics3.C1 = 0.429043;
 THREE.SphericalHarmonics3.C2 = 0.511664;
 THREE.SphericalHarmonics3.C3 = 0.743125;
@@ -59,8 +60,8 @@ THREE.SphericalHarmonics3.prototype = {
 
 	},
 
+	// get the radiance
 	// normal is assumed to be unit length!
-	// this is the radiance
 	getAt: function( normal, optionalResult ) {
 
 		var result = optionalResult || new THREE.Color();
@@ -86,10 +87,9 @@ THREE.SphericalHarmonics3.prototype = {
 		return result;
 	},
 
+	// get the irradiance (radiance convolved with hermispheric smooth lobe)
 	// normal is assumed to be unit length!
-	// this function convolves the base spherical harmoninc radiance with a cosine lobe representing
-	// a smooth hemispheric function.
-	getHemiIrradianceAt: function( normal, optionalResult ) {
+	getIrradianceAt: function( normal, optionalResult ) {
 
 		var result = optionalResult || new THREE.Color();
 
