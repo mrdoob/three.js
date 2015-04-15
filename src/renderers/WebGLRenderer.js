@@ -987,8 +987,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		objects.update( object );
-
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
