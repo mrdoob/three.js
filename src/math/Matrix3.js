@@ -134,7 +134,7 @@ THREE.Matrix3.prototype = {
 
 			}
 
-			return array;
+			return buffer;
 
 		};
 
