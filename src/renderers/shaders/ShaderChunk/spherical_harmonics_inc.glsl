@@ -25,7 +25,7 @@ vec3 sphericalHarmonicsEvaluate( vec3 normal )
     // band 2
     result += shCoefficients[4] * 2.0 * C1 * x*y;
     result += shCoefficients[5] * 2.0 * C1 * y*z;
-    result += shCoefficients[6] * C3 * z*z - C5;
+    result += shCoefficients[6] * ( C3 * z*z - C5 );
     result += shCoefficients[7] * 2.0 * C1 * x*z;
     result += shCoefficients[8] * C1 * ( x*x - y*y );
 
