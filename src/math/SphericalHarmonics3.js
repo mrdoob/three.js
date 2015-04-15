@@ -38,7 +38,7 @@ THREE.SphericalHarmonics3.prototype = {
 	zero: function () {
 
 		for( var i = 0; i < 9; i ++ ) {
-			this.coefficients[i].set( 0, 0, 0 );
+			this.coefficients[i].setRGB( 0, 0, 0 );
 		}
 
 		return this;
@@ -48,7 +48,7 @@ THREE.SphericalHarmonics3.prototype = {
 	set: function ( coefficients ) {
 
 		for( var i = 0; i < 9; i ++ ) {
-			this.coefficients[i].set( coefficients[i] );
+			this.coefficients[i].copy( coefficients[i] );
 		}
 
 		return this;
@@ -94,13 +94,12 @@ THREE.SphericalHarmonics3.prototype = {
 
 		var result = optionalResult || new THREE.Color();
 
-		var c = THREE.SphericalHarmonics3;
-
 		var x = normal.x, y = normal.y, z = normal.z;
 		var coeff = this.coefficients;
+		var c = THREE.SphericalHarmonics3;
 
 		// band 0
-		result.copy( coeff[0], c.C4 );
+		result.copy( coeff[0] );
 		result.multiplyScalar( c.C4 );
 
 		// band 1
@@ -147,6 +146,17 @@ THREE.SphericalHarmonics3.prototype = {
 
 	},
 
+	equals: function ( other ) {
+
+		for( var i = 0; i < 9; i ++ ) {
+			if( ! this.coefficients[i].equals( other.coefficients[i] ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	},
+
 	clone: function () {
 
 		return new THREE.SphericalHarmonics3().copy( this );
@@ -159,7 +169,7 @@ THREE.SphericalHarmonics3.prototype = {
 // Debevec's light probe gallery examples.  Source: http://www.yaldex.com/open-gl/ch12lev1sec3.html
 //
 
-THREE.SphericalHarmoncs3.EucalyptusGroove = new THREE.SphericalHarmoncs3().set(
+THREE.SphericalHarmonics3.EucalyptusGroove = new THREE.SphericalHarmoncs3().set(
     new THREE.Color( 0.3783264,  0.4260425,  0.4504587),
     new THREE.Color( 0.2887813,  0.3586803,  0.4147053),
     new THREE.Color( 0.0379030,  0.0295216,  0.0098567),
@@ -171,7 +181,7 @@ THREE.SphericalHarmoncs3.EucalyptusGroove = new THREE.SphericalHarmoncs3().set(
     new THREE.Color( 0.0203348, -0.0044201, -0.0452180)
 );
 
-THREE.SphericalHarmoncs3.FunstoneBeachSunset = new THREE.SphericalHarmoncs3().set(
+THREE.SphericalHarmonics3.FunstoneBeachSunset = new THREE.SphericalHarmoncs3().set(
     new THREE.Color( 0.6841148,  0.6929004,  0.7069543),
     new THREE.Color( 0.3173355,  0.3694407,  0.4406839),
     new THREE.Color(-0.1747193, -0.1737154, -0.1657420),
@@ -183,7 +193,7 @@ THREE.SphericalHarmoncs3.FunstoneBeachSunset = new THREE.SphericalHarmoncs3().se
     new THREE.Color( 0.3697189,  0.3097930,  0.2029923)
 );
 
-THREE.SphericalHarmoncs3.GalileoTomb = new THREE.SphericalHarmoncs3().set(
+THREE.SphericalHarmonics3.GalileoTomb = new THREE.SphericalHarmoncs3().set(
     new THREE.Color( 1.0351604,  0.7603549,  0.7074635),
     new THREE.Color( 0.4442150,  0.3430402,  0.3403777),
     new THREE.Color(-0.2247797, -0.1828517, -0.1705181),

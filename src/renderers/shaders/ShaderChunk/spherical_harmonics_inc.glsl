@@ -1,5 +1,5 @@
 // normal is assumed to be unit length!
-vec3 shGetRadianceAt( vec3 shCoefficients[9], vec3 normal )
+vec3 shGetAt( vec3 shCoefficients[9], vec3 normal )
 {
     // band 0
     vec3 result = shCoefficients[0];
