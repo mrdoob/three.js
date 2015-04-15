@@ -1,5 +1,6 @@
 /**
  * @author bhouston / http://clara.io
+ * @author WestLangley
  *
  * Primary theory reference:
  *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
