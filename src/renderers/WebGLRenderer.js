@@ -1668,6 +1668,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		objects.update( opaqueObjects );
+		objects.update( transparentObjects );
 		//
 
 		shadowMap.render( scene, camera );
