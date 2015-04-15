@@ -111,7 +111,7 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 		return this.cacheLengths;
 
-	};
+	}
 
 	// Get length of subsurve
 	// Push sums into cached array

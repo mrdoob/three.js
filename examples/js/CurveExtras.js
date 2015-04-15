@@ -217,7 +217,7 @@ var scaleTo = function(x, y, t) {
 	var r = y - x;
 	return t * r + x;
 
-}
+};
 
 THREE.Curves.FigureEightPolynomialKnot = THREE.Curve.create(
 

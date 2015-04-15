@@ -4,6 +4,8 @@
 
 THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
+	var _this = this;
+
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
@@ -15,6 +17,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentBlendSrcAlpha = null;
 	var currentBlendDstAlpha = null;
 
+	var currentDepthFunc = null;
 	var currentDepthTest = null;
 	var currentDepthWrite = null;
 
@@ -28,6 +31,11 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentPolygonOffset = null;
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
+
+	var maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
+
+	var currentTextureSlot = undefined;
+	var currentBoundTextures = {};
 
 	this.initAttributes = function () {
 
@@ -147,6 +155,71 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 			currentBlendDstAlpha = null;
 
 		}
+
+	};
+
+	this.setDepthFunc = function ( depthFunc ) {
+
+	    if ( currentDepthFunc !== depthFunc ) {
+
+	        if ( depthFunc ) {
+
+	            switch ( depthFunc ) {
+
+	                case THREE.NeverDepth:
+
+	                    gl.depthFunc( gl.NEVER );
+	                    break;
+
+	                case THREE.AlwaysDepth:
+
+	                    gl.depthFunc( gl.ALWAYS );
+	                    break;
+
+	                case THREE.LessDepth:
+
+	                    gl.depthFunc( gl.LESS );
+	                    break;
+
+	                case THREE.LessEqualDepth:
+
+	                    gl.depthFunc( gl.LEQUAL );
+	                    break;
+
+	                case THREE.EqualDepth:
+
+	                    gl.depthFunc( gl.EQUAL );
+	                    break;
+
+	                case THREE.GreaterEqualDepth:
+
+	                    gl.depthFunc( gl.GEQUAL );
+	                    break;
+
+	                case THREE.GreaterDepth:
+
+	                    gl.depthFunc( gl.GREATER );
+	                    break;
+
+	                case THREE.NotEqualDepth:
+
+	                    gl.depthFunc( gl.NOTEQUAL );
+	                    break;
+
+	                default:
+
+                        gl.depthFunc( gl.LEQUAL );
+	            }
+
+	        } else {
+
+	            gl.depthFunc( gl.LEQUAL );
+
+	        }
+
+	        currentDepthFunc = depthFunc;
+
+	    }
 
 	};
 
@@ -272,6 +345,47 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		}
 
 	};
+
+	this.activeTexture = function ( webglSlot ) {
+
+		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+		if ( currentTextureSlot !== webglSlot ) {
+
+			gl.activeTexture( webglSlot );
+			currentTextureSlot = webglSlot;
+
+		}
+
+	}
+
+	this.bindTexture = function ( webglType, webglTexture ) {
+
+		if ( currentTextureSlot === undefined ) {
+
+			_this.activeTexture();
+
+		}
+
+		var boundTexture = currentBoundTextures[currentTextureSlot];
+
+		if ( boundTexture === undefined ) {
+
+			boundTexture = { type: undefined, texture: undefined };
+			currentBoundTextures[currentTextureSlot] = boundTexture;
+
+		}
+
+		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+
+			gl.bindTexture( webglType, webglTexture );
+
+			boundTexture.type = webglType;
+			boundTexture.texture = webglTexture;
+
+		}
+
+	}
 
 	this.reset = function () {
 

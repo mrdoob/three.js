@@ -246,7 +246,7 @@ THREE.Car = function () {
 
 		createCar();
 
-	};
+	}
 
 	function createWheels ( geometry, materials ) {
 
@@ -255,7 +255,7 @@ THREE.Car = function () {
 
 		createCar();
 
-	};
+	}
 
 	function createCar () {
 
@@ -360,7 +360,7 @@ THREE.Car = function () {
 
 		}
 
-	};
+	}
 
 	function quadraticEaseOut( k ) { return - k * ( k - 2 ); }
 	function cubicEaseOut( k ) { return -- k * k * k + 1; }

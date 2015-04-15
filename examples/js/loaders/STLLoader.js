@@ -269,7 +269,7 @@ if ( typeof DataView === 'undefined') {
 		this.byteLength = byteLength || buffer.byteLength || buffer.length;
 		this._isString = typeof buffer === "string";
 
-	}
+	};
 
 	DataView.prototype = {
 

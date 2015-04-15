@@ -115,5 +115,5 @@ THREE.UVsDebug = function( geometry, size ) {
 
 	return canvas;
 
-}
+};
 

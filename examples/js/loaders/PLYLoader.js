@@ -164,11 +164,11 @@ THREE.PLYLoader.prototype = {
 		for ( var i = 0; i < lines.length; i ++ ) {
 
 			var line = lines[ i ];
-			line = line.trim()
+			line = line.trim();
 			if ( line === "" ) { continue; }
 			lineValues = line.split( /\s+/ );
-			lineType = lineValues.shift()
-			line = lineValues.join(" ")
+			lineType = lineValues.shift();
+			line = lineValues.join(" ");
 
 			switch ( lineType ) {
 
@@ -209,7 +209,7 @@ THREE.PLYLoader.prototype = {
 
 			default:
 
-				console.log("unhandled", lineType, lineValues);
+				THREE.log("unhandled", lineType, lineValues);
 
 			}
 
@@ -299,7 +299,7 @@ THREE.PLYLoader.prototype = {
 		for ( var i = 0; i < lines.length; i ++ ) {
 
 			var line = lines[ i ];
-			line = line.trim()
+			line = line.trim();
 			if ( line === "" ) { continue; }
 
 			if ( currentElementCount >= header.elements[currentElement].count ) {

@@ -103,19 +103,19 @@ function Transition ( sceneA, sceneB ) {
 	
 		this.quadmaterial.uniforms.threshold.value = value;
 
-	}
+	};
 	
 	this.useTexture = function ( value ) {
 	
 		this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
 
-	}
+	};
 	
 	this.setTexture = function ( i ) {
 		
 		this.quadmaterial.uniforms.tMixTexture.value = this.textures[i];
 		
-	}
+	};
 	
 	this.render = function( delta ) {
 		

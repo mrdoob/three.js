@@ -966,7 +966,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	this.render = function ( scene, camera ) {
 
