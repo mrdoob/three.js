@@ -803,8 +803,8 @@ THREE.Geometry.prototype = {
 
 		// standard Geometry serialization
 
-		data.type = this.type;
 		data.uuid = this.uuid;
+		data.type = this.type;
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.parameters !== undefined ) {

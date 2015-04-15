@@ -1107,8 +1107,8 @@ THREE.BufferGeometry.prototype = {
 
 		// standard BufferGeometry serialization
 
-		data.type = this.type;
 		data.uuid = this.uuid;
+		data.type = this.type;
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.parameters !== undefined ) {
