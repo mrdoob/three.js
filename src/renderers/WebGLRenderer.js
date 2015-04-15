@@ -472,11 +472,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setPixelRatio = function ( value, updateStyle ) {
+	this.setPixelRatio = function ( value ) {
 
 		pixelRatio = value;
 
-		this.setSize( _width, _height, updateStyle);
+		this.setSize( _width, _height, true );
 		
 	};
 
