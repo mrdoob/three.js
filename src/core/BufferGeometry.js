@@ -1090,8 +1090,22 @@ THREE.BufferGeometry.prototype = {
 		data.type = this.type;
 		data.uuid = this.uuid;
 		if ( this.name !== '' ) data.name = this.name;
-		data.data = {};
-		data.data.attributes = {};
+
+		if ( this.parameters !== undefined ) {
+
+			var parameters = this.parameters;
+
+			for ( var key in parameters ) {
+
+				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+
+			}
+
+			return data;
+
+		}
+
+		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
 		var offsets = this.offsets;
