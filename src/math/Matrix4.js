@@ -101,7 +101,7 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
- 
+
 	makeBasis: function ( xAxis, yAxis, zAxis ) {
 
 		this.set(
@@ -469,7 +469,7 @@ THREE.Matrix4.prototype = {
 
 		var v1;
 
-		return function applyToVector3Array( array, offset, length ) {
+		return function ( array, offset, length ) {
 
 			if ( v1 === undefined ) v1 = new THREE.Vector3();
 			if ( offset === undefined ) offset = 0;
