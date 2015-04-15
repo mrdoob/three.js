@@ -1,43 +1,24 @@
-THREE.WebGLShader = ( function () {
+/**
+ * @author benaadams / https://twitter.com/ben_a_adams
+ */
 
-	var addLineNumbers = function ( string ) {
+THREE.WebGLShader = function ( type, webglShader ) {
 
-		var lines = string.split( '\n' );
+	this.state = THREE.WebGLShader.CompilingState;
+	this.type = type;
+	this.webglShader = webglShader;
+	this.usedTimes = 1;
+	this.compileMessage = '';
+	this.source = '';
 
-		for ( var i = 0; i < lines.length; i ++ ) {
+};
 
-			lines[ i ] = ( i + 1 ) + ': ' + lines[ i ];
+THREE.WebGLShader.CompilingState = 0;
+THREE.WebGLShader.CompileErrorState = 1;
+THREE.WebGLShader.CompiledState = 2;
 
-		}
+THREE.WebGLShader.prototype = {
 
-		return lines.join( '\n' );
+	constructor: THREE.WebGLShader
 
-	};
-
-	return function ( gl, type, string ) {
-
-		var shader = gl.createShader( type ); 
-
-		gl.shaderSource( shader, string );
-		gl.compileShader( shader );
-
-		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
-
-			THREE.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
-
-		}
-
-		if ( gl.getShaderInfoLog( shader ) !== '' ) {
-
-			THREE.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', type === gl.VERTEX_SHADER ? 'vertex' : 'fragment', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
-
-		}
-
-		// --enable-privileged-webgl-extension
-		// THREE.log( type, gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
-
-		return shader;
-
-	};
-
-} )();
+};

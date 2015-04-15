@@ -72,6 +72,8 @@
 
 			function render() {
 
+			    var memory = renderer.info.memory;
+
 			    var geometry = new THREE.SphereBufferGeometry( 50, Math.random() * 64, Math.random() * 32 );
 
 				var texture = new THREE.Texture( createImage() );
@@ -83,7 +85,16 @@
 
 				scene.add( mesh );
 
-				renderer.render( scene, camera );
+			    // triple render for async shaders, as shaders are deleted each frame
+				renderer.render( scene, camera ); // Compile step
+
+				console.log( "1: compiling - vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs, " geometries: ", memory.geometries, " textures: ", memory.textures );
+
+				renderer.render( scene, camera ); // Link step
+				renderer.render( scene, camera ); // Render
+
+				console.log( "2: linked - vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs, " geometries: ", memory.geometries, " textures: ", memory.textures );
+
 
 				scene.remove( mesh );
 
@@ -93,6 +104,7 @@
 				material.dispose();
 				texture.dispose();
 
+				console.log( "3: disposed - vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs, " geometries: ", memory.geometries, " textures: ", memory.textures );
 			}
 
 		</script>

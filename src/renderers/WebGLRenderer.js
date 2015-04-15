@@ -78,6 +78,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		memory: {
 
 			programs: 0,
+			vertexShaders: 0,
+			fragmentShaders: 0,
 			geometries: 0,
 			textures: 0
 
@@ -98,7 +100,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _this = this,
 
-	_programs = [],
 
 	// internal state cache
 
@@ -190,6 +191,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		THREE.error( 'THREE.WebGLRenderer: ' + error );
 
 	}
+
+	var programs = new THREE.WebGLPrograms( _gl, this );
 
 	var state = new THREE.WebGLState( _gl, paramThreeToGL );
 
@@ -635,16 +638,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onMaterialDispose = function ( event ) {
-
-		var material = event.target;
-
-		material.removeEventListener( 'dispose', onMaterialDispose );
-
-		deallocateMaterial( material );
-
-	};
-
 	// Buffer deallocation
 
 	var deallocateTexture = function ( texture ) {
@@ -698,69 +691,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		delete renderTarget.__webglFramebuffer;
 		delete renderTarget.__webglRenderbuffer;
-
-	};
-
-	var deallocateMaterial = function ( material ) {
-
-		var program = material.program.program;
-
-		if ( program === undefined ) return;
-
-		material.program = undefined;
-
-		// only deallocate GL program if this was the last use of shared program
-		// assumed there is only single copy of any program in the _programs list
-		// (that's how it's constructed)
-
-		var i, il, programInfo;
-		var deleteProgram = false;
-
-		for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-			programInfo = _programs[ i ];
-
-			if ( programInfo.program === program ) {
-
-				programInfo.usedTimes --;
-
-				if ( programInfo.usedTimes === 0 ) {
-
-					deleteProgram = true;
-
-				}
-
-				break;
-
-			}
-
-		}
-
-		if ( deleteProgram === true ) {
-
-			// avoid using array.splice, this is costlier than creating new array from scratch
-
-			var newPrograms = [];
-
-			for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-				programInfo = _programs[ i ];
-
-				if ( programInfo.program !== program ) {
-
-					newPrograms.push( programInfo );
-
-				}
-
-			}
-
-			_programs = newPrograms;
-
-			_gl.deleteProgram( program );
-
-			_this.info.memory.programs --;
-
-		}
 
 	};
 
@@ -985,11 +915,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
 
-		if ( material.visible === false ) return;
-
-		objects.update( object );
-
 		var program = setProgram( camera, lights, fog, material, object );
+
+		if ( program === undefined ) return;
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -1551,9 +1479,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// load updated influences uniform
 
-		if ( material.program.uniforms.morphTargetInfluences !== null ) {
+		if ( material.program.webglUniforms.morphTargetInfluences !== null ) {
 
-			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
+			_gl.uniform1fv( material.program.webglUniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
 
 		}
 
@@ -1566,6 +1494,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( a.object.renderOrder !== b.object.renderOrder ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
+
+		} else if ( a.material.program !== b.material.program ) {
+
+			return a.material.program.id - b.material.program.id;
 
 		} else if ( a.material.id !== b.material.id ) {
 
@@ -1609,6 +1541,241 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Rendering
 
+	var renderParams;
+
+	function setupRenderParams( lights, fog ) {
+
+		// heuristics to create shader parameters according to lights in the scene
+		// (not to blow over maxLights budget)
+		var dirLights = 0;
+		var pointLights = 0;
+		var spotLights = 0;
+		var hemiLights = 0;
+
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
+
+			var light = lights[ l ];
+
+			if ( light.onlyShadow || light.visible === false ) continue;
+
+			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
+			if ( light instanceof THREE.PointLight ) pointLights ++;
+			if ( light instanceof THREE.SpotLight ) spotLights ++;
+			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
+
+		}
+
+		var maxShadows = 0;
+
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
+
+			var light = lights[ l ];
+
+			if ( ! light.castShadow ) continue;
+
+			if ( light instanceof THREE.SpotLight ) maxShadows ++;
+			if ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) maxShadows ++;
+
+		}
+
+		if ( renderParams === undefined ) {
+
+			renderParams = {
+				precision: _precision,
+				supportsVertexTextures: _supportsVertexTextures,
+
+				fog: fog,
+				fogExp: fog instanceof THREE.FogExp2,
+
+				logarithmicDepthBuffer: _logarithmicDepthBuffer,
+
+				maxBones: 0, // overriden per object
+				supportsBoneTextures: _supportsBoneTextures,
+				useVertexTexture: _supportsBoneTextures, // overriden per object
+
+				maxMorphTargets: _this.maxMorphTargets,
+				maxMorphNormals: _this.maxMorphNormals,
+
+				maxDirLights: dirLights,
+				maxPointLights: pointLights,
+				maxSpotLights: spotLights,
+				maxHemiLights: hemiLights,
+
+				maxShadows: maxShadows,
+				shadowMapGoballyEnabled: shadowMap.enabled,
+				shadowMapEnabled: shadowMap.enabled, // overriden per object
+				shadowMapType: shadowMap.type,
+				shadowMapDebug: shadowMap.debug,
+				shadowMapCascade: shadowMap.cascade
+
+			};
+
+		} else {
+
+			renderParams.precision = _precision,
+			renderParams.supportsVertexTextures = _supportsVertexTextures,
+
+			renderParams.fog = fog,
+			renderParams.fogExp = fog instanceof THREE.FogExp2,
+
+			renderParams.logarithmicDepthBuffer = _logarithmicDepthBuffer,
+
+			renderParams.maxBones = 0, // overriden per object
+			renderParams.supportsBoneTextures = _supportsBoneTextures,
+			renderParams.useVertexTexture = _supportsBoneTextures, // overriden per object
+
+			renderParams.maxMorphTargets = _this.maxMorphTargets,
+			renderParams.maxMorphNormals = _this.maxMorphNormals,
+
+			renderParams.maxDirLights = dirLights,
+			renderParams.maxPointLights = pointLights,
+			renderParams.maxSpotLights = spotLights,
+			renderParams.maxHemiLights = hemiLights,
+
+			renderParams.maxShadows = maxShadows,
+			renderParams.shadowMapGoballyEnabled = shadowMap.enabled,
+			renderParams.shadowMapEnabled = shadowMap.enabled, // overriden per object
+			renderParams.shadowMapType = shadowMap.type,
+			renderParams.shadowMapDebug = shadowMap.debug,
+			renderParams.shadowMapCascade = shadowMap.cascade
+
+		}
+	}
+
+	function resolvePrograms() {
+
+		var resolvedPrograms, programsUpdated;
+		// shadow map resolve
+
+		resolvedPrograms = programs.resolvePrograms( opaqueObjects, renderParams, scene.overrideMaterial );
+		if ( resolvedPrograms !== undefined ) {
+
+			programsUpdated = programsUpdated || [];
+			Array.prototype.push.apply( programsUpdated, resolvedPrograms );
+
+		}
+
+		resolvedPrograms = programs.resolvePrograms( transparentObjects, renderParams, scene.overrideMaterial );
+		if ( resolvedPrograms !== undefined ) {
+
+			programsUpdated = programsUpdated || [];
+			Array.prototype.push.apply( programsUpdated, resolvedPrograms );
+
+		}
+		// immediate resolve
+		// sprite resolve
+		// lens flare resolve
+
+		return programsUpdated;
+	}
+
+	function uploadTextures( renderList, overrideMaterial ) {
+		
+		if ( overrideMaterial ) {
+
+			if ( overrideMaterial.visible ) {
+
+			}
+
+			return;
+		}
+
+		for ( var i = 0, il = renderList.length; i < il; i++ ) {
+
+			var material = renderList[i].material;
+
+			if ( material.uniformsList !== undefined ) {
+
+				var uniforms = material.uniformsList;
+				for ( var u = 0, ul = uniforms.length; u < ul; u++ ) {
+
+					var uniform = uniforms[u];
+
+					if ( uniform[0].type === 't' ) {
+
+						var texture = uniform[0].value;
+
+						if ( texture.needsUpdate === true ) {
+
+							if ( texture.image.complete === false ) {
+
+								THREE.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
+								continue;
+
+							}
+
+							_this.uploadTexture( uniform[0].value, 0 );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	this.dataUpdate = function (scene) {
+
+		lights.length = 0;
+		opaqueObjects.length = 0;
+		transparentObjects.length = 0;
+
+		sprites.length = 0;
+		lensFlares.length = 0;
+
+		_this.info.render.calls = 0;
+		_this.info.render.vertices = 0;
+		_this.info.render.faces = 0;
+		_this.info.render.points = 0;
+
+		projectObject( scene );
+
+		var fog = scene.fog;
+
+
+		// *************************** TODO
+
+		// Setup scene wide parameters
+		setupRenderParams( lights, fog );
+		// Send new programs for compliation
+		var programsUpdated = resolvePrograms();
+
+		// *******************************
+
+		if ( _this.sortObjects === true ) {
+
+			opaqueObjects.sort( painterSortStable );
+			transparentObjects.sort( reversePainterSortStable );
+
+		}
+
+		// ******************************* TODO
+
+		// Update vertex/attribute buffers
+		objects.update( opaqueObjects );
+		objects.update( transparentObjects );
+		// other ones..?
+
+
+
+		// link complied 
+		programs.link( programsUpdated );
+
+		// upload textures
+		uploadTextures( opaqueObjects, scene.overrideMaterial );
+		uploadTextures( transparentObjects, scene.overrideMaterial );
+
+		// Force program link completion
+		programs.linkComplete( programsUpdated );
+		// *******************************
+		//
+
+	}
+
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
@@ -1635,49 +1802,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
-		// update Skeleton objects
-
-		scene.traverse( function ( object ) {
-
-			if ( object instanceof THREE.SkinnedMesh ) {
-
-				object.skeleton.update();
-
-			}
-
-		} );
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
-		lights.length = 0;
-		opaqueObjects.length = 0;
-		transparentObjects.length = 0;
-
-		sprites.length = 0;
-		lensFlares.length = 0;
-
-		projectObject( scene );
-
-		if ( _this.sortObjects === true ) {
-
-			opaqueObjects.sort( painterSortStable );
-			transparentObjects.sort( reversePainterSortStable );
-
-		}
-
-		//
+		_this.dataUpdate( scene );
 
 		shadowMap.render( scene, camera );
-
-		//
-
-		_this.info.render.calls = 0;
-		_this.info.render.vertices = 0;
-		_this.info.render.faces = 0;
-		_this.info.render.points = 0;
 
 		this.setRenderTarget( renderTarget );
 
@@ -1762,6 +1894,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// skip
 
 		} else {
+
+			// update Skeleton objects
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				object.skeleton.update();
+
+			}
 
 			objects.init( object );
 
@@ -1881,6 +2020,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var program = setProgram( camera, lights, fog, material, object );
 
+		if ( program === undefined ) return;
+
 		_currentGeometryProgram = '';
 
 		_this.setMaterialFaces( material );
@@ -1941,184 +2082,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Materials
 
-	var shaderIDs = {
-		MeshDepthMaterial: 'depth',
-		MeshNormalMaterial: 'normal',
-		MeshBasicMaterial: 'basic',
-		MeshLambertMaterial: 'lambert',
-		MeshPhongMaterial: 'phong',
-		LineBasicMaterial: 'basic',
-		LineDashedMaterial: 'dashed',
-		PointCloudMaterial: 'particle_basic'
-	};
 
 	function initMaterial( material, lights, fog, object ) {
 
-		var shaderID = shaderIDs[ material.type ];
+		var program = material.program;
 
-		// heuristics to create shader parameters according to lights in the scene
-		// (not to blow over maxLights budget)
+		if ( program.state !== THREE.WebGLProgram.LinkedState ) {
 
-		var maxLightCount = allocateLights( lights );
-		var maxShadows = allocateShadows( lights );
-		var maxBones = allocateBones( object );
-
-		var parameters = {
-
-			precision: _precision,
-			supportsVertexTextures: _supportsVertexTextures,
-
-			map: !! material.map,
-			envMap: !! material.envMap,
-			envMapMode: material.envMap && material.envMap.mapping,
-			lightMap: !! material.lightMap,
-			aoMap: !! material.aoMap,
-			bumpMap: !! material.bumpMap,
-			normalMap: !! material.normalMap,
-			specularMap: !! material.specularMap,
-			alphaMap: !! material.alphaMap,
-
-			combine: material.combine,
-
-			vertexColors: material.vertexColors,
-
-			fog: fog,
-			useFog: material.fog,
-			fogExp: fog instanceof THREE.FogExp2,
-
-			flatShading: material.shading === THREE.FlatShading,
-
-			sizeAttenuation: material.sizeAttenuation,
-			logarithmicDepthBuffer: _logarithmicDepthBuffer,
-
-			skinning: material.skinning,
-			maxBones: maxBones,
-			useVertexTexture: _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture,
-
-			morphTargets: material.morphTargets,
-			morphNormals: material.morphNormals,
-			maxMorphTargets: _this.maxMorphTargets,
-			maxMorphNormals: _this.maxMorphNormals,
-
-			maxDirLights: maxLightCount.directional,
-			maxPointLights: maxLightCount.point,
-			maxSpotLights: maxLightCount.spot,
-			maxHemiLights: maxLightCount.hemi,
-
-			maxShadows: maxShadows,
-			shadowMapEnabled: shadowMap.enabled && object.receiveShadow && maxShadows > 0,
-			shadowMapType: shadowMap.type,
-			shadowMapDebug: shadowMap.debug,
-			shadowMapCascade: shadowMap.cascade,
-
-			alphaTest: material.alphaTest,
-			metal: material.metal,
-			doubleSided: material.side === THREE.DoubleSide,
-			flipSided: material.side === THREE.BackSide
-
-		};
-
-		// Generate code
-
-		var chunks = [];
-
-		if ( shaderID ) {
-
-			chunks.push( shaderID );
-
-		} else {
-
-			chunks.push( material.fragmentShader );
-			chunks.push( material.vertexShader );
+			return false;
 
 		}
-
-		if ( material.defines !== undefined ) {
-
-			for ( var name in material.defines ) {
-
-				chunks.push( name );
-				chunks.push( material.defines[ name ] );
-
-			}
-
-		}
-
-		for ( var name in parameters ) {
-
-			chunks.push( name );
-			chunks.push( parameters[ name ] );
-
-		}
-
-		var code = chunks.join();
-
-		if ( !material.program ) {
-
-		    // new material
-		    material.addEventListener( 'dispose', onMaterialDispose );
-
-		} else if ( material.program.code !== code ) {
-
-		    // changed glsl or parameters
-		    deallocateMaterial( material );
-
-		} else {
-
-            // same glsl and parameters
-		    return;
-
-		}
-
-		if ( shaderID ) {
-
-			var shader = THREE.ShaderLib[ shaderID ];
-
-			material.__webglShader = {
-				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			}
-
-		} else {
-
-			material.__webglShader = {
-				uniforms: material.uniforms,
-				vertexShader: material.vertexShader,
-				fragmentShader: material.fragmentShader
-			}
-
-		}
-
-		var program;
-
-		// Check if code has been already compiled
-
-		for ( var p = 0, pl = _programs.length; p < pl; p ++ ) {
-
-			var programInfo = _programs[ p ];
-
-			if ( programInfo.code === code ) {
-
-				program = programInfo;
-				program.usedTimes ++;
-
-				break;
-
-			}
-
-		}
-
-		if ( program === undefined ) {
-
-			program = new THREE.WebGLProgram( _this, code, material, parameters );
-			_programs.push( program );
-
-			_this.info.memory.programs = _programs.length;
-
-		}
-
-		material.program = program;
 
 		var attributes = program.attributes;
 
@@ -2164,16 +2137,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniformsList = [];
 
-		for ( var u in material.__webglShader.uniforms ) {
+		for ( var u in program.sourceUniforms ) {
 
-			var location = material.program.uniforms[ u ];
+			var location = program.webglUniforms[ u ];
 
 			if ( location ) {
-				material.uniformsList.push( [ material.__webglShader.uniforms[ u ], location ] );
+				material.uniformsList.push( [program.sourceUniforms[u], location] );
 			}
 
 		}
 
+		return true;
 	}
 
 	function setMaterial( material ) {
@@ -2202,7 +2176,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			initMaterial( material, lights, fog, object );
+			if ( !initMaterial( material, lights, fog, object ) ) {
+
+				return undefined;
+
+			}
+
 			material.needsUpdate = false;
 
 		}
@@ -2221,13 +2200,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var refreshMaterial = false;
 		var refreshLights = false;
 
-		var program = material.program,
-			p_uniforms = program.uniforms,
-			m_uniforms = material.__webglShader.uniforms;
+		var program = material.program;
+
+		if ( program.state !== THREE.WebGLProgram.LinkedState ) return undefined;
+
+		var p_uniforms = program.webglUniforms,
+			m_uniforms = program.sourceUniforms;
 
 		if ( program.id !== _currentProgram ) {
 
-			_gl.useProgram( program.program );
+			_gl.useProgram( program.webglProgram );
 			_currentProgram = program.id;
 
 			refreshProgram = true;
@@ -3981,89 +3963,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		return 0;
-
-	}
-
-	// Allocations
-
-	function allocateBones ( object ) {
-
-		if ( _supportsBoneTextures && object && object.skeleton && object.skeleton.useVertexTexture ) {
-
-			return 1024;
-
-		} else {
-
-			// default for when object is not specified
-			// ( for example when prebuilding shader to be used with multiple objects )
-			//
-			//  - leave some extra space for other uniforms
-			//  - limit here is ANGLE's 254 max uniform vectors
-			//    (up to 54 should be safe)
-
-			var nVertexUniforms = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );
-			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
-
-			var maxBones = nVertexMatrices;
-
-			if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
-
-				maxBones = Math.min( object.skeleton.bones.length, maxBones );
-
-				if ( maxBones < object.skeleton.bones.length ) {
-
-					THREE.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
-
-				}
-
-			}
-
-			return maxBones;
-
-		}
-
-	}
-
-	function allocateLights( lights ) {
-
-		var dirLights = 0;
-		var pointLights = 0;
-		var spotLights = 0;
-		var hemiLights = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( light.onlyShadow || light.visible === false ) continue;
-
-			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
-			if ( light instanceof THREE.PointLight ) pointLights ++;
-			if ( light instanceof THREE.SpotLight ) spotLights ++;
-			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
-
-		}
-
-		return { 'directional': dirLights, 'point': pointLights, 'spot': spotLights, 'hemi': hemiLights };
-
-	}
-
-	function allocateShadows( lights ) {
-
-		var maxShadows = 0;
-
-		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			var light = lights[ l ];
-
-			if ( ! light.castShadow ) continue;
-
-			if ( light instanceof THREE.SpotLight ) maxShadows ++;
-			if ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) maxShadows ++;
-
-		}
-
-		return maxShadows;
 
 	}
 
