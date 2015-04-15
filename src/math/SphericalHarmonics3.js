@@ -60,7 +60,36 @@ THREE.SphericalHarmonics3.prototype = {
 	},
 
 	// normal is assumed to be unit length!
-	evaluate: function( normal, optionalResult ) {
+	// this is the radiance
+	getAt: function( normal, optionalResult ) {
+
+		var result = optionalResult || new THREE.Color();
+
+		var x = normal.x, y = normal.y, z = normal.z;
+		var coeff = this.coefficients;
+
+		// band 0
+		result.copy( coeff[0] );
+
+		// band 1
+		result.addScale( coeff[1], y );
+		result.addScale( coeff[2], z );
+		result.addScale( coeff[3], x );
+
+		// band 2
+		result.addScale( coeff[4], x*y );
+		result.addScale( coeff[5], y*z );
+		result.addScale( coeff[6], 3.0 * z*z - 1.0 );
+		result.addScale( coeff[7], x*z );
+		result.addScale( coeff[8], ( x*x - y*y ) );
+
+		return result;
+	},
+
+	// normal is assumed to be unit length!
+	// this function convolves the base spherical harmoninc radiance with a cosine lobe representing
+	// a smooth hemispheric function.
+	getHemiIrradianceAt: function( normal, optionalResult ) {
 
 		var result = optionalResult || new THREE.Color();
 
@@ -71,6 +100,7 @@ THREE.SphericalHarmonics3.prototype = {
 
 		// band 0
 		result.copy( coeff[0], c.C4 );
+		result.multiplyScalar( c.C4 );
 
 		// band 1
 		result.addScale( coeff[1], 2.0 * c.C2 * y );
