@@ -274,7 +274,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				webglObject = _renderList[ j ];
 
 				object = webglObject.object;
-				buffer = webglObject.buffer;
+				buffer = _objects.geometries.get( object );
 
 				// culling is overriden globally for all objects
 				// while rendering depth map
@@ -309,16 +309,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				}
 
 				_renderer.setMaterialFaces( objectMaterial );
-
-				if ( buffer instanceof THREE.BufferGeometry ) {
-
-					_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object );
-
-				} else {
-
-					_renderer.renderBuffer( shadowCamera, _lights, fog, material, buffer, object );
-
-				}
+				_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object );
 
 			}
 
@@ -363,18 +354,12 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		if ( object.visible ) {
 
-			var webglObjects = _webglObjects[ object.id ];
+			var webglObject = _objects.objects[ object.id ];
 
-			if ( webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+			if ( webglObject && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
 
-				for ( var i = 0, l = webglObjects.length; i < l; i ++ ) {
-
-					var webglObject = webglObjects[ i ];
-
-					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push( webglObject );
-
-				}
+				object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+				_renderList.push( webglObject );
 
 			}
 
