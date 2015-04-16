@@ -1609,6 +1609,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function uploadTextures( renderList ) {
+
+		for ( var i = 0, il = renderList.length; i < il; i++ ) {
+
+			var material = renderList[i].material;
+
+			if ( material.uniformsList !== undefined ) {
+
+				var uniforms = material.uniformsList;
+
+				for ( var u = 0, ul = uniforms.length; u < ul; u++ ) {
+
+					var uniform = uniforms[u];
+
+					if ( uniform[0].type === 't' ) {
+
+						var texture = uniform[0].value;
+
+						if ( texture.needsUpdate === true ) {
+
+							_this.setTexture( texture, 0 );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
@@ -1661,6 +1695,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		objects.update( opaqueObjects );
 		objects.update( transparentObjects );
 		//
+		if ( !scene.overrideMaterial ) {
+
+			uploadTextures( opaqueObjects );
+			uploadTextures( transparentObjects );
+		
+		}
 
 		shadowMap.render( scene, camera );
 
