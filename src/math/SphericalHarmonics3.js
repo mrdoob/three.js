@@ -55,6 +55,30 @@ THREE.SphericalHarmonics3.prototype = {
 
 	},
 
+	// adds color contribution in normal direction to the SH coefficients.
+	addAt: function( normal, color ) {
+
+		// based on sphericalHarmonicsEvaluateDirection from:
+		//    http://www.sunandblackcat.com/tipFullView.php?l=eng&topicid=32
+	   var p_0_0 = 0.282094791773878140;
+	   var p_1_0 = 0.488602511902919920 * dir.z;
+	   var p_1_1 = -0.488602511902919920;
+	   var p_2_0 = 0.946174695757560080 * dir.z * dir.z - 0.315391565252520050;
+	   var p_2_1 = -1.092548430592079200 * dir.z;
+	   var p_2_2 = 0.546274215296039590;
+
+	   this.coefficients[0].addScale( color, p_0_0 );
+	   this.coefficients[1].addScale( color, p_1_1 * dir.y );
+	   this.coefficients[2].addScale( color, p_1_0 );
+	   this.coefficients[3].addScale( color, p_1_1 * dir.x );
+	   this.coefficients[4].addScale( color, p_2_2 * (dir.x * dir.y + dir.y * dir.x) );
+	   this.coefficients[5].addScale( color, p_2_1 * dir.y );
+	   this.coefficients[6].addScale( color, p_2_0 );
+	   this.coefficients[7].addScale( color, p_2_1 * dir.x );
+	   this.coefficients[8].addScale( color, p_2_2 * (dir.x * dir.x - dir.y * dir.y) );
+
+	},
+
 	copy: function ( sh ) {
 
 		return this.set( sh.coefficients );
