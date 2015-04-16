@@ -991,8 +991,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		objects.update( object );
-
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
@@ -1672,6 +1670,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		objects.update( opaqueObjects );
+		objects.update( transparentObjects );
 		//
 
 		shadowMap.render( scene, camera );
