@@ -1726,7 +1726,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		setupRenderParams( lights, fog ); // Setup scene wide parameters
 
-		var programsUpdated = resolvePrograms( scene );
+		var programsUpdated = resolvePrograms( scene ); // resolve programs for correct sorting, and start compile 
 
 		if ( _this.sortObjects === true ) {
 
@@ -1734,6 +1734,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			transparentObjects.sort( reversePainterSortStable );
 
 		}
+
+		programs.link( programsUpdated ); // start linking of any shaders just compiled
 
 		objects.update( opaqueObjects );
 		objects.update( transparentObjects );
@@ -1762,7 +1764,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		programs.link( programsUpdated );
 
 		// set matrices for immediate objects
 
@@ -1781,7 +1782,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		programs.linkComplete( programsUpdated );
+		programs.linkComplete( programsUpdated ); // wait for program linking to complete before renderering
 
 		if ( scene.overrideMaterial ) {
 
