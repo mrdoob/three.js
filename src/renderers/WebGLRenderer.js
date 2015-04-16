@@ -217,6 +217,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	extensions.get( 'OES_standard_derivatives' );
 	extensions.get( 'ANGLE_instanced_arrays' );
 
+	if ( extensions.get( 'OES_element_index_uint' ) ) {
+
+		THREE.BufferGeometry.MaxIndex = 4294967296;
+
+	}
+
 	if ( _logarithmicDepthBuffer ) {
 
 		extensions.get( 'EXT_frag_depth' );
@@ -957,13 +963,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( material.defaultAttributeValues !== undefined ) {
 
-					if ( material.defaultAttributeValues[ key ].length === 2 ) {
+					if ( material.defaultAttributeValues[ key ] !== undefined ) {
 
-						_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ key ] );
+						if ( material.defaultAttributeValues[ key ].length === 2 ) {
 
-					} else if ( material.defaultAttributeValues[ key ].length === 3 ) {
+							_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ key ] );
 
-						_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ key ] );
+						} else if ( material.defaultAttributeValues[ key ].length === 3 ) {
+
+							_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ key ] );
+
+						}
 
 					}
 
@@ -1813,7 +1823,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var webglObject = renderList[ i ];
 
 			var object = webglObject.object;
-			var buffer = objects.geometries[ object.geometry.id ];
+			var buffer = objects.geometries.get( object );
 
 			setupMatrices( object, camera );
 
@@ -2007,7 +2017,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			alphaTest: material.alphaTest,
 			metal: material.metal,
-			wrapAround: material.wrapAround,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
 
@@ -2444,10 +2453,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.diffuse.value = material.color;
 
 		uniforms.map.value = material.map;
-		uniforms.lightMap.value = material.lightMap;
-		uniforms.lightMapIntensity.value = material.lightMapIntensity;
-		uniforms.aoMap.value = material.aoMap;
-		uniforms.aoMapIntensity.value = material.aoMapIntensity;
 		uniforms.specularMap.value = material.specularMap;
 		uniforms.alphaMap.value = material.alphaMap;
 
@@ -2572,23 +2577,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.emissive.value = material.emissive;
 		uniforms.specular.value = material.specular;
 
-		if ( material.wrapAround ) {
+		uniforms.lightMap.value = material.lightMap;
+		uniforms.lightMapIntensity.value = material.lightMapIntensity;
 
-			uniforms.wrapRGB.value.copy( material.wrapRGB );
-
-		}
+		uniforms.aoMap.value = material.aoMap;
+		uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
 	}
 
 	function refreshUniformsLambert ( uniforms, material ) {
 
 		uniforms.emissive.value = material.emissive;
-
-		if ( material.wrapAround ) {
-
-			uniforms.wrapRGB.value.copy( material.wrapRGB );
-
-		}
 
 	}
 
@@ -3356,8 +3355,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.activeTexture( _gl.TEXTURE0 + slot );
-		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+		state.activeTexture( _gl.TEXTURE0 + slot );
+		state.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
 		_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -3474,8 +3473,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.activeTexture( _gl.TEXTURE0 + slot );
-		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+		state.activeTexture( _gl.TEXTURE0 + slot );
+		state.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
 	};
 
@@ -3521,8 +3520,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_gl.activeTexture( _gl.TEXTURE0 + slot );
-				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
+				state.activeTexture( _gl.TEXTURE0 + slot );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
@@ -3610,8 +3609,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				_gl.activeTexture( _gl.TEXTURE0 + slot );
-				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
+				state.activeTexture( _gl.TEXTURE0 + slot );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
 
 			}
 
@@ -3621,8 +3620,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setCubeTextureDynamic ( texture, slot ) {
 
-		_gl.activeTexture( _gl.TEXTURE0 + slot );
-		_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.__webglTexture );
+		state.activeTexture( _gl.TEXTURE0 + slot );
+		state.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.__webglTexture );
 
 	}
 
@@ -3689,7 +3688,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				renderTarget.__webglFramebuffer = [];
 				renderTarget.__webglRenderbuffer = [];
 
-				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, renderTarget.__webglTexture );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, renderTarget.__webglTexture );
+
 				setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget, isTargetPowerOfTwo );
 
 				for ( var i = 0; i < 6; i ++ ) {
@@ -3720,7 +3720,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_gl.bindTexture( _gl.TEXTURE_2D, renderTarget.__webglTexture );
+				state.bindTexture( _gl.TEXTURE_2D, renderTarget.__webglTexture );
 				setTextureParameters( _gl.TEXTURE_2D, renderTarget, isTargetPowerOfTwo );
 
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
@@ -3753,11 +3753,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( isCube ) {
 
-				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 			} else {
 
-				_gl.bindTexture( _gl.TEXTURE_2D, null );
+				state.bindTexture( _gl.TEXTURE_2D, null );
 
 			}
 
@@ -3864,15 +3864,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
-			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, renderTarget.__webglTexture );
+			state.bindTexture( _gl.TEXTURE_CUBE_MAP, renderTarget.__webglTexture );
 			_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 		} else {
 
-			_gl.bindTexture( _gl.TEXTURE_2D, renderTarget.__webglTexture );
+			state.bindTexture( _gl.TEXTURE_2D, renderTarget.__webglTexture );
 			_gl.generateMipmap( _gl.TEXTURE_2D );
-			_gl.bindTexture( _gl.TEXTURE_2D, null );
+			state.bindTexture( _gl.TEXTURE_2D, null );
 
 		}
 

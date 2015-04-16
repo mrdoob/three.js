@@ -191,8 +191,7 @@
 
 				// cloth geometry
 				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
-				clothGeometry.dynamic = true;
-				clothGeometry.computeFaceNormals();
+				clothGeometry = new THREE.DynamicGeometry().fromGeometry( clothGeometry );
 
 				var uniforms = { texture:  { type: "t", value: clothTexture } };
 				var vertexShader = document.getElementById( 'vertexShaderDepth' ).textContent;
@@ -230,7 +229,7 @@
 				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 				groundTexture.repeat.set( 25, 25 );
 				groundTexture.anisotropy = 16;
-				
+
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: groundTexture } );
 
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
@@ -292,7 +291,7 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.enabled = true;
 
 				//
 
@@ -348,9 +347,6 @@
 					clothGeometry.vertices[ i ].copy( p[ i ].position );
 
 				}
-
-				clothGeometry.computeFaceNormals();
-				clothGeometry.computeVertexNormals();
 
 				clothGeometry.normalsNeedUpdate = true;
 				clothGeometry.verticesNeedUpdate = true;

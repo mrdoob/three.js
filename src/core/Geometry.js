@@ -17,10 +17,8 @@ THREE.Geometry = function () {
 	this.type = 'Geometry';
 
 	this.vertices = [];
-	this.colors = [];  // one-to-one vertex colors, used in Points and Line
-
+	this.colors = [];
 	this.faces = [];
-
 	this.faceVertexUvs = [ [] ];
 
 	this.morphTargets = [];
@@ -36,8 +34,6 @@ THREE.Geometry = function () {
 	this.boundingSphere = null;
 
 	this.hasTangents = false;
-
-	this.dynamic = true; // the intermediate typed arrays will be deleted when set to false
 
 	// update flags
 
@@ -807,8 +803,8 @@ THREE.Geometry.prototype = {
 
 		// standard Geometry serialization
 
-		data.type = this.type;
 		data.uuid = this.uuid;
+		data.type = this.type;
 		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.parameters !== undefined ) {

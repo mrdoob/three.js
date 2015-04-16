@@ -48,7 +48,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		// diffuse
 
-		vec3 cosineTerm = calcCosineTerm( normal, lightDir );
+		float cosineTerm = saturate( dot( normal, lightDir ) );
 
 		totalDiffuseLight += lightColor * attenuation * cosineTerm;
 
@@ -88,7 +88,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 			// diffuse
 
-			vec3 cosineTerm = calcCosineTerm( normal, lightDir );
+			float cosineTerm = saturate( dot( normal, lightDir ) );
 
 			totalDiffuseLight += lightColor * attenuation * cosineTerm;
 
@@ -114,7 +114,7 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 		// diffuse
 
-		vec3 cosineTerm = calcCosineTerm( normal, lightDir );
+		float cosineTerm = saturate( dot( normal, lightDir ) );
 
 		totalDiffuseLight += lightColor * cosineTerm;
 
@@ -156,10 +156,10 @@ vec3 totalSpecularLight = vec3( 0.0 );
 
 #ifdef METAL
 
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor ) * specular + totalSpecularLight + emissive;
+	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) * specular + totalSpecularLight + emissive;
 
 #else
 
-	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + ambientLightColor ) + totalSpecularLight + emissive;
+	outgoingLight += diffuseColor.rgb * ( totalDiffuseLight + totalAmbientLight ) + totalSpecularLight + emissive;
 
 #endif

@@ -43,12 +43,6 @@ uniform vec3 ambientLightColor;
 
 #endif
 
-#ifdef WRAP_AROUND
-
-	uniform vec3 wrapRGB;
-
-#endif
-
 varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
@@ -56,20 +50,3 @@ varying vec3 vViewPosition;
 	varying vec3 vNormal;
 
 #endif
-
-vec3 calcCosineTerm( in vec3 normal, in vec3 lightDir ) {
-
-	float dotProduct = dot( normal, lightDir );
-	vec3 cosineTerm = vec3( saturate( dotProduct ) );
-
-	#ifdef WRAP_AROUND
-
-		vec3 cosineTermHalf = vec3( saturate( 0.5 * dotProduct + 0.5 ) );
-
-		cosineTerm = mix( cosineTerm, cosineTermHalf, wrapRGB );
-
-	#endif
-
-	return cosineTerm;
-
-}

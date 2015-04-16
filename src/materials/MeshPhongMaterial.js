@@ -63,9 +63,6 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.metal = false;
 
-	this.wrapAround = false;
-	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
-
 	this.map = null;
 
 	this.lightMap = null;
@@ -123,9 +120,6 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	material.shininess = this.shininess;
 
 	material.metal = this.metal;
-
-	material.wrapAround = this.wrapAround;
-	material.wrapRGB.copy( this.wrapRGB );
 
 	material.map = this.map;
 

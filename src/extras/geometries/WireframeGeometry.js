@@ -93,7 +93,9 @@ THREE.WireframeGeometry = function ( geometry ) {
 	} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 		if ( geometry.attributes.index !== undefined ) { // Indexed BufferGeometry
+
 			var vertices = geometry.attributes.position.array;
+
 			var indices = geometry.attributes.index.array;
 			var drawcalls = geometry.drawcalls;
 			

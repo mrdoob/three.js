@@ -597,8 +597,8 @@ THREE.Object3D.prototype = {
 
 		// standard Object3D serialization
 
-		data.type = this.type;
 		data.uuid = this.uuid;
+		data.type = this.type;
 		if ( this.name !== '' ) data.name = this.name;
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 		if ( this.visible !== true ) data.visible = this.visible;
@@ -619,22 +619,21 @@ THREE.Object3D.prototype = {
 
 		// wrap serialized object with additional data
 
-		var output;
+		var output = {};
 
 		if ( isRootObject ) {
 
-			output = {
-				metadata: metadata,
-				geometries: extractFromCache(meta.geometries),
-				materials: extractFromCache(meta.materials),
-				object: data
-			};
+			output.metadata = metadata;
 
-		} else {
+			var geometries = extractFromCache( meta.geometries );
+			var materials = extractFromCache( meta.materials );
 
-			output = { object: data };
+			if ( geometries.length > 0 ) output.geometries = geometries;
+			if ( materials.length > 0 ) output.materials = materials;
 
 		}
+
+		output.object = data;
 
 		return output;
 
