@@ -126,9 +126,13 @@
 
 				}
 
+				var memory = renderer.info.memory;
+
+				console.log( "pre-render: vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs );
+
 				renderer.render( scene, camera );
 
-				console.log( "before", renderer.info.memory.programs );
+				console.log( "post-render: vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs );
 
 				for ( var i = 0; i < N; i ++ ) {
 
@@ -137,7 +141,7 @@
 
 				}
 
-				console.log( "after", renderer.info.memory.programs );
+				console.log( "post-dispose: vertex: ", memory.vertexShaders, " fragment: ", memory.fragmentShaders, " programs: ", memory.programs );
 
 			}
 
