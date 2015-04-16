@@ -1731,7 +1731,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objects.update( opaqueObjects );
 		objects.update( transparentObjects );
-		//
+
 		if ( !scene.overrideMaterial ) {
 
 			uploadTextures( opaqueObjects );
@@ -1741,7 +1741,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		shadowMap.render( scene, camera );
 
-		//
+		programs.link( programsUpdated );
 
 		_this.info.render.calls = 0;
 		_this.info.render.vertices = 0;
@@ -1756,7 +1756,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		programs.link( programsUpdated );
 
 		// set matrices for immediate objects
 
