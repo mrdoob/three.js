@@ -158,6 +158,7 @@
 	"src/renderers/webgl/WebGLObjects.js",
 	"src/renderers/webgl/WebGLProgram.js",
 	"src/renderers/webgl/WebGLShader.js",
+	"src/renderers/webgl/WebGLPrograms.js",
 	"src/renderers/webgl/WebGLShadowMap.js",
 	"src/renderers/webgl/WebGLState.js",
 	"src/renderers/webgl/plugins/LensFlarePlugin.js",
