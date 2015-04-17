@@ -246,7 +246,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
+				for ( var oi = 0, ol = drawcalls.length; oi < ol; ++oi ) {
 
 					var start = drawcalls[ oi ].start;
 					var count = drawcalls[ oi ].count;
