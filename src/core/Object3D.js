@@ -679,6 +679,7 @@ THREE.Object3D.prototype = {
 		object.receiveShadow = this.receiveShadow;
 
 		object.frustumCulled = this.frustumCulled;
+		object.renderOrder = this.renderOrder;
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
