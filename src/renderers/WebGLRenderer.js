@@ -917,6 +917,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objects.update( object );
 
+		programs.resolveProgramImmediate( material, object, renderParams );
 		var program = setProgram( camera, lights, fog, material, object );
 
 		if ( program === undefined ) return;
@@ -1923,7 +1924,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderImmediateObject = function ( camera, lights, fog, material, object ) {
 
-		_this.programs.resolveProgramImmediate( object, renderParams );
+		programs.resolveProgramImmediate( material, object, renderParams );
 
 		var program = setProgram( camera, lights, fog, material, object );
 

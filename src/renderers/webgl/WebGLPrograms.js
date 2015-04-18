@@ -73,9 +73,7 @@ THREE.WebGLPrograms = function ( gl, renderer ) {
 
 	}
 	
-	this.resolveProgramImmediate = function ( object, params ) {
-
-		var material = object.material;
+	this.resolveProgramImmediate = function ( material, object, params ) {
 
 		if ( material.visible && material.needsUpdate ) {
 
