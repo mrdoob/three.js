@@ -18,21 +18,46 @@ THREE.SceneUtils = {
 
 	},
 
-	detach: function ( child, parent, scene ) {
+	detach: function ( child, scene ) {
 
-		child.applyMatrix( parent.matrixWorld );
-		parent.remove( child );
+		var topParent = child.parent;
+		
+		while ( topParent.parent !== undefined ) {
+			
+			topParent = topParent.parent;
+			
+		}
+		
+		topParent.updateMatrixWorld( true );
+
+		child.applyMatrix( child.parent.matrixWorld );
+		child.parent.remove( child );
 		scene.add( child );
 
 	},
 
-	attach: function ( child, scene, parent ) {
+	attach: function ( child, parent ) {
 
-		var matrixWorldInverse = new THREE.Matrix4();
-		matrixWorldInverse.getInverse( parent.matrixWorld );
-		child.applyMatrix( matrixWorldInverse );
+		var topParent = child.parent;
+		
+		while ( topParent.parent !== undefined ) {
+			
+			topParent = topParent.parent;
+			
+		}
+		
+		if ( topParent !== undefined ) {
+			
+			topParent.updateMatrixWorld( true );
+		
+			var matrixWorldInverse = new THREE.Matrix4();
+			matrixWorldInverse.getInverse( child.parent.matrixWorld );
+			child.applyMatrix( matrixWorldInverse );
 
-		scene.remove( child );
+			child.parent.remove( child );
+			
+		}
+		
 		parent.add( child );
 
 	}
