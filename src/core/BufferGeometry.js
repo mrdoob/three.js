@@ -68,7 +68,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( position !== undefined ) {
 
-			matrix.applyToBuffer( position );
+			matrix.applyToVector3Array( position.array );
 			position.needsUpdate = true;
 
 		}
@@ -79,7 +79,7 @@ THREE.BufferGeometry.prototype = {
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.applyToBuffer( normal );
+			normalMatrix.applyToVector3Array( normal.array );
 			normal.needsUpdate = true;
 
 		}
@@ -265,10 +265,10 @@ THREE.BufferGeometry.prototype = {
 		var faceVertexUvs = geometry.faceVertexUvs;
 		var vertexColors = material.vertexColors;
 
-		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
-		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
+		var hasFaceVertexNormals = faces[ 0 ] && faces[ 0 ].vertexNormals.length == 3;
 
 		var positions = new Float32Array( faces.length * 3 * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -391,35 +391,55 @@ THREE.BufferGeometry.prototype = {
 
 			if ( hasFaceVertexUv === true ) {
 
-				var uva = faceVertexUvs[ 0 ][ i ][ 0 ];
-				var uvb = faceVertexUvs[ 0 ][ i ][ 1 ];
-				var uvc = faceVertexUvs[ 0 ][ i ][ 2 ];
+				var vertexUvs = faceVertexUvs[ 0 ][ i ];
 
-				uvs[ i2     ] = uva.x;
-				uvs[ i2 + 1 ] = uva.y;
+				if ( vertexUvs !== undefined ) {
 
-				uvs[ i2 + 2 ] = uvb.x;
-				uvs[ i2 + 3 ] = uvb.y;
+					var uva = vertexUvs[ 0 ];
+					var uvb = vertexUvs[ 1 ];
+					var uvc = vertexUvs[ 2 ];
 
-				uvs[ i2 + 4 ] = uvc.x;
-				uvs[ i2 + 5 ] = uvc.y;
+					uvs[ i2     ] = uva.x;
+					uvs[ i2 + 1 ] = uva.y;
+
+					uvs[ i2 + 2 ] = uvb.x;
+					uvs[ i2 + 3 ] = uvb.y;
+
+					uvs[ i2 + 4 ] = uvc.x;
+					uvs[ i2 + 5 ] = uvc.y;
+
+				} else {
+
+					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i )
+
+				}
 
 			}
 
 			if ( hasFaceVertexUv2 === true ) {
 
-				var uva = faceVertexUvs[ 1 ][ i ][ 0 ];
-				var uvb = faceVertexUvs[ 1 ][ i ][ 1 ];
-				var uvc = faceVertexUvs[ 1 ][ i ][ 2 ];
+				var vertexUvs = faceVertexUvs[ 1 ][ i ];
 
-				uvs2[ i2     ] = uva.x;
-				uvs2[ i2 + 1 ] = uva.y;
+				if ( vertexUvs !== undefined ) {
 
-				uvs2[ i2 + 2 ] = uvb.x;
-				uvs2[ i2 + 3 ] = uvb.y;
+					var uva = vertexUvs[ 0 ];
+					var uvb = vertexUvs[ 1 ];
+					var uvc = vertexUvs[ 2 ];
 
-				uvs2[ i2 + 4 ] = uvc.x;
-				uvs2[ i2 + 5 ] = uvc.y;
+					uvs2[ i2     ] = uva.x;
+					uvs2[ i2 + 1 ] = uva.y;
+
+					uvs2[ i2 + 2 ] = uvb.x;
+					uvs2[ i2 + 3 ] = uvb.y;
+
+					uvs2[ i2 + 4 ] = uvc.x;
+					uvs2[ i2 + 5 ] = uvc.y;
+
+				} else {
+
+					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i )
+
+				}
 
 			}
 
@@ -466,16 +486,16 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position;
+			var positions = this.attributes.position.array;
 
 			if ( positions ) {
 
 				var bb = this.boundingBox;
 				bb.makeEmpty();
 
-				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
+					vector.fromArray( positions, i );
 					bb.expandByPoint( vector );
 
 				}
@@ -491,7 +511,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-				THREE.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
+				THREE.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
 			}
 
@@ -512,7 +532,7 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var positions = this.attributes.position;
+			var positions = this.attributes.position.array;
 
 			if ( positions ) {
 
@@ -520,9 +540,9 @@ THREE.BufferGeometry.prototype = {
 
 				var center = this.boundingSphere.center;
 
-				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
+					vector.fromArray( positions, i );
 					box.expandByPoint( vector );
 
 				}
@@ -534,9 +554,9 @@ THREE.BufferGeometry.prototype = {
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = positions.length / positions.itemSize; i < il; i ++ ) {
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-					vector.set( positions.getX( i ), positions.getY( i ), positions.getZ( i ) );
+					vector.fromArray( positions, i );
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 				}
@@ -545,7 +565,7 @@ THREE.BufferGeometry.prototype = {
 
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
-					THREE.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
+					THREE.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
 
 				}
 
@@ -1087,11 +1107,25 @@ THREE.BufferGeometry.prototype = {
 
 		// standard BufferGeometry serialization
 
-		data.type = this.type;
 		data.uuid = this.uuid;
+		data.type = this.type;
 		if ( this.name !== '' ) data.name = this.name;
-		data.data = {};
-		data.data.attributes = {};
+
+		if ( this.parameters !== undefined ) {
+
+			var parameters = this.parameters;
+
+			for ( var key in parameters ) {
+
+				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
+
+			}
+
+			return data;
+
+		}
+
+		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
 		var offsets = this.offsets;
