@@ -215,7 +215,7 @@
 			});
 
 		    this.quadSphere = new THREE.QuadTreeSphere({
-				workerPath: "js/wip/quadsphere/QuadTreeSphereWorker.js",
+				workerPath: "scripts/QuadTreeSphereWorker.js",
 				camera: this.camera,
 				radius: this.quadSphereRadius,
 				patchSize: 16,
