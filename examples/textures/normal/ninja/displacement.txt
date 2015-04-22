@@ -1,2 +1,0 @@
-DisplacementMap Scale: 2.436143
-DisplacementMap Bias : -0.428408

@@ -1,5 +1,0 @@
-Using freenect and a modified version of glview.c:
-https://gist.github.com/1326080
-
-Recorded the screen using ffmpeg (I have 0 knowledge of C...):
-https://gist.github.com/1325393
