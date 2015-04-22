@@ -2,7 +2,7 @@ importScripts("Three.Lite.js", "Vector2.js", "Vector3.js", "QuadBuilder.js", "Qu
 
 var QuadTreeSphereWorker = function () {
 	
-	 console.log("QuadTreeSphereWorker Spawned.");
+	// console.log("QuadTreeSphereWorker Spawned.");
 	
 	self.onmessage = this.handleMessage.bind(this);
 };
@@ -47,9 +47,9 @@ QuadTreeSphereWorker.prototype = {
 	    this.localCameraMaxAngle = Math.acos(this.radius / (this.cameraHeight + this.radius));
 
 	    this.cameraHeight = this.cameraHeight > 0 ? this.cameraHeight : this.radius + 1;
-	     this.log = function (text) {
-	         self.postMessage({log: text});
-	    };
+	    // this.log = function (text) {
+	    //     self.postMessage({log: text});
+	    // };
 	    this.quadTrees.forEach(function (tree) {
 	        tree.rootNode.update();
 	    });
@@ -86,15 +86,10 @@ QuadTreeSphereWorker.prototype = {
 	    this.fov = data.fov;
 	    // this.geometryProvider = new GeometryProvider(this.patchSize);
 	    this.vs = Math.tan(this.fov / data.screenWidth);
-console.log("building quadTree");
 	    this.quadTrees = [];
-console.log("building splitTable");
 	    this.splitTable = [];
-console.log("calling BuildSplitTable()");
 	    this.BuildSplitTable();
-console.log("calling InitQuadTrees()");
 	    this.InitQuadTrees();
-console.log("calling AssignNeighbors()");
 	    this.AssignNeighbors();
 	    self.postMessage({isInitialized: true});
 	},

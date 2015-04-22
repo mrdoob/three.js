@@ -169,7 +169,6 @@ THREE.QuadTreeSphere.prototype.buildNewMesh = function (mesh) {
     //buff.attributes.uv.itemSize = 2;
 
     buff.computeBoundingSphere();
-    buff.computeVertexNormals();
 	
 	
 	

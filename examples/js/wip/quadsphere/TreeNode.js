@@ -5,7 +5,7 @@ THREE.TreeNode = function (options) {
     this.tree = options.tree;
     this.position = options.position;
 
-    console.log(this.position.x + " : " + this.position.y + " : " + this.position.z);
+    //console.log(this.position.x + " : " + this.position.y + " : " + this.position.z);
 
     this.width = this.tree.planet.radius * 2 / Math.pow(2, this.level);
     this.halfWidth = this.width / 2;
@@ -487,7 +487,7 @@ THREE.TreeNode.prototype = {
 
 
     ShouldSplit: function () {
-        console.log("\tShould " + this.level + " Split if: " + this.tree.sphere.splitTable[this.level] + " >= " + this.distance);
+        //console.log("\tShould " + this.level + " Split if: " + this.tree.sphere.splitTable[this.level] + " >= " + this.distance);
         this.tree.planet.log(this.level + " < " + this.tree.planet.maxLevel);
         return this.level < this.tree.planet.maxLevel && this.tree.planet.splitTable[this.level] >= this.distance;
 
@@ -496,7 +496,7 @@ THREE.TreeNode.prototype = {
 
     ShouldUnSplit: function () {
 
-        console.log("\tShould " + this.level + " UnSplit if: " + this.tree.sphere.splitTable[this.level-1] + " < " + this.distance);
+        //console.log("\tShould " + this.level + " UnSplit if: " + this.tree.sphere.splitTable[this.level-1] + " < " + this.distance);
         return this.level >= 0 && this.tree.planet.splitTable[this.level] < this.distance;
 
     },

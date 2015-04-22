@@ -6,14 +6,8 @@ THREE.QuadTreeSphere = function (options) {
     this.pause = false;
     this.meshes = {};
     this.meshBuildTimeAvg = 0;
-	
-
-	
-	
 	this.initializeOptions(options);
-	
 	this.initializeWorker();
-	
 	this.updateCounter = 0;
 	this.avg = 0;
 	
@@ -33,7 +27,6 @@ THREE.QuadTreeSphere.prototype.initializeOptions = function (options, callback) 
     this.radius = options.radius;
     this.patchSize = options.patchSize;
     this.fov = options.fov;
-	
 	this.quadMaterial = options.quadMaterial;
 	
 };
