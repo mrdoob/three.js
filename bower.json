@@ -19,6 +19,7 @@
 		"editor",
 		"examples/*",
 		"!examples/js",
+		"!examples/fonts",
 		"src",
 		"test",
 		"utils",
