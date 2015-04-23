@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 three.js
 ========
 
@@ -67,12 +66,3 @@ If everything went well you should see [this](http://jsfiddle.net/f17Lz5ux/).
 ### Change log ###
 
 [releases](https://github.com/mrdoob/three.js/releases)
-=======
-# quadtree sphere addon for three.js
-
-from https://github.com/merpnderp/webglquadtreeplanet
-
-# issues:
-* needs a callback option (split/unspilt) for loading/unloading geometry
-* more information about quadmatterial options
->>>>>>> 8daa641e6dafb517ddd1a518d1d24571893253c9
