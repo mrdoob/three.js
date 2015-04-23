@@ -566,6 +566,23 @@ THREE.Object3D.prototype = {
 		}
 
 	},
+	
+	getUpdatedMatrixWorld: function () {
+
+		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+
+		if ( this.parent === undefined ) {
+
+			this.matrixWorld.copy( this.matrix );
+
+		} else {
+
+			this.matrixWorld.multiplyMatrices( this.parent.getUpdatedMatrixWorld() , this.matrix );
+
+		}
+		
+		return this.matrixWorld;
+	}
 
 	toJSON: function( meta ) {
 
