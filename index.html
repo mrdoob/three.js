@@ -97,15 +97,14 @@
 				position: absolute;
 				left: 180px;
 				top: 0px;
-				padding: 28px 20px;
+				margin: 28px 20px;
 			}
 
 				#viewer img {
-					width: 200px;
-					height: 150px;
 					display: block;
+					width: 50%;
+					height: auto;
 					float: left;
-					transition: opacity 0.2s;
 				}
 
 				#viewer img:hover {
@@ -146,7 +145,6 @@
 					margin-bottom: 20px;
 				}
 				h2{
-					margin-top: 20px;
 					margin-bottom: 20px;
 				}
 				#panel{
@@ -174,17 +172,38 @@
 					position: absolute;
 					left: 0;
 					top: 56px;
-					width: 100%;
-				}
-				#viewer img {
-					width: 33.33%;
-					height: auto;
 				}
 				#expandButton{
 					display: block;
 				}
 				#panel.collapsed{
 					height: 56px;
+				}
+			}
+
+			/* grid */
+
+			@media all and ( min-width: 420px ) {
+				#viewer img {
+					width: 33.33%;
+				}
+			}
+
+			@media all and ( min-width: 840px ) {
+				#viewer img {
+					width: 25%;
+				}
+			}
+
+			@media all and ( min-width: 1100px ) {
+				#viewer img {
+					width: 20%;
+				}
+			}
+
+			@media all and ( min-width: 1250px ) {
+				#viewer img {
+					width: 16.66%;
 				}
 			}
 
@@ -224,7 +243,6 @@
 
 				<a href="docs/index.html#Manual/Introduction/Creating_a_scene">getting started</a><br />
 				<a href="docs/">documentation</a><br />
-				<a href="https://plus.google.com/104300307601542851567" rel="publisher">google+</a><br />
 				<a href="http://webchat.freenode.net/?channels=three.js">chat</a><br />
 				<a href="http://stackoverflow.com/questions/tagged/three.js">help</a><br /><br />
 
@@ -274,6 +292,7 @@
 		<div id="viewer">
 
 			<h2>featured projects</h2>
+			<a href="https://plus.google.com/+ThreejsOrg" style="position:absolute;top:4px;right:0px;">submit project</a>
 
 			<a href="http://a-way-to-go.com/" target="_blank"><img src="files/projects/waytogo.png"></a>
 			<a href="http://www.urbangalaxyonline.com/" target="_blank"><img src="files/projects/urbangalaxyonline.jpg"></a>
