@@ -20,7 +20,7 @@ THREE.SceneUtils = {
 
 	detach: function ( child, parent, scene ) {
 
-		child.applyMatrix( parent.matrixWorld );
+		child.applyMatrix( parent.getUpdatedMatrixWorld() );
 		parent.remove( child );
 		scene.add( child );
 
@@ -29,7 +29,7 @@ THREE.SceneUtils = {
 	attach: function ( child, scene, parent ) {
 
 		var matrixWorldInverse = new THREE.Matrix4();
-		matrixWorldInverse.getInverse( parent.matrixWorld );
+		matrixWorldInverse.getInverse( parent.getUpdatedMatrixWorld() );
 		child.applyMatrix( matrixWorldInverse );
 
 		scene.remove( child );
