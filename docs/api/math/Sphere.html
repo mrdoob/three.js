@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A geometric sphere defined by a center position and radius.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Vector3 center], [page:Float radius])</h3>
+		<div>
+		center -- [page:Vector3] <br />
+		radius -- [page:Float]
+		</div>
+		
+
+		<h2>Properties</h2>
+
+
+		<h3>[property:Vector3 center]</h3>
+		
+		<h3>[property:Float radius]</h3>
+		
+		
+		<h2>Methods</h2>
+
+
+
+		<h3>.set([page:Vector3 center], [page:Float radius]) [page:this:Sphere]</h3>
+		<div>
+		center -- [page:Vector3] <br />
+		radius -- [page:Float]
+		</div>
+		<div>
+		Sets the center and radius.
+		</div>
+
+		<h3>[method:Sphere applyMatrix4]([page:Matrix4 matrix]) [page:Sphere this]</h3>
+		<div>
+		matrix -- [page:Matrix4]
+		</div>
+		<div>
+		Transforms this sphere with the provided [page:Matrix4].
+		</div>
+
+		<h3>[method:Vector3 clampPoint]([page:Vector3 point], [page:Vector3 optionalTarget])</h3>
+		<div>
+		point -- [page:Vector3] The point to clamp <br />
+		optionalTarget -- [page:Vector3] The optional target point to return
+		</div>
+		<div>
+		Clamps a point within the sphere. If the point is is outside the sphere, it will clamp it to the closets point on the edge of the sphere.
+		</div>
+
+		<h3>[method:Sphere translate]([page:Vector3 offset]) [page:Sphere this]</h3>
+		<div>
+		offset -- [page:Vector3]
+		</div>
+		<div>
+		Translate the sphere's center by the provided offset vector.
+		</div>
+
+		<h3>[method:Sphere clone]()</h3>
+		<div>
+		Provides a new copy of the sphere.
+		</div>
+
+		<h3>[method:Boolean equals]([page:Sphere sphere])</h3>
+		<div>
+		sphere -- [page:Sphere]
+		</div>
+		<div>
+		Checks to see if the two spheres' centers and radii are equal.
+		</div>
+
+		<h3>[method:Sphere setFromPoints]([page:Array points], [page:Vector3 optionalCenter]) [page:Sphere this]</h3>
+		<div>
+		points -- [page:Array] of [page:Vector3] positions.<br />  
+		optionalCenter -- Optional [page:Vector3] position for the sphere's center.<br />
+		</div>
+		<div>
+		Computes the minimum bounding sphere for *points*. If *optionalCenter* is given, it is used as the sphere's center. Otherwise, the center of the axis-aligned bounding box encompassing *points* is calculated.
+		</div>
+
+		<h3>[method:Float distanceToPoint]([page:Vector3 point])</h3>
+		<div>
+		point -- [page:Vector3]
+		</div>
+		<div>
+		Returns the closest distance from the boundary of the sphere to the point. If the sphere contains the point, the distance will be negative.
+		</div>
+
+		<h3>[method:Box getBoundingBox]([page:Box optionalTarget])</h3>
+		<div>
+		optionalTarget -- [page:Box]
+		</div>
+		<div>
+		Returns a bounding box for the sphere, optionally setting a provided box target.
+		</div>
+
+		<h3>[method:Boolean containsPoint]([page:Vector3 point])</h3>
+		<div>
+		point -- [page:Vector3]
+		</div>
+		<div>
+		Checks to see if the sphere contains the provided point inclusive of the edge of the sphere.
+		</div>
+
+		<h3>[method:Sphere copy]([page:Sphere sphere])</h3>
+		<div>
+		sphere -- [page:Sphere] to copy
+		</div>
+		<div>
+		Copies the values of the passed sphere to this sphere.
+		</div>
+
+		<h3>[method:Boolean intersectsSphere]([page:Sphere sphere])</h3>
+		<div>
+		sphere -- [page:Sphere]
+		</div>
+		<div>
+		Checks to see if two spheres intersect.
+		</div>
+
+		<h3>[method:Boolean empty]()</h3>
+		<div>
+		Checks to see if the sphere is empty (the radius set to 0).
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

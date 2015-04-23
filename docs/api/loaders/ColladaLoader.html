@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for <em>Collada</em> files.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<div>
+		Creates a new [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array options]</h3>
+		<div>
+		&nbsp;.[page:Boolean centerGeometry] — Force [page:Geometry] to always be centered at the local origin of the containing [page: Mesh].<br />
+		&nbsp;.[page:Boolean convertUpAxis] — Axis conversion is done for geometries, animations, and controllers.<br />
+		&nbsp;.[page:Boolean subdivideFaces] — Force subdivision into multiple [page: Face3].<br />
+		&nbsp;.[page:String upAxis] — X, Y or Z<br />
+		&nbsp;.[page:Boolean defaultEnvMap] — Cubemap to use for reflective or refractive materials.<br />
+		</div>
+
+		<h3>[property:Object geometries]</h3>
+		<div>
+		Parsed <em>.dae</em> geometries.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function onLoad], [page:Function onProgress] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:function onLoad] — Will be called when load completes. The argument will be an [page:Object object] containing loaded resources.<br />
+		[page:function onProgress] — Will be called while load progresses. The argument will be an object containing .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		</div>
+		<div>
+		Begin loading from url and call onLoad with the parsed response content.
+		</div>
+
+		<h3>[method:Object parse]( [page:Document doc], [page:Function callBack], [page:String url] )</h3>
+		<div>
+		[page:Document doc] — The <em>XML</em> document to parse.<br />
+		[page:Function callBack] — Will be called when parse completes.<br />
+		[page:String url] — The base url from which to find subsequent resources.<br />
+		</div>
+		<div>
+		Parse an <em>XML Document</em> and return an [page:Object object] that contain loaded parts: .[page:Scene scene], .[page:Array morphs], .[page:Array skins], .[page:Array animations], .[page:Object dae]
+		</div>
+
+		<h3>[method:null setPreferredShading]( [page:Integer shading] )</h3>
+		<div>
+		[page:Integer shading] — required
+		</div>
+		<div>
+		Set the .[page:Integer shading] property on the resource's materials.<br />
+		Options are [page:Materials THREE.SmoothShading], [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading].
+		</div>
+
+		<h3>[method:null applySkin]( [page:Geometry geometry], [page:Object instanceCtrl], [page:Integer frame] )</h3>
+		<div>
+		[page:Geometry geometry] — required<br />
+		[page:Object instanceCtrl] — required. A collada <em>skinController</em><br />
+		[page:Integer frame] — optionnal. Default is 40<br />
+		</div>
+		<div>
+		Apply a skin (vertices, animation, bones) from a <em>collada skin controller</em>, on the given [page:Geometry].
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.ColladaLoader();
+
+		loader.load(
+			// resource URL
+			'models/collada/monster/monster.dae',
+			// Function when resource is loaded
+			function ( collada ) {
+				scene.add( collada.scene );
+			},
+			// Function called when download progresses
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_collada]<br />
+		[example:webgl_loader_collada_keyframe]<br />
+		[example:webgl_loader_collada_skinning]<br />
+		[example:webgl_loader_collada_kinematics]
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/ColladaLoader.js examples/js/loaders/ColladaLoader.js]
+	</body>
+</html>

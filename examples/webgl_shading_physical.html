@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - physically based shading</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0px;
+				width: 550px;
+				padding: 5px;
+				z-index:100;
+			}
+
+			a { color: skyblue; }
+
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #444 !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
+
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<script>
+
+			var MARGIN = 0;
+
+			var WIDTH = window.innerWidth || 2;
+			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
+
+			var SCREEN_WIDTH = WIDTH;
+			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
+
+			var FAR = 10000;
+
+			var DAY = 0;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh, geometry;
+
+			var cubeCamera;
+
+			var sunLight, pointLight, ambientLight;
+
+			var morph;
+
+			var parameters, tweenDirection, tweenDay, tweenNight;
+
+			var clock = new THREE.Clock();
+
+			var gui, shadowConfig = {
+
+				shadowCameraVisible: false,
+				shadowCameraNear: 750,
+				shadowCameraFar: 4000,
+				shadowCameraFov: 30,
+				shadowBias: -0.0002,
+				shadowDarkness: 0.3
+
+			}, gamma = {
+				gammaFactor: 2.0,
+				gammaInput: true,
+				gammaOutput: true
+			};
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
+				camera.position.set( 500, 400, 1200 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
+
+				// CUBE CAMERA
+
+				cubeCamera = new THREE.CubeCamera( 1, FAR, 128 );
+				scene.add( cubeCamera );
+
+				// TEXTURES
+
+				var x = document.createElement( "canvas" );
+				var xc = x.getContext("2d");
+				x.width = x.height = 128;
+				xc.fillStyle = "#fff";
+				xc.fillRect(0, 0, 128, 128);
+				xc.fillStyle = "#000";
+				xc.fillRect(0, 0, 64, 64);
+				xc.fillStyle = "#999";
+				xc.fillRect(32, 32, 32, 32);
+				xc.fillStyle = "#000";
+				xc.fillRect(64, 64, 64, 64);
+				xc.fillStyle = "#555";
+				xc.fillRect(96, 96, 32, 32);
+
+				var texturePattern = new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				texturePattern.needsUpdate = true;
+				texturePattern.repeat.set( 1000, 1000 );
+				texturePattern.format = THREE.RGBFormat;
+
+				var textureSquares = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
+				textureSquares.repeat.set( 50, 50 );
+				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
+				textureSquares.magFilter = THREE.NearestFilter;
+				textureSquares.format = THREE.RGBFormat;
+
+				var textureNoiseColor = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				textureNoiseColor.repeat.set( 1, 1 );
+				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
+				textureNoiseColor.format = THREE.RGBFormat;
+
+				var textureLava = THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" );
+				textureLava.repeat.set( 6, 2 );
+				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
+				textureLava.format = THREE.RGBFormat;
+
+				//
+
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
+
+				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+
+				// GROUND
+
+				var groundMaterial = new THREE.MeshPhongMaterial( {
+					shininess: 80,
+					color: 0xffffff,
+					specular: 0xffffff,
+					map: textureSquares
+				} );
+
+				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+
+				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
+				ground.position.set( 0, 0, 0 );
+				ground.rotation.x = - Math.PI / 2;
+				ground.scale.set( 1000, 1000, 1000 );
+
+				ground.receiveShadow = true;
+
+				scene.add( ground );
+
+				// MATERIALS
+
+				var shader = THREE.ShaderLib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = cubeCamera.renderTarget;
+				shader.uniforms[ "tFlip" ].value = 1;
+
+				var materialCube = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms
+
+				} );
+
+				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
+				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
+
+				// OBJECTS
+
+				var sphereGeometry = new THREE.SphereGeometry( 100, 64, 32 );
+				var torusGeometry = new THREE.TorusGeometry( 240, 60, 32, 64 );
+				var cubeGeometry = new THREE.BoxGeometry( 150, 150, 150 );
+
+				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
+				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
+				mesh = addObject( sphereGeometry, materialPhongCube, 350, 100, -350, 0 );
+
+				function addObjectColor( geometry, color, x, y, z, ry ) {
+
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+
+					return addObject( geometry, material, x, y, z, ry );
+
+				}
+
+				function addObject( geometry, material, x, y, z, ry ) {
+
+					var tmpMesh = new THREE.Mesh( geometry, material );
+
+					tmpMesh.material.color.offsetHSL( 0.1, -0.1, 0 );
+
+					tmpMesh.position.set( x, y, z );
+
+					tmpMesh.rotation.y = ry;
+
+					tmpMesh.castShadow = true;
+					tmpMesh.receiveShadow = true;
+
+					scene.add( tmpMesh );
+
+					return tmpMesh;
+
+				}
+
+				var bigCube = new THREE.BoxGeometry( 50, 500, 50 );
+				var midCube = new THREE.BoxGeometry( 50, 200, 50 );
+				var smallCube = new THREE.BoxGeometry( 100, 100, 100 );
+
+				addObjectColor( bigCube,   0xff0000, -500, 250, 0, 0 );
+				addObjectColor( smallCube, 0xff0000, -500, 50, -150, 0 );
+
+				addObjectColor( midCube,   0x00ff00, 500, 100, 0, 0 );
+				addObjectColor( smallCube, 0x00ff00, 500, 50, -150, 0 );
+
+				addObjectColor( midCube,   0x0000ff, 0, 100, -500, 0 );
+				addObjectColor( smallCube, 0x0000ff, -150, 50, -500, 0 );
+
+				addObjectColor( midCube,   0xff00ff, 0, 100, 500, 0 );
+				addObjectColor( smallCube, 0xff00ff, -150, 50, 500, 0 );
+
+				addObjectColor( new THREE.BoxGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
+				addObjectColor( new THREE.BoxGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
+
+				addObjectColor( new THREE.SphereGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
+
+				// MORPHS
+
+				var loader = new THREE.JSONLoader();
+
+				loader.load( "models/animated/sittingBox.js", function( geometry ) {
+
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
+					morphMaterial.shading = THREE.FlatShading;
+
+					geometry.computeMorphNormals();
+					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
+
+					var s = 200;
+					morph.scale.set( s, s, s );
+
+					morph.duration = 8000;
+					morph.mirroredLoop = true;
+
+					morph.castShadow = true;
+					morph.receiveShadow = true;
+
+					scene.add( morph );
+
+				} );
+
+				// LIGHTS
+
+				var sunIntensity = 0.3,
+					pointIntensity = 1,
+					pointColor = 0xffaa00;
+
+				if ( DAY ) {
+
+					sunIntensity = 1;
+					pointIntensity = 0.5;
+					pointColor = 0xffffff;
+
+				}
+
+				ambientLight = new THREE.AmbientLight( 0x3f2806 );
+				scene.add( ambientLight );
+
+				pointLight = new THREE.PointLight( 0xffaa00, pointIntensity, 5000 );
+				pointLight.position.set( 0, 0, 0 );
+				scene.add( pointLight );
+
+				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI/2, 1 );
+				sunLight.position.set( 1000, 2000, 1000 );
+
+				sunLight.castShadow = true;
+
+				sunLight.shadowDarkness = 0.3 * sunIntensity;
+				sunLight.shadowBias = -0.0002;
+
+				sunLight.shadowCameraNear = 750;
+				sunLight.shadowCameraFar = 4000;
+				sunLight.shadowCameraFov = 30;
+
+				sunLight.shadowCameraVisible = false;
+
+				scene.add( sunLight );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				renderer.domElement.style.position = "absolute";
+				renderer.domElement.style.top = MARGIN + "px";
+				renderer.domElement.style.left = "0px";
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapType = THREE.PCFSoftShadowMap;
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.target.set( 0, 120, 0 );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.15;
+
+				controls.keys = [ 65, 83, 68 ];
+
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', onKeyDown, false );
+
+				// TWEEN
+
+				parameters = { control: 0 };
+
+				tweenDirection = -1;
+
+				tweenDay = new TWEEN.Tween( parameters ).to( { control: 1 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+
+				// GUI
+
+				gui = new dat.GUI();
+
+				shadowGUI = gui.addFolder( "Shadow" );
+    	
+    			shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+
+					sunLight.shadowCameraVisible = shadowConfig.shadowCameraVisible;
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
+
+					sunLight.shadowCamera.near = shadowConfig.shadowCameraNear;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
+
+					sunLight.shadowCamera.far = shadowConfig.shadowCameraFar;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
+
+					sunLight.shadowCamera.fov = shadowConfig.shadowCameraFov;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
+
+					sunLight.shadowBias = shadowConfig.shadowBias;
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
+
+				});
+				shadowGUI.open();
+
+				gammaGUI = gui.addFolder( "Gamma" );
+    
+				gammaGUI.add( gamma, 'gammaFactor', 0.1, 4.0 ).onChange( function() {
+
+					renderer.gammaFactor = gamma.gammaFactor;
+
+				});
+				gammaGUI.open();
+
+				/*
+
+				Not exposed because they are not easily dynamically updated - as all shaders need to be recompiled.  -bhouston
+
+				gammaGUI.add( gamma, 'gammaInput', true ).onChange( function() {
+
+					renderer.gammaInput = gamma.gammaInput;
+
+				});
+
+				gammaGUI.add( gamma, 'gammaOutput', true ).onChange( function() {
+
+					renderer.gammaOutput = gamma.gammaOutput;
+
+				});*/
+
+			}
+
+			//
+
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				controls.handleResize();
+
+			}
+
+			//
+
+			function onKeyDown ( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 78: /*N*/
+
+						if ( tweenDirection == 1 ) {
+
+							tweenDay.stop();
+							tweenNight.start();
+
+							tweenDirection = -1;
+
+						} else {
+
+							tweenNight.stop();
+							tweenDay.start();
+
+							tweenDirection = 1;
+
+						}
+
+					break;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				// update
+
+				var delta = 1000 * clock.getDelta();
+
+				TWEEN.update();
+				controls.update();
+
+				if ( morph ) morph.updateAnimation( delta );
+
+				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
+				renderer.setClearColor( scene.fog.color );
+
+				sunLight.intensity = parameters.control * 0.7 + 0.3;
+				pointLight.intensity = - parameters.control * 0.5 + 1;
+
+				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
+
+				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
+
+				// render cube map
+
+				mesh.visible = false;
+
+				renderer.autoClear = true;
+				cubeCamera.position.copy( mesh.position );
+				cubeCamera.updateCubeMap( renderer, scene );
+				renderer.autoClear = false;
+
+				mesh.visible = true;
+
+				// render scene
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

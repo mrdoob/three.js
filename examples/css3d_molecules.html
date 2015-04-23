@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>three.js css3d - molecules</title>
+		<style>
+			html, body {
+				height: 100%;
+			}
+
+			body {
+				background-color: #050505;
+
+				background: rgb(43,45,48); /* Old browsers */
+				background: -moz-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%, rgba(0,0,0,1) 100%); /* FF3.6+ */
+				background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(43,45,48,1)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
+				background: -webkit-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
+				background: -o-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Opera 12+ */
+				background: -ms-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
+				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* W3C */
+
+				margin: 0;
+				font-family: Arial;
+				overflow: hidden;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				font-weight: bold;
+				text-align: center;
+				z-index: 1;
+			}
+
+			#menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+				padding: 0;
+				margin: 0;
+			}
+
+			#topmenu {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				width: 100%;
+				text-align: right;
+				padding: 0;
+				margin: 0;
+				z-index: 1;
+			}
+
+			button {
+				color: rgb(255,255,255);
+				background: transparent;
+				border: 0px;
+				padding: 5px 10px;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: rgba(0,255,255,0.5);
+			}
+			button:active {
+				color: #000000;
+				background-color: rgba(0,255,255,1);
+			}
+
+			.bond {
+				width: 5px;
+				height: 10px;
+				background: #eee;
+				display: block;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.min.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/renderers/CSS3DRenderer.js"></script>
+		<script src="js/loaders/PDBLoader.js"></script>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - molecules</div>
+		<div id="topmenu">
+			<button id="b_a">Atoms</button>
+			<button id="b_b">Bonds</button>
+			<button id="b_ab">Atoms + Bonds</button>
+		</div>
+		<div id="menu"></div>
+
+		<script>
+			var camera, scene, renderer;
+			var controls;
+			var root;
+
+			var objects = [];
+			var tmpVec1 = new THREE.Vector3();
+			var tmpVec2 = new THREE.Vector3();
+			var tmpVec3 = new THREE.Vector3();
+			var tmpVec4 = new THREE.Vector3();
+
+			var visualizationType = 2;
+
+			var MOLECULES = {
+				"Ethanol": "ethanol.pdb",
+				"Aspirin": "aspirin.pdb",
+				"Caffeine": "caffeine.pdb",
+				"Nicotine": "nicotine.pdb",
+				"LSD": "lsd.pdb",
+				"Cocaine": "cocaine.pdb",
+				"Cholesterol": "cholesterol.pdb",
+				"Lycopene": "lycopene.pdb",
+				"Glucose": "glucose.pdb",
+				"Aluminium oxide": "Al2O3.pdb",
+				"Cubane": "cubane.pdb",
+				"Copper": "cu.pdb",
+				"Fluorite": "caf2.pdb",
+				"Salt": "nacl.pdb",
+				"YBCO superconductor": "ybco.pdb",
+				"Buckyball": "buckyball.pdb",
+				//"Diamond": "diamond.pdb",
+				"Graphite": "graphite.pdb"
+			};
+
+			var loader = new THREE.PDBLoader();
+			var colorSpriteMap = {};
+			var baseSprite = document.createElement( 'img' );
+
+			var menu = document.getElementById( "menu" );
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1500;
+
+				scene = new THREE.Scene();
+
+				root = new THREE.Object3D();
+				scene.add( root );
+
+				//
+
+				renderer = new THREE.CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 0.5;
+				controls.addEventListener( 'change', render );
+
+				//
+
+				baseSprite.onload = function () {
+
+					loadMolecule( "models/molecules/caffeine.pdb" );
+					createMenu();
+
+				};
+
+				baseSprite.src = 'textures/sprites/ball.png';
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function generateButtonCallback( url ) {
+
+				return function ( event ) {
+
+					loadMolecule( url );
+
+				}
+
+			}
+
+			function createMenu() {
+
+				for ( var m in MOLECULES ) {
+
+					var button = document.createElement( 'button' );
+					button.innerHTML = m;
+					menu.appendChild( button );
+
+					var url = "models/molecules/" +  MOLECULES[ m ];
+
+					button.addEventListener( 'click', generateButtonCallback( url ), false );
+
+				}
+
+				var b_a = document.getElementById( "b_a" );
+				var b_b = document.getElementById( "b_b" );
+				var b_ab = document.getElementById( "b_ab" );
+
+				b_a.addEventListener( 'click', function() { visualizationType = 0; showAtoms() } );
+				b_b.addEventListener( 'click', function() { visualizationType = 1; showBonds() } );
+				b_ab.addEventListener( 'click', function() { visualizationType = 2; showAtomsBonds() } );
+
+			}
+
+			//
+
+			function showAtoms() {
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+
+					if ( object instanceof THREE.CSS3DSprite ) {
+
+						object.element.style.display = "";
+						object.visible = true;
+
+					} else {
+
+						object.element.style.display = "none";
+						object.visible = false;
+
+					}
+
+				}
+
+			}
+
+			function showBonds() {
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+
+					if ( object instanceof THREE.CSS3DSprite ) {
+
+						object.element.style.display = "none";
+						object.visible = false;
+
+					} else {
+
+						object.element.style.display = "";
+						object.element.style.height = object.userData.bondLengthFull;
+						object.visible = true;
+
+					}
+
+				}
+
+			}
+
+			function showAtomsBonds() {
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+
+					object.element.style.display = "";
+					object.visible = true;
+
+					if ( ! ( object instanceof THREE.CSS3DSprite ) ) {
+
+						object.element.style.height = object.userData.bondLengthShort;
+
+					}
+
+				}
+
+			}
+
+			//
+
+			function colorify( ctx, width, height, color, a ) {
+
+				var r = color.r;
+				var g = color.g;
+				var b = color.b;
+
+				var imageData = ctx.getImageData( 0, 0, width, height );
+				var data = imageData.data;
+
+				for ( var y = 0; y < height; y ++ ) {
+
+					for ( var x = 0; x < width; x ++ ) {
+
+						var index = ( y * width + x ) * 4;
+
+						data[ index ]     *= r;
+						data[ index + 1 ] *= g;
+						data[ index + 2 ] *= b;
+						data[ index + 3 ] *= a;
+
+					}
+
+				}
+
+				ctx.putImageData( imageData, 0, 0 );
+
+			}
+
+			function imageToCanvas( image ) {
+
+				var width = image.width;
+				var height = image.height;
+
+				var canvas = document.createElement( 'canvas' );
+
+				canvas.width = width;
+				canvas.height = height;
+
+				var context = canvas.getContext( '2d' );
+				context.drawImage( image, 0, 0, width, height );
+
+				return canvas;
+
+			}
+
+			//
+
+			function loadMolecule( url ) {
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+					object.parent.remove( object );
+
+				}
+
+				objects = [];
+
+				loader.load( url, function ( geometry, geometryBonds ) {
+
+					var offset = geometry.center();
+					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+
+					for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
+						var position = geometry.vertices[ i ];
+						var color = geometry.colors[ i ];
+						var element = geometry.elements[ i ];
+
+						if ( ! colorSpriteMap[ element ] ) {
+
+							var canvas = imageToCanvas( baseSprite );
+							var context = canvas.getContext( '2d' );
+
+							colorify( context, canvas.width, canvas.height, color, 1 );
+
+							var dataUrl = canvas.toDataURL();
+
+							colorSpriteMap[ element ] = dataUrl;
+
+						}
+
+						colorSprite = colorSpriteMap[ element ];
+
+						var atom = document.createElement( 'img' );
+						atom.src = colorSprite;
+
+						var object = new THREE.CSS3DSprite( atom );
+						object.position.copy( position );
+						object.position.multiplyScalar( 75 );
+
+						object.matrixAutoUpdate = false;
+						object.updateMatrix();
+
+						root.add( object );
+
+						objects.push( object );
+
+					}
+
+					for ( var i = 0; i < geometryBonds.vertices.length; i += 2 ) {
+
+						var start = geometryBonds.vertices[ i ];
+						var end = geometryBonds.vertices[ i + 1 ];
+
+						start.multiplyScalar( 75 );
+						end.multiplyScalar( 75 );
+
+						tmpVec1.subVectors( end, start );
+						var bondLength = tmpVec1.length() - 50;
+
+
+						//
+
+						var bond = document.createElement( 'div' );
+						bond.className = "bond";
+						bond.style.height = bondLength + "px";
+
+						var object = new THREE.CSS3DObject( bond );
+						object.position.copy( start );
+						object.position.lerp( end, 0.5 );
+
+						object.userData.bondLengthShort = bondLength + "px";
+						object.userData.bondLengthFull = ( bondLength + 55 ) + "px";
+
+						//
+
+						var axis = tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
+						var radians = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
+
+						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+						object.matrix = objMatrix;
+						object.rotation.setFromRotationMatrix( object.matrix, object.rotation.order );
+
+						object.matrixAutoUpdate = false;
+						object.updateMatrix();
+
+						root.add( object );
+
+						objects.push( object );
+
+						//
+
+						var bond = document.createElement( 'div' );
+						bond.className = "bond";
+						bond.style.height = bondLength + "px";
+
+						var joint = new THREE.Object3D( bond );
+						joint.position.copy( start );
+						joint.position.lerp( end, 0.5 );
+
+						joint.matrix.copy( objMatrix );
+						joint.rotation.setFromRotationMatrix( joint.matrix, joint.rotation.order );
+
+						joint.matrixAutoUpdate = false;
+						joint.updateMatrix();
+
+						var object = new THREE.CSS3DObject( bond );
+						object.rotation.y = Math.PI/2;
+
+						object.matrixAutoUpdate = false;
+						object.updateMatrix();
+
+						object.userData.bondLengthShort = bondLength + "px";
+						object.userData.bondLengthFull = ( bondLength + 55 ) + "px";
+
+						object.userData.joint = joint;
+
+						joint.add( object );
+						root.add( joint );
+
+						objects.push( object );
+
+					}
+
+					//console.log( "CSS3DObjects:", objects.length );
+
+					switch ( visualizationType ) {
+
+						case 0: showAtoms(); break;
+						case 1: showBonds(); break;
+						case 2: showAtomsBonds(); break;
+
+					}
+
+					render();
+
+				} );
+
+
+			}
+
+			//
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+
+				var time = Date.now() * 0.0004;
+
+				root.rotation.x = time;
+				root.rotation.y = time * 0.7;
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">This class animates an object based on an hierarchy. This hierarchy can be Object3ds or bones.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Object3d root], [page:String name])</h3>
+		<div>
+		root -- The mesh to animate. <br />
+		name -- The name of the animation
+		</div>
+		<div>
+		Creates an animation for root. The animation data is gathered from AnimationHandler based on its name.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Object3d root]</h3>
+		<div>
+		The root object of the animation.
+		</div> 
+
+		<h3>[property:Object data]</h3>
+		<div>
+		The data containing the animation
+		</div> 
+		
+		<h3>[property:Array hierarchy]</h3>
+		<div>
+		The objects that are influenced by the animation.
+		</div>
+
+		<h3>[property:number currentTime]</h3>
+		<div>
+		The time elapsed since the last start/restart of the animation.
+		</div>
+		
+		<h3>[property:number timeScale]</h3>
+		<div>
+		The timez 
+		</div>
+
+		<h3>[property:boolean isPlaying]</h3>
+		<div>
+		Indicates whether the animation is playing. This shouldn't be adapted by user code.
+		</div>
+		
+		<h3>[property:boolean isPaused]</h3>
+		<div>
+		Indicates whether the animation is paused. This shouldn't be adapted by user code.
+		</div>
+		
+		<h3>[property:boolean loop]</h3>
+		<div>
+		Set to make the animation restart when the animation ends.
+		</div> 
+		
+		<h3>[property:number interpolationType]</h3>
+		<div>
+		The type to indicate how to interpolate between 2 data points.
+		</div> 
+
+		<h2>Methods</h2>
+		
+		<h3>[method:null play]([page:Number startTime])</h3>
+		<div>
+		Starts the animation from a moment startTime in the animation.
+		</div>
+
+		<h3>[method:null stop]()</h3>
+		<div>
+		Stops the animation.
+		</div>
+
+		<h3>[method:Boolean update]([page:Number deltaTimeMS])</h3>
+		<div>
+		deltaTimeMS -- The time of the between the previous frame and this frame in miliseconds. 
+		</div>
+		<div>
+		Updates the animation in time. This shouldn't be called by user code. The animationHandler calls this method.
+		</div>
+
+		<h3>[method:array interpolateCatmullRom]([page:Array points], [page:Number scale])</h3>
+		<div>
+		points -- The 4 control point to calculate CatMullRom <br />
+		scale -- The scale between the previous key and the nex key 
+		</div>
+		<div>
+		Interpolates the point based on the key. Is used in update.
+		</div>
+
+		<h3>[method:Object getNextKeyWith]([page:String type], [page:Object h], [page:Number key])</h3>
+		<div>
+		type -- The animationtype for the key. Can be "pos", "rot" and "scl".<br />
+		h -- The object of the hierarchy that catins the key <br />
+		key -- The index of the next possible key.
+		</div>
+		<div>
+		Gets the next key. Is used in Update.
+		</div>
+
+		<h3>[method:Object getPrevKeyWith]([page:String type], [page:Object h], [page:Number key])</h3>
+		<div>
+		type -- The animationtype for the key. Can be "pos", "rot" and "scl".<br />
+		h -- The object of the hierarchy that contains the key. <br />
+		key -- The index of the prev possible key.
+		</div>
+		<div>
+		Gets the previous key. Is used in Update.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading objects in JSON format.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Boolean showStatus] )</h3>
+		<div>
+		[page:Boolean showStatus] — Show the status of loading div.
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:boolean withCredentials]</h3>
+		<div>
+		If true, the ajax request will use cookies.
+		</div>
+
+
+		<h2>Properties inherited from [page:Loader]</h2>
+
+		<h3>[property:Boolean showStatus]</h3>
+		<div>If true, show loading status in the statusDomElement.</div>
+
+		<h3>[property:DOMElement statusDomElement]</h3>
+		<div>This is the recipient of status messages.</div>
+
+		<h3>[property:Function onLoadStart]</h3>
+		<div>Will be called when load starts.</div>
+		<div>The default is a function with empty body.</div>
+
+		<!--
+		<h3>[property:Function onLoadProgress]</h3>
+		<div>Will be called while load progresses.</div>
+		<div>The default is a function with empty body.</div>
+		-->
+
+		<h3>[property:Function onLoadComplete]</h3>
+		<div>Will be called when load completes.</div>
+		<div>The default is a function with empty body.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String url], [page:Function callback], [page:String texturePath] )</h3>
+		<div>
+		[page:String url] — required<br />
+		[page:Function callback] — required. Will be called when load completes. The arguments will be the loaded [page:Object3D] and the loaded [page:Array materials].<br />
+		[page:String texturePath] — optional. If not specified, textures will be assumed to be in the same folder as the Javascript model file.
+		</div>
+
+		<h3>[method:null loadAjaxJSON]([page:JSONLoader context], [page:String url], [page:Function callback], [page:String texturePath], [page:Function callbackProgress])</h3>
+		<div>
+		[page:JSONLoader context] — The [page:JSONLoader] instance<br />
+		[page:String url] — required<br />
+		[page:Function callback] — required. This function will be called with the loaded model as an instance of [page:Geometry geometry] when the load is completed.<br />
+		[page:String texturePath] — Base path for textures.<br />
+		[page:Function callbackProgress] — Will be called while load progresses. The argument will be an [page:Object] containing two attributes: .[page:Integer total] and .[page:Integer loaded] bytes.
+		</div>
+		<div>
+		Begin loading from url and call <em>callback</em> with the parsed response content.
+		</div>
+
+		<h3>[method:Object3D parse]( [page:Object json], [page:String texturePath] )</h3>
+		<div>
+		[page:String json] — JSON object to parse.<br />
+		[page:String texturePath] — Base path for textures.
+		</div>
+		<div>
+		Parse a <em>JSON</em> structure and return an [page:Object] containing the parsed .[page:Geometry] and .[page:Array materials].
+		</div>
+
+		<h2>Methods inherited from [page:Loader]</h2>
+
+		<h3>[method:Boolean needsTangents]( [page:Array materials] )</h3>
+		<div>
+		[page:Array materials] — an array of [page:Material]
+		</div>
+		<div>
+		Checks if the loaded object needs tangents based on its materials.
+		</div>
+
+		<h3>[method:null updateProgress]( [page:object progress] )</h3>
+		<div>
+		[page:Object progress] — an object containing loaded(contains the amount of bytes loaded) and optionally total (containing the total amount of bytes).
+		</div>
+		<div>
+		Updates the DOM object with the progress made.
+		</div>
+
+		<h3>[method:Material createMaterial]( [page:object m], [page:string texturePath] )</h3>
+		<div>
+		[page:Object m] — The parameters to create the material. <br />
+		[page:String texturePath] — The base path of the textures.
+		</div>
+		<div>
+		Creates the Material based on the parameters m.
+		</div>
+
+		<h3>[method:Array initMaterials]( [page:Array materials], [page:string texturePath] )</h3>
+		<div>
+		[page:Array materials] — an array of parameters to create materials. <br />
+		[page:String texturePath] —  The base path of the textures.
+		</div>
+		<div>
+		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
+		</div>
+
+		<h3>[method:String extractUrlBase]( [page:string url] )</h3>
+		<div>
+		[page:String url] —  The url to extract the base url from.
+		</div>
+		<div>
+		Extract the base from the URL.
+		</div>
+
+		<h3>[method:DOMElement addStatusElement]()</h3>
+		<div>
+		Add a DOM element to indicate the progress and return the DOMElement
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.JSONLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'models/animated/monster/monster.js',
+			// Function when resource is loaded
+			function ( geometry, materials ) {
+				var material = new THREE.MeshFaceMaterial( materials );
+				var object = new THREE.Mesh( geometry, material );
+				scene.add( object );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_json_blender]
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

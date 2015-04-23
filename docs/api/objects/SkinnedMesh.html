@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">An 3d object that has bones data. These Bones can then be used to animate the vertices of the object.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Geometry geometry], [page:Material material], [page:boolean useVertexTexture])</h3>
+		<div>
+                geometry — An instance of [page:Geometry].<br />
+                material — An instance of [page:Material] (optional).<br />
+		useVertexTexture -- Defines wether a vertex texture can be used (optional).
+		</div>
+		<div>
+		This Creates a new instance of skinnedMesh.
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+
+		<h3>[property:array bones]</h3>
+		<div>
+		This contains the array of bones for this mesh. These should be set in the constructor.
+		</div>
+
+		<h3>[property:Matrix4 identityMatrix]</h3>
+		<div>
+		This is an identityMatrix to calculate the bones matrices from.
+		</div>
+
+		<h3>[property:boolean useVertexTexture]</h3>
+		<div>
+		The boolean defines whether a vertex texture is used to calculate the bones. This boolean shouldn't be changed after constructor.
+		</div>
+
+		<h3>[property:array boneMatrices]</h3>
+		<div>
+		This array of matrices contains the matrices of the bones. These get calculated in the constructor.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null pose]()</h3>
+		<div>
+		This method sets the skinnedmesh in the rest pose.
+		</div>
+
+		<h3>[method:Bone addBone]([page:Bone bone])</h3>
+		<div>
+		bone -- This is the bone that needs to be added. (optional)
+		</div>
+		<div>
+		This method adds the bone to the skinnedmesh when it is provided. It creates a new bone and adds that when no bone is given.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

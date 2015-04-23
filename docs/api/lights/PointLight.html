@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Affects objects using [page:MeshLambertMaterial] or [page:MeshPhongMaterial].
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>var light = new THREE.PointLight( 0xff0000, 1, 100 );
+light.position.set( 50, 50, 50 );
+scene.add( light );</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Number distance])</h3>
+		<div>
+		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
+		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
+		[page:Number distance] -- The distance of the light where the intensity is 0. When distance is 0, then the distance is endless. 
+		</div>
+		<div>
+		Creates a light at a specific position in the scene.  The light shines in all directions (roughly similar to a light bulb.)
+	
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float intensity]</h3>
+		<div>
+			Light's intensity.<br />
+			Default - *1.0*.
+		</div>
+
+		<h3>[property:Float distance]</h3>
+		<div>
+			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
+			Default — *0.0*.
+		</div>
+		
+		<h2>Methods</h2>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Handles and keeps track of loaded and pending data.</div>
+		<code>
+		var manager = new THREE.LoadingManager();
+		manager.onProgress = function ( item, loaded, total ) {
+
+			console.log( item, loaded, total );
+
+		};
+
+		var loader = new THREE.OBJLoader( manager );
+		loader.load( 'file.obj', function ( object ) {
+
+			//
+
+		} );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:Function onLoad] — The function that needs to be called when all loaders are done.<br />
+		[page:Function onProgress] — The function that needs to be called when an item is complete.<br />
+		[page:Function onError] — The function that needs to be called when an item is errors.
+		</div>
+		<div>
+		Creates a [name].
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Function onLoad]</h3>
+		<div>
+		The function that needs to be called when all loaders are done.
+		</div>
+
+		<h3>[property:Function onProgress]</h3>
+		<div>
+		The function that needs to be called when an item is complete. The arguments are url(The url of the item just loaded),<br />
+		loaded(the amount of items already loaded), total( The total amount of items to be loaded.)
+		</div>
+
+		<h3>[property:Function onError]</h3>
+		<div>
+		The function that needs to be called when an item errors.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null itemStart]( [page:String url] )</h3>
+		<div>
+		[page:String url] — the url to load
+		</div>
+		<div>
+		This should be called by any loader used by the manager when the loader starts loading an url. These shouldn't be called outside a loader.
+		</div>
+
+		<h3>[method:null itemEnd]( [page:String url] )</h3>
+		<div>
+		[page:String url] — the loaded url
+		</div>
+		<div>
+		This should be called by any loader used by the manager when the loader ended loading an url.  These shouldn't be called outside a loader.
+		</div>
+
+
+		<h2>Example</h2>
+
+		[example:webgl_loader_obj]
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

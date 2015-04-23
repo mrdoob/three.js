@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		<p>
+		This class is an efficient alternative to [page:Geometry], because it stores all data, including
+		vertex positions, face indices, normals, colors, UVs, and custom attributes within buffers; this
+		reduces the cost of passing all this data to the GPU. 
+		This also makes BufferGeometry harder to work with than [page:Geometry]; rather than accessing 
+		position data as [page:Vector3] objects, color data as [page:Color] objects, and so on, you have to 
+		access the raw data from the appropriate [page:BufferAttribute attribute] buffer. This makes 
+		BufferGeometry best-suited for static objects where you don't need to manipulate the geometry much
+		after instantiating it.
+		</p>
+
+		<h3>Example</h3>
+		<code>
+		var geometry = new THREE.BufferGeometry();
+		// create a simple square shape. We duplicate the top left and bottom right
+		// vertices because each vertex needs to appear once per triangle. 
+		var vertexPositions = [ 
+			[-1.0, -1.0,  1.0],
+			[ 1.0, -1.0,  1.0],
+			[ 1.0,  1.0,  1.0],
+
+			[ 1.0,  1.0,  1.0],
+			[-1.0,  1.0,  1.0],
+			[-1.0, -1.0,  1.0]
+		];
+		var vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex
+
+		// components of the position vector for each vertex are stored
+		// contiguously in the buffer.
+		for ( var i = 0; i < vertexPositions.length; i++ )
+		{
+			vertices[ i*3 + 0 ] = vertexPositions[i][0];
+			vertices[ i*3 + 1 ] = vertexPositions[i][1];
+			vertices[ i*3 + 2 ] = vertexPositions[i][2];
+		}
+
+		// itemSize = 3 because there are 3 values (components) per vertex
+		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		</code>
+		<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>
+
+		
+		<h3>Accessing attributes</h3>
+		<p>
+		WebGL stores data associated with individual vertices of a geometry in <emph>attributes</emph>. 
+		Examples include the position of the vertex, the normal vector for the vertex, the vertex color,
+		and so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping
+		up this information into typed array buffers and sending this data to the shader. With 
+		BufferGeometry, all of this data is stored in buffers associated with an individual attributes.
+		This means that to get the position data associated with a vertex (for instance), you must call
+		[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual 
+		x, y, and z coordinates of the position.  
+		</p>
+		<p>
+		The following attributes are set by various members of this class:
+		</p>
+		<h4>[page:BufferAttribute position] (itemSize: 3)</h4>
+		<div>
+		Stores the x, y, and z coordinates of each vertex in this geometry. Set by [page:.fromGeometry]().
+		</div>
+
+		<h4>[page:BufferAttribute normal] (itemSize: 3)</h4>
+		<div>
+		Stores the x, y, and z components of the face or vertex normal vector of each vertex in this geometry.
+		Set by [page:.fromGeometry]().
+		</div>
+
+		<h4>[page:BufferAttribute color] (itemSize: 3)</h4>
+		<div>
+		Stores the red, green, and blue channels of vertex color of each vertex in this geometry.
+		Set by [page:.fromGeometry]().
+		</div>
+
+		<h4>[page:BufferAttribute tangent] (itemSize: 3)</h4>
+		<div>
+		Stores the x, y, and z components of the tangent vector of each vertex in this geometry. Set by [page:.computeTangents]().
+		</div>
+
+		<h4>[page:BufferAttribute index] (itemSize: 3)</h4>
+		Allows for vertices to be re-used across multiple triangles; this is called using "indexed triangles," and works much the same as it does in [page:Geometry]: each triangle is associated with the index of three vertices. This attribute therefore stores the index of each vertex for each triangular face.
+
+		If this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous positions represent a single triangle.
+		</div>
+		<p>
+		In addition to the the built-in attributes, you can set your own custom attributes using the addAttribute method. With [page:Geometry], these attributes are set and stored on the [page:Material]. In BufferGeometry, the attributes are stored with the geometry itself. Note that you still need to set the attributes information on the material as well, but the value of each attribute is stored in the BufferGeometry. 
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<div>
+		This creates a new [name]. It also sets several properties to a default value.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Integer id]</h3>
+		<div>
+		Unique number for this buffergeometry instance.
+		</div>
+		
+		<h3>[property:Hashmap attributes]</h3>
+		<div>
+		This hashmap has as id the name of the attribute to be set and as value the [page:BufferAttribute buffer] to set it to.
+		Rather than accessing this property directly, use addAttribute and getAttribute to access attributes of this geometry.
+		</div>
+		
+		<!--
+ 		<h3>[property:Boolean dynamic]</h3>
+		<div>
+		When set, it holds certain buffers in memory to have faster updates for this object. When unset, it deletes those buffers and   saves memory.
+		</div> -->
+		
+		<h3>[property:Array drawCalls] (previously [property:Array offsets])</h3>
+		<div>
+		For geometries that use indexed triangles, this Array can be used to split the object into multiple WebGL draw calls. Each draw call will draw some subset of the vertices in this geometry using the configured [page:Material shader]. This may be necessary if, for instance, you have more than 65535 vertices in your object. 
+		Each element is an object of the form:
+		<code>{ start: Integer, count: Integer, index: Integer }</code>
+		where start specifies the index of the first vertex in this draw call, count specifies how many vertices are included, and index specifies an optional offset.
+
+		Use addDrawCall to add draw calls, rather than modifying this array directly.
+		</div>
+
+		<h3>[property:Box3 boundingBox]</h3>
+		<div>
+		Bounding box.
+		<code>{ min: new THREE.Vector3(), max: new THREE.Vector3() }</code>
+		</div>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<div>
+		Bounding sphere.
+		<code>{ radius: float }</code>
+		</div>
+		
+		<h3>[property:Array morphTargets]</h3>
+		<div>
+		Array of morph targets. Each morph target is a Javascript object:
+		<code>{ name: "targetName", vertices: [ new THREE.Vertex(), ... ] }</code>
+		Morph vertices match number and order of primary vertices.
+		</div>
+
+		<h3>[property:boolean hasTangents]</h3>
+		<div>
+		True if BufferGeometry has tangents. Set in [page:.computeTangents].
+		</div> 
+
+		<h2>Methods</h2>
+
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		
+		<h3>[property:null addAttribute]( [page:String name], [page:BufferAttribute attribute] )</h3>
+		<div>
+		Adds an attribute to this geometry. Use this rather than the attributes property, 
+		because an internal array of attributes is maintained to speed up iterating over
+		attributes.
+		</div>
+
+		<h3>[method:null addDrawCall]( [page:Integer start], [page:Integer count], [page:Integer indexOffset] )</h3>
+		<div>
+		Adds a draw call to this geometry; see the drawcalls property for details.
+		</div>
+
+
+		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
+		<div>
+		Bakes matrix transform directly into vertex coordinates.
+		</div>
+
+		<h3>[method:null computeVertexNormals]()</h3>
+		<div>
+		Computes vertex normals by averaging face normals.<br />
+		</div>
+
+		<h3>[method:null computeTangents]()</h3>
+		<div>
+		Computes vertex tangents.<br />
+		Based on [link:http://www.terathon.com/code/tangent.html]<br />
+		Geometry must have vertex [page:UV UVs] (layer 0 will be used).
+		</div>
+
+		<h3>[method:null computeBoundingBox]()</h3>
+		<div>
+		Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.<br />
+		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
+		</div>
+
+		<h3>[method:null computeBoundingSphere]()</h3>
+		<div>
+		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.<br />
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
+		</div>
+		
+		<h3>[method:null dispose]()</h3>
+		<div>
+		Disposes the object from memory. <br />
+		You need to call this when you want the bufferGeometry removed while the application is running.
+		</div>
+
+		<h3>[method:null fromGeometry]( [page:Geometry] )</h3>
+		<div>
+		Populates this BufferGeometry with data from a [page:Geometry] object.
+		</div>
+
+		<h3>[method:BufferAttribute getAttribute]( [page:String name] )</h3>
+		<div>
+		Returns the [page:BufferAttribute attribute] with the specified name.
+		</div>
+
+		<h3>[method:null normalizeNormals]()</h3>
+		<div>
+		Every normal vector in a geometry will have a magnitude of 1.
+		This will correct lighting on the geometry surfaces.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

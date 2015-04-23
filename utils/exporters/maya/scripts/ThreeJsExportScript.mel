@@ -1,0 +1,108 @@
+// ThreeJsExportScript.mel
+// Author: Sean Griffin
+// Email: sean@thoughtbot.com
+
+global proc int ThreeJsExportScript(string $parent, string $action, string $settings, string $callback)
+{
+    if ($action == "post")
+    {
+        setParent $parent;
+        columnLayout -adj true;
+
+          frameLayout -cll true -cl false -bv true -bs "etchedIn" -l "General Export Options";
+            columnLayout -adj true;
+              checkBox -v true -l "Vertices" vertsCb;
+              checkBox -v true -l "Faces" facesCb;
+              checkBox -v true -l "Normals" normalsCb;
+              checkBox -v true -l "UVs" uvsCb;
+              checkBox -v false -l "Colors" colorsCb;
+              checkBox
+                -v true
+                -l "Bones"
+                -onc "textField -e -en true maxInfluencesText;"
+                -ofc "textField -e -en false maxInfluencesText;"
+                bonesCb;
+              textFieldGrp -tx 4 -label "Max Influences Per Vertex" maxInfluencesText;
+              setParent ..; // columnLayout
+            setParent ..; // frameLayout
+
+          frameLayout -cll true -cl false -bv true -bs "etchedIn" -l "Skinning Options";
+            columnLayout -adj true;
+              checkBox -v true -l "Material Indices" materialsCb;
+              checkBox -v true -l "Diffuse Maps" diffuseMapsCb;
+              checkBox -v true -l "Specular Maps" specularMapsCb;
+              checkBox -v true -l "Bump Maps" bumpMapsCb;
+              checkBox -v true -l "Copy Texture Files to Target Directory" copyTexturesCb;
+              setParent ..; // columnLayout
+            setParent ..; // frameLayout
+
+          frameLayout -cll true -cl false -bv true -bs "etchedIn" -l "Animation Options";
+            columnLayout -adj true;
+              checkBox -v true -l "Export Animations" animCb;
+              checkBox
+                -v false
+                -l "Bake Animation"
+                -onc "textField -e -en true startText; textField -e -en true endText; textField -e -en true stepText;"
+                -ofc "textField -e -en false startText; textField -e -en false endText; textField -e -en false stepText;"
+                bakeAnimCb;
+              textField -en false -tx `playbackOptions -minTime true -q` -ann "Start" startText;
+              textField -en false -tx `playbackOptions -maxTime true -q` -ann "End" endText;
+              textField -en false -tx 1 -ann "Step" stepText;
+            setParent ..; // columnLayout
+          setParent ..; // frameLayout
+
+          frameLayout -cll true -cl false -bv true -bs "etchedIn" -l "Debug Options";
+            columnLayout -adj true;
+              checkBox -v false -l "Pretty Output" prettyOutputCb;
+            setParent ..; // columnLayout
+          setParent ..; // frameLayout
+
+    }
+    else if ($action == "query")
+    {
+        string $option = "\"";
+        if (`checkBox -q -v vertsCb`)
+            $option += "vertices ";
+        if (`checkBox -q -v facesCb`)
+            $option += "faces ";
+        if (`checkBox -q -v normalsCb`)
+            $option += "normals ";
+        if (`checkBox -q -v uvsCb`)
+            $option += "uvs ";
+        if (`checkBox -q -v materialsCb`)
+            $option += "materials ";
+        if (`checkBox -q -v diffuseMapsCb`)
+            $option += "diffuseMaps ";
+        if (`checkBox -q -v specularMapsCb`)
+            $option += "specularMaps ";
+        if (`checkBox -q -v bumpMapsCb`)
+            $option += "bumpMaps ";
+        if (`checkBox -q -v copyTexturesCb`)
+            $option += "copyTexturesMaps ";
+        if (`checkBox -q -v colorsCb`)
+            $option += "colors ";
+        if (`checkBox -q -v bonesCb`)
+        {
+            $option += "bones ";
+            $option += `textFieldGrp -q -tx maxInfluencesText`;
+            $option += " ";
+        }
+        if (`checkBox -q -v animCb`)
+            $option += "skeletalAnim ";
+        if (`checkBox -q -v bakeAnimCb`)
+        {
+            $option += "bakeAnimations ";
+            $option += `textField -q -tx startText`;
+            $option += " ";
+            $option += `textField -q -tx endText`;
+            $option += " ";
+            $option += `textField -q -tx stepText`;
+            $option += " ";
+        }
+        if (`checkBox -q -v prettyOutputCb`)
+            $option += "prettyOutput ";
+        $option += "\"";
+        eval($callback + $option);
+    }
+    return 1;
+}

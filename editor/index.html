@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js / editor</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+	<body ontouchstart="">
+		<link href="css/main.css" rel="stylesheet" />
+		<link id="theme" href="css/light.css" rel="stylesheet" />
+
+		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/libs/system.min.js"></script>
+
+		<script src="../examples/js/controls/EditorControls.js"></script>
+		<script src="../examples/js/controls/TransformControls.js"></script>
+		<script src="../examples/js/loaders/AWDLoader.js"></script>
+		<script src="../examples/js/loaders/BabylonLoader.js"></script>
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/PLYLoader.js"></script>
+		<script src="../examples/js/loaders/STLLoader.js"></script>
+		<script src="../examples/js/loaders/UTF8Loader.js"></script>
+		<script src="../examples/js/loaders/VRMLLoader.js"></script>
+		<script src="../examples/js/loaders/VTKLoader.js"></script>
+		<script src="../examples/js/loaders/ctm/lzma.js"></script>
+		<script src="../examples/js/loaders/ctm/ctm.js"></script>
+		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
+		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/exporters/STLExporter.js"></script>
+
+		<script src="../examples/js/loaders/deprecated/SceneLoader.js"></script>
+
+		<script src="../examples/js/renderers/Projector.js"></script>
+		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
+		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
+		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
+		<script src="../examples/js/renderers/SVGRenderer.js"></script>
+
+		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
+		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
+		<script src="js/libs/codemirror/codemirror.js"></script>
+		<script src="js/libs/codemirror/mode/javascript.js"></script>
+		<script src="js/libs/esprima.js"></script>
+
+		<script src="js/libs/jszip.min.js"></script>
+		<script src="js/libs/sortable.min.js"></script>
+		<script src="js/libs/signals.min.js"></script>
+		<script src="js/libs/ui.js"></script>
+		<script src="js/libs/ui.three.js"></script>
+
+		<script src="js/libs/app.js"></script>
+		<script src="js/Player.js"></script>
+		<script src="js/Script.js"></script>
+
+		<script src="../examples/js/effects/VREffect.js"></script>
+		<script src="../examples/js/controls/VRControls.js"></script>
+
+		<script src="js/Storage.js"></script>
+
+		<script src="js/Editor.js"></script>
+		<script src="js/Config.js"></script>
+		<script src="js/Loader.js"></script>
+		<script src="js/Menubar.js"></script>
+		<script src="js/Menubar.File.js"></script>
+		<script src="js/Menubar.Edit.js"></script>
+		<script src="js/Menubar.Add.js"></script>
+		<script src="js/Menubar.Play.js"></script>
+		<script src="js/Menubar.View.js"></script>
+		<script src="js/Menubar.Examples.js"></script>
+		<script src="js/Menubar.Help.js"></script>
+		<script src="js/Menubar.Status.js"></script>
+		<script src="js/Sidebar.js"></script>
+		<script src="js/Sidebar.Project.js"></script>
+		<script src="js/Sidebar.Scene.js"></script>
+		<script src="js/Sidebar.Object3D.js"></script>
+		<script src="js/Sidebar.Animation.js"></script>
+		<script src="js/Sidebar.Geometry.js"></script>
+		<script src="js/Sidebar.Geometry.Geometry.js"></script>
+		<script src="js/Sidebar.Geometry.BufferGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.Modifiers.js"></script>
+		<script src="js/Sidebar.Geometry.BoxGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.CircleGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.CylinderGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.IcosahedronGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.PlaneGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.SphereGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
+		<script src="js/Sidebar.Material.js"></script>
+		<script src="js/Sidebar.Script.js"></script>
+		<script src="js/Toolbar.js"></script>
+		<script src="js/Viewport.js"></script>
+		<script src="js/Viewport.Info.js"></script>
+
+		<script>
+
+			window.URL = window.URL || window.webkitURL;
+			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+			Number.prototype.format = function (){
+				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			};
+
+			//
+
+			var editor = new Editor();
+
+			var viewport = new Viewport( editor );
+			document.body.appendChild( viewport.dom );
+
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
+
+			var player = new Player( editor );
+			document.body.appendChild( player.dom );
+
+			var toolbar = new Toolbar( editor );
+			document.body.appendChild( toolbar.dom );
+
+			var menubar = new Menubar( editor );
+			document.body.appendChild( menubar.dom );
+
+			var sidebar = new Sidebar( editor );
+			document.body.appendChild( sidebar.dom );
+
+			var dialog = new UI.Dialog();
+			document.body.appendChild( dialog.dom );
+
+			//
+
+			editor.setTheme( editor.config.getKey( 'theme' ) );
+
+			editor.storage.init( function () {
+
+				editor.storage.get( function ( state ) {
+
+					if ( state !== undefined ) {
+
+						editor.fromJSON( state );
+
+					}
+
+					var selected = editor.config.getKey( 'selected' );
+
+					if ( selected !== undefined ) {
+
+						editor.selectByUuid( selected );
+
+					}
+
+				} );
+
+				//
+
+				var timeout;
+
+				var saveState = function ( scene ) {
+
+					if ( editor.config.getKey( 'autosave' ) === false ) {
+
+						return;
+
+					}
+
+					clearTimeout( timeout );
+
+					timeout = setTimeout( function () {
+
+						editor.signals.savingStarted.dispatch();
+
+						timeout = setTimeout( function () {
+
+							editor.storage.set( editor.toJSON() );
+
+							editor.signals.savingFinished.dispatch();
+
+						}, 100 );
+
+					}, 1000 );
+
+				};
+
+				var signals = editor.signals;
+
+				signals.editorCleared.add( saveState );
+				signals.geometryChanged.add( saveState );
+				signals.objectAdded.add( saveState );
+				signals.objectChanged.add( saveState );
+				signals.objectRemoved.add( saveState );
+				signals.materialChanged.add( saveState );
+				signals.sceneGraphChanged.add( saveState );
+				signals.scriptChanged.add( saveState );
+
+				/*
+				var showDialog = function ( content ) {
+
+					dialog.clear();
+
+					dialog.add( content );
+					dialog.showModal();
+
+				};
+
+				signals.showDialog.add( showDialog );
+				*/
+
+			} );
+
+			//
+
+			document.addEventListener( 'dragover', function ( event ) {
+
+				event.preventDefault();
+				event.dataTransfer.dropEffect = 'copy';
+
+			}, false );
+
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+
+				if ( event.dataTransfer.files.length > 0 ) {
+
+					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				}
+
+			}, false );
+
+			document.addEventListener( 'keydown', function ( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 8: // prevent browser back
+						event.preventDefault();
+						break;
+
+				}
+
+			}, false );
+
+			var onWindowResize = function ( event ) {
+
+				editor.signals.windowResize.dispatch();
+
+			};
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			onWindowResize();
+
+			//
+
+			var file = null;
+			var hash = window.location.hash;
+
+			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
+			if ( hash.substr( 1, 6 ) === 'scene=' ) file = hash.substr( 7 );
+
+			if ( file !== null ) {
+
+				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+
+					var loader = new THREE.XHRLoader();
+					loader.crossOrigin = '';
+					loader.load( file, function ( text ) {
+
+						var json = JSON.parse( text );
+
+						editor.clear();
+						editor.fromJSON( json );
+
+					} );
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>

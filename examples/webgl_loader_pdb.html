@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>three.js webgl - molecules</title>
+		<style>
+
+			body {
+				margin: 0;
+				font-family: Arial;
+				overflow: hidden;
+			}
+
+			a {
+				color: #ffffff;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				font-weight: bold;
+				text-align: center;
+				z-index: 1;
+			}
+
+			#menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+				padding: 0;
+				margin: 0;
+			}
+
+			button {
+				color: rgb(255,255,255);
+				background: transparent;
+				border: 0px;
+				padding: 5px 10px;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: rgba(0,255,255,0.5);
+			}
+			button:active {
+				color: #000000;
+				background-color: rgba(0,255,255,1);
+			}
+
+			.label {
+				text-shadow: -1px 1px 1px rgb(0,0,0);
+				margin-left: 25px;
+			}
+
+
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/loaders/PDBLoader.js"></script>
+		<script src="js/renderers/CSS2DRenderer.js"></script>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - molecules</div>
+		<div id="menu"></div>
+
+		<script>
+			var camera, scene, renderer, labelsRenderer;
+			var controls;
+
+			var root;
+
+			var MOLECULES = {
+				"Ethanol": "ethanol.pdb",
+				"Aspirin": "aspirin.pdb",
+				"Caffeine": "caffeine.pdb",
+				"Nicotine": "nicotine.pdb",
+				"LSD": "lsd.pdb",
+				"Cocaine": "cocaine.pdb",
+				"Cholesterol": "cholesterol.pdb",
+				"Lycopene": "lycopene.pdb",
+				"Glucose": "glucose.pdb",
+				"Aluminium oxide": "Al2O3.pdb",
+				"Cubane": "cubane.pdb",
+				"Copper": "cu.pdb",
+				"Fluorite": "caf2.pdb",
+				"Salt": "nacl.pdb",
+				"YBCO superconductor": "ybco.pdb",
+				"Buckyball": "buckyball.pdb",
+				//"Diamond": "diamond.pdb",
+				"Graphite": "graphite.pdb"
+			};
+
+			var loader = new THREE.PDBLoader();
+
+			var menu = document.getElementById( "menu" );
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1500;
+
+				scene = new THREE.Scene();
+
+				var light = new THREE.HemisphereLight( 0xffffff, 0x000000 );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				root = new THREE.Object3D();
+				scene.add( root );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x050505 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				labelRenderer = new THREE.CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = '0';
+				labelRenderer.domElement.style.pointerEvents = 'none';
+				document.getElementById( 'container' ).appendChild( labelRenderer.domElement );
+
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 0.5;
+				controls.addEventListener( 'change', render );
+
+				//
+
+				loadMolecule( "models/molecules/caffeine.pdb" );
+				createMenu();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function generateButtonCallback( url ) {
+
+				return function ( event ) {
+
+					loadMolecule( url );
+
+				}
+
+			}
+
+			function createMenu() {
+
+				for ( var m in MOLECULES ) {
+
+					var button = document.createElement( 'button' );
+					button.innerHTML = m;
+					menu.appendChild( button );
+
+					var url = "models/molecules/" +  MOLECULES[ m ];
+
+					button.addEventListener( 'click', generateButtonCallback( url ), false );
+
+				}
+
+			}
+
+			//
+
+			function loadMolecule( url ) {
+
+				while( root.children.length > 0 ) {
+
+					var object = root.children[ 0 ];
+					object.parent.remove( object );
+
+				}
+
+				loader.load( url, function ( geometry, geometryBonds, json ) {
+
+					var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+					var sphereGeometry = new THREE.IcosahedronGeometry( 1, 2 );
+
+					var offset = geometry.center();
+					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+
+					for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
+						var position = geometry.vertices[ i ];
+						var color = geometry.colors[ i ];
+						var element = geometry.elements[ i ];
+
+						var material = new THREE.MeshLambertMaterial( { color: color } );
+
+						var object = new THREE.Mesh( sphereGeometry, material );
+						object.position.copy( position );
+						object.position.multiplyScalar( 75 );
+						object.scale.multiplyScalar( 25 );
+						root.add( object );
+
+						var atom = json.atoms[ i ];
+
+						var text = document.createElement( 'div' );
+						text.className = 'label';
+						text.style.color = 'rgb(' + atom[ 3 ][ 0 ] + ',' + atom[ 3 ][ 1 ] + ',' + atom[ 3 ][ 2 ] + ')';
+						text.textContent = atom[ 4 ];
+
+						var label = new THREE.CSS2DObject( text );
+						label.position.copy( object.position );
+						root.add( label );
+
+					}
+
+					for ( var i = 0; i < geometryBonds.vertices.length; i += 2 ) {
+
+						var start = geometryBonds.vertices[ i ];
+						var end = geometryBonds.vertices[ i + 1 ];
+
+						start.multiplyScalar( 75 );
+						end.multiplyScalar( 75 );
+
+						var object = new THREE.Mesh( boxGeometry, new THREE.MeshLambertMaterial( 0xffffff ) );
+						object.position.copy( start );
+						object.position.lerp( end, 0.5 );
+						object.scale.set( 5, 5, start.distanceTo( end ) );
+						object.lookAt( end );
+						root.add( object );
+
+					}
+
+					render();
+
+				}, function ( xhr ) {
+
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+
+					}
+
+				}, function ( xhr ) {
+
+				} );
+
+			}
+
+			//
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+
+				var time = Date.now() * 0.0004;
+
+				root.rotation.x = time;
+				root.rotation.y = time * 0.7;
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
+
+			}
+
+    </script>
+  </body>
+
+</html>

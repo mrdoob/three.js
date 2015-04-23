@@ -1,0 +1,2 @@
+
+	outgoingLight = linearToOutput( outgoingLight );

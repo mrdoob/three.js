@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+		
+		<h1>[name]</h1>
+
+		<div class="desc">A class for generating a two-dimensional ring geometry.</div>
+
+		<h2>Example</h2>
+		
+		<code>var geometry = new THREE.RingGeometry( 1, 5, 32 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Float innerRadius], [page:Float outerRadius], [page:Integer thetaSegments], [page:Integer phiSegments], [page:Float thetaStart], [page:Float thetaLength])</h3>
+		<div>
+		innerRadius — Default is 0, but it doesn't work right when innerRadius is set to 0.<br />
+		outerRadius — Default is 50. <br />
+		thetaSegments — Number of segments.  A higher number means the ring will be more round.  Minimum is 3.  Default is 8. <br />
+		phiSegments — Minimum is 3.  Default is 8.<br />
+		thetaStart — Starting angle. Default is 0. <br />
+		thetaLength — Central angle.  Default is Math.PI * 2.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js misc - sound</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl 3d sounds example -
+			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank">larrylarrybb</a> and
+			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank">skullbeatz</a> <br/><br/>
+
+			navigate with WASD / arrows / mouse
+		</div>
+
+
+		<div id="container"></div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/FirstPersonControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container;
+			var camera, controls, scene, renderer;
+			var light, pointLight;
+
+			var mesh;
+			var material_sphere1, material_sphere2;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 25, 0 );
+
+				var listener = new THREE.AudioListener();
+				camera.add( listener );
+
+				controls = new THREE.FirstPersonControls( camera );
+
+				controls.movementSpeed = 70;
+				controls.lookSpeed = 0.05;
+				controls.noFly = true;
+				controls.lookVertical = false;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0.5, 1 ).normalize();
+				scene.add( light );
+
+				var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+
+				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
+				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
+
+				// sound spheres
+
+				var mesh1 = new THREE.Mesh( sphere, material_sphere1 );
+				mesh1.position.set( -250, 30, 0 );
+				scene.add( mesh1 );
+
+				var sound1 = new THREE.Audio( listener );
+				sound1.load( 'sounds/358232_j_s_song.ogg' );
+				sound1.setRefDistance( 20 );
+				mesh1.add( sound1 );
+
+				//
+
+				var mesh2 = new THREE.Mesh( sphere, material_sphere2 );
+				mesh2.position.set( 250, 30, 0 );
+				scene.add( mesh2 );
+
+				var sound2 = new THREE.Audio( listener );
+				sound2.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' );
+				sound2.setRefDistance( 20 );
+				mesh2.add( sound2 );
+
+				// ground
+
+				var helper = new THREE.GridHelper( 500, 10 );
+				helper.color1.setHex( 0x444444 );
+				helper.color2.setHex( 0x444444 );
+				helper.position.y = 0.1
+				scene.add( helper );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.innerHTML = "";
+				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+
+			function render() {
+
+				var delta = clock.getDelta(),
+					time = clock.getElapsedTime() * 5;
+
+				controls.update( delta );
+
+				material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 0.5 );
+				material_sphere2.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

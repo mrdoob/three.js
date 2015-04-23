@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A class for generating cylinder geometries</div>
+
+
+		<h2>Example</h2>
+		
+		<code>var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
+		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		var cylinder = new THREE.Mesh( geometry, material );
+		scene.add( cylinder );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Float radiusTop], [page:Float radiusBottom], [page:Float height], [page:Integer radiusSegments], [page:Integer heightSegments], [page:Boolean openEnded], [page:Float thetaStart], [page:Float thetaLength])</h3>
+		<div>
+		radiusTop — Radius of the cylinder at the top. Default is 20.<br />
+		radiusBottom — Radius of the cylinder at the bottom. Default is 20.<br />
+		height — Height of the cylinder. Default is 100.<br />
+		radiusSegments — Number of segmented faces around the circumference of the cylinder. Default is 8<br />
+		heightSegments — Number of rows of faces along the height of the cylinder. Default is 1.<br />
+		openEnded — A Boolean indicating whether the ends of the cylinder are open or capped. Default is false, meaning capped.<br />
+		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
+		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete cylinder.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<div>
+		Each of the constructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

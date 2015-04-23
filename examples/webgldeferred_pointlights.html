@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - deferred rendering</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 20px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+
+			#stats { position: absolute; top:10px; left: 5px }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - deferred point lights WebGL demo by <a href="http://de.redplant.de" target=_blank>redPlant</a> -
+			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head -
+			light attenuation formula by <a href="http://imdoingitwrong.wordpress.com/tag/glsl/" target=_blank>Tom Madams</a>
+		</div>
+		<div id="container"></div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/loaders/BinaryLoader.js"></script>
+		<!-- <script src="js/loaders/UTF8Loader.js"></script> -->
+
+		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
+		<script src="js/ShaderDeferred.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SCALE = 1;
+
+			var WIDTH = window.innerWidth;
+			var HEIGHT = window.innerHeight;
+
+			var NEAR = 1.0, FAR = 350.0;
+			var VIEW_ANGLE = 45;
+
+			// controls
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var targetX = 0, targetY = 0;
+			var angle = 0;
+			var target = new THREE.Vector3( 0, 0, 0 );
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			// core
+
+			var renderer, camera, scene, stats, clock;
+
+			// lights
+
+			var numLights = 50;
+			var lights = [];
+
+			//
+
+			init();
+			animate();
+
+			// -----------------------------
+
+			function init() {
+
+				// renderer
+
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true } );
+
+				var container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
+				camera.position.z = 150;
+
+				// scene
+
+				scene = new THREE.Scene();
+				scene.add( camera );
+
+				// stats
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '8px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				// clock
+
+				clock = new THREE.Clock();
+
+				// add lights
+
+				initLights();
+
+				// add objects
+
+				initObjects();
+
+				// events
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			// -----------------------------
+
+			function initLights() {
+
+				var distance = 40;
+
+				// front light
+
+				var light = new THREE.PointLight( 0xffffff, 1.5, 1.5 * distance );
+				scene.add( light );
+				lights.push( light );
+
+				// random lights
+
+				var c = new THREE.Vector3();
+
+				for ( var i = 1; i < numLights; i ++ ) {
+
+					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
+
+					c.set( Math.random(), Math.random(), Math.random() ).normalize();
+					light.color.setRGB( c.x, c.y, c.z );
+
+					scene.add( light );
+					lights.push( light );
+
+				}
+
+				var geometry = new THREE.SphereGeometry( 0.7, 7, 7 );
+
+				for ( var i = 0; i < numLights; i ++ ) {
+
+					var light = lights[ i ];
+
+					var material = new THREE.MeshBasicMaterial();
+					material.color = light.color;
+
+					var emitter = new THREE.Mesh( geometry, material );
+					light.add( emitter );
+
+				}
+
+			}
+
+			// -----------------------------
+
+			function initObjects() {
+
+				/*
+
+				var loader = new THREE.UTF8Loader();
+
+				loader.load( "models/utf8/ben_dds.js", function ( object ) {
+
+					object.scale.multiplyScalar( 150 );
+					object.position.y = -75;
+					scene.add( object );
+
+				}, { normalizeRGB: true } );
+
+				loader.load( "models/utf8/WaltHi.js", function ( object ) {
+
+					object.position.y = -35;
+					scene.add( object );
+
+				}, { normalizeRGB: true } );
+
+				*/
+
+
+				var loader = new THREE.JSONLoader();
+				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
+
+					var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+					var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+					mapHeight.repeat.set( 0.998, 0.998 );
+					mapHeight.offset.set( 0.001, 0.001 )
+					mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+					mapHeight.anisotropy = 4;
+					mapHeight.format = THREE.RGBFormat;
+
+					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x333333, wrapAround: true, metal: true } );
+
+					var object = new THREE.Mesh( geometry, material );
+					object.scale.multiplyScalar( 8 );
+					scene.add( object );
+
+				} );
+
+
+				var loader = new THREE.BinaryLoader();
+				loader.load( "obj/female02/Female02_bin.js", function( geometry, materials ) {
+
+					for ( var i = 0; i < materials.length; i ++ ) materials[ i ].wrapAround = true;
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					object.position.x = -50;
+					object.position.y = -48;
+					object.scale.multiplyScalar( 0.45 );
+					scene.add( object );
+
+				} );
+
+				loader.load( "obj/male02/Male02_bin.js", function( geometry, materials ) {
+
+					for ( var i = 0; i < materials.length; i ++ ) materials[ i ].wrapAround = true;
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					object.position.x = 50;
+					object.position.y = -48;
+					object.scale.multiplyScalar( 0.45 );
+					scene.add( object );
+
+				} );
+
+				// create box
+
+				var box = generateBox();
+				box.scale.multiplyScalar( 8 );
+				scene.add( box );
+
+			}
+
+			// -----------------------------
+
+			function generateBox() {
+
+				var object = new THREE.Object3D();
+
+				var mapHeight2 = THREE.ImageUtils.loadTexture( "obj/lightmap/rocks.jpg" );
+				mapHeight2.repeat.set( 3, 1.5 );
+				mapHeight2.wrapS = mapHeight2.wrapT = THREE.RepeatWrapping;
+				mapHeight2.anisotropy = 4;
+				mapHeight2.format = THREE.RGBFormat;
+
+				var mapHeight3 = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+				mapHeight3.repeat.set( 16, 8 );
+				mapHeight3.wrapS = mapHeight3.wrapT = THREE.RepeatWrapping;
+				mapHeight3.anisotropy = 4;
+				mapHeight3.format = THREE.RGBFormat;
+
+				var geoPlane = new THREE.PlaneBufferGeometry( 40, 20 );
+
+				var matPlane  = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 0.5 } );
+				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x331919, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 1 } );
+				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0x00aaff, specular: 0xffffff, shininess: 200, bumpMap: mapHeight3, bumpScale: 1.2, wrapAround: true } );
+				var matPlane4 = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight3, bumpScale: 1 } );
+
+				// bottom
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane3 );
+				mesh.position.z = -2;
+				mesh.position.y = -6;
+				mesh.rotation.x = -Math.PI/2;
+				object.add( mesh );
+
+				// top
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane4 );
+				mesh.position.z = -2;
+				mesh.position.y = 6;
+				mesh.rotation.x = Math.PI/2;
+				object.add( mesh );
+
+				// back
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = -4;
+				mesh.position.y = 0;
+				object.add( mesh );
+
+				// right
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = 0;
+				mesh.position.y = 0;
+				mesh.position.x = 13;
+				mesh.rotation.y = -Math.PI/2;
+				//object.add( mesh );
+
+				// left
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = 0;
+				mesh.position.y = 0;
+				mesh.position.x = -13;
+				mesh.rotation.y = Math.PI/2;
+				//object.add( mesh );
+
+				return object;
+
+			}
+
+			// -----------------------------
+
+			function onWindowResize( event ) {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				WIDTH = window.innerWidth;
+				HEIGHT = window.innerHeight;
+
+				renderer.setSize( WIDTH, HEIGHT );
+
+				camera.aspect = WIDTH / HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 1;
+				mouseY = ( event.clientY - windowHalfY ) * 1;
+
+			}
+
+			// -----------------------------
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				// update lights
+
+				var time = Date.now() * 0.0005;
+				var x, y, z;
+
+				for ( var i = 0, il = lights.length; i < il; i ++ ) {
+
+					var light = lights[ i ];
+
+					if ( i > 0 ) {
+
+						x = Math.sin( time + i * 1.7 ) * 80;
+						y = Math.cos( time + i * 1.5 ) * 40;
+						z = Math.cos( time + i * 1.3 ) * 30;
+
+					} else {
+
+						x = Math.sin( time * 3 ) * 20;
+						y = 15;
+						z = Math.cos( time * 3 ) * 25 + 10;
+
+					}
+
+					light.position.set( x, y, z );
+
+				}
+
+				// update camera
+
+				var delta = clock.getDelta();
+
+				targetX = mouseX * .001;
+				targetY = mouseY * .001;
+
+				angle += 0.05 * ( targetX - angle );
+
+				camera.position.x = -Math.sin( angle ) * 150;
+				camera.position.z =  Math.cos( angle ) * 150;
+
+				camera.lookAt( target );
+
+				// render
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+
+</html>

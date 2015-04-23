@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Contains handy functions geometry manipulations.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3> .merge( [page:Geometry geometry1] , [page:Geometry geometry2], [page:Integer materialIndexOffset] )</h3>
+		<div>
+		geometry1 — Parent geometry element <br />
+		geometry2 — Geometry that need to be added in parent <br />
+		materialIndexOffset — Offset applied to the materialIndex of all the new faces in the merged geometry. Default : 0 <br />
+		</div>
+
+		<h3> .randomPointInTriangle( [page:Vector VectorA] , [page:Vector VectorB]  , [page:Vector VectorC])</h3>
+		<div>
+		VectorA — Vector  <br />
+		VectorB — Vector  <br />
+		VectorC — Vector  <br />
+
+		 returns [page:Int Point]
+
+		</div>
+
+		
+		<h3> .center ( [page:Vector VectorA] , [page:Vector VectorB]  , [page:Vector VectorC]) </h3>
+
+		<div>
+		VectorA — Vector  <br />
+		VectorB — Vector  <br />
+		VectorC — Vector  <br />
+
+		returns [page:Int Area]
+
+		</div>
+
+		<h3> .center ( [page:Geometry geometry] ) </h3>
+
+		<div>
+
+		Geometry — Geometry to Center position
+
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

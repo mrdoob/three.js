@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading a <em>.obj</em> and its <em>.mtl</em> together.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:LoadingManager manager] )</h3>
+		<div>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</div>
+		<div>
+		Creates a new [name].
+		</div>
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null load]( [page:String objUrl], [page:String mtlUrl], [page:Function onLoad], [page:Function onProgress], [page:Function onError] )</h3>
+		<div>
+		[page:String objUrl] — required. URL to the <em>.obj</em> resource<br />
+		[page:String mtlUrl] — required. URL to the <em>.mtl</em> resource<br />
+		[page:Function onLoad] — Will be called when both resources load complete. The argument will be the loaded [page:Object3D].<br />
+		[page:Function onProgress] — Will be called while both load progress. The argument will be the XmlHttpRequest instance, that contain .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</div>
+		<div>
+		Begin loading from urls and call onLoad with the parsed response content.
+		</div>
+
+		<h3>[method:Object3D parse]( [page:String text], [page:Function mtllibCallback] )</h3>
+		<div>
+		[page:String text] — required. The textual <em>obj</em> structure to parse.<br/>
+		[page:Function mtllibCallback] — optional. Callback to handle <em>mtllib</em> declaration.<br/>
+		</div>
+		<div>
+		Parse an <em>obj</em> text structure and return an [page:Object3D].<br />
+		Found objects are converted to a [page:Mesh] and materials are converted to [page:MeshLambertMaterial].
+		</div>
+
+		<h2>Example</h2>
+
+		<code>
+		// instantiate a loader
+		var loader = new THREE.OBJMTLLoader();
+
+		// load an obj / mtl resource pair
+		loader.load(
+			// OBJ resource URL
+			'obj/male02/male02.obj',
+			// MTL resource URL
+			'obj/male02/male02_dds.mtl',
+			// Function when both resources are loaded
+			function ( object ) {
+				scene.add( object );
+			},
+			// Function called when downloads progress
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+			// Function called when downloads error
+			function ( xhr ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		[example:webgl_loader_obj_mtl]
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/OBJMTLLoader.js examples/js/loaders/OBJMTLLoader.js]
+	</body>
+</html>

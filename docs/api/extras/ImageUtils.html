@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A Helper class to ease the loading of images of different types.</div>
+		
+
+		<h2>Properties</h2>
+
+
+
+		<h3>[property:string crossOrigin]</h3>
+		<div>
+		The crossOrigin string to implement CORS for loading the image from a different domain that allows CORS.
+		</div> 
+
+		<h2>Methods</h2>
+
+
+
+		<h3>[method:DataTexture generateDataTexture]([page:Number width], [page:Number height], [page:Number color])</h3>
+		<div>
+		width -- The width of the texture. <br />
+		height -- The height of the texture. <br />
+		color -- The hexadecimal value of the color.
+		</div>
+		<div>
+		Generates a texture of a single color. It is a DataTexture with format, RGBFormat.
+		</div>
+
+		<h3>[method:CompressedTexture parseDDS]([page:String buffer], [page:boolean loadMipmaps])</h3>
+		<div>
+		buffer -- A string containing the data of the dds. <br />
+		loadMipmaps -- A boolean to indicate if you need to load the mipmaps. Default is True.
+		</div>
+		<div>
+		Parses a DDS Image from the string into a CompressedTexture. 
+		</div>
+
+		<h3>[method:todo loadCompressedTexture]([page:todo url], [page:todo mapping], [page:todo onLoad], [page:todo onError])</h3>
+		<div>
+		url -- todo <br />
+		mapping -- todo <br />
+		onLoad -- todo <br />
+		onError -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>[method:todo loadTexture]([page:String url], [page:UVMapping mapping], [page:Function onLoad], [page:Function onError])</h3>
+		<div>
+		url -- the url of the texture<br />
+		mapping -- Can be an instance of [page:UVMapping THREE.UVMapping], [page:CubeReflectionMapping THREE.CubeReflectionMapping] or [page:SphericalReflectionMapping THREE.SphericalReflectionMapping]. Describes how the image is applied to the object.<br />Use undefined instead of null as a default value. See mapping property of [page:Texture texture] for more details. <br/>
+		onLoad -- callback function<br />
+		onError -- callback function
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>[method:todo getNormalMap]([page:todo image], [page:todo depth])</h3>
+		<div>
+		image -- todo <br />
+		depth -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>[method:todo loadCompressedTextureCube]([page:todo array], [page:todo mapping], [page:todo onLoad], [page:todo onError])</h3>
+		<div>
+		array -- todo <br />
+		mapping -- todo <br />
+		onLoad -- todo <br />
+		onError -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>[method:todo loadTextureCube]([page:todo array], [page:todo mapping], [page:todo onLoad], [page:todo onError])</h3>
+		<div>
+		array -- todo <br />
+		mapping -- todo <br />
+		onLoad -- todo <br />
+		onError -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

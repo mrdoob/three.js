@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A point light that can cast shadow in one direction.</div>
+		
+		<div class="desc">Affects objects using [page:MeshLambertMaterial] or [page:MeshPhongMaterial].</div>
+
+
+		<h2>Example</h2>
+
+		<code>// white spotlight shining from the side, casting shadow
+
+var spotLight = new THREE.SpotLight( 0xffffff );
+spotLight.position.set( 100, 1000, 100 );
+
+spotLight.castShadow = true;
+
+spotLight.shadowMapWidth = 1024;
+spotLight.shadowMapHeight = 1024;
+
+spotLight.shadowCameraNear = 500;
+spotLight.shadowCameraFar = 4000;
+spotLight.shadowCameraFov = 30;
+
+scene.add( spotLight );</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:todo distance], [page:todo angle], [page:todo exponent])</h3>
+		<div>
+		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
+		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
+		distance -- Maximum distance from origin where light will shine whose intensity is attenuated linearly based on distance from origin. <br />
+		angle -- Maximum angle of light dispersion from its direction whose upper bound is Math.PI/2.  <br />
+		exponent -- todo
+		</div>
+		<div>
+		todo
+		</div>
+		
+
+		<h2>Properties</h2>
+
+		<h3>[property:Object3D target]</h3>
+		<div>
+			Spotlight focus points at target.position.<br />
+			Default position — *(0,0,0)*.
+		</div>
+	
+		<h3>[property:Float intensity]</h3>
+		<div>
+			Light's intensity.<br />
+			Default — *1.0*.
+		</div>
+	
+		<h3>[property:Float distance]</h3>
+		<div>
+			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
+			Default — *0.0*.
+		</div>
+	
+		<h3>[property:Float angle]</h3>
+		<div>
+			Maximum extent of the spotlight, in radians, from its direction. Should be no more than *Math.PI/2*.<br />
+			Default — *Math.PI/3*.
+		</div>
+	
+		<h3>[property:Float exponent]</h3>
+		<div>
+			Rapidity of the falloff of light from its target direction.<br />
+			Default — *10.0*.
+		</div>
+	
+		<h3>[property:Boolean castShadow]</h3>
+		<div>
+			If set to *true* light will cast dynamic shadows. *Warning*: This is expensive and requires tweaking to get shadows looking right.<br />
+			Default — *false*.
+		</div>
+		
+		<h3>[property:Boolean onlyShadow]</h3>
+		<div>
+			If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br />
+			Default — *false*.
+		</div>
+		
+		<h3>[property:Float shadowCameraNear]</h3>
+		<div>
+			Perspective shadow camera frustum <em>near</em> parameter.<br />
+			Default — *50*.
+		</div>
+
+		<h3>[property:Float shadowCameraFar]</h3>
+		<div>
+			Perspective shadow camera frustum <em>far</em> parameter.<br />
+			Default — *5000*.
+		</div>
+
+		<h3>[property:Float shadowCameraFov]</h3>
+		<div>
+			Perspective shadow camera frustum <em>field of view</em> parameter.<br />
+			Default — *50*.
+		</div>
+		
+		<h3>[property:Boolean shadowCameraVisible]</h3>
+		<div>
+			Show debug shadow camera frustum.<br />
+			Default — *false*.
+		</div>
+		
+		<h3>[property:Float shadowBias]</h3>
+		<div>
+			Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br />
+			Default — *0*.
+		</div>
+
+		<h3>[property:Float shadowDarkness]</h3>
+		<div>
+			Darkness of shadow casted by this light (from *0* to *1*).<br />
+			Default — *0.5*.
+		</div>
+
+		<h3>[property:Integer shadowMapWidth]</h3>
+		<div>
+			Shadow map texture width in pixels.<br />
+			Default — *512*.
+		</div>
+
+		<h3>[property:Integer shadowMapHeight]</h3>
+		<div>
+			Shadow map texture height in pixels.<br />
+			Default — *512*.
+		</div>
+		
+		<h3>[property:Vector2 shadowMapSize]</h3>
+		<div>
+			The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering.
+		</div> 
+
+		<h3>[property:PerspectiveCamera shadowCamera]</h3>
+		<div>
+			The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings.
+		</div> 
+
+		<h3>[property:Matrix4 shadowMatrix]</h3>
+		<div>
+			Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering.
+		</div> 
+
+		<h3>[property:WebGLRenderTarget shadowMap]</h3>
+		<div>
+		    The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
+		</div> 
+
+		<h2>Methods</h2>		
+		
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

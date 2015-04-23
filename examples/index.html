@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js / examples</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+
+			@font-face {
+				font-family: 'inconsolata';
+				src: url('files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+			}
+
+			*{
+				box-sizing: border-box;
+			}
+
+			html {
+				height: 100%;
+			}
+
+			body {
+				background-color: #ffffff;
+				margin: 0px;
+				height: 100%;
+				color: #555;
+				font-family: 'inconsolata';
+				font-size: 15px;
+				line-height: 18px;
+				overflow: hidden;
+			}
+
+			h1 {
+				margin-top: 30px;
+				margin-bottom: 40px;
+				margin-left: 20px;
+				font-size: 25px;
+				font-weight: normal;
+			}
+
+			h2 {
+				font-size: 20px;
+				font-weight: normal;
+			}
+
+			a {
+				color: #2194CE;
+				text-decoration: none;
+			}
+
+			#panel {
+				position: fixed;
+				left: 0px;
+				width: 310px;
+				height: 100%;
+				overflow: auto;
+				background: #fafafa;
+			}
+
+				#panel #content {
+					padding: 0px 20px;
+				}
+
+				#panel #content .link {
+					color: #2194CE;
+					text-decoration: none;
+					cursor: pointer;
+				}
+
+				#panel #content .selected {
+					color: #ff0000;
+				}
+
+					#panel #content .link:hover {
+						text-decoration: underline;
+					}
+
+			#viewer {
+				position: absolute;
+				border: 0px;
+				left: 310px;
+				width: calc(100% - 310px);
+				height: 100%;
+				overflow: auto;
+			}
+
+			#button {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				padding: 8px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.7;
+			}
+
+				#button:hover {
+					cursor: pointer;
+					opacity: 1;
+				}
+
+			/* mobile */
+
+			#expandButton {
+				display: none;
+				position: absolute;
+				right: 20px;
+				top: 12px;
+				width: 32px;
+				height: 32px;
+			}
+
+				#expandButton span {
+					height: 2px;
+					background-color: #2194CE;
+					width: 16px;
+					position: absolute;
+					left: 8px;
+					top: 10px;
+				}
+
+				#expandButton span:nth-child(1) {
+					top: 16px;
+				}
+
+				#expandButton span:nth-child(2) {
+					top: 22px;
+				}
+
+			@media all and ( max-width: 640px ) {
+				h1{
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
+				#panel{
+					position: absolute;
+					left: 0;
+					top: 0;
+					height: 480px;
+					width: 100%;
+					right: 0;
+					z-index: 100;
+					overflow: hidden;
+					border-bottom: 1px solid #dedede;
+				}
+				#content{
+					position: absolute;
+					left: 0;
+					top: 60px;
+					right: 0;
+					bottom: 0;
+					font-size: 17px;
+					line-height: 22px;
+					overflow: auto;
+				}
+				#viewer{
+					position: absolute;
+					left: 0;
+					top: 56px;
+					width: 100%;
+					height: calc(100% - 56px);
+				}
+				#expandButton{
+					display: block;
+				}
+				#panel.collapsed{
+					height: 56px;
+				}
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="panel" class="collapsed">
+			<h1><a href="http://threejs.org">three.js</a> / examples</h1>
+			<a id="expandButton" href="#">
+				<span></span>
+				<span></span>
+				<span></span>
+			</a>
+			<div id="content"></div>
+		</div>
+		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
+
+		<script>
+
+		var files = {
+			"webgl": [
+				"webgl_animation_cloth",
+				"webgl_animation_skinning_blending",
+				"webgl_animation_skinning_morph",
+				"webgl_buffergeometry",
+				"webgl_buffergeometry_custom_attributes_particles",
+				"webgl_buffergeometry_lines",
+				"webgl_buffergeometry_lines_indexed",
+				"webgl_buffergeometry_particles",
+				"webgl_buffergeometry_drawcalls",
+				"webgl_buffergeometry_rawshader",
+				"webgl_buffergeometry_uint",
+				"webgl_camera",
+				"webgl_camera_logarithmicdepthbuffer",
+				"webgl_custom_attributes",
+				"webgl_custom_attributes_lines",
+				"webgl_custom_attributes_particles",
+				"webgl_custom_attributes_particles2",
+				"webgl_custom_attributes_particles3",
+				"webgl_decals",
+				"webgl_effects_anaglyph",
+				"webgl_effects_parallaxbarrier",
+				"webgl_effects_stereo",
+				"webgl_geometries",
+				"webgl_geometries2",
+				"webgl_geometry_colors",
+				"webgl_geometry_colors_blender",
+				"webgl_geometry_colors_lookuptable",
+				"webgl_geometry_convex",
+				"webgl_geometry_cube",
+				"webgl_geometry_dynamic",
+				"webgl_geometry_extrude_shapes",
+				"webgl_geometry_extrude_shapes2",
+				"webgl_geometry_extrude_splines",
+				"webgl_geometry_hierarchy",
+				"webgl_geometry_hierarchy2",
+				"webgl_geometry_large_mesh",
+				"webgl_geometry_minecraft",
+				"webgl_geometry_minecraft_ao",
+				"webgl_geometry_normals",
+				"webgl_geometry_nurbs",
+				"webgl_geometry_shapes",
+				"webgl_geometry_terrain",
+				"webgl_geometry_terrain_fog",
+				"webgl_geometry_terrain_raycast",
+				"webgl_geometry_text",
+				"webgl_geometry_text2",
+				"webgl_gpgpu_birds",
+				"webgl_hdr",
+				"webgl_helpers",
+				"webgl_interactive_buffergeometry",
+				"webgl_interactive_cubes",
+				"webgl_interactive_cubes_gpu",
+				"webgl_interactive_cubes_ortho",
+				"webgl_interactive_draggablecubes",
+				"webgl_interactive_lines",
+				"webgl_interactive_particles",
+				"webgl_interactive_raycasting_pointcloud",
+				"webgl_interactive_voxelpainter",
+				"webgl_kinect",
+				"webgl_lensflares",
+				"webgl_lights_hemisphere",
+				"webgl_lights_pointlights",
+				"webgl_lights_pointlights2",
+				"webgl_lines_colors",
+				"webgl_lines_cubes",
+				"webgl_lines_dashed",
+				"webgl_lines_sphere",
+				"webgl_lines_splines",
+				"webgl_loader_assimp2json",
+				"webgl_loader_awd",
+				"webgl_loader_babylon",
+				"webgl_loader_collada",
+				"webgl_loader_collada_keyframe",
+				"webgl_loader_collada_skinning",
+				"webgl_loader_collada_kinematics",
+				"webgl_loader_ctm",
+				"webgl_loader_ctm_materials",
+				"webgl_loader_gltf",
+				"webgl_loader_json_blender",
+				"webgl_loader_json_objconverter",
+				"webgl_loader_msgpack",
+				"webgl_loader_obj",
+				"webgl_loader_obj_mtl",
+				"webgl_loader_pdb",
+				"webgl_loader_ply",
+				"webgl_loader_scene",
+				"webgl_loader_stl",
+				"webgl_loader_utf8",
+				"webgl_loader_vrml",
+				"webgl_loader_vtk",
+				"webgl_lod",
+				"webgl_marchingcubes",
+				"webgl_materials",
+				"webgl_materials2",
+				"webgl_materials_blending",
+				"webgl_materials_blending_custom",
+				"webgl_materials_bumpmap",
+				"webgl_materials_bumpmap_skin",
+				"webgl_materials_cars",
+				"webgl_materials_cars_camaro",
+				"webgl_materials_cubemap",
+				"webgl_materials_cubemap_balls_reflection",
+				"webgl_materials_cubemap_balls_refraction",
+				"webgl_materials_cubemap_dynamic",
+				"webgl_materials_cubemap_dynamic2",
+				"webgl_materials_cubemap_escher",
+				"webgl_materials_cubemap_refraction",
+				"webgl_materials_envmaps",
+				"webgl_materials_grass",
+				"webgl_materials_lightmap",
+				"webgl_materials_normalmap",
+				"webgl_materials_normaldisplacementmap",
+				"webgl_materials_parallaxmap",
+				"webgl_materials_shaders_fresnel",
+				"webgl_materials_skin",
+				"webgl_materials_texture_anisotropy",
+				"webgl_materials_texture_compressed",
+				"webgl_materials_texture_filters",
+				"webgl_materials_texture_manualmipmap",
+				"webgl_materials_texture_pvrtc",
+				"webgl_materials_texture_tga",
+				"webgl_materials_video",
+				"webgl_materials_wireframe",
+				"webgl_mirror",
+				"webgl_modifier_subdivision",
+				"webgl_modifier_tessellation",
+				"webgl_morphnormals",
+				"webgl_morphtargets",
+				"webgl_morphtargets_horse",
+				"webgl_morphtargets_human",
+				"webgl_morphtargets_md2",
+				"webgl_morphtargets_md2_control",
+				"webgl_multiple_canvases_circle",
+				"webgl_multiple_canvases_complex",
+				"webgl_multiple_canvases_grid",
+				"webgl_multiple_views",
+				"webgl_nearestneighbour",
+				"webgl_octree",
+				"webgl_octree_raycasting",
+				"webgl_panorama_equirectangular",
+				"webgl_particles_billboards",
+				"webgl_particles_billboards_colors",
+				"webgl_particles_dynamic",
+				"webgl_particles_random",
+				"webgl_particles_shapes",
+				"webgl_particles_sprites",
+				"webgl_performance",
+				"webgl_performance_doublesided",
+				"webgl_performance_static",
+				"webgl_postprocessing",
+				"webgl_postprocessing_advanced",
+				"webgl_postprocessing_dof",
+				"webgl_postprocessing_dof2",
+				"webgl_postprocessing_godrays",
+				"webgl_postprocessing_crossfade",
+				"webgl_postprocessing_glitch",
+				"webgl_rtt",
+				"webgl_sandbox",
+				"webgl_shader",
+				"webgl_shader_lava",
+				"webgl_shader2",
+				"webgl_shaders_ocean",
+				"webgl_shading_physical",
+				"webgl_shaders_sky",
+				"webgl_shaders_tonemapping",
+				"webgl_shaders_vector",
+				"webgl_shadowmap",
+				"webgl_shadowmap_performance",
+				"webgl_shadowmap_viewer",
+				"webgl_shadowmesh",
+				"webgl_sprites",
+				"webgl_terrain_dynamic",
+				"webgl_test_memory",
+				"webgl_test_memory2",
+				"webgl_trails",
+				"webgl_video_panorama_equirectangular"
+			],
+			"webgldeferred": [
+				"webgldeferred_animation",
+				"webgldeferred_arealights",
+				"webgldeferred_pointlights"
+			],
+			"vr": [
+				"vr_cubes",
+				"vr_video"
+			],
+			"css3d": [
+				"css3d_molecules",
+				"css3d_panorama",
+				"css3d_periodictable",
+				"css3d_sandbox",
+				"css3d_sprites",
+				"css3d_youtube"
+			],
+			"css3d stereo": [
+				"css3dstereo_periodictable",
+			],
+			"misc": [
+				"misc_animation_keys",
+				"misc_controls_deviceorientation",
+				"misc_controls_fly",
+				"misc_controls_orbit",
+				"misc_controls_pointerlock",
+				"misc_controls_trackball",
+				"misc_controls_transform",
+				"misc_lights_test",
+				"misc_lookat",
+				"misc_fps",
+				"misc_sound",
+				"misc_ubiquity_test",
+				"misc_ubiquity_test2",
+				"misc_uv_tests"
+			],
+			"canvas": [
+				"canvas_ascii_effect",
+				"canvas_camera_orthographic",
+				"canvas_camera_orthographic2",
+				"canvas_effects_stereo",
+				"canvas_geometry_birds",
+				"canvas_geometry_cube",
+				"canvas_geometry_earth",
+				"canvas_geometry_hierarchy",
+				"canvas_geometry_nurbs",
+				"canvas_geometry_panorama",
+				"canvas_geometry_panorama_fisheye",
+				"canvas_geometry_shapes",
+				"canvas_geometry_terrain",
+				"canvas_geometry_text",
+				"canvas_interactive_cubes",
+				"canvas_interactive_cubes_tween",
+				"canvas_interactive_particles",
+				"canvas_interactive_voxelpainter",
+				"canvas_lights_pointlights",
+				"canvas_lines",
+				"canvas_lines_colors",
+				"canvas_lines_dashed",
+				"canvas_lines_sphere",
+				"canvas_materials",
+				"canvas_materials_depth",
+				"canvas_materials_normal",
+				"canvas_materials_reflection",
+				"canvas_materials_video",
+				"canvas_morphtargets_horse",
+				"canvas_particles_floor",
+				"canvas_particles_random",
+				"canvas_particles_shapes",
+				"canvas_particles_sprites",
+				"canvas_particles_waves",
+				"canvas_performance",
+				"canvas_sandbox"
+			],
+			"raytracing": [
+				"raytracing_sandbox"
+			],
+			"software": [
+				"software_geometry_earth",
+				"software_sandbox"
+			],
+			"svg": [
+				"svg_sandbox"
+			]
+		};
+
+		//
+
+		var panel = document.getElementById( 'panel' );
+		var content = document.getElementById( 'content' );
+		var viewer = document.getElementById( 'viewer' );
+
+		var expandButton = document.getElementById( 'expandButton' );
+		expandButton.addEventListener( 'click', function ( event ) {
+			panel.classList.toggle( 'collapsed' );
+			event.preventDefault();
+		} );
+
+		// iOS8 workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			viewer.addEventListener( 'load', function ( event ) {
+
+				viewer.contentWindow.innerWidth -= 10;
+				viewer.contentWindow.innerHeight -= 2;
+
+			} );
+
+		}
+
+		var container = document.createElement( 'div' );
+		content.appendChild( container );
+
+		var button = document.createElement( 'div' );
+		button.id = 'button';
+		button.textContent = 'View source';
+		button.addEventListener( 'click', function ( event ) {
+
+			var array = location.href.split( '/' );
+			array.pop();
+
+			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
+
+		}, false );
+		button.style.display = 'none';
+		document.body.appendChild( button );
+
+		var divs = {};
+		var selected = null;
+
+		for ( var key in files ) {
+
+			var section = files[ key ];
+
+			var div = document.createElement( 'h2' );
+			div.textContent = key;
+			container.appendChild( div );
+
+			for ( var i = 0; i < section.length; i ++ ) {
+
+				( function ( file ) {
+
+					var name = file.split( '_' );
+					name.shift();
+					name = name.join( ' / ' );
+
+					var div = document.createElement( 'div' );
+					div.className = 'link';
+					div.textContent = name;
+					div.addEventListener( 'click', function () {
+
+						panel.classList.toggle( 'collapsed' );
+						load( file );
+
+					} );
+					container.appendChild( div );
+
+					divs[ file ] = div;
+
+				} )( section[ i ] );
+
+			}
+
+		}
+
+		var load = function ( file ) {
+
+			if ( selected !== null ) divs[ selected ].className = 'link';
+
+			divs[ file ].className = 'link selected';
+
+			window.location.hash = file;
+			viewer.src = file + '.html';
+			viewer.focus();
+
+			button.style.display = '';
+
+			selected = file;
+
+		};
+
+		if ( window.location.hash !== '' ) {
+
+			load( window.location.hash.substring( 1 ) );
+
+		}
+
+		</script>
+
+	</body>
+</html>

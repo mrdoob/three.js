@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Affects objects using [page:MeshLambertMaterial] or [page:MeshPhongMaterial].
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>// White directional light at half intensity shining from the top.
+
+var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+directionalLight.position.set( 0, 1, 0 );
+scene.add( directionalLight );</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Integer hex], [page:Float intensity])</h3>
+		<div>
+		[page:Integer hex] -- Numeric value of the RGB component of the color. <br />
+		[page:Float intensity] -- Numeric value of the light's strength/intensity.
+		</div>
+		<div>
+		Creates a light that shines from a specific direction not from a specific position.  This light will behave
+		as though it is infinitely far away and the rays produced from it are all parallel.  The best
+		analogy would be a light source that acts like the sun: the sun is so far away that all sunlight
+		hitting objects comes from the same angle.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Object3D target]</h3>
+		<div>
+			Target used for shadow camera orientation.
+		</div>
+
+		<h3>[property:Float intensity]</h3>
+		<div>
+			Light's intensity.<br />
+			Default — *1.0*.
+		</div>
+
+		<h3>[property:Boolean onlyShadow]</h3>
+		<div>
+			If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br />
+			Default — *false*.
+		</div>
+
+		<h3>[property:Float shadowCameraNear]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *50*.
+		</div>
+
+		<h3>[property:Float shadowCameraFar]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *5000*.
+		</div>
+
+		<h3>[property:Float shadowCameraLeft]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *-500*.
+		</div>
+
+		<h3>[property:Float shadowCameraRight]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *500*.
+		</div>
+
+		<h3>[property:Float shadowCameraTop]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *500*.
+		</div>
+
+		<h3>[property:Float shadowCameraBottom]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *-500*.
+		</div>
+
+		<h3>[property:Boolean shadowCameraVisible]</h3>
+		<div>
+			Show debug shadow camera frustum.<br />
+			Default — *false*.
+		</div>
+
+		<h3>[property:Float shadowBias]</h3>
+		<div>
+			Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br />
+			Default — *0*.
+		</div>
+
+		<h3>[property:Float shadowDarkness]</h3>
+		<div>
+			Darkness of shadow casted by this light (from *0* to *1*).<br />
+			Default — *0.5*.
+		</div>
+
+		<h3>[property:Integer shadowMapWidth]</h3>
+		<div>
+			Shadow map texture width in pixels.<br />
+			Default — *512*.
+		</div>
+
+		<h3>[property:Integer shadowMapHeight]</h3>
+		<div>
+			Shadow map texture height in pixels.<br />
+			Default — *512*.
+		</div>
+
+		<h3>[property:Boolean shadowCascade]</h3>
+		<div>
+			**Experimental** If true, use a series of shadow maps in a cascade. This can give better z-depth resolution for a directional light. <br />
+			Default — *false*.
+		</div>
+
+		<h3>[property:Integer shadowCascadeCount]</h3>
+		<div>
+			Number of shadow maps to allocate in a cascade (one after another). <br />
+			Default — *2*.
+		</div>
+
+		<h3>[property:Vector3 shadowCascadeOffset]</h3>
+		<div>
+			A relative position to real camera where virtual shadow cameras are attached. A magic vector; scene and light orientation dependent. <br />
+			Default — *Three.Vector3( 0, 0, -1000 )*.
+		</div>
+
+		<h3>[property:Array shadowCascadeBias]</h3>
+		<div>
+			An array of shadowMapBias values for the corresponding shadow map in the cascade, near to far. <br />
+			Default — <strong>[ 0, 0, 0 ]</strong>.
+		</div>
+
+		<h3>[property:Array shadowCascadeWidth]</h3>
+		<div>
+			An array of shadowMapWidth values for the corresponding shadow map in the cascade, near to far. <br />
+			Default — <strong>[ 512, 512, 512 ]</strong>.
+		</div>
+
+		<h3>[property:Array shadowCascadeHeight]</h3>
+		<div>
+			An array of shadowMapHeight values for the corresponding shadow map in the cascade, near to far. <br />
+			Default — <strong>[ 512, 512, 512 ]</strong>.
+		</div>
+
+		<h3>[property:Array shadowCascadeNearZ]</h3>
+		<div>
+			An array of shadowMapNear values for the corresponding shadow map in the cascade, near to far. These typically start with -1.0 (near plane) and match with the previous shadowCascadeFarZ array value.<br />
+			Default — <strong>[ -1.000, 0.990, 0.998 ]</strong>.
+		</div>
+
+		<h3>[property:Array shadowCascadeFarZ]</h3>
+		<div>
+			An array of shadowMapFar values for the corresponding shadow map in the cascade, near to far. These typically match with the next shadowCascadeNearZ array value, ending in 1.0.<br />
+			Default — <strong>[ 0.990, 0.998, 1.000 ]</strong>.
+		</div>
+
+		<h3>[property:Array shadowCascadeArray]</h3>
+		<div>
+			Array of size shadowCascadeCount of [page:DirectionalLight THREE.DirectionalLight] objects. This holds the series of separate shadow maps in a cascade, near to far. Created internally.
+		</div>
+
+		<h3>[property:Vector2 shadowMapSize]</h3>
+		<div>
+			The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering.
+		</div> 
+
+		<h3>[property:OrthographicCamera shadowCamera]</h3>
+		<div>
+			The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings.
+		</div> 
+
+		<h3>[property:Matrix4 shadowMatrix]</h3>
+		<div>
+			Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering.
+		</div> 
+
+		<h3>[property:WebGLRenderTarget shadowMap]</h3>
+		<div>
+		    The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
+		</div> 
+		
+		<h2>Methods</h2>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

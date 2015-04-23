@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+        [page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">This illuminates the scene from a complete surface. This light only works in the [page:WebGLDeferredRenderer deferredrenderer]. </div>
+
+
+		<h2>Example</h2>
+		<code>areaLight1 = new THREE.AreaLight( 0xffffff, 1 );
+areaLight1.position.set( 0.0001, 10.0001, -18.5001 );
+areaLight1.rotation.set( -0.74719, 0.0001, 0.0001 );
+areaLight1.width = 10;
+areaLight1.height = 1;
+
+scene.add( areaLight1 );</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Integer hex], [page:Float intensity])</h3>
+		<div>
+		[page:Integer hex] — Numeric value of the RGB component of the color.<br />
+		[page:Float intensity] — Numeric value of the light's strength/intensity.
+		</div>
+		<div>
+		This creates a arealight with color.
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+
+		<h3>[property:Vector3 right]</h3>
+		<div>
+		Sets or gets an unit vector that indicates the right side of the light. This is calculated in local space. 
+		</div> 
+
+		<h3>[property:Vector3 normal]</h3>
+		<div>
+		Sets or gets an unit vectorSets or gets an unit vector that indicates the right side of the light. This is calculated in local space.
+		</div> 
+
+		<h3>[property:number height]</h3>
+		<div>
+		Sets or gets the height of the illuminating plane. 
+		</div> 
+
+		<h3>[property:number width]</h3>
+		<div>
+		Sets or gets the width of the illuminating plane. 
+		</div> 
+
+		<h3>[property:Float intensity]</h3>
+		<div>
+		Light's intensity.<br />
+		Default — *1.0*.
+		</div>
+
+		<h3>[property:number constantAttenuation]</h3>
+		<div>
+		Sets or gets the attention of the light in constant space. This is independant of the distance of the light. 
+		</div> 
+
+		<h3>[property:number linearAttenuation]</h3>
+		<div>
+		Sets or gets the attention of the light in linear space. This increases the attenuation linearly with the distance from the light.
+		</div> 
+
+		<h3>[property:number quadraticAttenuation]</h3>
+		<div>
+		Sets or gets the attention of the light in linear space. This increases the attenuation quadratic with the distance from the light.
+		</div> 
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
