@@ -86,6 +86,8 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 	}
 
+	coords = coords.subarray( 0, index );
+
 	this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
 };
