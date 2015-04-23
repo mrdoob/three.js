@@ -94,7 +94,7 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 		var h = hash[ key ];
 
-		if ( h.coplanar === undefined || h.coplanar === false ) {
+		if ( h.coplanar !== true ) {
 
 			var vertex = vertices[ h.vert1 ];
 			coords[ index ++ ] = vertex.x;
