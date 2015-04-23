@@ -582,7 +582,8 @@ THREE.Object3D.prototype = {
 		}
 		
 		return this.matrixWorld;
-	}
+		
+	},
 
 	toJSON: function( meta ) {
 
