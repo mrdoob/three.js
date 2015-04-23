@@ -56,19 +56,23 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 			} else {
 
-				if ( h.coplanar !== false ) {
+				if ( h.coplanar !== undefined ) {
 
-					var keep = ( faces[ h.face1 ].normal.dot( face.normal ) <= thresholdDot );
+					if ( h.coplanar === true ) {
 
-					if ( keep === false && h.coplanar === undefined ) {
-
-						numEdges --;
+						numEdges ++;
 
 					}
 
-					if ( keep === true && h.coplanar === true ) {
+					h.coplanar = false;
 
-						numEdges ++;
+				} else {
+
+					var keep = ( faces[ h.face1 ].normal.dot( face.normal ) <= thresholdDot );
+
+					if ( keep === false ) {
+
+						numEdges --;
 
 					}
 
