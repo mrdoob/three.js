@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - BillboardMesh</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - BillboardMesh example - drag to rotate
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/objects/BillboardMesh.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var billboards = [];
+
+			var textureLoader = new THREE.TextureLoader();
+			var textures = {};
+			var texturesToLoad = [
+				{ url: "textures/alienbody.png", name: "alienBody" },
+				{ url: "textures/alienhead.png", name: "alienHead" },
+				{ url: "textures/alienplanet.png", name: "planet" },
+				{ url: "textures/alienstar.png", name: "star" }
+			];
+
+			var loadedTextures = 0;
+			for ( var i = 0; i < texturesToLoad.length; i ++ ) {
+
+				loadTextureEntryAndInitIfDone( texturesToLoad[ i ] )
+
+			}
+
+			function loadTextureEntryAndInitIfDone( entry ) {
+
+				textureLoader.load( entry.url, function ( texture ) {
+
+					textures[ entry.name ] = texture;
+					loadedTextures ++;
+					if ( loadedTextures >= texturesToLoad.length ) {
+
+						init();
+
+					}
+
+				} );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+
+			}
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 620;
+
+				controls = new THREE.TrackballControls( camera );
+				controls.rotateSpeed = 4.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = false;
+				controls.noPan = false;
+				controls.staticMoving = true;
+				controls.addEventListener( 'change', render );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x00000f, 0.001 );
+
+				// planet
+
+				var radius = 200;
+				var sphereGeometry = new THREE.SphereGeometry( radius, 32, 32 );
+				var sphereMaterial = new THREE.MeshPhongMaterial( { bumpMap: textures.planet, bumpScale: 10, color: 0x333344, overdraw: 0.5 } );
+				var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+				sphere.position.set( 0, 0, 0 );
+				scene.add( sphere );
+
+				// create the little alien billboards
+
+				var alienBodyGeom = new THREE.PlaneBufferGeometry( 25, 100 );
+				var alienBodyMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, map: textures.alienBody, transparent: true } );
+
+				var alienHeadGeom = new THREE.PlaneBufferGeometry( 25, 50 );
+				var alienHeadMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, map: textures.alienHead, transparent: true } );
+
+				// picking random points on a sphere
+
+				var i, u, v, theta, phi, surfacePoint, orthogonalAxis, billboardBodyPosition, billboardHeadPosition, alienBodyBillboard, alienHeadBillboard;
+				for ( i = 0; i < 100; i ++ ) {
+
+					// http://mathworld.wolfram.com/SpherePointPicking.html
+					u = Math.random();
+					v = Math.random();
+					theta = 2 * Math.PI * u;
+					phi = Math.acos( 2 * v - 1 );
+					surfacePoint = new THREE.Vector3( radius * Math.cos( theta ) * Math.sin( phi ), radius * Math.sin( theta ) * Math.sin( phi ), radius * Math.cos( phi ) );
+					orthogonalAxis = surfacePoint.clone();
+					orthogonalAxis.normalize();
+
+					// create an axially constrained billboard for the alien body
+					billboardBodyPosition = surfacePoint.clone().add( orthogonalAxis.clone().multiplyScalar( 20 ) );
+					alienBodyBillboard = new THREE.BillboardMesh( alienBodyGeom, alienBodyMaterial, camera.position, orthogonalAxis, true );
+					alienBodyBillboard.position.set( billboardBodyPosition.x, billboardBodyPosition.y, billboardBodyPosition.z );
+					billboards.push( alienBodyBillboard );
+					scene.add( alienBodyBillboard );
+
+					// create an unconstrained billboard for the alien head (always directly faces the camera)
+					billboardHeadPosition = surfacePoint.clone().add( orthogonalAxis.clone().multiplyScalar( 75 ) );
+					alienHeadBillboard = new THREE.BillboardMesh( alienHeadGeom, alienHeadMaterial, camera.position, orthogonalAxis, false );
+					alienHeadBillboard.position.set( billboardHeadPosition.x, billboardHeadPosition.y, billboardHeadPosition.z );
+					billboards.push( alienHeadBillboard );
+					scene.add( alienHeadBillboard );
+
+				}
+
+				// star sprites
+
+				var spriteMaterial = new THREE.SpriteMaterial( { map: textures.star, fog: true } );
+				var group = new THREE.Group();
+
+				for ( i = 0; i < 500; i ++ ) {
+
+					var spriteX = 2000 * Math.random() - 1000;
+					var spriteY = 2000 * Math.random() - 1000;
+					var spriteZ = 2000 * Math.random() - 1000;
+
+					var sprite = new THREE.Sprite( spriteMaterial );
+					sprite.position.set( spriteX, spriteY, spriteZ );
+					sprite.scale.set( 15, 15, 15 );
+					group.add( sprite );
+
+				}
+
+				scene.add( group );
+
+				// lights
+
+				light = new THREE.DirectionalLight( 0xccccff );
+				light.position.set( 500, 500, 500 );
+				scene.add( light );
+
+				light = new THREE.AmbientLight( 0x555555 );
+				scene.add( light );
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				animate();
+				render();
+
+			}
+
+			// update all the billboards to look at their specified points
+			function updateBillboards() {
+
+				for ( var i = 0; i < billboards.length; i ++ ) {
+
+					billboards[ i ].update();
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				updateBillboards();
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>
