@@ -1,0 +1,365 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>WebGL Quad Sphere Demonstration</title>
+  <meta name="description" content="WebGL Quad Sphere Demonstration">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+	  
+  <style>
+	  body {
+		  margin:0px;
+	  }
+  </style>
+</head>
+
+<body>
+  <script src="../build/three.min.js"></script>
+  <script src="js/wip/quadsphere/Logger.js"></script>
+  <script src="js/controls/FlyControls.js"></script>
+  <script src="js/wip/quadsphere/stats.js"></script>
+  <script src="js/wip/quadsphere/QuadMaterialBuilder.js"></script>
+  <script src="js/wip/quadsphere/QuadTreeSphere.js"></script>
+  <script src="js/wip/quadsphere/Application.js"></script>
+  
+<script>
+  
+	// Create a new demo application
+	var demo = new Application({
+		
+		// Dom element to append the application to.
+		domElement: document.body,
+		
+		// Called when the applications initialization stages have completed.
+		onInitialize: function () {
+
+		    this.scene.add(this.quadSphere);
+			// window.addEventListener("load", this.start.bind(this));
+			this.start.bind(this)();
+		},
+		
+		// Called when the application has been started.
+		onStart: function () {
+			console.log("start");
+		    this.render();
+
+		    window.addEventListener("keypress", function (key) {
+	
+		        if (key.key === "Spacebar") {
+		
+		            this.pause = !this.pause;
+		            this.quadSphere.pause = this.pause;
+
+		        }
+
+		    }.bind(this));
+		},
+		
+		// Called if there is an error during the initialization or starting of the applications.
+		onError: function (error) {
+			console.error(error);
+		}
+
+	});
+	
+
+	// Initialization stages run in a first in first out order
+	// this refers to the context of the Application instance
+
+	demo.addInitializationStage({
+		name: "initialize-statistics",
+		stage: function () {
+		    this.stats = new Stats();
+
+		    this.stats.setMode(0);
+		    this.stats.domElement.style.position = 'absolute';
+		    this.stats.domElement.style.top = '0px';
+		    this.stats.domElement.style.zIndex = 100;
+
+		    this.domElement.appendChild(this.stats.domElement);
+		}
+	});
+
+	demo.addInitializationStage({
+		name: "initialize-logger",
+		stage: function () {
+		    this.logger = new Logger();
+
+		    this.logger.domElement.style.position = 'absolute';
+		    this.logger.domElement.style.top = '100px';
+		    this.logger.domElement.style.zIndex = 100;
+
+		    this.domElement.appendChild(this.logger.domElement);
+		}
+	});
+
+	demo.addInitializationStage({
+		name: "append-member-properties",
+		stage: function () {
+
+			this.quadSphereRadius = 6376136; // earth sized
+		    this.controlMaxSpeed = 1000000;
+
+		    this.pause = false;
+
+		    this.clock = new THREE.Clock();
+		    this.clockTest = new THREE.Clock();
+		    this.updateClock = new THREE.Clock();
+		    this.delta;
+		    this.origin = new THREE.Vector3();
+
+		    this.planetupdate = 0;
+			this.del = 0;
+			this.renderupdate = 0;
+			this.updateUpdate = 0;
+			this.count = 0;
+		    this.renderAverage = 0;
+			this.planetAverage = 0;
+			this.updateAverage = 0;
+
+			this.summaryAverage = 0;
+
+		}
+	});
+
+
+	demo.addInitializationStage({
+		name: "create-camera",
+		stage: function () {
+
+		    this.camera = new THREE.PerspectiveCamera(
+				30,
+				window.innerWidth / window.innerHeight,
+				0.1,
+				7000000
+			);
+	
+		    this.camera.position.z = this.quadSphereRadius * 4;
+			
+		    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+	
+		}
+	});
+	
+
+	demo.addInitializationStage({
+		name: "create-controls",
+		stage: function () {
+
+
+		    this.control = new THREE.FlyControls(this.camera);
+
+		    this.control.movementSpeed = this.controlMaxSpeed;
+		    this.control.domElement = document.body;
+		    this.control.rollSpeed = Math.PI / 12;
+		    this.control.autoForward = false;
+		    this.control.dragToLook = false;
+
+
+		}
+	});
+
+
+
+	demo.addInitializationStage({
+		name: "create-three-enviornment",
+		stage: function () {
+
+		    this.scene = new THREE.Scene();
+
+		    this.renderer = new THREE.WebGLRenderer();
+		    this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+		    this.domElement.appendChild(this.renderer.domElement);
+
+		}
+	});
+	
+	
+	// This is the heart of the code.
+	// Two parts a material builder and the sphere.
+	demo.addInitializationStage({
+		name: "create-quad-sphere",
+		stage: function () {
+		
+			this.quadMaterial = new QuadMaterialBuilder({
+			
+				onCreate: function () {
+					// NOP
+				},
+			
+				buildMaterialForQuad: function (centerPoint, position, radius, width) {
+		
+				    var color = new THREE.Color();
+			
+					var decimalColor = ((width/1E11) * 16777215);
+			
+			
+				    var R =	 decimalColor%256;
+				    var G =	 (decimalColor/256)%256;
+				    var B =	 ((decimalColor/256)/256)%256;
+			
+				    color.r = R;
+				    color.g = G;
+				    color.b = B;
+			
+					return new THREE.MeshBasicMaterial({ wireframe:true, color: color});
+				
+				}
+			
+			});
+
+		    this.quadSphere = new THREE.QuadTreeSphere({
+				workerPath: "js/wip/quadsphere/QuadTreeSphereWorker.js",
+				camera: this.camera,
+				radius: this.quadSphereRadius,
+				patchSize: 16,
+				scene: this.scene,
+				fov: 30,
+				quadMaterial: this.quadMaterial
+			});
+	
+		}
+	});
+
+
+
+	// demo.addInitializationStage({
+	// 	name: "append-render-callback-to-application",
+	// 	stage: function () {
+	// 
+	// 		this.render = function () {
+	// 			
+	// 	        this.quadSphere.update();
+	// 			
+	// 	        this.renderer.render(this.scene, this.camera);
+	// 			
+	// 	        requestAnimationFrame(this.render);
+	// 
+	// 
+	// 		}.bind(this);
+	// 
+	// 	}
+	// });
+	// 
+
+	demo.addInitializationStage({
+		name: "append-render-callback-to-application",
+		stage: function () {
+
+		    this.updateToLocal = function() {
+
+		        if (this.camera.position.length() > 10000) {
+
+		            this.origin = this.origin.subVectors(this.camera.position, this.origin);
+
+		            this.scene.children.forEach(function (child) {
+		                //console.log("Moving " + child.position.x + " : " + child.position.y + " : " + child.position.z);
+		                child.position.sub(this.origin);
+		                //console.log("To " + child.position.x + " : " + child.position.y + " : " + child.position.z);
+		            }.bind(this));
+		            //planet.position.sub(origin);
+		            this.origin.x = 0;
+		            this.origin.y = 0;
+		            this.origin.z = 0;
+		            this.camera.position.x = 0;
+		            this.camera.position.y = 0;
+		            this.camera.position.z = 0;
+
+		        }
+
+		    }
+
+			this.render = function () {
+
+				
+		        this.quadSphere.update();
+				
+		        this.renderer.render(this.scene, this.camera);
+				
+		        requestAnimationFrame(this.render);
+
+
+
+		        this.count++;
+		        this.updateClock.getDelta();
+		        this.delta = this.clock.getDelta();
+
+		        this.control.update(this.delta);
+
+		        this.clockTest.getDelta();
+				
+		        this.del = this.clockTest.getDelta();
+		        this.renderAverage += this.del;
+		        if (this.del > this.renderupdate && this.count > 15) {
+		            this.renderupdate = this.del;
+		        }
+
+		        this.del = this.clockTest.getDelta();
+		        this.planetAverage += this.del;
+		        if (this.del > this.planetupdate && this.count > 15) {
+		            this.planetupdate = this.del;
+		        }
+
+		        this.control.movementSpeed = this.quadSphere.cameraHeight * 2;
+
+		        this.stats.update();
+
+		        this.clockTest.getDelta();
+		        this.updateToLocal();
+
+		        this.del = this.clockTest.getDelta();
+		        this.updateAverage += this.del;
+
+		        if (this.del > this.summaryAverage && this.count > 15) {
+		            this.summaryAverage = this.del;
+		        }
+		        if (this.count % 30 === 0) {
+		            this.logger.Log("Geometries ", this.renderer.info.memory.geometries);
+		            this.logger.Log("Textures ", this.renderer.info.memory.textures);
+		            this.logger.Log("Calls ", this.renderer.info.render.calls);
+		            this.logger.Log("Vertices ", this.renderer.info.render.vertices);
+		            this.logger.Log("Deepest Level ", this.quadSphere.deepestNode);
+		            this.logger.Log("Total Nodes ", this.quadSphere.totalNodes);
+		            this.logger.Log("Total Leaf Nodes ", this.quadSphere.leafNodes);
+		            this.logger.Log("CameraHeight (meters) ", Math.round(this.quadSphere.cameraHeight));
+		            this.logger.Log("CameraHeight (miles) ", Math.round(this.quadSphere.cameraHeight * 0.000621371));
+		            this.logger.Log("CameraPosition: ", this.camera.position);
+		            this.logger.Log("PlanetPosition: ", this.quadSphere.position);
+		            this.logger.Log("Slowest Planet Move time ", (this.summaryAverage).toFixed(3));
+		            this.logger.Log("Slowest Planet update ", (this.planetupdate).toFixed(3));
+		            this.logger.Log("Slowest Render update ", (this.renderupdate).toFixed(3));
+		            this.logger.Log("Slowest update update ", (this.updateUpdate).toFixed(3));
+		            this.logger.Log("Average render: ", (this.renderAverage/this.count).toFixed(6));
+		            this.logger.Log("Average planet ", this.quadSphere.meshBuildTimeAvg.toFixed(6));
+		            this.logger.Log("Average position ", (this.updateAverage/this.count).toFixed(6));
+		            this.updateAverage = 0
+					this.planetAverage = 0
+					this.renderAverage = 0;
+		            this.count = 0
+		            this.del = this.updateClock.getDelta();
+		            if (this.del > this.updateUpdate) {
+		                this.updateUpdate = this.del;
+		            }
+		        }
+
+			}.bind(this);
+
+		}
+	});
+
+
+
+
+	demo.initialize();
+
+
+</script>
+  
+</body>
+</html>
