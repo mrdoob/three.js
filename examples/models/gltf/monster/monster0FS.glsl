@@ -1,12 +1,10 @@
 precision highp float;
 varying vec3 v_normal;
-varying vec4 v_joint;
-varying vec4 v_weight;
-uniform float u_shininess;
 uniform vec4 u_ambient;
 varying vec2 v_texcoord0;
 uniform sampler2D u_diffuse;
 uniform vec4 u_specular;
+uniform float u_shininess;
 void main(void) {
 vec3 normal = normalize(v_normal);
 vec4 color = vec4(0., 0., 0., 0.);
