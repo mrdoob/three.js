@@ -119,13 +119,13 @@ THREE.Audio.prototype.setVolume = function ( value ) {
 
 };
 
-THREE.Audio.prototype.updateMatrixWorld = ( function () {
+THREE.Audio.prototype.updateWorldMatrices = ( function () {
 
 	var position = new THREE.Vector3();
 
 	return function ( force ) {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+		THREE.Object3D.prototype.updateWorldMatrices.call( this, force );
 
 		position.setFromMatrixPosition( this.matrixWorld );
 

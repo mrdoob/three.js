@@ -535,7 +535,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	updateMatrixWorld: function ( force ) {
+	updateWorldMatrices: function ( force ) {
 
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
@@ -561,13 +561,13 @@ THREE.Object3D.prototype = {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-			this.children[ i ].updateMatrixWorld( force );
+			this.children[ i ].updateWorldMatrices( force );
 
 		}
 
 	},
 	
-	getUpdatedMatrixWorld: function () {
+	updateMatrixWorld: function () {
 
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
