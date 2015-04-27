@@ -24,8 +24,8 @@ THREE.DynamicGeometry = function () {
 	this.morphColors = [];
 	this.morphNormals = [];
 
-	this.skinWeights = [];
 	this.skinIndices = [];
+	this.skinWeights = [];
 
 	this.lineDistances = [];
 
@@ -100,6 +100,9 @@ THREE.DynamicGeometry.prototype = {
 			}
 
 		}
+
+		if ( geometry.skinIndices ) this.skinIndices = geometry.skinIndices.slice( 0 );
+		if ( geometry.skinWeights ) this.skinWeights = geometry.skinWeights.slice( 0 );
 
 		return this;
 

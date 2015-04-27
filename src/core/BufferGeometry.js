@@ -112,7 +112,7 @@ THREE.BufferGeometry.prototype = {
 
 	setFromObject: function ( object ) {
 
-		console.log( 'THREE.BufferGeometry.setFromObject(). Converting ', object, this );
+		console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
 
 		var geometry = object.geometry;
 		var material = object.material;
@@ -127,6 +127,23 @@ THREE.BufferGeometry.prototype = {
 			this.computeBoundingSphere();
 
 		} else if ( object instanceof THREE.Mesh ) {
+
+			if ( object instanceof THREE.SkinnedMesh ) {
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for THREE.SkinnedMesh.', geometry );
+					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+
+				}
+
+				var skinIndices = new Float32Array( geometry.skinIndices.length * 4 );
+				var skinWeights = new Float32Array( geometry.skinWeights.length * 4 );
+
+				this.addAttribute( 'skinIndex', new THREE.BufferAttribute( skinIndices, 4 ).copyVector4sArray( geometry.skinIndices ) );
+				this.addAttribute( 'skinWeight', new THREE.BufferAttribute( skinWeights, 4 ).copyVector4sArray( geometry.skinWeights ) );
+
+			}
 
 			if ( geometry instanceof THREE.DynamicGeometry ) {
 
