@@ -443,6 +443,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	ShaderDelegate.prototype.resourceAvailable = function(data, ctx) {
 		theLoader.shadersLoaded ++;
 		theLoader.shaders[ctx.id] = data;
+		theLoader.checkComplete();
 		return true;
 	};
 
