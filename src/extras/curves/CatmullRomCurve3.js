@@ -1,4 +1,4 @@
-/*
+/**
  * @author zz85 https://github.com/zz85
  *
  * Centripetal CatmullRom Curve - which is useful for avoiding
