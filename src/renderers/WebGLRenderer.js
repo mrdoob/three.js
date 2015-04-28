@@ -1690,7 +1690,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setupMatrices( object, camera );
 
-				unrollImmediateBufferMaterial( webglObject );
+				var material = object.material;
+
+				if ( material.transparent ) {
+
+					webglObject.transparent = material;
+					webglObject.opaque = null;
+
+				} else {
+
+					webglObject.opaque = material;
+					webglObject.transparent = null;
+
+				}
 
 			}
 
@@ -1782,9 +1794,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-					unrollBufferMaterial( webglObject );
+					var material = object.material;
 
-					webglObject.render = true;
+					if ( material.transparent ) {
+
+						transparentObjects.push( webglObject );
+
+					} else {
+
+						opaqueObjects.push( webglObject );
+
+					}
 
 					if ( _this.sortObjects === true ) {
 
@@ -1895,48 +1915,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-
-	function unrollImmediateBufferMaterial ( globject ) {
-
-		var object = globject.object,
-			material = object.material;
-
-		if ( material.transparent ) {
-
-			globject.transparent = material;
-			globject.opaque = null;
-
-		} else {
-
-			globject.opaque = material;
-			globject.transparent = null;
-
-		}
-
-	}
-
-	function unrollBufferMaterial ( globject ) {
-
-		var object = globject.object;
-		var material = object.material;
-
-		if ( material ) {
-
-			globject.material = material;
-
-			if ( material.transparent ) {
-
-				transparentObjects.push( globject );
-
-			} else {
-
-				opaqueObjects.push( globject );
-
-			}
-
-		}
-
-	}
 
 	// Materials
 
