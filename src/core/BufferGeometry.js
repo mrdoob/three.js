@@ -98,6 +98,37 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	copy: function ( geometry ) {
+
+		var attributes = geometry.attributes;
+		var offsets = geometry.offsets;
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+
+			this.addAttribute( name, attribute.clone() );
+
+		}
+
+		for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+			var offset = offsets[ i ];
+
+			this.offsets.push( {
+
+				start: offset.start,
+				index: offset.index,
+				count: offset.count
+
+			} );
+
+		}
+
+		return this;
+
+	},
+
 	center: function () {
 
 		this.computeBoundingBox();
@@ -1207,33 +1238,6 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		return geometry;
-
-	},
-	
-	copy: function ( geometry ) {
-		
-		for ( var attr in geometry.attributes ) {
-
-			var sourceAttr = geometry.attributes[attr];
-			this.addAttribute( attr, sourceAttr.clone() );
-
-		}
-
-		for ( var i = 0, il = geometry.offsets.length; i < il; i++ ) {
-
-			var offset = geometry.offsets[i];
-
-			this.offsets.push( {
-
-				start: offset.start,
-				index: offset.index,
-				count: offset.count
-
-			} );
-
-		}
-
-		return this;
 
 	},
 
