@@ -18,18 +18,7 @@ THREE.DynamicGeometry = function () {
 	this.uvs = [];
 	this.faces = [];
 
-	/*
-
-	this.morphTargets = [];
-	this.morphColors = [];
-	this.morphNormals = [];
-
-	this.skinIndices = [];
-	this.skinWeights = [];
-
-	this.lineDistances = [];
-
-	*/
+	// this.lineDistances = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -100,6 +89,10 @@ THREE.DynamicGeometry.prototype = {
 			}
 
 		}
+
+		if ( geometry.morphTargets ) this.morphTargets = geometry.morphTargets.slice( 0 );
+		if ( geometry.morphColors ) this.morphColors = geometry.morphColors.slice( 0 );
+		if ( geometry.morphNormals ) this.morphNormals = geometry.morphNormals.slice( 0 );
 
 		if ( geometry.skinIndices ) this.skinIndices = geometry.skinIndices.slice( 0 );
 		if ( geometry.skinWeights ) this.skinWeights = geometry.skinWeights.slice( 0 );
