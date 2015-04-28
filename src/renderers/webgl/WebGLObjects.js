@@ -9,9 +9,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	var geometries = new THREE.WebGLGeometries( gl, info );
 
-	var geometryGroups = {};
-	var geometryGroupCounter = 0;
-
 	//
 
 	function onObjectRemoved( event ) {
@@ -118,10 +115,13 @@ THREE.WebGLObjects = function ( gl, info ) {
 		if ( object.geometry instanceof THREE.DynamicGeometry ) {
 
 			geometry.updateFromObject( object );
+			geometry.updateFromMaterial( object.material );
+
+		} else if ( object.geometry instanceof THREE.Geometry ) {
+
+			geometry.updateFromMaterial( object.material );
 
 		}
-
-		geometry.updateFromMaterial( object.material );
 
 		//
 
@@ -199,7 +199,9 @@ THREE.WebGLObjects = function ( gl, info ) {
 				update( object );
 
 			}
+
 		}
-	}
+
+	};
 
 };
