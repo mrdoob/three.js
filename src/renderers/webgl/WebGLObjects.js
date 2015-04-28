@@ -82,7 +82,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		}
 
-		if ( object.__webglActive === undefined) {
+		if ( object.__webglActive === undefined ) {
 
 			object.__webglActive = true;
 
@@ -91,7 +91,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 				objects[ object.id ] = {
 					id: object.id,
 					object: object,
-					material: null,
+					material: object.material,
 					z: 0
 				};
 

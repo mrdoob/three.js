@@ -1660,6 +1660,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objects.update( opaqueObjects );
 		objects.update( transparentObjects );
+
 		//
 
 		shadowMap.render( scene, camera );
@@ -2032,18 +2033,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( !material.program ) {
 
-		    // new material
-		    material.addEventListener( 'dispose', onMaterialDispose );
+			// new material
+			material.addEventListener( 'dispose', onMaterialDispose );
 
 		} else if ( material.program.code !== code ) {
 
-		    // changed glsl or parameters
-		    deallocateMaterial( material );
+			// changed glsl or parameters
+			deallocateMaterial( material );
 
 		} else {
 
-            // same glsl and parameters
-		    return;
+			// same glsl and parameters
+			return;
 
 		}
 
