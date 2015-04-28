@@ -2104,13 +2104,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material.numSupportedMorphTargets = 0;
 
-			var id, base = 'morphTarget';
-
 			for ( var i = 0; i < _this.maxMorphTargets; i ++ ) {
 
-				id = base + i;
-
-				if ( attributes[ id ] >= 0 ) {
+				if ( attributes[ 'morphTarget' + i ] >= 0 ) {
 
 					material.numSupportedMorphTargets ++;
 
@@ -2124,13 +2120,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material.numSupportedMorphNormals = 0;
 
-			var id, base = 'morphNormal';
-
 			for ( i = 0; i < _this.maxMorphNormals; i ++ ) {
 
-				id = base + i;
-
-				if ( attributes[ id ] >= 0 ) {
+				if ( attributes[ 'morphNormal' + i ] >= 0 ) {
 
 					material.numSupportedMorphNormals ++;
 
