@@ -114,7 +114,7 @@ THREE.BufferGeometry.prototype = {
 
 				var buffer = interleavedBuffers[ attribute.data.uuid ];
 
-				if ( !buffer ) {
+				if ( buffer === undefined ) {
 
 					buffer = attribute.data.clone();
 					interleavedBuffers[ attribute.data.uuid ] = buffer;
