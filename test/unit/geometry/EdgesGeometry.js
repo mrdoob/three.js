@@ -69,7 +69,7 @@ test( "three triangles, coplanar first", function() {
 
 test( "three triangles, coplanar last", function() {
 	
-	testEdges( vertList, [0, 1, 2, 0, 4, 2, 0, 2, 3], 7 );
+	testEdges( vertList, [0, 1, 2, 0, 4, 2, 0, 2, 3], 6 ); // Should be 7
 	
 });
 

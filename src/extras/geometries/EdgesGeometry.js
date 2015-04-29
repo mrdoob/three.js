@@ -47,38 +47,14 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 			var key = edge.toString();
 
-			var h = hash[ key ];
+			if ( hash[ key ] === undefined ) {
 
-			if ( h === undefined ) {
-
-				hash[ key ] = { vert1: edge[ 0 ], vert2: edge[ 1 ], face1: i, coplanar: undefined };
+				hash[ key ] = { vert1: edge[ 0 ], vert2: edge[ 1 ], face1: i, face2: undefined };
 				numEdges ++;
 
 			} else {
 
-				if ( h.coplanar !== undefined ) {
-
-					if ( h.coplanar === true ) {
-
-						numEdges ++;
-
-					}
-
-					h.coplanar = false;
-
-				} else {
-
-					var keep = ( faces[ h.face1 ].normal.dot( face.normal ) <= thresholdDot );
-
-					if ( keep === false ) {
-
-						numEdges --;
-
-					}
-
-					h.coplanar = !keep;
-
-				}
+				hash[ key ].face2 = i;
 
 			}
 
@@ -94,7 +70,7 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 
 		var h = hash[ key ];
 
-		if ( h.coplanar !== true ) {
+		if ( h.face2 === undefined || faces[ h.face1 ].normal.dot( faces[ h.face2 ].normal ) <= thresholdDot ) {
 
 			var vertex = vertices[ h.vert1 ];
 			coords[ index ++ ] = vertex.x;
@@ -109,6 +85,8 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 		}
 
 	}
+
+	coords = coords.subarray( 0, index );
 
 	this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
