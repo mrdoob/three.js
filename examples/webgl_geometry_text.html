@@ -138,7 +138,7 @@
 
 			var postprocessing = { enabled : false };
 			var glow = 0.9;
-            var fontIndex = 0;
+        		var fontIndex = 0;
 
 			init();
 			animate();
@@ -260,9 +260,9 @@
 				document.addEventListener( 'keypress', onDocumentKeyPress, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				renderer.domElement.addEventListener( 'drop', onDrop, false );
-                renderer.domElement.addEventListener("dragover", function (evt) {
-                    evt.preventDefault();
-                }, false);
+			        renderer.domElement.addEventListener("dragover", function (evt) {
+			            evt.preventDefault();
+			        }, false);
 
 				document.getElementById( "color" ).addEventListener( 'click', function() {
 
@@ -275,10 +275,14 @@
 
 				document.getElementById( "font" ).addEventListener( 'click', function() {
 
-                    fontIndex++
-                    if ( fontIndex >= reverseFontMap.length ) { fontIndex = 0;}
-
-                    font = reverseFontMap[fontIndex];
+					fontIndex ++;
+					if ( fontIndex >= reverseFontMap.length ) { 
+						
+						fontIndex = 0;
+						
+					}
+					
+					font = reverseFontMap[fontIndex];
 
 					refreshText();
 
@@ -380,35 +384,37 @@
 
 			}
 
-            function onDrop( e ) {
-                e.preventDefault();
-
-                var file = e.dataTransfer.files[0],
-                    reader = new FileReader();
-
-                reader.onload = function (event) {
-                    console.log(event.target);
-                    eval(event.target.result);
-
-                    var index = 0;
-                    for (f in THREE.FontUtils.faces) {
-                        if (!fontMap[f]){
-
-                            fontMap[f] = reverseFontMap.length;
-                            reverseFontMap[reverseFontMap.length] = f;
-                            font = f;
-
-                        }
-                    };
-
+			function onDrop( e ) {
+				e.preventDefault();
+				
+				var file = e.dataTransfer.files[0],
+				    reader = new FileReader();
+				
+				reader.onload = function ( event ) {
+					console.log( event.target );
+					eval( event.target.result );
+				
+					var index = 0;
+					for ( f in THREE.FontUtils.faces ) {
+					
+						if ( ! fontMap[ f ] ) {
+						
+						fontMap[ f ] = reverseFontMap.length;
+						reverseFontMap[ reverseFontMap.length ] = f;
+						font = f;
+				
+						}
+					};
+			
 					refreshText();
-                };
+					
+				};
 
-                console.log(file);
-                reader.readAsText(file);
-
-                return false;
-            };
+				console.log(file);
+				reader.readAsText(file);
+				
+				return false;
+			};
 
 			function onDocumentKeyDown( event ) {
 
