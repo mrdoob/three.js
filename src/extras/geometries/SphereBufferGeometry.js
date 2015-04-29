@@ -30,14 +30,14 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
-	var stride = ( 3 + 3 + 2 );
-	var vertexBuffer = new THREE.InterleavedBuffer( new Float32Array( ( ( widthSegments + 1 ) * ( heightSegments + 1 ) ) * stride ), stride );
+	var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
 
-	var positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
+	var positions = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3);
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
+
 	this.addAttribute( 'position', positions );
-	var normals = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 3 );
 	this.addAttribute( 'normal', normals );
-	var uvs = new THREE.InterleavedBufferAttribute( vertexBuffer, 2, 6 );
 	this.addAttribute( 'uv', uvs );
 
 	var x, y, u, v, px, py, pz, index = 0, vertices = [], normal = new THREE.Vector3();
