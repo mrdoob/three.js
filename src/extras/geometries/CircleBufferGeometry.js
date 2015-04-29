@@ -22,36 +22,31 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
 	var i;
-	
-	var stride = ( 3 + 3 + 2 );
-	var vertexData = new Float32Array( ( segments + 2 ) * stride );
-	var vertexBuffer = new THREE.InterleavedBuffer( vertexData, stride );
+	var vertices = segments + 2;
 
-	var positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
-	this.addAttribute( 'position', positions );
-	var normals = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 3 );
-	this.addAttribute( 'normal', normals );
-	var uvs = new THREE.InterleavedBufferAttribute( vertexBuffer, 2, 6 );
-	this.addAttribute( 'uv', uvs );
+	var positions = new Float32Array( 3 * vertices );
+	this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+	var normals = new Float32Array( 3 * vertices );
+	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	var uvs = new Float32Array( 2 * vertices );
+	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 	// center data is already zero, but need to set a few extras
-	// center normal z
-	vertexData[5] = 1.0; 
-	// center uv
-	vertexData[6] = 0.5;
-	vertexData[7] = 0.5;
+	normals[3] = 1.0;
+	uvs[0] = 0.5;
+	uvs[1] = 0.5;
 
-	for ( i = stride, s = 0, ul = ( segments + 2 ) * stride; i < ul; i += stride, s++ ) {
+	for ( s = 0, i = 3, ii = 2 ; s < vertices; s++, i += 3, ii += 2 ) {
 
 		var segment = thetaStart + s / segments * thetaLength;
 
-		vertexData[i] = radius * Math.cos( segment ); // x
-		vertexData[i + 1] = radius * Math.sin( segment ); // y
+		positions[i] = radius * Math.cos( segment ); 
+		positions[i + 1] = radius * Math.sin( segment );
 
-		vertexData[i + 5] = 1; // normal z
+		normals[i + 2] = 1; // normal z
 
-		vertexData[i + 6] = ( vertexData[i] / radius + 1 ) / 2; // u
-		vertexData[i + 7] = ( vertexData[i + 1] / radius + 1 ) / 2; // v
+		uvs[ii] = ( positions[i] / radius + 1 ) / 2; 
+		uvs[ii + 1] = ( positions[i + 1] / radius + 1 ) / 2; 
 
 	}
 
