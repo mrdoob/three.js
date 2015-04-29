@@ -17,7 +17,7 @@ THREE.BufferAttribute.prototype = {
 
 	get length () {
 
-		return this.array.length;
+		return this.array.length / this.itemSize;
 
 	},
 
