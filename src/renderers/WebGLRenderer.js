@@ -1014,19 +1014,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderMesh( material, geometry, object, program, updateBuffers );
 
-		} else if ( object instanceof THREE.PointCloud ) {
-
-			renderPointCloud( material, geometry, object, program, updateBuffers );
-
 		} else if ( object instanceof THREE.Line ) {
 
 			renderLine( material, geometry, object, program, updateBuffers );
+
+		} else if ( object instanceof THREE.PointCloud ) {
+
+			renderPointCloud( material, geometry, object, program, updateBuffers );
 
 		}
 
 	};
 
-	function renderMesh ( material, geometry, object, program, updateBuffers ) {
+	function renderMesh( material, geometry, object, program, updateBuffers ) {
 
 		var mode = material.wireframe === true ? _gl.LINES : _gl.TRIANGLES;
 
@@ -1186,116 +1186,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	function renderPointCloud ( material, geometry, object, program, updateBuffers ) {
+	function renderLine( material, geometry, object, program, updateBuffers ) {
 
-		var mode = _gl.POINTS;
-
-		var index = geometry.attributes.index;
-
-		if ( index ) {
-
-			// indexed points
-
-			var type, size;
-
-			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
-
-				type = _gl.UNSIGNED_INT;
-				size = 4;
-
-			} else {
-
-				type = _gl.UNSIGNED_SHORT;
-				size = 2;
-
-			}
-
-			var offsets = geometry.offsets;
-
-			if ( offsets.length === 0 ) {
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-
-				}
-
-				_gl.drawElements( mode, index.array.length, type, 0);
-
-				_this.info.render.calls ++;
-				_this.info.render.points += index.array.length;
-
-			} else {
-
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
-				// even if geometry and materials didn't change
-
-				if ( offsets.length > 1 ) updateBuffers = true;
-
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-					var startIndex = offsets[ i ].index;
-
-					if ( updateBuffers ) {
-
-						setupVertexAttributes( material, program, geometry, startIndex );
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-
-					}
-
-					// render indexed points
-
-					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
-
-					_this.info.render.calls ++;
-					_this.info.render.points += offsets[ i ].count;
-
-				}
-
-			}
-
-		} else {
-
-			// non-indexed points
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( material, program, geometry, 0 );
-
-			}
-
-			var position = geometry.attributes.position;
-			var offsets = geometry.offsets;
-
-			if ( offsets.length === 0 ) {
-
-				_gl.drawArrays( mode, 0, position.array.length / 3 );
-
-				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length / 3;
-
-			} else {
-
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
-
-					_this.info.render.calls ++;
-					_this.info.render.points += offsets[ i ].count;
-
-				}
-
-			}
-
-		}
-
-	};
-
-	function renderLine ( material, geometry, object, program, updateBuffers ) {
 		var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
 		// In case user is not using Line*Material by mistake
@@ -1404,9 +1298,116 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
-	function setupMorphTargets ( material, geometryGroup, object ) {
+	function renderPointCloud( material, geometry, object, program, updateBuffers ) {
+
+		var mode = _gl.POINTS;
+
+		var index = geometry.attributes.index;
+
+		if ( index ) {
+
+			// indexed points
+
+			var type, size;
+
+			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+
+				type = _gl.UNSIGNED_INT;
+				size = 4;
+
+			} else {
+
+				type = _gl.UNSIGNED_SHORT;
+				size = 2;
+
+			}
+
+			var offsets = geometry.offsets;
+
+			if ( offsets.length === 0 ) {
+
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( material, program, geometry, 0 );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+				}
+
+				_gl.drawElements( mode, index.array.length, type, 0);
+
+				_this.info.render.calls ++;
+				_this.info.render.points += index.array.length;
+
+			} else {
+
+				// if there is more than 1 chunk
+				// must set attribute pointers to use new offsets for each chunk
+				// even if geometry and materials didn't change
+
+				if ( offsets.length > 1 ) updateBuffers = true;
+
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+					var startIndex = offsets[ i ].index;
+
+					if ( updateBuffers ) {
+
+						setupVertexAttributes( material, program, geometry, startIndex );
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+					}
+
+					// render indexed points
+
+					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+
+					_this.info.render.calls ++;
+					_this.info.render.points += offsets[ i ].count;
+
+				}
+
+			}
+
+		} else {
+
+			// non-indexed points
+
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( material, program, geometry, 0 );
+
+			}
+
+			var position = geometry.attributes.position;
+			var offsets = geometry.offsets;
+
+			if ( offsets.length === 0 ) {
+
+				_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+				_this.info.render.calls ++;
+				_this.info.render.points += position.array.length / 3;
+
+			} else {
+
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
+
+					_this.info.render.calls ++;
+					_this.info.render.points += offsets[ i ].count;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	function setupMorphTargets( material, geometryGroup, object ) {
 
 		// set base
 
