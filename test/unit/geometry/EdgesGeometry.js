@@ -85,7 +85,7 @@ test( "tetrahedron", function() {
 // HELPERS
 //
 
-function testEdges( vertList, idxList, numAfter ) {
+function testEdges ( vertList, idxList, numAfter ) {
 	
 	var geoms = createGeometries ( vertList, idxList );
 
@@ -213,11 +213,11 @@ var camera;
 var scene = new THREE.Scene();
 var xoffset = 0;
 
-function output (geom, egeom) {
+function output ( geom, egeom ) {
 	
 	if ( DEBUG !== true ) return;
 	
-	if ( !renderer ) initDebug( DEBUG );
+	if ( !renderer ) initDebug();
 	
 	var mesh = new THREE.Mesh( geom, undefined );
 	var edges = new THREE.Line( egeom, new THREE.LineBasicMaterial( { color: 'black' }), THREE.LinePieces );
@@ -233,22 +233,22 @@ function output (geom, egeom) {
 	
 }
 
-function initDebug( debug ) {
-	
-	if ( renderer || !debug ) return;
+function initDebug () {
 
-    renderer = new THREE.WebGLRenderer({
+	renderer = new THREE.WebGLRenderer({
+
 		antialias: true
-    });
+		
+	});
 	
 	var width = 600;
 	var height = 480;
 	
-    renderer.setSize(width, height);
+	renderer.setSize(width, height);
 	renderer.setClearColor( 0xCCCCCC );
 
 	camera = new THREE.PerspectiveCamera(45, width / height, 1, 100);
-    camera.position.x = 30;
+	camera.position.x = 30;
 	camera.position.z = 40;
 	camera.lookAt(new THREE.Vector3(30, 0, 0));
 	
