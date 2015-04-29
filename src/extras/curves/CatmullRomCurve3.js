@@ -100,7 +100,7 @@ THREE.CatmullRomCurve3 = ( function() {
 			intPoint = Math.floor( point );
 			weight = point - intPoint;
 
-			if ( weight == 0 && intPoint == l - 1 ) {
+			if ( weight === 0 && intPoint === l - 1 ) {
 
 				intPoint = l - 2;
 				weight = 1;
@@ -109,7 +109,7 @@ THREE.CatmullRomCurve3 = ( function() {
 
 			var p0, p1, p2, p3;
 
-			if ( intPoint == 0 ) {
+			if ( intPoint === 0 ) {
 
 				// extrapolate first point
 				tmp.subVectors( points[ 0 ], points[ 1 ] ).add( points[ 0 ] );

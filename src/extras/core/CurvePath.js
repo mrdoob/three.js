@@ -12,7 +12,7 @@ THREE.CurvePath = function () {
 
 	this.curves = [];
 	this.bends = [];
-	
+
 	this.autoClose = false; // Automatically closes the path
 };
 
@@ -37,11 +37,11 @@ THREE.CurvePath.prototype.closePath = function() {
 	// Add a line curve if start and end of lines are not connected
 	var startPoint = this.curves[0].getPoint(0);
 	var endPoint = this.curves[this.curves.length - 1].getPoint(1);
-	
+
 	if (! startPoint.equals(endPoint)) {
 		this.curves.push( new THREE.LineCurve(endPoint, startPoint) );
 	}
-	
+
 };
 
 // To get accurate point with reference to
@@ -107,7 +107,7 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 	// We use cache values if curves and cache array are same length
 
-	if ( this.cacheLengths && this.cacheLengths.length == this.curves.length ) {
+	if ( this.cacheLengths && this.cacheLengths.length === this.curves.length ) {
 
 		return this.cacheLengths;
 
@@ -322,4 +322,3 @@ THREE.CurvePath.prototype.getWrapPoints = function ( oldPts, path ) {
 	return oldPts;
 
 };
-
