@@ -316,7 +316,7 @@ THREE.BufferGeometry.prototype = {
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
-		var hasFaceVertexNormals = faces[ 0 ] && faces[ 0 ].vertexNormals.length == 3;
+		var hasFaceVertexNormals = faces[ 0 ] && faces[ 0 ].vertexNormals.length === 3;
 
 		var positions = new Float32Array( faces.length * 3 * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -977,7 +977,7 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var vo = 0; vo < 3; vo ++ ) {
 				var vid = indices[ findex * 3 + vo ];
-				if ( vertexMap[ vid ] == - 1 ) {
+				if ( vertexMap[ vid ] === - 1 ) {
 					//Unmapped vertice
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
@@ -1111,7 +1111,7 @@ THREE.BufferGeometry.prototype = {
 		/* Create a copy of all attributes for reordering. */
 		var sortedAttributes = {};
 		for ( var attr in this.attributes ) {
-			if ( attr == 'index' )
+			if ( attr === 'index' )
 				continue;
 			var sourceArray = this.attributes[ attr ].array;
 			sortedAttributes[ attr ] = new sourceArray.constructor( this.attributes[ attr ].itemSize * vertexCount );
@@ -1121,7 +1121,7 @@ THREE.BufferGeometry.prototype = {
 		for ( var new_vid = 0; new_vid < vertexCount; new_vid ++ ) {
 			var vid = indexMap[ new_vid ];
 			for ( var attr in this.attributes ) {
-				if ( attr == 'index' )
+				if ( attr === 'index' )
 					continue;
 				var attrArray = this.attributes[ attr ].array;
 				var attrSize = this.attributes[ attr ].itemSize;
@@ -1134,7 +1134,7 @@ THREE.BufferGeometry.prototype = {
 		/* Carry the new sorted buffers locally */
 		this.attributes[ 'index' ].array = indexBuffer;
 		for ( var attr in this.attributes ) {
-			if ( attr == 'index' )
+			if ( attr === 'index' )
 				continue;
 			this.attributes[ attr ].array = sortedAttributes[ attr ];
 			this.attributes[ attr ].numItems = this.attributes[ attr ].itemSize * vertexCount;

@@ -250,7 +250,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 				if ( v_prev_x < - EPSILON ) {
 					if ( v_next_x < - EPSILON ) { direction_eq = true; }
 				} else {
-					if ( Math.sign(v_prev_y) == Math.sign(v_next_y) ) { direction_eq = true; }
+					if ( Math.sign(v_prev_y) === Math.sign(v_next_y) ) { direction_eq = true; }
 				}
 			}
 

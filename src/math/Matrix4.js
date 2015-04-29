@@ -685,7 +685,7 @@ THREE.Matrix4.prototype = {
 
 		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
 
-		if ( det == 0 ) {
+		if ( det === 0 ) {
 
 			var msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
 

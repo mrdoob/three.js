@@ -757,7 +757,7 @@ THREE.Geometry.prototype = {
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
 			for ( var n = 0; n < 3; n ++ ) {
-				if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
 					dupIndex = n;
 					faceIndicesToRemove.push( i );
