@@ -1010,126 +1010,56 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// render mesh
-
 		if ( object instanceof THREE.Mesh ) {
 
-			var mode = material.wireframe === true ? _gl.LINES : _gl.TRIANGLES;
+			renderMesh( material, geometry, object, program, updateBuffers );
 
-			var index = geometry.attributes.index;
+		} else if ( object instanceof THREE.PointCloud ) {
 
-			if ( index ) {
+			renderPointCloud( material, geometry, object, program, updateBuffers );
 
-				// indexed triangles
+		} else if ( object instanceof THREE.Line ) {
 
-				var type, size;
+			renderLine( material, geometry, object, program, updateBuffers );
 
-				if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+		}
 
-					type = _gl.UNSIGNED_INT;
-					size = 4;
+	};
 
-				} else {
+	function renderMesh ( material, geometry, object, program, updateBuffers ) {
 
-					type = _gl.UNSIGNED_SHORT;
-					size = 2;
+		var mode = material.wireframe === true ? _gl.LINES : _gl.TRIANGLES;
 
-				}
+		var index = geometry.attributes.index;
 
-				var offsets = geometry.offsets;
+		if ( index ) {
 
-				if ( offsets.length === 0 ) {
+			// indexed triangles
 
-					if ( updateBuffers ) {
+			var type, size;
 
-						setupVertexAttributes( material, program, geometry, 0 );
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
 
-					}
-
-					if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
-
-						var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-						if ( extension === null ) {
-
-							THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-							return;
-
-						}
-
-						extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-					} else {
-
-						_gl.drawElements( mode, index.array.length, type, 0 );
-
-					}
-					_this.info.render.calls ++;
-					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
-					_this.info.render.faces += index.array.length / 3;
-
-				} else {
-
-					// if there is more than 1 chunk
-					// must set attribute pointers to use new offsets for each chunk
-					// even if geometry and materials didn't change
-
-					updateBuffers = true;
-
-					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-						var startIndex = offsets[ i ].index;
-
-						if ( updateBuffers ) {
-
-							setupVertexAttributes( material, program, geometry, startIndex );
-							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-
-						}
-
-						// render indexed triangles
-
-						if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[i].instances > 0 ) {
-
-							var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-							if ( extension === null ) {
-
-								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-								return;
-
-							}
-
-							extension.drawElementsInstancedANGLE( mode, offsets[i].count, type, offsets[i].start * size, offsets[i].count, type, offsets[i].instances ); // Draw the instanced meshes
-
-						} else {
-
-							_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
-
-						}
-
-						_this.info.render.calls ++;
-						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-						_this.info.render.faces += offsets[ i ].count / 3;
-
-					}
-
-				}
+				type = _gl.UNSIGNED_INT;
+				size = 4;
 
 			} else {
 
-				// non-indexed triangles
+				type = _gl.UNSIGNED_SHORT;
+				size = 2;
+
+			}
+
+			var offsets = geometry.offsets;
+
+			if ( offsets.length === 0 ) {
 
 				if ( updateBuffers ) {
 
 					setupVertexAttributes( material, program, geometry, 0 );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 				}
-
-				var position = geometry.attributes[ 'position' ];
-
-				// render non-indexed triangles
 
 				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
@@ -1142,248 +1072,331 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-						extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-					} else {
-
-						extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
-
-					}
+					extension.drawElementsInstancedANGLE( mode, index.array.length, type, 0, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 				} else {
 
-					if ( position instanceof THREE.InterleavedBufferAttribute ) {
-
-						_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
-
-					} else {
-
-						_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
-
-					}
+					_gl.drawElements( mode, index.array.length, type, 0 );
 
 				}
-
 				_this.info.render.calls ++;
-				_this.info.render.vertices += position.array.length / position.itemSize;
-				_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
+				_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
+				_this.info.render.faces += index.array.length / 3;
 
-			}
+			} else {
 
-		} else if ( object instanceof THREE.PointCloud ) {
+				// if there is more than 1 chunk
+				// must set attribute pointers to use new offsets for each chunk
+				// even if geometry and materials didn't change
 
-			// render particles
+				updateBuffers = true;
 
-			var mode = _gl.POINTS;
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-			var index = geometry.attributes.index;
-
-			if ( index ) {
-
-				// indexed points
-
-				var type, size;
-
-				if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
-
-					type = _gl.UNSIGNED_INT;
-					size = 4;
-
-				} else {
-
-					type = _gl.UNSIGNED_SHORT;
-					size = 2;
-
-				}
-
-				var offsets = geometry.offsets;
-
-				if ( offsets.length === 0 ) {
+					var startIndex = offsets[ i ].index;
 
 					if ( updateBuffers ) {
 
-						setupVertexAttributes( material, program, geometry, 0 );
+						setupVertexAttributes( material, program, geometry, startIndex );
 						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
 
-					_gl.drawElements( mode, index.array.length, type, 0);
+					// render indexed triangles
 
-					_this.info.render.calls ++;
-					_this.info.render.points += index.array.length;
+					if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[i].instances > 0 ) {
 
-				} else {
+						var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-					// if there is more than 1 chunk
-					// must set attribute pointers to use new offsets for each chunk
-					// even if geometry and materials didn't change
+						if ( extension === null ) {
 
-					if ( offsets.length > 1 ) updateBuffers = true;
-
-					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-						var startIndex = offsets[ i ].index;
-
-						if ( updateBuffers ) {
-
-							setupVertexAttributes( material, program, geometry, startIndex );
-							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+							THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+							return;
 
 						}
 
-						// render indexed points
+						extension.drawElementsInstancedANGLE( mode, offsets[i].count, type, offsets[i].start * size, offsets[i].count, type, offsets[i].instances ); // Draw the instanced meshes
+
+					} else {
 
 						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
 
-						_this.info.render.calls ++;
-						_this.info.render.points += offsets[ i ].count;
-
 					}
-
-				}
-
-			} else {
-
-				// non-indexed points
-
-				if ( updateBuffers ) {
-
-					setupVertexAttributes( material, program, geometry, 0 );
-
-				}
-
-				var position = geometry.attributes.position;
-				var offsets = geometry.offsets;
-
-				if ( offsets.length === 0 ) {
-
-					_gl.drawArrays( mode, 0, position.array.length / 3 );
 
 					_this.info.render.calls ++;
-					_this.info.render.points += position.array.length / 3;
-
-				} else {
-
-					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-						_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
-
-						_this.info.render.calls ++;
-						_this.info.render.points += offsets[ i ].count;
-
-					}
+					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+					_this.info.render.faces += offsets[ i ].count / 3;
 
 				}
 
 			}
 
-		} else if ( object instanceof THREE.Line ) {
+		} else {
 
-			var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			// non-indexed triangles
 
-			// In case user is not using Line*Material by mistake
-			var lineWidth = material.linewidth !== undefined ? material.linewidth : 1;
+			if ( updateBuffers ) {
 
-			state.setLineWidth( lineWidth * pixelRatio );
+				setupVertexAttributes( material, program, geometry, 0 );
 
-			var index = geometry.attributes.index;
+			}
 
-			if ( index ) {
+			var position = geometry.attributes[ 'position' ];
 
-				// indexed lines
+			// render non-indexed triangles
 
-				var type, size;
+			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
 
-				if ( index.array instanceof Uint32Array ) {
+				var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
-					type = _gl.UNSIGNED_INT;
-					size = 4;
+				if ( extension === null ) {
 
-				} else {
-
-					type = _gl.UNSIGNED_SHORT;
-					size = 2;
+					THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+					return;
 
 				}
 
-				var offsets = geometry.offsets;
+				if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-				if ( offsets.length === 0 ) {
-
-					if ( updateBuffers ) {
-
-						setupVertexAttributes( material, program, geometry, 0 );
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-
-					}
-
-					_gl.drawElements( mode, index.array.length, type, 0 ); // 2 bytes per Uint16Array
-
-					_this.info.render.calls ++;
-					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
+					extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 				} else {
 
-					// if there is more than 1 chunk
-					// must set attribute pointers to use new offsets for each chunk
-					// even if geometry and materials didn't change
-
-					if ( offsets.length > 1 ) updateBuffers = true;
-
-					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-						var startIndex = offsets[ i ].index;
-
-						if ( updateBuffers ) {
-
-							setupVertexAttributes( material, program, geometry, startIndex );
-							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-
-						}
-
-						// render indexed lines
-
-						_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
-
-						_this.info.render.calls ++;
-						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-
-					}
+					extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 				}
 
 			} else {
 
-				// non-indexed lines
+				if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+					_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+
+				} else {
+
+					_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+
+				}
+
+			}
+
+			_this.info.render.calls ++;
+			_this.info.render.vertices += position.array.length / position.itemSize;
+			_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
+
+		}
+
+	};
+
+	function renderPointCloud ( material, geometry, object, program, updateBuffers ) {
+
+		var mode = _gl.POINTS;
+
+		var index = geometry.attributes.index;
+
+		if ( index ) {
+
+			// indexed points
+
+			var type, size;
+
+			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
+
+				type = _gl.UNSIGNED_INT;
+				size = 4;
+
+			} else {
+
+				type = _gl.UNSIGNED_SHORT;
+				size = 2;
+
+			}
+
+			var offsets = geometry.offsets;
+
+			if ( offsets.length === 0 ) {
 
 				if ( updateBuffers ) {
 
 					setupVertexAttributes( material, program, geometry, 0 );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 				}
 
-				var position = geometry.attributes.position;
-				var offsets = geometry.offsets;
+				_gl.drawElements( mode, index.array.length, type, 0);
 
-				if ( offsets.length === 0 ) {
+				_this.info.render.calls ++;
+				_this.info.render.points += index.array.length;
 
-					_gl.drawArrays( mode, 0, position.array.length / 3 );
+			} else {
 
-					_this.info.render.calls ++;
-					_this.info.render.vertices += position.array.length / 3;
+				// if there is more than 1 chunk
+				// must set attribute pointers to use new offsets for each chunk
+				// even if geometry and materials didn't change
 
-				} else {
+				if ( offsets.length > 1 ) updateBuffers = true;
 
-					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-						_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
+					var startIndex = offsets[ i ].index;
 
-						_this.info.render.calls ++;
-						_this.info.render.vertices += offsets[ i ].count;
+					if ( updateBuffers ) {
+
+						setupVertexAttributes( material, program, geometry, startIndex );
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
+
+					// render indexed points
+
+					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
+
+					_this.info.render.calls ++;
+					_this.info.render.points += offsets[ i ].count;
+
+				}
+
+			}
+
+		} else {
+
+			// non-indexed points
+
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( material, program, geometry, 0 );
+
+			}
+
+			var position = geometry.attributes.position;
+			var offsets = geometry.offsets;
+
+			if ( offsets.length === 0 ) {
+
+				_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+				_this.info.render.calls ++;
+				_this.info.render.points += position.array.length / 3;
+
+			} else {
+
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
+
+					_this.info.render.calls ++;
+					_this.info.render.points += offsets[ i ].count;
+
+				}
+
+			}
+
+		}
+
+	};
+
+	function renderLine ( material, geometry, object, program, updateBuffers ) {
+		var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+
+		// In case user is not using Line*Material by mistake
+		var lineWidth = material.linewidth !== undefined ? material.linewidth : 1;
+
+		state.setLineWidth( lineWidth * pixelRatio );
+
+		var index = geometry.attributes.index;
+
+		if ( index ) {
+
+			// indexed lines
+
+			var type, size;
+
+			if ( index.array instanceof Uint32Array ) {
+
+				type = _gl.UNSIGNED_INT;
+				size = 4;
+
+			} else {
+
+				type = _gl.UNSIGNED_SHORT;
+				size = 2;
+
+			}
+
+			var offsets = geometry.offsets;
+
+			if ( offsets.length === 0 ) {
+
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( material, program, geometry, 0 );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+				}
+
+				_gl.drawElements( mode, index.array.length, type, 0 ); // 2 bytes per Uint16Array
+
+				_this.info.render.calls ++;
+				_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
+
+			} else {
+
+				// if there is more than 1 chunk
+				// must set attribute pointers to use new offsets for each chunk
+				// even if geometry and materials didn't change
+
+				if ( offsets.length > 1 ) updateBuffers = true;
+
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+					var startIndex = offsets[ i ].index;
+
+					if ( updateBuffers ) {
+
+						setupVertexAttributes( material, program, geometry, startIndex );
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+					}
+
+					// render indexed lines
+
+					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
+
+					_this.info.render.calls ++;
+					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+
+				}
+
+			}
+
+		} else {
+
+			// non-indexed lines
+
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( material, program, geometry, 0 );
+
+			}
+
+			var position = geometry.attributes.position;
+			var offsets = geometry.offsets;
+
+			if ( offsets.length === 0 ) {
+
+				_gl.drawArrays( mode, 0, position.array.length / 3 );
+
+				_this.info.render.calls ++;
+				_this.info.render.vertices += position.array.length / 3;
+
+			} else {
+
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
+
+					_this.info.render.calls ++;
+					_this.info.render.vertices += offsets[ i ].count;
 
 				}
 
