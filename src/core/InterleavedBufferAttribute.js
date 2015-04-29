@@ -111,6 +111,12 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 		return this;
 
+	},
+
+	clone: function ( interleavedBuffer ) {
+
+		return new THREE.InterleavedBufferAttribute( interleavedBuffer, this.itemSize, this.offset );
+
 	}
 
 };

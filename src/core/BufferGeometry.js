@@ -102,13 +102,32 @@ THREE.BufferGeometry.prototype = {
 
 		var attributes = geometry.attributes;
 		var offsets = geometry.offsets;
+		var interleavedBuffers = undefined;
 
 		for ( var name in attributes ) {
 
 			var attribute = attributes[ name ];
 
-			this.addAttribute( name, attribute.clone() );
+			if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
+				if ( interleavedBuffers === undefined ) interleavedBuffers = {};
+
+				var buffer = interleavedBuffers[ attribute.data.uuid ];
+
+				if ( !buffer ) {
+
+					buffer = attribute.data.clone();
+					interleavedBuffers[ attribute.data.uuid ] = buffer;
+
+				}
+
+				this.addAttribute( name, attribute.clone( buffer ) );
+
+			} else {
+
+				this.addAttribute( name, attribute.clone() );
+
+			}
 		}
 
 		for ( var i = 0, il = offsets.length; i < il; i ++ ) {
