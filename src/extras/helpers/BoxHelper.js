@@ -1,13 +1,16 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author deignacio
  */
 
-THREE.BoxHelper = function ( object ) {
+THREE.BoxHelper = function ( object, hex ) {
+
+	var color = ( hex !== undefined ) ? hex : 0xffff00;
 
 	var geometry = new THREE.BufferGeometry();
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 72 ), 3 ) );
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
 
 	if ( object !== undefined ) {
 

@@ -2,13 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GridHelper = function ( size, step ) {
+THREE.GridHelper = function ( size, step, hex1, hex2 ) {
 
 	var geometry = new THREE.Geometry();
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
-	this.color1 = new THREE.Color( 0x444444 );
-	this.color2 = new THREE.Color( 0x888888 );
+	this.color1 = new THREE.Color( ( hex1 !== undefined ) ? hex1 : 0x444444 );
+	this.color2 = new THREE.Color( ( hex2 !== undefined ) ? hex2 : 0x888888 );
 
 	for ( var i = - size; i <= size; i += step ) {
 

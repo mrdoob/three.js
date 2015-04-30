@@ -1,9 +1,10 @@
 /**
  * @author sroucheray / http://sroucheray.org/
  * @author mrdoob / http://mrdoob.com/
+ * @author deignacio
  */
 
-THREE.AxisHelper = function ( size ) {
+THREE.AxisHelper = function ( size, hexes ) {
 
 	size = size || 1;
 
@@ -13,7 +14,7 @@ THREE.AxisHelper = function ( size ) {
 		0, 0, 0,  0, 0, size
 	] );
 
-	var colors = new Float32Array( [
+	var colors = new Float32Array( ( hexes !== undefined ) ? hexes : [
 		1, 0, 0,  1, 0.6, 0,
 		0, 1, 0,  0.6, 1, 0,
 		0, 0, 1,  0, 0.6, 1

@@ -1,26 +1,36 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author deignacio
  *
  *	- shows frustum, line of sight and up of the camera
  *	- suitable for fast updates
+ *	- colors can be overridden in the constructor
  * 	- based on frustum visualization in lightgl.js shadowmap example
  *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
  */
 
-THREE.CameraHelper = function ( camera ) {
+THREE.CameraHelper = function ( camera, hexes ) {
+
+	var colors = {};
+	colors["material"] = ( hexes !== undefined && hexes["material"] === undefined ) hexes["material"] = 0xffffff;
+	colors["frustum"] = ( hexes !== undefined && hexes["frustum"] === undefined ) hexes["frustum"] = 0xffaa00;
+	colors["cone"] = ( hexes !== undefined && hexes["cone"] === undefined ) hexes["cone"] = 0xff0000;
+	colors["up"] = ( hexes !== undefined && hexes["up"] === undefined ) hexes["up"] = 0x00aaff;
+	colors["target"] = ( hexes !== undefined && hexes["target"] === undefined ) hexes["target"] = 0xffffff;
+	colors["cross"] = ( hexes !== undefined && hexes["cross"] === undefined ) hexes["cross"] = 0x333333;
 
 	var geometry = new THREE.Geometry();
-	var material = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } );
+	var material = new THREE.LineBasicMaterial( { color: colors["material"], vertexColors: THREE.FaceColors } );
 
 	var pointMap = {};
 
 	// colors
 
-	var hexFrustum = 0xffaa00;
-	var hexCone = 0xff0000;
-	var hexUp = 0x00aaff;
-	var hexTarget = 0xffffff;
-	var hexCross = 0x333333;
+	var hexFrustum = colors["frustum"];
+	var hexCone = colors["cone"];
+	var hexUp = colors["up"];
+	var hexTarget = colors["target"];
+	var hexCross = colors["cross"];
 
 	// near
 
