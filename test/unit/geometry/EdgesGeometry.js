@@ -92,7 +92,7 @@ function testEdges ( vertList, idxList, numAfter ) {
 	for ( var i = 0 ; i < geoms.length ; i ++ ) {
 	
 		var geom = geoms[i];
-		console.log(geom);
+
 		var numBefore = idxList.length;
 		equal( countEdges (geom), numBefore, "Edges before!" );
 	
@@ -183,7 +183,7 @@ function countEdges ( geom ) {
 	
 	if ( geom instanceof THREE.EdgesGeometry ) {
 		
-		return geom.getAttribute( 'position' ).length / ( 3 * 2 );
+		return geom.getAttribute( 'position' ).length / 2;
 		
 	}
 	
@@ -200,7 +200,7 @@ function countEdges ( geom ) {
 		 
 	}
 		
-	return geom.getAttribute( 'position' ).length / 3;
+	return geom.getAttribute( 'position' ).length;
 	
 }
 
