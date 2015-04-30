@@ -15,8 +15,8 @@ class Geometry(base_classes.BaseNode):
     def __init__(self, node, parent=None):
         logger.debug("Geometry().__init__(%s)", node)
 
-        #@TODO: maybe better to have `three` constants for
-        #       strings that are specific to `three` properties
+#       @TODO: maybe better to have `three` constants for
+#              strings that are specific to `three` properties
         geo_type = constants.GEOMETRY.title()
         if parent.options.get(constants.GEOMETRY_TYPE):
             opt_type = parent.options[constants.GEOMETRY_TYPE]
@@ -69,7 +69,16 @@ class Geometry(base_classes.BaseNode):
 
         length = len(faces)
         offset = 0
-        bitset = lambda x, y: x & (1 << y)
+
+        def bitset(bit, mask):
+            """
+
+            :type bit: int
+            :type mask: int
+
+            """
+            return bit & (1 << mask)
+
         face_count = 0
 
         masks = (constants.MASK[constants.UVS],
@@ -213,8 +222,8 @@ class Geometry(base_classes.BaseNode):
             io.dump(filepath, data, options=self.scene.options)
             return filepath
         else:
-            logger.warning("Could not determine a filepath for "\
-                "animation data. Nothing written to disk.")
+            logger.warning("Could not determine a filepath for "
+                           "animation data. Nothing written to disk.")
 
     def _component_data(self):
         """Query the component data only
@@ -405,8 +414,9 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.FACES):
             logger.info("Parsing %s", constants.FACES)
+            materials = self.get(constants.MATERIALS)
             self[constants.FACES] = api.mesh.faces(
-                self.node, self.options) or []
+                self.node, self.options, materials=materials) or []
 
         no_anim = (None, False, constants.OFF)
         if self.options.get(constants.ANIMATION) not in no_anim:
@@ -414,8 +424,8 @@ class Geometry(base_classes.BaseNode):
             self[constants.ANIMATION] = api.mesh.skeletal_animation(
                 self.node, self.options) or []
 
-        #@TODO: considering making bones data implied when
-        #       querying skinning data
+#       @TODO: considering making bones data implied when
+#              querying skinning data
 
         bone_map = {}
         if self.options.get(constants.BONES):
@@ -438,4 +448,3 @@ class Geometry(base_classes.BaseNode):
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
                 self.node, self.options) or []
-
