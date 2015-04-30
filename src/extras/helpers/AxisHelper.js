@@ -25,9 +25,9 @@ THREE.AxisHelper = function ( size ) {
 
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
-	THREE.Line.call( this, geometry, material, THREE.LinePieces );
+	THREE.SegmentsLine.call( this, geometry, material );
 
 };
 
-THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.AxisHelper.prototype = Object.create( THREE.SegmentsLine.prototype );
 THREE.AxisHelper.prototype.constructor = THREE.AxisHelper;

@@ -1190,7 +1190,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderLine( material, geometry, object, program, updateBuffers ) {
 
-		var mode = ( object.mode === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+		var mode = object instanceof THREE.SegmentsLine ? _gl.LINES : _gl.LINE_STRIP;
 
 		// In case user is not using Line*Material by mistake
 		var lineWidth = material.linewidth !== undefined ? material.linewidth : 1;

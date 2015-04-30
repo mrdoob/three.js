@@ -468,7 +468,7 @@ THREE.Projector = function () {
 					_normalMatrix.getNormalMatrix( _modelMatrix );
 
 					var material = object.material;
-					
+
 					var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
 					var objectMaterials = isFaceMaterial === true ? object.material : null;
 
@@ -616,7 +616,7 @@ THREE.Projector = function () {
 
 						} else {
 
-							var step = object.mode === THREE.LinePieces ? 2 : 1;
+							var step = object instanceof THREE.SegmentsLine ? 2 : 1;
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
@@ -639,8 +639,7 @@ THREE.Projector = function () {
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
-					// Handle LineStrip and LinePieces
-					var step = object.mode === THREE.LinePieces ? 2 : 1;
+					var step = object instanceof THREE.SegmentsLine ? 2 : 1;
 
 					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
 

@@ -7,29 +7,11 @@
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr;
+		[page:Line] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">A continuous line.</div>
-
-
-		<h2>Example</h2>
-
-		<code>var material = new THREE.LineBasicMaterial({
-			color: 0x0000ff
-		});
-
-		var geometry = new THREE.Geometry();
-		geometry.vertices.push(
-			new THREE.Vector3( -10, 0, 0 ),
-			new THREE.Vector3( 0, 10, 0 ),
-			new THREE.Vector3( 10, 0, 0 )
-		);
-
-		var line = new THREE.Line( geometry, material );
-		scene.add( line );
-		</code>
+		<div class="desc">A series of lines.</div>
 
 
 		<h2>Constructor</h2>
@@ -38,7 +20,7 @@
 
 		<div>
 		geometry — Vertices representing the line segment(s).<br />
-		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].<br />
+		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].
 		</div>
 
 		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
