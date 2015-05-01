@@ -1584,9 +1584,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return a.object.renderOrder - b.object.renderOrder;
 
-		} else if ( a.material.id !== b.material.id ) {
+		} else if ( a.object.material.id !== b.object.material.id ) {
 
-			return a.material.id - b.material.id;
+			return a.object.material.id - b.object.material.id;
 
 		} else if ( a.z !== b.z ) {
 
@@ -1863,7 +1863,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				material = webglObject.material;
+				material = object.material;
 
 				if ( ! material ) continue;
 

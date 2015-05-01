@@ -88,7 +88,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 				objects[ object.id ] = {
 					id: object.id,
 					object: object,
-					material: object.material,
 					z: 0
 				};
 
