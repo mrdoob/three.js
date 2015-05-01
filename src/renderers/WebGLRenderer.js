@@ -987,15 +987,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
+	this.renderBufferDirect = function ( camera, lights, fog, material, object ) {
 
 		if ( material.visible === false ) return;
 
+		var geometry = objects.geometries.get( object );
 		var program = setProgram( camera, lights, fog, material, object );
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryProgram = 'direct_' + geometry.id + '_' + program.id + '_' + wireframeBit;
+			geometryProgram = geometry.id + '_' + program.id + '_' + wireframeBit;
 
 		if ( geometryProgram !== _currentGeometryProgram ) {
 
@@ -1853,7 +1854,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var webglObject = renderList[ i ];
 
 			var object = webglObject.object;
-			var buffer = objects.geometries.get( object );
 
 			setupMatrices( object, camera );
 
@@ -1872,7 +1872,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_this.setMaterialFaces( material );
-			_this.renderBufferDirect( camera, lights, fog, material, buffer, object );
+			_this.renderBufferDirect( camera, lights, fog, material, object );
 
 		}
 
