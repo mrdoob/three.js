@@ -220,7 +220,7 @@ function output ( geom, egeom ) {
 	if ( !renderer ) initDebug();
 
 	var mesh = new THREE.Mesh( geom, undefined );
-	var edges = new THREE.SegmentsLine( egeom, new THREE.LineBasicMaterial( { color: 'black' } ) );
+	var edges = new THREE.LineSegments( egeom, new THREE.LineBasicMaterial( { color: 'black' } ) );
 
 	mesh.position.setX( xoffset );
 	edges.position.setX( xoffset ++ );

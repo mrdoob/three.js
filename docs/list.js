@@ -110,7 +110,7 @@ var list = {
 			[ "Bone", "api/objects/Bone" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
-			[ "SegmentsLine", "api/objects/SegmentsLine" ],
+			[ "LineSegments", "api/objects/LineSegments" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],

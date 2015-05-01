@@ -78,7 +78,7 @@
 	"src/objects/Group.js",
 	"src/objects/PointCloud.js",
 	"src/objects/Line.js",
-	"src/objects/SegmentsLine.js",
+	"src/objects/LineSegments.js",
 	"src/objects/Mesh.js",
 	"src/objects/Bone.js",
 	"src/objects/Skeleton.js",
