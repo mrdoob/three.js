@@ -1955,9 +1955,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
 
+		if ( material.precision ) {
+			if ( material.precision === 'highp' && ! highpAvailable ) {
+				if ( mediumpAvailable ) {
+					THREE.warn('THREE.WebGLRenderer: Material requires highp but only mediump is available.');
+				} else {
+					THREE.warn('THREE.WebGLRenderer: Material requires highp but only lowp is available.');
+				}
+			}
+
+			if ( material.precision === 'mediump' && ! mediumpAvailable ) {
+				THREE.warn('THREE.WebGLRenderer: Material requires mediump but only lowp is available.');
+			}
+		}
+
 		var parameters = {
 
-			precision: _precision,
+			precision: material.precision ? material.precision : _precision,
 			supportsVertexTextures: _supportsVertexTextures,
 
 			map: !! material.map,
