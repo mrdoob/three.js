@@ -107,7 +107,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	};
 
-	var update = function ( object ) {
+	function updateObject( object ) {
 
 		var geometry = geometries.get( object );
 
@@ -195,7 +195,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			if ( object.material.visible !== false ) {
 
-				update( object );
+				updateObject( object );
 
 			}
 
