@@ -75,7 +75,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			if ( drawcalls.length === 0 ) {
 
-				drawcalls = [ { count : indices.length, index : 0, start : 0 } ];
+				drawcalls = [ { count : indices.length, indexOffset : 0, start : 0 } ];
 
 			}
 
@@ -86,7 +86,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 				var start = drawcalls[ o ].start;
 				var count = drawcalls[ o ].count;
-				var index = drawcalls[ o ].index;
+				var index = drawcalls[ o ].indexOffset;
 
 				for ( var i = start, il = start + count; i < il; i += 3 ) {
 

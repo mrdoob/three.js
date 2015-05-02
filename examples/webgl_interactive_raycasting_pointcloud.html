@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - interactive - raycasting - pointcloud</title>
@@ -161,7 +161,7 @@
 
 				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
 
-				var offset = { start: 0, count: indices.length, index: 0 };
+				var offset = { start: 0, count: indices.length, indexOffset: 0 };
 				geometry.offsets.push( offset );
 
 				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );

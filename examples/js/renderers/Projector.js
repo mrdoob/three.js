@@ -429,7 +429,7 @@ THREE.Projector = function () {
 							for ( var o = 0; o < offsets.length; o ++ ) {
 
 								var offset = offsets[ o ];
-								var index = offset.index;
+								var index = offset.indexOffset;
 
 								for ( var i = offset.start, l = offset.start + offset.count; i < l; i += 3 ) {
 

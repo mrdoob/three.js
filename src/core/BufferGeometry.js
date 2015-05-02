@@ -56,7 +56,7 @@ THREE.BufferGeometry.prototype = {
 
 			start: start,
 			count: count,
-			index: indexOffset !== undefined ? indexOffset : 0
+			indexOffset: indexOffset !== undefined ? indexOffset : 0
 
 		} );
 
@@ -118,7 +118,7 @@ THREE.BufferGeometry.prototype = {
 			this.offsets.push( {
 
 				start: offset.start,
-				index: offset.index,
+				indexOffset: offset.indexOffset,
 				count: offset.count
 
 			} );
@@ -672,13 +672,13 @@ THREE.BufferGeometry.prototype = {
 
 				var indices = attributes.index.array;
 
-				var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
+				var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, indexOffset: 0 } ] );
 
 				for ( var j = 0, jl = offsets.length; j < jl; ++ j ) {
 
 					var start = offsets[ j ].start;
 					var count = offsets[ j ].count;
-					var index = offsets[ j ].index;
+					var index = offsets[ j ].indexOffset;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -865,7 +865,7 @@ THREE.BufferGeometry.prototype = {
 
 			var start = drawcalls[ j ].start;
 			var count = drawcalls[ j ].count;
-			var index = drawcalls[ j ].index;
+			var index = drawcalls[ j ].indexOffset;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -912,7 +912,7 @@ THREE.BufferGeometry.prototype = {
 
 			var start = drawcalls[ j ].start;
 			var count = drawcalls[ j ].count;
-			var index = drawcalls[ j ].index;
+			var index = drawcalls[ j ].indexOffset;
 
 			for ( i = start, il = start + count; i < il; i += 3 ) {
 
@@ -958,7 +958,7 @@ THREE.BufferGeometry.prototype = {
 		var indexPtr = 0;
 		var vertexPtr = 0;
 
-		var offsets = [ { start:0, count:0, index:0 } ];
+		var offsets = [ { start:0, count:0, indexOffset:0 } ];
 		var offset = offsets[ 0 ];
 
 		var duplicatedVertices = 0;
@@ -982,7 +982,7 @@ THREE.BufferGeometry.prototype = {
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
 					newVerticeMaps ++;
-				} else if ( vertexMap[ vid ] < offset.index ) {
+				} else if ( vertexMap[vid] < offset.indexOffset ) {
 					//Reused vertices from previous block (duplicate)
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
@@ -995,15 +995,15 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			var faceMax = vertexPtr + newVerticeMaps;
-			if ( faceMax > ( offset.index + size ) ) {
-				var new_offset = { start:indexPtr, count:0, index:vertexPtr };
+			if ( faceMax > ( offset.indexOffset + size ) ) {
+				var new_offset = { start: indexPtr, count: 0, indexOffset: vertexPtr };
 				offsets.push( new_offset );
 				offset = new_offset;
 
 				//Re-evaluate reused vertices in light of new offset.
 				for ( var v = 0; v < 6; v += 2 ) {
 					var new_vid = faceVertices[ v + 1 ];
-					if ( new_vid > - 1 && new_vid < offset.index )
+					if ( new_vid > -1 && new_vid < offset.indexOffset )
 						faceVertices[ v + 1 ] = - 1;
 				}
 			}
@@ -1018,7 +1018,7 @@ THREE.BufferGeometry.prototype = {
 
 				vertexMap[ vid ] = new_vid;
 				revVertexMap[ new_vid ] = vid;
-				sortedIndices[ indexPtr ++ ] = new_vid - offset.index; //XXX overflows at 16bit
+				sortedIndices[indexPtr++] = new_vid - offset.indexOffset; //XXX overflows at 16bit
 				offset.count ++;
 			}
 		}
@@ -1230,7 +1230,7 @@ THREE.BufferGeometry.prototype = {
 			geometry.offsets.push( {
 
 				start: offset.start,
-				index: offset.index,
+				indexOffset: offset.indexOffset,
 				count: offset.count
 
 			} );

@@ -117,7 +117,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				if ( offsets.length === 0 ) {
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+					offsets = [ { start: 0, count: indices.length, indexOffset: 0 } ];
 
 				}
 
@@ -125,7 +125,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var index = offsets[ oi ].indexOffset ;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 

@@ -20,7 +20,7 @@ THREE.InstancedBufferGeometry.prototype.addDrawCall = function ( start, count, i
 
 		start: start,
 		count: count,
-		index: indexOffset !== undefined ? indexOffset : 0,
+		indexOffset: indexOffset !== undefined ? indexOffset : 0,
 		instances: instances
 
 	} );
@@ -45,7 +45,7 @@ THREE.InstancedBufferGeometry.prototype.clone = function () {
 		geometry.offsets.push( {
 
 			start: offset.start,
-			index: offset.index,
+			indexOffset: offset.indexOffset,
 			count: offset.count,
 			instances: offset.instances
 

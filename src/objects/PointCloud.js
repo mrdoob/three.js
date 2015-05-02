@@ -84,7 +84,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 					var offset = {
 						start: 0,
 						count: indices.length,
-						index: 0
+						indexOffset: 0
 					};
 
 					offsets = [ offset ];
@@ -95,11 +95,11 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var indexOffset = offsets[ oi ].indexOffset;
 
 					for ( var i = start, il = start + count; i < il; i ++ ) {
 
-						var a = index + indices[ i ];
+						var a = indexOffset + indices[i];
 
 						position.fromArray( positions, a * 3 );
 
