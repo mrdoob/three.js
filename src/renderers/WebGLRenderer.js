@@ -1195,19 +1195,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// must set attribute pointers to use new offsets for each chunk
 				// even if geometry and materials didn't change
 
-				updateBuffers = true;
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( material, program, geometry, 0 );
+
+				}
 
 				for ( var i = 0, il = offsets.length; i < il; i++ ) {
-
-					var startIndex = offsets[i].index;
-
-					if ( updateBuffers ) {
-
-						setupVertexAttributes( material, program, geometry, startIndex );
-
-					}
-
-					var position = geometry.attributes['position'];
 
 					// render non-indexed triangles
 
