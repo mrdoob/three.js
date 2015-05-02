@@ -1212,13 +1212,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else {
 
-						_gl.drawArrays( mode, offsets[ i ].start, offsets[i].count );
+						_gl.drawArrays( mode, offsets[ i ].start, offsets[ i ].count );
 
 					}
 
 					_this.info.render.calls++;
-					_this.info.render.vertices += offsets[ i ].count - offsets[ i ].start;
-					_this.info.render.faces += ( offsets[ i ].count - offsets[ i ].start ) / 3;
+					_this.info.render.vertices += offsets[ i ].count;
+					_this.info.render.faces += ( offsets[ i ].count  ) / 3;
 
 				}
 			}
