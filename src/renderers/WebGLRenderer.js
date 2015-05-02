@@ -1068,7 +1068,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( extension === null ) {
 
-						THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						THREE.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 						return;
 
 					}
@@ -1111,7 +1111,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( extension === null ) {
 
-							THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+							THREE.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 							return;
 
 						}
@@ -1135,56 +1135,93 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			// non-indexed triangles
+			
+			var offsets = geometry.offsets;
 
-			if ( updateBuffers ) {
+			if ( offsets.length === 0 ) {
 
-				setupVertexAttributes( material, program, geometry, 0 );
+				if ( updateBuffers ) {
 
-			}
-
-			var position = geometry.attributes[ 'position' ];
-
-			// render non-indexed triangles
-
-			if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
-
-				var extension = extensions.get( 'ANGLE_instanced_arrays' );
-
-				if ( extension === null ) {
-
-					THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-					return;
+					setupVertexAttributes( material, program, geometry, 0 );
 
 				}
 
-				if ( position instanceof THREE.InterleavedBufferAttribute ) {
+				var position = geometry.attributes['position'];
 
-					extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+				// render non-indexed triangles
+
+				if ( geometry instanceof THREE.InstancedBufferGeometry && geometry.maxInstancedCount > 0 ) {
+
+					var extension = extensions.get( 'ANGLE_instanced_arrays' );
+
+					if ( extension === null ) {
+
+						THREE.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						return;
+
+					}
+
+					if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+						extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+					} else {
+
+						extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+
+					}
 
 				} else {
 
-					extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+					if ( position instanceof THREE.InterleavedBufferAttribute ) {
+
+						_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+
+					} else {
+
+						_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+
+					}
 
 				}
+
+				_this.info.render.calls++;
+				_this.info.render.vertices += position.array.length / position.itemSize;
+				_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
 
 			} else {
 
-				if ( position instanceof THREE.InterleavedBufferAttribute ) {
+				// if there is more than 1 chunk
+				// must set attribute pointers to use new offsets for each chunk
+				// even if geometry and materials didn't change
 
-					_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+				if ( updateBuffers ) {
 
-				} else {
-
-					_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+					setupVertexAttributes( material, program, geometry, 0 );
 
 				}
 
+				for ( var i = 0, il = offsets.length; i < il; i++ ) {
+
+					// render non-indexed triangles
+
+					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
+
+						THREE.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
+						return;
+
+					} else {
+
+						_gl.drawArrays( mode, offsets[ i ].start, offsets[ i ].count );
+
+					}
+
+					_this.info.render.calls++;
+					_this.info.render.vertices += offsets[ i ].count;
+					_this.info.render.faces += ( offsets[ i ].count  ) / 3;
+
+				}
 			}
-
-			_this.info.render.calls ++;
-			_this.info.render.vertices += position.array.length / position.itemSize;
-			_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
-
 		}
 
 	}
