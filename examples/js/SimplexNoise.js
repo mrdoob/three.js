@@ -55,7 +55,7 @@ SimplexNoise.prototype.dot = function(g, x, y) {
 
 SimplexNoise.prototype.dot3 = function(g, x, y, z) {
 	return g[0] * x + g[1] * y + g[2] * z; 
-}
+};
 
 SimplexNoise.prototype.dot4 = function(g, x, y, z, w) {
 	return g[0] * x + g[1] * y + g[2] * z + g[3] * w;

@@ -225,6 +225,6 @@ THREE.DepthPassPlugin = function () {
 			? object.material.materials[ 0 ]
 			: object.material;
 
-	};
+	}
 
 };

@@ -185,6 +185,9 @@
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
 				var material1 = new THREE.ShaderMaterial( parameters );
 
+				// Ensure that ENVMAP_MODE_REFLECTION is defined in shader
+				material1.envMap = reflectionCube;
+
 				var material2 = new THREE.MeshPhongMaterial( {
 					color: diffuse,
 					specular: specular,
@@ -217,8 +220,8 @@
 
 				//
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.PCFShadowMap;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 
 				//

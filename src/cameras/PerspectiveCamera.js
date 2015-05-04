@@ -38,7 +38,7 @@ THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight 
 	this.fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
 	this.updateProjectionMatrix();
 
-}
+};
 
 
 /**
@@ -138,5 +138,18 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 	camera.projectionMatrix.copy( this.projectionMatrix );
 
 	return camera;
+
+};
+
+THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.fov = this.fov;
+	data.object.aspect = this.aspect;
+	data.object.near = this.near;
+	data.object.far = this.far;
+
+	return data;
 
 };

@@ -284,7 +284,7 @@ THREE.Shape.Utils = {
 			if ( Math.abs(from2toAngle) > EPSILON ) {			// angle != 180 deg.
 
 				var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
-				// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
+				// THREE.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
 
 				if ( from2toAngle > 0 ) {				// main angle < 180 deg.
 					return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
@@ -292,7 +292,7 @@ THREE.Shape.Utils = {
 					return	( ( from2otherAngle >= 0 ) || ( other2toAngle >= 0 ) );
 				}
 			} else {										// angle == 180 deg.
-				// console.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
+				// THREE.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
 				return	( from2otherAngle > 0 );
 			}
 		}
@@ -315,7 +315,7 @@ THREE.Shape.Utils = {
 
 				var insideAngle = isPointInsideAngle( shape[inShapeIdx], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[inHoleIdx] );
 				if (! insideAngle ) {
-					// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
+					// THREE.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
 					return	false;
 				}
 
@@ -330,7 +330,7 @@ THREE.Shape.Utils = {
 
 				insideAngle = isPointInsideAngle( hole[inHoleIdx], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[inShapeIdx] );
 				if (! insideAngle ) {
-					// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
+					// THREE.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
 					return	false;
 				}
 
@@ -383,7 +383,7 @@ THREE.Shape.Utils = {
 			while ( indepHoles.length > 0 ) {
 				counter --;
 				if ( counter < 0 ) {
-					console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
+					THREE.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
 					break;
 				}
 
@@ -452,7 +452,7 @@ THREE.Shape.Utils = {
 
 		}
 
-		//console.log( "allpoints",allpoints, allpoints.length );
+		//THREE.log( "allpoints",allpoints, allpoints.length );
 
 		// prepare all points map
 
@@ -474,7 +474,7 @@ THREE.Shape.Utils = {
 		var shapeWithoutHoles = removeHoles( contour, holes );
 
 		var triangles = THREE.FontUtils.Triangulate( shapeWithoutHoles, false ); // True returns indices for points of spooled shape
-		//console.log( "triangles",triangles, triangles.length );
+		//THREE.log( "triangles",triangles, triangles.length );
 
 		// check all face vertices against all points map
 

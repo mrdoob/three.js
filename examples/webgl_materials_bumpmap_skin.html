@@ -185,8 +185,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				renderer.autoClear = false;
 
@@ -236,7 +236,7 @@
 
 				mapHeight.anisotropy = 4;
 				mapHeight.repeat.set( 0.998, 0.998 );
-				mapHeight.offset.set( 0.001, 0.001 )
+				mapHeight.offset.set( 0.001, 0.001 );
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
@@ -244,7 +244,7 @@
 
 				mapSpecular.anisotropy = 4;
 				mapSpecular.repeat.set( 0.998, 0.998 );
-				mapSpecular.offset.set( 0.001, 0.001 )
+				mapSpecular.offset.set( 0.001, 0.001 );
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
@@ -252,7 +252,7 @@
 
 				mapColor.anisotropy = 4;
 				mapColor.repeat.set( 0.998, 0.998 );
-				mapColor.offset.set( 0.001, 0.001 )
+				mapColor.offset.set( 0.001, 0.001 );
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
 				mapColor.format = THREE.RGBFormat;
 

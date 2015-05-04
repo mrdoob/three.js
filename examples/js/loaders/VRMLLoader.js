@@ -58,7 +58,7 @@ THREE.VRMLLoader.prototype = {
 
 		var parseV1 = function ( lines, scene ) {
 
-			console.warn( 'VRML V1.0 not supported yet' );
+			THREE.warn( 'VRML V1.0 not supported yet' );
 
 		};
 
@@ -349,7 +349,7 @@ THREE.VRMLLoader.prototype = {
 						case 'color':
 
 							if (parts.length != 4) {
-								console.warn('Invalid color format detected for ' + fieldName );
+								THREE.warn('Invalid color format detected for ' + fieldName );
 								break;
 							}
 
@@ -357,7 +357,7 @@ THREE.VRMLLoader.prototype = {
 								r: parseFloat(parts[1]),
 								g: parseFloat(parts[2]),
 								b: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -365,7 +365,7 @@ THREE.VRMLLoader.prototype = {
 						case 'scale':
 						case 'size':
 							if (parts.length != 4) {
-								console.warn('Invalid vector format detected for ' + fieldName);
+								THREE.warn('Invalid vector format detected for ' + fieldName);
 								break;
 							}
 
@@ -373,7 +373,7 @@ THREE.VRMLLoader.prototype = {
 								x: parseFloat(parts[1]),
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -385,7 +385,7 @@ THREE.VRMLLoader.prototype = {
 						case 'shininess':
 						case 'ambientIntensity':
 							if (parts.length != 2) {
-								console.warn('Invalid single float value specification detected for ' + fieldName);
+								THREE.warn('Invalid single float value specification detected for ' + fieldName);
 								break;
 							}
 
@@ -395,7 +395,7 @@ THREE.VRMLLoader.prototype = {
 
 						case 'rotation':
 							if (parts.length != 5) {
-								console.warn('Invalid quaternion format detected for ' + fieldName);
+								THREE.warn('Invalid quaternion format detected for ' + fieldName);
 								break;
 							}
 
@@ -404,7 +404,7 @@ THREE.VRMLLoader.prototype = {
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3]),
 								w: parseFloat(parts[4])
-							}
+							};
 
 							break;
 
@@ -413,7 +413,7 @@ THREE.VRMLLoader.prototype = {
 						case 'colorPerVertex':
 						case 'convex':
 							if (parts.length != 2) {
-								console.warn('Invalid format detected for ' + fieldName);
+								THREE.warn('Invalid format detected for ' + fieldName);
 								break;
 							}
 
@@ -498,11 +498,11 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				return tree;
-			}
+			};
 
 			var parseNode = function ( data, parent ) {
 
-				// console.log( data );
+				// THREE.log( data );
 
 				if ( typeof data === 'string' ) {
 
@@ -511,7 +511,7 @@ THREE.VRMLLoader.prototype = {
 						var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
 
 						if (undefined == defines[defineKey]) {
-							console.warn(defineKey + ' is not defined.');
+							THREE.warn(defineKey + ' is not defined.');
 						} else {
 
 							if ( /appearance/.exec( data ) && defineKey ) {
@@ -807,7 +807,7 @@ THREE.VRMLLoader.prototype = {
 
 				}
 
-			}
+			};
 
 			parseNode( getTree( lines ), scene );
 

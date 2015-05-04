@@ -3,6 +3,7 @@
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author elephantatwork / www.elephantatwork.ch
  */
 
 THREE.Object3D = function () {
@@ -309,7 +310,7 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		};
+		}
 
 		if ( object === this ) {
 
@@ -351,7 +352,7 @@ THREE.Object3D.prototype = {
 
 			}
 
-		};
+		}
 
 		var index = this.children.indexOf( object );
 
@@ -567,165 +568,164 @@ THREE.Object3D.prototype = {
 
 	},
 
-	toJSON: function () {
+	toJSON: function( meta ) {
 
-		var output = {
-			metadata: {
-				version: 4.3,
+		var textures = [];
+		var images = [];
+
+		var parseTexture = function ( texture ) {
+
+			console.log(texture);
+
+
+			if ( meta.textures === undefined ) {
+
+				meta.textures = [];
+				meta.images = [];
+			}
+			
+			if ( textures[ texture.uuid ] === undefined ) {
+
+				var json = texture.toJSON();
+				var jsonImage = texture.toJSONImage(json.image);
+
+				delete json.metadata;
+				delete jsonImage.metadata;
+
+				textures[ texture.uuid ] = json;
+				images[ texture.uuid ] = jsonImage;
+
+				meta.textures.push( json );
+				meta.images.push(jsonImage);
+			}
+
+			return texture.uuid;
+
+		};
+
+		var isRootObject = ( meta === undefined );
+
+		// we will store all serialization data on 'data'
+		var data = {};
+		var metadata;
+
+		// meta is a hash used to collect geometries, materials.
+		// not providing it implies that this is the root object
+		// being serialized.
+		if ( isRootObject ) {
+
+			// initialize meta obj
+			meta = {
+				geometries: {},
+				materials: {},
+				textures: [],
+				images: []
+			};
+
+			// add metadata
+			metadata = {
+				version: 4.41,
 				type: 'Object',
-				generator: 'ObjectExporter'
+				generator: 'Object3D.toJSON'
 			}
-		};
-
-		//
-
-		var geometries = {};
-
-		var parseGeometry = function ( geometry ) {
-
-			if ( output.geometries === undefined ) {
-
-				output.geometries = [];
-
-			}
-
-			if ( geometries[ geometry.uuid ] === undefined ) {
-
-				var json = geometry.toJSON();
-
-				delete json.metadata;
-
-				geometries[ geometry.uuid ] = json;
-
-				output.geometries.push( json );
-
-			}
-
-			return geometry.uuid;
-
-		};
-
-		//
-
-		var materials = {};
-
-		var parseMaterial = function ( material ) {
-
-			if ( output.materials === undefined ) {
-
-				output.materials = [];
-
-			}
-
-			if ( materials[ material.uuid ] === undefined ) {
-
-				var json = material.toJSON();
-
-				delete json.metadata;
-
-				materials[ material.uuid ] = json;
-
-				output.materials.push( json );
-
-			}
-
-			return material.uuid;
-
-		};
-
-		//
-
-		var parseObject = function ( object ) {
-
-			var data = {};
-
-			data.uuid = object.uuid;
-			data.type = object.type;
-
-			if ( object.name !== '' ) data.name = object.name;
-			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
-			if ( object.visible !== true ) data.visible = object.visible;
-
-			if ( object instanceof THREE.PerspectiveCamera ) {
-
-				data.fov = object.fov;
-				data.aspect = object.aspect;
-				data.near = object.near;
-				data.far = object.far;
-
-			} else if ( object instanceof THREE.OrthographicCamera ) {
-
-				data.left = object.left;
-				data.right = object.right;
-				data.top = object.top;
-				data.bottom = object.bottom;
-				data.near = object.near;
-				data.far = object.far;
-
-			} else if ( object instanceof THREE.AmbientLight ) {
-
-				data.color = object.color.getHex();
-
-			} else if ( object instanceof THREE.DirectionalLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-
-			} else if ( object instanceof THREE.PointLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.distance = object.distance;
-				data.decay = object.decay;
-
-			} else if ( object instanceof THREE.SpotLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.distance = object.distance;
-				data.angle = object.angle;
-				data.exponent = object.exponent;
-				data.decay = object.decay;
-
-			} else if ( object instanceof THREE.HemisphereLight ) {
-
-				data.color = object.color.getHex();
-				data.groundColor = object.groundColor.getHex();
-
-			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				data.geometry = parseGeometry( object.geometry );
-				data.material = parseMaterial( object.material );
-
-				if ( object instanceof THREE.Line ) data.mode = object.mode;
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				data.material = parseMaterial( object.material );
-
-			}
-
-			data.matrix = object.matrix.toArray();
-
-			if ( object.children.length > 0 ) {
-
-				data.children = [];
-
-				for ( var i = 0; i < object.children.length; i ++ ) {
-
-					data.children.push( parseObject( object.children[ i ] ) );
-
-				}
-
-			}
-
-			return data;
 
 		}
 
-		output.object = parseObject( this );
+		// standard Object3D serialization
+
+		data.uuid = this.uuid;
+		data.type = this.type;
+		if ( this.name !== '' ) data.name = this.name;
+		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
+		if ( this.visible !== true ) data.visible = this.visible;
+
+		data.matrix = this.matrix.toArray();
+
+		if ( this.children.length > 0 ) {
+
+			data.children = [];
+
+			for ( var i = 0; i < this.children.length; i ++ ) {
+
+				data.children.push( this.children[ i ].toJSON( meta ).object );
+
+					if(this.children[ i ].material instanceof THREE.MeshPhongMaterial){
+						var _mat = this.children[ i ].material;
+
+						
+						if(_mat.map !== null){ 
+
+							console.log(_mat.map);
+							parseTexture(_mat.map);
+						
+						}	
+						if(_mat.alphaMap !== null) parseTexture(_mat.alphaMap);
+						if(_mat.lightMap !== null) parseTexture(_mat.lightMap);
+						if(_mat.bumpMap !== null) parseTexture(_mat.bumpMap);
+						if(_mat.normalMap !== null) parseTexture(_mat.normalMap);	
+						if(_mat.specularMap !== null) parseTexture(_mat.specularMap);
+						if(_mat.envMap !== null) parseTexture(_mat.envMap);
+
+
+						// if(object.material.reflectivity !== null) data.reflectivity = object.material.reflectivity;
+						// if(object.material.bumpScale !== null) data.bumpScale = object.material.bumpScale;
+					}
+			}
+
+		}
+
+		// wrap serialized object with additional data
+
+		// if(object.material instanceof THREE.MeshPhongMaterial){
+		// 	if(object.material.map !== null) data.texture = parseTexture(object.material.map);
+		// 	if(object.material.alphaMap !== null) data.texture = parseTexture(object.material.alphaMap);
+		// 	if(object.material.lightMap !== null) data.texture = parseTexture(object.material.lightMap);
+		// 	if(object.material.bumpMap !== null) data.texture = parseTexture(object.material.bumpMap);
+		// 	if(object.material.normalMap !== null) data.texture = parseTexture(object.material.normalMap);	
+		// 	if(object.material.specularMap !== null) data.texture = parseTexture(object.material.specularMap);
+		// 	if(object.material.envMap !== null) data.texture = parseTexture(object.material.envMap);
+		// 	console.log(data.texture);
+
+		// 	if(object.material.reflectivity !== null) data.reflectivity = object.material.reflectivity;
+		// 	if(object.material.bumpScale !== null) data.bumpScale = object.material.bumpScale;
+		// }
+
+		var output = {};
+
+		if ( isRootObject ) {
+
+			output.metadata = metadata;
+
+			var geometries = extractFromCache( meta.geometries );
+			var materials = extractFromCache( meta.materials );
+			// var textures1 = extractFromCache( meta.textures );
+			// var images1 = extractFromCache( meta.images );
+
+			console.log(meta.textures);
+
+			if ( geometries.length > 0 ) output.geometries = geometries;
+			if ( materials.length > 0 ) output.materials = materials;
+			if ( meta.textures.length > 0 ) output.textures = meta.textures;
+			if ( meta.images.length > 0 ) output.images = meta.images;
+
+		}
+
+		output.object = data;
 
 		return output;
+
+		// extract data from the cache hash
+		// remove metadata on each item
+		// and return as array
+		function extractFromCache ( cache ) {
+			var values = [];
+			for ( var key in cache ) {
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+			}
+			return values;
+		}
 
 	},
 
@@ -756,6 +756,7 @@ THREE.Object3D.prototype = {
 		object.receiveShadow = this.receiveShadow;
 
 		object.frustumCulled = this.frustumCulled;
+		object.renderOrder = this.renderOrder;
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 

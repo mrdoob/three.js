@@ -95,6 +95,57 @@ THREE.Texture.prototype = {
 
 	},
 
+	toJSON: function(){
+
+		var output = {
+			metadata: {
+				version: 4.41,
+				type: 'Texture',
+				generator: 'TextureExporter'
+			},
+			uuid: this.uuid
+
+		};
+
+		output.image = THREE.Math.generateUUID();
+
+		return output;
+		
+	},
+
+	//Bad place for something like this
+	toJSONImage: function(imageUUID){
+
+		var output = {
+			metadata: {
+				version: 4.41,
+				type: 'Image',
+				generator: 'ImageExporter'
+			},
+			uuid: imageUUID
+		};
+
+		var image = new Image();
+
+		image = this.image;
+
+		var imgCanvas = document.createElement("canvas"),
+		imgContext = imgCanvas.getContext("2d");
+
+		imgCanvas.width = image.width;
+		imgCanvas.height = image.height;
+
+		imgContext.drawImage(image, 0, 0, image.width, image.height );
+
+		if(image.width > 2048 || image.height > 2048){
+			output.data64 = imgCanvas.toDataURL("image/jpeg", 0.6);
+		}else{
+			output.data64 = imgCanvas.toDataURL("image/png");
+		}
+
+		return output;
+	},
+
 	update: function () {
 
 		this.dispatchEvent( { type: 'update' } );

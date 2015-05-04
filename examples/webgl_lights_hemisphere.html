@@ -184,7 +184,7 @@
 					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
 					offset:		 { type: "f", value: 33 },
 					exponent:	 { type: "f", value: 0.6 }
-				}
+				};
 				uniforms.topColor.value.copy( hemiLight.color );
 
 				scene.fog.color.copy( uniforms.bottomColor.value );
@@ -233,8 +233,8 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				// STATS
 

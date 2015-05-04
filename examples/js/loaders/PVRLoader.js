@@ -61,15 +61,15 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 			format = THREE.RGB_PVRTC_2BPPV1_Format;
 			break;
 		case 1 : // PVRTC 2bpp RGBA
-			bpp = 2
+			bpp = 2;
 			format = THREE.RGBA_PVRTC_2BPPV1_Format;
 			break;
 		case 2 : // PVRTC 4bpp RGB
-			bpp = 4
+			bpp = 4;
 			format = THREE.RGB_PVRTC_4BPPV1_Format;
 			break;
 		case 3 : // PVRTC 4bpp RGBA
-			bpp = 4
+			bpp = 4;
 			format = THREE.RGBA_PVRTC_4BPPV1_Format;
 			break;
 		default :
@@ -108,9 +108,9 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 		numSurfs      =  header[12];
 
 
-	var TYPE_MASK = 0xff
+	var TYPE_MASK = 0xff;
 	var PVRTC_2 = 24,
-		PVRTC_4 = 25
+		PVRTC_4 = 25;
 
 	var formatFlags = flags & TYPE_MASK;
 
@@ -164,21 +164,21 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 
 
-	// console.log( "--------------------------" );
+	// THREE.log( "--------------------------" );
 
-	// console.log( "headerLength ", headerLength);
-	// console.log( "height       ", height      );
-	// console.log( "width        ", width       );
-	// console.log( "numMipmaps   ", numMipmaps  );
-	// console.log( "flags        ", flags       );
-	// console.log( "dataLength   ", dataLength  );
-	// console.log( "bpp          ", bpp         );
-	// console.log( "bitmaskRed   ", bitmaskRed  );
-	// console.log( "bitmaskGreen ", bitmaskGreen);
-	// console.log( "bitmaskBlue  ", bitmaskBlue );
-	// console.log( "bitmaskAlpha ", bitmaskAlpha);
-	// console.log( "pvrTag       ", pvrTag      );
-	// console.log( "numSurfs     ", numSurfs    );
+	// THREE.log( "headerLength ", headerLength);
+	// THREE.log( "height       ", height      );
+	// THREE.log( "width        ", width       );
+	// THREE.log( "numMipmaps   ", numMipmaps  );
+	// THREE.log( "flags        ", flags       );
+	// THREE.log( "dataLength   ", dataLength  );
+	// THREE.log( "bpp          ", bpp         );
+	// THREE.log( "bitmaskRed   ", bitmaskRed  );
+	// THREE.log( "bitmaskGreen ", bitmaskGreen);
+	// THREE.log( "bitmaskBlue  ", bitmaskBlue );
+	// THREE.log( "bitmaskAlpha ", bitmaskAlpha);
+	// THREE.log( "pvrTag       ", pvrTag      );
+	// THREE.log( "numSurfs     ", numSurfs    );
 
 
 
@@ -249,4 +249,4 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 
 	return pvr;
-}
+};

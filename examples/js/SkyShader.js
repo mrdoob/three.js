@@ -251,7 +251,7 @@ THREE.Sky = function () {
 		side: THREE.BackSide
 	} );
 
-	var skyGeo = new THREE.SphereGeometry( 450000, 32, 15 );
+	var skyGeo = new THREE.SphereBufferGeometry( 450000, 32, 15 );
 	var skyMesh = new THREE.Mesh( skyGeo, skyMat );
 
 

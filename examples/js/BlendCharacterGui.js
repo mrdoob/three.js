@@ -78,7 +78,7 @@ function BlendCharacterGui(animations) {
 		playback.open();
 		blending.open();
 
-	}
+	};
 
 	var getAnimationData = function() {
 
@@ -94,7 +94,7 @@ function BlendCharacterGui(animations) {
 			}
 
 		};
-	}
+	};
 
 	controls.start = function() {
 
@@ -144,7 +144,7 @@ function BlendCharacterGui(animations) {
 		fadeData.detail.time = controls[ "Crossfade Time" ];
 
 		window.dispatchEvent( new CustomEvent( 'crossfade', fadeData ) );
-	}
+	};
 
 	controls.warp = function( from, to ) {
 
@@ -154,7 +154,7 @@ function BlendCharacterGui(animations) {
 		warpData.detail.time = controls[ "Crossfade Time" ];
 
 		window.dispatchEvent( new CustomEvent( 'warp', warpData ) );
-	}
+	};
 
 	controls['idle to walk'] = function() {
 
@@ -180,10 +180,10 @@ function BlendCharacterGui(animations) {
 			detail: {
 				shouldLock: controls['Lock Camera']
 			}
-		}
+		};
 
 		window.dispatchEvent( new CustomEvent( 'toggle-lock-camera', data ) );
-	}
+	};
 
 	controls.showSkeletonChanged = function() {
 
@@ -191,10 +191,10 @@ function BlendCharacterGui(animations) {
 			detail: {
 				shouldShow: controls['Show Skeleton']
 			}
-		}
+		};
 
 		window.dispatchEvent( new CustomEvent( 'toggle-show-skeleton', data ) );
-	}
+	};
 
 
 	controls.showModelChanged = function() {
@@ -203,10 +203,10 @@ function BlendCharacterGui(animations) {
 			detail: {
 				shouldShow: controls['Show Model']
 			}
-		}
+		};
 
 		window.dispatchEvent( new CustomEvent( 'toggle-show-model', data ) );
-	}
+	};
 
 
 	init.call(this);

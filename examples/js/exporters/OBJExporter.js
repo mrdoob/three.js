@@ -13,7 +13,7 @@ THREE.OBJExporter.prototype = {
 		var output = '';
 
 		var indexVertex = 0;
-		var indexVertexUvs = 0
+		var indexVertexUvs = 0;
 		var indexNormals = 0;
 
 		var parseObject = function ( child ) {

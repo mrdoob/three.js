@@ -26,6 +26,7 @@ THREE.Material = function () {
 	this.blendDstAlpha = null;
 	this.blendEquationAlpha = null;
 
+	this.depthFunc = THREE.LessEqualDepth;
 	this.depthTest = true;
 	this.depthWrite = true;
 
@@ -107,83 +108,28 @@ THREE.Material.prototype = {
 
 	},
 
-	toJSON: function () {
+	toJSON: function() {
 
-		var output = {
-			metadata: {
-				version: 4.2,
-				type: 'material',
-				generator: 'MaterialExporter'
-			},
-			uuid: this.uuid,
-			type: this.type
+		// we will store all serialization data on 'data'
+		var data = {};
+
+		// add metadata
+		data.metadata = {
+			version: 4.4,
+			type: 'Material',
+			generator: 'Material.toJSON'
 		};
 
-		if ( this.name !== "" ) output.name = this.name;
+		// standard Material serialization
+		data.uuid = this.uuid;
+		data.type = this.type;
+		if ( this.name !== '' ) data.name = this.name;
 
-		if ( this instanceof THREE.MeshBasicMaterial ) {
+		if ( this.opacity < 1 ) data.opacity = this.opacity;
+		if ( this.transparent !== false ) data.transparent = this.transparent;
+		if ( this.wireframe !== false ) data.wireframe = this.wireframe;
 
-			output.color = this.color.getHex();
-			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
-			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
-			if ( this.side !== THREE.FrontSide ) output.side = this.side;
-
-		} else if ( this instanceof THREE.MeshLambertMaterial ) {
-
-			output.color = this.color.getHex();
-			output.emissive = this.emissive.getHex();
-			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
-			if ( this.shading !== THREE.SmoothShading ) output.shading = this.shading;
-			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
-			if ( this.side !== THREE.FrontSide ) output.side = this.side;
-
-		} else if ( this instanceof THREE.MeshPhongMaterial ) {
-
-			output.color = this.color.getHex();
-			output.emissive = this.emissive.getHex();
-			output.specular = this.specular.getHex();
-			output.shininess = this.shininess;
-			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
-			if ( this.shading !== THREE.SmoothShading ) output.shading = this.shading;
-			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
-			if ( this.side !== THREE.FrontSide ) output.side = this.side;
-
-		} else if ( this instanceof THREE.MeshNormalMaterial ) {
-
-			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
-			if ( this.side !== THREE.FrontSide ) output.side = this.side;
-
-		} else if ( this instanceof THREE.MeshDepthMaterial ) {
-
-			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
-			if ( this.side !== THREE.FrontSide ) output.side = this.side;
-
-		} else if ( this instanceof THREE.PointCloudMaterial ) {
-
-			output.size  = this.size;
-			output.sizeAttenuation = this.sizeAttenuation;
-			output.color = this.color.getHex();
-
-			if ( this.vertexColors !== THREE.NoColors ) output.vertexColors = this.vertexColors;
-			if ( this.blending !== THREE.NormalBlending ) output.blending = this.blending;
-
-		} else if ( this instanceof THREE.ShaderMaterial ) {
-
-			output.uniforms = this.uniforms;
-			output.vertexShader = this.vertexShader;
-			output.fragmentShader = this.fragmentShader;
-
-		} else if ( this instanceof THREE.SpriteMaterial ) {
-
-			output.color = this.color.getHex();
-
-		}
-
-		if ( this.opacity < 1 ) output.opacity = this.opacity;
-		if ( this.transparent !== false ) output.transparent = this.transparent;
-		if ( this.wireframe !== false ) output.wireframe = this.wireframe;
-
-		return output;
+		return data;
 
 	},
 
@@ -207,6 +153,7 @@ THREE.Material.prototype = {
 		material.blendDstAlpha = this.blendDstAlpha;
 		material.blendEquationAlpha = this.blendEquationAlpha;
 
+		material.depthFunc = this.depthFunc;
 		material.depthTest = this.depthTest;
 		material.depthWrite = this.depthWrite;
 

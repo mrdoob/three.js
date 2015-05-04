@@ -324,7 +324,6 @@ function guiMeshBasicMaterial ( gui, mesh, material, geometry ) {
 		color : material.color.getHex(),
 		envMaps : envMapKeys,
 		map : textureMapKeys,
-		lightMap : textureMapKeys,
 		specularMap : textureMapKeys,
 		alphaMap : textureMapKeys
 	};
@@ -340,7 +339,6 @@ function guiMeshBasicMaterial ( gui, mesh, material, geometry ) {
 
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
-	folder.add( data, 'lightMap', textureMapKeys ).onChange( updateTexture( material, 'lightMap', textureMaps ) );
 	folder.add( data, 'specularMap', textureMapKeys ).onChange( updateTexture( material, 'specularMap', textureMaps ) );
 	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
 	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
@@ -365,7 +363,6 @@ function guiMeshNormalMaterial ( gui, mesh, material, geometry ) {
 
 	var folder = gui.addFolder('THREE.MeshNormalMaterial');
 
-	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );
 	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );
@@ -396,7 +393,6 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 		emissive : material.emissive.getHex(),
 		envMaps : envMapKeys,
 		map : textureMapKeys,
-		lightMap : textureMapKeys,
 		specularMap : textureMapKeys,
 		alphaMap : textureMapKeys
 	};
@@ -416,7 +412,6 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', textureMapKeys ).onChange( updateTexture( material, 'map', textureMaps ) );
-	folder.add( data, 'lightMap', textureMapKeys ).onChange( updateTexture( material, 'lightMap', textureMaps ) );
 	folder.add( data, 'specularMap', textureMapKeys ).onChange( updateTexture( material, 'specularMap', textureMaps ) );
 	folder.add( data, 'alphaMap', textureMapKeys ).onChange( updateTexture( material, 'alphaMap', textureMaps ) );
 	folder.add( material, 'morphTargets' ).onChange( updateMorphs( mesh, material ) );

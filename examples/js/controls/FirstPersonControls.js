@@ -271,7 +271,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		};
 
-	};
+	}
 
 	this.handleResize();
 

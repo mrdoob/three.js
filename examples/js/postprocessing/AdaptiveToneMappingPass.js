@@ -18,7 +18,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.currentLuminanceRT = null;
 
 	if ( THREE.CopyShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
+		THREE.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
 
 	var copyShader = THREE.CopyShader;
 
@@ -35,11 +35,11 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	} );
 
 	if ( THREE.LuminosityShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.LuminosityShader" );
+		THREE.error( "THREE.AdaptiveToneMappingPass relies on THREE.LuminosityShader" );
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.LuminosityShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
 		blending: THREE.NoBlending,
@@ -47,7 +47,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : Math.log2( this.resolution ).toFixed(1),
+			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed(1),
 		},
 		uniforms: {
 			"lastLum": { type: "t", value: null },
@@ -95,7 +95,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialAdaptiveLum = new THREE.ShaderMaterial( {
 
-		uniforms: this.adaptLuminanceShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
 		vertexShader: this.adaptLuminanceShader.vertexShader,
 		fragmentShader: this.adaptLuminanceShader.fragmentShader,
 		defines: this.adaptLuminanceShader.defines,
@@ -103,11 +103,11 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	} );
 
 	if ( THREE.ToneMapShader === undefined )
-		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.ToneMapShader" );
+		THREE.error( "THREE.AdaptiveToneMappingPass relies on THREE.ToneMapShader" );
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.ToneMapShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( THREE.ToneMapShader.uniforms ),
 		vertexShader: THREE.ToneMapShader.vertexShader,
 		fragmentShader: THREE.ToneMapShader.fragmentShader,
 		blending: THREE.NoBlending
