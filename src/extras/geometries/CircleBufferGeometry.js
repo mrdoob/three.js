@@ -32,7 +32,7 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 	uvs[0] = 0.5;
 	uvs[1] = 0.5;
 
-	for ( var s = 0, i = 3, ii = 2 ; s < vertices; s++, i += 3, ii += 2 ) {
+	for ( var s = 0, i = 3, ii = 2 ; s <= segments; s++, i += 3, ii += 2 ) {
 
 		var segment = thetaStart + s / segments * thetaLength;
 
