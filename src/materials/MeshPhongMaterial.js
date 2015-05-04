@@ -177,6 +177,23 @@ THREE.MeshPhongMaterial.prototype.toJSON = function () {
 	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
 	if ( this.side !== THREE.FrontSide ) data.side = this.side;
 
+	if(this.map !== null && this.map !== THREE.Texture ) data.map = this.map.uuid;
+	if(this.alphaMap !== null && this.alphaMap !== THREE.Texture ) data.alphaMap = this.alphaMap.uuid;
+	if(this.lightMap !== null && this.lightMap !== THREE.Texture ) data.lightMap = this.lightMap.uuid;
+	if(this.bumpMap !== null && this.bumpMap !== THREE.Texture ){ 
+		data.bumpMap = this.bumpMap.uuid;
+		data.bumpScale = this.bumpScale;
+	}
+	if(this.normalMap !== null && this.normalMap !== THREE.Texture ){
+		data.normalMap = this.normalMap.uuid;
+		data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
+	}
+	if(this.specularMap !== null && this.specularMap !== THREE.Texture ) data.specularMap = this.specularMap.uuid;
+	if(this.envMap !== null && this.envMap !== THREE.Texture ){
+		data.envMap = this.envMap.uuid;
+		data.reflectivity = this.reflectivity; // Scale behind envMap
+	} 
+
 	return data;
 
 };

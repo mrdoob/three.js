@@ -3,6 +3,7 @@
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author elephantatwork / www.elephantatwork.ch
  */
 
 THREE.Object3D = function () {
@@ -569,6 +570,39 @@ THREE.Object3D.prototype = {
 
 	toJSON: function( meta ) {
 
+		var textures = [];
+		var images = [];
+
+		var parseTexture = function ( texture ) {
+
+			console.log(texture);
+
+
+			if ( meta.textures === undefined ) {
+
+				meta.textures = [];
+				meta.images = [];
+			}
+			
+			if ( textures[ texture.uuid ] === undefined ) {
+
+				var json = texture.toJSON();
+				var jsonImage = texture.toJSONImage(json.image);
+
+				delete json.metadata;
+				delete jsonImage.metadata;
+
+				textures[ texture.uuid ] = json;
+				images[ texture.uuid ] = jsonImage;
+
+				meta.textures.push( json );
+				meta.images.push(jsonImage);
+			}
+
+			return texture.uuid;
+
+		};
+
 		var isRootObject = ( meta === undefined );
 
 		// we will store all serialization data on 'data'
@@ -583,12 +617,14 @@ THREE.Object3D.prototype = {
 			// initialize meta obj
 			meta = {
 				geometries: {},
-				materials: {}
+				materials: {},
+				textures: [],
+				images: []
 			};
 
 			// add metadata
 			metadata = {
-				version: 4.4,
+				version: 4.41,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			}
@@ -613,11 +649,46 @@ THREE.Object3D.prototype = {
 
 				data.children.push( this.children[ i ].toJSON( meta ).object );
 
+					if(this.children[ i ].material instanceof THREE.MeshPhongMaterial){
+						var _mat = this.children[ i ].material;
+
+						
+						if(_mat.map !== null){ 
+
+							console.log(_mat.map);
+							parseTexture(_mat.map);
+						
+						}	
+						if(_mat.alphaMap !== null) parseTexture(_mat.alphaMap);
+						if(_mat.lightMap !== null) parseTexture(_mat.lightMap);
+						if(_mat.bumpMap !== null) parseTexture(_mat.bumpMap);
+						if(_mat.normalMap !== null) parseTexture(_mat.normalMap);	
+						if(_mat.specularMap !== null) parseTexture(_mat.specularMap);
+						if(_mat.envMap !== null) parseTexture(_mat.envMap);
+
+
+						// if(object.material.reflectivity !== null) data.reflectivity = object.material.reflectivity;
+						// if(object.material.bumpScale !== null) data.bumpScale = object.material.bumpScale;
+					}
 			}
 
 		}
 
 		// wrap serialized object with additional data
+
+		// if(object.material instanceof THREE.MeshPhongMaterial){
+		// 	if(object.material.map !== null) data.texture = parseTexture(object.material.map);
+		// 	if(object.material.alphaMap !== null) data.texture = parseTexture(object.material.alphaMap);
+		// 	if(object.material.lightMap !== null) data.texture = parseTexture(object.material.lightMap);
+		// 	if(object.material.bumpMap !== null) data.texture = parseTexture(object.material.bumpMap);
+		// 	if(object.material.normalMap !== null) data.texture = parseTexture(object.material.normalMap);	
+		// 	if(object.material.specularMap !== null) data.texture = parseTexture(object.material.specularMap);
+		// 	if(object.material.envMap !== null) data.texture = parseTexture(object.material.envMap);
+		// 	console.log(data.texture);
+
+		// 	if(object.material.reflectivity !== null) data.reflectivity = object.material.reflectivity;
+		// 	if(object.material.bumpScale !== null) data.bumpScale = object.material.bumpScale;
+		// }
 
 		var output = {};
 
@@ -627,9 +698,15 @@ THREE.Object3D.prototype = {
 
 			var geometries = extractFromCache( meta.geometries );
 			var materials = extractFromCache( meta.materials );
+			// var textures1 = extractFromCache( meta.textures );
+			// var images1 = extractFromCache( meta.images );
+
+			console.log(meta.textures);
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
+			if ( meta.textures.length > 0 ) output.textures = meta.textures;
+			if ( meta.images.length > 0 ) output.images = meta.images;
 
 		}
 
