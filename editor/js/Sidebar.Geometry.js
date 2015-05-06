@@ -146,13 +146,13 @@ Sidebar.Geometry = function ( editor ) {
 
 			parameters.clear();
 
-			if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
-
-				parameters.add( new Sidebar.Geometry[ geometry.type ]( signals, object ) );
-
-			} else {
+			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
 
 				parameters.add( new Sidebar.Geometry.Modifiers( signals, object ) );
+
+			} else if ( Sidebar.Geometry[ geometry.type ] !== undefined ) {
+
+				parameters.add( new Sidebar.Geometry[ geometry.type ]( signals, object ) );
 
 			}
 
