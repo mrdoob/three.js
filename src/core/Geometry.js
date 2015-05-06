@@ -789,16 +789,14 @@ THREE.Geometry.prototype = {
 
 	},
 
-	toJSON: function() {
+	toJSON: function () {
 
-		// we will store all serialization data on 'data'
-		var data = {};
-
-		// add metadata
-		data.metadata = {
-			version: 4.4,
-			type: 'Geometry',
-			generator: 'Geometry.toJSON'
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'Geometry',
+				generator: 'Geometry.toJSON'
+			}
 		};
 
 		// standard Geometry serialization

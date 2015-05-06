@@ -203,12 +203,12 @@ THREE.ObjectLoader.prototype = {
 						break;
 
 					case 'TextGeometry':
-					
+
 						geometry = new THREE.TextGeometry(
 							data.text,
 							data.data
-						); 
-						
+						);
+
 						break;
 
 				}
@@ -264,50 +264,32 @@ THREE.ObjectLoader.prototype = {
 				if ( data.alphaMap !== undefined ) {
 
 					material.alphaMap = getTexture( data.alphaMap );
-
 					material.transparent = true;
 
-				}	
-
-				if ( data.bumpMap !== undefined ) {
-
-					material.bumpMap = getTexture( data.bumpMap );
-					if ( data.bumpScale !== undefined) material.bumpScale = data.bumpScale;
 				}
 
-				if ( data.normalMap !== undefined ) {
+				if ( data.bumpMap !== undefined ) material.bumpMap = getTexture( data.bumpMap );
+				if ( data.bumpScale !== undefined ) material.bumpScale = data.bumpScale;
 
-					material.normalMap = getTexture( data.normalMap );
-					if ( data.normalScale )	material.normalScale = new THREE.Vector2( data.normalScale, data.normalScale );
-					
-				}
+				if ( data.normalMap !== undefined ) material.normalMap = getTexture( data.normalMap );
+				if ( data.normalScale )	material.normalScale = new THREE.Vector2( data.normalScale, data.normalScale );
 
 				if ( data.specularMap !== undefined ) material.specularMap = getTexture( data.specularMap );
 
 				if ( data.envMap !== undefined ) {
 
 					material.envMap = getTexture( data.envMap );
-					if ( data.reflectivity ) material.reflectivity = data.reflectivity;
-					
-					material.envMap.mapping = THREE.EquirectangularRefractionMapping;
 					material.combine = THREE.MultiplyOperation;
 
 				}
 
-				if ( data.lightMap !== undefined ) {
+				if ( data.reflectivity ) material.reflectivity = data.reflectivity;
 
-					material.lightMap = getTexture( data.lightMap );
-					if ( data.lightMapIntensity !== undefined ) material.lightMapIntensity = data.lightMapIntensity;
+				if ( data.lightMap !== undefined ) material.lightMap = getTexture( data.lightMap );
+				if ( data.lightMapIntensity !== undefined ) material.lightMapIntensity = data.lightMapIntensity;
 
-				}
-
-				if ( data.aoMap !== undefined ) {
-
-					material.aoMap = getTexture( data.aoMap );
-					if ( data.aoMapIntensity !== undefined ) {
-						material.aoMapIntensity = data.aoMapIntensity;
-					}
-				}
+				if ( data.aoMap !== undefined ) material.aoMap = getTexture( data.aoMap );
+				if ( data.aoMapIntensity !== undefined ) material.aoMapIntensity = data.aoMapIntensity;
 
 				materials[ data.uuid ] = material;
 
@@ -346,9 +328,7 @@ THREE.ObjectLoader.prototype = {
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
 				var image = json[ i ];
-				var imageData = image.data64;
-
-				images[ image.uuid ] = loadImage(imageData);
+				images[ image.uuid ] = loadImage( image.src );
 
 			}
 
@@ -386,6 +366,7 @@ THREE.ObjectLoader.prototype = {
 				texture.uuid = data.uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
+				if ( data.mapping !== undefined ) texture.mapping = data.mapping;
 				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
 				if ( data.minFilter !== undefined ) texture.minFilter = THREE[ data.minFilter ];
 				if ( data.magFilter !== undefined ) texture.magFilter = THREE[ data.magFilter ];
@@ -438,9 +419,6 @@ THREE.ObjectLoader.prototype = {
 				return materials[ name ];
 
 			};
-
-			console.log(data);
-			console.log(data.type);
 
 			switch ( data.type ) {
 

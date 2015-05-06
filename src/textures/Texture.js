@@ -95,55 +95,69 @@ THREE.Texture.prototype = {
 
 	},
 
-	toJSON: function(){
+	toJSON: function ( meta ) {
 
-		var output = {
-			metadata: {
-				version: 4.41,
-				type: 'Texture',
-				generator: 'TextureExporter'
-			},
-			uuid: this.uuid
+		if ( meta.textures[ this.uuid ] !== undefined ) {
 
-		};
+			return meta.textures[ this.uuid ];
 
-		output.image = THREE.Math.generateUUID();
-
-		return output;
-		
-	},
-
-	//Bad place for something like this
-	toJSONImage: function(imageUUID){
-
-		var output = {
-			metadata: {
-				version: 4.41,
-				type: 'Image',
-				generator: 'ImageExporter'
-			},
-			uuid: imageUUID
-		};
-
-		var image = new Image();
-
-		image = this.image;
-
-		var imgCanvas = document.createElement("canvas"),
-		imgContext = imgCanvas.getContext("2d");
-
-		imgCanvas.width = image.width;
-		imgCanvas.height = image.height;
-
-		imgContext.drawImage(image, 0, 0, image.width, image.height );
-
-		if(image.width > 2048 || image.height > 2048){
-			output.data64 = imgCanvas.toDataURL("image/jpeg", 0.6);
-		}else{
-			output.data64 = imgCanvas.toDataURL("image/png");
 		}
 
+		var output = {
+			metadata: {
+				version: 4.4,
+				type: 'Texture',
+				generator: 'Texture.toJSON'
+			},
+			uuid: this.uuid,
+			mapping: this.mapping
+		};
+
+		if ( this.image !== undefined ) {
+
+			// TODO: Move to THREE.Image
+
+			var image = this.image;
+
+			if ( image.uuid === undefined ) {
+
+				image.uuid = THREE.Math.generateUUID(); // UGH
+
+			}
+
+			if ( meta.images[ this.image.uuid ] === undefined ) {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = image.width;
+				canvas.height = image.height;
+
+				var context = canvas.getContext( '2d' );
+				context.drawImage( image, 0, 0, image.width, image.height );
+
+				var src;
+
+				if ( image.width > 2048 || image.height > 2048 ) {
+
+					src = canvas.toDataURL( 'image/jpeg', 0.6 );
+
+				} else {
+
+					src = canvas.toDataURL( 'image/png' );
+
+				}
+
+				meta.images[ this.image.uuid ] = { uuid: this.image.uuid, src: src };
+
+			}
+
+			output.image = image.uuid;
+
+		}
+
+		meta.textures[ this.uuid ] = output;
+
 		return output;
+
 	},
 
 	update: function () {

@@ -1141,16 +1141,14 @@ THREE.BufferGeometry.prototype = {
 		}
 	},
 
-	toJSON: function() {
+	toJSON: function () {
 
-		// we will store all serialization data on 'data'
-		var data = {};
-
-		// add metadata
-		data.metadata = {
-			version: 4.4,
-			type: 'BufferGeometry',
-			generator: 'BufferGeometry.toJSON'
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'BufferGeometry',
+				generator: 'BufferGeometry.toJSON'
+			}
 		};
 
 		// standard BufferGeometry serialization

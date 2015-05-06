@@ -163,36 +163,36 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 
 };
 
-THREE.MeshPhongMaterial.prototype.toJSON = function () {
+THREE.MeshPhongMaterial.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Material.prototype.toJSON.call( this );
+	var data = THREE.Material.prototype.toJSON.call( this, meta );
 
 	data.color = this.color.getHex();
 	data.emissive = this.emissive.getHex();
 	data.specular = this.specular.getHex();
 	data.shininess = this.shininess;
 
+	if ( this.map instanceof THREE.Texture ) data.map = this.map.toJSON( meta ).uuid;
+	if ( this.alphaMap instanceof THREE.Texture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
+	if ( this.lightMap instanceof THREE.Texture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
+	if ( this.bumpMap instanceof THREE.Texture ) {
+		data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
+		data.bumpScale = this.bumpScale;
+	}
+	if ( this.normalMap instanceof THREE.Texture ) {
+		data.normalMap = this.normalMap.toJSON( meta ).uuid;
+		data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
+	}
+	if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
+	if ( this.envMap instanceof THREE.Texture ) {
+		data.envMap = this.envMap.toJSON( meta ).uuid;
+		data.reflectivity = this.reflectivity; // Scale behind envMap
+	}
+
 	if ( this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
 	if ( this.shading !== THREE.SmoothShading ) data.shading = this.shading;
 	if ( this.blending !== THREE.NormalBlending ) data.blending = this.blending;
 	if ( this.side !== THREE.FrontSide ) data.side = this.side;
-
-	if(this.map !== null && this.map !== THREE.Texture ) data.map = this.map.uuid;
-	if(this.alphaMap !== null && this.alphaMap !== THREE.Texture ) data.alphaMap = this.alphaMap.uuid;
-	if(this.lightMap !== null && this.lightMap !== THREE.Texture ) data.lightMap = this.lightMap.uuid;
-	if(this.bumpMap !== null && this.bumpMap !== THREE.Texture ){ 
-		data.bumpMap = this.bumpMap.uuid;
-		data.bumpScale = this.bumpScale;
-	}
-	if(this.normalMap !== null && this.normalMap !== THREE.Texture ){
-		data.normalMap = this.normalMap.uuid;
-		data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
-	}
-	if(this.specularMap !== null && this.specularMap !== THREE.Texture ) data.specularMap = this.specularMap.uuid;
-	if(this.envMap !== null && this.envMap !== THREE.Texture ){
-		data.envMap = this.envMap.uuid;
-		data.reflectivity = this.reflectivity; // Scale behind envMap
-	} 
 
 	return data;
 

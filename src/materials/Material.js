@@ -108,16 +108,14 @@ THREE.Material.prototype = {
 
 	},
 
-	toJSON: function() {
+	toJSON: function ( meta ) {
 
-		// we will store all serialization data on 'data'
-		var data = {};
-
-		// add metadata
-		data.metadata = {
-			version: 4.4,
-			type: 'Material',
-			generator: 'Material.toJSON'
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'Material',
+				generator: 'Material.toJSON'
+			}
 		};
 
 		// standard Material serialization
