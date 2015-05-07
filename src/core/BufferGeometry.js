@@ -105,9 +105,13 @@ THREE.BufferGeometry.prototype = {
 
 		for ( var name in attributes ) {
 
-			var attribute = attributes[ name ];
+			if ( attributes.hasOwnProperty( name ) ) {
 
-			this.addAttribute( name, attribute.clone() );
+				var attribute = attributes[ name ];
+
+				this.addAttribute( name, attribute.clone() );
+
+			}
 
 		}
 
@@ -194,31 +198,35 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var name in attributes ) {
 
-				var attribute = attributes[ name ];
+				if ( attributes.hasOwnProperty( name ) ) {
 
-				var type = attribute.type;
-				var array = attribute.value;
+					var attribute = attributes[ name ];
 
-				switch ( type ) {
+					var type = attribute.type;
+					var array = attribute.value;
 
-					case "f":
-						var floats = new Float32Array( array.length );
-						this.addAttribute( name, new THREE.BufferAttribute( floats, 1 ).copyArray( array ) );
-						break;
+					switch ( type ) {
 
-					case "c":
-						var colors = new Float32Array( array.length * 3 );
-						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyColorsArray( array ) );
-						break;
+						case "f":
+							var floats = new Float32Array( array.length );
+							this.addAttribute( name, new THREE.BufferAttribute( floats, 1 ).copyArray( array ) );
+							break;
 
-					case "v3":
-						var colors = new Float32Array( array.length * 3 );
-						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( array ) );
-						break;
+						case "c":
+							var colors = new Float32Array( array.length * 3 );
+							this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyColorsArray( array ) );
+							break;
 
-					default:
-						console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: attribute unsupported', type );
-						break;
+						case "v3":
+							var colors = new Float32Array( array.length * 3 );
+							this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( array ) );
+							break;
+
+						default:
+							console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: attribute unsupported', type );
+							break;
+
+					}
 
 				}
 
@@ -274,27 +282,31 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var name in attributes ) {
 
-				var attribute = attributes[ name ];
+				if ( attributes.hasOwnProperty( name ) ) {
 
-				var type = attribute.type;
-				var array = attribute.value;
+					var attribute = attributes[ name ];
 
-				switch ( type ) {
+					var type = attribute.type;
+					var array = attribute.value;
 
-					case "f":
-						this.attributes[ name ].copyArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
+					switch ( type ) {
 
-					case "c":
-						this.attributes[ name ].copyColorsArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
+						case "f":
+							this.attributes[ name ].copyArray( array );
+							this.attributes[ name ].needsUpdate = true;
+							break;
 
-					case "v3":
-						this.attributes[ name ].copyVector3sArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
+						case "c":
+							this.attributes[ name ].copyColorsArray( array );
+							this.attributes[ name ].needsUpdate = true;
+							break;
+
+						case "v3":
+							this.attributes[ name ].copyVector3sArray( array );
+							this.attributes[ name ].needsUpdate = true;
+							break;
+
+					}
 
 				}
 
