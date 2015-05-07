@@ -458,7 +458,7 @@ THREE.BufferGeometry.prototype = {
 
 				} else {
 
-					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i )
+					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i );
 
 				}
 
@@ -485,7 +485,7 @@ THREE.BufferGeometry.prototype = {
 
 				} else {
 
-					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i )
+					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i );
 
 				}
 
@@ -563,7 +563,7 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-		}
+		};
 
 	}(),
 
@@ -619,7 +619,7 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-		}
+		};
 
 	}(),
 
