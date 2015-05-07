@@ -207,20 +207,20 @@ THREE.SoftwareRenderer = function ( parameters ) {
 				}
 
 			} else if ( element instanceof THREE.RenderableLine ) {
-               
-               var shader = getMaterialShader( material );
-               
-                drawLine(
-                        element.v1.positionScreen,
-                        element.v2.positionScreen,
-                        element.vertexColors[0],
-                        element.vertexColors[1],
-                        shader,
-                        material
-                );
-            }
+				
+				var shader = getMaterialShader( material );
 
-        }
+				drawLine(
+					element.v1.positionScreen,
+					element.v2.positionScreen,
+					element.vertexColors[0],
+					element.vertexColors[1],
+					shader,
+					material
+				);
+			}
+
+		}
 
 		finishClear();
 
