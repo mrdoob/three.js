@@ -3478,6 +3478,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var image = texture.image;
 
+			if ( image === undefined ) {
+
+				THREE.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
+				return;
+
+			}
+
 			if ( image.complete === false ) {
 
 				THREE.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
