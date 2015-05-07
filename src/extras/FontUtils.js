@@ -6,10 +6,6 @@
  *
  * It uses techniques used in:
  *
- * 	typeface.js and canvastext
- * 		For converting fonts and rendering with javascript
- *		http://typeface.neocracy.org
- *
  *	Triangulation ported from AS3
  *		Simple Polygon Triangulation
  *		http://actionsnippet.com/?p=1462
@@ -233,7 +229,7 @@ THREE.FontUtils = {
 
 THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
-	// Parameters 
+	// Parameters
 
 	parameters = parameters || {};
 
