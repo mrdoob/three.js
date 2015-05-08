@@ -80,6 +80,9 @@ var constants = {
 
 function updateGroupGeometry( mesh, geometry ) {
 	
+	mesh.children[0].geometry.dispose();
+	mesh.children[1].geometry.dispose();
+	
 	mesh.children[0].geometry = geometry
 	mesh.children[1].geometry = geometry.clone()
 	
