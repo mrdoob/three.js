@@ -329,7 +329,8 @@ def extract_mesh(obj, options, recalculate=False):
 
     """
     logger.debug('object.extract_mesh(%s, %s)', obj, options)
-    mesh_node = obj.to_mesh(context.scene, True, RENDER)
+    apply_modifiers = options.get(constants.APPLY_MODIFIERS, True)
+    mesh_node = obj.to_mesh(context.scene, apply_modifiers, RENDER)
 
     # transfer the geometry type to the extracted mesh
     mesh_node.THREE_geometry_type = obj.data.THREE_geometry_type

@@ -301,6 +301,10 @@ def restore_export_settings(properties, settings):
         constants.INFLUENCES_PER_VERTEX,
         constants.EXPORT_OPTIONS[constants.INFLUENCES_PER_VERTEX])
 
+    properties.option_apply_modifiers = settings.get(
+        constants.APPLY_MODIFIERS,
+        constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS])
+
     properties.option_geometry_type = settings.get(
         constants.GEOMETRY_TYPE,
         constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
@@ -424,6 +428,7 @@ def set_settings(properties):
         constants.NORMALS: properties.option_normals,
         constants.SKINNING: properties.option_skinning,
         constants.BONES: properties.option_bones,
+        constants.APPLY_MODIFIERS: properties.option_apply_modifiers,
         constants.GEOMETRY_TYPE: properties.option_geometry_type,
 
         constants.MATERIALS: properties.option_materials,
@@ -554,6 +559,12 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Bones",
         description="Export bones",
         default=constants.EXPORT_OPTIONS[constants.BONES])
+
+    option_apply_modifiers = BoolProperty(
+        name="Apply Modifiers",
+        description="Apply Modifiers to mesh objects",
+        default=constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS]
+    )
 
     option_scale = FloatProperty(
         name="Scale",
@@ -750,6 +761,9 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row = layout.row()
         row.prop(self.properties, 'option_bones')
         row.prop(self.properties, 'option_skinning')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_apply_modifiers')
 
         row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
