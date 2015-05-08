@@ -44,6 +44,7 @@ FACES = 'faces'
 NORMALS = 'normals'
 BONES = 'bones'
 UVS = 'uvs'
+APPLY_MODIFIERS = 'applyModifiers'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
 SCALE = 'scale'
@@ -95,6 +96,7 @@ EXPORT_OPTIONS = {
     VERTICES: True,
     NORMALS: True,
     UVS: True,
+    APPLY_MODIFIERS: True,
     COLORS: False,
     MATERIALS: False,
     FACE_MATERIALS: False,
