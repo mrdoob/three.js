@@ -15,29 +15,21 @@ THREE.ObjectLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		if(typeof url !==  "string" ){
+		if ( this.texturePath === '' ) {
 
-			this.parse(url.scene, onLoad);
+			this.texturePath = url.substring( 0, url.lastIndexOf( '/' ) + 1 );
 
-
-		}else{
-
-			if ( this.texturePath === '' ) {
-
-				this.texturePath = url.substring( 0, url.lastIndexOf( '/' ) + 1 );
-
-			}
-
-			var scope = this;
-
-			var loader = new THREE.XHRLoader( scope.manager );
-			loader.setCrossOrigin( this.crossOrigin );
-			loader.load( url, function ( text ) {
-
-				scope.parse( JSON.parse( text ), onLoad );
-
-			}, onProgress, onError );
 		}
+
+		var scope = this;
+
+		var loader = new THREE.XHRLoader( scope.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
+
+			scope.parse( JSON.parse( text ), onLoad );
+
+		}, onProgress, onError );
 
 	},
 
@@ -72,7 +64,7 @@ THREE.ObjectLoader.prototype = {
 			if ( onLoad !== undefined ) onLoad( object );
 
 		}
-		console.log(object);
+
 		return object;
 
 	},
