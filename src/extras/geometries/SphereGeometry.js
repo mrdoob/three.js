@@ -17,12 +17,12 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 		phiStart: phiStart,
 		phiLength: phiLength,
 		thetaStart: thetaStart,
-		thetaLength: thetaLength 
+		thetaLength: thetaLength
 	};
 
 	radius = radius || 50;
 
-	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
+	widthSegments = Math.max( 2, Math.floor( widthSegments ) || 8 );
 	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
 
 	phiStart = phiStart !== undefined ? phiStart : 0;
