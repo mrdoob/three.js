@@ -20,8 +20,8 @@ THREE.ImageLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			onLoad( cached );
-			return;
+			if ( onLoad ) onLoad( cached );
+			return cached;
 
 		}
 
@@ -32,7 +32,7 @@ THREE.ImageLoader.prototype = {
 			THREE.Cache.add( url, this );
 
 			if ( onLoad ) onLoad( this );
-			
+
 			scope.manager.itemEnd( url );
 
 		}, false );
