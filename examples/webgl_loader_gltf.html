@@ -112,7 +112,7 @@
 		<div class="controlValue"><input type="checkbox" checked onclick="toggleAnimations();">Play</input></div>
 		</div>
 	</div>
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/loaders/gltf/glTF-parser.js"></script>
 		<script src="js/loaders/gltf/glTFLoader.js"></script>
@@ -135,7 +135,7 @@
 				document.addEventListener( 'keypress', function(e) { onKeyPress(e); }, false );
 
 				buildSceneList();
-				switchScene(0);
+				switchScene(1);
 				animate();
 
 			}
@@ -374,7 +374,7 @@
 					objectRotation: new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 2),
 					animationTime: 3,
 					addLights:true,
-					shadows:true,
+					shadows:false,
 					addGround:true
 				},
 				{

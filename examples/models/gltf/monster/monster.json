@@ -1,794 +1,43 @@
 {
     "accessors": {
-        "accessor_10": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 3112,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_100": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 110576,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_101": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 111788,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_102": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 12808,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_103": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 113404,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_104": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 114616,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_105": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 115828,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_106": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 13212,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_107": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 117444,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_108": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 118656,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_109": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 119868,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_11": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 20484,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_110": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 13616,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_111": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 121484,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_112": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 122696,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_113": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 123908,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_114": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 14020,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_115": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 125524,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_116": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 126736,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_117": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 127948,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_118": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 14424,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_119": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 129564,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_12": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 21696,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_120": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 130776,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_121": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 131988,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_122": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 14828,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_123": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 133604,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_124": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 134816,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_125": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 136028,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_126": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 15232,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_127": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 137644,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_128": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 138856,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_129": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 140068,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_13": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 22908,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_130": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 15636,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_131": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 141684,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_132": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 142896,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_133": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 144108,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_14": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 3516,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_15": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 24524,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_16": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 25736,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_17": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 26948,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_18": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 3920,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_19": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 28564,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_20": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 29776,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_21": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 30988,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_22": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 4324,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_23": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 32604,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_24": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 33816,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_25": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 35028,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_26": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 4728,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_27": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 36644,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_28": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 37856,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_29": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 39068,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_30": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 5132,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_31": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 40684,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_32": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 41896,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_33": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 43108,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_34": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 5536,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_35": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 44724,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_36": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 45936,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_37": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 47148,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_38": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 5940,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_39": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 48764,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_40": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 49976,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_41": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 51188,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_42": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 6344,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_43": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 52804,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_44": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 54016,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_45": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 55228,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_46": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 6748,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_47": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 56844,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_48": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 58056,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_49": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 59268,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_50": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 7152,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_51": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 60884,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_52": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 62096,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_53": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 63308,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_54": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 7556,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_55": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 64924,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_56": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 66136,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_57": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 67348,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_58": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 7960,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_59": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 68964,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_6": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 2708,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_60": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 70176,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_61": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 71388,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_62": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 8364,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_63": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 73004,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_64": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 74216,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_65": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 75428,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_66": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 8768,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_67": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 77044,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_68": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 78256,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_69": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 79468,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_7": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 16444,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_70": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 9576,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_71": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 81084,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_72": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 82296,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_73": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 83508,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_74": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 9980,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_75": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 85124,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_76": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 86336,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_77": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 87548,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_78": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 10384,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_79": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 89164,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_8": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 17656,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_80": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 90376,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_81": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 91588,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_82": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 10788,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_83": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 93204,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_84": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 94416,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_85": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 95628,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_86": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 11192,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_87": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 97244,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_88": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 98456,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_89": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 99668,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_9": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 18868,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_90": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 11596,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_91": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 101284,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_92": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 102496,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_93": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 103708,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_94": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 12000,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_95": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 105324,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_96": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 106536,
-            "count": 101,
-            "type": 35665
-        },
-        "accessor_97": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 107748,
-            "count": 101,
-            "type": 35666
-        },
-        "accessor_98": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 12404,
-            "count": 101,
-            "type": 5126
-        },
-        "accessor_99": {
-            "bufferView": "bufferView_185",
-            "byteOffset": 109364,
-            "count": 101,
-            "type": 35665
-        },
-        "attribute_163": {
+        "IBM_monster-mesh-skin-skin": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 36,
+            "type": "MAT4"
+        },
+        "accessor_161": {
             "bufferView": "bufferView_183",
             "byteOffset": 0,
+            "byteStride": 0,
+            "componentType": 5123,
+            "count": 2652,
+            "type": "SCALAR"
+        },
+        "accessor_163": {
+            "bufferView": "bufferView_184",
+            "byteOffset": 0,
             "byteStride": 12,
+            "componentType": 5126,
             "count": 818,
             "max": [
-                1154.32,
-                892.627,
-                584.533
+                29.3197,
+                22.6727,
+                14.8471
             ],
             "min": [
-                -1746.98,
-                -913.328,
-                -504.127
+                -44.3733,
+                -23.1985,
+                -12.8048
             ],
-            "type": 35665
+            "type": "VEC3"
         },
-        "attribute_165": {
-            "bufferView": "bufferView_183",
+        "accessor_165": {
+            "bufferView": "bufferView_184",
             "byteOffset": 9816,
             "byteStride": 12,
+            "componentType": 5126,
             "count": 818,
             "max": [
                 0.997713,
@@ -800,12 +49,13 @@
                 -1,
                 -0.998876
             ],
-            "type": 35665
+            "type": "VEC3"
         },
-        "attribute_167": {
-            "bufferView": "bufferView_183",
+        "accessor_167": {
+            "bufferView": "bufferView_184",
             "byteOffset": 19632,
             "byteStride": 8,
+            "componentType": 5126,
             "count": 818,
             "max": [
                 1.00961,
@@ -815,12 +65,13 @@
                 0.005086,
                 -0.07435
             ],
-            "type": 35664
+            "type": "VEC2"
         },
-        "attribute_176": {
-            "bufferView": "bufferView_183",
+        "accessor_176": {
+            "bufferView": "bufferView_184",
             "byteOffset": 26176,
             "byteStride": 16,
+            "componentType": 5126,
             "count": 818,
             "max": [
                 1,
@@ -834,12 +85,13 @@
                 0,
                 0
             ],
-            "type": 35666
+            "type": "VEC4"
         },
-        "attribute_179": {
-            "bufferView": "bufferView_183",
+        "accessor_179": {
+            "bufferView": "bufferView_184",
             "byteOffset": 39264,
             "byteStride": 16,
+            "componentType": 5126,
             "count": 818,
             "max": [
                 34,
@@ -853,13 +105,658 @@
                 0,
                 0
             ],
-            "type": 35666
+            "type": "VEC4"
         },
-        "indices_161": {
-            "bufferView": "bufferView_184",
-            "byteOffset": 0,
-            "count": 2652,
-            "type": 5123
+        "animAccessor_0": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 2304,
+            "componentType": 5126,
+            "count": 101,
+            "type": "SCALAR"
+        },
+        "animAccessor_1": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 2708,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_10": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 14424,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_11": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 16040,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_12": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 17252,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_13": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 18464,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_14": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 20080,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_15": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 21292,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_16": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 22504,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_17": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 24120,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_18": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 25332,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_19": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 26544,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_2": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 3920,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_20": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 28160,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_21": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 29372,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_22": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 30584,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_23": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 32200,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_24": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 33412,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_25": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 34624,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_26": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 36240,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_27": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 37452,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_28": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 38664,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_29": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 40280,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_3": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 5132,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_30": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 41492,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_31": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 42704,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_32": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 44320,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_33": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 45532,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_34": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 46744,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_35": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 47956,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_36": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 49572,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_37": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 50784,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_38": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 51996,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_39": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 53612,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_4": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 6748,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_40": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 54824,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_41": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 56036,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_42": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 57652,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_43": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 58864,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_44": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 60076,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_45": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 61692,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_46": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 62904,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_47": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 64116,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_48": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 65732,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_49": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 66944,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_5": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 7960,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_50": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 68156,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_51": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 69772,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_52": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 70984,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_53": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 72196,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_54": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 73812,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_55": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 75024,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_56": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 76236,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_57": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 77852,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_58": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 79064,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_59": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 80276,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_6": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 9172,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_60": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 81892,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_61": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 83104,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_62": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 84316,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_63": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 85932,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_64": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 87144,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_65": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 88356,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_66": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 89972,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_67": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 91184,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_68": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 92396,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_69": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 94012,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_7": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 10788,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_70": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 95224,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_71": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 96436,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_72": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 98052,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_73": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 99264,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_74": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 100476,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_75": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 102092,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_76": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 103304,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_77": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 104516,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_78": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 106132,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_79": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 107344,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_8": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 12000,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_80": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 108556,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_81": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 110172,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_82": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 111384,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_83": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 112596,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_84": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 114212,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_85": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 115424,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_86": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 116636,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_87": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 118252,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_88": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 119464,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_89": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 120676,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
+        },
+        "animAccessor_9": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 13212,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_90": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 122292,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_91": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 123504,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC3"
+        },
+        "animAccessor_92": {
+            "bufferView": "bufferView_182",
+            "byteOffset": 124716,
+            "componentType": 5126,
+            "count": 101,
+            "type": "VEC4"
         }
     },
     "animations": {
@@ -889,10 +786,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_6",
-                "rotation": "accessor_9",
-                "scale": "accessor_7",
-                "translation": "accessor_8"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_3",
+                "scale": "animAccessor_1",
+                "translation": "animAccessor_2"
             },
             "samplers": {
                 "animation_1_rotation_sampler": {
@@ -938,10 +835,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_42",
-                "rotation": "accessor_45",
-                "scale": "accessor_43",
-                "translation": "accessor_44"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_6",
+                "scale": "animAccessor_4",
+                "translation": "animAccessor_5"
             },
             "samplers": {
                 "animation_10_rotation_sampler": {
@@ -987,10 +884,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_46",
-                "rotation": "accessor_49",
-                "scale": "accessor_47",
-                "translation": "accessor_48"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_6",
+                "scale": "animAccessor_4",
+                "translation": "animAccessor_7"
             },
             "samplers": {
                 "animation_11_rotation_sampler": {
@@ -1036,10 +933,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_50",
-                "rotation": "accessor_53",
-                "scale": "accessor_51",
-                "translation": "accessor_52"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_10",
+                "scale": "animAccessor_8",
+                "translation": "animAccessor_9"
             },
             "samplers": {
                 "animation_12_rotation_sampler": {
@@ -1085,10 +982,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_54",
-                "rotation": "accessor_57",
-                "scale": "accessor_55",
-                "translation": "accessor_56"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_13",
+                "scale": "animAccessor_11",
+                "translation": "animAccessor_12"
             },
             "samplers": {
                 "animation_13_rotation_sampler": {
@@ -1134,10 +1031,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_58",
-                "rotation": "accessor_61",
-                "scale": "accessor_59",
-                "translation": "accessor_60"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_16",
+                "scale": "animAccessor_14",
+                "translation": "animAccessor_15"
             },
             "samplers": {
                 "animation_14_rotation_sampler": {
@@ -1183,10 +1080,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_62",
-                "rotation": "accessor_65",
-                "scale": "accessor_63",
-                "translation": "accessor_64"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_19",
+                "scale": "animAccessor_17",
+                "translation": "animAccessor_18"
             },
             "samplers": {
                 "animation_15_rotation_sampler": {
@@ -1232,10 +1129,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_66",
-                "rotation": "accessor_69",
-                "scale": "accessor_67",
-                "translation": "accessor_68"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_22",
+                "scale": "animAccessor_20",
+                "translation": "animAccessor_21"
             },
             "samplers": {
                 "animation_16_rotation_sampler": {
@@ -1281,10 +1178,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_70",
-                "rotation": "accessor_73",
-                "scale": "accessor_71",
-                "translation": "accessor_72"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_25",
+                "scale": "animAccessor_23",
+                "translation": "animAccessor_24"
             },
             "samplers": {
                 "animation_18_rotation_sampler": {
@@ -1330,10 +1227,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_74",
-                "rotation": "accessor_77",
-                "scale": "accessor_75",
-                "translation": "accessor_76"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_28",
+                "scale": "animAccessor_26",
+                "translation": "animAccessor_27"
             },
             "samplers": {
                 "animation_19_rotation_sampler": {
@@ -1379,10 +1276,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_10",
-                "rotation": "accessor_13",
-                "scale": "accessor_11",
-                "translation": "accessor_12"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_31",
+                "scale": "animAccessor_29",
+                "translation": "animAccessor_30"
             },
             "samplers": {
                 "animation_2_rotation_sampler": {
@@ -1428,10 +1325,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_78",
-                "rotation": "accessor_81",
-                "scale": "accessor_79",
-                "translation": "accessor_80"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_6",
+                "scale": "animAccessor_4",
+                "translation": "animAccessor_32"
             },
             "samplers": {
                 "animation_20_rotation_sampler": {
@@ -1477,10 +1374,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_82",
-                "rotation": "accessor_85",
-                "scale": "accessor_83",
-                "translation": "accessor_84"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_35",
+                "scale": "animAccessor_33",
+                "translation": "animAccessor_34"
             },
             "samplers": {
                 "animation_21_rotation_sampler": {
@@ -1526,10 +1423,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_86",
-                "rotation": "accessor_89",
-                "scale": "accessor_87",
-                "translation": "accessor_88"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_38",
+                "scale": "animAccessor_36",
+                "translation": "animAccessor_37"
             },
             "samplers": {
                 "animation_22_rotation_sampler": {
@@ -1575,10 +1472,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_90",
-                "rotation": "accessor_93",
-                "scale": "accessor_91",
-                "translation": "accessor_92"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_41",
+                "scale": "animAccessor_39",
+                "translation": "animAccessor_40"
             },
             "samplers": {
                 "animation_23_rotation_sampler": {
@@ -1624,10 +1521,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_94",
-                "rotation": "accessor_97",
-                "scale": "accessor_95",
-                "translation": "accessor_96"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_44",
+                "scale": "animAccessor_42",
+                "translation": "animAccessor_43"
             },
             "samplers": {
                 "animation_24_rotation_sampler": {
@@ -1673,10 +1570,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_98",
-                "rotation": "accessor_101",
-                "scale": "accessor_99",
-                "translation": "accessor_100"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_47",
+                "scale": "animAccessor_45",
+                "translation": "animAccessor_46"
             },
             "samplers": {
                 "animation_25_rotation_sampler": {
@@ -1722,10 +1619,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_102",
-                "rotation": "accessor_105",
-                "scale": "accessor_103",
-                "translation": "accessor_104"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_50",
+                "scale": "animAccessor_48",
+                "translation": "animAccessor_49"
             },
             "samplers": {
                 "animation_26_rotation_sampler": {
@@ -1771,10 +1668,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_106",
-                "rotation": "accessor_109",
-                "scale": "accessor_107",
-                "translation": "accessor_108"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_53",
+                "scale": "animAccessor_51",
+                "translation": "animAccessor_52"
             },
             "samplers": {
                 "animation_27_rotation_sampler": {
@@ -1820,10 +1717,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_110",
-                "rotation": "accessor_113",
-                "scale": "accessor_111",
-                "translation": "accessor_112"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_56",
+                "scale": "animAccessor_54",
+                "translation": "animAccessor_55"
             },
             "samplers": {
                 "animation_28_rotation_sampler": {
@@ -1869,10 +1766,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_114",
-                "rotation": "accessor_117",
-                "scale": "accessor_115",
-                "translation": "accessor_116"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_59",
+                "scale": "animAccessor_57",
+                "translation": "animAccessor_58"
             },
             "samplers": {
                 "animation_29_rotation_sampler": {
@@ -1918,10 +1815,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_14",
-                "rotation": "accessor_17",
-                "scale": "accessor_15",
-                "translation": "accessor_16"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_62",
+                "scale": "animAccessor_60",
+                "translation": "animAccessor_61"
             },
             "samplers": {
                 "animation_3_rotation_sampler": {
@@ -1967,10 +1864,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_118",
-                "rotation": "accessor_121",
-                "scale": "accessor_119",
-                "translation": "accessor_120"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_65",
+                "scale": "animAccessor_63",
+                "translation": "animAccessor_64"
             },
             "samplers": {
                 "animation_30_rotation_sampler": {
@@ -2016,10 +1913,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_122",
-                "rotation": "accessor_125",
-                "scale": "accessor_123",
-                "translation": "accessor_124"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_68",
+                "scale": "animAccessor_66",
+                "translation": "animAccessor_67"
             },
             "samplers": {
                 "animation_31_rotation_sampler": {
@@ -2065,10 +1962,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_126",
-                "rotation": "accessor_129",
-                "scale": "accessor_127",
-                "translation": "accessor_128"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_71",
+                "scale": "animAccessor_69",
+                "translation": "animAccessor_70"
             },
             "samplers": {
                 "animation_32_rotation_sampler": {
@@ -2114,10 +2011,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_130",
-                "rotation": "accessor_133",
-                "scale": "accessor_131",
-                "translation": "accessor_132"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_74",
+                "scale": "animAccessor_72",
+                "translation": "animAccessor_73"
             },
             "samplers": {
                 "animation_33_rotation_sampler": {
@@ -2163,10 +2060,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_18",
-                "rotation": "accessor_21",
-                "scale": "accessor_19",
-                "translation": "accessor_20"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_77",
+                "scale": "animAccessor_75",
+                "translation": "animAccessor_76"
             },
             "samplers": {
                 "animation_4_rotation_sampler": {
@@ -2212,10 +2109,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_22",
-                "rotation": "accessor_25",
-                "scale": "accessor_23",
-                "translation": "accessor_24"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_80",
+                "scale": "animAccessor_78",
+                "translation": "animAccessor_79"
             },
             "samplers": {
                 "animation_5_rotation_sampler": {
@@ -2261,10 +2158,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_26",
-                "rotation": "accessor_29",
-                "scale": "accessor_27",
-                "translation": "accessor_28"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_83",
+                "scale": "animAccessor_81",
+                "translation": "animAccessor_82"
             },
             "samplers": {
                 "animation_6_rotation_sampler": {
@@ -2310,10 +2207,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_30",
-                "rotation": "accessor_33",
-                "scale": "accessor_31",
-                "translation": "accessor_32"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_86",
+                "scale": "animAccessor_84",
+                "translation": "animAccessor_85"
             },
             "samplers": {
                 "animation_7_rotation_sampler": {
@@ -2359,10 +2256,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_34",
-                "rotation": "accessor_37",
-                "scale": "accessor_35",
-                "translation": "accessor_36"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_89",
+                "scale": "animAccessor_87",
+                "translation": "animAccessor_88"
             },
             "samplers": {
                 "animation_8_rotation_sampler": {
@@ -2408,10 +2305,10 @@
             ],
             "count": 101,
             "parameters": {
-                "TIME": "accessor_38",
-                "rotation": "accessor_41",
-                "scale": "accessor_39",
-                "translation": "accessor_40"
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_92",
+                "scale": "animAccessor_90",
+                "translation": "animAccessor_91"
             },
             "samplers": {
                 "animation_9_rotation_sampler": {
@@ -2433,43 +2330,46 @@
         }
     },
     "asset": {
-        "generator": "collada2gltf@fb6d6e65e66c3b0013c75a8d1e63650f4309bf77"
+        "generator": "collada2gltf@47c51b9482f82fc191951d38a2b019507418e1ed",
+        "premultipliedAlpha": true,
+        "profile": "WebGL 1.0.2",
+        "version": 0.8
     },
     "bufferViews": {
+        "bufferView_182": {
+            "buffer": "monster",
+            "byteLength": 126332,
+            "byteOffset": 0
+        },
         "bufferView_183": {
             "buffer": "monster",
-            "byteLength": 52352,
-            "byteOffset": 0,
-            "target": 34962
+            "byteLength": 5304,
+            "byteOffset": 126332,
+            "target": 34963
         },
         "bufferView_184": {
             "buffer": "monster",
-            "byteLength": 5304,
-            "byteOffset": 52352,
-            "target": 34963
-        },
-        "bufferView_185": {
-            "buffer": "monster",
-            "byteLength": 145724,
-            "byteOffset": 57656
+            "byteLength": 52352,
+            "byteOffset": 131636,
+            "target": 34962
         }
     },
     "buffers": {
         "monster": {
-            "byteLength": 203380,
-            "path": "monster.bin",
-            "type": "arraybuffer"
+            "byteLength": 183988,
+            "type": "arraybuffer",
+            "uri": "monster.bin"
         }
     },
     "images": {
-        "image_0": {
-            "path": "monster.jpg"
+        "monster.jpg": {
+            "uri": "monster.jpg"
         }
     },
     "materials": {
         "monster-fx": {
             "instanceTechnique": {
-                "technique": "technique1",
+                "technique": "technique0",
                 "values": {
                     "ambient": [
                         0.588235,
@@ -2477,7 +2377,7 @@
                         0.588235,
                         1
                     ],
-                    "diffuse": "texture_image_0",
+                    "diffuse": "texture_monster.jpg",
                     "shininess": 20,
                     "specular": [
                         0.1,
@@ -2496,13 +2396,13 @@
             "primitives": [
                 {
                     "attributes": {
-                        "JOINT": "attribute_179",
-                        "NORMAL": "attribute_165",
-                        "POSITION": "attribute_163",
-                        "TEXCOORD_0": "attribute_167",
-                        "WEIGHT": "attribute_176"
+                        "jointName": "accessor_179",
+                        "NORMAL": "accessor_165",
+                        "POSITION": "accessor_163",
+                        "TEXCOORD_0": "accessor_167",
+                        "WEIGHT": "accessor_176"
                     },
-                    "indices": "indices_161",
+                    "indices": "accessor_161",
                     "material": "monster-fx",
                     "primitive": 4
                 }
@@ -2514,7 +2414,7 @@
             "children": [
                 "Bip01_HeadNub-node"
             ],
-            "jointId": "Bone5",
+            "jointName": "Bone5",
             "name": "Bip01_Head",
             "rotation": [
                 0.888952,
@@ -2528,14 +2428,14 @@
                 1
             ],
             "translation": [
-                181.732,
-                -8e-05,
-                -2e-06
+                4.61599,
+                -2.032e-06,
+                -5.08e-08
             ]
         },
         "Bip01_HeadNub-node": {
             "children": [],
-            "jointId": "Bone6",
+            "jointName": "Bone6",
             "name": "Bip01_HeadNub",
             "rotation": [
                 1,
@@ -2549,16 +2449,16 @@
                 1
             ],
             "translation": [
-                345.132,
-                1.7e-05,
-                -7e-06
+                8.76635,
+                4.318e-07,
+                -1.778e-07
             ]
         },
         "Bip01_L_Calf-node": {
             "children": [
                 "Bip01_L_Foot-node"
             ],
-            "jointId": "Bone24",
+            "jointName": "Bone24",
             "name": "Bip01_L_Calf",
             "rotation": [
                 0,
@@ -2572,16 +2472,16 @@
                 1
             ],
             "translation": [
-                547.819,
-                -5e-06,
-                -1.2e-05
+                13.9146,
+                -1.27e-07,
+                -3.048e-07
             ]
         },
         "Bip01_L_Clavicle-node": {
             "children": [
                 "Bip01_L_UpperArm-node"
             ],
-            "jointId": "Bone7",
+            "jointName": "Bone7",
             "name": "Bip01_L_Clavicle",
             "rotation": [
                 0.821819,
@@ -2595,16 +2495,16 @@
                 1
             ],
             "translation": [
-                7.49618,
-                0.138573,
-                42.5129
+                0.190403,
+                0.00351975,
+                1.07983
             ]
         },
         "Bip01_L_Finger0-node": {
             "children": [
                 "Bip01_L_Finger0Nub-node"
             ],
-            "jointId": "Bone11",
+            "jointName": "Bone11",
             "name": "Bip01_L_Finger0",
             "rotation": [
                 0.205207,
@@ -2618,14 +2518,14 @@
                 1
             ],
             "translation": [
-                186.693,
-                -2.3e-05,
-                -9e-06
+                4.742,
+                -5.842e-07,
+                -2.286e-07
             ]
         },
         "Bip01_L_Finger0Nub-node": {
             "children": [],
-            "jointId": "Bone12",
+            "jointName": "Bone12",
             "name": "Bip01_L_Finger0Nub",
             "rotation": [
                 1,
@@ -2639,16 +2539,16 @@
                 1
             ],
             "translation": [
-                167.761,
-                1.9e-05,
-                1.3e-05
+                4.26113,
+                4.826e-07,
+                3.302e-07
             ]
         },
         "Bip01_L_Foot-node": {
             "children": [
                 "Bip01_L_Toe0-node"
             ],
-            "jointId": "Bone25",
+            "jointName": "Bone25",
             "name": "Bip01_L_Foot",
             "rotation": [
                 0.0131495,
@@ -2662,16 +2562,16 @@
                 1
             ],
             "translation": [
-                532.748,
-                5.1e-05,
-                -8e-06
+                13.5318,
+                1.2954e-06,
+                -2.032e-07
             ]
         },
         "Bip01_L_Forearm-node": {
             "children": [
                 "Bip01_L_Hand-node"
             ],
-            "jointId": "Bone9",
+            "jointName": "Bone9",
             "name": "Bip01_L_Forearm",
             "rotation": [
                 0,
@@ -2685,8 +2585,8 @@
                 1
             ],
             "translation": [
-                370.017,
-                2e-05,
+                9.39843,
+                5.08e-07,
                 0
             ]
         },
@@ -2694,7 +2594,7 @@
             "children": [
                 "Bip01_L_Finger0-node"
             ],
-            "jointId": "Bone10",
+            "jointName": "Bone10",
             "name": "Bip01_L_Hand",
             "rotation": [
                 -0.468739,
@@ -2708,16 +2608,16 @@
                 1
             ],
             "translation": [
-                370.018,
-                -5.8e-05,
-                -4e-06
+                9.39846,
+                -1.4732e-06,
+                -1.016e-07
             ]
         },
         "Bip01_L_Thigh-node": {
             "children": [
                 "Bip01_L_Calf-node"
             ],
-            "jointId": "Bone23",
+            "jointName": "Bone23",
             "name": "Bip01_L_Thigh",
             "rotation": [
                 0.84539,
@@ -2731,16 +2631,16 @@
                 1
             ],
             "translation": [
-                -115.92,
-                125.412,
-                124.981
+                -2.94437,
+                3.18546,
+                3.17452
             ]
         },
         "Bip01_L_Toe0-node": {
             "children": [
                 "Bip01_L_Toe0Nub-node"
             ],
-            "jointId": "Bone26",
+            "jointName": "Bone26",
             "name": "Bip01_L_Toe0",
             "rotation": [
                 0,
@@ -2754,14 +2654,14 @@
                 1
             ],
             "translation": [
-                214.572,
-                189.363,
-                3e-05
+                5.45013,
+                4.80982,
+                7.62e-07
             ]
         },
         "Bip01_L_Toe0Nub-node": {
             "children": [],
-            "jointId": "Bone27",
+            "jointName": "Bone27",
             "matrix": [
                 1,
                 0,
@@ -2775,9 +2675,9 @@
                 0,
                 -1,
                 0,
-                166.968,
+                4.24099,
                 0,
-                8e-06,
+                2.032e-07,
                 1
             ],
             "name": "Bip01_L_Toe0Nub"
@@ -2786,7 +2686,7 @@
             "children": [
                 "Bip01_L_Forearm-node"
             ],
-            "jointId": "Bone8",
+            "jointName": "Bone8",
             "name": "Bip01_L_UpperArm",
             "rotation": [
                 0.977167,
@@ -2800,9 +2700,9 @@
                 1
             ],
             "translation": [
-                175.071,
-                7.1e-05,
-                7e-06
+                4.4468,
+                1.8034e-06,
+                1.778e-07
             ]
         },
         "Bip01_Neck-node": {
@@ -2811,7 +2711,7 @@
                 "Bip01_L_Clavicle-node",
                 "Bip01_R_Clavicle-node"
             ],
-            "jointId": "Bone4",
+            "jointName": "Bone4",
             "name": "Bip01_Neck",
             "rotation": [
                 -0.0848005,
@@ -2825,16 +2725,16 @@
                 1
             ],
             "translation": [
-                402.56,
-                -0.112731,
-                -1.7e-05
+                10.225,
+                -0.00286337,
+                -4.318e-07
             ]
         },
         "Bip01_Pelvis-node": {
             "children": [
                 "Bip01_Spine-node"
             ],
-            "jointId": "Bone1",
+            "jointName": "Bone1",
             "name": "Bip01_Pelvis",
             "rotation": [
                 -0.959472,
@@ -2848,16 +2748,16 @@
                 1
             ],
             "translation": [
-                524.412,
-                -3.8e-05,
-                898.736
+                13.3201,
+                -9.652e-07,
+                22.8279
             ]
         },
         "Bip01_R_Calf-node": {
             "children": [
                 "Bip01_R_Foot-node"
             ],
-            "jointId": "Bone29",
+            "jointName": "Bone29",
             "name": "Bip01_R_Calf",
             "rotation": [
                 0,
@@ -2871,16 +2771,16 @@
                 1
             ],
             "translation": [
-                547.819,
-                3.7e-05,
-                -1.5e-05
+                13.9146,
+                9.398e-07,
+                -3.81e-07
             ]
         },
         "Bip01_R_Clavicle-node": {
             "children": [
                 "Bip01_R_UpperArm-node"
             ],
-            "jointId": "Bone13",
+            "jointName": "Bone13",
             "name": "Bip01_R_Clavicle",
             "rotation": [
                 -0.404858,
@@ -2894,16 +2794,16 @@
                 1
             ],
             "translation": [
-                -7.49618,
-                0.150702,
-                -42.5129
+                -0.190403,
+                0.00382783,
+                -1.07983
             ]
         },
         "Bip01_R_Finger0-node": {
             "children": [
                 "Bip01_R_Finger0Nub-node"
             ],
-            "jointId": "Bone17",
+            "jointName": "Bone17",
             "name": "Bip01_R_Finger0",
             "rotation": [
                 -0.100383,
@@ -2917,14 +2817,14 @@
                 1
             ],
             "translation": [
-                186.693,
-                5.6e-05,
-                3e-06
+                4.742,
+                1.4224e-06,
+                7.62e-08
             ]
         },
         "Bip01_R_Finger0Nub-node": {
             "children": [],
-            "jointId": "Bone18",
+            "jointName": "Bone18",
             "name": "Bip01_R_Finger0Nub",
             "rotation": [
                 -0,
@@ -2938,16 +2838,16 @@
                 -1
             ],
             "translation": [
-                167.761,
-                -5e-06,
-                -4.4e-05
+                4.26113,
+                -1.27e-07,
+                -1.1176e-06
             ]
         },
         "Bip01_R_Foot-node": {
             "children": [
                 "Bip01_R_Toe0-node"
             ],
-            "jointId": "Bone30",
+            "jointName": "Bone30",
             "name": "Bip01_R_Foot",
             "rotation": [
                 0.725694,
@@ -2961,16 +2861,16 @@
                 1
             ],
             "translation": [
-                532.748,
-                4.1e-05,
-                -2e-06
+                13.5318,
+                1.0414e-06,
+                -5.08e-08
             ]
         },
         "Bip01_R_Forearm-node": {
             "children": [
                 "Bip01_R_Hand-node"
             ],
-            "jointId": "Bone15",
+            "jointName": "Bone15",
             "name": "Bip01_R_Forearm",
             "rotation": [
                 0,
@@ -2984,16 +2884,16 @@
                 1
             ],
             "translation": [
-                370.017,
-                2.9e-05,
-                3e-06
+                9.39843,
+                7.366e-07,
+                7.62e-08
             ]
         },
         "Bip01_R_Hand-node": {
             "children": [
                 "Bip01_R_Finger0-node"
             ],
-            "jointId": "Bone16",
+            "jointName": "Bone16",
             "name": "Bip01_R_Hand",
             "rotation": [
                 0.983491,
@@ -3007,16 +2907,16 @@
                 1
             ],
             "translation": [
-                370.017,
-                -2e-06,
-                6.4e-05
+                9.39843,
+                -5.08e-08,
+                1.6256e-06
             ]
         },
         "Bip01_R_Thigh-node": {
             "children": [
                 "Bip01_R_Calf-node"
             ],
-            "jointId": "Bone28",
+            "jointName": "Bone28",
             "name": "Bip01_R_Thigh",
             "rotation": [
                 0.99724,
@@ -3030,16 +2930,16 @@
                 1
             ],
             "translation": [
-                -64.1862,
-                86.8699,
-                -181.92
+                -1.63033,
+                2.2065,
+                -4.62077
             ]
         },
         "Bip01_R_Toe0-node": {
             "children": [
                 "Bip01_R_Toe0Nub-node"
             ],
-            "jointId": "Bone31",
+            "jointName": "Bone31",
             "name": "Bip01_R_Toe0",
             "rotation": [
                 0.0298918,
@@ -3053,14 +2953,14 @@
                 1
             ],
             "translation": [
-                214.572,
-                189.364,
+                5.45013,
+                4.80985,
                 -0
             ]
         },
         "Bip01_R_Toe0Nub-node": {
             "children": [],
-            "jointId": "Bone32",
+            "jointName": "Bone32",
             "name": "Bip01_R_Toe0Nub",
             "rotation": [
                 1,
@@ -3074,16 +2974,16 @@
                 1
             ],
             "translation": [
-                166.968,
-                4e-06,
-                -3.3e-05
+                4.24099,
+                1.016e-07,
+                -8.382e-07
             ]
         },
         "Bip01_R_UpperArm-node": {
             "children": [
                 "Bip01_R_Forearm-node"
             ],
-            "jointId": "Bone14",
+            "jointName": "Bone14",
             "name": "Bip01_R_UpperArm",
             "rotation": [
                 0.747885,
@@ -3097,9 +2997,9 @@
                 1
             ],
             "translation": [
-                175.071,
-                -0.000136,
-                1.5e-05
+                4.4468,
+                -3.4544e-06,
+                3.81e-07
             ]
         },
         "Bip01_Spine-node": {
@@ -3109,7 +3009,7 @@
                 "Bip01_L_Thigh-node",
                 "Bip01_Tail-node"
             ],
-            "jointId": "Bone2",
+            "jointName": "Bone2",
             "name": "Bip01_Spine",
             "rotation": [
                 0.0503303,
@@ -3123,9 +3023,9 @@
                 1
             ],
             "translation": [
-                142.077,
-                -0.208117,
-                -0.038858
+                3.60876,
+                -0.00528617,
+                -0.000986993
             ]
         },
         "Bip01_Spine1-node": {
@@ -3134,7 +3034,7 @@
                 "Bone01-node",
                 "Bone03-node"
             ],
-            "jointId": "Bone3",
+            "jointName": "Bone3",
             "name": "Bip01_Spine1",
             "rotation": [
                 0.339141,
@@ -3148,16 +3048,16 @@
                 1
             ],
             "translation": [
-                399.228,
-                -0.310882,
-                -0.041171
+                10.1404,
+                -0.0078964,
+                -0.00104574
             ]
         },
         "Bip01_Tail-node": {
             "children": [
                 "Bip01_Tail1-node"
             ],
-            "jointId": "Bone33",
+            "jointName": "Bone33",
             "name": "Bip01_Tail",
             "rotation": [
                 -0.0332696,
@@ -3171,16 +3071,16 @@
                 1
             ],
             "translation": [
-                -217.547,
-                76.1463,
-                -46.1944
+                -5.52569,
+                1.93412,
+                -1.17334
             ]
         },
         "Bip01_Tail1-node": {
             "children": [
                 "Bip01_Tail2-node"
             ],
-            "jointId": "Bone34",
+            "jointName": "Bone34",
             "name": "Bip01_Tail1",
             "rotation": [
                 0.0281731,
@@ -3194,8 +3094,8 @@
                 1
             ],
             "translation": [
-                275.134,
-                -0.261342,
+                6.9884,
+                -0.00663809,
                 0
             ]
         },
@@ -3203,7 +3103,7 @@
             "children": [
                 "Bip01_TailNub-node"
             ],
-            "jointId": "Bone35",
+            "jointName": "Bone35",
             "name": "Bip01_Tail2",
             "rotation": [
                 0,
@@ -3217,14 +3117,14 @@
                 1
             ],
             "translation": [
-                339.089,
-                -0.290226,
-                -7e-06
+                8.61286,
+                -0.00737174,
+                -1.778e-07
             ]
         },
         "Bip01_TailNub-node": {
             "children": [],
-            "jointId": "Bone36",
+            "jointName": "Bone36",
             "name": "Bip01_TailNub",
             "rotation": [
                 0.707388,
@@ -3238,22 +3138,22 @@
                 1
             ],
             "translation": [
-                374.193,
-                -3.8e-05,
-                -3e-06
+                9.5045,
+                -9.652e-07,
+                -7.62e-08
             ]
         },
         "Bone01-node": {
             "children": [
                 "Bone02-node"
             ],
-            "jointId": "Bone21",
+            "jointName": "Bone21",
             "name": "Bone01",
             "rotation": [
                 0.998254,
                 -0.012858,
                 -0.0576427,
-                3.00283
+                3.00042
             ],
             "scale": [
                 0.993689,
@@ -3261,14 +3161,14 @@
                 9.75437
             ],
             "translation": [
-                179.053,
-                1051.53,
-                -104.193
+                4.54795,
+                26.7089,
+                -2.6465
             ]
         },
         "Bone02-node": {
             "children": [],
-            "jointId": "Bone22",
+            "jointName": "Bone22",
             "name": "Bone02",
             "rotation": [
                 1,
@@ -3282,22 +3182,22 @@
                 1
             ],
             "translation": [
-                17.8219,
-                1.4e-05,
-                -2e-06
+                0.452676,
+                3.556e-07,
+                -5.08e-08
             ]
         },
         "Bone03-node": {
             "children": [
                 "Bone04-node"
             ],
-            "jointId": "Bone19",
+            "jointName": "Bone19",
             "name": "Bone03",
             "rotation": [
                 0.998968,
                 -0.0442843,
                 0.0101098,
-                3.11183
+                3.11179
             ],
             "scale": [
                 0.657025,
@@ -3305,14 +3205,14 @@
                 7.3972
             ],
             "translation": [
-                164.819,
-                1034.98,
-                -108.759
+                4.1864,
+                26.2885,
+                -2.76248
             ]
         },
         "Bone04-node": {
             "children": [],
-            "jointId": "Bone20",
+            "jointName": "Bone20",
             "name": "Bone04",
             "rotation": [
                 1,
@@ -3326,21 +3226,21 @@
                 1
             ],
             "translation": [
-                17.8219,
-                7e-06,
-                -2e-06
+                0.452676,
+                1.778e-07,
+                -5.08e-08
             ]
         },
         "monster-node": {
             "children": [],
             "instanceSkin": {
+                "meshes": [
+                    "monster-mesh-skin"
+                ],
                 "skeletons": [
                     "Bip01_Pelvis-node"
                 ],
-                "skin": "monster-mesh-skin-skin",
-                "sources": [
-                    "monster-mesh-skin"
-                ]
+                "skin": "monster-mesh-skin-skin"
             },
             "matrix": [
                 1,
@@ -3361,9 +3261,33 @@
                 1
             ],
             "name": "monster"
+        },
+        "node_37": {
+            "children": [
+                "Bip01_Pelvis-node",
+                "monster-node"
+            ],
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "name": "Y_UP_Transform"
         }
     },
-    "profile": "WebGL 1.0.2",
     "programs": {
         "program_0": {
             "attributes": [
@@ -3389,17 +3313,18 @@
     "scenes": {
         "defaultScene": {
             "nodes": [
-                "Bip01_Pelvis-node",
-                "monster-node"
+                "node_37"
             ]
         }
     },
     "shaders": {
         "monster0FS": {
-            "path": "monster0FS.glsl"
+            "type": 35632,
+            "uri": "monster0FS.glsl"
         },
         "monster0VS": {
-            "path": "monster0VS.glsl"
+            "type": 35633,
+            "uri": "monster0VS.glsl"
         }
     },
     "skins": {
@@ -3422,13 +3347,8 @@
                 597.2,
                 1
             ],
-            "inverseBindMatrices": {
-                "bufferView": "bufferView_185",
-                "byteOffset": 0,
-                "count": 36,
-                "type": 35676
-            },
-            "joints": [
+            "inverseBindMatrices": "IBM_monster-mesh-skin-skin",
+            "jointNames": [
                 "Bone1",
                 "Bone2",
                 "Bone3",
@@ -3469,7 +3389,7 @@
         }
     },
     "techniques": {
-        "technique1": {
+        "technique0": {
             "parameters": {
                 "ambient": {
                     "type": 35666
@@ -3477,12 +3397,13 @@
                 "diffuse": {
                     "type": 35678
                 },
-                "joint": {
-                    "semantic": "JOINT",
+                "jointName": {
+                    "semantic": "jointName",
                     "type": 35666
                 },
                 "jointMat": {
-                    "semantic": "JOINT_MATRIX",
+                    "count": 36,
+                    "semantic": "JOINTMATRIX",
                     "type": 35676
                 },
                 "modelViewMatrix": {
@@ -3547,7 +3468,7 @@
                     },
                     "instanceProgram": {
                         "attributes": {
-                            "a_joint": "joint",
+                            "a_joint": "jointName",
                             "a_normal": "normal",
                             "a_position": "position",
                             "a_texcoord0": "texcoord0",
@@ -3566,22 +3487,24 @@
                         }
                     },
                     "states": {
-                        "blendEnable": 0,
-                        "cullFaceEnable": 1,
-                        "depthMask": 1,
-                        "depthTestEnable": 1
+                        "depthMask": true,
+                        "enable": [
+                            2884,
+                            2929
+                        ]
                     }
                 }
             }
         }
     },
     "textures": {
-        "texture_image_0": {
+        "texture_monster.jpg": {
             "format": 6408,
             "internalFormat": 6408,
             "sampler": "sampler_0",
-            "source": "image_0",
-            "target": 3553
+            "source": "monster.jpg",
+            "target": 3553,
+            "type": 5121
         }
     }
 }
