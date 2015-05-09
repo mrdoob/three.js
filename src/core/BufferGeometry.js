@@ -31,7 +31,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
-			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
 			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
 
@@ -458,7 +458,7 @@ THREE.BufferGeometry.prototype = {
 
 				} else {
 
-					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i );
+					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i );
 
 				}
 
@@ -485,7 +485,7 @@ THREE.BufferGeometry.prototype = {
 
 				} else {
 
-					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i );
+					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i );
 
 				}
 
@@ -559,7 +559,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-				THREE.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
 			}
 
@@ -613,7 +613,7 @@ THREE.BufferGeometry.prototype = {
 
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
-					THREE.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
 
 				}
 
@@ -758,7 +758,7 @@ THREE.BufferGeometry.prototype = {
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
 
-			THREE.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
+			console.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
 			return;
 
 		}
@@ -948,9 +948,9 @@ THREE.BufferGeometry.prototype = {
 		var UintArray = ( ( vertices.length / 3 ) > 65535 && THREE.BufferGeometry.MaxIndex > 65535 ) ? Uint32Array : Uint16Array;
 
 		/*
-		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
-		THREE.log("Faces to process: "+(indices.length/3));
-		THREE.log("Reordering "+verticesCount+" vertices.");
+		console.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
+		console.log("Faces to process: "+(indices.length/3));
+		console.log("Reordering "+verticesCount+" vertices.");
 		*/
 
 		var sortedIndices = new UintArray( indices.length );
@@ -1030,10 +1030,10 @@ THREE.BufferGeometry.prototype = {
 
 		/*
 		var orderTime = Date.now();
-		THREE.log("Reorder time: "+(orderTime-s)+"ms");
-		THREE.log("Duplicated "+duplicatedVertices+" vertices.");
-		THREE.log("Compute Buffers time: "+(Date.now()-s)+"ms");
-		THREE.log("Draw offsets: "+offsets.length);
+		console.log("Reorder time: "+(orderTime-s)+"ms");
+		console.log("Duplicated "+duplicatedVertices+" vertices.");
+		console.log("Compute Buffers time: "+(Date.now()-s)+"ms");
+		console.log("Draw offsets: "+offsets.length);
 		*/
 
 		return offsets;
@@ -1044,7 +1044,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
 
-			THREE.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
+			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
 			return;
 
 		}

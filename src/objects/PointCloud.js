@@ -178,7 +178,7 @@ THREE.PointCloud.prototype.toJSON = function ( meta ) {
 
 THREE.ParticleSystem = function ( geometry, material ) {
 
-	THREE.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
+	console.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
 	return new THREE.PointCloud( geometry, material );
 
 };

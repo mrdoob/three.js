@@ -7,7 +7,7 @@ THREE.SplineCurve3 = THREE.Curve.create(
 
 	function ( points /* array of Vector3 */) {
 
-		THREE.warn( 'THREE.SplineCurve3 will be deprecated. Please use THREE.CatmullRomCurve3' );
+		console.warn( 'THREE.SplineCurve3 will be deprecated. Please use THREE.CatmullRomCurve3' );
 		this.points = ( points == undefined ) ? [] : points;
 
 	},

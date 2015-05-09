@@ -49,15 +49,15 @@ THREE.WebGLProgram = ( function () {
 		return attributes;
 
 	}
-	
+
 	function programArrayToString ( previousValue, currentValue, index, array ) {
-	
+
 		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
-		
+
 			return previousValue + currentValue + '\n';
-			
+
 		}
-		
+
 		return previousValue;
 	}
 
@@ -147,7 +147,7 @@ THREE.WebGLProgram = ( function () {
 
 		var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
 
-		// THREE.log( 'building new program ' );
+		// console.log( 'building new program ' );
 
 		//
 
@@ -357,13 +357,13 @@ THREE.WebGLProgram = ( function () {
 
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-			THREE.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
+			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
 
 		}
 
 		if ( programLogInfo !== '' ) {
 
-			THREE.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
+			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
 
 		}
 

@@ -6,7 +6,7 @@ THREE.Line = function ( geometry, material, mode ) {
 
 	if ( mode === 1 ) {
 
-		THREE.error( 'THREE.Line: THREE.LinePieces mode has been removed. Use THREE.LineSegments instead.' );
+		console.error( 'THREE.Line: THREE.LinePieces mode has been removed. Use THREE.LineSegments instead.' );
 
 	}
 

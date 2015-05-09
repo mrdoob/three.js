@@ -583,7 +583,7 @@ THREE.Geometry.prototype = {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
-			THREE.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
+			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
 
 		}
@@ -689,7 +689,7 @@ THREE.Geometry.prototype = {
 
 		if ( mesh instanceof THREE.Mesh === false ) {
 
-			THREE.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
+			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 			return;
 
 		}
@@ -730,7 +730,7 @@ THREE.Geometry.prototype = {
 
 			} else {
 
-				//THREE.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 				changes[ i ] = changes[ verticesMap[ key ] ];
 
 			}

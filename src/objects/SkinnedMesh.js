@@ -148,7 +148,7 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 
 	} else {
 
-		THREE.warn( 'THREE.SkinnedMesh unreckognized bindMode: ' + this.bindMode );
+		console.warn( 'THREE.SkinnedMesh unreckognized bindMode: ' + this.bindMode );
 
 	}
 

@@ -130,7 +130,7 @@ THREE.FontUtils = {
 
 				action = outline[ i ++ ];
 
-				//THREE.log( action );
+				//console.log( action );
 
 				switch ( action ) {
 
@@ -327,7 +327,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 				//throw ( "Warning, unable to triangulate polygon!" );
 				//return null;
 				// Sometimes warning is fine, especially polygons are triangulated in reverse.
-				THREE.warn( 'THREE.FontUtils: Warning, unable to triangulate polygon! in Triangulate.process()' );
+				console.warn( 'THREE.FontUtils: Warning, unable to triangulate polygon! in Triangulate.process()' );
 
 				if ( indices ) return vertIndices;
 				return result;

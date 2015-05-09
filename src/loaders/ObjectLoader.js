@@ -229,7 +229,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( textures[ name ] === undefined ) {
 
-					THREE.warn( 'THREE.ObjectLoader: Undefined texture', name );
+					console.warn( 'THREE.ObjectLoader: Undefined texture', name );
 
 				}
 
@@ -342,13 +342,13 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.image === undefined ) {
 
-					THREE.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
+					console.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
 
 				}
 
 				if ( images[ data.image ] === undefined ) {
 
-					THREE.warn( 'THREE.ObjectLoader: Undefined image', data.image );
+					console.warn( 'THREE.ObjectLoader: Undefined image', data.image );
 
 				}
 
@@ -392,7 +392,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( geometries[ name ] === undefined ) {
 
-					THREE.warn( 'THREE.ObjectLoader: Undefined geometry', name );
+					console.warn( 'THREE.ObjectLoader: Undefined geometry', name );
 
 				}
 
@@ -404,7 +404,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( materials[ name ] === undefined ) {
 
-					THREE.warn( 'THREE.ObjectLoader: Undefined material', name );
+					console.warn( 'THREE.ObjectLoader: Undefined material', name );
 
 				}
 

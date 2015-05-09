@@ -41,14 +41,14 @@ THREE.DynamicGeometry.prototype = {
 
 	computeFaceNormals: function () {
 
-		THREE.warn( 'THREE.DynamicGeometry: computeFaceNormals() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DynamicGeometry: computeFaceNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},
 
 	computeVertexNormals: function () {
 
-		THREE.warn( 'THREE.DynamicGeometry: computeVertexNormals	() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DynamicGeometry: computeVertexNormals	() is not a method of this type of geometry.' );
 		return this;
 
 	},

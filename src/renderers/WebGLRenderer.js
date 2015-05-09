@@ -187,7 +187,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	} catch ( error ) {
 
-		THREE.error( 'THREE.WebGLRenderer: ' + error );
+		console.error( 'THREE.WebGLRenderer: ' + error );
 
 	}
 
@@ -353,12 +353,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( mediumpAvailable ) {
 
 			_precision = 'mediump';
-			THREE.warn( 'THREE.WebGLRenderer: highp not supported, using mediump.' );
+			console.warn( 'THREE.WebGLRenderer: highp not supported, using mediump.' );
 
 		} else {
 
 			_precision = 'lowp';
-			THREE.warn( 'THREE.WebGLRenderer: highp and mediump not supported, using lowp.' );
+			console.warn( 'THREE.WebGLRenderer: highp and mediump not supported, using lowp.' );
 
 		}
 
@@ -367,7 +367,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	if ( _precision === 'mediump' && ! mediumpAvailable ) {
 
 		_precision = 'lowp';
-		THREE.warn( 'THREE.WebGLRenderer: mediump not supported, using lowp.' );
+		console.warn( 'THREE.WebGLRenderer: mediump not supported, using lowp.' );
 
 	}
 
@@ -881,7 +881,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( extension === null ) {
 
-				THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 				return;
 
 			}
@@ -920,7 +920,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( extension === null ) {
 
-								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+								console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
 								return;
 
 							}
@@ -944,7 +944,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( extension === null ) {
 
-								THREE.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
+								console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferAttribute but hardware does not support extension ANGLE_instanced_arrays.' );
 								return;
 
 							}
@@ -1068,7 +1068,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( extension === null ) {
 
-						THREE.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 						return;
 
 					}
@@ -1111,7 +1111,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( extension === null ) {
 
-							THREE.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+							console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 							return;
 
 						}
@@ -1135,7 +1135,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			// non-indexed triangles
-			
+
 			var offsets = geometry.offsets;
 
 			if ( offsets.length === 0 ) {
@@ -1156,7 +1156,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( extension === null ) {
 
-						THREE.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+						console.error( 'THREE.WebGLRenderer.renderMesh: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
 						return;
 
 					}
@@ -1207,7 +1207,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( geometry instanceof THREE.InstancedBufferGeometry ) {
 
-						THREE.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
+						console.error( 'THREE.WebGLRenderer.renderMesh: cannot use drawCalls with THREE.InstancedBufferGeometry.' );
 						return;
 
 					} else {
@@ -1521,7 +1521,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( influences.length > morphTargets.length ) {
 
-				THREE.warn( 'THREE.WebGLRenderer: Influences array is bigger than morphTargets array.' );
+				console.warn( 'THREE.WebGLRenderer: Influences array is bigger than morphTargets array.' );
 				influences.length = morphTargets.length;
 
 			}
@@ -1667,7 +1667,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
-			THREE.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
+			console.error( 'THREE.WebGLRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}
@@ -2714,7 +2714,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( textureUnit >= _maxTextures ) {
 
-			THREE.warn( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + _maxTextures );
+			console.warn( 'WebGLRenderer: trying to use ' + textureUnit + ' texture units while this GPU supports only ' + _maxTextures );
 
 		}
 
@@ -3052,7 +3052,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				default:
 
-					THREE.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
+					console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
 
 			}
 
@@ -3328,7 +3328,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.wrapS !== THREE.ClampToEdgeWrapping || texture.wrapT !== THREE.ClampToEdgeWrapping ) {
 
-				THREE.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping. ( ' + texture.sourceFile + ' )' );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping. ( ' + texture.sourceFile + ' )' );
 
 			}
 
@@ -3337,7 +3337,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( texture.minFilter !== THREE.NearestFilter && texture.minFilter !== THREE.LinearFilter ) {
 
-				THREE.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter. ( ' + texture.sourceFile + ' )' );
+				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter. ( ' + texture.sourceFile + ' )' );
 
 			}
 
@@ -3427,7 +3427,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					} else {
 
-						THREE.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
+						console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()" );
 
 					}
 
@@ -3480,14 +3480,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( image === undefined ) {
 
-				THREE.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
 				return;
 
 			}
 
 			if ( image.complete === false ) {
 
-				THREE.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
+				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
 				return;
 
 			}
@@ -3518,7 +3518,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var context = canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
 
-			THREE.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
+			console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
 
 			return canvas;
 
@@ -3605,7 +3605,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 								} else {
 
-									THREE.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
+									console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setCubeTexture()" );
 
 								}
 
@@ -3840,7 +3840,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( ! ( renderTarget instanceof THREE.WebGLRenderTarget ) ) {
 
-			THREE.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+			console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
 			return;
 
 		}
@@ -3849,7 +3849,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( renderTarget.format !== THREE.RGBAFormat ) {
 
-				THREE.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA format. readPixels can read only RGBA format.' );
+				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA format. readPixels can read only RGBA format.' );
 				return;
 
 			}
@@ -3870,7 +3870,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				THREE.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
+				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: readPixels from renderTarget failed. Framebuffer not complete.' );
 
 			}
 
@@ -4040,7 +4040,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( maxBones < object.skeleton.bones.length ) {
 
-					THREE.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
+					console.warn( 'WebGLRenderer: too many bones - ' + object.skeleton.bones.length + ', this GPU supports just ' + maxBones + ' (try OpenGL instead of ANGLE)' );
 
 				}
 
@@ -4099,25 +4099,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function () {
 
-		THREE.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .initMaterial() has been removed.' );
 
 	};
 
 	this.addPrePlugin = function () {
 
-		THREE.warn( 'THREE.WebGLRenderer: .addPrePlugin() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .addPrePlugin() has been removed.' );
 
 	};
 
 	this.addPostPlugin = function () {
 
-		THREE.warn( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .addPostPlugin() has been removed.' );
 
 	};
 
 	this.updateShadowMap = function () {
 
-		THREE.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
+		console.warn( 'THREE.WebGLRenderer: .updateShadowMap() has been removed.' );
 
 	};
 
@@ -4127,7 +4127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				return shadowMap.enabled;
 			},
 			set: function ( value ) {
-				THREE.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
 				shadowMap.enabled = value;
 			}
 		},
@@ -4136,7 +4136,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				return shadowMap.type;
 			},
 			set: function ( value ) {
-				THREE.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
 				shadowMap.type = value;
 			}
 		},
@@ -4145,7 +4145,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				return shadowMap.cullFace;
 			},
 			set: function ( value ) {
-				THREE.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
 				shadowMap.cullFace = value;
 			}
 		},
@@ -4154,7 +4154,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				return shadowMap.debug;
 			},
 			set: function ( value ) {
-				THREE.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
 				shadowMap.debug = value;
 			}
 		},
@@ -4163,7 +4163,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				return shadowMap.cascade;
 			},
 			set: function ( value ) {
-				THREE.warn( 'THREE.WebGLRenderer: .shadowMapCascade is now .shadowMap.cascade.' );
+				console.warn( 'THREE.WebGLRenderer: .shadowMapCascade is now .shadowMap.cascade.' );
 				shadowMap.cascade = value;
 			}
 		}

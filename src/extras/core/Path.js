@@ -208,7 +208,7 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	if (this.useSpacedPoints) {
-		THREE.log('tata');
+		console.log('tata');
 		return this.getSpacedPoints( divisions, closedPath );
 	}
 
@@ -367,13 +367,13 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				tx = aX + aRadius * Math.cos( angle );
 				ty = aY + aRadius * Math.sin( angle );
 
-				//THREE.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
 			}
 
-			//THREE.log(points);
+			//console.log(points);
 
 			break;
 
@@ -405,13 +405,13 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				tx = aX + xRadius * Math.cos( angle );
 				ty = aY + yRadius * Math.sin( angle );
 
-				//THREE.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
 			}
 
-			//THREE.log(points);
+			//console.log(points);
 
 			break;
 
@@ -485,7 +485,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		}
 
-		// THREE.log(subPaths);
+		// console.log(subPaths);
 
 		return	subPaths;
 	}
@@ -505,7 +505,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			shapes.push( tmpShape );
 		}
 
-		//THREE.log("shape", shapes);
+		//console.log("shape", shapes);
 
 		return shapes;
 	}
@@ -578,7 +578,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 	var holesFirst = ! THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
 	holesFirst = isCCW ? ! holesFirst : holesFirst;
 
-	// THREE.log("Holes first", holesFirst);
+	// console.log("Holes first", holesFirst);
 
 	var betterShapeHoles = [];
 	var newShapes = [];
@@ -609,13 +609,13 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			if ( holesFirst )	mainIdx ++;
 			newShapeHoles[mainIdx] = [];
 
-			//THREE.log('cw', i);
+			//console.log('cw', i);
 
 		} else {
 
 			newShapeHoles[mainIdx].push( { h: tmpPath, p: tmpPoints[0] } );
 
-			//THREE.log('ccw', i);
+			//console.log('ccw', i);
 
 		}
 
@@ -651,9 +651,9 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 				if ( hole_unassigned ) { betterShapeHoles[sIdx].push( ho ); }
 			}
 		}
-		// THREE.log("ambigious: ", ambigious);
+		// console.log("ambigious: ", ambigious);
 		if ( toChange.length > 0 ) {
-			// THREE.log("to change: ", toChange);
+			// console.log("to change: ", toChange);
 			if (! ambigious)	newShapeHoles = betterShapeHoles;
 		}
 	}
@@ -668,7 +668,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		}
 	}
 
-	//THREE.log("shape", shapes);
+	//console.log("shape", shapes);
 
 	return shapes;
 
