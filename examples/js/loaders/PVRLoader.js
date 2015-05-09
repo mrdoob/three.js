@@ -164,21 +164,21 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 
 
-	// THREE.log( "--------------------------" );
+	// console.log( "--------------------------" );
 
-	// THREE.log( "headerLength ", headerLength);
-	// THREE.log( "height       ", height      );
-	// THREE.log( "width        ", width       );
-	// THREE.log( "numMipmaps   ", numMipmaps  );
-	// THREE.log( "flags        ", flags       );
-	// THREE.log( "dataLength   ", dataLength  );
-	// THREE.log( "bpp          ", bpp         );
-	// THREE.log( "bitmaskRed   ", bitmaskRed  );
-	// THREE.log( "bitmaskGreen ", bitmaskGreen);
-	// THREE.log( "bitmaskBlue  ", bitmaskBlue );
-	// THREE.log( "bitmaskAlpha ", bitmaskAlpha);
-	// THREE.log( "pvrTag       ", pvrTag      );
-	// THREE.log( "numSurfs     ", numSurfs    );
+	// console.log( "headerLength ", headerLength);
+	// console.log( "height       ", height      );
+	// console.log( "width        ", width       );
+	// console.log( "numMipmaps   ", numMipmaps  );
+	// console.log( "flags        ", flags       );
+	// console.log( "dataLength   ", dataLength  );
+	// console.log( "bpp          ", bpp         );
+	// console.log( "bitmaskRed   ", bitmaskRed  );
+	// console.log( "bitmaskGreen ", bitmaskGreen);
+	// console.log( "bitmaskBlue  ", bitmaskBlue );
+	// console.log( "bitmaskAlpha ", bitmaskAlpha);
+	// console.log( "pvrTag       ", pvrTag      );
+	// console.log( "numSurfs     ", numSurfs    );
 
 
 

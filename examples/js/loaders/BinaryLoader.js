@@ -54,7 +54,7 @@ THREE.BinaryLoader.prototype.loadAjaxJSON = function ( context, url, callback, t
 
 			} else {
 
-				THREE.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -119,7 +119,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 	xhr.addEventListener( 'error', function ( event ) {
 
-		THREE.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
+		console.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 	}, false );
 
@@ -251,31 +251,31 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			};
 /*
-			THREE.log( "signature: " + metaData.signature );
+			console.log( "signature: " + metaData.signature );
 
-			THREE.log( "header_bytes: " + metaData.header_bytes );
-			THREE.log( "vertex_coordinate_bytes: " + metaData.vertex_coordinate_bytes );
-			THREE.log( "normal_coordinate_bytes: " + metaData.normal_coordinate_bytes );
-			THREE.log( "uv_coordinate_bytes: " + metaData.uv_coordinate_bytes );
+			console.log( "header_bytes: " + metaData.header_bytes );
+			console.log( "vertex_coordinate_bytes: " + metaData.vertex_coordinate_bytes );
+			console.log( "normal_coordinate_bytes: " + metaData.normal_coordinate_bytes );
+			console.log( "uv_coordinate_bytes: " + metaData.uv_coordinate_bytes );
 
-			THREE.log( "vertex_index_bytes: " + metaData.vertex_index_bytes );
-			THREE.log( "normal_index_bytes: " + metaData.normal_index_bytes );
-			THREE.log( "uv_index_bytes: " + metaData.uv_index_bytes );
-			THREE.log( "material_index_bytes: " + metaData.material_index_bytes );
+			console.log( "vertex_index_bytes: " + metaData.vertex_index_bytes );
+			console.log( "normal_index_bytes: " + metaData.normal_index_bytes );
+			console.log( "uv_index_bytes: " + metaData.uv_index_bytes );
+			console.log( "material_index_bytes: " + metaData.material_index_bytes );
 
-			THREE.log( "nvertices: " + metaData.nvertices );
-			THREE.log( "nnormals: " + metaData.nnormals );
-			THREE.log( "nuvs: " + metaData.nuvs );
+			console.log( "nvertices: " + metaData.nvertices );
+			console.log( "nnormals: " + metaData.nnormals );
+			console.log( "nuvs: " + metaData.nuvs );
 
-			THREE.log( "ntri_flat: " + metaData.ntri_flat );
-			THREE.log( "ntri_smooth: " + metaData.ntri_smooth );
-			THREE.log( "ntri_flat_uv: " + metaData.ntri_flat_uv );
-			THREE.log( "ntri_smooth_uv: " + metaData.ntri_smooth_uv );
+			console.log( "ntri_flat: " + metaData.ntri_flat );
+			console.log( "ntri_smooth: " + metaData.ntri_smooth );
+			console.log( "ntri_flat_uv: " + metaData.ntri_flat_uv );
+			console.log( "ntri_smooth_uv: " + metaData.ntri_smooth_uv );
 
-			THREE.log( "nquad_flat: " + metaData.nquad_flat );
-			THREE.log( "nquad_smooth: " + metaData.nquad_smooth );
-			THREE.log( "nquad_flat_uv: " + metaData.nquad_flat_uv );
-			THREE.log( "nquad_smooth_uv: " + metaData.nquad_smooth_uv );
+			console.log( "nquad_flat: " + metaData.nquad_flat );
+			console.log( "nquad_smooth: " + metaData.nquad_smooth );
+			console.log( "nquad_flat_uv: " + metaData.nquad_flat_uv );
+			console.log( "nquad_smooth_uv: " + metaData.nquad_smooth_uv );
 
 			var total = metaData.header_bytes
 					  + metaData.nvertices * metaData.vertex_coordinate_bytes * 3
@@ -289,7 +289,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 					  + metaData.nquad_smooth * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 )
 					  + metaData.nquad_flat_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.uv_index_bytes*4 )
 					  + metaData.nquad_smooth_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 + metaData.uv_index_bytes*4 );
-			THREE.log( "total bytes: " + total );
+			console.log( "total bytes: " + total );
 */
 
 			return metaData;

@@ -121,12 +121,12 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 							var ctmFile = files[ i ];
 
 							var e1 = Date.now();
-							// THREE.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
+							// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
 
 							scope.createModel( ctmFile, callback );
 
 							var e = Date.now();
-							THREE.log( "model load time [worker]: " + (e - e1) + " ms, total: " + (e - s));
+							console.log( "model load time [worker]: " + (e - e1) + " ms, total: " + (e - s));
 
 						}
 
@@ -149,13 +149,13 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 					}
 
 					//var e = Date.now();
-					//THREE.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
+					//console.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
 
 				}
 
 			} else {
 
-				THREE.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 

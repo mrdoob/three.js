@@ -91,7 +91,7 @@ THREE.ColladaLoader = function () {
 
 							} else {
 
-								THREE.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
+								console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
 
 							}
 
@@ -412,7 +412,7 @@ THREE.ColladaLoader = function () {
 
 		if ( !morphCtrl || !morphCtrl.morph ) {
 
-			THREE.log("could not find morph controller!");
+			console.log("could not find morph controller!");
 			return;
 
 		}
@@ -450,14 +450,14 @@ THREE.ColladaLoader = function () {
 
 		if ( !skinCtrl || !skinCtrl.skin ) {
 
-			THREE.log( "could not find skin controller!" );
+			console.log( "could not find skin controller!" );
 			return;
 
 		}
 
 		if ( !ctrl.skeleton || !ctrl.skeleton.length ) {
 
-			THREE.log( "could not find the skeleton for the skin!" );
+			console.log( "could not find the skeleton for the skin!" );
 			return;
 
 		}
@@ -587,7 +587,7 @@ THREE.ColladaLoader = function () {
 
 			} else {
 
-				THREE.warn( "ColladaLoader: Could not find joint '" + bone.sid + "'." );
+				console.warn( "ColladaLoader: Could not find joint '" + bone.sid + "'." );
 
 				bone.skinningMatrix = new THREE.Matrix4();
 				bone.weights = [];
@@ -686,14 +686,14 @@ THREE.ColladaLoader = function () {
 
 		if ( !skinController || !skinController.skin ) {
 
-			THREE.log( 'ColladaLoader: Could not find skin controller.' );
+			console.log( 'ColladaLoader: Could not find skin controller.' );
 			return;
 
 		}
 
 		if ( !instanceCtrl.skeleton || !instanceCtrl.skeleton.length ) {
 
-			THREE.log( 'ColladaLoader: Could not find the skeleton for the skin. ' );
+			console.log( 'ColladaLoader: Could not find the skeleton for the skin. ' );
 			return;
 
 		}
@@ -776,7 +776,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		THREE.log( 'ColladaLoader:', animationBounds.ID + ' has ' + sortedbones.length + ' bones.' );
+		console.log( 'ColladaLoader:', animationBounds.ID + ' has ' + sortedbones.length + ' bones.' );
 
 
 
@@ -874,7 +874,7 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					THREE.log( 'getJointValue: joint ' + jointIndex + ' doesn\'t exist' );
+					console.log( 'getJointValue: joint ' + jointIndex + ' doesn\'t exist' );
 
 				}
 
@@ -890,11 +890,11 @@ THREE.ColladaLoader = function () {
 
 					if ( value > joint.limits.max || value < joint.limits.min ) {
 
-						THREE.log( 'setJointValue: joint ' + jointIndex + ' value ' + value + ' outside of limits (min: ' + joint.limits.min + ', max: ' + joint.limits.max + ')' );
+						console.log( 'setJointValue: joint ' + jointIndex + ' value ' + value + ' outside of limits (min: ' + joint.limits.min + ', max: ' + joint.limits.max + ')' );
 
 					} else if ( joint.static ) {
 
-						THREE.log( 'setJointValue: joint ' + jointIndex + ' is static' );
+						console.log( 'setJointValue: joint ' + jointIndex + ' is static' );
 
 					} else {
 
@@ -926,7 +926,7 @@ THREE.ColladaLoader = function () {
 
 									default:
 
-										THREE.warn( 'setJointValue: unknown joint type: ' + joint.type );
+										console.warn( 'setJointValue: unknown joint type: ' + joint.type );
 										break;
 
 								}
@@ -988,7 +988,7 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					THREE.log( 'setJointValue: joint ' + jointIndex + ' doesn\'t exist' );
+					console.log( 'setJointValue: joint ' + jointIndex + ' doesn\'t exist' );
 
 				}
 
@@ -1100,7 +1100,7 @@ THREE.ColladaLoader = function () {
 
 					}
 
-					THREE.log( 'ColladaLoader: Morph-controller partially supported.' );
+					console.log( 'ColladaLoader: Morph-controller partially supported.' );
 
 				default:
 					break;
@@ -1453,7 +1453,7 @@ THREE.ColladaLoader = function () {
 					if ( sampler.input[ j + 1 ] > t ) {
 
 						value = sampler.output[ j ];
-						//THREE.log(value.flatten)
+						//console.log(value.flatten)
 						break;
 
 					}
@@ -1552,7 +1552,7 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					THREE.log( 'Could not find transform "' + channel.sid + '" in node ' + node.id );
+					console.log( 'Could not find transform "' + channel.sid + '" in node ' + node.id );
 
 				}
 
@@ -1818,7 +1818,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -1928,7 +1928,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -2339,7 +2339,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -2413,7 +2413,7 @@ THREE.ColladaLoader = function () {
 				break;
 
 			default:
-				THREE.log( 'Can not convert Transform of type ' + this.type );
+				console.log( 'Can not convert Transform of type ' + this.type );
 				break;
 
 		}
@@ -2519,7 +2519,7 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					THREE.log('Incorrect addressing of matrix in transform.');
+					console.log('Incorrect addressing of matrix in transform.');
 
 				}
 
@@ -2739,7 +2739,7 @@ THREE.ColladaLoader = function () {
 
 				case 'extra':
 
-					// THREE.log( child );
+					// console.log( child );
 					break;
 
 				default:
@@ -3096,7 +3096,7 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					THREE.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
+					console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
 
 				}
 
@@ -3161,7 +3161,7 @@ THREE.ColladaLoader = function () {
 
 				case 'ph':
 
-					THREE.warn( 'polygon holes not yet supported!' );
+					console.warn( 'polygon holes not yet supported!' );
 					break;
 
 				default:
@@ -3350,7 +3350,7 @@ THREE.ColladaLoader = function () {
 					break;
 
 				default:
-					// THREE.log(child.nodeName);
+					// console.log(child.nodeName);
 					break;
 
 			}
@@ -3369,7 +3369,7 @@ THREE.ColladaLoader = function () {
 
 		var param = this.accessor.params[ 0 ];
 
-			//THREE.log(param.name + " " + param.type);
+			//console.log(param.name + " " + param.type);
 
 		switch ( param.type ) {
 
@@ -3392,7 +3392,7 @@ THREE.ColladaLoader = function () {
 
 			default:
 
-				THREE.log( 'ColladaLoader: Source: Read dont know how to read ' + param.type + '.' );
+				console.log( 'ColladaLoader: Source: Read dont know how to read ' + param.type + '.' );
 				break;
 
 		}
@@ -3606,11 +3606,11 @@ THREE.ColladaLoader = function () {
 						} else if ( bumpType.toLowerCase() === "normalmap" ) {
 							this[ 'normal' ] = ( new ColorOrTexture() ).parse( child );
 						} else {
-							THREE.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType + ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
+							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType + ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
 							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
 						}
 					} else {
-						THREE.warn( "Shader.prototype.parse: Attribute 'bumptype' missing from bump node - defaulting to 'HEIGHTFIELD'" );
+						console.warn( "Shader.prototype.parse: Attribute 'bumptype' missing from bump node - defaulting to 'HEIGHTFIELD'" );
 						this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
 					}
 
@@ -3840,7 +3840,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( "unhandled Surface prop: " + child.nodeName );
+					console.log( "unhandled Surface prop: " + child.nodeName );
 					break;
 
 			}
@@ -3904,7 +3904,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( "unhandled Sampler2D prop: " + child.nodeName );
+					console.log( "unhandled Sampler2D prop: " + child.nodeName );
 					break;
 
 			}
@@ -3994,7 +3994,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -4041,7 +4041,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -4343,7 +4343,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log(input.semantic);
+					console.log(input.semantic);
 					break;
 
 			}

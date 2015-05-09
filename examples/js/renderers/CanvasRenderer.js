@@ -220,7 +220,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		THREE.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
+		console.warn( 'THREE.CanvasRenderer: .setClearColorHex() is being removed. Use .setClearColor() instead.' );
 		this.setClearColor( hex, alpha );
 
 	};
@@ -298,7 +298,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( camera instanceof THREE.Camera === false ) {
 
-			THREE.error( 'THREE.CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
+			console.error( 'THREE.CanvasRenderer.render: camera is not an instance of THREE.Camera.' );
 			return;
 
 		}

@@ -5,7 +5,7 @@
 THREE.DotScreenPass = function ( center, angle, scale ) {
 
 	if ( THREE.DotScreenShader === undefined )
-		THREE.error( "THREE.DotScreenPass relies on THREE.DotScreenShader" );
+		console.error( "THREE.DotScreenPass relies on THREE.DotScreenShader" );
 
 	var shader = THREE.DotScreenShader;
 

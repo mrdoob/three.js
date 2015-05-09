@@ -67,7 +67,7 @@ THREE.BabylonLoader.prototype = {
 
 				var data = json.multiMaterials[ i ];
 
-				THREE.warn( 'THREE.BabylonLoader: Multi materials not yet supported.' );
+				console.warn( 'THREE.BabylonLoader: Multi materials not yet supported.' );
 
 				materials[ data.id ] = new THREE.MeshPhongMaterial();
 
