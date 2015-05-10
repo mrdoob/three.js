@@ -796,6 +796,11 @@ THREE.Geometry.prototype = {
 		return diff;
 
 	},
+	
+	updateVertices : function(iterator){
+		this.vertices.forEach(iterator);
+		this.verticesNeedUpdate = false;
+	},
 
 	toJSON: function () {
 
