@@ -799,7 +799,7 @@ THREE.Geometry.prototype = {
 	
 	updateVertices : function(iterator){
 		this.vertices.forEach(iterator);
-		this.verticesNeedUpdate = false;
+		this.verticesNeedUpdate = true;
 	},
 
 	toJSON: function () {
