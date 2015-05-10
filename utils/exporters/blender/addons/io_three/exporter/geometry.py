@@ -260,6 +260,15 @@ class Geometry(base_classes.BaseNode):
             else:
                 logger.info("No animation data found for %s", self.node)
 
+        option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
+
+        if option_extra_vgroups:
+            patterns = option_extra_vgroups
+            for i in range(
+                    api.mesh.extra_vertex_group_count(self.node, patterns)):
+                name = api.mesh.extra_vertex_group_name(self.node, patterns, i)
+                components.append(name)
+
         for component in components:
             try:
                 data[component] = self[component]
@@ -363,6 +372,7 @@ class Geometry(base_classes.BaseNode):
         options_vertices = self.options.get(constants.VERTICES)
         option_normals = self.options.get(constants.NORMALS)
         option_uvs = self.options.get(constants.UVS)
+        option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
 
         pos_tuple = (constants.POSITION, options_vertices,
                      api.mesh.buffer_position, 3)
@@ -387,6 +397,29 @@ class Geometry(base_classes.BaseNode):
                 constants.TYPE: constants.FLOAT_32,
                 constants.ARRAY: array
             }
+
+        if option_extra_vgroups:
+
+            patterns = option_extra_vgroups
+
+            for i in range(
+                    api.mesh.extra_vertex_group_count(self.node, patterns)):
+
+                key = api.mesh.extra_vertex_group_name(self.node, patterns, i)
+                array = api.mesh.buffer_extra_vertex_group(self.node, patterns, i)
+
+                if not array:
+                    logger.warning("No array could be made for %s", key)
+                    continue
+
+                logger.info("Exporting extra vertex group %s", key)
+
+                self[constants.ATTRIBUTES][key] = {
+                    constants.ITEM_SIZE: 1,
+                    constants.TYPE: constants.FLOAT_32,
+                    constants.ARRAY: array
+                }
+
 
     def _parse_geometry(self):
         """Parse the geometry to Three.Geometry specs"""
@@ -448,3 +481,18 @@ class Geometry(base_classes.BaseNode):
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
                 self.node, self.options) or []
+
+        # In the moment there is no way to add extra data to a Geomtry in
+        # Three.js. In case it does some day, here is the code:
+        #
+        # option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
+        # if option_extra_vgroups:
+        #
+        #     patterns = option_extra_vgroups
+        #     for i in range(
+        #             api.mesh.extra_vertex_group_count(self.node, patterns)):
+        #
+        #         key = api.mesh.extra_vertex_group_name(self.node, patterns, i)
+        #         logger.info("Exporting extra vertex group %s", key)
+        #         self[key] = api.mesh.extra_vertex_group(self.node, patterns, i)
+

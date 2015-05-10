@@ -5,6 +5,7 @@ morph targets) with the geometry nodes.
 """
 
 import operator
+import re
 from bpy import data, types, context
 from . import material, texture, animation
 from . import object as object_
@@ -175,6 +176,124 @@ def buffer_uv(mesh):
         uvs_.extend(uv_tuple)
 
     return uvs_
+
+
+@_mesh
+def extra_vertex_group_count(mesh, patterns):
+    """
+    Return the number of non-skinning vertex groups that match a list
+    of comma-separated strings with star character wildcards.
+
+    :param mesh:
+    :param patterns:
+
+    """
+    return len(_extra_vertex_groups(mesh, patterns))
+
+
+@_mesh
+def extra_vertex_group_name(mesh, patterns, index):
+    """
+    Return the name of an extra vertex group.
+
+    :param mesh:
+    :param patterns:
+    :param index:
+
+    """
+
+    obj = object_.objects_using_mesh(mesh)[0]
+    extra_vgroups = _extra_vertex_groups(mesh, patterns)
+    return obj.vertex_groups[extra_vgroups[index]].name
+
+
+@_mesh
+def extra_vertex_group(mesh, patterns, index):
+    """
+    Return (indexed) data of an extra vertex group.
+
+    :param mesh:
+    :param patterns:
+    :param index:
+
+    """
+    data = []
+    extra_vgroups = _extra_vertex_groups(mesh, patterns)
+    group_index = extra_vgroups[index]
+    for vertex in mesh.vertices:
+        weight = None
+        for group in vertex.groups:
+            if group.group == group_index:
+                weight = group.weight
+        data.append(weight or 0.0)
+    return data
+
+
+@_mesh
+def buffer_extra_vertex_group(mesh, patterns, index):
+    """
+    Return a buffer of the values within an extra vertex group.
+
+    :param mesh:
+    :param patterns:
+    :param index:
+
+    """
+    data = []
+    extra_vgroups = _extra_vertex_groups(mesh, patterns)
+    group_index = extra_vgroups[index]
+    for face in mesh.tessfaces:
+        for vertex_index in face.vertices:
+            vertex = mesh.vertices[vertex_index]
+            weight = None
+            for group in vertex.groups:
+                if group.group == group_index:
+                    weight = group.weight
+            data.append(weight or 0.0)
+    return data
+
+
+def _extra_vertex_groups(mesh, patterns):
+    """
+
+    :param mesh:
+    :param patterns:
+
+    """
+    logger.debug("mesh._extra_vertex_groups(%s)", mesh)
+    pattern_re = None
+    extra_vgroups = []
+    if not patterns.strip():
+        return extra_vgroups
+    armature = _armature(mesh)
+    obj = object_.objects_using_mesh(mesh)[0]
+    for vgroup_index, vgroup in enumerate(obj.vertex_groups):
+        # Skip bone weights:
+        vgroup_name = vgroup.name
+        if armature:
+            is_bone_weight=False
+            for bone in armature.pose.bones:
+                if bone.name == vgroup_name:
+                    is_bone_weight=True
+                    break
+            if (is_bone_weight):
+                continue
+
+        if pattern_re is None:
+            # Translate user-friendly patterns to a regular expression:
+            # Join the whitespace-stripped, initially comma-separated
+            # entries to alternatives. Escape all characters except
+            # the star and replace that one with '.*?'.
+            pattern_re = '^(?:' + '|'.join(
+                map(lambda entry:
+                    '.*?'.join(map(re.escape, entry.strip().split('*'))),
+                patterns.split(',')) ) + ')$'
+
+        if not re.match(pattern_re, vgroup_name):
+            continue
+
+        extra_vgroups.append(vgroup_index)
+    return extra_vgroups
 
 
 @_mesh

@@ -47,6 +47,7 @@ UVS = 'uvs'
 APPLY_MODIFIERS = 'applyModifiers'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
+EXTRA_VGROUPS = 'extraVertexGroups'
 SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
@@ -98,6 +99,7 @@ EXPORT_OPTIONS = {
     UVS: True,
     APPLY_MODIFIERS: True,
     COLORS: False,
+    EXTRA_VGROUPS: '',
     MATERIALS: False,
     FACE_MATERIALS: False,
     SCALE: 1,
