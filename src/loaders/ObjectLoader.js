@@ -320,7 +320,7 @@ THREE.ObjectLoader.prototype = {
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
 				var image = json[ i ];
-				images[ image.uuid ] = loadImage( image.src );
+				images[ image.uuid ] = loadImage( image.url );
 
 			}
 

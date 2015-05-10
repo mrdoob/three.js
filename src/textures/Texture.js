@@ -146,7 +146,7 @@ THREE.Texture.prototype = {
 
 				}
 
-				meta.images[ this.image.uuid ] = { uuid: this.image.uuid, src: src };
+				meta.images[ this.image.uuid ] = { uuid: this.image.uuid, url: src };
 
 			}
 
