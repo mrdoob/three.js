@@ -299,7 +299,7 @@ class Geometry(base_classes.BaseNode):
             metadata[key] = len(array)/size
 
     def _geometry_metadata(self, metadata):
-        """Three.Geometry metadat
+        """Three.Geometry metadata
 
         :rtype: dict
 
