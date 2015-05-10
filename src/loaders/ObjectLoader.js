@@ -295,7 +295,7 @@ THREE.ObjectLoader.prototype = {
 
 	parseConstant: function ( json ) {
 
-		return typeof( json ) === 'number' ? json : THREE[json];
+		return typeof( json ) === 'number' ? json : THREE[ json ];
 
 	},
 
