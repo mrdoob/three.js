@@ -604,7 +604,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Type",
         description="Geometry type",
         items=_geometry_types()[1:],
-        default=constants.GEOMETRY)
+        default=constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
 
     option_export_scene = BoolProperty(
         name="Scene",
