@@ -143,8 +143,6 @@ THREE.BufferGeometry.prototype = {
 
 	setFromObject: function ( object ) {
 
-		console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
-
 		var geometry = object.geometry;
 		var material = object.material;
 
@@ -163,7 +161,6 @@ THREE.BufferGeometry.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for THREE.SkinnedMesh.', geometry );
 					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
 
 				}
