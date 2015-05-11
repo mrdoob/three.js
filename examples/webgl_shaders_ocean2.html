@@ -40,7 +40,9 @@
 		<script src="js/Ocean.js"></script>
 
 		<script>
-			var stats;
+			var stats = new Stats();
+			document.body.appendChild( stats.domElement );
+
 			var lastTime = (new Date()).getTime();
 
 			var types = { 'float': 'half-float', 'half-float': 'float' };
@@ -48,59 +50,7 @@
 			if (!(hash in types)) hash = 'half-float';
 
 			document.getElementById('type-status').innerHTML = hash;
-			document.getElementById('change-type').innerHTML =
-				'<a href="#" onclick="return change(\'' + types[hash] + '\')">' + types[hash] + '</a>';
-
-			var WINDOW = {
-				ms_Width: 0,
-				ms_Height: 0,
-				ms_Callbacks: {
-					70: "WINDOW.ToggleFullScreen()",		// Toggle fullscreen
-				},
-
-				Initialize: function () {
-					this.UpdateSize();
-
-					stats = new Stats();
-					document.body.appendChild( stats.domElement );
-
-					// Create callbacks from keyboard
-					document.onkeydown = function (inEvent) { WINDOW.CallAction(inEvent.keyCode); };
-					window.onresize = function (inEvent) {
-						WINDOW.UpdateSize();
-						WINDOW.ResizeCallback(WINDOW.ms_Width, WINDOW.ms_Height);
-					};
-				},
-				UpdateSize: function () {
-					this.ms_Width = window.outerWidth;
-					this.ms_Height = window.outerHeight - 4;
-				},
-				CallAction: function (inId) {
-					if (inId in this.ms_Callbacks) {
-						eval(this.ms_Callbacks[inId]);
-						return false;
-					}
-				},
-				ToggleFullScreen: function () {
-					if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
-						if (document.documentElement.requestFullscreen)
-							document.documentElement.requestFullscreen();
-						else if (document.documentElement.mozRequestFullScreen)
-							document.documentElement.mozRequestFullScreen();
-						else if (document.documentElement.webkitRequestFullscreen)
-							document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-					}
-					else {
-						if (document.cancelFullScreen)
-							document.cancelFullScreen();
-						else if (document.mozCancelFullScreen)
-							document.mozCancelFullScreen();
-						else if (document.webkitCancelFullScreen)
-							document.webkitCancelFullScreen();
-					}
-				},
-				ResizeCallback: function (inWidth, inHeight) { },
-			};
+			document.getElementById('change-type').innerHTML = '<a href="#" onclick="return change(\'' + types[hash] + '\')">' + types[hash] + '</a>';
 
 			var lastTime = (new Date()).getTime();
 
@@ -129,7 +79,7 @@
 
 					this.ms_Scene = new THREE.Scene();
 
-					this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 300000);
+					this.ms_Camera = new THREE.PerspectiveCamera(55.0, window.innerWidth / window.innerHeight, 0.5, 300000);
 					this.ms_Camera.position.set(450, 350, 450);
 					this.ms_Camera.lookAt(new THREE.Vector3());
 
@@ -246,12 +196,12 @@
 				}
 			};
 
-			WINDOW.Initialize();
-
 			DEMO.Initialize();
 
-			WINDOW.ResizeCallback = function (inWidth, inHeight) { DEMO.Resize(inWidth, inHeight); };
-			DEMO.Resize(WINDOW.ms_Width, WINDOW.ms_Height);
+			window.addEventListener( 'resize', function () {
+				DEMO.Resize(window.innerWidth, window.innerHeight);
+			} );
+			DEMO.Resize(window.innerWidth, window.innerHeight);
 
 			var render = function () {
 
