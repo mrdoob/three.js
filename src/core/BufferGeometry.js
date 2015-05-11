@@ -150,11 +150,11 @@ THREE.BufferGeometry.prototype = {
 
 		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
 
-			var positions = new Float32Array( geometry.vertices.length * 3 );
-			var colors = new Float32Array( geometry.colors.length * 3 );
+			var positions = new THREE.Float32Attribute( geometry.vertices.length * 3, 3 );
+			var colors = new THREE.Float32Attribute( geometry.colors.length * 3, 3 );
 
-			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
+			this.addAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
 			this.computeBoundingSphere();
 
 		} else if ( object instanceof THREE.Mesh ) {
@@ -168,11 +168,12 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-				var skinIndices = new Float32Array( geometry.skinIndices.length * 4 );
-				var skinWeights = new Float32Array( geometry.skinWeights.length * 4 );
+				var skinIndices = new THREE.Float32Attribute( geometry.skinIndices.length * 4, 4 );
+				var skinWeights = new THREE.Float32Attribute( geometry.skinWeights.length * 4, 4 );
 
-				this.addAttribute( 'skinIndex', new THREE.BufferAttribute( skinIndices, 4 ).copyVector4sArray( geometry.skinIndices ) );
-				this.addAttribute( 'skinWeight', new THREE.BufferAttribute( skinWeights, 4 ).copyVector4sArray( geometry.skinWeights ) );
+				this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+				this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+
 
 			}
 
@@ -202,18 +203,15 @@ THREE.BufferGeometry.prototype = {
 				switch ( type ) {
 
 					case "f":
-						var floats = new Float32Array( array.length );
-						this.addAttribute( name, new THREE.BufferAttribute( floats, 1 ).copyArray( array ) );
+						this.addAttribute( name, new THREE.Float32Attribute( array.length, 1 ).copyArray( array ) );
 						break;
 
 					case "c":
-						var colors = new Float32Array( array.length * 3 );
-						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyColorsArray( array ) );
+						this.addAttribute( name, new THREE.Float32Attribute( array.length * 3, 3 ).copyColorsArray( array ) );
 						break;
 
 					case "v3":
-						var colors = new Float32Array( array.length * 3 );
-						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( array ) );
+						this.addAttribute( name, new THREE.Float32Attribute( array.length * 3, 3 ).copyVector3sArray( array ) );
 						break;
 
 					default:
