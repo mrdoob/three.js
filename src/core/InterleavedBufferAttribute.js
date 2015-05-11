@@ -17,6 +17,13 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 	get length() {
 
+		THREE.warn( 'THREE.InterleavedBufferAttribute.length has been removed. Use THREE.InterleavedBufferAttribute.count instead.' );
+		return this.count;
+
+	},
+
+	get count() {
+
 		return this.data.array.length / this.data.stride;
 
 	},
