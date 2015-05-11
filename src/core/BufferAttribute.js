@@ -17,7 +17,7 @@ THREE.BufferAttribute.prototype = {
 
 	get length () {
 
-		THREE.warn( 'THREE.BufferAttribute.length has been removed. Use THREE.BufferAttribute.count instead.' );
+		console.warn( 'THREE.BufferAttribute: .length has been renamed to .count.' );
 		return this.count;
 
 	},
