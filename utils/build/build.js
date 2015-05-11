@@ -36,7 +36,7 @@ function main() {
 	var sources = []; // used for source maps with minification
 
 	if ( args.amd ){
-		buffer.push('function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
+		buffer.push('(function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [ \'exports\' ], factory );\n\n\t} else if ( typeof exports === \'object\' ) {\n\n\t\tfactory( exports );\n\n\t} else {\n\n\t\tfactory( root );\n\n\t}\n\n}( this, function ( exports ) {\n\n');
 	};
 	
 	for ( var i = 0; i < args.include.length; i ++ ){
@@ -69,7 +69,7 @@ function main() {
 	}
 	
 	if ( args.amd ){
-		buffer.push('exports.THREE = THREE;\n\n} ) );');
+		buffer.push('return (exports.THREE = THREE);\n\n} ) );');
 	};
 	
 	var temp = buffer.join( '' );

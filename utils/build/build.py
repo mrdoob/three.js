@@ -67,7 +67,7 @@ def main(argv=None):
 					tmp.write(u'\n')
 
 	if args.amd:
-		tmp.write('exports.THREE = THREE;\n\n} ) );')
+		tmp.write('return (exports.THREE = THREE);\n\n} ) );')
 
 	tmp.close()
 
