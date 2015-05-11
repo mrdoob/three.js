@@ -330,6 +330,8 @@ def extract_mesh(obj, options, recalculate=False):
     """
     logger.debug('object.extract_mesh(%s, %s)', obj, options)
     apply_modifiers = options.get(constants.APPLY_MODIFIERS, True)
+    if apply_modifiers:
+        bpy.ops.object.mode_set(mode='OBJECT')
     mesh_node = obj.to_mesh(context.scene, apply_modifiers, RENDER)
 
     # transfer the geometry type to the extracted mesh
@@ -350,6 +352,7 @@ def extract_mesh(obj, options, recalculate=False):
                      original_mesh.name,
                      mesh_node.name)
 
+        bpy.ops.object.mode_set(mode='OBJECT')
         obj.select = True
         bpy.context.scene.objects.active = obj
         logger.info('Applying triangulation to %s', obj.data.name)

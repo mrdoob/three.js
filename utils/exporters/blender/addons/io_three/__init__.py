@@ -312,6 +312,10 @@ def restore_export_settings(properties, settings):
     properties.option_geometry_type = settings.get(
         constants.GEOMETRY_TYPE,
         constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
+
+    properties.option_index_type = settings.get(
+        constants.INDEX_TYPE,
+        constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
     ## }
 
     ## Materials {
@@ -435,6 +439,7 @@ def set_settings(properties):
         constants.EXTRA_VGROUPS: properties.option_extra_vgroups,
         constants.APPLY_MODIFIERS: properties.option_apply_modifiers,
         constants.GEOMETRY_TYPE: properties.option_geometry_type,
+        constants.INDEX_TYPE: properties.option_index_type,
 
         constants.MATERIALS: properties.option_materials,
         constants.UVS: properties.option_uv_coords,
@@ -576,6 +581,17 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS]
     )
 
+    index_buffer_types = [
+        (constants.NONE,) * 3,
+        (constants.UINT_16,) * 3,
+        (constants.UINT_32,) * 3]
+
+    option_index_type = EnumProperty(
+        name="Index Buffer",
+        description="Index buffer type that will be used for BufferGeometry objects.",
+        items=index_buffer_types,
+        default=constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
+
     option_scale = FloatProperty(
         name="Scale",
         description="Scale vertices",
@@ -614,7 +630,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Type",
         description="Geometry type",
         items=_geometry_types()[1:],
-        default=constants.GEOMETRY)
+        default=constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
 
     option_export_scene = BoolProperty(
         name="Scene",
@@ -781,6 +797,8 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
 
+        row = layout.row()
+        row.prop(self.properties, 'option_index_type')
         ## }
 
         layout.separator()

@@ -48,6 +48,11 @@ APPLY_MODIFIERS = 'applyModifiers'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
 EXTRA_VGROUPS = 'extraVertexGroups'
+INDEX = 'index'
+DRAW_CALLS = 'offsets'
+DC_START = 'start'
+DC_COUNT = 'count'
+DC_INDEX = 'index'
 SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
@@ -78,6 +83,7 @@ GLOBAL = 'global'
 BUFFER_GEOMETRY = 'BufferGeometry'
 GEOMETRY = 'geometry'
 GEOMETRY_TYPE = 'geometryType'
+INDEX_TYPE = 'indexType'
 
 CRITICAL = 'critical'
 ERROR = 'error'
@@ -90,6 +96,10 @@ MSGPACK = 'msgpack'
 
 PACK = 'pack'
 
+FLOAT_32 = 'Float32Array'
+UINT_16 = 'Uint16Array'
+UINT_32 = 'Uint32Array'
+
 INFLUENCES_PER_VERTEX = 'influencesPerVertex'
 
 EXPORT_OPTIONS = {
@@ -100,6 +110,7 @@ EXPORT_OPTIONS = {
     APPLY_MODIFIERS: True,
     COLORS: False,
     EXTRA_VGROUPS: '',
+    INDEX_TYPE: UINT_16,
     MATERIALS: False,
     FACE_MATERIALS: False,
     SCALE: 1,
@@ -188,8 +199,6 @@ ATTRIBUTES = 'attributes'
 NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
 ARRAY = 'array'
-
-FLOAT_32 = 'Float32Array'
 
 VISIBLE = 'visible'
 CAST_SHADOW = 'castShadow'

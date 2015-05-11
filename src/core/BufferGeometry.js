@@ -316,8 +316,6 @@ THREE.BufferGeometry.prototype = {
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
-		var hasFaceVertexNormals = faces[ 0 ] && faces[ 0 ].vertexNormals.length === 3;
-
 		var positions = new Float32Array( faces.length * 3 * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
@@ -365,11 +363,13 @@ THREE.BufferGeometry.prototype = {
 			positions[ i3 + 7 ] = c.y;
 			positions[ i3 + 8 ] = c.z;
 
-			if ( hasFaceVertexNormals === true ) {
+			var vertexNormals = face.vertexNormals;
 
-				var na = face.vertexNormals[ 0 ];
-				var nb = face.vertexNormals[ 1 ];
-				var nc = face.vertexNormals[ 2 ];
+			if ( vertexNormals.length === 3 ) {
+
+				var na = vertexNormals[ 0 ];
+				var nb = vertexNormals[ 1 ];
+				var nc = vertexNormals[ 2 ];
 
 				normals[ i3     ] = na.x;
 				normals[ i3 + 1 ] = na.y;
