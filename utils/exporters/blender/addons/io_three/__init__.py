@@ -38,7 +38,7 @@ logging.basicConfig(
 
 bl_info = {
     'name': "Three.js Format",
-    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa",
+    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa, tschw",
     'version': (1, 4, 0),
     'blender': (2, 7, 3),
     'location': "File > Export",
@@ -308,6 +308,10 @@ def restore_export_settings(properties, settings):
     properties.option_geometry_type = settings.get(
         constants.GEOMETRY_TYPE,
         constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
+
+    properties.option_index_type = settings.get(
+        constants.INDEX_TYPE,
+        constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
     ## }
 
     ## Materials {
@@ -430,6 +434,7 @@ def set_settings(properties):
         constants.BONES: properties.option_bones,
         constants.APPLY_MODIFIERS: properties.option_apply_modifiers,
         constants.GEOMETRY_TYPE: properties.option_geometry_type,
+        constants.INDEX_TYPE: properties.option_index_type,
 
         constants.MATERIALS: properties.option_materials,
         constants.UVS: properties.option_uv_coords,
@@ -565,6 +570,17 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Apply Modifiers to mesh objects",
         default=constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS]
     )
+
+    index_buffer_types = [
+        (constants.NONE,) * 3,
+        (constants.UINT_16,) * 3,
+        (constants.UINT_32,) * 3]
+
+    option_index_type = EnumProperty(
+        name="Index Buffer",
+        description="Index buffer type that will be used for BufferGeometry objects.",
+        items=index_buffer_types,
+        default=constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
 
     option_scale = FloatProperty(
         name="Scale",
@@ -768,6 +784,8 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
 
+        row = layout.row()
+        row.prop(self.properties, 'option_index_type')
         ## }
 
         layout.separator()
