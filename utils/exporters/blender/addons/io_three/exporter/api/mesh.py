@@ -179,91 +179,22 @@ def buffer_uv(mesh):
 
 
 @_mesh
-def extra_vertex_group_count(mesh, patterns):
+def extra_vertex_groups(mesh, patterns_string):
     """
-    Return the number of non-skinning vertex groups that match a list
-    of comma-separated strings with star character wildcards.
+    Returns (name,index) tuples for the extra (non-skinning) vertex groups
+    matching the given patterns.
+    The patterns are comma-separated where the star character can be used
+    as a wildcard character sequence.
 
     :param mesh:
-    :param patterns:
-
-    """
-    return len(_extra_vertex_groups(mesh, patterns))
-
-
-@_mesh
-def extra_vertex_group_name(mesh, patterns, index):
-    """
-    Return the name of an extra vertex group.
-
-    :param mesh:
-    :param patterns:
-    :param index:
-
-    """
-
-    obj = object_.objects_using_mesh(mesh)[0]
-    extra_vgroups = _extra_vertex_groups(mesh, patterns)
-    return obj.vertex_groups[extra_vgroups[index]].name
-
-
-@_mesh
-def extra_vertex_group(mesh, patterns, index):
-    """
-    Return (indexed) data of an extra vertex group.
-
-    :param mesh:
-    :param patterns:
-    :param index:
-
-    """
-    data = []
-    extra_vgroups = _extra_vertex_groups(mesh, patterns)
-    group_index = extra_vgroups[index]
-    for vertex in mesh.vertices:
-        weight = None
-        for group in vertex.groups:
-            if group.group == group_index:
-                weight = group.weight
-        data.append(weight or 0.0)
-    return data
-
-
-@_mesh
-def buffer_extra_vertex_group(mesh, patterns, index):
-    """
-    Return a buffer of the values within an extra vertex group.
-
-    :param mesh:
-    :param patterns:
-    :param index:
-
-    """
-    data = []
-    extra_vgroups = _extra_vertex_groups(mesh, patterns)
-    group_index = extra_vgroups[index]
-    for face in mesh.tessfaces:
-        for vertex_index in face.vertices:
-            vertex = mesh.vertices[vertex_index]
-            weight = None
-            for group in vertex.groups:
-                if group.group == group_index:
-                    weight = group.weight
-            data.append(weight or 0.0)
-    return data
-
-
-def _extra_vertex_groups(mesh, patterns):
-    """
-
-    :param mesh:
-    :param patterns:
+    :param patterns_string:
+    :rtype: []
 
     """
     logger.debug("mesh._extra_vertex_groups(%s)", mesh)
     pattern_re = None
     extra_vgroups = []
-    if not patterns.strip():
+    if not patterns_string.strip():
         return extra_vgroups
     armature = _armature(mesh)
     obj = object_.objects_using_mesh(mesh)[0]
@@ -287,13 +218,55 @@ def _extra_vertex_groups(mesh, patterns):
             pattern_re = '^(?:' + '|'.join(
                 map(lambda entry:
                     '.*?'.join(map(re.escape, entry.strip().split('*'))),
-                patterns.split(',')) ) + ')$'
+                patterns_string.split(',')) ) + ')$'
 
         if not re.match(pattern_re, vgroup_name):
             continue
 
-        extra_vgroups.append(vgroup_index)
+        extra_vgroups.append( (vgroup_name, vgroup_index) )
     return extra_vgroups
+
+
+@_mesh
+def vertex_group_data(mesh, index):
+    """
+    Return vertex group data for each vertex. Vertices not in the group
+    get a zero value.
+
+    :param mesh:
+    :param index:
+
+    """
+    data = []
+    for vertex in mesh.vertices:
+        weight = None
+        for group in vertex.groups:
+            if group.group == index:
+                weight = group.weight
+        data.append(weight or 0.0)
+    return data
+
+
+@_mesh
+def buffer_vertex_group_data(mesh, index):
+    """
+    Return vertex group data for each deindexed vertex. Vertices not in the
+    group get a zero value.
+
+    :param mesh:
+    :param index:
+
+    """
+    data = []
+    for face in mesh.tessfaces:
+        for vertex_index in face.vertices:
+            vertex = mesh.vertices[vertex_index]
+            weight = None
+            for group in vertex.groups:
+                if group.group == index:
+                    weight = group.weight
+            data.append(weight or 0.0)
+    return data
 
 
 @_mesh

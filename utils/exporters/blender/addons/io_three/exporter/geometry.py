@@ -263,12 +263,9 @@ class Geometry(base_classes.BaseNode):
 
         option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
 
-        if option_extra_vgroups:
-            patterns = option_extra_vgroups
-            for i in range(
-                    api.mesh.extra_vertex_group_count(self.node, patterns)):
-                name = api.mesh.extra_vertex_group_name(self.node, patterns, i)
-                components.append(name)
+        for name, index in api.mesh.extra_vertex_groups(self.node,
+                                                        option_extra_vgroups):
+            components.append(name);
 
         for component in components:
             try:
@@ -407,27 +404,21 @@ class Geometry(base_classes.BaseNode):
                 constants.ARRAY: array
             }
 
-        if option_extra_vgroups:
+        for name, index in api.mesh.extra_vertex_groups(self.node,
+                                                        option_extra_vgroups):
 
-            patterns = option_extra_vgroups
+            logger.info("Exporting extra vertex group %s", name)
 
-            for i in range(
-                    api.mesh.extra_vertex_group_count(self.node, patterns)):
+            array = api.mesh.buffer_vertex_group_data(self.node, index)
+            if not array:
+                logger.warning("No array could be made for %s", name)
+                continue
 
-                key = api.mesh.extra_vertex_group_name(self.node, patterns, i)
-                array = api.mesh.buffer_extra_vertex_group(self.node, patterns, i)
-
-                if not array:
-                    logger.warning("No array could be made for %s", key)
-                    continue
-
-                logger.info("Exporting extra vertex group %s", key)
-
-                self[constants.ATTRIBUTES][key] = {
-                    constants.ITEM_SIZE: 1,
-                    constants.TYPE: constants.FLOAT_32,
-                    constants.ARRAY: array
-                }
+            self[constants.ATTRIBUTES][name] = {
+                constants.ITEM_SIZE: 1,
+                constants.TYPE: constants.FLOAT_32,
+                constants.ARRAY: array
+            }
 
         if option_index_type != constants.NONE:
 
@@ -573,16 +564,12 @@ class Geometry(base_classes.BaseNode):
                 self.node, self.options) or []
 
         # In the moment there is no way to add extra data to a Geomtry in
-        # Three.js. In case it does some day, here is the code:
+        # Three.js. In case there is some day, here is the code:
         #
         # option_extra_vgroups = self.options.get(constants.EXTRA_VGROUPS)
-        # if option_extra_vgroups:
         #
-        #     patterns = option_extra_vgroups
-        #     for i in range(
-        #             api.mesh.extra_vertex_group_count(self.node, patterns)):
+        # for name, index in api.mesh.extra_vertex_groups(self.node,
+        #                                                 option_extra_vgroups):
         #
-        #         key = api.mesh.extra_vertex_group_name(self.node, patterns, i)
-        #         logger.info("Exporting extra vertex group %s", key)
-        #         self[key] = api.mesh.extra_vertex_group(self.node, patterns, i)
-
+        #         logger.info("Exporting extra vertex group %s", name)
+        #         self[name] = api.mesh.vertex_group_data(self.node, index)
