@@ -13,7 +13,7 @@ THREE.OBJExporter.prototype = {
 		var output = '';
 
 		var indexVertex = 0;
-		var indexVertexUvs = 0
+		var indexVertexUvs = 0;
 		var indexNormals = 0;
 
 		var parseObject = function ( child ) {
@@ -41,21 +41,34 @@ THREE.OBJExporter.prototype = {
 
 				// uvs
 
-				for ( var i = 0, l = geometry.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+				if (geometry.faceVertexUvs[ 0 ].length == geometry.faces.length) {
+					
+					for ( var i = 0, l = geometry.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
 
-					var vertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
+						var vertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
 
-					for ( var j = 0; j < vertexUvs.length; j ++ ) {
+						for ( var j = 0; j < vertexUvs.length; j ++ ) {
 
-						var uv = vertexUvs[ j ];
-						vertex.applyMatrix4( child.matrixWorld );
+							var uv = vertexUvs[ j ];
+							vertex.applyMatrix4( child.matrixWorld );
 
-						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+							output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
-						nbVertexUvs ++;
+							nbVertexUvs ++;
+
+						}
 
 					}
+					
+				} else {
+					
+					for ( var i = 0, l = geometry.faces.length * 3; i < l; i ++ ) {
 
+						output += 'vt 0 0\n';
+						nbVertexUvs ++;
+						
+					}
+					
 				}
 
 				// normals
@@ -64,13 +77,29 @@ THREE.OBJExporter.prototype = {
 
 					var normals = geometry.faces[ i ].vertexNormals;
 
-					for ( var j = 0; j < normals.length; j ++ ) {
+					if (normals.length == 3) {
 
-						var normal = normals[ j ];
-						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+						for ( var j = 0; j < normals.length; j ++ ) {
 
-						nbNormals ++;
+							var normal = normals[ j ];
+							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
 
+							nbNormals ++;
+
+						}
+						
+					} else {
+						
+						var normal = geometry.faces[ i ].normal;
+						
+						for ( var j = 0; j < 3; j ++ ) {
+
+							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
+
+							nbNormals ++;
+
+						}										
+						
 					}
 
 				}
