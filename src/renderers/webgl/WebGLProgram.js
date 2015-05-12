@@ -4,15 +4,15 @@ THREE.WebGLProgram = ( function () {
 
 	function generateDefines( defines ) {
 
-		var value, chunk, chunks = [];
+		var chunks = [];
 
-		for ( var d in defines ) {
+		for ( var name in defines ) {
 
-			value = defines[ d ];
+			var value = defines[ name ];
+
 			if ( value === false ) continue;
 
-			chunk = '#define ' + d + ' ' + value;
-			chunks.push( chunk );
+			chunks.push( '#define ' + name + ' ' + value );
 
 		}
 
@@ -50,7 +50,7 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function programArrayToString ( previousValue, currentValue, index, array ) {
+	function programArrayToString( previousValue, currentValue, index, array ) {
 
 		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
 
