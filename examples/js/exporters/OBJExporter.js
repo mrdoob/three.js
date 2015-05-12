@@ -45,7 +45,7 @@ THREE.OBJExporter.prototype = {
 
 				var faces = geometry.faces;
 				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-				var hasVertexUvs = (faces.length === faceVertexUvs.length);
+				var hasVertexUvs = faces.length === faceVertexUvs.length;
 
 				if ( hasVertexUvs ) {
 
@@ -53,7 +53,7 @@ THREE.OBJExporter.prototype = {
 
 						var vertexUvs = faceVertexUvs[ i ];
 
-						for ( var j = 0; j < vertexUvs.length; j ++ ) {
+						for ( var j = 0, jl = vertexUvs.length; j < jl; j ++ ) {
 
 							var uv = vertexUvs[ j ];
 
@@ -71,7 +71,7 @@ THREE.OBJExporter.prototype = {
 
 				var normalMatrixWorld = new THREE.Matrix3();
 				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
-				
+
 				for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 					var face = faces[ i ];
@@ -79,10 +79,11 @@ THREE.OBJExporter.prototype = {
 
 					if ( vertexNormals.length === 3 ) {
 
-						for ( var j = 0; j < vertexNormals.length; j ++ ) {
+						for ( var j = 0, jl = vertexNormals.length; j < jl; j ++ ) {
 
-							var normal = vertexNormals[ j ].clone ();
-							normal.applyMatrix3( normalMatrixWorld ).normalize();
+							var normal = vertexNormals[ j ].clone();
+							normal.applyMatrix3( normalMatrixWorld );
+
 							output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
 
 							nbNormals ++;
@@ -91,8 +92,8 @@ THREE.OBJExporter.prototype = {
 
 					} else {
 
-						var normal = face.normal.clone ();
-						normal.applyMatrix3( normalMatrixWorld ).normalize();
+						var normal = face.normal.clone();
+						normal.applyMatrix3( normalMatrixWorld );
 
 						for ( var j = 0; j < 3; j ++ ) {
 
@@ -108,15 +109,15 @@ THREE.OBJExporter.prototype = {
 
 				// faces
 
-				
+
 				for ( var i = 0, j = 1, l = faces.length; i < l; i ++, j += 3 ) {
 
 					var face = faces[ i ];
 
 					output += 'f ';
-					output += ( indexVertex + face.a + 1 ) + '/' + (hasVertexUvs ? ( indexVertexUvs + j ) : '') + '/' + ( indexNormals + j ) + ' ';
-					output += ( indexVertex + face.b + 1 ) + '/' + (hasVertexUvs ? ( indexVertexUvs + j + 1 ) : '') + '/' + ( indexNormals + j + 1 ) + ' ';
-					output += ( indexVertex + face.c + 1 ) + '/' + (hasVertexUvs ? ( indexVertexUvs + j + 2 ) : '') + '/' + ( indexNormals + j + 2 ) + '\n';
+					output += ( indexVertex + face.a + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j     ) : '' ) + '/' + ( indexNormals + j     ) + ' ';
+					output += ( indexVertex + face.b + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 1 ) : '' ) + '/' + ( indexNormals + j + 1 ) + ' ';
+					output += ( indexVertex + face.c + 1 ) + '/' + ( hasVertexUvs ? ( indexVertexUvs + j + 2 ) : '' ) + '/' + ( indexNormals + j + 2 ) + '\n';
 
 				}
 
