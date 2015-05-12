@@ -40,7 +40,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	if ( parameters.attributes !== undefined && Array.isArray( parameters.attributes ) === false ) {
 
-		console.warn( 'THREE.ShaderMaterial: attributes should now be an Array.' );
+		console.warn( 'THREE.ShaderMaterial: attributes should now be an array of attribute names.' );
 		parameters.attributes = Object.keys( parameters.attributes );
 
 	}
