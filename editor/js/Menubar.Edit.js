@@ -46,9 +46,7 @@ Menubar.Edit = function ( editor ) {
 
 		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
-		var parent = object.parent;
-		editor.removeObject( object );
-		editor.select( parent );
+    editor.removeAndReassignObjectToParent(object);
 
 	} );
 	options.add( option );
