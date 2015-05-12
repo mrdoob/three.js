@@ -2092,7 +2092,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// changed glsl or parameters
 			deallocateMaterial( material );
 
-		} else if ( shaderID === undefined ) {
+		} else if ( shaderID !== undefined ) {
 
 			// same glsl
 			return;
