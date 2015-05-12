@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - custom attributes</title>
@@ -90,7 +90,7 @@
 
 		var sphere, uniforms, attributes;
 
-		var noise = [];
+		var noise, displacement, displacementAttribute;
 
 		var WIDTH = window.innerWidth,
 			HEIGHT = window.innerHeight;
@@ -105,11 +105,7 @@
 
 			scene = new THREE.Scene();
 
-			attributes = {
-
-				displacement: {	type: 'f', value: [] }
-
-			};
+			attributes = { displacement: 0 };
 
 			uniforms = {
 
@@ -132,20 +128,27 @@
 
 
 			var radius = 50, segments = 128, rings = 64;
-			var geometry = new THREE.SphereGeometry( radius, segments, rings );
-			geometry.dynamic = true;
+			var geometry = new THREE.SphereBufferGeometry( radius, segments, rings );
 
-			sphere = new THREE.Mesh( geometry, shaderMaterial );
+			var positions = geometry.attributes.position;
+			var vertexCount = positions.length / positions.itemSize;
 
-			var vertices = sphere.geometry.vertices;
-			var values = attributes.displacement.value;
 
-			for ( var v = 0; v < vertices.length; v++ ) {
+			displacement = new Float32Array( vertexCount );
+			noise = new Float32Array( vertexCount );
 
-				values[ v ] = 0;
+			for ( var v = 0, vl = displacement.length; v < vl; v++ ) {
+
+				displacement[v] = 0;
 				noise[ v ] = Math.random() * 5;
 
 			}
+
+			displacementAttribute = new THREE.DynamicBufferAttribute( displacement, 1 );
+
+			geometry.addAttribute( 'displacement', displacementAttribute );
+
+			sphere = new THREE.Mesh( geometry, shaderMaterial );
 
 			scene.add( sphere );
 
@@ -195,18 +198,18 @@
 			uniforms.amplitude.value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
 			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
-			for ( var i = 0; i < attributes.displacement.value.length; i ++ ) {
+			for ( var i = 0, ul = displacement.length; i < ul; i ++ ) {
 
-				attributes.displacement.value[ i ] = Math.sin( 0.1 * i + time );
+				displacement[ i ] = Math.sin( 0.1 * i + time );
 
 				noise[ i ] += 0.5 * ( 0.5 - Math.random() );
 				noise[ i ] = THREE.Math.clamp( noise[ i ], -5, 5 );
 
-				attributes.displacement.value[ i ] += noise[ i ];
+				displacement[ i ] += noise[ i ];
 
 			}
 
-			attributes.displacement.needsUpdate = true;
+			displacementAttribute.needsUpdate = true;
 
 			renderer.render( scene, camera );
 
