@@ -34,7 +34,23 @@ THREE.MaterialLoader.prototype = {
 
 	parse: function ( json ) {
 
-		var material = new THREE[ json.type ];
+		var materialLookup = {
+			Material: THREE.Material,
+			LineBasicMaterial: THREE.LineBasicMaterial,
+			LineDashedMaterial: THREE.LineDashedMaterial,
+			MeshBasicMaterial: THREE.MeshBasicMaterial,
+			MeshDepthMaterial: THREE.MeshDepthMaterial,
+			MeshFaceMaterial: THREE.MeshFaceMaterial,
+			MeshLambertMaterial: THREE.MeshLambertMaterial,
+			MeshNormalMaterial: THREE.MeshNormalMaterial,
+			MeshPhongMaterial: THREE.MeshPhongMaterial,
+			PointCloudMaterial: THREE.PointCloudMaterial,
+			RawShaderMaterial: THREE.RawShaderMaterial,
+			ShaderMaterial: THREE.ShaderMaterial,
+			SpriteMaterial: THREE.SpriteMaterial
+		};
+
+		var material = new materialLookup[ json.type ];
 
 		if ( json.color !== undefined ) material.color.setHex( json.color );
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );

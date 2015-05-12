@@ -86,9 +86,19 @@ THREE.ObjectLoader.prototype = {
 				switch ( data.type ) {
 
 					case 'PlaneGeometry':
+
+						geometry = new THREE.PlaneGeometry(
+							data.width,
+							data.height,
+							data.widthSegments,
+							data.heightSegments
+						);
+
+						break;
+
 					case 'PlaneBufferGeometry':
 
-						geometry = new THREE[ data.type ](
+						geometry = new THREE.PlaneBufferGeometry(
 							data.width,
 							data.height,
 							data.widthSegments,
@@ -332,13 +342,37 @@ THREE.ObjectLoader.prototype = {
 
 	parseTextures: function ( json, images ) {
 
-		function parseConstant( value ) {
+		var filterLookup = {
+			NearestFilter: THREE.NearestFilter,
+			NearestMipMapNearestFilter: THREE.NearestMipMapNearestFilter,
+			NearestMipMapLinearFilter: THREE.NearestMipMapLinearFilter,
+			LinearFilter: THREE.LinearFilter,
+			LinearMipMapNearestFilter: THREE.LinearMipMapNearestFilter,
+			LinearMipMapLinearFilter: THREE.LinearMipMapLinearFilter
+		};
+
+		var wrappingLookup = {
+			RepeatWrapping: THREE.RepeatWrapping,
+			ClampToEdgeWrapping: THREE.ClampToEdgeWrapping,
+			MirroredRepeatWrapping: THREE.MirroredRepeatWrapping
+		};
+
+		var mappingLookup = {
+			UVMapping: THREE.UVMapping,
+			CubeReflectionMapping: THREE.CubeReflectionMapping,
+			CubeRefractionMapping: THREE.CubeRefractionMapping,
+			EquirectangularReflectionMapping: THREE.EquirectangularReflectionMapping,
+			EquirectangularRefractionMapping: THREE.EquirectangularRefractionMapping,
+			SphericalReflectionMapping: THREE.SphericalReflectionMapping
+		};
+
+		function parseConstant( value, lookup ) {
 
 			if ( typeof( value ) === 'number' ) return value;
 
 			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
 
-			return THREE[ value ];
+			return lookup[ value ];
 
 		}
 
@@ -368,15 +402,15 @@ THREE.ObjectLoader.prototype = {
 				texture.uuid = data.uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
-				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping );
+				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, mappingLookup );
 				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
-				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter );
-				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter );
+				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, filterLookup );
+				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, filterLookup );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 				if ( data.wrap instanceof Array ) {
 
-					texture.wrapS = parseConstant( data.wrap[ 0 ] );
-					texture.wrapT = parseConstant( data.wrap[ 1 ] );
+					texture.wrapS = parseConstant( data.wrap[ 0 ], wrappingLookup );
+					texture.wrapT = parseConstant( data.wrap[ 1 ], wrappingLookup );
 
 				}
 

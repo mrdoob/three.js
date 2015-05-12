@@ -108,9 +108,18 @@ THREE.Loader.prototype = {
 		function nearest_pow2( n ) {
 
 			var l = Math.log( n ) / Math.LN2;
-			return Math.pow( 2, Math.round(  l ) );
+			return Math.pow( 2, Math.round( l ) );
 
 		}
+
+		var blendingLookup = {
+			NoBlending: THREE.NoBlending,
+			NormalBlending: THREE.NormalBlending,
+			AdditiveBlending: THREE.AdditiveBlending,
+			SubtractiveBlending: THREE.SubtractiveBlending,
+			MultiplyBlending: THREE.MultiplyBlending,
+			CustomBlending: THREE.CustomBlending
+		};
 
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
@@ -206,7 +215,7 @@ THREE.Loader.prototype = {
 
 		// defaults
 
-		var mtype = 'MeshLambertMaterial';
+		var Material = THREE.MeshLambertMaterial;
 		var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, bumpMap: null, wireframe: false };
 
 		// parameters from model file
@@ -215,14 +224,14 @@ THREE.Loader.prototype = {
 
 			var shading = m.shading.toLowerCase();
 
-			if ( shading === 'phong' ) mtype = 'MeshPhongMaterial';
-			else if ( shading === 'basic' ) mtype = 'MeshBasicMaterial';
+			if ( shading === 'phong' ) Material = THREE.MeshPhongMaterial;
+			else if ( shading === 'basic' ) Material = THREE.MeshBasicMaterial;
 
 		}
 
-		if ( m.blending !== undefined && THREE[ m.blending ] !== undefined ) {
+		if ( m.blending !== undefined && blendingLookup[ m.blending ] !== undefined ) {
 
-			mpars.blending = THREE[ m.blending ];
+			mpars.blending = blendingLookup[ m.blending ];
 
 		}
 
@@ -391,7 +400,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		var material = new THREE[ mtype ]( mpars );
+		var material = new Material( mpars );
 
 		if ( m.DbgName !== undefined ) material.name = m.DbgName;
 
@@ -416,7 +425,7 @@ THREE.Loader.Handlers = {
 		for ( var i = 0, l = this.handlers.length; i < l; i += 2 ) {
 
 			var regex = this.handlers[ i ];
-			var loader  = this.handlers[ i + 1 ];
+			var loader = this.handlers[ i + 1 ];
 
 			if ( regex.test( file ) ) {
 
