@@ -441,9 +441,11 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		for ( var a in attributes ) {
+		// ShaderMaterial attributes
 
-			identifiers.push( a );
+		if ( Array.isArray( attributes ) ) {
+
+			identifiers = identifiers.concat( attributes );
 
 		}
 

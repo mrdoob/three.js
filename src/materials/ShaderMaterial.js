@@ -36,11 +36,12 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
-	// this.attributes = null;
+	this.attributes = [];
 
-	if ( parameters.attributes !== undefined ) {
+	if ( parameters.attributes !== undefined && Array.isArray( parameters.attributes ) === false ) {
 
-		console.warn( 'THREE.ShaderMaterial: Materials no longer support attributes. Use THREE.BufferGeometry attributes instead.' );
+		console.warn( 'THREE.ShaderMaterial: attributes should now be an Array.' );
+		parameters.attributes = Object.keys( parameters.attributes );
 
 	}
 
