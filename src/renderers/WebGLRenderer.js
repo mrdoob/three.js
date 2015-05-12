@@ -1146,7 +1146,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				var position = geometry.attributes['position'];
+				var position = geometry.attributes.position;
 
 				// render non-indexed triangles
 

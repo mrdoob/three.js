@@ -59,6 +59,7 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		return previousValue;
+
 	}
 
 	return function ( renderer, code, material, parameters ) {
