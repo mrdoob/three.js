@@ -415,37 +415,45 @@ THREE.WebGLProgram = ( function () {
 
 		// cache attributes locations
 
-		identifiers = [
+		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			'position',
-			'normal',
-			'uv',
-			'uv2',
-			'tangent',
-			'color',
-			'skinIndex',
-			'skinWeight',
-			'lineDistance'
+			identifiers = attributes;
 
-		];
+		} else {
 
-		for ( var i = 0; i < parameters.maxMorphTargets; i ++ ) {
+			identifiers = [
 
-			identifiers.push( 'morphTarget' + i );
+				'position',
+				'normal',
+				'uv',
+				'uv2',
+				'tangent',
+				'color',
+				'skinIndex',
+				'skinWeight',
+				'lineDistance'
 
-		}
+			];
 
-		for ( var i = 0; i < parameters.maxMorphNormals; i ++ ) {
+			for ( var i = 0; i < parameters.maxMorphTargets; i ++ ) {
 
-			identifiers.push( 'morphNormal' + i );
+				identifiers.push( 'morphTarget' + i );
 
-		}
+			}
 
-		// ShaderMaterial attributes
+			for ( var i = 0; i < parameters.maxMorphNormals; i ++ ) {
 
-		if ( Array.isArray( attributes ) ) {
+				identifiers.push( 'morphNormal' + i );
 
-			identifiers = identifiers.concat( attributes );
+			}
+
+			// ShaderMaterial attributes
+
+			if ( Array.isArray( attributes ) ) {
+
+				identifiers = identifiers.concat( attributes );
+
+			}
 
 		}
 
