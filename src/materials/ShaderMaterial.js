@@ -119,9 +119,9 @@ THREE.ShaderMaterial.prototype.clone = function ( material ) {
 
 };
 
-THREE.ShaderMaterial.prototype.toJSON = function () {
+THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Material.prototype.toJSON.call( this );
+	var data = THREE.Material.prototype.toJSON.call( this, meta );
 
 	data.uniforms = this.uniforms;
 	data.attributes = this.attributes;

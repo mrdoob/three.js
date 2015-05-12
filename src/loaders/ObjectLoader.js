@@ -293,6 +293,12 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
+	parseConstant: function ( json ) {
+
+		return typeof( json ) === 'number' ? json : THREE[ json ];
+
+	},
+
 	parseImages: function ( json, onLoad ) {
 
 		var scope = this;
@@ -358,15 +364,15 @@ THREE.ObjectLoader.prototype = {
 				texture.uuid = data.uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
-				if ( data.mapping !== undefined ) texture.mapping = data.mapping;
+				if ( data.mapping !== undefined ) texture.mapping = this.parseConstant( data.mapping );
 				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
-				if ( data.minFilter !== undefined ) texture.minFilter = THREE[ data.minFilter ];
-				if ( data.magFilter !== undefined ) texture.magFilter = THREE[ data.magFilter ];
+				if ( data.minFilter !== undefined ) texture.minFilter = this.parseConstant( data.minFilter );
+				if ( data.magFilter !== undefined ) texture.magFilter = this.parseConstant( data.magFilter );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 				if ( data.wrap instanceof Array ) {
 
-					texture.wrapS = THREE[ data.wrap[ 0 ] ];
-					texture.wrapT = THREE[ data.wrap[ 1 ] ];
+					texture.wrapS = this.parseConstant( data.wrap[ 0 ] );
+					texture.wrapT = this.parseConstant( data.wrap[ 1 ] );
 
 				}
 

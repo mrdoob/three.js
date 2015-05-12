@@ -109,8 +109,19 @@ THREE.Texture.prototype = {
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},
+
 			uuid: this.uuid,
-			mapping: this.mapping
+			name: this.name,
+
+			mapping: this.mapping,
+
+			repeat: [ this.repeat.x, this.repeat.y ],
+			offset: [ this.offset.x, this.offset.y ],
+			wrap: [ this.wrapS, this.wrapT ],
+
+			minFilter: this.minFilter,
+			magFilter: this.magFilter,
+			anisotropy: this.anisotropy
 		};
 
 		if ( this.image !== undefined ) {
