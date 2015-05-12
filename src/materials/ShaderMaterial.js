@@ -36,7 +36,13 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
-	this.attributes = null;
+	// this.attributes = null;
+
+	if ( parameters.attributes !== undefined ) {
+
+		console.warn( 'THREE.ShaderMaterial: Materials no longer support attributes. Use THREE.BufferGeometry attributes instead.' );
+
+	}
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
