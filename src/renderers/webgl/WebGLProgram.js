@@ -4,15 +4,15 @@ THREE.WebGLProgram = ( function () {
 
 	function generateDefines( defines ) {
 
-		var value, chunk, chunks = [];
+		var chunks = [];
 
-		for ( var d in defines ) {
+		for ( var name in defines ) {
 
-			value = defines[ d ];
+			var value = defines[ name ];
+
 			if ( value === false ) continue;
 
-			chunk = '#define ' + d + ' ' + value;
-			chunks.push( chunk );
+			chunks.push( '#define ' + name + ' ' + value );
 
 		}
 
@@ -50,7 +50,7 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function programArrayToString ( previousValue, currentValue, index, array ) {
+	function programArrayToString( previousValue, currentValue, index, array ) {
 
 		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
 
@@ -59,6 +59,7 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		return previousValue;
+
 	}
 
 	return function ( renderer, code, material, parameters ) {
@@ -414,35 +415,45 @@ THREE.WebGLProgram = ( function () {
 
 		// cache attributes locations
 
-		identifiers = [
+		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			'position',
-			'normal',
-			'uv',
-			'uv2',
-			'tangent',
-			'color',
-			'skinIndex',
-			'skinWeight',
-			'lineDistance'
+			identifiers = attributes;
 
-		];
+		} else {
 
-		for ( var i = 0; i < parameters.maxMorphTargets; i ++ ) {
+			identifiers = [
 
-			identifiers.push( 'morphTarget' + i );
+				'position',
+				'normal',
+				'uv',
+				'uv2',
+				'tangent',
+				'color',
+				'skinIndex',
+				'skinWeight',
+				'lineDistance'
 
-		}
+			];
 
-		for ( var i = 0; i < parameters.maxMorphNormals; i ++ ) {
+			for ( var i = 0; i < parameters.maxMorphTargets; i ++ ) {
 
-			identifiers.push( 'morphNormal' + i );
+				identifiers.push( 'morphTarget' + i );
 
-		}
+			}
 
-		for ( var a in attributes ) {
+			for ( var i = 0; i < parameters.maxMorphNormals; i ++ ) {
 
-			identifiers.push( a );
+				identifiers.push( 'morphNormal' + i );
+
+			}
+
+			// ShaderMaterial attributes
+
+			if ( Array.isArray( attributes ) ) {
+
+				identifiers = identifiers.concat( attributes );
+
+			}
 
 		}
 

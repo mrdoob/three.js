@@ -1146,7 +1146,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				var position = geometry.attributes['position'];
+				var position = geometry.attributes.position;
 
 				// render non-indexed triangles
 
@@ -2092,9 +2092,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// changed glsl or parameters
 			deallocateMaterial( material );
 
-		} else {
+		} else if ( shaderID !== undefined ) {
 
-			// same glsl and parameters
+			// same glsl
+			return;
+
+		} else if ( material.__webglShader.uniforms === material.uniforms ) {
+
+			// same uniforms (container object)
 			return;
 
 		}

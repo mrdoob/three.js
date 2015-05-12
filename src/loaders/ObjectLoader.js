@@ -332,6 +332,16 @@ THREE.ObjectLoader.prototype = {
 
 	parseTextures: function ( json, images ) {
 
+		function parseConstant( value ) {
+
+			if ( typeof( value ) === 'number' ) return value;
+
+			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
+
+			return THREE[ value ];
+
+		}
+
 		var textures = {};
 
 		if ( json !== undefined ) {
@@ -358,15 +368,15 @@ THREE.ObjectLoader.prototype = {
 				texture.uuid = data.uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
-				if ( data.mapping !== undefined ) texture.mapping = data.mapping;
+				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping );
 				if ( data.repeat !== undefined ) texture.repeat = new THREE.Vector2( data.repeat[ 0 ], data.repeat[ 1 ] );
-				if ( data.minFilter !== undefined ) texture.minFilter = THREE[ data.minFilter ];
-				if ( data.magFilter !== undefined ) texture.magFilter = THREE[ data.magFilter ];
+				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter );
+				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 				if ( data.wrap instanceof Array ) {
 
-					texture.wrapS = THREE[ data.wrap[ 0 ] ];
-					texture.wrapT = THREE[ data.wrap[ 1 ] ];
+					texture.wrapS = parseConstant( data.wrap[ 0 ] );
+					texture.wrapT = parseConstant( data.wrap[ 1 ] );
 
 				}
 

@@ -36,7 +36,14 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
-	this.attributes = null;
+	this.attributes = [];
+
+	if ( parameters.attributes !== undefined && Array.isArray( parameters.attributes ) === false ) {
+
+		console.warn( 'THREE.ShaderMaterial: attributes should now be an array of attribute names.' );
+		parameters.attributes = Object.keys( parameters.attributes );
+
+	}
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -112,9 +119,9 @@ THREE.ShaderMaterial.prototype.clone = function ( material ) {
 
 };
 
-THREE.ShaderMaterial.prototype.toJSON = function () {
+THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
 
-	var data = THREE.Material.prototype.toJSON.call( this );
+	var data = THREE.Material.prototype.toJSON.call( this, meta );
 
 	data.uniforms = this.uniforms;
 	data.attributes = this.attributes;

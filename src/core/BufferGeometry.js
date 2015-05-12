@@ -174,7 +174,6 @@ THREE.BufferGeometry.prototype = {
 				this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
 				this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
 
-
 			}
 
 			if ( geometry instanceof THREE.DynamicGeometry ) {
@@ -184,41 +183,6 @@ THREE.BufferGeometry.prototype = {
 			} else if ( geometry instanceof THREE.Geometry ) {
 
 				this.fromGeometry( geometry, material );
-
-			}
-
-		}
-
-		if ( material.attributes !== undefined ) {
-
-			var attributes = material.attributes;
-
-			for ( var name in attributes ) {
-
-				var attribute = attributes[ name ];
-
-				var type = attribute.type;
-				var array = attribute.value;
-
-				switch ( type ) {
-
-					case "f":
-						this.addAttribute( name, new THREE.Float32Attribute( array.length, 1 ).copyArray( array ) );
-						break;
-
-					case "c":
-						this.addAttribute( name, new THREE.Float32Attribute( array.length * 3, 3 ).copyColorsArray( array ) );
-						break;
-
-					case "v3":
-						this.addAttribute( name, new THREE.Float32Attribute( array.length * 3, 3 ).copyVector3sArray( array ) );
-						break;
-
-					default:
-						console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: attribute unsupported', type );
-						break;
-
-				}
 
 			}
 
@@ -259,44 +223,6 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.colorsNeedUpdate = false;
-
-		}
-
-	},
-
-	updateFromMaterial: function ( material ) {
-
-		if ( material.attributes !== undefined ) {
-
-			var attributes = material.attributes;
-
-			for ( var name in attributes ) {
-
-				var attribute = attributes[ name ];
-
-				var type = attribute.type;
-				var array = attribute.value;
-
-				switch ( type ) {
-
-					case "f":
-						this.attributes[ name ].copyArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
-
-					case "c":
-						this.attributes[ name ].copyColorsArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
-
-					case "v3":
-						this.attributes[ name ].copyVector3sArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
-
-				}
-
-			}
 
 		}
 

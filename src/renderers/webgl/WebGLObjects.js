@@ -114,11 +114,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 		if ( object.geometry instanceof THREE.DynamicGeometry ) {
 
 			geometry.updateFromObject( object );
-			geometry.updateFromMaterial( object.material );
-
-		} else if ( object.geometry instanceof THREE.Geometry ) {
-
-			geometry.updateFromMaterial( object.material );
 
 		}
 
