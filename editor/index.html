@@ -234,6 +234,7 @@
 
 					case 8: // prevent browser back
 						event.preventDefault();
+						editor.removeAndReassignObjectToParent(editor.selected);
 						break;
 
 				}

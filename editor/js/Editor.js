@@ -205,6 +205,15 @@ Editor.prototype = {
 
 	},
 
+  removeAndReassignObjectToParent: function( object ){
+		var object = this.selected;
+		var parent = object.parent;
+
+		this.removeObject( object );
+		this.select( parent );
+
+  },
+
 	addGeometry: function ( geometry ) {
 
 		this.geometries[ geometry.uuid ] = geometry;
