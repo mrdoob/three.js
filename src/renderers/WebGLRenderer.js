@@ -2092,11 +2092,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// changed glsl or parameters
 			deallocateMaterial( material );
 
-		} else if ( shaderID ||
-				material.__webglShader.uniforms === material.uniforms ) {
+		} else if ( shaderID === undefined ) {
 
-			// stop unless the container object for the uniforms has
-			// changed - same glsl and parameters
+			// same glsl
+			return;
+
+		} else if ( material.__webglShader.uniforms === material.uniforms ) {
+
+			// same uniforms (container object)
 			return;
 
 		}
