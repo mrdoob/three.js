@@ -20,14 +20,20 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function cacheUniformLocations( gl, program, identifiers ) {
+	var UniformArraySuffix = /\[0\]$/;
+
+	function cacheUniformLocations( gl, program ) {
 
 		var uniforms = {};
 
-		for ( var i = 0, l = identifiers.length; i < l; i ++ ) {
+		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-			var id = identifiers[ i ];
-			uniforms[ id ] = gl.getUniformLocation( program, id );
+		for ( var i = 0; i < n; i ++ ) {
+
+			var activeInfo = gl.getActiveUniform( program, i );
+
+			var name = activeInfo.name.replace( UniformArraySuffix, '' );
+			uniforms[ name ] = gl.getUniformLocation( program, name );
 
 		}
 
@@ -377,45 +383,11 @@ THREE.WebGLProgram = ( function () {
 
 		// cache uniform locations
 
-		var identifiers = [
-
-			'viewMatrix',
-			'modelViewMatrix',
-			'projectionMatrix',
-			'normalMatrix',
-			'modelMatrix',
-			'cameraPosition',
-			'morphTargetInfluences',
-			'bindMatrix',
-			'bindMatrixInverse'
-
-		];
-
-		if ( parameters.useVertexTexture ) {
-
-			identifiers.push( 'boneTexture', 'boneTextureWidth', 'boneTextureHeight' );
-
-		} else {
-
-			identifiers.push( 'boneGlobalMatrices' );
-
-		}
-
-		if ( parameters.logarithmicDepthBuffer ) {
-
-			identifiers.push( 'logDepthBufFC' );
-
-		}
-
-		for ( var u in uniforms ) {
-
-			identifiers.push( u );
-
-		}
-
-		this.uniforms = cacheUniformLocations( gl, program, identifiers );
+		this.uniforms = cacheUniformLocations( gl, program );
 
 		// cache attributes locations
+
+		var identifiers;
 
 		if ( material instanceof THREE.RawShaderMaterial ) {
 
