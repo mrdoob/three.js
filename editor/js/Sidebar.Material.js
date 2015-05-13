@@ -5,6 +5,7 @@
 Sidebar.Material = function ( editor ) {
 
 	var signals = editor.signals;
+	var currentObject;
 
 	var container = new UI.CollapsiblePanel();
 	container.setCollapsed( editor.config.getKey( 'ui/sidebar/material/collapsed' ) );
@@ -111,39 +112,6 @@ Sidebar.Material = function ( editor ) {
 	materialShininessRow.add( materialShininess );
 
 	container.add( materialShininessRow );
-
-	// uniforms
-
-	var materialUniformsRow = new UI.Panel();
-	var materialUniforms = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
-	materialUniforms.setValue( '{\n  "uColor": {\n    "type": "3f",\n    "value": [1, 0, 0]\n  }\n}' ).onChange( update );
-
-	materialUniformsRow.add( new UI.Text( 'Uniforms' ).setWidth( '90px' ) );
-	materialUniformsRow.add( materialUniforms );
-
-	container.add( materialUniformsRow );
-
-	// vertex shader
-
-	var materialVertexShaderRow = new UI.Panel();
-	var materialVertexShader = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
-	materialVertexShader.setValue( 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}' ).onChange( update );
-
-	materialVertexShaderRow.add( new UI.Text( 'Vertex Shader' ).setWidth( '90px' ) );
-	materialVertexShaderRow.add( materialVertexShader );
-
-	container.add( materialVertexShaderRow );
-
-	// fragment shader
-
-	var materialFragmentShaderRow = new UI.Panel();
-	var materialFragmentShader = new UI.TextArea().setWidth( '150px' ).setHeight( '80px' );
-	materialFragmentShader.setValue( 'uniform vec3 uColor;\n\nvoid main() {\n\tgl_FragColor = vec4( uColor, 1.0 );\n}' ).onChange( update );
-
-	materialFragmentShaderRow.add( new UI.Text( 'Fragment Shader' ).setWidth( '90px' ) );
-	materialFragmentShaderRow.add( materialFragmentShader );
-
-	container.add( materialFragmentShaderRow );
 
 	// vertex colors
 
@@ -356,11 +324,60 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialWireframeRow );
 
+
+	// program info (defines, uniforms, attributes)
+
+	var materialProgramInfoRow = new UI.Panel();
+	var edit = new UI.Button( 'Edit' );
+	edit.setMarginLeft( '4px' );
+	edit.onClick( function () {
+
+		signals.editScript.dispatch( currentObject.material, 'programInfo' );
+
+	} );
+
+	materialProgramInfoRow.add( new UI.Text( 'Program Info' ).setWidth( '130px' ) );
+	materialProgramInfoRow.add( edit );
+
+	container.add( materialProgramInfoRow );
+
+	// vertex shader
+
+	var materialVertexShaderRow = new UI.Panel();
+	var edit = new UI.Button( 'Edit' );
+	edit.setMarginLeft( '4px' );
+	edit.onClick( function () {
+
+		signals.editScript.dispatch( currentObject.material, 'vertexShader' );
+
+	} );
+
+	materialVertexShaderRow.add( new UI.Text( 'Vertex Shader' ).setWidth( '130px' ) );
+	materialVertexShaderRow.add( edit );
+
+	container.add( materialVertexShaderRow );
+
+	// fragment shader
+
+	var materialFragmentShaderRow = new UI.Panel();
+	var edit = new UI.Button( 'Edit' );
+	edit.setMarginLeft( '4px' );
+	edit.onClick( function () {
+
+		signals.editScript.dispatch( currentObject.material, 'fragmentShader' );
+
+	} );
+
+	materialFragmentShaderRow.add( new UI.Text( 'Fragment Shader' ).setWidth( '130px' ) );
+	materialFragmentShaderRow.add( edit );
+
+	container.add( materialFragmentShaderRow );
+
 	//
 
 	function update() {
 
-		var object = editor.selected;
+		var object = currentObject;
 
 		var geometry = object.geometry;
 		var material = object.material;
@@ -383,7 +400,13 @@ Sidebar.Material = function ( editor ) {
 			if ( material instanceof THREE[ materialClass.getValue() ] === false ) {
 
 				material = new THREE[ materialClass.getValue() ]();
+
 				object.material = material;
+				// TODO Copy other references in the scene graph
+				// keeping name and UUID then.
+				// Also there should be means to create a unique
+				// copy for the current object explicitly and to
+				// attach the current material to other objects.
 
 			}
 
@@ -408,24 +431,6 @@ Sidebar.Material = function ( editor ) {
 			if ( material.shininess !== undefined ) {
 
 				material.shininess = materialShininess.getValue();
-
-			}
-
-			if ( material.uniforms !== undefined ) {
-
-				material.uniforms = JSON.parse( materialUniforms.getValue() );
-
-			}
-
-			if ( material.vertexShader !== undefined ) {
-
-				material.vertexShader = materialVertexShader.getValue();
-
-			}
-
-			if ( material.fragmentShader !== undefined ) {
-
-				material.fragmentShader = materialFragmentShader.getValue();
 
 			}
 
@@ -585,6 +590,7 @@ Sidebar.Material = function ( editor ) {
 				}
 
 			}
+
 			if ( material.side !== undefined ) {
 
 				material.side = parseInt( materialSide.getValue() );
@@ -627,7 +633,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			updateRows();
+			refreshUi(false);
 
 			signals.materialChanged.dispatch( material );
 
@@ -641,7 +647,9 @@ Sidebar.Material = function ( editor ) {
 
 	};
 
-	function updateRows() {
+	//
+
+	function setRowVisibility() {
 
 		var properties = {
 			'name': materialNameRow,
@@ -649,7 +657,7 @@ Sidebar.Material = function ( editor ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
-			'uniforms': materialUniformsRow,
+			'uniforms': materialProgramInfoRow,
 			'vertexShader': materialVertexShaderRow,
 			'fragmentShader': materialFragmentShaderRow,
 			'vertexColors': materialVertexColorsRow,
@@ -670,7 +678,7 @@ Sidebar.Material = function ( editor ) {
 			'wireframe': materialWireframeRow
 		};
 
-		var material = editor.selected.material;
+		var material = currentObject.material;
 
 		for ( var property in properties ) {
 
@@ -680,189 +688,224 @@ Sidebar.Material = function ( editor ) {
 
 	};
 
+
+	function refreshUi(resetTextureSelectors) {
+
+		var material = currentObject.material;
+
+		if ( material.uuid !== undefined ) {
+
+			materialUUID.setValue( material.uuid );
+
+		}
+
+		if ( material.name !== undefined ) {
+
+			materialName.setValue( material.name );
+
+		}
+
+		materialClass.setValue( material.type );
+
+		if ( material.color !== undefined ) {
+
+			materialColor.setHexValue( material.color.getHexString() );
+
+		}
+
+		if ( material.emissive !== undefined ) {
+
+			materialEmissive.setHexValue( material.emissive.getHexString() );
+
+		}
+
+		if ( material.specular !== undefined ) {
+
+			materialSpecular.setHexValue( material.specular.getHexString() );
+
+		}
+
+		if ( material.shininess !== undefined ) {
+
+			materialShininess.setValue( material.shininess );
+
+		}
+
+		if ( material.vertexColors !== undefined ) {
+
+			materialVertexColors.setValue( material.vertexColors );
+
+		}
+
+		if ( material.skinning !== undefined ) {
+
+			materialSkinning.setValue( material.skinning );
+
+		}
+
+		if ( material.map !== undefined ) {
+
+			materialMapEnabled.setValue( material.map !== null );
+
+			if ( material.map !== null || resetTextureSelectors ) {
+
+				materialMap.setValue( material.map );
+
+			}
+
+		}
+
+		if ( material.alphaMap !== undefined ) {
+
+			materialAlphaMapEnabled.setValue( material.alphaMap !== null );
+
+			if ( material.alphaMap !== null || resetTextureSelectors ) {
+
+				materialAlphaMap.setValue( material.alphaMap );
+
+			}
+
+		}
+
+		if ( material.bumpMap !== undefined ) {
+
+			materialBumpMapEnabled.setValue( material.bumpMap !== null );
+
+			if ( material.bumpMap !== null || resetTextureSelectors ) {
+
+				materialBumpMap.setValue( material.bumpMap );
+
+			}
+
+			materialBumpScale.setValue( material.bumpScale );
+
+		}
+
+		if ( material.normalMap !== undefined ) {
+
+			materialNormalMapEnabled.setValue( material.normalMap !== null );
+
+			if ( material.normalMap !== null || resetTextureSelectors ) {
+
+				materialNormalMap.setValue( material.normalMap );
+
+			}
+
+		}
+
+		if ( material.specularMap !== undefined ) {
+
+			materialSpecularMapEnabled.setValue( material.specularMap !== null );
+
+			if ( material.specularMap !== null || resetTextureSelectors ) {
+
+				materialSpecularMap.setValue( material.specularMap );
+
+			}
+
+		}
+
+		if ( material.envMap !== undefined ) {
+
+			materialEnvMapEnabled.setValue( material.envMap !== null );
+
+			if ( material.envMap !== null || resetTextureSelectors ) {
+
+				materialEnvMap.setValue( material.envMap );
+
+			}
+
+			materialReflectivity.setValue( material.reflectivity );
+
+		}
+
+		if ( material.lightMap !== undefined ) {
+
+			materialLightMapEnabled.setValue( material.lightMap !== null );
+
+			if ( material.lightMap !== null || resetTextureSelectors ) {
+
+				materialLightMap.setValue( material.lightMap );
+
+			}
+
+		}
+
+		if ( material.aoMap !== undefined ) {
+
+			materialAOMapEnabled.setValue( material.aoMap !== null );
+
+			if ( material.aoMap !== null || resetTextureSelectors ) {
+
+				materialAOMap.setValue( material.aoMap );
+
+			}
+
+			materialAOScale.setValue( material.aoMapIntensity );
+
+		}
+
+		if ( material.side !== undefined ) {
+
+			materialSide.setValue( material.side );
+
+		}
+
+		if ( material.shading !== undefined ) {
+
+			materialShading.setValue( material.shading );
+
+		}
+
+		if ( material.blending !== undefined ) {
+
+			materialBlending.setValue( material.blending );
+
+		}
+
+		if ( material.opacity !== undefined ) {
+
+			materialOpacity.setValue( material.opacity );
+
+		}
+
+		if ( material.transparent !== undefined ) {
+
+			materialTransparent.setValue( material.transparent );
+
+		}
+
+		if ( material.wireframe !== undefined ) {
+
+			materialWireframe.setValue( material.wireframe );
+
+		}
+
+		if ( material.wireframeLinewidth !== undefined ) {
+
+			materialWireframeLinewidth.setValue( material.wireframeLinewidth );
+
+		}
+
+		setRowVisibility();
+
+	}
+
 	// events
 
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object && object.material ) {
 
+			var objectChanged = object !== currentObject;
+
+			currentObject = object;
+			refreshUi(objectChanged);
 			container.setDisplay( '' );
-
-			var material = object.material;
-
-			if ( material.uuid !== undefined ) {
-
-				materialUUID.setValue( material.uuid );
-
-			}
-
-			if ( material.name !== undefined ) {
-
-				materialName.setValue( material.name );
-
-			}
-
-			materialClass.setValue( material.type );
-
-			if ( material.color !== undefined ) {
-
-				materialColor.setHexValue( material.color.getHexString() );
-
-			}
-
-			if ( material.emissive !== undefined ) {
-
-				materialEmissive.setHexValue( material.emissive.getHexString() );
-
-			}
-
-			if ( material.specular !== undefined ) {
-
-				materialSpecular.setHexValue( material.specular.getHexString() );
-
-			}
-
-			if ( material.shininess !== undefined ) {
-
-				materialShininess.setValue( material.shininess );
-
-			}
-
-			if ( material.uniforms !== undefined ) {
-
-				materialUniforms.setValue( JSON.stringify( material.uniforms, null, '  ' ) );
-
-			}
-
-			if ( material.vertexShader !== undefined ) {
-
-				materialVertexShader.setValue( material.vertexShader );
-
-			}
-
-			if ( material.fragmentShader !== undefined ) {
-
-				materialFragmentShader.setValue( material.fragmentShader );
-
-			}
-
-			if ( material.vertexColors !== undefined ) {
-
-				materialVertexColors.setValue( material.vertexColors );
-
-			}
-
-			if ( material.skinning !== undefined ) {
-
-				materialSkinning.setValue( material.skinning );
-
-			}
-
-			if ( material.map !== undefined ) {
-
-				materialMapEnabled.setValue( material.map !== null );
-				materialMap.setValue( material.map );
-
-			}
-
-			if ( material.alphaMap !== undefined ) {
-
-				materialAlphaMapEnabled.setValue( material.alphaMap !== null );
-				materialAlphaMap.setValue( material.alphaMap );
-
-			}
-
-			if ( material.bumpMap !== undefined ) {
-
-				materialBumpMapEnabled.setValue( material.bumpMap !== null );
-				materialBumpMap.setValue( material.bumpMap );
-				materialBumpScale.setValue( material.bumpScale );
-
-			}
-
-			if ( material.normalMap !== undefined ) {
-
-				materialNormalMapEnabled.setValue( material.normalMap !== null );
-				materialNormalMap.setValue( material.normalMap );
-
-			}
-
-			if ( material.specularMap !== undefined ) {
-
-				materialSpecularMapEnabled.setValue( material.specularMap !== null );
-				materialSpecularMap.setValue( material.specularMap );
-
-			}
-
-			if ( material.envMap !== undefined ) {
-
-				materialEnvMapEnabled.setValue( material.envMap !== null );
-				materialEnvMap.setValue( material.envMap );
-				materialReflectivity.setValue( material.reflectivity );
-
-			}
-
-			if ( material.lightMap !== undefined ) {
-
-				materialLightMapEnabled.setValue( material.lightMap !== null );
-				materialLightMap.setValue( material.lightMap );
-
-			}
-
-			if ( material.aoMap !== undefined ) {
-
-				materialAOMapEnabled.setValue( material.aoMap !== null );
-				materialAOMap.setValue( material.aoMap );
-				materialAOScale.setValue( material.aoMapIntensity );
-
-			}
-
-			if ( material.side !== undefined ) {
-
-				materialSide.setValue( material.side );
-
-			}
-
-			if ( material.shading !== undefined ) {
-
-				materialShading.setValue( material.shading );
-
-			}
-
-			if ( material.blending !== undefined ) {
-
-				materialBlending.setValue( material.blending );
-
-			}
-
-			if ( material.opacity !== undefined ) {
-
-				materialOpacity.setValue( material.opacity );
-
-			}
-
-			if ( material.transparent !== undefined ) {
-
-				materialTransparent.setValue( material.transparent );
-
-			}
-
-			if ( material.wireframe !== undefined ) {
-
-				materialWireframe.setValue( material.wireframe );
-
-			}
-
-			if ( material.wireframeLinewidth !== undefined ) {
-
-				materialWireframeLinewidth.setValue( material.wireframeLinewidth );
-
-			}
-
-			updateRows();
 
 		} else {
 
+			currentObject = null;
 			container.setDisplay( 'none' );
 
 		}
