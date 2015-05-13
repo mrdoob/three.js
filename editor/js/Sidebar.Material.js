@@ -73,6 +73,40 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialClassRow );
 
+	// program
+
+	var materialProgramRow = new UI.Panel();
+	materialProgramRow.add( new UI.Text( 'Program' ).setWidth( '90px' ) );
+
+	var materialProgramInfo = new UI.Button( 'Info' );
+	materialProgramInfo.setMarginLeft( '4px' );
+	materialProgramInfo.onClick( function () {
+
+		signals.editScript.dispatch( currentObject.material, 'programInfo' );
+
+	} );
+	materialProgramRow.add( materialProgramInfo );
+
+	var materialProgramVertex = new UI.Button( 'Vertex' );
+	materialProgramVertex.setMarginLeft( '4px' );
+	materialProgramVertex.onClick( function () {
+
+		signals.editScript.dispatch( currentObject.material, 'vertexShader' );
+
+	} );
+	materialProgramRow.add( materialProgramVertex );
+
+	var materialProgramFragment = new UI.Button( 'Fragment' );
+	materialProgramFragment.setMarginLeft( '4px' );
+	materialProgramFragment.onClick( function () {
+
+		signals.editScript.dispatch( currentObject.material, 'fragmentShader' );
+
+	} );
+	materialProgramRow.add( materialProgramFragment );
+
+	container.add( materialProgramRow );
+
 	// color
 
 	var materialColorRow = new UI.Panel();
@@ -323,55 +357,6 @@ Sidebar.Material = function ( editor ) {
 	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
-
-
-	// program info (defines, uniforms, attributes)
-
-	var materialProgramInfoRow = new UI.Panel();
-	var edit = new UI.Button( 'Edit' );
-	edit.setMarginLeft( '4px' );
-	edit.onClick( function () {
-
-		signals.editScript.dispatch( currentObject.material, 'programInfo' );
-
-	} );
-
-	materialProgramInfoRow.add( new UI.Text( 'Program Info' ).setWidth( '130px' ) );
-	materialProgramInfoRow.add( edit );
-
-	container.add( materialProgramInfoRow );
-
-	// vertex shader
-
-	var materialVertexShaderRow = new UI.Panel();
-	var edit = new UI.Button( 'Edit' );
-	edit.setMarginLeft( '4px' );
-	edit.onClick( function () {
-
-		signals.editScript.dispatch( currentObject.material, 'vertexShader' );
-
-	} );
-
-	materialVertexShaderRow.add( new UI.Text( 'Vertex Shader' ).setWidth( '130px' ) );
-	materialVertexShaderRow.add( edit );
-
-	container.add( materialVertexShaderRow );
-
-	// fragment shader
-
-	var materialFragmentShaderRow = new UI.Panel();
-	var edit = new UI.Button( 'Edit' );
-	edit.setMarginLeft( '4px' );
-	edit.onClick( function () {
-
-		signals.editScript.dispatch( currentObject.material, 'fragmentShader' );
-
-	} );
-
-	materialFragmentShaderRow.add( new UI.Text( 'Fragment Shader' ).setWidth( '130px' ) );
-	materialFragmentShaderRow.add( edit );
-
-	container.add( materialFragmentShaderRow );
 
 	//
 
@@ -657,9 +642,7 @@ Sidebar.Material = function ( editor ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
-			'uniforms': materialProgramInfoRow,
-			'vertexShader': materialVertexShaderRow,
-			'fragmentShader': materialFragmentShaderRow,
+			'program': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
