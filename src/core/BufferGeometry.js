@@ -159,6 +159,8 @@ THREE.BufferGeometry.prototype = {
 
 		} else if ( object instanceof THREE.Mesh ) {
 
+			// skinning
+
 			if ( object instanceof THREE.SkinnedMesh ) {
 
 				if ( geometry instanceof THREE.Geometry ) {
@@ -173,6 +175,40 @@ THREE.BufferGeometry.prototype = {
 
 				this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
 				this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+
+			}
+
+			// morphs
+
+			if ( object.morphTargetInfluences !== undefined ) {
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for MorphTargets.', geometry );
+					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+
+				}
+
+				this.morphsInfluences = new THREE.Float32Attribute( object.morphTargetInfluences, 1 ).copyArray( object.morphTargetInfluences );
+
+				// positions
+
+				var morphTargets = geometry.morphTargets;
+
+				if ( morphTargets.length > 0 ) {
+
+					for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
+
+						var morphTarget = morphTargets[ i ];
+
+						var attribute = new THREE.Float32Attribute( morphTarget.vertices.length * 3, 3 );
+						attribute.enabled = false;
+
+						this.addAttribute( 'position_' + i, attribute.copyVector3sArray( morphTarget.vertices ) );
+
+					}
+
+				}
 
 			}
 

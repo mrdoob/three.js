@@ -2233,6 +2233,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		/*
 		if ( material.morphTargets ) {
 
 			if ( ! object.__webglMorphTargetInfluences ) {
@@ -2242,6 +2243,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+		*/
 
 		var refreshProgram = false;
 		var refreshMaterial = false;

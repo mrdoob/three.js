@@ -128,6 +128,9 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 				var key = attributesKeys[ i ];
 				var attribute = attributes[ key ];
+
+				if ( attribute.enabled === false ) continue;
+
 				var bufferType = ( key === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
 				var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;

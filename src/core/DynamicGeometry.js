@@ -82,6 +82,13 @@ THREE.DynamicGeometry.prototype = {
 
 			}
 
+			if ( vertexUvs === undefined ) {
+
+				console.warn( 'THREE.DynamicGeometry.fromGeometry(): Missing vertexUVs', i );
+				vertexUvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
+
+			}
+
 			for ( var j = 0, jl = vertexUvs.length; j < jl; j ++ ) {
 
 				this.uvs[ indices[ j ] ] = vertexUvs[ j ];
