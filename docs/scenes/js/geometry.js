@@ -80,6 +80,9 @@ var constants = {
 
 function updateGroupGeometry( mesh, geometry ) {
 	
+	mesh.children[0].geometry.dispose();
+	mesh.children[1].geometry.dispose();
+	
 	mesh.children[0].geometry = geometry
 	mesh.children[1].geometry = geometry.clone()
 	
@@ -149,8 +152,8 @@ var guis = {
 		folder.add( data, 'tube', 0.1, 10 ).onChange( generateGeometry )
 		folder.add( data, 'radialSegments', 3, 300 ).step(1).onChange( generateGeometry )
 		folder.add( data, 'tubularSegments', 3, 20 ).step(1).onChange( generateGeometry )
-		folder.add( data, 'p', 1, 20 ).onChange( generateGeometry )
-		folder.add( data, 'q', 1, 20 ).onChange( generateGeometry )
+		folder.add( data, 'p', 1, 20 ).step(1).onChange( generateGeometry )
+		folder.add( data, 'q', 1, 20 ).step(1).onChange( generateGeometry )
 		folder.add( data, 'heightScale', 1, 20 ).onChange( generateGeometry )
 		
 		generateGeometry()

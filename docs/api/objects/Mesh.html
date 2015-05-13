@@ -42,6 +42,34 @@
 		<h3>[property:Material material]</h3>
 
 		<div>An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour.</div>
+		
+		<h3>[property:Array morphTargetForcedOrder]</h3>
+		
+		<div>
+		An array of indices specifying the order that the morphs will be applied. Undefined by
+		default, but reset to a blank array by [page:Mesh.updateMorphTargets updateMorphTargets].
+		</div>
+		
+		<h3>[property:Array morphTargetInfluences]</h3>
+		
+		<div>
+		An array of weights typically from 0-1 that specify how much of the morph is applied.
+		Undefined by default, but reset to a blank array by [page:Mesh.updateMorphTargets updateMorphTargets].
+		</div>
+		
+		<h3>[property:Array morphTargetDictionary]</h3>
+		
+		<div>
+		A dictionary of morphTargets based on the morphTarget.name property.
+		Undefined by default, but rebuilt [page:Mesh.updateMorphTargets updateMorphTargets].
+		</div>
+
+		<h3>[property:Integer morphTargetBase]</h3>
+		
+		<div>
+		Specify the index of the morph that should be used as the base morph. Replaces the positions.
+		Undefined by default, but reset to -1 (non set) by [page:Mesh.updateMorphTargets updateMorphTargets].
+		</div>
 
 
 		<h2>Methods</h2>
@@ -57,7 +85,11 @@
 
 		<h3>[method:null updateMorphTargets]()</h3>
 		<div>
-		Updates the morphtargets to have no influence on the object.
+		Updates the morphtargets to have no influence on the object. Resets the
+		[page:Mesh.morphTargetForcedOrder morphTargetForcedOrder],
+		[page:Mesh.morphTargetInfluences morphTargetInfluences],
+		[page:Mesh.morphTargetDictionary morphTargetDictionary], and
+		[page:Mesh.morphTargetBase morphTargetBase] properties.
 		</div>
 
 		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>

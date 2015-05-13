@@ -88,7 +88,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 				objects[ object.id ] = {
 					id: object.id,
 					object: object,
-					material: object.material,
 					z: 0
 				};
 
@@ -108,18 +107,13 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	};
 
-	var update = function ( object ) {
+	function updateObject( object ) {
 
 		var geometry = geometries.get( object );
 
 		if ( object.geometry instanceof THREE.DynamicGeometry ) {
 
 			geometry.updateFromObject( object );
-			geometry.updateFromMaterial( object.material );
-
-		} else if ( object.geometry instanceof THREE.Geometry ) {
-
-			geometry.updateFromMaterial( object.material );
 
 		}
 
@@ -134,6 +128,9 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 				var key = attributesKeys[ i ];
 				var attribute = attributes[ key ];
+
+				if ( attribute.enabled === false ) continue;
+
 				var bufferType = ( key === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
 				var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
@@ -167,7 +164,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 					} else if ( data.updateRange.count === 0 ) {
 
-						THREE.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+						console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
 
 					} else {
 
@@ -196,7 +193,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			if ( object.material.visible !== false ) {
 
-				update( object );
+				updateObject( object );
 
 			}
 

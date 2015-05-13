@@ -573,7 +573,7 @@ THREE.ProxyGeometry.prototype.mergeVertices = function () {
 
 		} else {
 
-			//THREE.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+			//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 			changes[ i ] = changes[ verticesMap[ key ] ];
 
 		}

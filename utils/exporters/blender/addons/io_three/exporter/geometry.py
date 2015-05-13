@@ -15,8 +15,8 @@ class Geometry(base_classes.BaseNode):
     def __init__(self, node, parent=None):
         logger.debug("Geometry().__init__(%s)", node)
 
-        #@TODO: maybe better to have `three` constants for
-        #       strings that are specific to `three` properties
+#       @TODO: maybe better to have `three` constants for
+#              strings that are specific to `three` properties
         geo_type = constants.GEOMETRY.title()
         if parent.options.get(constants.GEOMETRY_TYPE):
             opt_type = parent.options[constants.GEOMETRY_TYPE]
@@ -69,7 +69,16 @@ class Geometry(base_classes.BaseNode):
 
         length = len(faces)
         offset = 0
-        bitset = lambda x, y: x & (1 << y)
+
+        def bitset(bit, mask):
+            """
+
+            :type bit: int
+            :type mask: int
+
+            """
+            return bit & (1 << mask)
+
         face_count = 0
 
         masks = (constants.MASK[constants.UVS],
@@ -213,8 +222,8 @@ class Geometry(base_classes.BaseNode):
             io.dump(filepath, data, options=self.scene.options)
             return filepath
         else:
-            logger.warning("Could not determine a filepath for "\
-                "animation data. Nothing written to disk.")
+            logger.warning("Could not determine a filepath for "
+                           "animation data. Nothing written to disk.")
 
     def _component_data(self):
         """Query the component data only
@@ -232,7 +241,8 @@ class Geometry(base_classes.BaseNode):
                       constants.NORMALS, constants.BONES,
                       constants.SKIN_WEIGHTS,
                       constants.SKIN_INDICES, constants.NAME,
-                      constants.INFLUENCES_PER_VERTEX]
+                      constants.INFLUENCES_PER_VERTEX,
+                      constants.INDEX]
 
         data = {}
         anim_components = [constants.MORPH_TARGETS, constants.ANIMATION]
@@ -276,6 +286,10 @@ class Geometry(base_classes.BaseNode):
 
         data[constants.METADATA].update(self.metadata)
 
+        draw_calls = self.get(constants.DRAW_CALLS)
+        if draw_calls is not None:
+            data[constants.DRAW_CALLS] = draw_calls
+
         return data
 
     def _buffer_geometry_metadata(self, metadata):
@@ -290,7 +304,7 @@ class Geometry(base_classes.BaseNode):
             metadata[key] = len(array)/size
 
     def _geometry_metadata(self, metadata):
-        """Three.Geometry metadat
+        """Three.Geometry metadata
 
         :rtype: dict
 
@@ -336,12 +350,15 @@ class Geometry(base_classes.BaseNode):
                 constants.METADATA: self.metadata
             })
         else:
+            geometry_data = data
             if self.options.get(constants.EMBED_GEOMETRY, True):
-                data[constants.DATA] = {
-                    constants.ATTRIBUTES: component_data
-                }
-            else:
-                data[constants.ATTRIBUTES] = component_data
+                data[constants.DATA] = geometry_data = {}
+
+            geometry_data[constants.ATTRIBUTES] = component_data
+            draw_calls = self.get(constants.DRAW_CALLS)
+            if draw_calls is not None:
+                geometry_data[constants.DRAW_CALLS] = draw_calls
+
             data[constants.METADATA] = self.metadata
             data[constants.NAME] = self[constants.NAME]
 
@@ -354,6 +371,7 @@ class Geometry(base_classes.BaseNode):
         options_vertices = self.options.get(constants.VERTICES)
         option_normals = self.options.get(constants.NORMALS)
         option_uvs = self.options.get(constants.UVS)
+        option_index_type = self.options.get(constants.INDEX_TYPE)
 
         pos_tuple = (constants.POSITION, options_vertices,
                      api.mesh.buffer_position, 3)
@@ -378,6 +396,88 @@ class Geometry(base_classes.BaseNode):
                 constants.TYPE: constants.FLOAT_32,
                 constants.ARRAY: array
             }
+
+        if option_index_type != constants.NONE:
+
+            assert(not (self.get(constants.INDEX) or
+                        self.get(constants.DRAW_CALLS)))
+
+            indices_per_face = 3
+            index_threshold  = 0xffff - indices_per_face
+            if option_index_type == constants.UINT_32:
+                index_threshold = 0x7fffffff - indices_per_face
+
+            attrib_data_in, attrib_data_out, attrib_keys = [], [], []
+
+            i = 0
+            for key, entry in self[constants.ATTRIBUTES].items():
+
+                item_size = entry[constants.ITEM_SIZE]
+
+                attrib_keys.append(key)
+                attrib_data_in.append( (entry[constants.ARRAY], item_size) )
+                attrib_data_out.append( ([], i, i + item_size) )
+                i += item_size
+
+            index_data, draw_calls = [], []
+            indexed, flush_req, base_vertex = {}, False, 0
+
+            assert(len(attrib_data_in) > 0)
+            array, item_size = attrib_data_in[0]
+            i, n = 0, len(array) / item_size
+            while i < n:
+
+                vertex_data = ()
+                for array, item_size in attrib_data_in:
+                    vertex_data += tuple(
+                            array[i * item_size : (i + 1) * item_size])
+
+                vertex_index = indexed.get(vertex_data)
+
+                if vertex_index is None:
+
+                    vertex_index = len(indexed)
+                    flush_req = vertex_index >= index_threshold
+
+                    indexed[vertex_data] = vertex_index
+                    for array, i_from, i_to in attrib_data_out:
+                        array.extend(vertex_data[i_from : i_to])
+
+                index_data.append(vertex_index)
+
+                i += 1
+                if i == n:
+                    flush_req = len(draw_calls) > 0
+                    assert(i % indices_per_face == 0)
+
+                if flush_req and i % indices_per_face == 0:
+                    start, count = 0, len(index_data)
+                    if draw_calls:
+                        prev = draw_calls[-1]
+                        start = prev[constants.DC_START] + prev[constants.DC_COUNT]
+                        count -= start
+                    draw_calls.append({
+                        constants.DC_START: start,
+                        constants.DC_COUNT: count,
+                        constants.DC_INDEX: base_vertex
+                    })
+                    base_vertex += len(indexed)
+                    indexed.clear()
+                    flush_req = False
+
+            for i, key in enumerate(attrib_keys):
+                array = attrib_data_out[i][0]
+                self[constants.ATTRIBUTES][key][constants.ARRAY] = array
+
+            self[constants.ATTRIBUTES][constants.INDEX] = {
+                constants.ITEM_SIZE: 3,
+                constants.TYPE: option_index_type,
+                constants.ARRAY: index_data
+            }
+            if (draw_calls):
+                logger.info("draw_calls = %s", repr(draw_calls))
+                self[constants.DRAW_CALLS] = draw_calls
+
 
     def _parse_geometry(self):
         """Parse the geometry to Three.Geometry specs"""
@@ -405,8 +505,9 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.FACES):
             logger.info("Parsing %s", constants.FACES)
+            materials = self.get(constants.MATERIALS)
             self[constants.FACES] = api.mesh.faces(
-                self.node, self.options) or []
+                self.node, self.options, materials=materials) or []
 
         no_anim = (None, False, constants.OFF)
         if self.options.get(constants.ANIMATION) not in no_anim:
@@ -414,8 +515,8 @@ class Geometry(base_classes.BaseNode):
             self[constants.ANIMATION] = api.mesh.skeletal_animation(
                 self.node, self.options) or []
 
-        #@TODO: considering making bones data implied when
-        #       querying skinning data
+#       @TODO: considering making bones data implied when
+#              querying skinning data
 
         bone_map = {}
         if self.options.get(constants.BONES):
@@ -438,4 +539,3 @@ class Geometry(base_classes.BaseNode):
             logger.info("Parsing %s", constants.MORPH_TARGETS)
             self[constants.MORPH_TARGETS] = api.mesh.morph_targets(
                 self.node, self.options) or []
-

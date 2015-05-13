@@ -19,7 +19,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	// copy material
 
 	if ( THREE.CopyShader === undefined )
-		THREE.error( "THREE.BloomPass relies on THREE.CopyShader" );
+		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
 
 	var copyShader = THREE.CopyShader;
 
@@ -40,7 +40,7 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	// convolution material
 
 	if ( THREE.ConvolutionShader === undefined )
-		THREE.error( "THREE.BloomPass relies on THREE.ConvolutionShader" );
+		console.error( "THREE.BloomPass relies on THREE.ConvolutionShader" );
 
 	var convolutionShader = THREE.ConvolutionShader;
 

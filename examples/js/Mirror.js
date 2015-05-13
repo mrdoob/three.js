@@ -103,7 +103,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	} else {
 
 		this.camera = new THREE.PerspectiveCamera();
-		THREE.log( this.name + ': camera is not a Perspective Camera!' );
+		console.log( this.name + ': camera is not a Perspective Camera!' );
 
 	}
 

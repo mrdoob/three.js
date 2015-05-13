@@ -6,7 +6,7 @@ THREE.Line = function ( geometry, material, mode ) {
 
 	if ( mode === 1 ) {
 
-		THREE.error( 'THREE.Line: THREE.LinePieces mode has been removed. Use THREE.SegmentsLine instead.' );
+		console.error( 'THREE.Line: THREE.LinePieces mode has been removed. Use THREE.LineSegments instead.' );
 
 	}
 
@@ -55,7 +55,7 @@ THREE.Line.prototype.raycast = ( function () {
 		var vEnd = new THREE.Vector3();
 		var interSegment = new THREE.Vector3();
 		var interRay = new THREE.Vector3();
-		var step = this instanceof THREE.SegmentsLine ? 2 : 1;
+		var step = this instanceof THREE.LineSegments ? 2 : 1;
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 

@@ -21,7 +21,7 @@ THREE.XHRLoader.prototype = {
 		if ( cached !== undefined ) {
 
 			if ( onLoad ) onLoad( cached );
-			return;
+			return cached;
 
 		}
 

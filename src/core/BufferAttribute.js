@@ -7,6 +7,7 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
+	this.enabled = true;
 	this.needsUpdate = false;
 
 };
@@ -16,6 +17,13 @@ THREE.BufferAttribute.prototype = {
 	constructor: THREE.BufferAttribute,
 
 	get length () {
+
+		console.warn( 'THREE.BufferAttribute: .length has been renamed to .count.' );
+		return this.count;
+
+	},
+
+	get count() {
 
 		return this.array.length / this.itemSize;
 
@@ -274,66 +282,56 @@ THREE.BufferAttribute.prototype = {
 
 //
 
-THREE.Int8Attribute = function ( data, itemSize ) {
+THREE.Int8Attribute = function ( array, itemSize ) {
 
-	THREE.warn( 'THREE.Int8Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
-
-};
-
-THREE.Uint8Attribute = function ( data, itemSize ) {
-
-	THREE.warn( 'THREE.Uint8Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
+	return new THREE.BufferAttribute( new Int8Array( array ), itemSize );
 
 };
 
-THREE.Uint8ClampedAttribute = function ( data, itemSize ) {
+THREE.Uint8Attribute = function ( array, itemSize ) {
 
-	THREE.warn( 'THREE.Uint8ClampedAttribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
-
+	return new THREE.BufferAttribute( new Uint8Array( array ), itemSize );
 
 };
 
-THREE.Int16Attribute = function ( data, itemSize ) {
+THREE.Uint8ClampedAttribute = function ( array, itemSize ) {
 
-	THREE.warn( 'THREE.Int16Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
-
-};
-
-THREE.Uint16Attribute = function ( data, itemSize ) {
-
-	THREE.warn( 'THREE.Uint16Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
+	return new THREE.BufferAttribute( new Uint8ClampedArray( array ), itemSize );
 
 };
 
-THREE.Int32Attribute = function ( data, itemSize ) {
+THREE.Int16Attribute = function ( array, itemSize ) {
 
-	THREE.warn( 'THREE.Int32Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
-
-};
-
-THREE.Uint32Attribute = function ( data, itemSize ) {
-
-	THREE.warn( 'THREE.Uint32Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
+	return new THREE.BufferAttribute( new Int16Array( array ), itemSize );
 
 };
 
-THREE.Float32Attribute = function ( data, itemSize ) {
+THREE.Uint16Attribute = function ( array, itemSize ) {
 
-	THREE.warn( 'THREE.Float32Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
+	return new THREE.BufferAttribute( new Uint16Array( array ), itemSize );
 
 };
 
-THREE.Float64Attribute = function ( data, itemSize ) {
+THREE.Int32Attribute = function ( array, itemSize ) {
 
-	THREE.warn( 'THREE.Float64Attribute has been removed. Use THREE.BufferAttribute( array, itemSize ) instead.' );
-	return new THREE.BufferAttribute( data, itemSize );
+	return new THREE.BufferAttribute( new Int32Array( array ), itemSize );
+
+};
+
+THREE.Uint32Attribute = function ( array, itemSize ) {
+
+	return new THREE.BufferAttribute( new Uint32Array( array ), itemSize );
+
+};
+
+THREE.Float32Attribute = function ( array, itemSize ) {
+
+	return new THREE.BufferAttribute( new Float32Array( array ), itemSize );
+
+};
+
+THREE.Float64Attribute = function ( array, itemSize ) {
+
+	return new THREE.BufferAttribute( new Float64Array( array ), itemSize );
 
 };

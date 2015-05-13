@@ -40,8 +40,12 @@
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
 		<script src="js/libs/codemirror/codemirror.js"></script>
+
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
 		<script src="js/libs/esprima.js"></script>
+		<script src="js/libs/jsonlint.js"></script>
+
+		<script src="js/libs/codemirror/mode/glsl.js"></script>
 
 		<script src="js/libs/jszip.min.js"></script>
 		<script src="js/libs/sortable.min.js"></script>
@@ -109,11 +113,11 @@
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var script = new Script( editor );
-			document.body.appendChild( script.dom );
-
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
+
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
 
 			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
@@ -232,8 +236,17 @@
 
 				switch ( event.keyCode ) {
 
-					case 8: // prevent browser back
-						event.preventDefault();
+					case 8:
+						event.preventDefault(); // prevent browser back
+
+						var object = editor.selected;
+
+						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+						var parent = object.parent;
+						editor.removeObject( object );
+						editor.select( parent );
+
 						break;
 
 				}

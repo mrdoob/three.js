@@ -27,7 +27,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 	this.passes = [];
 
 	if ( THREE.CopyShader === undefined )
-		THREE.error( "THREE.EffectComposer relies on THREE.CopyShader" );
+		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
 
 	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 

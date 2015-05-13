@@ -4,15 +4,15 @@ THREE.WebGLProgram = ( function () {
 
 	function generateDefines( defines ) {
 
-		var value, chunk, chunks = [];
+		var chunks = [];
 
-		for ( var d in defines ) {
+		for ( var name in defines ) {
 
-			value = defines[ d ];
+			var value = defines[ name ];
+
 			if ( value === false ) continue;
 
-			chunk = '#define ' + d + ' ' + value;
-			chunks.push( chunk );
+			chunks.push( '#define ' + name + ' ' + value );
 
 		}
 
@@ -49,16 +49,17 @@ THREE.WebGLProgram = ( function () {
 		return attributes;
 
 	}
-	
-	function programArrayToString ( previousValue, currentValue, index, array ) {
-	
+
+	function programArrayToString( previousValue, currentValue, index, array ) {
+
 		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
-		
+
 			return previousValue + currentValue + '\n';
-			
+
 		}
-		
+
 		return previousValue;
+
 	}
 
 	return function ( renderer, code, material, parameters ) {
@@ -74,6 +75,7 @@ THREE.WebGLProgram = ( function () {
 
 		var index0AttributeName = material.index0AttributeName;
 
+		/*
 		if ( index0AttributeName === undefined && parameters.morphTargets === true ) {
 
 			// programs with morphTargets displace position out of attribute 0
@@ -81,6 +83,7 @@ THREE.WebGLProgram = ( function () {
 			index0AttributeName = 'position';
 
 		}
+		*/
 
 		var shadowMapTypeDefine = 'SHADOWMAP_TYPE_BASIC';
 
@@ -147,7 +150,7 @@ THREE.WebGLProgram = ( function () {
 
 		var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
 
-		// THREE.log( 'building new program ' );
+		// console.log( 'building new program ' );
 
 		//
 
@@ -275,10 +278,10 @@ THREE.WebGLProgram = ( function () {
 
 			prefix_fragment = [
 
+				( parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
-
-				( parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 
 				customDefines,
 
@@ -357,13 +360,13 @@ THREE.WebGLProgram = ( function () {
 
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-			THREE.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
+			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
 
 		}
 
 		if ( programLogInfo !== '' ) {
 
-			THREE.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
+			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
 
 		}
 
@@ -414,35 +417,45 @@ THREE.WebGLProgram = ( function () {
 
 		// cache attributes locations
 
-		identifiers = [
+		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			'position',
-			'normal',
-			'uv',
-			'uv2',
-			'tangent',
-			'color',
-			'skinIndex',
-			'skinWeight',
-			'lineDistance'
+			identifiers = attributes;
 
-		];
+		} else {
 
-		for ( var i = 0; i < parameters.maxMorphTargets; i ++ ) {
+			identifiers = [
 
-			identifiers.push( 'morphTarget' + i );
+				'position',
+				'normal',
+				'uv',
+				'uv2',
+				'tangent',
+				'color',
+				'skinIndex',
+				'skinWeight',
+				'lineDistance'
 
-		}
+			];
 
-		for ( var i = 0; i < parameters.maxMorphNormals; i ++ ) {
+			for ( var i = 0; i < parameters.maxMorphTargets; i ++ ) {
 
-			identifiers.push( 'morphNormal' + i );
+				identifiers.push( 'morphTarget' + i );
 
-		}
+			}
 
-		for ( var a in attributes ) {
+			for ( var i = 0; i < parameters.maxMorphNormals; i ++ ) {
 
-			identifiers.push( a );
+				identifiers.push( 'morphNormal' + i );
+
+			}
+
+			// ShaderMaterial attributes
+
+			if ( Array.isArray( attributes ) ) {
+
+				identifiers = identifiers.concat( attributes );
+
+			}
 
 		}
 

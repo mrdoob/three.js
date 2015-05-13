@@ -22,7 +22,7 @@ THREE.StereoEffect = function ( renderer ) {
 				return scope.eyeSeparation;
 			},
 			set: function ( value ) {
-				THREE.warn( 'THREE.StereoEffect: .separation is now .eyeSeparation.' );
+				console.warn( 'THREE.StereoEffect: .separation is now .eyeSeparation.' );
 				scope.eyeSeparation = value;
 			}
 		},
@@ -31,7 +31,7 @@ THREE.StereoEffect = function ( renderer ) {
 				return scope.focalLength;
 			},
 			set: function ( value ) {
-				THREE.warn( 'THREE.StereoEffect: .targetDistance is now .focalLength.' );
+				console.warn( 'THREE.StereoEffect: .targetDistance is now .focalLength.' );
 				scope.focalLength = value;
 			}
 		}

@@ -316,7 +316,7 @@ THREE.Loader.prototype = {
 
 		if ( m.transparency !== undefined ) {
 
-			THREE.warn( 'THREE.Loader: transparency has been renamed to opacity' );
+			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
 			m.opacity = m.transparency;
 
 		}

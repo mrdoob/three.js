@@ -209,7 +209,7 @@ THREE.PLYLoader.prototype = {
 
 			default:
 
-				THREE.log("unhandled", lineType, lineValues);
+				console.log("unhandled", lineType, lineValues);
 
 			}
 

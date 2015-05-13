@@ -178,14 +178,18 @@ def buffer_uv(mesh):
 
 
 @_mesh
-def faces(mesh, options):
+def faces(mesh, options, materials=None):
     """
 
     :param mesh:
     :param options:
+    :param materials: (Default value = None)
 
     """
-    logger.debug("mesh.faces(%s, %s)", mesh, options)
+    logger.debug("mesh.faces(%s, %s, materials=%s)",
+                 mesh, options, materials)
+
+    materials = materials or []
     vertex_uv = len(mesh.uv_textures) > 0
     has_colors = len(mesh.vertex_colors) > 0
     logger.info("Has UVs = %s", vertex_uv)
@@ -242,7 +246,14 @@ def faces(mesh, options):
         face_data.extend([v for v in face.vertices])
 
         if mask[constants.MATERIALS]:
-            face_data.append(face.material_index)
+            for mat_index, mat in enumerate(materials):
+                if mat[constants.DBG_INDEX] == face.material_index:
+                    face_data.append(mat_index)
+                    break
+            else:
+                error = ("Could not map the material index "
+                         "for face %d" % face.index)
+                raise exceptions.MaterialError(error)
 
         # @TODO: this needs the same optimization as what
         #        was done for colours and normals
@@ -339,7 +350,12 @@ def materials(mesh, options):
 
     """
     logger.debug("mesh.materials(%s, %s)", mesh, options)
-    indices = set([face.material_index for face in mesh.tessfaces])
+
+    indices = []
+    for face in mesh.tessfaces:
+        if face.material_index not in indices:
+            indices.append(face.material_index)
+
     material_sets = [(mesh.materials[index], index) for index in indices]
     materials_ = []
 

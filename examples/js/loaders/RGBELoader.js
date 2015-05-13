@@ -29,14 +29,14 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 		rgbe_memory_error   = 4,
 		rgbe_error = function(rgbe_error_code, msg) {
 			switch (rgbe_error_code) {
-				case rgbe_read_error: THREE.error("THREE.RGBELoader Read Error: " + (msg||''));
+				case rgbe_read_error: console.error("THREE.RGBELoader Read Error: " + (msg||''));
 					break;
-				case rgbe_write_error: THREE.error("THREE.RGBELoader Write Error: " + (msg||''));
+				case rgbe_write_error: console.error("THREE.RGBELoader Write Error: " + (msg||''));
 					break;
-				case rgbe_format_error:  THREE.error("THREE.RGBELoader Bad File Format: " + (msg||''));
+				case rgbe_format_error:  console.error("THREE.RGBELoader Bad File Format: " + (msg||''));
 					break;
 				default:
-				case rgbe_memory_error:  THREE.error("THREE.RGBELoader: Error: " + (msg||''));
+				case rgbe_memory_error:  console.error("THREE.RGBELoader: Error: " + (msg||''));
 			}
 			return RGBE_RETURN_FAILURE;
 		},

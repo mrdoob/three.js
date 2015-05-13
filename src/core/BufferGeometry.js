@@ -31,7 +31,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( attribute instanceof THREE.BufferAttribute === false && attribute instanceof THREE.InterleavedBufferAttribute === false ) {
 
-			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
 			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
 
@@ -150,14 +150,16 @@ THREE.BufferGeometry.prototype = {
 
 		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
 
-			var positions = new Float32Array( geometry.vertices.length * 3 );
-			var colors = new Float32Array( geometry.colors.length * 3 );
+			var positions = new THREE.Float32Attribute( geometry.vertices.length * 3, 3 );
+			var colors = new THREE.Float32Attribute( geometry.colors.length * 3, 3 );
 
-			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.addAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
+			this.addAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
 			this.computeBoundingSphere();
 
 		} else if ( object instanceof THREE.Mesh ) {
+
+			// skinning
 
 			if ( object instanceof THREE.SkinnedMesh ) {
 
@@ -168,11 +170,45 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-				var skinIndices = new Float32Array( geometry.skinIndices.length * 4 );
-				var skinWeights = new Float32Array( geometry.skinWeights.length * 4 );
+				var skinIndices = new THREE.Float32Attribute( geometry.skinIndices.length * 4, 4 );
+				var skinWeights = new THREE.Float32Attribute( geometry.skinWeights.length * 4, 4 );
 
-				this.addAttribute( 'skinIndex', new THREE.BufferAttribute( skinIndices, 4 ).copyVector4sArray( geometry.skinIndices ) );
-				this.addAttribute( 'skinWeight', new THREE.BufferAttribute( skinWeights, 4 ).copyVector4sArray( geometry.skinWeights ) );
+				this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+				this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+
+			}
+
+			// morphs
+
+			if ( object.morphTargetInfluences !== undefined ) {
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for MorphTargets.', geometry );
+					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+
+				}
+
+				this.morphsInfluences = new THREE.Float32Attribute( object.morphTargetInfluences, 1 ).copyArray( object.morphTargetInfluences );
+
+				// positions
+
+				var morphTargets = geometry.morphTargets;
+
+				if ( morphTargets.length > 0 ) {
+
+					for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
+
+						var morphTarget = morphTargets[ i ];
+
+						var attribute = new THREE.Float32Attribute( morphTarget.vertices.length * 3, 3 );
+						attribute.enabled = false;
+
+						this.addAttribute( 'position_' + i, attribute.copyVector3sArray( morphTarget.vertices ) );
+
+					}
+
+				}
 
 			}
 
@@ -183,44 +219,6 @@ THREE.BufferGeometry.prototype = {
 			} else if ( geometry instanceof THREE.Geometry ) {
 
 				this.fromGeometry( geometry, material );
-
-			}
-
-		}
-
-		if ( material.attributes !== undefined ) {
-
-			var attributes = material.attributes;
-
-			for ( var name in attributes ) {
-
-				var attribute = attributes[ name ];
-
-				var type = attribute.type;
-				var array = attribute.value;
-
-				switch ( type ) {
-
-					case "f":
-						var floats = new Float32Array( array.length );
-						this.addAttribute( name, new THREE.BufferAttribute( floats, 1 ).copyArray( array ) );
-						break;
-
-					case "c":
-						var colors = new Float32Array( array.length * 3 );
-						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyColorsArray( array ) );
-						break;
-
-					case "v3":
-						var colors = new Float32Array( array.length * 3 );
-						this.addAttribute( name, new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( array ) );
-						break;
-
-					default:
-						console.warn( 'THREE.BufferGeometry.setFromObject(). TODO: attribute unsupported', type );
-						break;
-
-				}
 
 			}
 
@@ -266,44 +264,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	updateFromMaterial: function ( material ) {
-
-		if ( material.attributes !== undefined ) {
-
-			var attributes = material.attributes;
-
-			for ( var name in attributes ) {
-
-				var attribute = attributes[ name ];
-
-				var type = attribute.type;
-				var array = attribute.value;
-
-				switch ( type ) {
-
-					case "f":
-						this.attributes[ name ].copyArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
-
-					case "c":
-						this.attributes[ name ].copyColorsArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
-
-					case "v3":
-						this.attributes[ name ].copyVector3sArray( array );
-						this.attributes[ name ].needsUpdate = true;
-						break;
-
-				}
-
-			}
-
-		}
-
-	},
-
 	fromGeometry: function ( geometry, material ) {
 
 		material = material || { 'vertexColors': THREE.NoColors };
@@ -315,8 +275,6 @@ THREE.BufferGeometry.prototype = {
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
-
-		var hasFaceVertexNormals = faces[ 0 ] && faces[ 0 ].vertexNormals.length === 3;
 
 		var positions = new Float32Array( faces.length * 3 * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -365,11 +323,13 @@ THREE.BufferGeometry.prototype = {
 			positions[ i3 + 7 ] = c.y;
 			positions[ i3 + 8 ] = c.z;
 
-			if ( hasFaceVertexNormals === true ) {
+			var vertexNormals = face.vertexNormals;
 
-				var na = face.vertexNormals[ 0 ];
-				var nb = face.vertexNormals[ 1 ];
-				var nc = face.vertexNormals[ 2 ];
+			if ( vertexNormals.length === 3 ) {
+
+				var na = vertexNormals[ 0 ];
+				var nb = vertexNormals[ 1 ];
+				var nc = vertexNormals[ 2 ];
 
 				normals[ i3     ] = na.x;
 				normals[ i3 + 1 ] = na.y;
@@ -458,7 +418,7 @@ THREE.BufferGeometry.prototype = {
 
 				} else {
 
-					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i )
+					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i );
 
 				}
 
@@ -485,7 +445,7 @@ THREE.BufferGeometry.prototype = {
 
 				} else {
 
-					THREE.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i )
+					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i );
 
 				}
 
@@ -559,11 +519,11 @@ THREE.BufferGeometry.prototype = {
 
 			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-				THREE.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
 			}
 
-		}
+		};
 
 	}(),
 
@@ -613,13 +573,13 @@ THREE.BufferGeometry.prototype = {
 
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
-					THREE.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
 
 				}
 
 			}
 
-		}
+		};
 
 	}(),
 
@@ -758,7 +718,7 @@ THREE.BufferGeometry.prototype = {
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
 
-			THREE.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
+			console.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
 			return;
 
 		}
@@ -948,9 +908,9 @@ THREE.BufferGeometry.prototype = {
 		var UintArray = ( ( vertices.length / 3 ) > 65535 && THREE.BufferGeometry.MaxIndex > 65535 ) ? Uint32Array : Uint16Array;
 
 		/*
-		THREE.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
-		THREE.log("Faces to process: "+(indices.length/3));
-		THREE.log("Reordering "+verticesCount+" vertices.");
+		console.log("Computing buffers in offsets of "+size+" -> indices:"+indices.length+" vertices:"+vertices.length);
+		console.log("Faces to process: "+(indices.length/3));
+		console.log("Reordering "+verticesCount+" vertices.");
 		*/
 
 		var sortedIndices = new UintArray( indices.length );
@@ -1030,10 +990,10 @@ THREE.BufferGeometry.prototype = {
 
 		/*
 		var orderTime = Date.now();
-		THREE.log("Reorder time: "+(orderTime-s)+"ms");
-		THREE.log("Duplicated "+duplicatedVertices+" vertices.");
-		THREE.log("Compute Buffers time: "+(Date.now()-s)+"ms");
-		THREE.log("Draw offsets: "+offsets.length);
+		console.log("Reorder time: "+(orderTime-s)+"ms");
+		console.log("Duplicated "+duplicatedVertices+" vertices.");
+		console.log("Compute Buffers time: "+(Date.now()-s)+"ms");
+		console.log("Draw offsets: "+offsets.length);
 		*/
 
 		return offsets;
@@ -1044,7 +1004,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
 
-			THREE.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
+			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
 			return;
 
 		}
@@ -1141,16 +1101,14 @@ THREE.BufferGeometry.prototype = {
 		}
 	},
 
-	toJSON: function() {
+	toJSON: function () {
 
-		// we will store all serialization data on 'data'
-		var data = {};
-
-		// add metadata
-		data.metadata = {
-			version: 4.4,
-			type: 'BufferGeometry',
-			generator: 'BufferGeometry.toJSON'
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'BufferGeometry',
+				generator: 'BufferGeometry.toJSON'
+			}
 		};
 
 		// standard BufferGeometry serialization

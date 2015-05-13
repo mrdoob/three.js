@@ -41,14 +41,14 @@ THREE.DynamicGeometry.prototype = {
 
 	computeFaceNormals: function () {
 
-		THREE.warn( 'THREE.DynamicGeometry: computeFaceNormals() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DynamicGeometry: computeFaceNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},
 
 	computeVertexNormals: function () {
 
-		THREE.warn( 'THREE.DynamicGeometry: computeVertexNormals	() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DynamicGeometry: computeVertexNormals	() is not a method of this type of geometry.' );
 		return this;
 
 	},
@@ -79,6 +79,13 @@ THREE.DynamicGeometry.prototype = {
 			for ( var j = 0, jl = vertexColors.length; j < jl; j ++ ) {
 
 				this.colors[ indices[ j ] ] = vertexColors[ j ];
+
+			}
+
+			if ( vertexUvs === undefined ) {
+
+				console.warn( 'THREE.DynamicGeometry.fromGeometry(): Missing vertexUVs', i );
+				vertexUvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
 
 			}
 

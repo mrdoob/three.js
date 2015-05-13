@@ -74,8 +74,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		var i, il, j, jl, n,
 
 		shadowMap, shadowMatrix, shadowCamera,
-		buffer, material,
-		webglObject, object, light,
+		webglObject, object, material, light,
 
 		lights = [],
 		k = 0,
@@ -133,7 +132,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 						light.shadowCascadeArray[ n ] = virtualLight;
 
-						//THREE.log( "Created virtualLight", virtualLight );
+						//console.log( "Created virtualLight", virtualLight );
 
 					} else {
 
@@ -194,7 +193,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				} else {
 
-					THREE.error( "THREE.ShadowMapPlugin: Unsupported light type for shadow", light );
+					console.error( "THREE.ShadowMapPlugin: Unsupported light type for shadow", light );
 					continue;
 
 				}
@@ -274,7 +273,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				webglObject = _renderList[ j ];
 
 				object = webglObject.object;
-				buffer = _objects.geometries.get( object );
 
 				// culling is overriden globally for all objects
 				// while rendering depth map
@@ -309,7 +307,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				}
 
 				_renderer.setMaterialFaces( objectMaterial );
-				_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object );
+				_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, object );
 
 			}
 

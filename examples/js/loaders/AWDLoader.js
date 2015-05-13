@@ -137,7 +137,7 @@ THREE.AWDLoader = (function () {
 
 				} else {
 
-					THREE.error( 'AWDLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
+					console.error( 'AWDLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
 
 				}
 
@@ -159,11 +159,11 @@ THREE.AWDLoader = (function () {
 		this._parseHeader( );
 
 		if ( this._compression != 0  ) {
-			THREE.error( 'compressed AWD not supported' );
+			console.error( 'compressed AWD not supported' );
 		}
 
 		if (!this._streaming && this._bodylen != data.byteLength - this._ptr ) {
-			THREE.error('AWDLoader: body len does not match file length', this._bodylen,  blen - this._ptr);
+			console.error('AWDLoader: body len does not match file length', this._bodylen,  blen - this._ptr);
 		}
 
 		while ( this._ptr < blen ) {
@@ -451,7 +451,7 @@ THREE.AWDLoader = (function () {
 		if (type === 0) {
 			data_len = this.readU32();
 			var url = this.readUTFBytes(data_len);
-			THREE.log( url );
+			console.log( url );
 
 			asset = this.loadTexture( url );
 		} else {
@@ -883,7 +883,7 @@ THREE.AWDLoader = (function () {
 		var mesh = this.getBlock( geoAdress );
 
 		if (mesh == null) {
-			THREE.log( "parseMeshPoseAnimation target mesh not found at:", geoAdress );
+			console.log( "parseMeshPoseAnimation target mesh not found at:", geoAdress );
 			return;
 		}
 

@@ -53,6 +53,7 @@
 			document.body.appendChild( renderer.domElement );
 			
 			var orbit = new THREE.OrbitControls( camera, renderer.domElement );
+			orbit.noZoom = true;
 
 			var ambientLight = new THREE.AmbientLight( 0x000000 );
 			scene.add( ambientLight );
@@ -87,7 +88,8 @@
 					new THREE.MeshPhongMaterial({
 						color: 0x156289,
 						emissive: 0x072534,
-						side: THREE.DoubleSide
+						side: THREE.DoubleSide,
+						shading: THREE.FlatShading
 					})
 					
 				]

@@ -43,7 +43,9 @@ var Script = function ( editor ) {
 	header.add( close );
 
 	var delay;
+	var currentMode;
 	var currentScript;
+	var currentObject;
 
 	var codemirror = CodeMirror( container.dom, {
 		value: '',
@@ -61,16 +63,49 @@ var Script = function ( editor ) {
 
 			var value = codemirror.getValue();
 
-			if ( validate( value ) ) {
+			if ( ! validate( value ) ) return;
+
+			if ( typeof( currentScript ) === 'object' ) {
 
 				currentScript.source = value;
 				signals.scriptChanged.dispatch( currentScript );
+				return;
+			}
+
+			switch ( currentScript ) {
+
+				case 'vertexShader':
+
+					currentObject.vertexShader = value;
+					break;
+
+				case 'fragmentShader':
+
+					currentObject.fragmentShader = value;
+					break;
+
+				case 'programInfo':
+
+					var json = JSON.parse( value );
+					currentObject.defines = json.defines;
+					currentObject.uniforms = json.uniforms;
+					currentObject.attributes = json.attributes;
 
 			}
 
-		}, 300 );
+			currentObject.needsUpdate = true;
+			signals.materialChanged.dispatch( currentObject );
+
+		}, 200 );
 
 	});
+
+	// prevent backspace from deleting objects
+	var wrapper = codemirror.getWrapperElement();
+	wrapper.addEventListener( 'keydown', function ( event ) {
+		event.stopPropagation();
+	} );
+
 
 	// validate
 
@@ -79,7 +114,7 @@ var Script = function ( editor ) {
 
 	var validate = function ( string ) {
 
-		var syntax, errors;
+		var errors;
 
 		return codemirror.operation( function () {
 
@@ -97,48 +132,84 @@ var Script = function ( editor ) {
 
 			//
 
-			try {
+			switch ( currentMode ) {
 
-				syntax = esprima.parse( string, { tolerant: true } );
-				errors = syntax.errors;
+				case 'javascript':
 
-				for ( var i = 0; i < errors.length; i ++ ) {
+					try {
 
-					var error = errors[ i ];
+						var syntax = esprima.parse( string, { tolerant: true } );
+						errors = syntax.errors;
 
-					var message = document.createElement( 'div' );
-					message.className = 'esprima-error';
-					message.textContent = error.message.replace(/Line [0-9]+: /, '');
+					} catch ( error ) {
 
-					var lineNumber = error.lineNumber - 1;
-					errorLines.push( lineNumber );
+						errors = [
 
-					codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
+							{ lineNumber: error.lineNumber,message: error.message }
+						];
 
-					var widget = codemirror.addLineWidget(
-						lineNumber,
-						message
-					);
+					}
 
-					widgets.push( widget );
+					for ( var i = 0; i < errors.length; i ++ ) {
 
-				}
+						var error = errors[ i ];
+						error.message = error.message.replace(/Line [0-9]+: /, '');
 
-			} catch ( error ) {
+					}
+
+					break;
+
+				case 'json':
+
+					errors = [];
+
+					jsonlint.parseError = function ( message, info ) {
+
+						message = message.split('\n')[3];
+
+						errors.push({
+							lineNumber: info.loc.first_line,
+							message: message
+						});
+
+					};
+
+					try {
+
+						jsonlint.parse( string );
+
+					} catch ( error ) {
+
+						// ignore failed error recovery
+
+					}
+
+					break;
+
+				case 'glsl':
+
+					// TODO validate GLSL (compiling shader?)
+
+				default:
+
+					errors = [];
+
+			}
+
+			for ( var i = 0; i < errors.length; i ++ ) {
+
+				var error = errors[ i ];
 
 				var message = document.createElement( 'div' );
 				message.className = 'esprima-error';
-				message.textContent = error.message.replace(/Line [0-9]+: /, '');
+				message.textContent = error.message;
 
 				var lineNumber = error.lineNumber - 1;
 				errorLines.push( lineNumber );
 
 				codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
 
-				var widget = codemirror.addLineWidget(
-					lineNumber,
-					message
-				);
+				var widget = codemirror.addLineWidget( lineNumber, message );
 
 				widgets.push( widget );
 
@@ -160,12 +231,58 @@ var Script = function ( editor ) {
 
 	signals.editScript.add( function ( object, script ) {
 
-		container.setDisplay( '' );
+		var mode, name, source;
 
+		if ( typeof( script ) === 'object' ) {
+
+			mode = 'javascript';
+			name = script.name;
+			source = script.source;
+
+		} else {
+
+			switch ( script ) {
+
+				case 'vertexShader':
+
+					mode = 'glsl';
+					name = 'Vertex Shader';
+					source = object.vertexShader || "";
+
+					break;
+
+				case 'fragmentShader':
+
+					mode = 'glsl';
+					name = 'Fragment Shader';
+					source = object.fragmentShader || "";
+
+					break;
+
+				case 'programInfo':
+
+					mode = 'json';
+					name = 'Program Properties';
+					var json = {
+						defines: object.defines,
+						uniforms: object.uniforms,
+						attributes: object.attributes
+					};
+					source = JSON.stringify( json, null, '\t' );
+
+			}
+
+		}
+
+		currentMode = mode;
 		currentScript = script;
+		currentObject = object;
 
-		title.setValue( object.name + ' / ' + script.name );
-		codemirror.setValue( script.source );
+		title.setValue( object.name + ' / ' + name );
+		container.setDisplay( '' );
+		codemirror.setValue( source );
+		if (mode === 'json' ) mode = { name: 'javascript', json: true };
+		codemirror.setOption( 'mode', mode );
 
 	} );
 

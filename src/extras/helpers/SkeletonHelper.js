@@ -28,7 +28,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors, depthTest: false, depthWrite: false, transparent: true } );
 
-	THREE.SegmentsLine.call( this, geometry, material );
+	THREE.LineSegments.call( this, geometry, material );
 
 	this.root = object;
 
@@ -40,7 +40,7 @@ THREE.SkeletonHelper = function ( object ) {
 };
 
 
-THREE.SkeletonHelper.prototype = Object.create( THREE.SegmentsLine.prototype );
+THREE.SkeletonHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.SkeletonHelper.prototype.constructor = THREE.SkeletonHelper;
 
 THREE.SkeletonHelper.prototype.getBoneList = function( object ) {

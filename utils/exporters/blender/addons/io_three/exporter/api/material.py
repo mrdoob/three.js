@@ -384,7 +384,10 @@ def _valid_textures(material, strict_use=True):
             in_use = texture.use
         else:
             in_use = True
-        if texture.texture.type != IMAGE or not in_use:
+        if not in_use:
+            continue
+        if not texture.texture or texture.texture.type != IMAGE:
+            logger.warning("Unable to export non-image texture %s", texture)
             continue
         logger.debug("Valid texture found %s", texture)
         yield texture

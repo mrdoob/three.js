@@ -17,7 +17,14 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 	get length() {
 
-		return this.itemSize * this.data.array.length / this.data.stride;
+		console.warn( 'THREE.InterleavedBufferAttribute: .length has been renamed to .count.' );
+		return this.count;
+
+	},
+
+	get count() {
+
+		return this.data.array.length / this.data.stride;
 
 	},
 
