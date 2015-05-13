@@ -633,7 +633,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			refreshUi();
+			refreshUi(false);
 
 			signals.materialChanged.dispatch( material );
 
@@ -689,7 +689,7 @@ Sidebar.Material = function ( editor ) {
 	};
 
 
-	function refreshUi() {
+	function refreshUi(resetTextureSelectors) {
 
 		var material = currentObject.material;
 
@@ -746,21 +746,37 @@ Sidebar.Material = function ( editor ) {
 		if ( material.map !== undefined ) {
 
 			materialMapEnabled.setValue( material.map !== null );
-			materialMap.setValue( material.map );
+
+			if ( material.map !== null || resetTextureSelectors ) {
+
+				materialMap.setValue( material.map );
+
+			}
 
 		}
 
 		if ( material.alphaMap !== undefined ) {
 
 			materialAlphaMapEnabled.setValue( material.alphaMap !== null );
-			materialAlphaMap.setValue( material.alphaMap );
+
+			if ( material.alphaMap !== null || resetTextureSelectors ) {
+
+				materialAlphaMap.setValue( material.alphaMap );
+
+			}
 
 		}
 
 		if ( material.bumpMap !== undefined ) {
 
 			materialBumpMapEnabled.setValue( material.bumpMap !== null );
-			materialBumpMap.setValue( material.bumpMap );
+
+			if ( material.bumpMap !== null || resetTextureSelectors ) {
+
+				materialBumpMap.setValue( material.bumpMap );
+
+			}
+
 			materialBumpScale.setValue( material.bumpScale );
 
 		}
@@ -768,21 +784,37 @@ Sidebar.Material = function ( editor ) {
 		if ( material.normalMap !== undefined ) {
 
 			materialNormalMapEnabled.setValue( material.normalMap !== null );
-			materialNormalMap.setValue( material.normalMap );
+
+			if ( material.normalMap !== null || resetTextureSelectors ) {
+
+				materialNormalMap.setValue( material.normalMap );
+
+			}
 
 		}
 
 		if ( material.specularMap !== undefined ) {
 
 			materialSpecularMapEnabled.setValue( material.specularMap !== null );
-			materialSpecularMap.setValue( material.specularMap );
+
+			if ( material.specularMap !== null || resetTextureSelectors ) {
+
+				materialSpecularMap.setValue( material.specularMap );
+
+			}
 
 		}
 
 		if ( material.envMap !== undefined ) {
 
 			materialEnvMapEnabled.setValue( material.envMap !== null );
-			materialEnvMap.setValue( material.envMap );
+
+			if ( material.envMap !== null || resetTextureSelectors ) {
+
+				materialEnvMap.setValue( material.envMap );
+
+			}
+
 			materialReflectivity.setValue( material.reflectivity );
 
 		}
@@ -790,14 +822,25 @@ Sidebar.Material = function ( editor ) {
 		if ( material.lightMap !== undefined ) {
 
 			materialLightMapEnabled.setValue( material.lightMap !== null );
-			materialLightMap.setValue( material.lightMap );
+
+			if ( material.lightMap !== null || resetTextureSelectors ) {
+
+				materialLightMap.setValue( material.lightMap );
+
+			}
 
 		}
 
 		if ( material.aoMap !== undefined ) {
 
 			materialAOMapEnabled.setValue( material.aoMap !== null );
-			materialAOMap.setValue( material.aoMap );
+
+			if ( material.aoMap !== null || resetTextureSelectors ) {
+
+				materialAOMap.setValue( material.aoMap );
+
+			}
+
 			materialAOScale.setValue( material.aoMapIntensity );
 
 		}
@@ -854,8 +897,10 @@ Sidebar.Material = function ( editor ) {
 
 		if ( object && object.material ) {
 
+			var objectChanged = object !== currentObject;
+
 			currentObject = object;
-			refreshUi();
+			refreshUi(objectChanged);
 			container.setDisplay( '' );
 
 		} else {
