@@ -100,6 +100,13 @@ var Script = function ( editor ) {
 
 	});
 
+	// prevent backspace from deleting objects
+	var wrapper = codemirror.getWrapperElement();
+	wrapper.addEventListener( 'keydown', function ( event ) {
+		event.stopPropagation();
+	} );
+
+
 	// validate
 
 	var errorLines = [];
@@ -162,7 +169,7 @@ var Script = function ( editor ) {
 
 						errors.push({
 							lineNumber: info.loc.first_line,
-							message: message 
+							message: message
 						});
 
 					};
