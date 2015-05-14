@@ -103,7 +103,9 @@ var Script = function ( editor ) {
 	// prevent backspace from deleting objects
 	var wrapper = codemirror.getWrapperElement();
 	wrapper.addEventListener( 'keydown', function ( event ) {
+
 		event.stopPropagation();
+
 	} );
 
 
