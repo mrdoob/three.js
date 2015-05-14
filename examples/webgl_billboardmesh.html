@@ -113,7 +113,7 @@
 
 				var radius = 200;
 				var sphereGeometry = new THREE.SphereGeometry( radius, 32, 32 );
-				var sphereMaterial = new THREE.MeshPhongMaterial( { bumpMap: textures.planet, bumpScale: 10, color: 0x333344, overdraw: 0.5 } );
+				var sphereMaterial = new THREE.MeshPhongMaterial( { bumpMap: textures.planet, bumpScale: 10, color: 0x333344 } );
 				var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 				sphere.position.set( 0, 0, 0 );
 				scene.add( sphere );
@@ -143,14 +143,14 @@
 					// create an axially constrained billboard for the alien body
 					billboardBodyPosition = surfacePoint.clone().add( orthogonalAxis.clone().multiplyScalar( 20 ) );
 					alienBodyBillboard = new THREE.BillboardMesh( alienBodyGeom, alienBodyMaterial, camera.position, orthogonalAxis, true );
-					alienBodyBillboard.position.set( billboardBodyPosition.x, billboardBodyPosition.y, billboardBodyPosition.z );
+					alienBodyBillboard.position.copy( billboardBodyPosition );
 					billboards.push( alienBodyBillboard );
 					scene.add( alienBodyBillboard );
 
 					// create an unconstrained billboard for the alien head (always directly faces the camera)
 					billboardHeadPosition = surfacePoint.clone().add( orthogonalAxis.clone().multiplyScalar( 75 ) );
 					alienHeadBillboard = new THREE.BillboardMesh( alienHeadGeom, alienHeadMaterial, camera.position, orthogonalAxis, false );
-					alienHeadBillboard.position.set( billboardHeadPosition.x, billboardHeadPosition.y, billboardHeadPosition.z );
+					alienHeadBillboard.position.copy( billboardHeadPosition );
 					billboards.push( alienHeadBillboard );
 					scene.add( alienHeadBillboard );
 

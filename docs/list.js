@@ -239,6 +239,7 @@ var list = {
 		],
 
 		"Examples" : [
+			[ "BillboardMesh", "api/examples/meshes/BillboardMesh" ],
 			[ "CombinedCamera", "api/examples/cameras/CombinedCamera" ],
 			[ "LookupTable", "api/examples/Lut" ]
 
