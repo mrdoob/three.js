@@ -20,26 +20,46 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	var UniformArraySuffix = /\[0\]$/;
-
-	function cacheUniformLocations( gl, program ) {
+	function cacheUniformLocations( gl, program, vertexGlsl, fragmentGlsl ) {
 
 		var uniforms = {};
 
-		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
+		findUniformNames( uniforms, vertexGlsl );
+		findUniformNames( uniforms, fragmentGlsl );
 
-		for ( var i = 0; i < n; i ++ ) {
+		for ( var id in uniforms ) {
 
-			var activeInfo = gl.getActiveUniform( program, i );
+			uniforms[ id ] = gl.getUniformLocation( program, id );
 
-			var name = activeInfo.name.replace( UniformArraySuffix, '' );
-			uniforms[ name ] = gl.getUniformLocation( program, name );
+			// console.log( 'UNIFORM CANDIDATE: ' + id );
 
 		}
 
 		return uniforms;
 
 	}
+
+	function findUniformNames( uniforms, glslCode ) {
+
+		glslCode = glslCode.replace( RegExFindComments, '' );
+
+		while ( true ) {
+
+			var match = RegExFindUniformNames.exec( glslCode );
+
+			if ( match === null ) break;
+
+			uniforms[ match[1] ] = null;
+
+		}
+
+	}
+
+	var RegExFindComments = (
+			/\/(?:\*(?:.|\s)*?\*\/|\/[^\n\r]*)/g );
+
+	var RegExFindUniformNames = (
+			/uniform\s(?:.|\s)*?([_A-Za-z][_\w]+)\s*(?:\[(?:.|\s)*?]\s*)?;/g );
 
 	function cacheAttributeLocations( gl, program, identifiers ) {
 
@@ -166,16 +186,16 @@ THREE.WebGLProgram = ( function () {
 
 		var program = gl.createProgram();
 
-		var prefix_vertex, prefix_fragment;
+		var prefixVertex, prefixFragment;
 
 		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			prefix_vertex = '';
-			prefix_fragment = '';
+			prefixVertex = '';
+			prefixFragment = '';
 
 		} else {
 
-			prefix_vertex = [
+			prefixVertex = [
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
@@ -282,7 +302,7 @@ THREE.WebGLProgram = ( function () {
 
 			].reduce( programArrayToString, '' );
 
-			prefix_fragment = [
+			prefixFragment = [
 
 				( parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 
@@ -342,8 +362,11 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, prefix_vertex + vertexShader );
-		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
+		var vertexGlsl = prefixVertex + vertexShader;
+		var fragmentGlsl = prefixFragment + fragmentShader;
+
+		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
+		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );
@@ -383,7 +406,7 @@ THREE.WebGLProgram = ( function () {
 
 		// cache uniform locations
 
-		this.uniforms = cacheUniformLocations( gl, program );
+		this.uniforms = cacheUniformLocations( gl, program, vertexGlsl, fragmentGlsl );
 
 		// cache attributes locations
 
