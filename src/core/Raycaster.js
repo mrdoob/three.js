@@ -101,7 +101,7 @@
 
 			var intersects = [];
 
-			if ( objects instanceof Array === false ) {
+			if ( Array.isArray( objects ) === false ) {
 
 				console.warn( 'THREE.Raycaster.intersectObjects: objects is not an Array.' );
 				return intersects;

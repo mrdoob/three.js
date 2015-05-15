@@ -887,7 +887,7 @@ THREE.SceneLoader.prototype = {
 
 			textureJSON = data.textures[ textureID ];
 
-			if ( textureJSON.url instanceof Array ) {
+			if ( Array.isArray( textureJSON.url ) ) {
 
 				counter_textures += textureJSON.url.length;
 
@@ -921,7 +921,7 @@ THREE.SceneLoader.prototype = {
 
 			var texture;
 
-			if ( textureJSON.url instanceof Array ) {
+			if ( Array.isArray( textureJSON.url ) ) {
 
 				var count = textureJSON.url.length;
 				var url_array = [];

@@ -373,7 +373,7 @@ THREE.ObjectLoader.prototype = {
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
-				if ( data.wrap instanceof Array ) {
+				if ( Array.isArray( data.wrap ) ) {
 
 					texture.wrapS = parseConstant( data.wrap[ 0 ] );
 					texture.wrapT = parseConstant( data.wrap[ 1 ] );

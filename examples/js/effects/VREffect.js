@@ -115,7 +115,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 			var sceneL, sceneR;
 
-			if ( scene instanceof Array ) {
+			if ( Array.isArray( scene ) ) {
 
 				sceneL = scene[ 0 ];
 				sceneR = scene[ 1 ];
@@ -162,7 +162,7 @@ THREE.VREffect = function ( renderer, onError ) {
 
 		// Regular render mode if not HMD
 
-		if ( scene instanceof Array ) scene = scene[ 0 ];
+		if ( Array.isArray( scene ) ) scene = scene[ 0 ];
 
 		renderer.render( scene, camera );
 

@@ -33,7 +33,7 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	this.type = 'ExtrudeGeometry';
 
-	shapes = shapes instanceof Array ? shapes : [ shapes ];
+	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
 
 	this.addShapeList( shapes, options );
 

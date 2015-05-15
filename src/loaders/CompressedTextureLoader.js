@@ -28,7 +28,7 @@ THREE.CompressedTextureLoader.prototype = {
 		var loader = new THREE.XHRLoader();
 		loader.setResponseType( 'arraybuffer' );
 
-		if ( url instanceof Array ) {
+		if ( Array.isArray( url ) ) {
 
 			var loaded = 0;
 
