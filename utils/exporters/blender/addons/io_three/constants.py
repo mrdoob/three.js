@@ -47,6 +47,7 @@ UVS = 'uvs'
 APPLY_MODIFIERS = 'applyModifiers'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
+EXTRA_VGROUPS = 'extraVertexGroups'
 INDEX = 'index'
 DRAW_CALLS = 'offsets'
 DC_START = 'start'
@@ -108,6 +109,7 @@ EXPORT_OPTIONS = {
     UVS: True,
     APPLY_MODIFIERS: True,
     COLORS: False,
+    EXTRA_VGROUPS: '',
     INDEX_TYPE: UINT_16,
     MATERIALS: False,
     FACE_MATERIALS: False,
