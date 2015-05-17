@@ -92,8 +92,8 @@ def cast_shadow(obj):
         if obj.data.type in (SPOT, SUN):
             ret = obj.data.shadow_method != NO_SHADOW
         else:
-            logger.info('%s is a lamp but this lamp type does not '\
-                'have supported shadows in ThreeJS', obj.name)
+            logger.info("%s is a lamp but this lamp type does not "
+                        "have supported shadows in ThreeJS", obj.name)
             ret = None
         return ret
     elif obj.type == MESH:
@@ -217,6 +217,7 @@ def nodes(valid_types, options):
         if _valid_node(obj, valid_types, options):
             yield obj.name
 
+
 @_object
 def position(obj, options):
     """
@@ -246,6 +247,7 @@ def receive_shadow(obj):
 
 
 AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4()
+
 
 @_object
 def matrix(obj, options):
@@ -553,6 +555,3 @@ def _valid_node(obj, valid_types, options):
 
     # if we get this far assume that the mesh is valid
     return True
-
-
-

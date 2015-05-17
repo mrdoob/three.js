@@ -265,7 +265,7 @@ class Geometry(base_classes.BaseNode):
 
         for name, index in api.mesh.extra_vertex_groups(self.node,
                                                         option_extra_vgroups):
-            components.append(name);
+            components.append(name)
 
         for component in components:
             try:
@@ -284,7 +284,9 @@ class Geometry(base_classes.BaseNode):
         data = self._component_data()
 
         if self[constants.TYPE] != constants.GEOMETRY.title():
-            data = {constants.ATTRIBUTES: data}
+            data = {
+                constants.DATA: {constants.ATTRIBUTES: data}
+            }
 
         data[constants.METADATA] = {
             constants.TYPE: self[constants.TYPE]
@@ -426,7 +428,7 @@ class Geometry(base_classes.BaseNode):
                         self.get(constants.DRAW_CALLS)))
 
             indices_per_face = 3
-            index_threshold  = 0xffff - indices_per_face
+            index_threshold = 0xffff - indices_per_face
             if option_index_type == constants.UINT_32:
                 index_threshold = 0x7fffffff - indices_per_face
 
@@ -438,8 +440,8 @@ class Geometry(base_classes.BaseNode):
                 item_size = entry[constants.ITEM_SIZE]
 
                 attrib_keys.append(key)
-                attrib_data_in.append( (entry[constants.ARRAY], item_size) )
-                attrib_data_out.append( ([], i, i + item_size) )
+                attrib_data_in.append((entry[constants.ARRAY], item_size))
+                attrib_data_out.append(([], i, i + item_size))
                 i += item_size
 
             index_data, draw_calls = [], []
@@ -453,7 +455,7 @@ class Geometry(base_classes.BaseNode):
                 vertex_data = ()
                 for array, item_size in attrib_data_in:
                     vertex_data += tuple(
-                            array[i * item_size : (i + 1) * item_size])
+                            array[i * item_size:(i + 1) * item_size])
 
                 vertex_index = indexed.get(vertex_data)
 
@@ -464,7 +466,7 @@ class Geometry(base_classes.BaseNode):
 
                     indexed[vertex_data] = vertex_index
                     for array, i_from, i_to in attrib_data_out:
-                        array.extend(vertex_data[i_from : i_to])
+                        array.extend(vertex_data[i_from:i_to])
 
                 index_data.append(vertex_index)
 
@@ -477,7 +479,8 @@ class Geometry(base_classes.BaseNode):
                     start, count = 0, len(index_data)
                     if draw_calls:
                         prev = draw_calls[-1]
-                        start = prev[constants.DC_START] + prev[constants.DC_COUNT]
+                        start = (prev[constants.DC_START] +
+                                 prev[constants.DC_COUNT])
                         count -= start
                     draw_calls.append({
                         constants.DC_START: start,
@@ -500,7 +503,6 @@ class Geometry(base_classes.BaseNode):
             if (draw_calls):
                 logger.info("draw_calls = %s", repr(draw_calls))
                 self[constants.DRAW_CALLS] = draw_calls
-
 
     def _parse_geometry(self):
         """Parse the geometry to Three.Geometry specs"""
@@ -528,9 +530,9 @@ class Geometry(base_classes.BaseNode):
 
         if self.options.get(constants.FACES):
             logger.info("Parsing %s", constants.FACES)
-            materials = self.get(constants.MATERIALS)
+            material_list = self.get(constants.MATERIALS)
             self[constants.FACES] = api.mesh.faces(
-                self.node, self.options, materials=materials) or []
+                self.node, self.options, material_list=material_list) or []
 
         no_anim = (None, False, constants.OFF)
         if self.options.get(constants.ANIMATION) not in no_anim:
