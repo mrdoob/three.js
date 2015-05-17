@@ -296,7 +296,7 @@ def faces(mesh, options, materials=None):
     logger.debug("Materials enabled = %s", opt_materials)
     logger.debug("Normals enabled = %s", opt_normals)
 
-    uv_layers = _uvs(mesh) if opt_uvs else None
+    uv_layers, uv_indices = _uvs(mesh) if opt_uvs else None
     vertex_normals = _normals(mesh) if opt_normals else None
     vertex_colours = vertex_colors(mesh) if opt_colours else None
 
@@ -347,15 +347,14 @@ def faces(mesh, options, materials=None):
                          "for face %d" % face.index)
                 raise exceptions.MaterialError(error)
 
-        # @TODO: this needs the same optimization as what
-        #        was done for colours and normals
-        if uv_layers:
+        if uv_layers and uv_indices:
             for index, uv_layer in enumerate(uv_layers):
                 layer = mesh.tessface_uv_textures[index]
 
                 for uv_data in layer.data[face.index].uv:
                     uv_tuple = (uv_data[0], uv_data[1])
-                    face_data.append(uv_layer.index(uv_tuple))
+                    uv_index = uv_indices[index][str(uv_tuple)]
+                    face_data.append(uv_index)
                     mask[constants.UVS] = True
 
         if vertex_normals:
@@ -639,12 +638,7 @@ def uvs(mesh):
     """
     logger.debug("mesh.uvs(%s)", mesh)
     uvs_ = []
-    for layer in _uvs(mesh):
-        uvs_.append([])
-        logger.info("Parsing UV layer %d", len(uvs_))
-        for pair in layer:
-            uvs_[-1].extend(pair)
-    return uvs_
+    return _uvs(mesh)[0]
 
 
 @_mesh
@@ -850,20 +844,29 @@ def _uvs(mesh):
     """
 
     :param mesh:
+    :rtype: [[], ...], [{}, ...]
 
     """
     uv_layers = []
+    uv_indices = []
 
     for layer in mesh.uv_layers:
         uv_layers.append([])
+        uv_indices.append({})
+        index = 0
 
         for uv_data in layer.data:
             uv_tuple = (uv_data.uv[0], uv_data.uv[1])
+            uv_key = str(uv_tuple)
 
-            if uv_tuple not in uv_layers[-1]:
+            try:
+                uv_indices[-1][uv_key]
+            except KeyError:
+                uv_indices[-1][uv_key] = index
                 uv_layers[-1].append(uv_tuple)
+                index += 1
 
-    return uv_layers
+    return uv_layers, uv_indices
 
 
 def _armature(mesh):
