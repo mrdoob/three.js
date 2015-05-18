@@ -9089,6 +9089,28 @@ THREE.Geometry.prototype = {
 
 	},
 
+	normalize: function () {
+
+		this.computeBoundingSphere();
+
+		var center = this.boundingSphere.center;
+		var radius = this.boundingSphere.radius;
+
+		var s = radius === 0 ? 1 : 1.0 / radius;
+
+		var matrix = new THREE.Matrix4();
+		matrix.set(
+			s, 0, 0, -s * center.x,
+			0, s, 0, -s * center.y,
+			0, 0, s, -s * center.z,
+			0, 0, 0, 1
+		);
+
+		this.applyMatrix( matrix );
+
+		return this;
+	},
+
 	computeFaceNormals: function () {
 
 		var cb = new THREE.Vector3(), ab = new THREE.Vector3();
@@ -10514,7 +10536,7 @@ THREE.BufferGeometry.prototype = {
 		if ( geometry.colors.length > 0 ) {
 
 			var colors = new Float32Array( geometry.colors.length * 3 );
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
 
 		}
 
