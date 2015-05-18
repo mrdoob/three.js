@@ -889,18 +889,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var geometryAttributes = geometry.attributes;
-
 		var programAttributes = program.attributes;
-		var programAttributesKeys = program.attributesKeys;
 
-		for ( var i = 0, l = programAttributesKeys.length; i < l; i ++ ) {
+		for ( var name in programAttributes ) {
 
-			var key = programAttributesKeys[ i ];
-			var programAttribute = programAttributes[ key ];
+			var programAttribute = programAttributes[ name ];
 
 			if ( programAttribute >= 0 ) {
 
-				var geometryAttribute = geometryAttributes[ key ];
+				var geometryAttribute = geometryAttributes[ name ];
 
 				if ( geometryAttribute !== undefined ) {
 
@@ -963,15 +960,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( material.defaultAttributeValues !== undefined ) {
 
-					if ( material.defaultAttributeValues[ key ] !== undefined ) {
+					if ( material.defaultAttributeValues[ name ] !== undefined ) {
 
-						if ( material.defaultAttributeValues[ key ].length === 2 ) {
+						if ( material.defaultAttributeValues[ name ].length === 2 ) {
 
-							_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ key ] );
+							_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ name ] );
 
-						} else if ( material.defaultAttributeValues[ key ].length === 3 ) {
+						} else if ( material.defaultAttributeValues[ name ].length === 3 ) {
 
-							_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ key ] );
+							_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ name ] );
 
 						}
 

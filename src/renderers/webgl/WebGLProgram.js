@@ -460,7 +460,6 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		this.attributes = cacheAttributeLocations( gl, program, identifiers );
-		this.attributesKeys = Object.keys( this.attributes );
 
 		//
 

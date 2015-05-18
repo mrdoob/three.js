@@ -12,8 +12,7 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 	this.type = 'BufferGeometry';
 
-	this.attributes = {}; // TODO: Change to Array and remove attributeKeys?
-	this.attributesKeys = [];
+	this.attributes = {};
 
 	this.morphAttributes = [];
 
@@ -42,7 +41,6 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		this.attributes[ name ] = attribute;
-		this.attributesKeys = Object.keys( this.attributes );
 
 	},
 

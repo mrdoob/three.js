@@ -179,14 +179,12 @@ THREE.WebGLObjects = function ( gl, info ) {
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			var attributes = geometry.attributes;
-			var attributesKeys = geometry.attributesKeys;
 
-			for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
+			for ( var name in attributes ) {
 
-				var key = attributesKeys[ i ];
-				var attribute = attributes[ key ];
+				var attribute = attributes[ name ];
 
-				var bufferType = ( key === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+				var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
 				var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
