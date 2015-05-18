@@ -34089,7 +34089,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	this.bones = this.getBoneList( object );
 
-	var geometry = new THREE.Geometry();
+	var geometry = new THREE.DynamicGeometry();
 
 	for ( var i = 0; i < this.bones.length; i ++ ) {
 
