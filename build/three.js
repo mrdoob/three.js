@@ -8279,7 +8279,6 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
-	this.enabled = true;
 	this.needsUpdate = false;
 
 };
@@ -9967,7 +9966,7 @@ THREE.DynamicGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		console.warn( 'THREE.DynamicGeometry: computeVertexNormals	() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DynamicGeometry: computeVertexNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},
@@ -10054,7 +10053,8 @@ THREE.BufferGeometry = function () {
 	this.type = 'BufferGeometry';
 
 	this.attributes = {};
-	this.attributesKeys = [];
+
+	this.morphAttributes = [];
 
 	this.drawcalls = [];
 	this.offsets = this.drawcalls; // backwards compatibility
@@ -10081,7 +10081,6 @@ THREE.BufferGeometry.prototype = {
 		}
 
 		this.attributes[ name ] = attribute;
-		this.attributesKeys = Object.keys( this.attributes );
 
 	},
 
@@ -10230,8 +10229,6 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-				this.morphsInfluences = new THREE.Float32Attribute( object.morphTargetInfluences, 1 ).copyArray( object.morphTargetInfluences );
-
 				// positions
 
 				var morphTargets = geometry.morphTargets;
@@ -10243,9 +10240,8 @@ THREE.BufferGeometry.prototype = {
 						var morphTarget = morphTargets[ i ];
 
 						var attribute = new THREE.Float32Attribute( morphTarget.vertices.length * 3, 3 );
-						attribute.enabled = false;
 
-						this.addAttribute( 'position_' + i, attribute.copyVector3sArray( morphTarget.vertices ) );
+						this.morphAttributes.push( attribute.copyVector3sArray( morphTarget.vertices ) );
 
 					}
 
@@ -10508,14 +10504,26 @@ THREE.BufferGeometry.prototype = {
 		var positions = new Float32Array( geometry.vertices.length * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
 
-		var normals = new Float32Array( geometry.normals.length * 3 );
-		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+		if ( geometry.normals.length > 0 ) {
 
-		var colors = new Float32Array( geometry.colors.length * 3 );
-		this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+			var normals = new Float32Array( geometry.normals.length * 3 );
+			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
 
-		var uvs = new Float32Array( geometry.uvs.length * 2 );
-		this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+		}
+
+		if ( geometry.colors.length > 0 ) {
+
+			var colors = new Float32Array( geometry.colors.length * 3 );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+
+		}
+
+		if ( geometry.uvs.length > 0 ) {
+
+			var uvs = new Float32Array( geometry.uvs.length * 2 );
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+
+		}
 
 		this.computeBoundingSphere();
 
@@ -17944,9 +17952,7 @@ THREE.UniformsLib = {
 		"envMap" : { type: "t", value: null },
 		"flipEnvMap" : { type: "f", value: - 1 },
 		"reflectivity" : { type: "f", value: 1.0 },
-		"refractionRatio" : { type: "f", value: 0.98 },
-
-		"morphTargetInfluences" : { type: "f", value: 0 }
+		"refractionRatio" : { type: "f", value: 0.98 }
 
 	},
 
@@ -19758,18 +19764,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var geometryAttributes = geometry.attributes;
-
 		var programAttributes = program.attributes;
-		var programAttributesKeys = program.attributesKeys;
 
-		for ( var i = 0, l = programAttributesKeys.length; i < l; i ++ ) {
+		for ( var name in programAttributes ) {
 
-			var key = programAttributesKeys[ i ];
-			var programAttribute = programAttributes[ key ];
+			var programAttribute = programAttributes[ name ];
 
 			if ( programAttribute >= 0 ) {
 
-				var geometryAttribute = geometryAttributes[ key ];
+				var geometryAttribute = geometryAttributes[ name ];
 
 				if ( geometryAttribute !== undefined ) {
 
@@ -19832,15 +19835,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( material.defaultAttributeValues !== undefined ) {
 
-					if ( material.defaultAttributeValues[ key ] !== undefined ) {
+					if ( material.defaultAttributeValues[ name ] !== undefined ) {
 
-						if ( material.defaultAttributeValues[ key ].length === 2 ) {
+						if ( material.defaultAttributeValues[ name ].length === 2 ) {
 
-							_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ key ] );
+							_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ name ] );
 
-						} else if ( material.defaultAttributeValues[ key ].length === 3 ) {
+						} else if ( material.defaultAttributeValues[ name ].length === 3 ) {
 
-							_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ key ] );
+							_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ name ] );
 
 						}
 
@@ -20309,174 +20312,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-
-		}
-
-	}
-
-	function setupMorphTargets( material, geometryGroup, object ) {
-
-		// set base
-
-		var attributes = material.program.attributes;
-
-		if ( object.morphTargetBase !== - 1 && attributes.position >= 0 ) {
-
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ object.morphTargetBase ] );
-
-			state.enableAttribute( attributes.position );
-
-			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
-
-		} else if ( attributes.position >= 0 ) {
-
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer );
-
-			state.enableAttribute( attributes.position );
-
-			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
-
-		}
-
-		if ( object.morphTargetForcedOrder.length ) {
-
-			// set forced order
-
-			var m = 0;
-			var order = object.morphTargetForcedOrder;
-			var influences = object.morphTargetInfluences;
-
-			var attribute;
-
-			while ( m < material.numSupportedMorphTargets && m < order.length ) {
-
-				attribute = attributes[ 'morphTarget' + m ];
-
-				if ( attribute >= 0 ) {
-
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ order[ m ] ] );
-
-					state.enableAttribute( attribute );
-
-					_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
-
-				}
-
-				attribute = attributes[ 'morphNormal' + m ];
-
-				if ( attribute >= 0 && material.morphNormals ) {
-
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ order[ m ] ] );
-
-					state.enableAttribute( attribute );
-
-					_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
-
-				}
-
-				object.__webglMorphTargetInfluences[ m ] = influences[ order[ m ] ];
-
-				m ++;
-
-			}
-
-		} else {
-
-			// find the most influencing
-
-			var activeInfluenceIndices = [];
-			var influences = object.morphTargetInfluences;
-			var morphTargets = object.geometry.morphTargets;
-
-			if ( influences.length > morphTargets.length ) {
-
-				console.warn( 'THREE.WebGLRenderer: Influences array is bigger than morphTargets array.' );
-				influences.length = morphTargets.length;
-
-			}
-
-			for ( var i = 0, il = influences.length; i < il; i ++ ) {
-
-				var influence = influences[ i ];
-
-				activeInfluenceIndices.push( [ influence, i ] );
-
-			}
-
-			if ( activeInfluenceIndices.length > material.numSupportedMorphTargets ) {
-
-				activeInfluenceIndices.sort( numericalSort );
-				activeInfluenceIndices.length = material.numSupportedMorphTargets;
-
-			} else if ( activeInfluenceIndices.length > material.numSupportedMorphNormals ) {
-
-				activeInfluenceIndices.sort( numericalSort );
-
-			} else if ( activeInfluenceIndices.length === 0 ) {
-
-				activeInfluenceIndices.push( [ 0, 0 ] );
-
-			}
-
-			var attribute;
-
-			for ( var m = 0, ml = material.numSupportedMorphTargets; m < ml; m ++ ) {
-
-				if ( activeInfluenceIndices[ m ] ) {
-
-					var influenceIndex = activeInfluenceIndices[ m ][ 1 ];
-
-					attribute = attributes[ 'morphTarget' + m ];
-
-					if ( attribute >= 0 ) {
-
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ influenceIndex ] );
-
-						state.enableAttribute( attribute );
-
-						_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
-
-					}
-
-					attribute = attributes[ 'morphNormal' + m ];
-
-					if ( attribute >= 0 && material.morphNormals ) {
-
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ influenceIndex ] );
-
-						state.enableAttribute( attribute );
-
-						_gl.vertexAttribPointer( attribute, 3, _gl.FLOAT, false, 0, 0 );
-
-					}
-
-					object.__webglMorphTargetInfluences[ m ] = influences[ influenceIndex ];
-
-				} else {
-
-					/*
-					_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
-
-					if ( material.morphNormals ) {
-
-						_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
-
-					}
-					*/
-
-					object.__webglMorphTargetInfluences[ m ] = 0;
-
-				}
-
-			}
-
-		}
-
-		// load updated influences uniform
-
-		if ( material.program.uniforms.morphTargetInfluences !== null ) {
-
-			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
 
 		}
 
@@ -21101,18 +20936,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			material.needsUpdate = false;
 
 		}
-
-		/*
-		if ( material.morphTargets ) {
-
-			if ( ! object.__webglMorphTargetInfluences ) {
-
-				object.__webglMorphTargetInfluences = new Float32Array( _this.maxMorphTargets );
-
-			}
-
-		}
-		*/
 
 		var refreshProgram = false;
 		var refreshMaterial = false;
@@ -23286,6 +23109,8 @@ THREE.WebGLObjects = function ( gl, info ) {
 	var objects = {};
 	var objectsImmediate = [];
 
+	var morphInfluences = new Float32Array( 8 );
+
 	var geometries = new THREE.WebGLGeometries( gl, info );
 
 	//
@@ -23386,6 +23211,12 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	};
 
+	function numericalSort ( a, b ) {
+
+		return b[ 0 ] - a[ 0 ];
+
+	}
+
 	function updateObject( object ) {
 
 		var geometry = geometries.get( object );
@@ -23396,21 +23227,66 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		}
 
+		// morph targets
+
+		if ( object.morphTargetInfluences !== undefined ) {
+
+			var activeInfluences = [];
+			var morphTargetInfluences = object.morphTargetInfluences;
+
+			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
+
+				var influence = morphTargetInfluences[ i ];
+				activeInfluences.push( [ influence, i ] );
+
+			}
+
+			activeInfluences.sort( numericalSort );
+
+			if ( activeInfluences.length > 8 ) {
+
+				activeInfluences.length = 8;
+
+			}
+
+			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
+
+				morphInfluences[ i ] = activeInfluences[ i ][ 0 ];
+
+				var attribute = geometry.morphAttributes[ activeInfluences[ i ][ 1 ] ];
+				geometry.addAttribute( 'morphTarget' + i, attribute );
+
+			}
+
+			var material = object.material;
+
+			if ( material.program !== undefined ) {
+
+				if ( material.program.uniforms.morphTargetInfluences !== null ) {
+
+					gl.uniform1fv( material.program.uniforms.morphTargetInfluences, morphInfluences );
+
+				}
+
+			} else {
+
+				console.warn( 'TOFIX: material.program is undefined' );
+
+			}
+
+		}
+
 		//
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			var attributes = geometry.attributes;
-			var attributesKeys = geometry.attributesKeys;
 
-			for ( var i = 0, l = attributesKeys.length; i < l; i ++ ) {
+			for ( var name in attributes ) {
 
-				var key = attributesKeys[ i ];
-				var attribute = attributes[ key ];
+				var attribute = attributes[ name ];
 
-				if ( attribute.enabled === false ) continue;
-
-				var bufferType = ( key === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+				var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
 				var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
@@ -23946,7 +23822,6 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		this.attributes = cacheAttributeLocations( gl, program, identifiers );
-		this.attributesKeys = Object.keys( this.attributes );
 
 		//
 
