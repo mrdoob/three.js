@@ -12,8 +12,10 @@ THREE.BufferGeometry = function () {
 	this.name = '';
 	this.type = 'BufferGeometry';
 
-	this.attributes = {};
+	this.attributes = {}; // TODO: Change to Array and remove attributeKeys?
 	this.attributesKeys = [];
+
+	this.morphAttributes = [];
 
 	this.drawcalls = [];
 	this.offsets = this.drawcalls; // backwards compatibility
@@ -189,8 +191,6 @@ THREE.BufferGeometry.prototype = {
 
 				}
 
-				this.morphsInfluences = new THREE.Float32Attribute( object.morphTargetInfluences, 1 ).copyArray( object.morphTargetInfluences );
-
 				// positions
 
 				var morphTargets = geometry.morphTargets;
@@ -202,9 +202,8 @@ THREE.BufferGeometry.prototype = {
 						var morphTarget = morphTargets[ i ];
 
 						var attribute = new THREE.Float32Attribute( morphTarget.vertices.length * 3, 3 );
-						attribute.enabled = false;
 
-						this.addAttribute( 'position_' + i, attribute.copyVector3sArray( morphTarget.vertices ) );
+						this.morphAttributes.push( attribute.copyVector3sArray( morphTarget.vertices ) );
 
 					}
 
@@ -467,14 +466,26 @@ THREE.BufferGeometry.prototype = {
 		var positions = new Float32Array( geometry.vertices.length * 3 );
 		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
 
-		var normals = new Float32Array( geometry.normals.length * 3 );
-		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+		if ( geometry.normals.length > 0 ) {
 
-		var colors = new Float32Array( geometry.colors.length * 3 );
-		this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+			var normals = new Float32Array( geometry.normals.length * 3 );
+			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
 
-		var uvs = new Float32Array( geometry.uvs.length * 2 );
-		this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+		}
+
+		if ( geometry.colors.length > 0 ) {
+
+			var colors = new Float32Array( geometry.colors.length * 3 );
+			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+
+		}
+
+		if ( geometry.uvs.length > 0 ) {
+
+			var uvs = new Float32Array( geometry.uvs.length * 2 );
+			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+
+		}
 
 		this.computeBoundingSphere();
 

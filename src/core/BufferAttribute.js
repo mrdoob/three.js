@@ -7,7 +7,6 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
-	this.enabled = true;
 	this.needsUpdate = false;
 
 };

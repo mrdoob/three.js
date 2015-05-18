@@ -48,7 +48,7 @@ THREE.DynamicGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		console.warn( 'THREE.DynamicGeometry: computeVertexNormals	() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DynamicGeometry: computeVertexNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},

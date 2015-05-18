@@ -7,6 +7,8 @@ THREE.WebGLObjects = function ( gl, info ) {
 	var objects = {};
 	var objectsImmediate = [];
 
+	var morphInfluences = new Float32Array( 8 );
+
 	var geometries = new THREE.WebGLGeometries( gl, info );
 
 	//
@@ -107,6 +109,12 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	};
 
+	function numericalSort ( a, b ) {
+
+		return b[ 0 ] - a[ 0 ];
+
+	}
+
 	function updateObject( object ) {
 
 		var geometry = geometries.get( object );
@@ -114,6 +122,55 @@ THREE.WebGLObjects = function ( gl, info ) {
 		if ( object.geometry instanceof THREE.DynamicGeometry ) {
 
 			geometry.updateFromObject( object );
+
+		}
+
+		// morph targets
+
+		if ( object.morphTargetInfluences !== undefined ) {
+
+			var activeInfluences = [];
+			var morphTargetInfluences = object.morphTargetInfluences;
+
+			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
+
+				var influence = morphTargetInfluences[ i ];
+				activeInfluences.push( [ influence, i ] );
+
+			}
+
+			activeInfluences.sort( numericalSort );
+
+			if ( activeInfluences.length > 8 ) {
+
+				activeInfluences.length = 8;
+
+			}
+
+			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
+
+				morphInfluences[ i ] = activeInfluences[ i ][ 0 ];
+
+				var attribute = geometry.morphAttributes[ activeInfluences[ i ][ 1 ] ];
+				geometry.addAttribute( 'morphTarget' + i, attribute );
+
+			}
+
+			var material = object.material;
+
+			if ( material.program !== undefined ) {
+
+				if ( material.program.uniforms.morphTargetInfluences !== null ) {
+
+					gl.uniform1fv( material.program.uniforms.morphTargetInfluences, morphInfluences );
+
+				}
+
+			} else {
+
+				console.warn( 'TOFIX: material.program is undefined' );
+
+			}
 
 		}
 
@@ -128,8 +185,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 				var key = attributesKeys[ i ];
 				var attribute = attributes[ key ];
-
-				if ( attribute.enabled === false ) continue;
 
 				var bufferType = ( key === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
