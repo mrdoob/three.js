@@ -37,7 +37,6 @@
 				z-index:100;
 			}
 
-
 			a { color:red }
 
 		</style>
@@ -106,9 +105,12 @@
 				var light = new THREE.AmbientLight( 0x111111 );
 				scene.add( light );
 
-
 				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					shading: THREE.FlatShading,
+					morphTargets: true
+				} );
 
 				// construct 8 blend shapes
 
