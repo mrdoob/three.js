@@ -471,7 +471,7 @@ THREE.BufferGeometry.prototype = {
 		this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
 
 		var colors = new Float32Array( geometry.colors.length * 3 );
-		this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyVector3sArray( geometry.colors ) );
+		this.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
 
 		var uvs = new Float32Array( geometry.uvs.length * 2 );
 		this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
