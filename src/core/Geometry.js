@@ -220,22 +220,24 @@ THREE.Geometry.prototype = {
 
 	},
 
-	normalize: function() {
+	normalize: function () {
 
 		this.computeBoundingSphere();
 
-		var COM = this.boundingSphere.center;
-		var R = this.boundingSphere.radius;
+		var center = this.boundingSphere.center;
+		var radius = this.boundingSphere.radius;
 
-		var s = (R === 0 ? 1 : 1.0 / R);
+		var s = radius === 0 ? 1 : 1.0 / radius;
 
-		var m = new THREE.Matrix4().set(
-			s, 0, 0, -s * COM.x,
-			0, s, 0, -s * COM.y,
-			0, 0, s, -s * COM.z,
-			0, 0, 0, 1 );
+		var matrix = new THREE.Matrix4();
+		matrix.set(
+			s, 0, 0, -s * center.x,
+			0, s, 0, -s * center.y,
+			0, 0, s, -s * center.z,
+			0, 0, 0, 1
+		);
 
-		this.applyMatrix( m );
+		this.applyMatrix( matrix );
 
 		return this;
 	},
