@@ -261,7 +261,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			_renderList.length = 0;
 
-			projectObject( scene, scene, shadowCamera );
+			projectObject( scene, shadowCamera );
 
 
 			// render regular objects
@@ -348,13 +348,13 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	};
 
-	function projectObject( scene, object, shadowCamera ) {
+	function projectObject( object, shadowCamera ) {
 
 		if ( object.visible === true ) {
 
 			var webglObject = _objects.objects[ object.id ];
 
-			if ( webglObject && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+			if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
 				object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 				_renderList.push( webglObject );
@@ -363,7 +363,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-				projectObject( scene, object.children[ i ], shadowCamera );
+				projectObject( object.children[ i ], shadowCamera );
 
 			}
 
