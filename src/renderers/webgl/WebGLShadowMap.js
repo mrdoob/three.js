@@ -350,7 +350,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	function projectObject( scene, object, shadowCamera ) {
 
-		if ( object.visible ) {
+		if ( object.visible === true ) {
 
 			var webglObject = _objects.objects[ object.id ];
 
