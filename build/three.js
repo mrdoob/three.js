@@ -20469,7 +20469,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var webglObject = objects.objectsImmediate[ i ];
 			var object = webglObject.object;
 
-			if ( object.visible ) {
+			if ( object.visible === true ) {
 
 				setupMatrices( object, camera );
 
@@ -20542,59 +20542,61 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function projectObject( object ) {
 
-		if ( object.visible === false ) return;
+		if ( object.visible === true ) {
 
-		if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
+			if ( object instanceof THREE.Scene || object instanceof THREE.Group ) {
 
-			// skip
-
-		} else {
-
-			// update Skeleton objects
-			if ( object instanceof THREE.SkinnedMesh ) {
-
-				object.skeleton.update();
-
-			}
-
-			objects.init( object );
-
-			if ( object instanceof THREE.Light ) {
-
-				lights.push( object );
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				sprites.push( object );
-
-			} else if ( object instanceof THREE.LensFlare ) {
-
-				lensFlares.push( object );
+				// skip
 
 			} else {
 
-				var webglObject = objects.objects[ object.id ];
+				// update Skeleton objects
+				if ( object instanceof THREE.SkinnedMesh ) {
 
-				if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+					object.skeleton.update();
 
-					var material = object.material;
+				}
 
-					if ( material.transparent ) {
+				objects.init( object );
 
-						transparentObjects.push( webglObject );
+				if ( object instanceof THREE.Light ) {
 
-					} else {
+					lights.push( object );
 
-						opaqueObjects.push( webglObject );
+				} else if ( object instanceof THREE.Sprite ) {
 
-					}
+					sprites.push( object );
 
-					if ( _this.sortObjects === true ) {
+				} else if ( object instanceof THREE.LensFlare ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld );
-						_vector3.applyProjection( _projScreenMatrix );
+					lensFlares.push( object );
 
-						webglObject.z = _vector3.z;
+				} else {
+
+					var webglObject = objects.objects[ object.id ];
+
+					if ( webglObject && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
+
+						var material = object.material;
+
+						if ( material.transparent ) {
+
+							transparentObjects.push( webglObject );
+
+						} else {
+
+							opaqueObjects.push( webglObject );
+
+						}
+
+						if ( _this.sortObjects === true ) {
+
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector3.applyProjection( _projScreenMatrix );
+
+							webglObject.z = _vector3.z;
+
+						}
 
 					}
 
@@ -20602,11 +20604,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		}
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+				projectObject( object.children[ i ] );
 
-			projectObject( object.children[ i ] );
+			}
 
 		}
 
@@ -20654,7 +20656,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var webglObject = renderList[ i ];
 			var object = webglObject.object;
 
-			if ( object.visible ) {
+			if ( object.visible === true ) {
 
 				if ( overrideMaterial ) {
 
