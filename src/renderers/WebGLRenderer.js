@@ -444,15 +444,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		return function () {
 
-			if ( value !== undefined ) {
-
-				return value;
-
-			}
+			if ( value !== undefined ) return value;
 
 			var extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
-			value = extension !== null ? _gl.getParameter( extension.MAX_TEXTURE_MAX_ANISOTROPY_EXT ) : 0;
+			if ( extension !== null ) {
+
+				value = _gl.getParameter( extension.MAX_TEXTURE_MAX_ANISOTROPY_EXT );
+
+			} else {
+
+				value = 0;
+
+			}
 
 			return value;
 
