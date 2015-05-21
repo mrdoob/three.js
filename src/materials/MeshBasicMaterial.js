@@ -7,6 +7,9 @@
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
+ *  aoMap: new THREE.Texture( <Image> ),
+ *  aoMapIntensity: <float>
+ *
  *  specularMap: new THREE.Texture( <Image> ),
  *
  *  alphaMap: new THREE.Texture( <Image> ),
@@ -42,6 +45,9 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff ); // emissive
 
 	this.map = null;
+
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
 
 	this.specularMap = null;
 
@@ -82,6 +88,9 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 	material.color.copy( this.color );
 
 	material.map = this.map;
+
+	material.aoMap = this.aoMap;
+	material.aoMapIntensity = this.aoMapIntensity;
 
 	material.specularMap = this.specularMap;
 

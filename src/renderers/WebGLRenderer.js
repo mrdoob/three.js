@@ -2255,6 +2255,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsLambert( m_uniforms, material );
 
+			} else if ( material instanceof THREE.MeshBasicMaterial ) {
+
+				refreshUniformsBasic( m_uniforms, material );
+
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
 				m_uniforms.mNear.value = camera.near;
@@ -2435,6 +2439,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsLambert ( uniforms, material ) {
 
 		uniforms.emissive.value = material.emissive;
+
+	}
+
+	function refreshUniformsBasic ( uniforms, material ) {
+
+		uniforms.aoMap.value = material.aoMap;
+		uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
 	}
 
