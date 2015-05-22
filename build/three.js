@@ -9936,20 +9936,20 @@ THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
 
 THREE.GeometryIdCount = 0;
 
-// File:src/core/DynamicGeometry.js
+// File:src/core/DirectGeometry.js
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DynamicGeometry = function () {
+THREE.DirectGeometry = function () {
 
 	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.type = 'DynamicGeometry';
+	this.type = 'DirectGeometry';
 
 	this.vertices = [];
 	this.colors = [];
@@ -9972,23 +9972,23 @@ THREE.DynamicGeometry = function () {
 
 };
 
-THREE.DynamicGeometry.prototype = {
+THREE.DirectGeometry.prototype = {
 
-	constructor: THREE.DynamicGeometry,
+	constructor: THREE.DirectGeometry,
 
 	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
 	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
 
 	computeFaceNormals: function () {
 
-		console.warn( 'THREE.DynamicGeometry: computeFaceNormals() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DirectGeometry: computeFaceNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},
 
 	computeVertexNormals: function () {
 
-		console.warn( 'THREE.DynamicGeometry: computeVertexNormals() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DirectGeometry: computeVertexNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},
@@ -10024,7 +10024,7 @@ THREE.DynamicGeometry.prototype = {
 
 			if ( vertexUvs === undefined ) {
 
-				console.warn( 'THREE.DynamicGeometry.fromGeometry(): Missing vertexUVs', i );
+				console.warn( 'THREE.DirectGeometry.fromGeometry(): Missing vertexUVs', i );
 				vertexUvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
 
 			}
@@ -10056,7 +10056,7 @@ THREE.DynamicGeometry.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.DynamicGeometry.prototype );
+THREE.EventDispatcher.prototype.apply( THREE.DirectGeometry.prototype );
 
 // File:src/core/BufferGeometry.js
 
@@ -10227,8 +10227,8 @@ THREE.BufferGeometry.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for THREE.SkinnedMesh.', geometry );
-					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DirectGeometry as required for THREE.SkinnedMesh.', geometry );
+					geometry = new THREE.DirectGeometry().fromGeometry( geometry );
 
 				}
 
@@ -10246,8 +10246,8 @@ THREE.BufferGeometry.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for MorphTargets.', geometry );
-					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DirectGeometry as required for MorphTargets.', geometry );
+					geometry = new THREE.DirectGeometry().fromGeometry( geometry );
 
 				}
 
@@ -10271,9 +10271,9 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			if ( geometry instanceof THREE.DynamicGeometry ) {
+			if ( geometry instanceof THREE.DirectGeometry ) {
 
-				this.fromDynamicGeometry( geometry );
+				this.fromDirectGeometry( geometry );
 
 			} else if ( geometry instanceof THREE.Geometry ) {
 
@@ -10518,7 +10518,7 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromDynamicGeometry: function ( geometry ) {
+	fromDirectGeometry: function ( geometry ) {
 
 		var indices = new Uint16Array( geometry.faces.length * 3 );
 		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyFacesArray( geometry.faces ) );
@@ -14733,6 +14733,9 @@ THREE.LineDashedMaterial.prototype.clone = function () {
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
+ *  aoMap: new THREE.Texture( <Image> ),
+ *  aoMapIntensity: <float>
+ *
  *  specularMap: new THREE.Texture( <Image> ),
  *
  *  alphaMap: new THREE.Texture( <Image> ),
@@ -14768,6 +14771,9 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff ); // emissive
 
 	this.map = null;
+
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
 
 	this.specularMap = null;
 
@@ -14808,6 +14814,9 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 	material.color.copy( this.color );
 
 	material.map = this.map;
+
+	material.aoMap = this.aoMap;
+	material.aoMapIntensity = this.aoMapIntensity;
 
 	material.specularMap = this.specularMap;
 
@@ -18088,6 +18097,7 @@ THREE.ShaderLib = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "aomap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "shadowmap" ]
 
@@ -18144,6 +18154,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "uv2_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "alphamap_pars_fragment" ],
+			THREE.ShaderChunk[ "aomap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
@@ -18152,8 +18163,9 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-			"	vec3 outgoingLight = vec3( 0.0 );",	// outgoing light does not have an alpha, the surface does
+			"	vec3 outgoingLight = vec3( 0.0 );",
 			"	vec4 diffuseColor = vec4( diffuse, opacity );",
+			"	vec3 totalAmbientLight = vec3( 1.0 );", // hardwired
 
 				THREE.ShaderChunk[ "logdepthbuf_fragment" ],
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -18161,8 +18173,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "alphamap_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "specularmap_fragment" ],
+				THREE.ShaderChunk[ "aomap_fragment" ],
 
-			"	outgoingLight = diffuseColor.rgb;", // simple shader
+			"	outgoingLight = diffuseColor.rgb * totalAmbientLight;", // simple shader
 
 				THREE.ShaderChunk[ "envmap_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],		// TODO: Shadows on an otherwise unlit surface doesn't make sense.
@@ -21152,6 +21165,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsLambert( m_uniforms, material );
 
+			} else if ( material instanceof THREE.MeshBasicMaterial ) {
+
+				refreshUniformsBasic( m_uniforms, material );
+
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
 				m_uniforms.mNear.value = camera.near;
@@ -21332,6 +21349,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsLambert ( uniforms, material ) {
 
 		uniforms.emissive.value = material.emissive;
+
+	}
+
+	function refreshUniformsBasic ( uniforms, material ) {
+
+		uniforms.aoMap.value = material.aoMap;
+		uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
 	}
 
@@ -23249,7 +23273,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( object.geometry instanceof THREE.DynamicGeometry ) {
+		if ( object.geometry instanceof THREE.DirectGeometry ) {
 
 			geometry.updateFromObject( object );
 
@@ -34127,7 +34151,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	this.bones = this.getBoneList( object );
 
-	var geometry = new THREE.DynamicGeometry();
+	var geometry = new THREE.DirectGeometry();
 
 	for ( var i = 0; i < this.bones.length; i ++ ) {
 
