@@ -165,8 +165,8 @@ THREE.BufferGeometry.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for THREE.SkinnedMesh.', geometry );
-					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DirectGeometry as required for THREE.SkinnedMesh.', geometry );
+					geometry = new THREE.DirectGeometry().fromGeometry( geometry );
 
 				}
 
@@ -184,8 +184,8 @@ THREE.BufferGeometry.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DynamicGeometry as required for MorphTargets.', geometry );
-					geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+					console.log( 'THREE.BufferGeometry.setFromObject(): Converted THREE.Geometry to THREE.DirectGeometry as required for MorphTargets.', geometry );
+					geometry = new THREE.DirectGeometry().fromGeometry( geometry );
 
 				}
 
@@ -209,9 +209,9 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			if ( geometry instanceof THREE.DynamicGeometry ) {
+			if ( geometry instanceof THREE.DirectGeometry ) {
 
-				this.fromDynamicGeometry( geometry );
+				this.fromDirectGeometry( geometry );
 
 			} else if ( geometry instanceof THREE.Geometry ) {
 
@@ -456,7 +456,7 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromDynamicGeometry: function ( geometry ) {
+	fromDirectGeometry: function ( geometry ) {
 
 		var indices = new Uint16Array( geometry.faces.length * 3 );
 		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyFacesArray( geometry.faces ) );

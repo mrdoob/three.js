@@ -31,7 +31,7 @@
 	"src/core/InstancedInterleavedBuffer.js",
 	"src/core/InterleavedBufferAttribute.js",
 	"src/core/Geometry.js",
-	"src/core/DynamicGeometry.js",
+	"src/core/DirectGeometry.js",
 	"src/core/BufferGeometry.js",
 	"src/core/InstancedBufferGeometry.js",
 	"src/cameras/Camera.js",

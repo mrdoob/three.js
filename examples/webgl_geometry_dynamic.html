@@ -96,7 +96,7 @@
 
 				}
 
-				geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+				geometry = new THREE.DirectGeometry().fromGeometry( geometry );
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;

@@ -119,7 +119,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( object.geometry instanceof THREE.DynamicGeometry ) {
+		if ( object.geometry instanceof THREE.DirectGeometry ) {
 
 			geometry.updateFromObject( object );
 

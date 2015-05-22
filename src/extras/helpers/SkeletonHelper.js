@@ -9,7 +9,7 @@ THREE.SkeletonHelper = function ( object ) {
 
 	this.bones = this.getBoneList( object );
 
-	var geometry = new THREE.DynamicGeometry();
+	var geometry = new THREE.DirectGeometry();
 
 	for ( var i = 0; i < this.bones.length; i ++ ) {
 

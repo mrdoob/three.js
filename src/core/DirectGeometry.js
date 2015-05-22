@@ -2,14 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DynamicGeometry = function () {
+THREE.DirectGeometry = function () {
 
 	Object.defineProperty( this, 'id', { value: THREE.GeometryIdCount ++ } );
 
 	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.type = 'DynamicGeometry';
+	this.type = 'DirectGeometry';
 
 	this.vertices = [];
 	this.colors = [];
@@ -32,23 +32,23 @@ THREE.DynamicGeometry = function () {
 
 };
 
-THREE.DynamicGeometry.prototype = {
+THREE.DirectGeometry.prototype = {
 
-	constructor: THREE.DynamicGeometry,
+	constructor: THREE.DirectGeometry,
 
 	computeBoundingBox: THREE.Geometry.prototype.computeBoundingBox,
 	computeBoundingSphere: THREE.Geometry.prototype.computeBoundingSphere,
 
 	computeFaceNormals: function () {
 
-		console.warn( 'THREE.DynamicGeometry: computeFaceNormals() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DirectGeometry: computeFaceNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},
 
 	computeVertexNormals: function () {
 
-		console.warn( 'THREE.DynamicGeometry: computeVertexNormals() is not a method of this type of geometry.' );
+		console.warn( 'THREE.DirectGeometry: computeVertexNormals() is not a method of this type of geometry.' );
 		return this;
 
 	},
@@ -84,7 +84,7 @@ THREE.DynamicGeometry.prototype = {
 
 			if ( vertexUvs === undefined ) {
 
-				console.warn( 'THREE.DynamicGeometry.fromGeometry(): Missing vertexUVs', i );
+				console.warn( 'THREE.DirectGeometry.fromGeometry(): Missing vertexUVs', i );
 				vertexUvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
 
 			}
@@ -116,4 +116,4 @@ THREE.DynamicGeometry.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.DynamicGeometry.prototype );
+THREE.EventDispatcher.prototype.apply( THREE.DirectGeometry.prototype );

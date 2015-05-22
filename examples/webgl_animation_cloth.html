@@ -191,7 +191,7 @@
 
 				// cloth geometry
 				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
-				clothGeometry = new THREE.DynamicGeometry().fromGeometry( clothGeometry );
+				clothGeometry = new THREE.DirectGeometry().fromGeometry( clothGeometry );
 
 				var uniforms = { texture:  { type: "t", value: clothTexture } };
 				var vertexShader = document.getElementById( 'vertexShaderDepth' ).textContent;
