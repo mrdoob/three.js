@@ -174,25 +174,13 @@ THREE.BufferGeometry.prototype = {
 
 				this.fromGeometry( geometry );
 
-				// skinning
-
-				if ( object instanceof THREE.SkinnedMesh ) {
-
-					/*
-					var skinIndices = new THREE.Float32Attribute( geometry.skinIndices.length * 4, 4 );
-					var skinWeights = new THREE.Float32Attribute( geometry.skinWeights.length * 4, 4 );
-
-					this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
-					this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
-					*/
-
-				}
+				var directgeometry = geometry.__directGeometry;
 
 				// morphs
 
 				if ( object.morphTargetInfluences !== undefined ) {
 
-					var morphTargets = geometry.__directGeometry.morphTargets;
+					var morphTargets = directgeometry.morphTargets;
 
 					for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
 
@@ -205,6 +193,18 @@ THREE.BufferGeometry.prototype = {
 					}
 
 					// TODO normals, colors
+
+				}
+
+				// skinning
+
+				if ( object instanceof THREE.SkinnedMesh ) {
+
+					var skinIndices = new THREE.Float32Attribute( directgeometry.skinIndices.length * 4, 4 );
+					var skinWeights = new THREE.Float32Attribute( directgeometry.skinWeights.length * 4, 4 );
+
+					this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( directgeometry.skinIndices ) );
+					this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( directgeometry.skinWeights ) );
 
 				}
 

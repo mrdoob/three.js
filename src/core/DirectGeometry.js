@@ -22,6 +22,9 @@ THREE.DirectGeometry = function () {
 	this.morphColors = [];
 	this.morphNormals = [];
 
+	this.skinWeights = [];
+	this.skinIndices = [];
+
 	// this.lineDistances = [];
 
 	this.boundingBox = null;
@@ -97,6 +100,14 @@ THREE.DirectGeometry.prototype = {
 			this.morphColors[ i ] = [];
 
 		}
+
+		// skins
+
+		var skinIndices = geometry.skinIndices;
+		var skinWeights = geometry.skinWeights;
+
+		var hasSkinIndices = skinIndices.length === vertices.length;
+		var hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
 
@@ -196,6 +207,20 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
+			// skins
+
+			if ( hasSkinIndices ) {
+
+				this.skinIndices.push( skinIndices[ face.a ], skinIndices[ face.b ], skinIndices[ face.c ] );
+
+			}
+
+			if ( hasSkinWeights ) {
+
+				this.skinWeights.push( skinWeights[ face.a ], skinWeights[ face.b ], skinWeights[ face.c ] );
+
+			}
+
 		}
 
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
@@ -204,11 +229,6 @@ THREE.DirectGeometry.prototype = {
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 
 		return this;
-
-		/*
-		if ( geometry.skinIndices ) this.skinIndices = geometry.skinIndices.slice( 0 );
-		if ( geometry.skinWeights ) this.skinWeights = geometry.skinWeights.slice( 0 );
-		*/
 
 	},
 
