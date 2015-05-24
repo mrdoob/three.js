@@ -228,15 +228,23 @@ THREE.BufferGeometry.prototype = {
 
 	updateFromObject: function ( object ) {
 
-		var geometry;
+		var geometry = object.geometry;
 
-		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+		if ( object instanceof THREE.Mesh ) {
 
-			geometry = object.geometry;
+			var direct = geometry.__directGeometry;
 
-		} else if ( object instanceof THREE.Mesh ) {
+			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
+			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
+			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
+			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
 
-			geometry = object.geometry.__directGeometry.updateFromGeometry( object.geometry );
+			geometry.verticesNeedUpdate = false;
+			geometry.normalsNeedUpdate = false;
+			geometry.colorsNeedUpdate = false;
+			geometry.uvsNeedUpdate = false;
+
+			geometry = direct;
 
 		}
 
@@ -298,9 +306,6 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	fromDirectGeometry: function ( geometry ) {
-
-		var indices = new Uint16Array( geometry.indices.length * 3 );
-		this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		if ( geometry.vertices.length > 0 ) {
 

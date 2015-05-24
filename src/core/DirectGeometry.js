@@ -11,7 +11,6 @@ THREE.DirectGeometry = function () {
 	this.name = '';
 	this.type = 'DirectGeometry';
 
-	this.indices = [];
 	this.vertices = [];
 	this.colors = [];
 	this.normals = [];
@@ -66,9 +65,7 @@ THREE.DirectGeometry.prototype = {
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
-		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
-
-			this.indices.push( new THREE.Index( i3, i3 + 1, i3 + 2 ) );
+		for ( var i = 0; i < faces.length; i ++ ) {
 
 			var face = faces[ i ];
 
@@ -157,22 +154,6 @@ THREE.DirectGeometry.prototype = {
 
 		return this;
 		*/
-
-	},
-
-	updateFromGeometry: function ( geometry, material ) {
-
-		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
-		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
-		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
-		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
-
-		geometry.verticesNeedUpdate = false;
-		geometry.normalsNeedUpdate = false;
-		geometry.colorsNeedUpdate = false;
-		geometry.uvsNeedUpdate = false;
-
-		return this;
 
 	},
 

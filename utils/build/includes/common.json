@@ -20,7 +20,6 @@
 	"src/math/Triangle.js",
 	"src/core/Clock.js",
 	"src/core/EventDispatcher.js",
-	"src/core/Index.js",
 	"src/core/Raycaster.js",
 	"src/core/Object3D.js",
 	"src/core/Face3.js",
