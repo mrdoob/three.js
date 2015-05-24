@@ -174,40 +174,6 @@ THREE.BufferGeometry.prototype = {
 
 				this.fromGeometry( geometry );
 
-				var directgeometry = geometry.__directGeometry;
-
-				// morphs
-
-				if ( object.morphTargetInfluences !== undefined ) {
-
-					var morphTargets = directgeometry.morphTargets;
-
-					for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
-
-						var morphTarget = morphTargets[ i ];
-
-						var attribute = new THREE.Float32Attribute( morphTarget.length * 3, 3 );
-
-						this.morphAttributes.push( attribute.copyVector3sArray( morphTarget ) );
-
-					}
-
-					// TODO normals, colors
-
-				}
-
-				// skinning
-
-				if ( object instanceof THREE.SkinnedMesh ) {
-
-					var skinIndices = new THREE.Float32Attribute( directgeometry.skinIndices.length * 4, 4 );
-					var skinWeights = new THREE.Float32Attribute( directgeometry.skinWeights.length * 4, 4 );
-
-					this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( directgeometry.skinIndices ) );
-					this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( directgeometry.skinWeights ) );
-
-				}
-
 			}
 
 		}
@@ -331,6 +297,44 @@ THREE.BufferGeometry.prototype = {
 			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
 
 		}
+
+		// morphs
+
+		if ( geometry.morphTargets.length > 0 ) {
+
+			var morphTargets = geometry.morphTargets;
+
+			for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
+
+				var morphTarget = morphTargets[ i ];
+
+				var attribute = new THREE.Float32Attribute( morphTarget.length * 3, 3 );
+
+				this.morphAttributes.push( attribute.copyVector3sArray( morphTarget ) );
+
+			}
+
+			// TODO normals, colors
+
+		}
+
+		// skinning
+
+		if ( geometry.skinIndices.length > 0 ) {
+
+			var skinIndices = new THREE.Float32Attribute( geometry.skinIndices.length * 4, 4 );
+			this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+
+		}
+
+		if ( geometry.skinWeights.length > 0 ) {
+
+			var skinWeights = new THREE.Float32Attribute( geometry.skinWeights.length * 4, 4 );
+			this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+
+		}
+
+		//
 
 		if ( geometry.boundingSphere !== null ) {
 

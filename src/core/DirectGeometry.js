@@ -191,12 +191,12 @@ THREE.DirectGeometry.prototype = {
 				this.morphTargets[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
-
+			/*
 			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
-				var morphNormal = morphNormals[ j ].normals;
+				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
-				this.morphNormals[ j ].push( morphNormal[ face.a ], morphNormal[ face.b ], morphNormal[ face.c ] );
+				this.morphNormals[ j ].push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 			}
 
@@ -207,6 +207,7 @@ THREE.DirectGeometry.prototype = {
 				this.morphColors[ j ].push( morphColor[ face.a ], morphColor[ face.b ], morphColor[ face.c ] );
 
 			}
+			*/
 
 			// skins
 
