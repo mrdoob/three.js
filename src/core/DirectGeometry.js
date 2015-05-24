@@ -58,17 +58,17 @@ THREE.DirectGeometry.prototype = {
 
 		material = material || { 'vertexColors': THREE.NoColors };
 
-		var vertices = geometry.vertices;
 		var faces = geometry.faces;
+		var vertices = geometry.vertices;
 		var faceVertexUvs = geometry.faceVertexUvs;
 		var materialVertexColors = material.vertexColors;
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
-		for ( var i = 0, j = 0; i < faces.length; i ++ ) {
+		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
 
-			this.indices.push( new THREE.Index( j ++, j ++, j ++ ) );
+			this.indices.push( new THREE.Index( i3, i3 + 1, i3 + 2 ) );
 
 			var face = faces[ i ];
 
@@ -179,48 +179,6 @@ THREE.DirectGeometry.prototype = {
 		return this;
 
 		/*
-		this.vertices = geometry.vertices;
-		this.faces = geometry.faces;
-
-		var faces = geometry.faces;
-		var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-
-		for ( var i = 0, il = faces.length; i < il; i ++ ) {
-
-			var face = faces[ i ];
-			var indices = [ face.a, face.b, face.c ];
-
-			var vertexNormals = face.vertexNormals;
-			var vertexColors = face.vertexColors;
-			var vertexUvs = faceVertexUvs[ i ];
-
-			for ( var j = 0, jl = vertexNormals.length; j < jl; j ++ ) {
-
-				this.normals[ indices[ j ] ] = vertexNormals[ j ];
-
-			}
-
-			for ( var j = 0, jl = vertexColors.length; j < jl; j ++ ) {
-
-				this.colors[ indices[ j ] ] = vertexColors[ j ];
-
-			}
-
-			if ( vertexUvs === undefined ) {
-
-				console.warn( 'THREE.DirectGeometry.fromGeometry(): Missing vertexUVs', i );
-				vertexUvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
-
-			}
-
-			for ( var j = 0, jl = vertexUvs.length; j < jl; j ++ ) {
-
-				this.uvs[ indices[ j ] ] = vertexUvs[ j ];
-
-			}
-
-		}
-
 		if ( geometry.morphTargets ) this.morphTargets = geometry.morphTargets.slice( 0 );
 		if ( geometry.morphColors ) this.morphColors = geometry.morphColors.slice( 0 );
 		if ( geometry.morphNormals ) this.morphNormals = geometry.morphNormals.slice( 0 );
@@ -230,6 +188,67 @@ THREE.DirectGeometry.prototype = {
 
 		return this;
 		*/
+
+	},
+
+	updateFromGeometry: function ( geometry, material ) {
+
+		var faces = geometry.faces;
+		var vertices = geometry.vertices;
+
+		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
+
+			var face = faces[ i ];
+
+			var a = vertices[ face.a ];
+			var b = vertices[ face.b ];
+			var c = vertices[ face.c ];
+
+			if ( geometry.verticesNeedUpdate ) {
+
+				this.vertices[ i3     ].copy( a );
+				this.vertices[ i3 + 1 ].copy( b );
+				this.vertices[ i3 + 2 ].copy( c );
+
+			}
+
+			if ( geometry.normalsNeedUpdate ) {
+
+				var vertexNormals = face.vertexNormals;
+
+				if ( vertexNormals.length === 3 ) {
+
+					this.normals[ i3     ].copy( vertexNormals[ 0 ] );
+					this.normals[ i3 + 1 ].copy( vertexNormals[ 1 ] );
+					this.normals[ i3 + 2 ].copy( vertexNormals[ 2 ] );
+
+				} else {
+
+					var normal = face.normal;
+
+					this.normals[ i3     ].copy( normal );
+					this.normals[ i3 + 1 ].copy( normal );
+					this.normals[ i3 + 2 ].copy( normal );
+
+				}
+
+			}
+
+		}
+
+		// TODO: normals, colors, uvs
+
+		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
+		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
+		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
+		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
+
+		geometry.verticesNeedUpdate = false;
+		geometry.normalsNeedUpdate = false;
+		geometry.colorsNeedUpdate = false;
+		geometry.uvsNeedUpdate = false;
+
+		return this;
 
 	},
 

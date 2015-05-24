@@ -170,9 +170,13 @@ THREE.BufferGeometry.prototype = {
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			if ( geometry instanceof THREE.Geometry ) {
+			if ( geometry instanceof THREE.DirectGeometry ) {
 
-				geometry = new THREE.DirectGeometry().fromGeometry( geometry, material );
+				this.fromDirectGeometry( geometry );
+
+			} else if ( geometry instanceof THREE.Geometry ) {
+
+				this.fromGeometry( geometry );
 
 			}
 
@@ -216,8 +220,6 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			this.fromDirectGeometry( geometry );
-
 		}
 
 		return this;
@@ -226,9 +228,18 @@ THREE.BufferGeometry.prototype = {
 
 	updateFromObject: function ( object ) {
 
-		var geometry = object.geometry;
+		var geometry;
 
-		/*
+		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
+
+			geometry = object.geometry;
+
+		} else if ( object instanceof THREE.Mesh ) {
+
+			geometry = object.geometry.__directGeometry.updateFromGeometry( object.geometry );
+
+		}
+
 		if ( geometry.verticesNeedUpdate === true ) {
 
 			var attribute = this.attributes.position;
@@ -241,6 +252,21 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.verticesNeedUpdate = false;
+
+		}
+
+		if ( geometry.normalsNeedUpdate === true ) {
+
+			var attribute = this.attributes.normal;
+
+			if ( attribute !== undefined ) {
+
+				attribute.copyVector3sArray( geometry.normals );
+				attribute.needsUpdate = true;
+
+			}
+
+			geometry.normalsNeedUpdate = false;
 
 		}
 
@@ -258,7 +284,6 @@ THREE.BufferGeometry.prototype = {
 			geometry.colorsNeedUpdate = false;
 
 		}
-		*/
 
 		return this;
 
@@ -266,7 +291,9 @@ THREE.BufferGeometry.prototype = {
 
 	fromGeometry: function ( geometry, material ) {
 
-		return this.fromDirectGeometry( new THREE.DirectGeometry().fromGeometry( geometry, material ) );
+		geometry.__directGeometry = new THREE.DirectGeometry().fromGeometry( geometry, material );
+
+		return this.fromDirectGeometry( geometry.__directGeometry );
 
 	},
 
