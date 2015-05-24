@@ -111,8 +111,11 @@
 			light.position.set( 1, 0.75, 0.5 );
 			scene.add( light );
 
-			line = new THREE.Line( new THREE.DirectGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
-			line.geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
+			var geometry = new THREE.Geometry();
+			geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
+			geometry.dynamic = true;
+
+			line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 }) );
 			scene.add( line );
 
 			loadLeePerrySmith();
@@ -179,9 +182,11 @@
 					var p = intersects[ 0 ].point;
 					mouseHelper.position.copy( p );
 					intersection.point.copy( p );
+
 					var n = intersects[ 0 ].face.normal.clone();
 					n.multiplyScalar( 10 );
 					n.add( intersects[ 0 ].point );
+
 					intersection.normal.copy( intersects[ 0 ].face.normal );
 					mouseHelper.lookAt( n );
 

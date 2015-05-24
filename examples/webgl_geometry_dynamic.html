@@ -96,7 +96,11 @@
 
 				}
 
-				geometry = new THREE.DirectGeometry().fromGeometry( geometry );
+
+				//console.log( "triangles: " + geometry.faces.length * 2 + " faces: " + geometry.faces.length + " vertices: " + geometry.vertices.length );
+
+				geometry.computeFaceNormals();
+				geometry.computeVertexNormals();
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
