@@ -174,25 +174,25 @@ THREE.DirectGeometry.prototype = {
 
 			for ( var j = 0; j < morphTargetsLength; j ++ ) {
 
-				var morph = morphTargets[ j ].vertices;
+				var morphTarget = morphTargets[ j ].vertices;
 
-				this.morphTargets[ j ].push( morph[ face.a ], morph[ face.b ], morph[ face.c ] );
+				this.morphTargets[ j ].push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
 
 			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
-				var morph = morphNormals[ j ].normals;
+				var morphNormal = morphNormals[ j ].normals;
 
-				this.morphNormals[ j ].push( morph[ face.a ], morph[ face.b ], morph[ face.c ] );
+				this.morphNormals[ j ].push( morphNormal[ face.a ], morphNormal[ face.b ], morphNormal[ face.c ] );
 
 			}
 
 			for ( var j = 0; j < morphColorsLength; j ++ ) {
 
-				var morph = morphColors[ j ].colors;
+				var morphColor = morphColors[ j ].colors;
 
-				this.morphColors[ j ].push( morph[ face.a ], morph[ face.b ], morph[ face.c ] );
+				this.morphColors[ j ].push( morphColor[ face.a ], morphColor[ face.b ], morphColor[ face.c ] );
 
 			}
 
