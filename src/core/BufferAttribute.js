@@ -76,17 +76,17 @@ THREE.BufferAttribute.prototype = {
 
 	},
 
-	copyFacesArray: function ( faces ) {
+	copyIndicesArray: function ( indices ) {
 
 		var array = this.array, offset = 0;
 
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+		for ( var i = 0, l = indices.length; i < l; i ++ ) {
 
-			var face = faces[ i ];
+			var index = indices[ i ];
 
-			array[ offset ++ ] = face.a;
-			array[ offset ++ ] = face.b;
-			array[ offset ++ ] = face.c;
+			array[ offset ++ ] = index.a;
+			array[ offset ++ ] = index.b;
+			array[ offset ++ ] = index.c;
 
 		}
 

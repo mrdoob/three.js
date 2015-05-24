@@ -119,7 +119,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( object.geometry instanceof THREE.DirectGeometry ) {
+		if ( object.geometry.dynamic === true ) {
 
 			geometry.updateFromObject( object );
 
@@ -176,61 +176,57 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		//
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		var attributes = geometry.attributes;
 
-			var attributes = geometry.attributes;
+		for ( var name in attributes ) {
 
-			for ( var name in attributes ) {
+			var attribute = attributes[ name ];
 
-				var attribute = attributes[ name ];
+			var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
-				var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+			var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
-				var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
+			if ( data.buffer === undefined ) {
 
-				if ( data.buffer === undefined ) {
+				data.buffer = gl.createBuffer();
+				gl.bindBuffer( bufferType, data.buffer );
 
-					data.buffer = gl.createBuffer();
-					gl.bindBuffer( bufferType, data.buffer );
+				var usage = gl.STATIC_DRAW;
 
-					var usage = gl.STATIC_DRAW;
+				if ( data instanceof THREE.DynamicBufferAttribute
+						 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
+						 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
 
-					if ( data instanceof THREE.DynamicBufferAttribute
-							 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
-							 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
-
-						usage = gl.DYNAMIC_DRAW;
-
-					}
-
-					gl.bufferData( bufferType, data.array, usage );
-
-					data.needsUpdate = false;
-
-				} else if ( data.needsUpdate === true ) {
-
-					gl.bindBuffer( bufferType, data.buffer );
-
-					if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
-
-						gl.bufferSubData( bufferType, 0, data.array );
-
-					} else if ( data.updateRange.count === 0 ) {
-
-						console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
-
-					} else {
-
-						gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-										 data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
-
-						data.updateRange.count = 0; // reset range
-
-					}
-
-					data.needsUpdate = false;
+					usage = gl.DYNAMIC_DRAW;
 
 				}
+
+				gl.bufferData( bufferType, data.array, usage );
+
+				data.needsUpdate = false;
+
+			} else if ( data.needsUpdate === true ) {
+
+				gl.bindBuffer( bufferType, data.buffer );
+
+				if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+
+					gl.bufferSubData( bufferType, 0, data.array );
+
+				} else if ( data.updateRange.count === 0 ) {
+
+					console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+
+				} else {
+
+					gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+									 data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
+
+					data.updateRange.count = 0; // reset range
+
+				}
+
+				data.needsUpdate = false;
 
 			}
 
