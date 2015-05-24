@@ -297,6 +297,13 @@ THREE.BufferGeometry.prototype = {
 
 	fromDirectGeometry: function ( geometry ) {
 
+		if ( geometry.indices.length > 0 ) {
+
+			var indices = new Uint16Array( geometry.indices.length * 3 );
+			this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
+
+		}
+
 		if ( geometry.vertices.length > 0 ) {
 
 			var positions = new Float32Array( geometry.vertices.length * 3 );
