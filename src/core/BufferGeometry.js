@@ -170,53 +170,43 @@ THREE.BufferGeometry.prototype = {
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			if ( geometry instanceof THREE.DirectGeometry ) {
-
-				this.fromDirectGeometry( geometry );
-
-			} else if ( geometry instanceof THREE.Geometry ) {
+			if ( geometry instanceof THREE.Geometry ) {
 
 				this.fromGeometry( geometry );
 
-			}
+				// skinning
 
-			// skinning
+				if ( object instanceof THREE.SkinnedMesh ) {
 
-			if ( object instanceof THREE.SkinnedMesh ) {
+					/*
+					var skinIndices = new THREE.Float32Attribute( geometry.skinIndices.length * 4, 4 );
+					var skinWeights = new THREE.Float32Attribute( geometry.skinWeights.length * 4, 4 );
 
-				/*
-				var skinIndices = new THREE.Float32Attribute( geometry.skinIndices.length * 4, 4 );
-				var skinWeights = new THREE.Float32Attribute( geometry.skinWeights.length * 4, 4 );
+					this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+					this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+					*/
 
-				this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
-				this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
-				*/
+				}
 
-			}
+				// morphs
 
-			// morphs
+				if ( object.morphTargetInfluences !== undefined ) {
 
-			if ( object.morphTargetInfluences !== undefined ) {
-
-				/*
-				var morphTargets = geometry.morphTargets;
-
-				if ( morphTargets.length > 0 ) {
+					var morphTargets = geometry.__directGeometry.morphTargets;
 
 					for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
 
 						var morphTarget = morphTargets[ i ];
 
-						var attribute = new THREE.Float32Attribute( morphTarget.vertices.length * 3, 3 );
+						var attribute = new THREE.Float32Attribute( morphTarget.length * 3, 3 );
 
-						this.morphAttributes.push( attribute.copyVector3sArray( morphTarget.vertices ) );
+						this.morphAttributes.push( attribute.copyVector3sArray( morphTarget ) );
 
 					}
 
-				}
-				*/
+					// TODO normals, colors
 
-				// TODO normals, colors
+				}
 
 			}
 

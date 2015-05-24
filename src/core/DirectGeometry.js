@@ -18,6 +18,10 @@ THREE.DirectGeometry = function () {
 	this.uvs = [];
 	this.uvs2 = [];
 
+	this.morphTargets = [];
+	this.morphColors = [];
+	this.morphNormals = [];
+
 	// this.lineDistances = [];
 
 	this.boundingBox = null;
@@ -64,6 +68,37 @@ THREE.DirectGeometry.prototype = {
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+
+		// morphs
+
+		var morphTargets = geometry.morphTargets;
+		var morphTargetsLength = morphTargets.length;
+
+		for ( var i = 0; i < morphTargetsLength; i ++ ) {
+
+			this.morphTargets[ i ] = [];
+
+		}
+
+		var morphNormals = geometry.morphNormals;
+		var morphNormalsLength = morphNormals.length;
+
+		for ( var i = 0; i < morphNormalsLength; i ++ ) {
+
+			this.morphNormals[ i ] = [];
+
+		}
+
+		var morphColors = geometry.morphColors;
+		var morphColorsLength = morphColors.length;
+
+		for ( var i = 0; i < morphColorsLength; i ++ ) {
+
+			this.morphColors[ i ] = [];
+
+		}
+
+		//
 
 		for ( var i = 0; i < faces.length; i ++ ) {
 
@@ -135,6 +170,32 @@ THREE.DirectGeometry.prototype = {
 
 			}
 
+			// morphs
+
+			for ( var j = 0; j < morphTargetsLength; j ++ ) {
+
+				var morph = morphTargets[ j ].vertices;
+
+				this.morphTargets[ j ].push( morph[ face.a ], morph[ face.b ], morph[ face.c ] );
+
+			}
+
+			for ( var j = 0; j < morphNormalsLength; j ++ ) {
+
+				var morph = morphNormals[ j ].normals;
+
+				this.morphNormals[ j ].push( morph[ face.a ], morph[ face.b ], morph[ face.c ] );
+
+			}
+
+			for ( var j = 0; j < morphColorsLength; j ++ ) {
+
+				var morph = morphColors[ j ].colors;
+
+				this.morphColors[ j ].push( morph[ face.a ], morph[ face.b ], morph[ face.c ] );
+
+			}
+
 		}
 
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
@@ -145,14 +206,8 @@ THREE.DirectGeometry.prototype = {
 		return this;
 
 		/*
-		if ( geometry.morphTargets ) this.morphTargets = geometry.morphTargets.slice( 0 );
-		if ( geometry.morphColors ) this.morphColors = geometry.morphColors.slice( 0 );
-		if ( geometry.morphNormals ) this.morphNormals = geometry.morphNormals.slice( 0 );
-
 		if ( geometry.skinIndices ) this.skinIndices = geometry.skinIndices.slice( 0 );
 		if ( geometry.skinWeights ) this.skinWeights = geometry.skinWeights.slice( 0 );
-
-		return this;
 		*/
 
 	},
