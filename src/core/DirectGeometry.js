@@ -72,31 +72,19 @@ THREE.DirectGeometry.prototype = {
 
 			var face = faces[ i ];
 
-			var a = vertices[ face.a ];
-			var b = vertices[ face.b ];
-			var c = vertices[ face.c ];
-
-			this.vertices.push( a.clone(), b.clone(), c.clone() );
+			this.vertices.push( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ] );
 
 			var vertexNormals = face.vertexNormals;
 
 			if ( vertexNormals.length === 3 ) {
 
-				this.normals.push(
-					vertexNormals[ 0 ].clone(),
-					vertexNormals[ 1 ].clone(),
-					vertexNormals[ 2 ].clone()
-				);
+				this.normals.push( vertexNormals[ 0 ], vertexNormals[ 1 ], vertexNormals[ 2 ] );
 
 			} else {
 
 				var normal = face.normal;
 
-				this.normals.push(
-					normal.clone(),
-					normal.clone(),
-					normal.clone()
-				);
+				this.normals.push( normal, normal, normal );
 
 			}
 
@@ -104,21 +92,13 @@ THREE.DirectGeometry.prototype = {
 
 			if ( materialVertexColors === THREE.VertexColors ) {
 
-				this.colors.push(
-					vertexColors[ 0 ].clone(),
-					vertexColors[ 1 ].clone(),
-					vertexColors[ 2 ].clone()
-				);
+				this.colors.push( vertexColors[ 0 ], vertexColors[ 1 ], vertexColors[ 2 ] );
 
 			} else if ( materialVertexColors === THREE.FaceColors ) {
 
 				var color = face.color;
 
-				this.colors.push(
-					color.clone(),
-					color.clone(),
-					color.clone()
-				);
+				this.colors.push( color, color, color );
 
 			}
 
@@ -128,21 +108,13 @@ THREE.DirectGeometry.prototype = {
 
 				if ( vertexUvs !== undefined ) {
 
-					this.uvs.push(
-						vertexUvs[ 0 ].clone(),
-						vertexUvs[ 1 ].clone(),
-						vertexUvs[ 2 ].clone()
-					);
+					this.uvs.push( vertexUvs[ 0 ], vertexUvs[ 1 ], vertexUvs[ 2 ] );
 
 				} else {
 
 					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i );
 
-					this.uvs.push(
-						new THREE.Vector2(),
-						new THREE.Vector2(),
-						new THREE.Vector2()
-					);
+					this.uvs.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
 
 				}
 
@@ -154,27 +126,24 @@ THREE.DirectGeometry.prototype = {
 
 				if ( vertexUvs !== undefined ) {
 
-					this.uvs2.push(
-						vertexUvs[ 0 ].clone(),
-						vertexUvs[ 1 ].clone(),
-						vertexUvs[ 2 ].clone()
-					);
+					this.uvs2.push( vertexUvs[ 0 ], vertexUvs[ 1 ], vertexUvs[ 2 ] );
 
 				} else {
 
 					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i );
 
-					this.uvs2.push(
-						new THREE.Vector2(),
-						new THREE.Vector2(),
-						new THREE.Vector2()
-					);
+					this.uvs2.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
 
 				}
 
 			}
 
 		}
+
+		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
+		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
+		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
+		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 
 		return this;
 
@@ -192,51 +161,6 @@ THREE.DirectGeometry.prototype = {
 	},
 
 	updateFromGeometry: function ( geometry, material ) {
-
-		var faces = geometry.faces;
-		var vertices = geometry.vertices;
-
-		for ( var i = 0, i3 = 0; i < faces.length; i ++, i3 += 3 ) {
-
-			var face = faces[ i ];
-
-			var a = vertices[ face.a ];
-			var b = vertices[ face.b ];
-			var c = vertices[ face.c ];
-
-			if ( geometry.verticesNeedUpdate ) {
-
-				this.vertices[ i3     ].copy( a );
-				this.vertices[ i3 + 1 ].copy( b );
-				this.vertices[ i3 + 2 ].copy( c );
-
-			}
-
-			if ( geometry.normalsNeedUpdate ) {
-
-				var vertexNormals = face.vertexNormals;
-
-				if ( vertexNormals.length === 3 ) {
-
-					this.normals[ i3     ].copy( vertexNormals[ 0 ] );
-					this.normals[ i3 + 1 ].copy( vertexNormals[ 1 ] );
-					this.normals[ i3 + 2 ].copy( vertexNormals[ 2 ] );
-
-				} else {
-
-					var normal = face.normal;
-
-					this.normals[ i3     ].copy( normal );
-					this.normals[ i3 + 1 ].copy( normal );
-					this.normals[ i3 + 2 ].copy( normal );
-
-				}
-
-			}
-
-		}
-
-		// TODO: normals, colors, uvs
 
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
