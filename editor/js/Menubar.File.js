@@ -287,7 +287,10 @@ Menubar.File = function ( editor ) {
 		link.href = objectURL;
 		link.download = filename || 'data.json';
 		link.target = '_blank';
+		link.style.display = 'none';
+		document.body.appendChild( link );
 		link.click();
+		document.body.removeChild( link );
 
 	};
 
