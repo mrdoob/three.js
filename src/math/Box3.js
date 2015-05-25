@@ -61,7 +61,7 @@ THREE.Box3.prototype = {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( object ) {
+		return function ( object, disregardInvisibleObjects ) {
 
 			var scope = this;
 
@@ -70,6 +70,12 @@ THREE.Box3.prototype = {
 			this.makeEmpty();
 
 			object.traverse( function ( node ) {
+
+				if (disregardInvisibleObjects && !node.visible) {
+
+					return;
+
+				}
 
 				var geometry = node.geometry;
 
