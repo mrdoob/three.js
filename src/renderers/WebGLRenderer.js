@@ -1488,12 +1488,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function numericalSort ( a, b ) {
-
-		return b[ 0 ] - a[ 0 ];
-
-	}
-
 	// Rendering
 
 	this.render = function ( scene, camera, renderTarget, forceClear ) {
