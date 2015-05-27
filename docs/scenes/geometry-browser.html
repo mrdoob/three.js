@@ -80,30 +80,33 @@
 			scene.add( lights[1] );
 			scene.add( lights[2] );
 
-			var mesh = THREE.SceneUtils.createMultiMaterialObject(
+			var mesh = new THREE.Object3D()
+			
+			mesh.add( new THREE.LineSegments(
 				
 				new THREE.Geometry(),
 				
-				[
-					
-					new THREE.MeshBasicMaterial({
-						color: 0xffffff,
-						side: THREE.DoubleSide,
-						wireframe: true,
-						transparent: true,
-						opacity: 0.5
-					}),
-					
-					new THREE.MeshPhongMaterial({
-						color: 0x156289,
-						emissive: 0x072534,
-						side: THREE.DoubleSide,
-						shading: THREE.FlatShading
-					})
-					
-				]
+				new THREE.LineBasicMaterial({
+					color: 0xffffff,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: 0.5
+				})
 				
-			);
+			));
+			
+			mesh.add( new THREE.Mesh(
+				
+				new THREE.Geometry(),
+				
+				new THREE.MeshPhongMaterial({
+					color: 0x156289,
+					emissive: 0x072534,
+					side: THREE.DoubleSide,
+					shading: THREE.FlatShading
+				})
+				
+			));
 			
 			var options = chooseFromHash( mesh );
 			

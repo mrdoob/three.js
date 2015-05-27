@@ -85,8 +85,8 @@ function updateGroupGeometry( mesh, geometry ) {
 	mesh.children[0].geometry.dispose();
 	mesh.children[1].geometry.dispose();
 	
-	mesh.children[0].geometry = geometry
-	mesh.children[1].geometry = geometry.clone()
+	mesh.children[0].geometry = new THREE.WireframeGeometry( geometry );
+	mesh.children[1].geometry = geometry;
 	
 	//these do not update nicely together if shared
 }
@@ -531,91 +531,18 @@ function chooseFromHash ( mesh ) {
 
 	var selectedGeometry = window.location.hash.substring(1) || "TorusGeometry";
 
-	switch (selectedGeometry) {
+	if ( guis[ selectedGeometry ] !== undefined ) {
 
-	case "BoxGeometry" :
+	    guis[ selectedGeometry ]( mesh );
 
-		guis.BoxGeometry( mesh )
-
-		break;
-
-	case "CircleGeometry" :
-
-		guis.CircleGeometry( mesh )
-
-		break;
-
-	case "CylinderGeometry" :
-
-		guis.CylinderGeometry( mesh )
-
-		break;
-	
-	case "PlaneGeometry" :
-
-		guis.PlaneGeometry( mesh )
-
-		break;
-	
-	case "RingGeometry" :
-
-		guis.RingGeometry( mesh )
-
-		break;
-
-	case "SphereGeometry" :
-
-		guis.SphereGeometry( mesh )
-
-		break;
-
-	case "TextGeometry" :
-
-		guis.TextGeometry( mesh )
-
-		return {
-			fixed : true
-		};
-		
-		break;
-	
-	case "TorusGeometry" :
-
-		guis.TorusGeometry( mesh )
-
-		break;
-		
-	case "TorusKnotGeometry" :
-
-		guis.TorusKnotGeometry( mesh )
-
-		break;
-		
-	case "DodecahedronGeometry" :
-
-		guis.DodecahedronGeometry( mesh )
-
-		break;
-		
-	case "IcosahedronGeometry" :
-
-		guis.IcosahedronGeometry( mesh )
-
-		break;
-		
-	case "OctahedronGeometry" :
-
-		guis.OctahedronGeometry( mesh )
-
-		break;
-		
-	case "TetrahedronGeometry" :
-
-		guis.TetrahedronGeometry( mesh )
-
-		break;
 	}
-	
+
+	if ( selectedGeometry === 'TextGeometry' ) {
+
+	    return { fixed : true };
+
+	}
+
 	//No configuration options
 	return {};
 
