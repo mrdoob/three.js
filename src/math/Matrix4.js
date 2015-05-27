@@ -936,9 +936,11 @@ THREE.Matrix4.prototype = {
 
 		var projectionMatrix = this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
 
-		// shift principle point, details: http://ksimek.github.io/2013/08/13/intrinsic/
-		projectionMatrix.elements[8] = 2 * projectionPlaneOffset.x / projectionPlaneSize.x;
-		projectionMatrix.elements[9] = 2 * projectionPlaneOffset.y / projectionPlaneSize.y;
+		if( projectionPlaneOffset && projectionPlaneSize ) {
+			// shift principle point, details: http://ksimek.github.io/2013/08/13/intrinsic/
+			projectionMatrix.elements[8] = 2 * projectionPlaneOffset.x / projectionPlaneSize.x;
+			projectionMatrix.elements[9] = 2 * projectionPlaneOffset.y / projectionPlaneSize.y;
+		}
 
 		return projectionMatrix;
 	},
