@@ -98,9 +98,9 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		var hdrOutputTypeDefine = null;
-		if ( _this.hdrOutputEnabled ) {
+		if ( renderer.hdrOutputEnabled ) {
 			if ( parameters.hdrOutputEnabled !== false ) {
-				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : _this.hdrOutputType;
+				var outputType = parameters.hdrOutputType ? parameters.hdrOutputType : renderer.hdrOutputType;
 				if ( outputType === THREE.HDRRGBM ) {
 					hdrOutputTypeDefine = "HDR_OUTPUT_RGBM";
 				}
@@ -309,7 +309,7 @@ THREE.WebGLProgram = ( function () {
 				"#define HDR_TYPE_RGBE " + THREE.HDRRGBE,
 				"#define HDR_TYPE_LOGLUV " + THREE.HDRLOGLUV,
 
-				_this.hdrInputEnabled && parameters.hdrInputEnabled !== false ? "#define HDR_INPUT" : "",
+				renderer.hdrInputEnabled && parameters.hdrInputEnabled !== false ? "#define HDR_INPUT" : "",
 
 				'#define MAX_DIR_LIGHTS ' + parameters.maxDirLights,
 				'#define MAX_POINT_LIGHTS ' + parameters.maxPointLights,

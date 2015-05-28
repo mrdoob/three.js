@@ -57,18 +57,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_depthMaterialSkin._shadowPass = true;
 	_depthMaterialMorphSkin._shadowPass = true;
 
-	this.dispose = function() {
-		_depthMaterial.dispose();
-		_depthMaterial = null;
-		_depthMaterialSkin.dispose();
-		_depthMaterialSkin = null;
-		_depthMaterialMorph.dispose();
-		_depthMaterialMorph = null;
-		_depthMaterialMorphSkin.dispose();
-		_depthMaterialMorphSkin = null;
-		_renderer = null;
-		_renderList.splice(0, _renderList.length);
-	};
 	//
 
 	var scope = this;
@@ -187,7 +175,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
 				light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
-				light.shadowMap.name = (light.name !== '' ? light.name : "Light, " + light.id + "," ) + " shadow map";
 				light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
 
 				light.shadowMatrix = new THREE.Matrix4();
@@ -224,7 +211,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			if ( light.isVirtual && light.originalCamera == camera ) {
+			if ( light.isVirtual && virtualLight.originalCamera == camera ) {
 
 				updateShadowCamera( camera, light );
 
@@ -320,17 +307,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 				}
 
 				_renderer.setMaterialFaces( objectMaterial );
-
-				if ( buffer instanceof THREE.BufferGeometry ) {
-					// START_VEROLD_MOD - materialIndex in offsets
-					_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object, webglObject.offsetIndices );
-					// END_VEROLD_MOD - materialIndex in offsets
-
-				} else {
-
-					_renderer.renderBuffer( shadowCamera, _lights, fog, material, buffer, object );
-
-				}
+				_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, object );
 
 			}
 
@@ -457,7 +434,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		virtualLight.position.copy( light.position );
 		virtualLight.target.position.copy( light.target.position );
-		virtualLight.lookAt( virtualLight.target.position );
+		virtualLight.lookAt( virtualLight.target );
 
 		virtualLight.shadowCameraVisible = light.shadowCameraVisible;
 		virtualLight.shadowDarkness = light.shadowDarkness;

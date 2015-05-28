@@ -110,6 +110,9 @@
 	"src/renderers/shaders/ShaderChunk/envmap_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/fog_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/fog_pars_fragment.glsl",
+	"src/renderers/shaders/ShaderChunk/hdr_encode_pars_fragment.glsl",
+	"src/renderers/shaders/ShaderChunk/hdr_decode_pars_fragment.glsl",
+	"src/renderers/shaders/ShaderChunk/hdr_encode_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/lightmap_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/lightmap_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/lights_lambert_pars_vertex.glsl",
@@ -119,20 +122,9 @@
 	"src/renderers/shaders/ShaderChunk/lights_phong_pars_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/lights_phong_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/linear_to_gamma_fragment.glsl",
-<<<<<<< HEAD
-	"src/renderers/shaders/ShaderChunk/hdr_encode_pars_fragment.glsl",
-	"src/renderers/shaders/ShaderChunk/hdr_decode_pars_fragment.glsl",
-	"src/renderers/shaders/ShaderChunk/hdr_encode_fragment.glsl",
-	"src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl",
-	"src/renderers/shaders/ShaderChunk/lights_lambert_pars_vertex.glsl",
-	"src/renderers/shaders/ShaderChunk/map_pars_vertex.glsl",
-	"src/renderers/shaders/ShaderChunk/envmap_fragment.glsl",
-	"src/renderers/shaders/ShaderChunk/specularmap_pars_fragment.glsl",
-=======
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_pars_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_pars_vertex.glsl",
->>>>>>> 9c2a88d21713eaddd73bfc5b9b00847cf8059225
 	"src/renderers/shaders/ShaderChunk/logdepthbuf_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/map_fragment.glsl",
 	"src/renderers/shaders/ShaderChunk/map_pars_fragment.glsl",
@@ -148,12 +140,6 @@
 	"src/renderers/shaders/ShaderChunk/shadowmap_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/skinbase_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/skinning_pars_vertex.glsl",
-<<<<<<< HEAD
-	"src/renderers/shaders/ShaderChunk/logdepthbuf_pars_fragment.glsl",
-	"src/renderers/shaders/ShaderChunk/alphamap_fragment.glsl",
-	"src/renderers/shaders/ShaderChunk/alphamap_pars_fragment.glsl",
-		"src/renderers/shaders/UniformsUtils.js",
-=======
 	"src/renderers/shaders/ShaderChunk/skinning_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/skinnormal_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/specularmap_fragment.glsl",
@@ -166,7 +152,6 @@
 	"src/renderers/shaders/ShaderChunk/uv_vertex.glsl",
 	"src/renderers/shaders/ShaderChunk/worldpos_vertex.glsl",
 	"src/renderers/shaders/UniformsUtils.js",
->>>>>>> 9c2a88d21713eaddd73bfc5b9b00847cf8059225
 	"src/renderers/shaders/UniformsLib.js",
 	"src/renderers/shaders/ShaderLib.js",
 	"src/renderers/WebGLRenderer.js",
