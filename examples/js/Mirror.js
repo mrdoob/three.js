@@ -110,6 +110,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	this.textureMatrix = new THREE.Matrix4();
 
 	this.mirrorCamera = this.camera.clone();
+	this.mirrorCamera.matrixAutoUpdate = true;
 
 	this.texture = new THREE.WebGLRenderTarget( width, height );
 	this.tempTexture = new THREE.WebGLRenderTarget( width, height );

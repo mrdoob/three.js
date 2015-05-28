@@ -51,7 +51,6 @@ THREE.BabylonLoader.prototype = {
 
 			var material = new THREE.MeshPhongMaterial();
 			material.name = data.name;
-			material.ambient.fromArray( data.ambient );
 			material.color.fromArray( data.diffuse );
 			material.emissive.fromArray( data.emissive );
 			material.specular.fromArray( data.specular );
@@ -201,8 +200,9 @@ THREE.BabylonLoader.prototype = {
 			}
 
 			light.name = data.name;
-			light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
+			if ( data.position ) light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
 			light.color.fromArray( data.diffuse );
+			if ( data.groundColor ) light.groundColor.fromArray( data.groundColor );
 			if ( data.intensity ) light.intensity = data.intensity;
 
 			objects[ data.id ] = light;

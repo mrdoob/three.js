@@ -65,9 +65,9 @@ THREE.ImageUtils = {
 
 				}
 
-			} );
+			}, undefined, onError );
 
-		}
+		};
 
 		for ( var i = 0, il = array.length; i < il; ++ i ) {
 
@@ -99,20 +99,20 @@ THREE.ImageUtils = {
 
 			return [ a[ 1 ] * b[ 2 ] - a[ 2 ] * b[ 1 ], a[ 2 ] * b[ 0 ] - a[ 0 ] * b[ 2 ], a[ 0 ] * b[ 1 ] - a[ 1 ] * b[ 0 ] ];
 
-		}
+		};
 
 		var subtract = function ( a, b ) {
 
 			return [ a[ 0 ] - b[ 0 ], a[ 1 ] - b[ 1 ], a[ 2 ] - b[ 2 ] ];
 
-		}
+		};
 
 		var normalize = function ( a ) {
 
 			var l = Math.sqrt( a[ 0 ] * a[ 0 ] + a[ 1 ] * a[ 1 ] + a[ 2 ] * a[ 2 ] );
 			return [ a[ 0 ] / l, a[ 1 ] / l, a[ 2 ] / l ];
 
-		}
+		};
 
 		depth = depth | 1;
 
@@ -144,7 +144,7 @@ THREE.ImageUtils = {
 				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [  1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
+				points.push( [ 1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 0, data[ ( y * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 1, data[ ( uy * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );

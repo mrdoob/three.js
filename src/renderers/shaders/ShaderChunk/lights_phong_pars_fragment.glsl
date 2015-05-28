@@ -21,6 +21,7 @@ uniform vec3 ambientLightColor;
 
 	uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];
 	uniform float pointLightDistance[ MAX_POINT_LIGHTS ];
+	uniform float pointLightDecay[ MAX_POINT_LIGHTS ];
 
 #endif
 
@@ -31,8 +32,8 @@ uniform vec3 ambientLightColor;
 	uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];
 	uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];
 	uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];
-
 	uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];
+	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];
 
 #endif
 
@@ -42,11 +43,10 @@ uniform vec3 ambientLightColor;
 
 #endif
 
-#ifdef WRAP_AROUND
+varying vec3 vViewPosition;
 
-	uniform vec3 wrapRGB;
+#ifndef FLAT_SHADED
+
+	varying vec3 vNormal;
 
 #endif
-
-varying vec3 vViewPosition;
-varying vec3 vNormal;

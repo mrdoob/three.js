@@ -98,8 +98,10 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.useProgram( program );
 
-		gl.enableVertexAttribArray( attributes.position );
-		gl.enableVertexAttribArray( attributes.uv );
+		renderer.state.initAttributes();
+		renderer.state.enableAttribute( attributes.position );
+		renderer.state.enableAttribute( attributes.uv );
+		renderer.state.disableUnusedAttributes();
 
 		gl.disable( gl.CULL_FACE );
 		gl.enable( gl.BLEND );
@@ -112,7 +114,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
-		gl.activeTexture( gl.TEXTURE0 );
+		renderer.state.activeTexture( gl.TEXTURE0 );
 		gl.uniform1i( uniforms.map, 0 );
 
 		var oldFogType = 0;
@@ -214,9 +216,9 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			gl.uniform1f( uniforms.rotation, material.rotation );
 			gl.uniform2fv( uniforms.scale, scale );
 
-			renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			renderer.setDepthTest( material.depthTest );
-			renderer.setDepthWrite( material.depthWrite );
+			renderer.state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			renderer.state.setDepthTest( material.depthTest );
+			renderer.state.setDepthWrite( material.depthWrite );
 
 			if ( material.map && material.map.image && material.map.image.width ) {
 
@@ -322,7 +324,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 					'} else {',
 
 						'const float LOG2 = 1.442695;',
-						'float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
+						'fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );',
 						'fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );',
 
 					'}',
@@ -345,7 +347,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		return program;
 
-	};
+	}
 
 	function painterSortStable ( a, b ) {
 
@@ -359,6 +361,6 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		}
 
-	};
+	}
 
 };

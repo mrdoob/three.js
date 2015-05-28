@@ -8,6 +8,10 @@ var Editor = function () {
 
 	this.signals = {
 
+		// script
+
+		editScript: new SIGNALS.Signal(),
+
 		// player
 
 		startPlayer: new SIGNALS.Signal(),
@@ -18,9 +22,11 @@ var Editor = function () {
 		playAnimation: new SIGNALS.Signal(),
 		stopAnimation: new SIGNALS.Signal(),
 
-		showDialog: new SIGNALS.Signal(),
+		// showDialog: new SIGNALS.Signal(),
 
 		// notifications
+
+		editorCleared: new SIGNALS.Signal(),
 
 		savingStarted: new SIGNALS.Signal(),
 		savingFinished: new SIGNALS.Signal(),
@@ -50,7 +56,9 @@ var Editor = function () {
 
 		materialChanged: new SIGNALS.Signal(),
 
+		scriptAdded: new SIGNALS.Signal(),
 		scriptChanged: new SIGNALS.Signal(),
+		scriptRemoved: new SIGNALS.Signal(),
 
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
@@ -65,7 +73,7 @@ var Editor = function () {
 	this.storage = new Storage();
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100000 );
+	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
 	this.camera.name = 'Camera';
 
 	this.scene = new THREE.Scene();
@@ -94,16 +102,19 @@ Editor.prototype = {
 
 	},
 
+	/*
 	showDialog: function ( value ) {
 
 		this.signals.showDialog.dispatch( value );
 
 	},
+	*/
 
 	//
 
 	setScene: function ( scene ) {
 
+		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -144,7 +155,31 @@ Editor.prototype = {
 
 	},
 
-	setObjectName: function ( object, name ) {
+	moveObject: function ( object, parent, before ) {
+
+		if ( parent === undefined ) {
+
+			parent = this.scene;
+
+		}
+
+		parent.add( object );
+
+		// sort children array
+
+		if ( before !== undefined ) {
+
+			var index = parent.children.indexOf( before );
+			parent.children.splice( index, 0, object );
+			parent.children.pop();
+
+		}
+
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	nameObject: function ( object, name ) {
 
 		object.name = name;
 		this.signals.sceneGraphChanged.dispatch();
@@ -154,8 +189,6 @@ Editor.prototype = {
 	removeObject: function ( object ) {
 
 		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
-
-		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var scope = this;
 
@@ -278,17 +311,33 @@ Editor.prototype = {
 
 	//
 
-	parent: function ( object, parent ) {
+	addScript: function ( object, script ) {
 
-		if ( parent === undefined ) {
+		if ( this.scripts[ object.uuid ] === undefined ) {
 
-			parent = this.scene;
+			this.scripts[ object.uuid ] = [];
 
 		}
 
-		parent.add( object );
+		this.scripts[ object.uuid ].push( script );
 
-		this.signals.sceneGraphChanged.dispatch();
+		this.signals.scriptAdded.dispatch( script );
+
+	},
+
+	removeScript: function ( object, script ) {
+
+		if ( this.scripts[ object.uuid ] === undefined ) return;
+
+		var index = this.scripts[ object.uuid ].indexOf( script );
+
+		if ( index !== - 1 ) {
+
+			this.scripts[ object.uuid ].splice( index, 1 );
+
+		}
+
+		this.signals.scriptRemoved.dispatch( script );
 
 	},
 
@@ -360,6 +409,30 @@ Editor.prototype = {
 
 	},
 
+	clear: function () {
+
+		this.camera.position.set( 500, 250, 500 );
+		this.camera.lookAt( new THREE.Vector3() );
+
+		var objects = this.scene.children;
+
+		while ( objects.length > 0 ) {
+
+			this.removeObject( objects[ 0 ] );
+
+		}
+
+		this.geometries = {};
+		this.materials = {};
+		this.textures = {};
+		this.scripts = {};
+
+		this.deselect();
+
+		this.signals.editorCleared.dispatch();
+
+	},
+
 	//
 
 	fromJSON: function ( json ) {
@@ -397,6 +470,9 @@ Editor.prototype = {
 
 		return {
 
+			project: {
+				vr: this.config.getKey( 'project/vr' )
+			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts

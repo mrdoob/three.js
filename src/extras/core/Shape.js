@@ -128,7 +128,7 @@ THREE.Shape.Utils = {
 
 		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
 			// inOtherPt needs to be colinear to the inSegment
-			if ( inSegPt1.x != inSegPt2.x ) {
+			if ( inSegPt1.x !== inSegPt2.x ) {
 				if ( inSegPt1.x < inSegPt2.x ) {
 					return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
 				} else {
@@ -170,19 +170,19 @@ THREE.Shape.Utils = {
 
 				// i.e. to reduce rounding errors
 				// intersection at endpoint of segment#1?
-				if ( perpSeg2 == 0 ) {
+				if ( perpSeg2 === 0 ) {
 					if ( ( inExcludeAdjacentSegs ) &&
-						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
-					return  [ inSeg1Pt1 ];
+						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+					return [ inSeg1Pt1 ];
 				}
-				if ( perpSeg2 == limit ) {
+				if ( perpSeg2 === limit ) {
 					if ( ( inExcludeAdjacentSegs ) &&
-						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
-					return  [ inSeg1Pt2 ];
+						 ( ( perpSeg1 === 0 ) || ( perpSeg1 === limit ) ) )		return [];
+					return [ inSeg1Pt2 ];
 				}
 				// intersection at endpoint of segment#2?
-				if ( perpSeg1 == 0 )		return  [ inSeg2Pt1 ];
-				if ( perpSeg1 == limit )	return  [ inSeg2Pt2 ];
+				if ( perpSeg1 === 0 )		return [ inSeg2Pt1 ];
+				if ( perpSeg1 === limit )	return [ inSeg2Pt2 ];
 
 				// return real intersection point
 				var factorSeg1 = perpSeg2 / limit;
@@ -190,33 +190,33 @@ THREE.Shape.Utils = {
 							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
 
 			} else {		// parallel or colinear
-				if ( ( perpSeg1 != 0 ) ||
-					 ( seg2dy * seg1seg2dx != seg2dx * seg1seg2dy ) ) 			return [];
+				if ( ( perpSeg1 !== 0 ) ||
+					 ( seg2dy * seg1seg2dx !== seg2dx * seg1seg2dy ) ) 			return [];
 
 				// they are collinear or degenerate
-				var seg1Pt = ( (seg1dx == 0) && (seg1dy == 0) );	// segment1 ist just a point?
-				var seg2Pt = ( (seg2dx == 0) && (seg2dy == 0) );	// segment2 ist just a point?
+				var seg1Pt = ( (seg1dx === 0) && (seg1dy === 0) );	// segment1 ist just a point?
+				var seg2Pt = ( (seg2dx === 0) && (seg2dy === 0) );	// segment2 ist just a point?
 				// both segments are points
 				if ( seg1Pt && seg2Pt ) {
-					if ( (inSeg1Pt1.x != inSeg2Pt1.x) ||
-						 (inSeg1Pt1.y != inSeg2Pt1.y) )		return [];   	// they are distinct  points
-					return  [ inSeg1Pt1 ];                 					// they are the same point
+					if ( (inSeg1Pt1.x !== inSeg2Pt1.x) ||
+						 (inSeg1Pt1.y !== inSeg2Pt1.y) )		return [];	// they are distinct  points
+					return [ inSeg1Pt1 ];                 						// they are the same point
 				}
 				// segment#1  is a single point
 				if ( seg1Pt ) {
 					if (! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
-					return  [ inSeg1Pt1 ];
+					return [ inSeg1Pt1 ];
 				}
 				// segment#2  is a single point
 				if ( seg2Pt ) {
 					if (! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
-					return  [ inSeg2Pt1 ];
+					return [ inSeg2Pt1 ];
 				}
 
 				// they are collinear segments, which might overlap
 				var seg1min, seg1max, seg1minVal, seg1maxVal;
 				var seg2min, seg2max, seg2minVal, seg2maxVal;
-				if (seg1dx != 0) {		// the segments are NOT on a vertical line
+				if (seg1dx !== 0) {		// the segments are NOT on a vertical line
 					if ( inSeg1Pt1.x < inSeg1Pt2.x ) {
 						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.x;
 						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.x;
@@ -249,7 +249,7 @@ THREE.Shape.Utils = {
 				}
 				if ( seg1minVal <= seg2minVal ) {
 					if ( seg1maxVal <  seg2minVal )	return [];
-					if ( seg1maxVal == seg2minVal )	{
+					if ( seg1maxVal === seg2minVal )	{
 						if ( inExcludeAdjacentSegs )		return [];
 						return [ seg2min ];
 					}
@@ -257,7 +257,7 @@ THREE.Shape.Utils = {
 					return	[ seg2min, seg2max ];
 				} else {
 					if ( seg1minVal >  seg2maxVal )	return [];
-					if ( seg1minVal == seg2maxVal )	{
+					if ( seg1minVal === seg2maxVal )	{
 						if ( inExcludeAdjacentSegs )		return [];
 						return [ seg1min ];
 					}
@@ -341,7 +341,7 @@ THREE.Shape.Utils = {
 				// checks for intersections with shape edges
 				var sIdx, nextIdx, intersection;
 				for ( sIdx = 0; sIdx < shape.length; sIdx ++ ) {
-					nextIdx = sIdx+1; nextIdx %= shape.length;
+					nextIdx = sIdx + 1; nextIdx %= shape.length;
 					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[sIdx], shape[nextIdx], true );
 					if ( intersection.length > 0 )		return	true;
 				}
@@ -358,7 +358,7 @@ THREE.Shape.Utils = {
 				for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx ++ ) {
 					chkHole = holes[indepHoles[ihIdx]];
 					for ( hIdx = 0; hIdx < chkHole.length; hIdx ++ ) {
-						nextIdx = hIdx+1; nextIdx %= chkHole.length;
+						nextIdx = hIdx + 1; nextIdx %= chkHole.length;
 						intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[hIdx], chkHole[nextIdx], true );
 						if ( intersection.length > 0 )		return	true;
 					}
@@ -410,12 +410,12 @@ THREE.Shape.Utils = {
 							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
 
 							holeIndex = h2;
-							indepHoles.splice(h,1);
+							indepHoles.splice(h, 1);
 
-							tmpShape1 = shape.slice( 0, shapeIndex+1 );
+							tmpShape1 = shape.slice( 0, shapeIndex + 1 );
 							tmpShape2 = shape.slice( shapeIndex );
 							tmpHole1 = hole.slice( holeIndex );
-							tmpHole2 = hole.slice( 0, holeIndex+1 );
+							tmpHole2 = hole.slice( 0, holeIndex + 1 );
 
 							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
 
@@ -462,7 +462,7 @@ THREE.Shape.Utils = {
 
 			if ( allPointsMap[ key ] !== undefined ) {
 
-				console.log( "Duplicate point", key );
+				console.warn( "THREE.Shape: Duplicate point", key );
 
 			}
 
@@ -574,4 +574,3 @@ THREE.Shape.Utils = {
 	}
 
 };
-

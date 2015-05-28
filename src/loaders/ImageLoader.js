@@ -4,7 +4,6 @@
 
 THREE.ImageLoader = function ( manager ) {
 
-	this.cache = new THREE.Cache();
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
@@ -17,29 +16,26 @@ THREE.ImageLoader.prototype = {
 
 		var scope = this;
 
-		var cached = scope.cache.get( url );
+		var cached = THREE.Cache.get( url );
 
 		if ( cached !== undefined ) {
 
-			onLoad( cached );
-			return;
+			if ( onLoad ) onLoad( cached );
+			return cached;
 
 		}
 
 		var image = document.createElement( 'img' );
 
-		if ( onLoad !== undefined ) {
+		image.addEventListener( 'load', function ( event ) {
 
-			image.addEventListener( 'load', function ( event ) {
+			THREE.Cache.add( url, this );
 
-				scope.cache.add( url, this );
+			if ( onLoad ) onLoad( this );
 
-				onLoad( this );
-				scope.manager.itemEnd( url );
+			scope.manager.itemEnd( url );
 
-			}, false );
-
-		}
+		}, false );
 
 		if ( onProgress !== undefined ) {
 
@@ -63,9 +59,9 @@ THREE.ImageLoader.prototype = {
 
 		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
-		image.src = url;
-
 		scope.manager.itemStart( url );
+
+		image.src = url;
 
 		return image;
 
@@ -77,4 +73,4 @@ THREE.ImageLoader.prototype = {
 
 	}
 
-}
+};

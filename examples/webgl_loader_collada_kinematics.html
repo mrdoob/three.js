@@ -108,7 +108,7 @@
 
 				}
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				// Add the COLLADA
@@ -120,9 +120,7 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0xcccccc ) );
-
-				var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
+				var directionalLight = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
@@ -153,7 +151,7 @@
 
 				var duration = getRandomInt(1000, 5000);
 
-				var target = {}
+				var target = {};
 
 				for ( var i = 0; i < kinematics.joints.length; i++ ) {
 
@@ -161,9 +159,9 @@
 
 						var old = tweenParameters[ i ];
 
-						var position = old ? old : joint.zeroPosition
+						var position = old ? old : joint.zeroPosition;
 
-						tweenParameters[ i ] = position
+						tweenParameters[ i ] = position;
 
 						target[ i ] = getRandomInt(joint.limits.min, joint.limits.max)
 
@@ -179,7 +177,7 @@
 
 					}
 
-				} )
+				} );
 
 				kinematicsTween.start();
 

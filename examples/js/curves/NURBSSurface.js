@@ -23,9 +23,9 @@ THREE.NURBSSurface = function ( degree1, degree2, knots1, knots2 /* arrays of re
 	var len2 = knots2.length - degree2 - 1;
 
 	// ensure Vector4 for control points
-	for (var i = 0; i < len1; ++i) {
-		this.controlPoints[i] = []
-		for (var j = 0; j < len2; ++j) {
+	for (var i = 0; i < len1; ++ i) {
+		this.controlPoints[i] = [];
+		for (var j = 0; j < len2; ++ j) {
 			var point = controlPoints[i][j];
 			this.controlPoints[i][j] = new THREE.Vector4(point.x, point.y, point.z, point.w);
 		}

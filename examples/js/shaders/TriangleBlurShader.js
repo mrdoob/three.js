@@ -15,7 +15,7 @@ THREE.TriangleBlurShader = {
 	uniforms : {
 
 		"texture": { type: "t", value: null },
-		"delta":   { type: "v2", value:new THREE.Vector2( 1, 1 )  }
+		"delta":   { type: "v2", value:new THREE.Vector2( 1, 1 ) }
 
 	},
 

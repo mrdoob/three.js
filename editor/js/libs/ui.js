@@ -4,14 +4,18 @@
 
 var UI = {};
 
-UI.Element = function () {};
+UI.Element = function ( dom ) {
+
+	this.dom = dom;
+
+};
 
 UI.Element.prototype = {
 
 	setId: function ( id ) {
 
 		this.dom.id = id;
-		
+
 		return this;
 
 	},
@@ -56,7 +60,7 @@ UI.Element.prototype = {
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor' ];
+'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
@@ -101,9 +105,6 @@ UI.Panel = function () {
 
 	this.dom = dom;
 
-	this.parent = null;
-	this.children = [];
-
 	return this;
 };
 
@@ -119,9 +120,6 @@ UI.Panel.prototype.add = function () {
 		if ( argument instanceof UI.Element ) {
 
 			this.dom.appendChild( argument.dom );
-			this.children.push( argument );
-
-			argument.parent = this;
 
 		} else {
 
@@ -139,22 +137,12 @@ UI.Panel.prototype.add = function () {
 UI.Panel.prototype.remove = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
-	
+
 		var argument = arguments[ i ];
 
 		if ( argument instanceof UI.Element ) {
 
 			this.dom.removeChild( argument.dom );
-
-			var index = this.children.indexOf( argument );
-
-			if ( index !== - 1 ) {
-
-				this.children.splice( index, 1 );
-
-			}
-
-			argument.parent = null;
 
 		} else {
 
@@ -175,8 +163,6 @@ UI.Panel.prototype.clear = function () {
 		this.dom.removeChild( this.dom.lastChild );
 
 	}
-
-	this.children = [];
 
 };
 
@@ -346,7 +332,7 @@ UI.Text.prototype.setValue = function ( value ) {
 
 // Input
 
-UI.Input = function () {
+UI.Input = function ( text ) {
 
 	UI.Element.call( this );
 
@@ -355,7 +341,7 @@ UI.Input = function () {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Input';
 	dom.style.padding = '2px';
-	dom.style.border = '1px solid #ccc';
+	dom.style.border = '1px solid transparent';
 
 	dom.addEventListener( 'keydown', function ( event ) {
 
@@ -364,6 +350,7 @@ UI.Input = function () {
 	}, false );
 
 	this.dom = dom;
+	this.setValue( text );
 
 	return this;
 
@@ -398,7 +385,6 @@ UI.TextArea = function () {
 	var dom = document.createElement( 'textarea' );
 	dom.className = 'TextArea';
 	dom.style.padding = '2px';
-	dom.style.border = '1px solid #ccc';
 	dom.spellcheck = false;
 
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -453,10 +439,7 @@ UI.Select = function () {
 
 	var dom = document.createElement( 'select' );
 	dom.className = 'Select';
-	dom.style.width = '64px';
-	dom.style.height = '16px';
-	dom.style.border = '0px';
-	dom.style.padding = '0px';
+	dom.style.padding = '2px';
 
 	this.dom = dom;
 
@@ -519,159 +502,6 @@ UI.Select.prototype.setValue = function ( value ) {
 	return this;
 
 };
-
-// FancySelect
-
-UI.FancySelect = function () {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'div' );
-	dom.className = 'FancySelect';
-	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
-
-	// Broadcast for object selection after arrow navigation
-	var changeEvent = document.createEvent('HTMLEvents');
-	changeEvent.initEvent( 'change', true, true );
-
-	// Prevent native scroll behavior
-	dom.addEventListener( 'keydown', function (event) {
-
-		switch ( event.keyCode ) {
-			case 38: // up
-			case 40: // down
-				event.preventDefault();
-				event.stopPropagation();
-				break;
-		}
-
-	}, false);
-
-	// Keybindings to support arrow navigation
-	dom.addEventListener( 'keyup', function (event) {
-
-		switch ( event.keyCode ) {
-			case 38: // up
-			case 40: // down
-				scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
-
-				if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
-
-					// Highlight selected dom elem and scroll parent if needed
-					scope.setValue( scope.options[ scope.selectedIndex ].value );
-
-					scope.dom.dispatchEvent( changeEvent );
-
-				}
-
-				break;
-		}
-
-	}, false);
-
-	this.dom = dom;
-
-	this.options = [];
-	this.selectedIndex = -1;
-	this.selectedValue = null;
-
-	return this;
-
-};
-
-UI.FancySelect.prototype = Object.create( UI.Element.prototype );
-UI.FancySelect.prototype.constructor = UI.FancySelect;
-
-UI.FancySelect.prototype.setOptions = function ( options ) {
-
-	var scope = this;
-
-	var changeEvent = document.createEvent( 'HTMLEvents' );
-	changeEvent.initEvent( 'change', true, true );
-
-	while ( scope.dom.children.length > 0 ) {
-
-		scope.dom.removeChild( scope.dom.firstChild );
-
-	}
-
-	scope.options = [];
-
-	for ( var i = 0; i < options.length; i ++ ) {
-
-		var option = options[ i ];
-
-		var div = document.createElement( 'div' );
-		div.className = 'option';
-		div.innerHTML = option.html;
-		div.value = option.value;
-		scope.dom.appendChild( div );
-
-		scope.options.push( div );
-
-		div.addEventListener( 'click', function ( event ) {
-
-			scope.setValue( this.value );
-			scope.dom.dispatchEvent( changeEvent );
-
-		}, false );
-
-	}
-
-	return scope;
-
-};
-
-UI.FancySelect.prototype.getValue = function () {
-
-	return this.selectedValue;
-
-};
-
-UI.FancySelect.prototype.setValue = function ( value ) {
-
-	for ( var i = 0; i < this.options.length; i ++ ) {
-
-		var element = this.options[ i ];
-
-		if ( element.value === value ) {
-
-			element.classList.add( 'active' );
-
-			// scroll into view
-
-			var y = element.offsetTop - this.dom.offsetTop;
-			var bottomY = y + element.offsetHeight;
-			var minScroll = bottomY - this.dom.offsetHeight;
-
-			if ( this.dom.scrollTop > y ) {
-
-				this.dom.scrollTop = y
-
-			} else if ( this.dom.scrollTop < minScroll ) {
-
-				this.dom.scrollTop = minScroll;
-
-			}
-
-			this.selectedIndex = i;
-
-		} else {
-
-			element.classList.remove( 'active' );
-
-		}
-
-	}
-
-	this.selectedValue = value;
-
-	return this;
-
-};
-
 
 // Checkbox
 
@@ -810,8 +640,8 @@ UI.Number = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
-	var pointer = new THREE.Vector2();
-	var prevPointer = new THREE.Vector2();
+	var pointer = [ 0, 0 ];
+	var prevPointer = [ 0, 0 ];
 
 	var onMouseDown = function ( event ) {
 
@@ -821,7 +651,7 @@ UI.Number = function ( number ) {
 
 		onMouseDownValue = parseFloat( dom.value );
 
-		prevPointer.set( event.clientX, event.clientY );
+		prevPointer = [ event.clientX, event.clientY ];
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -832,9 +662,9 @@ UI.Number = function ( number ) {
 
 		var currentValue = dom.value;
 
-		pointer.set( event.clientX, event.clientY );
+		pointer = [ event.clientX, event.clientY ];
 
-		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
+		distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
@@ -842,7 +672,7 @@ UI.Number = function ( number ) {
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
 
-		prevPointer.set( event.clientX, event.clientY );
+		prevPointer = [ event.clientX, event.clientY ];
 
 	};
 
@@ -974,8 +804,8 @@ UI.Integer = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
-	var pointer = new THREE.Vector2();
-	var prevPointer = new THREE.Vector2();
+	var pointer = [ 0, 0 ];
+	var prevPointer = [ 0, 0 ];
 
 	var onMouseDown = function ( event ) {
 
@@ -985,7 +815,7 @@ UI.Integer = function ( number ) {
 
 		onMouseDownValue = parseFloat( dom.value );
 
-		prevPointer.set( event.clientX, event.clientY );
+		prevPointer = [ event.clientX, event.clientY ];
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -996,9 +826,9 @@ UI.Integer = function ( number ) {
 
 		var currentValue = dom.value;
 
-		pointer.set( event.clientX, event.clientY );
+		pointer = [ event.clientX, event.clientY ];
 
-		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
+		distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
@@ -1006,7 +836,7 @@ UI.Integer = function ( number ) {
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
 
-		prevPointer.set( event.clientX, event.clientY );
+		prevPointer = [ event.clientX, event.clientY ];
 
 	};
 
@@ -1171,7 +1001,7 @@ UI.Button.prototype.setLabel = function ( value ) {
 UI.Dialog = function ( value ) {
 
 	var scope = this;
-	
+
 	var dom = document.createElement( 'dialog' );
 
 	if ( dom.showModal === undefined ) {

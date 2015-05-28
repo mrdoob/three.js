@@ -183,7 +183,7 @@
 			</a>
 			<div id="content"></div>
 		</div>
-		<iframe id="viewer" allowfullscreen></iframe>
+		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script>
 
@@ -192,27 +192,12 @@
 				"webgl_animation_cloth",
 				"webgl_animation_skinning_blending",
 				"webgl_animation_skinning_morph",
-				"webgl_buffergeometry",
-				"webgl_buffergeometry_custom_attributes_particles",
-				"webgl_buffergeometry_lines",
-				"webgl_buffergeometry_lines_indexed",
-				"webgl_buffergeometry_particles",
-				"webgl_buffergeometry_drawcalls",
-				"webgl_buffergeometry_rawshader",
-				"webgl_buffergeometry_uint",
 				"webgl_camera",
 				"webgl_camera_logarithmicdepthbuffer",
-				"webgl_custom_attributes",
-				"webgl_custom_attributes_lines",
-				"webgl_custom_attributes_particles",
-				"webgl_custom_attributes_particles2",
-				"webgl_custom_attributes_particles3",
 				"webgl_decals",
 				"webgl_effects_anaglyph",
-				"webgl_effects_oculusrift",
 				"webgl_effects_parallaxbarrier",
 				"webgl_effects_stereo",
-				"webgl_effects_vr",
 				"webgl_geometries",
 				"webgl_geometries2",
 				"webgl_geometry_colors",
@@ -282,6 +267,7 @@
 				"webgl_loader_utf8",
 				"webgl_loader_vrml",
 				"webgl_loader_vtk",
+				"webgl_exporter_obj",
 				"webgl_lod",
 				"webgl_marchingcubes",
 				"webgl_materials",
@@ -354,12 +340,15 @@
 				"webgl_shader_lava",
 				"webgl_shader2",
 				"webgl_shaders_ocean",
+				"webgl_shaders_ocean2",
 				"webgl_shading_physical",
 				"webgl_shaders_sky",
 				"webgl_shaders_tonemapping",
 				"webgl_shaders_vector",
 				"webgl_shadowmap",
 				"webgl_shadowmap_performance",
+				"webgl_shadowmap_viewer",
+				"webgl_shadowmesh",
 				"webgl_sprites",
 				"webgl_terrain_dynamic",
 				"webgl_test_memory",
@@ -367,10 +356,33 @@
 				"webgl_trails",
 				"webgl_video_panorama_equirectangular"
 			],
+			"webgl / advanced": [
+				"webgl_buffergeometry",
+				"webgl_buffergeometry_custom_attributes_particles",
+				"webgl_buffergeometry_drawcalls",
+				"webgl_buffergeometry_instancing",
+				"webgl_buffergeometry_instancing_dynamic",
+				"webgl_buffergeometry_instancing_billboards",
+				"webgl_buffergeometry_instancing_interleaved_dynamic",
+				"webgl_buffergeometry_lines",
+				"webgl_buffergeometry_lines_indexed",
+				"webgl_buffergeometry_particles",
+				"webgl_buffergeometry_rawshader",
+				"webgl_buffergeometry_uint",
+				"webgl_custom_attributes",
+				"webgl_custom_attributes_lines",
+				"webgl_custom_attributes_particles",
+				"webgl_custom_attributes_particles2",
+				"webgl_custom_attributes_particles3"
+			],
 			"webgldeferred": [
 				"webgldeferred_animation",
 				"webgldeferred_arealights",
 				"webgldeferred_pointlights"
+			],
+			"vr": [
+				"vr_cubes",
+				"vr_video"
 			],
 			"css3d": [
 				"css3d_molecules",
@@ -387,7 +399,6 @@
 				"misc_animation_keys",
 				"misc_controls_deviceorientation",
 				"misc_controls_fly",
-				"misc_controls_oculusrift",
 				"misc_controls_orbit",
 				"misc_controls_pointerlock",
 				"misc_controls_trackball",

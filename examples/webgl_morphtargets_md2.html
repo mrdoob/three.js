@@ -146,8 +146,7 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = 2;
+				renderer.shadowMap.enabled = true;
 
 				// STATS
 
@@ -218,7 +217,11 @@
 				// 	setupWeaponsGUI( character );
 				// 	setupGUIAnimations( character );
 
+<<<<<<< HEAD
 				// }
+=======
+				};
+>>>>>>> 9c2a88d21713eaddd73bfc5b9b00847cf8059225
 
 				// character.loadParts( config );
 
@@ -239,6 +242,103 @@
 				camera.updateProjectionMatrix();
 
 			}
+<<<<<<< HEAD
+=======
+
+			// GUI
+
+			function labelize( text ) {
+
+				var parts = text.split( "." );
+
+				if ( parts.length > 1 ) {
+
+					parts.length -= 1;
+					return parts.join( "." );
+
+				}
+
+				return text;
+
+			}
+
+			//
+
+			function setupWeaponsGUI( character ) {
+
+				var folder = gui.addFolder( "Weapons" );
+
+				var generateCallback = function( index ) {
+
+					return function () { character.setWeapon( index ); };
+
+				};
+
+				var guiItems = [];
+
+				for ( var i = 0; i < character.weapons.length; i ++ ) {
+
+					var name = character.weapons[ i ].name;
+
+					playbackConfig[ name ] = generateCallback( i );
+					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
+
+				}
+
+			}
+
+			//
+
+			function setupSkinsGUI( character ) {
+
+				var folder = gui.addFolder( "Skins" );
+
+				var generateCallback = function( index ) {
+
+					return function () { character.setSkin( index ); };
+
+				};
+
+				var guiItems = [];
+
+				for ( var i = 0; i < character.skinsBody.length; i ++ ) {
+
+					var name = character.skinsBody[ i ].name;
+
+					playbackConfig[ name ] = generateCallback( i );
+					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
+
+				}
+
+			}
+
+			//
+
+			function setupGUIAnimations( character ) {
+
+				var folder = gui.addFolder( "Animations" );
+
+				var generateCallback = function( animationName ) {
+
+					return function () { character.setAnimation( animationName ); };
+
+				};
+
+				var i = 0, guiItems = [];
+				var animations = character.meshBody.geometry.animations;
+
+				for ( var a in animations ) {
+
+					playbackConfig[ a ] = generateCallback( a );
+					guiItems[ i ] = folder.add( playbackConfig, a, a );
+
+					i ++;
+
+				}
+
+			}
+
+>>>>>>> 9c2a88d21713eaddd73bfc5b9b00847cf8059225
 			//
 
 			function animate() {

@@ -142,6 +142,16 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+	
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
+		this.z -= s;
+
+		return this;
+
+	},
 
 	subVectors: function ( a, b ) {
 
@@ -597,6 +607,14 @@ THREE.Vector3.prototype = {
 
 	},
 
+	lerpVectors: function ( v1, v2, alpha ) {
+
+		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+
+		return this;
+
+	},
+
 	cross: function ( v, w ) {
 
 		if ( w !== undefined ) {
@@ -765,7 +783,7 @@ THREE.Vector3.prototype = {
 	},
 
 	setFromMatrixColumn: function ( index, matrix ) {
-
+		
 		var offset = index * 4;
 
 		var me = matrix.elements;
@@ -811,15 +829,15 @@ THREE.Vector3.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) offset = 0;
 
-	    index = index * attribute.itemSize + offset;
+		index = index * attribute.itemSize + offset;
 
-	    this.x = attribute.array[ index ];
-	    this.y = attribute.array[ index + 1 ];
-	    this.z = attribute.array[ index + 2 ];
+		this.x = attribute.array[ index ];
+		this.y = attribute.array[ index + 1 ];
+		this.z = attribute.array[ index + 2 ];
 
-	    return this;
+		return this;
 
 	},
 

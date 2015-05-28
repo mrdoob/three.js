@@ -42,41 +42,13 @@ Menubar.Edit = function ( editor ) {
 	option.setTextContent( 'Delete' );
 	option.onClick( function () {
 
-		var parent = editor.selected.parent;
-		editor.removeObject( editor.selected );
-		editor.select( parent );
-
-	} );
-	options.add( option );
-
-	//
-
-	options.add( new UI.HorizontalRule() );
-
-	// Flatten
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Flatten' );
-	option.onClick( function () {
-
 		var object = editor.selected;
 
-		if ( object.parent === undefined ) return; // avoid flattening the camera or scene
+		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
-		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
-
-		var geometry = object.geometry;
-
-		geometry.applyMatrix( object.matrix );
-		geometry.verticesNeedUpdate = true;
-		geometry.normalsNeedUpdate = true;
-
-		object.position.set( 0, 0, 0 );
-		object.rotation.set( 0, 0, 0 );
-		object.scale.set( 1, 1, 1 );
-
-		editor.signals.objectChanged.dispatch( object );
+		var parent = object.parent;
+		editor.removeObject( object );
+		editor.select( parent );
 
 	} );
 	options.add( option );

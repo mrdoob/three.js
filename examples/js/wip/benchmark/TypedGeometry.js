@@ -138,7 +138,7 @@ THREE.TypedFace.prototype = {
 
 	}
 
-}
+};
 
 
 THREE.TypedGeometry = function ( size ) {

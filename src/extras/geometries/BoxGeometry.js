@@ -28,14 +28,14 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 	var height_half = height / 2;
 	var depth_half = depth / 2;
 
-	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, 0 ); // px
-	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, 1 ); // nx
-	buildPlane( 'x', 'z',   1,   1, width, depth, height_half, 2 ); // py
-	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, 3 ); // ny
-	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, 4 ); // pz
-	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, 5 ); // nz
+	buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half ); // px
+	buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half ); // nx
+	buildPlane( 'x', 'z',   1,   1, width, depth, height_half ); // py
+	buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half ); // ny
+	buildPlane( 'x', 'y',   1, - 1, width, height, depth_half ); // pz
+	buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half ); // nz
 
-	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
+	function buildPlane( u, v, udir, vdir, width, height, depth ) {
 
 		var w, ix, iy,
 		gridX = scope.widthSegments,
@@ -100,7 +100,6 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 				var face = new THREE.Face3( a + offset, b + offset, d + offset );
 				face.normal.copy( normal );
 				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
@@ -108,7 +107,6 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 				face = new THREE.Face3( b + offset, c + offset, d + offset );
 				face.normal.copy( normal );
 				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
@@ -125,3 +123,5 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
+
+THREE.CubeGeometry = THREE.BoxGeometry; // backwards compatibility

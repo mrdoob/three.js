@@ -123,7 +123,7 @@
 				geometry.computeVertexNormals();
 				totalFaces += geometry.faces.length;
 				
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x030303, shininess: 30 } );
+				var material = new THREE.MeshPhongMaterial( { color: 0x030303, specular: 0x030303, shininess: 30 } );
 				
 				modifyOctree( geometry, material, true );
 				
@@ -196,7 +196,7 @@
 			checkbox.id = "octreeToggle";
 			checkbox.checked = true;
 
-			var label = document.createElement('label')
+			var label = document.createElement('label');
 			label.htmlFor = "octreeToggle";
 			label.appendChild(document.createTextNode('Use Octree') );
 

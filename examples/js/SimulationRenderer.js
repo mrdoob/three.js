@@ -19,12 +19,12 @@ function SimulationRenderer(WIDTH, renderer) {
 	// Init RTT stuff
 	gl = renderer.getContext();
 
-	if( !gl.getExtension( "OES_texture_float" )) {
+	if ( !gl.getExtension( "OES_texture_float" )) {
 		alert( "No OES_texture_float support for float textures!" );
 		return;
 	}
 
-	if( gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) == 0) {
+	if ( gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) == 0) {
 		alert( "No support for vertex shader textures!" );
 		return;
 	}
@@ -130,7 +130,7 @@ function SimulationRenderer(WIDTH, renderer) {
 		mesh.material = passThruShader;
 		uniforms.texture.value = input;
 		renderer.render( scene, camera, output );
-	}
+	};
 
 
 	this.renderPosition = function(position, velocity, output, delta) {
@@ -141,7 +141,7 @@ function SimulationRenderer(WIDTH, renderer) {
 		positionShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
 		this.currentPosition = output;
-	}
+	};
 
 	this.renderVelocity = function(position, velocity, output, delta) {
 		mesh.material = velocityShader;
@@ -151,7 +151,7 @@ function SimulationRenderer(WIDTH, renderer) {
 		velocityShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
 		this.currentVelocity = output;
-	}
+	};
 
 	this.simulate = function( delta ) {
 
@@ -169,7 +169,7 @@ function SimulationRenderer(WIDTH, renderer) {
 
 		flipflop = !flipflop;
 
-	}
+	};
 
 	function generatePositionTexture() {
 

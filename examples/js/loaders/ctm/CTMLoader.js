@@ -72,7 +72,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
@@ -126,7 +126,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 							scope.createModel( ctmFile, callback );
 
 							var e = Date.now();
-							console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
+							console.log( "model load time [worker]: " + (e - e1) + " ms, total: " + (e - s));
 
 						}
 
@@ -179,7 +179,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 		}
 
-	}
+	};
 
 	xhr.open( "GET", url, true );
 	xhr.responseType = "arraybuffer";
@@ -240,7 +240,7 @@ THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 		}
 
-	}
+	};
 
 	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
 	Model.prototype.constructor = Model;

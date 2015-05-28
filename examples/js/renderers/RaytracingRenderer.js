@@ -9,6 +9,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	var scope = this;
+
 	var canvas = document.createElement( 'canvas' );
 	var context = canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
@@ -48,6 +50,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 		clearColor.set( color );
 
 	};
+
+	this.setPixelRatio = function () {};
 
 	this.setSize = function ( width, height ) {
 
@@ -298,7 +302,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					var eta = material.refractionRatio;
 
-					var dotNI = rayDirection.dot( normalVector )
+					var dotNI = rayDirection.dot( normalVector );
 					var k = 1.0 - eta * eta * ( 1.0 - dotNI * dotNI );
 
 					if ( k < 0.0 ) {
@@ -456,7 +460,12 @@ THREE.RaytracingRenderer = function ( parameters ) {
 				blockX = 0;
 				blockY += blockSize;
 
-				if ( blockY >= canvasHeight ) return;
+				if ( blockY >= canvasHeight ) {
+
+					scope.dispatchEvent( { type: "complete" } );
+					return;
+
+				}
 
 			}
 
@@ -519,7 +528,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			}
 
-			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld )
+			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
 			var _object = cache[ object.id ];
 
@@ -533,3 +542,5 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	};
 
 };
+
+THREE.EventDispatcher.prototype.apply(THREE.RaytracingRenderer.prototype);

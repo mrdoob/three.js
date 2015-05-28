@@ -89,7 +89,7 @@ var Viewport = function ( editor ) {
 
 		raycaster.setFromCamera( mouse, camera );
 
-		if ( object instanceof Array ) {
+		if ( Array.isArray( object ) ) {
 
 			return raycaster.intersectObjects( object );
 
@@ -225,6 +225,13 @@ var Viewport = function ( editor ) {
 
 	// signals
 
+	signals.editorCleared.add( function () {
+
+		controls.center.set( 0, 0, 0 );
+		render();
+
+	} );
+
 	signals.themeChanged.add( function ( value ) {
 
 		switch ( value ) {
@@ -269,8 +276,6 @@ var Viewport = function ( editor ) {
 		container.dom.removeChild( renderer.domElement );
 
 		renderer = createRenderer( type, antialias );
-		renderer.setClearColor( clearColor );
-		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
@@ -323,11 +328,7 @@ var Viewport = function ( editor ) {
 
 			}
 
-			if ( object instanceof THREE.PerspectiveCamera === false ) {
-
-				transformControls.attach( object );
-
-			}
+			transformControls.attach( object );
 
 		}
 
@@ -369,19 +370,15 @@ var Viewport = function ( editor ) {
 
 		transformControls.update();
 
-		if ( object !== camera ) {
+		if ( object instanceof THREE.PerspectiveCamera ) {
 
-			if ( object.geometry !== undefined ) {
+			object.updateProjectionMatrix();
 
-				selectionBox.update( object );
+		}
 
-			}
+		if ( editor.helpers[ object.id ] !== undefined ) {
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
-
-				editor.helpers[ object.id ].update();
-
-			}
+			editor.helpers[ object.id ].update();
 
 		}
 
@@ -522,6 +519,8 @@ var Viewport = function ( editor ) {
 		}
 
 		var renderer = new THREE[ type ]( { antialias: antialias } );
+		renderer.setClearColor( clearColor );
+		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
 
@@ -530,7 +529,7 @@ var Viewport = function ( editor ) {
 	};
 
 	var clearColor;
-	var renderer = createRenderer( editor.config.getKey( 'renderer' ), editor.config.getKey( 'renderer/antialias' ) );
+	var renderer = createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
 	container.dom.appendChild( renderer.domElement );
 
 	animate();

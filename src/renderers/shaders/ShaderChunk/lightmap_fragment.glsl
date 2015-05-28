@@ -13,6 +13,6 @@
     #endif
   #endif
 
-	gl_FragColor.xyz = gl_FragColor.xyz * lightMapColor.xyz;
+	totalAmbientLight += lightMapColor.xyz * lightMapIntensity;
 
 #endif

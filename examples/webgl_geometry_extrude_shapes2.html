@@ -292,7 +292,6 @@ var addGeoObject = function( group, svgObject ) {
 		color = new THREE.Color( theColors[i] ); 
 		material = new THREE.MeshLambertMaterial({
 			color: color,
-			ambient: color,
 			emissive: color,
 		});
 		amount = theAmounts[i];
@@ -408,7 +407,7 @@ var initSVGObject = function() {
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
-	};
+	}
 
 	function onDocumentMouseDown( event ) {
 
@@ -420,28 +419,28 @@ var initSVGObject = function() {
 
 		mouseXOnMouseDown = event.clientX - windowHalfX;
 		targetRotationOnMouseDown = targetRotation;
-	};
+	}
 
 	function onDocumentMouseMove( event ) {
 
 		mouseX = event.clientX - windowHalfX;
 
 		targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
-	};
+	}
 
 	function onDocumentMouseUp( event ) {
 
 		document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 		document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-	};
+	}
 
 	function onDocumentMouseOut( event ) {
 
 		document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 		document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 		document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-	};
+	}
 
 	function onDocumentTouchStart( event ) {
 
@@ -452,7 +451,7 @@ var initSVGObject = function() {
 			mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
 			targetRotationOnMouseDown = targetRotation;
 		}
-	};
+	}
 
 	function onDocumentTouchMove( event ) {
 
@@ -463,7 +462,7 @@ var initSVGObject = function() {
 			mouseX = event.touches[ 0 ].pageX - windowHalfX;
 			targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 		}
-	};
+	}
 
 	function animate() {
 
@@ -472,13 +471,13 @@ var initSVGObject = function() {
 
 		render();
 		stats.update();
-	};
+	}
 
 	function render() {
 
 		group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 		renderer.render( scene, camera );
-	};
+	}
 </script>
 
 

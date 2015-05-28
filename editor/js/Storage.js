@@ -8,7 +8,7 @@ var Storage = function () {
 
 	if ( indexedDB === undefined  ) {
 		console.warn( 'Storage: IndexedDB not available.' );
-		return { init: function (){}, get: function (){}, set: function (){}, clear: function (){} };
+		return { init: function () {}, get: function () {}, set: function () {}, clear: function () {} };
 	}
 
 	var name = 'threejs-editor';

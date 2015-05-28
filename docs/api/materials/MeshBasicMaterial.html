@@ -24,8 +24,8 @@
 		<div>parameters is an object with one or more properties defining the material's appearance.</div>
 		<div>
 		color — geometry color in hexadecimal. Default is 0xffffff.<br />
-		map — Sets the texture map. Default is null <br />
-		lightMap — Set light map. Default is null.<br />
+		map — Set texture map. Default is null <br />
+		aoMap — Set ambient occlusion map. Default is null <br />
 		specularMap — Set specular map. Default is null.<br />
 		alphaMap — Set alpha map. Default is null.<br />
 		envMap — Set env map. Default is null.<br />
@@ -45,8 +45,13 @@
 		<h3>[property:Integer color]</h3>
 		<div>Sets the color of the geometry. Default is 0xffffff.</div>
 		
-		<h3>[property:Texture lightMap]</h3>
-		<div>Set light map. Default is null.</div>
+		<h3>[property:Texture map]</h3>
+		<div>
+		Set texture map. Default is  null.
+		</div>
+
+		<h3>[property:Texture aoMap]</h3>
+		<div>Set ambient occlusion map. Default is null.</div>
 
 		<h3>[property:Texture specularMap]</h3>
 		<div>Set specular map. Default is null.</div>
@@ -90,11 +95,6 @@
 		<h3>[property:Boolean morphTargets]</h3>
 		<div>Define whether the material uses morphTargets. Default is false.</div>	
 		
-		<h3>[property:Texture map]</h3>
-		<div>
-		Sets the texture map. Default is  null.
-		</div> 
-
 		<h3>[property:number combine]</h3>
 		<div>
 		How to combine the result of the surface's color with the environment map, if any.

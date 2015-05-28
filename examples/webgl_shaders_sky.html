@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - shaders - sky sun shader</title>
@@ -20,8 +20,8 @@
 			}
 
 			#info {
-				color:#333;
-				text-shadow: 1px 1px #fff;
+				color:#ccc;
+				text-shadow: 1px 1px rgba(0,0,0,0.25);
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
@@ -29,7 +29,7 @@
 			}
 
 			a {
-				color: #333;
+				color: #fff;
 			}
 
 		</style>
@@ -75,7 +75,7 @@
 
 
 				// Add Sun Helper
-				sunSphere = new THREE.Mesh( new THREE.SphereGeometry( 20000, 30, 30 ),
+				sunSphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 20000, 30, 30 ),
 					new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: false }));
 				sunSphere.position.y = -700000;
 				sunSphere.visible = true;
@@ -90,9 +90,9 @@
 					mieDirectionalG: 0.8,
 					luminance: 1,
 					inclination: 0.49, // elevation / inclination
-					azimuth: 0.25, // Facing front,					
+					azimuth: 0.25, // Facing front,
 					sun: !true
-				}
+				};
 
 				var distance = 400000;
 
@@ -108,8 +108,8 @@
 					var phi = 2 * Math.PI * (effectController.azimuth - 0.5);
 
 					sunSphere.position.x = distance * Math.cos(phi);
-					sunSphere.position.y = distance * Math.sin(phi) * Math.sin(theta); 
-					sunSphere.position.z = distance * Math.sin(phi) * Math.cos(theta); 
+					sunSphere.position.y = distance * Math.sin(phi) * Math.sin(theta);
+					sunSphere.position.z = distance * Math.sin(phi) * Math.cos(theta);
 
 					sunSphere.visible = effectController.sun;
 
@@ -125,18 +125,18 @@
 				gui.add( effectController, "reileigh", 0.0, 4, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieCoefficient", 0.0, 0.1, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieDirectionalG", 0.0, 1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "luminance", 0.0, 2).onChange( guiChanged );;
+				gui.add( effectController, "luminance", 0.0, 2).onChange( guiChanged );
 				gui.add( effectController, "inclination", 0, 1, 0.0001).onChange( guiChanged );
 				gui.add( effectController, "azimuth", 0, 1, 0.0001).onChange( guiChanged );
 				gui.add( effectController, "sun").onChange( guiChanged );
-				
+
 
 				guiChanged();
 
 
 				camera.lookAt(sunSphere.position)
 
-	
+
 			}
 
 
@@ -150,21 +150,10 @@
 
 				scene = new THREE.Scene();
 
-				var size = 500;
-
-				var geometryLines = new THREE.BoxGeometry( size, size, size );
-	
-				var geometryPlane = new THREE.PlaneGeometry( size * 10, size * 10, 1, 1);
-				geometryPlane.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-	
-
-				var materialLines = new THREE.MeshBasicMaterial( { wireframe: true } );
-
-				meshLines = new THREE.Mesh( geometryLines, materialLines );
-
-				// scene.add( meshLines );
-
-				scene.add( new THREE.Mesh( geometryPlane, materialLines ) );
+				var helper = new THREE.GridHelper( 5000, 5000 );
+				helper.color1.setHex( 0xffffff );
+				helper.color2.setHex( 0xffffff );
+				scene.add( helper );
 
 				initSky();
 
@@ -206,7 +195,7 @@
 				time = Date.now();
 
 				requestAnimationFrame( animate );
-				
+
 				controls.update();
 
 				render();

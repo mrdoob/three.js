@@ -43,14 +43,14 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		tempTexture      = gl.createTexture();
 		occlusionTexture = gl.createTexture();
 
-		gl.bindTexture( gl.TEXTURE_2D, tempTexture );
+		renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
 		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 16, 16, 0, gl.RGB, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
-		gl.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+		renderer.state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
 		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, 16, 16, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
@@ -250,7 +250,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		attributes = {
 			vertex: gl.getAttribLocation ( program, "position" ),
 			uv:     gl.getAttribLocation ( program, "uv" )
-		}
+		};
 
 		uniforms = {
 			renderType:     gl.getUniformLocation( program, "renderType" ),
@@ -295,8 +295,10 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		gl.useProgram( program );
 
-		gl.enableVertexAttribArray( attributes.vertex );
-		gl.enableVertexAttribArray( attributes.uv );
+		renderer.state.initAttributes();
+		renderer.state.enableAttribute( attributes.vertex );
+		renderer.state.enableAttribute( attributes.uv );
+		renderer.state.disableUnusedAttributes();
 
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms
@@ -321,7 +323,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 			// calc object screen position
 
 			var flare = flares[ i ];
-			
+
 			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
 			tempPosition.applyMatrix4( camera.matrixWorldInverse );
@@ -329,7 +331,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 			// setup arrays for gl programs
 
-			screenPosition.copy( tempPosition )
+			screenPosition.copy( tempPosition );
 
 			screenPositionPixels.x = screenPosition.x * halfViewportWidth + halfViewportWidth;
 			screenPositionPixels.y = screenPosition.y * halfViewportHeight + halfViewportHeight;
@@ -344,8 +346,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				// save current RGB to temp texture
 
-				gl.activeTexture( gl.TEXTURE1 );
-				gl.bindTexture( gl.TEXTURE_2D, tempTexture );
+				renderer.state.activeTexture( gl.TEXTURE1 );
+				renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
 
 
@@ -363,8 +365,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				// copy result to occlusionMap
 
-				gl.activeTexture( gl.TEXTURE0 );
-				gl.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+				renderer.state.activeTexture( gl.TEXTURE0 );
+				renderer.state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
 
 
@@ -373,14 +375,14 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform1i( uniforms.renderType, 1 );
 				gl.disable( gl.DEPTH_TEST );
 
-				gl.activeTexture( gl.TEXTURE1 );
-				gl.bindTexture( gl.TEXTURE_2D, tempTexture );
+				renderer.state.activeTexture( gl.TEXTURE1 );
+				renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 
 				// update object positions
 
-				flare.positionScreen.copy( screenPosition )
+				flare.positionScreen.copy( screenPosition );
 
 				if ( flare.customUpdateCallback ) {
 
@@ -419,7 +421,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 						gl.uniform1f( uniforms.opacity, sprite.opacity );
 						gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-						renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
+						renderer.state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
 						renderer.setTexture( sprite.texture, 1 );
 
 						gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );

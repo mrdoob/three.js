@@ -79,7 +79,7 @@
 
 				var texture1 = new THREE.Texture( generateTexture( 0, 0.5, 1 ), THREE.UVMapping );
 				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), THREE.SphericalReflectionMapping );
-				var texture3 = THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' )
+				var texture3 = THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 				texture1.needsUpdate = true;
 				texture2.needsUpdate = true;
@@ -96,8 +96,8 @@
 					new THREE.MeshLambertMaterial( { map: texture3 } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ),
-					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
-					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } )
+					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
+					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } )
 
 				];
 

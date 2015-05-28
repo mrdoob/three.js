@@ -19,7 +19,6 @@
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
-		<script src="../examples/js/loaders/SceneLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VRMLLoader.js"></script>
@@ -30,20 +29,36 @@
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
 
+		<script src="../examples/js/loaders/deprecated/SceneLoader.js"></script>
+
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
 		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
+		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
+		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
+		<script src="js/libs/codemirror/codemirror.js"></script>
+
+		<script src="js/libs/codemirror/mode/javascript.js"></script>
+		<script src="js/libs/esprima.js"></script>
+		<script src="js/libs/jsonlint.js"></script>
+
+		<script src="js/libs/codemirror/mode/glsl.js"></script>
+
 		<script src="js/libs/jszip.min.js"></script>
+		<script src="js/libs/sortable.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
-		<script src="js/libs/ui.editor.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/libs/app.js"></script>
 		<script src="js/Player.js"></script>
+		<script src="js/Script.js"></script>
+
+		<script src="../examples/js/effects/VREffect.js"></script>
+		<script src="../examples/js/controls/VRControls.js"></script>
 
 		<script src="js/Storage.js"></script>
 
@@ -56,10 +71,11 @@
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
+		<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
-		<script src="js/Sidebar.Renderer.js"></script>
+		<script src="js/Sidebar.Project.js"></script>
 		<script src="js/Sidebar.Scene.js"></script>
 		<script src="js/Sidebar.Object3D.js"></script>
 		<script src="js/Sidebar.Animation.js"></script>
@@ -100,6 +116,9 @@
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
 
+			var script = new Script( editor );
+			document.body.appendChild( script.dom );
+
 			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
 
@@ -109,8 +128,10 @@
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
+			/*
 			var dialog = new UI.Dialog();
 			document.body.appendChild( dialog.dom );
+			*/
 
 			//
 
@@ -168,6 +189,7 @@
 
 				var signals = editor.signals;
 
+				signals.editorCleared.add( saveState );
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
@@ -176,6 +198,7 @@
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
 
+				/*
 				var showDialog = function ( content ) {
 
 					dialog.clear();
@@ -186,6 +209,7 @@
 				};
 
 				signals.showDialog.add( showDialog );
+				*/
 
 			} );
 
@@ -201,7 +225,12 @@
 			document.addEventListener( 'drop', function ( event ) {
 
 				event.preventDefault();
-				editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				if ( event.dataTransfer.files.length > 0 ) {
+
+					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				}
 
 			}, false );
 
@@ -209,13 +238,17 @@
 
 				switch ( event.keyCode ) {
 
-					case 8: // prevent browser back
-						event.preventDefault();
-						break;
-					case 46: // delete
-						var parent = editor.selected.parent;
-						editor.removeObject( editor.selected );
+					case 8:
+						event.preventDefault(); // prevent browser back
+
+						var object = editor.selected;
+
+						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+						var parent = object.parent;
+						editor.removeObject( object );
 						editor.select( parent );
+
 						break;
 
 				}
@@ -231,6 +264,33 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
+
+			//
+
+			var file = null;
+			var hash = window.location.hash;
+
+			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
+			if ( hash.substr( 1, 6 ) === 'scene=' ) file = hash.substr( 7 );
+
+			if ( file !== null ) {
+
+				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+
+					var loader = new THREE.XHRLoader();
+					loader.crossOrigin = '';
+					loader.load( file, function ( text ) {
+
+						var json = JSON.parse( text );
+
+						editor.clear();
+						editor.fromJSON( json );
+
+					} );
+
+				}
+
+			}
 
 		</script>
 	</body>

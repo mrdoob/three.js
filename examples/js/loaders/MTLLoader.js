@@ -87,6 +87,7 @@ THREE.MTLLoader.prototype = {
 		}
 
 		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options );
+		materialCreator.crossOrigin = this.crossOrigin;
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -120,8 +121,8 @@ THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 	this.materialsArray = [];
 	this.nameLookup = {};
 
-	this.side = ( this.options && this.options.side )? this.options.side: THREE.FrontSide;
-	this.wrap = ( this.options && this.options.wrap )? this.options.wrap: THREE.RepeatWrapping;
+	this.side = ( this.options && this.options.side ) ? this.options.side : THREE.FrontSide;
+	this.wrap = ( this.options && this.options.wrap ) ? this.options.wrap : THREE.RepeatWrapping;
 
 };
 
@@ -296,8 +297,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Ambient color (color under shadow) using RGB values
 
-					params[ 'ambient' ] = new THREE.Color().fromArray( value );
-
 					break;
 
 				case 'ks':
@@ -341,6 +340,19 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					break;
 
+				case 'map_bump':
+				case 'bump':
+
+					// Bump texture map
+
+					if ( params[ 'bumpMap' ] ) break; // Avoid loading twice.
+
+					params[ 'bumpMap' ] = this.loadTexture( this.baseUrl + value );
+					params[ 'bumpMap' ].wrapS = this.wrap;
+					params[ 'bumpMap' ].wrapT = this.wrap;
+
+					break;
+
 				default:
 					break;
 
@@ -350,7 +362,6 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 		if ( params[ 'diffuse' ] ) {
 
-			if ( !params[ 'ambient' ]) params[ 'ambient' ] = params[ 'diffuse' ];
 			params[ 'color' ] = params[ 'diffuse' ];
 
 		}
@@ -415,7 +426,7 @@ THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 
 THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
 
-	--x;
+	-- x;
 
 	for ( var i = 1; i < 32; i <<= 1 ) {
 

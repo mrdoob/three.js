@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSize ) {
+THREE.HemisphereLightHelper = function ( light, sphereSize ) {
 
 	THREE.Object3D.call( this );
 

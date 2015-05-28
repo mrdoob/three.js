@@ -32,7 +32,7 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.generateMipmaps = true;
 
-	this.shareDepthFrom = null;
+	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
 	if ( window.VAPI ) {
 		window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:registerTexture", this );
@@ -46,9 +46,14 @@ THREE.WebGLRenderTarget.prototype = {
 
 	setSize: function ( width, height ) {
 
-		this.width = width;
-		this.height = height;
+		if ( this.width !== width || this.height !== height ) {
 
+			this.width = width;
+			this.height = height;
+
+			this.dispose();
+
+		}
 	},
 
 	clone: function () {

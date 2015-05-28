@@ -10,15 +10,15 @@
 THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.resolution = ( resolution !== undefined ) ? resolution : 256;
-	this.needsUpdate = true;
-	this.adaptive = adaptive !== undefined? !!adaptive : true;
+	this.needsInit = true;
+	this.adaptive = adaptive !== undefined ? !!adaptive : true;
 	this.needsManualDownSample = false;
 
 	this.luminanceRT = null;
 	this.previousLuminanceRT = null;
 	this.currentLuminanceRTDownSampled = [];
 	this.currentLuminanceRT = null;
-	
+
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
 
@@ -41,7 +41,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.LuminosityShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( THREE.LuminosityShader.uniforms ),
 		vertexShader: THREE.LuminosityShader.vertexShader,
 		fragmentShader: THREE.LuminosityShader.fragmentShader,
 		blending: THREE.NoBlending,
@@ -51,7 +51,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.adaptLuminanceShader = {
 		defines: {
-			"MIP_LEVEL_1X1" : Math.log2( this.resolution ).toFixed(1),
+			"MIP_LEVEL_1X1" : ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed(1),
 		},
 		uniforms: {
 			"lastLum": { type: "t", value: null },
@@ -76,9 +76,10 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 			"uniform sampler2D currentLum;",
 			"uniform float delta;",
 			"uniform float tau;",
+
 			THREE.ShaderChunk[ "hdr_decode_pars_fragment" ],
 			THREE.ShaderChunk[ "hdr_encode_pars_fragment" ],
-			
+
 			"void main() {",
 			
 				"vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
@@ -121,7 +122,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialAdaptiveLum = new THREE.ShaderMaterial( {
 
-		uniforms: this.adaptLuminanceShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
 		vertexShader: this.adaptLuminanceShader.vertexShader,
 		fragmentShader: this.adaptLuminanceShader.fragmentShader,
 		defines: this.adaptLuminanceShader.defines,
@@ -134,7 +135,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 
-		uniforms: THREE.ToneMapShader.uniforms,
+		uniforms: THREE.UniformsUtils.clone( THREE.ToneMapShader.uniforms ),
 		vertexShader: THREE.ToneMapShader.vertexShader,
 		fragmentShader: THREE.ToneMapShader.fragmentShader,
 		blending: THREE.NoBlending,
@@ -219,7 +220,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
 	this.scene.add( this.quad );
 
 };
@@ -266,7 +267,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 		this.quad.material = this.materialToneMap;
 		this.materialToneMap.uniforms.tDiffuse.value = readBuffer;
 		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
-		
+
 	},
 
 	downSampleLuminance: function( renderer ) {
@@ -338,12 +339,13 @@ THREE.AdaptiveToneMappingPass.prototype = {
 			pars.minFilter = THREE.LinearMipMapLinearFilter;
 		}
 		this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
-		
+
 		if ( this.adaptive ) {
 			this.materialToneMap.defines["SAMPLE_LUMINANCE"] = "";
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
 		}
-		
+		//Put something in the adaptive luminance texture so that the scene can render initially
+		this.quad.material = new THREE.MeshBasicMaterial( { color: 0x777777 });
 		this.materialLuminance.needsUpdate = true;
 		this.materialAdaptiveLum.needsUpdate = true;
 		this.materialToneMap.needsUpdate = true;

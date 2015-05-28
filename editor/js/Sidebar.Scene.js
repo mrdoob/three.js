@@ -19,7 +19,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var ignoreObjectSelectedSignal = false;
 
-	var outliner = new UI.FancySelect().setId( 'outliner' );
+	var outliner = new UI.Outliner( editor );
 	outliner.onChange( function () {
 
 		ignoreObjectSelectedSignal = true;
@@ -56,7 +56,7 @@ Sidebar.Scene = function ( editor ) {
 		'Fog': 'Linear',
 		'FogExp2': 'Exponential'
 
-	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' )
+	} ).setWidth( '150px' );
 	fogType.onChange( function () {
 
 		var type = fogType.getValue();
@@ -133,8 +133,8 @@ Sidebar.Scene = function ( editor ) {
 
 		var options = [];
 
-		options.push( { value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
-		options.push( { value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
+		// options.push( { value: camera.id, html: '<span class="type ' + camera.type + '"></span> ' + camera.name } );
+		options.push( { static: true, value: scene.id, html: '<span class="type ' + scene.type + '"></span> ' + scene.name } );
 
 		( function addObjects( objects, pad ) {
 

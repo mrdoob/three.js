@@ -80,7 +80,7 @@ THREE.ToneMapShader = {
 		"void main() {",
 
 			"vec4 texel = texture2D( tDiffuse, vUv );",
-			
+
 			"#if defined( HDR_INPUT ) && defined( HDR_INPUT_TYPE )",
 				"#if ( HDR_INPUT_TYPE == HDR_TYPE_LOGLUV )",
 					"gl_FragColor = vec4( ToneMap( HDRDecodeLOGLUV( texel ) ), 1.0 );",
@@ -96,9 +96,6 @@ THREE.ToneMapShader = {
 			"#else",
 				"gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );",
 			"#endif",
-
-			//Gamma 2.0
-			"gl_FragColor.xyz = sqrt( gl_FragColor.xyz );",
 
 		"}"
 

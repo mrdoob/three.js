@@ -127,7 +127,7 @@
 
 				//
 
-				var light = new THREE.DirectionalLight( 0x497f13, 1 );
+				var light = new THREE.DirectionalLight( 0x493f13, 1 );
 				light.position.set( 0, -1, 0 );
 				scene.add( light );
 
@@ -144,7 +144,7 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.enabled = true;
 
 
 				// STATS
@@ -232,7 +232,6 @@
 					m.specular.setHSL( 0, 0, 0.1 );
 
 					m.color.setHSL( 0.6, 0, 0.6 );
-					m.ambient.copy( m.color );
 
 					//m.map = map;
 					//m.envMap = envMap;
@@ -241,8 +240,6 @@
 
 					//m.combine = THREE.MixOperation;
 					//m.reflectivity = 0.75;
-
-					m.wrapAround = true;
 
 				}
 

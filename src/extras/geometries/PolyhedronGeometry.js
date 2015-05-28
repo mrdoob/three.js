@@ -28,7 +28,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 	}
 
-	var midpoints = [], p = this.vertices;
+	var p = this.vertices;
 
 	var faces = [];
 
@@ -136,7 +136,6 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 	function subdivide( face, detail ) {
 
 		var cols = Math.pow(2, detail);
-		var cells = Math.pow(4, detail);
 		var a = prepare( that.vertices[ face.a ] );
 		var b = prepare( that.vertices[ face.b ] );
 		var c = prepare( that.vertices[ face.c ] );
@@ -154,7 +153,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 			for ( var j = 0; j <= rows; j ++) {
 
-				if ( j == 0 && i == cols ) {
+				if ( j === 0 && i === cols ) {
 
 					v[ i ][ j ] = aj;
 
@@ -176,7 +175,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 				var k = Math.floor( j / 2 );
 
-				if ( j % 2 == 0 ) {
+				if ( j % 2 === 0 ) {
 
 					make(
 						v[ i ][ k + 1],

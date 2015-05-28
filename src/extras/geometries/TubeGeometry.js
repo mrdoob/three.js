@@ -42,8 +42,6 @@ THREE.TubeGeometry = function ( path, segments, radius, radialSegments, closed, 
 
 		numpoints = segments + 1,
 
-		x, y, z,
-		tx, ty, tz,
 		u, v, r,
 
 		cx, cy,
@@ -154,9 +152,7 @@ THREE.TubeGeometry.SinusoidalTaper = function ( u ) {
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
-	var	tangent = new THREE.Vector3(),
-		normal = new THREE.Vector3(),
-		binormal = new THREE.Vector3(),
+	var	normal = new THREE.Vector3(),
 
 		tangents = [],
 		normals = [],
@@ -171,7 +167,7 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 		smallest,
 
 		tx, ty, tz,
-		i, u, v;
+		i, u;
 
 
 	// expose internals
@@ -252,17 +248,17 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	for ( i = 1; i < numpoints; i ++ ) {
 
-		normals[ i ] = normals[ i-1 ].clone();
+		normals[ i ] = normals[ i - 1 ].clone();
 
-		binormals[ i ] = binormals[ i-1 ].clone();
+		binormals[ i ] = binormals[ i - 1 ].clone();
 
-		vec.crossVectors( tangents[ i-1 ], tangents[ i ] );
+		vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
 
 		if ( vec.length() > epsilon ) {
 
 			vec.normalize();
 
-			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+			theta = Math.acos( THREE.Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -277,10 +273,10 @@ THREE.TubeGeometry.FrenetFrames = function ( path, segments, closed ) {
 
 	if ( closed ) {
 
-		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), - 1, 1 ) );
+		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints - 1 ] ), - 1, 1 ) );
 		theta /= ( numpoints - 1 );
 
-		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
+		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints - 1 ] ) ) > 0 ) {
 
 			theta = - theta;
 

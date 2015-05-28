@@ -36,7 +36,7 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank">three.js</a> webgl - effects - parallax barrier. 
+				<a href="http://threejs.org" target="_blank">three.js</a> webgl - effects - parallax barrier.
 				texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a> :
 				<span id="car_info">
 					<span id="car_name">Bugatti Veyron model</span>
@@ -245,7 +245,7 @@
 				"Carmine": 	new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Gold": 	new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Bronze":	new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
-				"Chrome": 	new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.Multiply } ),
+				"Chrome": 	new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 
 				"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Blue metal": 	new THREE.MeshLambertMaterial( { color: 0x001133, envMap: textureCube, combine: THREE.MultiplyOperation  } ),
@@ -277,7 +277,7 @@
 				"Darkgray shiny":	new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x050505 } ),
 				"Gray shiny":		new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } )
 
-				}
+				};
 
 				// Gallardo materials
 
@@ -303,7 +303,7 @@
 
 					]
 
-				}
+				};
 
 				m = CARS[ "gallardo" ].materials;
 				mi = CARS[ "gallardo" ].init_material;
@@ -318,7 +318,7 @@
 					5: mlib[ "Yellow glass" ],  // front lights
 					6: mlib[ "Dark chrome" ]	// windshield rim
 
-				}
+				};
 
 				// Veyron materials
 
@@ -338,7 +338,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "veyron" ].materials;
 				mi = CARS[ "veyron" ].init_material;
@@ -354,7 +354,7 @@
 					6: mlib[ "Red glass 50" ],		// backlights
 					7: mlib[ "Orange glass 50" ]	// backsignals
 
-				}
+				};
 
 				// F50 materials
 
@@ -379,7 +379,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "f50" ].materials;
 				mi = CARS[ "f50" ].init_material;
@@ -412,7 +412,7 @@
 					23: m.body[ mi ][ 1 ], 			// back torso
 					24: m.body[ mi ][ 1 ] 			// back torso center
 
-				}
+				};
 
 
 				// Camero materials
@@ -439,7 +439,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "camaro" ].materials;
 				mi = CARS[ "camaro" ].init_material;
@@ -456,7 +456,7 @@
 					7: mlib[ "Fullblack rough" ],   // tireling
 					8: mlib[ "Fullblack rough" ]    // behind grille
 
-				}
+				};
 
 				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
 

@@ -103,7 +103,7 @@ scene.add( directionalLight );</code>
 
 		<h3>[property:Float shadowBias]</h3>
 		<div>
-			Shadow map bias.<br />
+			Shadow map bias, how much to add or subtract from the normalized depth when deciding whether a surface is in shadow.<br />
 			Default — *0*.
 		</div>
 
@@ -127,81 +127,76 @@ scene.add( directionalLight );</code>
 
 		<h3>[property:Boolean shadowCascade]</h3>
 		<div>
-			??? <br />
+			**Experimental** If true, use a series of shadow maps in a cascade. This can give better z-depth resolution for a directional light. <br />
 			Default — *false*.
-		</div>
-
-		<h3>[property:Vector3 shadowCascadeOffset]</h3>
-		<div>
-			??? <br />
-			Default — *Three.Vector3( 0, 0, -1000 )*.
 		</div>
 
 		<h3>[property:Integer shadowCascadeCount]</h3>
 		<div>
-			??? <br />
+			Number of shadow maps to allocate in a cascade (one after another). <br />
 			Default — *2*.
+		</div>
+
+		<h3>[property:Vector3 shadowCascadeOffset]</h3>
+		<div>
+			A relative position to real camera where virtual shadow cameras are attached. A magic vector; scene and light orientation dependent. <br />
+			Default — *Three.Vector3( 0, 0, -1000 )*.
 		</div>
 
 		<h3>[property:Array shadowCascadeBias]</h3>
 		<div>
-			??? <br />
+			An array of shadowMapBias values for the corresponding shadow map in the cascade, near to far. <br />
 			Default — <strong>[ 0, 0, 0 ]</strong>.
 		</div>
 
 		<h3>[property:Array shadowCascadeWidth]</h3>
 		<div>
-			??? <br />
+			An array of shadowMapWidth values for the corresponding shadow map in the cascade, near to far. <br />
 			Default — <strong>[ 512, 512, 512 ]</strong>.
 		</div>
 
 		<h3>[property:Array shadowCascadeHeight]</h3>
 		<div>
-			??? <br />
+			An array of shadowMapHeight values for the corresponding shadow map in the cascade, near to far. <br />
 			Default — <strong>[ 512, 512, 512 ]</strong>.
 		</div>
 
 		<h3>[property:Array shadowCascadeNearZ]</h3>
 		<div>
-			??? <br />
+			An array of shadowMapNear values for the corresponding shadow map in the cascade, near to far. These typically start with -1.0 (near plane) and match with the previous shadowCascadeFarZ array value.<br />
 			Default — <strong>[ -1.000, 0.990, 0.998 ]</strong>.
 		</div>
 
 		<h3>[property:Array shadowCascadeFarZ]</h3>
 		<div>
-			??? <br />
+			An array of shadowMapFar values for the corresponding shadow map in the cascade, near to far. These typically match with the next shadowCascadeNearZ array value, ending in 1.0.<br />
 			Default — <strong>[ 0.990, 0.998, 1.000 ]</strong>.
 		</div>
 
 		<h3>[property:Array shadowCascadeArray]</h3>
 		<div>
-			??? <br />
-			Default — <strong>[ ]</strong>.
+			Array of size shadowCascadeCount of [page:DirectionalLight THREE.DirectionalLight] objects. This holds the series of separate shadow maps in a cascade, near to far. Created internally.
 		</div>
 
-		<h3>[property:RenderTarget shadowMap]</h3>
+		<h3>[property:Vector2 shadowMapSize]</h3>
 		<div>
-			??? <br />
-			Default — *null*.
-		</div>
+			The shadowMapWidth and shadowMapHeight stored in a [page:Vector2 THREE.Vector2]. Set internally during rendering.
+		</div> 
 
-		<h3>[property:Integer shadowMapSize]</h3>
+		<h3>[property:OrthographicCamera shadowCamera]</h3>
 		<div>
-			??? <br />
-			Default — *null*.
-		</div>
+			The shadow's view of the world. Computed internally during rendering from the shadowCamera* settings.
+		</div> 
 
-		<h3>[property:Camera shadowCamera]</h3>
+		<h3>[property:Matrix4 shadowMatrix]</h3>
 		<div>
-			??? <br />
-			Default — *null*.
-		</div>
+			Model to shadow camera space, to compute location and depth in shadow map. Computed internally during rendering.
+		</div> 
 
-		<h3>[property:Matrix shadowMatrix]</h3>
+		<h3>[property:WebGLRenderTarget shadowMap]</h3>
 		<div>
-			??? <br />
-			Default — *null*.
-		</div>
+		    The depth map generated using the shadowCamera; a location beyond a pixel's depth is in shadow. Computed internally during rendering.
+		</div> 
 		
 		<h2>Methods</h2>
 

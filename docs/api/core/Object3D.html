@@ -263,22 +263,20 @@
 		</div>
 
 
-		<h3>[method:Object3D getObjectByName]([page:String name], [page:Boolean recursive])</h3>
+		<h3>[method:Object3D getObjectByName]([page:String name])</h3>
 		<div>
 		name -- String to match to the children's Object3d.name property. <br />
-		recursive -- Boolean whether to search through the children's children. Default is false.
 		</div>
 		<div>
-		Searches through the object's children and returns the first with a matching name, optionally recursive.
+		Searches through the object's children and returns the first with a matching name.
 		</div>
 
-		<h3>[method:Object3D getObjectById]([page:Integer id], [page:Boolean recursive])</h3>
+		<h3>[method:Object3D getObjectById]([page:Integer id])</h3>
 		<div>
 		id -- Unique number of the object instance<br />
-		recursive -- Boolean whether to search through the children's children. Default is false.
 		</div>
 		<div>
-		Searches through the object's children and returns the first with a matching id, optionally recursive.
+		Searches through the object's children and returns the first with a matching id.
 		</div>
 
 		<h3>[method:Object3D translateOnAxis]([page:Vector3 axis], [page:Float distance])</h3>
@@ -297,6 +295,11 @@
 		</div>
 		<div>
 		Rotate an object along an axis in object space. The axis is assumed to be normalized.
+		</div>
+
+		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
+		<div>
+		Abstract method to get intersections between a casted ray and this object. Subclasses such as [page:Mesh], [page:Line], and [page:PointCloud] implement this method in order to participate in raycasting.
 		</div>
 
 		<h2>Source</h2>

@@ -34,6 +34,7 @@ MAPPING_TYPES = type('Mapping', (), {
 
 JSON = 'json'
 EXTENSION = '.%s' % JSON
+INDENT = 'indent'
 
 
 MATERIALS = 'materials'
@@ -43,32 +44,46 @@ FACES = 'faces'
 NORMALS = 'normals'
 BONES = 'bones'
 UVS = 'uvs'
+APPLY_MODIFIERS = 'applyModifiers'
 COLORS = 'colors'
 MIX_COLORS = 'mixColors'
+EXTRA_VGROUPS = 'extraVertexGroups'
+INDEX = 'index'
+DRAW_CALLS = 'offsets'
+DC_START = 'start'
+DC_COUNT = 'count'
+DC_INDEX = 'index'
 SCALE = 'scale'
 COMPRESSION = 'compression'
 MAPS = 'maps'
 FRAME_STEP = 'frameStep'
-ANIMATION = 'animation'
+FRAME_INDEX_AS_TIME = 'frameIndexAsTime'
+ANIMATION = 'animations'
 MORPH_TARGETS = 'morphTargets'
+POSE = 'pose'
+REST = 'rest'
 SKIN_INDICES = 'skinIndices'
 SKIN_WEIGHTS = 'skinWeights'
 LOGGING = 'logging'
 CAMERAS = 'cameras'
 LIGHTS = 'lights'
+HIERARCHY = 'hierarchy'
 FACE_MATERIALS = 'faceMaterials'
 SKINNING = 'skinning'
 COPY_TEXTURES = 'copyTextures'
+TEXTURE_FOLDER = 'textureFolder'
 ENABLE_PRECISION = 'enablePrecision'
 PRECISION = 'precision'
 DEFAULT_PRECISION = 6
 EMBED_GEOMETRY = 'embedGeometry'
 EMBED_ANIMATION = 'embedAnimation'
+OFF = 'off'
 
 GLOBAL = 'global'
 BUFFER_GEOMETRY = 'BufferGeometry'
 GEOMETRY = 'geometry'
 GEOMETRY_TYPE = 'geometryType'
+INDEX_TYPE = 'indexType'
 
 CRITICAL = 'critical'
 ERROR = 'error'
@@ -81,36 +96,47 @@ MSGPACK = 'msgpack'
 
 PACK = 'pack'
 
+FLOAT_32 = 'Float32Array'
+UINT_16 = 'Uint16Array'
+UINT_32 = 'Uint32Array'
+
 INFLUENCES_PER_VERTEX = 'influencesPerVertex'
 
 EXPORT_OPTIONS = {
     FACES: True,
     VERTICES: True,
-    NORMALS: False,
-    UVS: False,
+    NORMALS: True,
+    UVS: True,
+    APPLY_MODIFIERS: True,
     COLORS: False,
+    EXTRA_VGROUPS: '',
+    INDEX_TYPE: UINT_16,
     MATERIALS: False,
     FACE_MATERIALS: False,
     SCALE: 1,
     FRAME_STEP: 1,
-    SCENE: True,
+    FRAME_INDEX_AS_TIME: False,
+    SCENE: False,
     MIX_COLORS: False,
     COMPRESSION: None,
     MAPS: False,
-    ANIMATION: False,
+    ANIMATION: OFF,
     BONES: False,
     SKINNING: False,
     MORPH_TARGETS: False,
     CAMERAS: False,
     LIGHTS: False,
+    HIERARCHY: False,
     COPY_TEXTURES: True,
+    TEXTURE_FOLDER: '',
     LOGGING: DEBUG,
-    ENABLE_PRECISION: False,
+    ENABLE_PRECISION: True,
     PRECISION: DEFAULT_PRECISION,
     EMBED_GEOMETRY: True,
     EMBED_ANIMATION: True,
     GEOMETRY_TYPE: GEOMETRY,
-    INFLUENCES_PER_VERTEX: 2
+    INFLUENCES_PER_VERTEX: 2,
+    INDENT: True
 }
 
 
@@ -151,6 +177,7 @@ POINT_LIGHT = 'PointLight'
 SPOT_LIGHT = 'SpotLight'
 HEMISPHERE_LIGHT = 'HemisphereLight'
 MESH = 'Mesh'
+EMPTY = 'Empty'
 SPRITE = 'Sprite'
 
 DEFAULT_METADATA = {
@@ -164,7 +191,7 @@ UUID = 'uuid'
 MATRIX = 'matrix'
 POSITION = 'position'
 QUATERNION = 'quaternion'
-ROTATION ='rotation'
+ROTATION = 'rotation'
 SCALE = 'scale'
 
 UV = 'uv'
@@ -172,8 +199,6 @@ ATTRIBUTES = 'attributes'
 NORMAL = 'normal'
 ITEM_SIZE = 'itemSize'
 ARRAY = 'array'
-
-FLOAT_32 = 'Float32Array'
 
 VISIBLE = 'visible'
 CAST_SHADOW = 'castShadow'
@@ -210,10 +235,15 @@ IMAGE = 'image'
 
 NAME = 'name'
 PARENT = 'parent'
-
-#@TODO move to api.constants?
+LENGTH = 'length'
+FPS = 'fps'
+HIERARCHY = 'hierarchy'
 POS = 'pos'
 ROTQ = 'rotq'
+ROT = 'rot'
+SCL = 'scl'
+TIME = 'time'
+KEYS = 'keys'
 
 AMBIENT = 'ambient'
 COLOR = 'color'
@@ -307,7 +337,9 @@ BASIC = 'basic'
 
 NORMAL_BLENDING = 'NormalBlending'
 
-DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee)
+DBG_COLORS = (0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee,
+              0xeeee00, 0x00eeee, 0xee00ee)
 
 DOUBLE_SIDED = 'doubleSided'
 
+EXPORT_SETTINGS_KEY = 'threeExportSettings'
