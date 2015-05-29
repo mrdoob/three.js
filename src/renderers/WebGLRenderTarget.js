@@ -34,10 +34,11 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
+	//START_VEROLD_MOD
 	if ( window.VAPI ) {
 		window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:registerTexture", this );
 	}
-
+	//END_VEROLD_MOD
 };
 
 THREE.WebGLRenderTarget.prototype = {

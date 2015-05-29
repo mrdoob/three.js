@@ -35,9 +35,6 @@ THREE.EdgeShader = {
 
 		"uniform vec2 aspect;",
 
-		"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
-
-
 		"mat3 G[9];",
 
 		// hard coded matrix values!!!! as suggested in https://github.com/neilmendoza/ofxPostProcessing/blob/master/src/EdgePass.cpp#L45
@@ -54,6 +51,7 @@ THREE.EdgeShader = {
 
 		"void main(void)",
 		"{",
+			"vec2 texel = vec2(1.0 / aspect.x, 1.0 / aspect.y);",
 
 			"G[0] = g0,",
 			"G[1] = g1,",

@@ -19027,11 +19027,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.gammaInput = false;
 	this.gammaOutput = false;
 
-	// hdr rendering
-	
-	this.hdrOutputEnabled = false;
-	this.hdrOutputType = THREE.HDRFull;
-
 	// morphs
 
 	this.maxMorphTargets = 8;
@@ -19246,6 +19241,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_lightsNeedUpdate = true;
 
+		// START_VEROLD_MOD
+		for ( var i = 0; i < _newAttributes.length; i ++ ) {
+			_newAttributes[ i ] = 0;
+		}
+		// END_VEROLD_MOD
+
 		state.reset();
 
 	};
@@ -19396,12 +19397,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.supportsCompressedTextureATC = function () {
-
-		return extensions.get( 'WEBGL_compressed_texture_atc' );
-
-	};
-
 	this.supportsCompressedTexturePVRTC = function () {
 
 		return extensions.get( 'WEBGL_compressed_texture_pvrtc' );
@@ -19440,64 +19435,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	} )();
 
-	//START_VEROLD_MOD
-	this.getMaxTextureSize  = function () {
-
-		return _maxTextureSize;
-
-	};
-
-	this.getMaxCubemapSize  = function () {
-
-		return _maxCubemapSize;
-
-	};
-
-	this.getMaxTextures  = function () {
-
-		return _maxTextures;
-
-	};
-
-	this.getMaxVertexTextures  = function () {
-
-		return _maxVertexTextures;
-
-	};
-
-	this.setPrecision = function( precision ) {
-		_precision = precision !== undefined ? precision : 'highp';
-	};
-
-	this.getLights = function () {
-		return _lights;
-	};
-	//END_VEROLD_MOD
-
-
 	this.getPrecision = function () {
 
 		return _precision;
 
 	};
 
-	this.dispose = function() {
-		var i;
-		for ( i in this.renderPluginsPre ) {
-		   this.renderPluginsPre[i].dispose();
-		}
-		for ( i in this.renderPluginsPost ) {
-		   this.renderPluginsPost[i].dispose();
-		}
-		this.renderPluginsPre = null;
-		this.renderPluginsPost = null;
-		opaqueObjects = null;
-		transparentObjects = null;
-		_canvas = null;
-		_programs = null;
-		_this = null;
-	};
-	
 	this.getPixelRatio = function () {
 
 		return pixelRatio;
@@ -19557,7 +19500,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			y: _viewportY / pixelRatio,
 			width: _viewportWidth / pixelRatio,
 			height: _viewportHeight / pixelRatio,
-		}
+		};
 		return viewport;
 	};
 	//END_VEROLD_MOD
@@ -19671,9 +19614,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var renderTarget = event.target;
 
+		// START_VEROLD_MOD
 		if ( window.VAPI ) {
 			window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:unregisterTexture", renderTarget );
 		}
+		// END_VEROLD_MOD
 
 		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 
@@ -21242,10 +21187,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( _this.toneMappingEnabled ) {
-				refreshUniformsToneMapping( m_uniforms );
-			}
-
 			if ( material instanceof THREE.MeshPhongMaterial ||
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
@@ -21402,15 +21343,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 		}
-		// VEROLD - HDR PACKING
-		if ( material.envMap && material.envMap.hdrPacking && material.hdrInputEnabled !== false ) {
-			if ( !material.defines ) material.defines = {};
-			if ( material.defines['ENVMAP_HDR_INPUT'] !== material.envMap.hdrPacking ) {
-				material.hdrInputEnabled = true;
-				material.defines['ENVMAP_HDR_INPUT'] = material.envMap.hdrPacking;
-				material.needsUpdate = true;
-			}
-		}
+
 		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
 
@@ -21471,15 +21404,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsToneMapping ( uniforms ) {
-		if ( uniforms.avgLuminance ) {
-			uniforms.avgLuminance.value = _this.toneMapping_AvgLum;
-			uniforms.maxLuminance.value = _this.toneMappingMaxLuminance;
-			uniforms.middleGrey.value = _this.toneMappingMiddleGrey;
-			uniforms.luminanceMap.value = _this.toneMappingLuminanceMap;
-		}
-	}
-
 	function refreshUniformsPhong ( uniforms, material ) {
 
 		uniforms.shininess.value = material.shininess;
@@ -21487,15 +21411,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.emissive.value = material.emissive;
 		uniforms.specular.value = material.specular;
 
-		// VEROLD - HDR PACKING
-		if ( material.lightMap && material.lightMap.hdrPacking && material.hdrInputEnabled !== false ) {
-			if ( !material.defines ) material.defines = {};
-			if ( material.defines['LIGHTMAP_HDR_INPUT'] !== material.lightMap.hdrPacking ) {
-				material.hdrInputEnabled = true;
-				material.defines['LIGHTMAP_HDR_INPUT'] = material.lightMap.hdrPacking;
-				material.needsUpdate = true;
-			}
-		}
 		uniforms.lightMap.value = material.lightMap;
 		uniforms.lightMapIntensity.value = material.lightMapIntensity;
 
@@ -22028,21 +21943,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		pointOffset = 0,
 		spotOffset = 0,
 		hemiOffset = 0;
-
-		//First, push all shadow-casting lights to the beginning of the light array
-		var numShadowCasters = 0;
-		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-			light = lights[ l ];
-			if ( light.onlyShadow ) continue;
-			if ( light.castShadow ) {
-				if ( l !== numShadowCasters ) {
-					var tmpLight = lights[ numShadowCasters ];
-					lights[ numShadowCasters ] = light;
-					lights[ l ] = tmpLight;
-				}
-				numShadowCasters++;
-			}
-		}
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -22912,16 +22812,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		extension = extensions.get( 'WEBGL_compressed_texture_atc' );
-		
-		if ( extension !== undefined ) {
-
-			if ( p === THREE.RGB_ATC_Format ) return extension.COMPRESSED_RGB_ATC_WEBGL;
-			if ( p === THREE.RGBA_ATC_EXPLICIT_ALPHA_Format ) return extension.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL;
-			if ( p === THREE.RGBA_ATC_INTERP_ALPHA_Format ) return extension.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL;
-
-		}
-
 		extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
 		if ( extension !== null ) {
@@ -22999,10 +22889,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light.onlyShadow || light.visible === false ) continue;
 
-			if ( light instanceof THREE.DirectionalLight && ( dirLights < _this.maxDirLights || _this.maxDirLights === -1 ) ) dirLights ++;
-			if ( light instanceof THREE.PointLight && ( pointLights < _this.maxPointLights || _this.maxPointLights === -1 ) ) pointLights ++;
-			if ( light instanceof THREE.SpotLight && ( spotLights < _this.maxSpotLights || _this.maxSpotLights === -1 ) ) spotLights ++;
-			if ( light instanceof THREE.HemisphereLight && ( hemiLights < _this.maxHemiLights || _this.maxHemiLights === -1 ) ) hemiLights ++;
+			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
+			if ( light instanceof THREE.PointLight ) pointLights ++;
+			if ( light instanceof THREE.SpotLight ) spotLights ++;
+			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
 
 		}
 
@@ -23025,7 +22915,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		return _this.maxShadows === -1 ? maxShadows : Math.min( maxShadows, _this.maxShadows );
+		return maxShadows;
 
 	}
 
@@ -23143,10 +23033,11 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
 
+	//START_VEROLD_MOD
 	if ( window.VAPI ) {
 		window.VAPI.globalEvents.trigger("veroldEngine:textureDebugger:registerTexture", this );
 	}
-
+	//END_VEROLD_MOD
 };
 
 THREE.WebGLRenderTarget.prototype = {
@@ -29944,6 +29835,14 @@ THREE.Animation.prototype = {
 					var prevKey = animationCache.prevKey[ type ];
 					var nextKey = animationCache.nextKey[ type ];
 
+					// START_VEROLD_MOD - robust keyframes
+					if ( !prevKey || !prevKey[ type ] || !nextKey || !nextKey[ type ] ) {
+
+						continue;
+
+					}
+					// END_VEROLD_MOD - robust keyframes
+
 					if ( ( this.timeScale > 0 && nextKey.time <= this.currentTime ) ||
 						( this.timeScale < 0 && prevKey.time >= this.currentTime ) ) {
 
@@ -30067,30 +29966,84 @@ THREE.Animation.prototype = {
 
 		var keys = this.data.hierarchy[ h ].keys;
 
-		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-			 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+		// START_VEROLD_MOD - robust keyframes
+		if ( keys !== undefined && keys.length > 0 ) {
+		// END_VEROLD_MOD - robust keyframes
 
-			key = key < keys.length - 1 ? key : keys.length - 1;
+			if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+				 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
-		} else {
-
-			key = key % keys.length;
-
-		}
-
-		for ( ; key < keys.length; key ++ ) {
-
-			if ( keys[ key ][ type ] !== undefined ) {
-
-				return keys[ key ];
+				key = key < keys.length - 1 ? key : keys.length - 1;
 
 			} else {
-		
+
 				key = key % keys.length;
-		
+
+			}
+
+			for ( ; key < keys.length; key ++ ) {
+
+				if ( keys[ key ][ type ] !== undefined ) {
+
+					return keys[ key ];
+
+				} else {
+			
+					key = key % keys.length;
+			
+				}
+			
+				// for ( ; key < keys.length; key++ ) {
+			
+					if ( keys[ key ][ type ] !== undefined ) {
+			
+						return keys[ key ];
+			
+					}
+			
+				// }
+			}
+
+			return this.data.hierarchy[ h ].keys[ 0 ];
+
+		// START_VEROLD_MOD - robust keyframes
+		}
+		return null;
+		// END_VEROLD_MOD - robust keyframes
+	},
+
+	getPrevKeyWith: function ( type, h, key ) {
+
+		var keys = this.data.hierarchy[ h ].keys;
+
+		// START_VEROLD_MOD - robust keyframes
+		if ( keys !== undefined && keys.length > 0 ) {
+		// END_VEROLD_MOD - robust keyframes
+			
+			if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+				this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+
+				key = key > 0 ? key : 0;
+
+			} else {
+
+				key = key >= 0 ? key : key + keys.length;
+
+			}
+
+
+			for ( ; key >= 0; key -- ) {
+
+				if ( keys[ key ][ type ] !== undefined ) {
+
+					return keys[ key ];
+
+				}
+
 			}
 		
-			// for ( ; key < keys.length; key++ ) {
+		
+			for ( ; key >= 0; key -- ) {
 		
 				if ( keys[ key ][ type ] !== undefined ) {
 		
@@ -30098,52 +30051,15 @@ THREE.Animation.prototype = {
 		
 				}
 		
-			// }
-		}
-
-		return this.data.hierarchy[ h ].keys[ 0 ];
-
-	},
-
-	getPrevKeyWith: function ( type, h, key ) {
-
-		var keys = this.data.hierarchy[ h ].keys;
-
-		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-			this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-			key = key > 0 ? key : 0;
-
-		} else {
-
-			key = key >= 0 ? key : key + keys.length;
-
-		}
-
-
-		for ( ; key >= 0; key -- ) {
-
-			if ( keys[ key ][ type ] !== undefined ) {
-
-				return keys[ key ];
-
 			}
-
+		
+			return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
+			
+		// START_VEROLD_MOD - robust keyframes
 		}
-	
-	
-		for ( ; key >= 0; key -- ) {
-	
-			if ( keys[ key ][ type ] !== undefined ) {
-	
-				return keys[ key ];
-	
-			}
-	
-		}
-	
-		return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
 
+		return null;
+		// END_VEROLD_MOD - robust keyframes
 	}
 
 };
