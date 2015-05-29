@@ -278,12 +278,14 @@ THREE.TrackballControls = function ( object, domElement ) {
 			if ( _eye.lengthSq() > _this.maxDistance * _this.maxDistance ) {
 
 				_this.object.position.addVectors( _this.target, _eye.setLength( _this.maxDistance ) );
+				_zoomStart.copy( _zoomEnd );
 
 			}
 
 			if ( _eye.lengthSq() < _this.minDistance * _this.minDistance ) {
 
 				_this.object.position.addVectors( _this.target, _eye.setLength( _this.minDistance ) );
+				_zoomStart.copy( _zoomEnd );
 
 			}
 
