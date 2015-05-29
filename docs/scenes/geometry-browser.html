@@ -37,6 +37,15 @@
 		<script src="../../build/three.min.js"></script>
 		<script src='../../examples/js/libs/dat.gui.min.js'></script>
 		<script src="../../examples/js/controls/OrbitControls.js"></script>
+		<script src="../../examples/fonts/gentilis_bold.typeface.js"></script>
+		<script src="../../examples/fonts/gentilis_regular.typeface.js"></script>
+		<script src="../../examples/fonts/optimer_bold.typeface.js"></script>
+		<script src="../../examples/fonts/optimer_regular.typeface.js"></script>
+		<script src="../../examples/fonts/helvetiker_bold.typeface.js"></script>
+		<script src="../../examples/fonts/helvetiker_regular.typeface.js"></script>
+		<script src="../../examples/fonts/droid/droid_serif_regular.typeface.js"></script>
+		<script src="../../examples/fonts/droid/droid_serif_bold.typeface.js"></script>
+		
 		<script src='js/geometry.js'></script>
 		
 		<script>
@@ -71,32 +80,34 @@
 			scene.add( lights[1] );
 			scene.add( lights[2] );
 
-			var mesh = THREE.SceneUtils.createMultiMaterialObject(
+			var mesh = new THREE.Object3D()
+			
+			mesh.add( new THREE.LineSegments(
 				
 				new THREE.Geometry(),
 				
-				[
-					
-					new THREE.MeshBasicMaterial({
-						color: 0xffffff,
-						side: THREE.DoubleSide,
-						wireframe: true,
-						transparent: true,
-						opacity: 0.5
-					}),
-					
-					new THREE.MeshPhongMaterial({
-						color: 0x156289,
-						emissive: 0x072534,
-						side: THREE.DoubleSide,
-						shading: THREE.FlatShading
-					})
-					
-				]
+				new THREE.LineBasicMaterial({
+					color: 0xffffff,
+					transparent: true,
+					opacity: 0.5
+				})
 				
-			)
+			));
 			
-			chooseFromHash( mesh );
+			mesh.add( new THREE.Mesh(
+				
+				new THREE.Geometry(),
+				
+				new THREE.MeshPhongMaterial({
+					color: 0x156289,
+					emissive: 0x072534,
+					side: THREE.DoubleSide,
+					shading: THREE.FlatShading
+				})
+				
+			));
+			
+			var options = chooseFromHash( mesh );
 			
 			scene.add( mesh );
 			
@@ -108,8 +119,10 @@
 
 				var time = Date.now() * 0.001;
 
-				mesh.rotation.x += 0.005;
-				mesh.rotation.y += 0.005;
+				if( !options.fixed ) {
+					mesh.rotation.x += 0.005;
+					mesh.rotation.y += 0.005;
+				}
 
 				renderer.render( scene, camera );
 				
