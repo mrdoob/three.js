@@ -50,15 +50,9 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function programArrayToString( previousValue, currentValue, index, array ) {
+	function filterEmptyLine( string ) {
 
-		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
-
-			return previousValue + currentValue + '\n';
-
-		}
-
-		return previousValue;
+		return string !== '';
 
 	}
 
@@ -272,9 +266,9 @@ THREE.WebGLProgram = ( function () {
 
 				'#endif',
 
-				''
+				'\n'
 
-			].reduce( programArrayToString, '' );
+			].filter( filterEmptyLine ).join( '\n' );
 
 			prefix_fragment = [
 
@@ -330,9 +324,10 @@ THREE.WebGLProgram = ( function () {
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
-				''
 
-			].reduce( programArrayToString, '' );
+				'\n'
+
+			].filter( filterEmptyLine ).join( '\n' );
 
 		}
 
