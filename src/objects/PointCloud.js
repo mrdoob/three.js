@@ -54,6 +54,8 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
+				if ( distance < raycaster.near || distance > raycaster.far ) return;
+
 				intersects.push( {
 
 					distance: distance,
