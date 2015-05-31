@@ -779,14 +779,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object.hasUvs && ! object.__webglUvBuffer ) object.__webglUvBuffer = _gl.createBuffer();
 		if ( object.hasColors && ! object.__webglColorBuffer ) object.__webglColorBuffer = _gl.createBuffer();
 
+		var attributes = program.attributes();
+
 		if ( object.hasPositions ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( program.attributes.position );
-
-			_gl.vertexAttribPointer( program.attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			state.enableAttribute( attributes.position );
+			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -839,9 +840,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( program.attributes.normal );
+			state.enableAttribute( attributes.normal );
 
-			_gl.vertexAttribPointer( program.attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -850,9 +851,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUvBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( program.attributes.uv );
+			state.enableAttribute( attributes.uv );
 
-			_gl.vertexAttribPointer( program.attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -861,9 +862,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( program.attributes.color );
+			state.enableAttribute( attributes.color );
 
-			_gl.vertexAttribPointer( program.attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -893,7 +894,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var geometryAttributes = geometry.attributes;
-		var programAttributes = program.attributes;
+
+		var programAttributes = program.attributes();
 
 		var materialDefaultAttributeValues = material.defaultAttributeValues;
 
@@ -1995,7 +1997,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.program = program;
 
-		var attributes = program.attributes;
+		var attributes = program.attributes();
 
 		if ( material.morphTargets ) {
 
@@ -2031,9 +2033,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniformsList = [];
 
+		var uniformLocations = material.program.uniforms();
 		for ( var u in material.__webglShader.uniforms ) {
 
-			var location = material.program.uniforms[ u ];
+			var location = uniformLocations[ u ];
 
 			if ( location ) {
 				material.uniformsList.push( [ material.__webglShader.uniforms[ u ], location ] );
@@ -2079,7 +2082,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var refreshLights = false;
 
 		var program = material.program,
-			p_uniforms = program.uniforms,
+			p_uniforms = program.uniforms(),
 			m_uniforms = material.__webglShader.uniforms;
 
 		if ( program.id !== _currentProgram ) {
