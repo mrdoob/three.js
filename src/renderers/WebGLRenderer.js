@@ -895,6 +895,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var geometryAttributes = geometry.attributes;
 		var programAttributes = program.attributes;
 
+		var materialDefaultAttributeValues = material.defaultAttributeValues;
+
 		for ( var name in programAttributes ) {
 
 			var programAttribute = programAttributes[ name ];
@@ -962,17 +964,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-				} else if ( material.defaultAttributeValues !== undefined ) {
+				} else if ( materialDefaultAttributeValues !== undefined ) {
 
-					if ( material.defaultAttributeValues[ name ] !== undefined ) {
+					var value = materialDefaultAttributeValues[ key ];
+					if ( value !== undefined ) {
 
-						if ( material.defaultAttributeValues[ name ].length === 2 ) {
+						switch ( value.length ) {
 
-							_gl.vertexAttrib2fv( programAttribute, material.defaultAttributeValues[ name ] );
+							case 2:
+								_gl.vertexAttrib2fv( programAttribute, value );
+								break;
 
-						} else if ( material.defaultAttributeValues[ name ].length === 3 ) {
+							case 3:
+								_gl.vertexAttrib3fv( programAttribute, value );
+								break;
 
-							_gl.vertexAttrib3fv( programAttribute, material.defaultAttributeValues[ name ] );
+							case 4:
+								_gl.vertexAttrib4fv( programAttribute, value );
+								break;
+
+							default:
+								_gl.vertexAttrib1fv( programAttribute, value );
 
 						}
 
