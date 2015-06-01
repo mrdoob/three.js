@@ -1,23 +1,34 @@
-﻿.FancySelect {
+﻿.Outliner {
+	color: #868686;
 	background: #222;
-	border: 1px solid #3C3C3C;
 	padding: 0;
+	width: 100%;
+	height: 140px;
+	font-size: 12px;
 	cursor: default;
 	overflow: auto;
 	outline: none;
 }
 
-	.FancySelect .option {
+	.Outliner .option {
 		padding: 4px;
 		white-space: nowrap;
 	}
 
-	.FancySelect .option.active {
+	.Outliner .option.active {
 		background-color: #153C5E;
 	}
 
+.Panel.Collapsible.collapsed .Static .Button {
+	border-left-color: #444;
+}
+
+.Panel.Collapsible:not(.collapsed) .Static .Button {
+	border-top-color: #444;
+}
+
 input.Number {
-	color: #2A75B7;
+	color: #2A75B7!important;
 	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
 	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
 	border: 1px solid transparent;
@@ -97,11 +108,11 @@ input.Number {
 		}
 
 			#menubar .menu .options hr {
-				border-color: #444;
+				border-color: #333;
 			}
 
 			#menubar .menu .options .option {
-				color: #666;
+				color: #888;
 				background-color: transparent;
 				padding: 5px 10px;
 				margin: 0px !important;
@@ -113,7 +124,6 @@ input.Number {
 				}
 
 				#menubar .menu .options .option:active {
-					color: #666;
 					background: transparent;
 				}
 
@@ -134,7 +144,9 @@ input.Number {
 	#sidebar input,
 	#sidebar textarea,
 	#sidebar select {
-		background: #ccc;
+		background: #222;
+		border: 1px solid transparent;
+		color: #888;
 	}
 
 	#sidebar .Panel {
@@ -149,13 +161,6 @@ input.Number {
 		color: #888;
 		padding: 10px;
 		border-top: 1px solid #333;
-	}
-
-	#sidebar #outliner {
-		width: 100%;
-		height: 140px;
-		color: #868686;
-		font-size: 12px;
 	}
 
 	#sidebar .Panel.Material canvas {
@@ -173,6 +178,10 @@ input.Number {
 	background-color: #111;
 	color: #333;
 }
+
+	#toolbar * {
+		vertical-align: middle;
+	}
 
 	#toolbar .Panel {
 		padding: 4px;

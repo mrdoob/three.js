@@ -269,11 +269,11 @@
 						var li = document.createElement( 'li' );
 						var a = document.createElement( 'a' );
 						a.setAttribute( 'href', '#' );
-						( function( s, c, p ) { 
+						( function( s, c, p ) {
 							a.addEventListener( 'click', function( e ) {
 								goTo( s, c, p );
 								e.preventDefault();
-							} ) 
+							} )
 						} )( section, category, page[ 0 ] )
 						a.textContent = page[ 0 ];
 						li.appendChild( a );
@@ -370,7 +370,7 @@
 					// Resolve links of the form 'Class.member'
 					if(section.indexOf(MEMBER_DELIMITER) !== -1) {
 						parts = section.split(MEMBER_DELIMITER)
-						section = parts[0]; 
+						section = parts[0];
 						member = parts[1];
 					}
 
@@ -379,7 +379,7 @@
 					section = location.section;
 					category = location.category;
 					name = location.name;
-				} 
+				}
 
 				var title = 'three.js - documentation - ' + section + ' - ' + name;
 				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name) + (!!member ? MEMBER_DELIMITER + encodeUrl(member) : '');
@@ -405,6 +405,18 @@
 
 			if ( window.location.hash.length > 0 ) goToHash();
 
+			console.log([
+				'   __     __',
+				' __/ __\\  / __\\__   ____   _____   _____',
+				'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
+				'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
+				'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
+				'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
+				'                                         / __/  /  \\__  \\',
+				'                                         \\/____/\\/_____/'
+			].join('\n'));
+
 		</script>
+		<script src="../build/three.min.js"></script>
 	</body>
 </html>

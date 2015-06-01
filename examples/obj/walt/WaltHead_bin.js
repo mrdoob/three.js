@@ -22,7 +22,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 92.156863,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	}],
 
     "buffers": "WaltHead_bin.bin"

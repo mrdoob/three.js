@@ -15,7 +15,7 @@ var Script = function ( editor ) {
 	var header = new UI.Panel();
 	header.setPadding( '10px' );
 	container.add( header );
-	
+
 	var title = new UI.Text().setColor( '#fff' );
 	header.add( title );
 
@@ -59,16 +59,99 @@ var Script = function ( editor ) {
 		clearTimeout( delay );
 		delay = setTimeout( function () {
 
-			currentScript.source = codemirror.getValue();
+			var value = codemirror.getValue();
 
-			signals.scriptChanged.dispatch( currentScript );
+			if ( validate( value ) ) {
+
+				currentScript.source = value;
+				signals.scriptChanged.dispatch( currentScript );
+
+			}
 
 		}, 300 );
 
 	});
 
+	// validate
+
+	var errorLines = [];
+	var widgets = [];
+
+	var validate = function ( string ) {
+
+		var syntax, errors;
+
+		return codemirror.operation( function () {
+
+			while ( errorLines.length > 0 ) {
+
+				codemirror.removeLineClass( errorLines.shift(), 'background', 'errorLine' );
+
+			}
+
+			while ( widgets.length > 0 ) {
+
+				codemirror.removeLineWidget( widgets.shift() );
+
+			}
+
+			//
+
+			try {
+
+				syntax = esprima.parse( string, { tolerant: true } );
+				errors = syntax.errors;
+
+				for ( var i = 0; i < errors.length; i ++ ) {
+
+					var error = errors[ i ];
+
+					var message = document.createElement( 'div' );
+					message.className = 'esprima-error';
+					message.textContent = error.message.replace(/Line [0-9]+: /, '');
+
+					var lineNumber = error.lineNumber - 1;
+					errorLines.push( lineNumber );
+
+					codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
+
+					var widget = codemirror.addLineWidget(
+						lineNumber,
+						message
+					);
+
+					widgets.push( widget );
+
+				}
+
+			} catch ( error ) {
+
+				var message = document.createElement( 'div' );
+				message.className = 'esprima-error';
+				message.textContent = error.message.replace(/Line [0-9]+: /, '');
+
+				var lineNumber = error.lineNumber - 1;
+				errorLines.push( lineNumber );
+
+				codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
+
+				var widget = codemirror.addLineWidget(
+					lineNumber,
+					message
+				);
+
+				widgets.push( widget );
+
+			}
+
+			return errorLines.length === 0;
+
+		});
+
+	};
+
 	//
-	
+
 	signals.editorCleared.add( function () {
 
 		container.setDisplay( 'none' );

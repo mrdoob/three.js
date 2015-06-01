@@ -22,7 +22,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 782.352941,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -35,7 +35,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 782.352941,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -48,7 +48,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 7.843137,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -61,7 +61,7 @@
 	"illumination" : 1,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 0.0,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -74,7 +74,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 782.352941,
-	"transparency" : 0.34
+	"opacity" : 0.34
 	},
 
 	{
@@ -87,7 +87,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 98.039216,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -100,7 +100,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -113,7 +113,7 @@
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	},
 
 	{
@@ -126,7 +126,7 @@
 	"illumination" : 1,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 0.0,
-	"transparency" : 1.0
+	"opacity" : 1.0
 	}],
 
     "buffers": "CamaroNoUv_bin.bin"

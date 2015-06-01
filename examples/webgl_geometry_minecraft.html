@@ -182,7 +182,7 @@
 				texture.magFilter = THREE.NearestFilter;
 				texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, ambient: 0xbbbbbb } ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture } ) );
 				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );

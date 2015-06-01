@@ -42,7 +42,7 @@ THREE.Lut.prototype = {
 
 	constructor: THREE.Lut,
 
-	lut: [], map: [], mapname: 'rainbow' , n: 256, minV: 0, maxV: 1, legend: null,
+	lut: [], map: [], mapname: 'rainbow', n: 256, minV: 0, maxV: 1, legend: null,
 
 	set: function ( value ) {
 
@@ -167,7 +167,7 @@ THREE.Lut.prototype = {
 
 		for ( var i = 1; i >= 0; i-=step ) {
 
-			for ( var j = this.map.length - 1; j >= 0; j-- ) {
+			for ( var j = this.map.length - 1; j >= 0; j -- ) {
 
 				if ( i < this.map[ j ][ 0 ] && i >= this.map[ j - 1 ][ 0 ]  ) {
 
@@ -194,7 +194,7 @@ THREE.Lut.prototype = {
 		this.legend.ctx.putImageData( imageData, 0, 0 );
 		this.legend.texture.needsUpdate = true;
 
-		this.legend.legendGeometry = new THREE.PlaneBufferGeometry( this.legend.dimensions.width , this.legend.dimensions.height );
+		this.legend.legendGeometry = new THREE.PlaneBufferGeometry( this.legend.dimensions.width, this.legend.dimensions.height );
 		this.legend.legendMaterial = new THREE.MeshBasicMaterial( { map : this.legend.texture, side : THREE.DoubleSide } );
 
 		this.legend.mesh = new THREE.Mesh( this.legend.legendGeometry, this.legend.legendMaterial );
@@ -269,7 +269,7 @@ THREE.Lut.prototype = {
 
 		this.legend.labels.title = parameters.hasOwnProperty( 'title' ) ? parameters[ 'title' ] : '';
 
-		this.legend.labels.um = parameters.hasOwnProperty( 'um' ) ? ' [ '+ parameters[ 'um' ] + ' ]': '';
+		this.legend.labels.um = parameters.hasOwnProperty( 'um' ) ? ' [ ' + parameters[ 'um' ] + ' ]' : '';
 
 		this.legend.labels.ticks = parameters.hasOwnProperty( 'ticks' ) ? parameters[ 'ticks' ] : 0;
 
@@ -300,7 +300,7 @@ THREE.Lut.prototype = {
 		contextTitle.fillText( this.legend.labels.title.toString() + this.legend.labels.um.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
 		var txtTitle = new THREE.Texture( canvasTitle );
-
+		txtTitle.minFilter = THREE.LinearFilter;
 		txtTitle.needsUpdate = true;
 
 		var spriteMaterialTitle = new THREE.SpriteMaterial( { map: txtTitle, useScreenCoordinates: false } );
@@ -340,7 +340,7 @@ THREE.Lut.prototype = {
 
 			}
 
-			for ( var i = 0; i < this.legend.labels.ticks; i++ ) {
+			for ( var i = 0; i < this.legend.labels.ticks; i ++ ) {
 
 				var value = ( this.maxV - this.minV ) / ( this.legend.labels.ticks - 1  ) * i ;
 
@@ -385,7 +385,7 @@ THREE.Lut.prototype = {
 				contextTick.fillText( value.toString(), borderThickness, this.legend.labels.fontsize + borderThickness );
 
 				var txtTick = new THREE.Texture( canvasTick );
-
+				txtTick.minFilter = THREE.LinearFilter;
 				txtTick.needsUpdate = true;
 
 				var spriteMaterialTick = new THREE.SpriteMaterial( { map: txtTick, useScreenCoordinates: false } );
@@ -429,7 +429,7 @@ THREE.Lut.prototype = {
 
 					var linePosition = ( this.legend.position.y - ( this.legend.dimensions.height * 0.5 ) + 0.01 ) + ( this.legend.dimensions.height ) * ( value / ( this.maxV - this.minV ) * 0.99 );
 
-					geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition , this.legend.position.z  ) );
+					geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.55, linePosition, this.legend.position.z  ) );
 
 					geometry.vertices.push( new THREE.Vector3( this.legend.position.x + this.legend.dimensions.width * 0.7, linePosition, this.legend.position.z  ) );
 
@@ -463,9 +463,9 @@ THREE.Lut.prototype = {
 
 THREE.ColorMapKeywords = {
 
-  "rainbow":    [ [ 0.0, '0x0000FF' ], [ 0.2, '0x00FFFF' ], [ 0.5, '0x00FF00' ], [ 0.8, '0xFFFF00'],  [1.0, '0xFF0000' ] ],
-  "cooltowarm": [ [ 0.0, '0x3C4EC2' ], [ 0.2, '0x9BBCFF' ], [ 0.5, '0xDCDCDC' ], [ 0.8, '0xF6A385'],  [1.0, '0xB40426' ] ],
-  "blackbody" : [ [ 0.0, '0x000000' ], [ 0.2, '0x780000' ], [ 0.5, '0xE63200' ], [ 0.8, '0xFFFF00'],  [1.0, '0xFFFFFF' ] ],
-  "grayscale" : [ [ 0.0, '0x000000' ], [ 0.2, '0x404040' ], [ 0.5, '0x7F7F80' ], [ 0.8, '0xBFBFBF'],  [1.0, '0xFFFFFF' ] ]
+  "rainbow":    [ [ 0.0, '0x0000FF' ], [ 0.2, '0x00FFFF' ], [ 0.5, '0x00FF00' ], [ 0.8, '0xFFFF00' ],  [ 1.0, '0xFF0000' ] ],
+  "cooltowarm": [ [ 0.0, '0x3C4EC2' ], [ 0.2, '0x9BBCFF' ], [ 0.5, '0xDCDCDC' ], [ 0.8, '0xF6A385' ],  [ 1.0, '0xB40426' ] ],
+  "blackbody" : [ [ 0.0, '0x000000' ], [ 0.2, '0x780000' ], [ 0.5, '0xE63200' ], [ 0.8, '0xFFFF00' ],  [ 1.0, '0xFFFFFF' ] ],
+  "grayscale" : [ [ 0.0, '0x000000' ], [ 0.2, '0x404040' ], [ 0.5, '0x7F7F80' ], [ 0.8, '0xBFBFBF' ],  [ 1.0, '0xFFFFFF' ] ]
 
 };

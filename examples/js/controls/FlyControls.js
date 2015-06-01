@@ -80,7 +80,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.keyup = function( event ) {
 
-		switch( event.keyCode ) {
+		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = 1; break;
 

@@ -43,7 +43,7 @@ THREE.VREffect = function ( renderer, done ) {
 		function gotVRDevices( devices ) {
 			var vrHMD;
 			var error;
-			for ( var i = 0; i < devices.length; ++i ) {
+			for ( var i = 0; i < devices.length; ++ i ) {
 				if ( devices[i] instanceof HMDVRDevice ) {
 					vrHMD = devices[i];
 					self._vrHMD = vrHMD;
@@ -56,7 +56,7 @@ THREE.VREffect = function ( renderer, done ) {
 			}
 			if ( done ) {
 				if ( !vrHMD ) {
-				 error = 'HMD not available';
+					error = 'HMD not available';
 				}
 				done( error );
 			}
@@ -74,16 +74,31 @@ THREE.VREffect = function ( renderer, done ) {
 			return;
 		}
 		// Regular render mode if not HMD
+		if ( scene instanceof Array ) scene = scene[ 0 ];
 		renderer.render.apply( this._renderer, arguments );
 	};
 
 	this.renderStereo = function( scene, camera, renderTarget, forceClear ) {
 
+		var sceneLeft, sceneRight;
+
+		if ( scene instanceof Array ) {
+
+			sceneLeft = scene[ 0 ];
+			sceneRight = scene[ 1 ];
+
+		} else {
+
+			sceneLeft = scene;
+			sceneRight = scene;
+
+		}
+
 		var leftEyeTranslation = this.leftEyeTranslation;
 		var rightEyeTranslation = this.rightEyeTranslation;
 		var renderer = this._renderer;
-		var rendererWidth = renderer.domElement.clientWidth;
-		var rendererHeight = renderer.domElement.clientHeight;
+		var rendererWidth = renderer.context.drawingBufferWidth;
+		var rendererHeight = renderer.context.drawingBufferHeight;
 		var eyeDivisionLine = rendererWidth / 2;
 
 		renderer.enableScissorTest( true );
@@ -105,12 +120,12 @@ THREE.VREffect = function ( renderer, done ) {
 		// render left eye
 		renderer.setViewport( 0, 0, eyeDivisionLine, rendererHeight );
 		renderer.setScissor( 0, 0, eyeDivisionLine, rendererHeight );
-		renderer.render( scene, cameraLeft );
+		renderer.render( sceneLeft, cameraLeft );
 
 		// render right eye
 		renderer.setViewport( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
 		renderer.setScissor( eyeDivisionLine, 0, eyeDivisionLine, rendererHeight );
-		renderer.render( scene, cameraRight );
+		renderer.render( sceneRight, cameraRight );
 
 		renderer.enableScissorTest( false );
 
@@ -155,7 +170,7 @@ THREE.VREffect = function ( renderer, done ) {
 		var vrHMD = this._vrHMD;
 		var canvas = renderer.domElement;
 		var fullScreenChange =
-			canvas.mozRequestFullScreen? 'mozfullscreenchange' : 'webkitfullscreenchange';
+			canvas.mozRequestFullScreen ? 'mozfullscreenchange' : 'webkitfullscreenchange';
 
 		document.addEventListener( fullScreenChange, onFullScreenChanged, false );
 		function onFullScreenChanged() {
@@ -165,7 +180,7 @@ THREE.VREffect = function ( renderer, done ) {
 		}
 		if ( canvas.mozRequestFullScreen ) {
 			canvas.mozRequestFullScreen( { vrDisplay: vrHMD } );
-		} else {
+		} else if ( canvas.webkitRequestFullscreen ) {
 			canvas.webkitRequestFullscreen( { vrDisplay: vrHMD } );
 		}
 	};
@@ -175,7 +190,7 @@ THREE.VREffect = function ( renderer, done ) {
 		var pxoffset = (fov.leftTan - fov.rightTan) * pxscale * 0.5;
 		var pyscale = 2.0 / (fov.upTan + fov.downTan);
 		var pyoffset = (fov.upTan - fov.downTan) * pyscale * 0.5;
-		return { scale: [pxscale, pyscale], offset: [pxoffset, pyoffset] };
+		return { scale: [ pxscale, pyscale ], offset: [ pxoffset, pyoffset ] };
 	};
 
 	this.FovPortToProjection = function( fov, rightHanded /* = true */, zNear /* = 0.01 */, zFar /* = 10000.0 */ )
@@ -194,30 +209,30 @@ THREE.VREffect = function ( renderer, done ) {
 		var scaleAndOffset = this.FovToNDCScaleOffset(fov);
 
 		// X result, map clip edges to [-w,+w]
-		m[0*4+0] = scaleAndOffset.scale[0];
-		m[0*4+1] = 0.0;
-		m[0*4+2] = scaleAndOffset.offset[0] * handednessScale;
-		m[0*4+3] = 0.0;
+		m[0 * 4 + 0] = scaleAndOffset.scale[0];
+		m[0 * 4 + 1] = 0.0;
+		m[0 * 4 + 2] = scaleAndOffset.offset[0] * handednessScale;
+		m[0 * 4 + 3] = 0.0;
 
 		// Y result, map clip edges to [-w,+w]
 		// Y offset is negated because this proj matrix transforms from world coords with Y=up,
 		// but the NDC scaling has Y=down (thanks D3D?)
-		m[1*4+0] = 0.0;
-		m[1*4+1] = scaleAndOffset.scale[1];
-		m[1*4+2] = -scaleAndOffset.offset[1] * handednessScale;
-		m[1*4+3] = 0.0;
+		m[1 * 4 + 0] = 0.0;
+		m[1 * 4 + 1] = scaleAndOffset.scale[1];
+		m[1 * 4 + 2] = -scaleAndOffset.offset[1] * handednessScale;
+		m[1 * 4 + 3] = 0.0;
 
 		// Z result (up to the app)
-		m[2*4+0] = 0.0;
-		m[2*4+1] = 0.0;
-		m[2*4+2] = zFar / (zNear - zFar) * -handednessScale;
-		m[2*4+3] = (zFar * zNear) / (zNear - zFar);
+		m[2 * 4 + 0] = 0.0;
+		m[2 * 4 + 1] = 0.0;
+		m[2 * 4 + 2] = zFar / (zNear - zFar) * -handednessScale;
+		m[2 * 4 + 3] = (zFar * zNear) / (zNear - zFar);
 
 		// W result (= Z in)
-		m[3*4+0] = 0.0;
-		m[3*4+1] = 0.0;
-		m[3*4+2] = handednessScale;
-		m[3*4+3] = 0.0;
+		m[3 * 4 + 0] = 0.0;
+		m[3 * 4 + 1] = 0.0;
+		m[3 * 4 + 2] = handednessScale;
+		m[3 * 4 + 3] = 0.0;
 
 		mobj.transpose();
 

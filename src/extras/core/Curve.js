@@ -43,7 +43,7 @@ THREE.Curve = function () {
 
 THREE.Curve.prototype.getPoint = function ( t ) {
 
-	console.log( "Warning, getPoint() not implemented!" );
+	THREE.warn( "THREE.Curve: Warning, getPoint() not implemented!" );
 	return null;
 
 };
@@ -107,7 +107,7 @@ THREE.Curve.prototype.getLength = function () {
 
 THREE.Curve.prototype.getLengths = function ( divisions ) {
 
-	if ( ! divisions ) divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions): 200;
+	if ( ! divisions ) divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions) : 200;
 
 	if ( this.cacheArcLengths
 		&& ( this.cacheArcLengths.length == divisions + 1 )
@@ -182,12 +182,10 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 		if ( comparison < 0 ) {
 
 			low = i + 1;
-			continue;
 
 		} else if ( comparison > 0 ) {
 
 			high = i - 1;
-			continue;
 
 		} else {
 
@@ -214,17 +212,17 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 	// we could get finer grain at lengths, or use simple interpolatation between two points
 
 	var lengthBefore = arcLengths[ i ];
-    var lengthAfter = arcLengths[ i + 1 ];
+	var lengthAfter = arcLengths[ i + 1 ];
 
-    var segmentLength = lengthAfter - lengthBefore;
+	var segmentLength = lengthAfter - lengthBefore;
 
     // determine where we are between the 'before' and 'after' points
 
-    var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
+	var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
 
     // add that fractional amount to t
 
-    var t = ( i + segmentFraction ) / ( il -1 );
+	var t = ( i + segmentFraction ) / ( il - 1 );
 
 	return t;
 
@@ -283,8 +281,8 @@ THREE.Curve.Utils = {
 	tangentCubicBezier: function (t, p0, p1, p2, p3 ) {
 
 		return - 3 * p0 * (1 - t) * (1 - t)  +
-			3 * p1 * (1 - t) * (1-t) - 6 *t *p1 * (1-t) +
-			6 * t *  p2 * (1-t) - 3 * t * t * p2 +
+			3 * p1 * (1 - t) * (1 - t) - 6 * t * p1 * (1 - t) +
+			6 * t *  p2 * (1 - t) - 3 * t * t * p2 +
 			3 * t * t * p3;
 
 	},

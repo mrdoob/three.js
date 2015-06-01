@@ -123,7 +123,7 @@
 				geometry.computeVertexNormals();
 				totalFaces += geometry.faces.length;
 				
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x030303, shininess: 30 } );
+				var material = new THREE.MeshPhongMaterial( { color: 0x030303, specular: 0x030303, shininess: 30 } );
 				
 				modifyOctree( geometry, material, true );
 				

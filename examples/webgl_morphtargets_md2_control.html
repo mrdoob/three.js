@@ -109,14 +109,23 @@
 				light.shadowMapWidth = 1024;
 				light.shadowMapHeight = 1024;
 				light.shadowMapDarkness = 0.95;
+				// by turning on the frustum, you can see where the light's
+				// shadow volume is located:
 				//light.shadowCameraVisible = true;
+				light.shadowCameraNear = 100;
+				light.shadowCameraFar = 1200;
+				light.shadowCameraTop = 400;
+				light.shadowCameraBottom = -250;
+				light.shadowCameraRight = 900;
+				light.shadowCameraLeft = -1000;
 
-				light.shadowCascade = true;
-				light.shadowCascadeCount = 3;
-				light.shadowCascadeNearZ = [ -1.000, 0.995, 0.998 ];
-				light.shadowCascadeFarZ  = [  0.995, 0.998, 1.000 ];
-				light.shadowCascadeWidth = [ 1024, 1024, 1024 ];
-				light.shadowCascadeHeight = [ 1024, 1024, 1024 ];
+				// cascaded shadows don't appear to be working, and add little
+				// light.shadowCascade = true;
+				//light.shadowCascadeCount = 3;
+				//light.shadowCascadeNearZ = [ -1.000, 0.995, 0.998 ];
+				//light.shadowCascadeFarZ  = [  0.995, 0.998, 1.000 ];
+				//light.shadowCascadeWidth = [ 1024, 1024, 1024 ];
+				//light.shadowCascadeHeight = [ 1024, 1024, 1024 ];
 
 				scene.add( light );
 
@@ -131,6 +140,7 @@
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 64, 64 );
 				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
+				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
 				scene.add( ground );
@@ -149,8 +159,8 @@
 				renderer.gammaOutput = true;
 				renderer.shadowMapEnabled = true;
 
-				renderer.shadowMapCascade = true;
-				renderer.shadowMapType = THREE.PCFSoftShadowMap;
+				//renderer.shadowMapCascade = true;
+				//renderer.shadowMapType = THREE.PCFSoftShadowMap;
 				//renderer.shadowMapDebug = true;
 
 				// STATS
@@ -226,6 +236,7 @@
 
 							cloneCharacter.shareParts( baseCharacter );
 
+							// cast and receive shadows
 							cloneCharacter.enableShadows( true );
 
 							cloneCharacter.setWeapon( 0 );

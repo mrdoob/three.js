@@ -84,7 +84,7 @@ Sidebar.Script = function ( editor ) {
 
 					} );
 					scriptsContainer.add( remove );
-					
+
 					scriptsContainer.add( new UI.Break() );
 
 				} )( object, scripts[ i ] )

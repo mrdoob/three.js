@@ -1,6 +1,6 @@
 {
 	"name": "three.js",
-	"version": "0.0.70",
+	"version": "0.0.71",
 	"homepage": "http://threejs.org/",
 	"description": "JavaScript 3D library",
 	"main": "build/three.js",
@@ -17,7 +17,8 @@
 		"*.md",
 		"docs",
 		"editor",
-		"examples",
+		"examples/*",
+		"!examples/js",
 		"src",
 		"test",
 		"utils",

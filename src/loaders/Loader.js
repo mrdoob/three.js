@@ -226,9 +226,15 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.transparent !== undefined || m.opacity < 1.0 ) {
+		if ( m.transparent !== undefined ) {
 
 			mpars.transparent = m.transparent;
+
+		}
+
+		if ( m.opacity !== undefined && m.opacity < 1.0 ) {
+
+			mpars.transparent = true;
 
 		}
 
@@ -300,12 +306,6 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.colorAmbient ) {
-
-			mpars.ambient = rgb2hex( m.colorAmbient );
-
-		}
-
 		if ( m.colorEmissive ) {
 
 			mpars.emissive = rgb2hex( m.colorEmissive );
@@ -314,9 +314,16 @@ THREE.Loader.prototype = {
 
 		// modifiers
 
-		if ( m.transparency ) {
+		if ( m.transparency !== undefined ) {
 
-			mpars.opacity = m.transparency;
+			console.warn( 'THREE.Loader: transparency has been renamed to opacity' );
+			m.opacity = m.transparency;
+
+		}
+
+		if ( m.opacity !== undefined ) {
+
+			mpars.opacity = m.opacity;
 
 		}
 

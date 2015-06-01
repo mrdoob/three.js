@@ -16,8 +16,6 @@ THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
 
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
-	var scope = this;
-
 	// todo: unify load API to for easier SceneLoader use
 
 	texturePath = texturePath && ( typeof texturePath === 'string' ) ? texturePath : this.extractUrlBase( url );
@@ -42,11 +40,23 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 				if ( xhr.responseText ) {
 
 					var json = JSON.parse( xhr.responseText );
+					var metadata = json.metadata;
 
-					if ( json.metadata !== undefined && json.metadata.type === 'scene' ) {
+					if ( metadata !== undefined ) {
 
-						console.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
-						return;
+						if ( metadata.type === 'object' ) {
+
+							THREE.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
+							return;
+
+						}
+
+						if ( metadata.type === 'scene' ) {
+
+							THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be a Scene. Use THREE.SceneLoader instead.' );
+							return;
+
+						}
 
 					}
 
@@ -55,7 +65,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 				} else {
 
-					console.error( 'THREE.JSONLoader: "' + url + '" seems to be unreachable or the file is empty.' );
+					THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be unreachable or the file is empty.' );
 
 				}
 
@@ -67,7 +77,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			} else {
 
-				console.error( 'THREE.JSONLoader: Couldn\'t load "' + url + '" (' + xhr.status + ')' );
+				THREE.error( 'THREE.JSONLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
 
 			}
 
@@ -105,8 +115,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
-	var scope = this,
-	geometry = new THREE.Geometry(),
+	var geometry = new THREE.Geometry(),
 	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
 	parseModel( scale );
@@ -138,7 +147,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
 
-		vertex, face, faceA, faceB, color, hex, normal,
+		vertex, face, faceA, faceB, hex, normal,
 
 		uvLayer, uv, u, v,
 
@@ -454,7 +463,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
 
-				console.warn( 'When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+			THREE.warn( 'THREE.JSONLoader: When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
 					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
 
 		}

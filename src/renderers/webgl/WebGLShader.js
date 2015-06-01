@@ -23,14 +23,13 @@ THREE.WebGLShader = ( function () {
 
 		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
 
-			console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
+			THREE.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
 
 		}
 
 		if ( gl.getShaderInfoLog( shader ) !== '' ) {
 
-			console.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', gl.getShaderInfoLog( shader ) );
-			console.warn( addLineNumbers( string ) );
+			THREE.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
 
 		}
 

@@ -345,7 +345,7 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	intersectBox: function ( box , optionalTarget ) {
+	intersectBox: function ( box, optionalTarget ) {
 
 		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
 

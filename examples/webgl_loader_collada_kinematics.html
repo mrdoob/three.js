@@ -120,9 +120,7 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0xcccccc ) );
-
-				var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
+				var directionalLight = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;

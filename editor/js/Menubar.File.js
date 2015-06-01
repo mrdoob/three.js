@@ -89,7 +89,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output );
+		exportString( output, 'geometry.json' );
 
 	} );
 	options.add( option );
@@ -114,7 +114,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output );
+		exportString( output, 'model.json' );
 
 	} );
 	options.add( option );
@@ -130,7 +130,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		exportString( output );
+		exportString( output, 'scene.json' );
 
 	} );
 	options.add( option );
@@ -153,7 +153,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.OBJExporter();
 
-		exportString( exporter.parse( object ) );
+		exportString( exporter.parse( object ), 'model.obj' );
 
 	} );
 	options.add( option );
@@ -167,7 +167,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new THREE.STLExporter();
 
-		exportString( exporter.parse( editor.scene ) );
+		exportString( exporter.parse( editor.scene ), 'model.stl' );
 
 	} );
 	options.add( option );
@@ -216,6 +216,10 @@ Menubar.File = function ( editor ) {
 			'				player.play();',
 			'',
 			'				document.body.appendChild( player.dom );',
+			'',
+			'				window.addEventListener( \'resize\', function () {',
+			'					player.setSize( window.innerWidth, window.innerHeight );',
+			'				} );',
 			'',
 			'			} );',
 			'',
@@ -272,16 +276,18 @@ Menubar.File = function ( editor ) {
 	*/
 
 
-
 	//
 
-	var exportString = function ( output ) {
+	var exportString = function ( output, filename ) {
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
 
-		window.open( objectURL, '_blank' );
-		window.focus();
+		var link = document.createElement( 'a' );
+		link.href = objectURL;
+		link.download = filename || 'data.json';
+		link.target = '_blank';
+		link.click();
 
 	};
 

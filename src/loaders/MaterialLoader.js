@@ -37,7 +37,6 @@ THREE.MaterialLoader.prototype = {
 		var material = new THREE[ json.type ];
 
 		if ( json.color !== undefined ) material.color.setHex( json.color );
-		if ( json.ambient !== undefined ) material.ambient.setHex( json.ambient );
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
@@ -51,6 +50,10 @@ THREE.MaterialLoader.prototype = {
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
+
+		// for PointCloudMaterial
+		if ( json.size !== undefined ) material.size = json.size;
+		if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
 
 		if ( json.materials !== undefined ) {
 

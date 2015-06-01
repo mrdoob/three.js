@@ -15,7 +15,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 	_max = new THREE.Vector3(),
 
 	_matrixPosition = new THREE.Vector3(),
-	
+
 	_renderList = [];
 
 	// init
@@ -63,7 +63,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		var i, il, j, jl, n,
 
 		shadowMap, shadowMatrix, shadowCamera,
-		program, buffer, material,
+		buffer, material,
 		webglObject, object, light,
 
 		lights = [],
@@ -89,7 +89,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 		}
 
-		_renderer.setDepthTest( true );
+		_renderer.state.setDepthTest( true );
 
 		// preprocess lights
 		// 	- skip lights that are not casting shadows
@@ -122,7 +122,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 						light.shadowCascadeArray[ n ] = virtualLight;
 
-						console.log( "Created virtualLight", virtualLight );
+						//console.log( "Created virtualLight", virtualLight );
 
 					} else {
 
@@ -183,7 +183,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 				} else {
 
-					console.error( "Unsupported light type for shadow" );
+					THREE.error( "THREE.ShadowMapPlugin: Unsupported light type for shadow", light );
 					continue;
 
 				}
@@ -348,7 +348,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 	};
 
-	function projectObject( scene, object, shadowCamera ){
+	function projectObject( scene, object, shadowCamera ) {
 
 		if ( object.visible ) {
 

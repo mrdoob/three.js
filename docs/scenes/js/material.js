@@ -393,7 +393,6 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 
 	var data = {
 		color : material.color.getHex(),
-		ambient : material.ambient.getHex(),
 		emissive : material.emissive.getHex(),
 		envMaps : envMapKeys,
 		map : textureMapKeys,
@@ -407,7 +406,6 @@ function guiMeshLambertMaterial ( gui, mesh, material, geometry ) {
 	var folder = gui.addFolder('THREE.MeshLambertMaterial');
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
-	folder.addColor( data, 'ambient' ).onChange( handleColorChange( material.ambient ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 
 	folder.add( material, 'shading', constants.shading ).onChange( needsUpdate( material, geometry ) );
@@ -433,7 +431,6 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 
 	var data = {
 		color : material.color.getHex(),
-		ambient : material.ambient.getHex(),
 		emissive : material.emissive.getHex(),
 		specular : material.specular.getHex(),
 		envMaps : envMapKeys,
@@ -446,11 +443,10 @@ function guiMeshPhongMaterial ( gui, mesh, material, geometry ) {
 	var folder = gui.addFolder('THREE.MeshPhongMaterial');
 
 	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
-	folder.addColor( data, 'ambient' ).onChange( handleColorChange( material.ambient ) );
 	folder.addColor( data, 'emissive' ).onChange( handleColorChange( material.emissive ) );
 	folder.addColor( data, 'specular' ).onChange( handleColorChange( material.specular ) );
 
-	folder.add( material, 'shininess', 0, 100);
+	folder.add( material, 'shininess', 1, 100);
 	folder.add( material, 'shading', constants.shading).onChange( needsUpdate( material, geometry ) );
 	folder.add( material, 'wireframe' );
 	folder.add( material, 'wireframeLinewidth', 0, 10 );

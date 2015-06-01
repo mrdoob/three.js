@@ -228,7 +228,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 		action = item.action;
 		args = item.args;
 
-		switch( action ) {
+		switch ( action ) {
 
 		case THREE.PathActions.MOVE_TO:
 
@@ -375,7 +375,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			//console.log(points);
 
-		  break;
+			break;
 		  
 		case THREE.PathActions.ELLIPSE:
 
@@ -413,7 +413,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			//console.log(points);
 
-		  break;
+			break;
 
 		} // end switch
 
@@ -520,7 +520,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		//  with the horizontal line through inPt, left of inPt
 		//  not counting lowerY endpoints of edges and whole edges on that line
 		var inside = false;
-		for( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
+		for ( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
 			var edgeLowPt  = inPolygon[ p ];
 			var edgeHighPt = inPolygon[ q ];
 
@@ -633,7 +633,6 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			betterShapeHoles[sIdx] = [];
 		}
 		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-			var sh = newShapes[sIdx];
 			var sho = newShapeHoles[sIdx];
 			for (var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 				var ho = sho[hIdx];

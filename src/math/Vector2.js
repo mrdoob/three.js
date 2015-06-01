@@ -78,22 +78,13 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
 
 		this.x += v.x;
 		this.y += v.y;
-
-		return this;
-
-	},
-
-	addVectors: function ( a, b ) {
-
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
 
 		return this;
 
@@ -108,17 +99,35 @@ THREE.Vector2.prototype = {
 
 	},
 
+	addVectors: function ( a, b ) {
+
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+
+		return this;
+
+	},
+
 	sub: function ( v, w ) {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
 
 		this.x -= v.x;
 		this.y -= v.y;
+
+		return this;
+
+	},
+
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
 
 		return this;
 
@@ -369,6 +378,14 @@ THREE.Vector2.prototype = {
 
 	},
 
+	lerpVectors: function ( v1, v2, alpha ) {
+
+		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+
+		return this;
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
@@ -400,14 +417,14 @@ THREE.Vector2.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) offset = 0;
 
-	    index = index * attribute.itemSize + offset;
+		index = index * attribute.itemSize + offset;
 
-	    this.x = attribute.array[ index ];
-	    this.y = attribute.array[ index + 1 ];
+		this.x = attribute.array[ index ];
+		this.y = attribute.array[ index + 1 ];
 
-	    return this;
+		return this;
 
 	},
 

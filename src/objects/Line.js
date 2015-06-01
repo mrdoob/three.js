@@ -11,7 +11,7 @@ THREE.Line = function ( geometry, material, mode ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.mode = ( mode !== undefined ) ? mode : THREE.LineStrip;
+	this.mode = mode !== undefined ? mode : THREE.LineStrip;
 
 };
 
@@ -72,7 +72,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0; oi < offsets.length; oi++){
+				for ( var oi = 0; oi < offsets.length; oi ++) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -100,6 +100,8 @@ THREE.Line.prototype.raycast = ( function () {
 							// What do we want? intersection point on the ray or on the segment??
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+							index: i,
+							offsetIndex: oi,
 							face: null,
 							faceIndex: null,
 							object: this
@@ -133,6 +135,7 @@ THREE.Line.prototype.raycast = ( function () {
 						// What do we want? intersection point on the ray or on the segment??
 						// point: raycaster.ray.at( distance ),
 						point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+						index: i,
 						face: null,
 						faceIndex: null,
 						object: this
@@ -164,6 +167,7 @@ THREE.Line.prototype.raycast = ( function () {
 					// What do we want? intersection point on the ray or on the segment??
 					// point: raycaster.ray.at( distance ),
 					point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+					index: i,
 					face: null,
 					faceIndex: null,
 					object: this

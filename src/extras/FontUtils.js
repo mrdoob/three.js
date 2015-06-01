@@ -56,7 +56,7 @@ THREE.FontUtils = {
 		ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
 		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
-		var face = ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
+		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
 		return data;
 
@@ -64,11 +64,9 @@ THREE.FontUtils = {
 
 	drawText: function ( text ) {
 
-		var characterPts = [], allPts = [];
-
 		// RenderText
 
-		var i, p,
+		var i,
 			face = this.getFace(),
 			scale = this.size / face.resolution,
 			offset = 0,
@@ -156,7 +154,7 @@ THREE.FontUtils = {
 
 					x = outline[ i ++ ] * scaleX + offset;
 					y = outline[ i ++ ] * scaleY;
-					path.lineTo( x,y );
+					path.lineTo( x, y );
 					break;
 
 				case 'q':
@@ -180,13 +178,13 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
-							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
-					  }
+							THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+						}
 
-				  }
+					}
 
-				  break;
+					break;
 
 				case 'b':
 
@@ -211,8 +209,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
-							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+							THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 
 						}
 
@@ -333,7 +331,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 				//throw ( "Warning, unable to triangulate polygon!" );
 				//return null;
 				// Sometimes warning is fine, especially polygons are triangulated in reverse.
-				console.log( 'Warning, unable to triangulate polygon!' );
+				THREE.warn( 'THREE.FontUtils: Warning, unable to triangulate polygon! in Triangulate.process()' );
 
 				if ( indices ) return vertIndices;
 				return result;
@@ -367,7 +365,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 				/* remove v from the remaining polygon */
 
-				for ( s = v, t = v + 1; t < nv; s++, t++ ) {
+				for ( s = v, t = v + 1; t < nv; s ++, t ++ ) {
 
 					verts[ s ] = verts[ t ];
 

@@ -3,8 +3,9 @@ from . import base_classes, image, api
 
 
 class Texture(base_classes.BaseNode):
+    """Class that wraps a texture node"""
     def __init__(self, node, parent):
-        logger.debug('Texture().__init__(%s)', node)
+        logger.debug("Texture().__init__(%s)", node)
         base_classes.BaseNode.__init__(self, node, parent, constants.TEXTURE)
 
         img_inst = self.scene.image(api.texture.file_name(self.node))
@@ -29,4 +30,10 @@ class Texture(base_classes.BaseNode):
 
     @property
     def image(self):
+        """
+
+        :return: the image object of the current texture
+        :rtype: image.Image
+
+        """
         return self.scene.image(self[constants.IMAGE])

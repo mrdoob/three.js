@@ -380,7 +380,6 @@
 
 				uniformsTerrain[ "diffuse" ].value.setHex( 0xffffff );
 				uniformsTerrain[ "specular" ].value.setHex( 0xffffff );
-				uniformsTerrain[ "ambient" ].value.setHex( 0x111111 );
 
 				uniformsTerrain[ "shininess" ].value = 30;
 
@@ -607,7 +606,7 @@
 
 				var sceneTmp = new THREE.Scene();
 
-				var meshTmp = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
+				var meshTmp = new THREE.Mesh( new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
 				meshTmp.position.z = -500;
 
 				sceneTmp.add( meshTmp );

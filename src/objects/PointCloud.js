@@ -91,7 +91,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
+				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -157,7 +157,7 @@ THREE.PointCloud.prototype.clone = function ( object ) {
 
 THREE.ParticleSystem = function ( geometry, material ) {
 
-	console.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
+	THREE.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
 	return new THREE.PointCloud( geometry, material );
 
 };

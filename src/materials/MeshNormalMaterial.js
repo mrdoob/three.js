@@ -20,8 +20,6 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 
 	this.type = 'MeshNormalMaterial';
 
-	this.shading = THREE.FlatShading;
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
@@ -39,8 +37,6 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 	var material = new THREE.MeshNormalMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
-
-	material.shading = this.shading;
 
 	material.wireframe = this.wireframe;
 	material.wireframeLinewidth = this.wireframeLinewidth;

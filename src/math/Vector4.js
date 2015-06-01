@@ -105,7 +105,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -145,7 +145,7 @@ THREE.Vector4.prototype = {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			THREE.warn( 'THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -154,6 +154,17 @@ THREE.Vector4.prototype = {
 		this.y -= v.y;
 		this.z -= v.z;
 		this.w -= v.w;
+
+		return this;
+
+	},
+
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
+		this.z -= s;
+		this.w -= s;
 
 		return this;
 
@@ -505,49 +516,49 @@ THREE.Vector4.prototype = {
 
 	} )(),
 
-    floor: function () {
+  floor: function () {
 
-        this.x = Math.floor( this.x );
-        this.y = Math.floor( this.y );
-        this.z = Math.floor( this.z );
-        this.w = Math.floor( this.w );
+		this.x = Math.floor( this.x );
+		this.y = Math.floor( this.y );
+		this.z = Math.floor( this.z );
+		this.w = Math.floor( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
-    ceil: function () {
+  ceil: function () {
 
-        this.x = Math.ceil( this.x );
-        this.y = Math.ceil( this.y );
-        this.z = Math.ceil( this.z );
-        this.w = Math.ceil( this.w );
+		this.x = Math.ceil( this.x );
+		this.y = Math.ceil( this.y );
+		this.z = Math.ceil( this.z );
+		this.w = Math.ceil( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
-    round: function () {
+  round: function () {
 
-        this.x = Math.round( this.x );
-        this.y = Math.round( this.y );
-        this.z = Math.round( this.z );
-        this.w = Math.round( this.w );
+		this.x = Math.round( this.x );
+		this.y = Math.round( this.y );
+		this.z = Math.round( this.z );
+		this.w = Math.round( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
-    roundToZero: function () {
+  roundToZero: function () {
 
-        this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-        this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-        this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
-        this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
+		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
+		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+		this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+		this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
 
-        return this;
+		return this;
 
-    },
+  },
 
 	negate: function () {
 
@@ -615,6 +626,14 @@ THREE.Vector4.prototype = {
 
 	},
 
+	lerpVectors: function ( v1, v2, alpha ) {
+
+		this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+
+		return this;
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
@@ -650,16 +669,16 @@ THREE.Vector4.prototype = {
 
 	fromAttribute: function ( attribute, index, offset ) {
 
-	    if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) offset = 0;
 
-	    index = index * attribute.itemSize + offset;
+		index = index * attribute.itemSize + offset;
 
-	    this.x = attribute.array[ index ];
-	    this.y = attribute.array[ index + 1 ];
-	    this.z = attribute.array[ index + 2 ];
-	    this.w = attribute.array[ index + 3 ];
+		this.x = attribute.array[ index ];
+		this.y = attribute.array[ index + 1 ];
+		this.z = attribute.array[ index + 2 ];
+		this.w = attribute.array[ index + 3 ];
 
-	    return this;
+		return this;
 
 	},
 

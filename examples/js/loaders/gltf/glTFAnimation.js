@@ -24,7 +24,7 @@ THREE.glTFAnimator = ( function () {
 
 		update : function()
 		{
-			for (i = 0; i < animators.length; i++)
+			for (i = 0; i < animators.length; i ++)
 			{
 				animators[i].update();
 			}
@@ -50,7 +50,7 @@ THREE.glTFAnimation = function(interps)
 THREE.glTFAnimation.prototype.createInterpolators = function(interps)
 {
 	var i, len = interps.length;
-	for (i = 0; i < len; i++)
+	for (i = 0; i < len; i ++)
 	{
 		var interp = new THREE.glTFInterpolator(interps[i]);
 		this.interps.push(interp);
@@ -90,7 +90,7 @@ THREE.glTFAnimation.prototype.update = function()
 	{
 		this.running = false;
 		var i, len = this.interps.length;
-		for (i = 0; i < len; i++)
+		for (i = 0; i < len; i ++)
 		{
 			this.interps[i].interp(this.duration);
 		}
@@ -100,7 +100,7 @@ THREE.glTFAnimation.prototype.update = function()
 	else
 	{
 		var i, len = this.interps.length;
-		for (i = 0; i < len; i++)
+		for (i = 0; i < len; i ++)
 		{
 			this.interps[i].interp(t);
 		}
@@ -202,7 +202,7 @@ THREE.glTFInterpolator.prototype.interp = function(t)
 	}
 	else
 	{
-		for (i = 0; i < this.count - 1; i++)
+		for (i = 0; i < this.count - 1; i ++)
 		{
 			var key1 = this.keys[i];
 			var key2 = this.keys[i + 1];

@@ -1,0 +1,168 @@
+{
+	"camera": {
+		"metadata": {
+			"version": 4.3,
+			"type": "Object",
+			"generator": "ObjectExporter"
+		},
+		"object": {
+			"uuid": "8EFB9C06-6312-4975-B04A-C9E4549BE348",
+			"type": "PerspectiveCamera",
+			"name": "Camera",
+			"fov": 50,
+			"aspect": 1.536388140161725,
+			"near": 0.1,
+			"far": 100000,
+			"matrix": [0.9392361044883728,-1.2050817232989175e-8,-0.34327182173728943,0,-0.15080472826957703,0.8983326554298401,-0.41262128949165344,0,0.30837228894233704,0.4393158257007599,0.8437464833259583,0,142.32125854492188,202.75485229492188,389.40936279296875,1]
+		}
+	},
+	"scene": {
+		"metadata": {
+			"version": 4.3,
+			"type": "Object",
+			"generator": "ObjectExporter"
+		},
+		"geometries": [
+			{
+				"uuid": "8F05A1F2-3877-478B-8DFC-F572AC61AB3A",
+				"type": "PlaneGeometry",
+				"width": 300,
+				"height": 400,
+				"widthSegments": 1,
+				"heightSegments": 1
+			},
+			{
+				"uuid": "7149652B-DBD7-4CB7-A600-27A9AC005C95",
+				"type": "BoxGeometry",
+				"width": 20,
+				"height": 10,
+				"depth": 10,
+				"widthSegments": 1,
+				"heightSegments": 1,
+				"depthSegments": 1
+			},
+			{
+				"uuid": "CABCC711-1331-4D4C-9FF6-409299F10C68",
+				"type": "SphereGeometry",
+				"radius": 5,
+				"widthSegments": 32,
+				"heightSegments": 16,
+				"phiStart": 0,
+				"phiLength": 6.28,
+				"thetaStart": 0,
+				"thetaLength": 3.14
+			},
+			{
+				"uuid": "A1D8B049-74DD-4B08-B5BC-8DCEC9AF0222",
+				"type": "BoxGeometry",
+				"width": 40,
+				"height": 10,
+				"depth": 10,
+				"widthSegments": 1,
+				"heightSegments": 1,
+				"depthSegments": 1
+			}],
+		"materials": [
+			{
+				"uuid": "2F69AF3A-DDF5-4BBA-87B5-80159F90DDBF",
+				"type": "MeshPhongMaterial",
+				"color": 86015,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 30
+			},
+			{
+				"uuid": "CFBEAD4C-6695-4A99-887B-8161E2947225",
+				"type": "MeshPhongMaterial",
+				"color": 16777215,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 30
+			},
+			{
+				"uuid": "043B208C-1F83-42C6-802C-E0E35621C27C",
+				"type": "MeshPhongMaterial",
+				"color": 16777215,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 30
+			},
+			{
+				"uuid": "40EC9BDA-91C0-4671-937A-2BCB6DA7EEBB",
+				"type": "MeshPhongMaterial",
+				"color": 13486790,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 30
+			}],
+		"object": {
+			"uuid": "31517222-A9A7-4EAF-B5F6-60751C0BABA3",
+			"type": "Scene",
+			"name": "Scene",
+			"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+			"children": [
+				{
+					"uuid": "EBBB1E63-6318-4752-AE2E-440A4E0B3EF3",
+					"type": "Mesh",
+					"name": "Ground",
+					"geometry": "8F05A1F2-3877-478B-8DFC-F572AC61AB3A",
+					"material": "2F69AF3A-DDF5-4BBA-87B5-80159F90DDBF",
+					"matrix": [1,0,0,0,0,0.000796250649727881,-0.9999997019767761,0,0,0.9999997019767761,0.000796250649727881,0,0,0,0,1]
+				},
+				{
+					"uuid": "6EE2E764-43E0-48E0-85F2-E0C8823C20DC",
+					"type": "DirectionalLight",
+					"name": "DirectionalLight 1",
+					"color": 16777215,
+					"intensity": 1,
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,100,200,150,1]
+				},
+				{
+					"uuid": "38219749-1E67-45F2-AB15-E64BA0940CAD",
+					"type": "Mesh",
+					"name": "Brick",
+					"geometry": "7149652B-DBD7-4CB7-A600-27A9AC005C95",
+					"material": "CFBEAD4C-6695-4A99-887B-8161E2947225",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,5,0,1]
+				},
+				{
+					"uuid": "18FFA67C-F893-4E7A-8A76-8D996DEBE0C6",
+					"type": "Mesh",
+					"name": "Ball",
+					"geometry": "CABCC711-1331-4D4C-9FF6-409299F10C68",
+					"material": "043B208C-1F83-42C6-802C-E0E35621C27C",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,5,35.54999923706055,1]
+				},
+				{
+					"uuid": "6D660D49-39B8-40C3-95F6-E4E007AA8D79",
+					"type": "Mesh",
+					"name": "Paddle",
+					"geometry": "A1D8B049-74DD-4B08-B5BC-8DCEC9AF0222",
+					"material": "40EC9BDA-91C0-4671-937A-2BCB6DA7EEBB",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,5,159.54217529296875,1]
+				},
+				{
+					"uuid": "B0BEAF69-8B5D-4D87-ADCA-FDE83A02762D",
+					"type": "PointLight",
+					"name": "PointLight 2",
+					"color": 16777215,
+					"intensity": 1,
+					"distance": 0,
+					"decay": 1,
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,-116.54356384277344,69.48957061767578,-206.8248291015625,1]
+				}]
+		}
+	},
+	"scripts": {
+		"6D660D49-39B8-40C3-95F6-E4E007AA8D79": [
+			{
+				"name": "User",
+				"source": "function mousemove( event ) {\n\n\tthis.position.x = ( event.clientX / player.width ) * 300 - 150;\n\n}\n\n// function update( event ) {}"
+			}],
+		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
+			{
+				"name": "Game Logic",
+				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = - 0.5;\ndirection.normalize();\n\nvar speed = new THREE.Vector3();\n\n//\n\nvar group = new THREE.Group();\nthis.add( group );\n\nvar paddle = this.getObjectByName( 'Paddle' );\ngroup.add( paddle );\n\nvar brick = this.getObjectByName( 'Brick' );\n\nfor ( var j = 0; j < 8; j ++ ) {\n\n\tvar material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );\n\n\tfor ( var i = 0; i < 12; i ++ ) {\n\t\t\n\t\tvar object = brick.clone();\n\t\tobject.material = material;\n\t\tobject.position.x = i * 22 - 120;\n\t\tobject.position.z = j * 14 - 120;\n\t\tgroup.add( object );\n\t\t\n\t}\n\t\n}\n\nbrick.visible = false;\n\n//\n\nvar raycaster = new THREE.Raycaster();\n\nfunction update( event ) {\n\t\n\tif ( ball.position.x < - 150 || ball.position.x > 150 ) direction.x = - direction.x;\n\tif ( ball.position.z < - 200 || ball.position.z > 200 ) direction.z = - direction.z;\n\n\tball.position.x = Math.max( - 150, Math.min( 150, ball.position.x ) );\n\tball.position.z = Math.max( - 200, Math.min( 200, ball.position.z ) );\n\t\n\tball.position.add( speed.copy( direction ).multiplyScalar( event.delta / 4 ) );\n\t\n\traycaster.set( ball.position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( group.children );\n\t\n\tif ( intersections.length > 0 ) {\n\t\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 5 ) {\n\t\t\t\n\t\t\tif ( intersection.object !== paddle ) {\n\n\t\t\t\tgroup.remove( intersection.object );\n\t\t\t\t\n\t\t\t}\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n}"
+			}]
+	}
+}

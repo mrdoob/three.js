@@ -63,7 +63,6 @@ var list = {
 			[ "ObjectLoader", "api/loaders/ObjectLoader" ],
 			[ "PDBLoader", "api/loaders/PDBLoader" ],
 			[ "SVGLoader", "api/loaders/SVGLoader" ],
-			[ "SceneLoader", "api/loaders/SceneLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
 			[ "TGALoader", "api/loaders/TGALoader" ],
 			[ "XHRLoader", "api/loaders/XHRLoader" ]
@@ -219,6 +218,7 @@ var list = {
 			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
 			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
 			[ "BoundingBoxHelper", "api/extras/helpers/BoundingBoxHelper" ],
+			[ "BoxHelper", "api/extras/helpers/BoxHelper" ],
 			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
 			[ "EdgesHelper", "api/extras/helpers/EdgesHelper" ],

@@ -22,7 +22,7 @@ var Editor = function () {
 		playAnimation: new SIGNALS.Signal(),
 		stopAnimation: new SIGNALS.Signal(),
 
-		showDialog: new SIGNALS.Signal(),
+		// showDialog: new SIGNALS.Signal(),
 
 		// notifications
 
@@ -155,7 +155,31 @@ Editor.prototype = {
 
 	},
 
-	setObjectName: function ( object, name ) {
+	moveObject: function ( object, parent, before ) {
+
+		if ( parent === undefined ) {
+
+			parent = this.scene;
+
+		}
+
+		parent.add( object );
+
+		// sort children array
+
+		if ( before !== undefined ) {
+
+			var index = parent.children.indexOf( before );
+			parent.children.splice( index, 0, object );
+			parent.children.pop();
+
+		}
+
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	nameObject: function ( object, name ) {
 
 		object.name = name;
 		this.signals.sceneGraphChanged.dispatch();
@@ -319,22 +343,6 @@ Editor.prototype = {
 
 	//
 
-	parent: function ( object, parent ) {
-
-		if ( parent === undefined ) {
-
-			parent = this.scene;
-
-		}
-
-		parent.add( object );
-
-		this.signals.sceneGraphChanged.dispatch();
-
-	},
-
-	//
-
 	select: function ( object ) {
 
 		if ( this.selected === object ) return;
@@ -462,6 +470,9 @@ Editor.prototype = {
 
 		return {
 
+			project: {
+				vr: this.config.getKey( 'project/vr' )
+			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts

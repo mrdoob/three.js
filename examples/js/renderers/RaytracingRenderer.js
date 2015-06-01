@@ -9,6 +9,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	var scope = this;
+
 	var canvas = document.createElement( 'canvas' );
 	var context = canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
@@ -48,6 +50,8 @@ THREE.RaytracingRenderer = function ( parameters ) {
 		clearColor.set( color );
 
 	};
+
+	this.setPixelRatio = function () {};
 
 	this.setSize = function ( width, height ) {
 
@@ -456,7 +460,12 @@ THREE.RaytracingRenderer = function ( parameters ) {
 				blockX = 0;
 				blockY += blockSize;
 
-				if ( blockY >= canvasHeight ) return;
+				if ( blockY >= canvasHeight ) {
+
+					scope.dispatchEvent( { type: "complete" } );
+					return;
+
+				}
 
 			}
 
@@ -533,3 +542,5 @@ THREE.RaytracingRenderer = function ( parameters ) {
 	};
 
 };
+
+THREE.EventDispatcher.prototype.apply(THREE.RaytracingRenderer.prototype);

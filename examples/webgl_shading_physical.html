@@ -88,6 +88,10 @@
 				shadowBias: -0.0002,
 				shadowDarkness: 0.3
 
+			}, gamma = {
+				gammaFactor: 2.0,
+				gammaInput: true,
+				gammaOutput: true
 			};
 
 			init();
@@ -166,7 +170,6 @@
 
 				var groundMaterial = new THREE.MeshPhongMaterial( {
 					shininess: 80,
-					ambient: 0x444444,
 					color: 0xffffff,
 					specular: 0xffffff,
 					map: textureSquares
@@ -197,9 +200,9 @@
 
 				} );
 
-				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, map: textureNoiseColor } );
-				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
+				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
+				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
 
 				// OBJECTS
 
@@ -213,7 +216,7 @@
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444 } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
 
 					return addObject( geometry, material, x, y, z, ry );
 
@@ -265,7 +268,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
 					morphMaterial.shading = THREE.FlatShading;
 
 					geometry.computeMorphNormals();
@@ -385,44 +388,70 @@
 
 				gui = new dat.GUI();
 
-				gui.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+				shadowGUI = gui.addFolder( "Shadow" );
+    	
+    			shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
 
 					sunLight.shadowCameraVisible = shadowConfig.shadowCameraVisible;
 
 				});
 
-				gui.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
 
 					sunLight.shadowCamera.near = shadowConfig.shadowCameraNear;
 					sunLight.shadowCamera.updateProjectionMatrix();
 
 				});
 
-				gui.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
 
 					sunLight.shadowCamera.far = shadowConfig.shadowCameraFar;
 					sunLight.shadowCamera.updateProjectionMatrix();
 
 				});
 
-				gui.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
 
 					sunLight.shadowCamera.fov = shadowConfig.shadowCameraFov;
 					sunLight.shadowCamera.updateProjectionMatrix();
 
 				});
 
-				gui.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
 
 					sunLight.shadowBias = shadowConfig.shadowBias;
 
 				});
 
-				gui.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
+				shadowGUI.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
+
+				});
+				shadowGUI.open();
+
+				gammaGUI = gui.addFolder( "Gamma" );
+    
+				gammaGUI.add( gamma, 'gammaFactor', 0.1, 4.0 ).onChange( function() {
+
+					renderer.gammaFactor = gamma.gammaFactor;
+
+				});
+				gammaGUI.open();
+
+				/*
+
+				Not exposed because they are not easily dynamically updated - as all shaders need to be recompiled.  -bhouston
+
+				gammaGUI.add( gamma, 'gammaInput', true ).onChange( function() {
+
+					renderer.gammaInput = gamma.gammaInput;
 
 				});
 
-				gui.close();
+				gammaGUI.add( gamma, 'gammaOutput', true ).onChange( function() {
+
+					renderer.gammaOutput = gamma.gammaOutput;
+
+				});*/
 
 			}
 

@@ -31,7 +31,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( attribute instanceof THREE.BufferAttribute === false ) {
 
-			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+			THREE.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
 
 			this.attributes[ name ] = { array: arguments[ 1 ], itemSize: arguments[ 2 ] };
 
@@ -84,11 +84,29 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( this.boundingBox !== null ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere !== null ) {
+
+			this.computeBoundingSphere();
+
+		}
+
 	},
 
 	center: function () {
 
-		// TODO
+		this.computeBoundingBox();
+
+		var offset = this.boundingBox.center().negate();
+
+		this.applyMatrix( new THREE.Matrix4().setPosition( offset ) );
+
+		return offset;
 
 	},
 
@@ -277,7 +295,7 @@ THREE.BufferGeometry.prototype = {
 
 			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
+				THREE.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.' );
 
 			}
 
@@ -331,7 +349,7 @@ THREE.BufferGeometry.prototype = {
 
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
-					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
+					THREE.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.' );
 
 				}
 
@@ -476,7 +494,7 @@ THREE.BufferGeometry.prototype = {
 			 this.attributes.normal === undefined ||
 			 this.attributes.uv === undefined ) {
 
-			console.warn( 'Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
+			THREE.warn( 'THREE.BufferGeometry: Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()' );
 			return;
 
 		}
@@ -649,24 +667,18 @@ THREE.BufferGeometry.prototype = {
 	},
 
 	/*
-		computeOffsets
-		Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
-		This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
-		WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
-		indexBufferSize - Defaults to 65535, but allows for larger or smaller chunks.
+	Compute the draw offset for large models by chunking the index buffer into chunks of 65k addressable vertices.
+	This method will effectively rewrite the index buffer and remap all attributes to match the new indices.
+	WARNING: This method will also expand the vertex count to prevent sprawled triangles across draw offsets.
+	size - Defaults to 65535, but allows for larger or smaller chunks.
 	*/
-	computeOffsets: function ( indexBufferSize ) {
+	computeOffsets: function ( size ) {
 
-		var size = indexBufferSize;
-		if ( indexBufferSize === undefined )
-			size = 65535; //WebGL limits type of index buffer values to 16-bit.
-
-		var s = Date.now();
+		if ( size === undefined ) size = 65535; // WebGL limits type of index buffer values to 16-bit.
 
 		var indices = this.attributes.index.array;
 		var vertices = this.attributes.position.array;
 
-		var verticesCount = ( vertices.length / 3 );
 		var facesCount = ( indices.length / 3 );
 
 		/*
@@ -746,7 +758,8 @@ THREE.BufferGeometry.prototype = {
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
-		this.offsets = offsets;
+		this.offsets = offsets; // TODO: Deprecate
+		this.drawcalls = offsets;
 
 		/*
 		var orderTime = Date.now();
@@ -764,7 +777,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( geometry instanceof THREE.BufferGeometry === false ) {
 
-			console.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
+			THREE.error( 'THREE.BufferGeometry.merge(): geometry not an instance of THREE.BufferGeometry.', geometry );
 			return;
 
 		}
@@ -884,13 +897,7 @@ THREE.BufferGeometry.prototype = {
 
 			var attribute = attributes[ key ];
 
-			var array = [], typeArray = attribute.array;
-
-			for ( var i = 0, l = typeArray.length; i < l; i ++ ) {
-
-				array[ i ] = typeArray[ i ];
-
-			}
+			var array = Array.prototype.slice.call( attribute.array );
 
 			output.data.attributes[ key ] = {
 				itemSize: attribute.itemSize,
