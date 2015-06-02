@@ -15,6 +15,7 @@ THREE.DirectGeometry = function () {
 	this.vertices = [];
 	this.colors = [];
 	this.normals = [];
+	this.tangents = [];
 	this.colors = [];
 	this.uvs = [];
 	this.uvs2 = [];
@@ -35,6 +36,7 @@ THREE.DirectGeometry = function () {
 
 	this.verticesNeedUpdate = false;
 	this.normalsNeedUpdate = false;
+	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 
@@ -129,6 +131,20 @@ THREE.DirectGeometry.prototype = {
 				var normal = face.normal;
 
 				this.normals.push( normal, normal, normal );
+
+			}
+
+			var vertexTangents = face.vertexTangents;
+
+			if ( vertexTangents.length === 3 ) {
+
+				this.tangents.push( vertexTangents[ 0 ], vertexTangents[ 1 ], vertexTangents[ 2 ] );
+
+			} else if ( face.tangent ) {
+
+				var tangent = face.tangent;
+
+				this.tangents.push( tangent, tangent, tangent );
 
 			}
 
@@ -227,6 +243,7 @@ THREE.DirectGeometry.prototype = {
 
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
+		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 

@@ -192,11 +192,13 @@ THREE.BufferGeometry.prototype = {
 
 			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
+			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
+			geometry.tangentsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
 
@@ -231,6 +233,21 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.normalsNeedUpdate = false;
+
+		}
+
+		if ( geometry.tangentsNeedUpdate === true ) {
+
+			var attribute = this.attributes.tangent;
+
+			if ( attribute !== undefined ) {
+
+				attribute.copyVector4sArray( geometry.tangents );
+				attribute.needsUpdate = true;
+
+			}
+
+			geometry.tangentsNeedUpdate = false;
 
 		}
 
@@ -281,6 +298,13 @@ THREE.BufferGeometry.prototype = {
 
 			var normals = new Float32Array( geometry.normals.length * 3 );
 			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+
+		}
+
+		if ( geometry.tangents.length > 0 ) {
+
+			var tangents = new Float32Array( geometry.tangents.length * 4 );
+			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
 
 		}
 

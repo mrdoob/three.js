@@ -107,7 +107,6 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var attributes = geometry.attributes;
 
 			var a, b, c;
-			var precision = raycaster.precision;
 
 			if ( attributes.index !== undefined ) {
 
@@ -153,7 +152,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-						if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 						intersects.push( {
 
@@ -199,7 +198,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-					if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 					intersects.push( {
 
@@ -221,7 +220,6 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
 
 			var a, b, c;
-			var precision = raycaster.precision;
 
 			var vertices = geometry.vertices;
 
@@ -294,7 +292,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-				if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 				intersects.push( {
 

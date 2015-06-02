@@ -7445,7 +7445,6 @@ THREE.EventDispatcher.prototype = {
 
 		constructor: THREE.Raycaster,
 
-		precision: 0.0001,
 		linePrecision: 1,
 
 		set: function ( origin, direction ) {
@@ -9995,6 +9994,7 @@ THREE.DirectGeometry = function () {
 	this.vertices = [];
 	this.colors = [];
 	this.normals = [];
+	this.tangents = [];
 	this.colors = [];
 	this.uvs = [];
 	this.uvs2 = [];
@@ -10015,6 +10015,7 @@ THREE.DirectGeometry = function () {
 
 	this.verticesNeedUpdate = false;
 	this.normalsNeedUpdate = false;
+	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
 
@@ -10109,6 +10110,20 @@ THREE.DirectGeometry.prototype = {
 				var normal = face.normal;
 
 				this.normals.push( normal, normal, normal );
+
+			}
+
+			var vertexTangents = face.vertexTangents;
+
+			if ( vertexTangents.length === 3 ) {
+
+				this.tangents.push( vertexTangents[ 0 ], vertexTangents[ 1 ], vertexTangents[ 2 ] );
+
+			} else if ( face.tangent ) {
+
+				var tangent = face.tangent;
+
+				this.tangents.push( tangent, tangent, tangent );
 
 			}
 
@@ -10207,6 +10222,7 @@ THREE.DirectGeometry.prototype = {
 
 		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
+		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 
@@ -10420,11 +10436,13 @@ THREE.BufferGeometry.prototype = {
 
 			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
+			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
+			geometry.tangentsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
 
@@ -10459,6 +10477,21 @@ THREE.BufferGeometry.prototype = {
 			}
 
 			geometry.normalsNeedUpdate = false;
+
+		}
+
+		if ( geometry.tangentsNeedUpdate === true ) {
+
+			var attribute = this.attributes.tangent;
+
+			if ( attribute !== undefined ) {
+
+				attribute.copyVector4sArray( geometry.tangents );
+				attribute.needsUpdate = true;
+
+			}
+
+			geometry.tangentsNeedUpdate = false;
 
 		}
 
@@ -10509,6 +10542,13 @@ THREE.BufferGeometry.prototype = {
 
 			var normals = new Float32Array( geometry.normals.length * 3 );
 			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+
+		}
+
+		if ( geometry.tangents.length > 0 ) {
+
+			var tangents = new Float32Array( geometry.tangents.length * 4 );
+			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
 
 		}
 
@@ -15995,6 +16035,8 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
+				if ( distance < raycaster.near || distance > raycaster.far ) return;
+
 				intersects.push( {
 
 					distance: distance,
@@ -16475,7 +16517,6 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var attributes = geometry.attributes;
 
 			var a, b, c;
-			var precision = raycaster.precision;
 
 			if ( attributes.index !== undefined ) {
 
@@ -16521,7 +16562,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-						if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 						intersects.push( {
 
@@ -16567,7 +16608,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-					if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 					intersects.push( {
 
@@ -16589,7 +16630,6 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
 
 			var a, b, c;
-			var precision = raycaster.precision;
 
 			var vertices = geometry.vertices;
 
@@ -16662,7 +16702,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-				if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 				intersects.push( {
 
@@ -19243,12 +19283,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentMaterialId = - 1;
 
 		_lightsNeedUpdate = true;
-
-		// START_VEROLD_MOD
-		for ( var i = 0; i < _newAttributes.length; i ++ ) {
-			_newAttributes[ i ] = 0;
-		}
-		// END_VEROLD_MOD
 
 		state.reset();
 
@@ -23561,15 +23595,9 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function programArrayToString( previousValue, currentValue, index, array ) {
+	function filterEmptyLine( string ) {
 
-		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
-
-			return previousValue + currentValue + '\n';
-
-		}
-
-		return previousValue;
+		return string !== '';
 
 	}
 
@@ -23802,9 +23830,9 @@ THREE.WebGLProgram = ( function () {
 
 				'#endif',
 
-				''
+				'\n'
 
-			].reduce( programArrayToString, '' );
+			].filter( filterEmptyLine ).join( '\n' );
 
 			prefix_fragment = [
 
@@ -23869,9 +23897,10 @@ THREE.WebGLProgram = ( function () {
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
-				''
 
-			].reduce( programArrayToString, '' );
+				'\n'
+
+			].filter( filterEmptyLine ).join( '\n' );
 
 		}
 
