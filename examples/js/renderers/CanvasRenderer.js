@@ -155,7 +155,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setPixelRatio = function ( value ) {
 
-		pixelRatio = value;
+		if ( value !== undefined ) {
+
+			pixelRatio = value;
+
+		}
 
 	};
 
