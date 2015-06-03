@@ -423,6 +423,9 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		for ( var i = 0; i < enabledAttributes.length; i ++ ) {
 
+			if ( enabledAttributes[ i ] ) {
+				gl.disableVertexAttribArray( i );
+			}
 			enabledAttributes[ i ] = 0;
 
 		}
