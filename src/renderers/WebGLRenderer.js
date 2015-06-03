@@ -968,7 +968,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
-					var value = materialDefaultAttributeValues[ key ];
+					var value = materialDefaultAttributeValues[ name ];
 					if ( value !== undefined ) {
 
 						switch ( value.length ) {
