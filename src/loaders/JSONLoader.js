@@ -46,14 +46,14 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 						if ( metadata.type === 'object' ) {
 
-							THREE.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
+							console.error( 'THREE.JSONLoader: ' + url + ' should be loaded with THREE.ObjectLoader instead.' );
 							return;
 
 						}
 
 						if ( metadata.type === 'scene' ) {
 
-							THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be a Scene. Use THREE.SceneLoader instead.' );
+							console.error( 'THREE.JSONLoader: ' + url + ' seems to be a Scene. Use THREE.SceneLoader instead.' );
 							return;
 
 						}
@@ -65,7 +65,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 				} else {
 
-					THREE.error( 'THREE.JSONLoader: ' + url + ' seems to be unreachable or the file is empty.' );
+					console.error( 'THREE.JSONLoader: ' + url + ' seems to be unreachable or the file is empty.' );
 
 				}
 
@@ -77,7 +77,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			} else {
 
-				THREE.error( 'THREE.JSONLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
+				console.error( 'THREE.JSONLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
 
 			}
 
@@ -138,7 +138,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		offset, zLength,
 
-		colorIndex, normalIndex, uvIndex, materialIndex,
+		colorIndex, normalIndex, uvIndex,
 
 		type,
 		isQuad,
@@ -225,9 +225,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasMaterial ) {
 
-					materialIndex = faces[ offset ++ ];
-					faceA.materialIndex = materialIndex;
-					faceB.materialIndex = materialIndex;
+					offset ++;
 
 				}
 
@@ -242,7 +240,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 						uvLayer = json.uvs[ i ];
 
 						geometry.faceVertexUvs[ i ][ fi ] = [];
-						geometry.faceVertexUvs[ i ][ fi + 1 ] = []
+						geometry.faceVertexUvs[ i ][ fi + 1 ] = [];
 
 						for ( j = 0; j < 4; j ++ ) {
 
@@ -334,8 +332,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				if ( hasMaterial ) {
 
-					materialIndex = faces[ offset ++ ];
-					face.materialIndex = materialIndex;
+					offset ++;
 
 				}
 
@@ -424,7 +421,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		}
 
-	};
+	}
 
 	function parseSkin() {
 		var influencesPerVertex = ( json.influencesPerVertex !== undefined ) ? json.influencesPerVertex : 2;
@@ -463,7 +460,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
 
-			THREE.warn( 'THREE.JSONLoader: When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+			console.warn( 'THREE.JSONLoader: When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
 					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
 
 		}
@@ -474,7 +471,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
 
-	};
+	}
 
 	function parseMorphing( scale ) {
 
@@ -531,7 +528,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		}
 
-	};
+	}
 
 	if ( json.materials === undefined || json.materials.length === 0 ) {
 

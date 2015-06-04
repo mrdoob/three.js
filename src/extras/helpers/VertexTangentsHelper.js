@@ -30,7 +30,7 @@ THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ) );
 
 	this.matrixAutoUpdate = false;
 
@@ -38,7 +38,7 @@ THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 
 };
 
-THREE.VertexTangentsHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.VertexTangentsHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.VertexTangentsHelper.prototype.constructor = THREE.VertexTangentsHelper;
 
 THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {

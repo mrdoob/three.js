@@ -11,11 +11,10 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">A line or a series of lines.</div>
+		<div class="desc">A continuous line.</div>
 
 
 		<h2>Example</h2>
-
 
 		<code>var material = new THREE.LineBasicMaterial({
 			color: 0x0000ff
@@ -35,18 +34,15 @@
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]( [page:Geometry geometry], [page:Material material], [page:Integer type] )</h3>
+		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
 
 		<div>
 		geometry — Vertices representing the line segment(s).<br />
 		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].<br />
-		type — Connection type between vertices. Default is THREE.LineStrip.
 		</div>
 
 		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
 
-		<div>Also, if no type is supplied, the default (THREE.LineStrip) will be used).</div>
 
 		<h2>Properties</h2>
 
@@ -60,13 +56,6 @@
 		Material for the line.
 		</div>
 
-		<h3>[property:Integer type]</h3>
-		<div>
-		Possible values: THREE.LineStrip or THREE.LinePieces. THREE.LineStrip will draw a series of segments connecting each point (first connected to the second, the second connected to the third, and so on and so forth); and THREE.LinePieces will draw a series of pairs of segments (first connected to the second, the third connected to the fourth, and so on and so forth).</div>
-
-		<div>
-		In OpenGL terms, LineStrip is the classic GL_LINE_STRIP and LinePieces is the equivalent to GL_LINES.
-		</div>
 
 		<h2>Methods</h2>
 

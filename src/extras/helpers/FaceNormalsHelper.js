@@ -23,7 +23,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ) );
 
 	this.matrixAutoUpdate = false;
 
@@ -33,7 +33,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 };
 
-THREE.FaceNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.FaceNormalsHelper.prototype = Object.create( THREE.LineSegments.prototype );
 THREE.FaceNormalsHelper.prototype.constructor = THREE.FaceNormalsHelper;
 
 THREE.FaceNormalsHelper.prototype.update = function () {
@@ -72,4 +72,3 @@ THREE.FaceNormalsHelper.prototype.update = function () {
 	return this;
 
 };
-

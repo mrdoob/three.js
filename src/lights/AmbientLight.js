@@ -22,3 +22,13 @@ THREE.AmbientLight.prototype.clone = function () {
 	return light;
 
 };
+
+THREE.AmbientLight.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.color = this.color.getHex();
+
+	return data;
+
+};

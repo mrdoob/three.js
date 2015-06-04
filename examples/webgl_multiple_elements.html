@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - multiple elements</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			* {
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+			}
+
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+
+				background-color: #fff;
+				margin: 0px;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				text-align:center;
+			}
+
+			#content {
+				position: absolute;
+				top: 0px; width: 100%;
+				z-index: 1;
+				padding: 2em;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+			#c {
+				position: fixed;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+			}
+
+			.list-item {
+				margin: 1em;
+				padding: 2em;
+				display: -webkit-flex;
+				display: flex;
+				flex-direction: row;
+				-webkit-flex-direction: row;
+			}
+
+			.list-item .scene {
+				width: 200px;
+				height: 200px;
+				flex: 0 0 auto;
+				-webkit-flex: 0 0 auto;
+			}
+			.list-item .description {
+				font-family: sans-serif;
+				font-size: large;
+				padding-left: 2em;
+				flex: 1 1 auto;
+				-webkit-flex: 1 1 auto;
+			}
+
+			@media only screen and (max-width : 600px) {
+				#content {
+					width: 100%;
+				}
+				.list-item {
+					margin: 0.5em;
+					padding: 0.5em;
+					flex-direction: column;
+					-webkit-flex-direction: column;
+				}
+				.list-item .description {
+					padding-left: 0em;
+				}
+			}
+		</style>
+	</head>
+	<body>
+
+		<canvas id="c"></canvas>
+		<div id="content">
+			<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple elements - webgl</div>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script id="template" type="notjs">
+			<div class="scene"></div>
+			<div class="description">some random text about this object, scene, whatever</div>
+		</script>
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var canvas;
+
+			var scenes = [], camera, renderer, emptyScene;
+
+			init();
+			animate();
+
+			function init() {
+
+				canvas = document.getElementById( "c" );
+
+				camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 100 );
+				camera.position.z = 1.5;
+
+				var geometries = [
+					new THREE.BoxGeometry( 1, 1, 1 ),
+					new THREE.SphereGeometry( 0.5, 12, 12 ),
+					new THREE.DodecahedronGeometry( 0.5 ),
+					new THREE.CylinderGeometry( 0.5, 0.5, 1, 12 ),
+				];
+
+				var template = document.getElementById("template").text;
+				var content = document.getElementById("content");
+
+				var emptyScene = new THREE.Scene();
+
+				var numScenes = 100;
+
+				for ( var ii =  0; ii < numScenes; ++ii ) {
+
+					var scene = new THREE.Scene();
+
+					// make a list item.
+					var element = document.createElement( "div" );
+					element.innerHTML = template;
+					element.className = "list-item";
+
+					// Look up the element that represents the area
+					// we want to render the scene
+					scene.element = element.querySelector(".scene");
+					content.appendChild(element);
+
+					// add one random mesh to each scene
+					var geometry = geometries[ geometries.length * Math.random() | 0 ];
+					var material = new THREE.MeshLambertMaterial( { color: randColor() } );
+
+					scene.add( new THREE.Mesh( geometry, material ) );
+
+					light = new THREE.DirectionalLight( 0xffffff );
+					light.position.set( 0.5, 0.8, 1 );
+					scene.add( light );
+
+					light = new THREE.DirectionalLight( 0xffffff );
+					light.position.set( -0.5, -0.8, -1 );
+					scene.add( light );
+
+					scenes.push( scene );
+				}
+
+
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+				renderer.setClearColor( 0xFFFFFF );
+
+			}
+
+			function updateSize() {
+
+				var width = canvas.clientWidth;
+				var height = canvas.clientHeight;
+
+				if ( canvas.width !== width || canvas.height != height ) {
+
+					renderer.setSize ( width, height, false );
+
+				}
+
+			}
+
+			function animate() {
+
+				render();
+
+				requestAnimationFrame( animate );
+			}
+
+			function render() {
+
+				updateSize();
+
+				renderer.setClearColor( 0xFFFFFF );
+				renderer.clear( true );
+				renderer.setClearColor( 0xE0E0E0 );
+
+				renderer.enableScissorTest( true );
+				scenes.forEach( function( scene ) {
+					// so something moves
+					scene.children[0].rotation.x = Date.now() * 0.00111;
+					scene.children[0].rotation.z = Date.now() * 0.001;
+
+					// get the element that is a place holder for where we want to
+					// draw the scene
+					var element = scene.element;
+
+					// get its position relative to the page's viewport
+					var rect = element.getBoundingClientRect();
+
+					// check if it's offscreen. If so skip it
+					if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
+						 rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
+					  return;  // it's off screen
+					}
+
+					// set the viewport
+					var width  = rect.right - rect.left;
+					var height = rect.bottom - rect.top;
+					var left   = rect.left;
+					var bottom = renderer.domElement.clientHeight - rect.bottom;
+
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
+					renderer.setViewport( left, bottom, width, height );
+					renderer.setScissor( left, bottom, width, height );
+					renderer.render( scene, camera );
+
+				} );
+				renderer.enableScissorTest( false );
+
+			}
+
+			function rand( min, max ) {
+				if ( max == undefined ) {
+					max = min;
+					min = 0;
+				}
+
+				return Math.random() * ( max - min ) + min;
+			}
+
+			function randColor() {
+				var colors = [ rand( 256 ), rand ( 256 ), rand( 256 ) ];
+				colors[ Math.random() * 3 | 0 ] = 255;
+				return ( colors[0] << 16 ) |
+					   ( colors[1] <<  8 ) |
+					   ( colors[2] <<  0 ) ;
+			}
+
+		</script>
+
+	</body>
+</html>

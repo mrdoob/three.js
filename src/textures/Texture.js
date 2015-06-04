@@ -95,6 +95,82 @@ THREE.Texture.prototype = {
 
 	},
 
+	toJSON: function ( meta ) {
+
+		if ( meta.textures[ this.uuid ] !== undefined ) {
+
+			return meta.textures[ this.uuid ];
+
+		}
+
+		var output = {
+			metadata: {
+				version: 4.4,
+				type: 'Texture',
+				generator: 'Texture.toJSON'
+			},
+
+			uuid: this.uuid,
+			name: this.name,
+
+			mapping: this.mapping,
+
+			repeat: [ this.repeat.x, this.repeat.y ],
+			offset: [ this.offset.x, this.offset.y ],
+			wrap: [ this.wrapS, this.wrapT ],
+
+			minFilter: this.minFilter,
+			magFilter: this.magFilter,
+			anisotropy: this.anisotropy
+		};
+
+		if ( this.image !== undefined ) {
+
+			// TODO: Move to THREE.Image
+
+			var image = this.image;
+
+			if ( image.uuid === undefined ) {
+
+				image.uuid = THREE.Math.generateUUID(); // UGH
+
+			}
+
+			if ( meta.images[ this.image.uuid ] === undefined ) {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = image.width;
+				canvas.height = image.height;
+
+				var context = canvas.getContext( '2d' );
+				context.drawImage( image, 0, 0, image.width, image.height );
+
+				var src;
+
+				if ( image.width > 2048 || image.height > 2048 ) {
+
+					src = canvas.toDataURL( 'image/jpeg', 0.6 );
+
+				} else {
+
+					src = canvas.toDataURL( 'image/png' );
+
+				}
+
+				meta.images[ this.image.uuid ] = { uuid: this.image.uuid, url: src };
+
+			}
+
+			output.image = image.uuid;
+
+		}
+
+		meta.textures[ this.uuid ] = output;
+
+		return output;
+
+	},
+
 	update: function () {
 
 		this.dispatchEvent( { type: 'update' } );

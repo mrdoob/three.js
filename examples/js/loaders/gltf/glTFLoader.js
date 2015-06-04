@@ -14,7 +14,7 @@ THREE.glTFLoader = function (showStatus) {
 	this.shadersLoaded = 0;
 	this.shaders = {};
 	THREE.Loader.call( this, showStatus );
-}
+};
 
 THREE.glTFLoader.prototype = Object.create( THREE.Loader.prototype );
 THREE.glTFLoader.prototype.constructor = THREE.glTFLoader;
@@ -107,7 +107,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		geometry.addDrawCall( 0, this.indexArray.length, 0 );
 
 		geometry.computeBoundingSphere();
-	}
+	};
     
 	ClassicGeometry.prototype.checkFinished = function() {
 		if (this.indexArray && this.loadedAttributes === this.totalAttributes) {
@@ -203,7 +203,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		geom.geometry.skinIndices.push( new THREE.Vector4( floatArray[i], floatArray[i + 1], floatArray[i + 2], floatArray[i + 3] ) );
 	}
         }
-	}
+	};
     
 	VertexAttributeDelegate.prototype.bufferResourceAvailable = function(glResource, ctx) {
 		var geom = ctx.geometry;
@@ -241,7 +241,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	floatArray = new Float32Array(glResource, 0, attribute.count * nComponents);
 	geom.geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( floatArray, nComponents ) );
         }
-	}
+	};
     
 	VertexAttributeDelegate.prototype.resourceAvailable = function(glResource, ctx) {
 
@@ -438,11 +438,12 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	ShaderDelegate.prototype.convert = function(resource, ctx) {
 		return resource; 
-	}
+	};
     
 	ShaderDelegate.prototype.resourceAvailable = function(data, ctx) {
 		theLoader.shadersLoaded ++;
 		theLoader.shaders[ctx.id] = data;
+		theLoader.checkComplete();
 		return true;
 	};
 
@@ -487,11 +488,11 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	};
 
 	LoadDelegate = function() {
-    }
+    };
     
 	LoadDelegate.prototype.loadCompleted = function(callback, obj) {
 		callback.call(Window, obj);
-	}
+	};
     
     // Loader
 
@@ -1517,7 +1518,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 	this.callback = callback;
 	this.rootObj = rootObj;
 	return rootObj;
-}
+};
 
 THREE.glTFLoader.prototype.callLoadedCallback = function() {
 	var result = {
@@ -1527,7 +1528,7 @@ THREE.glTFLoader.prototype.callLoadedCallback = function() {
 	};
 	
 	this.callback(result);
-}
+};
 
 THREE.glTFLoader.prototype.checkComplete = function() {
 	if (this.meshesLoaded == this.meshesRequested 
@@ -1550,7 +1551,7 @@ THREE.glTFLoader.prototype.checkComplete = function() {
         
 		this.callLoadedCallback();
 	}
-}
+};
 
 
 

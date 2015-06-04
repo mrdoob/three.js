@@ -130,7 +130,7 @@ function SimulationRenderer(WIDTH, renderer) {
 		mesh.material = passThruShader;
 		uniforms.texture.value = input;
 		renderer.render( scene, camera, output );
-	}
+	};
 
 
 	this.renderPosition = function(position, velocity, output, delta) {
@@ -141,7 +141,7 @@ function SimulationRenderer(WIDTH, renderer) {
 		positionShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
 		this.currentPosition = output;
-	}
+	};
 
 	this.renderVelocity = function(position, velocity, output, delta) {
 		mesh.material = velocityShader;
@@ -151,7 +151,7 @@ function SimulationRenderer(WIDTH, renderer) {
 		velocityShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
 		this.currentVelocity = output;
-	}
+	};
 
 	this.simulate = function( delta ) {
 
@@ -169,7 +169,7 @@ function SimulationRenderer(WIDTH, renderer) {
 
 		flipflop = !flipflop;
 
-	}
+	};
 
 	function generatePositionTexture() {
 

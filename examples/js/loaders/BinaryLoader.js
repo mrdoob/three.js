@@ -217,7 +217,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return ( n % 4 ) ? ( 4 - n % 4 ) : 0;
 
-		};
+		}
 
 		function parseMetaData( data, offset ) {
 
@@ -294,7 +294,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return metaData;
 
-		};
+		}
 
 		function parseString( data, offset, length ) {
 
@@ -310,7 +310,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return text;
 
-		};
+		}
 
 		function parseUChar8( data, offset ) {
 
@@ -318,7 +318,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return charArray[ 0 ];
 
-		};
+		}
 
 		function parseUInt32( data, offset ) {
 
@@ -326,7 +326,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return intArray[ 0 ];
 
-		};
+		}
 
 		function init_vertices( start ) {
 
@@ -348,7 +348,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return nElements * 3 * Float32Array.BYTES_PER_ELEMENT;
 
-		};
+		}
 
 		function init_normals( start ) {
 
@@ -374,7 +374,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return nElements * 3 * Int8Array.BYTES_PER_ELEMENT;
 
-		};
+		}
 
 		function init_uvs( start ) {
 
@@ -399,7 +399,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			return nElements * 2 * Float32Array.BYTES_PER_ELEMENT;
 
-		};
+		}
 
 		function init_uvs3( nElements, offset ) {
 
@@ -430,7 +430,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_uvs4( nElements, offset ) {
 
@@ -471,7 +471,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_faces3_flat( nElements, offsetVertices, offsetMaterials ) {
 
@@ -488,11 +488,11 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				scope.faces.push( new THREE.Face3( a, b, c, null, null, m ) );
+				scope.faces.push( new THREE.Face3( a, b, c ) );
 
 			}
 
-		};
+		}
 
 		function init_faces4_flat( nElements, offsetVertices, offsetMaterials ) {
 
@@ -510,12 +510,12 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 				m = materialIndexBuffer[ i ];
 
-				scope.faces.push( new THREE.Face3( a, b, d, null, null, m ) );
-				scope.faces.push( new THREE.Face3( b, c, d, null, null, m ) );
+				scope.faces.push( new THREE.Face3( a, b, d ) );
+				scope.faces.push( new THREE.Face3( b, c, d ) );
 
 			}
 
-		};
+		}
 
 		function init_faces3_smooth( nElements, offsetVertices, offsetNormals, offsetMaterials ) {
 
@@ -554,11 +554,11 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 					new THREE.Vector3( nax, nay, naz ),
 					new THREE.Vector3( nbx, nby, nbz ),
 					new THREE.Vector3( ncx, ncy, ncz )
-				], null, m ) );
+				] ) );
 
 			}
 
-		};
+		}
 
 		function init_faces4_smooth( nElements, offsetVertices, offsetNormals, offsetMaterials ) {
 
@@ -603,17 +603,17 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 					new THREE.Vector3( nax, nay, naz ),
 					new THREE.Vector3( nbx, nby, nbz ),
 					new THREE.Vector3( ndx, ndy, ndz )
-				], null, m ) );
+				] ) );
 
 				scope.faces.push( new THREE.Face3( b, c, d, [
 					new THREE.Vector3( nbx, nby, nbz ),
 					new THREE.Vector3( ncx, ncy, ncz ),
 					new THREE.Vector3( ndx, ndy, ndz )
-				], null, m ) );
+				] ) );
 
 			}
 
-		};
+		}
 
 		function init_triangles_flat( start ) {
 
@@ -626,7 +626,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_triangles_flat_uv( start ) {
 
@@ -642,7 +642,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_triangles_smooth( start ) {
 
@@ -657,7 +657,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_triangles_smooth_uv( start ) {
 
@@ -674,7 +674,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_quads_flat( start ) {
 
@@ -687,7 +687,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_quads_flat_uv( start ) {
 
@@ -703,7 +703,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_quads_smooth( start ) {
 
@@ -718,7 +718,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 		function init_quads_smooth_uv( start ) {
 
@@ -735,7 +735,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 			}
 
-		};
+		}
 
 	};
 

@@ -69,7 +69,7 @@
 					  camera.lookAt( scene.position );
 					}
 				},
-				{ 
+				{
 					left: 0.5,
 					bottom: 0,
 					width: 0.5,
@@ -84,7 +84,7 @@
 					  camera.lookAt( camera.position.clone().setY( 0 ) );
 					}
 				},
-				{ 
+				{
 					left: 0.5,
 					bottom: 0.5,
 					width: 0.5,
@@ -164,9 +164,9 @@
 				mesh.rotation.x = - Math. PI / 2;
 				scene.add( mesh );
 
-				var faceIndices = [ 'a', 'b', 'c', 'd' ];
+				var faceIndices = [ 'a', 'b', 'c' ];
 
-				var color, f, f2, f3, p, n, vertexIndex,
+				var color, f, f2, f3, p, vertexIndex,
 
 					radius = 200,
 
@@ -180,9 +180,7 @@
 					f2 = geometry2.faces[ i ];
 					f3 = geometry3.faces[ i ];
 
-					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
-
-					for( var j = 0; j < n; j++ ) {
+					for( var j = 0; j < 3; j++ ) {
 
 						vertexIndex = f[ faceIndices[ j ] ];
 

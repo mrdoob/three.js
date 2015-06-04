@@ -30,7 +30,7 @@ THREE.Camera.prototype.getWorldDirection = function () {
 
 		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
-	}
+	};
 
 }();
 

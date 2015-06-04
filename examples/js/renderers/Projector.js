@@ -10,6 +10,7 @@ THREE.RenderableObject = function () {
 
 	this.object = null;
 	this.z = 0;
+	this.renderOrder = 0;
 
 };
 
@@ -33,6 +34,7 @@ THREE.RenderableFace = function () {
 	this.uvs = [ new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() ];
 
 	this.z = 0;
+	this.renderOrder = 0;
 
 };
 
@@ -68,6 +70,7 @@ THREE.RenderableLine = function () {
 	this.material = null;
 
 	this.z = 0;
+	this.renderOrder = 0;
 
 };
 
@@ -87,6 +90,7 @@ THREE.RenderableSprite = function () {
 	this.scale = new THREE.Vector2();
 
 	this.material = null;
+	this.renderOrder = 0;
 
 };
 
@@ -243,6 +247,7 @@ THREE.Projector = function () {
 			_line.v1.copy( v1 );
 			_line.v2.copy( v2 );
 			_line.z = ( v1.positionScreen.z + v2.positionScreen.z ) / 2;
+			_line.renderOrder = object.renderOrder;
 
 			_line.material = object.material;
 
@@ -267,6 +272,7 @@ THREE.Projector = function () {
 				_face.v2.copy( v2 );
 				_face.v3.copy( v3 );
 				_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
+				_face.renderOrder = object.renderOrder;
 
 				for ( var i = 0; i < 3; i ++ ) {
 
@@ -351,6 +357,7 @@ THREE.Projector = function () {
 					_vector3.setFromMatrixPosition( object.matrixWorld );
 					_vector3.applyProjection( _viewProjectionMatrix );
 					_object.z = _vector3.z;
+					_object.renderOrder = object.renderOrder;
 
 					_renderData.objects.push( _object );
 
@@ -468,7 +475,7 @@ THREE.Projector = function () {
 					_normalMatrix.getNormalMatrix( _modelMatrix );
 
 					var material = object.material;
-					
+
 					var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
 					var objectMaterials = isFaceMaterial === true ? object.material : null;
 
@@ -581,6 +588,7 @@ THREE.Projector = function () {
 						_face.material = material;
 
 						_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
+						_face.renderOrder = object.renderOrder;
 
 						_renderData.elements.push( _face );
 
@@ -616,7 +624,7 @@ THREE.Projector = function () {
 
 						} else {
 
-							var step = object.mode === THREE.LinePieces ? 2 : 1;
+							var step = object instanceof THREE.LineSegments ? 2 : 1;
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
@@ -639,8 +647,7 @@ THREE.Projector = function () {
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
-					// Handle LineStrip and LinePieces
-					var step = object.mode === THREE.LinePieces ? 2 : 1;
+					var step = object instanceof THREE.LineSegments ? 2 : 1;
 
 					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
 
@@ -667,6 +674,7 @@ THREE.Projector = function () {
 							_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
 
 							_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
+							_line.renderOrder = object.renderOrder;
 
 							_line.material = object.material;
 
@@ -701,6 +709,7 @@ THREE.Projector = function () {
 					_sprite.x = _vector4.x * invW;
 					_sprite.y = _vector4.y * invW;
 					_sprite.z = _vector4.z;
+					_sprite.renderOrder = object.renderOrder;
 					_sprite.object = object;
 
 					_sprite.rotation = object.rotation;
@@ -786,7 +795,7 @@ THREE.Projector = function () {
 			var line = new THREE.RenderableLine();
 			_linePool.push( line );
 			_linePoolLength ++;
-			_lineCount ++
+			_lineCount ++;
 			return line;
 
 		}
@@ -802,7 +811,7 @@ THREE.Projector = function () {
 			var sprite = new THREE.RenderableSprite();
 			_spritePool.push( sprite );
 			_spritePoolLength ++;
-			_spriteCount ++
+			_spriteCount ++;
 			return sprite;
 
 		}
@@ -815,7 +824,11 @@ THREE.Projector = function () {
 
 	function painterSort( a, b ) {
 
-		if ( a.z !== b.z ) {
+		if ( a.renderOrder !== b.renderOrder) {
+
+			return a.renderOrder - b.renderOrder;
+
+		} else if ( a.z !== b.z ) {
 
 			return b.z - a.z;
 

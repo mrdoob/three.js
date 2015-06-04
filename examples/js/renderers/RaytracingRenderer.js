@@ -302,7 +302,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 					var eta = material.refractionRatio;
 
-					var dotNI = rayDirection.dot( normalVector )
+					var dotNI = rayDirection.dot( normalVector );
 					var k = 1.0 - eta * eta * ( 1.0 - dotNI * dotNI );
 
 					if ( k < 0.0 ) {
@@ -528,7 +528,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 			}
 
-			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld )
+			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
 			var _object = cache[ object.id ];
 
