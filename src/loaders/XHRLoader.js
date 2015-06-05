@@ -65,6 +65,8 @@ THREE.XHRLoader.prototype = {
 
 		scope.manager.itemStart( url );
 
+		return request;
+
 	},
 
 	setResponseType: function ( value ) {
