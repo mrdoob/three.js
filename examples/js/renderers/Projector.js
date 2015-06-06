@@ -274,6 +274,11 @@ THREE.Projector = function () {
 				_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
 				_face.renderOrder = object.renderOrder;
 
+				// use first vertex normal as face normal
+
+				_face.normalModel.fromArray( normals, a * 3 );
+				_face.normalModel.applyMatrix3( normalMatrix ).normalize();
+
 				for ( var i = 0; i < 3; i ++ ) {
 
 					var offset = arguments[ i ] * 3;
