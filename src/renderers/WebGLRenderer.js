@@ -779,7 +779,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object.hasUvs && ! object.__webglUvBuffer ) object.__webglUvBuffer = _gl.createBuffer();
 		if ( object.hasColors && ! object.__webglColorBuffer ) object.__webglColorBuffer = _gl.createBuffer();
 
-		var attributes = program.attributes();
+		var attributes = program.getAttributes();
 
 		if ( object.hasPositions ) {
 
@@ -895,7 +895,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var geometryAttributes = geometry.attributes;
 
-		var programAttributes = program.attributes();
+		var programAttributes = program.getAttributes();
 
 		var materialDefaultAttributeValues = material.defaultAttributeValues;
 
@@ -1997,7 +1997,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.program = program;
 
-		var attributes = program.attributes();
+		var attributes = program.getAttributes();
 
 		if ( material.morphTargets ) {
 
@@ -2033,7 +2033,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniformsList = [];
 
-		var uniformLocations = material.program.uniforms();
+		var uniformLocations = material.program.getUniforms();
 		for ( var u in material.__webglShader.uniforms ) {
 
 			var location = uniformLocations[ u ];
@@ -2082,7 +2082,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var refreshLights = false;
 
 		var program = material.program,
-			p_uniforms = program.uniforms(),
+			p_uniforms = program.getUniforms(),
 			m_uniforms = material.__webglShader.uniforms;
 
 		if ( program.id !== _currentProgram ) {

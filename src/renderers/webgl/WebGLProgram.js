@@ -396,12 +396,12 @@ THREE.WebGLProgram = ( function () {
 
 		var getUniforms = function() { return this._cachedUniforms; };
 
-		this.uniforms = function() {
+		this.getUniforms = function() {
 
 			// fetch, cache, and next time just use a dumb accessor
 			var uniforms = fetchUniformLocations( gl, program );
 			this._cachedUniforms = uniforms;
-			this.uniforms = getUniforms;
+			this.getUniforms = getUniforms;
 			return uniforms;
 
 		};
@@ -411,18 +411,18 @@ THREE.WebGLProgram = ( function () {
 		var getAttributes = function() { return this._cachedAttributes; };
 		var getAttribKeys = function() { return this._cachedAttribKeys; };
 
-		this.attributes = function() {
+		this.getAttributes = function() {
 
 			var attributes = fetchAttributeLocations( gl, program );
 			this._cachedAttributes = attributes;
 			this._cachedAttribKeys = Object.keys( attributes );
-			this.attributes = getAttributes;
-			this.attributesKeys = getAttribKeys;
+			this.getAttributes = getAttributes;
+			this.getAttributesKeys = getAttribKeys;
 			return attributes;
 
 		};
 
-		this.attributesKeys = function() {
+		this.getAttributesKeys = function() {
 
 			this.attributes();
 			return this._cachedAttribKeys;
