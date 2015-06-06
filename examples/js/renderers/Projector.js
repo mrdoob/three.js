@@ -281,16 +281,12 @@ THREE.Projector = function () {
 
 				for ( var i = 0; i < 3; i ++ ) {
 
-					var offset = arguments[ i ] * 3;
 					var normal = _face.vertexNormalsModel[ i ];
-
-					normal.set( normals[ offset ], normals[ offset + 1 ], normals[ offset + 2 ] );
+					normal.fromArray( normals, arguments[ i ] * 3 );
 					normal.applyMatrix3( normalMatrix ).normalize();
 
-					var offset2 = arguments[ i ] * 2;
-
 					var uv = _face.uvs[ i ];
-					uv.set( uvs[ offset2 ], uvs[ offset2 + 1 ] );
+					uv.fromArray( uvs, arguments[ i ] * 2 );
 
 				}
 
