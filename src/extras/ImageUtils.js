@@ -194,10 +194,11 @@ THREE.ImageUtils = {
 
 	},
 
-	generateDataTexture: function ( width, height, color ) {
+	generateDataTexture: function ( width, height, color, alpha ) {
 
+		var n = arguments.length;
 		var size = width * height;
-		var data = new Uint8Array( 3 * size );
+		var data = new Uint8Array( n * size );
 
 		var r = Math.floor( color.r * 255 );
 		var g = Math.floor( color.g * 255 );
@@ -205,13 +206,15 @@ THREE.ImageUtils = {
 
 		for ( var i = 0; i < size; i ++ ) {
 
-			data[ i * 3 ] 	   = r;
-			data[ i * 3 + 1 ] = g;
-			data[ i * 3 + 2 ] = b;
-
+			data[ i * n ] 	  = r;
+			data[ i * n + 1 ] = g;
+			data[ i * n + 2 ] = b;
+			if (n > 3) {
+				data[ i * n + 3 ] = alpha;
+			}
 		}
 
-		var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+		var texture = new THREE.DataTexture( data, width, height, (n == 3) ? THREE.RGBFormat : THREE.RGBAFormat );
 		texture.needsUpdate = true;
 
 		return texture;
