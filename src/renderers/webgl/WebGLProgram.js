@@ -409,23 +409,13 @@ THREE.WebGLProgram = ( function () {
 		// set up caching for attribute keys and locations
 
 		var getAttributes = function() { return this._cachedAttributes; };
-		var getAttribKeys = function() { return this._cachedAttribKeys; };
 
 		this.getAttributes = function() {
 
 			var attributes = fetchAttributeLocations( gl, program );
 			this._cachedAttributes = attributes;
-			this._cachedAttribKeys = Object.keys( attributes );
 			this.getAttributes = getAttributes;
-			this.getAttributesKeys = getAttribKeys;
 			return attributes;
-
-		};
-
-		this.getAttributesKeys = function() {
-
-			this.attributes();
-			return this._cachedAttribKeys;
 
 		};
 
