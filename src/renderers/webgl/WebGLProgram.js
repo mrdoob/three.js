@@ -26,6 +26,7 @@ THREE.WebGLProgram = ( function () {
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
+
 		for ( var i = 0; i < n; i ++ ) {
 
 			var info = gl.getActiveUniform( program , i );
@@ -54,6 +55,7 @@ THREE.WebGLProgram = ( function () {
 		var attributes = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_ATTRIBUTES );
+
 		for ( var i = 0; i < n; i ++ ) {
 
 			var info = gl.getActiveAttrib( program , i );
@@ -439,16 +441,8 @@ THREE.WebGLProgram = ( function () {
 					return this.getAttributes();
 
 				}
-			},
-
-			attributesKeys: {
-				get: function() {
-
-					console.warn( 'THREE.WebGLProgram: .attributesKeys has been removed.' );
-					return Object.keys( this.getAttributes() );
-
-				}
 			}
+
 		});
 
 
