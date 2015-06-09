@@ -5310,7 +5310,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// distance is 0 if decay is 0, because there is no attenuation at all.
 				pointDistances[ pointLength ] = distance;
 
-				if( light.physicalQuadraticFalloff ) {
+				if( light.physicalFalloff ) {
 					// magic value of -1 switches the equation to UE4 physical quadratic falloff.
 					pointDecays[ pointLength ] = -1.0;
 				}
@@ -5350,7 +5350,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotDistances[ spotLength ] = distance;
 
-				if( light.physicalQuadraticFalloff ) {
+				if( light.physicalFalloff ) {
 					// magic value of -1 switches the equation to UE4 physical quadratic falloff.
 					spotDecays[ spotLength ] = -1.0;
 				}

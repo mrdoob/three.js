@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay, physicalQuadraticFalloff ) {
+THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay, physicalFalloff ) {
 
 	THREE.Light.call( this, color );
 
@@ -16,7 +16,7 @@ THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay,
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
 	this.decay = ( decay !== undefined ) ? decay : 1;
-	this.physicalQuadraticFalloff =  ( physicalQuadraticFalloff !== undefined ) ? physicalQuadraticFalloff : false;
+	this.physicalFalloff =  ( physicalFalloff !== undefined ) ? physicalFalloff : false;
 
 	this.castShadow = false;
 	this.onlyShadow = false;
@@ -78,7 +78,7 @@ THREE.SpotLight.prototype.clone = function () {
 	light.shadowMapWidth = this.shadowMapWidth;
 	light.shadowMapHeight = this.shadowMapHeight;
 
-	light.physicalQuadraticFalloff = this.physicalQuadraticFalloff;
+	light.physicalFalloff = this.physicalFalloff;
 
 	return light;
 
