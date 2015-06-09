@@ -102,7 +102,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		gl.enableVertexAttribArray( attributes.uv );
 
 		gl.disable( gl.CULL_FACE );
-		gl.enable( gl.BLEND );
+		renderer.state.enableBlending();
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.vertexAttribPointer( attributes.position, 2, gl.FLOAT, false, 2 * 8, 0 );
