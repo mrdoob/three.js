@@ -74,7 +74,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_gl.disable( _gl.BLEND );
+		_renderer.state.disableBlending();
 
 		_gl.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
@@ -336,7 +336,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_gl.enable( _gl.BLEND );
+		_renderer.state.enableBlending();
 
 		if ( _renderer.shadowMapCullFace === THREE.CullFaceFront ) {
 
