@@ -134,7 +134,7 @@ THREE.DirectGeometry.prototype = {
 
 			var vertexColors = face.vertexColors;
 
-			if ( materialVertexColors === THREE.VertexColors ) {
+			if ( vertexColors.length === 3 ) {
 
 				this.colors.push( vertexColors[ 0 ], vertexColors[ 1 ], vertexColors[ 2 ] );
 
