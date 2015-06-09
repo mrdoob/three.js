@@ -39,9 +39,16 @@
 
 		<h2>Properties</h2>
 
-		<div>
-		Each of the constructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
-		</div>
+		<h3>.parameters</h3>
+ 		<div>
+			<p>Using the above example code above as our basis:</p>
+			<code>
+				geometry.parameters; // outputs an object {width: 1, height: 1, depth: 1, widthSegments: undefined, heightSegments: undefined}
+				cube.geometry.parameters; // as above
+				cube.geometry.parameters.width; // === 1
+				cube.geometry.parameters.widthSegments // === undefined.
+			</code>
+ 		</div>
 
 		<h2>Source</h2>
 
