@@ -136,28 +136,42 @@ THREE.Texture.prototype = {
 
 			}
 
-			if ( meta.images[ this.image.uuid ] === undefined ) {
+			function getDataURL( image ) {
 
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = image.width;
-				canvas.height = image.height;
+				var canvas;
 
-				var context = canvas.getContext( '2d' );
-				context.drawImage( image, 0, 0, image.width, image.height );
+				if ( image.toDataURL !== undefined ) {
 
-				var src;
-
-				if ( image.width > 2048 || image.height > 2048 ) {
-
-					src = canvas.toDataURL( 'image/jpeg', 0.6 );
+					canvas = image;
 
 				} else {
 
-					src = canvas.toDataURL( 'image/png' );
+					canvas = document.createElement( 'canvas' );
+					canvas.width = image.width;
+					canvas.height = image.height;
+
+					canvas.getContext( '2d' ).drawImage( image, 0, 0, image.width, image.height );
 
 				}
 
-				meta.images[ this.image.uuid ] = { uuid: this.image.uuid, url: src };
+				if ( canvas.width > 2048 || canvas.height > 2048 ) {
+
+					return canvas.toDataURL( 'image/jpeg', 0.6 );
+
+				} else {
+
+					return canvas.toDataURL( 'image/png' );
+
+				}
+
+			}
+
+			if ( meta.images[ image.uuid ] === undefined ) {
+
+				meta.images[ image.uuid ] = {
+					uuid: image.uuid,
+					url: getDataURL( image )
+				};
 
 			}
 
