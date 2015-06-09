@@ -66,6 +66,16 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		}
 
 	};
+	
+	this.enableBlending = function(){
+		gl.enable( gl.BLEND );
+		currentBlending = null;
+	};
+	
+	this.disableBlending = function(){
+		gl.disable( gl.BLEND );
+		currentBlending = null;
+	};
 
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
 
