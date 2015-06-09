@@ -10012,14 +10012,11 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
-	fromGeometry: function ( geometry, material ) {
-
-		material = material || { 'vertexColors': THREE.NoColors };
+	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
 		var vertices = geometry.vertices;
 		var faceVertexUvs = geometry.faceVertexUvs;
-		var materialVertexColors = material.vertexColors;
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
@@ -10085,11 +10082,11 @@ THREE.DirectGeometry.prototype = {
 
 			var vertexColors = face.vertexColors;
 
-			if ( materialVertexColors === THREE.VertexColors ) {
+			if ( vertexColors.length === 3 ) {
 
 				this.colors.push( vertexColors[ 0 ], vertexColors[ 1 ], vertexColors[ 2 ] );
 
-			} else if ( materialVertexColors === THREE.FaceColors ) {
+			} else {
 
 				var color = face.color;
 
@@ -10452,9 +10449,9 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromGeometry: function ( geometry, material ) {
+	fromGeometry: function ( geometry ) {
 
-		geometry.__directGeometry = new THREE.DirectGeometry().fromGeometry( geometry, material );
+		geometry.__directGeometry = new THREE.DirectGeometry().fromGeometry( geometry );
 
 		return this.fromDirectGeometry( geometry.__directGeometry );
 
