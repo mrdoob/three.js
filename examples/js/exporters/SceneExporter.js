@@ -243,6 +243,7 @@ THREE.SceneExporter.prototype = {
 				'	"intensity"      : ' + o.intensity + ',',
 				'	"position"       : ' + Vector3String( o.position ) + ',',
 				'	"decay"          : ' + o.decay + ',',
+				'	"physicalFalloff": ' + o.physicalFalloff + ',',
 				'	"distance"       : ' + o.distance + ( o.children.length ? ',' : '' )
 
 				];
@@ -260,6 +261,7 @@ THREE.SceneExporter.prototype = {
 				'	"angle"          : ' + o.angle + ',',
 				'	"exponent"       : ' + o.exponent + ',',
 				'	"decay"          : ' + o.decay + ',',
+				'	"physicalFalloff": ' + o.physicalFalloff + ',',
 				'	"target"         : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
 				];
