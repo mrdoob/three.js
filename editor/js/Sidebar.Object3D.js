@@ -245,13 +245,13 @@ Sidebar.Object3D = function ( editor ) {
 
 	// physical quadratic falloff
 
-	var objectPhysicalQuadraticFalloffRow = new UI.Panel();
-	var objectPhysicalQuadraticFalloff = new UI.Checkbox().onChange( update );
+	var objectPhysicalFalloffRow = new UI.Panel();
+	var objectPhysicalFalloff = new UI.Checkbox().onChange( update );
 
-	objectPhysicalQuadraticFalloffRow.add( new UI.Text( 'Quadratic Physical Falloff' ).setWidth( '90px' ) );
-	objectPhysicalQuadraticFalloffRow.add( objectPhysicalQuadraticFalloff );
+	objectPhysicalFalloffRow.add( new UI.Text( 'Physical Falloff' ).setWidth( '90px' ) );
+	objectPhysicalFalloffRow.add( objectPhysicalFalloff );
 
-	container.add( objectPhysicalQuadraticFalloffRow );
+	container.add( objectPhysicalFalloffRow );
 
 	// visible
 
@@ -437,9 +437,9 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
-			if ( object.physicalQuadraticFalloff !== undefined ) {
+			if ( object.physicalFalloff !== undefined ) {
 
-				object.physicalQuadraticFalloff = objectPhysicalQuadraticFalloff.getValue();
+				object.physicalFalloff = objectPhysicalFalloff.getValue();
 
 			}
 
@@ -629,9 +629,9 @@ Sidebar.Object3D = function ( editor ) {
 
 		}
 
-		if ( object.physicalQuadraticFalloff !== undefined ) {
+		if ( object.physicalFalloff !== undefined ) {
 
-			objectPhysicalQuadraticFalloff.setValue( object.physicalQuadraticFalloff );
+			objectPhysicalFalloff.setValue( object.physicalFalloff );
 
 		}
 
