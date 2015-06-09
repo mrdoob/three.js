@@ -48,7 +48,11 @@ THREE.ColladaLoader = function () {
 		upAxis: 'Y',
 
 		// For reflective or refractive materials we'll use this cubemap
-		defaultEnvMap: null
+		defaultEnvMap: null,
+
+		// If a primitive has multiple texcoords, remove those that are not
+		// referenced in the material
+		removeUnusedUV: false
 
 	};
 
@@ -1110,7 +1114,6 @@ THREE.ColladaLoader = function () {
 		}
 
 		// geometries
-
 		var double_sided_materials = {};
 
 		for ( i = 0; i < node.geometries.length; i ++ ) {
@@ -1138,6 +1141,10 @@ THREE.ColladaLoader = function () {
 
 				if ( instance_materials ) {
 
+					var texture_sets = geometry.mesh.geometry3js.texture_sets;
+					var occupied = new Array( texture_sets.length );
+					var has_input_set = false;
+
 					for ( j = 0; j < instance_materials.length; j ++ ) {
 
 						var instance_material = instance_materials[ j ];
@@ -1145,6 +1152,20 @@ THREE.ColladaLoader = function () {
 						var effect_id = mat.instance_effect.url;
 						var shader = effects[ effect_id ].shader;
 						var material3js = shader.material;
+
+						if ( options.removeUnusedUV ) {
+
+							// find out which input sets are used. marked it as occupied
+							if ( typeof instance_material.bind!="undefined" ) {
+								for ( var k=0; k<texture_sets.length; k++ ) {
+									if ( texture_sets[k]==instance_material.bind ) {
+										occupied[k] = true;
+										has_input_set = true;
+										break;
+									}
+								}
+							}
+						}
 
 						if ( geometry.doubleSided ) {
 
@@ -1167,6 +1188,19 @@ THREE.ColladaLoader = function () {
 						first_material.name = mat.name === null || mat.name === '' ? mat.id : mat.name;
 						num_materials ++;
 
+					}
+
+					if ( options.removeUnusedUV && has_input_set ) {
+
+						// remove face uvs that are not used
+						for ( var k=0; k<occupied.length; ) {
+							if ( !occupied[k] ) {
+								geometry.mesh.geometry3js.faceVertexUvs.splice(k,1);
+								occupied.splice(k,1);
+							} else {
+								k++;
+							}
+						}
 					}
 
 				}
@@ -2671,6 +2705,7 @@ THREE.ColladaLoader = function () {
 
 		this.symbol = "";
 		this.target = "";
+		this.bind = "";
 
 	};
 
@@ -2678,6 +2713,13 @@ THREE.ColladaLoader = function () {
 
 		this.symbol = element.getAttribute('symbol');
 		this.target = element.getAttribute('target').replace(/^#/, '');
+
+		// store the input set binding
+		var binds = element.querySelectorAll('bind_vertex_input');
+		if (binds.length>0) {
+			this.bind = binds[0].getAttribute('input_set');
+		}
+
 		return this;
 
 	};
@@ -3113,6 +3155,9 @@ THREE.ColladaLoader = function () {
 
 		}
 
+		// store it so that we can reference it later when building the
+		//scenegraph
+		geom.texture_sets = texture_sets;
 	};
 
 	function Polygons () {
