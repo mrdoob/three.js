@@ -31,7 +31,7 @@ scene.add( light );</code>
 		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
 		[page:Number distance] -- The distance of the light where the intensity is 0. When distance is 0, then the distance is endless. 
-		[page:Number Decay] -- The rate of exponential decay.  0 is no decay, 1 is linear decay, and 2 is quadratic.
+		[page:Number Decay] -- The rate of exponential decay of the list over distance.  0 is no decay, 1 is linear decay, and 2 is quadratic.
 		[page:Boolean physicalFalloff] -- Whether the decay paramters is ignored and instead true physically-based (inverse quadradic) falloff is used.
 		</div>
 		<div>
@@ -55,14 +55,13 @@ scene.add( light );</code>
 		</div>
 		<h3>[property:Float decay]</h3>
 		<div>
-			The rate of exponential decay.  0 is no decay, 1 is linear decay, and 2 is quadratic.<br />
+			The rate of exponential decay of the light intensity as one gets further away from the light.  0 is no decay, 1 is linear decay, and 2 is quadratic.<br />
 			Default — *0.0*.
 		</div>
-
 		<h3>[property:Boolean physicalFalloff]</h3>
 		<div>
-			Whether the decay paramters is ignored and instead true physically-based (inverse quadradic) falloff is used.<br />
-			Default — *0.0*.
+			Whether the decay paramters is ignored and instead true physically-based (inverse quadradic) falloff is used.  If distance is set, then it falls off within the distance range, otherwise it uses an infinite distance cutoff.  For true physical falloff, the intensity of the light is assumed to be in lumens, and the distance is in meters.<br />
+			Default — *fakse*.
 		</div>
 
 		<h2>Methods</h2>
