@@ -47,17 +47,21 @@ float calcLightAttenuation( float lightDistance, float cutoffDistance, float dec
 	  return pow( saturate( -lightDistance / cutoffDistance + 1.0 ), decayExponent );
 
 	}
-	else if( decayExponent < 0.0 ) {
+	else if ( decayExponent < 0.0 ) {
 
 		// this is based upon UE4 light fall as described on page 11 of:
 		//  https://de45xmedrsdbp.cloudfront.net/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
 		float numerator = 1.0;
-		
+
 		if( cutoffDistance > 0.0 ) {
-			numerator = square( saturate( 1.0 - pow( lightDistance / cutoffDistance, 4.0 ) ) );
+			numerator = ( saturate( 1.0 - pow( lightDistance / cutoffDistance, 4.0 ) ) );
+			numerator *= numerator;
 		} 
 
-		return numerator / ( square( lightDistance ) + 1.0 );
+		return numerator / ( ( lightDistance * lightDistance ) + 1.0 );
+	}
+	else {
+		return 1.0;
 	}
 }
 
