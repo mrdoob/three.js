@@ -27,7 +27,6 @@
 
 		<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a> &amp; alteredq
-		(fonts from <a href="http://typeface.neocracy.org/">typeface.js</a> and <a href="http://en.wikipedia.org/wiki/Droid_%28font%29">Droid</a>)
 		<br/>type to enter new text, drag to spin the text
 		<br/><span class="button" id="color">change color</span>,
 			<span class="button" id="font">change font</span>,
@@ -68,7 +67,6 @@
 		<script src="fonts/droid/droid_sans_bold.typeface.js"></script>
 		<script src="fonts/droid/droid_serif_regular.typeface.js"></script>
 		<script src="fonts/droid/droid_serif_bold.typeface.js"></script>
-
 		<!-- todo async loader for fonts -->
 
 		<script>
@@ -122,8 +120,8 @@
 
 			};
 
-			var reverseFontMap = {};
-			var reverseWeightMap = {};
+			var reverseFontMap = [];
+			var reverseWeightMap = [];
 
 			for ( var i in fontMap ) reverseFontMap[ fontMap[i] ] = i;
 			for ( var i in weightMap ) reverseWeightMap[ weightMap[i] ] = i;
@@ -139,15 +137,10 @@
 
 			var postprocessing = { enabled : false };
 			var glow = 0.9;
+        		var fontIndex = 0;
 
 			init();
 			animate();
-
-			function capitalize( txt ) {
-
-				return txt.substring( 0, 1 ).toUpperCase() + txt.substring( 1 );
-
-			}
 
 			function decimalToHex( d ) {
 
@@ -265,6 +258,10 @@
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 				document.addEventListener( 'keypress', onDocumentKeyPress, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				renderer.domElement.addEventListener( 'drop', onDrop, false );
+			        renderer.domElement.addEventListener("dragover", function (evt) {
+			            evt.preventDefault();
+			        }, false);
 
 				document.getElementById( "color" ).addEventListener( 'click', function() {
 
@@ -277,31 +274,19 @@
 
 				document.getElementById( "font" ).addEventListener( 'click', function() {
 
-					if ( font == "helvetiker" ) {
+					fontIndex ++;
+					if ( fontIndex >= reverseFontMap.length ) {
 
-						font = "optimer";
-
-					} else if ( font == "optimer" ) {
-
-						font = "gentilis";
-
-					} else if ( font == "gentilis" ) {
-
-						font = "droid sans";
-
-					} else if ( font == "droid sans" ) {
-
-						font = "droid serif";
-
-					} else {
-
-						font = "helvetiker";
+						fontIndex = 0;
 
 					}
+
+					font = reverseFontMap[fontIndex];
 
 					refreshText();
 
 				}, false );
+
 
 				document.getElementById( "weight" ).addEventListener( 'click', function() {
 
@@ -397,6 +382,38 @@
 				window.location.hash = link;
 
 			}
+
+			function onDrop( e ) {
+				e.preventDefault();
+
+				var file = e.dataTransfer.files[0],
+				    reader = new FileReader();
+
+				reader.onload = function ( event ) {
+					console.log( event.target );
+					eval( event.target.result );
+
+					var index = 0;
+					for ( f in THREE.FontUtils.faces ) {
+
+						if ( ! fontMap[ f ] ) {
+
+						fontMap[ f ] = reverseFontMap.length;
+						reverseFontMap[ reverseFontMap.length ] = f;
+						font = f;
+
+						}
+					};
+
+					refreshText();
+
+				};
+
+				console.log(file);
+				reader.readAsText(file);
+
+				return false;
+			};
 
 			function onDocumentKeyDown( event ) {
 

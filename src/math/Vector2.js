@@ -78,22 +78,13 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			THREE.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
 
 		this.x += v.x;
 		this.y += v.y;
-
-		return this;
-
-	},
-
-	addVectors: function ( a, b ) {
-
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
 
 		return this;
 
@@ -108,17 +99,35 @@ THREE.Vector2.prototype = {
 
 	},
 
+	addVectors: function ( a, b ) {
+
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+
+		return this;
+
+	},
+
 	sub: function ( v, w ) {
 
 		if ( w !== undefined ) {
 
-			THREE.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
 
 		this.x -= v.x;
 		this.y -= v.y;
+
+		return this;
+
+	},
+
+	subScalar: function ( s ) {
+
+		this.x -= s;
+		this.y -= s;
 
 		return this;
 

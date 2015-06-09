@@ -213,8 +213,8 @@ SPARKS.Emitter.prototype = {
  * Events called by emitter.dispatchEvent()
  *
  */
-SPARKS.EVENT_PARTICLE_CREATED = "created"
-SPARKS.EVENT_PARTICLE_UPDATED = "updated"
+SPARKS.EVENT_PARTICLE_CREATED = "created";
+SPARKS.EVENT_PARTICLE_UPDATED = "updated";
 SPARKS.EVENT_PARTICLE_DEAD = "dead";
 SPARKS.EVENT_LOOP_UPDATED = "loopUpdated";
 
@@ -495,7 +495,7 @@ SPARKS.RandomDrift = function(x,y,z) {
 	}
 
 	this.drift = new THREE.Vector3(x,y,z);
-}
+};
 
 
 SPARKS.RandomDrift.prototype.update = function(emitter, particle, time) {

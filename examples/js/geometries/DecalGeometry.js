@@ -3,13 +3,13 @@ THREE.DecalVertex = function( v, n ) {
 	this.vertex = v;
 	this.normal = n;
 
-}
+};
 
 THREE.DecalVertex.prototype.clone = function() {
 
 	return new THREE.DecalVertex( this.vertex.clone(), this.normal.clone() );
 
-}
+};
 
 THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 
@@ -162,7 +162,7 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 
 		return outVertices;
 
-	}
+	};
 
 	this.pushVertex = function( vertices, id, n ) {
 
@@ -171,7 +171,7 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 		v.applyMatrix4( this.iCubeMatrix );
 		vertices.push( new THREE.DecalVertex( v, n.clone() ) );
 
-	}
+	};
 
 	this.computeDecal = function() {
 
@@ -230,7 +230,7 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 				k, 
 				k + 1, 
 				k + 2
-			) 
+			);
 			f.vertexNormals.push( finalVertices[ k + 0 ].normal );
 			f.vertexNormals.push( finalVertices[ k + 1 ].normal );
 			f.vertexNormals.push( finalVertices[ k + 2 ].normal );
@@ -254,11 +254,11 @@ THREE.DecalGeometry = function( mesh, position, rotation, dimensions, check ) {
 		this.tangentsNeedUpdate = true;
 		this.computeFaceNormals();
 
-	}
+	};
 
 	this.computeDecal();
 
-}
+};
 
 THREE.DecalGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.DecalGeometry.prototype.constructor = THREE.DecalGeometry;

@@ -61,7 +61,7 @@ THREE.Triangle.barycoordFromPoint = function () {
 		var result = optionalTarget || new THREE.Vector3();
 
 		// colinear or singular triangle
-		if ( denom == 0 ) {
+		if ( denom === 0 ) {
 			// arbitrary location outside of triangle?
 			// not sure if this is the best idea, maybe should be returning undefined
 			return result.set( - 2, - 1, - 1 );

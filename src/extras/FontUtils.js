@@ -6,10 +6,6 @@
  *
  * It uses techniques used in:
  *
- * 	typeface.js and canvastext
- * 		For converting fonts and rendering with javascript
- *		http://typeface.neocracy.org
- *
  *	Triangulation ported from AS3
  *		Simple Polygon Triangulation
  *		http://actionsnippet.com/?p=1462
@@ -41,7 +37,7 @@ THREE.FontUtils = {
 
 			throw "The font " + this.face + " with " + this.weight + " weight and " + this.style + " style is missing."
 
-		};
+		}
 
 	},
 
@@ -56,7 +52,7 @@ THREE.FontUtils = {
 		ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
 		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
-		var face = ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
+		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
 		return data;
 
@@ -64,11 +60,9 @@ THREE.FontUtils = {
 
 	drawText: function ( text ) {
 
-		var characterPts = [], allPts = [];
-
 		// RenderText
 
-		var i, p,
+		var i,
 			face = this.getFace(),
 			scale = this.size / face.resolution,
 			offset = 0,
@@ -180,8 +174,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
-							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+							THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 						}
 
 					}
@@ -211,8 +205,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
-							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+							THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 
 						}
 
@@ -235,7 +229,7 @@ THREE.FontUtils = {
 
 THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
-	// Parameters 
+	// Parameters
 
 	parameters = parameters || {};
 
@@ -333,7 +327,7 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 				//throw ( "Warning, unable to triangulate polygon!" );
 				//return null;
 				// Sometimes warning is fine, especially polygons are triangulated in reverse.
-				THREE.warn( 'THREE.FontUtils: Warning, unable to triangulate polygon! in Triangulate.process()' );
+				console.warn( 'THREE.FontUtils: Warning, unable to triangulate polygon! in Triangulate.process()' );
 
 				if ( indices ) return vertIndices;
 				return result;
@@ -432,8 +426,8 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 
 		for ( p = 0; p < n; p ++ ) {
 
-			px = contour[ verts[ p ] ].x
-			py = contour[ verts[ p ] ].y
+			px = contour[ verts[ p ] ].x;
+			py = contour[ verts[ p ] ].y;
 
 			if ( ( ( px === ax ) && ( py === ay ) ) ||
 				 ( ( px === bx ) && ( py === by ) ) ||
@@ -466,5 +460,6 @@ THREE.FontUtils.generateShapes = function ( text, parameters ) {
 } )( THREE.FontUtils );
 
 // To use the typeface.js face files, hook up the API
-self._typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
-THREE.typeface_js = self._typeface_js;
+
+THREE.typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
+if ( typeof self !== 'undefined' ) self._typeface_js = THREE.typeface_js;

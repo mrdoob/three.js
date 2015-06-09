@@ -89,7 +89,7 @@ var Viewport = function ( editor ) {
 
 		raycaster.setFromCamera( mouse, camera );
 
-		if ( object instanceof Array ) {
+		if ( Array.isArray( object ) ) {
 
 			return raycaster.intersectObjects( object );
 

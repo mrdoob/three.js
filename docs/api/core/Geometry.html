@@ -185,6 +185,11 @@
 		Bakes matrix transform directly into vertex coordinates.
 		</div>
 
+		<h3>[method:null center]()</h3>
+		<div>
+		Center the geometry based on the bounding box.
+		</div>
+
 		<h3>[method:null computeFaceNormals]()</h3>
 		<div>
 		Computes face normals.
@@ -227,6 +232,12 @@
 		<div>
 		Checks for duplicate vertices using hashmap.<br />
 		Duplicated vertices are removed and faces' vertices are updated.
+		</div>
+
+		<h3>[method:null normalize]()</h3>
+		<div>
+		Normalize the geometry. <br />
+		Make the geometry centered and has a bounding sphere whose raidus equals to 1.0.
 		</div>
 		
 		<h3>[method:Geometry clone]()</h3>

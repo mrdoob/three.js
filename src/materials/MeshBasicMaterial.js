@@ -7,7 +7,8 @@
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
- *  lightMap: new THREE.Texture( <Image> ),
+ *  aoMap: new THREE.Texture( <Image> ),
+ *  aoMapIntensity: <float>
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -45,7 +46,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	this.map = null;
 
-	this.lightMap = null;
+	this.aoMap = null;
+	this.aoMapIntensity = 1.0;
 
 	this.specularMap = null;
 
@@ -87,7 +89,8 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 
 	material.map = this.map;
 
-	material.lightMap = this.lightMap;
+	material.aoMap = this.aoMap;
+	material.aoMapIntensity = this.aoMapIntensity;
 
 	material.specularMap = this.specularMap;
 

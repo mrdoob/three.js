@@ -176,7 +176,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			_eye.copy( _this.object.position ).sub( _this.target );
 
-			vector.copy( _this.object.up ).setLength( mouseOnBall.y )
+			vector.copy( _this.object.up ).setLength( mouseOnBall.y );
 			vector.add( objectUp.copy( _this.object.up ).cross( _eye ).setLength( mouseOnBall.x ) );
 			vector.add( _eye.setLength( mouseOnBall.z ) );
 

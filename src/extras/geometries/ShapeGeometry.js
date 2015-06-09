@@ -20,7 +20,7 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	this.type = 'ShapeGeometry';
 
-	if ( shapes instanceof Array === false ) shapes = [ shapes ];
+	if ( Array.isArray( shapes ) === false ) shapes = [ shapes ];
 
 	this.addShapeList( shapes, options );
 
@@ -59,7 +59,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	//
 
-	var i, l, hole, s;
+	var i, l, hole;
 
 	var shapesOffset = this.vertices.length;
 	var shapePoints = shape.extractPoints( curveSegments );
@@ -108,7 +108,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var vert, vlen = vertices.length;
 	var face, flen = faces.length;
-	var cont, clen = contour.length;
 
 	for ( i = 0; i < vlen; i ++ ) {
 

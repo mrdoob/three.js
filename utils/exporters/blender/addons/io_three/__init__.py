@@ -36,13 +36,10 @@ logging.basicConfig(
     format='%(levelname)s:THREE:%(message)s',
     level=logging.DEBUG)
 
-SETTINGS_FILE_EXPORT = 'three_settings_export.js'
-
-
 bl_info = {
     'name': "Three.js Format",
-    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks",
-    'version': (1, 3, 1),
+    'author': "repsac, mrdoob, yomotsu, mpk, jpweeks, rkusa, tschw",
+    'version': (1, 4, 0),
     'blender': (2, 7, 3),
     'location': "File > Export",
     'description': "Export Three.js formatted JSON files.",
@@ -52,6 +49,7 @@ bl_info = {
     'tracker_url':  "https://github.com/mrdoob/three.js/issues",
     'category': 'Import-Export'
 }
+
 
 def _geometry_types():
     """The valid geometry types that are supported by Three.js
@@ -257,87 +255,27 @@ class ThreeObject(bpy.types.Panel):
         row = layout.row()
         row.prop(obj, 'THREE_export', text='Export')
 
-def get_settings_fullpath():
-    """
+class ThreeExportSettings(bpy.types.Operator):
+    """Save the current export settings (gets saved in .blend)"""
+    bl_label = "Save Settings"
+    bl_idname = "scene.three_export_settings_set"
 
-    :returns: Full path to the settings file (temp directory)
+    def execute(self, context):
+        cycles = context.scene.cycles
+        cycles.use_samples_final = True
 
-    """
-    return os.path.join(bpy.app.tempdir, SETTINGS_FILE_EXPORT)
+        context.scene[constants.EXPORT_SETTINGS_KEY] = set_settings(context.active_operator.properties)
 
+        self.report({"INFO"}, "Three Export Settings Saved")
 
-def save_settings_export(properties):
-    """Save the current export settings to disk.
+        return {"FINISHED"}
 
-    :param properties:
-    :returns: settings
-    :rtype: dict
-
-    """
-    settings = {
-        constants.VERTICES: properties.option_vertices,
-        constants.FACES: properties.option_faces,
-        constants.NORMALS: properties.option_normals,
-        constants.SKINNING: properties.option_skinning,
-        constants.BONES: properties.option_bones,
-        constants.GEOMETRY_TYPE: properties.option_geometry_type,
-
-        constants.MATERIALS: properties.option_materials,
-        constants.UVS: properties.option_uv_coords,
-        constants.FACE_MATERIALS: properties.option_face_materials,
-        constants.MAPS: properties.option_maps,
-        constants.COLORS: properties.option_colors,
-        constants.MIX_COLORS: properties.option_mix_colors,
-
-        constants.SCALE: properties.option_scale,
-        constants.ENABLE_PRECISION: properties.option_round_off,
-        constants.PRECISION: properties.option_round_value,
-        constants.LOGGING: properties.option_logging,
-        constants.COMPRESSION: properties.option_compression,
-        constants.INDENT: properties.option_indent,
-        constants.COPY_TEXTURES: properties.option_copy_textures,
-        constants.TEXTURE_FOLDER: properties.option_texture_folder,
-
-        constants.SCENE: properties.option_export_scene,
-        #constants.EMBED_GEOMETRY: properties.option_embed_geometry,
-        constants.EMBED_ANIMATION: properties.option_embed_animation,
-        constants.LIGHTS: properties.option_lights,
-        constants.CAMERAS: properties.option_cameras,
-        constants.HIERARCHY: properties.option_hierarchy,
-
-        constants.MORPH_TARGETS: properties.option_animation_morph,
-        constants.ANIMATION: properties.option_animation_skeletal,
-        constants.FRAME_STEP: properties.option_frame_step,
-        constants.FRAME_INDEX_AS_TIME: properties.option_frame_index_as_time,
-        constants.INFLUENCES_PER_VERTEX: properties.option_influences
-    }
-
-    fname = get_settings_fullpath()
-    logging.debug("Saving settings to %s", fname)
-    with open(fname, 'w') as stream:
-        json.dump(settings, stream)
-
-    return settings
-
-
-def restore_settings_export(properties):
-    """Restore the settings (if settings file is found on disk)
-    If not found thend default to paramgers defined in
-    constants.EXPORT_OPTIONS
+def restore_export_settings(properties, settings):
+    """Restore the settings
 
     :param properties:
 
     """
-
-    settings = {}
-
-    fname = get_settings_fullpath()
-    if os.path.exists(fname) and os.access(fname, os.R_OK):
-        logging.debug("Settings cache found %s", fname)
-        with open(fname, 'r') as fs:
-            settings = json.load(fs)
-    else:
-        logging.debug("No settings file found, using defaults.")
 
     ## Geometry {
     properties.option_vertices = settings.get(
@@ -363,9 +301,21 @@ def restore_settings_export(properties):
         constants.INFLUENCES_PER_VERTEX,
         constants.EXPORT_OPTIONS[constants.INFLUENCES_PER_VERTEX])
 
+    properties.option_apply_modifiers = settings.get(
+        constants.APPLY_MODIFIERS,
+        constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS])
+
+    properties.option_extra_vgroups = settings.get(
+        constants.EXTRA_VGROUPS,
+        constants.EXPORT_OPTIONS[constants.EXTRA_VGROUPS])
+
     properties.option_geometry_type = settings.get(
         constants.GEOMETRY_TYPE,
         constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
+
+    properties.option_index_type = settings.get(
+        constants.INDEX_TYPE,
+        constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
     ## }
 
     ## Materials {
@@ -472,6 +422,58 @@ def restore_settings_export(properties):
         constants.EXPORT_OPTIONS[constants.FRAME_INDEX_AS_TIME])
     ## }
 
+def set_settings(properties):
+    """Set the export settings to the correct keys.
+
+    :param properties:
+    :returns: settings
+    :rtype: dict
+
+    """
+    settings = {
+        constants.VERTICES: properties.option_vertices,
+        constants.FACES: properties.option_faces,
+        constants.NORMALS: properties.option_normals,
+        constants.SKINNING: properties.option_skinning,
+        constants.BONES: properties.option_bones,
+        constants.EXTRA_VGROUPS: properties.option_extra_vgroups,
+        constants.APPLY_MODIFIERS: properties.option_apply_modifiers,
+        constants.GEOMETRY_TYPE: properties.option_geometry_type,
+        constants.INDEX_TYPE: properties.option_index_type,
+
+        constants.MATERIALS: properties.option_materials,
+        constants.UVS: properties.option_uv_coords,
+        constants.FACE_MATERIALS: properties.option_face_materials,
+        constants.MAPS: properties.option_maps,
+        constants.COLORS: properties.option_colors,
+        constants.MIX_COLORS: properties.option_mix_colors,
+
+        constants.SCALE: properties.option_scale,
+        constants.ENABLE_PRECISION: properties.option_round_off,
+        constants.PRECISION: properties.option_round_value,
+        constants.LOGGING: properties.option_logging,
+        constants.COMPRESSION: properties.option_compression,
+        constants.INDENT: properties.option_indent,
+        constants.COPY_TEXTURES: properties.option_copy_textures,
+        constants.TEXTURE_FOLDER: properties.option_texture_folder,
+
+        constants.SCENE: properties.option_export_scene,
+        #constants.EMBED_GEOMETRY: properties.option_embed_geometry,
+        constants.EMBED_ANIMATION: properties.option_embed_animation,
+        constants.LIGHTS: properties.option_lights,
+        constants.CAMERAS: properties.option_cameras,
+        constants.HIERARCHY: properties.option_hierarchy,
+
+        constants.MORPH_TARGETS: properties.option_animation_morph,
+        constants.ANIMATION: properties.option_animation_skeletal,
+        constants.FRAME_STEP: properties.option_frame_step,
+        constants.FRAME_INDEX_AS_TIME: properties.option_frame_index_as_time,
+        constants.INFLUENCES_PER_VERTEX: properties.option_influences
+    }
+
+    return settings
+
+
 def compression_types():
     """Supported compression formats
 
@@ -488,6 +490,7 @@ def compression_types():
         pass
 
     return types
+
 
 def animation_options():
     """The supported skeletal animation types
@@ -508,6 +511,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
     bl_idname = 'export.three'
     bl_label = 'Export THREE'
+    bl_options = {'PRESET'}
 
     filename_ext = constants.EXTENSION
 
@@ -566,6 +570,28 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         description="Export bones",
         default=constants.EXPORT_OPTIONS[constants.BONES])
 
+    option_extra_vgroups = StringProperty(
+        name="Extra Vertex Groups",
+        description="Non-skinning vertex groups to export (comma-separated, w/ star wildcard, BufferGeometry only).",
+        default=constants.EXPORT_OPTIONS[constants.EXTRA_VGROUPS])
+
+    option_apply_modifiers = BoolProperty(
+        name="Apply Modifiers",
+        description="Apply Modifiers to mesh objects",
+        default=constants.EXPORT_OPTIONS[constants.APPLY_MODIFIERS]
+    )
+
+    index_buffer_types = [
+        (constants.NONE,) * 3,
+        (constants.UINT_16,) * 3,
+        (constants.UINT_32,) * 3]
+
+    option_index_type = EnumProperty(
+        name="Index Buffer",
+        description="Index buffer type that will be used for BufferGeometry objects.",
+        items=index_buffer_types,
+        default=constants.EXPORT_OPTIONS[constants.INDEX_TYPE])
+
     option_scale = FloatProperty(
         name="Scale",
         description="Scale vertices",
@@ -604,7 +630,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         name="Type",
         description="Geometry type",
         items=_geometry_types()[1:],
-        default=constants.GEOMETRY)
+        default=constants.EXPORT_OPTIONS[constants.GEOMETRY_TYPE])
 
     option_export_scene = BoolProperty(
         name="Scene",
@@ -692,7 +718,17 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         default=2)
 
     def invoke(self, context, event):
-        restore_settings_export(self.properties)
+        settings = context.scene.get(constants.EXPORT_SETTINGS_KEY)
+        if settings:
+            try:
+                restore_export_settings(self.properties, settings)
+            except AttributeError as e:
+                logging.error("Loading export settings failed:")
+                logging.exception(e)
+                logging.debug("Removed corrupted settings")
+
+                del context.scene[constants.EXPORT_SETTINGS_KEY]
+
         return ExportHelper.invoke(self, context, event)
 
     @classmethod
@@ -713,7 +749,7 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         if not self.properties.filepath:
             raise Exception("filename not set")
 
-        settings = save_settings_export(self.properties)
+        settings = set_settings(self.properties)
         settings['addon_version'] = bl_info['version']
 
         filepath = self.filepath
@@ -753,8 +789,16 @@ class ExportThree(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, 'option_skinning')
 
         row = layout.row()
+        row.prop(self.properties, 'option_extra_vgroups')
+
+        row = layout.row()
+        row.prop(self.properties, 'option_apply_modifiers')
+
+        row = layout.row()
         row.prop(self.properties, 'option_geometry_type')
 
+        row = layout.row()
+        row.prop(self.properties, 'option_index_type')
         ## }
 
         layout.separator()
@@ -863,6 +907,15 @@ class ExportThree(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, 'option_indent')
+        ## }
+
+        ## Operators {
+        has_settings = context.scene.get(constants.EXPORT_SETTINGS_KEY, False)
+        row = layout.row()
+        row.operator(
+            ThreeExportSettings.bl_idname,
+            ThreeExportSettings.bl_label,
+            icon="%s" % "PINNED" if has_settings else "UNPINNED")
         ## }
 
 

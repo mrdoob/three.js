@@ -138,7 +138,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-	}
+	};
 
 	// WebGLRenderer compatibility
 
@@ -155,7 +155,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setPixelRatio = function ( value ) {
 
-		pixelRatio = value;
+		if ( value !== undefined ) pixelRatio = value;
 
 	};
 
@@ -177,7 +177,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf ),
+		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf );
 		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );

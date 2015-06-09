@@ -387,7 +387,7 @@ THREE.NormalDisplacementShader = {
 
 		"	#ifdef METAL",
 
-		"		outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor * diffuse + totalSpecularLight );",
+		"		outgoingLight += diffuseColor.xyz * ( totalDiffuseLight + ambientLightColor + totalSpecularLight );",
 
 		"	#else",
 
@@ -399,13 +399,15 @@ THREE.NormalDisplacementShader = {
 
 		"		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
+		"		vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );",
+
 		"		#ifdef ENVMAP_MODE_REFLECTION",
 
-		"			vec3 vReflect = reflect( cameraToVertex, normal );",
+		"			vec3 vReflect = reflect( cameraToVertex, worldNormal );",
 
 		"		#else",
 
-		"			vec3 vReflect = refract( cameraToVertex, normal, refractionRatio );",
+		"			vec3 vReflect = refract( cameraToVertex, worldNormal, refractionRatio );",
 
 		"		#endif",
 
@@ -417,7 +419,7 @@ THREE.NormalDisplacementShader = {
 
 		"		#endif",
 
-		"		outgoingLight = mix( outgoingLight.xyz, cubeColor.xyz, specularTex.r * reflectivity );",
+		"		outgoingLight = mix( outgoingLight, cubeColor.xyz, specularTex.r * reflectivity );",
 
 		"	}",
 

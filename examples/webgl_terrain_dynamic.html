@@ -314,7 +314,7 @@
 				var normalShader = THREE.NormalMapShader;
 
 				var rx = 256, ry = 256;
-				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
 				heightMap  = new THREE.WebGLRenderTarget( rx, ry, pars );
 				heightMap.generateMipmaps = false;
@@ -588,7 +588,7 @@
 
 				}
 
-			};
+			}
 
 			//
 
@@ -606,14 +606,14 @@
 
 				var sceneTmp = new THREE.Scene();
 
-				var meshTmp = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
+				var meshTmp = new THREE.Mesh( new THREE.PlaneBufferGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
 				meshTmp.position.z = -500;
 
 				sceneTmp.add( meshTmp );
 
 				renderer.render( sceneTmp, cameraOrtho, target, true );
 
-			};
+			}
 
 			//
 

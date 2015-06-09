@@ -110,6 +110,7 @@ var list = {
 			[ "Bone", "api/objects/Bone" ],
 			[ "LensFlare", "api/objects/LensFlare" ],
 			[ "Line", "api/objects/Line" ],
+			[ "LineSegments", "api/objects/LineSegments" ],
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
@@ -150,6 +151,7 @@ var list = {
 		],
 
 		"Textures": [
+			[ "CubeTexture", "api/textures/CubeTexture" ],
 			[ "CompressedTexture", "api/textures/CompressedTexture" ],
 			[ "DataTexture", "api/textures/DataTexture" ],
 			[ "Texture", "api/textures/Texture" ]
@@ -165,8 +167,7 @@ var list = {
 		"Extras / Animation": [
 			[ "Animation", "api/extras/animation/Animation" ],
 			[ "AnimationHandler", "api/extras/animation/AnimationHandler" ],
-			[ "KeyFrameAnimation", "api/extras/animation/KeyFrameAnimation" ],
-			[ "AnimationMorphTarget", "api/extras/animation/AnimationMorphTarget" ]
+			[ "KeyFrameAnimation", "api/extras/animation/KeyFrameAnimation" ]
 		],
 
 		"Extras / Core": [

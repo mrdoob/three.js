@@ -45,7 +45,7 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 		this.lineTo( vectors[ v ].x, vectors[ v ].y );
 
-	};
+	}
 
 };
 
@@ -376,7 +376,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			//console.log(points);
 
 			break;
-		  
+
 		case THREE.PathActions.ELLIPSE:
 
 			var aX = args[ 0 ], aY = args[ 1 ],
@@ -464,9 +464,9 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			args = item.args;
 			action = item.action;
 
-			if ( action == THREE.PathActions.MOVE_TO ) {
+			if ( action === THREE.PathActions.MOVE_TO ) {
 
-				if ( lastPath.actions.length != 0 ) {
+				if ( lastPath.actions.length !== 0 ) {
 
 					subPaths.push( lastPath );
 					lastPath = new THREE.Path();
@@ -479,7 +479,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 		}
 
-		if ( lastPath.actions.length != 0 ) {
+		if ( lastPath.actions.length !== 0 ) {
 
 			subPaths.push( lastPath );
 
@@ -508,7 +508,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 		//console.log("shape", shapes);
 
 		return shapes;
-	};
+	}
 
 	function isPointInsidePolygon( inPt, inPolygon ) {
 		var EPSILON = 0.0000000001;
@@ -534,17 +534,17 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 				}
 				if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
 
-				if ( inPt.y == edgeLowPt.y ) {
-					if ( inPt.x == edgeLowPt.x )		return	true;		// inPt is on contour ?
+				if ( inPt.y === edgeLowPt.y ) {
+					if ( inPt.x === edgeLowPt.x )		return	true;		// inPt is on contour ?
 					// continue;				// no intersection or edgeLowPt => doesn't count !!!
 				} else {
 					var perpEdge = edgeDy * (inPt.x - edgeLowPt.x) - edgeDx * (inPt.y - edgeLowPt.y);
-					if ( perpEdge == 0 )				return	true;		// inPt is on contour ?
+					if ( perpEdge === 0 )				return	true;		// inPt is on contour ?
 					if ( perpEdge < 0 ) 				continue;
 					inside = ! inside;		// true intersection left of inPt
 				}
 			} else {		// parallel or colinear
-				if ( inPt.y != edgeLowPt.y ) 		continue;			// parallel
+				if ( inPt.y !== edgeLowPt.y ) 		continue;			// parallel
 				// egde lies on the same horizontal line as inPt
 				if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
 					 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
@@ -557,14 +557,14 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 
 	var subPaths = extractSubpaths( this.actions );
-	if ( subPaths.length == 0 ) return [];
+	if ( subPaths.length === 0 ) return [];
 
 	if ( noHoles === true )	return	toShapesNoHoles( subPaths );
 
 
 	var solid, tmpPath, tmpShape, shapes = [];
 
-	if ( subPaths.length == 1) {
+	if ( subPaths.length === 1) {
 
 		tmpPath = subPaths[0];
 		tmpShape = new THREE.Shape();
@@ -579,7 +579,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 	holesFirst = isCCW ? ! holesFirst : holesFirst;
 
 	// console.log("Holes first", holesFirst);
-	
+
 	var betterShapeHoles = [];
 	var newShapes = [];
 	var newShapeHoles = [];
@@ -605,7 +605,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			newShapes[mainIdx] = { s: new THREE.Shape(), p: tmpPoints };
 			newShapes[mainIdx].s.actions = tmpPath.actions;
 			newShapes[mainIdx].s.curves = tmpPath.curves;
-			
+
 			if ( holesFirst )	mainIdx ++;
 			newShapeHoles[mainIdx] = [];
 
@@ -633,14 +633,13 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 			betterShapeHoles[sIdx] = [];
 		}
 		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
-			var sh = newShapes[sIdx];
 			var sho = newShapeHoles[sIdx];
 			for (var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 				var ho = sho[hIdx];
 				var hole_unassigned = true;
 				for (var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
 					if ( isPointInsidePolygon( ho.p, newShapes[s2Idx].p ) ) {
-						if ( sIdx != s2Idx )		toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
+						if ( sIdx !== s2Idx )	toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
 						if ( hole_unassigned ) {
 							hole_unassigned = false;
 							betterShapeHoles[s2Idx].push( ho );

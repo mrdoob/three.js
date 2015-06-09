@@ -87,7 +87,7 @@
 
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2, transparent: true } );
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				//

@@ -3,6 +3,7 @@
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author elephantatwork / www.elephantatwork.ch
  */
 
 THREE.Object3D = function () {
@@ -18,8 +19,6 @@ THREE.Object3D = function () {
 	this.children = [];
 
 	this.up = THREE.Object3D.DefaultUp.clone();
-
-	var scope = this;
 
 	var position = new THREE.Vector3();
 	var rotation = new THREE.Euler();
@@ -53,7 +52,7 @@ THREE.Object3D = function () {
 		scale: {
 			enumerable: true,
 			value: scale
-		},
+		}
 	} );
 
 	this.rotationAutoUpdate = true;
@@ -84,7 +83,7 @@ THREE.Object3D.prototype = {
 
 	get eulerOrder () {
 
-		THREE.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		return this.rotation.order;
 
@@ -92,7 +91,7 @@ THREE.Object3D.prototype = {
 
 	set eulerOrder ( value ) {
 
-		THREE.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		this.rotation.order = value;
 
@@ -100,13 +99,13 @@ THREE.Object3D.prototype = {
 
 	get useQuaternion () {
 
-		THREE.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
 	set useQuaternion ( value ) {
 
-		THREE.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
@@ -224,7 +223,7 @@ THREE.Object3D.prototype = {
 
 	translate: function ( distance, axis ) {
 
-		THREE.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
+		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
 		return this.translateOnAxis( axis, distance );
 
 	},
@@ -311,11 +310,11 @@ THREE.Object3D.prototype = {
 
 			return this;
 
-		};
+		}
 
 		if ( object === this ) {
 
-			THREE.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
+			console.error( "THREE.Object3D.add: object can't be added as a child of itself.", object );
 			return this;
 
 		}
@@ -335,7 +334,7 @@ THREE.Object3D.prototype = {
 
 		} else {
 
-			THREE.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
+			console.error( "THREE.Object3D.add: object not an instance of THREE.Object3D.", object );
 
 		}
 
@@ -353,7 +352,7 @@ THREE.Object3D.prototype = {
 
 			}
 
-		};
+		}
 
 		var index = this.children.indexOf( object );
 
@@ -371,7 +370,7 @@ THREE.Object3D.prototype = {
 
 	getChildByName: function ( name ) {
 
-		THREE.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
+		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name );
 
 	},
@@ -569,165 +568,88 @@ THREE.Object3D.prototype = {
 
 	},
 
-	toJSON: function () {
+	toJSON: function ( meta ) {
 
-		var output = {
-			metadata: {
-				version: 4.3,
+		var isRootObject = ( meta === undefined );
+
+		var data = {};
+
+		// meta is a hash used to collect geometries, materials.
+		// not providing it implies that this is the root object
+		// being serialized.
+		if ( isRootObject ) {
+
+			// initialize meta obj
+			meta = {
+				geometries: {},
+				materials: {},
+				textures: {},
+				images: {}
+			};
+
+			data.metadata = {
+				version: 4.4,
 				type: 'Object',
-				generator: 'ObjectExporter'
-			}
-		};
-
-		//
-
-		var geometries = {};
-
-		var parseGeometry = function ( geometry ) {
-
-			if ( output.geometries === undefined ) {
-
-				output.geometries = [];
-
-			}
-
-			if ( geometries[ geometry.uuid ] === undefined ) {
-
-				var json = geometry.toJSON();
-
-				delete json.metadata;
-
-				geometries[ geometry.uuid ] = json;
-
-				output.geometries.push( json );
-
-			}
-
-			return geometry.uuid;
-
-		};
-
-		//
-
-		var materials = {};
-
-		var parseMaterial = function ( material ) {
-
-			if ( output.materials === undefined ) {
-
-				output.materials = [];
-
-			}
-
-			if ( materials[ material.uuid ] === undefined ) {
-
-				var json = material.toJSON();
-
-				delete json.metadata;
-
-				materials[ material.uuid ] = json;
-
-				output.materials.push( json );
-
-			}
-
-			return material.uuid;
-
-		};
-
-		//
-
-		var parseObject = function ( object ) {
-
-			var data = {};
-
-			data.uuid = object.uuid;
-			data.type = object.type;
-
-			if ( object.name !== '' ) data.name = object.name;
-			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
-			if ( object.visible !== true ) data.visible = object.visible;
-
-			if ( object instanceof THREE.PerspectiveCamera ) {
-
-				data.fov = object.fov;
-				data.aspect = object.aspect;
-				data.near = object.near;
-				data.far = object.far;
-
-			} else if ( object instanceof THREE.OrthographicCamera ) {
-
-				data.left = object.left;
-				data.right = object.right;
-				data.top = object.top;
-				data.bottom = object.bottom;
-				data.near = object.near;
-				data.far = object.far;
-
-			} else if ( object instanceof THREE.AmbientLight ) {
-
-				data.color = object.color.getHex();
-
-			} else if ( object instanceof THREE.DirectionalLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-
-			} else if ( object instanceof THREE.PointLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.distance = object.distance;
-				data.decay = object.decay;
-
-			} else if ( object instanceof THREE.SpotLight ) {
-
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.distance = object.distance;
-				data.angle = object.angle;
-				data.exponent = object.exponent;
-				data.decay = object.decay;
-
-			} else if ( object instanceof THREE.HemisphereLight ) {
-
-				data.color = object.color.getHex();
-				data.groundColor = object.groundColor.getHex();
-
-			} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
-
-				data.geometry = parseGeometry( object.geometry );
-				data.material = parseMaterial( object.material );
-
-				if ( object instanceof THREE.Line ) data.mode = object.mode;
-
-			} else if ( object instanceof THREE.Sprite ) {
-
-				data.material = parseMaterial( object.material );
-
-			}
-
-			data.matrix = object.matrix.toArray();
-
-			if ( object.children.length > 0 ) {
-
-				data.children = [];
-
-				for ( var i = 0; i < object.children.length; i ++ ) {
-
-					data.children.push( parseObject( object.children[ i ] ) );
-
-				}
-
-			}
-
-			return data;
+				generator: 'Object3D.toJSON'
+			};
 
 		}
 
-		output.object = parseObject( this );
+		// standard Object3D serialization
+
+		data.uuid = this.uuid;
+		data.type = this.type;
+
+		if ( this.name !== '' ) data.name = this.name;
+		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
+		if ( this.visible !== true ) data.visible = this.visible;
+
+		data.matrix = this.matrix.toArray();
+
+		if ( this.children.length > 0 ) {
+
+			data.children = [];
+
+			for ( var i = 0; i < this.children.length; i ++ ) {
+
+				data.children.push( this.children[ i ].toJSON( meta ).object );
+
+			}
+
+		}
+
+		var output = {};
+
+		if ( isRootObject ) {
+
+			var geometries = extractFromCache( meta.geometries );
+			var materials = extractFromCache( meta.materials );
+			var textures = extractFromCache( meta.textures );
+			var images = extractFromCache( meta.images );
+
+			if ( geometries.length > 0 ) output.geometries = geometries;
+			if ( materials.length > 0 ) output.materials = materials;
+			if ( textures.length > 0 ) output.textures = textures;
+			if ( images.length > 0 ) output.images = images;
+
+		}
+
+		output.object = data;
 
 		return output;
+
+		// extract data from the cache hash
+		// remove metadata on each item
+		// and return as array
+		function extractFromCache ( cache ) {
+			var values = [];
+			for ( var key in cache ) {
+				var data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+			}
+			return values;
+		}
 
 	},
 
@@ -758,6 +680,7 @@ THREE.Object3D.prototype = {
 		object.receiveShadow = this.receiveShadow;
 
 		object.frustumCulled = this.frustumCulled;
+		object.renderOrder = this.renderOrder;
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 

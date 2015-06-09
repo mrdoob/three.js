@@ -176,5 +176,5 @@ THREE.PDBLoader.prototype = {
 
 	}
 
-}
+};
 

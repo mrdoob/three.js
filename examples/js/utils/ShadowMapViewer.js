@@ -154,7 +154,7 @@ THREE.ShadowMapViewer = function ( light ) {
 
 			userAutoClearSetting = renderer.autoClear;
 			renderer.autoClear = false; // To allow render overlay
-			renderer.clearDepth()
+			renderer.clearDepth();
 			renderer.render( scene, camera );
 			renderer.autoClear = userAutoClearSetting;	//Restore user's setting
 
@@ -185,6 +185,6 @@ THREE.ShadowMapViewer = function ( light ) {
 	//Force an update to set position/size
 	this.update();
 
-}
+};
 
 THREE.ShadowMapViewer.prototype.constructor = THREE.ShadowMapViewer;
