@@ -94,6 +94,7 @@ THREE.SpotLight.prototype.toJSON = function ( meta ) {
 	data.object.angle = this.angle;
 	data.object.exponent = this.exponent;
 	data.object.decay = this.decay;
+	data.object.physicalFalloff = this.physicalFalloff;
 
 	return data;
 

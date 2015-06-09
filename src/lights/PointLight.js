@@ -41,6 +41,7 @@ THREE.PointLight.prototype.toJSON = function ( meta ) {
 	data.object.intensity = this.intensity;
 	data.object.distance = this.distance;
 	data.object.decay = this.decay;
+	data.object.physicalFalloff = this.physicalFalloff;
 
 	return data;
 
