@@ -61,14 +61,11 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
-	fromGeometry: function ( geometry, material ) {
-
-		material = material || { 'vertexColors': THREE.NoColors };
+	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
 		var vertices = geometry.vertices;
 		var faceVertexUvs = geometry.faceVertexUvs;
-		var materialVertexColors = material.vertexColors;
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
@@ -138,7 +135,7 @@ THREE.DirectGeometry.prototype = {
 
 				this.colors.push( vertexColors[ 0 ], vertexColors[ 1 ], vertexColors[ 2 ] );
 
-			} else if ( materialVertexColors === THREE.FaceColors ) {
+			} else {
 
 				var color = face.color;
 
