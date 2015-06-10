@@ -16,7 +16,14 @@
  		Use this only if you do not wish to manage
  		both an Orthographic and Perspective Camera</div>
 
-
+		<h2>Examples</h2>
+		
+		<div>[example:canvas_camera_orthographic2 camera / orthographic2 ]</div>
+		
+		<code>//Create combined camera
+		camera = new THREE.CombinedCamera( window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000 );
+		</code>
+		
 		<h2>Constructor</h2>
 
 
@@ -79,6 +86,11 @@
 		Gets camera frustum far plane.
 		</div> 
 
+		<h3>[property:Matrix4 projectionMatrix]</h3>
+		<div>
+		This is the matrix which contains the projection.
+		</div>
+		
 		<h3>[property:OrthographicCamera cameraO]</h3>
 		<div>
 		Gets or sets the internal OrthographicCamera used as camera.
@@ -182,6 +194,6 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/cameras/CombinedCamera.js examples/cameras/CombinedCamera.js]
 	</body>
 </html>

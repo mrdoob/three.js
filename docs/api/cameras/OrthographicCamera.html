@@ -15,7 +15,21 @@
 
 
 		<h2>Example</h2>
-
+		
+		<div>[example:canvas_camera_orthographic camera / orthographic ]</div>
+		<div>[example:canvas_camera_orthographic2 camera / orthographic2 ]</div>
+		<div>[example:webgl_camera camera ]</div>
+		<div>[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]</div>
+		<div>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</div>
+		<div>[example:webgl_materials_normaldisplacementmap materials / normaldisplacementmap ]</div>
+		<div>[example:webgl_postprocessing_advanced postprocessing / advanced ]</div>
+		<div>[example:webgl_postprocessing_dof2 postprocessing / dof2 ]</div>
+		<div>[example:webgl_postprocessing_godrays postprocessing / godrays ]</div>
+		<div>[example:webgl_rtt rtt ]</div>
+		<div>[example:webgl_shaders_tonemapping shaders / tonemapping ]</div>
+		<div>[example:webgl_shadowmap shadowmap ]</div>
+		<div>[example:webgl_terrain_dynamic terrain / dynamic ]</div>
+		
 		<code>var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
 scene.add( camera );</code>
 
@@ -36,6 +50,9 @@ scene.add( camera );</code>
 
 		<h2>Properties</h2>
 
+		<h3>[property:number zoom]</h3>
+		<div>Gets or sets the zoom factor of the camera. </div>
+		
 		<h3>[property:Float left]</h3>
 		<div>Camera frustum left plane.</div>
 
@@ -60,6 +77,18 @@ scene.add( camera );</code>
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<div>
 		Updates the camera projection matrix. Must be called after change of parameters.
+		</div>
+		
+		<h3>[method:OrthographicCamera clone]()</h3>
+		<div>
+		<br />
+		It returns a clone of OrthographicCamera.
+		</div>
+
+		
+		<h3>[method:JSON toJSON]()</h3>
+		<div>
+		Return camera data in JSON format.
 		</div>
 
 
