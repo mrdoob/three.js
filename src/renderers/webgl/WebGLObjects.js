@@ -160,9 +160,11 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			if ( material.program !== undefined ) {
 
-				if ( material.program.uniforms.morphTargetInfluences !== null ) {
+				var uniforms = material.program.getUniforms();
 
-					gl.uniform1fv( material.program.uniforms.morphTargetInfluences, morphInfluences );
+				if ( uniforms.morphTargetInfluences !== null ) {
+
+					gl.uniform1fv( uniforms.morphTargetInfluences, morphInfluences );
 
 				}
 
