@@ -11,20 +11,53 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">An 3d object that has bones data. These Bones can then be used to animate the vertices of the object.</div>
+		<div class="desc">A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.</div>
 
+		<h2>Example</h2>
+		
+		<iframe src='../../scenes/bones-browser.html'></iframe>
+		
+		<code>
+		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+		
+		//Create the skin indices and skin weights
+		for( var i=0; i < geometry.vertices.length; i++ ) {
+			
+			// Imaginary functions to calculate the indices and weights
+			var skinIndex = calculateSkinIndex( geometry.vertices, i );
+			var skinWeight = calculateSkinWeight( geometry.vertices, i );
+			
+			// Ease between each bone
+			geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex+1, 0, 0 ) );
+			geometry.skinWeights.push( new THREE.Vector4( 1-skinWeight, skinWeight, 0, 0 ) );		
+			
+		}
+		
+		var mesh = THREE.SkinnedMesh( geometry, material );
+		
+		// See example from THREE.Skeleton for the armSkeleton
+		mesh.bind( armSkeleton );
+		
+		// Add the root bone, then recalculate the skeleton inverses
+		mesh.add( armSkeleton.bones[0] );
+		mesh.updateMatrixWorld( true ); // ensure the bones matrices are already recomputed
+		skeleton.calculateInverses();
+		
+		// Move the bones and manipulate the model
+		armSkeleton.bones[0].rotation.x = -0.1;
+		armSkeleton.bones[1].rotation.x = 0.2;
+		
+		</code>
+		
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]([page:Geometry geometry], [page:Material material], [page:boolean useVertexTexture])</h3>
 		<div>
-                geometry — An instance of [page:Geometry].<br />
-                material — An instance of [page:Material] (optional).<br />
-		useVertexTexture -- Defines wether a vertex texture can be used (optional).
-		</div>
-		<div>
-		This Creates a new instance of skinnedMesh.
+        geometry —- An instance of [page:Geometry]. [page:Geometry.skinIndices] and [page:Geometry.skinWeights] should be set.<br />
+        material —- An instance of [page:Material] (optional).<br />
+		useVertexTexture -- Defines whether a vertex texture can be used (optional).
 		</div>
 
 

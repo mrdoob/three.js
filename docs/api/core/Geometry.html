@@ -102,12 +102,29 @@
 
 		<h3>[property:Array skinWeights]</h3>
 		<div>
-		Array of skinning weights, matching number and order of vertices.
+		Array of [page:Vector4 Vector4s] representing the skinning weights as used in a [page:SkinnedMesh],
+		The weights match the number and order of vertices in the geometry. The weighted values
+		are typically between the values of 0 and 1 and affect the amount that the individuals bones affect
+		a given vertex.
 		</div>
 
 		<h3>[property:Array skinIndices]</h3>
 		<div>
-		Array of skinning indices, matching number and order of vertices.
+		Array of [page:Vector4 Vector4s] representing the indices of individual bones in the [page:Skeleton.bones] array,
+		The indices match the number and order of vertices in the geometry.
+		<code>
+		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 0 );
+		geometry.skinWeights[15] = new THREE.Vector4( 0.2, 0.5, 0.3, 0 );
+		
+		// corresponds with the following vertex
+		geometry.vertices[15]
+		
+		// these bones will be used like so:
+		skeleton.bones[0]; // weight of 0.2
+		skeleton.bones[5]; // weight of 0.5
+		skeleton.bones[9]; // weight of 0.3
+		skeleton.bones[0]; // weight of 0
+		</code>
 		</div>
 
 		<h3>[property:Object boundingBox]</h3>
