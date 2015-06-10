@@ -15,7 +15,15 @@
 
 
 		<h2>Example</h2>
-
+		
+		<div>[example:canvas_effects_stereo effects / stereo ]</div>
+		<div>[example:canvas_geometry_birds geometry / birds ]</div>
+		<div>[example:canvas_geometry_cube geometry / cube ]</div>
+		<div>[example:webgl_animation_skinning_blending animation / skinning / blending ]</div>
+		<div>[example:webgl_animation_skinning_morph animation / skinning / blending ]</div>
+		<div>[example:webgl_interactive_cubes interactive / cubes ]</div>
+		<div>[example:webgl_loader_collada_skinning loader / collada / skinning ]</div>
+		
 		<code>var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
 scene.add( camera );</code>
 
@@ -33,6 +41,9 @@ scene.add( camera );</code>
 
 		<h2>Properties</h2>
 
+		<h3>[property:number zoom]</h3>
+		<div>Gets or sets the zoom factor of the camera. </div>
+		
 		<h3>[property:Float fov]</h3>
 		<div>Camera frustum vertical field of view, from bottom to top of view, in degrees.</div>
 
@@ -110,7 +121,17 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 		<div>
 		Updates the camera projection matrix. Must be called after change of parameters.
 		</div>
-
+		
+		<h3>[method:PerspectiveCamera clone]()</h3>
+		<div>
+		<br />
+		It returns a clone of PerspectiveCamera.
+		</div>
+		
+		<h3>[method:JSON toJSON]()</h3>
+		<div>
+		Return camera data in JSON format.
+		</div>
 
 		<h2>Source</h2>
 
