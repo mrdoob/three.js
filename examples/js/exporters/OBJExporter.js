@@ -136,7 +136,9 @@ THREE.OBJExporter.prototype = {
 		};
 
 		object.traverse( function ( child ) {
+
 			if ( child instanceof THREE.Mesh ) parseMesh( child );
+
 		} );
 
 		return output;

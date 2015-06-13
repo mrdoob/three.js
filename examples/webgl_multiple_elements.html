@@ -30,11 +30,10 @@
 				position: absolute;
 				top: 0px; width: 100%;
 				z-index: 1;
-				padding: 2em;
+				padding: 3em 0 0 0;
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -46,47 +45,30 @@
 			}
 
 			.list-item {
+				display: inline-block;
 				margin: 1em;
-				padding: 2em;
-				display: -webkit-flex;
-				display: flex;
-				flex-direction: row;
-				-webkit-flex-direction: row;
+				padding: 1em;
+				box-shadow: 1px 2px 4px 0px rgba(0,0,0,0.25);
 			}
 
 			.list-item .scene {
 				width: 200px;
 				height: 200px;
-				flex: 0 0 auto;
-				-webkit-flex: 0 0 auto;
-			}
-			.list-item .description {
-				font-family: sans-serif;
-				font-size: large;
-				padding-left: 2em;
-				flex: 1 1 auto;
-				-webkit-flex: 1 1 auto;
 			}
 
-			@media only screen and (max-width : 600px) {
-				#content {
-					width: 100%;
-				}
-				.list-item {
-					margin: 0.5em;
-					padding: 0.5em;
-					flex-direction: column;
-					-webkit-flex-direction: column;
-				}
-				.list-item .description {
-					padding-left: 0em;
-				}
+			.list-item .description {
+				color: #888;
+				font-family: sans-serif;
+				font-size: large;
+				width: 200px;
+				margin-top: 0.5em;
 			}
 		</style>
 	</head>
 	<body>
 
 		<canvas id="c"></canvas>
+
 		<div id="content">
 			<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple elements - webgl</div>
 		</div>
@@ -97,7 +79,7 @@
 
 		<script id="template" type="notjs">
 			<div class="scene"></div>
-			<div class="description">some random text about this object, scene, whatever</div>
+			<div class="description">Scene $</div>
 		</script>
 		<script>
 
@@ -114,8 +96,8 @@
 
 				canvas = document.getElementById( "c" );
 
-				camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 100 );
-				camera.position.z = 1.5;
+				camera = new THREE.PerspectiveCamera( 50, 1, 0.1, 100 );
+				camera.position.z = 2;
 
 				var geometries = [
 					new THREE.BoxGeometry( 1, 1, 1 ),
@@ -129,37 +111,32 @@
 
 				var emptyScene = new THREE.Scene();
 
-				var numScenes = 100;
-
-				for ( var ii =  0; ii < numScenes; ++ii ) {
+				for ( var i =  0; i < 100; i ++ ) {
 
 					var scene = new THREE.Scene();
 
-					// make a list item.
+					// make a list item
 					var element = document.createElement( "div" );
-					element.innerHTML = template;
 					element.className = "list-item";
+					element.innerHTML = template.replace('$', i + 1 );
 
 					// Look up the element that represents the area
 					// we want to render the scene
 					scene.element = element.querySelector(".scene");
-					content.appendChild(element);
+					content.appendChild( element );
 
 					// add one random mesh to each scene
 					var geometry = geometries[ geometries.length * Math.random() | 0 ];
-					var material = new THREE.MeshLambertMaterial( { color: randColor() } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffffff * Math.random() } );
 
 					scene.add( new THREE.Mesh( geometry, material ) );
 
-					light = new THREE.DirectionalLight( 0xffffff );
-					light.position.set( 0.5, 0.8, 1 );
-					scene.add( light );
-
-					light = new THREE.DirectionalLight( 0xffffff );
-					light.position.set( -0.5, -0.8, -1 );
+					light = new THREE.HemisphereLight( 0xffbbbb, 0x444488 );
+					light.position.set( - 0.5, 0.8, 1 );
 					scene.add( light );
 
 					scenes.push( scene );
+
 				}
 
 
@@ -230,23 +207,6 @@
 				} );
 				renderer.enableScissorTest( false );
 
-			}
-
-			function rand( min, max ) {
-				if ( max == undefined ) {
-					max = min;
-					min = 0;
-				}
-
-				return Math.random() * ( max - min ) + min;
-			}
-
-			function randColor() {
-				var colors = [ rand( 256 ), rand ( 256 ), rand( 256 ) ];
-				colors[ Math.random() * 3 | 0 ] = 255;
-				return ( colors[0] << 16 ) |
-					   ( colors[1] <<  8 ) |
-					   ( colors[2] <<  0 ) ;
 			}
 
 		</script>
