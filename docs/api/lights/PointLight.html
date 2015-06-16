@@ -31,6 +31,8 @@ scene.add( light );</code>
 		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
 		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
 		[page:Number distance] -- The distance of the light where the intensity is 0. When distance is 0, then the distance is endless. 
+		[page:Number decay] -- The rate of exponential decay of the light over distance.  0 is no decay, 1 is linear decay, and 2 is quadratic.
+		[page:Boolean physicalFalloff] -- Whether the decay paramters is ignored and instead true physically-based (inverse quadradic) falloff is used.
 		</div>
 		<div>
 		Creates a light at a specific position in the scene.  The light shines in all directions (roughly similar to a light bulb.)
@@ -51,7 +53,17 @@ scene.add( light );</code>
 			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
 			Default — *0.0*.
 		</div>
-		
+		<h3>[property:Float decay]</h3>
+		<div>
+			The rate of exponential decay of the light intensity as one gets further away from the light.  0 is no decay, 1 is linear decay, and 2 is quadratic.<br />
+			Default — *0.0*.
+		</div>
+		<h3>[property:Boolean physicalFalloff]</h3>
+		<div>
+			Whether the decay paramters is ignored and instead true physically-based (inverse quadradic) falloff is used.  If distance is set, then it falls off within the distance range, otherwise it uses an infinite distance cutoff.  For true physical falloff, the intensity of the light is assumed to be in lumens (40W incandescent bulb has 450 lumens, while a 100W incandescent bulb has 1600 lumens), and the distance is in meters.<br />
+			Default — *false*.
+		</div>
+
 		<h2>Methods</h2>
 
 

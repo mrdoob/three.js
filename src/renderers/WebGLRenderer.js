@@ -3027,7 +3027,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// distance is 0 if decay is 0, because there is no attenuation at all.
 				pointDistances[ pointLength ] = distance;
-				pointDecays[ pointLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				if( light.physicalFalloff ) {
+					// magic value of -1 switches the equation to UE4 physical quadratic falloff.
+					pointDecays[ pointLength ] = -1.0;
+				}
+				else {
+					pointDecays[ pointLength ] = ( distance === 0 ) ? 0.0 : light.decay;
+				}
 
 				pointLength += 1;
 
@@ -3047,7 +3054,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				spotPositions[ spotOffset + 1 ] = _direction.y;
 				spotPositions[ spotOffset + 2 ] = _direction.z;
 
-				spotDistances[ spotLength ] = distance;
 
 				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
@@ -3059,7 +3065,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
 				spotExponents[ spotLength ] = light.exponent;
-				spotDecays[ spotLength ] = ( light.distance === 0 ) ? 0.0 : light.decay;
+
+				spotDistances[ spotLength ] = distance;
+
+				if( light.physicalFalloff ) {
+					// magic value of -1 switches the equation to UE4 physical quadratic falloff.
+					spotDecays[ spotLength ] = -1.0;
+				}
+				else {
+					spotDecays[ spotLength ] = ( distance === 0 ) ? 0.0 : light.decay;
+				}
 
 				spotLength += 1;
 
