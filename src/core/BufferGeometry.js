@@ -253,9 +253,9 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	fromGeometry: function ( geometry, material ) {
+	fromGeometry: function ( geometry ) {
 
-		geometry.__directGeometry = new THREE.DirectGeometry().fromGeometry( geometry, material );
+		geometry.__directGeometry = new THREE.DirectGeometry().fromGeometry( geometry );
 
 		return this.fromDirectGeometry( geometry.__directGeometry );
 
