@@ -58,6 +58,12 @@
 		return -1;
 		
 	}
+	
+	var descSort = function ( a, b ) {
+
+		return a.distance - b.distance;
+
+	}
 
 	/*===================================================
 
@@ -2106,6 +2112,8 @@
 			intersects = intersects.concat( this.intersectOctreeObject( objects[ i ], recursive ) );
 		
 		}
+		
+		intersects.sort( descSort );
 		
 		return intersects;
 		
