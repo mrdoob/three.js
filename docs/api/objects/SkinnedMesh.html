@@ -21,22 +21,22 @@
 		var geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
 		
 		//Create the skin indices and skin weights
-		for( var i=0; i < geometry.vertices.length; i++ ) {
+		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 			
 			// Imaginary functions to calculate the indices and weights
 			var skinIndex = calculateSkinIndex( geometry.vertices, i );
 			var skinWeight = calculateSkinWeight( geometry.vertices, i );
 			
 			// Ease between each bone
-			geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex+1, 0, 0 ) );
-			geometry.skinWeights.push( new THREE.Vector4( 1-skinWeight, skinWeight, 0, 0 ) );		
+			geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex + 1, 0, 0 ) );
+			geometry.skinWeights.push( new THREE.Vector4( 1 - skinWeight, skinWeight, 0, 0 ) );		
 			
 		}
 		
 		var mesh = THREE.SkinnedMesh( geometry, material );
 
 		// See example from THREE.Skeleton for the armSkeleton
-		var rootBone = armSkeleton.bones[0];
+		var rootBone = armSkeleton.bones[ 0 ];
 		mesh.add( rootBone );
 		
 		// Bind the skeleton to the mesh
@@ -46,8 +46,8 @@
 		armSkeleton.calculateInverses();
 		
 		// Move the bones and manipulate the model
-		armSkeleton.bones[0].rotation.x = -0.1;
-		armSkeleton.bones[1].rotation.x = 0.2;
+		armSkeleton.bones[ 0 ].rotation.x = -0.1;
+		armSkeleton.bones[ 1 ].rotation.x = 0.2;
 		</code>
 		
 
