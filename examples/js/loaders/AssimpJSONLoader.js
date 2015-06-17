@@ -149,13 +149,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 			function convertColors(in_color, out_faces) {
 				var i, e, face, a, b, c;
-
-				function makeColor(start) {
-					var col = new THREE.Color( );
-					col.setRGB( arr[0], arr[1], arr[2] );
-					// TODO: what about alpha?
-					return col;
-				}
+				var color = new THREE.Color();
 
 				for (i = 0, e = out_faces.length; i < e; ++ i) {
 					face = out_faces[i];
@@ -163,9 +157,9 @@ THREE.AssimpJSONLoader.prototype = {
 					b = face.b * 4;
 					c = face.c * 4;
 					face.vertexColors = [
-						makeColor( a ),
-						makeColor( b ),
-						makeColor( c )
+						color.fromArray( a ),
+						color.fromArray( b ),
+						color.fromArray( c )
 					];
 				}
 			}
