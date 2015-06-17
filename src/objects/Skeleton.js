@@ -28,8 +28,8 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 		
-		var size = THREE.Math.nextPowerOfTwo( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
-
+		var size = THREE.Math.nextPowerOfTwo( Math.sqrt( this.bones.length * 4 ) ); // 4 pixels needed for 1 matrix
+		
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
 
