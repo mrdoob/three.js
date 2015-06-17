@@ -113,11 +113,12 @@
 		Array of [page:Vector4 Vector4s] representing the indices of individual bones in the [page:Skeleton.bones] array,
 		The indices match the number and order of vertices in the geometry.
 		<code>
+		// e.g.
 		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 0 );
 		geometry.skinWeights[15] = new THREE.Vector4( 0.2, 0.5, 0.3, 0 );
 		
 		// corresponds with the following vertex
-		geometry.vertices[15]
+		geometry.vertices[15];
 		
 		// these bones will be used like so:
 		skeleton.bones[0]; // weight of 0.2

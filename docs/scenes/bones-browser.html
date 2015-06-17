@@ -148,17 +148,12 @@
 					shading: THREE.FlatShading
 				});
 				
-				var mesh = new THREE.SkinnedMesh(
-					geometry,
-					material
-				);
-				
+				var mesh = new THREE.SkinnedMesh( geometry,	material );
 				var skeleton = new THREE.Skeleton( bones );
 				
-				mesh.bind( skeleton );
-
 				mesh.add( bones[0] );
-				mesh.updateMatrixWorld( true );
+				
+				mesh.bind( skeleton );
 				skeleton.calculateInverses();
 	
 				skeletonHelper = new THREE.SkeletonHelper( mesh );
@@ -166,6 +161,7 @@
 				scene.add( skeletonHelper );
 	
 				return mesh;
+				
 			};
 			
 			function setupDatGui () {
@@ -173,7 +169,7 @@
 				var folder = gui.addFolder( "General Options" );
 				
 				folder.add( state, "animateBones" );
-				folder.__controllers[0].name("Animate Bones")
+				folder.__controllers[0].name("Animate Bones");
 
 				folder.add( mesh, "pose" );
 				folder.__controllers[1].name(".pose()");
@@ -182,7 +178,7 @@
 				
 				for( var i=0; i < bones.length; i++ ) {
 					
-					var bone = bones[i]
+					var bone = bones[i];
 					
 					folder = gui.addFolder( "Bone " + i );
 				
@@ -198,17 +194,17 @@
 					folder.add( bone.scale, 'y', 0, 2 );
 					folder.add( bone.scale, 'z', 0, 2 );
 
-					folder.__controllers[0].name("position.x")
-					folder.__controllers[1].name("position.y")
-					folder.__controllers[2].name("position.z")
+					folder.__controllers[0].name("position.x");
+					folder.__controllers[1].name("position.y");
+					folder.__controllers[2].name("position.z");
 					
-					folder.__controllers[3].name("rotation.x")
-					folder.__controllers[4].name("rotation.y")
-					folder.__controllers[5].name("rotation.z")
+					folder.__controllers[3].name("rotation.x");
+					folder.__controllers[4].name("rotation.y");
+					folder.__controllers[5].name("rotation.z");
 					
-					folder.__controllers[6].name("scale.x")
-					folder.__controllers[7].name("scale.y")
-					folder.__controllers[8].name("scale.z")
+					folder.__controllers[6].name("scale.x");
+					folder.__controllers[7].name("scale.y");
+					folder.__controllers[8].name("scale.z");
 					
 				}
 							
@@ -218,8 +214,8 @@
 				
 				var segmentHeight = 8;
 				var segmentCount = 4;
-				var height = segmentHeight * segmentCount
-				var halfHeight = height * 0.5
+				var height = segmentHeight * segmentCount;
+				var halfHeight = height * 0.5;
 	
 				var sizing = {
 					segmentHeight : segmentHeight,
