@@ -102,23 +102,36 @@ function eav_get_range_from_mods_con obj &i_t1 &i_t2 =
 	local props, pr
 	local t1min = 0, t2max = 0
 	
---	format "\n\nModifiers:\n"
+	format "\n\nModifiers:\n"
 	
 	for i = 1 to obj.modifiers.count do
 	(
 		cmod = obj.modifiers[i]
 		
-	--	format "\n%: \"%\" (%)\n" i (cmod.name) (classof cmod)
+		format "\n%: \"%\" (%)\n" i (cmod.name) (classof cmod)
 		
+		format "\n%\n" (showProperties cmod)
 		props = getpropnames cmod
-		
+		format "\n%\n" props
+				
 		for pr in props do
 		(
 			mod_con = (getPropertyController cmod pr)
-			
+		
+			--format "% = % (Animatable - %)\n" pr mod_con	(isPropertyAnimatable obj pr)	
 			if mod_con == undefined then
 			(
-				continue
+				format "%" (cmod.name == "Morpher")
+				if cmod.name == "Morpher" then
+				(
+					format "% = %" pr cmod[pr]
+					mod_con = cmod[pr]
+				)
+				
+				if mod_con == undefined then
+				(
+					continue
+				)
 			)
 			
 			if mod_con.keys.count <= 0 then
@@ -126,7 +139,7 @@ function eav_get_range_from_mods_con obj &i_t1 &i_t2 =
 				continue
 			)
 			
-		--	format "\t%\t(keys: %)\n" pr (mod_con.keys.count)
+			format "\t%\t(keys: %)\n" pr (mod_con.keys.count)
 			
 			t1 = mod_con.keys[1].time.frame as integer
 			t2 = (mod_con.keys[mod_con.keys.count].time.frame) as integer
@@ -185,7 +198,7 @@ function eav_exp_obj obj ostream =
 	
 	if b_ran_set and b_ran_mod_set then
 	(
-	--	format "\nAll ranges set - compare\n"
+		format "\nAll ranges set - compare\n"
 		-- Set smallest first key, and latest final key
 		if t1_m < t1 then
 		(
@@ -199,13 +212,13 @@ function eav_exp_obj obj ostream =
 	)
 	else if( not b_ran_set )and( b_ran_mod_set )then
 	(
-	--	format "\nTrans range not set\n"
+		format "\nTrans range not set\n"
 		t1 = t1_m
 		t2 = t2_m
 	)
 	else if( not b_ran_mod_set )and( b_ran_set )then
 	(
-	--	format "\nmods range not set\n"
+		format "\nmods range not set\n"
 		-- all values t1, t2 - save in initial state
 	)
 	else if( not b_ran_set )and( not b_ran_mod_set )then
