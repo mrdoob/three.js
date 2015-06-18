@@ -23145,14 +23145,11 @@ THREE.WebGLGeometries = function ( gl, info ) {
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
+		var buffergeometry = geometries[ geometry.id ];
 
-		geometry.removeEventListener( 'dispose', onGeometryDispose );
+		for ( var name in buffergeometry.attributes ) {
 
-		geometry = geometries[ geometry.id ];
-
-		for ( var name in geometry.attributes ) {
-
-			var attribute = geometry.attributes[ name ];
+			var attribute = buffergeometry.attributes[ name ];
 
 			if ( attribute.buffer !== undefined ) {
 
@@ -23163,6 +23160,10 @@ THREE.WebGLGeometries = function ( gl, info ) {
 			}
 
 		}
+
+		geometry.removeEventListener( 'dispose', onGeometryDispose );
+
+		delete geometries[ geometry.id ];
 
 		info.memory.geometries --;
 
