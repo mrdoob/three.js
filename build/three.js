@@ -8913,8 +8913,6 @@ THREE.Geometry = function () {
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
 
-	this.groupsNeedUpdate = false;
-
 };
 
 THREE.Geometry.prototype = {
@@ -9938,6 +9936,14 @@ THREE.Geometry.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	// Backwards compatibility
+
+	set groupsNeedUpdate ( value ) {
+
+		if ( value === true ) this.dispose();
 
 	}
 
@@ -16504,9 +16510,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 							distance: distance,
 							point: intersectionPoint,
 							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-							faceIndex: null,
+							faceIndex: Math.floor(i/3), // triangle number in indices buffer semantics
 							object: this
-
+							
 						} );
 
 					}
@@ -16550,7 +16556,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 						distance: distance,
 						point: intersectionPoint,
 						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-						faceIndex: null,
+						index: Math.floor(i/3), // triangle number in positions buffer semantics
 						object: this
 
 					} );
@@ -16733,25 +16739,16 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 	// create a bone texture or an array of floats
 
 	if ( this.useVertexTexture ) {
-
+		
 		// layout (1 matrix = 4 pixels)
 		//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-		//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
-		//       16x16 pixel texture max   64 bones (16 * 16 / 4)
-		//       32x32 pixel texture max  256 bones (32 * 32 / 4)
-		//       64x64 pixel texture max 1024 bones (64 * 64 / 4)
-
-		var size;
-
-		if ( this.bones.length > 256 )
-			size = 64;
-		else if ( this.bones.length > 64 )
-			size = 32;
-		else if ( this.bones.length > 16 )
-			size = 16;
-		else
-			size = 8;
-
+		//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
+		//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
+		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
+		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
+		
+		var size = THREE.Math.nextPowerOfTwo( Math.sqrt( this.bones.length * 4 ) ); // 4 pixels needed for 1 matrix
+		
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
 
@@ -31665,8 +31662,6 @@ THREE.LatheGeometry.prototype.constructor = THREE.LatheGeometry;
  */
 
 THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
-
-	console.log( 'THREE.PlaneGeometry: Consider using THREE.PlaneBufferGeometry for lower memory footprint.' );
 
 	THREE.Geometry.call( this );
 
