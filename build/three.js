@@ -16005,21 +16005,21 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 				if ( offsets.length === 0 ) {
 
-					var offset = {
+					offsets.push( {
 						start: 0,
 						count: indices.length,
 						index: 0
-					};
-
-					offsets = [ offset ];
+					} );
 
 				}
 
 				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
-					var start = offsets[ oi ].start;
-					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var offset = offsets[ oi ];
+
+					var start = offset.start;
+					var count = offset.count;
+					var index = offset.index;
 
 					for ( var i = start, il = start + count; i < il; i ++ ) {
 
@@ -16035,15 +16035,9 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 			} else {
 
-				var pointCount = positions.length / 3;
+				for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
 
-				for ( var i = 0; i < pointCount; i ++ ) {
-
-					position.set(
-						positions[ 3 * i ],
-						positions[ 3 * i + 1 ],
-						positions[ 3 * i + 2 ]
-					);
+					position.fromArray( positions, i * 3 );
 
 					testPoint( position, i );
 
@@ -16053,9 +16047,9 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		} else {
 
-			var vertices = this.geometry.vertices;
+			var vertices = geometry.vertices;
 
-			for ( var i = 0; i < vertices.length; i ++ ) {
+			for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
 				testPoint( vertices[ i ], i );
 
@@ -16420,6 +16414,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 	return function ( raycaster, intersects ) {
 
 		var geometry = this.geometry;
+		var material = this.material;
+
+		if ( material === undefined ) return;
 
 		// Checking boundingSphere distance to ray
 
@@ -16449,15 +16446,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		}
 
+		var a, b, c;
+
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			var material = this.material;
-
-			if ( material === undefined ) return;
-
 			var attributes = geometry.attributes;
-
-			var a, b, c;
 
 			if ( attributes.index !== undefined ) {
 
@@ -16510,9 +16503,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 							distance: distance,
 							point: intersectionPoint,
 							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-							faceIndex: Math.floor(i/3), // triangle number in indices buffer semantics
+							faceIndex: Math.floor( i / 3 ), // triangle number in indices buffer semantics
 							object: this
-							
+
 						} );
 
 					}
@@ -16567,26 +16560,24 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		} else if ( geometry instanceof THREE.Geometry ) {
 
-			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
-			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
-
-			var a, b, c;
+			var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
+			var materials = isFaceMaterial === true ? material.materials : null;
 
 			var vertices = geometry.vertices;
+			var faces = geometry.faces;
 
-			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+			for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
-				var face = geometry.faces[ f ];
+				var face = faces[ f ];
+				var faceMaterial = isFaceMaterial === true ? materials[ face.materialIndex ] : material;
 
-				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : this.material;
-
-				if ( material === undefined ) continue;
+				if ( faceMaterial === undefined ) continue;
 
 				a = vertices[ face.a ];
 				b = vertices[ face.b ];
 				c = vertices[ face.c ];
 
-				if ( material.morphTargets === true ) {
+				if ( faceMaterial.morphTargets === true ) {
 
 					var morphTargets = geometry.morphTargets;
 					var morphInfluences = this.morphTargetInfluences;
@@ -16627,13 +16618,13 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				}
 
-				if ( material.side === THREE.BackSide ) {
+				if ( faceMaterial.side === THREE.BackSide ) {
 
 					var intersectionPoint = ray.intersectTriangle( c, b, a, true );
 
 				} else {
 
-					var intersectionPoint = ray.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+					var intersectionPoint = ray.intersectTriangle( a, b, c, faceMaterial.side !== THREE.DoubleSide );
 
 				}
 
@@ -26087,7 +26078,7 @@ THREE.FontUtils = {
 
 		try {
 
-			return this.faces[ this.face ][ this.weight ][ this.style ];
+			return this.faces[ this.face.toLowerCase() ][ this.weight ][ this.style ];
 
 		} catch (e) {
 
