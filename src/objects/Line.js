@@ -69,7 +69,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				if ( offsets.length === 0 ) {
 
-					offsets = [ { start: 0, count: indices.length, index: 0 } ];
+					offsets = [{ start: 0, count: indices.length, indexOffset: 0 }];
 
 				}
 
@@ -77,7 +77,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var index = offsets[ oi ].indexOffset;
 
 					for ( var i = start; i < start + count - 1; i += step ) {
 

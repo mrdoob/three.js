@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - buffergeometry - lines drawcalls</title>
@@ -149,7 +149,7 @@
 				particles.drawcalls.push( {
 					start: 0,
 					count: particleCount,
-					index: 0
+					indexOffset: 0
 				} );
 
 				particles.addAttribute( 'position', new THREE.DynamicBufferAttribute( particlePositions, 3 ) );
@@ -168,7 +168,7 @@
 				geometry.drawcalls.push( {
 					start: 0,
 					count: 0,
-					index: 0
+					indexOffset: 0
 				} );
 
 				var material = new THREE.LineBasicMaterial( {

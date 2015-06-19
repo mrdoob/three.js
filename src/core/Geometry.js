@@ -158,7 +158,7 @@ THREE.Geometry.prototype = {
 
 					var start = drawcall.start;
 					var count = drawcall.count;
-					var index = drawcall.index;
+					var index = drawcall.indexOffset;
 
 					for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
