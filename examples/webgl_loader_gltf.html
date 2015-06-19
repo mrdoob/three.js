@@ -132,7 +132,7 @@
 			function onload() {
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keypress', function(e) { onKeyPress(e); }, false );
+				document.addEventListener( 'keydown', function(e) { onKeyDown(e); }, false );
 
 				buildSceneList();
 				switchScene(0);
@@ -343,7 +343,7 @@
 				renderer.render( scene, camera );
 			}
 
-			function onKeyPress(event) {
+			function onKeyDown(event) {
 
 				var chr = String.fromCharCode(event.keyCode);
 

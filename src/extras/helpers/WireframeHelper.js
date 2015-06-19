@@ -6,7 +6,14 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
-	THREE.LineSegments.call( this, new THREE.WireframeGeometry( object.geometry ), new THREE.LineBasicMaterial( { color: color } ) );
+	var geometry = new THREE.WireframeGeometry( object.geometry );
+	var skinning = !!geometry.skinning;
+	if ( skinning && object.skeleton ) {
+		this.skeleton = object.skeleton;
+		this.bindMatrix = object.bindMatrix;
+		this.bindMatrixInverse = object.bindMatrixInverse;
+	}
+	THREE.LineSegments.call( this, new THREE.WireframeGeometry( object.geometry ), new THREE.LineBasicMaterial( { color: color, skinning: skinning } ) );
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;

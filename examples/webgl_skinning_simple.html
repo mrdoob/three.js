@@ -14,6 +14,7 @@
 		</style>
 	</head>
 	<body>
+		<div style="position:absolute; left:50%"><a style="color:#fff">Wireframe</a><input id="Wireframe" onchange="wireframeToggle()" type="checkbox"/></div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -23,10 +24,14 @@
 
 			var container, stats, controls;
 			var camera, scene, renderer, loader, clock, light;
-			var skinnedMesh, animation, groundMaterial, planeGeometry;
+			var skinnedMesh, animation, groundMaterial, planeGeometry, wireframeHelper;
 
 			init();
 			animate();
+
+			function wireframeToggle() {
+				wireframeHelper.visible = !wireframeHelper.visible;
+			}
 
 			function init() {
 
@@ -76,6 +81,10 @@
 					scene.add( skinnedMesh );
 					animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[ 0 ] );
 					animation.play();
+
+					wireframeHelper = new THREE.WireframeHelper( skinnedMesh, 0xffffff );
+					wireframeHelper.visible = false;
+					scene.add( wireframeHelper );
 
 				});
 

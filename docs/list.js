@@ -109,6 +109,7 @@ var list = {
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
 			[ "PointCloud", "api/objects/PointCloud" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
+			[ "Skeleton", "api/objects/Skeleton" ],
 			[ "Sprite", "api/objects/Sprite" ]
 		],
 
