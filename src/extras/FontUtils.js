@@ -31,7 +31,7 @@ THREE.FontUtils = {
 
 		try {
 
-			return this.faces[ this.face ][ this.weight ][ this.style ];
+			return this.faces[ this.face.toLowerCase() ][ this.weight ][ this.style ];
 
 		} catch (e) {
 
