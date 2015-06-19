@@ -67,7 +67,7 @@ THREE.BabylonLoader.prototype = {
 
 				var data = json.multiMaterials[ i ];
 
-				THREE.warn( 'THREE.BabylonLoader: Multi materials not yet supported.' );
+				console.warn( 'THREE.BabylonLoader: Multi materials not yet supported.' );
 
 				materials[ data.id ] = new THREE.MeshPhongMaterial();
 
@@ -200,8 +200,9 @@ THREE.BabylonLoader.prototype = {
 			}
 
 			light.name = data.name;
-			light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
+			if ( data.position ) light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
 			light.color.fromArray( data.diffuse );
+			if ( data.groundColor ) light.groundColor.fromArray( data.groundColor );
 			if ( data.intensity ) light.intensity = data.intensity;
 
 			objects[ data.id ] = light;

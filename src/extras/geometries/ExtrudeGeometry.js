@@ -33,7 +33,7 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	this.type = 'ExtrudeGeometry';
 
-	shapes = shapes instanceof Array ? shapes : [ shapes ];
+	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
 
 	this.addShapeList( shapes, options );
 
@@ -45,7 +45,7 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	//this.computeVertexNormals();
 
-	//THREE.log( "took", ( Date.now() - startTime ) );
+	//console.log( "took", ( Date.now() - startTime ) );
 
 };
 
@@ -96,7 +96,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		splineTube = options.frames !== undefined ? options.frames : new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
 
-		// THREE.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
+		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
 		binormal = new THREE.Vector3();
 		normal = new THREE.Vector3();
@@ -168,7 +168,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	function scalePt2 ( pt, vec, size ) {
 
-		if ( ! vec ) THREE.error( "THREE.ExtrudeGeometry: vec does not exist" );
+		if ( ! vec ) console.error( "THREE.ExtrudeGeometry: vec does not exist" );
 
 		return vec.clone().multiplyScalar( size ).add( pt );
 
@@ -250,17 +250,17 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 				if ( v_prev_x < - EPSILON ) {
 					if ( v_next_x < - EPSILON ) { direction_eq = true; }
 				} else {
-					if ( Math.sign(v_prev_y) == Math.sign(v_next_y) ) { direction_eq = true; }
+					if ( Math.sign(v_prev_y) === Math.sign(v_next_y) ) { direction_eq = true; }
 				}
 			}
 
 			if ( direction_eq ) {
-				// THREE.log("Warning: lines are a straight sequence");
+				// console.log("Warning: lines are a straight sequence");
 				v_trans_x = - v_prev_y;
 				v_trans_y =  v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
 			} else {
-				// THREE.log("Warning: lines are a straight spike");
+				// console.log("Warning: lines are a straight spike");
 				v_trans_x = v_prev_x;
 				v_trans_y = v_prev_y;
 				shrink_by = Math.sqrt( v_prev_lensq / 2 );
@@ -281,7 +281,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		if ( k === il ) k = 0;
 
 		//  (j)---(i)---(k)
-		// THREE.log('i,j,k', i, j , k)
+		// console.log('i,j,k', i, j , k)
 
 		contourMovements[ i ] = getBevelVec( contour[ i ], contour[ j ], contour[ k ] );
 
@@ -553,7 +553,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			k = i - 1;
 			if ( k < 0 ) k = contour.length - 1;
 
-			//THREE.log('b', i,j, i-1, k,vertices.length);
+			//console.log('b', i,j, i-1, k,vertices.length);
 
 			var s = 0, sl = steps  + bevelSegments * 2;
 

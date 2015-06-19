@@ -111,7 +111,7 @@ THREE.VRControls = function ( object, onError ) {
 
 	this.zeroSensor = function () {
 
-		THREE.warn( 'THREE.VRControls: .zeroSensor() is now .resetSensor().' );
+		console.warn( 'THREE.VRControls: .zeroSensor() is now .resetSensor().' );
 		this.resetSensor();
 
 	};

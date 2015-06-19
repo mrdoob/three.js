@@ -9,7 +9,10 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">An extensible curve object which contains methods for interpolation.</div>
+		<div class="desc">
+		An abstract base class for creating a curve object that contains methods for interpolation.
+		For an array of Curves see [page:CurvePath].
+		</div>
 		
 		<h2>Examples</h2>
 		
@@ -27,7 +30,7 @@
 		<h2>Methods</h2>
 
 		<h3>[method:Vector getPoint]( t )</h3>
-		<div>Returns a vector for point t of the curve where t is between 0 and 1</div>
+		<div>Returns a vector for point t of the curve where t is between 0 and 1. Must be implemented in the extending class.</div>
 
 		<h3>[method:Vector getPointAt]( u )</h3>
 		<div>Returns a vector for point at relative position in curve according to arc length</div>

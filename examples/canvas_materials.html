@@ -60,7 +60,7 @@
 
 				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
 
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				var line = new THREE.LineSegments( geometry, material );
 				scene.add( line );
 
 				// Spheres

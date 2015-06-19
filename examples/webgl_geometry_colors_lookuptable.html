@@ -112,7 +112,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener( "keypress", onKeyPress, true);
+				window.addEventListener( "keydown", onKeyDown, true);
 
 			}
 
@@ -272,7 +272,7 @@
 			}
 
 
-			function onKeyPress ( e ) {
+			function onKeyDown ( e ) {
 
 				var maps = [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ];
 

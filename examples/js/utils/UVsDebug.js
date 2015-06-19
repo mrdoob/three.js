@@ -6,9 +6,7 @@
  * geometries UV mapping
  *
  * Sample usage:
- *	document.body.appendChild(
- *		THREE.UVsDebug(
- *			new THREE.SphereGeometry(10,10,10,10));
+ *	document.body.appendChild( THREE.UVsDebug( new THREE.SphereGeometry( 10, 10, 10, 10 ) );
  *
  */
  
@@ -16,7 +14,7 @@ THREE.UVsDebug = function( geometry, size ) {
 
     // handles wrapping of uv.x > 1 only
     
-	var abc = 'abcd';
+	var abc = 'abc';
 
 	var uv, u, ax, ay;
 	var i, il, j, jl;
@@ -25,8 +23,10 @@ THREE.UVsDebug = function( geometry, size ) {
 	var a = new THREE.Vector2();
 	var b = new THREE.Vector2();
 
-	var faces = geometry.faces;
-	var uvs = geometry.faceVertexUvs[ 0 ];
+	var geo = ( geometry instanceof THREE.BufferGeometry ) ? new THREE.Geometry().fromBufferGeometry( geometry ) : geometry;
+
+	var faces = geo.faces;
+	var uvs = geo.faceVertexUvs[ 0 ];
 
 	var canvas = document.createElement( 'canvas' );
 	var width = size || 1024;   // power of 2 required for wrapping

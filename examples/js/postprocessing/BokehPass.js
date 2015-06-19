@@ -33,7 +33,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	// bokeh material
 
 	if ( THREE.BokehShader === undefined ) {
-		THREE.error( "THREE.BokehPass relies on THREE.BokehShader" );
+		console.error( "THREE.BokehPass relies on THREE.BokehShader" );
 	}
 	
 	var bokehShader = THREE.BokehShader;

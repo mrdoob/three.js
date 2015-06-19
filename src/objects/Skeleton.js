@@ -20,25 +20,16 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 	// create a bone texture or an array of floats
 
 	if ( this.useVertexTexture ) {
-
+		
 		// layout (1 matrix = 4 pixels)
 		//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-		//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
-		//       16x16 pixel texture max   64 bones (16 * 16 / 4)
-		//       32x32 pixel texture max  256 bones (32 * 32 / 4)
-		//       64x64 pixel texture max 1024 bones (64 * 64 / 4)
-
-		var size;
-
-		if ( this.bones.length > 256 )
-			size = 64;
-		else if ( this.bones.length > 64 )
-			size = 32;
-		else if ( this.bones.length > 16 )
-			size = 16;
-		else
-			size = 8;
-
+		//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
+		//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
+		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
+		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
+		
+		var size = THREE.Math.nextPowerOfTwo( Math.sqrt( this.bones.length * 4 ) ); // 4 pixels needed for 1 matrix
+		
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
 
@@ -69,7 +60,7 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 		} else {
 
-			THREE.warn( 'THREE.Skeleton bonInverses is the wrong length.' );
+			console.warn( 'THREE.Skeleton bonInverses is the wrong length.' );
 
 			this.boneInverses = [];
 

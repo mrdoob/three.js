@@ -20,8 +20,8 @@ THREE.ImageLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			onLoad( cached );
-			return;
+			if ( onLoad ) onLoad( cached );
+			return cached;
 
 		}
 
@@ -32,7 +32,7 @@ THREE.ImageLoader.prototype = {
 			THREE.Cache.add( url, this );
 
 			if ( onLoad ) onLoad( this );
-			
+
 			scope.manager.itemEnd( url );
 
 		}, false );
@@ -59,9 +59,9 @@ THREE.ImageLoader.prototype = {
 
 		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
-		image.src = url;
-
 		scope.manager.itemStart( url );
+
+		image.src = url;
 
 		return image;
 

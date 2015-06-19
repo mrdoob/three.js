@@ -91,7 +91,7 @@
 
 					material = new THREE.LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ], linewidth: p[ 3 ] } );
 
-					line = new THREE.Line( geometry, material, THREE.LinePieces );
+					line = new THREE.LineSegments( geometry, material );
 					line.scale.x = line.scale.y = line.scale.z = p[ 0 ];
 					line.originalScale = p[ 0 ];
 					line.rotation.y = Math.random() * Math.PI;

@@ -443,9 +443,9 @@ def parse_mtl(fname):
             if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
                 materials[identifier]["transparent"] = True
                 if TRANSPARENCY == "invert":
-                    materials[identifier]["transparency"] = 1.0 - float(chunks[1])
+                    materials[identifier]["opacity"] = float(chunks[1])
                 else:
-                    materials[identifier]["transparency"] = float(chunks[1])
+                    materials[identifier]["opacity"] = 1.0 - float(chunks[1])
 
             # Optical density
             # Ni 1.0

@@ -18,7 +18,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	this.currentLuminanceRT = null;
 
 	if ( THREE.CopyShader === undefined )
-		THREE.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
+		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.CopyShader" );
 
 	var copyShader = THREE.CopyShader;
 
@@ -35,7 +35,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	} );
 
 	if ( THREE.LuminosityShader === undefined )
-		THREE.error( "THREE.AdaptiveToneMappingPass relies on THREE.LuminosityShader" );
+		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.LuminosityShader" );
 
 	this.materialLuminance = new THREE.ShaderMaterial( {
 
@@ -103,7 +103,7 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 	} );
 
 	if ( THREE.ToneMapShader === undefined )
-		THREE.error( "THREE.AdaptiveToneMappingPass relies on THREE.ToneMapShader" );
+		console.error( "THREE.AdaptiveToneMappingPass relies on THREE.ToneMapShader" );
 
 	this.materialToneMap = new THREE.ShaderMaterial( {
 

@@ -88,15 +88,13 @@
 				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				var i, j, il, jl;
+				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-				for ( i = 0, il = geometry.vertices.length; i < il; i ++ ) {
-
-					geometry.vertices[ i ].y = 35 * Math.sin( i/2 );
+					geometry.vertices[ i ].y = 35 * Math.sin( i / 2 );
 
 				}
 
-				geometry = new THREE.DynamicGeometry().fromGeometry( geometry );
+				geometry.dynamic = true;
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;

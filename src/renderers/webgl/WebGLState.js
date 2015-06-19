@@ -346,6 +346,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
+	// texture
+
 	this.activeTexture = function ( webglSlot ) {
 
 		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
@@ -385,13 +387,48 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
-	}
+	};
+
+	this.compressedTexImage2D = function () {
+
+		try {
+
+			gl.compressedTexImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( error );
+
+		}
+
+	};
+
+	this.texImage2D = function () {
+
+		try {
+
+			gl.texImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( error );
+
+		}
+
+	};
+
+	//
 
 	this.reset = function () {
 
 		for ( var i = 0; i < enabledAttributes.length; i ++ ) {
 
-			enabledAttributes[ i ] = 0;
+			if ( enabledAttributes[ i ] === 1 ) {
+
+				gl.disableVertexAttribArray( i );
+				enabledAttributes[ i ] = 0;
+
+			}
 
 		}
 

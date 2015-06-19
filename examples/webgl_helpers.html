@@ -53,20 +53,33 @@
 
 					var material = new THREE.MeshLambertMaterial();
 
+					var group = new THREE.Group();
+					group.scale.multiplyScalar( 50 );
+					scene.add( group );
+
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.scale.multiplyScalar( 50 );
-					scene.add( mesh );
+					group.add( mesh );
 
-					scene.add( new THREE.FaceNormalsHelper( mesh, 10 ) );
-					scene.add( new THREE.VertexNormalsHelper( mesh, 10 ) );
+					group.add( new THREE.FaceNormalsHelper( mesh, 0.1 ) );
+					group.add( new THREE.VertexNormalsHelper( mesh, 0.1 ) );
 
-					var helper = new THREE.WireframeHelper( mesh );
-					helper.material.depthTest = false;
-					helper.material.opacity = 0.25;
-					helper.material.transparent = true;
-					scene.add( helper );
+					group.add( new THREE.BoxHelper( mesh ) );
 
-					scene.add( new THREE.BoxHelper( mesh ) );
+					var wireframe = new THREE.WireframeGeometry( geometry );
+					var line = new THREE.LineSegments( wireframe );
+					line.material.depthTest = false;
+					line.material.opacity = 0.25;
+					line.material.transparent = true;
+					line.position.x = 4;
+					group.add( line );
+
+					var edges = new THREE.EdgesGeometry( geometry );
+					var line = new THREE.LineSegments( edges );
+					line.material.depthTest = false;
+					line.material.opacity = 0.25;
+					line.material.transparent = true;
+					line.position.x = -4;
+					group.add( line );
 
 				} );
 

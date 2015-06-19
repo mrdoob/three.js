@@ -4,15 +4,15 @@ THREE.WebGLProgram = ( function () {
 
 	function generateDefines( defines ) {
 
-		var value, chunk, chunks = [];
+		var chunks = [];
 
-		for ( var d in defines ) {
+		for ( var name in defines ) {
 
-			value = defines[ d ];
+			var value = defines[ name ];
+
 			if ( value === false ) continue;
 
-			chunk = '#define ' + d + ' ' + value;
-			chunks.push( chunk );
+			chunks.push( '#define ' + name + ' ' + value );
 
 		}
 
@@ -20,14 +20,29 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function cacheUniformLocations( gl, program, identifiers ) {
+	function fetchUniformLocations( gl, program, identifiers ) {
+
 
 		var uniforms = {};
 
-		for ( var i = 0, l = identifiers.length; i < l; i ++ ) {
+		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-			var id = identifiers[ i ];
-			uniforms[ id ] = gl.getUniformLocation( program, id );
+		for ( var i = 0; i < n; i ++ ) {
+
+			var info = gl.getActiveUniform( program , i );
+			var name = info.name;
+			var location = gl.getUniformLocation( program, name );
+
+			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
+
+			var suffixPos = name.lastIndexOf( '[0]' );
+			if ( suffixPos !== -1 && suffixPos === name.length - 3 ) {
+
+				uniforms[ name.substr( 0, suffixPos ) ] = location;
+
+			}
+
+			uniforms[ name ] = location;
 
 		}
 
@@ -35,30 +50,31 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	function cacheAttributeLocations( gl, program, identifiers ) {
+	function fetchAttributeLocations( gl, program, identifiers ) {
 
 		var attributes = {};
 
-		for ( var i = 0, l = identifiers.length; i < l; i ++ ) {
+		var n = gl.getProgramParameter( program, gl.ACTIVE_ATTRIBUTES );
 
-			var id = identifiers[ i ];
-			attributes[ id ] = gl.getAttribLocation( program, id );
+		for ( var i = 0; i < n; i ++ ) {
+
+			var info = gl.getActiveAttrib( program , i );
+			var name = info.name;
+
+			//console.log("THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:", name);
+
+			attributes[ name ] = gl.getAttribLocation( program, name );
 
 		}
 
 		return attributes;
 
 	}
-	
-	function programArrayToString ( previousValue, currentValue, index, array ) {
-	
-		if ( currentValue !== '' && currentValue !== undefined && currentValue !== null ) {
-		
-			return previousValue + currentValue + '\n';
-			
-		}
-		
-		return previousValue;
+
+	function filterEmptyLine( string ) {
+
+		return string !== '';
+
 	}
 
 	return function ( renderer, code, material, parameters ) {
@@ -74,6 +90,7 @@ THREE.WebGLProgram = ( function () {
 
 		var index0AttributeName = material.index0AttributeName;
 
+		/*
 		if ( index0AttributeName === undefined && parameters.morphTargets === true ) {
 
 			// programs with morphTargets displace position out of attribute 0
@@ -81,6 +98,7 @@ THREE.WebGLProgram = ( function () {
 			index0AttributeName = 'position';
 
 		}
+		*/
 
 		var shadowMapTypeDefine = 'SHADOWMAP_TYPE_BASIC';
 
@@ -147,7 +165,7 @@ THREE.WebGLProgram = ( function () {
 
 		var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
 
-		// THREE.log( 'building new program ' );
+		// console.log( 'building new program ' );
 
 		//
 
@@ -157,16 +175,16 @@ THREE.WebGLProgram = ( function () {
 
 		var program = gl.createProgram();
 
-		var prefix_vertex, prefix_fragment;
+		var prefixVertex, prefixFragment;
 
 		if ( material instanceof THREE.RawShaderMaterial ) {
 
-			prefix_vertex = '';
-			prefix_fragment = '';
+			prefixVertex = '';
+			prefixFragment = '';
 
 		} else {
 
-			prefix_vertex = [
+			prefixVertex = [
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
@@ -217,7 +235,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				//renderer.glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && renderer.extensions.get('EXT_frag_depth') ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 
 				'uniform mat4 modelMatrix;',
@@ -269,16 +287,16 @@ THREE.WebGLProgram = ( function () {
 
 				'#endif',
 
-				''
+				'\n'
 
-			].reduce( programArrayToString, '' );
+			].filter( filterEmptyLine ).join( '\n' );
 
-			prefix_fragment = [
+			prefixFragment = [
+
+				( parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
-
-				( parameters.bumpMap || parameters.normalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 
 				customDefines,
 
@@ -323,18 +341,22 @@ THREE.WebGLProgram = ( function () {
 				parameters.shadowMapCascade ? '#define SHADOWMAP_CASCADE' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				//renderer.glExtensionFragDepth ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && renderer.extensions.get('EXT_frag_depth') ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
-				''
 
-			].reduce( programArrayToString, '' );
+				'\n'
+
+			].filter( filterEmptyLine ).join( '\n' );
 
 		}
 
-		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, prefix_vertex + vertexShader );
-		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, prefix_fragment + fragmentShader );
+		var vertexGlsl = prefixVertex + vertexShader;
+		var fragmentGlsl = prefixFragment + fragmentShader;
+
+		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
+		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );
@@ -357,13 +379,13 @@ THREE.WebGLProgram = ( function () {
 
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-			THREE.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
+			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLogInfo, vertexErrorLogInfo, fragmentErrorLogInfo );
 
 		}
 
 		if ( programLogInfo !== '' ) {
 
-			THREE.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
+			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
 
 		}
 
@@ -372,82 +394,57 @@ THREE.WebGLProgram = ( function () {
 		gl.deleteShader( glVertexShader );
 		gl.deleteShader( glFragmentShader );
 
-		// cache uniform locations
+		// set up caching for uniform locations
 
-		var identifiers = [
+		var getUniforms = function() { return this._cachedUniforms; };
 
-			'viewMatrix',
-			'modelViewMatrix',
-			'projectionMatrix',
-			'normalMatrix',
-			'modelMatrix',
-			'cameraPosition',
-			'morphTargetInfluences',
-			'bindMatrix',
-			'bindMatrixInverse'
+		this.getUniforms = function() {
 
-		];
+			// fetch, cache, and next time just use a dumb accessor
+			var uniforms = fetchUniformLocations( gl, program );
+			this._cachedUniforms = uniforms;
+			this.getUniforms = getUniforms;
+			return uniforms;
 
-		if ( parameters.useVertexTexture ) {
+		};
 
-			identifiers.push( 'boneTexture', 'boneTextureWidth', 'boneTextureHeight' );
+		// set up caching for attribute locations
 
-		} else {
+		var getAttributes = function() { return this._cachedAttributes; };
 
-			identifiers.push( 'boneGlobalMatrices' );
+		this.getAttributes = function() {
 
-		}
+			var attributes = fetchAttributeLocations( gl, program );
+			this._cachedAttributes = attributes;
+			this.getAttributes = getAttributes;
+			return attributes;
 
-		if ( parameters.logarithmicDepthBuffer ) {
+		};
 
-			identifiers.push( 'logDepthBufFC' );
+		// DEPRECATED
 
-		}
+		Object.defineProperties( this, {
 
-		for ( var u in uniforms ) {
+			uniforms: {
+				get: function() {
 
-			identifiers.push( u );
+					console.warn( 'THREE.WebGLProgram: .uniforms is now .getUniforms().' );
+					return this.getUniforms();
 
-		}
+				}
+			},
 
-		this.uniforms = cacheUniformLocations( gl, program, identifiers );
+			attributes: {
+				get: function() {
 
-		// cache attributes locations
+					console.warn( 'THREE.WebGLProgram: .attributes is now .getAttributes().' );
+					return this.getAttributes();
 
-		identifiers = [
+				}
+			}
 
-			'position',
-			'normal',
-			'uv',
-			'uv2',
-			'tangent',
-			'color',
-			'skinIndex',
-			'skinWeight',
-			'lineDistance'
+		});
 
-		];
-
-		for ( var i = 0; i < parameters.maxMorphTargets; i ++ ) {
-
-			identifiers.push( 'morphTarget' + i );
-
-		}
-
-		for ( var i = 0; i < parameters.maxMorphNormals; i ++ ) {
-
-			identifiers.push( 'morphNormal' + i );
-
-		}
-
-		for ( var a in attributes ) {
-
-			identifiers.push( a );
-
-		}
-
-		this.attributes = cacheAttributeLocations( gl, program, identifiers );
-		this.attributesKeys = Object.keys( this.attributes );
 
 		//
 

@@ -74,7 +74,7 @@ THREE.Material.prototype = {
 
 			if ( newValue === undefined ) {
 
-				THREE.warn( "THREE.Material: '" + key + "' parameter is undefined." );
+				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
 				continue;
 
 			}
@@ -91,7 +91,7 @@ THREE.Material.prototype = {
 
 					currentValue.copy( newValue );
 
-				} else if ( key == 'overdraw' ) {
+				} else if ( key === 'overdraw' ) {
 
 					// ensure overdraw is backwards-compatable with legacy boolean type
 					this[ key ] = Number( newValue );
@@ -108,16 +108,14 @@ THREE.Material.prototype = {
 
 	},
 
-	toJSON: function() {
+	toJSON: function ( meta ) {
 
-		// we will store all serialization data on 'data'
-		var data = {};
-
-		// add metadata
-		data.metadata = {
-			version: 4.4,
-			type: 'Material',
-			generator: 'Material.toJSON'
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'Material',
+				generator: 'Material.toJSON'
+			}
 		};
 
 		// standard Material serialization
@@ -125,9 +123,39 @@ THREE.Material.prototype = {
 		data.type = this.type;
 		if ( this.name !== '' ) data.name = this.name;
 
+		if ( this.color instanceof THREE.Color ) data.color = this.color.getHex();
+		if ( this.emissive instanceof THREE.Color ) data.emissive = this.emissive.getHex();
+		if ( this.specular instanceof THREE.Color ) data.specular = this.specular.getHex();
+		if ( this.shininess !== undefined ) data.shininess = this.shininess;
+
+		if ( this.map instanceof THREE.Texture ) data.map = this.map.toJSON( meta ).uuid;
+		if ( this.alphaMap instanceof THREE.Texture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
+		if ( this.lightMap instanceof THREE.Texture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
+		if ( this.bumpMap instanceof THREE.Texture ) {
+			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
+			data.bumpScale = this.bumpScale;
+		}
+		if ( this.normalMap instanceof THREE.Texture ) {
+			data.normalMap = this.normalMap.toJSON( meta ).uuid;
+			data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
+		}
+		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
+		if ( this.envMap instanceof THREE.Texture ) {
+			data.envMap = this.envMap.toJSON( meta ).uuid;
+			data.reflectivity = this.reflectivity; // Scale behind envMap
+		}
+
+		if ( this.size !== undefined ) data.size = this.size;
+		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
+
+		if ( this.vertexColors !== undefined && this.vertexColors !== THREE.NoColors ) data.vertexColors = this.vertexColors;
+		if ( this.shading !== undefined && this.shading !== THREE.SmoothShading ) data.shading = this.shading;
+		if ( this.blending !== undefined && this.blending !== THREE.NormalBlending ) data.blending = this.blending;
+		if ( this.side !== undefined && this.side !== THREE.FrontSide ) data.side = this.side;
+
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
-		if ( this.transparent !== false ) data.transparent = this.transparent;
-		if ( this.wireframe !== false ) data.wireframe = this.wireframe;
+		if ( this.transparent === true ) data.transparent = this.transparent;
+		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 
 		return data;
 

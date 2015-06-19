@@ -26,13 +26,6 @@ if ( Math.sign === undefined ) {
 
 }
 
-
-// set the default log handlers
-THREE.log = function() { console.log.apply( console, arguments ); };
-THREE.warn = function() { console.warn.apply( console, arguments ); };
-THREE.error = function() { console.error.apply( console, arguments ); };
-
-
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
 THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
@@ -208,25 +201,25 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
 THREE.Projector = function () {
 
-	THREE.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
+	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
 
 	this.projectVector = function ( vector, camera ) {
 
-		THREE.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
+		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
 		vector.project( camera );
 
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		THREE.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
+		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
 		vector.unproject( camera );
 
 	};
 
 	this.pickingRay = function ( vector, camera ) {
 
-		THREE.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
+		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
 
 	};
 
@@ -234,7 +227,7 @@ THREE.Projector = function () {
 
 THREE.CanvasRenderer = function () {
 
-	THREE.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
+	console.error( 'THREE.CanvasRenderer has been moved to /examples/js/renderers/CanvasRenderer.js' );
 
 	this.domElement = document.createElement( 'canvas' );
 	this.clear = function () {};

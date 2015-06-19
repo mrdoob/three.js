@@ -89,8 +89,17 @@
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					var type = Math.random() > 0.5 ? THREE.LineStrip : THREE.LinePieces;
-					var object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } ), type );
+					var object;
+
+					if ( Math.random() > 0.5 ) {
+
+						object = new THREE.Line( geometry );
+
+					} else {
+
+						object = new THREE.LineSegments( geometry );
+
+					}
 
 					object.position.x = Math.random() * 400 - 200;
 					object.position.y = Math.random() * 400 - 200;

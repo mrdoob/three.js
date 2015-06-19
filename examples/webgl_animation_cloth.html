@@ -191,7 +191,7 @@
 
 				// cloth geometry
 				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h );
-				clothGeometry = new THREE.DynamicGeometry().fromGeometry( clothGeometry );
+				clothGeometry.dynamic = true;
 
 				var uniforms = { texture:  { type: "t", value: clothTexture } };
 				var vertexShader = document.getElementById( 'vertexShaderDepth' ).textContent;
@@ -241,7 +241,7 @@
 				// poles
 
 				var poleGeo = new THREE.BoxGeometry( 5, 375, 5 );
-				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shiness: 100 } );
+				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 100 } );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
 				mesh.position.x = -125;
@@ -347,6 +347,9 @@
 					clothGeometry.vertices[ i ].copy( p[ i ].position );
 
 				}
+
+				clothGeometry.computeFaceNormals();
+				clothGeometry.computeVertexNormals();
 
 				clothGeometry.normalsNeedUpdate = true;
 				clothGeometry.verticesNeedUpdate = true;

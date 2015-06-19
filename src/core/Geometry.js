@@ -45,8 +45,6 @@ THREE.Geometry = function () {
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
 
-	this.groupsNeedUpdate = false;
-
 };
 
 THREE.Geometry.prototype = {
@@ -220,6 +218,28 @@ THREE.Geometry.prototype = {
 
 	},
 
+	normalize: function () {
+
+		this.computeBoundingSphere();
+
+		var center = this.boundingSphere.center;
+		var radius = this.boundingSphere.radius;
+
+		var s = radius === 0 ? 1 : 1.0 / radius;
+
+		var matrix = new THREE.Matrix4();
+		matrix.set(
+			s, 0, 0, -s * center.x,
+			0, s, 0, -s * center.y,
+			0, 0, s, -s * center.z,
+			0, 0, 0, 1
+		);
+
+		this.applyMatrix( matrix );
+
+		return this;
+	},
+
 	computeFaceNormals: function () {
 
 		var cb = new THREE.Vector3(), ab = new THREE.Vector3();
@@ -306,9 +326,21 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
-			face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
-			face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
+			var vertexNormals = face.vertexNormals;
+
+			if ( vertexNormals.length === 3 ) {
+
+				vertexNormals[ 0 ].copy( vertices[ face.a ] );
+				vertexNormals[ 1 ].copy( vertices[ face.b ] );
+				vertexNormals[ 2 ].copy( vertices[ face.c ] );
+
+			} else {
+
+				vertexNormals[ 0 ] = vertices[ face.a ].clone();
+				vertexNormals[ 1 ] = vertices[ face.b ].clone();
+				vertexNormals[ 2 ] = vertices[ face.c ].clone();
+
+			}
 
 		}
 
@@ -583,7 +615,7 @@ THREE.Geometry.prototype = {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
-			THREE.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
+			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
 
 		}
@@ -689,7 +721,7 @@ THREE.Geometry.prototype = {
 
 		if ( mesh instanceof THREE.Mesh === false ) {
 
-			THREE.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
+			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 			return;
 
 		}
@@ -730,7 +762,7 @@ THREE.Geometry.prototype = {
 
 			} else {
 
-				//THREE.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 				changes[ i ] = changes[ verticesMap[ key ] ];
 
 			}
@@ -757,7 +789,7 @@ THREE.Geometry.prototype = {
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
 			for ( var n = 0; n < 3; n ++ ) {
-				if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
 					dupIndex = n;
 					faceIndicesToRemove.push( i );
@@ -789,16 +821,14 @@ THREE.Geometry.prototype = {
 
 	},
 
-	toJSON: function() {
+	toJSON: function () {
 
-		// we will store all serialization data on 'data'
-		var data = {};
-
-		// add metadata
-		data.metadata = {
-			version: 4.4,
-			type: 'Geometry',
-			generator: 'Geometry.toJSON'
+		var data = {
+			metadata: {
+				version: 4.4,
+				type: 'Geometry',
+				generator: 'Geometry.toJSON'
+			}
 		};
 
 		// standard Geometry serialization
@@ -1038,6 +1068,14 @@ THREE.Geometry.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	// Backwards compatibility
+
+	set groupsNeedUpdate ( value ) {
+
+		if ( value === true ) this.dispose();
 
 	}
 

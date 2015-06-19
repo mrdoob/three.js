@@ -16,12 +16,12 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 		phiStart: phiStart,
 		phiLength: phiLength,
 		thetaStart: thetaStart,
-		thetaLength: thetaLength 
+		thetaLength: thetaLength
 	};
 
 	radius = radius || 50;
 
-	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
+	widthSegments = Math.max( 2, Math.floor( widthSegments ) || 8 );
 	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
 
 	phiStart = phiStart !== undefined ? phiStart : 0;
@@ -30,31 +30,27 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
-	var stride = ( 3 + 3 + 2 );
-	var vertexBuffer = new THREE.InterleavedBuffer( new Float32Array( ( ( widthSegments + 1 ) * ( heightSegments + 1 ) ) * stride ), stride );
+	var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
 
-	var positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
-	this.addAttribute( 'position', positions );
-	var normals = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 3 );
-	this.addAttribute( 'normal', normals );
-	var uvs = new THREE.InterleavedBufferAttribute( vertexBuffer, 2, 6 );
-	this.addAttribute( 'uv', uvs );
+	var positions = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3 );
+	var normals = new THREE.BufferAttribute( new Float32Array( vertexCount * 3 ), 3);
+	var uvs = new THREE.BufferAttribute( new Float32Array( vertexCount * 2 ), 2 );
 
-	var x, y, u, v, px, py, pz, index = 0, vertices = [], normal = new THREE.Vector3();
+	var index = 0, vertices = [], normal = new THREE.Vector3();
 
-	for ( y = 0; y <= heightSegments; y ++ ) {
+	for ( var y = 0; y <= heightSegments; y ++ ) {
 
 		var verticesRow = [];
 
-		v = y / heightSegments;
+		var v = y / heightSegments;
 
-		for ( x = 0; x <= widthSegments; x ++ ) {
+		for ( var x = 0; x <= widthSegments; x ++ ) {
 
-			u = x / widthSegments;
+			var u = x / widthSegments;
 
-			px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-			py = radius * Math.cos( thetaStart + v * thetaLength );
-			pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			var px = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			var py = radius * Math.cos( thetaStart + v * thetaLength );
+			var pz = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
 			normal.set( px, py, pz ).normalize();
 
@@ -73,35 +69,27 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 	}
 
 	var indices = [];
-	var ul;
-	for ( y = 0, ul = heightSegments - 1; y < ul; y++ ) {
 
-		for ( x = 0; x < widthSegments; x++ ) {
+	for ( var y = 0; y < heightSegments; y ++ ) {
 
-			var v1 = vertices[y][x + 1];
-			var v2 = vertices[y][x];
-			var v3 = vertices[y + 1][x];
-			var v4 = vertices[y + 1][x + 1];
+		for ( var x = 0; x < widthSegments; x ++ ) {
+
+			var v1 = vertices[ y     ][ x + 1 ];
+			var v2 = vertices[ y     ][ x     ];
+			var v3 = vertices[ y + 1 ][ x     ];
+			var v4 = vertices[ y + 1 ][ x + 1 ];
 
 			if ( y !== 0 ) indices.push( v1, v2, v4 );
-			indices.push( v2, v3, v4 );
+			if ( y !== heightSegments - 1 ) indices.push( v2, v3, v4 );
 
 		}
-	}
-
-	y = heightSegments;
-
-	for ( x = 0; x < widthSegments; x++ ) {
-
-		var v2 = vertices[y][x];
-		var v3 = vertices[y - 1][x];
-		var v4 = vertices[y - 1][x + 1];
-
-		indices.push( v2, v4, v3 );
 
 	}
 
 	this.addAttribute( 'index', new THREE.BufferAttribute( new Uint16Array( indices ), 1 ) );
+	this.addAttribute( 'position', positions );
+	this.addAttribute( 'normal', normals );
+	this.addAttribute( 'uv', uvs );
 
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 

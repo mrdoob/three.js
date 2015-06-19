@@ -740,7 +740,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		this.render( geo_callback );
 
-		// THREE.log( "generated " + geo.faces.length + " triangles" );
+		// console.log( "generated " + geo.faces.length + " triangles" );
 
 		return geo;
 

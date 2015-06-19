@@ -10,7 +10,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 	var sortFunction = function ( a, b ) { return a - b };
 
 	var keys = [ 'a', 'b', 'c' ];
-	var skinning = false;
+	this.skinning = false;
 
 	if ( geometry instanceof THREE.Geometry ) {
 
@@ -54,7 +54,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 		if ( skinIndices && skinWeights && skinIndices.length && skinWeights.length ) {
 			newSkinWeights = new Float32Array( numEdges * 2 * 4 );
 			newSkinIndices = new Float32Array( numEdges * 2 * 4 );
-			skinning = true;
+			this.skinning = true;
 		}
 
 		for ( var i = 0, l = numEdges; i < l; i ++ ) {
@@ -67,7 +67,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 				coords[ index + 0 ] = vertex.x;
 				coords[ index + 1 ] = vertex.y;
 				coords[ index + 2 ] = vertex.z;
-				if ( skinning ) {
+				if ( this.skinning ) {
 					var skinIndex = skinIndices[ edges [ 2 * i + j] ];
 					var skinWeight = skinWeights[ edges [ 2 * i + j] ];
 					index = 8 * i + 4 * j;
@@ -85,7 +85,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 		}
 
 		this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
-		if ( skinning ) {
+		if ( this.skinning ) {
 			this.addAttribute( 'skinWeight', new THREE.BufferAttribute( newSkinWeights, 4 ) );
 			this.addAttribute( 'skinIndex', new THREE.BufferAttribute( newSkinIndices, 4 ) );
 		}
@@ -132,7 +132,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 				var skinWeights = geometry.attributes.skinWeight.array;
 				this.addAttribute( 'skinWeight', new THREE.BufferAttribute( skinWeights, 4 ) );
 				this.addAttribute( 'skinIndex', new THREE.BufferAttribute( skinIndices, 4 ) );
-				skinning = true;
+				this.skinning = true;
 			}
 
 		} else { // non-indexed BufferGeometry

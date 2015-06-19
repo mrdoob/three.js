@@ -8,7 +8,7 @@ THREE.Cache = {
 
 	add: function ( key, file ) {
 
-		// THREE.log( 'THREE.Cache', 'Adding key:', key );
+		// console.log( 'THREE.Cache', 'Adding key:', key );
 
 		this.files[ key ] = file;
 
@@ -16,7 +16,7 @@ THREE.Cache = {
 
 	get: function ( key ) {
 
-		// THREE.log( 'THREE.Cache', 'Checking key:', key );
+		// console.log( 'THREE.Cache', 'Checking key:', key );
 
 		return this.files[ key ];
 

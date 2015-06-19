@@ -55,13 +55,3 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	return material;
 
 };
-
-THREE.SpriteMaterial.prototype.toJSON = function () {
-
-	var data = THREE.Material.prototype.toJSON.call( this );
-
-	data.color = this.color.getHex();
-
-	return data;
-
-};
