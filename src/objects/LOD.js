@@ -136,10 +136,14 @@ THREE.LOD.prototype.clone = function ( object ) {
 
 	THREE.Object3D.prototype.clone.call( this, object, false );
 
-	for ( var i = 0, l = this.objects.length; i < l; i ++ ) {
-		var x = this.objects[ i ].object.clone();
-		x.visible = i === 0;
-		object.addLevel( x, this.objects[ i ].distance );
+	var levels = this.levels;
+
+	for ( var i = 0, l = levels.length; i < l; i ++ ) {
+
+		var level = levels[ i ];
+
+		object.addLevel( level.object.clone(), level.distance );
+
 	}
 
 	return object;
