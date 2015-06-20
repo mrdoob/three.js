@@ -116,7 +116,7 @@ THREE.LOD.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) object = new THREE.LOD();
 
-	THREE.Object3D.prototype.clone.call( this, object );
+	THREE.Object3D.prototype.clone.call( this, object, false );
 
 	for ( var i = 0, l = this.objects.length; i < l; i ++ ) {
 		var x = this.objects[ i ].object.clone();
