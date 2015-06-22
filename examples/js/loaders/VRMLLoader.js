@@ -357,7 +357,7 @@ THREE.VRMLLoader.prototype = {
 								r: parseFloat(parts[1]),
 								g: parseFloat(parts[2]),
 								b: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -373,7 +373,7 @@ THREE.VRMLLoader.prototype = {
 								x: parseFloat(parts[1]),
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -404,7 +404,7 @@ THREE.VRMLLoader.prototype = {
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3]),
 								w: parseFloat(parts[4])
-							}
+							};
 
 							break;
 
@@ -498,7 +498,7 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				return tree;
-			}
+			};
 
 			var parseNode = function ( data, parent ) {
 
@@ -807,7 +807,7 @@ THREE.VRMLLoader.prototype = {
 
 				}
 
-			}
+			};
 
 			parseNode( getTree( lines ), scene );
 

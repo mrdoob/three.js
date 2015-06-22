@@ -208,13 +208,6 @@
 
 				var particles = new THREE.Geometry();
 
-				function newpos( x, y, z ) {
-
-					return new THREE.Vector3( x, y, z );
-
-				}
-
-
 				var Pool = {
 
 					__pools: [],
@@ -229,7 +222,7 @@
 
 						}
 
-						console.log( "pool ran out!" )
+						console.log( "pool ran out!" );
 						return null;
 
 					},
@@ -247,7 +240,7 @@
 
 				for ( i = 0; i < particlesLength; i ++ ) {
 
-					particles.vertices.push( newpos( Math.random() * 200 - 100, Math.random() * 100 + 150, Math.random() * 50 ) );
+					particles.vertices.push( new THREE.Vector3( Math.random() * 200 - 100, Math.random() * 100 + 150, Math.random() * 50 ) );
 					Pool.add( i );
 
 				}
@@ -346,17 +339,14 @@
 
 				particleCloud = new THREE.PointCloud( particles, shaderMaterial );
 
-				var vertices = particleCloud.geometry.vertices;
+				var vertices = particles.vertices;
 				var values_size = attributes.size.value;
 				var values_color = attributes.pcolor.value;
 
 				for( var v = 0; v < vertices.length; v ++ ) {
 
 					values_size[ v ] = 50;
-
 					values_color[ v ] = new THREE.Color( 0x000000 );
-
-					particles.vertices[ v ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
 				}
 
@@ -432,7 +422,7 @@
 						pointLight.color.setHSL( hue, 0.8, 0.5 );
 
 
-					};
+					}
 
 				};
 

@@ -5,7 +5,7 @@ THREE.MultiVector3 = function(links) {
 
 	this.links = links;
 
-}
+};
 
 THREE.MultiVector3.prototype = Object.create( THREE.Vector3.prototype );
 THREE.MultiVector3.prototype.constructor = THREE.MultiVector3;
@@ -18,7 +18,7 @@ THREE.MultiVector3.prototype.setAll = function(axis, value) {
 
 	}
 
-}
+};
 
 // Getters return value from the first linked vector
 // Setters set the same value for all linked vectors

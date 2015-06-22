@@ -36,7 +36,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.defines = {};
 	this.uniforms = {};
-	this.attributes = null;
+	this.attributes = [];
 
 	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
 	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
@@ -59,6 +59,8 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
+	this.derivatives = false; // set to use derivatives
+
 	// When rendered geometry doesn't include these attributes but the material does,
 	// use these default values in WebGL. This avoids errors when buffer data is missing.
 	this.defaultAttributeValues = {
@@ -69,16 +71,27 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.index0AttributeName = undefined;
 
-	this.setValues( parameters );
+	if ( parameters !== undefined ) {
+
+		if ( parameters.attributes !== undefined && Array.isArray( parameters.attributes ) === false ) {
+
+			console.warn( 'THREE.ShaderMaterial: attributes should now be an array of attribute names.' );
+			parameters.attributes = Object.keys( parameters.attributes );
+
+		}
+
+		this.setValues( parameters );
+
+	}
 
 };
 
 THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 
-THREE.ShaderMaterial.prototype.clone = function () {
+THREE.ShaderMaterial.prototype.clone = function ( material ) {
 
-	var material = new THREE.ShaderMaterial();
+	if ( material === undefined ) material = new THREE.ShaderMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -107,5 +120,18 @@ THREE.ShaderMaterial.prototype.clone = function () {
 	material.morphNormals = this.morphNormals;
 
 	return material;
+
+};
+
+THREE.ShaderMaterial.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Material.prototype.toJSON.call( this, meta );
+
+	data.uniforms = this.uniforms;
+	data.attributes = this.attributes;
+	data.vertexShader = this.vertexShader;
+	data.fragmentShader = this.fragmentShader;
+
+	return data;
 
 };

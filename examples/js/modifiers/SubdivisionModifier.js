@@ -136,7 +136,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var metaVertices, sourceEdges;
 
 		// new stuff.
-		var sourceEdges, newEdgeVertices, newSourceVertices
+		var sourceEdges, newEdgeVertices, newSourceVertices;
 
 		oldVertices = geometry.vertices; // { x, y, z}
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }

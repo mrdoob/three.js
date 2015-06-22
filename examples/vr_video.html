@@ -131,6 +131,7 @@
 				controls = new THREE.VRControls( camera );
 
 				effect = new THREE.VREffect( renderer );
+				effect.scale = 0; // video doesn't need eye separation
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//

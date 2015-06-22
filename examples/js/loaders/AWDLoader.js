@@ -74,7 +74,7 @@ THREE.AWDLoader = (function () {
 	return tex;
 
     }
-  }
+  };
 
 
 
@@ -113,7 +113,7 @@ THREE.AWDLoader = (function () {
 		this._accuracyProps   = false;
 
 
-	};
+	}
 
 
 	AWDLoader.prototype = Object.create( THREE.Loader.prototype );
@@ -172,7 +172,7 @@ THREE.AWDLoader = (function () {
 
 		return this.trunk;
 
-	}
+	};
 
 
 
@@ -240,7 +240,7 @@ THREE.AWDLoader = (function () {
 		block.data = assetData;
 		block.id = blockId;
 
-	}
+	};
 
 
 	AWDLoader.prototype._parseHeader = function () {
@@ -277,7 +277,7 @@ THREE.AWDLoader = (function () {
 		this._bodylen = this.readU32();
 
 
-	}
+	};
 
 
 	AWDLoader.prototype.parseContainer = function ( len ) {
@@ -302,7 +302,7 @@ THREE.AWDLoader = (function () {
 		ctr.extra = this.parseUserAttributes();
 
 		return ctr;
-	}
+	};
 
 
 
@@ -336,13 +336,13 @@ THREE.AWDLoader = (function () {
 
 
 
-		meshLen = geometries.length
+		meshLen = geometries.length;
 		meshes = [];
 
     // TODO : BufferGeometry don't support "geometryGroups" for now.
     // so we create sub meshes for each groups
 		if ( meshLen  > 1 ) {
-			mesh = new THREE.Object3D()
+			mesh = new THREE.Object3D();
 			for ( i = 0; i < meshLen; i ++) {
 				var sm = new THREE.Mesh( geometries[i] );
 				meshes.push( sm );
@@ -373,7 +373,7 @@ THREE.AWDLoader = (function () {
 		mesh.extra = this.parseUserAttributes();
 
 		return mesh;
-	}
+	};
 
 
 
@@ -434,7 +434,7 @@ THREE.AWDLoader = (function () {
 
 
 		return mat;
-	}
+	};
 
 
 
@@ -462,7 +462,7 @@ THREE.AWDLoader = (function () {
 
 		this.parseUserAttributes();
 		return asset;
-	}
+	};
 
 	AWDLoader.prototype.loadTexture = function( url ) {
 
@@ -470,7 +470,7 @@ THREE.AWDLoader = (function () {
       this._resourceLoader = new ResourcesLoader( this._url );
 
 		return this._resourceLoader.loadTexture( url );
-	}
+	};
 
   // broken : skeleton pose format is different than threejs one
 	AWDLoader.prototype.parseSkeleton = function(len) // Array<Bone>
@@ -508,7 +508,7 @@ THREE.AWDLoader = (function () {
 
 
 		return skeleton;
-	}
+	};
 
 
 
@@ -548,7 +548,7 @@ THREE.AWDLoader = (function () {
 		this.parseUserAttributes();
 
 		return pose
-	}
+	};
 
 	AWDLoader.prototype.parseSkeletonAnimation = function(blockID)
   {
@@ -573,7 +573,7 @@ THREE.AWDLoader = (function () {
 			pose_addr = this.readU32();
 			frame_dur = this.readU16();
 
-			pose = this._blocks[pose_addr].data
+			pose = this._blocks[pose_addr].data;
       // debug( 'pose address ',pose[2].elements[12],pose[2].elements[13],pose[2].elements[14] );
 			clip.push( {
         pose : pose,
@@ -589,7 +589,7 @@ THREE.AWDLoader = (function () {
     // Ignore attributes for now
 		this.parseUserAttributes();
 		return clip;
-	}
+	};
 
 
 
@@ -612,7 +612,7 @@ THREE.AWDLoader = (function () {
 
 
 		return skeletonFrames;
-	}
+	};
 
 
 	AWDLoader.prototype.parseAnimatorSet = function(len)
@@ -650,7 +650,7 @@ THREE.AWDLoader = (function () {
 			targetMeshes.push(this._blocks[meshAdresses[i]].data);
 		}
 
-		targetAnimationSet = this._blocks[animSetBlockAdress].data
+		targetAnimationSet = this._blocks[animSetBlockAdress].data;
 		var thisAnimator;
 
 		if (type == 1) {
@@ -672,7 +672,7 @@ THREE.AWDLoader = (function () {
     // debug("Parsed a Animator: Name = " + name);
 
 		return thisAnimator;
-	}
+	};
 
 
 
@@ -851,7 +851,7 @@ THREE.AWDLoader = (function () {
     //finalizeAsset(geom, name);
 
 		return geometries;
-	}
+	};
 
 	AWDLoader.prototype.parseMeshPoseAnimation = function(len, poseOnly)
   {
@@ -957,7 +957,7 @@ THREE.AWDLoader = (function () {
 		this.parseUserAttributes();
 
 		return null;
-	}
+	};
 
 
 
@@ -1000,7 +1000,7 @@ THREE.AWDLoader = (function () {
     //e[15] = this.readF32();
 	e[15] = 1.0;
 	return mtx;
-  }
+  };
 
 
 	AWDLoader.prototype.parseProperties = function ( expected ) {
@@ -1111,47 +1111,47 @@ THREE.AWDLoader = (function () {
 			return read_func.call( this );
 		}
 
-	}
+	};
 
 
 	AWDLoader.prototype.readU8 = function () {
 		return this._data.getUint8( this._ptr ++ );
-	}
+	};
 	AWDLoader.prototype.readI8 = function () {
 		return this._data.getInt8( this._ptr ++ );
-	}
+	};
 
 	AWDLoader.prototype.readU16 = function () {
 		var a = this._data.getUint16( this._ptr, littleEndian );
 		this._ptr += 2;
 		return a;
-	}
+	};
 	AWDLoader.prototype.readI16 = function () {
 		var a = this._data.getInt16( this._ptr, littleEndian );
 		this._ptr += 2;
 		return a;
-	}
+	};
 
 	AWDLoader.prototype.readU32 = function () {
 		var a = this._data.getUint32( this._ptr, littleEndian );
 		this._ptr += 4;
 		return a;
-	}
+	};
 	AWDLoader.prototype.readI32 = function () {
 		var a = this._data.getInt32( this._ptr, littleEndian );
 		this._ptr += 4;
 		return a;
-	}
+	};
 	AWDLoader.prototype.readF32 = function () {
 		var a = this._data.getFloat32( this._ptr, littleEndian );
 		this._ptr += 4;
 		return a;
-	}
+	};
 	AWDLoader.prototype.readF64 = function () {
 		var a = this._data.getFloat64( this._ptr, littleEndian );
 		this._ptr += 8;
 		return a;
-	}
+	};
 
 
   /**
@@ -1203,7 +1203,7 @@ THREE.AWDLoader = (function () {
 
 
 
-	AWDProperties = function() {}
+	AWDProperties = function() {};
 
 	AWDProperties.prototype = {
 
@@ -1219,7 +1219,7 @@ THREE.AWDLoader = (function () {
         return this[key];
       else return fallback;
     }
-  }
+  };
 
 	return AWDLoader;
 

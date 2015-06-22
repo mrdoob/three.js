@@ -34,12 +34,27 @@
 
 
 		<h2>Methods</h2>
+		
+		<h3>[method:Vector3 getWorldDirection]([page:Vector3 vector])</h3>
+		<div>
+		vector — (optional)<br />
+		<br />
+		It returns a vector representing the direction in which the camera is looking, in world space.
+		</div>
+		
 
 		<h3>[method:null lookAt]( [page:Vector3 vector] )</h3>
 		<div>
 		vector — point to look at<br />
 		<br />
 		This makes the camera look at the vector position in the global space as long as the parent of this camera is the scene or at position (0,0,0).
+		</div>
+		
+		<h3>[method:Camera clone]( [page:Camera camera] )</h3>
+		<div>
+		camera — camera to clone<br />
+		<br />
+		It returns a clone of camera.
 		</div>
 
 

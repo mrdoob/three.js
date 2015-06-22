@@ -68,4 +68,4 @@ var ImprovedNoise = function () {
 
 		}
 	}
-}
+};

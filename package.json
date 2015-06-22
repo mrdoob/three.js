@@ -1,0 +1,30 @@
+{
+  "name": "three.js",
+  "version": "0.71.0",
+  "description": "JavaScript 3D library",
+  "main": "build/three.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrdoob/three.js"
+  },
+  "keywords": [
+    "three",
+    "three.js",
+    "3d",
+    "webgl"
+  ],
+  "author": "mrdoob",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrdoob/three.js/issues"
+  },
+  "homepage": "http://threejs.org/"
+}

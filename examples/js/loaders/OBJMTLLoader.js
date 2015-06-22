@@ -225,7 +225,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		// f vertex//normal vertex//normal vertex//normal ...
 
-		var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/
+		var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/;
 
 		//
 

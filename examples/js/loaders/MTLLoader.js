@@ -87,7 +87,7 @@ THREE.MTLLoader.prototype = {
 		}
 
 		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options );
-		materialCreator.crossOrigin = this.crossOrigin
+		materialCreator.crossOrigin = this.crossOrigin;
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
