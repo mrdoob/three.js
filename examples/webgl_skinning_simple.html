@@ -76,7 +76,7 @@
 
 					}
 
-					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial(materials));
+					skinnedMesh = new THREE.SkinnedMesh(geometry, new THREE.MeshLambertMaterial({ skinning: true }));
 					skinnedMesh.scale.set( 1, 1, 1 );
 					scene.add( skinnedMesh );
 					animation = new THREE.Animation( skinnedMesh, skinnedMesh.geometry.animations[ 0 ] );
