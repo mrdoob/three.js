@@ -13,7 +13,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 		this.bindMatrix = object.bindMatrix;
 		this.bindMatrixInverse = object.bindMatrixInverse;
 	}
-	THREE.LineSegments.call( this, new THREE.WireframeGeometry( object.geometry ), new THREE.LineBasicMaterial( { color: color, skinning: skinning } ) );
+	THREE.LineSegments.call( this, geometry, new THREE.LineBasicMaterial( { color: color, skinning: skinning } ) );
 
 	this.matrix = object.matrixWorld;
 	this.matrixAutoUpdate = false;
