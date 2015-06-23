@@ -346,6 +346,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				// save current RGB to temp texture
 
+				renderer.state.activeTexture( gl.TEXTURE0 );
+				renderer.state.bindTexture( gl.TEXTURE_2D, null );
 				renderer.state.activeTexture( gl.TEXTURE1 );
 				renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
