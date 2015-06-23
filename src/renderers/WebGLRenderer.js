@@ -1019,6 +1019,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
+		setMaterial( material );
+
 		var geometry = objects.geometries.get( object );
 		var program = setProgram( camera, lights, fog, material, object );
 
@@ -1625,8 +1627,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			setMaterial( overrideMaterial );
-
 			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
 			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
 			renderObjectsImmediate( objects.objectsImmediate, '', camera, lights, fog, overrideMaterial );
@@ -1752,7 +1752,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
-		var material;
+		var material = overrideMaterial;
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -1762,21 +1762,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setupMatrices( object, camera );
 
-			if ( overrideMaterial ) {
+			if ( overrideMaterial === null ) material = object.material;
 
-				material = overrideMaterial;
+			if ( material instanceof THREE.MeshFaceMaterial ) {
 
-			} else {
+				var materials = material.materials;
 
-				material = object.material;
+				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
 
-				if ( ! material ) continue;
+					_this.renderBufferDirect( camera, lights, fog, materials[ j ], object );
 
-				setMaterial( material );
+				}
+
+				continue;
 
 			}
 
-			_this.setMaterialFaces( material );
 			_this.renderBufferDirect( camera, lights, fog, material, object );
 
 		}
@@ -1785,7 +1786,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
 
-		var material;
+		var material = overrideMaterial;
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -1794,19 +1795,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible === true ) {
 
-				if ( overrideMaterial ) {
-
-					material = overrideMaterial;
-
-				} else {
-
-					material = webglObject[ materialType ];
-
-					if ( ! material ) continue;
-
-					setMaterial( material );
-
-				}
+				if ( overrideMaterial === null ) material = webglObject[ materialType ];
 
 				_this.renderImmediateObject( camera, lights, fog, material, object );
 
@@ -1818,11 +1807,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderImmediateObject = function ( camera, lights, fog, material, object ) {
 
+		setMaterial( material );
+
 		var program = setProgram( camera, lights, fog, material, object );
 
 		_currentGeometryProgram = '';
-
-		_this.setMaterialFaces( material );
 
 		if ( object.immediateRenderCallback ) {
 
@@ -2080,6 +2069,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setMaterial( material ) {
 
+		setMaterialFaces( material );
+
 		if ( material.transparent === true ) {
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
@@ -2095,6 +2086,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		state.setDepthWrite( material.depthWrite );
 		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+
+	}
+
+	function setMaterialFaces( material ) {
+
+		state.setDoubleSided( material.side === THREE.DoubleSide );
+		state.setFlipSided( material.side === THREE.BackSide );
 
 	}
 
@@ -3190,12 +3188,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setMaterialFaces = function ( material ) {
-
-		state.setDoubleSided( material.side === THREE.DoubleSide );
-		state.setFlipSided( material.side === THREE.BackSide );
-
-	};
+	this.setMaterialFaces = setMaterialFaces;
 
 	// Textures
 
