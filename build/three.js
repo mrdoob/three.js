@@ -19396,20 +19396,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var setDefaultGLState = function () {
 
-		_gl.clearColor( 0, 0, 0, 1 );
-		_gl.clearDepth( 1 );
-		_gl.clearStencil( 0 );
-
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthFunc( _gl.LEQUAL );
-
-		_gl.frontFace( _gl.CCW );
-		_gl.cullFace( _gl.BACK );
-		_gl.enable( _gl.CULL_FACE );
-
-		_gl.enable( _gl.BLEND );
-		_gl.blendEquation( _gl.FUNC_ADD );
-		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
+		state.init();
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
@@ -21092,6 +21079,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var shader = THREE.ShaderLib[ shaderID ];
 
 			material.__webglShader = {
+				name: material.type,
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
@@ -21100,6 +21088,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			material.__webglShader = {
+				name: material.type,
 				uniforms: material.uniforms,
 				vertexShader: material.vertexShader,
 				fragmentShader: material.fragmentShader
@@ -23845,6 +23834,8 @@ THREE.WebGLProgram = ( function () {
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
 
+				'#define SHADER_NAME ' + material.__webglShader.name,
+
 				customDefines,
 
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
@@ -24173,6 +24164,7 @@ THREE.WebGLShader = ( function () {
 THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	var _gl = _renderer.context,
+	_state = _renderer.state,
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
@@ -24251,7 +24243,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_gl.disable( _gl.BLEND );
+		_state.setBlend( false );
 
 		_gl.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
@@ -24266,7 +24258,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.state.setDepthTest( true );
+		_state.setDepthTest( true );
 
 		// preprocess lights
 		// 	- skip lights that are not casting shadows
@@ -24503,7 +24495,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_gl.enable( _gl.BLEND );
+		_state.setBlend( true );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 
@@ -24695,6 +24687,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
+	var currentBlend = null;
 	var currentBlending = null;
 	var currentBlendEquation = null;
 	var currentBlendSrc = null;
@@ -24722,6 +24715,25 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	var currentTextureSlot = undefined;
 	var currentBoundTextures = {};
+
+	this.init = function () {
+
+		gl.clearColor( 0, 0, 0, 1 );
+		gl.clearDepth( 1 );
+		gl.clearStencil( 0 );
+
+		gl.enable( gl.DEPTH_TEST );
+		gl.depthFunc( gl.LEQUAL );
+
+		gl.frontFace( gl.CCW );
+		gl.cullFace( gl.BACK );
+		gl.enable( gl.CULL_FACE );
+
+		gl.enable( gl.BLEND );
+		gl.blendEquation( gl.FUNC_ADD );
+		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+
+	};
 
 	this.initAttributes = function () {
 
@@ -24761,41 +24773,63 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
+	this.setBlend = function ( blend ) {
+
+		if ( blend !== currentBlend ) {
+
+			if ( blend ) {
+
+				gl.enable( gl.BLEND );
+
+			} else {
+
+				gl.disable( gl.BLEND );
+
+			}
+
+			currentBlend = blend;
+
+		}
+
+	};
+
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
 
 		if ( blending !== currentBlending ) {
 
 			if ( blending === THREE.NoBlending ) {
 
-				gl.disable( gl.BLEND );
+				this.setBlend( false );
 
 			} else if ( blending === THREE.AdditiveBlending ) {
 
-				gl.enable( gl.BLEND );
+				this.setBlend( true );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
 			} else if ( blending === THREE.SubtractiveBlending ) {
 
 				// TODO: Find blendFuncSeparate() combination
-				gl.enable( gl.BLEND );
+
+				this.setBlend( true );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
 
 			} else if ( blending === THREE.MultiplyBlending ) {
 
 				// TODO: Find blendFuncSeparate() combination
-				gl.enable( gl.BLEND );
+
+				this.setBlend( true );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
 			} else if ( blending === THREE.CustomBlending ) {
 
-				gl.enable( gl.BLEND );
+				this.setBlend( true );
 
 			} else {
 
-				gl.enable( gl.BLEND );
+				this.setBlend( true );
 				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 				gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
@@ -24846,66 +24880,67 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	this.setDepthFunc = function ( depthFunc ) {
 
-	    if ( currentDepthFunc !== depthFunc ) {
+		if ( currentDepthFunc !== depthFunc ) {
 
-	        if ( depthFunc ) {
+			if ( depthFunc ) {
 
-	            switch ( depthFunc ) {
+				switch ( depthFunc ) {
 
-	                case THREE.NeverDepth:
+					case THREE.NeverDepth:
 
-	                    gl.depthFunc( gl.NEVER );
-	                    break;
+						gl.depthFunc( gl.NEVER );
+						break;
 
-	                case THREE.AlwaysDepth:
+					case THREE.AlwaysDepth:
 
-	                    gl.depthFunc( gl.ALWAYS );
-	                    break;
+						gl.depthFunc( gl.ALWAYS );
+						break;
 
-	                case THREE.LessDepth:
+					case THREE.LessDepth:
 
-	                    gl.depthFunc( gl.LESS );
-	                    break;
+						gl.depthFunc( gl.LESS );
+						break;
 
-	                case THREE.LessEqualDepth:
+					case THREE.LessEqualDepth:
 
-	                    gl.depthFunc( gl.LEQUAL );
-	                    break;
+						gl.depthFunc( gl.LEQUAL );
+						break;
 
-	                case THREE.EqualDepth:
+					case THREE.EqualDepth:
 
-	                    gl.depthFunc( gl.EQUAL );
-	                    break;
+						gl.depthFunc( gl.EQUAL );
+						break;
 
-	                case THREE.GreaterEqualDepth:
+					case THREE.GreaterEqualDepth:
 
-	                    gl.depthFunc( gl.GEQUAL );
-	                    break;
+						gl.depthFunc( gl.GEQUAL );
+						break;
 
-	                case THREE.GreaterDepth:
+					case THREE.GreaterDepth:
 
-	                    gl.depthFunc( gl.GREATER );
-	                    break;
+						gl.depthFunc( gl.GREATER );
+						break;
 
-	                case THREE.NotEqualDepth:
+					case THREE.NotEqualDepth:
 
-	                    gl.depthFunc( gl.NOTEQUAL );
-	                    break;
+						gl.depthFunc( gl.NOTEQUAL );
+						break;
 
-	                default:
+					default:
 
-                        gl.depthFunc( gl.LEQUAL );
-	            }
+						gl.depthFunc( gl.LEQUAL );
 
-	        } else {
+				}
 
-	            gl.depthFunc( gl.LEQUAL );
+			} else {
 
-	        }
+				gl.depthFunc( gl.LEQUAL );
 
-	        currentDepthFunc = depthFunc;
+			}
 
-	    }
+			currentDepthFunc = depthFunc;
+
+		}
 
 	};
 
@@ -25139,6 +25174,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 	var gl = renderer.context;
+	var state = renderer.state;
 
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
@@ -25176,14 +25212,14 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		tempTexture      = gl.createTexture();
 		occlusionTexture = gl.createTexture();
 
-		renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
+		state.bindTexture( gl.TEXTURE_2D, tempTexture );
 		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 16, 16, 0, gl.RGB, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 
-		renderer.state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+		state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
 		gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, 16, 16, 0, gl.RGBA, gl.UNSIGNED_BYTE, null );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
 		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
@@ -25428,10 +25464,10 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		gl.useProgram( program );
 
-		renderer.state.initAttributes();
-		renderer.state.enableAttribute( attributes.vertex );
-		renderer.state.enableAttribute( attributes.uv );
-		renderer.state.disableUnusedAttributes();
+		state.initAttributes();
+		state.enableAttribute( attributes.vertex );
+		state.enableAttribute( attributes.uv );
+		state.disableUnusedAttributes();
 
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms
@@ -25479,8 +25515,10 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				// save current RGB to temp texture
 
-				renderer.state.activeTexture( gl.TEXTURE1 );
-				renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
+				state.activeTexture( gl.TEXTURE0 );
+				state.bindTexture( gl.TEXTURE_2D, null );
+				state.activeTexture( gl.TEXTURE1 );
+				state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGB, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
 
 
@@ -25490,7 +25528,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform2f( uniforms.scale, scale.x, scale.y );
 				gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 
-				gl.disable( gl.BLEND );
+				state.setBlend( false );
 				gl.enable( gl.DEPTH_TEST );
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
@@ -25498,8 +25536,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 				// copy result to occlusionMap
 
-				renderer.state.activeTexture( gl.TEXTURE0 );
-				renderer.state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
+				state.activeTexture( gl.TEXTURE0 );
+				state.bindTexture( gl.TEXTURE_2D, occlusionTexture );
 				gl.copyTexImage2D( gl.TEXTURE_2D, 0, gl.RGBA, screenPositionPixels.x - 8, screenPositionPixels.y - 8, 16, 16, 0 );
 
 
@@ -25508,8 +25546,8 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform1i( uniforms.renderType, 1 );
 				gl.disable( gl.DEPTH_TEST );
 
-				renderer.state.activeTexture( gl.TEXTURE1 );
-				renderer.state.bindTexture( gl.TEXTURE_2D, tempTexture );
+				state.activeTexture( gl.TEXTURE1 );
+				state.bindTexture( gl.TEXTURE_2D, tempTexture );
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
 
@@ -25530,7 +25568,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				// render flares
 
 				gl.uniform1i( uniforms.renderType, 2 );
-				gl.enable( gl.BLEND );
+				state.setBlend( true );
 
 				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
@@ -25554,7 +25592,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 						gl.uniform1f( uniforms.opacity, sprite.opacity );
 						gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-						renderer.state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
+						state.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
 						renderer.setTexture( sprite.texture, 1 );
 
 						gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
@@ -25613,6 +25651,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 THREE.SpritePlugin = function ( renderer, sprites ) {
 
 	var gl = renderer.context;
+	var state = renderer.state;
 
 	var vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
@@ -25705,13 +25744,13 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.useProgram( program );
 
-		renderer.state.initAttributes();
-		renderer.state.enableAttribute( attributes.position );
-		renderer.state.enableAttribute( attributes.uv );
-		renderer.state.disableUnusedAttributes();
+		state.initAttributes();
+		state.enableAttribute( attributes.position );
+		state.enableAttribute( attributes.uv );
+		state.disableUnusedAttributes();
 
 		gl.disable( gl.CULL_FACE );
-		gl.enable( gl.BLEND );
+		state.setBlend( true );
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.vertexAttribPointer( attributes.position, 2, gl.FLOAT, false, 2 * 8, 0 );
@@ -25721,7 +25760,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
-		renderer.state.activeTexture( gl.TEXTURE0 );
+		state.activeTexture( gl.TEXTURE0 );
 		gl.uniform1i( uniforms.map, 0 );
 
 		var oldFogType = 0;
@@ -25823,9 +25862,9 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 			gl.uniform1f( uniforms.rotation, material.rotation );
 			gl.uniform2fv( uniforms.scale, scale );
 
-			renderer.state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			renderer.state.setDepthTest( material.depthTest );
-			renderer.state.setDepthWrite( material.depthWrite );
+			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			state.setDepthTest( material.depthTest );
+			state.setDepthWrite( material.depthWrite );
 
 			if ( material.map && material.map.image && material.map.image.width ) {
 
