@@ -1848,6 +1848,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var webglProps = objectRendererWebGLProps[material.uuid];
+
 		var shaderID = shaderIDs[ material.type ];
 
 		// heuristics to create shader parameters according to lights in the scene
@@ -1947,12 +1949,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var code = chunks.join();
 
-		if ( !objectRendererWebGLProps[material.uuid].program ) {
+		if ( !webglProps.program ) {
 
 			// new material
 			material.addEventListener( 'dispose', onMaterialDispose );
 
-		} else if ( objectRendererWebGLProps[material.uuid].program.code !== code ) {
+		} else if ( webglProps.program.code !== code ) {
 
 			// changed glsl or parameters
 			deallocateMaterial( material );
@@ -1962,7 +1964,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// same glsl
 			return;
 
-		} else if ( objectRendererWebGLProps[material.uuid].__webglShader.uniforms === material.uniforms ) {
+		} else if ( webglProps.__webglShader.uniforms === material.uniforms ) {
 
 			// same uniforms (container object)
 			return;
@@ -1973,7 +1975,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var shader = THREE.ShaderLib[ shaderID ];
 
-			objectRendererWebGLProps[material.uuid].__webglShader = {
+			webglProps.__webglShader = {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
@@ -1981,7 +1983,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			objectRendererWebGLProps[material.uuid].__webglShader = {
+			webglProps.__webglShader = {
 				uniforms: material.uniforms,
 				vertexShader: material.vertexShader,
 				fragmentShader: material.fragmentShader
@@ -2010,7 +2012,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( program === undefined ) {
 
-			material.__webglShader = objectRendererWebGLProps[material.uuid].__webglShader;
+			material.__webglShader = webglProps.__webglShader;
 			program = new THREE.WebGLProgram( _this, code, material, parameters );
 			_programs.push( program );
 
@@ -2018,7 +2020,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		objectRendererWebGLProps[material.uuid].program = program;
+		webglProps.program = program;
 
 		var attributes = program.getAttributes();
 
@@ -2054,15 +2056,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		objectRendererWebGLProps[material.uuid].uniformsList = [];
+		webglProps.uniformsList = [];
 
-		var uniformLocations = objectRendererWebGLProps[material.uuid].program.getUniforms();
-		for ( var u in objectRendererWebGLProps[material.uuid].__webglShader.uniforms ) {
+		var uniformLocations = webglProps.program.getUniforms();
+		for ( var u in webglProps.__webglShader.uniforms ) {
 
 			var location = uniformLocations[ u ];
 
 			if ( location ) {
-				objectRendererWebGLProps[material.uuid].uniformsList.push( [ objectRendererWebGLProps[material.uuid].__webglShader.uniforms[ u ], location ] );
+				webglProps.uniformsList.push( [ webglProps.__webglShader.uniforms[ u ], location ] );
 			}
 
 		}
@@ -3614,12 +3616,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget && objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer === undefined ) {
 
+			var webglProps = objectRendererWebGLProps[renderTarget.uuid];
+
 			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
 
 			renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
-			objectRendererWebGLProps[renderTarget.uuid].__webglTexture = _gl.createTexture();
+			webglProps.__webglTexture = _gl.createTexture();
 
 			_this.info.memory.textures ++;
 
@@ -3631,22 +3635,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( isCube ) {
 
-				objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer = [];
-				objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer = [];
+				webglProps.__webglFramebuffer = [];
+				webglProps.__webglRenderbuffer = [];
 
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, objectRendererWebGLProps[renderTarget.uuid].__webglTexture );
+				state.bindTexture( _gl.TEXTURE_CUBE_MAP, webglProps.__webglTexture );
 
 				setTextureParameters( _gl.TEXTURE_CUBE_MAP, renderTarget, isTargetPowerOfTwo );
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer[ i ] = _gl.createFramebuffer();
-					objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer[ i ] = _gl.createRenderbuffer();
+					webglProps.__webglFramebuffer[ i ] = _gl.createFramebuffer();
+					webglProps.__webglRenderbuffer[ i ] = _gl.createRenderbuffer();
 
 					state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
-					setupFrameBuffer( objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer[ i ], renderTarget, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
-					setupRenderBuffer( objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer[ i ], renderTarget );
+					setupFrameBuffer( webglProps.__webglFramebuffer[ i ], renderTarget, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
+					setupRenderBuffer( webglProps.__webglRenderbuffer[ i ], renderTarget );
 
 				}
 
@@ -3654,40 +3658,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer = _gl.createFramebuffer();
+				webglProps.__webglFramebuffer = _gl.createFramebuffer();
 
 				if ( renderTarget.shareDepthFrom ) {
 
-					objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer = renderTarget.shareDepthFrom.__webglRenderbuffer;
+					webglProps.__webglRenderbuffer = renderTarget.shareDepthFrom.__webglRenderbuffer;
 
 				} else {
 
-					objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer = _gl.createRenderbuffer();
+					webglProps.__webglRenderbuffer = _gl.createRenderbuffer();
 
 				}
 
-				state.bindTexture( _gl.TEXTURE_2D, objectRendererWebGLProps[renderTarget.uuid].__webglTexture );
+				state.bindTexture( _gl.TEXTURE_2D, webglProps.__webglTexture );
 				setTextureParameters( _gl.TEXTURE_2D, renderTarget, isTargetPowerOfTwo );
 
 				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
-				setupFrameBuffer( objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
+				setupFrameBuffer( webglProps.__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
 
 				if ( renderTarget.shareDepthFrom ) {
 
 					if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
-						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer );
+						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, webglProps.__webglRenderbuffer );
 
 					} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
-						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer );
+						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, webglProps.__webglRenderbuffer );
 
 					}
 
 				} else {
 
-					setupRenderBuffer( objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer, renderTarget );
+					setupRenderBuffer( webglProps.__webglRenderbuffer, renderTarget );
 
 				}
 
@@ -3716,13 +3720,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget ) {
 
+			var webglProps = objectRendererWebGLProps[renderTarget.uuid];
+
 			if ( isCube ) {
 
-				framebuffer = objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer[ renderTarget.activeCubeFace ];
+				framebuffer = webglProps.__webglFramebuffer[ renderTarget.activeCubeFace ];
 
 			} else {
 
-				framebuffer = objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer;
+				framebuffer = webglProps.__webglFramebuffer;
 
 			}
 
