@@ -1941,6 +1941,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var shader = THREE.ShaderLib[ shaderID ];
 
 			material.__webglShader = {
+				name: material.type,
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
@@ -1949,6 +1950,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			material.__webglShader = {
+				name: material.type,
 				uniforms: material.uniforms,
 				vertexShader: material.vertexShader,
 				fragmentShader: material.fragmentShader
