@@ -7,7 +7,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 	var color = ( hex !== undefined ) ? hex : 0xffffff;
 
 	var geometry = new THREE.WireframeGeometry( object.geometry );
-	var skinning = !!geometry.skinning;
+	var skinning = geometry.skinning === true;
 	if ( skinning && object.skeleton ) {
 		this.skeleton = object.skeleton;
 		this.bindMatrix = object.bindMatrix;
