@@ -37,6 +37,25 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentTextureSlot = undefined;
 	var currentBoundTextures = {};
 
+	this.init = function () {
+
+		gl.clearColor( 0, 0, 0, 1 );
+		gl.clearDepth( 1 );
+		gl.clearStencil( 0 );
+
+		gl.enable( gl.DEPTH_TEST );
+		gl.depthFunc( gl.LEQUAL );
+
+		gl.frontFace( gl.CCW );
+		gl.cullFace( gl.BACK );
+		gl.enable( gl.CULL_FACE );
+
+		gl.enable( gl.BLEND );
+		gl.blendEquation( gl.FUNC_ADD );
+		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+
+	};
+
 	this.initAttributes = function () {
 
 		for ( var i = 0, l = newAttributes.length; i < l; i ++ ) {
