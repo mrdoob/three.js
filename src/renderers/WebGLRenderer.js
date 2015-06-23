@@ -785,16 +785,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( object.hasPositions && ! objectRendererWebGLProps[object.uuid].__webglVertexBuffer ) objectRendererWebGLProps[object.uuid].__webglVertexBuffer = _gl.createBuffer();
-		if ( object.hasNormals && ! objectRendererWebGLProps[object.uuid].__webglNormalBuffer ) objectRendererWebGLProps[object.uuid].__webglNormalBuffer = _gl.createBuffer();
-		if ( object.hasUvs && ! objectRendererWebGLProps[object.uuid].__webglUvBuffer ) objectRendererWebGLProps[object.uuid].__webglUvBuffer = _gl.createBuffer();
-		if ( object.hasColors && ! objectRendererWebGLProps[object.uuid].__webglColorBuffer ) objectRendererWebGLProps[object.uuid].__webglColorBuffer = _gl.createBuffer();
+		var webglProps = objectRendererWebGLProps[object.uuid];
+
+		if ( object.hasPositions && ! webglProps.__webglVertexBuffer ) webglProps.__webglVertexBuffer = _gl.createBuffer();
+		if ( object.hasNormals && ! webglProps.__webglNormalBuffer ) webglProps.__webglNormalBuffer = _gl.createBuffer();
+		if ( object.hasUvs && ! webglProps.__webglUvBuffer ) webglProps.__webglUvBuffer = _gl.createBuffer();
+		if ( object.hasColors && ! webglProps.__webglColorBuffer ) webglProps.__webglColorBuffer = _gl.createBuffer();
 
 		var attributes = program.getAttributes();
 
 		if ( object.hasPositions ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectRendererWebGLProps[object.uuid].__webglVertexBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
 
 			state.enableAttribute( attributes.position );
@@ -804,7 +806,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasNormals ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectRendererWebGLProps[object.uuid].__webglNormalBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglNormalBuffer );
 
 			if ( material instanceof THREE.MeshPhongMaterial === false && material.shading === THREE.FlatShading ) {
 
@@ -859,7 +861,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasUvs && material.map ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectRendererWebGLProps[object.uuid].__webglUvBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglUvBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 
 			state.enableAttribute( attributes.uv );
@@ -870,7 +872,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasColors && material.vertexColors !== THREE.NoColors ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectRendererWebGLProps[object.uuid].__webglColorBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
 
 			state.enableAttribute( attributes.color );
