@@ -7,6 +7,9 @@ THREE.WebGLObjects = function ( gl, info ) {
 	var objects = {};
 	var objectsImmediate = [];
 
+	// stores attributes by uuid in order to decouple buffers from attribute objects
+	var objectWebglProperties = {};
+
 	var morphInfluences = new Float32Array( 8 );
 
 	var geometries = new THREE.WebGLGeometries( gl, info );
@@ -40,11 +43,11 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		}
 
-		delete object.__webglInit;
+		delete objectWebglProperties[object.uuid].__webglInit;
 		delete object._modelViewMatrix;
 		delete object._normalMatrix;
 
-		delete object.__webglActive;
+		delete objectWebglProperties[object.uuid].__webglActive;
 
 	}
 
@@ -71,9 +74,15 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	this.init = function ( object ) {
 
-		if ( object.__webglInit === undefined ) {
+		if ( ! objectWebglProperties[object.uuid] ) {
 
-			object.__webglInit = true;
+			objectWebglProperties[object.uuid] = {};
+
+		}
+
+		if ( objectWebglProperties[object.uuid].__webglInit === undefined ) {
+
+			objectWebglProperties[object.uuid].__webglInit = true;
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
@@ -81,9 +90,9 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		}
 
-		if ( object.__webglActive === undefined ) {
+		if ( objectWebglProperties[object.uuid].__webglActive === undefined ) {
 
-			object.__webglActive = true;
+			objectWebglProperties[object.uuid].__webglActive = true;
 
 			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
@@ -184,14 +193,26 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			var attribute = attributes[ name ];
 
+			if ( ! attribute.uuid ) {
+
+				attribute.uuid = THREE.Math.generateUUID();
+
+			}
+
+			if ( ! objectWebglProperties[attribute.uuid] ) {
+
+				objectWebglProperties[attribute.uuid] = {};
+
+			}
+
 			var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
 			var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
-			if ( data.buffer === undefined ) {
+			if ( objectWebglProperties[attribute.uuid].__webglBuffer === undefined ) {
 
-				data.buffer = gl.createBuffer();
-				gl.bindBuffer( bufferType, data.buffer );
+				objectWebglProperties[attribute.uuid].__webglBuffer = gl.createBuffer();
+				gl.bindBuffer( bufferType, objectWebglProperties[attribute.uuid].__webglBuffer );
 
 				var usage = gl.STATIC_DRAW;
 
@@ -209,7 +230,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			} else if ( data.needsUpdate === true ) {
 
-				gl.bindBuffer( bufferType, data.buffer );
+				gl.bindBuffer( bufferType, objectWebglProperties[attribute.uuid].__webglBuffer );
 
 				if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
 
@@ -235,6 +256,11 @@ THREE.WebGLObjects = function ( gl, info ) {
 		}
 
 	};
+
+	// returns the webgl buffer for a specified attribute
+	this.getAttributeBuffer = function (attribute) {
+		return objectWebglProperties[attribute.uuid] ? objectWebglProperties[attribute.uuid].__webglBuffer : undefined;
+	}
 
 	this.update = function ( renderList ) {
 
