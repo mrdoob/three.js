@@ -116,6 +116,7 @@ bpy.types.Material.THREE_blending_type = EnumProperty(
 
 bpy.types.Material.THREE_depth_write = BoolProperty(default=True)
 bpy.types.Material.THREE_depth_test = BoolProperty(default=True)
+bpy.types.Material.THREE_double_sided = BoolProperty(default=False)
 
 class ThreeMaterial(bpy.types.Panel):
     """Adds custom properties to the Materials of an object"""
@@ -149,6 +150,10 @@ class ThreeMaterial(bpy.types.Panel):
             row = layout.row()
             row.prop(mat, 'THREE_depth_test',
                      text="Enable depth testing")
+
+            row = layout.row()
+            row.prop(mat, 'THREE_double_sided',
+                     text="Double-sided")
 
 def _mag_filters(index):
     """Three.js mag filters
