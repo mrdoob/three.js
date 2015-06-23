@@ -360,7 +360,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform2f( uniforms.scale, scale.x, scale.y );
 				gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 
-				gl.disable( gl.BLEND );
+				state.setBlend( false );
 				gl.enable( gl.DEPTH_TEST );
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
@@ -400,7 +400,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				// render flares
 
 				gl.uniform1i( uniforms.renderType, 2 );
-				gl.enable( gl.BLEND );
+				state.setBlend( true );
 
 				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 

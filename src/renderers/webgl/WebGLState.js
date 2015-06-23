@@ -9,6 +9,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
+	var currentBlend = null;
 	var currentBlending = null;
 	var currentBlendEquation = null;
 	var currentBlendSrc = null;
@@ -94,41 +95,63 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
+	this.setBlend = function ( blend ) {
+
+		if ( blend !== currentBlend ) {
+
+			if ( blend ) {
+
+				gl.enable( gl.BLEND );
+
+			} else {
+
+				gl.disable( gl.BLEND );
+
+			}
+
+			currentBlend = blend;
+
+		}
+
+	};
+
 	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha ) {
 
 		if ( blending !== currentBlending ) {
 
 			if ( blending === THREE.NoBlending ) {
 
-				gl.disable( gl.BLEND );
+				this.setBlend( false );
 
 			} else if ( blending === THREE.AdditiveBlending ) {
 
-				gl.enable( gl.BLEND );
+				this.setBlend( true );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
 			} else if ( blending === THREE.SubtractiveBlending ) {
 
 				// TODO: Find blendFuncSeparate() combination
-				gl.enable( gl.BLEND );
+
+				this.setBlend( true );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
 
 			} else if ( blending === THREE.MultiplyBlending ) {
 
 				// TODO: Find blendFuncSeparate() combination
-				gl.enable( gl.BLEND );
+
+				this.setBlend( true );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
 			} else if ( blending === THREE.CustomBlending ) {
 
-				gl.enable( gl.BLEND );
+				this.setBlend( true );
 
 			} else {
 
-				gl.enable( gl.BLEND );
+				this.setBlend( true );
 				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 				gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
