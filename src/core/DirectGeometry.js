@@ -18,6 +18,7 @@ THREE.DirectGeometry = function () {
 	this.colors = [];
 	this.uvs = [];
 	this.uvs2 = [];
+	this.tangents = [];
 
 	this.morphTargets = [];
 	this.morphColors = [];
@@ -37,6 +38,7 @@ THREE.DirectGeometry = function () {
 	this.normalsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
+	this.tangentsNeedUpdate = false;
 
 };
 
@@ -61,6 +63,14 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
+	computeTangents: function () {
+
+		console.warn( 'THREE.DirectGeometry: computeTangents() is not a method of this type of geometry.' );
+		return this;
+
+	},
+
+
 	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
@@ -69,6 +79,8 @@ THREE.DirectGeometry.prototype = {
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+
+		var hasTangents = geometry.hasTangents;
 
 		// morphs
 
@@ -153,7 +165,7 @@ THREE.DirectGeometry.prototype = {
 
 				} else {
 
-					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i );
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i );
 
 					this.uvs.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
 
@@ -171,9 +183,27 @@ THREE.DirectGeometry.prototype = {
 
 				} else {
 
-					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i );
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i );
 
 					this.uvs2.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+
+				}
+
+			}
+
+			if ( hasTangents === true ) {
+
+				var vertexTangents = face.vertexTangents;
+
+				if ( vertexTangents.length === 3 ) {
+
+					this.tangents.push( vertexTangents[ 0 ], vertexTangents[ 1 ], vertexTangents[ 2 ] );
+
+				} else {
+
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined tangents ', i );
+
+					this.tangents.push( new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4() );
 
 				}
 
@@ -226,6 +256,7 @@ THREE.DirectGeometry.prototype = {
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
+		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 
 		return this;
 

@@ -45,8 +45,6 @@ THREE.Geometry = function () {
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
 
-	this.groupsNeedUpdate = false;
-
 };
 
 THREE.Geometry.prototype = {
@@ -105,11 +103,18 @@ THREE.Geometry.prototype = {
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
+		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+		var tangents = attributes.tangent !== undefined ? attributes.tangent.array : undefined;
+
+		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+		if ( tangents !== undefined ) this.hasTangents = true;
 
 		var tempNormals = [];
 		var tempUVs = [];
+		var tempUVs2 = [];
+		var tempTangents = [];
 
-		for ( var i = 0, j = 0; i < vertices.length; i += 3, j += 2 ) {
+		for ( var i = 0, j = 0, k = 0; i < vertices.length; i += 3, j += 2, k += 4 ) {
 
 			scope.vertices.push( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
 
@@ -131,6 +136,18 @@ THREE.Geometry.prototype = {
 
 			}
 
+			if ( uvs2 !== undefined ) {
+
+				tempUVs2.push( new THREE.Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+
+			}
+
+			if ( tangents !== undefined ) {
+
+				tempTangents.push( new THREE.Vector4( tangents[ k ], tangents[ k + 1 ], tangents[ k + 2 ], tangents[ k + 3 ] ) );
+
+			}
+
 		}
 
 		var addFace = function ( a, b, c ) {
@@ -138,11 +155,25 @@ THREE.Geometry.prototype = {
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			scope.faces.push( new THREE.Face3( a, b, c, vertexNormals, vertexColors ) );
+			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors );
+
+			scope.faces.push( face );
 
 			if ( uvs !== undefined ) {
 
 				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+
+			}
+
+			if ( uvs2 !== undefined ) {
+
+				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
+
+			}
+
+			if ( tangents !== undefined ) {
+
+				face.vertexTangents.push( tempTangents[ a ].clone(), tempTangents[ b ].clone(), tempTangents[ c ].clone() );
 
 			}
 
@@ -1070,6 +1101,14 @@ THREE.Geometry.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	// Backwards compatibility
+
+	set groupsNeedUpdate ( value ) {
+
+		if ( value === true ) this.dispose();
 
 	}
 
