@@ -16084,6 +16084,15 @@ THREE.Group = function () {
 THREE.Group.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Group.prototype.constructor = THREE.Group;
 
+THREE.Group.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Group();
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};
 // File:src/objects/PointCloud.js
 
 /**
@@ -16507,6 +16516,15 @@ THREE.LineSegments = function ( geometry, material ) {
 THREE.LineSegments.prototype = Object.create( THREE.Line.prototype );
 THREE.LineSegments.prototype.constructor = THREE.LineSegments;
 
+THREE.LineSegments.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.LineSegments( this.geometry, this.material );
+
+	THREE.Line.prototype.clone.call( this, object );
+
+	return object;
+
+};
 // File:src/objects/Mesh.js
 
 /**
@@ -16872,6 +16890,16 @@ THREE.Bone = function ( skin ) {
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Bone.prototype.constructor = THREE.Bone;
 
+THREE.Bone.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Bone( this.skin );
+
+	THREE.Object3D.prototype.clone.call( this, object );
+	object.skin = this.skin; 
+
+	return object;
+
+};
 // File:src/objects/Skeleton.js
 
 /**
@@ -16896,16 +16924,16 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 	// create a bone texture or an array of floats
 
 	if ( this.useVertexTexture ) {
-		
+
 		// layout (1 matrix = 4 pixels)
 		//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
 		//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
 		//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
 		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
-		
+
 		var size = THREE.Math.nextPowerOfTwo( Math.sqrt( this.bones.length * 4 ) ); // 4 pixels needed for 1 matrix
-		
+
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
 
@@ -17020,7 +17048,7 @@ THREE.Skeleton.prototype.pose = function () {
 THREE.Skeleton.prototype.update = ( function () {
 
 	var offsetMatrix = new THREE.Matrix4();
-	
+
 	return function () {
 
 		// flatten bone matrices to array
@@ -17041,11 +17069,16 @@ THREE.Skeleton.prototype.update = ( function () {
 			this.boneTexture.needsUpdate = true;
 
 		}
-		
+
 	};
 
 } )();
 
+THREE.Skeleton.prototype.clone = function () {
+
+	return new THREE.Skeleton( this.bones, this.boneInverses, this.useVertexTexture );
+
+};
 
 // File:src/objects/SkinnedMesh.js
 
@@ -17764,6 +17797,24 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 
 };
 
+THREE.LensFlare.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.LensFlare();
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	object.positionScreen.copy( this.positionScreen );
+	object.customUpdateCallback = this.customUpdateCallback;
+
+	for ( var i = 0, l = this.lensFlares.length; i < l; i ++ ) {
+
+		object.lensFlares.push( this.lensFlares[ i ] );
+
+	}
+
+	return object;
+
+};
 
 // File:src/scenes/Scene.js
 
