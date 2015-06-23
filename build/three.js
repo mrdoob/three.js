@@ -8971,11 +8971,18 @@ THREE.Geometry.prototype = {
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
+		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+		var tangents = attributes.tangent !== undefined ? attributes.tangent.array : undefined;
+
+		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+		if ( tangents !== undefined ) this.hasTangents = true;
 
 		var tempNormals = [];
 		var tempUVs = [];
+		var tempUVs2 = [];
+		var tempTangents = [];
 
-		for ( var i = 0, j = 0; i < vertices.length; i += 3, j += 2 ) {
+		for ( var i = 0, j = 0, k = 0; i < vertices.length; i += 3, j += 2, k += 4 ) {
 
 			scope.vertices.push( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
 
@@ -8997,6 +9004,18 @@ THREE.Geometry.prototype = {
 
 			}
 
+			if ( uvs2 !== undefined ) {
+
+				tempUVs2.push( new THREE.Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+
+			}
+
+			if ( tangents !== undefined ) {
+
+				tempTangents.push( new THREE.Vector4( tangents[ k ], tangents[ k + 1 ], tangents[ k + 2 ], tangents[ k + 3 ] ) );
+
+			}
+
 		}
 
 		var addFace = function ( a, b, c ) {
@@ -9004,11 +9023,25 @@ THREE.Geometry.prototype = {
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			scope.faces.push( new THREE.Face3( a, b, c, vertexNormals, vertexColors ) );
+			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors );
+
+			scope.faces.push( face );
 
 			if ( uvs !== undefined ) {
 
 				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+
+			}
+
+			if ( uvs2 !== undefined ) {
+
+				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
+
+			}
+
+			if ( tangents !== undefined ) {
+
+				face.vertexTangents.push( tempTangents[ a ].clone(), tempTangents[ b ].clone(), tempTangents[ c ].clone() );
 
 			}
 
@@ -9975,6 +10008,7 @@ THREE.DirectGeometry = function () {
 	this.colors = [];
 	this.uvs = [];
 	this.uvs2 = [];
+	this.tangents = [];
 
 	this.morphTargets = [];
 	this.morphColors = [];
@@ -9994,6 +10028,7 @@ THREE.DirectGeometry = function () {
 	this.normalsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.uvsNeedUpdate = false;
+	this.tangentsNeedUpdate = false;
 
 };
 
@@ -10018,6 +10053,14 @@ THREE.DirectGeometry.prototype = {
 
 	},
 
+	computeTangents: function () {
+
+		console.warn( 'THREE.DirectGeometry: computeTangents() is not a method of this type of geometry.' );
+		return this;
+
+	},
+
+
 	fromGeometry: function ( geometry ) {
 
 		var faces = geometry.faces;
@@ -10026,6 +10069,8 @@ THREE.DirectGeometry.prototype = {
 
 		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
 		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+
+		var hasTangents = geometry.hasTangents;
 
 		// morphs
 
@@ -10110,7 +10155,7 @@ THREE.DirectGeometry.prototype = {
 
 				} else {
 
-					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv', i );
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i );
 
 					this.uvs.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
 
@@ -10128,9 +10173,27 @@ THREE.DirectGeometry.prototype = {
 
 				} else {
 
-					console.warn( 'THREE.BufferGeometry.fromGeometry(): Undefined vertexUv2', i );
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i );
 
 					this.uvs2.push( new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2() );
+
+				}
+
+			}
+
+			if ( hasTangents === true ) {
+
+				var vertexTangents = face.vertexTangents;
+
+				if ( vertexTangents.length === 3 ) {
+
+					this.tangents.push( vertexTangents[ 0 ], vertexTangents[ 1 ], vertexTangents[ 2 ] );
+
+				} else {
+
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined tangents ', i );
+
+					this.tangents.push( new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4() );
 
 				}
 
@@ -10183,6 +10246,7 @@ THREE.DirectGeometry.prototype = {
 		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
 		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
+		this.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 
 		return this;
 
@@ -10396,11 +10460,13 @@ THREE.BufferGeometry.prototype = {
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
 			direct.uvsNeedUpdate = geometry.uvsNeedUpdate;
+			direct.tangentsNeedUpdate = geometry.tangentsNeedUpdate;
 
 			geometry.verticesNeedUpdate = false;
 			geometry.normalsNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
 			geometry.uvsNeedUpdate = false;
+			geometry.tangentsNeedUpdate = false;
 
 			geometry = direct;
 
@@ -10451,6 +10517,21 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+		if ( geometry.tangentsNeedUpdate === true ) {
+
+			var attribute = this.attributes.tangent;
+
+			if ( attribute !== undefined ) {
+
+				attribute.copyVector4sArray( geometry.tangents );
+				attribute.needsUpdate = true;
+
+			}
+
+			geometry.tangentsNeedUpdate = false;
+
+		}
+
 		return this;
 
 	},
@@ -10497,6 +10578,20 @@ THREE.BufferGeometry.prototype = {
 
 			var uvs = new Float32Array( geometry.uvs.length * 2 );
 			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+
+		}
+
+		if ( geometry.uvs2.length > 0 ) {
+
+			var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
+			this.addAttribute( 'uv2', new THREE.BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
+
+		}
+
+		if ( geometry.tangents.length > 0 ) {
+
+			var tangents = new Float32Array( geometry.tangents.length * 4 );
+			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
 
 		}
 
@@ -15273,12 +15368,54 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 
 THREE.MeshFaceMaterial = function ( materials ) {
 
-	console.error( 'THREE.MeshFaceMaterial has been removed.' );
+	this.uuid = THREE.Math.generateUUID();
 
-	var material = Array.isArray( materials ) ? materials[ 0 ] : new THREE.MeshBasicMaterial();
-	material.materials = []; // temporal workaround
+	this.type = 'MeshFaceMaterial';
 
-	return material;
+	this.materials = materials instanceof Array ? materials : [];
+
+};
+
+THREE.MeshFaceMaterial.prototype = {
+
+	constructor: THREE.MeshFaceMaterial,
+
+	toJSON: function () {
+
+		var output = {
+			metadata: {
+				version: 4.2,
+				type: 'material',
+				generator: 'MaterialExporter'
+			},
+			uuid: this.uuid,
+			type: this.type,
+			materials: []
+		};
+
+		for ( var i = 0, l = this.materials.length; i < l; i ++ ) {
+
+			output.materials.push( this.materials[ i ].toJSON() );
+
+		}
+
+		return output;
+
+	},
+
+	clone: function () {
+
+		var material = new THREE.MeshFaceMaterial();
+
+		for ( var i = 0; i < this.materials.length; i ++ ) {
+
+			material.materials.push( this.materials[ i ].clone() );
+
+		}
+
+		return material;
+
+	}
 
 };
 
@@ -19969,6 +20106,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
+		setMaterial( material );
+
 		var geometry = objects.geometries.get( object );
 		var program = setProgram( camera, lights, fog, material, object );
 
@@ -20569,8 +20708,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			setMaterial( overrideMaterial );
-
 			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
 			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
 			renderObjectsImmediate( objects.objectsImmediate, '', camera, lights, fog, overrideMaterial );
@@ -20690,7 +20827,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
 
-		var material;
+		var material = overrideMaterial;
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -20700,21 +20837,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setupMatrices( object, camera );
 
-			if ( overrideMaterial ) {
+			if ( overrideMaterial === null ) material = object.material;
 
-				material = overrideMaterial;
+			if ( material instanceof THREE.MeshFaceMaterial ) {
 
-			} else {
+				var materials = material.materials;
 
-				material = object.material;
+				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
 
-				if ( ! material ) continue;
+					_this.renderBufferDirect( camera, lights, fog, materials[ j ], object );
 
-				setMaterial( material );
+				}
+
+				continue;
 
 			}
 
-			_this.setMaterialFaces( material );
 			_this.renderBufferDirect( camera, lights, fog, material, object );
 
 		}
@@ -20723,7 +20861,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
 
-		var material;
+		var material = overrideMaterial;
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
@@ -20732,19 +20870,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible === true ) {
 
-				if ( overrideMaterial ) {
-
-					material = overrideMaterial;
-
-				} else {
-
-					material = webglObject[ materialType ];
-
-					if ( ! material ) continue;
-
-					setMaterial( material );
-
-				}
+				if ( overrideMaterial === null ) material = webglObject[ materialType ];
 
 				_this.renderImmediateObject( camera, lights, fog, material, object );
 
@@ -20756,11 +20882,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderImmediateObject = function ( camera, lights, fog, material, object ) {
 
+		setMaterial( material );
+
 		var program = setProgram( camera, lights, fog, material, object );
 
 		_currentGeometryProgram = '';
-
-		_this.setMaterialFaces( material );
 
 		if ( object.immediateRenderCallback ) {
 
@@ -21011,6 +21137,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setMaterial( material ) {
 
+		setMaterialFaces( material );
+
 		if ( material.transparent === true ) {
 
 			state.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst, material.blendEquationAlpha, material.blendSrcAlpha, material.blendDstAlpha );
@@ -21026,6 +21154,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		state.setDepthWrite( material.depthWrite );
 		state.setColorWrite( material.colorWrite );
 		state.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+
+	}
+
+	function setMaterialFaces( material ) {
+
+		state.setDoubleSided( material.side === THREE.DoubleSide );
+		state.setFlipSided( material.side === THREE.BackSide );
 
 	}
 
@@ -22113,12 +22248,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setMaterialFaces = function ( material ) {
-
-		state.setDoubleSided( material.side === THREE.DoubleSide );
-		state.setFlipSided( material.side === THREE.BackSide );
-
-	};
+	this.setMaterialFaces = setMaterialFaces;
 
 	// Textures
 
