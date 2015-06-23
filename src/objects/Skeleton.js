@@ -170,3 +170,10 @@ THREE.Skeleton.prototype.update = ( function () {
 
 } )();
 
+THREE.Skeleton.prototype.clone = function ( ) {
+
+	var object = new THREE.Skeleton(this.bones, this.boneInverses, this.useVertexTexture);
+	
+	return object;
+
+};

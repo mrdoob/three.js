@@ -78,3 +78,22 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 
 };
 
+THREE.LensFlare.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.LensFlare();
+
+	THREE.Object3D.prototype.clone.call( this, object );
+	
+	object.positionScreen.copy(this.positionScreen);
+	object.customUpdateCallback = this.customUpdateCallback;
+	
+	object.lensFlares = [];
+	
+	for ( var i = 0, l = this.lensFlares.length; i < l; i ++ ) {
+		
+		object.lensFlares.push(this.lensFlares[i]);			
+	}
+
+	return object;
+
+};
