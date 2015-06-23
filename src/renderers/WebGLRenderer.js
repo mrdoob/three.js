@@ -35,7 +35,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// tracks context specific properties to allow sharing of objects across webgl renderers
 	// each object stores relevant webgl properties that are specific to this renderer
 	// objects are stored by their uuids
-	// attributes are given a uuid in order to store their properties
 	var objectRendererWebGLProps = {};
 
 	var lights = [];
