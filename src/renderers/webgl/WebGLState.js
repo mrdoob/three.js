@@ -160,66 +160,67 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	this.setDepthFunc = function ( depthFunc ) {
 
-	    if ( currentDepthFunc !== depthFunc ) {
+		if ( currentDepthFunc !== depthFunc ) {
 
-	        if ( depthFunc ) {
+			if ( depthFunc ) {
 
-	            switch ( depthFunc ) {
+				switch ( depthFunc ) {
 
-	                case THREE.NeverDepth:
+					case THREE.NeverDepth:
 
-	                    gl.depthFunc( gl.NEVER );
-	                    break;
+						gl.depthFunc( gl.NEVER );
+						break;
 
-	                case THREE.AlwaysDepth:
+					case THREE.AlwaysDepth:
 
-	                    gl.depthFunc( gl.ALWAYS );
-	                    break;
+						gl.depthFunc( gl.ALWAYS );
+						break;
 
-	                case THREE.LessDepth:
+					case THREE.LessDepth:
 
-	                    gl.depthFunc( gl.LESS );
-	                    break;
+						gl.depthFunc( gl.LESS );
+						break;
 
-	                case THREE.LessEqualDepth:
+					case THREE.LessEqualDepth:
 
-	                    gl.depthFunc( gl.LEQUAL );
-	                    break;
+						gl.depthFunc( gl.LEQUAL );
+						break;
 
-	                case THREE.EqualDepth:
+					case THREE.EqualDepth:
 
-	                    gl.depthFunc( gl.EQUAL );
-	                    break;
+						gl.depthFunc( gl.EQUAL );
+						break;
 
-	                case THREE.GreaterEqualDepth:
+					case THREE.GreaterEqualDepth:
 
-	                    gl.depthFunc( gl.GEQUAL );
-	                    break;
+						gl.depthFunc( gl.GEQUAL );
+						break;
 
-	                case THREE.GreaterDepth:
+					case THREE.GreaterDepth:
 
-	                    gl.depthFunc( gl.GREATER );
-	                    break;
+						gl.depthFunc( gl.GREATER );
+						break;
 
-	                case THREE.NotEqualDepth:
+					case THREE.NotEqualDepth:
 
-	                    gl.depthFunc( gl.NOTEQUAL );
-	                    break;
+						gl.depthFunc( gl.NOTEQUAL );
+						break;
 
-	                default:
+					default:
 
-                        gl.depthFunc( gl.LEQUAL );
-	            }
+						gl.depthFunc( gl.LEQUAL );
 
-	        } else {
+				}
 
-	            gl.depthFunc( gl.LEQUAL );
+			} else {
 
-	        }
+				gl.depthFunc( gl.LEQUAL );
 
-	        currentDepthFunc = depthFunc;
+			}
 
-	    }
+			currentDepthFunc = depthFunc;
+
+		}
 
 	};
 
