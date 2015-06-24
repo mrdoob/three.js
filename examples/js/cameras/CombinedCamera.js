@@ -127,7 +127,7 @@ THREE.CombinedCamera.prototype.setFov = function( fov ) {
 
 };
 
-// For mantaining similar API with PerspectiveCamera
+// For maintaining similar API with PerspectiveCamera
 
 THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
 
