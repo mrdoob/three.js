@@ -43,11 +43,10 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 		}
 
-		delete objectWebglProperties[object.uuid].__webglInit;
 		delete object._modelViewMatrix;
 		delete object._normalMatrix;
 
-		delete objectWebglProperties[object.uuid].__webglActive;
+		delete objectWebglProperties[object.uuid];
 
 	}
 

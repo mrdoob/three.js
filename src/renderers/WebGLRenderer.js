@@ -664,8 +664,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.deleteTexture( objectRendererWebGLProps[texture.uuid].__image__webglTextureCube );
 
-			delete objectRendererWebGLProps[texture.uuid].__image__webglTextureCube;
-
 		} else {
 
 			// 2D texture
@@ -674,10 +672,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.deleteTexture( objectRendererWebGLProps[texture.uuid].__webglTexture );
 
-			delete objectRendererWebGLProps[texture.uuid].__webglTexture;
-			delete objectRendererWebGLProps[texture.uuid].__webglInit;
-
 		}
+
+		// remove all webgl props at once
+		delete objectRendererWebGLProps[texture.uuid];
 
 	};
 
@@ -686,8 +684,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( ! renderTarget || objectRendererWebGLProps[renderTarget.uuid].__webglTexture === undefined ) return;
 
 		_gl.deleteTexture( objectRendererWebGLProps[renderTarget.uuid].__webglTexture );
-
-		delete objectRendererWebGLProps[renderTarget.uuid].__webglTexture;
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
@@ -705,8 +701,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		delete objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer;
-		delete objectRendererWebGLProps[renderTarget.uuid].__webglRenderbuffer;
+		delete objectRendererWebGLProps[renderTarget.uuid];
 
 	};
 
@@ -716,7 +711,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( program === undefined ) return;
 
-		objectRendererWebGLProps[material.uuid].program = undefined;
+		material.program = undefined;
 
 		// only deallocate GL program if this was the last use of shared program
 		// assumed there is only single copy of any program in the _programs list
@@ -770,6 +765,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_this.info.memory.programs --;
 
 		}
+
+		delete objectRendererWebGLProps[material.uuid];
 
 	};
 
@@ -3198,6 +3195,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
 
+		if ( ! objectRendererWebGLProps[texture.uuid] ) {
+
+			objectRendererWebGLProps[texture.uuid] = {};
+
+		}
+
 		var extension;
 
 		if ( isImagePowerOfTwo ) {
@@ -3246,6 +3249,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	this.uploadTexture = function ( texture, slot ) {
+
+		if ( ! objectRendererWebGLProps[texture.uuid] ) {
+
+			objectRendererWebGLProps[texture.uuid] = {};
+
+		}
 
 		if ( objectRendererWebGLProps[texture.uuid].__webglInit === undefined ) {
 
@@ -3370,7 +3379,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// if the image has been uploaded into a separate renderer, will need to reupload to this renderer
-		if ( ( texture.image && texture.image.complete ) && texture.__webglInit === true && objectRendererWebGLProps[texture.uuid].__webglInit === undefined ) {
+		if ( ( texture.image && texture.image.complete !== false ) && texture.__webglInit === true && objectRendererWebGLProps[texture.uuid].__webglInit === undefined ) {
 
 			texture.needsUpdate = true;
 
@@ -3609,7 +3618,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setRenderTarget = function ( renderTarget ) {
 
 		if ( renderTarget && ! objectRendererWebGLProps[renderTarget.uuid] ) {
+
 			objectRendererWebGLProps[renderTarget.uuid] = {};
+
 		}
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
@@ -3773,6 +3784,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( ! objectRendererWebGLProps[renderTarget.uuid] ) {
+
+			objectRendererWebGLProps[renderTarget.uuid] = {};
+
+		}
+
 		if ( objectRendererWebGLProps[renderTarget.uuid].__webglFramebuffer ) {
 
 			if ( renderTarget.format !== THREE.RGBAFormat ) {
@@ -3813,6 +3830,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function updateRenderTargetMipmap ( renderTarget ) {
+
+		if ( ! objectRendererWebGLProps[renderTarget.uuid] ) {
+
+			objectRendererWebGLProps[renderTarget.uuid] = {};
+
+		}
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
