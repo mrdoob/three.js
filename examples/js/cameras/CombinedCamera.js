@@ -29,8 +29,6 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 
 	this.toPerspective();
 
-	var aspect = width / height;
-
 };
 
 THREE.CombinedCamera.prototype = Object.create( THREE.Camera.prototype );
