@@ -45,6 +45,7 @@
 				height: 300px;
 				left: 75px;
 				top: 300px;
+  				box-shadow: 0px 0px 100px 0px #000;
 			}
 
 			a {
@@ -284,8 +285,8 @@
 
 					camera.setViewOffset( fullWidth, fullHeight, container.offsetLeft, container.offsetTop, container.clientWidth, container.clientHeight );
 
-					camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-					camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+					camera.position.x += ( -mouseX - camera.position.x ) * 0.5;
+					camera.position.y += ( - mouseY - camera.position.y ) * 0.5;
 
 					camera.lookAt( scene.position );
 
