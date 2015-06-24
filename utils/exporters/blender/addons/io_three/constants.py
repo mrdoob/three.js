@@ -302,6 +302,8 @@ NORMAL_BLENDING = 0
 VERTEX_COLORS_ON = 2
 VERTEX_COLORS_OFF = 0
 
+SIDE_DOUBLE = 2
+
 THREE_BASIC = 'MeshBasicMaterial'
 THREE_LAMBERT = 'MeshLambertMaterial'
 THREE_PHONG = 'MeshPhongMaterial'

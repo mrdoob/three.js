@@ -290,7 +290,13 @@ Menubar.File = function ( editor ) {
 		link.href = objectURL;
 		link.download = filename || 'data.json';
 		link.target = '_blank';
-		link.click();
+
+		var event = document.createEvent("MouseEvents");
+		event.initMouseEvent(
+			"click", true, false, window, 0, 0, 0, 0, 0
+			, false, false, false, false, 0, null
+		);
+		link.dispatchEvent(event);
 
 	};
 

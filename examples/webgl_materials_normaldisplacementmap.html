@@ -148,7 +148,7 @@
 
 				// common material parameters
 
-				var diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
+				var diffuse = 0x0a0100, specular = 0xffffff, shininess = 10, scale = 23;
 
 				// normal map shader
 
@@ -177,10 +177,6 @@
 
 				uniforms[ "tCube" ].value = reflectionCube;
 				uniforms[ "reflectivity" ].value = 0.1;
-
-				uniforms[ "diffuse" ].value.convertGammaToLinear();
-				uniforms[ "specular" ].value.convertGammaToLinear();
-
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
 				var material1 = new THREE.ShaderMaterial( parameters );
