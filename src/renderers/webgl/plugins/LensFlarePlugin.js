@@ -302,7 +302,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		state.disableUnusedAttributes();
 
 		// loop through all lens flares to update their occlusion and positions
-		// setup gl and common used attribs/unforms
+		// setup gl and common used attribs/uniforms
 
 		gl.uniform1i( uniforms.occlusionMap, 0 );
 		gl.uniform1i( uniforms.map, 1 );

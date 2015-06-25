@@ -42,7 +42,7 @@ THREE.LensFlare.prototype.add = function ( texture, size, distance, blending, co
 		texture: texture, 			// THREE.Texture
 		size: size, 				// size in pixels (-1 = use texture.width)
 		distance: distance, 		// distance (0-1) from light source (0=at light source)
-		x: 0, y: 0, z: 0,			// screen position (-1 => 1) z = 0 is ontop z = 1 is back
+		x: 0, y: 0, z: 0,			// screen position (-1 => 1) z = 0 is in front z = 1 is back
 		scale: 1, 					// scale
 		rotation: 1, 				// rotation
 		opacity: opacity,			// opacity

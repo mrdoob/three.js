@@ -27,7 +27,7 @@ THREE.PathActions = {
 	LINE_TO: 'lineTo',
 	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
 	BEZIER_CURVE_TO: 'bezierCurveTo', 		// Bezier cubic curve
-	CSPLINE_THRU: 'splineThru',				// Catmull-rom spline
+	CSPLINE_THRU: 'splineThru',				// Catmull-Rom spline
 	ARC: 'arc',								// Circle
 	ELLIPSE: 'ellipse'
 };
@@ -208,7 +208,6 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	if (this.useSpacedPoints) {
-		console.log('tata');
 		return this.getSpacedPoints( divisions, closedPath );
 	}
 
@@ -543,9 +542,9 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 					if ( perpEdge < 0 ) 				continue;
 					inside = ! inside;		// true intersection left of inPt
 				}
-			} else {		// parallel or colinear
+			} else {		// parallel or collinear
 				if ( inPt.y !== edgeLowPt.y ) 		continue;			// parallel
-				// egde lies on the same horizontal line as inPt
+				// edge lies on the same horizontal line as inPt
 				if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
 					 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
 				// continue;
@@ -626,7 +625,7 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 
 
 	if ( newShapes.length > 1 ) {
-		var ambigious = false;
+		var ambiguous = false;
 		var toChange = [];
 
 		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
@@ -644,17 +643,17 @@ THREE.Path.prototype.toShapes = function( isCCW, noHoles ) {
 							hole_unassigned = false;
 							betterShapeHoles[s2Idx].push( ho );
 						} else {
-							ambigious = true;
+							ambiguous = true;
 						}
 					}
 				}
 				if ( hole_unassigned ) { betterShapeHoles[sIdx].push( ho ); }
 			}
 		}
-		// console.log("ambigious: ", ambigious);
+		// console.log("ambiguous: ", ambiguous);
 		if ( toChange.length > 0 ) {
 			// console.log("to change: ", toChange);
-			if (! ambigious)	newShapeHoles = betterShapeHoles;
+			if (! ambiguous)	newShapeHoles = betterShapeHoles;
 		}
 	}
 

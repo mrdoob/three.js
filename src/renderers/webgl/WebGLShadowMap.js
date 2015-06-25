@@ -275,7 +275,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				object = webglObject.object;
 
-				// culling is overriden globally for all objects
+				// culling is overridden globally for all objects
 				// while rendering depth map
 
 				// need to deal with MeshFaceMaterial somehow
