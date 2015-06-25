@@ -35,9 +35,3 @@ uniform vec3 ambientLightColor;
 	uniform float spotLightDecay[ MAX_SPOT_LIGHTS ];
 
 #endif
-
-#ifdef WRAP_AROUND
-
-	uniform vec3 wrapRGB;
-
-#endif

@@ -11,7 +11,7 @@ var APP = {
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
 
-		var vr, controls;
+		var vr, controls, effect;
 
 		var events = {};
 
@@ -89,7 +89,7 @@ var APP = {
 				if ( camera.parent === undefined ) {
 
 					// camera needs to be in the scene so camera2 matrix updates
-					
+
 					scene.add( camera );
 
 				}
@@ -100,7 +100,7 @@ var APP = {
 				camera = camera2;
 
 				controls = new THREE.VRControls( camera );
-				renderer = new THREE.VREffect( renderer );
+				effect = new THREE.VREffect( renderer );
 
 				document.addEventListener( 'keyup', function ( event ) {
 
@@ -114,7 +114,7 @@ var APP = {
 
 				this.dom.addEventListener( 'dblclick', function () {
 
-					renderer.setFullScreen( true );
+					effect.setFullScreen( true );
 
 				} );
 
@@ -160,9 +160,16 @@ var APP = {
 
 			dispatch( events.update, { time: time, delta: time - prevTime } );
 
-			if ( vr ) controls.update();
+			if ( vr === true ) {
 
-			renderer.render( scene, camera );
+				controls.update();
+				effect.render( scene, camera );
+
+			} else {
+
+				renderer.render( scene, camera );
+
+			}
 
 			prevTime = time;
 

@@ -86,7 +86,7 @@ Particle.prototype.integrate = function(timesq) {
 	this.position = newPos;
 
 	this.a.set(0, 0, 0);
-}
+};
 
 
 var diff = new THREE.Vector3();
@@ -243,7 +243,7 @@ function simulate(time) {
 
 
 	ballPosition.z = -Math.sin(Date.now() / 600) * 90 ; //+ 40;
-	ballPosition.x = Math.cos(Date.now() / 400) * 70
+	ballPosition.x = Math.cos(Date.now() / 400) * 70;
 
 	if (sphere.visible)
 	for (particles = cloth.particles, i = 0, il = particles.length

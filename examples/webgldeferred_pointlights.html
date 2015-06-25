@@ -226,12 +226,12 @@
 					var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 					var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 					mapHeight.repeat.set( 0.998, 0.998 );
-					mapHeight.offset.set( 0.001, 0.001 )
+					mapHeight.offset.set( 0.001, 0.001 );
 					mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 					mapHeight.anisotropy = 4;
 					mapHeight.format = THREE.RGBFormat;
 
-					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x333333, wrapAround: true, metal: true } );
+					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x333333, metal: true } );
 
 					var object = new THREE.Mesh( geometry, material );
 					object.scale.multiplyScalar( 8 );
@@ -243,8 +243,6 @@
 				var loader = new THREE.BinaryLoader();
 				loader.load( "obj/female02/Female02_bin.js", function( geometry, materials ) {
 
-					for ( var i = 0; i < materials.length; i ++ ) materials[ i ].wrapAround = true;
-
 					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 					object.position.x = -50;
 					object.position.y = -48;
@@ -254,8 +252,6 @@
 				} );
 
 				loader.load( "obj/male02/Male02_bin.js", function( geometry, materials ) {
-
-					for ( var i = 0; i < materials.length; i ++ ) materials[ i ].wrapAround = true;
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 					object.position.x = 50;
@@ -295,7 +291,7 @@
 
 				var matPlane  = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 0.5 } );
 				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x331919, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 1 } );
-				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0x00aaff, specular: 0xffffff, shininess: 200, bumpMap: mapHeight3, bumpScale: 1.2, wrapAround: true } );
+				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0x00aaff, specular: 0xffffff, shininess: 200, bumpMap: mapHeight3, bumpScale: 1.2 } );
 				var matPlane4 = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight3, bumpScale: 1 } );
 
 				// bottom

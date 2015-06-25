@@ -225,14 +225,14 @@
 
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 
-		var lineXGeometry = new THREE.Geometry();
-		lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
+		var lineXGeometry = new THREE.BufferGeometry();
+		lineXGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
 
-		var lineYGeometry = new THREE.Geometry();
-		lineYGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+		var lineYGeometry = new THREE.BufferGeometry();
+		lineYGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
 
-		var lineZGeometry = new THREE.Geometry();
-		lineZGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) );
+		var lineZGeometry = new THREE.BufferGeometry();
+		lineZGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
 
 		this.handleGizmos = {
 			X: [
@@ -331,14 +331,15 @@
 
 		var CircleGeometry = function ( radius, facing, arc ) {
 
-			var geometry = new THREE.Geometry();
+			var geometry = new THREE.BufferGeometry();
+			var vertices = [];
 			arc = arc ? arc : 1;
 			for ( var i = 0; i <= 64 * arc; ++ i ) {
-				if ( facing == 'x' ) geometry.vertices.push( new THREE.Vector3( 0, Math.cos( i / 32 * Math.PI ), Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
-				if ( facing == 'y' ) geometry.vertices.push( new THREE.Vector3( Math.cos( i / 32 * Math.PI ), 0, Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
-				if ( facing == 'z' ) geometry.vertices.push( new THREE.Vector3( Math.sin( i / 32 * Math.PI ), Math.cos( i / 32 * Math.PI ), 0 ).multiplyScalar(radius) );
+				if ( facing == 'x' ) vertices.push( 0, Math.cos( i / 32 * Math.PI ) * radius, Math.sin( i / 32 * Math.PI ) * radius );
+				if ( facing == 'y' ) vertices.push( Math.cos( i / 32 * Math.PI ) * radius, 0, Math.sin( i / 32 * Math.PI ) * radius );
+				if ( facing == 'z' ) vertices.push( Math.sin( i / 32 * Math.PI ) * radius, Math.cos( i / 32 * Math.PI ) * radius, 0 );
 			}
-
+			geometry.addAttribute( 'position', new THREE.Float32Attribute( vertices, 3 ) );
 			return geometry;
 		};
 
@@ -463,14 +464,14 @@
 
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 
-		var lineXGeometry = new THREE.Geometry();
-		lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
+		var lineXGeometry = new THREE.BufferGeometry();
+		lineXGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  1, 0, 0 ], 3 ) );
 
-		var lineYGeometry = new THREE.Geometry();
-		lineYGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+		var lineYGeometry = new THREE.BufferGeometry();
+		lineYGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 1, 0 ], 3 ) );
 
-		var lineZGeometry = new THREE.Geometry();
-		lineZGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) );
+		var lineZGeometry = new THREE.BufferGeometry();
+		lineZGeometry.addAttribute( 'position', new THREE.Float32Attribute( [ 0, 0, 0,  0, 0, 1 ], 3 ) );
 
 		this.handleGizmos = {
 			X: [
@@ -632,6 +633,23 @@
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
 
+		this.dispose = function () {
+			domElement.removeEventListener( "mousedown", onPointerDown );
+			domElement.removeEventListener( "touchstart", onPointerDown );
+
+			domElement.removeEventListener( "mousemove", onPointerHover );
+			domElement.removeEventListener( "touchmove", onPointerHover );
+
+			domElement.removeEventListener( "mousemove", onPointerMove );
+			domElement.removeEventListener( "touchmove", onPointerMove );
+
+			domElement.removeEventListener( "mouseup", onPointerUp );
+			domElement.removeEventListener( "mouseout", onPointerUp );
+			domElement.removeEventListener( "touchend", onPointerUp );
+			domElement.removeEventListener( "touchcancel", onPointerUp );
+			domElement.removeEventListener( "touchleave", onPointerUp );
+		};
+
 		this.attach = function ( object ) {
 
 			scope.object = object;
@@ -645,7 +663,7 @@
 
 		};
 
-		this.detach = function ( object ) {
+		this.detach = function () {
 
 			scope.object = undefined;
 			this.axis = null;
@@ -726,8 +744,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
@@ -737,6 +753,8 @@
 			if ( intersect ) {
 
 				axis = intersect.object.name;
+
+				event.preventDefault();
 
 			}
 
@@ -754,9 +772,6 @@
 
 			if ( scope.object === undefined || _dragging === true ) return;
 
-			event.preventDefault();
-			event.stopPropagation();
-
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
@@ -764,6 +779,9 @@
 				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
+
+					event.preventDefault();
+					event.stopPropagation();
 
 					scope.dispatchEvent( mouseDownEvent );
 

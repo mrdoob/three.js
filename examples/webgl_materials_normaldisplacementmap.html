@@ -148,7 +148,7 @@
 
 				// common material parameters
 
-				var diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
+				var diffuse = 0x0a0100, specular = 0xffffff, shininess = 10, scale = 23;
 
 				// normal map shader
 
@@ -178,12 +178,11 @@
 				uniforms[ "tCube" ].value = reflectionCube;
 				uniforms[ "reflectivity" ].value = 0.1;
 
-				uniforms[ "diffuse" ].value.convertGammaToLinear();
-				uniforms[ "specular" ].value.convertGammaToLinear();
-
-
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
 				var material1 = new THREE.ShaderMaterial( parameters );
+
+				// Ensure that ENVMAP_MODE_REFLECTION is defined in shader
+				material1.envMap = reflectionCube;
 
 				var material2 = new THREE.MeshPhongMaterial( {
 					color: diffuse,
@@ -217,8 +216,8 @@
 
 				//
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapType = THREE.PCFShadowMap;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 
 				//

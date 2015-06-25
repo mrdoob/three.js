@@ -43,12 +43,6 @@ uniform vec3 ambientLightColor;
 
 #endif
 
-#ifdef WRAP_AROUND
-
-	uniform vec3 wrapRGB;
-
-#endif
-
 varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED

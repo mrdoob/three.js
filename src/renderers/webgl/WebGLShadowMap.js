@@ -1,18 +1,20 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObjectsImmediate ) {
+THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
-	var _gl = _renderer.context;
-
-	var _depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
-
+	var _gl = _renderer.context,
+	_state = _renderer.state,
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
 	_min = new THREE.Vector3(),
 	_max = new THREE.Vector3(),
+
+	_webglObjects = _objects.objects,
+	_webglObjectsImmediate = _objects.objectsImmediate,
 
 	_matrixPosition = new THREE.Vector3(),
 
@@ -23,27 +25,27 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 	var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 	var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-	_depthMaterial = new THREE.ShaderMaterial( {
+	var _depthMaterial = new THREE.ShaderMaterial( {
 		uniforms: depthUniforms,
 		vertexShader: depthShader.vertexShader,
 		fragmentShader: depthShader.fragmentShader
 	 } );
 
-	_depthMaterialMorph = new THREE.ShaderMaterial( {
+	var _depthMaterialMorph = new THREE.ShaderMaterial( {
 		uniforms: depthUniforms,
 		vertexShader: depthShader.vertexShader,
 		fragmentShader: depthShader.fragmentShader,
 		morphTargets: true
 	} );
 
-	_depthMaterialSkin = new THREE.ShaderMaterial( {
+	var _depthMaterialSkin = new THREE.ShaderMaterial( {
 		uniforms: depthUniforms,
 		vertexShader: depthShader.vertexShader,
 		fragmentShader: depthShader.fragmentShader,
 		skinning: true
 	} );
 
-	_depthMaterialMorphSkin = new THREE.ShaderMaterial( {
+	var _depthMaterialMorphSkin = new THREE.ShaderMaterial( {
 		uniforms: depthUniforms,
 		vertexShader: depthShader.vertexShader,
 		fragmentShader: depthShader.fragmentShader,
@@ -56,15 +58,24 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 	_depthMaterialSkin._shadowPass = true;
 	_depthMaterialMorphSkin._shadowPass = true;
 
+	//
+
+	var scope = this;
+
+	this.enabled = false;
+	this.type = THREE.PCFShadowMap;
+	this.cullFace = THREE.CullFaceFront;
+	this.debug = false;
+	this.cascade = false;
+
 	this.render = function ( scene, camera ) {
 
-		if ( _renderer.shadowMapEnabled === false ) return;
+		if ( scope.enabled === false ) return;
 
 		var i, il, j, jl, n,
 
 		shadowMap, shadowMatrix, shadowCamera,
-		buffer, material,
-		webglObject, object, light,
+		webglObject, object, material, light,
 
 		lights = [],
 		k = 0,
@@ -74,12 +85,12 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_gl.disable( _gl.BLEND );
+		_state.setBlend( false );
 
 		_gl.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 
-		if ( _renderer.shadowMapCullFace === THREE.CullFaceFront ) {
+		if ( scope.cullFace === THREE.CullFaceFront ) {
 
 			_gl.cullFace( _gl.FRONT );
 
@@ -89,7 +100,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 		}
 
-		_renderer.state.setDepthTest( true );
+		_state.setDepthTest( true );
 
 		// preprocess lights
 		// 	- skip lights that are not casting shadows
@@ -156,7 +167,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 				var shadowFilter = THREE.LinearFilter;
 
-				if ( _renderer.shadowMapType === THREE.PCFSoftShadowMap ) {
+				if ( scope.type === THREE.PCFSoftShadowMap ) {
 
 					shadowFilter = THREE.NearestFilter;
 
@@ -183,7 +194,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 				} else {
 
-					THREE.error( "THREE.ShadowMapPlugin: Unsupported light type for shadow", light );
+					console.error( "THREE.ShadowMapPlugin: Unsupported light type for shadow", light );
 					continue;
 
 				}
@@ -251,7 +262,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 			_renderList.length = 0;
 
-			projectObject( scene, scene, shadowCamera );
+			projectObject( scene, shadowCamera );
 
 
 			// render regular objects
@@ -263,7 +274,6 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 				webglObject = _renderList[ j ];
 
 				object = webglObject.object;
-				buffer = webglObject.buffer;
 
 				// culling is overriden globally for all objects
 				// while rendering depth map
@@ -298,16 +308,7 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 				}
 
 				_renderer.setMaterialFaces( objectMaterial );
-
-				if ( buffer instanceof THREE.BufferGeometry ) {
-
-					_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, buffer, object );
-
-				} else {
-
-					_renderer.renderBuffer( shadowCamera, _lights, fog, material, buffer, object );
-
-				}
+				_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, object );
 
 			}
 
@@ -336,9 +337,9 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_gl.enable( _gl.BLEND );
+		_state.setBlend( true );
 
-		if ( _renderer.shadowMapCullFace === THREE.CullFaceFront ) {
+		if ( scope.cullFace === THREE.CullFaceFront ) {
 
 			_gl.cullFace( _gl.BACK );
 
@@ -348,28 +349,22 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 
 	};
 
-	function projectObject( scene, object, shadowCamera ) {
+	function projectObject( object, shadowCamera ) {
 
-		if ( object.visible ) {
+		if ( object.visible === true ) {
 
-			var webglObjects = _webglObjects[ object.id ];
+			var webglObject = _objects.objects[ object.id ];
 
-			if ( webglObjects && object.castShadow && (object.frustumCulled === false || _frustum.intersectsObject( object ) === true) ) {
+			if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-				for ( var i = 0, l = webglObjects.length; i < l; i ++ ) {
-
-					var webglObject = webglObjects[ i ];
-
-					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-					_renderList.push( webglObject );
-
-				}
+				object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+				_renderList.push( webglObject );
 
 			}
 
 			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-				projectObject( scene, object.children[ i ], shadowCamera );
+				projectObject( object.children[ i ], shadowCamera );
 
 			}
 
@@ -517,6 +512,6 @@ THREE.ShadowMapPlugin = function ( _renderer, _lights, _webglObjects, _webglObje
 			? object.material.materials[ 0 ]
 			: object.material;
 
-	};
+	}
 
 };

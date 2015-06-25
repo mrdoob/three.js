@@ -56,6 +56,7 @@ class BaseClass(constants.BASE_DICT):
 
         """
         data = {}
+
         def _dict_copy(old, new):
             """Recursive function for processing all values
 

@@ -16,7 +16,7 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 	this.fov = fov;
 
 	this.left = -width / 2;
-	this.right = width / 2
+	this.right = width / 2;
 	this.top = height / 2;
 	this.bottom = -height / 2;
 
@@ -28,8 +28,6 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 	this.zoom = 1;
 
 	this.toPerspective();
-
-	var aspect = width / height;
 
 };
 
@@ -106,7 +104,7 @@ THREE.CombinedCamera.prototype.setSize = function( width, height ) {
 
 	this.cameraP.aspect = width / height;
 	this.left = -width / 2;
-	this.right = width / 2
+	this.right = width / 2;
 	this.top = height / 2;
 	this.bottom = -height / 2;
 
@@ -129,7 +127,7 @@ THREE.CombinedCamera.prototype.setFov = function( fov ) {
 
 };
 
-// For mantaining similar API with PerspectiveCamera
+// For maintaining similar API with PerspectiveCamera
 
 THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
 

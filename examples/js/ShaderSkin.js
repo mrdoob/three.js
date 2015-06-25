@@ -59,7 +59,6 @@ THREE.ShaderSkin = {
 		fragmentShader: [
 
 			"#define USE_BUMPMAP",
-			"#extension GL_OES_standard_derivatives : enable",
 
 			"uniform bool enableBump;",
 			"uniform bool enableSpecular;",

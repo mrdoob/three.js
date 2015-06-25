@@ -577,7 +577,7 @@ THREE.UTF8Loader.prototype.downloadMesh = function ( path, name, meshEntry, deco
 
 		}
 
-	};
+	}
 
 	getHttpRequest( path, function( req, e ) {
 

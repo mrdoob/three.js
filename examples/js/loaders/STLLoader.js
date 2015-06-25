@@ -44,14 +44,15 @@ THREE.STLLoader.prototype = {
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType('arraybuffer');
-		loader.load( url, function ( text ) {
+		var request = loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
+		return request;
 	},
-	
+
 	parse: function ( data ) {
 
 		var isBinary = function () {
@@ -61,11 +62,11 @@ THREE.STLLoader.prototype = {
 			face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
 			n_faces = reader.getUint32(80, true);
 			expect = 80 + (32 / 8) + (n_faces * face_size);
-			
+
 			if ( expect === reader.byteLength ) {
-				
+
 				return true;
-				
+
 			}
 
 			// some binary files will have different size from expected,
@@ -74,9 +75,9 @@ THREE.STLLoader.prototype = {
 			for ( var index = 0; index < fileLength; index ++ ) {
 
 				if ( reader.getUint8(index, false) > 127 ) {
-					
+
 					return true;
-					
+
 				}
 
 			}
@@ -255,7 +256,7 @@ THREE.STLLoader.prototype = {
 		} else {
 			return buf;
 		}
-		
+
 	}
 
 };
@@ -269,7 +270,7 @@ if ( typeof DataView === 'undefined') {
 		this.byteLength = byteLength || buffer.byteLength || buffer.length;
 		this._isString = typeof buffer === "string";
 
-	}
+	};
 
 	DataView.prototype = {
 
@@ -337,7 +338,7 @@ if ( typeof DataView === 'undefined') {
 
 			if (!littleEndian && length > 1) {
 
-				if (!(result instanceof Array)) {
+				if ( Array.isArray( result ) === false ) {
 
 					result = Array.prototype.slice.call(result);
 

@@ -183,9 +183,9 @@
 					mesh.rotation.x = - Math.PI / 2;
 					scene.add( mesh );
 
-					var faceIndices = [ 'a', 'b', 'c', 'd' ];
+					var faceIndices = [ 'a', 'b', 'c' ];
 
-					var color, f1, f2, f3, p, n, vertexIndex,
+					var color, f1, f2, f3, p, vertexIndex,
 
 						radius = 200,
 
@@ -199,9 +199,7 @@
 						f2 = geometry2.faces[ i ];
 						f3 = geometry3.faces[ i ];
 
-						n = ( f1 instanceof THREE.Face3 ) ? 3 : 4;
-
-						for( var j = 0; j < n; j ++ ) {
+						for( var j = 0; j < 3; j ++ ) {
 
 							vertexIndex = f1[ faceIndices[ j ] ];
 

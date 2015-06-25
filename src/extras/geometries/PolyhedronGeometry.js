@@ -153,7 +153,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 			for ( var j = 0; j <= rows; j ++) {
 
-				if ( j == 0 && i == cols ) {
+				if ( j === 0 && i === cols ) {
 
 					v[ i ][ j ] = aj;
 
@@ -175,7 +175,7 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 
 				var k = Math.floor( j / 2 );
 
-				if ( j % 2 == 0 ) {
+				if ( j % 2 === 0 ) {
 
 					make(
 						v[ i ][ k + 1],
