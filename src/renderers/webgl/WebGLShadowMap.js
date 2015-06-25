@@ -6,6 +6,7 @@
 THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	var _gl = _renderer.context,
+	_state = _renderer.state,
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
@@ -84,7 +85,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_gl.disable( _gl.BLEND );
+		_state.setBlend( false );
 
 		_gl.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
@@ -99,7 +100,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.state.setDepthTest( true );
+		_state.setDepthTest( true );
 
 		// preprocess lights
 		// 	- skip lights that are not casting shadows
@@ -336,7 +337,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_gl.enable( _gl.BLEND );
+		_state.setBlend( true );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 
