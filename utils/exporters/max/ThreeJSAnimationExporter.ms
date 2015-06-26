@@ -1303,6 +1303,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			
 			max modify mode
 			
+			modPanel.setCurrentObject node.modifiers[#skin]
 			total_bones = skinops.getnumberbones node.modifiers[#skin]
 			
 			vertex_count = getNumverts node
