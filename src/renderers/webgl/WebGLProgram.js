@@ -300,6 +300,8 @@ THREE.WebGLProgram = ( function () {
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
 
+				'#define SHADER_NAME ' + material.__webglShader.name,
+
 				customDefines,
 
 				'#define MAX_DIR_LIGHTS ' + parameters.maxDirLights,
