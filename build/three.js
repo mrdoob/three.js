@@ -11650,8 +11650,6 @@ THREE.OrthographicCamera.prototype.clone = function () {
 	camera.near = this.near;
 	camera.far = this.far;
 
-	camera.projectionMatrix.copy( this.projectionMatrix );
-
 	return camera;
 };
 
@@ -11659,6 +11657,7 @@ THREE.OrthographicCamera.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
+	data.object.zoom = this.zoom;
 	data.object.left = this.left;
 	data.object.right = this.right;
 	data.object.top = this.top;
@@ -11809,8 +11808,6 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 	camera.near = this.near;
 	camera.far = this.far;
 
-	camera.projectionMatrix.copy( this.projectionMatrix );
-
 	return camera;
 
 };
@@ -11819,6 +11816,7 @@ THREE.PerspectiveCamera.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
+	data.object.zoom = this.zoom;
 	data.object.fov = this.fov;
 	data.object.aspect = this.aspect;
 	data.object.near = this.near;
@@ -23944,6 +23942,8 @@ THREE.WebGLProgram = ( function () {
 
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
+
+				'#define SHADER_NAME ' + material.__webglShader.name,
 
 				customDefines,
 
