@@ -1821,6 +1821,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			envMapMode: material.envMap && material.envMap.mapping,
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
+			emissiveMap: !! material.emissiveMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			specularMap: !! material.specularMap,
@@ -2323,6 +2324,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// 3. normal map
 		// 4. bump map
 		// 5. alpha map
+		// 6. emissive map
 
 		var uvScaleMap;
 
@@ -2345,6 +2347,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material.alphaMap ) {
 
 			uvScaleMap = material.alphaMap;
+
+		} else if ( material.emissiveMap ) {
+
+			uvScaleMap = material.emissiveMap;
 
 		}
 
@@ -2429,6 +2435,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.aoMap.value = material.aoMap;
 		uniforms.aoMapIntensity.value = material.aoMapIntensity;
+
+		uniforms.emissiveMap.value = material.emissiveMap;
 
 	}
 
