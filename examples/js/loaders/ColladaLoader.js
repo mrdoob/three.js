@@ -635,7 +635,7 @@ THREE.ColladaLoader = function () {
 		var bones = [];
 		setupSkeleton( skeleton, bones, -1 );
 		setupSkinningMatrices( bones, skinController.skin );
-		v = new THREE.Vector3();
+		var v = new THREE.Vector3();
 		var skinned = [];
 
 		for (var i = 0; i < geometry.vertices.length; i ++) {
@@ -648,14 +648,14 @@ THREE.ColladaLoader = function () {
 
 			if ( bones[ i ].type != 'JOINT' ) continue;
 
-			for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
+			for ( var j = 0; j < bones[ i ].weights.length; j ++ ) {
 
-				w = bones[ i ].weights[ j ];
-				vidx = w.index;
-				weight = w.weight;
+				var w = bones[ i ].weights[ j ];
+				var vidx = w.index;
+				var weight = w.weight;
 
-				o = geometry.vertices[vidx];
-				s = skinned[vidx];
+				var o = geometry.vertices[vidx];
+				var s = skinned[vidx];
 
 				v.x = o.x;
 				v.y = o.y;
@@ -5195,7 +5195,7 @@ THREE.ColladaLoader = function () {
 
 	function loadTextureImage ( texture, url ) {
 
-		loader = new THREE.ImageLoader();
+		var loader = new THREE.ImageLoader();
 
 		loader.load( url, function ( image ) {
 
