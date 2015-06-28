@@ -27,7 +27,7 @@ THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
 
 /**
  * Uses Focal Length (in mm) to estimate and set FOV
- * 35mm (fullframe) camera is used if frame size is not specified;
+ * 35mm (full-frame) camera is used if frame size is not specified;
  * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
  */
 

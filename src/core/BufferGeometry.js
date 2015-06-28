@@ -839,7 +839,7 @@ THREE.BufferGeometry.prototype = {
 			for ( var vo = 0; vo < 3; vo ++ ) {
 				var vid = indices[ findex * 3 + vo ];
 				if ( vertexMap[ vid ] === - 1 ) {
-					//Unmapped vertice
+					//Unmapped vertex
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
 					newVerticeMaps ++;
@@ -849,7 +849,7 @@ THREE.BufferGeometry.prototype = {
 					faceVertices[ vo * 2 + 1 ] = - 1;
 					duplicatedVertices ++;
 				} else {
-					//Reused vertice in the current block
+					//Reused vertex in the current block
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = vertexMap[ vid ];
 				}
@@ -884,7 +884,7 @@ THREE.BufferGeometry.prototype = {
 			}
 		}
 
-		/* Move all attribute values to map to the new computed indices , also expand the vertice stack to match our new vertexPtr. */
+		/* Move all attribute values to map to the new computed indices , also expand the vertex stack to match our new vertexPtr. */
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
 		this.offsets = offsets; // TODO: Deprecate
 		this.drawcalls = offsets;
@@ -965,7 +965,7 @@ THREE.BufferGeometry.prototype = {
 		Reorder attributes based on a new indexBuffer and indexMap.
 		indexBuffer - Uint16Array of the new ordered indices.
 		indexMap - Int32Array where the position is the new vertex ID and the value the old vertex ID for each vertex.
-		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertice stack).
+		vertexCount - Amount of total vertices considered in this reordering (in case you want to grow the vertex stack).
 	*/
 	reorderBuffers: function ( indexBuffer, indexMap, vertexCount ) {
 

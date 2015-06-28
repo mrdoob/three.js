@@ -127,7 +127,7 @@ THREE.Shape.Utils = {
 	triangulateShape: function ( contour, holes ) {
 
 		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
-			// inOtherPt needs to be colinear to the inSegment
+			// inOtherPt needs to be collinear to the inSegment
 			if ( inSegPt1.x !== inSegPt2.x ) {
 				if ( inSegPt1.x < inSegPt2.x ) {
 					return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
@@ -189,13 +189,13 @@ THREE.Shape.Utils = {
 				return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx,
 							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
 
-			} else {		// parallel or colinear
+			} else {		// parallel or collinear
 				if ( ( perpSeg1 !== 0 ) ||
 					 ( seg2dy * seg1seg2dx !== seg2dx * seg1seg2dy ) ) 			return [];
 
 				// they are collinear or degenerate
-				var seg1Pt = ( (seg1dx === 0) && (seg1dy === 0) );	// segment1 ist just a point?
-				var seg2Pt = ( (seg2dx === 0) && (seg2dy === 0) );	// segment2 ist just a point?
+				var seg1Pt = ( (seg1dx === 0) && (seg1dy === 0) );	// segment1 is just a point?
+				var seg2Pt = ( (seg2dx === 0) && (seg2dy === 0) );	// segment2 is just a point?
 				// both segments are points
 				if ( seg1Pt && seg2Pt ) {
 					if ( (inSeg1Pt1.x !== inSeg2Pt1.x) ||
