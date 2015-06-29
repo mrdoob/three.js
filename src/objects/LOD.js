@@ -8,6 +8,8 @@ THREE.LOD = function () {
 
 	THREE.Object3D.call( this );
 
+	this.type = 'LOD';
+
 	Object.defineProperties( this, {
 		levels: {
 			enumerable: true,
@@ -147,5 +149,28 @@ THREE.LOD.prototype.clone = function ( object ) {
 	}
 
 	return object;
+
+};
+
+THREE.LOD.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	data.object.levels = [];
+
+	var levels = this.levels;
+
+	for ( var i = 0, l = levels.length; i < l; i ++ ) {
+
+		var level = levels[ i ];
+
+		data.object.levels.push({
+			distance: level.distance,
+			object: level.object.uuid
+		});
+
+	}
+
+	return data;
 
 };

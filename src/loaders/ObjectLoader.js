@@ -478,6 +478,12 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
+				case 'LOD':
+
+					object = new THREE.LOD();
+
+					break;
+
 				case 'Line':
 
 					object = new THREE.Line( getGeometry( data.geometry ), getMaterial( data.material ), data.mode );
@@ -535,6 +541,31 @@ THREE.ObjectLoader.prototype = {
 				for ( var child in data.children ) {
 
 					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+
+				}
+
+			}
+
+			if ( data.type === 'LOD' ) {
+
+				for ( var l = 0; l < data.levels.length; l ++ ) {
+
+					var level = data.levels[l];
+
+					for ( var c = 0; c < object.children.length; c ++ ) {
+
+						var child = object.children[c];
+
+						if ( child.uuid === level.object ) {
+
+							object.levels.push({
+								distance: level.distance,
+								object: child
+							});
+
+						}
+
+					}
 
 				}
 
