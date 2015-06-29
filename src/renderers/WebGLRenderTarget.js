@@ -49,9 +49,12 @@ THREE.WebGLRenderTarget.prototype = {
 		}
 	},
 
-	clone: function () {
+	clone: function (tmp) {
 
-		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
+		if( tmp === undefined ) tmp = new THREE.WebGLRenderTarget( this.width, this.height );
+
+		tmp.width = this.width;
+		tmp.height = this.height;
 
 		tmp.wrapS = this.wrapS;
 		tmp.wrapT = this.wrapT;
