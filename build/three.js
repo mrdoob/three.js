@@ -7600,6 +7600,22 @@ THREE.Object3D.prototype = {
 
 	},
 
+	get renderDepth () {
+
+		console.warn( 'THREE.Object3D: .renderDepth has been renamed to .renderOrder.' );
+
+		return this.renderOrder;
+
+	},
+
+	set renderDepth ( value ) {
+
+		console.warn( 'THREE.Object3D: .renderDepth has been renamed to .renderOrder.' );
+		
+		this.renderOrder = value;
+
+	},
+
 	applyMatrix: function ( matrix ) {
 
 		this.matrix.multiplyMatrices( matrix, this.matrix );
