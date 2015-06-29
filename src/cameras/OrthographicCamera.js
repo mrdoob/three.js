@@ -52,8 +52,6 @@ THREE.OrthographicCamera.prototype.clone = function () {
 	camera.near = this.near;
 	camera.far = this.far;
 
-	camera.projectionMatrix.copy( this.projectionMatrix );
-
 	return camera;
 };
 
@@ -61,6 +59,7 @@ THREE.OrthographicCamera.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
 
+	data.object.zoom = this.zoom;
 	data.object.left = this.left;
 	data.object.right = this.right;
 	data.object.top = this.top;
