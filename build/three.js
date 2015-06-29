@@ -10569,19 +10569,8 @@ THREE.BufferGeometry.prototype = {
 
 	fromDirectGeometry: function ( geometry ) {
 
-		if ( geometry.indices.length > 0 ) {
-
-			var indices = new Uint16Array( geometry.indices.length * 3 );
-			this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
-
-		}
-
-		if ( geometry.vertices.length > 0 ) {
-
-			var positions = new Float32Array( geometry.vertices.length * 3 );
-			this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
-
-		}
+		var positions = new Float32Array( geometry.vertices.length * 3 );
+		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
 
 		if ( geometry.normals.length > 0 ) {
 
@@ -10615,6 +10604,13 @@ THREE.BufferGeometry.prototype = {
 
 			var tangents = new Float32Array( geometry.tangents.length * 4 );
 			this.addAttribute( 'tangent', new THREE.BufferAttribute( tangents, 4 ).copyVector4sArray( geometry.tangents ) );
+
+		}
+
+		if ( geometry.indices.length > 0 ) {
+
+			var indices = new Uint16Array( geometry.indices.length * 3 );
+			this.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
 
