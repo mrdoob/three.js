@@ -3,6 +3,7 @@
  *	- renders scene into axis-aligned cube
  *
  * @author alteredq / http://alteredqualia.com/
+ * @author prafullit
  */
 
 THREE.CubeCamera = function ( near, far, cubeResolution ) {
@@ -82,3 +83,14 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 
 THREE.CubeCamera.prototype = Object.create( THREE.Object3D.prototype );
 THREE.CubeCamera.prototype.constructor = THREE.CubeCamera;
+
+THREE.CubeCamera.prototype.clone = function () {
+
+	var camera = new THREE.CubeCamera();
+
+	THREE.Object3D.prototype.clone.call( this, camera, false );
+	this.renderTarget.clone(camera.renderTarget);
+	
+	return camera;
+
+};
