@@ -40,12 +40,6 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( ! attribute.uuid ) {
-
-			attribute.uuid = THREE.Math.generateUUID();
-
-		}
-
 		this.attributes[ name ] = attribute;
 
 	},
