@@ -4,6 +4,8 @@
 
 THREE.BufferAttribute = function ( array, itemSize ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.array = array;
 	this.itemSize = itemSize;
 

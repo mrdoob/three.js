@@ -4,6 +4,8 @@
 
 THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
 	this.offset = offset;
