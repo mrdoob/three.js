@@ -45,7 +45,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 		delete object._modelViewMatrix;
 		delete object._normalMatrix;
 
-		delete webGLProps.deleteProperties( object );
+		delete webGLProps.delete( object );
 
 	}
 
@@ -72,7 +72,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	this.init = function ( object ) {
 
-		var objectWebglProperties = webGLProps.getProperties( object );
+		var objectWebglProperties = webGLProps.get( object );
 
 		if ( objectWebglProperties.__webglInit === undefined ) {
 
@@ -191,7 +191,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 			var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
-			var attributeWebGLProperties = webGLProps.getProperties( attribute );
+			var attributeWebGLProperties = webGLProps.get( data );
 
 			if ( attributeWebGLProperties.__webglBuffer === undefined ) {
 
@@ -243,7 +243,13 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	// returns the webgl buffer for a specified attribute
 	this.getAttributeBuffer = function (attribute) {
-		return webGLProps.getProperties( attribute ).__webglBuffer;
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			return webGLProps.get( attribute.data ).__webglBuffer
+
+		}
+
+		return webGLProps.get( attribute ).__webglBuffer;
 	}
 
 	this.update = function ( renderList ) {

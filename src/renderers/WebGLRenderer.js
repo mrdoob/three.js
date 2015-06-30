@@ -642,7 +642,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateTexture = function ( texture ) {
 
-		var textureWebGLProperties = webGLProps.getProperties( texture );
+		var textureWebGLProperties = webGLProps.get( texture );
 
 		if ( texture.image && textureWebGLProperties.__image__webglTextureCube ) {
 
@@ -661,13 +661,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// remove all webgl properties
-		delete webGLProps.deleteProperties( texture );
+		delete webGLProps.delete( texture );
 
 	};
 
 	var deallocateRenderTarget = function ( renderTarget ) {
 
-		var renderTargetWebGLProperties = webGLProps.getProperties( renderTarget );
+		var renderTargetWebGLProperties = webGLProps.get( renderTarget );
 
 		if ( ! renderTarget || renderTargetWebGLProperties.__webglTexture === undefined ) return;
 
@@ -689,13 +689,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		delete webGLProps.deleteProperties( renderTargetWebGLProperties );
+		delete webGLProps.delete( renderTargetWebGLProperties );
 
 	};
 
 	var deallocateMaterial = function ( material ) {
 
-		var program = webGLProps.getProperties( material ).program.program;
+		var program = webGLProps.get( material ).program.program;
 
 		if ( program === undefined ) return;
 
@@ -754,7 +754,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		delete webGLProps.deleteProperties( material );
+		delete webGLProps.delete( material );
 
 	};
 
@@ -764,18 +764,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.initAttributes();
 
-		var webglProps = webGLProps.getProperties( object );
+		var objectWebGLProperties = webGLProps.get( object );
 
-		if ( object.hasPositions && ! webglProps.__webglVertexBuffer ) webglProps.__webglVertexBuffer = _gl.createBuffer();
-		if ( object.hasNormals && ! webglProps.__webglNormalBuffer ) webglProps.__webglNormalBuffer = _gl.createBuffer();
-		if ( object.hasUvs && ! webglProps.__webglUvBuffer ) webglProps.__webglUvBuffer = _gl.createBuffer();
-		if ( object.hasColors && ! webglProps.__webglColorBuffer ) webglProps.__webglColorBuffer = _gl.createBuffer();
+		if ( object.hasPositions && ! objectWebGLProperties.__webglVertexBuffer ) objectWebGLProperties.__webglVertexBuffer = _gl.createBuffer();
+		if ( object.hasNormals && ! objectWebGLProperties.__webglNormalBuffer ) objectWebGLProperties.__webglNormalBuffer = _gl.createBuffer();
+		if ( object.hasUvs && ! objectWebGLProperties.__webglUvBuffer ) objectWebGLProperties.__webglUvBuffer = _gl.createBuffer();
+		if ( object.hasColors && ! objectWebGLProperties.__webglColorBuffer ) objectWebGLProperties.__webglColorBuffer = _gl.createBuffer();
 
 		var attributes = program.getAttributes();
 
 		if ( object.hasPositions ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglVertexBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectWebGLProperties.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
 
 			state.enableAttribute( attributes.position );
@@ -785,7 +785,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasNormals ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglNormalBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectWebGLProperties.__webglNormalBuffer );
 
 			if ( material instanceof THREE.MeshPhongMaterial === false && material.shading === THREE.FlatShading ) {
 
@@ -840,7 +840,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasUvs && material.map ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglUvBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectWebGLProperties.__webglUvBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 
 			state.enableAttribute( attributes.uv );
@@ -851,7 +851,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasColors && material.vertexColors !== THREE.NoColors ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, webglProps.__webglColorBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, objectWebGLProperties.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
 
 			state.enableAttribute( attributes.color );
@@ -1690,9 +1690,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						var material = object.material;
 
-						if ( webGLProps.getProperties( material ) ) {
+						if ( webGLProps.get( material ) ) {
 
-							material.program = webGLProps.getProperties( material ).program;
+							material.program = webGLProps.get( material ).program;
 
 						}
 
@@ -1821,7 +1821,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMaterial( material, lights, fog, object ) {
 
-		var materialWebGLProperties = webGLProps.getProperties( material );
+		var materialWebGLProperties = webGLProps.get( material );
 
 		var shaderID = shaderIDs[ material.type ];
 
@@ -2080,7 +2080,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_usedTextureUnits = 0;
 
-		var materialWebGLProperties = webGLProps.getProperties( material );
+		var materialWebGLProperties = webGLProps.get( material );
 
 		if ( material.needsUpdate || ! materialWebGLProperties.program ) {
 
@@ -3211,10 +3211,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( extension && texture.type !== THREE.FloatType && texture.type !== THREE.HalfFloatType ) {
 
-			if ( texture.anisotropy > 1 || webGLProps.getProperties( texture ).__currentAnisotropy ) {
+			if ( texture.anisotropy > 1 || webGLProps.get( texture ).__currentAnisotropy ) {
 
 				_gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, _this.getMaxAnisotropy() ) );
-				webGLProps.getProperties( texture ).__currentAnisotropy = texture.anisotropy;
+				webGLProps.get( texture ).__currentAnisotropy = texture.anisotropy;
 
 			}
 
@@ -3224,7 +3224,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.uploadTexture = function ( texture, slot ) {
 
-		var textureWebGLProperties = webGLProps.getProperties( texture );
+		var textureWebGLProperties = webGLProps.get( texture );
 
 		if ( textureWebGLProperties.__webglInit === undefined ) {
 
@@ -3343,7 +3343,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setTexture = function ( texture, slot ) {
 
 		// if the image has been uploaded into a separate renderer, will need to reupload to this renderer
-		if ( ( texture.image && texture.image.complete !== false ) && texture.__webglInit === true && webGLProps.getProperties( texture ).__webglInit === undefined ) {
+		if ( ( texture.image && texture.image.complete !== false ) && texture.__webglInit === true && webGLProps.get( texture ).__webglInit === undefined ) {
 
 			texture.needsUpdate = true;
 
@@ -3373,7 +3373,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, webGLProps.getProperties( texture ).__webglTexture );
+		state.bindTexture( _gl.TEXTURE_2D, webGLProps.get( texture ).__webglTexture );
 
 	};
 
@@ -3405,7 +3405,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setCubeTexture ( texture, slot ) {
 
-		var textureWebGLProperties = webGLProps.getProperties( texture );
+		var textureWebGLProperties = webGLProps.get( texture );
 
 		if ( texture.image.length === 6 ) {
 
@@ -3522,7 +3522,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setCubeTextureDynamic ( texture, slot ) {
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_CUBE_MAP, webGLProps.getProperties( texture ).__webglTexture );
+		state.bindTexture( _gl.TEXTURE_CUBE_MAP, webGLProps.get( texture ).__webglTexture );
 
 	}
 
@@ -3531,7 +3531,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setupFrameBuffer ( framebuffer, renderTarget, textureTarget ) {
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, webGLProps.getProperties( renderTarget ).__webglTexture, 0 );
+		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, webGLProps.get( renderTarget ).__webglTexture, 0 );
 
 	}
 
@@ -3567,9 +3567,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 
-		if ( renderTarget && webGLProps.getProperties( renderTarget ).__webglFramebuffer === undefined ) {
+		if ( renderTarget && webGLProps.get( renderTarget ).__webglFramebuffer === undefined ) {
 
-			var renderTargetWebGLProperties = webGLProps.getProperties( renderTarget );
+			var renderTargetWebGLProperties = webGLProps.get( renderTarget );
 
 			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
@@ -3673,7 +3673,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget ) {
 
-			var renderTargetWebGLProperties = webGLProps.getProperties( renderTarget );
+			var renderTargetWebGLProperties = webGLProps.get( renderTarget );
 
 			if ( isCube ) {
 
@@ -3726,7 +3726,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( webGLProps.getProperties( renderTarget ).__webglFramebuffer ) {
+		if ( webGLProps.get( renderTarget ).__webglFramebuffer ) {
 
 			if ( renderTarget.format !== THREE.RGBAFormat ) {
 
@@ -3737,9 +3737,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var restore = false;
 
-			if ( webGLProps.getProperties( renderTarget ).__webglFramebuffer !== _currentFramebuffer ) {
+			if ( webGLProps.get( renderTarget ).__webglFramebuffer !== _currentFramebuffer ) {
 
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, webGLProps.getProperties( renderTarget ).__webglFramebuffer );
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, webGLProps.get( renderTarget ).__webglFramebuffer );
 
 				restore = true;
 
@@ -3769,13 +3769,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
-			state.bindTexture( _gl.TEXTURE_CUBE_MAP, webGLProps.getProperties( renderTarget ).__webglTexture );
+			state.bindTexture( _gl.TEXTURE_CUBE_MAP, webGLProps.get( renderTarget ).__webglTexture );
 			_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 		} else {
 
-			state.bindTexture( _gl.TEXTURE_2D, webGLProps.getProperties( renderTarget ).__webglTexture );
+			state.bindTexture( _gl.TEXTURE_2D, webGLProps.get( renderTarget ).__webglTexture );
 			_gl.generateMipmap( _gl.TEXTURE_2D );
 			state.bindTexture( _gl.TEXTURE_2D, null );
 

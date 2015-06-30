@@ -6,13 +6,13 @@ THREE.WebGLProperties = function () {
 
 	var properties = {};
 
-	this.deleteProperties = function ( object ) {
+	this.delete = function ( object ) {
 
 		delete properties[ object.uuid ];
 
 	};
 
-	this.getProperties = function ( object ) {
+	this.get = function ( object ) {
 
 		initObject( object );
 
@@ -20,18 +20,11 @@ THREE.WebGLProperties = function () {
 
 	};
 
-	this.propertiesExist = function ( object ) {
-
-		return properties[ object.uuid ] !== undefined;
-
-	}
-
 	function initObject ( object ) {
 
 		if ( properties[ object.uuid ] === undefined ) {
 
 			properties[ object.uuid ] = {};
-
 		}
 
 	}
