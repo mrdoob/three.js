@@ -19,6 +19,7 @@
 
 			var scene, renderer;
 			var camera, light;
+			var fnh, vnh;
 
 			init();
 			animate();
@@ -60,10 +61,13 @@
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
 
-					group.add( new THREE.FaceNormalsHelper( mesh, 0.1 ) );
-					group.add( new THREE.VertexNormalsHelper( mesh, 0.1 ) );
+					fnh = new THREE.FaceNormalsHelper( mesh, 5 );
+					scene.add( fnh );
 
-					group.add( new THREE.BoxHelper( mesh ) );
+					vnh = new THREE.VertexNormalsHelper( mesh, 5 );
+					scene.add( vnh );
+
+					scene.add( new THREE.BoxHelper( mesh ) );
 
 					var wireframe = new THREE.WireframeGeometry( geometry );
 					var line = new THREE.LineSegments( wireframe );
@@ -111,6 +115,9 @@
 				light.position.x = Math.sin( time * 1.7 ) * 300;
 				light.position.y = Math.cos( time * 1.5 ) * 400;
 				light.position.z = Math.cos( time * 1.3 ) * 300;
+
+				if ( fnh ) fnh.update();
+				if ( vnh ) vnh.update();
 
 				renderer.render( scene, camera );
 
