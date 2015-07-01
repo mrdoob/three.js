@@ -13,7 +13,7 @@
 
 		this.near = near || 0;
 		this.far = far || Infinity;
-		this.visibleOnly = false;
+		this.visibleOnly = true;
 
 		this.params = {
 			Sprite: {},
