@@ -57,6 +57,15 @@ THREE.Math = {
 
 	},
 
+	// compute euclidian modulo of m % n
+	// https://en.wikipedia.org/wiki/Modulo_operation
+
+	euclideanModulo: function ( n, m ) {
+
+		return ( ( n % m ) + m ) % m;
+
+	},
+
 	// Linear mapping from range <a1, a2> to range <b1, b2>
 
 	mapLinear: function ( x, a1, a2, b1, b2 ) {
