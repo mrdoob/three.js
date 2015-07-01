@@ -109,19 +109,9 @@ THREE.Object3D.prototype = {
 
 	},
 
-	get renderDepth () {
-
-		console.warn( 'THREE.Object3D: .renderDepth has been renamed to .renderOrder.' );
-
-		return this.renderOrder;
-
-	},
-
 	set renderDepth ( value ) {
 
-		console.warn( 'THREE.Object3D: .renderDepth has been renamed to .renderOrder.' );
-		
-		this.renderOrder = value;
+		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
 
 	},
 
