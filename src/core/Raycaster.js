@@ -13,6 +13,7 @@
 
 		this.near = near || 0;
 		this.far = far || Infinity;
+		this.visibleOnly = false;
 
 		this.params = {
 			Sprite: {},
@@ -32,6 +33,8 @@
 
 	var intersectObject = function ( object, raycaster, intersects, recursive ) {
 
+		if ( raycaster.visibleOnly === true && object.visible === false ) return;
+	
 		object.raycast( raycaster, intersects );
 
 		if ( recursive === true ) {
