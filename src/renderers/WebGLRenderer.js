@@ -184,6 +184,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setDefaultGLState();
 
 			objects.objects = {};
+			objects.webGLProps.deleteAll();
+			webGLProps.deleteAll();
 
 		}, false);
 

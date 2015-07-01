@@ -67,6 +67,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	this.objects = objects;
 	this.objectsImmediate = objectsImmediate;
+	this.webGLProps = webGLProps;
 
 	this.geometries = geometries;
 
