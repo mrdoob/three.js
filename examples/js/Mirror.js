@@ -112,8 +112,10 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	this.mirrorCamera = this.camera.clone();
 	this.mirrorCamera.matrixAutoUpdate = true;
 
-	this.texture = new THREE.WebGLRenderTarget( width, height );
-	this.tempTexture = new THREE.WebGLRenderTarget( width, height );
+	var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+
+	this.texture = new THREE.WebGLRenderTarget( width, height, parameters );
+	this.tempTexture = new THREE.WebGLRenderTarget( width, height, parameters );
 
 	var mirrorShader = THREE.ShaderLib[ "mirror" ];
 	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
@@ -262,7 +264,13 @@ THREE.Mirror.prototype.render = function () {
 
 	if ( scene !== undefined && scene instanceof THREE.Scene) {
 
+		// We can't render ourself to ourself
+		var visible = this.material.visible;
+		this.material.visible = false;
+
 		this.renderer.render( scene, this.mirrorCamera, this.texture, true );
+
+		this.material.visible = visible;
 
 	}
 
