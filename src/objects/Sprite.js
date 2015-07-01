@@ -38,9 +38,9 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
-		var distance = raycaster.ray.distanceToPoint( matrixPosition );
+		var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
 
-		if ( distance > this.scale.x ) {
+		if ( distanceSq > this.scale.x * this.scale.x ) {
 
 			return;
 
@@ -48,7 +48,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 		intersects.push( {
 
-			distance: distance,
+			distance: Math.sqrt( distanceSq ),
 			point: this.position,
 			face: null,
 			object: this
