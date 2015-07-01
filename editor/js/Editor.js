@@ -443,10 +443,7 @@ Editor.prototype = {
 
 		if ( json.scene === undefined ) {
 
-			var scene = loader.parse( json );
-
-			this.setScene( scene );
-
+			this.setScene( loader.parse( json ) );
 			return;
 
 		}
