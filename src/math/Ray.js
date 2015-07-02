@@ -69,15 +69,11 @@ THREE.Ray.prototype = {
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function ( point ) {
 
-		return function ( point ) {
+		return Math.sqrt( this.distanceSqToPoint( point ) );
 
-			return Math.sqrt( this.distanceSqToPoint( point ) );
-
-		};
-
-	}(),
+	},
 
 	distanceSqToPoint: function () {
 
