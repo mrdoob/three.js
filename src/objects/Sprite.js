@@ -39,8 +39,9 @@ THREE.Sprite.prototype.raycast = ( function () {
 		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
 		var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
-
-		if ( distanceSq > this.scale.x * this.scale.x ) {
+		var diag = ( this.scale.x + this.scale.y ) / 2;
+		
+		if ( distanceSq > diag * diag ) {
 
 			return;
 
