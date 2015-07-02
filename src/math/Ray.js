@@ -71,6 +71,16 @@ THREE.Ray.prototype = {
 
 	distanceToPoint: function () {
 
+		return function ( point ) {
+
+			return Math.sqrt( this.distanceSqToPoint( point ) );
+
+		};
+
+	}(),
+
+	distanceSqToPoint: function () {
+
 		var v1 = new THREE.Vector3();
 
 		return function ( point ) {
@@ -81,13 +91,13 @@ THREE.Ray.prototype = {
 
 			if ( directionDistance < 0 ) {
 
-				return this.origin.distanceTo( point );
+				return this.origin.distanceToSquared( point );
 
 			}
 
 			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-			return v1.distanceTo( point );
+			return v1.distanceToSquared( point );
 
 		};
 
