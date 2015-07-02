@@ -82,7 +82,9 @@ THREE.ParallaxShader = {
 				"float heightFromTexture = texture2D( bumpMap, currentTextureCoords ).r;",
 
 				// while ( heightFromTexture > currentLayerHeight )
-				"for ( int i = 0; i == 0; i += 0 ) {",
+				// Infinite loops are not well supported. Do a "large" finite
+				// loop, but not too large, as it slows down some compilers.
+				"for ( int i = 0; i < 30; i += 1 ) {",
 					"if ( heightFromTexture <= currentLayerHeight ) {",
 						"break;",
 					"}",
