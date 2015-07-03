@@ -229,6 +229,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	// Extend renderable objects by injecting functions into their prototypes.
+	THREE.WebGLRenderFog().init();
+
+
 	//
 
 	var glClearColor = function ( r, g, b, a ) {
@@ -2204,7 +2208,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( fog && material.fog ) {
 
-				refreshUniformsFog( m_uniforms, fog );
+				fog.__refreshUniformsFog( renderer, m_uniforms );
 
 			}
 
@@ -2408,23 +2412,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var repeat = material.map.repeat;
 
 			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-	}
-
-	function refreshUniformsFog ( uniforms, fog ) {
-
-		uniforms.fogColor.value = fog.color;
-
-		if ( fog instanceof THREE.Fog ) {
-
-			uniforms.fogNear.value = fog.near;
-			uniforms.fogFar.value = fog.far;
-
-		} else if ( fog instanceof THREE.FogExp2 ) {
-
-			uniforms.fogDensity.value = fog.density;
 
 		}
 
