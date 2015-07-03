@@ -232,6 +232,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Extend renderable objects by injecting functions into their prototypes.
 	THREE.WebGLRenderFog().init();
 	THREE.WebGLRenderLights().init();
+	THREE.WebGLRenderMaterials().init();
 
 
 	//
@@ -2213,9 +2214,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material.lights ) {
+			if ( material.__supportsLights() ) {
 
 				if ( _lightsNeedUpdate ) {
 
