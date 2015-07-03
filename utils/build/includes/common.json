@@ -161,6 +161,7 @@
 	"src/renderers/webgl/WebGLObjects.js",
 	"src/renderers/webgl/WebGLProgram.js",
 	"src/renderers/webgl/WebGLRenderFog.js",
+	"src/renderers/webgl/WebGLRenderLights.js",
 	"src/renderers/webgl/WebGLShader.js",
 	"src/renderers/webgl/WebGLShadowMap.js",
 	"src/renderers/webgl/WebGLState.js",

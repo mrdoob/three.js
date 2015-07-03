@@ -231,6 +231,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Extend renderable objects by injecting functions into their prototypes.
 	THREE.WebGLRenderFog().init();
+	THREE.WebGLRenderLights().init();
 
 
 	//
@@ -2224,10 +2225,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				if ( refreshLights ) {
+
 					refreshUniformsLights( m_uniforms, _lights );
 					markUniformsLightsNeedsUpdate( m_uniforms, true );
+
 				} else {
+
 					markUniformsLightsNeedsUpdate( m_uniforms, false );
+
 				}
 
 			}
@@ -2511,17 +2516,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var light = lights[ i ];
 
-				if ( ! light.castShadow ) continue;
-
-				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) ) {
-
-					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
-
-					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
-
-					uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
-					uniforms.shadowBias.value[ j ] = light.shadowBias;
+				if ( light.__refreshUniformsShadow( undefined, uniforms, j ) === true ) {
 
 					j ++;
 
