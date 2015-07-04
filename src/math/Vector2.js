@@ -337,6 +337,11 @@ THREE.Vector2.prototype = {
 
 	},
 
+	lengthManhattan: function() {
+
+		return Math.abs( this.x ) + Math.abs( this.y );
+	},
+
 	normalize: function () {
 
 		return this.divideScalar( this.length() );
