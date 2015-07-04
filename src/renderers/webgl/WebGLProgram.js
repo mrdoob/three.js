@@ -76,6 +76,25 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
+	function getProgramInfoLog ( gl, program ) {
+
+		var programLogInfo = gl.getProgramInfoLog( program );
+
+		// Filter empty line.
+		// Filter warning X3557: loop only executes for 1 iteration
+		programLogInfo = programLogInfo
+			.split( /\r\n|\r|\n/ )
+			.filter( function ( line ) {
+
+				return line !== '' && ! line.match( /X3557/ );
+
+			} )
+			.join( '\n' );
+
+		return programLogInfo;
+
+	}
+
 	return function ( renderer, code, material, parameters ) {
 
 		var gl = renderer.context;
@@ -378,7 +397,7 @@ THREE.WebGLProgram = ( function () {
 
 		gl.linkProgram( program );
 
-		var programLog = gl.getProgramInfoLog( program );
+		var programLog = getProgramInfoLog( gl, program );
 		var vertexLog = gl.getShaderInfoLog( glVertexShader );
 		var fragmentLog = gl.getShaderInfoLog( glFragmentShader );
 
