@@ -337,7 +337,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	lengthManhatten: function() {
+	lengthManhattan: function() {
 
 		return Math.abs( this.x ) + Math.abs( this.y );
 	},
