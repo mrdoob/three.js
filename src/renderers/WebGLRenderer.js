@@ -229,6 +229,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	// Extend renderable objects by injecting functions into their prototypes.
+	THREE.WebGLRenderFog().init();
+	THREE.WebGLRenderLights().init();
+	THREE.WebGLRenderMaterials().init();
+
+
 	//
 
 	var glClearColor = function ( r, g, b, a ) {
@@ -2204,13 +2210,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( fog && material.fog ) {
 
-				refreshUniformsFog( m_uniforms, fog );
+				fog.__refreshUniformsFog( renderer, m_uniforms );
 
 			}
 
-			if ( material instanceof THREE.MeshPhongMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material.lights ) {
+			if ( material.__supportsLights() ) {
 
 				if ( _lightsNeedUpdate ) {
 
@@ -2220,64 +2224,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				if ( refreshLights ) {
+
 					refreshUniformsLights( m_uniforms, _lights );
 					markUniformsLightsNeedsUpdate( m_uniforms, true );
+
 				} else {
+
 					markUniformsLightsNeedsUpdate( m_uniforms, false );
+
 				}
-
-			}
-
-			if ( material instanceof THREE.MeshBasicMaterial ||
-				 material instanceof THREE.MeshLambertMaterial ||
-				 material instanceof THREE.MeshPhongMaterial ) {
-
-				refreshUniformsCommon( m_uniforms, material );
 
 			}
 
 			// refresh single material specific uniforms
 
-			if ( material instanceof THREE.LineBasicMaterial ) {
+			if ( material.__refreshUniforms !== undefined ) {
 
-				refreshUniformsLine( m_uniforms, material );
-
-			} else if ( material instanceof THREE.LineDashedMaterial ) {
-
-				refreshUniformsLine( m_uniforms, material );
-				refreshUniformsDash( m_uniforms, material );
-
-			} else if ( material instanceof THREE.PointCloudMaterial ) {
-
-				refreshUniformsParticle( m_uniforms, material );
-
-			} else if ( material instanceof THREE.MeshPhongMaterial ) {
-
-				refreshUniformsPhong( m_uniforms, material );
-
-			} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-				refreshUniformsLambert( m_uniforms, material );
-
-			} else if ( material instanceof THREE.MeshBasicMaterial ) {
-
-				refreshUniformsBasic( m_uniforms, material );
-
-			} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-				m_uniforms.mNear.value = camera.near;
-				m_uniforms.mFar.value = camera.far;
-				m_uniforms.opacity.value = material.opacity;
-
-			} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-				m_uniforms.opacity.value = material.opacity;
+				material.__refreshUniforms( this, m_uniforms );
 
 			}
 
 			if ( object.receiveShadow && ! material._shadowPass ) {
 
-				refreshUniformsShadow( m_uniforms, lights );
+				refreshUniformsShadow( this, m_uniforms, lights );
 
 			}
 
@@ -2296,167 +2265,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		return program;
-
-	}
-
-	// Uniforms (refresh uniforms objects)
-
-	function refreshUniformsCommon ( uniforms, material ) {
-
-		uniforms.opacity.value = material.opacity;
-
-		uniforms.diffuse.value = material.color;
-
-		uniforms.map.value = material.map;
-		uniforms.specularMap.value = material.specularMap;
-		uniforms.alphaMap.value = material.alphaMap;
-
-		if ( material.bumpMap ) {
-
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-
-		}
-
-		// uv repeat and offset setting priorities
-		// 1. color map
-		// 2. specular map
-		// 3. normal map
-		// 4. bump map
-		// 5. alpha map
-		// 6. emissive map
-
-		var uvScaleMap;
-
-		if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.specularMap ) {
-
-			uvScaleMap = material.specularMap;
-
-		} else if ( material.normalMap ) {
-
-			uvScaleMap = material.normalMap;
-
-		} else if ( material.bumpMap ) {
-
-			uvScaleMap = material.bumpMap;
-
-		} else if ( material.alphaMap ) {
-
-			uvScaleMap = material.alphaMap;
-
-		} else if ( material.emissiveMap ) {
-
-			uvScaleMap = material.emissiveMap;
-
-		}
-
-		if ( uvScaleMap !== undefined ) {
-
-			var offset = uvScaleMap.offset;
-			var repeat = uvScaleMap.repeat;
-
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-		uniforms.envMap.value = material.envMap;
-		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : - 1;
-
-		uniforms.reflectivity.value = material.reflectivity;
-		uniforms.refractionRatio.value = material.refractionRatio;
-
-	}
-
-	function refreshUniformsLine ( uniforms, material ) {
-
-		uniforms.diffuse.value = material.color;
-		uniforms.opacity.value = material.opacity;
-
-	}
-
-	function refreshUniformsDash ( uniforms, material ) {
-
-		uniforms.dashSize.value = material.dashSize;
-		uniforms.totalSize.value = material.dashSize + material.gapSize;
-		uniforms.scale.value = material.scale;
-
-	}
-
-	function refreshUniformsParticle ( uniforms, material ) {
-
-		uniforms.psColor.value = material.color;
-		uniforms.opacity.value = material.opacity;
-		uniforms.size.value = material.size;
-		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
-
-		uniforms.map.value = material.map;
-
-		if ( material.map !== null ) {
-
-			var offset = material.map.offset;
-			var repeat = material.map.repeat;
-
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-		}
-
-	}
-
-	function refreshUniformsFog ( uniforms, fog ) {
-
-		uniforms.fogColor.value = fog.color;
-
-		if ( fog instanceof THREE.Fog ) {
-
-			uniforms.fogNear.value = fog.near;
-			uniforms.fogFar.value = fog.far;
-
-		} else if ( fog instanceof THREE.FogExp2 ) {
-
-			uniforms.fogDensity.value = fog.density;
-
-		}
-
-	}
-
-	function refreshUniformsPhong ( uniforms, material ) {
-
-		uniforms.shininess.value = material.shininess;
-
-		uniforms.emissive.value = material.emissive;
-		uniforms.specular.value = material.specular;
-
-		uniforms.lightMap.value = material.lightMap;
-		uniforms.lightMapIntensity.value = material.lightMapIntensity;
-
-		uniforms.aoMap.value = material.aoMap;
-		uniforms.aoMapIntensity.value = material.aoMapIntensity;
-
-		uniforms.emissiveMap.value = material.emissiveMap;
-
-	}
-
-	function refreshUniformsLambert ( uniforms, material ) {
-
-		uniforms.emissive.value = material.emissive;
-
-	}
-
-	function refreshUniformsBasic ( uniforms, material ) {
-
-		uniforms.aoMap.value = material.aoMap;
-		uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
 	}
 
@@ -2514,7 +2322,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function refreshUniformsShadow ( uniforms, lights ) {
+	function refreshUniformsShadow ( renderer, uniforms, lights ) {
 
 		if ( uniforms.shadowMatrix ) {
 
@@ -2524,17 +2332,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var light = lights[ i ];
 
-				if ( ! light.castShadow ) continue;
-
-				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) ) {
-
-					uniforms.shadowMap.value[ j ] = light.shadowMap;
-					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
-
-					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
-
-					uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
-					uniforms.shadowBias.value[ j ] = light.shadowBias;
+				if ( light.__refreshUniformsShadow( renderer, uniforms, j ) === true ) {
 
 					j ++;
 

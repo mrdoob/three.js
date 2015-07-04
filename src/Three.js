@@ -214,6 +214,18 @@ THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 
 
+// UTILITIES
+
+THREE.extend = function( type, fnName, fn ) {
+	
+	if ( type !== undefined && type.prototype.hasOwnProperty( fnName ) === false ) {
+
+		type.prototype[fnName] = fn;
+
+	}
+
+};
+
 // DEPRECATED
 
 THREE.Projector = function () {
