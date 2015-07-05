@@ -182,7 +182,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setDefaultGLState();
 
 			objects.objects = {};
-			webGLProps.deleteAll();
+			webGLProps.clear();
 
 		}, false);
 

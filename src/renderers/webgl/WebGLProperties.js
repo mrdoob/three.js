@@ -6,7 +6,7 @@ THREE.WebGLProperties = function () {
 
 	var properties = {};
 
-	this.deleteAll = function () {
+	this.clear = function () {
 
 		properties = {};
 
