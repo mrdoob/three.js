@@ -32,8 +32,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
 
-	var webGLProps = new THREE.WebGLProperties();
-
 	var lights = [];
 
 	var opaqueObjects = [];
@@ -184,7 +182,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setDefaultGLState();
 
 			objects.objects = {};
-			objects.webGLProps.deleteAll();
 			webGLProps.deleteAll();
 
 		}, false);
@@ -211,8 +208,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	var webGLProps = new THREE.WebGLProperties();
+	var objects = new THREE.WebGLObjects( _gl, webGLProps, this.info );
+
 	var extensions = new THREE.WebGLExtensions( _gl );
-	var objects = new THREE.WebGLObjects( _gl, this.info );
 
 	extensions.get( 'OES_texture_float' );
 	extensions.get( 'OES_texture_float_linear' );

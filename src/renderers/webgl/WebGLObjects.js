@@ -2,12 +2,10 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLObjects = function ( gl, info ) {
+THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 
 	var objects = {};
 	var objectsImmediate = [];
-
-	var webGLProps = new THREE.WebGLProperties();
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -67,7 +65,6 @@ THREE.WebGLObjects = function ( gl, info ) {
 
 	this.objects = objects;
 	this.objectsImmediate = objectsImmediate;
-	this.webGLProps = webGLProps;
 
 	this.geometries = geometries;
 
@@ -243,7 +240,8 @@ THREE.WebGLObjects = function ( gl, info ) {
 	};
 
 	// returns the webgl buffer for a specified attribute
-	this.getAttributeBuffer = function (attribute) {
+	this.getAttributeBuffer = function ( attribute ) {
+
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
 			return webGLProps.get( attribute.data ).__webglBuffer
@@ -251,6 +249,7 @@ THREE.WebGLObjects = function ( gl, info ) {
 		}
 
 		return webGLProps.get( attribute ).__webglBuffer;
+
 	}
 
 	this.update = function ( renderList ) {
