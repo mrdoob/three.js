@@ -21330,7 +21330,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setMaterialFaces( material ) {
 
-		state.setDoubleSided( material.side === THREE.DoubleSide );
+		material.side !== THREE.DoubleSide ? state.enable( _gl.CULL_FACE ) : state.disable( _gl.CULL_FACE );
 		state.setFlipSided( material.side === THREE.BackSide );
 
 	}
@@ -22394,7 +22394,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( cullFace === THREE.CullFaceNone ) {
 
-			_gl.disable( _gl.CULL_FACE );
+			state.disable( _gl.CULL_FACE );
 
 		} else {
 
@@ -22422,7 +22422,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_gl.enable( _gl.CULL_FACE );
+			state.enable( _gl.CULL_FACE );
 
 		}
 
@@ -24445,7 +24445,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.enabled = false;
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
-	this.debug = false;
 	this.cascade = false;
 
 	this.render = function ( scene, camera ) {
@@ -24465,9 +24464,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_state.setBlend( false );
+		_state.disable( _gl.BLEND );
 
-		_gl.enable( _gl.CULL_FACE );
+		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
@@ -24717,7 +24716,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_state.setBlend( true );
+		_state.enable( _gl.BLEND );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 
@@ -24909,7 +24908,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
-	var currentBlend = null;
+	var switches = {};
+
 	var currentBlending = null;
 	var currentBlendEquation = null;
 	var currentBlendSrc = null;
@@ -24924,7 +24924,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	var currentColorWrite = null;
 
-	var currentDoubleSided = null;
 	var currentFlipSided = null;
 
 	var currentLineWidth = null;
@@ -24949,9 +24948,9 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		gl.frontFace( gl.CCW );
 		gl.cullFace( gl.BACK );
-		gl.enable( gl.CULL_FACE );
+		this.enable( gl.CULL_FACE );
 
-		gl.enable( gl.BLEND );
+		this.enable( gl.BLEND );
 		gl.blendEquation( gl.FUNC_ADD );
 		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
@@ -24995,21 +24994,23 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	this.setBlend = function ( blend ) {
+	this.enable = function ( id ) {
 
-		if ( blend !== currentBlend ) {
+		if ( switches[ id ] !== true ) {
 
-			if ( blend ) {
+			gl.enable( id );
+			switches[ id ] = true;
 
-				gl.enable( gl.BLEND );
+		}
 
-			} else {
+	};
 
-				gl.disable( gl.BLEND );
+	this.disable = function ( id ) {
 
-			}
+		if ( switches[ id ] !== false ) {
 
-			currentBlend = blend;
+			gl.disable( id );
+			switches[ id ] = false;
 
 		}
 
@@ -25021,11 +25022,11 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 			if ( blending === THREE.NoBlending ) {
 
-				this.setBlend( false );
+				this.disable( gl.BLEND );
 
 			} else if ( blending === THREE.AdditiveBlending ) {
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
@@ -25033,7 +25034,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 				// TODO: Find blendFuncSeparate() combination
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
 
@@ -25041,17 +25042,17 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 				// TODO: Find blendFuncSeparate() combination
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
 			} else if ( blending === THREE.CustomBlending ) {
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 
 			} else {
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 				gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
@@ -25208,26 +25209,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	this.setDoubleSided = function ( doubleSided ) {
-
-		if ( currentDoubleSided !== doubleSided ) {
-
-			if ( doubleSided ) {
-
-				gl.disable( gl.CULL_FACE );
-
-			} else {
-
-				gl.enable( gl.CULL_FACE );
-
-			}
-
-			currentDoubleSided = doubleSided;
-
-		}
-
-	};
-
 	this.setFlipSided = function ( flipSided ) {
 
 		if ( currentFlipSided !== flipSided ) {
@@ -25375,11 +25356,13 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
+		switches = {};
+
 		currentBlending = null;
 		currentDepthTest = null;
 		currentDepthWrite = null;
 		currentColorWrite = null;
-		currentDoubleSided = null;
+
 		currentFlipSided = null;
 
 	};
@@ -25703,7 +25686,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
-		gl.disable( gl.CULL_FACE );
+		state.disable( gl.CULL_FACE );
 		gl.depthMask( false );
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
@@ -25750,7 +25733,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform2f( uniforms.scale, scale.x, scale.y );
 				gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 
-				state.setBlend( false );
+				state.disable( gl.BLEND );
 				gl.enable( gl.DEPTH_TEST );
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
@@ -25790,7 +25773,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				// render flares
 
 				gl.uniform1i( uniforms.renderType, 2 );
-				state.setBlend( true );
+				state.enable( gl.BLEND );
 
 				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
@@ -25829,7 +25812,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		// restore gl
 
-		gl.enable( gl.CULL_FACE );
+		state.enable( gl.CULL_FACE );
 		gl.enable( gl.DEPTH_TEST );
 		gl.depthMask( true );
 
@@ -25971,8 +25954,8 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		state.enableAttribute( attributes.uv );
 		state.disableUnusedAttributes();
 
-		gl.disable( gl.CULL_FACE );
-		state.setBlend( true );
+		state.disable( gl.CULL_FACE );
+		state.enable( gl.BLEND );
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.vertexAttribPointer( attributes.position, 2, gl.FLOAT, false, 2 * 8, 0 );
@@ -26104,7 +26087,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		// restore gl
 
-		gl.enable( gl.CULL_FACE );
+		state.enable( gl.CULL_FACE );
 
 		renderer.resetGLState();
 
