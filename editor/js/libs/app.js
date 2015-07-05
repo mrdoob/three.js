@@ -33,9 +33,9 @@ var APP = {
 			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
-				appload: [],
-				appstart: [],
-				appstop: [],
+				init: [],
+				start: [],
+				stop: [],
 				keydown: [],
 				keyup: [],
 				mousedown: [],
@@ -88,7 +88,7 @@ var APP = {
 
 			}
 
-			dispatch( events.appload, arguments );
+			dispatch( events.init, arguments );
 
 		};
 
@@ -217,7 +217,7 @@ var APP = {
 			document.addEventListener( 'touchend', onDocumentTouchEnd );
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
-			dispatch( events.appstart, arguments );
+			dispatch( events.start, arguments );
 
 			request = requestAnimationFrame( animate );
 			prevTime = performance.now();
@@ -234,7 +234,7 @@ var APP = {
 			document.removeEventListener( 'touchend', onDocumentTouchEnd );
 			document.removeEventListener( 'touchmove', onDocumentTouchMove );
 
-			dispatch( events.appstop, arguments );
+			dispatch( events.stop, arguments );
 
 			cancelAnimationFrame( request );
 		};
