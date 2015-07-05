@@ -6,11 +6,17 @@ THREE.WebGLProperties = function () {
 
 	var properties = {};
 
-	this.clear = function () {
+	this.get = function ( object ) {
 
-		properties = {};
+		if ( properties[ object.uuid ] === undefined ) {
 
-	}
+			properties[ object.uuid ] = {};
+
+		}
+
+		return properties[ object.uuid ];
+
+	};
 
 	this.delete = function ( object ) {
 
@@ -18,21 +24,10 @@ THREE.WebGLProperties = function () {
 
 	};
 
-	this.get = function ( object ) {
+	this.clear = function () {
 
-		initObject( object );
-
-		return properties[ object.uuid ];
+		properties = {};
 
 	};
-
-	function initObject ( object ) {
-
-		if ( properties[ object.uuid ] === undefined ) {
-
-			properties[ object.uuid ] = {};
-		}
-
-	}
 
 };
