@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLObjects = function ( gl, webGLProps, info ) {
+THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	var objects = {};
 	var objectsImmediate = [];
@@ -43,7 +43,7 @@ THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 		delete object._modelViewMatrix;
 		delete object._normalMatrix;
 
-		webGLProps.delete( object );
+		properties.delete( object );
 
 	}
 
@@ -70,11 +70,11 @@ THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 
 	this.init = function ( object ) {
 
-		var objectWebglProperties = webGLProps.get( object );
+		var objectProperties = properties.get( object );
 
-		if ( objectWebglProperties.__webglInit === undefined ) {
+		if ( objectProperties.__webglInit === undefined ) {
 
-			objectWebglProperties.__webglInit = true;
+			objectProperties.__webglInit = true;
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
@@ -82,9 +82,9 @@ THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 
 		}
 
-		if ( objectWebglProperties.__webglActive === undefined ) {
+		if ( objectProperties.__webglActive === undefined ) {
 
-			objectWebglProperties.__webglActive = true;
+			objectProperties.__webglActive = true;
 
 			if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.PointCloud ) {
 
@@ -189,12 +189,12 @@ THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 
 			var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
 
-			var attributeWebGLProperties = webGLProps.get( data );
+			var attributeProperties = properties.get( data );
 
-			if ( attributeWebGLProperties.__webglBuffer === undefined ) {
+			if ( attributeProperties.__webglBuffer === undefined ) {
 
-				attributeWebGLProperties.__webglBuffer = gl.createBuffer();
-				gl.bindBuffer( bufferType, attributeWebGLProperties.__webglBuffer );
+				attributeProperties.__webglBuffer = gl.createBuffer();
+				gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
 				var usage = gl.STATIC_DRAW;
 
@@ -212,7 +212,7 @@ THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 
 			} else if ( data.needsUpdate === true ) {
 
-				gl.bindBuffer( bufferType, attributeWebGLProperties.__webglBuffer );
+				gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
 				if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
 
@@ -244,11 +244,11 @@ THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
-			return webGLProps.get( attribute.data ).__webglBuffer
+			return properties.get( attribute.data ).__webglBuffer
 
 		}
 
-		return webGLProps.get( attribute ).__webglBuffer;
+		return properties.get( attribute ).__webglBuffer;
 
 	}
 
