@@ -30,7 +30,7 @@ THREE.Cache = {
 
 	clear: function () {
 
-		this.files = {}
+		this.files = {};
 
 	}
 
