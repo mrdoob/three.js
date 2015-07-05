@@ -43,7 +43,7 @@ THREE.WebGLObjects = function ( gl, webGLProps, info ) {
 		delete object._modelViewMatrix;
 		delete object._normalMatrix;
 
-		delete webGLProps.delete( object );
+		webGLProps.delete( object );
 
 	}
 

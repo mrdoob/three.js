@@ -662,7 +662,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// remove all webgl properties
-		delete webGLProps.delete( texture );
+		webGLProps.delete( texture );
 
 	};
 
@@ -690,7 +690,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		delete webGLProps.delete( renderTargetWebGLProperties );
+		webGLProps.delete( renderTargetWebGLProperties );
 
 	};
 
@@ -755,7 +755,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		delete webGLProps.delete( material );
+		webGLProps.delete( material );
 
 	};
 
