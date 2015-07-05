@@ -13945,7 +13945,7 @@ THREE.ObjectLoader.prototype = {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data.data ).geometry;
+						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
 
 						break;
 
@@ -14061,6 +14061,8 @@ THREE.ObjectLoader.prototype = {
 			loader.setCrossOrigin( this.crossOrigin );
 
 			var loadImage = function ( url ) {
+
+				url = scope.texturePath + url;
 
 				scope.manager.itemStart( url );
 
@@ -19430,10 +19432,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			resetGLState();
 			setDefaultGLState();
 
-			objects.objects = {};
+			objects.clear();
 			properties.clear();
 
-		}, false);
+		}, false );
 
 	} catch ( error ) {
 
@@ -23812,6 +23814,13 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
+	this.clear = function () {
+
+		objects = {};
+		objectsImmediate = [];
+
+	};
+
 };
 
 // File:src/renderers/webgl/WebGLProgram.js
@@ -24341,7 +24350,7 @@ THREE.WebGLShader = ( function () {
 
 	return function ( gl, type, string ) {
 
-		var shader = gl.createShader( type ); 
+		var shader = gl.createShader( type );
 
 		gl.shaderSource( shader, string );
 		gl.compileShader( shader );
