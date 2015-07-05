@@ -161,7 +161,23 @@ var APP = {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-				array[ i ]( event );
+				try {
+
+					array[ i ]( event );
+
+				} catch (e) {
+
+					if ( window.console !== undefined && console.error !== undefined ) {
+
+						console.error(e.stack || e);
+
+					} else {
+
+						throw e;
+
+					}
+
+				}
 
 			}
 
