@@ -101,6 +101,15 @@
 			var planeMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
 			planeMaterial.side = THREE.DoubleSide;
 
+			if (showActivePlane) {
+
+				this._planeMaterial = planeMaterial;
+				this._planeMaterialVisible = planeMaterial.clone();
+
+			}
+
+			planeMaterial.visible = false;
+
 			var planes = {
 				"XY":   new THREE.Mesh( planeGeometry, planeMaterial ),
 				"YZ":   new THREE.Mesh( planeGeometry, planeMaterial ),
@@ -117,7 +126,6 @@
 				planes[i].name = i;
 				this.planes.add(planes[i]);
 				this.planes[i] = planes[i];
-				planes[i].visible = false;
 			}
 
 			//// HANDLES AND PICKERS
@@ -162,6 +170,12 @@
 					child.rotation.set( 0, 0, 0 );
 					child.scale.set( 1, 1, 1 );
 				}
+
+				if ( ! showPickers && child.parent === scope.pickers ) {
+
+					child.material.visible = false;
+
+				}
 			});
 
 		};
@@ -173,12 +187,20 @@
 		};
 
 		this.show = function () {
+
 			this.traverse(function( child ) {
 				child.visible = true;
-				if (child.parent == scope.pickers ) child.visible = showPickers;
-				if (child.parent == scope.planes ) child.visible = false;
 			});
-			this.activePlane.visible = showActivePlane;
+			if (showActivePlane) {
+
+				this.traverse(function( child ) {
+
+					if (child.parent === scope.planes ) child.material = scope._planeMaterial;
+				});
+
+				this.activePlane.material =
+						showActivePlane ? scope._planeMaterialVisible : scope._planeMaterial;
+			}
 		};
 
 		this.highlight = function ( axis ) {
