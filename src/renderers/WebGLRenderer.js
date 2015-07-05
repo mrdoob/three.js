@@ -181,10 +181,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			resetGLState();
 			setDefaultGLState();
 
-			objects.objects = {};
+			objects.clear();
 			properties.clear();
 
-		}, false);
+		}, false );
 
 	} catch ( error ) {
 

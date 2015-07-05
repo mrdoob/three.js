@@ -268,4 +268,11 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
+	this.clear = function () {
+
+		objects = {};
+		objectsImmediate = [];
+
+	};
+
 };
