@@ -47,6 +47,15 @@ var APP = {
 				update: []
 			};
 
+			var scriptWrapParams = 'player,renderer,scene';
+			var scriptWrapResultObj = {};
+			for ( var eventKey in events ) {
+				scriptWrapParams += ',' + eventKey;
+				scriptWrapResultObj[ eventKey ] = eventKey;
+			}
+			var scriptWrapResult =
+					JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
+
 			for ( var uuid in json.scripts ) {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );
@@ -57,7 +66,8 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( 'player, scene, keydown, keyup, mousedown, mouseup, mousemove, touchstart, touchend, touchmove, update', script.source + '\nreturn { keydown: keydown, keyup: keyup, mousedown: mousedown, mouseup: mouseup, mousemove: mousemove, touchstart: touchstart, touchend: touchend, touchmove: touchmove, update: update };' ).bind( object ) )( this, scene );
+					var functions = ( new Function( scriptWrapParams,
+							script.source + '\nreturn ' + scriptWrapResult+ ';' ).bind( object ) )( this, renderer, scene );
 
 					for ( var name in functions ) {
 
