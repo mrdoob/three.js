@@ -33,6 +33,9 @@ var APP = {
 			this.setCamera( loader.parse( json.camera ) );
 
 			events = {
+				appload: [],
+				appstart: [],
+				appstop: [],
 				keydown: [],
 				keyup: [],
 				mousedown: [],
@@ -74,6 +77,8 @@ var APP = {
 				}
 
 			}
+
+			dispatch( events.appload, arguments );
 
 		};
 
@@ -186,9 +191,10 @@ var APP = {
 			document.addEventListener( 'touchend', onDocumentTouchEnd );
 			document.addEventListener( 'touchmove', onDocumentTouchMove );
 
+			dispatch( events.appstart, arguments );
+
 			request = requestAnimationFrame( animate );
 			prevTime = performance.now();
-
 		};
 
 		this.stop = function () {
@@ -202,8 +208,9 @@ var APP = {
 			document.removeEventListener( 'touchend', onDocumentTouchEnd );
 			document.removeEventListener( 'touchmove', onDocumentTouchMove );
 
-			cancelAnimationFrame( request );
+			dispatch( events.appstop, arguments );
 
+			cancelAnimationFrame( request );
 		};
 
 		//
