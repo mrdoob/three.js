@@ -190,7 +190,7 @@ THREE.ObjectLoader.prototype = {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data.data ).geometry;
+						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
 
 						break;
 
@@ -306,6 +306,8 @@ THREE.ObjectLoader.prototype = {
 			loader.setCrossOrigin( this.crossOrigin );
 
 			var loadImage = function ( url ) {
+
+				url = scope.texturePath + url;
 
 				scope.manager.itemStart( url );
 
