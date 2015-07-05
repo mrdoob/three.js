@@ -313,7 +313,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
-		gl.disable( gl.CULL_FACE );
+		state.disable( gl.CULL_FACE );
 		gl.depthMask( false );
 
 		for ( var i = 0, l = flares.length; i < l; i ++ ) {
@@ -360,7 +360,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform2f( uniforms.scale, scale.x, scale.y );
 				gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 
-				state.setBlend( false );
+				state.disable( gl.BLEND );
 				gl.enable( gl.DEPTH_TEST );
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
@@ -400,7 +400,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				// render flares
 
 				gl.uniform1i( uniforms.renderType, 2 );
-				state.setBlend( true );
+				state.enable( gl.BLEND );
 
 				for ( var j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
@@ -439,7 +439,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 
 		// restore gl
 
-		gl.enable( gl.CULL_FACE );
+		state.enable( gl.CULL_FACE );
 		gl.enable( gl.DEPTH_TEST );
 		gl.depthMask( true );
 

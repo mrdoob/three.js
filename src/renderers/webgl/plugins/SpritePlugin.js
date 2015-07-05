@@ -104,8 +104,8 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 		state.enableAttribute( attributes.uv );
 		state.disableUnusedAttributes();
 
-		gl.disable( gl.CULL_FACE );
-		state.setBlend( true );
+		state.disable( gl.CULL_FACE );
+		state.enable( gl.BLEND );
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
 		gl.vertexAttribPointer( attributes.position, 2, gl.FLOAT, false, 2 * 8, 0 );
@@ -237,7 +237,7 @@ THREE.SpritePlugin = function ( renderer, sprites ) {
 
 		// restore gl
 
-		gl.enable( gl.CULL_FACE );
+		state.enable( gl.CULL_FACE );
 
 		renderer.resetGLState();
 

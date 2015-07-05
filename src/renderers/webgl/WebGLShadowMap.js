@@ -65,7 +65,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.enabled = false;
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
-	this.debug = false;
 	this.cascade = false;
 
 	this.render = function ( scene, camera ) {
@@ -85,9 +84,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_state.setBlend( false );
+		_state.disable( _gl.BLEND );
 
-		_gl.enable( _gl.CULL_FACE );
+		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
@@ -337,7 +336,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_state.setBlend( true );
+		_state.enable( _gl.BLEND );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 

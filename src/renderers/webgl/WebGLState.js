@@ -9,7 +9,8 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
-	var currentBlend = null;
+	var switches = {};
+
 	var currentBlending = null;
 	var currentBlendEquation = null;
 	var currentBlendSrc = null;
@@ -24,7 +25,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	var currentColorWrite = null;
 
-	var currentDoubleSided = null;
 	var currentFlipSided = null;
 
 	var currentLineWidth = null;
@@ -49,9 +49,9 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		gl.frontFace( gl.CCW );
 		gl.cullFace( gl.BACK );
-		gl.enable( gl.CULL_FACE );
+		this.enable( gl.CULL_FACE );
 
-		gl.enable( gl.BLEND );
+		this.enable( gl.BLEND );
 		gl.blendEquation( gl.FUNC_ADD );
 		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
@@ -95,21 +95,23 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	this.setBlend = function ( blend ) {
+	this.enable = function ( id ) {
 
-		if ( blend !== currentBlend ) {
+		if ( switches[ id ] !== true ) {
 
-			if ( blend ) {
+			gl.enable( id );
+			switches[ id ] = true;
 
-				gl.enable( gl.BLEND );
+		}
 
-			} else {
+	};
 
-				gl.disable( gl.BLEND );
+	this.disable = function ( id ) {
 
-			}
+		if ( switches[ id ] !== false ) {
 
-			currentBlend = blend;
+			gl.disable( id );
+			switches[ id ] = false;
 
 		}
 
@@ -121,11 +123,11 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 			if ( blending === THREE.NoBlending ) {
 
-				this.setBlend( false );
+				this.disable( gl.BLEND );
 
 			} else if ( blending === THREE.AdditiveBlending ) {
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
@@ -133,7 +135,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 				// TODO: Find blendFuncSeparate() combination
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.ONE_MINUS_SRC_COLOR );
 
@@ -141,17 +143,17 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 				// TODO: Find blendFuncSeparate() combination
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquation( gl.FUNC_ADD );
 				gl.blendFunc( gl.ZERO, gl.SRC_COLOR );
 
 			} else if ( blending === THREE.CustomBlending ) {
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 
 			} else {
 
-				this.setBlend( true );
+				this.enable( gl.BLEND );
 				gl.blendEquationSeparate( gl.FUNC_ADD, gl.FUNC_ADD );
 				gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
 
@@ -308,26 +310,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	this.setDoubleSided = function ( doubleSided ) {
-
-		if ( currentDoubleSided !== doubleSided ) {
-
-			if ( doubleSided ) {
-
-				gl.disable( gl.CULL_FACE );
-
-			} else {
-
-				gl.enable( gl.CULL_FACE );
-
-			}
-
-			currentDoubleSided = doubleSided;
-
-		}
-
-	};
-
 	this.setFlipSided = function ( flipSided ) {
 
 		if ( currentFlipSided !== flipSided ) {
@@ -475,11 +457,13 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
+		switches = {};
+
 		currentBlending = null;
 		currentDepthTest = null;
 		currentDepthWrite = null;
 		currentColorWrite = null;
-		currentDoubleSided = null;
+
 		currentFlipSided = null;
 
 	};
