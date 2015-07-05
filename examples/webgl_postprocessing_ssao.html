@@ -59,7 +59,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
             var group;
             var depthScale = 1.0;
             var height = window.innerHeight;
-            var postprocessing = { enabled : true, renderMode: 'framebuffer' }; // renderMode: 'framebuffer', 'onlyAO'
+            var postprocessing = { enabled : true, renderMode: 0 }; // renderMode: 0('framebuffer'), 1('onlyAO')
 
             init();
             animate();
@@ -87,15 +87,10 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
                 group = new THREE.Object3D();
                 scene.add( group );
-
-                var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-                directionalLight.position.set( 2, 1.2, 10 ).normalize();
-                scene.add( directionalLight );
+           
+                var geometry = new THREE.IcosahedronGeometry( 5, 1 );
+                for ( var i = 0; i < 200; i ++ ) {
                 
-                var geometry = new THREE.SphereBufferGeometry(5, 100, 100); //new THREE.BoxGeometry( 10, 10, 10 );
-                for ( var i = 0; i < 100; i ++ ) {
-                
-                    //var material = new THREE.MeshLambertMaterial({color: 0xaa0000});  //new 
                     var material = new THREE.MeshBasicMaterial();
                     material.color.r = Math.random();
                     material.color.g = Math.random();
@@ -124,7 +119,6 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
                 // Init gui
                 var gui = new dat.GUI();
                 gui.add( postprocessing, "enabled" ).onChange();
-                // gui.add( postprocessing, "type" ).onChange( postprocessChange );
                 gui.add( postprocessing, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
 
                 window.addEventListener( 'resize', onWindowResize, false );
@@ -132,9 +126,9 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
             function renderModeChange( value ) {
 
-                if ( value == 0 ) {    // framebuffer
+                if ( value == 0 ) { // framebuffer
                     postprocessing.ssao_uniforms[ 'onlyAO' ].value = false;
-                } else if ( value == 1 ) { // onlyAO
+                } else if ( value == 1 ) {  // onlyAO
                     postprocessing.ssao_uniforms[ 'onlyAO' ].value = true;
                 } else {
                     console.error( "Not define renderModeChange type: " + value );
@@ -146,6 +140,8 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize( window.innerWidth, window.innerHeight );
+
+                initPostprocessing();
             }
 
             function initPostprocessing() {
@@ -168,7 +164,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
                 postprocessing.ssao_uniforms[ 'size' ].value.set( window.innerWidth*depthScale, window.innerHeight*depthScale );
                 postprocessing.ssao_uniforms[ 'cameraNear' ].value = camera.near;
                 postprocessing.ssao_uniforms[ 'cameraFar' ].value = camera.far;
-                postprocessing.ssao_uniforms[ 'onlyAO' ].value = false;
+                postprocessing.ssao_uniforms[ 'onlyAO' ].value = ( postprocessing.renderMode == 1 );
                 
                 postprocessing.materialSSAO = new THREE.ShaderMaterial( {
                     
