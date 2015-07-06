@@ -71,31 +71,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.autoScaleCubemaps = true;
 
-	// info
-
-	var _memoryInfo = {
-
-		programs: 0,
-		geometries: 0,
-		textures: 0
-
-	};
-
-	var _renderInfo = {
-
-		calls: 0,
-		vertices: 0,
-		faces: 0,
-		points: 0
-
-	};
-
+	// info (see below for details)
 
 	this.info = {
 
-		memory: _memoryInfo,
-		render: _renderInfo
-
+		render: null,
+		memory: null,
+		programs: null
+	
 	};
 
 	// internal properties
@@ -145,7 +128,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], decays: [] },
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
 
+	},
+
+	_memoryInfo = {
+
+		programs: 0,
+		geometries: 0,
+		textures: 0
+
+	},
+
+	_renderInfo = {
+
+		calls: 0,
+		vertices: 0,
+		faces: 0,
+		points: 0
+
 	};
+
+	this.info.render = _renderInfo;
+	this.info.memory = _memoryInfo;
+	this.info.programs = _programs;
+
 
 	// initialize
 
