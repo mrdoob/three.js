@@ -73,24 +73,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// info
 
+	var _memoryInfo = {
+
+		programs: 0,
+		geometries: 0,
+		textures: 0
+
+	};
+
+	var _renderInfo = {
+
+		calls: 0,
+		vertices: 0,
+		faces: 0,
+		points: 0
+
+	};
+
+
 	this.info = {
 
-		memory: {
-
-			programs: 0,
-			geometries: 0,
-			textures: 0
-
-		},
-
-		render: {
-
-			calls: 0,
-			vertices: 0,
-			faces: 0,
-			points: 0
-
-		}
+		memory: _memoryInfo,
+		render: _renderInfo
 
 	};
 
@@ -612,7 +616,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateTexture( texture );
 
-		_this.info.memory.textures --;
+		_memoryInfo.textures --;
 
 
 	};
@@ -625,7 +629,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateRenderTarget( renderTarget );
 
-		_this.info.memory.textures --;
+		_memoryInfo.textures --;
 
 	};
 
@@ -739,7 +743,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.deleteProgram( program );
 
-			_this.info.memory.programs --;
+			_memoryInfo.programs --;
 
 		}
 
@@ -1089,9 +1093,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.drawElements( mode, index.array.length, type, 0 );
 
 				}
-				_this.info.render.calls ++;
-				_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
-				_this.info.render.faces += index.array.length / 3;
+				_renderInfo.calls ++;
+				_renderInfo.vertices += index.array.length; // not really true, here vertices can be shared
+				_renderInfo.faces += index.array.length / 3;
 
 			} else {
 
@@ -1133,9 +1137,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-					_this.info.render.faces += offsets[ i ].count / 3;
+					_renderInfo.calls ++;
+					_renderInfo.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+					_renderInfo.faces += offsets[ i ].count / 3;
 
 				}
 
@@ -1194,9 +1198,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_this.info.render.calls++;
-				_this.info.render.vertices += position.count;
-				_this.info.render.faces += position.count / 3;
+				_renderInfo.calls++;
+				_renderInfo.vertices += position.count;
+				_renderInfo.faces += position.array.length / 3;
 
 			} else {
 
@@ -1225,9 +1229,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_this.info.render.calls++;
-					_this.info.render.vertices += offsets[ i ].count;
-					_this.info.render.faces += ( offsets[ i ].count  ) / 3;
+					_renderInfo.calls++;
+					_renderInfo.vertices += offsets[ i ].count;
+					_renderInfo.faces += ( offsets[ i ].count  ) / 3;
 
 				}
 			}
@@ -1279,8 +1283,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawElements( mode, index.array.length, type, 0 ); // 2 bytes per Uint16Array
 
-				_this.info.render.calls ++;
-				_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
+				_renderInfo.calls ++;
+				_renderInfo.vertices += index.array.length; // not really true, here vertices can be shared
 
 			} else {
 
@@ -1305,8 +1309,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
 
-					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+					_renderInfo.calls ++;
+					_renderInfo.vertices += offsets[ i ].count; // not really true, here vertices can be shared
 
 				}
 
@@ -1329,8 +1333,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
-				_this.info.render.calls ++;
-				_this.info.render.vertices += position.array.length / 3;
+				_renderInfo.calls ++;
+				_renderInfo.vertices += position.array.length / 3;
 
 			} else {
 
@@ -1338,8 +1342,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
-					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count;
+					_renderInfo.calls ++;
+					_renderInfo.vertices += offsets[ i ].count;
 
 				}
 
@@ -1388,8 +1392,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawElements( mode, index.array.length, type, 0);
 
-				_this.info.render.calls ++;
-				_this.info.render.points += index.array.length;
+				_renderInfo.calls ++;
+				_renderInfo.points += index.array.length;
 
 			} else {
 
@@ -1414,8 +1418,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
 
-					_this.info.render.calls ++;
-					_this.info.render.points += offsets[ i ].count;
+					_renderInfo.calls ++;
+					_renderInfo.points += offsets[ i ].count;
 
 				}
 
@@ -1438,8 +1442,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
-				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length / 3;
+				_renderInfo.calls ++;
+				_renderInfo.points += position.array.length / 3;
 
 			} else {
 
@@ -1447,8 +1451,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
-					_this.info.render.calls ++;
-					_this.info.render.points += offsets[ i ].count;
+					_renderInfo.calls ++;
+					_renderInfo.points += offsets[ i ].count;
 
 				}
 
@@ -1558,10 +1562,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		_this.info.render.calls = 0;
-		_this.info.render.vertices = 0;
-		_this.info.render.faces = 0;
-		_this.info.render.points = 0;
+		_renderInfo.calls = 0;
+		_renderInfo.vertices = 0;
+		_renderInfo.faces = 0;
+		_renderInfo.points = 0;
 
 		this.setRenderTarget( renderTarget );
 
@@ -1988,7 +1992,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			program = new THREE.WebGLProgram( _this, code, material, parameters );
 			_programs.push( program );
 
-			_this.info.memory.programs = _programs.length;
+			_memoryInfo.programs = _programs.length;
 
 		}
 
@@ -3232,7 +3236,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			textureProperties.__webglTexture = _gl.createTexture();
 
-			_this.info.memory.textures ++;
+			_memoryInfo.textures ++;
 
 		}
 
@@ -3413,7 +3417,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					textureProperties.__image__webglTextureCube = _gl.createTexture();
 
-					_this.info.memory.textures ++;
+					_memoryInfo.textures ++;
 
 				}
 
@@ -3574,7 +3578,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderTargetProperties.__webglTexture = _gl.createTexture();
 
-			_this.info.memory.textures ++;
+			_memoryInfo.textures ++;
 
 			// Setup texture, create render and frame buffers
 
