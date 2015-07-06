@@ -731,23 +731,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( deleteProgram === true ) {
 
-			// avoid using array.splice, this is costlier than creating new array from scratch
+			// avoid using array.splice, instead replace with last and pop
 
-			var newPrograms = [];
+			_programs[ i ] = _programs[ il - 1 ];
+			_programs.pop();
 
-			for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-				programInfo = _programs[ i ];
-
-				if ( programInfo.program !== program ) {
-
-					newPrograms.push( programInfo );
-
-				}
-
-			}
-
-			_programs = newPrograms;
 
 			_gl.deleteProgram( program );
 
