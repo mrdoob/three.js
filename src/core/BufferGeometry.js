@@ -17,7 +17,6 @@ THREE.BufferGeometry = function () {
 	this.morphAttributes = [];
 
 	this.drawcalls = [];
-	this.offsets = this.drawcalls; // backwards compatibility
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -50,6 +49,13 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	offsets: function () {
+
+		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
+		return this.drawcalls.slice();
+
+	},
+
 	addDrawCall: function ( start, count, indexOffset ) {
 
 		this.drawcalls.push( {
@@ -65,7 +71,6 @@ THREE.BufferGeometry.prototype = {
 	clearDrawCalls: function () {
 
 		this.drawcalls = [];
-		this.offsets = this.drawcalls;
 
 	},
 
