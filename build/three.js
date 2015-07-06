@@ -8342,8 +8342,8 @@ THREE.BufferAttribute.prototype = {
 
 	get length () {
 
-		console.warn( 'THREE.BufferAttribute: .length has been renamed to .count.' );
-		return this.count;
+		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+		return this.array.length;
 
 	},
 
@@ -8738,6 +8738,12 @@ THREE.InterleavedBuffer.prototype = {
 
 	},
 
+	get count () {
+
+		return this.array.length / this.stride;
+
+	},
+
 	copyAt: function ( index1, attribute, index2 ) {
 
 		index1 *= this.stride;
@@ -8817,8 +8823,8 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 	get length() {
 
-		console.warn( 'THREE.InterleavedBufferAttribute: .length has been renamed to .count.' );
-		return this.count;
+		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+		return this.array.length;
 
 	},
 
@@ -11391,7 +11397,7 @@ THREE.BufferGeometry.prototype = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
 				array: array
-			}
+			};
 
 		}
 
@@ -11406,7 +11412,7 @@ THREE.BufferGeometry.prototype = {
 			data.data.boundingSphere = {
 				center: boundingSphere.center.toArray(),
 				radius: boundingSphere.radius
-			}
+			};
 
 		}
 
@@ -12387,7 +12393,7 @@ THREE.Cache = {
 
 	clear: function () {
 
-		this.files = {}
+		this.files = {};
 
 	}
 
@@ -12853,7 +12859,16 @@ THREE.XHRLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			if ( onLoad ) onLoad( cached );
+			if ( onLoad ) {
+
+				setTimeout( function () {
+
+					onLoad( cached );
+
+				}, 0 );
+
+			}
+
 			return cached;
 
 		}
@@ -12940,7 +12955,16 @@ THREE.ImageLoader.prototype = {
 
 		if ( cached !== undefined ) {
 
-			if ( onLoad ) onLoad( cached );
+			if ( onLoad ) {
+
+				setTimeout( function () {
+
+					onLoad( cached );
+
+				}, 0 );
+
+			}
+
 			return cached;
 
 		}
@@ -20180,7 +20204,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
-								geometry.maxInstancedCount = data.meshPerAttribute * ( data.array.length / data.stride );
+								geometry.maxInstancedCount = data.meshPerAttribute * data.count;
 
 							}
 
@@ -20204,7 +20228,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
-								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
 							}
 
@@ -20435,11 +20459,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-						extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 					} else {
 
-						extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 					}
 
@@ -20447,19 +20471,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-						_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+						_gl.drawArrays( mode, 0, position.data.count );
 
 					} else {
 
-						_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+						_gl.drawArrays( mode, 0, position.count );
 
 					}
 
 				}
 
 				_this.info.render.calls++;
-				_this.info.render.vertices += position.array.length / position.itemSize;
-				_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
+				_this.info.render.vertices += position.count;
+				_this.info.render.faces += position.count / 3;
 
 			} else {
 
@@ -31135,7 +31159,7 @@ THREE.EdgesGeometry = function ( geometry, thresholdAngle ) {
 	var thresholdDot = Math.cos( THREE.Math.degToRad( thresholdAngle ) );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+	var sortFunction = function ( a, b ) { return a - b; };
 
 	var keys = [ 'a', 'b', 'c' ];
 
