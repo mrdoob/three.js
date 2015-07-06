@@ -80,14 +80,13 @@ THREE.PointCloud.prototype.raycast = ( function () {
 			if ( attributes.index !== undefined ) {
 
 				var indices = attributes.index.array;
+				var offsets = geometry.drawcalls;
 
-				if ( geometry.drawcalls.length === 0 ) {
+				if ( offsets.length === 0 ) {
 
-					offsets.addDrawCall( 0, indices.length, 0 );
+					offsets = [ { start: 0, count: indices.length, index: 0 } ];
 
 				}
-
-				var offsets = geometry.drawcalls;
 
 				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
