@@ -389,7 +389,7 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		if ( programLogInfo !== '' ) {
+		else if ( programLogInfo !== '' ) {
 
 			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLogInfo );
 
