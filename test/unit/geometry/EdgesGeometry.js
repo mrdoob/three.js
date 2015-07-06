@@ -96,7 +96,7 @@ function testEdges ( vertList, idxList, numAfter ) {
 		var numBefore = idxList.length;
 		equal( countEdges (geom), numBefore, "Edges before!" );
 
-		var egeom = new THREE.EdgesGeometry ( geom );;
+		var egeom = new THREE.EdgesGeometry( geom );
 
 		equal( countEdges (egeom), numAfter, "Edges after!" );
 		output( geom, egeom );
@@ -163,7 +163,7 @@ function createIndexedBufferGeometry ( vertList, idxList ) {
 
 function addDrawCalls ( geometry ) {
 
-	var numTris = geometry.getAttribute( 'index' ).length / 3;
+	var numTris = geometry.getAttribute( 'index' ).count / 3;
 
 	var offset = 0;
 	for ( var i = 0 ; i < numTris; i ++ ) {
@@ -183,7 +183,7 @@ function countEdges ( geom ) {
 
 	if ( geom instanceof THREE.EdgesGeometry ) {
 
-		return geom.getAttribute( 'position' ).length / 2;
+		return geom.getAttribute( 'position' ).count / 2;
 
 	}
 
@@ -196,11 +196,11 @@ function countEdges ( geom ) {
 	var indices = geom.getAttribute( 'index' );
 	if ( indices !== undefined ) {
 
-		return indices.length;
+		return indices.count;
 
 	}
 
-	return geom.getAttribute( 'position' ).length;
+	return geom.getAttribute( 'position' ).count;
 
 }
 
@@ -228,7 +228,9 @@ function output ( geom, egeom ) {
 	scene.add(edges);
 
 	if (scene.children.length % 8 === 0) {
+
 		xoffset += 2;
+
 	}
 
 }

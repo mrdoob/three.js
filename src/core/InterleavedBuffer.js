@@ -26,6 +26,12 @@ THREE.InterleavedBuffer.prototype = {
 
 	},
 
+	get count () {
+
+		return this.array.length / this.stride;
+
+	},
+
 	copyAt: function ( index1, attribute, index2 ) {
 
 		index1 *= this.stride;

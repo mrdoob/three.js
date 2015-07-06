@@ -929,7 +929,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
-								geometry.maxInstancedCount = data.meshPerAttribute * ( data.array.length / data.stride );
+								geometry.maxInstancedCount = data.meshPerAttribute * data.count;
 
 							}
 
@@ -953,7 +953,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
-								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
 							}
 
@@ -1184,11 +1184,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-						extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 					} else {
 
-						extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 					}
 
@@ -1196,19 +1196,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-						_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+						_gl.drawArrays( mode, 0, position.data.count );
 
 					} else {
 
-						_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+						_gl.drawArrays( mode, 0, position.count );
 
 					}
 
 				}
 
 				_this.info.render.calls++;
-				_this.info.render.vertices += position.array.length / position.itemSize;
-				_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
+				_this.info.render.vertices += position.count;
+				_this.info.render.faces += position.count / 3;
 
 			} else {
 

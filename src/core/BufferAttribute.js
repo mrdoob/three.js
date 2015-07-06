@@ -19,8 +19,8 @@ THREE.BufferAttribute.prototype = {
 
 	get length () {
 
-		console.warn( 'THREE.BufferAttribute: .length has been renamed to .count.' );
-		return this.count;
+		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+		return this.array.length;
 
 	},
 

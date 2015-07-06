@@ -1067,7 +1067,7 @@ THREE.BufferGeometry.prototype = {
 				itemSize: attribute.itemSize,
 				type: attribute.array.constructor.name,
 				array: array
-			}
+			};
 
 		}
 
@@ -1082,7 +1082,7 @@ THREE.BufferGeometry.prototype = {
 			data.data.boundingSphere = {
 				center: boundingSphere.center.toArray(),
 				radius: boundingSphere.radius
-			}
+			};
 
 		}
 
