@@ -62,6 +62,13 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	clearDrawCalls: function () {
+
+		this.drawcalls = [];
+		this.offsets = this.drawcalls;
+
+	},
+
 	applyMatrix: function ( matrix ) {
 
 		var position = this.attributes.position;
@@ -100,6 +107,8 @@ THREE.BufferGeometry.prototype = {
 
 	copy: function ( geometry ) {
 
+		// TODO Clear attributes? Clear drawcalls? Copy morphTargets?
+
 		var attributes = geometry.attributes;
 		var offsets = geometry.offsets;
 
@@ -114,14 +123,7 @@ THREE.BufferGeometry.prototype = {
 		for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
 			var offset = offsets[ i ];
-
-			this.offsets.push( {
-
-				start: offset.start,
-				index: offset.index,
-				count: offset.count
-
-			} );
+			this.addDrawCall( offset.start, offset.count, offset.index );
 
 		}
 
@@ -552,13 +554,17 @@ THREE.BufferGeometry.prototype = {
 
 				var indices = attributes.index.array;
 
-				var offsets = ( this.offsets.length > 0 ? this.offsets : [ { start: 0, count: indices.length, index: 0 } ] );
+				if ( this.drawcalls.length === 0 ) {
 
-				for ( var j = 0, jl = offsets.length; j < jl; ++ j ) {
+					this.addDrawCall( 0, indices.length, 0 );
 
-					var start = offsets[ j ].start;
-					var count = offsets[ j ].count;
-					var index = offsets[ j ].index;
+				}
+
+				for ( var j = 0, jl = this.drawcalls.length; j < jl; ++ j ) {
+
+					var start = this.drawcalls[ j ].start;
+					var count = this.drawcalls[ j ].count;
+					var index = this.drawcalls[ j ].index;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -838,8 +844,8 @@ THREE.BufferGeometry.prototype = {
 		var indexPtr = 0;
 		var vertexPtr = 0;
 
-		var offsets = [ { start:0, count:0, index:0 } ];
-		var offset = offsets[ 0 ];
+		var tmpOffsets = [ { start:0, count:0, index:0 } ];
+		var offset = tmpOffsets[ 0 ];
 
 		var duplicatedVertices = 0;
 		var newVerticeMaps = 0;
@@ -877,7 +883,7 @@ THREE.BufferGeometry.prototype = {
 			var faceMax = vertexPtr + newVerticeMaps;
 			if ( faceMax > ( offset.index + size ) ) {
 				var new_offset = { start:indexPtr, count:0, index:vertexPtr };
-				offsets.push( new_offset );
+				tmpOffsets.push( new_offset );
 				offset = new_offset;
 
 				//Re-evaluate reused vertices in light of new offset.
@@ -905,18 +911,22 @@ THREE.BufferGeometry.prototype = {
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertex stack to match our new vertexPtr. */
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
-		this.offsets = offsets; // TODO: Deprecate
-		this.drawcalls = offsets;
+
+		this.clearDrawCalls();
+		for ( var i = 0; i < tmpOffsets.length; i ++ ) {
+
+			var offset = tmpOffsets[ i ];
+			this.addDrawCall( offset.start, offset.count, offset.index );
+
+		}
 
 		/*
 		var orderTime = Date.now();
 		console.log("Reorder time: "+(orderTime-s)+"ms");
 		console.log("Duplicated "+duplicatedVertices+" vertices.");
 		console.log("Compute Buffers time: "+(Date.now()-s)+"ms");
-		console.log("Draw offsets: "+offsets.length);
+		console.log("Draw tmpOffsets: "+tmpOffsets.length);
 		*/
-
-		return offsets;
 
 	},
 
@@ -1105,13 +1115,7 @@ THREE.BufferGeometry.prototype = {
 
 			var offset = this.offsets[ i ];
 
-			geometry.offsets.push( {
-
-				start: offset.start,
-				index: offset.index,
-				count: offset.count
-
-			} );
+			geometry.addDrawCall( offset.start, offset.count, offset.index );
 
 		}
 

@@ -70,7 +70,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			var vertices = geometry.attributes.position;
 			var indices = geometry.attributes.index.array;
-			var drawcalls = geometry.drawcalls;
+			var drawcalls = geometry.drawcalls.slice();
 			var numEdges = 0;
 
 			if ( drawcalls.length === 0 ) {
