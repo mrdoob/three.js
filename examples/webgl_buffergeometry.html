@@ -200,9 +200,9 @@
 				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
-				var offsets = triangles / chunkSize;
+				var num_offsets = triangles / chunkSize;
 
-				for ( var i = 0; i < offsets; i ++ ) {
+				for ( var i = 0; i < num_offsets; i ++ ) {
 
 					var indexStart = i * chunkSize * 3;
 					var indexCount = Math.min( triangles - ( i * chunkSize ), chunkSize ) * 3;

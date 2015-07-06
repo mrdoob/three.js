@@ -110,7 +110,7 @@ THREE.BufferGeometry.prototype = {
 		// TODO Clear attributes? Clear drawcalls? Copy morphTargets?
 
 		var attributes = geometry.attributes;
-		var offsets = geometry.offsets;
+		var offsets = geometry.drawcalls;
 
 		for ( var name in attributes ) {
 
@@ -1064,7 +1064,7 @@ THREE.BufferGeometry.prototype = {
 		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
-		var offsets = this.offsets;
+		var offsets = this.drawcalls;
 		var boundingSphere = this.boundingSphere;
 
 		for ( var key in attributes ) {
@@ -1111,9 +1111,9 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for ( var i = 0, il = this.offsets.length; i < il; i ++ ) {
+		for ( var i = 0, il = this.drawcalls.length; i < il; i ++ ) {
 
-			var offset = this.offsets[ i ];
+			var offset = this.drawcalls[ i ];
 
 			geometry.addDrawCall( offset.start, offset.count, offset.index );
 

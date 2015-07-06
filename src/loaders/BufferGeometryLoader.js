@@ -51,7 +51,18 @@ THREE.BufferGeometryLoader.prototype = {
 
 		if ( offsets !== undefined ) {
 
-			geometry.offsets = JSON.parse( JSON.stringify( offsets ) );
+			var offsetsArray = JSON.parse( JSON.stringify( offsets ) );
+
+			for ( var i = 0; i < offsetsArray.length; i ++ ) {
+
+				var offset = offsetsArray[i];
+				var indexStart = offset.start;
+				var indexCount = offset.count;
+				var indexOffset = offset.index;
+
+				geometry.addAttribute( indexStart, indexCount, indexOffset );
+
+			}
 
 		}
 
