@@ -60,7 +60,7 @@ THREE.BufferGeometryLoader.prototype = {
 				var indexCount = offset.count;
 				var indexOffset = offset.index;
 
-				geometry.addAttribute( indexStart, indexCount, indexOffset );
+				geometry.addDrawcall( indexStart, indexCount, indexOffset );
 
 			}
 
