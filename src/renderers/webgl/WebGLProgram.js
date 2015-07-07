@@ -402,28 +402,32 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		if ( haveDiagnostics ) this.diagnostics = {
+		if ( haveDiagnostics ) {
+		
+			this.diagnostics = {
 
-			runnable: runnable,
-			material: material,
+				runnable: runnable,
+				material: material,
 
-			programLog: programLog,
+				programLog: programLog,
 
-			vertexShader: {
+				vertexShader: {
 
-				log: vertexLog,
-				prefix: prefixVertex
+					log: vertexLog,
+					prefix: prefixVertex
 
-			},
+				},
 
-			fragmentShader: {
+				fragmentShader: {
 
-				log: fragmentLog,
-				prefix: prefixFragment
+					log: fragmentLog,
+					prefix: prefixFragment
 
-			}
+				}
 
-		};
+			};
+
+		}
 
 		// clean up
 
