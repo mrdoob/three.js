@@ -3,8 +3,7 @@
  */
 
 var THREE = { REVISION: '72dev' };
-// I've added this again because it fixes android support for stock browser on blacklisted devices
-// but it completely fixes refresh errors with my modified index_mobile.html
+// I've added these lines again because it fixes android support for stock browser many blacklisted devices
 // it is to be considered a temporary workaroud until the real cause is found
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating

@@ -32,6 +32,31 @@
 				overflow: hidden;
 			}
 
+			.marquee { 
+				width:130px;
+				height:40px;
+				padding:5px;
+				background-color: yellowgreen;
+				border: 20px solid rgba(0,0,0,0.3);
+				white-space: nowrap; 
+				overflow: hidden;
+
+				/* Safari and Chrome  */
+				overflow-x:-webkit-marquee;
+				-webkit-marquee-direction: backwards;
+				-webkit-marquee-style: scroll;
+				-webkit-marquee-speed: fast;
+				-webkit-marquee-increment: small;
+				-webkit-marquee-repetition: infinite;
+
+				/* W3C  */
+				overflow-x: marquee-line;
+				marquee-direction: forward;
+				marquee-style: scroll;
+				marquee-speed: fast;
+				marquee-play-count: infinite;
+			}
+
 			h1 {
 				margin-top: 30px;
 				margin-bottom: 40px;
@@ -183,7 +208,7 @@
 			</a>
 			<div id="content"></div>
 		</div>
-		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
+		<article><iframe id="viewer" width="100%" allowfullscreen onmousewheel=""></iframe>
 
 		<script>
 
@@ -564,7 +589,7 @@
 
 		}
 
-		</script>
+		</script><div class="marquee"><p>refresh_fix_on_some_blacklisted_android_chipsets</p></div></article>
 
 	</body>
 </html>
