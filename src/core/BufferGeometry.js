@@ -49,7 +49,7 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	offsets: function () {
+	get offsets() {
 
 		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
 		return this.drawcalls;
