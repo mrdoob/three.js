@@ -167,15 +167,7 @@ var APP = {
 
 				} catch (e) {
 
-					if ( window.console !== undefined && console.error !== undefined ) {
-
-						console.error(e.stack || e);
-
-					} else {
-
-						throw e;
-
-					}
+					console.error(e.stack || e);
 
 				}
 
