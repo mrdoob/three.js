@@ -650,7 +650,7 @@
 		var objectChangeEvent = { type: "objectChange" };
 
 		var ray = new THREE.Raycaster();
-		var pointerVector = new THREE.Vector3();
+		var pointerVector = new THREE.Vector2();
 
 		var point = new THREE.Vector3();
 		var offset = new THREE.Vector3();
@@ -1085,7 +1085,7 @@
 			var x = ( pointer.clientX - rect.left ) / rect.width;
 			var y = ( pointer.clientY - rect.top ) / rect.height;
 
-			pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1, 0.5 );
+			pointerVector.set( ( x * 2 ) - 1, - ( y * 2 ) + 1 );
 			ray.setFromCamera( pointerVector, camera );
 
 			var intersections = ray.intersectObjects( objects, true );
