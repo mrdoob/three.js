@@ -172,18 +172,6 @@
 
 		};
 
-		this.hide = function () {
-
-			this.traverse( function( child ) { child.visible = false; } );
-
-		};
-
-		this.show = function () {
-
-			this.traverse( function( child ) { child.visible = true; } );
-
-		};
-
 		this.highlight = function ( axis ) {
 
 			this.traverse( function( child ) {
@@ -619,20 +607,8 @@
 
 		domElement = ( domElement !== undefined ) ? domElement : document;
 
-		this.gizmo = {};
-		this.gizmo["translate"] = new THREE.TransformGizmoTranslate();
-		this.gizmo["rotate"] = new THREE.TransformGizmoRotate();
-		this.gizmo["scale"] = new THREE.TransformGizmoScale();
-
-		this.add(this.gizmo["translate"]);
-		this.add(this.gizmo["rotate"]);
-		this.add(this.gizmo["scale"]);
-
-		this.gizmo["translate"].hide();
-		this.gizmo["rotate"].hide();
-		this.gizmo["scale"].hide();
-
 		this.object = undefined;
+		this.visible = false;
 		this.snap = null;
 		this.space = "world";
 		this.size = 1;
@@ -640,9 +616,24 @@
 
 		var scope = this;
 
-		var _dragging = false;
 		var _mode = "translate";
+		var _dragging = false;
 		var _plane = "XY";
+		var _gizmo = {
+
+			"translate": new THREE.TransformGizmoTranslate(),
+			"rotate": new THREE.TransformGizmoRotate(),
+			"scale": new THREE.TransformGizmoScale()
+		};
+
+		for (var type in _gizmo) {
+
+			var gizmoObj = _gizmo[type];
+
+			gizmoObj.visible = ( type === _mode );
+			this.add( gizmoObj );
+
+		}
 
 		var changeEvent = { type: "change" };
 		var mouseDownEvent = { type: "mouseDown" };
@@ -724,25 +715,17 @@
 
 		this.attach = function ( object ) {
 
-			scope.object = object;
-
-			this.gizmo["translate"].hide();
-			this.gizmo["rotate"].hide();
-			this.gizmo["scale"].hide();
-			this.gizmo[_mode].show();
-
-			scope.update();
+			this.object = object;
+			this.visible = true;
+			this.update();
 
 		};
 
 		this.detach = function () {
 
-			scope.object = undefined;
+			this.object = undefined;
+			this.visible = false;
 			this.axis = null;
-
-			this.gizmo["translate"].hide();
-			this.gizmo["rotate"].hide();
-			this.gizmo["scale"].hide();
 
 		};
 
@@ -752,10 +735,7 @@
 
 			if ( _mode === "scale" ) scope.space = "local";
 
-			this.gizmo["translate"].hide();
-			this.gizmo["rotate"].hide();
-			this.gizmo["scale"].hide();
-			this.gizmo[_mode].show();
+			for (var type in _gizmo) _gizmo[type].visible = ( type === _mode );
 
 			this.update();
 			scope.dispatchEvent( changeEvent );
@@ -804,15 +784,15 @@
 
 			if ( scope.space === "local" ) {
 
-				this.gizmo[_mode].update( worldRotation, eye );
+				_gizmo[_mode].update( worldRotation, eye );
 
 			} else if ( scope.space === "world" ) {
 
-				this.gizmo[_mode].update( new THREE.Euler(), eye );
+				_gizmo[_mode].update( new THREE.Euler(), eye );
 
 			}
 
-			this.gizmo[_mode].highlight( scope.axis );
+			_gizmo[_mode].highlight( scope.axis );
 
 		};
 
@@ -822,7 +802,7 @@
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
-			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
+			var intersect = intersectObjects( pointer, _gizmo[_mode].pickers.children );
 
 			var axis = null;
 
@@ -852,7 +832,7 @@
 
 			if ( pointer.button === 0 || pointer.button === undefined ) {
 
-				var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
+				var intersect = intersectObjects( pointer, _gizmo[_mode].pickers.children );
 
 				if ( intersect ) {
 
@@ -867,9 +847,9 @@
 
 					eye.copy( camPosition ).sub( worldPosition ).normalize();
 
-					scope.gizmo[_mode].setActivePlane( scope.axis, eye );
+					_gizmo[_mode].setActivePlane( scope.axis, eye );
 
-					var planeIntersect = intersectObjects( pointer, [ scope.gizmo[_mode].activePlane ] );
+					var planeIntersect = intersectObjects( pointer, [ _gizmo[_mode].activePlane ] );
 
 					if ( planeIntersect ) {
 
@@ -900,7 +880,7 @@
 
 			var pointer = event.changedTouches ? event.changedTouches[0] : event;
 
-			var planeIntersect = intersectObjects( pointer, [ scope.gizmo[_mode].activePlane ] );
+			var planeIntersect = intersectObjects( pointer, [ _gizmo[_mode].activePlane ] );
 
 			if ( planeIntersect === false ) return;
 
