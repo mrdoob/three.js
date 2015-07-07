@@ -162,13 +162,7 @@
 				if ( SELECTED ) {
 
 					var intersects = raycaster.intersectObject( plane );
-
-					if ( intersects.length > 0 ) {
-
-						SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
-
-					}
-
+					SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
 					return;
 
 				}
@@ -207,7 +201,9 @@
 
 				event.preventDefault();
 
-				raycaster.setFromCamera( mouse, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
+
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -218,12 +214,7 @@
 					SELECTED = intersects[ 0 ].object;
 
 					var intersects = raycaster.intersectObject( plane );
-
-					if ( intersects.length > 0 ) {
-
-						offset.copy( intersects[ 0 ].point ).sub( plane.position );
-
-					}
+					offset.copy( intersects[ 0 ].point ).sub( plane.position );
 
 					container.style.cursor = 'move';
 
