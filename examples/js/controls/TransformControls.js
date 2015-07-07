@@ -102,7 +102,7 @@
 			//// PLANES
 
 			var planeGeometry = new THREE.PlaneBufferGeometry( 50, 50, 2, 2 );
-			var planeMaterial = new THREE.MeshBasicMaterial( { visible: false } );
+			var planeMaterial = new THREE.MeshBasicMaterial( { visible: false, side: THREE.DoubleSide } );
 
 			var planes = {
 				"XY":   new THREE.Mesh( planeGeometry, planeMaterial ),
