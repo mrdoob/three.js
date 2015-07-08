@@ -234,6 +234,8 @@ var Viewport = function ( editor ) {
 
 	signals.themeChanged.add( function ( value ) {
 
+		var clearColor;
+
 		switch ( value ) {
 
 			case 'css/light.css':
@@ -271,11 +273,15 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( type, antialias ) {
+	signals.rendererChanged.add( function ( newRenderer ) {
 
-		container.dom.removeChild( renderer.domElement );
+		if ( renderer !== null ) {
 
-		renderer = createRenderer( type, antialias );
+			container.dom.removeChild( renderer.domElement );
+
+		}
+
+		renderer = newRenderer;
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
@@ -510,27 +516,7 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var createRenderer = function ( type, antialias ) {
-
-		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
-
-			type = 'CanvasRenderer';
-
-		}
-
-		var renderer = new THREE[ type ]( { antialias: antialias } );
-		renderer.setClearColor( clearColor );
-		renderer.setPixelRatio( window.devicePixelRatio );
-		renderer.autoClear = false;
-		renderer.autoUpdateScene = false;
-
-		return renderer;
-
-	};
-
-	var clearColor;
-	var renderer = createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
-	container.dom.appendChild( renderer.domElement );
+	var renderer = null;
 
 	animate();
 
