@@ -40,6 +40,11 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/shaders/SSAOShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script> <!-- Why must include this? -->
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>  <!-- Why must include this? -->
+		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
@@ -56,9 +61,10 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 			var container, stats;   
 			var camera, scene, renderer,
 				depthMaterial;
+			var effectComposer, depthRenderTarget;
+			var ssaoPass;
 			var group;
 			var depthScale = 1.0;
-			var height = window.innerHeight;
 			var postprocessing = { enabled : true, renderMode: 0 }; // renderMode: 0('framebuffer'), 1('onlyAO')
 
 			init();
@@ -71,15 +77,10 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( 0xa0a0a0 );
-
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
-				var depthShader = THREE.ShaderLib[ "depthRGBA" ];
-				var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-				depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader,
-					uniforms: depthUniforms, blending: THREE.NoBlending } );
-								
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 100, 700 );
 				camera.position.z = 500;
 
@@ -113,7 +114,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
-				// postprocessing                
+				// Init postprocessing                
 				initPostprocessing();
 			
 				// Init gui
@@ -127,9 +128,9 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 			function renderModeChange( value ) {
 
 				if ( value == 0 ) { // framebuffer
-					postprocessing.ssao_uniforms[ 'onlyAO' ].value = false;
+					ssaoPass.uniforms[ 'onlyAO' ].value = false;
 				} else if ( value == 1 ) {  // onlyAO
-					postprocessing.ssao_uniforms[ 'onlyAO' ].value = true;
+					ssaoPass.uniforms[ 'onlyAO' ].value = true;
 				} else {
 					console.error( "Not define renderModeChange type: " + value );
 				}
@@ -141,45 +142,40 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				initPostprocessing();
+				// depthRenderTarget.width = window.innerWidth;
+				// depthRenderTarget.height = window.innerHeight;
+				//effectComposer.setSize( window.innerWidth, window.innerHeight );
 			}
 
 			function initPostprocessing() {
-				
-				postprocessing.scene = new THREE.Scene();
-				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -1000, 1000 );
-				postprocessing.camera.position.z = 1;                
-				
-				postprocessing.scene.add( postprocessing.camera );
-				
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
-				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth * depthScale, height * depthScale, pars );
-				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 
-				// Setup SSAO material
-				var ssao_shader = THREE.SSAOShader;
-				postprocessing.ssao_uniforms = THREE.UniformsUtils.clone( ssao_shader.uniforms );
-				postprocessing.ssao_uniforms[ "tDiffuse" ].value = postprocessing.rtTextureColor; 
-				postprocessing.ssao_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth; 
-				postprocessing.ssao_uniforms[ 'size' ].value.set( window.innerWidth*depthScale, window.innerHeight*depthScale );
-				postprocessing.ssao_uniforms[ 'cameraNear' ].value = camera.near;
-				postprocessing.ssao_uniforms[ 'cameraFar' ].value = camera.far;
-				postprocessing.ssao_uniforms[ 'onlyAO' ].value = ( postprocessing.renderMode == 1 );
+				// Setup render pass
+				var renderPass = new THREE.RenderPass( scene, camera );
+
+				// Setup depth pass
+				var depthShader = THREE.ShaderLib[ "depthRGBA" ];
+				var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
+
+				depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader,
+					uniforms: depthUniforms, blending: THREE.NoBlending } );
+								
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 				
-				postprocessing.materialSSAO = new THREE.ShaderMaterial( {
-					
-					uniforms: postprocessing.ssao_uniforms,
-					vertexShader: ssao_shader.vertexShader,
-					fragmentShader: ssao_shader.fragmentShader
-				});
+				// Setup SSAO pass
+				ssaoPass = new THREE.ShaderPass( THREE.SSAOShader );
+				ssaoPass.renderToScreen = true;
+				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass 
+				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget; 
+				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				ssaoPass.uniforms[ 'cameraNear' ].value = camera.near;
+				ssaoPass.uniforms[ 'cameraFar' ].value = camera.far;
+				ssaoPass.uniforms[ 'onlyAO' ].value = ( postprocessing.renderMode == 1 );
 				
-				postprocessing.ssaoQuad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialSSAO );
-				postprocessing.ssaoQuad.position.z = -500;
-				postprocessing.scene.add( postprocessing.ssaoQuad );
-			}
-			
-			function shaderUpdate() {
-				postprocessing.materialSSAO.needsUpdate = true;
+				// Add pass to effect composer
+				effectComposer = new THREE.EffectComposer( renderer );
+				effectComposer.addPass( renderPass );
+				effectComposer.addPass( ssaoPass );
 			}
 			
 			function animate() {
@@ -196,23 +192,15 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				if ( postprocessing.enabled ) {
 					
-					renderer.clear();
-
-					// Render scene into texture
-					scene.overrideMaterial = null;
-					renderer.render( scene, camera, postprocessing.rtTextureColor , true );
-
-					// Render depth into texture                    
+					// Render depth into depthRenderTarget                    
 					scene.overrideMaterial = depthMaterial;
-					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					renderer.render( scene, camera, depthRenderTarget, true );
 
-					// Render SSAO composite
-					renderer.render( postprocessing.scene, postprocessing.camera );
+					// Render renderPass and SSAO shaderPass
+					scene.overrideMaterial = null;
+					effectComposer.render();
 					
 				} else {
-					
-					scene.overrideMaterial = null;
-					renderer.clear();
 					renderer.render( scene, camera );
 				}
 			}
