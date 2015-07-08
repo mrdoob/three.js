@@ -21061,6 +21061,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( overrideMaterial === null ) material = webglObject[ materialType ];
 
+				if ( ! material ) continue;
+
 				_this.renderImmediateObject( camera, lights, fog, material, object );
 
 			}
