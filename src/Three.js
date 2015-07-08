@@ -3,7 +3,7 @@
  */
 
 var THREE = { REVISION: '72dev' };
-// I've added these lines again because it fixes android support for stock browser many blacklisted devices
+// I've added these lines again because it fixes android support for stock browser on many blacklisted devices
 // it is to be considered a temporary workaroud until the real cause is found
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
@@ -15,43 +15,31 @@ var THREE = { REVISION: '72dev' };
 	var lastTime = 0;
 	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-
 	for ( var x = 0; x < vendors.length && !self.requestAnimationFrame; ++ x ) {
-
 
 		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
 		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
 
-
 	}
-
 
 	if ( self.requestAnimationFrame === undefined && self['setTimeout'] !== undefined ) {
 
-
 		self.requestAnimationFrame = function ( callback ) {
-
 
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
 			var id = self.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
 			lastTime = currTime + timeToCall;
 			return id;
 
-
 		};
 
-
 	}
-
 
 	if( self.cancelAnimationFrame === undefined && self['clearTimeout'] !== undefined ) {
 
-
 		self.cancelAnimationFrame = function ( id ) { self.clearTimeout( id ) };
 
-
 	}
-
 
 }() );
 // browserify support
