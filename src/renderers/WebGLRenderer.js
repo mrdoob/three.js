@@ -1944,11 +1944,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// same glsl and uniform list
 			return;
 
-		} else if ( materialProperties.__webglShader.uniforms === material.uniforms ) {
-
-			// same uniforms (container object)
-			return;
-
 		} else {
 
 			// only rebuild uniform list
