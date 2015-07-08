@@ -1927,6 +1927,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var code = chunks.join();
+		var programChange = true;
 
 		if ( !materialProperties.program ) {
 
@@ -1940,13 +1941,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( shaderID !== undefined ) {
 
-			// same glsl
+			// same glsl and uniform list
 			return;
 
 		} else if ( materialProperties.__webglShader.uniforms === material.uniforms ) {
 
 			// same uniforms (container object)
 			return;
+
+		} else {
+
+			// only rebuild uniform list
+			programChange = false;
 
 		}
 
@@ -1983,7 +1989,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( programInfo.code === code ) {
 
 				program = programInfo;
-				program.usedTimes ++;
+
+				if ( programChange ) {
+
+					program.usedTimes ++;
+
+				}
 
 				break;
 
