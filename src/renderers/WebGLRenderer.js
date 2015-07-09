@@ -705,6 +705,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateMaterial = function ( material ) {
 
+		releaseMaterialProgramReference( material );
+
+		properties.delete( material );
+
+	};
+
+
+	function releaseMaterialProgramReference ( material ) {
+
 		var program = properties.get( material ).program.program;
 
 		if ( program === undefined ) return;
@@ -752,9 +761,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		properties.delete( material );
-
-	};
+	}
 
 	// Buffer rendering
 
@@ -1937,7 +1944,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( materialProperties.program.code !== code ) {
 
 			// changed glsl or parameters
-			deallocateMaterial( material );
+			releaseMaterialProgramReference( material );
 
 		} else if ( shaderID !== undefined ) {
 
