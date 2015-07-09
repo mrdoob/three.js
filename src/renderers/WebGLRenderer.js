@@ -78,7 +78,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		render: null,
 		memory: null,
 		programs: null
-	
+
 	};
 
 	// internal properties
