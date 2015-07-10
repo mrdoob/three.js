@@ -40,18 +40,18 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/shaders/SSAOShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script> <!-- Why must include this? -->
+		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>  <!-- Why must include this? -->
+		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl screen space ambient occlusion example -
-			shader by <a href="http://alteredqualia.com">alteredq</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl screen space ambient occlusion example			
+			<p id="info">shader by <a href="http://alteredqualia.com">alteredq</a></p>
 		</div>
 
 		<script>
@@ -59,9 +59,8 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 						
 			var container, stats;   
-			var camera, scene, renderer,
-				depthMaterial;
-			var effectComposer, depthRenderTarget;
+			var camera, scene, renderer;
+			var depthMaterial, effectComposer, depthRenderTarget;
 			var ssaoPass;
 			var group;
 			var depthScale = 1.0;
@@ -142,9 +141,10 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				// depthRenderTarget.width = window.innerWidth;
-				// depthRenderTarget.height = window.innerHeight;
-				//effectComposer.setSize( window.innerWidth, window.innerHeight );
+				// Resize renderTargets
+				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				depthRenderTarget.setSize( window.innerWidth, window.innerHeight );
+				effectComposer.setSize( window.innerWidth, window.innerHeight );
 			}
 
 			function initPostprocessing() {
@@ -171,6 +171,8 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				ssaoPass.uniforms[ 'cameraNear' ].value = camera.near;
 				ssaoPass.uniforms[ 'cameraFar' ].value = camera.far;
 				ssaoPass.uniforms[ 'onlyAO' ].value = ( postprocessing.renderMode == 1 );
+				ssaoPass.uniforms[ 'aoClamp' ].value = 0.3;
+				ssaoPass.uniforms[ 'lumInfluence' ].value = 0.5;
 				
 				// Add pass to effect composer
 				effectComposer = new THREE.EffectComposer( renderer );
