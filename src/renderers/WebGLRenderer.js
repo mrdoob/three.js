@@ -71,16 +71,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.autoScaleCubemaps = true;
 
-	// info (see below for details)
-
-	this.info = {
-
-		render: null,
-		memory: null,
-		programs: null
-
-	};
-
 	// internal properties
 
 	var _this = this,
@@ -130,6 +120,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	},
 
+	// info
+
 	_infoMemory = {
 
 		programs: 0,
@@ -147,10 +139,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.info.render = _infoRender;
-	this.info.memory = _infoMemory;
-	this.info.programs = _programs;
+	this.info = {
 
+		render: _infoRender,
+		memory: _infoMemory,
+		programs: _programs
+
+	};
 
 	// initialize
 
