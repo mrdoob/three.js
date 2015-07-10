@@ -22,7 +22,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 	radius = radius || 50;
 
-	widthSegments = Math.max( 2, Math.floor( widthSegments ) || 8 );
+	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
 	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
 
 	phiStart = phiStart !== undefined ? phiStart : 0;
