@@ -92,9 +92,32 @@ Sidebar.Project = function ( editor ) {
 
 	function updateRenderer() {
 
-		signals.rendererChanged.dispatch( rendererType.getValue(), rendererAntialias.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
 
 	}
+
+	function createRenderer( type, antialias ) {
+
+		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
+
+			type = 'CanvasRenderer';
+
+		}
+
+		var ctor = rendererTypes[ type ];
+		renderer = new ctor( { antialias: antialias } );
+
+		//renderer.setClearColor( clearColor );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.autoClear = false;
+		renderer.autoUpdateScene = false;
+
+		signals.rendererChanged.dispatch( renderer );
+
+	}
+
+	var renderer = createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
+
 
 	return container;
 
