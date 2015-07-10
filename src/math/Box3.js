@@ -57,7 +57,7 @@ THREE.Box3.prototype = {
 	setFromObject: function () {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and childrens', world transforms
+		// accounting for both the object's, and children's, world transforms
 
 		var v1 = new THREE.Vector3();
 

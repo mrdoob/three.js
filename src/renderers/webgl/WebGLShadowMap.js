@@ -6,6 +6,7 @@
 THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	var _gl = _renderer.context,
+	_state = _renderer.state,
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
@@ -64,7 +65,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.enabled = false;
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
-	this.debug = false;
 	this.cascade = false;
 
 	this.render = function ( scene, camera ) {
@@ -84,9 +84,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_gl.disable( _gl.BLEND );
+		_state.disable( _gl.BLEND );
 
-		_gl.enable( _gl.CULL_FACE );
+		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
@@ -99,7 +99,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.state.setDepthTest( true );
+		_state.setDepthTest( true );
 
 		// preprocess lights
 		// 	- skip lights that are not casting shadows
@@ -274,7 +274,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				object = webglObject.object;
 
-				// culling is overriden globally for all objects
+				// culling is overridden globally for all objects
 				// while rendering depth map
 
 				// need to deal with MeshFaceMaterial somehow
@@ -336,7 +336,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_gl.enable( _gl.BLEND );
+		_state.enable( _gl.BLEND );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 

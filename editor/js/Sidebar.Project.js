@@ -64,7 +64,7 @@ Sidebar.Project = function ( editor ) {
 	var rendererAntialias = new UI.Checkbox( editor.config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
 
 		editor.config.setKey( 'project/renderer/antialias', this.getValue() );
-		// updateRenderer();
+		updateRenderer();
 
 	} );
 

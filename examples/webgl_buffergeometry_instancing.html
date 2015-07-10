@@ -145,7 +145,7 @@
 
             var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1, false );
 
-            for ( var i = 0, ul = offsets.length; i < ul; i++ ) {
+            for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
 
                 offsets.setXYZ( i, Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
 
@@ -155,7 +155,7 @@
 
             var colors = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, false );
 
-            for ( var i = 0, ul = colors.length; i < ul; i++ ) {
+            for ( var i = 0, ul = colors.count; i < ul; i++ ) {
 
                 colors.setXYZW( i, Math.random(), Math.random(), Math.random(), Math.random() );
 
@@ -167,7 +167,7 @@
 
             var orientationsStart = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, false );
 
-            for ( var i = 0, ul = orientationsStart.length; i < ul; i++ ) {
+            for ( var i = 0, ul = orientationsStart.count; i < ul; i++ ) {
 
                 vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
                 vector.normalize();
@@ -180,7 +180,7 @@
 
             var orientationsEnd = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1, false );
 
-            for ( var i = 0, ul = orientationsEnd.length; i < ul; i++ ) {
+            for ( var i = 0, ul = orientationsEnd.count; i < ul; i++ ) {
 
                 vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
                 vector.normalize();

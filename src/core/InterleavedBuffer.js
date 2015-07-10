@@ -4,6 +4,8 @@
 
 THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.array = array;
 	this.stride = stride;
 
@@ -21,6 +23,12 @@ THREE.InterleavedBuffer.prototype = {
 	get length () {
 
 		return this.array.length;
+
+	},
+
+	get count () {
+
+		return this.array.length / this.stride;
 
 	},
 

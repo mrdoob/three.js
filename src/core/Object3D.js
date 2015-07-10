@@ -110,6 +110,12 @@ THREE.Object3D.prototype = {
 
 	},
 
+	set renderDepth ( value ) {
+
+		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
+
+	},
+
 	applyMatrix: function ( matrix ) {
 
 		this.matrix.multiplyMatrices( matrix, this.matrix );

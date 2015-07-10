@@ -12,3 +12,13 @@ THREE.Group = function () {
 
 THREE.Group.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Group.prototype.constructor = THREE.Group;
+
+THREE.Group.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Group();
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};

@@ -97,7 +97,7 @@ THREE.Material.prototype = {
 
 				} else if ( key === 'overdraw' ) {
 
-					// ensure overdraw is backwards-compatable with legacy boolean type
+					// ensure overdraw is backwards-compatible with legacy boolean type
 					this[ key ] = Number( newValue );
 
 				} else {

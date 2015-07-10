@@ -208,6 +208,8 @@ THREE.WebGLProgram = ( function () {
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
 
+				'#define SHADER_NAME ' + material.__webglShader.name,
+
 				customDefines,
 
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
@@ -230,6 +232,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.envMap ? '#define ' + envMapModeDefine : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
+				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
 				parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',
@@ -317,6 +320,8 @@ THREE.WebGLProgram = ( function () {
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
 
+				'#define SHADER_NAME ' + material.__webglShader.name,
+
 				customDefines,
 
 				"#define HDR_TYPE_RGBM " + THREE.HDRRGBM,
@@ -351,6 +356,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.envMap ? '#define ' + envMapBlendingDefine : '',
 				parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 				parameters.aoMap ? '#define USE_AOMAP' : '',
+				parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
 				parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 				parameters.normalMap ? '#define USE_NORMALMAP' : '',
 				parameters.specularMap ? '#define USE_SPECULARMAP' : '',

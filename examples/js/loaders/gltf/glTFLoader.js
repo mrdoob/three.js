@@ -84,7 +84,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 
 	var ClassicGeometry = function() {
 
-		this.geometry = new THREE.BufferGeometry;
+		this.geometry = new THREE.BufferGeometry();
 
 		this.totalAttributes = 0;
 		this.loadedAttributes = 0;

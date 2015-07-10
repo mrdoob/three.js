@@ -26,6 +26,23 @@ if ( Math.sign === undefined ) {
 
 }
 
+if ( Function.prototype.name === undefined && Object.defineProperty !== undefined ) {
+
+	// Missing in IE9-11.
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
+
+	Object.defineProperty( Function.prototype, 'name', {
+
+		get: function () {
+
+			return this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
+
+		}
+
+	} );
+
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
 THREE.MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };

@@ -62,39 +62,46 @@ THREE.Color.prototype = {
 
 	},
 
-	setHSL: function ( h, s, l ) {
+	setHSL: function () {
 
-		// h,s,l ranges are in 0.0 - 1.0
+		function hue2rgb ( p, q, t ) {
 
-		if ( s === 0 ) {
+			if ( t < 0 ) t += 1;
+			if ( t > 1 ) t -= 1;
+			if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+			if ( t < 1 / 2 ) return q;
+			if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+			return p;
 
-			this.r = this.g = this.b = l;
+		};
 
-		} else {
+		return function ( h, s, l ) {
 
-			var hue2rgb = function ( p, q, t ) {
+			// h,s,l ranges are in 0.0 - 1.0
+			h = THREE.Math.euclideanModulo( h, 1 );
+			s = THREE.Math.clamp( s, 0, 1 );
+			l = THREE.Math.clamp( l, 0, 1 );
 
-				if ( t < 0 ) t += 1;
-				if ( t > 1 ) t -= 1;
-				if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
-				if ( t < 1 / 2 ) return q;
-				if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
-				return p;
+			if ( s === 0 ) {
 
-			};
+				this.r = this.g = this.b = l;
 
-			var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
-			var q = ( 2 * l ) - p;
+			} else {
 
-			this.r = hue2rgb( q, p, h + 1 / 3 );
-			this.g = hue2rgb( q, p, h );
-			this.b = hue2rgb( q, p, h - 1 / 3 );
+				var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+				var q = ( 2 * l ) - p;
 
-		}
+				this.r = hue2rgb( q, p, h + 1 / 3 );
+				this.g = hue2rgb( q, p, h );
+				this.b = hue2rgb( q, p, h - 1 / 3 );
 
-		return this;
+			}
 
-	},
+			return this;
+
+		};
+
+	}(),
 
 	setStyle: function ( style ) {
 

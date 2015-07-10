@@ -36,6 +36,12 @@ THREE.UniformsLib = {
 
 	},
 
+	emissivemap: {
+
+		"emissiveMap" : { type: "t", value: null },
+
+	},
+
 	bump: {
 
 		"bumpMap" : { type: "t", value: null },
