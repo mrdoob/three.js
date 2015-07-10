@@ -30,7 +30,7 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
-	var isSector = thetaStart > 0 || thetaStart + thetaLength < Math.PI;
+	var thetaEnd = thetaStart + thetaLength;
 
 	var vertexCount = ( ( widthSegments + 1 ) * ( heightSegments + 1 ) );
 
@@ -81,8 +81,8 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 			var v3 = vertices[ y + 1 ][ x ];
 			var v4 = vertices[ y + 1 ][ x + 1 ];
 
-			if ( y !== 0 || isSector === true ) indices.push( v1, v2, v4 );
-			if ( y !== heightSegments - 1 || isSector === true ) indices.push( v2, v3, v4 );
+			if ( y !== 0 || thetaStart > 0 ) indices.push( v1, v2, v4 );
+			if ( y !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( v2, v3, v4 );
 
 		}
 
