@@ -22,7 +22,6 @@ THREE.WebGLProgram = ( function () {
 
 	function fetchUniformLocations( gl, program, identifiers ) {
 
-
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
@@ -403,7 +402,7 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		if ( haveDiagnostics ) {
-		
+
 			this.diagnostics = {
 
 				runnable: runnable,
@@ -436,30 +435,33 @@ THREE.WebGLProgram = ( function () {
 
 		// set up caching for uniform locations
 
-		var _cachedUniforms;
-
-		var getUniforms = function() { return _cachedUniforms; };
+		var cachedUniforms;
 
 		this.getUniforms = function() {
 
-			// fetch, cache, and next time just use a dumb accessor
-			_cachedUniforms = fetchUniformLocations( gl, program );
-			this.getUniforms = getUniforms;
-			return _cachedUniforms;
+			if ( cachedUniforms === undefined ) {
+
+				cachedUniforms = fetchUniformLocations( gl, program );
+
+			}
+
+			return cachedUniforms;
 
 		};
 
 		// set up caching for attribute locations
 
-		var _cachedAttributes;
-
-		var getAttributes = function() { return _cachedAttributes; };
+		var cachedAttributes;
 
 		this.getAttributes = function() {
 
-			_cachedAttributes = fetchAttributeLocations( gl, program );
-			this.getAttributes = getAttributes;
-			return _cachedAttributes;
+			if ( cachedAttributes === undefined ) {
+
+				cachedAttributes = fetchAttributeLocations( gl, program );
+
+			}
+
+			return cachedAttributes;
 
 		};
 
