@@ -104,20 +104,12 @@ Sidebar.Project = function ( editor ) {
 
 		}
 
-		var ctor = rendererTypes[ type ];
-		renderer = new ctor( { antialias: antialias } );
-
-		//renderer.setClearColor( clearColor );
-		renderer.setPixelRatio( window.devicePixelRatio );
-		renderer.autoClear = false;
-		renderer.autoUpdateScene = false;
-
+		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
 		signals.rendererChanged.dispatch( renderer );
 
 	}
 
-	var renderer = createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
-
+	createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
 
 	return container;
 

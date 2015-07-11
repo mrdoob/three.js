@@ -232,9 +232,9 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.themeChanged.add( function ( value ) {
+	var clearColor;
 
-		var clearColor;
+	signals.themeChanged.add( function ( value ) {
 
 		switch ( value ) {
 
@@ -282,6 +282,11 @@ var Viewport = function ( editor ) {
 		}
 
 		renderer = newRenderer;
+
+		renderer.autoClear = false;
+		renderer.autoUpdateScene = false;
+		renderer.setClearColor( clearColor );
+		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
