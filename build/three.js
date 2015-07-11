@@ -19513,7 +19513,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	var glClearColor = function ( r, g, b, a ) {
+	function glClearColor( r, g, b, a ) {
 
 		if ( _premultipliedAlpha === true ) {
 
@@ -19523,9 +19523,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clearColor( r, g, b, a );
 
-	};
+	}
 
-	var setDefaultGLState = function () {
+	function setDefaultGLState() {
 
 		state.init();
 
@@ -19533,9 +19533,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
 
-	var resetGLState = function () {
+	function resetGLState() {
 
 		_currentProgram = null;
 		_currentCamera = null;
@@ -19547,7 +19547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.reset();
 
-	};
+	}
 
 	setDefaultGLState();
 
@@ -19883,7 +19883,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 
-	var onTextureDispose = function ( event ) {
+	function onTextureDispose( event ) {
 
 		var texture = event.target;
 
@@ -19894,9 +19894,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_infoMemory.textures --;
 
 
-	};
+	}
 
-	var onRenderTargetDispose = function ( event ) {
+	function onRenderTargetDispose( event ) {
 
 		var renderTarget = event.target;
 
@@ -19906,9 +19906,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_infoMemory.textures --;
 
-	};
+	}
 
-	var onMaterialDispose = function ( event ) {
+	function onMaterialDispose( event ) {
 
 		var material = event.target;
 
@@ -19916,11 +19916,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateMaterial( material );
 
-	};
+	}
 
 	// Buffer deallocation
 
-	var deallocateTexture = function ( texture ) {
+	function deallocateTexture( texture ) {
 
 		var textureProperties = properties.get( texture );
 
@@ -19943,9 +19943,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// remove all webgl properties
 		properties.delete( texture );
 
-	};
+	}
 
-	var deallocateRenderTarget = function ( renderTarget ) {
+	function deallocateRenderTarget( renderTarget ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
 
@@ -19971,18 +19971,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		properties.delete( renderTargetProperties );
 
-	};
+	}
 
-	var deallocateMaterial = function ( material ) {
+	function deallocateMaterial( material ) {
 
 		releaseMaterialProgramReference( material );
 
 		properties.delete( material );
 
-	};
+	}
 
 
-	function releaseMaterialProgramReference ( material ) {
+	function releaseMaterialProgramReference( material ) {
 
 		var program = properties.get( material ).program.program;
 
@@ -19990,44 +19990,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.program = undefined;
 
-		// only deallocate GL program if this was the last use of shared program
-		// assumed there is only single copy of any program in the _programs list
-		// (that's how it's constructed)
+		for ( var i = 0, n = _programs.length; i !== n; ++ i ) {
 
-		var i, il, programInfo;
-		var deleteProgram = false;
-
-		for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-			programInfo = _programs[ i ];
+			var programInfo = _programs[ i ];
 
 			if ( programInfo.program === program ) {
 
-				programInfo.usedTimes --;
+				var newReferenceCount = -- programInfo.usedTimes;
 
-				if ( programInfo.usedTimes === 0 ) {
+				if ( newReferenceCount === 0 ) {
 
-					deleteProgram = true;
+					// the last meterial that has been using the program let
+					// go of it, so remove it from the (unordered) _programs
+					// set and deallocate the GL resource
+
+					var newLength = n - 1;
+
+					_programs[ i ] = _programs[ newLength ];
+					_programs.pop();
+
+					_gl.deleteProgram( program );
+
+					_infoMemory.programs = newLength;
 
 				}
 
 				break;
 
 			}
-
-		}
-
-		if ( deleteProgram === true ) {
-
-			// avoid using array.splice, instead replace with last and pop
-
-			_programs[ i ] = _programs[ il - 1 ];
-			_programs.pop();
-
-
-			_gl.deleteProgram( program );
-
-			_infoMemory.programs --;
 
 		}
 
@@ -23880,7 +23870,6 @@ THREE.WebGLProgram = ( function () {
 
 	function fetchUniformLocations( gl, program, identifiers ) {
 
-
 		var uniforms = {};
 
 		var n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
@@ -24261,7 +24250,7 @@ THREE.WebGLProgram = ( function () {
 		}
 
 		if ( haveDiagnostics ) {
-		
+
 			this.diagnostics = {
 
 				runnable: runnable,
@@ -24294,28 +24283,33 @@ THREE.WebGLProgram = ( function () {
 
 		// set up caching for uniform locations
 
-		var getUniforms = function() { return this._cachedUniforms; };
+		var cachedUniforms;
 
 		this.getUniforms = function() {
 
-			// fetch, cache, and next time just use a dumb accessor
-			var uniforms = fetchUniformLocations( gl, program );
-			this._cachedUniforms = uniforms;
-			this.getUniforms = getUniforms;
-			return uniforms;
+			if ( cachedUniforms === undefined ) {
+
+				cachedUniforms = fetchUniformLocations( gl, program );
+
+			}
+
+			return cachedUniforms;
 
 		};
 
 		// set up caching for attribute locations
 
-		var getAttributes = function() { return this._cachedAttributes; };
+		var cachedAttributes;
 
 		this.getAttributes = function() {
 
-			var attributes = fetchAttributeLocations( gl, program );
-			this._cachedAttributes = attributes;
-			this.getAttributes = getAttributes;
-			return attributes;
+			if ( cachedAttributes === undefined ) {
+
+				cachedAttributes = fetchAttributeLocations( gl, program );
+
+			}
+
+			return cachedAttributes;
 
 		};
 
