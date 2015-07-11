@@ -94,3 +94,18 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
+
+THREE.PlaneBufferGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.PlaneBufferGeometry(
+		this.parameters.width,
+		this.parameters.height,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments
+	);
+
+	THREE.BufferGeometry.prototype.clone.call( this, geometry );
+
+	return geometry;
+
+};

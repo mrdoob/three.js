@@ -99,3 +99,21 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 THREE.SphereBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.SphereBufferGeometry.prototype.constructor = THREE.SphereBufferGeometry;
+
+THREE.SphereBufferGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.SphereBufferGeometry(
+		this.parameters.radius,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments,
+		this.parameters.phiStart,
+		this.parameters.phiLength,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	THREE.BufferGeometry.prototype.clone.call( this, geometry );
+
+	return geometry;
+
+};
