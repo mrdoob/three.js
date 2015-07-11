@@ -361,7 +361,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 
 				state.disable( gl.BLEND );
-				gl.enable( gl.DEPTH_TEST );
+				state.enable( gl.DEPTH_TEST );
 
 				gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
 
@@ -376,7 +376,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 				// restore graphics
 
 				gl.uniform1i( uniforms.renderType, 1 );
-				gl.disable( gl.DEPTH_TEST );
+				state.disable( gl.DEPTH_TEST );
 
 				state.activeTexture( gl.TEXTURE1 );
 				state.bindTexture( gl.TEXTURE_2D, tempTexture );
@@ -440,7 +440,7 @@ THREE.LensFlarePlugin = function ( renderer, flares ) {
 		// restore gl
 
 		state.enable( gl.CULL_FACE );
-		gl.enable( gl.DEPTH_TEST );
+		state.enable( gl.DEPTH_TEST );
 		gl.depthMask( true );
 
 		renderer.resetGLState();
