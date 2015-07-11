@@ -95,7 +95,7 @@ var Script = function ( editor ) {
 			currentObject.needsUpdate = true;
 			signals.materialChanged.dispatch( currentObject );
 
-		}, 200 );
+		}, 300 );
 
 	});
 
