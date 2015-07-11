@@ -205,7 +205,7 @@
 				object.receiveShadow = true;
 				scene.add( object );
 
-				object.customDepthMaterial = new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+				object.customDepthMaterial = new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader, side: THREE.DoubleSide } );
 
 				// sphere
 
