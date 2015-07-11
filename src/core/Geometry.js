@@ -1046,9 +1046,19 @@ THREE.Geometry.prototype = {
 
 	},
 
-	clone: function () {
+	clone: function ( geometry ) {
 
-		var geometry = new THREE.Geometry();
+		if ( geometry === undefined ) {
+
+			geometry = new THREE.Geometry();
+
+		} else {
+
+			geometry.vertices = [];
+			geometry.faces = [];
+			geometry.faceVertexUvs = [ [] ];
+
+		}
 
 		var vertices = this.vertices;
 
