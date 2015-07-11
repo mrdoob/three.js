@@ -238,7 +238,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	var glClearColor = function ( r, g, b, a ) {
+	function glClearColor( r, g, b, a ) {
 
 		if ( _premultipliedAlpha === true ) {
 
@@ -248,9 +248,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clearColor( r, g, b, a );
 
-	};
+	}
 
-	var setDefaultGLState = function () {
+	function setDefaultGLState() {
 
 		state.init();
 
@@ -258,9 +258,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
 
-	var resetGLState = function () {
+	function resetGLState() {
 
 		_currentProgram = null;
 		_currentCamera = null;
@@ -272,7 +272,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.reset();
 
-	};
+	}
 
 	setDefaultGLState();
 
@@ -608,7 +608,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 
-	var onTextureDispose = function ( event ) {
+	function onTextureDispose( event ) {
 
 		var texture = event.target;
 
@@ -619,9 +619,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_infoMemory.textures --;
 
 
-	};
+	}
 
-	var onRenderTargetDispose = function ( event ) {
+	function onRenderTargetDispose( event ) {
 
 		var renderTarget = event.target;
 
@@ -631,9 +631,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_infoMemory.textures --;
 
-	};
+	}
 
-	var onMaterialDispose = function ( event ) {
+	function onMaterialDispose( event ) {
 
 		var material = event.target;
 
@@ -641,11 +641,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateMaterial( material );
 
-	};
+	}
 
 	// Buffer deallocation
 
-	var deallocateTexture = function ( texture ) {
+	function deallocateTexture( texture ) {
 
 		var textureProperties = properties.get( texture );
 
@@ -668,9 +668,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// remove all webgl properties
 		properties.delete( texture );
 
-	};
+	}
 
-	var deallocateRenderTarget = function ( renderTarget ) {
+	function deallocateRenderTarget( renderTarget ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
 
@@ -696,18 +696,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		properties.delete( renderTargetProperties );
 
-	};
+	}
 
-	var deallocateMaterial = function ( material ) {
+	function deallocateMaterial( material ) {
 
 		releaseMaterialProgramReference( material );
 
 		properties.delete( material );
 
-	};
+	}
 
 
-	function releaseMaterialProgramReference ( material ) {
+	function releaseMaterialProgramReference( material ) {
 
 		var program = properties.get( material ).program.program;
 
