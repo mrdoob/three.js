@@ -9,7 +9,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
-	var switches = {};
+	var capabilities = {};
 
 	var currentBlending = null;
 	var currentBlendEquation = null;
@@ -97,10 +97,10 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	this.enable = function ( id ) {
 
-		if ( switches[ id ] !== true ) {
+		if ( capabilities[ id ] !== true ) {
 
 			gl.enable( id );
-			switches[ id ] = true;
+			capabilities[ id ] = true;
 
 		}
 
@@ -108,10 +108,10 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	this.disable = function ( id ) {
 
-		if ( switches[ id ] !== false ) {
+		if ( capabilities[ id ] !== false ) {
 
 			gl.disable( id );
-			switches[ id ] = false;
+			capabilities[ id ] = false;
 
 		}
 
@@ -457,7 +457,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
-		switches = {};
+		capabilities = {};
 
 		currentBlending = null;
 		currentDepthTest = null;
