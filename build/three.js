@@ -19807,7 +19807,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.enableScissorTest = function ( boolean ) {
 
-		state.set( _gl.SCISSOR_TEST, boolean );
+		state.setScissorTest( boolean );
 
 	};
 
@@ -25276,6 +25276,20 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 			currentPolygonOffsetFactor = factor;
 			currentPolygonOffsetUnits = units;
+
+		}
+
+	};
+
+	this.setScissorTest = function ( scissorTest ) {
+
+		if ( scissorTest ) {
+
+			this.enable( gl.SCISSOR_TEST );
+
+		} else {
+
+			this.disable( gl.SCISSOR_TEST );
 
 		}
 
