@@ -9,7 +9,6 @@ THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
 	this.array = array;
 	this.stride = stride;
 
-	this._needsUpdate = false;
 	this.updateCounter = 0;
 
 	this.dynamic = dynamic || false;
@@ -33,17 +32,9 @@ THREE.InterleavedBuffer.prototype = {
 
 	},
 
-	get needsUpdate() {
-
-		return this._needsUpdate;
-
-	},
-
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.updateCounter ++;
-
-		this._needsUpdate = value;
 
 	},
 
