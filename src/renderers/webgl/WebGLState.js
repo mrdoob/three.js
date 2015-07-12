@@ -357,6 +357,20 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
+	this.setScissorTest = function ( scissorTest ) {
+
+		if ( scissorTest ) {
+
+			this.enable( gl.SCISSOR_TEST );
+
+		} else {
+
+			this.disable( gl.SCISSOR_TEST );
+
+		}
+
+	};
+
 	// texture
 
 	this.activeTexture = function ( webglSlot ) {

@@ -532,7 +532,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.enableScissorTest = function ( boolean ) {
 
-		state.set( _gl.SCISSOR_TEST, boolean );
+		state.setScissorTest( boolean );
 
 	};
 
