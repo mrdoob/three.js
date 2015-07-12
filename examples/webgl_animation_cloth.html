@@ -208,7 +208,6 @@
 				object = new THREE.Mesh( clothGeometry, clothMaterial );
 				object.position.set( 0, 0, 0 );
 				object.castShadow = true;
-				object.receiveShadow = true;
 				scene.add( object );
 
 				object.customDepthMaterial = new THREE.ShaderMaterial( {
@@ -221,7 +220,7 @@
 				// sphere
 
 				var ballGeo = new THREE.SphereGeometry( ballSize, 20, 20 );
-				var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+				var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
 
 				sphere = new THREE.Mesh( ballGeo, ballMaterial );
 				sphere.castShadow = true;
