@@ -99,6 +99,8 @@
 
 			function animate() {
 
+				updateScene();
+
 				for ( var i = 0; i < apps.length; ++i ) {
 
 					apps[ i ].animate();
@@ -223,12 +225,33 @@
 				group2.rotation.x = 0;
 				scene.add( group2 );
 
-				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
+				group3 = new THREE.Group();
+				group3.add( new THREE.Mesh( new THREE.BufferGeometry().fromGeometry( geometry3 ), materials[0] ) );
+				group3.add( new THREE.Mesh( geometry3, materials[1] ) );
+				group3.name = 'rotating ball';
 				group3.position.x = 0;
 				group3.rotation.x = 0;
 				scene.add( group3 );
 
 				return scene;
+			}
+
+			function updateScene () {
+
+				var group = scene.getObjectByName( 'rotating ball' )
+				group.rotation.x += Math.PI / 600;
+
+				var geometry = group.children[0].geometry;
+				var array = geometry.attributes.color.array;
+
+				for (var i = 0; i < array.length; i ++) {
+
+					array[i] = ( array[i] + 0.99 ) % 1.0;
+
+				}
+
+				geometry.attributes.color.needsUpdate = true;
+
 			}
 
 			function App( container, fullWidth, fullHeight ) {
