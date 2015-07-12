@@ -21062,19 +21062,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentGeometryProgram = '';
 
-		if ( object.immediateRenderCallback ) {
+		object.render( function ( object ) {
 
-			object.immediateRenderCallback( program, _gl, _frustum );
+			_this.renderBufferImmediate( object, program, material );
 
-		} else {
-
-			object.render( function ( object ) {
-
-				_this.renderBufferImmediate( object, program, material );
-
-			} );
-
-		}
+		} );
 
 	};
 
