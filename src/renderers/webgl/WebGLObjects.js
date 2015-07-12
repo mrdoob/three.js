@@ -5,7 +5,6 @@
 THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	var objects = {};
-	var objectsImmediate = [];
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -34,10 +33,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			delete objects[ object.id ];
 
-		} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
-
-			removeInstances( objectsImmediate, object );
-
 		}
 
 		delete object._modelViewMatrix;
@@ -64,7 +59,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	//
 
 	this.objects = objects;
-	this.objectsImmediate = objectsImmediate;
 
 	this.geometries = geometries;
 
@@ -93,16 +87,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 					object: object,
 					z: 0
 				};
-
-			} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
-
-				objectsImmediate.push( {
-					id: null,
-					object: object,
-					opaque: null,
-					transparent: null,
-					z: 0
-				} );
 
 			}
 
@@ -271,7 +255,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	this.clear = function () {
 
 		objects = {};
-		objectsImmediate = [];
 
 	};
 
