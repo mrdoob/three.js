@@ -19312,6 +19312,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var opaqueObjects = [];
 	var transparentObjects = [];
 
+	var opaqueImmediateObjects = [];
+	var transparentImmediateObjects = [];
+
 	var sprites = [];
 	var lensFlares = [];
 
@@ -20810,8 +20813,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_frustum.setFromMatrix( _projScreenMatrix );
 
 		lights.length = 0;
+
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
+
+		opaqueImmediateObjects.length = 0;
+		transparentImmediateObjects.length = 0;
 
 		sprites.length = 0;
 		lensFlares.length = 0;
@@ -20847,34 +20854,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// set matrices for immediate objects
-
-		for ( var i = 0, il = objects.objectsImmediate.length; i < il; i ++ ) {
-
-			var webglObject = objects.objectsImmediate[ i ];
-			var object = webglObject.object;
-
-			if ( object.visible === true ) {
-
-				setupMatrices( object, camera );
-
-				var material = object.material;
-
-				if ( material.transparent ) {
-
-					webglObject.transparent = material;
-					webglObject.opaque = null;
-
-				} else {
-
-					webglObject.opaque = material;
-					webglObject.transparent = null;
-
-				}
-
-			}
-
-		}
+		//
 
 		if ( scene.overrideMaterial ) {
 
@@ -20882,7 +20862,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
 			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
-			renderObjectsImmediate( objects.objectsImmediate, '', camera, lights, fog, overrideMaterial );
+
+			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, overrideMaterial );
+			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, overrideMaterial );
 
 		} else {
 
@@ -20891,12 +20873,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			state.setBlending( THREE.NoBlending );
 
 			renderObjects( opaqueObjects, camera, lights, fog, null );
-			renderObjectsImmediate( objects.objectsImmediate, 'opaque', camera, lights, fog, null );
+			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, null );
 
 			// transparent pass (back-to-front order)
 
 			renderObjects( transparentObjects, camera, lights, fog, null );
-			renderObjectsImmediate( objects.objectsImmediate, 'transparent', camera, lights, fog, null );
+			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, null );
 
 		}
 
@@ -20954,6 +20936,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					lensFlares.push( object );
 
+				} else if ( object instanceof THREE.ImmediateRenderObject ) {
+
+					var material = object.material;
+
+					if ( material.transparent ) {
+
+						transparentImmediateObjects.push( object );
+
+					} else {
+
+						opaqueImmediateObjects.push( object );
+
+					}
+
 				} else {
 
 					var webglObject = objects.objects[ object.id ];
@@ -21010,7 +21006,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var webglObject = renderList[ i ];
-
 			var object = webglObject.object;
 
 			setupMatrices( object, camera );
@@ -21037,20 +21032,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
+	function renderObjectsImmediate( renderList, camera, lights, fog, overrideMaterial ) {
 
 		var material = overrideMaterial;
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
-			var webglObject = renderList[ i ];
-			var object = webglObject.object;
+			var object = renderList[ i ];
+
+			setupMatrices( object, camera );
 
 			if ( object.visible === true ) {
 
-				if ( overrideMaterial === null ) material = webglObject[ materialType ];
-
-				if ( ! material ) continue;
+				if ( overrideMaterial === null ) material = object.material;
 
 				_this.renderImmediateObject( camera, lights, fog, material, object );
 
@@ -21074,7 +21068,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			object.render( function ( object ) { _this.renderBufferImmediate( object, program, material ); } );
+			object.render( function ( object ) {
+
+				_this.renderBufferImmediate( object, program, material );
+
+			} );
 
 		}
 
@@ -22209,7 +22207,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setupMatrices ( object, camera ) {
+	function setupMatrices( object, camera ) {
 
 		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
@@ -23572,7 +23570,6 @@ THREE.WebGLGeometries = function ( gl, info ) {
 THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	var objects = {};
-	var objectsImmediate = [];
 
 	var morphInfluences = new Float32Array( 8 );
 
@@ -23601,10 +23598,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			delete objects[ object.id ];
 
-		} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
-
-			removeInstances( objectsImmediate, object );
-
 		}
 
 		delete object._modelViewMatrix;
@@ -23631,7 +23624,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	//
 
 	this.objects = objects;
-	this.objectsImmediate = objectsImmediate;
 
 	this.geometries = geometries;
 
@@ -23660,16 +23652,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 					object: object,
 					z: 0
 				};
-
-			} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
-
-				objectsImmediate.push( {
-					id: null,
-					object: object,
-					opaque: null,
-					transparent: null,
-					z: 0
-				} );
 
 			}
 
@@ -23838,7 +23820,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	this.clear = function () {
 
 		objects = {};
-		objectsImmediate = [];
 
 	};
 
@@ -24457,7 +24438,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_max = new THREE.Vector3(),
 
 	_webglObjects = _objects.objects,
-	_webglObjectsImmediate = _objects.objectsImmediate,
 
 	_matrixPosition = new THREE.Vector3(),
 
@@ -24759,23 +24739,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			// set matrices and render immediate objects
-
-			for ( j = 0, jl = _webglObjectsImmediate.length; j < jl; j ++ ) {
-
-				webglObject = _webglObjectsImmediate[ j ];
-				object = webglObject.object;
-
-				if ( object.visible && object.castShadow ) {
-
-					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-
-					_renderer.renderImmediateObject( shadowCamera, _lights, fog, _depthMaterial, object );
-
-				}
-
-			}
-
 		}
 
 		// restore GL state
@@ -24798,7 +24761,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	};
 
-	function projectObject( object, shadowCamera ) {
+	function projectObject( object, camera ) {
 
 		if ( object.visible === true ) {
 
@@ -24806,14 +24769,14 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-				object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_renderList.push( webglObject );
 
 			}
 
 			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-				projectObject( object.children[ i ], shadowCamera );
+				projectObject( object.children[ i ], camera );
 
 			}
 
@@ -25349,12 +25312,12 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
-		var boundTexture = currentBoundTextures[currentTextureSlot];
+		var boundTexture = currentBoundTextures[ currentTextureSlot ];
 
 		if ( boundTexture === undefined ) {
 
 			boundTexture = { type: undefined, texture: undefined };
-			currentBoundTextures[currentTextureSlot] = boundTexture;
+			currentBoundTextures[ currentTextureSlot ] = boundTexture;
 
 		}
 
