@@ -380,12 +380,12 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
-		var boundTexture = currentBoundTextures[currentTextureSlot];
+		var boundTexture = currentBoundTextures[ currentTextureSlot ];
 
 		if ( boundTexture === undefined ) {
 
 			boundTexture = { type: undefined, texture: undefined };
-			currentBoundTextures[currentTextureSlot] = boundTexture;
+			currentBoundTextures[ currentTextureSlot ] = boundTexture;
 
 		}
 
