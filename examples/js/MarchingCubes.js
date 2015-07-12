@@ -18,7 +18,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 	// prototype functions kill performance
 	// (tested and it was 4x slower !!!)
 
-	this.init = function( resolution ) {
+	this.init = function ( resolution ) {
 
 		this.resolution = resolution;
 
@@ -632,7 +632,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 	// Updates
 	/////////////////////////////////////
 
-	this.reset = function() {
+	this.reset = function () {
 
 		var i;
 
@@ -647,7 +647,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	};
 
-	this.render = function( renderCallback ) {
+	this.render = function ( renderCallback ) {
 
 		this.begin();
 

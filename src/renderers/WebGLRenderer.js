@@ -1762,7 +1762,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
+	function renderObjectsImmediate( renderList, materialType, camera, lights, fog, overrideMaterial ) {
 
 		var material = overrideMaterial;
 
@@ -1799,7 +1799,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			object.render( function ( object ) { _this.renderBufferImmediate( object, program, material ); } );
+			object.render( function ( object ) {
+
+				this.renderBufferImmediate( object, program, material );
+
+			} );
 
 		}
 
