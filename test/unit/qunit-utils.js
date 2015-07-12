@@ -143,3 +143,70 @@ function runStdGeometryTests( assert, geometries ) {
 	});
 
 }
+
+
+
+
+//
+//	LIGHT TEST HELPERS
+//
+
+// Run common light tests.
+function runStdLightTests( assert, lights ) {
+
+	_.each( lights, function( light ) {
+
+		// Clone
+		checkLightClone( light );
+
+		// json round trip
+		checkLightJsonRoundtrip( light );
+
+	});
+
+}
+
+
+function checkLightClone( light ) {
+
+	// Clone
+	var copy = light.clone();
+	QUnit.assert.notEqual( copy.uuid, light.uuid, "clone uuid should differ from original" );
+	QUnit.assert.notEqual( copy.id, light.id, "clone id should differ from original" );
+	QUnit.assert.smartEqual( copy, light, "clone is equal to original" );
+
+
+	// json round trip with clone
+	checkLightJsonRoundtrip( copy );
+
+}
+
+// Compare json file with its source Light.
+function checkLightJsonWriting( light, json ) {
+
+	QUnit.assert.equal( json.metadata.version, "4.4", "check metadata version" );
+	QUnit.assert.equalKey( light, json, 'type' );
+	QUnit.assert.equalKey( light, json, 'uuid' );
+	QUnit.assert.equal( json.id, undefined, "should not persist id" );
+
+}
+
+// Check parsing and reconstruction of json Light
+function checkLightJsonReading( json, light ) {
+
+	var loader = new THREE.ObjectLoader();
+	var outputLight = loader.parse( json );
+
+	QUnit.assert.smartEqual( outputLight, light, 'Reconstruct Light from ObjectLoader' );
+
+}
+
+// Verify light -> json -> light
+function checkLightJsonRoundtrip( light ) {
+
+	var json = light.toJSON();
+	checkLightJsonWriting( light, json.object );
+	checkLightJsonReading( json, light );
+
+}
+
