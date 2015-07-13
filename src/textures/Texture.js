@@ -63,9 +63,14 @@ THREE.Texture.prototype = {
 
 	},
 
-	clone: function ( texture ) {
+	clone: function () {
 
-		if ( texture === undefined ) texture = new THREE.Texture();
+		var texture = new THREE.Texture();
+		return this.cloneProperties( texture );
+
+	},
+
+	cloneProperties: function ( texture ) {
 
 		texture.image = this.image;
 		texture.mipmaps = this.mipmaps.slice( 0 );

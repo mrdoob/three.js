@@ -22,7 +22,7 @@ THREE.SpriteCanvasMaterial.prototype.clone = function () {
 
 	var material = new THREE.SpriteCanvasMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	THREE.Material.prototype.cloneProperties.call( this, material );
 
 	material.color.copy( this.color );
 	material.program = this.program;

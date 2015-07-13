@@ -43,7 +43,7 @@ THREE.SpriteMaterial.prototype.clone = function () {
 
 	var material = new THREE.SpriteMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	THREE.Material.prototype.cloneProperties.call( this, material );
 
 	material.color.copy( this.color );
 	material.map = this.map;

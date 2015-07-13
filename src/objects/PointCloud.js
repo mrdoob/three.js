@@ -136,13 +136,17 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 }() );
 
-THREE.PointCloud.prototype.clone = function ( object ) {
+THREE.PointCloud.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.PointCloud( this.geometry, this.material );
+	var pointCloud = new THREE.PointCloud( this.geometry, this.material );
+	return this.cloneProperties( pointCloud );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	return object;
+THREE.PointCloud.prototype.cloneProperties = function ( pointCloud ) {
+
+	THREE.Object3D.prototype.cloneProperties.call( this, pointCloud );
+	return pointCloud;
 
 };
 

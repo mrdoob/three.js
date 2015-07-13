@@ -234,21 +234,22 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
 
-THREE.PolyhedronGeometry.prototype.clone = function ( geometry ) {
+THREE.PolyhedronGeometry.prototype.clone = function () {
 
-	if ( geometry === undefined ) {
+	var geometry = new THREE.PolyhedronGeometry(
+		this.parameters.vertices,
+		this.parameters.indices,
+		this.parameters.radius,
+		this.parameters.detail
+	);
 
-		geometry = new THREE.PolyhedronGeometry(
-			this.parameters.vertices,
-			this.parameters.indices,
-			this.parameters.radius,
-			this.parameters.detail
-		);
+	return this.cloneProperties( geometry );
 
-	}
+};
 
-	THREE.Geometry.prototype.clone.call( this, geometry );
+THREE.PolyhedronGeometry.prototype.cloneProperties = function ( geometry ) {
 
+	THREE.Geometry.prototype.cloneProperties.call( this, geometry );
 	return geometry;
 
 };

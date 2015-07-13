@@ -78,21 +78,26 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 
 };
 
-THREE.LensFlare.prototype.clone = function ( object ) {
+THREE.LensFlare.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.LensFlare();
+	var flare = new THREE.LensFlare();
+	return this.cloneProperties( flare );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	object.positionScreen.copy( this.positionScreen );
-	object.customUpdateCallback = this.customUpdateCallback;
+THREE.LensFlare.prototype.cloneProperties = function ( flare ) {
+
+	THREE.Object3D.prototype.cloneProperties.call( this, flare );
+
+	flare.positionScreen.copy( this.positionScreen );
+	flare.customUpdateCallback = this.customUpdateCallback;
 
 	for ( var i = 0, l = this.lensFlares.length; i < l; i ++ ) {
 
-		object.lensFlares.push( this.lensFlares[ i ] );
+		flare.lensFlares.push( this.lensFlares[ i ] );
 
 	}
 
-	return object;
+	return flare;
 
 };

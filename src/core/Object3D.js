@@ -659,9 +659,15 @@ THREE.Object3D.prototype = {
 
 	},
 
-	clone: function ( object, recursive ) {
+	clone: function ( recursive ) {
 
-		if ( object === undefined ) object = new THREE.Object3D();
+		var object = new THREE.Object3D();
+		return this.cloneProperties( object, recursive );
+
+	},
+
+	cloneProperties: function ( object, recursive ) {
+
 		if ( recursive === undefined ) recursive = true;
 
 		object.name = this.name;

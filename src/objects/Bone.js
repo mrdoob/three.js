@@ -17,13 +17,18 @@ THREE.Bone = function ( skin ) {
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Bone.prototype.constructor = THREE.Bone;
 
-THREE.Bone.prototype.clone = function ( object ) {
+THREE.Bone.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Bone( this.skin );
+	var bone = new THREE.Bone( this.skin );
+	return this.cloneProperties( bone );
 
-	THREE.Object3D.prototype.clone.call( this, object );
-	object.skin = this.skin; 
+};
 
-	return object;
+THREE.Bone.prototype.cloneProperties = function ( bone ) {
+
+	THREE.Object3D.prototype.cloneProperties.call( this, bone );
+	bone.skin = this.skin;
+
+	return bone;
 
 };

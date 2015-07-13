@@ -1108,6 +1108,11 @@ THREE.BufferGeometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.BufferGeometry();
+		return this.cloneProperties( geometry );
+
+	},
+
+	cloneProperties: function ( geometry ) {
 
 		for ( var attr in this.attributes ) {
 

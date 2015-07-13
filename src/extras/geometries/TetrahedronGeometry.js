@@ -33,7 +33,7 @@ THREE.TetrahedronGeometry.prototype.clone = function () {
 		this.parameters.detail
 	);
 
-	THREE.PolyhedronGeometry.prototype.clone.call( this, geometry );
+	THREE.PolyhedronGeometry.prototype.cloneProperties.call( this, geometry );
 
 	return geometry;
 

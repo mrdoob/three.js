@@ -161,9 +161,14 @@ THREE.Material.prototype = {
 
 	},
 
-	clone: function ( material ) {
+	clone: function () {
 
-		if ( material === undefined ) material = new THREE.Material();
+		var material = new THREE.Material();
+		return this.cloneProperties( material );
+
+	},
+
+	cloneProperties: function ( material ) {
 
 		material.name = this.name;
 

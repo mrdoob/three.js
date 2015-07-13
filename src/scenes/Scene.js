@@ -18,18 +18,25 @@ THREE.Scene = function () {
 THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Scene.prototype.constructor = THREE.Scene;
 
-THREE.Scene.prototype.clone = function ( object ) {
+THREE.Scene.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Scene();
+	var scene = new THREE.Scene();
+	return this.cloneProperties( scene );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	if ( this.fog !== null ) object.fog = this.fog.clone();
-	if ( this.overrideMaterial !== null ) object.overrideMaterial = this.overrideMaterial.clone();
+THREE.Scene.prototype.cloneProperties = function ( scene ) {
 
-	object.autoUpdate = this.autoUpdate;
-	object.matrixAutoUpdate = this.matrixAutoUpdate;
+	if ( scene === undefined ) scene = new THREE.Scene();
 
-	return object;
+	THREE.Object3D.prototype.cloneProperties.call( this, scene );
+
+	if ( this.fog !== null ) scene.fog = this.fog.clone();
+	if ( this.overrideMaterial !== null ) scene.overrideMaterial = this.overrideMaterial.clone();
+
+	scene.autoUpdate = this.autoUpdate;
+	scene.matrixAutoUpdate = this.matrixAutoUpdate;
+
+	return scene;
 
 };

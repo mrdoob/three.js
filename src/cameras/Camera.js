@@ -50,14 +50,20 @@ THREE.Camera.prototype.lookAt = function () {
 
 }();
 
-THREE.Camera.prototype.clone = function ( camera ) {
+THREE.Camera.prototype.clone = function () {
 
-	if ( camera === undefined ) camera = new THREE.Camera();
+	var camera = new THREE.Camera();
+	return this.cloneProperties( camera );
 
-	THREE.Object3D.prototype.clone.call( this, camera );
+};
+
+THREE.Camera.prototype.cloneProperties = function ( camera ) {
+
+	THREE.Object3D.prototype.cloneProperties.call( this, camera );
 
 	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
 	camera.projectionMatrix.copy( this.projectionMatrix );
 
 	return camera;
+
 };

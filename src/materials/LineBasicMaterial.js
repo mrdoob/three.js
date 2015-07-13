@@ -47,7 +47,7 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 
 	var material = new THREE.LineBasicMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	THREE.Material.prototype.cloneProperties.call( this, material );
 
 	material.color.copy( this.color );
 

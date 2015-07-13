@@ -40,7 +40,7 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 		var distanceSq = raycaster.ray.distanceSqToPoint( matrixPosition );
 		var guessSizeSq = this.scale.x * this.scale.y;
-		
+
 		if ( distanceSq > guessSizeSq ) {
 
 			return;
@@ -60,13 +60,17 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Sprite.prototype.clone = function ( object ) {
+THREE.Sprite.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Sprite( this.material );
+	var sprite = new THREE.Sprite( this.material );
+	return this.cloneProperties( sprite );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	return object;
+THREE.Sprite.prototype.cloneProperties = function ( sprite ) {
+
+	THREE.Object3D.prototype.cloneProperties.call( this, sprite );
+	return sprite;
 
 };
 

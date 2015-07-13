@@ -124,7 +124,7 @@ THREE.TorusKnotGeometry.prototype.clone = function () {
 		this.parameters.heightScale
 	);
 
-	THREE.Geometry.prototype.clone.call( this, geometry );
+	THREE.Geometry.prototype.cloneProperties.call( this, geometry );
 
 	return geometry;
 

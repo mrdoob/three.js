@@ -192,22 +192,27 @@ THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 
 };
 
-THREE.MorphAnimMesh.prototype.clone = function ( object ) {
+THREE.MorphAnimMesh.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.MorphAnimMesh( this.geometry, this.material );
+	var morph = new THREE.MorphAnimMesh( this.geometry, this.material );
+	return this.cloneProperties( morph );
 
-	object.duration = this.duration;
-	object.mirroredLoop = this.mirroredLoop;
-	object.time = this.time;
+};
 
-	object.lastKeyframe = this.lastKeyframe;
-	object.currentKeyframe = this.currentKeyframe;
+THREE.MorphAnimMesh.prototype.cloneProperties = function ( morph ) {
 
-	object.direction = this.direction;
-	object.directionBackwards = this.directionBackwards;
+	morph.duration = this.duration;
+	morph.mirroredLoop = this.mirroredLoop;
+	morph.time = this.time;
 
-	THREE.Mesh.prototype.clone.call( this, object );
+	morph.lastKeyframe = this.lastKeyframe;
+	morph.currentKeyframe = this.currentKeyframe;
 
-	return object;
+	morph.direction = this.direction;
+	morph.directionBackwards = this.directionBackwards;
+
+	THREE.Mesh.prototype.cloneProperties.call( this, morph );
+
+	return morph;
 
 };

@@ -154,17 +154,16 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 
 };
 
-THREE.SkinnedMesh.prototype.clone = function( object ) {
+THREE.SkinnedMesh.prototype.clone = function() {
 
-	if ( object === undefined ) {
-
-		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
-
-	}
-
-	THREE.Mesh.prototype.clone.call( this, object );
-
-	return object;
+	var skinMesh = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
+	return this.cloneProperties( skinMesh );
 
 };
 
+THREE.SkinnedMesh.prototype.cloneProperties = function( skinMesh ) {
+
+	THREE.Mesh.prototype.cloneProperties.call( this, skinMesh );
+	return skinMesh;
+
+};

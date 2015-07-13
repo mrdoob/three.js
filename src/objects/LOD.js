@@ -130,11 +130,17 @@ THREE.LOD.prototype.update = function () {
 
 }();
 
-THREE.LOD.prototype.clone = function ( object ) {
+THREE.LOD.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.LOD();
+	var lod = new THREE.LOD();
+	return this.cloneProperties( lod );
 
-	THREE.Object3D.prototype.clone.call( this, object, false );
+};
+
+
+THREE.LOD.prototype.cloneProperties = function ( lod ) {
+
+	THREE.Object3D.prototype.cloneProperties.call( this, lod, false );
 
 	var levels = this.levels;
 
@@ -142,10 +148,10 @@ THREE.LOD.prototype.clone = function ( object ) {
 
 		var level = levels[ i ];
 
-		object.addLevel( level.object.clone(), level.distance );
+		lod.addLevel( level.object.clone(), level.distance );
 
 	}
 
-	return object;
+	return lod;
 
 };

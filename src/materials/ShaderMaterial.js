@@ -89,11 +89,16 @@ THREE.ShaderMaterial = function ( parameters ) {
 THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 
-THREE.ShaderMaterial.prototype.clone = function ( material ) {
+THREE.ShaderMaterial.prototype.clone = function () {
 
-	if ( material === undefined ) material = new THREE.ShaderMaterial();
+	var material = new THREE.ShaderMaterial();
+	return this.clone( material );
 
-	THREE.Material.prototype.clone.call( this, material );
+};
+
+THREE.ShaderMaterial.prototype.cloneProperties = function ( material ) {
+
+	THREE.Material.prototype.cloneProperties.call( this, material );
 
 	material.fragmentShader = this.fragmentShader;
 	material.vertexShader = this.vertexShader;
