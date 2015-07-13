@@ -79,12 +79,11 @@
 				camera.add( dirLight.target );
 
 				var loader = new THREE.VRMLLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( 'models/vrml/house.wrl', function ( object ) {
 
-					scene.add(event.content);
+					scene.add( object );
 
 				} );
-				loader.load( "models/vrml/house.wrl" );
 
 				// renderer
 
