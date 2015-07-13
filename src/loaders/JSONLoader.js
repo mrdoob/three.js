@@ -14,14 +14,14 @@ THREE.JSONLoader = function ( showStatus ) {
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
 THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
 
-THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
+THREE.JSONLoader.prototype.load = function ( url, callback, texturePath, callbackProgress ) {
 
 	// TODO: unify load API to for easier SceneLoader use
 
 	texturePath = texturePath && ( typeof texturePath === 'string' ) ? texturePath : this.extractUrlBase( url );
 
 	this.onLoadStart();
-	this.loadAjaxJSON( this, url, callback, texturePath );
+	this.loadAjaxJSON( this, url, callback, texturePath, callbackProgress );
 
 };
 
