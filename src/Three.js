@@ -3,13 +3,17 @@
  */
 
 var THREE = { REVISION: '72dev' };
-// I've added these lines again because it fixes android support for stock browser on many blacklisted devices
-// it is to be considered a temporary workaroud until the real cause is found
-// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-// requestAnimationFrame polyfill by Erik Möller
-// fixes from Paul Irish and Tino Zijdel
-// using 'self' instead of 'window' for compatibility with both NodeJS and IE10.
+
+// browserify support
+
+if ( typeof module === 'object' ) {
+
+	module.exports = THREE;
+
+}
+
+// polyfills
+
 ( function () {
 
 	var lastTime = 0;
@@ -22,12 +26,12 @@ var THREE = { REVISION: '72dev' };
 
 	}
 
-	if ( self.requestAnimationFrame === undefined && self['setTimeout'] !== undefined ) {
+	if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
 
 		self.requestAnimationFrame = function ( callback ) {
 
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-			var id = self.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
+			var id = self.setTimeout( function () { callback( currTime + timeToCall ) }, timeToCall );
 			lastTime = currTime + timeToCall;
 			return id;
 
@@ -35,22 +39,13 @@ var THREE = { REVISION: '72dev' };
 
 	}
 
-	if( self.cancelAnimationFrame === undefined && self['clearTimeout'] !== undefined ) {
+	if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
 
 		self.cancelAnimationFrame = function ( id ) { self.clearTimeout( id ) };
 
 	}
 
 }() );
-// browserify support
-
-if ( typeof module === 'object' ) {
-
-	module.exports = THREE;
-
-}
-
-// polyfills
 
 if ( Math.sign === undefined ) {
 
