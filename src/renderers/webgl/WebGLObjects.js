@@ -185,7 +185,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 			createBuffer( attributeProperties, data, bufferType );
 
-		} else if ( attributeProperties.updateCounter !== data.updateCounter ) {
+		} else if ( attributeProperties.version !== data.version ) {
 
 			updateBuffer( attributeProperties, data, bufferType );
 
@@ -210,8 +210,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		gl.bufferData( bufferType, data.array, usage );
 
-		attributeProperties.updateCounter = data.updateCounter;
-		data.needsUpdate = false;
+		attributeProperties.version = data.version;
 
 	}
 
@@ -236,8 +235,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		attributeProperties.updateCounter = data.updateCounter;
-		data.needsUpdate = false;
+		attributeProperties.version = data.version;
 
 	}
 
