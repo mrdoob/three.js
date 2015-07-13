@@ -9,7 +9,7 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
-	this.needsUpdate = false;
+	this.version = 0;
 
 };
 
@@ -27,6 +27,12 @@ THREE.BufferAttribute.prototype = {
 	get count() {
 
 		return this.array.length / this.itemSize;
+
+	},
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
 
 	},
 
