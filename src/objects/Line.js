@@ -73,7 +73,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 				}
 
-				for ( var oi = 0; oi < offsets.length; oi ++) {
+				for ( var oi = 0; oi < offsets.length; oi ++ ) {
 
 					var start = offsets[ oi ].start;
 					var count = offsets[ oi ].count;
@@ -185,7 +185,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 THREE.Line.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE[ this.type ]( this.geometry, this.material );
+	if ( object === undefined ) object = new this.constructor( this.geometry, this.material );
 
 	THREE.Object3D.prototype.clone.call( this, object );
 
