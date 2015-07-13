@@ -16,6 +16,39 @@ if ( typeof module === 'object' ) {
 
 // polyfills
 
+( function () {
+
+	var lastTime = 0;
+	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
+
+	for ( var x = 0; x < vendors.length && !self.requestAnimationFrame; ++ x ) {
+
+		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
+		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+
+	}
+
+	if ( self.requestAnimationFrame === undefined && self.setTimeout !== undefined ) {
+
+		self.requestAnimationFrame = function ( callback ) {
+
+			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
+			var id = self.setTimeout( function () { callback( currTime + timeToCall ) }, timeToCall );
+			lastTime = currTime + timeToCall;
+			return id;
+
+		};
+
+	}
+
+	if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
+
+		self.cancelAnimationFrame = function ( id ) { self.clearTimeout( id ) };
+
+	}
+
+}() );
+
 if ( Math.sign === undefined ) {
 
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
@@ -8332,7 +8365,7 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
-	this.needsUpdate = false;
+	this.version = 0;
 
 };
 
@@ -8350,6 +8383,12 @@ THREE.BufferAttribute.prototype = {
 	get count() {
 
 		return this.array.length / this.itemSize;
+
+	},
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
 
 	},
 
@@ -8721,7 +8760,7 @@ THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
 	this.array = array;
 	this.stride = stride;
 
-	this.needsUpdate = false;
+	this.version = 0;
 
 	this.dynamic = dynamic || false;
 	this.updateRange = { offset: 0, count: -1 };
@@ -8741,6 +8780,12 @@ THREE.InterleavedBuffer.prototype = {
 	get count () {
 
 		return this.array.length / this.stride;
+
+	},
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
 
 	},
 
@@ -23724,74 +23769,90 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		for ( var name in attributes ) {
 
-			var attribute = attributes[ name ];
-
-			var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
-
-			var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
-
-			var attributeProperties = properties.get( data );
-
-			if ( attributeProperties.__webglBuffer === undefined ) {
-
-				attributeProperties.__webglBuffer = gl.createBuffer();
-				gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
-
-				var usage = gl.STATIC_DRAW;
-
-				if ( data instanceof THREE.DynamicBufferAttribute
-						 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
-						 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
-
-					usage = gl.DYNAMIC_DRAW;
-
-				}
-
-				gl.bufferData( bufferType, data.array, usage );
-
-				data.needsUpdate = false;
-
-			} else if ( data.needsUpdate === true ) {
-
-				gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
-
-				if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
-
-					gl.bufferSubData( bufferType, 0, data.array );
-
-				} else if ( data.updateRange.count === 0 ) {
-
-					console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
-
-				} else {
-
-					gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
-									 data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
-
-					data.updateRange.count = 0; // reset range
-
-				}
-
-				data.needsUpdate = false;
-
-			}
+			updateAttribute( attributes[ name ], name );
 
 		}
 
-	};
+	}
+
+	function updateAttribute ( attribute, name ) {
+
+		var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
+
+		var data = ( attribute instanceof THREE.InterleavedBufferAttribute ) ? attribute.data : attribute;
+
+		var attributeProperties = properties.get( data );
+
+		if ( attributeProperties.__webglBuffer === undefined ) {
+
+			createBuffer( attributeProperties, data, bufferType );
+
+		} else if ( attributeProperties.version !== data.version ) {
+
+			updateBuffer( attributeProperties, data, bufferType );
+
+		}
+
+	}
+
+	function createBuffer ( attributeProperties, data, bufferType ) {
+
+		attributeProperties.__webglBuffer = gl.createBuffer();
+		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
+
+		var usage = gl.STATIC_DRAW;
+
+		if ( data instanceof THREE.DynamicBufferAttribute
+			 || ( data instanceof THREE.InstancedBufferAttribute && data.dynamic === true )
+			 || ( data instanceof THREE.InterleavedBuffer && data.dynamic === true ) ) {
+
+			usage = gl.DYNAMIC_DRAW;
+
+		}
+
+		gl.bufferData( bufferType, data.array, usage );
+
+		attributeProperties.version = data.version;
+
+	}
+
+	function updateBuffer ( attributeProperties, data, bufferType ) {
+
+		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
+
+		if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+
+			gl.bufferSubData( bufferType, 0, data.array );
+
+		} else if ( data.updateRange.count === 0 ) {
+
+			console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+
+		} else {
+
+			gl.bufferSubData( bufferType, data.updateRange.offset * data.array.BYTES_PER_ELEMENT,
+							  data.array.subarray( data.updateRange.offset, data.updateRange.offset + data.updateRange.count ) );
+
+			data.updateRange.count = 0; // reset range
+
+		}
+
+		attributeProperties.version = data.version;
+
+	}
 
 	// returns the webgl buffer for a specified attribute
 	this.getAttributeBuffer = function ( attribute ) {
 
 		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
 
-			return properties.get( attribute.data ).__webglBuffer
+			return properties.get( attribute.data ).__webglBuffer;
 
 		}
 
 		return properties.get( attribute ).__webglBuffer;
 
-	}
+	};
 
 	this.update = function ( renderList ) {
 
