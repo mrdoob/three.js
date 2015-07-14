@@ -136,7 +136,8 @@ var list = {
 
 		"Renderers / WebGL": [
 			[ "WebGLProgram", "api/renderers/webgl/WebGLProgram" ],
-			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ]
+			[ "WebGLShader", "api/renderers/webgl/WebGLShader" ],
+			[ "WebGLState", "api/renderers/webgl/WebGLState" ]
 		],
 
 		"Renderers / WebGL / Plugins": [

@@ -9,7 +9,7 @@ THREE.BufferAttribute = function ( array, itemSize ) {
 	this.array = array;
 	this.itemSize = itemSize;
 
-	this.needsUpdate = false;
+	this.version = 0;
 
 };
 
@@ -19,14 +19,20 @@ THREE.BufferAttribute.prototype = {
 
 	get length () {
 
-		console.warn( 'THREE.BufferAttribute: .length has been renamed to .count.' );
-		return this.count;
+		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+		return this.array.length;
 
 	},
 
 	get count() {
 
 		return this.array.length / this.itemSize;
+
+	},
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
 
 	},
 

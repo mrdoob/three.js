@@ -64,7 +64,7 @@ Sidebar.Project = function ( editor ) {
 	var rendererAntialias = new UI.Checkbox( editor.config.getKey( 'project/renderer/antialias' ) ).setLeft( '100px' ).onChange( function () {
 
 		editor.config.setKey( 'project/renderer/antialias', this.getValue() );
-		// updateRenderer();
+		updateRenderer();
 
 	} );
 
@@ -92,9 +92,24 @@ Sidebar.Project = function ( editor ) {
 
 	function updateRenderer() {
 
-		signals.rendererChanged.dispatch( rendererType.getValue(), rendererAntialias.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
 
 	}
+
+	function createRenderer( type, antialias ) {
+
+		if ( type === 'WebGLRenderer' && System.support.webgl === false ) {
+
+			type = 'CanvasRenderer';
+
+		}
+
+		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
+		signals.rendererChanged.dispatch( renderer );
+
+	}
+
+	createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ) );
 
 	return container;
 

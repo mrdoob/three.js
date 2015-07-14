@@ -37,6 +37,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var opaqueObjects = [];
 	var transparentObjects = [];
 
+	var opaqueImmediateObjects = [];
+	var transparentImmediateObjects = [];
+
 	var sprites = [];
 	var lensFlares = [];
 
@@ -70,29 +73,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// flags
 
 	this.autoScaleCubemaps = true;
-
-	// info
-
-	this.info = {
-
-		memory: {
-
-			programs: 0,
-			geometries: 0,
-			textures: 0
-
-		},
-
-		render: {
-
-			calls: 0,
-			vertices: 0,
-			faces: 0,
-			points: 0
-
-		}
-
-	};
 
 	// internal properties
 
@@ -140,6 +120,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 		point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
 		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], decays: [] },
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
+
+	},
+
+	// info
+
+	_infoMemory = {
+
+		programs: 0,
+		geometries: 0,
+		textures: 0
+
+	},
+
+	_infoRender = {
+
+		calls: 0,
+		vertices: 0,
+		faces: 0,
+		points: 0
+
+	};
+
+	this.info = {
+
+		render: _infoRender,
+		memory: _infoMemory,
+		programs: _programs
 
 	};
 
@@ -234,7 +241,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	var glClearColor = function ( r, g, b, a ) {
+	function glClearColor( r, g, b, a ) {
 
 		if ( _premultipliedAlpha === true ) {
 
@@ -244,9 +251,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clearColor( r, g, b, a );
 
-	};
+	}
 
-	var setDefaultGLState = function () {
+	function setDefaultGLState() {
 
 		state.init();
 
@@ -254,9 +261,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		glClearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
 
-	var resetGLState = function () {
+	function resetGLState() {
 
 		_currentProgram = null;
 		_currentCamera = null;
@@ -268,7 +275,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		state.reset();
 
-	};
+	}
 
 	setDefaultGLState();
 
@@ -523,9 +530,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.enableScissorTest = function ( enable ) {
+	this.enableScissorTest = function ( boolean ) {
 
-		enable ? _gl.enable( _gl.SCISSOR_TEST ) : _gl.disable( _gl.SCISSOR_TEST );
+		state.setScissorTest( boolean );
 
 	};
 
@@ -604,7 +611,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 
-	var onTextureDispose = function ( event ) {
+	function onTextureDispose( event ) {
 
 		var texture = event.target;
 
@@ -612,12 +619,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateTexture( texture );
 
-		_this.info.memory.textures --;
+		_infoMemory.textures --;
 
 
-	};
+	}
 
-	var onRenderTargetDispose = function ( event ) {
+	function onRenderTargetDispose( event ) {
 
 		var renderTarget = event.target;
 
@@ -625,11 +632,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateRenderTarget( renderTarget );
 
-		_this.info.memory.textures --;
+		_infoMemory.textures --;
 
-	};
+	}
 
-	var onMaterialDispose = function ( event ) {
+	function onMaterialDispose( event ) {
 
 		var material = event.target;
 
@@ -637,11 +644,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateMaterial( material );
 
-	};
+	}
 
 	// Buffer deallocation
 
-	var deallocateTexture = function ( texture ) {
+	function deallocateTexture( texture ) {
 
 		var textureProperties = properties.get( texture );
 
@@ -664,9 +671,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// remove all webgl properties
 		properties.delete( texture );
 
-	};
+	}
 
-	var deallocateRenderTarget = function ( renderTarget ) {
+	function deallocateRenderTarget( renderTarget ) {
 
 		var renderTargetProperties = properties.get( renderTarget );
 
@@ -692,9 +699,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		properties.delete( renderTargetProperties );
 
-	};
+	}
 
-	var deallocateMaterial = function ( material ) {
+	function deallocateMaterial( material ) {
+
+		releaseMaterialProgramReference( material );
+
+		properties.delete( material );
+
+	}
+
+
+	function releaseMaterialProgramReference( material ) {
 
 		var program = properties.get( material ).program.program;
 
@@ -702,24 +718,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.program = undefined;
 
-		// only deallocate GL program if this was the last use of shared program
-		// assumed there is only single copy of any program in the _programs list
-		// (that's how it's constructed)
+		for ( var i = 0, n = _programs.length; i !== n; ++ i ) {
 
-		var i, il, programInfo;
-		var deleteProgram = false;
-
-		for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-			programInfo = _programs[ i ];
+			var programInfo = _programs[ i ];
 
 			if ( programInfo.program === program ) {
 
-				programInfo.usedTimes --;
+				var newReferenceCount = -- programInfo.usedTimes;
 
-				if ( programInfo.usedTimes === 0 ) {
+				if ( newReferenceCount === 0 ) {
 
-					deleteProgram = true;
+					// the last meterial that has been using the program let
+					// go of it, so remove it from the (unordered) _programs
+					// set and deallocate the GL resource
+
+					var newLength = n - 1;
+
+					_programs[ i ] = _programs[ newLength ];
+					_programs.pop();
+
+					_gl.deleteProgram( program );
+
+					_infoMemory.programs = newLength;
 
 				}
 
@@ -729,35 +749,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( deleteProgram === true ) {
-
-			// avoid using array.splice, this is costlier than creating new array from scratch
-
-			var newPrograms = [];
-
-			for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-				programInfo = _programs[ i ];
-
-				if ( programInfo.program !== program ) {
-
-					newPrograms.push( programInfo );
-
-				}
-
-			}
-
-			_programs = newPrograms;
-
-			_gl.deleteProgram( program );
-
-			_this.info.memory.programs --;
-
-		}
-
-		properties.delete( material );
-
-	};
+	}
 
 	// Buffer rendering
 
@@ -929,7 +921,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
-								geometry.maxInstancedCount = data.meshPerAttribute * ( data.array.length / data.stride );
+								geometry.maxInstancedCount = data.meshPerAttribute * data.count;
 
 							}
 
@@ -953,7 +945,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
-								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * ( geometryAttribute.array.length / geometryAttribute.itemSize );
+								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
 							}
 
@@ -1101,9 +1093,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.drawElements( mode, index.array.length, type, 0 );
 
 				}
-				_this.info.render.calls ++;
-				_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
-				_this.info.render.faces += index.array.length / 3;
+				_infoRender.calls ++;
+				_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
+				_infoRender.faces += index.array.length / 3;
 
 			} else {
 
@@ -1145,9 +1137,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-					_this.info.render.faces += offsets[ i ].count / 3;
+					_infoRender.calls ++;
+					_infoRender.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+					_infoRender.faces += offsets[ i ].count / 3;
 
 				}
 
@@ -1184,11 +1176,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-						extension.drawArraysInstancedANGLE( mode, 0, position.data.array.length / position.data.stride, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.data.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 					} else {
 
-						extension.drawArraysInstancedANGLE( mode, 0, position.array.length / position.itemSize, geometry.maxInstancedCount ); // Draw the instanced meshes
+						extension.drawArraysInstancedANGLE( mode, 0, position.count, geometry.maxInstancedCount ); // Draw the instanced meshes
 
 					}
 
@@ -1196,19 +1188,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( position instanceof THREE.InterleavedBufferAttribute ) {
 
-						_gl.drawArrays( mode, 0, position.data.array.length / position.data.stride );
+						_gl.drawArrays( mode, 0, position.data.count );
 
 					} else {
 
-						_gl.drawArrays( mode, 0, position.array.length / position.itemSize );
+						_gl.drawArrays( mode, 0, position.count );
 
 					}
 
 				}
 
-				_this.info.render.calls++;
-				_this.info.render.vertices += position.array.length / position.itemSize;
-				_this.info.render.faces += position.array.length / ( 3 * position.itemSize );
+				_infoRender.calls++;
+				_infoRender.vertices += position.count;
+				_infoRender.faces += position.array.length / 3;
 
 			} else {
 
@@ -1237,9 +1229,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_this.info.render.calls++;
-					_this.info.render.vertices += offsets[ i ].count;
-					_this.info.render.faces += ( offsets[ i ].count  ) / 3;
+					_infoRender.calls++;
+					_infoRender.vertices += offsets[ i ].count;
+					_infoRender.faces += ( offsets[ i ].count  ) / 3;
 
 				}
 			}
@@ -1291,8 +1283,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawElements( mode, index.array.length, type, 0 ); // 2 bytes per Uint16Array
 
-				_this.info.render.calls ++;
-				_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
+				_infoRender.calls ++;
+				_infoRender.vertices += index.array.length; // not really true, here vertices can be shared
 
 			} else {
 
@@ -1317,8 +1309,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
 
-					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+					_infoRender.calls ++;
+					_infoRender.vertices += offsets[ i ].count; // not really true, here vertices can be shared
 
 				}
 
@@ -1341,8 +1333,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
-				_this.info.render.calls ++;
-				_this.info.render.vertices += position.array.length / 3;
+				_infoRender.calls ++;
+				_infoRender.vertices += position.array.length / 3;
 
 			} else {
 
@@ -1350,8 +1342,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
-					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count;
+					_infoRender.calls ++;
+					_infoRender.vertices += offsets[ i ].count;
 
 				}
 
@@ -1400,8 +1392,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawElements( mode, index.array.length, type, 0);
 
-				_this.info.render.calls ++;
-				_this.info.render.points += index.array.length;
+				_infoRender.calls ++;
+				_infoRender.points += index.array.length;
 
 			} else {
 
@@ -1426,8 +1418,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawElements( mode, offsets[ i ].count, type, offsets[ i ].start * size );
 
-					_this.info.render.calls ++;
-					_this.info.render.points += offsets[ i ].count;
+					_infoRender.calls ++;
+					_infoRender.points += offsets[ i ].count;
 
 				}
 
@@ -1450,8 +1442,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.drawArrays( mode, 0, position.array.length / 3 );
 
-				_this.info.render.calls ++;
-				_this.info.render.points += position.array.length / 3;
+				_infoRender.calls ++;
+				_infoRender.points += position.array.length / 3;
 
 			} else {
 
@@ -1459,8 +1451,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.drawArrays( mode, offsets[ i ].index, offsets[ i ].count );
 
-					_this.info.render.calls ++;
-					_this.info.render.points += offsets[ i ].count;
+					_infoRender.calls ++;
+					_infoRender.points += offsets[ i ].count;
 
 				}
 
@@ -1546,8 +1538,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_frustum.setFromMatrix( _projScreenMatrix );
 
 		lights.length = 0;
+
 		opaqueObjects.length = 0;
 		transparentObjects.length = 0;
+
+		opaqueImmediateObjects.length = 0;
+		transparentImmediateObjects.length = 0;
 
 		sprites.length = 0;
 		lensFlares.length = 0;
@@ -1570,10 +1566,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		_this.info.render.calls = 0;
-		_this.info.render.vertices = 0;
-		_this.info.render.faces = 0;
-		_this.info.render.points = 0;
+		_infoRender.calls = 0;
+		_infoRender.vertices = 0;
+		_infoRender.faces = 0;
+		_infoRender.points = 0;
 
 		this.setRenderTarget( renderTarget );
 
@@ -1583,34 +1579,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// set matrices for immediate objects
-
-		for ( var i = 0, il = objects.objectsImmediate.length; i < il; i ++ ) {
-
-			var webglObject = objects.objectsImmediate[ i ];
-			var object = webglObject.object;
-
-			if ( object.visible === true ) {
-
-				setupMatrices( object, camera );
-
-				var material = object.material;
-
-				if ( material.transparent ) {
-
-					webglObject.transparent = material;
-					webglObject.opaque = null;
-
-				} else {
-
-					webglObject.opaque = material;
-					webglObject.transparent = null;
-
-				}
-
-			}
-
-		}
+		//
 
 		if ( scene.overrideMaterial ) {
 
@@ -1618,7 +1587,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
 			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
-			renderObjectsImmediate( objects.objectsImmediate, '', camera, lights, fog, overrideMaterial );
+
+			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, overrideMaterial );
+			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, overrideMaterial );
 
 		} else {
 
@@ -1627,12 +1598,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			state.setBlending( THREE.NoBlending );
 
 			renderObjects( opaqueObjects, camera, lights, fog, null );
-			renderObjectsImmediate( objects.objectsImmediate, 'opaque', camera, lights, fog, null );
+			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, null );
 
 			// transparent pass (back-to-front order)
 
 			renderObjects( transparentObjects, camera, lights, fog, null );
-			renderObjectsImmediate( objects.objectsImmediate, 'transparent', camera, lights, fog, null );
+			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, null );
 
 		}
 
@@ -1690,6 +1661,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					lensFlares.push( object );
 
+				} else if ( object instanceof THREE.ImmediateRenderObject ) {
+
+					var material = object.material;
+
+					if ( material.transparent ) {
+
+						transparentImmediateObjects.push( object );
+
+					} else {
+
+						opaqueImmediateObjects.push( object );
+
+					}
+
 				} else {
 
 					var webglObject = objects.objects[ object.id ];
@@ -1746,7 +1731,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
 			var webglObject = renderList[ i ];
-
 			var object = webglObject.object;
 
 			setupMatrices( object, camera );
@@ -1773,18 +1757,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, overrideMaterial ) {
+	function renderObjectsImmediate( renderList, camera, lights, fog, overrideMaterial ) {
 
 		var material = overrideMaterial;
 
 		for ( var i = 0, l = renderList.length; i < l; i ++ ) {
 
-			var webglObject = renderList[ i ];
-			var object = webglObject.object;
+			var object = renderList[ i ];
+
+			setupMatrices( object, camera );
 
 			if ( object.visible === true ) {
 
-				if ( overrideMaterial === null ) material = webglObject[ materialType ];
+				if ( overrideMaterial === null ) material = object.material;
 
 				_this.renderImmediateObject( camera, lights, fog, material, object );
 
@@ -1802,15 +1787,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentGeometryProgram = '';
 
-		if ( object.immediateRenderCallback ) {
+		object.render( function ( object ) {
 
-			object.immediateRenderCallback( program, _gl, _frustum );
+			_this.renderBufferImmediate( object, program, material );
 
-		} else {
-
-			object.render( function ( object ) { _this.renderBufferImmediate( object, program, material ); } );
-
-		}
+		} );
 
 	};
 
@@ -1930,6 +1911,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		var code = chunks.join();
+		var programChange = true;
 
 		if ( !materialProperties.program ) {
 
@@ -1939,17 +1921,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( materialProperties.program.code !== code ) {
 
 			// changed glsl or parameters
-			deallocateMaterial( material );
+			releaseMaterialProgramReference( material );
 
 		} else if ( shaderID !== undefined ) {
 
-			// same glsl
+			// same glsl and uniform list
 			return;
 
-		} else if ( materialProperties.__webglShader.uniforms === material.uniforms ) {
+		} else {
 
-			// same uniforms (container object)
-			return;
+			// only rebuild uniform list
+			programChange = false;
 
 		}
 
@@ -1986,7 +1968,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( programInfo.code === code ) {
 
 				program = programInfo;
-				program.usedTimes ++;
+
+				if ( programChange ) {
+
+					program.usedTimes ++;
+
+				}
 
 				break;
 
@@ -2000,7 +1987,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			program = new THREE.WebGLProgram( _this, code, material, parameters );
 			_programs.push( program );
 
-			_this.info.memory.programs = _programs.length;
+			_infoMemory.programs = _programs.length;
 
 		}
 
@@ -2937,7 +2924,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setupMatrices ( object, camera ) {
+	function setupMatrices( object, camera ) {
 
 		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
@@ -3244,7 +3231,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			textureProperties.__webglTexture = _gl.createTexture();
 
-			_this.info.memory.textures ++;
+			_infoMemory.textures ++;
 
 		}
 
@@ -3425,7 +3412,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					textureProperties.__image__webglTextureCube = _gl.createTexture();
 
-					_this.info.memory.textures ++;
+					_infoMemory.textures ++;
 
 				}
 
@@ -3586,7 +3573,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderTargetProperties.__webglTexture = _gl.createTexture();
 
-			_this.info.memory.textures ++;
+			_infoMemory.textures ++;
 
 			// Setup texture, create render and frame buffers
 

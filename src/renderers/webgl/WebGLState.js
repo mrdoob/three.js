@@ -9,7 +9,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var newAttributes = new Uint8Array( 16 );
 	var enabledAttributes = new Uint8Array( 16 );
 
-	var switches = {};
+	var capabilities = {};
 
 	var currentBlending = null;
 	var currentBlendEquation = null;
@@ -20,7 +20,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 	var currentBlendDstAlpha = null;
 
 	var currentDepthFunc = null;
-	var currentDepthTest = null;
 	var currentDepthWrite = null;
 
 	var currentColorWrite = null;
@@ -29,7 +28,6 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	var currentLineWidth = null;
 
-	var currentPolygonOffset = null;
 	var currentPolygonOffsetFactor = null;
 	var currentPolygonOffsetUnits = null;
 
@@ -44,7 +42,7 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 		gl.clearDepth( 1 );
 		gl.clearStencil( 0 );
 
-		gl.enable( gl.DEPTH_TEST );
+		this.enable( gl.DEPTH_TEST );
 		gl.depthFunc( gl.LEQUAL );
 
 		gl.frontFace( gl.CCW );
@@ -97,10 +95,10 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	this.enable = function ( id ) {
 
-		if ( switches[ id ] !== true ) {
+		if ( capabilities[ id ] !== true ) {
 
 			gl.enable( id );
-			switches[ id ] = true;
+			capabilities[ id ] = true;
 
 		}
 
@@ -108,10 +106,10 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	this.disable = function ( id ) {
 
-		if ( switches[ id ] !== false ) {
+		if ( capabilities[ id ] !== false ) {
 
 			gl.disable( id );
-			switches[ id ] = false;
+			capabilities[ id ] = false;
 
 		}
 
@@ -270,19 +268,13 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	this.setDepthTest = function ( depthTest ) {
 
-		if ( currentDepthTest !== depthTest ) {
+		if ( depthTest ) {
 
-			if ( depthTest ) {
+			this.enable( gl.DEPTH_TEST );
 
-				gl.enable( gl.DEPTH_TEST );
+		} else {
 
-			} else {
-
-				gl.disable( gl.DEPTH_TEST );
-
-			}
-
-			currentDepthTest = depthTest;
+			this.disable( gl.DEPTH_TEST );
 
 		}
 
@@ -342,30 +334,38 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 	};
 
-	this.setPolygonOffset = function ( polygonoffset, factor, units ) {
+	this.setPolygonOffset = function ( polygonOffset, factor, units ) {
 
-		if ( currentPolygonOffset !== polygonoffset ) {
+		if ( polygonOffset ) {
 
-			if ( polygonoffset ) {
+			this.enable( gl.POLYGON_OFFSET_FILL );
 
-				gl.enable( gl.POLYGON_OFFSET_FILL );
+		} else {
 
-			} else {
-
-				gl.disable( gl.POLYGON_OFFSET_FILL );
-
-			}
-
-			currentPolygonOffset = polygonoffset;
+			this.disable( gl.POLYGON_OFFSET_FILL );
 
 		}
 
-		if ( polygonoffset && ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) ) {
+		if ( polygonOffset && ( currentPolygonOffsetFactor !== factor || currentPolygonOffsetUnits !== units ) ) {
 
 			gl.polygonOffset( factor, units );
 
 			currentPolygonOffsetFactor = factor;
 			currentPolygonOffsetUnits = units;
+
+		}
+
+	};
+
+	this.setScissorTest = function ( scissorTest ) {
+
+		if ( scissorTest ) {
+
+			this.enable( gl.SCISSOR_TEST );
+
+		} else {
+
+			this.disable( gl.SCISSOR_TEST );
 
 		}
 
@@ -394,12 +394,12 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
-		var boundTexture = currentBoundTextures[currentTextureSlot];
+		var boundTexture = currentBoundTextures[ currentTextureSlot ];
 
 		if ( boundTexture === undefined ) {
 
 			boundTexture = { type: undefined, texture: undefined };
-			currentBoundTextures[currentTextureSlot] = boundTexture;
+			currentBoundTextures[ currentTextureSlot ] = boundTexture;
 
 		}
 
@@ -457,10 +457,10 @@ THREE.WebGLState = function ( gl, paramThreeToGL ) {
 
 		}
 
-		switches = {};
+		capabilities = {};
 
 		currentBlending = null;
-		currentDepthTest = null;
+
 		currentDepthWrite = null;
 		currentColorWrite = null;
 

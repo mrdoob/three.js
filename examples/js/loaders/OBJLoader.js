@@ -26,6 +26,12 @@ THREE.OBJLoader.prototype = {
 
 	},
 
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
 	parse: function ( text ) {
 
 		console.time( 'OBJLoader' );

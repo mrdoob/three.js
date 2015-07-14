@@ -90,9 +90,8 @@
 				// PLY file
 
 				var loader = new THREE.PLYLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
-					var geometry = event.content;
 					var material = new THREE.MeshPhongMaterial( { color: 0x0055ff, specular: 0x111111, shininess: 200 } );
 					var mesh = new THREE.Mesh( geometry, material );
 
@@ -106,7 +105,6 @@
 					scene.add( mesh );
 
 				} );
-				loader.load( './models/ply/ascii/dolphins.ply' );
 
 				// Lights
 
