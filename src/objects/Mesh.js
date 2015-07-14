@@ -305,16 +305,16 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Mesh.prototype.clone = function ( recursive ) {
+THREE.Mesh.prototype.clone = function () {
 
 	var mesh = new THREE.Mesh( this.geometry, this.material );
 	return this.cloneProperties( mesh );
 
 };
 
-THREE.Mesh.prototype.cloneProperties = function ( mesh, recursive ) {
+THREE.Mesh.prototype.cloneProperties = function ( mesh ) {
 
-	THREE.Object3D.prototype.cloneProperties.call( this, mesh, recursive );
+	THREE.Object3D.prototype.cloneProperties.call( this, mesh );
 
 	return mesh;
 
