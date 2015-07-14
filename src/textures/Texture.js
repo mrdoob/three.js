@@ -90,7 +90,7 @@ THREE.Texture.prototype = {
 		texture.premultiplyAlpha = this.premultiplyAlpha;
 		texture.flipY = this.flipY;
 		texture.unpackAlignment = this.unpackAlignment;
-
+		texture._needsUpdate = this._needsUpdate;
 		return texture;
 
 	},
