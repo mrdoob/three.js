@@ -151,8 +151,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var loader = new THREE.BinaryLoader( true );
-			document.body.appendChild( loader.statusDomElement );
+			var loader = new THREE.BinaryLoader();
 
 			init();
 			animate();
@@ -494,7 +493,6 @@
 
 					if ( ! CARS[ car ].object ) {
 
-						loader.statusDomElement.style.display = "block";
 						loader.load( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) } );
 
 					} else {
@@ -570,8 +568,6 @@
 
 			function createScene( geometry, car ) {
 
-				loader.statusDomElement.innerHTML = "Creating model ...";
-
 				var m = new THREE.MeshFaceMaterial(),
 					s = CARS[ car ].scale * 1,
 					r = CARS[ car ].init_rotation,
@@ -601,9 +597,6 @@
 				attachButtonMaterials( materials.body, m, bm, car );
 
 				switchCar( car );
-
-				loader.statusDomElement.style.display = "none";
-				loader.statusDomElement.innerHTML = "Loading model ...";
 
 			}
 

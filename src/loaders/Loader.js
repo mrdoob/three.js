@@ -2,10 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Loader = function ( showStatus ) {
-
-	this.showStatus = showStatus;
-	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
+THREE.Loader = function () {
 
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function () {};
@@ -18,46 +15,6 @@ THREE.Loader.prototype = {
 	constructor: THREE.Loader,
 
 	crossOrigin: undefined,
-
-	addStatusElement: function () {
-
-		var e = document.createElement( 'div' );
-
-		e.style.position = 'absolute';
-		e.style.right = '0px';
-		e.style.top = '0px';
-		e.style.fontSize = '0.8em';
-		e.style.textAlign = 'left';
-		e.style.background = 'rgba(0,0,0,0.25)';
-		e.style.color = '#fff';
-		e.style.width = '120px';
-		e.style.padding = '0.5em 0.5em 0.5em 0.5em';
-		e.style.zIndex = 1000;
-
-		e.innerHTML = 'Loading ...';
-
-		return e;
-
-	},
-
-	updateProgress: function ( progress ) {
-
-		var message = 'Loaded ';
-
-		if ( progress.total ) {
-
-			message += ( 100 * progress.loaded / progress.total ).toFixed( 0 ) + '%';
-
-
-		} else {
-
-			message += ( progress.loaded / 1024 ).toFixed( 2 ) + ' KB';
-
-		}
-
-		this.statusDomElement.innerHTML = message;
-
-	},
 
 	extractUrlBase: function ( url ) {
 
