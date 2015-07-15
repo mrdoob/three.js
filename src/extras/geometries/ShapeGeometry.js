@@ -95,8 +95,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	// Vertices
 
-	var contour = vertices;
-
 	for ( i = 0, l = holes.length; i < l; i ++ ) {
 
 		hole = holes[ i ];

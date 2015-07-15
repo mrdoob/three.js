@@ -1944,7 +1944,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
-			}
+			};
 
 		} else {
 
@@ -1953,7 +1953,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				uniforms: material.uniforms,
 				vertexShader: material.vertexShader,
 				fragmentShader: material.fragmentShader
-			}
+			};
 
 		}
 
