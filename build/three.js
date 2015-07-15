@@ -23608,24 +23608,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function removeInstances( objlist, object ) {
-
-		for ( var o = objlist.length - 1; o >= 0; o -- ) {
-
-			if ( objlist[ o ].object === object ) {
-
-				objlist.splice( o, 1 );
-
-			}
-
-		}
-
-	}
-
 	//
 
 	this.objects = objects;
-
 	this.geometries = geometries;
 
 	this.init = function ( object ) {
@@ -23670,7 +23655,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		var geometry = geometries.get( object );
 
-		if ( object.geometry.dynamic === true ) {
+		if ( object.geometry instanceof THREE.Geometry ) {
 
 			geometry.updateFromObject( object );
 
@@ -23790,7 +23775,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		} else if ( data.updateRange.count === 0 ) {
 
-			console.error( 'THREE.WebGLRenderer.updateObject: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
+			console.error( 'THREE.WebGLObjects.updateBuffer: using updateRange for THREE.DynamicBufferAttribute and marked as needsUpdate but count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 
