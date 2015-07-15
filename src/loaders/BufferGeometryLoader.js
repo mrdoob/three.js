@@ -47,18 +47,16 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
-		var offsets = json.data.offsets;
+		var drawcalls = json.data.drawcalls || json.data.offsets;
 
-		if ( offsets !== undefined ) {
+		if ( drawcalls !== undefined ) {
 
-			var offsetsArray = JSON.parse( JSON.stringify( offsets ) );
+			for ( var i = 0, n = drawcalls.length; i !== n; ++ i ) {
 
-			for ( var i = 0; i < offsetsArray.length; i ++ ) {
-
-				var offset = offsetsArray[i];
-				var indexStart = offset.start;
-				var indexCount = offset.count;
-				var indexOffset = offset.index;
+				var drawcall = drawcallsArray[i];
+				var indexStart = drawcall.start;
+				var indexCount = drawcall.count;
+				var indexOffset = drawcall.index;
 
 				geometry.addDrawcall( indexStart, indexCount, indexOffset );
 
