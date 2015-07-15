@@ -44,10 +44,11 @@
 		<script>
 
 			var group;
-			var container, stats;
+			var container, controls, stats;
 			var particlesData = [];
 			var camera, scene, renderer;
-			var positions,colors;
+			var positions, colors;
+			var particles;
 			var pointCloud;
 			var particlePositions;
 			var linesMesh;
@@ -146,12 +147,7 @@
 
 				}
 
-				particles.drawcalls.push( {
-					start: 0,
-					count: particleCount,
-					index: 0
-				} );
-
+				particles.addDrawCall( 0, particleCount );
 				particles.addAttribute( 'position', new THREE.DynamicBufferAttribute( particlePositions, 3 ) );
 
 				// create the particle system
@@ -165,11 +161,7 @@
 
 				geometry.computeBoundingSphere();
 
-				geometry.drawcalls.push( {
-					start: 0,
-					count: 0,
-					index: 0
-				} );
+				geometry.addDrawCall( 0, 0 );
 
 				var material = new THREE.LineBasicMaterial( {
 					vertexColors: THREE.VertexColors,
