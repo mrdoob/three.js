@@ -918,10 +918,11 @@ THREE.BufferGeometry.prototype = {
 		this.reorderBuffers( sortedIndices, revVertexMap, vertexPtr );
 
 		this.clearDrawCalls();
+
 		for ( var i = 0; i < tmpOffsets.length; i ++ ) {
 
-			var offset = tmpOffsets[ i ];
-			this.addDrawCall( offset.start, offset.count, offset.index );
+			var tmpOffset = tmpOffsets[ i ];
+			this.addDrawCall( tmpOffset.start, tmpOffset.count, tmpOffset.index );
 
 		}
 
