@@ -561,7 +561,7 @@ THREE.BufferGeometry.prototype = {
 
 				if ( this.drawcalls.length === 0 ) {
 
-					this.addDrawCall( 0, indices.length, 0 );
+					this.addDrawCall( 0, indices.length );
 
 				}
 
@@ -746,7 +746,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( this.drawcalls.length === 0 ) {
 
-			this.addDrawCall( 0, indices.length, 0 );
+			this.addDrawCall( 0, indices.length );
 
 		}
 

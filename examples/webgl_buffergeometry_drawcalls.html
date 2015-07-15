@@ -147,7 +147,7 @@
 
 				}
 
-				particles.addDrawCall( 0, particleCount, 0 );
+				particles.addDrawCall( 0, particleCount );
 				particles.addAttribute( 'position', new THREE.DynamicBufferAttribute( particlePositions, 3 ) );
 
 				// create the particle system
@@ -161,7 +161,7 @@
 
 				geometry.computeBoundingSphere();
 
-				geometry.addDrawCall( 0, 0, 0 );
+				geometry.addDrawCall( 0, 0 );
 
 				var material = new THREE.LineBasicMaterial( {
 					vertexColors: THREE.VertexColors,

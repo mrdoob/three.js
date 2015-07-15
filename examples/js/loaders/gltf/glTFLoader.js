@@ -104,7 +104,7 @@ THREE.glTFLoader.prototype.load = function( url, callback ) {
 		var geometry = this.geometry;
 
 		geometry.addAttribute( 'index', new THREE.BufferAttribute( this.indexArray, 1 ) );
-		geometry.addDrawCall( 0, this.indexArray.length, 0 );
+		geometry.addDrawCall( 0, this.indexArray.length );
 
 		geometry.computeBoundingSphere();
 	};

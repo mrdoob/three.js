@@ -699,7 +699,7 @@
 						attrib = new THREE.BufferAttribute( buffer, 1 );
 						geom.addAttribute( 'index', attrib );
 
-						geom.addDrawCall( 0, str_len / 2, 0 );
+						geom.addDrawCall( 0, str_len / 2 );
 
 						idx = 0;
 

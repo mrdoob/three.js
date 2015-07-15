@@ -160,7 +160,7 @@
 				}
 
 				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
-				geometry.addDrawCall( 0, indices.length, 0 );
+				geometry.addDrawCall( 0, indices.length );
 
 				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 				var pointcloud = new THREE.PointCloud( geometry, material );
