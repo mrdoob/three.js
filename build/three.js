@@ -16063,10 +16063,11 @@ THREE.TextureIdCount = 0;
 THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 	mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
-	
+
 	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.images = images;
+	this.flipY = false;
 
 };
 
@@ -26333,10 +26334,6 @@ THREE.ImageUtils = {
 		loader.crossOrigin = this.crossOrigin;
 
 		var texture = new THREE.CubeTexture( images, mapping );
-
-		// no flipping needed for cube textures
-
-		texture.flipY = false;
 
 		var loaded = 0;
 
