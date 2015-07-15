@@ -544,20 +544,14 @@ THREE.Object3D.prototype = {
 			this.matrixWorld.copy( this.matrix );
 
 		} else {
-			
-			var matrix;
-			if ( noUpdatingParent === true ) {
+
+			if ( noUpdatingParent !== true ) {
 				
-				matrix = this.matrixWorld;
-				
-			} else {
-				
-				matrix = this.parent.updateMatrixWorld();
+				this.parent.updateMatrixWorld();
 				
 			}
-			
 
-			this.matrixWorld.multiplyMatrices( matrix , this.matrix );
+			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld , this.matrix );
 
 		}
 		
