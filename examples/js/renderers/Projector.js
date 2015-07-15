@@ -392,7 +392,7 @@ THREE.Projector = function () {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var attributes = geometry.attributes;
-					var offsets = geometry.offsets;
+					var offsets = geometry.drawcalls;
 
 					if ( attributes.position === undefined ) continue;
 

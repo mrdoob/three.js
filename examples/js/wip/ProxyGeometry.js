@@ -744,7 +744,7 @@ THREE.ProxyGeometry.prototype.clone = function () {
 	var buff = THREE.BufferGeometry.prototype.clone.call(this);
 	var geo = new THREE.ProxyGeometry();
 	geo.attributes = buff.attributes;
-	geo.offsets = buff.offsets;
+	geo.offsets = buff.drawcalls;
 
 	return geo;
 

@@ -1064,7 +1064,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var offsets = geometry.offsets;
+			var offsets = geometry.drawcalls;
 
 			if ( offsets.length === 0 ) {
 
@@ -1149,7 +1149,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// non-indexed triangles
 
-			var offsets = geometry.offsets;
+			var offsets = geometry.drawcalls;
 
 			if ( offsets.length === 0 ) {
 
@@ -1270,7 +1270,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var offsets = geometry.offsets;
+			var offsets = geometry.drawcalls;
 
 			if ( offsets.length === 0 ) {
 
@@ -1327,7 +1327,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			var position = geometry.attributes.position;
-			var offsets = geometry.offsets;
+			var offsets = geometry.drawcalls;
 
 			if ( offsets.length === 0 ) {
 
@@ -1379,7 +1379,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			var offsets = geometry.offsets;
+			var offsets = geometry.drawcalls;
 
 			if ( offsets.length === 0 ) {
 
@@ -1436,7 +1436,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			var position = geometry.attributes.position;
-			var offsets = geometry.offsets;
+			var offsets = geometry.drawcalls;
 
 			if ( offsets.length === 0 ) {
 
