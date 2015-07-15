@@ -22,9 +22,15 @@ THREE.WebGLGeometries = function ( gl, info ) {
 
 			geometries[ geometry.id ] = geometry;
 
-		} else {
+		} else if ( geometry instanceof THREE.Geometry ) {
 
-			geometries[ geometry.id ] = new THREE.BufferGeometry().setFromObject( object );
+			if ( object._bufferGeometry === undefined ) {
+
+				object._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+
+			}
+
+			geometries[ geometry.id ] = object._bufferGeometry;
 
 		}
 
