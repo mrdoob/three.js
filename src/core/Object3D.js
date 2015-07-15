@@ -534,38 +534,6 @@ THREE.Object3D.prototype = {
 		this.matrixWorldNeedsUpdate = true;
 
 	},
-
-	updateWorldMatrices: function ( force ) {
-
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
-
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
-
-			if ( this.parent === undefined ) {
-
-				this.matrixWorld.copy( this.matrix );
-
-			} else {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-			}
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// update children
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].updateWorldMatrices( force );
-
-		}
-
-	},
 	
 	updateMatrixWorld: function (recursive, noUpdatingParent) {
 
