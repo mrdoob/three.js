@@ -82,7 +82,7 @@ THREE.Object3D.prototype = {
 
 	get eulerOrder () {
 
-		THREE.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		return this.rotation.order;
 
@@ -90,7 +90,7 @@ THREE.Object3D.prototype = {
 
 	set eulerOrder ( value ) {
 
-		THREE.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		this.rotation.order = value;
 
@@ -98,15 +98,21 @@ THREE.Object3D.prototype = {
 
 	get useQuaternion () {
 
-		THREE.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
 	set useQuaternion ( value ) {
 
-		THREE.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
+
+	set renderDepth ( value ) {
+
+		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
+
+ 	},
 
 	applyMatrix: function ( matrix ) {
 
@@ -222,7 +228,7 @@ THREE.Object3D.prototype = {
 
 	translate: function ( distance, axis ) {
 
-		THREE.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
+		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
 		return this.translateOnAxis( axis, distance );
 
 	},
@@ -369,7 +375,7 @@ THREE.Object3D.prototype = {
 
 	getChildByName: function ( name ) {
 
-		THREE.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
+		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name );
 
 	},
@@ -568,13 +574,11 @@ THREE.Object3D.prototype = {
 		
 	},
 
-	toJSON: function( meta ) {
+	toJSON: function ( meta ) {
 
 		var isRootObject = ( meta === undefined );
 
-		// we will store all serialization data on 'data'
 		var data = {};
-		var metadata;
 
 		// meta is a hash used to collect geometries, materials.
 		// not providing it implies that this is the root object
@@ -584,15 +588,16 @@ THREE.Object3D.prototype = {
 			// initialize meta obj
 			meta = {
 				geometries: {},
-				materials: {}
+				materials: {},
+				textures: {},
+				images: {}
 			};
 
-			// add metadata
-			metadata = {
+			data.metadata = {
 				version: 4.4,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
-			}
+			};
 
 		}
 
@@ -600,6 +605,7 @@ THREE.Object3D.prototype = {
 
 		data.uuid = this.uuid;
 		data.type = this.type;
+
 		if ( this.name !== '' ) data.name = this.name;
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 		if ( this.visible !== true ) data.visible = this.visible;
@@ -618,19 +624,19 @@ THREE.Object3D.prototype = {
 
 		}
 
-		// wrap serialized object with additional data
-
 		var output = {};
 
 		if ( isRootObject ) {
 
-			output.metadata = metadata;
-
 			var geometries = extractFromCache( meta.geometries );
 			var materials = extractFromCache( meta.materials );
+			var textures = extractFromCache( meta.textures );
+			var images = extractFromCache( meta.images );
 
 			if ( geometries.length > 0 ) output.geometries = geometries;
 			if ( materials.length > 0 ) output.materials = materials;
+			if ( textures.length > 0 ) output.textures = textures;
+			if ( images.length > 0 ) output.images = images;
 
 		}
 
