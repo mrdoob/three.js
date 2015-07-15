@@ -201,7 +201,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				scene.add( light.shadowCamera );
 
-				if ( scene.autoUpdate === true ) scene.updateWorldMatrices();
+				if ( scene.autoUpdate === true ) scene.updateMatrixWorld(true);
 
 			}
 
