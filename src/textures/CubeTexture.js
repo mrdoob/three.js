@@ -10,6 +10,8 @@ THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilt
 
 	this.images = images;
 
+    this.flipY = false;
+
 };
 
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );

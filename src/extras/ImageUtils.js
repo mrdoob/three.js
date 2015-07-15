@@ -43,10 +43,6 @@ THREE.ImageUtils = {
 
 		var texture = new THREE.CubeTexture( images, mapping );
 
-		// no flipping needed for cube textures
-
-		texture.flipY = false;
-
 		var loaded = 0;
 
 		var loadTexture = function ( i ) {
