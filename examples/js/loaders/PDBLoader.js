@@ -27,6 +27,12 @@ THREE.PDBLoader.prototype = {
 
 	},
 
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
 	// Based on CanvasMol PDB parser
 
 	parsePDB: function ( text ) {

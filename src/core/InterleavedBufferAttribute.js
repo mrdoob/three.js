@@ -4,6 +4,8 @@
 
 THREE.InterleavedBufferAttribute = function ( interleavedBuffer, itemSize, offset ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
 	this.offset = offset;
@@ -17,7 +19,14 @@ THREE.InterleavedBufferAttribute.prototype = {
 
 	get length() {
 
-		return this.itemSize * this.data.array.length / this.data.stride;
+		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
+		return this.array.length;
+
+	},
+
+	get count() {
+
+		return this.data.array.length / this.data.stride;
 
 	},
 

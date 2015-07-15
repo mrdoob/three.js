@@ -69,11 +69,11 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 	}
 
-	// THREE.log(this);
+	// console.log(this);
 
 	// magic bullet
 	// var diff = this.mergeVertices();
-	// THREE.log('removed ', diff, ' vertices by merging');
+	// console.log('removed ', diff, ' vertices by merging');
 
 	this.computeFaceNormals();
 	this.computeVertexNormals();

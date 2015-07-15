@@ -210,7 +210,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.moveVector.y = ( -this.moveState.down    + this.moveState.up );
 		this.moveVector.z = ( -forward + this.moveState.back );
 
-		//THREE.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
+		//console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
 
 	};
 
@@ -220,7 +220,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.rotationVector.y = ( -this.moveState.yawRight  + this.moveState.yawLeft );
 		this.rotationVector.z = ( -this.moveState.rollRight + this.moveState.rollLeft );
 
-		//THREE.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
+		//console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
 
 	};
 

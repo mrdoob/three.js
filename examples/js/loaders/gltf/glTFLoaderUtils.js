@@ -43,12 +43,12 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
         enumerable: false,
         value: function(resourceID, resource) {
 	if (!resourceID) {
-		THREE.log("ERROR: entry does not contain id, cannot store");
+		console.log("ERROR: entry does not contain id, cannot store");
 		return;
 	}
 
 	if (this._containsResource[resourceID]) {
-		THREE.log("WARNING: resource:" + resourceID + " is already stored, overriding");
+		console.log("WARNING: resource:" + resourceID + " is already stored, overriding");
 	}
 
 	this._resources[resourceID] = resource;

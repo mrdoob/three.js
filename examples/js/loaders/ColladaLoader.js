@@ -3,7 +3,8 @@
 * @author Tony Parisi / http://www.tonyparisi.com/
 */
 
-THREE.ColladaLoader = function () {
+
+(function(){
 
 	var COLLADA = null;
 	var scene = null;
@@ -33,6 +34,10 @@ THREE.ColladaLoader = function () {
 	var flip_uv = true;
 	var preferredShading = THREE.SmoothShading;
 
+	var colladaUnit = 1.0;
+	var colladaUp = 'Y';
+	var upConversion = null;
+
 	var options = {
 		// Force Geometry to always be centered at the local origin of the
 		// containing Mesh.
@@ -52,1423 +57,689 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	var colladaUnit = 1.0;
-	var colladaUp = 'Y';
-	var upConversion = null;
+	THREE.ColladaLoader = function ( manager ) {
 
-	function load ( url, readyCallback, progressCallback, failCallback ) {
+		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-		var length = 0;
+		/*
 
-		if ( document.implementation && document.implementation.createDocument ) {
+		return {
 
-			var request = new XMLHttpRequest();
+			load: load,
+			parse: parse,
+			setPreferredShading: setPreferredShading,
+			applySkin: applySkin,
+			geometries : geometries,
+			options: options
 
-			request.onreadystatechange = function() {
+		};
 
-				if ( request.readyState === 4 ) {
+		*/
 
-					if ( request.status === 0 || request.status === 200 ) {
+	};
 
+	THREE.ColladaLoader.prototype = {
 
-						if ( request.responseXML ) {
+		constructor: THREE.ColladaLoader,
 
-							readyCallbackFunc = readyCallback;
-							parse( request.responseXML, undefined, url );
+		options: options, //hack
 
-						} else if ( request.responseText ) {
+		load: function ( url, onLoad, onProgress, onError ) {
 
-							readyCallbackFunc = readyCallback;
-							var xmlParser = new DOMParser();
-							var responseXML = xmlParser.parseFromString( request.responseText, "application/xml" );
-							parse( responseXML, undefined, url );
+			var length = 0;
 
-						} else {
+			if ( document.implementation && document.implementation.createDocument ) {
 
-							if ( failCallback ) {
+				var scope = this;
 
-								failCallback();
+				var loader = new THREE.XHRLoader( this.manager );
+				loader.setCrossOrigin( this.crossOrigin );
+				loader.load( url, function ( text ) {
 
-							} else {
+					var xmlParser = new DOMParser();
+					var responseXML = xmlParser.parseFromString( text, "application/xml" );
+					onLoad( scope.parse( responseXML, url ) );
 
-								THREE.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
+				}, onProgress, onError );
+
+			} else {
+
+				alert( "Don't know how to parse XML!" );
+
+			}
+
+		},
+
+		setCrossOrigin: function ( value ) {
+
+			this.crossOrigin = value;
+
+		},
+
+		parse: function( doc, url ) {
+
+			COLLADA = doc;
+
+			if ( url !== undefined ) {
+
+				var parts = url.split( '/' );
+				parts.pop();
+				baseUrl = ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+
+			}
+
+			this.parseAsset();
+			this.setUpConversion();
+			images = this.parseLib( "library_images image", _Image, "image" );
+			materials = this.parseLib( "library_materials material", Material, "material" );
+			effects = this.parseLib( "library_effects effect", Effect, "effect" );
+			geometries = this.parseLib( "library_geometries geometry", Geometry, "geometry" );
+			cameras = this.parseLib( "library_cameras camera", Camera, "camera" );
+			lights = this.parseLib( "library_lights light", Light, "light" );
+			controllers = this.parseLib( "library_controllers controller", Controller, "controller" );
+			animations = this.parseLib( "library_animations animation", Animation, "animation" );
+			visualScenes = this.parseLib( "library_visual_scenes visual_scene", VisualScene, "visual_scene" );
+			kinematicsModels = this.parseLib( "library_kinematics_models kinematics_model", KinematicsModel, "kinematics_model" );
+
+			morphs = [];
+			skins = [];
+
+			visualScene = this.parseScene();
+			scene = new THREE.Group();
+
+			for ( var i = 0; i < visualScene.nodes.length; i ++ ) {
+
+				scene.add( createSceneGraph( visualScene.nodes[ i ] ) );
+
+			}
+
+			// unit conversion
+			scene.scale.multiplyScalar( colladaUnit );
+
+			this.createAnimations();
+
+			kinematicsModel = this.parseKinematicsModel();
+			this.createKinematics();
+
+			var result = {
+				scene: scene,
+				morphs: morphs,
+				skins: skins,
+				animations: animData,
+				kinematics: kinematics,
+				dae: {
+					images: images,
+					materials: materials,
+					cameras: cameras,
+					lights: lights,
+					effects: effects,
+					geometries: geometries,
+					controllers: controllers,
+					animations: animations,
+					visualScenes: visualScenes,
+					visualScene: visualScene,
+					scene: visualScene,
+					kinematicsModels: kinematicsModels,
+					kinematicsModel: kinematicsModel
+				}
+			};
+
+			return result;
+
+		},
+
+		setPreferredShading: function ( shading ) {
+
+			preferredShading = shading;
+
+		},
+
+		parseAsset: function () {
+
+			var elements = COLLADA.querySelectorAll('asset');
+
+			var element = elements[0];
+
+			if ( element && element.childNodes ) {
+
+				for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+					var child = element.childNodes[ i ];
+
+					switch ( child.nodeName ) {
+
+						case 'unit':
+
+							var meter = child.getAttribute( 'meter' );
+
+							if ( meter ) {
+
+								colladaUnit = parseFloat( meter );
 
 							}
 
-						}
+							break;
 
-					}
+						case 'up_axis':
 
-				} else if ( request.readyState === 3 ) {
-
-					if ( progressCallback ) {
-
-						if ( length === 0 ) {
-
-							length = request.getResponseHeader( "Content-Length" );
-
-						}
-
-						progressCallback( { total: length, loaded: request.responseText.length } );
+							colladaUp = child.textContent.charAt(0);
+							break;
 
 					}
 
 				}
 
-			};
-
-			request.open( "GET", url, true );
-			request.send( null );
-
-		} else {
-
-			alert( "Don't know how to parse XML!" );
-
-		}
-
-	}
-
-	function parse( doc, callBack, url ) {
-
-		COLLADA = doc;
-		callBack = callBack || readyCallbackFunc;
-
-		if ( url !== undefined ) {
-
-			var parts = url.split( '/' );
-			parts.pop();
-			baseUrl = ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
-
-		}
-
-		parseAsset();
-		setUpConversion();
-		images = parseLib( "library_images image", _Image, "image" );
-		materials = parseLib( "library_materials material", Material, "material" );
-		effects = parseLib( "library_effects effect", Effect, "effect" );
-		geometries = parseLib( "library_geometries geometry", Geometry, "geometry" );
-		cameras = parseLib( "library_cameras camera", Camera, "camera" );
-		lights = parseLib( "library_lights light", Light, "light" );
-		controllers = parseLib( "library_controllers controller", Controller, "controller" );
-		animations = parseLib( "library_animations animation", Animation, "animation" );
-		visualScenes = parseLib( "library_visual_scenes visual_scene", VisualScene, "visual_scene" );
-		kinematicsModels = parseLib( "library_kinematics_models kinematics_model", KinematicsModel, "kinematics_model" );
-
-		morphs = [];
-		skins = [];
-
-		visualScene = parseScene();
-		scene = new THREE.Group();
-
-		for ( var i = 0; i < visualScene.nodes.length; i ++ ) {
-
-			scene.add( createSceneGraph( visualScene.nodes[ i ] ) );
-
-		}
-
-		// unit conversion
-		scene.scale.multiplyScalar( colladaUnit );
-
-		createAnimations();
-
-		kinematicsModel = parseKinematicsModel();
-		createKinematics();
-
-		var result = {
-
-			scene: scene,
-			morphs: morphs,
-			skins: skins,
-			animations: animData,
-			kinematics: kinematics,
-			dae: {
-				images: images,
-				materials: materials,
-				cameras: cameras,
-				lights: lights,
-				effects: effects,
-				geometries: geometries,
-				controllers: controllers,
-				animations: animations,
-				visualScenes: visualScenes,
-				visualScene: visualScene,
-				scene: visualScene,
-				kinematicsModels: kinematicsModels,
-				kinematicsModel: kinematicsModel
 			}
 
-		};
+		},
 
-		if ( callBack ) {
+		parseLib: function ( q, classSpec, prefix ) {
 
-			callBack( result );
+			var elements = COLLADA.querySelectorAll(q);
 
-		}
+			var lib = {};
 
-		return result;
+			var i = 0;
 
-	}
+			var elementsLength = elements.length;
 
-	function setPreferredShading ( shading ) {
+			for ( var j = 0; j < elementsLength; j ++ ) {
 
-		preferredShading = shading;
+				var element = elements[j];
+				var daeElement = ( new classSpec() ).parse( element );
 
-	}
-
-	function parseAsset () {
-
-		var elements = COLLADA.querySelectorAll('asset');
-
-		var element = elements[0];
-
-		if ( element && element.childNodes ) {
-
-			for ( var i = 0; i < element.childNodes.length; i ++ ) {
-
-				var child = element.childNodes[ i ];
-
-				switch ( child.nodeName ) {
-
-					case 'unit':
-
-						var meter = child.getAttribute( 'meter' );
-
-						if ( meter ) {
-
-							colladaUnit = parseFloat( meter );
-
-						}
-
-						break;
-
-					case 'up_axis':
-
-						colladaUp = child.textContent.charAt(0);
-						break;
-
-				}
+				if ( !daeElement.id || daeElement.id.length === 0 ) daeElement.id = prefix + ( i ++ );
+				lib[ daeElement.id ] = daeElement;
 
 			}
 
-		}
+			return lib;
 
-	}
+		},
 
-	function parseLib ( q, classSpec, prefix ) {
+		parseScene: function () {
 
-		var elements = COLLADA.querySelectorAll(q);
+			var sceneElement = COLLADA.querySelectorAll('scene instance_visual_scene')[0];
 
-		var lib = {};
+			if ( sceneElement ) {
 
-		var i = 0;
+				var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
+				return visualScenes[ url.length > 0 ? url : 'visual_scene0' ];
 
-		var elementsLength = elements.length;
+			} else {
 
-		for ( var j = 0; j < elementsLength; j ++ ) {
-
-			var element = elements[j];
-			var daeElement = ( new classSpec() ).parse( element );
-
-			if ( !daeElement.id || daeElement.id.length === 0 ) daeElement.id = prefix + ( i ++ );
-			lib[ daeElement.id ] = daeElement;
-
-		}
-
-		return lib;
-
-	}
-
-	function parseScene() {
-
-		var sceneElement = COLLADA.querySelectorAll('scene instance_visual_scene')[0];
-
-		if ( sceneElement ) {
-
-			var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
-			return visualScenes[ url.length > 0 ? url : 'visual_scene0' ];
-
-		} else {
-
-			return null;
-
-		}
-
-	}
-
-	function parseKinematicsModel() {
-
-		var kinematicsModelElement = COLLADA.querySelectorAll('instance_kinematics_model')[0];
-
-		if ( kinematicsModelElement ) {
-
-			var url = kinematicsModelElement.getAttribute( 'url' ).replace(/^#/, '');
-			return kinematicsModels[ url.length > 0 ? url : 'kinematics_model0' ];
-
-		} else {
-
-			return null;
-
-		}
-
-	}
-
-	function createAnimations() {
-
-		animData = [];
-
-		// fill in the keys
-		recurseHierarchy( scene );
-
-	}
-
-	function recurseHierarchy( node ) {
-
-		var n = visualScene.getChildById( node.colladaId, true ),
-			newData = null;
-
-		if ( n && n.keys ) {
-
-			newData = {
-				fps: 60,
-				hierarchy: [ {
-					node: n,
-					keys: n.keys,
-					sids: n.sids
-				} ],
-				node: node,
-				name: 'animation_' + node.name,
-				length: 0
-			};
-
-			animData.push(newData);
-
-			for ( var i = 0, il = n.keys.length; i < il; i ++ ) {
-
-				newData.length = Math.max( newData.length, n.keys[i].time );
+				return null;
 
 			}
 
-		} else {
+		},
 
-			newData = {
-				hierarchy: [ {
-					keys: [],
-					sids: []
-				} ]
-			}
+		parseKinematicsModel: function () {
 
-		}
+			var kinematicsModelElement = COLLADA.querySelectorAll('instance_kinematics_model')[0];
 
-		for ( var i = 0, il = node.children.length; i < il; i ++ ) {
+			if ( kinematicsModelElement ) {
 
-			var d = recurseHierarchy( node.children[i] );
+				var url = kinematicsModelElement.getAttribute( 'url' ).replace(/^#/, '');
+				return kinematicsModels[ url.length > 0 ? url : 'kinematics_model0' ];
 
-			for ( var j = 0, jl = d.hierarchy.length; j < jl; j ++ ) {
+			} else {
 
-				newData.hierarchy.push( {
-					keys: [],
-					sids: []
-				} );
+				return null;
 
 			}
 
-		}
+		},
 
-		return newData;
+		createAnimations: function () {
 
-	}
+			animData = [];
 
-	function calcAnimationBounds () {
+			// fill in the keys
+			recurseHierarchy( scene );
 
-		var start = 1000000;
-		var end = -start;
-		var frames = 0;
-		var ID;
-		for ( var id in animations ) {
+		},
 
-			var animation = animations[ id ];
-			ID = ID || animation.id;
-			for ( var i = 0; i < animation.sampler.length; i ++ ) {
+		recurseHierarchy: function ( node ) {
 
-				var sampler = animation.sampler[ i ];
+			var n = visualScene.getChildById( node.colladaId, true ),
+				newData = null;
 
-				sampler.create();
+			if ( n && n.keys ) {
 
-				start = Math.min( start, sampler.startTime );
-				end = Math.max( end, sampler.endTime );
-				frames = Math.max( frames, sampler.input.length );
+				newData = {
+					fps: 60,
+					hierarchy: [ {
+						node: n,
+						keys: n.keys,
+						sids: n.sids
+					} ],
+					node: node,
+					name: 'animation_' + node.name,
+					length: 0
+				};
 
-			}
+				animData.push(newData);
 
-		}
+				for ( var i = 0, il = n.keys.length; i < il; i++ ) {
 
-		return { start:start, end:end, frames:frames,ID:ID };
-
-	}
-
-	function createMorph ( geometry, ctrl ) {
-
-		var morphCtrl = ctrl instanceof InstanceController ? controllers[ ctrl.url ] : ctrl;
-
-		if ( !morphCtrl || !morphCtrl.morph ) {
-
-			THREE.log("could not find morph controller!");
-			return;
-
-		}
-
-		var morph = morphCtrl.morph;
-
-		for ( var i = 0; i < morph.targets.length; i ++ ) {
-
-			var target_id = morph.targets[ i ];
-			var daeGeometry = geometries[ target_id ];
-
-			if ( !daeGeometry.mesh ||
-				 !daeGeometry.mesh.primitives ||
-				 !daeGeometry.mesh.primitives.length ) {
-				 continue;
-			}
-
-			var target = daeGeometry.mesh.primitives[ 0 ].geometry;
-
-			if ( target.vertices.length === geometry.vertices.length ) {
-
-				geometry.morphTargets.push( { name: "target_1", vertices: target.vertices } );
-
-			}
-
-		}
-
-		geometry.morphTargets.push( { name: "target_Z", vertices: geometry.vertices } );
-
-	}
-
-	function createSkin ( geometry, ctrl, applyBindShape ) {
-
-		var skinCtrl = controllers[ ctrl.url ];
-
-		if ( !skinCtrl || !skinCtrl.skin ) {
-
-			THREE.log( "could not find skin controller!" );
-			return;
-
-		}
-
-		if ( !ctrl.skeleton || !ctrl.skeleton.length ) {
-
-			THREE.log( "could not find the skeleton for the skin!" );
-			return;
-
-		}
-
-		var skin = skinCtrl.skin;
-		var skeleton = visualScene.getChildById( ctrl.skeleton[ 0 ] );
-		var hierarchy = [];
-
-		applyBindShape = applyBindShape !== undefined ? applyBindShape : true;
-
-		var bones = [];
-		geometry.skinWeights = [];
-		geometry.skinIndices = [];
-
-		//createBones( geometry.bones, skin, hierarchy, skeleton, null, -1 );
-		//createWeights( skin, geometry.bones, geometry.skinIndices, geometry.skinWeights );
-
-		/*
-		geometry.animation = {
-			name: 'take_001',
-			fps: 30,
-			length: 2,
-			JIT: true,
-			hierarchy: hierarchy
-		};
-		*/
-
-		if ( applyBindShape ) {
-
-			for ( var i = 0; i < geometry.vertices.length; i ++ ) {
-
-				geometry.vertices[ i ].applyMatrix4( skin.bindShapeMatrix );
-
-			}
-
-		}
-
-	}
-
-	function setupSkeleton ( node, bones, frame, parent ) {
-
-		node.world = node.world || new THREE.Matrix4();
-		node.localworld = node.localworld || new THREE.Matrix4();
-		node.world.copy( node.matrix );
-		node.localworld.copy( node.matrix );
-
-		if ( node.channels && node.channels.length ) {
-
-			var channel = node.channels[ 0 ];
-			var m = channel.sampler.output[ frame ];
-
-			if ( m instanceof THREE.Matrix4 ) {
-
-				node.world.copy( m );
-				node.localworld.copy(m);
-				if (frame === 0)
-					node.matrix.copy(m);
-			}
-
-		}
-
-		if ( parent ) {
-
-			node.world.multiplyMatrices( parent, node.world );
-
-		}
-
-		bones.push( node );
-
-		for ( var i = 0; i < node.nodes.length; i ++ ) {
-
-			setupSkeleton( node.nodes[ i ], bones, frame, node.world );
-
-		}
-
-	}
-
-	function setupSkinningMatrices ( bones, skin ) {
-
-		// FIXME: this is dumb...
-
-		for ( var i = 0; i < bones.length; i ++ ) {
-
-			var bone = bones[ i ];
-			var found = -1;
-
-			if ( bone.type != 'JOINT' ) continue;
-
-			for ( var j = 0; j < skin.joints.length; j ++ ) {
-
-				if ( bone.sid === skin.joints[ j ] ) {
-
-					found = j;
-					break;
-
-				}
-
-			}
-
-			if ( found >= 0 ) {
-
-				var inv = skin.invBindMatrices[ found ];
-
-				bone.invBindMatrix = inv;
-				bone.skinningMatrix = new THREE.Matrix4();
-				bone.skinningMatrix.multiplyMatrices(bone.world, inv); // (IBMi * JMi)
-				bone.animatrix = new THREE.Matrix4();
-
-				bone.animatrix.copy(bone.localworld);
-				bone.weights = [];
-
-				for ( var j = 0; j < skin.weights.length; j ++ ) {
-
-					for (var k = 0; k < skin.weights[ j ].length; k ++ ) {
-
-						var w = skin.weights[ j ][ k ];
-
-						if ( w.joint === found ) {
-
-							bone.weights.push( w );
-
-						}
-
-					}
+					newData.length = Math.max( newData.length, n.keys[i].time );
 
 				}
 
 			} else {
 
-				THREE.warn( "ColladaLoader: Could not find joint '" + bone.sid + "'." );
-
-				bone.skinningMatrix = new THREE.Matrix4();
-				bone.weights = [];
-
-			}
-		}
-
-	}
-
-	//Walk the Collada tree and flatten the bones into a list, extract the position, quat and scale from the matrix
-	function flattenSkeleton(skeleton) {
-
-		var list = [];
-		var walk = function(parentid, node, list) {
-
-			var bone = {};
-			bone.name = node.sid;
-			bone.parent = parentid;
-			bone.matrix = node.matrix;
-			var data = [ new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3() ];
-			bone.matrix.decompose(data[0], data[1], data[2]);
-
-			bone.pos = [ data[0].x,data[0].y,data[0].z ];
-
-			bone.scl = [ data[2].x,data[2].y,data[2].z ];
-			bone.rotq = [ data[1].x,data[1].y,data[1].z,data[1].w ];
-			list.push(bone);
-
-			for (var i in node.nodes) {
-
-				walk(node.sid, node.nodes[i], list);
+				newData = {
+					hierarchy: [ {
+						keys: [],
+						sids: []
+					} ]
+				}
 
 			}
 
-		};
+			for ( var i = 0, il = node.children.length; i < il; i++ ) {
 
-		walk(-1, skeleton, list);
-		return list;
+				var d = recurseHierarchy( node.children[i] );
 
-	}
+				for ( var j = 0, jl = d.hierarchy.length; j < jl; j ++ ) {
 
-	//Move the vertices into the pose that is proper for the start of the animation
-	function skinToBindPose(geometry,skeleton,skinController) {
-
-		var bones = [];
-		setupSkeleton( skeleton, bones, -1 );
-		setupSkinningMatrices( bones, skinController.skin );
-		v = new THREE.Vector3();
-		var skinned = [];
-
-		for (var i = 0; i < geometry.vertices.length; i ++) {
-
-			skinned.push(new THREE.Vector3());
-
-		}
-
-		for ( i = 0; i < bones.length; i ++ ) {
-
-			if ( bones[ i ].type != 'JOINT' ) continue;
-
-			for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
-
-				w = bones[ i ].weights[ j ];
-				vidx = w.index;
-				weight = w.weight;
-
-				o = geometry.vertices[vidx];
-				s = skinned[vidx];
-
-				v.x = o.x;
-				v.y = o.y;
-				v.z = o.z;
-
-				v.applyMatrix4( bones[i].skinningMatrix );
-
-				s.x += (v.x * weight);
-				s.y += (v.y * weight);
-				s.z += (v.z * weight);
-			}
-
-		}
-
-		for (var i = 0; i < geometry.vertices.length; i ++) {
-
-			geometry.vertices[i] = skinned[i];
-
-		}
-
-	}
-
-	function applySkin ( geometry, instanceCtrl, frame ) {
-
-		var skinController = controllers[ instanceCtrl.url ];
-
-		frame = frame !== undefined ? frame : 40;
-
-		if ( !skinController || !skinController.skin ) {
-
-			THREE.log( 'ColladaLoader: Could not find skin controller.' );
-			return;
-
-		}
-
-		if ( !instanceCtrl.skeleton || !instanceCtrl.skeleton.length ) {
-
-			THREE.log( 'ColladaLoader: Could not find the skeleton for the skin. ' );
-			return;
-
-		}
-
-		var animationBounds = calcAnimationBounds();
-		var skeleton = visualScene.getChildById( instanceCtrl.skeleton[0], true ) || visualScene.getChildBySid( instanceCtrl.skeleton[0], true );
-
-		//flatten the skeleton into a list of bones
-		var bonelist = flattenSkeleton(skeleton);
-		var joints = skinController.skin.joints;
-
-		//sort that list so that the order reflects the order in the joint list
-		var sortedbones = [];
-		for (var i = 0; i < joints.length; i ++) {
-
-			for (var j = 0; j < bonelist.length; j ++) {
-
-				if (bonelist[j].name === joints[i]) {
-
-					sortedbones[i] = bonelist[j];
+					newData.hierarchy.push( {
+						keys: [],
+						sids: []
+					} );
 
 				}
 
 			}
 
-		}
+			return newData;
 
-		//hook up the parents by index instead of name
-		for (var i = 0; i < sortedbones.length; i ++) {
+		},
 
-			for (var j = 0; j < sortedbones.length; j ++) {
+		createMorph: function ( geometry, ctrl ) {
 
-				if (sortedbones[i].parent === sortedbones[j].name) {
+			var morphCtrl = ctrl instanceof InstanceController ? controllers[ ctrl.url ] : ctrl;
 
-					sortedbones[i].parent = j;
+			if ( !morphCtrl || !morphCtrl.morph ) {
+
+				console.log("could not find morph controller!");
+				return;
+
+			}
+
+			var morph = morphCtrl.morph;
+
+			for ( var i = 0; i < morph.targets.length; i ++ ) {
+
+				var target_id = morph.targets[ i ];
+				var daeGeometry = geometries[ target_id ];
+
+				if ( !daeGeometry.mesh ||
+					 !daeGeometry.mesh.primitives ||
+					 !daeGeometry.mesh.primitives.length ) {
+					 continue;
+				}
+
+				var target = daeGeometry.mesh.primitives[ 0 ].geometry;
+
+				if ( target.vertices.length === geometry.vertices.length ) {
+
+					geometry.morphTargets.push( { name: "target_1", vertices: target.vertices } );
 
 				}
 
 			}
 
-		}
+			geometry.morphTargets.push( { name: "target_Z", vertices: geometry.vertices } );
 
+		},
 
-		var i, j, w, vidx, weight;
-		var v = new THREE.Vector3(), o, s;
+		createSkin: function ( geometry, ctrl, applyBindShape ) {
 
-		// move vertices to bind shape
-		for ( i = 0; i < geometry.vertices.length; i ++ ) {
-			geometry.vertices[i].applyMatrix4( skinController.skin.bindShapeMatrix );
-		}
+			var skinCtrl = controllers[ ctrl.url ];
 
-		var skinIndices = [];
-		var skinWeights = [];
-		var weights = skinController.skin.weights;
+			if ( !skinCtrl || !skinCtrl.skin ) {
 
-		// hook up the skin weights
-		// TODO - this might be a good place to choose greatest 4 weights
-		for ( var i =0; i < weights.length; i ++ ) {
+				console.log( "could not find skin controller!" );
+				return;
 
-			var indicies = new THREE.Vector4(weights[i][0] ? weights[i][0].joint : 0,weights[i][1] ? weights[i][1].joint : 0,weights[i][2] ? weights[i][2].joint : 0,weights[i][3] ? weights[i][3].joint : 0);
-			var weight = new THREE.Vector4(weights[i][0] ? weights[i][0].weight : 0,weights[i][1] ? weights[i][1].weight : 0,weights[i][2] ? weights[i][2].weight : 0,weights[i][3] ? weights[i][3].weight : 0);
+			}
 
-			skinIndices.push(indicies);
-			skinWeights.push(weight);
+			if ( !ctrl.skeleton || !ctrl.skeleton.length ) {
 
-		}
+				console.log( "could not find the skeleton for the skin!" );
+				return;
 
-		geometry.skinIndices = skinIndices;
-		geometry.skinWeights = skinWeights;
-		geometry.bones = sortedbones;
-		// process animation, or simply pose the rig if no animation
+			}
 
-		//create an animation for the animated bones
-		//NOTE: this has no effect when using morphtargets
-		var animationdata = { "name":animationBounds.ID,"fps":30,"length":animationBounds.frames / 30,"hierarchy":[] };
+			var skin = skinCtrl.skin;
+			var skeleton = visualScene.getChildById( ctrl.skeleton[ 0 ] );
+			var hierarchy = [];
 
-		for (var j = 0; j < sortedbones.length; j ++) {
-
-			animationdata.hierarchy.push({ parent:sortedbones[j].parent, name:sortedbones[j].name, keys:[] });
-
-		}
-
-		THREE.log( 'ColladaLoader:', animationBounds.ID + ' has ' + sortedbones.length + ' bones.' );
-
-
-
-		skinToBindPose(geometry, skeleton, skinController);
-
-
-		for ( frame = 0; frame < animationBounds.frames; frame ++ ) {
+			applyBindShape = applyBindShape !== undefined ? applyBindShape : true;
 
 			var bones = [];
-			var skinned = [];
-			// process the frame and setup the rig with a fresh
-			// transform, possibly from the bone's animation channel(s)
+			geometry.skinWeights = [];
+			geometry.skinIndices = [];
 
-			setupSkeleton( skeleton, bones, frame );
-			setupSkinningMatrices( bones, skinController.skin );
+			//createBones( geometry.bones, skin, hierarchy, skeleton, null, -1 );
+			//createWeights( skin, geometry.bones, geometry.skinIndices, geometry.skinWeights );
 
-			for (var i = 0; i < bones.length; i ++) {
+			/*
+			geometry.animation = {
+				name: 'take_001',
+				fps: 30,
+				length: 2,
+				JIT: true,
+				hierarchy: hierarchy
+			};
+			*/
 
-				for (var j = 0; j < animationdata.hierarchy.length; j ++) {
+			if ( applyBindShape ) {
 
-					if (animationdata.hierarchy[j].name === bones[i].sid) {
+				for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
-						var key = {};
-						key.time = (frame / 30);
-						key.matrix = bones[i].animatrix;
-
-						if (frame === 0)
-							bones[i].matrix = key.matrix;
-
-						var data = [ new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3() ];
-						key.matrix.decompose(data[0], data[1], data[2]);
-
-						key.pos = [ data[0].x,data[0].y,data[0].z ];
-
-						key.scl = [ data[2].x,data[2].y,data[2].z ];
-						key.rot = data[1];
-
-						animationdata.hierarchy[j].keys.push(key);
-
-					}
+					geometry.vertices[ i ].applyMatrix4( skin.bindShapeMatrix );
 
 				}
 
 			}
 
-			geometry.animation = animationdata;
+		},
 
-		}
+		createKinematics: function () {
 
-	}
+			if ( kinematicsModel && kinematicsModel.joints.length === 0 ) {
+				kinematics = undefined;
+				return;
+			}
 
-	function createKinematics() {
+			var jointMap = {};
 
-		if ( kinematicsModel && kinematicsModel.joints.length === 0 ) {
-			kinematics = undefined;
-			return;
-		}
+			var _addToMap = function( jointIndex, parentVisualElement ) {
 
-		var jointMap = {};
+				var parentVisualElementId = parentVisualElement.getAttribute( 'id' );
+				var colladaNode = visualScene.getChildById( parentVisualElementId, true );
+				var joint = kinematicsModel.joints[ jointIndex ];
 
-		var _addToMap = function( jointIndex, parentVisualElement ) {
+				scene.traverse(function( node ) {
 
-			var parentVisualElementId = parentVisualElement.getAttribute( 'id' );
-			var colladaNode = visualScene.getChildById( parentVisualElementId, true );
-			var joint = kinematicsModel.joints[ jointIndex ];
+					if ( node.colladaId == parentVisualElementId ) {
 
-			scene.traverse(function( node ) {
+						jointMap[ jointIndex ] = {
+							node: node,
+							transforms: colladaNode.transforms,
+							joint: joint,
+							position: joint.zeroPosition
+						};
 
-				if ( node.colladaId == parentVisualElementId ) {
+					}
 
-					jointMap[ jointIndex ] = {
-						node: node,
-						transforms: colladaNode.transforms,
-						joint: joint,
-						position: joint.zeroPosition
-					};
+				});
 
-				}
+			};
 
-			});
+			kinematics = {
 
-		};
+				joints: kinematicsModel && kinematicsModel.joints,
 
-		kinematics = {
+				getJointValue: function( jointIndex ) {
 
-			joints: kinematicsModel && kinematicsModel.joints,
+					var jointData = jointMap[ jointIndex ];
 
-			getJointValue: function( jointIndex ) {
+					if ( jointData ) {
 
-				var jointData = jointMap[ jointIndex ];
-
-				if ( jointData ) {
-
-					return jointData.position;
-
-				} else {
-
-					THREE.log( 'getJointValue: joint ' + jointIndex + ' doesn\'t exist' );
-
-				}
-
-			},
-
-			setJointValue: function( jointIndex, value ) {
-
-				var jointData = jointMap[ jointIndex ];
-
-				if ( jointData ) {
-
-					var joint = jointData.joint;
-
-					if ( value > joint.limits.max || value < joint.limits.min ) {
-
-						THREE.log( 'setJointValue: joint ' + jointIndex + ' value ' + value + ' outside of limits (min: ' + joint.limits.min + ', max: ' + joint.limits.max + ')' );
-
-					} else if ( joint.static ) {
-
-						THREE.log( 'setJointValue: joint ' + jointIndex + ' is static' );
+						return jointData.position;
 
 					} else {
 
-						var threejsNode = jointData.node;
-						var axis = joint.axis;
-						var transforms = jointData.transforms;
+						console.log( 'getJointValue: joint ' + jointIndex + ' doesn\'t exist' );
 
-						var matrix = new THREE.Matrix4();
+					}
 
-						for (i = 0; i < transforms.length; i ++ ) {
+				},
 
-							var transform = transforms[ i ];
+				setJointValue: function( jointIndex, value ) {
 
-							// kinda ghetto joint detection
-							if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== -1 ) {
+					var jointData = jointMap[ jointIndex ];
 
-								// apply actual joint value here
-								switch ( joint.type ) {
+					if ( jointData ) {
 
-									case 'revolute':
+						var joint = jointData.joint;
 
-										matrix.multiply( m1.makeRotationAxis( axis, THREE.Math.degToRad(value) ) );
-										break;
+						if ( value > joint.limits.max || value < joint.limits.min ) {
 
-									case 'prismatic':
+							console.log( 'setJointValue: joint ' + jointIndex + ' value ' + value + ' outside of limits (min: ' + joint.limits.min + ', max: ' + joint.limits.max + ')' );
 
-										matrix.multiply( m1.makeTranslation(axis.x * value, axis.y * value, axis.z * value ) );
-										break;
+						} else if ( joint.static ) {
 
-									default:
+							console.log( 'setJointValue: joint ' + jointIndex + ' is static' );
 
-										THREE.warn( 'setJointValue: unknown joint type: ' + joint.type );
-										break;
+						} else {
 
-								}
+							var threejsNode = jointData.node;
+							var axis = joint.axis;
+							var transforms = jointData.transforms;
 
-							} else {
+							var matrix = new THREE.Matrix4();
 
-								var m1 = new THREE.Matrix4();
+							for (i = 0; i < transforms.length; i++ ) {
 
-								switch ( transform.type ) {
+								var transform = transforms[ i ];
 
-									case 'matrix':
+								// kinda ghetto joint detection
+								if ( transform.sid && transform.sid.indexOf( 'joint' + jointIndex ) !== -1 ) {
 
-										matrix.multiply( transform.obj );
+									// apply actual joint value here
+									switch ( joint.type ) {
 
-										break;
+										case 'revolute':
 
-									case 'translate':
+											matrix.multiply( m1.makeRotationAxis( axis, THREE.Math.degToRad(value) ) );
+											break;
 
-										matrix.multiply( m1.makeTranslation( transform.obj.x, transform.obj.y, transform.obj.z ) );
+										case 'prismatic':
 
-										break;
+											matrix.multiply( m1.makeTranslation(axis.x * value, axis.y * value, axis.z * value ) );
+											break;
 
-									case 'rotate':
+										default:
 
-										matrix.multiply( m1.makeRotationAxis( transform.obj, transform.angle ) );
+											console.warn( 'setJointValue: unknown joint type: ' + joint.type );
+											break;
 
-										break;
+									}
 
+								} else {
+
+									var m1 = new THREE.Matrix4();
+
+									switch ( transform.type ) {
+
+										case 'matrix':
+
+											matrix.multiply( transform.obj );
+
+											break;
+
+										case 'translate':
+
+											matrix.multiply( m1.makeTranslation( transform.obj.x, transform.obj.y, transform.obj.z ) );
+
+											break;
+
+										case 'rotate':
+
+											matrix.multiply( m1.makeRotationAxis( transform.obj, transform.angle ) );
+
+											break;
+
+									}
 								}
 							}
+
+							// apply the matrix to the threejs node
+							var elementsFloat32Arr = matrix.elements;
+							var elements = Array.prototype.slice.call( elementsFloat32Arr );
+
+							var elementsRowMajor = [
+								elements[ 0 ],
+								elements[ 4 ],
+								elements[ 8 ],
+								elements[ 12 ],
+								elements[ 1 ],
+								elements[ 5 ],
+								elements[ 9 ],
+								elements[ 13 ],
+								elements[ 2 ],
+								elements[ 6 ],
+								elements[ 10 ],
+								elements[ 14 ],
+								elements[ 3 ],
+								elements[ 7 ],
+								elements[ 11 ],
+								elements[ 15 ]
+							];
+
+							threejsNode.matrix.set.apply( threejsNode.matrix, elementsRowMajor );
+							threejsNode.matrix.decompose( threejsNode.position, threejsNode.quaternion, threejsNode.scale );
 						}
 
-						// apply the matrix to the threejs node
-						var elementsFloat32Arr = matrix.elements;
-						var elements = Array.prototype.slice.call( elementsFloat32Arr );
+					} else {
 
-						var elementsRowMajor = [
-							elements[ 0 ],
-							elements[ 4 ],
-							elements[ 8 ],
-							elements[ 12 ],
-							elements[ 1 ],
-							elements[ 5 ],
-							elements[ 9 ],
-							elements[ 13 ],
-							elements[ 2 ],
-							elements[ 6 ],
-							elements[ 10 ],
-							elements[ 14 ],
-							elements[ 3 ],
-							elements[ 7 ],
-							elements[ 11 ],
-							elements[ 15 ]
-						];
-
-						threejsNode.matrix.set.apply( threejsNode.matrix, elementsRowMajor );
-						threejsNode.matrix.decompose( threejsNode.position, threejsNode.quaternion, threejsNode.scale );
-					}
-
-				} else {
-
-					THREE.log( 'setJointValue: joint ' + jointIndex + ' doesn\'t exist' );
-
-				}
-
-			}
-
-		};
-
-		var element = COLLADA.querySelector('scene instance_kinematics_scene');
-
-		if ( element ) {
-
-			for ( var i = 0; i < element.childNodes.length; i ++ ) {
-
-				var child = element.childNodes[ i ];
-
-				if ( child.nodeType != 1 ) continue;
-
-				switch ( child.nodeName ) {
-
-					case 'bind_joint_axis':
-
-						var visualTarget = child.getAttribute( 'target' ).split( '/' ).pop();
-						var axis = child.querySelector('axis param').textContent;
-						var jointIndex = parseInt( axis.split( 'joint' ).pop().split( '.' )[0] );
-						var visualTargetElement = COLLADA.querySelector( '[sid="' + visualTarget + '"]' );
-
-						if ( visualTargetElement ) {
-							var parentVisualElement = visualTargetElement.parentElement;
-							_addToMap(jointIndex, parentVisualElement);
-						}
-
-						break;
-
-					default:
-
-						break;
-
-				}
-
-			}
-		}
-
-	}
-
-	function createSceneGraph ( node, parent ) {
-
-		var obj = new THREE.Object3D();
-		var skinned = false;
-		var skinController;
-		var morphController;
-		var i, j;
-
-		// FIXME: controllers
-
-		for ( i = 0; i < node.controllers.length; i ++ ) {
-
-			var controller = controllers[ node.controllers[ i ].url ];
-
-			switch ( controller.type ) {
-
-				case 'skin':
-
-					if ( geometries[ controller.skin.source ] ) {
-
-						var inst_geom = new InstanceGeometry();
-
-						inst_geom.url = controller.skin.source;
-						inst_geom.instance_material = node.controllers[ i ].instance_material;
-
-						node.geometries.push( inst_geom );
-						skinned = true;
-						skinController = node.controllers[ i ];
-
-					} else if ( controllers[ controller.skin.source ] ) {
-
-						// urgh: controller can be chained
-						// handle the most basic case...
-
-						var second = controllers[ controller.skin.source ];
-						morphController = second;
-					//	skinController = node.controllers[i];
-
-						if ( second.morph && geometries[ second.morph.source ] ) {
-
-							var inst_geom = new InstanceGeometry();
-
-							inst_geom.url = second.morph.source;
-							inst_geom.instance_material = node.controllers[ i ].instance_material;
-
-							node.geometries.push( inst_geom );
-
-						}
+						console.log( 'setJointValue: joint ' + jointIndex + ' doesn\'t exist' );
 
 					}
 
-					break;
-
-				case 'morph':
-
-					if ( geometries[ controller.morph.source ] ) {
-
-						var inst_geom = new InstanceGeometry();
-
-						inst_geom.url = controller.morph.source;
-						inst_geom.instance_material = node.controllers[ i ].instance_material;
-
-						node.geometries.push( inst_geom );
-						morphController = node.controllers[ i ];
-
-					}
-
-					THREE.log( 'ColladaLoader: Morph-controller partially supported.' );
-
-				default:
-					break;
-
-			}
-
-		}
-
-		// geometries
-
-		var double_sided_materials = {};
-
-		for ( i = 0; i < node.geometries.length; i ++ ) {
-
-			var instance_geometry = node.geometries[i];
-			var instance_materials = instance_geometry.instance_material;
-			var geometry = geometries[ instance_geometry.url ];
-			var used_materials = {};
-			var used_materials_array = [];
-			var num_materials = 0;
-			var first_material;
-
-			if ( geometry ) {
-
-				if ( !geometry.mesh || !geometry.mesh.primitives )
-					continue;
-
-				if ( obj.name.length === 0 ) {
-
-					obj.name = geometry.id;
-
 				}
 
-				// collect used fx for this geometry-instance
+			};
 
-				if ( instance_materials ) {
+			var element = COLLADA.querySelector('scene instance_kinematics_scene');
 
-					for ( j = 0; j < instance_materials.length; j ++ ) {
+			if ( element ) {
 
-						var instance_material = instance_materials[ j ];
-						var mat = materials[ instance_material.target ];
-						var effect_id = mat.instance_effect.url;
-						var shader = effects[ effect_id ].shader;
-						var material3js = shader.material;
+				for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-						if ( geometry.doubleSided ) {
+					var child = element.childNodes[ i ];
 
-							if ( !( instance_material.symbol in double_sided_materials ) ) {
+					if ( child.nodeType != 1 ) continue;
 
-								var _copied_material = material3js.clone();
-								_copied_material.side = THREE.DoubleSide;
-								double_sided_materials[ instance_material.symbol ] = _copied_material;
+					switch ( child.nodeName ) {
 
+						case 'bind_joint_axis':
+
+							var visualTarget = child.getAttribute( 'target' ).split( '/' ).pop();
+							var axis = child.querySelector('axis param').textContent;
+							var jointIndex = parseInt( axis.split( 'joint' ).pop().split( '.' )[0] );
+							var visualTargetElement = COLLADA.querySelector( '[sid="' + visualTarget + '"]' );
+
+							if ( visualTargetElement ) {
+								var parentVisualElement = visualTargetElement.parentElement;
+								_addToMap(jointIndex, parentVisualElement);
 							}
 
-							material3js = double_sided_materials[ instance_material.symbol ];
+							break;
+
+						default:
+
+							break;
+
+					}
+
+				}
+			}
+
+		},
+
+		getJointId: function ( skin, id ) {
+
+			for ( var i = 0; i < skin.joints.length; i ++ ) {
+
+				if ( skin.joints[ i ] === id ) {
+
+					return i;
+
+				}
+
+			}
+
+		},
+
+		calcFrameDuration: function ( node ) {
+
+			var minT = 10000000;
+
+			for ( var i = 0; i < node.channels.length; i ++ ) {
+
+				var sampler = node.channels[i].sampler;
+
+				for ( var j = 0; j < sampler.input.length - 1; j ++ ) {
+
+					var t0 = sampler.input[ j ];
+					var t1 = sampler.input[ j + 1 ];
+					minT = Math.min( minT, t1 - t0 );
+
+				}
+			}
+
+			return minT;
+
+		},
+
+		calcMatrixAt: function ( node, t ) {
+
+			var animated = {};
+
+			var i, j;
+
+			for ( i = 0; i < node.channels.length; i ++ ) {
+
+				var channel = node.channels[ i ];
+				animated[ channel.sid ] = channel;
+
+			}
+
+			var matrix = new THREE.Matrix4();
+
+			for ( i = 0; i < node.transforms.length; i ++ ) {
+
+				var transform = node.transforms[ i ];
+				var channel = animated[ transform.sid ];
+
+				if ( channel !== undefined ) {
+
+					var sampler = channel.sampler;
+					var value;
+
+					for ( j = 0; j < sampler.input.length - 1; j ++ ) {
+
+						if ( sampler.input[ j + 1 ] > t ) {
+
+							value = sampler.output[ j ];
+							//console.log(value.flatten)
+							break;
 
 						}
 
-						material3js.opacity = !material3js.opacity ? 1 : material3js.opacity;
-						used_materials[ instance_material.symbol ] = num_materials;
-						used_materials_array.push( material3js );
-						first_material = material3js;
-						first_material.name = mat.name === null || mat.name === '' ? mat.id : mat.name;
-						num_materials ++;
-
 					}
 
-				}
+					if ( value !== undefined ) {
 
-				var mesh;
-				var material = first_material || new THREE.MeshLambertMaterial( { color: 0xdddddd, side: geometry.doubleSided ? THREE.DoubleSide : THREE.FrontSide } );
-				var geom = geometry.mesh.geometry3js;
+						if ( value instanceof THREE.Matrix4 ) {
 
-				if ( num_materials > 1 ) {
+							matrix.multiplyMatrices( matrix, value );
 
-					material = new THREE.MeshFaceMaterial( used_materials_array );
+						} else {
 
-				}
+							// FIXME: handle other types
 
-				if ( skinController !== undefined ) {
+							matrix.multiplyMatrices( matrix, transform.matrix );
 
-
-					applySkin( geom, skinController );
-
-					if ( geom.morphTargets.length > 0 ) {
-
-						material.morphTargets = true;
-						material.skinning = false;
+						}
 
 					} else {
-
-						material.morphTargets = false;
-						material.skinning = true;
-
-					}
-
-
-					mesh = new THREE.SkinnedMesh( geom, material, false );
-
-
-					//mesh.skeleton = skinController.skeleton;
-					//mesh.skinController = controllers[ skinController.url ];
-					//mesh.skinInstanceController = skinController;
-					mesh.name = 'skin_' + skins.length;
-
-
-
-					//mesh.animationHandle.setKey(0);
-					skins.push( mesh );
-
-				} else if ( morphController !== undefined ) {
-
-					createMorph( geom, morphController );
-
-					material.morphTargets = true;
-
-					mesh = new THREE.Mesh( geom, material );
-					mesh.name = 'morph_' + morphs.length;
-
-					morphs.push( mesh );
-
-				} else {
-
-					if ( geom.isLineStrip === true ) {
-
-						mesh = new THREE.Line( geom );
-
-					} else {
-
-						mesh = new THREE.Mesh( geom, material );
-
-					}
-
-				}
-
-				obj.add(mesh);
-
-			}
-
-		}
-
-		for ( i = 0; i < node.cameras.length; i ++ ) {
-
-			var instance_camera = node.cameras[i];
-			var cparams = cameras[instance_camera.url];
-
-			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio),
-					parseFloat(cparams.znear), parseFloat(cparams.zfar));
-
-			obj.add(cam);
-		}
-
-		for ( i = 0; i < node.lights.length; i ++ ) {
-
-			var light = null;
-			var instance_light = node.lights[i];
-			var lparams = lights[instance_light.url];
-
-			if ( lparams && lparams.technique ) {
-
-				var color = lparams.color.getHex();
-				var intensity = lparams.intensity;
-				var distance = lparams.distance;
-				var angle = lparams.falloff_angle;
-				var exponent; // Intentionally undefined, don't know what this is yet
-
-				switch ( lparams.technique ) {
-
-					case 'directional':
-
-						light = new THREE.DirectionalLight( color, intensity, distance );
-						light.position.set(0, 0, 1);
-						break;
-
-					case 'point':
-
-						light = new THREE.PointLight( color, intensity, distance );
-						break;
-
-					case 'spot':
-
-						light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
-						light.position.set(0, 0, 1);
-						break;
-
-					case 'ambient':
-
-						light = new THREE.AmbientLight( color );
-						break;
-
-				}
-
-			}
-
-			if (light) {
-				obj.add(light);
-			}
-		}
-
-		obj.name = node.name || node.id || "";
-		obj.colladaId = node.id || "";
-		obj.layer = node.layer || "";
-		obj.matrix = node.matrix;
-		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
-
-		if ( options.centerGeometry && obj.geometry ) {
-
-			var delta = obj.geometry.center();
-			delta.multiply( obj.scale );
-			delta.applyQuaternion( obj.quaternion );
-
-			obj.position.sub( delta );
-
-		}
-
-		for ( i = 0; i < node.nodes.length; i ++ ) {
-
-			obj.add( createSceneGraph( node.nodes[i], node ) );
-
-		}
-
-		return obj;
-
-	}
-
-	function getJointId( skin, id ) {
-
-		for ( var i = 0; i < skin.joints.length; i ++ ) {
-
-			if ( skin.joints[ i ] === id ) {
-
-				return i;
-
-			}
-
-		}
-
-	}
-
-	function getLibraryNode( id ) {
-
-		var nodes = COLLADA.querySelectorAll('library_nodes node');
-
-		for ( var i = 0; i < nodes.length; i++ ) {
-
-			var attObj = nodes[i].attributes.getNamedItem('id');
-
-			if ( attObj && attObj.value === id ) {
-
-				return nodes[i];
-
-			}
-
-		}
-
-		return undefined;
-
-	}
-
-	function getChannelsForNode ( node ) {
-
-		var channels = [];
-		var startTime = 1000000;
-		var endTime = -1000000;
-
-		for ( var id in animations ) {
-
-			var animation = animations[id];
-
-			for ( var i = 0; i < animation.channel.length; i ++ ) {
-
-				var channel = animation.channel[i];
-				var sampler = animation.sampler[i];
-				var id = channel.target.split('/')[0];
-
-				if ( id == node.id ) {
-
-					sampler.create();
-					channel.sampler = sampler;
-					startTime = Math.min(startTime, sampler.startTime);
-					endTime = Math.max(endTime, sampler.endTime);
-					channels.push(channel);
-
-				}
-
-			}
-
-		}
-
-		if ( channels.length ) {
-
-			node.startTime = startTime;
-			node.endTime = endTime;
-
-		}
-
-		return channels;
-
-	}
-
-	function calcFrameDuration( node ) {
-
-		var minT = 10000000;
-
-		for ( var i = 0; i < node.channels.length; i ++ ) {
-
-			var sampler = node.channels[i].sampler;
-
-			for ( var j = 0; j < sampler.input.length - 1; j ++ ) {
-
-				var t0 = sampler.input[ j ];
-				var t1 = sampler.input[ j + 1 ];
-				minT = Math.min( minT, t1 - t0 );
-
-			}
-		}
-
-		return minT;
-
-	}
-
-	function calcMatrixAt( node, t ) {
-
-		var animated = {};
-
-		var i, j;
-
-		for ( i = 0; i < node.channels.length; i ++ ) {
-
-			var channel = node.channels[ i ];
-			animated[ channel.sid ] = channel;
-
-		}
-
-		var matrix = new THREE.Matrix4();
-
-		for ( i = 0; i < node.transforms.length; i ++ ) {
-
-			var transform = node.transforms[ i ];
-			var channel = animated[ transform.sid ];
-
-			if ( channel !== undefined ) {
-
-				var sampler = channel.sampler;
-				var value;
-
-				for ( j = 0; j < sampler.input.length - 1; j ++ ) {
-
-					if ( sampler.input[ j + 1 ] > t ) {
-
-						value = sampler.output[ j ];
-						//THREE.log(value.flatten)
-						break;
-
-					}
-
-				}
-
-				if ( value !== undefined ) {
-
-					if ( value instanceof THREE.Matrix4 ) {
-
-						matrix.multiplyMatrices( matrix, value );
-
-					} else {
-
-						// FIXME: handle other types
 
 						matrix.multiplyMatrices( matrix, transform.matrix );
 
@@ -1480,241 +751,53 @@ THREE.ColladaLoader = function () {
 
 				}
 
-			} else {
-
-				matrix.multiplyMatrices( matrix, transform.matrix );
-
 			}
 
-		}
+			return matrix;
 
-		return matrix;
+		},
 
-	}
+		// Up axis conversion
+		setUpConversion: function () {
 
-	function bakeAnimations ( node ) {
+			if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
 
-		if ( node.channels && node.channels.length ) {
-
-			var keys = [],
-				sids = [];
-
-			for ( var i = 0, il = node.channels.length; i < il; i ++ ) {
-
-				var channel = node.channels[i],
-					fullSid = channel.fullSid,
-					sampler = channel.sampler,
-					input = sampler.input,
-					transform = node.getTransformBySid( channel.sid ),
-					member;
-
-				if ( channel.arrIndices ) {
-
-					member = [];
-
-					for ( var j = 0, jl = channel.arrIndices.length; j < jl; j ++ ) {
-
-						member[ j ] = getConvertedIndex( channel.arrIndices[ j ] );
-
-					}
-
-				} else {
-
-					member = getConvertedMember( channel.member );
-
-				}
-
-				if ( transform ) {
-
-					if ( sids.indexOf( fullSid ) === -1 ) {
-
-						sids.push( fullSid );
-
-					}
-
-					for ( var j = 0, jl = input.length; j < jl; j ++ ) {
-
-						var time = input[j],
-							data = sampler.getData( transform.type, j, member ),
-							key = findKey( keys, time );
-
-						if ( !key ) {
-
-							key = new Key( time );
-							var timeNdx = findTimeNdx( keys, time );
-							keys.splice( timeNdx === -1 ? keys.length : timeNdx, 0, key );
-
-						}
-
-						key.addTarget( fullSid, transform, member, data );
-
-					}
-
-				} else {
-
-					THREE.log( 'Could not find transform "' + channel.sid + '" in node ' + node.id );
-
-				}
-
-			}
-
-			// post process
-			for ( var i = 0; i < sids.length; i ++ ) {
-
-				var sid = sids[ i ];
-
-				for ( var j = 0; j < keys.length; j ++ ) {
-
-					var key = keys[ j ];
-
-					if ( !key.hasTarget( sid ) ) {
-
-						interpolateKeys( keys, key, j, sid );
-
-					}
-
-				}
-
-			}
-
-			node.keys = keys;
-			node.sids = sids;
-
-		}
-
-	}
-
-	function findKey ( keys, time) {
-
-		var retVal = null;
-
-		for ( var i = 0, il = keys.length; i < il && retVal === null; i ++ ) {
-
-			var key = keys[i];
-
-			if ( key.time === time ) {
-
-				retVal = key;
-
-			} else if ( key.time > time ) {
-
-				break;
-
-			}
-
-		}
-
-		return retVal;
-
-	}
-
-	function findTimeNdx ( keys, time) {
-
-		var ndx = -1;
-
-		for ( var i = 0, il = keys.length; i < il && ndx === -1; i ++ ) {
-
-			var key = keys[i];
-
-			if ( key.time >= time ) {
-
-				ndx = i;
-
-			}
-
-		}
-
-		return ndx;
-
-	}
-
-	function interpolateKeys ( keys, key, ndx, fullSid ) {
-
-		var prevKey = getPrevKeyWith( keys, fullSid, ndx ? ndx - 1 : 0 ),
-			nextKey = getNextKeyWith( keys, fullSid, ndx + 1 );
-
-		if ( prevKey && nextKey ) {
-
-			var scale = (key.time - prevKey.time) / (nextKey.time - prevKey.time),
-				prevTarget = prevKey.getTarget( fullSid ),
-				nextData = nextKey.getTarget( fullSid ).data,
-				prevData = prevTarget.data,
-				data;
-
-			if ( prevTarget.type === 'matrix' ) {
-
-				data = prevData;
-
-			} else if ( prevData.length ) {
-
-				data = [];
-
-				for ( var i = 0; i < prevData.length; ++ i ) {
-
-					data[ i ] = prevData[ i ] + ( nextData[ i ] - prevData[ i ] ) * scale;
-
-				}
+				upConversion = null;
 
 			} else {
 
-				data = prevData + ( nextData - prevData ) * scale;
+				switch ( colladaUp ) {
 
-			}
+					case 'X':
 
-			key.addTarget( fullSid, prevTarget.transform, prevTarget.member, data );
+						upConversion = options.upAxis === 'Y' ? 'XtoY' : 'XtoZ';
+						break;
 
-		}
+					case 'Y':
 
-	}
+						upConversion = options.upAxis === 'X' ? 'YtoX' : 'YtoZ';
+						break;
 
-	// Get next key with given sid
+					case 'Z':
 
-	function getNextKeyWith( keys, fullSid, ndx ) {
+						upConversion = options.upAxis === 'X' ? 'ZtoX' : 'ZtoY';
+						break;
 
-		for ( ; ndx < keys.length; ndx ++ ) {
-
-			var key = keys[ ndx ];
-
-			if ( key.hasTarget( fullSid ) ) {
-
-				return key;
-
-			}
-
-		}
-
-		return null;
-
-	}
-
-	// Get previous key with given sid
-
-	function getPrevKeyWith( keys, fullSid, ndx ) {
-
-		ndx = ndx >= 0 ? ndx : ndx + keys.length;
-
-		for ( ; ndx >= 0; ndx -- ) {
-
-			var key = keys[ ndx ];
-
-			if ( key.hasTarget( fullSid ) ) {
-
-				return key;
+				}
 
 			}
 
 		}
 
-		return null;
 
-	}
+	};
 
 	function _Image() {
 
 		this.id = "";
 		this.init_from = "";
 
-	}
+	};
 
 	_Image.prototype.parse = function(element) {
 
@@ -1744,7 +827,7 @@ THREE.ColladaLoader = function () {
 		this.skin = null;
 		this.morph = null;
 
-	}
+	};
 
 	Controller.prototype.parse = function( element ) {
 
@@ -1752,7 +835,7 @@ THREE.ColladaLoader = function () {
 		this.name = element.getAttribute('name');
 		this.type = "none";
 
-		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+		for ( var i = 0; i < element.childNodes.length; i++ ) {
 
 			var child = element.childNodes[ i ];
 
@@ -1787,7 +870,7 @@ THREE.ColladaLoader = function () {
 		this.targets = null;
 		this.weights = null;
 
-	}
+	};
 
 	Morph.prototype.parse = function( element ) {
 
@@ -1818,7 +901,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -1885,7 +968,7 @@ THREE.ColladaLoader = function () {
 		this.joints = [];
 		this.weights = [];
 
-	}
+	};
 
 	Skin.prototype.parse = function( element ) {
 
@@ -1928,7 +1011,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -2015,7 +1098,7 @@ THREE.ColladaLoader = function () {
 			var numBones = vcount[i];
 			var vertex_weights = [];
 
-			for ( var j = 0; j < numBones; j ++ ) {
+			for ( var j = 0; j < numBones; j++ ) {
 
 				var influence = {};
 
@@ -2066,7 +1149,7 @@ THREE.ColladaLoader = function () {
 		this.nodes = [];
 		this.scene = new THREE.Group();
 
-	}
+	};
 
 	VisualScene.prototype.getChildById = function( id, recursive ) {
 
@@ -2145,7 +1228,7 @@ THREE.ColladaLoader = function () {
 		this.channels = [];
 		this.matrix = new THREE.Matrix4();
 
-	}
+	};
 
 	Node.prototype.getChannelForTransform = function( transformSid ) {
 
@@ -2339,7 +1422,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -2374,7 +1457,7 @@ THREE.ColladaLoader = function () {
 		this.data = [];
 		this.obj = null;
 
-	}
+	};
 
 	Transform.prototype.parse = function ( element ) {
 
@@ -2413,7 +1496,7 @@ THREE.ColladaLoader = function () {
 				break;
 
 			default:
-				THREE.log( 'Can not convert Transform of type ' + this.type );
+				console.log( 'Can not convert Transform of type ' + this.type );
 				break;
 
 		}
@@ -2519,7 +1602,7 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					THREE.log('Incorrect addressing of matrix in transform.');
+					console.log('Incorrect addressing of matrix in transform.');
 
 				}
 
@@ -2613,7 +1696,7 @@ THREE.ColladaLoader = function () {
 		this.skeleton = [];
 		this.instance_material = [];
 
-	}
+	};
 
 	InstanceController.prototype.parse = function ( element ) {
 
@@ -2637,7 +1720,7 @@ THREE.ColladaLoader = function () {
 
 					var instances = child.querySelectorAll('instance_material');
 
-					for ( var j = 0; j < instances.length; j ++ ) {
+					for ( var j = 0; j < instances.length; j ++ ){
 
 						var instance = instances[j];
 						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
@@ -2665,7 +1748,7 @@ THREE.ColladaLoader = function () {
 		this.symbol = "";
 		this.target = "";
 
-	}
+	};
 
 	InstanceMaterial.prototype.parse = function ( element ) {
 
@@ -2680,7 +1763,7 @@ THREE.ColladaLoader = function () {
 		this.url = "";
 		this.instance_material = [];
 
-	}
+	};
 
 	InstanceGeometry.prototype.parse = function ( element ) {
 
@@ -2718,7 +1801,7 @@ THREE.ColladaLoader = function () {
 		this.id = "";
 		this.mesh = null;
 
-	}
+	};
 
 	Geometry.prototype.parse = function ( element ) {
 
@@ -2739,7 +1822,7 @@ THREE.ColladaLoader = function () {
 
 				case 'extra':
 
-					// THREE.log( child );
+					// console.log( child );
 					break;
 
 				default:
@@ -2758,7 +1841,7 @@ THREE.ColladaLoader = function () {
 		this.vertices = null;
 		this.geometry3js = null;
 
-	}
+	};
 
 	Mesh.prototype.parse = function ( element ) {
 
@@ -2866,7 +1949,7 @@ THREE.ColladaLoader = function () {
 			input = inputs[ j ];
 
 			var offset = input.offset + 1;
-			maxOffset = (maxOffset < offset) ? offset : maxOffset;
+			maxOffset = (maxOffset < offset)? offset : maxOffset;
 
 			switch ( input.semantic ) {
 
@@ -2878,7 +1961,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		for ( var pCount = 0; pCount < pList.length; ++ pCount ) {
+		for ( var pCount = 0; pCount < pList.length; ++pCount ) {
 
 			var p = pList[ pCount ], i = 0;
 
@@ -2960,7 +2043,7 @@ THREE.ColladaLoader = function () {
 						source = sources[ input.source ];
 						numParams = source.accessor.params.length;
 
-						for ( var ndx = 0, len = vs.length; ndx < len; ndx ++ ) {
+						for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
 
 							ns.push( getConvertedVec3( source.data, vs[ ndx ] * numParams ) );
 
@@ -2986,7 +2069,7 @@ THREE.ColladaLoader = function () {
 						source = sources[ input.source ];
 						numParams = source.accessor.params.length;
 
-						for ( var ndx = 0, len = vs.length; ndx < len; ndx ++ ) {
+						for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
 
 							idx32 = vs[ ndx ] * numParams;
 							if ( ts[ input.set ] === undefined ) ts[ input.set ] = [ ];
@@ -3009,7 +2092,7 @@ THREE.ColladaLoader = function () {
 						source = sources[ input.source ];
 						numParams = source.accessor.params.length;
 
-						for ( var ndx = 0, len = vs.length; ndx < len; ndx ++ ) {
+						for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
 
 							idx32 = vs[ ndx ] * numParams;
 							cs.push( new THREE.Color().setRGB( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
@@ -3028,9 +2111,9 @@ THREE.ColladaLoader = function () {
 
 				} else if ( vcount === 4 ) {
 
-					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], [ ns[0].clone(), ns[1].clone(), ns[3].clone() ], cs.length ? [ cs[0], cs[1], cs[3] ] : new THREE.Color() ) );
+					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], [ns[0].clone(), ns[1].clone(), ns[3].clone()], cs.length ? [cs[0], cs[1], cs[3]] : new THREE.Color() ) );
 
-					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], [ ns[1].clone(), ns[2].clone(), ns[3].clone() ], cs.length ? [ cs[1], cs[2], cs[3] ] : new THREE.Color() ) );
+					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], [ns[1].clone(), ns[2].clone(), ns[3].clone()], cs.length ? [cs[1], cs[2], cs[3]] : new THREE.Color() ) );
 
 				} else if ( vcount > 4 && options.subdivideFaces ) {
 
@@ -3041,7 +2124,9 @@ THREE.ColladaLoader = function () {
 
 					for ( k = 1; k < vcount - 1; ) {
 
-						faces.push( new THREE.Face3( vs[0], vs[k], vs[k + 1], [ ns[0].clone(), ns[k ++].clone(), ns[k].clone() ], clr ) );
+						// FIXME: normals don't seem to be quite right
+
+						faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0].clone(), ns[k++].clone(), ns[k].clone() ],  clr ) );
 
 					}
 
@@ -3055,14 +2140,14 @@ THREE.ColladaLoader = function () {
 						face.daeMaterial = primitive.material;
 						geom.faces.push( face );
 
-						for ( k = 0; k < texture_sets.length; k ++ ) {
+						for ( k = 0; k < texture_sets.length; k++ ) {
 
 							uv = ts[ texture_sets[k] ];
 
 							if ( vcount > 4 ) {
 
 								// Grab the right UVs for the vertices in this face
-								uvArr = [ uv[0], uv[ndx + 1], uv[ndx + 2] ];
+								uvArr = [ uv[0], uv[ndx+1], uv[ndx+2] ];
 
 							} else if ( vcount === 4 ) {
 
@@ -3096,7 +2181,7 @@ THREE.ColladaLoader = function () {
 
 				} else {
 
-					THREE.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
+					console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
 
 				}
 
@@ -3117,7 +2202,7 @@ THREE.ColladaLoader = function () {
 		this.p = [];
 		this.geometry = new THREE.Geometry();
 
-	}
+	};
 
 	Polygons.prototype.setVertices = function ( vertices ) {
 
@@ -3161,7 +2246,7 @@ THREE.ColladaLoader = function () {
 
 				case 'ph':
 
-					THREE.warn( 'polygon holes not yet supported!' );
+					console.warn( 'polygon holes not yet supported!' );
 					break;
 
 				default:
@@ -3181,7 +2266,7 @@ THREE.ColladaLoader = function () {
 
 		this.vcount = [];
 
-	}
+	};
 
 	Polylist.prototype = Object.create( Polygons.prototype );
 	Polylist.prototype.constructor = Polylist;
@@ -3192,7 +2277,7 @@ THREE.ColladaLoader = function () {
 
 		this.vcount = 1;
 
-	}
+	};
 
 	LineStrips.prototype = Object.create( Polygons.prototype );
 	LineStrips.prototype.constructor = LineStrips;
@@ -3203,7 +2288,7 @@ THREE.ColladaLoader = function () {
 
 		this.vcount = 3;
 
-	}
+	};
 
 	Triangles.prototype = Object.create( Polygons.prototype );
 	Triangles.prototype.constructor = Triangles;
@@ -3215,7 +2300,7 @@ THREE.ColladaLoader = function () {
 		this.stride = 0;
 		this.params = [];
 
-	}
+	};
 
 	Accessor.prototype.parse = function ( element ) {
 
@@ -3247,7 +2332,7 @@ THREE.ColladaLoader = function () {
 
 		this.input = {};
 
-	}
+	};
 
 	Vertices.prototype.parse = function ( element ) {
 
@@ -3275,7 +2360,7 @@ THREE.ColladaLoader = function () {
 		this.source = "";
 		this.set = 0;
 
-	}
+	};
 
 	Input.prototype.parse = function ( element ) {
 
@@ -3299,7 +2384,7 @@ THREE.ColladaLoader = function () {
 		this.id = id;
 		this.type = null;
 
-	}
+	};
 
 	Source.prototype.parse = function ( element ) {
 
@@ -3350,7 +2435,7 @@ THREE.ColladaLoader = function () {
 					break;
 
 				default:
-					// THREE.log(child.nodeName);
+					// console.log(child.nodeName);
 					break;
 
 			}
@@ -3367,35 +2452,35 @@ THREE.ColladaLoader = function () {
 
 		//for (var i = 0; i < this.accessor.params.length; i++) {
 
-		var param = this.accessor.params[ 0 ];
+			var param = this.accessor.params[ 0 ];
 
-			//THREE.log(param.name + " " + param.type);
+			//console.log(param.name + " " + param.type);
 
-		switch ( param.type ) {
+			switch ( param.type ) {
 
-			case 'IDREF':
-			case 'Name': case 'name':
-			case 'float':
+				case 'IDREF':
+				case 'Name': case 'name':
+				case 'float':
 
-				return this.data;
+					return this.data;
 
-			case 'float4x4':
+				case 'float4x4':
 
-				for ( var j = 0; j < this.data.length; j += 16 ) {
+					for ( var j = 0; j < this.data.length; j += 16 ) {
 
-					var s = this.data.slice( j, j + 16 );
-					var m = getConvertedMat4( s );
-					result.push( m );
-				}
+						var s = this.data.slice( j, j + 16 );
+						var m = getConvertedMat4( s );
+						result.push( m );
+					}
 
-				break;
+					break;
 
-			default:
+				default:
 
-				THREE.log( 'ColladaLoader: Source: Read dont know how to read ' + param.type + '.' );
-				break;
+					console.log( 'ColladaLoader: Source: Read dont know how to read ' + param.type + '.' );
+					break;
 
-		}
+			}
 
 		//}
 
@@ -3409,7 +2494,7 @@ THREE.ColladaLoader = function () {
 		this.name = "";
 		this.instance_effect = null;
 
-	}
+	};
 
 	Material.prototype.parse = function ( element ) {
 
@@ -3441,7 +2526,7 @@ THREE.ColladaLoader = function () {
 		this.texcoord = null;
 		this.texOpts = null;
 
-	}
+	};
 
 	ColorOrTexture.prototype.isColor = function () {
 
@@ -3575,7 +2660,7 @@ THREE.ColladaLoader = function () {
 		this.effect = effect;
 		this.material = null;
 
-	}
+	};
 
 	Shader.prototype.parse = function ( element ) {
 
@@ -3606,11 +2691,12 @@ THREE.ColladaLoader = function () {
 						} else if ( bumpType.toLowerCase() === "normalmap" ) {
 							this[ 'normal' ] = ( new ColorOrTexture() ).parse( child );
 						} else {
-							THREE.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType + ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
+							console.error( "Shader.prototype.parse: Invalid value for attribute 'bumptype' (" + bumpType +
+										   ") - valid bumptypes are 'HEIGHTFIELD' and 'NORMALMAP' - defaulting to 'HEIGHTFIELD'" );
 							this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
 						}
 					} else {
-						THREE.warn( "Shader.prototype.parse: Attribute 'bumptype' missing from bump node - defaulting to 'HEIGHTFIELD'" );
+						console.warn( "Shader.prototype.parse: Attribute 'bumptype' missing from bump node - defaulting to 'HEIGHTFIELD'" );
 						this[ 'bump' ] = ( new ColorOrTexture() ).parse( child );
 					}
 
@@ -3662,7 +2748,7 @@ THREE.ColladaLoader = function () {
 
 		var keys = {
 			'diffuse':'map',
-			'ambient':'lightMap',
+			'ambient':'lightMap' ,
 			'specular':'specularMap',
 			'emission':'emissionMap',
 			'bump':'bumpMap',
@@ -3759,7 +2845,7 @@ THREE.ColladaLoader = function () {
 				case 'reflectivity':
 
 					props[ prop ] = this[ prop ];
-					if ( props[ prop ] > 0.0 ) props['envMap'] = options.defaultEnvMap;
+					if( props[ prop ] > 0.0 ) props['envMap'] = options.defaultEnvMap;
 					props['combine'] = THREE.MixOperation;	//mix regular shading with reflective component
 					break;
 
@@ -3817,7 +2903,7 @@ THREE.ColladaLoader = function () {
 		this.init_from = null;
 		this.format = null;
 
-	}
+	};
 
 	Surface.prototype.parse = function ( element ) {
 
@@ -3840,7 +2926,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( "unhandled Surface prop: " + child.nodeName );
+					console.log( "unhandled Surface prop: " + child.nodeName );
 					break;
 
 			}
@@ -3861,7 +2947,7 @@ THREE.ColladaLoader = function () {
 		this.magfilter = null;
 		this.mipfilter = null;
 
-	}
+	};
 
 	Sampler2D.prototype.parse = function ( element ) {
 
@@ -3904,7 +2990,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( "unhandled Sampler2D prop: " + child.nodeName );
+					console.log( "unhandled Sampler2D prop: " + child.nodeName );
 					break;
 
 			}
@@ -3923,7 +3009,7 @@ THREE.ColladaLoader = function () {
 		this.surface = {};
 		this.sampler = {};
 
-	}
+	};
 
 	Effect.prototype.create = function () {
 
@@ -3994,7 +3080,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -4041,7 +3127,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log( child.nodeName );
+					console.log( child.nodeName );
 					break;
 
 			}
@@ -4052,7 +3138,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Effect.prototype.parseTechnique = function ( element ) {
+	Effect.prototype.parseTechnique= function ( element ) {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
@@ -4101,7 +3187,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Effect.prototype.parseExtraTechnique = function ( element ) {
+	Effect.prototype.parseExtraTechnique= function ( element ) {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
@@ -4126,7 +3212,7 @@ THREE.ColladaLoader = function () {
 
 		this.url = "";
 
-	}
+	};
 
 	InstanceEffect.prototype.parse = function ( element ) {
 
@@ -4143,7 +3229,7 @@ THREE.ColladaLoader = function () {
 		this.sampler = [];
 		this.channel = [];
 
-	}
+	};
 
 	Animation.prototype.parse = function ( element ) {
 
@@ -4217,7 +3303,7 @@ THREE.ColladaLoader = function () {
 		this.arrIndices = null;
 		this.member = null;
 
-	}
+	};
 
 	Channel.prototype.parse = function ( element ) {
 
@@ -4278,7 +3364,7 @@ THREE.ColladaLoader = function () {
 		this.endTime = null;
 		this.duration = 0;
 
-	}
+	};
 
 	Sampler.prototype.parse = function ( element ) {
 
@@ -4343,7 +3429,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					THREE.log(input.semantic);
+					console.log(input.semantic);
 					break;
 
 			}
@@ -4385,7 +3471,7 @@ THREE.ColladaLoader = function () {
 			data = [];
 			ndx *= this.strideOut;
 
-			for ( var i = 0; i < this.strideOut; ++ i ) {
+			for ( var i = 0; i < this.strideOut; ++i ) {
 
 				data[ i ] = this.output[ ndx + i ];
 
@@ -4433,7 +3519,7 @@ THREE.ColladaLoader = function () {
 		this.targets = [];
 		this.time = time;
 
-	}
+	};
 
 	Key.prototype.addTarget = function ( fullSid, transform, member, data ) {
 
@@ -4448,7 +3534,7 @@ THREE.ColladaLoader = function () {
 
 	Key.prototype.apply = function ( opt_sid ) {
 
-		for ( var i = 0; i < this.targets.length; ++ i ) {
+		for ( var i = 0; i < this.targets.length; ++i ) {
 
 			var target = this.targets[ i ];
 
@@ -4464,7 +3550,7 @@ THREE.ColladaLoader = function () {
 
 	Key.prototype.getTarget = function ( fullSid ) {
 
-		for ( var i = 0; i < this.targets.length; ++ i ) {
+		for ( var i = 0; i < this.targets.length; ++i ) {
 
 			if ( this.targets[ i ].sid === fullSid ) {
 
@@ -4480,7 +3566,7 @@ THREE.ColladaLoader = function () {
 
 	Key.prototype.hasTarget = function ( fullSid ) {
 
-		for ( var i = 0; i < this.targets.length; ++ i ) {
+		for ( var i = 0; i < this.targets.length; ++i ) {
 
 			if ( this.targets[ i ].sid === fullSid ) {
 
@@ -4516,7 +3602,7 @@ THREE.ColladaLoader = function () {
 
 					data = [];
 
-					for ( var j = 0; j < prevData.length; ++ j ) {
+					for ( var j = 0; j < prevData.length; ++j ) {
 
 						data[ j ] = prevData[ j ] + ( nextData[ j ] - prevData[ j ] ) * scale;
 
@@ -4547,7 +3633,7 @@ THREE.ColladaLoader = function () {
 		this.name = "";
 		this.technique = "";
 
-	}
+	};
 
 	Camera.prototype.parse = function ( element ) {
 
@@ -4665,7 +3751,7 @@ THREE.ColladaLoader = function () {
 
 		this.url = "";
 
-	}
+	};
 
 	InstanceCamera.prototype.parse = function ( element ) {
 
@@ -4683,7 +3769,7 @@ THREE.ColladaLoader = function () {
 		this.name = "";
 		this.technique = "";
 
-	}
+	};
 
 	Light.prototype.parse = function ( element ) {
 
@@ -4754,7 +3840,7 @@ THREE.ColladaLoader = function () {
 
 							case 'quadratic_attenuation':
 								var f = parseFloat( child.textContent );
-								this.distance = f ? Math.sqrt( 1 / f ) : 0;
+								this.distance = f ? Math.sqrt( 1/f ) : 0;
 						}
 
 					}
@@ -4794,7 +3880,7 @@ THREE.ColladaLoader = function () {
 
 		this.url = "";
 
-	}
+	};
 
 	InstanceLight.prototype.parse = function ( element ) {
 
@@ -4820,7 +3906,7 @@ THREE.ColladaLoader = function () {
 		this.joints = [];
 		this.links = [];
 
-		for (var i = 0; i < element.childNodes.length; i ++ ) {
+		for (var i = 0; i < element.childNodes.length; i++ ) {
 
 			var child = element.childNodes[ i ];
 			if ( child.nodeType != 1 ) continue;
@@ -4845,7 +3931,7 @@ THREE.ColladaLoader = function () {
 
 	KinematicsModel.prototype.parseCommon = function( element ) {
 
-		for (var i = 0; i < element.childNodes.length; i ++ ) {
+		for (var i = 0; i < element.childNodes.length; i++ ) {
 
 			var child = element.childNodes[ i ];
 			if ( child.nodeType != 1 ) continue;
@@ -4913,8 +3999,8 @@ THREE.ColladaLoader = function () {
 			max: max
 		};
 
-		var jointTypes = [ 'prismatic', 'revolute' ];
-		for (var i = 0; i < jointTypes.length; i ++ ) {
+		var jointTypes = ['prismatic', 'revolute'];
+		for (var i = 0; i < jointTypes.length; i++ ) {
 
 			var type = jointTypes[ i ];
 
@@ -4956,7 +4042,7 @@ THREE.ColladaLoader = function () {
 		this.transforms = [];
 		this.attachments = [];
 
-		for (var i = 0; i < element.childNodes.length; i ++ ) {
+		for (var i = 0; i < element.childNodes.length; i++ ) {
 
 			var child = element.childNodes[ i ];
 			if ( child.nodeType != 1 ) continue;
@@ -4999,7 +4085,7 @@ THREE.ColladaLoader = function () {
 		this.joint = element.getAttribute('joint').split('/').pop();
 		this.links = [];
 
-		for (var i = 0; i < element.childNodes.length; i ++ ) {
+		for (var i = 0; i < element.childNodes.length; i++ ) {
 
 			var child = element.childNodes[ i ];
 			if ( child.nodeType != 1 ) continue;
@@ -5042,7 +4128,7 @@ THREE.ColladaLoader = function () {
 		sources[ id ] = ( new Source(id )).parse( element );
 		return sources[ id ];
 
-	}
+	};
 
 	function _nsResolver( nsPrefix ) {
 
@@ -5054,7 +4140,7 @@ THREE.ColladaLoader = function () {
 
 		return null;
 
-	}
+	};
 
 	function _bools( str ) {
 
@@ -5069,7 +4155,7 @@ THREE.ColladaLoader = function () {
 
 		return data;
 
-	}
+	};
 
 	function _floats( str ) {
 
@@ -5084,7 +4170,7 @@ THREE.ColladaLoader = function () {
 
 		return data;
 
-	}
+	};
 
 	function _ints( str ) {
 
@@ -5099,19 +4185,19 @@ THREE.ColladaLoader = function () {
 
 		return data;
 
-	}
+	};
 
 	function _strings( str ) {
 
 		return ( str.length > 0 ) ? _trimString( str ).split( /\s+/ ) : [];
 
-	}
+	};
 
 	function _trimString( str ) {
 
 		return str.replace( /^\s+/, "" ).replace( /\s+$/, "" );
 
-	}
+	};
 
 	function _attr_as_float( element, name, defaultValue ) {
 
@@ -5125,7 +4211,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	}
+	};
 
 	function _attr_as_int( element, name, defaultValue ) {
 
@@ -5139,7 +4225,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	}
+	};
 
 	function _attr_as_string( element, name, defaultValue ) {
 
@@ -5153,7 +4239,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	}
+	};
 
 	function _format_float( f, num ) {
 
@@ -5176,7 +4262,7 @@ THREE.ColladaLoader = function () {
 		var parts = f.toString().split( '.' );
 		parts[ 1 ] = parts.length > 1 ? parts[ 1 ].substr( 0, num ) : "0";
 
-		while ( parts[ 1 ].length < num ) {
+		while( parts[ 1 ].length < num ) {
 
 			parts[ 1 ] += '0';
 
@@ -5184,11 +4270,11 @@ THREE.ColladaLoader = function () {
 
 		return parts.join( '.' );
 
-	}
+	};
 
 	function loadTextureImage ( texture, url ) {
 
-		loader = new THREE.ImageLoader();
+		var loader = new THREE.ImageLoader();
 
 		loader.load( url, function ( image ) {
 
@@ -5197,7 +4283,579 @@ THREE.ColladaLoader = function () {
 
 		} );
 
-	}
+	};
+
+	function applySkin ( geometry, instanceCtrl, frame ) {
+
+		var skinController = controllers[ instanceCtrl.url ];
+
+		frame = frame !== undefined ? frame : 40;
+
+		if ( !skinController || !skinController.skin ) {
+
+			console.log( 'ColladaLoader: Could not find skin controller.' );
+			return;
+
+		}
+
+		if ( !instanceCtrl.skeleton || !instanceCtrl.skeleton.length ) {
+
+			console.log( 'ColladaLoader: Could not find the skeleton for the skin. ' );
+			return;
+
+		}
+
+		var animationBounds = calcAnimationBounds();
+		var skeleton = visualScene.getChildById( instanceCtrl.skeleton[0], true ) ||
+					   visualScene.getChildBySid( instanceCtrl.skeleton[0], true );
+
+		//flatten the skeleton into a list of bones
+		var bonelist = flattenSkeleton(skeleton);
+		var joints = skinController.skin.joints;
+
+		//sort that list so that the order reflects the order in the joint list
+		var sortedbones = [];
+		for(var i = 0; i < joints.length; i++) {
+
+			for(var j =0; j < bonelist.length; j++) {
+
+				if(bonelist[j].name === joints[i]) {
+
+					sortedbones[i] = bonelist[j];
+
+				}
+
+			}
+
+		}
+
+		//hook up the parents by index instead of name
+		for(var i = 0; i < sortedbones.length; i++) {
+
+			for(var j =0; j < sortedbones.length; j++) {
+
+				if(sortedbones[i].parent === sortedbones[j].name) {
+
+					sortedbones[i].parent = j;
+
+				}
+
+			}
+
+		}
+
+
+		var i, j, w, vidx, weight;
+		var v = new THREE.Vector3(), o, s;
+
+		// move vertices to bind shape
+		for ( i = 0; i < geometry.vertices.length; i ++ ) {
+					geometry.vertices[i].applyMatrix4( skinController.skin.bindShapeMatrix );
+		}
+
+		var skinIndices = [];
+		var skinWeights = [];
+		var weights = skinController.skin.weights;
+
+		//hook up the skin weights
+		// TODO -  this might be a good place to choose greatest 4 weights
+		for(var i =0; i < weights.length; i++) {
+
+			var indicies = new THREE.Vector4(weights[i][0]?weights[i][0].joint:0,weights[i][1]?weights[i][1].joint:0,weights[i][2]?weights[i][2].joint:0,weights[i][3]?weights[i][3].joint:0);
+			var weight = new THREE.Vector4(weights[i][0]?weights[i][0].weight:0,weights[i][1]?weights[i][1].weight:0,weights[i][2]?weights[i][2].weight:0,weights[i][3]?weights[i][3].weight:0);
+
+			skinIndices.push(indicies);
+			skinWeights.push(weight);
+
+		}
+
+		geometry.skinIndices = skinIndices;
+		geometry.skinWeights = skinWeights;
+		geometry.bones = sortedbones;
+		// process animation, or simply pose the rig if no animation
+
+		//create an animation for the animated bones
+		//NOTE: this has no effect when using morphtargets
+		var animationdata = {"name":animationBounds.ID,"fps":30,"length":animationBounds.frames/30,"hierarchy":[]};
+
+		for(var j =0; j < sortedbones.length; j++) {
+
+			animationdata.hierarchy.push({parent:sortedbones[j].parent, name:sortedbones[j].name, keys:[]});
+
+		}
+
+		console.log( 'ColladaLoader:', animationBounds.ID + ' has ' + sortedbones.length + ' bones.' );
+
+
+
+		skinToBindPose(geometry,skeleton,skinController);
+
+
+		for ( frame = 0; frame < animationBounds.frames; frame ++ ) {
+
+			var bones = [];
+			var skinned = [];
+			// process the frame and setup the rig with a fresh
+			// transform, possibly from the bone's animation channel(s)
+
+			setupSkeleton( skeleton, bones, frame );
+			setupSkinningMatrices( bones, skinController.skin );
+
+			for(var i = 0; i < bones.length; i ++) {
+
+				for(var j = 0; j < animationdata.hierarchy.length; j ++) {
+
+					if(animationdata.hierarchy[j].name === bones[i].sid) {
+
+						var key = {};
+						key.time = (frame/30);
+						key.matrix = bones[i].animatrix;
+
+						if(frame === 0)
+							bones[i].matrix = key.matrix;
+
+						var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
+						key.matrix.decompose(data[0],data[1],data[2]);
+
+						key.pos = [data[0].x,data[0].y,data[0].z];
+
+						key.scl = [data[2].x,data[2].y,data[2].z];
+						key.rot = data[1];
+
+						animationdata.hierarchy[j].keys.push(key);
+
+					}
+
+				}
+
+			}
+
+			geometry.animation = animationdata;
+
+		}
+
+	};
+
+	function calcAnimationBounds () {
+
+		var start = 1000000;
+		var end = -start;
+		var frames = 0;
+		var ID;
+		for ( var id in animations ) {
+
+			var animation = animations[ id ];
+			ID = ID || animation.id;
+			for ( var i = 0; i < animation.sampler.length; i ++ ) {
+
+				var sampler = animation.sampler[ i ];
+
+				sampler.create();
+
+				start = Math.min( start, sampler.startTime );
+				end = Math.max( end, sampler.endTime );
+				frames = Math.max( frames, sampler.input.length );
+
+			}
+
+		}
+
+		return { start:start, end:end, frames:frames,ID:ID };
+
+	};
+
+	function createSceneGraph ( node, parent ) {
+
+		var obj = new THREE.Object3D();
+		var skinned = false;
+		var skinController;
+		var morphController;
+		var i, j;
+
+		// FIXME: controllers
+
+		for ( i = 0; i < node.controllers.length; i ++ ) {
+
+			var controller = controllers[ node.controllers[ i ].url ];
+
+			switch ( controller.type ) {
+
+				case 'skin':
+
+					if ( geometries[ controller.skin.source ] ) {
+
+						var inst_geom = new InstanceGeometry();
+
+						inst_geom.url = controller.skin.source;
+						inst_geom.instance_material = node.controllers[ i ].instance_material;
+
+						node.geometries.push( inst_geom );
+						skinned = true;
+						skinController = node.controllers[ i ];
+
+					} else if ( controllers[ controller.skin.source ] ) {
+
+						// urgh: controller can be chained
+						// handle the most basic case...
+
+						var second = controllers[ controller.skin.source ];
+						morphController = second;
+					//	skinController = node.controllers[i];
+
+						if ( second.morph && geometries[ second.morph.source ] ) {
+
+							var inst_geom = new InstanceGeometry();
+
+							inst_geom.url = second.morph.source;
+							inst_geom.instance_material = node.controllers[ i ].instance_material;
+
+							node.geometries.push( inst_geom );
+
+						}
+
+					}
+
+					break;
+
+				case 'morph':
+
+					if ( geometries[ controller.morph.source ] ) {
+
+						var inst_geom = new InstanceGeometry();
+
+						inst_geom.url = controller.morph.source;
+						inst_geom.instance_material = node.controllers[ i ].instance_material;
+
+						node.geometries.push( inst_geom );
+						morphController = node.controllers[ i ];
+
+					}
+
+					console.log( 'ColladaLoader: Morph-controller partially supported.' );
+
+				default:
+					break;
+
+			}
+
+		}
+
+		// geometries
+
+		var double_sided_materials = {};
+
+		for ( i = 0; i < node.geometries.length; i ++ ) {
+
+			var instance_geometry = node.geometries[i];
+			var instance_materials = instance_geometry.instance_material;
+			var geometry = geometries[ instance_geometry.url ];
+			var used_materials = {};
+			var used_materials_array = [];
+			var num_materials = 0;
+			var first_material;
+
+			if ( geometry ) {
+
+				if ( !geometry.mesh || !geometry.mesh.primitives )
+					continue;
+
+				if ( obj.name.length === 0 ) {
+
+					obj.name = geometry.id;
+
+				}
+
+				// collect used fx for this geometry-instance
+
+				if ( instance_materials ) {
+
+					for ( j = 0; j < instance_materials.length; j ++ ) {
+
+						var instance_material = instance_materials[ j ];
+						var mat = materials[ instance_material.target ];
+						var effect_id = mat.instance_effect.url;
+						var shader = effects[ effect_id ].shader;
+						var material3js = shader.material;
+
+						if ( geometry.doubleSided ) {
+
+							if ( !( instance_material.symbol in double_sided_materials ) ) {
+
+								var _copied_material = material3js.clone();
+								_copied_material.side = THREE.DoubleSide;
+								double_sided_materials[ instance_material.symbol ] = _copied_material;
+
+							}
+
+							material3js = double_sided_materials[ instance_material.symbol ];
+
+						}
+
+						material3js.opacity = !material3js.opacity ? 1 : material3js.opacity;
+						used_materials[ instance_material.symbol ] = num_materials;
+						used_materials_array.push( material3js );
+						first_material = material3js;
+						first_material.name = mat.name === null || mat.name === '' ? mat.id : mat.name;
+						num_materials ++;
+
+					}
+
+				}
+
+				var mesh;
+				var material = first_material || new THREE.MeshLambertMaterial( { color: 0xdddddd, side: geometry.doubleSided ? THREE.DoubleSide : THREE.FrontSide } );
+				var geom = geometry.mesh.geometry3js;
+
+				if ( num_materials > 1 ) {
+
+					material = new THREE.MeshFaceMaterial( used_materials_array );
+
+					for ( j = 0; j < geom.faces.length; j ++ ) {
+
+						var face = geom.faces[ j ];
+						face.materialIndex = used_materials[ face.daeMaterial ]
+
+					}
+
+				}
+
+				if ( skinController !== undefined ) {
+
+
+					applySkin( geom, skinController );
+
+					if ( geom.morphTargets.length > 0 ) {
+
+						material.morphTargets = true;
+						material.skinning = false;
+
+					} else {
+
+						material.morphTargets = false;
+						material.skinning = true;
+
+					}
+
+
+					mesh = new THREE.SkinnedMesh( geom, material, false );
+
+
+					//mesh.skeleton = skinController.skeleton;
+					//mesh.skinController = controllers[ skinController.url ];
+					//mesh.skinInstanceController = skinController;
+					mesh.name = 'skin_' + skins.length;
+
+
+
+					//mesh.animationHandle.setKey(0);
+					skins.push( mesh );
+
+				} else if ( morphController !== undefined ) {
+
+					createMorph( geom, morphController );
+
+					material.morphTargets = true;
+
+					mesh = new THREE.Mesh( geom, material );
+					mesh.name = 'morph_' + morphs.length;
+
+					morphs.push( mesh );
+
+				} else {
+
+					if ( geom.isLineStrip === true ) {
+
+						mesh = new THREE.Line( geom );
+
+					} else {
+
+						mesh = new THREE.Mesh( geom, material );
+
+					}
+
+				}
+
+				obj.add(mesh);
+
+			}
+
+		}
+
+		for ( i = 0; i < node.cameras.length; i ++ ) {
+
+			var instance_camera = node.cameras[i];
+			var cparams = cameras[instance_camera.url];
+
+			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio),
+					parseFloat(cparams.znear), parseFloat(cparams.zfar));
+
+			obj.add(cam);
+		}
+
+		for ( i = 0; i < node.lights.length; i ++ ) {
+
+			var light = null;
+			var instance_light = node.lights[i];
+			var lparams = lights[instance_light.url];
+
+			if ( lparams && lparams.technique ) {
+
+				var color = lparams.color.getHex();
+				var intensity = lparams.intensity;
+				var distance = lparams.distance;
+				var angle = lparams.falloff_angle;
+				var exponent; // Intentionally undefined, don't know what this is yet
+
+				switch ( lparams.technique ) {
+
+					case 'directional':
+
+						light = new THREE.DirectionalLight( color, intensity, distance );
+						light.position.set(0, 0, 1);
+						break;
+
+					case 'point':
+
+						light = new THREE.PointLight( color, intensity, distance );
+						break;
+
+					case 'spot':
+
+						light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						light.position.set(0, 0, 1);
+						break;
+
+					case 'ambient':
+
+						light = new THREE.AmbientLight( color );
+						break;
+
+				}
+
+			}
+
+			if (light) {
+				obj.add(light);
+			}
+		}
+
+		obj.name = node.name || node.id || "";
+		obj.colladaId = node.id || "";
+		obj.layer = node.layer || "";
+		obj.matrix = node.matrix;
+		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+
+		if ( options.centerGeometry && obj.geometry ) {
+
+			var delta = obj.geometry.center();
+			delta.multiply( obj.scale );
+			delta.applyQuaternion( obj.quaternion );
+
+			obj.position.sub( delta );
+
+		}
+
+		for ( i = 0; i < node.nodes.length; i ++ ) {
+
+			obj.add( createSceneGraph( node.nodes[i], node ) );
+
+		}
+
+		return obj;
+
+	};
+
+	function bakeAnimations ( node ) {
+
+		if ( node.channels && node.channels.length ) {
+
+			var keys = [],
+				sids = [];
+
+			for ( var i = 0, il = node.channels.length; i < il; i++ ) {
+
+				var channel = node.channels[i],
+					fullSid = channel.fullSid,
+					sampler = channel.sampler,
+					input = sampler.input,
+					transform = node.getTransformBySid( channel.sid ),
+					member;
+
+				if ( channel.arrIndices ) {
+
+					member = [];
+
+					for ( var j = 0, jl = channel.arrIndices.length; j < jl; j++ ) {
+
+						member[ j ] = getConvertedIndex( channel.arrIndices[ j ] );
+
+					}
+
+				} else {
+
+					member = getConvertedMember( channel.member );
+
+				}
+
+				if ( transform ) {
+
+					if ( sids.indexOf( fullSid ) === -1 ) {
+
+						sids.push( fullSid );
+
+					}
+
+					for ( var j = 0, jl = input.length; j < jl; j++ ) {
+
+						var time = input[j],
+							data = sampler.getData( transform.type, j, member ),
+							key = findKey( keys, time );
+
+						if ( !key ) {
+
+							key = new Key( time );
+							var timeNdx = findTimeNdx( keys, time );
+							keys.splice( timeNdx === -1 ? keys.length : timeNdx, 0, key );
+
+						}
+
+						key.addTarget( fullSid, transform, member, data );
+
+					}
+
+				} else {
+
+					console.log( 'Could not find transform "' + channel.sid + '" in node ' + node.id );
+
+				}
+
+			}
+
+			// post process
+			for ( var i = 0; i < sids.length; i++ ) {
+
+				var sid = sids[ i ];
+
+				for ( var j = 0; j < keys.length; j++ ) {
+
+					var key = keys[ j ];
+
+					if ( !key.hasTarget( sid ) ) {
+
+						interpolateKeys( keys, key, j, sid );
+
+					}
+
+				}
+
+			}
+
+			node.keys = keys;
+			node.sids = sids;
+
+		}
+
+	};
 
 	function extractDoubleSided( obj, element ) {
 
@@ -5215,40 +4873,51 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	}
+	};
 
-	// Up axis conversion
+	function findKey ( keys, time) {
 
-	function setUpConversion() {
+		var retVal = null;
 
-		if ( options.convertUpAxis !== true || colladaUp === options.upAxis ) {
+		for ( var i = 0, il = keys.length; i < il && retVal === null; i++ ) {
 
-			upConversion = null;
+			var key = keys[i];
 
-		} else {
+			if ( key.time === time ) {
 
-			switch ( colladaUp ) {
+				retVal = key;
 
-				case 'X':
+			} else if ( key.time > time ) {
 
-					upConversion = options.upAxis === 'Y' ? 'XtoY' : 'XtoZ';
-					break;
-
-				case 'Y':
-
-					upConversion = options.upAxis === 'X' ? 'YtoX' : 'YtoZ';
-					break;
-
-				case 'Z':
-
-					upConversion = options.upAxis === 'X' ? 'ZtoX' : 'ZtoY';
-					break;
+				break;
 
 			}
 
 		}
 
-	}
+		return retVal;
+
+	};
+
+	function findTimeNdx ( keys, time) {
+
+		var ndx = -1;
+
+		for ( var i = 0, il = keys.length; i < il && ndx === -1; i++ ) {
+
+			var key = keys[i];
+
+			if ( key.time >= time ) {
+
+				ndx = i;
+
+			}
+
+		}
+
+		return ndx;
+
+	};
 
 	function fixCoords( data, sign ) {
 
@@ -5306,7 +4975,39 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	}
+	};
+
+	//Walk the Collada tree and flatten the bones into a list, extract the position, quat and scale from the matrix
+	function flattenSkeleton (skeleton) {
+
+		var list = [];
+		var walk = function(parentid, node, list) {
+
+			var bone = {};
+			bone.name = node.sid;
+			bone.parent = parentid;
+			bone.matrix = node.matrix;
+			var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
+			bone.matrix.decompose(data[0],data[1],data[2]);
+
+			bone.pos = [data[0].x,data[0].y,data[0].z];
+
+			bone.scl = [data[2].x,data[2].y,data[2].z];
+			bone.rotq = [data[1].x,data[1].y,data[1].z,data[1].w];
+			list.push(bone);
+
+			for(var i in node.nodes) {
+
+				walk(node.sid,node.nodes[i],list);
+
+			}
+
+		};
+
+		walk(-1,skeleton,list);
+		return list;
+
+	};
 
 	function getConvertedTranslation( axis, data ) {
 
@@ -5331,7 +5032,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		return data;
-	}
+	};
 
 	function getConvertedVec3( data, offset ) {
 
@@ -5339,7 +5040,7 @@ THREE.ColladaLoader = function () {
 		fixCoords( arr, -1 );
 		return new THREE.Vector3( arr[ 0 ], arr[ 1 ], arr[ 2 ] );
 
-	}
+	};
 
 	function getConvertedMat4( data ) {
 
@@ -5396,13 +5097,13 @@ THREE.ColladaLoader = function () {
 			data[12], data[13], data[14], data[15]
 			);
 
-	}
+	};
 
 	function getConvertedIndex( index ) {
 
 		if ( index > -1 && index < 3 ) {
 
-			var members = [ 'X', 'Y', 'Z' ],
+			var members = ['X', 'Y', 'Z'],
 				indices = { X: 0, Y: 1, Z: 2 };
 
 			index = getConvertedMember( members[ index ] );
@@ -5412,7 +5113,48 @@ THREE.ColladaLoader = function () {
 
 		return index;
 
-	}
+	};
+
+	function getChannelsForNode ( node ) {
+
+		var channels = [];
+		var startTime = 1000000;
+		var endTime = -1000000;
+
+		for ( var id in animations ) {
+
+			var animation = animations[id];
+
+			for ( var i = 0; i < animation.channel.length; i ++ ) {
+
+				var channel = animation.channel[i];
+				var sampler = animation.sampler[i];
+				var id = channel.target.split('/')[0];
+
+				if ( id == node.id ) {
+
+					sampler.create();
+					channel.sampler = sampler;
+					startTime = Math.min(startTime, sampler.startTime);
+					endTime = Math.max(endTime, sampler.endTime);
+					channels.push(channel);
+
+				}
+
+			}
+
+		}
+
+		if ( channels.length ) {
+
+			node.startTime = startTime;
+			node.endTime = endTime;
+
+		}
+
+		return channels;
+
+	};
 
 	function getConvertedMember( member ) {
 
@@ -5488,17 +5230,308 @@ THREE.ColladaLoader = function () {
 
 		return member;
 
-	}
+	};
 
-	return {
+	function getLibraryNode ( id ) {
 
-		load: load,
-		parse: parse,
-		setPreferredShading: setPreferredShading,
-		applySkin: applySkin,
-		geometries : geometries,
-		options: options
+		var nodes = COLLADA.querySelectorAll('library_nodes node');
+
+		for ( var i = 0; i < nodes.length; i++ ) {
+
+			var attObj = nodes[i].attributes.getNamedItem('id');
+			if ( attObj && attObj.value === id ) {
+				return nodes[i];
+		}
+		}
+
+		return undefined;
 
 	};
 
-};
+	// Get next key with given sid
+	function getNextKeyWith ( keys, fullSid, ndx ) {
+
+		for ( ; ndx < keys.length; ndx++ ) {
+
+			var key = keys[ ndx ];
+
+			if ( key.hasTarget( fullSid ) ) {
+
+				return key;
+
+			}
+
+		}
+
+		return null;
+
+	};
+
+	// Get previous key with given sid
+	function getPrevKeyWith ( keys, fullSid, ndx ) {
+
+		ndx = ndx >= 0 ? ndx : ndx + keys.length;
+
+		for ( ; ndx >= 0; ndx-- ) {
+
+			var key = keys[ ndx ];
+
+			if ( key.hasTarget( fullSid ) ) {
+
+				return key;
+
+			}
+
+		}
+
+		return null;
+
+	};
+
+	function interpolateKeys ( keys, key, ndx, fullSid ) {
+
+		var prevKey = getPrevKeyWith( keys, fullSid, ndx ? ndx-1 : 0 ),
+			nextKey = getNextKeyWith( keys, fullSid, ndx+1 );
+
+		if ( prevKey && nextKey ) {
+
+			var scale = (key.time - prevKey.time) / (nextKey.time - prevKey.time),
+				prevTarget = prevKey.getTarget( fullSid ),
+				nextData = nextKey.getTarget( fullSid ).data,
+				prevData = prevTarget.data,
+				data;
+
+			if ( prevTarget.type === 'matrix' ) {
+
+				data = prevData;
+
+			} else if ( prevData.length ) {
+
+				data = [];
+
+				for ( var i = 0; i < prevData.length; ++i ) {
+
+					data[ i ] = prevData[ i ] + ( nextData[ i ] - prevData[ i ] ) * scale;
+
+				}
+
+			} else {
+
+				data = prevData + ( nextData - prevData ) * scale;
+
+			}
+
+			key.addTarget( fullSid, prevTarget.transform, prevTarget.member, data );
+
+		}
+
+	};
+
+	function recurseHierarchy( node ) {
+
+		var n = visualScene.getChildById( node.colladaId, true ),
+			newData = null;
+
+		if ( n && n.keys ) {
+
+			newData = {
+				fps: 60,
+				hierarchy: [ {
+					node: n,
+					keys: n.keys,
+					sids: n.sids
+				} ],
+				node: node,
+				name: 'animation_' + node.name,
+				length: 0
+			};
+
+			animData.push(newData);
+
+			for ( var i = 0, il = n.keys.length; i < il; i++ ) {
+
+				newData.length = Math.max( newData.length, n.keys[i].time );
+
+			}
+
+		} else {
+
+			newData = {
+				hierarchy: [ {
+					keys: [],
+					sids: []
+				} ]
+			}
+
+		}
+
+		for ( var i = 0, il = node.children.length; i < il; i++ ) {
+
+			var d = recurseHierarchy( node.children[i] );
+
+			for ( var j = 0, jl = d.hierarchy.length; j < jl; j ++ ) {
+
+				newData.hierarchy.push( {
+					keys: [],
+					sids: []
+				} );
+
+			}
+
+		}
+
+		return newData;
+
+	};
+
+	function setupSkeleton ( node, bones, frame, parent ) {
+
+		node.world = node.world || new THREE.Matrix4();
+		node.localworld = node.localworld || new THREE.Matrix4();
+		node.world.copy( node.matrix );
+		node.localworld.copy( node.matrix );
+
+		if ( node.channels && node.channels.length ) {
+
+			var channel = node.channels[ 0 ];
+			var m = channel.sampler.output[ frame ];
+
+			if ( m instanceof THREE.Matrix4 ) {
+
+				node.world.copy( m );
+				node.localworld.copy(m);
+				if(frame === 0)
+					node.matrix.copy(m);
+			}
+
+		}
+
+		if ( parent ) {
+
+			node.world.multiplyMatrices( parent, node.world );
+
+		}
+
+		bones.push( node );
+
+		for ( var i = 0; i < node.nodes.length; i ++ ) {
+
+			setupSkeleton( node.nodes[ i ], bones, frame, node.world );
+
+		}
+
+	};
+
+	function setupSkinningMatrices ( bones, skin ) {
+
+		// FIXME: this is dumb...
+
+		for ( var i = 0; i < bones.length; i ++ ) {
+
+			var bone = bones[ i ];
+			var found = -1;
+
+			if ( bone.type != 'JOINT' ) continue;
+
+			for ( var j = 0; j < skin.joints.length; j ++ ) {
+
+				if ( bone.sid === skin.joints[ j ] ) {
+
+					found = j;
+					break;
+
+				}
+
+			}
+
+			if ( found >= 0 ) {
+
+				var inv = skin.invBindMatrices[ found ];
+
+				bone.invBindMatrix = inv;
+				bone.skinningMatrix = new THREE.Matrix4();
+				bone.skinningMatrix.multiplyMatrices(bone.world, inv); // (IBMi * JMi)
+				bone.animatrix = new THREE.Matrix4();
+
+				bone.animatrix.copy(bone.localworld);
+				bone.weights = [];
+
+				for ( var j = 0; j < skin.weights.length; j ++ ) {
+
+					for (var k = 0; k < skin.weights[ j ].length; k ++ ) {
+
+						var w = skin.weights[ j ][ k ];
+
+						if ( w.joint === found ) {
+
+							bone.weights.push( w );
+
+						}
+
+					}
+
+				}
+
+			} else {
+
+				console.warn( "ColladaLoader: Could not find joint '" + bone.sid + "'." );
+
+				bone.skinningMatrix = new THREE.Matrix4();
+				bone.weights = [];
+
+			}
+		}
+
+	};
+
+	//Move the vertices into the pose that is proper for the start of the animation
+	function skinToBindPose (geometry,skeleton,skinController) {
+
+		var bones = [];
+		setupSkeleton( skeleton, bones, -1 );
+		setupSkinningMatrices( bones, skinController.skin );
+		var v = new THREE.Vector3();
+		var skinned = [];
+
+		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
+			skinned.push(new THREE.Vector3());
+
+		}
+
+		for ( var i = 0; i < bones.length; i ++ ) {
+
+			if ( bones[ i ].type != 'JOINT' ) continue;
+
+			for ( var j = 0; j < bones[ i ].weights.length; j ++ ) {
+
+				var w = bones[ i ].weights[ j ];
+				var vidx = w.index;
+				var weight = w.weight;
+
+				var o = geometry.vertices[vidx];
+				var s = skinned[vidx];
+
+				v.x = o.x;
+				v.y = o.y;
+				v.z = o.z;
+
+				v.applyMatrix4( bones[i].skinningMatrix );
+
+				s.x += (v.x * weight);
+				s.y += (v.y * weight);
+				s.z += (v.z * weight);
+			}
+
+		}
+
+		for(var i =0; i < geometry.vertices.length; i++) {
+
+			geometry.vertices[i] = skinned[i];
+
+		}
+
+	};
+
+
+})();

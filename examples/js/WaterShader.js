@@ -142,7 +142,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	else 
 	{
 		this.camera = new THREE.PerspectiveCamera();
-		THREE.log(this.name + ': camera is not a Perspective Camera!')
+		console.log(this.name + ': camera is not a Perspective Camera!')
 	}
 
 	this.textureMatrix = new THREE.Matrix4();

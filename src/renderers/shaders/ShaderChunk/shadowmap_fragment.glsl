@@ -209,9 +209,6 @@
 
 	}
 
-	// NOTE: I am unsure if this is correct in linear space.  -bhouston, Dec 29, 2014
-	shadowColor = inputToLinear( shadowColor );
-
 	outgoingLight = outgoingLight * shadowColor;
 
 #endif

@@ -27,7 +27,9 @@
  */
 
 
-THREE.PLYLoader = function () {
+THREE.PLYLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 	this.propertyNameMapping = {};
 
@@ -37,42 +39,30 @@ THREE.PLYLoader.prototype = {
 
 	constructor: THREE.PLYLoader,
 
-	setPropertyNameMapping: function ( mapping ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
-		this.propertyNameMapping = mapping;
+		var scope = this;
+
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.setResponseType( 'arraybuffer' );
+		loader.load( url, function ( text ) {
+
+			onLoad( scope.parse( text ) );
+
+		}, onProgress, onError );
 
 	},
 
-	load: function ( url, callback ) {
+	setCrossOrigin: function ( value ) {
 
-		var scope = this;
-		var request = new XMLHttpRequest();
+		this.crossOrigin = value;
 
-		request.addEventListener( 'load', function ( event ) {
+	},
 
-			var geometry = scope.parse( event.target.response );
+	setPropertyNameMapping: function ( mapping ) {
 
-			scope.dispatchEvent( { type: 'load', content: geometry } );
-
-			if ( callback ) callback( geometry );
-
-		}, false );
-
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.responseType = "arraybuffer";
-		request.send( null );
+		this.propertyNameMapping = mapping;
 
 	},
 
@@ -209,7 +199,7 @@ THREE.PLYLoader.prototype = {
 
 			default:
 
-				THREE.log("unhandled", lineType, lineValues);
+				console.log("unhandled", lineType, lineValues);
 
 			}
 
@@ -478,5 +468,3 @@ THREE.PLYLoader.prototype = {
 	}
 
 };
-
-THREE.EventDispatcher.prototype.apply( THREE.PLYLoader.prototype );

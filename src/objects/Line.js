@@ -4,6 +4,12 @@
 
 THREE.Line = function ( geometry, material, mode ) {
 
+	if ( mode === 1 ) {
+
+		console.error( 'THREE.Line: THREE.LinePieces mode has been removed. Use THREE.LineSegments instead.' );
+
+	}
+
 	THREE.Object3D.call( this );
 
 	this.type = 'Line';
@@ -11,12 +17,7 @@ THREE.Line = function ( geometry, material, mode ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.mode = mode !== undefined ? mode : THREE.LineStrip;
-
 };
-
-THREE.LineStrip = 0;
-THREE.LinePieces = 1;
 
 THREE.Line.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Line.prototype.constructor = THREE.Line;
@@ -54,7 +55,7 @@ THREE.Line.prototype.raycast = ( function () {
 		var vEnd = new THREE.Vector3();
 		var interSegment = new THREE.Vector3();
 		var interRay = new THREE.Vector3();
-		var step = this.mode === THREE.LineStrip ? 1 : 2;
+		var step = this instanceof THREE.LineSegments ? 2 : 1;
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -184,7 +185,7 @@ THREE.Line.prototype.raycast = ( function () {
 
 THREE.Line.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.Line( this.geometry, this.material, this.mode );
+	if ( object === undefined ) object = new THREE[ this.type ]( this.geometry, this.material );
 
 	THREE.Object3D.prototype.clone.call( this, object );
 
@@ -195,8 +196,6 @@ THREE.Line.prototype.clone = function ( object ) {
 THREE.Line.prototype.toJSON = function ( meta ) {
 
 	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
-
-	data.object.mode = this.mode;
 
 	// only serialize if not in meta geometries cache
 	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
@@ -214,3 +213,8 @@ THREE.Line.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+// DEPRECATED
+
+THREE.LineStrip = 0;
+THREE.LinePieces = 1;

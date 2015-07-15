@@ -101,9 +101,8 @@
 
 				plane = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 2000, 2000, 8, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true } )
+					new THREE.MeshBasicMaterial( { visible: false } )
 				);
-				plane.visible = false;
 				scene.add( plane );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -163,7 +162,13 @@
 				if ( SELECTED ) {
 
 					var intersects = raycaster.intersectObject( plane );
-					SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
+
+					if ( intersects.length > 0 ) {
+
+						SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
+
+					}
+
 					return;
 
 				}
@@ -202,9 +207,7 @@
 
 				event.preventDefault();
 
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera );
-
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.setFromCamera( mouse, camera );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -215,7 +218,12 @@
 					SELECTED = intersects[ 0 ].object;
 
 					var intersects = raycaster.intersectObject( plane );
-					offset.copy( intersects[ 0 ].point ).sub( plane.position );
+
+					if ( intersects.length > 0 ) {
+
+						offset.copy( intersects[ 0 ].point ).sub( plane.position );
+
+					}
 
 					container.style.cursor = 'move';
 

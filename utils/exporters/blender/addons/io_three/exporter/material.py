@@ -43,6 +43,12 @@ class Material(base_classes.BaseNode):
 
         self[constants.BLENDING] = api.material.blending(self.node)
 
+        if api.material.transparent(self.node):
+            self[constants.TRANSPARENT] = True
+
+        if api.material.double_sided(self.node):
+            self[constants.SIDE] = constants.SIDE_DOUBLE
+
         self[constants.DEPTH_TEST] = api.material.depth_test(self.node)
 
         self[constants.DEPTH_WRITE] = api.material.depth_write(self.node)

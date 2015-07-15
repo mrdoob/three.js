@@ -36,7 +36,7 @@ THREE.Triangle.normal = function () {
 
 }();
 
-// static/instance method to calculate barycoordinates
+// static/instance method to calculate barycentric coordinates
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 THREE.Triangle.barycoordFromPoint = function () {
 
@@ -60,8 +60,8 @@ THREE.Triangle.barycoordFromPoint = function () {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		// colinear or singular triangle
-		if ( denom == 0 ) {
+		// collinear or singular triangle
+		if ( denom === 0 ) {
 			// arbitrary location outside of triangle?
 			// not sure if this is the best idea, maybe should be returning undefined
 			return result.set( - 2, - 1, - 1 );
@@ -71,7 +71,7 @@ THREE.Triangle.barycoordFromPoint = function () {
 		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
 		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-		// barycoordinates must always sum to 1
+		// barycentric coordinates must always sum to 1
 		return result.set( 1 - u - v, v, u );
 
 	};

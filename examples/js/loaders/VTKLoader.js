@@ -26,6 +26,12 @@ THREE.VTKLoader.prototype = {
 
 	},
 
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
 	parse: function ( data ) {
 
 		var indices = [];

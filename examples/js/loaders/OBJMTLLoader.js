@@ -19,8 +19,9 @@ THREE.OBJMTLLoader.prototype = {
 
 		var scope = this;
 
-		var mtlLoader = new THREE.MTLLoader( url.substr( 0, url.lastIndexOf( "/" ) + 1 ) );
-		mtlLoader.crossOrigin = scope.crossOrigin;
+		var mtlLoader = new THREE.MTLLoader( this.manager );
+		mtlLoader.setBaseUrl( url.substr( 0, url.lastIndexOf( "/" ) + 1 ) );
+		mtlLoader.setCrossOrigin( this.crossOrigin );
 		mtlLoader.load( mtlurl, function ( materials ) {
 
 			var materialsCreator = materials;
@@ -53,6 +54,12 @@ THREE.OBJMTLLoader.prototype = {
 			}, onProgress, onError );
 
 		}, onProgress, onError );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
 
 	},
 
@@ -347,7 +354,7 @@ THREE.OBJMTLLoader.prototype = {
 
 			} else {
 
-				THREE.log( "THREE.OBJMTLLoader: Unhandled line " + line );
+				console.log( "THREE.OBJMTLLoader: Unhandled line " + line );
 
 			}
 

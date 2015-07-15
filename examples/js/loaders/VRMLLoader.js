@@ -2,7 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VRMLLoader = function () {};
+THREE.VRMLLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.VRMLLoader.prototype = {
 
@@ -22,35 +26,23 @@ THREE.VRMLLoader.prototype = {
 
 	recordingFieldname: null,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			var object = scope.parse( event.target.responseText );
+			onLoad( scope.parse( text ) );
 
-			scope.dispatchEvent( { type: 'load', content: object } );
+		}, onProgress, onError );
 
-			if ( callback ) callback( object );
+	},
 
-		}, false );
+	setCrossOrigin: function ( value ) {
 
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		this.crossOrigin = value;
 
 	},
 
@@ -58,7 +50,7 @@ THREE.VRMLLoader.prototype = {
 
 		var parseV1 = function ( lines, scene ) {
 
-			THREE.warn( 'VRML V1.0 not supported yet' );
+			console.warn( 'VRML V1.0 not supported yet' );
 
 		};
 
@@ -349,7 +341,7 @@ THREE.VRMLLoader.prototype = {
 						case 'color':
 
 							if (parts.length != 4) {
-								THREE.warn('Invalid color format detected for ' + fieldName );
+								console.warn('Invalid color format detected for ' + fieldName );
 								break;
 							}
 
@@ -365,7 +357,7 @@ THREE.VRMLLoader.prototype = {
 						case 'scale':
 						case 'size':
 							if (parts.length != 4) {
-								THREE.warn('Invalid vector format detected for ' + fieldName);
+								console.warn('Invalid vector format detected for ' + fieldName);
 								break;
 							}
 
@@ -385,7 +377,7 @@ THREE.VRMLLoader.prototype = {
 						case 'shininess':
 						case 'ambientIntensity':
 							if (parts.length != 2) {
-								THREE.warn('Invalid single float value specification detected for ' + fieldName);
+								console.warn('Invalid single float value specification detected for ' + fieldName);
 								break;
 							}
 
@@ -395,7 +387,7 @@ THREE.VRMLLoader.prototype = {
 
 						case 'rotation':
 							if (parts.length != 5) {
-								THREE.warn('Invalid quaternion format detected for ' + fieldName);
+								console.warn('Invalid quaternion format detected for ' + fieldName);
 								break;
 							}
 
@@ -413,7 +405,7 @@ THREE.VRMLLoader.prototype = {
 						case 'colorPerVertex':
 						case 'convex':
 							if (parts.length != 2) {
-								THREE.warn('Invalid format detected for ' + fieldName);
+								console.warn('Invalid format detected for ' + fieldName);
 								break;
 							}
 
@@ -502,7 +494,7 @@ THREE.VRMLLoader.prototype = {
 
 			var parseNode = function ( data, parent ) {
 
-				// THREE.log( data );
+				// console.log( data );
 
 				if ( typeof data === 'string' ) {
 
@@ -511,7 +503,7 @@ THREE.VRMLLoader.prototype = {
 						var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
 
 						if (undefined == defines[defineKey]) {
-							THREE.warn(defineKey + ' is not defined.');
+							console.warn(defineKey + ' is not defined.');
 						} else {
 
 							if ( /appearance/.exec( data ) && defineKey ) {
@@ -834,6 +826,3 @@ THREE.VRMLLoader.prototype = {
 	}
 
 };
-
-THREE.EventDispatcher.prototype.apply( THREE.VRMLLoader.prototype );
-

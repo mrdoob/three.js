@@ -43,10 +43,6 @@ THREE.ImageUtils = {
 
 		var texture = new THREE.CubeTexture( images, mapping );
 
-		// no flipping needed for cube textures
-
-		texture.flipY = false;
-
 		var loaded = 0;
 
 		var loadTexture = function ( i ) {
@@ -81,13 +77,13 @@ THREE.ImageUtils = {
 
 	loadCompressedTexture: function () {
 
-		THREE.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' )
+		console.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' )
 
 	},
 
 	loadCompressedTextureCube: function () {
 
-		THREE.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
+		console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
 
 	},
 

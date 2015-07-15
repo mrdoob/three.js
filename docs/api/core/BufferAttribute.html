@@ -43,10 +43,14 @@
 		Flag to indicate that this attribute has changed and should be re-send to the GPU. Set this to true when you modify the value of the array.
 		</div>
 
+		<h3>[property:Integer version]</h3>
+		<div>
+		A version number, incremented every time the needsUpdate property is set to true.
+		</div>
 
 
 		<h2>Methods</h2>
-		
+
 		<h3>[method:null copyAt] ( [page:Integer index1], attribute, [page:Integer index2] ) </h3>
 		<div>
 		Copies itemSize values in the array from the vertex at index2 to the vertex at index1.

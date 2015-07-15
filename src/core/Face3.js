@@ -10,10 +10,10 @@ THREE.Face3 = function ( a, b, c, normal, color ) {
 	this.c = c;
 
 	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
-	this.vertexNormals = normal instanceof Array ? normal : [];
+	this.vertexNormals = Array.isArray( normal ) ? normal : [];
 
 	this.color = color instanceof THREE.Color ? color : new THREE.Color();
-	this.vertexColors = color instanceof Array ? color : [];
+	this.vertexColors = Array.isArray( color ) ? color : [];
 
 	this.vertexTangents = [];
 

@@ -5,6 +5,8 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.width = width;
 	this.height = height;
 

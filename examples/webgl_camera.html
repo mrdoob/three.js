@@ -102,25 +102,22 @@
 
 				//
 
-				mesh = new THREE.Line(
+				mesh = new THREE.LineSegments(
 					new THREE.WireframeGeometry( new THREE.SphereBufferGeometry( 100, 16, 8 ) ),
-					new THREE.LineBasicMaterial( { color: 0xffffff } ),
-					THREE.LinePieces
+					new THREE.LineBasicMaterial( { color: 0xffffff } )
 				);
 				scene.add( mesh );
 
-				var mesh2 = new THREE.Line(
+				var mesh2 = new THREE.LineSegments(
 					new THREE.WireframeGeometry( new THREE.SphereBufferGeometry( 50, 16, 8 ) ),
-					new THREE.LineBasicMaterial( { color: 0x00ff00 } ),
-					THREE.LinePieces
+					new THREE.LineBasicMaterial( { color: 0x00ff00 } )
 				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
-				var mesh3 = new THREE.Line(
+				var mesh3 = new THREE.LineSegments(
 					new THREE.WireframeGeometry( new THREE.SphereBufferGeometry( 5, 16, 8 ) ),
-					new THREE.LineBasicMaterial( { color: 0x0000ff } ),
-					THREE.LinePieces
+					new THREE.LineBasicMaterial( { color: 0x0000ff } )
 				);
 				mesh3.position.z = 150;
 				cameraRig.add( mesh3 );
