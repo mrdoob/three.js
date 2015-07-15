@@ -23,7 +23,6 @@ THREE.CubeTexture.clone = function ( texture ) {
 	THREE.Texture.prototype.clone.call( this, texture );
 
 	texture.images = this.images;
-	texture.flipY = this.flipY;
 
 	return texture;
 
