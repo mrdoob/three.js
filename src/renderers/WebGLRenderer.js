@@ -3337,13 +3337,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setTexture = function ( texture, slot ) {
 
-		// if the image has been uploaded into a separate renderer, will need to reupload to this renderer
-		if ( ( texture.image && texture.image.complete !== false ) && texture.__webglInit === true && properties.get( texture ).__webglInit === undefined ) {
-
-			texture.needsUpdate = true;
-
-		}
-
 		if ( texture.needsUpdate === true ) {
 
 			var image = texture.image;
