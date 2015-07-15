@@ -15,7 +15,7 @@ THREE.AudioListener = function () {
 THREE.AudioListener.prototype = Object.create( THREE.Object3D.prototype );
 THREE.AudioListener.prototype.constructor = THREE.AudioListener;
 
-THREE.AudioListener.prototype.updateWorldMatrices = ( function () {
+THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 	var quaternion = new THREE.Quaternion();
@@ -23,9 +23,9 @@ THREE.AudioListener.prototype.updateWorldMatrices = ( function () {
 
 	var orientation = new THREE.Vector3();
 
-	return function ( force ) {
+	return function ( recursive, noUpdatingParent ) {
 
-		THREE.Object3D.prototype.updateWorldMatrices.call( this, force );
+		THREE.Object3D.prototype.updateMatrixWorld.call( this, recursive, noUpdatingParent );
 
 		var listener = this.context.listener;
 		var up = this.up;
