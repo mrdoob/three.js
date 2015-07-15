@@ -5,12 +5,11 @@
 THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 	mapping = mapping !== undefined ? mapping : THREE.CubeReflectionMapping;
-	
+
 	THREE.Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.images = images;
-
-    this.flipY = false;
+	this.flipY = false;
 
 };
 
@@ -24,6 +23,7 @@ THREE.CubeTexture.clone = function ( texture ) {
 	THREE.Texture.prototype.clone.call( this, texture );
 
 	texture.images = this.images;
+	texture.flipY = this.flipY;
 
 	return texture;
 
