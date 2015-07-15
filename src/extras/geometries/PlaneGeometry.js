@@ -32,8 +32,6 @@ THREE.PlaneGeometry.prototype.clone = function () {
 		this.parameters.heightSegments
 	);
 
-	THREE.Geometry.prototype.cloneProperties.call( this, geometry );
-
 	return geometry;
 
 };

@@ -88,8 +88,6 @@ THREE.TorusGeometry.prototype.clone = function () {
 		this.parameters.arc
 	);
 
-	THREE.Geometry.prototype.cloneProperties.call( this, geometry );
-
 	return geometry;
 
 };

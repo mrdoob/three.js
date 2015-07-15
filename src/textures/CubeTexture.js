@@ -16,9 +16,9 @@ THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilt
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
 THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
-THREE.CubeTexture.clone = function ( texture ) {
+THREE.CubeTexture.clone = function () {
 
-	if ( texture === undefined ) texture = new THREE.CubeTexture();
+	var texture = new THREE.CubeTexture();
 
 	THREE.Texture.prototype.cloneProperties.call( this, texture );
 

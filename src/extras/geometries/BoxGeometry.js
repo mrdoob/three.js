@@ -135,8 +135,6 @@ THREE.BoxGeometry.prototype.clone = function () {
 		this.parameters.depthSegments
 	);
 
-	THREE.Geometry.prototype.cloneProperties.call( this, geometry );
-
 	return geometry;
 
 };
