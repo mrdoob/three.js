@@ -3404,17 +3404,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( texture.image.length === 6 ) {
 
+			if ( ! textureProperties.__image__webglTextureCube ) {
+
+				texture.addEventListener( 'dispose', onTextureDispose );
+
+				textureProperties.__image__webglTextureCube = _gl.createTexture();
+
+				_infoMemory.textures ++;
+
+				texture.needsUpdate = true;
+
+			}
+
 			if ( texture.needsUpdate ) {
-
-				if ( ! textureProperties.__image__webglTextureCube ) {
-
-					texture.addEventListener( 'dispose', onTextureDispose );
-
-					textureProperties.__image__webglTextureCube = _gl.createTexture();
-
-					_infoMemory.textures ++;
-
-				}
 
 				state.activeTexture( _gl.TEXTURE0 + slot );
 				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube );
