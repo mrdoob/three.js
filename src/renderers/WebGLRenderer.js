@@ -1631,7 +1631,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateWorldMatrices();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 
