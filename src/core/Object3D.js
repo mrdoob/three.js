@@ -567,7 +567,7 @@ THREE.Object3D.prototype = {
 
 	},
 	
-	updateMatrixWorld: function () {
+	updateMatrixWorld: function (recursive, noUpdatingParent) {
 
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
@@ -576,9 +576,30 @@ THREE.Object3D.prototype = {
 			this.matrixWorld.copy( this.matrix );
 
 		} else {
+			
+			var matrix;
+			if ( noUpdatingParent === true ) {
+				
+				matrix = this.matrixWorld;
+				
+			} else {
+				
+				matrix = this.parent.updateMatrixWorld();
+				
+			}
+			
 
-			this.matrixWorld.multiplyMatrices( this.parent.getUpdatedMatrixWorld() , this.matrix );
+			this.matrixWorld.multiplyMatrices( matrix , this.matrix );
 
+		}
+		
+		if ( recursive === true ) {
+			
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+	
+				this.children[ i ].updateMatrixWorld( true, true );
+	
+			}
 		}
 		
 		return this.matrixWorld;
