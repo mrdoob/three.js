@@ -110,6 +110,7 @@
 
 				var refractionCube = THREE.ImageUtils.loadTextureCube( urls );
 				refractionCube.mapping = THREE.CubeRefractionMapping;
+				refractionCube.format = THREE.RGBFormat;
 
 				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.25 } );
 				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
