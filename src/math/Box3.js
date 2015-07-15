@@ -65,7 +65,7 @@ THREE.Box3.prototype = {
 
 			var scope = this;
 
-			object.updateMatrixWorld( true );
+			object.updateMatrixWorld( );
 
 			this.makeEmpty();
 

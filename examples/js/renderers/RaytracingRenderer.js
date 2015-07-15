@@ -489,7 +489,7 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld( true );
 
 		// update camera matrices
 

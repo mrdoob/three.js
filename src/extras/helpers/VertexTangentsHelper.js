@@ -59,7 +59,7 @@ THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
 
 		var keys = [ 'a', 'b', 'c' ];
 
-		this.object.updateMatrixWorld( true );
+		this.object.updateMatrixWorld( );
 
 		var matrixWorld = this.object.matrixWorld;
 

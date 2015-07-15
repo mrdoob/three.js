@@ -23,34 +23,29 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 
 	return function ( recursive, noUpdatingParent ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
-		// update matrixWorld
+		if ( this.parent === undefined ) {
 
-		if ( this.matrixWorldNeedsUpdate ) {
+			this.matrixWorld.copy( this.matrix );
 
-			if ( this.parent ) {
+		} else {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-				this.matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
-				this.matrix.decompose( translationObject, quaternionObject, scaleObject );
-
-				this.matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
-
-
-			} else {
-
-				this.matrixWorld.copy( this.matrix );
-
+			if ( noUpdatingParent !== true ) {
+				
+				this.parent.updateMatrixWorld();
+				
 			}
 
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
+			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld , this.matrix );
+			
+			this.matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
+			this.matrix.decompose( translationObject, quaternionObject, scaleObject );
+	
+			this.matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
 
 		}
+
 
 		// update children
 		if ( recursive === true ) {

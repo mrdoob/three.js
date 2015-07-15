@@ -61,7 +61,7 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 
 	return function() {
 
-		this.object.updateMatrixWorld( true );
+		this.object.updateMatrixWorld( );
 
 		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
