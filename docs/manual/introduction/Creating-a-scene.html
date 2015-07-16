@@ -63,7 +63,7 @@
 
 		<div>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, Three.js comes with a few others, often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.</div>
 
-		<div>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our game - in this case, the width and height of the browser window. For performance intensive games, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, for half the resolution. This does not mean that the game will only fill half the window, but rather look a bit blurry and scaled up.</div>
+		<div>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our game - in this case, the width and height of the browser window. For performance intensive games, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, which will make the game fill only half the window. If you wish to keep the size, but render the game at a lower resolution, you can do that by calling <strong>setPixelRatio</strong> with a value like 0.5 which will make the game look a bit blurry and scaled up.</div>
 
 		<div>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</div>
 
