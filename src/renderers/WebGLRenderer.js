@@ -2487,7 +2487,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var mode, faces;
+			var mode;
 
 			if ( material.wireframe === true ) {
 
