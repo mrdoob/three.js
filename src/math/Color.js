@@ -10,7 +10,7 @@ THREE.Color = function ( color ) {
 
 	}
 
-	return this.set( color )
+	return this.set( color );
 
 };
 
@@ -73,7 +73,7 @@ THREE.Color.prototype = {
 			if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
 			return p;
 
-		};
+		}
 
 		return function ( h, s, l ) {
 

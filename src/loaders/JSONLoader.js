@@ -68,8 +68,7 @@ THREE.JSONLoader.prototype = {
 
 	parse: function ( json, texturePath ) {
 
-		var scope = this,
-		geometry = new THREE.Geometry(),
+		var geometry = new THREE.Geometry(),
 		scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
 		parseModel( scale );

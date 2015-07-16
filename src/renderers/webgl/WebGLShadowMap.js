@@ -13,8 +13,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	_min = new THREE.Vector3(),
 	_max = new THREE.Vector3(),
 
-	_webglObjects = _objects.objects,
-
 	_matrixPosition = new THREE.Vector3(),
 
 	_renderList = [];

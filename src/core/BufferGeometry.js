@@ -153,7 +153,6 @@ THREE.BufferGeometry.prototype = {
 		console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
 
 		var geometry = object.geometry;
-		var material = object.material;
 
 		if ( object instanceof THREE.PointCloud || object instanceof THREE.Line ) {
 

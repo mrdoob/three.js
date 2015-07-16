@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - multiple Renderers - complex</title>
+		<title>three.js webgl - multiple renderers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -62,7 +62,7 @@
 			<div id="container2"></div>
 			<div id="container3"></div>
 		</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple canvases - complex</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple renderers</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -115,8 +115,8 @@
 
 				var container3 = document.getElementById( 'container3' );
 
-				container3.style.left = e.pageX - container3.clientWidth / 2 + "px"
-				container3.style.top = e.pageY - container3.clientHeight / 2 + "px"
+				container3.style.left = e.pageX - container3.clientWidth / 2 + "px";
+				container3.style.top = e.pageY - container3.clientHeight / 2 + "px";
 
 			}
 
@@ -225,9 +225,7 @@
 				group2.rotation.x = 0;
 				scene.add( group2 );
 
-				group3 = new THREE.Group();
-				group3.add( new THREE.Mesh( new THREE.BufferGeometry().fromGeometry( geometry3 ), materials[0] ) );
-				group3.add( new THREE.Mesh( geometry3, materials[1] ) );
+				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
 				group3.name = 'rotating ball';
 				group3.position.x = 0;
 				group3.rotation.x = 0;
@@ -238,25 +236,31 @@
 
 			function updateScene () {
 
-				var group = scene.getObjectByName( 'rotating ball' )
+				var group = scene.getObjectByName( 'rotating ball' );
 				group.rotation.x += Math.PI / 600;
 
 				var geometry = group.children[0].geometry;
-				var array = geometry.attributes.color.array;
 
-				for (var i = 0; i < array.length; i ++) {
+				for (var i = 0; i < geometry.faces.length; i ++) {
 
-					array[i] = ( array[i] + 0.99 ) % 1.0;
+						var f = geometry.faces[ i ];
 
-				}
+						for( var j = 0; j < 3; j ++ ) {
 
-				geometry.attributes.color.needsUpdate = true;
+							var color = f.vertexColors[ j ];
+							color.setHex( ( color.getHex() + 0xfdfdfd ) % 0xffffff );
+
+						}
+
+					}
+
+				geometry.colorsNeedUpdate = true;
 
 			}
 
 			function App( container, fullWidth, fullHeight ) {
 
-				var container, stats;
+				var stats;
 
 				var camera, renderer;
 
