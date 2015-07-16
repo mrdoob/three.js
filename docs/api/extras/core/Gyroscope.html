@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
@@ -17,13 +18,13 @@
 		var root = new THREE.Group();
 		var gyro = new THREE.Gyroscope();
 		var cube = new THREE.Mesh( geometry, material );
-		
+
 		root.add( gyro )
 		gyro.add( cube )
-		
+
 		cube.position.x = 10;
 		root.rotation.y = Math.PI;
-		
+
 		// The cube will have changed its position but maintained its orientation
 		</code>
 

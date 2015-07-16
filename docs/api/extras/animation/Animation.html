@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -29,13 +30,13 @@
 		<h3>[property:Object3d root]</h3>
 		<div>
 		The root object of the animation.
-		</div> 
+		</div>
 
 		<h3>[property:Object data]</h3>
 		<div>
 		The data containing the animation
-		</div> 
-		
+		</div>
+
 		<h3>[property:Array hierarchy]</h3>
 		<div>
 		The objects that are influenced by the animation.
@@ -45,7 +46,7 @@
 		<div>
 		The time elapsed since the last start/restart of the animation.
 		</div>
-		
+
 		<h3>[property:number timeScale]</h3>
 		<div>
 		How much to scale the speed of the animation. Defaults to 1.
@@ -55,24 +56,24 @@
 		<div>
 		Indicates whether the animation is playing. This shouldn't be adapted by user code.
 		</div>
-		
+
 		<h3>[property:boolean isPaused]</h3>
 		<div>
 		Indicates whether the animation is paused. This shouldn't be adapted by user code.
 		</div>
-		
+
 		<h3>[property:boolean loop]</h3>
 		<div>
 		Set to make the animation restart when the animation ends.
-		</div> 
-		
+		</div>
+
 		<h3>[property:number interpolationType]</h3>
 		<div>
 		The type to indicate how to interpolate between 2 data points.
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
-		
+
 		<h3>[method:null play]([page:Number startTime])</h3>
 		<div>
 		Starts the animation at the startTime (in seconds) of the animation.
@@ -85,7 +86,7 @@
 
 		<h3>[method:Boolean update]([page:Number deltaTimeMS])</h3>
 		<div>
-		deltaTimeMS -- The time of the between the previous frame and this frame in miliseconds. 
+		deltaTimeMS -- The time of the between the previous frame and this frame in miliseconds.
 		</div>
 		<div>
 		Updates the animation in time. This shouldn't be called by user code. The animationHandler calls this method.
@@ -94,7 +95,7 @@
 		<h3>[method:array interpolateCatmullRom]([page:Array points], [page:Number scale])</h3>
 		<div>
 		points -- The 4 control point to calculate CatMullRom <br />
-		scale -- The scale between the previous key and the nex key 
+		scale -- The scale between the previous key and the nex key
 		</div>
 		<div>
 		Interpolates the point based on the key. Is used in update.

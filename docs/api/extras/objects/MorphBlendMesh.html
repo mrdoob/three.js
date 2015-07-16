@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Mesh] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">A mesh that can blend together multiple animated morph targets.</div>
@@ -33,12 +34,12 @@
 		<h3>[property:object animationsMap]</h3>
 		<div>
 		An object of named animations as added by [page:MorphBlendMesh.createAnimation].
-		</div> 
+		</div>
 
 		<h3>[property:array animationsList]</h3>
 		<div>
 		The list of animations as added by [page:MorphBlendMesh.createAnimation].
-		</div> 
+		</div>
 
 		<h2>Methods</h2>
 
@@ -72,7 +73,7 @@
 		<div>
 		Creates an animation object that gets added to both the [page:MorphBlendMesh.animationsMap animationsMap] and
 		[page:MorphBlendMesh.animationsList animationsList].<br/><br/>
-		
+
 		Animation object:<br/><br/>
 		startFrame -- Starting frame<br/>
 		endFrame -- Ending frame<br/>
