@@ -43,6 +43,8 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
+			selectionBox.update( object );
+
 			if ( editor.helpers[ object.id ] !== undefined ) {
 
 				editor.helpers[ object.id ].update();
