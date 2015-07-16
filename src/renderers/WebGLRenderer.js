@@ -2487,7 +2487,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var mode = material.wireframe === true ? _gl.LINES : _gl.TRIANGLES;
+			var mode, faces;
+
+			if ( material.wireframe === true ) {
+
+				mode = _gl.LINES;
+
+			} else {
+
+				switch ( object.mode ) {
+
+					case THREE.TrianglePieces:
+						mode = _gl.TRIANGLES;
+						break;
+
+					case THREE.TriangleStrip:
+						mode = _gl.TRIANGLE_STRIP;
+						break;
+
+					case THREE.TriangleFan:
+						mode = _gl.TRIANGLE_FAN;
+						break;
+
+				}
+
+			}
 
 			var index = geometry.attributes.index;
 

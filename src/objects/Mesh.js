@@ -5,7 +5,7 @@
  * @author jonobr1 / http://jonobr1.com/
  */
 
-THREE.Mesh = function ( geometry, material ) {
+THREE.Mesh = function ( geometry, material, mode ) {
 
 	THREE.Object3D.call( this );
 
@@ -14,9 +14,15 @@ THREE.Mesh = function ( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
 	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
+	this.mode = mode !== undefined ? mode : THREE.TrianglePieces;
+
 	this.updateMorphTargets();
 
 };
+
+THREE.TrianglePieces = 0;
+THREE.TriangleStrip = 1;
+THREE.TriangleFan = 2;
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Mesh.prototype.constructor = THREE.Mesh;
