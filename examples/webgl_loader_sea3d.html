@@ -7,7 +7,7 @@
 		<style>
 			body {
 				font-family: Monospace;
-				background-color: #333;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -23,12 +23,12 @@
 
 			}
 
-			a { color: skyblue }
+			a { color: white }
 		</style>
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> • <a href="https://github.com/sunag/sea3d" style="color:#0099FF" target="_blank">sea3d</a>	
+			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -57,61 +57,59 @@
 			var container, stats;
 
 			var camera, scene, renderer, composer, controls;
-			
+
 			var loader;
-			
+
 			// Initialize Three.JS
-			
+
 			init(); 
-			
+
 			//
-			//	TODO: SEA3D Loader
+			//	SEA3D Loader
 			//
-			
-			loader = new THREE.SEA3D({
+
+			loader = new THREE.SEA3D( {
+
 				autoPlay : true, // Auto play animations
 				container : scene, // Container to add models
-				parser : THREE.SEA3D.DEFAULT, // THREE.SEA3D.BUFFER to THREE.GeometryBuffer				
+				parser : THREE.SEA3D.DEFAULT, // THREE.SEA3D.BUFFER to THREE.GeometryBuffer
 				multiplier : 1 // Light multiplier
-			});	
-			
+
+			} );
+
 			loader.onComplete = function( e ) {
-				
+
 				// Get camera from 3ds Max
 				// use loader.get... to get others objects
-				
-				var cam = loader.getCamera("Camera007");
+
+				var cam = loader.getCamera( "Camera007" );
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
-				
-				animate();
-				
-			};
-			
-			loader.container = scene;				
-			loader.load( './models/sea3d/mascot.sea' );			
 
-			//--
-			
+				animate();
+
+			};
+
+			loader.container = scene;
+			loader.load( './models/sea3d/mascot.sea' );
+
+			//
+
 			function init() {
-			
+
 				scene = new THREE.Scene();
-				
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 1000, -300, 1000 );
-				
-				controls = new THREE.TrackballControls(camera, document);
-				controls.rotateSpeed = 2.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-				controls.noZoom = false;
-				controls.noPan = false;
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.1;
-				
+				camera.position.set( 1000, - 300, 1000 );
+
+				controls = new THREE.TrackballControls( camera, document );
+				controls.noZoom = true;
+				controls.noPan = true;
+				controls.dynamicDampingFactor = 0.05;
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -124,38 +122,38 @@
 				container.appendChild( stats.domElement );
 
 				// post-processing
-				
+
 				composer = new THREE.EffectComposer( renderer );
-				
+
 				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );				
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				composer.addPass( renderPass );
-				
+
 				var vh = 1.4, vl = 1.2;
-				
+
 				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
 				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
 				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
-				composer.addPass( colorCorrectionPass );							
-				
+				composer.addPass( colorCorrectionPass );
+
 				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
-				
-				composer.addPass( copyPass );				
+
+				composer.addPass( copyPass );
 				copyPass.renderToScreen = true;
-				
+
 				// extra lights
-				
+
 				scene.add( new THREE.AmbientLight( 0x333333 ) );
-				
+
 				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
-			
+
 			}
-			
-			
+
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -172,8 +170,9 @@
 				requestAnimationFrame( animate );
 
 				controls.update();
-				
+
 				render();
+
 				stats.update();
 
 			}
@@ -181,17 +180,17 @@
 			var clock = new THREE.Clock();
 
 			function render() {
-				
+
 				var delta = clock.getDelta();
-				
+
 				THREE.AnimationHandler.update( delta );
 
 				// SEA3D Keyframe Update		
 				SEA3D.AnimationHandler.update( delta ); 
-				
-				//renderer.render( scene, camera );				
+
+				//renderer.render( scene, camera );
 				composer.render( delta );
-				
+
 			}
 
 		</script>
