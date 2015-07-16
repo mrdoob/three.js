@@ -84,6 +84,10 @@
 					line.material.transparent = true;
 					line.position.x = -4;
 					group.add( line );
+					
+					scene.add( new THREE.BoxHelper( group ) );
+					scene.add( new THREE.BoxHelper( scene ) );
+					
 
 				} );
 

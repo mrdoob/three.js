@@ -22,16 +22,30 @@ THREE.BoxHelper.prototype.constructor = THREE.BoxHelper;
 
 THREE.BoxHelper.prototype.update = function ( object ) {
 
-	var geometry = object.geometry;
-
-	if ( geometry.boundingBox === null ) {
-
-		geometry.computeBoundingBox();
-
+	var min, max;
+	 if ( object.type == 'Mesh') {
+		
+		var geometry = object.geometry;
+		
+		if ( geometry.boundingBox === null ) {
+			
+			geometry.computeBoundingBox();
+			
+		}
+		
+		min = geometry.boundingBox.min;
+		max = geometry.boundingBox.max;
+		
+		this.matrix = object.matrixWorld;
+		this.matrixAutoUpdate = false;
+		
+	} else {
+		
+		var box = new THREE.Box3().setFromObject(object);
+		min = box.min;
+		max = box.max;
+		
 	}
-
-	var min = geometry.boundingBox.min;
-	var max = geometry.boundingBox.max;
 
 	/*
 	  5____4
@@ -94,8 +108,5 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 	this.geometry.attributes.position.needsUpdate = true;
 
 	this.geometry.computeBoundingSphere();
-
-	this.matrix = object.matrixWorld;
-	this.matrixAutoUpdate = false;
 
 };
