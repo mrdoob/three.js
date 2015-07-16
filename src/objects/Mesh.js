@@ -65,6 +65,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 	var vA = new THREE.Vector3();
 	var vB = new THREE.Vector3();
 	var vC = new THREE.Vector3();
+	
+	var tempA = new THREE.Vector3();
+	var tempB = new THREE.Vector3();
+	var tempC = new THREE.Vector3();
+
 
 	return function ( raycaster, intersects ) {
 
@@ -221,6 +226,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 			var vertices = geometry.vertices;
 			var faces = geometry.faces;
 
+
 			for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
 				var face = faces[ f ];
@@ -248,18 +254,10 @@ THREE.Mesh.prototype.raycast = ( function () {
 						if ( influence === 0 ) continue;
 
 						var targets = morphTargets[ t ].vertices;
-
-						vA.x += ( targets[ face.a ].x - a.x ) * influence;
-						vA.y += ( targets[ face.a ].y - a.y ) * influence;
-						vA.z += ( targets[ face.a ].z - a.z ) * influence;
-
-						vB.x += ( targets[ face.b ].x - b.x ) * influence;
-						vB.y += ( targets[ face.b ].y - b.y ) * influence;
-						vB.z += ( targets[ face.b ].z - b.z ) * influence;
-
-						vC.x += ( targets[ face.c ].x - c.x ) * influence;
-						vC.y += ( targets[ face.c ].y - c.y ) * influence;
-						vC.z += ( targets[ face.c ].z - c.z ) * influence;
+						
+						vA.addScaledVector(tempA.subVectors(targets[ face.a ], a),influence);
+						vB.addScaledVector(tempB.subVectors(targets[ face.b ], b),influence);
+						vC.addScaledVector(tempC.subVectors(targets[ face.c ], c),influence);
 
 					}
 
