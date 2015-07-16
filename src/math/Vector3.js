@@ -486,7 +486,7 @@ THREE.Vector3.prototype = {
 
 		var min, max;
 
-		return function ( minVal, maxVal ) {
+		return function clampScalar ( minVal, maxVal ) {
 
 			if ( min === undefined ) {
 

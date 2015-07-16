@@ -76,7 +76,7 @@ THREE.WebGLProgram = ( function () {
 
 	}
 
-	return function ( renderer, code, material, parameters ) {
+	return function WebGLProgram ( renderer, code, material, parameters ) {
 
 		var gl = renderer.context;
 

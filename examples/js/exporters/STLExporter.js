@@ -14,7 +14,7 @@ THREE.STLExporter.prototype = {
 		var vector = new THREE.Vector3();
 		var normalMatrixWorld = new THREE.Matrix3();
 
-		return function ( scene ) {
+		return function parse ( scene ) {
 
 			var output = '';
 

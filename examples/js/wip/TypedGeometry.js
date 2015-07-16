@@ -40,7 +40,7 @@ THREE.TypedGeometry.prototype.merge = ( function () {
 	var offset = 0;
 	var normalMatrix = new THREE.Matrix3();
 
-	return function ( geometry, matrix, startOffset ) {
+	return function merge ( geometry, matrix, startOffset ) {
 
 		if ( startOffset !== undefined ) offset = startOffset;
 

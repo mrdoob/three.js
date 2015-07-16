@@ -60,7 +60,7 @@ THREE.Loader.prototype = {
 
 		var imageLoader;
 
-		return function ( m, texturePath, crossOrigin ) {
+		return function createMaterial ( m, texturePath, crossOrigin ) {
 
 			var scope = this;
 

@@ -66,7 +66,7 @@ THREE.Mesh.prototype.raycast = ( function () {
 	var vB = new THREE.Vector3();
 	var vC = new THREE.Vector3();
 
-	return function ( raycaster, intersects ) {
+	return function raycast ( raycaster, intersects ) {
 
 		var geometry = this.geometry;
 		var material = this.material;

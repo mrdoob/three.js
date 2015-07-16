@@ -14,7 +14,7 @@ THREE.WebGLShader = ( function () {
 
 	};
 
-	return function ( gl, type, string ) {
+	return function WebGLShader ( gl, type, string ) {
 
 		var shader = gl.createShader( type );
 

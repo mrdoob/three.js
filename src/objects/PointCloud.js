@@ -21,7 +21,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
 
-	return function ( raycaster, intersects ) {
+	return function raycast ( raycaster, intersects ) {
 
 		var object = this;
 		var geometry = object.geometry;

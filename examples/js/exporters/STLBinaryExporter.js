@@ -15,7 +15,7 @@ THREE.STLBinaryExporter.prototype = {
 		var vector = new THREE.Vector3();
 		var normalMatrixWorld = new THREE.Matrix3();
 
-		return function ( scene ) {
+		return function parse ( scene ) {
 
 			var triangles = 0;
 			scene.traverse( function ( object ) {

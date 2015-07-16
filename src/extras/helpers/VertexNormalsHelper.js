@@ -57,7 +57,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
 
-	return function() {
+	return function update ( ) {
 
 		var keys = [ 'a', 'b', 'c' ];
 
