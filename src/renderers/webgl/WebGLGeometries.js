@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLGeometries = function ( gl, info ) {
+THREE.WebGLGeometries = function ( gl,properties, info ) {
 
 	var geometries = {};
 
@@ -48,12 +48,12 @@ THREE.WebGLGeometries = function ( gl, info ) {
 		for ( var name in buffergeometry.attributes ) {
 
 			var attribute = buffergeometry.attributes[ name ];
+			var buffer = getAttributeBuffer(attribute);
 
-			if ( attribute.buffer !== undefined ) {
+			if ( buffer !== undefined ) {
 
-				gl.deleteBuffer( attribute.buffer );
-
-				delete attribute.buffer;
+				gl.deleteBuffer( buffer );
+				removeAttributeBuffer(attribute);
 
 			}
 
@@ -66,5 +66,30 @@ THREE.WebGLGeometries = function ( gl, info ) {
 		info.memory.geometries --;
 
 	}
+	
+	 function getAttributeBuffer( attribute ) {
 
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			return properties.get( attribute.data ).__webglBuffer;
+
+		}
+
+		return properties.get( attribute ).__webglBuffer;
+
+	};
+	
+	 function removeAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			properties.delete( attribute.data );
+
+		} else {
+
+			properties.delete( attribute );
+			
+		};
+
+	};
 };
