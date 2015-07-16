@@ -125,6 +125,16 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+	
+	addScaledVector: function ( v, s ) {
+
+        this.x += v.x * s;
+        this.y += v.y * s;
+        this.z += v.z * s;
+
+        return this;
+
+    },
 
 	sub: function ( v, w ) {
 
