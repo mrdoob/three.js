@@ -1353,6 +1353,15 @@ THREE.Vector2.prototype = {
 		return this;
 
 	},
+	
+	addScaledVector: function ( v, s ) {
+
+        this.x += v.x * s;
+        this.y += v.y * s;
+
+        return this;
+
+    },
 
 	sub: function ( v, w ) {
 
@@ -1816,6 +1825,16 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+	
+	addScaledVector: function ( v, s ) {
+
+        this.x += v.x * s;
+        this.y += v.y * s;
+        this.z += v.z * s;
+
+        return this;
+
+    },
 
 	sub: function ( v, w ) {
 
@@ -2684,6 +2703,17 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
+	
+	addScaledVector: function ( v, s ) {
+
+        this.x += v.x * s;
+        this.y += v.y * s;
+        this.z += v.z * s;
+        this.w += v.w * s;
+
+        return this;
+
+    },
 
 	sub: function ( v, w ) {
 
@@ -16720,6 +16750,10 @@ THREE.Mesh.prototype.raycast = ( function () {
 	var vB = new THREE.Vector3();
 	var vC = new THREE.Vector3();
 
+	var tempA = new THREE.Vector3();
+	var tempB = new THREE.Vector3();
+	var tempC = new THREE.Vector3();
+
 	return function ( raycaster, intersects ) {
 
 		var geometry = this.geometry;
@@ -16903,17 +16937,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						var targets = morphTargets[ t ].vertices;
 
-						vA.x += ( targets[ face.a ].x - a.x ) * influence;
-						vA.y += ( targets[ face.a ].y - a.y ) * influence;
-						vA.z += ( targets[ face.a ].z - a.z ) * influence;
-
-						vB.x += ( targets[ face.b ].x - b.x ) * influence;
-						vB.y += ( targets[ face.b ].y - b.y ) * influence;
-						vB.z += ( targets[ face.b ].z - b.z ) * influence;
-
-						vC.x += ( targets[ face.c ].x - c.x ) * influence;
-						vC.y += ( targets[ face.c ].y - c.y ) * influence;
-						vC.z += ( targets[ face.c ].z - c.z ) * influence;
+						vA.addScaledVector( tempA.subVectors( targets[ face.a ], a ), influence );
+						vB.addScaledVector( tempB.subVectors( targets[ face.b ], b ), influence );
+						vC.addScaledVector( tempC.subVectors( targets[ face.c ], c ), influence );
 
 					}
 
