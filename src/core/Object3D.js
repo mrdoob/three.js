@@ -57,8 +57,8 @@ THREE.Object3D = function () {
 
 	this.rotationAutoUpdate = true;
 
-	this.matrix = new THREE.Matrix4();
-	this.matrixWorld = new THREE.Matrix4();
+	this.matrixCached = new THREE.Matrix4();
+	this.matrixWorldCached = new THREE.Matrix4();
 
 	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = false;
@@ -113,6 +113,28 @@ THREE.Object3D.prototype = {
 
 		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
 
+	},
+	
+	get matrix () {
+	    return this.updateMatrix();
+	},
+	
+	get matrixWorld () {
+
+	    if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+	
+	    if ( this.parent === undefined ) {
+	
+	        this.matrixWorldCached.copy( this.matrixCached );
+	
+	    } else {
+	
+	        this.matrixWorldCached.multiplyMatrices( this.parent.matrixWorld , this.matrixCached );
+	
+	    }
+	
+	    return this.matrixWorldCached;
+	
 	},
 
 	applyMatrix: function ( matrix ) {
@@ -536,10 +558,9 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.compose( this.position, this.quaternion, this.scale );
-
-		this.matrixWorldNeedsUpdate = true;
-
+		this.matrixCached.compose( this.position, this.quaternion, this.scale );
+		
+		return this.matrixCached;
 	},
 
 	updateMatrixWorld: function ( force ) {
@@ -550,11 +571,11 @@ THREE.Object3D.prototype = {
 
 			if ( this.parent === undefined ) {
 
-				this.matrixWorld.copy( this.matrix );
+				this.matrixWorldCached.copy( this.matrixCached );
 
 			} else {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				this.matrixWorldCached.multiplyMatrices( this.parent.matrixWorldCached, this.matrixCached );
 
 			}
 
