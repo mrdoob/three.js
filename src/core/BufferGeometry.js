@@ -1108,28 +1108,28 @@ THREE.BufferGeometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.BufferGeometry();
-		return this.cloneProperties( geometry );
+		return geometry._copyFrom( this );
 
 	},
 
-	cloneProperties: function ( geometry ) {
+	_copyFrom: function ( source ) {
 
-		for ( var attr in this.attributes ) {
+		for ( var attr in source.attributes ) {
 
-			var sourceAttr = this.attributes[ attr ];
-			geometry.addAttribute( attr, sourceAttr.clone() );
-
-		}
-
-		for ( var i = 0, il = this.drawcalls.length; i < il; i ++ ) {
-
-			var offset = this.drawcalls[ i ];
-
-			geometry.addDrawCall( offset.start, offset.count, offset.index );
+			var sourceAttr = source.attributes[ attr ];
+			this.addAttribute( attr, sourceAttr.clone() );
 
 		}
 
-		return geometry;
+		for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
+
+			var offset = source.drawcalls[ i ];
+
+			this.addDrawCall( offset.start, offset.count, offset.index );
+
+		}
+
+		return this;
 
 	},
 

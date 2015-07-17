@@ -66,37 +66,37 @@ THREE.Texture.prototype = {
 	clone: function () {
 
 		var texture = new THREE.Texture();
-		return this.cloneProperties( texture );
+		return texture._copyFrom( this );
 
 	},
 
-	cloneProperties: function ( texture ) {
+	_copyFrom: function ( source ) {
 
-		texture.image = this.image;
-		texture.mipmaps = this.mipmaps.slice( 0 );
+		this.image = source.image;
+		this.mipmaps = source.mipmaps.slice( 0 );
 
-		texture.mapping = this.mapping;
+		this.mapping = source.mapping;
 
-		texture.wrapS = this.wrapS;
-		texture.wrapT = this.wrapT;
+		this.wrapS = source.wrapS;
+		this.wrapT = source.wrapT;
 
-		texture.magFilter = this.magFilter;
-		texture.minFilter = this.minFilter;
+		this.magFilter = source.magFilter;
+		this.minFilter = source.minFilter;
 
-		texture.anisotropy = this.anisotropy;
+		this.anisotropy = source.anisotropy;
 
-		texture.format = this.format;
-		texture.type = this.type;
+		this.format = source.format;
+		this.type = source.type;
 
-		texture.offset.copy( this.offset );
-		texture.repeat.copy( this.repeat );
+		this.offset.copy( source.offset );
+		this.repeat.copy( source.repeat );
 
-		texture.generateMipmaps = this.generateMipmaps;
-		texture.premultiplyAlpha = this.premultiplyAlpha;
-		texture.flipY = this.flipY;
-		texture.unpackAlignment = this.unpackAlignment;
+		this.generateMipmaps = source.generateMipmaps;
+		this.premultiplyAlpha = source.premultiplyAlpha;
+		this.flipY = source.flipY;
+		this.unpackAlignment = source.unpackAlignment;
 
-		return texture;
+		return this;
 
 	},
 

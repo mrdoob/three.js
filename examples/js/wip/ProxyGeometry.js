@@ -741,7 +741,7 @@ THREE.ProxyGeometry.prototype.computeBoundingBox = function () {
 };
 THREE.ProxyGeometry.prototype.clone = function () {
 
-	var buff = THREE.BufferGeometry.prototype.cloneProperties.call(this);
+	var buff = THREE.BufferGeometry.prototype.clone.call( this );
 	var geo = new THREE.ProxyGeometry();
 	geo.attributes = buff.attributes;
 	geo.offsets = buff.drawcalls;

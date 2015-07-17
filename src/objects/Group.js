@@ -16,13 +16,13 @@ THREE.Group.prototype.constructor = THREE.Group;
 THREE.Group.prototype.clone = function () {
 
 	var group = new THREE.Group();
-	return this.cloneProperties( group );
+	return group._copyFrom( this );
 
 };
 
-THREE.Group.prototype.cloneProperties = function ( group ) {
+THREE.Group.prototype._copyFrom = function ( source ) {
 
-	THREE.Object3D.prototype.cloneProperties.call( this, group );
-	return group;
+	THREE.Object3D.prototype._copyFrom.call( this, source );
+	return this;
 
 };

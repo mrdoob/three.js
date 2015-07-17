@@ -164,43 +164,43 @@ THREE.Material.prototype = {
 	clone: function () {
 
 		var material = new THREE.Material();
-		return this.cloneProperties( material );
+		return material._copyFrom( this );
 
 	},
 
-	cloneProperties: function ( material ) {
+	_copyFrom: function ( source ) {
 
-		material.name = this.name;
+		this.name = source.name;
 
-		material.side = this.side;
+		this.side = source.side;
 
-		material.opacity = this.opacity;
-		material.transparent = this.transparent;
+		this.opacity = source.opacity;
+		this.transparent = source.transparent;
 
-		material.blending = this.blending;
+		this.blending = source.blending;
 
-		material.blendSrc = this.blendSrc;
-		material.blendDst = this.blendDst;
-		material.blendEquation = this.blendEquation;
-		material.blendSrcAlpha = this.blendSrcAlpha;
-		material.blendDstAlpha = this.blendDstAlpha;
-		material.blendEquationAlpha = this.blendEquationAlpha;
+		this.blendSrc = source.blendSrc;
+		this.blendDst = source.blendDst;
+		this.blendEquation = source.blendEquation;
+		this.blendSrcAlpha = source.blendSrcAlpha;
+		this.blendDstAlpha = source.blendDstAlpha;
+		this.blendEquationAlpha = source.blendEquationAlpha;
 
-		material.depthFunc = this.depthFunc;
-		material.depthTest = this.depthTest;
-		material.depthWrite = this.depthWrite;
+		this.depthFunc = source.depthFunc;
+		this.depthTest = source.depthTest;
+		this.depthWrite = source.depthWrite;
 
-		material.polygonOffset = this.polygonOffset;
-		material.polygonOffsetFactor = this.polygonOffsetFactor;
-		material.polygonOffsetUnits = this.polygonOffsetUnits;
+		this.polygonOffset = source.polygonOffset;
+		this.polygonOffsetFactor = source.polygonOffsetFactor;
+		this.polygonOffsetUnits = source.polygonOffsetUnits;
 
-		material.alphaTest = this.alphaTest;
+		this.alphaTest = source.alphaTest;
 
-		material.overdraw = this.overdraw;
+		this.overdraw = source.overdraw;
 
-		material.visible = this.visible;
+		this.visible = source.visible;
 
-		return material;
+		return this;
 
 	},
 

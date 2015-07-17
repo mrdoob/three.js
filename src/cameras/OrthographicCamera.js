@@ -40,7 +40,7 @@ THREE.OrthographicCamera.prototype.clone = function () {
 
 	var camera = new THREE.OrthographicCamera();
 
-	THREE.Camera.prototype.cloneProperties.call( this, camera );
+	THREE.Camera.prototype._copyFrom.call( camera, this );
 
 	camera.zoom = this.zoom;
 

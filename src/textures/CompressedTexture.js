@@ -28,7 +28,7 @@ THREE.CompressedTexture.prototype.clone = function () {
 
 	var texture = new THREE.CompressedTexture();
 
-	THREE.Texture.prototype.cloneProperties.call( this, texture );
+	THREE.Texture.prototype._copyFrom.call( texture, this );
 
 	return texture;
 

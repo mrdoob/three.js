@@ -19,15 +19,15 @@ THREE.Light.prototype.constructor = THREE.Light;
 THREE.Light.prototype.clone = function () {
 
 	var light = new THREE.Light();
-	return this.cloneProperties( light );
+	return light._copyFrom( this );
 
 };
 
-THREE.Light.prototype.cloneProperties = function ( light ) {
+THREE.Light.prototype._copyFrom = function ( source ) {
 
-	THREE.Object3D.prototype.cloneProperties.call( this, light );
-	light.color.copy( this.color );
+	THREE.Object3D.prototype._copyFrom.call( this, source );
+	this.color.copy( source.color );
 
-	return light;
+	return this;
 
 };

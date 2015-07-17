@@ -20,15 +20,15 @@ THREE.Bone.prototype.constructor = THREE.Bone;
 THREE.Bone.prototype.clone = function () {
 
 	var bone = new THREE.Bone( this.skin );
-	return this.cloneProperties( bone );
+	return bone._copyFrom( this );
 
 };
 
-THREE.Bone.prototype.cloneProperties = function ( bone ) {
+THREE.Bone.prototype._copyFrom = function ( source ) {
 
-	THREE.Object3D.prototype.cloneProperties.call( this, bone );
-	bone.skin = this.skin;
+	THREE.Object3D.prototype._copyFrom.call( this, source );
+	this.skin = source.skin;
 
-	return bone;
+	return this;
 
 };

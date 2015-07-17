@@ -17,7 +17,7 @@ THREE.LineSegments.prototype.clone = function () {
 
 	var line = new THREE.LineSegments( this.geometry, this.material );
 
-	THREE.Line.prototype.cloneProperties.call( this, line );
+	THREE.Line.prototype._copyFrom.call( line, this );
 
 	return line;
 

@@ -20,7 +20,7 @@ THREE.CubeTexture.clone = function () {
 
 	var texture = new THREE.CubeTexture();
 
-	THREE.Texture.prototype.cloneProperties.call( this, texture );
+	THREE.Texture.prototype._copyFrom.call( texture, this );
 
 	texture.images = this.images;
 

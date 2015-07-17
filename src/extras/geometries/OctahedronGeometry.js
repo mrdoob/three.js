@@ -32,7 +32,7 @@ THREE.OctahedronGeometry.prototype.clone = function () {
 		this.parameters.detail
 	);
 
-	THREE.PolyhedronGeometry.prototype.cloneProperties.call( this, geometry );
+	THREE.PolyhedronGeometry.prototype._copyFrom.call( geometry, this );
 
 	return geometry;
 

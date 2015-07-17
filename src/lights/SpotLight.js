@@ -50,7 +50,7 @@ THREE.SpotLight.prototype.clone = function () {
 
 	var light = new THREE.SpotLight();
 
-	THREE.Light.prototype.cloneProperties.call( this, light );
+	THREE.Light.prototype._copyFrom.call( light, this );
 
 	light.target = this.target.clone();
 

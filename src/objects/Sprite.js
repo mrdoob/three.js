@@ -63,14 +63,14 @@ THREE.Sprite.prototype.raycast = ( function () {
 THREE.Sprite.prototype.clone = function () {
 
 	var sprite = new THREE.Sprite( this.material );
-	return this.cloneProperties( sprite );
+	return sprite._copyFrom( this );
 
 };
 
-THREE.Sprite.prototype.cloneProperties = function ( sprite ) {
+THREE.Sprite.prototype._copyFrom = function ( source ) {
 
-	THREE.Object3D.prototype.cloneProperties.call( this, sprite );
-	return sprite;
+	THREE.Object3D.prototype._copyFrom.call( this, source );
+	return this;
 
 };
 

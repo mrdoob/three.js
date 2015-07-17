@@ -157,13 +157,13 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 THREE.SkinnedMesh.prototype.clone = function() {
 
 	var skinMesh = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
-	return this.cloneProperties( skinMesh );
+	return skinMesh._copyFrom( this );
 
 };
 
-THREE.SkinnedMesh.prototype.cloneProperties = function( skinMesh ) {
+THREE.SkinnedMesh.prototype._copyFrom = function( source ) {
 
-	THREE.Mesh.prototype.cloneProperties.call( this, skinMesh );
-	return skinMesh;
+	THREE.Mesh.prototype._copyFrom.call( this, source );
+	return this;
 
 };

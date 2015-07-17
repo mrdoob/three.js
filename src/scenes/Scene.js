@@ -21,22 +21,20 @@ THREE.Scene.prototype.constructor = THREE.Scene;
 THREE.Scene.prototype.clone = function () {
 
 	var scene = new THREE.Scene();
-	return this.cloneProperties( scene );
+	return scene._copyFrom( this );
 
 };
 
-THREE.Scene.prototype.cloneProperties = function ( scene ) {
+THREE.Scene.prototype._copyFrom = function ( source ) {
 
-	if ( scene === undefined ) scene = new THREE.Scene();
+	THREE.Object3D.prototype._copyFrom.call( this, source );
 
-	THREE.Object3D.prototype.cloneProperties.call( this, scene );
+	if ( source.fog !== null ) this.fog = source.fog.clone();
+	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-	if ( this.fog !== null ) scene.fog = this.fog.clone();
-	if ( this.overrideMaterial !== null ) scene.overrideMaterial = this.overrideMaterial.clone();
+	this.autoUpdate = source.autoUpdate;
+	this.matrixAutoUpdate = source.matrixAutoUpdate;
 
-	scene.autoUpdate = this.autoUpdate;
-	scene.matrixAutoUpdate = this.matrixAutoUpdate;
-
-	return scene;
+	return this;
 
 };

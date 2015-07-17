@@ -116,7 +116,7 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshPhongMaterial();
 
-	THREE.Material.prototype.cloneProperties.call( this, material );
+	THREE.Material.prototype._copyFrom.call( material, this );
 
 	material.color.copy( this.color );
 	material.emissive.copy( this.emissive );

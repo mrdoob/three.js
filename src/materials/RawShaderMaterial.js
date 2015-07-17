@@ -17,7 +17,7 @@ THREE.RawShaderMaterial.prototype.clone = function () {
 
 	var material = new THREE.RawShaderMaterial();
 
-	THREE.ShaderMaterial.prototype.cloneProperties.call( this, material );
+	THREE.ShaderMaterial.prototype._copyFrom.call( material, this );
 
 	return material;
 

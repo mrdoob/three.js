@@ -53,17 +53,17 @@ THREE.Camera.prototype.lookAt = function () {
 THREE.Camera.prototype.clone = function () {
 
 	var camera = new THREE.Camera();
-	return this.cloneProperties( camera );
+	return camera._copyFrom( this );
 
 };
 
-THREE.Camera.prototype.cloneProperties = function ( camera ) {
+THREE.Camera.prototype._copyFrom = function ( source ) {
 
-	THREE.Object3D.prototype.cloneProperties.call( this, camera );
+	THREE.Object3D.prototype._copyFrom.call( this, source );
 
-	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
-	camera.projectionMatrix.copy( this.projectionMatrix );
+	this.matrixWorldInverse.copy( source.matrixWorldInverse );
+	this.projectionMatrix.copy( source.projectionMatrix );
 
-	return camera;
+	return this;
 
 };

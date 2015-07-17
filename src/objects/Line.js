@@ -186,14 +186,14 @@ THREE.Line.prototype.raycast = ( function () {
 THREE.Line.prototype.clone = function () {
 
 	var line = new THREE.Line( this.geometry, this.material );
-	return this.cloneProperties( line );
+	return line._copyFrom( this );
 
 };
 
-THREE.Line.prototype.cloneProperties = function ( line ) {
+THREE.Line.prototype._copyFrom = function ( source ) {
 
-	THREE.Object3D.prototype.cloneProperties.call( this, line );
-	return line;
+	THREE.Object3D.prototype._copyFrom.call( this, source );
+	return this;
 
 };
 

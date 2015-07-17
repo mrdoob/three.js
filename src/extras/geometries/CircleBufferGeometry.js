@@ -77,7 +77,7 @@ THREE.CircleBufferGeometry.prototype.clone = function () {
 		this.parameters.thetaLength
 	);
 
-	THREE.BufferGeometry.prototype.cloneProperties.call( this, geometry );
+	THREE.BufferGeometry.prototype._copyFrom.call( geometry, this );
 
 	return geometry;
 

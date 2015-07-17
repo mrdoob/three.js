@@ -17,7 +17,7 @@ THREE.AmbientLight.prototype.clone = function () {
 
 	var light = new THREE.AmbientLight();
 
-	THREE.Light.prototype.cloneProperties.call( this, light );
+	THREE.Light.prototype._copyFrom.call( light, this );
 
 	return light;
 

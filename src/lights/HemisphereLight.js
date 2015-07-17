@@ -22,7 +22,7 @@ THREE.HemisphereLight.prototype.clone = function () {
 
 	var light = new THREE.HemisphereLight();
 
-	THREE.Light.prototype.cloneProperties.call( this, light );
+	THREE.Light.prototype._copyFrom.call( light, this );
 
 	light.groundColor.copy( this.groundColor );
 	light.intensity = this.intensity;

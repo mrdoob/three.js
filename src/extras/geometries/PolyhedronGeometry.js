@@ -243,13 +243,13 @@ THREE.PolyhedronGeometry.prototype.clone = function () {
 		this.parameters.detail
 	);
 
-	return this.cloneProperties( geometry );
+	return geometry._copyFrom( this );
 
 };
 
-THREE.PolyhedronGeometry.prototype.cloneProperties = function ( geometry ) {
+THREE.PolyhedronGeometry.prototype._copyFrom = function ( source ) {
 
-	THREE.Geometry.prototype.cloneProperties.call( this, geometry );
-	return geometry;
+	THREE.Geometry.prototype._copyFrom.call( this, source );
+	return this;
 
 };

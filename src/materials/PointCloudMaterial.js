@@ -48,7 +48,7 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 	var material = new THREE.PointCloudMaterial();
 
-	THREE.Material.prototype.cloneProperties.call( this, material );
+	THREE.Material.prototype._copyFrom.call( material, this );
 
 	material.color.copy( this.color );
 

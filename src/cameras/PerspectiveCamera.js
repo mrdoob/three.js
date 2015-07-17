@@ -126,7 +126,7 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 
 	var camera = new THREE.PerspectiveCamera();
 
-	THREE.Camera.prototype.cloneProperties.call( this, camera );
+	THREE.Camera.prototype._copyFrom.call( camera, this );
 
 	camera.zoom = this.zoom;
 
