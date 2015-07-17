@@ -28,12 +28,12 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 			#info {
 				color:#fff;
-				position: relative;
+				position: absolute;
 				top: 0px;
-				width: 50em;
-				margin: 0 auto -2.1em;
+				width: 100%;
 				padding: 5px;
 				z-index:100;
+				text-align: center;
 			}
 		</style>
 	</head>
@@ -137,14 +137,21 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 			
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 
 				// Resize renderTargets
-				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
-				depthRenderTarget.setSize( window.innerWidth, window.innerHeight );
-				effectComposer.setSize( window.innerWidth, window.innerHeight );
+				ssaoPass.uniforms[ 'size' ].value.set( width, height );
+
+				var pixelRatio = renderer.getPixelRatio();
+				var newWidth  = Math.floor( width / pixelRatio ) || 1;
+				var newHeight = Math.floor( height / pixelRatio ) || 1;
+				depthRenderTarget.setSize( newWidth, newHeight );
+				effectComposer.setSize( newWidth, newHeight );
 			}
 
 			function initPostprocessing() {
