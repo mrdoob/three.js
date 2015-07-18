@@ -37,7 +37,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.flipY = true;
 	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-	this._needsUpdate = false;
+	this.version = 0;
 	this.onUpdate = null;
 
 };
@@ -49,17 +49,11 @@ THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
 
-	get needsUpdate () {
-
-		return this._needsUpdate;
-
-	},
-
 	set needsUpdate ( value ) {
 
 		if ( value === true ) this.update();
 
-		this._needsUpdate = value;
+		this.version ++;
 
 	},
 
