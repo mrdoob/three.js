@@ -2245,19 +2245,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if(_localFogsNeedUpdate && material.fog && material instanceof THREE.MeshPhongMaterial) {
+			if( material instanceof THREE.MeshPhongMaterial ) {
 
-				refreshLocalFogs = true;
-				setupLocalFogs( localFogs );
-				_localFogsNeedUpdate = false;
-			}
+				if(_localFogsNeedUpdate && material.fog) {
 
-			if(refreshLocalFogs) {
-				refreshUniformsLocalFogs( m_uniforms, _localFogs );
-				markUniformsLocalFogsNeedsUpdate( m_uniforms, true );
-			}
-			else {
-				markUniformsLocalFogsNeedsUpdate( m_uniforms, false );
+					refreshLocalFogs = true;
+					setupLocalFogs( localFogs );
+					_localFogsNeedUpdate = false;
+					
+				}
+
+				if(refreshLocalFogs) {
+
+					refreshUniformsLocalFogs( m_uniforms, _localFogs );
+					markUniformsLocalFogsNeedsUpdate( m_uniforms, true );
+
+				}
+				else {
+
+					markUniformsLocalFogsNeedsUpdate( m_uniforms, false );
+
+				}
+
 			}
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
