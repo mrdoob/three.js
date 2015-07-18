@@ -67,5 +67,6 @@
 	"src/extras/helpers/VertexTangentsHelper.js",
 	"src/extras/helpers/WireframeHelper.js",
 	"src/extras/objects/ImmediateRenderObject.js",
-	"src/extras/objects/MorphBlendMesh.js"
+	"src/extras/objects/MorphBlendMesh.js",
+	"src/extras/core/LocalFog.js"
 ]

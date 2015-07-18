@@ -43,6 +43,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var sprites = [];
 	var lensFlares = [];
 
+	var localFogs = [];
+
 	// public properties
 
 	this.domElement = _canvas;
@@ -122,6 +124,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
 
 	},
+
+	_localFogsNeedUpdate = true,
+
+	_localFogs = {length: 0, colors:[], radii: [], positions: [], fars: [] };
 
 	// info
 
@@ -272,6 +278,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentMaterialId = - 1;
 
 		_lightsNeedUpdate = true;
+
+		_localFogsNeedUpdate = true;
 
 		state.reset();
 
@@ -989,14 +997,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	this.renderBufferDirect = function ( camera, lights, fog, material, object ) {
+	this.renderBufferDirect = function ( camera, lights, fog, material, object, localFogs ) {
 
 		if ( material.visible === false ) return;
 
 		setMaterial( material );
 
 		var geometry = objects.geometries.get( object );
-		var program = setProgram( camera, lights, fog, material, object );
+		var program = setProgram( camera, lights, fog, material, object, localFogs );
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -1523,6 +1531,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentMaterialId = - 1;
 		_currentCamera = null;
 		_lightsNeedUpdate = true;
+		_localFogsNeedUpdate = true;
 
 		// update scene graph
 
@@ -1547,6 +1556,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		sprites.length = 0;
 		lensFlares.length = 0;
+
+		localFogs.length = 0;
 
 		projectObject( scene );
 
@@ -1585,11 +1596,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var overrideMaterial = scene.overrideMaterial;
 
-			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial );
-			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial );
+			renderObjects( opaqueObjects, camera, lights, fog, overrideMaterial, localFogs );
+			renderObjects( transparentObjects, camera, lights, fog, overrideMaterial, localFogs );
 
-			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, overrideMaterial );
-			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, overrideMaterial );
+			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, overrideMaterial, localFogs );
+			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, overrideMaterial, localFogs );
 
 		} else {
 
@@ -1597,13 +1608,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			state.setBlending( THREE.NoBlending );
 
-			renderObjects( opaqueObjects, camera, lights, fog, null );
-			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, null );
+			renderObjects( opaqueObjects, camera, lights, fog, null, localFogs );
+			renderObjectsImmediate( opaqueImmediateObjects, camera, lights, fog, null, localFogs );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( transparentObjects, camera, lights, fog, null );
-			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, null );
+			renderObjects( transparentObjects, camera, lights, fog, null, localFogs );
+			renderObjectsImmediate( transparentImmediateObjects, camera, lights, fog, null, localFogs );
 
 		}
 
@@ -1675,6 +1686,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
+				} else if ( object instanceof THREE.LocalFog ) {
+
+					localFogs.push( object );
+
 				} else {
 
 					var webglObject = objects.objects[ object.id ];
@@ -1724,7 +1739,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function renderObjects( renderList, camera, lights, fog, overrideMaterial ) {
+	function renderObjects( renderList, camera, lights, fog, overrideMaterial, localFogs ) {
 
 		var material = overrideMaterial;
 
@@ -1743,7 +1758,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var j = 0, jl = materials.length; j < jl; j ++ ) {
 
-					_this.renderBufferDirect( camera, lights, fog, materials[ j ], object );
+					_this.renderBufferDirect( camera, lights, fog, materials[ j ], object, localFogs );
 
 				}
 
@@ -1751,13 +1766,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_this.renderBufferDirect( camera, lights, fog, material, object );
+			_this.renderBufferDirect( camera, lights, fog, material, object, localFogs );
 
 		}
 
 	}
 
-	function renderObjectsImmediate( renderList, camera, lights, fog, overrideMaterial ) {
+	function renderObjectsImmediate( renderList, camera, lights, fog, overrideMaterial, localFogs ) {
 
 		var material = overrideMaterial;
 
@@ -1771,7 +1786,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( overrideMaterial === null ) material = object.material;
 
-				_this.renderImmediateObject( camera, lights, fog, material, object );
+				_this.renderImmediateObject( camera, lights, fog, material, object, localFogs );
 
 			}
 
@@ -1779,11 +1794,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	this.renderImmediateObject = function ( camera, lights, fog, material, object ) {
+	this.renderImmediateObject = function ( camera, lights, fog, material, object, localFogs ) {
 
 		setMaterial( material );
 
-		var program = setProgram( camera, lights, fog, material, object );
+		var program = setProgram( camera, lights, fog, material, object, localFogs );
 
 		_currentGeometryProgram = '';
 
@@ -1820,6 +1835,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var maxLightCount = allocateLights( lights );
 		var maxShadows = allocateShadows( lights );
 		var maxBones = allocateBones( object );
+		var maxLocalFogs = localFogs.length;
 
 		var parameters = {
 
@@ -1873,7 +1889,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			alphaTest: material.alphaTest,
 			metal: material.metal,
 			doubleSided: material.side === THREE.DoubleSide,
-			flipSided: material.side === THREE.BackSide
+			flipSided: material.side === THREE.BackSide,
+
+			maxLocalFogs: maxLocalFogs
 
 		};
 
@@ -2071,7 +2089,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setProgram( camera, lights, fog, material, object ) {
+	function setProgram( camera, lights, fog, material, object, localFogs ) {
 
 		_usedTextureUnits = 0;
 
@@ -2087,6 +2105,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var refreshProgram = false;
 		var refreshMaterial = false;
 		var refreshLights = false;
+		var refreshLocalFogs = false;
 
 		var program = materialProperties.program,
 			p_uniforms = program.getUniforms(),
@@ -2100,12 +2119,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 			refreshProgram = true;
 			refreshMaterial = true;
 			refreshLights = true;
+			refreshLocalFogs = true;
 
 		}
 
 		if ( material.id !== _currentMaterialId ) {
 
-			if ( _currentMaterialId === -1 ) refreshLights = true;
+			if ( _currentMaterialId === -1 ) {
+
+				refreshLights = true;
+				refreshLocalFogs = true;
+
+			}
 			_currentMaterialId = material.id;
 
 			refreshMaterial = true;
@@ -2218,6 +2243,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsFog( m_uniforms, fog );
 
+			}
+
+			if(_localFogsNeedUpdate && material.fog && material instanceof THREE.MeshPhongMaterial) {
+
+				refreshLocalFogs = true;
+				setupLocalFogs( localFogs );
+				_localFogsNeedUpdate = false;
+			}
+
+			if(refreshLocalFogs) {
+				refreshUniformsLocalFogs( m_uniforms, _localFogs );
+				markUniformsLocalFogsNeedsUpdate( m_uniforms, true );
+			}
+			else {
+				markUniformsLocalFogsNeedsUpdate( m_uniforms, false );
 			}
 
 			if ( material instanceof THREE.MeshPhongMaterial ||
@@ -2442,6 +2482,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	function refreshUniformsLocalFogs( uniforms, localFogs ) {
+
+		uniforms.localFogPosition.value = localFogs.positions;
+		uniforms.localFogRadius.value = localFogs.radii;
+		uniforms.localFogColor.value = localFogs.colors;
+		uniforms.localFogFar.value = localFogs.fars;
+
+	}
+
 	function refreshUniformsPhong ( uniforms, material ) {
 
 		uniforms.shininess.value = material.shininess;
@@ -2523,6 +2572,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.hemisphereLightSkyColor.needsUpdate = value;
 		uniforms.hemisphereLightGroundColor.needsUpdate = value;
 		uniforms.hemisphereLightDirection.needsUpdate = value;
+
+	}
+
+	function markUniformsLocalFogsNeedsUpdate ( uniforms, value ) {
+
+		uniforms.localFogPosition.needsUpdate = value;
+		uniforms.localFogRadius.needsUpdate = value;
+		uniforms.localFogColor.needsUpdate = value;
+		uniforms.localFogFar.needsUpdate = value;
 
 	}
 
@@ -2936,6 +2994,57 @@ THREE.WebGLRenderer = function ( parameters ) {
 		array[ offset + 0 ] = color.r * intensity;
 		array[ offset + 1 ] = color.g * intensity;
 		array[ offset + 2 ] = color.b * intensity;
+
+	}
+
+	function setupLocalFogs ( localFogs ) {
+
+		var f, ff, localFog,
+		color, radius, far,
+		offset = 0,
+		length = 0,
+
+		zFogs = _localFogs,
+
+		colors = zFogs.colors,
+		positions = zFogs.positions,
+		fars = zFogs.fars,
+		radii = zFogs.radii;
+
+		for ( f = 0, ff = localFogs.length; f < ff; f ++ ) {
+
+			localFog = localFogs[ f ];
+
+			color = localFog.color;
+
+			far = localFog.far;
+
+			radius = localFog.radius;
+
+
+			offset = length * 3;
+
+			_direction.setFromMatrixPosition( localFog.matrixWorld );
+
+			positions[ offset ] = _direction.x;
+			positions[ offset + 1 ] = _direction.y;
+			positions[ offset + 2 ] = _direction.z;
+
+			
+
+			colors[ offset ] = color.r;
+			colors[ offset + 1 ] = color.g;
+			colors[ offset + 2 ] = color.b;
+
+			fars[ length ] = radius - far;
+
+			radii[ length ] = radius;
+
+
+			length += 1;
+		}
+
+		zFogs.length = length;
 
 	}
 

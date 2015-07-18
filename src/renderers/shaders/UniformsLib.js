@@ -116,6 +116,14 @@ THREE.UniformsLib = {
 
 		"shadowMatrix" : { type: "m4v", value: [] }
 
+	},
+
+	localFog: {
+		
+		"localFogPosition": { type: "fv", value: [] },
+		"localFogRadius": { type: "fv1", value: [] },
+		"localFogColor": { type: "fv", value: [] },
+		"localFogFar": {type: "fv1", value: [] }
 	}
 
 };
