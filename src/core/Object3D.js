@@ -72,6 +72,9 @@ THREE.Object3D = function () {
 	this.renderOrder = 0;
 
 	this.userData = {};
+	
+	//contains the last state of position, quaternion & scale
+	this._matrixState = [ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 ]
 
 };
 
@@ -120,20 +123,8 @@ THREE.Object3D.prototype = {
 	},
 	
 	get matrixWorld () {
-
-	    if ( this.matrixAutoUpdate === true ) this.updateMatrix();
-	
-	    if ( this.parent === undefined ) {
-	
-	        this.matrixWorldCached.copy( this.matrixCached );
-	
-	    } else {
-	
-	        this.matrixWorldCached.multiplyMatrices( this.parent.matrixWorld , this.matrixCached );
-	
-	    }
-	
-	    return this.matrixWorldCached;
+		
+	    return this.updateMatrixWorld(false, false);
 	
 	},
 
@@ -556,14 +547,61 @@ THREE.Object3D.prototype = {
 
 	},
 
-	updateMatrix: function () {
-
-		this.matrixCached.compose( this.position, this.quaternion, this.scale );
+	updateMatrix: (function () {
 		
-		return this.matrixCached;
-	},
+	
+		var checkLastStateChanged = function(object3D){
+			
+			var position = object3D.position;
+			var quaternion = object3D.quaternion;
+			var scale = object3D.scale;
+			var matrixState = object3D._matrixState;
+			
+			return matrixState[0] !== position.x ||
+				matrixState[1] !== position.y ||
+				matrixState[2] !== position.z ||
+				matrixState[3] !== quaternion.x ||
+				matrixState[4] !== quaternion.y ||
+				matrixState[5] !== quaternion.z ||
+				matrixState[6] !== quaternion.w ||
+				matrixState[7] !== scale.x ||
+				matrixState[8] !== scale.y ||
+				matrixState[9] !== scale.z
+				
+		};
+		var setLastState = function(object3D){
+			
+			var position = object3D.position;
+			var quaternion = object3D.quaternion;
+			var scale = object3D.scale;
+			var matrixState = object3D._matrixState;
+			
+			matrixState[0] = position.x;
+			matrixState[1] = position.y;
+			matrixState[2] = position.z;
+			matrixState[3] = quaternion.x;
+			matrixState[4] = quaternion.y;
+			matrixState[5] = quaternion.z;
+			matrixState[6] = quaternion.w;
+			matrixState[7] = scale.x;
+			matrixState[8] = scale.y;
+			matrixState[9] = scale.z;
+				
+		};
+	
+		return function(){		
+			if 	(checkLastStateChanged(this)){
+				this.matrixCached.compose( this.position, this.quaternion, this.scale );
+				this.traverse( function ( child ) {
+		            child.matrixWorldNeedsUpdate = true; // mark dirty hierarchy
+		        } );
+				setLastState(this);
+			}
+			return this.matrixCached;
+		}
+	})(),
 
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld: function ( force, recursive ) {
 
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
@@ -582,17 +620,22 @@ THREE.Object3D.prototype = {
 			this.matrixWorldNeedsUpdate = false;
 
 			force = true;
-
+			
 		}
 
 		// update children
+		if ( recursive !== false || force === true){ 
+			
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+				this.children[ i ].updateMatrixWorld( force );
 
-			this.children[ i ].updateMatrixWorld( force );
-
+			}
+			
 		}
-
+		
+		return this.matrixWorldCached;
+		
 	},
 
 	toJSON: function ( meta ) {
