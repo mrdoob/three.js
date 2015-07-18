@@ -21,43 +21,41 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function ( force ) {
+	return function ( recursive, noUpdatingParent ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
-		// update matrixWorld
+		if ( this.parent === undefined ) {
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+			this.matrixWorld.copy( this.matrix );
 
-			if ( this.parent ) {
+		} else {
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-				this.matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
-				this.matrix.decompose( translationObject, quaternionObject, scaleObject );
-
-				this.matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
-
-
-			} else {
-
-				this.matrixWorld.copy( this.matrix );
-
+			if ( noUpdatingParent !== true ) {
+				
+				this.parent.updateMatrixWorld();
+				
 			}
 
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
+			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld , this.matrix );
+			
+			this.matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
+			this.matrix.decompose( translationObject, quaternionObject, scaleObject );
+	
+			this.matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
 
 		}
 
+
 		// update children
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].updateMatrixWorld( force );
-
+		if ( recursive === true ) {
+			
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+	
+				this.children[ i ].updateMatrixWorld( true, true );
+	
+			}
+			
 		}
 
 	};

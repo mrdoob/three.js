@@ -3,7 +3,6 @@
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
- * @author elephantatwork / www.elephantatwork.ch
  */
 
 THREE.Object3D = function () {
@@ -113,7 +112,7 @@ THREE.Object3D.prototype = {
 
 		console.warn( 'THREE.Object3D: .renderDepth has been removed. Use .renderOrder, instead.' );
 
-	},
+ 	},
 
 	applyMatrix: function ( matrix ) {
 
@@ -418,7 +417,7 @@ THREE.Object3D.prototype = {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		this.updateMatrixWorld( true );
+		this.updateMatrixWorld( );
 
 		return result.setFromMatrixPosition( this.matrixWorld );
 
@@ -433,7 +432,7 @@ THREE.Object3D.prototype = {
 
 			var result = optionalTarget || new THREE.Quaternion();
 
-			this.updateMatrixWorld( true );
+			this.updateMatrixWorld( );
 
 			this.matrixWorld.decompose( position, result, scale );
 
@@ -541,37 +540,38 @@ THREE.Object3D.prototype = {
 		this.matrixWorldNeedsUpdate = true;
 
 	},
-
-	updateMatrixWorld: function ( force ) {
+	
+	updateMatrixWorld: function (recursive, noUpdatingParent) {
 
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+		if ( this.parent === undefined ) {
 
-			if ( this.parent === undefined ) {
+			this.matrixWorld.copy( this.matrix );
 
-				this.matrixWorld.copy( this.matrix );
+		} else {
 
-			} else {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
+			if ( noUpdatingParent !== true ) {
+				
+				this.parent.updateMatrixWorld();
+				
 			}
 
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
+			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld , this.matrix );
 
 		}
-
-		// update children
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].updateMatrixWorld( force );
-
+		
+		if ( recursive === true ) {
+			
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+	
+				this.children[ i ].updateMatrixWorld( true, true );
+	
+			}
 		}
-
+		
+		return this.matrixWorld;
+		
 	},
 
 	toJSON: function ( meta ) {

@@ -134,9 +134,9 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function( recursive, noUpdatingParent ) {
 
-	THREE.Mesh.prototype.updateMatrixWorld.call( this, true );
+	THREE.Mesh.prototype.updateMatrixWorld.call( this, false, noUpdatingParent );
 
 	if ( this.bindMode === "attached" ) {
 
@@ -148,10 +148,21 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 
 	} else {
 
-		console.warn( 'THREE.SkinnedMesh unrecognized bindMode: ' + this.bindMode );
+		console.warn( 'THREE.SkinnedMesh unreckognized bindMode: ' + this.bindMode );
 
 	}
+	
+	if ( recursive === true ) {
+			
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
+			this.children[ i ].updateMatrixWorld( true, true );
+
+		}
+	}
+		
+	return this.matrixWorld;
+		
 };
 
 THREE.SkinnedMesh.prototype.clone = function( object ) {
