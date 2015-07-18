@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<!--Reference: 
+<!--Reference:
 SSAO algo: http://devlog-martinsh.blogspot.tw/2011/12/ssao-shader-update-v12.html?showComment=1398158188712#c1563204765906693531
 log depth http://outerra.blogspot.tw/2013/07/logarithmic-depth-buffer-optimizations.html
 convert the exponential depth to a linear value: http://www.ozone3d.net/blogs/lab/20090206/how-to-linearize-the-depth-value/
@@ -23,17 +23,18 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 			}
 
 			a {
-				color:#0078ff;
+				color:#00ff78;
 			}
 
 			#info {
-				color:#fff;
-				position: relative;
+				color: #fff;
+				position: absolute;
 				top: 0px;
-				width: 40em;
-				margin: 0 auto -1.86em;
+				width: 100%;
 				padding: 5px;
-				z-index:100;
+			}
+			.dg.ac {
+				z-index: 1 !important; /* FIX DAT.GUI */
 			}
 		</style>
 	</head>
@@ -50,15 +51,15 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl screen space ambient occlusion example			
-			<p id="info">shader by <a href="http://alteredqualia.com">alteredq</a></p>
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl screen space ambient occlusion example<br/>
+			shader by <a href="http://alteredqualia.com">alteredq</a>
 		</div>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-						
-			var container, stats;   
+
+			var container, stats;
 			var camera, scene, renderer;
 			var depthMaterial, effectComposer, depthRenderTarget;
 			var ssaoPass;
@@ -87,15 +88,15 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				group = new THREE.Object3D();
 				scene.add( group );
-		   
+
 				var geometry = new THREE.IcosahedronGeometry( 5, 1 );
 				for ( var i = 0; i < 200; i ++ ) {
-				
+
 					var material = new THREE.MeshBasicMaterial();
 					material.color.r = Math.random();
 					material.color.g = Math.random();
 					material.color.b = Math.random();
-				   
+
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 400 - 200;
 					mesh.position.y = Math.random() * 400 - 200;
@@ -107,15 +108,15 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 10 + 1;
 					group.add( mesh );
 				}
-				
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
-				// Init postprocessing                
+				// Init postprocessing
 				initPostprocessing();
-			
+
 				// Init gui
 				var gui = new dat.GUI();
 				gui.add( postprocessing, "enabled" ).onChange();
@@ -134,7 +135,7 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 					console.error( "Not define renderModeChange type: " + value );
 				}
 			}
-			
+
 			function onWindowResize() {
 
 				var width = window.innerWidth;
@@ -165,28 +166,28 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 
 				depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader,
 					uniforms: depthUniforms, blending: THREE.NoBlending } );
-								
+
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
 				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				
+
 				// Setup SSAO pass
 				ssaoPass = new THREE.ShaderPass( THREE.SSAOShader );
 				ssaoPass.renderToScreen = true;
-				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass 
-				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget; 
+				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
+				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
 				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
 				ssaoPass.uniforms[ 'cameraNear' ].value = camera.near;
 				ssaoPass.uniforms[ 'cameraFar' ].value = camera.far;
 				ssaoPass.uniforms[ 'onlyAO' ].value = ( postprocessing.renderMode == 1 );
 				ssaoPass.uniforms[ 'aoClamp' ].value = 0.3;
 				ssaoPass.uniforms[ 'lumInfluence' ].value = 0.5;
-				
+
 				// Add pass to effect composer
 				effectComposer = new THREE.EffectComposer( renderer );
 				effectComposer.addPass( renderPass );
 				effectComposer.addPass( ssaoPass );
 			}
-			
+
 			function animate() {
 				requestAnimationFrame( animate );
 
@@ -194,26 +195,26 @@ Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info
 				stats.update();
 			}
 
-			function render() {                                
+			function render() {
 				var timer = performance.now();
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
 				if ( postprocessing.enabled ) {
-					
-					// Render depth into depthRenderTarget                    
+
+					// Render depth into depthRenderTarget
 					scene.overrideMaterial = depthMaterial;
 					renderer.render( scene, camera, depthRenderTarget, true );
 
 					// Render renderPass and SSAO shaderPass
 					scene.overrideMaterial = null;
 					effectComposer.render();
-					
+
 				} else {
 					renderer.render( scene, camera );
 				}
 			}
-			
+
 		</script>
 	</body>
 </html>
