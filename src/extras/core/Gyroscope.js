@@ -21,7 +21,7 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function ( force ) {
+	return function updateMatrixWorld( force ) {
 
 		this.matrixAutoUpdate && this.updateMatrix();
 
@@ -61,5 +61,5 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 		}
 
 	};
-	
+
 }() );

@@ -28,7 +28,7 @@ THREE.Line.prototype.raycast = ( function () {
 	var ray = new THREE.Ray();
 	var sphere = new THREE.Sphere();
 
-	return function ( raycaster, intersects ) {
+	return function raycast( raycaster, intersects ) {
 
 		var precision = raycaster.linePrecision;
 		var precisionSq = precision * precision;

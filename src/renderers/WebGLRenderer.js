@@ -312,7 +312,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var array;
 
-		return function () {
+		return function getCompressedTextureFormats() {
 
 			if ( array !== undefined ) {
 
@@ -439,7 +439,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var value;
 
-		return function () {
+		return function getMaxAnisotropy() {
 
 			if ( value !== undefined ) return value;
 

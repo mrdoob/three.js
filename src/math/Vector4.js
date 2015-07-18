@@ -140,7 +140,7 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
-	
+
 	addScaledVector: function ( v, s ) {
 
         this.x += v.x * s;
@@ -505,11 +505,11 @@ THREE.Vector4.prototype = {
 
 	},
 
-	clampScalar: ( function () {
+	clampScalar: function () {
 
 		var min, max;
 
-		return function ( minVal, maxVal ) {
+		return function clampScalar( minVal, maxVal ) {
 
 			if ( min === undefined ) {
 
@@ -525,7 +525,7 @@ THREE.Vector4.prototype = {
 
 		};
 
-	} )(),
+	}(),
 
   floor: function () {
 
