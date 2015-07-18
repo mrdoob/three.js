@@ -697,7 +697,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		properties.delete( renderTargetProperties );
+		properties.delete( renderTarget );
 
 	}
 
