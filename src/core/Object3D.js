@@ -601,19 +601,30 @@ THREE.Object3D.prototype = {
 		}
 	})(),
 
-	updateMatrixWorld: function ( force, recursive ) {
+	updateMatrixWorld: function ( force, recursive , parentChanged ) {
+		var parent = this.parent; 
+		var parentmatrixWorld;
+		
+		// first update parents before check matrixWorldNeedsUpdate
+		if (parentChanged !== false && parent !== undefined) {
+			parentmatrixWorld = parent.updateMatrixWorld(false,false);
+		} else if ( parent !== undefined ){
+			parentmatrixWorld = parent.matrixWorldCached; 	
+		}
 
+		//check own matrix
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
+		// update own matrixWOrld
 		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
-			if ( this.parent === undefined ) {
+			if ( parent === undefined ) {
 
 				this.matrixWorldCached.copy( this.matrixCached );
 
 			} else {
 
-				this.matrixWorldCached.multiplyMatrices( this.parent.matrixWorldCached, this.matrixCached );
+				this.matrixWorldCached.multiplyMatrices( parentmatrixWorld, this.matrixCached );
 
 			}
 
@@ -628,7 +639,7 @@ THREE.Object3D.prototype = {
 			
 			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-				this.children[ i ].updateMatrixWorld( force );
+				this.children[ i ].updateMatrixWorld( force, true, false );
 
 			}
 			
