@@ -1,71 +1,106 @@
 /**
  * @author astrodud / http://astrodud.isgreat.org/
+ * @author zz85 / https://github.com/zz85
+ * @author bhouston / http://exocortex.com
  */
 
-THREE.LatheGeometry = function ( points, steps, angle ) {
+// points - to create a closed torus, one must use a set of points 
+//    like so: [ a, b, c, d, a ], see first is the same as last.
+// segments - the number of circumference segments to create
+// phiStart - the starting radian
+// phiLength - the radian (0 to 2*PI) range of the lathed section
+//    2*pi is a closed lathe, less than 2PI is a portion.
+
+THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	THREE.Geometry.call( this );
 
-	this.steps = steps || 12;
-	this.angle = angle || 2 * Math.PI;
+	this.type = 'LatheGeometry';
 
-	var stepSize = this.angle / this.steps,
-	newV = [], oldInds = [], newInds = [], startInds = [],
-	matrix = new THREE.Matrix4().setRotationZ( stepSize );
+	this.parameters = {
+		points: points,
+		segments: segments,
+		phiStart: phiStart,
+		phiLength: phiLength
+	};
 
-	for ( var j = 0; j < points.length; j ++ ) {
+	segments = segments || 12;
+	phiStart = phiStart || 0;
+	phiLength = phiLength || 2 * Math.PI;
 
-		this.vertices.push( new THREE.Vertex( points[ j ] ) );
+	var inversePointLength = 1.0 / ( points.length - 1 );
+	var inverseSegments = 1.0 / segments;
 
-		newV[ j ] = points[ j ].clone();
-		oldInds[ j ] = this.vertices.length - 1;
+	for ( var i = 0, il = segments; i <= il; i ++ ) {
 
-	}
+		var phi = phiStart + i * inverseSegments * phiLength;
 
-	for ( var r = 0; r <= this.angle + 0.001; r += stepSize ) { // need the +0.001 for it go up to angle
+		var c = Math.cos( phi ),
+			s = Math.sin( phi );
 
-		for ( var j = 0; j < newV.length; j ++ ) {
+		for ( var j = 0, jl = points.length; j < jl; j ++ ) {
 
-			if ( r < this.angle ) {
+			var pt = points[ j ];
 
-				newV[ j ] = matrix.multiplyVector3( newV[ j ].clone() );
-				this.vertices.push( new THREE.Vertex( newV[ j ] ) );
-				newInds[ j ] = this.vertices.length - 1;
+			var vertex = new THREE.Vector3();
 
-			} else {
+			vertex.x = c * pt.x - s * pt.y;
+			vertex.y = s * pt.x + c * pt.y;
+			vertex.z = pt.z;
 
-				newInds = startInds; // wrap it up!
-
-			}
+			this.vertices.push( vertex );
 
 		}
 
-		if ( r == 0 ) startInds = oldInds;
+	}
 
-		for ( var j = 0; j < oldInds.length - 1; j ++ ) {
+	var np = points.length;
 
-			this.faces.push( new THREE.Face4( newInds[ j ], newInds[ j + 1 ], oldInds[ j + 1 ], oldInds[ j ] ) );
+	for ( var i = 0, il = segments; i < il; i ++ ) {
+
+		for ( var j = 0, jl = points.length - 1; j < jl; j ++ ) {
+
+			var base = j + np * i;
+			var a = base;
+			var b = base + np;
+			var c = base + 1 + np;
+			var d = base + 1;
+
+			var u0 = i * inverseSegments;
+			var v0 = j * inversePointLength;
+			var u1 = u0 + inverseSegments;
+			var v1 = v0 + inversePointLength;
+
+			this.faces.push( new THREE.Face3( a, b, d ) );
+
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.UV( 1 - r / this.angle, j / points.length ),
-				new THREE.UV( 1 - r / this.angle, ( j + 1 ) / points.length ),
-				new THREE.UV( 1 - ( r - stepSize ) / this.angle, ( j + 1 ) / points.length ),
-				new THREE.UV( 1 - ( r - stepSize ) / this.angle, j / points.length )
+				new THREE.Vector2( u0, v0 ),
+				new THREE.Vector2( u1, v0 ),
+				new THREE.Vector2( u0, v1 )
 
 			] );
 
-		}
+			this.faces.push( new THREE.Face3( b, c, d ) );
 
-		oldInds = newInds;
-		newInds = [];
+			this.faceVertexUvs[ 0 ].push( [
+
+				new THREE.Vector2( u1, v0 ),
+				new THREE.Vector2( u1, v1 ),
+				new THREE.Vector2( u0, v1 )
+
+			] );
+
+
+		}
 
 	}
 
-	this.computeCentroids();
+	this.mergeVertices();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
 };
 
-THREE.LatheGeometry.prototype = new THREE.Geometry();
+THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.LatheGeometry.prototype.constructor = THREE.LatheGeometry;

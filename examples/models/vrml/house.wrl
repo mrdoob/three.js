@@ -1,0 +1,5183 @@
+#VRML V2.0 utf8
+
+
+Group {
+children[
+DirectionalLight {
+  ambientIntensity  0 
+  color             1 1 0.9
+  direction         0.5 -1.5 -1
+  intensity         1.8 
+  on                TRUE 
+}
+
+DirectionalLight {
+  ambientIntensity  0 
+  color             1 1 0.9
+  direction         -0.5 1 0
+  intensity        1 
+  on                TRUE 
+}
+
+NavigationInfo {
+  
+  avatarSize       [ 0.2, 1.4, 0.5 ]
+
+  headlight        FALSE
+ 
+  
+}
+
+
+
+
+DirectionalLight {
+  ambientIntensity  0 
+  color             0.6 0.6 0.8
+  direction         -1 0.5 2
+  intensity         1 
+  on                TRUE 
+}
+
+Background {
+  groundAngle  [ 1.5 1.6 ]
+  groundColor  [ 0.2 0.6 0.3, 0.4 0.4 0.35, 0.3 0.5 0.6  ]
+  backUrl      []
+  bottomUrl    []
+  frontUrl     []
+  leftUrl      []
+  rightUrl     []
+  topUrl       []
+  skyAngle     [ 1.5 ]
+  skyColor     [ 0.5 0.7 1,	0.7 1 0.9 ]
+  
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation     0 1 0 -0.5
+	position       -4 2 10
+
+	description    "Entry"
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    0 0 1  0
+	position       3.5 1.7 13
+
+	description    "Vooraanzicht"
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    0 0 1  0
+	position       2.5 1.5 -4.5
+
+	description    "Woonkamer"
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    0 0 1  0
+	position       1.5 1.5 -1.7
+
+	description    "Keuken"
+}
+
+
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    0 1 0  3.1415927
+	position       2.5 2.5 -20
+
+	description    "Achteraanzicht"
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    1 0 0  -1.5707963
+	position       2.5 20 -4.5
+
+	description    "Bovenaanzicht"
+}
+
+
+
+
+
+# beneden/beneden.wrl
+
+
+
+
+DEF vloer Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.5 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.14	0	-0.14,
+						5.54	0	-0.14,
+						5.54	0	-8.86,
+						0.14	0	-8.86,
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	0, 1, 2, 3, -1,
+	0, 3, 2, 1, -1,
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+DEF drempelvoor Transform {
+children[
+	Shape {
+		appearance 	Appearance {
+			material 	Material {
+	ambientIntensity  0.2
+	diffuseColor      0.4 0.4 0.4
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+					}	
+				}
+		geometry 	Box {
+	size	1.23 0.04 0.30
+				}
+
+	}
+ ]
+translation		3.805	0.02 -0.14
+}
+
+DEF drempelachter Transform {
+children[
+	Shape {
+		appearance 	Appearance {
+			material 	Material {
+	ambientIntensity  0.2
+	diffuseColor      0.4 0.4 0.4
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+					}	
+				}
+		geometry 	Box {
+	size	1.05 0.04 0.30
+				}
+
+	}
+ ]
+translation		1.725	0.02 -8.86
+}
+
+
+DEF stukmuur1 Transform {
+children[
+	Shape {
+	appearance DEF wandkleur Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.9 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+		geometry 	Box {
+	size	0.70 2.70 0.07
+				}
+
+	}
+ ]
+translation		0.63	1.35 -3.395
+}
+
+DEF stukmuur2 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	1.41 2.70 0.07
+				}
+
+	}
+ ]
+translation		2.485	1.35 -3.395
+}
+
+
+DEF stukmuur3 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.43 2.70 0.07
+				}
+
+	}
+ ]
+translation		4.205	1.35 -3.395
+}
+
+DEF stukmuur4 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	1.06 2.8 0.07
+				}
+
+	}
+ ]
+translation		4.87	1.4 -4.395
+}
+
+DEF stukmuur5 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.07 2.70 2.28
+				}
+
+	}
+ ]
+translation		3.155	1.35 -1.42
+}
+
+DEF stukmuur6 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.98 2.8 0.07
+				}
+
+	}
+ ]
+translation		4.91	1.4 -2.325
+}
+
+DEF stukmuur7 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.98 2.70 0.07
+				}
+
+	}
+ ]
+translation		4.91	1.35 -1.515
+}
+
+
+DEF stukmuur8 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.07 2.70 0.4
+				}
+
+	}
+ ]
+translation		4.455	1.35 -0.48
+}
+
+DEF stukmuur9 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.07 2.70 0.74
+				}
+
+	}
+ ]
+translation		4.7	1.35 -1.92
+}
+
+
+
+# binmuur.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.9 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.28	0	-0.28, #0 linkerbenedenhoek voorgevel
+						5.40	0	-0.28,
+						5.40	5.40	-0.28,
+						0.28	5.40	-0.28, #3 linkerbovenhoek voorgevel
+
+						3.19	0	-0.28, #4 voordeur
+						4.42	0	-0.28,
+						4.42	2.30	-0.28,
+						3.19	2.30	-0.28, #7 voordeur
+
+						4.84	1.60	-0.28, #toiletraam-8
+						5.04	1.60	-0.28,
+						5.04	2.30	-0.28,
+						4.84	2.30	-0.28, 
+
+						2.60	0.90	-0.28, #keukenraam-12
+						2.60	2.30	-0.28,
+						0.60	2.30	-0.28,
+						0.60	0.90	-0.28,
+
+						0.60	3.60	-0.28, #bovenraam-16
+						1.50	3.60	-0.28,
+						1.50	5.0	-0.28,
+						4.42	5.0	-0.28,
+						4.42	5.40	-0.28, 
+						0.60	5.40	-0.28,
+
+						0.28	8.55	-3.15, #linkergevel-22
+						0.28	2.70	-8.72,
+						0.28	0	-8.72,
+
+						5.40	8.55	-3.15, #rechtergevel-25
+						5.40	5.40	-6.30,
+						5.40	5.40	-8.72,
+						5.40	0	-8.72,
+
+						2.25	0	-8.72, #achtergevel-29
+						2.25	0.6	-8.72,
+						4.8	0.6	-8.72,
+						4.8	5.40	-8.72,
+						1.2	0	-8.72,
+						1.2	2.70	-8.72,
+
+
+						3.19	0	-0.14, #diepte van de voordeur-35
+						4.42	0	-0.14,
+						4.42	2.30	-0.14,
+						3.19	2.30	-0.14, #diepte van de voordeur-38
+
+						2.60	0.90	-0.14, # diepte van het keukenraam-39
+						2.60	2.30	-0.14,
+						0.60	2.30	-0.14,
+						0.60	0.90	-0.14,
+
+						4.84	1.60	-0.14, #diepte van het toiletraam-43
+						5.04	1.60	-0.14,
+						5.04	2.30	-0.14,
+						4.84	2.30	-0.14, 
+
+						0.60	3.60	-0.14, #diepte van het bovenraam-47
+						1.50	3.60	-0.14,
+						1.50	5.0	-0.14,
+						4.42	5.0	-0.14,
+						4.42	5.40	-0.14, 
+						0.60	5.40	-0.14, #52
+
+						2.25	0	-8.86, #diepte van de achtergevel-53
+						2.25	0.6	-8.86,
+						4.8	0.6	-8.86,
+						4.8	5.40	-8.86,
+						1.2	0	-8.86,
+						1.2	2.70	-8.86,	#58
+
+						0.28	5.40	0,	#59 hoekpunt voor dakvorm zolder
+						5.40	5.40	0,
+						0.28	5.40	-6.30, #61
+						0.28	2.70	-9.0,  #62 hoekpunt voor dakvorm 1e verdieping
+
+						0.28	2.7	-0.28, #63 extra punten voor segmentering beneden
+						0.14	2.7	-0.14,
+
+						5.4	2.7	-0.28, #65
+						5.54	2.7	-0.14, #
+
+						0.28	2.7	-8.72, #67
+						0.14	2.7	-8.86, #
+
+						5.4	2.7	-8.72, #69
+						5.54	2.7	-8.86, #
+
+						1.2	2.7	-8.72, #71
+						1.2	2.7	-8.86, #
+
+						4.8	2.7	-8.72, #73
+						4.8	2.7	-8.86, #
+						
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		0, 4, 12, 15, -1,
+		0, 15, 12, 4, -1,
+
+		0, 15, 14, 63, -1,
+		0, 63, 14, 15, -1,
+
+		14, 13, 65, 63, -1,
+		
+		4, 12, 13, 7, -1,
+
+		13, 7, 6, 65, -1,
+
+		6, 11, 10, 65, -1,
+
+		5, 8, 11, 6, -1,
+
+		5, 8, 9, 1, -1,
+
+		1, 9, 10, 65, -1,
+
+		0, 63, 67, 24, -1,
+
+		67, 24, 33, 71, -1,
+
+		28, 29, 30, 31, -1,
+
+		28, 31, 73, 69, -1,
+
+		28, 69, 65, 1, -1,
+
+		63, 65, 66, 64, -1,
+
+		65, 69, 70, 66, -1,
+
+		63, 67, 68, 64, -1,
+
+		69, 73, 74, 70, -1,
+
+		67, 71, 72, 68, -1,
+
+		5, 6, 37, 36, -1,
+
+		6, 7, 38, 37, -1,
+
+		4, 35, 38, 7, -1,
+
+		12, 39, 40, 13, -1,
+
+		13, 40, 41, 14, -1, 
+
+		14, 41, 42, 15, -1,
+
+		15, 42, 39, 12, -1, 
+
+		8, 43, 44, 9, -1,
+
+
+		9, 44, 45, 10, -1,
+
+
+		10, 45, 46, 11, -1,
+
+
+		11, 46, 43, 8, -1,
+
+
+		29, 53, 54, 30, -1,
+
+
+		30, 54, 55, 31, -1, 
+
+
+		31, 55, 74, 73, -1,
+
+
+		33, 57, 72, 71, -1,
+
+
+
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+#benodigde tijd tot hier 2 uur(kale buitenkant van het huis )
+
+# /binmuur.wrl
+
+# buitmuur.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance DEF steen Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.8 0.4 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0	    0	    0, # 0 linkerbenedenhoek voorgevel
+						5.68	0	    0,
+						5.68	5.40	0, # 2
+						0	    5.40	0, # 3 linkerbovenhoek voorgevel
+
+						3.19	0	    0, #voordeur
+						4.42	0	    0,
+						4.42	2.30	0, # 6
+						3.19	2.30	0, # 7 voordeur
+
+						4.84	1.60	0, #toiletraam-8
+						5.04	1.60	0,
+						5.04	2.30	0, # 10
+						4.84	2.30	0, 
+
+						2.60	0.90	0, #keukenraam-12
+						2.60	2.30	0, # 13
+						0.60	2.30	0,
+						0.60	0.90	0,
+
+						0.60	3.60	0, #bovenraam-16
+						1.50	3.60	0,
+						1.50	5.0	    0,
+						4.42	5.0	    0,
+						4.42	5.40	0, 
+						0.60	5.40	0,
+
+						0	8.555	-3.15, #linkergevel-22
+						0	2.7	-9.0,
+						0	0	-9.0,
+
+						5.68	8.555	-3.15, #rechtergevel-25
+						5.68	5.40	-6.3,
+						5.68	5.40	-9,
+						5.68	0	-9.0,
+
+						2.25	0	-9.0, #achtergevel-29
+						2.25	0.6	-9.0,
+						4.8	0.6	-9.0,
+						4.8	5.40	-9.0,
+						1.2	0	-9.0,
+						1.2	2.7	-9,
+
+
+						3.19	0	-0.14, #diepte van de voordeur-35
+						4.42	0	-0.14,
+						4.42	2.30	-0.14,
+						3.19	2.30	-0.14, #diepte van de voordeur-38
+
+						2.60	0.90	-0.14, # diepte van het keukenraam-39
+						2.60	2.30	-0.14,
+						0.60	2.30	-0.14,
+						0.60	0.90	-0.14,
+
+						4.84	1.60	-0.14, #diepte van het toiletraam-43
+						5.04	1.60	-0.14,
+						5.04	2.30	-0.14,
+						4.84	2.30	-0.14, 
+
+						0.60	3.60	-0.14, #diepte van het bovenraam-47
+						1.50	3.60	-0.14,
+						1.50	5.0	-0.14,
+						4.42	5.0	-0.14,
+						4.42	5.40	-0.14, 
+						0.60	5.40	-0.14, #52
+
+						2.25	0	-8.86, #diepte van de achtergevel-53
+						2.25	0.6	-8.86,
+						4.8	0.6	-8.86,
+						4.8	5.40	-8.86,
+						1.2	0	-8.86,
+						1.2	2.7	-8.86,	#58
+
+						0	2.7	0, #59 extra punten voor segmentering beneden
+						0.14	2.7	-0.14,
+
+						5.68	2.7	0, #61
+						5.54	2.7	-0.14, #
+
+						0	2.7	-9, #63
+						0.14	2.7	-8.86, #
+
+						5.68	2.7	-9, #65
+						5.54	2.7	-8.86, #
+
+						1.2	2.7	-9, #67
+						1.2	2.7	-8.86, #
+
+						4.8	2.7	-9, #69
+						4.8	2.7	-8.86, #
+
+
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		0, 4, 12, 15, -1,
+
+		0, 15, 14, 59, -1,
+
+		14, 13, 61, 59,-1,
+
+
+		4, 7, 13, 12, -1,
+
+        13, 11, 61, -1,
+
+		11, 10, 61, -1,
+
+		9, 1, 61, 10, -1, 
+
+		5, 1, 9, 8, -1,
+
+		5, 8, 11, 6, -1,
+
+
+		0, 59, 63, 24, -1,
+
+		1, 28, 65, 61, -1,
+
+		28, 29, 30, 31, -1,
+
+		28, 31, 69, 65, -1,
+
+		33, 24, 63, 67, -1,
+
+		5, 6, 37, 36, -1,
+
+		6, 7, 38, 37, -1,
+
+		4, 35, 38, 7, -1,
+
+		12, 13, 40, 39, -1,
+
+		13, 14, 41, 40, -1,
+
+		15, 42, 41, 14, -1,
+
+		12, 39, 42, 15, -1
+
+		8, 9, 44, 43, -1,
+
+		9, 10 , 45, 44, -1,
+
+		10, 11, 46, 45, -1,
+
+		11, 8, 43, 46, -1,
+
+		29, 53, 54, 30, -1,
+
+		30, 54, 55, 31, -1, 
+
+		31, 55, 70, 69, -1,
+
+		33, 67, 68, 57, -1,
+
+		59, 61, 62, 60, -1,
+
+		59, 60, 64, 63, -1,
+
+		61, 65, 66, 62, -1,
+
+		65, 69, 70, 66, -1,
+
+		64, 68, 67, 63, -1,
+
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+Transform{#schuurtje
+children [
+
+DEF schuurvloer Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.5 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.1	0	-0.1,
+						2.1	0	-0.1,
+						2.1	0	-3.1,
+						0.1	0	-3.1,
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	0, 1, 2, 3, -1,
+	
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+Transform {
+children [
+Shape {
+appearance USE steen
+geometry Box {	size	2.2	2.6	0.1	}
+}
+]
+translation 1.1 1.3 -0.05
+}
+
+Transform{
+children [
+Shape {
+appearance USE steen
+geometry Box {	size	2.2	2.6	0.1	}
+}
+]
+translation	1.1	1.3	-3.15
+}
+
+Transform{
+children [
+Shape {
+appearance USE steen
+geometry Box {	size	0.1	2.6	1.3	}
+}
+]
+translation		0.05	1.3	-0.75
+}
+
+Transform{
+children [
+Shape {
+appearance USE steen
+geometry Box {	size	0.1	2.6	0.75	}
+}
+]
+translation		0.05	1.3	-2.725
+}
+
+Transform{
+children [
+Shape {
+appearance USE steen
+geometry Box {	size	0.1	2.6	3	}
+}
+]
+translation		2.15	1.3	-1.6
+}
+
+Transform{
+children [
+Shape {
+appearance DEF blauw Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.3 0.4 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+geometry Box {	size	0.05	0.44	0.85	}
+}
+]
+translation		0.05	2.38	-1.875
+}
+
+Transform{#drempel van schuurdeur
+children [
+
+Transform{#deurpost
+children [
+
+DEF deurpost Shape {
+		appearance 	DEF grijs Appearance {
+			material 	Material {
+	ambientIntensity  0.2
+	diffuseColor      0.4 0.4 0.4
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+					}	
+				}
+		geometry 	Box {
+	size	0.05 2.56 0.05
+				}
+	}
+]
+translation 0 1.3 0.45
+}
+
+Transform{#deurpost
+children [
+
+Shape {
+		appearance USE grijs
+		geometry 	Box {
+	size	0.05 0.05 0.85
+				}
+	}
+]
+translation 0 2.135 0
+}
+
+
+Transform{#deurpost
+children [
+
+USE deurpost
+]
+translation 0 1.3 -0.45
+}
+
+Shape {
+		appearance 	USE grijs
+		geometry 	Box {
+	size	0.1 0.04 0.95
+				}
+
+	}
+]
+translation		0.05	0.02	-1.875
+}
+
+
+]
+translation 3.48	0	7.8
+}
+
+# /buitmuur.wrl
+
+
+# trapbeneden.wrl
+
+
+
+
+DEF trapbeneden Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material          Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.5 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry DEF trap IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+	-0.2	0	1, #0
+	0	0.2	1,
+	0	0.2	0,
+	-0.2	0	0, #3
+
+	0.28	0.4	1, #4
+	0.6	0.6	1,
+	0.98	0.8	1,
+	0.98	1	0.45, #7
+
+	0.98	1.2	0.25, #8
+	0.98	1.4	0, 
+	0.98	1.6	-0.25, 
+	0.98	1.8	-0.45, #11
+
+	0.98	2.0	-1, #12
+	0.6	2.2	-1,
+	0.28	2.4	-1,
+	0	2.6	-1, #15
+
+	0	0.6	0, #16
+	0	0.8	0,
+	0	1	0, #18
+	0	1.2	0, #19
+
+	0	1.4	0, #20
+	0	1.6	0,
+	0	1.8	0, #22
+	0	2	0, #23
+
+	0	2.2	0, #24
+	0	2.4	0, 
+	0	2.6	0,  
+	0	2.8	0,  #27
+
+	-0.2	0.2	1, #28
+	0	0.4	1,
+	0	0.4	0,
+	-0.2	0.2	0, #31
+
+	0.28	0.6	1, #32
+	0.6	0.8	1,
+	0.98	1	1,
+	0.98	1.2	0.45, #35
+
+	0.98	1.4	0.25, #36
+	0.98	1.6	0, 
+	0.98	1.8	-0.25, 
+	0.98	2	-0.45, #39
+
+	0.98	2.2	-1, #40
+	0.6	2.4	-1,
+	0.28	2.6	-1,
+	0	2.8	-1, #43
+
+	0	0	1,
+	0	0	0, #45
+	0	0.4	0, #46
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+
+	28, 1, 2, 31, -1, #1e_treevlak
+	29, 4, 46, -1, #2e
+	32, 5, 16, -1,
+	33, 6, 17, -1,
+	34, 7, 18, -1, 
+	35, 8, 19, -1, 
+	36, 9, 20, -1, 
+	37, 10, 21, -1,
+	38, 11, 22, -1,
+	39, 12, 23, -1,
+	40, 13, 24, -1,
+	41, 14, 25, -1,
+	42, 15, 26, -1, #13e_treevlak
+
+	0, 28, 31, 3, -1, #voor_en_zijvlakken_van_de_eerste_tree
+	0, 44, 1, 28, -1,
+	3, 31, 2, 45, -1,
+
+	2, 1, 29, 30, -1, #alle_voorvlakken
+	46, 4, 32, 16, -1,
+	16, 5, 33, 17, -1,
+	17, 6, 34, 18, -1,
+	18, 7, 35, 19, -1, 
+	19, 8, 36, 20, -1,
+	20, 9, 37, 21, -1,
+	21, 10, 38, 22, -1,
+	22, 11, 39, 23, -1,
+	23, 12, 40, 24, -1,
+	24, 13, 41, 25, -1,
+	25, 14, 42, 26, -1,
+	26, 15, 43, 27, -1,
+
+
+	
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+translation 4.42	0	-3.36
+}
+
+
+
+
+
+# /trapbeneden.wrl
+
+# deuren.wrl
+
+
+
+Transform {
+children [
+DEF deurgroep Group {#DEURKEUKENWOONKAMER
+children[
+#dwarslat boven de deur
+DEF dwarslat Transform {
+	children [
+		Shape {
+appearance DEF kozijn Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.95 0.95 0.9
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.8 0.05 0.05 }
+}
+
+]
+translation	0 2.035 0
+}
+
+
+
+
+DEF ruitje Transform {
+	children [
+		Shape {
+appearance DEF glas Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.6 0.6 0.9
+	emissiveColor     0 0 0
+	shininess         0.8
+	specularColor     1 1 1 
+	transparency      0.7
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.8 0.64 0.01 }
+}
+
+]
+translation	0 2.38 0
+}#ruit boven de deur
+
+#deur
+DEF deur Transform {
+center -0.4 0 0
+	children [
+
+
+
+DEF klikopdeur TouchSensor {}
+  DEF TimeSource TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+  DEF Deuropen OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+
+
+
+# ../boven/deurklink.wrl
+
+
+
+
+
+DEF deurklink Transform {
+	children [
+	    DEF enehelft	Shape {
+            appearance DEF aluminium Appearance {
+                material         Material {
+                ambientIntensity  0.2
+                diffuseColor      0.4 0.4 0.5
+                emissiveColor     0 0 0
+                shininess         0.8
+                specularColor     0.4 0.4 0.5
+                }
+                texture           NULL
+                textureTransform  NULL
+            }
+		    geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {
+					point [
+                        -0.015	0.02	0, #0
+                        0.015		0.02	0,
+                        0.02		-0.02	0,
+                        -0.02		-0.02	0, #3
+
+                        -0.01		-0.015	0.06, #4
+                        0.01		-0.015	0.06,
+                        -0.01		0.015		0.03,
+                        0.01		0.015		0.03,
+
+                        0.005		0.1		0.035, #8
+                        -0.005	0.1		0.035,
+                        -0.005	0.1		0.055,
+                        0.005		0.1		0.055,
+
+
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	
+2, 3, 4, 5, -1,
+2, 5, 4, 3, -1,
+
+4, 5, 11, 10, -1, 
+4, 10, 11, 5, -1,
+
+0, 1, 7, 6, -1, 
+0, 6, 7, 1, -1,
+
+6, 7, 8, 9, -1, 
+6, 9, 8, 7, -1,
+
+8, 9, 10, 11, -1, 
+8, 11, 10, 9, -1,
+
+0, 6, 4, 3, -1,
+0, 3, 4, 6, -1,
+
+6, 9, 10, 4, -1, 
+6, 4, 10, 9, -1,
+
+1, 2, 5, 7, -1,
+1, 7, 5, 2, -1,
+
+7, 5, 11, 8, -1,
+7, 8, 11, 5, -1,
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				#texCoordIndex     []
+			}
+		}#enehelft
+
+	Transform {
+		children [
+
+			USE enehelft
+		]
+	rotation 0 1 0 3.1415927
+	translation	0 0 -0.07
+	}
+	Transform {
+
+		children [
+		DEF vlakdeel Shape {
+			appearance USE aluminium
+			geometry Box { size 0.18 0.07 0.01 }
+		}#shape
+		]
+	translation -0.03 0 -0.005
+	}
+
+	Transform {
+
+		children [
+		USE vlakdeel 
+		]
+	translation -0.03 0 -0.065
+	}
+
+
+
+	]
+
+translation 0.35 0 0.035
+rotation 0 0 1 1.5707963
+}#deurklink
+
+
+
+# /../boven/deurklink.wrl
+
+DEF deurvorm Shape {
+	appearance DEF deurkleur Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.8 0.8 0.8
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.8 2 0.05 }
+}
+
+]
+translation	0 1.005 0
+}
+
+
+
+
+
+]
+}#deurgroep
+
+]
+translation 1.38 0 -3.395
+}
+#ROUTE klikopdeur.touchTime TO TimeSource.startTime
+#ROUTE TimeSource.fraction_changed TO Deuropen.set_fraction
+#ROUTE Deuropen.value_changed TO deur.rotation
+
+
+#deur2
+Transform {
+children[ 	USE dwarslat
+		USE ruitje
+
+#deur
+DEF deurkeukengang Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur2 TouchSensor {}
+  DEF TimeSource2 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+   DEF Deuropen2 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+USE deurklink
+USE deurvorm
+]
+translation	0 1.005 0
+}
+		
+]
+translation 3.155 0 -2.96
+rotation 0 1 0 1.5707963
+}
+
+#ROUTE klikopdeur2.touchTime TO TimeSource2.startTime
+#ROUTE TimeSource2.fraction_changed TO Deuropen2.set_fraction
+#ROUTE Deuropen2.value_changed TO deurkeukengang.rotation
+
+
+#deur3
+Transform {
+children[ 	USE dwarslat
+		USE ruitje
+#deur
+DEF deurwoonkamergang Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur3 TouchSensor {}
+  DEF TimeSource3 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as: deze deur draait tegengesteld aan de andere
+   DEF Deuropen3 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 1, 0 1 0 2, 0 1 0 2, 0 1 0 1, 0 1 0 0 ]
+  }
+USE deurklink
+USE deurvorm
+]
+translation	0 1.005 0
+}
+		
+]
+translation 3.59 0 -3.395
+rotation 0 1 0 0
+}#deur3
+
+#ROUTE klikopdeur3.touchTime TO TimeSource3.startTime
+#ROUTE TimeSource3.fraction_changed TO Deuropen3.set_fraction
+#ROUTE Deuropen3.value_changed TO deurwoonkamergang.rotation
+
+
+#deur4
+Transform {
+children[ DEF dwarslatafw Transform {
+	children [
+		Shape {
+appearance USE kozijn
+			geometry Box { size	0.93 0.05 0.05 }
+}
+
+]
+translation	0 2.035 0
+}
+
+
+
+
+DEF ruitjeafw Transform {
+	children [
+		Shape {
+appearance USE kozijn 
+			geometry Box { size	0.93 0.64 0.01 }
+}
+
+]
+translation	0 2.38 0
+}#ruit boven de deur#deur
+DEF deurwoonkamertrapkast Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur4 TouchSensor {}
+  DEF TimeSource4 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+   DEF Deuropen4 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+USE deurklink
+Shape { #afwijkende deurmaat
+	appearance USE deurkleur 
+			geometry Box { size	0.93 2 0.05 }
+}
+]
+translation	0 1.005 0
+}
+		
+]
+translation 4.395 0 -3.895
+rotation 0 1 0 -1.5707963
+}#deur4
+
+#ROUTE klikopdeur4.touchTime TO TimeSource4.startTime
+#ROUTE TimeSource4.fraction_changed TO Deuropen4.set_fraction
+#ROUTE Deuropen4.value_changed TO deurwoonkamertrapkast.rotation
+
+
+
+#deur5
+Transform {
+children[ DEF dwarslatafw2 Transform {
+	children [
+		Shape {
+appearance USE kozijn
+			geometry Box { size	0.74 0.05 0.05 }
+}
+
+]
+translation	0 2.035 0
+}
+
+
+
+
+DEF ruitjeafw2 Transform {
+	children [
+		Shape {
+appearance USE kozijn 
+			geometry Box { size	0.74 0.64 0.01 }
+}
+
+]
+translation	0 2.38 0
+}#ruit boven de deur#deur
+
+DEF deurgangmeterkast Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur5 TouchSensor {}
+  DEF TimeSource5 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+   DEF Deuropen5 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -0.7, 0 1 0 -1.5, 0 1 0 -1.5, 0 1 0 -0.7, 0 1 0 0 ]
+  }
+DEF deurklinkafw Transform {
+	children [
+	USE enehelft
+	Transform {
+		children [
+
+			USE enehelft
+		]
+	rotation 0 1 0 3.1415927
+	translation	0 0 -0.07
+	}
+	Transform {
+
+		children [
+		DEF vlakdeel Shape {
+			appearance USE aluminium
+			geometry Box { size 0.18 0.07 0.01 }
+		}#shape
+		]
+	translation -0.03 0 -0.005
+	}
+
+	Transform {
+
+		children [
+		USE vlakdeel 
+		]
+	translation -0.03 0 -0.065
+	}
+
+
+
+	]
+
+translation 0.32 0 0.035
+rotation 0 0 1 1.5707963
+}#deurklink
+Shape { #afwijkende deurmaat
+	appearance USE deurkleur 
+			geometry Box { size	0.74 2 0.05 }
+}
+]
+translation	0 1.005 0
+}
+		
+]
+translation 4.455 0 -1.92
+rotation 0 1 0 -1.5707963
+}#deur5
+
+#ROUTE klikopdeur5.touchTime TO TimeSource5.startTime
+#ROUTE TimeSource5.fraction_changed TO Deuropen5.set_fraction
+#ROUTE Deuropen5.value_changed TO deurgangmeterkast.rotation
+
+
+#deur6
+Transform {
+children[ 	USE dwarslat
+		USE ruitje
+#deur
+DEF deurtoiletgang Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur6 TouchSensor {}
+  DEF TimeSource6 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as: 
+   DEF Deuropen6 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+USE deurklink
+USE deurvorm
+]
+translation	0 1.005 0
+}
+		
+]
+translation 4.455 0 -1.08
+rotation 0 1 0 -1.5707963
+}#deur6
+
+#ROUTE klikopdeur6.touchTime TO TimeSource6.startTime
+#ROUTE TimeSource6.fraction_changed TO Deuropen6.set_fraction
+#ROUTE Deuropen6.value_changed TO deurtoiletgang.rotation
+
+
+# voordeur.wrl
+
+
+
+
+DEF voordeur Transform {
+center 1.11 0 0 
+	children [
+
+		Shape {
+appearance DEF deurkleur Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.8 0.8 0.8
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+
+	0	0	0.025, #0
+	1.11	0	0.025, #
+	1.11	2.19	0.025, #
+	0	2.19	0.025, #3
+				
+	0.71	0.49	0.025, #4
+	0.91	0.49	0.025, #
+	0.91	1.99	0.025, #
+	0.71	1.99	0.025, #7
+
+	0	0	-0.025, #8
+	1.11	0	-0.025, #
+	1.11	2.19	-0.025, #
+	0	2.19	-0.025, #11
+				
+	0.71	0.49	-0.025, #12
+	0.91	0.49	-0.025, #
+	0.91	1.99	-0.025, #
+	0.71	1.99	-0.025, #15
+	]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	
+	0, 1, 5, 4, -1, 
+
+	1, 2, 6, 5, -1,
+
+	6, 2, 3, 7, -1,
+
+	0, 4, 7, 3, -1, 
+
+
+	1, 0, 8, 9, -1,
+
+	3, 2, 10, 11, -1,
+
+	0, 3, 11, 8, -1,
+
+	2, 1, 9, 10, -1,
+
+
+	5, 6, 14, 13, -1,
+
+	4, 5, 13, 12, -1,
+
+	6, 7, 15, 14, -1,
+
+	7, 4, 12, 15, -1,
+
+	
+	9, 8, 12, 13, -1,
+	
+	10, 9, 13, 14, -1,
+
+	11, 10, 14, 15, -1, 
+
+	12, 8, 11, 15, -1,
+
+
+
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+
+DEF klikopvoordeur TouchSensor {}
+  DEF TimeSourcevoor TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+  DEF VoorDeuropen OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -0.7, 0 1 0 -1.5, 0 1 0 -1.5, 0 1 0 -0.7, 0 1 0 0 ]
+  }
+
+DEF deurgreep Transform{
+children[
+		Shape {
+	appearance DEF aluminium Appearance {
+		material         Material {
+		ambientIntensity  0.2
+		diffuseColor      0.4 0.4 0.4
+		emissiveColor     0 0 0
+		shininess         0.8
+		specularColor     0.9 0.9 0.9
+		transparency      0
+		}
+		texture           NULL
+		textureTransform  NULL
+		}
+			geometry Box { size	0.2	0.2	0.004	}
+}
+
+]
+translation	0.15	0.9	0.067
+}
+
+
+DEF steunblokje Transform{
+children[
+		Shape {
+	appearance DEF aluminium Appearance {
+		material         Material {
+		ambientIntensity  0.2
+		diffuseColor      0.4 0.4 0.4
+		emissiveColor     0 0 0
+		shininess         0.8
+		specularColor     0.9 0.9 0.9
+		transparency      0
+		}
+		texture           NULL
+		textureTransform  NULL
+		}
+			geometry Box { size	0.14	0.14	0.04	}
+}
+
+]
+translation	0.15	0.9	0.045
+}
+
+DEF ruitjeindeur Transform{
+children[
+		Shape {
+	appearance DEF glas Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.6 0.6 0.9
+	emissiveColor     0 0 0
+	shininess         0.8
+	specularColor     1 1 1 
+	transparency      0.7
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.2	1.5	0.01	}
+}
+
+]
+translation	0.81	1.24	0
+}
+
+	]
+translation 3.25	0.05	-0.14
+}
+
+#ROUTE klikopvoordeur.touchTime TO TimeSourcevoor.startTime
+#ROUTE TimeSourcevoor.fraction_changed TO VoorDeuropen.set_fraction
+#ROUTE VoorDeuropen.value_changed TO voordeur.rotation
+
+# /voordeur.wrl
+
+# achterdeur.wrl
+
+
+
+#bevat ook schuurdeur
+
+
+DEF achterdeur Transform {
+center 0 0 0 
+	children [
+
+
+		Shape {
+appearance DEF deurkleur Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.8 0.8 0.8
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry DEF deurInd IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+
+	0.93	0	-0.025, #0
+	0	0	-0.025, #
+	0	2.09	-0.025, #
+	0.93	2.09	-0.025, #3
+
+	0.765	0.6	-0.025, #4
+	0.165	0.6	-0.025, #
+	0.165	1.9	-0.025, #
+	0.765	1.9	-0.025, #7
+
+	0.93	0	0.025, #0
+	0	0	0.025, #
+	0	2.09	0.025, #
+	0.93	2.09	0.025, #3
+
+	0.765	0.6	0.025, #4
+	0.165	0.6	0.025, #
+	0.165	1.9	0.025, #
+	0.765	1.9	0.025, #7
+
+	]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	
+	0, 1, 5, 4, -1, 
+
+	1, 2, 6, 5, -1,
+
+	6, 2, 3, 7, -1,
+
+	0, 4, 7, 3, -1, 
+
+
+	1, 0, 8, 9, -1,
+
+	3, 2, 10, 11, -1,
+
+	0, 3, 11, 8, -1,
+
+	2, 1, 9, 10, -1,
+
+
+	5, 6, 14, 13, -1,
+
+	4, 5, 13, 12, -1,
+
+	6, 7, 15, 14, -1,
+
+	7, 4, 12, 15, -1,
+
+	
+	9, 8, 12, 13, -1,
+	
+	10, 9, 13, 14, -1,
+
+	11, 10, 14, 15, -1, 
+
+	12, 8, 11, 15, -1,
+
+
+
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+
+DEF klikopachterdeur TouchSensor {}
+  DEF TimeSourceachter TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+  DEF achterDeuropen OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 0.7, 0 1 0 1.5, 0 1 0 1.5, 0 1 0 0.7, 0 1 0 0 ]
+  }
+
+
+
+Transform {
+    # ../boven/deurklink.wrl
+
+
+
+
+
+DEF deurklink Transform {
+	children [
+	    DEF enehelft	Shape {
+            appearance DEF aluminium Appearance {
+                material         Material {
+                ambientIntensity  0.2
+                diffuseColor      0.4 0.4 0.5
+                emissiveColor     0 0 0
+                shininess         0.8
+                specularColor     0.4 0.4 0.5
+                }
+                texture           NULL
+                textureTransform  NULL
+            }
+		    geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {
+					point [
+                        -0.015	0.02	0, #0
+                        0.015		0.02	0,
+                        0.02		-0.02	0,
+                        -0.02		-0.02	0, #3
+
+                        -0.01		-0.015	0.06, #4
+                        0.01		-0.015	0.06,
+                        -0.01		0.015		0.03,
+                        0.01		0.015		0.03,
+
+                        0.005		0.1		0.035, #8
+                        -0.005	0.1		0.035,
+                        -0.005	0.1		0.055,
+                        0.005		0.1		0.055,
+
+
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	
+2, 3, 4, 5, -1,
+2, 5, 4, 3, -1,
+
+4, 5, 11, 10, -1, 
+4, 10, 11, 5, -1,
+
+0, 1, 7, 6, -1, 
+0, 6, 7, 1, -1,
+
+6, 7, 8, 9, -1, 
+6, 9, 8, 7, -1,
+
+8, 9, 10, 11, -1, 
+8, 11, 10, 9, -1,
+
+0, 6, 4, 3, -1,
+0, 3, 4, 6, -1,
+
+6, 9, 10, 4, -1, 
+6, 4, 10, 9, -1,
+
+1, 2, 5, 7, -1,
+1, 7, 5, 2, -1,
+
+7, 5, 11, 8, -1,
+7, 8, 11, 5, -1,
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				#texCoordIndex     []
+			}
+		}#enehelft
+
+	Transform {
+		children [
+
+			USE enehelft
+		]
+	rotation 0 1 0 3.1415927
+	translation	0 0 -0.07
+	}
+	Transform {
+
+		children [
+		DEF vlakdeel Shape {
+			appearance USE aluminium
+			geometry Box { size 0.18 0.07 0.01 }
+		}#shape
+		]
+	translation -0.03 0 -0.005
+	}
+
+	Transform {
+
+		children [
+		USE vlakdeel 
+		]
+	translation -0.03 0 -0.065
+	}
+
+
+
+	]
+
+translation 0.35 0 0.035
+rotation 0 0 1 1.5707963
+}#deurklink
+
+
+
+# /../boven/deurklink.wrl
+    translation 0.50 1 0
+}
+
+
+
+
+DEF ruitindeur Transform{
+children[
+		Shape {
+	appearance DEF glas Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.6 0.6 0.9
+	emissiveColor     0 0 0
+	shininess         0.8
+	specularColor     1 1 1 
+	transparency      0.7
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.6	1.3	0.01	}
+}
+
+]
+translation	0.465	1.25	0
+}
+
+	]
+translation 1.26	0.05	-8.86
+}
+
+#ROUTE klikopachterdeur.touchTime TO TimeSourceachter.startTime
+#ROUTE TimeSourceachter.fraction_changed TO achterDeuropen.set_fraction
+#ROUTE achterDeuropen.value_changed TO achterdeur.rotation
+
+#schuurdeur
+DEF schuurdeur Transform {
+children [
+
+DEF klikopschuurdeur TouchSensor {}
+  DEF TimeSourceschuur TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+  DEF schuurDeuropen OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 1.5707963, 0 1 0 2.4, 0 1 0 3.4, 0 1 0 3.4, 0 1 0 2.4, 0 1 0 1.5707963 ]
+  }
+
+Transform{
+    children[
+        Shape{
+            appearance 	USE deurkleur
+            geometry	USE deurInd
+        }
+    ]
+    scale 0.9139785	1	1   #maakt de deur op maat
+}
+
+USE ruitindeur
+
+Transform {
+    children USE deurklink
+    translation 0.43 1 0
+}
+
+
+]
+translation 3.53	0.05	6.35
+rotation 0 1 0 1.5707963
+}
+
+#ROUTE klikopschuurdeur.touchTime TO TimeSourceschuur.startTime
+#ROUTE TimeSourceschuur.fraction_changed TO schuurDeuropen.set_fraction
+#ROUTE schuurDeuropen.value_changed TO schuurdeur.rotation
+
+# /achterdeur.wrl
+
+
+
+
+# /deuren.wrl
+
+# ramen.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance DEF kozijn Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.95 0.95 0.9
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.05 1.3 0.05 }
+}
+
+]
+translation	0.625 1.6 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 1.3 0.05 }
+}
+
+]
+translation	2.575 1.6 -0.14
+}
+
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 1.3 0.05 }
+}
+
+]
+translation	1.475 1.6 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 1.3 0.05 }
+}
+
+]
+translation	1.725 1.6 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	2 0.05 0.05 }
+}
+
+]
+translation	1.6 0.925 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	2 0.05 0.05 }
+}
+
+]
+translation	1.6 2.275 -0.14
+}
+
+#einde keukenraam
+
+#begin toiletraam
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 0.7 0.05 }
+}
+
+]
+translation	4.865 1.95 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 0.7 0.05 }
+}
+
+]
+translation	5.015 1.95 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.1 0.05 0.05 }
+}
+
+]
+translation	4.94 1.625 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.1 0.05 0.05 }
+}
+
+]
+translation	4.94 2.275 -0.14
+}
+
+#einde toiletraam
+#voordeur posten
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.26 0.05 }
+}
+
+]
+translation	3.215 1.17 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.26 0.05 }
+}
+
+]
+translation	4.395 1.17 -0.14
+}
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	1.13 0.05 0.05 }
+}
+
+]
+translation	3.805 2.275 -0.14
+}
+#einde deurposten
+#begin kozijnen achter
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.1 0.05 }
+}
+
+]
+translation	3.215 1.65 -8.86
+}
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.1 0.05 }
+}
+
+]
+translation	4.775	1.65 -8.86
+}
+
+Transform {
+	children [
+		Shape {
+appearance		DEF blauw Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.3 0.4 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+
+geometry	Box { size	1.51 0.5 0.05 }
+}
+
+]
+translation	3.995 2.45 -8.86
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	1.51 0.05 0.05 }
+}
+
+]
+translation	3.995 0.625 -8.86
+}#1
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	1.51 0.05 0.05 }
+}
+
+]
+translation	3.995 2.175 -8.86
+}#2
+
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.94 0.05 0.05 }
+}
+
+]
+translation	2.72 0.625 -8.86
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	1.99 0.05 0.05 }
+}
+
+]
+translation	2.195 2.675 -8.86
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	1 0.05 0.05 }
+}
+
+]
+translation	1.725 2.175 -8.86
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.61 0.05 }
+}
+
+]
+translation	1.225 1.345 -8.86
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.61 0.05 }
+}
+
+]
+translation	2.225 1.345 -8.86
+}
+
+
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 1.5 0.05 }
+}
+
+]
+translation	3.565 1.4 -8.86
+}
+
+#einde ramen achter
+
+
+
+# /ramen.wrl
+
+# ruiten.wrl
+
+
+
+
+#begin vensterglas
+
+Transform {
+	children [
+		Shape {
+appearance DEF glas Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.6 0.6 0.9
+	emissiveColor     0 0 0
+	shininess         0.8
+	specularColor     1 1 1 
+	transparency      0.7
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.94 2 0.01 }
+}
+
+]
+translation	2.72 1.65 -8.86
+}#ruit 5 achter
+
+#ruit1 keuken
+Transform {
+	children [
+		Shape {
+appearance USE glas
+geometry Box { size	0.8 1.3 0.01 }
+}
+
+]
+translation	1.05 1.6 -0.14
+}#ruit 1 keuken
+
+#ruit3 keuken
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.8 1.3 0.01 }
+}
+
+]
+translation	2.15 1.6 -0.14
+}#ruit 3 keuken
+
+#ruit2 keuken
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.2 1.3 0.01 }
+}
+
+]
+translation	1.6 1.6 -0.14
+}#ruit 2 keuken
+
+
+#toiletruit
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.1 0.6 0.01 }
+}
+
+]
+translation	4.94 1.95 -0.14
+}#ruit van toiletraam
+
+#ramen achter
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	1.16 1.5 0.01 }
+}
+
+]
+translation	4.17 1.4 -8.86
+}#ruit 3 achter
+
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.3 1.5 0.01 }
+}
+
+]
+translation	3.39 1.4 -8.86
+}#ruit 4 achter
+
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.95 0.45 0.01 }
+}
+
+]
+translation	1.725 2.425 -8.86
+}#ruit 6 achter
+
+# /ruiten.wrl
+
+
+# /beneden/beneden.wrl
+
+
+DEF boven Transform {
+children[
+
+Transform {
+children[
+
+Transform {
+children[
+	Shape {
+appearance DEF groen Appearance {
+	material         Material {
+	ambientIntensity  1
+	diffuseColor      0 1 0
+	emissiveColor     0 1 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry DEF pijl IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0 0 0,
+						0.2 0.2 0,
+						0.2 -0.2 0,
+						
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [	0,1,2,-1, 
+				]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+}#shape
+]
+rotation 0 1 0 3.1415927
+}
+
+DEF schuifboven TouchSensor {}
+]
+translation 0.15 2.95 0.3
+}
+
+Transform {
+children[
+
+	Shape {
+appearance DEF rood Appearance {
+	material         Material {
+	ambientIntensity  1
+	diffuseColor      1 0 0
+	emissiveColor     1 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+
+geometry USE pijl
+}
+
+DEF schuifboven2 TouchSensor {}
+]
+
+translation 5.48 2.95 0.3
+}
+
+# boven/boven.wrl
+
+
+
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    1 0 0  0
+	position       2.5 3.75 -2.5
+
+	description    "Ouderslaapkamer"
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    1 0 0  0
+	position       2.5 3.75 -5
+
+	description    "Tweede slaapkamer"
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    1 0 0  0
+	position       4.5 3.75 -7
+
+	description    "Kinderkamer"
+}
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    1 0 0  0
+	position       4.5 3.75 -1.5
+
+	description    "Badkamer"
+}
+
+
+
+#dak van schuur
+
+Transform {
+children [
+Shape {
+appearance  DEF appdak Appearance {
+	 material          Material {
+  	ambientIntensity  0
+  	diffuseColor      0.2 0.2 0.2
+  	emissiveColor     0 0 0
+  	shininess         0
+  	specularColor     0 0 0 
+  	transparency      0
+			  }
+
+  texture           ImageTexture {
+  			  url     [""]
+  			  repeatS TRUE
+  			  repeatT TRUE
+ 			  }
+}
+
+geometry Box { size 2.24 0.04 3.24	}
+}
+]
+translation 4.6 2.62 6.2
+}
+
+
+DEF plafond Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 1 1
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.14	2.70	-0.14,
+						5.54	2.70	-0.14,
+						5.54	2.70	-8.86,
+						0.14	2.70	-8.86,
+
+						5.54	2.70	-2.36, #-4
+						5.54	2.70	-4.36,
+						4.42	2.70	-4.36,
+						4.42	2.70	-2.36,
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		0, 1, 4, 7, -1, 
+		0, 7, 4, 1, -1, 
+
+		0, 7, 6, 3, -1,
+		0, 3, 6, 7, -1, 
+
+		5, 2, 3, 6, -1, 
+		5, 6, 3, 2, -1,
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+DEF vloerboven Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.5 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.14	2.80	-0.14,
+						5.54	2.80	-0.14,
+						5.54	2.80	-8.86,
+						0.14	2.80	-8.86,
+
+						5.54	2.80	-2.36, #-4
+						5.54	2.8	-4.36,
+						4.42	2.8	-4.36,
+						4.42	2.8	-2.36,
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		0, 1, 4, 7, -1, 
+		0, 7, 4, 1, -1, 
+
+		0, 7, 6, 3, -1,
+		0, 3, 6, 7, -1, 
+
+		5, 2, 3, 6, -1, 
+		5, 6, 3, 2, -1,
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+
+DEF stukmuur1 Transform {
+children[
+	Shape {
+	appearance DEF wandkleur Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.9 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+		geometry 	Box {
+	size	2.84 2.50 0.07
+				}
+
+	}
+ ]
+translation		1.7	4.05 -4.565
+}
+
+DEF stukmuur2 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.07 2.50 0.7
+				}
+
+	}
+ ]
+translation		3.155	4.05 -4.28
+}
+
+
+DEF stukmuur3 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.07 2.68 3.57
+				}
+
+	}
+ ]
+translation		3.155	4.05 -7.215
+}
+
+DEF stukmuur4 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.07 2.50 2.85
+				}
+
+	}
+ ]
+translation		3.155	4.05 -1.705
+}
+
+DEF stukmuur5 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.42 2.50 0.07
+				}
+
+	}
+ ]
+translation		3.4	4.05 -2.325
+}
+
+DEF stukmuur6 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.98 2.50 0.07
+				}
+
+	}
+ ]
+translation		4.91	4.05 -2.325
+}
+
+DEF stukmuur7 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	1.34 2.50 0.07
+				}
+
+	}
+ ]
+translation		4.73	4.05 -4.395
+}
+
+
+DEF stukmuur8 Transform {
+children[
+	Shape {
+	appearance USE wandkleur
+		geometry 	Box {
+	size	0.07 2.50 1.2
+				}
+
+	}
+ ]
+translation		4.025	4.05 -4.96
+}
+
+DEF vulstukvoortrap Transform {
+	children [
+		Shape {
+appearance USE wandkleur
+
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						4.42	2.7	-2.36,
+						4.42	2.7	-3.36,
+						4.42	2.8	-3.36,
+						4.42	2.8	-2.36,
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	0, 1, 2, 3, -1,
+	0, 3, 2, 1, -1,
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+DEF paalvoortrap Transform {
+children[
+Shape {
+appearance 	USE wandkleur
+geometry	Box { size	0.07	2.50	0.07	}
+}
+]
+translation 4.385	4.05	-3.36
+}
+
+# deuren.wrl
+
+
+
+
+
+#Deuren boven
+
+#deur7
+Transform {
+children[ 
+
+#dwarslat boven de deur
+DEF dwarslat Transform {
+	children [
+		Shape {
+appearance DEF kozijn Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.95 0.95 0.9
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.8 0.05 0.05 }
+}
+
+]
+translation	0 2.035 0
+}
+
+
+
+DEF ruitjeboven Transform {
+	children [
+		Shape {
+appearance DEF glas Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.6 0.6 0.9
+	emissiveColor     0 0 0
+	shininess         0.8
+	specularColor     1 1 1 
+	transparency      0.7
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.8 0.44 0.01 }
+}
+
+]
+translation	0 2.28 0
+}#ruit boven de deur
+
+#deur
+DEF deuroudersgang Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur7 TouchSensor {}
+  DEF TimeSource7 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+   DEF Deuropen7 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+
+
+DEF deurklink # deurklink.wrl
+
+
+
+
+
+DEF deurklink Transform {
+	children [
+	    DEF enehelft	Shape {
+            appearance DEF aluminium Appearance {
+                material         Material {
+                ambientIntensity  0.2
+                diffuseColor      0.4 0.4 0.5
+                emissiveColor     0 0 0
+                shininess         0.8
+                specularColor     0.4 0.4 0.5
+                }
+                texture           NULL
+                textureTransform  NULL
+            }
+		    geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {
+					point [
+                        -0.015	0.02	0, #0
+                        0.015		0.02	0,
+                        0.02		-0.02	0,
+                        -0.02		-0.02	0, #3
+
+                        -0.01		-0.015	0.06, #4
+                        0.01		-0.015	0.06,
+                        -0.01		0.015		0.03,
+                        0.01		0.015		0.03,
+
+                        0.005		0.1		0.035, #8
+                        -0.005	0.1		0.035,
+                        -0.005	0.1		0.055,
+                        0.005		0.1		0.055,
+
+
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	
+2, 3, 4, 5, -1,
+2, 5, 4, 3, -1,
+
+4, 5, 11, 10, -1, 
+4, 10, 11, 5, -1,
+
+0, 1, 7, 6, -1, 
+0, 6, 7, 1, -1,
+
+6, 7, 8, 9, -1, 
+6, 9, 8, 7, -1,
+
+8, 9, 10, 11, -1, 
+8, 11, 10, 9, -1,
+
+0, 6, 4, 3, -1,
+0, 3, 4, 6, -1,
+
+6, 9, 10, 4, -1, 
+6, 4, 10, 9, -1,
+
+1, 2, 5, 7, -1,
+1, 7, 5, 2, -1,
+
+7, 5, 11, 8, -1,
+7, 8, 11, 5, -1,
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				#texCoordIndex     []
+			}
+		}#enehelft
+
+	Transform {
+		children [
+
+			USE enehelft
+		]
+	rotation 0 1 0 3.1415927
+	translation	0 0 -0.07
+	}
+	Transform {
+
+		children [
+		DEF vlakdeel Shape {
+			appearance USE aluminium
+			geometry Box { size 0.18 0.07 0.01 }
+		}#shape
+		]
+	translation -0.03 0 -0.005
+	}
+
+	Transform {
+
+		children [
+		USE vlakdeel 
+		]
+	translation -0.03 0 -0.065
+	}
+
+
+
+	]
+
+translation 0.35 0 0.035
+rotation 0 0 1 1.5707963
+}#deurklink
+
+
+
+# /deurklink.wrl
+
+
+DEF deurvorm Shape {
+	appearance DEF deurkleur Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.8 0.8 0.8
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry Box { size	0.8 2 0.05 }
+}]
+translation	0 1.005 0
+}
+		
+]
+translation 3.155 2.8 -3.53
+rotation 0 1 0 1.5707963
+}
+
+#ROUTE klikopdeur7.touchTime TO TimeSource7.startTime
+#ROUTE TimeSource7.fraction_changed TO Deuropen7.set_fraction
+#ROUTE Deuropen7.value_changed TO deuroudersgang.rotation
+
+#deur8
+Transform {
+children[ 	USE dwarslat
+		USE ruitjeboven 
+
+#deur
+DEF deurtweedeslaapkamergang Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur8 TouchSensor {}
+  DEF TimeSource8 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+   DEF Deuropen8 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+USE deurklink
+USE deurvorm
+]
+translation	0 1.005 0
+}
+		
+]
+translation 3.155 2.8 -5.03
+rotation 0 1 0 -1.5707963
+}
+
+#ROUTE klikopdeur8.touchTime TO TimeSource8.startTime
+#ROUTE TimeSource8.fraction_changed TO Deuropen8.set_fraction
+#ROUTE Deuropen8.value_changed TO deurtweedeslaapkamergang.rotation
+
+
+#deur9
+Transform {
+children[ 	USE dwarslat
+		USE ruitjeboven 
+
+#deur
+DEF deurkinderkamergang Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur9 TouchSensor {}
+  DEF TimeSource9 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+   DEF Deuropen9 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+USE deurklink
+USE deurvorm
+]
+translation	0 1.005 0
+}
+		
+]
+translation 3.59 2.8 -5.465
+rotation 0 1 0 3.1415927
+}
+
+#ROUTE klikopdeur9.touchTime TO TimeSource9.startTime
+#ROUTE TimeSource9.fraction_changed TO Deuropen9.set_fraction
+#ROUTE Deuropen9.value_changed TO deurkinderkamergang.rotation
+
+
+#deur10
+Transform {
+children[ 	USE dwarslat
+		USE ruitjeboven 
+
+#deur
+DEF deurbadkamergang Transform {
+center -0.4 0 0
+	children [
+
+
+
+	DEF klikopdeur10 TouchSensor {}
+  DEF TimeSource10 TimeSensor { cycleInterval 20.0 } # Run once for 20 sec.
+  # Animeer het openzwaaien van de deur rond de Y as:
+   DEF Deuropen10 OrientationInterpolator {
+       key      [ 0,      0.025,	0.05,	0.95,	0.975,       1.0 ]
+       keyValue [ 0 1 0 0, 0 1 0 -1, 0 1 0 -2, 0 1 0 -2, 0 1 0 -1, 0 1 0 0 ]
+  }
+USE deurklink
+USE deurvorm
+]
+translation	0 1.005 0
+}
+		
+]
+translation 4.01 2.8 -2.325
+rotation 0 1 0 0
+}
+
+
+
+#ROUTE klikopdeur10.touchTime TO TimeSource10.startTime
+#ROUTE TimeSource10.fraction_changed TO Deuropen10.set_fraction
+#ROUTE Deuropen10.value_changed TO deurbadkamergang.rotation
+
+
+# /deuren.wrl
+
+# trapboven.wrl
+
+
+
+
+
+
+
+
+DEF trapboven Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material          Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.5 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry DEF trap2 IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+	-0.2	0	1, #0
+	0	0.2	1,
+	0	0.2	0,
+	-0.2	0	0, #3
+
+	0.28	0.4	1, #4
+	0.6	0.6	1,
+	0.98	0.8	1,
+	0.98	1	0.45, #7
+
+	0.98	1.2	0.25, #8
+	0.98	1.4	0, 
+	0.98	1.6	-0.25, 
+	0.98	1.8	-0.45, #11
+
+	0.98	2.0	-1, #12
+	0.6	2.2	-1,
+	0.28	2.4	-1,
+	0	2.6	-1, #15
+
+	0	0.6	0, #16
+	0	0.8	0,
+	0	1	0, #18
+	0	1.2	0, #19
+
+	0	1.4	0, #20
+	0	1.6	0,
+	0	1.8	0, #22
+	0	2	0, #23
+
+	0	2.2	0, #24
+	0	2.4	0, 
+	0	2.6	0,  
+	0	2.8	0,  #27
+
+	-0.2	0.2	1, #28
+	0	0.4	1,
+	0	0.4	0,
+	-0.2	0.2	0, #31
+
+	0.28	0.6	1, #32
+	0.6	0.8	1,
+	0.98	1	1,
+	0.98	1.2	0.45, #35
+
+	0.98	1.4	0.25, #36
+	0.98	1.6	0, 
+	0.98	1.8	-0.25, 
+	0.98	2	-0.45, #39
+
+	0.98	2.2	-1, #40
+	0.6	2.4	-1,
+	0.28	2.6	-1,
+	0	2.8	-1, #43
+
+	0	0	1,
+	0	0	0, #45
+	0	0.4	0, #46
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+
+	28, 1, 2, 31, -1, #1e_treevlak
+	29, 4, 46, -1, #2e
+	32, 5, 16, -1,
+	33, 6, 17, -1,
+	34, 7, 18, -1, 
+	35, 8, 19, -1, 
+	36, 9, 20, -1, 
+	37, 10, 21, -1,
+	38, 11, 22, -1,
+	39, 12, 23, -1,
+	40, 13, 24, -1,
+	41, 14, 25, -1,
+	42, 15, 26, -1, #13e_treevlak
+
+#	0, 28, 31, 3, -1, #voor_en_zijvlakken_van_de_eerste_tree_komt_boven_niet_voor
+#	0, 44, 1, 28, -1,
+#	3, 31, 2, 45, -1,
+
+	2, 1, 29, 30, -1, #alle_voorvlakken
+	46, 4, 32, 16, -1,
+	16, 5, 33, 17, -1,
+	17, 6, 34, 18, -1,
+	18, 7, 35, 19, -1, 
+	19, 8, 36, 20, -1,
+	20, 9, 37, 21, -1,
+	21, 10, 38, 22, -1,
+	22, 11, 39, 23, -1,
+	23, 12, 40, 24, -1,
+	24, 13, 41, 25, -1,
+	25, 14, 42, 26, -1,
+	26, 15, 43, 27, -1,
+
+
+	
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+translation 4.42	2.6	-3.36
+}
+
+
+# /trapboven.wrl
+
+# buitmuur.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance DEF steen Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.8 0.4 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0	0	0, #linkerbenedenhoek voorgevel
+						5.68	0	0,
+						5.68	5.40	0,
+						0	5.40	0, #linkerbovenhoek voorgevel
+
+						3.19	0	0, #voordeur
+						4.42	0	0,
+						4.42	2.30	0,
+						3.19	2.30	0, #voordeur
+
+						4.84	1.60	0, #toiletraam-8
+						5.04	1.60	0,
+						5.04	2.30	0,
+						4.84	2.30	0, 
+
+						2.60	0.90	0, #keukenraam-12
+						2.60	2.30	0,
+						0.60	2.30	0,
+						0.60	0.90	0,
+
+						0.60	3.60	0, #bovenraam-16
+						1.50	3.60	0,
+						1.50	5.0	0,
+						4.42	5.0	0,
+						4.42	5.40	0, 
+						0.60	5.40	0,
+
+						0	8.555	-3.15, #linkergevel-22
+						0	2.7	-9.0,
+						0	0	-9.0,
+
+						5.68	8.555	-3.15, #rechtergevel-25
+						5.68	5.40	-6.3,
+						5.68	5.40	-9,
+						5.68	0	-9.0,
+
+						2.25	0	-9.0, #achtergevel-29
+						2.25	0.6	-9.0,
+						4.8	0.6	-9.0,
+						4.8	5.40	-9.0,
+						1.2	0	-9.0,
+						1.2	2.7	-9,
+
+
+						3.19	0	-0.14, #diepte van de voordeur-35
+						4.42	0	-0.14,
+						4.42	2.30	-0.14,
+						3.19	2.30	-0.14, #diepte van de voordeur-38
+
+						2.60	0.90	-0.14, # diepte van het keukenraam-39
+						2.60	2.30	-0.14,
+						0.60	2.30	-0.14,
+						0.60	0.90	-0.14,
+
+						4.84	1.60	-0.14, #diepte van het toiletraam-43
+						5.04	1.60	-0.14,
+						5.04	2.30	-0.14,
+						4.84	2.30	-0.14, 
+
+						0.60	3.60	-0.14, #diepte van het bovenraam-47
+						1.50	3.60	-0.14,
+						1.50	5.0	-0.14,
+						4.42	5.0	-0.14,
+						4.42	5.40	-0.14, 
+						0.60	5.40	-0.14, #52
+
+						2.25	0	-8.86, #diepte van de achtergevel-53
+						2.25	0.6	-8.86,
+						4.8	0.6	-8.86,
+						4.8	5.40	-8.86,
+						1.2	0	-8.86,
+						1.2	2.7	-8.86,	#58
+
+						0	2.7	0, #59 extra punten voor segmentering beneden
+						0.14	2.7	-0.14,
+
+						5.68	2.7	0, #61
+						5.54	2.7	-0.14, #
+
+						0	2.7	-9, #63
+						0.14	2.7	-8.86, #
+
+						5.68	2.7	-9, #65
+						5.54	2.7	-8.86, #
+
+						1.2	2.7	-9, #67
+						1.2	2.7	-8.86, #
+
+						4.8	2.7	-9, #69
+						4.8	2.7	-8.86, #
+
+						0.14	5.4	-0.14, #71
+						5.54	5.4	-0.14, #72
+						5.54	5.4	-8.86, #73
+						0.14	2.7	-9, #74
+						0.14	5.4	-6.3, #75
+						0	5.4	-6.3, #76
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		16, 21, 3, 59, -1,
+
+		19, 2, 20, -1,
+
+		2, 19, 61, -1,
+
+		65, 27, 2, 61, -1, 
+
+		59, 3, 76, 23, -1,
+
+		17, 48, 47, 16, -1,
+
+		18, 49, 48, 17, -1,
+
+		19, 50, 49, 18, -1,
+
+		20, 51, 50, 19, -1,
+
+		16, 47, 52, 21, -1,
+
+		3, 21, 52, 71, -1, 
+
+		20, 2, 72, 51, -1,
+
+		2, 27, 73, 72, -1,
+
+		27, 32, 56, 73, -1,
+
+		63, 64, 75, 76, -1,
+
+		3, 76, 75, 71, -1,
+
+		#27, 32, 69, 65, -1,
+		27, 65, 69, 32, -1,
+
+		32, 69, 70, 56, -1,
+
+		59, 17, 16, -1,
+
+		59, 61, 17, -1,
+
+		17, 61 , 18. -1,
+
+		18, 61, 19, -1,
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+# /buitmuur.wrl
+
+# binmuur.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.9 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.28	0	-0.28, #0 linkerbenedenhoek voorgevel
+						5.40	0	-0.28,
+						5.40	5.40	-0.28,
+						0.28	5.40	-0.28, #3 linkerbovenhoek voorgevel
+
+						3.19	0	-0.28, #4 voordeur
+						4.42	0	-0.28,
+						4.42	2.30	-0.28,
+						3.19	2.30	-0.28, #7 voordeur
+
+						4.84	1.60	-0.28, #toiletraam-8
+						5.04	1.60	-0.28,
+						5.04	2.30	-0.28,
+						4.84	2.30	-0.28, 
+
+						2.60	0.90	-0.28, #keukenraam-12
+						2.60	2.30	-0.28,
+						0.60	2.30	-0.28,
+						0.60	0.90	-0.28,
+
+						0.60	3.60	-0.28, #bovenraam-16
+						1.50	3.60	-0.28,
+						1.50	5.0	-0.28,
+						4.42	5.0	-0.28,
+						4.42	5.40	-0.28, 
+						0.60	5.40	-0.28,
+
+						0.28	8.55	-3.15, #linkergevel-22
+						0.28	2.70	-8.72,
+						0.28	0	-8.72,
+
+						5.40	8.55	-3.15, #rechtergevel-25
+						5.40	5.40	-6.30,
+						5.40	5.40	-8.72,
+						5.40	0	-8.72,
+
+						2.25	0	-8.72, #achtergevel-29
+						2.25	0.6	-8.72,
+						4.8	0.6	-8.72,
+						4.8	5.40	-8.72,
+						1.2	0	-8.72,
+						1.2	2.70	-8.72,
+
+
+						3.19	0	-0.14, #diepte van de voordeur-35
+						4.42	0	-0.14,
+						4.42	2.30	-0.14,
+						3.19	2.30	-0.14, #diepte van de voordeur-38
+
+						2.60	0.90	-0.14, # diepte van het keukenraam-39
+						2.60	2.30	-0.14,
+						0.60	2.30	-0.14,
+						0.60	0.90	-0.14,
+
+						4.84	1.60	-0.14, #diepte van het toiletraam-43
+						5.04	1.60	-0.14,
+						5.04	2.30	-0.14,
+						4.84	2.30	-0.14, 
+
+						0.60	3.60	-0.14, #diepte van het bovenraam-47
+						1.50	3.60	-0.14,
+						1.50	5.0	-0.14,
+						4.42	5.0	-0.14,
+						4.42	5.40	-0.14, 
+						0.60	5.40	-0.14, #52
+
+						2.25	0	-8.86, #diepte van de achtergevel-53
+						2.25	0.6	-8.86,
+						4.8	0.6	-8.86,
+						4.8	5.40	-8.86,
+						1.2	0	-8.86,
+						1.2	2.70	-8.86,	#58
+
+						0.28	5.40	0,	#59 hoekpunt voor dakvorm zolder
+						5.40	5.40	0,
+						0.28	5.40	-6.30, #61
+						0.28	2.70	-9.0,  #62 hoekpunt voor dakvorm 1e verdieping
+
+						0.28	2.7	-0.28, #63 extra punten voor segmentering boven
+						0.14	2.7	-0.14,
+
+						5.4	2.7	-0.28, #65
+						5.54	2.7	-0.14, #
+
+						0.28	2.7	-8.72, #67
+						0.14	2.7	-8.86, #
+
+						5.4	2.7	-8.72, #69
+						5.54	2.7	-8.86, #
+
+						1.2	2.7	-8.72, #71
+						1.2	2.7	-8.86, #
+
+						4.8	2.7	-8.72, #73
+						4.8	2.7	-8.86, #
+
+						0.14	5.4	-0.14, #75
+						5.54	5.4	-0.14, #76
+						5.54	5.4	-8.86, #77
+						0.14	2.7	-9, #78
+						0.14	5.4	-6.3, #79
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+
+
+
+		16, 21, 3, 63, -1,
+
+		19, 2, 20, -1,
+
+		63, 16, 17, 65, -1,
+
+		17, 18, 19, 65, -1,
+
+		2, 19, 65, -1,
+
+		69, 27, 2, 65, -1, 
+
+		63, 3, 61, 62, -1,
+
+		16, 47, 48, 17, -1,
+
+		17, 48, 49, 18, -1,
+
+		18, 49, 50, 19, -1, 
+
+		19, 50, 51, 20, -1, 
+
+		21, 52, 47, 16, -1,
+
+		73, 74, 56, 32, -1,
+
+		69, 73, 32, 27, -1,
+
+		3, 21, 52, 75 -1,
+
+		20, 2, 76, 51, -1,
+
+		3, 61, 79, 75, -1,
+
+		2, 27, 77, 76, -1,
+
+		62, 61, 79, 78, -1,
+
+		27, 32, 56, 77, -1,
+
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+# /binmuur.wrl
+
+# ramen.wrl
+
+
+
+
+
+
+#begin bovenraam
+
+Transform {
+	children [
+		Shape {
+appearance DEF kozijn Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.95 0.95 0.9
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+
+geometry	Box { size	3.82 0.05 0.05 }
+}
+
+]
+translation	2.51 5.025 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	3.82 0.1 0.05 }
+}
+
+]
+translation	2.51 5.35 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 1.8 0.05 }
+}
+
+]
+translation	0.625 4.5 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 1.8 0.05 }
+}
+
+]
+translation	1.475 4.5 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 0.25 0.05 }
+}
+
+]
+translation	4.395 5.175 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance DEF blauw Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.3 0.4 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+
+geometry	Box { size	0.9 0.25 0.05 }
+}
+
+]
+translation	3.05 5.175 -0.14
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.9 0.05 0.05 }
+}
+
+]
+translation	1.05 3.625 -0.14
+}
+
+#einde bovenraam
+#begin kozijnen achter
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.4 0.05 }
+}
+
+]
+translation	3.215 3.9 -8.86
+}
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 2.4 0.05 }
+}
+
+]
+translation	4.775 3.9 -8.86
+}
+Transform {
+	children [
+		Shape {
+appearance	USE blauw 
+geometry	Box { size	1.61 0.3 0.05 }
+}
+
+]
+translation	3.995 5.25 -8.86
+}
+Transform {
+	children [
+		Shape {
+appearance	USE blauw 
+geometry	Box { size	1.51 0.8 0.05 }
+}
+
+]
+translation	3.995 3.1 -8.86
+}
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	1.51 0.05 0.05 }
+}
+
+]
+translation	3.995 3.525 -8.86
+}#3
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	1.51 0.05 0.05 }
+}
+
+]
+translation	3.995 5.075 -8.86
+}#4
+
+
+
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance	USE kozijn 
+geometry	Box { size	0.05 1.5 0.05 }
+}
+
+]
+translation	3.565 4.3 -8.86
+}
+
+
+
+#einde ramen achter
+
+
+
+# /ramen.wrl
+
+# ruiten.wrl
+
+
+
+
+
+
+#bovenruiten
+Transform {
+	children [
+		Shape {
+appearance DEF glas Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.6 0.6 0.9
+	emissiveColor     0 0 0
+	shininess         0.8
+	specularColor     1 1 1 
+	transparency      0.7
+}	texture           NULL
+	textureTransform  NULL
+}
+
+			geometry Box { size	0.8 1.35 0.01 }
+}
+
+]
+translation	1.05 4.325 -0.14
+}#ruit 1 boven
+
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.8 0.3 0.01 }
+}
+
+]
+translation	1.05 5.2 -0.14
+}#ruit 2 boven
+
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	1.1 0.3 0.01 }
+}
+
+]
+translation	2.05 5.2 -0.14
+}#ruit 3 boven
+
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.85 0.3 0.01 }
+}
+
+]
+translation	3.935 5.2 -0.14
+}#ruit 4 boven
+
+
+
+#ramen achter
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	1.16 1.5 0.01 }
+}
+
+]
+translation	4.17 4.3 -8.86
+}#ruit 1 achter
+
+Transform {
+	children [
+		Shape {
+appearance USE glas
+			geometry Box { size	0.3 1.5 0.01 }
+}
+
+]
+translation	3.39 4.3 -8.86
+}#ruit 2 achter
+
+
+
+# /ruiten.wrl
+
+# /boven/boven.wrl
+
+
+
+DEF zolder Transform {
+children[
+
+Transform {
+children[
+
+Transform{
+children[
+	Shape {
+appearance USE groen
+geometry USE pijl
+}
+]
+rotation 0 1 0 3.1415927
+}
+
+DEF schuifzolder TouchSensor {}
+]
+translation 0.15 5.4 0.3
+}
+
+Transform {
+children[
+
+	Shape {
+appearance USE rood
+geometry USE pijl
+}
+
+DEF schuifzolder2 TouchSensor {}
+]
+translation 5.48 5.4 0.3
+}
+
+DEF dak Transform {
+children [
+# dak/dak.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.3 0.4 0.5
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+					0	5.4	0, #dakranden-0
+					5.68	5.4	0,
+					5.68	8.55	-3.15,
+					0	8.55	-3.15,
+					0	2.7	-9,
+					3.12	2.7	-9,
+					3.12	5.4	-6.30,
+					5.68	5.4	-6.30, #7
+
+					1.5	3.7	-8, #dakraam1-8
+					2.3	3.7	-8,
+					2.3	4.7	-7,
+					1.5	4.7	-7,
+
+					4.1	7.3	-1.9,  #dakraam2-12
+					3.5	7.3	-1.9, 
+					3.5	7.7	-2.3, 
+					4.1	7.7	-2.3, #15
+
+					0	5.44	0.04, #dikte van dakranden-16
+					5.68	5.44	0.04,
+					5.68	8.6065685	-3.15,
+					0	8.6065685	-3.15,
+					0	2.74	-9.04,
+					3.12	2.74	-9.04,
+					3.12	5.44	-6.34,
+					5.68	5.44	-6.34, #23	
+
+					1.5	3.74	-8.04, #dikte van het dakraam1-24
+					2.3	3.74	-8.04,
+					2.3	4.74	-7.04,
+					1.5	4.74	-7.04, #27	
+
+					4.1	7.34	-1.86,  #dikte van het dakraam2-28
+					3.5	7.34	-1.86, 
+					3.5	7.74	-2.26,
+					4.1	7.74	-2.26, #31
+			
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+
+
+	0, 13, 14, 3, -1,
+	0, 3, 14, 13, -1,
+
+	16, 29, 30, 19, -1,
+	16, 19, 30, 29, -1,
+
+	0, 1, 12, 13, -1, 
+	0, 13, 12, 1, -1,
+
+	16, 17, 28, 29, -1,
+	16, 29, 28, 17, -1,
+
+	1, 12, 15, 2, -1, 
+	1, 2, 15, 12, -1,
+
+	17, 28, 31, 18, -1,
+	17, 18, 31, 28, -1,
+
+	15, 2, 3, 14, -1, 
+	15, 14, 3, 2, -1,
+
+	31, 18, 19, 30, -1,
+	31, 30, 19, 18, -1,
+	
+	4, 8, 11, 3, -1, 
+	4, 3, 11, 8, -1, 
+
+	20, 24, 27, 19, -1,
+	20, 19, 27, 24, -1,
+
+	5, 4, 8, 9, -1, 
+	5, 9, 8, 4, -1, 
+
+	21, 20, 24, 25, -1,
+	21, 25, 24, 20, -1, 
+
+	5, 9, 10, 6, -1,
+	5, 6, 10, 9, -1,
+
+	21, 25, 26, 22, -1,
+	21, 22, 26, 25, -1,
+
+	7, 6, 2, -1, 
+	7, 2, 6, -1,
+
+	23, 22, 18, -1,
+	23, 18, 22, -1,
+
+	6, 10, 11, 3, 2, -1,
+	6, 2, 3, 11, 10, -1,
+
+	22, 26, 18, -1,
+	22, 18, 26, -1,
+
+	26, 27, 19, -1,
+	26, 19, 27, -1, 
+
+	26, 19, 18, -1,
+	26, 18, 19, -1,
+
+	0, 1, 17, 16, -1,
+	0, 16, 17, 1, -1,
+
+	1, 2, 18, 17, -1,
+	1, 17, 18, 2, -1, 
+
+	3, 0, 16, 19, -1, 
+	3, 19, 16, 0, -1,
+
+	2, 7, 23, 18, -1,
+	2, 18, 23, 7, -1, 
+
+	7, 6, 22, 23, -1, 
+	7, 23, 22, 6, -1,
+
+	5, 6, 22, 21, -1, 
+	5, 21, 22, 6, -1,
+
+	5, 4, 20, 21, -1,
+	5, 21, 20, 4, -1,
+
+	4, 3, 19, 20, -1, 
+	4, 20, 19, 3, -1,
+
+	9, 8, 24, 25, -1,
+	9, 25, 24, 8, -1,
+
+	8, 11, 27, 24, -1,
+	8, 24, 27, 11, -1,
+
+	10, 11, 27, 26, -1,
+	10, 26, 27, 11, -1,
+
+	9, 10, 26, 25, -1, 
+	9, 25, 26, 10, -1,
+
+	12, 13, 29, 28, -1,
+	12, 28, 29, 13, -1,
+
+	12, 15, 31, 28, -1, 
+	12, 28, 31, 15, -1,
+
+	14, 15, 31, 30, -1, 
+	14, 30, 31, 15, -1,
+
+	13, 14, 30, 29, -1,
+	13, 29, 30, 14, -1,
+
+
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+#schoorsteen
+
+Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.1 0.1 0.1
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0.3 0.3 0.3
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+		4.8	8	-2.6,
+		5.3	8	-2.6,
+		5.3	8.4	-3.0,
+		4.8	8.4	-3.0,
+
+		4.9	9.4	-2.65,
+		5.2	9.4	-2.65,
+		5.2	9.4	-2.95,	
+		4.9	9.4	-2.95, ]
+	}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		0, 1, 5, 4, -1, 
+		0, 4, 5, 1, -1, 
+
+		1, 2, 6, 5, -1, 
+		1, 5, 6, 2, -1,
+
+		2, 3, 7, 6, -1,
+		2, 6, 7, 3, -1,
+
+		0, 3, 7, 4, -1,
+		0, 4, 7, 3, -1, 
+
+		4, 5, 6, 7, -1, 
+		4, 7, 6, 5, -1,
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+
+
+
+# /dak/dak.wrl
+
+Transform {
+children[
+
+
+Transform{
+children[
+
+	Shape {
+appearance USE groen
+geometry USE pijl
+}
+
+]
+rotation 0 1 0 3.1415927
+}
+
+DEF schuifdak TouchSensor {}
+
+]
+translation 0.15 6 0.3
+}
+
+
+Transform {
+children[
+
+	Shape {
+appearance USE rood
+geometry USE pijl
+}
+
+DEF schuifdak2 TouchSensor {}
+]
+translation 5.48 6 0.3
+}
+
+DEF tijd1 TimeSensor {
+	cycleInterval 4
+	enabled       TRUE
+	loop          FALSE
+	startTime     0
+	stopTime      0
+}
+
+DEF plaats1 PositionInterpolator {
+	key           [0, 1]
+	keyValue      [0 0 0 ,6 0 0]
+}
+
+DEF tijd1a TimeSensor {
+	cycleInterval 4
+	enabled       TRUE
+	loop          FALSE
+	startTime     0
+	stopTime      0
+}
+
+DEF plaats1a PositionInterpolator {
+	key           [0, 1]
+	keyValue      [6 0 0 ,0 0 0]
+}
+
+
+
+]
+}#dak
+
+# zolder/zolder.wrl
+
+
+
+Viewpoint {
+	fieldOfView    1
+	jump           TRUE
+	orientation    1 0 0  0
+	position       2.5 7 -3.15
+
+	description    "op zolder"
+}
+
+#kleine platte dakje
+
+Transform {
+children [
+Shape {
+appearance DEF appdak Appearance {
+	 material          Material {
+  	ambientIntensity  0
+  	diffuseColor      0.2 0.2 0.2
+  	emissiveColor     0 0 0
+  	shininess         0
+  	specularColor     0 0 0 
+  	transparency      0
+			  }
+
+  texture           ImageTexture {
+  			  url     [""]
+  			  repeatS TRUE
+  			  repeatT TRUE
+ 			  }
+}
+geometry Box { size 2.6 0.04 2.74	}
+}
+]
+translation 4.39 5.40 -7.67
+}
+
+
+DEF zoldervloer Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material          Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.5 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.14	5.40	0,
+						5.54	5.40	0,
+						5.54	5.40	-6.30,
+						0.14	5.40	-6.30,
+
+						5.54	5.40	-2.36, #-4
+						5.54	5.40	-4.36,
+						4.42	5.40	-4.36,
+						4.42	5.40	-2.36,
+
+
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		0, 1, 4, 7, -1, 
+		0, 7, 4, 1, -1, 
+
+		0, 7, 6, 3, -1,
+		0, 3, 6, 7, -1, 
+
+		5, 2, 3, 6, -1, 
+		5, 6, 3, 2, -1,
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+DEF plafondboven Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 1 1 
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.14	5.30	-0.14,
+						5.54	5.30	-0.14,
+						5.54	5.30	-8.86,
+						3.19	5.30	-8.86,
+
+						5.54	5.30	-2.36, #-4
+						5.54	5.30	-4.36,
+						4.42	5.30	-4.36,
+						4.42	5.30	-2.36,
+
+						3.19	5.30	-6.40,
+						0.14	5.30	-6.40,
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+		0, 1, 4, 7, -1, 
+		0, 7, 4, 1, -1, 
+
+		0, 7, 6, 8, 9, -1,
+		0, 9, 8, 6, 7, -1, 
+
+		5, 2, 3, 8, 6, -1, 
+		5, 6, 8, 3, 2, -1,
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             TRUE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+DEF vulstukvoortrap Transform {
+	children [
+		Shape {
+appearance DEF wandkleur Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.9 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+
+
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						4.42	5.3	-2.36, #0
+						4.42	5.3	-3.36, 
+						4.42	5.4	-3.36,
+						4.42	5.4	-2.36, #3
+
+						5.4	5.3	-2.36, #4
+						5.4	5.4	-2.36,
+
+						5.4	5.3	-4.36, #6
+						5.4	5.4	-4.36,
+						4.42	5.3	-4.36, #8
+						4.42	5.4	-4.36,
+				
+				
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	0, 1, 2, 3, -1,
+	0, 3, 2, 1, -1,
+	0, 3, 5, 4, -1,
+	9, 8, 6, 7, -1,
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+
+]
+}
+
+# ballustrade.wrl
+
+
+
+Transform {
+children[
+
+DEF spijlen Group {
+children [
+Transform{
+children [
+DEF spijl Shape {
+appearance DEF kozijn Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.95 0.95 0.9
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+geometry  Cylinder {
+				bottom  FALSE
+				height  0.8
+				radius  0.015
+				side    TRUE
+				top     FALSE
+			}
+}
+]
+translation -0.025	0.4	0.05
+}
+
+Transform{
+children USE spijl
+translation -0.025	0.4	0.15
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.25
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.35
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.45
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.55
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.65
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.75
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.85
+}
+Transform{
+children USE spijl
+translation -0.025	0.4	0.95
+}
+
+]
+}#spijlengroup
+
+Transform{
+translation 0 0 1
+rotation 0 1 0 1.5707963
+children USE spijlen
+}
+
+Transform{
+children [
+Shape {
+appearance USE  kozijn
+geometry  Box { size 0.05	0.03	1.05	}
+}
+]
+translation -0.025	0.815	0.525
+}
+
+Transform{
+children [
+Shape {
+appearance USE  kozijn
+geometry  Box { size 1	0.03	0.05	}
+}
+]
+translation 0.5	0.815	1.025
+}
+
+
+]
+translation	4.42	5.4	-3.36
+}
+
+# /ballustrade.wrl
+
+# binmuur.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      1 0.9 0.7
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0.28	0	-0.28, #0 linkerbenedenhoek voorgevel
+						5.40	0	-0.28,
+						5.40	5.40	-0.28,
+						0.28	5.40	-0.28, #3 linkerbovenhoek voorgevel
+
+						3.19	0	-0.28, #4 voordeur
+						4.42	0	-0.28,
+						4.42	2.30	-0.28,
+						3.19	2.30	-0.28, #7 voordeur
+
+						4.84	1.60	-0.28, #toiletraam-8
+						5.04	1.60	-0.28,
+						5.04	2.30	-0.28,
+						4.84	2.30	-0.28, 
+
+						2.60	0.90	-0.28, #keukenraam-12
+						2.60	2.30	-0.28,
+						0.60	2.30	-0.28,
+						0.60	0.90	-0.28,
+
+						0.60	3.60	-0.28, #bovenraam-16
+						1.50	3.60	-0.28,
+						1.50	5.0	-0.28,
+						4.42	5.0	-0.28,
+						4.42	5.40	-0.28, 
+						0.60	5.40	-0.28,
+
+						0.28	8.55	-3.15, #linkergevel-22
+						0.28	2.70	-8.72,
+						0.28	0	-8.72,
+
+						5.40	8.55	-3.15, #rechtergevel-25
+						5.40	5.40	-6.30,
+						5.40	5.40	-8.72,
+						5.40	0	-8.72,
+
+						2.25	0	-8.72, #achtergevel-29
+						2.25	0.6	-8.72,
+						4.8	0.6	-8.72,
+						4.8	5.40	-8.72,
+						1.2	0	-8.72,
+						1.2	2.70	-8.72,
+
+
+						3.19	0	-0.14, #diepte van de voordeur-35
+						4.42	0	-0.14,
+						4.42	2.30	-0.14,
+						3.19	2.30	-0.14, #diepte van de voordeur-38
+
+						2.60	0.90	-0.14, # diepte van het keukenraam-39
+						2.60	2.30	-0.14,
+						0.60	2.30	-0.14,
+						0.60	0.90	-0.14,
+
+						4.84	1.60	-0.14, #diepte van het toiletraam-43
+						5.04	1.60	-0.14,
+						5.04	2.30	-0.14,
+						4.84	2.30	-0.14, 
+
+						0.60	3.60	-0.14, #diepte van het bovenraam-47
+						1.50	3.60	-0.14,
+						1.50	5.0	-0.14,
+						4.42	5.0	-0.14,
+						4.42	5.40	-0.14, 
+						0.60	5.40	-0.14, #52
+
+						2.25	0	-8.86, #diepte van de achtergevel-53
+						2.25	0.6	-8.86,
+						4.8	0.6	-8.86,
+						4.8	5.40	-8.86,
+						1.2	0	-8.86,
+						1.2	2.70	-8.86,	#58
+
+						0.28	5.40	0,	#59 hoekpunt voor dakvorm zolder
+						5.40	5.40	0,
+						0.28	5.40	-6.30, #61
+						0.28	2.70	-9.0,  #62 hoekpunt voor dakvorm 1e verdieping
+
+						0.14	5.40	0,	#63 extra punten voor segmentering
+						5.54	5.40	0,
+						0.14	5.40	-6.30, 
+						5.54	5.40	-6.3,  #66
+						5.54	8.55	-3.15, #rechtergevel-67
+						0.14	8.55	-3.15, #linkergevel-68
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	
+		59, 22, 61, -1,
+		60, 25, 26, -1,
+
+		59, 63, 68, 22, -1,
+		68, 22, 61, 65, -1,
+
+		60, 64, 67, 25, -1, 
+		25, 67, 66, 26, -1,
+
+		
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+# /binmuur.wrl
+
+# buitmuur.wrl
+
+
+
+
+Transform {
+	children [
+		Shape {
+appearance DEF steen Appearance {
+	material         Material {
+	ambientIntensity  0.2
+	diffuseColor      0.8 0.4 0.3
+	emissiveColor     0 0 0
+	shininess         0.1
+	specularColor     0 0 0
+	transparency      0
+}	texture           NULL
+	textureTransform  NULL
+}
+			geometry IndexedFaceSet {
+				color             NULL
+				coord  Coordinate {	#default NULL
+					point [
+						0	0	0, #linkerbenedenhoek voorgevel
+						5.68	0	0,
+						5.68	5.40	0,
+						0	5.40	0, #linkerbovenhoek voorgevel
+
+						3.19	0	0, #voordeur
+						4.42	0	0,
+						4.42	2.30	0,
+						3.19	2.30	0, #voordeur
+
+						4.84	1.60	0, #toiletraam-8
+						5.04	1.60	0,
+						5.04	2.30	0,
+						4.84	2.30	0, 
+
+						2.60	0.90	0, #keukenraam-12
+						2.60	2.30	0,
+						0.60	2.30	0,
+						0.60	0.90	0,
+
+						0.60	3.60	0, #bovenraam-16
+						1.50	3.60	0,
+						1.50	5.0	0,
+						4.42	5.0	0,
+						4.42	5.40	0, 
+						0.60	5.40	0,
+
+						0	8.555	-3.15, #linkergevel-22
+						0	2.7	-9.0,
+						0	0	-9.0,
+
+						5.68	8.555	-3.15, #rechtergevel-25
+						5.68	5.40	-6.3,
+						5.68	5.40	-9,
+						5.68	0	-9.0,
+
+						2.25	0	-9.0, #achtergevel-29
+						2.25	0.6	-9.0,
+						4.8	0.6	-9.0,
+						4.8	5.40	-9.0,
+						1.2	0	-9.0,
+						1.2	2.7	-9,
+
+
+						3.19	0	-0.14, #diepte van de voordeur-35
+						4.42	0	-0.14,
+						4.42	2.30	-0.14,
+						3.19	2.30	-0.14, #diepte van de voordeur-38
+
+						2.60	0.90	-0.14, # diepte van het keukenraam-39
+						2.60	2.30	-0.14,
+						0.60	2.30	-0.14,
+						0.60	0.90	-0.14,
+
+						4.84	1.60	-0.14, #diepte van het toiletraam-43
+						5.04	1.60	-0.14,
+						5.04	2.30	-0.14,
+						4.84	2.30	-0.14, 
+
+						0.60	3.60	-0.14, #diepte van het bovenraam-47
+						1.50	3.60	-0.14,
+						1.50	5.0	-0.14,
+						4.42	5.0	-0.14,
+						4.42	5.40	-0.14, 
+						0.60	5.40	-0.14, #52
+
+						2.25	0	-8.86, #diepte van de achtergevel-53
+						2.25	0.6	-8.86,
+						4.8	0.6	-8.86,
+						4.8	5.40	-8.86,
+						1.2	0	-8.86,
+						1.2	2.7	-8.86,	#58
+
+						0.14	5.40	0,	#59 extra punten voor segmentering
+						5.54	5.40	0,
+						0.14	5.40	-6.30, 
+						5.54	5.40	-6.3,  #62
+						5.54	8.55	-3.15, #rechtergevel-63
+						0.14	8.55	-3.15, #linkergevel-64
+						0 	5.4	-6.3,
+					]
+				}
+				normal            NULL
+				texCoord          NULL
+				ccw               TRUE
+				colorIndex        []
+				colorPerVertex    TRUE
+				convex            TRUE
+				coordIndex  [
+	3, 22, 65, -1,
+	2, 26, 25, -1,
+
+	3, 59, 64, 22, -1,
+	61, 65, 22, 64, -1,
+
+	60, 2, 25, 63, -1,
+	63, 25, 26, 62, -1,
+
+
+]     #default []
+				creaseAngle       0
+				normalIndex       []
+				normalPerVertex   TRUE
+				solid             FALSE
+				texCoordIndex     []
+			}
+		}
+	]
+}
+
+
+
+# /buitmuur.wrl
+
+# /zolder/zolder.wrl
+
+DEF tijd2 TimeSensor {
+	cycleInterval 4
+	enabled       TRUE
+	loop          FALSE
+	startTime     0
+	stopTime      0
+}
+
+DEF plaats2 PositionInterpolator {
+	key           [0, 1]
+	keyValue      [0 0 0 ,6 0 0]
+}
+
+DEF tijd2a TimeSensor {
+	cycleInterval 4
+	enabled       TRUE
+	loop          FALSE
+	startTime     0
+	stopTime      0
+}
+
+DEF plaats2a PositionInterpolator {
+	key           [0, 1]
+	keyValue      [6 0 0 ,0 0 0]
+}
+
+
+
+]
+}#zolder
+
+DEF tijd3 TimeSensor {
+	cycleInterval 4
+	enabled       TRUE
+	loop          FALSE
+	startTime     0
+	stopTime      0
+}
+
+DEF plaats3 PositionInterpolator {
+	key           [0, 1]
+	keyValue      [0 0 0 ,6 0 0]
+}
+
+DEF tijd3a TimeSensor {
+	cycleInterval 4
+	enabled       TRUE
+	loop          FALSE
+	startTime     0
+	stopTime      0
+}
+
+DEF plaats3a PositionInterpolator {
+	key           [0, 1]
+	keyValue      [6 0 0 ,0 0 0]
+}
+
+
+]
+}#boven
+
+
+
+]
+}
+
+#ROUTE schuifdak.touchTime TO tijd1.startTime
+#ROUTE tijd1.fraction_changed TO plaats1.set_fraction
+#ROUTE plaats1.value_changed TO dak.translation
+
+#ROUTE schuifzolder.touchTime TO tijd2.startTime
+#ROUTE tijd2.fraction_changed TO plaats2.set_fraction
+#ROUTE plaats2.value_changed TO zolder.translation
+
+#ROUTE schuifboven.touchTime TO tijd3.startTime
+#ROUTE tijd3.fraction_changed TO plaats3.set_fraction
+#ROUTE plaats3.value_changed TO boven.translation
+
+#ROUTE schuifdak2.touchTime TO tijd1a.startTime
+#ROUTE tijd1a.fraction_changed TO plaats1a.set_fraction
+#ROUTE plaats1a.value_changed TO dak.translation
+
+#ROUTE schuifzolder2.touchTime TO tijd2a.startTime
+#ROUTE tijd2a.fraction_changed TO plaats2a.set_fraction
+#ROUTE plaats2a.value_changed TO zolder.translation
+
+#ROUTE schuifboven2.touchTime TO tijd3a.startTime
+#ROUTE tijd3a.fraction_changed TO plaats3a.set_fraction
+#ROUTE plaats3a.value_changed TO boven.translation
+

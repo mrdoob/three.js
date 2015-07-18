@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - wireframe</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexShader">
+
+			attribute vec3 center;
+			varying vec3 vCenter;
+
+			void main() {
+
+				vCenter = center;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+
+			#extension GL_OES_standard_derivatives : enable
+
+			varying vec3 vCenter;
+
+			float edgeFactorTri() {
+
+				vec3 d = fwidth( vCenter.xyz );
+				vec3 a3 = smoothstep( vec3( 0.0 ), d * 1.5, vCenter.xyz );
+				return min( min( a3.x, a3.y ), a3.z );
+
+			}
+
+			void main() {
+
+				gl_FragColor.rgb = mix( vec3( 1.0 ), vec3( 0.2 ), edgeFactorTri() );
+				gl_FragColor.a = 1.0;
+			}
+
+		</script>
+
+		<script>
+
+			var camera, scene, renderer;
+			var meshTris, meshLines, meshMixed;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 800;
+
+				scene = new THREE.Scene();
+
+				var size = 150;
+
+				var geometryLines = new THREE.BoxGeometry( size, size, size );
+				var geometryTris = new THREE.BoxGeometry( size, size, size );
+
+				// wireframe using gl.LINES
+
+				var materialLines = new THREE.MeshBasicMaterial( { wireframe: true } );
+
+				meshLines = new THREE.Mesh( geometryLines, materialLines );
+				meshLines.position.x = -150;
+				scene.add( meshLines );
+
+				//
+
+				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
+				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+
+				// wireframe using gl.TRIANGLES (interpreted as triangles)
+
+				var attributesTris = { center: { type: 'v3', boundTo: 'faceVertices', value: [] } };
+				var valuesTris = attributesTris.center.value;
+
+				setupAttributes( geometryTris, valuesTris );
+
+				var materialTris = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesTris, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+
+				meshTris = new THREE.Mesh( geometryTris, materialTris );
+				meshTris.position.x = 150;
+				scene.add( meshTris );
+
+				// wireframe using gl.TRIANGLES (mixed triangles and quads)
+
+				var mixedGeometry = new THREE.SphereGeometry( size / 2, 32, 16 );
+
+				var attributesMixed = { center: { type: 'v3', boundTo: 'faceVertices', value: [] } };
+				var valuesMixed = attributesMixed.center.value;
+
+				setupAttributes( mixedGeometry, valuesMixed );
+
+				var materialMixed = new THREE.ShaderMaterial( { uniforms: {}, attributes: attributesMixed, vertexShader: vertexShader, fragmentShader: fragmentShader } );
+
+				meshMixed = new THREE.Mesh( mixedGeometry, materialMixed );
+				meshMixed.position.x = -150;
+				scene.add( meshMixed );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function setupAttributes( geometry, values ) {
+
+				for( var f = 0; f < geometry.faces.length; f ++ ) {
+
+					values[ f ] = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				meshLines.rotation.x += 0.005;
+				meshLines.rotation.y += 0.01;
+
+				meshTris.rotation.x += 0.005;
+				meshTris.rotation.y += 0.01;
+
+				if ( meshMixed ) {
+
+					meshMixed.rotation.x += 0.005;
+					meshMixed.rotation.y += 0.01;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

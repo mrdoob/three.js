@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - custom attributes [particles][billboards]</title>
@@ -28,14 +28,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example - particles - billboards</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles - billboards</div>
 		<div id="container"></div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -68,8 +67,11 @@
 
 			void main() {
 
-				gl_FragColor = vec4( color * vColor, 1.0 );
-				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+				vec4 color = vec4( color * vColor, 1.0 ) * texture2D( texture, gl_PointCoord );
+
+				if ( color.w < 0.5 ) discard;
+
+				gl_FragColor = color;
 
 			}
 
@@ -86,8 +88,8 @@
 
 		var vc1;
 
-		var WIDTH = window.innerWidth,
-			HEIGHT = window.innerHeight;
+		var WIDTH = window.innerWidth;
+		var HEIGHT = window.innerHeight;
 
 		init();
 		animate();
@@ -110,18 +112,19 @@
 
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" ) },
 
 			};
 
-			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
+			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
+				uniforms:       uniforms,
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
-				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+				transparent:    true
 
 			});
 
@@ -131,32 +134,28 @@
 
 			vc1 = geometry.vertices.length;
 
-			var geometry2 = new THREE.CubeGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
+			var geometry2 = new THREE.BoxGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
+			geometry.merge( geometry2 );
 
-			THREE.GeometryUtils.merge( geometry, geometry2 );
-
-			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
-
-			sphere.dynamic = true;
-			sphere.sortParticles = true;
+			sphere = new THREE.PointCloud( geometry, shaderMaterial );
 
 			var vertices = sphere.geometry.vertices;
 			var values_size = attributes.size.value;
 			var values_color = attributes.ca.value;
 
-			for( var v = 0; v < vertices.length; v++ ) {
+			for ( var v = 0; v < vertices.length; v ++ ) {
 
 				values_size[ v ] = 10;
 				values_color[ v ] = new THREE.Color( 0xffffff );
 
 				if ( v < vc1 ) {
 
-					values_color[ v ].setHSV( 0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].position.y + radius ) / ( 2 *radius ) );
+					values_color[ v ].setHSL( 0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].y + radius ) / ( 4 * radius ) );
 
 				} else {
 
 					values_size[ v ] = 40;
-					values_color[ v ].setHSV( 0.6, 0.75, 0.5 + vertices[ v ].position.y / ( 0.8 * radius ) );
+					values_color[ v ].setHSL( 0.6, 0.75, 0.25 + vertices[ v ].y / ( 2 * radius ) );
 
 				}
 
@@ -164,7 +163,8 @@
 
 			scene.add( sphere );
 
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );
@@ -174,6 +174,19 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 

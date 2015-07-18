@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - lines - sphere</title>
@@ -18,9 +18,10 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script>
 
@@ -55,20 +56,20 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-				container.appendChild(renderer.domElement);
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( renderer.domElement );
 
 				// particles
 
 				var PI2 = Math.PI * 2;
-				var material = new THREE.ParticleCanvasMaterial( {
+				var material = new THREE.SpriteCanvasMaterial( {
 
 					color: 0xffffff,
 					program: function ( context ) {
 
 						context.beginPath();
-						context.arc( 0, 0, 1, 0, PI2, true );
-						context.closePath();
+						context.arc( 0, 0, 0.5, 0, PI2, true );
 						context.fill();
 
 					}
@@ -77,12 +78,13 @@
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
-					particle = new THREE.Particle( material );
+					particle = new THREE.Sprite( material );
 					particle.position.x = Math.random() * 2 - 1;
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
 					particle.position.multiplyScalar( Math.random() * 10 + 450 );
+					particle.scale.multiplyScalar( 2 );
 					scene.add( particle );
 
 				}
@@ -93,16 +95,16 @@
 
 					var geometry = new THREE.Geometry();
 
-					var vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-					vector.normalize();
-					vector.multiplyScalar( 450 );
+					var vertex = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+					vertex.normalize();
+					vertex.multiplyScalar( 450 );
 
-					geometry.vertices.push( new THREE.Vertex( vector ) );
+					geometry.vertices.push( vertex );
 
-					var vector2 = vector.clone();
-					vector2.multiplyScalar( Math.random() * 0.3 + 1 );
+					var vertex2 = vertex.clone();
+					vertex2.multiplyScalar( Math.random() * 0.3 + 1 );
 
-					geometry.vertices.push( new THREE.Vertex( vector2 ) );
+					geometry.vertices.push( vertex2 );
 
 					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: Math.random() } ) );
 					scene.add( line );
@@ -111,6 +113,23 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//

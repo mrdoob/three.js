@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - terrain + fog</title>
@@ -32,15 +32,16 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/FirstPersonControls.js"></script>
 
 		<script src="js/ImprovedNoise.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -72,7 +73,6 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				controls = new THREE.FirstPersonControls( camera );
-
 				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
 
@@ -83,22 +83,26 @@
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
-				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
+				var vertices = geometry.attributes.position.array;
 
-					geometry.vertices[ i ].position.z = data[ i ] * 10;
+				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+
+					vertices[ j + 1 ] = data[ i ] * 10;
 
 				}
 
-				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
+				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
 				texture.needsUpdate = true;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
-				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0xefd1b5, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xefd1b5 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
@@ -110,18 +114,28 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
 			}
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Float32Array( size ),
+				var size = width * height, data = new Uint8Array( size ),
 				perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
-
-				for ( var i = 0; i < size; i ++ ) {
-
-					data[ i ] = 0
-
-				}
 
 				for ( var j = 0; j < 4; j ++ ) {
 
@@ -129,7 +143,6 @@
 
 						var x = i % width, y = ~~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
-
 
 					}
 

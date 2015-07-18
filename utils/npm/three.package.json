@@ -1,0 +1,46 @@
+{
+
+    "name" : "three",
+
+    "version" : "%VERSION%",
+
+    "description" : "JavaScript 3D library",
+
+    "keywords" : [
+        "3D",
+        "WebGL",
+        "Three",
+        "ThreeJS",
+        "CSS",
+        "engine",
+        "rendering",
+        "geometry",
+        "math"
+    ],
+
+    "homepage" : "http://threejs.org/",
+
+    "bugs" : {
+        "url" : "https://github.com/mrdoob/three.js/issues"
+    },
+
+    "author" : "three.js contributors",
+
+    "main" : "./three.js",
+
+    "repository" : {
+        "type" : "git",
+        "url" : "git://github.com/mrdoob/three.js.git"
+    },
+
+    "license" : "MIT",
+
+    "engines" : {
+        "node" : "*"
+    },
+
+    "help" : {
+        "web" : "http://stackoverflow.com/questions/tagged/three.js"
+    }
+
+}

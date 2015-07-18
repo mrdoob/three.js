@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - render-to-texture</title>
@@ -31,13 +31,12 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> render-to-texture webgl example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> render-to-texture webgl example</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader_screen" type="x-shader/x-fragment">
 
@@ -108,11 +107,13 @@
 
 				container = document.getElementById( 'container' );
 
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 100;
+
 				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				cameraRTT.position.z = 100;
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 100;
+				//
 
 				scene = new THREE.Scene();
 				sceneRTT = new THREE.Scene();
@@ -138,7 +139,7 @@
 
 				var materialScreen = new THREE.ShaderMaterial( {
 
-					uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture } },
+					uniforms: { tDiffuse: { type: "t", value: rtTexture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
@@ -146,13 +147,26 @@
 
 				} );
 
-				var plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
+				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = -100;
 				sceneRTT.add( quad );
 
-				createMesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), sceneRTT );
+				var geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
+
+				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
+				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
+
+				zmesh1 = new THREE.Mesh( geometry, mat1 );
+				zmesh1.position.set( 0, 0, 100 );
+				zmesh1.scale.set( 1.5, 1.5, 1.5 );
+				sceneRTT.add( zmesh1 );
+
+				zmesh2 = new THREE.Mesh( geometry, mat2 );
+				zmesh2.position.set( 0, 150, 100 );
+				zmesh2.scale.set( 0.75, 0.75, 0.75 );
+				sceneRTT.add( zmesh2 );
 
 				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;
@@ -168,11 +182,11 @@
 
 						mesh = new THREE.Mesh( geometry, material2 );
 
-						mesh.position.x = ( i - (n-1)/2 ) * 20;
-						mesh.position.y = ( j - (n-1)/2 ) * 20;
+						mesh.position.x = ( i - ( n - 1 ) / 2 ) * 20;
+						mesh.position.y = ( j - ( n - 1 ) / 2 ) * 20;
 						mesh.position.z = 0;
 
-						mesh.rotation.y = -Math.PI/2;
+						mesh.rotation.y = - Math.PI / 2;
 
 						scene.add( mesh );
 
@@ -181,6 +195,7 @@
 				}
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 
@@ -192,23 +207,6 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-			}
-
-			function createMesh( geometry, xscene ) {
-
-				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } ),
-					mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
-
-				zmesh1 = new THREE.Mesh( geometry, mat1 );
-				zmesh1.position.set( 0, 0, 100 );
-				zmesh1.scale.set( 1.5, 1.5, 1.5 );
-				xscene.add( zmesh1 );
-
-				zmesh2 = new THREE.Mesh( geometry, mat2 );
-				zmesh2.position.set( 0, 150, 100 );
-				zmesh2.scale.set( 0.75, 0.75, 0.75 );
-				xscene.add( zmesh2 );
 
 			}
 

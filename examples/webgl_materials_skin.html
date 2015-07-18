@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - skin [Lee Perry-Smith]</title>
@@ -32,20 +32,27 @@
 				color:#fff;
 			}
 
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl skin rendering demo.
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl skin rendering demo.
 			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head.
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
 		<script src="js/ShaderSkin.js"></script>
+
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -56,14 +63,13 @@
 
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var statsEnabled = false;
+			var statsEnabled = true;
 
 			var container, stats, loader;
 
@@ -101,14 +107,13 @@
 				ambientLight = new THREE.AmbientLight( 0x222222 );
 				scene.add( ambientLight );
 
-
 				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1 );
 				directionalLight.position.set( 1, -1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				// MATERIALS
 
-				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x070707, shininess = 50;
+				var diffuse = 0xbbbbbb, specular = 0x070707, shininess = 50;
 
 				specular = 0x555555;
 
@@ -116,23 +121,22 @@
 
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniformsUV[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniformsUV[ "uNormalScale" ].value = -0.75;
+				uniformsUV[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniformsUV[ "uNormalScale" ].value = 0.75;
 
-				uniformsUV[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
-				uniformsUV[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniformsUV[ "uSpecularColor" ].value.setHex( specular );
-				uniformsUV[ "uAmbientColor" ].value.setHex( ambient );
+				uniformsUV[ "diffuse" ].value.setHex( diffuse );
+				uniformsUV[ "specular" ].value.setHex( specular );
 
 				uniformsUV[ "uRoughness" ].value = 0.185;
 				uniformsUV[ "uSpecularBrightness" ].value = 0.8;
 
 				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
-				uniforms[ "tDiffuse" ].texture = uniformsUV[ "tDiffuse" ].texture;
-				uniforms[ "tNormal" ].texture = uniformsUV[ "tNormal" ].texture;
+				uniforms[ "tDiffuse" ].value = uniformsUV[ "tDiffuse" ].value;
+				uniforms[ "tNormal" ].value = uniformsUV[ "tNormal" ].value;
 				uniforms[ "passID" ].value = 1;
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
@@ -152,8 +156,9 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( 0x050505 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColorHex( 0x050505, 1 );
 				renderer.autoClear = false;
 
 				container.appendChild( renderer.domElement );
@@ -163,9 +168,6 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
 					container.appendChild( stats.domElement );
 
 				}
@@ -176,12 +178,10 @@
 
 				// POSTPROCESSING
 
-				var renderModelUV = new THREE.RenderPass( scene, camera, materialUV, new THREE.Color( 0xca9c8d ) );
+				var renderModelUV = new THREE.RenderPass( scene, camera, materialUV, new THREE.Color( 0x575757 ) );
 				var renderModel = new THREE.RenderPass( scene, camera );
 
-				THREE.ColorUtils.adjustHSV( renderModelUV.clearColor, 0, -0.5, -0.45 );
-
-				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
 				var effectBloom1 = new THREE.BloomPass( 1, 15, 2, 512 );
 				var effectBloom2 = new THREE.BloomPass( 1, 25, 4, 512 );
@@ -191,11 +191,11 @@
 				effectBloom2.clear = true;
 				effectBloom3.clear = true;
 
-				effectScreen.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 
 				//
 
-				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
+				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				var rtwidth = 512;
 				var rtheight = 512;
 
@@ -235,7 +235,7 @@
 
 				var effectBloom = new THREE.BloomPass( 0.25 );
 
-				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
 				effectBleach.uniforms.opacity.value = 0.25;
 
 				effectBleach.renderToScreen = true;
@@ -248,13 +248,28 @@
 
 				//
 
-				uniforms[ "tBlur1" ].texture = composerScene.renderTarget2;
-				uniforms[ "tBlur2" ].texture = composerUV1.renderTarget2;
-				uniforms[ "tBlur3" ].texture = composerUV2.renderTarget2;
-				uniforms[ "tBlur4" ].texture = composerUV3.renderTarget2;
+				uniforms[ "tBlur1" ].value = composerScene.renderTarget2;
+				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2;
+				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2;
+				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2;
 
-				uniforms[ "tBeckmann" ].texture = composerBeckmann.renderTarget1;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -265,7 +280,6 @@
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );
-				mesh.doubleSided = true;
 
 				scene.add( mesh );
 
@@ -273,7 +287,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );

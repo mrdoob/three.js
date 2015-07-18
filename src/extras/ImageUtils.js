@@ -1,45 +1,93 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
+ * @author Daosheng Mu / https://github.com/DaoshengMu/
  */
 
 THREE.ImageUtils = {
 
-	loadTexture: function ( path, mapping, callback ) {
+	crossOrigin: undefined,
 
-		var image = new Image(), texture = new THREE.Texture( image, mapping );
+	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		image.onload = function () { texture.needsUpdate = true; if ( callback ) callback( this ); };
-		image.crossOrigin = '';
-		image.src = path;
+		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
+
+		var texture = new THREE.Texture( undefined, mapping );
+
+		loader.load( url, function ( image ) {
+
+			texture.image = image;
+			texture.needsUpdate = true;
+
+			if ( onLoad ) onLoad( texture );
+
+		}, undefined, function ( event ) {
+
+			if ( onError ) onError( event );
+
+		} );
+
+		texture.sourceFile = url;
 
 		return texture;
 
 	},
 
-	loadTextureCube: function ( array, mapping, callback ) {
+	loadTextureCube: function ( array, mapping, onLoad, onError ) {
 
-		var i, l, images = [], texture = new THREE.Texture( images, mapping );
+		var images = [];
 
-		images.loadCount = 0;
+		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
 
-		for ( i = 0, l = array.length; i < l; ++i ) {
+		var texture = new THREE.CubeTexture( images, mapping );
 
-			images[ i ] = new Image();
-			images[ i ].onload = function () {
+		// no flipping needed for cube textures
 
-				images.loadCount += 1;
-				if ( images.loadCount === 6 ) texture.needsUpdate = true;
-				if ( callback ) callback( this );
+		texture.flipY = false;
 
-			};
+		var loaded = 0;
 
-			images[ i ].crossOrigin = '';
-			images[ i ].src = array[ i ];
+		var loadTexture = function ( i ) {
+
+			loader.load( array[ i ], function ( image ) {
+
+				texture.images[ i ] = image;
+
+				loaded += 1;
+
+				if ( loaded === 6 ) {
+
+					texture.needsUpdate = true;
+
+					if ( onLoad ) onLoad( texture );
+
+				}
+
+			}, undefined, onError );
+
+		}
+
+		for ( var i = 0, il = array.length; i < il; ++ i ) {
+
+			loadTexture( i );
 
 		}
 
 		return texture;
+
+	},
+
+	loadCompressedTexture: function () {
+
+		THREE.error( 'THREE.ImageUtils.loadCompressedTexture has been removed. Use THREE.DDSLoader instead.' )
+
+	},
+
+	loadCompressedTextureCube: function () {
+
+		THREE.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' )
 
 	},
 
@@ -66,7 +114,8 @@ THREE.ImageUtils = {
 
 		}
 
-		var depth = depth | 1;
+		depth = depth | 1;
+
 		var width = image.width;
 		var height = image.height;
 
@@ -83,19 +132,19 @@ THREE.ImageUtils = {
 
 		for ( var x = 0; x < width; x ++ ) {
 
-			for ( var y = 1; y < height; y ++ ) {
+			for ( var y = 0; y < height; y ++ ) {
 
-				var ly = y - 1 < 0 ? height - 1 : y - 1;
-				var uy = ( y + 1 ) % height;
-				var lx = x - 1 < 0 ? width - 1 : x - 1;
-				var ux = ( x + 1 ) % width;
+				var ly = y - 1 < 0 ? 0 : y - 1;
+				var uy = y + 1 > height - 1 ? height - 1 : y + 1;
+				var lx = x - 1 < 0 ? 0 : x - 1;
+				var ux = x + 1 > width - 1 ? width - 1 : x + 1;
 
 				var points = [];
 				var origin = [ 0, 0, data[ ( y * width + x ) * 4 ] / 255 * depth ];
 				points.push( [ - 1, 0, data[ ( y * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ - 1, - 1, data[ ( ly * width + lx ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, - 1, data[ ( ly * width + x ) * 4 ] / 255 * depth ] );
-				points.push( [  1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
+				points.push( [ 1, - 1, data[ ( ly * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 0, data[ ( y * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 1, 1, data[ ( uy * width + ux ) * 4 ] / 255 * depth ] );
 				points.push( [ 0, 1, data[ ( uy * width + x ) * 4 ] / 255 * depth ] );
@@ -131,7 +180,7 @@ THREE.ImageUtils = {
 				var idx = ( y * width + x ) * 4;
 
 				output[ idx ] = ( ( normal[ 0 ] + 1.0 ) / 2.0 * 255 ) | 0;
-				output[ idx + 1 ] = ( ( normal[ 1 ] + 1.0 / 2.0 ) * 255 ) | 0;
+				output[ idx + 1 ] = ( ( normal[ 1 ] + 1.0 ) / 2.0 * 255 ) | 0;
 				output[ idx + 2 ] = ( normal[ 2 ] * 255 ) | 0;
 				output[ idx + 3 ] = 255;
 
@@ -142,6 +191,30 @@ THREE.ImageUtils = {
 		context.putImageData( imageData, 0, 0 );
 
 		return canvas;
+
+	},
+
+	generateDataTexture: function ( width, height, color ) {
+
+		var size = width * height;
+		var data = new Uint8Array( 3 * size );
+
+		var r = Math.floor( color.r * 255 );
+		var g = Math.floor( color.g * 255 );
+		var b = Math.floor( color.b * 255 );
+
+		for ( var i = 0; i < size; i ++ ) {
+
+			data[ i * 3 ] 	   = r;
+			data[ i * 3 + 1 ] = g;
+			data[ i * 3 + 2 ] = b;
+
+		}
+
+		var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+		texture.needsUpdate = true;
+
+		return texture;
 
 	}
 

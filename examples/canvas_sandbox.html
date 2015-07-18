@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - sandbox</title>
@@ -15,10 +15,12 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -59,41 +61,40 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.y = 150;
-				camera.position.z = 400;
+				camera.position.set( 0, 150, 400 );
 				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
 
+
 				// Grid
 
+				var size = 500, step = 100;
+
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
+
+				for ( var i = - size; i <= size; i += step ) {
+
+					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
+
+				}
 
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
 
-				for ( var i = 0; i <= 10; i ++ ) {
-
-					var line = new THREE.Line( geometry, material );
-					line.position.z = ( i * 100 ) - 500;
-					scene.add( line );
-
-					var line = new THREE.Line( geometry, material );
-					line.position.x = ( i * 100 ) - 500;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.add( line );
-
-				}
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				scene.add( line );
 
 				// Spheres
 
 				objects = [];
 
-				geometry = new THREE.IcosahedronGeometry( 1 );
-				geometry.applyMatrix( new THREE.Matrix4().setScale( 100, 100, 100 ) );
+				geometry = new THREE.IcosahedronGeometry( 100, 1 );
 
-				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: true } );
+				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', THREE.SphericalReflectionMapping ), overdraw: 0.5 } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
@@ -131,8 +132,9 @@
 				scene.add( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				var debugCanvas = document.createElement( 'canvas' );
@@ -155,6 +157,23 @@
 
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function onDocumentKeyDown( event ) {

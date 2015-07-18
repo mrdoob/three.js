@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [custom]</title>
@@ -12,7 +12,7 @@
 				text-align:center;
 				font-weight: bold;
 
-				background-color: #000000;
+				background-color: #050505;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -34,13 +34,12 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
 
@@ -115,9 +114,6 @@
 		</script>
 
 		<script id="fragment_shader1" type="x-shader/x-fragment">
-			#ifdef GL_ES
-			precision highp float;
-			#endif
 
 			uniform vec2 resolution;
 			uniform float time;
@@ -175,17 +171,11 @@
 
 			var container, stats;
 
-			var start_time;
-
 			var camera, scene, renderer;
 
-			var uniforms1, uniforms2, material1, material2, mesh, meshes = [];
+			var uniforms1, uniforms2;
 
-			var mouseX = 0, mouseY = 0,
-			lat = 0, lon = 0, phy = 0, theta = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -194,12 +184,12 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 40, windowHalfX / windowHalfY, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
 
-				start_time = Date.now();
+				var geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
 					time: { type: "f", value: 1.0 },
@@ -209,17 +199,21 @@
 				uniforms2 = {
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
-					texture: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
+					texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
 				};
 
-				uniforms2.texture.texture.wrapS = uniforms2.texture.texture.wrapT = THREE.Repeat;
+				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
 
-				var size = 0.75, mlib = [],
-					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];
+				var params = [
+					[ 'fragment_shader1', uniforms1 ],
+					[ 'fragment_shader2', uniforms2 ],
+					[ 'fragment_shader3', uniforms1 ],
+					[ 'fragment_shader4', uniforms1 ]
+				];
 
 				for( var i = 0; i < params.length; i++ ) {
 
-					material = new THREE.ShaderMaterial( {
+					var material = new THREE.ShaderMaterial( {
 
 						uniforms: params[ i ][ 1 ],
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -227,18 +221,15 @@
 
 						} );
 
-					mlib[ i ] = material;
-
-					mesh = new THREE.Mesh( new THREE.CubeGeometry( size, size, size, 1, 1, 1, [ mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ] ], false ), new THREE.MeshFaceMaterial() );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = i - ( params.length - 1 ) / 2;
 					mesh.position.y = i % 2 - 0.5;
 					scene.add( mesh );
 
-					meshes[ i ] = mesh;
-
 				}
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -260,6 +251,9 @@
 				uniforms2.resolution.value.x = window.innerWidth;
 				uniforms2.resolution.value.y = window.innerHeight;
 
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
@@ -277,13 +271,17 @@
 
 			function render() {
 
-				uniforms1.time.value += 0.05;
-				uniforms2.time.value = ( Date.now() - start_time ) / 1000;
+				var delta = clock.getDelta();
 
-				for( var i = 0; i < meshes.length; ++ i ) {
+				uniforms1.time.value += delta * 5;
+				uniforms2.time.value = clock.elapsedTime;
 
-					meshes[ i ].rotation.y += 0.01 * ( i % 2 ? 1 : -1 );
-					meshes[ i ].rotation.x += 0.01 * ( i % 2 ? -1 : 1 );
+				for ( var i = 0; i < scene.children.length; i ++ ) {
+
+					var object = scene.children[ i ];
+
+					object.rotation.y += delta * 0.5 * ( i % 2 ? 1 : -1 );
+					object.rotation.x += delta * 0.5 * ( i % 2 ? -1 : 1 );
 
 				}
 

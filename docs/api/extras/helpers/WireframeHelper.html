@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Line] &rarr;
+		
+		<h1>[name]</h1>
+
+		<div class="desc">Creates a wireframe object that shows the edges of another object's geometry. To draw a  wireframe image showing only "hard" edges (edges between non-coplanar faces), see [page:EdgesHelper].</div>
+
+		<h2>Example</h2>
+
+		<code>
+		geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+		material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		object = new THREE.Mesh( geometry, material );
+
+		wireframe = new THREE.WireframeHelper( object, 0x00ff00 );
+
+		scene.add( object );
+		scene.add( wireframe );
+
+		</code>
+		[example:webgl_helpers Example using various helpers], [example:webgl_materials_wireframe Alternative approach using a shader.]
+
+		<h2>Constructor</h2>
+		<h3>[name]( [page:Object3D object], [page:Color color] )</h3>
+		<div>
+		object -- Object of which to draw edges <br />
+		color -- Color of the edges.
+		</div>
+		<div>
+		Creates a [page:Line], showing only the edges between vertices of an object.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<div>none</div>
+
+
+		<h2>Methods</h2>
+		
+		<div>none</div>
+		
+
+		<h2>Source</h2>
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

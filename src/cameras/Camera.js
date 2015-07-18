@@ -1,40 +1,63 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
- */
+ * @author WestLangley / http://github.com/WestLangley
+*/
 
 THREE.Camera = function () {
 
-	if ( arguments.length ) {
-
-		console.warn( 'DEPRECATED: Camera() is now PerspectiveCamera() or OrthographicCamera().' );
-		return new THREE.PerspectiveCamera( arguments[ 0 ], arguments[ 1 ], arguments[ 2 ], arguments[ 3 ] );
-
-	}
-
 	THREE.Object3D.call( this );
 
+	this.type = 'Camera';
+
 	this.matrixWorldInverse = new THREE.Matrix4();
-
 	this.projectionMatrix = new THREE.Matrix4();
-	this.projectionMatrixInverse = new THREE.Matrix4();
-
 
 };
 
-THREE.Camera.prototype = new THREE.Object3D();
+THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Camera.prototype.constructor = THREE.Camera;
 
-THREE.Camera.prototype.lookAt = function ( vector ) {
+THREE.Camera.prototype.getWorldDirection = function () {
 
-	// TODO: Add hierarchy support.
+	var quaternion = new THREE.Quaternion();
 
-	this.matrix.lookAt( this.position, vector, this.up );
+	return function ( optionalTarget ) {
 
-	if ( this.rotationAutoUpdate ) {
+		var result = optionalTarget || new THREE.Vector3();
 
-		this.rotation.setRotationFromMatrix( this.matrix );
+		this.getWorldQuaternion( quaternion );
+
+		return result.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 	}
 
+}();
+
+THREE.Camera.prototype.lookAt = function () {
+
+	// This routine does not support cameras with rotated and/or translated parent(s)
+
+	var m1 = new THREE.Matrix4();
+
+	return function ( vector ) {
+
+		m1.lookAt( this.position, vector, this.up );
+
+		this.quaternion.setFromRotationMatrix( m1 );
+
+	};
+
+}();
+
+THREE.Camera.prototype.clone = function ( camera ) {
+
+	if ( camera === undefined ) camera = new THREE.Camera();
+
+	THREE.Object3D.prototype.clone.call( this, camera );
+
+	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
+	camera.projectionMatrix.copy( this.projectionMatrix );
+
+	return camera;
 };

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - combo camera - orthographic + perspective</title>
@@ -20,77 +20,90 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
-		<script src="../src/extras/cameras/CombinedCamera.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/cameras/CombinedCamera.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
 
 		<div style="position: absolute; top: 10px; width: 100%; text-align: center; ">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Combo Camera<br>
-			View: <a href="#" onclick="setOrthographic();return false;"> Orthographic</a> | 
+			<a href="http://threejs.org" target="_blank">three.js</a> - Combo Camera<br>
+			View: <a href="#" onclick="setOrthographic();return false;"> Orthographic</a> |
 				<a href="#" onclick="setPerspective();return false;">Perspective</a><br>
-			Lens: <a href="#" onclick="setLens(12);return false;">12mm</a> | 
-				<a href="#" onclick="setLens(16);return false;">16mm</a> | 
-				<a href="#" onclick="setLens(24);return false;">24mm</a> | 
-				<a href="#" onclick="setLens(35);return false;">35mm</a> | 
-				<a href="#" onclick="setLens(50);return false;">50mm</a> | 
-				<a href="#" onclick="setLens(60);return false;">60mm</a> | 
-				<a href="#" onclick="setLens(85);return false;">85mm</a> | 
+			Lens: <a href="#" onclick="setLens(12);return false;">12mm</a> |
+				<a href="#" onclick="setLens(16);return false;">16mm</a> |
+				<a href="#" onclick="setLens(24);return false;">24mm</a> |
+				<a href="#" onclick="setLens(35);return false;">35mm</a> |
+				<a href="#" onclick="setLens(50);return false;">50mm</a> |
+				<a href="#" onclick="setLens(60);return false;">60mm</a> |
+				<a href="#" onclick="setLens(85);return false;">85mm</a> |
 				<a href="#" onclick="setLens(105);return false;">105mm</a><br>
-			Fov: <a href="#" onclick="setFov(30);return false;">30°</a> | 
-				<a href="#" onclick="setFov(50);return false;">50°</a> | 
-				<a href="#" onclick="setFov(70);return false;">70°</a> | 
+			Fov: <a href="#" onclick="setFov(30);return false;">30°</a> |
+				<a href="#" onclick="setFov(50);return false;">50°</a> |
+				<a href="#" onclick="setFov(70);return false;">70°</a> |
 				<a href="#" onclick="setFov(100);return false;">100°</a><br>
 			Zoom: <a href="#" onclick="camera.setZoom(0.5);return false;">0.5x</a> |
 					<a href="#" onclick="camera.setZoom(1);return false;">1x</a> |
 					<a href="#" onclick="camera.setZoom(2);return false;">2x</a> |
-					
+
 				<br/>
-			Views: <a href="#" onclick="camera.toTopView();return false;">Top view</a> |
-				<a href="#" onclick="camera.toBottomView();return false;">Bottom view</a> |
-				<a href="#" onclick="camera.toLeftView();return false;">Left view</a> |
-				<a href="#" onclick="camera.toRightView();return false;">Right view</a> |
-				<a href="#" onclick="camera.toFrontView();return false;">Front view</a> |
-				<a href="#" onclick="camera.toBackView();return false;">Back view</a> |
-				<a href="#" onclick="camera.rotationAutoUpdate = true;return false;">Look at Scene</a>
+			Views: <a href="#" onclick="camera.toTopView();lookAtScene=false;return false;">Top view</a> |
+				<a href="#" onclick="camera.toBottomView();lookAtScene=false;return false;">Bottom view</a> |
+				<a href="#" onclick="camera.toLeftView();lookAtScene=false;return false;">Left view</a> |
+				<a href="#" onclick="camera.toRightView();lookAtScene=false;return false;">Right view</a> |
+				<a href="#" onclick="camera.toFrontView();lookAtScene=false;return false;">Front view</a> |
+				<a href="#" onclick="camera.toBackView();lookAtScene=false;return false;">Back view</a> |
+				<a href="#" onclick="lookAtScene=true;return false;">Look at Scene</a>
 				<br/>
 			<div id="fov"></div>
 		</div>
-			
+
 
 
 		<script>
 
 			var container, stats;
 			var camera, scene, renderer;
+			var lookAtScene = true;
 
 			init();
 			animate();
 
-			function setFov(fov) {
-				camera.setFov(fov);
+			function setFov( fov ) {
+
+				camera.setFov( fov );
 
 				document.getElementById('fov').innerHTML = 'FOV '+ fov.toFixed(2) +'&deg;' ;
+
 			}
 
-			function setLens(lens) {
+			function setLens( lens ) {
+
 				// try adding a tween effect while changing focal length, and it'd be even cooler!
-				var fov = camera.setLens(lens);
+
+				var fov = camera.setLens( lens );
 
 				document.getElementById('fov').innerHTML = 'Converted ' + lens + 'mm lens to FOV '+ fov.toFixed(2) +'&deg;' ;
+
 			}
 
 			function setOrthographic() {
+
 				camera.toOrthographic();
 
 				document.getElementById('fov').innerHTML = 'Orthographic mode' ;
+
 			}
 
 			function setPerspective() {
+
 				camera.toPerspective();
 
 				document.getElementById('fov').innerHTML = 'Perspective mode' ;
+
 			}
 
 			function init() {
@@ -98,7 +111,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.CombinedCamera( window.innerWidth /2, window.innerHeight/2, 70, 1, 1000, -1000, 1000, 1000 );
+				camera = new THREE.CombinedCamera( window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000 );
 
 				camera.position.x = 200;
 				camera.position.y = 100;
@@ -108,32 +121,33 @@
 
 				// Grid
 
+				var size = 500, step = 50;
+
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
 
-				for ( var i = 0; i <= 20; i ++ ) {
+				for ( var i = - size; i <= size; i += step ) {
 
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
-					line.position.z = ( i * 50 ) - 500;
-					scene.add( line );
+					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
 
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
-					line.position.x = ( i * 50 ) - 500;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.add( line );
+					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
 
 				}
 
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
+
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				scene.add( line );
+
 				// Cubes
 
-				var geometry = new THREE.CubeGeometry( 50, 50, 50 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
+				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
 					var cube = new THREE.Mesh( geometry, material );
-					cube.overdraw = true;
 
 					cube.scale.y = Math.floor( Math.random() * 2 + 1 );
 
@@ -165,14 +179,26 @@
 				scene.add( directionalLight );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				function onWindowResize(){
+
+					camera.setSize( window.innerWidth, window.innerHeight );
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				}
 
 			}
 
@@ -189,11 +215,11 @@
 
 			function render() {
 
-				var timer = new Date().getTime() * 0.0001;
+				var timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 200;
 				camera.position.z = Math.sin( timer ) * 200;
-				camera.lookAt( scene.position );
+				if ( lookAtScene ) camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

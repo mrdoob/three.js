@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - custom attributes [particles][billboards][alphatest]</title>
@@ -28,14 +28,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example - particles - billboards - alphatest</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles - billboards - alphatest</div>
 		<div id="container"></div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -94,8 +93,8 @@
 
 		var vc1;
 
-		var WIDTH = window.innerWidth,
-			HEIGHT = window.innerHeight;
+		var WIDTH = window.innerWidth;
+		var HEIGHT = window.innerHeight;
 
 		init();
 		animate();
@@ -118,15 +117,15 @@
 
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" ) },
 
 			};
 
-			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
+			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
+				uniforms:       uniforms,
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
@@ -139,32 +138,33 @@
 
 			for ( var i = 0; i < 100000; i ++ ) {
 
-				vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+				var vertex = new THREE.Vector3();
+				vertex.x = Math.random() * 2 - 1;
+				vertex.y = Math.random() * 2 - 1;
+				vertex.z = Math.random() * 2 - 1;
+				vertex.multiplyScalar( radius );
 
-				vector.multiplyScalar( radius );
+				if ( ( vertex.x > inner || vertex.x < -inner ) ||
+				     ( vertex.y > inner || vertex.y < -inner ) ||
+				     ( vertex.z > inner || vertex.z < -inner )  )
 
-				if ( ( vector.x > inner || vector.x < -inner ) ||
-				     ( vector.y > inner || vector.y < -inner ) ||
-				     ( vector.z > inner || vector.z < -inner )  )
-
-				geometry.vertices.push( new THREE.Vertex( vector ) );
+				geometry.vertices.push( vertex );
 
 			}
 
 			vc1 = geometry.vertices.length;
 
-			var m, dummyMaterial = new THREE.MeshFaceMaterial();
-
 			radius = 200;
-			var geometry2 = new THREE.CubeGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
+			var geometry2 = new THREE.BoxGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
 
 			function addGeo( geo, x, y, z, ry ) {
 
-				m = new THREE.Mesh( geo, dummyMaterial );
-				m.position.set( x, y, z );
-				m.rotation.y = ry;
+				var mesh = new THREE.Mesh( geo );
+				mesh.position.set( x, y, z );
+				mesh.rotation.y = ry;
+				mesh.updateMatrix();
 
-				THREE.GeometryUtils.merge( geometry, m );
+				geometry.merge( mesh.geometry, mesh.matrix );
 
 			}
 
@@ -184,7 +184,7 @@
 
 			// corner edges
 
-			var geometry3 = new THREE.CubeGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
+			var geometry3 = new THREE.BoxGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
 
 			addGeo( geometry3,  110, 0,  110, 0 );
 			addGeo( geometry3,  110, 0, -110, 0 );
@@ -193,8 +193,7 @@
 
 			// particle system
 
-			object = new THREE.ParticleSystem( geometry, shaderMaterial );
-			object.dynamic = true;
+			object = new THREE.PointCloud( geometry, shaderMaterial );
 
 			// custom attributes
 
@@ -203,19 +202,19 @@
 			var values_size = attributes.size.value;
 			var values_color = attributes.ca.value;
 
-			for( var v = 0; v < vertices.length; v ++ ) {
+			for ( var v = 0; v < vertices.length; v ++ ) {
 
 				values_size[ v ] = 10;
 				values_color[ v ] = new THREE.Color( 0xffffff );
 
 				if ( v < vc1 ) {
 
-					values_color[ v ].setHSV( 0.5 + 0.2 * ( v / vc1 ), 0.99, 1.0 );
+					values_color[ v ].setHSL( 0.5 + 0.2 * ( v / vc1 ), 1, 0.5 );
 
 				} else {
 
 					values_size[ v ] = 55;
-					values_color[ v ].setHSV( 0.1, 0.99, 1.0 );
+					values_color[ v ].setHSL( 0.1, 1, 0.5 );
 
 				}
 
@@ -225,7 +224,8 @@
 
 			scene.add( object );
 
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );
@@ -235,6 +235,19 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -256,7 +269,7 @@
 			for( var i = 0; i < attributes.size.value.length; i ++ ) {
 
 				if ( i < vc1 )
-					attributes.size.value[ i ] = 26 + 32 * Math.sin( 0.1 * i + 0.6 * time );
+					attributes.size.value[ i ] = Math.max(0, 26 + 32 * Math.sin( 0.1 * i + 0.6 * time ));
 
 
 			}

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - particles - sprites</title>
@@ -18,11 +18,13 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 
 		<script>
 
@@ -46,11 +48,14 @@
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.ParticleBasicMaterial( { map: new THREE.Texture( generateSprite() ), blending: THREE.AdditiveBlending } );
+				var material = new THREE.SpriteMaterial( {
+					map: new THREE.Texture( generateSprite() ),
+					blending: THREE.AdditiveBlending
+				} );
 
 				for ( var i = 0; i < 1000; i++ ) {
 
-					particle = new THREE.Particle( material );
+					particle = new THREE.Sprite( material );
 
 					initParticle( particle, i * 10 );
 
@@ -58,9 +63,9 @@
 				}
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0x000040 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortElements = false;
-				renderer.setClearColorHex( 0x0000ff, 0.25 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -71,8 +76,24 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
 
 			function generateSprite() {
 
@@ -96,13 +117,11 @@
 
 			function initParticle( particle, delay ) {
 
-				var particle = this instanceof THREE.Particle ? this : particle;
+				var particle = this instanceof THREE.Sprite ? this : particle;
 				var delay = delay !== undefined ? delay : 0;
 
-				particle.position.x = 0;
-				particle.position.y = 0;
-				particle.position.z = 0;
-				particle.scale.x = particle.scale.y = Math.random() * 3 + 1;
+				particle.position.set( 0, 0, 0 )
+				particle.scale.x = particle.scale.y = Math.random() * 32 + 16;
 
 				new TWEEN.Tween( particle )
 					.delay( delay )

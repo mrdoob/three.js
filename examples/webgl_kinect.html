@@ -23,8 +23,7 @@
 				font-weight: bold;
 
 				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+				top: 5px; width: 100%;
 			}
 
 			a {
@@ -36,13 +35,12 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src='js/DAT.GUI.min.js'></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vs" type="x-shader/x-vertex">
 
@@ -62,7 +60,7 @@
 
 			void main() {
 
-				vUv = vec2( position.x / width, 1.0 - ( position.y / height ) );
+				vUv = vec2( position.x / width, position.y / height );
 
 				vec4 color = texture2D( map, vUv );
 				float depth = ( color.r + color.g + color.b ) / 3.0;
@@ -93,7 +91,7 @@
 			void main() {
 
 				vec4 color = texture2D( map, vUv );
-				gl_FragColor = vec4( color.r, color.g, color.b, smoothstep( 8000.0, -8000.0, gl_FragCoord.z / gl_FragCoord.w ) );
+				gl_FragColor = vec4( color.r, color.g, color.b, 0.2 );
 
 			}
 
@@ -128,7 +126,7 @@
 
 				var info = document.createElement( 'div' );
 				info.id = 'info';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - kinect';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - kinect';
 				document.body.appendChild( info );
 
 				stats = new Stats();
@@ -136,39 +134,40 @@
 				stats.domElement.style.top = '0px';
 				// container.appendChild( stats.domElement );
 
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 500 );
+
 				scene = new THREE.Scene();
 				center = new THREE.Vector3();
 				center.z = - 1000;
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 0, 500 );
-				scene.add( camera );
-
 				video = document.createElement( 'video' );
 				video.addEventListener( 'loadedmetadata', function ( event ) {
 
-					texture = new THREE.Texture( video );
+					texture = new THREE.VideoTexture( video );
+					texture.minFilter = THREE.NearestFilter;
 
 					var width = 640, height = 480;
-					var nearClipping = 850/*850*/, farClipping = 4000/*4000*/;
+					var nearClipping = 850, farClipping = 4000;
 
-					geometry = new THREE.Geometry();
+					geometry = new THREE.BufferGeometry();
 
-					for ( var i = 0, l = width * height; i < l; i ++ ) {
- 
-						var position = new THREE.Vector3();
-						position.x = ( i % width );
-						position.y = Math.floor( i / width );
+					var vertices = new Float32Array( width * height * 3 );
 
-						geometry.vertices.push( new THREE.Vertex( position ) );
+					for ( var i = 0, j = 0, l = vertices.length; i < l; i += 3, j ++ ) {
+
+						vertices[ i ] = j % width;
+						vertices[ i + 1 ] = Math.floor( j / width );
 
 					}
+
+					geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 					material = new THREE.ShaderMaterial( {
 
 						uniforms: {
 
-							"map": { type: "t", value: 0, texture: texture },
+							"map": { type: "t", value: texture },
 							"width": { type: "f", value: width },
 							"height": { type: "f", value: height },
 							"nearClipping": { type: "f", value: nearClipping },
@@ -180,31 +179,20 @@
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
 						fragmentShader: document.getElementById( 'fs' ).textContent,
-						depthWrite: false
+						blending: THREE.AdditiveBlending,
+						depthTest: false, depthWrite: false,
+						transparent: true
 
 					} );
 
-					mesh = new THREE.ParticleSystem( geometry, material );
-					mesh.position.x = 0;
-					mesh.position.y = 0;
+					mesh = new THREE.PointCloud( geometry, material );
 					scene.add( mesh );
 
-					setInterval( function () {
-
-						if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
-							texture.needsUpdate = true;
-
-						}
-
-					}, 1000 / 30 );
-
-
-					var gui = new DAT.GUI();
-					gui.add( material.uniforms.nearClipping, 'value' ).name( 'nearClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
-					gui.add( material.uniforms.farClipping, 'value' ).name( 'farClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
-					gui.add( material.uniforms.pointSize, 'value' ).name( 'pointSize' ).min( 1 ).max( 10 ).step( 1.0 );
-					gui.add( material.uniforms.zOffset, 'value' ).name( 'zOffset' ).min( 0 ).max( 4000 ).step( 1.0 );
+					var gui = new dat.GUI();
+					gui.add( material.uniforms.nearClipping, 'value', 1, 10000, 1.0 ).name( 'nearClipping' );
+					gui.add( material.uniforms.farClipping, 'value', 1, 10000, 1.0 ).name( 'farClipping' );
+					gui.add( material.uniforms.pointSize, 'value', 1, 10, 1.0 ).name( 'pointSize' );
+					gui.add( material.uniforms.zOffset, 'value', 0, 4000, 1.0 ).name( 'zOffset' );
 					gui.close();
 
 
@@ -214,14 +202,26 @@
 				video.play();
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				mouse = new THREE.Vector3( 0, 0, 1 );
-				projector = new THREE.Projector();
-				ray = new THREE.Ray( camera.position );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

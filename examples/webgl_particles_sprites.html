@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - sprites</title>
@@ -33,15 +33,14 @@
 	<body>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl particle sprites example -
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl particle sprites example -
 			snowflakes by <a href="http://en.wikipedia.org/wiki/File:Sketch_of_snow_crystal_by_Ren%C3%A9_Descartes.jpg">Ren&eacute;  Descartes</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -78,16 +77,20 @@
 
 				for ( i = 0; i < 10000; i ++ ) {
 
-					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
-					geometry.vertices.push( new THREE.Vertex( vector ) );
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2000 - 1000;
+					vertex.y = Math.random() * 2000 - 1000;
+					vertex.z = Math.random() * 2000 - 1000;
+
+					geometry.vertices.push( vertex );
 
 				}
 
-				parameters = [ [ [1.0, 0.2, 1.0], sprite2, 20 ],
-							   [ [0.95, 0.1, 1], sprite3, 15 ],
-							   [ [0.90, 0.05, 1], sprite1, 10 ],
-							   [ [0.85, 0, 0.8], sprite5, 8 ],
-							   [ [0.80, 0, 0.7], sprite4, 5 ],
+				parameters = [ [ [1.0, 0.2, 0.5], sprite2, 20 ],
+							   [ [0.95, 0.1, 0.5], sprite3, 15 ],
+							   [ [0.90, 0.05, 0.5], sprite1, 10 ],
+							   [ [0.85, 0, 0.5], sprite5, 8 ],
+							   [ [0.80, 0, 0.5], sprite4, 5 ],
 							   ];
 
 				for ( i = 0; i < parameters.length; i ++ ) {
@@ -96,10 +99,10 @@
 					sprite = parameters[i][1];
 					size   = parameters[i][2];
 
-					materials[i] = new THREE.ParticleBasicMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
-					materials[i].color.setHSV( color[0], color[1], color[2] );
+					materials[i] = new THREE.PointCloudMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
+					materials[i].color.setHSL( color[0], color[1], color[2] );
 
-					particles = new THREE.ParticleSystem( geometry, materials[i] );
+					particles = new THREE.PointCloud( geometry, materials[i] );
 
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
@@ -109,7 +112,8 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -122,6 +126,22 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -133,7 +153,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -141,11 +161,12 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -176,18 +197,24 @@
 
 				camera.lookAt( scene.position );
 
-				for( i = 0; i < scene.objects.length; i ++ ) {
+				for ( i = 0; i < scene.children.length; i ++ ) {
 
-					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
+					var object = scene.children[ i ];
+
+					if ( object instanceof THREE.PointCloud ) {
+
+						object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+
+					}
 
 				}
 
-				for( i = 0; i < materials.length; i ++ ) {
+				for ( i = 0; i < materials.length; i ++ ) {
 
 					color = parameters[i][0];
 
 					h = ( 360 * ( color[0] + time ) % 360 ) / 360;
-					materials[i].color.setHSV( h, color[1], color[2] );
+					materials[i].color.setHSL( h, color[1], color[2] );
 
 				}
 

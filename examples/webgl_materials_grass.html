@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - grass</title>
@@ -18,17 +18,15 @@
 	</head>
 
 	<body>
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var camera, scene, renderer,
-			mesh, levels = [];
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -40,30 +38,54 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
-				var bitmap = generateTextureBase();
+				var texture = new THREE.Texture( generateTexture() );
+				texture.needsUpdate = true;
 
 				for ( var i = 0; i < 15; i ++ ) {
 
-					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( bitmap ) ), transparent: true, depthTest: false } ) );
-					mesh.material.map.needsUpdate = true;
+					var material = new THREE.MeshBasicMaterial( {
+						color: new THREE.Color().setHSL( 0.3, 0.75, ( i / 15 ) * 0.4 + 0.1 ),
+						map: texture,
+						depthTest: false,
+						depthWrite: false,
+						transparent: true
+					} );
 
-					mesh.rotation.x = - 90 * ( Math.PI / 180 );
+					var mesh = new THREE.Mesh( geometry, material );
+
 					mesh.position.y = i * 0.25;
+					mesh.rotation.x = - Math.PI / 2;
 
 					scene.add( mesh );
 
 				}
 
+				scene.children.reverse();
+
 				renderer = new THREE.WebGLRenderer();
-				renderer.sortObjects = false;
+				renderer.setClearColor( 0x003300 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
-			function generateTextureBase() {
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function generateTexture() {
 
 				var canvas = document.createElement( 'canvas' );
 				canvas.width = 512;
@@ -73,29 +95,15 @@
 
 				for ( var i = 0; i < 20000; i ++ ) {
 
-					context.fillStyle = 'rgba(0,' + Math.floor( Math.random() * 64 + 32 ) + ',16,1)';
+					context.fillStyle = 'hsl(0,0%,' + ( Math.random() * 50 + 50 ) + '%)';
 					context.beginPath();
-					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1 + 0.5, 0, Math.PI * 2, true );
-					context.closePath();
+					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() + 0.15, 0, Math.PI * 2, true );
 					context.fill();
 
 				}
 
 				context.globalAlpha = 0.075;
 				context.globalCompositeOperation = 'lighter';
-
-				return canvas;
-			}
-
-			function generateTextureLevel( texture ) {
-
-				texture.getContext( '2d' ).drawImage( texture, 0, 0 );
-
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = texture.width;
-				canvas.height = texture.height;
-
-				canvas.getContext( '2d' ).drawImage( texture, 0, 0 );
 
 				return canvas;
 
@@ -120,9 +128,9 @@
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = levels.length; i < l; i ++ ) {
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
-					mesh = levels[ i ];
+					var mesh = scene.children[ i ];
 					mesh.position.x = Math.sin( time * 4 ) * i * i * 0.005;
 					mesh.position.z = Math.cos( time * 6 ) * i * i * 0.005;
 

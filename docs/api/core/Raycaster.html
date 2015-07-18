@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		This class makes raycasting easier. Raycasting is used for picking and more.
+		</div>
+
+		<h2>Example</h2>
+		<code>
+		var raycaster = new THREE.Raycaster();
+		var mouse = new THREE.Vector2();
+
+		function onMouseMove( event ) {
+
+			// calculate mouse position in normalized device coordinates
+			// (-1 to +1) for both components
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;		
+		
+		}
+
+		function render() {
+
+			// update the picking ray with the camera and mouse position	
+			raycaster.setFromCamera( mouse, camera );	
+
+			// calculate objects intersecting the picking ray
+			var intersects = raycaster.intersectObjects( scene.children );
+
+			for ( var i = 0; i < intersects.length; i++ ) {
+
+				intersects[ i ].object.material.color.set( 0xff0000 );
+			
+			}
+			
+			renderer.render( scene, camera );
+
+		}
+
+		window.addEventListener( 'mousemove', onMouseMove, false );
+
+		window.requestAnimationFrame(render);
+
+		</code>
+		<div>Examples: [example:webgl_interactive_cubes Raycasting to a Mesh], 
+			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera], 
+			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry], 
+			[example:webgl_interactive_lines Raycasting to a Line], 
+			[example:webgl_interactive_raycasting_pointcloud Raycasting to a PointCloud], 
+			[example:webgl_geometry_terrain_raycast Terrain raycasting], 
+			[example:webgl_octree_raycasting Raycasting using an octree],
+			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]</div>
+
+
+		<div>
+		</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Vector3 origin], [page:Vector3 direction], [page:Float near], [page:Float far] ) {</h3>
+		<div>
+		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
+		[page:Vector3 direction] — The direction vector that  gives direction to the ray.<br />
+		[page:Float near] — All results returned are further away than near. Near can't be negative. Default value is 0.<br />
+		[page:Float far] — All results returned are closer then far. Far can't be lower then near . Default value is Infinity.
+		</div>
+		<div>
+		This creates a new raycaster object.<br />
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Ray ray]</h3>
+		<div>
+		The Ray used for the raycasting.
+		</div>
+
+		<h3>[property:float near]</h3>
+		<div>
+		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
+		This value shouldn't be negative and should be smaller than the far property. 
+		</div>
+
+		<h3>[property:float far]</h3>
+		<div>
+		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
+		This value shouldn't be negative and should be larger than the near property. 
+		</div>
+
+		<h3>[property:float precision]</h3>
+		<div>
+		The precision factor of the raycaster when intersecting [page:Mesh] objects. 
+		</div>
+
+		<h3>.[page:float linePrecision]</h3>
+		<div>
+		The precision factor of the raycaster when intersecting [page:Line] objects. 
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null set]( [page:Vector3 origin], [page:Vector3 direction] )</h3>
+		<div>
+		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
+		[page:Vector3 direction] — The direction vector that  gives direction to the ray.
+		</div>
+		<div>
+		Updates the ray with a new origin and direction.
+		</div>
+
+		<h3>[method:null setFromCamera]( [page:Vector2 coords], [page:Camera camera] )</h3>
+		<div>
+		[page:Vector2 coords] — 2D coordinates of the mouse, in normalized device coordinates (NDC)---X and Y components should be between -1 and 1.<br />
+		[page:Camera camera] — camera from which the ray should originate
+		</div>
+		<div>
+		Updates the ray with a new origin and direction.
+		</div>
+
+
+		<h3>[method:Array intersectObject]( [page:Object3D object], [page:Boolean recursive] )</h3>
+		<div>
+		<p>
+		[page:Object3D object] — The object to check for intersection with the ray.<br />
+		[page:Boolean recursive] — If set, it also checks all descendants. Otherwise it only checks intersecton with the object.
+		</p>
+		</div>
+		<div>
+		Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first. An array of intersections is returned...
+        <code>
+            [ { distance, point, face, faceIndex, indices, object }, ... ]
+        </code>
+        <p>
+        [page:Float distance] – distance between the origin of the ray and the intersection<br />
+        [page:Vector3 point] – point of intersection, in world coordinates<br />
+        [page:Face3 face] – intersected face<br />
+        [page:Integer faceIndex] – index of the intersected face<br />
+        [page:Array indices] – indices of vertices comprising the intersected face<br />
+        [page:Object3D object] – the intersected object
+    	</p>
+        <p>
+        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. 
+        </p>
+		<p>
+		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:PointCloud pointclouds].
+		</p>
+		<p>
+		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.  
+		</p>
+		</div>
+
+		<h3>[method:Array intersectObjects]( [page:Array objects], [page:Boolean recursive] )</h3>
+		<div>
+		[page:Array objects] — The objects to check for intersection with the ray.<br />
+		[page:Boolean recursive] — If set, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects.
+		</div>
+		<div>
+		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

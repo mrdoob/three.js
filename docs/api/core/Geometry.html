@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		Base class for geometries.<br />
+		A geometry holds all data necessary to describe a 3D model.
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.Geometry();
+
+		geometry.vertices.push(
+			new THREE.Vector3( -10,  10, 0 ),
+			new THREE.Vector3( -10, -10, 0 ),
+			new THREE.Vector3(  10, -10, 0 )
+		);
+
+		geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+		geometry.computeBoundingSphere();
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<div>
+		The constructor takes no arguments.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Integer id]</h3>
+		<div>
+		Unique number for this geometry instance.
+		</div>
+
+		<h3>[property:String name]</h3>
+		<div>
+		Name for this geometry. Default is an empty string.
+		</div>
+
+		<h3>[property:Array vertices]</h3>
+		<div>
+		Array of [page:Vector3 vertices].<br />
+		The array of vertices holds every position of points in the model.<br />
+		To signal an update in this array, [page:Geometry Geometry.verticesNeedUpdate] needs to be set to true.
+		</div>
+
+		<h3>[property:Array colors]</h3>
+		<div>
+		Array of vertex [page:Color colors], matching number and order of vertices.<br />
+		Used in [page:PointCloud] and [page:Line].<br />
+		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.<br />
+		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
+		</div>
+
+		<h3>[property:Array faces]</h3>
+		<div>
+		Array of [page:Face3 triangles].<br />
+		The array of faces describe how each vertex in the model is connected with each other.<br />
+		To signal an update in this array, [page:Geometry Geometry.elementsNeedUpdate] needs to be set to true.
+		</div>
+
+		<h3>[property:Array faceVertexUvs]</h3>
+		<div>
+		Array of face [page:UV] layers.<br />
+		Each UV layer is an array of [page:UV]s matching the order and number of vertices in faces.<br />
+		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
+		</div>
+
+		<h3>[property:Array morphTargets]</h3>
+		<div>
+		Array of morph targets. Each morph target is a Javascript object:
+		<code>{ name: "targetName", vertices: [ new THREE.Vector3(), ... ] }</code>
+		Morph vertices match number and order of primary vertices.
+		</div>
+
+		<h3>[property:Array morphColors]</h3>
+		<div>
+		Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:
+		<code>morphColor = { name: "colorName", colors: [ new THREE.Color(), ... ] }</code>
+		Morph colors can match either the number and order of faces (face colors) or the number of vertices (vertex colors).
+		</div>
+
+		<h3>[property:Array morphNormals]</h3>
+		<div>
+		Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
+		<code>morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }</code>
+		</div>
+
+		<h3>[property:Array skinWeights]</h3>
+		<div>
+		Array of skinning weights, matching number and order of vertices.
+		</div>
+
+		<h3>[property:Array skinIndices]</h3>
+		<div>
+		Array of skinning indices, matching number and order of vertices.
+		</div>
+
+		<h3>[property:Object boundingBox]</h3>
+		<div>
+		Bounding box.
+		<code>{ min: new THREE.Vector3(), max: new THREE.Vector3() }</code>
+		</div>
+
+		<h3>[property:Object boundingSphere]</h3>
+		<div>
+		Bounding sphere.
+		<code>{ radius: float }</code>
+		</div>
+
+		<h3>[property:Boolean hasTangents]</h3>
+		<div>
+		True if geometry has tangents. Set in [page:Geometry Geometry.computeTangents].
+		</div>
+
+		<h3>[property:Boolean dynamic]</h3>
+		<div>
+		Set to *true* if attribute buffers will need to change in runtime (using "dirty" flags).<br/>
+		Unless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.<br/>
+		Defaults to true.
+		</div>
+		
+		<h3>[property:Boolean verticesNeedUpdate]</h3>
+		<div>
+		Set to *true* if the vertices array has been updated.
+		</div>
+		
+		<h3>[property:Boolean elementsNeedUpdate]</h3>
+		<div>
+		Set to *true* if the faces array has been updated.
+		</div>
+		
+		<h3>[property:Boolean uvsNeedUpdate]</h3>
+		<div>
+		Set to *true* if the uvs array has been updated.
+		</div>
+		
+		<h3>[property:Boolean normalsNeedUpdate]</h3>
+		<div>
+		Set to *true* if the normals array has been updated.
+		</div>
+		
+		<h3>[property:Boolean tangentsNeedUpdate]</h3>
+		<div>
+		Set to *true* if the tangents in the faces has been updated.
+		</div>
+		
+		<h3>[property:Boolean colorsNeedUpdate]</h3>
+		<div>
+		Set to *true* if the colors array has been updated.
+		</div>
+		
+		<h3>[property:Boolean lineDistancesNeedUpdate]</h3>
+		<div>
+		Set to *true* if the linedistances array has been updated.
+		</div>
+
+		<h3>[property:array lineDistances]</h3>
+		<div>
+		An array containing distances between vertices for Line geometries.
+		This is required for LinePieces/LineDashedMaterial to render correctly.
+		Line distances can also be generated with computeLineDistances.
+		</div> 
+
+		<h2>Methods</h2>
+		
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
+		<h3>[method:null applyMatrix]( [page:Matrix4 matrix] )</h3>
+		<div>
+		Bakes matrix transform directly into vertex coordinates.
+		</div>
+
+		<h3>[method:null computeFaceNormals]()</h3>
+		<div>
+		Computes face normals.
+		</div>
+
+		<h3>[method:null computeVertexNormals]()</h3>
+		<div>
+		Computes vertex normals by averaging face normals.<br />
+		Face normals must be existing / computed beforehand.
+		</div>
+
+		<h3>[method:null computeMorphNormals]()</h3>
+		<div>
+		Computes morph normals.
+		</div>
+
+		<h3>[method:null computeTangents]()</h3>
+		<div>
+		Computes vertex tangents.<br />
+		Based on [link:http://www.terathon.com/code/tangent.html]<br />
+		Geometry must have vertex [page:UV UVs] (layer 0 will be used).
+		</div>
+
+		<h3>[method:null computeBoundingBox]()</h3>
+		<div>
+		Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.
+		</div>
+
+		<h3>[method:null computeBoundingSphere]()</h3>
+		<div>
+		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.
+		</div>
+		
+		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
+
+		<h3>[method:null merge]( [page:Geometry geometry], [page:Matrix4 matrix], [page:Integer materialIndexOffset] )</h3>
+		<div>Merge two geometries or geometry and geometry from object (using object's transform)</div>
+
+		<h3>[method:null mergeVertices]()</h3>
+		<div>
+		Checks for duplicate vertices using hashmap.<br />
+		Duplicated vertices are removed and faces' vertices are updated.
+		</div>
+		
+		<h3>[method:Geometry clone]()</h3>
+		<div>
+		Creates a new clone of the Geometry.
+		</div>
+		
+		<h3>[method:null dispose]()</h3>
+		<div>
+		Removes The object from memory. <br />
+		Don't forget to call this method when you remove a geometry because it can cause memory leaks. 
+		</div>
+
+		<h3>[method:null computeLineDistances]()</h3>
+		<div>
+		Compute distances between vertices for Line geometries.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

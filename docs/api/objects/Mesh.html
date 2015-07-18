@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Base class for Mesh objects, such as [page:MorphAnimMesh] and [page:SkinnedMesh].</div>
+
+
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
+
+		<div>
+		geometry — An instance of [page:Geometry].<br />
+		material — An instance of [page:Material] (optional).
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Geometry geometry]</h3>
+
+		<div>An instance of [page:Geometry], defining the object's structure.</div>
+
+		<h3>[property:Material material]</h3>
+
+		<div>An instance of [page:Material], defining the object's appearance. Default is a [page:MeshBasicMaterial] with wireframe mode enabled and randomised colour.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:Integer getMorphTargetIndexByName]( [page:String name] )</h3>
+		<div>
+		name — a morph target name<br />
+		</div>
+		<div>
+		Returns the index of a morph target defined by name.
+		</div>
+
+
+		<h3>[method:null updateMorphTargets]()</h3>
+		<div>
+		Updates the morphtargets to have no influence on the object.
+		</div>
+
+		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
+		<div>
+		Get intersections between a casted ray and this mesh. [page:Raycaster.intersectObject] will call this method.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

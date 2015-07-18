@@ -1,48 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - dynamic - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #fff;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 
-			background-color: #000;
-			margin: 0px;
-			overflow: hidden;
-		    }
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-		    #info {
-					color:#fff;
-			position: absolute;
-			top: 0px; width: 100%;
-			padding: 5px;
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
 
-		    }
-
-		    a { color: red; }
-
+			a {
+				color: red;
+			}
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-				<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl dynamic particles + postprocessing
-				- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank">Reallusion</a>
-				<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank">iClone</a>,
-				<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl dynamic particles + postprocessing
+			- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank">Reallusion</a>
+			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank">iClone</a>,
+			<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>
+		</div>
 
-			</div>
+		<script src="../build/three.min.js"></script>
 
-		<script src="../build/Three.js"></script>
+		<script src="js/loaders/BinaryLoader.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FocusShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
@@ -52,7 +56,6 @@
 		<script src="js/postprocessing/FilmPass.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
 
 		<script>
 
@@ -71,8 +74,6 @@
 
 			var aloader, bloader;
 
-			var total = 0, totaln = 0;
-
 			var composer, effectFocus;
 
 			var clock = new THREE.Clock();
@@ -88,7 +89,6 @@
 				camera.position.set( 0, 700, 7000 );
 
 				scene = new THREE.Scene();
-
 				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
 
 				camera.lookAt( scene.position );
@@ -136,26 +136,23 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				//
 
 				parent = new THREE.Object3D();
 				scene.add( parent );
 
-				var grid = new THREE.ParticleSystem( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.ParticleBasicMaterial( { color: 0xff0000, size: 10 } ) );
-				grid.rotation.x = Math.PI/2;
+				var grid = new THREE.PointCloud( new THREE.PlaneBufferGeometry( 15000, 15000, 64, 64 ), new THREE.PointCloudMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.position.y = -400;
+				grid.rotation.x = - Math.PI / 2;
 				parent.add( grid );
-
-				totaln += 1;
-				total += grid.geometry.vertices.length;
 
 				// postprocessing
 
@@ -163,7 +160,7 @@
 				var effectBloom = new THREE.BloomPass( 0.75 );
 				var effectFilm = new THREE.FilmPass( 0.5, 0.5, 1448, false );
 
-				effectFocus = new THREE.ShaderPass( THREE.ShaderExtras[ "focus" ] );
+				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
 				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
 				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
@@ -215,9 +212,9 @@
 
 				for ( i = 0; i < vl; i ++ ) {
 
-					p = vertices[ i ].position;
+					p = vertices[ i ];
 
-					geometry.vertices[ i ] = new THREE.Vertex( p.clone() );
+					geometry.vertices[ i ] = p.clone();
 					vertices_tmp[ i ] = [ p.x, p.y, p.z, 0, 0 ];
 
 				}
@@ -242,7 +239,7 @@
 
 						c = ( i < clones.length -1 ) ? 0x252525 : color;
 
-						mesh = new THREE.ParticleSystem( geometry, new THREE.ParticleBasicMaterial( { size: 3, color: c } ) );
+						mesh = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { size: 3, color: c } ) );
 						mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
 
 						mesh.position.x = x + clones[ i ][ 0 ];
@@ -255,12 +252,9 @@
 
 					}
 
-					totaln += clones.length;
-					total += clones.length * vl;
-
 				} else {
 
-					mesh = new THREE.ParticleSystem( geometry, new THREE.ParticleBasicMaterial( { size: 3, color: color } ) );
+					mesh = new THREE.PointCloud( geometry, new THREE.PointCloudMaterial( { size: 3, color: color } ) );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
 
 					mesh.position.x = x;
@@ -268,9 +262,6 @@
 					mesh.position.z = z;
 
 					parent.add( mesh );
-
-					totaln += 1;
-					total += vl;
 
 				}
 
@@ -280,8 +271,7 @@
 					mesh: mesh, vertices: geometry.vertices, vertices_tmp: vertices_tmp, vl: vl,
 					down: 0, up: 0, direction: 0, speed: 35, delay: Math.floor( 200 + 200 * Math.random() ),
 					started: false, start: Math.floor( 100 + 200 * Math.random() ),
-					dynamic: dynamic,
-					bb: geometry.boundingBox
+					dynamic: dynamic
 				} );
 
 			}
@@ -298,7 +288,7 @@
 
 			function render () {
 
-				delta = 10 * clock.getDelta();;
+				delta = 10 * clock.getDelta();
 
 				delta = delta < 2 ? delta : 2;
 
@@ -338,7 +328,7 @@
 
 					for ( i = 0; i < vl; i ++ ) {
 
-						p = vertices[ i ].position;
+						p = vertices[ i ];
 						vt = vertices_tmp[ i ];
 
 						// falling down
@@ -453,7 +443,7 @@
 
 					}
 
-					mesh.geometry.__dirtyVertices = true;
+					mesh.geometry.verticesNeedUpdate = true;
 
 				}
 

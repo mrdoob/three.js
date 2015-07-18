@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - multiple canvases - complex</title>
@@ -58,13 +58,12 @@
 			<div id="container2"></div>
 			<div id="container3"></div>
 		</div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - multiple canvases - complex</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple canvases - complex</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -131,33 +130,52 @@
 					light.position.set( 0, 0, 1 ).normalize();
 					scene.add( light );
 
-					var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
-					var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
+					// shadow
+
+					var canvas = document.createElement( 'canvas' );
+					canvas.width = 128;
+					canvas.height = 128;
+
+					var context = canvas.getContext( '2d' );
+					var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+					gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
+					gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
+
+					context.fillStyle = gradient;
+					context.fillRect( 0, 0, canvas.width, canvas.height );
+
+					var shadowTexture = new THREE.Texture( canvas );
+					shadowTexture.needsUpdate = true;
+
+					var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
+					var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;
-					mesh.rotation.x = - 90 * Math.PI / 180;
+					mesh.rotation.x = - Math.PI / 2;
 					scene.add( mesh );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-					mesh.position.y = - 250;
 					mesh.position.x = - 400;
-					mesh.rotation.x = - 90 * Math.PI / 180;
+					mesh.position.y = - 250;
+					mesh.rotation.x = - Math.PI / 2;
 					scene.add( mesh );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-					mesh.position.y = - 250;
 					mesh.position.x = 400;
-					mesh.rotation.x = - 90 * Math.PI / 180;
+					mesh.position.y = - 250;
+					mesh.rotation.x = - Math.PI / 2;
 					scene.add( mesh );
 
 					var faceIndices = [ 'a', 'b', 'c', 'd' ];
 
 					var color, f1, f2, f3, p, n, vertexIndex,
 
-						geometry1 = new THREE.IcosahedronGeometry( 1 ),
-						geometry2 = new THREE.IcosahedronGeometry( 1 ),
-						geometry3 = new THREE.IcosahedronGeometry( 1 );
+						radius = 200,
+
+						geometry1 = new THREE.IcosahedronGeometry( radius, 1 ),
+						geometry2 = new THREE.IcosahedronGeometry( radius, 1 ),
+						geometry3 = new THREE.IcosahedronGeometry( radius, 1 );
 
 					for ( var i = 0; i < geometry1.faces.length; i ++ ) {
 
@@ -171,20 +189,20 @@
 
 							vertexIndex = f1[ faceIndices[ j ] ];
 
-							p = geometry1.vertices[ vertexIndex ].position;
+							p = geometry1.vertices[ vertexIndex ];
 
 							color = new THREE.Color( 0xffffff );
-							color.setHSV( ( p.y + 1 ) / 2, 1.0, 1.0 );
+							color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
 
 							f1.vertexColors[ j ] = color;
 
 							color = new THREE.Color( 0xffffff );
-							color.setHSV( 0.0, ( p.y + 1 ) / 2, 1.0 );
+							color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
 
 							f2.vertexColors[ j ] = color;
 
 							color = new THREE.Color( 0xffffff );
-							color.setHSV( 0.125 * vertexIndex / geometry1.vertices.length, 1.0, 1.0 );
+							color.setHSL( 0.125 * vertexIndex / geometry1.vertices.length, 1.0, 0.5 );
 
 							f3.vertexColors[ j ] = color;
 
@@ -199,11 +217,6 @@
 						new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
 
 					];
-
-					var scaleMatrix = new THREE.Matrix4().setScale( 200, 200, 200 );
-					geometry1.applyMatrix( scaleMatrix );
-					geometry2.applyMatrix( scaleMatrix );
-					geometry3.applyMatrix( scaleMatrix );
 
 					group1 = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
 					group1.position.x = -400;
@@ -221,8 +234,9 @@
 					scene.add( group3 );
 
 					renderer = new THREE.WebGLRenderer( { antialias: true } );
+					renderer.setClearColor( 0xffffff );
+					renderer.setPixelRatio( window.devicePixelRatio );
 					renderer.setSize( container.clientWidth, container.clientHeight );
-
 					container.appendChild( renderer.domElement );
 
 					stats = new Stats();

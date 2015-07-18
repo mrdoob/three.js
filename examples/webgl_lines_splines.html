@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - lines - splines</title>
@@ -40,15 +40,16 @@
 	<body>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - splines WebGL demo
+			<a href="http://threejs.org" target="_blank">three.js</a> - splines WebGL demo
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/geometries/hilbert3D.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -77,8 +78,8 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				var geometry = new THREE.Geometry(),
@@ -98,17 +99,16 @@
 					index = i / ( points.length * n_sub );
 					position = spline.getPoint( index );
 
-					geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
+					geometry.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSV( 0.6, ( 200 + position.x ) / 400, 1.0 );
+					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, - position.x / 200 ) + 0.5 );
 
 					colors2[ i ] = new THREE.Color( 0xffffff );
-					//colors2[ i ].setHSV( 0.1, 1.0, ( 200 + position.x ) / 400 );
-					colors2[ i ].setHSV( 0.9, ( 200 + position.y ) / 400, 1.0 );
+					colors2[ i ].setHSL( 0.9, 1.0, Math.max( 0, - position.y / 200 ) + 0.5 );
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSV( i / ( points.length * n_sub ), 1.0, 1.0 );
+					colors3[ i ].setHSL( i / ( points.length * n_sub ), 1.0, 0.5 );
 
 
 				}
@@ -121,14 +121,14 @@
 
 				// lines
 
-				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3 } );
+				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 
-				var line, p, scale = 0.3, d = 225,
-					parameters =  [ [ material, scale*1.5, [-d,0,0],  geometry ],
-									[ material, scale*1.5, [0,0,0],  geometry2 ],
-									[ material, scale*1.5, [d,0,0],  geometry3 ] ];
-
-				material.vertexColors = true;
+				var line, p, scale = 0.3, d = 225;
+				var parameters =  [
+					[ material, scale*1.5, [-d,0,0],  geometry ],
+					[ material, scale*1.5, [0,0,0],  geometry2 ],
+					[ material, scale*1.5, [d,0,0],  geometry3 ]
+				];
 
 				for ( i = 0; i < parameters.length; ++ i ) {
 
@@ -153,48 +153,21 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
-			// port of Processing Java code by Thomas Diewald
-			// http://www.openprocessing.org/visuals/?visualID=15599
+			function onWindowResize() {
 
-			function hilbert3D( center, side, iterations, v0, v1, v2, v3, v4, v5, v6, v7 ) {
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
-				var half = side/2,
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-					vec_s = [
-
-					new THREE.Vector3( center.x - half, center.y + half, center.z - half ),
-					new THREE.Vector3( center.x - half, center.y + half, center.z + half ),
-					new THREE.Vector3( center.x - half, center.y - half, center.z + half ),
-					new THREE.Vector3( center.x - half, center.y - half, center.z - half ),
-					new THREE.Vector3( center.x + half, center.y - half, center.z - half ),
-					new THREE.Vector3( center.x + half, center.y - half, center.z + half ),
-					new THREE.Vector3( center.x + half, center.y + half, center.z + half ),
-					new THREE.Vector3( center.x + half, center.y + half, center.z - half )
-
-					],
-
-					vec = [ vec_s[ v0 ], vec_s[ v1 ], vec_s[ v2 ], vec_s[ v3 ], vec_s[ v4 ], vec_s[ v5 ], vec_s[ v6 ], vec_s[ v7 ] ];
-
-				if( --iterations >= 0 ) {
-
-					var tmp = [];
-
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
-
-					return tmp;
-
-				}
-
-				return vec;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -247,9 +220,15 @@
 
 				var time = Date.now() * 0.0005;
 
-				for( var i = 0; i < scene.objects.length; i ++ ) {
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
-					scene.objects[ i ].rotation.y = time * ( i % 2 ? 1 : -1 );
+					var object = scene.children[ i ];
+
+					if ( object instanceof THREE.Line ) {
+
+						object.rotation.y = time * ( i % 2 ? 1 : -1 );
+
+					}
 
 				}
 

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - shapes</title>
@@ -14,13 +14,9 @@
 		</style>
 	</head>
 	<body>
-		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
-		<script src="../build/Three.js"></script>
-
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -28,7 +24,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -52,79 +48,83 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Simple procedurally generated 3D shapes example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin';
+				info.innerHTML = 'Simple procedurally generated 3D shapes<br/>Drag to spin';
 				container.appendChild( info );
-
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.y = 150;
-				camera.position.z = 500;
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 );
-				light.position.normalize();
-				scene.add( light );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 150, 500 );
+				scene.add( camera );
 
-				parent = new THREE.Object3D();
-				parent.position.y = 50;
-				scene.add( parent );
+				var light = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( light );
 
-				function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
+				group = new THREE.Group();
+				group.position.y = 50;
+				scene.add( group );
+
+				function addShape( shape, extrudeSettings, color, x, y, z, rx, ry, rz, s ) {
+
+					var points = shape.createPointsGeometry();
+					var spacedPoints = shape.createSpacedPointsGeometry( 50 );
+
+					// flat shape
+
+					var geometry = new THREE.ShapeGeometry( shape );
+
+					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide } ) );
+					mesh.position.set( x, y, z - 125 );
+					mesh.rotation.set( rx, ry, rz );
+					mesh.scale.set( s, s, s );
+					group.add( mesh );
 
 					// 3d shape
 
-					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ) ] );
+					var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+
+					var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
 					mesh.position.set( x, y, z - 75 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
-					parent.add( mesh );
+					group.add( mesh );
 
 					// solid line
 
-					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 2 } ) );
-					line.position.set( x, y, z + 25 );
+					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
+					line.position.set( x, y, z - 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.add( line );
-
-					// transparent line from real points
-
-					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.5 } ) );
-					line.position.set( x, y, z + 75 );
-					line.rotation.set( rx, ry, rz );
-					line.scale.set( s, s, s );
-					parent.add( line );
+					group.add( line );
 
 					// vertices from real points
 
-					var pgeo = THREE.GeometryUtils.clone( points );
-					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.75 } ) );
-					particles.position.set( x, y, z + 75 );
+					var pgeo = points.clone();
+					var particles = new THREE.PointCloud( pgeo, new THREE.PointCloudMaterial( { color: color, size: 4 } ) );
+					particles.position.set( x, y, z + 25 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
-					parent.add( particles );
+					group.add( particles );
 
-					// transparent line from equidistance sampled points
+					// line from equidistance sampled points
 
-					var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
-					line.position.set( x, y, z + 100 );
+					var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, linewidth: 3 } ) );
+					line.position.set( x, y, z + 75 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.add( line );
+					group.add( line );
 
 					// equidistance sampled points
 
-					var pgeo = THREE.GeometryUtils.clone( spacedPoints );
-					var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.5 } ) );
-					particles2.position.set( x, y, z + 100 );
+					var pgeo = spacedPoints.clone();
+					var particles2 = new THREE.PointCloud( pgeo, new THREE.PointCloudMaterial( { color: color, size: 4 } ) );
+					particles2.position.set( x, y, z + 125 );
 					particles2.rotation.set( rx, ry, rz );
 					particles2.scale.set( s, s, s );
-					parent.add( particles2 );
+					group.add( particles2 );
 
 				}
 
-				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; // bevelSegments: 2, steps: 2 , bevelSegments: 5, bevelSize: 8, bevelThickness:5,
 
 				// California
 
@@ -153,11 +153,10 @@
 				californiaPts.push( new THREE.Vector2 ( 600, 370 ) );
 				californiaPts.push( new THREE.Vector2 ( 610, 320 ) );
 
+				for( var i = 0; i < californiaPts.length; i ++ ) californiaPts[ i ].multiplyScalar( 0.25 );
+
 				var californiaShape = new THREE.Shape( californiaPts );
 
-				var california3d = new THREE.ExtrudeGeometry( californiaShape, { amount: 20	} );
-				var californiaPoints = californiaShape.createPointsGeometry();
-				var californiaSpacedPoints = californiaShape.createSpacedPointsGeometry( 100 );
 
 				// Triangle
 
@@ -166,10 +165,6 @@
 				triangleShape.lineTo(  40, 80 );
 				triangleShape.lineTo( 120, 80 );
 				triangleShape.lineTo(  80, 20 ); // close path
-
-				var triangle3d = triangleShape.extrude( extrudeSettings );
-				var trianglePoints = triangleShape.createPointsGeometry();
-				var triangleSpacedPoints = triangleShape.createSpacedPointsGeometry();
 
 
 				// Heart
@@ -186,11 +181,6 @@
 				heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
-				var heart3d = heartShape.extrude( extrudeSettings );
-				var heartPoints = heartShape.createPointsGeometry();
-				var heartSpacedPoints = heartShape.createSpacedPointsGeometry();
-
-				//heartShape.debug( document.getElementById("debug") );
 
 				// Square
 
@@ -203,9 +193,6 @@
 				squareShape.lineTo( sqLength, 0 );
 				squareShape.lineTo( 0, 0 );
 
-				var square3d = squareShape.extrude( extrudeSettings );
-				var squarePoints = squareShape.createPointsGeometry();
-				var squareSpacedPoints = squareShape.createSpacedPointsGeometry();
 
 				// Rectangle
 
@@ -218,20 +205,12 @@
 				rectShape.lineTo( rectLength, 0 );
 				rectShape.lineTo( 0, 0 );
 
-				var rect3d = rectShape.extrude( extrudeSettings );
-				var rectPoints = rectShape.createPointsGeometry();
-				var rectSpacedPoints = rectShape.createSpacedPointsGeometry();
 
 				// Rounded rectangle
 
 				var roundedRectShape = new THREE.Shape();
-				roundedRect( roundedRectShape, 0, 0, 50, 50, 20 );
 
-				var roundedRect3d = roundedRectShape.extrude( extrudeSettings );
-				var roundedRectPoints = roundedRectShape.createPointsGeometry();
-				var roundedRectSpacedPoints = roundedRectShape.createSpacedPointsGeometry();
-
-				function roundedRect( ctx, x, y, width, height, radius ){
+				( function roundedRect( ctx, x, y, width, height, radius ){
 
 					ctx.moveTo( x, y + radius );
 					ctx.lineTo( x, y + height - radius );
@@ -243,7 +222,19 @@
 					ctx.lineTo( x + radius, y );
 					ctx.quadraticCurveTo( x, y, x, y + radius );
 
-				}
+				} )( roundedRectShape, 0, 0, 50, 50, 20 );
+
+
+				// Track
+
+				var trackShape = new THREE.Shape();
+
+				trackShape.moveTo( 40, 40 );
+				trackShape.lineTo( 40, 160 );
+				trackShape.absarc( 60, 160, 20, Math.PI, 0, true );
+				trackShape.lineTo( 80, 40 );
+				trackShape.absarc( 60, 40, 20, 2 * Math.PI, Math.PI, true );
+
 
 				// Circle
 
@@ -255,13 +246,10 @@
 				circleShape.quadraticCurveTo( -circleRadius, -circleRadius, -circleRadius, 0 );
 				circleShape.quadraticCurveTo( -circleRadius, circleRadius, 0, circleRadius );
 
-				var circle3d = circleShape.extrude( extrudeSettings );
-				var circlePoints = circleShape.createPointsGeometry();
-				var circleSpacedPoints = circleShape.createSpacedPointsGeometry();
 
 				// Fish
 
-				x = y = 0;
+				var x = y = 0;
 
 				var fishShape = new THREE.Shape();
 
@@ -272,50 +260,37 @@
 				fishShape.quadraticCurveTo(x + 100, y + 10, x + 90, y + 10);
 				fishShape.quadraticCurveTo(x + 50, y + 80, x, y);
 
-				var fish3d = fishShape.extrude( extrudeSettings );
-				var fishPoints = fishShape.createPointsGeometry();
-				var fishSpacedPoints = fishShape.createSpacedPointsGeometry();
 
 				// Arc circle
 
 				var arcShape = new THREE.Shape();
-				arcShape.moveTo( 0, 0 );
-				arcShape.arc( 10, 10, 40, 0, Math.PI*2, false );
+				arcShape.moveTo( 50, 10 );
+				arcShape.absarc( 10, 10, 40, 0, Math.PI*2, false );
 
 				var holePath = new THREE.Path();
-				holePath.moveTo( 0, 0 );
-				holePath.arc( 10, 10, 10, 0, Math.PI*2, true );
+				holePath.moveTo( 20, 10 );
+				holePath.absarc( 10, 10, 10, 0, Math.PI*2, true );
 				arcShape.holes.push( holePath );
-
-				var arc3d = arcShape.extrude( extrudeSettings );
-				var arcPoints = arcShape.createPointsGeometry();
-				var arcSpacedPoints = arcShape.createSpacedPointsGeometry();
 
 
 				// Smiley
 
 				var smileyShape = new THREE.Shape();
-				smileyShape.moveTo( 0, 0 );
-				smileyShape.arc( 40, 40, 40, 0, Math.PI*2, false );
+				smileyShape.moveTo( 80, 40 );
+				smileyShape.absarc( 40, 40, 40, 0, Math.PI*2, false );
 
 				var smileyEye1Path = new THREE.Path();
-				smileyEye1Path.moveTo( 0, 0 );
-				smileyEye1Path.arc( 25, 20, 10, 0, Math.PI*2, true );
+				smileyEye1Path.moveTo( 35, 20 );
+				smileyEye1Path.absellipse( 25, 20, 10, 10, 0, Math.PI*2, true );
+
 				smileyShape.holes.push( smileyEye1Path );
 
 				var smileyEye2Path = new THREE.Path();
-				smileyEye2Path.moveTo( 0, 0 );
-				smileyEye2Path.arc( 55, 20, 10, 0, Math.PI*2, true );
+				smileyEye2Path.moveTo( 65, 20 );
+				smileyEye2Path.absarc( 55, 20, 10, 0, Math.PI*2, true );
 				smileyShape.holes.push( smileyEye2Path );
 
 				var smileyMouthPath = new THREE.Path();
-				// ugly box mouth
-				// smileyMouthPath.moveTo( 20, 40 );
-				// smileyMouthPath.lineTo( 60, 40 );
-				// smileyMouthPath.lineTo( 60, 60 );
-				// smileyMouthPath.lineTo( 20, 60 );
-				// smileyMouthPath.lineTo( 20, 40 );
-
 				smileyMouthPath.moveTo( 20, 40 );
 				smileyMouthPath.quadraticCurveTo( 40, 60, 60, 40 );
 				smileyMouthPath.bezierCurveTo( 70, 45, 70, 50, 60, 60 );
@@ -325,55 +300,40 @@
 				smileyShape.holes.push( smileyMouthPath );
 
 
-				var smiley3d = smileyShape.extrude( extrudeSettings );
-				var smileyPoints = smileyShape.createPointsGeometry();
-				var smileySpacedPoints = smileyShape.createSpacedPointsGeometry();
-
-				// Spline shape + path extrusion
+				// Spline shape
 
 				var splinepts = [];
-				splinepts.push( new THREE.Vector2 ( 350, 100 ) );
-				splinepts.push( new THREE.Vector2 ( 400, 450 ) );
-				splinepts.push( new THREE.Vector2 ( -140, 350 ) );
+				splinepts.push( new THREE.Vector2 ( 70, 20 ) );
+				splinepts.push( new THREE.Vector2 ( 80, 90 ) );
+				splinepts.push( new THREE.Vector2 ( -30, 70 ) );
 				splinepts.push( new THREE.Vector2 ( 0, 0 ) );
 
-				var splineShape = new THREE.Shape(  );
+				var splineShape = new THREE.Shape();
 				splineShape.moveTo( 0, 0 );
 				splineShape.splineThru( splinepts );
 
-				//splineShape.debug( document.getElementById("debug") );
+				var extrudeSettings = { amount: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
-				var extrudePath = new THREE.Path();
+				// addShape( shape, color, x, y, z, rx, ry,rz, s );
 
-				extrudePath.moveTo( 0, 0 );
-				extrudePath.lineTo( 10, 10 );
-				extrudePath.quadraticCurveTo( 80, 60, 160, 10 );
-				extrudePath.quadraticCurveTo( 240, -40, 320, 10 );
-
-				extrudeSettings.extrudePath = extrudePath;
-				extrudeSettings.bevelEnabled = false;
-
-				var splineShape3d = splineShape.extrude( extrudeSettings );
-				var splinePoints = splineShape.createPointsGeometry( );
-				var splineSpacedPoints = splineShape.createSpacedPointsGeometry( );
-
-				addGeometry( california3d, californiaPoints, californiaSpacedPoints,	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
-				addGeometry( triangle3d, trianglePoints, triangleSpacedPoints, 			0xffee00, -180,    0, 0,     0, 0, 0, 1 );
-				addGeometry( roundedRect3d, roundedRectPoints, roundedRectSpacedPoints,	0x005500, -150,  150, 0,     0, 0, 0, 1 );
-				addGeometry( square3d, squarePoints, squareSpacedPoints,				0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
-				addGeometry( heart3d, heartPoints, heartSpacedPoints,					0xff1100,    0,  100, 0, 	 Math.PI, 0, 0, 1 );
-				addGeometry( circle3d, circlePoints, circleSpacedPoints,				0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
-				addGeometry( fish3d, fishPoints, fishSpacedPoints,						0x222222,  -60,  200, 0,     0, 0, 0, 1 );
-				addGeometry( splineShape3d, splinePoints, splineSpacedPoints,			0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
-				addGeometry( arc3d, arcPoints, arcSpacedPoints,							0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
-				addGeometry( smiley3d, smileyPoints, smileySpacedPoints,				0xee00ff,  -270,    250, 0,  Math.PI, 0, 0, 1 );
-
+				addShape( californiaShape,  extrudeSettings, 0xf08000, -300, -100, 0, 0, 0, 0, 1 );
+				addShape( triangleShape,    extrudeSettings, 0x8080f0, -180,    0, 0, 0, 0, 0, 1 );
+				addShape( roundedRectShape, extrudeSettings, 0x008000, -150,  150, 0, 0, 0, 0, 1 );
+				addShape( trackShape,       extrudeSettings, 0x008080,  200, -100, 0, 0, 0, 0, 1 );
+				addShape( squareShape,      extrudeSettings, 0x0040f0,  150,  100, 0, 0, 0, 0, 1 );
+				addShape( heartShape,       extrudeSettings, 0xf00000,   60,  100, 0, 0, 0, Math.PI, 1 );
+				addShape( circleShape,      extrudeSettings, 0x00f000,  120,  250, 0, 0, 0, 0, 1 );
+				addShape( fishShape,        extrudeSettings, 0x404040,  -60,  200, 0, 0, 0, 0, 1 );
+				addShape( smileyShape,      extrudeSettings, 0xf000f0, -200,  250, 0, 0, 0, Math.PI, 1 );
+				addShape( arcShape,         extrudeSettings, 0x804000,  150,    0, 0, 0, 0, 0, 1 );
+				addShape( splineShape,      extrudeSettings, 0x808080,  -50, -100, 0, 0, 0, 0, 1 );
 
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-                renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -384,6 +344,22 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -465,7 +441,7 @@
 
 			function render() {
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

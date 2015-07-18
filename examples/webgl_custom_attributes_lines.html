@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - custom attributes [lines]</title>
@@ -28,14 +28,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
-		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="fonts/helvetiker_bold.typeface.js"></script>
 
@@ -96,7 +95,6 @@
 			bevelSize = 1.5,
 			bevelSegments = 10,
 			bevelEnabled = true,
-			bend = false,
 
 			font = "helvetiker", 		// helvetiker, optimer, gentilis, droid sans, droid serif
 			weight = "bold",		// normal bold
@@ -110,12 +108,10 @@
 
 		function init() {
 
-			scene = new THREE.Scene();
-
 			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 400;
 
-			scene.add( camera );
+			scene = new THREE.Scene();
 
 			attributes = {
 
@@ -134,13 +130,13 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
+				uniforms:       uniforms,
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-				blending: 		THREE.AdditiveBlending,
-				depthTest:		false,
-				transparent:	true
+				blending:       THREE.AdditiveBlending,
+				depthTest:      false,
+				transparent:    true
 
 			});
 
@@ -161,15 +157,13 @@
 				bevelEnabled: bevelEnabled,
 				bevelSegments: bevelSegments,
 
-				bend: bend,
-
 				steps: steps
 
 			});
 
 			geometry.dynamic = true;
 
-			THREE.GeometryUtils.center( geometry );
+			geometry.center();
 
 			object = new THREE.Line( geometry, shaderMaterial, THREE.LineStrip );
 
@@ -180,10 +174,10 @@
 
 			for( var v = 0; v < vertices.length; v ++ ) {
 
-				displacement[ v ] = new THREE.Vector3( 0, 0, 0 );
+				displacement[ v ] = new THREE.Vector3();
 
 				color[ v ] = new THREE.Color( 0xffffff );
-				color[ v ].setHSV( v / vertices.length, 0.9, 0.9 );
+				color[ v ].setHSL( v / vertices.length, 0.5, 0.5 );
 
 			}
 
@@ -191,7 +185,9 @@
 
 			scene.add( object );
 
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0x050505 );
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );
@@ -201,6 +197,19 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -220,7 +229,7 @@
 			object.rotation.y = 0.25 * time;
 
 			uniforms.amplitude.value = 0.5 * Math.sin( 0.5 * time );
-			THREE.ColorUtils.adjustHSV( uniforms.color.value, 0.0005, 0, 0 );
+			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
 			var nx, ny, nz, value;
 

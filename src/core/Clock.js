@@ -14,52 +14,59 @@ THREE.Clock = function ( autoStart ) {
 
 };
 
-THREE.Clock.prototype.start = function () {
+THREE.Clock.prototype = {
 
-	this.startTime = Date.now();
-	this.oldTime = this.startTime;
+	constructor: THREE.Clock,
 
-	this.running = true;
+	start: function () {
 
-};
+		this.startTime = self.performance !== undefined && self.performance.now !== undefined
+					 ? self.performance.now()
+					 : Date.now();
 
-THREE.Clock.prototype.stop = function () {
+		this.oldTime = this.startTime;
+		this.running = true;
+	},
 
-	this.getElapsedTime();
+	stop: function () {
 
-	this.running = false;
+		this.getElapsedTime();
+		this.running = false;
 
-};
+	},
 
-THREE.Clock.prototype.getElapsedTime = function () {
+	getElapsedTime: function () {
 
-	this.elapsedTime += this.getDelta();
+		this.getDelta();
+		return this.elapsedTime;
 
-	return this.elapsedTime;
+	},
 
-};
+	getDelta: function () {
 
+		var diff = 0;
 
-THREE.Clock.prototype.getDelta = function () {
+		if ( this.autoStart && ! this.running ) {
 
-	var diff = 0;
+			this.start();
 
-	if ( this.autoStart && ! this.running ) {
+		}
 
-		this.start();
+		if ( this.running ) {
+
+			var newTime = self.performance !== undefined && self.performance.now !== undefined
+					 ? self.performance.now()
+					 : Date.now();
+
+			diff = 0.001 * ( newTime - this.oldTime );
+			this.oldTime = newTime;
+
+			this.elapsedTime += diff;
+
+		}
+
+		return diff;
 
 	}
-
-	if ( this.running ) {
-
-		var newTime = Date.now();
-		diff = 0.001 * ( newTime - this.oldTime );
-		this.oldTime = newTime;
-
-		this.elapsedTime += diff;
-
-	}
-
-	return diff;
 
 };

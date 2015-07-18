@@ -2,476 +2,468 @@
 
 "metadata" :
 {
-    "formatVersion" : 3,
-    "sourceFile"    : "scene.blend",
-    "generatedBy"   : "Blender 2.60 Exporter",
-    "objects"       : 27,
-    "geometries"    : 3,
-    "materials"     : 3,
-    "textures"      : 0
+	"formatVersion" : 3.2,
+	"type"          : "scene",
+	"sourceFile"    : "scene.blend",
+	"generatedBy"   : "Blender 2.65 Exporter",
+	"objects"       : 29,
+	"geometries"    : 3,
+	"materials"     : 3,
+	"textures"      : 0
 },
 
-"type" : "scene",
 "urlBaseType" : "relativeToScene",
 
 
 "objects" :
 {
-    "Cube.006" : {
-        "geometry"  : "geo_Cube",
-        "groups"    : [  ],
-        "materials" : [ "Material" ],
-        "position"  : [ 10.623673, 0.321692, 3.370784 ],
-        "rotation"  : [ 0.005265, 0.056306, 1.566005 ],
-        "quaternion": [ 0.708568, -0.017992, 0.021809, 0.705076 ],
-        "scale"     : [ 8.310000, 0.120000, 4.930000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Cube.006" : {
+		"geometry"  : "geo_Cube",
+		"groups"    : [  ],
+		"material"  : "Material",
+		"position"  : [ 10.6237, 3.37078, -0.321692 ],
+		"rotation"  : [ -1.62708, 0.00553477, 1.56601 ],
+		"quaternion": [ -0.513755, 0.513985, 0.483143, 0.488311 ],
+		"scale"     : [ 8.31, 0.12, 4.93 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.018" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ 1.702659, -5.860421, 0.680278 ],
-        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
-        "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.018" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ 1.70266, 0.680277, 5.86042 ],
+		"rotation"  : [ 0.156946, -3.09251, 0.0901553 ],
+		"quaternion": [ -0.0429884, -0.995697, -0.0771868, 0.0279714 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.017" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ 0.081295, -5.808783, 0.639505 ],
-        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
-        "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.017" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ 0.0812951, 0.639505, 5.80878 ],
+		"rotation"  : [ 0.156946, -3.09251, 0.0901553 ],
+		"quaternion": [ -0.0429884, -0.995697, -0.0771868, 0.0279714 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.016" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -1.569030, -5.747240, 0.619385 ],
-        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
-        "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.016" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -1.56903, 0.619385, 5.74724 ],
+		"rotation"  : [ 0.156946, -3.09251, 0.0901553 ],
+		"quaternion": [ -0.0429884, -0.995697, -0.0771868, 0.0279714 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.015" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -3.129120, -5.709269, 0.552267 ],
-        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
-        "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.015" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -3.12912, 0.552266, 5.70927 ],
+		"rotation"  : [ 0.156946, -3.09251, 0.0901553 ],
+		"quaternion": [ -0.0429884, -0.995697, -0.0771868, 0.0279714 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.014" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -6.386331, -3.004400, 0.382167 ],
-        "rotation"  : [ 1.646237, 0.058425, 1.670594 ],
-        "quaternion": [ 0.471896, 0.477057, 0.556810, 0.489585 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.014" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -6.38633, 0.382167, 3.0044 ],
+		"rotation"  : [ -0.670006, 1.69226, 0.607818 ],
+		"quaternion": [ 0.00364945, 0.739913, -0.0475347, 0.671011 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.013" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -6.499331, -1.593073, 0.471640 ],
-        "rotation"  : [ 1.646237, 0.058425, 1.670594 ],
-        "quaternion": [ 0.471896, 0.477057, 0.556810, 0.489585 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.013" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -6.49933, 0.47164, 1.59307 ],
+		"rotation"  : [ -0.670006, 1.69226, 0.607818 ],
+		"quaternion": [ 0.00364945, 0.739913, -0.0475347, 0.671011 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.012" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -6.629794, -0.234131, 0.533840 ],
-        "rotation"  : [ 1.646237, 0.058425, 1.670594 ],
-        "quaternion": [ 0.471896, 0.477057, 0.556810, 0.489585 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.012" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -6.62979, 0.53384, 0.234131 ],
+		"rotation"  : [ -0.670006, 1.69226, 0.607818 ],
+		"quaternion": [ 0.00364945, 0.739913, -0.0475347, 0.671011 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.011" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -6.713673, 1.008146, 0.629835 ],
-        "rotation"  : [ 1.646237, 0.058425, 1.670594 ],
-        "quaternion": [ 0.471896, 0.477057, 0.556810, 0.489585 ],
-        "scale"     : [ 0.435837, 0.435837, 0.435837 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.011" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -6.71367, 0.629835, -1.00815 ],
+		"rotation"  : [ -0.670006, 1.69226, 0.607818 ],
+		"quaternion": [ 0.00364945, 0.739913, -0.0475347, 0.671011 ],
+		"scale"     : [ 0.435837, 0.435837, 0.435837 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.010" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -2.010442, -24.343616, 1.387332 ],
-        "rotation"  : [ -1.621122, -2.949867, -0.136972 ],
-        "quaternion": [ 0.016439, -0.116140, -0.679574, -0.724169 ],
-        "scale"     : [ 9.160008, 9.160008, 9.160007 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.010" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -2.01044, 1.38733, 24.3436 ],
+		"rotation"  : [ 0.0499381, 2.9952, 0.184673 ],
+		"quaternion": [ 0.0937477, 0.992596, 0.0315343, 0.0704984 ],
+		"scale"     : [ 9.16001, 9.16001, 9.16001 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.009" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -4.292194, 7.975398, 1.826282 ],
-        "rotation"  : [ 1.594819, -0.080713, 0.213986 ],
-        "quaternion": [ 0.690920, 0.713888, 0.048328, 0.103242 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.009" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -4.29219, 1.82628, -7.9754 ],
+		"rotation"  : [ 0.0245137, 0.21586, 0.075485 ],
+		"quaternion": [ 0.0162409, 0.107176, 0.0388305, 0.993349 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.008" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ 2.151757, 8.065320, 1.891882 ],
-        "rotation"  : [ 1.594819, -0.080713, 0.213986 ],
-        "quaternion": [ 0.690920, 0.713888, 0.048328, 0.103242 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.008" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ 2.15176, 1.89188, -8.06532 ],
+		"rotation"  : [ 0.0245137, 0.21586, 0.075485 ],
+		"quaternion": [ 0.0162409, 0.107176, 0.0388305, 0.993349 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.007" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -0.712512, 8.097841, 2.115002 ],
-        "rotation"  : [ 1.594819, -0.080713, 0.213986 ],
-        "quaternion": [ 0.690920, 0.713888, 0.048328, 0.103242 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.007" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -0.712512, 2.115, -8.09784 ],
+		"rotation"  : [ 0.0245137, 0.21586, 0.075485 ],
+		"quaternion": [ 0.0162409, 0.107176, 0.0388305, 0.993349 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Cube.005" : {
-        "geometry"  : "geo_Cube",
-        "groups"    : [  ],
-        "materials" : [ "Material" ],
-        "position"  : [ -1.000975, 8.755547, 1.319482 ],
-        "rotation"  : [ 0.000000, -0.000000, 0.000000 ],
-        "quaternion": [ 1.000000, 0.000000, 0.000000, 0.000000 ],
-        "scale"     : [ 6.130000, 0.070000, 1.690000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Cube.005" : {
+		"geometry"  : "geo_Cube",
+		"groups"    : [  ],
+		"material"  : "Material",
+		"position"  : [ -1.00097, 1.31948, -8.75555 ],
+		"rotation"  : [ -1.5708, 0, 0 ],
+		"quaternion": [ -0.707107, 0, 0, 0.707107 ],
+		"scale"     : [ 6.13, 0.07, 1.69 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Cube.004" : {
-        "geometry"  : "geo_Cube",
-        "groups"    : [  ],
-        "materials" : [ "Material" ],
-        "position"  : [ 2.484517, -7.486932, 2.724846 ],
-        "rotation"  : [ 0.220417, 0.075224, -0.181029 ],
-        "quaternion": [ 0.988791, 0.112836, 0.027288, -0.093898 ],
-        "scale"     : [ 0.350000, 0.890000, 3.309999 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Cube.004" : {
+		"geometry"  : "geo_Cube",
+		"groups"    : [  ],
+		"material"  : "Material",
+		"position"  : [ 2.48452, 2.72485, 7.48693 ],
+		"rotation"  : [ -1.34037, 0.0327791, -0.193151 ],
+		"quaternion": [ -0.619393, -0.0471007, -0.0856912, 0.778968 ],
+		"scale"     : [ 0.35, 0.89, 3.31 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.006" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ 7.724935, 7.123103, 1.694883 ],
-        "rotation"  : [ 1.835590, -0.083161, 2.048913 ],
-        "quaternion": [ 0.287189, 0.433893, 0.664936, 0.535835 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.006" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ 7.72494, 1.69488, -7.1231 ],
+		"rotation"  : [ -0.512649, 2.13144, 0.530967 ],
+		"quaternion": [ 0.103735, 0.849073, -0.0912881, 0.509882 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.005" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -6.334642, 6.636147, 0.566791 ],
-        "rotation"  : [ 1.327136, 0.032561, -2.147285 ],
-        "quaternion": [ 0.366859, 0.304988, -0.535181, -0.697122 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.005" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -6.33464, 0.566791, -6.63615 ],
+		"rotation"  : [ 0.432442, -2.18384, 0.327431 ],
+		"quaternion": [ -0.0437495, -0.87137, -0.11451, 0.475067 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.004" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -5.384042, -6.194087, 0.444915 ],
-        "rotation"  : [ 0.991213, -0.181430, -1.037108 ],
-        "quaternion": [ 0.782246, 0.371851, -0.303947, -0.396780 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.004" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -5.38404, 0.444915, 6.19409 ],
+		"rotation"  : [ -1.00704, -0.879796, -0.667908 ],
+		"quaternion": [ -0.290193, -0.495489, -0.0656431, 0.81607 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.003" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ 3.147747, -4.230884, 1.014840 ],
-        "rotation"  : [ -1.422281, 2.834549, 0.213809 ],
-        "quaternion": [ 0.046369, -0.179128, 0.733783, 0.653701 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.003" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ 3.14775, 1.01484, 4.23088 ],
+		"rotation"  : [ -0.14353, -2.97468, -0.334254 ],
+		"quaternion": [ 0.15945, -0.9811, 0.0566266, 0.0938749 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.002" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -2.668043, -2.153389, 3.008879 ],
-        "rotation"  : [ 1.881970, -0.457870, 2.217052 ],
-        "quaternion": [ 0.091675, 0.470648, 0.644833, 0.595211 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.002" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -2.66804, 3.00888, 2.15339 ],
+		"rotation"  : [ -0.38317, 2.39587, 0.744646 ],
+		"quaternion": [ 0.267974, 0.876844, -0.0350883, 0.397623 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Cube.003" : {
-        "geometry"  : "geo_Cube",
-        "groups"    : [  ],
-        "materials" : [ "Material" ],
-        "position"  : [ -3.031251, -1.943665, 0.702044 ],
-        "rotation"  : [ 1.840852, 1.811250, -0.141131 ],
-        "quaternion": [ 0.328619, 0.523567, 0.440581, -0.650981 ],
-        "scale"     : [ 1.781142, 0.361142, 0.231142 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Cube.003" : {
+		"geometry"  : "geo_Cube",
+		"groups"    : [  ],
+		"material"  : "Material",
+		"position"  : [ -3.03125, 0.702044, 1.94366 ],
+		"rotation"  : [ -0.0691183, -0.402911, -1.82999 ],
+		"quaternion": [ 0.137849, -0.148775, -0.771851, 0.602586 ],
+		"scale"     : [ 1.78114, 0.361142, 0.231142 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey.001" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ 1.245307, 0.137285, 0.620196 ],
-        "rotation"  : [ 2.339869, 0.286025, 1.394760 ],
-        "quaternion": [ 0.380330, 0.662839, 0.627894, 0.147451 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey.001" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ 1.24531, 0.620196, -0.137285 ],
+		"rotation"  : [ 1.12478, 0.738376, -1.34162 ],
+		"quaternion": [ 0.199764, 0.548252, -0.339724, 0.737632 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Monkey" : {
-        "geometry"  : "geo_Monkey",
-        "groups"    : [  ],
-        "materials" : [ "Material.002" ],
-        "position"  : [ -0.282500, 4.272932, 1.813606 ],
-        "rotation"  : [ 0.646062, 0.219349, 0.010569 ],
-        "quaternion": [ 0.942751, 0.314982, 0.105460, -0.029764 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Monkey" : {
+		"geometry"  : "geo_Monkey",
+		"groups"    : [  ],
+		"material"  : "Material.002",
+		"position"  : [ -0.2825, 1.81361, -4.27293 ],
+		"rotation"  : [ -0.914542, 0.181082, -0.124918 ],
+		"quaternion": [ -0.443899, 0.0535249, -0.0956176, 0.889351 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Cube.002" : {
-        "geometry"  : "geo_Cube",
-        "groups"    : [  ],
-        "materials" : [ "Material" ],
-        "position"  : [ 0.042212, 0.199037, 5.536832 ],
-        "rotation"  : [ 0.000000, -0.000000, 0.000000 ],
-        "quaternion": [ 1.000000, 0.000000, 0.000000, 0.000000 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Cube.002" : {
+		"geometry"  : "geo_Cube",
+		"groups"    : [  ],
+		"material"  : "Material",
+		"position"  : [ 0.0422118, 5.53683, -0.199037 ],
+		"rotation"  : [ -1.5708, 0, 0 ],
+		"quaternion": [ -0.707107, 0, 0, 0.707107 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Cube.001" : {
-        "geometry"  : "geo_Cube",
-        "groups"    : [  ],
-        "materials" : [ "Material" ],
-        "position"  : [ -0.395497, 3.944532, 1.009696 ],
-        "rotation"  : [ 0.000000, -0.000000, 0.000000 ],
-        "quaternion": [ 1.000000, 0.000000, 0.000000, 0.000000 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Cube.001" : {
+		"geometry"  : "geo_Cube",
+		"groups"    : [  ],
+		"material"  : "Material",
+		"position"  : [ -0.395497, 1.0097, -3.94453 ],
+		"rotation"  : [ -1.5708, 0, 0 ],
+		"quaternion": [ -0.707107, 0, 0, 0.707107 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Plane" : {
-        "geometry"  : "geo_Plane",
-        "groups"    : [  ],
-        "materials" : [ "Material.001" ],
-        "position"  : [ 0.000000, -0.118260, 0.000000 ],
-        "rotation"  : [ 0.000000, -0.000000, 0.000000 ],
-        "quaternion": [ 1.000000, 0.000000, 0.000000, 0.000000 ],
-        "scale"     : [ 7.922787, 7.922787, 7.922787 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    },
+	"Plane" : {
+		"geometry"  : "geo_Plane",
+		"groups"    : [  ],
+		"material"  : "Material.001",
+		"position"  : [ 0, -4.04787e-09, 0.11826 ],
+		"rotation"  : [ -1.5708, 0, 0 ],
+		"quaternion": [ -0.707107, 0, 0, 0.707107 ],
+		"scale"     : [ 7.92279, 7.92279, 7.92279 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
 
-    "Cube" : {
-        "geometry"  : "geo_Cube",
-        "groups"    : [  ],
-        "materials" : [ "Material" ],
-        "position"  : [ 3.651978, -0.000000, 1.071144 ],
-        "rotation"  : [ 0.220417, 0.075224, -0.181029 ],
-        "quaternion": [ 0.988791, 0.112836, 0.027288, -0.093898 ],
-        "scale"     : [ 1.000000, 1.000000, 1.000000 ],
-        "visible"       : true,
-        "castsShadow"   : false,
-        "meshCollider"  : false,
-        "trigger"       : "None"
-    }
+	"Cube" : {
+		"geometry"  : "geo_Cube",
+		"groups"    : [  ],
+		"material"  : "Material",
+		"position"  : [ 3.65198, 1.07114, 5.15649e-08 ],
+		"rotation"  : [ -1.34037, 0.0327791, -0.193151 ],
+		"quaternion": [ -0.619393, -0.0471007, -0.0856911, 0.778968 ],
+		"scale"     : [ 1, 1, 1 ],
+		"visible"       : true,
+		"castShadow"    : false,
+		"receiveShadow" : false,
+		"doubleSided"   : false
+	},
+
+	"default_light" : {
+		"type"       : "DirectionalLight",
+		"direction"  : [ 0, 1, 1 ],
+		"color"      : 16777215,
+		"intensity"  : 0.80
+	},
+
+	"default_camera" : {
+		"type"  : "PerspectiveCamera",
+		"fov"   : 60.000000,
+		"aspect": 1.333000,
+		"near"  : 1.000000,
+		"far"   : 10000.000000,
+		"position": [ 0, 0, 10 ],
+		"target"  : [ 0, 0, 0 ]
+	}
 },
 
 
 "geometries" :
 {
-    "geo_Cube" : {
-        "type" : "ascii_mesh",
-        "url"  : "scene.Cube.js"
-    },
+	"geo_Cube" : {
+		"type" : "ascii",
+		"url"  : "scene.Cube.js"
+	},
 
-    "geo_Monkey" : {
-        "type" : "ascii_mesh",
-        "url"  : "scene.Monkey.js"
-    },
+	"geo_Monkey" : {
+		"type" : "ascii",
+		"url"  : "scene.Monkey.js"
+	},
 
-    "geo_Plane" : {
-        "type" : "ascii_mesh",
-        "url"  : "scene.Plane.js"
-    }
+	"geo_Plane" : {
+		"type" : "ascii",
+		"url"  : "scene.Plane.js"
+	}
 },
 
 
 "materials" :
 {
-    "Material" : {
-        "type": "MeshLambertMaterial",
-        "parameters": { "color": 10688800, "opacity": 1 }
-    },
+	"Material" : {
+		"type": "MeshLambertMaterial",
+		"parameters": { "color": 10688800, "opacity": 1, "blending": "NormalBlending" }
+	},
 
-    "Material.001" : {
-        "type": "MeshLambertMaterial",
-        "parameters": { "color": 2401086, "opacity": 1 }
-    },
+	"Material.001" : {
+		"type": "MeshLambertMaterial",
+		"parameters": { "color": 2401086, "opacity": 1, "blending": "NormalBlending" }
+	},
 
-    "Material.002" : {
-        "type": "MeshLambertMaterial",
-        "parameters": { "color": 10711076, "opacity": 1 }
-    }
-},
-
-
-"cameras" :
-{
-    "default_camera" : {
-        "type"  : "perspective",
-        "fov"   : 60.000000,
-        "aspect": 1.333000,
-        "near"  : 1.000000,
-        "far"   : 10000.000000,
-        "position": [ 0.000000, 0.000000, 10.000000 ],
-        "target"  : [ 0.000000, 0.000000, 0.000000 ]
-    }
-},
-
-
-"lights" :
-{
-    "default_light": {
-        "type"		 : "directional",
-        "direction"	 : [ 0.000000, 1.000000, 1.000000 ],
-        "color" 	 : 16777215,
-        "intensity"	 : 0.80
-    }
+	"Material.002" : {
+		"type": "MeshLambertMaterial",
+		"parameters": { "color": 10711076, "opacity": 1, "blending": "NormalBlending" }
+	}
 },
 
 
 "transform" :
 {
-    "position"  : [ 0.000000, 0.000000, 0.000000 ],
-    "rotation"  : [ -1.570796, 0.000000, 0.000000 ],
-    "scale"     : [ 1.000000, 1.000000, 1.000000 ]
+	"position"  : [ 0, 0, 0 ],
+	"rotation"  : [ -1.5708, 0, 0 ],
+	"scale"     : [ 1, 1, 1 ]
 },
 
 "defaults" :
 {
-    "bgcolor" : [ 0.000000, 0.000000, 0.000000 ],
-    "bgalpha" : 1.000000,
-    "camera"  : "default_camera"
+	"bgcolor" : [ 0, 0, 0 ],
+	"bgalpha" : 1.000000,
+	"camera"  : "default_camera"
 }
 
 }

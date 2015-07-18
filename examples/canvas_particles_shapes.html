@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - particles with shapes</title>
@@ -16,11 +16,13 @@
 	<body>
 
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 		<script src="js/Sparks.js"></script>
 
 		<!-- load the font file from canvas-text -->
@@ -34,7 +36,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group, text, plane;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -66,10 +68,12 @@
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.y = 150;
-				camera.position.z = 700;
+				camera.position.set( 0, 150, 700 );
 
 				scene = new THREE.Scene();
+
+				group = new THREE.Group();
+				scene.add( group );
 
 				// Get text from hash
 
@@ -92,16 +96,14 @@
 				});
 
 				text3d.computeBoundingBox();
-				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
+				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: true } );
+				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: 0.5 } );
 
 				text = new THREE.Mesh( text3d, textMaterial );
 
 				// Potentially, we can extract the vertices or faces of the text to generate particles too.
 				// Geo > Vertices > Position
-
-				text.doubleSided = false;
 
 				text.position.x = centerOffset;
 				text.position.y = 100;
@@ -109,18 +111,13 @@
 
 				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
-				text.overdraw = true;
 
-				parent = new THREE.Object3D();
-				parent.add( text );
+				group.add( text );
 
 
 				particleCloud = new THREE.Object3D(); // Just a group
 				particleCloud.y = 800;
-				parent.add( particleCloud );
-
-				scene.add( parent );
-
+				group.add( particleCloud );
 
 				// Create Particle Systems
 
@@ -138,23 +135,13 @@
 				heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
-				var circleLines = function ( context ) {
-					context.lineWidth = 0.05;
-					context.beginPath();
-					context.arc( 0, 0, 1, 0, Math.PI*2, true );
-					context.closePath();
-					context.stroke();
-
-					context.globalAlpha = 0.2;
-					context.fill();
-				}
-
 				var hue = 0;
 
 				var hearts = function ( context ) {
+
 					context.globalAlpha = 0.5;
 					var x = 0, y = 0;
-					context.scale(0.1, -0.1); // Scale so canvas render can redraw within bounds
+					context.scale(0.05, -0.05); // Scale so canvas render can redraw within bounds
 					context.beginPath();
 					 // From http://blog.burlock.org/html5/130-paths
 					context.bezierCurveTo( x + 2.5, y + 2.5, x + 2.0, y, x, y );
@@ -163,37 +150,42 @@
 					context.bezierCurveTo( x + 6.0, y + 7.7, x + 8.0, y + 5.5, x + 8.0, y + 3.5 );
 					context.bezierCurveTo( x + 8.0, y + 3.5, x + 8.0, y, x + 5.0, y );
 					context.bezierCurveTo( x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5 );
-					context.closePath();
 					context.fill();
 					context.lineWidth = 0.5; //0.05
 					context.stroke();
+
 				}
 
 				var setTargetParticle = function() {
 
-					//hearts circleLines
-					var material = new THREE.ParticleCanvasMaterial( {  program: hearts, blending:THREE.AdditiveBlending } );
+					var material = new THREE.SpriteCanvasMaterial( {
+						program: hearts
+					} );
 
-					material.color.setHSV(hue, 0.5, 1); 
+					material.color.setHSL(hue, 1, 0.75);
 					hue += 0.001;
 					if (hue>1) hue-=1;
 
-					particle = new THREE.Particle( material );
+					particle = new THREE.Sprite( material );
 
-					particle.scale.x = particle.scale.y = Math.random() * 20 +20;
-					particleCloud.add( particle );	
+					particle.scale.x = particle.scale.y = Math.random() * 40 + 40;
+					particleCloud.add( particle );
 
 					return particle;
+
 				};
 
-				var onParticleCreated = function(p) {
-					var position = p.position;
-					p.target.position = position;	
+				var onParticleCreated = function( p ) {
+
+					p.target.position.copy( p.position );
+
 				};
 
-				var onParticleDead = function(particle) {
+				var onParticleDead = function( particle ) {
+
 					particle.target.visible = false;
-					particleCloud.remove(particle.target); 
+					particleCloud.remove( particle.target );
+
 				};
 
 				sparksEmitter = new SPARKS.Emitter(new SPARKS.SteadyCounter(160));
@@ -210,19 +202,26 @@
 
 				sparksEmitter.addAction(new SPARKS.Age());
 				//sparksEmitter.addAction(new SPARKS.Accelerate(0.2));
-				sparksEmitter.addAction(new SPARKS.Move()); 
+				sparksEmitter.addAction(new SPARKS.Move());
 				sparksEmitter.addAction(new SPARKS.RandomDrift(50,50,2000));
 
 				sparksEmitter.addCallback("created", onParticleCreated);
 				sparksEmitter.addCallback("dead", onParticleDead);
+				sparksEmitter.addCallback("updated", function( particle ) {
+
+					particle.target.position.copy( particle.position );
+
+				});
+
 				sparksEmitter.start();
 
 				// End Particles
 
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -233,6 +232,22 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -247,10 +262,14 @@
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
 
-				if (sparksEmitter.isRunning()) {
+				if ( sparksEmitter.isRunning() ) {
+
 					sparksEmitter.stop();
+
 				} else {
+
 					sparksEmitter.start();
+
 				}
 
 			}
@@ -313,9 +332,9 @@
 				emitterpos.y = -pointOnShape.y * 5 + 400;
 
 				// Pretty cool effect if you enable this
-				//particleCloud.rotation.y += 0.05;
+				// particleCloud.rotation.y += 0.05;
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

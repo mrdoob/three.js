@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shaders - sky sun shader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+				text
+			}
+
+			#info {
+				color:#ccc;
+				text-shadow: 1px 1px rgba(0,0,0,0.25);
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+
+			}
+
+			a {
+				color: #fff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - sky + sun shader
+
+			<br/><a href="https://plus.google.com/117614030945250277079/posts/MYkgKdvLhNj">More info</a> by <a href="http://twitter.com/blurspline">@blurspline</a>
+
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/SkyShader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+
+		<script>
+
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var sky, sunSphere;
+
+
+			init();
+			animate();
+
+			function initSky(){
+
+				// Add Sky Mesh
+				sky = new THREE.Sky();
+				scene.add( sky.mesh );
+
+
+				// Add Sun Helper
+				sunSphere = new THREE.Mesh( new THREE.SphereGeometry( 20000, 30, 30 ),
+					new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: false }));
+				sunSphere.position.y = -700000;
+				sunSphere.visible = true;
+				scene.add( sunSphere );
+
+				/// GUI
+
+				var effectController  = {
+					turbidity: 10,
+					reileigh: 2,
+					mieCoefficient: 0.005,
+					mieDirectionalG: 0.8,
+					luminance: 1,
+					inclination: 0.49, // elevation / inclination
+					azimuth: 0.25, // Facing front,
+					sun: !true
+				}
+
+				var distance = 400000;
+
+				function guiChanged() {
+					var uniforms = sky.uniforms;
+					uniforms.turbidity.value = effectController.turbidity;
+					uniforms.reileigh.value = effectController.reileigh;
+					uniforms.luminance.value = effectController.luminance;
+					uniforms.mieCoefficient.value = effectController.mieCoefficient;
+					uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+
+					var theta = Math.PI * (effectController.inclination - 0.5);
+					var phi = 2 * Math.PI * (effectController.azimuth - 0.5);
+
+					sunSphere.position.x = distance * Math.cos(phi);
+					sunSphere.position.y = distance * Math.sin(phi) * Math.sin(theta);
+					sunSphere.position.z = distance * Math.sin(phi) * Math.cos(theta);
+
+					sunSphere.visible = effectController.sun;
+
+					sky.uniforms.sunPosition.value.copy(sunSphere.position);
+
+				}
+
+
+				var gui = new dat.GUI();
+
+
+				gui.add( effectController, "turbidity", 1.0, 20.0, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, "reileigh", 0.0, 4, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, "mieCoefficient", 0.0, 0.1, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, "mieDirectionalG", 0.0, 1, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, "luminance", 0.0, 2).onChange( guiChanged );;
+				gui.add( effectController, "inclination", 0, 1, 0.0001).onChange( guiChanged );
+				gui.add( effectController, "azimuth", 0, 1, 0.0001).onChange( guiChanged );
+				gui.add( effectController, "sun").onChange( guiChanged );
+
+
+				guiChanged();
+
+
+				camera.lookAt(sunSphere.position)
+
+
+			}
+
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.5, 2000000 );
+				camera.position.z = 2000;
+
+				camera.position.y = 100;
+				camera.setLens(20);
+
+				scene = new THREE.Scene();
+
+				var helper = new THREE.GridHelper( 5000, 5000 );
+				helper.color1.setHex( 0xffffff );
+				helper.color2.setHex( 0xffffff );
+				scene.add( helper );
+
+				initSky();
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				document.body.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			var time = 0;
+
+			function animate() {
+
+				time = Date.now();
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+
+		</script>
+	</body>
+</html>

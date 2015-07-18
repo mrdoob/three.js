@@ -2,7 +2,7 @@
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "lucy100k.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 50002,

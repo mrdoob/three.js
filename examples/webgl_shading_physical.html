@@ -1,185 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - physically based shading</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #222;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+			body {
+				color: #fff;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
 
-			background-color: #fff;
-			margin: 0px;
-			overflow: hidden;
-		    }
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-		    #info {
-			color:#000;
-			position: relative;
-			margin: 0 auto -2.1em;
-			top: 0px;
-			width: 550px;
-			padding: 5px;
-			z-index:100;
-		    }
+			#info {
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0px;
+				width: 550px;
+				padding: 5px;
+				z-index:100;
+			}
 
-		    a { color: skyblue; }
+			a { color: skyblue; }
+
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #444 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl physically based shading testbed
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
 		</div>
 
-		<!--
-		<script src="../build/Three.js"></script>
-		-->
+		<script src="../build/three.min.js"></script>
 
-		<script type="text/javascript" src="../src/Three.js"></script>
-		<script type="text/javascript" src="../src/core/Color.js"></script>
-		<script type="text/javascript" src="../src/core/Clock.js"></script>
-		<script type="text/javascript" src="../src/core/Vector2.js"></script>
-		<script type="text/javascript" src="../src/core/Vector3.js"></script>
-		<script type="text/javascript" src="../src/core/Vector4.js"></script>
-		<script type="text/javascript" src="../src/core/Ray.js"></script>
-		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
-		<script type="text/javascript" src="../src/core/Math.js"></script>
-		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
-		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
-		<script type="text/javascript" src="../src/core/Object3D.js"></script>
-		<script type="text/javascript" src="../src/core/Projector.js"></script>
-		<script type="text/javascript" src="../src/core/Quaternion.js"></script>
-		<script type="text/javascript" src="../src/core/Vertex.js"></script>
-		<script type="text/javascript" src="../src/core/Face3.js"></script>
-		<script type="text/javascript" src="../src/core/Face4.js"></script>
-		<script type="text/javascript" src="../src/core/UV.js"></script>
-		<script type="text/javascript" src="../src/core/Geometry.js"></script>
-		<script type="text/javascript" src="../src/core/Spline.js"></script>
-		<script type="text/javascript" src="../src/core/Edge.js"></script>
-		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
-		<script type="text/javascript" src="../src/cameras/OrthographicCamera.js"></script>
-		<script type="text/javascript" src="../src/cameras/PerspectiveCamera.js"></script>
-		<script type="text/javascript" src="../src/lights/Light.js"></script>
-		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
-		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
-		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
-		<script type="text/javascript" src="../src/lights/SpotLight.js"></script>
-		<script type="text/javascript" src="../src/materials/Material.js"></script>
-		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleCanvasMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ShaderMaterial.js"></script>
-		<script type="text/javascript" src="../src/textures/Texture.js"></script>
-		<script type="text/javascript" src="../src/textures/DataTexture.js"></script>
-		<script type="text/javascript" src="../src/objects/Particle.js"></script>
-		<script type="text/javascript" src="../src/objects/ParticleSystem.js"></script>
-		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
-		<script type="text/javascript" src="../src/objects/Bone.js"></script>
-		<script type="text/javascript" src="../src/objects/SkinnedMesh.js"></script>
-		<script type="text/javascript" src="../src/objects/MorphAnimMesh.js"></script>
-		<script type="text/javascript" src="../src/objects/Ribbon.js"></script>
-		<script type="text/javascript" src="../src/objects/LOD.js"></script>
-		<script type="text/javascript" src="../src/objects/Sprite.js"></script>
-		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
-		<script type="text/javascript" src="../src/scenes/Fog.js"></script>
-		<script type="text/javascript" src="../src/scenes/FogExp2.js"></script>
-		<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/WebGLShaders.js"></script>
-		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/WebGLRenderTarget.js"></script>
-		<script type="text/javascript" src="../src/renderers/WebGLRenderTargetCube.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableVertex.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableObject.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
-		<script type="text/javascript" src="../src/extras/ColorUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/core/Curve.js"></script>
-		<script type="text/javascript" src="../src/extras/core/CurvePath.js"></script>
-		<script type="text/javascript" src="../src/extras/core/Path.js"></script>
-		<script type="text/javascript" src="../src/extras/core/Shape.js"></script>
-		<script type="text/javascript" src="../src/extras/core/TextPath.js"></script>
-		<script type="text/javascript" src="../src/extras/animation/AnimationHandler.js"></script>
-		<script type="text/javascript" src="../src/extras/animation/Animation.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/CubeCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/FirstPersonCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/PathCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/FlyCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/RollCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/TrackballCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/CombinedCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/controls/FirstPersonControls.js"></script>
-		<script type="text/javascript" src="../src/extras/controls/PathControls.js"></script>
-		<script type="text/javascript" src="../src/extras/controls/FlyControls.js"></script>
-		<script type="text/javascript" src="../src/extras/controls/RollControls.js"></script>
-		<script type="text/javascript" src="../src/extras/controls/TrackballControls.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/CubeGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/CylinderGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/ExtrudeGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/IcosahedronGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/LatheGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/OctahedronGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/PlaneGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/SphereGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/TextGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/TorusGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/TorusKnotGeometry.js"></script>
-		<script type="text/javascript" src="../src/extras/modifiers/SubdivisionModifier.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/BinaryLoader.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/ColladaLoader.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/JSONLoader.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/SceneLoader.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/UTF8Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/objects/Axes.js"></script>
-		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
-		<script type="text/javascript" src="../src/extras/physics/Collisions.js"></script>
-		<script type="text/javascript" src="../src/extras/physics/CollisionUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/renderers/AnaglyphWebGLRenderer.js"></script>
-		<script type="text/javascript" src="../src/extras/renderers/CrosseyedWebGLRenderer.js"></script>
-
-		<script src="js/ShaderExtras.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/SavePass.js"></script>
-
+		<script src="js/controls/TrackballControls.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
+
+		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
 
 			var MARGIN = 0;
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var WIDTH = window.innerWidth || 2;
+			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
+
+			var SCREEN_WIDTH = WIDTH;
+			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
 
 			var FAR = 10000;
 
@@ -191,15 +69,30 @@
 
 			var mesh, geometry;
 
+			var cubeCamera;
+
 			var sunLight, pointLight, ambientLight;
 
 			var morph;
 
-			var composer, effectFXAA, hblur, vblur;
-
 			var parameters, tweenDirection, tweenDay, tweenNight;
 
 			var clock = new THREE.Clock();
+
+			var gui, shadowConfig = {
+
+				shadowCameraVisible: false,
+				shadowCameraNear: 750,
+				shadowCameraFar: 4000,
+				shadowCameraFov: 30,
+				shadowBias: -0.0002,
+				shadowDarkness: 0.3
+
+			}, gamma = {
+				gammaFactor: 2.0,
+				gammaInput: true,
+				gammaOutput: true
+			};
 
 			init();
 			animate();
@@ -209,39 +102,20 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// CAMERA
+
 				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
 				camera.position.set( 500, 400, 1200 );
 
-				controls = new THREE.TrackballControls( camera );
-				controls.target.set( 0, 120, 0 );
+				// SCENE
 
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.15;
-
-				controls.keys = [ 65, 83, 68 ];
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, FAR, 0, 128 );
-				var cubeTarget = cubeCamera.renderTarget;
-
-
-				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
-
-				if ( DAY )
-					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
-				else
-					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
-
+				cubeCamera = new THREE.CubeCamera( 1, FAR, 128 );
+				scene.add( cubeCamera );
 
 				// TEXTURES
 
@@ -259,22 +133,26 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var texturePattern = new THREE.Texture( x, new THREE.UVMapping(), THREE.RepeatWrapping, THREE.RepeatWrapping );
+				var texturePattern = new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				texturePattern.needsUpdate = true;
 				texturePattern.repeat.set( 1000, 1000 );
+				texturePattern.format = THREE.RGBFormat;
 
 				var textureSquares = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
+				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
-				textureSquares.repeat.set( 50, 50 );
+				textureSquares.format = THREE.RGBFormat;
 
 				var textureNoiseColor = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
+				textureNoiseColor.format = THREE.RGBFormat;
 
 				var textureLava = THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
+				textureLava.format = THREE.RGBFormat;
 
 				//
 
@@ -290,14 +168,18 @@
 
 				// GROUND
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { shininess: 80, ambient: 0x444444, color: 0xffffff, specular: 0xffffff, map: textureSquares } );
-				//groundMaterial.color.setHSV( 0.1, 0.1, 0.99 );
+				var groundMaterial = new THREE.MeshPhongMaterial( {
+					shininess: 80,
+					color: 0xffffff,
+					specular: 0xffffff,
+					map: textureSquares
+				} );
 
-				var planeGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
-				ground.rotation.x = -Math.PI/2;
+				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
 
 				ground.receiveShadow = true;
@@ -306,8 +188,8 @@
 
 				// MATERIALS
 
-				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = cubeTarget;
+				var shader = THREE.ShaderLib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = cubeCamera.renderTarget;
 				shader.uniforms[ "tFlip" ].value = 1;
 
 				var materialCube = new THREE.ShaderMaterial( {
@@ -318,15 +200,15 @@
 
 				} );
 
-				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, map: textureNoiseColor } );
-				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeTarget } );
+				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
+				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
 
 				// OBJECTS
 
 				var sphereGeometry = new THREE.SphereGeometry( 100, 64, 32 );
 				var torusGeometry = new THREE.TorusGeometry( 240, 60, 32, 64 );
-				var cubeGeometry = new THREE.CubeGeometry( 150, 150, 150 );
+				var cubeGeometry = new THREE.BoxGeometry( 150, 150, 150 );
 
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
@@ -334,9 +216,7 @@
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444 } );
-					//var material = new THREE.MeshPhongMaterial( { color: color, ambient: color } );
-					//THREE.ColorUtils.adjustHSV( material.ambient, 0, 0, -0.5 );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
 
 					return addObject( geometry, material, x, y, z, ry );
 
@@ -346,7 +226,7 @@
 
 					var tmpMesh = new THREE.Mesh( geometry, material );
 
-					THREE.ColorUtils.adjustHSV( tmpMesh.material.color, 0.1, -0.1, 0 );
+					tmpMesh.material.color.offsetHSL( 0.1, -0.1, 0 );
 
 					tmpMesh.position.set( x, y, z );
 
@@ -361,9 +241,9 @@
 
 				}
 
-				var bigCube = new THREE.CubeGeometry( 50, 500, 50 );
-				var midCube = new THREE.CubeGeometry( 50, 200, 50 );
-				var smallCube = new THREE.CubeGeometry( 100, 100, 100 );
+				var bigCube = new THREE.BoxGeometry( 50, 500, 50 );
+				var midCube = new THREE.BoxGeometry( 50, 200, 50 );
+				var smallCube = new THREE.BoxGeometry( 100, 100, 100 );
 
 				addObjectColor( bigCube,   0xff0000, -500, 250, 0, 0 );
 				addObjectColor( smallCube, 0xff0000, -500, 50, -150, 0 );
@@ -377,8 +257,8 @@
 				addObjectColor( midCube,   0xff00ff, 0, 100, 500, 0 );
 				addObjectColor( smallCube, 0xff00ff, -150, 50, 500, 0 );
 
-				addObjectColor( new THREE.CubeGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
-				addObjectColor( new THREE.CubeGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
+				addObjectColor( new THREE.BoxGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI/4 );
+				addObjectColor( new THREE.BoxGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
 
 				addObjectColor( new THREE.SphereGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
 
@@ -388,10 +268,10 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x222222, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
 					morphMaterial.shading = THREE.FlatShading;
 
-					//geometry.computeVertexNormals();
+					geometry.computeMorphNormals();
 					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
 
 					var s = 200;
@@ -421,26 +301,35 @@
 
 				}
 
-				ambientLight = new THREE.AmbientLight( 0xffffff );
-				ambientLight.color.setHSV( 0.1, 0.9, 0.25 );
+				ambientLight = new THREE.AmbientLight( 0x3f2806 );
 				scene.add( ambientLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00, pointIntensity, 5000 );
 				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
-				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity );
+				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI/2, 1 );
 				sunLight.position.set( 1000, 2000, 1000 );
+
 				sunLight.castShadow = true;
+
+				sunLight.shadowDarkness = 0.3 * sunIntensity;
+				sunLight.shadowBias = -0.0002;
+
+				sunLight.shadowCameraNear = 750;
+				sunLight.shadowCameraFar = 4000;
+				sunLight.shadowCameraFov = 30;
+
+				sunLight.shadowCameraVisible = false;
+
 				scene.add( sunLight );
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x00aaff, clearAlpha: 1, antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				if ( scene.fog )
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -448,31 +337,37 @@
 
 				container.appendChild( renderer.domElement );
 
-
 				//
 
-				renderer.shadowMapAutoUpdate = false;
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapDarkness = 0.5 * sunIntensity;
-				renderer.shadowMapBias = 0.00390125;
+				renderer.shadowMapType = THREE.PCFSoftShadowMap;
 
 				//
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
+
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.target.set( 0, 120, 0 );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.15;
+
+				controls.keys = [ 65, 83, 68 ];
+
 
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#222";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 				container.appendChild( stats.domElement );
 
 				// EVENTS
@@ -480,54 +375,83 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'keydown', onKeyDown, false );
 
-				// COMPOSER
-
-				renderer.autoClear = false;
-
-				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
-				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
-				var effectVignette = new THREE.ShaderPass( THREE.ShaderExtras[ "vignette" ] );
-
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
-
-				var bluriness = 4;
-
-				hblur.uniforms[ 'h' ].value = bluriness / SCREEN_WIDTH;
-				vblur.uniforms[ 'v' ].value = bluriness / SCREEN_HEIGHT;
-
-				hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
-
-				composer = new THREE.EffectComposer( renderer, renderTarget );
-
-				var renderModel = new THREE.RenderPass( scene, camera );
-
-				effectVignette.renderToScreen = true;
-				vblur.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer, renderTarget );
-
-				composer.addPass( renderModel );
-
-				composer.addPass( effectFXAA );
-
-				composer.addPass( hblur );
-				composer.addPass( vblur );
-
-				//composer.addPass( effectVignette );
-
 				// TWEEN
 
 				parameters = { control: 0 };
 
 				tweenDirection = -1;
 
-				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
-				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
+				tweenDay = new TWEEN.Tween( parameters ).to( { control: 1 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+
+				// GUI
+
+				gui = new dat.GUI();
+
+				shadowGUI = gui.addFolder( "Shadow" );
+    	
+    			shadowGUI.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+
+					sunLight.shadowCameraVisible = shadowConfig.shadowCameraVisible;
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
+
+					sunLight.shadowCamera.near = shadowConfig.shadowCameraNear;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
+
+					sunLight.shadowCamera.far = shadowConfig.shadowCameraFar;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
+
+					sunLight.shadowCamera.fov = shadowConfig.shadowCameraFov;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
+
+					sunLight.shadowBias = shadowConfig.shadowBias;
+
+				});
+
+				shadowGUI.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
+
+				});
+				shadowGUI.open();
+
+				gammaGUI = gui.addFolder( "Gamma" );
+    
+				gammaGUI.add( gamma, 'gammaFactor', 0.1, 4.0 ).onChange( function() {
+
+					renderer.gammaFactor = gamma.gammaFactor;
+
+				});
+				gammaGUI.open();
+
+				/*
+
+				Not exposed because they are not easily dynamically updated - as all shaders need to be recompiled.  -bhouston
+
+				gammaGUI.add( gamma, 'gammaInput', true ).onChange( function() {
+
+					renderer.gammaInput = gamma.gammaInput;
+
+				});
+
+				gammaGUI.add( gamma, 'gammaOutput', true ).onChange( function() {
+
+					renderer.gammaOutput = gamma.gammaOutput;
+
+				});*/
 
 			}
 
@@ -539,19 +463,12 @@
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				composer.reset( renderTarget );
-
-				hblur.uniforms[ 'h' ].value = 4 / SCREEN_WIDTH;
-				vblur.uniforms[ 'v' ].value = 4 / SCREEN_HEIGHT;
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+				controls.handleResize();
 
 			}
 
@@ -559,23 +476,26 @@
 
 			function onKeyDown ( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 78: /*N*/   if ( tweenDirection == 1 ) {
+					case 78: /*N*/
 
-										tweenDay.stop();
-										tweenNight.start();
+						if ( tweenDirection == 1 ) {
 
-										tweenDirection = -1;
+							tweenDay.stop();
+							tweenNight.start();
 
-									} else {
+							tweenDirection = -1;
 
-										tweenNight.stop();
-										tweenDay.start();
+						} else {
 
-										tweenDirection = 1;
+							tweenNight.stop();
+							tweenDay.start();
 
-									}
+							tweenDirection = 1;
+
+						}
+
 					break;
 
 				}
@@ -604,29 +524,22 @@
 
 				if ( morph ) morph.updateAnimation( delta );
 
-				scene.fog.color.setHSV( 0.13, 0.25, THREE.Math.mapLinear( parameters.control, 0, 100, 0.1, 0.99 ) );
-				renderer.setClearColor( scene.fog.color, 1 );
+				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
+				renderer.setClearColor( scene.fog.color );
 
-				sunLight.intensity = THREE.Math.mapLinear( parameters.control, 0, 100, 0.3, 1 );
-				pointLight.intensity = THREE.Math.mapLinear( parameters.control, 0, 100, 1, 0.5 );
+				sunLight.intensity = parameters.control * 0.7 + 0.3;
+				pointLight.intensity = - parameters.control * 0.5 + 1;
 
-				pointLight.color.setHSV( 0.1, THREE.Math.mapLinear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
+				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
 
-				renderer.shadowMapDarkness = 0.5 * sunLight.intensity;
-
-				// render shadow map
-
-				renderer.autoUpdateObjects = false;
-
-				renderer.initWebGLObjects( scene );
-				renderer.updateShadowMap( scene, camera );
+				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
 
 				// render cube map
 
 				mesh.visible = false;
 
 				renderer.autoClear = true;
-				cubeCamera.updatePosition( mesh.position );
+				cubeCamera.position.copy( mesh.position );
 				cubeCamera.updateCubeMap( renderer, scene );
 				renderer.autoClear = false;
 
@@ -634,11 +547,7 @@
 
 				// render scene
 
-				renderer.autoUpdateObjects = true;
-
-				//renderer.render( scene, camera );
-				//renderer.clearTarget( null, 1, 1, 1 );
-				composer.render( 0.1 );
+				renderer.render( scene, camera );
 
 			}
 
@@ -646,4 +555,3 @@
 
 	</body>
 </html>
-

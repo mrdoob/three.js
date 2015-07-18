@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A material for drawing wireframe-style geometries.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Object parameters] )</h3>
+
+		<div>parameters is an object with one or more properties defining the material's appearance.</div>
+		<div>
+		color — Line color in hexadecimal. Default is 0xffffff.<br />
+		linewidth — Line thickness. Default is 1.<br />
+		linecap — Define appearance of line ends. Default is 'round'.<br />
+		linejoin — Define appearance of line joints. Default is 'round'.<br />
+		vertexColors — Define how the vertices gets colored. Default is THREE.NoColors.<br />
+		fog — Define whether the material color is affected by global fog settings. Default is false.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Integer color]</h3>
+		<div>Sets the color of the line. Default is 0xffffff.</div>
+
+		<h3>[property:Float linewidth]</h3>
+		<div>Controls line thickness. Default is 1.</div>
+		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+
+		<h3>[property:String linecap]</h3>
+		<div>Define appearance of line ends. Possible values are "butt", "round" and "square". Default is 'round'.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+
+		<h3>[property:String linejoin]</h3>
+		<div>Define appearance of line joints. Possible values are "round", "bevel" and "miter". Default is 'round'.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+
+		<h3>[property:Integer vertexColors]</h3>
+		<div>Define how the vertices gets colored. Possible values are THREE.NoColors, THREE.FaceColors and THREE.VertexColors. Default is THREE.NoColors.</div>
+		<div>This setting might not have any effect when used with certain renderers.</div>
+
+		<h3>[property:Boolean fog]</h3>
+		<div>Define whether the material color is affected by global fog settings.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+
+		
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -8,6 +8,7 @@
  *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  linewidth: <float>,
  *  linecap: "round",
@@ -21,21 +22,43 @@
 
 THREE.LineBasicMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.type = 'LineBasicMaterial';
 
-	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
+	this.color = new THREE.Color( 0xffffff );
 
-	this.linewidth = parameters.linewidth !== undefined ? parameters.linewidth : 1;
-	this.linecap = parameters.linecap !== undefined ? parameters.linecap : 'round';
-	this.linejoin = parameters.linejoin !== undefined ? parameters.linejoin : 'round';
+	this.linewidth = 1;
+	this.linecap = 'round';
+	this.linejoin = 'round';
 
-	this.vertexColors = parameters.vertexColors ? parameters.vertexColors : false;
+	this.vertexColors = THREE.NoColors;
 
-	this.fog = parameters.fog !== undefined ? parameters.fog : true;
+	this.fog = true;
+
+	this.setValues( parameters );
 
 };
 
-THREE.LineBasicMaterial.prototype = new THREE.Material();
+THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.LineBasicMaterial.prototype.constructor = THREE.LineBasicMaterial;
+
+THREE.LineBasicMaterial.prototype.clone = function () {
+
+	var material = new THREE.LineBasicMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+
+	material.linewidth = this.linewidth;
+	material.linecap = this.linecap;
+	material.linejoin = this.linejoin;
+
+	material.vertexColors = this.vertexColors;
+
+	material.fog = this.fog;
+
+	return material;
+
+};

@@ -1,73 +1,79 @@
 /**
  * @author oosmoxiecode
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
+THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
 
 	THREE.Geometry.call( this );
 
-	var scope = this;
+	this.type = 'TorusGeometry';
 
-	this.radius = radius || 100;
-	this.tube = tube || 40;
-	this.segmentsR = segmentsR || 8;
-	this.segmentsT = segmentsT || 6;
-	this.arc = arc || Math.PI * 2;
+	this.parameters = {
+		radius: radius,
+		tube: tube,
+		radialSegments: radialSegments,
+		tubularSegments: tubularSegments,
+		arc: arc
+	};
+
+	radius = radius || 100;
+	tube = tube || 40;
+	radialSegments = radialSegments || 8;
+	tubularSegments = tubularSegments || 6;
+	arc = arc || Math.PI * 2;
 
 	var center = new THREE.Vector3(), uvs = [], normals = [];
 
-	for ( var j = 0; j <= this.segmentsR; j ++ ) {
+	for ( var j = 0; j <= radialSegments; j ++ ) {
 
-		for ( var i = 0; i <= this.segmentsT; i ++ ) {
+		for ( var i = 0; i <= tubularSegments; i ++ ) {
 
-			var u = i / this.segmentsT * this.arc;
-			var v = j / this.segmentsR * Math.PI * 2;
+			var u = i / tubularSegments * arc;
+			var v = j / radialSegments * Math.PI * 2;
 
-			center.x = this.radius * Math.cos( u );
-			center.y = this.radius * Math.sin( u );
+			center.x = radius * Math.cos( u );
+			center.y = radius * Math.sin( u );
 
-			var vector = new THREE.Vector3();
-			vector.x = ( this.radius + this.tube * Math.cos( v ) ) * Math.cos( u );
-			vector.y = ( this.radius + this.tube * Math.cos( v ) ) * Math.sin( u );
-			vector.z = this.tube * Math.sin( v );
+			var vertex = new THREE.Vector3();
+			vertex.x = ( radius + tube * Math.cos( v ) ) * Math.cos( u );
+			vertex.y = ( radius + tube * Math.cos( v ) ) * Math.sin( u );
+			vertex.z = tube * Math.sin( v );
 
-			this.vertices.push( new THREE.Vertex( vector ) );
+			this.vertices.push( vertex );
 
-			uvs.push( new THREE.UV( i / this.segmentsT, 1 - j / this.segmentsR ) );
-			normals.push( vector.clone().subSelf( center ).normalize() );
+			uvs.push( new THREE.Vector2( i / tubularSegments, j / radialSegments ) );
+			normals.push( vertex.clone().sub( center ).normalize() );
 
 		}
+
 	}
 
+	for ( var j = 1; j <= radialSegments; j ++ ) {
 
-	for ( var j = 1; j <= this.segmentsR; j ++ ) {
+		for ( var i = 1; i <= tubularSegments; i ++ ) {
 
-		for ( var i = 1; i <= this.segmentsT; i ++ ) {
+			var a = ( tubularSegments + 1 ) * j + i - 1;
+			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+			var d = ( tubularSegments + 1 ) * j + i;
 
-			var a = ( this.segmentsT + 1 ) * j + i - 1;
-			var b = ( this.segmentsT + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( this.segmentsT + 1 ) * ( j - 1 ) + i;
-			var d = ( this.segmentsT + 1 ) * j + i;
-
-			var face = new THREE.Face4( a, b, c, d, [ normals[ a ], normals[ b ], normals[ c ], normals[ d ] ] );
-			face.normal.addSelf( normals[ a ] );
-			face.normal.addSelf( normals[ b ] );
-			face.normal.addSelf( normals[ c ] );
-			face.normal.addSelf( normals[ d ] );
-			face.normal.normalize();
-
+			var face = new THREE.Face3( a, b, d, [ normals[ a ].clone(), normals[ b ].clone(), normals[ d ].clone() ] );
 			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ d ].clone() ] );
 
-			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
+			face = new THREE.Face3( b, c, d, [ normals[ b ].clone(), normals[ c ].clone(), normals[ d ].clone() ] );
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
+
 		}
 
 	}
 
-	this.computeCentroids();
+	this.computeFaceNormals();
 
 };
 
-THREE.TorusGeometry.prototype = new THREE.Geometry();
+THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;

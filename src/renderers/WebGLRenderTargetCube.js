@@ -10,5 +10,5 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 
 };
 
-THREE.WebGLRenderTargetCube.prototype = new THREE.WebGLRenderTarget();
+THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
 THREE.WebGLRenderTargetCube.prototype.constructor = THREE.WebGLRenderTargetCube;

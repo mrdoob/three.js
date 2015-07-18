@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - shapes</title>
@@ -17,14 +17,19 @@
 	<body>
 
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 		<script src="js/Sparks.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FocusShader.js"></script>
+		<script src="js/shaders/HorizontalBlurShader.js"></script>
+		<script src="js/shaders/TriangleBlurShader.js"></script>
+		<script src="js/shaders/VerticalBlurShader.js"></script>
+
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
@@ -80,7 +85,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group, text, plane;
 
 			var speed = 50;
 
@@ -101,6 +106,9 @@
 			var _rotation = 0;
 			var timeOnShapePath = 0;
 
+			var composer;
+			var effectBlurX, effectBlurY, hblur, vblur;
+
 			init();
 			animate();
 
@@ -114,7 +122,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Three.js - simple particle systems with shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Move your mouse. Click to pause/resume.';
+				info.innerHTML = 'Three.js - simple particle systems with shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br>Move your mouse. Click to pause/resume.';
 				container.appendChild( info );
 
 				// CAMERA
@@ -125,6 +133,8 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+
+				// LIGHTS
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 0, -1, 1 );
@@ -149,8 +159,10 @@
 
 				}
 
-                var textMaterialFront = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, opacity: 0.95 } );
-                var textMaterialSide = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+				var material = new THREE.MeshFaceMaterial( [
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, opacity: 0.95 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff } )
+				] );
 
 				var text3d = new THREE.TextGeometry( theText, {
 
@@ -168,30 +180,29 @@
 
 				});
 
-				text3d.materials = [ textMaterialFront, textMaterialSide ];
-
 				text3d.computeVertexNormals();
 				text3d.computeBoundingBox();
 
-				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
+				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				text = new THREE.Mesh( text3d, new THREE.MeshFaceMaterial() );
+				group = new THREE.Group();
+				scene.add( group );
+
+				text = new THREE.Mesh( text3d, material );
 
 				// Potentially, we can extract the vertices or faces of the text to generate particles too.
 				// Geo > Vertices > Position
 
-                text.position.x = centerOffset;
-                text.position.y = 130;
-                text.position.z = -50;
+				text.position.x = centerOffset;
+				text.position.y = 130;
+				text.position.z = -50;
 
-                text.rotation.x = 0;
-                text.rotation.y = Math.PI * 2;
+				text.rotation.x = 0;
+				text.rotation.y = Math.PI * 2;
 
-				parent = new THREE.Object3D();
-                parent.add( text );
-				scene.add( parent );
+				group.add( text );
 
-				///// Create particle objects for Three.js
+				// Create particle objects for Three.js
 
 				var particlesLength = 70000;
 
@@ -199,7 +210,7 @@
 
 				function newpos( x, y, z ) {
 
-					return new THREE.Vertex( new THREE.Vector3( x, y, z ) );
+					return new THREE.Vector3( x, y, z );
 
 				}
 
@@ -258,7 +269,7 @@
 
 				uniforms = {
 
-					texture:   { type: "t", value: 0, texture: texture }
+					texture:   { type: "t", value: texture }
 
 				};
 
@@ -295,11 +306,9 @@
 					// context.bezierCurveTo( x + 6.0, y + 7.7, x + 8.0, y + 5.5, x + 8.0, y + 3.5 );
 					// context.bezierCurveTo( x + 8.0, y + 3.5, x + 8.0, y, x + 5.0, y );
 					// context.bezierCurveTo( x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5 );
-					// context.closePath();
 
 					context.beginPath();
 					context.arc( 64, 64, 60, 0, Math.PI * 2, false) ;
-					context.closePath();
 
 					context.lineWidth = 0.5; //0.05
 					context.stroke();
@@ -323,22 +332,19 @@
 
 				var shaderMaterial = new THREE.ShaderMaterial( {
 
-					uniforms: 		uniforms,
-					attributes:     attributes,
+					uniforms: uniforms,
+					attributes: attributes,
 
-					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-					blending: 		THREE.AdditiveBlending,
-					depthWrite:		false,
-					transparent:	true
+					blending: THREE.AdditiveBlending,
+					depthWrite: false,
+					transparent: true
 
 				});
 
-				particleCloud = new THREE.ParticleSystem( particles, shaderMaterial );
-
-				particleCloud.dynamic = true;
-				//particleCloud.sortParticles = true;
+				particleCloud = new THREE.PointCloud( particles, shaderMaterial );
 
 				var vertices = particleCloud.geometry.vertices;
 				var values_size = attributes.size.value;
@@ -348,14 +354,13 @@
 
 					values_size[ v ] = 50;
 
-					values_color[ v ] = new THREE.Color( 0xffffff );
-					values_color[ v ].setHSV( 0, 0, 0 );
+					values_color[ v ] = new THREE.Color( 0x000000 );
 
-					particles.vertices[ v ].position.set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
+					particles.vertices[ v ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
 				}
 
-				parent.add( particleCloud );
+				group.add( particleCloud );
 				particleCloud.y = 800;
 
 
@@ -398,9 +403,9 @@
 
 					if ( target ) {
 
-						//console.log(target,particles.vertices[target]);
-						//values_size[target]
-						//values_color[target]
+						// console.log(target,particles.vertices[target]);
+						// values_size[target]
+						// values_color[target]
 
 						hue += 0.0003 * delta;
 						if ( hue > 1 ) hue -= 1;
@@ -415,16 +420,16 @@
 						emitterpos.x = pointOnShape.x * 5 - 100;
 						emitterpos.y = -pointOnShape.y * 5 + 400;
 
-						//pointLight.position.copy( emitterpos );
+						// pointLight.position.copy( emitterpos );
 						pointLight.position.x = emitterpos.x;
 						pointLight.position.y = emitterpos.y;
 						pointLight.position.z = 100;
 
-						particles.vertices[ target ].position = p.position;
+						particles.vertices[ target ] = p.position;
 
-						values_color[ target ].setHSV( hue, 0.8, 0.15 );
+						values_color[ target ].setHSL( hue, 0.6, 0.1 );
 
-						pointLight.color.setHSV( hue, 0.8, 0.95 );
+						pointLight.color.setHSL( hue, 0.8, 0.5 );
 
 
 					};
@@ -439,8 +444,8 @@
 
 						// Hide the particle
 
-						values_color[ target ].setHSV( 0, 0, 0 );
-						particles.vertices[ target ].position.set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
+						values_color[ target ].setRGB( 0, 0, 0 );
+						particles.vertices[ target ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
 						// Mark particle system as available by returning to pool
 
@@ -465,7 +470,6 @@
 
 
 				sparksEmitter.addInitializer( new SPARKS.Velocity( new SPARKS.PointZone( new THREE.Vector3( 0, -5, 1 ) ) ) );
-				// TOTRY Set velocity to move away from centroid
 
 				sparksEmitter.addAction( new SPARKS.Age() );
 				sparksEmitter.addAction( new SPARKS.Accelerate( 0, 0, -50 ) );
@@ -477,23 +481,11 @@
 				sparksEmitter.addCallback( "dead", onParticleDead );
 				sparksEmitter.start();
 
-				//sparksEmitter.addCallback("loopUpdated", engineLoopUpdate);
-
-				//sparksEmitter.addCallback("updated", function(p) {
-					// var target = particle.target;
-					// 					if (target) {
-					// 						// update energy properties
-					// 						//values_size[target] = Math.random()*100;
-					// 					}
-				//});
-				//
 				// End Particles
 
-
 				renderer = new THREE.WebGLRenderer();
-                renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColorHex( 0x000000, 1 );
-
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -503,21 +495,21 @@
 
 				// POST PROCESSING
 
-				var effectFocus = new THREE.ShaderPass( THREE.ShaderExtras[ "focus" ] );
+				var effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
-				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 				effectFilm = new THREE.FilmPass( 0.5, 0.25, 2048, false );
 
-				var shaderBlur = THREE.ShaderExtras[ "triangleBlur" ];
-				var effectBlurX = new THREE.ShaderPass( shaderBlur, 'texture' );
-				var effectBlurY = new THREE.ShaderPass( shaderBlur, 'texture' );
+				var shaderBlur = THREE.TriangleBlurShader;
+				effectBlurX = new THREE.ShaderPass( shaderBlur, 'texture' );
+				effectBlurY = new THREE.ShaderPass( shaderBlur, 'texture' );
 
 				var radius = 15;
 				var blurAmountX = radius / window.innerWidth;
 				var blurAmountY = radius / window.innerHeight;
 
-				var hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
-				var vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalBlurShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalBlurShader);
 
 				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
 				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
@@ -534,21 +526,51 @@
 				composer.addPass( renderScene );
 				composer.addPass( hblur );
 				composer.addPass( vblur );
-				//composer.addPass( effectBlurX );
-				//composer.addPass( effectBlurY );
-				//composer.addPass( effectScreen );
-				//composer.addPass( effectFocus );
-				//composer.addPass( effectFilm );
+				// composer.addPass( effectBlurX );
+				// composer.addPass( effectBlurY );
+				// composer.addPass( effectCopy );
+				// composer.addPass( effectFocus );
+				// composer.addPass( effectFilm );
 
 				vblur.renderToScreen = true;
 				effectBlurY.renderToScreen = true;
 				effectFocus.renderToScreen = true;
-				effectScreen.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 				effectFilm.renderToScreen = true;
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				//
+
+				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
+				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
+
+				var radius = 15;
+				var blurAmountX = radius / window.innerWidth;
+				var blurAmountY = radius / window.innerHeight;
+
+				effectBlurX.uniforms[ 'delta' ].value = new THREE.Vector2( blurAmountX, 0 );
+				effectBlurY.uniforms[ 'delta' ].value = new THREE.Vector2( 0, blurAmountY );
+
+				composer.reset();
 
 			}
 
@@ -586,7 +608,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -599,7 +621,7 @@
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -627,21 +649,20 @@
 
 				delta = speed * clock.getDelta();
 
-				particleCloud.geometry.__dirtyVertices = true;
+				particleCloud.geometry.verticesNeedUpdate = true;
 
 				attributes.size.needsUpdate = true;
 				attributes.pcolor.needsUpdate = true;
 
 				// Pretty cool effect if you enable this
-				//particleCloud.rotation.y += 0.05;
+				// particleCloud.rotation.y += 0.05;
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 
 				renderer.clear();
 
-				//renderer.render( scene, camera );
+				// renderer.render( scene, camera );
 				composer.render( 0.1 );
-
 
 			}
 

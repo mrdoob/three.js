@@ -20,9 +20,7 @@ THREE.Car = function () {
 	//	- other wheels are mirrored against car root
 	//	- if necessary back wheels can be offset manually
 
-	this.wheelOffsetX = 0;
-	this.wheelOffsetY = 0;
-	this.wheelOffsetZ = 0;
+	this.wheelOffset = new THREE.Vector3();
 
 	this.wheelDiameter = 1;
 
@@ -72,6 +70,9 @@ THREE.Car = function () {
 	this.bodyGeometry = null;
 	this.wheelGeometry = null;
 
+	this.bodyMaterials = null;
+	this.wheelMaterials = null;
+
 	// internal helper variables
 
 	this.loaded = false;
@@ -106,8 +107,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.JSONLoader();
 
-		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
-		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
+		loader.load( bodyURL, function( geometry, materials ) { createBody( geometry, materials ) } );
+		loader.load( wheelURL, function( geometry, materials ) { createWheels( geometry, materials ) } );
 
 	};
 
@@ -115,8 +116,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.BinaryLoader();
 
-		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
-		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
+		loader.load( bodyURL, function( geometry, materials ) { createBody( geometry, materials ) } );
+		loader.load( wheelURL, function( geometry, materials ) { createWheels( geometry, materials ) } );
 
 	};
 
@@ -194,7 +195,7 @@ THREE.Car = function () {
 
 		var forwardDelta = this.speed * delta;
 
-		this.carOrientation += ( forwardDelta * this.STEERING_RADIUS_RATIO )* this.wheelOrientation;
+		this.carOrientation += ( forwardDelta * this.STEERING_RADIUS_RATIO ) * this.wheelOrientation;
 
 		// displacement
 
@@ -238,17 +239,19 @@ THREE.Car = function () {
 
 	// internal helper methods
 
-	function createBody ( geometry ) {
+	function createBody ( geometry, materials ) {
 
 		scope.bodyGeometry = geometry;
+		scope.bodyMaterials = materials;
 
 		createCar();
 
 	};
 
-	function createWheels ( geometry ) {
+	function createWheels ( geometry, materials ) {
 
 		scope.wheelGeometry = geometry;
+		scope.wheelMaterials = materials;
 
 		createCar();
 
@@ -266,40 +269,37 @@ THREE.Car = function () {
 
 				var bb = scope.wheelGeometry.boundingBox;
 
-				var dx = 0.5 * ( bb.x[ 1 ] + bb.x[ 0 ] );
-				var dy = 0.5 * ( bb.y[ 1 ] + bb.y[ 0 ] );
-				var dz = 0.5 * ( bb.z[ 1 ] + bb.z[ 0 ] );
+				scope.wheelOffset.addVectors( bb.min, bb.max );
+				scope.wheelOffset.multiplyScalar( 0.5 );
 
-				scope.wheelOffsetX = dx;
-				scope.wheelOffsetY = dy;
-				scope.wheelOffsetZ = dz;
+				scope.wheelDiameter = bb.max.y - bb.min.y;
 
-				scope.wheelDiameter = bb.y[ 1 ] - bb.y[ 0 ];
-
-				THREE.GeometryUtils.center( scope.wheelGeometry );
+				scope.wheelGeometry.center();
 
 			}
 
 			// rig the car
 
-			var delta,
-				s = scope.modelScale,
-				faceMaterial = new THREE.MeshFaceMaterial();
+			var s = scope.modelScale,
+				delta = new THREE.Vector3();
+
+			var bodyFaceMaterial = new THREE.MeshFaceMaterial( scope.bodyMaterials );
+			var wheelFaceMaterial = new THREE.MeshFaceMaterial( scope.wheelMaterials );
 
 			// body
 
-			scope.bodyMesh = new THREE.Mesh( scope.bodyGeometry, faceMaterial );
+			scope.bodyMesh = new THREE.Mesh( scope.bodyGeometry, bodyFaceMaterial );
 			scope.bodyMesh.scale.set( s, s, s );
 
 			scope.root.add( scope.bodyMesh );
 
 			// front left wheel
 
-			delta = new THREE.Vector3( s * scope.wheelOffsetX, s * scope.wheelOffsetY, s * scope.wheelOffsetZ );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, s ) );
 
-			scope.frontLeftWheelRoot.position.addSelf( delta );
+			scope.frontLeftWheelRoot.position.add( delta );
 
-			scope.frontLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.frontLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 			scope.frontLeftWheelMesh.scale.set( s, s, s );
 
 			scope.frontLeftWheelRoot.add( scope.frontLeftWheelMesh );
@@ -307,11 +307,11 @@ THREE.Car = function () {
 
 			// front right wheel
 
-			delta = new THREE.Vector3( -s * scope.wheelOffsetX, s * scope.wheelOffsetY, s * scope.wheelOffsetZ );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, s ) );
 
-			scope.frontRightWheelRoot.position.addSelf( delta );
+			scope.frontRightWheelRoot.position.add( delta );
 
-			scope.frontRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.frontRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
 			scope.frontRightWheelMesh.scale.set( s, s, s );
 			scope.frontRightWheelMesh.rotation.z = Math.PI;
@@ -321,22 +321,24 @@ THREE.Car = function () {
 
 			// back left wheel
 
-			delta = new THREE.Vector3( s * scope.wheelOffsetX, s * scope.wheelOffsetY, - s * scope.wheelOffsetZ - scope.backWheelOffset );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, -s ) );
+			delta.z -= scope.backWheelOffset;
 
-			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
-			scope.backLeftWheelMesh.position.addSelf( delta );
+			scope.backLeftWheelMesh.position.add( delta );
 			scope.backLeftWheelMesh.scale.set( s, s, s );
 
 			scope.root.add( scope.backLeftWheelMesh );
 
 			// back right wheel
 
-			delta = new THREE.Vector3( -s * scope.wheelOffsetX, s * scope.wheelOffsetY, - s * scope.wheelOffsetZ - scope.backWheelOffset )
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, -s ) );
+			delta.z -= scope.backWheelOffset;
 
-			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
-			scope.backRightWheelMesh.position.addSelf( delta );
+			scope.backRightWheelMesh.position.add( delta );
 			scope.backRightWheelMesh.scale.set( s, s, s );
 			scope.backRightWheelMesh.rotation.z = Math.PI;
 
@@ -361,8 +363,8 @@ THREE.Car = function () {
 	};
 
 	function quadraticEaseOut( k ) { return - k * ( k - 2 ); }
-	function cubicEaseOut( k ) { return --k * k * k + 1; }
-	function circularEaseOut( k ) { return Math.sqrt( 1 - --k * k ); }
+	function cubicEaseOut( k ) { return -- k * k * k + 1; }
+	function circularEaseOut( k ) { return Math.sqrt( 1 - -- k * k ); }
 	function sinusoidalEaseOut( k ) { return Math.sin( k * Math.PI / 2 ); }
 	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
 

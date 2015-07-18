@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [Escher]</title>
@@ -25,16 +25,16 @@
 
 	<body>
 		<div id="d">
-			<p><a href="http://github.com/mrdoob/three.js">Three.js</a> cube mapping demo
+			<p><a href="http://threejs.org">Three.js</a> cube mapping demo
 			<p>Original artwork by <a href="http://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank">M. C. Escher</a>
 			<p>Texture by <a href="http://brainwagon.org/2002/12/05/fun-with-environment-maps/" target="_blank">Mark VandeWettering</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -71,7 +71,7 @@
 
 				scene = new THREE.Scene();
 
-
+				/*
 				var r = "textures/cube/Escher/";
 
 				var urls = [ r + "px.jpg", r + "nx.jpg",
@@ -79,6 +79,17 @@
 							 r + "pz.jpg", r + "nz.jpg" ];
 
 				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				*/
+
+				var r = "textures/cube/Escher/dds/";
+
+				var urls = [ r + "px.dds", r + "nx.dds",
+							 r + "py.dds", r + "ny.dds",
+							 r + "pz.dds", r + "nz.dds" ];
+
+				var loader = new THREE.DDSLoader();
+				
+				var textureCube = loader.load( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } )
 				var geometry = new THREE.SphereGeometry( 100, 96, 64 );
 
@@ -88,24 +99,25 @@
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = textureCube;
+				var shader = THREE.ShaderLib[ "cube" ];
+				shader.uniforms[ "tCube" ].value = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					side: THREE.BackSide
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 6000, 6000, 6000 ), material );
-				mesh.flipSided = true;
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 6000, 6000, 6000 ), material );
 				scene.add( mesh );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -118,6 +130,22 @@
 					container.appendChild( stats.domElement );
 
 				}
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

@@ -1,0 +1,112 @@
+@font-face {
+	font-family: 'inconsolata';
+	src: url('files/inconsolata.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
+body {
+	margin: 30px 20px;
+	color: #555;
+	font-family: 'inconsolata';
+	font-size: 15px;
+	line-height: 18px;
+	overflow: auto;
+}
+
+a {
+	color: #1184CE;
+}
+
+h1 {
+	color: #333;
+	font-size: 25px;
+	font-weight: normal;
+
+	margin-top: 10px;
+}
+
+h2 {
+	color: #4B0;
+	font-size: 18px;
+	font-weight: normal;
+
+	margin-top: 40px;
+}
+
+h3 {
+	color: #000;
+	font-size: 16px;
+	font-weight: normal;
+
+	margin-top: 30px;
+}
+
+div {
+	/* padding-left: 30px; */
+	margin-bottom: 20px;
+}
+
+div.desc {
+	padding-left: 0px;
+}
+
+pre, code {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+code {
+	display: block;
+	width: -webkit-calc( 100% - 40px );
+	width: -moz-calc( 100% - 40px );
+	width: calc( 100% - 40px );
+	padding: 20px;
+	white-space: pre-wrap;
+	background-color: #f9f9f9;
+	overflow: auto;
+}
+
+iframe {
+	width: 100%;
+	height: 420px;
+	border:0;
+}
+
+th {
+	padding: 10px;
+	text-decoration: underline;
+}
+td {
+	text-align: center;
+}
+
+table code {
+	padding: 2px;
+	margin: 0px;
+	width: auto;
+}
+
+strong {
+	color: #000;
+	font-weight: normal;
+}
+
+#button {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	padding: 8px;
+	color: #fff;
+	background-color: #555;
+	opacity: 0.5;
+}
+
+	#button:hover {
+		cursor: pointer;
+		opacity: 1;
+	}
+
+a.permalink {
+	float: right;
+	margin-left: 5px;
+}

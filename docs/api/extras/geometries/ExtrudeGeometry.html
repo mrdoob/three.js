@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+		
+		<h1>[name]</h1>
+
+		<div class="desc">Creates extruded geometry from a path shape</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Array shapes], [page:Object options])</h3>
+		<div>
+		shapes — Shape or an array of shapes. <br />
+		options — Object that can contain the following parameters.
+
+	<ul>
+<li>curveSegments —  int. number of points on the curves</li>
+<li>steps —  int. number of points used for subdividing segements of extrude spline</li>
+<li>amount —  int. Depth to extrude the shape</li>
+<li>bevelEnabled —  bool. turn on bevel</li>
+<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
+<li>bevelSize —  float. how far from shape outline is bevel</li>
+<li>bevelSegments —  int. number of bevel layers</li>
+<li>extrudePath —  THREE.CurvePath. 3d spline path to extrude shape along. (creates Frames if (frames aren't defined)</li>
+<li>frames —  THREE.TubeGeometry.FrenetFrames.  containing arrays of tangents, normals, binormals</li>
+<li>material —  int. material index for front and back faces</li>
+<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
+<li>uvGenerator —  Object. object that provides UV generator functions</li>
+	</ul>
+
+		</div>
+		<div>
+		This object extrudes an 2D shape to an 3D geometry.
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null addShapeList]([page:Array shapes], [page:Object options])</h3>
+		<div>
+			shapes — An Array of shapes to add. <br />
+			options — Object that can contain the following parameters.
+	<ul>
+<li>curveSegments —  int. number of points on the curves</li>
+<li>steps —  int. number of points used for subdividing segements of extrude spline</li>
+<li>amount —  int. Depth to extrude the shape</li>
+<li>bevelEnabled —  bool. turn on bevel</li>
+<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
+<li>bevelSize —  float. how far from shape outline is bevel</li>
+<li>bevelSegments —  int. number of bevel layers</li>
+<li>extrudePath —  THREE.CurvePath. 3d spline path to extrude shape along. (creates Frames if (frames aren't defined)</li>
+<li>frames —  THREE.TubeGeometry.FrenetFrames.  containing arrays of tangents, normals, binormals</li>
+<li>material —  int. material index for front and back faces</li>
+<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
+<li>uvGenerator —  Object. object that provides UV generator functions</li>
+	</ul>
+	</div>
+		<div>Adds the shapes to the list to extrude.</div>
+
+		<h3>[method:null addShape]([page:Shape shape], [page:Object options])</h3>
+		<div>
+			shape — A shape to add. <br />
+			options — Object that can contain the following parameters.
+	<ul>
+<li>curveSegments —  int. number of points on the curves</li>
+<li>steps —  int. number of points used for subdividing segements of extrude spline</li>
+<li>amount —  int. Depth to extrude the shape</li>
+<li>bevelEnabled —  bool. turn on bevel</li>
+<li>bevelThickness —  float. how deep into the original shape bevel goes</li>
+<li>bevelSize —  float. how far from shape outline is bevel</li>
+<li>bevelSegments —  int. number of bevel layers</li>
+<li>extrudePath —  THREE.CurvePath. 3d spline path to extrude shape along. (creates Frames if (frames aren't defined)</li>
+<li>frames —  THREE.TubeGeometry.FrenetFrames.  containing arrays of tangents, normals, binormals</li>
+<li>material —  int. material index for front and back faces</li>
+<li>extrudeMaterial —  int. material index for extrusion and beveled faces</li>
+<li>uvGenerator —  Object. object that provides UV generator functions</li>
+	</ul>
+	</div>
+		<div>Add the shape to the list to extrude.</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

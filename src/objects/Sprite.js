@@ -1,67 +1,74 @@
 /**
  * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = function ( parameters ) {
+THREE.Sprite = ( function () {
 
-	THREE.Object3D.call( this );
+	var indices = new Uint16Array( [ 0, 1, 2,  0, 2, 3 ] );
+	var vertices = new Float32Array( [ - 0.5, - 0.5, 0,   0.5, - 0.5, 0,   0.5, 0.5, 0,   - 0.5, 0.5, 0 ] );
+	var uvs = new Float32Array( [ 0, 0,   1, 0,   1, 1,   0, 1 ] );
 
-	this.color = ( parameters.color !== undefined ) ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
-	this.map = ( parameters.map instanceof THREE.Texture ) ? parameters.map : THREE.ImageUtils.loadTexture( parameters.map );
-	this.blending = ( parameters.blending !== undefined ) ? parameters.blending : THREE.NormalBlending;
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
-	this.useScreenCoordinates = ( parameters.useScreenCoordinates !== undefined ) ? parameters.useScreenCoordinates : true;
-	this.mergeWith3D = ( parameters.mergeWith3D !== undefined ) ? parameters.mergeWith3D : !this.useScreenCoordinates;
-	this.affectedByDistance = ( parameters.affectedByDistance !== undefined ) ? parameters.affectedByDistance : !this.useScreenCoordinates;
-	this.scaleByViewport = ( parameters.scaleByViewport !== undefined ) ? parameters.scaleByViewport : !this.affectedByDistance;
-	this.alignment = ( parameters.alignment instanceof THREE.Vector2 ) ? parameters.alignment : THREE.SpriteAlignment.center;
+	return function ( material ) {
 
-	this.rotation3d = this.rotation;
-	this.rotation = 0;
-	this.opacity = 1;
+		THREE.Object3D.call( this );
 
-	this.uvOffset = new THREE.Vector2( 0, 0 );
-	this.uvScale  = new THREE.Vector2( 1, 1 );
+		this.type = 'Sprite';
 
-};
+		this.geometry = geometry;
+		this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
-THREE.Sprite.prototype = new THREE.Object3D();
+	};
+
+} )();
+
+THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Sprite.prototype.constructor = THREE.Sprite;
 
+THREE.Sprite.prototype.raycast = ( function () {
 
-/*
- * Custom update matrix
- */
+	var matrixPosition = new THREE.Vector3();
 
-THREE.Sprite.prototype.updateMatrix = function () {
+	return function ( raycaster, intersects ) {
 
-	this.matrix.setPosition( this.position );
+		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
-	this.rotation3d.set( 0, 0, this.rotation );
-	this.matrix.setRotationFromEuler( this.rotation3d );
+		var distance = raycaster.ray.distanceToPoint( matrixPosition );
 
-	if ( this.scale.x !== 1 || this.scale.y !== 1 ) {
+		if ( distance > this.scale.x ) {
 
-		this.matrix.scale( this.scale );
-		this.boundRadiusScale = Math.max( this.scale.x, this.scale.y );
+			return;
 
-	}
+		}
 
-	this.matrixWorldNeedsUpdate = true;
+		intersects.push( {
+
+			distance: distance,
+			point: this.position,
+			face: null,
+			object: this
+
+		} );
+
+	};
+
+}() );
+
+THREE.Sprite.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Sprite( this.material );
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
 
 };
 
-/*
- * Alignment
- */
+// Backwards compatibility
 
-THREE.SpriteAlignment = {};
-THREE.SpriteAlignment.topLeft = new THREE.Vector2( 1, -1 );
-THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -1 );
-THREE.SpriteAlignment.topRight = new THREE.Vector2( -1, -1 );
-THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 1, 0 );
-THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
-THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
-THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
-THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
-THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
+THREE.Particle = THREE.Sprite;

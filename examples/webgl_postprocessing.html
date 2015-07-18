@@ -1,415 +1,117 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #000;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
-
-			background-color: #000;
-			margin: 0px;
-			overflow: hidden;
-		    }
-
-		    #info {
-			color:#fff;
-			background-color: rgba( 0, 0, 0, 0.5 );
-			position: relative;
-			margin: 0 auto -2.1em;
-			top: 0px;
-			width: 550px;
-			padding: 5px;
-			z-index:100;
-		    }
-
-		    a { color: red; }
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
 		</style>
 	</head>
 	<body>
 
-		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl postprocessing example -
-			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
-		</div>
+		<script src="../build/three.min.js"></script>
 
-		<div id="container"></div>
-
-		<script src="../build/Three.js"></script>
-
-
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/DotScreenShader.js"></script>
+		<script src="js/shaders/RGBShiftShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-		<script src="js/postprocessing/DotScreenPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-
-		<!-- Time modulated procedural color fragment shader -->
-
-		<script id="fs-colors" type="x-shader/x-fragment">
-
-			varying vec2 vUv;
-			uniform float time;
-
-			void main() {
-
-				//gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
-				//gl_FragColor = vec4( 0.4, 0.4, 0.4, 1.0 );
-				gl_FragColor = vec4( 0.2, 0.4, 0.5, 1.0 );
-
-			}
-
-		</script>
-
-		<!-- Generic vertex shader -->
-
-		<script id="vs-generic" type="x-shader/x-vertex">
-
-			varying vec2 vUv;
-
-			void main() {
-
-				vUv = vec2( uv.x, 1.0 - uv.y );
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			}
-
-		</script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
 
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var container, stats;
-
-			var composerScene, composer1, composer2, composer3, composer4;
-
-			var cameraOrtho, cameraPerspective, sceneModel, sceneBG, renderer, mesh, directionalLight;
-
-			var halfWidth = window.innerWidth / 2;
-			var halfHeight = window.innerHeight / 2;
-
-			var materialColor, material2D, quadBG, quadMask, renderScene;
-
-			var rtParameters;
-
-			var delta = 0.01;
+			var camera, scene, renderer, composer;
+			var object, light;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
-
-				cameraOrtho = new THREE.OrthographicCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
-				cameraOrtho.position.z = 100;
-
-				cameraPerspective = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				cameraPerspective.position.z = 900;
-
-				//
-
-				sceneModel = new THREE.Scene();
-
-				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
-				sceneModel.add( directionalLight );
-
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
-
-				//
-
-				sceneBG = new THREE.Scene();
-
-				materialColor = new THREE.ShaderMaterial( {
-
-					uniforms: { time: { type: "f", value: 0.0 } },
-					vertexShader: getText( 'vs-generic' ),
-					fragmentShader: getText( 'fs-colors' ),
-					depthTest: false
-
-				} );
-
-				var plane = new THREE.PlaneGeometry( 1, 1 );
-
-				quadBG = new THREE.Mesh( plane, materialColor );
-				quadBG.position.z = -500;
-				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
-				sceneBG.add( quadBG );
-
-				//
-
-				var sceneMask = new THREE.Scene();
-
-				var plane = new THREE.PlaneGeometry( 1, 1 );
-
-				quadMask = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
-				quadMask.position.z = -300;
-				quadMask.scale.set( window.innerWidth / 2, window.innerHeight/2, 1 );
-				sceneMask.add( quadMask );
-
-				//
-
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColorHex( 0x000000, 1 );
-				renderer.autoClear = false;
-
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 400;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
+
+				object = new THREE.Object3D();
+				scene.add( object );
+
+				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+
+				for ( var i = 0; i < 100; i ++ ) {
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
+					mesh.position.multiplyScalar( Math.random() * 400 );
+					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50;
+					object.add( mesh );
+
+				}
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				// postprocessing
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+				var effect = new THREE.ShaderPass( THREE.DotScreenShader );
+				effect.uniforms[ 'scale' ].value = 4;
+				composer.addPass( effect );
+
+				var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
+				effect.uniforms[ 'amount' ].value = 0.0015;
+				effect.renderToScreen = true;
+				composer.addPass( effect );
 
 				//
-
-				var shaderBleach = THREE.ShaderExtras[ "bleachbypass" ];
-				var shaderSepia = THREE.ShaderExtras[ "sepia" ];
-				var shaderVignette = THREE.ShaderExtras[ "vignette" ];
-				var shaderScreen = THREE.ShaderExtras[ "screen" ];
-
-				var effectBleach = new THREE.ShaderPass( shaderBleach );
-				var effectSepia = new THREE.ShaderPass( shaderSepia );
-				var effectVignette = new THREE.ShaderPass( shaderVignette );
-				var effectScreen = new THREE.ShaderPass( shaderScreen );
-
-				effectBleach.uniforms[ "opacity" ].value = 0.95;
-
-				effectSepia.uniforms[ "amount" ].value = 0.9;
-
-				effectVignette.uniforms[ "offset" ].value = 0.95;
-				effectVignette.uniforms[ "darkness" ].value = 1.6;
-
-				var effectBloom = new THREE.BloomPass( 0.5 );
-				var effectFilm = new THREE.FilmPass( 0.5, 0.025, 648, false );
-				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
-				var effectFilmBW2 = new THREE.FilmPass( 0.05, 0.5, 2048, true );
-				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.6 );
-
-				//var renderMask = new THREE.MaskPass( sceneMask, cameraOrtho );
-				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
-				var clearMask = new THREE.ClearMaskPass();
-
-				//effectFilm.renderToScreen = true;
-				//effectFilmBW.renderToScreen = true;
-				//effectDotScreen.renderToScreen = true;
-				//effectBleach.renderToScreen = true;
-				effectVignette.renderToScreen = true;
-				//effectScreen.renderToScreen = true;
-
-				//
-
-				var renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
-				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
-
-				renderModel.clear = false;
-
-				composerScene = new THREE.EffectComposer( renderer );
-
-				composerScene.addPass( renderBackground );
-				composerScene.addPass( renderModel );
-
-				//
-
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
-
-				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: true };
-
-				var rtWidth  = window.innerWidth / 2;
-				var rtHeight = window.innerHeight / 2;
-
-				//
-
-				composer1 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
-
-				composer1.addPass( renderScene );
-				//composer1.addPass( renderMask );
-				composer1.addPass( effectFilmBW );
-				//composer1.addPass( clearMask );
-				composer1.addPass( effectVignette );
-
-				//
-
-				composer2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
-
-				composer2.addPass( renderScene );
-				composer2.addPass( renderMask );
-				composer2.addPass( effectDotScreen );
-				composer2.addPass( clearMask );
-				composer2.addPass( effectFilmBW2 );
-				composer2.addPass( effectVignette );
-
-				//
-
-				composer3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
-
-				composer3.addPass( renderScene );
-				//composer3.addPass( renderMask );
-				composer3.addPass( effectSepia );
-				composer3.addPass( effectFilm );
-				//composer3.addPass( clearMask );
-				composer3.addPass( effectVignette );
-
-				//
-
-				composer4 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
-
-				composer4.addPass( renderScene );
-				//composer4.addPass( renderMask );
-				composer4.addPass( effectBloom );
-				composer4.addPass( effectFilm );
-				composer4.addPass( effectBleach );
-				//composer4.addPass( clearMask );
-				composer4.addPass( effectVignette );
-
-				//
-
-				//onWindowResize();
-
-				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
-				halfWidth = window.innerWidth / 2;
-				halfHeight = window.innerHeight / 2;
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				cameraPerspective.aspect = window.innerWidth / window.innerHeight;
-				cameraPerspective.updateProjectionMatrix();
-
-				cameraOrtho.left = -halfWidth;
-				cameraOrtho.right = halfWidth;
-				cameraOrtho.top = halfHeight;
-				cameraOrtho.bottom = -halfHeight;
-
-				cameraOrtho.updateProjectionMatrix();
-
-				composerScene.reset();
-
-				composer1.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
-				composer2.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
-				composer3.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
-				composer4.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
-
-				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
-
-				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
-				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
-
 			}
-
-			function getText( id ) {
-
-				return document.getElementById( id ).textContent;
-
-			}
-
-			function createMesh( geometry, scene, scale ) {
-
-				geometry.computeTangents();
-
-				var ambient = 0x444444, diffuse = 0x888888, specular = 0x080810, shininess = 2;
-
-				var shader = THREE.ShaderUtils.lib[ "normal" ];
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value = - 0.75;
-
-				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-
-				uniforms[ "enableAO" ].value = false;
-				uniforms[ "enableDiffuse" ].value = true;
-
-				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniforms[ "uSpecularColor" ].value.setHex( specular );
-				uniforms[ "uAmbientColor" ].value.setHex( ambient );
-
-				uniforms[ "uShininess" ].value = shininess;
-
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var mat2 = new THREE.ShaderMaterial( parameters );
-
-				mesh = new THREE.Mesh( geometry, mat2 );
-				mesh.position.set( 0, -50, 0 );
-				mesh.scale.set( scale, scale, scale );
-
-				scene.add( mesh );
-
-				loader.statusDomElement.style.display = "none";
-
-			}
-
-			//
 
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				render();
-				stats.update();
+				object.rotation.x += 0.005;
+				object.rotation.y += 0.01;
 
-			}
-
-			function render() {
-
-				var time = Date.now() * 0.0004;
-
-				if ( mesh ) mesh.rotation.y = -time;
-
-				if ( materialColor.uniforms.time.value > 1 || materialColor.uniforms.time.value < 0 ) {
-
-					delta *= -1;
-
-				}
-
-				materialColor.uniforms.time.value += delta / 2;
-
-				renderer.setViewport( 0, 0, 2 * halfWidth, 2 * halfHeight );
-
-				renderer.clear();
-				composerScene.render( delta );
-
-				renderer.setViewport( 0, 0, halfWidth, halfHeight );
-				composer1.render( delta );
-
-				renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
-				composer2.render( delta );
-
-				renderer.setViewport( 0, halfHeight, halfWidth, halfHeight );
-				composer3.render( delta );
-
-				renderer.setViewport( halfWidth, halfHeight, halfWidth, halfHeight );
-				composer4.render( delta );
+				composer.render();
 
 			}
 
 		</script>
+
 	</body>
 </html>

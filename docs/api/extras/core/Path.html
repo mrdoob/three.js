@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:CurvePath] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A 2d path representation, comprising of points, lines, and cubes,  similar to the html5 2d canvas api. It extends CurvePath.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:todo points])</h3>
+		<div>
+		points -- array of Vector2
+		</div>
+		<div>
+		Creates a Path from the points. The first vector defines the offset. After that the lines get defined.
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+		<h3>[property:array actions]</h3>
+		<div>
+		The possible actions that define the path.
+		</div> 
+
+		<h2>Methods</h2>
+
+		<h3>[method:todo fromPoints]( vectors )</h3>
+		<div>
+		Adds to the Path from the points. The first vector defines the offset. After that the lines get defined.
+		</div>
+
+		<h3>[method:todo moveTo]( x, y )</h3>
+		<div>This moves the offset to x and y</div>
+
+		<h3>[method:todo lineTo]( x, y )</h3>
+		<div>This creates a line from the offset to X and Y and updates the offset to X and Y.</div>
+
+		<h3>[method:todo quadraticCurveTo]( aCPx, aCPy, aX, aY )</h3>
+		<div>This creates a quadratic curve from the offset to aX and aY with aCPx and aCPy as control point and updates the offset to aX and aY.</div>
+
+		<h3>[method:todo bezierCurveTo]( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY )</h3>
+		<div>This creates a bezier curve from the offset to aX and aY with aCP1x, aCP1y and aCP1x, aCP1y  as control points and updates the offset to aX and aY.</div>
+
+		<h3>.splineThru ( pts /*Array of Vector*/ ) </h3>
+		<div>todo</div>
+
+		<h3>[method:todo arc]( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise )</h3>
+		<div>todo</div>
+
+		<h3>[method:todo absarc]( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise )</h3>
+		<div>todo</div>
+
+		<h3>[method:todo ellipse]( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise )</h3>
+		<div>todo</div>
+
+		<h3>[method:todo absellipse]( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise )</h3>
+		<div>todo</div>
+
+		<h3>[method:todo toShapes]()</h3>
+		<div>todo</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

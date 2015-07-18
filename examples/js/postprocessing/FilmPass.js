@@ -2,9 +2,12 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
+THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
-	var shader = THREE.ShaderExtras[ "film" ];
+	if ( THREE.FilmShader === undefined )
+		console.error( "THREE.FilmPass relies on THREE.FilmShader" );
+
+	var shader = THREE.FilmShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -25,24 +28,31 @@ THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, g
 	this.renderToScreen = false;
 	this.needsSwap = true;
 
+
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene  = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.scene.add( this.quad );
+
 };
 
 THREE.FilmPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ "tDiffuse" ].texture = readBuffer;
+		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "time" ].value += delta;
 
-		THREE.EffectComposer.quad.material = this.material;
+		this.quad.material = this.material;
 
 		if ( this.renderToScreen ) {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera );
+			renderer.render( this.scene, this.camera );
 
 		} else {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false );
+			renderer.render( this.scene, this.camera, writeBuffer, false );
 
 		}
 

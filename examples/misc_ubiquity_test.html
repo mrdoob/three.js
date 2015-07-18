@@ -1,7 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js misc - geometry - polyfield</title>
+		<title>three.js misc - ubiquity - test</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -14,53 +14,51 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+		<script src="js/renderers/SVGRenderer.js"></script>
+		<script src="js/renderers/SoftwareRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="obj/Qrcode.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-
 		<script>
 
-			var SCREEN_WIDTH = window.innerWidth / 3;
-			var SCREEN_HEIGHT = window.innerHeight;
 			var AMOUNT = 100;
 
-			var container, stats;
+			var stats;
 
 			var camera, scene;
-			var canvasRenderer, svgRenderer, webglRenderer;
+			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
 
-			var mesh, group, qrcode;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var mesh, group;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				var width = window.innerWidth / 2;
+				var height = window.innerHeight / 2;
 
-				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, width / height, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.autoUpdate = false;
 
 				// QRCODE
 
-				qrcode = mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshFaceMaterial() );
+				mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshLambertMaterial( { /*emissive: 0xff0000,*/ vertexColors: THREE.FaceColors } ) );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
 
 				// CUBES
 
-				var cube = new THREE.CubeGeometry( 100, 100, 100 );
+				var cube = new THREE.BoxGeometry( 100, 100, 100 );
 
 				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } ) );
 				mesh.position.x = 500;
@@ -79,10 +77,9 @@
 
 				// PLANE
 
-				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 				mesh.position.y = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				mesh.doubleSided = true;
 				scene.add( mesh );
 
 				// CYLINDER
@@ -96,43 +93,83 @@
 				// POLYFIELD
 
 				var geometry = new THREE.Geometry();
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, side: THREE.DoubleSide } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var v = new THREE.Vector3( Math.random() * 1000 - 500, Math.random() * 1000 - 500, Math.random() * 1000 - 500 );
+					var v = new THREE.Vector3(
+						Math.random() * 1000 - 500,
+						Math.random() * 1000 - 500,
+						Math.random() * 1000 - 500
+					);
 
-					var v0 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
-					var v1 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
-					var v2 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+					var v0 = new THREE.Vector3(
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50
+					);
 
-					v0.position.addSelf( v );
-					v1.position.addSelf( v );
-					v2.position.addSelf( v );
+					var v1 = new THREE.Vector3(
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50
+					);
 
-					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, geometry.materials.length );
+					var v2 = new THREE.Vector3(
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50
+					);
 
-					geometry.materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+					v0.add( v );
+					v1.add( v );
+					v2.add( v );
+
+					var face = new THREE.Face3(
+						geometry.vertices.push( v0 ) - 1,
+						geometry.vertices.push( v1 ) - 1,
+						geometry.vertices.push( v2 ) - 1,
+						null,
+						new THREE.Color( Math.random() * 0xffffff )
+					);
 
 					geometry.faces.push( face );
 
 				}
 
 				geometry.computeFaceNormals();
-				geometry.computeCentroids();
 
-				group = new THREE.Object3D();
-				group.scale.x = group.scale.y = group.scale.z = 2;
+				group = new THREE.Mesh( geometry, material );
+				group.scale.set( 2, 2, 2 );
 				scene.add( group );
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				mesh.doubleSided = true;
-				group.add( mesh );
+				// SPRITES
 
-				/*
-				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10 } ) );
-				mesh.doubleSided = true;
-				group.add( mesh );
-				*/
+				var texture = THREE.ImageUtils.loadTexture( 'textures/sprite.png' );
+				var material = new THREE.SpriteMaterial( { map: texture, transparent: true } );
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					var sprite = new THREE.Sprite( material );
+					sprite.position.x = Math.random() * 1000 - 500;
+					sprite.position.y = Math.random() * 1000 - 500;
+					sprite.position.z = Math.random() * 1000 - 500;
+					sprite.scale.set( 64, 64, 1 );
+					scene.add( sprite );
+
+				}
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					var material = new THREE.SpriteMaterial( { color: Math.random() * 0xffffff } );
+					var sprite = new THREE.Sprite( material );
+					sprite.position.x = Math.random() * 1000 - 500;
+					sprite.position.y = Math.random() * 1000 - 500;
+					sprite.position.z = Math.random() * 1000 - 500;
+					sprite.scale.set( 64, 64, 1 );
+					scene.add( sprite );
+
+				}
 
 				// LIGHTS
 
@@ -140,35 +177,55 @@
 				scene.add( ambient );
 
 				var directional = new THREE.DirectionalLight( 0xffff00 );
+				directional.position.set( - 1, 0.5, 0 );
 				scene.add( directional );
 
 				canvasRenderer = new THREE.CanvasRenderer();
-				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( canvasRenderer.domElement );
+				canvasRenderer.setClearColor( 0xf0f0f0 );
+				canvasRenderer.setPixelRatio( window.devicePixelRatio );
+				canvasRenderer.setSize( width, height );
+				document.body.appendChild( canvasRenderer.domElement );
 
 				svgRenderer = new THREE.SVGRenderer();
-				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				svgRenderer.setClearColor( 0xf0f0f0 );
+				svgRenderer.setSize( width, height );
 				svgRenderer.setQuality( 'low' );
-				container.appendChild( svgRenderer.domElement );
+				document.body.appendChild( svgRenderer.domElement );
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				// webglRenderer.setFaceCulling( 0 );
-				container.appendChild( webglRenderer.domElement );
+				softwareRenderer = new THREE.SoftwareRenderer();
+				softwareRenderer.setClearColor( 0xf0f0f0 );
+				softwareRenderer.setSize( width, height );
+				document.body.appendChild( softwareRenderer.domElement );
+
+				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
+				webglRenderer.setClearColor( 0xf0f0f0 );
+				webglRenderer.setPixelRatio( window.devicePixelRatio );
+				webglRenderer.setSize( width, height );
+				document.body.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				document.body.appendChild( stats.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onWindowResize() {
 
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
+				var width = window.innerWidth / 2;
+				var height = window.innerHeight / 2;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				canvasRenderer.setSize( width, height );
+				svgRenderer.setSize( width, height );
+				softwareRenderer.setSize( width, height );
+				webglRenderer.setSize( width, height );
 
 			}
 
@@ -185,19 +242,19 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				var time = Date.now() * 0.0002;
+
+				camera.position.x = Math.sin( time ) * 500;
+				camera.position.z = Math.cos( time ) * 500;
 				camera.lookAt( scene.position );
 
-				group.rotation.y += 0.01;
+				group.rotation.x += 0.01;
 
-				/*
-				qrcode.rotation.x += 0.01;
-				qrcode.rotation.z += 0.02;
-				*/
+				scene.updateMatrixWorld();
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );
+				softwareRenderer.render( scene, camera );
 				webglRenderer.render( scene, camera );
 
 			}

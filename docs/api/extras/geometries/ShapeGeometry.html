@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+		
+		<h1>[name]</h1>
+
+		<div class="desc">Creates a one-sided polygonal geometry from one or more path shapes. Similar to [page:ExtrudeGeometry]</div>
+
+		<h2>Example</h2>
+		
+		
+		<code>var rectLength = 120, rectWidth = 40;
+		
+		var rectShape = new THREE.Shape();
+		rectShape.moveTo( 0,0 );
+		rectShape.lineTo( 0, rectWidth );
+		rectShape.lineTo( rectLength, rectWidth );
+		rectShape.lineTo( rectLength, 0 );
+		rectShape.lineTo( 0, 0 );
+		
+		var rectGeom = new THREE.ShapeGeometry( rectShape );
+		var rectMesh = new THREE.Mesh( rectGeom, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ) ;		
+		
+		scene.add( rectMesh );
+		</code>
+	
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Array shapes], [page:Object options])</h3>
+		<div>
+		shapes — [page:Array] of shapes, or a single [page:Shape shape] <br />
+		options — Optional options [page:Object object]
+		<ul>
+		<li>curveSegments - [page:Integer] - Not used at the moment - defaults to 12</li>
+		<li>material - [page:Integer] - index of the material in a material list</li>
+		<li>UVGenerator - A UV generator, defaults to [page:ExtrudeGeometry]'s WorldUVGenerator</li>
+		</ul>
+		</div>
+
+
+		<h2>Methods</h2>
+
+
+
+		<h3>.addShapeList([page:Array shapes], [page:Object options]) [page:this]</h3>
+		<div>
+		shapes — [page:Array] of [page:Shape shapes] <br />
+		options — See options in constructor
+		</div>
+		<div>
+		Adds a list of shapes to the geometry.
+		</div>
+
+		<h3>[method:null addShape]([page:Shape shape], [page:Object options])</h3>
+		<div>
+		shape — [page:Shape] <br />
+		options — See options in constructor
+		</div>
+		<div>
+		Adds a single shape to the geometry
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

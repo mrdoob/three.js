@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js - webgl</title>
@@ -17,7 +17,7 @@
 
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script>
 
@@ -26,7 +26,7 @@
 			var camera, scene, renderer;
 
 			init();
-			setInterval( render, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -39,6 +39,8 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -85,8 +87,11 @@
 
 				scene.remove( mesh );
 
-				renderer.deallocateObject( mesh );
-				renderer.deallocateTexture( texture );
+				// clean up
+
+				geometry.dispose();
+				material.dispose();
+				texture.dispose();
 
 			}
 

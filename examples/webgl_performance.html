@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - performance</title>
@@ -16,10 +16,8 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
-
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -27,7 +25,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var objects;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -37,7 +35,6 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			// render();
 			animate();
 
 
@@ -51,10 +48,12 @@
 
 				scene = new THREE.Scene();
 
+				objects = [];
+
 				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( { model: 'obj/Suzanne.js', callback: function ( geometry ) {
+				loader.load( 'obj/Suzanne.js', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
@@ -62,24 +61,25 @@
 
 						var mesh = new THREE.Mesh( geometry, material );
 
-						mesh.position.x = Math.random() * 10000 - 5000;
-						mesh.position.y = Math.random() * 10000 - 5000;
-						mesh.position.z = Math.random() * 10000 - 5000;
-						mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
-						mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
+						mesh.position.x = Math.random() * 8000 - 4000;
+						mesh.position.y = Math.random() * 8000 - 4000;
+						mesh.position.z = Math.random() * 8000 - 4000;
+						mesh.rotation.x = Math.random() * 2 * Math.PI;
+						mesh.rotation.y = Math.random() * 2 * Math.PI;
 						mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50 + 100;
-						mesh.matrixAutoUpdate = false;
-						mesh.updateMatrix();
+
+						objects.push( mesh );
 
 						scene.add( mesh );
 
 					}
 
-				} } );
+				} );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -87,6 +87,22 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -112,8 +128,14 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
 				camera.lookAt( scene.position );
+
+				for ( var i = 0, il = objects.length; i < il; i ++ ) {
+
+					objects[ i ].rotation.x += 0.01;
+					objects[ i ].rotation.y += 0.02;
+
+				}
 
 				renderer.render( scene, camera );
 

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Base class for implementing loaders.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Boolean showStatus] )</h3>
+		<div>
+		[page:Boolean showStatus] — Show the status of loading div.
+		</div>
+		<div>
+		Creates a new [name]. This should be called as base class.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean showStatus]</h3>
+		<div>If true, show loading status in the statusDomElement.</div>
+
+		<h3>[property:DOMElement statusDomElement]</h3>
+		<div>This is the recipient of status messages.</div>
+
+		<h3>[property:Function onLoadStart]</h3>
+		<div>Will be called when load starts.</div>
+		<div>The default is a function with empty body.</div>
+
+		<h3>[property:Function onLoadProgress]</h3>
+		<div>Will be called while load progresses.</div>
+		<div>The default is a function with empty body.</div>
+
+		<h3>[property:Function onLoadComplete]</h3>
+		<div>Will be called when load completes.</div>
+		<div>The default is a function with empty body.</div>
+
+		<h3>[property:string crossOrigin]</h3>
+		<div>
+		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Boolean needsTangents]( [page:Array materials] )</h3>
+		<div>
+		[page:Array materials] — an array of [page:Material]
+		</div>
+		<div>
+		Checks if the loaded object needs tangents based on its materials.
+		</div>
+
+		<h3>[method:null updateProgress]( [page:object progress] )</h3>
+		<div>
+		[page:Object progress] — an object containing loaded(contains the amount of bytes loaded) and optionally total (containing the total amount of bytes).
+		</div>
+		<div>
+		Updates the DOM object with the progress made.
+		</div>
+
+		<h3>[method:Material createMaterial]( [page:object m], [page:string texturePath] )</h3>
+		<div>
+		[page:Object m] — The parameters to create the material. <br />
+		[page:String texturePath] — The base path of the textures.
+		</div>
+		<div>
+		Creates the Material based on the parameters m.
+		</div>
+
+		<h3>[method:Array initMaterials]( [page:Array materials], [page:string texturePath] )</h3>
+		<div>
+		[page:Array materials] — an array of parameters to create materials. <br />
+		[page:String texturePath] —  The base path of the textures.
+		</div>
+		<div>
+		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
+		</div>
+
+		<h3>[method:String extractUrlBase]( [page:string url] )</h3>
+		<div>
+		[page:String url] —  The url to extract the base url from.
+		</div>
+		<div>
+		Extract the base from the URL.
+		</div>
+
+		<h3>[method:DOMElement addStatusElement]()</h3>
+		<div>
+		Add a DOM element to indicate the progress and return the DOMElement
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

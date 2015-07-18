@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [camaro]</title>
@@ -18,7 +18,7 @@
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; position:relative; }
 
-			#d { text-align:center; margin:1em 0 -2.5em 0; z-index:0; position:relative; display:block }
+			#d { text-align:center; margin:1em 0 2.5em 0; z-index:0; position:relative; display:block }
 			#buttons { margin:0.5em 0 0 0 }
 			button { font-family:georgia; border:0; background:#222; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px }
 			button:hover { background:#333 }
@@ -27,16 +27,17 @@
 
 	<body>
 		<div id="d">
-			<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube reflection demo. chevrolet camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a></div>
+			<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube reflection demo. chevrolet camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a></div>
 
 			<div id="buttons"></div>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/loaders/BinaryLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -48,8 +49,6 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-
-			var lightMesh;
 
 			var directionalLight, pointLight;
 
@@ -66,6 +65,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// CAMERA
+
 				camera = new THREE.PerspectiveCamera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 1000;
 
@@ -73,7 +74,7 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x555555 );
+				var ambient = new THREE.AmbientLight( 0x020202 );
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
@@ -81,18 +82,18 @@
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
-				sphere = new THREE.SphereGeometry( 100, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				lightMesh.scale.set( 0.05, 0.05, 0.05 );
-				lightMesh.position = pointLight.position;
-				scene.add( lightMesh );
+				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
+				
+				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				mesh.scale.set( 0.05, 0.05, 0.05 );
+				pointLight.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setFaceCulling( 0 );
+				renderer.setFaceCulling( THREE.CullFaceNone );
 
 				container.appendChild( renderer.domElement );
 
@@ -114,51 +115,145 @@
 
 				var camaroMaterials = {
 
-					body: [],
-					chrome: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube } ),
-					darkchrome: new THREE.MeshLambertMaterial( { color: 0x444444, envMap: textureCube } ),
-					glass: new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25, transparent: true } ),
-					tire: new THREE.MeshLambertMaterial( { color: 0x050505 } ),
-					interior: new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } ),
-					black: new THREE.MeshLambertMaterial( { color: 0x000000 } )
+					body: {
 
-				}
+						Orange: new THREE.MeshLambertMaterial( {
+							color: 0xff6600,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.3
+						} ),
 
-				camaroMaterials.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
-				camaroMaterials.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x226699, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
-				camaroMaterials.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+						Blue: new THREE.MeshLambertMaterial( {
+							color: 0x226699,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.3
+						} ),
 
-				camaroMaterials.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
-				camaroMaterials.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
-				camaroMaterials.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
+						Red: new THREE.MeshLambertMaterial( {
+							color: 0x660000,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						Black: new THREE.MeshLambertMaterial( {
+							color: 0x000000,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						White: new THREE.MeshLambertMaterial( {
+							color: 0xffffff,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						Carmine: new THREE.MeshPhongMaterial( {
+							color: 0x770000,
+							specular: 0xffaaaa,
+							envMap: textureCube,
+							combine: THREE.MultiplyOperation
+						} ),
+
+						Gold: new THREE.MeshPhongMaterial( {
+							color: 0xaa9944,
+							specular: 0xbbaa99,
+							shininess: 50,
+							envMap: textureCube,
+							combine: THREE.MultiplyOperation
+						} ),
+
+						Bronze: new THREE.MeshPhongMaterial( {
+							color: 0x150505,
+							specular: 0xee6600,
+							shininess: 10,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						Chrome: new THREE.MeshPhongMaterial( {
+							color: 0xffffff,
+							specular:0xffffff,
+							envMap: textureCube,
+							combine: THREE.MultiplyOperation
+						} )
+
+					},
+
+					chrome: new THREE.MeshLambertMaterial( {
+						color: 0xffffff,
+						envMap: textureCube
+					} ),
+
+					darkchrome: new THREE.MeshLambertMaterial( {
+						color: 0x444444,
+						envMap: textureCube
+					} ),
+
+					glass: new THREE.MeshBasicMaterial( {
+						color: 0x223344,
+						envMap: textureCube,
+						opacity: 0.25,
+						combine: THREE.MixOperation,
+						reflectivity: 0.25,
+						transparent: true
+					} ),
+
+					tire: new THREE.MeshLambertMaterial( {
+						color: 0x050505
+					} ),
+
+					interior: new THREE.MeshPhongMaterial( {
+						color: 0x050505,
+						shininess: 20
+					} ),
+
+					black: new THREE.MeshLambertMaterial( {
+						color: 0x000000
+					} )
+
+				};
 
 				var loader = new THREE.BinaryLoader();
 				loader.load( "obj/camaro/CamaroNoUv_bin.js", function( geometry ) { createScene( geometry, camaroMaterials ) } );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
-			function $( id ) { return document.getElementById( id ) }
+			function onWindowResize() {
 
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
-			function createButtons( materials, geometry ) {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-				var i, src = "", parent = $( "buttons" );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				for( i = 0; i < materials.length; i ++ ) {
+			}
 
-					src += '<button id="m' + i + '">' + materials[ i ][ 0 ] + '</button>';
+			function createButtons( materials, faceMaterial ) {
 
-				}
+				var buttons = document.getElementById( "buttons" );
 
-				parent.innerHTML = src;
+				for ( var key in materials ) {
 
-				for( i = 0; i < materials.length; i ++ ) {
+					var button = document.createElement( 'button' );
+					button.textContent = key;
+					button.addEventListener( 'click', function ( event ) {
 
-					$( "m" + i ).counter = i;
-					$( "m" + i ).addEventListener( 'click', function() { geometry.materials[ 0 ] = materials[ this.counter ][ 1 ] }, false );
+						faceMaterial.materials[ 0 ] = materials[ this.textContent ];
+
+					}, false );
+					buttons.appendChild( button );
 
 				}
 
@@ -168,22 +263,22 @@
 
 				var s = 75, m = new THREE.MeshFaceMaterial();
 
-				geometry.materials[ 0 ] = materials.body[ 0 ][ 1 ]; // car body
-				geometry.materials[ 1 ] = materials.chrome; // wheels chrome
-				geometry.materials[ 2 ] = materials.chrome; // grille chrome
-				geometry.materials[ 3 ] = materials.darkchrome; // door lines
-				geometry.materials[ 4 ] = materials.glass; // windshield
-				geometry.materials[ 5 ] = materials.interior; // interior
-				geometry.materials[ 6 ] = materials.tire; // tire
-				geometry.materials[ 7 ] = materials.black; // tireling
-				geometry.materials[ 8 ] = materials.black; // behind grille
+				m.materials[ 0 ] = materials.body[ "Orange" ]; // car body
+				m.materials[ 1 ] = materials.chrome; // wheels chrome
+				m.materials[ 2 ] = materials.chrome; // grille chrome
+				m.materials[ 3 ] = materials.darkchrome; // door lines
+				m.materials[ 4 ] = materials.glass; // windshield
+				m.materials[ 5 ] = materials.interior; // interior
+				m.materials[ 6 ] = materials.tire; // tire
+				m.materials[ 7 ] = materials.black; // tireling
+				m.materials[ 8 ] = materials.black; // behind grille
 
 				var mesh = new THREE.Mesh( geometry, m );
 				mesh.rotation.y = 1;
 				mesh.scale.set( s, s, s );
 				scene.add( mesh );
 
-				createButtons( materials.body, geometry );
+				createButtons( materials.body, m );
 
 			}
 
@@ -214,8 +309,8 @@
 
 				camera.lookAt( scene.position );
 
-				lightMesh.position.x = 1500 * Math.cos( timer );
-				lightMesh.position.z = 1500 * Math.sin( timer );
+				pointLight.position.x = 1500 * Math.cos( timer );
+				pointLight.position.z = 1500 * Math.sin( timer );
 
 				renderer.render( scene, camera );
 

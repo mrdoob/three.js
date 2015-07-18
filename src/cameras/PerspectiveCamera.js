@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
@@ -7,6 +7,10 @@
 THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 	THREE.Camera.call( this );
+
+	this.type = 'PerspectiveCamera';
+
+	this.zoom = 1;
 
 	this.fov = fov !== undefined ? fov : 50;
 	this.aspect = aspect !== undefined ? aspect : 1;
@@ -17,7 +21,7 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 };
 
-THREE.PerspectiveCamera.prototype = new THREE.Camera();
+THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
 THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
 
 
@@ -27,13 +31,11 @@ THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
  * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
  */
 
-THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameSize ) {
+THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
-	frameSize = frameSize !== undefined ? frameSize : 43.25; // 36x24mm
+	if ( frameHeight === undefined ) frameHeight = 24;
 
-	this.fov = 2 * Math.atan( frameSize / ( focalLength * 2 ) );
-	this.fov = 180 / Math.PI * this.fov;
-
+	this.fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
 	this.updateProjectionMatrix();
 
 }
@@ -91,28 +93,50 @@ THREE.PerspectiveCamera.prototype.setViewOffset = function ( fullWidth, fullHeig
 
 THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
+	var fov = THREE.Math.radToDeg( 2 * Math.atan( Math.tan( THREE.Math.degToRad( this.fov ) * 0.5 ) / this.zoom ) );
+
 	if ( this.fullWidth ) {
 
 		var aspect = this.fullWidth / this.fullHeight;
-		var top = Math.tan( this.fov * Math.PI / 360 ) * this.near;
-		var bottom = -top;
+		var top = Math.tan( THREE.Math.degToRad( fov * 0.5 ) ) * this.near;
+		var bottom = - top;
 		var left = aspect * bottom;
 		var right = aspect * top;
 		var width = Math.abs( right - left );
 		var height = Math.abs( top - bottom );
 
-		this.projectionMatrix = THREE.Matrix4.makeFrustum(
+		this.projectionMatrix.makeFrustum(
 			left + this.x * width / this.fullWidth,
 			left + ( this.x + this.width ) * width / this.fullWidth,
 			top - ( this.y + this.height ) * height / this.fullHeight,
 			top - this.y * height / this.fullHeight,
 			this.near,
-			this.far );
+			this.far
+		);
 
 	} else {
 
-		this.projectionMatrix = THREE.Matrix4.makePerspective( this.fov, this.aspect, this.near, this.far );
+		this.projectionMatrix.makePerspective( fov, this.aspect, this.near, this.far );
 
 	}
+
+};
+
+THREE.PerspectiveCamera.prototype.clone = function () {
+
+	var camera = new THREE.PerspectiveCamera();
+
+	THREE.Camera.prototype.clone.call( this, camera );
+
+	camera.zoom = this.zoom;
+
+	camera.fov = this.fov;
+	camera.aspect = this.aspect;
+	camera.near = this.near;
+	camera.far = this.far;
+
+	camera.projectionMatrix.copy( this.projectionMatrix );
+
+	return camera;
 
 };

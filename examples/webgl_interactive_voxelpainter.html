@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - interactive - voxel painter</title>
@@ -17,35 +17,26 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
-
-		<script src='js/DAT.GUI.min.js'></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
-			var camera, cameraTarget, scene, renderer;
-			var projector, plane, cube;
-			var mouse2D, mouse3D, ray,
-			rollOveredFace, isShiftDown = false,
-			theta = 45, isCtrlDown = false;
+			var container;
+			var camera, scene, renderer;
+			var plane, cube;
+			var mouse, raycaster, isShiftDown = false;
 
-			var rollOverMesh, rollOverMaterial, voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3();
+			var rollOverMesh, rollOverMaterial;
 			var cubeGeo, cubeMaterial;
-			var i, intersector;
 
-			var gui, voxelConfig = {
-				orthographicProjection: false
-			};
+			var objects = [];
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -57,41 +48,61 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel';
 				container.appendChild( info );
 
-				camera = new THREE.CombinedCamera( window.innerWidth, window.innerHeight, 45, 1, 10000, -2000, 10000 );
-				camera.position.y = 800;
-
-				cameraTarget = new THREE.Vector3( 0, 0, 0 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 500, 800, 1300 );
+				camera.lookAt( new THREE.Vector3() );
 
 				scene = new THREE.Scene();
 
 				// roll-over helpers
 
-				rollOverGeo = new THREE.CubeGeometry( 50, 50, 50 );
+				rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.add( rollOverMesh );
 
 				// cubes
 
-				cubeGeo = new THREE.CubeGeometry( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, ambient: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
-				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
-				cubeMaterial.ambient = cubeMaterial.color;
-
-				// picking
-
-				projector = new THREE.Projector();
+				cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
+				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
 
 				// grid
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
-				plane.rotation.x = - 90 * Math.PI / 180;
+				var size = 500, step = 50;
+
+				var geometry = new THREE.Geometry();
+
+				for ( var i = - size; i <= size; i += step ) {
+
+					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
+
+				}
+
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2, transparent: true } );
+
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				scene.add( line );
+
+				//
+
+				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+
+				var geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+				plane = new THREE.Mesh( geometry );
+				plane.visible = false;
 				scene.add( plane );
 
-				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
+				objects.push( plane );
 
 				// Lights
 
@@ -102,68 +113,29 @@
 				directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer : true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xf0f0f0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
-				// add GUI
-				gui = new DAT.GUI();
-				gui.add(voxelConfig, 'orthographicProjection').onChange(function(){
+				//
 
-					if ( voxelConfig.orthographicProjection ) {
-						camera.toOrthographic();
-						camera.position.x = 1000;
-               			camera.position.y = 707.106;
-                		camera.position.z = 1000;
-						theta = 90;
-					} else {
-						camera.toPerspective();
-						camera.position.y = 800;
-					}
-
-				});
-				gui.close();
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function getRealIntersector( intersects ) {
+			function onWindowResize() {
 
-				for( i = 0; i < intersects.length; i++ ) {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-					intersector = intersects[ i ];
-
-					if ( intersector.object != rollOverMesh ) {
-
-						return intersector;
-
-					}
-
-				}
-
-				return null;
-
-			}
-
-			function setVoxelPosition( intersector ) {
-
-				tmpVec.copy( intersector.face.normal );
-
-				voxelPosition.add( intersector.point, intersector.object.matrixRotationWorld.multiplyVector3( tmpVec ) );
-
-				voxelPosition.x = Math.floor( voxelPosition.x / 50 ) * 50 + 25;
-				voxelPosition.y = Math.floor( voxelPosition.y / 50 ) * 50 + 25;
-				voxelPosition.z = Math.floor( voxelPosition.z / 50 ) * 50 + 25;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -171,8 +143,22 @@
 
 				event.preventDefault();
 
-				mouse2D.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse2D.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+
+				raycaster.setFromCamera( mouse, camera );
+
+				var intersects = raycaster.intersectObjects( objects );
+
+				if ( intersects.length > 0 ) {
+
+					var intersect = intersects[ 0 ];
+
+					rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+					rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+
+				}
+
+				render();
 
 			}
 
@@ -180,19 +166,25 @@
 
 				event.preventDefault();
 
-				var intersects = ray.intersectScene( scene );
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+
+				raycaster.setFromCamera( mouse, camera );
+
+				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 
-					intersector = getRealIntersector( intersects );
+					var intersect = intersects[ 0 ];
 
 					// delete cube
 
-					if ( isCtrlDown ) {
+					if ( isShiftDown ) {
 
-						if ( intersector.object != plane ) {
+						if ( intersect.object != plane ) {
 
-							scene.remove( intersector.object );
+							scene.remove( intersect.object );
+
+							objects.splice( objects.indexOf( intersect.object ), 1 );
 
 						}
 
@@ -200,18 +192,19 @@
 
 					} else {
 
-						intersector = getRealIntersector( intersects );
-						setVoxelPosition( intersector );
-
 						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-						voxel.position.copy( voxelPosition );
-						voxel.matrixAutoUpdate = false;
-						voxel.updateMatrix();
+						voxel.position.copy( intersect.point ).add( intersect.face.normal );
+						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
 						scene.add( voxel );
+
+						objects.push( voxel );
 
 					}
 
+					render();
+
 				}
+
 			}
 
 			function onDocumentKeyDown( event ) {
@@ -219,7 +212,6 @@
 				switch( event.keyCode ) {
 
 					case 16: isShiftDown = true; break;
-					case 17: isCtrlDown = true; break;
 
 				}
 
@@ -227,59 +219,15 @@
 
 			function onDocumentKeyUp( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 16: isShiftDown = false; break;
-					case 17: isCtrlDown = false; break;
 
 				}
-			}
-
-			function save() {
-
-				window.open( renderer.domElement.toDataURL('image/png'), 'mywindow' );
-
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
 
 			}
 
 			function render() {
-
-				if ( isShiftDown ) {
-
-					theta += mouse2D.x * 3;
-
-				}
-
-				ray = projector.pickingRay( mouse2D.clone(), camera );
-
-				var intersects = ray.intersectScene( scene );
-
-				if ( intersects.length > 0 ) {
-
-					intersector = getRealIntersector( intersects );
-					if ( intersector ) {
-
-						setVoxelPosition( intersector );
-						rollOverMesh.position = voxelPosition;
-
-					}
-
-				}
-
-				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
-				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
-
-				camera.lookAt( cameraTarget );
 
 				renderer.render( scene, camera );
 

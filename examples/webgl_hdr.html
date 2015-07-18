@@ -1,31 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - HDR texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-		    body {
-			color: #000;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 
-			background-color: #fff;
-			margin: 0px;
-			overflow: hidden;
-		    }
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-		    #info {
-					color:#000;
-			position: absolute;
-			top: 0px; width: 100%;
-			padding: 5px;
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
 
-		    }
+			}
 
-		    a { color: red; }
+			a { color: red; }
 
 		</style>
 	</head>
@@ -33,15 +33,14 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl HDR texture example -
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl HDR texture example -
 			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<!-- HDR fragment shader -->
 
@@ -108,11 +107,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, mesh, directionalLight;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
+			var camera, scene, renderer;
 			var materialHDR, quad;
 
 			var sign = 1, rate = 1;
@@ -131,10 +126,6 @@
 
 				scene = new THREE.Scene();
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( directionalLight );
-
 				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
@@ -142,7 +133,7 @@
 				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						tDiffuse:  { type: "t", value: 0, texture: texture },
+						tDiffuse:  { type: "t", value: texture },
 						exposure:  { type: "f", value: 0.125 },
 						brightMax: { type: "f", value: 0.5 }
 						},
@@ -151,13 +142,14 @@
 
 				} );
 
-				var plane = new THREE.PlaneGeometry( 512, 768 );
+				var plane = new THREE.PlaneBufferGeometry( 512, 768 );
 
 				quad = new THREE.Mesh( plane, materialHDR );
 				quad.position.z = -100;
 				scene.add( quad );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -165,6 +157,19 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -206,8 +211,6 @@
 				}
 
 				materialHDR.uniforms.exposure.value += sign * rate * delta;
-
-				// Render final scene to the screen with film shader
 
 				renderer.render( scene, camera );
 

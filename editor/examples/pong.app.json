@@ -1,0 +1,134 @@
+{
+	"camera": {
+		"metadata": {
+			"version": 4.3,
+			"type": "Object",
+			"generator": "ObjectExporter"
+		},
+		"object": {
+			"uuid": "8EFB9C06-6312-4975-B04A-C9E4549BE348",
+			"type": "PerspectiveCamera",
+			"name": "Camera",
+			"fov": 50,
+			"aspect": 1.3291139240506329,
+			"near": 0.1,
+			"far": 100000,
+			"matrix": [0.9522120356559753,4.209433246415983e-9,-0.3054378032684326,0,-0.17742955684661865,0.8139731884002686,-0.553142249584198,0,0.24861818552017212,0.5809023976325989,0.7750750780105591,0,186.46363830566406,435.67681884765625,581.3063354492188,1]
+		}
+	},
+	"scene": {
+		"metadata": {
+			"version": 4.3,
+			"type": "Object",
+			"generator": "ObjectExporter"
+		},
+		"geometries": [
+			{
+				"uuid": "77B20ED1-2871-4B14-A652-8F823B2A817E",
+				"type": "PlaneGeometry",
+				"width": 600,
+				"height": 400,
+				"widthSegments": 1,
+				"heightSegments": 1
+			},
+			{
+				"uuid": "7ADE0D01-A56A-4D33-869A-6C360E096EF7",
+				"type": "BoxGeometry",
+				"width": 10,
+				"height": 10,
+				"depth": 10,
+				"widthSegments": 1,
+				"heightSegments": 1,
+				"depthSegments": 1
+			},
+			{
+				"uuid": "E8C064B6-3454-4739-9E02-3B07B8E70B4C",
+				"type": "BoxGeometry",
+				"width": 20,
+				"height": 20,
+				"depth": 100,
+				"widthSegments": 1,
+				"heightSegments": 1,
+				"depthSegments": 1
+			}],
+		"materials": [
+			{
+				"uuid": "7EDF7C08-6325-418A-BBAB-89341C694730",
+				"type": "MeshPhongMaterial",
+				"color": 16777215,
+				"emissive": 0,
+				"specular": 16777215,
+				"shininess": 30
+			},
+			{
+				"uuid": "B1CAF098-FE36-45E1-BEBE-8D6AC04821CC",
+				"type": "MeshPhongMaterial",
+				"color": 16711680,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 30
+			},
+			{
+				"uuid": "FBDBE66D-B613-4741-802D-5AE1DE07DE46",
+				"type": "MeshPhongMaterial",
+				"color": 2752767,
+				"emissive": 0,
+				"specular": 1118481,
+				"shininess": 30
+			}],
+		"object": {
+			"uuid": "31517222-A9A7-4EAF-B5F6-60751C0BABA3",
+			"type": "Scene",
+			"name": "Scene",
+			"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+			"children": [
+				{
+					"uuid": "B47D0BFC-D63A-4CBB-985E-9C4DBDF086E4",
+					"type": "Mesh",
+					"name": "Ground",
+					"geometry": "77B20ED1-2871-4B14-A652-8F823B2A817E",
+					"material": "7EDF7C08-6325-418A-BBAB-89341C694730",
+					"matrix": [1,0,0,0,0,0.0007960614748299122,-0.9999997019767761,0,0,0.9999997019767761,0.0007960614748299122,0,0,-10,0,1]
+				},
+				{
+					"uuid": "CE13E58A-4E8B-4F72-9E2E-7DE57C58F989",
+					"type": "Mesh",
+					"name": "Ball",
+					"geometry": "7ADE0D01-A56A-4D33-869A-6C360E096EF7",
+					"material": "B1CAF098-FE36-45E1-BEBE-8D6AC04821CC",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+				},
+				{
+					"uuid": "2AAEA3AA-EC45-492B-B450-10473D1EC6C5",
+					"type": "Mesh",
+					"name": "Pad 1",
+					"geometry": "E8C064B6-3454-4739-9E02-3B07B8E70B4C",
+					"material": "FBDBE66D-B613-4741-802D-5AE1DE07DE46",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,-240,0,0,1]
+				},
+				{
+					"uuid": "F1DD46A7-6584-4A37-BC76-852C3911077E",
+					"type": "Mesh",
+					"name": "Pad 2",
+					"geometry": "E8C064B6-3454-4739-9E02-3B07B8E70B4C",
+					"material": "FBDBE66D-B613-4741-802D-5AE1DE07DE46",
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,240,0,0,1]
+				},
+				{
+					"uuid": "C62AAE9F-9E51-46A5-BD2B-71BA804FC0B3",
+					"type": "DirectionalLight",
+					"name": "DirectionalLight 3",
+					"color": 16777215,
+					"intensity": 1,
+					"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,100,200,150,1]
+				}]
+		}
+	},
+	"scripts": {
+		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
+			{
+				"name": "Game logic",
+				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar position = ball.position;\n\nvar velocity = new THREE.Vector3();\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = Math.random() - 0.5;\ndirection.normalize();\n\nvar pad1 = this.getObjectByName( 'Pad 1' );\nvar pad2 = this.getObjectByName( 'Pad 2' );\n\nvar raycaster = new THREE.Raycaster();\nvar objects = [ pad1, pad2 ];\n\n//\n\nfunction mousemove( event ) {\n\n\tpad1.position.z = ( event.clientX / player.width ) * 300 - 150;\n\tpad2.position.z = - pad1.position.z;\n\n}\n\nfunction update( event ) {\n\t\n\tif ( position.x < -300 || position.x > 300 ) direction.x = - direction.x;\n\tif ( position.z < -200 || position.z > 200 ) direction.z = - direction.z;\n\t\n\tposition.x = Math.max( - 300, Math.min( 300, position.x ) );\n\tposition.z = Math.max( - 200, Math.min( 200, position.z ) );\n\t\n\traycaster.set( position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( objects );\n\t\n\tif ( intersections.length > 0 ) {\n\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 10 ) {\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n\tposition.add( velocity.copy( direction ).multiplyScalar( event.delta / 2 ) );\n\n}"
+			}]
+	}
+}

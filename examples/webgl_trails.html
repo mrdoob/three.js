@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - trails</title>
@@ -16,10 +16,9 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -27,18 +26,13 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
-
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
 			init();
 			animate();
-
 
 			function init() {
 
@@ -46,8 +40,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.x = 100000;
-				camera.position.z = 3200;
+				camera.position.set( 100000, 0, 3200 );
 
 				scene = new THREE.Scene();
 
@@ -56,22 +49,23 @@
 
 				for ( var i = 0; i < 2000; i ++ ) {
 
-					var vertex = new THREE.Vertex();
-					vertex.position.x = Math.random() * 4000 - 2000;
-					vertex.position.y = Math.random() * 4000 - 2000;
-					vertex.position.z = Math.random() * 4000 - 2000;
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 4000 - 2000;
+					vertex.y = Math.random() * 4000 - 2000;
+					vertex.z = Math.random() * 4000 - 2000;
 					geometry.vertices.push( vertex );
 
 					geometry.colors.push( new THREE.Color( colors[ Math.floor( Math.random() * colors.length ) ] ) );
 
 				}
 
-				var material = new THREE.ParticleBasicMaterial( { size: 1, vertexColors: THREE. VertexColors, depthTest: false, opacity: 0.5, sizeAttenuation: false } );
+				var material = new THREE.PointCloudMaterial( { size: 1, vertexColors: THREE. VertexColors, depthTest: false, opacity: 0.5, sizeAttenuation: false, transparent: true } );
 
-				var mesh = new THREE.ParticleSystem( geometry, material );
+				var mesh = new THREE.PointCloud( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				renderer.autoClearColor = false;
@@ -82,6 +76,24 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				//
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

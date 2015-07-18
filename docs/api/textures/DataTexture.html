@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+		Creates a texture directly from bitmapdata, width and height.
+		</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:ArraybufferView data], [page:Integer width], [page:Integer height], [page:number format], [page:number type], [page:number mapping], [page:number wrapS], [page:number wrapT], [page:number magFilter], [page:number minFilter], [page:number anisotropy])</h3>
+		<div>
+		data -- The data should be arraybufferview. It contains the data of image based on the type and format.<br />
+		width -- The width of the image. <br />
+		height -- The height of the image. <br />
+		format -- The default is THREE.RGBAFormat for the texture. Other formats are: THREE.AlphaFormat, THREE.RGBFormat, THREE.LuminanceFormat, and THREE.LuminanceAlphaFormat. There are also compressed texture formats, if the S3TC extension is supported: THREE.RGB_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT3_Format, and THREE.RGBA_S3TC_DXT5_Format.<br />
+		type -- The default is THREE.UnsignedByteType. Other valid types (as WebGL allows) are THREE.ByteType, THREE.ShortType, THREE.UnsignedShortType, THREE.IntType, THREE.UnsignedIntType, THREE.FloatType, THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type, and THREE.UnsignedShort565Type.<br />
+		mapping -- How the image is applied to the object. An object type of THREE.UVMapping is the default, where the U,V coordinates are used to apply the map, and a single texture is expected. The other types are THREE.CubeReflectionMapping, for cube maps used as a reflection map; THREE.CubeRefractionMapping, refraction mapping; and THREE.SphericalReflectionMapping, a spherical reflection map projection.<br />
+		wrapS -- The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.<br />
+		wrapT -- The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.<br />
+		magFilter -- How the texture is sampled when a texel covers more than one pixel. The default is THREE.LinearFilter, which takes the four closest texels and bilinearly interpolates among them. The other option is THREE.NearestFilter, which uses the value of the closest texel.<br />
+		minFilter -- How the texture is sampled when a texel covers less than one pixel. The default is THREE.LinearMipMapLinearFilter, which uses mipmapping and a trilinear filter. Other choices are THREE.NearestFilter, THREE.NearestMipMapNearestFilter, THREE.NearestMipMapLinearFilter, THREE.LinearFilter, and THREE.LinearMipMapNearestFilter. These vary whether the nearest texel or nearest four texels are retrieved on the nearest mipmap or nearest two mipmaps. Interpolation occurs among the samples retrieved.<br />
+		anisotropy -- The number of samples taken along the axis through the pixel that has the highest density of texels. By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used. Use renderer.getMaxAnisotropy() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.
+		</div>
+		<div>
+		This loads a image through the bitmap values. The values are dependant on the type and format.
+	 	If the type is THREE.UnsignedByteType, a Uint8Array must be supplied. If it is THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type or THREE.UnsignedShort565Type, a Uint16Array must be supplied.<br />
+	 	If the format is THREE.RGBAFormat, data needs 4 values for 1 pixel. These are supplied in the Red,Green,Blue and alpha sequence. <br />
+	 	Except if the type is THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type or THREE.UnsignedShort565Type.
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+
+		<h2>Methods</h2>
+
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

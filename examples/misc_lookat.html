@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js misc - lookAt</title>
@@ -29,12 +29,11 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Object3D::lookAt() demo</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Object3D::lookAt() demo</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -42,7 +41,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry, sphere;
+			var mesh, geometry, sphere;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -60,7 +59,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
@@ -69,7 +68,7 @@
 				scene.add( sphere );
 
 				var geometry = new THREE.CylinderGeometry( 0, 10, 100, 3 );
-				geometry.applyMatrix( new THREE.Matrix4().setRotationFromEuler( new THREE.Vector3( Math.PI / 2, Math.PI, 0 ) ) );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( new THREE.Euler( Math.PI / 2, Math.PI, 0 ) ) );
 
 				var material = new THREE.MeshNormalMaterial();
 
@@ -86,7 +85,9 @@
 
 				scene.matrixAutoUpdate = false;
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
@@ -96,6 +97,22 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -125,9 +142,9 @@
 				sphere.position.y = Math.cos( time * 0.5 ) * 2000;
 				sphere.position.z = Math.cos( time * 0.3 ) * 2000;
 
-				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
+				for ( var i = 1, l = scene.children.length; i < l; i ++ ) {
 
-					scene.objects[ i ].lookAt( sphere.position );
+					scene.children[ i ].lookAt( sphere.position );
 
 				}
 

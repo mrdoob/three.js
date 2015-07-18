@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry hierarchy</title>
@@ -16,10 +16,8 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
-
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -50,10 +48,10 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
+				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
 
-				group = new THREE.Object3D();
+				group = new THREE.Group();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
@@ -62,8 +60,8 @@
 					mesh.position.y = Math.random() * 2000 - 1000;
 					mesh.position.z = Math.random() * 2000 - 1000;
 
-					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
-					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
+					mesh.rotation.x = Math.random() * 2 * Math.PI;
+					mesh.rotation.y = Math.random() * 2 * Math.PI;
 
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
@@ -75,6 +73,8 @@
 				scene.add( group );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 
@@ -85,6 +85,22 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - depth material</title>
@@ -15,10 +15,12 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -33,9 +35,6 @@
 
 			var mouseX = 0;
 			var mouseXOnMouseDown = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			var moveForward = false;
 			var moveBackwards = false;
@@ -58,30 +57,24 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.x = 1000;
-				camera.position.y = 1000;
-				camera.position.z = 1000;
+				camera.position.set( 1000, 1000, 1000 );
 				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
 
 				// Plane
 
-				var material = new THREE.MeshDepthMaterial();
+				var material = new THREE.MeshDepthMaterial( { side: THREE.DoubleSide, overdraw: 0.5 } );
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
-				plane.overdraw = true;
-				plane.doubleSided = true;
-
-				plane.rotation.x = - 90 * ( Math.PI / 180 );
+				plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1000, 1000, 10, 10 ), material );
 				plane.position.y = - 100;
-
+				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
-				// Spheres
+				// Cubes
 
-				geometry = new THREE.CubeGeometry( 100, 100, 100 );
-				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000, overdraw: true } );
+				geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				material = new THREE.MeshDepthMaterial( { overdraw: 0.5 } );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
@@ -101,8 +94,8 @@
 				}
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				var debugCanvas = document.createElement( 'canvas' );
@@ -125,6 +118,20 @@
 
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function onDocumentKeyDown( event ) {

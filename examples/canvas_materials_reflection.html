@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - spherical reflection</title>
@@ -34,14 +34,14 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - spherical reflection demo.<br />
-			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>. Reflection texture by <a href="http://kewlers.scene.org/" target="_blank">Kewlers</a>.
+			<a href="http://threejs.org" target="_blank">three.js</a> - spherical reflection demo.<br />
+			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>. Reflection texture by <a href="http://kewlers.scene.org/" target="_blank">Kewlers</a>.
 		</div>
 
-		<script src="../build/Three.js"></script>
-		<script src="../src/extras/ImageUtils.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/CanvasRenderer.js"></script>
 
 		<script>
 
@@ -58,8 +58,7 @@
 				var container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.y = - 6;
-				camera.position.z = 100;
+				camera.position.set( 0, - 6, 100 );
 
 				scene = new THREE.Scene();
 
@@ -68,14 +67,28 @@
 
 					geometry.computeVertexNormals();
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: true } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', THREE.SphericalReflectionMapping ), overdraw: 0.5 } ) );
 					scene.add( mesh );
 
 				} );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -91,7 +104,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.0005;
+				var time = Date.now() * 0.0005;
 
 				if ( mesh ) mesh.rotation.y -= 0.01;
 

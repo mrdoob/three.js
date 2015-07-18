@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Material rendered with custom shaders. A shader is a small program written in [link:https://www.opengl.org/documentation/glsl/ GLSL] to run on the GPU. You may want to use a custom shader if you need to:
+		<ul>
+			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
+			<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>
+			<li>associate custom data with individual vertices ("custom attributes")</li>
+		</ul>
+		Note that a ShaderMaterial will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the vertexShader and fragmentShader properties must be compiled and run on the GPU using WebGL.
+		</div>
+
+		<h3>Example</h3>
+
+		<code>
+		var material = new THREE.ShaderMaterial( {
+
+			uniforms: {
+				time: { type: "f", value: 1.0 },
+				resolution: { type: "v2", value: new THREE.Vector2() }
+			},
+			attributes: {
+				vertexOpacity: { type: 'f', value: [] }
+			},
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+		} );
+		</code>
+
+		<h3>Vertex shaders and fragment shaders</h3>
+		<p>You can specify two different types of shaders for each material:
+		<ul>
+			<li>The *vertex shader* runs first; it recieves *attributes*, calculates/manipulates the position of each individual vertex, and passes additional data (*varying*s) to the fragment shader.</li>
+			<li>The *fragment shader* runs second; it sets the color of each individual "fragment" (pixel) rendered to the screen.</li>
+		</ul>
+		</p>
+		<p>
+		There are three types of variables in shaders: uniforms, attributes, and varyings:
+		<ul>
+			<li>*Uniforms* are variables that have the same value for all vertices---lighting, fog, and shadow maps are examples of data that would be stored in uniforms. Uniforms can be accessed by both the vertex shader and the fragment shader.</li>
+			<li>*Attributes* are variables associated with each vertex---for instance, the vertex position, face normal, and vertex color are all examples of data that would be stored in attributes. Attributes can <emph>only</emph> be accessed within the vertex shader.</li>
+			<li>*Varyings* are variables that are passed from the vertex shader to the fragment shader. For each fragment, the value of each varying will be smoothly interpolated from the values of adjacent vertices.</li>
+		</ul>
+		Note that <emph>within</emph> the shader itself, uniforms and attributes act like constants; you can only modify their values by passing different values to the buffers from your JavaScript code.
+		</p>
+		<h3>Built-in attributes and uniforms</h3>
+		<p>
+		[page:WebGLRenderer] provides many attributes and uniforms to shaders by default; definitions of these variables are prepended to your *fragmentShader* and *vertexShader* code by [page:WebGLProgram] when the shader is compiled; you don't need to declare them yourself. These variables are described in [page:WebGLProgram].
+		</p>
+		<p>
+		Some of these uniforms or attributes (e.g. those pertaining lighting, fog, etc.) require properties to be set on the material in order for [page:WebGLRenderer] to copy the appropriate values to the GPU---make sure to set these flags if you want to use these features in your own shader.
+		</p>
+		<p>
+		If you don't want [page:WebGLProgram] to add anything to your shader code, you can use [page:RawShaderMaterial] instead of this class.
+		</p>
+
+		<h3>Custom attributes and uniforms</h3>
+		Custom attributes and uniforms must be declared both in your GLSL shader code (within *vertexShader* and/or *fragmentShader*), <emph>and</emph> in the *attributes* and *uniforms* properties of your ShaderMaterial. The declaration in the material is necessary to ensure [page:WebGLRenderer] passes your attribute/uniform data in a buffer to the GPU when the shader is run. Note that *varying*s only need to be declared within the shader code (not within the material).
+		</p>
+		<p>
+		To declare a custom attribute, use the *attributes* property of the material:
+		<code>
+		attributes: {
+			vertexOpacity: { type: 'f', value: [] }
+		}
+		</code>
+		Each attribute must have a *type* property and a *value* property.
+		<table>
+			<caption><a id="attribute-types">Attribute types</a></caption>
+			<thead>
+				<tr>
+					<th>Attribute *type* string</th>
+					<th>GLSL type</th>
+					<th>JavaScript type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>'f'</code></td>
+					<td>float</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td><code>'v2'</code></td>
+					<td>vec2</td>
+					<td>[page:Vector2 THREE.Vector2]</td>
+				</tr>
+				<tr>
+					<td><code>'v3'</code></td>
+					<td>vec3</td>
+					<td>[page:Vector3 THREE.Vector3]</td>
+				</tr>
+				<tr>
+					<td><code>'c'</code></td>
+					<td>vec3</td>
+					<td>[page:Color THREE.Color]</td>
+				</tr>
+				<tr>
+					<td><code>'v4'</code></td>
+					<td>vec4</td>
+					<td>[page:Vector4 THREE.Vector4]</td>
+				</tr>
+			</tbody>
+		</table>
+		The way attribute data is stored depends on whether you're using [page:BufferGeometry] or [page:Geometry]:
+		<ul>
+			<li>When using [page:Geometry], attribute data is stored directly on the <emph>material</emph>, using the attribute's *value* array; each element of *value* should correspond to one vertex. To update an attribute, set the *needsUpdate* flag to true on the material attribute:
+			<code>
+			material.attributes.vertexOpacity.needsUpdate = true;
+			</code>
+			</li>
+			<li>When using [page:BufferGeometry], attribute data is stored within a [page:BufferAttribute] on the geometry itself, and the *value* within the material is ignored. To update an attribute, set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry:
+			<code>
+			geometry.attributes.vertexOpacity.needsUpdate = true;
+			</code>
+			See [page:BufferGeometry] for details.</li>
+		</ul>
+		</p>
+
+		<p>
+		To declare a custom uniform, use the *uniforms* property:
+		<code>
+		uniforms: {
+			time: { type: "f", value: 1.0 },
+			resolution: { type: "v2", value: new THREE.Vector2() }
+		}
+		</code>
+		Each uniform must have a <a href="#uniform-types">*type*</a> and a *value*:
+		<table>
+			<caption><a id="uniform-types">Uniform types</a></caption>
+			<thead>
+				<tr>
+					<th>Uniform *type* string</th>
+					<th>GLSL type</th>
+					<th>JavaScript type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>'i', '1i'</code></td>
+					<td>int</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td><code>'f', '1f'</code></td>
+					<td>float</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td><code>'v2'</code></td>
+					<td>vec2</td>
+					<td>[page:Vector2 THREE.Vector2]</td>
+				</tr>
+				<tr>
+					<td><code>'v3'</code></td>
+					<td>vec3</td>
+					<td>[page:Vector3 THREE.Vector3]</td>
+				</tr>
+				<tr>
+					<td><code>'c'</code></td>
+					<td>vec3</td>
+					<td>[page:Color THREE.Color]</td>
+				</tr>
+
+				<tr>
+					<td><code>'v4'</code></td>
+					<td>vec4</td>
+					<td>[page:Vector4 THREE.Vector4]</td>
+				</tr>
+
+				<tr>
+					<td><code>'m3'</code></td>
+					<td>mat3</td>
+					<td>[page:Matrix3 THREE.Matrix3]</td>
+				</tr>
+
+				<tr>
+					<td><code>'m4'</code></td>
+					<td>mat4</td>
+					<td>[page:Matrix4 THREE.Matrix4]</td>
+				</tr>
+				<tr>
+					<td><code>'t'</code></td>
+					<td>sampler2D</td>
+					<td>[page:Texture THREE.Texture]</td>
+				</tr>
+				<tr>
+					<td><code>'t'</code></td>
+					<td>samplerCube</td>
+					<td>[page:Texture THREE.CubeTexture]</td>
+				</tr>
+			</tbody>
+		</table>
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([page:Object parameters])</h3>
+		<div>
+		parameters -- An object containing various parameters setting up shaders and their uniforms.
+		</div>
+		<div>
+		shading — Define shading type. Default is THREE.SmoothShading.<br />
+		fog — Define whether the material color is affected by global fog settings. Default is true.<br />
+		wireframe — render geometry as wireframe. Default is false.<br />
+		wireframeLinewidth — Line thickness. Default is 1.<br />
+		vertexColors — Define how the vertices gets colored. Default is THREE.NoColors.<br />
+		skinning — Define whether the material uses skinning. Default is false.<br />
+		morphTargets — Define whether the material uses morphTargets. Default is false.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Object uniforms]</h3>
+		<div>
+		Object specifying the uniforms to be passed to the shader code; keys are uniform names, values are definitions of the form
+		<code>
+		{ type: 'f', value: 1.0 }
+		</code>
+		where *type* is a <a href="#uniform-types">uniform type string</a>, and *value* is the value of the uniform. Names must match the name of the uniform, as defined in the GLSL code. Note that uniforms are refreshed on every frame, so updating the value of the uniform will immediately update the value available to the GLSL code.
+		</div>
+
+		<h3>[property:Object attributes]</h3>
+		<div>
+		<p>
+		Object specifying the custom attributes to be passed to the shader code; keys are attribute names, values are definitions of the form
+		<code>
+		{ type: 'f', value: [1.0, 0.5, 2.0, ...] }
+		</code>
+		where *type* is an <a href="#attribute-types">attribute type string</a>, and *value* is an array containing an attribute value for each vertex in the geometry (or *undefined* if using [page:BufferGeometry]). Names must match the name of the attribute, as defined in the GLSL code.
+		</p>
+		<p>
+		Note that attribute buffers are <emph>not</emph> refreshed automatically when their values change; if using [page:Geometry], set <code>needsUpdate = true</code> on the attribute definition. If using [page:BufferGeometry], set <code>needsUpdate = true</code> on the [page:BufferAttribute].
+		</p>
+		</div>
+
+		<h3>[property:Object defines]</h3>
+		<div>
+		Defines custom constants using *#define* directives within the GLSL code for both the vertex shader and the fragment shader; each key/value pair yields another directive:
+		<code>
+		defines: {
+			FOO: 15,
+			BAR: true
+		}
+		</code>
+		yields the lines
+		<code>
+		#define FOO 15
+		#define BAR true
+		</code>
+		in the GLSL code.
+		</div>
+
+		<h3>[property:String vertexShader]</h3>
+		<div>
+		Vertex shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed as a string directly or loaded via AJAX instead.
+		</div>
+
+		<h3>[property:String fragmentShader]</h3>
+		<div>
+		Fragment shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed as a string directly or loaded via AJAX instead.
+		</div>
+
+		<h3>[property:Number shading]</h3>
+		<div>
+		Define shading type, which determines whether normals are smoothed between vertices; possible values are [page:Materials THREE.SmoothShading] or [page:Materials THREE.FlatShading]. Default is THREE.SmoothShading.
+		</div>
+
+		<h3>[property:Number linewidth]</h3>
+		<div>Controls line thickness; only effective if the material is attached to a [page:Line]. Default is 1.</div>
+		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<div>
+		Render geometry as wireframe (using GL_LINES instead of GL_TRIANGLES). Default is false (i.e. render as flat polygons).
+		</div>
+
+		<h3>[property:Number wireframeLinewidth]</h3>
+		<div>Controls wireframe thickness; only effective if the material is attached to a [page:Mesh] and *wireframe* is true. Default is 1.</div>
+		<div>Due to limitations in the <a href="https://code.google.com/p/angleproject/" target="_blank">ANGLE layer</a>, on Windows platforms linewidth will always be 1 regardless of the set value.</div>
+
+		<h3>[property:Boolean fog]</h3>
+		<div>Define whether the material color is affected by global fog settings; true to pass fog uniforms to the shader. Default is false.</div>
+
+		<h3>[property:Boolean lights]</h3>
+		<div>
+		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader
+		</div>
+
+		<h3>[property:Number vertexColors]</h3>
+		<div>
+		Define how the vertices are colored, by defining how the *colors* attribute gets populated. Possible values are [page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] and [page:Materials THREE.VertexColors]. Default is THREE.NoColors.
+		</div>
+
+		<h3>[property:Boolean skinning]</h3>
+		<div>
+		Define whether the material uses skinning; true to pass skinning attributes to the shader. Default is false.
+		</div>
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<div>
+		Defines whether the material uses morphTargets; true morphTarget attributes to this shader
+		</div>
+
+		<h3>[property:boolean morphNormals]</h3>
+		<div>
+			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
+			to the shader. Default is *false*.
+		</div>
+
+		<h3>[property:WebGLProgram program]</h3>
+		<div>
+		The compiled shader program associated with this material, generated by [page:WebGLRenderer]. You should not need to access this property.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[method:ShaderMaterial clone]()</h3>
+		<div>
+		Generates a shallow copy of this material. Note that the vertexShader and fragmentShader are copied <emph>by reference</emph>, as are the definitions of the *attributes*; this means that clones of the material will share the same compiled [page:WebGLProgram]. However, the *uniforms* are copied <emph>by value</emph>, which allows you to have different sets of uniforms for different copies of the material.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

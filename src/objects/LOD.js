@@ -1,34 +1,30 @@
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.LOD = function () {
 
 	THREE.Object3D.call( this );
 
-	this.LODs = [];
+	this.objects = [];
 
 };
 
-THREE.LOD.prototype = new THREE.Object3D();
+
+THREE.LOD.prototype = Object.create( THREE.Object3D.prototype );
 THREE.LOD.prototype.constructor = THREE.LOD;
-THREE.LOD.prototype.supr = THREE.Object3D.prototype;
 
-THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
+THREE.LOD.prototype.addLevel = function ( object, distance ) {
 
-	if ( visibleAtDistance === undefined ) {
+	if ( distance === undefined ) distance = 0;
 
-		visibleAtDistance = 0;
+	distance = Math.abs( distance );
 
-	}
+	for ( var l = 0; l < this.objects.length; l ++ ) {
 
-	visibleAtDistance = Math.abs( visibleAtDistance );
-
-	for ( var l = 0; l < this.LODs.length; l ++ ) {
-
-		if ( visibleAtDistance < this.LODs[ l ].visibleAtDistance ) {
+		if ( distance < this.objects[ l ].distance ) {
 
 			break;
 
@@ -36,43 +32,98 @@ THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 
 	}
 
-	this.LODs.splice( l, 0, { visibleAtDistance: visibleAtDistance, object3D: object3D } );
-	this.add( object3D );
+	this.objects.splice( l, 0, { distance: distance, object: object } );
+	this.add( object );
 
 };
 
-THREE.LOD.prototype.update = function ( camera ) {
+THREE.LOD.prototype.getObjectForDistance = function ( distance ) {
 
-	if ( this.LODs.length > 1 ) {
+	for ( var i = 1, l = this.objects.length; i < l; i ++ ) {
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+		if ( distance < this.objects[ i ].distance ) {
 
-		var inverse  = camera.matrixWorldInverse;
-		var distance = -( inverse.n31 * this.position.x + inverse.n32 * this.position.y + inverse.n33 * this.position.z + inverse.n34 );
+			break;
 
-		this.LODs[ 0 ].object3D.visible = true;
+		}
 
-		for ( var l = 1; l < this.LODs.length; l ++ ) {
+	}
 
-			if( distance >= this.LODs[ l ].visibleAtDistance ) {
+	return this.objects[ i - 1 ].object;
 
-				this.LODs[ l - 1 ].object3D.visible = false;
-				this.LODs[ l     ].object3D.visible = true;
+};
 
-			} else {
+THREE.LOD.prototype.raycast = ( function () {
 
-				break;
+	var matrixPosition = new THREE.Vector3();
+
+	return function ( raycaster, intersects ) {
+
+		matrixPosition.setFromMatrixPosition( this.matrixWorld );
+
+		var distance = raycaster.ray.origin.distanceTo( matrixPosition );
+
+		this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+
+	};
+
+}() );
+
+THREE.LOD.prototype.update = function () {
+
+	var v1 = new THREE.Vector3();
+	var v2 = new THREE.Vector3();
+
+	return function ( camera ) {
+
+		if ( this.objects.length > 1 ) {
+
+			v1.setFromMatrixPosition( camera.matrixWorld );
+			v2.setFromMatrixPosition( this.matrixWorld );
+
+			var distance = v1.distanceTo( v2 );
+
+			this.objects[ 0 ].object.visible = true;
+
+			for ( var i = 1, l = this.objects.length; i < l; i ++ ) {
+
+				if ( distance >= this.objects[ i ].distance ) {
+
+					this.objects[ i - 1 ].object.visible = false;
+					this.objects[ i     ].object.visible = true;
+
+				} else {
+
+					break;
+
+				}
+
+			}
+
+			for ( ; i < l; i ++ ) {
+
+				this.objects[ i ].object.visible = false;
 
 			}
 
 		}
 
-		for( ; l < this.LODs.length; l ++ ) {
+	};
 
-			this.LODs[ l ].object3D.visible = false;
+}();
 
-		}
+THREE.LOD.prototype.clone = function ( object ) {
 
+	if ( object === undefined ) object = new THREE.LOD();
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	for ( var i = 0, l = this.objects.length; i < l; i ++ ) {
+		var x = this.objects[ i ].object.clone();
+		x.visible = i === 0;
+		object.addLevel( x, this.objects[ i ].distance );
 	}
+
+	return object;
 
 };

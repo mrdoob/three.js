@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - custom attributes</title>
@@ -28,15 +28,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
-		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="../build/three.min.js"></script>
+
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
-
-		<script src="../build/Three.js"></script>
-
+		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -117,11 +115,11 @@
 
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xff2200 ) },
-				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/water.jpg" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/water.jpg" ) },
 
 			};
 
-			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
+			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
@@ -142,7 +140,7 @@
 			var vertices = sphere.geometry.vertices;
 			var values = attributes.displacement.value;
 
-			for( var v = 0; v < vertices.length; v++ ) {
+			for ( var v = 0; v < vertices.length; v++ ) {
 
 				values[ v ] = 0;
 				noise[ v ] = Math.random() * 5;
@@ -151,7 +149,9 @@
 
 			scene.add( sphere );
 
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1 } );
+			renderer = new THREE.WebGLRenderer();
+			renderer.setClearColor( 0x050505 );
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );
@@ -161,6 +161,19 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -180,9 +193,9 @@
 			sphere.rotation.y = sphere.rotation.z = 0.01 * time;
 
 			uniforms.amplitude.value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
-			THREE.ColorUtils.adjustHSV( uniforms.color.value, 0.0005, 0, 0 );
+			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
-			for( var i = 0; i < attributes.displacement.value.length; i ++ ) {
+			for ( var i = 0; i < attributes.displacement.value.length; i ++ ) {
 
 				attributes.displacement.value[ i ] = Math.sin( 0.1 * i + time );
 

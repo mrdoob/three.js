@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A class for displaying particles in the form of variable size points. For example, if using the [page:WebGLRenderer], the particles are displayed using GL_POINTS.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Geometry geometry], [page:Material material] )</h3>
+
+		<div>
+		geometry — An instance of [page:Geometry].<br />
+		material — An instance of [page:Material] (optional).
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Geometry geometry]</h3>
+
+		<div>An instance of [page:Geometry], where each vertex designates the position of a particle in the system.</div>
+
+		<h3>[property:Material material]</h3>
+
+		<div>An instance of [page:Material], defining the object's appearance. Default is a [page:PointCloudMaterial] with randomised colour.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:PointCloud clone]()</h3>
+		<div>
+		This creates a clone of the particle system.
+		</div>
+
+		<h3>[method:Array raycast]([page:Raycaster raycaster], [page:Array intersects])</h3>
+		<div>
+		Get intersections between a casted ray and this PointCloud. [page:Raycaster.intersectObject] will call this method.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+
+	</body>
+</html>
