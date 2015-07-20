@@ -509,23 +509,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( texture !== null && texture.image !== undefined ) {
 
-				if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
+				if ( texture.version > 0 ) {
 
-					if ( texture.image.width > 0 ) {
+					var pattern = _patterns[ texture.id ];
 
-						textureToPattern( texture );
+					if ( pattern === undefined || pattern.version !== texture.version ) {
+
+						pattern = textureToPattern( texture );
+						_patterns[ texture.id ] = pattern;
 
 					}
 
-					texture.addEventListener( 'update', onTextureUpdate );
-
-				}
-
-				var pattern = _patterns[ texture.id ];
-
-				if ( pattern !== undefined ) {
-
-					setFillStyle( pattern );
+					setFillStyle( pattern.canvas );
 
 				} else {
 
@@ -822,18 +817,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
-	function onTextureUpdate ( event ) {
-
-		textureToPattern( event.target );
-
-	}
-
 	function textureToPattern( texture ) {
 
 		if ( texture instanceof THREE.CompressedTexture ) return;
-
-		var repeatX = texture.wrapS === THREE.RepeatWrapping;
-		var repeatY = texture.wrapT === THREE.RepeatWrapping;
 
 		var image = texture.image;
 
@@ -845,15 +831,29 @@ THREE.CanvasRenderer = function ( parameters ) {
 		context.setTransform( 1, 0, 0, - 1, 0, image.height );
 		context.drawImage( image, 0, 0 );
 
-		_patterns[ texture.id ] = _context.createPattern(
-			canvas, repeatX === true && repeatY === true
-				 ? 'repeat'
-				 : repeatX === true && repeatY === false
-					 ? 'repeat-x'
-					 : repeatX === false && repeatY === true
-						 ? 'repeat-y'
-						 : 'no-repeat'
-		);
+		var repeatX = texture.wrapS === THREE.RepeatWrapping;
+		var repeatY = texture.wrapT === THREE.RepeatWrapping;
+
+		var repeat = 'no-repeat';
+
+		if ( repeatX === true && repeatY === true ) {
+
+			repeat = 'repeat';
+
+		} else if ( repeatX === true ) {
+
+			repeat = 'repeat-x';
+
+		} else if ( repeatY === true ) {
+
+			repeat = 'repeat-y';
+
+		}
+
+		return {
+			canvas: _context.createPattern( canvas, repeat ),
+			version: texture.version
+		};
 
 	}
 
@@ -861,30 +861,29 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( texture instanceof THREE.DataTexture ) return;
 
-		if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
+		if ( texture.image !== undefined ) {
 
-			if ( texture.image !== undefined && texture.image.width > 0 ) {
+			if ( texture.version > 0 ) {
 
-				textureToPattern( texture );
+				var pattern = _patterns[ texture.id ];
+
+				if ( pattern === undefined || pattern.version !== texture.version ) {
+
+					pattern = textureToPattern( texture );
+					_patterns[ texture.id ] = pattern;
+
+				}
+
+				setFillStyle( pattern.canvas );
+
+			} else {
+
+				setFillStyle( 'rgba( 0, 0, 0, 1)' );
+				_context.fill();
+
+				return;
 
 			}
-
-			texture.addEventListener( 'update', onTextureUpdate );
-
-		}
-
-		var pattern = _patterns[ texture.id ];
-
-		if ( pattern !== undefined ) {
-
-			setFillStyle( pattern );
-
-		} else {
-
-			setFillStyle( 'rgba(0,0,0,1)' );
-			_context.fill();
-
-			return;
 
 		}
 
