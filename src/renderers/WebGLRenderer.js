@@ -312,7 +312,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var array;
 
-		return function () {
+		return function getCompressedTextureFormats() {
 
 			if ( array !== undefined ) {
 
@@ -439,7 +439,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var value;
 
-		return function () {
+		return function getMaxAnisotropy() {
 
 			if ( value !== undefined ) return value;
 
@@ -697,7 +697,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		properties.delete( renderTargetProperties );
+		properties.delete( renderTarget );
 
 	}
 
@@ -3217,9 +3217,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	this.uploadTexture = function ( texture, slot ) {
-
-		var textureProperties = properties.get( texture );
+	function uploadTexture( textureProperties, texture, slot ) {
 
 		if ( textureProperties.__webglInit === undefined ) {
 
@@ -3329,15 +3327,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( texture.generateMipmaps && isImagePowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
-		texture.needsUpdate = false;
+		textureProperties.__version = texture.version;
 
 		if ( texture.onUpdate ) texture.onUpdate( texture );
 
-	};
+	}
 
 	this.setTexture = function ( texture, slot ) {
 
-		if ( texture.needsUpdate === true ) {
+		var textureProperties = properties.get( texture );
+
+		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 			var image = texture.image;
 
@@ -3355,13 +3355,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_this.uploadTexture( texture, slot );
+			uploadTexture( textureProperties, texture, slot );
 			return;
 
 		}
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, properties.get( texture ).__webglTexture );
+		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 
 	};
 
@@ -3397,7 +3397,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( texture.image.length === 6 ) {
 
-			if ( texture.needsUpdate ) {
+			if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
 				if ( ! textureProperties.__image__webglTextureCube ) {
 
@@ -3492,7 +3492,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				texture.needsUpdate = false;
+				textureProperties.__version = texture.version;
 
 				if ( texture.onUpdate ) texture.onUpdate( texture );
 

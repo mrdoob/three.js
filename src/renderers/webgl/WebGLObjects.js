@@ -8,7 +8,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	var morphInfluences = new Float32Array( 8 );
 
-	var geometries = new THREE.WebGLGeometries( gl, info );
+	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
 

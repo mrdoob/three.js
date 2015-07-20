@@ -73,7 +73,7 @@ THREE.LOD.prototype.raycast = ( function () {
 
 	var matrixPosition = new THREE.Vector3();
 
-	return function ( raycaster, intersects ) {
+	return function raycast( raycaster, intersects ) {
 
 		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
@@ -90,7 +90,7 @@ THREE.LOD.prototype.update = function () {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
 
-	return function ( camera ) {
+	return function update( camera ) {
 
 		var levels = this.levels;
 

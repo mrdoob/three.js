@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author mudcube / http://mudcu.be/
  */
- 
+
 THREE.STLBinaryExporter = function () {};
 
 THREE.STLBinaryExporter.prototype = {
@@ -15,7 +15,7 @@ THREE.STLBinaryExporter.prototype = {
 		var vector = new THREE.Vector3();
 		var normalMatrixWorld = new THREE.Matrix3();
 
-		return function ( scene ) {
+		return function parse( scene ) {
 
 			var triangles = 0;
 			scene.traverse( function ( object ) {
@@ -64,12 +64,12 @@ THREE.STLBinaryExporter.prototype = {
 
 					}
 
-					output.setUint16(offset, 0, true); offset += 2; // attribute byte count					
+					output.setUint16(offset, 0, true); offset += 2; // attribute byte count
 
 				}
 
 			} );
-			
+
 			return output;
 
 		};

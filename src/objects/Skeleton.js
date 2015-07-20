@@ -145,7 +145,7 @@ THREE.Skeleton.prototype.update = ( function () {
 
 	var offsetMatrix = new THREE.Matrix4();
 
-	return function () {
+	return function update() {
 
 		// flatten bone matrices to array
 
