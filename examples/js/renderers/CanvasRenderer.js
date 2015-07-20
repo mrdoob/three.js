@@ -509,24 +509,22 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( texture !== null ) {
 
-				if ( texture.version === 0 ||
-					texture instanceof THREE.CompressedTexture ||
-					texture instanceof THREE.DataTexture ) {
+				var pattern = _patterns[ texture.id ];
 
-						setFillStyle( 'rgba( 0, 0, 0, 1 )' );
+				if ( pattern === undefined || pattern.version !== texture.version ) {
+
+					pattern = textureToPattern( texture );
+					_patterns[ texture.id ] = pattern;
+
+				}
+
+				if ( pattern.canvas !== undefined ) {
+
+					setFillStyle( pattern.canvas );
 
 				} else {
 
-					var pattern = _patterns[ texture.id ];
-
-					if ( pattern === undefined || pattern.version !== texture.version ) {
-
-						pattern = textureToPattern( texture );
-						_patterns[ texture.id ] = pattern;
-
-					}
-
-					setFillStyle( pattern.canvas );
+					setFillStyle( 'rgba( 0, 0, 0, 1 )' );
 
 				}
 
@@ -821,6 +819,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function textureToPattern( texture ) {
 
+		if ( texture.version === 0 ||
+			texture instanceof THREE.CompressedTexture ||
+			texture instanceof THREE.DataTexture ) {
+
+				return {
+					canvas: undefined,
+					version: texture.version
+				}
+
+		}
+
 		var image = texture.image;
 
 		var canvas = document.createElement( 'canvas' );
@@ -853,21 +862,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 		return {
 			canvas: _context.createPattern( canvas, repeat ),
 			version: texture.version
-		};
+		}
 
 	}
 
 	function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
-
-		if ( texture.version === 0 ||
-			texture instanceof THREE.CompressedTexture ||
-			texture instanceof THREE.DataTexture ) {
-
-				setFillStyle( 'rgba( 0, 0, 0, 1)' );
-				_context.fill();
-				return;
-
-		}
 
 		var pattern = _patterns[ texture.id ];
 
@@ -878,7 +877,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		setFillStyle( pattern.canvas );
+		if ( pattern.canvas !== undefined ) {
+
+			setFillStyle( pattern.canvas );
+
+		} else {
+
+			setFillStyle( 'rgba( 0, 0, 0, 1)' );
+			_context.fill();
+			return;
+
+		}
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
