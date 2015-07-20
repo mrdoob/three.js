@@ -11474,7 +11474,7 @@ THREE.BufferGeometry.prototype = {
 		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
-		var offsets = this.drawcalls;
+		var drawcalls = this.drawcalls;
 		var boundingSphere = this.boundingSphere;
 
 		for ( var key in attributes ) {
@@ -11491,9 +11491,9 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( offsets.length > 0 ) {
+		if ( drawcalls.length > 0 ) {
 
-			data.data.offsets = JSON.parse( JSON.stringify( offsets ) );
+			data.data.drawcalls = JSON.parse( JSON.stringify( drawcalls ) );
 
 		}
 
@@ -13695,18 +13695,16 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
-		var offsets = json.data.offsets;
+		var drawcalls = json.data.drawcalls || json.data.offsets;
 
-		if ( offsets !== undefined ) {
+		if ( drawcalls !== undefined ) {
 
-			var offsetsArray = JSON.parse( JSON.stringify( offsets ) );
+			for ( var i = 0, n = drawcalls.length; i !== n; ++ i ) {
 
-			for ( var i = 0; i < offsetsArray.length; i ++ ) {
-
-				var offset = offsetsArray[i];
-				var indexStart = offset.start;
-				var indexCount = offset.count;
-				var indexOffset = offset.index;
+				var drawcall = drawcalls[ i ];
+				var indexStart = drawcall.start;
+				var indexCount = drawcall.count;
+				var indexOffset = drawcall.index;
 
 				geometry.addDrawcall( indexStart, indexCount, indexOffset );
 
@@ -17088,6 +17086,8 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 
 		var size = THREE.Math.nextPowerOfTwo( Math.sqrt( this.bones.length * 4 ) ); // 4 pixels needed for 1 matrix
 
+		if ( size === 0 ) size = 2; // Avoid creating empty texture
+
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
 
@@ -17261,32 +17261,19 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	if ( this.geometry && this.geometry.bones !== undefined ) {
 
-		var bone, gbone, p, q, s;
+		var bone, gbone;
 
 		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			p = gbone.pos;
-			q = gbone.rotq;
-			s = gbone.scl;
-
 			bone = new THREE.Bone( this );
 			bones.push( bone );
 
 			bone.name = gbone.name;
-			bone.position.set( p[ 0 ], p[ 1 ], p[ 2 ] );
-			bone.quaternion.set( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
-
-			if ( s !== undefined ) {
-
-				bone.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
-
-			} else {
-
-				bone.scale.set( 1, 1, 1 );
-
-			}
+			bone.position.fromArray( gbone.pos );
+			bone.quaternion.fromArray( gbone.rotq );
+			if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
 
 		}
 
@@ -17405,7 +17392,6 @@ THREE.SkinnedMesh.prototype.clone = function( object ) {
 	return object;
 
 };
-
 
 // File:src/objects/MorphAnimMesh.js
 
