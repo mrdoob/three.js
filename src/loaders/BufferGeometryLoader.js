@@ -53,7 +53,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 			for ( var i = 0, n = drawcalls.length; i !== n; ++ i ) {
 
-				var drawcall = drawcallsArray[i];
+				var drawcall = drawcalls[ i ];
 				var indexStart = drawcall.start;
 				var indexCount = drawcall.count;
 				var indexOffset = drawcall.index;
