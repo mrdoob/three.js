@@ -30,11 +30,27 @@
 
 				scene = new THREE.Scene();
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
+				var geometry = new THREE.BufferGeometry().fromGeometry( new THREE.BoxGeometry( 200, 200, 200 ) );
 
-				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				var vertsPerFace = 3;
+				var faceColor = new Float32Array( 36 );
 
+				for ( var i = 0; i < 6; i ++ ) {
+
+					var color = new THREE.Color( 0xffffff * Math.random() );
+
+					faceColor[i * 6 + 0] = color.r;
+					faceColor[i * 6 + 1] = color.g;
+					faceColor[i * 6 + 2] = color.b;
+					faceColor[i * 6 + 3] = color.r;
+					faceColor[i * 6 + 4] = color.g;
+					faceColor[i * 6 + 5] = color.b;
+
+				}
+
+				geometry.addAttribute( 'color', new THREE.ElementBufferAttribute( faceColor, 3, vertsPerFace ) );
+
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 

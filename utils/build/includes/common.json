@@ -26,6 +26,7 @@
 	"src/core/Face4.js",
 	"src/core/BufferAttribute.js",
 	"src/core/DynamicBufferAttribute.js",
+	"src/core/ElementBufferAttribute.js",
 	"src/core/InstancedBufferAttribute.js",
 	"src/core/InterleavedBuffer.js",
 	"src/core/InstancedInterleavedBuffer.js",
