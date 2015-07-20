@@ -74,7 +74,7 @@ THREE.Object3D = function () {
 	this.userData = {};
 	
 	//contains the last state of position, quaternion & scale
-	this._matrixState = [ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 ]
+	this._matrixState = [ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 ];
 
 };
 
@@ -627,8 +627,6 @@ THREE.Object3D.prototype = {
 			}
 
 			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
 			
 		}
 
