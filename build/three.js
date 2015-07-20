@@ -12443,9 +12443,13 @@ THREE.SpotLight.prototype.toJSON = function ( meta ) {
 
 THREE.Cache = {
 
+	enabled: false,
+
 	files: {},
 
 	add: function ( key, file ) {
+
+		if ( this.enabled === false ) return;
 
 		// console.log( 'THREE.Cache', 'Adding key:', key );
 
@@ -12454,6 +12458,8 @@ THREE.Cache = {
 	},
 
 	get: function ( key ) {
+
+		if ( this.enabled === false ) return;
 
 		// console.log( 'THREE.Cache', 'Checking key:', key );
 
@@ -23566,21 +23572,6 @@ THREE.WebGLGeometries = function ( gl, info ) {
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
-		var buffergeometry = geometries[ geometry.id ];
-
-		for ( var name in buffergeometry.attributes ) {
-
-			var attribute = buffergeometry.attributes[ name ];
-
-			if ( attribute.buffer !== undefined ) {
-
-				gl.deleteBuffer( attribute.buffer );
-
-				delete attribute.buffer;
-
-			}
-
-		}
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
