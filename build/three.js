@@ -23531,7 +23531,7 @@ THREE.WebGLExtensions = function ( gl ) {
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLGeometries = function ( gl, info ) {
+THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	var geometries = {};
 
@@ -23572,12 +23572,53 @@ THREE.WebGLGeometries = function ( gl, info ) {
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
+		var buffergeometry = geometries[ geometry.id ];
+
+		for ( var name in buffergeometry.attributes ) {
+
+			var attribute = buffergeometry.attributes[ name ];
+			var buffer = getAttributeBuffer( attribute );
+
+			if ( buffer !== undefined ) {
+
+				gl.deleteBuffer( buffer );
+				removeAttributeBuffer( attribute );
+
+			}
+
+		}
 
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		delete geometries[ geometry.id ];
 
 		info.memory.geometries --;
+
+	}
+
+	function getAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			return properties.get( attribute.data ).__webglBuffer;
+
+		}
+
+		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function removeAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			properties.delete( attribute.data );
+
+		} else {
+
+			properties.delete( attribute );
+
+		}
 
 	}
 
@@ -23595,7 +23636,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	var morphInfluences = new Float32Array( 8 );
 
-	var geometries = new THREE.WebGLGeometries( gl, info );
+	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
 
