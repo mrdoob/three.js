@@ -507,9 +507,15 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			var texture = material.map;
 
-			if ( texture !== null && texture.image !== undefined ) {
+			if ( texture !== null ) {
 
-				if ( texture.version > 0 ) {
+				if ( texture.version === 0 ||
+					texture instanceof THREE.CompressedTexture ||
+					texture instanceof THREE.DataTexture ) {
+
+						setFillStyle( 'rgba( 0, 0, 0, 1 )' );
+
+				} else {
 
 					var pattern = _patterns[ texture.id ];
 
@@ -521,10 +527,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 					}
 
 					setFillStyle( pattern.canvas );
-
-				} else {
-
-					setFillStyle( 'rgba( 0, 0, 0, 1 )' );
 
 				}
 
@@ -819,8 +821,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function textureToPattern( texture ) {
 
-		if ( texture instanceof THREE.CompressedTexture ) return;
-
 		var image = texture.image;
 
 		var canvas = document.createElement( 'canvas' );
@@ -859,33 +859,26 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-		if ( texture instanceof THREE.DataTexture ) return;
-
-		if ( texture.image !== undefined ) {
-
-			if ( texture.version > 0 ) {
-
-				var pattern = _patterns[ texture.id ];
-
-				if ( pattern === undefined || pattern.version !== texture.version ) {
-
-					pattern = textureToPattern( texture );
-					_patterns[ texture.id ] = pattern;
-
-				}
-
-				setFillStyle( pattern.canvas );
-
-			} else {
+		if ( texture.version === 0 ||
+			texture instanceof THREE.CompressedTexture ||
+			texture instanceof THREE.DataTexture ) {
 
 				setFillStyle( 'rgba( 0, 0, 0, 1)' );
 				_context.fill();
-
 				return;
 
-			}
+		}
+
+		var pattern = _patterns[ texture.id ];
+
+		if ( pattern === undefined || pattern.version !== texture.version ) {
+
+			pattern = textureToPattern( texture );
+			_patterns[ texture.id ] = pattern;
 
 		}
+
+		setFillStyle( pattern.canvas );
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
