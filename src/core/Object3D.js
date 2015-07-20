@@ -662,11 +662,11 @@ THREE.Object3D.prototype = {
 	clone: function ( recursive ) {
 
 		var object = new THREE.Object3D();
-		return object._copyFrom( this, recursive );
+		return object.copy( this, recursive );
 
 	},
 
-	_copyFrom: function ( source, recursive ) {
+	copy: function ( source, recursive ) {
 
 		if ( recursive === undefined ) recursive = true;
 

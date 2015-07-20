@@ -112,7 +112,7 @@ THREE.SphereBufferGeometry.prototype.clone = function () {
 		this.parameters.thetaLength
 	);
 
-	THREE.BufferGeometry.prototype._copyFrom.call( geometry, this );
+	THREE.BufferGeometry.prototype.copy.call( geometry, this );
 
 	return geometry;
 

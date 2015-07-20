@@ -1049,11 +1049,11 @@ THREE.Geometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.Geometry();
-		return geometry._copyFrom( this );
+		return geometry.copy( this );
 
 	},
 
-	_copyFrom: function ( source ) {
+	copy: function ( source ) {
 
 		this.vertices = [];
 		this.faces = [];

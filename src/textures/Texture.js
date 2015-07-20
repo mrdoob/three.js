@@ -66,11 +66,11 @@ THREE.Texture.prototype = {
 	clone: function () {
 
 		var texture = new THREE.Texture();
-		return texture._copyFrom( this );
+		return texture.copy( this );
 
 	},
 
-	_copyFrom: function ( source ) {
+	copy: function ( source ) {
 
 		this.image = source.image;
 		this.mipmaps = source.mipmaps.slice( 0 );

@@ -110,32 +110,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	copy: function ( geometry ) {
-
-		// TODO Clear attributes? Clear drawcalls? Copy morphTargets?
-
-		var attributes = geometry.attributes;
-		var offsets = geometry.drawcalls;
-
-		for ( var name in attributes ) {
-
-			var attribute = attributes[ name ];
-
-			this.addAttribute( name, attribute.clone() );
-
-		}
-
-		for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-			var offset = offsets[ i ];
-			this.addDrawCall( offset.start, offset.count, offset.index );
-
-		}
-
-		return this;
-
-	},
-
 	center: function () {
 
 		this.computeBoundingBox();
@@ -1108,11 +1082,38 @@ THREE.BufferGeometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.BufferGeometry();
-		return geometry._copyFrom( this );
+		return geometry.copy( this );
 
 	},
 
-	_copyFrom: function ( source ) {
+
+	copy: function ( geometry ) {
+
+		// TODO Clear attributes? Clear drawcalls? Copy morphTargets?
+
+		var attributes = geometry.attributes;
+		var offsets = geometry.drawcalls;
+
+		for ( var name in attributes ) {
+
+			var attribute = attributes[ name ];
+
+			this.addAttribute( name, attribute.clone() );
+
+		}
+
+		for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+			var offset = offsets[ i ];
+			this.addDrawCall( offset.start, offset.count, offset.index );
+
+		}
+
+		return this;
+
+	},
+
+	copy: function ( source ) {
 
 		for ( var attr in source.attributes ) {
 

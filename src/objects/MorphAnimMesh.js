@@ -195,11 +195,11 @@ THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 THREE.MorphAnimMesh.prototype.clone = function () {
 
 	var morph = new THREE.MorphAnimMesh( this.geometry, this.material );
-	return morph._copyFrom( this );
+	return morph.copy( this );
 
 };
 
-THREE.MorphAnimMesh.prototype._copyFrom = function ( source ) {
+THREE.MorphAnimMesh.prototype.copy = function ( source ) {
 
 	this.duration = source.duration;
 	this.mirroredLoop = source.mirroredLoop;
@@ -211,7 +211,7 @@ THREE.MorphAnimMesh.prototype._copyFrom = function ( source ) {
 	this.direction = source.direction;
 	this.directionBackwards = source.directionBackwards;
 
-	THREE.Mesh.prototype._copyFrom.call( this, source );
+	THREE.Mesh.prototype.copy.call( this, source );
 
 	return this;
 

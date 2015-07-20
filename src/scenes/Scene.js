@@ -21,13 +21,13 @@ THREE.Scene.prototype.constructor = THREE.Scene;
 THREE.Scene.prototype.clone = function () {
 
 	var scene = new THREE.Scene();
-	return scene._copyFrom( this );
+	return scene.copy( this );
 
 };
 
-THREE.Scene.prototype._copyFrom = function ( source ) {
+THREE.Scene.prototype.copy = function ( source ) {
 
-	THREE.Object3D.prototype._copyFrom.call( this, source );
+	THREE.Object3D.prototype.copy.call( this, source );
 
 	if ( source.fog !== null ) this.fog = source.fog.clone();
 	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();

@@ -39,7 +39,7 @@ THREE.IcosahedronGeometry.prototype.clone = function () {
 		this.parameters.detail
 	);
 
-	THREE.PolyhedronGeometry.prototype._copyFrom.call( geometry, this );
+	THREE.PolyhedronGeometry.prototype.copy.call( geometry, this );
 
 	return geometry;
 

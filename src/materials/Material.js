@@ -164,11 +164,11 @@ THREE.Material.prototype = {
 	clone: function () {
 
 		var material = new THREE.Material();
-		return material._copyFrom( this );
+		return material.copy( this );
 
 	},
 
-	_copyFrom: function ( source ) {
+	copy: function ( source ) {
 
 		this.name = source.name;
 

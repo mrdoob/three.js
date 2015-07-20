@@ -81,13 +81,13 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 THREE.LensFlare.prototype.clone = function () {
 
 	var flare = new THREE.LensFlare();
-	return flare._copyFrom( this );
+	return flare.copy( this );
 
 };
 
-THREE.LensFlare.prototype._copyFrom = function ( source ) {
+THREE.LensFlare.prototype.copy = function ( source ) {
 
-	THREE.Object3D.prototype._copyFrom.call( this, source );
+	THREE.Object3D.prototype.copy.call( this, source );
 
 	this.positionScreen.copy( source.positionScreen );
 	this.customUpdateCallback = source.customUpdateCallback;

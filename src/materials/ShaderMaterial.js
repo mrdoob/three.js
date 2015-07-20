@@ -92,13 +92,13 @@ THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 THREE.ShaderMaterial.prototype.clone = function () {
 
 	var material = new THREE.ShaderMaterial();
-	return material._copyFrom( this );
+	return material.copy( this );
 
 };
 
-THREE.ShaderMaterial.prototype._copyFrom = function ( source ) {
+THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
-	THREE.Material.prototype._copyFrom.call( this, source );
+	THREE.Material.prototype.copy.call( this, source );
 
 	this.fragmentShader = source.fragmentShader;
 	this.vertexShader = source.vertexShader;

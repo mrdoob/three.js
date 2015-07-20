@@ -31,7 +31,7 @@ THREE.AreaLight.prototype.clone = function () {
 
 	var light = new THREE.AreaLight();
 
-	THREE.Light.prototype._copyFrom.call( light, this );
+	THREE.Light.prototype.copy.call( light, this );
 
 	light.normal.copy(this.normal);
 	light.right.copy(this.right);
