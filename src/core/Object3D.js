@@ -588,13 +588,14 @@ THREE.Object3D.prototype = {
 			matrixState[9] = scale.z;
 				
 		};
+		function updateMatrixWorldNeedsUpdate ( child ) {
+			child.matrixWorldNeedsUpdate = true; // mark dirty hierarchy
+		};
 	
 		return function(){		
 			if 	(checkLastStateChanged(this)){
 				this.matrixCached.compose( this.position, this.quaternion, this.scale );
-				this.traverse( function ( child ) {
-		            child.matrixWorldNeedsUpdate = true; // mark dirty hierarchy
-		        } );
+				this.traverse( updateMatrixWorldNeedsUpdate );
 				setLastState(this);
 			}
 			return this.matrixCached;
