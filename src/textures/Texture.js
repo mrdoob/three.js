@@ -51,11 +51,7 @@ THREE.Texture.prototype = {
 
 	set needsUpdate ( value ) {
 
-		if ( value === true ) {
-
-			this.version ++;
-
-		}
+		if ( value === true ) this.version ++;
 
 	},
 
