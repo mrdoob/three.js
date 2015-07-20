@@ -193,7 +193,35 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		gl.bufferData( bufferType, data.array, usage );
+		if ( data.grouping !== undefined && data.grouping > 1 ) {
+
+			var array = data.array;
+			var vertexArray = new array.constructor( data.count * data.itemSize * data.grouping );
+
+			// TODO Optimize.
+			var idx = 0;
+			for ( var i = 0, il = data.count; i < il; i ++ ) {
+
+				for ( var k = 0, kl = data.grouping; k < kl; k ++ ) {
+
+					for ( var j = 0, jl = data.itemSize; j < jl; j ++ ) {
+
+						var value = array[ i * data.itemSize + j ];
+						vertexArray[ idx ++ ] = value;
+
+					}
+
+				}
+
+			}
+
+			gl.bufferData( bufferType, vertexArray, usage );
+
+		} else {
+
+			gl.bufferData( bufferType, data.array, usage );
+
+		}
 
 		attributeProperties.version = data.version;
 
@@ -202,6 +230,8 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 	function updateBuffer ( attributeProperties, data, bufferType ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
+
+		// TODO Update ElementBufferAttribute
 
 		if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
 
