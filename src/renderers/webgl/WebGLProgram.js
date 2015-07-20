@@ -203,6 +203,8 @@ THREE.WebGLProgram = ( function () {
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
 
+				'#define MAX_LOCAL_FOGS ' + parameters.maxLocalFogs,
+
 				'#define MAX_BONES ' + parameters.maxBones,
 
 				parameters.map ? '#define USE_MAP' : '',
@@ -308,6 +310,8 @@ THREE.WebGLProgram = ( function () {
 				'#define MAX_HEMI_LIGHTS ' + parameters.maxHemiLights,
 
 				'#define MAX_SHADOWS ' + parameters.maxShadows,
+
+				'#define MAX_LOCAL_FOGS ' + parameters.maxLocalFogs,
 
 				parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest : '',
 
