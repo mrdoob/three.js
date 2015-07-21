@@ -123,7 +123,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		var vector = new THREE.Vector2();
 
-		return function ( pageX, pageY ) {
+		return function getMouseOnScreen( pageX, pageY ) {
 
 			vector.set(
 				( pageX - _this.screen.left ) / _this.screen.width,
@@ -142,7 +142,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		var objectUp = new THREE.Vector3();
 		var mouseOnBall = new THREE.Vector3();
 
-		return function ( pageX, pageY ) {
+		return function getMouseProjectionOnBall( pageX, pageY ) {
 
 			mouseOnBall.set(
 				( pageX - _this.screen.width * 0.5 - _this.screen.left ) / _this.radius,
@@ -176,7 +176,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			_eye.copy( _this.object.position ).sub( _this.target );
 
-			vector.copy( _this.object.up ).setLength( mouseOnBall.y )
+			vector.copy( _this.object.up ).setLength( mouseOnBall.y );
 			vector.add( objectUp.copy( _this.object.up ).cross( _eye ).setLength( mouseOnBall.x ) );
 			vector.add( _eye.setLength( mouseOnBall.z ) );
 
@@ -192,7 +192,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 			quaternion = new THREE.Quaternion();
 
 
-		return function () {
+		return function rotateCamera() {
 
 			var angle = Math.acos( _rotateStart.dot( _rotateEnd ) / _rotateStart.length() / _rotateEnd.length() );
 
@@ -270,7 +270,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 			objectUp = new THREE.Vector3(),
 			pan = new THREE.Vector3();
 
-		return function () {
+		return function panCamera() {
 
 			mouseChange.copy( _panEnd ).sub( _panStart );
 

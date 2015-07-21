@@ -2,7 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.VRMLLoader = function () {};
+THREE.VRMLLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.VRMLLoader.prototype = {
 
@@ -22,35 +26,23 @@ THREE.VRMLLoader.prototype = {
 
 	recordingFieldname: null,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		var loader = new THREE.XHRLoader( this.manager );
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			var object = scope.parse( event.target.responseText );
+			onLoad( scope.parse( text ) );
 
-			scope.dispatchEvent( { type: 'load', content: object } );
+		}, onProgress, onError );
 
-			if ( callback ) callback( object );
+	},
 
-		}, false );
+	setCrossOrigin: function ( value ) {
 
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		this.crossOrigin = value;
 
 	},
 
@@ -357,7 +349,7 @@ THREE.VRMLLoader.prototype = {
 								r: parseFloat(parts[1]),
 								g: parseFloat(parts[2]),
 								b: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -373,7 +365,7 @@ THREE.VRMLLoader.prototype = {
 								x: parseFloat(parts[1]),
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3])
-							}
+							};
 
 							break;
 
@@ -404,7 +396,7 @@ THREE.VRMLLoader.prototype = {
 								y: parseFloat(parts[2]),
 								z: parseFloat(parts[3]),
 								w: parseFloat(parts[4])
-							}
+							};
 
 							break;
 
@@ -498,7 +490,7 @@ THREE.VRMLLoader.prototype = {
 				}
 
 				return tree;
-			}
+			};
 
 			var parseNode = function ( data, parent ) {
 
@@ -807,7 +799,7 @@ THREE.VRMLLoader.prototype = {
 
 				}
 
-			}
+			};
 
 			parseNode( getTree( lines ), scene );
 
@@ -834,6 +826,3 @@ THREE.VRMLLoader.prototype = {
 	}
 
 };
-
-THREE.EventDispatcher.prototype.apply( THREE.VRMLLoader.prototype );
-

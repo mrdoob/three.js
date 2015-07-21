@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -15,22 +16,13 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Boolean showStatus] )</h3>
-		<div>
-		[page:Boolean showStatus] — Show the status of loading div.
-		</div>
+		<h3>[name]()</h3>
 		<div>
 		Creates a new [name]. This should be called as base class.
 		</div>
 
 
 		<h2>Properties</h2>
-
-		<h3>[property:Boolean showStatus]</h3>
-		<div>If true, show loading status in the statusDomElement.</div>
-
-		<h3>[property:DOMElement statusDomElement]</h3>
-		<div>This is the recipient of status messages.</div>
 
 		<h3>[property:Function onLoadStart]</h3>
 		<div>Will be called when load starts.</div>
@@ -57,14 +49,6 @@
 		</div>
 		<div>
 		Checks if the loaded object needs tangents based on its materials.
-		</div>
-
-		<h3>[method:null updateProgress]( [page:object progress] )</h3>
-		<div>
-		[page:Object progress] — an object containing loaded(contains the amount of bytes loaded) and optionally total (containing the total amount of bytes).
-		</div>
-		<div>
-		Updates the DOM object with the progress made.
 		</div>
 
 		<h3>[method:Material createMaterial]( [page:object m], [page:string texturePath] )</h3>

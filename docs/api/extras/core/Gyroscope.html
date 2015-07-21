@@ -2,32 +2,36 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">An Object3d that rotates independently of its parent objects, but keeps the position and scale.</div>
 
+		<code>
+		var root = new THREE.Group();
+		var gyro = new THREE.Gyroscope();
+		var cube = new THREE.Mesh( geometry, material );
+
+		root.add( gyro )
+		gyro.add( cube )
+
+		cube.position.x = 10;
+		root.rotation.y = Math.PI;
+
+		// The cube will have changed its position but maintained its orientation
+		</code>
 
 		<h2>Constructor</h2>
 
 
 		<h3>[name]()</h3>
-		<div>
-		todo
-		</div>
-
-
-		<h2>Properties</h2>
-
-
-		<h2>Methods</h2>
-
 
 		<h2>Source</h2>
 

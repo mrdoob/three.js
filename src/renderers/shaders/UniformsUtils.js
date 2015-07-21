@@ -40,12 +40,13 @@ THREE.UniformsUtils = {
 					 parameter_src instanceof THREE.Vector2 ||
 					 parameter_src instanceof THREE.Vector3 ||
 					 parameter_src instanceof THREE.Vector4 ||
+					 parameter_src instanceof THREE.Matrix3 ||
 					 parameter_src instanceof THREE.Matrix4 ||
 					 parameter_src instanceof THREE.Texture ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.clone();
 
-				} else if ( parameter_src instanceof Array ) {
+				} else if ( Array.isArray( parameter_src ) ) {
 
 					uniforms_dst[ u ][ p ] = parameter_src.slice();
 

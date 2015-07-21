@@ -194,8 +194,8 @@
 
 				// SHADOW
 
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.cullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
 
 				// STATS
 
@@ -228,7 +228,7 @@
 					"Black metal": new THREE.MeshLambertMaterial( { color: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
 					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
 
-				}
+				};
 
 				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
 				mlib.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
@@ -791,7 +791,7 @@
 
 				}
 
-			};
+			}
 
 			function onKeyUp ( event ) {
 
@@ -811,7 +811,7 @@
 
 				}
 
-			};
+			}
 
 
 			//
@@ -982,7 +982,7 @@
 				// render scene
 
 				renderer.autoClear = false;
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.enabled = true;
 
 				camera.lookAt( cameraTarget );
 
@@ -991,7 +991,7 @@
 				renderer.clear();
 				composer.render( 0.1 );
 
-				renderer.shadowMapEnabled = false;
+				renderer.shadowMap.enabled = false;
 
 			}
 

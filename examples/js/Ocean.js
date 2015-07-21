@@ -18,7 +18,7 @@
 	// Assign optional parameters as variables and object properties
 	function optionalParameter(value, defaultValue) {
 		return value !== undefined ? value : defaultValue;
-	};
+	}
 	options = options || {};
 	this.clearColor = optionalParameter(options.CLEAR_COLOR, [ 1.0, 1.0, 1.0, 0.0 ]);
 	this.geometryOrigin = optionalParameter(options.GEOMETRY_ORIGIN, [ -1000.0, -1000.0 ]);

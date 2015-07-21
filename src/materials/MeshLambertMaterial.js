@@ -9,8 +9,6 @@
  *
  *  map: new THREE.Texture( <Image> ),
  *
- *  lightMap: new THREE.Texture( <Image> ),
- *
  *  specularMap: new THREE.Texture( <Image> ),
  *
  *  alphaMap: new THREE.Texture( <Image> ),
@@ -47,12 +45,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff ); // diffuse
 	this.emissive = new THREE.Color( 0x000000 );
 
-	this.wrapAround = false;
-	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
-
 	this.map = null;
-
-	this.lightMap = null;
 
 	this.specularMap = null;
 
@@ -94,12 +87,7 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 	material.color.copy( this.color );
 	material.emissive.copy( this.emissive );
 
-	material.wrapAround = this.wrapAround;
-	material.wrapRGB.copy( this.wrapRGB );
-
 	material.map = this.map;
-
-	material.lightMap = this.lightMap;
 
 	material.specularMap = this.specularMap;
 

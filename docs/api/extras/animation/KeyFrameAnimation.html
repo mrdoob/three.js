@@ -2,131 +2,114 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Runs a keyframe animation as imported from the [page:ColladaLoader].</div>
+
+		<h2>Examples</h2>
+
+		<div>[example:webgl_loader_collada_keyframe loader / collada / keyframe ]</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo root], [page:todo data], [page:todo JITCompile])</h3>
+		<h3>[name]([page:Object data])</h3>
 		<div>
-		root -- todo <br />
-		data -- todo <br />
-		JITCompile -- todo
+		data -- An individual animation object from a the [page:ColladaLoader], e.g. loadedColladaObj.animations[0] <br />
 		</div>
 		<div>
-		todo
+		Creates a new keyframe animation and initializes it to the first keyframes.
 		</div>
-		
+
 
 		<h2>Properties</h2>
 
-		<h3>[property:todo root]</h3>
+		<h3>[property:Object3D root]</h3>
 		<div>
-		todo
-		</div> 
+		The root object of the animation
+		</div>
 
-		<h3>[property:todo data]</h3>
+		<h3>[property:Object data]</h3>
 		<div>
-		todo
-		</div> 
-		
-		<h3>[property:todo hierarchy]</h3>
+		The data containing the animation
+		</div>
+
+		<h3>[property:Array hierarchy]</h3>
 		<div>
-		todo
+		The objects that are influenced by the animation.
 		</div>
 
 		<h3>[property:number currentTime]</h3>
 		<div>
-		todo
+		The time elapsed since the last start/restart of the animation.
 		</div>
-		
+
 		<h3>[property:number timeScale]</h3>
 		<div>
-		todo
+		How much to scale the speed of the animation. Defaults to 1.
 		</div>
 
 		<h3>[property:boolean isPlaying]</h3>
 		<div>
-		todo
+		Indicates whether the animation is playing. This shouldn't be adapted by user code.
 		</div>
-		
+
 		<h3>[property:boolean isPaused]</h3>
 		<div>
-		todo
+		Indicates whether the animation is paused. This shouldn't be adapted by user code.
 		</div>
-		
+
 		<h3>[property:boolean loop]</h3>
 		<div>
-		todo
-		</div> 
-		
-		<h3>[property:boolean JITCompile]</h3>
-		<div>
-		todo
+		Set to make the animation restart when the animation ends.
 		</div>
 
 		<h2>Methods</h2>
-		
-		<h3>[method:todo play]()</h3>
+
+		<h3>[method:null play]([page:Number startTime])</h3>
 		<div>
-		todo
+		Starts the animation at the startTime (in seconds) of the animation.
 		</div>
 
-		<h3>[method:todo pause]()</h3>
+		<h3>[method:null stop]()</h3>
 		<div>
-		todo
+		Stops the animation.
 		</div>
 
-		<h3>[method:todo stop]()</h3>
+		<h3>[method:null update]([page:Float deltaTime])</h3>
 		<div>
-		todo
+		deltaTime -- The change in time in seconds
+		</div>
+		<div>
+		Updates the keyframe animation
 		</div>
 
-		<h3>[method:todo update]([page:todo deltaTimeMS])</h3>
+		<h3>[method:Object getNextKeyWith]([page:String sid], [page:Integer h], [page:Integer key])</h3>
 		<div>
-		deltaTimeMS -- todo
+		sid -- The string id <br />
+		h -- The index in the heirarchy to use<br />
+		key -- The index of which key to start from
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>[method:todo interpolateCatmullRom]([page:todo points], [page:todo scale])</h3>
-		<div>
-		points -- todo <br />
-		scale -- todo
-		</div>
-		<div>
-		todo
+		Used internally to traverse the animation
 		</div>
 
-		<h3>[method:todo getNextKeyWith]([page:todo sid], [page:todo h], [page:todo key])</h3>
+		<h3>[method:Object getPrevKeyWith]([page:String sid], [page:Integer h], [page:Integer key])</h3>
 		<div>
-		sid -- todo <br />
-		h -- todo <br />
-		key -- todo
+		sid -- The string id <br />
+		h -- The index in the heirarchy to use<br />
+		key -- The index of which key to start from
 		</div>
 		<div>
-		todo
+		Used internally to traverse the animation
 		</div>
-
-		<h3>[method:todo getPrevKeyWith]([page:todo sid], [page:todo h], [page:todo key])</h3>
-		<div>
-		sid -- todo <br />
-		h -- todo <br />
-		key -- todo
-		</div>
-		<div>
-		todo
-		</div>
-		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

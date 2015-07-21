@@ -42,7 +42,7 @@
 
 			var renderer, scene, camera, stats;
 			var pointclouds;
-			var raycaster, intersects;
+			var raycaster;
 			var mouse = new THREE.Vector2();
 			var intersection = null;
 			var spheres = [];
@@ -160,9 +160,7 @@
 				}
 
 				geometry.addAttribute( 'index', new THREE.BufferAttribute( indices, 1 ) );
-
-				var offset = { start: 0, count: indices.length, index: 0 };
-				geometry.offsets.push( offset );
+				geometry.addDrawCall( 0, indices.length );
 
 				var material = new THREE.PointCloudMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 				var pointcloud = new THREE.PointCloud( geometry, material );
@@ -174,7 +172,6 @@
 			function generateRegularPointcloud( color, width, length ) {
 
 				var geometry = new THREE.Geometry();
-				var numPoints = width * length;
 
 				var colors = [];
 
@@ -217,7 +214,7 @@
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				var container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
 
@@ -229,7 +226,7 @@
 
 				//
 
-				pcBuffer = generatePointcloud( new THREE.Color( 1,0,0 ), width, length );
+				var pcBuffer = generatePointcloud( new THREE.Color( 1,0,0 ), width, length );
 				pcBuffer.scale.set( 10,10,10 );
 				pcBuffer.position.set( -5,0,5 );
 				scene.add( pcBuffer );

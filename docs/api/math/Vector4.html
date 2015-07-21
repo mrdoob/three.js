@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -55,6 +56,11 @@
 		<h3>[method:Vector4 addVectors]( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4 this]</h3>
 		<div>
 		Sets this vector to *a + b*.
+		</div>
+
+		<h3>[method:Vector4 addScaledVector]( [page:Vector4 v], [page:Float s] ) [page:Vector4 this]</h3>
+		<div>
+		Adds the multiple of v and s to this vector.
 		</div>
 
 		<h3>[method:Vector4 sub]( [page:Vector4 v] )</h3>

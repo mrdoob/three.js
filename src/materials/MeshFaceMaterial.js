@@ -7,7 +7,7 @@ THREE.MeshFaceMaterial = function ( materials ) {
 	this.uuid = THREE.Math.generateUUID();
 
 	this.type = 'MeshFaceMaterial';
-	
+
 	this.materials = materials instanceof Array ? materials : [];
 
 };

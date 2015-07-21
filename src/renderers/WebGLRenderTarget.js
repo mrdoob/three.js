@@ -5,6 +5,8 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	this.uuid = THREE.Math.generateUUID();
+
 	this.width = width;
 	this.height = height;
 
@@ -39,9 +41,14 @@ THREE.WebGLRenderTarget.prototype = {
 
 	setSize: function ( width, height ) {
 
-		this.width = width;
-		this.height = height;
+		if ( this.width !== width || this.height !== height ) {
 
+			this.width = width;
+			this.height = height;
+
+			this.dispose();
+
+		}
 	},
 
 	clone: function () {

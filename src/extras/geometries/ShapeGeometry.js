@@ -20,7 +20,7 @@ THREE.ShapeGeometry = function ( shapes, options ) {
 
 	this.type = 'ShapeGeometry';
 
-	if ( shapes instanceof Array === false ) shapes = [ shapes ];
+	if ( Array.isArray( shapes ) === false ) shapes = [ shapes ];
 
 	this.addShapeList( shapes, options );
 
@@ -94,8 +94,6 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 	var faces = THREE.Shape.Utils.triangulateShape( vertices, holes );
 
 	// Vertices
-
-	var contour = vertices;
 
 	for ( i = 0, l = holes.length; i < l; i ++ ) {
 

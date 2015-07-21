@@ -146,7 +146,7 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.shadowMapEnabled = true;
+				renderer.shadowMap.enabled = true;
 
 				// STATS
 
@@ -210,7 +210,7 @@
 					setupWeaponsGUI( character );
 					setupGUIAnimations( character );
 
-				}
+				};
 
 				character.loadParts( config );
 
@@ -259,7 +259,7 @@
 
 					return function () { character.setWeapon( index ); };
 
-				}
+				};
 
 				var guiItems = [];
 
@@ -284,7 +284,7 @@
 
 					return function () { character.setSkin( index ); };
 
-				}
+				};
 
 				var guiItems = [];
 
@@ -309,7 +309,7 @@
 
 					return function () { character.setAnimation( animationName ); };
 
-				}
+				};
 
 				var i = 0, guiItems = [];
 				var animations = character.meshBody.geometry.animations;

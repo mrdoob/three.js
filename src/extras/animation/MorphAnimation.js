@@ -52,7 +52,7 @@ THREE.MorphAnimation.prototype = {
 
 		var influences = this.mesh.morphTargetInfluences;
 
-		if ( frame != this.currentFrame ) {
+		if ( frame !== this.currentFrame ) {
 
 			influences[ this.lastFrame ] = 0;
 			influences[ this.currentFrame ] = 1;

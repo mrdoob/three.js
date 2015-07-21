@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
@@ -47,6 +48,13 @@
 		Get intersections between a casted ray and this PointCloud. [page:Raycaster.intersectObject] will call this method.
 		</div>
 
+		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<div>
+		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned PointCloud Object.
+		</div>
+		<div>
+		Clone a PointCloud Object.
+		</div>
 
 		<h2>Source</h2>
 

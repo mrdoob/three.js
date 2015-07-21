@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
         [page:Object3D] &rarr; [page:Light] &rarr;
@@ -15,6 +16,10 @@
 
 
 		<h2>Example</h2>
+		<h2>Example</h2>
+
+		<div>[example:webgldeferred_arealights arealights ]</div>
+
 		<code>areaLight1 = new THREE.AreaLight( 0xffffff, 1 );
 areaLight1.position.set( 0.0001, 10.0001, -18.5001 );
 areaLight1.rotation.set( -0.74719, 0.0001, 0.0001 );
@@ -42,23 +47,23 @@ scene.add( areaLight1 );</code>
 
 		<h3>[property:Vector3 right]</h3>
 		<div>
-		Sets or gets an unit vector that indicates the right side of the light. This is calculated in local space. 
-		</div> 
+		Sets or gets an unit vector that indicates the right side of the light. This is calculated in local space.
+		</div>
 
 		<h3>[property:Vector3 normal]</h3>
 		<div>
 		Sets or gets an unit vectorSets or gets an unit vector that indicates the right side of the light. This is calculated in local space.
-		</div> 
+		</div>
 
 		<h3>[property:number height]</h3>
 		<div>
-		Sets or gets the height of the illuminating plane. 
-		</div> 
+		Sets or gets the height of the illuminating plane.
+		</div>
 
 		<h3>[property:number width]</h3>
 		<div>
-		Sets or gets the width of the illuminating plane. 
-		</div> 
+		Sets or gets the width of the illuminating plane.
+		</div>
 
 		<h3>[property:Float intensity]</h3>
 		<div>
@@ -68,19 +73,18 @@ scene.add( areaLight1 );</code>
 
 		<h3>[property:number constantAttenuation]</h3>
 		<div>
-		Sets or gets the attention of the light in constant space. This is independant of the distance of the light. 
-		</div> 
+		Sets or gets the attenuation of the light in constant space. This is independant of the distance of the light.
+		</div>
 
 		<h3>[property:number linearAttenuation]</h3>
 		<div>
-		Sets or gets the attention of the light in linear space. This increases the attenuation linearly with the distance from the light.
-		</div> 
+		Sets or gets the attenuation of the light in linear space. This increases the attenuation linearly with the distance from the light.
+		</div>
 
 		<h3>[property:number quadraticAttenuation]</h3>
 		<div>
-		Sets or gets the attention of the light in linear space. This increases the attenuation quadratic with the distance from the light.
-		</div> 
-
+		Sets or gets the attenuation of the light in quadratic space. This increases the attenuation quadraticly with the distance from the light.
+		</div>
 
 		<h2>Source</h2>
 

@@ -117,7 +117,9 @@ THREE.EffectComposer.prototype = {
 
 		}
 
+		this.renderTarget1.dispose();
 		this.renderTarget1 = renderTarget;
+		this.renderTarget2.dispose();
 		this.renderTarget2 = renderTarget.clone();
 
 		this.writeBuffer = this.renderTarget1;
@@ -127,12 +129,8 @@ THREE.EffectComposer.prototype = {
 
 	setSize: function ( width, height ) {
 
-		var renderTarget = this.renderTarget1.clone();
-
-		renderTarget.width = width;
-		renderTarget.height = height;
-
-		this.reset( renderTarget );
+		this.renderTarget1.setSize( width, height );
+		this.renderTarget2.setSize( width, height );
 
 	}
 

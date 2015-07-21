@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -62,6 +63,11 @@
 		Sets this vector to *a + b*.
 		</div>
 
+		<h3>[method:Vector2 addScaledVector]( [page:Vector2 v], [page:Float s] ) [page:Vector2 this]</h3>
+		<div>
+		Adds the multiple of v and s to this vector.
+		</div>
+
 		<h3>[method:Vector2 sub]( [page:Vector2 v] ) [page:Vector2 this]</h3>
 		<div>
 		Subtracts *v* from this vector.
@@ -101,6 +107,12 @@
 		<h3>[method:Float length]()</h3>
 		<div>
 		Computes length of this vector.
+		</div>
+
+		<h3>[method:Float lengthManhattan]()</h3>
+		<div>
+		Computes Manhattan length of this vector.<br />
+		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
 		</div>
 
 		<h3>[method:Vector2 normalize]() [page:Vector2 this]</h3>

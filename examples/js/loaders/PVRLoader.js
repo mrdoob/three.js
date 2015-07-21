@@ -8,8 +8,10 @@
  *   TODO : implement loadMipmaps option
  */
 
+THREE.PVRLoader = function ( manager ) {
 
-THREE.PVRLoader = function () {
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
 	this._parser = THREE.PVRLoader.parse;
 };
 
@@ -61,15 +63,15 @@ THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 			format = THREE.RGB_PVRTC_2BPPV1_Format;
 			break;
 		case 1 : // PVRTC 2bpp RGBA
-			bpp = 2
+			bpp = 2;
 			format = THREE.RGBA_PVRTC_2BPPV1_Format;
 			break;
 		case 2 : // PVRTC 4bpp RGB
-			bpp = 4
+			bpp = 4;
 			format = THREE.RGB_PVRTC_4BPPV1_Format;
 			break;
 		case 3 : // PVRTC 4bpp RGBA
-			bpp = 4
+			bpp = 4;
 			format = THREE.RGBA_PVRTC_4BPPV1_Format;
 			break;
 		default :
@@ -108,9 +110,9 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 		numSurfs      =  header[12];
 
 
-	var TYPE_MASK = 0xff
+	var TYPE_MASK = 0xff;
 	var PVRTC_2 = 24,
-		PVRTC_4 = 25
+		PVRTC_4 = 25;
 
 	var formatFlags = flags & TYPE_MASK;
 
@@ -249,4 +251,4 @@ THREE.PVRLoader._extract = function ( pvrDatas ) {
 
 
 	return pvr;
-}
+};

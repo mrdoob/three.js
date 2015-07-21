@@ -252,7 +252,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		};
 
-	};
+	}
 
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 

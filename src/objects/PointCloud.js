@@ -21,7 +21,7 @@ THREE.PointCloud.prototype.raycast = ( function () {
 	var inverseMatrix = new THREE.Matrix4();
 	var ray = new THREE.Ray();
 
-	return function ( raycaster, intersects ) {
+	return function raycast( raycaster, intersects ) {
 
 		var object = this;
 		var geometry = object.geometry;
@@ -41,23 +41,26 @@ THREE.PointCloud.prototype.raycast = ( function () {
 		}
 
 		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		var localThresholdSq = localThreshold * localThreshold;
 		var position = new THREE.Vector3();
 
 		var testPoint = function ( point, index ) {
 
-			var rayPointDistance = ray.distanceToPoint( point );
+			var rayPointDistanceSq = ray.distanceSqToPoint( point );
 
-			if ( rayPointDistance < localThreshold ) {
+			if ( rayPointDistanceSq < localThresholdSq ) {
 
 				var intersectPoint = ray.closestPointToPoint( point );
 				intersectPoint.applyMatrix4( object.matrixWorld );
 
 				var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
+				if ( distance < raycaster.near || distance > raycaster.far ) return;
+
 				intersects.push( {
 
 					distance: distance,
-					distanceToRay: rayPointDistance,
+					distanceToRay: Math.sqrt( rayPointDistanceSq ),
 					point: intersectPoint.clone(),
 					index: index,
 					face: null,
@@ -77,25 +80,21 @@ THREE.PointCloud.prototype.raycast = ( function () {
 			if ( attributes.index !== undefined ) {
 
 				var indices = attributes.index.array;
-				var offsets = geometry.offsets;
+				var offsets = geometry.drawcalls;
 
 				if ( offsets.length === 0 ) {
 
-					var offset = {
-						start: 0,
-						count: indices.length,
-						index: 0
-					};
-
-					offsets = [ offset ];
+					offsets = [ { start: 0, count: indices.length, index: 0 } ];
 
 				}
 
 				for ( var oi = 0, ol = offsets.length; oi < ol; ++ oi ) {
 
-					var start = offsets[ oi ].start;
-					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
+					var offset = offsets[ oi ];
+
+					var start = offset.start;
+					var count = offset.count;
+					var index = offset.index;
 
 					for ( var i = start, il = start + count; i < il; i ++ ) {
 
@@ -111,15 +110,9 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 			} else {
 
-				var pointCount = positions.length / 3;
+				for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
 
-				for ( var i = 0; i < pointCount; i ++ ) {
-
-					position.set(
-						positions[ 3 * i ],
-						positions[ 3 * i + 1 ],
-						positions[ 3 * i + 2 ]
-					);
+					position.fromArray( positions, i * 3 );
 
 					testPoint( position, i );
 
@@ -129,9 +122,9 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 		} else {
 
-			var vertices = this.geometry.vertices;
+			var vertices = geometry.vertices;
 
-			for ( var i = 0; i < vertices.length; i ++ ) {
+			for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
 				testPoint( vertices[ i ], i );
 
@@ -153,11 +146,32 @@ THREE.PointCloud.prototype.clone = function ( object ) {
 
 };
 
+THREE.PointCloud.prototype.toJSON = function ( meta ) {
+
+	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+
+	// only serialize if not in meta geometries cache
+	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON();
+	}
+
+	// only serialize if not in meta materials cache
+	if ( meta.materials[ this.material.uuid ] === undefined ) {
+		meta.materials[ this.material.uuid ] = this.material.toJSON();
+	}
+
+	data.object.geometry = this.geometry.uuid;
+	data.object.material = this.material.uuid;
+
+	return data;
+
+};
+
 // Backwards compatibility
 
 THREE.ParticleSystem = function ( geometry, material ) {
 
-	THREE.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
+	console.warn( 'THREE.ParticleSystem has been renamed to THREE.PointCloud.' );
 	return new THREE.PointCloud( geometry, material );
 
 };

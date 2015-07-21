@@ -56,7 +56,7 @@ THREE.Audio.prototype.play = function () {
 
 	if ( this.isPlaying === true ) {
 
-		THREE.warn( 'THREE.Audio: Audio is already playing.' );
+		console.warn( 'THREE.Audio: Audio is already playing.' );
 		return;
 
 	}
@@ -123,7 +123,7 @@ THREE.Audio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 
-	return function ( force ) {
+	return function updateMatrixWorld( force ) {
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 

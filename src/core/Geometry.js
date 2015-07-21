@@ -17,10 +17,8 @@ THREE.Geometry = function () {
 	this.type = 'Geometry';
 
 	this.vertices = [];
-	this.colors = [];  // one-to-one vertex colors, used in Points and Line
-
+	this.colors = [];
 	this.faces = [];
-
 	this.faceVertexUvs = [ [] ];
 
 	this.morphTargets = [];
@@ -37,8 +35,6 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = true; // the intermediate typed arrays will be deleted when set to false
-
 	// update flags
 
 	this.verticesNeedUpdate = false;
@@ -48,8 +44,6 @@ THREE.Geometry = function () {
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
 	this.lineDistancesNeedUpdate = false;
-
-	this.groupsNeedUpdate = false;
 
 };
 
@@ -109,11 +103,18 @@ THREE.Geometry.prototype = {
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
 		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
+		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+		var tangents = attributes.tangent !== undefined ? attributes.tangent.array : undefined;
+
+		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+		if ( tangents !== undefined ) this.hasTangents = true;
 
 		var tempNormals = [];
 		var tempUVs = [];
+		var tempUVs2 = [];
+		var tempTangents = [];
 
-		for ( var i = 0, j = 0; i < vertices.length; i += 3, j += 2 ) {
+		for ( var i = 0, j = 0, k = 0; i < vertices.length; i += 3, j += 2, k += 4 ) {
 
 			scope.vertices.push( new THREE.Vector3( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] ) );
 
@@ -135,6 +136,18 @@ THREE.Geometry.prototype = {
 
 			}
 
+			if ( uvs2 !== undefined ) {
+
+				tempUVs2.push( new THREE.Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+
+			}
+
+			if ( tangents !== undefined ) {
+
+				tempTangents.push( new THREE.Vector4( tangents[ k ], tangents[ k + 1 ], tangents[ k + 2 ], tangents[ k + 3 ] ) );
+
+			}
+
 		}
 
 		var addFace = function ( a, b, c ) {
@@ -142,11 +155,25 @@ THREE.Geometry.prototype = {
 			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
 			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
 
-			scope.faces.push( new THREE.Face3( a, b, c, vertexNormals, vertexColors ) );
+			var face = new THREE.Face3( a, b, c, vertexNormals, vertexColors );
+
+			scope.faces.push( face );
 
 			if ( uvs !== undefined ) {
 
 				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+
+			}
+
+			if ( uvs2 !== undefined ) {
+
+				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
+
+			}
+
+			if ( tangents !== undefined ) {
+
+				face.vertexTangents.push( tempTangents[ a ].clone(), tempTangents[ b ].clone(), tempTangents[ c ].clone() );
 
 			}
 
@@ -222,6 +249,28 @@ THREE.Geometry.prototype = {
 
 		return offset;
 
+	},
+
+	normalize: function () {
+
+		this.computeBoundingSphere();
+
+		var center = this.boundingSphere.center;
+		var radius = this.boundingSphere.radius;
+
+		var s = radius === 0 ? 1 : 1.0 / radius;
+
+		var matrix = new THREE.Matrix4();
+		matrix.set(
+			s, 0, 0, -s * center.x,
+			0, s, 0, -s * center.y,
+			0, 0, s, -s * center.z,
+			0, 0, 0, 1
+		);
+
+		this.applyMatrix( matrix );
+
+		return this;
 	},
 
 	computeFaceNormals: function () {
@@ -310,9 +359,21 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
-			face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
-			face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
+			var vertexNormals = face.vertexNormals;
+
+			if ( vertexNormals.length === 3 ) {
+
+				vertexNormals[ 0 ].copy( vertices[ face.a ] );
+				vertexNormals[ 1 ].copy( vertices[ face.b ] );
+				vertexNormals[ 2 ].copy( vertices[ face.c ] );
+
+			} else {
+
+				vertexNormals[ 0 ] = vertices[ face.a ].clone();
+				vertexNormals[ 1 ] = vertices[ face.b ].clone();
+				vertexNormals[ 2 ] = vertices[ face.c ].clone();
+
+			}
 
 		}
 
@@ -583,11 +644,11 @@ THREE.Geometry.prototype = {
 
 	},
 
-	merge: function ( geometry, matrix, materialIndexOffset ) {
+	merge: function ( geometry, matrix ) {
 
 		if ( geometry instanceof THREE.Geometry === false ) {
 
-			THREE.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
+			console.error( 'THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry );
 			return;
 
 		}
@@ -600,8 +661,6 @@ THREE.Geometry.prototype = {
 		faces2 = geometry.faces,
 		uvs1 = this.faceVertexUvs[ 0 ],
 		uvs2 = geometry.faceVertexUvs[ 0 ];
-
-		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( matrix !== undefined ) {
 
@@ -663,8 +722,6 @@ THREE.Geometry.prototype = {
 
 			}
 
-			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
-
 			faces1.push( faceCopy );
 
 		}
@@ -697,7 +754,7 @@ THREE.Geometry.prototype = {
 
 		if ( mesh instanceof THREE.Mesh === false ) {
 
-			THREE.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
+			console.error( 'THREE.Geometry.mergeMesh(): mesh not an instance of THREE.Mesh.', mesh );
 			return;
 
 		}
@@ -716,11 +773,11 @@ THREE.Geometry.prototype = {
 
 	mergeVertices: function () {
 
-		var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
+		var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
 
 		var v, key;
-		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
+		var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i, il, face;
 		var indices, j, jl;
@@ -743,7 +800,7 @@ THREE.Geometry.prototype = {
 
 			}
 
-		};
+		}
 
 
 		// if faces are completely degenerate after merging vertices, we
@@ -765,7 +822,7 @@ THREE.Geometry.prototype = {
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
 			for ( var n = 0; n < 3; n ++ ) {
-				if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
 					dupIndex = n;
 					faceIndicesToRemove.push( i );
@@ -799,17 +856,19 @@ THREE.Geometry.prototype = {
 
 	toJSON: function () {
 
-		var output = {
+		var data = {
 			metadata: {
-				version: 4.0,
-				type: 'BufferGeometry',
-				generator: 'BufferGeometryExporter'
-			},
-			uuid: this.uuid,
-			type: this.type
+				version: 4.4,
+				type: 'Geometry',
+				generator: 'Geometry.toJSON'
+			}
 		};
 
-		if ( this.name !== "" ) output.name = this.name;
+		// standard Geometry serialization
+
+		data.uuid = this.uuid;
+		data.type = this.type;
+		if ( this.name !== '' ) data.name = this.name;
 
 		if ( this.parameters !== undefined ) {
 
@@ -817,11 +876,11 @@ THREE.Geometry.prototype = {
 
 			for ( var key in parameters ) {
 
-				if ( parameters[ key ] !== undefined ) output[ key ] = parameters[ key ];
+				if ( parameters[ key ] !== undefined ) data[ key ] = parameters[ key ];
 
 			}
 
-			return output;
+			return data;
 
 		}
 
@@ -867,15 +926,6 @@ THREE.Geometry.prototype = {
 
 			faces.push( faceType );
 			faces.push( face.a, face.b, face.c );
-
-
-			/*
-			if ( hasMaterial ) {
-
-				faces.push( face.materialIndex );
-
-			}
-			*/
 
 			if ( hasFaceVertexUv ) {
 
@@ -984,17 +1034,15 @@ THREE.Geometry.prototype = {
 
 		}
 
-		output.data = {};
+		data.data = {};
 
-		output.data.vertices = vertices;
-		output.data.normals = normals;
-		if ( colors.length > 0 ) output.data.colors = colors;
-		if ( uvs.length > 0 ) output.data.uvs = [ uvs ]; // temporal backward compatibility
-		output.data.faces = faces;
+		data.data.vertices = vertices;
+		data.data.normals = normals;
+		if ( colors.length > 0 ) data.data.colors = colors;
+		if ( uvs.length > 0 ) data.data.uvs = [ uvs ]; // temporal backward compatibility
+		data.data.faces = faces;
 
-		//
-
-		return output;
+		return data;
 
 	},
 
@@ -1053,6 +1101,14 @@ THREE.Geometry.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
+	// Backwards compatibility
+
+	set groupsNeedUpdate ( value ) {
+
+		if ( value === true ) this.dispose();
 
 	}
 

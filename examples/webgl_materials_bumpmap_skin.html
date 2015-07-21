@@ -172,9 +172,7 @@
 
 				//
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
+				loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100 ) } );
 
 				//
@@ -185,8 +183,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFace = THREE.CullFaceBack;
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.cullFace = THREE.CullFaceBack;
 
 				renderer.autoClear = false;
 
@@ -216,7 +214,7 @@
 
 				effectCopy.renderToScreen = true;
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				var rtwidth = 512, rtheight = 512;
 
 				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
@@ -236,7 +234,7 @@
 
 				mapHeight.anisotropy = 4;
 				mapHeight.repeat.set( 0.998, 0.998 );
-				mapHeight.offset.set( 0.001, 0.001 )
+				mapHeight.offset.set( 0.001, 0.001 );
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
@@ -244,7 +242,7 @@
 
 				mapSpecular.anisotropy = 4;
 				mapSpecular.repeat.set( 0.998, 0.998 );
-				mapSpecular.offset.set( 0.001, 0.001 )
+				mapSpecular.offset.set( 0.001, 0.001 );
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
 				mapSpecular.format = THREE.RGBFormat;
 
@@ -252,7 +250,7 @@
 
 				mapColor.anisotropy = 4;
 				mapColor.repeat.set( 0.998, 0.998 );
-				mapColor.offset.set( 0.001, 0.001 )
+				mapColor.offset.set( 0.001, 0.001 );
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
 				mapColor.format = THREE.RGBFormat;
 
@@ -282,7 +280,7 @@
 
 				uniforms[ "offsetRepeat" ].value.set( 0.001, 0.001, 0.998, 0.998 );
 
-				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
+				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true, derivatives: true } );
 
 				mesh = new THREE.Mesh( geometry, material );
 
@@ -293,8 +291,6 @@
 				mesh.receiveShadow = true;
 
 				scene.add( mesh );
-
-				loader.statusDomElement.style.display = "none";
 
 			}
 

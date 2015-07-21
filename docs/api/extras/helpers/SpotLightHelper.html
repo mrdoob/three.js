@@ -2,55 +2,55 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
-		
+
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">This displays a cylinder helper object for a [page:SpotLight] </div>
+
+
+		<h2>Example</h2>
+
+		<code>
+		var spotLight = new THREE.SpotLight( 0xffffff );
+		spotLight.position.set( 10, 10, 10 );
+		scene.add( spotLight );
+
+		var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+		scene.add( spotLightHelper );
+		</code>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo light], [page:todo sphereSize])</h3>
+		<h3>[name]([page:SpotLight light])</h3>
 		<div>
-		light -- todo <br />
-		sphereSize -- todo
+		light -- The [page:SpotLight] to display
 		</div>
-		<div>
-		todo
-		</div>
-		
+
 
 		<h2>Properties</h2>
 
 
-		<h3>[property:Mesh lightSphere]</h3>
-		<div>
-		todo
-		</div> 
-
 		<h3>[property:SpotLight light]</h3>
 		<div>
-		todo
-		</div> 
+		The [page:SpotLight]
+		</div>
 
-		<h3>[property:Mesh lightCone]</h3>
-		<div>
-		todo
-		</div> 
 
 		<h2>Methods</h2>
-		
 
-		<h3>[method:todo update]()</h3>
+
+		<h3>[method:null update]()</h3>
 		<div>
-		todo
+		Updates the light helper.
 		</div>
 
 		<h2>Source</h2>

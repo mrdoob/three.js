@@ -10,9 +10,9 @@ THREE.AnimationHandler = {
 
 	//
 
-	add: function () { THREE.warn( 'THREE.AnimationHandler.add() has been deprecated.' ); },
-	get: function () { THREE.warn( 'THREE.AnimationHandler.get() has been deprecated.' ); },
-	remove: function () { THREE.warn( 'THREE.AnimationHandler.remove() has been deprecated.' ); },
+	add: function () { console.warn( 'THREE.AnimationHandler.add() has been deprecated.' ); },
+	get: function () { console.warn( 'THREE.AnimationHandler.get() has been deprecated.' ); },
+	remove: function () { console.warn( 'THREE.AnimationHandler.remove() has been deprecated.' ); },
 
 	//
 

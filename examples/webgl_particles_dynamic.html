@@ -95,11 +95,8 @@
 
 				//
 
-				aloader = new THREE.JSONLoader( );
-				bloader = new THREE.BinaryLoader( true );
-
-				document.body.appendChild( bloader.statusDomElement );
-
+				aloader = new THREE.JSONLoader();
+				bloader = new THREE.BinaryLoader();
 				aloader.load( "obj/terrain.js", function( geometry ) {
 
 					createMesh( geometry, scene, 16.8, -11000, -200,  -5000, 0x00ff44, false );
@@ -264,8 +261,6 @@
 					parent.add( mesh );
 
 				}
-
-				bloader.statusDomElement.style.display = "none";
 
 				meshes.push( {
 					mesh: mesh, vertices: geometry.vertices, vertices_tmp: vertices_tmp, vl: vl,

@@ -151,8 +151,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var loader = new THREE.BinaryLoader( true );
-			document.body.appendChild( loader.statusDomElement );
+			var loader = new THREE.BinaryLoader();
 
 			init();
 			animate();
@@ -277,7 +276,7 @@
 				"Darkgray shiny":	new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x050505 } ),
 				"Gray shiny":		new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } )
 
-				}
+				};
 
 				// Gallardo materials
 
@@ -303,7 +302,7 @@
 
 					]
 
-				}
+				};
 
 				m = CARS[ "gallardo" ].materials;
 				mi = CARS[ "gallardo" ].init_material;
@@ -318,7 +317,7 @@
 					5: mlib[ "Yellow glass" ],  // front lights
 					6: mlib[ "Dark chrome" ]	// windshield rim
 
-				}
+				};
 
 				// Veyron materials
 
@@ -338,7 +337,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "veyron" ].materials;
 				mi = CARS[ "veyron" ].init_material;
@@ -354,7 +353,7 @@
 					6: mlib[ "Red glass 50" ],		// backlights
 					7: mlib[ "Orange glass 50" ]	// backsignals
 
-				}
+				};
 
 				// F50 materials
 
@@ -379,7 +378,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "f50" ].materials;
 				mi = CARS[ "f50" ].init_material;
@@ -412,7 +411,7 @@
 					23: m.body[ mi ][ 1 ], 			// back torso
 					24: m.body[ mi ][ 1 ] 			// back torso center
 
-				}
+				};
 
 
 				// Camero materials
@@ -439,7 +438,7 @@
 
 					],
 
-				}
+				};
 
 				m = CARS[ "camaro" ].materials;
 				mi = CARS[ "camaro" ].init_material;
@@ -456,7 +455,7 @@
 					7: mlib[ "Fullblack rough" ],   // tireling
 					8: mlib[ "Fullblack rough" ]    // behind grille
 
-				}
+				};
 
 				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
 
@@ -486,7 +485,6 @@
 
 					if ( ! CARS[ car ].object ) {
 
-						loader.statusDomElement.style.display = "block";
 						loader.load( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) } );
 
 					} else {
@@ -562,8 +560,6 @@
 
 			function createScene( geometry, car ) {
 
-				loader.statusDomElement.innerHTML = "Creating model ...";
-
 				var m = new THREE.MeshFaceMaterial(),
 					s = CARS[ car ].scale * 1,
 					r = CARS[ car ].init_rotation,
@@ -590,9 +586,6 @@
 				attachButtonMaterials( materials.body, m, bm, car );
 
 				switchCar( car );
-
-				loader.statusDomElement.style.display = "none";
-				loader.statusDomElement.innerHTML = "Loading model ...";
 
 			}
 

@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -18,19 +19,20 @@
 		There are two ways to update an object's transformation:
 		<ol>
 			<li>
-				Modify the object's *position*, *quaternion*, and *scale* properties, then ask Three.js to recompute the object's matrix from these properties:
+				Modify the object's *position*, *quaternion*, and *scale* properties, and let Three.js recompute
+				the object's matrix from these properties:
 				<code>
-				object.position = start_position;
-				object.quaternion = quaternion;
-				object.updateMatrix();
+				object.position.copy(start_position);
+				object.quaternion.copy(quaternion);
 				</code>
-				Calling the *updateMatrix* method forces the object's matrix to be recomputed from *position*, *quaternion*, and *scale*. You can also set 
-				<code>
-				object.matrixAutoUpdate = true;
-				</code>
-				in lieu of calling *updateMatrix*. This will force the matrix to be recomputed every frame; for static objects, you should therefore set 
+				By default, the *matrixAutoUpdate* property is set true, and the matrix will be automatically recalculated.
+				If the object is static, or you wish to manually control when recalculation occurs, better performance can be obtained by setting the property false:
 				<code>
 				object.matrixAutoUpdate = false;
+				</code>
+				And after changing any properties, manually update the matrix:
+				<code>
+				object.updateMatrix();
 				</code>
 			</li>
 			<li>

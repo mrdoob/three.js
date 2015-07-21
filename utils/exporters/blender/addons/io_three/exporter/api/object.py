@@ -92,8 +92,8 @@ def cast_shadow(obj):
         if obj.data.type in (SPOT, SUN):
             ret = obj.data.shadow_method != NO_SHADOW
         else:
-            logger.info('%s is a lamp but this lamp type does not '\
-                'have supported shadows in ThreeJS', obj.name)
+            logger.info("%s is a lamp but this lamp type does not "
+                        "have supported shadows in ThreeJS", obj.name)
             ret = None
         return ret
     elif obj.type == MESH:
@@ -217,6 +217,7 @@ def nodes(valid_types, options):
         if _valid_node(obj, valid_types, options):
             yield obj.name
 
+
 @_object
 def position(obj, options):
     """
@@ -246,6 +247,7 @@ def receive_shadow(obj):
 
 
 AXIS_CONVERSION = axis_conversion(to_forward='Z', to_up='Y').to_4x4()
+
 
 @_object
 def matrix(obj, options):
@@ -329,7 +331,10 @@ def extract_mesh(obj, options, recalculate=False):
 
     """
     logger.debug('object.extract_mesh(%s, %s)', obj, options)
-    mesh_node = obj.to_mesh(context.scene, True, RENDER)
+    apply_modifiers = options.get(constants.APPLY_MODIFIERS, True)
+    if apply_modifiers:
+        bpy.ops.object.mode_set(mode='OBJECT')
+    mesh_node = obj.to_mesh(context.scene, apply_modifiers, RENDER)
 
     # transfer the geometry type to the extracted mesh
     mesh_node.THREE_geometry_type = obj.data.THREE_geometry_type
@@ -349,6 +354,7 @@ def extract_mesh(obj, options, recalculate=False):
                      original_mesh.name,
                      mesh_node.name)
 
+        bpy.ops.object.mode_set(mode='OBJECT')
         obj.select = True
         bpy.context.scene.objects.active = obj
         logger.info('Applying triangulation to %s', obj.data.name)
@@ -549,6 +555,3 @@ def _valid_node(obj, valid_types, options):
 
     # if we get this far assume that the mesh is valid
     return True
-
-
-

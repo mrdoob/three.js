@@ -78,7 +78,7 @@ THREE.Vector2.prototype = {
 
 		if ( w !== undefined ) {
 
-			THREE.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
 			return this.addVectors( v, w );
 
 		}
@@ -108,11 +108,20 @@ THREE.Vector2.prototype = {
 
 	},
 
+	addScaledVector: function ( v, s ) {
+
+        this.x += v.x * s;
+        this.y += v.y * s;
+
+        return this;
+
+    },
+
 	sub: function ( v, w ) {
 
 		if ( w !== undefined ) {
 
-			THREE.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
 			return this.subVectors( v, w );
 
 		}
@@ -252,11 +261,11 @@ THREE.Vector2.prototype = {
 		return this;
 	},
 
-	clampScalar: ( function () {
+	clampScalar: function () {
 
 		var min, max;
 
-		return function ( minVal, maxVal ) {
+		return function clampScalar( minVal, maxVal ) {
 
 			if ( min === undefined ) {
 
@@ -272,7 +281,7 @@ THREE.Vector2.prototype = {
 
 		};
 
-	} )(),
+	}(),
 
 	floor: function () {
 
@@ -335,6 +344,11 @@ THREE.Vector2.prototype = {
 
 		return Math.sqrt( this.x * this.x + this.y * this.y );
 
+	},
+
+	lengthManhattan: function() {
+
+		return Math.abs( this.x ) + Math.abs( this.y );
 	},
 
 	normalize: function () {
