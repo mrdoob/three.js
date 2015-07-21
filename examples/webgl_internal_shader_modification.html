@@ -30,7 +30,7 @@
 				color: #f00;
 			}
 
-			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
+			
 			strong { color: red }
 
 			#stats { position: absolute; top:0; left: 0 }
@@ -46,10 +46,7 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> webgl - modification of the internal shader<br/>
 		</div>
 		
-
 		<script src="../build/three.js"></script>
-
-		<script src="js/controls/TrackballControls.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -117,7 +114,7 @@
 
 		var fogs = [];
 
-		function setupUniforms () {
+		function updateUniforms () {
 
 			var f, ff, localFog,
 			color, radius, far,
@@ -130,10 +127,7 @@
 			positions = uniforms.localFogPosition.value,
 			fars = uniforms.localFogFar.value,
 			radii = uniforms.localFogRadius.value;
-			uniforms.localFogColor.needsUpdate = true;
-			uniforms.localFogPosition.needsUpdate = true;
-			uniforms.localFogFar.needsUpdate = true;
-			uniforms.localFogRadius.needsUpdate = true;
+			
 
 			for ( f = 0, ff = fogs.length; f < ff; f ++ ) {
 
@@ -269,18 +263,14 @@
 				cameraControls.target.set( 0, 0, 0);
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
-				cameraControls.update();
 				
-				
-
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-				setupUniforms();
-				//console.log(uniforms.localFogPosition);
+				updateUniforms();
 				render();
 				stats.update();
 
@@ -288,7 +278,6 @@
 
 			function render() {
 
-				cameraControls.update();
 				renderer.render( scene, camera );
 
 			}
