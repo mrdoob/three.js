@@ -550,12 +550,7 @@ THREE.Object3D.prototype = {
 	updateMatrix: (function () {
 		
 	
-		var checkLastStateChanged = function(object3D){
-			
-			var position = object3D.position;
-			var quaternion = object3D.quaternion;
-			var scale = object3D.scale;
-			var matrixState = object3D._matrixState;
+		var checkLastStateChanged = function(position, quaternion, scale, matrixState){
 			
 			return matrixState[0] !== position.x ||
 				matrixState[1] !== position.y ||
@@ -569,12 +564,7 @@ THREE.Object3D.prototype = {
 				matrixState[9] !== scale.z;
 				
 		};
-		var setLastState = function(object3D){
-			
-			var position = object3D.position;
-			var quaternion = object3D.quaternion;
-			var scale = object3D.scale;
-			var matrixState = object3D._matrixState;
+		var setLastState = function(position,quaternion,scale,matrixState){
 			
 			matrixState[0] = position.x;
 			matrixState[1] = position.y;
@@ -593,11 +583,16 @@ THREE.Object3D.prototype = {
 			o.matrixWorldNeedsUpdate = true;
 			
 		}
-		return function(){		
-			if 	(checkLastStateChanged( this )){
-				this.matrixCached.compose( this.position, this.quaternion, this.scale );
+		return function(){
+			var position = this.position;
+			var quaternion = this.quaternion;
+			var scale = this.scale;
+			var matrixState = this._matrixState;
+			
+			if 	(checkLastStateChanged( position,quaternion,scale,matrixState )){
+				this.matrixCached.compose( position,quaternion,scale );
 				this.traverse( updateMatrixWorldNeedsUpdate );
-				setLastState( this );
+				setLastState( position, quaternion, scale, matrixState );
 			}
 			return this.matrixCached;
 		};
@@ -605,34 +600,35 @@ THREE.Object3D.prototype = {
 
 	updateMatrixWorld: function ( force, recursive , parentChanged ) {
 		var parent = this.parent; 
-		var parentmatrixWorld;
 		
-		// first update parents before check matrixWorldNeedsUpdate
-		if (parentChanged !== false && parent !== undefined) {
-			parentmatrixWorld = parent.updateMatrixWorld(false,false);
-		} else if ( parent !== undefined ){
-			parentmatrixWorld = parent.matrixWorldCached; 	
-		}
-
 		//check own matrix
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
-
-		// update own matrixWOrld
-		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
-
-			if ( parent === undefined ) {
-
+		
+		if ( parent === undefined ) {
+					// update own matrixWOrld
+			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+				
 				this.matrixWorldCached.copy( this.matrixCached );
-
-			} else {
-
-				this.matrixWorldCached.multiplyMatrices( parentmatrixWorld, this.matrixCached );
-
+				
 			}
-
-			this.matrixWorldNeedsUpdate = false;
 			
+		} else {
+		
+			// first update parents before check matrixWorldNeedsUpdate
+			if (parentChanged !== false) {
+				parent.updateMatrixWorld(false,false);
+			};
+			
+			// update own matrixWOrld
+			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+	
+				this.matrixWorldCached.multiplyMatrices( parent.matrixWorldCached, this.matrixCached );
+				
+				
+			}
 		}
+		
+		this.matrixWorldNeedsUpdate = false;
 
 		// update children
 		if ( recursive !== false || force === true) { 
