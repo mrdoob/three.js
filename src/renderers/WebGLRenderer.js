@@ -2150,6 +2150,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( p_uniforms.viewMatrix !== undefined ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements );
+
 				}
 
 			}
@@ -2202,7 +2203,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( p_uniforms.boneGlobalMatrices !== undefined ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );
-
 
 				}
 
@@ -2304,7 +2304,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( p_uniforms.modelMatrix !== undefined ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.modelMatrix, false, object.matrixWorld.elements );
-			
+
 		}
 
 		return program;
