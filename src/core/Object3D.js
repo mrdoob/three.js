@@ -74,7 +74,16 @@ THREE.Object3D = function () {
 	this.userData = {};
 	
 	//contains the last state of position, quaternion & scale
-	this._matrixState = [ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 ];
+	this._matrixState = { positionx: 0, 
+	positiony: 0, 
+	positionz: 0, 
+	quaternionx: 0, 
+	quaterniony: 0, 
+	quaternionz: 0, 
+	quaternionw: 1, 
+	scalex: 1, 
+	scaley: 1, 
+	scalez: 1 };
 
 };
 
@@ -552,30 +561,30 @@ THREE.Object3D.prototype = {
 	
 		var checkLastStateChanged = function(position, quaternion, scale, matrixState){
 			
-			return matrixState[0] !== position.x ||
-				matrixState[1] !== position.y ||
-				matrixState[2] !== position.z ||
-				matrixState[3] !== quaternion.x ||
-				matrixState[4] !== quaternion.y ||
-				matrixState[5] !== quaternion.z ||
-				matrixState[6] !== quaternion.w ||
-				matrixState[7] !== scale.x ||
-				matrixState[8] !== scale.y ||
-				matrixState[9] !== scale.z;
+			return matrixState.positionx !== position.x ||
+				matrixState.positiony !== position.y ||
+				matrixState.positionz !== position.z ||
+				matrixState.quaternionx !== quaternion.x ||
+				matrixState.quaterniony !== quaternion.y ||
+				matrixState.quaternionz !== quaternion.z ||
+				matrixState.quaternionw !== quaternion.w ||
+				matrixState.scalex !== scale.x ||
+				matrixState.scaley !== scale.y ||
+				matrixState.scalez !== scale.z;
 				
 		};
 		var setLastState = function(position,quaternion,scale,matrixState){
 			
-			matrixState[0] = position.x;
-			matrixState[1] = position.y;
-			matrixState[2] = position.z;
-			matrixState[3] = quaternion.x;
-			matrixState[4] = quaternion.y;
-			matrixState[5] = quaternion.z;
-			matrixState[6] = quaternion.w;
-			matrixState[7] = scale.x;
-			matrixState[8] = scale.y;
-			matrixState[9] = scale.z;
+			matrixState.positionx = position.x;
+			matrixState.positiony = position.y;
+			matrixState.positionz = position.z;
+			matrixState.quaternionx = quaternion.x;
+			matrixState.quaterniony = quaternion.y;
+			matrixState.quaternionz = quaternion.z;
+			matrixState.quaternionw = quaternion.w;
+			matrixState.scalex = scale.x;
+			matrixState.scaley = scale.y;
+			matrixState.scalez = scale.z;
 				
 		};
 		function updateMatrixWorldNeedsUpdate(o) {
