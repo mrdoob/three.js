@@ -67,7 +67,7 @@ THREE.DirectionalLight.prototype.clone = function () {
 
 	var light = new THREE.DirectionalLight();
 
-	THREE.Light.prototype.copy.call( light, this );
+	light.copy( this );
 
 	light.target = this.target.clone();
 

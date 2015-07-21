@@ -104,7 +104,7 @@ THREE.PlaneBufferGeometry.prototype.clone = function () {
 		this.parameters.heightSegments
 	);
 
-	THREE.BufferGeometry.prototype.copy.call( geometry, this );
+	geometry.copy( this );
 
 	return geometry;
 

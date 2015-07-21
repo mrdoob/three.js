@@ -64,7 +64,7 @@ THREE.DodecahedronGeometry.prototype.clone = function () {
 		this.parameters.detail
 	);
 
-	THREE.PolyhedronGeometry.prototype.copy.call( geometry, this );
+	geometry.copy( this );
 
 	return geometry;
 

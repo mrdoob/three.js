@@ -50,7 +50,7 @@ THREE.LineDashedMaterial.prototype.clone = function () {
 
 	var material = new THREE.LineDashedMaterial();
 
-	THREE.Material.prototype.copy.call( material, this );
+	material.copy( this );
 
 	material.color.copy( this.color );
 

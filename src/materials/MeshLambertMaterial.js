@@ -82,7 +82,7 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshLambertMaterial();
 
-	THREE.Material.prototype.copy.call( material, this );
+	material.copy( this );
 
 	material.color.copy( this.color );
 	material.emissive.copy( this.emissive );
