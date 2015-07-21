@@ -26,11 +26,15 @@ THREE.Object3D = function () {
 	var scale = new THREE.Vector3( 1, 1, 1 );
 
 	var onRotationChange = function () {
+
 		quaternion.setFromEuler( rotation, false );
+
 	};
 
 	var onQuaternionChange = function () {
+
 		rotation.setFromQuaternion( quaternion, undefined, false );
+
 	};
 
 	rotation.onChange( onRotationChange );
@@ -128,12 +132,14 @@ THREE.Object3D.prototype = {
 	},
 	
 	get matrix () {
-	    return this.updateMatrix();
+
+		return this.updateMatrix();
+
 	},
 	
 	get matrixWorld () {
 		
-	    return this.updateMatrixWorld(false, false);
+		return this.updateMatrixWorld( false, false );
 	
 	},
 
@@ -556,10 +562,10 @@ THREE.Object3D.prototype = {
 
 	},
 
-	updateMatrix: (function () {
+	updateMatrix: ( function () {
 		
 	
-		var checkLastStateChanged = function(position, quaternion, scale, matrixState){
+		var checkLastStateChanged = function( position, quaternion, scale, matrixState ) {
 			
 			return matrixState.positionx !== position.x ||
 				matrixState.positiony !== position.y ||
@@ -573,7 +579,7 @@ THREE.Object3D.prototype = {
 				matrixState.scalez !== scale.z;
 				
 		};
-		var setLastState = function(position,quaternion,scale,matrixState){
+		var setLastState = function( position, quaternion, scale, matrixState ) {
 			
 			matrixState.positionx = position.x;
 			matrixState.positiony = position.y;
@@ -587,34 +593,41 @@ THREE.Object3D.prototype = {
 			matrixState.scalez = scale.z;
 				
 		};
-		function updateMatrixWorldNeedsUpdate(o) {
+		function updateMatrixWorldNeedsUpdate( o ) {
 			
 			o.matrixWorldNeedsUpdate = true;
 			
 		}
-		return function(){
+		return function() {
+
 			var position = this.position;
 			var quaternion = this.quaternion;
 			var scale = this.scale;
 			var matrixState = this._matrixState;
 			
-			if 	(checkLastStateChanged( position,quaternion,scale,matrixState )){
-				this.matrixCached.compose( position,quaternion,scale );
+			if ( checkLastStateChanged( position, quaternion, scale, matrixState ) ) {
+
+				this.matrixCached.compose( position, quaternion, scale );
 				this.traverse( updateMatrixWorldNeedsUpdate );
 				setLastState( position, quaternion, scale, matrixState );
+
 			}
 			return this.matrixCached;
-		};
-	})(),
 
-	updateMatrixWorld: function ( force, recursive , parentChanged ) {
+		};
+
+	} )(),
+
+	updateMatrixWorld: function ( force, recursive, parentChanged ) {
+
 		var parent = this.parent; 
 		
 		//check own matrix
 		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 		
 		if ( parent === undefined ) {
-					// update own matrixWOrld
+
+			// update own matrixWOrld
 			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 				
 				this.matrixWorldCached.copy( this.matrixCached );
@@ -624,8 +637,10 @@ THREE.Object3D.prototype = {
 		} else {
 		
 			// first update parents before check matrixWorldNeedsUpdate
-			if (parentChanged !== false) {
-				parent.updateMatrixWorld(false,false);
+			if ( parentChanged !== false ) {
+
+				parent.updateMatrixWorld( false, false );
+
 			};
 			
 			// update own matrixWOrld
@@ -635,12 +650,13 @@ THREE.Object3D.prototype = {
 				
 				
 			}
+
 		}
 		
 		this.matrixWorldNeedsUpdate = false;
 
 		// update children
-		if ( recursive !== false || force === true) { 
+		if ( recursive !== false || force === true ) { 
 			
 			var children = this.children;
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
@@ -729,13 +745,17 @@ THREE.Object3D.prototype = {
 		// remove metadata on each item
 		// and return as array
 		function extractFromCache ( cache ) {
+
 			var values = [];
 			for ( var key in cache ) {
+
 				var data = cache[ key ];
 				delete data.metadata;
 				values.push( data );
+
 			}
 			return values;
+
 		}
 
 	},
