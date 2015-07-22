@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - internal shader modification</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #fff;
+				color: #111;
+				margin: 0px;
+				overflow: hidden;
+				font-family: Monospace;
+				font-size: 13px;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				text-align: center;
+			}
+
+			a {
+				color: #0080ff;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #f00;
+			}
+
+			
+			strong { color: red }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #555 !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> webgl - modification of the internal shader<br/>
+		</div>
+		
+		<script src="../build/three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script>
+
+		THREE.UniformsLib['localFog'] = {
+			
+			"localFogPosition": { type: "fv", value: [] },
+			"localFogRadius": { type: "fv1", value: [] },
+			"localFogColor": { type: "fv", value: [] },
+			"localFogFar": {type: "fv1", value: [] }
+
+		};
+		var uniforms = THREE.UniformsUtils.clone( THREE.UniformsLib['localFog'] );
+
+
+		THREE.ShaderLib['phong'].uniforms = THREE.UniformsUtils.merge(
+			[
+
+				THREE.ShaderLib['phong'].uniforms,
+				THREE.UniformsLib['localFog']
+
+			]
+		);
+
+		
+
+		var fragment_pars = [
+
+			"uniform vec3  localFogPosition[ MAX_LOCAL_FOGS ];",
+			"uniform vec3  localFogColor[ MAX_LOCAL_FOGS ];",
+			"uniform float localFogRadius[ MAX_LOCAL_FOGS ];",
+			"uniform float localFogFar[ MAX_LOCAL_FOGS ];"
+
+		].join("\n");
+
+		var fragment = [
+
+			"for ( int i = 0; i < MAX_LOCAL_FOGS; i ++ ) {",
+			"	vec3  fVector = localFogPosition[ i ] - vWorldPosition;",
+			"	float dist = length( fVector );",
+			"	float fogFactor = 1.0 - smoothstep( localFogFar[ i ], localFogRadius [ i ], dist );",
+			"	outgoingLight = mix( outgoingLight, localFogColor[ i ], fogFactor );",
+			"}"
+
+		].join("\n");
+
+		THREE.MeshPhongMaterial.prototype.onProgram = function ( program ) {
+			
+			var head = [
+				"#define USE_WORLD_POS",
+				"#define MAX_LOCAL_FOGS " + fogs.length
+			].join("\n");
+
+			program.vertexShader = program.vertexShader.replace( "//[PrefixBegin]", head );
+
+			program.fragmentShader = program.fragmentShader.replace( "//[PrefixBegin]", head );
+			program.fragmentShader = program.fragmentShader.replace("//[PrefixEnd]", fragment_pars );
+			program.fragmentShader = program.fragmentShader.replace( "//[MainEnd]", fragment );
+			//console.log(program.fragmentShader);
+
+		};
+
+		var fogs = [];
+
+		function updateUniforms () {
+
+			var f, ff, localFog,
+			color, radius, far,
+			offset = 0,
+			length = 0,
+
+			
+
+			colors = uniforms.localFogColor.value,
+			positions = uniforms.localFogPosition.value,
+			fars = uniforms.localFogFar.value,
+			radii = uniforms.localFogRadius.value;
+			
+
+			for ( f = 0, ff = fogs.length; f < ff; f ++ ) {
+
+				localFog = fogs[ f ];
+
+				color = localFog.color;
+
+				far = localFog.far;
+
+				radius = localFog.radius;
+
+
+				offset = length * 3;
+
+
+				positions[ offset ] = localFog.position.x;
+				positions[ offset + 1 ] = localFog.position.y;
+				positions[ offset + 2 ] = localFog.position.z;
+
+				
+
+				colors[ offset ] = color.r;
+				colors[ offset + 1 ] = color.g;
+				colors[ offset + 2 ] = color.b;
+
+				fars[ length ] = radius - far;
+
+				radii[ length ] = radius;
+
+
+				length += 1;
+			}
+
+
+			
+
+		}
+		
+
+		var LocalFog = function (color, radius, far) {
+
+			this.position = new THREE.Vector3();
+			this.color = new THREE.Color(color);
+			this.radius = radius || 100;
+			this.far = far || 50;
+
+		};
+
+		
+
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer, wall;
+			var morphs = [];
+			var stats, cameraControls;
+
+			
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.set( 0, 0, 250 );
+
+				scene = new THREE.Scene();
+
+				var fog1 = new LocalFog(0x777777, 5000, 500);
+				fog1.position.set(5200, 0, 0);
+				fogs.push(fog1);
+
+				var fog2 = new LocalFog(0x777777, 5000, 500);
+				fog2.position.set(0, 0, 5200);
+				fogs.push(fog2);
+
+				var fog3 = new LocalFog(0x777777, 5000, 500);
+				fog3.position.set(-5200, 0, 0);
+				fogs.push(fog3);
+
+				var fog4 = new LocalFog(0x777777, 5000, 500);
+				fog4.position.set(0, 0, -5200);
+				fogs.push(fog4);
+
+				scene.add(new THREE.AmbientLight(0x999999));
+
+				
+
+				var groundGeo = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				var groundMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x050505 } );
+				groundMat.color.setHSL( 0.095, 1, 0.75 );
+				groundMat.customUniforms = uniforms;
+				
+				var ground = new THREE.Mesh( groundGeo, groundMat );
+				ground.rotation.x = -Math.PI/2;
+				ground.position.y = -99;
+				scene.add( ground );
+
+
+
+
+				var boxGeo = new THREE.BoxGeometry( 200, 200, 200 );
+				var boxMat = new THREE.MeshPhongMaterial({color: 0xff1111});
+				boxMat.customUniforms = uniforms;
+				
+				var box1 = new THREE.Mesh(boxGeo, boxMat);
+				box1.position.set(500, 0, 0)
+				scene.add(box1);
+
+				var box2 = new THREE.Mesh(boxGeo, boxMat);
+				box2.position.set(0, 0, -600)
+				box2.rotation.y = Math.PI / 3;
+				scene.add(box2);
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor(0x777777);
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+				cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+				cameraControls.target.set( 0, 0, 0);
+				cameraControls.maxDistance = 400;
+				cameraControls.minDistance = 10;
+				
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				updateUniforms();
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+
+		</script>
+	</body>

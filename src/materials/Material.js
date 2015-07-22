@@ -195,6 +195,12 @@ THREE.Material.prototype = {
 
 		material.visible = this.visible;
 
+		if(  this.customUniforms ) {
+
+			material.customUniforms = THREE.UniformsUtils.clone( this.customUniforms );
+			
+		}
+
 		return material;
 
 	},

@@ -2214,6 +2214,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// refresh uniforms common to several materials
 
+			if( material.customUniforms ) {
+
+				for ( var u in material.customUniforms ) {
+
+					m_uniforms[ u ].value = material.customUniforms[ u ].value;
+
+				}
+
+			}
+
 			if ( fog && material.fog ) {
 
 				refreshUniformsFog( m_uniforms, fog );

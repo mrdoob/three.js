@@ -183,6 +183,8 @@ THREE.WebGLProgram = ( function () {
 
 			prefixVertex = [
 
+				"//[PrefixBegin]",
+
 				'precision ' + parameters.precision + ' float;',
 				'precision ' + parameters.precision + ' int;',
 
@@ -286,12 +288,15 @@ THREE.WebGLProgram = ( function () {
 				'	attribute vec4 skinWeight;',
 
 				'#endif',
+				"//[PrefixEnd]",
 
 				'\n'
 
 			].filter( filterEmptyLine ).join( '\n' );
 
 			prefixFragment = [
+
+				"//[PrefixBegin]",
 
 				( parameters.bumpMap || parameters.normalMap || parameters.flatShading || material.derivatives ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 
@@ -348,6 +353,7 @@ THREE.WebGLProgram = ( function () {
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
+				"//[PrefixEnd]",
 
 				'\n'
 
@@ -355,11 +361,21 @@ THREE.WebGLProgram = ( function () {
 
 		}
 
-		var vertexGlsl = prefixVertex + vertexShader;
-		var fragmentGlsl = prefixFragment + fragmentShader;
+		var glslProgram = {
 
-		var glVertexShader = THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-		var glFragmentShader = THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+			vertexShader: prefixVertex + vertexShader,
+			fragmentShader: prefixFragment + fragmentShader
+
+		};
+
+		if ( material.onProgram ) {
+
+			material.onProgram( glslProgram );
+			
+		}
+
+		var glVertexShader = THREE.WebGLShader(gl, gl.VERTEX_SHADER, glslProgram.vertexShader);
+		var glFragmentShader = THREE.WebGLShader(gl, gl.FRAGMENT_SHADER, glslProgram.fragmentShader);
 
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );
