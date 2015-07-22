@@ -10,6 +10,7 @@ THREE.Action = function ( clip, startTime, timeScale, weight, loop ) {
 	this.timeScale = timeScale || 1;
 	this.weight = weight || 1;
 	this.loop = loop || false;
+	this.enabled = true;	// allow for easy disabling of the action.
 
 	this.cache = {}; // track name, track, last evaluated time, last evaluated value (with weight included), keyIndex.
 };
@@ -19,6 +20,8 @@ THREE.Action.prototype = {
 	constructor: THREE.Action,
 
 	toClipTime: function( time ) {
+
+		console.log( 'Action[' + this.clip.name + '].toClipTime( ' + time + ' )' );
 
 		var clipTime = time - this.startTime;
 
@@ -42,25 +45,23 @@ THREE.Action.prototype = {
 
 	   	}
 
+		console.log( '   clipTime: ' + clipTime );
+
    		return clipTime;
-	}
+	},
 
 	getAt: function( time ) {
 
+		console.log( 'Action[' + this.clip.name + '].getAt( ' + time + ' )' );
+
 		var clipTime = this.toClipTime( time );
 
-		var results = {};
+		var clipResults = this.clip.getAt( clipTime );
 
-		foreach( var name in clip.tracks ) {
+		console.log( "  clipResults: ", clipResults );
 
-			var track = clip.tracks[name];
-
-			var value = track.getAt( time );
-
-			results[name] = value;
-		}
-
-		return results;
+		return clipResults;
+		
 	}
 
 };

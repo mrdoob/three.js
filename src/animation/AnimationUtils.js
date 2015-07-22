@@ -29,8 +29,11 @@
 	// TODO: Cache this at some point
 	findNode: function( root, nodeName ) {
 
+		console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')');
+		
 		if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 ) {
 
+			console.log( '  root.' );
 			return root;
 
 		}
@@ -57,7 +60,12 @@
 
 			var boneNode = searchSkeleton( root.skeleton );
 
-			if( boneNode ) return boneNode;
+			if( boneNode ) {
+
+				console.log( '  bone: ' + bone.name + '.' );
+				return boneNode;
+
+			}
 		}
 
 		// (3) search into node subtree.
@@ -87,11 +95,16 @@
 
 			var subTreeNode = searchNodeSubtree( root.children );
 
-			if( subTreeNode ) return subTreeNode;
+			if( subTreeNode ) {
+
+				console.log( '  node: ' + subTreeNode.name + '.' );
+				return subTreeNode;
+
+			}
 
 		}
 
-		console.log( "no node found for name: " + name );
+		console.log( "   <null>.  No node found for name: " + name );
 
 		return null;
 	}

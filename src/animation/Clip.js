@@ -1,4 +1,7 @@
 /**
+ *
+ * Reusable set of Tracks that represent an animation.
+ * 
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
@@ -14,6 +17,21 @@ THREE.Clip = function ( name, duration, tracks ) {
 THREE.Clip.prototype = {
 
 	constructor: THREE.Clip,
+
+	getAt: function( clipTime ) {
+
+		var results = [];
+
+		for( var i = 0; i < this.tracks.length; i ++ ) {
+
+			var track = this.tracks[i];
+
+			results.push( { name: track.name, value: this.getAt( time ) } );
+
+		}
+
+		return results;
+	},
 
 	importFromData: function( data ) {
 
