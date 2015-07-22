@@ -280,15 +280,6 @@ THREE.AnimationHandler.addCrossfade = function( mesh, crossfade ) {
 }
 
 //
-//	KeyFrame
-//
-
-THREE.VertexAnimation = function () {
-
-
-}
-
-//
 //	Animation Event Extension
 //
 
