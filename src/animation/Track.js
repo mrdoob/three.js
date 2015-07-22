@@ -1,3 +1,13 @@
+/**
+ *
+ * A Track base class that has a getAt function and name handling.
+ *
+ * TODO: Add support for bone indices via a number rather than a name?
+ * TODO: Add support for explicitly setting the nodeName and propertyName?
+ * 
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ */
 
 THREE.Track = function ( name ) {
 

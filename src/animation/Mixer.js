@@ -1,4 +1,7 @@
 /**
+ *
+ * Mixes together the Clips scheduled by Actions and applies them to the root and subtree
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */

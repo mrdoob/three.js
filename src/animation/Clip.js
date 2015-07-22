@@ -35,7 +35,7 @@ THREE.Clip.prototype = {
 
 	importFromData: function( data ) {
 
-		init: function ( data ) {
+		// TODO: Convert this copy-paste code from AnimationHandler into an importer into Tracks and Clips with some improvements to the track names
 
 		if ( data.initialized === true ) return data;
 

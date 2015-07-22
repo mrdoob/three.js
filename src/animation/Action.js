@@ -1,4 +1,7 @@
 /**
+ *
+ * A clip that has been explicitly scheduled.
+ * 
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */

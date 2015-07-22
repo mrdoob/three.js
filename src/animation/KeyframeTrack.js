@@ -1,4 +1,12 @@
-
+/**
+ *
+ * A Track that returns a keyframe interpolated value.
+ *
+ * TODO: Add cubic in addition to linear interpolation.
+ * 
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ */
 
 THREE.KeyframeTrack = function ( name, keys ) {
 

@@ -1,4 +1,10 @@
-
+/**
+ *
+ * A Track that returns a constant value.
+ * 
+ * @author Ben Houston / http://clara.io/
+ * @author David Sarno / http://lighthaus.us/
+ */
 
 THREE.ConstantTrack = function ( name, value ) {
 
