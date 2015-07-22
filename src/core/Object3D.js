@@ -656,7 +656,7 @@ THREE.Object3D.prototype = {
 		this.matrixWorldNeedsUpdate = false;
 
 		// update children
-		if ( recursive !== false || force === true ) { 
+		if ( recursive === true || force === true ) { 
 			
 			var children = this.children;
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
