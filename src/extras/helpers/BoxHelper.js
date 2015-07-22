@@ -28,6 +28,8 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 		box.setFromObject( object );
 
+		if ( box.empty() ) return;
+
 		var min = box.min;
 		var max = box.max;
 
