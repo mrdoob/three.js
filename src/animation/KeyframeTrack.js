@@ -1,0 +1,53 @@
+
+
+THREE.KeyframeTrack = function ( name, keys ) {
+
+	this.keys = keys || [];	// time in seconds, value as value
+
+	// TODO: sort keys via their times
+	this.keys.sort( function( a, b ) { return a.time < b.time; } );
+
+	THREE.Track.call( this, name );
+
+};
+
+THREE.KeyframeTrack.prototype = {
+
+	constructor: THREE.Track,
+
+	getAt: function( time ) {
+
+		if( this.keys.length == 0 ) throw new Error( "no keys in track named " + this.name );
+		
+		// before the start of the track, return the first key value
+		if( this.keys[0].time >= time ) {
+
+			return this.keys[0].value;
+
+		}
+
+		// past the end of the track, return the last key value
+		if( this.keys[ this.keys.length - 1 ].time <= time ) {
+
+			return this.keys[ this.keys.length - 1 ].value;
+
+		}
+
+		// interpolate to the required time
+		for( var i = 1; i < this.keys.length; i ++ ) {
+
+			if( time <= this.keys[ i ].time ) {
+
+				// linear interpolation to start with
+				var alpha = ( time - this.keys[ i - 1 ].time ) / ( this.keys[ i ].time - this.keys[ i - 1 ].time );
+
+				return THREE.AnimationUtils.lerp( this.keys[ i - 1 ].value, this.keys[ i ].value, alpha );
+
+			}
+		}
+
+		throw new Error( "should never get here." );
+
+	};
+
+};
