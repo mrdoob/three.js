@@ -61,8 +61,8 @@ THREE.Object3D = function () {
 
 	this.rotationAutoUpdate = true;
 
-	this.matrixCached = new THREE.Matrix4();
-	this.matrixWorldCached = new THREE.Matrix4();
+	this._matrix = new THREE.Matrix4();
+	this._matrixWorld = new THREE.Matrix4();
 
 	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = false;
@@ -607,12 +607,12 @@ THREE.Object3D.prototype = {
 			
 			if ( checkLastStateChanged( position, quaternion, scale, matrixState ) ) {
 
-				this.matrixCached.compose( position, quaternion, scale );
+				this._matrix.compose( position, quaternion, scale );
 				this.traverse( updateMatrixWorldNeedsUpdate );
 				setLastState( position, quaternion, scale, matrixState );
 
 			}
-			return this.matrixCached;
+			return this._matrix;
 
 		};
 
@@ -630,7 +630,7 @@ THREE.Object3D.prototype = {
 			// update own matrixWOrld
 			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 				
-				this.matrixWorldCached.copy( this.matrixCached );
+				this._matrixWorld.copy( this._matrix );
 				
 			}
 			
@@ -646,7 +646,7 @@ THREE.Object3D.prototype = {
 			// update own matrixWOrld
 			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 	
-				this.matrixWorldCached.multiplyMatrices( parent.matrixWorldCached, this.matrixCached );
+				this._matrixWorld.multiplyMatrices( parent._matrixWorld, this._matrix );
 				
 				
 			}
@@ -667,7 +667,7 @@ THREE.Object3D.prototype = {
 			
 		}
 		
-		return this.matrixWorldCached;
+		return this._matrixWorld;
 		
 	},
 
