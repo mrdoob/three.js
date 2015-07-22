@@ -21179,6 +21179,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( overrideMaterial === null ) material = webglObject[ materialType ];
 
+				if ( ! material ) continue;
+
 				_this.renderImmediateObject( camera, lights, fog, material, object );
 
 			}
@@ -24635,6 +24637,10 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	var scope = this;
 
 	this.enabled = false;
+
+	this.autoUpdate = true;
+	this.needsUpdate = false;
+
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
 	this.cascade = false;
@@ -24642,6 +24648,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	this.render = function ( scene, camera ) {
 
 		if ( scope.enabled === false ) return;
+		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
 		var i, il, j, jl, n,
 
@@ -24917,6 +24924,8 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		}
 
 		_renderer.resetGLState();
+
+		scope.needsUpdate = false;
 
 	};
 
