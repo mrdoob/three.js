@@ -1,6 +1,8 @@
 /**
  *
  * Reusable set of Tracks that represent an animation.
+ *
+ * TODO: MUST add support for importing Clips from JSONLoader data files.
  * 
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/

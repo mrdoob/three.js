@@ -2,6 +2,8 @@
  *
  * Mixes together the Clips scheduled by Actions and applies them to the root and subtree
  *
+ * TODO: MUST add support for blending between Actions based on their weights, right now only the last Action is applied at full weight.
+ *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
