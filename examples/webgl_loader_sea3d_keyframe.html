@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d</title>
+		<title>three.js webgl - sea3d / keyframe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -29,6 +29,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<div id="description">Click to play</div>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -56,7 +57,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls;
+			var camera, scene, renderer, composer, controls, demoAt = -1;
 
 			var loader;
 
@@ -70,28 +71,71 @@
 
 			loader = new THREE.SEA3D( {
 
-				autoPlay : true, // Auto play animations
+				autoPlay : false, // Manual play animations
 				container : scene, // Container to add models
-				parser : THREE.SEA3D.AUTO, // Auto choose THREE.BufferGeometry and THREE.Geometry
+				parser : THREE.SEA3D.BUFFER, // THREE.SEA3D.BUFFER to THREE.BufferGeometry
 				multiplier : 1 // Light multiplier
 
 			} );
 
 			loader.onComplete = function( e ) {
 
-				// Get camera from 3ds Max
+				// Get the first camera from 3ds Max
 				// use loader.get... to get others objects
 
-				var cam = loader.getCamera( "Camera007" );
+				var cam = loader.cameras[0];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
+				// reset global animation time
+				SEA3D.AnimationHandler.setTime( 0 );
+				
+				// events
+				
+				window.addEventListener('click', onMouseClick, false);
+				
 				animate();
 
 			};
 
-			loader.load( './models/sea3d/mascot.sea' );
+			loader.load( './models/sea3d/keyframe.sea' );
 
+			//
+			//	Animation Functions
+			//
+
+			function playAll(name, crossfade, offset) {
+
+				// reset global time
+				SEA3D.AnimationHandler.setTime( 0 );
+
+				// play all animations
+				for(var i = 0; i < loader.meshes.length; i++) {
+					if (loader.meshes[i].animation)
+						loader.meshes[i].animation.play(name, crossfade, offset);
+				}
+
+			}
+			
+			function setTimeScale( timeScale ) {		
+			
+				// set in all active animations
+				for(var i in SEA3D.AnimationHandler.animations) {		
+					SEA3D.AnimationHandler.animations[i].timeScale = timeScale;
+				}
+
+			}
+			
+			function stopAll() {
+
+				// reset global time
+				SEA3D.AnimationHandler.setTime( 0 );
+				
+				// stop all active animations
+				SEA3D.AnimationHandler.stop();
+				
+			}
+			
 			//
 
 			function init() {
@@ -147,7 +191,7 @@
 				scene.add( new THREE.AmbientLight( 0x333333 ) );
 
 				// events
-
+				
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -164,6 +208,77 @@
 
 			//
 
+			function description(msg) {
+
+				document.getElementById('description').innerHTML = (demoAt + 1) + " - " + msg;
+
+			}
+			
+			function onMouseClick( e ) {
+
+				// 0 at 3 demos
+
+				switch( demoAt = ++demoAt % 4 ) {				
+
+					// play all animation to sequence "crash#1"
+
+					case 0:
+
+						playAll("crash#1", .5);	
+						setTimeScale(1);
+
+						description("crash#1 - crossfade 0.5 seconds");
+
+						break;
+
+					// play all animation to sequence "crash#2"
+
+					case 1:
+
+						playAll("crash#2", .5);	
+						
+						description("crash#2 - crossfade 0.5 seconds");
+
+						break;		
+
+					// play animation in single object
+
+					case 2:
+
+						stopAll();
+
+						var fracture99 = loader.getMesh("Object099");
+
+						//fracture99.animation.time = 0;
+						//fracture99.animation.timeScale = 1;						
+						//fracture99.animation.playing								
+						//fracture99.animation.states ...	
+						//fracture99.animation.currentState ...						
+
+						//fracture99.animation.node ...
+						//fracture99.animation.node.duration
+
+						fracture99.animation.play("crash#2", .5, 0);
+						//fracture99.animation.pause();
+						//fracture99.animation.stop();						
+
+						description("crash#2 in single object - crossfade 0.5 seconds");
+
+						break;
+
+					// set time scale
+
+					case 3:
+
+						playAll("crash#2", .5);
+						setTimeScale(.1);	
+
+						description("time scale / 10 - crossfade 0.5 seconds");
+
+						break;							
+				}
+			}
+			
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -183,6 +298,9 @@
 				var delta = clock.getDelta();
 
 				THREE.AnimationHandler.update( delta );
+
+				// SEA3D Keyframe Update		
+				SEA3D.AnimationHandler.update( delta ); 
 
 				//renderer.render( scene, camera );
 				composer.render( delta );

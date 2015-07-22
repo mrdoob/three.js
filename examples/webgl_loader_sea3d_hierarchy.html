@@ -69,20 +69,29 @@
 			//
 
 			loader = new THREE.SEA3D( {
-
-				autoPlay : true, // Auto play animations
+				
+				autoPlay : false, // Auto play animations
 				container : scene, // Container to add models
-				parser : THREE.SEA3D.AUTO, // Auto choose THREE.BufferGeometry and THREE.Geometry
+				parser : THREE.SEA3D.BUFFER, // THREE.BufferGeometry
 				multiplier : 1 // Light multiplier
 
 			} );
 
 			loader.onComplete = function( e ) {
 
-				// Get camera from 3ds Max
+				// reset global time
+				SEA3D.AnimationHandler.setTime( 0 );
+
+				// play all animations
+				for(var i = 0; i < loader.meshes.length; i++) {
+					if (loader.meshes[i].animation)
+						loader.meshes[i].animation.play("root");
+				}
+			
+				// Get the first camera from 3ds Max
 				// use loader.get... to get others objects
 
-				var cam = loader.getCamera( "Camera007" );
+				var cam = loader.cameras[0];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
@@ -90,7 +99,7 @@
 
 			};
 
-			loader.load( './models/sea3d/mascot.sea' );
+			loader.load( './models/sea3d/robot.sea' );
 
 			//
 
@@ -142,10 +151,6 @@
 				composer.addPass( copyPass );
 				copyPass.renderToScreen = true;
 
-				// extra lights
-
-				scene.add( new THREE.AmbientLight( 0x333333 ) );
-
 				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -184,6 +189,9 @@
 
 				THREE.AnimationHandler.update( delta );
 
+				// SEA3D Keyframe Update		
+				SEA3D.AnimationHandler.update( delta ); 
+				
 				//renderer.render( scene, camera );
 				composer.render( delta );
 
