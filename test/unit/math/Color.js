@@ -118,9 +118,25 @@ test( "setStyleRGBRed", function(){
     ok( c.b === 0, "Blue: " + c.b );
 });
 
+test( "setStyleRGBARed", function(){
+    var c = new THREE.Color();
+    c.setStyle('rgba(255,0,0,0.5)');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g === 0, "Green: " + c.g );
+    ok( c.b === 0, "Blue: " + c.b );
+});
+
 test( "setStyleRGBRedWithSpaces", function(){
     var c = new THREE.Color();
-    c.setStyle('rgb(255, 0, 0)');
+    c.setStyle('rgb( 255 , 0,   0 )');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g === 0, "Green: " + c.g );
+    ok( c.b === 0, "Blue: " + c.b );
+});
+
+test( "setStyleRGBARedWithSpaces", function(){
+    var c = new THREE.Color();
+    c.setStyle('rgba( 255,  0,  0  , 1 )');
     ok( c.r == 1, "Red: " + c.r );
     ok( c.g === 0, "Green: " + c.g );
     ok( c.b === 0, "Blue: " + c.b );
@@ -134,17 +150,71 @@ test( "setStyleRGBPercent", function(){
     ok( c.b == 0.1, "Blue: " + c.b );
 });
 
-test( "setStyleRGBPercentWithSpaces", function(){
+test( "setStyleRGBAPercent", function(){
     var c = new THREE.Color();
-    c.setStyle('rgb(100%,50%,10%)');
+    c.setStyle('rgba(100%,50%,10%, 0.5)');
     ok( c.r == 1, "Red: " + c.r );
     ok( c.g == 0.5, "Green: " + c.g );
     ok( c.b == 0.1, "Blue: " + c.b );
 });
 
+test( "setStyleRGBPercentWithSpaces", function(){
+    var c = new THREE.Color();
+    c.setStyle('rgb( 100% ,50%  , 10% )');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g == 0.5, "Green: " + c.g );
+    ok( c.b == 0.1, "Blue: " + c.b );
+});
+
+test( "setStyleRGBAPercentWithSpaces", function(){
+    var c = new THREE.Color();
+    c.setStyle('rgba( 100% ,50%  ,  10%, 0.5 )');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g == 0.5, "Green: " + c.g );
+    ok( c.b == 0.1, "Blue: " + c.b );
+});
+
+test( "setStyleHSLRed", function(){
+    var c = new THREE.Color();
+    c.setStyle('hsl(360,100%,50%)');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g === 0, "Green: " + c.g );
+    ok( c.b === 0, "Blue: " + c.b );
+});
+
+test( "setStyleHSLARed", function(){
+    var c = new THREE.Color();
+    c.setStyle('hsla(360,100%,50%,0.5)');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g === 0, "Green: " + c.g );
+    ok( c.b === 0, "Blue: " + c.b );
+});
+
+test( "setStyleHSLRedWithSpaces", function(){
+    var c = new THREE.Color();
+    c.setStyle('hsl(360,  100% , 50% )');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g === 0, "Green: " + c.g );
+    ok( c.b === 0, "Blue: " + c.b );
+});
+
+test( "setStyleHSLARedWithSpaces", function(){
+    var c = new THREE.Color();
+    c.setStyle('hsla( 360,  100% , 50%,  0.5 )');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g === 0, "Green: " + c.g );
+    ok( c.b === 0, "Blue: " + c.b );
+});
+
 test( "setStyleHexSkyBlue", function(){
     var c = new THREE.Color();
     c.setStyle('#87CEEB');
+    ok(c.getHex() == 0x87CEEB, "Hex c: " + c.getHex());
+});
+
+test( "setStyleHexSkyBlueMixed", function(){
+    var c = new THREE.Color();
+    c.setStyle('#87cEeB');
     ok(c.getHex() == 0x87CEEB, "Hex c: " + c.getHex());
 });
 
@@ -154,12 +224,17 @@ test( "setStyleHex2Olive", function(){
     ok(c.getHex() == 0xFF0000, "Hex c: " + c.getHex());
 });
 
+test( "setStyleHex2OliveMixed", function(){
+    var c = new THREE.Color();
+    c.setStyle('#f00');
+    ok(c.getHex() == 0xFF0000, "Hex c: " + c.getHex());
+});
+
 test( "setStyleColorName", function(){
     var c = new THREE.Color();
     c.setStyle('powderblue');
     ok(c.getHex() == 0xB0E0E6, "Hex c: " + c.getHex());
 });
-
 
 test( "getHex", function(){
     var c = new THREE.Color('red');
