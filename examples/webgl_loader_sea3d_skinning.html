@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - sea3d</title>
+		<title>three.js webgl - sea3d / skin</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -29,6 +29,8 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - model by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
+			<br/>BoneObject: Object3D attached in a Bone
+			<br/>Click to hidden/show the hat - Right click to run
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -56,7 +58,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls;
+			var camera, scene, renderer, composer, controls, player, hat;
 
 			var loader;
 
@@ -79,18 +81,27 @@
 
 			loader.onComplete = function( e ) {
 
-				// Get camera from 3ds Max
+				// Get the first camera from 3ds Max
 				// use loader.get... to get others objects
 
-				var cam = loader.getCamera( "Camera007" );
+				var cam = loader.cameras[0];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
+				// get meshes
+				player = loader.getMesh("Player");
+				hat = loader.getMesh("Hat");
+				
+				// events
+				
+				window.addEventListener( 'click', onMouseClick, false );
+				window.addEventListener( 'contextmenu', onRightClick, false );
+				
 				animate();
 
 			};
 
-			loader.load( './models/sea3d/mascot.sea' );
+			loader.load( './models/sea3d/skin.sea' );
 
 			//
 
@@ -152,7 +163,27 @@
 
 			}
 
+			function onRightClick( e ) {
 
+				// play character animation
+				if (player.currentAnimation.name == "idle")
+					player.play("run", .5);
+				else
+					player.play("idle", .5);
+
+				e.preventDefault();
+
+			}
+			
+			function onMouseClick( e ) {
+
+				if (e.button != 0) return;
+
+				var hat = loader.getMesh("Hat");
+				hat.visible = !hat.visible;
+
+			}
+			
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
