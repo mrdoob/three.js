@@ -6,7 +6,7 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.Action = function ( clip, startTime, timeScale, weight, loop ) {
+THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 
 	this.clip = clip;
 	this.startTime = startTime || 0;
@@ -18,13 +18,13 @@ THREE.Action = function ( clip, startTime, timeScale, weight, loop ) {
 	this.cache = {}; // track name, track, last evaluated time, last evaluated value (with weight included), keyIndex.
 };
 
-THREE.Action.prototype = {
+THREE.AnimationAction.prototype = {
 
-	constructor: THREE.Action,
+	constructor: THREE.AnimationAction,
 
-	toClipTime: function( time ) {
+	toAnimationClipTime: function( time ) {
 
-		console.log( 'Action[' + this.clip.name + '].toClipTime( ' + time + ' )' );
+		console.log( 'AnimationAction[' + this.clip.name + '].toAnimationClipTime( ' + time + ' )' );
 
 		var clipTime = time - this.startTime;
 
@@ -55,9 +55,9 @@ THREE.Action.prototype = {
 
 	getAt: function( time ) {
 
-		console.log( 'Action[' + this.clip.name + '].getAt( ' + time + ' )' );
+		console.log( 'AnimationAction[' + this.clip.name + '].getAt( ' + time + ' )' );
 
-		var clipTime = this.toClipTime( time );
+		var clipTime = this.toAnimationClipTime( time );
 
 		var clipResults = this.clip.getAt( clipTime );
 

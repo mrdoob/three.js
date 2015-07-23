@@ -1,14 +1,14 @@
 /**
  *
- * Mixes together the Clips scheduled by Actions and applies them to the root and subtree
+ * Mixes together the AnimationClips scheduled by AnimationActions and applies them to the root and subtree
  *
- * TODO: MUST add support for blending between Actions based on their weights, right now only the last Action is applied at full weight.
+ * TODO: MUST add support for blending between AnimationActions based on their weights, right now only the last AnimationAction is applied at full weight.
  *
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.Mixer = function( root ) {
+THREE.AnimationMixer = function( root ) {
 
 	this.root = root;
 	this.actions = [];
@@ -16,12 +16,12 @@ THREE.Mixer = function( root ) {
 
 };
 
-THREE.Mixer.prototype = {
+THREE.AnimationMixer.prototype = {
 
-	constructor: THREE.Mixer,
+	constructor: THREE.AnimationMixer,
 
-	addAction: function( action ) {
-		console.log( root.name + ".Mixer.addAction( " + action.name + " )" );
+	addAnimationAction: function( action ) {
+		console.log( root.name + ".AnimationMixer.addAnimationAction( " + action.name + " )" );
 
 		this.actions.push( action );
 
@@ -36,8 +36,8 @@ THREE.Mixer.prototype = {
 
 	},
 
-	removeAction: function( action ) {
-		console.log( root.name + ".Mixer.addRemove( " + action.name + " )" );
+	removeAnimationAction: function( action ) {
+		console.log( root.name + ".AnimationMixer.addRemove( " + action.name + " )" );
 
 		var index = this.actions.indexOf( action );
 
@@ -49,7 +49,7 @@ THREE.Mixer.prototype = {
 	},
 
 	update: function( time ) {
-		console.log( root.name + ".Mixer.update( " + time + " )" );
+		console.log( root.name + ".AnimationMixer.update( " + time + " )" );
 
 		var mixerResults = {};
 

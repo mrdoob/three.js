@@ -2,13 +2,13 @@
  *
  * Reusable set of Tracks that represent an animation.
  *
- * TODO: MUST add support for importing Clips from JSONLoader data files.
+ * TODO: MUST add support for importing AnimationClips from JSONLoader data files.
  * 
  * @author Ben Houston / http://clara.io/
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.Clip = function ( name, duration, tracks ) {
+THREE.AnimationClip = function ( name, duration, tracks ) {
 
 	this.name = name || "";
 	this.duration = duration || 0;
@@ -16,9 +16,9 @@ THREE.Clip = function ( name, duration, tracks ) {
 
 };
 
-THREE.Clip.prototype = {
+THREE.AnimationClip.prototype = {
 
-	constructor: THREE.Clip,
+	constructor: THREE.AnimationClip,
 
 	getAt: function( clipTime ) {
 
@@ -37,7 +37,7 @@ THREE.Clip.prototype = {
 
 	importFromData: function( data ) {
 
-		// TODO: Convert this copy-paste code from AnimationHandler into an importer into Tracks and Clips with some improvements to the track names
+		// TODO: Convert this copy-paste code from AnimationHandler into an importer into Tracks and AnimationClips with some improvements to the track names
 
 		if ( data.initialized === true ) return data;
 
