@@ -1,0 +1,13 @@
+{
+    "preset": "mdcs",
+    "excludeFiles": [ 
+        "build/**", 
+        "docs/**",
+        "editor/**",
+        "examples/**",
+        "node_modules/**",
+        "test/**",
+        "utils/**"
+        ]
+    
+}

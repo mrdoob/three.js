@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -102,6 +103,14 @@
 		</div>
 		<div>
 		Get the distance of the closest approach between the [page:Ray] and the [page:Vector3].
+		</div>
+
+		<h3>[method:Float distanceSqToPoint]([page:Vector3 point])</h3>
+		<div>
+		point -- [page:Vector3] The [page:Vector3] to compute a distance to.
+		</div>
+		<div>
+		Get the squared distance of the closest approach between the [page:Ray] and the [page:Vector3].
 		</div>
 
 		<h3>[method:Boolean equals]([page:Ray ray])</h3>

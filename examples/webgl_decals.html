@@ -59,17 +59,10 @@
 			depthTest: true,
 			depthWrite: false,
 			polygonOffset: true,
-			polygonOffsetFactor: -4,
+			polygonOffsetFactor: - 4,
 			wireframe: false
-		});
-		/*decalMaterial = new THREE.MeshNormalMaterial( {
-			transparent: true,
-			depthTest: true,
-			depthWrite: false,
-			polygonOffset: true,
-			polygonOffsetFactor: -4,
-			shading: THREE.SmoothShading
-		});*/
+		} );
+
 		var decals = [];
 		var decalHelper, mouseHelper;
 		var p = new THREE.Vector3( 0, 0, 0 );
@@ -84,7 +77,9 @@
 			maxScale: 20,
 			rotate: true,
 			clear: function() {
+
 				removeDecals();
+
 			}
 		};
 
@@ -113,9 +108,8 @@
 
 			var geometry = new THREE.Geometry();
 			geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
-			geometry.dynamic = true;
 
-			line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 }) );
+			line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 } ) );
 			scene.add( line );
 
 			loadLeePerrySmith();
@@ -145,7 +139,7 @@
 			window.addEventListener( 'mouseup', function() {
 
 				checkIntersection();
-				if( !moved ) shoot();
+				if ( ! moved ) shoot();
 
 			} );
 
@@ -154,12 +148,16 @@
 
 			function onTouchMove( event ) {
 
-				if( event.changedTouches ) {
+				if ( event.changedTouches ) {
+
 					x = event.changedTouches[ 0 ].pageX;
 					y = event.changedTouches[ 0 ].pageY;
+
 				} else {
+
 					x = event.clientX;
 					y = event.clientY;
+
 				}
 
 				mouse.x = ( x / window.innerWidth ) * 2 - 1;
@@ -171,7 +169,7 @@
 
 			function checkIntersection() {
 
-				if( !mesh ) return;
+				if ( ! mesh ) return;
 
 				raycaster.setFromCamera( mouse, camera );
 
@@ -214,7 +212,7 @@
 			gui.open();
 
 			onWindowResize();
-			render();
+			animate();
 
 		}
 
@@ -223,14 +221,6 @@
 			var loader = new THREE.JSONLoader();
 
 			loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function( geometry ) {
-
-				geometry.verticesNeedUpdate = true;
-				geometry.elementsNeedUpdate = true;
-				geometry.morphTargetsNeedUpdate = true;
-				geometry.uvsNeedUpdate = true;
-				geometry.normalsNeedUpdate = true;
-				geometry.colorsNeedUpdate = true;
-				geometry.tangentsNeedUpdate = true;
 
 				var material = new THREE.MeshPhongMaterial( {
 					map: THREE.ImageUtils.loadTexture( 'obj/leeperrysmith/Map-COL.jpg' ),
@@ -252,7 +242,7 @@
 
 		function shoot() {
 
-			if( params.projection == 'camera' ) {
+			if ( params.projection == 'camera' ) {
 
 				var dir = camera.target.clone();
 				dir.sub( camera.position );
@@ -281,7 +271,7 @@
 			var scale = params.minScale + Math.random() * ( params.maxScale - params.minScale );
 			s.set( scale, scale, scale );
 
-			if( params.rotate) r.z = Math.random() * 2 * Math.PI;
+			if ( params.rotate ) r.z = Math.random() * 2 * Math.PI;
 
 			var material = decalMaterial.clone();
 			material.color.setHex( Math.random() * 0xffffff );
@@ -295,8 +285,10 @@
 		function removeDecals() {
 
 			decals.forEach( function( d ) {
+
 				scene.remove( d );
 				d = null;
+
 			} );
 			decals = [];
 
@@ -305,24 +297,24 @@
 		function mergeDecals() {
 
 			var merge = {};
-			decals.forEach(function (decal) {
+			decals.forEach( function ( decal ) {
 
 				var uuid = decal.material.uuid;
-				var d = merge[uuid] = merge[uuid] || {};
+				var d = merge[ uuid ] = merge[ uuid ] || {};
 				d.material = d.material || decal.material;
 				d.geometry = d.geometry || new THREE.Geometry();
-				d.geometry.merge(decal.geometry, decal.matrix);
+				d.geometry.merge( decal.geometry, decal.matrix );
 
-			});
+			} );
 
 			removeDecals();
 
-			for (var key in merge) {
+			for ( var key in merge ) {
 
-				var d = merge[key];
-				var mesh = new THREE.Mesh(d.geometry, d.material);
-				scene.add(mesh);
-				decals.push(mesh);
+				var d = merge[ key ];
+				var mesh = new THREE.Mesh( d.geometry, d.material );
+				scene.add( mesh );
+				decals.push( mesh );
 
 			}
 
@@ -337,9 +329,9 @@
 
 		}
 
-		function render() {
+		function animate() {
 
-			requestAnimationFrame( render );
+			requestAnimationFrame( animate );
 
 			renderer.render( scene, camera );
 

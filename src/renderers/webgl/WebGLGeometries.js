@@ -2,7 +2,7 @@
 * @author mrdoob / http://mrdoob.com/
 */
 
-THREE.WebGLGeometries = function ( gl, info ) {
+THREE.WebGLGeometries = function ( gl, properties, info ) {
 
 	var geometries = {};
 
@@ -22,9 +22,15 @@ THREE.WebGLGeometries = function ( gl, info ) {
 
 			geometries[ geometry.id ] = geometry;
 
-		} else {
+		} else if ( geometry instanceof THREE.Geometry ) {
 
-			geometries[ geometry.id ] = new THREE.BufferGeometry().setFromObject( object );
+			if ( object._bufferGeometry === undefined ) {
+
+				object._bufferGeometry = new THREE.BufferGeometry().setFromObject( object );
+
+			}
+
+			geometries[ geometry.id ] = object._bufferGeometry;
 
 		}
 
@@ -37,26 +43,53 @@ THREE.WebGLGeometries = function ( gl, info ) {
 	function onGeometryDispose( event ) {
 
 		var geometry = event.target;
+		var buffergeometry = geometries[ geometry.id ];
 
-		geometry.removeEventListener( 'dispose', onGeometryDispose );
+		for ( var name in buffergeometry.attributes ) {
 
-		geometry = geometries[ geometry.id ];
+			var attribute = buffergeometry.attributes[ name ];
+			var buffer = getAttributeBuffer( attribute );
 
-		for ( var name in geometry.attributes ) {
+			if ( buffer !== undefined ) {
 
-			var attribute = geometry.attributes[ name ];
-
-			if ( attribute.buffer !== undefined ) {
-
-				gl.deleteBuffer( attribute.buffer );
-
-				delete attribute.buffer;
+				gl.deleteBuffer( buffer );
+				removeAttributeBuffer( attribute );
 
 			}
 
 		}
 
+		geometry.removeEventListener( 'dispose', onGeometryDispose );
+
+		delete geometries[ geometry.id ];
+
 		info.memory.geometries --;
+
+	}
+
+	function getAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			return properties.get( attribute.data ).__webglBuffer;
+
+		}
+
+		return properties.get( attribute ).__webglBuffer;
+
+	}
+
+	function removeAttributeBuffer( attribute ) {
+
+		if ( attribute instanceof THREE.InterleavedBufferAttribute ) {
+
+			properties.delete( attribute.data );
+
+		} else {
+
+			properties.delete( attribute );
+
+		}
 
 	}
 

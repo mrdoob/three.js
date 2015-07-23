@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -22,6 +23,11 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean enabled]</h3>
+		<div>
+		Whether caching is enabled. Default is *false*.
+		</div>
+
 		<h3>[property:Object files]</h3>
 		<div>
 		An [page:Object object] that hold cached values.
@@ -33,7 +39,7 @@
 		<h3>[method:null add]( [page:String key], value )</h3>
 		<div>
 		[page:String key] — required. A string key <br />
-		[page:Object] value — <br />
+		[page:Object] value — A value <br />
 		</div>
 		<div>
 		Adds a cache entry with that key to hold the value. If this key already holds a value, it is overwritten.
@@ -44,7 +50,7 @@
 		[page:String key] — required. A string key <br />
 		</div>
 		<div>
-		Get the value of key. If the key does not exist the null value is returned.
+		Get the value of key. If the key does not exist *undefined* is returned.
 		</div>
 
 		<h3>[method:null remove]( [page:String key] )</h3>

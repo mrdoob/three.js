@@ -62,7 +62,7 @@
 				param: 4,
 				filterparam: 1
 			};
-			
+
 			var waterNormals;
 
 			init();
@@ -94,12 +94,12 @@
 				light.position.set( - 1, 1, - 1 );
 				scene.add( light );
 
-				
+
 				waterNormals = new THREE.ImageUtils.loadTexture( 'textures/waternormals.jpg' );
-				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
+				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
 
 				water = new THREE.Water( renderer, camera, scene, {
-					textureWidth: 512, 
+					textureWidth: 512,
 					textureHeight: 512,
 					waterNormals: waterNormals,
 					alpha: 	1.0,
@@ -124,7 +124,6 @@
 
 				var cubeMap = new THREE.CubeTexture( [] );
 				cubeMap.format = THREE.RGBFormat;
-				cubeMap.flipY = false;
 
 				var loader = new THREE.ImageLoader();
 				loader.load( 'textures/skyboxsun25degtest.png', function ( image ) {
@@ -169,7 +168,7 @@
 					new THREE.BoxGeometry( 1000000, 1000000, 1000000 ),
 					skyBoxMaterial
 				);
-				
+
 				scene.add( skyBox );
 
 
@@ -186,7 +185,7 @@
 					shininess: 100,
 					envMap: cubeMap
 				} );
-				
+
 				sphere = new THREE.Mesh( geometry, material );
 				scene.add( sphere );
 

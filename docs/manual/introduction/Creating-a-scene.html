@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -21,8 +22,10 @@
 		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of <a href="http://threejs.org/build/three.min.js">three.min.js</a> in the js/ directory, and open it in your browser.</div>
 
 		<code>
+		&lt;!DOCTYPE html&gt;
 		&lt;html&gt;
 			&lt;head&gt;
+				&lt;meta charset=utf-8&gt;
 				&lt;title&gt;My first Three.js app&lt;/title&gt;
 				&lt;style&gt;
 					body { margin: 0; }
@@ -57,12 +60,14 @@
 
 		<div>The second one is the <strong>aspect ratio</strong>. You almost always want to use the width of the element divided by the height, or you'll get the same result as when you play old movies on a widescreen TV - the image looks squished.</div>
 
-		<div>The next two attributes are the <strong>near</strong> and <strong>far</strong> clipping plane. What that means, is that objects further away from the camera than the value of <strong>far</strong> or closer than <strong>near</strong> won't be rendered. You don't have to worry about this now, but you may want to use other values in your games to get better performance.</div>
+		<div>The next two attributes are the <strong>near</strong> and <strong>far</strong> clipping plane. What that means, is that objects further away from the camera than the value of <strong>far</strong> or closer than <strong>near</strong> won't be rendered. You don't have to worry about this now, but you may want to use other values in your apps to get better performance.</div>
 
 		<div>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, Three.js comes with a few others, often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.</div>
 
-		<div>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our game - in this case, the width and height of the browser window. For performance intensive games, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, for half the resolution. This does not mean that the game will only fill half the window, but rather look a bit blurry and scaled up.</div>
-
+		<div>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, which will make the app render at half size.</div>
+		
+		<div>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling <strong>setSize</strong> with false as <strong>updateStyle</strong>. For example, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</div>
+		
 		<div>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</div>
 
 		<div><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</div>
@@ -109,7 +114,7 @@
 		cube.rotation.y += 0.1;
 		</code>
 
-		<div>This will be run every frame (60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the game / app is running has to go through the render loop. You can of course call other functions from there, so that you don't end up with a <strong>render</strong> function that's hundreds of lines.
+		<div>This will be run every frame (60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the render loop. You can of course call other functions from there, so that you don't end up with a <strong>render</strong> function that's hundreds of lines.
 		</div>
 
 		<h2>The result</h2>

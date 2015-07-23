@@ -190,7 +190,7 @@ THREE.ObjectLoader.prototype = {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data.data ).geometry;
+						geometry = geometryLoader.parse( data.data, this.texturePath ).geometry;
 
 						break;
 
@@ -307,6 +307,8 @@ THREE.ObjectLoader.prototype = {
 
 			var loadImage = function ( url ) {
 
+				url = scope.texturePath + url;
+
 				scope.manager.itemStart( url );
 
 				return loader.load( url, function () {
@@ -352,7 +354,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.image === undefined ) {
 
-					console.warn( 'THREE.ObjectLoader: No "image" speficied for', data.uuid );
+					console.warn( 'THREE.ObjectLoader: No "image" specified for', data.uuid );
 
 				}
 

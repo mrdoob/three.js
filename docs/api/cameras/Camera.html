@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
@@ -20,7 +21,7 @@
 		<h3>[name]()</h3>
 		<div>
 			This constructor sets the following properties to the correct type: matrixWorldInverse and projectionMatrix.
-			
+
 		</div>
 
 
@@ -34,14 +35,14 @@
 
 
 		<h2>Methods</h2>
-		
+
 		<h3>[method:Vector3 getWorldDirection]([page:Vector3 vector])</h3>
 		<div>
 		vector — (optional)<br />
 		<br />
 		It returns a vector representing the direction in which the camera is looking, in world space.
 		</div>
-		
+
 
 		<h3>[method:null lookAt]( [page:Vector3 vector] )</h3>
 		<div>
@@ -49,7 +50,7 @@
 		<br />
 		This makes the camera look at the vector position in the global space as long as the parent of this camera is the scene or at position (0,0,0).
 		</div>
-		
+
 		<h3>[method:Camera clone]( [page:Camera camera] )</h3>
 		<div>
 		camera — camera to clone<br />

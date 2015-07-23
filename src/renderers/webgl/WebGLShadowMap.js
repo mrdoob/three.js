@@ -6,14 +6,12 @@
 THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 	var _gl = _renderer.context,
+	_state = _renderer.state,
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
 
 	_min = new THREE.Vector3(),
 	_max = new THREE.Vector3(),
-
-	_webglObjects = _objects.objects,
-	_webglObjectsImmediate = _objects.objectsImmediate,
 
 	_matrixPosition = new THREE.Vector3(),
 
@@ -62,14 +60,18 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 	var scope = this;
 
 	this.enabled = false;
+
+	this.autoUpdate = true;
+	this.needsUpdate = false;
+
 	this.type = THREE.PCFShadowMap;
 	this.cullFace = THREE.CullFaceFront;
-	this.debug = false;
 	this.cascade = false;
 
 	this.render = function ( scene, camera ) {
 
 		if ( scope.enabled === false ) return;
+		if ( scope.autoUpdate === false && scope.needsUpdate === false ) return;
 
 		var i, il, j, jl, n,
 
@@ -84,9 +86,9 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		// set GL state for depth map
 
 		_gl.clearColor( 1, 1, 1, 1 );
-		_gl.disable( _gl.BLEND );
+		_state.disable( _gl.BLEND );
 
-		_gl.enable( _gl.CULL_FACE );
+		_state.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
@@ -99,7 +101,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		}
 
-		_renderer.state.setDepthTest( true );
+		_state.setDepthTest( true );
 
 		// preprocess lights
 		// 	- skip lights that are not casting shadows
@@ -274,7 +276,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				object = webglObject.object;
 
-				// culling is overriden globally for all objects
+				// culling is overridden globally for all objects
 				// while rendering depth map
 
 				// need to deal with MeshFaceMaterial somehow
@@ -311,23 +313,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			}
 
-			// set matrices and render immediate objects
-
-			for ( j = 0, jl = _webglObjectsImmediate.length; j < jl; j ++ ) {
-
-				webglObject = _webglObjectsImmediate[ j ];
-				object = webglObject.object;
-
-				if ( object.visible && object.castShadow ) {
-
-					object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
-
-					_renderer.renderImmediateObject( shadowCamera, _lights, fog, _depthMaterial, object );
-
-				}
-
-			}
-
 		}
 
 		// restore GL state
@@ -336,7 +321,7 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 		clearAlpha = _renderer.getClearAlpha();
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-		_gl.enable( _gl.BLEND );
+		_state.enable( _gl.BLEND );
 
 		if ( scope.cullFace === THREE.CullFaceFront ) {
 
@@ -346,9 +331,11 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 		_renderer.resetGLState();
 
+		scope.needsUpdate = false;
+
 	};
 
-	function projectObject( object, shadowCamera ) {
+	function projectObject( object, camera ) {
 
 		if ( object.visible === true ) {
 
@@ -356,14 +343,14 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 			if ( webglObject && object.castShadow && ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) ) {
 
-				object._modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
+				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 				_renderList.push( webglObject );
 
 			}
 
 			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-				projectObject( object.children[ i ], shadowCamera );
+				projectObject( object.children[ i ], camera );
 
 			}
 

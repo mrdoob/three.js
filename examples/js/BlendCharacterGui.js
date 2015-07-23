@@ -7,7 +7,6 @@ function BlendCharacterGui(animations) {
 	var controls = {
 
 		gui: null,
-		"Lock Camera": false,
 		"Show Model": true,
 		"Show Skeleton": false,
 		"Time Scale": 1.0,
@@ -55,7 +54,6 @@ function BlendCharacterGui(animations) {
 		var playback = controls.gui.addFolder( 'Playback' );
 		var blending = controls.gui.addFolder( 'Blend Tuning' );
 
-		settings.add( controls, "Lock Camera" ).onChange( controls.lockCameraChanged );
 		settings.add( controls, "Show Model" ).onChange( controls.showModelChanged );
 		settings.add( controls, "Show Skeleton" ).onChange( controls.showSkeletonChanged );
 		settings.add( controls, "Time Scale", 0, 1, 0.01 );
@@ -172,17 +170,6 @@ function BlendCharacterGui(animations) {
 
 		controls.warp( 'walk', 'run' );
 
-	};
-
-	controls.lockCameraChanged = function() {
-
-		var data = {
-			detail: {
-				shouldLock: controls['Lock Camera']
-			}
-		};
-
-		window.dispatchEvent( new CustomEvent( 'toggle-lock-camera', data ) );
 	};
 
 	controls.showSkeletonChanged = function() {

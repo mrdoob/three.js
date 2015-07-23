@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<div class="desc">A class for generating plane geometries</div>
@@ -16,8 +17,8 @@
 
 		<h2>Example</h2>
 
-		<iframe src='../../../scenes/geometry-browser.html#PlaneGeometry'></iframe>
-		
+		<iframe src='scenes/geometry-browser.html#PlaneGeometry'></iframe>
+
 		<code>var geometry = new THREE.PlaneGeometry( 5, 20, 32 );
 		var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
 		var plane = new THREE.Mesh( geometry, material );

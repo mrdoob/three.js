@@ -42,6 +42,16 @@ var Script = function ( editor ) {
 	} );
 	header.add( close );
 
+
+	var renderer;
+
+	signals.rendererChanged.add( function ( newRenderer ) {
+
+		renderer = newRenderer;
+
+	} );
+
+
 	var delay;
 	var currentMode;
 	var currentScript;
@@ -75,31 +85,17 @@ var Script = function ( editor ) {
 				return;
 			}
 
-			switch ( currentScript ) {
+			if ( currentScript !== 'programInfo' ) return;
 
-				case 'vertexShader':
-
-					currentObject.vertexShader = value;
-					break;
-
-				case 'fragmentShader':
-
-					currentObject.fragmentShader = value;
-					break;
-
-				case 'programInfo':
-
-					var json = JSON.parse( value );
-					currentObject.defines = json.defines;
-					currentObject.uniforms = json.uniforms;
-					currentObject.attributes = json.attributes;
-
-			}
+			var json = JSON.parse( value );
+			currentObject.defines = json.defines;
+			currentObject.uniforms = json.uniforms;
+			currentObject.attributes = json.attributes;
 
 			currentObject.needsUpdate = true;
 			signals.materialChanged.dispatch( currentObject );
 
-		}, 200 );
+		}, 300 );
 
 	});
 
@@ -118,7 +114,8 @@ var Script = function ( editor ) {
 
 	var validate = function ( string ) {
 
-		var errors;
+		var valid;
+		var errors = [];
 
 		return codemirror.operation( function () {
 
@@ -147,10 +144,12 @@ var Script = function ( editor ) {
 
 					} catch ( error ) {
 
-						errors = [
+						errors.push( {
 
-							{ lineNumber: error.lineNumber,message: error.message }
-						];
+							lineNumber: error.lineNumber - 1,
+							message: error.message
+
+						} );
 
 					}
 
@@ -171,10 +170,12 @@ var Script = function ( editor ) {
 
 						message = message.split('\n')[3];
 
-						errors.push({
-							lineNumber: info.loc.first_line,
+						errors.push( {
+
+							lineNumber: info.loc.first_line - 1,
 							message: message
-						});
+
+						} );
 
 					};
 
@@ -192,13 +193,75 @@ var Script = function ( editor ) {
 
 				case 'glsl':
 
-					// TODO validate GLSL (compiling shader?)
+					try {
 
-				default:
+						var shaderType = currentScript === 'vertexShader' ?
+								glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
 
-					errors = [];
+						glslprep.parseGlsl( string, shaderType );
 
-			}
+					} catch( error ) {
+
+						if ( error instanceof glslprep.SyntaxError ) {
+
+							errors.push( {
+
+								lineNumber: error.line,
+								message: "Syntax Error: " + error.message
+
+							} );
+
+						} else {
+
+							console.error( error.stack || error );
+
+						}
+
+					}
+
+					if ( errors.length !== 0 ) break;
+					if ( renderer instanceof THREE.WebGLRenderer === false ) break;
+
+					currentObject[ currentScript ] = string;
+					currentObject.needsUpdate = true;
+					signals.materialChanged.dispatch( currentObject );
+
+					var programs = renderer.info.programs;
+
+					valid = true;
+					var parseMessage = /^(?:ERROR|WARNING): \d+:(\d+): (.*)/g;
+
+					for ( var i = 0, n = programs.length; i !== n; ++ i ) {
+
+						var diagnostics = programs[i].diagnostics;
+
+						if ( diagnostics === undefined ||
+								diagnostics.material !== currentObject ) continue;
+
+						if ( ! diagnostics.runnable ) valid = false;
+
+						var shaderInfo = diagnostics[ currentScript ];
+						var lineOffset = shaderInfo.prefix.split(/\r\n|\r|\n/).length;
+
+						while ( true ) {
+
+							var parseResult = parseMessage.exec( shaderInfo.log );
+							if ( parseResult === null ) break;
+
+							errors.push( {
+
+								lineNumber: parseResult[ 1 ] - lineOffset,
+								message: parseResult[ 2 ]
+
+							} );
+
+						} // messages
+
+						break;
+
+					} // programs
+
+			} // mode switch
 
 			for ( var i = 0; i < errors.length; i ++ ) {
 
@@ -208,7 +271,7 @@ var Script = function ( editor ) {
 				message.className = 'esprima-error';
 				message.textContent = error.message;
 
-				var lineNumber = error.lineNumber - 1;
+				var lineNumber = Math.max( error.lineNumber, 0 );
 				errorLines.push( lineNumber );
 
 				codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
@@ -219,7 +282,7 @@ var Script = function ( editor ) {
 
 			}
 
-			return errorLines.length === 0;
+			return valid !== undefined ? valid : errors.length === 0;
 
 		});
 

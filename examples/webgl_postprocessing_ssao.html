@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<!--Reference:
+SSAO algo: http://devlog-martinsh.blogspot.tw/2011/12/ssao-shader-update-v12.html?showComment=1398158188712#c1563204765906693531
+log depth http://outerra.blogspot.tw/2013/07/logarithmic-depth-buffer-optimizations.html
+convert the exponential depth to a linear value: http://www.ozone3d.net/blogs/lab/20090206/how-to-linearize-the-depth-value/
+Spiral sampling http://web.archive.org/web/20120421191837/http://www.cgafaq.info/wiki/Evenly_distributed_points_on_sphere-->
+
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+			}
+
+			a {
+				color:#00ff78;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+			}
+			.dg.ac {
+				z-index: 1 !important; /* FIX DAT.GUI */
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../build/three.js"></script>
+		<script src="js/shaders/SSAOShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl screen space ambient occlusion example<br/>
+			shader by <a href="http://alteredqualia.com">alteredq</a>
+		</div>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var camera, scene, renderer;
+			var depthMaterial, effectComposer, depthRenderTarget;
+			var ssaoPass;
+			var group;
+			var depthScale = 1.0;
+			var postprocessing = { enabled : true, renderMode: 0 }; // renderMode: 0('framebuffer'), 1('onlyAO')
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( 0xa0a0a0 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 100, 700 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+
+				group = new THREE.Object3D();
+				scene.add( group );
+
+				var geometry = new THREE.IcosahedronGeometry( 5, 1 );
+				for ( var i = 0; i < 200; i ++ ) {
+
+					var material = new THREE.MeshBasicMaterial();
+					material.color.r = Math.random();
+					material.color.g = Math.random();
+					material.color.b = Math.random();
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = Math.random() * 400 - 200;
+					mesh.position.y = Math.random() * 400 - 200;
+					mesh.position.z = Math.random() * 400 - 200;
+					mesh.rotation.x = Math.random();
+					mesh.rotation.y = Math.random();
+					mesh.rotation.z = Math.random();
+
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 10 + 1;
+					group.add( mesh );
+				}
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				// Init postprocessing
+				initPostprocessing();
+
+				// Init gui
+				var gui = new dat.GUI();
+				gui.add( postprocessing, "enabled" ).onChange();
+				gui.add( postprocessing, "renderMode", { framebuffer: 0, onlyAO: 1 } ).onChange( renderModeChange ).listen();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function renderModeChange( value ) {
+
+				if ( value == 0 ) { // framebuffer
+					ssaoPass.uniforms[ 'onlyAO' ].value = false;
+				} else if ( value == 1 ) {  // onlyAO
+					ssaoPass.uniforms[ 'onlyAO' ].value = true;
+				} else {
+					console.error( "Not define renderModeChange type: " + value );
+				}
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+				renderer.setSize( width, height );
+
+				// Resize renderTargets
+				ssaoPass.uniforms[ 'size' ].value.set( width, height );
+
+				var pixelRatio = renderer.getPixelRatio();
+				var newWidth  = Math.floor( width / pixelRatio ) || 1;
+				var newHeight = Math.floor( height / pixelRatio ) || 1;
+				depthRenderTarget.setSize( newWidth, newHeight );
+				effectComposer.setSize( newWidth, newHeight );
+			}
+
+			function initPostprocessing() {
+
+				// Setup render pass
+				var renderPass = new THREE.RenderPass( scene, camera );
+
+				// Setup depth pass
+				var depthShader = THREE.ShaderLib[ "depthRGBA" ];
+				var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
+
+				depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader,
+					uniforms: depthUniforms, blending: THREE.NoBlending } );
+
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+				depthRenderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+
+				// Setup SSAO pass
+				ssaoPass = new THREE.ShaderPass( THREE.SSAOShader );
+				ssaoPass.renderToScreen = true;
+				//ssaoPass.uniforms[ "tDiffuse" ].value will be set by ShaderPass
+				ssaoPass.uniforms[ "tDepth" ].value = depthRenderTarget;
+				ssaoPass.uniforms[ 'size' ].value.set( window.innerWidth, window.innerHeight );
+				ssaoPass.uniforms[ 'cameraNear' ].value = camera.near;
+				ssaoPass.uniforms[ 'cameraFar' ].value = camera.far;
+				ssaoPass.uniforms[ 'onlyAO' ].value = ( postprocessing.renderMode == 1 );
+				ssaoPass.uniforms[ 'aoClamp' ].value = 0.3;
+				ssaoPass.uniforms[ 'lumInfluence' ].value = 0.5;
+
+				// Add pass to effect composer
+				effectComposer = new THREE.EffectComposer( renderer );
+				effectComposer.addPass( renderPass );
+				effectComposer.addPass( ssaoPass );
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+			}
+
+			function render() {
+				var timer = performance.now();
+				group.rotation.x = timer * 0.0002;
+				group.rotation.y = timer * 0.0001;
+
+				if ( postprocessing.enabled ) {
+
+					// Render depth into depthRenderTarget
+					scene.overrideMaterial = depthMaterial;
+					renderer.render( scene, camera, depthRenderTarget, true );
+
+					// Render renderPass and SSAO shaderPass
+					scene.overrideMaterial = null;
+					effectComposer.render();
+
+				} else {
+					renderer.render( scene, camera );
+				}
+			}
+
+		</script>
+	</body>
+</html>

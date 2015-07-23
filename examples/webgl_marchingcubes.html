@@ -264,8 +264,9 @@
 			var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 			reflectionCube.format = THREE.RGBFormat;
 
-			var refractionCube = new THREE.Texture( reflectionCube.image, THREE.CubeRefractionMapping );
+			var refractionCube = THREE.ImageUtils.loadTextureCube( urls );
 			reflectionCube.format = THREE.RGBFormat;
+			refractionCube.mapping = THREE.CubeRefractionMapping;
 
 			// toons
 

@@ -20,13 +20,11 @@ THREE.AssimpJSONLoader.prototype = {
 
 	constructor: THREE.AssimpJSONLoader,
 
-	texturePath : '',
-
-	load: function ( url, onLoad, onProgress, onError, texturePath ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		this.texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
+		this.texturePath = this.texturePath && ( typeof this.texturePath === "string" ) ? this.texturePath : this.extractUrlBase( url );
 
 		var loader = new THREE.XHRLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
@@ -58,6 +56,10 @@ THREE.AssimpJSONLoader.prototype = {
 
 	setCrossOrigin: function ( value ) {
 		this.crossOrigin = value;
+	},
+
+	setTexturePath: function ( value ) {
+		this.texturePath = value;
 	},
 
 	extractUrlBase: function ( url ) { // from three/src/loaders/Loader.js

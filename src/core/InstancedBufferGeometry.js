@@ -38,18 +38,10 @@ THREE.InstancedBufferGeometry.prototype.clone = function () {
 
 	}
 
-	for ( var i = 0, il = this.offsets.length; i < il; i++ ) {
+	for ( var i = 0, il = this.drawcalls.length; i < il; i++ ) {
 
-		var offset = this.offsets[i];
-
-		geometry.offsets.push( {
-
-			start: offset.start,
-			index: offset.index,
-			count: offset.count,
-			instances: offset.instances
-
-		} );
+		var offset = this.drawcalls[i];
+		geometry.addDrawCall( offset.start, offset.count, offset.index, offset.instances );
 
 	}
 

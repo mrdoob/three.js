@@ -66,9 +66,16 @@ THREE.Mesh.prototype.raycast = ( function () {
 	var vB = new THREE.Vector3();
 	var vC = new THREE.Vector3();
 
-	return function ( raycaster, intersects ) {
+	var tempA = new THREE.Vector3();
+	var tempB = new THREE.Vector3();
+	var tempC = new THREE.Vector3();
+
+	return function raycast( raycaster, intersects ) {
 
 		var geometry = this.geometry;
+		var material = this.material;
+
+		if ( material === undefined ) return;
 
 		// Checking boundingSphere distance to ray
 
@@ -98,21 +105,17 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		}
 
+		var a, b, c;
+
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			var material = this.material;
-
-			if ( material === undefined ) return;
-
 			var attributes = geometry.attributes;
-
-			var a, b, c;
 
 			if ( attributes.index !== undefined ) {
 
 				var indices = attributes.index.array;
 				var positions = attributes.position.array;
-				var offsets = geometry.offsets;
+				var offsets = geometry.drawcalls;
 
 				if ( offsets.length === 0 ) {
 
@@ -159,9 +162,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 							distance: distance,
 							point: intersectionPoint,
 							face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-							faceIndex: Math.floor(i/3), // triangle number in indices buffer semantics
+							faceIndex: Math.floor( i / 3 ), // triangle number in indices buffer semantics
 							object: this
-							
+
 						} );
 
 					}
@@ -172,15 +175,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var positions = attributes.position.array;
 
-				for ( var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9 ) {
+				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-					a = i;
-					b = i + 1;
-					c = i + 2;
-
-					vA.fromArray( positions, j );
-					vB.fromArray( positions, j + 3 );
-					vC.fromArray( positions, j + 6 );
+					vA.fromArray( positions, i );
+					vB.fromArray( positions, i + 3 );
+					vC.fromArray( positions, i + 6 );
 
 					if ( material.side === THREE.BackSide ) {
 
@@ -200,12 +199,16 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
+					a = i / 3;
+					b = a + 1;
+					c = a + 2;
+
 					intersects.push( {
 
 						distance: distance,
 						point: intersectionPoint,
 						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-						index: Math.floor(i/3), // triangle number in positions buffer semantics
+						index: a, // triangle number in positions buffer semantics
 						object: this
 
 					} );
@@ -216,26 +219,24 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 		} else if ( geometry instanceof THREE.Geometry ) {
 
-			var isFaceMaterial = this.material instanceof THREE.MeshFaceMaterial;
-			var objectMaterials = isFaceMaterial === true ? this.material.materials : null;
-
-			var a, b, c;
+			var isFaceMaterial = material instanceof THREE.MeshFaceMaterial;
+			var materials = isFaceMaterial === true ? material.materials : null;
 
 			var vertices = geometry.vertices;
+			var faces = geometry.faces;
 
-			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+			for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
-				var face = geometry.faces[ f ];
+				var face = faces[ f ];
+				var faceMaterial = isFaceMaterial === true ? materials[ face.materialIndex ] : material;
 
-				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : this.material;
-
-				if ( material === undefined ) continue;
+				if ( faceMaterial === undefined ) continue;
 
 				a = vertices[ face.a ];
 				b = vertices[ face.b ];
 				c = vertices[ face.c ];
 
-				if ( material.morphTargets === true ) {
+				if ( faceMaterial.morphTargets === true ) {
 
 					var morphTargets = geometry.morphTargets;
 					var morphInfluences = this.morphTargetInfluences;
@@ -252,17 +253,9 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 						var targets = morphTargets[ t ].vertices;
 
-						vA.x += ( targets[ face.a ].x - a.x ) * influence;
-						vA.y += ( targets[ face.a ].y - a.y ) * influence;
-						vA.z += ( targets[ face.a ].z - a.z ) * influence;
-
-						vB.x += ( targets[ face.b ].x - b.x ) * influence;
-						vB.y += ( targets[ face.b ].y - b.y ) * influence;
-						vB.z += ( targets[ face.b ].z - b.z ) * influence;
-
-						vC.x += ( targets[ face.c ].x - c.x ) * influence;
-						vC.y += ( targets[ face.c ].y - c.y ) * influence;
-						vC.z += ( targets[ face.c ].z - c.z ) * influence;
+						vA.addScaledVector( tempA.subVectors( targets[ face.a ], a ), influence );
+						vB.addScaledVector( tempB.subVectors( targets[ face.b ], b ), influence );
+						vC.addScaledVector( tempC.subVectors( targets[ face.c ], c ), influence );
 
 					}
 
@@ -276,13 +269,13 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				}
 
-				if ( material.side === THREE.BackSide ) {
+				if ( faceMaterial.side === THREE.BackSide ) {
 
 					var intersectionPoint = ray.intersectTriangle( c, b, a, true );
 
 				} else {
 
-					var intersectionPoint = ray.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+					var intersectionPoint = ray.intersectTriangle( a, b, c, faceMaterial.side !== THREE.DoubleSide );
 
 				}
 

@@ -147,7 +147,7 @@ THREE.Curve.prototype.updateArcLengths = function() {
 	this.getLengths();
 };
 
-// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equi distance
+// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
 
 THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
@@ -209,7 +209,7 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 	}
 
-	// we could get finer grain at lengths, or use simple interpolatation between two points
+	// we could get finer grain at lengths, or use simple interpolation between two points
 
 	var lengthBefore = arcLengths[ i ];
 	var lengthAfter = arcLengths[ i + 1 ];

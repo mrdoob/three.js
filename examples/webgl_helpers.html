@@ -19,6 +19,7 @@
 
 			var scene, renderer;
 			var camera, light;
+			var fnh, vnh;
 
 			init();
 			animate();
@@ -56,14 +57,20 @@
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 50 );
 					scene.add( group );
+					
+					// To make sure that the matrixWorld is up to date for the boxhelpers
+					group.updateMatrixWorld(true);
 
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
 
-					group.add( new THREE.FaceNormalsHelper( mesh, 0.1 ) );
-					group.add( new THREE.VertexNormalsHelper( mesh, 0.1 ) );
+					fnh = new THREE.FaceNormalsHelper( mesh, 5 );
+					scene.add( fnh );
 
-					group.add( new THREE.BoxHelper( mesh ) );
+					vnh = new THREE.VertexNormalsHelper( mesh, 5 );
+					scene.add( vnh );
+
+					scene.add( new THREE.BoxHelper( mesh ) );
 
 					var wireframe = new THREE.WireframeGeometry( geometry );
 					var line = new THREE.LineSegments( wireframe );
@@ -72,6 +79,7 @@
 					line.material.transparent = true;
 					line.position.x = 4;
 					group.add( line );
+					scene.add( new THREE.BoxHelper( line ) );
 
 					var edges = new THREE.EdgesGeometry( geometry );
 					var line = new THREE.LineSegments( edges );
@@ -80,6 +88,11 @@
 					line.material.transparent = true;
 					line.position.x = -4;
 					group.add( line );
+					scene.add( new THREE.BoxHelper( line ) );
+					
+					scene.add( new THREE.BoxHelper( group ) );
+					scene.add( new THREE.BoxHelper( scene ) );
+					
 
 				} );
 
@@ -111,6 +124,9 @@
 				light.position.x = Math.sin( time * 1.7 ) * 300;
 				light.position.y = Math.cos( time * 1.5 ) * 400;
 				light.position.z = Math.cos( time * 1.3 ) * 300;
+
+				if ( fnh ) fnh.update();
+				if ( vnh ) vnh.update();
 
 				renderer.render( scene, camera );
 

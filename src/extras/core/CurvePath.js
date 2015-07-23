@@ -113,7 +113,7 @@ THREE.CurvePath.prototype.getCurveLengths = function() {
 
 	}
 
-	// Get length of subsurve
+	// Get length of sub-curve
 	// Push sums into cached array
 
 	var lengths = [], sums = 0;
@@ -206,7 +206,7 @@ THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
 };
 
-// Generate geometry from equidistance sampling along the path
+// Generate geometry from equidistant sampling along the path
 
 THREE.CurvePath.prototype.createSpacedPointsGeometry = function( divisions ) {
 

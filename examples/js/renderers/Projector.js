@@ -392,7 +392,7 @@ THREE.Projector = function () {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var attributes = geometry.attributes;
-					var offsets = geometry.offsets;
+					var offsets = geometry.drawcalls;
 
 					if ( attributes.position === undefined ) continue;
 
@@ -516,8 +516,8 @@ THREE.Projector = function () {
 
 						var face = faces[ f ];
 
-						var material = isFaceMaterial === true
-							 ? objectMaterials.materials[ face.materialIndex ]
+						material = isFaceMaterial === true
+							 ? objectMaterials.materials[ 0 ] // objectMaterials.materials[ face.materialIndex ]
 							 : object.material;
 
 						if ( material === undefined ) continue;

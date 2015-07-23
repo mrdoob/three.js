@@ -2,21 +2,22 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Geometry] &rarr;
-	
+
 		<h1>[name]</h1>
 
 		<div class="desc">A class for generating torus geometries</div>
 
-		<iframe src='../../../scenes/geometry-browser.html#TorusGeometry'></iframe>
+		<iframe src='scenes/geometry-browser.html#TorusGeometry'></iframe>
 
 		<h2>Example</h2>
-		
+
 		<code>var geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 		var torus = new THREE.Mesh( geometry, material );

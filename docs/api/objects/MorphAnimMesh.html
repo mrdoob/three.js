@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		[page:Object3D] &rarr;
@@ -165,6 +166,14 @@
 		Defines an animation. Sets the geometry.animations[label] to be an object with the start and end properties.
 		</div>
 
+		<h3>[method:Object3D clone]([page:Object3D object])</h3>
+		<div>
+		object -- (optional) Object3D which needs to be cloned. If undefined, clone method will create a new cloned MorphAnimMesh Object.
+		</div>
+		<div>
+		Clone a MorphAnimMesh Object.
+		</div>
+		
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
