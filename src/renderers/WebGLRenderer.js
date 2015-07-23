@@ -554,6 +554,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getAlpha = function () {
+
+		return _alpha;
+
+	};
+
 	this.getClearAlpha = function () {
 
 		return _clearAlpha;

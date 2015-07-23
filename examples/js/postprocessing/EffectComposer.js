@@ -10,9 +10,11 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 		var pixelRatio = renderer.getPixelRatio();
 
+		var format = renderer.getAlpha() ? THREE.RGBAFormat : THREE.RGBFormat;
+
 		var width  = Math.floor( renderer.context.canvas.width  / pixelRatio ) || 1;
 		var height = Math.floor( renderer.context.canvas.height / pixelRatio ) || 1;
-		var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+		var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: format, stencilBuffer: false };
 
 		renderTarget = new THREE.WebGLRenderTarget( width, height, parameters );
 
