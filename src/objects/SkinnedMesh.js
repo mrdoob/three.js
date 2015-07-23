@@ -87,8 +87,6 @@ THREE.SkinnedMesh.prototype.bind = function( skeleton, bindMatrix ) {
 
 	if ( bindMatrix === undefined ) {
 
-		this.updateMatrixWorld( true );
-
 		bindMatrix = this.matrixWorld;
 
 	}
@@ -134,13 +132,13 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force, recursive, parentChanged ) {
 
-	THREE.Mesh.prototype.updateMatrixWorld.call( this, true );
+	THREE.Mesh.prototype.updateMatrixWorld.call( this, false, recursive, parentChanged );
 
 	if ( this.bindMode === "attached" ) {
 
-		this.bindMatrixInverse.getInverse( this.matrixWorld );
+		this.bindMatrixInverse.getInverse( this._matrixWorld );
 
 	} else if ( this.bindMode === "detached" ) {
 
@@ -151,6 +149,8 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 		console.warn( 'THREE.SkinnedMesh unrecognized bindMode: ' + this.bindMode );
 
 	}
+	
+	return this._matrixWorld;
 
 };
 
