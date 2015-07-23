@@ -51,9 +51,9 @@
 		var thetaDelta = 0;
 		var scale = 1;
 		var panOffset = new THREE.Vector3();
+		var zoomChanged = false;
 
-		// events
-		var changeEvent = { type: 'change' };
+		// API
 
 		this.getPolarAngle = function () {
 
@@ -160,7 +160,7 @@
 
 				scope.object.zoom = Math.max( this.minZoom, Math.min( this.maxZoom, this.object.zoom * dollyScale ) );
 				scope.object.updateProjectionMatrix();
-				scope.dispatchEvent( changeEvent );
+				zoomChanged = true;
 
 			} else {
 
@@ -180,7 +180,7 @@
 
 				scope.object.zoom = Math.max( this.minZoom, Math.min( this.maxZoom, this.object.zoom / dollyScale ) );
 				scope.object.updateProjectionMatrix();
-				scope.dispatchEvent( changeEvent );
+				zoomChanged = true;
 
 			} else {
 
@@ -258,11 +258,13 @@
 				// min(camera displacement, camera rotation in radians)^2 > EPS
 				// using small-angle approximation cos(x/2) = 1 - x^2 / 8
 
-				if ( lastPosition.distanceToSquared( this.object.position ) > EPS ||
+				if ( zoomChanged ||
+					 lastPosition.distanceToSquared( this.object.position ) > EPS ||
 				    8 * ( 1 - lastQuaternion.dot( this.object.quaternion) ) > EPS ) {
 
 					lastPosition.copy( this.object.position );
 					lastQuaternion.copy( this.object.quaternion );
+					zoomChanged = false;
 
 					return true;
 
@@ -276,10 +278,6 @@
 
 	};
 
-	OrbitConstraint.prototype = Object.create( THREE.EventDispatcher.prototype );
-	OrbitConstraint.prototype.constructor = OrbitConstraint;
-
-
 
 	// This set of controls performs orbiting, dollying (zooming), and panning. It maintains
 	// the "up" direction as +Y, unlike the TrackballControls. Touch on tablet and phones is
@@ -291,11 +289,33 @@
 
 	THREE.OrbitControls = function ( object, domElement ) {
 
-		OrbitConstraint.call( this, object );
+		var constraint = new OrbitConstraint( object );
 
 		this.domElement = ( domElement !== undefined ) ? domElement : document;
 
 		// API
+
+		Object.defineProperty(this, 'constraint', {
+
+		    get: function() {
+
+		        return constraint;
+
+		    }
+
+		});
+
+		this.getPolarAngle = function () {
+
+			return constraint.phi;
+
+		};
+
+		this.getAzimuthalAngle = function () {
+
+			return constraint.theta;
+
+		};
 
 		// Set to false to disable this control
 		this.enabled = true;
@@ -364,25 +384,23 @@
 
 		// pass in x,y of change desired in pixel space,
 		// right and down are positive
-		var _pan = this.pan;
-		this.pan = function ( deltaX, deltaY ) {
+		function pan( deltaX, deltaY ) {
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-			_pan.call( this, deltaX, deltaY, element.clientWidth, element.clientHeight );
+			constraint.pan( deltaX, deltaY, element.clientWidth, element.clientHeight );
 
-		};
+		}
 
-		var _update = this.update;
 		this.update = function() {
 
 			if ( this.autoRotate && state === STATE.NONE ) {
 
-				this.rotateLeft( getAutoRotationAngle() );
+				constraint.rotateLeft( getAutoRotationAngle() );
 
 			}
 
-			if ( _update.call( this ) === true ) {
+			if ( constraint.update() === true ) {
 
 				this.dispatchEvent( changeEvent );
 
@@ -420,9 +438,11 @@
 		function onMouseDown( event ) {
 
 			if ( scope.enabled === false ) return;
+
 			event.preventDefault();
 
 			if ( event.button === scope.mouseButtons.ORBIT ) {
+
 				if ( scope.noRotate === true ) return;
 
 				state = STATE.ROTATE;
@@ -430,6 +450,7 @@
 				rotateStart.set( event.clientX, event.clientY );
 
 			} else if ( event.button === scope.mouseButtons.ZOOM ) {
+
 				if ( scope.noZoom === true ) return;
 
 				state = STATE.DOLLY;
@@ -437,6 +458,7 @@
 				dollyStart.set( event.clientX, event.clientY );
 
 			} else if ( event.button === scope.mouseButtons.PAN ) {
+
 				if ( scope.noPan === true ) return;
 
 				state = STATE.PAN;
@@ -471,10 +493,10 @@
 				rotateDelta.subVectors( rotateEnd, rotateStart );
 
 				// rotating across whole screen goes 360 degrees around
-				scope.rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
+				constraint.rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
 
 				// rotating up and down along whole screen attempts to go 360, but limited to 180
-				scope.rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+				constraint.rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
 
 				rotateStart.copy( rotateEnd );
 
@@ -487,11 +509,11 @@
 
 				if ( dollyDelta.y > 0 ) {
 
-					scope.dollyIn( getZoomScale() );
+					contraint.dollyIn( getZoomScale() );
 
 				} else if ( dollyDelta.y < 0 ) {
 
-					scope.dollyOut( getZoomScale() );
+					contraint.dollyOut( getZoomScale() );
 
 				}
 
@@ -504,7 +526,7 @@
 				panEnd.set( event.clientX, event.clientY );
 				panDelta.subVectors( panEnd, panStart );
 
-				scope.pan( panDelta.x, panDelta.y );
+				pan( panDelta.x, panDelta.y );
 
 				panStart.copy( panEnd );
 
@@ -546,11 +568,11 @@
 
 			if ( delta > 0 ) {
 
-				scope.dollyOut( getZoomScale() );
+				constraint.dollyOut( getZoomScale() );
 
 			} else if ( delta < 0 ) {
 
-				scope.dollyIn( getZoomScale() );
+				constraint.dollyIn( getZoomScale() );
 
 			}
 
@@ -567,22 +589,22 @@
 			switch ( event.keyCode ) {
 
 				case scope.keys.UP:
-					scope.pan( 0, scope.keyPanSpeed );
+					pan( 0, scope.keyPanSpeed );
 					scope.update();
 					break;
 
 				case scope.keys.BOTTOM:
-					scope.pan( 0, - scope.keyPanSpeed );
+					pan( 0, - scope.keyPanSpeed );
 					scope.update();
 					break;
 
 				case scope.keys.LEFT:
-					scope.pan( scope.keyPanSpeed, 0 );
+					pan( scope.keyPanSpeed, 0 );
 					scope.update();
 					break;
 
 				case scope.keys.RIGHT:
-					scope.pan( - scope.keyPanSpeed, 0 );
+					pan( - scope.keyPanSpeed, 0 );
 					scope.update();
 					break;
 
@@ -656,9 +678,9 @@
 					rotateDelta.subVectors( rotateEnd, rotateStart );
 
 					// rotating across whole screen goes 360 degrees around
-					scope.rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
+					constraint.rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
 					// rotating up and down along whole screen attempts to go 360, but limited to 180
-					scope.rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+					constraint.rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
 
 					rotateStart.copy( rotateEnd );
 
@@ -679,11 +701,11 @@
 
 					if ( dollyDelta.y > 0 ) {
 
-						scope.dollyOut( getZoomScale() );
+						constraint.dollyOut( getZoomScale() );
 
 					} else if ( dollyDelta.y < 0 ) {
 
-						scope.dollyIn( getZoomScale() );
+						constraint.dollyIn( getZoomScale() );
 
 					}
 
@@ -700,7 +722,7 @@
 					panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 					panDelta.subVectors( panEnd, panStart );
 
-					scope.pan( panDelta.x, panDelta.y );
+					pan( panDelta.x, panDelta.y );
 
 					panStart.copy( panEnd );
 
@@ -740,7 +762,158 @@
 
 	};
 
-	THREE.OrbitControls.prototype = Object.create( OrbitConstraint.prototype );
+	THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 	THREE.OrbitControls.prototype.constructor = THREE.OrbitControls;
+
+	Object.defineProperties( THREE.OrbitControls.prototype, {
+
+		object: {
+
+			get: function () {
+
+				return this.constraint.object;
+			}
+
+		},
+
+		target: {
+
+			get: function () {
+
+				return this.constraint.target;
+
+			}
+
+		},
+
+		minDistance : {
+
+			get: function () {
+
+				return this.constraint.minDistance;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.minDistance = value;
+
+			},
+
+		},
+
+		maxDistance : {
+
+			get: function () {
+
+				return this.constraint.maxDistance;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.maxDistance = value;
+
+			},
+
+		},
+
+		minZoom : {
+
+			get: function () {
+
+				return this.constraint.minZoom;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.minZoom = value;
+
+			},
+
+		},
+
+		maxZoom : {
+
+			get: function () {
+
+				return this.constraint.maxZoom;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.maxZoom = value;
+
+			},
+
+		},
+
+		minPolarAngle : {
+
+			get: function () {
+
+				return this.constraint.minPolarAngle;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.minPolarAngle = value;
+
+			},
+
+		},
+
+		maxPolarAngle : {
+
+			get: function () {
+
+				return this.constraint.maxPolarAngle;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.maxPolarAngle = value;
+
+			},
+
+		},
+
+		minAzimuthAngle : {
+
+			get: function () {
+
+				return this.constraint.minAzimuthAngle;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.minAzimuthAngle = value;
+
+			},
+
+		},
+
+		maxAzimuthAngle : {
+
+			get: function () {
+
+				return this.constraint.maxAzimuthAngle;
+
+			},
+
+			set: function ( value ) {
+
+				this.constraint.maxAzimuthAngle = value;
+
+			}
+
+		}
+
+	});
 
 }());
