@@ -60,7 +60,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 	this.normalizeSkinWeights();
 
 	this.updateMatrixWorld( true );
-	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ) );
+	this.bind( new THREE.Skeleton( bones, undefined, useVertexTexture ), this.matrixWorld );
 
 };
 
