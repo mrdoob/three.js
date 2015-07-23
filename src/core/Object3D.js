@@ -132,14 +132,28 @@ THREE.Object3D.prototype = {
 	},
 	
 	get matrix () {
+		
+	    if ( this.matrixAutoUpdate === true ) {
+	    	
+	        return this.updateMatrix();
+	        
+	    } else {
+	    	
+	        return this._matrix;
+	        
+	    }
 
-		return this.updateMatrix();
-
+	},
+	set matrix (value) {
+		
+		this.matrixWorldNeedsUpdate = true;
+	    this._matrix = value;
+	    
 	},
 	
 	get matrixWorld () {
 		
-		return this.updateMatrixWorld( false, false );
+		return this.updateMatrixWorld();
 	
 	},
 
@@ -446,8 +460,6 @@ THREE.Object3D.prototype = {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		this.updateMatrixWorld( true );
-
 		return result.setFromMatrixPosition( this.matrixWorld );
 
 	},
@@ -460,8 +472,6 @@ THREE.Object3D.prototype = {
 		return function ( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Quaternion();
-
-			this.updateMatrixWorld( true );
 
 			this.matrixWorld.decompose( position, result, scale );
 
@@ -495,8 +505,6 @@ THREE.Object3D.prototype = {
 		return function ( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
-
-			this.updateMatrixWorld( true );
 
 			this.matrixWorld.decompose( position, quaternion, result );
 
@@ -623,7 +631,15 @@ THREE.Object3D.prototype = {
 		var parent = this.parent; 
 		
 		//check own matrix
-		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) {
+			
+			this.updateMatrix();
+			
+		} else {
+			
+			this.matrixWorldNeedsUpdate = true;
+			
+		} 
 		
 		if ( parent === undefined ) {
 
@@ -639,7 +655,7 @@ THREE.Object3D.prototype = {
 			// first update parents before check matrixWorldNeedsUpdate
 			if ( parentChanged !== false ) {
 
-				parent.updateMatrixWorld( false, false );
+				parent.updateMatrixWorld( );
 
 			};
 			
