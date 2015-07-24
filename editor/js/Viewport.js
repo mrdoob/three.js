@@ -85,7 +85,7 @@ var Viewport = function ( editor ) {
 
 	// events
 
-	var getIntersects = function ( point, objects ) {
+	function getIntersects( point, objects ) {
 
 		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
 
@@ -99,14 +99,14 @@ var Viewport = function ( editor ) {
 	var onUpPosition = new THREE.Vector2();
 	var onDoubleClickPosition = new THREE.Vector2();
 
-	var getMousePosition = function ( dom, x, y ) {
+	function getMousePosition( dom, x, y ) {
 
 		var rect = dom.getBoundingClientRect();
 		return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
 
 	};
 
-	var handleClick = function () {
+	function handleClick() {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) == 0 ) {
 
@@ -140,7 +140,7 @@ var Viewport = function ( editor ) {
 
 	};
 
-	var onMouseDown = function ( event ) {
+	function onMouseDown( event ) {
 
 		event.preventDefault();
 
@@ -151,7 +151,7 @@ var Viewport = function ( editor ) {
 
 	};
 
-	var onMouseUp = function ( event ) {
+	function onMouseUp( event ) {
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onUpPosition.fromArray( array );
@@ -162,7 +162,7 @@ var Viewport = function ( editor ) {
 
 	};
 
-	var onTouchStart = function ( event ) {
+	function onTouchStart( event ) {
 
 		var touch = event.changedTouches[ 0 ];
 
@@ -173,7 +173,7 @@ var Viewport = function ( editor ) {
 
 	};
 
-	var onTouchEnd = function ( event ) {
+	function onTouchEnd( event ) {
 
 		var touch = event.changedTouches[ 0 ];
 
@@ -186,7 +186,7 @@ var Viewport = function ( editor ) {
 
 	};
 
-	var onDoubleClick = function ( event ) {
+	function onDoubleClick( event ) {
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDoubleClickPosition.fromArray( array );
