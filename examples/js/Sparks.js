@@ -487,7 +487,7 @@ SPARKS.ActionZone.prototype.update = function( emitter, particle, time ) {
 /*
  * Accelerate action affects velocity in specified 3d direction
  */
-SPARKS.Accelerate = function( x,y,z ) {
+SPARKS.Accelerate = function( x, y, z ) {
 
 	if ( x instanceof THREE.Vector3 ) {
 
@@ -496,7 +496,7 @@ SPARKS.Accelerate = function( x,y,z ) {
 
 	}
 
-	this.acceleration = new THREE.Vector3( x,y,z );
+	this.acceleration = new THREE.Vector3( x, y, z );
 
 };
 
@@ -569,7 +569,7 @@ SPARKS.AccelerateVelocity.prototype.update = function( emitter, particle, time )
 
 
 /* Set the max ammount of x,y,z drift movements in a second */
-SPARKS.RandomDrift = function( x,y,z ) {
+SPARKS.RandomDrift = function( x, y, z ) {
 
 	if ( x instanceof THREE.Vector3 ) {
 
@@ -578,7 +578,7 @@ SPARKS.RandomDrift = function( x,y,z ) {
 
 	}
 
-	this.drift = new THREE.Vector3( x,y,z );
+	this.drift = new THREE.Vector3( x, y, z );
 
 };
 

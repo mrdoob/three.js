@@ -509,7 +509,7 @@ THREE.VRMLLoader.prototype = {
 
 						// first subpattern should match the Node name
 
-						var block = { 'nodeType' : matches[ 1 ], 'string': line, 'parent': current, 'children': [],'comment' : comment };
+						var block = { 'nodeType' : matches[ 1 ], 'string': line, 'parent': current, 'children': [], 'comment' : comment };
 						current.children.push( block );
 						current = block;
 

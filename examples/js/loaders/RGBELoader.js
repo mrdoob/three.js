@@ -327,7 +327,7 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 		var w = rgbe_header_info.width,
 			h = rgbe_header_info.height
-			,image_rgba_data = RGBE_ReadPixels_RLE( byteArray.subarray( byteArray.pos ), w, h )
+			, image_rgba_data = RGBE_ReadPixels_RLE( byteArray.subarray( byteArray.pos ), w, h )
 		;
 		if ( RGBE_RETURN_FAILURE !== image_rgba_data ) {
 

@@ -302,7 +302,7 @@ if ( typeof DataView === 'undefined' ) {
 
 	DataView.prototype = {
 
-		_getCharCodes: function( buffer,start,length ) {
+		_getCharCodes: function( buffer, start, length ) {
 
 			start = start || 0;
 			length = length || buffer.length;

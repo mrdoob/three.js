@@ -35,7 +35,7 @@ var pins = [];
 
 var wind = true;
 var windStrength = 2;
-var windForce = new THREE.Vector3( 0,0,0 );
+var windForce = new THREE.Vector3( 0, 0, 0 );
 
 var ballPosition = new THREE.Vector3( 0, - 45, 0 );
 var ballSize = 60; //40
@@ -239,7 +239,7 @@ function simulate( time ) {
 
 		particles = cloth.particles;
 
-		for ( i = 0,il = faces.length; i < il; i ++ ) {
+		for ( i = 0, il = faces.length; i < il; i ++ ) {
 
 			face = faces[ i ];
 			normal = face.normal;

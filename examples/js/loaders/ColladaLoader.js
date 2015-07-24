@@ -4398,8 +4398,8 @@
 		// TODO -  this might be a good place to choose greatest 4 weights
 		for ( var i = 0; i < weights.length; i ++ ) {
 
-			var indicies = new THREE.Vector4( weights[ i ][ 0 ] ? weights[ i ][ 0 ].joint : 0,weights[ i ][ 1 ] ? weights[ i ][ 1 ].joint : 0,weights[ i ][ 2 ] ? weights[ i ][ 2 ].joint : 0,weights[ i ][ 3 ] ? weights[ i ][ 3 ].joint : 0 );
-			var weight = new THREE.Vector4( weights[ i ][ 0 ] ? weights[ i ][ 0 ].weight : 0,weights[ i ][ 1 ] ? weights[ i ][ 1 ].weight : 0,weights[ i ][ 2 ] ? weights[ i ][ 2 ].weight : 0,weights[ i ][ 3 ] ? weights[ i ][ 3 ].weight : 0 );
+			var indicies = new THREE.Vector4( weights[ i ][ 0 ] ? weights[ i ][ 0 ].joint : 0, weights[ i ][ 1 ] ? weights[ i ][ 1 ].joint : 0, weights[ i ][ 2 ] ? weights[ i ][ 2 ].joint : 0, weights[ i ][ 3 ] ? weights[ i ][ 3 ].joint : 0 );
+			var weight = new THREE.Vector4( weights[ i ][ 0 ] ? weights[ i ][ 0 ].weight : 0, weights[ i ][ 1 ] ? weights[ i ][ 1 ].weight : 0, weights[ i ][ 2 ] ? weights[ i ][ 2 ].weight : 0, weights[ i ][ 3 ] ? weights[ i ][ 3 ].weight : 0 );
 
 			skinIndices.push( indicies );
 			skinWeights.push( weight );
@@ -4413,7 +4413,7 @@
 
 		//create an animation for the animated bones
 		//NOTE: this has no effect when using morphtargets
-		var animationdata = { "name": animationBounds.ID,"fps": 30,"length": animationBounds.frames / 30,"hierarchy": [] };
+		var animationdata = { "name": animationBounds.ID, "fps": 30, "length": animationBounds.frames / 30, "hierarchy": [] };
 
 		for ( var j = 0; j < sortedbones.length; j ++ ) {
 
@@ -4451,12 +4451,12 @@
 						if ( frame === 0 )
 							bones[ i ].matrix = key.matrix;
 
-						var data = [ new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3() ];
+						var data = [ new THREE.Vector3(), new THREE.Quaternion(), new THREE.Vector3() ];
 						key.matrix.decompose( data[ 0 ], data[ 1 ], data[ 2 ] );
 
-						key.pos = [ data[ 0 ].x,data[ 0 ].y,data[ 0 ].z ];
+						key.pos = [ data[ 0 ].x, data[ 0 ].y, data[ 0 ].z ];
 
-						key.scl = [ data[ 2 ].x,data[ 2 ].y,data[ 2 ].z ];
+						key.scl = [ data[ 2 ].x, data[ 2 ].y, data[ 2 ].z ];
 						key.rot = data[ 1 ];
 
 						animationdata.hierarchy[ j ].keys.push( key );
@@ -4497,7 +4497,7 @@
 
 		}
 
-		return { start: start, end: end, frames: frames,ID: ID };
+		return { start: start, end: end, frames: frames, ID: ID };
 
 	};
 
@@ -5028,13 +5028,13 @@
 			bone.name = node.sid;
 			bone.parent = parentid;
 			bone.matrix = node.matrix;
-			var data = [ new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3() ];
+			var data = [ new THREE.Vector3(), new THREE.Quaternion(), new THREE.Vector3() ];
 			bone.matrix.decompose( data[ 0 ], data[ 1 ], data[ 2 ] );
 
-			bone.pos = [ data[ 0 ].x,data[ 0 ].y,data[ 0 ].z ];
+			bone.pos = [ data[ 0 ].x, data[ 0 ].y, data[ 0 ].z ];
 
-			bone.scl = [ data[ 2 ].x,data[ 2 ].y,data[ 2 ].z ];
-			bone.rotq = [ data[ 1 ].x,data[ 1 ].y,data[ 1 ].z,data[ 1 ].w ];
+			bone.scl = [ data[ 2 ].x, data[ 2 ].y, data[ 2 ].z ];
+			bone.rotq = [ data[ 1 ].x, data[ 1 ].y, data[ 1 ].z, data[ 1 ].w ];
 			list.push( bone );
 
 			for ( var i in node.nodes ) {
@@ -5532,7 +5532,7 @@
 	};
 
 	//Move the vertices into the pose that is proper for the start of the animation
-	function skinToBindPose ( geometry,skeleton,skinController ) {
+	function skinToBindPose ( geometry, skeleton, skinController ) {
 
 		var bones = [];
 		setupSkeleton( skeleton, bones, - 1 );
