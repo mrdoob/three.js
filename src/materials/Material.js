@@ -132,17 +132,23 @@ THREE.Material.prototype = {
 		if ( this.alphaMap instanceof THREE.Texture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
 		if ( this.lightMap instanceof THREE.Texture ) data.lightMap = this.lightMap.toJSON( meta ).uuid;
 		if ( this.bumpMap instanceof THREE.Texture ) {
+
 			data.bumpMap = this.bumpMap.toJSON( meta ).uuid;
 			data.bumpScale = this.bumpScale;
+
 		}
 		if ( this.normalMap instanceof THREE.Texture ) {
+
 			data.normalMap = this.normalMap.toJSON( meta ).uuid;
 			data.normalScale = this.normalScale; // Removed for now, causes issue in editor ui.js
+
 		}
 		if ( this.specularMap instanceof THREE.Texture ) data.specularMap = this.specularMap.toJSON( meta ).uuid;
 		if ( this.envMap instanceof THREE.Texture ) {
+
 			data.envMap = this.envMap.toJSON( meta ).uuid;
 			data.reflectivity = this.reflectivity; // Scale behind envMap
+
 		}
 
 		if ( this.size !== undefined ) data.size = this.size;

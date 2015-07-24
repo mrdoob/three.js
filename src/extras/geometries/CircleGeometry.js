@@ -24,7 +24,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 	var i, uvs = [],
 	center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
 
-	this.vertices.push(center);
+	this.vertices.push( center );
 	uvs.push( centerUV );
 
 	for ( i = 0; i <= segments; i ++ ) {

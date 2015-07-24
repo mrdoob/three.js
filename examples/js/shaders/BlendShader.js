@@ -26,7 +26,7 @@ THREE.BlendShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -46,6 +46,6 @@ THREE.BlendShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

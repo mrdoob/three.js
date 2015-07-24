@@ -128,13 +128,13 @@ THREE.Vector3.prototype = {
 
 	addScaledVector: function ( v, s ) {
 
-        this.x += v.x * s;
-        this.y += v.y * s;
-        this.z += v.z * s;
+		this.x += v.x * s;
+		this.y += v.y * s;
+		this.z += v.z * s;
 
-        return this;
+		return this;
 
-    },
+	},
 
 	sub: function ( v, w ) {
 
@@ -601,6 +601,7 @@ THREE.Vector3.prototype = {
 		if ( oldLength !== 0 && l !== oldLength  ) {
 
 			this.multiplyScalar( l / oldLength );
+
 		}
 
 		return this;
@@ -759,6 +760,7 @@ THREE.Vector3.prototype = {
 		console.warn( 'THREE.Vector3: .getScaleFromMatrix() has been renamed to .setFromMatrixScale().' );
 
 		return this.setFromMatrixScale( m );
+
 	},
 
 	getColumnFromMatrix: function ( index, matrix ) {
@@ -781,8 +783,8 @@ THREE.Vector3.prototype = {
 
 	setFromMatrixScale: function ( m ) {
 
-		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[  2 ] ).length();
-		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[  6 ] ).length();
+		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[ 2 ] ).length();
+		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[ 6 ] ).length();
 		var sz = this.set( m.elements[ 8 ], m.elements[ 9 ], m.elements[ 10 ] ).length();
 
 		this.x = sx;
@@ -790,6 +792,7 @@ THREE.Vector3.prototype = {
 		this.z = sz;
 
 		return this;
+
 	},
 
 	setFromMatrixColumn: function ( index, matrix ) {

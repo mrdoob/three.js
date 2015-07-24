@@ -90,7 +90,7 @@ THREE.MTLLoader.prototype = {
 				if ( key === "ka" || key === "kd" || key === "ks" ) {
 
 					var ss = value.split( delimiter_pattern, 3 );
-					info[ key ] = [ parseFloat( ss[0] ), parseFloat( ss[1] ), parseFloat( ss[2] ) ];
+					info[ key ] = [ parseFloat( ss[ 0 ] ), parseFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
 
 				} else {
 
@@ -170,7 +170,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 	convert: function( materialsInfo ) {
 
-		if ( !this.options ) return materialsInfo;
+		if ( ! this.options ) return materialsInfo;
 
 		var converted = {};
 
@@ -213,6 +213,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 								save = false;
 
 							}
+
 						}
 
 						break;
@@ -350,7 +351,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 					// The specular exponent (defines the focus of the specular highlight)
 					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
 
-					params['shininess'] = value;
+					params[ 'shininess' ] = value;
 
 					break;
 
@@ -362,8 +363,8 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					if ( value < 1 ) {
 
-						params['transparent'] = true;
-						params['opacity'] = value;
+						params[ 'transparent' ] = true;
+						params[ 'opacity' ] = value;
 
 					}
 
@@ -444,7 +445,7 @@ THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
 		canvas.height = THREE.MTLLoader.nextHighestPowerOfTwo_( image.height );
 
-		var ctx = canvas.getContext("2d");
+		var ctx = canvas.getContext( "2d" );
 		ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
 		return canvas;
 

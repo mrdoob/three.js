@@ -13,37 +13,37 @@ var ImprovedNoise = function () {
 		 14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,
 		 93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180 ];
 
-	for (var i = 0; i < 256 ; i ++) {
+	for ( var i = 0; i < 256 ; i ++ ) {
 
-		p[256 + i] = p[i];
-
-	}
-
-	function fade(t) {
-
-		return t * t * t * (t * (t * 6 - 15) + 10);
+		p[ 256 + i ] = p[ i ];
 
 	}
 
-	function lerp(t, a, b) {
+	function fade( t ) {
 
-		return a + t * (b - a);
+		return t * t * t * ( t * ( t * 6 - 15 ) + 10 );
 
 	}
 
-	function grad(hash, x, y, z) {
+	function lerp( t, a, b ) {
+
+		return a + t * ( b - a );
+
+	}
+
+	function grad( hash, x, y, z ) {
 
 		var h = hash & 15;
 		var u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-		return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
+		return ( ( h & 1 ) == 0 ? u : - u ) + ( ( h & 2 ) == 0 ? v : - v );
 
 	}
 
 	return {
 
-		noise: function (x, y, z) {
+		noise: function ( x, y, z ) {
 
-			var floorX = ~~x, floorY = ~~y, floorZ = ~~z;
+			var floorX = ~~ x, floorY = ~~ y, floorZ = ~~ z;
 
 			var X = floorX & 255, Y = floorY & 255, Z = floorZ & 255;
 
@@ -53,19 +53,20 @@ var ImprovedNoise = function () {
 
 			var xMinus1 = x - 1, yMinus1 = y - 1, zMinus1 = z - 1;
 
-			var u = fade(x), v = fade(y), w = fade(z);
+			var u = fade( x ), v = fade( y ), w = fade( z );
 
-			var A = p[X] + Y, AA = p[A] + Z, AB = p[A + 1] + Z, B = p[X + 1] + Y, BA = p[B] + Z, BB = p[B + 1] + Z;
+			var A = p[ X ] + Y, AA = p[ A ] + Z, AB = p[ A + 1 ] + Z, B = p[ X + 1 ] + Y, BA = p[ B ] + Z, BB = p[ B + 1 ] + Z;
 
-			return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), 
-							grad(p[BA], xMinus1, y, z)),
-						lerp(u, grad(p[AB], x, yMinus1, z),
-							grad(p[BB], xMinus1, yMinus1, z))),
-					lerp(v, lerp(u, grad(p[AA + 1], x, y, zMinus1),
-							grad(p[BA + 1], xMinus1, y, z - 1)),
-						lerp(u, grad(p[AB + 1], x, yMinus1, zMinus1),
-							grad(p[BB + 1], xMinus1, yMinus1, zMinus1))));
+			return lerp( w, lerp( v, lerp( u, grad( p[ AA ], x, y, z ), 
+							grad( p[ BA ], xMinus1, y, z ) ),
+						lerp( u, grad( p[ AB ], x, yMinus1, z ),
+							grad( p[ BB ], xMinus1, yMinus1, z ) ) ),
+					lerp( v, lerp( u, grad( p[ AA + 1 ], x, y, zMinus1 ),
+							grad( p[ BA + 1 ], xMinus1, y, z - 1 ) ),
+						lerp( u, grad( p[ AB + 1 ], x, yMinus1, zMinus1 ),
+							grad( p[ BB + 1 ], xMinus1, yMinus1, zMinus1 ) ) ) );
 
 		}
 	}
+
 };

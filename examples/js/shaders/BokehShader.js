@@ -30,7 +30,7 @@ THREE.BokehShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -111,6 +111,6 @@ THREE.BokehShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

@@ -15,8 +15,10 @@ THREE.LOD = function () {
 		},
 		objects: {
 			get: function () {
+
 				console.warn( 'THREE.LOD: .objects has been renamed to .levels.' );
 				return this.levels;
+
 			}
 		}
 	} );
@@ -108,7 +110,7 @@ THREE.LOD.prototype.update = function () {
 				if ( distance >= levels[ i ].distance ) {
 
 					levels[ i - 1 ].object.visible = false;
-					levels[ i     ].object.visible = true;
+					levels[ i ].object.visible = true;
 
 				} else {
 

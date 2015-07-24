@@ -27,7 +27,7 @@ THREE.MirrorShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -53,6 +53,6 @@ THREE.MirrorShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

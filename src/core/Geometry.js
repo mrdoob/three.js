@@ -262,15 +262,16 @@ THREE.Geometry.prototype = {
 
 		var matrix = new THREE.Matrix4();
 		matrix.set(
-			s, 0, 0, -s * center.x,
-			0, s, 0, -s * center.y,
-			0, 0, s, -s * center.z,
+			s, 0, 0, - s * center.x,
+			0, s, 0, - s * center.y,
+			0, 0, s, - s * center.z,
 			0, 0, 0, 1
 		);
 
 		this.applyMatrix( matrix );
 
 		return this;
+
 	},
 
 	computeFaceNormals: function () {
@@ -822,6 +823,7 @@ THREE.Geometry.prototype = {
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
 			for ( var n = 0; n < 3; n ++ ) {
+
 				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
 					dupIndex = n;
@@ -829,11 +831,13 @@ THREE.Geometry.prototype = {
 					break;
 
 				}
+
 			}
 
 		}
 
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+
 			var idx = faceIndicesToRemove[ i ];
 
 			this.faces.splice( idx, 1 );
@@ -979,7 +983,7 @@ THREE.Geometry.prototype = {
 
 		function setBit( value, position, enabled ) {
 
-			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position) );
+			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position ) );
 
 		}
 

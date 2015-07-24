@@ -48,7 +48,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -72,7 +72,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	} );
 
@@ -123,26 +123,26 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 			// translate xOffset
 
-			eyeRight.elements[12] = eyeSep;
-			eyeLeft.elements[12] = -eyeSep;
+			eyeRight.elements[ 12 ] = eyeSep;
+			eyeLeft.elements[ 12 ] = - eyeSep;
 
 			// for left eye
 
-			xmin = -ymax * _aspect + eyeSepOnProjection;
+			xmin = - ymax * _aspect + eyeSepOnProjection;
 			xmax = ymax * _aspect + eyeSepOnProjection;
 
-			projectionMatrix.elements[0] = 2 * _near / ( xmax - xmin );
-			projectionMatrix.elements[8] = ( xmax + xmin ) / ( xmax - xmin );
+			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
 			_cameraL.projectionMatrix.copy( projectionMatrix );
 
 			// for right eye
 
-			xmin = -ymax * _aspect - eyeSepOnProjection;
+			xmin = - ymax * _aspect - eyeSepOnProjection;
 			xmax = ymax * _aspect - eyeSepOnProjection;
 
-			projectionMatrix.elements[0] = 2 * _near / ( xmax - xmin );
-			projectionMatrix.elements[8] = ( xmax + xmin ) / ( xmax - xmin );
+			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
 			_cameraR.projectionMatrix.copy( projectionMatrix );
 

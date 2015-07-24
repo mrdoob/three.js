@@ -20,6 +20,7 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 		radius: radius,
 		detail: detail
 	};
+
 };
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );

@@ -203,7 +203,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+		if ( data.updateRange === undefined || data.updateRange.count === - 1 ) {
+
+			// Not using update ranges
 
 			gl.bufferSubData( bufferType, 0, data.array );
 
@@ -239,9 +241,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	this.update = function ( renderList ) {
 
-		for ( var i = 0, ul = renderList.length; i < ul; i++ ) {
+		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
 
-			var object = renderList[i].object;
+			var object = renderList[ i ].object;
 
 			if ( object.material.visible !== false ) {
 

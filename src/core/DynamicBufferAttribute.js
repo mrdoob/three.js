@@ -7,7 +7,7 @@ THREE.DynamicBufferAttribute = function ( array, itemSize ) {
 
 	THREE.BufferAttribute.call( this, array, itemSize );
 
-	this.updateRange = { offset: 0, count: -1 };
+	this.updateRange = { offset: 0, count: - 1 };
 
 };
 

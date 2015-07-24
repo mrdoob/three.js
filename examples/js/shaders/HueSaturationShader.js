@@ -29,7 +29,7 @@ THREE.HueSaturationShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -64,6 +64,6 @@ THREE.HueSaturationShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

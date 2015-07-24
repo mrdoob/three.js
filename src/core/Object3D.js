@@ -26,11 +26,15 @@ THREE.Object3D = function () {
 	var scale = new THREE.Vector3( 1, 1, 1 );
 
 	var onRotationChange = function () {
+
 		quaternion.setFromEuler( rotation, false );
+
 	};
 
 	var onQuaternionChange = function () {
+
 		rotation.setFromQuaternion( quaternion, undefined, false );
+
 	};
 
 	rotation.onChange( onRotationChange );
@@ -648,13 +652,17 @@ THREE.Object3D.prototype = {
 		// remove metadata on each item
 		// and return as array
 		function extractFromCache ( cache ) {
+
 			var values = [];
 			for ( var key in cache ) {
+
 				var data = cache[ key ];
 				delete data.metadata;
 				values.push( data );
+
 			}
 			return values;
+
 		}
 
 	},

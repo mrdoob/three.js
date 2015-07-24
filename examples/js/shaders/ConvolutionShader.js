@@ -36,7 +36,7 @@ THREE.ConvolutionShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -64,7 +64,7 @@ THREE.ConvolutionShader = {
 		"}"
 
 
-	].join("\n"),
+	].join( "\n" ),
 
 	buildKernel: function ( sigma ) {
 

@@ -19,7 +19,7 @@ if ( typeof module === 'object' ) {
 	var lastTime = 0;
 	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-	for ( var x = 0; x < vendors.length && !self.requestAnimationFrame; ++ x ) {
+	for ( var x = 0; x < vendors.length && ! self.requestAnimationFrame; ++ x ) {
 
 		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
 		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
@@ -31,7 +31,11 @@ if ( typeof module === 'object' ) {
 		self.requestAnimationFrame = function ( callback ) {
 
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-			var id = self.setTimeout( function () { callback( currTime + timeToCall ) }, timeToCall );
+			var id = self.setTimeout( function () {
+
+				callback( currTime + timeToCall )
+
+			}, timeToCall );
 			lastTime = currTime + timeToCall;
 			return id;
 
@@ -41,7 +45,11 @@ if ( typeof module === 'object' ) {
 
 	if ( self.cancelAnimationFrame === undefined && self.clearTimeout !== undefined ) {
 
-		self.cancelAnimationFrame = function ( id ) { self.clearTimeout( id ) };
+		self.cancelAnimationFrame = function ( id ) {
+
+			self.clearTimeout( id )
+
+		};
 
 	}
 
@@ -53,7 +61,7 @@ if ( Math.sign === undefined ) {
 
 	Math.sign = function ( x ) {
 
-		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : +x;
+		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : + x;
 
 	};
 
@@ -68,7 +76,7 @@ if ( Function.prototype.name === undefined && Object.defineProperty !== undefine
 
 		get: function () {
 
-			return this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
+			return this.toString().match( /^\s*function\s*(\S*)\s*\(/ )[ 1 ];
 
 		}
 

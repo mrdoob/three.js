@@ -29,7 +29,7 @@ THREE.DotScreenShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -63,6 +63,6 @@ THREE.DotScreenShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };
