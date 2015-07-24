@@ -21,9 +21,9 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function ( force, recursive, parentChanged ) {
+	return function ( recursive, parentChanged ) {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, force, false, parentChanged );
+		THREE.Object3D.prototype.updateMatrixWorld.call( this, false, parentChanged );
 
 		this._matrixWorld.decompose( translationWorld, quaternionWorld, scaleWorld );
 		this._matrix.decompose( translationObject, quaternionObject, scaleObject );
@@ -31,12 +31,12 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 		this._matrixWorld.compose( translationWorld, quaternionObject, scaleWorld );
 
 		// update children
-		if ( recursive === true || force === true ) { 
+		if ( recursive === true ) { 
 			
 			var children = this.children;
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-				children[ i ].updateMatrixWorld( force, true, false );
+				children[ i ].updateMatrixWorld( true, false );
 
 			}
 			

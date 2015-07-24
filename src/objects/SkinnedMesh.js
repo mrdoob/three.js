@@ -132,9 +132,9 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force, recursive, parentChanged ) {
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function( recursive, parentChanged ) {
 
-	THREE.Mesh.prototype.updateMatrixWorld.call( this, false, recursive, parentChanged );
+	THREE.Mesh.prototype.updateMatrixWorld.call( this, recursive, parentChanged );
 
 	if ( this.bindMode === "attached" ) {
 
