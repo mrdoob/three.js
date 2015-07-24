@@ -146,7 +146,6 @@ THREE.Object3D.prototype = {
 	},
 	set matrix (value) {
 		
-		this.matrixWorldNeedsUpdate = true;
 	    this._matrix = value;
 	    
 	},
@@ -601,11 +600,13 @@ THREE.Object3D.prototype = {
 			matrixState.scalez = scale.z;
 				
 		};
+		
 		function updateMatrixWorldNeedsUpdate( o ) {
 			
 			o.matrixWorldNeedsUpdate = true;
 			
-		}
+		};
+		
 		return function() {
 
 			var position = this.position;
@@ -626,7 +627,7 @@ THREE.Object3D.prototype = {
 
 	} )(),
 
-	updateMatrixWorld: function ( force, recursive, parentChanged ) {
+	updateMatrixWorld: function ( recursive, parentChanged ) {
 
 		var parent = this.parent; 
 		
@@ -644,7 +645,7 @@ THREE.Object3D.prototype = {
 		if ( parent === undefined ) {
 
 			// update own matrixWOrld
-			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+			if ( this.matrixWorldNeedsUpdate === true ) {
 				
 				this._matrixWorld.copy( this._matrix );
 				
@@ -660,10 +661,9 @@ THREE.Object3D.prototype = {
 			};
 			
 			// update own matrixWOrld
-			if ( this.matrixWorldNeedsUpdate === true || force === true ) {
+			if ( this.matrixWorldNeedsUpdate === true ) {
 	
 				this._matrixWorld.multiplyMatrices( parent._matrixWorld, this._matrix );
-				
 				
 			}
 
@@ -672,12 +672,12 @@ THREE.Object3D.prototype = {
 		this.matrixWorldNeedsUpdate = false;
 
 		// update children
-		if ( recursive === true || force === true ) { 
+		if ( recursive === true ) { 
 			
 			var children = this.children;
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-				children[ i ].updateMatrixWorld( force, true, false );
+				children[ i ].updateMatrixWorld( true, false );
 
 			}
 			

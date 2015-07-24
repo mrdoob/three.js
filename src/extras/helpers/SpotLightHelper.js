@@ -9,7 +9,6 @@ THREE.SpotLightHelper = function ( light ) {
 	THREE.Object3D.call( this );
 
 	this.light = light;
-	this.light.updateMatrixWorld();
 
 	this.matrix = light.matrixWorld;
 	this.matrixAutoUpdate = false;

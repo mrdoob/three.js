@@ -175,8 +175,6 @@ THREE.Mirror.prototype.renderWithMirror = function ( otherMirror ) {
 
 THREE.Mirror.prototype.updateTextureMatrix = function () {
 
-	this.updateMatrixWorld();
-	this.camera.updateMatrixWorld();
 
 	this.mirrorWorldPosition.setFromMatrixPosition( this.matrixWorld );
 	this.cameraWorldPosition.setFromMatrixPosition( this.camera.matrixWorld );
@@ -209,7 +207,6 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	this.mirrorCamera.lookAt( target );
 
 	this.mirrorCamera.updateProjectionMatrix();
-	this.mirrorCamera.updateMatrixWorld();
 	this.mirrorCamera.matrixWorldInverse.getInverse( this.mirrorCamera.matrixWorld );
 
 	// Update the texture matrix

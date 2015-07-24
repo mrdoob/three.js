@@ -133,8 +133,6 @@
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
-				camera.updateMatrixWorld();
-
 				// find intersections
 
 				raycaster.setFromCamera( mouse, camera );
