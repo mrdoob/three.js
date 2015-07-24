@@ -115,7 +115,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		var vector = new THREE.Vector2();
 
-		return function ( pageX, pageY ) {
+		return function getMouseOnScreen( pageX, pageY ) {
 
 			vector.set(
 				( pageX - _this.screen.left ) / _this.screen.width,
@@ -132,7 +132,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		var vector = new THREE.Vector2();
 
-		return function ( pageX, pageY ) {
+		return function getMouseOnCircle( pageX, pageY ) {
 
 			vector.set(
 				( ( pageX - _this.screen.width * 0.5 - _this.screen.left ) / ( _this.screen.width * 0.5 ) ),
@@ -154,7 +154,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 			moveDirection = new THREE.Vector3(),
 			angle;
 
-		return function () {
+		return function rotateCamera() {
 
 			moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
 			angle = moveDirection.length();
@@ -183,9 +183,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 				_lastAxis.copy( axis );
 				_lastAngle = angle;
 
-			}
-
-			else if ( !_this.staticMoving && _lastAngle ) {
+			} else if ( !_this.staticMoving && _lastAngle ) {
 
 				_lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
 				_eye.copy( _this.object.position ).sub( _this.target );
@@ -242,7 +240,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 			objectUp = new THREE.Vector3(),
 			pan = new THREE.Vector3();
 
-		return function () {
+		return function panCamera() {
 
 			mouseChange.copy( _panEnd ).sub( _panStart );
 

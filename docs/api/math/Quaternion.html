@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -119,26 +120,6 @@
 		Clones this quaternion.
 		</div>
 
-
-		<h2>Static methods</h2>
-
-		<h3>[method:Quaternion slerp]( [page:Quaternion qa], [page:Quaternion qb], [page:Quaternion qm], [page:Float t] )</h3>
-		<div>
-		Adapted from [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/].
-		</div>
-
-
-		<h3>[method:Quaternion slerp]([page:Quaternion qb], [page:float t])</h3>
-		<div>
-		qb -- Target quaternion rotation.<br />
-		t -- Normalized [0..1] interpolation factor.
-		</div>
-		<div>
-		Handles the spherical linear interpolation between this quaternion's configuration
-		and that of *qb*. *t* represents how close to the current (0) or target (1) rotation the
-		result should be.
-		</div>
-
 		<h3>[method:Array toArray]( [page:Array array] )</h3>
 		<div>
 		array -- Array to store the quaternion.
@@ -174,6 +155,48 @@
 		Returns the rotational conjugate of this quaternion. The conjugate of a quaternion
 		represents the same rotation in the opposite direction about the rotational axis.
 		</div>
+
+		<h3>[method:Quaternion slerp]([page:Quaternion quaternionB], [page:float t])</h3>
+		<div>
+		quaternionB -- The other quaternion rotation<br />
+		t -- Normalized 0 to 1 interpolation factor
+		</div>
+		<div>
+		Handles the spherical linear interpolation between quaternions. *t* represents the amount of rotation
+		between this quaternion (where *t* is 0) and quaternionB (where *t* is 1). This quaternion is set to
+		the result. Also see the static version of the *slerp* below.
+		</div>
+		<code>
+		// rotate a mesh towards a target quaternion
+		mesh.quaternion.slerp( endQuaternion, 0.01 );
+		</code>
+		
+		
+		<h2>Static Methods</h2>
+
+		<h3>[method:Quaternion slerp]( [page:Quaternion qStart], [page:Quaternion qEnd], [page:Quaternion qTarget], [page:Float t] )</h3>
+		<div>
+		qStart -- The starting quaternion (where *t* is 0)<br />
+		qEnd -- The ending quaternion (where *t* is 1)<br />
+		qTarget -- The target quaternion that gets set with the result<br />
+		t -- Normalized 0 to 1 interpolation factor
+		</div>
+		<div>
+		Unlike the normal method, the static version of slerp sets a target quaternion to the result of the slerp operation.
+		</div>
+		<code>
+		// Code setup
+		var startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
+		var endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
+		var t = 0;
+		</code>
+		<code>
+		// Update a mesh's rotation in the loop
+		t = ( t + 0.01 ) % 1; // constant angular momentum
+		THREE.Quaternion.slerp( startQuaternion, endQuaternion, mesh.quaternion, t );
+		</code>
+		
+		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->
 
 		<h2>Source</h2>
 

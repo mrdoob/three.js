@@ -517,7 +517,7 @@ THREE.Projector = function () {
 						var face = faces[ f ];
 
 						material = isFaceMaterial === true
-							 ? objectMaterials.materials[ face.materialIndex ]
+							 ? objectMaterials.materials[ 0 ] // objectMaterials.materials[ face.materialIndex ]
 							 : object.material;
 
 						if ( material === undefined ) continue;

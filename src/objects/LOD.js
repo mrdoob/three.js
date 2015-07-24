@@ -73,7 +73,7 @@ THREE.LOD.prototype.raycast = ( function () {
 
 	var matrixPosition = new THREE.Vector3();
 
-	return function ( raycaster, intersects ) {
+	return function raycast( raycaster, intersects ) {
 
 		matrixPosition.setFromMatrixPosition( this.matrixWorld );
 
@@ -90,7 +90,7 @@ THREE.LOD.prototype.update = function () {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
 
-	return function ( camera ) {
+	return function update( camera ) {
 
 		var levels = this.levels;
 
@@ -130,22 +130,28 @@ THREE.LOD.prototype.update = function () {
 
 }();
 
-THREE.LOD.prototype.clone = function ( object ) {
+THREE.LOD.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.LOD();
+	var lod = new THREE.LOD();
+	return lod.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object, false );
+};
 
-	var levels = this.levels;
+
+THREE.LOD.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source, false );
+
+	var levels = source.levels;
 
 	for ( var i = 0, l = levels.length; i < l; i ++ ) {
 
 		var level = levels[ i ];
 
-		object.addLevel( level.object.clone(), level.distance );
+		this.addLevel( level.object.clone(), level.distance );
 
 	}
 
-	return object;
+	return this;
 
 };

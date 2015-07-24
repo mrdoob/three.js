@@ -110,32 +110,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	copy: function ( geometry ) {
-
-		// TODO Clear attributes? Clear drawcalls? Copy morphTargets?
-
-		var attributes = geometry.attributes;
-		var offsets = geometry.drawcalls;
-
-		for ( var name in attributes ) {
-
-			var attribute = attributes[ name ];
-
-			this.addAttribute( name, attribute.clone() );
-
-		}
-
-		for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-			var offset = offsets[ i ];
-			this.addDrawCall( offset.start, offset.count, offset.index );
-
-		}
-
-		return this;
-
-	},
-
 	center: function () {
 
 		this.computeBoundingBox();
@@ -1069,7 +1043,7 @@ THREE.BufferGeometry.prototype = {
 		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
-		var offsets = this.drawcalls;
+		var drawcalls = this.drawcalls;
 		var boundingSphere = this.boundingSphere;
 
 		for ( var key in attributes ) {
@@ -1086,9 +1060,9 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( offsets.length > 0 ) {
+		if ( drawcalls.length > 0 ) {
 
-			data.data.offsets = JSON.parse( JSON.stringify( offsets ) );
+			data.data.drawcalls = JSON.parse( JSON.stringify( drawcalls ) );
 
 		}
 
@@ -1108,23 +1082,28 @@ THREE.BufferGeometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.BufferGeometry();
+		return geometry.copy( this );
 
-		for ( var attr in this.attributes ) {
+	},
 
-			var sourceAttr = this.attributes[ attr ];
-			geometry.addAttribute( attr, sourceAttr.clone() );
+	copy: function ( source ) {
 
-		}
+		for ( var attr in source.attributes ) {
 
-		for ( var i = 0, il = this.drawcalls.length; i < il; i ++ ) {
-
-			var offset = this.drawcalls[ i ];
-
-			geometry.addDrawCall( offset.start, offset.count, offset.index );
+			var sourceAttr = source.attributes[ attr ];
+			this.addAttribute( attr, sourceAttr.clone() );
 
 		}
 
-		return geometry;
+		for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
+
+			var offset = source.drawcalls[ i ];
+
+			this.addDrawCall( offset.start, offset.count, offset.index );
+
+		}
+
+		return this;
 
 	},
 

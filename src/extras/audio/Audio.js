@@ -123,7 +123,7 @@ THREE.Audio.prototype.updateMatrixWorld = ( function () {
 
 	var position = new THREE.Vector3();
 
-	return function ( recursive, parentChanged ) {
+	return function updateMatrixWorld( recursive, parentChanged ) {
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this,  recursive, parentChanged );
 

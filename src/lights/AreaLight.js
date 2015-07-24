@@ -31,7 +31,7 @@ THREE.AreaLight.prototype.clone = function () {
 
 	var light = new THREE.AreaLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.normal.copy(this.normal);
 	light.right.copy(this.right);
@@ -40,7 +40,7 @@ THREE.AreaLight.prototype.clone = function () {
 	light.height = this.height;
 	light.constantAttenuation = this.constantAttenuation;
 	light.linearAttenuation = this.linearAttenuation;
-	light.quadraticAttenuation = this.quadraticAttenuation
+	light.quadraticAttenuation = this.quadraticAttenuation;
 
 	return light;
 

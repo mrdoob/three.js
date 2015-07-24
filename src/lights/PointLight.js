@@ -21,7 +21,7 @@ THREE.PointLight.prototype.clone = function () {
 
 	var light = new THREE.PointLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.intensity = this.intensity;
 	light.distance = this.distance;

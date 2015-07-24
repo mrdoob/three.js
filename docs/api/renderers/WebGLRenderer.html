@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -160,11 +161,15 @@
 		Return the WebGL context.
 		</div>
 
+		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
+		<div>
+		Returns an object that describes the attributes set on the WebGL context when it was created.
+		</div>
+
 		<h3>[method:Boolean supportsVertexTextures]()</h3>
 		<div>
 		Return a [page:Boolean] true if the context supports vertex textures.
 		</div>
-
 
 		<h3>[method:null setSize]( [page:Integer width], [page:Integer height] )</h3>
 		<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).</div>

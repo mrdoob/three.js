@@ -113,3 +113,19 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
+
+THREE.SphereGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.SphereGeometry(
+		this.parameters.radius,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments,
+		this.parameters.phiStart,
+		this.parameters.phiLength,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	return geometry;
+
+};

@@ -21,7 +21,7 @@ THREE.Gyroscope.prototype.updateMatrixWorld = ( function () {
 	var quaternionWorld = new THREE.Quaternion();
 	var scaleWorld = new THREE.Vector3();
 
-	return function ( recursive, parentChanged ) {
+	return function updateMatrixWorld( recursive, parentChanged ) {
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this, false, parentChanged );
 

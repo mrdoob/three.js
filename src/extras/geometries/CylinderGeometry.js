@@ -170,3 +170,20 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
+
+THREE.CylinderGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.CylinderGeometry(
+		this.parameters.radiusTop,
+		this.parameters.radiusBottom,
+		this.parameters.height,
+		this.parameters.radialSegments,
+		this.parameters.heightSegments,
+		this.parameters.openEnded,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	return geometry;
+
+};

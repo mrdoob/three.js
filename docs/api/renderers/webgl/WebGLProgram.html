@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -52,7 +53,7 @@
 		</code>
 		</p>
 		</div>
-		
+
 		<h3>Vertex shader (conditional):</h3>
 		<code>
 		#ifdef USE_COLOR
@@ -92,7 +93,7 @@
 		#endif
 		</code>
 		</div>
-		
+
 		<h3>Fragment shader:</h3>
 		<div>
 		<code>
@@ -100,7 +101,7 @@
 		uniform vec3 cameraPosition;
 		</code>
 		</div>
-		
+
 
 		<h2>Constructor</h2>
 
@@ -110,25 +111,25 @@
 		<h2>Properties</h2>
 
 		<h3>[property:String id]</h3>
-		<div></div> 
+		<div></div>
 
 		<h3>[property:String code]</h3>
-		<div></div> 
+		<div></div>
 
 		<h3>[property:Integer usedTimes]</h3>
-		<div></div> 
+		<div></div>
 
 		<h3>[property:Object program]</h3>
-		<div></div> 
+		<div></div>
 
 		<h3>[property:WebGLShader vertexShader]</h3>
-		<div></div> 
+		<div></div>
 
 		<h3>[property:WebGLShader fragmentShader]</h3>
-		<div></div> 
+		<div></div>
 
 		<h2>Methods</h2>
-		
+
 		<h3>[method:Object getUniforms]()</h3>
 		<div>
 		Returns a name-value mapping of all active uniform locations.

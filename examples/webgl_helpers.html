@@ -57,6 +57,9 @@
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 50 );
 					scene.add( group );
+					
+					// To make sure that the matrixWorld is up to date for the boxhelpers
+					group.updateMatrixWorld(true);
 
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
@@ -76,6 +79,7 @@
 					line.material.transparent = true;
 					line.position.x = 4;
 					group.add( line );
+					scene.add( new THREE.BoxHelper( line ) );
 
 					var edges = new THREE.EdgesGeometry( geometry );
 					var line = new THREE.LineSegments( edges );
@@ -84,6 +88,11 @@
 					line.material.transparent = true;
 					line.position.x = -4;
 					group.add( line );
+					scene.add( new THREE.BoxHelper( line ) );
+					
+					scene.add( new THREE.BoxHelper( group ) );
+					scene.add( new THREE.BoxHelper( scene ) );
+					
 
 				} );
 

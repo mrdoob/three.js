@@ -2,9 +2,10 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../../list.js"></script>
-		<script src="../../../page.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
@@ -15,15 +16,15 @@
 
 		<code>
 		var gl = renderer.context;
-		
+
 		var glVertexShader = new THREE.WebGLShader( gl, gl.VERTEX_SHADER, vertexSourceCode );
 		var glFragmentShader = new THREE.WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentSourceCode );
-		
+
 		var program = gl.createProgram();
-		
+
 		gl.attachShader( program, glVertexShader );
 		gl.attachShader( program, glFragmentShader );
-		
+
 		gl.linkProgram( program );
 		</code>
 

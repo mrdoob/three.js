@@ -29,14 +29,6 @@ THREE.BlendCharacter = function () {
 
 			}
 
-			// Create the debug visualization
-
-			scope.skeletonHelper = new THREE.SkeletonHelper( scope );
-			scope.skeletonHelper.material.linewidth = 3;
-			scope.add( scope.skeletonHelper );
-
-			scope.showSkeleton( false );
-
 			// Loading is complete, fire the callback
 			if ( onLoad !== undefined ) onLoad();
 
@@ -77,7 +69,6 @@ THREE.BlendCharacter = function () {
 		}
 
 		this.updateWarps( dt );
-		this.skeletonHelper.update();
 
 	};
 
@@ -230,12 +221,6 @@ THREE.BlendCharacter = function () {
 
 		this.weightSchedule.length = 0;
 		this.warpSchedule.length = 0;
-
-	};
-
-	this.showSkeleton = function( boolean ) {
-
-		this.skeletonHelper.visible = boolean;
 
 	};
 
