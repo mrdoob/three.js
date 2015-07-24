@@ -85,19 +85,13 @@ var Viewport = function ( editor ) {
 
 	// events
 
-	var getIntersects = function ( point, object ) {
+	var getIntersects = function ( point, objects ) {
 
 		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
 
 		raycaster.setFromCamera( mouse, camera );
 
-		if ( Array.isArray( object ) ) {
-
-			return raycaster.intersectObjects( object );
-
-		}
-
-		return raycaster.intersectObject( object );
+		return raycaster.intersectObjects( objects );
 
 	};
 
