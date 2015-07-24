@@ -40,6 +40,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var opaqueImmediateObjects = [];
 	var transparentImmediateObjects = [];
 
+	var morphInfluences = new Float32Array( 8 );
+
 	var sprites = [];
 	var lensFlares = [];
 
@@ -1021,6 +1023,47 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// morph targets
+
+		if ( object.morphTargetInfluences !== undefined ) {
+
+			var activeInfluences = [];
+			var morphTargetInfluences = object.morphTargetInfluences;
+
+			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
+
+				var influence = morphTargetInfluences[ i ];
+				activeInfluences.push( [ influence, i ] );
+
+			}
+
+			activeInfluences.sort( numericalSort );
+
+			if ( activeInfluences.length > 8 ) {
+
+				activeInfluences.length = 8;
+
+			}
+
+			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
+
+				morphInfluences[ i ] = activeInfluences[ i ][ 0 ];
+
+				var attribute = geometry.morphAttributes[ activeInfluences[ i ][ 1 ] ];
+				geometry.addAttribute( 'morphTarget' + i, attribute );
+
+			}
+
+			var uniforms = program.getUniforms();
+
+			if ( uniforms.morphTargetInfluences !== null ) {
+
+				_gl.uniform1fv( uniforms.morphTargetInfluences, morphInfluences );
+
+			}
+
+		}
+
 		if ( object instanceof THREE.Mesh ) {
 
 			renderMesh( material, geometry, object, program, updateBuffers );
@@ -1469,6 +1512,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Sorting
+
+	function numericalSort ( a, b ) {
+
+		return b[ 0 ] - a[ 0 ];
+
+	}
 
 	function painterSortStable ( a, b ) {
 
