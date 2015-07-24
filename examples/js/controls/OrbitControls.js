@@ -805,7 +805,7 @@
 
 				this.constraint.minDistance = value;
 
-			},
+			}
 
 		},
 
@@ -821,7 +821,7 @@
 
 				this.constraint.maxDistance = value;
 
-			},
+			}
 
 		},
 
@@ -837,7 +837,7 @@
 
 				this.constraint.minZoom = value;
 
-			},
+			}
 
 		},
 
@@ -853,7 +853,7 @@
 
 				this.constraint.maxZoom = value;
 
-			},
+			}
 
 		},
 
@@ -869,7 +869,7 @@
 
 				this.constraint.minPolarAngle = value;
 
-			},
+			}
 
 		},
 
@@ -885,7 +885,7 @@
 
 				this.constraint.maxPolarAngle = value;
 
-			},
+			}
 
 		},
 
@@ -901,7 +901,7 @@
 
 				this.constraint.minAzimuthAngle = value;
 
-			},
+			}
 
 		},
 
