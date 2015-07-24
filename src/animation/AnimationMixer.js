@@ -12,7 +12,7 @@ THREE.AnimationMixer = function( root ) {
 
 	this.root = root;
 	this.actions = [];
-	this.trackInfos = {};
+	this.trackBindings = {};
 
 };
 
@@ -25,12 +25,9 @@ THREE.AnimationMixer.prototype = {
 
 		this.actions.push( action );
 
-		foreach( var track in action.tracks ) {
-			if( ! this.trackInfos[track.name] ) {
-				this.trackInfos[track.name] = {
-					node: THREE.AnimationUtils.findNode( this.root, track.nodeName ),
-					propertyName: track.propertyName
-				} 
+		for( var track in action.tracks ) {
+			if( ! this.trackBindings[track.name] ) {
+				this.trackBindings[track.name] = new THREE.TrackBinding( this.root, track.name );
 			}
 		}
 
@@ -86,42 +83,9 @@ THREE.AnimationMixer.prototype = {
 
 			var mixerResult = mixerResults[ name ];
 
-			var trackInfo = this.trackInfos[ name ];
-
-			var node = trackInfo.node;
-
-			if( ! node ) {
-				console.log( "  trying to update node for track: " + name + " but it wasn't found." );
-				continue;
-			}
-
-			var propertyName = trackInfo.propertyName;
-
-			if( ! node[ propertyName ] ) {
-				console.log( "  trying to update property for track: " + name + '.' + propertyName + " but it wasn't found." );				
-				continue;
-			}
-
-			// must use copy for Object3D.Euler/Quaternion
-			if( node[ propertyName ].copy ) {
-				console.log( '  update property ' + name + '.' + propertyName + ' via a set() function.' );				
-				node[ propertyName ].copy( mixerResult.value );
-			}
-			// otherwise just copy across value
-			else {
-				console.log( '  update property ' + name + '.' + propertyName + ' via assignment.' );				
-				node[ propertyName ] = mixerResult.value;	
-			}
-
-
-			// trigger node dirty			
-			if( node.needsUpdate ) { // material
-				node.needsUpdate = true;
-			}			
-			if( node.matrixWorldNeedsUpdate && ! this.matrixAutoUpdate ) { // node transform
-				node.matrixWorldNeedsUpdate = true;
-			}
-
+			var trackBinding = this.trackBindings[ name ];
+			trackBinding.set( mixerResult.value );
+			
 		}
 	}
 
