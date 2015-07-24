@@ -1,13 +1,26 @@
 {
     "preset": "mdcs",
     "excludeFiles": [ 
-        "build/**", 
-        "docs/**",
-        "editor/**",
-        "examples/**",
-        "node_modules/**",
-        "test/**",
-        "utils/**"
+        "../../.c9/", 
+        "../../.c9version/", 
+        "../../.git/", 
+        "../../build/", 
+        "../../docs/",
+        "../../editor/",
+        "../../node_modules/",
+        "../../test/",
+        "../../utils/",
+        "../../examples/files/",
+        "../../examples/fonts/",
+        "../../examples/models/",
+        "../../examples/obj/",
+        "../../examples/scenes/",
+        "../../examples/sounds/",
+        "../../examples/textures/",
+        "../../examples/js/libs/",
+        "../../examples/js/loaders/ctm/",
+        "../../examples/js/loaders/gltf/",
+        "../../examples/js/loaders/sea3d/"
         ]
     
 }
