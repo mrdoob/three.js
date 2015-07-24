@@ -46,7 +46,7 @@
 
 			var container, stats;
 
-			var blendMesh, camera, scene, renderer, controls;
+			var blendMesh, skeletonHelper, camera, scene, renderer, controls;
 
 			var clock = new THREE.Clock();
 			var gui = null;
@@ -186,7 +186,7 @@
 			function onShowSkeleton( event ) {
 
 				var shouldShow = event.detail.shouldShow;
-				blendMesh.showSkeleton( shouldShow );
+				skeletonHelper.visible = shouldShow;
 
 			}
 
@@ -220,6 +220,14 @@
 
 				gui = new BlendCharacterGui(blendMesh.animations);
 
+				// Create the debug visualization
+
+				skeletonHelper = new THREE.SkeletonHelper( blendMesh );
+				skeletonHelper.material.linewidth = 3;
+				scene.add( skeletonHelper );
+
+				skeletonHelper.visible = false;
+
 				animate();
 			}
 
@@ -236,6 +244,7 @@
 				// modify blend weights
 
 				blendMesh.update( stepSize );
+				skeletonHelper.update();
 				gui.update();
 
 				THREE.AnimationHandler.update( stepSize );
