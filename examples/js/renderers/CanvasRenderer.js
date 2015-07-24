@@ -144,7 +144,19 @@ THREE.CanvasRenderer = function ( parameters ) {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
-	//
+	// API
+
+	this.getContext = function () {
+
+		return _context;
+
+	};
+
+	this.getContextAttributes = function () {
+
+		return _context.getContextAttributes();
+
+	};
 
 	this.getPixelRatio = function () {
 
