@@ -1,5 +1,6 @@
 {
     "preset": "mdcs",
+    "disallowNewlineBeforeBlockStatements": true,
     "excludeFiles": [ 
         "../../.c9/", 
         "../../.c9version/", 
@@ -20,7 +21,10 @@
         "../../examples/js/libs/",
         "../../examples/js/loaders/ctm/",
         "../../examples/js/loaders/gltf/",
-        "../../examples/js/loaders/sea3d/"
+        "../../examples/js/loaders/sea3d/",
+        "../../examples/js/ImprovedNoise.js",
+        "../../examples/js/SimplexNoise.js",
+        "../../examples/js/loaders/UTF8Loader.js"
         ]
     
 }
