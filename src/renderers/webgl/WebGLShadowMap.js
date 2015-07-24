@@ -308,7 +308,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				}
 
-				_renderer.setMaterialFaces( objectMaterial );
 				_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, object );
 
 			}
