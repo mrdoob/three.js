@@ -1929,8 +1929,7 @@
 				tmin;
 
 			// ray would intersect in reverse direction, i.e. this is behind ray
-			if ( tmax < 0 )
-			{
+			if ( tmax < 0 ) {
 
 				return false;
 

@@ -125,8 +125,7 @@ SPARKS.Emitter.prototype = {
 
 		// Update activities
 		len = this._activities.length;
-		for ( i = 0; i < len; i ++ )
-	{
+		for ( i = 0; i < len; i ++ ) {
 
 			this._activities[ i ].update( this, time );
 
@@ -139,12 +138,10 @@ SPARKS.Emitter.prototype = {
 		var action;
 		var len2 = this._particles.length;
 
-		for ( j = 0; j < len; j ++ )
-	{
+		for ( j = 0; j < len; j ++ ) {
 
 			action = this._actions[ j ];
-			for ( i = 0; i < len2; ++ i )
-	{
+			for ( i = 0; i < len2; ++ i ) {
 
 				particle = this._particles[ i ];
 				action.update( this, particle, time );
@@ -155,12 +152,10 @@ SPARKS.Emitter.prototype = {
 
 
 		// remove dead particles
-		for ( i = len2; i --; )
-	{
+		for ( i = len2; i --; ) {
 
 			particle = this._particles[ i ];
-			if ( particle.isDead )
-	{
+			if ( particle.isDead ) {
 
 				//particle =
 				this._particles.splice( i, 1 );
@@ -389,15 +384,13 @@ SPARKS.Age = function( easing ) {
 SPARKS.Age.prototype.update = function ( emitter, particle, time ) {
 
 	particle.age += time;
-	if ( particle.age >= particle.lifetime )
-    {
+	if ( particle.age >= particle.lifetime ) {
 
 		particle.energy = 0;
 		particle.isDead = true;
 
 	}
-	else
-	{
+	else {
 
 		var t = this._easing( particle.age / particle.lifetime );
 		particle.energy = - 1 * t + 1;
@@ -971,17 +964,14 @@ SPARKS.Utils = {
 
 	},
 
-	getPerpendicular: function( v )
-	{
+	getPerpendicular: function( v ) {
 
-		if ( v.x == 0 )
-		{
+		if ( v.x == 0 ) {
 
 			return new THREE.Vector3D( 1, 0, 0 );
 
 		}
-		else
-		{
+		else {
 
 			var temp = new THREE.Vector3( v.y, - v.x, 0 );
 			return temp.normalize();

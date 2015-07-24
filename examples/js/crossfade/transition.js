@@ -120,18 +120,15 @@ function Transition ( sceneA, sceneB ) {
 	this.render = function( delta ) {
 		
 		// Transition animation
-		if ( transitionParams.animateTransition )
-		{
+		if ( transitionParams.animateTransition ) {
 
 			var t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
 			transitionParams.transition = THREE.Math.smoothstep( t, 0.3, 0.7 );
 			
 			// Change the current alpha texture after each transition
-			if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) )
-			{
+			if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) ) {
 
-				if ( this.needChange )
-				{
+				if ( this.needChange ) {
 
 					transitionParams.texture = ( transitionParams.texture + 1 ) % this.textures.length;
 					this.quadmaterial.uniforms.tMixTexture.value = this.textures[ transitionParams.texture ];

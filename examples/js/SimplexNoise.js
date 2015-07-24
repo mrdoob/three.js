@@ -168,8 +168,7 @@ SimplexNoise.prototype.noise3d = function( xin, yin, zin ) {
 	var i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords 
 	if ( x0 >= y0 ) { 
 
-		if ( y0 >= z0 ) 
-      {
+		if ( y0 >= z0 ) {
 
 			i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 1; k2 = 0;
 

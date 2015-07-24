@@ -55,15 +55,13 @@
 	AWDProperties = function() {}
 
 	AWDProperties.prototype = {
-		set : function( key, value )
-		{
+		set : function( key, value ) {
 
 			this[ key ] = value;
 
 		},
 
-		get : function( key, fallback )
-		{
+		get : function( key, fallback ) {
 
 			if ( this.hasOwnProperty( key ) )
 				return this[ key ];
@@ -548,8 +546,7 @@
 
 					mtx_data = this.parseMatrix4();
 
-				} else
-				{
+				} else {
 
 					mtx_data = new THREE.Matrix4();
 

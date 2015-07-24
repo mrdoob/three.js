@@ -141,8 +141,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	if ( camera instanceof THREE.PerspectiveCamera )
 		this.camera = camera;
-	else 
-	{
+	else {
 
 		this.camera = new THREE.PerspectiveCamera();
 		console.log( this.name + ': camera is not a Perspective Camera!' )
@@ -178,8 +177,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	this.material.uniforms.eye.value = this.eye;
 	
-	if ( ! THREE.Math.isPowerOfTwo( width ) || ! THREE.Math.isPowerOfTwo( height ) )
-	{
+	if ( ! THREE.Math.isPowerOfTwo( width ) || ! THREE.Math.isPowerOfTwo( height ) ) {
 
 		this.texture.generateMipmaps = false;
 		this.texture.minFilter = THREE.LinearFilter;

@@ -37,8 +37,7 @@ THREE.AssimpJSONLoader.prototype = {
 			// This header is used to disambiguate between
 			// different JSON-based file formats.
 			metadata = json.__metadata__;
-			if ( typeof metadata !== 'undefined' )
-			{
+			if ( typeof metadata !== 'undefined' ) {
 
 				// Check if assimp2json at all
 				if ( metadata.format !== 'assimp2json' ) {
