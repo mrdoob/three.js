@@ -155,3 +155,27 @@ THREE.AnimationClip.prototype = {
 };
 
 
+THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration ) {
+	// TODO
+	//  - should create three keys per morphTarget track.
+	//  - one track per morphTarget name.
+};
+
+THREE.AnimationClip.CreateRotationAnimation = function( node, period ) {
+	// TODO
+	//  - create a single track representing the rotation
+	//  - create a few quaternion keys representing the rotation path
+};
+
+THREE.AnimationClip.CreateShakeAnimation = function( node, duration, shakeScale ) {
+	// TODO
+	//  - create a single track representing the shake
+	//  - multiple random vector by shake scalar/vector
+};
+
+
+THREE.AnimationClip.CreatePulsationAnimation = function( node, duration, pulseScale ) {
+	// TODO
+	//  - create a single track representing the shake
+	//  - multiple random vector by pulse scalar/vector
+};

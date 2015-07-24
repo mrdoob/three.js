@@ -20,7 +20,7 @@ THREE.KeyframeTrack = function ( name, keys ) {
 
 THREE.KeyframeTrack.prototype = {
 
-	constructor: THREE.Track,
+	constructor: THREE.KeyframeTrack,
 
 	getAt: function( time ) {
 		console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
