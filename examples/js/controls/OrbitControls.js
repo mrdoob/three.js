@@ -782,6 +782,13 @@
 
 				return this.constraint.target;
 
+			},
+
+			set: function ( value ) {
+
+				console.warn( 'THREE.OrbitControls: target is now immutable. Use target.set() instead.' );
+				this.constraint.target.copy( value );
+
 			}
 
 		},
