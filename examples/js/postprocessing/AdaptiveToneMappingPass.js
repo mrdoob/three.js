@@ -221,8 +221,7 @@ THREE.AdaptiveToneMappingPass.prototype = {
 			this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ] = "";
 			this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT;
 
-		}
-		else {
+		} else {
 
 			this.adaptive = false;
 			delete this.materialToneMap.defines[ "ADAPTED_LUMINANCE" ];

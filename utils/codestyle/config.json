@@ -2,6 +2,7 @@
     "preset": "mdcs",
     "disallowNewlineBeforeBlockStatements": true,
     "requireSpaceAfterBinaryOperators": [","],
+    "disallowKeywordsOnNewLine": ["else"],
     "excludeFiles": [ 
         "../../.c9/", 
         "../../.c9version/", 

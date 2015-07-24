@@ -375,8 +375,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 			buffer[ colorOffset + 3 ] = material.opacity * 255;
 			depthBuf[ offset ] = depth;
 
-		}
-		else {
+		} else {
 
 			var opaci = tdata[ tIndex + 3 ] * material.opacity;
 			var texel = ( tdata[ tIndex ] << 16 ) + ( tdata[ tIndex + 1 ] << 8 ) + tdata[ tIndex + 2 ];

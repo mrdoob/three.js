@@ -376,17 +376,13 @@ THREE.Lut.prototype = {
 
 					value = callback ( value );
 
-				}
-
-				else {
+				} else {
 
 					if ( this.legend.labels.notation == 'scientific' ) {
 
 						value = value.toExponential( this.legend.labels.decimal );
 
-					}
-
-					else {
+					} else {
 
 						value = value.toFixed( this.legend.labels.decimal );
 
@@ -440,17 +436,13 @@ THREE.Lut.prototype = {
 
 							var offset = 1.7;
 
-						}
-
-						else {
+						} else {
 
 							var offset = 2.1;
 
 						}
 
-					}
-
-					else {
+					} else {
 
 						var offset = 1.7;
 

@@ -59,8 +59,7 @@ THREE.GlitchPass.prototype = {
 			this.curF = 0;
 			this.generateTrigger();
 
-		}
-		else if ( this.curF % this.randX < this.randX / 5 ) {
+		} else if ( this.curF % this.randX < this.randX / 5 ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 90;
 			this.uniforms[ 'angle' ].value = THREE.Math.randFloat( - Math.PI, Math.PI );
@@ -69,8 +68,7 @@ THREE.GlitchPass.prototype = {
 			this.uniforms[ 'seed_x' ].value = THREE.Math.randFloat( - 0.3, 0.3 );
 			this.uniforms[ 'seed_y' ].value = THREE.Math.randFloat( - 0.3, 0.3 );
 
-		}
-		else if ( this.goWild == false ) {
+		} else if ( this.goWild == false ) {
 
 			this.uniforms[ 'byp' ].value = 1;
 
@@ -82,8 +80,7 @@ THREE.GlitchPass.prototype = {
 
 			renderer.render( this.scene, this.camera );
 
-		} 
-		else {
+		} else {
 
 			renderer.render( this.scene, this.camera, writeBuffer, false );
 

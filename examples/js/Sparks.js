@@ -389,8 +389,7 @@ SPARKS.Age.prototype.update = function ( emitter, particle, time ) {
 		particle.energy = 0;
 		particle.isDead = true;
 
-	}
-	else {
+	} else {
 
 		var t = this._easing( particle.age / particle.lifetime );
 		particle.energy = - 1 * t + 1;
@@ -970,8 +969,7 @@ SPARKS.Utils = {
 
 			return new THREE.Vector3D( 1, 0, 0 );
 
-		}
-		else {
+		} else {
 
 			var temp = new THREE.Vector3( v.y, - v.x, 0 );
 			return temp.normalize();

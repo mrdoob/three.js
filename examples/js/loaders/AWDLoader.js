@@ -334,8 +334,7 @@
 
 				}
 
-			}
-			else {
+			} else {
 
 				mesh = new THREE.Mesh( geometries[ 0 ] );
 				meshes.push( mesh );
@@ -417,8 +416,7 @@
 				// Color material
 				mat.color.setHex( props.get( 1, 0xcccccc ) );
 
-			}
-			else if ( type === 2 ) {
+			} else if ( type === 2 ) {
 
 				// Bitmap material
 				var tex_addr = props.get( 2, 0 );
@@ -1133,8 +1131,7 @@
 
 				return list;
 
-			}
-			else {
+			} else {
 
 				return read_func.call( this );
 

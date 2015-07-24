@@ -279,18 +279,15 @@ THREE.AssimpJSONLoader.prototype = {
 
 							keyname = 'map';
 
-						}
-						else if ( semantic === 5 ) {
+						} else if ( semantic === 5 ) {
 
 							keyname = 'bumpMap';
 
-						}
-						else if ( semantic === 6 ) {
+						} else if ( semantic === 6 ) {
 
 							keyname = 'normalMap';
 
-						}
-						else if ( semantic === 2 ) {
+						} else if ( semantic === 2 ) {
 
 							keyname = 'specularMap';
 
@@ -320,28 +317,23 @@ THREE.AssimpJSONLoader.prototype = {
 
 				}
 
-			}
-			else if ( prop.key === '?mat.name' ) {
+			} else if ( prop.key === '?mat.name' ) {
 
 				init_props.name = prop.value;
 
-			}
-			else if ( prop.key === '$clr.diffuse' ) {
+			} else if ( prop.key === '$clr.diffuse' ) {
 
 				init_props.color = toColor( prop.value );
 
-			}
-			else if ( prop.key === '$clr.specular' ) {
+			} else if ( prop.key === '$clr.specular' ) {
 
 				init_props.specular = toColor( prop.value );
 
-			}
-			else if ( prop.key === '$clr.emissive' ) {
+			} else if ( prop.key === '$clr.emissive' ) {
 
 				init_props.emissive = toColor( prop.value );
 
-			}
-			else if ( prop.key === '$mat.shadingm' ) {
+			} else if ( prop.key === '$mat.shadingm' ) {
 
 				// aiShadingMode_Flat
 				if ( prop.value === 1 ) {
@@ -350,8 +342,7 @@ THREE.AssimpJSONLoader.prototype = {
 
 				}
 
-			}
-			else if ( prop.key === '$mat.shininess' ) {
+			} else if ( prop.key === '$mat.shininess' ) {
 
 				init_props.shininess = prop.value;
 

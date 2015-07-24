@@ -136,8 +136,7 @@ function Transition ( sceneA, sceneB ) {
 
 				}
 
-			}	
-			else
+			} else
 				this.needChange = true;
 				
 		}

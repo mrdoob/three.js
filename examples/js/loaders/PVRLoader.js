@@ -134,14 +134,12 @@ THREE.PVRLoader._parseV2 = function ( pvrDatas ) {
 		format = _hasAlpha ? THREE.RGBA_PVRTC_4BPPV1_Format : THREE.RGB_PVRTC_4BPPV1_Format;
 		bpp = 4;
 
-	}
-	else if ( formatFlags === PVRTC_2 ) {
+	} else if ( formatFlags === PVRTC_2 ) {
 
 		format = _hasAlpha ? THREE.RGBA_PVRTC_2BPPV1_Format : THREE.RGB_PVRTC_2BPPV1_Format;
 		bpp = 2;
 
-	}
-	else
+	} else
 		throw new Error( "pvrtc - unknown format " + formatFlags );
 	
 
