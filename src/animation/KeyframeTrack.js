@@ -10,12 +10,11 @@
 
 THREE.KeyframeTrack = function ( name, keys ) {
 
+	this.name = name;
 	this.keys = keys || [];	// time in seconds, value as value
 
 	// TODO: sort keys via their times
 	this.keys.sort( function( a, b ) { return a.time < b.time; } );
-
-	THREE.Track.call( this, name );
 
 };
 
