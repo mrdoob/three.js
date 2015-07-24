@@ -1047,9 +1047,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
 
-				morphInfluences[ i ] = activeInfluences[ i ][ 0 ];
+				var influence = activeInfluences[ i ];
+				morphInfluences[ i ] = influence[ 0 ];
 
-				var attribute = geometry.morphAttributes[ activeInfluences[ i ][ 1 ] ];
+				var attribute = geometry.morphAttributes[ influence[ 1 ] ];
+
+				objects.updateAttribute( attribute );
+
 				geometry.addAttribute( 'morphTarget' + i, attribute );
 
 			}

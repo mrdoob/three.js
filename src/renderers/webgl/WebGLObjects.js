@@ -194,6 +194,8 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
+	this.updateAttribute = updateAttribute;
+
 	this.clear = function () {
 
 		objects = {};
