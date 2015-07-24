@@ -178,6 +178,12 @@ THREE.BufferGeometry.prototype = {
 
 			var direct = geometry.__directGeometry;
 
+			if ( direct === undefined ) {
+
+				return this.fromGeometry( geometry );
+
+			}
+
 			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
 			direct.colorsNeedUpdate = geometry.colorsNeedUpdate;
