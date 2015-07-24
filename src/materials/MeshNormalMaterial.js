@@ -36,7 +36,7 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshNormalMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.wireframe = this.wireframe;
 	material.wireframeLinewidth = this.wireframeLinewidth;

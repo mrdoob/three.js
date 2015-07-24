@@ -7,7 +7,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 	THREE.BufferGeometry.call( this );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+	var sortFunction = function ( a, b ) { return a - b; };
 
 	var keys = [ 'a', 'b', 'c' ];
 
