@@ -93,6 +93,17 @@ THREE.PropertyBinding.prototype = {
 
 			// access a sub element of the property array (only primitives are supported right now)
 			if( this.propertyIndex !== undefined ) {
+
+ 
+				if( this.propertyName === "morphTargetInfluences" ) {
+					// support resolving morphTarget names into indices.
+					for( var i = 0; i < this.node.mesh.morphTargets.length; i ++ ) {
+						if( this.node.mesh.morphTargets[i].name === this.propertyIndex ) {
+							this.propertyIndex = i;
+							break;
+						}
+					}
+				}
 				//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
 				this.internalApply = function() {
 					nodeProperty[ this.propertyIndex ] = this.cumulativeValue;
@@ -107,6 +118,7 @@ THREE.PropertyBinding.prototype = {
 			}
 			// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
 			else {
+
 				//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
 				this.internalApply = function() {
 					targetObject[ this.propertyName ] = this.cumulativeValue;	
