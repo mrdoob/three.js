@@ -83,10 +83,14 @@ THREE.PropertyBinding.prototype = {
 THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 	// matches strings in the form of:
-	//    directory/directory/directory/filename.property[index]
+	//    nodeName.property
+	//    nodeName.property[accessor]
+	//    uuid.property[accessor]
+	//    parentName/nodeName.property
+	//    parentName/parentName/nodeName.property[index]
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w]+)(\.([\w]+)(\[([\w]+)\])?)?$/; 
+	var re = /^(([\w]+\/)*)([\w-]+)(\.([\w]+)(\[([\w]+)\])?)?$/; 
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -97,16 +101,23 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
         re.lastIndex++;
     }
 
-	var parseResults = {
+	var results = {
 		directoryName: m[0],
 		nodeName: m[2],
 		propertyName: m[4],
 		propertySubElement: m[6]
 	};
 
-	console.log( "PropertyBinding.parseTrackName", trackName, parseResults );
+	console.log( "PropertyBinding.parseTrackName", trackName, results );
 
-	return parseResults;
+	if( results.nodeName === null || results.nodeName.length === 0 ) {
+		throw new Error( "can not parse nodeName from trackName: " + trackName );
+	}
+	if( results.propertyName === null || results.propertyName.length === 0 ) {
+		throw new Error( "can not parse propertyName from trackName: " + trackName );
+	}
+
+	return results;
 
 };
 
@@ -161,7 +172,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 				var childNode = children[i];
 
-				if( childNode.name === nodeName ) {
+				if( childNode.name === nodeName || childNode.uuid === nodeName ) {
 
 					return childNode;
 
