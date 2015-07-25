@@ -22,20 +22,20 @@ THREE.AnimationClip.prototype = {
 
 	getAt: function( clipTime ) {
 
-		clipTime = Math.max( 0, Math.min( clipTime, duration ) );
+		clipTime = Math.max( 0, Math.min( clipTime, this.duration ) );
 
 		var results = {};
 
 		for( var track in this.tracks ) {
 
-			results[ track.name ] = track.getAt( time );
+			results[ track.name ] = track.getAt( clipTime );
 
 		}
 
 		return results;
 	},
-
-	importFromData: function( data ) {
+/*
+/	importFromData: function( data ) {
 
 		// TODO: Convert this copy-paste code from AnimationHandler into an importer into Tracks and AnimationClips with some improvements to the track names
 
@@ -151,7 +151,7 @@ THREE.AnimationClip.prototype = {
 
 		return data;
 
-	}
+	}*/
 };
 
 
@@ -179,7 +179,7 @@ THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration 
 		}
 
 		var morphName = morphTargetNames[i];
-		var trackName = node.name + '.morphTargetInfluences[' + morphName + ']';
+		var trackName = '.morphTargetInfluences[' + morphName + ']';
 		var track = new THREE.KeyframeTrack( trackName, keys );
 
 		tracks.push( track );

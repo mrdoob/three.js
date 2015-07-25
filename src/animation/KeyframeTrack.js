@@ -70,6 +70,6 @@ THREE.KeyframeTrack.prototype = {
 
 		throw new Error( "should never get here." );
 
-	};
+	}
 
 };

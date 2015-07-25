@@ -33,14 +33,14 @@ THREE.PropertyBinding.prototype = {
  		// ensure there is a value node
 		if( ! this.node ) {
 			console.log( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
-			continue;
+			return;
 		}
 
  		// ensure there is a value property on the node
 		var nodeProperty = this.node[ this.propertyName ];
 		if( ! nodeProperty ) {
 			console.log( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found." );				
-			continue;
+			return;
 		}
 
 		// access a sub element of the property array (only primitives are supported right now)
@@ -90,7 +90,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//    parentName/parentName/nodeName.property[index]
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-]+)(\.([\w]+)(\[([\w]+)\])?)?$/; 
+	var re = /^(([\w]+\/)*)([\w-]+)?(\.([\w]+)(\[([\w]+)\])?)?$/; 
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -102,13 +102,13 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
     }
 
 	var results = {
-		directoryName: m[0],
-		nodeName: m[2], 	// allowed to be null, specified root node.
-		propertyName: m[4],
-		propertySubElement: m[6]	// allowed to be null, specifies that the whole property is set.
+		directoryName: matches[0],
+		nodeName: matches[2], 	// allowed to be null, specified root node.
+		propertyName: matches[4],
+		propertySubElement: matches[6]	// allowed to be null, specifies that the whole property is set.
 	};
 
-	console.log( "PropertyBinding.parseTrackName", trackName, results );
+	console.log( "PropertyBinding.parseTrackName", trackName, results, matches );
 
 	if( results.propertyName === null || results.propertyName.length === 0 ) {
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
@@ -141,7 +141,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 				if( bone.name === nodeName ) {
 
-					return childNode;
+					return bone;
 
 				}
 			}
@@ -150,12 +150,12 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		};
 
-		var boneNode = searchSkeleton( root.skeleton );
+		var bone = searchSkeleton( root.skeleton );
 
-		if( boneNode ) {
+		if( bone ) {
 
 			console.log( '  bone: ' + bone.name + '.' );
-			return boneNode;
+			return bone;
 
 		}
 	}
@@ -196,7 +196,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	}
 
-	console.log( "   <null>.  No node found for name: " + name );
+	console.log( "   <null>.  No node found for name: " + nodeName );
 
 	return null;
 }

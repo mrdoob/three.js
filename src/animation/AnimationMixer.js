@@ -77,7 +77,7 @@ THREE.AnimationMixer.prototype = {
 				else {
 
 					var lerpAlpha = action.weight / ( mixerResult.cumulativeWeight + action.weight );
-					mixerResult.cumulativeValue = AnimationUtils.lerp( mixerResult.cumulativeValue, result.value, lerpAlpha );
+					mixerResult.cumulativeValue = AnimationUtils.lerp( mixerResult.cumulativeValue, actionResult.value, lerpAlpha );
 					mixerResult.cumulativeWeight += action.weight;
 
 				}
