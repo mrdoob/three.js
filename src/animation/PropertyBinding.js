@@ -17,7 +17,7 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 	this.nodeName = parseResults.nodeName;
 	this.material = parseResults.material;
 	this.propertyName = parseResults.propertyName || null;
-	this.propertyArrayIndex = parseResults.propertyArrayIndex || -1;
+	this.propertySubElement = parseResults.propertySubElement || -1;
 
 	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName );
 
@@ -51,9 +51,9 @@ THREE.PropertyBinding.prototype = {
 		}
 
 		// access a sub element of the property array (only primitives are supported right now)
-		if( this.propertyArrayIndex >= 0 ) {
-			console.log( '  update property array ' + this.propertyName + '[' + this.propertyArrayIndex + '] via assignment.' );				
-			nodeProperty[ this.propertyArrayIndex ] = value;
+		if( ( this.propertySubElement.length && this.propertySubElement.length > 0 ) || this.propertySubElement >= 0 ) {
+			console.log( '  update property array ' + this.propertyName + '[' + this.propertySubElement + '] via assignment.' );				
+			nodeProperty[ this.propertySubElement ] = value;
 		}
 		// must use copy for Object3D.Euler/Quaternion		
 		else if( nodeProperty.copy ) {

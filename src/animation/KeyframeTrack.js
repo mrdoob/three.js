@@ -14,7 +14,7 @@ THREE.KeyframeTrack = function ( name, keys ) {
 	this.keys = keys || [];	// time in seconds, value as value
 
 	// TODO: sort keys via their times
-	this.keys.sort( function( a, b ) { return a.time < b.time; } );
+	//this.keys.sort( function( a, b ) { return a.time < b.time; } );
 
 };
 
@@ -27,6 +27,7 @@ THREE.KeyframeTrack.prototype = {
 
 		if( this.keys.length == 0 ) throw new Error( "no keys in track named " + this.name );
 		
+		console.log( "keys", this.keys );
 		// before the start of the track, return the first key value
 		if( this.keys[0].time >= time ) {
 

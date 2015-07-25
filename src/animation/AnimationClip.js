@@ -211,6 +211,23 @@ THREE.AnimationClip.CreateRotationAnimation = function( period, axis ) {
 	return clip;
 };
 
+THREE.AnimationClip.CreateScaleAxisAnimation = function( period, axis ) {
+
+	var keys = [];
+	keys.push( { time: 0, value: 0 } );
+	keys.push( { time: period, value: 360 } );
+
+	axis = axis || 'x';
+	var trackName = '.scale[' + axis + ']';
+
+	var track = new THREE.KeyframeTrack( trackName, keys );
+
+	var clip = new THREE.AnimationClip( 'scale.x', 10, [ track ] );
+	console.log( 'scaleClip', clip );
+
+	return clip;
+};
+
 THREE.AnimationClip.CreateShakeAnimation = function( duration, shakeScale ) {
 
 	var keys = [];
@@ -228,14 +245,14 @@ THREE.AnimationClip.CreateShakeAnimation = function( duration, shakeScale ) {
 
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
-	var clip = new THREE.AnimationClip( 'shake' + duration, trackName, [ track ] );
+	var clip = new THREE.AnimationClip( 'shake' + duration, duration, [ track ] );
 	console.log( 'shakeClip', clip );
 
 	return clip;
 };
 
 
-THREE.AnimationClip.CreatePulsationAnimation = function( node, duration, pulseScale ) {
+THREE.AnimationClip.CreatePulsationAnimation = function( duration, pulseScale ) {
 
 	var keys = [];
 
@@ -249,11 +266,11 @@ THREE.AnimationClip.CreatePulsationAnimation = function( node, duration, pulseSc
 
 	}
 
-	var trackName = node.name + '.scale';
+	var trackName = '.scale';
 
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
-	var clip = new THREE.AnimationClip( 'scale' + duration, trackName, [ track ] );
+	var clip = new THREE.AnimationClip( 'scale' + duration, duration, [ track ] );
 	console.log( 'scaleClip', clip );
 
 	return clip;

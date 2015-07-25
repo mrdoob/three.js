@@ -258,9 +258,13 @@
 
 				mixer = new THREE.AnimationMixer( mesh );
 
-				var rotateClip = THREE.AnimationClip.CreateRotationAnimation( 10 );
+				//var clip = THREE.AnimationClip.CreateShakeAnimation( 10, new THREE.Vector3( 10, 10, 10 ) );
+				//var clip = THREE.AnimationClip.CreatePulsationAnimation( 10, 100 );
+				//var clip = THREE.AnimationClip.CreateRotationAnimation( 10, 'x' );
+				var clip = THREE.AnimationClip.CreateScaleAxisAnimation( 10, 'x' );
 
-				mixer.addAction( new THREE.AnimationAction( rotateClip, 0, 1, 1, true ) );
+
+				mixer.addAction( new THREE.AnimationAction( clip, 0, 1, 1, true ) );
 
 			}
 
