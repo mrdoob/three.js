@@ -15,6 +15,7 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 
 	this.directoryName = parseResults.directoryName || null;
 	this.nodeName = parseResults.nodeName;
+	this.material = parseResults.material;
 	this.propertyName = parseResults.propertyName || null;
 	this.propertyArrayIndex = parseResults.propertyArrayIndex || -1;
 
@@ -30,14 +31,20 @@ THREE.PropertyBinding.prototype = {
 
 		 console.log( "PropertyBinding.set( " + value + ")" );
 
+		 var targetObject = this.node;
+
  		// ensure there is a value node
-		if( ! this.node ) {
+		if( ! targetObject ) {
 			console.log( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
 			return;
 		}
 
+		if( this.material ) {
+			targetObject = targetObject.material;
+		}
+
  		// ensure there is a value property on the node
-		var nodeProperty = this.node[ this.propertyName ];
+		var nodeProperty = targetObject[ this.propertyName ];
 		if( ! nodeProperty ) {
 			console.log( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", this );				
 			return;
@@ -56,17 +63,17 @@ THREE.PropertyBinding.prototype = {
 		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
 		else {
 			console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
-			this.node[ this.propertyName ] = value;	
+			targetObject[ this.propertyName ] = value;	
 		}
 
 		// trigger node dirty			
-		if( this.node.needsUpdate !== undefined ) { // material
+		if( targetObject.needsUpdate !== undefined ) { // material
 			console.log( '  triggering material as dirty' );
 			this.node.needsUpdate = true;
 		}			
-		if( this.node.matrixWorldNeedsUpdate !== undefined ) { // node transform
+		if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
 			console.log( '  triggering node as dirty' );
-			this.node.matrixWorldNeedsUpdate = true;
+			targetObject.matrixWorldNeedsUpdate = true;
 		}
 
 	},
@@ -85,12 +92,14 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	// matches strings in the form of:
 	//    nodeName.property
 	//    nodeName.property[accessor]
+	//    nodeName.material.property[accessor]
 	//    uuid.property[accessor]
+	//    uuid.material.property[accessor]
 	//    parentName/nodeName.property
 	//    parentName/parentName/nodeName.property[index]
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-]+)?(\.([\w]+)(\[([\w]+)\])?)?$/; 
+	var re = /^(([\w]+\/)*)([\w-]+)?(\.material)?(\.([\w]+)(\[([\w]+)\])?)?$/; 
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -104,8 +113,9 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	var results = {
 		directoryName: matches[0],
 		nodeName: matches[3], 	// allowed to be null, specified root node.
-		propertyName: matches[5],
-		propertySubElement: matches[7]	// allowed to be null, specifies that the whole property is set.
+		material: ( matches[4] && matches[4].length > 0 ),
+		propertyName: matches[6],
+		propertySubElement: matches[8]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	console.log( "PropertyBinding.parseTrackName", trackName, results, matches );
