@@ -60,15 +60,18 @@ THREE.MeshPhongMaterial.prototype.__defineGetter__("__webglShader", function(){
 
 // Local Animation
 THREE.Object3D.prototype.UPDATEMATRIXWORLD = THREE.Mesh.prototype.updateMatrixWorld;
-THREE.Object3D.prototype.updateMatrixWorld = function(force) {
+THREE.Object3D.prototype.updateMatrixWorld = function( updateChildren, updateParents ) {
 	if (this.animateMatrix) {
-		this.UPDATEMATRIXWORLD(force);
+		this.UPDATEMATRIXWORLD( updateChildren, updateParents );
 		
 		this.animateMatrix.compose( this.animatePosition, this.animateQuaternion, this.animateScale );
 		
-		this.matrixWorld.multiplyMatrices( this.matrixWorld, this.animateMatrix );
+		this._matrixWorld.multiplyMatrices( this._matrixWorld, this.animateMatrix );
 	}
-	else this.UPDATEMATRIXWORLD(force);
+	else this.UPDATEMATRIXWORLD();
+
+	return this._matrixWorld;
+	
 }
 
 THREE.Object3D.prototype.setAnimateMatrix = function(val) {
@@ -86,9 +89,7 @@ THREE.Object3D.prototype.setAnimateMatrix = function(val) {
 		delete this.animatePosition;
 		delete this.animateQuaternion;
 		delete this.animateScale;		
-	}	
-	
-	this.matrixWorldNeedsUpdate = true;
+	}
 }
  
 THREE.Object3D.prototype.getAnimateMatrix = function() {
@@ -572,7 +573,6 @@ THREE.SEA3D.prototype.updateMatrix = function(obj3d) {
 	
 	// convert to global
 	
-	obj3d.updateMatrixWorld();
 	buf.copy( obj3d.matrixWorld );
 	
 	this.flipMatrixScale( buf ); // flip matrix
@@ -612,7 +612,6 @@ THREE.SEA3D.prototype.updateTransform = function(obj3d, sea) {
 	// optimize if is static
 	
 	if (sea.isStatic) {
-		obj3d.updateMatrixWorld();
 		obj3d.matrixAutoUpdate = false;		
 	} 			
 }
@@ -910,8 +909,6 @@ THREE.SEA3D.Object3DAnimator.prototype.updateAnimationFrame = function(frame, ki
 				this.object3d.animateScale.set(v.x, v.y, v.z);
 				break;
 		}
-		
-		this.object3d.matrixWorldNeedsUpdate = true;
 	} else {
 		switch(kind) {
 			case SEA3D.Animation.POSITION:					

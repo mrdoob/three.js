@@ -65,7 +65,7 @@ THREE.Object3D = function () {
 	this._matrixWorld = new THREE.Matrix4();
 
 	this.matrixAutoUpdate = true;
-	this.matrixWorldNeedsUpdate = false;
+	this._matrixWorldNeedsUpdate = false;
 
 	this.visible = true;
 
@@ -603,7 +603,7 @@ THREE.Object3D.prototype = {
 		
 		function updateMatrixWorldNeedsUpdate( o ) {
 			
-			o.matrixWorldNeedsUpdate = true;
+			o._matrixWorldNeedsUpdate = true;
 			
 		};
 		
@@ -638,14 +638,14 @@ THREE.Object3D.prototype = {
 			
 		} else {
 			
-			this.matrixWorldNeedsUpdate = true;
+			this._matrixWorldNeedsUpdate = true;
 			
 		} 
 		
 		if ( parent === undefined ) {
 
 			// update own matrixWOrld
-			if ( this.matrixWorldNeedsUpdate === true ) {
+			if ( this._matrixWorldNeedsUpdate === true ) {
 				
 				this._matrixWorld.copy( this._matrix );
 				
@@ -658,10 +658,10 @@ THREE.Object3D.prototype = {
 
 				parent.updateMatrixWorld( );
 
-			};
+			}
 			
 			// update own matrixWOrld
-			if ( this.matrixWorldNeedsUpdate === true ) {
+			if ( this._matrixWorldNeedsUpdate === true ) {
 	
 				this._matrixWorld.multiplyMatrices( parent._matrixWorld, this._matrix );
 				
@@ -669,7 +669,7 @@ THREE.Object3D.prototype = {
 
 		}
 		
-		this.matrixWorldNeedsUpdate = false;
+		this._matrixWorldNeedsUpdate = false;
 
 		// update children
 		if ( updateChildren === true ) { 
@@ -801,7 +801,7 @@ THREE.Object3D.prototype = {
 		this.matrixWorld.copy( source.matrixWorld );
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
+		this._matrixWorldNeedsUpdate = source._matrixWorldNeedsUpdate;
 
 		this.visible = source.visible;
 
