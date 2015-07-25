@@ -6,29 +6,29 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.TrackBinding = function ( rootNode, trackName ) {
+THREE.PropertyBinding = function ( rootNode, trackName ) {
 
 	this.rootNode = rootNode;
 	this.trackName = trackName;
 
-	var parseResults = THREE.TrackBinding.parseTrackName( trackName );
+	var parseResults = THREE.PropertyBinding.parseTrackName( trackName );
 
 	this.directoryName = parseResults.directoryName || null;
 	this.nodeName = parseResults.nodeName;
 	this.propertyName = parseResults.propertyName || null;
 	this.propertyArrayIndex = parseResults.propertyArrayIndex || -1;
 
-	this.node = THREE.TrackBinding.findNode( rootNode, this.nodeName );
+	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName );
 
 };
 
-THREE.TrackBinding.prototype = {
+THREE.PropertyBinding.prototype = {
 
-	constructor: THREE.TrackBinding,
+	constructor: THREE.PropertyBinding,
 
 	set: function( value ) {
 
-		 console.log( "TrackBinding.set( " + value + ")" );
+		 console.log( "PropertyBinding.set( " + value + ")" );
 
  		// ensure there is a value node
 		if( ! this.node ) {
@@ -80,7 +80,7 @@ THREE.TrackBinding.prototype = {
 };
 
 
-THREE.TrackBinding.parseTrackName = function( trackName ) {
+THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 	// matches strings in the form of:
 	//    directory/directory/directory/filename.property[index]
@@ -104,14 +104,14 @@ THREE.TrackBinding.parseTrackName = function( trackName ) {
 		propertySubElement: m[6]
 	};
 
-	console.log( "TrackBinding.parseTrackName", trackName, parseResults );
+	console.log( "PropertyBinding.parseTrackName", trackName, parseResults );
 
 	return parseResults;
 
 };
 
 // TODO: Cache this at some point
-THREE.TrackBinding.findNode = function( root, nodeName ) {
+THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')');
 	

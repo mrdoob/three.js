@@ -12,7 +12,7 @@ THREE.AnimationMixer = function( root ) {
 
 	this.root = root;
 	this.actions = [];
-	this.trackBindings = {};
+	this.propertyBindings = {};
 
 };
 
@@ -26,8 +26,11 @@ THREE.AnimationMixer.prototype = {
 		this.actions.push( action );
 
 		for( var track in action.tracks ) {
-			if( ! this.trackBindings[track.name] ) {
-				this.trackBindings[track.name] = new THREE.TrackBinding( this.root, track.name );
+
+			if( ! this.propertyBindings[ track.name ] ) {
+			
+				this.propertyBindings[ track.name ] = new THREE.PropertyBinding( this.root, track.name );
+			
 			}
 		}
 
@@ -58,33 +61,38 @@ THREE.AnimationMixer.prototype = {
 
 			var actionResults = action.getAt( time );
 
-			for( var j = 0; j < actionResults.length; j ++ ) {
+			for( var actionResult in actionResults ) {
 
-				var actionResult = actionResults[j];
+				var mixerResult = mixerResults[actionResult.name];
 
-				// TODO: do iterative linear interpolator based on cumulative weight ratios
-				if( ! mixerResults[ actionResult.name ] ) {
+				if( ! mixerResult ) {
 
 					mixerResults[actionResult.name] = {
-						name: actionResult.name
+						name: actionResult.name,
+						cumulativeValue: actionResult.value,
+						cumulativeWeight: action.weight
 					};
+
 				}
+				else {
 
-				mixerResults[actionResult.name].value = result.value;
+					var lerpAlpha = action.weight / ( mixerResult.cumulativeWeight + action.weight );
+					mixerResult.cumulativeValue = AnimationUtils.lerp( mixerResult.cumulativeValue, result.value, lerpAlpha );
+					mixerResult.cumulativeWeight += action.weight;
 
+				}
 			}
 
 		}
 	    console.log( "  mixerResults: ", mixerResults );
 	
-
 		// apply to nodes
 		for ( var name in mixerResults ) {
 
 			var mixerResult = mixerResults[ name ];
 
-			var trackBinding = this.trackBindings[ name ];
-			trackBinding.set( mixerResult.value );
+			var propertyBinding = this.propertyBindings[ name ];
+			propertyBinding.set( mixerResult.value );
 			
 		}
 	}

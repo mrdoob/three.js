@@ -8,11 +8,11 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationClip = function ( name, duration, tracks ) {
+THREE.AnimationClip = function ( name, tracks, duration ) {
 
-	this.name = name || "";
-	this.duration = duration || 0;
-	this.tracks = tracks || [];
+	this.name = name;
+	this.tracks = tracks;
+	this.duration = duration;
 
 };
 
@@ -22,13 +22,13 @@ THREE.AnimationClip.prototype = {
 
 	getAt: function( clipTime ) {
 
-		var results = [];
+		clipTime = Math.max( 0, Math.min( clipTime, duration ) );
 
-		for( var i = 0; i < this.tracks.length; i ++ ) {
+		var results = {};
 
-			var track = this.tracks[i];
+		for( var track in this.tracks ) {
 
-			results.push( { name: track.name, value: this.getAt( time ) } );
+			results[ track.name ] = track.getAt( time );
 
 		}
 
@@ -161,21 +161,67 @@ THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration 
 	//  - one track per morphTarget name.
 };
 
-THREE.AnimationClip.CreateRotationAnimation = function( node, period ) {
-	// TODO
-	//  - create a single track representing the rotation
-	//  - create a few quaternion keys representing the rotation path
+THREE.AnimationClip.CreateRotationAnimation = function( node, period, axis ) {
+
+	var keys = [];
+	keys.push( { time: 0, value: 0 } );
+	keys.push( { time: period, value: 360 } );
+
+	axis = axis || 'x';
+	var trackName = node.name + '.rotation[' + axis + ']';
+
+	var track = new THREE.KeyframeTrack( trackName, keys );
+
+	var clip = new THREE.AnimationClip( 'rotate.x', 10, [ track ] );
+	console.log( 'rotateClip', clip );
+
+	return clip;
 };
 
 THREE.AnimationClip.CreateShakeAnimation = function( node, duration, shakeScale ) {
-	// TODO
-	//  - create a single track representing the shake
-	//  - multiple random vector by shake scalar/vector
+
+	var keys = [];
+
+	for( var i = 0; i < duration * 10; i ++ ) {
+
+		keys.push( { 
+			time: ( i / 10.0 ),
+			value: new THREE.Vector3( Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0 ).multiply( shakeScale )
+		} );
+
+	}
+
+	var trackName = node.name + '.position';
+
+	var track = new THREE.KeyframeTrack( trackName, keys );
+
+	var clip = new THREE.AnimationClip( 'shake' + duration, trackName, [ track ] );
+	console.log( 'shakeClip', clip );
+
+	return clip;
 };
 
 
 THREE.AnimationClip.CreatePulsationAnimation = function( node, duration, pulseScale ) {
-	// TODO
-	//  - create a single track representing the shake
-	//  - multiple random vector by pulse scalar/vector
+
+	var keys = [];
+
+	for( var i = 0; i < duration * 10; i ++ ) {
+
+		var scaleFactor = Math.random() * pulseScale;
+		keys.push( {
+			time: ( i / 10.0 ),
+			value: new THREE.Vector3( scaleFactor, scaleFactor, scaleFactor )
+		} );
+
+	}
+
+	var trackName = node.name + '.scale';
+
+	var track = new THREE.KeyframeTrack( trackName, keys );
+
+	var clip = new THREE.AnimationClip( 'scale' + duration, trackName, [ track ] );
+	console.log( 'scaleClip', clip );
+
+	return clip;
 };
