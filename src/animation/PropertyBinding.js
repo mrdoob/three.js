@@ -79,31 +79,70 @@ THREE.PropertyBinding.prototype = {
 						targetObject = targetObject.materials[ this.materialIndex ];
 					}
 					else {
-						console.error( "  trying to submaterial via index, but no materials exist:", targetObject );				
+						console.error( "  trying to submaterial via index, but no materials exist:", targetObject );
+						return;				
 					}
 				}
 			}
 
-	 		// ensure there is a value property on the node
-			var nodeProperty = targetObject[ this.propertyName ];
-			if( ! nodeProperty ) {
-				console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
-				return;
+	 		// special case mappings
+	 		var nodeProperty = null;
+			if( this.propertyName === "materials" ) {
+				if( ! targetObject.material ) {
+					console.error( '  can not bind to material as node does not have a material', this );
+					return;				
+				}
+				if( ! targetObject.material.materials ) {
+					console.error( '  can not bind to material.materials as node.material does not have a materials array', this );
+					return;				
+				}
+				nodeProperty = targetObject.material.materials;
+			}
+			if( this.propertyName === "bones" ) {
+				if( ! targetObject.skeleton ) {
+					console.error( '  can not bind to bones as node does not have a skeleton', this );
+				}
+				nodeProperty = targetObject.skeleton.bones;
+			}
+			else {
+				nodeProperty = targetObject[ this.propertyName ];
+				if( ! nodeProperty ) {
+					console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+					return;
+				}
 			}
 
 			// access a sub element of the property array (only primitives are supported right now)
 			if( this.propertyIndex !== undefined ) {
 
- 
 				if( this.propertyName === "morphTargetInfluences" ) {
+					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+					
 					// support resolving morphTarget names into indices.
-					for( var i = 0; i < this.node.mesh.morphTargets.length; i ++ ) {
-						if( this.node.mesh.morphTargets[i].name === this.propertyIndex ) {
+					console.log( "  resolving morphTargetInfluence name: ", this.propertyIndex );
+					for( var i = 0; i < this.node.morphTargets.length; i ++ ) {
+						if( this.node.morphTargets[i].name === this.propertyIndex ) {
+							console.log( "  resolved to index: ", i );
 							this.propertyIndex = i;
 							break;
 						}
 					}
 				}
+				else if( this.propertyName === "bones" ) {
+					// TODO/OPTIMIZE, skip this if propertyIndex is already an integer, and convert the integer string to a true integer.
+					
+					// support resolving morphTarget names into indices.
+					console.log( "  resolving bone name: ", this.propertyIndex );
+					for( var i = 0; i < this.node.skeleton.bones.length; i ++ ) {
+						if( this.node.skeleton.bones[i].name === this.propertyIndex ) {
+							console.log( "  resolved to index: ", i );
+							this.propertyIndex = i;
+							break;
+						}
+					}
+				}
+
+
 				//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
 				this.internalApply = function() {
 					nodeProperty[ this.propertyIndex ] = this.cumulativeValue;

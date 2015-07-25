@@ -279,6 +279,30 @@ THREE.AnimationClip.CreatePulsationAnimation = function( duration, pulseScale ) 
 };
 
 
+THREE.AnimationClip.CreateVisibilityAnimation = function( duration ) {
+
+	var keys = [];
+
+	for( var i = 0; i < duration * 10; i ++ ) {
+
+		keys.push( {
+			time: ( i / 10.0 ),
+			value: ( Math.random() > 0.5 )
+		} );
+
+	}
+
+	var trackName = '.visibility';
+
+	var track = new THREE.KeyframeTrack( trackName, keys );
+
+	var clip = new THREE.AnimationClip( 'visibility' + duration, duration, [ track ] );
+	//console.log( 'scaleClip', clip );
+
+	return clip;
+};
+
+
 THREE.AnimationClip.CreateMaterialColorAnimation = function( duration, colors, loop ) {
 
 	var timeStep = duration / colors.length;

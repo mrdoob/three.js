@@ -5,23 +5,47 @@
 
  THREE.AnimationUtils = {
 
- 	lerp: function( a, b, alpha ) {
+ 	getLerpFunc: function( accumulator, b, alpha, interTrack ) {
 
-		if( a.lerp ) {
+		
+		var typeName = typeof true;
+		switch( typeName ) {
+		 	case "object": {
 
-			return a.clone().lerp( b, alpha );
+				if( accumulator.lerp ) {
 
-		}
-		else if( a.slerp ) {
+					return accumulator.lerp( b, alpha );
 
-			return a.clone().lerp( b, alpha );
+				}
+				if( accumulator.slerp ) {
 
-		}
-		else {
+					return accumulator.lerp( b, alpha );
 
-			return a * ( 1 - alpha ) + b * alpha;
-			
-		}
+				}
+				break;
+			}
+		 	case "number": {
+				return accumulator * ( 1 - alpha ) + b * alpha;
+		 	}	
+		 	case "boolean": {
+		 		if( interTrack ) {
+		 			return ( alpha < 0.5 ) ? accumulator : b;
+		 		}
+		 		else {
+		 			return accumulator;
+		 		}
+		 	}
+		 	case "string": {
+		 		if( interTrack ) {
+		 			return ( alpha < 0.5 ) ? accumulator : b;
+		 		}
+		 		else {
+			 		return accumulator;		 		
+			 	}
+		 	}
+		};
+
+
 	}
 	
 };
