@@ -103,9 +103,9 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 	var results = {
 		directoryName: m[0],
-		nodeName: m[2],
-		propertyName: m[4],	// allowed to be null, specified root node.
-		propertySubElement: m[6]
+		nodeName: m[2], 	// allowed to be null, specified root node.
+		propertyName: m[4],
+		propertySubElement: m[6]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	console.log( "PropertyBinding.parseTrackName", trackName, results );

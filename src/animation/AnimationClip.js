@@ -156,9 +156,39 @@ THREE.AnimationClip.prototype = {
 
 
 THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration ) {
-	// TODO
-	//  - should create three keys per morphTarget track.
-	//  - one track per morphTarget name.
+
+	var tracks = [];
+	var frameStep = duration / morphTargetNames;
+
+	for( var i = 0; i < morphTargetNames.length; i ++ ) {
+
+		var keys = [];
+
+		if( ( i - 1 ) >= 0 ) {
+
+			keys.push( { time: ( i - 1 ) * frameStep, value: 0 } );
+
+		}
+
+		keys.push( { time: i * frameStep, value: 1 } );
+
+		if( ( i + 1 ) <= morphTargetNames.length ) {
+
+			keys.push( { time: ( i + 1 ) * frameStep, value: 0 } );
+
+		}
+
+		var morphName = morphTargetNames[i];
+		var trackName = node.name + '.morphTargetInfluences[' + morphName + ']';
+		var track = new THREE.KeyframeTrack( trackName, keys );
+
+		tracks.push( track );
+	}
+
+	var clip = new THREE.AnimationClip( 'morphAnimation', duration, tracks );
+	console.log( 'morphAnimationClip', clip );
+
+	return clip;
 };
 
 THREE.AnimationClip.CreateRotationAnimation = function( node, period, axis ) {
