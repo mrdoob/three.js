@@ -21,8 +21,6 @@ THREE.Euler.prototype = {
 
 	constructor: THREE.Euler,
 
-	_x: 0, _y: 0, _z: 0, _order: THREE.Euler.DefaultOrder,
-
 	get x () {
 
 		return this._x;

@@ -18,8 +18,6 @@ THREE.Quaternion.prototype = {
 
 	constructor: THREE.Quaternion,
 
-	_x: 0, _y: 0, _z: 0, _w: 0,
-
 	get x () {
 
 		return this._x;
