@@ -23,13 +23,15 @@
 
 		<div>
 		canvas — A [page:Canvas] where the renderer draws its output.<br />
-		precision — shader precision. Can be *"highp"*, *"mediump"* or *"lowp"*.<br />
+		context — The [page:RenderingContext] context to use.<br />
+		precision — Shader precision. Can be *"highp"*, *"mediump"* or *"lowp"*. Defaults to *"highp"* if supported by the device.<br />
 		alpha — [page:Boolean], default is *false*.<br />
 		premultipliedAlpha — [page:Boolean], default is *true*.<br />
 		antialias — [page:Boolean], default is *false*.<br />
 		stencil — [page:Boolean], default is *true*.<br />
 		preserveDrawingBuffer — [page:Boolean], default is *false*.<br />
-		maxLights — [page:Integer], default is *4*.<br />
+		depth — [page:Boolean], default is *true*.<br />
+		logarithmicDepthBuffer — [page:Boolean], default is *false*.<br />
 		</div>
 
 		<h2>Properties</h2>
@@ -69,10 +71,6 @@
 
 		<div>Note: Sorting is used to attempt to properly render objects that have some degree of transparency.  By definition, sorting objects may not work in all cases.  Depending on the needs of application, it may be neccessary to turn off sorting and use other methods to deal with transparency rendering e.g. manually determining the object rendering order.</div>
 
-
-		<h3>[property:Boolean autoUpdateObjects]</h3>
-
-		<div>Defines whether the renderer should auto update objects. Default is true.</div>
 
 		<h3>[property:Boolean gammaInput]</h3>
 
