@@ -59,6 +59,7 @@ THREE.PropertyBinding.prototype = {
 
 	apply: function() {
 
+		// for speed capture the setter pattern as a closure.
 		if( ! this.internalApply ) {
 
 			 //console.log( "PropertyBinding.set( " + value + ")" );
@@ -125,9 +126,6 @@ THREE.PropertyBinding.prototype = {
 					targetObject.matrixWorldNeedsUpdate = true;
 				}
 			}
-			else {
-				this.triggerDirty = function() {};
-			}
 
 		}
 
@@ -137,9 +135,10 @@ THREE.PropertyBinding.prototype = {
 		}
 
 		this.internalApply();
-		this.triggerDirty();
-	
 
+		if( this.triggerDirty ) {
+			this.triggerDirty();
+		}
 	},
 
 	get: function() {
