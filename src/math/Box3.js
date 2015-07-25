@@ -65,13 +65,12 @@ THREE.Box3.prototype = {
 
 			var scope = this;
 
-			object.updateMatrixWorld( true );
-
 			this.makeEmpty();
 
 			object.traverse( function ( node ) {
 
 				var geometry = node.geometry;
+				var matrixWorld = node.matrixWorld;
 
 				if ( geometry !== undefined ) {
 
@@ -83,7 +82,7 @@ THREE.Box3.prototype = {
 
 							v1.copy( vertices[ i ] );
 
-							v1.applyMatrix4( node.matrixWorld );
+							v1.applyMatrix4( matrixWorld );
 
 							scope.expandByPoint( v1 );
 
@@ -97,7 +96,7 @@ THREE.Box3.prototype = {
 
 							v1.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
-							v1.applyMatrix4( node.matrixWorld );
+							v1.applyMatrix4( matrixWorld );
 
 							scope.expandByPoint( v1 );
 

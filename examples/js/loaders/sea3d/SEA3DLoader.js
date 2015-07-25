@@ -68,7 +68,7 @@ THREE.Object3D.prototype.updateMatrixWorld = function( updateChildren, updatePar
 		
 		this._matrixWorld.multiplyMatrices( this._matrixWorld, this.animateMatrix );
 	}
-	else this.UPDATEMATRIXWORLD();
+	else this.UPDATEMATRIXWORLD( updateChildren, updateParents );
 
 	return this._matrixWorld;
 	
