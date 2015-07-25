@@ -13,7 +13,6 @@ THREE.DirectGeometry = function () {
 
 	this.indices = [];
 	this.vertices = [];
-	this.colors = [];
 	this.normals = [];
 	this.colors = [];
 	this.uvs = [];
