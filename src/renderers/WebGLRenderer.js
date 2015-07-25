@@ -1066,6 +1066,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			updateBuffers = true;
+
 		}
 
 		if ( object instanceof THREE.Mesh ) {
