@@ -25,8 +25,10 @@ THREE.AnimationMixer.prototype = {
 
 		this.actions.push( action );
 
-		for( var track in action.tracks ) {
 
+		for( var trackID in action.clip.tracks ) {
+
+			var track = action.clip.tracks[ trackID ];
 			if( ! this.propertyBindings[ track.name ] ) {
 			
 				this.propertyBindings[ track.name ] = new THREE.PropertyBinding( this.root, track.name );

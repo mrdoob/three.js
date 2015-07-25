@@ -39,7 +39,7 @@ THREE.PropertyBinding.prototype = {
  		// ensure there is a value property on the node
 		var nodeProperty = this.node[ this.propertyName ];
 		if( ! nodeProperty ) {
-			console.log( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found." );				
+			console.log( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", this );				
 			return;
 		}
 
@@ -60,11 +60,11 @@ THREE.PropertyBinding.prototype = {
 		}
 
 		// trigger node dirty			
-		if( this.node.needsUpdate ) { // material
+		if( this.node.needsUpdate !== undefined ) { // material
 			console.log( '  triggering material as dirty' );
 			this.node.needsUpdate = true;
 		}			
-		if( this.node.matrixWorldNeedsUpdate && ! this.node.matrixAutoUpdate ) { // node transform
+		if( this.node.matrixWorldNeedsUpdate !== undefined ) { // node transform
 			console.log( '  triggering node as dirty' );
 			this.node.matrixWorldNeedsUpdate = true;
 		}
@@ -103,9 +103,9 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 
 	var results = {
 		directoryName: matches[0],
-		nodeName: matches[2], 	// allowed to be null, specified root node.
-		propertyName: matches[4],
-		propertySubElement: matches[6]	// allowed to be null, specifies that the whole property is set.
+		nodeName: matches[3], 	// allowed to be null, specified root node.
+		propertyName: matches[5],
+		propertySubElement: matches[7]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	console.log( "PropertyBinding.parseTrackName", trackName, results, matches );

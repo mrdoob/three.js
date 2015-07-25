@@ -15,7 +15,6 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.loop = loop || clip.loop || false;
 	this.enabled = true;	// allow for easy disabling of the action.
 
-	this.cache = {}; // track name, track, last evaluated time, last evaluated value (with weight included), keyIndex.
 };
 
 THREE.AnimationAction.prototype = {
