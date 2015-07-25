@@ -33,7 +33,7 @@ if ( typeof module === 'object' ) {
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
 			var id = self.setTimeout( function () {
 
-				callback( currTime + timeToCall )
+				callback( currTime + timeToCall );
 
 			}, timeToCall );
 			lastTime = currTime + timeToCall;
@@ -47,7 +47,7 @@ if ( typeof module === 'object' ) {
 
 		self.cancelAnimationFrame = function ( id ) {
 
-			self.clearTimeout( id )
+			self.clearTimeout( id );
 
 		};
 

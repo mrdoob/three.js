@@ -338,7 +338,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			for ( j = 1; j <= n; j ++ ) {
 
-				points.push( spline.getPointAt( j / n ) ) ;
+				points.push( spline.getPointAt( j / n ) );
 
 			}
 
