@@ -902,9 +902,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometryAttribute !== undefined ) {
 
-					var size = geometryAttribute.itemSize;
 					state.enableAttribute( programAttribute );
 
+					var size = geometryAttribute.itemSize;
 					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
 					if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
@@ -1051,14 +1051,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var influence = activeInfluences[ i ];
 				morphInfluences[ i ] = influence[ 0 ];
 
-
 				if ( influence[ 0 ] !== 0 ) {
 
 					var attribute = geometry.morphAttributes[ influence[ 1 ] ];
 
-					objects.updateAttribute( attribute );
-
 					geometry.addAttribute( 'morphTarget' + i, attribute );
+
+				} else {
+
+					geometry.removeAttribute( 'morphTarget' + i );
 
 				}
 

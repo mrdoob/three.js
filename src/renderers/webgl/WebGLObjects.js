@@ -87,13 +87,21 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		//
-
 		var attributes = geometry.attributes;
 
 		for ( var name in attributes ) {
 
 			updateAttribute( attributes[ name ], name );
+
+		}
+
+		// morph targets
+
+		var morphAttributes = geometry.morphAttributes;
+
+		for ( var i = 0, l = morphAttributes.length; i < l; i ++ ) {
+
+			updateAttribute( morphAttributes[ i ], i );
 
 		}
 
@@ -195,8 +203,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		}
 
 	};
-
-	this.updateAttribute = updateAttribute;
 
 	this.clear = function () {
 
