@@ -17,7 +17,7 @@ Sidebar.Geometry.Modifiers = function ( signals, object ) {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			geometry.attributes.normal.needsUpdate = true;
+			geometry.attributes.normal.setNeedsUpdate();
 
 		} else {
 

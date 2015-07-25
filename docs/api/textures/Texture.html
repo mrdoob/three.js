@@ -53,7 +53,7 @@
 		<div>
 		The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.
 		</div>
-		
+
 		<div>
 		NOTE: tiling of images in textures only functions if image dimensions are powers of two (2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, ...) in terms of pixels. Individual dimensions need not be equal, but each must be a power of two. This is a limitation of WebGL, not Three.js.
 		</div>
@@ -85,7 +85,13 @@
 
 		<h3>[property:boolean needsUpdate]</h3>
 		<div>
-		If a texture is changed after creation, set this flag to true so that the texture is properly set up. Particularly important for setting the wrap mode.
+		If a texture is changed after creation, set this flag to true so that the texture is properly set up. Particularly important for setting the wrap mode.<br/>
+		This property is deprecated---instead, you should use the [page:BufferAttribute.setNeedsUpdate setNeedsUpdate] method.
+		</div>
+
+		<h3>[property:Integer version]</h3>
+		<div>
+		A version number, incremented every time the [page:Texture.setNeedsUpdate setNeedsUpdate] method is called.
 		</div>
 
 		<h3>[property:Vector2 repeat]</h3>
@@ -137,6 +143,11 @@
 		<h2>Methods</h2>
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
+		<h3>[method:null setNeedsUpdate]() </h3>
+		<div>
+		Increases the version number for the texture, indicating that this texture has changed and should be re-sent to the GPU. Call this method when you modify the image or parameters of the texture. Particularly important for setting the wrap mode.
+		</div>
 
 		<h3>.clone([page:Texture texture])</h3>
 		<div>

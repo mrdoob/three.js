@@ -112,7 +112,7 @@ THREE.GlitchPass.prototype = {
 		console.log( dt_size );
 		texture.minFilter = THREE.NearestFilter;
 		texture.magFilter = THREE.NearestFilter;
-		texture.needsUpdate = true;
+		texture.setNeedsUpdate();
 		texture.flipY = false;
 		return texture;
 

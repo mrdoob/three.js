@@ -76,7 +76,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 			}
 
-			texture.needsUpdate = true;
+			texture.setNeedsUpdate();
 
 			if ( onLoad ) onLoad( texture, texData );
 

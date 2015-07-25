@@ -117,13 +117,13 @@
 				var textureCanvas = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 					materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
 
-				textureCanvas.needsUpdate = true;
+				textureCanvas.setNeedsUpdate();
 				textureCanvas.repeat.set( 1000, 1000 );
 
 				var textureCanvas2 = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.NearestFilter, THREE.NearestFilter );
 					materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
-				textureCanvas2.needsUpdate = true;
+				textureCanvas2.setNeedsUpdate();
 				textureCanvas2.repeat.set( 1000, 1000 );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
@@ -144,7 +144,7 @@
 					var image = texturePainting.image;
 
 					texturePainting2.image = image;
-					texturePainting2.needsUpdate = true;
+					texturePainting2.setNeedsUpdate();
 
 					scene.add( meshCanvas );
 					scene2.add( meshCanvas2 );

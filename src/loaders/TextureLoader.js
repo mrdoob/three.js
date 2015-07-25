@@ -21,7 +21,7 @@ THREE.TextureLoader.prototype = {
 		loader.load( url, function ( image ) {
 
 			var texture = new THREE.Texture( image );
-			texture.needsUpdate = true;
+			texture.setNeedsUpdate();
 
 			if ( onLoad !== undefined ) {
 

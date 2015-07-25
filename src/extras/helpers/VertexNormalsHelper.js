@@ -137,7 +137,7 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 		}
 
-		position.needsUpdate = true;
+		position.setNeedsUpdate();
 
 		return this;
 

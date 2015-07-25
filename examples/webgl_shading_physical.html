@@ -134,7 +134,7 @@
 				xc.fillRect(96, 96, 32, 32);
 
 				var texturePattern = new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
-				texturePattern.needsUpdate = true;
+				texturePattern.setNeedsUpdate();
 				texturePattern.repeat.set( 1000, 1000 );
 				texturePattern.format = THREE.RGBFormat;
 

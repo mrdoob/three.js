@@ -91,7 +91,7 @@ THREE.BoxHelper.prototype.update = ( function () {
 		vertices[ 66 ] = max.x; vertices[ 67 ] = min.y; vertices[ 68 ] = max.z;
 		vertices[ 69 ] = max.x; vertices[ 70 ] = min.y; vertices[ 71 ] = min.z;
 
-		this.geometry.attributes.position.needsUpdate = true;
+		this.geometry.attributes.position.setNeedsUpdate();
 
 		this.geometry.computeBoundingSphere();
 

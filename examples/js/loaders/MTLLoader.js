@@ -421,7 +421,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 			loader.load( url, function ( image ) {
 
 				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
-				texture.needsUpdate = true;
+				texture.setNeedsUpdate();
 
 				if ( onLoad ) onLoad( texture );
 

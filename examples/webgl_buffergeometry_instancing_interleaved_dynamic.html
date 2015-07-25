@@ -298,7 +298,7 @@
             orientations.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
 
         }
-        instanceBuffer.needsUpdate = true;
+        instanceBuffer.setNeedsUpdate();
         lastTime = time;
     }
 

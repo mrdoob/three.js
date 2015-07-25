@@ -34,7 +34,9 @@ THREE.InterleavedBuffer.prototype = {
 
 	set needsUpdate( value ) {
 
-		if ( value === true ) this.version ++;
+		console.warn( 'THREE.InterleavedBuffer: .needsUpdate is deprecated. Use .setNeedsUpdate() instead.' );
+
+		if ( value === true ) this.setNeedsUpdate();
 
 	},
 
@@ -60,6 +62,12 @@ THREE.InterleavedBuffer.prototype = {
 		this.array.set( value, offset );
 
 		return this;
+
+	},
+
+	setNeedsUpdate: function () {
+
+		this.version ++;
 
 	},
 

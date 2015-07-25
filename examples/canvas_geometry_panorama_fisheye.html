@@ -132,7 +132,7 @@
 				image.onload = function () {
 
 					texture.image = this;
-					texture.needsUpdate = true;
+					texture.setNeedsUpdate();
 
 				};
 				image.src = path;

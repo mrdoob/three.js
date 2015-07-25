@@ -326,7 +326,7 @@
                 orientations.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
 
             }
-            orientations.needsUpdate = true;
+            orientations.setNeedsUpdate();
             lastTime = time;
         }
 

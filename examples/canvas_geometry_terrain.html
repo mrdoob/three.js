@@ -70,7 +70,7 @@
 
 				var data = generateHeight( 1024, 1024 );
 				var texture = new THREE.Texture( generateTexture( data, 1024, 1024 ) );
-				texture.needsUpdate = true;
+				texture.setNeedsUpdate();
 
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 

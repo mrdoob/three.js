@@ -82,7 +82,7 @@ THREE.ShadowMapViewer = function ( light ) {
 		var labelTexture = new THREE.Texture( labelCanvas );
 		labelTexture.magFilter = THREE.LinearFilter;
 		labelTexture.minFilter = THREE.LinearFilter;
-		labelTexture.needsUpdate = true;
+		labelTexture.setNeedsUpdate();
 
 		var labelMaterial = new THREE.MeshBasicMaterial( { map: labelTexture, side: THREE.DoubleSide } );
 		labelMaterial.transparent = true;

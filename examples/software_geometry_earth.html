@@ -101,7 +101,7 @@
 				context.fillRect( 0, 0, canvas.width, canvas.height );
 
 				var texture = new THREE.Texture( canvas );
-				texture.needsUpdate = true;
+				texture.setNeedsUpdate();
 
 				var geometry = new THREE.PlaneBufferGeometry( 300, 300, 3, 3 );
 				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );

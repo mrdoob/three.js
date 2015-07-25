@@ -135,7 +135,7 @@ THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
 
 		}
 
-		position.needsUpdate = true;
+		position.setNeedsUpdate();
 
 		return this;
 

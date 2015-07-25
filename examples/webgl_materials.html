@@ -66,7 +66,7 @@
 				// Materials
 
 				var texture = new THREE.Texture( generateTexture() );
-				texture.needsUpdate = true;
+				texture.setNeedsUpdate();
 
 				materials.push( new THREE.MeshLambertMaterial( { map: texture, transparent: true } ) );
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );

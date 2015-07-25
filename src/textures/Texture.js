@@ -51,7 +51,15 @@ THREE.Texture.prototype = {
 
 	set needsUpdate ( value ) {
 
-		if ( value === true ) this.version ++;
+		console.warn( 'THREE.Texture: .needsUpdate is deprecated. Use .setNeedsUpdate() instead.' );
+
+		if ( value === true ) this.setNeedsUpdate();
+
+	},
+
+	setNeedsUpdate: function () {
+
+		this.version ++;
 
 	},
 

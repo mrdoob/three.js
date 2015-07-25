@@ -121,9 +121,9 @@
 			material.attributes.vertexOpacity.needsUpdate = true;
 			</code>
 			</li>
-			<li>When using [page:BufferGeometry], attribute data is stored within a [page:BufferAttribute] on the geometry itself, and the *value* within the material is ignored. To update an attribute, set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry:
+			<li>When using [page:BufferGeometry], attribute data is stored within a [page:BufferAttribute] on the geometry itself, and the *value* within the material is ignored. To update an attribute, call the *setNeedsUpdate()* method on the [page:BufferAttribute] of the geometry:
 			<code>
-			geometry.attributes.vertexOpacity.needsUpdate = true;
+			geometry.attributes.vertexOpacity.setNeedsUpdate();
 			</code>
 			See [page:BufferGeometry] for details.</li>
 		</ul>
@@ -242,7 +242,7 @@
 		where *type* is an <a href="#attribute-types">attribute type string</a>, and *value* is an array containing an attribute value for each vertex in the geometry (or *undefined* if using [page:BufferGeometry]). Names must match the name of the attribute, as defined in the GLSL code.
 		</p>
 		<p>
-		Note that attribute buffers are <emph>not</emph> refreshed automatically when their values change; if using [page:Geometry], set <code>needsUpdate = true</code> on the attribute definition. If using [page:BufferGeometry], set <code>needsUpdate = true</code> on the [page:BufferAttribute].
+		Note that attribute buffers are <emph>not</emph> refreshed automatically when their values change; if using [page:Geometry], set <code>needsUpdate = true</code> on the attribute definition. If using [page:BufferGeometry], call <code>setNeedsUpdate()</code> on the [page:BufferAttribute].
 		</p>
 		</div>
 

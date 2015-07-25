@@ -164,7 +164,7 @@ THREE.Skeleton.prototype.update = ( function () {
 
 		if ( this.useVertexTexture ) {
 
-			this.boneTexture.needsUpdate = true;
+			this.boneTexture.setNeedsUpdate();
 
 		}
 

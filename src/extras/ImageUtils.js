@@ -18,7 +18,7 @@ THREE.ImageUtils = {
 		loader.load( url, function ( image ) {
 
 			texture.image = image;
-			texture.needsUpdate = true;
+			texture.setNeedsUpdate();
 
 			if ( onLoad ) onLoad( texture );
 
@@ -55,7 +55,7 @@ THREE.ImageUtils = {
 
 				if ( loaded === 6 ) {
 
-					texture.needsUpdate = true;
+					texture.setNeedsUpdate();
 
 					if ( onLoad ) onLoad( texture );
 
@@ -208,7 +208,7 @@ THREE.ImageUtils = {
 		}
 
 		var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
-		texture.needsUpdate = true;
+		texture.setNeedsUpdate();
 
 		return texture;
 

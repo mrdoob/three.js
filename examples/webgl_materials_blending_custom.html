@@ -141,12 +141,12 @@
 				var mapBg0 = new THREE.Texture( x );
 				mapBg0.wrapS = mapBg0.wrapT = THREE.RepeatWrapping;
 				mapBg0.repeat.set( 128, 64 );
-				mapBg0.needsUpdate = true;
+				mapBg0.setNeedsUpdate();
 
 				var mapBg1 = new THREE.Texture( x2 );
 				mapBg1.wrapS = mapBg1.wrapT = THREE.RepeatWrapping;
 				mapBg1.repeat.set( 128, 64 );
-				mapBg1.needsUpdate = true;
+				mapBg1.setNeedsUpdate();
 
 				var mapBg2 = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
 				mapBg2.wrapS = mapBg2.wrapT = THREE.RepeatWrapping;
@@ -193,7 +193,7 @@
 					var mapPre = map.clone();
 
 					mapPre.premultiplyAlpha = true;
-					mapPre.needsUpdate = true;
+					mapPre.setNeedsUpdate();
 
 					mapsNoPre.push( map );
 					mapsPre.push( mapPre );
@@ -417,7 +417,7 @@
 				xc.fillText( text, 8, 22 );
 
 				var map = new THREE.Texture( x );
-				map.needsUpdate = true;
+				map.setNeedsUpdate();
 
 				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 				return material;
