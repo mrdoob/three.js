@@ -7,7 +7,7 @@
  */
 /*global THREE, console */
 
-(function () {
+( function () {
 
 	function OrbitConstraint ( object ) {
 
@@ -260,7 +260,7 @@
 
 				if ( zoomChanged ||
 					 lastPosition.distanceToSquared( this.object.position ) > EPS ||
-				    8 * ( 1 - lastQuaternion.dot( this.object.quaternion) ) > EPS ) {
+				    8 * ( 1 - lastQuaternion.dot( this.object.quaternion ) ) > EPS ) {
 
 					lastPosition.copy( this.object.position );
 					lastQuaternion.copy( this.object.quaternion );
@@ -295,15 +295,15 @@
 
 		// API
 
-		Object.defineProperty(this, 'constraint', {
+		Object.defineProperty( this, 'constraint', {
 
-		    get: function() {
+			get: function() {
 
-		        return constraint;
+				return constraint;
 
-		    }
+			}
 
-		});
+		} );
 
 		this.getPolarAngle = function () {
 
@@ -366,7 +366,7 @@
 		var dollyEnd = new THREE.Vector2();
 		var dollyDelta = new THREE.Vector2();
 
-		var STATE = { NONE : -1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
+		var STATE = { NONE : - 1, ROTATE : 0, DOLLY : 1, PAN : 2, TOUCH_ROTATE : 3, TOUCH_DOLLY : 4, TOUCH_PAN : 5 };
 
 		var state = STATE.NONE;
 
@@ -556,11 +556,15 @@
 
 			var delta = 0;
 
-			if ( event.wheelDelta !== undefined ) { // WebKit / Opera / Explorer 9
+			if ( event.wheelDelta !== undefined ) {
+
+				// WebKit / Opera / Explorer 9
 
 				delta = event.wheelDelta;
 
-			} else if ( event.detail !== undefined ) { // Firefox
+			} else if ( event.detail !== undefined ) {
+
+				// Firefox
 
 				delta = - event.detail;
 
@@ -746,7 +750,11 @@
 
 		}
 
-		this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+		this.domElement.addEventListener( 'contextmenu', function ( event ) {
+
+			event.preventDefault();
+
+		}, false );
 		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 		this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 		this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
@@ -772,6 +780,7 @@
 			get: function () {
 
 				return this.constraint.object;
+
 			}
 
 		},
@@ -921,6 +930,6 @@
 
 		}
 
-	});
+	} );
 
-}());
+}() );

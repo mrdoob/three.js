@@ -1,5 +1,2 @@
-
-jscs "../../src" --fix --preset=mdcs
-jscs "../../examples/js" --fix --preset=mdcs
-
+jscs "../.." --fix --config=./config.json --max-errors=1000000
 

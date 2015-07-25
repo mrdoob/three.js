@@ -32,7 +32,7 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 		this._matrixWorld.decompose( position, quaternion, scale );
 
-		orientation.set( 0, 0, -1 ).applyQuaternion( quaternion );
+		orientation.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 
 		listener.setPosition( position.x, position.y, position.z );
 		listener.setOrientation( orientation.x, orientation.y, orientation.z, up.x, up.y, up.z );

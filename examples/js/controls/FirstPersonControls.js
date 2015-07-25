@@ -52,7 +52,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	if ( this.domElement !== document ) {
 
-		this.domElement.setAttribute( 'tabindex', -1 );
+		this.domElement.setAttribute( 'tabindex', - 1 );
 
 	}
 
@@ -203,7 +203,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		var actualMoveSpeed = delta * this.movementSpeed;
 
-		if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
 
 		if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
@@ -214,7 +214,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		var actualLookSpeed = delta * this.lookSpeed;
 
-		if ( !this.activeLook ) {
+		if ( ! this.activeLook ) {
 
 			actualLookSpeed = 0;
 
@@ -254,7 +254,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	this.domElement.addEventListener( 'contextmenu', function ( event ) {
+
+		event.preventDefault();
+
+	}, false );
 
 	this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
 	this.domElement.addEventListener( 'mousedown', bind( this, this.onMouseDown ), false );

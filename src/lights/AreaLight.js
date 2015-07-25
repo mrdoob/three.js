@@ -33,8 +33,8 @@ THREE.AreaLight.prototype.clone = function () {
 
 	light.copy( this );
 
-	light.normal.copy(this.normal);
-	light.right.copy(this.right);
+	light.normal.copy( this.normal );
+	light.right.copy( this.right );
 	light.intensity = this.intensity;
 	light.width = this.width;
 	light.height = this.height;
@@ -54,4 +54,5 @@ THREE.AreaLight.prototype.toJSON = function ( meta ) {
 	data.object.intensity = this.intensity;
 
 	return data;
+
 };

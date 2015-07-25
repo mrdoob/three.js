@@ -3,7 +3,7 @@
  * Date: 09/12/2013 17:21
  */
 
-(function (){
+( function () {
 
 	var UNCOMPRESSED  = 0,
 			DEFLATE       = 1,
@@ -45,24 +45,28 @@
 
 	var littleEndian = true;
 
-	function Block(){
+	function Block() {
+
 		this.id = 0;
 		this.data = null;
+
 	}
 
-	AWDProperties = function(){}
+	AWDProperties = function() {}
 
 	AWDProperties.prototype = {
-		set : function(key, value)
-		{
-			this[key] = value;
+		set : function( key, value ) {
+
+			this[ key ] = value;
+
 		},
 
-		get : function(key, fallback)
-		{
-			if ( this.hasOwnProperty(key) )
-				return this[key];
+		get : function( key, fallback ) {
+
+			if ( this.hasOwnProperty( key ) )
+				return this[ key ];
 			else return fallback;
+
 		}
 	}
 
@@ -103,14 +107,14 @@
 			var scope = this;
 
 			this._url = url;
-			this._baseDir = url.substr( 0, url.lastIndexOf( '/' )+1 );
+			this._baseDir = url.substr( 0, url.lastIndexOf( '/' ) + 1 );
 
 			var loader = new THREE.XHRLoader( this.manager );
 			loader.setCrossOrigin( this.crossOrigin );
-			loader.setResponseType('arraybuffer');
+			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( text ) {
 
-				onLoad( scope.parse(text) );
+				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
 
@@ -131,16 +135,22 @@
 
 			this._parseHeader( );
 
-			if( this._compression != 0  ) {
+			if ( this._compression != 0  ) {
+
 				console.error( 'compressed AWD not supported' );
+
 			}
 
-			if (!this._streaming && this._bodylen != data.byteLength - this._ptr ) {
-				console.error('AWDLoader: body len does not match file length', this._bodylen ,  blen - this._ptr);
+			if ( ! this._streaming && this._bodylen != data.byteLength - this._ptr ) {
+
+				console.error( 'AWDLoader: body len does not match file length', this._bodylen,  blen - this._ptr );
+
 			}
 
 			while ( this._ptr < blen ) {
+
 				this.parseNextBlock();
+
 			}
 
 			return this.trunk;
@@ -158,43 +168,43 @@
 					len     = this.readU32();
 
 
-			switch (type) {
+			switch ( type ) {
 				case 1:
-					assetData = this.parseMeshData(len);
+					assetData = this.parseMeshData( len );
 					break;
 				case 22:
-					assetData = this.parseContainer(len);
+					assetData = this.parseContainer( len );
 					break;
 				case 23:
-					assetData = this.parseMeshInstance(len);
+					assetData = this.parseMeshInstance( len );
 					break;
 				case 81:
-					assetData = this.parseMaterial(len);
+					assetData = this.parseMaterial( len );
 					break;
 				case 82:
-					assetData = this.parseTexture(len);
+					assetData = this.parseTexture( len );
 					break;
 				case 101:
-					assetData = this.parseSkeleton(len);
+					assetData = this.parseSkeleton( len );
 					break;
 
 	//      case 111:
 	//        assetData = this.parseMeshPoseAnimation(len, true);
 	//        break;
 				case 112:
-					assetData = this.parseMeshPoseAnimation(len, false);
+					assetData = this.parseMeshPoseAnimation( len, false );
 					break;
 				case 113:
-					assetData = this.parseVertexAnimationSet(len);
+					assetData = this.parseVertexAnimationSet( len );
 					break;
 				case 102:
-					assetData = this.parseSkeletonPose(len);
+					assetData = this.parseSkeletonPose( len );
 					break;
 				case 103:
-					assetData = this.parseSkeletonAnimation(len);
+					assetData = this.parseSkeletonAnimation( len );
 					break;
 				case 122:
-					assetData = this.parseAnimatorSet(len);
+					assetData = this.parseAnimatorSet( len );
 					break;
 				// case 121:
 				//  assetData = parseUVAnimation(len);
@@ -207,7 +217,7 @@
 
 
 			// Store block reference for later use
-			this._blocks[blockId] = block = new Block();
+			this._blocks[ blockId ] = block = new Block();
 			block.data = assetData;
 			block.id = blockId;
 
@@ -218,31 +228,33 @@
 
 			var version = this._version,
 					awdmagic =
-							( this.readU8()<<16)
-					|   ( this.readU8()<<8 )
+							( this.readU8() << 16 )
+					|   ( this.readU8() << 8 )
 					|     this.readU8();
 
-			if( awdmagic != 4282180 )
+			if ( awdmagic != 4282180 )
 				throw new Error( "AWDLoader - bad magic" );
 
-			version[0] = this.readU8();
-			version[1] = this.readU8();
+			version[ 0 ] = this.readU8();
+			version[ 1 ] = this.readU8();
 
 			var flags = this.readU16();
 
-			this._streaming = (flags & 0x1) == 0x1;
+			this._streaming = ( flags & 0x1 ) == 0x1;
 
-			if ((version[0] === 2) && (version[1] === 1)) {
-				this._accuracyMatrix =  (flags & 0x2) === 0x2;
-				this._accuracyGeo =     (flags & 0x4) === 0x4;
-				this._accuracyProps =   (flags & 0x8) === 0x8;
+			if ( ( version[ 0 ] === 2 ) && ( version[ 1 ] === 1 ) ) {
+
+				this._accuracyMatrix =  ( flags & 0x2 ) === 0x2;
+				this._accuracyGeo =     ( flags & 0x4 ) === 0x4;
+				this._accuracyProps =   ( flags & 0x8 ) === 0x8;
+
 			}
 
 			this._geoNrType     = this._accuracyGeo     ? FLOAT64 : FLOAT32;
 			this._matrixNrType  = this._accuracyMatrix  ? FLOAT64 : FLOAT32;
 			this._propsNrType   = this._accuracyProps   ? FLOAT64 : FLOAT32;
 
-			this._optimized_for_accuracy  = (flags & 0x2) === 0x2;
+			this._optimized_for_accuracy  = ( flags & 0x2 ) === 0x2;
 
 			this._compression = this.readU8();
 			this._bodylen = this.readU32();
@@ -250,6 +262,7 @@
 		},
 
 		parseContainer: function ( len ) {
+
 			var parent,
 					ctr     = new THREE.Object3D(),
 					par_id  = this.readU32(),
@@ -258,22 +271,24 @@
 			ctr.name = this.readUTF();
 			ctr.applyMatrix( mtx );
 
-			parent = this._blocks[par_id].data || this.trunk;
-			parent.add(ctr);
+			parent = this._blocks[ par_id ].data || this.trunk;
+			parent.add( ctr );
 
-			this.parseProperties({
-				1:this._matrixNrType,
-				2:this._matrixNrType,
-				3:this._matrixNrType,
-				4:UINT8
-			});
+			this.parseProperties( {
+				1: this._matrixNrType,
+				2: this._matrixNrType,
+				3: this._matrixNrType,
+				4: UINT8
+			} );
 
 			ctr.extra = this.parseUserAttributes();
 
 			return ctr;
+
 		},
 
 		parseMeshInstance: function ( len ) {
+
 			var name,
 					mesh, geometries, meshLen, meshes,
 					par_id, data_id,
@@ -295,10 +310,12 @@
 			materials = [];
 			materials_parsed = 0;
 
-			for ( i = 0; i < num_materials; i++) {
+			for ( i = 0; i < num_materials; i ++ ) {
+
 				mat_id = this.readU32();
 				mat = this.getBlock( mat_id );
 				materials.push( mat );
+
 			}
 
 			meshLen = geometries.length;
@@ -306,17 +323,22 @@
 
 			// TODO : BufferGeometry don't support "geometryGroups" for now.
 			// so we create sub meshes for each groups
-			if( meshLen  > 1 ) {
+			if ( meshLen  > 1 ) {
+
 				mesh = new THREE.Object3D();
-				for ( i = 0; i < meshLen; i++) {
-					var sm = new THREE.Mesh( geometries[i] );
+				for ( i = 0; i < meshLen; i ++ ) {
+
+					var sm = new THREE.Mesh( geometries[ i ] );
 					meshes.push( sm );
 					mesh.add( sm );
+
 				}
-			}
-			else {
-				mesh = new THREE.Mesh( geometries[0] );
+
+			} else {
+
+				mesh = new THREE.Mesh( geometries[ 0 ] );
 				meshes.push( mesh );
+
 			}
 
 			mesh.applyMatrix( mtx );
@@ -328,9 +350,9 @@
 
 
 			var matLen = materials.length;
-			var maxLen = Math.max( meshLen, matLen);
-			for( i = 0; i< maxLen; i++ )
-				meshes[ i%meshLen ].material = materials[ i % matLen ];
+			var maxLen = Math.max( meshLen, matLen );
+			for ( i = 0; i < maxLen; i ++ )
+				meshes[ i % meshLen ].material = materials[ i % matLen ];
 
 
 			// Ignore for now
@@ -338,9 +360,11 @@
 			mesh.extra = this.parseUserAttributes();
 
 			return mesh;
+
 		},
 
 		parseMaterial: function ( len ) {
+
 			var name,
 					type,
 					props,
@@ -358,60 +382,73 @@
 
 			// Read material numerical properties
 			// (1=color, 2=bitmap url, 11=alpha_blending, 12=alpha_threshold, 13=repeat)
-			props = this.parseProperties({
+			props = this.parseProperties( {
 				1:  AWD_FIELD_INT32,
 				2:  AWD_FIELD_BADDR,
 				11: AWD_FIELD_BOOL,
 				12: AWD_FIELD_FLOAT32,
 				13: AWD_FIELD_BOOL
-			});
+			} );
 
 			methods_parsed = 0;
 
-			while( methods_parsed < num_methods ) {
+			while ( methods_parsed < num_methods ) {
+
 				var method_type = this.readU16();
 				this.parseProperties( null );
 				this.parseUserAttributes();
+
 			}
 
 			attributes = this.parseUserAttributes();
 
-			if( this.materialFactory !== undefined ) {
+			if ( this.materialFactory !== undefined ) {
+
 				mat = this.materialFactory( name );
-				if( mat ) return mat;
+				if ( mat ) return mat;
+
 			}
 
 			mat = new THREE.MeshPhongMaterial();
 
-			if (type === 1) { // Color material
-				mat.color.setHex( props.get(1, 0xcccccc) );
-			}
-			else if (type === 2) { // Bitmap material
-				var tex_addr = props.get(2, 0);
+			if ( type === 1 ) {
+
+				// Color material
+				mat.color.setHex( props.get( 1, 0xcccccc ) );
+
+			} else if ( type === 2 ) {
+
+				// Bitmap material
+				var tex_addr = props.get( 2, 0 );
 				mat.map = this.getBlock( tex_addr );
+
 			}
 
 			mat.extra = attributes;
-			mat.alphaThreshold = props.get(12, 0.0);
-			mat.repeat = props.get(13, false);
+			mat.alphaThreshold = props.get( 12, 0.0 );
+			mat.repeat = props.get( 13, false );
 
 
 			return mat;
+
 		},
 
 		parseTexture: function( len ) {
+
 			var name = this.readUTF(),
 					type = this.readU8(),
 					asset,
 					data_len;
 
 			// External
-			if (type === 0) {
+			if ( type === 0 ) {
+
 				data_len = this.readU32();
-				var url = this.readUTFBytes(data_len);
+				var url = this.readUTFBytes( data_len );
 				console.log( url );
 
 				asset = this.loadTexture( url );
+
 			} else {
 				// embed texture not supported
 			}
@@ -420,22 +457,29 @@
 
 			this.parseUserAttributes();
 			return asset;
+
 		},
 
 		loadTexture: function( url ) {
+
 			var tex = new THREE.Texture();
 
 			var loader = new THREE.ImageLoader( this.manager );
 
-			loader.load( this._baseDir+url, function( image ) {
+			loader.load( this._baseDir + url, function( image ) {
+
 				tex.image = image;
 				tex.needsUpdate = true;
-			});
+
+			} );
 
 			return tex;
+
 		},
 
-		parseSkeleton: function( len ) { // Array<Bone>
+		parseSkeleton: function( len ) {
+
+			// Array<Bone>
 			var name          = this.readUTF(),
 					num_joints    = this.readU16(),
 					skeleton      = [],
@@ -443,7 +487,8 @@
 
 			this.parseProperties( null );
 
-			while (joints_parsed < num_joints) {
+			while ( joints_parsed < num_joints ) {
+
 				var joint, ibp;
 
 				// Ignore joint id
@@ -457,11 +502,12 @@
 				joint.skinMatrix = ibp;
 
 				// Ignore joint props/attributes for now
-				this.parseProperties(null);
+				this.parseProperties( null );
 				this.parseUserAttributes();
 
-				skeleton.push(joint);
-				joints_parsed++;
+				skeleton.push( joint );
+				joints_parsed ++;
+
 			}
 
 			// Discard attributes for now
@@ -469,13 +515,15 @@
 
 
 			return skeleton;
+
 		},
 
 		parseSkeletonPose: function( blockID ) {
+
 			var name = this.readUTF();
 
 			var num_joints = this.readU16();
-			this.parseProperties(null);
+			this.parseProperties( null );
 
 			// debug( 'parse Skeleton Pose. joints : ' + num_joints);
 
@@ -483,7 +531,7 @@
 
 			var joints_parsed = 0;
 
-			while (joints_parsed < num_joints) {
+			while ( joints_parsed < num_joints ) {
 
 				var joint_pose;
 
@@ -492,14 +540,18 @@
 
 				has_transform = this.readU8();
 
-				if (has_transform === 1) {
+				if ( has_transform === 1 ) {
+
 					mtx_data = this.parseMatrix4();
-				} else
-				{
+
+				} else {
+
 					mtx_data = new THREE.Matrix4();
+
 				}
-				pose[joints_parsed] = mtx_data;
-				joints_parsed++;
+				pose[ joints_parsed ] = mtx_data;
+				joints_parsed ++;
+
 			}
 
 			// Skip attributes for now
@@ -528,22 +580,26 @@
 			// debug( 'parse Skeleton Animation. frames : ' + num_frames);
 
 			while ( frames_parsed < num_frames ) {
+
 				pose_addr = this.readU32();
 				frame_dur = this.readU16();
 
-				pose = this._blocks[pose_addr].data;
+				pose = this._blocks[ pose_addr ].data;
 				// debug( 'pose address ',pose[2].elements[12],pose[2].elements[13],pose[2].elements[14] );
 				clip.push( {
 					pose : pose,
 					duration : frame_dur
 				} );
 
-				frames_parsed++;
+				frames_parsed ++;
+
 			}
 
 			if ( clip.length === 0 ) {
+
 				// debug("Could not this SkeletonClipNode, because no Frames where set.");
 				return;
+
 			}
 			// Ignore attributes for now
 			this.parseUserAttributes();
@@ -556,14 +612,16 @@
 			var poseBlockAdress,
 					name           = this.readUTF(),
 					num_frames     = this.readU16(),
-					props          = this.parseProperties( { 1:UINT16 } ),
+					props          = this.parseProperties( { 1: UINT16 } ),
 					frames_parsed  = 0,
 					skeletonFrames = [];
 
 			while ( frames_parsed < num_frames ) {
+
 				poseBlockAdress = this.readU32();
-				skeletonFrames.push( this._blocks[poseBlockAdress].data );
-				frames_parsed++;
+				skeletonFrames.push( this._blocks[ poseBlockAdress ].data );
+				frames_parsed ++;
+
 			}
 
 			this.parseUserAttributes();
@@ -574,6 +632,7 @@
 		},
 
 		parseAnimatorSet: function( len ) {
+
 			var targetMesh;
 
 			var animSetBlockAdress; //:int
@@ -583,14 +642,14 @@
 			var name = this.readUTF();
 			var type = this.readU16();
 
-			var props = this.parseProperties( { 1:BADDR } );
+			var props = this.parseProperties( { 1: BADDR } );
 
 			animSetBlockAdress = this.readU32();
 			var targetMeshLength = this.readU16();
 
 			var meshAdresses = []; //:Vector.<uint> = new Vector.<uint>;
 
-			for (var i = 0; i < targetMeshLength; i++)
+			for ( var i = 0; i < targetMeshLength; i ++ )
 				meshAdresses.push( this.readU32() );
 
 			var activeState = this.readU16();
@@ -601,30 +660,34 @@
 			var returnedArray;
 			var targetMeshes = []; //:Vector.<Mesh> = new Vector.<Mesh>;
 
-			for ( i = 0; i < meshAdresses.length; i++ ) {
-	//      returnedArray = getAssetByID(meshAdresses[i], [AssetType.MESH]);
-	//      if (returnedArray[0])
-					targetMeshes.push( this._blocks[meshAdresses[i]].data );
+			for ( i = 0; i < meshAdresses.length; i ++ ) {
+
+				//      returnedArray = getAssetByID(meshAdresses[i], [AssetType.MESH]);
+				//      if (returnedArray[0])
+				targetMeshes.push( this._blocks[ meshAdresses[ i ]].data );
+
 			}
 
-			targetAnimationSet = this._blocks[animSetBlockAdress].data;
+			targetAnimationSet = this._blocks[ animSetBlockAdress ].data;
 			var thisAnimator;
 
-			if (type == 1) {
+			if ( type == 1 ) {
 
 
 				thisAnimator = {
 					animationSet : targetAnimationSet,
-					skeleton : this._blocks[props.get(1, 0)].data
+					skeleton : this._blocks[ props.get( 1, 0 ) ].data
 				};
 
-			} else if (type == 2) {
+			} else if ( type == 2 ) {
 				// debug( "vertex Anim???");
 			}
 
 
-			for ( i = 0; i < targetMeshes.length; i++ ) {
-					targetMeshes[i].animator = thisAnimator;
+			for ( i = 0; i < targetMeshes.length; i ++ ) {
+
+				targetMeshes[ i ].animator = thisAnimator;
+
 			}
 			// debug("Parsed a Animator: Name = " + name);
 
@@ -633,6 +696,7 @@
 		},
 
 		parseMeshData: function ( len ) {
+
 			var name      = this.readUTF(),
 				num_subs  = this.readU16(),
 				geom,
@@ -642,10 +706,10 @@
 				skinW, skinI,
 				geometries = [];
 
-			props = this.parseProperties({
+			props = this.parseProperties( {
 				1: this._geoNrType,
 				2: this._geoNrType
-			});
+			} );
 
 			// Loop through sub meshes
 			while ( subs_parsed < num_subs ) {
@@ -662,7 +726,7 @@
 
 
 				// Ignore for now
-				this.parseProperties( { 1:this._geoNrType, 2:this._geoNrType } );
+				this.parseProperties( { 1: this._geoNrType, 2: this._geoNrType } );
 
 				// Loop through data streams
 				while ( this._ptr < sm_end ) {
@@ -683,17 +747,20 @@
 						geom.addAttribute( 'position', attrib );
 						idx = 0;
 
-						while (this._ptr < str_end) {
-							buffer[idx]   = -this.readF32();
-							buffer[idx+1] = this.readF32();
-							buffer[idx+2] = this.readF32();
-							idx+=3;
+						while ( this._ptr < str_end ) {
+
+							buffer[ idx ]   = - this.readF32();
+							buffer[ idx + 1 ] = this.readF32();
+							buffer[ idx + 2 ] = this.readF32();
+							idx += 3;
+
 						}
+
 					}
 
 					// INDICES
 					// -----------------
-					else if (str_type === 2) {
+					else if ( str_type === 2 ) {
 
 						buffer = new Uint16Array( str_len / 2 );
 						attrib = new THREE.BufferAttribute( buffer, 1 );
@@ -703,17 +770,20 @@
 
 						idx = 0;
 
-						while (this._ptr < str_end) {
-							buffer[idx+1]   = this.readU16();
-							buffer[idx]     = this.readU16();
-							buffer[idx+2]   = this.readU16();
-							idx+=3;
+						while ( this._ptr < str_end ) {
+
+							buffer[ idx + 1 ]   = this.readU16();
+							buffer[ idx ]     = this.readU16();
+							buffer[ idx + 2 ]   = this.readU16();
+							idx += 3;
+
 						}
+
 					}
 
 					// UVS
 					// -------------------
-					else if (str_type === 3) {
+					else if ( str_type === 3 ) {
 
 						buffer = new Float32Array( ( str_len / 8 ) * 2 );
 						attrib = new THREE.BufferAttribute( buffer, 2 );
@@ -721,26 +791,31 @@
 						geom.addAttribute( 'uv', attrib );
 						idx = 0;
 
-						while (this._ptr < str_end) {
-							buffer[idx]   = this.readF32();
-							buffer[idx+1] = 1.0-this.readF32();
-							idx+=2;
+						while ( this._ptr < str_end ) {
+
+							buffer[ idx ]   = this.readF32();
+							buffer[ idx + 1 ] = 1.0 - this.readF32();
+							idx += 2;
+
 						}
+
 					}
 
 					// NORMALS
-					else if (str_type === 4) {
+					else if ( str_type === 4 ) {
 
 						buffer = new Float32Array( ( str_len / 12 ) * 3 );
 						attrib = new THREE.BufferAttribute( buffer, 3 );
 						geom.addAttribute( 'normal', attrib );
 						idx = 0;
 
-						while (this._ptr < str_end) {
-							buffer[idx]   = -this.readF32();
-							buffer[idx+1] = this.readF32();
-							buffer[idx+2] = this.readF32();
-							idx+=3;
+						while ( this._ptr < str_end ) {
+
+							buffer[ idx ]   = - this.readF32();
+							buffer[ idx + 1 ] = this.readF32();
+							buffer[ idx + 2 ] = this.readF32();
+							idx += 3;
+
 						}
 
 					}
@@ -765,7 +840,9 @@
 					//   }
 					// }
 					else {
+
 						this._ptr = str_end;
+
 					}
 
 				}
@@ -773,7 +850,8 @@
 				this.parseUserAttributes();
 
 				geom.computeBoundingSphere();
-				subs_parsed++;
+				subs_parsed ++;
+
 			}
 
 			//geom.computeFaceNormals();
@@ -786,6 +864,7 @@
 		},
 
 		parseMeshPoseAnimation: function( len, poseOnly ) {
+
 			var num_frames = 1,
 					num_submeshes,
 					frames_parsed,
@@ -812,15 +891,17 @@
 
 			var mesh = this.getBlock( geoAdress );
 
-			if (mesh === null) {
+			if ( mesh === null ) {
+
 				console.log( "parseMeshPoseAnimation target mesh not found at:", geoAdress );
 				return;
+
 			}
 
 			geom = mesh.geometry;
 			geom.morphTargets = [];
 
-			if (!poseOnly)
+			if ( ! poseOnly )
 				num_frames = this.readU16();
 
 			num_submeshes = this.readU16();
@@ -832,10 +913,12 @@
 
 			streamsParsed = 0;
 			while ( streamsParsed < num_Streams ) {
-				streamtypes.push(this.readU16());
-				streamsParsed++;
+
+				streamtypes.push( this.readU16() );
+				streamsParsed ++;
+
 			}
-			props = this.parseProperties( { 1:BOOL, 2:BOOL } );
+			props = this.parseProperties( { 1: BOOL, 2: BOOL } );
 
 			clip.looping = props.get( 1, true );
 			clip.stitchFinalFrame = props.get( 2, false );
@@ -855,44 +938,51 @@
 
 					while ( streamsParsed < num_Streams ) {
 
-						if ( streamtypes[streamsParsed] === 1 ) {
+						if ( streamtypes[ streamsParsed ] === 1 ) {
 
 							//geom.addAttribute( 'morphTarget'+frames_parsed, Float32Array, str_len/12, 3 );
-							var buffer = new Float32Array(str_len/4);
+							var buffer = new Float32Array( str_len / 4 );
 							geom.morphTargets.push( {
 								array : buffer
-							});
+							} );
 
 							//buffer = geom.attributes['morphTarget'+frames_parsed].array
 							idx = 0;
 
 							while ( this._ptr < str_end ) {
-								buffer[idx]     = this.readF32();
-								buffer[idx+1]   = this.readF32();
-								buffer[idx+2]   = this.readF32();
+
+								buffer[ idx ]     = this.readF32();
+								buffer[ idx + 1 ]   = this.readF32();
+								buffer[ idx + 2 ]   = this.readF32();
 								idx += 3;
+
 							}
 
 
-							subMeshParsed++;
+							subMeshParsed ++;
+
 						} else
 							this._ptr = str_end;
-						streamsParsed++;
+						streamsParsed ++;
+
 					}
+
 				}
 
 
-				frames_parsed++;
+				frames_parsed ++;
+
 			}
 
 			this.parseUserAttributes();
 
 			return null;
+
 		},
 
 		getBlock: function ( id ) {
 
-			return this._blocks[id].data;
+			return this._blocks[ id ].data;
 
 		},
 
@@ -901,71 +991,81 @@
 			var mtx = new THREE.Matrix4();
 			var e = mtx.elements;
 
-			e[0] = this.readF32();
-			e[1] = this.readF32();
-			e[2] = this.readF32();
-			e[3] = 0.0;
+			e[ 0 ] = this.readF32();
+			e[ 1 ] = this.readF32();
+			e[ 2 ] = this.readF32();
+			e[ 3 ] = 0.0;
 			//e[3] = 0.0;
 
-			e[4] = this.readF32();
-			e[5] = this.readF32();
-			e[6] = this.readF32();
+			e[ 4 ] = this.readF32();
+			e[ 5 ] = this.readF32();
+			e[ 6 ] = this.readF32();
 			//e[7] = this.readF32();
-			e[7] = 0.0;
+			e[ 7 ] = 0.0;
 
-			e[8] = this.readF32();
-			e[9] = this.readF32();
-			e[10] = this.readF32();
+			e[ 8 ] = this.readF32();
+			e[ 9 ] = this.readF32();
+			e[ 10 ] = this.readF32();
 			//e[11] = this.readF32();
-			e[11] = 0.0;
+			e[ 11 ] = 0.0;
 
-			e[12] = -this.readF32();
-			e[13] = this.readF32();
-			e[14] = this.readF32();
+			e[ 12 ] = - this.readF32();
+			e[ 13 ] = this.readF32();
+			e[ 14 ] = this.readF32();
 			//e[15] = this.readF32();
-			e[15] = 1.0;
+			e[ 15 ] = 1.0;
 			return mtx;
 
 		},
 
 		parseProperties: function ( expected ) {
+
 			var list_len = this.readU32();
 			var list_end = this._ptr + list_len;
 
 			var props = new AWDProperties();
 
-			if( expected ) {
+			if ( expected ) {
 
-				while( this._ptr < list_end ) {
+				while ( this._ptr < list_end ) {
 
 					var key = this.readU16();
 					var len = this.readU32();
 					var type;
 
-					if( expected.hasOwnProperty( key ) ) {
+					if ( expected.hasOwnProperty( key ) ) {
+
 						type = expected[ key ];
 						props.set( key, this.parseAttrValue( type, len ) );
+
 					} else {
+
 						this._ptr += len;
+
 					}
+
 				}
 
 			}
 
 			return props;
+
 		},
 
 		parseUserAttributes: function () {
+
 			// skip for now
 			this._ptr = this.readU32() + this._ptr;
 			return null;
+
 		},
 
 		parseAttrValue: function ( type, len ) {
+
 			var elem_len;
 			var read_func;
 
-			switch (type) {
+			switch ( type ) {
 				case AWD_FIELD_INT8:
 					elem_len = 1;
 					read_func = this.readI8;
@@ -1012,7 +1112,8 @@
 					break;
 			}
 
-			if (elem_len < len) {
+			if ( elem_len < len ) {
+
 				var list;
 				var num_read;
 				var num_elems;
@@ -1021,53 +1122,74 @@
 				num_read = 0;
 				num_elems = len / elem_len;
 
-				while (num_read < num_elems) {
-					list.push(read_func.call( this ) );
-					num_read++;
+				while ( num_read < num_elems ) {
+
+					list.push( read_func.call( this ) );
+					num_read ++;
+
 				}
 
 				return list;
-			}
-			else {
+
+			} else {
+
 				return read_func.call( this );
+
 			}
+
 		},
 
 		readU8: function () {
-			return this._data.getUint8( this._ptr++ );
+
+			return this._data.getUint8( this._ptr ++ );
+
 		},
 		readI8: function () {
-			return this._data.getInt8( this._ptr++ );
+
+			return this._data.getInt8( this._ptr ++ );
+
 		},
 		readU16: function () {
+
 			var a = this._data.getUint16( this._ptr, littleEndian );
 			this._ptr += 2;
 			return a;
+
 		},
 		readI16: function () {
+
 			var a = this._data.getInt16( this._ptr, littleEndian );
 			this._ptr += 2;
 			return a;
+
 		},
 		readU32: function () {
+
 			var a = this._data.getUint32( this._ptr, littleEndian );
 			this._ptr += 4;
 			return a;
+
 		},
 		readI32: function () {
+
 			var a = this._data.getInt32( this._ptr, littleEndian );
 			this._ptr += 4;
 			return a;
+
 		},
 		readF32: function () {
+
 			var a = this._data.getFloat32( this._ptr, littleEndian );
 			this._ptr += 4;
 			return a;
+
 		},
 		readF64: function () {
+
 			var a = this._data.getFloat64( this._ptr, littleEndian );
 			this._ptr += 8;
 			return a;
+
 		},
 
 		/**
@@ -1076,8 +1198,10 @@
 	 * @return {string} 16-bit Unicode string.
 	 */
 		readUTF: function () {
+
 			var len = this.readU16();
 			return this.readUTFBytes( len );
+
 		},
 
 		/**
@@ -1086,27 +1210,37 @@
 		 * @return {string} 16-bit Unicode string.
 		 */
 		readUTFBytes: function ( len ) {
+
 			// TODO(user): Use native implementations if/when available
 			var out = [], c = 0;
 
 			while ( out.length < len ) {
-				var c1 = this._data.getUint8( this._ptr++, littleEndian );
-				if (c1 < 128) {
-					out[c++] = String.fromCharCode(c1);
-				} else if (c1 > 191 && c1 < 224) {
-					var c2 = this._data.getUint8( this._ptr++, littleEndian );
-					out[c++] = String.fromCharCode((c1 & 31) << 6 | c2 & 63);
+
+				var c1 = this._data.getUint8( this._ptr ++, littleEndian );
+				if ( c1 < 128 ) {
+
+					out[ c ++ ] = String.fromCharCode( c1 );
+
+				} else if ( c1 > 191 && c1 < 224 ) {
+
+					var c2 = this._data.getUint8( this._ptr ++, littleEndian );
+					out[ c ++ ] = String.fromCharCode( ( c1 & 31 ) << 6 | c2 & 63 );
+
 				} else {
-					var c2 = this._data.getUint8( this._ptr++, littleEndian );
-					var c3 = this._data.getUint8( this._ptr++, littleEndian );
-					out[c++] = String.fromCharCode(
-							(c1 & 15) << 12 | (c2 & 63) << 6 | c3 & 63
+
+					var c2 = this._data.getUint8( this._ptr ++, littleEndian );
+					var c3 = this._data.getUint8( this._ptr ++, littleEndian );
+					out[ c ++ ] = String.fromCharCode(
+							( c1 & 15 ) << 12 | ( c2 & 63 ) << 6 | c3 & 63
 					);
+
 				}
+
 			}
-			return out.join('');
+			return out.join( '' );
+
 		}
 
 	};
 
-})();
+} )();

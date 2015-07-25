@@ -133,20 +133,20 @@ THREE.Object3D.prototype = {
 	
 	get matrix () {
 		
-	    if ( this.matrixAutoUpdate === true ) {
+		if ( this.matrixAutoUpdate === true ) {
 	    	
-	        return this.updateMatrix();
+			return this.updateMatrix();
 	        
-	    } else {
+		} else {
 	    	
-	        return this._matrix;
+			return this._matrix;
 	        
-	    }
+		}
 
 	},
-	set matrix (value) {
+	set matrix ( value ) {
 		
-	    this._matrix = value;
+		this._matrix = value;
 	    
 	},
 	

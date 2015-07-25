@@ -6,8 +6,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	var objects = {};
 
-	var morphInfluences = new Float32Array( 8 );
-
 	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
@@ -79,12 +77,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
-	function numericalSort ( a, b ) {
-
-		return b[ 0 ] - a[ 0 ];
-
-	}
-
 	function updateObject( object ) {
 
 		var geometry = geometries.get( object );
@@ -95,59 +87,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
-		// morph targets
-
-		if ( object.morphTargetInfluences !== undefined ) {
-
-			var activeInfluences = [];
-			var morphTargetInfluences = object.morphTargetInfluences;
-
-			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
-
-				var influence = morphTargetInfluences[ i ];
-				activeInfluences.push( [ influence, i ] );
-
-			}
-
-			activeInfluences.sort( numericalSort );
-
-			if ( activeInfluences.length > 8 ) {
-
-				activeInfluences.length = 8;
-
-			}
-
-			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
-
-				morphInfluences[ i ] = activeInfluences[ i ][ 0 ];
-
-				var attribute = geometry.morphAttributes[ activeInfluences[ i ][ 1 ] ];
-				geometry.addAttribute( 'morphTarget' + i, attribute );
-
-			}
-
-			var material = object.material;
-
-			if ( material.program !== undefined ) {
-
-				var uniforms = material.program.getUniforms();
-
-				if ( uniforms.morphTargetInfluences !== null ) {
-
-					gl.uniform1fv( uniforms.morphTargetInfluences, morphInfluences );
-
-				}
-
-			} else {
-
-				console.warn( 'TOFIX: material.program is undefined' );
-
-			}
-
-		}
-
-		//
-
 		var attributes = geometry.attributes;
 
 		for ( var name in attributes ) {
@@ -156,9 +95,19 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		}
 
+		// morph targets
+
+		var morphAttributes = geometry.morphAttributes;
+
+		for ( var i = 0, l = morphAttributes.length; i < l; i ++ ) {
+
+			updateAttribute( morphAttributes[ i ], i );
+
+		}
+
 	}
 
-	function updateAttribute ( attribute, name ) {
+	function updateAttribute( attribute, name ) {
 
 		var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
@@ -178,7 +127,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function createBuffer ( attributeProperties, data, bufferType ) {
+	function createBuffer( attributeProperties, data, bufferType ) {
 
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
@@ -199,11 +148,13 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function updateBuffer ( attributeProperties, data, bufferType ) {
+	function updateBuffer( attributeProperties, data, bufferType ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+		if ( data.updateRange === undefined || data.updateRange.count === - 1 ) {
+
+			// Not using update ranges
 
 			gl.bufferSubData( bufferType, 0, data.array );
 
@@ -239,9 +190,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	this.update = function ( renderList ) {
 
-		for ( var i = 0, ul = renderList.length; i < ul; i++ ) {
+		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
 
-			var object = renderList[i].object;
+			var object = renderList[ i ].object;
 
 			if ( object.material.visible !== false ) {
 

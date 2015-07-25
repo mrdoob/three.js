@@ -80,7 +80,9 @@ THREE.Sprite.prototype.toJSON = function ( meta ) {
 
 	// only serialize if not in meta materials cache
 	if ( meta.materials[ this.material.uuid ] === undefined ) {
+
 		meta.materials[ this.material.uuid ] = this.material.toJSON();
+
 	}
 
 	data.object.material = this.material.uuid;

@@ -27,7 +27,7 @@ THREE.ColorCorrectionShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -45,6 +45,6 @@ THREE.ColorCorrectionShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

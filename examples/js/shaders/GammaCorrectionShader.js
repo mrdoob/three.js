@@ -24,7 +24,7 @@ THREE.GammaCorrectionShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -45,6 +45,6 @@ THREE.GammaCorrectionShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

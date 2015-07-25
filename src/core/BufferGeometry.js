@@ -49,6 +49,12 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	removeAttribute: function ( name ) {
+
+		delete this.attributes[ name ];
+
+	},
+
 	get offsets() {
 
 		console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .drawcalls.' );
@@ -177,6 +183,12 @@ THREE.BufferGeometry.prototype = {
 		if ( object instanceof THREE.Mesh ) {
 
 			var direct = geometry.__directGeometry;
+
+			if ( direct === undefined ) {
+
+				return this.fromGeometry( geometry );
+
+			}
 
 			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
@@ -546,7 +558,7 @@ THREE.BufferGeometry.prototype = {
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-						vA = ( index + indices[ i     ] ) * 3;
+						vA = ( index + indices[ i ] ) * 3;
 						vB = ( index + indices[ i + 1 ] ) * 3;
 						vC = ( index + indices[ i + 2 ] ) * 3;
 
@@ -558,15 +570,15 @@ THREE.BufferGeometry.prototype = {
 						ab.subVectors( pA, pB );
 						cb.cross( ab );
 
-						normals[ vA     ] += cb.x;
+						normals[ vA ] += cb.x;
 						normals[ vA + 1 ] += cb.y;
 						normals[ vA + 2 ] += cb.z;
 
-						normals[ vB     ] += cb.x;
+						normals[ vB ] += cb.x;
 						normals[ vB + 1 ] += cb.y;
 						normals[ vB + 2 ] += cb.z;
 
-						normals[ vC     ] += cb.x;
+						normals[ vC ] += cb.x;
 						normals[ vC + 1 ] += cb.y;
 						normals[ vC + 2 ] += cb.z;
 
@@ -588,7 +600,7 @@ THREE.BufferGeometry.prototype = {
 					ab.subVectors( pA, pB );
 					cb.cross( ab );
 
-					normals[ i     ] = cb.x;
+					normals[ i ] = cb.x;
 					normals[ i + 1 ] = cb.y;
 					normals[ i + 2 ] = cb.z;
 
@@ -765,7 +777,7 @@ THREE.BufferGeometry.prototype = {
 			test = tmp2.dot( tan2[ v ] );
 			w = ( test < 0.0 ) ? - 1.0 : 1.0;
 
-			tangents[ v * 4     ] = tmp.x;
+			tangents[ v * 4 ] = tmp.x;
 			tangents[ v * 4 + 1 ] = tmp.y;
 			tangents[ v * 4 + 2 ] = tmp.z;
 			tangents[ v * 4 + 3 ] = w;
@@ -822,7 +834,7 @@ THREE.BufferGeometry.prototype = {
 		var indexPtr = 0;
 		var vertexPtr = 0;
 
-		var tmpOffsets = [ { start:0, count:0, index:0 } ];
+		var tmpOffsets = [ { start: 0, count: 0, index: 0 } ];
 		var offset = tmpOffsets[ 0 ];
 
 		var duplicatedVertices = 0;
@@ -830,50 +842,68 @@ THREE.BufferGeometry.prototype = {
 		var faceVertices = new Int32Array( 6 );
 		var vertexMap = new Int32Array( vertices.length );
 		var revVertexMap = new Int32Array( vertices.length );
-		for ( var j = 0; j < vertices.length; j ++ ) { vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1; }
+		for ( var j = 0; j < vertices.length; j ++ ) {
+
+			vertexMap[ j ] = - 1; revVertexMap[ j ] = - 1;
+
+		}
 
 		/*
 			Traverse every face and reorder vertices in the proper offsets of 65k.
 			We can have more than 'size' entries in the index buffer per offset, but only reference 'size' values.
 		*/
 		for ( var findex = 0; findex < facesCount; findex ++ ) {
+
 			newVerticeMaps = 0;
 
 			for ( var vo = 0; vo < 3; vo ++ ) {
+
 				var vid = indices[ findex * 3 + vo ];
 				if ( vertexMap[ vid ] === - 1 ) {
+
 					//Unmapped vertex
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
 					newVerticeMaps ++;
+
 				} else if ( vertexMap[ vid ] < offset.index ) {
+
 					//Reused vertices from previous block (duplicate)
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = - 1;
 					duplicatedVertices ++;
+
 				} else {
+
 					//Reused vertex in the current block
 					faceVertices[ vo * 2 ] = vid;
 					faceVertices[ vo * 2 + 1 ] = vertexMap[ vid ];
+
 				}
+
 			}
 
 			var faceMax = vertexPtr + newVerticeMaps;
 			if ( faceMax > ( offset.index + size ) ) {
-				var new_offset = { start:indexPtr, count:0, index:vertexPtr };
+
+				var new_offset = { start: indexPtr, count: 0, index: vertexPtr };
 				tmpOffsets.push( new_offset );
 				offset = new_offset;
 
 				//Re-evaluate reused vertices in light of new offset.
 				for ( var v = 0; v < 6; v += 2 ) {
+
 					var new_vid = faceVertices[ v + 1 ];
 					if ( new_vid > - 1 && new_vid < offset.index )
 						faceVertices[ v + 1 ] = - 1;
+
 				}
+
 			}
 
 			//Reindex the face.
 			for ( var v = 0; v < 6; v += 2 ) {
+
 				var vid = faceVertices[ v ];
 				var new_vid = faceVertices[ v + 1 ];
 
@@ -884,7 +914,9 @@ THREE.BufferGeometry.prototype = {
 				revVertexMap[ new_vid ] = vid;
 				sortedIndices[ indexPtr ++ ] = new_vid - offset.index; //XXX overflows at 16bit
 				offset.count ++;
+
 			}
+
 		}
 
 		/* Move all attribute values to map to the new computed indices , also expand the vertex stack to match our new vertexPtr. */
@@ -960,7 +992,7 @@ THREE.BufferGeometry.prototype = {
 
 			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
-			normals[ i     ] *= n;
+			normals[ i ] *= n;
 			normals[ i + 1 ] *= n;
 			normals[ i + 2 ] *= n;
 
@@ -980,16 +1012,20 @@ THREE.BufferGeometry.prototype = {
 		/* Create a copy of all attributes for reordering. */
 		var sortedAttributes = {};
 		for ( var attr in this.attributes ) {
+
 			if ( attr === 'index' )
 				continue;
 			var sourceArray = this.attributes[ attr ].array;
 			sortedAttributes[ attr ] = new sourceArray.constructor( this.attributes[ attr ].itemSize * vertexCount );
+
 		}
 
 		/* Move attribute positions based on the new index map */
 		for ( var new_vid = 0; new_vid < vertexCount; new_vid ++ ) {
+
 			var vid = indexMap[ new_vid ];
 			for ( var attr in this.attributes ) {
+
 				if ( attr === 'index' )
 					continue;
 				var attrArray = this.attributes[ attr ].array;
@@ -997,17 +1033,22 @@ THREE.BufferGeometry.prototype = {
 				var sortedAttr = sortedAttributes[ attr ];
 				for ( var k = 0; k < attrSize; k ++ )
 					sortedAttr[ new_vid * attrSize + k ] = attrArray[ vid * attrSize + k ];
+
 			}
+
 		}
 
 		/* Carry the new sorted buffers locally */
 		this.attributes[ 'index' ].array = indexBuffer;
 		for ( var attr in this.attributes ) {
+
 			if ( attr === 'index' )
 				continue;
 			this.attributes[ attr ].array = sortedAttributes[ attr ];
 			this.attributes[ attr ].numItems = this.attributes[ attr ].itemSize * vertexCount;
+
 		}
+
 	},
 
 	toJSON: function () {

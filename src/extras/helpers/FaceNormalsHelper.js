@@ -109,4 +109,4 @@ THREE.FaceNormalsHelper.prototype.update = ( function () {
 
 	}
 
-}());
+}() );

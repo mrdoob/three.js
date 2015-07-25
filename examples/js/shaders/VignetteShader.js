@@ -27,7 +27,7 @@ THREE.VignetteShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -58,6 +58,6 @@ THREE.VignetteShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

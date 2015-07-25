@@ -139,4 +139,4 @@ THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
 
 	}
 
-}());
+}() );

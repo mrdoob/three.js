@@ -141,4 +141,4 @@ THREE.VertexNormalsHelper.prototype.update = ( function () {
 
 	}
 
-}());
+}() );

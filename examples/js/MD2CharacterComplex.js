@@ -16,7 +16,7 @@ THREE.MD2CharacterComplex = function () {
 	// movement model parameters
 
 	this.maxSpeed = 275;
-	this.maxReverseSpeed = -275;
+	this.maxReverseSpeed = - 275;
 
 	this.frontAcceleration = 600;
 	this.backAcceleration = 600;
@@ -261,7 +261,7 @@ THREE.MD2CharacterComplex = function () {
 
 	this.setAnimation = function ( animationName ) {
 
-		if ( animationName === this.activeAnimation || !animationName ) return;
+		if ( animationName === this.activeAnimation || ! animationName ) return;
 
 		if ( this.meshBody ) {
 
@@ -388,7 +388,7 @@ THREE.MD2CharacterComplex = function () {
 		}
 
 
-		if ( Math.abs( this.speed ) < 0.2 * this.maxSpeed && !( controls.moveLeft || controls.moveRight || controls.moveForward || controls.moveBackward ) ) {
+		if ( Math.abs( this.speed ) < 0.2 * this.maxSpeed && ! ( controls.moveLeft || controls.moveRight || controls.moveForward || controls.moveBackward ) ) {
 
 			if ( this.activeAnimation !== idleAnimation ) {
 
@@ -447,7 +447,7 @@ THREE.MD2CharacterComplex = function () {
 		if ( controls.crouch ) 	this.maxSpeed = this.crouchSpeed;
 		else this.maxSpeed = this.walkSpeed;
 
-		this.maxReverseSpeed = -this.maxSpeed;
+		this.maxReverseSpeed = - this.maxSpeed;
 
 		if ( controls.moveForward )  this.speed = THREE.Math.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 		if ( controls.moveBackward ) this.speed = THREE.Math.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
@@ -532,7 +532,7 @@ THREE.MD2CharacterComplex = function () {
 		//
 
 		var mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
-		mesh.rotation.y = -Math.PI / 2;
+		mesh.rotation.y = - Math.PI / 2;
 
 		//
 
@@ -554,6 +554,10 @@ THREE.MD2CharacterComplex = function () {
 
 	}
 
-	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
+	function exponentialEaseOut( k ) {
+
+		return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
+
+	}
 
 };

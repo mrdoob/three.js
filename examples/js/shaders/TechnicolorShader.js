@@ -26,7 +26,7 @@ THREE.TechnicolorShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -42,6 +42,6 @@ THREE.TechnicolorShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

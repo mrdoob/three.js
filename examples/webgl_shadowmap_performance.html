@@ -289,12 +289,11 @@
 
 					morphColorsToFaceColors( geometry );
 
+					for ( var i = - 600; i < 601; i += 2 ) {
 
-                    var i = -600;
-                    while (i < 601){
-					    addMorph( geometry, 550, 1000, 100 - Math.random() * 3000, FLOOR, i, true );
-                        i += 2;
-                    }
+						addMorph( geometry, 550, 1000, 100 - Math.random() * 3000, FLOOR, i, true );
+
+					}
 
 				} );
 

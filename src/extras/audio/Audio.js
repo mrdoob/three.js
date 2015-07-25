@@ -10,7 +10,7 @@ THREE.Audio = function ( listener ) {
 
 	this.context = listener.context;
 	this.source = this.context.createBufferSource();
-	this.source.onended = this.onEnded.bind(this);
+	this.source.onended = this.onEnded.bind( this );
 
 	this.gain = this.context.createGain();
 	this.gain.connect( this.context.destination );
@@ -41,7 +41,7 @@ THREE.Audio.prototype.load = function ( file ) {
 
 			scope.source.buffer = buffer;
 
-			if( scope.autoplay ) scope.play();
+			if ( scope.autoplay ) scope.play();
 
 		} );
 

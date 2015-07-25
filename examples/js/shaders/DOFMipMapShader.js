@@ -28,7 +28,7 @@ THREE.DOFMipMapShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -53,6 +53,6 @@ THREE.DOFMipMapShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

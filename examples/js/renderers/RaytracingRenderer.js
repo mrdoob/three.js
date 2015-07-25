@@ -543,4 +543,4 @@ THREE.RaytracingRenderer = function ( parameters ) {
 
 };
 
-THREE.EventDispatcher.prototype.apply(THREE.RaytracingRenderer.prototype);
+THREE.EventDispatcher.prototype.apply( THREE.RaytracingRenderer.prototype );

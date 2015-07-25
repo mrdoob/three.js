@@ -62,7 +62,7 @@ THREE.BlendCharacter = function () {
 
 				// interpolate the weight for the current time
 
-				data.anim.weight = data.startWeight + (data.endWeight - data.startWeight) * data.timeElapsed / data.duration;
+				data.anim.weight = data.startWeight + ( data.endWeight - data.startWeight ) * data.timeElapsed / data.duration;
 
 			}
 
@@ -117,7 +117,7 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	this.play = function(animName, weight) {
+	this.play = function( animName, weight ) {
 
 		this.animations[ animName ].play( 0, weight );
 
@@ -172,7 +172,7 @@ THREE.BlendCharacter = function () {
 
 	};
 
-	this.applyWeight = function(animName, weight) {
+	this.applyWeight = function( animName, weight ) {
 
 		this.animations[ animName ].weight = weight;
 
@@ -212,7 +212,9 @@ THREE.BlendCharacter = function () {
 		for ( a in this.animations ) {
 
 			if ( this.animations[ a ].isPlaying ) {
-				this.animations[ a ].stop(0);
+
+				this.animations[ a ].stop( 0 );
+
 			}
 
 			this.animations[ a ].weight = 0;
@@ -244,12 +246,14 @@ THREE.BlendCharacter.prototype.getForward = function() {
 
 		// pull the character's forward basis vector out of the matrix
 		forward.set(
-			-this.matrix.elements[ 8 ],
-			-this.matrix.elements[ 9 ],
-			-this.matrix.elements[ 10 ]
+			- this.matrix.elements[ 8 ],
+			- this.matrix.elements[ 9 ],
+			- this.matrix.elements[ 10 ]
 		);
 
 		return forward;
+
 	}
+
 };
 

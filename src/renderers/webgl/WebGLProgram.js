@@ -28,14 +28,14 @@ THREE.WebGLProgram = ( function () {
 
 		for ( var i = 0; i < n; i ++ ) {
 
-			var info = gl.getActiveUniform( program , i );
+			var info = gl.getActiveUniform( program, i );
 			var name = info.name;
 			var location = gl.getUniformLocation( program, name );
 
 			//console.log("THREE.WebGLProgram: ACTIVE UNIFORM:", name);
 
 			var suffixPos = name.lastIndexOf( '[0]' );
-			if ( suffixPos !== -1 && suffixPos === name.length - 3 ) {
+			if ( suffixPos !== - 1 && suffixPos === name.length - 3 ) {
 
 				uniforms[ name.substr( 0, suffixPos ) ] = location;
 
@@ -57,7 +57,7 @@ THREE.WebGLProgram = ( function () {
 
 		for ( var i = 0; i < n; i ++ ) {
 
-			var info = gl.getActiveAttrib( program , i );
+			var info = gl.getActiveAttrib( program, i );
 			var name = info.name;
 
 			//console.log("THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:", name);
@@ -217,7 +217,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
-				parameters.flatShading ? '#define FLAT_SHADED': '',
+				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 				parameters.skinning ? '#define USE_SKINNING' : '',
 				parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
@@ -235,7 +235,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				parameters.logarithmicDepthBuffer && renderer.extensions.get('EXT_frag_depth') ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 
 				'uniform mat4 modelMatrix;',
@@ -332,7 +332,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 
-				parameters.flatShading ? '#define FLAT_SHADED': '',
+				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 				parameters.metal ? '#define METAL' : '',
 				parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
@@ -344,7 +344,7 @@ THREE.WebGLProgram = ( function () {
 				parameters.shadowMapCascade ? '#define SHADOWMAP_CASCADE' : '',
 
 				parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-				parameters.logarithmicDepthBuffer && renderer.extensions.get('EXT_frag_depth') ? '#define USE_LOGDEPTHBUF_EXT' : '',
+				parameters.logarithmicDepthBuffer && renderer.extensions.get( 'EXT_frag_depth' ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
 				'uniform mat4 viewMatrix;',
 				'uniform vec3 cameraPosition;',
@@ -485,7 +485,7 @@ THREE.WebGLProgram = ( function () {
 				}
 			}
 
-		});
+		} );
 
 
 		//
