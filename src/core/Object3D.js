@@ -77,18 +77,9 @@ THREE.Object3D = function () {
 
 	this.userData = {};
 	
-	//contains the last state of position, quaternion & scale
-	this._matrixState = { positionx: 0, 
-	positiony: 0, 
-	positionz: 0, 
-	quaternionx: 0, 
-	quaterniony: 0, 
-	quaternionz: 0, 
-	quaternionw: 1, 
-	scalex: 1, 
-	scaley: 1, 
-	scalez: 1 };
-
+	this._position = this.position.clone();
+	this._quaternion = this.quaternion.clone();
+	this._scale = this.scale.clone();
 };
 
 THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
@@ -571,36 +562,6 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: ( function () {
 		
-	
-		var checkLastStateChanged = function( position, quaternion, scale, matrixState ) {
-			
-			return matrixState.positionx !== position.x ||
-				matrixState.positiony !== position.y ||
-				matrixState.positionz !== position.z ||
-				matrixState.quaternionx !== quaternion.x ||
-				matrixState.quaterniony !== quaternion.y ||
-				matrixState.quaternionz !== quaternion.z ||
-				matrixState.quaternionw !== quaternion.w ||
-				matrixState.scalex !== scale.x ||
-				matrixState.scaley !== scale.y ||
-				matrixState.scalez !== scale.z;
-				
-		};
-		var setLastState = function( position, quaternion, scale, matrixState ) {
-			
-			matrixState.positionx = position.x;
-			matrixState.positiony = position.y;
-			matrixState.positionz = position.z;
-			matrixState.quaternionx = quaternion.x;
-			matrixState.quaterniony = quaternion.y;
-			matrixState.quaternionz = quaternion.z;
-			matrixState.quaternionw = quaternion.w;
-			matrixState.scalex = scale.x;
-			matrixState.scaley = scale.y;
-			matrixState.scalez = scale.z;
-				
-		};
-		
 		function updateMatrixWorldNeedsUpdate( o ) {
 			
 			o._matrixWorldNeedsUpdate = true;
@@ -612,14 +573,17 @@ THREE.Object3D.prototype = {
 			var position = this.position;
 			var quaternion = this.quaternion;
 			var scale = this.scale;
-			var matrixState = this._matrixState;
+			var _position = this._position;
+			var _quaternion = this._quaternion;
+			var _scale = this._scale;
 			
-			if ( checkLastStateChanged( position, quaternion, scale, matrixState ) ) {
+			if ( ! _position.equals( position ) || ! _quaternion.equals( quaternion ) || ! _scale.equals( scale )  ) {
 
 				this._matrix.compose( position, quaternion, scale );
 				this.traverse( updateMatrixWorldNeedsUpdate );
-				setLastState( position, quaternion, scale, matrixState );
-
+				_position.copy( position );
+				_quaternion.copy( quaternion );
+				_scale.copy( scale );
 			}
 			return this._matrix;
 
