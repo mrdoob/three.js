@@ -1025,10 +1025,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// morph targets
 
-		if ( object.morphTargetInfluences !== undefined ) {
+		var morphTargetInfluences = object.morphTargetInfluences;
+
+		if ( morphTargetInfluences !== undefined ) {
 
 			var activeInfluences = [];
-			var morphTargetInfluences = object.morphTargetInfluences;
 
 			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
 
