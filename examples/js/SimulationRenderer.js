@@ -10,7 +10,7 @@
  *
  */
 
-function SimulationRenderer(WIDTH, renderer) {
+function SimulationRenderer( WIDTH, renderer ) {
 
 	WIDTH = WIDTH || 4;
 	var camera = new THREE.Camera();
@@ -19,14 +19,18 @@ function SimulationRenderer(WIDTH, renderer) {
 	// Init RTT stuff
 	gl = renderer.getContext();
 
-	if ( !gl.getExtension( "OES_texture_float" )) {
+	if ( ! gl.getExtension( "OES_texture_float" ) ) {
+
 		alert( "No OES_texture_float support for float textures!" );
 		return;
+
 	}
 
-	if ( gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) == 0) {
+	if ( gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) == 0 ) {
+
 		alert( "No support for vertex shader textures!" );
 		return;
+
 	}
 
 	var scene = new THREE.Scene();
@@ -77,7 +81,7 @@ function SimulationRenderer(WIDTH, renderer) {
 			predator: { type: "v3", value: new THREE.Vector3() }
 		},
 		defines: {
-			WIDTH: WIDTH.toFixed(2)
+			WIDTH: WIDTH.toFixed( 2 )
 		},
 		vertexShader: document.getElementById( 'vertexShader' ).textContent,
 		fragmentShader: document.getElementById( 'fragmentShaderVelocity' ).textContent
@@ -92,6 +96,7 @@ function SimulationRenderer(WIDTH, renderer) {
 	var rtPosition1, rtPosition2, rtVelocity1, rtVelocity2;
 
 	function init() {
+
 		var dtPosition = generatePositionTexture();
 		var dtVelocity = generateVelocityTexture();
 
@@ -100,19 +105,21 @@ function SimulationRenderer(WIDTH, renderer) {
 		rtVelocity1 = getRenderTarget( THREE.RGBFormat );
 		rtVelocity2 = rtVelocity1.clone();
 
-		simulator.renderTexture(dtPosition, rtPosition1);
-		simulator.renderTexture(rtPosition1, rtPosition2);
+		simulator.renderTexture( dtPosition, rtPosition1 );
+		simulator.renderTexture( rtPosition1, rtPosition2 );
 
-		simulator.renderTexture(dtVelocity, rtVelocity1);
-		simulator.renderTexture(rtVelocity1, rtVelocity2);
+		simulator.renderTexture( dtVelocity, rtVelocity1 );
+		simulator.renderTexture( rtVelocity1, rtVelocity2 );
 
 		simulator.velocityUniforms.testing.value = 10;
+
 	}
 
 	this.init = init;
 
 	function getRenderTarget( type ) {
-		var renderTarget = new THREE.WebGLRenderTarget(WIDTH, WIDTH, {
+
+		var renderTarget = new THREE.WebGLRenderTarget( WIDTH, WIDTH, {
 			wrapS: THREE.RepeatWrapping,
 			wrapT: THREE.RepeatWrapping,
 			minFilter: THREE.NearestFilter,
@@ -120,20 +127,24 @@ function SimulationRenderer(WIDTH, renderer) {
 			format: type,
 			type: THREE.FloatType,
 			stencilBuffer: false
-		});
+		} );
 
 		return renderTarget;
+
 	}
 
 	// Takes a texture, and render out as another texture
 	this.renderTexture = function ( input, output ) {
+
 		mesh.material = passThruShader;
 		uniforms.texture.value = input;
 		renderer.render( scene, camera, output );
+
 	};
 
 
-	this.renderPosition = function(position, velocity, output, delta) {
+	this.renderPosition = function( position, velocity, output, delta ) {
+
 		mesh.material = positionShader;
 		positionShader.uniforms.texturePosition.value = position;
 		positionShader.uniforms.textureVelocity.value = velocity;
@@ -141,9 +152,11 @@ function SimulationRenderer(WIDTH, renderer) {
 		positionShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
 		this.currentPosition = output;
+
 	};
 
-	this.renderVelocity = function(position, velocity, output, delta) {
+	this.renderVelocity = function( position, velocity, output, delta ) {
+
 		mesh.material = velocityShader;
 		velocityShader.uniforms.texturePosition.value = position;
 		velocityShader.uniforms.textureVelocity.value = velocity;
@@ -151,11 +164,12 @@ function SimulationRenderer(WIDTH, renderer) {
 		velocityShader.uniforms.delta.value = delta;
 		renderer.render( scene, camera, output );
 		this.currentVelocity = output;
+
 	};
 
 	this.simulate = function( delta ) {
 
-		if (flipflop) {
+		if ( flipflop ) {
 
 			simulator.renderVelocity( rtPosition1, rtVelocity1, rtVelocity2, delta );
 			simulator.renderPosition( rtPosition1, rtVelocity2, rtPosition2, delta );
@@ -167,7 +181,7 @@ function SimulationRenderer(WIDTH, renderer) {
 
 		}
 
-		flipflop = !flipflop;
+		flipflop = ! flipflop;
 
 	};
 

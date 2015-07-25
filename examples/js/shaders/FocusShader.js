@@ -29,7 +29,7 @@ THREE.FocusShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -87,5 +87,5 @@ THREE.FocusShader = {
 		"}"
 
 
-	].join("\n")
+	].join( "\n" )
 };

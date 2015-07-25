@@ -308,10 +308,10 @@ THREE.SceneLoader.prototype = {
 
 								object.matrixAutoUpdate = false;
 								object.matrix.set(
-									mat[0],  mat[1],  mat[2],  mat[3],
-									mat[4],  mat[5],  mat[6],  mat[7],
-									mat[8],  mat[9],  mat[10], mat[11],
-									mat[12], mat[13], mat[14], mat[15]
+									mat[ 0 ],  mat[ 1 ],  mat[ 2 ],  mat[ 3 ],
+									mat[ 4 ],  mat[ 5 ],  mat[ 6 ],  mat[ 7 ],
+									mat[ 8 ],  mat[ 9 ],  mat[ 10 ], mat[ 11 ],
+									mat[ 12 ], mat[ 13 ], mat[ 14 ], mat[ 15 ]
 								);
 
 							} else {
@@ -385,7 +385,7 @@ THREE.SceneLoader.prototype = {
 								break;
 
 							case 'AreaLight':
-								light = new THREE.AreaLight(color, intensity);
+								light = new THREE.AreaLight( color, intensity );
 								light.position.fromArray( position );
 								light.width = objJSON.size;
 								light.height = objJSON.size_y;
@@ -763,7 +763,7 @@ THREE.SceneLoader.prototype = {
 			}
 
 			color = fogJSON.color;
-			fog.color.setRGB( color[0], color[1], color[2] );
+			fog.color.setRGB( color[ 0 ], color[ 1 ], color[ 2 ] );
 
 			result.fogs[ fogID ] = fog;
 
@@ -805,7 +805,7 @@ THREE.SceneLoader.prototype = {
 
 				}
 
-			});
+			} );
 
 		}
 

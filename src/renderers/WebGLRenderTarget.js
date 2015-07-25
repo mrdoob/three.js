@@ -49,6 +49,7 @@ THREE.WebGLRenderTarget.prototype = {
 			this.dispose();
 
 		}
+
 	},
 
 	clone: function () {

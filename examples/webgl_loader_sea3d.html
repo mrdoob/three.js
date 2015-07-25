@@ -72,7 +72,7 @@
 
 				autoPlay : true, // Auto play animations
 				container : scene, // Container to add models
-				parser : THREE.SEA3D.DEFAULT, // THREE.SEA3D.BUFFER to THREE.GeometryBuffer
+				parser : THREE.SEA3D.AUTO, // Auto choose THREE.BufferGeometry and THREE.Geometry
 				multiplier : 1 // Light multiplier
 
 			} );
@@ -183,9 +183,6 @@
 				var delta = clock.getDelta();
 
 				THREE.AnimationHandler.update( delta );
-
-				// SEA3D Keyframe Update		
-				SEA3D.AnimationHandler.update( delta ); 
 
 				//renderer.render( scene, camera );
 				composer.render( delta );

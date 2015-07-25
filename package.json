@@ -28,6 +28,7 @@
   },
   "homepage": "http://threejs.org/",
   "devDependencies": {
-    "jscs": "^1.13.1"
+    "jscs": "^1.13.1",
+    "lodash": "^3.10.0"
   }
 }

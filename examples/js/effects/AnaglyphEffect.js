@@ -17,7 +17,7 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 	var _cameraR = new THREE.PerspectiveCamera();
 	_cameraR.matrixAutoUpdate = false;
 
-	var _camera = new THREE.OrthographicCamera( -1, 1, 1, - 1, 0, 1 );
+	var _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 	var _scene = new THREE.Scene();
 
@@ -49,7 +49,7 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 
 		fragmentShader: [
 
@@ -71,7 +71,7 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 			"}"
 
-		].join("\n")
+		].join( "\n" )
 
 	} );
 
@@ -124,26 +124,26 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 			// translate xOffset
 
-			eyeRight.elements[12] = eyeSep;
-			eyeLeft.elements[12] = -eyeSep;
+			eyeRight.elements[ 12 ] = eyeSep;
+			eyeLeft.elements[ 12 ] = - eyeSep;
 
 			// for left eye
 
-			xmin = -ymax * _aspect + eyeSepOnProjection;
+			xmin = - ymax * _aspect + eyeSepOnProjection;
 			xmax = ymax * _aspect + eyeSepOnProjection;
 
-			projectionMatrix.elements[0] = 2 * _near / ( xmax - xmin );
-			projectionMatrix.elements[8] = ( xmax + xmin ) / ( xmax - xmin );
+			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
 			_cameraL.projectionMatrix.copy( projectionMatrix );
 
 			// for right eye
 
-			xmin = -ymax * _aspect - eyeSepOnProjection;
+			xmin = - ymax * _aspect - eyeSepOnProjection;
 			xmax = ymax * _aspect - eyeSepOnProjection;
 
-			projectionMatrix.elements[0] = 2 * _near / ( xmax - xmin );
-			projectionMatrix.elements[8] = ( xmax + xmin ) / ( xmax - xmin );
+			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
 			_cameraR.projectionMatrix.copy( projectionMatrix );
 
@@ -168,8 +168,10 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 	};
 
 	this.dispose = function() {
+
 		if ( _renderTargetL ) _renderTargetL.dispose();
 		if ( _renderTargetR ) _renderTargetR.dispose();
+
 	}
 
 };

@@ -60,13 +60,17 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Sprite.prototype.clone = function ( object ) {
+THREE.Sprite.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Sprite( this.material );
+	var sprite = new THREE.Sprite( this.material );
+	return sprite.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	return object;
+THREE.Sprite.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
 
 };
 
@@ -76,7 +80,9 @@ THREE.Sprite.prototype.toJSON = function ( meta ) {
 
 	// only serialize if not in meta materials cache
 	if ( meta.materials[ this.material.uuid ] === undefined ) {
+
 		meta.materials[ this.material.uuid ] = this.material.toJSON();
+
 	}
 
 	data.object.material = this.material.uuid;

@@ -89,37 +89,42 @@ THREE.ShaderMaterial = function ( parameters ) {
 THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 
-THREE.ShaderMaterial.prototype.clone = function ( material ) {
+THREE.ShaderMaterial.prototype.clone = function () {
 
-	if ( material === undefined ) material = new THREE.ShaderMaterial();
+	var material = new THREE.ShaderMaterial();
+	return material.copy( this );
 
-	THREE.Material.prototype.clone.call( this, material );
+};
 
-	material.fragmentShader = this.fragmentShader;
-	material.vertexShader = this.vertexShader;
+THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
-	material.uniforms = THREE.UniformsUtils.clone( this.uniforms );
+	THREE.Material.prototype.copy.call( this, source );
 
-	material.attributes = this.attributes;
-	material.defines = this.defines;
+	this.fragmentShader = source.fragmentShader;
+	this.vertexShader = source.vertexShader;
 
-	material.shading = this.shading;
+	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
+	this.attributes = source.attributes;
+	this.defines = source.defines;
 
-	material.fog = this.fog;
+	this.shading = source.shading;
 
-	material.lights = this.lights;
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
 
-	material.vertexColors = this.vertexColors;
+	this.fog = source.fog;
 
-	material.skinning = this.skinning;
+	this.lights = source.lights;
 
-	material.morphTargets = this.morphTargets;
-	material.morphNormals = this.morphNormals;
+	this.vertexColors = source.vertexColors;
 
-	return material;
+	this.skinning = source.skinning;
+
+	this.morphTargets = source.morphTargets;
+	this.morphNormals = source.morphNormals;
+
+	return this;
 
 };
 

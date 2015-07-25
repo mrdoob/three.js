@@ -2,13 +2,13 @@ function Transition ( sceneA, sceneB ) {
 
 	this.scene = new THREE.Scene();
 	
-	this.cameraOrtho = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10, 10);
+	this.cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
 
 	this.textures = [];
-	for (var i = 0; i < 6; i ++)
-		this.textures[i] = new THREE.ImageUtils.loadTexture('textures/transition/transition' + (i + 1) + '.png');
+	for ( var i = 0; i < 6; i ++ )
+		this.textures[ i ] = new THREE.ImageUtils.loadTexture( 'textures/transition/transition' + ( i + 1 ) + '.png' );
 				
-	this.quadmaterial = new THREE.ShaderMaterial({
+	this.quadmaterial = new THREE.ShaderMaterial( {
 
 		uniforms: {
 
@@ -34,7 +34,7 @@ function Transition ( sceneA, sceneB ) {
 			},
 			tMixTexture: {
 				type: "t",
-				value: this.textures[0]
+				value: this.textures[ 0 ]
 			}
 		},
 		vertexShader: [
@@ -48,7 +48,7 @@ function Transition ( sceneA, sceneB ) {
 
 			"}"
 
-		].join("\n"),
+		].join( "\n" ),
 		fragmentShader: [
 
 			"uniform float mixRatio;",
@@ -81,14 +81,14 @@ function Transition ( sceneA, sceneB ) {
 			"}",
 		"}"
 
-		].join("\n")
+		].join( "\n" )
 
-	});
+	} );
 
-	quadgeometry = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight);
+	quadgeometry = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 	
-	this.quad = new THREE.Mesh(quadgeometry, this.quadmaterial);
-	this.scene.add(this.quad);
+	this.quad = new THREE.Mesh( quadgeometry, this.quadmaterial );
+	this.scene.add( this.quad );
 
 	// Link both scenes and their FBOs
 	this.sceneA = sceneA;
@@ -113,29 +113,30 @@ function Transition ( sceneA, sceneB ) {
 	
 	this.setTexture = function ( i ) {
 		
-		this.quadmaterial.uniforms.tMixTexture.value = this.textures[i];
+		this.quadmaterial.uniforms.tMixTexture.value = this.textures[ i ];
 		
 	};
 	
 	this.render = function( delta ) {
 		
 		// Transition animation
-		if (transitionParams.animateTransition)
-		{
-			var t = (1 + Math.sin(transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI)) / 2;
-			transitionParams.transition = THREE.Math.smoothstep(t, 0.3, 0.7);
+		if ( transitionParams.animateTransition ) {
+
+			var t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
+			transitionParams.transition = THREE.Math.smoothstep( t, 0.3, 0.7 );
 			
 			// Change the current alpha texture after each transition
-			if (transitionParams.loopTexture && (transitionParams.transition == 0 || transitionParams.transition == 1))
-			{
-				if (this.needChange)
-				{
-					transitionParams.texture = (transitionParams.texture + 1)%this.textures.length;
-					this.quadmaterial.uniforms.tMixTexture.value = this.textures[transitionParams.texture];
+			if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) ) {
+
+				if ( this.needChange ) {
+
+					transitionParams.texture = ( transitionParams.texture + 1 ) % this.textures.length;
+					this.quadmaterial.uniforms.tMixTexture.value = this.textures[ transitionParams.texture ];
 					this.needChange = false;
+
 				}
-			}	
-			else
+
+			} else
 				this.needChange = true;
 				
 		}
@@ -143,11 +144,11 @@ function Transition ( sceneA, sceneB ) {
 		this.quadmaterial.uniforms.mixRatio.value = transitionParams.transition;
 
 		// Prevent render both scenes when it's not necessary
-		if (transitionParams.transition == 0) {
+		if ( transitionParams.transition == 0 ) {
 			
 			this.sceneB.render( delta, false );
 		
-		} else if (transitionParams.transition == 1) {
+		} else if ( transitionParams.transition == 1 ) {
 		
 			this.sceneA.render( delta, false );
 			
@@ -162,4 +163,5 @@ function Transition ( sceneA, sceneB ) {
 		}
 
 	}
+
 }

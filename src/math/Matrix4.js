@@ -603,7 +603,7 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		array[ offset     ] = te[ 0 ];
+		array[ offset ] = te[ 0 ];
 		array[ offset + 1 ] = te[ 1 ];
 		array[ offset + 2 ] = te[ 2 ];
 		array[ offset + 3 ] = te[ 3 ];

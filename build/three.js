@@ -398,68 +398,112 @@ THREE.Color.prototype = {
 
 	setStyle: function ( style ) {
 
-		// rgb(255,0,0)
+		var m;
 
-		if ( /^rgb\((\d+), ?(\d+), ?(\d+)\)$/i.test( style ) ) {
+		// rgb / hsl
+		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
 
-			var color = /^rgb\((\d+), ?(\d+), ?(\d+)\)$/i.exec( style );
+			var color;
+			var name = m[ 1 ];
+			var components = m[ 2 ];
 
-			this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-			this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-			this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+			switch ( name ) {
 
+				case 'rgb':
+				case 'rgba':
+
+					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec( components ) ) {
+
+						// rgb(255,0,0)
+						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
+						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
+						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+
+						return this;
+
+					}
+
+					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%/.exec( components ) ) {
+
+						// rgb(100%,0%,0%)
+						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
+						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
+						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+
+						return this;
+
+					}
+
+					break;
+
+				case 'hsl':
+				case 'hsla':
+
+					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%/.exec( components ) ) {
+
+						// hsl(120,50%,50%)
+						var h = parseFloat( color[ 1 ], 10 );
+						var s = parseInt( color[ 2 ], 10 ) / 100;
+						var l = parseInt( color[ 3 ], 10 ) / 100;
+
+						return this.setHSL( h, s, l );
+
+					}
+
+					break;
+
+			}
+
+			// unknown color
 			return this;
 
 		}
 
-		// rgb(100%,0%,0%)
+		// hex
+		if ( m = /^\#([A-Fa-f0-9]+)$/.exec( style ) ) {
 
-		if ( /^rgb\((\d+)\%, ?(\d+)\%, ?(\d+)\%\)$/i.test( style ) ) {
+			var hex = m[ 1 ];
+			var size = hex.length;
 
-			var color = /^rgb\((\d+)\%, ?(\d+)\%, ?(\d+)\%\)$/i.exec( style );
+			if ( size === 3 ) {
 
-			this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-			this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-			this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+				// # ff0
+				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
+				this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
+				this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
 
+				return this;
+
+			}
+
+			if ( size === 6 ) {
+
+				// #fa11ac
+				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
+				this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
+				this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
+
+				return this;
+
+			}
+
+			// unknown color
 			return this;
 
 		}
 
-		// #ff0000
+		// color keywords
+		if ( /^\w+$/i.test( style ) ) {
 
-		if ( /^\#([0-9a-f]{6})$/i.test( style ) ) {
-
-			var color = /^\#([0-9a-f]{6})$/i.exec( style );
-
-			this.setHex( parseInt( color[ 1 ], 16 ) );
-
-			return this;
-
-		}
-
-		// #f00
-
-		if ( /^\#([0-9a-f])([0-9a-f])([0-9a-f])$/i.test( style ) ) {
-
-			var color = /^\#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec( style );
-
-			this.setHex( parseInt( color[ 1 ] + color[ 1 ] + color[ 2 ] + color[ 2 ] + color[ 3 ] + color[ 3 ], 16 ) );
-
-			return this;
-
-		}
-
-		// red
-
-		if ( /^(\w+)$/i.test( style ) ) {
-
+			// red
 			this.setHex( THREE.ColorKeywords[ style ] );
 
 			return this;
 
 		}
 
+		// unknown color
+		return this;
 
 	},
 
@@ -6844,7 +6888,7 @@ THREE.Math = {
 
 	randInt: function ( low, high ) {
 
-		return Math.floor( this.randFloat( low, high ) );
+		return low + Math.floor( Math.random() * ( high - low + 1 ) );
 
 	},
 
@@ -8259,49 +8303,55 @@ THREE.Object3D.prototype = {
 
 	},
 
-	clone: function ( object, recursive ) {
+	clone: function ( recursive ) {
 
-		if ( object === undefined ) object = new THREE.Object3D();
+		var object = new THREE.Object3D();
+		return object.copy( this, recursive );
+
+	},
+
+	copy: function ( source, recursive ) {
+
 		if ( recursive === undefined ) recursive = true;
 
-		object.name = this.name;
+		this.name = source.name;
 
-		object.up.copy( this.up );
+		this.up.copy( source.up );
 
-		object.position.copy( this.position );
-		object.quaternion.copy( this.quaternion );
-		object.scale.copy( this.scale );
+		this.position.copy( source.position );
+		this.quaternion.copy( source.quaternion );
+		this.scale.copy( source.scale );
 
-		object.rotationAutoUpdate = this.rotationAutoUpdate;
+		this.rotationAutoUpdate = source.rotationAutoUpdate;
 
-		object.matrix.copy( this.matrix );
-		object.matrixWorld.copy( this.matrixWorld );
+		this.matrix.copy( source.matrix );
+		this.matrixWorld.copy( source.matrixWorld );
 
-		object.matrixAutoUpdate = this.matrixAutoUpdate;
-		object.matrixWorldNeedsUpdate = this.matrixWorldNeedsUpdate;
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
-		object.visible = this.visible;
+		this.visible = source.visible;
 
-		object.castShadow = this.castShadow;
-		object.receiveShadow = this.receiveShadow;
+		this.castShadow = source.castShadow;
+		this.receiveShadow = source.receiveShadow;
 
-		object.frustumCulled = this.frustumCulled;
-		object.renderOrder = this.renderOrder;
+		this.frustumCulled = source.frustumCulled;
+		this.renderOrder = source.renderOrder;
 
-		object.userData = JSON.parse( JSON.stringify( this.userData ) );
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		if ( recursive === true ) {
 
-			for ( var i = 0; i < this.children.length; i ++ ) {
+			for ( var i = 0; i < source.children.length; i ++ ) {
 
-				var child = this.children[ i ];
-				object.add( child.clone() );
+				var child = source.children[ i ];
+				this.add( child.clone() );
 
 			}
 
 		}
 
-		return object;
+		return this;
 
 	}
 
@@ -10056,30 +10106,39 @@ THREE.Geometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.Geometry();
+		return geometry.copy( this );
 
-		var vertices = this.vertices;
+	},
+
+	copy: function ( source ) {
+
+		this.vertices = [];
+		this.faces = [];
+		this.faceVertexUvs = [ [] ];
+
+		var vertices = source.vertices;
 
 		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
-			geometry.vertices.push( vertices[ i ].clone() );
+			this.vertices.push( vertices[ i ].clone() );
 
 		}
 
-		var faces = this.faces;
+		var faces = source.faces;
 
 		for ( var i = 0, il = faces.length; i < il; i ++ ) {
 
-			geometry.faces.push( faces[ i ].clone() );
+			this.faces.push( faces[ i ].clone() );
 
 		}
 
-		for ( var i = 0, il = this.faceVertexUvs.length; i < il; i ++ ) {
+		for ( var i = 0, il = source.faceVertexUvs.length; i < il; i ++ ) {
 
-			var faceVertexUvs = this.faceVertexUvs[ i ];
+			var faceVertexUvs = source.faceVertexUvs[ i ];
 
-			if ( geometry.faceVertexUvs[ i ] === undefined ) {
+			if ( this.faceVertexUvs[ i ] === undefined ) {
 
-				geometry.faceVertexUvs[ i ] = [];
+				this.faceVertexUvs[ i ] = [];
 
 			}
 
@@ -10095,13 +10154,13 @@ THREE.Geometry.prototype = {
 
 				}
 
-				geometry.faceVertexUvs[ i ].push( uvsCopy );
+				this.faceVertexUvs[ i ].push( uvsCopy );
 
 			}
 
 		}
 
-		return geometry;
+		return this;
 
 	},
 
@@ -10515,32 +10574,6 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	copy: function ( geometry ) {
-
-		// TODO Clear attributes? Clear drawcalls? Copy morphTargets?
-
-		var attributes = geometry.attributes;
-		var offsets = geometry.drawcalls;
-
-		for ( var name in attributes ) {
-
-			var attribute = attributes[ name ];
-
-			this.addAttribute( name, attribute.clone() );
-
-		}
-
-		for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-			var offset = offsets[ i ];
-			this.addDrawCall( offset.start, offset.count, offset.index );
-
-		}
-
-		return this;
-
-	},
-
 	center: function () {
 
 		this.computeBoundingBox();
@@ -10608,6 +10641,12 @@ THREE.BufferGeometry.prototype = {
 		if ( object instanceof THREE.Mesh ) {
 
 			var direct = geometry.__directGeometry;
+
+			if ( direct === undefined ) {
+
+				return this.fromGeometry( geometry );
+
+			}
 
 			direct.verticesNeedUpdate = geometry.verticesNeedUpdate;
 			direct.normalsNeedUpdate = geometry.normalsNeedUpdate;
@@ -11474,7 +11513,7 @@ THREE.BufferGeometry.prototype = {
 		data.data = { attributes: {} };
 
 		var attributes = this.attributes;
-		var offsets = this.drawcalls;
+		var drawcalls = this.drawcalls;
 		var boundingSphere = this.boundingSphere;
 
 		for ( var key in attributes ) {
@@ -11491,9 +11530,9 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( offsets.length > 0 ) {
+		if ( drawcalls.length > 0 ) {
 
-			data.data.offsets = JSON.parse( JSON.stringify( offsets ) );
+			data.data.drawcalls = JSON.parse( JSON.stringify( drawcalls ) );
 
 		}
 
@@ -11513,23 +11552,28 @@ THREE.BufferGeometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.BufferGeometry();
+		return geometry.copy( this );
 
-		for ( var attr in this.attributes ) {
+	},
 
-			var sourceAttr = this.attributes[ attr ];
-			geometry.addAttribute( attr, sourceAttr.clone() );
+	copy: function ( source ) {
 
-		}
+		for ( var attr in source.attributes ) {
 
-		for ( var i = 0, il = this.drawcalls.length; i < il; i ++ ) {
-
-			var offset = this.drawcalls[ i ];
-
-			geometry.addDrawCall( offset.start, offset.count, offset.index );
+			var sourceAttr = source.attributes[ attr ];
+			this.addAttribute( attr, sourceAttr.clone() );
 
 		}
 
-		return geometry;
+		for ( var i = 0, il = source.drawcalls.length; i < il; i ++ ) {
+
+			var offset = source.drawcalls[ i ];
+
+			this.addDrawCall( offset.start, offset.count, offset.index );
+
+		}
+
+		return this;
 
 	},
 
@@ -11654,16 +11698,22 @@ THREE.Camera.prototype.lookAt = function () {
 
 }();
 
-THREE.Camera.prototype.clone = function ( camera ) {
+THREE.Camera.prototype.clone = function () {
 
-	if ( camera === undefined ) camera = new THREE.Camera();
+	var camera = new THREE.Camera();
+	return camera.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, camera );
+};
 
-	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
-	camera.projectionMatrix.copy( this.projectionMatrix );
+THREE.Camera.prototype.copy = function ( source ) {
 
-	return camera;
+	THREE.Object3D.prototype.copy.call( this, source );
+
+	this.matrixWorldInverse.copy( source.matrixWorldInverse );
+	this.projectionMatrix.copy( source.projectionMatrix );
+
+	return this;
+
 };
 
 // File:src/cameras/CubeCamera.js
@@ -11797,7 +11847,7 @@ THREE.OrthographicCamera.prototype.clone = function () {
 
 	var camera = new THREE.OrthographicCamera();
 
-	THREE.Camera.prototype.clone.call( this, camera );
+	camera.copy( this );
 
 	camera.zoom = this.zoom;
 
@@ -11958,7 +12008,7 @@ THREE.PerspectiveCamera.prototype.clone = function () {
 
 	var camera = new THREE.PerspectiveCamera();
 
-	THREE.Camera.prototype.clone.call( this, camera );
+	camera.copy( this );
 
 	camera.zoom = this.zoom;
 
@@ -11997,7 +12047,7 @@ THREE.Light = function ( color ) {
 	THREE.Object3D.call( this );
 
 	this.type = 'Light';
-	
+
 	this.color = new THREE.Color( color );
 
 };
@@ -12005,15 +12055,19 @@ THREE.Light = function ( color ) {
 THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Light.prototype.constructor = THREE.Light;
 
-THREE.Light.prototype.clone = function ( light ) {
+THREE.Light.prototype.clone = function () {
 
-	if ( light === undefined ) light = new THREE.Light();
+	var light = new THREE.Light();
+	return light.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, light );
+};
 
-	light.color.copy( this.color );
+THREE.Light.prototype.copy = function ( source ) {
 
-	return light;
+	THREE.Object3D.prototype.copy.call( this, source );
+	this.color.copy( source.color );
+
+	return this;
 
 };
 
@@ -12038,7 +12092,7 @@ THREE.AmbientLight.prototype.clone = function () {
 
 	var light = new THREE.AmbientLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	return light;
 
@@ -12089,7 +12143,7 @@ THREE.AreaLight.prototype.clone = function () {
 
 	var light = new THREE.AreaLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.normal.copy(this.normal);
 	light.right.copy(this.right);
@@ -12098,7 +12152,7 @@ THREE.AreaLight.prototype.clone = function () {
 	light.height = this.height;
 	light.constantAttenuation = this.constantAttenuation;
 	light.linearAttenuation = this.linearAttenuation;
-	light.quadraticAttenuation = this.quadraticAttenuation
+	light.quadraticAttenuation = this.quadraticAttenuation;
 
 	return light;
 
@@ -12185,7 +12239,7 @@ THREE.DirectionalLight.prototype.clone = function () {
 
 	var light = new THREE.DirectionalLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.target = this.target.clone();
 
@@ -12267,7 +12321,7 @@ THREE.HemisphereLight.prototype.clone = function () {
 
 	var light = new THREE.HemisphereLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.groundColor.copy( this.groundColor );
 	light.intensity = this.intensity;
@@ -12312,7 +12366,7 @@ THREE.PointLight.prototype.clone = function () {
 
 	var light = new THREE.PointLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.intensity = this.intensity;
 	light.distance = this.distance;
@@ -12389,7 +12443,7 @@ THREE.SpotLight.prototype.clone = function () {
 
 	var light = new THREE.SpotLight();
 
-	THREE.Light.prototype.clone.call( this, light );
+	light.copy( this );
 
 	light.target = this.target.clone();
 
@@ -13695,18 +13749,16 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
-		var offsets = json.data.offsets;
+		var drawcalls = json.data.drawcalls || json.data.offsets;
 
-		if ( offsets !== undefined ) {
+		if ( drawcalls !== undefined ) {
 
-			var offsetsArray = JSON.parse( JSON.stringify( offsets ) );
+			for ( var i = 0, n = drawcalls.length; i !== n; ++ i ) {
 
-			for ( var i = 0; i < offsetsArray.length; i ++ ) {
-
-				var offset = offsetsArray[i];
-				var indexStart = offset.start;
-				var indexCount = offset.count;
-				var indexOffset = offset.index;
+				var drawcall = drawcalls[ i ];
+				var indexStart = drawcall.start;
+				var indexCount = drawcall.count;
+				var indexOffset = drawcall.index;
 
 				geometry.addDrawcall( indexStart, indexCount, indexOffset );
 
@@ -13928,11 +13980,24 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'CircleBufferGeometry':
+
+						geometry = new THREE.CircleBufferGeometry(
+							data.radius,
+							data.segments,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
 					case 'CircleGeometry':
 
 						geometry = new THREE.CircleGeometry(
 							data.radius,
-							data.segments
+							data.segments,
+							data.thetaStart,
+							data.thetaLength
 						);
 
 						break;
@@ -13945,7 +14010,9 @@ THREE.ObjectLoader.prototype = {
 							data.height,
 							data.radialSegments,
 							data.heightSegments,
-							data.openEnded
+							data.openEnded,
+							data.thetaStart,
+							data.thetaLength
 						);
 
 						break;
@@ -13964,11 +14031,65 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'SphereBufferGeometry':
+
+						geometry = new THREE.SphereBufferGeometry(
+							data.radius,
+							data.widthSegments,
+							data.heightSegments,
+							data.phiStart,
+							data.phiLength,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
+					case 'DodecahedronGeometry':
+
+						geometry = new THREE.DodecahedronGeometry(
+							data.radius,
+							data.detail
+						);
+
+						break;
+
 					case 'IcosahedronGeometry':
 
 						geometry = new THREE.IcosahedronGeometry(
 							data.radius,
 							data.detail
+						);
+
+						break;
+
+					case 'OctahedronGeometry':
+
+						geometry = new THREE.OctahedronGeometry(
+							data.radius,
+							data.detail
+						);
+
+						break;
+
+					case 'TetrahedronGeometry':
+
+						geometry = new THREE.TetrahedronGeometry(
+							data.radius,
+							data.detail
+						);
+
+						break;
+
+					case 'RingGeometry':
+
+						geometry = new THREE.RingGeometry(
+							data.innerRadius,
+							data.outerRadius,
+							data.thetaSegments,
+							data.phiSegments,
+							data.thetaStart,
+							data.thetaLength
 						);
 
 						break;
@@ -14814,41 +14935,46 @@ THREE.Material.prototype = {
 
 	},
 
-	clone: function ( material ) {
+	clone: function () {
 
-		if ( material === undefined ) material = new THREE.Material();
+		var material = new THREE.Material();
+		return material.copy( this );
 
-		material.name = this.name;
+	},
 
-		material.side = this.side;
+	copy: function ( source ) {
 
-		material.opacity = this.opacity;
-		material.transparent = this.transparent;
+		this.name = source.name;
 
-		material.blending = this.blending;
+		this.side = source.side;
 
-		material.blendSrc = this.blendSrc;
-		material.blendDst = this.blendDst;
-		material.blendEquation = this.blendEquation;
-		material.blendSrcAlpha = this.blendSrcAlpha;
-		material.blendDstAlpha = this.blendDstAlpha;
-		material.blendEquationAlpha = this.blendEquationAlpha;
+		this.opacity = source.opacity;
+		this.transparent = source.transparent;
 
-		material.depthFunc = this.depthFunc;
-		material.depthTest = this.depthTest;
-		material.depthWrite = this.depthWrite;
+		this.blending = source.blending;
 
-		material.polygonOffset = this.polygonOffset;
-		material.polygonOffsetFactor = this.polygonOffsetFactor;
-		material.polygonOffsetUnits = this.polygonOffsetUnits;
+		this.blendSrc = source.blendSrc;
+		this.blendDst = source.blendDst;
+		this.blendEquation = source.blendEquation;
+		this.blendSrcAlpha = source.blendSrcAlpha;
+		this.blendDstAlpha = source.blendDstAlpha;
+		this.blendEquationAlpha = source.blendEquationAlpha;
 
-		material.alphaTest = this.alphaTest;
+		this.depthFunc = source.depthFunc;
+		this.depthTest = source.depthTest;
+		this.depthWrite = source.depthWrite;
 
-		material.overdraw = this.overdraw;
+		this.polygonOffset = source.polygonOffset;
+		this.polygonOffsetFactor = source.polygonOffsetFactor;
+		this.polygonOffsetUnits = source.polygonOffsetUnits;
 
-		material.visible = this.visible;
+		this.alphaTest = source.alphaTest;
 
-		return material;
+		this.overdraw = source.overdraw;
+
+		this.visible = source.visible;
+
+		return this;
 
 	},
 
@@ -14921,7 +15047,7 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 
 	var material = new THREE.LineBasicMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.color.copy( this.color );
 
@@ -14991,7 +15117,7 @@ THREE.LineDashedMaterial.prototype.clone = function () {
 
 	var material = new THREE.LineDashedMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.color.copy( this.color );
 
@@ -15096,7 +15222,7 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshBasicMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.color.copy( this.color );
 
@@ -15218,7 +15344,7 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshLambertMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.color.copy( this.color );
 	material.emissive.copy( this.emissive );
@@ -15373,7 +15499,7 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshPhongMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.color.copy( this.color );
 	material.emissive.copy( this.emissive );
@@ -15465,7 +15591,7 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshDepthMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.wireframe = this.wireframe;
 	material.wireframeLinewidth = this.wireframeLinewidth;
@@ -15514,7 +15640,7 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshNormalMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.wireframe = this.wireframe;
 	material.wireframeLinewidth = this.wireframeLinewidth;
@@ -15634,7 +15760,7 @@ THREE.PointCloudMaterial.prototype.clone = function () {
 
 	var material = new THREE.PointCloudMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.color.copy( this.color );
 
@@ -15760,37 +15886,42 @@ THREE.ShaderMaterial = function ( parameters ) {
 THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
 THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
 
-THREE.ShaderMaterial.prototype.clone = function ( material ) {
+THREE.ShaderMaterial.prototype.clone = function () {
 
-	if ( material === undefined ) material = new THREE.ShaderMaterial();
+	var material = new THREE.ShaderMaterial();
+	return material.copy( this );
 
-	THREE.Material.prototype.clone.call( this, material );
+};
 
-	material.fragmentShader = this.fragmentShader;
-	material.vertexShader = this.vertexShader;
+THREE.ShaderMaterial.prototype.copy = function ( source ) {
 
-	material.uniforms = THREE.UniformsUtils.clone( this.uniforms );
+	THREE.Material.prototype.copy.call( this, source );
 
-	material.attributes = this.attributes;
-	material.defines = this.defines;
+	this.fragmentShader = source.fragmentShader;
+	this.vertexShader = source.vertexShader;
 
-	material.shading = this.shading;
+	this.uniforms = THREE.UniformsUtils.clone( source.uniforms );
 
-	material.wireframe = this.wireframe;
-	material.wireframeLinewidth = this.wireframeLinewidth;
+	this.attributes = source.attributes;
+	this.defines = source.defines;
 
-	material.fog = this.fog;
+	this.shading = source.shading;
 
-	material.lights = this.lights;
+	this.wireframe = source.wireframe;
+	this.wireframeLinewidth = source.wireframeLinewidth;
 
-	material.vertexColors = this.vertexColors;
+	this.fog = source.fog;
 
-	material.skinning = this.skinning;
+	this.lights = source.lights;
 
-	material.morphTargets = this.morphTargets;
-	material.morphNormals = this.morphNormals;
+	this.vertexColors = source.vertexColors;
 
-	return material;
+	this.skinning = source.skinning;
+
+	this.morphTargets = source.morphTargets;
+	this.morphNormals = source.morphNormals;
+
+	return this;
 
 };
 
@@ -15828,7 +15959,7 @@ THREE.RawShaderMaterial.prototype.clone = function () {
 
 	var material = new THREE.RawShaderMaterial();
 
-	THREE.ShaderMaterial.prototype.clone.call( this, material );
+	material.copy( this );
 
 	return material;
 
@@ -15881,7 +16012,7 @@ THREE.SpriteMaterial.prototype.clone = function () {
 
 	var material = new THREE.SpriteMaterial();
 
-	THREE.Material.prototype.clone.call( this, material );
+	material.copy( this );
 
 	material.color.copy( this.color );
 	material.map = this.map;
@@ -15949,44 +16080,44 @@ THREE.Texture.prototype = {
 
 	set needsUpdate ( value ) {
 
-		if ( value === true ) {
-
-			this.version ++;
-			this.update();
-
-		}
+		if ( value === true ) this.version ++;
 
 	},
 
-	clone: function ( texture ) {
+	clone: function () {
 
-		if ( texture === undefined ) texture = new THREE.Texture();
+		var texture = new THREE.Texture();
+		return texture.copy( this );
 
-		texture.image = this.image;
-		texture.mipmaps = this.mipmaps.slice( 0 );
+	},
 
-		texture.mapping = this.mapping;
+	copy: function ( source ) {
 
-		texture.wrapS = this.wrapS;
-		texture.wrapT = this.wrapT;
+		this.image = source.image;
+		this.mipmaps = source.mipmaps.slice( 0 );
 
-		texture.magFilter = this.magFilter;
-		texture.minFilter = this.minFilter;
+		this.mapping = source.mapping;
 
-		texture.anisotropy = this.anisotropy;
+		this.wrapS = source.wrapS;
+		this.wrapT = source.wrapT;
 
-		texture.format = this.format;
-		texture.type = this.type;
+		this.magFilter = source.magFilter;
+		this.minFilter = source.minFilter;
 
-		texture.offset.copy( this.offset );
-		texture.repeat.copy( this.repeat );
+		this.anisotropy = source.anisotropy;
 
-		texture.generateMipmaps = this.generateMipmaps;
-		texture.premultiplyAlpha = this.premultiplyAlpha;
-		texture.flipY = this.flipY;
-		texture.unpackAlignment = this.unpackAlignment;
+		this.format = source.format;
+		this.type = source.type;
 
-		return texture;
+		this.offset.copy( source.offset );
+		this.repeat.copy( source.repeat );
+
+		this.generateMipmaps = source.generateMipmaps;
+		this.premultiplyAlpha = source.premultiplyAlpha;
+		this.flipY = source.flipY;
+		this.unpackAlignment = source.unpackAlignment;
+
+		return this;
 
 	},
 
@@ -16080,12 +16211,6 @@ THREE.Texture.prototype = {
 
 	},
 
-	update: function () {
-
-		this.dispatchEvent( { type: 'update' } );
-
-	},
-
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
@@ -16118,11 +16243,11 @@ THREE.CubeTexture = function ( images, mapping, wrapS, wrapT, magFilter, minFilt
 THREE.CubeTexture.prototype = Object.create( THREE.Texture.prototype );
 THREE.CubeTexture.prototype.constructor = THREE.CubeTexture;
 
-THREE.CubeTexture.clone = function ( texture ) {
+THREE.CubeTexture.clone = function () {
 
-	if ( texture === undefined ) texture = new THREE.CubeTexture();
+	var texture = new THREE.CubeTexture();
 
-	THREE.Texture.prototype.clone.call( this, texture );
+	texture.copy( this );
 
 	texture.images = this.images;
 
@@ -16162,7 +16287,7 @@ THREE.CompressedTexture.prototype.clone = function () {
 
 	var texture = new THREE.CompressedTexture();
 
-	THREE.Texture.prototype.clone.call( this, texture );
+	texture.copy( this );
 
 	return texture;
 
@@ -16189,7 +16314,7 @@ THREE.DataTexture.prototype.clone = function () {
 
 	var texture = new THREE.DataTexture();
 
-	THREE.Texture.prototype.clone.call( this, texture );
+	texture.copy( this );
 
 	return texture;
 
@@ -16245,15 +16370,20 @@ THREE.Group = function () {
 THREE.Group.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Group.prototype.constructor = THREE.Group;
 
-THREE.Group.prototype.clone = function ( object ) {
+THREE.Group.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Group();
-
-	THREE.Object3D.prototype.clone.call( this, object );
-
-	return object;
+	var group = new THREE.Group();
+	return group.copy( this );
 
 };
+
+THREE.Group.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
+
+};
+
 // File:src/objects/PointCloud.js
 
 /**
@@ -16394,13 +16524,17 @@ THREE.PointCloud.prototype.raycast = ( function () {
 
 }() );
 
-THREE.PointCloud.prototype.clone = function ( object ) {
+THREE.PointCloud.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.PointCloud( this.geometry, this.material );
+	var pointCloud = new THREE.PointCloud( this.geometry, this.material );
+	return pointCloud.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	return object;
+THREE.PointCloud.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
 
 };
 
@@ -16621,13 +16755,17 @@ THREE.Line.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Line.prototype.clone = function ( object ) {
+THREE.Line.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE[ this.type ]( this.geometry, this.material );
+	var line = new THREE.Line( this.geometry, this.material );
+	return line.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	return object;
+THREE.Line.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
 
 };
 
@@ -16674,13 +16812,13 @@ THREE.LineSegments = function ( geometry, material ) {
 THREE.LineSegments.prototype = Object.create( THREE.Line.prototype );
 THREE.LineSegments.prototype.constructor = THREE.LineSegments;
 
-THREE.LineSegments.prototype.clone = function ( object ) {
+THREE.LineSegments.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.LineSegments( this.geometry, this.material );
+	var line = new THREE.LineSegments( this.geometry, this.material );
 
-	THREE.Line.prototype.clone.call( this, object );
+	line.copy( this );
 
-	return object;
+	return line;
 
 };
 // File:src/objects/Mesh.js
@@ -16862,15 +17000,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var positions = attributes.position.array;
 
-				for ( var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9 ) {
+				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-					a = i;
-					b = i + 1;
-					c = i + 2;
-
-					vA.fromArray( positions, j );
-					vB.fromArray( positions, j + 3 );
-					vC.fromArray( positions, j + 6 );
+					vA.fromArray( positions, i );
+					vB.fromArray( positions, i + 3 );
+					vC.fromArray( positions, i + 6 );
 
 					if ( material.side === THREE.BackSide ) {
 
@@ -16890,12 +17024,16 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
+					a = i / 3;
+					b = a + 1;
+					c = a + 2;
+
 					intersects.push( {
 
 						distance: distance,
 						point: intersectionPoint,
 						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-						index: Math.floor(i/3), // triangle number in positions buffer semantics
+						index: a, // triangle number in positions buffer semantics
 						object: this
 
 					} );
@@ -16992,13 +17130,17 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Mesh.prototype.clone = function ( object, recursive ) {
+THREE.Mesh.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
+	var mesh = new THREE.Mesh( this.geometry, this.material );
+	return mesh.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object, recursive );
+};
 
-	return object;
+THREE.Mesh.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
 
 };
 
@@ -17044,16 +17186,22 @@ THREE.Bone = function ( skin ) {
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Bone.prototype.constructor = THREE.Bone;
 
-THREE.Bone.prototype.clone = function ( object ) {
+THREE.Bone.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Bone( this.skin );
-
-	THREE.Object3D.prototype.clone.call( this, object );
-	object.skin = this.skin; 
-
-	return object;
+	var bone = new THREE.Bone( this.skin );
+	return bone.copy( this );
 
 };
+
+THREE.Bone.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	this.skin = source.skin;
+
+	return this;
+
+};
+
 // File:src/objects/Skeleton.js
 
 /**
@@ -17087,6 +17235,8 @@ THREE.Skeleton = function ( bones, boneInverses, useVertexTexture ) {
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 
 		var size = THREE.Math.nextPowerOfTwo( Math.sqrt( this.bones.length * 4 ) ); // 4 pixels needed for 1 matrix
+
+		if ( size === 0 ) size = 2; // Avoid creating empty texture
 
 		this.boneTextureWidth = size;
 		this.boneTextureHeight = size;
@@ -17261,32 +17411,19 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	if ( this.geometry && this.geometry.bones !== undefined ) {
 
-		var bone, gbone, p, q, s;
+		var bone, gbone;
 
 		for ( var b = 0, bl = this.geometry.bones.length; b < bl; ++ b ) {
 
 			gbone = this.geometry.bones[ b ];
 
-			p = gbone.pos;
-			q = gbone.rotq;
-			s = gbone.scl;
-
 			bone = new THREE.Bone( this );
 			bones.push( bone );
 
 			bone.name = gbone.name;
-			bone.position.set( p[ 0 ], p[ 1 ], p[ 2 ] );
-			bone.quaternion.set( q[ 0 ], q[ 1 ], q[ 2 ], q[ 3 ] );
-
-			if ( s !== undefined ) {
-
-				bone.scale.set( s[ 0 ], s[ 1 ], s[ 2 ] );
-
-			} else {
-
-				bone.scale.set( 1, 1, 1 );
-
-			}
+			bone.position.fromArray( gbone.pos );
+			bone.quaternion.fromArray( gbone.rotq );
+			if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
 
 		}
 
@@ -17392,20 +17529,19 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function( force ) {
 
 };
 
-THREE.SkinnedMesh.prototype.clone = function( object ) {
+THREE.SkinnedMesh.prototype.clone = function() {
 
-	if ( object === undefined ) {
-
-		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
-
-	}
-
-	THREE.Mesh.prototype.clone.call( this, object );
-
-	return object;
+	var skinMesh = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
+	return skinMesh.copy( this );
 
 };
 
+THREE.SkinnedMesh.prototype.copy = function( source ) {
+
+	THREE.Mesh.prototype.copy.call( this, source );
+	return this;
+
+};
 
 // File:src/objects/MorphAnimMesh.js
 
@@ -17433,7 +17569,7 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 	this.direction = 1;
 	this.directionBackwards = false;
 
-	this.setFrameRange( 0, this.geometry.morphTargets.length - 1 );
+	this.setFrameRange( 0, geometry.morphTargets.length - 1 );
 
 };
 
@@ -17563,12 +17699,13 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	var keyframe = this.startKeyframe + THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.length - 1 );
 
+	var influences = this.morphTargetInfluences;
+
 	if ( keyframe !== this.currentKeyframe ) {
 
-		this.morphTargetInfluences[ this.lastKeyframe ] = 0;
-		this.morphTargetInfluences[ this.currentKeyframe ] = 1;
-
-		this.morphTargetInfluences[ keyframe ] = 0;
+		influences[ this.lastKeyframe ] = 0;
+		influences[ this.currentKeyframe ] = 1;
+		influences[ keyframe ] = 0;
 
 		this.lastKeyframe = this.currentKeyframe;
 		this.currentKeyframe = keyframe;
@@ -17583,8 +17720,8 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	}
 
-	this.morphTargetInfluences[ this.currentKeyframe ] = mix;
-	this.morphTargetInfluences[ this.lastKeyframe ] = 1 - mix;
+	influences[ this.currentKeyframe ] = mix;
+	influences[ this.lastKeyframe ] = 1 - mix;
 
 };
 
@@ -17603,23 +17740,28 @@ THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 
 };
 
-THREE.MorphAnimMesh.prototype.clone = function ( object ) {
+THREE.MorphAnimMesh.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.MorphAnimMesh( this.geometry, this.material );
+	var morph = new THREE.MorphAnimMesh( this.geometry, this.material );
+	return morph.copy( this );
 
-	object.duration = this.duration;
-	object.mirroredLoop = this.mirroredLoop;
-	object.time = this.time;
+};
 
-	object.lastKeyframe = this.lastKeyframe;
-	object.currentKeyframe = this.currentKeyframe;
+THREE.MorphAnimMesh.prototype.copy = function ( source ) {
 
-	object.direction = this.direction;
-	object.directionBackwards = this.directionBackwards;
+	this.duration = source.duration;
+	this.mirroredLoop = source.mirroredLoop;
+	this.time = source.time;
 
-	THREE.Mesh.prototype.clone.call( this, object );
+	this.lastKeyframe = source.lastKeyframe;
+	this.currentKeyframe = source.currentKeyframe;
 
-	return object;
+	this.direction = source.direction;
+	this.directionBackwards = source.directionBackwards;
+
+	THREE.Mesh.prototype.copy.call( this, source );
+
+	return this;
 
 };
 
@@ -17757,23 +17899,29 @@ THREE.LOD.prototype.update = function () {
 
 }();
 
-THREE.LOD.prototype.clone = function ( object ) {
+THREE.LOD.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.LOD();
+	var lod = new THREE.LOD();
+	return lod.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object, false );
+};
 
-	var levels = this.levels;
+
+THREE.LOD.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source, false );
+
+	var levels = source.levels;
 
 	for ( var i = 0, l = levels.length; i < l; i ++ ) {
 
 		var level = levels[ i ];
 
-		object.addLevel( level.object.clone(), level.distance );
+		this.addLevel( level.object.clone(), level.distance );
 
 	}
 
-	return object;
+	return this;
 
 };
 
@@ -17841,13 +17989,17 @@ THREE.Sprite.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Sprite.prototype.clone = function ( object ) {
+THREE.Sprite.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Sprite( this.material );
+	var sprite = new THREE.Sprite( this.material );
+	return sprite.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	return object;
+THREE.Sprite.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
 
 };
 
@@ -17952,22 +18104,27 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 
 };
 
-THREE.LensFlare.prototype.clone = function ( object ) {
+THREE.LensFlare.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.LensFlare();
+	var flare = new THREE.LensFlare();
+	return flare.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	object.positionScreen.copy( this.positionScreen );
-	object.customUpdateCallback = this.customUpdateCallback;
+THREE.LensFlare.prototype.copy = function ( source ) {
 
-	for ( var i = 0, l = this.lensFlares.length; i < l; i ++ ) {
+	THREE.Object3D.prototype.copy.call( this, source );
 
-		object.lensFlares.push( this.lensFlares[ i ] );
+	this.positionScreen.copy( source.positionScreen );
+	this.customUpdateCallback = source.customUpdateCallback;
+
+	for ( var i = 0, l = source.lensFlares.length; i < l; i ++ ) {
+
+		this.lensFlares.push( source.lensFlares[ i ] );
 
 	}
 
-	return object;
+	return this;
 
 };
 
@@ -17993,19 +18150,24 @@ THREE.Scene = function () {
 THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
 THREE.Scene.prototype.constructor = THREE.Scene;
 
-THREE.Scene.prototype.clone = function ( object ) {
+THREE.Scene.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Scene();
+	var scene = new THREE.Scene();
+	return scene.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object );
+};
 
-	if ( this.fog !== null ) object.fog = this.fog.clone();
-	if ( this.overrideMaterial !== null ) object.overrideMaterial = this.overrideMaterial.clone();
+THREE.Scene.prototype.copy = function ( source ) {
 
-	object.autoUpdate = this.autoUpdate;
-	object.matrixAutoUpdate = this.matrixAutoUpdate;
+	THREE.Object3D.prototype.copy.call( this, source );
 
-	return object;
+	if ( source.fog !== null ) this.fog = source.fog.clone();
+	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+
+	this.autoUpdate = source.autoUpdate;
+	this.matrixAutoUpdate = source.matrixAutoUpdate;
+
+	return this;
 
 };
 
@@ -19361,6 +19523,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var opaqueImmediateObjects = [];
 	var transparentImmediateObjects = [];
 
+	var morphInfluences = new Float32Array( 8 );
+
 	var sprites = [];
 	var lensFlares = [];
 
@@ -19699,6 +19863,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.getContext = function () {
 
 		return _gl;
+
+	};
+
+	this.getContextAttributes = function () {
+
+		return _gl.getContextAttributes();
 
 	};
 
@@ -20336,6 +20506,51 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// morph targets
+
+		if ( object.morphTargetInfluences !== undefined ) {
+
+			var activeInfluences = [];
+			var morphTargetInfluences = object.morphTargetInfluences;
+
+			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
+
+				var influence = morphTargetInfluences[ i ];
+				activeInfluences.push( [ influence, i ] );
+
+			}
+
+			activeInfluences.sort( numericalSort );
+
+			if ( activeInfluences.length > 8 ) {
+
+				activeInfluences.length = 8;
+
+			}
+
+			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
+
+				var influence = activeInfluences[ i ];
+				morphInfluences[ i ] = influence[ 0 ];
+
+				var attribute = geometry.morphAttributes[ influence[ 1 ] ];
+
+				objects.updateAttribute( attribute );
+
+				geometry.addAttribute( 'morphTarget' + i, attribute );
+
+			}
+
+			var uniforms = program.getUniforms();
+
+			if ( uniforms.morphTargetInfluences !== null ) {
+
+				_gl.uniform1fv( uniforms.morphTargetInfluences, morphInfluences );
+
+			}
+
+		}
+
 		if ( object instanceof THREE.Mesh ) {
 
 			renderMesh( material, geometry, object, program, updateBuffers );
@@ -20784,6 +20999,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 	// Sorting
+
+	function numericalSort ( a, b ) {
+
+		return b[ 0 ] - a[ 0 ];
+
+	}
 
 	function painterSortStable ( a, b ) {
 
@@ -21453,7 +21674,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshPhongMaterial ||
 				 material.envMap ) {
 
-				if ( p_uniforms.cameraPosition !== null ) {
+				if ( p_uniforms.cameraPosition !== undefined ) {
 
 					_vector3.setFromMatrixPosition( camera.matrixWorld );
 					_gl.uniform3f( p_uniforms.cameraPosition, _vector3.x, _vector3.y, _vector3.z );
@@ -21468,7 +21689,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
-				if ( p_uniforms.viewMatrix !== null ) {
+				if ( p_uniforms.viewMatrix !== undefined ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements );
 
@@ -21484,13 +21705,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			if ( object.bindMatrix && p_uniforms.bindMatrix !== null ) {
+			if ( object.bindMatrix && p_uniforms.bindMatrix !== undefined ) {
 
 				_gl.uniformMatrix4fv( p_uniforms.bindMatrix, false, object.bindMatrix.elements );
 
 			}
 
-			if ( object.bindMatrixInverse && p_uniforms.bindMatrixInverse !== null ) {
+			if ( object.bindMatrixInverse && p_uniforms.bindMatrixInverse !== undefined ) {
 
 				_gl.uniformMatrix4fv( p_uniforms.bindMatrixInverse, false, object.bindMatrixInverse.elements );
 
@@ -21498,7 +21719,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( _supportsBoneTextures && object.skeleton && object.skeleton.useVertexTexture ) {
 
-				if ( p_uniforms.boneTexture !== null ) {
+				if ( p_uniforms.boneTexture !== undefined ) {
 
 					var textureUnit = getTextureUnit();
 
@@ -21507,13 +21728,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( p_uniforms.boneTextureWidth !== null ) {
+				if ( p_uniforms.boneTextureWidth !== undefined ) {
 
 					_gl.uniform1i( p_uniforms.boneTextureWidth, object.skeleton.boneTextureWidth );
 
 				}
 
-				if ( p_uniforms.boneTextureHeight !== null ) {
+				if ( p_uniforms.boneTextureHeight !== undefined ) {
 
 					_gl.uniform1i( p_uniforms.boneTextureHeight, object.skeleton.boneTextureHeight );
 
@@ -21521,7 +21742,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object.skeleton && object.skeleton.boneMatrices ) {
 
-				if ( p_uniforms.boneGlobalMatrices !== null ) {
+				if ( p_uniforms.boneGlobalMatrices !== undefined ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.skeleton.boneMatrices );
 
@@ -21622,7 +21843,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		loadUniformsMatrices( p_uniforms, object );
 
-		if ( p_uniforms.modelMatrix !== null ) {
+		if ( p_uniforms.modelMatrix !== undefined ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.modelMatrix, false, object.matrixWorld.elements );
 
@@ -23634,8 +23855,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	var objects = {};
 
-	var morphInfluences = new Float32Array( 8 );
-
 	var geometries = new THREE.WebGLGeometries( gl, properties, info );
 
 	//
@@ -23707,12 +23926,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	};
 
-	function numericalSort ( a, b ) {
-
-		return b[ 0 ] - a[ 0 ];
-
-	}
-
 	function updateObject( object ) {
 
 		var geometry = geometries.get( object );
@@ -23720,57 +23933,6 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		if ( object.geometry instanceof THREE.Geometry ) {
 
 			geometry.updateFromObject( object );
-
-		}
-
-		// morph targets
-
-		if ( object.morphTargetInfluences !== undefined ) {
-
-			var activeInfluences = [];
-			var morphTargetInfluences = object.morphTargetInfluences;
-
-			for ( var i = 0, l = morphTargetInfluences.length; i < l; i ++ ) {
-
-				var influence = morphTargetInfluences[ i ];
-				activeInfluences.push( [ influence, i ] );
-
-			}
-
-			activeInfluences.sort( numericalSort );
-
-			if ( activeInfluences.length > 8 ) {
-
-				activeInfluences.length = 8;
-
-			}
-
-			for ( var i = 0, l = activeInfluences.length; i < l; i ++ ) {
-
-				morphInfluences[ i ] = activeInfluences[ i ][ 0 ];
-
-				var attribute = geometry.morphAttributes[ activeInfluences[ i ][ 1 ] ];
-				geometry.addAttribute( 'morphTarget' + i, attribute );
-
-			}
-
-			var material = object.material;
-
-			if ( material.program !== undefined ) {
-
-				var uniforms = material.program.getUniforms();
-
-				if ( uniforms.morphTargetInfluences !== null ) {
-
-					gl.uniform1fv( uniforms.morphTargetInfluences, morphInfluences );
-
-				}
-
-			} else {
-
-				console.warn( 'TOFIX: material.program is undefined' );
-
-			}
 
 		}
 
@@ -23786,7 +23948,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function updateAttribute ( attribute, name ) {
+	function updateAttribute( attribute, name ) {
 
 		var bufferType = ( name === 'index' ) ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
 
@@ -23806,7 +23968,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function createBuffer ( attributeProperties, data, bufferType ) {
+	function createBuffer( attributeProperties, data, bufferType ) {
 
 		attributeProperties.__webglBuffer = gl.createBuffer();
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
@@ -23827,7 +23989,7 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	}
 
-	function updateBuffer ( attributeProperties, data, bufferType ) {
+	function updateBuffer( attributeProperties, data, bufferType ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
@@ -23867,9 +24029,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 	this.update = function ( renderList ) {
 
-		for ( var i = 0, ul = renderList.length; i < ul; i++ ) {
+		for ( var i = 0, ul = renderList.length; i < ul; i ++ ) {
 
-			var object = renderList[i].object;
+			var object = renderList[ i ].object;
 
 			if ( object.material.visible !== false ) {
 
@@ -23880,6 +24042,8 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 		}
 
 	};
+
+	this.updateAttribute = updateAttribute;
 
 	this.clear = function () {
 
@@ -24794,7 +24958,6 @@ THREE.WebGLShadowMap = function ( _renderer, _lights, _objects ) {
 
 				}
 
-				_renderer.setMaterialFaces( objectMaterial );
 				_renderer.renderBufferDirect( shadowCamera, _lights, fog, material, object );
 
 			}
@@ -30747,8 +30910,8 @@ THREE.MorphAnimation.prototype = {
 
 		this.currentTime = Math.min( this.currentTime, this.duration );
 
-		var interpolation = this.duration / this.frames;
-		var frame = Math.floor( this.currentTime / interpolation );
+		var frameTime = this.duration / this.frames;
+		var frame = Math.floor( this.currentTime / frameTime );
 
 		var influences = this.mesh.morphTargetInfluences;
 
@@ -30763,8 +30926,10 @@ THREE.MorphAnimation.prototype = {
 
 		}
 
-		influences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
-		influences[ this.lastFrame ] = 1 - influences[ frame ];
+		var mix = ( this.currentTime % frameTime ) / frameTime;
+
+		influences[ frame ] = mix;
+		influences[ this.lastFrame ] = 1 - mix;
 
 	}
 
@@ -30898,6 +31063,21 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.BoxGeometry.prototype.constructor = THREE.BoxGeometry;
 
+THREE.BoxGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.BoxGeometry(
+		this.parameters.width,
+		this.parameters.height,
+		this.parameters.depth,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments,
+		this.parameters.depthSegments
+	);
+
+	return geometry;
+
+};
+
 THREE.CubeGeometry = THREE.BoxGeometry; // backwards compatibility
 
 // File:src/extras/geometries/CircleGeometry.js
@@ -30961,6 +31141,19 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.CircleGeometry.prototype.constructor = THREE.CircleGeometry;
+
+THREE.CircleGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.CircleGeometry(
+		this.parameters.radius,
+		this.parameters.segments,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/CircleBufferGeometry.js
 
@@ -31033,6 +31226,21 @@ THREE.CircleBufferGeometry = function ( radius, segments, thetaStart, thetaLengt
 
 THREE.CircleBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.CircleBufferGeometry.prototype.constructor = THREE.CircleBufferGeometry;
+
+THREE.CircleBufferGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.CircleBufferGeometry(
+		this.parameters.radius,
+		this.parameters.segments,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/CylinderGeometry.js
 
@@ -31208,6 +31416,23 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
+
+THREE.CylinderGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.CylinderGeometry(
+		this.parameters.radiusTop,
+		this.parameters.radiusBottom,
+		this.parameters.height,
+		this.parameters.radialSegments,
+		this.parameters.heightSegments,
+		this.parameters.openEnded,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/EdgesGeometry.js
 
@@ -32235,6 +32460,19 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
 
+THREE.PlaneGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.PlaneGeometry(
+		this.parameters.width,
+		this.parameters.height,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments
+	);
+
+	return geometry;
+
+};
+
 // File:src/extras/geometries/PlaneBufferGeometry.js
 
 /**
@@ -32334,6 +32572,21 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 THREE.PlaneBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.PlaneBufferGeometry.prototype.constructor = THREE.PlaneBufferGeometry;
 
+THREE.PlaneBufferGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.PlaneBufferGeometry(
+		this.parameters.width,
+		this.parameters.height,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};
+
 // File:src/extras/geometries/RingGeometry.js
 
 /**
@@ -32419,6 +32672,20 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.RingGeometry.prototype.constructor = THREE.RingGeometry;
 
+THREE.RingGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.RingGeometry(
+		this.parameters.innerRadius,
+		this.parameters.outerRadius,
+		this.parameters.thetaSegments,
+		this.parameters.phiSegments,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/SphereGeometry.js
 
@@ -32538,6 +32805,22 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
 
+THREE.SphereGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.SphereGeometry(
+		this.parameters.radius,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments,
+		this.parameters.phiStart,
+		this.parameters.phiLength,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	return geometry;
+
+};
+
 // File:src/extras/geometries/SphereBufferGeometry.js
 
 /**
@@ -32641,6 +32924,24 @@ THREE.SphereBufferGeometry = function ( radius, widthSegments, heightSegments, p
 
 THREE.SphereBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 THREE.SphereBufferGeometry.prototype.constructor = THREE.SphereBufferGeometry;
+
+THREE.SphereBufferGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.SphereBufferGeometry(
+		this.parameters.radius,
+		this.parameters.widthSegments,
+		this.parameters.heightSegments,
+		this.parameters.phiStart,
+		this.parameters.phiLength,
+		this.parameters.thetaStart,
+		this.parameters.thetaLength
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/TextGeometry.js
 
@@ -32789,6 +33090,20 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
 
+THREE.TorusGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.TorusGeometry(
+		this.parameters.radius,
+		this.parameters.tube,
+		this.parameters.radialSegments,
+		this.parameters.tubularSegments,
+		this.parameters.arc
+	);
+
+	return geometry;
+
+};
+
 // File:src/extras/geometries/TorusKnotGeometry.js
 
 /**
@@ -32819,7 +33134,7 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 	p = p || 2;
 	q = q || 3;
 	heightScale = heightScale || 1;
-	
+
 	var grid = new Array( radialSegments );
 	var tang = new THREE.Vector3();
 	var n = new THREE.Vector3();
@@ -32904,6 +33219,22 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
+
+THREE.TorusKnotGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.TorusKnotGeometry(
+		this.parameters.radius,
+		this.parameters.tube,
+		this.parameters.radialSegments,
+		this.parameters.tubularSegments,
+		this.parameters.p,
+		this.parameters.q,
+		this.parameters.heightScale
+	);
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/TubeGeometry.js
 
@@ -33440,6 +33771,26 @@ THREE.PolyhedronGeometry = function ( vertices, indices, radius, detail ) {
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
 
+THREE.PolyhedronGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.PolyhedronGeometry(
+		this.parameters.vertices,
+		this.parameters.indices,
+		this.parameters.radius,
+		this.parameters.detail
+	);
+
+	return geometry.copy( this );
+
+};
+
+THREE.PolyhedronGeometry.prototype.copy = function ( source ) {
+
+	THREE.Geometry.prototype.copy.call( this, source );
+	return this;
+
+};
+
 // File:src/extras/geometries/DodecahedronGeometry.js
 
 /**
@@ -33447,11 +33798,6 @@ THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
  */
 
 THREE.DodecahedronGeometry = function ( radius, detail ) {
-
-	this.parameters = {
-		radius: radius,
-		detail: detail
-	};
 
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 	var r = 1 / t;
@@ -33494,10 +33840,30 @@ THREE.DodecahedronGeometry = function ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, indices, radius, detail );
 
+	this.type = 'DodecahedronGeometry';
+
+	this.parameters = {
+		radius: radius,
+		detail: detail
+	};
+
 };
 
-THREE.DodecahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.DodecahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.DodecahedronGeometry.prototype.constructor = THREE.DodecahedronGeometry;
+
+THREE.DodecahedronGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.DodecahedronGeometry(
+		this.parameters.radius,
+		this.parameters.detail
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/IcosahedronGeometry.js
 
@@ -33532,8 +33898,21 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 	};
 };
 
-THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.IcosahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
+
+THREE.IcosahedronGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.IcosahedronGeometry(
+		this.parameters.radius,
+		this.parameters.detail
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/OctahedronGeometry.js
 
@@ -33542,11 +33921,6 @@ THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
  */
 
 THREE.OctahedronGeometry = function ( radius, detail ) {
-
-	this.parameters = {
-		radius: radius,
-		detail: detail
-	};
 
 	var vertices = [
 		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0,- 1, 0,    0, 0, 1,    0, 0,- 1
@@ -33566,8 +33940,21 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 	};
 };
 
-THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.OctahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.OctahedronGeometry.prototype.constructor = THREE.OctahedronGeometry;
+
+THREE.OctahedronGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.OctahedronGeometry(
+		this.parameters.radius,
+		this.parameters.detail
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/TetrahedronGeometry.js
 
@@ -33596,8 +33983,21 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 
 };
 
-THREE.TetrahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.TetrahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );
 THREE.TetrahedronGeometry.prototype.constructor = THREE.TetrahedronGeometry;
+
+THREE.TetrahedronGeometry.prototype.clone = function () {
+
+	var geometry = new THREE.TetrahedronGeometry(
+		this.parameters.radius,
+		this.parameters.detail
+	);
+
+	geometry.copy( this );
+
+	return geometry;
+
+};
 
 // File:src/extras/geometries/ParametricGeometry.js
 
@@ -33697,7 +34097,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 	THREE.BufferGeometry.call( this );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+	var sortFunction = function ( a, b ) { return a - b; };
 
 	var keys = [ 'a', 'b', 'c' ];
 
@@ -34037,6 +34437,8 @@ THREE.BoxHelper.prototype.update = ( function () {
 	return function ( object ) {
 
 		box.setFromObject( object );
+
+		if ( box.empty() ) return;
 
 		var min = box.min;
 		var max = box.max;

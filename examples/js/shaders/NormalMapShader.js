@@ -27,7 +27,7 @@ THREE.NormalMapShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -48,6 +48,6 @@ THREE.NormalMapShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

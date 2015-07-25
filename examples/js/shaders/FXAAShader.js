@@ -25,7 +25,7 @@ THREE.FXAAShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -83,6 +83,6 @@ THREE.FXAAShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

@@ -68,7 +68,7 @@ THREE.EffectComposer.prototype = {
 
 			pass = this.passes[ i ];
 
-			if ( !pass.enabled ) continue;
+			if ( ! pass.enabled ) continue;
 
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 

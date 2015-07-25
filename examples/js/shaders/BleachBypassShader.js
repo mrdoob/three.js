@@ -26,7 +26,7 @@ THREE.BleachBypassShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -59,6 +59,6 @@ THREE.BleachBypassShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

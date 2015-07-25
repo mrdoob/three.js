@@ -28,6 +28,8 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 		box.setFromObject( object );
 
+		if ( box.empty() ) return;
+
 		var min = box.min;
 		var max = box.max;
 
@@ -49,11 +51,11 @@ THREE.BoxHelper.prototype.update = ( function () {
 
 		var vertices = this.geometry.attributes.position.array;
 
-		vertices[  0 ] = max.x; vertices[  1 ] = max.y; vertices[  2 ] = max.z;
-		vertices[  3 ] = min.x; vertices[  4 ] = max.y; vertices[  5 ] = max.z;
+		vertices[ 0 ] = max.x; vertices[ 1 ] = max.y; vertices[ 2 ] = max.z;
+		vertices[ 3 ] = min.x; vertices[ 4 ] = max.y; vertices[ 5 ] = max.z;
 
-		vertices[  6 ] = min.x; vertices[  7 ] = max.y; vertices[  8 ] = max.z;
-		vertices[  9 ] = min.x; vertices[ 10 ] = min.y; vertices[ 11 ] = max.z;
+		vertices[ 6 ] = min.x; vertices[ 7 ] = max.y; vertices[ 8 ] = max.z;
+		vertices[ 9 ] = min.x; vertices[ 10 ] = min.y; vertices[ 11 ] = max.z;
 
 		vertices[ 12 ] = min.x; vertices[ 13 ] = min.y; vertices[ 14 ] = max.z;
 		vertices[ 15 ] = max.x; vertices[ 16 ] = min.y; vertices[ 17 ] = max.z;

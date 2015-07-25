@@ -175,15 +175,11 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 				var positions = attributes.position.array;
 
-				for ( var i = 0, j = 0, il = positions.length; i < il; i += 3, j += 9 ) {
+				for ( var i = 0, il = positions.length; i < il; i += 9 ) {
 
-					a = i;
-					b = i + 1;
-					c = i + 2;
-
-					vA.fromArray( positions, j );
-					vB.fromArray( positions, j + 3 );
-					vC.fromArray( positions, j + 6 );
+					vA.fromArray( positions, i );
+					vB.fromArray( positions, i + 3 );
+					vC.fromArray( positions, i + 6 );
 
 					if ( material.side === THREE.BackSide ) {
 
@@ -203,12 +199,16 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
+					a = i / 3;
+					b = a + 1;
+					c = a + 2;
+
 					intersects.push( {
 
 						distance: distance,
 						point: intersectionPoint,
 						face: new THREE.Face3( a, b, c, THREE.Triangle.normal( vA, vB, vC ) ),
-						index: Math.floor(i/3), // triangle number in positions buffer semantics
+						index: a, // triangle number in positions buffer semantics
 						object: this
 
 					} );
@@ -305,13 +305,17 @@ THREE.Mesh.prototype.raycast = ( function () {
 
 }() );
 
-THREE.Mesh.prototype.clone = function ( object, recursive ) {
+THREE.Mesh.prototype.clone = function () {
 
-	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
+	var mesh = new THREE.Mesh( this.geometry, this.material );
+	return mesh.copy( this );
 
-	THREE.Object3D.prototype.clone.call( this, object, recursive );
+};
 
-	return object;
+THREE.Mesh.prototype.copy = function ( source ) {
+
+	THREE.Object3D.prototype.copy.call( this, source );
+	return this;
 
 };
 
@@ -321,12 +325,16 @@ THREE.Mesh.prototype.toJSON = function ( meta ) {
 
 	// only serialize if not in meta geometries cache
 	if ( meta.geometries[ this.geometry.uuid ] === undefined ) {
+
 		meta.geometries[ this.geometry.uuid ] = this.geometry.toJSON( meta );
+
 	}
 
 	// only serialize if not in meta materials cache
 	if ( meta.materials[ this.material.uuid ] === undefined ) {
+
 		meta.materials[ this.material.uuid ] = this.material.toJSON( meta );
+
 	}
 
 	data.object.geometry = this.geometry.uuid;

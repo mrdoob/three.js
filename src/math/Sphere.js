@@ -20,6 +20,7 @@ THREE.Sphere.prototype = {
 		this.radius = radius;
 
 		return this;
+
 	},
 
 	setFromPoints: function () {

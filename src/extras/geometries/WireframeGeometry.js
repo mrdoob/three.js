@@ -7,7 +7,11 @@ THREE.WireframeGeometry = function ( geometry ) {
 	THREE.BufferGeometry.call( this );
 
 	var edge = [ 0, 0 ], hash = {};
-	var sortFunction = function ( a, b ) { return a - b };
+	var sortFunction = function ( a, b ) {
+
+		return a - b;
+
+	};
 
 	var keys = [ 'a', 'b', 'c' ];
 
@@ -51,7 +55,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			for ( var j = 0; j < 2; j ++ ) {
 
-				var vertex = vertices[ edges [ 2 * i + j] ];
+				var vertex = vertices[ edges [ 2 * i + j ] ];
 
 				var index = 6 * i + 3 * j;
 				coords[ index + 0 ] = vertex.x;
@@ -66,7 +70,9 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 	} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-		if ( geometry.attributes.index !== undefined ) { // Indexed BufferGeometry
+		if ( geometry.attributes.index !== undefined ) {
+
+			// Indexed BufferGeometry
 
 			var vertices = geometry.attributes.position;
 			var indices = geometry.attributes.index.array;
@@ -120,7 +126,7 @@ THREE.WireframeGeometry = function ( geometry ) {
 				for ( var j = 0; j < 2; j ++ ) {
 
 					var index = 6 * i + 3 * j;
-					var index2 = edges[2 * i + j];
+					var index2 = edges[ 2 * i + j ];
 
 					coords[ index + 0 ] = vertices.getX( index2 );
 					coords[ index + 1 ] = vertices.getY( index2 );
@@ -132,7 +138,9 @@ THREE.WireframeGeometry = function ( geometry ) {
 
 			this.addAttribute( 'position', new THREE.BufferAttribute( coords, 3 ) );
 
-		} else { // non-indexed BufferGeometry
+		} else {
+
+			// non-indexed BufferGeometry
 
 			var vertices = geometry.attributes.position.array;
 			var numEdges = vertices.length / 3;

@@ -262,15 +262,16 @@ THREE.Geometry.prototype = {
 
 		var matrix = new THREE.Matrix4();
 		matrix.set(
-			s, 0, 0, -s * center.x,
-			0, s, 0, -s * center.y,
-			0, 0, s, -s * center.z,
+			s, 0, 0, - s * center.x,
+			0, s, 0, - s * center.y,
+			0, 0, s, - s * center.z,
 			0, 0, 0, 1
 		);
 
 		this.applyMatrix( matrix );
 
 		return this;
+
 	},
 
 	computeFaceNormals: function () {
@@ -822,6 +823,7 @@ THREE.Geometry.prototype = {
 			// if any duplicate vertices are found in a Face3
 			// we have to remove the face as nothing can be saved
 			for ( var n = 0; n < 3; n ++ ) {
+
 				if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
 					dupIndex = n;
@@ -829,11 +831,13 @@ THREE.Geometry.prototype = {
 					break;
 
 				}
+
 			}
 
 		}
 
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+
 			var idx = faceIndicesToRemove[ i ];
 
 			this.faces.splice( idx, 1 );
@@ -979,7 +983,7 @@ THREE.Geometry.prototype = {
 
 		function setBit( value, position, enabled ) {
 
-			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position) );
+			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position ) );
 
 		}
 
@@ -1049,30 +1053,39 @@ THREE.Geometry.prototype = {
 	clone: function () {
 
 		var geometry = new THREE.Geometry();
+		return geometry.copy( this );
 
-		var vertices = this.vertices;
+	},
+
+	copy: function ( source ) {
+
+		this.vertices = [];
+		this.faces = [];
+		this.faceVertexUvs = [ [] ];
+
+		var vertices = source.vertices;
 
 		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
-			geometry.vertices.push( vertices[ i ].clone() );
+			this.vertices.push( vertices[ i ].clone() );
 
 		}
 
-		var faces = this.faces;
+		var faces = source.faces;
 
 		for ( var i = 0, il = faces.length; i < il; i ++ ) {
 
-			geometry.faces.push( faces[ i ].clone() );
+			this.faces.push( faces[ i ].clone() );
 
 		}
 
-		for ( var i = 0, il = this.faceVertexUvs.length; i < il; i ++ ) {
+		for ( var i = 0, il = source.faceVertexUvs.length; i < il; i ++ ) {
 
-			var faceVertexUvs = this.faceVertexUvs[ i ];
+			var faceVertexUvs = source.faceVertexUvs[ i ];
 
-			if ( geometry.faceVertexUvs[ i ] === undefined ) {
+			if ( this.faceVertexUvs[ i ] === undefined ) {
 
-				geometry.faceVertexUvs[ i ] = [];
+				this.faceVertexUvs[ i ] = [];
 
 			}
 
@@ -1088,13 +1101,13 @@ THREE.Geometry.prototype = {
 
 				}
 
-				geometry.faceVertexUvs[ i ].push( uvsCopy );
+				this.faceVertexUvs[ i ].push( uvsCopy );
 
 			}
 
 		}
 
-		return geometry;
+		return this;
 
 	},
 

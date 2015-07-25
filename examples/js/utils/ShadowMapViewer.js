@@ -134,7 +134,7 @@ THREE.ShadowMapViewer = function ( light ) {
 			var width = scope.size.width;
 			var height = scope.size.height;
 
-			mesh.position.set( -window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
+			mesh.position.set( - window.innerWidth / 2 + width / 2 + this.x, window.innerHeight / 2 - height / 2 - this.y, 0 );
 
 			if ( doRenderLabel ) labelMesh.position.set( mesh.position.x, mesh.position.y - scope.size.height / 2 + labelCanvas.height / 2, 0 );
 
