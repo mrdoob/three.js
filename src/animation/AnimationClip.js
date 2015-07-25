@@ -8,11 +8,11 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
-THREE.AnimationClip = function ( name, tracks, duration ) {
+THREE.AnimationClip = function ( name, duration, tracks ) {
 
 	this.name = name;
 	this.tracks = tracks;
-	this.duration = duration;
+	this.duration = duration || 1;
 
 };
 
@@ -26,7 +26,10 @@ THREE.AnimationClip.prototype = {
 
 		var results = {};
 
-		for( var track in this.tracks ) {
+		for( var trackIndex in this.tracks ) {
+
+			var track = this.tracks[ trackIndex ];
+			console.log( 'track', track );
 
 			results[ track.name ] = track.getAt( clipTime );
 
@@ -191,14 +194,14 @@ THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration 
 	return clip;
 };
 
-THREE.AnimationClip.CreateRotationAnimation = function( node, period, axis ) {
+THREE.AnimationClip.CreateRotationAnimation = function( period, axis ) {
 
 	var keys = [];
 	keys.push( { time: 0, value: 0 } );
 	keys.push( { time: period, value: 360 } );
 
 	axis = axis || 'x';
-	var trackName = node.name + '.rotation[' + axis + ']';
+	var trackName = '.rotation[' + axis + ']';
 
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
@@ -208,7 +211,7 @@ THREE.AnimationClip.CreateRotationAnimation = function( node, period, axis ) {
 	return clip;
 };
 
-THREE.AnimationClip.CreateShakeAnimation = function( node, duration, shakeScale ) {
+THREE.AnimationClip.CreateShakeAnimation = function( duration, shakeScale ) {
 
 	var keys = [];
 
@@ -221,7 +224,7 @@ THREE.AnimationClip.CreateShakeAnimation = function( node, duration, shakeScale 
 
 	}
 
-	var trackName = node.name + '.position';
+	var trackName = '.position';
 
 	var track = new THREE.KeyframeTrack( trackName, keys );
 

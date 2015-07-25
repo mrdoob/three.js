@@ -20,8 +20,8 @@ THREE.AnimationMixer.prototype = {
 
 	constructor: THREE.AnimationMixer,
 
-	addAnimationAction: function( action ) {
-		console.log( root.name + ".AnimationMixer.addAnimationAction( " + action.name + " )" );
+	addAction: function( action ) {
+		console.log( this.root.name + ".AnimationMixer.addAnimationAction( " + action.name + " )" );
 
 		this.actions.push( action );
 
@@ -36,8 +36,8 @@ THREE.AnimationMixer.prototype = {
 
 	},
 
-	removeAnimationAction: function( action ) {
-		console.log( root.name + ".AnimationMixer.addRemove( " + action.name + " )" );
+	removeAction: function( action ) {
+		console.log( this.root.name + ".AnimationMixer.addRemove( " + action.name + " )" );
 
 		var index = this.actions.indexOf( action );
 
@@ -49,7 +49,7 @@ THREE.AnimationMixer.prototype = {
 	},
 
 	update: function( time ) {
-		console.log( root.name + ".AnimationMixer.update( " + time + " )" );
+		console.log( this.root.name + ".AnimationMixer.update( " + time + " )" );
 
 		var mixerResults = {};
 
@@ -60,16 +60,19 @@ THREE.AnimationMixer.prototype = {
 			if( action.weight <= 0 || ! action.enabled ) continue;
 
 			var actionResults = action.getAt( time );
+			console.log( '   actionResults', actionResults );
+			for( var name in actionResults ) {
 
-			for( var actionResult in actionResults ) {
-
-				var mixerResult = mixerResults[actionResult.name];
-
+				var mixerResult = mixerResults[name];
+				var actionResult = actionResults[name];
+				console.log( '   name', name );
+				console.log( '   mixerResult', mixerResult );
+				console.log( '   actionResult', actionResult );
+		
 				if( ! mixerResult ) {
 
-					mixerResults[actionResult.name] = {
-						name: actionResult.name,
-						cumulativeValue: actionResult.value,
+					mixerResults[name] = {
+						cumulativeValue: actionResult,
 						cumulativeWeight: action.weight
 					};
 
@@ -77,10 +80,12 @@ THREE.AnimationMixer.prototype = {
 				else {
 
 					var lerpAlpha = action.weight / ( mixerResult.cumulativeWeight + action.weight );
-					mixerResult.cumulativeValue = AnimationUtils.lerp( mixerResult.cumulativeValue, actionResult.value, lerpAlpha );
+					mixerResult.cumulativeValue = THREE.AnimationUtils.lerp( mixerResult.cumulativeValue, actionResult, lerpAlpha );
 					mixerResult.cumulativeWeight += action.weight;
 
 				}
+
+				console.log( '   mixerResults[name]', mixerResults[name] );
 			}
 
 		}
@@ -89,10 +94,13 @@ THREE.AnimationMixer.prototype = {
 		// apply to nodes
 		for ( var name in mixerResults ) {
 
+			console.log( '    track:' + name );
+
 			var mixerResult = mixerResults[ name ];
+			console.log( '    mixerResult:', mixerResult );
 
 			var propertyBinding = this.propertyBindings[ name ];
-			propertyBinding.set( mixerResult.value );
+			propertyBinding.set( mixerResult.cumulativeValue );
 			
 		}
 	}

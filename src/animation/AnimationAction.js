@@ -27,24 +27,29 @@ THREE.AnimationAction.prototype = {
 		console.log( 'AnimationAction[' + this.clip.name + '].toAnimationClipTime( ' + time + ' )' );
 
 		var clipTime = time - this.startTime;
+		console.log( '   clipTime: ' + clipTime );
 
 		clipTime *= this.timeScale;
+		console.log( '   clipTime: ' + clipTime );
 
 		if( this.loop ) {
 
 			if( clipTime < 0 ) {
 
 				clipTime = clipTime - Math.floor( clipTime / this.clip.duration ) * this.clip.duration;
+				console.log( '   clipTime: ' + clipTime );
 
 			}
 
 	   		clipTime = clipTime % this.clip.duration;
+			console.log( '   clipTime: ' + clipTime );
 
 	   	}
 	   	else {
 
 	   		clipTime = Math.min( clipTime, this.clip.duration );
 	   		clipTime = Math.max( clipTime, 0 );
+			console.log( '   clipTime: ' + clipTime );
 
 	   	}
 

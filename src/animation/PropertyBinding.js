@@ -56,7 +56,7 @@ THREE.PropertyBinding.prototype = {
 		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
 		else {
 			console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
-			node[ this.propertyName ] = value;	
+			this.node[ this.propertyName ] = value;	
 		}
 
 		// trigger node dirty			

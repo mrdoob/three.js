@@ -62,6 +62,9 @@
 
 			var mesh, helper;
 
+			var mixer;
+			var time1 = 0;
+
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -253,6 +256,12 @@
 				var animation = new THREE.Animation( mesh, geometry.animation );
 				//animation.play();
 
+				mixer = new THREE.AnimationMixer( mesh );
+
+				var rotateClip = THREE.AnimationClip.CreateRotationAnimation( 10 );
+
+				mixer.addAction( new THREE.AnimationAction( rotateClip, 0, 1, 1, true ) );
+
 			}
 
 			function initGUI() {
@@ -301,6 +310,11 @@
 
 				THREE.AnimationHandler.update( delta );
 
+				if( mixer ) {
+					time1 += delta;
+					mixer.update( time1 );
+				}
+				
 				if ( helper !== undefined ) helper.update();
 
 				// update morphs
