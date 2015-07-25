@@ -106,5 +106,4 @@ buildAll.stderr.on('data', function (data) {
 buildAll.on( 'exit', function ( exitCode ) {
 	console.log( "exitCode: " + exitCode );
 	buildModule( "three" );
-	buildModule( "three-math" );
 });
