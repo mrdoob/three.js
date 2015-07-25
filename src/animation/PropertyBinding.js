@@ -104,15 +104,12 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	var results = {
 		directoryName: m[0],
 		nodeName: m[2],
-		propertyName: m[4],
+		propertyName: m[4],	// allowed to be null, specified root node.
 		propertySubElement: m[6]
 	};
 
 	console.log( "PropertyBinding.parseTrackName", trackName, results );
 
-	if( results.nodeName === null || results.nodeName.length === 0 ) {
-		throw new Error( "can not parse nodeName from trackName: " + trackName );
-	}
 	if( results.propertyName === null || results.propertyName.length === 0 ) {
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
 	}
@@ -126,7 +123,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 	console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')');
 	
-	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 ) {
+	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 
 		console.log( '  root.' );
 		return root;
