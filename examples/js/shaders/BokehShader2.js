@@ -60,7 +60,7 @@ THREE.BokehShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -373,6 +373,6 @@ THREE.BokehShader = {
 			"gl_FragColor.a = 1.0;",
 		"} "
 
-	].join("\n")
+	].join( "\n" )
 
 };

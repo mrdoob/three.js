@@ -26,7 +26,7 @@ THREE.SepiaShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -49,6 +49,6 @@ THREE.SepiaShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

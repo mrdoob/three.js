@@ -188,7 +188,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.min.set( -_canvasWidthHalf, -_canvasHeightHalf );
+		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
 		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
@@ -828,7 +828,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			texture instanceof THREE.CompressedTexture ||
 			texture instanceof THREE.DataTexture ) {
 
-				return {
+			return {
 					canvas: undefined,
 					version: texture.version
 				}

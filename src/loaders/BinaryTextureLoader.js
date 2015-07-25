@@ -31,7 +31,7 @@ THREE.BinaryTextureLoader.prototype = {
 
 			var texData = scope._parser( buffer );
 
-			if ( !texData ) return;
+			if ( ! texData ) return;
 
 			if ( undefined !== texData.image ) {
 

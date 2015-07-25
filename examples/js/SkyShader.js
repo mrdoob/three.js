@@ -14,15 +14,15 @@
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-THREE.ShaderLib['sky'] = {
+THREE.ShaderLib[ 'sky' ] = {
 
 	uniforms: {
 
-		luminance:	 { type: "f", value:1 },
-		turbidity:	 { type: "f", value:2 },
-		reileigh:	 { type: "f", value:1 },
-		mieCoefficient:	 { type: "f", value:0.005 },
-		mieDirectionalG: { type: "f", value:0.8 },
+		luminance:	 { type: "f", value: 1 },
+		turbidity:	 { type: "f", value: 2 },
+		reileigh:	 { type: "f", value: 1 },
+		mieCoefficient:	 { type: "f", value: 0.005 },
+		mieDirectionalG: { type: "f", value: 0.8 },
 		sunPosition: 	 { type: "v3", value: new THREE.Vector3() }
 
 	},
@@ -40,7 +40,7 @@ THREE.ShaderLib['sky'] = {
 
 		"}",
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -235,7 +235,7 @@ THREE.ShaderLib['sky'] = {
 			"gl_FragColor.a = 1.0;",
 		"}",
 
-	].join("\n")
+	].join( "\n" )
 
 };
 

@@ -188,8 +188,8 @@ THREE.MorphAnimMesh.prototype.interpolateTargets = function ( a, b, t ) {
 
 	}
 
-	if ( a > -1 ) influences[ a ] = 1 - t;
-	if ( b > -1 ) influences[ b ] = t;
+	if ( a > - 1 ) influences[ a ] = 1 - t;
+	if ( b > - 1 ) influences[ b ] = t;
 
 };
 

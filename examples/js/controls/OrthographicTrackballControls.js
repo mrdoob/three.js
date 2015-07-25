@@ -8,7 +8,7 @@
 THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	var _this = this;
-	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
+	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -186,7 +186,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	}() );
 
-	this.rotateCamera = (function() {
+	this.rotateCamera = ( function() {
 
 		var axis = new THREE.Vector3(),
 			quaternion = new THREE.Quaternion();
@@ -202,7 +202,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 				angle *= _this.rotateSpeed;
 
-				quaternion.setFromAxisAngle( axis, -angle );
+				quaternion.setFromAxisAngle( axis, - angle );
 
 				_eye.applyQuaternion( quaternion );
 				_this.object.up.applyQuaternion( quaternion );
@@ -223,9 +223,10 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 				_changed = true;
 
 			}
+
 		}
 
-	}());
+	}() );
 
 	this.zoomCamera = function () {
 
@@ -264,7 +265,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.panCamera = (function() {
+	this.panCamera = ( function() {
 
 		var mouseChange = new THREE.Vector2(),
 			objectUp = new THREE.Vector3(),
@@ -301,21 +302,22 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 				_changed = true;
 
 			}
+
 		}
 
-	}());
+	}() );
 
 	this.update = function () {
 
 		_eye.subVectors( _this.object.position, _this.target );
 
-		if ( !_this.noRotate ) {
+		if ( ! _this.noRotate ) {
 
 			_this.rotateCamera();
 
 		}
 
-		if ( !_this.noZoom ) {
+		if ( ! _this.noZoom ) {
 
 			_this.zoomCamera();
 
@@ -327,7 +329,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		}
 
-		if ( !_this.noPan ) {
+		if ( ! _this.noPan ) {
 
 			_this.panCamera();
 
@@ -385,15 +387,15 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			return;
 
-		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && !_this.noRotate ) {
+		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && ! _this.noRotate ) {
 
 			_state = STATE.ROTATE;
 
-		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && !_this.noZoom ) {
+		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && ! _this.noZoom ) {
 
 			_state = STATE.ZOOM;
 
-		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && !_this.noPan ) {
+		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && ! _this.noPan ) {
 
 			_state = STATE.PAN;
 
@@ -424,20 +426,20 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		}
 
-		if ( _state === STATE.ROTATE && !_this.noRotate ) {
+		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
 
 			_rotateStart.copy( getMouseProjectionOnBall( event.pageX, event.pageY ) );
 			_rotateEnd.copy( _rotateStart );
 
-		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
+		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
 
 			_zoomStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_zoomEnd.copy(_zoomStart);
+			_zoomEnd.copy( _zoomStart );
 
-		} else if ( _state === STATE.PAN && !_this.noPan ) {
+		} else if ( _state === STATE.PAN && ! _this.noPan ) {
 
 			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_panEnd.copy(_panStart)
+			_panEnd.copy( _panStart )
 
 		}
 
@@ -455,15 +457,15 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( _state === STATE.ROTATE && !_this.noRotate ) {
+		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
 
 			_rotateEnd.copy( getMouseProjectionOnBall( event.pageX, event.pageY ) );
 
-		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
+		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
 
 			_zoomEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 
-		} else if ( _state === STATE.PAN && !_this.noPan ) {
+		} else if ( _state === STATE.PAN && ! _this.noPan ) {
 
 			_panEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 
@@ -495,11 +497,15 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 		var delta = 0;
 
-		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+		if ( event.wheelDelta ) {
+
+			// WebKit / Opera / Explorer 9
 
 			delta = event.wheelDelta / 40;
 
-		} else if ( event.detail ) { // Firefox
+		} else if ( event.detail ) {
+
+			// Firefox
 
 			delta = - event.detail / 3;
 
@@ -600,7 +606,11 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	}
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	this.domElement.addEventListener( 'contextmenu', function ( event ) {
+
+		event.preventDefault();
+
+	}, false );
 
 	this.domElement.addEventListener( 'mousedown', mousedown, false );
 

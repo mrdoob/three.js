@@ -7,7 +7,7 @@
  * @author Jonas Wagner / http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
  */
 
-THREE.ShaderLib['water'] = {
+THREE.ShaderLib[ 'water' ] = {
 
 	uniforms: { "normalSampler":	{ type: "t", value: null },
 				"mirrorSampler":	{ type: "t", value: null },
@@ -35,7 +35,7 @@ THREE.ShaderLib['water'] = {
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
 		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 		'}'
-	].join('\n'),
+	].join( '\n' ),
 
 	fragmentShader: [
 		'precision highp float;',
@@ -98,7 +98,7 @@ THREE.ShaderLib['water'] = {
 		'	vec3 albedo = mix( sunColor * diffuseLight * 0.3 + scatter, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance );',
 		'	gl_FragColor = vec4( albedo, alpha );',
 		'}'
-	].join('\n')
+	].join( '\n' )
 
 };
 
@@ -108,7 +108,9 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.name = 'water_' + this.id;
 
 	function optionalParameter ( value, defaultValue ) {
+
 		return value !== undefined ? value : defaultValue;
+
 	}
 
 	options = options || {};
@@ -134,15 +136,16 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.mirrorWorldPosition = new THREE.Vector3();
 	this.cameraWorldPosition = new THREE.Vector3();
 	this.rotationMatrix = new THREE.Matrix4();
-	this.lookAtPosition = new THREE.Vector3( 0, 0, -1 );
+	this.lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	this.clipPlane = new THREE.Vector4();
 	
 	if ( camera instanceof THREE.PerspectiveCamera )
 		this.camera = camera;
-	else 
-	{
+	else {
+
 		this.camera = new THREE.PerspectiveCamera();
-		console.log(this.name + ': camera is not a Perspective Camera!')
+		console.log( this.name + ': camera is not a Perspective Camera!' )
+
 	}
 
 	this.textureMatrix = new THREE.Matrix4();
@@ -174,16 +177,18 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	this.material.uniforms.eye.value = this.eye;
 	
-	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo(height) )
-	{
+	if ( ! THREE.Math.isPowerOfTwo( width ) || ! THREE.Math.isPowerOfTwo( height ) ) {
+
 		this.texture.generateMipmaps = false;
 		this.texture.minFilter = THREE.LinearFilter;
 		this.tempTexture.generateMipmaps = false;
 		this.tempTexture.minFilter = THREE.LinearFilter;
+
 	}
 
 	this.updateTextureMatrix();
 	this.render();
+
 };
 
 THREE.Water.prototype = Object.create( THREE.Mirror.prototype );
@@ -192,7 +197,11 @@ THREE.Water.prototype.constructor = THREE.Water;
 
 THREE.Water.prototype.updateTextureMatrix = function () {
 
-	function sign(x) { return x ? x < 0 ? -1 : 1 : 0; }
+	function sign( x ) {
+
+		return x ? x < 0 ? - 1 : 1 : 0;
+
+	}
 
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
@@ -211,7 +220,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	this.rotationMatrix.extractRotation( this.camera.matrixWorld );
 
-	this.lookAtPosition.set(0, 0, -1);
+	this.lookAtPosition.set( 0, 0, - 1 );
 	this.lookAtPosition.applyMatrix4( this.rotationMatrix );
 	this.lookAtPosition.add( this.cameraWorldPosition );
 
@@ -219,7 +228,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	target.reflect( this.normal ).negate();
 	target.add( this.mirrorWorldPosition );
 
-	this.up.set(0, -1, 0);
+	this.up.set( 0, - 1, 0 );
 	this.up.applyMatrix4( this.rotationMatrix );
 	this.up.reflect( this.normal ).negate();
 
@@ -230,43 +239,44 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	this.mirrorCamera.updateProjectionMatrix();
 	this.mirrorCamera.updateMatrixWorld();
-	this.mirrorCamera.matrixWorldInverse.getInverse(this.mirrorCamera.matrixWorld);
+	this.mirrorCamera.matrixWorldInverse.getInverse( this.mirrorCamera.matrixWorld );
 
 	// Update the texture matrix
 	this.textureMatrix.set( 0.5, 0.0, 0.0, 0.5,
 							0.0, 0.5, 0.0, 0.5,
 							0.0, 0.0, 0.5, 0.5,
 							0.0, 0.0, 0.0, 1.0 );
-	this.textureMatrix.multiply(this.mirrorCamera.projectionMatrix);
-	this.textureMatrix.multiply(this.mirrorCamera.matrixWorldInverse);
+	this.textureMatrix.multiply( this.mirrorCamera.projectionMatrix );
+	this.textureMatrix.multiply( this.mirrorCamera.matrixWorldInverse );
 
 	// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 	// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
 	this.mirrorPlane.setFromNormalAndCoplanarPoint( this.normal, this.mirrorWorldPosition );
-	this.mirrorPlane.applyMatrix4(this.mirrorCamera.matrixWorldInverse);
+	this.mirrorPlane.applyMatrix4( this.mirrorCamera.matrixWorldInverse );
 
-	this.clipPlane.set(this.mirrorPlane.normal.x, this.mirrorPlane.normal.y, this.mirrorPlane.normal.z, this.mirrorPlane.constant );
+	this.clipPlane.set( this.mirrorPlane.normal.x, this.mirrorPlane.normal.y, this.mirrorPlane.normal.z, this.mirrorPlane.constant );
 
 	var q = new THREE.Vector4();
 	var projectionMatrix = this.mirrorCamera.projectionMatrix;
 
-	q.x = (sign(this.clipPlane.x) + projectionMatrix.elements[8]) / projectionMatrix.elements[0];
-	q.y = (sign(this.clipPlane.y) + projectionMatrix.elements[9]) / projectionMatrix.elements[5];
-	q.z = -1.0;
-	q.w = (1.0 + projectionMatrix.elements[10]) / projectionMatrix.elements[14];
+	q.x = ( sign( this.clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+	q.y = ( sign( this.clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
+	q.z = - 1.0;
+	q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
 	// Calculate the scaled plane vector
 	var c = new THREE.Vector4();
-	c = this.clipPlane.multiplyScalar( 2.0 / this.clipPlane.dot(q) );
+	c = this.clipPlane.multiplyScalar( 2.0 / this.clipPlane.dot( q ) );
 
 	// Replacing the third row of the projection matrix
-	projectionMatrix.elements[2] = c.x;
-	projectionMatrix.elements[6] = c.y;
-	projectionMatrix.elements[10] = c.z + 1.0 - this.clipBias;
-	projectionMatrix.elements[14] = c.w;
+	projectionMatrix.elements[ 2 ] = c.x;
+	projectionMatrix.elements[ 6 ] = c.y;
+	projectionMatrix.elements[ 10 ] = c.z + 1.0 - this.clipBias;
+	projectionMatrix.elements[ 14 ] = c.w;
 	
 	var worldCoordinates = new THREE.Vector3();
 	worldCoordinates.setFromMatrixPosition( this.camera.matrixWorld );
 	this.eye = worldCoordinates;
 	this.material.uniforms.eye.value = this.eye;
+
 };

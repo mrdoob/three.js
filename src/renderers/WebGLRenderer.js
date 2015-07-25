@@ -118,7 +118,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lights = {
 
 		ambient: [ 0, 0, 0 ],
-		directional: { length: 0, colors:[], positions: [] },
+		directional: { length: 0, colors: [], positions: [] },
 		point: { length: 0, colors: [], positions: [], distances: [], decays: [] },
 		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], decays: [] },
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
@@ -171,7 +171,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _gl === null ) {
 
-			if ( _canvas.getContext( 'webgl') !== null ) {
+			if ( _canvas.getContext( 'webgl' ) !== null ) {
 
 				throw 'Error creating WebGL context with your selected attributes.';
 
@@ -815,7 +815,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					ny = ( nay + nby + ncy ) / 3;
 					nz = ( naz + nbz + ncz ) / 3;
 
-					normalArray[ i     ] = nx;
+					normalArray[ i ] = nx;
 					normalArray[ i + 1 ] = ny;
 					normalArray[ i + 2 ] = nz;
 
@@ -905,7 +905,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					var size = geometryAttribute.itemSize;
 					state.enableAttribute( programAttribute );
 
-					var buffer = objects.getAttributeBuffer(geometryAttribute);
+					var buffer = objects.getAttributeBuffer( geometryAttribute );
 
 					if ( geometryAttribute instanceof THREE.InterleavedBufferAttribute ) {
 
@@ -1103,7 +1103,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var type, size;
 
-			var indexBuffer = objects.getAttributeBuffer(index);
+			var indexBuffer = objects.getAttributeBuffer( index );
 
 			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
 
@@ -1171,7 +1171,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render indexed triangles
 
-					if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[i].instances > 0 ) {
+					if ( geometry instanceof THREE.InstancedBufferGeometry && offsets[ i ].instances > 0 ) {
 
 						var extension = extensions.get( 'ANGLE_instanced_arrays' );
 
@@ -1182,7 +1182,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						extension.drawElementsInstancedANGLE( mode, offsets[i].count, type, offsets[i].start * size, offsets[i].count, type, offsets[i].instances ); // Draw the instanced meshes
+						extension.drawElementsInstancedANGLE( mode, offsets[ i ].count, type, offsets[ i ].start * size, offsets[ i ].count, type, offsets[ i ].instances ); // Draw the instanced meshes
 
 					} else {
 
@@ -1251,7 +1251,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_infoRender.calls++;
+				_infoRender.calls ++;
 				_infoRender.vertices += position.count;
 				_infoRender.faces += position.array.length / 3;
 
@@ -1267,7 +1267,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( var i = 0, il = offsets.length; i < il; i++ ) {
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
 					// render non-indexed triangles
 
@@ -1282,12 +1282,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					_infoRender.calls++;
+					_infoRender.calls ++;
 					_infoRender.vertices += offsets[ i ].count;
 					_infoRender.faces += ( offsets[ i ].count  ) / 3;
 
 				}
+
 			}
+
 		}
 
 	}
@@ -1309,7 +1311,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var type, size;
 
-			var indexBuffer = objects.getAttributeBuffer(index);
+			var indexBuffer = objects.getAttributeBuffer( index );
 
 			if ( index.array instanceof Uint32Array && extensions.get( 'OES_element_index_uint' ) ) {
 
@@ -1443,7 +1445,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_gl.drawElements( mode, index.array.length, type, 0);
+				_gl.drawElements( mode, index.array.length, type, 0 );
 
 				_infoRender.calls ++;
 				_infoRender.points += index.array.length;
@@ -1972,7 +1974,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var code = chunks.join();
 		var programChange = true;
 
-		if ( !materialProperties.program ) {
+		if ( ! materialProperties.program ) {
 
 			// new material
 			material.addEventListener( 'dispose', onMaterialDispose );
@@ -2094,7 +2096,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var location = uniformLocations[ u ];
 
 			if ( location ) {
+
 				materialProperties.uniformsList.push( [ materialProperties.__webglShader.uniforms[ u ], location ] );
+
 			}
 
 		}
@@ -2164,7 +2168,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.id !== _currentMaterialId ) {
 
-			if ( _currentMaterialId === -1 ) refreshLights = true;
+			if ( _currentMaterialId === - 1 ) refreshLights = true;
 			_currentMaterialId = material.id;
 
 			refreshMaterial = true;
@@ -2288,13 +2292,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 					refreshLights = true;
 					setupLights( lights );
 					_lightsNeedUpdate = false;
+
 				}
 
 				if ( refreshLights ) {
+
 					refreshUniformsLights( m_uniforms, _lights );
 					markUniformsLightsNeedsUpdate( m_uniforms, true );
+
 				} else {
+
 					markUniformsLightsNeedsUpdate( m_uniforms, false );
+
 				}
 
 			}
@@ -2926,7 +2935,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( ! texture ) continue;
 
 					if ( texture instanceof THREE.CubeTexture ||
-						 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) { // CompressedTexture can have Array in image :/
+						 ( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
+
+						// CompressedTexture can have Array in image :/
 
 						setCubeTexture( texture, textureUnit );
 
@@ -3341,7 +3352,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-					if ( getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
+					if ( getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
 						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -3359,7 +3370,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		} else { // regular Texture (image, video, canvas)
+		} else {
+
+			// regular Texture (image, video, canvas)
 
 			// use manually created mipmaps if available
 			// if there are no manual mipmaps
@@ -3523,7 +3536,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( texture.format !== THREE.RGBAFormat && texture.format !== THREE.RGBFormat ) {
 
-								if ( getCompressedTextureFormats().indexOf( glFormat ) > -1 ) {
+								if ( getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
 
 									state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -3597,6 +3610,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTarget.width, renderTarget.height );
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 		*/
+
 		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
 
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
@@ -4052,47 +4066,67 @@ THREE.WebGLRenderer = function ( parameters ) {
 	Object.defineProperties( this, {
 		shadowMapEnabled: {
 			get: function () {
+
 				return shadowMap.enabled;
+
 			},
 			set: function ( value ) {
+
 				console.warn( 'THREE.WebGLRenderer: .shadowMapEnabled is now .shadowMap.enabled.' );
 				shadowMap.enabled = value;
+
 			}
 		},
 		shadowMapType: {
 			get: function () {
+
 				return shadowMap.type;
+
 			},
 			set: function ( value ) {
+
 				console.warn( 'THREE.WebGLRenderer: .shadowMapType is now .shadowMap.type.' );
 				shadowMap.type = value;
+
 			}
 		},
 		shadowMapCullFace: {
 			get: function () {
+
 				return shadowMap.cullFace;
+
 			},
 			set: function ( value ) {
+
 				console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace is now .shadowMap.cullFace.' );
 				shadowMap.cullFace = value;
+
 			}
 		},
 		shadowMapDebug: {
 			get: function () {
+
 				return shadowMap.debug;
+
 			},
 			set: function ( value ) {
+
 				console.warn( 'THREE.WebGLRenderer: .shadowMapDebug is now .shadowMap.debug.' );
 				shadowMap.debug = value;
+
 			}
 		},
 		shadowMapCascade: {
 			get: function () {
+
 				return shadowMap.cascade;
+
 			},
 			set: function ( value ) {
+
 				console.warn( 'THREE.WebGLRenderer: .shadowMapCascade is now .shadowMap.cascade.' );
 				shadowMap.cascade = value;
+
 			}
 		}
 	} );

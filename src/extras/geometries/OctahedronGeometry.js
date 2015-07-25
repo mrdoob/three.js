@@ -5,7 +5,7 @@
 THREE.OctahedronGeometry = function ( radius, detail ) {
 
 	var vertices = [
-		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0,- 1, 0,    0, 0, 1,    0, 0,- 1
+		1, 0, 0,   - 1, 0, 0,    0, 1, 0,    0, - 1, 0,    0, 0, 1,    0, 0, - 1
 	];
 
 	var indices = [
@@ -20,6 +20,7 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 		radius: radius,
 		detail: detail
 	};
+
 };
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.PolyhedronGeometry.prototype );

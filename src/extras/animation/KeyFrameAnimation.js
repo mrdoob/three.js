@@ -21,9 +21,9 @@ THREE.KeyFrameAnimation = function ( data ) {
 
 	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
-		var keys = this.data.hierarchy[h].keys,
-			sids = this.data.hierarchy[h].sids,
-			obj = this.hierarchy[h];
+		var keys = this.data.hierarchy[ h ].keys,
+			sids = this.data.hierarchy[ h ].sids,
+			obj = this.hierarchy[ h ];
 
 		if ( keys.length && sids ) {
 
@@ -41,7 +41,7 @@ THREE.KeyFrameAnimation = function ( data ) {
 			}
 
 			obj.matrixAutoUpdate = false;
-			this.data.hierarchy[h].node.updateMatrix();
+			this.data.hierarchy[ h ].node.updateMatrix();
 			obj.matrixWorldNeedsUpdate = true;
 
 		}
@@ -82,15 +82,15 @@ THREE.KeyFrameAnimation.prototype = {
 
 				}
 
-				var keys = this.data.hierarchy[h].keys;
+				var keys = this.data.hierarchy[ h ].keys;
 
-				if (keys.length) {
+				if ( keys.length ) {
 
 					node.animationCache.prevKey = keys[ 0 ];
 					node.animationCache.nextKey = keys[ 1 ];
 
-					this.startTime = Math.min( keys[0].time, this.startTime );
-					this.endTime = Math.max( keys[keys.length - 1].time, this.endTime );
+					this.startTime = Math.min( keys[ 0 ].time, this.startTime );
+					this.endTime = Math.max( keys[ keys.length - 1 ].time, this.endTime );
 
 				}
 

@@ -144,7 +144,9 @@ THREE.WebGLObjects = function ( gl, properties, info ) {
 
 		gl.bindBuffer( bufferType, attributeProperties.__webglBuffer );
 
-		if ( data.updateRange === undefined || data.updateRange.count === -1 ) { // Not using update ranges
+		if ( data.updateRange === undefined || data.updateRange.count === - 1 ) {
+
+			// Not using update ranges
 
 			gl.bufferSubData( bufferType, 0, data.array );
 

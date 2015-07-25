@@ -43,12 +43,12 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 
 			var x = ix * segment_width - width_half;
 
-			vertices[ offset     ] = x;
+			vertices[ offset ] = x;
 			vertices[ offset + 1 ] = - y;
 
 			normals[ offset + 2 ] = 1;
 
-			uvs[ offset2     ] = ix / gridX;
+			uvs[ offset2 ] = ix / gridX;
 			uvs[ offset2 + 1 ] = 1 - ( iy / gridY );
 
 			offset += 3;
@@ -71,7 +71,7 @@ THREE.PlaneBufferGeometry = function ( width, height, widthSegments, heightSegme
 			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 			var d = ( ix + 1 ) + gridX1 * iy;
 
-			indices[ offset     ] = a;
+			indices[ offset ] = a;
 			indices[ offset + 1 ] = b;
 			indices[ offset + 2 ] = d;
 

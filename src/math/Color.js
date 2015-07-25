@@ -433,6 +433,7 @@ THREE.Color.prototype = {
 		array[ offset + 2 ] = this.b;
 
 		return array;
+
 	},
 
 	clone: function () {

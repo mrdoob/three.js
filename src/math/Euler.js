@@ -291,6 +291,7 @@ THREE.Euler.prototype = {
 		array[ offset + 3 ] = this._order;
 
 		return array;
+
 	},
 
 	toVector3: function ( optionalResult ) {

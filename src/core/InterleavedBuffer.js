@@ -12,7 +12,7 @@ THREE.InterleavedBuffer = function ( array, stride, dynamic ) {
 	this.version = 0;
 
 	this.dynamic = dynamic || false;
-	this.updateRange = { offset: 0, count: -1 };
+	this.updateRange = { offset: 0, count: - 1 };
 
 };
 
@@ -43,7 +43,7 @@ THREE.InterleavedBuffer.prototype = {
 		index1 *= this.stride;
 		index2 *= attribute.stride;
 
-		for ( var i = 0, l = this.stride; i < l; i++ ) {
+		for ( var i = 0, l = this.stride; i < l; i ++ ) {
 
 			this.array[ index1 + i ] = attribute.array[ index2 + i ];
 
