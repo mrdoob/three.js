@@ -886,6 +886,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		state.initAttributes();
+
 		var geometryAttributes = geometry.attributes;
 
 		var programAttributes = program.getAttributes();
@@ -964,6 +966,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
 					var value = materialDefaultAttributeValues[ name ];
+
 					if ( value !== undefined ) {
 
 						switch ( value.length ) {
@@ -1014,12 +1017,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_currentGeometryProgram = geometryProgram;
 			updateBuffers = true;
-
-		}
-
-		if ( updateBuffers ) {
-
-			state.initAttributes();
 
 		}
 
