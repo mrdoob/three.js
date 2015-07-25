@@ -23,9 +23,9 @@ THREE.AudioListener.prototype.updateMatrixWorld = ( function () {
 
 	var orientation = new THREE.Vector3();
 
-	return function updateMatrixWorld( recursive, parentChanged ) {
+	return function updateMatrixWorld( updateChildren, updateParents ) {
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this, recursive, parentChanged );
+		THREE.Object3D.prototype.updateMatrixWorld.call( this, updateChildren, updateParents );
 
 		var listener = this.context.listener;
 		var up = this.up;

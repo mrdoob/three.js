@@ -627,7 +627,7 @@ THREE.Object3D.prototype = {
 
 	} )(),
 
-	updateMatrixWorld: function ( recursive, parentChanged ) {
+	updateMatrixWorld: function ( updateChildren, updateParents ) {
 
 		var parent = this.parent; 
 		
@@ -654,7 +654,7 @@ THREE.Object3D.prototype = {
 		} else {
 		
 			// first update parents before check matrixWorldNeedsUpdate
-			if ( parentChanged !== false ) {
+			if ( updateParents !== false ) {
 
 				parent.updateMatrixWorld( );
 
@@ -672,7 +672,7 @@ THREE.Object3D.prototype = {
 		this.matrixWorldNeedsUpdate = false;
 
 		// update children
-		if ( recursive === true ) { 
+		if ( updateChildren === true ) { 
 			
 			var children = this.children;
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
