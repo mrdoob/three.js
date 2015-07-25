@@ -35,7 +35,7 @@ if ( typeof module === 'object' ) {
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
 			var id = self.setTimeout( function () {
 
-				callback( currTime + timeToCall )
+				callback( currTime + timeToCall );
 
 			}, timeToCall );
 			lastTime = currTime + timeToCall;
@@ -49,7 +49,7 @@ if ( typeof module === 'object' ) {
 
 		self.cancelAnimationFrame = function ( id ) {
 
-			self.clearTimeout( id )
+			self.clearTimeout( id );
 
 		};
 
@@ -20635,11 +20635,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 				var influence = activeInfluences[ i ];
 				morphInfluences[ i ] = influence[ 0 ];
 
-				var attribute = geometry.morphAttributes[ influence[ 1 ] ];
 
-				objects.updateAttribute( attribute );
+				if ( influence[ 0 ] !== 0 ) {
 
-				geometry.addAttribute( 'morphTarget' + i, attribute );
+					var attribute = geometry.morphAttributes[ influence[ 1 ] ];
+
+					objects.updateAttribute( attribute );
+
+					geometry.addAttribute( 'morphTarget' + i, attribute );
+
+				}
 
 			}
 
@@ -28647,7 +28652,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			for ( j = 1; j <= n; j ++ ) {
 
-				points.push( spline.getPointAt( j / n ) ) ;
+				points.push( spline.getPointAt( j / n ) );
 
 			}
 
@@ -31975,7 +31980,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	// Variables initialization 
+	// Variables initialization
 
 	var ahole, h, hl; // looping of holes
 	var scope = this;
@@ -31987,7 +31992,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = ! THREE.Shape.Utils.isClockWise( vertices ) ;
+	var reverse = ! THREE.Shape.Utils.isClockWise( vertices );
 
 	if ( reverse ) {
 
@@ -32214,8 +32219,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		z = bevelThickness * ( 1 - t );
 
 		//z = bevelThickness * t;
-		bs = bevelSize * ( Math.sin ( t * Math.PI / 2 ) ) ; // curved
-		//bs = bevelSize * t ; // linear
+		bs = bevelSize * ( Math.sin ( t * Math.PI / 2 ) ); // curved
+		//bs = bevelSize * t; // linear
 
 		// contract shape
 
@@ -32314,7 +32319,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		t = b / bevelSegments;
 		z = bevelThickness * ( 1 - t );
 		//bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
-		bs = bevelSize * Math.sin ( t * Math.PI / 2 ) ;
+		bs = bevelSize * Math.sin ( t * Math.PI / 2 );
 
 		// contract shape
 
@@ -32369,7 +32374,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		if ( bevelEnabled ) {
 
-			var layer = 0 ; // steps + 1
+			var layer = 0; // steps + 1
 			var offset = vlen * layer;
 
 			// Bottom faces
