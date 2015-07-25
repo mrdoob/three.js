@@ -87,9 +87,9 @@ var buildModule = function ( name, version ) {
 var cmdExe, args;
 if (process.platform === 'win32' || process.platform === 'win64') {
 	cmdExe = "cmd.exe";
-	args = [ "/c", "build_all.bat" ];
+	args = [ "/c", "build.bat" ];
 } else {
-	cmdExe = './build_all.sh';
+	cmdExe = './build.sh';
 	args = [];
 }
 var opts = { "cwd": "../build" };
