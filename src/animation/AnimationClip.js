@@ -158,6 +158,8 @@ THREE.AnimationClip.prototype = {
 };
 
 
+// TODO: Fix this for loops.
+// TODO: Test this
 THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration ) {
 
 	var tracks = [];
@@ -272,6 +274,25 @@ THREE.AnimationClip.CreatePulsationAnimation = function( duration, pulseScale ) 
 
 	var clip = new THREE.AnimationClip( 'scale' + duration, duration, [ track ] );
 	console.log( 'scaleClip', clip );
+
+	return clip;
+};
+
+
+THREE.AnimationClip.CreateMaterialColorAnimation = function( duration, colors, loop ) {
+
+	var timeStep = duration / colors.length;
+	var keys = [];
+	for( var i = 0; i <= colors.length; i ++ ) {
+		keys.push( { time: i * timeStep, value: colors[ i % colors.length ] } );
+	}
+
+	var trackName = '.material[0].color';
+
+	var track = new THREE.KeyframeTrack( trackName, keys );
+
+	var clip = new THREE.AnimationClip( 'colorDiffuse', 10, [ track ] );
+	console.log( 'diffuseClip', clip );
 
 	return clip;
 };

@@ -16,8 +16,9 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 	this.directoryName = parseResults.directoryName || null;
 	this.nodeName = parseResults.nodeName;
 	this.material = parseResults.material;
+	this.materialIndex = parseResults.materialIndex;
 	this.propertyName = parseResults.propertyName || null;
-	this.propertySubElement = parseResults.propertySubElement || -1;
+	this.propertyIndex = parseResults.propertyIndex || -1;
 
 	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName );
 
@@ -41,19 +42,27 @@ THREE.PropertyBinding.prototype = {
 
 		if( this.material ) {
 			targetObject = targetObject.material;
+			if( this.materialIndex !== undefined && this.materialIndex !== null && this.materialIndex >= 0 ) {
+				if( targetObject.materials ) {
+					targetObject = targetObject.materials[ this.materialIndex ];
+				}
+				else {
+					console.log( "  trying to submaterial via index, but no materials exist:", targetObject );				
+				}
+			}
 		}
 
  		// ensure there is a value property on the node
 		var nodeProperty = targetObject[ this.propertyName ];
 		if( ! nodeProperty ) {
-			console.log( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", this );				
+			console.log( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
 			return;
 		}
 
 		// access a sub element of the property array (only primitives are supported right now)
-		if( ( this.propertySubElement.length && this.propertySubElement.length > 0 ) || this.propertySubElement >= 0 ) {
-			console.log( '  update property array ' + this.propertyName + '[' + this.propertySubElement + '] via assignment.' );				
-			nodeProperty[ this.propertySubElement ] = value;
+		if( ( this.propertyIndex.length && this.propertyIndex.length > 0 ) || this.propertyIndex >= 0 ) {
+			console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
+			nodeProperty[ this.propertyIndex ] = value;
 		}
 		// must use copy for Object3D.Euler/Quaternion		
 		else if( nodeProperty.copy ) {
@@ -99,7 +108,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 	//    parentName/parentName/nodeName.property[index]
 	// created and tested via https://regex101.com/#javascript
 
-	var re = /^(([\w]+\/)*)([\w-]+)?(\.material)?(\.([\w]+)(\[([\w]+)\])?)?$/; 
+	var re = /^(([\w]+\/)*)([\w-]+)?(\.material(\[([\w]+)\])?)?(\.([\w]+)(\[([\w]+)\])?)?$/; 
 	var matches = re.exec(trackName);
 
 	if( ! matches ) {
@@ -114,8 +123,9 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 		directoryName: matches[0],
 		nodeName: matches[3], 	// allowed to be null, specified root node.
 		material: ( matches[4] && matches[4].length > 0 ),
-		propertyName: matches[6],
-		propertySubElement: matches[8]	// allowed to be null, specifies that the whole property is set.
+		materialIndex: matches[6],
+		propertyName: matches[8],
+		propertyIndex: matches[10]	// allowed to be null, specifies that the whole property is set.
 	};
 
 	console.log( "PropertyBinding.parseTrackName", trackName, results, matches );

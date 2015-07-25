@@ -260,9 +260,9 @@
 
 				//var clip = THREE.AnimationClip.CreateShakeAnimation( 10, new THREE.Vector3( 10, 10, 10 ) );
 				//var clip = THREE.AnimationClip.CreatePulsationAnimation( 10, 100 );
-				//var clip = THREE.AnimationClip.CreateRotationAnimation( 10, 'x' );
-				var clip = THREE.AnimationClip.CreateScaleAxisAnimation( 10, 'x' );
-
+				//var clip = THREE.AnimationClip.CreateRotationAnimation( 100, 'y' );
+				//var clip = THREE.AnimationClip.CreateScaleAxisAnimation( 10, 'x' );
+				var clip = THREE.AnimationClip.CreateMaterialColorAnimation( 10, [ new THREE.Color( 0xffffff ), new THREE.Color( 0xff0000 ), new THREE.Color( 0xff00ff ) ] );
 
 				mixer.addAction( new THREE.AnimationAction( clip, 0, 1, 1, true ) );
 
