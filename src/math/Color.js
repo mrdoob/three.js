@@ -105,10 +105,26 @@ THREE.Color.prototype = {
 
 	setStyle: function ( style ) {
 
+		var parseAlpha = function ( strAlpha ) {
+
+			var alpha = parseFloat( strAlpha );
+
+			if ( alpha < 1 ) {
+
+				console.warn( 'THREE.Color: Alpha component of color ' + style + ' will be ignored.' );
+
+			}
+
+			return alpha;
+
+		}
+
+
 		var m;
 
-		// rgb / hsl
 		if ( m = /^((?:rgb|hsl)a?)\(\s*([^\)]*)\)/.exec( style ) ) {
+
+			// rgb / hsl
 
 			var color;
 			var name = m[ 1 ];
@@ -117,9 +133,8 @@ THREE.Color.prototype = {
 			switch ( name ) {
 
 				case 'rgb':
-				case 'rgba':
 
-					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec( components ) ) {
+					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*$/.exec( components ) ) {
 
 						// rgb(255,0,0)
 						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
@@ -130,7 +145,7 @@ THREE.Color.prototype = {
 
 					}
 
-					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%/.exec( components ) ) {
+					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*$/.exec( components ) ) {
 
 						// rgb(100%,0%,0%)
 						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
@@ -143,13 +158,40 @@ THREE.Color.prototype = {
 
 					break;
 
-				case 'hsl':
-				case 'hsla':
+				case 'rgba':
 
-					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%/.exec( components ) ) {
+					if ( color = /^(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+
+						// rgba(255,0,0,0.5)
+						this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
+						this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
+						this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+						parseAlpha( color[ 4 ] );
+
+						return this;
+
+					}
+
+					if ( color = /^(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+
+						// rgba(100%,0%,0%,0.5)
+						this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
+						this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
+						this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+						parseAlpha( color[ 4 ] );
+
+						return this;
+
+					}
+
+					break;
+
+				case 'hsl':
+
+					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*$/.exec( components ) ) {
 
 						// hsl(120,50%,50%)
-						var h = parseFloat( color[ 1 ], 10 );
+						var h = parseFloat( color[ 1 ] );
 						var s = parseInt( color[ 2 ], 10 ) / 100;
 						var l = parseInt( color[ 3 ], 10 ) / 100;
 
@@ -159,33 +201,43 @@ THREE.Color.prototype = {
 
 					break;
 
+				case 'hsla':
+
+					if ( color = /^([0-9]*\.?[0-9]+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*([0-9]*\.?[0-9]+)\s*$/.exec( components ) ) {
+
+						// hsla(120,50%,50%,0.5)
+						var h = parseFloat( color[ 1 ] );
+						var s = parseInt( color[ 2 ], 10 ) / 100;
+						var l = parseInt( color[ 3 ], 10 ) / 100;
+						parseAlpha( color[ 4 ] );
+
+						return this.setHSL( h, s, l );
+
+					}
+
+					break;
+
 			}
 
-			// unknown color
-			return this;
+		} else if ( m = /^\#([A-Fa-f0-9]+)$/.exec( style ) ) {
 
-		}
-
-		// hex
-		if ( m = /^\#([A-Fa-f0-9]+)$/.exec( style ) ) {
+			// hex color
 
 			var hex = m[ 1 ];
 			var size = hex.length;
 
 			if ( size === 3 ) {
 
-				// # ff0
+				// #ff0
 				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
 				this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
 				this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
 
 				return this;
 
-			}
+			} else if ( size === 6 ) {
 
-			if ( size === 6 ) {
-
-				// #fa11ac
+				// #ff0000
 				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
 				this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
 				this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
@@ -194,22 +246,27 @@ THREE.Color.prototype = {
 
 			}
 
-			// unknown color
-			return this;
+		}
+
+		if ( style && style.length > 0 ) {
+
+			// color keywords
+			var hex = THREE.ColorKeywords[ style ];
+
+			if ( hex !== undefined ) {
+
+				// red
+				this.setHex( hex );
+
+			} else {
+
+				// unknown color
+				console.warn( 'THREE.Color: Unknown color ' + style );
+
+			}
 
 		}
 
-		// color keywords
-		if ( /^\w+$/i.test( style ) ) {
-
-			// red
-			this.setHex( THREE.ColorKeywords[ style ] );
-
-			return this;
-
-		}
-
-		// unknown color
 		return this;
 
 	},

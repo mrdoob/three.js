@@ -1,13 +1,14 @@
 {
     "preset": "mdcs",
+    "disallowSpaceAfterPrefixUnaryOperators": ["+", "-"],
     "disallowNewlineBeforeBlockStatements": true,
     "requireSpaceAfterBinaryOperators": [","],
     "disallowKeywordsOnNewLine": ["else"],
-    "excludeFiles": [ 
-        "../../.c9/", 
-        "../../.c9version/", 
-        "../../.git/", 
-        "../../build/", 
+    "excludeFiles": [
+        "../../.c9/",
+        "../../.c9version/",
+        "../../.git/",
+        "../../build/",
         "../../docs/",
         "../../editor/",
         "../../node_modules/",
@@ -28,5 +29,4 @@
         "../../examples/js/SimplexNoise.js",
         "../../examples/js/loaders/UTF8Loader.js"
         ]
-    
 }
