@@ -13,77 +13,132 @@ THREE.PropertyBinding = function ( rootNode, trackName ) {
 
 	var parseResults = THREE.PropertyBinding.parseTrackName( trackName );
 
-	this.directoryName = parseResults.directoryName || null;
+	console.log( parseResults );
+	this.directoryName = parseResults.directoryName;
 	this.nodeName = parseResults.nodeName;
 	this.material = parseResults.material;
 	this.materialIndex = parseResults.materialIndex;
-	this.propertyName = parseResults.propertyName || null;
-	this.propertyIndex = parseResults.propertyIndex || -1;
+	this.propertyName = parseResults.propertyName;
+	this.propertyIndex = parseResults.propertyIndex;
 
 	this.node = THREE.PropertyBinding.findNode( rootNode, this.nodeName );
 
+	this.cumulativeValue = null;
+	this.cumulativeWeight = 0;
 };
 
 THREE.PropertyBinding.prototype = {
 
 	constructor: THREE.PropertyBinding,
 
-	set: function( value ) {
+	reset: function() {
 
-		 console.log( "PropertyBinding.set( " + value + ")" );
+		this.cumulativeValue = null;
+		this.cumulativeWeight = 0;
 
-		 var targetObject = this.node;
+	},
 
- 		// ensure there is a value node
-		if( ! targetObject ) {
-			console.log( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
-			return;
+	accumulate: function( value, weight ) {
+		
+		if( this.cumulativeWeight === 0 ) {
+
+			this.cumulativeValue = value;
+			this.cumulativeWeight = weight;
+
+		}
+		else {
+
+			var lerpAlpha = weight / ( this.cumulativeWeight + weight );
+			this.cumulativeValue = THREE.AnimationUtils.lerp( this.cumulativeValue, value, lerpAlpha );
+			this.cumulativeWeight += weight;
+
 		}
 
-		if( this.material ) {
-			targetObject = targetObject.material;
-			if( this.materialIndex !== undefined && this.materialIndex !== null && this.materialIndex >= 0 ) {
-				if( targetObject.materials ) {
-					targetObject = targetObject.materials[ this.materialIndex ];
-				}
-				else {
-					console.log( "  trying to submaterial via index, but no materials exist:", targetObject );				
+	},
+
+
+	apply: function() {
+
+		if( ! this.internalApply ) {
+
+			 //console.log( "PropertyBinding.set( " + value + ")" );
+
+			 var targetObject = this.node;
+
+	 		// ensure there is a value node
+			if( ! targetObject ) {
+				console.error( "  trying to update node for track: " + this.trackName + " but it wasn't found." );
+				return;
+			}
+
+			if( this.material ) {
+				targetObject = targetObject.material;
+				if( this.materialIndex !== undefined ) {
+					if( targetObject.materials ) {
+						targetObject = targetObject.materials[ this.materialIndex ];
+					}
+					else {
+						console.error( "  trying to submaterial via index, but no materials exist:", targetObject );				
+					}
 				}
 			}
+
+	 		// ensure there is a value property on the node
+			var nodeProperty = targetObject[ this.propertyName ];
+			if( ! nodeProperty ) {
+				console.error( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+				return;
+			}
+
+			// access a sub element of the property array (only primitives are supported right now)
+			if( this.propertyIndex !== undefined ) {
+				//console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
+				this.internalApply = function() {
+					nodeProperty[ this.propertyIndex ] = this.cumulativeValue;
+				};
+			}
+			// must use copy for Object3D.Euler/Quaternion		
+			else if( nodeProperty.copy ) {
+				//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via a set() function.' );				
+				this.internalApply = function() {
+					nodeProperty.copy( this.cumulativeValue );
+				}
+			}
+			// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
+			else {
+				//console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
+				this.internalApply = function() {
+					targetObject[ this.propertyName ] = this.cumulativeValue;	
+				}
+			}
+
+			// trigger node dirty			
+			if( targetObject.needsUpdate !== undefined ) { // material
+				//console.log( '  triggering material as dirty' );
+				this.triggerDirty = function() {
+					this.node.needsUpdate = true;
+				}
+			}			
+			else if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
+				//console.log( '  triggering node as dirty' );
+				this.triggerDirty = function() {
+					targetObject.matrixWorldNeedsUpdate = true;
+				}
+			}
+			else {
+				this.triggerDirty = function() {};
+			}
+
 		}
 
- 		// ensure there is a value property on the node
-		var nodeProperty = targetObject[ this.propertyName ];
-		if( ! nodeProperty ) {
-			console.log( "  trying to update property for track: " + this.nodeName + '.' + this.propertyName + " but it wasn't found.", targetObject );				
+		// early exit if there is nothing to apply.
+		if( this.cumulativeWeight <= 0 ) {
 			return;
 		}
 
-		// access a sub element of the property array (only primitives are supported right now)
-		if( ( this.propertyIndex.length && this.propertyIndex.length > 0 ) || this.propertyIndex >= 0 ) {
-			console.log( '  update property array ' + this.propertyName + '[' + this.propertyIndex + '] via assignment.' );				
-			nodeProperty[ this.propertyIndex ] = value;
-		}
-		// must use copy for Object3D.Euler/Quaternion		
-		else if( nodeProperty.copy ) {
-			console.log( '  update property ' + this.name + '.' + this.propertyName + ' via a set() function.' );				
-			nodeProperty.copy( value );
-		}
-		// otherwise just set the property directly on the node (do not use nodeProperty as it may not be a reference object)
-		else {
-			console.log( '  update property ' + this.name + '.' + this.propertyName + ' via assignment.' );				
-			targetObject[ this.propertyName ] = value;	
-		}
-
-		// trigger node dirty			
-		if( targetObject.needsUpdate !== undefined ) { // material
-			console.log( '  triggering material as dirty' );
-			this.node.needsUpdate = true;
-		}			
-		if( targetObject.matrixWorldNeedsUpdate !== undefined ) { // node transform
-			console.log( '  triggering node as dirty' );
-			targetObject.matrixWorldNeedsUpdate = true;
-		}
+		this.internalApply();
+		this.triggerDirty();
+	
 
 	},
 
@@ -128,7 +183,7 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 		propertyIndex: matches[10]	// allowed to be null, specifies that the whole property is set.
 	};
 
-	console.log( "PropertyBinding.parseTrackName", trackName, results, matches );
+	//console.log( "PropertyBinding.parseTrackName", trackName, results, matches );
 
 	if( results.propertyName === null || results.propertyName.length === 0 ) {
 		throw new Error( "can not parse propertyName from trackName: " + trackName );
@@ -141,11 +196,11 @@ THREE.PropertyBinding.parseTrackName = function( trackName ) {
 // TODO: Cache this at some point
 THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
-	console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')');
+	//console.log( 'AnimationUtils.findNode( ' + root.name + ', nodeName: ' + nodeName + ')');
 	
 	if( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === -1 || nodeName === root.name || nodeName === root.uuid ) {
 
-		console.log( '  root.' );
+		//console.log( '  root.' );
 		return root;
 
 	}
@@ -174,7 +229,7 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		if( bone ) {
 
-			console.log( '  bone: ' + bone.name + '.' );
+			//console.log( '  bone: ' + bone.name + '.' );
 			return bone;
 
 		}
@@ -209,14 +264,14 @@ THREE.PropertyBinding.findNode = function( root, nodeName ) {
 
 		if( subTreeNode ) {
 
-			console.log( '  node: ' + subTreeNode.name + '.' );
+			//console.log( '  node: ' + subTreeNode.name + '.' );
 			return subTreeNode;
 
 		}
 
 	}
 
-	console.log( "   <null>.  No node found for name: " + nodeName );
+	//console.log( "   <null>.  No node found for name: " + nodeName );
 
 	return null;
 }

@@ -23,15 +23,15 @@ THREE.KeyframeTrack.prototype = {
 	constructor: THREE.KeyframeTrack,
 
 	getAt: function( time ) {
-		console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
+		//console.log( 'KeyframeTrack[' + this.name + '].getAt( ' + time + ' )' );
 
 		if( this.keys.length == 0 ) throw new Error( "no keys in track named " + this.name );
 		
-		console.log( "keys", this.keys );
+		//console.log( "keys", this.keys );
 		// before the start of the track, return the first key value
 		if( this.keys[0].time >= time ) {
 
-			console.log( '   before: ' + this.keys[0].value );
+			//console.log( '   before: ' + this.keys[0].value );
 			return this.keys[0].value;
 
 		}
@@ -39,7 +39,7 @@ THREE.KeyframeTrack.prototype = {
 		// past the end of the track, return the last key value
 		if( this.keys[ this.keys.length - 1 ].time <= time ) {
 
-			console.log( '   after: ' + this.keys[ this.keys.length - 1 ].value );
+			//console.log( '   after: ' + this.keys[ this.keys.length - 1 ].value );
 			return this.keys[ this.keys.length - 1 ].value;
 
 		}
@@ -55,14 +55,14 @@ THREE.KeyframeTrack.prototype = {
 
 				var interpolatedValue = THREE.AnimationUtils.lerp( this.keys[ i - 1 ].value, this.keys[ i ].value, alpha );
 
-				console.log( '   interpolated: ', {
+				/*console.log( '   interpolated: ', {
 					value: interpolatedValue, 
 					alpha: alpha,
 					time0: this.keys[ i - 1 ].time,
 					time1: this.keys[ i ].time,
 					value0: this.keys[ i - 1 ].value,
 					value1: this.keys[ i ].value
-				} );
+				} );*/
 
 				return interpolatedValue;
 

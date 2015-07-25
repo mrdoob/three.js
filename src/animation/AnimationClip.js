@@ -29,7 +29,7 @@ THREE.AnimationClip.prototype = {
 		for( var trackIndex in this.tracks ) {
 
 			var track = this.tracks[ trackIndex ];
-			console.log( 'track', track );
+			//console.log( 'track', track );
 
 			results[ track.name ] = track.getAt( clipTime );
 
@@ -191,7 +191,7 @@ THREE.AnimationClip.CreateMorphAnimation = function( morphTargetNames, duration 
 	}
 
 	var clip = new THREE.AnimationClip( 'morphAnimation', duration, tracks );
-	console.log( 'morphAnimationClip', clip );
+	//console.log( 'morphAnimationClip', clip );
 
 	return clip;
 };
@@ -208,7 +208,7 @@ THREE.AnimationClip.CreateRotationAnimation = function( period, axis ) {
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'rotate.x', 10, [ track ] );
-	console.log( 'rotateClip', clip );
+	//console.log( 'rotateClip', clip );
 
 	return clip;
 };
@@ -225,7 +225,7 @@ THREE.AnimationClip.CreateScaleAxisAnimation = function( period, axis ) {
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'scale.x', 10, [ track ] );
-	console.log( 'scaleClip', clip );
+	//console.log( 'scaleClip', clip );
 
 	return clip;
 };
@@ -248,7 +248,7 @@ THREE.AnimationClip.CreateShakeAnimation = function( duration, shakeScale ) {
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'shake' + duration, duration, [ track ] );
-	console.log( 'shakeClip', clip );
+	//console.log( 'shakeClip', clip );
 
 	return clip;
 };
@@ -273,7 +273,7 @@ THREE.AnimationClip.CreatePulsationAnimation = function( duration, pulseScale ) 
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'scale' + duration, duration, [ track ] );
-	console.log( 'scaleClip', clip );
+	//console.log( 'scaleClip', clip );
 
 	return clip;
 };
@@ -292,7 +292,7 @@ THREE.AnimationClip.CreateMaterialColorAnimation = function( duration, colors, l
 	var track = new THREE.KeyframeTrack( trackName, keys );
 
 	var clip = new THREE.AnimationClip( 'colorDiffuse', 10, [ track ] );
-	console.log( 'diffuseClip', clip );
+	//console.log( 'diffuseClip', clip );
 
 	return clip;
 };
