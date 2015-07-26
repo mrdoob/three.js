@@ -52,7 +52,6 @@ THREE.KeyframeTrack.prototype = {
 				// linear interpolation to start with
 				var alpha = ( time - this.keys[ i - 1 ].time ) / ( this.keys[ i ].time - this.keys[ i - 1 ].time );
 
-
 				var interpolatedValue = THREE.AnimationUtils.lerp( this.keys[ i - 1 ].value, this.keys[ i ].value, alpha );
 
 				/*console.log( '   interpolated: ', {

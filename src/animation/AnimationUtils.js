@@ -5,21 +5,22 @@
 
  THREE.AnimationUtils = {
 
- 	getLerpFunc: function( accumulator, b, alpha, interTrack ) {
+ 	// TODO/OPTIMIZATION: do the switch statement once per user of this and cache the resulting function and call it directly.
+ 	// TODO/OPTIMIZATION: Accumulator should be writable and it will get rid of the *.clone() calls that are likely slow.
+ 	lerp: function( accumulator, b, alpha, interTrack ) {
 
-		
-		var typeName = typeof true;
+		var typeName = typeof accumulator;
 		switch( typeName ) {
 		 	case "object": {
 
 				if( accumulator.lerp ) {
 
-					return accumulator.lerp( b, alpha );
+					return accumulator.clone().lerp( b, alpha );
 
 				}
 				if( accumulator.slerp ) {
 
-					return accumulator.lerp( b, alpha );
+					return accumulator.clone().slerp( b, alpha );
 
 				}
 				break;
@@ -44,7 +45,6 @@
 			 	}
 		 	}
 		};
-
 
 	}
 	

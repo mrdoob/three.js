@@ -11,6 +11,8 @@
 THREE.AnimationMixer = function( root ) {
 
 	this.root = root;
+	this.time = 0;
+	this.timeScale = 1.0;
 	this.actions = [];
 	this.propertyBindings = {};
 
@@ -49,7 +51,10 @@ THREE.AnimationMixer.prototype = {
 		}
 	},
 
-	update: function( time ) {
+	update: function( deltaTime ) {
+
+		this.time += deltaTime * this.timeScale;
+
 		//console.log( this.root.name + ".AnimationMixer.update( " + time + " )" );
 
 		for ( var name in this.propertyBindings ) {
@@ -64,7 +69,7 @@ THREE.AnimationMixer.prototype = {
 
 			if( action.weight <= 0 || ! action.enabled ) continue;
 
-			var actionResults = action.getAt( time );
+			var actionResults = action.getAt( this.time );
 
 			for( var name in actionResults ) {
 

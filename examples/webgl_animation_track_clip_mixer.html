@@ -63,8 +63,7 @@
 			var mesh, helper;
 
 			var mixer;
-			var time1 = 0;
-
+		
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -318,8 +317,7 @@
 				//THREE.AnimationHandler.update( delta );
 
 				if( mixer ) {
-					time1 += delta;
-					mixer.update( time1 );
+					mixer.update( delta );
 				}
 				
 				//if ( helper !== undefined ) helper.update();

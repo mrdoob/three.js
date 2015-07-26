@@ -14,7 +14,6 @@ THREE.AnimationAction = function ( clip, startTime, timeScale, weight, loop ) {
 	this.weight = weight || 1;
 	this.loop = loop || clip.loop || false;
 	this.enabled = true;	// allow for easy disabling of the action.
-
 };
 
 THREE.AnimationAction.prototype = {
