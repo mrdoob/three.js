@@ -130,7 +130,7 @@ THREE.BufferGeometry.prototype = {
 
 	setFromObject: function ( object ) {
 
-		console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
+		// console.log( 'THREE.BufferGeometry.setFromObject(). Converting', object, this );
 
 		var geometry = object.geometry;
 
