@@ -57,8 +57,7 @@ THREE.Texture.prototype = {
 
 	clone: function () {
 
-		var texture = new THREE.Texture();
-		return texture.copy( this );
+		return new THREE.Texture().copy( this );
 
 	},
 

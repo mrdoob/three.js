@@ -495,7 +495,7 @@ THREE.Color.prototype = {
 
 	clone: function () {
 
-		return new THREE.Color().setRGB( this.r, this.g, this.b );
+		return new THREE.Color().copy( this );
 
 	}
 

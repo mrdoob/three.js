@@ -669,8 +669,7 @@ THREE.Object3D.prototype = {
 
 	clone: function ( recursive ) {
 
-		var object = new THREE.Object3D();
-		return object.copy( this, recursive );
+		return new THREE.Object3D().copy( this, recursive );
 
 	},
 

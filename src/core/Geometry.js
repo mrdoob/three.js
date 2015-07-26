@@ -1052,8 +1052,7 @@ THREE.Geometry.prototype = {
 
 	clone: function () {
 
-		var geometry = new THREE.Geometry();
-		return geometry.copy( this );
+		return new THREE.Geometry().copy( this );
 
 	},
 

@@ -169,7 +169,6 @@ THREE.MeshPhongMaterial.prototype.copy = function ( source ) {
 
 THREE.MeshPhongMaterial.prototype.clone = function () {
 
-	var material = new THREE.MeshPhongMaterial();
-	return material.copy( this );
+	return new THREE.MeshPhongMaterial().copy( this );
 
 };
