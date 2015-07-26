@@ -59,7 +59,7 @@ THREE.PropertyBinding.prototype = {
 
 	apply: function() {
 
-		// for speed capture the setter pattern as a closure.
+		// for speed capture the setter pattern as a closure (sort of a memoization pattern: https://en.wikipedia.org/wiki/Memoization)
 		if( ! this.internalApply ) {
 
 			 //console.log( "PropertyBinding.set( " + value + ")" );
